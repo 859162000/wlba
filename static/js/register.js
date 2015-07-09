@@ -64,7 +64,7 @@
           $(element).addClass('button-red');
           $(element).removeClass('button-gray');
           result = JSON.parse(xhr.responseText);
-          if (xhr.status > 400) {
+          if (xhr.status >= 400) {
             tool.modalAlert({
               title: '温馨提示',
               msg: result.message,
@@ -242,7 +242,7 @@
         }
       }).fail(function(xhr) {
         element = $('#sendValidateCodeButton');
-        if (xhr.status > 400) {
+        if (xhr.status >= 400) {
           tool.modalAlert({
             title: '温馨提示',
             msg: xhr.message

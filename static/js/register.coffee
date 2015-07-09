@@ -59,7 +59,7 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
         $(element).addClass 'button-red'
         $(element).removeClass 'button-gray'
         result = JSON.parse xhr.responseText
-        if xhr.status > 400
+        if xhr.status >= 400
           tool.modalAlert({title: '温馨提示', msg: result.message, callback_ok: _showModal})
           clearInterval(intervalId)
           $(element).html('重新获取')
@@ -227,7 +227,7 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
         element.html('系统繁忙请尝试短信验证码')
     .fail (xhr)->
       element = $('#sendValidateCodeButton')
-      if xhr.status > 400
+      if xhr.status >= 400
         tool.modalAlert({title: '温馨提示', msg: xhr.message})
         $(element).html('重新获取')
         $(element).prop 'disabled', false
