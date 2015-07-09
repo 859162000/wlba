@@ -587,8 +587,8 @@ class YeeShortPay:
         # if amount < 10 or len(str(amount)) > 20:
         #     return {"ret_code": 20115, 'message': '充值须大于等于10元'}
 
-        if amount > 1 or len(str(amount)) > 20:
-            return {"ret_code": 20115, 'message': '真实交易金额大hold不住'}
+        if len(str(amount)) > 20:
+            return {"ret_code": 20115, 'message': '充值金额太大'}
 
         user = request.user
         profile = user.wanglibaouserprofile
