@@ -56,11 +56,11 @@ html
                           if free == 'yes'
                             span.icon.icon-free 免费
 
-                    +nav-item('首页', '/', '', '')
-                    +nav-item('理财专区', '/p2p/list/', '', '')
-                    +nav-item('基金', '/fund/products', '', '')
-                    +nav-item('安全保障', '/security', 'left-line', '')
-                    +nav-item('帮助中心', '/help', '', '')
+                    +nav-item('首页', 'https://www.wanglibao.com/', '', '')
+                    +nav-item('理财专区', 'https://www.wanglibao.com/p2p/list/', '', '')
+                    +nav-item('自动投标', 'https://www.wanglibao.com/accounts/auto_tender/ ', '', '')
+                    +nav-item('安全保障', 'https://www.wanglibao.com/security/', 'left-line', '')
+                    +nav-item('帮助中心', 'https://www.wanglibao.com/help/', '', '')
 
         .banner
         .act_five
@@ -110,7 +110,7 @@ html
                         span.big >
                 .raiders_box.raiders_box_left.four
                     .title 邀请好友赢话费
-                    p 邀请好友理财，被推荐人获得50元现金礼包，推荐人送30元话费，多邀多送上不封顶（截止到7月15日）
+                    p 邀请好友理财，被推荐人获得50元现金礼包，推荐人送30元话费，多邀多送上不封顶<br>（截止到7月15日）
                     a(href="https://www.wanglibao.com/activity/full_send/")
                         span 立即前往
                         span.big >
@@ -166,6 +166,8 @@ html
                     .process-content 借款期满后自动回款
         .footer(style="background:#a8d2d5")
             include include/activityFooterTwo
+
+            include include/tracking
         script.
             require(['/static/js/hover.js','/static/js/pptv_redpack.js'])
 

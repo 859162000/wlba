@@ -7,9 +7,9 @@
 body{
     font-size:0;
 }
-div,p,a{
-    font-family: Microsoft YaHei,'微软雅黑';
-}
+/*div,p,a{*/
+    /*font-family: Microsoft YaHei,'微软雅黑';*/
+/*}*/
 .banner{
     background:#c5f6f9 url('/static/images/july_act_two/banner.jpg') no-repeat center center;
     width:100%;
