@@ -13,6 +13,11 @@ require.config(
 )
 
 require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.validate', 'tools'], ($, modal, backend, placeholder, validate, tool)->
+  url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v="+(+new Date())
+  $.getJSON url, {}, (json)->
+    $('#withdraw-form').find('input[name="captcha_0"]').val(json.key)
+    $('#withdraw-form').find('img.captcha').attr('src', json.image_url)
+
   $('input, textarea').placeholder()
 
   $('#add-card-button').click (e)->

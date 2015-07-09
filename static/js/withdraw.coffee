@@ -41,6 +41,9 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calcul
         required: true
       validate_code:
         required: true
+      captcha_1:
+        required: true
+        minlength: 1
 
     messages:
       amount:
@@ -53,6 +56,9 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calcul
         required: '请选择银行卡'
       validate_code:
         required: '请输入验证码'
+      captcha_1:
+        required: '不能为空'
+        minlength: $.format("验证码至少输入1位")
 
   if $('#id-is-valid').val() == 'False'
     $('#id-validate').modal()
