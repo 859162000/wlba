@@ -481,7 +481,7 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
             _save_activity_record(rule, user_introduced_by, 'message', content, True)
         if sms_template:
             sms = Template(sms_template)
-            content = sms.render(context) + u'回复TD退订 4008-588-066【网利宝】'
+            content = sms.render(context)
             _send_sms_template(user_introduced_by.wanglibaouserprofile.phone, content)
             _save_activity_record(rule, user_introduced_by, 'sms', content, True)
     else:
@@ -502,7 +502,7 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
             _save_activity_record(rule, user, 'message', content)
         if sms_template:
             sms = Template(sms_template)
-            content = sms.render(context) + u'回复TD退订 4008-588-066【网利宝】'
+            content = sms.render(context)
             _send_sms_template(mobile, content)
             _save_activity_record(rule, user, 'sms', content)
 
