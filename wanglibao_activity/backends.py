@@ -43,6 +43,8 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_f
         return
     channel = helper.which_channel(user)
     #查询符合条件的活动
+    # TODO: 需要将渠道判断重写，从sql中去掉
+    # TODO: 需要将渠道的判断的范围从渠道name缩小为渠道code
     activity_list = Activity.objects.filter(start_at__lt=now, end_at__gt=now, is_stopped=False)\
                                     .filter(Q(channel__contains=channel) | Q(is_all_channel=True))\
                                     .filter(Q(platform=device_type) | Q(platform=u'all')).order_by('-id')
