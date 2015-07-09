@@ -34,6 +34,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     invitecode = forms.CharField(label="Invitecode", required=False)
 
     MlGb = forms.CharField(label='MlGb', required=False)
+    captcha = CaptchaField(error_messages={'invalid': u'验证码错误', 'required': u'请输入验证码'}, required=True)
 
     error_messages = {
         'duplicate_username': u'该邮箱或手机号已经注册',
