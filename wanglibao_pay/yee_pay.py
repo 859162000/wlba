@@ -441,6 +441,11 @@ class YeeShortPay:
         res = requests.post(url, post)
         return self._response_data_change(res=json.loads(res.text))
 
+    def _request_yee_get(self, url, data):
+        post = self._format_post(data)
+        res = requests.get(url, params=post)
+        return self._response_data_change(res=json.loads(res.text))
+
     def _response_data_change(self, res):
         """ 将易宝返回的数据格式化成程序通用数据 """
         if 'error_code' in res:
@@ -452,12 +457,14 @@ class YeeShortPay:
             return {'ret_code': 20012, 'message': '易宝数据有误'}
 
         flag, data = self._response_decode(res=res)
-        if not flag:
-            return {'ret_code': 20011, 'message': '签名验证失败'}
 
         if 'error_code' in data:
             logger.error(data)
             return {'ret_code': data['error_code'], 'message': data['error_msg'], 'data': data}
+
+        if not flag:
+            logger.error(data)
+            return {'ret_code': 20011, 'message': '签名验证失败', 'data': data}
 
         return {'ret_code': 0, 'message': 'ok', 'data': data}
 
@@ -470,6 +477,8 @@ class YeeShortPay:
                 sign = data.pop('sign')
                 if self._verify(data, sign):
                     return True, data
+                else:
+                    return False, data
         return False, res
 
     def _bind_card_request(self, request, phone, card_no, request_id):
@@ -506,7 +515,7 @@ class YeeShortPay:
         post['merchantaccount'] = self.MER_ID
         post['identityid'] = str(user.wanglibaouserprofile.id_number)
         post['identitytype'] = 5
-        return self._request_yee(url=self.BIND_CARD_QUERY, data=post)
+        return self._request_yee_get(url=self.BIND_CARD_QUERY, data=post)
 
     def delete_bind(self, user, card, bank):
         """ 解绑银行卡 """
