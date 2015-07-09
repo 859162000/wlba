@@ -62,6 +62,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         captcha_1 = self.cleaned_data['captcha_1']
         captcha_0 = self.cleaned_data['captcha_0']
         if not captcha_0 and not captcha_1:
+            self._flag = True
             return
 
         if not captcha_0 or not captcha_1:
