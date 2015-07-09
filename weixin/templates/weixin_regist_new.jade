@@ -37,6 +37,7 @@ html(style="background: #f5f5f5")
         .form-icon.user-invitation.invitation-icon
         .form-input
           input(type="tel",name="invitation", placeholder="请填写邀请码，若无，请忽略", data-target2='invitation-icon', data-icon='user-invitation')
+          input(type="hidden", name="token", id="token", value="{{token}}")
           .form-edit-icon
       //注册协议
       section.regist-protocol-n
@@ -73,4 +74,4 @@ html(style="background: #f5f5f5")
           span 返回
       article.xieyi-cont
         include include/weixin_xieyiFixed
-    script(data-init='regist', src="/static/scripts/mobile/mobile.js")
+    script(data-init='regist', src="/static/scripts/mobile/dist/mobile.js?v=20150708")
