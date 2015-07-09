@@ -3,6 +3,9 @@
 
 html
   head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
     link(rel="stylesheet",href="/static/stylesheets/activity.css")
     link(rel="stylesheet",href="/static/css/bootstrap.min.css")
   body
