@@ -232,7 +232,6 @@
           type: "POST"
         }).fail(function(xhr) {
           var result;
-          $.modal.close();
           clearInterval(intervalId);
           $(element).text('重新获取');
           $(element).removeAttr('disabled');

@@ -53,7 +53,6 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
           url: "/api/phone_validation_code/register/" + phoneNumber + "/"
           type: "POST"
       .fail (xhr)->
-        $.modal.close()
         clearInterval(intervalId)
         $(element).text('重新获取')
         $(element).removeAttr 'disabled'
