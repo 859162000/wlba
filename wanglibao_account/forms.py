@@ -171,8 +171,28 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
                             self.error_messages['validate must not be null'],
                             code='validate_code_error',
                         )
-        #return self.cleaned_data
+        return self.cleaned_data
 
+
+def verify_captcha(dic):
+    captcha_1 = dic.get('captcha_1', "")
+    captcha_0 = dic.get('captcha_0', "")
+    if not captcha_0 and not captcha_1:
+        return True, ""
+
+    if not captcha_0 or not captcha_1:
+        return False,u"请输入验证码"
+    record = CaptchaStore.objects.filter(hashkey=captcha_0).first()
+    if not record:
+        return False,u"验证码错误"
+    if captcha_1.lower() == record.challenge.lower():
+        try:
+            record.delete()
+        except:
+            pass
+        return True, ""
+    else:
+        return False,u"验证码错误"
 
 class EmailOrPhoneAuthenticationForm(forms.Form):
     """
