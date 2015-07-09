@@ -119,10 +119,10 @@ def build_earning(product_id):
         })
 
     #发送活动赠送短信
-    send_messages.apply_async(kwargs={
-                    "phones": phone_list,
-                    "messages": [messages.earning_message(rule.percent_text)]
-                })
+    # send_messages.apply_async(kwargs={
+    #                 "phones": phone_list,
+    #                 "messages": [messages.earning_message(rule.percent_text)]
+    #             })
 
 
     Earning.objects.bulk_create(earning_list)
