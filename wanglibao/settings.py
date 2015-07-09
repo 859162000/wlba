@@ -290,16 +290,16 @@ DEFAULT_FROM_EMAIL = 'noreply@wanglibao.com'
 
 # ManDao sms service
 # 旧的漫道请求设置
-SMS_MANDAO_URL = 'http://sdk.entinfo.cn:8061/mdgxsend.ashx'
-SMS_MANDAO_MULTICAST_URL = 'http://sdk2.entinfo.cn:8061/mdsmssend.ashx'
-SMS_MANDAO_SN = 'SDK-BBX-010-20599'
-SMS_MANDAO_MD5_PWD = '4A4080BB5FCCC3422E14EA8247D1062C'
+# SMS_MANDAO_URL = 'http://sdk.entinfo.cn:8061/mdgxsend.ashx'
+# SMS_MANDAO_MULTICAST_URL = 'http://sdk2.entinfo.cn:8061/mdsmssend.ashx'
+# SMS_MANDAO_SN = 'SDK-BBX-010-20599'
+# SMS_MANDAO_MD5_PWD = '4A4080BB5FCCC3422E14EA8247D1062C'
 
 # 新的漫道请求设置
-# SMS_MANDAO_URL = 'http://sdk.entinfo.cn:8061/webservice.asmx/mdsmssend'
-# SMS_MANDAO_MULTICAST_URL = 'http://sdk.entinfo.cn:8061/webservice.asmx/mdsmssend'
-# SMS_MANDAO_SN = 'SDK-SKY-010-02839'
-# SMS_MANDAO_MD5_PWD = '1FE15236BBEB705A8F5D221F47164693'
+SMS_MANDAO_URL = 'http://sdk.entinfo.cn:8061/webservice.asmx/mdsmssend'
+SMS_MANDAO_MULTICAST_URL = 'http://sdk.entinfo.cn:8061/webservice.asmx/mdsmssend'
+SMS_MANDAO_SN = 'SDK-SKY-010-02839'
+SMS_MANDAO_MD5_PWD = '1FE15236BBEB705A8F5D221F47164693'
 
 SMS_BACKEND = 'wanglibao_sms.backends.ManDaoSMSBackEnd'
 

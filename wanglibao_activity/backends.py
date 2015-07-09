@@ -43,6 +43,8 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_f
         return
     channel = helper.which_channel(user)
     #查询符合条件的活动
+    # TODO: 需要将渠道判断重写，从sql中去掉
+    # TODO: 需要将渠道的判断的范围从渠道name缩小为渠道code
     activity_list = Activity.objects.filter(start_at__lt=now, end_at__gt=now, is_stopped=False)\
                                     .filter(Q(channel__contains=channel) | Q(is_all_channel=True))\
                                     .filter(Q(platform=device_type) | Q(platform=u'all')).order_by('-id')
@@ -479,7 +481,7 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
             _save_activity_record(rule, user_introduced_by, 'message', content, True)
         if sms_template:
             sms = Template(sms_template)
-            content = sms.render(context) + u'回复TD退订 4008-588-066【网利宝】'
+            content = sms.render(context)
             _send_sms_template(user_introduced_by.wanglibaouserprofile.phone, content)
             _save_activity_record(rule, user_introduced_by, 'sms', content, True)
     else:
@@ -500,7 +502,7 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
             _save_activity_record(rule, user, 'message', content)
         if sms_template:
             sms = Template(sms_template)
-            content = sms.render(context) + u'回复TD退订 4008-588-066【网利宝】'
+            content = sms.render(context)
             _send_sms_template(mobile, content)
             _save_activity_record(rule, user, 'sms', content)
 

@@ -4,7 +4,7 @@
 from django.conf import settings
 from django.conf.urls import patterns, url, include
 from django.contrib.auth.decorators import login_required
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 from registration.backends.default.views import ActivationView
 from forms import EmailOrPhoneAuthenticationForm
 from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView, AccountHome,
@@ -59,7 +59,7 @@ urlpatterns = patterns(
     url(r'^login/(?P<login_type>\w+)/$', login_required(Third_login.as_view())),
 
     url(r'^register/$', RegisterView.as_view(), name='auth_register'),
-    url(r'^register/wap/$', TemplateView.as_view(template_name='register_wap.jade'), name='wap_register'),
+    url(r'^register/wap/$', RedirectView.as_view(url='/weixin/regist/', permanent=True), name='wap_register'),
     url(r'^register/ajax/$', 'wanglibao_account.views.ajax_register'),
 
     url(r'^message/$', login_required(MessageView.as_view(), login_url='/accounts/login/')),

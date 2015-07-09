@@ -144,6 +144,10 @@
         },
         agreement: {
           required: true
+        },
+        captcha_1: {
+          required: true,
+          minlength: 1
         }
       },
       messages: {
@@ -164,6 +168,10 @@
         },
         agreement: {
           required: '请勾选注册协议'
+        },
+        captcha_1: {
+          required: '不能为空',
+          minlength: $.format("验证码至少输入1位")
         }
       },
       errorPlacement: function(error, element) {

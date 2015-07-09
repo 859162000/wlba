@@ -26,6 +26,12 @@ form#register-modal-form.login-form(method='post', action='/accounts/register/aj
   .form-row
     input#reg_password2(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码")
     .form-row-error
+  .form-row
+    input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
+    input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入验证码", maxlength="4")
+    img.captcha.captcha-img(alt="captcha", src="")
+    button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
+    .form-row-error
   .form-row.form-bottom-bar
     button#register_submit.button-account.span12(type='submit') 注 册
     .agreement

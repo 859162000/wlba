@@ -132,6 +132,9 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
         equalTo: "#reg_password"
       agreement:
         required: true
+      captcha_1:
+        required: true
+        minlength: 1
 
     messages:
       identifier:
@@ -147,6 +150,9 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
         equalTo: '密码不一致'
       agreement:
         required: '请勾选注册协议'
+      captcha_1:
+        required: '不能为空'
+        minlength: $.format("验证码至少输入1位")
 
 
     errorPlacement: (error, element) ->
