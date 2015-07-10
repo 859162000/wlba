@@ -76,7 +76,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
                 self.error_messages['verify_error'],
                 code='verify_error'
             )
-        if captcha_1.lower() == record.challenge.lower():
+        if captcha_1.lower() == record.response.lower():
             try:
                 record.delete()
             except:
