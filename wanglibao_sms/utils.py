@@ -48,7 +48,7 @@ def send_messages(phones, messages, channel=0):
     #    obj.append(
     #        ShortMessage(phones=phone, contents="|".join(messages), channel=channel_val, status=result, context=context)
     #    )
-    ShortMessage.objects.bulk_create(obj)
+    ShortMessage.objects.bulk_create(arr)
     #backend = import_by_path(settings.SMS_BACKEND)
     #status, context = backend.send_messages(phones, messages)
 
