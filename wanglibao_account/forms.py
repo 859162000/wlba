@@ -33,9 +33,9 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
 
     nickname = forms.CharField(label="Nick name", required=False)
     identifier = forms.CharField(label="Email/Phone")
+    invitecode = forms.CharField(label="Invitecode", required=False)
     validate_code = forms.CharField(label="Validate code for phone", required=True)
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
-    invitecode = forms.CharField(label="Invitecode", required=False)
 
     MlGb = forms.CharField(label='MlGb', required=False)
     #captcha = CaptchaField(error_messages={'invalid': u'验证码错误', 'required': u'请输入验证码'}, required=True)

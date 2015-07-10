@@ -34,16 +34,20 @@ def send_messages(phones, messages, channel=0):
         channel_val = u"亿美"
 
     if status != 200:
-        status = u'失败'
+        result = u'失败'
     else:
-        status = u'成功'
+        result = u'成功'
 
     context = json.dumps(context)
-    obj = []
-    for phone in phones:
-        obj.append(
-            ShortMessage(phones=phone, contents="|".join(messages), channel=channel_val, status=status, context=context)
+    arr = []
+    for k,phone in enumerate(phones):
+        arr.append(
+            ShortMessage(phones=phone, contents=messages[k], channel=channel_val, status=result, context=context)
         )
+    #for phone in phones:
+    #    obj.append(
+    #        ShortMessage(phones=phone, contents="|".join(messages), channel=channel_val, status=result, context=context)
+    #    )
     ShortMessage.objects.bulk_create(obj)
     #backend = import_by_path(settings.SMS_BACKEND)
     #status, context = backend.send_messages(phones, messages)
