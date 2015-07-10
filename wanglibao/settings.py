@@ -641,8 +641,9 @@ PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
 PROMO_TOKEN_QUERY_STRING = 'promo_token'
 
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
-# CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
-CAPTCHA_CHALLENGE_FUNCT = 'wanglibao.helpers.random_char_challenge'
+CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
+# CAPTCHA_CHALLENGE_FUNCT = 'wanglibao.helpers.random_char_challenge'
+CAPTCHA_LETTER_ROTATION = (-20, 20)
 
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 INTERNAL_IPS = ('127.0.0.1',)

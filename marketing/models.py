@@ -76,6 +76,7 @@ class PromotionToken(models.Model):
     class Meta:
         verbose_name_plural = u'用户邀请码'
 
+
 class Channels(models.Model):
     """
         渠道信息
@@ -84,6 +85,8 @@ class Channels(models.Model):
     name = models.CharField(u'渠道名字(xunlei)', max_length=20, default="")
     description = models.CharField(u'渠道描述', max_length=50, default="", blank=True)
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
+    image = models.ImageField(upload_to='channel', blank=True, default='',
+                              verbose_name=u'渠道图片', help_text=u'主要用于渠道落地页的banner图片')
 
     class Meta:
         verbose_name_plural = u"渠道"

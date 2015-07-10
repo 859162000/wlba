@@ -9,7 +9,7 @@ def format_datetime(time, fmt):
 
 def suffix(f):
     def wrapper(*args, **kwargs):
-        return unicode(f(*args, **kwargs))
+        return unicode(f(*args, **kwargs)) + u'【网利科技】'
     return wrapper
 
 
