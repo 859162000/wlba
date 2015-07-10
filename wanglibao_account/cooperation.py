@@ -91,6 +91,19 @@ class CoopRegister(object):
     def channel_user(self):
         return self.request.session.get(self.internal_channel_user_key, None)
 
+    def channel_user_from_db(self, user):
+        """
+        从binding中获取用户在渠道中的id
+        :param user:
+        :return:
+        """
+        try:
+            return Binding.objects.filter(user=user).get().bid
+        except:
+            return None
+
+
+
     def save_to_session(self):
         channel_code  = self.get_channel_code_from_request()
         channel_user  = self.request.GET.get(self.external_channel_user_key, None)
@@ -148,8 +161,29 @@ class CoopRegister(object):
         else:
             logger.debug('failed to save user %s to binding'%user)
 
-    def call_back(self, user):
+    def register_call_back(self, user):
+        """
+        用户注册成功后的回调
+        :param user:
+        :return:
+        """
         pass
+
+    def validate_call_back(self, user):
+        """
+        用户实名验证后的回调
+        :param user:
+        :return:
+        """
+
+    def binding_card_call_back(self, user):
+        """
+        用户绑定银行卡之后的回调
+        :param user:
+        :return:
+        """
+
+
 
     def process_for_register(self, user, invite_code):
         """
@@ -157,7 +191,7 @@ class CoopRegister(object):
         """
         self.save_to_introduceby(user, invite_code)
         self.save_to_binding(user)
-        self.call_back(user)
+        self.register_call_back(user)
         self.clear_session()
 
     @property
@@ -185,6 +219,31 @@ class CoopRegister(object):
             #默认注册
             self.process_for_register(user, invite_code)
 
+    def get_user_channel_processor(self, user):
+        """
+        返回该用户的渠道处理器
+        """
+        try:
+            channel_code = Channels.objects.filter(introducedby__user_id = user.id).get().code
+            for channel_processor in self.processors:
+                if channel_processor.c_code == channel_code:
+                    return channel_processor
+        except:
+            return None
+
+
+    def process_for_validate(self, user):
+        channel_processor = self.get_user_channel_processor(user)
+        if channel_processor:
+            channel_processor.validate_call_back()
+
+    def process_for_binding_card(self, user):
+        channel_processor = self.get_user_channel_processor(user)
+        if channel_processor:
+            channel_processor.binding_card_call_back
+
+
+
 class TianMangRegister(CoopRegister):
     def __init__(self, request):
         super(TianMangRegister, self).__init__(request)
@@ -210,7 +269,7 @@ class TianMangRegister(CoopRegister):
         super(TianMangRegister, self).clear_session()
         self.request.session.pop('tianmang_sn', None)
 
-    def call_back(self, user):
+    def register_call_back(self, user):
         params={
             "oid": self.coop_key,
             "sn" : self.tianmang_sn,
@@ -231,7 +290,7 @@ class YiRuiTeRegister(CoopRegister):
         self.key = WLB_FOR_YIRUITE_KEY
         self.call_back_url = YIRUITE_CALL_BACK_URL
 
-    def call_back(self, user):
+    def register_call_back(self, user):
         uid_for_coop = get_uid_for_coop(user.id)
         sign = hashlib.md5(self.channel_user + uid_for_coop + self.coop_key).hexdigest()
         params = {
@@ -252,7 +311,7 @@ class BengbengRegister(CoopRegister):
         self.key = WLB_FOR_BENGBENG_KEY
         self.call_back_url = BENGBENG_CALL_BACK_URL
 
-    def call_back(self, user):
+    def register_call_back(self, user):
         uid_for_coop = get_uid_for_coop(user.id)
         sign = hashlib.md5(self.coop_id + self.channel_user + uid_for_coop + self.coop_key).hexdigest()
         params = {
@@ -274,7 +333,7 @@ class JuxiangyouRegister(CoopRegister):
         self.coop_key = JUXIANGYOU_KEY
         self.call_back_url = JUXIANGYOU_CALL_BACK_URL
 
-    def call_back(self, user):
+    def register_call_back(self, user):
         uid_for_coop = get_uid_for_coop(user.id)
         sign = hashlib.md5(self.coop_id + self.channel_user + uid_for_coop + self.coop_key).hexdigest()
         params = {

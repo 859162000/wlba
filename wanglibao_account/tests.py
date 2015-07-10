@@ -12,7 +12,7 @@ from utils import detect_identifier_type, verify_id, create_user
 from wanglibao_account.backends import parse_id_verify_response
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.models import Binding
-from wanglibao_account.test_util import prepare_user, has_user, delete_user, get_user
+from wanglibao_account.test_util import prepare_user, has_user, delete_user, get_user, clear_db
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao_sms.utils import send_validation_code
 
@@ -154,6 +154,7 @@ class UtilityTestCase(TestCase):
 
         type = detect_identifier_type('')
         self.assertEqual('unknown', type)
+
 
 
 class EndToEndTestCase(TestCase):
@@ -313,6 +314,23 @@ class CooperationTestCase(TestCase):
         assert self.request.session == {'channel_code':'yiruite', 'channel_user':'123456'}
 
     def test_all_processors_for_register_for_default(self):
+        self.request.GET = {'promo_token':'pptv'}
+        self.request.session = {}
+        coop_reg = CoopRegister(self.request)
+        coop_reg.all_processors_for_session()
+
+        #prepare user data
+        prepare_user()
+        #prepare channel data
+        Channels(code='pptv',name='pptv').save()
+
+        coop_reg.all_processors_for_user_register(get_user(),None)
+
+        introduced_by = IntroducedBy.objects.filter(user = get_user()).get()
+
+        clear_db(Channels, User, IntroducedBy)
+
+    def test_all_processors_for_register_for_yiruite(self):
         self.request.GET = {'from':'yiruite', 'tid':'123456'}
         self.request.session = {}
         coop_reg = CoopRegister(self.request)
@@ -327,6 +345,25 @@ class CooperationTestCase(TestCase):
 
         introduced_by = IntroducedBy.objects.filter(user = get_user()).get()
         binding = Binding.objects.filter(bid='123456').get()
+
+        clear_db(Channels, User, IntroducedBy)
+
+
+    def test_get_user_channel_processor(self):
+        self.request.GET = {'from':'yiruite', 'tid':'123456'}
+        self.request.session = {}
+        coop_reg = CoopRegister(self.request)
+        coop_reg.all_processors_for_session()
+
+        #prepare user data
+        prepare_user()
+        #prepare channel data
+        Channels(code='yiruite',name='yiruite').save()
+
+        coop_reg.all_processors_for_user_register(get_user(),None)
+        assert coop_reg.get_user_channel_processor(get_user()).c_code == 'yiruite'
+
+        clear_db(Channels, User, IntroducedBy)
 
 
 
