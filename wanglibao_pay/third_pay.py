@@ -139,11 +139,11 @@ def list_bank_new(request):
     rs = []
     for bank in banks:
         obj = {"name": bank.name, "gate_id": bank.gate_id, "bank_id": bank.code, "bank_channel": bank.channel}
-        if bank.kuai_limit:
+        if bank.channel == 'kuaipay' and bank.kuai_limit:
             obj.update(util.handle_kuai_bank_limit(bank.kuai_limit))
-        elif bank.huifu_bind_limit:
+        elif bank.channel == 'huifu' and bank.huifu_bind_limit:
             obj.update(util.handle_kuai_bank_limit(bank.huifu_bind_limit))
-        elif bank.yee_bind_limit:
+        elif bank.channel == 'yeepay' and bank.yee_bind_limit:
             obj.update(util.handle_kuai_bank_limit(bank.yee_bind_limit))
 
         rs.append(obj)
