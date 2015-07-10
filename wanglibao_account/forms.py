@@ -76,7 +76,8 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
                 self.error_messages['verify_error'],
                 code='verify_error'
             )
-        if captcha_1.lower() == record.challenge.lower():
+        # if captcha_1.lower() == record.challenge.lower():
+        if captcha_1.lower() == record.response.lower():
             try:
                 record.delete()
             except:
@@ -185,7 +186,8 @@ def verify_captcha(dic):
     record = CaptchaStore.objects.filter(hashkey=captcha_0).first()
     if not record:
         return False,u"验证码错误"
-    if captcha_1.lower() == record.challenge.lower():
+    # if captcha_1.lower() == record.challenge.lower():
+    if captcha_1.lower() == record.response.lower():
         try:
             record.delete()
         except:
