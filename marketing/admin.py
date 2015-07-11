@@ -201,9 +201,9 @@ class ChannelsAdmin(admin.ModelAdmin):
     search_fields = ("name",)
     list_filter = ("name",)
 
-    def __init__(self, *args, **kwargs):
-        super(ChannelsAdmin, self).__init__(*args, **kwargs)
-        self.list_display_links = (None, )
+    # def __init__(self, *args, **kwargs):
+    #     super(ChannelsAdmin, self).__init__(*args, **kwargs)
+    #     self.list_display_links = (None, )
 
     def has_delete_permission(self, request, obj=None):
         return False
