@@ -53,7 +53,7 @@ class RedPackRecordAdmin(ExportMixin, admin.ModelAdmin):
                     "apply_amount", "apply_at", "order_id")
     search_fields = ('user__wanglibaouserprofile__phone', 'redpack__event__name')
     raw_id_fields = ('user', "redpack")
-    list_filter = ('change_platform', 'apply_platform', "apply_at")
+    list_filter = ('change_platform', 'apply_platform', "apply_at", "created_at")
 
     def has_delete_permission(self, request, obj=None):
         return False

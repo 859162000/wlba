@@ -809,7 +809,8 @@ class YeeShortPay:
         if pay_info.status == PayInfo.SUCCESS:
             return {"ret_code": 0, "message": PayResult.DEPOSIT_SUCCESS, "amount": amount}
 
-        pay_info.error_message = str(params['status'])
+        #pay_info.error_message = str(params['status'])
+        pay_info.error_message = "%s:%s" % (params['errorcode'], params['errormsg'])
         pay_info.response = "%s" % params
         pay_info.response_ip = util.get_client_ip(request)
 
