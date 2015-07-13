@@ -1299,54 +1299,54 @@ class AdminSendMessageAPIView(APIView):
         return Response({"ret_code": 0, "message": "发送成功"})
 
 
-class IntroduceRelation(TemplateView):
-    template_name = 'introduce_add.jade'
-
-    def post(self, request):
-        user_phone = request.POST.get('user_phone', '').strip()
-        introduced_by_phone = request.POST.get('introduced_by_phone', '').strip()
-        bought_at = request.POST.get('bought_at', '').strip()
-        gift_send_at = request.POST.get('gift_send_at', '').strip()
-        try:
-            user = User.objects.get(wanglibaouserprofile__phone=user_phone)
-        except User.DoesNotExist:
-            return HttpResponse({
-                u"没有找到 %s 该记录" % user_phone
-            })
-        try:
-            introduced_by = User.objects.get(wanglibaouserprofile__phone=introduced_by_phone)
-        except User.DoesNotExist:
-            return HttpResponse({
-                u"没有找到 %s 该记录" % user_phone
-            })
-        try:
-            introduce = IntroducedBy.objects.get(user=user, introduced_by=introduced_by)
-        except IntroducedBy.DoesNotExist:
-            record = IntroducedBy()
-            record.introduced_by = introduced_by
-            record.user = user
-            if bought_at:
-                print(bought_at)
-                record.bought_at = bought_at
-            if gift_send_at:
-                print(gift_send_at)
-                record.gift_send_at = gift_send_at
-            record.created_by = request.user
-            record.save()
-            return HttpResponse({
-                u" %s与%s的邀请关系已经确定" % (user_phone, introduced_by)
-            })
-
-        return HttpResponse({
-            u" %s与%s的邀请关系已经存在" % (user_phone, introduced_by)
-        })
-
-    @method_decorator(permission_required('marketing.add_introducedby'))
-    def dispatch(self, request, *args, **kwargs):
-        """
-        Only user with change payinfo permission can call this view
-        """
-        return super(IntroduceRelation, self).dispatch(request, *args, **kwargs)
+#class IntroduceRelation(TemplateView):
+#    template_name = 'introduce_add.jade'
+#
+#    def post(self, request):
+#        user_phone = request.POST.get('user_phone', '').strip()
+#        introduced_by_phone = request.POST.get('introduced_by_phone', '').strip()
+#        bought_at = request.POST.get('bought_at', '').strip()
+#        gift_send_at = request.POST.get('gift_send_at', '').strip()
+#        try:
+#            user = User.objects.get(wanglibaouserprofile__phone=user_phone)
+#        except User.DoesNotExist:
+#            return HttpResponse({
+#                u"没有找到 %s 该记录" % user_phone
+#            })
+#        try:
+#            introduced_by = User.objects.get(wanglibaouserprofile__phone=introduced_by_phone)
+#        except User.DoesNotExist:
+#            return HttpResponse({
+#                u"没有找到 %s 该记录" % user_phone
+#            })
+#        try:
+#            introduce = IntroducedBy.objects.get(user=user, introduced_by=introduced_by)
+#        except IntroducedBy.DoesNotExist:
+#            record = IntroducedBy()
+#            record.introduced_by = introduced_by
+#            record.user = user
+#            if bought_at:
+#                print(bought_at)
+#                record.bought_at = bought_at
+#            if gift_send_at:
+#                print(gift_send_at)
+#                record.gift_send_at = gift_send_at
+#            record.created_by = request.user
+#            record.save()
+#            return HttpResponse({
+#                u" %s与%s的邀请关系已经确定" % (user_phone, introduced_by)
+#            })
+#
+#        return HttpResponse({
+#            u" %s与%s的邀请关系已经存在" % (user_phone, introduced_by)
+#        })
+#
+#    @method_decorator(permission_required('marketing.add_introducedby'))
+#    def dispatch(self, request, *args, **kwargs):
+#        """
+#        Only user with change payinfo permission can call this view
+#        """
+#        return super(IntroduceRelation, self).dispatch(request, *args, **kwargs)
 
 
 class AddressView(TemplateView):
@@ -1607,60 +1607,3 @@ class AutomaticApiView(APIView):
             })
         except:
             return Response({'ret_code': 3009, 'message': u'用户设置自动投标计划失败'})
-
-
-# class CjdaoApiView(APIView):
-#
-#     """
-#         财经道入口
-#     """
-#
-#     permission_classes = ()
-#
-#     def get(self, request):
-#         uaccount = request.GET.get('uaccount')
-#         phone = request.GET.get('phone')
-#         companyid = request.GET.get('companyid')
-#         thirdproductid = request.GET.get('thirdproductid')
-#
-#         user = CjdaoUtils.get_wluser_by_phone(phone)
-#
-#         cjdaoinfo = {
-#             'uaccount': uaccount,
-#             'companyid': companyid,
-#             'usertype': 0,
-#         }
-#         # 保存到 session
-#         request.session['cjdaoinfo'] = cjdaoinfo
-#
-#         if thirdproductid:
-#             try:
-#                 p2p = P2PProduct.objects.select_related('activity').get(pk=int(thirdproductid), hide=False)
-#             except P2PProduct.DoesNotExist:
-#                 raise Http404(u'您查找的产品不存在')
-#
-#             request.session.get('cjdaoinfo').update(thirdproductid=int(thirdproductid))
-#
-#             if user:
-#                 request.session.get('cjdaoinfo').update(usertype=1)
-#                 return render_to_response('cjdao_login_product.jade', {'p2p': p2p, 'phone': phone})
-#             else:
-#                 return render_to_response('cjdao_register_product.jade', {'p2p': p2p, 'phone': phone})
-#         else:
-#
-#             if user:
-#                 request.session.get('cjdaoinfo').update(usertype=1)
-#                 return render_to_response('cjdao_login.jade', {'uaccount': uaccount, 'phone': phone})
-#             else:
-#                 return render_to_response('cjdao_register.jade', {'uaccount': uaccount, 'phone': phone})
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-
