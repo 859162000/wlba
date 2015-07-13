@@ -11,7 +11,7 @@ from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, 
                    AccountTransaction, AccountBankCard, AccountTransactionP2P, IdVerificationView,
                    AccountTransactionDeposit, AccountRedPacket,
                    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract,
-                   Third_login, Third_login_back, IntroduceRelation, MessageView, MessageDetailAPIView, MessageCountAPIView,
+                   Third_login, Third_login_back, MessageView, MessageDetailAPIView, MessageCountAPIView,
                    MessageListAPIView, AccountRepayment, AddressView, AccountInviteView)#, CjdaoApiView)
 from django.contrib.auth import views as auth_views
 from views import AutomaticView
@@ -44,7 +44,7 @@ urlpatterns = patterns(
     url(r'^setting/$', login_required(TemplateView.as_view(template_name='account_setting.jade'),
                                       login_url='/accounts/login/')),
     url(r'^id_verify/$', login_required(IdVerificationView.as_view(), login_url='/accounts/login/')),
-    url(r'^add_introduce/$', login_required(IntroduceRelation.as_view(), login_url='/accounts/login/')),
+    #url(r'^add_introduce/$', login_required(IntroduceRelation.as_view(), login_url='/accounts/login/')),
 
     url(r'^invite/$', login_required(AccountInviteView.as_view(), login_url='/accounts/login/')),
 
