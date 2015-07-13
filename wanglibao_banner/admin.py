@@ -1,5 +1,5 @@
 from django.contrib import admin
-from wanglibao_banner.models import Banner, Partner, Hiring, Aboutus
+from wanglibao_banner.models import Banner, Partner, Hiring, Aboutus, AppActivate
 
 
 class BannerAdmin(admin.ModelAdmin):
@@ -21,7 +21,12 @@ class AboutusAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'code')
 
 
+class AppActivateAdmin(admin.ModelAdmin):
+    list_display = ('name', 'device', 'img_one', 'img_two', 'img_three', 'last_updated', 'is_long_used', 'start_at', 'end_at', 'is_used', )
+
+
 admin.site.register(Banner, BannerAdmin)
 admin.site.register(Partner, PartnerAdmin)
 admin.site.register(Hiring, HiringAdmin)
 admin.site.register(Aboutus, AboutusAdmin)
+admin.site.register(AppActivate, AppActivateAdmin)
