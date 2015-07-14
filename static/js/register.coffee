@@ -27,7 +27,9 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
     re = /^1\d{10}$/
     re.test identifier
 
-  $("#id_identifier").keyup (e) ->
+  $("#id_identifier").change () ->
+    $(this).parent().parent().find('.error-label').remove()
+  $("#id_identifier").keyup () ->
     isMobile = undefined
     value = undefined
     value = $(this).val()
@@ -37,60 +39,74 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
       $("#validate-code-container").show()
 
   $("#id_identifier").keyup()
-  $("#button-get-validate-code").click (e) ->
-    e.preventDefault()
 
-    element = this
-
-    e.preventDefault()
+  $('#button-get-validate-code').click ->
+    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v="+(+new Date())
+    $.getJSON url, {}, (json)->
+      $('input[name="captcha_0"]').val(json.key)
+      $('img.captcha').attr('src', json.image_url)
 
     phoneNumber = $.trim($("#id_identifier").val())
     if checkMobile(phoneNumber)
       if console?
-        console.log "Phone number checked, now send the validation code"
+        console.log "Phone number checked, now send the valdiation code"
+      $('#img-code-div1').modal()
 
-      $.ajax
-          url: "/api/phone_validation_code/register/" + phoneNumber + "/"
-          type: "POST"
-      .fail (xhr)->
+  $("#submit-code-img").click (e) ->
+    element = $('#button-get-validate-code')
+    phoneNumber = $.trim($("#id_identifier").val())
+    captcha_1 = $(this).parents('form').find('#id_captcha_1').val()
+    $.ajax
+      url: "/api/phone_validation_code/register/" + phoneNumber + "/"
+      type: "POST"
+      data: {
+        captcha_0 : $('input[name="captcha_0"]').val()
+        captcha_1 : captcha_1
+      }
+    .success (xhr)->
+      element.attr 'disabled', 'disabled'
+      element.removeClass 'button-red'
+      element.addClass 'button-gray'
+      $('.voice-validate').attr 'disabled', 'disabled'
+      $.modal.close()
+    .fail (xhr)->
+      clearInterval(intervalId)
+      $(element).text('重新获取')
+      $(element).removeAttr 'disabled'
+      $(element).addClass 'button-red'
+      $(element).removeClass 'button-gray'
+      result = JSON.parse xhr.responseText
+      if xhr.status >= 400
+        tool.modalAlert({title: '温馨提示', msg: result.message})
         clearInterval(intervalId)
         $(element).text('重新获取')
         $(element).removeAttr 'disabled'
         $(element).addClass 'button-red'
         $(element).removeClass 'button-gray'
-        result = JSON.parse xhr.responseText
-        if xhr.status >= 400
-          tool.modalAlert({title: '温馨提示', msg: result.message})
-          clearInterval(intervalId)
-          $(element).html('重新获取')
-          $(element).prop 'disabled', false
-          $(element).removeClass("disabled")
+    intervalId
+    count = 180
 
-      intervalId
-      count = 180
+    $(element).attr 'disabled', 'disabled'
+    $(element).removeClass 'button-red'
+    $(element).addClass 'button-gray'
+    $('.voice-validate').attr 'disabled', 'disabled'
 
-      $(element).removeClass 'button-red'
-      $(element).addClass 'button-gray'
-      $(element).attr 'disabled', 'disabled'
-      $('.voice-validate').attr 'disabled', 'disabled'
-      timerFunction = ()->
-        if count >= 1
-          count--
-          $(element).text('重新获取(' + count + ')')
-        else
-          clearInterval(intervalId)
-          $(element).text('重新获取')
-          $(element).removeAttr 'disabled'
-          $(element).addClass 'button-red'
-          $(element).removeClass 'button-gray'
-          #author:hetao;datetime:2014.11.19;description: 增加语音验证链接（计时完成后）
-          $('.voice').removeClass('hidden')
-          $('.voice  .span12-omega').html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>')
-          $('.voice-validate').removeAttr 'disabled'
+    timerFunction = ()->
+      if count >= 1
+        count--
+        $(element).text('已经发送(' + count + ')')
+      else
+        clearInterval(intervalId)
+        $(element).text('重新获取')
+        $(element).removeAttr 'disabled'
+        $(element).addClass 'button-red'
+        $(element).removeClass 'button-gray'
+        $('.voice').removeClass('hidden')
+        $('.voice-validate').removeAttr 'disabled'
+        $('.voice  .span12-omega').html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>')
 
-      # Fire now and future
-      timerFunction()
-      intervalId = setInterval timerFunction, 1000
+    timerFunction()
+    intervalId = setInterval timerFunction, 1000
 
   # Add the validate rule function emailOrPhone
   $.validator.addMethod "isMobile", (value, element)->
@@ -101,6 +117,8 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
       identifier:
         required: true
         isMobile: true
+      validate_code:
+        required: true
       password:
         required: true
         minlength: 6
@@ -119,6 +137,8 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
       identifier:
         required: '不能为空'
         isMobile: '请输入手机号'
+      validate_code:
+        required: '不能为空'
       password:
         required: '不能为空'
         minlength: $.format("密码需要最少{0}位")
@@ -165,14 +185,9 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
 
 
   $("#register_submit").click (e)->
-    e.preventDefault()
-    if !$(this).hasClass("disabled")
-      $('input[name="identifier"]', $(this).parents('form')).trigger('keyup')
-      $('#register-form').submit()
+    if $(this).hasClass("disabled")
+      e.preventDefault()
       return
-
-
-
 
   $(".voice").on 'click', '.voice-validate', (e)->
     e.preventDefault()
