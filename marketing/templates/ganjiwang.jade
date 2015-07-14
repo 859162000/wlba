@@ -17,6 +17,13 @@ html
     .gjw-wrap
       .gjw-big
       .gjw-gold
+        .xl-backtop
+          span.seven-com.seven-ten
+          .backtop.sev-backtop 回到顶部
+          img(src="/static/imgs/pc_activity/xunlei/seven/sev_weixin.png")#xl-weixin
+          a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank")
+            img(src="/static/imgs/pc_activity/xunlei/seven/sev_qq.png",style="margin-top:10px")#xl-qq
+          .erweima
         h1.gjw-h 活动时间：2015年7月17日——2015年9月15日
         p.gjw-p
           span.gjw-font-com.gjw-font-one
@@ -29,7 +36,7 @@ html
               b 800
               |元现金红包
           .gjw-prize.gjw-prize-com.gjw-prize-two
-            a 点击领取
+            a#prize-two 点击领取
             p 特权二：首次充值送特权会员
           .gjw-prize.gjw-prize-com.gjw-prize-three
             a 点击领取
@@ -41,50 +48,180 @@ html
               b 100
               |元充值
           .gjw-prize.gjw-prize-com.gjw-prize-four(style="margin-right:0")
-            a 点击领取
+            a#prize-four 点击领取
             p 特权四：满额投资就送
               b(style="color:#f22527") 夏日双人游
-        p(style="top:127px").gjw-p
+        p(style="top:150px").gjw-p#recharge
           span.gjw-font-com.gjw-font-two
           br
           |首次充值网利宝，即可获得领取特权会员奖励！每位新注册用户可任意选择1个好礼领取。
         .gjw-girl.gjw-people-com.gjw-people-one
         .gjw-number-two
            .gjw-recharge
+              .gjw-over.gjw-tit-com.gjw-center-seven
               .gjw-title1.gjw-tit-com.gjw-tit-one
               .gjw-title2.gjw-tit-com.gjw-tit-two
               h2.gjw-h2 100G快盘容量
               .gjw-center.gjw-tit-com.gjw-center-one
            .gjw-recharge
+              .gjw-over.gjw-tit-com.gjw-center-seven
               .gjw-title1.gjw-tit-com.gjw-tit-one
               .gjw-title2.gjw-tit-com.gjw-tit-two
               h2.gjw-h2 七天爱奇艺会员
               .gjw-center.gjw-tit-com.gjw-center-two
            .gjw-recharge(style="margin-right:0")
+              .gjw-over.gjw-tit-com.gjw-center-seven
               .gjw-title1.gjw-tit-com.gjw-tit-one
               .gjw-title2.gjw-tit-com.gjw-tit-two
               h2.gjw-h2 抠电影10元代
                 br
                 |金券
               .gjw-center.gjw-tit-com.gjw-center-three
-           .gjw-recharge
-              .gjw-title1.gjw-tit-com.gjw-tit-one
-              .gjw-title2.gjw-tit-com.gjw-tit-two
+           .gjw-recharge.notouch
+              .gjw-over.gjw-tit-com.gjw-center-seven(style="display:block")
+              .gjw-title1.gjw-tit-com.gjw-tit-two
               h2.gjw-h2 抠电影20元代
                 br
                 |金券
               .gjw-center.gjw-tit-com.gjw-center-four
            .gjw-recharge
+              .gjw-over.gjw-tit-com.gjw-center-seven
               .gjw-title1.gjw-tit-com.gjw-tit-one
               .gjw-title2.gjw-tit-com.gjw-tit-two
               h2.gjw-h2 一个月风行会员
               .gjw-center.gjw-tit-com.gjw-center-five
-           .gjw-recharge(style="margin-right:0")
-              .gjw-title1.gjw-tit-com.gjw-tit-one
-              .gjw-title2.gjw-tit-com.gjw-tit-two
+           .gjw-recharge.notouch(style="margin-right:0")
+              .gjw-over.gjw-tit-com.gjw-center-seven(style="display:block;")
+              .gjw-title1.gjw-tit-com.gjw-tit-two
               h2.gjw-h2 一年迅雷会员
               .gjw-center.gjw-tit-com.gjw-center-six
-
+        p(style="top:254px").gjw-p#tour
+          span.gjw-font-com.gjw-font-three
+          br
+          |注册测送红包，投资网利宝，还送你夏日旅游双人游大奖！没有比这更美的事了！
+        .gjw-number-three
+           dl
+             dt
+             dd
+               h3 ￥6560
+                 span
+                   b.gjw-small-com.gjw-small-one
+                   |港澳双人游
+               if user.is_authenticated
+                 a.gjw-small-com.gjw-small-two
+               else
+                 a.gjw-small-com.gjw-small-two.go
+           dl
+             dt.yunnan
+             dd
+               h3 ￥2160
+                 span
+                   b.gjw-small-com.gjw-small-three
+                   |云南双人游
+               if user.is_authenticated
+                 a.gjw-small-com.gjw-small-two
+               else
+                 a.gjw-small-com.gjw-small-two.go
+           dl(style="margin-right:0")
+             dt.hainan
+             dd
+               h3 ￥2360
+                 span
+                   b.gjw-small-com.gjw-small-four
+                   |海南双人游
+               if user.is_authenticated
+                 a.gjw-small-com.gjw-small-two
+               else
+                 a.gjw-small-com.gjw-small-two.go
+        .gjw-number-four
+          h1 免费旅游 投资1万元即送
+          p 投资网利宝单笔满10000元可获得1次免费旅游机会
+            br
+            |港澳、云南、海南任你选，还是双人游哦
+            br
+            |每个用户只能报名1次，把握机会别错过！
+          h1
+            a 点击查看旅游线路及报名须知 >
+          .man.gjw-people-com.gjw-people-two
+      .xl-box1(style="height:auto")
+        h2.xl-jiang
+          .xl-center#seven-center(style="color:#cf0027")
+             |投资流程
+        .content-process
+          .content-pptv(style="background:#f8f2ce")
+            .process-text(style="height:32px;padding:0")
+            .process-list
+              .circle-free.circle-float
+                .close
+                .last
+                .next
+                img(src="/static/images/pptv/free.jpg")
+              .triangle-start
+                .start-cont
+              .circle
+                .circle-body.free
+                .circle-txt 注册网利宝账户
+                .circle-txt2
+              .triangle-center(style="width:0px")
+              .triangle-center#xl-triangle-center
+                .center-cont
+              .circle
+                .circle-body.recharge
+                .circle-txt 充值资金到账户
+              .triangle-center#xl-triangle-center
+                .center-cont
+              .circle
+                .circle-body.tender
+                .circle-txt 使用红包
+              .triangle-center#xl-triangle-center
+                .center-cont
+              .circle
+                .circle-body.collec
+                .circle-txt 获得收益和奖励
+              .triangle-end(style="width:120px")
+                .end-cont
+      .gjw-rule
+         h4 活动规则
+         ul
+           li 1. 手机号为网利宝唯一账户，本期活动仅限于赶集网注册新用户参与；
+           li 2. 新用户注册即送800元现金红包。此现金红包为组合红包，其中含50元的直抵红包和750元抵扣红包（750元折扣红包包含3张100元+2张200元+1张250元），投资满300元可使用50元直抵红包，折扣红包则按投资额1%抵扣使用（比如用户投资10000元，即可满额使用100元红包）；
+           li 3. 赶集网付费用户注册+实名+投资网利宝，并且投资≥3000元送赶集网100充值金；
+           li 4. 免费旅游机会有效期截至到2015年9月30日，过期失效；获得免费旅游机会的用户将在活动结束后收到电话通知，与您核实信息并确认行程细节；
+           li 5. 请您在出游前与户外圈网仔细确认行程细节，网利宝不参与您与户外圈网任何的信息沟通，您向户外圈网确认参加旅游后，旅途过程中产生的所有问题都与网利宝无关。
+           li 6. 红包统一以站内信形式通知，完成一次投资回款后即可取现；
+           li 7. 现金红包有效期：2015年7月15日-2015年10月1日；
+           li 8. 网利宝对此活动享有最终解释权。
+      .xl-box1
+         .san-new(style="background:#f8f2ce")
+          .san-new-content.container(style="padding:0")
+            .row.gold-dl-row
+              .san-span
+                dl
+                 dt.com.com-trust(style="background: url('/static/imgs/pc_activity/ganjiwang/safe1.png') no-repeat center")
+                 dd.pp-zi
+                   p
+                    b IDG资本
+                    br
+                    | 百亿市值
+                    b A股上市公司
+                    |入股
+              .san-span
+                dl
+                 dt.com.com-security(style="background: url('/static/imgs/pc_activity/ganjiwang/safe2.png') no-repeat center")
+                 dd.pp-zi
+                   p 账户资金安全
+                    br
+                    |由
+                    b 平安保险
+                    |承保
+              .san-span
+                dl
+                 dt.com.com-authority(style="background: url('/static/images/xunlei/three.png') no-repeat center")
+                 dd.pp-zi
+                   p 第三方
+                    br
+                    b 100%
+                    |本息保障
 
 
 
@@ -153,9 +290,21 @@ html
         #first-redpack-fail
           span.first-xl-off2 ×
           p 不符合参加条件
+        #activity-over
+          span.first-xl-off2 ×
+          h1
+            span.gjw-people-com.gjw-people-three
+            b 活动结束
+          p 本期活动已结束
+            br
+            |敬请期待下期惊喜！
+
 
 
   script.
       var v = new Date().getTime()
-      require(['/static/js/xun-newzhuce.js?v='+v,'/static/js/advance.js'])
+      require(['/static/js/hover.js','/static/js/xun-newzhuce.js?v='+v,'/static/js/advance.js'])
+
+
+
 
