@@ -37,7 +37,7 @@ from wanglibao_sms import messages, backends
 from django.utils import timezone
 #from wanglibao_account import message as inside_message
 from misc.models import Misc
-from wanglibao_account.forms import IdVerificationForm
+from wanglibao_account.forms import IdVerificationForm, verify_captcha
 #from marketing.helper import RewardStrategy, which_channel, Channel
 from wanglibao_rest.utils import split_ua, get_client_ip
 from django.http import HttpResponseRedirect
@@ -107,33 +107,21 @@ class SendRegisterValidationCodeView(APIView):
 
     def post(self, request, phone, format=None):
         phone_number = phone.strip()
-        #phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number, phone_verified=True)
         phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number)
         if phone_check:
-            return Response({
-                                "message": u"该手机号已经被注册，不能重复注册",
-                                "error_number": ErrorNumber.duplicate
-                            }, status=400)
+            return Response({"message": u"该手机号已经被注册，不能重复注册", 
+                            "error_number": ErrorNumber.duplicate,
+                            "type":"exists"}, status=400)
 
-        #phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
-        #if phone_validate_code_item:
-        #    count = phone_validate_code_item.code_send_count
-        #    if count > 6:
-        #        return Response({
-        #                            "message": u"该手机号验证次数过于频繁，请联系客服人工注册",
-        #                            "error_number": ErrorNumber.duplicate
-        #                        }, status=400)
+        res, msg = verify_captcha(request.POST)
+        if not res:
+            return Response({'message': message, "type":"captcha"}, status=403)
 
         status, message = send_validation_code(phone_number, ip=get_client_ip(request))
-        return Response({
-                            'message': message
-                        }, status=status)
+        return Response({'message': message, "type":"validation"}, status=status)
 
     def dispatch(self, request, *args, **kwargs):
         return super(SendRegisterValidationCodeView, self).dispatch(request, *args, **kwargs)
-
-
-
 
 class WeixinSendRegisterValidationCodeView(APIView):
     """
