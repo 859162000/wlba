@@ -393,6 +393,7 @@ LOGGING = {
             'level': 'DEBUG',
         },
     }
+
 }
 
 if ENV != ENV_DEV:

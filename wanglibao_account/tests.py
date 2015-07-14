@@ -348,6 +348,24 @@ class CooperationTestCase(TestCase):
 
         clear_db(Channels, User, IntroducedBy)
 
+    def test_all_processors_for_register_for_yiruite_with_wrong_para(self):
+        self.request.GET = {'promo_token':'yiruite', 'tid':'123456'}
+        self.request.session = {}
+        coop_reg = CoopRegister(self.request)
+        coop_reg.all_processors_for_session()
+
+        #prepare user data
+        prepare_user()
+        #prepare channel data
+        Channels(code='yiruite',name='yiruite').save()
+
+        coop_reg.all_processors_for_user_register(get_user(),None)
+
+        introduced_by = IntroducedBy.objects.filter(user = get_user()).get()
+        binding = Binding.objects.filter(bid='123456').get()
+
+        clear_db(Channels, User, IntroducedBy)
+
 
     def test_get_user_channel_processor(self):
         self.request.GET = {'from':'yiruite', 'tid':'123456'}
