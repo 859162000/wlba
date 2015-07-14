@@ -103,8 +103,3 @@ class AppRepaymentAPIView(APIView):
         except Exception, e:
             logging.error(e.message)
             return Response({'ret_code': 20001, 'message': 'fail'})
-
-
-class AppInvestListAPIView(APIView):
-    """ app端查询p2p列表"""
-    pass
