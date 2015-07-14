@@ -100,6 +100,4 @@ class AppRepaymentAPIView(APIView):
                 return Response({'ret_code': 0, 'message': 'ok', 'amount': amount, 'income_num': len(ams)})
         except Exception, e:
             logging.error(e.message)
-            import traceback
-            print traceback.print_exc()
             return Response({'ret_code': 20001, 'message': 'fail'})
