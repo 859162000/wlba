@@ -12,6 +12,10 @@ def split_ua(request):
     if not request or "HTTP_USER_AGENT" not in request.META:
         return {"device_type":"pc"}
     ua = request.META['HTTP_USER_AGENT']
+    tmp_ua = ua.lower()
+    if "mozilla" in tmp_ua or "safari" in tmp_ua:
+        return {"device_type":"pc"}
+
     arr = ua.split("/")
     if len(arr) < 5:
         return {"device_type":"pc"}

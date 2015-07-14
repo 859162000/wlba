@@ -15,7 +15,6 @@ from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
-# from wanglibao_account.views import CjdaoApiView
 from wanglibao_banner.views import HiringView, AboutView, CompanyView, TeamView, MilestoneView, \
     ResponsibilityView, ContactView, AgreementView, DirectorateView, AgreementAutoView
 
@@ -123,8 +122,6 @@ urlpatterns += patterns(
     # 迅雷
     url(r'^api/xunlei/getProjectList/$', XunleiP2PListAPIView.as_view()),
     url(r'^api/xunlei/getXLUserInvestInfo/$', XunleiP2PbyUser.as_view()),
-    # 财经道
-    # url(r'^accounts/cjdao/$', CjdaoApiView.as_view(), name='cjdao'),
     # 天芒云
     url(r'^api/tmyun/getRegisterList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangRegisterQuery.as_view()),
     url(r'^api/tmyun/getIDVerificationList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangIDVerificationQuery.as_view()),
