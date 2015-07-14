@@ -96,10 +96,10 @@ class CoopRegister(object):
         channel_user  = self.request.GET.get(self.external_channel_user_key, None)
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
-            logger.debug('save to session %s:%s'%(self.internal_channel_key, channel_code))
+            #logger.debug('save to session %s:%s'%(self.internal_channel_key, channel_code))
         if channel_user:
             self.request.session[self.internal_channel_user_key] = channel_user
-            logger.debug('save to session %s:%s'%(self.internal_channel_user_key, channel_user))
+            #logger.debug('save to session %s:%s'%(self.internal_channel_user_key, channel_user))
 
     def clear_session(self):
         self.request.session.pop(self.internal_channel_key, None)
