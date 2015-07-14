@@ -23,6 +23,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from order.models import Order
 from order.utils import OrderHelper
+from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_pay.models import Bank, Card, PayResult, PayInfo
@@ -703,6 +704,9 @@ class BankCardAddView(APIView):
 
     def post(self, request):
         result = third_pay.add_bank_card(request)
+
+        #处理第三方回调
+        CoopRegister(request).process_for_validate(request.user)
         return Response(result)
 
 

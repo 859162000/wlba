@@ -727,6 +727,8 @@ else:
     JUXIANGYOU_KEY = 'b0cj391b90p421n8'
     JUXIANGYOU_CALL_BACK_URL = 'http://api.juxiangyou.com/web/p2pApi_test.php'
 
+#都玩
+DOUWAN_CALL_BACK_URL = 'http://mall.366dw.com/interface/reflection'
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100

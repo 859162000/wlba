@@ -22,6 +22,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from marketing.models import PromotionToken, Channels
 from marketing.utils import set_promo_user
+from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import create_user
 from wanglibao_portfolio.models import UserPortfolio
 from wanglibao_portfolio.serializers import UserPortfolioSerializer
@@ -676,6 +677,9 @@ class IdValidate(APIView):
 
             device = split_ua(request)
             tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+            #处理渠道回调
+            CoopRegister(request).process_for_validate(user)
             return Response({ "validate": True }, status=200)
 
         else:
