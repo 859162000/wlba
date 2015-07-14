@@ -40,18 +40,13 @@ def send_messages(phones, messages, channel=0):
 
     context = json.dumps(context)
     arr = []
+    if len(phones) != len(messages):
+        messages = messages * len(phones)
     for k,phone in enumerate(phones):
         arr.append(
             ShortMessage(phones=phone, contents=messages[k], channel=channel_val, status=result, context=context)
         )
-    #for phone in phones:
-    #    obj.append(
-    #        ShortMessage(phones=phone, contents="|".join(messages), channel=channel_val, status=result, context=context)
-    #    )
     ShortMessage.objects.bulk_create(arr)
-    #backend = import_by_path(settings.SMS_BACKEND)
-    #status, context = backend.send_messages(phones, messages)
-
     return status, context
 
 

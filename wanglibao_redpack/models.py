@@ -103,7 +103,7 @@ class RedPack(models.Model):
         verbose_name_plural = u"红包列表"
 
     def __unicode__(self):
-        return u'%s<%s:%s>' % (self.id, self.evnet.id, self.event.name)
+        return u'%s<%s-%s>' % (self.id, self.event.id, self.event.name)
 
 class RedPackRecord(models.Model):
     redpack = models.ForeignKey(RedPack, verbose_name=u"红包")
