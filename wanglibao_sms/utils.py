@@ -17,37 +17,40 @@ def generate_validate_code():
 
 #channel sms, 0:auto 1:mandao 2:yimei
 def send_messages(phones, messages, channel=0):
-    short_message = ShortMessage()
-    short_message.phones = " ".join(phones)
-    if len(phones) == len(messages):
-        short_message.contents = " ".join([":".join(pair) for pair in zip(phones, messages)])
-    else:
-        short_message.contents = u"%s: %s" % (",".join(phones), "|".join(messages))
-    short_message.save()
-    #backend = import_by_path(settings.SMS_BACKEND)
-    #status, context = backend.send_messages(phones, messages)
+    # short_message = ShortMessage()
 
     if channel == 0:
         status, context = backends.ManDaoSMSBackEnd.send_messages(phones, messages)
-        short_message.channel = u"慢道"
+        channel_val = u"慢道"
         #失败使用emay重发
         if status != 200:
             status, context = backends.EmaySMS.send_messages(phones, messages)
-            short_message.channel = u"亿美"
+            channel_val = u"亿美"
     elif channel == 1:
         status, context = backends.ManDaoSMSBackEnd.send_messages(phones, messages)
+        channel_val = u'慢道'
     else:
-        short_message.channel = u"慢道"
         status, context = backends.EmaySMS.send_messages(phones, messages)
-        short_message.channel = u"亿美"
+        channel_val = u"亿美"
 
     if status != 200:
-        short_message.status = u'失败'
+        result = u'失败'
     else:
-        short_message.status = u'成功'
+        result = u'成功'
 
-    short_message.context = json.dumps(context)
-    short_message.save()
+    context = json.dumps(context)
+    arr = []
+    for k,phone in enumerate(phones):
+        arr.append(
+            ShortMessage(phones=phone, contents=messages[k], channel=channel_val, status=result, context=context)
+        )
+    #for phone in phones:
+    #    obj.append(
+    #        ShortMessage(phones=phone, contents="|".join(messages), channel=channel_val, status=result, context=context)
+    #    )
+    ShortMessage.objects.bulk_create(arr)
+    #backend = import_by_path(settings.SMS_BACKEND)
+    #status, context = backend.send_messages(phones, messages)
 
     return status, context
 

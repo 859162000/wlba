@@ -11,7 +11,7 @@ form#register-modal-form.login-form(method='post', action='/accounts/register/aj
     .span12-omega
       没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
   #validate-code-container.form-row
-    input#id_validate_code(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+    input#id_validate_code(type="text", name="validate_code", placeholder="请输入短信验证码", autocomplete='off', title="请输入短信验证码")
     .form-row-error
   .form-row
     input#reg_password.full-width(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")
@@ -28,7 +28,7 @@ form#register-modal-form.login-form(method='post', action='/accounts/register/aj
     .form-row-error
   .form-row
     input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
-    input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入验证码", maxlength="4")
+    input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
     img.captcha.captcha-img(alt="captcha", src="")
     button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
     .form-row-error

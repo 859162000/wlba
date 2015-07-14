@@ -30,13 +30,17 @@ require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
     intervalId = setInterval timerFunction, 1000
 
   $('#sendValidateCodeButton').click (event)->
+    element = $('#sendValidateCodeButton')
     target = $(event.target).attr('data-url')
     $.post target
     .done ->
       $('#nextStep').prop('disabled', false)
     .fail (xhr)->
-      if xhr.status > 400
-        tool.modalAlert({title: '温馨提示', msg: result.message})
+      if xhr.status >= 400
+        tool.modalAlert({title: '温馨提示', msg: xhr.message})
+        $(element).html('重新获取')
+        $(element).prop 'disabled', false
+        $(element).removeClass("disabled")
 
 
     _countDown()
@@ -111,5 +115,9 @@ require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
         #TODO
         element.html('系统繁忙请尝试短信验证码')
     .fail (xhr)->
-      if xhr.status > 400
-        tool.modalAlert({title: '温馨提示', msg: result.message})
+      element = $('#sendValidateCodeButton')
+      if xhr.status >= 400
+        tool.modalAlert({title: '温馨提示', msg: xhr.message})
+        $(element).html('重新获取')
+        $(element).prop 'disabled', false
+        $(element).removeClass("disabled")

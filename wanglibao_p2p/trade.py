@@ -193,13 +193,12 @@ class P2POperator(object):
             product.save()
 
         phones = {}.fromkeys(phones).keys()
-        user_ids = {}.fromkeys(user_ids).keys()
-
         send_messages.apply_async(kwargs={
             "phones": phones,
             "messages": [messages.product_settled(product, timezone.now())]
         })
 
+        user_ids = {}.fromkeys(user_ids).keys()
 
         matches = re.search(u'日计息', product.pay_method)
         if matches and matches.group():

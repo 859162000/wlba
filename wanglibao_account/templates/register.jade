@@ -30,7 +30,7 @@ html
               .span12-omega
                 没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
             #validate-code-container.form-row
-              - render_field form.validate_code class+="ispan6 clear-margin" placeholder="* 请输入验证码" autocomplete='off' title="* 请输入验证码"
+              - render_field form.validate_code class+="ispan6 clear-margin" placeholder="* 请输入计算结果" autocomplete='off' title="* 请输入计算结果"
               if form.validate_code.errors
                 label.form-row-error.error
                   for error in form.validate_code.errors
@@ -56,7 +56,7 @@ html
                     #{ error }
             .form-row
                 input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
-                input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入验证码", maxlength="4")
+                input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
                 img.captcha.captcha-img(alt="captcha", src="")
                 button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
                 if form.captcha_1.errors

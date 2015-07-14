@@ -1,0 +1,175 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+    head
+        - with '7月赚钱攻略' as title
+        include include/common_head
+        - endwith
+        link(href="/static/stylesheets/activity.css",rel="stylesheet")
+        link(rel="stylesheet",href="/static/css/wap/july_act_two.css")
+        link(rel="stylesheet",href="/static/css/wap/july_act_two_footer.css")
+    body
+        .full-container
+          .topbar
+            .container.row
+              .user-div
+                i.icon-phone.font-l &nbsp;
+                span 客服热线：
+                span 4008-588-066
+
+                span.margin-left-m 在线客服：
+                a.topbar-anchor.icon.icon-qq#top-qq(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw", data-role="hover", target="_blank")
+
+                span.margin-left-m 关注我们：
+                a.topbar-anchor.icon.icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo-top")
+                a.topbar-anchor.icon.icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode-top")
+                a#qrweibo-top.weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank", style="display:none", data-name="hoverbox")
+                  img(src="/static/images/weibo-nqr.png")
+                img#qrcode-top.icon.weixin-qr-code(src="/static/images/weixin-nqr.png", style="display:none", data-name="hoverbox")
+                span.mobile-app-top
+                  span.icon.icon-mobile-app
+                  span 手机网利宝
+                  .mobile-app-top-prompt
+                    div(style="height:30px; top:-20px; position:relative;")
+                    a.mobile-app-apple(href="https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8", target="_blank", title="iPhone版")
+                    a.mobile-app-android(href="https://www.wanglibao.com/static/wanglibao.apk", title="Android版")
+
+        .full-container-white.fudong
+          .container-navigation
+            .row
+              .span2
+                a(href='/')
+                  .wlb-logo
+              .span10
+                .nav-items.xiao-nav
+                  ul
+                    mixin nav-item(name, link, new_class, free)
+                      if activeItem == name
+                        li.nav-item.active
+                          a.nav-item-anchor(href=link, class=new_class)= name
+                          if free == 'yes'
+                            span.icon.icon-free 免费
+                      else
+                        li.nav-item
+                          a.nav-item-anchor(href=link, class=new_class)= name
+                          if free == 'yes'
+                            span.icon.icon-free 免费
+
+                    +nav-item('首页', '/', '', '')
+                    +nav-item('理财专区', '/p2p/list/', '', '')
+                    +nav-item('自动投标', '/accounts/auto_tender/ ', '', '')
+                    +nav-item('安全保障', '/security/', 'left-line', '')
+                    +nav-item('帮助中心', '/help/', '', '')
+
+        .banner
+        .act_five
+            img(src="/static/images/july_act_two/five_1.png")
+            span 每天领红包
+            img(src="/static/images/july_act_two/five_2.png")
+            span 全场加息3%
+            img(src="/static/images/july_act_two/five_3.png")
+            span 全民淘金躺着赚钱
+            img(src="/static/images/july_act_two/five_4.png")
+            span 邀请好友赢话费
+            img(src="/static/images/july_act_two/five_5.png")
+            span 财富擂台赛
+        .talk_wrap
+            .main
+                .box.left_box
+                    img(src="/static/images/july_act_two/user_head_1.png")
+                    .talk_box
+                        img(src="/static/images/july_act_two/arrow_left.png")
+                        p 纳尼？按这个方法投资网利宝，投资收益率可<br>高达20%以上！
+                .box.right_box
+                    img(src="/static/images/july_act_two/user_head_2.png")
+                    .talk_box
+                        p 没错！目前网利宝6个月理财收益12%，7月钜惠季系列活动<br>已陆续推出，今天就独家揭秘资深投资客如何步步为赢，点<br>滴油水不浪费，教你多赚30%，争取利益最大化！
+                        img(src="/static/images/july_act_two/arrow_right.png")
+                .clear
+        .raiders
+            img(src="/static/images/july_act_two/label1.png").label_img
+            .main
+                .raiders_box.raiders_box_right.one
+                    .title 每天领红包
+                    p 伸手领钱日每天限时限量领取1000元现金红包，最高按投资额2%使用，6个月相当于加4%（截止到7月15日);
+                    a(href="/activity/advance/")
+                        span 立即前往
+                        span.big >
+                .raiders_box.raiders_box_left.two
+                    .title 全场加息3%
+                    p 全场加息3%，每个标直接加3%（截止到7月15日）
+                    a(href="/")
+                        span 立即前往
+                        span.big >
+                .raiders_box.raiders_box_right.three
+                    .title 全民淘金躺着赚钱
+                    p 你邀请朋友投资，可一次性获得朋友交易额0.3%的收益，朋友邀请朋友投资，可一次性获得朋友的朋友交易额0.3%的收益（有效期1年）
+                    a(href="/activity/pan_gold/")
+                        span 立即前往
+                        span.big >
+                .raiders_box.raiders_box_left.four
+                    .title 邀请好友赢话费
+                    p 邀请好友理财，被推荐人获得50元现金礼包，推荐人送30元话费，多邀多送上不封顶<br>（截止到7月15日）
+                    a(href="/activity/full_send/")
+                        span 立即前往
+                        span.big >
+                .raiders_box.raiders_box_right.five
+                    .title 财富擂台赛
+                    p 每天投资排名前10名，可获得100-1000元不等的红包，每天均可领取！（截止到7月15日）
+                    a(href="/activity/investment/")
+                        span 立即前往
+                        span.big >
+        .clear
+        .act_welfare
+            img(src="/static/images/july_act_two/label2.png").label_img
+            .main
+                a.one(href="/")
+                    span
+                a.two(href="/activity/investment/")
+                    span
+                a.three(href="/activity/advance/")
+                    span
+                a.four(href="/activity/full_send/")
+                    span
+        .investment-process-container_wrap
+            img(src="/static/images/july_act_two/label3.png").label_img
+            .investment-process-container
+                .row
+                  .step.first-step
+                    span.icon.icon-first-step
+                    .process-title 第一步&nbsp;免费注册
+                    .process-content 30秒轻松免费注册成为会员
+                  .step-arrow
+                    ins
+                  .step.second-step
+                    span.icon.icon-second-step
+                    .process-title 第二步&nbsp;进行认证
+                    .process-content 完成实名认证
+                  .step-arrow
+                    ins
+                  .step.third-step
+                    span.icon.icon-third-step
+                    .process-title 第三步&nbsp;充值账户
+                    .process-content 在线充值，免收手续费
+                  .step-arrow
+                    ins
+                  .step.fourth-step
+                    span.icon.icon-fourth-step
+                    .process-title 第四步&nbsp;成功投标
+                    .process-content 按需筛选借款标并进行投标
+                  .step-arrow
+                    ins
+                  .step.fifth-step
+                    span.icon.icon-fifth-step
+                    .process-title 第五步&nbsp;自动收款
+                    .process-content 借款期满后自动回款
+        .footer(style="background:#a8d2d5")
+            include include/activityFooterTwo
+
+            include include/tracking
+        script.
+            require(['/static/js/hover.js','/static/js/pptv_redpack.js'])
+
+
+

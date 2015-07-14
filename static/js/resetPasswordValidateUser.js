@@ -35,16 +35,20 @@
       return intervalId = setInterval(timerFunction, 1000);
     };
     $('#sendValidateCodeButton').click(function(event) {
-      var target;
+      var element, target;
+      element = $('#sendValidateCodeButton');
       target = $(event.target).attr('data-url');
       $.post(target).done(function() {
         return $('#nextStep').prop('disabled', false);
       }).fail(function(xhr) {
-        if (xhr.status > 400) {
-          return tool.modalAlert({
+        if (xhr.status >= 400) {
+          tool.modalAlert({
             title: '温馨提示',
-            msg: result.message
+            msg: xhr.message
           });
+          $(element).html('重新获取');
+          $(element).prop('disabled', false);
+          return $(element).removeClass("disabled");
         }
       });
       return _countDown();
@@ -117,11 +121,15 @@
           return element.html('系统繁忙请尝试短信验证码');
         }
       }).fail(function(xhr) {
-        if (xhr.status > 400) {
-          return tool.modalAlert({
+        element = $('#sendValidateCodeButton');
+        if (xhr.status >= 400) {
+          tool.modalAlert({
             title: '温馨提示',
-            msg: result.message
+            msg: xhr.message
           });
+          $(element).html('重新获取');
+          $(element).prop('disabled', false);
+          return $(element).removeClass("disabled");
         }
       });
     });
