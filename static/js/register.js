@@ -87,16 +87,15 @@
         $(element).addClass('button-red');
         $(element).removeClass('button-gray');
         result = JSON.parse(xhr.responseText);
-        if (xhr.status >= 400) {
-          tool.modalAlert({
-            title: '温馨提示',
-            msg: result.message
-          });
-          clearInterval(intervalId);
-          $(element).text('重新获取');
-          $(element).removeAttr('disabled');
-          $(element).addClass('button-red');
-          return $(element).removeClass('button-gray');
+        if (result.type === 'captcha') {
+          return $("#submit-code-img").parent().parent().find('.code-img-error').html(result.message);
+        } else {
+          if (xhr.status >= 400) {
+            return tool.modalAlert({
+              title: '温馨提示',
+              msg: result.message
+            });
+          }
         }
       });
       intervalId;

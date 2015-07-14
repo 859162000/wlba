@@ -113,7 +113,7 @@ class SendRegisterValidationCodeView(APIView):
                             "error_number": ErrorNumber.duplicate,
                             "type":"exists"}, status=400)
 
-        res, msg = verify_captcha(request.POST)
+        res, message = verify_captcha(request.POST)
         if not res:
             return Response({'message': message, "type":"captcha"}, status=403)
 
