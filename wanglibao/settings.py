@@ -387,7 +387,11 @@ LOGGING = {
         'rest': {
             'handlers': ['file'],
             'level': 'DEBUG',
-        }
+        },
+        'wanglibao_account': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        },
     }
 }
 
