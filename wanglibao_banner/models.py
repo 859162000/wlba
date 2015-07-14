@@ -117,4 +117,5 @@ class AppActivate(models.Model):
     start_at = models.DateTimeField(u"banner生效时间", null=True, blank=True)
     end_at = models.DateTimeField(u"banner失效时间", null=True, blank=True)
     is_used = models.BooleanField(u'是否启用', default=False, help_text=u'默认不启用')
+    img_four = models.ImageField(u'小图片2', upload_to='activity', blank=True,  default='', help_text=u'小尺寸图片2，图片名称只允许字母数字下划线组成，ios使用')
 
