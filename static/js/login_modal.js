@@ -72,7 +72,7 @@
       var captcha_1, count, element, intervalId, phoneNumber, timerFunction;
       element = $('#img-code');
       phoneNumber = $.trim($("#reg_identifier").val());
-      captcha_1 = $(this).parents('form').find('#id_captcha_1').val();
+      captcha_1 = $(this).parents('form').find('.captcha').val();
       $.ajax({
         url: "/api/phone_validation_code/register/" + phoneNumber + "/",
         type: "POST",
@@ -94,17 +94,16 @@
         $(element).addClass('button-red');
         $(element).removeClass('button-gray');
         result = JSON.parse(xhr.responseText);
-        if (xhr.status >= 400) {
-          tool.modalAlert({
-            title: '温馨提示',
-            msg: result.message,
-            callback_ok: _showModal
-          });
-          clearInterval(intervalId);
-          $(element).text('重新获取');
-          $(element).removeAttr('disabled');
-          $(element).addClass('button-red');
-          return $(element).removeClass('button-gray');
+        if (result.type === 'captcha') {
+          return $("#submit-code-img1").parent().parent().find('.code-img-error').html(result.message);
+        } else {
+          if (xhr.status >= 400) {
+            return tool.modalAlert({
+              title: '温馨提示',
+              msg: result.message,
+              callback_ok: _showModal
+            });
+          }
         }
       });
       intervalId;
