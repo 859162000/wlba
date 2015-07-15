@@ -50,8 +50,8 @@ from marketing.play_list import InvestmentHistory
 from marketing.views import ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView, ThousandRedPackCountAPIView
 from weixin.views import P2PListWeixin
 
-from wanglibao_rest.views_app import (AppActivateImageAPIView, AppRepaymentAPIView, AppDayListView, AppGuardView,
-                                      AppGuideView, AppSecureView, AppExploreView)
+from wanglibao_app.views import (AppActivateImageAPIView, AppRepaymentAPIView, AppDayListView, AppGuardView,
+                                 AppGuideView, AppSecureView, AppExploreView)
 
 
 router = DefaultRouter()
