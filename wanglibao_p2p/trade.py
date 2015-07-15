@@ -278,7 +278,7 @@ class P2POperator(object):
         if not result:
             return
         for x in result:
-            order_id = OrderHelper.place_order(x.user, order_type=u'加息', product_id=product.id, status=u'新建').id
-            margin_keeper = MarginKeeper(user=x.user, order_id=order_id)
-            margin_keeper.hike_deposit(x.amount, u"加息存入%s元" % x.amount, savepoint=False)
-            OrderHelper.update_order(Order.objects.get(pk=order_id), user=x.user, status=u'成功', amount=x.amount)
+            order_id = OrderHelper.place_order(x['user'], order_type=u'加息', product_id=product.id, status=u'新建').id
+            margin_keeper = MarginKeeper(user=x['user'], order_id=order_id)
+            margin_keeper.hike_deposit(x['amount'], u"加息存入%s元" % x['amount'], savepoint=False)
+            OrderHelper.update_order(Order.objects.get(pk=order_id), user=x['user'], status=u'成功', amount=x['amount'])
