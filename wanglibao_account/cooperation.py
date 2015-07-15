@@ -467,6 +467,10 @@ class CoopQuery(APIView):
             amount, invested_time = get_first_investment_for_coop(user_id)
             user_info['investment'] = amount
             user_info['time'] = invested_time
+
+        if user_info['time']:
+            user_info['time'] = timezone.localtime(user_info['time']).strftime('%Y-%m-%d %H:%M:%S')
+
         return user_info
 
     def get_all_user_info_for_coop(self, channel_code, user_type, start_day, end_day, sign):
