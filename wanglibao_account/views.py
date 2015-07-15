@@ -1275,7 +1275,6 @@ class IdVerificationView(TemplateView):
 
         return super(IdVerificationView, self).form_valid(form)
 
-
 class AdminIdVerificationView(TemplateView):
     template_name = 'admin_verify_id.jade'
 

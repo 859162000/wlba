@@ -43,14 +43,12 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
                             DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView,
-                            GestureAddView, GestureUpdateView, GestureIsEnabledView)
+                            GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView)
 from wanglibao_redpack.views import RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView
 
 from marketing.play_list import InvestmentHistory
 from marketing.views import ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView, ThousandRedPackCountAPIView
 from weixin.views import P2PListWeixin
-
-from wanglibao_rest.views_app import AppActivateImageAPIView, AppRepaymentAPIView
 
 
 router = DefaultRouter()
@@ -209,7 +207,8 @@ urlpatterns = patterns(
 )
 
 urlpatterns += patterns('',
-    url(r'^api-token-auth/', 'wanglibao_rest.views.obtain_auth_token'),
+    #url(r'^api-token-auth/', 'wanglibao_rest.views.obtain_auth_token'),
+    url(r'^api-token-auth/', LoginAPIView.as_view()),
     url(r'wrapper/', 'drf_wrapper.views.wrapper_view'),
 )
 
@@ -233,6 +232,5 @@ urlpatterns += patterns(
 # app端改版新接口
 urlpatterns += patterns(
     '',
-    url(r'^m/preload/$', AppActivateImageAPIView.as_view()),
-    url(r'^m/repayment/$', AppRepaymentAPIView.as_view())
+    url(r'^m/', include('wanglibao_app.urls')),
 )
