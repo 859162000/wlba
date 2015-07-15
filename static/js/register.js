@@ -63,15 +63,16 @@
       }
     });
     $("#submit-code-img").click(function(e) {
-      var captcha_1, count, element, intervalId, phoneNumber, timerFunction;
+      var captcha_0, captcha_1, count, element, intervalId, phoneNumber, timerFunction;
       element = $('#button-get-validate-code');
       phoneNumber = $.trim($("#id_identifier").val());
+      captcha_0 = $(this).parents('form').find('#id_captcha_0').val();
       captcha_1 = $(this).parents('form').find('#id_captcha_1').val();
       $.ajax({
         url: "/api/phone_validation_code/register/" + phoneNumber + "/",
         type: "POST",
         data: {
-          captcha_0: $('input[name="captcha_0"]').val(),
+          captcha_0: captcha_0,
           captcha_1: captcha_1
         }
       }).success(function(xhr) {

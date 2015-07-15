@@ -56,12 +56,13 @@ require ['jquery', 'jquery.validate', 'tools', 'jquery.complexify', 'lib/backend
   $("#submit-code-img").click (e) ->
     element = $('#button-get-validate-code')
     phoneNumber = $.trim($("#id_identifier").val())
+    captcha_0 = $(this).parents('form').find('#id_captcha_0').val()
     captcha_1 = $(this).parents('form').find('#id_captcha_1').val()
     $.ajax
       url: "/api/phone_validation_code/register/" + phoneNumber + "/"
       type: "POST"
       data: {
-        captcha_0 : $('input[name="captcha_0"]').val()
+        captcha_0 : captcha_0
         captcha_1 : captcha_1
       }
     .success (xhr)->

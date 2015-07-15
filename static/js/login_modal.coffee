@@ -73,12 +73,13 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
   $('#submit-code-img1').click () ->
     element = $('#img-code')
     phoneNumber = $.trim($("#reg_identifier").val())
+    captcha_0 = $(this).parents('form').find('#id_captcha_0').val()
     captcha_1 = $(this).parents('form').find('.captcha').val()
     $.ajax
       url: "/api/phone_validation_code/register/" + phoneNumber + "/"
       type: "POST"
       data: {
-        captcha_0 : $('input[name="captcha_0"]').val()
+        captcha_0 : captcha_0
         captcha_1 : captcha_1
       }
     .success (data)->
