@@ -296,7 +296,7 @@ class CooperationTestCase(TestCase):
 
     def test_all_processors_for_session(self):
         #for yiruite
-        self.request.GET = {'from':'yiruite', 'tid':'123456'}
+        self.request.GET = {'promo_token':'yiruite', 'tid':'123456'}
         self.request.session = {}
         coop_reg = CoopRegister(self.request)
         coop_reg.all_processors_for_session()
@@ -307,12 +307,7 @@ class CooperationTestCase(TestCase):
         coop_reg = CoopRegister(self.request)
         coop_reg.all_processors_for_session()
         assert self.request.session == {'channel_code': 'pptv'}
-        #with mulitple token
-        self.request.GET = {'promo_token': 'pptv','from':'yiruite', 'tid':'123456'}
-        self.request.session = {}
-        coop_reg = CoopRegister(self.request)
-        coop_reg.all_processors_for_session()
-        assert self.request.session == {'channel_code':'yiruite', 'channel_user':'123456'}
+
 
     def test_all_processors_for_register_for_default(self):
         self.request.GET = {'promo_token':'pptv'}
@@ -332,7 +327,7 @@ class CooperationTestCase(TestCase):
         clear_db(Channels, User, IntroducedBy)
 
     def test_all_processors_for_register_for_yiruite(self):
-        self.request.GET = {'from':'yiruite', 'tid':'123456'}
+        self.request.GET = {'promo_token':'yiruite', 'tid':'123456'}
         self.request.session = {}
         coop_reg = CoopRegister(self.request)
         coop_reg.all_processors_for_session()
@@ -356,7 +351,7 @@ class CooperationTestCase(TestCase):
         clear_db(Channels, User, IntroducedBy)
 
     def test_get_user_channel_processor(self):
-        self.request.GET = {'from':'yiruite', 'tid':'123456'}
+        self.request.GET = {'promo_token':'yiruite', 'tid':'123456'}
         self.request.session = {}
         coop_reg = CoopRegister(self.request)
         coop_reg.all_processors_for_session()

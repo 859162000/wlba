@@ -321,8 +321,6 @@ class YiRuiTeRegister(CoopRegister):
     def __init__(self, request):
         super(YiRuiTeRegister, self).__init__(request)
         self.c_code = 'yiruite'
-        self.external_channel_key = 'from'
-        self.external_channel_user_key = 'tid'
         self.coop_key = YIRUITE_KEY
         self.key = WLB_FOR_YIRUITE_KEY
         self.call_back_url = YIRUITE_CALL_BACK_URL
@@ -342,7 +340,6 @@ class BengbengRegister(CoopRegister):
     def __init__(self, request):
         super(BengbengRegister, self).__init__(request)
         self.c_code = 'bengbeng'
-        self.external_channel_user_key = 'bengbeng_id'
         self.coop_id = BENGBENG_COOP_ID
         self.coop_key = BENGBENG_KEY
         self.key = WLB_FOR_BENGBENG_KEY
@@ -365,7 +362,6 @@ class JuxiangyouRegister(CoopRegister):
     def __init__(self, request):
         super(JuxiangyouRegister, self).__init__(request)
         self.c_code = 'juxiangyou'
-        self.external_channel_user_key = 'jxy_id'
         self.coop_id = JUXIANGYOU_COOP_ID
         self.coop_key = JUXIANGYOU_KEY
         self.call_back_url = JUXIANGYOU_CALL_BACK_URL
