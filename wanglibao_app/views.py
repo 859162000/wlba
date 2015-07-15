@@ -5,19 +5,19 @@ __author__ = 'zhanghe'
 
 import logging
 
-from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
+from datetime import datetime
 from marketing.utils import local_to_utc
 
 from wanglibao import settings
 from django.db.models import Q
+from django.views.generic import TemplateView
 from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from wanglibao_banner.models import AppActivate
-from wanglibao_p2p.models import ProductAmortization, UserAmortization, P2PEquity
+from wanglibao_p2p.models import ProductAmortization, P2PEquity
 from wanglibao_rest.utils import split_ua
 
 
@@ -103,3 +103,40 @@ class AppRepaymentAPIView(APIView):
         except Exception, e:
             logging.error(e.message)
             return Response({'ret_code': 20001, 'message': 'fail'})
+
+
+class AppDayListView(TemplateView):
+    """ app端榜单 """
+    template_name = ''
+
+    def get_context_data(self, **kwargs):
+        return {}
+
+
+class AppGuardView(TemplateView):
+    """ app保障页面 """
+    template_name = ''
+
+    def get_context_data(self, **kwargs):
+        return {}
+
+class AppGuideView(TemplateView):
+    """ app新手引导页面 """
+    template_name = ''
+
+    def get_context_data(self, **kwargs):
+        return {}
+
+class AppSecureView(TemplateView):
+    """ app安全保障页面"""
+    template_name = ''
+
+    def get_context_data(self, **kwargs):
+        return {}
+
+class AppExploreView(TemplateView):
+    """ app发现页面 """
+    template_name = ''
+
+    def get_context_data(self, **kwargs):
+        return {}

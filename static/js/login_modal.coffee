@@ -68,6 +68,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
       if console?
         console.log "Phone number checked, now send the valdiation code"
       $('#img-code-div').modal()
+      $('#img-code-div').find('#id_captcha_1').val('')
 
   $('#submit-code-img1').click () ->
     element = $('#img-code')

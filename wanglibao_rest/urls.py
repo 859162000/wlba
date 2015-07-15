@@ -50,8 +50,6 @@ from marketing.play_list import InvestmentHistory
 from marketing.views import ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView, ThousandRedPackCountAPIView
 from weixin.views import P2PListWeixin
 
-from wanglibao_rest.views_app import AppActivateImageAPIView, AppRepaymentAPIView
-
 
 router = DefaultRouter()
 
@@ -233,6 +231,5 @@ urlpatterns += patterns(
 # app端改版新接口
 urlpatterns += patterns(
     '',
-    url(r'^m/preload/$', AppActivateImageAPIView.as_view()),
-    url(r'^m/repayment/$', AppRepaymentAPIView.as_view())
+    url(r'^m/', include('wanglibao_app.urls')),
 )

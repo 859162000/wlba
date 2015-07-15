@@ -65,7 +65,8 @@
         if (typeof console !== "undefined" && console !== null) {
           console.log("Phone number checked, now send the valdiation code");
         }
-        return $('#img-code-div').modal();
+        $('#img-code-div').modal();
+        return $('#img-code-div').find('#id_captcha_1').val('');
       }
     });
     $('#submit-code-img1').click(function() {
