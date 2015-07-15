@@ -58,10 +58,6 @@ html
                 +nav-item('自动投标', '/fund/products', '', '')
                 +nav-item('安全保障', '/security', 'left-line', '')
                 +nav-item('帮助中心', '/help', '', '')
-                if user.is_authenticated
-                  +nav-item('我的账户', '/accounts/home', 'button button-red button-account-nav')
-                else
-                  +nav-item('我的账户', '/accounts/home', 'button button-red button-account-nav nologin')
     .fullbanner#invite-banner
     .full-container(style="height:910px")
       .full-gold#inivte-gold
