@@ -65,9 +65,9 @@ class SendValidationCodeView(APIView):
     The phone validate view which accept a post request and send a validate code to the phone
     """
     permission_classes = ()
-    throttle_classes = (UserRateThrottle,)
+    #throttle_classes = (UserRateThrottle,)
 
-    def post(self, request, phone, format=None):
+    def post(self, request, phone):
         phone_number = phone.strip()
         status, message = send_validation_code(phone_number, ip=get_client_ip(request))
         return Response({
@@ -81,12 +81,10 @@ class TestSendRegisterValidationCodeView(APIView):
     def post(self, request, phone):
         phone = phone.strip()
         user = WanglibaoUserProfile.objects.filter(phone=phone).first()
-        print(user)
         if user:
             return Response({"ret_code":-1, "message":"手机号已经注册"})
 
         phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone).first()
-        print(phone_validate_code_item)
 
         if phone_validate_code_item:
             phone_validate_code_item.code_send_count += 1
@@ -106,7 +104,7 @@ class SendRegisterValidationCodeView(APIView):
     permission_classes = ()
     # throttle_classes = (UserRateThrottle,)
 
-    def post(self, request, phone, format=None):
+    def post(self, request, phone):
         phone_number = phone.strip()
         phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number)
         if phone_check:
@@ -195,13 +193,14 @@ class RegisterAPIView(APIView):
 
         device = split_ua(request)
         invite_code = request.DATA.get('invite_code', "")
-        if not invite_code and "channel_id" in device:
-            if device['channel_id'] == "baidu":
-                invite_code = "baidushouji"
-            elif device['channel_id'] == "mi":
-                invite_code = "mi"
-            else:
-                invite_code = ""
+
+        #if not invite_code and "channel_id" in device:
+        #    if device['channel_id'] == "baidu":
+        #        invite_code = "baidushouji"
+        #    elif device['channel_id'] == "mi":
+        #        invite_code = "mi"
+        #    else:
+        #        invite_code = ""
                 #invite_code = device['channel_id']
         #if not invite_code and ("channel_id" in device and device['channel_id'] == "baidu"):
         #    invite_code = "baidushouji"
@@ -225,8 +224,9 @@ class RegisterAPIView(APIView):
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
 
-        auth_user = authenticate(identifier=identifier, password=password)
-        auth_login(request, auth_user)
+        if device['device_type'] == "pc":
+            auth_user = authenticate(identifier=identifier, password=password)
+            auth_login(request, auth_user)
 
         tools.register_ok.apply_async(kwargs={"user_id": user.id, 
                         "device":device})
@@ -536,7 +536,6 @@ class TopsOfDayView(APIView):
                 isvalid = 0
                 pass
         except Exception, e:
-            print e
             return Response({"ret_code": -1, "records": list()})
 
         return Response({"ret_code": 0, "records": records, "isvalid": isvalid})
@@ -557,7 +556,6 @@ class TopsOfWeekView(APIView):
             if len(records) == 0 and (datetime.utcnow().date() - top.activity_start.date()).days > int(week):
                 isvalid = 0
         except Exception, e:
-            print e
             return Response({"ret_code": -1, "records": list()})
 
         return Response({"ret_code": 0, "records": records, "isvalid": isvalid})
@@ -706,8 +704,49 @@ class AdminIdValidate(APIView):
                             "validate": True
                         }, status=200)
 
+class LoginAPIView(APIView):
+    permission_classes = ()
+
+    def post(self, request, *args, **kwargs):
+        identifier = request.DATA.get("identifier", "")
+        password = request.DATA.get("password", "")
+
+        if not identifier or not password:
+            return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
+
+        user = authenticate(identifier=identifier, password=password)
+
+        if not user:
+            return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
+        if not user.is_active:
+            return Response({"token":"false", "message":u"用户已被关闭"}, status=400)
+        if user.wanglibaouserprofile.frozen:
+            return Response({"token":"false", "message":u"用户已被冻结"}, status=400)
+
+        push_user_id = request.DATA.get("user_id", "")
+        push_channel_id = request.DATA.get("channel_id", "")
+        # 设备类型，默认为IOS
+        device_type = request.DATA.get("device_type", "ios")
+        if device_type not in ("ios", "android"):
+            return Response({'message': "device_type error"}, status=status.HTTP_200_OK)
+
+        if push_user_id and push_channel_id:
+            pu = UserPushId.objects.filter(push_user_id=push_user_id).first()
+            exist = False
+            if not pu:
+                pu = UserPushId()
+                pu.device_type = device_type
+                exist = True
+            if exist or pu.user != serializer.object['user'] or pu.push_channel_id != push_channel_id:
+                pu.user = serializer.object['user']
+                pu.push_user_id = push_user_id
+                pu.push_channel_id = push_channel_id
+                pu.save()
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({'token': token.key, "user_id":user.id}, status=status.HTTP_200_OK)
 
 class ObtainAuthTokenCustomized(ObtainAuthToken):
+    permission_classes = ()
     serializer_class = AuthTokenSerializer
 
     def post(self, request, *args, **kwargs):
