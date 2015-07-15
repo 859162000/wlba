@@ -57,7 +57,9 @@
 #ganjiwang-banner
   background: url("/static/imgs/pc_activity/ganjiwang/banner.jpg") no-repeat center center
   height: 453px
-
+#ganjiwang-welcome
+  background: rgba(0, 0, 0, 0.66)
+  top: 50px
 .gjw-wrap
   height: auto
   background: #f8f2ce
@@ -410,7 +412,7 @@
         color: #918958
         line-height: 25px
 #small-zc
-
+  z-index: 99999
   #activity-over
     width: 400px
     height: 200px
@@ -455,5 +457,60 @@
       font-size: 18px
       text-align: center
       line-height: 30px
+  #gjw-success
+    width: 400px
+    height: 200px
+    position: fixed
+    top: 50%
+    left: 50%
+    margin-top: -100px
+    margin-left: -200px
+    border-radius: 10px
+    background: #fff
+    display: none
+    .first-xl-off2
+      border-radius: 15px
+      background: #fff
+      font-weight: bold
+      color: #999
+      position: absolute
+      font-size: 21px
+      right: 3px
+      top: 2px
+      cursor: default
+      padding: 0 8px
+    p
+      font-size: 24px
+      margin-top: 50px
+      text-align: center
+    a
+      display: inline-block
+      padding: 8px 59px
+      font-size: 20px
+      background: #ff5252
+      cursor: default
+      border-radius: 5px
+      color: #fff
+      position: absolute
+      bottom: 0
+      left: 100px
+      display: none
+
+    ul
+      position: absolute
+      bottom: -10px
+      li
+        line-height: 20px
+        display: inline-block
+        padding: 10px 59px
+        font-size: 20px
+        background: #ff5252
+        cursor: default
+        border-radius: 5px
+        color: #fff
+        &:hover
+          background: #c93131
+          color: #fff
+
 
 
