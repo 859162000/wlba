@@ -5,7 +5,8 @@ form#register-modal-form.login-form(method='post', action='/accounts/register/aj
       .span7
         input#reg_identifier(type="text", name="identifier", placeholder="请输入手机号")
       .span5-omega
-        button#button-get-validate-code-modal.button-orange.button-large(type='button',style="top:-2px") 获取验证码
+        button#button-get-validate-code-modal.button-orange.button-large(type='button',style="display:none") 获取验证码
+        button#img-code.button-orange.button-large(type='button') 获取验证码
     .form-row-error
   .form-row.voice.hidden
     .span12-omega
@@ -25,12 +26,6 @@ form#register-modal-form.login-form(method='post', action='/accounts/register/aj
     .form-row-error
   .form-row
     input#reg_password2(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码")
-    .form-row-error
-  .form-row
-    input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
-    input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
-    img.captcha.captcha-img(alt="captcha", src="")
-    button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
     .form-row-error
   .form-row.form-bottom-bar
     button#register_submit.button-account.span12(type='submit') 注 册

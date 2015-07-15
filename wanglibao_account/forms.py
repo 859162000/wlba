@@ -28,8 +28,8 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     account is not activated. When the user clicked the activation link, the account
     will be activated.
     """
-    captcha_0 = forms.CharField(label='captcha_0', required=False)
-    captcha_1 = forms.CharField(label='captcha_1', required=False)
+    #captcha_0 = forms.CharField(label='captcha_0', required=False)
+    #captcha_1 = forms.CharField(label='captcha_1', required=False)
 
     nickname = forms.CharField(label="Nick name", required=False)
     identifier = forms.CharField(label="Email/Phone")
@@ -38,7 +38,6 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
 
     MlGb = forms.CharField(label='MlGb', required=False)
-    #captcha = CaptchaField(error_messages={'invalid': u'验证码错误', 'required': u'请输入验证码'}, required=True)
     _flag = False
 
     error_messages = {
@@ -58,36 +57,36 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         model = get_user_model()
         fields = ("email",)
 
-    def clean_captcha_1(self):
-        captcha_1 = self.cleaned_data['captcha_1']
-        captcha_0 = self.cleaned_data['captcha_0']
-        if not captcha_0 and not captcha_1:
-            self._flag = True
-            return
+    #def clean_captcha_1(self):
+    #    captcha_1 = self.cleaned_data['captcha_1']
+    #    captcha_0 = self.cleaned_data['captcha_0']
+    #    if not captcha_0 and not captcha_1:
+    #        self._flag = True
+    #        return
 
-        if not captcha_0 or not captcha_1:
-            raise forms.ValidationError(
-                self.error_messages['verify_invalid'],
-                code='verify_invalid'
-            )
-        record = CaptchaStore.objects.filter(hashkey=captcha_0).first()
-        if not record:
-            raise forms.ValidationError(
-                self.error_messages['verify_error'],
-                code='verify_error'
-            )
-        if captcha_1.lower() == record.response.lower():
-            try:
-                record.delete()
-            except:
-                pass
-            self._flag = True
-            return captcha_1.strip()
-        else:
-            raise forms.ValidationError(
-                self.error_messages['verify_error'],
-                code='verify_error'
-            )
+    #    if not captcha_0 or not captcha_1:
+    #        raise forms.ValidationError(
+    #            self.error_messages['verify_invalid'],
+    #            code='verify_invalid'
+    #        )
+    #    record = CaptchaStore.objects.filter(hashkey=captcha_0).first()
+    #    if not record:
+    #        raise forms.ValidationError(
+    #            self.error_messages['verify_error'],
+    #            code='verify_error'
+    #        )
+    #    if captcha_1.lower() == record.response.lower():
+    #        try:
+    #            record.delete()
+    #        except:
+    #            pass
+    #        self._flag = True
+    #        return captcha_1.strip()
+    #    else:
+    #        raise forms.ValidationError(
+    #            self.error_messages['verify_error'],
+    #            code='verify_error'
+    #        )
 
     def clean_identifier(self):
         """
@@ -131,7 +130,9 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
                             self.error_messages['invite code not match'],
                             code='invite code not match',
                         )
+            self._flag = True
             return invite_code
+        self._flag = True
 
     def clean_MlGb(self):
         MlGb_src = self.cleaned_data.get('MlGb')
