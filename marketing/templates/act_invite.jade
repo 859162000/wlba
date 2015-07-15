@@ -55,9 +55,13 @@ html
                         span.icon.icon-free 免费
                 +nav-item('首页', '/', '', '')
                 +nav-item('理财专区', '/p2p/list/', '', '')
-                +nav-item('基金', '/fund/products', '', '')
+                +nav-item('自动投标', '/fund/products', '', '')
                 +nav-item('安全保障', '/security', 'left-line', '')
                 +nav-item('帮助中心', '/help', '', '')
+                if user.is_authenticated
+                  +nav-item('我的账户', '/accounts/home', 'button button-red button-account-nav')
+                else
+                  +nav-item('我的账户', '/accounts/home', 'button button-red button-account-nav nologin')
     .fullbanner#invite-banner
     .full-container(style="height:910px")
       .full-gold#inivte-gold
@@ -112,8 +116,8 @@ html
             dl(style='margin-top: 20px;padding-bottom: 20px')
               dt 活动规则:
               dd 1、手机号为网利宝唯一账户，每个身份证号只可绑定一个网利宝账号；
-              dd 2、被推荐人注册送100元红包，投资满1000元即可使用；（100元红包完成一次投资后可提现）；
-              dd 3、被推荐人投资满1000元即成功建立邀请关系。推荐人获30元红包，多邀多送上不封顶！
+              dd 2、被推荐人注册送100元红包，投资满1000元即可使用（100元红包完成一次投资后可提现）；
+              dd 3、被推荐人首次投资满1000元即成功建立邀请关系。推荐人获30元红包，多邀多送上不封顶！
               dd 4、奖品信息将发送至您的网利宝站内信；
               dd 5、刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
               dd 6、网利宝对此活动享有最终解释权。
