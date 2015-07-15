@@ -130,9 +130,9 @@
 
 
   //固定回到顶部
-   function backtop(){
+   function backtop(box){
      var k=document.body.clientWidth,
-       e=$(".new-xl-big").width();
+       e=box.width();
        q=k-e;
        w=q/2;
        r= e+w;
@@ -141,7 +141,9 @@
    }
 
   var left;
-  left=backtop();
+  left=backtop($(".new-xl-big"));
+  left2=backtop($(".gjw-gold"));
+  console.log(left2)
   //浏览器大小改变触发的事件
   window.onresize = function(){
     left = backtop();
