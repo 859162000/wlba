@@ -22,7 +22,7 @@ class AboutusAdmin(admin.ModelAdmin):
 
 
 class AppActivateAdmin(admin.ModelAdmin):
-    list_display = ('name', 'device', 'img_one', 'img_two', 'img_three', 'last_updated', 'is_long_used', 'start_at', 'end_at', 'is_used', )
+    list_display = ('name', 'device', 'img_one', 'img_two', 'img_three', 'img_four', 'last_updated', 'is_long_used', 'start_at', 'end_at', 'is_used', )
 
 
 admin.site.register(Banner, BannerAdmin)
