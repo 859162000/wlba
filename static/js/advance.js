@@ -180,6 +180,12 @@
       }
 
     })
+    //点击旅游路线
+    $('#tour_line').on('click',function(){
+      $('.gjw-tour').slideToggle(300)
+    })
+
+
   });
 
 }).call(this);
