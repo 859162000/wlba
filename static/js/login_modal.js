@@ -58,6 +58,78 @@
     $.validator.addMethod("emailOrPhone", function(value, element) {
       return backend.checkEmail(value) || backend.checkMobile(value);
     });
+    $('#img-code').click(function() {
+      var phoneNumber;
+      phoneNumber = $.trim($("#reg_identifier").val());
+      if (checkMobile(phoneNumber)) {
+        if (typeof console !== "undefined" && console !== null) {
+          console.log("Phone number checked, now send the valdiation code");
+        }
+        return $('#img-code-div').modal();
+      }
+    });
+    $('#submit-code-img1').click(function() {
+      var captcha_1, count, element, intervalId, phoneNumber, timerFunction;
+      element = $('#img-code');
+      phoneNumber = $.trim($("#reg_identifier").val());
+      captcha_1 = $(this).parents('form').find('.captcha').val();
+      $.ajax({
+        url: "/api/phone_validation_code/register/" + phoneNumber + "/",
+        type: "POST",
+        data: {
+          captcha_0: $('input[name="captcha_0"]').val(),
+          captcha_1: captcha_1
+        }
+      }).success(function(data) {
+        element.attr('disabled', 'disabled');
+        element.removeClass('button-red');
+        element.addClass('button-gray');
+        $('.voice-validate').attr('disabled', 'disabled');
+        return $('#login-modal').modal();
+      }).fail(function(xhr) {
+        var result;
+        clearInterval(intervalId);
+        $(element).text('重新获取');
+        $(element).removeAttr('disabled');
+        $(element).addClass('button-red');
+        $(element).removeClass('button-gray');
+        result = JSON.parse(xhr.responseText);
+        if (result.type === 'captcha') {
+          return $("#submit-code-img1").parent().parent().find('.code-img-error').html(result.message);
+        } else {
+          if (xhr.status >= 400) {
+            return tool.modalAlert({
+              title: '温馨提示',
+              msg: result.message,
+              callback_ok: _showModal
+            });
+          }
+        }
+      });
+      intervalId;
+      count = 180;
+      $(element).attr('disabled', 'disabled');
+      $(element).removeClass('button-red');
+      $(element).addClass('button-gray');
+      $('.voice-validate').attr('disabled', 'disabled');
+      timerFunction = function() {
+        if (count >= 1) {
+          count--;
+          return $(element).text('已经发送(' + count + ')');
+        } else {
+          clearInterval(intervalId);
+          $(element).text('重新获取');
+          $(element).removeAttr('disabled');
+          $(element).addClass('button-red');
+          $(element).removeClass('button-gray');
+          $('.voice').removeClass('hidden');
+          $('.voice-validate').removeAttr('disabled');
+          return $('.voice  .span12-omega').html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>');
+        }
+      };
+      timerFunction();
+      return intervalId = setInterval(timerFunction, 1000);
+    });
     $('#login-modal-form').validate({
       rules: {
         identifier: {
