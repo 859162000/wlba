@@ -387,8 +387,13 @@ LOGGING = {
         'rest': {
             'handlers': ['file'],
             'level': 'DEBUG',
-        }
+        },
+        'wanglibao_account': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        },
     }
+
 }
 
 if ENV != ENV_DEV:
@@ -639,6 +644,7 @@ if ENV == ENV_DEV:
 
 PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
 PROMO_TOKEN_QUERY_STRING = 'promo_token'
+PROMO_TOKEN_USER_KEY = 'tid'
 
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
 CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
@@ -686,6 +692,7 @@ if ENV == ENV_PRODUCTION:
 else:
     TIANMANG_CALL_BACK_URL = "http://demo.bangwoya.com/callback/callback.php"
 TINMANG_KEY= '65'
+WLB_FOR_TIANMANG_KEY = '1988'
 
 # 易瑞特
 if ENV == ENV_PRODUCTION:
@@ -713,6 +720,7 @@ else:
     BENGBENG_CALL_BACK_URL = "http://www.bengbeng.com/retaste.php"
 
 # 聚享游
+WLB_FOR_JUXIANGYOU_KEY = '1991'
 if ENV == ENV_PRODUCTION:
     JUXIANGYOU_COOP_ID = ''
     JUXIANGYOU_KEY = ''
@@ -722,6 +730,9 @@ else:
     JUXIANGYOU_KEY = 'b0cj391b90p421n8'
     JUXIANGYOU_CALL_BACK_URL = 'http://api.juxiangyou.com/web/p2pApi_test.php'
 
+#都玩
+WLB_FOR_DOUWANWANG_KEY = '1992'
+DOUWANWANG_CALL_BACK_URL = 'http://mall.366dw.com/interface/reflection'
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100

@@ -15,7 +15,7 @@ from wanglibao import settings
 from wanglibao.settings import  YIRUITE_CALL_BACK_URL, \
         TIANMANG_CALL_BACK_URL, WLB_FOR_YIRUITE_KEY, YIRUITE_KEY, BENGBENG_KEY, \
     WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
-    JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY
+    JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import  yiruite_callback,  common_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord
@@ -41,8 +41,47 @@ def get_username_for_coop(user_id):
     :param user_id:
     :return:
     """
-    user_name = WanglibaoUserProfile.objects.get(user_id=int(user_id)).name
-    return u'*' + user_name[1:]
+    try:
+        user_name = WanglibaoUserProfile.objects.get(user_id=int(user_id)).name
+        return u'*' + user_name[1:]
+    except:
+        return None
+
+def get_phone_for_coop(user_id):
+    try:
+        phone_number = WanglibaoUserProfile.objects.get(user_id=user_id).phone
+        return phone_number[:3] + '***' + phone_number[-2:]
+    except:
+        return None
+
+def get_first_investment_for_coop(user_id):
+    try:
+        p2p_record = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购').order_by('create_time')
+        amount = p2p_record[0].amount
+        first_invest_time = p2p_record[0].create_time
+        return amount, first_invest_time
+    except:
+        return None
+
+def get_tid_for_coop(user_id):
+    try:
+        return Binding.objects.filter(user_id=user_id).get().bid
+    except:
+        return None
+
+def get_validate_time_for_coop(user_id):
+    try:
+        id_number = WanglibaoUserProfile.objects.filter(user_id=user_id).get().id_number
+        return IdVerification.objects.filter(id_number=id_number).created_at
+    except:
+        return None
+
+def get_binding_time_for_coop(user_id):
+    try:
+        return Binding.objects.filter(user_id=user_id).get().created_at
+    except:
+        return None
+
 
 #######################第三方用户注册#####################
 
@@ -58,7 +97,7 @@ class CoopRegister(object):
         self.external_channel_key = settings.PROMO_TOKEN_QUERY_STRING
         self.internal_channel_key = 'channel_code'
         #传递渠道用户时使用的变量名
-        self.external_channel_user_key = None
+        self.external_channel_user_key = settings.PROMO_TOKEN_USER_KEY
         self.internal_channel_user_key = 'channel_user'
         #渠道提供给我们的秘钥
         self.coop_key = None
@@ -91,15 +130,26 @@ class CoopRegister(object):
     def channel_user(self):
         return self.request.session.get(self.internal_channel_user_key, None)
 
+    def channel_user_from_db(self, user):
+        """
+        从binding中获取用户在渠道中的id
+        :param user:
+        :return:
+        """
+        try:
+            return Binding.objects.filter(user=user).get().bid
+        except:
+            return None
+
     def save_to_session(self):
         channel_code  = self.get_channel_code_from_request()
         channel_user  = self.request.GET.get(self.external_channel_user_key, None)
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
-            logger.debug('save to session %s:%s'%(self.internal_channel_key, channel_code))
+            #logger.debug('save to session %s:%s'%(self.internal_channel_key, channel_code))
         if channel_user:
             self.request.session[self.internal_channel_user_key] = channel_user
-            logger.debug('save to session %s:%s'%(self.internal_channel_user_key, channel_user))
+            #logger.debug('save to session %s:%s'%(self.internal_channel_user_key, channel_user))
 
     def clear_session(self):
         self.request.session.pop(self.internal_channel_key, None)
@@ -148,7 +198,28 @@ class CoopRegister(object):
         else:
             logger.debug('failed to save user %s to binding'%user)
 
-    def call_back(self, user):
+    def register_call_back(self, user):
+        """
+        用户注册成功后的回调
+        :param user:
+        :return:
+        """
+        pass
+
+    def validate_call_back(self, user):
+        """
+        用户实名验证后的回调
+        :param user:
+        :return:
+        """
+        pass
+
+    def binding_card_call_back(self, user):
+        """
+        用户绑定银行卡之后的回调
+        :param user:
+        :return:
+        """
         pass
 
     def process_for_register(self, user, invite_code):
@@ -157,7 +228,7 @@ class CoopRegister(object):
         """
         self.save_to_introduceby(user, invite_code)
         self.save_to_binding(user)
-        self.call_back(user)
+        self.register_call_back(user)
         self.clear_session()
 
     @property
@@ -185,6 +256,31 @@ class CoopRegister(object):
             #默认注册
             self.process_for_register(user, invite_code)
 
+    def get_user_channel_processor(self, user):
+        """
+        返回该用户的渠道处理器
+        """
+        try:
+            channel_code = Channels.objects.filter(introducedby__user_id = user.id).get().code
+            for channel_processor in self.processors:
+                if channel_processor.c_code == channel_code:
+                    return channel_processor
+        except:
+            return None
+
+
+    def process_for_validate(self, user):
+        channel_processor = self.get_user_channel_processor(user)
+        logger.debug('channel processor %s'%channel_processor)
+        if channel_processor:
+            channel_processor.validate_call_back(user)
+
+    def process_for_binding_card(self, user):
+        channel_processor = self.get_user_channel_processor(user)
+        logger.debug('channel processor %s'%channel_processor)
+        if channel_processor:
+            channel_processor.binding_card_call_back(user)
+
 class TianMangRegister(CoopRegister):
     def __init__(self, request):
         super(TianMangRegister, self).__init__(request)
@@ -210,7 +306,7 @@ class TianMangRegister(CoopRegister):
         super(TianMangRegister, self).clear_session()
         self.request.session.pop('tianmang_sn', None)
 
-    def call_back(self, user):
+    def register_call_back(self, user):
         params={
             "oid": self.coop_key,
             "sn" : self.tianmang_sn,
@@ -225,13 +321,11 @@ class YiRuiTeRegister(CoopRegister):
     def __init__(self, request):
         super(YiRuiTeRegister, self).__init__(request)
         self.c_code = 'yiruite'
-        self.external_channel_key = 'from'
-        self.external_channel_user_key = 'tid'
         self.coop_key = YIRUITE_KEY
         self.key = WLB_FOR_YIRUITE_KEY
         self.call_back_url = YIRUITE_CALL_BACK_URL
 
-    def call_back(self, user):
+    def register_call_back(self, user):
         uid_for_coop = get_uid_for_coop(user.id)
         sign = hashlib.md5(self.channel_user + uid_for_coop + self.coop_key).hexdigest()
         params = {
@@ -246,13 +340,12 @@ class BengbengRegister(CoopRegister):
     def __init__(self, request):
         super(BengbengRegister, self).__init__(request)
         self.c_code = 'bengbeng'
-        self.external_channel_user_key = 'bengbeng_id'
         self.coop_id = BENGBENG_COOP_ID
         self.coop_key = BENGBENG_KEY
         self.key = WLB_FOR_BENGBENG_KEY
         self.call_back_url = BENGBENG_CALL_BACK_URL
 
-    def call_back(self, user):
+    def binding_card_call_back(self, user):
         uid_for_coop = get_uid_for_coop(user.id)
         sign = hashlib.md5(self.coop_id + self.channel_user + uid_for_coop + self.coop_key).hexdigest()
         params = {
@@ -269,12 +362,11 @@ class JuxiangyouRegister(CoopRegister):
     def __init__(self, request):
         super(JuxiangyouRegister, self).__init__(request)
         self.c_code = 'juxiangyou'
-        self.external_channel_user_key = 'jxy_id'
         self.coop_id = JUXIANGYOU_COOP_ID
         self.coop_key = JUXIANGYOU_KEY
         self.call_back_url = JUXIANGYOU_CALL_BACK_URL
 
-    def call_back(self, user):
+    def register_call_back(self, user):
         uid_for_coop = get_uid_for_coop(user.id)
         sign = hashlib.md5(self.coop_id + self.channel_user + uid_for_coop + self.coop_key).hexdigest()
         params = {
@@ -286,9 +378,32 @@ class JuxiangyouRegister(CoopRegister):
         common_callback.apply_async(
             kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
 
+class DouwanRegister(CoopRegister):
+    def __init__(self, request):
+        super(DouwanRegister, self).__init__(request)
+        self.c_code = 'douwanwang'
+        self.call_back_url = DOUWANWANG_CALL_BACK_URL
+
+    def douwan_callback(self, user, step):
+        params = {
+            'tid': get_tid_for_coop(user.id),
+            step : get_uid_for_coop(user.id)
+        }
+        common_callback.apply_async(
+            kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+
+    def register_call_back(self, user):
+        self.douwan_callback(user, 'step1')
+
+    def validate_call_back(self, user):
+        self.douwan_callback(user, 'step2')
+
+    def binding_card_call_back(self, user):
+        self.douwan_callback(user, 'step3')
+
 
 #注册第三方通道
-coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister]
+coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister, JuxiangyouRegister, DouwanRegister]
 
 #######################第三方用户查询#####################
 
@@ -296,7 +411,15 @@ class CoopQuery(APIView):
     """
     第三方用户查询api
     """
+    permission_classes = ()
     channel = None
+
+    #查询用户的类型
+    REGISTERED_USER = 0
+    VALIDATED_USER = 1
+    BINDING_USER = 2
+    INVESTED_USER = 3
+
     def get_promo_user(self, channel_code, startday, endday):
         """
 
@@ -317,268 +440,91 @@ class CoopQuery(APIView):
         logger.debug("promo user:%s"%[promo_user.user for promo_user in promo_list])
         return promo_list
 
-    def check_sign(self, startday, endday, sign):
-        if self.channel:
-            m = hashlib.md5()
-            key = getattr(settings, 'WLB_FOR_%s_KEY'%self.channel.upper())
-            m.update(startday+endday+key)
-            local_sign = m.hexdigest()
-            if sign != local_sign:
-                logger.debug('正确的渠道校验参数%s'%local_sign)
-                logger.error(u"渠道查询接口，sign参数校验失败")
-                return False
-            return True
+    def check_sign(self, channel_code, startday, endday, sign):
+        m = hashlib.md5()
+        key = getattr(settings, 'WLB_FOR_%s_KEY'%channel_code.upper())
+        m.update(startday+endday+key)
+        local_sign = m.hexdigest()
+        if sign != local_sign:
+            logger.debug('正确的渠道校验参数%s'%local_sign)
+            logger.error(u"渠道查询接口，sign参数校验失败")
+            return False
+        return True
 
-class TianmangQuery(CoopQuery):
-    """
-    根据天芒要求的格式返回信息
-    """
-    channel = 'tianmang'
+    def get_user_info_for_coop(self, user_type, user_id, time=None):
+        user_info = {
+            'time': time,
+            'uid': get_uid_for_coop(user_id),
+            'uname': get_username_for_coop(user_id),
+            'phone': get_phone_for_coop(user_id),
+            'tid': get_tid_for_coop(user_id),
+        }
+        if user_type == self.VALIDATED_USER:
+            user_info['time'] = get_validate_time_for_coop(user_id)
+        elif user_type == self.BINDING_USER:
+            user_info['time'] = get_binding_time_for_coop(user_id)
+        elif user_type == self.INVESTED_USER:
+            amount, invested_time = get_first_investment_for_coop(user_id)
+            user_info['investment'] = amount
+            user_info['time'] = invested_time
 
-    def get_phone_for_tianmang(self, user_id):
-        phone_number = WanglibaoUserProfile.objects.get(user_id=user_id).phone
-        return phone_number[:3] + '***' + phone_number[-2:]
+        if user_info['time']:
+            user_info['time'] = timezone.localtime(user_info['time']).strftime('%Y-%m-%d %H:%M:%S')
 
-class TianmangIDVerificationQuery(TianmangQuery):
-    """天芒云 获取完成身份证认证用户"""
-    permission_classes = ()
-    def get(self, request, startday, endday):
-        response_user_list = []
-        try :
-            tianmang_promo_list = self.get_promo_user(self.channel, startday, endday)
-            for tianmang_promo_user in tianmang_promo_list:
+        return user_info
+
+    def get_all_user_info_for_coop(self, channel_code, user_type, start_day, end_day, sign):
+        if not self.check_sign(channel_code, start_day, end_day, sign):
+            raise ValueError('wrong signature.')
+
+        coop_users = self.get_promo_user(channel_code, start_day, end_day)
+
+        if user_type == self.VALIDATED_USER:
+            def is_validated_user(user_id):
                 try:
-                    if tianmang_promo_user.user.wanglibaouserprofile.id_is_valid:
-                        #获取身份认证的时间
-                        created_at = IdVerification.objects.get(\
-                            id_number=tianmang_promo_user.user.wanglibaouserprofile.id_number).created_at
-
-                        response_user ={
-                            "time": timezone.localtime(created_at).strftime("%Y-%m-%d %H:%M:%S"),
-                            "uid": get_uid_for_coop(tianmang_promo_user.user_id),
-                            "uname": get_username_for_coop(tianmang_promo_user.user_id),
-                            "phone": self.get_phone_for_tianmang(tianmang_promo_user.user_id),
-                            #"status":tianmang_promo_user.user.wanglibaouserprofile.id_is_valid and 1 or 0,
-                        }
-                        response_user_list.append(response_user)
+                    return WanglibaoUserProfile.objects.filter(user_id=user_id).get().id_is_valid
                 except:
-                    pass
-        except:
-            logger.error("TianmangIDVerificationListAPIView error")
+                    return False
+            logger.debug('user id %s'%[u.user_id for u in coop_users])
+            coop_users = [u for u in coop_users if is_validated_user(u.user_id)]
+        elif user_type == self.BINDING_USER:
+            def is_binding_user(user_id):
+                return Card.objects.filter(user_id=user_id).exists()
+            coop_users = [u for u in coop_users if is_binding_user(u.user_id)]
+        elif user_type == self.INVESTED_USER:
+            def is_invested_user(user_id):
+                return P2PRecord.objects.filter(user_id=user_id, catalog=u'申购').exists()
+            coop_users = [u for u in coop_users if is_invested_user(u.user_id)]
 
-        return HttpResponse(renderers.JSONRenderer().render(response_user_list, 'application/json'))
+        user_info = []
+        for coop_user in coop_users:
+            try:
+                user_info.append(self.get_user_info_for_coop(user_type, coop_user.user_id, coop_user.created_at))
+            except Exception, e:
+                logger.exception(e)
+                logging.debug('get user %s error:%s'%(coop_user.user_id, e))
 
+        return user_info
 
-class TianmangRegisterQuery(TianmangQuery):
-    """天芒云 获取注册完成用户"""
-    permission_classes = ()
-    def get(self, request, startday, endday):
-        response_user_list = []
-        try :
-            tianmang_promo_list = self.get_promo_user(self.channel, startday, endday)
-            for tianmang_promo_user in tianmang_promo_list:
-                try:
-                    response_user ={
-                        "time": timezone.localtime(tianmang_promo_user.created_at).strftime("%Y-%m-%d %H:%M:%S"),
-                        "uid": get_uid_for_coop(tianmang_promo_user.user_id),
-                        "uname": get_username_for_coop(tianmang_promo_user.user_id),
-                        #"status":tianmang_promo_user.user.wanglibaouserprofile.phone_verified and 1 or 0,
-                    }
-                    response_user_list.append(response_user)
-                except Exception, e:
-                    logger.debug('%s'%e)
-        except:
-            logger.error("TianmangRegisterListAPIView error")
-
-        return HttpResponse(renderers.JSONRenderer().render(response_user_list, 'application/json'))
-
-class TianmangInvestQuery(TianmangQuery):
-    """天芒云 投资成功及金额获取用户接口"""
-    permission_classes = ()
-    def get(self, request, startday, endday):
-        response_user_list = []
-        try :
-            tianmang_promo_list = self.get_promo_user(self.channel, startday, endday)
-
-            for tianmang_promo_user in tianmang_promo_list:
-                try:
-                    p2p_equities = P2PEquity.objects.filter(user=tianmang_promo_user.user).filter(product__status__in=[
-                        u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
-                        ])
-                    income_all = 0
-                    for equity in p2p_equities:
-                        if equity.confirm:
-                            income_all += equity.equity
-
-                    if not income_all:
-                        continue
-                    response_user ={
-                        "time": timezone.localtime(tianmang_promo_user.bought_at).strftime("%Y-%m-%d %H:%M:%S"),
-                        "uid": get_uid_for_coop(tianmang_promo_user.user_id),
-                        "uname": get_username_for_coop(tianmang_promo_user.user_id),
-                        "investment": float(income_all),
-                        #"status": 1 if income_all > 0 else 0
-                    }
-                    response_user_list.append(response_user)
-                except:
-                    pass
-        except:
-            logger.error("TianmangInvestListAPIView error")
-
-        return HttpResponse(renderers.JSONRenderer().render(response_user_list, 'application/json'))
-
-class TianmangInvestNotConfirmQuery(TianmangQuery):
-    """天芒云 投资成功及金额获取用户接口"""
-    permission_classes = ()
-    def get(self, request, startday, endday):
-
-        response_user_list = []
+    def get(self, request, channel_code, user_type, start_day, end_day, sign):
         try:
-            tianmang_promo_list = self.get_promo_user(self.channel, startday, endday)
-
-            for tianmang_promo_user in tianmang_promo_list:
-                try:
-                    total_equity = P2PEquity.objects.filter(user=tianmang_promo_user.user).filter(product__status__in=[
-                        u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
-                    ]).aggregate(total_equity=Sum('equity')).get('total_equity', 0)
-
-                    if not total_equity:
-                        continue
-                    response_user ={
-                        "time": timezone.localtime(tianmang_promo_user.bought_at).strftime("%Y-%m-%d %H:%M:%S"),
-                        "uid": get_uid_for_coop(tianmang_promo_user.user_id),
-                        "uname": get_username_for_coop(tianmang_promo_user.user_id),
-                        "investment": float(total_equity),
-                        #"status": 1 if income_all > 0 else 0
-                    }
-                    response_user_list.append(response_user)
-                except:
-                    pass
-        except Exception, e:
-            logger.error("TianmangInvestListNotConfirmAPIView error")
-            logger.error(e)
-
-        return HttpResponse(renderers.JSONRenderer().render(response_user_list, 'application/json'))
-
-class TianmangCardBindQuery(TianmangQuery):
-    """天芒云 批量查询通过天芒云渠道完成注册并成功绑定银行卡的用户列表接口"""
-    permission_classes = ()
-    def get(self, request, startday, endday):
-        response_user_list = []
-        try:
-            tianmang_promo_list = self.get_promo_user(self.channel, startday, endday)
-            for tianmang_promo_user in tianmang_promo_list:
-                try:
-                    add_at_list = Card.objects.filter(user=tianmang_promo_user.user).order_by('add_at')
-                    if add_at_list.exists():
-                        add_at = add_at_list[0].add_at
-                        response_user = {
-                            "time": timezone.localtime(add_at).strftime("%Y-%m-%d %H:%M:%S"),
-                            "uid": get_uid_for_coop(tianmang_promo_user.user_id),
-                            "uname": get_username_for_coop(tianmang_promo_user.user_id),
-                        }
-                        response_user_list.append(response_user)
-                except:
-                    pass
-        except:
-            logger.error("TianmangCardBindListAPIView error")
-
-        return HttpResponse(renderers.JSONRenderer().render(response_user_list, 'application/json'))
-
-
-class YiruiteQuery(CoopQuery):
-    permission_classes = ()
-    channel = 'yiruite'
-
-
-
-    def get(self, request, startday, endday, sign):
-        if not self.check_sign(startday, endday, sign):
-            return HttpResponse(renderers.JSONRenderer().render(
-                {"errorcode": 2, "errormsg": "sign error"}, 'application/json'))
-
-        response_user_list = []
-        try:
-            yiruite_promo_list = self.get_promo_user(self.channel, startday, endday)
-            for yiruite_promo_user in yiruite_promo_list:
-                try:
-                    # 易瑞特用户是否实名认证
-                    is_valid = IdVerification.objects.get(\
-                        id_number=yiruite_promo_user.user.wanglibaouserprofile.id_number).is_valid
-
-                    # 易瑞特用户标识
-                    tid_list = Binding.objects.filter(user=yiruite_promo_user.user)
-                    tid = tid_list.first().bid
-                except:
-                    logger.debug('failed to get idverification or binding for user %s' %yiruite_promo_user.user)
-                    continue
-
-                try:
-                    # 用户首次投资
-                    p2p_record = P2PRecord.objects.filter(user=yiruite_promo_user.user, catalog=u'申购').order_by('create_time')
-                    amount = p2p_record[0].amount
-                    first_invest_time = timezone.localtime(p2p_record[0].create_time).strftime("%Y-%m-%d %H:%M:%S")
-                except:
-                    amount = 0
-                    first_invest_time = '0000-00-00 00:00:00'
-
-                response_user = {
-                    "UserName": yiruite_promo_user.user.username,
-                    "RegisterTime": timezone.localtime(
-                        yiruite_promo_user.created_at).strftime("%Y-%m-%d %H:%M:%S"),
-                    "IsValidateIdentity": is_valid,
-                    "tid": tid,
-                    "amount": amount,
-                    "FirstInvestTime": first_invest_time,
-                }
-                response_user_list.append(response_user)
             result = {
-                "errorcode": 0,
-                "errormsg": "success",
-                "info": response_user_list
+                'errorcode': 0,
+                'errormsg': 'sucess',
+                'info': self.get_all_user_info_for_coop(channel_code, int(user_type), start_day, end_day, sign)
+            }
+        except ValueError, e:
+            result = {
+                'errorcode': 2,
+                'errormsg': 'sign error',
             }
         except Exception, e:
-            logger.error("YiruiteInfoListAPIView error")
-            logger.error(e)
+            logger.exception(e.message)
             result = {
-                "errorcode": 1,
-                "errormsg": "api error"
+                'errorcode': 1,
+                'errormsg': 'api error'
             }
-        return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
-
-class BengbengQuery(CoopQuery):
-    permission_classes = ()
-    channel = 'bengbeng'
-
-    def get(self, request, startday, endday, sign):
-        """
-        返回所有注册用户
-        """
-        if not self.check_sign(startday, endday, sign):
-            return HttpResponse(renderers.JSONRenderer().render(
-                {"errorcode": 2, "errormsg": "sign error"}, 'application/json'))
-
-        response_user_list = []
-        try:
-            yiruite_promo_list = self.get_promo_user(self.channel, startday, endday)
-            for yiruite_promo_user in yiruite_promo_list:
-                response_user = {
-                    "UserName": yiruite_promo_user.user.username,
-                    "RegisterTime": timezone.localtime(
-                        yiruite_promo_user.created_at).strftime("%Y-%m-%d %H:%M:%S"),
-                }
-                response_user_list.append(response_user)
-            result = {
-                "errorcode": 0,
-                "errormsg": "success",
-                "info": response_user_list
-            }
-        except Exception, e:
-            logger.error("Bengbeng query error")
-            logger.error(e)
-            result = {
-                "errorcode": 1,
-                "errormsg": "api error"
-            }
-        return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+        finally:
+            logger.debug(result)
+            return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
