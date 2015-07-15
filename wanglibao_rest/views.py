@@ -737,8 +737,8 @@ class LoginAPIView(APIView):
                 pu = UserPushId()
                 pu.device_type = device_type
                 exist = True
-            if exist or pu.user != serializer.object['user'] or pu.push_channel_id != push_channel_id:
-                pu.user = serializer.object['user']
+            if exist or pu.user != user or pu.push_channel_id != push_channel_id:
+                pu.user = user
                 pu.push_user_id = push_user_id
                 pu.push_channel_id = push_channel_id
                 pu.save()
