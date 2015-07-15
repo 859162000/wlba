@@ -344,9 +344,6 @@ class CooperationTestCase(TestCase):
 
         coop_reg.all_processors_for_user_register(get_user(),None)
 
-        introduced_by = IntroducedBy.objects.filter(user = get_user()).get()
-        binding = Binding.objects.filter(bid='123456').get()
-
         today = date.today()
         start_day = (today - timedelta(days=1)).strftime('%Y%m%d')
         end_day = (today + timedelta(days=1)).strftime('%Y%m%d')
@@ -357,7 +354,6 @@ class CooperationTestCase(TestCase):
         assert CoopQuery().get_all_user_info_for_coop('yiruite', 0, start_day, end_day, sign)[0]['tid'] == '123456'
 
         clear_db(Channels, User, IntroducedBy)
-
 
     def test_get_user_channel_processor(self):
         self.request.GET = {'from':'yiruite', 'tid':'123456'}

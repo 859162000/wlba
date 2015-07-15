@@ -15,7 +15,7 @@ from wanglibao import settings
 from wanglibao.settings import  YIRUITE_CALL_BACK_URL, \
         TIANMANG_CALL_BACK_URL, WLB_FOR_YIRUITE_KEY, YIRUITE_KEY, BENGBENG_KEY, \
     WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
-    JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWAN_CALL_BACK_URL
+    JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import  yiruite_callback,  common_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord
@@ -97,7 +97,7 @@ class CoopRegister(object):
         self.external_channel_key = settings.PROMO_TOKEN_QUERY_STRING
         self.internal_channel_key = 'channel_code'
         #传递渠道用户时使用的变量名
-        self.external_channel_user_key = None
+        self.external_channel_user_key = settings.PROMO_TOKEN_USER_KEY
         self.internal_channel_user_key = 'channel_user'
         #渠道提供给我们的秘钥
         self.coop_key = None
@@ -140,8 +140,6 @@ class CoopRegister(object):
             return Binding.objects.filter(user=user).get().bid
         except:
             return None
-
-
 
     def save_to_session(self):
         channel_code  = self.get_channel_code_from_request()
@@ -224,8 +222,6 @@ class CoopRegister(object):
         """
         pass
 
-
-
     def process_for_register(self, user, invite_code):
         """
         用户可以在从渠道跳转后的注册页使用邀请码，优先考虑邀请码
@@ -275,15 +271,15 @@ class CoopRegister(object):
 
     def process_for_validate(self, user):
         channel_processor = self.get_user_channel_processor(user)
+        logger.debug('channel processor %s'%channel_processor)
         if channel_processor:
-            channel_processor.validate_call_back()
+            channel_processor.validate_call_back(user)
 
     def process_for_binding_card(self, user):
         channel_processor = self.get_user_channel_processor(user)
+        logger.debug('channel processor %s'%channel_processor)
         if channel_processor:
-            channel_processor.binding_card_call_back
-
-
+            channel_processor.binding_card_call_back(user)
 
 class TianMangRegister(CoopRegister):
     def __init__(self, request):
@@ -389,13 +385,13 @@ class JuxiangyouRegister(CoopRegister):
 class DouwanRegister(CoopRegister):
     def __init__(self, request):
         super(DouwanRegister, self).__init__(request)
-        self.c_code = 'douwan'
-        self.call_back_url = DOUWAN_CALL_BACK_URL
+        self.c_code = 'douwanwang'
+        self.call_back_url = DOUWANWANG_CALL_BACK_URL
 
     def douwan_callback(self, user, step):
         params = {
-            'tid': get_tid_for_coop(user.user_id),
-            step : get_uid_for_coop(user.user_id)
+            'tid': get_tid_for_coop(user.id),
+            step : get_uid_for_coop(user.id)
         }
         common_callback.apply_async(
             kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
@@ -468,13 +464,13 @@ class CoopQuery(APIView):
             'tid': get_tid_for_coop(user_id),
         }
         if user_type == self.VALIDATED_USER:
-            user_info.time = get_validate_time_for_coop(user_id)
+            user_info['time'] = get_validate_time_for_coop(user_id)
         elif user_type == self.BINDING_USER:
-            user_info.time = get_binding_time_for_coop(user_id)
+            user_info['time'] = get_binding_time_for_coop(user_id)
         elif user_type == self.INVESTED_USER:
             amount, invested_time = get_first_investment_for_coop(user_id)
-            user_info.investment = amount
-            user_info.time = invested_time
+            user_info['investment'] = amount
+            user_info['time'] = invested_time
         return user_info
 
     def get_all_user_info_for_coop(self, channel_code, user_type, start_day, end_day, sign):
@@ -489,10 +485,11 @@ class CoopQuery(APIView):
                     return WanglibaoUserProfile.objects.filter(user_id=user_id).get().id_is_valid
                 except:
                     return False
+            logger.debug('user id %s'%[u.user_id for u in coop_users])
             coop_users = [u for u in coop_users if is_validated_user(u.user_id)]
         elif user_type == self.BINDING_USER:
             def is_binding_user(user_id):
-                return Binding.objects.filter(user_id=user_id).exists()
+                return Card.objects.filter(user_id=user_id).exists()
             coop_users = [u for u in coop_users if is_binding_user(u.user_id)]
         elif user_type == self.INVESTED_USER:
             def is_invested_user(user_id):
@@ -504,7 +501,8 @@ class CoopQuery(APIView):
             try:
                 user_info.append(self.get_user_info_for_coop(user_type, coop_user.user_id, coop_user.created_at))
             except Exception, e:
-                logging.debug('get user %s error:%s'%(coop_user.user_id, e.message))
+                logger.exception(e)
+                logging.debug('get user %s error:%s'%(coop_user.user_id, e))
 
         return user_info
 

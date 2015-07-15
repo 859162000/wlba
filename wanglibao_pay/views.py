@@ -357,6 +357,9 @@ class CardViewSet(ModelViewSet):
 
         card.save()
 
+        #处理第三方渠道回调
+        CoopRegister(request).process_for_binding_card(request.user)
+
         return Response({
             'id': card.pk,
             'no': card.no,
@@ -705,8 +708,6 @@ class BankCardAddView(APIView):
     def post(self, request):
         result = third_pay.add_bank_card(request)
 
-        #处理第三方回调
-        CoopRegister(request).process_for_validate(request.user)
         return Response(result)
 
 

@@ -679,7 +679,8 @@ class IdValidate(APIView):
             tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
             #处理渠道回调
-            CoopRegister(request).process_for_validate(user)
+            CoopRegister(self.request).process_for_validate(user)
+
             return Response({ "validate": True }, status=200)
 
         else:
