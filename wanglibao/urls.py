@@ -7,8 +7,9 @@ from django.contrib import admin
 from django.conf import settings
 from django.views.generic import TemplateView, RedirectView
 from wanglibao.views import IndexView, SecurityView, PartnerView
-from wanglibao_account.cooperation import YiruiteQuery, TianmangRegisterQuery, TianmangIDVerificationQuery, \
-    TianmangInvestQuery, TianmangInvestNotConfirmQuery, TianmangCardBindQuery, BengbengQuery
+# from wanglibao_account.cooperation import YiruiteQuery, TianmangRegisterQuery, TianmangIDVerificationQuery, \
+    # TianmangInvestQuery, TianmangInvestNotConfirmQuery, TianmangCardBindQuery, BengbengQuery, CoopQuery
+from wanglibao_account.cooperation import CoopQuery
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
@@ -122,16 +123,17 @@ urlpatterns += patterns(
     # 迅雷
     url(r'^api/xunlei/getProjectList/$', XunleiP2PListAPIView.as_view()),
     url(r'^api/xunlei/getXLUserInvestInfo/$', XunleiP2PbyUser.as_view()),
-    # 天芒云
-    url(r'^api/tmyun/getRegisterList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangRegisterQuery.as_view()),
-    url(r'^api/tmyun/getIDVerificationList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangIDVerificationQuery.as_view()),
-    url(r'^api/tmyun/getInvestList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangInvestQuery.as_view()),
-    url(r'^api/tmyun/getInvestListNotConfirm/(?P<startday>.*)/(?P<endday>.*)/$', TianmangInvestNotConfirmQuery.as_view()),
-    url(r'^api/tmyun/getCardBindList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangCardBindQuery.as_view()),
-    # 易瑞特
-    url(r'^api/yiruite/getInfoList/(?P<startday>.*)/(?P<endday>.*)/(?P<sign>.*)/$', YiruiteQuery.as_view()),
-    # 蹦蹦网
-    url(r'^api/bengbeng/getInfoList/(?P<startday>.*)/(?P<endday>.*)/(?P<sign>.*)/$', BengbengQuery.as_view())
+    # # 天芒云
+    # url(r'^api/tmyun/getRegisterList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangRegisterQuery.as_view()),
+    # url(r'^api/tmyun/getIDVerificationList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangIDVerificationQuery.as_view()),
+    # url(r'^api/tmyun/getInvestList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangInvestQuery.as_view()),
+    # url(r'^api/tmyun/getInvestListNotConfirm/(?P<startday>.*)/(?P<endday>.*)/$', TianmangInvestNotConfirmQuery.as_view()),
+    # url(r'^api/tmyun/getCardBindList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangCardBindQuery.as_view()),
+    # # 易瑞特
+    # url(r'^api/yiruite/getInfoList/(?P<startday>.*)/(?P<endday>.*)/(?P<sign>.*)/$', YiruiteQuery.as_view()),
+    # # 蹦蹦网
+    # url(r'^api/bengbeng/getInfoList/(?P<startday>.*)/(?P<endday>.*)/(?P<sign>.*)/$', BengbengQuery.as_view())
+    url(r'^api/coopinfo/(?P<channel_code>.*)/(?P<user_type>.*)/(?P<start_day>.*)/(?P<end_day>.*)/(?P<sign>.*)/$', CoopQuery.as_view())
 )
 
 # 微信

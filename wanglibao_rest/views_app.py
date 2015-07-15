@@ -27,7 +27,7 @@ class AppActivateImageAPIView(APIView):
 
     permission_classes = ()
 
-    SIZE_MAP = {'1': 'img_one', '2': 'img_two', '3': 'img_three'}
+    SIZE_MAP = {'1': 'img_one', '2': 'img_two', '3': 'img_three', '4': 'img_four'}
     DEVICE_MAP = {'ios': 'app_iso', 'android': 'app_android'}
 
     def post(self, request):
@@ -52,6 +52,8 @@ class AppActivateImageAPIView(APIView):
                 img_url = activate.img_two
             elif size == 'img_three':
                 img_url = activate.img_three
+            elif size == 'img_four':
+                img_url = activate.img_four
             else:
                 img_url = ''
 

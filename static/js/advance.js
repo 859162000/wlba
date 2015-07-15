@@ -7,6 +7,48 @@
   });
 
   require(['jquery'], function($) {
+      //固定回到顶部
+     function backtop(box){
+       var k=document.body.clientWidth,
+         e=box.width();
+         q=k-e;
+         w=q/2;
+         r= e+w;
+         a=r+20+'px';
+       return a;
+     }
+
+    var left2;
+    left2=backtop($(".gjw-gold"));
+    //浏览器大小改变触发的事件
+    window.onresize = function(){
+      left2 = backtop($(".gjw-gold"));
+    };
+    //赋值
+    $('.xl-backtop').css({'left':left2});
+
+    //显示微信二维码
+   $('#xl-weixin').on('mouseover',function(){
+     $('.erweima').show();
+   });
+
+    $('#xl-weixin').on('mouseout',function(){
+     $('.erweima').hide();
+   })
+
+    //返回顶部
+    $(window).scroll(function () {
+        if ($(document).scrollTop() > 0) {
+            $(".xl-backtop").fadeIn();
+        } else if ($(document).scrollTop() <= 0) {
+            $('.xl-backtop').stop().fadeOut();
+        }
+    });
+
+    $('.backtop').on('click',function(){
+      $('body,html').animate({scrollTop: 0}, 600);
+      return false
+    })
     //模态口
     var body_h=$('body').height();
     $('#small-zc').height(body_h);
@@ -105,7 +147,45 @@
           })
         }
       }
+
     })
+    //赶集网效果//滑动到相应区域
+    $('#prize-two').on('click',function(){
+      var re_top=$('#recharge').offset().top;
+      $('body,html').animate({scrollTop:re_top}, 600);
+      return false
+    })
+    $('#prize-four').on('click',function(){
+      var re_top2=$('#tour').offset().top;
+      $('body,html').animate({scrollTop:re_top2}, 600);
+      return false
+    })
+    //领取奖品
+    $('.gjw-recharge').on('click',function(){
+      if ($(this).hasClass('notouch')){
+        alert(123)
+      }else{
+        $(this).children('.gjw-title2').show();
+        $(this).children('.gjw-over').show();
+        $(this).addClass('notouch')
+      }
+    })
+
+    //马上报名
+    $('.gjw-small-com').on('click',function(){
+      if ($(this).hasClass('go')){
+        $('#small-zc').show();
+      }else{
+        window.location.href="/"
+      }
+
+    })
+    //点击旅游路线
+    $('#tour_line').on('click',function(){
+      $('.gjw-tour').slideToggle(300)
+    })
+
+
   });
 
 }).call(this);
