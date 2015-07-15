@@ -65,19 +65,21 @@
         if (typeof console !== "undefined" && console !== null) {
           console.log("Phone number checked, now send the valdiation code");
         }
-        return $('#img-code-div').modal();
+        $('#img-code-div').modal();
+        return $('#img-code-div').find('#id_captcha_1').val('');
       }
     });
     $('#submit-code-img1').click(function() {
-      var captcha_1, count, element, intervalId, phoneNumber, timerFunction;
+      var captcha_0, captcha_1, count, element, intervalId, phoneNumber, timerFunction;
       element = $('#img-code');
       phoneNumber = $.trim($("#reg_identifier").val());
+      captcha_0 = $(this).parents('form').find('#id_captcha_0').val();
       captcha_1 = $(this).parents('form').find('.captcha').val();
       $.ajax({
         url: "/api/phone_validation_code/register/" + phoneNumber + "/",
         type: "POST",
         data: {
-          captcha_0: $('input[name="captcha_0"]').val(),
+          captcha_0: captcha_0,
           captcha_1: captcha_1
         }
       }).success(function(data) {
