@@ -8,7 +8,6 @@ import logging
 from datetime import datetime
 from marketing.utils import local_to_utc
 
-from wanglibao import settings
 from django.db.models import Q
 from django.views.generic import TemplateView
 from django.utils import timezone
@@ -16,8 +15,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from wanglibao import settings
+from wanglibao.permissions import IsAdminUserOrReadOnly
+from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_banner.models import AppActivate
-from wanglibao_p2p.models import ProductAmortization, P2PEquity
+from wanglibao_p2p.models import ProductAmortization, P2PEquity, P2PProduct
+from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_rest.utils import split_ua
 
 
@@ -140,3 +143,33 @@ class AppExploreView(TemplateView):
 
     def get_context_data(self, **kwargs):
         return {}
+
+
+class AppP2PProductViewSet(PaginatedModelViewSet):
+    """ app查询表列表接口 """
+
+    model = P2PProduct
+    permission_classes = (IsAdminUserOrReadOnly,)
+    serializer_class = P2PProductSerializer
+    paginate_by = 10
+
+    def get_queryset(self):
+        qs = super(AppP2PProductViewSet, self).get_queryset()
+
+        maxid = self.request.QUERY_PARAMS.get('maxid', '')
+        minid = self.request.QUERY_PARAMS.get('minid', '')
+
+        pager = None
+        if maxid and not minid:
+            pager = Q(id__gt=maxid)
+        if minid and not maxid:
+            pager = Q(id__lt=minid)
+
+        if pager:
+            return qs.filter(hide=False).filter(status__in=[
+                u'满标已审核', u'还款中', u'正在招标'
+            ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).filter(pager).order_by('-priority', '-publish_time')
+        else:
+            return qs.filter(hide=False).filter(status__in=[
+                u'满标已审核', u'还款中', u'正在招标'
+            ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time')
