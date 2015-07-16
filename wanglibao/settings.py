@@ -112,6 +112,7 @@ INSTALLED_APPS = (
     'wanglibao_activity',
     'wanglibao_mobile',
     'weixin',
+    'wanglibao_app',
 
     'report',
     'misc',
@@ -173,6 +174,7 @@ if LOCAL_MYSQL:
         'NAME': 'wanglibao',
         'USER': 'wanglibao',
         'PASSWORD': 'wanglibank',
+        # 'HOST': '192.168.1.242',
     }
 
 import sys
@@ -712,7 +714,7 @@ if ENV == ENV_PRODUCTION:
     BENGBENG_COOP_ID = '7539'
     WLB_FOR_BENGBENG_KEY = '1990'
     BENGBENG_KEY = "af0ee5f72c55cdd6"
-    BENGBENG_CALL_BACK_URL = "www.bengbeng.com/reannal.php"
+    BENGBENG_CALL_BACK_URL = "http://www.bengbeng.com/reannal.php"
 else:
     BENGBENG_COOP_ID = '10'
     WLB_FOR_BENGBENG_KEY = '1990'
@@ -722,8 +724,8 @@ else:
 # 聚享游
 WLB_FOR_JUXIANGYOU_KEY = '1991'
 if ENV == ENV_PRODUCTION:
-    JUXIANGYOU_COOP_ID = ''
-    JUXIANGYOU_KEY = ''
+    JUXIANGYOU_COOP_ID = '112'
+    JUXIANGYOU_KEY = '1c12f445d038dd0f'
     JUXIANGYOU_CALL_BACK_URL = 'http://api.juxiangyou.com/web/p2pApi.php'
 else:
     JUXIANGYOU_COOP_ID = '10'

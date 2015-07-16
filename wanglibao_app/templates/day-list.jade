@@ -1,0 +1,34 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    include include/app_header.jade
+  body
+    aside.daylist-banner
+      img(src="/static/imgs/app/daylist/day_banner.jpg")
+    section.daylist-main
+      if top_list
+        for list in top_list
+          if forloop.counter < 4
+            if forloop.counter == 1
+              classname = 'top1'
+            if forloop.counter == 2
+              classname = 'top2'
+            if forloop.counter == 3
+              classname = 'top3'
+            .daylist-item(class=classname)
+              .daylist-num {{forloop.counter}}
+              .daylist-phone
+                span
+                | {{list.phone | safe_phone_new}}
+              .daylist-amount ￥{{list.amount_sum | money_format_int }}
+          else
+            .daylist-item
+              .daylist-num {{forloop.counter}}
+              .daylist-phone
+                span
+                | {{list.phone | safe_phone_new}}
+              .daylist-amount ￥{{list.amount_sum | money_format_int }}
+      else
+        |暂无投资

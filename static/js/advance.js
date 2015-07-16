@@ -235,6 +235,24 @@
       $('.gjw-tour').slideToggle(300)
     })
 
+    //倒计时
+    count_down = function(o) {
+      var sec, timer;
+      sec = (new Date(o.replace(/-/ig, '/')).getTime() - new Date().getTime()) / 1000;
+      sec = parseInt(sec);
+      timer = setTimeout((function() {
+        count_down(o);
+      }), 1000);
+      if (sec <= 0) {
+        console.log('时间到')
+        $('#small-zc').show();
+        $('#box1').hide();
+        $('#activity-over').show();
+      }
+    };
+
+    count_down('2015-09-15 00:00:00')
+
 
   });
 
