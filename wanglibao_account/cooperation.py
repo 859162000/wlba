@@ -59,9 +59,10 @@ def get_first_investment_for_coop(user_id):
         p2p_record = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购').order_by('create_time')
         amount = p2p_record[0].amount
         first_invest_time = p2p_record[0].create_time
-        return amount, first_invest_time
+        total_amount = P2PEquity.objects.filter(user_id=user_id).aggregate(Sum('equity'))['equity__sum'] or 0
+        return amount, total_amount, first_invest_time,
     except:
-        return None
+        return None, None, None
 
 def get_tid_for_coop(user_id):
     try:
@@ -444,8 +445,9 @@ class CoopQuery(APIView):
         elif user_type == self.BINDING_USER:
             user_info['time'] = get_binding_time_for_coop(user_id)
         elif user_type == self.INVESTED_USER:
-            amount, invested_time = get_first_investment_for_coop(user_id)
+            amount, total_amount, invested_time = get_first_investment_for_coop(user_id)
             user_info['investment'] = amount
+            user_info['total_investment'] = total_amount
             user_info['time'] = invested_time
 
         if user_info['time']:
