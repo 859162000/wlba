@@ -62,6 +62,69 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.validate', "tools", 'jque
   $.validator.addMethod "emailOrPhone", (value, element)->
       return backend.checkEmail(value) or backend.checkMobile(value)
 
+  $('#img-code').click ->
+    phoneNumber = $.trim($("#reg_identifier").val())
+    if checkMobile(phoneNumber)
+      if console?
+        console.log "Phone number checked, now send the valdiation code"
+      $('#img-code-div').modal()
+      $('#img-code-div').find('#id_captcha_1').val('')
+
+  $('#submit-code-img1').click () ->
+    element = $('#img-code')
+    phoneNumber = $.trim($("#reg_identifier").val())
+    captcha_0 = $(this).parents('form').find('#id_captcha_0').val()
+    captcha_1 = $(this).parents('form').find('.captcha').val()
+    $.ajax
+      url: "/api/phone_validation_code/register/" + phoneNumber + "/"
+      type: "POST"
+      data: {
+        captcha_0 : captcha_0
+        captcha_1 : captcha_1
+      }
+    .success (data)->
+      element.attr 'disabled', 'disabled'
+      element.removeClass 'button-red'
+      element.addClass 'button-gray'
+      $('.voice-validate').attr 'disabled', 'disabled'
+      $('#login-modal').modal()
+    .fail (xhr)->
+      clearInterval(intervalId)
+      $(element).text('重新获取')
+      $(element).removeAttr 'disabled'
+      $(element).addClass 'button-red'
+      $(element).removeClass 'button-gray'
+      result = JSON.parse xhr.responseText
+      if result.type == 'captcha'
+        $("#submit-code-img1").parent().parent().find('.code-img-error').html(result.message)
+      else
+        if xhr.status >= 400
+          tool.modalAlert({title: '温馨提示', msg: result.message, callback_ok: _showModal})
+    intervalId
+    count = 180
+
+    $(element).attr 'disabled', 'disabled'
+    $(element).removeClass 'button-red'
+    $(element).addClass 'button-gray'
+    $('.voice-validate').attr 'disabled', 'disabled'
+
+    timerFunction = ()->
+      if count >= 1
+        count--
+        $(element).text('已经发送(' + count + ')')
+      else
+        clearInterval(intervalId)
+        $(element).text('重新获取')
+        $(element).removeAttr 'disabled'
+        $(element).addClass 'button-red'
+        $(element).removeClass 'button-gray'
+        $('.voice').removeClass('hidden')
+        $('.voice-validate').removeAttr 'disabled'
+        $('.voice  .span12-omega').html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>')
+
+    timerFunction()
+    intervalId = setInterval timerFunction, 1000
+
   $('#login-modal-form').validate
     rules:
       identifier:

@@ -92,3 +92,31 @@ class Aboutus(models.Model):
     title = models.CharField(u'中文标题', max_length=128)
     code = models.CharField(u'英文代码', max_length=30)
     content = RichTextField(verbose_name=u'详细内容')
+
+
+class AppActivate(models.Model):
+
+    class Meta:
+        verbose_name_plural = u'app启动页活动'
+
+    IOS = 'app_iso'
+    ANDROID = 'app_android'
+
+    DEVICES = (
+        (IOS, IOS),
+        (ANDROID, ANDROID),
+    )
+
+    name = models.CharField(u'名称', max_length=30, help_text=u'名称')
+    device = models.CharField(u'设备', max_length=15, choices=DEVICES, help_text=u'活动图片应用的设备')
+    img_one = models.ImageField(u'大图片', upload_to='activity', blank=True,  help_text=u'IOS：5.5，Android：1280，图片名称只允许字母数字下划线组成')
+    img_two = models.ImageField(u'中图片', upload_to='activity', blank=True,  help_text=u'IOS：4.7，Android：720，图片名称只允许字母数字下划线组成')
+    img_three = models.ImageField(u'小图片', upload_to='activity', blank=True,  help_text=u'IOS：4.0，Android：480，图片名称只允许字母数字下划线组成')
+    img_four = models.ImageField(u'小图片2', upload_to='activity', blank=True,  default='', help_text=u'IOS：3.5，图片名称只允许字母数字下划线组成，ios使用')
+    last_updated = models.DateTimeField(u'更新时间', auto_now=True, help_text=u'上次更新时间')
+    is_long_used = models.BooleanField(u'长期生效', default=True, help_text=u'默认纪录长期有效，如果【不勾选】此项，则需要配置生效时间和失效时间')
+    start_at = models.DateTimeField(u"banner生效时间", null=True, blank=True)
+    end_at = models.DateTimeField(u"banner失效时间", null=True, blank=True)
+    is_used = models.BooleanField(u'是否启用', default=False, help_text=u'默认不启用')
+
+

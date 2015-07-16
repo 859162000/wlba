@@ -17,4 +17,8 @@ def has_user(username = 'wanglibao_test_user'):
 def get_user(username = 'wanglibao_test_user'):
     return User.objects.filter(username=username).get()
 
+def clear_db(*models):
+    for model in models:
+        model.objects.all().delete()
+
 
