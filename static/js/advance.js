@@ -166,12 +166,8 @@
       if ($(this).hasClass('reg1')){
         $('#small-zc').show();
       }else{
-        $('#small-zc').show();
-        $('#box1').hide();
-        $('#gjw-success').children('p').text('您已经注册成功')
-        $('#gjw-success').children('ul').hide();
-        $('#gjw-success').children('a').show();
-        $('#gjw-success').show();
+        $('#seven-success').hide();
+        window.location.href="/";
       }
     })
 
@@ -184,7 +180,7 @@
         $('#gjw-success').children('p').text('请到投资页进行投资!')
         $('#gjw-success').children('ul').show();
         $('#gjw-success').children('a').hide();
-        $('.fast').text('立即投资')
+        $('.fast').text('立即投资');
         $('#gjw-success').show();
       }
 
