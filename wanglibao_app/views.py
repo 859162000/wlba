@@ -298,4 +298,3 @@ class RecommendProductManagerView(TemplateView):
         except Exception, e:
             logging.error(e.message)
             return redirect('./recommend_manager')
->>>>>>> e34c61fd5adef7206c138372c7a1ac021aebe6e3
