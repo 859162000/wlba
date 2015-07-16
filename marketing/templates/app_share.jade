@@ -3,7 +3,7 @@ doctype html
 html
   head
     meta(name="viewport" content="width=device-width, initial-scale=1")
-    title 邀请好友理财送话费
+    title 邀请好友理财送红包
     link(rel="stylesheet",href="/static/css/wap/share_app.css")
     script(src="/static/js/require.js", data-main="/static/js/header")
 
@@ -14,7 +14,7 @@ html
         p 您的朋友
           span.red {{ identifier|safe_phone_new }}
           | 邀请您来网利宝赚钱，首次可获
-          span.red 50元
+          span.red 100元
           | 红包。
         #validate-modal-form
           - csrf_token
@@ -62,11 +62,11 @@ html
       if reg == "y"
         p.padding-l-r-s
           | 完成首次单笔
-          span.red 200元
+          span.red 1000元
           | （含）以上的P2P理财交易，您将获得
           span.red 30元
-          | 话费。
-        p.padding-l-r-s.gray 话费将在3个工作日内发放至您的注册手机号。
+          | 红包。
+        p.padding-l-r-s.gray 红包将在3个工作日内发放至您的注册手机号。
 
     script.
       var v = new Date().getTime()
