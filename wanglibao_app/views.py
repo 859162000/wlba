@@ -204,7 +204,7 @@ class AppRecommendViewSet(PaginatedModelViewSet):
         productions = qs.filter(hide=False, status=u'正在招标').exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标'))
         if productions:
             id_rate = [{'id': q.id, 'rate': q.completion_rate} for q in productions]
-            id_rate = sorted(id_rate, lambda x: x['rate'], reverse=True)
+            id_rate = sorted(id_rate, key=lambda x: x['rate'], reverse=True)
             return qs.filter(id=id_rate[0]['id'])
 
         else:
