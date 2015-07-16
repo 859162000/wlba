@@ -103,8 +103,6 @@ class CoopRegister(object):
         self.internal_channel_user_key = 'channel_user'
         #渠道提供给我们的秘钥
         self.coop_key = None
-        #我们提供给渠道的秘钥
-        self.key = None
         self.call_back_url = None
 
     @property
@@ -287,31 +285,13 @@ class TianMangRegister(CoopRegister):
     def __init__(self, request):
         super(TianMangRegister, self).__init__(request)
         self.c_code = 'tianmang'
-        self.external_channel_key = 'source'
-        self.external_channel_user_key = 'sn'
         self.coop_key = TINMANG_KEY
         self.call_back_url = TIANMANG_CALL_BACK_URL
-
-    @property
-    def tianmang_sn(self):
-        tianmang_sn = self.request.session.get('tianmang_sn', None)
-        if tianmang_sn:
-            return tianmang_sn
-
-    def save_to_session(self):
-        super(TianMangRegister, self).save_to_session()
-        tianmang_sn = self.request.GET.get('tianmang_sn', None)
-        if tianmang_sn:
-            self.request.session['tianmang_sn'] = tianmang_sn
-
-    def clear_session(self):
-        super(TianMangRegister, self).clear_session()
-        self.request.session.pop('tianmang_sn', None)
 
     def register_call_back(self, user):
         params={
             "oid": self.coop_key,
-            "sn" : self.tianmang_sn,
+            "sn" : self.channel_user,
             "uid": get_uid_for_coop(user.id),
             "uname": get_username_for_coop(user.id),
             "method": "json"
@@ -324,7 +304,6 @@ class YiRuiTeRegister(CoopRegister):
         super(YiRuiTeRegister, self).__init__(request)
         self.c_code = 'yiruite'
         self.coop_key = YIRUITE_KEY
-        self.key = WLB_FOR_YIRUITE_KEY
         self.call_back_url = YIRUITE_CALL_BACK_URL
 
     def register_call_back(self, user):
@@ -344,7 +323,6 @@ class BengbengRegister(CoopRegister):
         self.c_code = 'bengbeng'
         self.coop_id = BENGBENG_COOP_ID
         self.coop_key = BENGBENG_KEY
-        self.key = WLB_FOR_BENGBENG_KEY
         self.call_back_url = BENGBENG_CALL_BACK_URL
 
     def binding_card_call_back(self, user):
