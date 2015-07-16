@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body onload="func()">
+  <form id="form1" runat="server">
+    设置字数
+    <input type="text" id="txt" name="txt" value="100" onchange="func(this.id)" />
+    <div id="pagef" style="font-size: 14px; width: 500px; line-height: 150%; border: 1 solid red;background-color: Gray;">
+        据中国之声《新闻纵横》报道，全国人大代表、武汉钢铁(集团)公司总经理邓崎琳透露，今年武
+        钢准备建万头养猪场，而且年内就出栏。“钢铁侠”养猪种菜，这不是突发奇想，而是钢企向“
+        非钢”转型计划的一部分。不仅如此，除了养猪，武钢还有许多设想。比如“打个电话，就可以
+         代为接送幼儿园的孩子，甚至还可以帮您疏通家里堵塞的下水管”。在钢铁企业普遍微利的背景
+        下，武钢今年对钢铁产业可以说是一分钱掰成两半花，却在非钢产业上重金砸下390个亿谋求发展
+        。武钢“养猪”，究竟是“不务正业”还是另辟蹊径谋求转型？钢铁巨无霸——武汉钢铁公司要
+        开始养猪种菜？这听起来让人觉得不可思议，但是全国人大代表、武汉钢铁(集团)公司总经理邓
+        崎琳却证实确有其事，而且规模大约在一万头左右。邓崎琳：我们还准备搞的绿色养殖基地，青
+        山区60万人80%都是武钢人，我的快餐一做就是上万份，不仅送到武钢，送到铁路上去，所以我们
+        在武汉市周边丘林荒地买几千亩，养猪、养鸡、种菜，立体养殖、绿色养殖，发展这个产业，下
+        次你买就买“武钢”牌蔬菜。本来养猪、种菜、做盒饭等第三产业都是辅助和服务性质，如今把
+        这样的辅助产业做大、当成一个发展方向也是无奈之举。邓崎琳向记者解释说，受铁矿石资源短
+        缺、物流成本抬高等影响，连续两年，中国钢铁生产行业年销售利润率已不到3%，远低于全国工
+        业行业6%的平均利润水平。与此同时，我国钢铁产能严重过剩，按粗钢表观消费量在6.88亿吨左
+        右计算，产能过剩率约已达到122%。钢铁产业现在十分困难。邓崎琳：不光今年是严冬、去年是
+        严冬，至少是五年以上，钢铁工业处于一个微利和经营非常困难的境地。
+    </div>
+    </form>
+ <script type="text/javascript">
+        var pageNum;
+        function func() {
+            var p1 = document.getElementById('txt').value; //取出文本框的值，即每页显示的字数。
+            //alert(p1);
+            var o = document.getElementById('pagef'); //取出文字内容
+            var str = o.innerText;
+            var l = "";
+            var str1 = "";
+            var pagestr = ""; //专门用于显示页码的那个div的内容
+            var page = "";
+            l = str.length;//所取出的文字内容的长度
+            pageNum = Math.round(l / p1);     //计算出页数
+            for (var i = 0; i < pageNum; i++) {
+                //str1为分块显示的各页内容
+                str1 += '<div id="strpage' + i + '"';
+                if (i > 0)
+                str1 += 'style="display:none"';
+                str1 += '>' + str.substring(i * p1, p1 * (i + 1));
+                str1 += '</div>';
+                page = '<div style="width:500px; height:20px">' + pageNum + '</div>';
+                pagestr += ' <a href="javascript:page(' + i + ')">第' + (i + 1) + '页</a> ';
+                //alert(pagestr);
+            }
+            o.innerHTML = str1 + '<div>' + pagestr + '</div>';
+        }
+        //显示指定页
+        function page(num) {
+            for (var i = 0; i < pageNum; i++)
+                document.getElementById("strpage" + i).style.display = 'none';
+            document.getElementById("strpage" + num).style.display = '';
+        }
+    </script>
+</body>
+</html>

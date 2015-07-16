@@ -59,9 +59,10 @@ def get_first_investment_for_coop(user_id):
         p2p_record = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购').order_by('create_time')
         amount = p2p_record[0].amount
         first_invest_time = p2p_record[0].create_time
-        return amount, first_invest_time
+        total_amount = P2PEquity.objects.filter(user_id=user_id).aggregate(Sum('equity'))['equity__sum'] or 0
+        return amount, total_amount, first_invest_time,
     except:
-        return None
+        return None, None, None
 
 def get_tid_for_coop(user_id):
     try:
@@ -72,14 +73,16 @@ def get_tid_for_coop(user_id):
 def get_validate_time_for_coop(user_id):
     try:
         id_number = WanglibaoUserProfile.objects.filter(user_id=user_id).get().id_number
-        return IdVerification.objects.filter(id_number=id_number).created_at
-    except:
+        validate_time = IdVerification.objects.filter(id_number=id_number).get().created_at
+        return validate_time
+    except Exception, e:
         return None
 
 def get_binding_time_for_coop(user_id):
     try:
-        return Binding.objects.filter(user_id=user_id).get().created_at
-    except:
+        binding_time  = Card.objects.filter(user_id=user_id).order_by('add_at').first().add_at
+        return binding_time
+    except Exception, e:
         return None
 
 
@@ -101,8 +104,6 @@ class CoopRegister(object):
         self.internal_channel_user_key = 'channel_user'
         #渠道提供给我们的秘钥
         self.coop_key = None
-        #我们提供给渠道的秘钥
-        self.key = None
         self.call_back_url = None
 
     @property
@@ -285,31 +286,13 @@ class TianMangRegister(CoopRegister):
     def __init__(self, request):
         super(TianMangRegister, self).__init__(request)
         self.c_code = 'tianmang'
-        self.external_channel_key = 'source'
-        self.external_channel_user_key = 'sn'
         self.coop_key = TINMANG_KEY
         self.call_back_url = TIANMANG_CALL_BACK_URL
-
-    @property
-    def tianmang_sn(self):
-        tianmang_sn = self.request.session.get('tianmang_sn', None)
-        if tianmang_sn:
-            return tianmang_sn
-
-    def save_to_session(self):
-        super(TianMangRegister, self).save_to_session()
-        tianmang_sn = self.request.GET.get('tianmang_sn', None)
-        if tianmang_sn:
-            self.request.session['tianmang_sn'] = tianmang_sn
-
-    def clear_session(self):
-        super(TianMangRegister, self).clear_session()
-        self.request.session.pop('tianmang_sn', None)
 
     def register_call_back(self, user):
         params={
             "oid": self.coop_key,
-            "sn" : self.tianmang_sn,
+            "sn" : self.channel_user,
             "uid": get_uid_for_coop(user.id),
             "uname": get_username_for_coop(user.id),
             "method": "json"
@@ -322,7 +305,6 @@ class YiRuiTeRegister(CoopRegister):
         super(YiRuiTeRegister, self).__init__(request)
         self.c_code = 'yiruite'
         self.coop_key = YIRUITE_KEY
-        self.key = WLB_FOR_YIRUITE_KEY
         self.call_back_url = YIRUITE_CALL_BACK_URL
 
     def register_call_back(self, user):
@@ -342,7 +324,6 @@ class BengbengRegister(CoopRegister):
         self.c_code = 'bengbeng'
         self.coop_id = BENGBENG_COOP_ID
         self.coop_key = BENGBENG_KEY
-        self.key = WLB_FOR_BENGBENG_KEY
         self.call_back_url = BENGBENG_CALL_BACK_URL
 
     def binding_card_call_back(self, user):
@@ -464,9 +445,14 @@ class CoopQuery(APIView):
         elif user_type == self.BINDING_USER:
             user_info['time'] = get_binding_time_for_coop(user_id)
         elif user_type == self.INVESTED_USER:
-            amount, invested_time = get_first_investment_for_coop(user_id)
+            amount, total_amount, invested_time = get_first_investment_for_coop(user_id)
             user_info['investment'] = amount
+            user_info['total_investment'] = total_amount
             user_info['time'] = invested_time
+
+        if user_info['time']:
+            user_info['time'] = timezone.localtime(user_info['time']).strftime('%Y-%m-%d %H:%M:%S')
+
         return user_info
 
     def get_all_user_info_for_coop(self, channel_code, user_type, start_day, end_day, sign):

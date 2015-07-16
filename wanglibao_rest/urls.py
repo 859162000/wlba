@@ -43,7 +43,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
                             DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView,
-                            GestureAddView, GestureUpdateView, GestureIsEnabledView)
+                            GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView)
 from wanglibao_redpack.views import RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView
 
 from marketing.play_list import InvestmentHistory
@@ -207,7 +207,8 @@ urlpatterns = patterns(
 )
 
 urlpatterns += patterns('',
-    url(r'^api-token-auth/', 'wanglibao_rest.views.obtain_auth_token'),
+    #url(r'^api-token-auth/', 'wanglibao_rest.views.obtain_auth_token'),
+    url(r'^api-token-auth/', LoginAPIView.as_view()),
     url(r'wrapper/', 'drf_wrapper.views.wrapper_view'),
 )
 
