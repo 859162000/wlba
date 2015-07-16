@@ -72,14 +72,16 @@ def get_tid_for_coop(user_id):
 def get_validate_time_for_coop(user_id):
     try:
         id_number = WanglibaoUserProfile.objects.filter(user_id=user_id).get().id_number
-        return IdVerification.objects.filter(id_number=id_number).created_at
-    except:
+        validate_time = IdVerification.objects.filter(id_number=id_number).get().created_at
+        return validate_time
+    except Exception, e:
         return None
 
 def get_binding_time_for_coop(user_id):
     try:
-        return Binding.objects.filter(user_id=user_id).get().created_at
-    except:
+        binding_time  = Card.objects.filter(user_id=user_id).order_by('add_at').first().add_at
+        return binding_time
+    except Exception, e:
         return None
 
 
