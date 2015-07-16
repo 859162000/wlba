@@ -4,11 +4,12 @@
 from django.conf.urls import patterns, include, url
 from rest_framework.routers import DefaultRouter
 from wanglibao_app.views import (AppActivateImageAPIView, AppRepaymentAPIView, AppDayListView, AppGuardView,
-                                 AppGuideView, AppSecureView, AppExploreView, AppP2PProductViewSet)
+                                 AppGuideView, AppSecureView, AppExploreView, AppP2PProductViewSet, AppRecommendViewSet)
 
 router = DefaultRouter()
 
 router.register(r'investlist', AppP2PProductViewSet)
+router.register(r'recommend', AppRecommendViewSet)
 
 
 # app端改版新接口
