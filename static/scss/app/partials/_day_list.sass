@@ -1,0 +1,48 @@
+
+
+.daylist-banner
+  height: 7rem
+  img
+    display: block
+    width: 100%
+    height: 100%
+
+.daylist-item
+  display: -webkit-box
+  color: #666
+  font-size: $font-size14
+  padding-right: 2rem
+  border-bottom: 1px solid #e5e5e5
+  padding: .6rem 2rem .6rem 0
+  .daylist-num
+    width: 3rem
+    color: #999
+    padding-left: 1rem
+  .daylist-phone
+    width: 6rem
+    display: -webkit-box
+    -webkit-box-align: center
+    span
+      display: block
+      width: 1rem
+      height: 1rem
+      margin-right: .25rem
+  .daylist-amount
+    -webkit-box-flex: 1
+    text-align: right
+.top1
+  color: #FF4C2E
+  .daylist-num
+    color: #FF4C2E
+  span
+    background: url("/static/imgs/app/daylist/day_icon.png") no-repeat center center
+    background-position: 0 0
+    background-size: 100%
+.top2
+  @extend .top1
+  span
+    background-position: 0 -1rem
+.top3
+  @extend .top1
+  span
+    background-position: 0 -2rem

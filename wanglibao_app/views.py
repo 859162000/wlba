@@ -6,6 +6,7 @@ __author__ = 'zhanghe'
 import logging
 
 from datetime import datetime
+from marketing.tops import Top
 from marketing.utils import local_to_utc
 
 from wanglibao import settings
@@ -19,6 +20,7 @@ from rest_framework.views import APIView
 from wanglibao_banner.models import AppActivate
 from wanglibao_p2p.models import ProductAmortization, P2PEquity
 from wanglibao_rest.utils import split_ua
+from wanglibao_banner.models import Banner
 
 
 
@@ -107,10 +109,15 @@ class AppRepaymentAPIView(APIView):
 
 class AppDayListView(TemplateView):
     """ app端榜单 """
-    template_name = ''
+    template_name = 'day-list.jade'
 
     def get_context_data(self, **kwargs):
-        return {}
+
+        top = Top(limit=10)
+        top_list = top.day_tops_activate(day=datetime.now(), amount_min=0)
+        return {
+            'top_list': top_list,
+        }
 
 
 class AppGuardView(TemplateView):
@@ -122,21 +129,24 @@ class AppGuardView(TemplateView):
 
 class AppGuideView(TemplateView):
     """ app新手引导页面 """
-    template_name = ''
+    template_name = 'guide.jade'
 
     def get_context_data(self, **kwargs):
         return {}
 
 class AppSecureView(TemplateView):
     """ app安全保障页面"""
-    template_name = ''
+    template_name = 'secure.jade'
 
     def get_context_data(self, **kwargs):
         return {}
 
 class AppExploreView(TemplateView):
     """ app发现页面 """
-    template_name = ''
+    template_name = 'discover.jade'
 
     def get_context_data(self, **kwargs):
-        return {}
+        banner = Banner.objects.filter(device='weixin', type='banner', is_used=True).order_by('-priority')
+        return {
+            'banner': banner,
+        }
