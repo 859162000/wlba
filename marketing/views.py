@@ -555,6 +555,10 @@ class ActivityJoinLogAPIView(APIView):
             return Response({'ret_code': 3001, 'message': u'用户没有登陆，请先登陆'})
 
         start_time = timezone.datetime(2015, 6, 29)
+        dt = timezone.now()
+        if dt > timezone.datetime(2015, 8, 2, 23, 59, 59):
+            return Response({'ret_code': 3002, 'message': u'活动已过期'})
+
         user_ib = IntroducedBy.objects.filter(user=user, channel__name='xunlei', created_at__gt=start_time).first()
         if user_ib:
             has_log = ActivityJoinLog.objects.filter(user=user, action_name='xunlei_july').first()
@@ -582,9 +586,9 @@ class ActivityJoinLogAPIView(APIView):
                     numbers = numbers + [remainder]
                     for number in numbers:
                         describe = 'xunlei_july_' + str(number)
-                        redpack_event = RedPackEvent.objects.filter(invalid=False,
-                                                                    describe=describe,
-                                                                    target_channel='xunlei').first()
+                        redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,
+                                                                    target_channel='xunlei',
+                                                                    give_start_at__lt=dt, give_end_at__gt=dt).first()
                         if redpack_event:
                             redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
 
@@ -620,6 +624,9 @@ class ThousandRedPackAPIView(APIView):
         start_time = timezone.datetime(dt.year, dt.month, dt.day)
         end_time = timezone.datetime(dt.year, dt.month, dt.day, 23, 59, 59)
 
+        if dt > timezone.datetime(2015, 7, 15, 23, 59, 59):
+            return Response({'ret_code': 3003, 'message': u'活动已过期'})
+
         join_log = ActivityJoinLog.objects.filter(channel='all', action_name='thousand_redpack',
                                                   create_time__gt=start_time, create_time__lt=end_time)\
                                           .aggregate(user_count=Count('id'))
@@ -645,7 +652,8 @@ class ThousandRedPackAPIView(APIView):
             numbers = ['100', '200', '300', '400']
             for number in numbers:
                 describe = 'thousand_redpack_' + str(number)
-                redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe).first()
+                redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,
+                                                            give_start_at__lt=dt, give_end_at__gt=dt).first()
                 if redpack_event:
                     redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
 
