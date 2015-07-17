@@ -56,6 +56,7 @@
     $('.first-xl-off,.first-xl-off2,.look,.agin').on('click',function(){
       $('#small-zc').hide();
     });
+
     $('#small-zc').on('click',function(){
       $('#small-zc').hide();
     });
@@ -396,6 +397,7 @@
               $('#first-redpack-fail').hide();
               $('#seven-success').show();
             }
+
           })
         }).fail(function(xhr) {
           var error_message, message, result;
