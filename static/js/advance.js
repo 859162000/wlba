@@ -166,12 +166,8 @@
       if ($(this).hasClass('reg1')){
         $('#small-zc').show();
       }else{
-        $('#small-zc').show();
-        $('#box1').hide();
-        $('#gjw-success').children('p').text('您已经注册成功')
-        $('#gjw-success').children('ul').hide();
-        $('#gjw-success').children('a').show();
-        $('#gjw-success').show();
+        $('#seven-success').hide();
+        window.location.href="/";
       }
     })
 
@@ -184,7 +180,7 @@
         $('#gjw-success').children('p').text('请到投资页进行投资!')
         $('#gjw-success').children('ul').show();
         $('#gjw-success').children('a').hide();
-        $('.fast').text('立即投资')
+        $('.fast').text('立即投资');
         $('#gjw-success').show();
       }
 
@@ -192,6 +188,8 @@
     //领取奖品
     $('.gjw-recharge').on('click',function(){
       if ($(this).hasClass('gjw-star')){
+        $('#box1').show();
+        $('#gjw-success').hide();
         $('#small-zc').show();
       }else if ($(this).hasClass('notouch')){
         $('#small-zc').show();
@@ -224,6 +222,8 @@
     //马上报名
     $('.gjw-small-com').on('click',function(){
       if ($(this).hasClass('go')){
+        $('#box1').show();
+        $('#gjw-success').hide();
         $('#small-zc').show();
       }else{
         window.location.href="/"
@@ -234,6 +234,24 @@
     $('#tour_line').on('click',function(){
       $('.gjw-tour').slideToggle(300)
     })
+
+    //倒计时
+    count_down = function(o) {
+      var sec, timer;
+      sec = (new Date(o.replace(/-/ig, '/')).getTime() - new Date().getTime()) / 1000;
+      sec = parseInt(sec);
+      timer = setTimeout((function() {
+        count_down(o);
+      }), 1000);
+      if (sec <= 0) {
+        console.log('时间到')
+        $('#small-zc').show();
+        $('#box1').hide();
+        $('#activity-over').show();
+      }
+    };
+
+    count_down('2015-09-15 00:00:00')
 
 
   });

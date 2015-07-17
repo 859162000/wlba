@@ -1,0 +1,42 @@
+-load formatters
+doctype html
+html(style='background:#f5f5f5')
+  head
+    include include/app_header.jade
+  body
+    //banner
+    aside.ios-banner
+      .swiper-container
+        .swiper-wrapper
+          for item in banner
+            a(href="{{item.link}}").swiper-slide
+              img(data-src="/media/{{item.image}}", class="swiper-lazy")
+              .swiper-lazy-help
+        .swiper-pagination
+    //activity item
+    article.ios-main
+      title 最新活动
+      mixin item(url, imgUrl, title, explain, time)
+        section.ac-item
+          a(href=url)
+            img(src=imgUrl)
+            .item-text
+              h4.item-h4=title
+              p.item-explain=explain
+              p.item-time=time
+
+      +item('#', '/static/imgs/app/discover/banner_sml.jpg', '每天送万元大奖', '这里是活动的说明，这里是活动的说明，这里是活动的说明。', '2015.07.03 至 2015.07')
+      +item('#', '/static/imgs/app/discover/banner_sml.jpg', '每天送万元大奖', '这里是活动的说明，这里是活动的说明，这里是活动的说明。', '2015.07.03 至 2015.07')
+      +item('#', '/static/imgs/app/discover/banner_sml.jpg', '每天送万元大奖', '这里是活动的说明，这里是活动的说明，这里是活动的说明。', '2015.07.03 至 2015.07')
+
+    // banner javascript
+    script(src="/static/scripts/mobile/swiper/swiper.min.js")
+    script.
+      var myswiper = new Swiper('.swiper-container', {
+          pagination: '.swiper-pagination',
+          loop: true,
+          lazyLoading: true,
+          autoplay: 5000,
+          autoplayDisableOnInteraction: true,
+      });
+
