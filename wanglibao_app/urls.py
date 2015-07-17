@@ -21,6 +21,6 @@ urlpatterns = patterns(
     url(r'^guard/$', AppGuardView.as_view()),
     url(r'^guide/$', AppGuideView.as_view()),
     url(r'^daylist/$', AppDayListView.as_view()),
-    url(r'^secure/$', AppSecureView.as_view()),
+    # url(r'^secure/$', AppSecureView.as_view()),
     url(r'^explore/$', AppExploreView.as_view()),
 )
