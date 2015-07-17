@@ -188,6 +188,8 @@
     //领取奖品
     $('.gjw-recharge').on('click',function(){
       if ($(this).hasClass('gjw-star')){
+        $('#box1').show();
+        $('#gjw-success').hide();
         $('#small-zc').show();
       }else if ($(this).hasClass('notouch')){
         $('#small-zc').show();
@@ -220,6 +222,8 @@
     //马上报名
     $('.gjw-small-com').on('click',function(){
       if ($(this).hasClass('go')){
+        $('#box1').show();
+        $('#gjw-success').hide();
         $('#small-zc').show();
       }else{
         window.location.href="/"
