@@ -130,24 +130,15 @@ class AppDayListView(TemplateView):
 
 class AppGuardView(TemplateView):
     """ app保障页面 """
-    template_name = ''
-
-    def get_context_data(self, **kwargs):
-        return {}
+    template_name = 'secure.jade'
 
 class AppGuideView(TemplateView):
     """ app新手引导页面 """
     template_name = 'guide.jade'
 
-    def get_context_data(self, **kwargs):
-        return {}
-
 class AppSecureView(TemplateView):
     """ app安全保障页面"""
-    template_name = 'secure.jade'
-
-    def get_context_data(self, **kwargs):
-        return {}
+    template_name = ''
 
 class AppExploreView(TemplateView):
     """ app发现页面 """
