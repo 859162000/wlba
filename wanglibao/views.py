@@ -11,6 +11,7 @@ from itertools import chain
 from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2PNew
 from django.core.urlresolvers import reverse
 import re
+import urlparse
 
 
 class IndexView(TemplateView):
@@ -57,7 +58,13 @@ class IndexView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         device_list = ['android', 'iphone']
-        #user_agent = request.META['HTTP_USER_AGENT']
+        referer = request.META.get("HTTP_REFERER", "")
+        if referer:
+            res = urlparse.urlparse(referer)
+            if "baidu.com" in res.netloc:
+                qs = urlparse.parse_qs(res.query)
+                if "wd" in qs:
+                    request.session["promo_source_word"] = qs['wd']
         user_agent = request.META.get('HTTP_USER_AGENT', "").lower()
         for device in device_list:
             match = re.search(device, user_agent)
