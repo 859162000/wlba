@@ -165,6 +165,12 @@ class UserAddress(models.Model):
     postcode = models.CharField(max_length=6, verbose_name=u"邮政编码", blank=True)
     is_default = models.BooleanField(default=False, verbose_name=u"是否为默认")
 
+class UserSource(models.Model):
+    """
+        user baidu source keyword
+    """
+    user = models.ForeignKey(User)
+    keyword = models.CharField(max_length=50, verbose_name=u"收件人姓名", blank=False, null=False, default="")
 
 
 #发给所有人

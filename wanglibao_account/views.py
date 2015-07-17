@@ -88,6 +88,7 @@ class RegisterView(RegistrationView):
         auth.login(request, auth_user)
         device = utils.split_ua(request)
         tools.register_ok.apply_async(kwargs={"user_id": auth_user.id, "device":device})
+        account_backends.set_source(request, auth_user)
         return user
 
     def get_success_url(self, request=None, user=None):
@@ -1114,7 +1115,7 @@ def ajax_register(request):
                 identifier = form.cleaned_data['identifier']
                 invitecode = form.cleaned_data['invitecode']
 
-                if User.objects.filter(wanglibaouserprofile__phone=identifier).first():
+                if User.objects.filter(wanglibaouserprofile__phone=identifier).values("id"):
                     return HttpResponse(messenger('error'))
 
                 user = create_user(identifier, password, nickname)
@@ -1129,6 +1130,7 @@ def ajax_register(request):
 
                 device = utils.split_ua(request)
                 tools.register_ok.apply_async(kwargs={"user_id": auth_user.id, "device":device})
+                account_backends.set_source(request, auth_user)
 
                 return HttpResponse(messenger('done', user=request.user))
             else:
