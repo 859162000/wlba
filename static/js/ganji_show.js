@@ -378,24 +378,25 @@
           $('#seven-success').show();
           $('#first-redpack-fail').hide();
           $('#first-btn').addClass('selected');
-//          $.ajax({
-//            url: "/api/thousand/redpack/",
-//            type: "POST"
-//          }).done(function(data) {
-//
-//            if(data['ret_code']==3002 || data['ret_code']==3003){
-//              $('#first-redpack-fail').show();
-//              $('#box1').hide();
-//              $('#first-redpack-fail p').html(data.message);
-//            }
-//            if(data['ret_code']==3001){
-//              $('#small-zc').show();
-//            }
-//            if(data['ret_code']==0){
-//              $('#small-zc').show();
-//              $('#seven-success').show();
-//            }
-//          })
+          $.ajax({
+            url: "/api/thousand/redpack/",
+            type: "POST"
+          }).done(function(data) {
+
+            if(data['ret_code']==3002 || data['ret_code']==3003){
+              $('#first-redpack-fail').hide();
+              $('#box1').hide();
+              $('#first-redpack-fail p').html(data.message);
+            }
+            if(data['ret_code']==3001){
+              $('#small-zc').show();
+            }
+            if(data['ret_code']==0){
+              $('#small-zc').show();
+              $('#first-redpack-fail').hide();
+              $('#seven-success').show();
+            }
+          })
         }).fail(function(xhr) {
           var error_message, message, result;
           result = JSON.parse(xhr.responseText);
