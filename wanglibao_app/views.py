@@ -4,21 +4,31 @@
 __author__ = 'zhanghe'
 
 import logging
+import json
 
 from datetime import datetime
+from marketing.tops import Top
 from marketing.utils import local_to_utc
+from misc.views import MiscRecommendProduction
 
-from wanglibao import settings
+from django.contrib import messages
 from django.db.models import Q
+from django.shortcuts import redirect, render_to_response
+from django.template import RequestContext
 from django.views.generic import TemplateView
 from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from wanglibao import settings
+from wanglibao.permissions import IsAdminUserOrReadOnly
+from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_banner.models import AppActivate
-from wanglibao_p2p.models import ProductAmortization, P2PEquity
+from wanglibao_p2p.models import ProductAmortization, P2PEquity, P2PProduct
+from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_rest.utils import split_ua
+from wanglibao_banner.models import Banner
 
 
 
@@ -107,10 +117,15 @@ class AppRepaymentAPIView(APIView):
 
 class AppDayListView(TemplateView):
     """ app端榜单 """
-    template_name = ''
+    template_name = 'day-list.jade'
 
     def get_context_data(self, **kwargs):
-        return {}
+
+        top = Top(limit=10)
+        top_list = top.day_tops_activate(day=datetime.now(), amount_min=0)
+        return {
+            'top_list': top_list,
+        }
 
 
 class AppGuardView(TemplateView):
@@ -122,21 +137,164 @@ class AppGuardView(TemplateView):
 
 class AppGuideView(TemplateView):
     """ app新手引导页面 """
-    template_name = ''
+    template_name = 'guide.jade'
 
     def get_context_data(self, **kwargs):
         return {}
 
 class AppSecureView(TemplateView):
     """ app安全保障页面"""
-    template_name = ''
+    template_name = 'secure.jade'
 
     def get_context_data(self, **kwargs):
         return {}
 
 class AppExploreView(TemplateView):
     """ app发现页面 """
-    template_name = ''
+    template_name = 'discover.jade'
 
     def get_context_data(self, **kwargs):
-        return {}
+        banner = Banner.objects.filter(device='weixin', type='banner', is_used=True).order_by('-priority')
+        return {
+            'banner': banner,
+        }
+
+
+class AppP2PProductViewSet(PaginatedModelViewSet):
+    """ app查询标列表接口 """
+
+    model = P2PProduct
+    permission_classes = (IsAdminUserOrReadOnly,)
+    serializer_class = P2PProductSerializer
+    paginate_by = 10
+
+    def get_queryset(self):
+        qs = super(AppP2PProductViewSet, self).get_queryset()
+
+        maxid = self.request.QUERY_PARAMS.get('maxid', '')
+        minid = self.request.QUERY_PARAMS.get('minid', '')
+
+        pager = None
+        if maxid and not minid:
+            pager = Q(id__gt=maxid)
+        if minid and not maxid:
+            pager = Q(id__lt=minid)
+
+        if pager:
+            return qs.filter(hide=False).filter(status__in=[
+                u'满标已审核', u'还款中', u'正在招标'
+            ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).filter(pager).order_by('-priority', '-publish_time')
+        else:
+            return qs.filter(hide=False).filter(status__in=[
+                u'满标已审核', u'还款中', u'正在招标'
+            ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time')
+
+
+class AppRecommendViewSet(PaginatedModelViewSet):
+    """ app查询主推标接口
+    如果设置了主推标，按照设置的顺序显示
+    如果没有设置主推标，那就查找最近一个将要买完的显示
+    """
+    model = P2PProduct
+    permission_classes = (IsAdminUserOrReadOnly,)
+    serializer_class = P2PProductSerializer
+    paginate_by = 1
+
+    def get_queryset(self):
+        qs = super(AppRecommendViewSet, self).get_queryset()
+
+        misc = MiscRecommendProduction()
+        ids = misc.get_recommend_products()
+        if ids:
+            for id in ids:
+                recommend = qs.filter(hide=False, status=u'正在招标', id=id)
+                if recommend:
+                    return recommend
+        # 自定义查询标
+        productions = qs.filter(hide=False, status=u'正在招标').exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标'))
+        if productions:
+            id_rate = [{'id': q.id, 'rate': q.completion_rate} for q in productions]
+            id_rate = sorted(id_rate, key=lambda x: x['rate'], reverse=True)
+            return qs.filter(id=id_rate[0]['id'])
+
+        else:
+            return qs.filter(hide=False).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time')
+
+
+class RecommendProductManagerView(TemplateView):
+    """ 推荐标的管理 """
+    template_name = 'recommend_production.jade'
+
+    def _get_product(self, id):
+        if isinstance(id, list):
+            return P2PProduct.objects.filter(id__in=id).order_by('-id')
+        else:
+            return P2PProduct.objects.filter(id=id).order_by('-id')
+
+    def get_context_data(self, **kwargs):
+        p2p_list = []
+        misc = MiscRecommendProduction()
+        ids = misc.get_recommend_products()
+        if ids:
+            products = P2PProduct.objects.filter(id__in=ids)
+            for product in products:
+                p2p_list.append({
+                    'id': product.id,
+                    'name': product.name,
+                    'total_amount': product.total_amount,
+                })
+
+            p2p_list = sorted(p2p_list, key=lambda x: ids.index(x['id']))
+
+        return {'p2p_list': p2p_list}
+
+    def post(self, request, **kwargs):
+        """ 添加删除 """
+        operate = request.POST.get('manager')
+        product_id = request.POST.get('product_id')
+        if not operate or not product_id:
+            messages.warning(request, u'请填写标的id')
+            return redirect('./recommend_manager')
+
+        if product_id and not product_id.isdigit():
+            messages.warning(request, u'标的id不合法')
+            return redirect('./recommend_manager')
+
+        try:
+            product_id = int(product_id)
+            misc = MiscRecommendProduction()
+            ids = misc.get_recommend_products()
+
+            product = self._get_product(product_id)
+            if not product:
+                messages.warning(request, u'不存在id对应的标')
+                return redirect('./recommend_manager')
+
+            if operate == 'add':
+                if product_id in ids:
+                    messages.warning(request, u'此标已经被设置，不允许重复设置')
+                    return redirect('./recommend_manager')
+
+                if misc.add_product(product_id=product_id):
+                    messages.warning(request, u'增加成功')
+                    return redirect('./recommend_manager')
+
+                messages.warning(request, u'增加失败')
+                return redirect('./recommend_manager')
+
+            elif operate == 'del':
+                if product_id not in ids:
+                    messages.warning(request, u'此标未被设置')
+                    return redirect('./recommend_manager')
+
+                if misc.del_product(product_id=product_id):
+                    messages.warning(request, u'删除成功')
+                    return redirect('./recommend_manager')
+
+                messages.warning(request, u'删除失败')
+                return redirect('./recommend_manager')
+
+            return redirect('./recommend_manager')
+        except Exception, e:
+            logging.error(e.message)
+            return redirect('./recommend_manager')

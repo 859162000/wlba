@@ -1,0 +1,32 @@
+-load formatters
+doctype html
+html
+  head
+    include include/app_header.jade
+  body
+    article.secure-head
+      .secure-head-explain
+        p 多重保障
+        p 安全升级
+      .secure-head-img
+    mixin secureItem(bgStyle, explainTit, explain2, explain3, fangxiang)
+      article.secure-item(class=bgStyle)
+        if fangxiang
+          .secure-item-img
+          .secure-item-explain
+            h4=explainTit
+            p=explain2
+            p=explain3
+
+        else
+          .secure-item-explain
+            h4=explainTit
+            p=explain2
+            p=explain3
+          .secure-item-img
+    +secureItem('buleLeft', '多业务模式', '业务综合完整', '强力保障个人资产稳健增值', 'imgleft')
+    +secureItem('greenRight', '资金安全', '多重身份认证', '平安银行保障账户资金安全')
+    +secureItem('orginLeft', '合作伙伴', '与权威机构合作', '从源头杜绝安全风险', 'imgleft')
+    +secureItem('brownRight', '信息安全', '业界最安全标准全站加密', '全面保障账户信息安全')
+    +secureItem('greenLeft', '本息保障', '资金链360°保障', '银行全程监管，不动用户1分钱', 'imgleft')
+    +secureItem('writeNone')

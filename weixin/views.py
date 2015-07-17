@@ -34,12 +34,8 @@ from weixin.common.wx import generate_js_wxpay
 from .models import Account, WeixinUser, WeixinAccounts
 from .common.wechat import tuling
 from decimal import Decimal
-from shumi_backend.exception import *
-from shumi_backend.fetch import UserInfoFetcher
-from wanglibao_buy.models import BindBank
 from wanglibao_pay.models import Card
-from wanglibao_announcement.utility import AnnouncementAccounts
-from marketing.tops import Top
+from marketing.models import Channels
 import datetime
 import json
 import time
@@ -161,10 +157,16 @@ class WeixinRegister(TemplateView):
     def get_context_data(self, **kwargs):
         token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
         if not token:
-            token = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, 'weixin')
+            token = 'weixin'
+
+        if token:
+            channel = Channels.objects.filter(code=token).first()
+        else:
+            channel = None
 
         return {
             'token': token,
+            'channel': channel
         }
 
 

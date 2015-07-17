@@ -112,6 +112,7 @@ INSTALLED_APPS = (
     'wanglibao_activity',
     'wanglibao_mobile',
     'weixin',
+    'wanglibao_app',
 
     'report',
     'misc',
