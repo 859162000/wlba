@@ -376,6 +376,7 @@
           data: $(form).serialize()
         }).done(function(data, textStatus) {
           $('#seven-success').show();
+          $('#first-redpack-fail').hide();
           $('#first-btn').addClass('selected');
           $.ajax({
             url: "/api/thousand/redpack/",
@@ -383,7 +384,7 @@
           }).done(function(data) {
 
             if(data['ret_code']==3002 || data['ret_code']==3003){
-              $('#first-redpack-fail').show();
+              $('#first-redpack-fail').hide();
               $('#box1').hide();
               $('#first-redpack-fail p').html(data.message);
             }
@@ -392,6 +393,7 @@
             }
             if(data['ret_code']==0){
               $('#small-zc').show();
+              $('#first-redpack-fail').hide();
               $('#seven-success').show();
             }
           })
