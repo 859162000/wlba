@@ -3,7 +3,7 @@ import logging
 from django.conf import settings
 import requests
 from django.db.models import Sum
-from wanglibao_account.models import IdVerification
+from wanglibao_account.models import IdVerification, UserSource
 from wanglibao_redpack.models import Income
 
 logger = logging.getLogger(__name__)
@@ -50,6 +50,14 @@ def invite_earning(user):
         earning = 0
     return earning
 
+
+def set_source(request, user):
+    keyword = request.session.get("promo_source_word", "")
+    if keyword:
+        us = UserSource()
+        us.user = user
+        us.keyword = keyword
+        us.save()
 
 class TestIDVerifyBackEnd(object):
 
