@@ -692,7 +692,7 @@ if ENV == ENV_PRODUCTION:
     TIANMANG_CALL_BACK_URL = "http://www.bangwoya.com/callback/callback.php"
 else:
     TIANMANG_CALL_BACK_URL = "http://demo.bangwoya.com/callback/callback.php"
-TINMANG_KEY= '65'
+TINMANG_KEY= '30000065'
 WLB_FOR_TIANMANG_KEY = '1988'
 
 # 易瑞特
