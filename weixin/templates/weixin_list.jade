@@ -19,7 +19,11 @@ html
       .swiper-container
         .swiper-wrapper
           for item in banner
-            a(href="{{item.link}}").swiper-slide
+            if item.link
+              linkURL = item.link
+            else
+              linkURL = "javascript:void(0)"
+            a(href="{{linkURL}}").swiper-slide
               img(data-src="/media/{{item.image}}", class="swiper-lazy")
               .swiper-lazy-help
         .swiper-pagination

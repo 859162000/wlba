@@ -556,7 +556,7 @@ class ActivityJoinLogAPIView(APIView):
 
         start_time = timezone.datetime(2015, 6, 29)
         dt = timezone.now()
-        if dt > timezone.datetime(2015, 8, 2, 23, 59, 59):
+        if dt > timezone.datetime(2015, 8, 4, 23, 59, 59):
             return Response({'ret_code': 3002, 'message': u'活动已过期'})
 
         user_ib = IntroducedBy.objects.filter(user=user, channel__name='xunlei', created_at__gt=start_time).first()
