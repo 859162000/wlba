@@ -1,0 +1,52 @@
+
+.guide-main
+  position: relative
+  margin: 1.25rem 1.4rem 1.25rem 1rem
+  overflow: hidden
+
+.guide-line
+  position: absolute
+  top: 0
+  left: 2rem
+  height: 100%
+  width: .0375rem
+  background: rgba(93, 181,242, .3)
+.guide-body
+  position: relative
+  z-index: 1
+.guide-item
+  display: -webkit-box
+  margin-bottom: 1.4rem
+  &:last-child
+    margin-bottom: 0
+  .img-icon
+    display: block
+    width: 4rem
+    height: 4rem
+    margin-right: .75rem
+    background-image: url("/static/imgs/app/guide/guide.png")
+    background-repeat: no-repeat
+    background-size: 100%
+    border: 0
+  .guide-regist
+    background-position: 0 0
+  .guide-authentication
+    background-position: 0 -4.05rem
+  .guide-recharge
+    background-position: 0 -8.1rem
+  .guide-buy
+    background-position: 0 -12.15rem
+  .guide-payment
+    background-position: 0 -16.2rem
+
+  .guide-text
+    -webkit-box-flex: 1
+    display: -webkit-box
+    -webkit-box-align: center
+    .guide-item-h4
+      color: #666
+      font-size: $font-size14
+      margin-bottom: .25rem
+    .guide-item-explain
+      color: #999
+      font-size: $font-size12

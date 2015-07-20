@@ -25,7 +25,7 @@ html
                 a.banner-form--button(href="/accounts/home") 进入我的账户
         else
           .denelu-form#denglu
-            h1.biaoyu 领取1000元现金红包
+            h1.biaoyu 领取800元现金红包
             //.align-center
             //  a.font-s.blue(href="http://act.vip.xunlei.com/vip/2015/p2pcash/#wlb") 【立即领取】
             form#register-modal-form.login-form.dale(method='post', action='/accounts/register/ajax/')
@@ -67,14 +67,14 @@ html
     .gjw-wrap
       .gjw-big
       .gjw-gold
-        .xl-backtop
+        .xl-backtop(style="z-index:99")
           span.seven-com.seven-ten
           .backtop.sev-backtop 回到顶部
           img(src="/static/imgs/pc_activity/xunlei/seven/sev_weixin.png")#xl-weixin
           a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank")
             img(src="/static/imgs/pc_activity/xunlei/seven/sev_qq.png",style="margin-top:10px")#xl-qq
           .erweima
-        h1.gjw-h 活动时间：2015年7月17日——2015年9月15日
+        h1.gjw-h 活动时间：2015年7月20日——2015年9月20日
         p.gjw-p
           span.gjw-font-com.gjw-font-one
           br
@@ -110,7 +110,7 @@ html
         p(style="top:150px").gjw-p#recharge
           span.gjw-font-com.gjw-font-two
           br
-          | 首次充值网利宝，即可获得领取特权会员奖励！每位新注册用户可任意选择1个好礼领取。
+          | 首次充值网利宝，即可随机获得一项特权会员奖励，完成充值自动发送！每天限量1000个！
         .gjw-girl.gjw-people-com.gjw-people-one
         .gjw-number-two
           if user.is_authenticated
@@ -194,7 +194,7 @@ html
         p(style="top:254px").gjw-p#tour
           span.gjw-font-com.gjw-font-three
           br
-          | 注册测送红包，投资网利宝，还送你夏日旅游双人游大奖！没有比这更美的事了！
+          | 注册送红包，投资网利宝，还送你夏日旅游双人游大奖！没有比这更美的事了！
         .gjw-number-three
           dl
             dt
@@ -298,8 +298,8 @@ html
         h4 活动规则
         ul
           li 1. 手机号为网利宝唯一账户，本期活动仅限于赶集网注册新用户参与；
-          li 2. 新用户注册即送800元现金红包。此现金红包为组合红包，其中含50元的直抵红包和750元抵扣红包（750元折扣红包包含3张100元+2张200元+1张250元），投资满300元可使用50元直抵红包，折扣红包则按投资额1%抵扣使用（比如用户投资10000元，即可满额使用100元红包）；
-          li 3. 赶集网付费用户注册+实名+投资网利宝，并且投资≥3000元送赶集网100充值金；
+          li 2. 新用户注册即送800元现金红包。此现金红包为组合红包，其中含50元的直抵红包和750元抵扣红包（750元折扣红包包含3张100元+1张200元+1张250元），投资满300元可使用50元直抵红包，折扣红包则按投资额1%抵扣使用（比如用户投资10000元，即可满额使用100元红包）；
+          li 3.赶集网付费用户注册+实名+投资网利宝，并且单笔投资≥3000元送赶集网100充值金，每个账户只限一次；
           li 4. 免费旅游机会有效期截至到2015年9月30日，过期失效；获得免费旅游机会的用户将在活动结束后收到电话通知，与您核实信息并确认行程细节；
           li 5. 请您在出游前与户外圈网仔细确认行程细节，网利宝不参与您与户外圈网任何的信息沟通，您向户外圈网确认参加旅游后，旅途过程中产生的所有问题都与网利宝无关。
           li 6. 红包统一以站内信形式通知，完成一次投资回款后即可取现；
@@ -346,7 +346,7 @@ html
           .xl-small-zc
             span.first-xl-off ×
             .denelu-form(style="top:20px;left:32px")
-              h1.biaoyu  领取1000元现金红包
+              h1.biaoyu  领取800元现金红包
               //.align-center
               //  a.font-s.blue(href="http://act.vip.xunlei.com/vip/2015/p2pcash/#wlb") 【立即领取】
               form#register-modal-form2.login-form.dale(method='post', action='/accounts/register/ajax/')
@@ -387,15 +387,10 @@ html
         .seven-success#seven-success
           span.first-xl-off2 ×
           span.seven-happy.seven-com.seven-nine 亲，恭喜您
-            br
-            b 今天伸手领钱成功
-          p 1000元现金组合红包已发送到亲的账户，
+          p(style="margin:63px 0 0 30px") 800元现金组合红包已发送到亲的账户，
             br
             | 落袋为安妥妥哒！
-            br
-            | 7月钜惠季，全场加息3%即刻用起！
-          .first-money
-          a(href="/").first-user 立即使用
+          a(href="/",style="margin:122px 0 0 50px").first-user 立即使用
         #first-redpack-fail
           span.first-xl-off2 ×
           p 不符合参加条件
@@ -416,4 +411,4 @@ html
           a.agin 我再看看
   script.
       var v = new Date().getTime()
-      require(['/static/js/hover.js','/static/js/ganjiwang-regist.js?v='+v,'/static/js/advance.js'])
+      require(['/static/js/hover.js','/static/js/ganjiwang-regist.js?v='+v,'/static/js/ganji_show.js'])

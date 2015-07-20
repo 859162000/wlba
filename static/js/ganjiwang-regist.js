@@ -114,7 +114,7 @@
           type: "POST",
           data: $(form).serialize()
         }).done(function(data, textStatus) {
-          return window.location.href="/activity/ganjiwang"
+          return location.reload();
         }).fail(function(xhr) {
           var error_message, message, result;
           result = JSON.parse(xhr.responseText);
