@@ -155,7 +155,7 @@ class WangDaiListAPI(APIView):
                 "deadlineUnit": u"月",
                 "reward": '{}%'.format(0),#'{}%'.format(reward),
                 "type": u"信用标" if p2p.category == u'证大速贷'else u"抵押标",
-                "repaymentType": str(repaymentType),huo
+                "repaymentType": str(repaymentType),
                 "subscribes": subscribes,
                 "userName": md5(p2p.borrower_bankcard_bank_name.encode('utf-8')).hexdigest(),
                 "amountUsedDesc": strip_tags(p2p.short_usage),
