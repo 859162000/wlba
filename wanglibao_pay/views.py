@@ -42,7 +42,7 @@ from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
 from django.conf import settings
 from wanglibao_announcement.utility import AnnouncementAccounts
-from wanglibao_account.forms import verify_captcha
+#from wanglibao_account.forms import verify_captcha
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -191,11 +191,11 @@ class WithdrawCompleteView(TemplateView):
 
     @method_decorator(transaction.atomic)
     def post(self, request, *args, **kwargs):
-        result, message = verify_captcha(request.POST)
-        if not result:
-            return self.render_to_response({
-                'result': message
-            })
+        #result, message = verify_captcha(request.POST)
+        #if not result:
+        #    return self.render_to_response({
+        #        'result': message
+        #    })
 
         if not request.user.wanglibaouserprofile.id_is_valid:
             return self.render_to_response({
