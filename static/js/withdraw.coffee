@@ -94,7 +94,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       $(element).removeClass 'button-gray'
       result = JSON.parse xhr.responseText
       if result.type == 'captcha'
-        $("#submit-code-img1").parent().parent().find('.code-img-error').html(result.message)
+        $("#submit-code-img4").parent().parent().find('.code-img-error').html(result.message)
       else
         if xhr.status >= 400
           tool.modalAlert({title: '温馨提示', msg: result.message})
