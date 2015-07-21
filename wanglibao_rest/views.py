@@ -69,6 +69,11 @@ class SendValidationCodeView(APIView):
 
     def post(self, request, phone):
         phone_number = phone.strip()
+
+        res, message = verify_captcha(request.POST)
+        if not res:
+            return Response({'message': message, "type":"captcha"}, status=403)
+
         status, message = send_validation_code(phone_number, ip=get_client_ip(request))
         return Response({
                             'message': message
