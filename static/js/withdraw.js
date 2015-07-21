@@ -116,7 +116,7 @@
         $(element).removeClass('button-gray');
         result = JSON.parse(xhr.responseText);
         if (result.type === 'captcha') {
-          return $("#submit-code-img1").parent().parent().find('.code-img-error').html(result.message);
+          return $("#submit-code-img4").parent().parent().find('.code-img-error').html(result.message);
         } else {
           if (xhr.status >= 400) {
             return tool.modalAlert({
