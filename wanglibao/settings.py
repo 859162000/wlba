@@ -745,10 +745,21 @@ SUIT_CONFIG = {
 
 CACHES = {
     'default': {
-        "BACKEND": "redis_cache.RedisCache",
-        "LOCATION": "127.0.0.1:6379",
-        "OPTIONS": {
-            "CLIENT_CLASS": "redis_cache.client.DefaultClient",
+        'BACKEND': 'redis_cache.RedisCache',
+        'LOCATION': [
+            '127.0.0.1:6379',
+        ],
+        'OPTIONS': {
+            'DB': 0,
+            'PASSWORD': '',
+            'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
+            'CONNECTION_POOL_CLASS': 'redis.BlockingConnectionPool',
+            'CONNECTION_POOL_CLASS_KWARGS': {
+                'max_connections': 50,
+                'timeout': 20,
+            },
+            'MAX_CONNECTIONS': 1000,
+            'PICKLE_VERSION': -1,
         }
     }
 }
