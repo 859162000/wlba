@@ -195,9 +195,8 @@ class CoopRegister(object):
             binding.btype = self.channel_name
             binding.bid = self.channel_user
             binding.save()
-            logger.debug('save user %s to binding'%user)
-        else:
-            logger.debug('failed to save user %s to binding'%user)
+            # logger.debug('save user %s to binding'%user)
+
 
     def register_call_back(self, user):
         """
@@ -247,7 +246,7 @@ class CoopRegister(object):
     def all_processors_for_user_register(self, user, invite_code):
         if not invite_code:
             invite_code = self.channel_code
-        logger.debug('get invite code %s'%(invite_code))
+        # logger.debug('get invite code %s'%(invite_code))
         if invite_code:
             #通过渠道注册
             for processor in self.processors:
@@ -272,13 +271,13 @@ class CoopRegister(object):
 
     def process_for_validate(self, user):
         channel_processor = self.get_user_channel_processor(user)
-        logger.debug('channel processor %s'%channel_processor)
+        # logger.debug('channel processor %s'%channel_processor)
         if channel_processor:
             channel_processor.validate_call_back(user)
 
     def process_for_binding_card(self, user):
         channel_processor = self.get_user_channel_processor(user)
-        logger.debug('channel processor %s'%channel_processor)
+        # logger.debug('channel processor %s'%channel_processor)
         if channel_processor:
             channel_processor.binding_card_call_back(user)
 
@@ -418,7 +417,7 @@ class CoopQuery(APIView):
         daydelta = datetime.timedelta(hours=23, minutes=59, seconds=59, milliseconds=59)
         endday += daydelta
         promo_list = IntroducedBy.objects.filter(channel__code=channel_code, created_at__gte=startday, created_at__lte=endday)
-        logger.debug("promo user:%s"%[promo_user.user for promo_user in promo_list])
+        # logger.debug("promo user:%s"%[promo_user.user for promo_user in promo_list])
         return promo_list
 
     def check_sign(self, channel_code, startday, endday, sign):
@@ -427,7 +426,7 @@ class CoopQuery(APIView):
         m.update(startday+endday+key)
         local_sign = m.hexdigest()
         if sign != local_sign:
-            logger.debug('正确的渠道校验参数%s'%local_sign)
+            # logger.debug('正确的渠道校验参数%s'%local_sign)
             logger.error(u"渠道查询接口，sign参数校验失败")
             return False
         return True
@@ -467,7 +466,7 @@ class CoopQuery(APIView):
                     return WanglibaoUserProfile.objects.filter(user_id=user_id).get().id_is_valid
                 except:
                     return False
-            logger.debug('user id %s'%[u.user_id for u in coop_users])
+            # logger.debug('user id %s'%[u.user_id for u in coop_users])
             coop_users = [u for u in coop_users if is_validated_user(u.user_id)]
         elif user_type == self.BINDING_USER:
             def is_binding_user(user_id):
@@ -507,6 +506,6 @@ class CoopQuery(APIView):
                 'errormsg': 'api error'
             }
         finally:
-            logger.debug(result)
+            # logger.debug(result)
             return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
