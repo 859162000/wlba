@@ -61,20 +61,10 @@ block main
                 .span5
                   input.withdraw-input(type='text', name='validate_code', placeholder='请输入验证码')
                 .span4
-                  button.ispan4-omega#button-get-validate-code.button-orange.button-large(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
+                  button.ispan4-omega#button-get-code-btn.button-orange.button-large(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
               .row.voice.hidden
                 .span12-omega
                   没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/2/" class="voice-validate">语音验证</a>
-
-          tr
-            th 验证码
-            td
-                .span5
-                    input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
-                    input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4",style="width:100%")
-                img.captcha.captcha-img(alt="captcha", src="")
-                button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
-                .form-row-error
           tr
             td.opt(colspan=2)
               .withdraw-td
@@ -87,7 +77,17 @@ block main
         p 1. 提款申请提交后，您的提现金额将从可用金额中扣除，无法再进行出借。
         p 2. 为防止信用卡套现、洗钱等违法行为，网站将针对异常提款（包括提取无消费充值资金）进行严格审核，审核时间在 15 个工作日之后。
         p 3. 提现银行账号的开户名必须与银行卡名一致， 否则提现失败。
-
+  #img-code-div2(style="display:none")
+        form#img-code-form.img-code-form(method='post', action='')
+            .form-row
+                label.img-code-label 请输入验证码：
+                input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
+                input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
+                img.captcha.captcha-img(alt="captcha", src="")
+                button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
+            .code-img-error
+            .clearfix.tc
+                span.submit-code-img#submit-code-img4 确定
 block script
   include include/add_card
   script.
