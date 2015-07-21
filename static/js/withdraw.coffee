@@ -103,6 +103,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       element.removeClass 'button-red'
       element.addClass 'button-gray'
       $('.voice-validate').attr 'disabled', 'disabled'
+      $.modal.close()
 
     intervalId
     count = 180
