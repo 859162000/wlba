@@ -5,7 +5,8 @@
       jquery: 'lib/jquery.min',
       'jquery.modal': 'lib/jquery.modal.min',
       'jquery.placeholder': 'lib/jquery.placeholder',
-      'jquery.validate': 'lib/jquery.validate.min'
+      'jquery.validate': 'lib/jquery.validate.min',
+      tools: 'lib/modal.tools'
     },
     shim: {
       'jquery.modal': ['jquery'],
@@ -14,7 +15,7 @@
     }
   });
 
-  require(['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calculator', 'jquery.validate'], function($, modal, backend, placeholder, validate) {
+  require(['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator', 'jquery.validate'], function($, modal, backend, tool, placeholder, validate) {
     $.validator.addMethod("balance", function(value, element) {
       return backend.checkBalance(value, element);
     });
@@ -80,25 +81,55 @@
     if ($('#id-is-valid').val() === 'False') {
       $('#id-validate').modal();
     }
-    $("#button-get-validate-code").click(function(e) {
-      var count, element, intervalId, phoneNumber, timerFunction;
-      e.preventDefault();
-      element = this;
-      e.preventDefault();
+    $('#button-get-code-btn').click(function() {
+      var url;
+      $('#img-code-div2').modal();
+      $('#img-code-div2').find('#id_captcha_1').val('');
+      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
+      return $.getJSON(url, {}, function(json) {
+        $('input[name="captcha_0"]').val(json.key);
+        return $('img.captcha').attr('src', json.image_url);
+      });
+    });
+    $("#submit-code-img4").click(function(e) {
+      var captcha_0, captcha_1, count, element, intervalId, phoneNumber, timerFunction;
+      element = $('#button-get-code-btn');
       if ($(element).attr('disabled')) {
         return;
       }
       phoneNumber = $(element).attr("data-phone");
+      captcha_0 = $(this).parents('form').find('#id_captcha_0').val();
+      captcha_1 = $(this).parents('form').find('.captcha').val();
       $.ajax({
         url: "/api/phone_validation_code/" + phoneNumber + "/",
-        type: "POST"
-      }).fail(function(xhr) {
-        if (xhr.status > 400) {
-          return tool.modalAlert({
-            title: '温馨提示',
-            msg: result.message
-          });
+        type: "POST",
+        data: {
+          captcha_0: captcha_0,
+          captcha_1: captcha_1
         }
+      }).fail(function(xhr) {
+        var result;
+        clearInterval(intervalId);
+        $(element).text('重新获取');
+        $(element).removeAttr('disabled');
+        $(element).addClass('button-red');
+        $(element).removeClass('button-gray');
+        result = JSON.parse(xhr.responseText);
+        if (result.type === 'captcha') {
+          return $("#submit-code-img1").parent().parent().find('.code-img-error').html(result.message);
+        } else {
+          if (xhr.status >= 400) {
+            return tool.modalAlert({
+              title: '温馨提示',
+              msg: result.message
+            });
+          }
+        }
+      }).success(function() {
+        element.attr('disabled', 'disabled');
+        element.removeClass('button-red');
+        element.addClass('button-gray');
+        return $('.voice-validate').attr('disabled', 'disabled');
       });
       intervalId;
       count = 180;
