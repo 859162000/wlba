@@ -129,7 +129,8 @@
         element.attr('disabled', 'disabled');
         element.removeClass('button-red');
         element.addClass('button-gray');
-        return $('.voice-validate').attr('disabled', 'disabled');
+        $('.voice-validate').attr('disabled', 'disabled');
+        return $.modal.close();
       });
       intervalId;
       count = 180;
