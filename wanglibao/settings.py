@@ -685,12 +685,14 @@ CKEDITOR_CONFIGS = {
 }
 
 #aliyun oss
-OSS_ENDPOINT = 'oss-cn-beijing.aliyuncs.com'
 ACCESS_KEY_ID = 'ONOxmm1lwPLUyJ6U'
 ACCESS_KEY = 'ainfVHfl2VnnaxlaG7SL9pYPwA6oJU'
 if ENV == ENV_PRODUCTION:
+    OSS_ENDPOINT = 'oss-cn-beijing-internal.aliyuncs.com'
     OSS_BUCKET = 'wanglifile'
+
 else:
+    OSS_ENDPOINT = 'oss-cn-beijing.aliyuncs.com'
     OSS_BUCKET = 'wanglistaging'
 
 #ISCJDAO = False
