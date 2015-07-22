@@ -11,6 +11,8 @@ __author__ = 'guoya'
 from hashlib import md5
 import time
 
+DEFAULT_TIMEOUT = 10
+
 def get_host():
     return '%s.%s'%(OSS_BUCKET, OSS_ENDPOINT)
 
@@ -128,7 +130,7 @@ def get_date():
 def get_authorization(action, path, content_md5, content_type, date):
     canonical_resource = os.path.join('/', OSS_BUCKET,  path)
     str_to_sign = '\n'.join([action, content_md5, content_type, date, canonical_resource])
-    print str_to_sign, len(str_to_sign)
+    # print str_to_sign, len(str_to_sign)
     h = hmac.new(ACCESS_KEY,str_to_sign,sha)
     signature = base64.encodestring(h.digest()).strip()
     authorization = 'OSS ' + ACCESS_KEY_ID + ':' + signature
@@ -137,7 +139,7 @@ def get_authorization(action, path, content_md5, content_type, date):
 def oss_save(path, file):
     path = path.encode('utf-8')
     data=file.read()
-    print type(data), len(data)
+    # print type(data), len(data)
     size = len(data)
     m = md5()
     m.update(data)
@@ -145,9 +147,9 @@ def oss_save(path, file):
     content_type = get_content_type(path)
     date = get_date()
 
-    opener = urllib2.build_opener(urllib2.HTTPHandler(debuglevel=1))
+    opener = urllib2.build_opener(urllib2.HTTPHandler())
     # print 'data'+ data
-    print '========'+get_site_url(path)
+    # print '========'+get_site_url(path)
     request = urllib2.Request(get_site_url(path), data=data)
     request.add_header('Content-Length', size)
     request.add_header("Content-Type", content_type)
@@ -158,12 +160,12 @@ def oss_save(path, file):
     request.add_header('Authorization', get_authorization(action, path,content_md5,content_type, date))
     request.get_method = lambda: action
     try:
-        url = opener.open(request)
-        print 'get size %s' % size
+        url = opener.open(request, timeout = DEFAULT_TIMEOUT)
+        # print 'get size %s' % size
         return size
     except urllib2.HTTPError, e:
         c = e.fp.read()
-        print c
+        # print c
         raise e
         # m = re.findall(r'<StringToSign>(.*)</StringToSign>', c, re.S)[0]
         # h = hmac.new(ACCESS_KEY,m,sha)
@@ -173,7 +175,7 @@ def oss_save(path, file):
         # # print ali_str, len(ali_str)
 
 def oss_delete(path):
-    opener = urllib2.build_opener(urllib2.HTTPHandler(debuglevel=1))
+    opener = urllib2.build_opener(urllib2.HTTPHandler())
     # print 'data'+ data
     date = get_date()
     request = urllib2.Request(get_site_url(path))
@@ -183,14 +185,14 @@ def oss_delete(path):
     request.add_header('Authorization', get_authorization(action, path, '','', date))
     request.get_method = lambda: action
     try:
-        url = opener.open(request)
+        url = opener.open(request, timeout = DEFAULT_TIMEOUT)
     except urllib2.HTTPError, e:
         c = e.fp.read()
-        print c
+        # print c
         raise e
 
 def oss_open(path):
-    opener = urllib2.build_opener(urllib2.HTTPHandler(debuglevel=1))
+    opener = urllib2.build_opener(urllib2.HTTPHandler())
     # print 'data'+ data
     date = get_date()
     request = urllib2.Request(get_site_url(path))
@@ -200,10 +202,10 @@ def oss_open(path):
     request.add_header('Authorization', get_authorization(action, path, '','', date))
     request.get_method = lambda: action
     try:
-        return opener.open(request)
+        return opener.open(request, timeout = DEFAULT_TIMEOUT)
     except urllib2.HTTPError, e:
         c = e.fp.read()
-        print c
+        # print c
 
 if __name__ == '__main__':
     with open("/tmp/d.jpg") as f:
