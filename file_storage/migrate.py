@@ -1,4 +1,6 @@
 import os
+import sys
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wanglibao.settings')
 
 from StringIO import StringIO
@@ -68,6 +70,12 @@ def process_all(stop_mark=None):
 if __name__ == '__main__':
     # save_mark(1)
     # assert get_mark() == 1
+    if len(sys.argv) > 1:
+        ids = [int(file_id) for file_id in sys.argv[1:]]
+        print 'process ids %s' % ids
+        for id in ids:
+            process_file(id)
+        exit()
     process_all()
     # print File.objects.filter(id=2).first().id
 
