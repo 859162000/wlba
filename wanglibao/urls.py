@@ -97,7 +97,7 @@ urlpatterns = patterns(
 urlpatterns += patterns(
     '',
     url(r'^captcha/', include('captcha.urls')),
-    url(r'^media/(?P<path>.*)$', 'file_storage.views.serve')
+    url(r'^media/(?P<path>.*)$', 'file_storage.views.serve'),
 )
 
 
