@@ -555,7 +555,7 @@ class ActivityJoinLogAPIView(APIView):
             return Response({'ret_code': 3001, 'message': u'用户没有登陆，请先登陆'})
 
         start_time = timezone.datetime(2015, 6, 29)
-        dt = timezone.now()
+        dt = timezone.datetime.now()
         if dt > timezone.datetime(2015, 8, 4, 23, 59, 59):
             return Response({'ret_code': 3002, 'message': u'活动已过期'})
 

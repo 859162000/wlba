@@ -27,8 +27,9 @@ from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_banner.models import AppActivate
 from wanglibao_p2p.models import ProductAmortization, P2PEquity, P2PProduct
 from wanglibao_p2p.serializers import P2PProductSerializer
-from wanglibao_rest.utils import split_ua
+from wanglibao_rest.utils import split_ua, get_client_ip
 from wanglibao_banner.models import Banner
+from wanglibao_sms.utils import send_validation_code
 
 
 
@@ -289,3 +290,16 @@ class RecommendProductManagerView(TemplateView):
         except Exception, e:
             logging.error(e.message)
             return redirect('./recommend_manager')
+
+
+class SendValidationCodeView(APIView):
+    """ app端获取验证码，不在设置状态码， """
+    permission_classes = ()
+
+    def post(self, request, phone):
+        phone_number = phone.strip()
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
+        if status != 200:
+            return Response({"ret_code": 30044, "message": message})
+
+        return Response({"ret_code": 0, "message": u'验证码发送成功'})
