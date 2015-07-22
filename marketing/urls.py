@@ -33,6 +33,7 @@ urlpatterns = patterns(
     # url(r'^advance/$', TemplateView.as_view(template_name="advance.jade")),
     url(r'^act_invite/$', TemplateView.as_view(template_name="act_invite.jade")),
     url(r'^ganjiwang/$', TemplateView.as_view(template_name="ganjiwang.jade")),
+    url(r'^xunlei-august/$', TemplateView.as_view(template_name="xunlei-august.jade")),
 )
 
 urlpatterns += patterns(
