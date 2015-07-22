@@ -750,13 +750,14 @@ CACHES = {
             '127.0.0.1:6379',
         ],
         'OPTIONS': {
-            'DB': 0,
-            'PASSWORD': '',
+            # 'DB': 0,
+            # 'PASSWORD': '',
             'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
+            'PARSER_CLASS': 'redis.connection.HiredisParser',
             'CONNECTION_POOL_CLASS': 'redis.BlockingConnectionPool',
             'CONNECTION_POOL_CLASS_KWARGS': {
                 'max_connections': 50,
-                'timeout': 20,
+                # 'timeout': 20,
             },
             'MAX_CONNECTIONS': 1000,
             'PICKLE_VERSION': -1,

@@ -48,6 +48,7 @@ from exceptions import PrepaymentException
 from django.core.urlresolvers import reverse
 import re
 from celery.execute import send_task
+from django.core.cache import cache
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"

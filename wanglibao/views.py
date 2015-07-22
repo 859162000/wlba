@@ -43,14 +43,18 @@ class IndexView(TemplateView):
         banners = Banner.objects.filter(Q(device=Banner.PC_2), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now())))
         news_and_reports = NewsAndReport.objects.all().order_by("-score")[:5]
         site_data = SiteData.objects.all().first()
-        if cache.get('home_partners'):
+
+        if cache.has_key('home_partners'):
             partners = cache.get('home_partners')
             print "read caches"
             print partners
         else:
-            partners = Partner.objects.filter(type='partner')
-            cache.set('home_partners', partners)
-
+            partners_obj = Partner.objects.filter(type='partner')
+            partners = [
+                {'name': partner.name, 'link': partner.link, 'image': partner.image}
+                for partner in partners_obj
+            ]
+            cache.set('home_partners', partners, timeout=365*24*60*60)
         return {
             "p2p_products": p2p_products,
             "trade_records": trade_records,
