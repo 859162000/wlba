@@ -249,7 +249,9 @@ STATICFILES_DIRS = (
 # Media files path
 MEDIA_ROOT = '/var/media/wanglibao/'
 MEDIA_URL = '/media/'
-DEFAULT_FILE_STORAGE = 'file_storage.storages.DatabaseStorage'
+# DEFAULT_FILE_STORAGE = 'file_storage.storages.DatabaseStorage'
+DEFAULT_FILE_STORAGE = 'file_storage.storages.AliOSSStorage'
+
 
 # The request rate for some apis
 request_rate = '2/minute'
@@ -681,6 +683,17 @@ CKEDITOR_CONFIGS = {
         'toolbar': 'custom',
     }
 }
+
+#aliyun oss
+ACCESS_KEY_ID = 'ONOxmm1lwPLUyJ6U'
+ACCESS_KEY = 'ainfVHfl2VnnaxlaG7SL9pYPwA6oJU'
+if ENV == ENV_PRODUCTION:
+    OSS_ENDPOINT = 'oss-cn-beijing-internal.aliyuncs.com'
+    OSS_BUCKET = 'wanglifile'
+
+else:
+    OSS_ENDPOINT = 'oss-cn-beijing.aliyuncs.com'
+    OSS_BUCKET = 'wanglistaging'
 
 #ISCJDAO = False
 #CJDAOKEY = '1234'

@@ -172,14 +172,16 @@ class AppP2PProductViewSet(PaginatedModelViewSet):
         if minid and not maxid:
             pager = Q(id__lt=minid)
 
+        manual = u"FIELD({column}, '正在招标', '满标已审核', '还款中')".format(column='status')
+
         if pager:
             return qs.filter(hide=False).filter(status__in=[
                 u'满标已审核', u'还款中', u'正在招标'
-            ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).filter(pager).order_by('-priority', '-publish_time')
+            ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).filter(pager).extra(select={'manual': manual}, order_by=['manual', '-priority', '-publish_time'])
         else:
             return qs.filter(hide=False).filter(status__in=[
                 u'满标已审核', u'还款中', u'正在招标'
-            ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time')
+            ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).extra(select={'manual': manual}, order_by=['manual', '-priority', '-publish_time'])
 
 
 class AppRecommendViewSet(PaginatedModelViewSet):
