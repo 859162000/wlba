@@ -49,7 +49,7 @@ def oss_save(path, file):
     date = get_date()
 
     headers = {
-        'Content-Length': size,
+        'Content-Length': str(size),
         "Content-Type": content_type,
         'Content-Md5': content_md5,
         'Host': get_host(),
