@@ -156,7 +156,12 @@ class WeixinRegister(TemplateView):
 
     def get_context_data(self, **kwargs):
         token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
-        if not token:
+        token_session = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+        if token:
+            token = token
+        elif token_session:
+            token = token_session
+        else:
             token = 'weixin'
 
         if token:
