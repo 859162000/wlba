@@ -1,3 +1,5 @@
+# encoding:utf-8
+
 import os
 import random
 from urlparse import urljoin
@@ -66,7 +68,10 @@ class AliOSSStorage(Storage):
 
     def save(self, name, content):
         size = oss_save(name, content.file)
-        File(path=name, size=size).save()
+        #如果上传重名则覆盖
+        f = File.objects.get_or_create(path=name)[0]
+        f.size = size
+        f.save()
         return name
 
     def open(self, name, mode='rb'):
