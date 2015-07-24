@@ -6,9 +6,8 @@ import mimetypes
 import os
 import re
 import urllib
-import urllib2
 import StringIO
-import requests
+import httplib2
 from wanglibao.settings import OSS_BUCKET, OSS_ENDPOINT, ACCESS_KEY, ACCESS_KEY_ID
 
 from hashlib import md5, sha1
@@ -50,19 +49,19 @@ def oss_save(path, file):
     date = get_date()
 
     headers = {
-        'Content-Length': size,
+        'Content-Length': str(size),
         "Content-Type": content_type,
         'Content-Md5': content_md5,
         'Host': get_host(),
         'Date': date,
         'Authorization': get_authorization('PUT', path, content_md5, content_type, date)
     }
-    r = requests.put(get_site_url(path), headers=headers, data=data)
-
-    if r.status_code != 200:
+    http = httplib2.Http()
+    response, cont = http.request(get_site_url(path), 'PUT', headers=headers, body=data)
+    if str(response['status']) == "200":
+        return size
+    else:
         raise IOError('IOError while save %s to OSS  with error message: %s and headers: %s'%(path, r.content, headers))
-
-    return size
 
 def oss_delete(path):
     date = get_date()
@@ -71,10 +70,10 @@ def oss_delete(path):
         'Date': date,
         'Authorization': get_authorization('DELETE', path, '', '', date)
     }
-    r = requests.delete(get_site_url(path), headers=headers)
-
+    http = httplib2.Http()
+    response, cont = http.request(get_site_url(path), 'DELETE', headers=headers)
     #200：成功，204：object不存在，404：bucket不存在
-    return r.status_code
+    return response['status']
 
 def oss_open(path):
     date = get_date()
@@ -83,12 +82,12 @@ def oss_open(path):
         'Date': date,
         'Authorization': get_authorization('GET', path, '', '', date)
     }
-    r = requests.get(get_site_url(path), headers=headers)
-
-    if r.status_code != 200:
+    http = httplib2.Http()
+    response, cont = http.request(get_site_url(path), 'GET', headers=headers)
+    if str(response['status']) != "200":
         raise IOError('IOError while open %s from OSS  with error message: %s and headers: %s'%(path, r.content, headers))
 
-    return StringIO.StringIO(r.content)
+    return StringIO.StringIO(cont)
 
 if __name__ == '__main__':
     with open("/tmp/d.jpg") as f:
