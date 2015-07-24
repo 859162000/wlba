@@ -1,10 +1,13 @@
+# encoding:utf-8
+
 import base64
 import hmac
 import mimetypes
 import os
 import re
 import urllib
-import urllib2
+import StringIO
+import httplib2
 from wanglibao.settings import OSS_BUCKET, OSS_ENDPOINT, ACCESS_KEY, ACCESS_KEY_ID
 
 from hashlib import md5, sha1
@@ -17,7 +20,7 @@ def get_host():
 
 def get_site_url(path):
     url =  'http://' + os.path.join(get_host(),  path)
-    return url
+    return url.encode('utf8')
 
 def get_date():
     return time.strftime('%a, %d %b %Y %H:%M:%S GMT', time.gmtime())
@@ -45,43 +48,50 @@ def oss_save(path, file):
     content_type = mimetypes.guess_type(path)[0] or ''
     date = get_date()
 
-    opener = urllib2.build_opener(urllib2.HTTPHandler())
-    request = urllib2.Request(get_site_url(path), data=data)
-    request.add_header('Content-Length', size)
-    request.add_header("Content-Type", content_type)
-    request.add_header('Content-Md5', content_md5)
-    request.add_header('Host', get_host())
-    request.add_header('Date', date)
-    action = 'PUT'
-    request.add_header('Authorization', get_authorization(action, path,content_md5,content_type, date))
-    request.get_method = lambda: action
-    url = opener.open(request, timeout = DEFAULT_TIMEOUT)
-    return size
+    headers = {
+        'Content-Length': str(size),
+        "Content-Type": content_type,
+        'Content-Md5': content_md5,
+        'Host': get_host(),
+        'Date': date,
+        'Authorization': get_authorization('PUT', path, content_md5, content_type, date)
+    }
+    http = httplib2.Http()
+    response, cont = http.request(get_site_url(path), 'PUT', headers=headers, body=data)
+    if str(response['status']) == "200":
+        return size
+    else:
+        raise IOError('IOError while save %s to OSS  with error message: %s and headers: %s'%(path, r.content, headers))
 
 def oss_delete(path):
-    opener = urllib2.build_opener(urllib2.HTTPHandler())
     date = get_date()
-    request = urllib2.Request(get_site_url(path))
-    request.add_header('Host', get_host())
-    request.add_header('Date', date)
-    action = 'DELETE'
-    request.add_header('Authorization', get_authorization(action, path, '','', date))
-    request.get_method = lambda: action
-    url = opener.open(request, timeout = DEFAULT_TIMEOUT)
+    headers = {
+        'Host': get_host(),
+        'Date': date,
+        'Authorization': get_authorization('DELETE', path, '', '', date)
+    }
+    http = httplib2.Http()
+    response, cont = http.request(get_site_url(path), 'DELETE', headers=headers)
+    #200：成功，204：object不存在，404：bucket不存在
+    return response['status']
 
 def oss_open(path):
-    opener = urllib2.build_opener(urllib2.HTTPHandler())
     date = get_date()
-    request = urllib2.Request(get_site_url(path))
-    request.add_header('Host', get_host())
-    request.add_header('Date', date)
-    action = 'GET'
-    request.add_header('Authorization', get_authorization(action, path, '','', date))
-    request.get_method = lambda: action
-    return opener.open(request, timeout = DEFAULT_TIMEOUT)
+    headers = {
+        'Host': get_host(),
+        'Date': date,
+        'Authorization': get_authorization('GET', path, '', '', date)
+    }
+    http = httplib2.Http()
+    response, cont = http.request(get_site_url(path), 'GET', headers=headers)
+    if str(response['status']) != "200":
+        raise IOError('IOError while open %s from OSS  with error message: %s and headers: %s'%(path, r.content, headers))
+
+    return StringIO.StringIO(cont)
 
 if __name__ == '__main__':
     with open("/tmp/d.jpg") as f:
         oss_save('banner/200898163242920_2.jpg', f)
     print 'length %s' % len(oss_open('banner/200898163242920_2.jpg').read())
-    # oss_delete('/tests.py')
+    oss_delete('banner/200898163242920_2.jpg')
+    print 'length %s' % len(oss_open('banner/200898163242920_2.jpg').read())
