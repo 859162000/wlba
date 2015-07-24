@@ -42,7 +42,7 @@ html(style="background: #f5f5f5")
       .form-list
         .form-icon.user-invitation.invitation-icon
         .form-input
-          input(type="tel",name="invitation", placeholder="请填写邀请码，若无，请忽略", data-target2='invitation-icon', data-icon='user-invitation')
+          input(type="text",name="invitation", placeholder="请填写邀请码，若无，请忽略", data-target2='invitation-icon', data-icon='user-invitation')
           input(type="hidden", name="token", id="token", value="{{token}}")
           .form-edit-icon
       //注册协议
