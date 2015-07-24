@@ -24,8 +24,20 @@ html
                 a.banner-form--button(href="/accounts/home") 进入我的账户
         else
           .denelu-form#denglu
+            #aug-code
+              .aug-center
+                .off-form#off-form ×
+                form#img-code-form.img-code-form.aut-form(method='post', action='')
+                  .form-row
+                      input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
+                      input#id_captcha_1.captcha.aut-captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
+                      img.captcha.captcha-img(alt="captcha", src="")
+                      button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
+                  .code-img-error.aut-error
+                  .clearfix.tc
+                      span.submit-code-img#submit-code-img1 确定
             h1.biaoyu 领取800元现金红包
-            form#register-modal-form.login-form.dale(method='post', action='/accounts/register/ajax/')
+            form#register-modal-form.login-form.dale(method='post', action='')
               - csrf_token
               .form-row
                 .form-control-group
@@ -50,14 +62,14 @@ html
                 .form-row-error
               .form-row
                 input#reg_password2.com-tu.tu3(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
-                .form-row-error
+                .form-row-error#aug-form-row-eroor
               .form-row.form-bottom-bar
                 .agreement(style="padding:0 0 10px 10px;text-align:left")
                   label(for="agreement")
                     input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree",style="position: relative;top: 3px;margin-right: 10px;width: 16px;")
                   | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
                   .form-row-error
-                button#register_submit.button-account.span10.xun-zhuce(type='submit') 立即注册
+                button#register_submit.button-account.span10.xun-zhuce(type='button') 立即注册
               .space-vertical-s
             p.xun-p 已有账号,
               a(href="/accounts/login/") 立即登录
@@ -214,4 +226,4 @@ html
         a(href='/').alertBtn 赶紧去投资
   script.
       var v = new Date().getTime()
-      require(['/static/js/hover.js','/static/js/ganjiwang-regist.js?v='+v,'/static/js/baidu.js'])
+      require(['/static/js/hover.js','/static/js/xun_august.js?v='+v,'/static/js/baidu.js'])
