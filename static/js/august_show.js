@@ -55,7 +55,6 @@
     //关闭模态窗
     $('.first-xl-off,.first-xl-off2,.look,.agin,#go-top').on('click',function(){
       $('#small-zc').hide();
-      location.reload();
     });
 
 //    $('#small-zc').on('click',function(){
@@ -168,14 +167,13 @@
         count_down(o);
       }), 1000);
       if (sec <= 0) {
-        console.log('时间到')
         $('#small-zc').show();
         $('#box1').hide();
         $('#activity-over').show();
       }
     };
 
-    count_down('2015-09-15 00:00:00')
+    count_down('2015-09-30 00:00:00')
 
 
   });

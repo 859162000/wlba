@@ -31,9 +31,7 @@
     });
     //关闭验证码弹框
     $('#off-form').on('click',function(){
-
       $('#aug-code').hide();
-
     })
     getCookie = function(name) {
       var cookie, cookieValue, cookies, i;
@@ -82,6 +80,8 @@
         }
         $('#aug-code').show();
         return $('#aug-code').find('#id_captcha_1').val('');
+      }else{
+        $('#aug-form-row-eroor').text('* 请输入正确的手机号')
       }
     });
     $('#submit-code-img1').click(function() {
@@ -150,56 +150,33 @@
       timerFunction();
       return intervalId = setInterval(timerFunction, 1000);
     });
-    $('#register-modal-form').validate({
-      rules: {
-        identifier: {
-          required: true,
-          isMobile: true
-        },
-        validate_code: {
-          required: true
-        },
-        password: {
-          required: true,
-          minlength: 6,
-          maxlength: 20
-        },
-        password2: {
-          equalTo: "#reg_password"
-        },
-        agreement: {
-          required: true
-        }
-      },
-      messages: {
-        identifier: {
-          required: '不能为空',
-          isMobile: '请输入手机号'
-        },
-        validate_code: {
-          required: '不能为空'
-        },
-        password: {
-          required: '不能为空',
-          minlength: $.format("密码需要最少{0}位"),
-          maxlength: '密码不能超过20位'
-        },
-        password2: {
-          equalTo: '密码不一致'
-        },
-        agreement: {
-          required: '请勾选注册协议'
-        }
-      },
-      errorPlacement: function(error, element) {
-        return error.appendTo($(element).parents('.form-row').children('.form-row-error'));
-      },
-      submitHandler: function(form) {
-        $('input[name="identifier"]').trigger('keyup');
-        return $.ajax({
-          url: $(form).attr('action'),
+
+    $('#register_submit').on('click',function(){
+      if ($('#reg_identifier').val()==''){
+        $('#aug-form-row-eroor').text('* 请输入手机号')
+      }else if (!checkMobile(phoneNumber)){
+        $('#aug-form-row-eroor').text('* 请输入正确的手机号')
+      }else if ($('#id_validate_code').val()==''){
+        $('#aug-form-row-eroor').text('* 请输入验证码')
+      }else if ($('#reg_password').val()==''){
+        $('#aug-form-row-eroor').text('* 请输入密码')
+      }else if ($('#reg_password').val().length<6){
+        $('#aug-form-row-eroor').text('* 密码需要最少6位')
+      }else if ($('#reg_password').val().length>20){
+        $('#aug-form-row-eroor').text('* 密码不能超过20位')
+      }else if ($('#reg_password2').val()==''){
+        $('#aug-form-row-eroor').text('* 请再次输入密码')
+      }else if ($('#reg_password').val()!=$('#reg_password2').val()){
+        $('#aug-form-row-eroor').text('* 密码不一致')
+      }else{
+        var phoneNumber,pw,code,pw2;
+        phoneNumber=$('#reg_identifier').val();
+        code=$('#id_validate_code').val();
+        pw=$('#reg_password').val();
+        $.ajax({
+          url: '/accounts/register/ajax/',
           type: "POST",
-          data: $(form).serialize()
+          data: {identifier:phoneNumber,validate_code:code,password:pw}
         }).done(function(data, textStatus) {
           return location.reload();
         }).fail(function(xhr) {
@@ -209,10 +186,94 @@
           error_message = _.chain(message).pairs().map(function(e) {
             return e[1];
           }).flatten().value();
-          return alert(error_message);
+          $('#aug-form-row-eroor').text('* '+error_message)
         });
       }
-    });
+    })
+
+    $('#reg_identifier,#id_validate_code').on('keyup',function(){
+      $('#aug-form-row-eroor').text('')
+    })
+
+    $('#reg_password').on('keyup',function(){
+      if ($('#reg_password').val().length<6){
+        $('#aug-form-row-eroor').text('* 密码需要最少6位')
+      }else if ($('#reg_password').val().length>20){
+        $('#aug-form-row-eroor').text('* 密码不能超过20位')
+      }else{
+        $('#aug-form-row-eroor').text('')
+      }
+    })
+    $('#reg_password2').on('keyup',function(){
+      if ($('#reg_password').val()!=$('#reg_password2').val()){
+        $('#aug-form-row-eroor').text('* 密码不一致')
+      }else{
+        $('#aug-form-row-eroor').text('')
+      }
+    })
+//    $('#register-modal-form').validate({
+//      rules: {
+//        identifier: {
+//          required: true,
+//          isMobile: true
+//        },
+//        validate_code: {
+//          required: true
+//        },
+//        password: {
+//          required: true,
+//          minlength: 6,
+//          maxlength: 20
+//        },
+//        password2: {
+//          equalTo: "#reg_password"
+//        },
+//        agreement: {
+//          required: true
+//        }
+//      },
+//      messages: {
+//        identifier: {
+//          required: '不能为空',
+//          isMobile: '请输入手机号'
+//        },
+//        validate_code: {
+//          required: '不能为空'
+//        },
+//        password: {
+//          required: '不能为空',
+//          minlength: $.format("密码需要最少{0}位"),
+//          maxlength: '密码不能超过20位'
+//        },
+//        password2: {
+//          equalTo: '密码不一致'
+//        },
+//        agreement: {
+//          required: '请勾选注册协议'
+//        }
+//      },
+//      errorPlacement: function(error, element) {
+//        return error.appendTo($(element).parents('.form-row').children('.form-row-error'));
+//      },
+//      submitHandler: function(form) {
+//        $('input[name="identifier"]').trigger('keyup');
+//        return $.ajax({
+//          url: $(form).attr('action'),
+//          type: "POST",
+//          data: $(form).serialize()
+//        }).done(function(data, textStatus) {
+//          return location.reload();
+//        }).fail(function(xhr) {
+//          var error_message, message, result;
+//          result = JSON.parse(xhr.responseText);
+//          message = result.message;
+//          error_message = _.chain(message).pairs().map(function(e) {
+//            return e[1];
+//          }).flatten().value();
+//          return alert(error_message);
+//        });
+//      }
+//    });
     $('input, textarea').placeholder();
     checkMobile = function(identifier) {
       var re;
