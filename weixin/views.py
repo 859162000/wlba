@@ -163,10 +163,11 @@ class WeixinRegister(TemplateView):
             channel = Channels.objects.filter(code=token).first()
         else:
             channel = None
-
+        phone = self.request.GET.get('phone', 0)
         return {
             'token': token,
-            'channel': channel
+            'channel': channel,
+            'phone': phone
         }
 
 
