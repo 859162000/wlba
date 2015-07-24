@@ -154,7 +154,7 @@
     $('#register_submit').on('click',function(){
       if ($('#reg_identifier').val()==''){
         $('#aug-form-row-eroor').text('* 请输入手机号')
-      }else if (!checkMobile(phoneNumber)){
+      }else if (!checkMobile($('#reg_identifier').val())){
         $('#aug-form-row-eroor').text('* 请输入正确的手机号')
       }else if ($('#id_validate_code').val()==''){
         $('#aug-form-row-eroor').text('* 请输入验证码')
@@ -169,7 +169,7 @@
       }else if ($('#reg_password').val()!=$('#reg_password2').val()){
         $('#aug-form-row-eroor').text('* 密码不一致')
       }else{
-        var phoneNumber,pw,code,pw2;
+        var phoneNumber,pw,code;
         phoneNumber=$('#reg_identifier').val();
         code=$('#id_validate_code').val();
         pw=$('#reg_password').val();
