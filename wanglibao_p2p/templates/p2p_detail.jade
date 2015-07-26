@@ -5,7 +5,7 @@
 doctype html
 html
   head
-    title = p2p.name
+    title = p2p['name']
     include include/common_head
     meta(name="keywords", content="网利宝")
     meta(name="description", content="网利宝是针对中国中产阶级人群的一站式网络理财服务平台，网利宝把国外传统的“私人银行”模式引入中国，我们通过独有的用户投资专业评估体系和个人理财数据分析算法，利用PC和移动互联网等方式，为客户提供个性化投资产品推荐，降低理财门槛，提高投资者的理财收益水平。")
@@ -16,7 +16,7 @@ html
 
     include announcement_block
 
-    status = p2p.display_status
+    status = p2p['display_status']
     .space-m
     .full-container-home
       .p2p-container.dark-gray.border-all
@@ -46,18 +46,14 @@ html
                 p 还款期限
               .span3-omega
                 p.highlight
-                  earning_rate = str(p2p.expected_earning_rate)
-                  //if p2p.excess_earning_rate > 0
-                  //  earning_rate = str(p2p.expected_earning_rate - p2p.excess_earning_rate) + '+' + str(p2p.excess_earning_rate)
+                  earning_rate = str(p2p['expected_earning_rate'])
                   span.font-xxl {{earning_rate}}
                   span.font-xl %
-                  //if p2p.excess_earning_description
-                  //  span.detail-icon(title="{{p2p.excess_earning_description}}")
                   if p2p.activity
                     em.font-xxl +
-                    span.xunlei-vip-rate-detail(title="{{p2p.activity.name}}") {{p2p.activity.rule.percent_text}}
+                    span.xunlei-vip-rate-detail(title="{{p2p.activity.activity_name}}") {{p2p.activity.activity_rule_percent_text}}
                       span.font-xl %
-                      span.xunlei-vip-tip-detail(title="{{p2p.activity.name}}") {{p2p.activity.name}}
+                      span.xunlei-vip-tip-detail(title="{{p2p.activity.activity_name}}") {{p2p.activity.activity_name}}
                 p 年化收益
           .p2p-detail-footer
             if p2p.category == '新手标'
@@ -72,12 +68,12 @@ html
               .span4
                 span.pull-right 进度：
                   .progress-container
-                    percent = float(p2p.ordered_amount) / p2p.total_amount * 100
+                    percent = float(p2p['ordered_amount']) / p2p['total_amount'] * 100
                     .progress-indicator(style="width:{{percent | percentage}}")
                   span.highlight &nbsp;&nbsp; {{percent | percentage}}
               if status == '抢购中'
-                .span4-omega.p2p-detail-endtime.align-right(data-role="countdown", data-left="{{p2p.end_time | timedelta_now}}", data-target="#countdown") 剩余：
-                  span#countdown{{p2p.end_time | timedelta_now_day }}
+                .span4-omega.p2p-detail-endtime.align-right(data-role="countdown", data-left="{{end_time | timedelta_now}}", data-target="#countdown") 剩余：
+                  span#countdown {{ end_time | timedelta_now_day }}
 
           dl.p2p-detail-intro.clearfix
             dt 借款描述：
@@ -112,7 +108,7 @@ html
                     span.span4 投资金额
                     span.span8-omega
                       .row
-                        period = p2p.period * 30
+                        period = p2p['period'] * 30
                         if p2p.category == '票据'
                           user_limit = u"1元起投"
                         else
@@ -162,7 +158,7 @@ html
       .p2p-container
         .span8.p2p-detail-container
           if p2p.extra_data
-            r = p2p.extra_data.items()
+            r = p2p['extra_data'].items()
             for section_name, section_values in r
               .p2p-detail-list.clearfix
                 h1 {{section_name}}
@@ -174,7 +170,7 @@ html
 
           .p2p-detail-list.clearfix
             h1 相关文件
-            for attachment in attachments
+            for attachment in p2p.attachments
               .img-container
                 img(src="/media/{{attachment.file}}")
                 h2 {{attachment.name}}
@@ -265,13 +261,10 @@ html
               .p2p-detail-container.guarantee-company
                 h1 合作机构审核清单
                 table
-                  warrants = p2p.warrant_set.all()
-                  length = len(warrants)
-
-                  if length > 0
-                    caption {{p2p.warrant_company.name}}
+                  if p2p.warrants
+                    caption {{p2p.warrant_company_name}}
                     tbody
-                        for warrant in warrants
+                        for warrant in p2p.warrants
                           tr
                             td {{warrant.name}}
                             td
@@ -279,7 +272,7 @@ html
                               span.icon.icon-approve
                               | 认证通过
                   else
-                    caption.nowarrant {{p2p.warrant_company.name}}
+                    caption.nowarrant {{p2p.warrant_company_name}}
                     if p2p.category == "证大速贷"
                       tbody
                         tr
@@ -312,8 +305,6 @@ html
                 var invest_result = [];
 
               h1 投资记录
-                trade_records = p2p.p2precord_set.filter(catalog=u'申购')[0:30]
-                all_len = p2p.p2precord_set.filter(catalog=u'申购').count()
               table.invest-history-table
                 colgroup
                   col(width="35%")
@@ -325,8 +316,7 @@ html
                     th 投资人
                     th 金额
                 tbody
-                  show_list = trade_records
-                  for trade in show_list
+                  for trade in p2p_invest_records
                     tr
                       td
                         p {{trade.create_time | date:"Y-m-d"}}
@@ -337,7 +327,7 @@ html
                           span 元
 
 
-              if all_len > 30
+              if p2p_invest_records > 30
                 .row
                   a.get-more(href="#", data-product="{{p2p.id}}") 查看更多
 

@@ -12,7 +12,7 @@ from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2P
 from django.core.urlresolvers import reverse
 import re
 import urlparse
-from django.core.cache import cache
+from wanglibao_redis import backend as cache_backend
 
 
 class IndexView(TemplateView):
@@ -44,17 +44,8 @@ class IndexView(TemplateView):
         news_and_reports = NewsAndReport.objects.all().order_by("-score")[:5]
         site_data = SiteData.objects.all().first()
 
-        if cache.has_key('home_partners'):
-            partners = cache.get('home_partners')
-            print "read caches"
-            print partners
-        else:
-            partners_obj = Partner.objects.filter(type='partner')
-            partners = [
-                {'name': partner.name, 'link': partner.link, 'image': partner.image}
-                for partner in partners_obj
-            ]
-            cache.set('home_partners', partners, timeout=365*24*60*60)
+        partners = cache_backend.get_cache_partners()
+
         return {
             "p2p_products": p2p_products,
             "trade_records": trade_records,
@@ -89,12 +80,12 @@ class PartnerView(TemplateView):
     template_name = 'partner.jade'
 
     def get_context_data(self, **kwargs):
-        partners = Partner.objects.filter(type='partner')
+
+        partners = cache_backend.get_cache_partners()
 
         return {
             'partners': partners
         }
-
 
 
 class SecurityView(TemplateView):
