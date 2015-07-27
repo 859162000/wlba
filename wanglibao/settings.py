@@ -491,6 +491,7 @@ ID_VERIFY_PASSWORD = 'wljr888'
 
 if ENV == ENV_PRODUCTION:
     CALLBACK_HOST = 'https://www.wanglibao.com'
+    STATIC_FILE_HOST = 'https://img.wanglibao.com'
     MER_ID = '872724'
     CUSTOM_ID = '000007522683'
     SIGN_HOST = '10.171.17.243'
@@ -537,6 +538,7 @@ if ENV == ENV_PRODUCTION:
     YTX_APPID = "8a48b55149896cfd0149adab1d9a1a93"
 elif ENV == ENV_PREPRODUCTION:
     CALLBACK_HOST = 'https://pre.wanglibao.com'
+    STATIC_FILE_HOST = 'https://img.wanglibao.com'
     MER_ID = '872724'
     CUSTOM_ID = '000007522683'
     #SIGN_HOST = 'www.wanglibao.com'
@@ -583,6 +585,7 @@ elif ENV == ENV_PREPRODUCTION:
     YTX_APPID = "8a48b55149896cfd0149adab1d9a1a93"
 else:
     CALLBACK_HOST = 'https://staging.wanglibao.com'
+    STATIC_FILE_HOST = 'https://staging.wanglibao.com'
     MER_ID = '510743'
     CUSTOM_ID = '000010124821'
     SIGN_HOST = '127.0.0.1'
@@ -646,7 +649,7 @@ YTX_BACK_RETURN_URL = CALLBACK_HOST + "/api/ytx/voice_back/"
 ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
 if ENV == ENV_DEV:
     ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
-    CALLBACK_HOST = "http://localhost:8000"
+    STATIC_FILE_HOST = 'http://localhost:8000'
 
 PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
 PROMO_TOKEN_QUERY_STRING = 'promo_token'
