@@ -4,6 +4,7 @@ __author__ = 'zhanghe'
 
 import random
 from captcha.conf import settings
+from wanglibao.settings import CALLBACK_HOST
 from six import u
 
 
@@ -12,3 +13,6 @@ def random_char_challenge():
     for i in range(settings.CAPTCHA_LENGTH):
         ret += random.choice(chars)
     return ret.upper(), ret
+
+def global_set(request):
+    return {'host': CALLBACK_HOST}
