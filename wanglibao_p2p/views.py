@@ -48,7 +48,8 @@ from exceptions import PrepaymentException
 from django.core.urlresolvers import reverse
 import re
 from celery.execute import send_task
-from wanglibao_redis import backend as redis_backend
+from wanglibao_redis.backend import redis_backend
+import pickle
 
 
 class P2PDetailView(TemplateView):
@@ -57,7 +58,8 @@ class P2PDetailView(TemplateView):
     def get_context_data(self, id, **kwargs):
         context = super(P2PDetailView, self).get_context_data(**kwargs)
 
-        p2p = redis_backend.get_cache_p2p_detail(self.request, id)
+        cache_backend = redis_backend()
+        p2p = cache_backend.get_cache_p2p_detail(id)
 
         form = PurchaseForm(initial={'product': p2p.get('id')})
         user = self.request.user
@@ -480,16 +482,23 @@ class P2PListView(TemplateView):
     template_name = 'p2p_list.jade'
 
     def get_context_data(self, **kwargs):
+        cache_backend = redis_backend()
 
         p2p_done = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(
             Q(publish_time__lte=timezone.now())) \
             .filter(status=u'正在招标').order_by('-publish_time')
 
-        p2p_others = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(
-            Q(publish_time__lte=timezone.now())).filter(
-            status__in=[
-                u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
-            ]).order_by('-soldout_time')
+        p2p_done_list = cache_backend.get_p2p_list_from_objects(p2p_done)
+        if cache_backend.redis.exists('p2p_products'):
+            p2p_others_list = pickle.loads(cache_backend.redis.get('p2p_products'))
+        else:
+            p2p_others = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(
+                Q(publish_time__lte=timezone.now())).filter(
+                status__in=[
+                    u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
+                ]).order_by('-soldout_time')
+
+            p2p_others_list = cache_backend.get_p2p_list_from_objects(p2p_others)
 
         show_slider = False
         if p2p_done:
@@ -501,8 +510,8 @@ class P2PListView(TemplateView):
             p2p_earning = p2p_period = p2p_amount = []
 
         p2p_products = []
-        p2p_products.extend(p2p_done)
-        p2p_products.extend(p2p_others)
+        p2p_products.extend(p2p_done_list)
+        p2p_products.extend(p2p_others_list)
 
         limit = 10
         paginator = Paginator(p2p_products, limit)

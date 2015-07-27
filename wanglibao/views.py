@@ -12,7 +12,9 @@ from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2P
 from django.core.urlresolvers import reverse
 import re
 import urlparse
-from wanglibao_redis import backend as cache_backend
+from wanglibao_redis.backend import redis_backend
+import json
+import pickle
 
 
 class IndexView(TemplateView):
@@ -20,23 +22,35 @@ class IndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
 
-        p2p_pre_four = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
-            .filter(status=u'正在招标').order_by('-priority', '-total_amount')[:4]
+        cache_backend = redis_backend()
 
-        p2p_middle = P2PProduct.objects.select_related('warrant_company','activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
-            .filter(status__in=[
-                u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核'
-        ]).order_by('-soldout_time', '-priority')
+        p2p_pre_four = P2PProduct.objects.select_related('warrant_company', 'activity')\
+                                         .filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
+                                         .filter(status=u'正在招标').order_by('-priority', '-total_amount')[:4]
 
+        p2p_pre_four_list = cache_backend.get_p2p_list_from_objects(p2p_pre_four)
 
-        p2p_last = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
-            .filter(status=u'还款中').order_by('-soldout_time', '-priority')[:2]
+        if cache_backend.redis.exists('p2p_products'):
+            p2p_products_cache = pickle.loads(cache_backend.redis.get('p2p_products'))
+        else:
+            p2p_middle = P2PProduct.objects.select_related('warrant_company', 'activity')\
+                                           .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
+                                           .filter(status__in=[u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核'])\
+                                           .order_by('-soldout_time', '-priority')
 
-        p2p_products = chain(p2p_pre_four, p2p_middle, p2p_last)
+            p2p_last = P2PProduct.objects.select_related('warrant_company', 'activity')\
+                                         .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
+                                         .filter(status=u'还款中').order_by('-soldout_time', '-priority')[:2]
 
-        getmore = False
-        if p2p_pre_four.count() > 3 and p2p_last:
-            getmore = True
+            p2p_middle_list = cache_backend.get_p2p_list_from_objects(p2p_middle)
+            p2p_last_list = cache_backend.get_p2p_list_from_objects(p2p_last)
+            p2p_products_cache = p2p_middle_list + p2p_last_list
+
+        p2p_products = p2p_pre_four_list + p2p_products_cache
+
+        # p2p_products = chain(p2p_pre_four, p2p_middle, p2p_last)
+
+        getmore = True
 
         trade_records = P2PRecord.objects.filter(catalog=u'申购').select_related('user').select_related('user__wanglibaouserprofile')[:20]
         # banners = Banner.objects.filter(device=Banner.PC_2)
