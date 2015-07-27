@@ -85,6 +85,32 @@
       var this_index=k[j];
       $('.long').eq(j).animate({bottom:-this_index*58+'px'},500);
     }
+    //请求
+    $.ajax({
+      url: "/api/xunlei/august/count/",
+      type: "GET"
+    }).done(function(data) {
+      console.log(data);
+      var number=parseInt(data['num']);
+      console.log(number)
+//      if (number==0){
+//        var str1='500';
+//        for(var j=0,len2=str1.length;j<len2;j++){
+//          if(j>=$('#redpacknum li').length){
+//              $('#redpacknum').append('<li>'+str1[j]+'<hr></li>');
+//          }
+//        }
+//      }else{
+//        var rednum=500+number;
+//        var str=rednum.toString();
+//        for(var i=0,len=str.length;i<len;i++){
+//          if(i>=$('#redpacknum li').length){
+//              $('#redpacknum').append('<li>'+str[i]+'<hr></li>');
+//          }
+//        }
+//      }
+
+    });
     //点击旅游路线
     $('#tour_line').on('click',function(){
       $('.gjw-tour').slideToggle(300)
