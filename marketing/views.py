@@ -24,6 +24,7 @@ from utils import local_to_utc
 
 # used for reward
 from django.forms import model_to_dict
+from django.db.models import Q
 from marketing.models import RewardRecord, NewsAndReport
 from wanglibao_sms.tasks import send_messages
 from wanglibao_p2p.models import Earning
@@ -677,7 +678,12 @@ class ThunderActivityRewardCounter(APIView):
     permission_classes = ()
 
     def get(self, request):
-        record = ActivityRecord.objects.filter(trigger_node__in=['first_pay', 'first_buy'], activity__code='xunlei8').aggregate(num=Count('id'))
+        record = ActivityRecord.objects.filter(
+            trigger_node__in=['first_pay', 'first_buy'],
+            activity__code='xunlei8'
+        ).filter(
+            Q(activity__is_stopped=True) & Q(activity__stopped_at__gte=timezone.now()) | Q(activity__is_stopped=False) & Q(activity__start_at__lte=timezone.now()) & Q(activity__end_at__gte=timezone.now())
+        ).aggregate(num=Count('id'))
         return Response({
             'ret_code': 0,
             'num': int(record['num']) if record['num'] else 0,
