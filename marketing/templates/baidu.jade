@@ -1,0 +1,229 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    link(rel="stylesheet",href="/static/css/bootstrap.min.css")
+    link(rel="stylesheet",href="/static/stylesheets/baidu.css")
+  body(style="background:#f8f2ce")
+    include include/activityTop2
+    .wrap#ganjiwang-banner
+      .gold2
+        if user.is_authenticated
+          .banner-form#ganjiwang-welcome
+            .space-vertical-m
+              h1.banner-form--title 欢迎来网利宝投资理财
+              .space-vertical-s
+              p.banner-form--row.font-s 您的登录账户:
+                span {{user|display_name}}
+              .space-vertical-m
+              .banner-form--row.align-center
+                a.banner-form--button(href="/accounts/home") 进入我的账户
+        else
+          .denelu-form#denglu
+            #aug-code
+              .aug-center
+                .off-form#off-form ×
+                form#img-code-form.img-code-form.aut-form(method='post', action='')
+                  .form-row
+                      input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
+                      input#id_captcha_1.captcha.aut-captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
+                      img.captcha.captcha-img(alt="captcha", src="")
+                      button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
+                  .code-img-error.aut-error
+                  .clearfix.tc
+                      span.submit-code-img#submit-code-img1 确定
+            h1.biaoyu 领取800元现金红包
+            form#register-modal-form.login-form.dale(method='post', action='')
+              - csrf_token
+              .form-row
+                .form-control-group
+                  .span12
+                    input#reg_identifier.com-tu.tu1(type="text", name="identifier", placeholder="请输入手机号")
+                .form-row-error
+              .form-row.voice
+                .span12-omega.hidden.show
+                  没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
+                .form-control-group
+                  .span6
+                    input#id_validate_code.com-tu.tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+                  .span6-omega
+                    button#button-get-validate-code-modal.button-orange.button-large.huoqu-ma.new-btn(type='button',style="top:-2px") 获取验证码
+                .form-row-error
+              .form-row
+                input#reg_password.full-width.com-tu.tu3(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")
+                .password-strength-container
+                  span.password-strength-1
+                  span.password-strength-2
+                  span.password-strength-3
+                .form-row-error
+              .form-row
+                input#reg_password2.com-tu.tu3(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
+                .form-row-error#aug-form-row-eroor
+              .form-row.form-bottom-bar
+                .agreement(style="padding:0 0 10px 10px;text-align:left")
+                  label(for="agreement")
+                    input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree",style="position: relative;top: 3px;margin-right: 10px;width: 16px;")
+                  | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
+                  .form-row-error
+                button#register_submit.button-account.span10.xun-zhuce(type='button') 立即注册
+              .space-vertical-s
+            p.xun-p 已有账号,
+              a(href="/accounts/login/") 立即登录
+    //baidu
+    .baidu-content
+        .activity-one
+            .activity-one-img
+            span 夏日年中钜惠冲冲冲！网利宝三重活动特权年中回馈，力度空前，速速前往！
+        .one-prize
+            .prize-one
+                a(href='javascript:void(0)',tag='1').receiveBtns 点击领取
+            .prize-two
+                a(href='javascript:void(0)')#receiveTwo 点击领取
+            .prize-three
+                a(href='javascript:void(0)',tag='2').receiveBtns 点击领取
+        .activity-two
+            .activity-two-img
+            span 首次充值网利宝，即可随机获得一项特权会员奖励，完成充值自动发送！每天限量1000个！
+        ul.two-prize
+            li(tag='0').receiveBtns
+                span
+                label 七天迅雷会员
+                em.em1
+            li(tag='0').receiveBtns
+                span
+                label 100G快盘容量
+                em.em2
+            li(tag='0').receiveBtns
+                span
+                label 七天爱奇艺会员
+                em.em3
+            li.mr0(tag='0').receiveBtns
+                span
+                label.w126 抠电影100元代金券
+                em.em4
+            li
+                span.activity-over
+                label.w126 抠电影20元代金券
+                em.em5
+                span.selected
+            li(tag='0').receiveBtns
+                span
+                label 一个月风行会员
+                em.em6
+            li
+                span.activity-over
+                label 一年迅雷会员
+                em.em7
+                span.selected
+        .xl-backtop(style="z-index:99")
+          span.seven-com.seven-ten
+          .backtop.sev-backtop 回到顶部
+          img(src="/static/imgs/pc_activity/xunlei/seven/sev_weixin.png")#xl-weixin
+          a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank")
+            img(src="/static/imgs/pc_activity/xunlei/seven/sev_qq.png",style="margin-top:10px")#xl-qq
+          .erweima
+
+    //end
+    .baidu-activity(style="margin-top:-30px")
+        .baidu-div
+            .gjw-wrap
+              .xl-box1
+                h2.xl-jiang
+                  .xl-center#seven-center(style="color:#cf0027")
+                    | 投资流程
+                .content-process
+                  .content-pptv(style="background:#f8f2ce")
+                    .process-text(style="height:32px;padding:0")
+                    .process-list
+                      .circle-free.circle-float
+                        .close
+                        .last
+                        .next
+                        img(src="/static/images/pptv/free.jpg")
+                      .triangle-start
+                        .start-cont
+                      .circle
+                        .circle-body.free
+                        .circle-txt 注册网利宝账户
+                        .circle-txt2
+                      .triangle-center(style="width:0px")
+                      .triangle-center#xl-triangle-center
+                        .center-cont
+                      .circle
+                        .circle-body.recharge
+                        .circle-txt 充值资金到账户
+                      .triangle-center#xl-triangle-center
+                        .center-cont
+                      .circle
+                        .circle-body.tender
+                        .circle-txt 使用红包
+                      .triangle-center#xl-triangle-center
+                        .center-cont
+                      .circle
+                        .circle-body.collec
+                        .circle-txt 获得收益和奖励
+                      .triangle-end(style="width:120px")
+                        .end-cont
+              .gjw-rule
+                h4 活动规则
+                ul
+                  li 1.手机号为网利宝唯一账户，通过活动新注册网利宝用户均可参与；
+                  li 2.新用户注册即送50元红包。此现金红包为直抵红包，投资满300元即可抵扣使用；首次充值送150元红包（首次充值100元起），红包类型为折扣红包。折扣红包则按投资额1%抵扣使用（比如用户投资15000元，即可满额使用150元红包）；单笔投资5000元送800元组合红包，包含2个200元红包+1个400元红包。红包类型为折扣红包，折扣红包则按投资额0.2%抵扣使用 ；
+                  li 3.红包统一以站内信形式通知，完成一次投资回款后即可取现；
+                  li 4.现金红包有效期：2015年7月X日-2015年10月31日；
+                  li 5.本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+                  li 6.网利宝对此活动享有最终解释权。
+              .xl-box1
+                .san-new(style="background:#f8f2ce")
+                  .san-new-content.container(style="padding:10px 0 0")
+                    .row.gold-dl-row
+                      .san-span
+                        dl
+                          dt.com.com-trust(style="background: url('/static/imgs/pc_activity/ganjiwang/safe1.png') no-repeat center")
+                          dd.pp-zi
+                            p
+                              b IDG资本
+                              br
+                              | 百亿市值
+                              b A股上市公司
+                              | 入股
+                      .san-span
+                        dl
+                          dt.com.com-security(style="background: url('/static/imgs/pc_activity/ganjiwang/safe2.png') no-repeat center")
+                          dd.pp-zi
+                            p 账户资金安全
+                              br
+                              | 由
+                              b 平安保险
+                              | 承保
+                      .san-span
+                        dl
+                          dt.com.com-authority(style="background: url('/static/images/xunlei/three.png') no-repeat center")
+                          dd.pp-zi
+                            p 第三方
+                              br
+                              b 100%
+                              | 本息保障
+  .footer(style="background:#f8f2ce;margin-top:0")
+    include include/activityFooterTwo
+    include include/tracking
+  .baiduAlert#baiduAlert1(style='display:none')
+      p.alertFont 请先注册
+      p
+        a(href='javascript:void(0)').alertBtn 赶紧去注册
+  .baiduAlert#baiduAlert2(style='display:none')
+      p.alertFontFirst 首次充值送特权和150元红包
+      p.alertFontBack 充值完成系统自动发放
+      p
+        a(href='/pay/banks/').alertBtnHref 赶紧去充值
+  .baiduAlert#baiduAlert3(style='display:none')
+      p.alertFont 投资5000送800红包
+      p
+        a(href='/').alertBtnHref 赶紧去投资
+  script.
+      var v = new Date().getTime()
+      require(['/static/js/hover.js','/static/js/xun_august.js?v='+v,'/static/js/baidu.js'])
