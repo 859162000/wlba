@@ -79,8 +79,8 @@ class AliOSSStorage(Storage):
         return oss_open(name)
 
     def delete(self, name):
-        File.objects.get(path=name)
         oss_delete(name)
+        File.objects.filter(path=name).delete()
 
     def exists(self, name):
         return File.objects.filter(path=name).exists()
