@@ -495,7 +495,7 @@ class IntroducedAwardTemplate(TemplateView):
             print message_content
             print introduced_by.wanglibaouserprofile.name
             print safe_phone_str(user.wanglibaouserprofile.phone)
-            print text_content
+            # print text_content
 
 
 class NewsListView(TemplateView):
