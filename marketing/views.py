@@ -38,6 +38,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
 from wanglibao_redpack import backends as redpack_backends
+from wanglibao_activity.models import ActivityRecord, ActivityRule
 
 
 class YaoView(TemplateView):
@@ -669,4 +670,15 @@ class ThousandRedPackCountAPIView(APIView):
 
         return Response({'ret_code': 0,
                          'redpack_total': int(join_log['user_count'] * 4) if join_log['user_count'] else 0,
+        })
+
+class ThunderActivityRewardCounter(APIView):
+    """ 迅雷八月份活动统计迅雷会员发放个数，首次投资和首次充值发放迅雷会员"""
+    permission_classes = ()
+
+    def get(self, request):
+        record = ActivityRecord.objects.filter(trigger_node__in=['first_pay', 'first_buy'], activity__code='xunlei8').aggregate(num=Count('id'))
+        return Response({
+            'ret_code': 0,
+            'num': int(record['num']) if record['num'] else 0,
         })
