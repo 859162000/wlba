@@ -47,7 +47,8 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
 from wanglibao_redpack.views import RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView
 
 from marketing.play_list import InvestmentHistory
-from marketing.views import ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView, ThousandRedPackCountAPIView
+from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView,
+                             ThousandRedPackCountAPIView, ThunderActivityRewardCounter)
 from weixin.views import P2PListWeixin
 
 
@@ -226,6 +227,7 @@ urlpatterns += patterns(
     url(r'^xunlei/join/count/$', ActivityJoinLogCountAPIView.as_view()),
     url(r'^thousand/redpack/$', ThousandRedPackAPIView.as_view()),
     url(r'^thousand/redpack/count/$', ThousandRedPackCountAPIView.as_view()),
+    url(r'^xunlei/august/count/$', ThunderActivityRewardCounter.as_view())
 )
 
 
