@@ -26,6 +26,7 @@ urlpatterns = patterns(
     url(r'^ganjiwang/$', TemplateView.as_view(template_name="ganjiwang.jade")),
     url(r'^baidu/$', TemplateView.as_view(template_name="baidu.jade")),
     url(r'^xunlei_august/$', TemplateView.as_view(template_name="xunlei-august.jade")),
+    url(r'^singapore/$', TemplateView.as_view(template_name="singapore.jade")),
 )
 
 # app URL
