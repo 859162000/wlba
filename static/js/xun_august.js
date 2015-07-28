@@ -32,6 +32,7 @@
     //关闭验证码弹框
     $('#off-form').on('click',function(){
       $('#aug-code').hide();
+      $('#aug-center').hide();
     })
     getCookie = function(name) {
       var cookie, cookieValue, cookies, i;
@@ -79,6 +80,7 @@
           console.log("Phone number checked, now send the valdiation code");
         }
         $('#aug-code').show();
+        $('#aug-center').show();
         return $('#aug-code').find('#id_captcha_1').val('');
       }else{
         $('#aug-form-row-eroor').text('* 请输入正确的手机号')
@@ -104,6 +106,7 @@
         element.addClass('button-gray');
         $('.voice-validate').attr('disabled', 'disabled');
         $('#aug-code').hide();
+        $('#aug-center').hide();
 //        return $('#login-modal').modal();
       }).fail(function(xhr) {
         var result;
@@ -118,6 +121,7 @@
         } else {
           if (xhr.status >= 400) {
             $('#aug-code').hide();
+            $('#aug-center').hide();
             return tool.modalAlert({
               title: '温馨提示',
               msg: result.message,
