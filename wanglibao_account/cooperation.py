@@ -222,6 +222,14 @@ class CoopRegister(object):
         """
         pass
 
+    def purchase_call_back(self, user):
+        """
+        用户购买后回调，一般用于用于用户首次投资之后回调第三方接口
+        :param user:
+        :return:
+        """
+        pass
+
     def process_for_register(self, user, invite_code):
         """
         用户可以在从渠道跳转后的注册页使用邀请码，优先考虑邀请码
@@ -280,6 +288,11 @@ class CoopRegister(object):
         # logger.debug('channel processor %s'%channel_processor)
         if channel_processor:
             channel_processor.binding_card_call_back(user)
+
+    def process_for_purchse(self, user):
+        channel_processor = self.get_user_channel_processor(user)
+        if channel_processor:
+            channel_processor.purchase_call_back(user)
 
 class TianMangRegister(CoopRegister):
     def __init__(self, request):
