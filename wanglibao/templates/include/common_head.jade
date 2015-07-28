@@ -7,12 +7,12 @@ if title != '网利宝' and request.path != '/'
 else
   title {{title}}
 link(rel='shortcut icon', href='/static/images/favicon-128.png')
-link(rel="stylesheet", href="/static/stylesheets/jquery.modal.css",type="text/css",media="screen")
-link(href="/static/stylesheets/screen.css", media="screen, projection", rel="stylesheet", type="text/css")
-link(href="/static/stylesheets/print.css", media="print", rel="stylesheet", type="text/css")
+link(rel="stylesheet", href="{{host}}/static/stylesheets/jquery.modal.css",type="text/css",media="screen")
+link(href="{{host}}/static/stylesheets/screen.css", media="screen, projection", rel="stylesheet", type="text/css")
+link(href="{{host}}/static/stylesheets/print.css", media="print", rel="stylesheet", type="text/css")
 // if IE
-  link(rel="stylesheet", href="/static/stylesheets/iealert/style.css",type="text/css",media="screen")
-  link(href="/static/stylesheets/ie.css", media="screen, projection", rel="stylesheet", type="text/css")
-  link(href="/static/stylesheets/pie.css", rel="stylesheet", type="text/css")
-script(src="/static/js/lib/modernizr.js")
-script(src="/static/js/require.js", data-main="/static/js/header")
+  link(rel="stylesheet", href="{{host}}/static/stylesheets/iealert/style.css",type="text/css",media="screen")
+  link(href="{{host}}/static/stylesheets/ie.css", media="screen, projection", rel="stylesheet", type="text/css")
+  link(href="{{host}}/static/stylesheets/pie.css", rel="stylesheet", type="text/css")
+script(src="{{host}}/static/js/lib/modernizr.js")
+script(src="{{host}}/static/js/require.js", data-main="/static/js/header")
