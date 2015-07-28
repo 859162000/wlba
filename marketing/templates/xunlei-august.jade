@@ -6,8 +6,6 @@ html
     - with '网利宝' as title
     include include/common_head
     - endwith
-    //link(rel="stylesheet",href="/static/stylesheets/activity.css")
-    link(rel="stylesheet",href="/static/css/bootstrap.min.css")
     link(rel="stylesheet",href="/static/stylesheets/ganjiwang.css")
   body(style="background:#fff")
     include include/activityTop2
@@ -41,8 +39,8 @@ html
               .banner-form--row.align-center
                 a.banner-form--button(href="/accounts/home") 进入我的账户
         else
-          .denelu-form#denglu
-            #aug-code
+          .denelu-form(style="padding:13px 0")#denglu
+            #aug-code(style="top:-2px")
               .aug-center
                 .off-form#off-form ×
                 form#img-code-form.img-code-form.aut-form(method='post', action='')
@@ -94,7 +92,7 @@ html
       .gjw-gold.xl-aug-gold
         .xl-backtop(style="z-index:99")
           span.seven-com.seven-ten
-          .backtop.sev-backtop 回到顶部
+          .backtop.sev-backtop(style="font-size:14px") 回到顶部
           img(src="/static/imgs/pc_activity/xunlei/seven/sev_weixin.png")#xl-weixin
           a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank")
             img(src="/static/imgs/pc_activity/xunlei/seven/sev_qq.png",style="margin-top:10px")#xl-qq
