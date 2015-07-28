@@ -57,7 +57,8 @@ class ManDaoSMSBackEnd(SMSBackEnd):
 
         url = settings.SMS_MANDAO_URL
 
-        if len(phones) > 1 and len(messages) == 1:
+        #if len(phones) > 1 and len(messages) == 1:
+        if len(phones) > 1 and len(messages) > 1:
             url = settings.SMS_MANDAO_MULTICAST_URL
         params = {
             'sn': settings.SMS_MANDAO_SN,
