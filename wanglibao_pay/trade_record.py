@@ -7,8 +7,6 @@ from wanglibao_pay.models import PayInfo
 from wanglibao_pay import util
 from wanglibao_p2p.models import UserAmortization, AmortizationRecord
 from wanglibao_margin.models import MarginRecord
-import logging
-logger = logging.getLogger('p2p')
 
 def detect(request):
     stype = request.DATA.get("type", "").strip()
@@ -93,5 +91,4 @@ def _amo_record(user, pagesize, pagenum, product_id):
                 "settlement_time":util.fmt_date_normal(util.local_datetime(x.created_time))
                 }
         res.append(obj)
-    logger.info("return amo_record ===>>>: %s" % res)
     return res
