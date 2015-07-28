@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.utils import timezone
+import requests
 from rest_framework import renderers
 from rest_framework.views import APIView
 from marketing.models import Channels, IntroducedBy, PromotionToken
@@ -18,7 +19,7 @@ from wanglibao.settings import  YIRUITE_CALL_BACK_URL, \
     JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import  yiruite_callback,  common_callback
-from wanglibao_p2p.models import P2PEquity, P2PRecord
+from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
 from wanglibao_pay.models import Card
 from wanglibao_profile.models import WanglibaoUserProfile
 
@@ -508,4 +509,180 @@ class CoopQuery(APIView):
         finally:
             # logger.debug(result)
             return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+
+###########################################希财网对接#####################################################################
+
+def get_rate(product_id_or_instance):
+    """
+    获取产品收益率
+    :param product_id_or_instance: p2p产品id或是实例
+    :return:
+    """
+    if isinstance(product_id_or_instance, P2PProduct):
+        if product_id_or_instance.activity:
+            return product_id_or_instance.activity.rule_amount + product_id_or_instance.expected_earning_rate
+        else:
+            return product_id_or_instance.expected_earning_rate
+
+def get_buyer(product_id_or_instance):
+    """
+    获取持仓人数
+    :param product_id_or_instance:
+    :return:
+    """
+    if isinstance(product_id_or_instance, P2PProduct):
+        return P2PEquity.objects.filter(product_id=product_id_or_instance.id).distinct('user').count()
+
+def get_amortization_time(product_id_or_instance):
+    """
+    获取还款起始，结束时间
+    :param product_id_or_instance:
+    :return: datetime
+    """
+    if isinstance(product_id_or_instance, P2PProduct):
+        amortizations =  ProductAmortization.objects.filter(product_id = product_id_or_instance.id).order_by('term_date')
+        return amortizations[0].term_date, amortizations[-1].term_date
+
+def get_p2p_info(product_id):
+    product_info = {
+        'for_freshman': 0, #是否新手标
+        'period': 0, #产品周期
+        'rate': 0, #产品收益率
+        'amount': 0, #募集金额
+        'ordered_amount': 0, #已募集金额
+        'buyer': 0, #投资人数
+        'start_time': 0, #标的开始时间
+        'end_time': 0, #标的结束时间
+        'state': '', #产品状态
+        'borrower': '', #借款人名称
+        'guarant_mode': '本息担保', #担保方式
+        'guarantor': '', #担保方名称
+        'amortization_start_time': 0, #还款开始时间
+        'amortization_end_time': 0, #还款结束时间
+        'borrower_guarant_type': '第三方担保',#借款担保方式
+        'repayment_type': '', #还款方式
+        'start_price': 100, #起投金额
+        'id': 0, #产品id
+    }
+    mproduct = P2PProduct.objects.get(product_id)
+    product_info['for_freshman'] = 1 if mproduct.category == '新手标' else 0
+    product_info['period'] = mproduct.period
+    product_info['rate'] = get_rate(product_id)
+    product_info['amount'] = mproduct.total_amount
+    product_info['ordered_amount'] = mproduct.ordered_amount
+    product_info['buyer'] = get_buyer(product_id)
+    product_info['start_time'] = mproduct.publish_time
+    product_info['end_time'] = mproduct.end_time
+    product_info['state'] = mproduct.status
+    product_info['borrower'] = mproduct.borrower_name
+    product_info['guarantor'] = mproduct.warrant_company
+    product_info['amortization_start_time'], product_info['end_time'] = get_amortization_time(product_id)
+    product_info['repayment_type'] = mproduct.pay_method
+    product_info['id'] = product_id
+
+    return product_info
+
+def xicai_get_token():
+    #希财现在的过期时间在一个月左右
+    url = settings.XICAI_TOKEN_URL
+    client_id = settings.XICAI_CLIENT_ID
+    client_secret = settings.XICAI_CLIENT_SECRET
+    response = requests.post(url, data ={'client_id':client_id, 'client_secret': client_secret})
+    return response.json()['access_token']
+
+
+def xicai_get_p2p_info(product_id, access_token):
+    """
+    将我们的p2p信息转换后提供给西财网
+    :param product_id:
+    :return:
+    """
+    p2p_info = get_p2p_info(product_id)
+
+    #希财状态码：-1：已流标，0：筹款中，1.已满标，2.已开始还款，3.预发布，4.还款完成，5.逾期
+    #录标，录标完成，待审核的标均不推送给希财
+    p2p_state_convert_table = {
+        # u'录标': u'录标',
+        # u'录标完成': u'录标完成',
+        # u'待审核': u'待审核',
+        u'正在招标': 0,
+        u'满标待打款': 1,
+        u'满标已打款': 1,
+        u'满标待审核': 1,
+        u'满标已审核': 1,
+        u'还款中': 2,
+        u'流标': -1,
+        u'已完成': 4,
+    }
+
+    #希财还款方式码：1.按月付息 到期还本 2.按季付息 到期还本 3.每月等额本息 4.到期本息
+    pay_type_convert_table = {
+        u'等额本息': 3,
+        u'先息后本': 1,
+        u'按月付息': 1,
+        u'到期还本付息': 4,
+        u'按季度付息': 2,
+        u'日计息一次性还本付息': 4,
+        u'日计息月付息到期还本': 1,
+    }
+
+    xicai_info = {
+        'access_token': access_token,
+        'product_name': '网利宝',
+        'isexp': p2p_info['for_freshman'],
+        'life_cycle': p2p_info['period'],
+        'ev_rate': p2p_info['rate'],
+        'amount': p2p_info['amount'],
+        'invest_amount': p2p_info['ordered_amount'],
+        'invest_mans': p2p_info['buyer'],
+        'underlying_start': p2p_info['start_time'],
+        'underlying_end': p2p_info['end_time'],
+        'link_website': settings.XICAI_LOAD_PAGE.format(p2p_id=product_id),
+        'product_state': p2p_state_convert_table.get(p2p_info['state']),
+        'borrower': p2p_info['borrower'],
+        'guarantors': p2p_info['guarantor'],
+        'publish_time': p2p_info['start_time'],
+        'repay_start_time': p2p_info['amortization_start_time'],
+        'repay_end_time': p2p_info['amortization_end_time'],
+        'borrow_type': 4, #都是第三方担保
+        'pay_type': pay_type_convert_table.get(p2p_info['repayment_type']),
+        'start_price': 100,
+        'p2p_product_id': p2p_info['id']
+    }
+
+    return xicai_info
+
+    def xicai_post_product_info(product_id, access_token):
+        p2p_info = xicai_get_p2p_info(product_id, access_token)
+        url = settings.XICAI_CREATE_P2P_URL
+        requests.post(url, data=p2p_info)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
