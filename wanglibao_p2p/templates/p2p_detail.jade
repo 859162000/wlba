@@ -113,7 +113,7 @@ html
                           user_limit = u"1元起投"
                         else
                           user_limit = u"100的整数倍"
-                        -render_field form.amount class+="span12" type="text" style="line-height:40px" placeholder=user_limit p2p-type=p2p.category data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning data-rate=p2p.expected_earning_rate data-period=p2p.period data-paymethod=p2p.pay_method activity-rate=p2p.activity.rule.percent_text maxlength="8"
+                        -render_field form.amount class+="span12" type="text" style="line-height:40px" placeholder=user_limit p2p-type=p2p.category data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning data-rate=p2p.expected_earning_rate data-period=p2p.period data-paymethod=p2p.pay_method activity-rate=p2p.activity.activity_rule_percent_text maxlength="8"
                       .form-row-error
 
                   if user.is_authenticated and red_packets > 0
