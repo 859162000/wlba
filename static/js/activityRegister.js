@@ -17,17 +17,13 @@
 
   define(['jquery', 'lib/modal', 'lib/backend',  "tools", 'jquery.placeholder'], function($, modal, backend, tool, placeholder) {
     var container, csrfSafeMethod, getCookie, sameOrigin, _showModal;
-
     var activityRegister ={}
     jQuery.extend(activityRegister, {
-
         registerTitle :'',    //注册框标语
         isNOShow : '1',      //是否显示
         hasCallBack : false, //回调
-
         initFun : function(){
             $('.biaoyu').text(this.registerTitle);
-
             //cookie
             getCookie = function(name) {
                 var cookie, cookieValue, cookies, i;

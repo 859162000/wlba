@@ -13,7 +13,7 @@
   require(['jquery','activityRegister'], function($,re) {
     //注册
     re.activityRegister.activityRegisterInit({
-        registerTitle :'领取800元现金红包',    //注册框标语
+        registerTitle :'注册即送50元红包',    //注册框标语
         isNOShow : '1'
     });
     $('.receiveBtns').click(function(){
