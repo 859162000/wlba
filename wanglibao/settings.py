@@ -134,6 +134,7 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'concurrency.middleware.ConcurrencyMiddleware',
     'reversion.middleware.RevisionMiddleware',
@@ -144,6 +145,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'marketing.middlewares.PromotionTokenMiddleWare',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
 CONCURRENCY_POLICY = 2
@@ -757,3 +759,32 @@ DOUWANWANG_CALL_BACK_URL = 'http://mall.366dw.com/interface/reflection'
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100
 }
+
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = 6379
+REDIS_DB = 0
+
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'redis_cache.RedisCache',
+#         'LOCATION': [
+#             '127.0.0.1:6379',
+#         ],
+#         'OPTIONS': {
+#             'DB': 0,
+#             'PASSWORD': '',
+#             'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
+#             'PARSER_CLASS': 'redis.connection.HiredisParser',
+#             'CONNECTION_POOL_CLASS': 'redis.BlockingConnectionPool',
+#             'CONNECTION_POOL_CLASS_KWARGS': {
+#                 'max_connections': 50,
+#                 'timeout': 20,
+#             },
+#             'MAX_CONNECTIONS': 1000,
+#             'PICKLE_VERSION': -1,
+#         }
+#     }
+# }
+# REDIS_TIMEOUT = 7*24*60*60
+# CUBES_REDIS_TIMEOUT = 60*60
+# NEVER_REDIS_TIMEOUT = 365*24*60*60
