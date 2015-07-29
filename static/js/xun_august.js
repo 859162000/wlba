@@ -100,7 +100,6 @@
           captcha_1: captcha_1
         }
       }).success(function(data) {
-        console.log('123')
         element.attr('disabled', 'disabled');
         element.removeClass('button-red');
         element.addClass('button-gray');
