@@ -249,6 +249,7 @@ class redis_backend(object):
     def update_detail_cache(self, product_id):
         if self.redis.exists('p2p_detail_{0}'.format(product_id)):
             self.redis.delete('p2p_detail_{0}'.format(product_id))
+            self.get_cache_p2p_detail(product_id)
         else:
             self.get_cache_p2p_detail(product_id)
 
