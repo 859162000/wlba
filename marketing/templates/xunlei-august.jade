@@ -6,8 +6,6 @@ html
     - with '网利宝' as title
     include include/common_head
     - endwith
-    //link(rel="stylesheet",href="/static/stylesheets/activity.css")
-    link(rel="stylesheet",href="/static/css/bootstrap.min.css")
     link(rel="stylesheet",href="/static/stylesheets/ganjiwang.css")
   body(style="background:#fff")
     include include/activityTop2
@@ -15,7 +13,7 @@ html
       .gold2
         #xl-aug-scroll
           span 已有
-          .scroll
+          .scroll(style="width:220px")
             .view#view
               hr
               ul.long
@@ -31,6 +29,7 @@ html
                 li 0
           span 个白金会员被领走
         if user.is_authenticated
+          #ganjiwang-model
           .banner-form#ganjiwang-welcome
             .space-vertical-m
               h1.banner-form--title 欢迎来网利宝投资理财
@@ -41,19 +40,20 @@ html
               .banner-form--row.align-center
                 a.banner-form--button(href="/accounts/home") 进入我的账户
         else
-          .denelu-form#denglu
-            #aug-code
-              .aug-center
-                .off-form#off-form ×
-                form#img-code-form.img-code-form.aut-form(method='post', action='')
-                  .form-row
-                      input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
-                      input#id_captcha_1.captcha.aut-captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
-                      img.captcha.captcha-img(alt="captcha", src="")
-                      button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
-                  .code-img-error.aut-error
-                  .clearfix.tc
-                      span.submit-code-img#submit-code-img1 确定
+          .denelu-form(style="padding:13px 0")#denglu
+            #aug-center
+              .off-form#off-form ×
+              form#img-code-form.img-code-form.aut-form(method='post', action='')
+                .form-row
+                    input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
+                    input#id_captcha_1.captcha.aut-captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
+                    img.captcha.captcha-img(alt="captcha", src="")
+                    button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
+                .code-img-error.aut-error
+                .clearfix.tc
+                    span.submit-code-img#submit-code-img1 确定
+            #aug-code(style="top:-2px")
+
             h1.biaoyu 注册送白金会员+500元红包
             //.align-center
             //  a.font-s.blue(href="http://act.vip.xunlei.com/vip/2015/p2pcash/#wlb") 【立即领取】
@@ -72,7 +72,7 @@ html
                     input#id_validate_code.com-tu.tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
                   .span6-omega
                     button#button-get-validate-code-modal.button-orange.button-large.huoqu-ma.new-btn(type='button',style="top:-2px;display:none") 获取验证码
-                    button#img-code.button-orange.button-large.huoqu-ma.new-btn(type='button',style="top:-2px;margin-left:13px") 获取验证码
+                    button#img-code.button-orange.button-large.huoqu-ma.new-btn(type='button',style="top:-2px;margin-left:7px") 获取验证码
                 .form-row-error
               .form-row
                 input#reg_password.full-width.com-tu.tu3(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")
@@ -94,7 +94,7 @@ html
       .gjw-gold.xl-aug-gold
         .xl-backtop(style="z-index:99")
           span.seven-com.seven-ten
-          .backtop.sev-backtop 回到顶部
+          .backtop.sev-backtop(style="font-size:14px") 回到顶部
           img(src="/static/imgs/pc_activity/xunlei/seven/sev_weixin.png")#xl-weixin
           a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank")
             img(src="/static/imgs/pc_activity/xunlei/seven/sev_qq.png",style="margin-top:10px")#xl-qq
@@ -151,7 +151,7 @@ html
           h2.xl-aug-com.xl-aug-tit2(style="line-height: 85px") 带你赚钱带你玩
           .haixing2.xl-aug-com.xl-aug-haixing2
           .xl-aug-box2
-            p 500元现金红包注册就能领？没错！不是理财金不是XX币，真金白银敞开送！
+            p 注册送红包，投资网利宝，还送你夏日旅游双人游大奖！年中钜惠季，没有比这更美的事了！
             .gjw-number-three.xl-aug-three
               dl
                 dt
@@ -210,9 +210,9 @@ html
                 a(href="http://huwaiquan.org/thread-2105-1-1.html",target="_blank") 详情介绍>>
               li(style="margin-right:0") 海南5天4晚游（限19—60岁），
                 a(href="http://huwaiquan.org/thread-2118-1-1.html",target="_blank") 详情介绍>>
-            p 或扫码关注户外圈微信，回复关键字“云南游、海南游、港澳游”查看线路
+            p(style="margin:10px 0") 或扫码关注户外圈微信，回复关键字“云南游、海南游、港澳游”查看线路
             h1 报名须知
-            p 请仔细查看“详情介绍”中的导游小费、保证金、保证金交款方式、年龄限制、地区限制、出行人数要求、进店购物等细则说明后决定是否报名。旅游产品由户外圈网提供，网利宝只负责提供中奖资格，不参与您与旅游公司的相关后续事宜。活动结束后网利宝将统一给户外圈网提供中奖用户姓名和手机号，由户外圈网与您联系。
+            p(style="margin:10px 0") 请仔细查看“详情介绍”中的导游小费、保证金、保证金交款方式、年龄限制、地区限制、出行人数要求、进店购物等细则说明后决定是否报名。旅游产品由户外圈网提供，网利宝只负责提供中奖资格，不参与您与旅游公司的相关后续事宜。活动结束后网利宝将统一给户外圈网提供中奖用户姓名和手机号，由户外圈网与您联系。
       .xl-box1(style="height:auto;top:-385px")
         h2.xl-jiang
           .xl-center#seven-center(style="color:#696566")

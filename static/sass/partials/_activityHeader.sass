@@ -345,15 +345,18 @@
       top: 144px
       right: 160px
 
-#aug-code
-  width: 100%
-  height: 383px
-  border: 1px solid #000
+#aug-center
+  width: 90%
+  height: auto
+  margin-left: 5%
   position: absolute
-  background: rgba(8, 8, 8, 0.49)
-  z-index: 9
+  top: 29%
+  opacity: 1
+  background: #fff
   border-radius: 5px
+  padding-bottom: 10px
   display: none
+  z-index: 10
   .off-form
     border-radius: 15px
     background: #fff
@@ -365,19 +368,34 @@
     top: 2px
     cursor: default
     padding: 0 8px
-  .aug-center
-    width: 90%
-    height: auto
-    margin-left: 5%
-    position: absolute
-    top: 29%
-    background: #fff
-    border-radius: 5px
-    padding-bottom: 10px
-    .aut-form
-      padding: 18px 13px
-      .aut-error
-        padding: 0
-      .form-row
-        .aut-captcha
-          width: 123px
+  .aut-form
+    padding: 18px 13px
+    .aut-error
+      padding: 0
+    .form-row
+      .aut-captcha
+        width: 123px
+#aug-code
+  width: 100%
+  height: 383px
+  border: 1px solid #000
+  position: absolute
+  z-index: 9
+  background: #000
+  opacity: 0.4
+  filter: alpha(opacity=40)
+  border-radius: 5px
+  display: none
+
+#ganjiwang-model
+  background: #000
+  opacity: 0.4
+  filter: alpha(opacity=40)
+  top: 63px
+  width: 320px
+  height: 256px
+  position: absolute
+  right: 7px
+
+#ganjiwang-welcome
+  top: 50px

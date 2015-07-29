@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import wanglibao_account
+
 
 __author__ = 'rsj217'
 import requests
 import urllib
 import logging
 from wanglibao.celery import app
+
 
 from wanglibao_account.models import Binding
 
@@ -99,4 +102,25 @@ def yiruite_callback(url, params):
         logger.info(" {'errorcode':'error_sign', 'errormsg':'签名不正确'} ")
     else:
         pass
+
+@app.task
+def xicai_send_data_task():
+    """
+    向希财网更新数据
+    :return:
+    """
+    wanglibao_account.cooperation.xicai_send_data()
+
+
+
+
+
+
+
+
+
+
+
+
+
 
