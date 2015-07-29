@@ -134,7 +134,8 @@ urlpatterns += patterns(
     # url(r'^api/yiruite/getInfoList/(?P<startday>.*)/(?P<endday>.*)/(?P<sign>.*)/$', YiruiteQuery.as_view()),
     # # 蹦蹦网
     # url(r'^api/bengbeng/getInfoList/(?P<startday>.*)/(?P<endday>.*)/(?P<sign>.*)/$', BengbengQuery.as_view())
-    url(r'^api/coopinfo/(?P<channel_code>.*)/(?P<user_type>.*)/(?P<start_day>.*)/(?P<end_day>.*)/(?P<sign>.*)/$', CoopQuery.as_view())
+    url(r'^api/coopinfo/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<user_type>[a-z0-9A-Z_]*)/(?P<start_day>[0-9]*)/(?P<end_day>[0-9]*)/(?P<sign>[a-z0-9A-Z_]*)/$', CoopQuery.as_view()),
+    url(r'^api/coopinfo/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<user_type>[a-z0-9A-Z_]*)/(?P<start_day>[0-9]*)/(?P<end_day>[0-9]*)/(?P<sign>[a-z0-9A-Z_]*)/(?P<page>[0-9]*)/$', CoopQuery.as_view()),
 )
 
 # 微信

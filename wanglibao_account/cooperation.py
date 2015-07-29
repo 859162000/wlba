@@ -420,6 +420,9 @@ class CoopQuery(APIView):
     BINDING_USER = 2
     INVESTED_USER = 3
 
+    #每一页用户数
+    PAGE_LENGTH = 20
+
     def get_promo_user(self, channel_code, startday, endday):
         """
 
@@ -474,7 +477,7 @@ class CoopQuery(APIView):
 
         return user_info
 
-    def get_all_user_info_for_coop(self, channel_code, user_type, start_day, end_day, sign):
+    def get_all_user_info_for_coop(self, channel_code, user_type, start_day, end_day, sign, page):
         if not self.check_sign(channel_code, start_day, end_day, sign):
             raise ValueError('wrong signature.')
 
@@ -497,6 +500,13 @@ class CoopQuery(APIView):
                 return P2PRecord.objects.filter(user_id=user_id, catalog=u'申购').exists()
             coop_users = [u for u in coop_users if is_invested_user(u.user_id)]
 
+        #处理分页
+        if page:
+            page = int(page)
+            start = page * self.PAGE_LENGTH
+            end = start + self.PAGE_LENGTH
+            coop_users = coop_users[start:end]
+
         user_info = []
         for coop_user in coop_users:
             try:
@@ -507,12 +517,12 @@ class CoopQuery(APIView):
 
         return user_info
 
-    def get(self, request, channel_code, user_type, start_day, end_day, sign):
+    def get(self, request, channel_code, user_type, start_day, end_day, sign, page=None):
         try:
             result = {
                 'errorcode': 0,
                 'errormsg': 'sucess',
-                'info': self.get_all_user_info_for_coop(channel_code, int(user_type), start_day, end_day, sign)
+                'info': self.get_all_user_info_for_coop(channel_code, int(user_type), start_day, end_day, sign, page)
             }
         except ValueError, e:
             result = {
