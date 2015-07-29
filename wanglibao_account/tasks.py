@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from wanglibao_account.cooperation import xicai_send_data
 
 __author__ = 'rsj217'
 import requests
@@ -99,4 +100,25 @@ def yiruite_callback(url, params):
         logger.info(" {'errorcode':'error_sign', 'errormsg':'签名不正确'} ")
     else:
         pass
+
+@app.task
+def xicai_send_data_task():
+    """
+    向希财网更新数据
+    :return:
+    """
+    xicai_send_data()
+
+
+
+
+
+
+
+
+
+
+
+
+
 

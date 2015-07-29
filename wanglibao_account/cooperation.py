@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 # encoding:utf-8
+if __name__ == '__main__':
+    import os
+    import sys
+
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wanglibao.settings')
+
 import hashlib
 import datetime
 import logging
@@ -524,15 +530,6 @@ def get_rate(product_id_or_instance):
         else:
             return product_id_or_instance.expected_earning_rate
 
-def get_buyer(product_id_or_instance):
-    """
-    获取持仓人数
-    :param product_id_or_instance:
-    :return:
-    """
-    if isinstance(product_id_or_instance, P2PProduct):
-        return P2PEquity.objects.filter(product_id=product_id_or_instance.id).distinct('user').count()
-
 def get_amortization_time(product_id_or_instance):
     """
     获取还款起始，结束时间
@@ -541,9 +538,9 @@ def get_amortization_time(product_id_or_instance):
     """
     if isinstance(product_id_or_instance, P2PProduct):
         amortizations =  ProductAmortization.objects.filter(product_id = product_id_or_instance.id).order_by('term_date')
-        return amortizations[0].term_date, amortizations[-1].term_date
+        return amortizations.first().term_date, amortizations.last().term_date
 
-def get_p2p_info(product_id):
+def get_p2p_info(mproduct):
     product_info = {
         'for_freshman': 0, #是否新手标
         'period': 0, #产品周期
@@ -559,26 +556,25 @@ def get_p2p_info(product_id):
         'guarantor': '', #担保方名称
         'amortization_start_time': 0, #还款开始时间
         'amortization_end_time': 0, #还款结束时间
-        'borrower_guarant_type': '第三方担保',#借款担保方式
+        'borrower_guarant_type': '第三方担保', #借款担保方式
         'repayment_type': '', #还款方式
         'start_price': 100, #起投金额
         'id': 0, #产品id
     }
-    mproduct = P2PProduct.objects.get(product_id)
     product_info['for_freshman'] = 1 if mproduct.category == '新手标' else 0
     product_info['period'] = mproduct.period
-    product_info['rate'] = get_rate(product_id)
+    product_info['rate'] = get_rate(mproduct)
     product_info['amount'] = mproduct.total_amount
     product_info['ordered_amount'] = mproduct.ordered_amount
-    product_info['buyer'] = get_buyer(product_id)
+    product_info['buyer'] = mproduct.bought_people_count
     product_info['start_time'] = mproduct.publish_time
     product_info['end_time'] = mproduct.end_time
     product_info['state'] = mproduct.status
     product_info['borrower'] = mproduct.borrower_name
     product_info['guarantor'] = mproduct.warrant_company
-    product_info['amortization_start_time'], product_info['end_time'] = get_amortization_time(product_id)
+    product_info['amortization_start_time'], product_info['end_time'] = get_amortization_time(mproduct)
     product_info['repayment_type'] = mproduct.pay_method
-    product_info['id'] = product_id
+    product_info['id'] = mproduct.id
 
     return product_info
 
@@ -591,13 +587,13 @@ def xicai_get_token():
     return response.json()['access_token']
 
 
-def xicai_get_p2p_info(product_id, access_token):
+def xicai_get_p2p_info(mproduct, access_token):
     """
     将我们的p2p信息转换后提供给西财网
-    :param product_id:
+    :param mproduct:
     :return:
     """
-    p2p_info = get_p2p_info(product_id)
+    p2p_info = get_p2p_info(mproduct)
 
     #希财状态码：-1：已流标，0：筹款中，1.已满标，2.已开始还款，3.预发布，4.还款完成，5.逾期
     #录标，录标完成，待审核的标均不推送给希财
@@ -626,6 +622,10 @@ def xicai_get_p2p_info(product_id, access_token):
         u'日计息月付息到期还本': 1,
     }
 
+    def format_time(time):
+        if time:
+            return time.strftime('%Y-%m-%d')
+
     xicai_info = {
         'access_token': access_token,
         'product_name': '网利宝',
@@ -635,27 +635,79 @@ def xicai_get_p2p_info(product_id, access_token):
         'amount': p2p_info['amount'],
         'invest_amount': p2p_info['ordered_amount'],
         'invest_mans': p2p_info['buyer'],
-        'underlying_start': p2p_info['start_time'],
-        'underlying_end': p2p_info['end_time'],
-        'link_website': settings.XICAI_LOAD_PAGE.format(p2p_id=product_id),
+        'underlying_start': format_time(p2p_info['start_time']),
+        'underlying_end': format_time(p2p_info['end_time']),
+        'link_website': settings.XICAI_LOAD_PAGE.format(p2p_id=mproduct.id),
         'product_state': p2p_state_convert_table.get(p2p_info['state']),
         'borrower': p2p_info['borrower'],
         'guarantors': p2p_info['guarantor'],
-        'publish_time': p2p_info['start_time'],
-        'repay_start_time': p2p_info['amortization_start_time'],
-        'repay_end_time': p2p_info['amortization_end_time'],
+        'publish_time': format_time(p2p_info['start_time']),
+        'repay_start_time': format_time(p2p_info['amortization_start_time']),
+        'repay_end_time': format_time(p2p_info['amortization_end_time']),
         'borrow_type': 4, #都是第三方担保
         'pay_type': pay_type_convert_table.get(p2p_info['repayment_type']),
         'start_price': 100,
         'p2p_product_id': p2p_info['id']
     }
 
+    if settings.ENV != settings.ENV_PRODUCTION:
+        xicai_info['test'] = 1
     return xicai_info
 
-    def xicai_post_product_info(product_id, access_token):
-        p2p_info = xicai_get_p2p_info(product_id, access_token)
-        url = settings.XICAI_CREATE_P2P_URL
-        requests.post(url, data=p2p_info)
+def xicai_post_product_info(mproduct, access_token):
+    p2p_info = xicai_get_p2p_info(mproduct, access_token)
+    url = settings.XICAI_CREATE_P2P_URL
+    requests.post(url, data=p2p_info)
+
+def xicai_post_updated_product_info(mproduct, access_token):
+    p2p_info = xicai_get_p2p_info(mproduct, access_token)
+    updated_p2p_info = {}
+    for k in ['access_token', 'invest_amount',
+              'invest_mans', 'underlying_end',
+              'product_state', 'repay_start_time',
+              'repay_end_time', 'p2p_product_id']:
+        updated_p2p_info[k] = p2p_info[k]
+    url = settings.XICAI_UPDATE_P2P_URL
+    requests.post(url, data=updated_p2p_info)
+
+
+def xicai_get_new_p2p():
+    """
+    获取新标给希财
+    :return:
+    """
+    now = datetime.datetime.now()
+    start_time = now - settings.XICAI_UPDATE_TIMEDELTA
+    return P2PProduct.objects.filter(publish_time__gte = start_time).filter(publish_time__lt = now).all()
+
+
+def xicai_get_updated_p2p():
+    """
+    获取有更新的标给希财
+    :return:
+    """
+    start_time = datetime.datetime.now() - settings.XICAI_UPDATE_TIMEDELTA
+    p2p_equity = P2PEquity.objects.filter(created_at__gte = start_time).all()
+    return set([p.product for p in p2p_equity])
+
+def xicai_send_data():
+    """
+    向西财网 post最新的标的信息
+    :return:
+    """
+    access_token = xicai_get_token()
+    #更新新标数据
+    for p2p_product in xicai_get_new_p2p():
+        xicai_post_product_info(p2p_product, access_token)
+    #更新有变动的标的的数据
+    for p2p_product in xicai_get_updated_p2p():
+        xicai_post_updated_product_info(p2p_product,access_token)
+
+
+if __name__ == '__main__':
+    print xicai_get_updated_p2p()
+    print xicai_get_new_p2p()
+    xicai_send_data()
 
 
 
