@@ -103,7 +103,7 @@ class PartnerView(TemplateView):
     template_name = 'partner.jade'
 
     def get_context_data(self, **kwargs):
-
+        cache_backend = redis_backend()
         partners = cache_backend.get_cache_partners()
 
         return {
