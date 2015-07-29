@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from wanglibao_account.cooperation import xicai_send_data
+import wanglibao_account
+
 
 __author__ = 'rsj217'
 import requests
 import urllib
 import logging
 from wanglibao.celery import app
+
 
 from wanglibao_account.models import Binding
 
@@ -107,7 +109,7 @@ def xicai_send_data_task():
     向希财网更新数据
     :return:
     """
-    xicai_send_data()
+    wanglibao_account.cooperation.xicai_send_data()
 
 
 
