@@ -65,12 +65,7 @@
         //图片验证码
         imgCodeFun : function(){
             $('#img-code').click(function() {
-                //刷新验证码
-                url2 = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
-                $.getJSON(url2, {}, function(json) {
-                  $('#img-code-form').find('input[name="captcha_0"]').val(json.key);
-                  $('#img-code-form').find('img.captcha').attr('src', json.image_url);
-                });
+                activityRegister.imgCodeRe();
                 var phoneNumber;
                 phoneNumber = $.trim($("#reg_identifier").val());
                 if (activityRegister.checkMobile(phoneNumber)) {
@@ -144,28 +139,37 @@
                 return intervalId = setInterval(timerFunction, 1000);
             });
         },
+        //刷新验证码
+        imgCodeRe : function(){
+            url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
+            $.getJSON(url, {}, function(json) {
+              $('#img-code-form').find('input[name="captcha_0"]').val(json.key);
+              $('#img-code-form').find('img.captcha').attr('src', json.image_url);
+            });
+        },
         //提交表单
         registerSubmitFun : function(){
             $('#register_submit').on('click',function(){
                 if ($(this).hasClass("disabled")) {
                     return
                 }else{
+                    var errorLabel = $('#aug-form-row-eroor');
                     if ($('#reg_identifier').val()==''){
-                        $('#aug-form-row-eroor').text('* 请输入手机号')
+                        errorLabel.text('* 请输入手机号')
                     }else if (!activityRegister.checkMobile($('#reg_identifier').val())){
-                        $('#aug-form-row-eroor').text('* 请输入正确的手机号')
+                        errorLabel.text('* 请输入正确的手机号')
                     }else if ($('#id_validate_code').val()==''){
-                        $('#aug-form-row-eroor').text('* 请输入验证码')
+                        errorLabel.text('* 请输入验证码')
                     }else if ($('#reg_password').val()==''){
-                        $('#aug-form-row-eroor').text('* 请输入密码')
+                        errorLabel.text('* 请输入密码')
                     }else if ($('#reg_password').val().length<6){
-                        $('#aug-form-row-eroor').text('* 密码需要最少6位')
+                        errorLabel.text('* 密码需要最少6位')
                     }else if ($('#reg_password').val().length>20){
-                        $('#aug-form-row-eroor').text('* 密码不能超过20位')
+                        errorLabel.text('* 密码不能超过20位')
                     }else if ($('#reg_password2').val()==''){
-                        $('#aug-form-row-eroor').text('* 请再次输入密码')
+                        errorLabel.text('* 请再次输入密码')
                     }else if ($('#reg_password').val()!=$('#reg_password2').val()){
-                        $('#aug-form-row-eroor').text('* 密码不一致')
+                        errorLabel.text('* 密码不一致')
                     }else{
                         if($("#agreement").is(':checked')) {
                             var phoneNumber, pw, code;
@@ -201,23 +205,24 @@
         },
         //input验证
         inputValidateFun : function(){
+            var errorLabel = $('#aug-form-row-eroor');
             $('#reg_identifier,#id_validate_code').on('keyup',function(){
-              $('#aug-form-row-eroor').text('')
+              errorLabel.text('')
             })
             $('#reg_password').on('keyup',function(){
               if ($('#reg_password').val().length<6){
-                $('#aug-form-row-eroor').text('* 密码需要最少6位')
+                errorLabel.text('* 密码需要最少6位')
               }else if ($('#reg_password').val().length>20){
-                $('#aug-form-row-eroor').text('* 密码不能超过20位')
+                errorLabel.text('* 密码不能超过20位')
               }else{
-                $('#aug-form-row-eroor').text('')
+                errorLabel.text('')
               }
             })
             $('#reg_password2').on('keyup',function(){
               if ($('#reg_password').val()!=$('#reg_password2').val()){
-                $('#aug-form-row-eroor').text('* 密码不一致')
+                errorLabel.text('* 密码不一致')
               }else{
-                $('#aug-form-row-eroor').text('')
+                errorLabel.text('')
               }
             })
             $('input, textarea').placeholder();
@@ -244,13 +249,7 @@
         //刷新图片验证码
         captchaRefresh : function(){
             $('.captcha-refresh').click(function() {
-              var $form, url;
-              $form = $(this).parents('form');
-              url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
-              return $.getJSON(url, {}, function(json) {
-                $form.find('input[name="captcha_0"]').val(json.key);
-                return $form.find('img.captcha').attr('src', json.image_url);
-              });
+              activityRegister.imgCodeRe();
             });
         },
         //语音验证码
@@ -328,7 +327,6 @@
             activityRegister.setup(options);
         }
     })
-
       return {
         activityRegister : activityRegister
       }
