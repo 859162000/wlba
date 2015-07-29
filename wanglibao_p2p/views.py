@@ -198,7 +198,7 @@ class PurchaseP2P(APIView):
                 product_info, margin_info, equity_info = trader.purchase(amount, redpack)
 
                 #处理第三方渠道回调
-                CoopRegister(request).process_for_purchse(request.user)
+                #CoopRegister(request).process_for_purchse(request.user)
 
                 return Response({
                     'data': product_info.amount,
