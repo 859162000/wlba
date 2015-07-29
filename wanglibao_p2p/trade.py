@@ -21,6 +21,7 @@ from wanglibao_redpack import backends as redpack_backends
 # from wanglibao_account.tasks import cjdao_callback
 # from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
 import re
+from wanglibao_redis.backend import redis_backend
 
 from wanglibao_rest.utils import split_ua
 
@@ -93,12 +94,19 @@ class P2PTrader(object):
             "mtype": "purchase"
         })
 
-
         # 满标给管理员发短信
         if product_record.product_balance_after <= 0:
             from wanglibao_p2p.tasks import full_send_message
 
             full_send_message.apply_async(kwargs={"product_name": self.product.name})
+            # 满标将标信息写入redis
+            cache_backend = redis_backend()
+            if not cache_backend.redis.exists("p2p_detail_{0}".format(self.product.id)):
+                cache_backend.get_cache_p2p_detail(self.product.id)
+
+            # 将标写入redis list
+            cache_backend.push_p2p_products(self.product)
+
         return product_record, margin_record, equity
 
 
@@ -213,6 +221,10 @@ class P2POperator(object):
             "mtype": "loaned"
         })
 
+        # 将标信息从满标的redis列表中挪到还款中的redis列表
+        cache_backend = redis_backend()
+        cache_backend.update_list_cache('p2p_products_full', 'p2p_products_repayment', product)
+
     @classmethod
     def fail(cls, product):
         if product.status == u'流标':
@@ -271,6 +283,11 @@ class P2POperator(object):
 
                 cls.logger.info("Product [%d] [%s] payed all amortizations, finish it", product.id, product.name)
                 ProductKeeper(product).finish(None)
+
+                # 将标信息从还款中的redis列表中挪到已完成的redis列表
+                cache_backend = redis_backend()
+                cache_backend.update_list_cache('p2p_products_repayment', 'p2p_products_finished', product)
+
 
     @classmethod
     def settle_hike(cls, product):

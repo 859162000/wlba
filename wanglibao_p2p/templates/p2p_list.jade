@@ -21,7 +21,7 @@ html
       .row
         .span8
           for product in p2p_products
-            status = product.display_status
+            status = product['display_status']
             .panel-p2p-product
               if product.category == '新手标'
                 .new-user 新手福利
@@ -47,19 +47,19 @@ html
                       p 还款期限
                     .span3.align-center
                       p
-                        earning_rate = str(product.expected_earning_rate)
+                        earning_rate = str(product['expected_earning_rate'])
                         //if product.excess_earning_rate > 0
                         //  earning_rate = str(product.expected_earning_rate - product.excess_earning_rate) + '+' + str(product.excess_earning_rate)
                         em.highlight {{earning_rate}}
                         span.highlight.font-m %
                         if product.activity
                           em.highlight +
-                          span.xunlei-vip-rate(title="{{product.activity.name}}") {{product.activity.rule.percent_text}}%
-                            span.xunlei-vip-tip(title="{{product.activity.name}}") {{product.activity.name}}
+                          span.xunlei-vip-rate(title="{{product.activity.activity_name}}") {{product.activity.activity_rule_percent_text}}%
+                            span.xunlei-vip-tip(title="{{product.activity.activity_name}}") {{product.activity.activity_name}}
                       p 年化收益
                     .span2.align-center
                       p
-                        amount = product.total_amount - product.ordered_amount
+                        amount = product['total_amount'] - product['ordered_amount']
                         em {{amount | money_format_int}}
                       p 可投资金额(元)
                     .span3-omega.align-right
@@ -90,7 +90,7 @@ html
                     .span4
                       span 进度：
                       .progress-container
-                        percent = float(product.ordered_amount) / product.total_amount * 100
+                        percent = float(product['ordered_amount']) / product['total_amount'] * 100
                         if status == '抢购中' or status == '满标审核'
                           .progress-indicator(style="width:{{percent | percentage}}")
                         else
