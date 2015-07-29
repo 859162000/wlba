@@ -13,6 +13,7 @@ html
     .wrap#ganjiwang-banner
       .gold2
         if user.is_authenticated
+          #ganjiwang-model
           .banner-form#ganjiwang-welcome
             .space-vertical-m
               h1.banner-form--title 欢迎来网利宝投资理财
@@ -24,18 +25,18 @@ html
                 a.banner-form--button(href="/accounts/home") 进入我的账户
         else
           .denelu-form#denglu
+            #aug-center
+              .off-form#off-form ×
+              form#img-code-form.img-code-form.aut-form(method='post', action='')
+                .form-row
+                    input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
+                    input#id_captcha_1.captcha.aut-captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
+                    img.captcha.captcha-img(alt="captcha", src="")
+                    button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
+                .code-img-error.aut-error
+                .clearfix.tc
+                    span.submit-code-img#submit-code-img1 确定
             #aug-code
-              .aug-center
-                .off-form#off-form ×
-                form#img-code-form.img-code-form.aut-form(method='post', action='')
-                  .form-row
-                      input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
-                      input#id_captcha_1.captcha.aut-captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
-                      img.captcha.captcha-img(alt="captcha", src="")
-                      button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
-                  .code-img-error.aut-error
-                  .clearfix.tc
-                      span.submit-code-img#submit-code-img1 确定
             h1.biaoyu 领取800元现金红包
             form#register-modal-form.login-form.dale(method='post', action='')
               - csrf_token
