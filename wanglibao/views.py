@@ -30,25 +30,34 @@ class IndexView(TemplateView):
 
         p2p_pre_four_list = cache_backend.get_p2p_list_from_objects(p2p_pre_four)
 
-        if cache_backend.redis.exists('p2p_products'):
-            p2p_products_cache = pickle.loads(cache_backend.redis.get('p2p_products'))
+        p2p_products, p2p_full_list, p2p_repayment_list = [], [], []
+
+        if cache_backend.redis.exists('p2p_products_full'):
+            p2p_full_cache = cache_backend.redis.lrange('p2p_products_full', 0, -1)
+            for product in p2p_full_cache:
+                p2p_full_list.extend([pickle.loads(product)])
         else:
-            p2p_middle = P2PProduct.objects.select_related('warrant_company', 'activity')\
-                                           .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
-                                           .filter(status__in=[u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核'])\
-                                           .order_by('-soldout_time', '-priority')
+            p2p_full = P2PProduct.objects.select_related('warrant_company', 'activity') \
+                .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
+                .filter(status__in=[u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核']) \
+                .order_by('-soldout_time', '-priority')
+            p2p_full_list = cache_backend.get_p2p_list_from_objects(p2p_full)
 
-            p2p_last = P2PProduct.objects.select_related('warrant_company', 'activity')\
-                                         .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
-                                         .filter(status=u'还款中').order_by('-soldout_time', '-priority')[:2]
+        if cache_backend.redis.exists('p2p_products_repayment'):
+            p2p_repayment_cache = cache_backend.redis.lrange('p2p_products_repayment', 0, 1)
 
-            p2p_middle_list = cache_backend.get_p2p_list_from_objects(p2p_middle)
-            p2p_last_list = cache_backend.get_p2p_list_from_objects(p2p_last)
-            p2p_products_cache = p2p_middle_list + p2p_last_list
+            for product in p2p_repayment_cache:
+                p2p_repayment_list.extend([pickle.loads(product)])
+        else:
+            p2p_repayment = P2PProduct.objects.select_related('warrant_company', 'activity')\
+                .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
+                .filter(status=u'还款中').order_by('-soldout_time', '-priority')[:2]
 
-        p2p_products = p2p_pre_four_list + p2p_products_cache
+            p2p_repayment_list = cache_backend.get_p2p_list_from_objects(p2p_repayment)
 
-        # p2p_products = chain(p2p_pre_four, p2p_middle, p2p_last)
+        p2p_products.extend(p2p_pre_four_list)
+        p2p_products.extend(p2p_full_list)
+        p2p_products.extend(p2p_repayment_list)
 
         getmore = True
 

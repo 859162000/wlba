@@ -489,16 +489,43 @@ class P2PListView(TemplateView):
             .filter(status=u'正在招标').order_by('-publish_time')
 
         p2p_done_list = cache_backend.get_p2p_list_from_objects(p2p_done)
-        if cache_backend.redis.exists('p2p_products'):
-            p2p_others_list = pickle.loads(cache_backend.redis.get('p2p_products'))
-        else:
-            p2p_others = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(
-                Q(publish_time__lte=timezone.now())).filter(
-                status__in=[
-                    u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
-                ]).order_by('-soldout_time')
 
-            p2p_others_list = cache_backend.get_p2p_list_from_objects(p2p_others)
+        p2p_products, p2p_full_list, p2p_repayment_list, p2p_finished_list = [], [], [], []
+
+        if cache_backend.redis.exists('p2p_products_full'):
+            p2p_full_cache = cache_backend.redis.lrange('p2p_products_full', 0, -1)
+            for product in p2p_full_cache:
+                p2p_full_list.extend([pickle.loads(product)])
+        else:
+            p2p_full = P2PProduct.objects.select_related('warrant_company', 'activity') \
+                .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
+                .filter(status__in=[u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核']) \
+                .order_by('-soldout_time', '-priority')
+            p2p_full_list = cache_backend.get_p2p_list_from_objects(p2p_full)
+
+        if cache_backend.redis.exists('p2p_products_repayment'):
+            p2p_repayment_cache = cache_backend.redis.lrange('p2p_products_repayment', 0, -1)
+
+            for product in p2p_repayment_cache:
+                p2p_repayment_list.extend([pickle.loads(product)])
+        else:
+            p2p_repayment = P2PProduct.objects.select_related('warrant_company', 'activity') \
+                .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
+                .filter(status=u'还款中').order_by('-soldout_time', '-priority')
+
+            p2p_repayment_list = cache_backend.get_p2p_list_from_objects(p2p_repayment)
+
+        if cache_backend.redis.exists('p2p_products_finished'):
+            p2p_finished_cache = cache_backend.redis.lrange('p2p_products_finished', 0, -1)
+
+            for product in p2p_finished_cache:
+                p2p_finished_list.extend([pickle.loads(product)])
+        else:
+            p2p_finished = P2PProduct.objects.select_related('warrant_company', 'activity') \
+                .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
+                .filter(status=u'已完成').order_by('-soldout_time', '-priority')
+
+            p2p_finished_list = cache_backend.get_p2p_list_from_objects(p2p_finished)
 
         show_slider = False
         if p2p_done:
@@ -509,9 +536,10 @@ class P2PListView(TemplateView):
         else:
             p2p_earning = p2p_period = p2p_amount = []
 
-        p2p_products = []
         p2p_products.extend(p2p_done_list)
-        p2p_products.extend(p2p_others_list)
+        p2p_products.extend(p2p_full_list)
+        p2p_products.extend(p2p_repayment_list)
+        p2p_products.extend(p2p_finished_list)
 
         limit = 10
         paginator = Paginator(p2p_products, limit)
