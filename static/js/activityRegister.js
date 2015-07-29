@@ -1,21 +1,16 @@
-/**
- * activity register by qijinjin
- */
 (function() {
   require.config({
     paths: {
       jquery: 'lib/jquery.min',
-      'jquery.modal': 'lib/jquery.modal.min',
       'jquery.placeholder': 'lib/jquery.placeholder',
       tools: 'lib/modal.tools'
     },
     shim: {
-      'jquery.modal': ['jquery'],
       'jquery.placeholder': ['jquery']
     }
   });
 
-  define(['jquery', 'lib/modal', 'lib/backend',  "tools", 'jquery.placeholder'], function($, modal, backend, tool, placeholder) {
+  define(['jquery', "tools", 'jquery.placeholder'], function($, tool, placeholder) {
     var container, csrfSafeMethod, getCookie, sameOrigin, _showModal;
     var activityRegister ={}
     jQuery.extend(activityRegister, {
@@ -60,7 +55,6 @@
                     }
                 }
             });
-            //end cookie
         },
         //图片验证码
         imgCodeFun : function(){
@@ -78,8 +72,7 @@
                     $('#aug-form-row-eroor').text('* 请输入正确的手机号')
                 }
             });
-            //关闭验证码弹框
-            $('#off-form').on('click',function(){
+            $('#off-form').on('click',function(){   //关闭验证码弹框
               $('#aug-code,#aug-center').hide();
             })
         },
@@ -187,10 +180,9 @@
                                     return location.reload();
                                 }
                             }).fail(function (xhr) {
-                                var message, result;
+                                var result;
                                 result = JSON.parse(xhr.responseText);
-                                message = result.message;
-                                $('#aug-form-row-eroor').text('* ' + message.validate_code)
+                                $('#aug-form-row-eroor').text('* ' + result.message.validate_code)
                             });
                         }else{
                            return tool.modalAlert({
@@ -240,14 +232,12 @@
                 $(this).attr('placeholder', zhi)
             })
         },
-        //验证手机号
-        checkMobile : function(identifier) {
+        checkMobile : function(identifier) {  //验证手机号
           var re;
           re = /^1\d{10}$/;
           return re.test(identifier);
         },
-        //刷新图片验证码
-        captchaRefresh : function(){
+        captchaRefresh : function(){   //刷新图片验证码
             $('.captcha-refresh').click(function() {
               activityRegister.imgCodeRe();
             });
@@ -269,11 +259,11 @@
                 element = $('.voice .span12-omega');
                 url = $(this).attr('href');
                 return $.ajax({
-                url: url,
-                type: "POST",
-                data: {
-                    phone: $("#reg_identifier").val().trim()
-                }
+                    url: url,
+                    type: "POST",
+                    data: {
+                        phone: $("#reg_identifier").val().trim()
+                    }
                 }).success(function(json) {
                     var button, count, intervalId, timerFunction;
                     if (json.ret_code === 0) {
@@ -304,8 +294,7 @@
                 });
             });
         },
-        //初始化
-        setup : function(options){
+        setup : function(options){  //初始化
             this.registerTitle = options.registerTitle;
             this.isNOShow = options.isNOShow;
             this.hasCallBack = options.hasCallBack;
