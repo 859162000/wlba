@@ -104,14 +104,14 @@ html
                     .span4.align-left
                       if product.category == '证大速贷'
                         span 本息保障: &nbsp;&nbsp;
-                        span.d3-text {{product.warrant_company.name}}
+                        span.d3-text {{product.warrant_company_name}}
                       elif product.category == '票据'
                         span 承兑行: &nbsp;&nbsp;
-                        span.red-text {{product.warrant_company.name}}
+                        span.red-text {{product.warrant_company_name}}
                         span &nbsp;&nbsp;无条件兑付
                       else
                         span 合作机构: &nbsp;&nbsp;
-                        span.d3-text {{product.warrant_company.name}}
+                        span.d3-text {{product.warrant_company_name}}
 
                     .span4-omega.align-right
                       span 还款方式: &nbsp;&nbsp;
