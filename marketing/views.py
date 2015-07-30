@@ -24,6 +24,7 @@ from utils import local_to_utc
 
 # used for reward
 from django.forms import model_to_dict
+from django.db.models import Q
 from marketing.models import RewardRecord, NewsAndReport
 from wanglibao_sms.tasks import send_messages
 from wanglibao_p2p.models import Earning
@@ -38,6 +39,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
 from wanglibao_redpack import backends as redpack_backends
+from wanglibao_activity.models import ActivityRecord, ActivityRule
 
 
 class YaoView(TemplateView):
@@ -493,7 +495,7 @@ class IntroducedAwardTemplate(TemplateView):
             print message_content
             print introduced_by.wanglibaouserprofile.name
             print safe_phone_str(user.wanglibaouserprofile.phone)
-            print text_content
+            # print text_content
 
 
 class NewsListView(TemplateView):
@@ -669,4 +671,20 @@ class ThousandRedPackCountAPIView(APIView):
 
         return Response({'ret_code': 0,
                          'redpack_total': int(join_log['user_count'] * 4) if join_log['user_count'] else 0,
+        })
+
+class ThunderActivityRewardCounter(APIView):
+    """ 迅雷八月份活动统计迅雷会员发放个数，首次投资和首次充值发放迅雷会员"""
+    permission_classes = ()
+
+    def get(self, request):
+        record = ActivityRecord.objects.filter(
+            trigger_node__in=['first_pay', 'first_buy'],
+            activity__code='xunlei8'
+        ).filter(
+            Q(activity__is_stopped=True) & Q(activity__stopped_at__gte=timezone.now()) | Q(activity__is_stopped=False) & Q(activity__start_at__lte=timezone.now()) & Q(activity__end_at__gte=timezone.now())
+        ).aggregate(num=Count('id'))
+        return Response({
+            'ret_code': 0,
+            'num': int(record['num']) if record['num'] else 0,
         })

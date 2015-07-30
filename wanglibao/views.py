@@ -12,6 +12,9 @@ from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2P
 from django.core.urlresolvers import reverse
 import re
 import urlparse
+from wanglibao_redis.backend import redis_backend
+import json
+import pickle
 
 
 class IndexView(TemplateView):
@@ -19,30 +22,56 @@ class IndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
 
-        p2p_pre_four = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
-            .filter(status=u'正在招标').order_by('-priority', '-total_amount')[:4]
+        cache_backend = redis_backend()
 
-        p2p_middle = P2PProduct.objects.select_related('warrant_company','activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
-            .filter(status__in=[
-                u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核'
-        ]).order_by('-soldout_time', '-priority')
+        p2p_pre_four = P2PProduct.objects.select_related('warrant_company', 'activity')\
+                                         .filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
+                                         .filter(status=u'正在招标').order_by('-priority', '-total_amount')[:4]
 
+        p2p_pre_four_list = cache_backend.get_p2p_list_from_objects(p2p_pre_four)
 
-        p2p_last = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
-            .filter(status=u'还款中').order_by('-soldout_time', '-priority')[:2]
+        p2p_products, p2p_full_list, p2p_repayment_list = [], [], []
 
-        p2p_products = chain(p2p_pre_four, p2p_middle, p2p_last)
+        #if cache_backend.redis.exists('p2p_products_full'):
+        if cache_backend._exists('p2p_products_full'):
+            #p2p_full_cache = cache_backend.redis.lrange('p2p_products_full', 0, -1)
+            p2p_full_cache = cache_backend._lrange('p2p_products_full', 0, -1)
+            for product in p2p_full_cache:
+                p2p_full_list.extend([pickle.loads(product)])
+        else:
+            p2p_full = P2PProduct.objects.select_related('warrant_company', 'activity') \
+                .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
+                .filter(status__in=[u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核']) \
+                .order_by('-soldout_time', '-priority')
+            p2p_full_list = cache_backend.get_p2p_list_from_objects(p2p_full)
 
-        getmore = False
-        if p2p_pre_four.count() > 3 and p2p_last:
-            getmore = True
+        #if cache_backend.redis.exists('p2p_products_repayment'):
+        #    p2p_repayment_cache = cache_backend.redis.lrange('p2p_products_repayment', 0, 1)
+        if cache_backend._exists('p2p_products_repayment'):
+            p2p_repayment_cache = cache_backend._lrange('p2p_products_repayment', 0, 1)
+
+            for product in p2p_repayment_cache:
+                p2p_repayment_list.extend([pickle.loads(product)])
+        else:
+            p2p_repayment = P2PProduct.objects.select_related('warrant_company', 'activity')\
+                .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
+                .filter(status=u'还款中').order_by('-soldout_time', '-priority')[:2]
+
+            p2p_repayment_list = cache_backend.get_p2p_list_from_objects(p2p_repayment)
+
+        p2p_products.extend(p2p_pre_four_list)
+        p2p_products.extend(p2p_full_list)
+        p2p_products.extend(p2p_repayment_list)
+
+        getmore = True
 
         trade_records = P2PRecord.objects.filter(catalog=u'申购').select_related('user').select_related('user__wanglibaouserprofile')[:20]
         # banners = Banner.objects.filter(device=Banner.PC_2)
         banners = Banner.objects.filter(Q(device=Banner.PC_2), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now())))
         news_and_reports = NewsAndReport.objects.all().order_by("-score")[:5]
         site_data = SiteData.objects.all().first()
-        partners = Partner.objects.filter(type='partner')
+
+        partners = cache_backend.get_cache_partners()
 
         return {
             "p2p_products": p2p_products,
@@ -78,12 +107,12 @@ class PartnerView(TemplateView):
     template_name = 'partner.jade'
 
     def get_context_data(self, **kwargs):
-        partners = Partner.objects.filter(type='partner')
+        cache_backend = redis_backend()
+        partners = cache_backend.get_cache_partners()
 
         return {
             'partners': partners
         }
-
 
 
 class SecurityView(TemplateView):

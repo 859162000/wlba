@@ -168,7 +168,7 @@
         $('#small-zc').show();
       }else{
         $('#seven-success').hide();
-        window.location.href="/";
+        window.location.href="/accounts/home/";
       }
     })
 

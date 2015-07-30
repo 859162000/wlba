@@ -24,6 +24,10 @@ urlpatterns = patterns(
     url(r'^july_act/$', TemplateView.as_view(template_name="july_act.jade")),
     url(r'^act_invite/$', TemplateView.as_view(template_name="act_invite.jade")),
     url(r'^ganjiwang/$', TemplateView.as_view(template_name="ganjiwang.jade")),
+    url(r'^baidu/$', TemplateView.as_view(template_name="baidu.jade")),
+    url(r'^xunlei_august/$', TemplateView.as_view(template_name="xunlei-august.jade")),
+    url(r'^singapore/$', TemplateView.as_view(template_name="singapore.jade")),
+
 )
 
 # app URL
@@ -37,6 +41,7 @@ urlpatterns += patterns(
     url(r'^app_gold/$', TemplateView.as_view(template_name="app_gold.jade")),
     url(r'^app_july_act/$', TemplateView.as_view(template_name="app_july_act.jade")),
     url(r'^app_extension/$', TemplateView.as_view(template_name="app_extension.jade")),
+    # url(r'^app_ele/$', TemplateView.as_view(template_name="app_ele.jade")),
 )
 
 urlpatterns += patterns(

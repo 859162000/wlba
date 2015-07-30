@@ -1,0 +1,196 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+head
+  - with '网利宝' as title
+  include include/common_head
+  - endwith
+  link(href="{{host}}/static/stylesheets/activity.css", media="screen, projection", rel="stylesheet", type="text/css")
+  link(href="{{host}}/static/stylesheets/singapore.css?v=20150728", media="screen, projection", rel="stylesheet", type="text/css")
+body(style="background: #ffffff;")
+  .full-container-white.fudong
+      .container-navigation
+        .row
+          .span2
+            a(href='/')
+              .logo.logo1
+          .span10
+            .nav-items.xiao-nav.nav-singapore
+              ul
+                mixin nav-item(name, link, new_class, free)
+                  if activeItem == name
+                    li.nav-item.active
+                      a.nav-item-anchor(href=link, class=new_class)= name
+                      if free == 'yes'
+                        span.icon.icon-free 免费
+                  else
+                    li.nav-item
+                      a.nav-item-anchor(href=link, class=new_class)= name
+                      if free == 'yes'
+                        span.icon.icon-free 免费
+
+                +nav-item('首页', '/', '', '')
+                +nav-item('理财专区', '/p2p/list/', '', '')
+                +nav-item('自动投标', '/accounts/auto_tender/ ', '', '')
+
+                +nav-item('安全保障', '/security', 'left-line', '')
+                +nav-item('帮助中心', '/help', '', '')
+
+                if user.is_authenticated
+                  +nav-item('我的账户', '/accounts/home', 'button button-red button-account-nav')
+                else
+                  +nav-item('我的账户', '/accounts/home', 'button button-red button-account-nav nologin button-sing')
+  .singapore-banner
+  .singapore-content
+    .singapore-activitytop
+      .activitytop-left
+        h2 新加坡“慧眼中国环球论坛2015”
+        .line
+        p 新加坡“慧眼中国环球论坛2015”年会于2015年7月20日在新加坡香格里拉大酒店举行。全国政协副主席、前香港特首董建华担任了今年论坛开幕式主题演讲嘉宾，新加坡总理李显龙担任闭幕式主题演讲嘉宾。网利宝CEO赵润龙作为中国互联网金融行业唯一代表受邀参加演讲。
+      .activitytop-right
+    .singapore-activity
+      .activity-activity
+        h3 “慧眼中国环球论坛”是什么样的会议？
+        .line
+        p “慧眼中国环球论坛”是全球仅有探讨中国课题的高端中立双语高峰论坛，至今已是第六届。是加强中新两国联系，搭建衔接中国与世界各地文化和经济的桥梁，也是东南亚了解中国的窗口。“慧眼中国环球论坛2015”年会的主题为，中国深化改革：新常态中的命运共同体。
+    .singapore-activitymiddle
+      h4 论坛重量级嘉宾：
+      .line
+      .activitymiddle_middle(style="margin:0")
+        dl(style="margin:0")
+          dt.middle-to.middle-to1
+          dd
+            h3 李显龙
+            p 新加坡总理
+        dl
+          dt.middle-to.middle-to2
+          dd
+            h3 董建华
+            p 全国政协副主席，前香港特首
+        dl
+          dt.middle-to.middle-to3
+          dd
+            h3 林毅夫
+            p 北京大学国家发展研究院名誉院长、前世界银行首席经济学家兼副行长
+        dl
+          dt.middle-to.middle-to4
+          dd
+            h3 杨荣文
+            p 嘉里物流主席兼执行董事、新加坡前外交部长
+      .activitymiddle_middle
+        dl(style="margin:0;")
+          dt.middle-to.middle-to5
+          dd
+            h3 朱云来
+            p 前中金公司管委会主席、总裁和首席执行官、著名金融人士
+        dl
+          dt.middle-to.middle-to6
+          dd
+            h3 黄育川
+            p 美国卡内基国际和平研究院亚洲项目高级研究员、前世界银行中国局局长、前世界银行亚洲地区首席经济学家
+        dl
+          dt.middle-to.middle-to7
+          dd
+            h3 冯慧兰
+            p 印度尼西亚大学国际经济学教授、印尼前贸易部长、前国际货币基金组织和世界银行经济顾问
+
+    .singapore-activity
+      .activity-activity
+        h3 网利宝CEO赵润龙在论坛上发表演讲
+        .line
+        p 经过三十多年经济的快速增长，中国的经济形态正从投资和出口驱动型，转型成为以科技发展为基础的消费驱动型。如何在这样的经济“新常态”下更好地适应和发展，如何面对“新常态”下所带来的诸多机遇和挑战，成为了很多人关心的话题。年会开幕当天，赵润龙作为国内唯一受邀的互联网金融领域创业者，就中新两国创业氛围和中国“全民创业热”等问题，与到会的李显龙、董建华和林毅夫等行业专家做出了深入交流。
+    .activity-zhong
+      h3 中新两国创业氛围有何不同，中新两国企业家可以从彼此身上学习到哪些优势？
+      p
+       |李显龙对赵润龙说：
+       |“新加坡开展创业已有一段时间，政府重点扶植了一批小企业，政府不做过多干涉，同时尽量帮助企业解决困难。中国创业环境很好、市场很大、人才很多，我们是小巫见大巫。希望能从中国引进更多人才，带动新加坡经济发展。”
+    .activity-tut
+      dl
+        dt.middle-tut
+        dd
+          p 赵润龙在现场提问
+      dl
+        dt.middle-tut.middle-tut1
+        dd
+          p 李显龙对赵润龙提出的问题进行解答
+    .activity-zhong(style="clear: both")
+      h3 国家对特定行业的调控是否会对企业发展造成的一定的影响？
+      p 赵润龙就“我国对特定行业，如互联网、互联网金融等新兴领域的调控是否会对新生事物的发展及创新速度产生影响”这个问题，与董建华进行了深入探讨。董建华认为，新一代的企业家大多拥有较高的学历、良好的背景和广阔的视野，他们最大的优势还在于可以利用互联网来拓展信息途径。但董建华也表示，互联网这个平台是一把双刃剑，如果只是加以利用而没有政府对这个平台，以及基于这个平台所产生的新兴行业进行有序管理和调控的话，那么也许就会因为缺乏监管而产生一些负面作用，对行业本身的以及社会秩序造成影响。“所以政府必要的监管有助于企业间进行有序竞争。企业家更要对政府有信心，中国的发展空间很大，”他还说：“如果我现在只有25岁，我一定在中国创业。”
+    .activity-tut1
+      dl
+        dt.middle-tu12
+        dd
+          p 赵润龙与董建华探讨交流
+    .activity-zhong
+      h3 当前经济形势下，“创业浪潮”对中国经济增长有哪些促进作用？
+      p 对于赵润龙提出的“创业浪潮对中国经济增长的促进”这一话题，林毅夫结合2008年全球经济危机阐述了自己的看法。他认为，一个国家的经济发展主要靠出口、投资、消费来拉动。而高速发展的创新企业、优秀的创业者正是推动这三个指标增长、促进经济发展的内核，是不可或缺的重要因素。他说：“在经济全球化的今天，互联网为中国各方面带来了难得的发展机遇，抓住这次机遇，才能更好的推动中国与世界的融合。”
+      p
+        |在当前中国经济的态势下，很多传统行业都进入了所谓的发展“瓶颈期”：经济增速放缓、产业转型升级困难。与此同时，国内的互联网行业却显现出了另一派不同的景象。在“互联网+”、“创业带动就业”的新思维下，中国已经掀起了产业、企业与互联网融合的浪潮。在这样的时代背景下，“互联网金融”这一新兴领域更是掀起了一股创业浪潮。在此次的年会上，赵润龙发表了主题为“中国创业浪潮：新一代的公司正如何重塑商业景观”的演讲，就现阶段的“创业热”阐述了他自己的理解和看法：在瞬息万变的市场环境下，企业经营者该做到哪些变与不变？　　
+    .activity-tut1
+      dl
+        dt.middle-tu12.middle-tu14
+        dd
+          p 赵润龙与林毅夫在现场探讨交流
+
+    .activity-zhong
+      h3 不变的是什么？
+      p 赵润龙认为，不变的是互联网精神，这种精神尤其要渗入每个企业经营者的大脑最深处。中国已经进入DT时代，随着“互联网+”的概念被李克强总理提出、顶层设计的出炉，中国已经掀起了产业、企业与互联网融合的浪潮。所以在互联网时代，所有创业者、企业家都不能抛开互联网精神谈发展。
+    .activity-tut1
+      dl
+        dt.middle-tu12.middle-tu15
+        dd
+          p 赵润龙在论坛上发表演讲
+
+    .activity-zhong
+      h3 变的是什么？
+      p 赵润龙说：“一、要在互联网时代保持足够的警觉，经济全球化是大势所趋，中国正在加速与世界融合，企业必须积极拥抱分享、开放与合作；二、互联网的属性要求企业小步快跑，唯快不破，企业必须快速反应用户需求并在第一时间提升自身产品及服务质量。
+    .activity-tut1
+      dl
+        dt.middle-tu12.middle-tu13
+        dd
+          p 赵润龙（右一）在论坛上发言
+    .singapore-activity
+      .activity-activity
+        h3 结束总结
+        .line
+        p 作为中国互联网金融行业唯一受邀的参会代表，赵润龙在“2015慧眼中国环球论坛”与李显龙、董建华、朱云来、林毅夫等世界级政商界精英同台交锋，收获颇丰。他说：“通过与前辈的交流，我更加感受到中国正处于经济变革的重要转折点，中国已经迎来空前的发展机遇、创业机遇，这是任何一个国外市场都无法超越、并与之相媲美的！网利宝能在这样的历史机遇中诞生，是非常幸运的！”
+    .singapore-activity
+      .activity-activity
+        h3 现场风采
+        .line
+    .activity-tut(style="margin-top: 20px")
+      dl(style="height:452px")
+        dt.middle-tut.middle-tut2
+        dd
+          p(style="text-align:left") &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;对赵润龙的创业经历、网利宝的业务模式，弘毅投资董事长、
+          p(style="text-align:left") &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总裁赵令欢也给予了高度的评价。
+      dl
+        dt.middle-tut.middle-tut3
+        dd
+          p 赵润龙与朱云来在现场探讨交流
+    .activity-tut(style="clear: both")
+      dl
+        dt.middle-tut.middle-tut4
+        dd
+          p 赵润龙与黄育川在现场探讨问题
+      dl
+        dt.middle-tut.middle-tut5
+        dd
+          p 赵润龙与董建华现场交流并合影
+    .activity-tut(style="clear: both")
+      dl
+        dt.middle-tut.middle-tut17
+        dd
+          p 赵润龙与中国驻新加坡特命全权大使陈晓东探讨交流
+      dl
+        dt.middle-tut.middle-tut18
+        dd
+          p 赵润龙在论坛现场发言
+
+
+
+
+
+  .bottom-singapore(style="clear: both; background-color: #f7f7f7;")
+    include include/activityFooterTwo.jade

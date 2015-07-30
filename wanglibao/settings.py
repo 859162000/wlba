@@ -134,6 +134,7 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'concurrency.middleware.ConcurrencyMiddleware',
     'reversion.middleware.RevisionMiddleware',
@@ -144,6 +145,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'marketing.middlewares.PromotionTokenMiddleWare',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
 CONCURRENCY_POLICY = 2
@@ -226,6 +228,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.i18n",
     "django.core.context_processors.media",
     "django.core.context_processors.request",
+    "wanglibao.helpers.global_set",
 )
 
 # Static files (CSS, JavaScript, Images)
@@ -301,7 +304,7 @@ DEFAULT_FROM_EMAIL = 'noreply@wanglibao.com'
 
 # 新的漫道请求设置
 SMS_MANDAO_URL = 'http://sdk.entinfo.cn:8061/webservice.asmx/mdsmssend'
-SMS_MANDAO_MULTICAST_URL = 'http://sdk.entinfo.cn:8061/webservice.asmx/mdsmssend'
+SMS_MANDAO_MULTICAST_URL = 'http://sdk2.entinfo.cn:8061/webservice.asmx/mdgxsend'
 SMS_MANDAO_SN = 'SDK-SKY-010-02839'
 SMS_MANDAO_MD5_PWD = '1FE15236BBEB705A8F5D221F47164693'
 
@@ -490,6 +493,7 @@ ID_VERIFY_PASSWORD = 'wljr888'
 
 if ENV == ENV_PRODUCTION:
     CALLBACK_HOST = 'https://www.wanglibao.com'
+    STATIC_FILE_HOST = 'https://img.wanglibao.com'
     MER_ID = '872724'
     CUSTOM_ID = '000007522683'
     SIGN_HOST = '10.171.17.243'
@@ -536,6 +540,7 @@ if ENV == ENV_PRODUCTION:
     YTX_APPID = "8a48b55149896cfd0149adab1d9a1a93"
 elif ENV == ENV_PREPRODUCTION:
     CALLBACK_HOST = 'https://pre.wanglibao.com'
+    STATIC_FILE_HOST = 'https://img.wanglibao.com'
     MER_ID = '872724'
     CUSTOM_ID = '000007522683'
     #SIGN_HOST = 'www.wanglibao.com'
@@ -582,6 +587,7 @@ elif ENV == ENV_PREPRODUCTION:
     YTX_APPID = "8a48b55149896cfd0149adab1d9a1a93"
 else:
     CALLBACK_HOST = 'https://staging.wanglibao.com'
+    STATIC_FILE_HOST = 'https://staging.wanglibao.com'
     MER_ID = '510743'
     CUSTOM_ID = '000010124821'
     SIGN_HOST = '127.0.0.1'
@@ -645,6 +651,7 @@ YTX_BACK_RETURN_URL = CALLBACK_HOST + "/api/ytx/voice_back/"
 ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
 if ENV == ENV_DEV:
     ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
+    STATIC_FILE_HOST = 'http://localhost:8000'
 
 PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
 PROMO_TOKEN_QUERY_STRING = 'promo_token'
@@ -749,6 +756,48 @@ else:
 WLB_FOR_DOUWANWANG_KEY = '1992'
 DOUWANWANG_CALL_BACK_URL = 'http://mall.366dw.com/interface/reflection'
 
+#西财
+XICAI_TOKEN_URL = 'http://api.csai.cn/oauth2/access_token2'
+XICAI_CREATE_P2P_URL = 'http://api.csai.cn/api/create_p2p'
+XICAI_UPDATE_P2P_URL = 'http://api.csai.cn/api/update_p2p'
+XICAI_CLIENT_ID = '48e37e2cf4124c2c9f5bde3cc88d011c'
+XICAI_CLIENT_SECRET = '2e3dd17e800d48bca50e61b19f8fc11d'
+XICAI_LOAD_PAGE = 'https://www.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
+XICAI_UPDATE_TIMEDELTA = timedelta(hours=1)
+if ENV == ENV_PRODUCTION:
+    XICAI_LOAD_PAGE = 'https://www.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
+else:
+    XICAI_LOAD_PAGE = 'https://staging.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
+
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100
 }
+
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = 6379
+REDIS_DB = 0
+
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'redis_cache.RedisCache',
+#         'LOCATION': [
+#             '127.0.0.1:6379',
+#         ],
+#         'OPTIONS': {
+#             'DB': 0,
+#             'PASSWORD': '',
+#             'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
+#             'PARSER_CLASS': 'redis.connection.HiredisParser',
+#             'CONNECTION_POOL_CLASS': 'redis.BlockingConnectionPool',
+#             'CONNECTION_POOL_CLASS_KWARGS': {
+#                 'max_connections': 50,
+#                 'timeout': 20,
+#             },
+#             'MAX_CONNECTIONS': 1000,
+#             'PICKLE_VERSION': -1,
+#         }
+#     }
+# }
+# REDIS_TIMEOUT = 7*24*60*60
+# CUBES_REDIS_TIMEOUT = 60*60
+# NEVER_REDIS_TIMEOUT = 365*24*60*60

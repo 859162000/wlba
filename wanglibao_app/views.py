@@ -100,7 +100,7 @@ class AppRepaymentAPIView(APIView):
                         income_num += equity.pre_paid_interest
                         income_num += equity.activity_interest
 
-                return Response({'ret_code': 0, 'message': 'ok', 'amount': amount, 'income_num': income_num})
+                return Response({'ret_code': 0, 'message': 'ok', 'amount': float(amount), 'income_num': float(income_num)})
 
             else:
                 # 未登陆用户 查询当月还款金额和当月还款项目
@@ -110,7 +110,7 @@ class AppRepaymentAPIView(APIView):
                 ams = ProductAmortization.objects.filter(settlement_time__range=(start_utc, timezone.now()), settled=True)
                 for x in ams:
                     amount += x.principal + x.interest + x.penal_interest
-                return Response({'ret_code': 0, 'message': 'ok', 'amount': amount, 'income_num': len(ams)})
+                return Response({'ret_code': 0, 'message': 'ok', 'amount': float(amount), 'income_num': len(ams)})
         except Exception, e:
             logging.error(e.message)
             return Response({'ret_code': 20001, 'message': 'fail'})
