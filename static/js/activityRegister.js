@@ -96,10 +96,9 @@
                     $('.voice-validate').attr('disabled', 'disabled');
                     $('#aug-code,#aug-center').hide();
                 }).fail(function(xhr) {
-                    var result;
                     clearInterval(intervalId);
                     $(element).text('重新获取').removeAttr('disabled');
-                    result = JSON.parse(xhr.responseText);
+                    var result = JSON.parse(xhr.responseText);
                     if (result.type === 'captcha') {
                         return $("#submit-code-img1").parent().parent().find('.code-img-error').html(result.message);
                     } else {
@@ -180,8 +179,7 @@
                                     return location.reload();
                                 }
                             }).fail(function (xhr) {
-                                var result;
-                                result = JSON.parse(xhr.responseText);
+                                var result = JSON.parse(xhr.responseText);
                                 $('#aug-form-row-eroor').text('* ' + result.message.validate_code)
                             });
                         }else{
@@ -233,8 +231,7 @@
             })
         },
         checkMobile : function(identifier) {  //验证手机号
-          var re;
-          re = /^1\d{10}$/;
+          var re = /^1\d{10}$/;
           return re.test(identifier);
         },
         captchaRefresh : function(){   //刷新图片验证码
