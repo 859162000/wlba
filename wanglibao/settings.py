@@ -397,6 +397,10 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG',
         },
+        'wanglibao_app': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        },
     }
 
 }
@@ -482,6 +486,11 @@ CELERYBEAT_SCHEDULE = {
     #     'task': 'wanglibao_account.tasks.post_product_half_hour',
     #     'schedule': timedelta(minutes=30)
     # }
+
+    'xicai_send_data': {
+        'task': 'wanglibao_account.tasks.xicai_send_data_task',
+        'schedule': timedelta(hours=1),
+    }
 }
 
 CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
@@ -754,6 +763,49 @@ else:
 WLB_FOR_DOUWANWANG_KEY = '1992'
 DOUWANWANG_CALL_BACK_URL = 'http://mall.366dw.com/interface/reflection'
 
+#西财
+XICAI_TOKEN_URL = 'http://api.csai.cn/oauth2/access_token2'
+XICAI_CREATE_P2P_URL = 'http://api.csai.cn/api/create_p2p'
+XICAI_UPDATE_P2P_URL = 'http://api.csai.cn/api/update_p2p'
+XICAI_CLIENT_ID = '48e37e2cf4124c2c9f5bde3cc88d011c'
+XICAI_CLIENT_SECRET = '2e3dd17e800d48bca50e61b19f8fc11d'
+XICAI_LOAD_PAGE = 'https://www.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
+WLB_FOR_XICAI_KEY = '1993'
+XICAI_UPDATE_TIMEDELTA = timedelta(hours=1)
+if ENV == ENV_PRODUCTION:
+    XICAI_LOAD_PAGE = 'https://www.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
+else:
+    XICAI_LOAD_PAGE = 'https://staging.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
+
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100
 }
+
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = 6379
+REDIS_DB = 0
+
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'redis_cache.RedisCache',
+#         'LOCATION': [
+#             '127.0.0.1:6379',
+#         ],
+#         'OPTIONS': {
+#             'DB': 0,
+#             'PASSWORD': '',
+#             'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
+#             'PARSER_CLASS': 'redis.connection.HiredisParser',
+#             'CONNECTION_POOL_CLASS': 'redis.BlockingConnectionPool',
+#             'CONNECTION_POOL_CLASS_KWARGS': {
+#                 'max_connections': 50,
+#                 'timeout': 20,
+#             },
+#             'MAX_CONNECTIONS': 1000,
+#             'PICKLE_VERSION': -1,
+#         }
+#     }
+# }
+# REDIS_TIMEOUT = 7*24*60*60
+# CUBES_REDIS_TIMEOUT = 60*60
+# NEVER_REDIS_TIMEOUT = 365*24*60*60
