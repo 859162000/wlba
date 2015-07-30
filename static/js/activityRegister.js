@@ -59,6 +59,7 @@
         //图片验证码
         imgCodeFun : function(){
             $('#img-code').click(function() {
+                $('#aug-center').find('#id_captcha_1').val('');
                 activityRegister.imgCodeRe();
                 var phoneNumber;
                 phoneNumber = $.trim($("#reg_identifier").val());
@@ -67,7 +68,7 @@
                         console.log("Phone number checked, now send the valdiation code");
                     }
                     $('#aug-code,#aug-center').show();
-                    return $('#aug-code').find('#id_captcha_1').val('');
+                    return $('#aug-center').find('#id_captcha_1').val('');
                 }else{
                     $('#aug-form-row-eroor').text('* 请输入正确的手机号')
                 }
