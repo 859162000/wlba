@@ -1,21 +1,16 @@
-/**
- * activity register by qijinjin
- */
 (function() {
   require.config({
     paths: {
       jquery: 'lib/jquery.min',
-      'jquery.modal': 'lib/jquery.modal.min',
       'jquery.placeholder': 'lib/jquery.placeholder',
       tools: 'lib/modal.tools'
     },
     shim: {
-      'jquery.modal': ['jquery'],
       'jquery.placeholder': ['jquery']
     }
   });
 
-  define(['jquery', 'lib/modal', 'lib/backend',  "tools", 'jquery.placeholder'], function($, modal, backend, tool, placeholder) {
+  define(['jquery', "tools", 'jquery.placeholder'], function($, tool, placeholder) {
     var container, csrfSafeMethod, getCookie, sameOrigin, _showModal;
     var activityRegister ={}
     jQuery.extend(activityRegister, {
@@ -60,17 +55,11 @@
                     }
                 }
             });
-            //end cookie
         },
         //图片验证码
         imgCodeFun : function(){
             $('#img-code').click(function() {
-                //刷新验证码
-                url2 = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
-                $.getJSON(url2, {}, function(json) {
-                  $('#img-code-form').find('input[name="captcha_0"]').val(json.key);
-                  $('#img-code-form').find('img.captcha').attr('src', json.image_url);
-                });
+                activityRegister.imgCodeRe();
                 var phoneNumber;
                 phoneNumber = $.trim($("#reg_identifier").val());
                 if (activityRegister.checkMobile(phoneNumber)) {
@@ -83,8 +72,7 @@
                     $('#aug-form-row-eroor').text('* 请输入正确的手机号')
                 }
             });
-            //关闭验证码弹框
-            $('#off-form').on('click',function(){
+            $('#off-form').on('click',function(){   //关闭验证码弹框
               $('#aug-code,#aug-center').hide();
             })
         },
@@ -144,28 +132,37 @@
                 return intervalId = setInterval(timerFunction, 1000);
             });
         },
+        //刷新验证码
+        imgCodeRe : function(){
+            url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
+            $.getJSON(url, {}, function(json) {
+              $('#img-code-form').find('input[name="captcha_0"]').val(json.key);
+              $('#img-code-form').find('img.captcha').attr('src', json.image_url);
+            });
+        },
         //提交表单
         registerSubmitFun : function(){
             $('#register_submit').on('click',function(){
                 if ($(this).hasClass("disabled")) {
                     return
                 }else{
+                    var errorLabel = $('#aug-form-row-eroor');
                     if ($('#reg_identifier').val()==''){
-                        $('#aug-form-row-eroor').text('* 请输入手机号')
+                        errorLabel.text('* 请输入手机号')
                     }else if (!activityRegister.checkMobile($('#reg_identifier').val())){
-                        $('#aug-form-row-eroor').text('* 请输入正确的手机号')
+                        errorLabel.text('* 请输入正确的手机号')
                     }else if ($('#id_validate_code').val()==''){
-                        $('#aug-form-row-eroor').text('* 请输入验证码')
+                        errorLabel.text('* 请输入验证码')
                     }else if ($('#reg_password').val()==''){
-                        $('#aug-form-row-eroor').text('* 请输入密码')
+                        errorLabel.text('* 请输入密码')
                     }else if ($('#reg_password').val().length<6){
-                        $('#aug-form-row-eroor').text('* 密码需要最少6位')
+                        errorLabel.text('* 密码需要最少6位')
                     }else if ($('#reg_password').val().length>20){
-                        $('#aug-form-row-eroor').text('* 密码不能超过20位')
+                        errorLabel.text('* 密码不能超过20位')
                     }else if ($('#reg_password2').val()==''){
-                        $('#aug-form-row-eroor').text('* 请再次输入密码')
+                        errorLabel.text('* 请再次输入密码')
                     }else if ($('#reg_password').val()!=$('#reg_password2').val()){
-                        $('#aug-form-row-eroor').text('* 密码不一致')
+                        errorLabel.text('* 密码不一致')
                     }else{
                         if($("#agreement").is(':checked')) {
                             var phoneNumber, pw, code;
@@ -183,10 +180,9 @@
                                     return location.reload();
                                 }
                             }).fail(function (xhr) {
-                                var message, result;
+                                var result;
                                 result = JSON.parse(xhr.responseText);
-                                message = result.message;
-                                $('#aug-form-row-eroor').text('* ' + message.validate_code)
+                                $('#aug-form-row-eroor').text('* ' + result.message.validate_code)
                             });
                         }else{
                            return tool.modalAlert({
@@ -201,23 +197,24 @@
         },
         //input验证
         inputValidateFun : function(){
+            var errorLabel = $('#aug-form-row-eroor');
             $('#reg_identifier,#id_validate_code').on('keyup',function(){
-              $('#aug-form-row-eroor').text('')
+              errorLabel.text('')
             })
             $('#reg_password').on('keyup',function(){
               if ($('#reg_password').val().length<6){
-                $('#aug-form-row-eroor').text('* 密码需要最少6位')
+                errorLabel.text('* 密码需要最少6位')
               }else if ($('#reg_password').val().length>20){
-                $('#aug-form-row-eroor').text('* 密码不能超过20位')
+                errorLabel.text('* 密码不能超过20位')
               }else{
-                $('#aug-form-row-eroor').text('')
+                errorLabel.text('')
               }
             })
             $('#reg_password2').on('keyup',function(){
               if ($('#reg_password').val()!=$('#reg_password2').val()){
-                $('#aug-form-row-eroor').text('* 密码不一致')
+                errorLabel.text('* 密码不一致')
               }else{
-                $('#aug-form-row-eroor').text('')
+                errorLabel.text('')
               }
             })
             $('input, textarea').placeholder();
@@ -235,22 +232,14 @@
                 $(this).attr('placeholder', zhi)
             })
         },
-        //验证手机号
-        checkMobile : function(identifier) {
+        checkMobile : function(identifier) {  //验证手机号
           var re;
           re = /^1\d{10}$/;
           return re.test(identifier);
         },
-        //刷新图片验证码
-        captchaRefresh : function(){
+        captchaRefresh : function(){   //刷新图片验证码
             $('.captcha-refresh').click(function() {
-              var $form, url;
-              $form = $(this).parents('form');
-              url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
-              return $.getJSON(url, {}, function(json) {
-                $form.find('input[name="captcha_0"]').val(json.key);
-                return $form.find('img.captcha').attr('src', json.image_url);
-              });
+              activityRegister.imgCodeRe();
             });
         },
         //语音验证码
@@ -270,11 +259,11 @@
                 element = $('.voice .span12-omega');
                 url = $(this).attr('href');
                 return $.ajax({
-                url: url,
-                type: "POST",
-                data: {
-                    phone: $("#reg_identifier").val().trim()
-                }
+                    url: url,
+                    type: "POST",
+                    data: {
+                        phone: $("#reg_identifier").val().trim()
+                    }
                 }).success(function(json) {
                     var button, count, intervalId, timerFunction;
                     if (json.ret_code === 0) {
@@ -305,8 +294,7 @@
                 });
             });
         },
-        //初始化
-        setup : function(options){
+        setup : function(options){  //初始化
             this.registerTitle = options.registerTitle;
             this.isNOShow = options.isNOShow;
             this.hasCallBack = options.hasCallBack;
@@ -328,7 +316,6 @@
             activityRegister.setup(options);
         }
     })
-
       return {
         activityRegister : activityRegister
       }
