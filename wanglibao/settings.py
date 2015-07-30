@@ -484,6 +484,11 @@ CELERYBEAT_SCHEDULE = {
     #     'task': 'wanglibao_account.tasks.post_product_half_hour',
     #     'schedule': timedelta(minutes=30)
     # }
+
+    '': {
+        'task': 'wanglibao_account.tasks.xicai_send_data_task',
+        'schedule': timedelta(hours=1),
+    }
 }
 
 CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
@@ -763,6 +768,7 @@ XICAI_UPDATE_P2P_URL = 'http://api.csai.cn/api/update_p2p'
 XICAI_CLIENT_ID = '48e37e2cf4124c2c9f5bde3cc88d011c'
 XICAI_CLIENT_SECRET = '2e3dd17e800d48bca50e61b19f8fc11d'
 XICAI_LOAD_PAGE = 'https://www.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
+WLB_FOR_XICAI_KEY = '1993'
 XICAI_UPDATE_TIMEDELTA = timedelta(hours=1)
 if ENV == ENV_PRODUCTION:
     XICAI_LOAD_PAGE = 'https://www.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
