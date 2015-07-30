@@ -198,21 +198,8 @@ class AppRecommendViewSet(PaginatedModelViewSet):
         qs = super(AppRecommendViewSet, self).get_queryset()
 
         misc = MiscRecommendProduction()
-        ids = misc.get_recommend_products()
-        if ids:
-            for id in ids:
-                recommend = qs.filter(hide=False, status=u'正在招标', id=id)
-                if recommend:
-                    return recommend
-        # 自定义查询标
-        productions = qs.filter(hide=False, status=u'正在招标').exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标'))
-        if productions:
-            id_rate = [{'id': q.id, 'rate': q.completion_rate} for q in productions]
-            id_rate = sorted(id_rate, key=lambda x: x['rate'], reverse=True)
-            return qs.filter(id=id_rate[0]['id'])
-
-        else:
-            return qs.filter(hide=False).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time')
+        product_id = misc.get_recommend_product_id()
+        return qs.filter(id=product_id)
 
 
 class RecommendProductManagerView(TemplateView):
