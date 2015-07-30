@@ -349,6 +349,6 @@ class redis_backend(object):
             return None
         arr = pickle.loads(res)
         for x in arr[::-1]:
-            if not x.start <= timezone.now() <= x.end:
+            if not x['start_at'] <= timezone.now() <= x['end_at']:
                 arr.remove(x)
         return arr
