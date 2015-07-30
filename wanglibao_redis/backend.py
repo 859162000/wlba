@@ -330,3 +330,25 @@ class redis_backend(object):
         #            break
 
         return True
+
+    def get_announcement(self):
+        res = self._get('announcement')
+        if not res:
+            return None
+        return pickle.loads(res)
+
+    def get_news(self):
+        res = self._get('announcement_news')
+        if not res:
+            return None
+        return pickle.loads(res)
+
+    def get_banners(self):
+        res = self._get('banners')
+        if not res:
+            return None
+        arr = pickle.loads(res)
+        for x in arr[::-1]:
+            if not x['start_at'] <= timezone.now() <= x['end_at']:
+                arr.remove(x)
+        return arr

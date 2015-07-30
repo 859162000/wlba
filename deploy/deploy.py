@@ -99,6 +99,7 @@ def deploy_web_action():
         with cd(env.deploy_path):
             print yellow('Replacing wanglibao/settings.py ENV')
             run("fab config:'wanglibao/settings.py','ENV \= ENV_DEV','ENV \= %s'" % env.environment)
+            run("""fab config:'wanglibao/settings.py',"REDIS_HOST \= '127.0.0.1'",'REDIS_HOST \= "10.171.17.243"' """)
             json_env = json.dumps({"BROKER_URL":"amqp://wanglibao:wanglibank@10.171.17.243/wanglibao"})
             put(StringIO(json_env), 'env.json')
             #如果为web01
@@ -192,6 +193,7 @@ def deploy_mq_action():
         with cd(env.deploy_path):
             print yellow('Replacing wanglibao/settings.py ENV')
             run("fab config:'wanglibao/settings.py','ENV \= ENV_DEV','ENV \= %s'" % env.environment)
+            run("""fab config:'wanglibao/settings.py',"REDIS_HOST \= '127.0.0.1'",'REDIS_HOST \= "10.171.17.243"' """)
             json_env = json.dumps({"BROKER_URL":"amqp://wanglibao:wanglibank@10.171.17.243/wanglibao"})
             put(StringIO(json_env), 'env.json')
     print yellow("restart mq server")
@@ -264,6 +266,7 @@ def deploy_webback():
             print yellow('Replacing wanglibao/settings.py ENV')
             run("fab config:'wanglibao/settings.py','ENV \= ENV_DEV','ENV \= %s'" % env.environment)
             run("""fab config:'wanglibao/settings.py',"SIGN_HOST \= '10.171.17.243'","SIGN_HOST \= '182.92.104.171'" """)
+            run("""fab config:'wanglibao/settings.py',"REDIS_HOST \= '127.0.0.1'",'REDIS_HOST \= "10.171.17.243"' """)
             json_env = json.dumps({"BROKER_URL":"amqp://wanglibao:wanglibank@182.92.104.171/wanglibao"})
             put(StringIO(json_env), 'env.json')
     print yellow("restart webback server")

@@ -134,7 +134,6 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'concurrency.middleware.ConcurrencyMiddleware',
     'reversion.middleware.RevisionMiddleware',
@@ -145,7 +144,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'marketing.middlewares.PromotionTokenMiddleWare',
-    'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
 CONCURRENCY_POLICY = 2
@@ -396,6 +394,10 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'wanglibao_account': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        },
+        'wanglibao_app': {
             'handlers': ['file'],
             'level': 'DEBUG',
         },

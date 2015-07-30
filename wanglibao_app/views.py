@@ -31,7 +31,7 @@ from wanglibao_rest.utils import split_ua, get_client_ip
 from wanglibao_banner.models import Banner
 from wanglibao_sms.utils import send_validation_code
 
-
+logger = logging.getLogger(__name__)
 
 class AppActivateImageAPIView(APIView):
     """ app端查询启动活动图片 """
@@ -112,7 +112,7 @@ class AppRepaymentAPIView(APIView):
                     amount += x.principal + x.interest + x.penal_interest
                 return Response({'ret_code': 0, 'message': 'ok', 'amount': float(amount), 'income_num': len(ams)})
         except Exception, e:
-            logging.error(e.message)
+            logger.error(e.message)
             return Response({'ret_code': 20001, 'message': 'fail'})
 
 
