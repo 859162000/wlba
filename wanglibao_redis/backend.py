@@ -16,27 +16,59 @@ import json
 class redis_backend(object):
 
     def __init__(self, host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB):
-        self.pool = redis.ConnectionPool(host=host, port=port, db=db)
-        self.redis = redis.Redis(connection_pool=self.pool)
+        try:
+            self.pool = redis.ConnectionPool(host=host, port=port, db=db)
+            self.redis = redis.Redis(connection_pool=self.pool)
+            self.redis.set("test","test")
+        except:
+            self.pool = None
+            self.redis = None
+
+    def _exists(self, name):
+        if self.redis:
+            return self.redis.exists(name)
+        return False
+
+    def _set(self, key, value):
+        if self.redis:
+            self.redis.set(key, value)
+
+    def _get(self, key):
+        if self.redis:
+            return self.redis.get(key)
+        return None
+
+    def _lpush(self, key, value):
+        if self.redis:
+            self.redis.lpush(key, value)
+
+    def _delete(self, key):
+        if self.redis:
+            self.redis.delete(key)
 
     def get_cache_partners(self):
 
-        if self.redis.exists('partners'):
-            partners = pickle.loads(self.redis.get('partners'))
+        #if self.redis.exists('partners'):
+            #partners = pickle.loads(self.redis.get('partners'))
+        if self._exists('partners'):
+            partners = pickle.loads(self._get('partners'))
         else:
             partners_data = Partner.objects.filter(type='partner')
             partners = [
                 {'name': partner.name, 'link': partner.link, 'image': partner.image}
                 for partner in partners_data
             ]
-            self.redis.set('partners', pickle.dumps(partners))
+            #self.redis.set('partners', pickle.dumps(partners))
+            self._set('partners', pickle.dumps(partners))
 
         return partners
 
     def get_cache_p2p_detail(self, product_id):
 
-        if self.redis.exists('p2p_detail_{0}'.format(product_id)):
-            p2p_results = pickle.loads(self.redis.get('p2p_detail_{0}'.format(product_id)))
+        #if self.redis.exists('p2p_detail_{0}'.format(product_id)):
+        #    p2p_results = pickle.loads(self.redis.get('p2p_detail_{0}'.format(product_id)))
+        if self._exists('p2p_detail_{0}'.format(product_id)):
+            p2p_results = pickle.loads(self._get('p2p_detail_{0}'.format(product_id)))
             return p2p_results
         else:
             try:
@@ -125,7 +157,8 @@ class redis_backend(object):
                 }
 
                 if p2p.status != u'正在招标':
-                    self.redis.set('p2p_detail_{0}'.format(product_id), pickle.dumps(p2p_results))
+                    #self.redis.set('p2p_detail_{0}'.format(product_id), pickle.dumps(p2p_results))
+                    self._set('p2p_detail_{0}'.format(product_id), pickle.dumps(p2p_results))
 
             except P2PProduct.DoesNotExist:
                 raise Http404(u'您查找的产品不存在')
@@ -181,13 +214,16 @@ class redis_backend(object):
             }
             if p2p.status == u'还款中':
                 # 将还款中的标写入redis
-                self.redis.lpush('p2p_products_repayment', pickle.dumps(p2p_dict))
+                #self.redis.lpush('p2p_products_repayment', pickle.dumps(p2p_dict))
+                self._lpush('p2p_products_repayment', pickle.dumps(p2p_dict))
             elif p2p.status == u'已完成':
                 # 将已完成的标写入redis
-                self.redis.lpush('p2p_products_finished', pickle.dumps(p2p_dict))
+                #self.redis.lpush('p2p_products_finished', pickle.dumps(p2p_dict))
+                self._lpush('p2p_products_finished', pickle.dumps(p2p_dict))
             else:
                 # 将满标状态的标写入redis
-                self.redis.lpush('p2p_products_full', pickle.dumps(p2p_dict))
+                #self.redis.lpush('p2p_products_full', pickle.dumps(p2p_dict))
+                self._lpush('p2p_products_full', pickle.dumps(p2p_dict))
 
         return True
 
@@ -247,22 +283,43 @@ class redis_backend(object):
         return p2p_list
 
     def update_detail_cache(self, product_id):
-        if self.redis.exists('p2p_detail_{0}'.format(product_id)):
-            self.redis.delete('p2p_detail_{0}'.format(product_id))
+        #if self.redis.exists('p2p_detail_{0}'.format(product_id)):
+        #    self.redis.delete('p2p_detail_{0}'.format(product_id))
+        if self._exists('p2p_detail_{0}'.format(product_id)):
+            self._delete('p2p_detail_{0}'.format(product_id))
             self.get_cache_p2p_detail(product_id)
         else:
             self.get_cache_p2p_detail(product_id)
 
+    def _lrange(self, key, start, end):
+        if self.redis:
+            return self.redis.lrange(key, start, end)
+
+    def _lrem(self, key, value, count=0):
+        if self.redis:
+            self.redis.lrem(key, value, count)
+
     def update_list_cache(self, source_key, target_key, product):
-        if self.redis.exists(source_key) and self.redis.exists(target_key):
-            source_cache_list = self.redis.lrange(source_key, 0, -1)
+        if self._exists(source_key) and self._exists(target_key):
+            source_cache_list = self._lrange(source_key, 0, -1)
             for source in source_cache_list:
                 source_product = pickle.loads(source)
                 if source_product.get('id') == product.id:
                     # 删除 source_key 中的元素
-                    self.redis.lrem(source_key, source)
+                    self._lrem(source_key, source)
                     # 将删除的元素 push 进 target_key 的列表中
-                    self.redis.lpush(target_key, source)
+                    self._lpush(target_key, source)
                     break
+
+        #if self.redis.exists(source_key) and self.redis.exists(target_key):
+        #    source_cache_list = self.redis.lrange(source_key, 0, -1)
+        #    for source in source_cache_list:
+        #        source_product = pickle.loads(source)
+        #        if source_product.get('id') == product.id:
+        #            # 删除 source_key 中的元素
+        #            self.redis.lrem(source_key, source)
+        #            # 将删除的元素 push 进 target_key 的列表中
+        #            self.redis.lpush(target_key, source)
+        #            break
 
         return True
