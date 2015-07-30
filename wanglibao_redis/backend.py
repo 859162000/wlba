@@ -116,6 +116,7 @@ class redis_backend(object):
                     "excess_earning_rate": p2p.excess_earning_rate,
                     "excess_earning_description": p2p.excess_earning_description,
                     "pay_method": p2p.pay_method,
+                    "display_payback_method": p2p.display_payback_method,
                     "amortization_count": p2p.amortization_count,
                     "repaying_source": p2p.repaying_source,
                     "baoli_original_contract_number": p2p.baoli_original_contract_number,
