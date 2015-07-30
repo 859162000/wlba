@@ -165,11 +165,12 @@ class redis_backend(object):
             }
             extra_data = p2p.extra_data
 
-            for section_key in extra_data:
-                for item_key in extra_data[section_key]:
-                    if not item_key:
-                        extra_data[section_key][section_key] = extra_data[section_key][item_key]
-                        del extra_data[section_key][item_key]
+            if extra_data:
+                for section_key in extra_data:
+                    for item_key in extra_data[section_key]:
+                        if not item_key:
+                            extra_data[section_key][section_key] = extra_data[section_key][item_key]
+                            del extra_data[section_key][item_key]
             p2p_results['extra_data'] = extra_data
 
             #if p2p.status != u'正在招标':
