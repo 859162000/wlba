@@ -3,7 +3,9 @@
 
 import json
 
+from django.db.models import Q
 from misc.models import Misc
+from wanglibao_p2p.models import P2PProduct
 
 
 class MiscRecommendProduction(object):
@@ -52,3 +54,24 @@ class MiscRecommendProduction(object):
         value[self.key] = products
         self.misc.value = json.dumps(value)
         self.misc.save()
+
+    def get_recommend_product_id(self):
+        """ 根据业务规则获取一个推荐标的
+        如果没有设置推荐标的，则根据业务规则展示一个正在招标的标id
+        """
+        ids = self.get_recommend_products()
+        if ids:
+            for id in ids:
+                recommend = P2PProduct.objects.filter(hide=False, status=u'正在招标', id=id)
+                if recommend:
+                    return id
+        # 自定义查询标
+        productions = P2PProduct.objects.filter(hide=False, status=u'正在招标').exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标'))
+        if productions:
+            id_rate = [{'id': q.id, 'rate': q.completion_rate} for q in productions]
+            id_rate = sorted(id_rate, key=lambda x: x['rate'], reverse=True)
+            return id_rate[0]['id']
+
+        else:
+            product = P2PProduct.objects.filter(hide=False).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time').first()
+            return product.id
