@@ -1,0 +1,207 @@
+doctype html
+html
+  head
+    - with '网利宝官网' as title
+    include global/g_head
+    - endwith
+    script(src="/static/src/pc/lib/require.js", data-main="/static/src/pc/config")
+  body
+    include global/g_nav
+    include global/g_banner
+
+    .i-mod-wrap.mg-t-sm
+      .i-mod-exhibition
+        .ex-lf-cont
+          .ex-intro
+            mixin intro(icon, head, cont1, cont2)
+              .intro-item
+                i.iconfont.icon.t-d16(class=icon)
+                .item-text
+                  h4=head
+                  p.t-d4=cont1
+                  p.t-d4=cont2
+            +intro('icon-safe', '高收益 低门槛', '30倍银行活期收益', '100元起投')
+            +intro('icon-safe', '保障安全', '民生银行资金托管', '阳光保险承保资金安全')
+            +intro('icon-authority', '专业权威', '网贷协会会员单位', '来自世界顶级的金融精英团队')
+          .ex-ac-target.mg-t-sm.br-d1.bg-d3
+            .ac-tg-head.span12
+              h3.hd-name.fl 精选推荐
+              .hd-time.fr 距离下场更新：
+                |<span>10</span>时  55</span>分  38秒
+            .ac-tg-cont
+              a(href='/').font-m.t-d10.tg-pro-tit 企业投标保证金（一期）
+              .t-d7
+                span.mg-r-xl 本息保障：恒大担保
+                span 还款方式：按月付息 到期还本
+              .product-progress.progress-xl
+                .pro-container
+              .ac-tg-row.clearfix
+                .tg-list
+                  span.t-d5.font-xll 100
+                    span.font-m 元
+                  .t-d7.tg-bt-text 融资金额
+                .tg-list.profit-warp
+                  .font-xll.t-d2 12.0
+                    span.font-m %+
+                    |2.0
+                    span.font-m %
+                  .t-d7.tg-bt-text 年收益
+                .tg-list
+                  span.t-d5.font-xll 180
+                    span.font-m 天
+                  .t-d7.tg-bt-text 项目期限
+                .fr.buy-warp
+                  span.buy-text-r
+                    a(href="").buy-btn-xl 立即投资
+                    .t-d7.tg-bt-text 剩余金额￥14, 243, 111
+            .ac-tg-bg
+
+        .ex-rt-cont
+          .ex-dc.padding-l-r-sm
+            .dc-head
+              .dc-title.font-l
+                i.icon.iconfont.icon-data
+                span 数据统计
+              .dc-time.t-d7.fr 截止至2015-6-21
+            .ex-data
+              ul
+                li.mg-b-s
+                  p.t-d7 网利宝昨日交易额
+                  label.t-d8 <span>796</span>万&nbsp<span>6856</span>元
+                li.mg-b-s
+                  p.t-d7 投资人赚取收益金额
+                  label.t-d8 <span>796</span>万&nbsp<span>6856</span>元
+                li.mg-b-s
+                  p.t-d7 网利金融累计投资金额
+                  label.t-d8 <span>796</span>万&nbsp<span>6856</span>元
+            .dc-bg
+          .ex-download-app.mg-t-sm.padding-sm
+            img(src='/static/imgs/pc/home/erweima.jpg').dol-app.mg-r-sm.fl
+            .dol-btn.fl
+              .t-d4 网利宝APP－随身理财  随时赚钱
+              a(href='/').dol-btn-warp
+                .span3.android-icon.bg-d8.t-d6
+                  i.icon.iconfont.icon-android
+                .span9.btn-text.bg-d7.font-s Android版下载
+              a(href='/').dol-btn-warp
+                .span3.android-icon.bg-d9.t-d6
+                  i.icon.iconfont.icon-ios
+                .span9.btn-text.bg-d7.font-s iPhone版下载
+    //product start
+    .i-mod-wrap.mg-t-sm
+      .i-mod-product.clearfix
+        mixin pdtItem()
+          .pdt-item
+            .pdt-type.padding-sm.br-b-d2
+              .font-ll 短期稳赢
+              .font-s.t-d12 标的期限1-3月
+            mixin pdt-list(type)
+              .pdt-list
+                .pdt-warp.padding-t-l-r-sm
+                  a.pdt-name.mg-b-s
+                    i.icon.iconfont.icon-car
+                    span.font-l 车贷保证金
+                  if type == 'progress'
+                    .t-d7
+                      span.mg-r-xl 本息保障：恒大担保
+                      span 还款方式：按月付息 到期还本
+                    .pdt-progress-warp.clearfix
+                      .product-progress.progress-x.fl
+                        .pro-container
+                      .pdt-progress-percent.t-d7.fl.mg-l-s 81.6%
+                    .t-d7.mg-b-s 300万元/￥351,300元 可投
+                  .product-footer.clearfix
+                    .span5
+                      span.t-d7.font-s 年化
+                      span.font-ll.t-d2 12.0
+                        span.font-s %+
+                        |2
+                        span.font-s %
+                    .span3.ct
+                      span.font-ll 60
+                      span.font-s.t-d11 天
+                    .span4
+                      a.buy-btn-x 立即投资
+                if type == 'progress'
+                  .product-line
+                else
+                  .product-line.mg-l-r-sm
+            +pdt-list('progress')
+            +pdt-list('')
+            +pdt-list('')
+        +pdtItem()
+        +pdtItem()
+        +pdtItem()
+    //product end
+
+    .i-mod-wrap.mg-t-sm
+      .i-mod-news
+        ul.clearfix
+          li.mg-r-xxl
+            .ns-head
+              i.icon.iconfont.icon-about
+              span.font-l.mg-l-s 关于网利宝
+            .ns-cont
+              .ns-about
+          li.mg-r-xxl
+            .ns-head
+              i.icon.iconfont.icon-notice
+              span.font-l.mg-l-s 平台公告
+            .ns-cont.ns-notice.t-d4
+              mixin notice()
+                a(href="baiducom").font-ss.clearfix
+                  .span9.notice-body
+                    i.icon-notice-self
+                    | 7月20日已还款项目公告月20日已还款项目公告7月20日已还款项目公告
+                  .span3.tr.notice-time.t-d9 2015-06-19
+              +notice()
+              +notice()
+              +notice()
+              +notice()
+              +notice()
+              +notice()
+              +notice()
+
+          li
+            .ns-head
+              i.icon.iconfont.icon-report
+              span.font-l.mg-l-s 媒体报道
+            .ns-cont.ns-media.t-d4
+              mixin media()
+                a(href="/").t-d4.font-ss.clearfix.media-list
+                  img(src="").br-d2
+                  .media-txt 网利宝CEO赵润龙：抓住长尾市场，做到最快、最准
+                  .media-time.t-d9 2015-06-19
+              +media()
+              +media()
+              +media()
+              +media()
+    .i-mod-wrap.mg-t-sm
+      .i-mod-cooperation
+        .cn-head.br-b-d2.font-l.clearfix
+          .cn-head-title.fl
+            i.icon.iconfont.icon-cooperation.mg-r-s.t-d7.font-xxl
+            |合作伙伴
+          .cn-head-change.fr.t-d7
+            i.icon.iconfont.icon-flip-left.mg-r-sm.font-xl
+            i.icon.iconfont.icon-flip-right.font-xl
+        .cn-cont
+          ul.clearfix
+            li
+            li
+            li
+            li
+            li
+            li
+            li
+            li
+            li
+            li
+            li
+            li
+            li
+            li
+    include global/g_footer
+    script.
+      require(["/static/src/pc/index.js"])
+

@@ -15,7 +15,7 @@ import urlparse
 
 
 class IndexView(TemplateView):
-    template_name = 'index.jade'
+    template_name = 'index-test.jade'
 
     def get_context_data(self, **kwargs):
 
