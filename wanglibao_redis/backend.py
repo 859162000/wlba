@@ -24,6 +24,13 @@ class redis_backend(object):
             self.pool = None
             self.redis = None
 
+    def _is_available(self):
+        try:
+            self.redis.ping()
+        except:
+            return False
+        return True
+
     def _exists(self, name):
         if self.redis:
             return self.redis.exists(name)
@@ -50,7 +57,7 @@ class redis_backend(object):
 
         #if self.redis.exists('partners'):
             #partners = pickle.loads(self.redis.get('partners'))
-        if self._exists('partners'):
+        if self._is_available() and self._exists('partners'):
             partners = pickle.loads(self._get('partners'))
         else:
             partners_data = Partner.objects.filter(type='partner')
@@ -67,7 +74,7 @@ class redis_backend(object):
 
         #if self.redis.exists('p2p_detail_{0}'.format(product_id)):
         #    p2p_results = pickle.loads(self.redis.get('p2p_detail_{0}'.format(product_id)))
-        if self._exists('p2p_detail_{0}'.format(product_id)):
+        if self._is_available() and self._exists('p2p_detail_{0}'.format(product_id)):
             p2p_results = pickle.loads(self._get('p2p_detail_{0}'.format(product_id)))
             return p2p_results
         else:
