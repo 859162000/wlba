@@ -134,7 +134,6 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'concurrency.middleware.ConcurrencyMiddleware',
     'reversion.middleware.RevisionMiddleware',
@@ -145,7 +144,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'marketing.middlewares.PromotionTokenMiddleWare',
-    'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
 CONCURRENCY_POLICY = 2
@@ -399,6 +397,10 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG',
         },
+        'wanglibao_app': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        },
     }
 
 }
@@ -485,7 +487,7 @@ CELERYBEAT_SCHEDULE = {
     #     'schedule': timedelta(minutes=30)
     # }
 
-    '': {
+    'xicai_send_data': {
         'task': 'wanglibao_account.tasks.xicai_send_data_task',
         'schedule': timedelta(hours=1),
     }
