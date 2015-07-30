@@ -116,6 +116,7 @@ class redis_backend(object):
                     "excess_earning_rate": p2p.excess_earning_rate,
                     "excess_earning_description": p2p.excess_earning_description,
                     "pay_method": p2p.pay_method,
+                    "display_payback_method": p2p.display_payback_method,
                     "amortization_count": p2p.amortization_count,
                     "repaying_source": p2p.repaying_source,
                     "baoli_original_contract_number": p2p.baoli_original_contract_number,
@@ -330,3 +331,25 @@ class redis_backend(object):
         #            break
 
         return True
+
+    def get_announcement(self):
+        res = self._get('announcement')
+        if not res:
+            return None
+        return pickle.loads(res)
+
+    def get_news(self):
+        res = self._get('announcement_news')
+        if not res:
+            return None
+        return pickle.loads(res)
+
+    def get_banners(self):
+        res = self._get('banners')
+        if not res:
+            return None
+        arr = pickle.loads(res)
+        for x in arr[::-1]:
+            if not x['start_at'] <= timezone.now() <= x['end_at']:
+                arr.remove(x)
+        return arr
