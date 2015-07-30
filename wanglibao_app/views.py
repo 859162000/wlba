@@ -31,7 +31,7 @@ from wanglibao_rest.utils import split_ua, get_client_ip
 from wanglibao_banner.models import Banner
 from wanglibao_sms.utils import send_validation_code
 
-
+logger = logging.getLogger(__name__)
 
 class AppActivateImageAPIView(APIView):
     """ app端查询启动活动图片 """
@@ -85,11 +85,11 @@ class AppRepaymentAPIView(APIView):
         now = datetime.now()
         amount, income_num = 0, 0
         try:
-            logging.error('===' * 10)
-            logging.error(request.user)
+            logger.error('===' * 10)
+            logger.error(request.user)
             if request.user and request.user.is_authenticated():
                 pro = request.user.wanglibaouserprofile
-                logging.error('api/m/repayment interface>>> user:{id} {phone} {name}'.format(id=request.user.id, phone=pro.phone, name=pro.name))
+                logger.error('api/m/repayment interface>>> user:{id} {phone} {name}'.format(id=request.user.id, phone=pro.phone, name=pro.name))
                 # 登陆用户 查询当天收益和累计收益
                 user = request.user
                 start_utc = local_to_utc(now, 'min')
@@ -116,7 +116,7 @@ class AppRepaymentAPIView(APIView):
                     amount += x.principal + x.interest + x.penal_interest
                 return Response({'ret_code': 0, 'message': 'ok', 'amount': float(amount), 'income_num': len(ams)})
         except Exception, e:
-            logging.error(e.message)
+            logger.error(e.message)
             return Response({'ret_code': 20001, 'message': 'fail'})
 
 
