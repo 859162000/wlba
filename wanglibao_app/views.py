@@ -146,7 +146,9 @@ class AppExploreView(TemplateView):
     template_name = 'discover.jade'
 
     def get_context_data(self, **kwargs):
-        banner = Banner.objects.filter(device='weixin', type='banner', is_used=True).order_by('-priority')
+        #banner = Banner.objects.filter(device='mobile', type='banner', is_used=True).order_by('-priority')
+        banner = Banner.objects.filter(Q(device='mobile'), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now()))).order_by('-priority')
+        print banner
         return {
             'banner': banner,
         }
