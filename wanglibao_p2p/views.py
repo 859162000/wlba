@@ -27,7 +27,7 @@ from wanglibao_p2p.prepayment import PrepaymentHistory
 from wanglibao_p2p.forms import PurchaseForm, BillForm
 from wanglibao_p2p.keeper import ProductKeeper, EquityKeeperDecorator
 from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant, UserAmortization, \
-    P2PProductContract, InterestPrecisionBalance
+    P2PProductContract, InterestPrecisionBalance, P2PRecord
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags, AmortizationCalculator
@@ -49,6 +49,9 @@ from exceptions import PrepaymentException
 from django.core.urlresolvers import reverse
 import re
 from celery.execute import send_task
+from wanglibao_redis.backend import redis_backend
+import pickle
+
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -56,35 +59,15 @@ class P2PDetailView(TemplateView):
     def get_context_data(self, id, **kwargs):
         context = super(P2PDetailView, self).get_context_data(**kwargs)
 
-        try:
-            #p2p = P2PProduct.objects.select_related('activity').get(pk=id, hide=False).exclude(status=u'流标')
-            p2p = P2PProduct.objects.select_related('activity').exclude(status=u'流标').exclude(status=u'录标').get(pk=id, hide=False)
-            form = PurchaseForm(initial={'product': p2p})
+        cache_backend = redis_backend()
+        p2p = cache_backend.get_cache_p2p_detail(id)
 
-            if p2p.soldout_time:
-                end_time = p2p.soldout_time
-            else:
-                end_time = p2p.end_time
-        except P2PProduct.DoesNotExist:
-            raise Http404(u'您查找的产品不存在')
-
-        terms = get_amortization_plan(p2p.pay_method).generate(p2p.total_amount,
-                                                               p2p.expected_earning_rate / 100,
-                                                               datetime.datetime.now(),
-                                                               p2p.period)
-        total_earning = terms.get("total") - p2p.total_amount
-        total_fee_earning = 0
-
-        if p2p.activity:
-            total_fee_earning = Decimal(
-                p2p.total_amount * p2p.activity.rule.rule_amount * (Decimal(p2p.period) / Decimal(12))).quantize(
-                Decimal('0.01'))
-
+        form = PurchaseForm(initial={'product': p2p.get('id')})
         user = self.request.user
         current_equity = 0
 
         if user.is_authenticated():
-            equity_record = p2p.equities.filter(user=user).first()
+            equity_record = P2PEquity.objects.filter(user=user, product=p2p.get('id')).first()
             if equity_record is not None:
                 current_equity = equity_record.equity
 
@@ -94,35 +77,34 @@ class P2PDetailView(TemplateView):
                 'is_invested': user.wanglibaouserprofile.is_invested
             })
 
-        orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
-
-        site_data = SiteData.objects.all()[0]
-        #排行榜
-
-        # top = Top()
-        # day_tops = top.day_tops(datetime.datetime.now())
-        # week_tops = Top().week_tops(datetime.datetime.now())
-        # all_tops = Top().all_tops()
+        orderable_amount = min(p2p.get('limit_amount_per_user') - current_equity, p2p.get('remain'))
+        # site_data = SiteData.objects.all()[0]
+        p2p_invest_records = P2PRecord.objects.filter(product=p2p.get('id')).filter(catalog=u'申购')[0:30]
+        p2p_invest_records_total = P2PRecord.objects.filter(product=p2p.get('id')).filter(catalog=u'申购').count()
 
         device = utils.split_ua(self.request)
-        red_packets = backends.list_redpack(user, 'available', device['device_type'])
+        if p2p.get('status') == u'正在招标':
+            red_packets = backends.list_redpack(user, 'available', device['device_type'])
+        else:
+            red_packets = None
 
         context.update({
             'p2p': p2p,
+            'p2p_invest_records': p2p_invest_records,
+            'p2p_invest_records_total': p2p_invest_records_total,
             'form': form,
-            'end_time': end_time,
-            'orderable_amount': orderable_amount,
-            'total_earning': total_earning,
+            'end_time': p2p.get('end_time'),
+            'total_earning': p2p.get('total_earning'),
             'current_equity': current_equity,
-            'site_data': site_data,
-            'attachments': p2p.attachment_set.all(),
+            'orderable_amount': orderable_amount,
+            # 'site_data': site_data,
             'announcements': AnnouncementP2P,
-            'total_fee_earning': total_fee_earning,
+            'total_fee_earning': p2p.get('total_fee_earning'),
             'day_tops': [],
             'week_tops': [],
             'all_tops': [],
             'is_valid': False,
-            'red_packets': len(red_packets['packages']['available'])
+            'red_packets': len(red_packets['packages']['available']) if red_packets else 0,
         })
 
         return context
@@ -504,16 +486,50 @@ class P2PListView(TemplateView):
     template_name = 'p2p_list.jade'
 
     def get_context_data(self, **kwargs):
+        cache_backend = redis_backend()
 
         p2p_done = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(
             Q(publish_time__lte=timezone.now())) \
             .filter(status=u'正在招标').order_by('-publish_time')
 
-        p2p_others = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(
-            Q(publish_time__lte=timezone.now())).filter(
-            status__in=[
-                u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'
-            ]).order_by('-soldout_time')
+        p2p_done_list = cache_backend.get_p2p_list_from_objects(p2p_done)
+
+        p2p_products, p2p_full_list, p2p_repayment_list, p2p_finished_list = [], [], [], []
+
+        if cache_backend.redis.exists('p2p_products_full'):
+            p2p_full_cache = cache_backend.redis.lrange('p2p_products_full', 0, -1)
+            for product in p2p_full_cache:
+                p2p_full_list.extend([pickle.loads(product)])
+        else:
+            p2p_full = P2PProduct.objects.select_related('warrant_company', 'activity') \
+                .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
+                .filter(status__in=[u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核']) \
+                .order_by('-soldout_time', '-priority')
+            p2p_full_list = cache_backend.get_p2p_list_from_objects(p2p_full)
+
+        if cache_backend.redis.exists('p2p_products_repayment'):
+            p2p_repayment_cache = cache_backend.redis.lrange('p2p_products_repayment', 0, -1)
+
+            for product in p2p_repayment_cache:
+                p2p_repayment_list.extend([pickle.loads(product)])
+        else:
+            p2p_repayment = P2PProduct.objects.select_related('warrant_company', 'activity') \
+                .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
+                .filter(status=u'还款中').order_by('-soldout_time', '-priority')
+
+            p2p_repayment_list = cache_backend.get_p2p_list_from_objects(p2p_repayment)
+
+        if cache_backend.redis.exists('p2p_products_finished'):
+            p2p_finished_cache = cache_backend.redis.lrange('p2p_products_finished', 0, -1)
+
+            for product in p2p_finished_cache:
+                p2p_finished_list.extend([pickle.loads(product)])
+        else:
+            p2p_finished = P2PProduct.objects.select_related('warrant_company', 'activity') \
+                .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
+                .filter(status=u'已完成').order_by('-soldout_time', '-priority')
+
+            p2p_finished_list = cache_backend.get_p2p_list_from_objects(p2p_finished)
 
         show_slider = False
         if p2p_done:
@@ -524,9 +540,10 @@ class P2PListView(TemplateView):
         else:
             p2p_earning = p2p_period = p2p_amount = []
 
-        p2p_products = []
-        p2p_products.extend(p2p_done)
-        p2p_products.extend(p2p_others)
+        p2p_products.extend(p2p_done_list)
+        p2p_products.extend(p2p_full_list)
+        p2p_products.extend(p2p_repayment_list)
+        p2p_products.extend(p2p_finished_list)
 
         limit = 10
         paginator = Paginator(p2p_products, limit)
