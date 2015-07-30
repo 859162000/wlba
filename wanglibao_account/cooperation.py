@@ -24,7 +24,7 @@ from wanglibao.settings import  YIRUITE_CALL_BACK_URL, \
     WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
     JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL
 from wanglibao_account.models import Binding, IdVerification
-from wanglibao_account.tasks import  yiruite_callback,  common_callback
+from wanglibao_account.tasks import  common_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
 from wanglibao_pay.models import Card
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -335,7 +335,9 @@ class YiRuiTeRegister(CoopRegister):
             'ip': 'https://www.wanglibao.com',
             "sign": sign
         }
-        yiruite_callback.apply_async(kwargs={'url': self.call_back_url, 'params': params})
+        # yiruite_callback.apply_async(kwargs={'url': self.call_back_url, 'params': params})
+        common_callback.apply_async(
+            kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
 
 class BengbengRegister(CoopRegister):
     def __init__(self, request):
