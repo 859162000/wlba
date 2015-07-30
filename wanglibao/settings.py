@@ -399,6 +399,10 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG',
         },
+        'wanglibao_app': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        },
     }
 
 }
