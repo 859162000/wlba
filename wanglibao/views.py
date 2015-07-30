@@ -32,8 +32,10 @@ class IndexView(TemplateView):
 
         p2p_products, p2p_full_list, p2p_repayment_list = [], [], []
 
-        if cache_backend.redis.exists('p2p_products_full'):
-            p2p_full_cache = cache_backend.redis.lrange('p2p_products_full', 0, -1)
+        #if cache_backend.redis.exists('p2p_products_full'):
+        if cache_backend._exists('p2p_products_full'):
+            #p2p_full_cache = cache_backend.redis.lrange('p2p_products_full', 0, -1)
+            p2p_full_cache = cache_backend._lrange('p2p_products_full', 0, -1)
             for product in p2p_full_cache:
                 p2p_full_list.extend([pickle.loads(product)])
         else:
@@ -43,8 +45,10 @@ class IndexView(TemplateView):
                 .order_by('-soldout_time', '-priority')
             p2p_full_list = cache_backend.get_p2p_list_from_objects(p2p_full)
 
-        if cache_backend.redis.exists('p2p_products_repayment'):
-            p2p_repayment_cache = cache_backend.redis.lrange('p2p_products_repayment', 0, 1)
+        #if cache_backend.redis.exists('p2p_products_repayment'):
+        #    p2p_repayment_cache = cache_backend.redis.lrange('p2p_products_repayment', 0, 1)
+        if cache_backend._exists('p2p_products_repayment'):
+            p2p_repayment_cache = cache_backend._lrange('p2p_products_repayment', 0, 1)
 
             for product in p2p_repayment_cache:
                 p2p_repayment_list.extend([pickle.loads(product)])
