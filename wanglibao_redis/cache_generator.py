@@ -71,7 +71,7 @@ def cache_banners():
     banners = Banner.objects.filter(Q(device=Banner.PC_2), Q(is_used=True), Q(is_long_used=True) | Q(is_long_used=False))
     result = []
     for x in banners:
-        if x['start_at'] and x['end_at']:
+        if x.start_at and x.end_at:
             result.append(model_to_dict(x))
 
     cache_backend._set("banners", pickle.dumps(result))
