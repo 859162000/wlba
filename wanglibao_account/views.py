@@ -379,9 +379,6 @@ class AccountHomeAPIView(APIView):
     def get(self, request, format=None):
         user = request.user
 
-        logger.error('===' * 10)
-        logger.error(request.user)
-
         p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
             u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
         ]).select_related('product')
@@ -444,9 +441,6 @@ class AccountHomeAPIView(APIView):
             'p2p_income_today': float(p2p_income_today),  # 今日收益
 
         }
-
-        logger.error('income_today jinri:%s, p2p_total_paid_interest: %s, p2p_total_asset: %s' % (str(p2p_income_today), str(float(p2p_total_paid_interest + p2p_activity_interest)), str(p2p_total_asset)))
-        logger.error('***' * 20)
 
         return Response(res)
 
