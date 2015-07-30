@@ -445,6 +445,9 @@ class AccountHomeAPIView(APIView):
 
         }
 
+        logger.error('income_today jinri:%s, leiji: %s' % (str(p2p_income_today), str(p2p_total_paid_interest)))
+        logger.error('***' * 20)
+
         return Response(res)
 
 
