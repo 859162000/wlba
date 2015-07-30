@@ -85,11 +85,7 @@ class AppRepaymentAPIView(APIView):
         now = datetime.now()
         amount, income_num = 0, 0
         try:
-            logger.error('===' * 10)
-            logger.error(request.user)
             if request.user and request.user.is_authenticated():
-                pro = request.user.wanglibaouserprofile
-                logger.error('api/m/repayment interface>>> user:{id} {phone} {name}'.format(id=request.user.id, phone=pro.phone, name=pro.name))
                 # 登陆用户 查询当天收益和累计收益
                 user = request.user
                 start_utc = local_to_utc(now, 'min')
