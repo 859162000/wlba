@@ -8,7 +8,6 @@ import requests
 import urllib
 import logging
 from wanglibao.celery import app
-import wanglibao_account
 
 from wanglibao_account.models import Binding
 
@@ -109,7 +108,8 @@ def xicai_send_data_task():
     向希财网更新数据
     :return:
     """
-    wanglibao_account.cooperation.xicai_send_data()
+    from wanglibao_account.cooperation import xicai_send_data
+    xicai_send_data()
 
 
 
