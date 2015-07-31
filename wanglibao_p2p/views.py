@@ -61,6 +61,8 @@ class P2PDetailView(TemplateView):
 
         cache_backend = redis_backend()
         p2p = cache_backend.get_cache_p2p_detail(id)
+        if not p2p:
+            raise Http404(u'您查找的产品不存在')
 
         form = PurchaseForm(initial={'product': p2p.get('id')})
         user = self.request.user
@@ -496,8 +498,8 @@ class P2PListView(TemplateView):
 
         p2p_products, p2p_full_list, p2p_repayment_list, p2p_finished_list = [], [], [], []
 
-        if cache_backend.redis.exists('p2p_products_full'):
-            p2p_full_cache = cache_backend.redis.lrange('p2p_products_full', 0, -1)
+        if cache_backend._is_available() and cache_backend._exists('p2p_products_full'):
+            p2p_full_cache = cache_backend._lrange('p2p_products_full', 0, -1)
             for product in p2p_full_cache:
                 p2p_full_list.extend([pickle.loads(product)])
         else:
@@ -507,8 +509,8 @@ class P2PListView(TemplateView):
                 .order_by('-soldout_time', '-priority')
             p2p_full_list = cache_backend.get_p2p_list_from_objects(p2p_full)
 
-        if cache_backend.redis.exists('p2p_products_repayment'):
-            p2p_repayment_cache = cache_backend.redis.lrange('p2p_products_repayment', 0, -1)
+        if cache_backend._is_available() and cache_backend._exists('p2p_products_repayment'):
+            p2p_repayment_cache = cache_backend._lrange('p2p_products_repayment', 0, -1)
 
             for product in p2p_repayment_cache:
                 p2p_repayment_list.extend([pickle.loads(product)])
@@ -519,8 +521,8 @@ class P2PListView(TemplateView):
 
             p2p_repayment_list = cache_backend.get_p2p_list_from_objects(p2p_repayment)
 
-        if cache_backend.redis.exists('p2p_products_finished'):
-            p2p_finished_cache = cache_backend.redis.lrange('p2p_products_finished', 0, -1)
+        if cache_backend._is_available() and cache_backend._exists('p2p_products_finished'):
+            p2p_finished_cache = cache_backend._lrange('p2p_products_finished', 0, -1)
 
             for product in p2p_finished_cache:
                 p2p_finished_list.extend([pickle.loads(product)])
