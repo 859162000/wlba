@@ -33,6 +33,7 @@ urlpatterns = patterns(
 # app URL
 urlpatterns += patterns(
     '',
+    url(r'^app_father/$', TemplateView.as_view(template_name="app_fatherday.jade")),
     url(r'^app_movie/$', TemplateView.as_view(template_name="app_movie.jade")),
     url(r'^app_level/$', TemplateView.as_view(template_name="app_level.jade")),
     url(r'^app_invite/$', TemplateView.as_view(template_name="app_invite.jade")),
@@ -42,6 +43,7 @@ urlpatterns += patterns(
     url(r'^app_july_act/$', TemplateView.as_view(template_name="app_july_act.jade")),
     url(r'^app_extension/$', TemplateView.as_view(template_name="app_extension.jade")),
     url(r'^app_ele/$', TemplateView.as_view(template_name="app_ele.jade")),
+
 )
 
 urlpatterns += patterns(
