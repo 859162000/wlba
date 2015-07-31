@@ -66,12 +66,20 @@ class IndexView(TemplateView):
         getmore = True
 
         trade_records = P2PRecord.objects.filter(catalog=u'申购').select_related('user').select_related('user__wanglibaouserprofile')[:20]
-        # banners = Banner.objects.filter(device=Banner.PC_2)
-        banners = Banner.objects.filter(Q(device=Banner.PC_2), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now())))
-        news_and_reports = NewsAndReport.objects.all().order_by("-score")[:5]
+
+        banners = cache_backend.get_banners()
+        if not banners:
+            banners = Banner.objects.filter(Q(device=Banner.PC_2), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now())))
+
+        news_and_reports = cache_backend.get_news()
+        if not news_and_reports:
+            news_and_reports = NewsAndReport.objects.all().order_by("-score")[:5]
         site_data = SiteData.objects.all().first()
 
         partners = cache_backend.get_cache_partners()
+        annos = cache_backend.get_announcement()
+        if not annos:
+            annos = AnnouncementHomepage()
 
         return {
             "p2p_products": p2p_products,
@@ -80,7 +88,7 @@ class IndexView(TemplateView):
             'banners': banners,
             'site_data': site_data,
             'getmore': getmore,
-            'announcements': AnnouncementHomepage,
+            'announcements': annos,
             'announcements_p2p': AnnouncementP2PNew,
             'partners': partners,
         }
