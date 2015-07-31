@@ -1,13 +1,15 @@
 
 require.config({
   paths: {
-    'jquery.placeholder': 'lib/jquery.placeholder'
+    'jquery.animateNumber': 'lib/jquery.animateNumber.min'
   },
   shim: {
-    'jquery.placeholder': ['jquery']
+    'jquery.animateNumber': ['jquery']
   }
 });
 
-require(['jquery', 'jquery.placeholder'], function( $ ) {
-   $('input, textarea').placeholder();
+require(['jquery', 'jquery.animateNumber'], function( $ ) {
+    $('.num-animate').prop('number', 0).animateNumber({
+      number: 5000,
+    },2000);
 });

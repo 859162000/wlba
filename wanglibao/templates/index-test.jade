@@ -65,15 +65,17 @@ html
               .dc-time.t-d7.fr 截止至2015-6-21
             .ex-data
               ul
-                li.mg-b-s
-                  p.t-d7 网利宝昨日交易额
-                  label.t-d8 <span>796</span>万&nbsp<span>6856</span>元
-                li.mg-b-s
-                  p.t-d7 投资人赚取收益金额
-                  label.t-d8 <span>796</span>万&nbsp<span>6856</span>元
-                li.mg-b-s
-                  p.t-d7 网利金融累计投资金额
-                  label.t-d8 <span>796</span>万&nbsp<span>6856</span>元
+                mixin animateNum()
+                  li.mg-b-s
+                    p.t-d7 网利宝昨日交易额
+                    label.t-d8
+                      span.num-animate 796
+                      |万&nbsp
+                      span.num-animate 6856
+                      |元
+                +animateNum()
+                +animateNum()
+                +animateNum()
             .dc-bg
           .ex-download-app.mg-t-sm.padding-sm
             img(src='/static/imgs/pc/home/erweima.jpg').dol-app.mg-r-sm.fl
