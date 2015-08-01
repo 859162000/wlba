@@ -77,8 +77,11 @@
   .tg-bt-text
     margin-top: 6px
 
-
-
+.ac-tg-bg
+  width: 60px
+  height: 60px
+  @include home-sprite(xianliang)
+  +abs-pos(0, auto, auto, 0)
 .ex-download-app
   +clearfix()
   img
@@ -121,6 +124,15 @@
   .pdt-item
     @extend .fl
     width: 354px
+    .p2p3
+      @include home-sprite(p2p3)
+      background-color: $bg-d11
+    .p2p6
+      @include home-sprite(p2p6)
+      background-color: $bg-d12
+    .p2p12
+      @include home-sprite(p2p12)
+      background-color: $bg-d13
     .pdt-name
       line-height: 1
       +inline-block
@@ -134,12 +146,15 @@
     .product-line
       margin-top: $space-sm
       @extend .br-b-d2
+
   .pdt-list
     &:last-child
       .product-line
         visibility: hidden
     &:hover
       background: $bg-d4
+
+
 //product end
 
 //news start
@@ -211,6 +226,10 @@
       width: 151px
       height: 85px
       border: dotted 1px #b2b2b2
+      img
+        display: block
+        width: 100%
+        height: 100%
       &:hover
         +box-shadow(1px 1px 8px $bg-d11)
 

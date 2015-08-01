@@ -126,7 +126,7 @@ class IndexView(TemplateView):
 
         # 公告 前7个
         annos = AnnouncementHomepage()[:7]
-
+        print annos
         return {
             "p2p_products": p2p_products,
             "news_and_reports": news_and_reports,

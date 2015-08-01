@@ -1,3 +1,4 @@
+-load mathfilters
 doctype html
 html
   head
@@ -92,9 +93,9 @@ html
     //product start
     .i-mod-wrap.mg-t-sm
       .i-mod-product.clearfix
-        mixin pdtItem()
+        mixin pdtItem(bgclass)
           .pdt-item
-            .pdt-type.padding-sm.br-b-d2
+            .pdt-type.padding-sm.br-b-d2(class=bgclass)
               .font-ll 短期稳赢
               .font-s.t-d12 标的期限1-3月
             mixin pdt-list(type)
@@ -131,9 +132,9 @@ html
             +pdt-list('progress')
             +pdt-list('')
             +pdt-list('')
-        +pdtItem()
-        +pdtItem()
-        +pdtItem()
+        +pdtItem('p2p3')
+        +pdtItem('p2p6')
+        +pdtItem('p2p12')
     //product end
 
     .i-mod-wrap.mg-t-sm
@@ -150,34 +151,22 @@ html
               i.icon.iconfont.icon-notice
               span.font-l.mg-l-s 平台公告
             .ns-cont.ns-notice.t-d4
-              mixin notice()
+              for anno in announcements
                 a(href="baiducom").font-ss.clearfix
                   .span9.notice-body
                     i.icon-notice-self
-                    | 7月20日已还款项目公告月20日已还款项目公告7月20日已还款项目公告
-                  .span3.tr.notice-time.t-d9 2015-06-19
-              +notice()
-              +notice()
-              +notice()
-              +notice()
-              +notice()
-              +notice()
-              +notice()
-
+                    | {{anno}}
+                  .span3.tr.notice-time.t-d9 {{anno.createtime | date:"Y-m-d" }}
           li
             .ns-head
               i.icon.iconfont.icon-report
               span.font-l.mg-l-s 媒体报道
             .ns-cont.ns-media.t-d4
-              mixin media()
-                a(href="/").t-d4.font-ss.clearfix.media-list
-                  img(src="").br-d2
-                  .media-txt 网利宝CEO赵润龙：抓住长尾市场，做到最快、最准
-                  .media-time.t-d9 2015-06-19
-              +media()
-              +media()
-              +media()
-              +media()
+              for news in news_and_reports
+                a(href="{{news.link}}",title="{{news.name}}", target='_blank').t-d4.font-ss.clearfix.media-list
+                  img(src="/media/{{news.image}}", alt="{{news.name}}")
+                  .media-txt {{news.name}}
+                  .media-time.t-d9 {{news.created_at | date:"Y-m-d"}}
     .i-mod-wrap.mg-t-sm
       .i-mod-cooperation
         .cn-head.br-b-d2.font-l.clearfix
@@ -189,20 +178,10 @@ html
             i.icon.iconfont.icon-flip-right.font-xl
         .cn-cont
           ul.clearfix
-            li
-            li
-            li
-            li
-            li
-            li
-            li
-            li
-            li
-            li
-            li
-            li
-            li
-            li
+            for partner in partners
+              li
+                a(href="{{partner.link}}", target="_blank", title="{{partner.name}}", rel="nofollow")
+                  img(src="/media/{{partner.image}}", alt="{{partner.name}}")
     include global/g_footer
     script.
       require(["/static/src/pc/index.js"])
