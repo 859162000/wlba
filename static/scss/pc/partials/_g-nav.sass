@@ -3,6 +3,7 @@ $g-nav-height: 80px
 .g-nav-warp
   height: $g-nav-height
   background: $bg-d3
+  top: -$g-nav-height
 .g-logo-box
   width: 360px
   height: 55px
@@ -18,4 +19,10 @@ $g-nav-height: 80px
     font-size: $font-m
     padding: 0 20px
     +line-height(80)
+
+.g-nav-fixed
+  position: fixed
+  width: 100%
+  z-index: 10
+  +box-shadow(0 2px 4px $bg-d11)
 

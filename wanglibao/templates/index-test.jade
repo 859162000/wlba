@@ -1,4 +1,6 @@
+-load formatters
 -load mathfilters
+
 doctype html
 html
   head
@@ -21,7 +23,7 @@ html
                   h4=head
                   p.t-d4=cont1
                   p.t-d4=cont2
-            +intro('icon-safe', '高收益 低门槛', '30倍银行活期收益', '100元起投')
+            +intro('icon-rocket', '高收益 低门槛', '30倍银行活期收益', '100元起投')
             +intro('icon-safe', '保障安全', '民生银行资金托管', '阳光保险承保资金安全')
             +intro('icon-authority', '专业权威', '网贷协会会员单位', '来自世界顶级的金融精英团队')
           .ex-ac-target.mg-t-sm.br-d1.bg-d3
@@ -174,14 +176,18 @@ html
             i.icon.iconfont.icon-cooperation.mg-r-s.t-d7.font-xxl
             |合作伙伴
           .cn-head-change.fr.t-d7
-            i.icon.iconfont.icon-flip-left.mg-r-sm.font-xl
-            i.icon.iconfont.icon-flip-right.font-xl
+            i.icon.iconfont.icon-flip-left.mg-r-sm.font-xl.un-click.cn-last
+            if partners.length <= 14
+              i.icon.iconfont.icon-flip-right.font-xl.cn-next.un-click
+            else
+              i.icon.iconfont.icon-flip-right.font-xl.cn-next
         .cn-cont
-          ul.clearfix
-            for partner in partners
-              li
-                a(href="{{partner.link}}", target="_blank", title="{{partner.name}}", rel="nofollow")
-                  img(src="/media/{{partner.image}}", alt="{{partner.name}}")
+          .cn-ul-warp
+            ul.clearfix
+              for partner in partners
+                li
+                  a(href="{{partner.link}}", target="_blank", title="{{partner.name}}", rel="nofollow")
+                    img(src="/media/{{partner.image}}", alt="{{partner.name}}")
     include global/g_footer
     script.
       require(["/static/src/pc/index.js"])
