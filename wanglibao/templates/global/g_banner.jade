@@ -22,38 +22,40 @@
     .g-banner-login
       .g-banner-bg
       .g-banner-cont
-        .g-landed
-          .landed-head.clearfix
-            img(src='/static/imgs/pc/home/user.jpg').fl
-            .head-username.fr.tl
-              .font-m 151179689554
-                span.font-s , 你好!
-              .font-s.t-d17 感谢您对网利宝的信任！
-          .landed-cont
-            .landed-cont-hide.font-m
-              div 全方位控制项目风险
-              div 业界唯一零坏账平台
-            .landed-cont-show.font-m.hide
-              div
-                span.t-d17.font-xs 可用余额：
-                span 1856.00
-              div
-                span.t-d17.font-xs 账户资产：
-                span 1856.00
+        if user.is_authenticated
+          .g-landed
+            .landed-head.clearfix
+              img(src='/static/imgs/pc/home/user.jpg').fl
+              .head-username.fr.tl
+                .font-m {{user|display_name}}
+                  span.font-s , 你好!
+                .font-s.t-d17 感谢您对网利宝的信任！
+            .landed-cont
+              .landed-cont-hide.font-m
+                div 全方位控制项目风险
+                div 业界唯一零坏账平台
+              .landed-cont-show.font-m.hide
+                div
+                  span.t-d17.font-xs 可用余额：
+                  span 1856.00
+                div
+                  span.t-d17.font-xs 账户资产：
+                  span 1856.00
 
-            .landed-cont-btn
-              i.icon.iconfont.icon-eye03
-              i.icon.iconfont.icon-eye02.hide
-          .landed-btn.font-m
-            a(href="").landed-for-chong.mg-r-l 充值
-            a(href="").landed-for-tou 投资
-        .g-unlanded(style="display:none")
-          .font-xxxll.t-d2.lh 13.0%
-          .font-m.t-d4 平均年化收益率
-          .font-m.t-d5.mg-t-s.mg-b-sm 账户资金由民生银行全额托管
-          .unlanded-btn.font-m
-            a(href="").unlanded-for-regist.mg-r-sm 快速注册
-            a(href="").unlanded-for-login 登陆
+              .landed-cont-btn
+                i.icon.iconfont.icon-eye03
+                i.icon.iconfont.icon-eye02.hide
+            .landed-btn.font-m
+              a(href="/pay/banks/").landed-for-chong.mg-r-l 充值
+              a(href="/p2p/list/").landed-for-tou 投资
+        else
+          .g-unlanded
+            .font-xxxll.t-d2.lh 13.0%
+            .font-m.t-d4 平均年化收益率
+            .font-m.t-d5.mg-t-s.mg-b-sm 账户资金由民生银行全额托管
+            .unlanded-btn.font-m
+              a(href="").unlanded-for-regist.mg-r-sm 快速注册
+              a(href="").unlanded-for-login 登陆
 
 
 

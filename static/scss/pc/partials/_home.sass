@@ -5,7 +5,53 @@
 .ex-intro, .ex-dc, .ex-download-app, .pdt-item, .i-mod-news,.i-mod-cooperation
   background: $bg-d3
   @extend .br-d2
+//product btn
 
+.buy-btn-xl
+  position: relative
+  top: 0
+  width: 140px
+  background: $bg-d6
+  color: $t-d6
+  font-size: $font-m
+  text-align: center
+  +line-height(40)
+  +border-radius(4px)
+  +inline-block
+  +box-shadow(0 2px 0 #dadada, 0 -2px 0 #fe7369)
+  transition: all .01s ease-in
+  &:link, &:visited
+    color: $t-d6
+  &:hover
+    color: $t-d6
+    +box-shadow(0 2px 0 #dadada, 0 0 0 #fe7369)
+  &:active
+    color: $t-d6
+    +box-shadow(0 0 0 #dadada, 0 0 0 #fe7369)
+.un-buy-btn-xl
+  position: relative
+  top: 0
+  width: 140px
+  background: $bg-d5
+  color: $t-d6
+  font-size: $font-m
+  text-align: center
+  +line-height(40)
+  +border-radius(4px)
+  +inline-block
+.buy-btn-x
+  @extend .buy-btn-xl
+  width: 100px
+  font-size: $font-s
+  +line-height(30)
+.un-buy-btn-x
+  @extend .un-buy-btn-xl
+  width: 100px
+  color: $t-d6
+  font-size: $font-s
+  +line-height(30)
+  &:link, &:visited
+    color: $t-d6
 
 //exhibition start
 .i-mod-exhibition
@@ -70,10 +116,15 @@
     text-align: left
   .tg-list
     margin-top: 15px
-    margin-right: 80px
+    margin-right: 60px
     float: left
   .profit-warp
     width: 120px
+  .profit-amount
+    width: 100px
+  .profit-date
+    width: 90px
+    text-align: center
   .tg-bt-text
     margin-top: 6px
 

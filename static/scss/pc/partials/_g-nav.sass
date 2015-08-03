@@ -24,5 +24,34 @@ $g-nav-height: 80px
   position: fixed
   width: 100%
   z-index: 10
-  +box-shadow(0 2px 4px $bg-d11)
+  +box-shadow(0 3px 6px $bg-d16)
 
+.g-user-warp
+  margin-left: 70px
+  .g-user
+    position: relative
+    font-size: $font-m
+    &:hover, &:active
+      color: $t-d2
+      cursor: pointer
+      .g-nav-user-nav
+        display: block
+  .user-nav
+    text-align: center
+    +line-height(80)
+
+  .g-nav-user-nav
+    position: absolute
+    top: 80px
+    right: 0
+    background: #fff
+    z-index: 11
+    +box-shadow(0 3px 6px $bg-d16)
+    a
+      display: block
+      width: 150px
+      text-align: center
+      +line-height(50)
+      &:hover, &:active
+        background: $bg-d15
+        color: $bg-d1

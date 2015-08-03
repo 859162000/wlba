@@ -111,7 +111,6 @@ class IndexView(TemplateView):
         # 获取期限大于6个月的标(period>6 or period>180)
         #p2p_products.extend(self.get_products(period=9, product_id=recommend_product_id))
         p2p_gt6 = self.get_products(period=9, product_id=recommend_product_id)
-
         getmore = True
 
         banners = Banner.objects.filter(Q(device=Banner.PC_2), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now())))
@@ -129,8 +128,10 @@ class IndexView(TemplateView):
 
         # 公告 前7个
         annos = AnnouncementHomepage()[:7]
+        print p2p_gt6
         return {
             #"p2p_products": p2p_products,
+            "recommend_product": recommend_product,
             "p2p_lt_three": p2p_lt3,
             "p2p_lt_six": p2p_lt6,
             "p2p_gt_six": p2p_gt6,

@@ -27,37 +27,50 @@ html
             +intro('icon-safe', '保障安全', '民生银行资金托管', '阳光保险承保资金安全')
             +intro('icon-authority', '专业权威', '网贷协会会员单位', '来自世界顶级的金融精英团队')
           .ex-ac-target.mg-t-sm.br-d1.bg-d3
-            for recommend_product in recommend_product
+            for product in recommend_product
               .ac-tg-head.span12
                 h3.hd-name.fl 精选推荐
                 .hd-time.fr 距离下场更新：
                   |<span>10</span>时  55</span>分  38秒
               .ac-tg-cont
-                a(href='/').font-m.t-d10.tg-pro-tit {{recommend_product.name}}
+                a(href='/p2p/detail/{{product.id}}/').font-m.t-d10.tg-pro-tit {{product.name}}
                 .t-d7
-                  span.mg-r-xl 本息保障：恒大担保
-                  span 还款方式：按月付息 到期还本
+                  span.mg-r-xl 本息保障：{{product.warrant_company}}
+                  span 还款方式：{{product.display_payback_method}}
                 .product-progress.progress-xl
-                  .pro-container
+                  percent = float(product.ordered_amount) / product.total_amount * 100
+                  .pro-container(style="width:{{percent | percentage}}")
                 .ac-tg-row.clearfix
-                  .tg-list
-                    span.t-d5.font-xll 100
-                      span.font-m 元
+                  .tg-list.profit-amount
+                    total_amount = product.total_amount / 10000
+                    span.t-d5.font-xll {{total_amount}}
+                      span.font-m 万
                     .t-d7.tg-bt-text 融资金额
+
                   .tg-list.profit-warp
-                    .font-xll.t-d2 12.0
-                      span.font-m %+
-                      |2.0
+                    earning_rate = str(product.expected_earning_rate)
+                    .font-xll.t-d2 {{earning_rate}}
                       span.font-m %
+                      if product.activity
+                        span.font-m +
+                        |{{product.activity.activity_rule_percent_text}}
+                        span.font-m %
                     .t-d7.tg-bt-text 年收益
-                  .tg-list
-                    span.t-d5.font-xll 180
-                      span.font-m 天
+                  .tg-list.profit-date
+                    span.t-d5.font-xll {{product.period}}
+                      span.font-m {{product.pay_method|period_unit}}
                     .t-d7.tg-bt-text 项目期限
                   .fr.buy-warp
                     span.buy-text-r
-                      a(href="").buy-btn-xl 立即投资
-                      .t-d7.tg-bt-text 剩余金额￥14, 243, 111
+                      if product.display_status == '抢购中'
+                        status = '立即投资'
+                        statusClass = 'buy-btn-xl'
+                      else
+                        status = product.display_status
+                        statusClass = 'un-buy-btn-xl'
+                      a(href="/p2p/detail/{{product.id}}/", class='{{statusClass}}') {{status}}
+                      amount = product.total_amount - product.ordered_amount
+                      .t-d7.tg-bt-text 剩余金额￥{{amount | money_format_int}}
             .ac-tg-bg
 
         .ex-rt-cont
@@ -96,48 +109,56 @@ html
     //product start
     .i-mod-wrap.mg-t-sm
       .i-mod-product.clearfix
-        mixin pdtItem(bgclass)
+        p2ptype = [{'title': '短期稳赢', 'period': '标的期限1-3月', 'class': 'p2p3', 'data': p2p_lt_three}, {'title': '中期保收', 'period': '标的期限3-6月', 'class': 'p2p6', 'data': p2p_lt_six}, {'title': '长期优选', 'period': '标的期限6月以上', 'class': 'p2p12', 'data': p2p_gt_six}]
+        for type in p2ptype
           .pdt-item
-            .pdt-type.padding-sm.br-b-d2(class=bgclass)
-              .font-ll 短期稳赢
-              .font-s.t-d12 标的期限1-3月
-            mixin pdt-list(type)
+            .pdt-type.padding-sm.br-b-d2(class='{{type.class}}')
+              .font-ll {{type.title}}
+              .font-s.t-d12 {{type.period}}
+            product = enumerate(type['data'])
+            for index, p2p in product
               .pdt-list
                 .pdt-warp.padding-t-l-r-sm
-                  a.pdt-name.mg-b-s
+                  a(href='/p2p/detail/{{p2p.id}}/').pdt-name.mg-b-s
                     i.icon.iconfont.icon-car
-                    span.font-l 车贷保证金
-                  if type == 'progress'
+                    span.font-l {{p2p.name}}
+                  if index == 0
                     .t-d7
-                      span.mg-r-xl 本息保障：恒大担保
-                      span 还款方式：按月付息 到期还本
+                      span.mg-r-xl 本息保障：{{p2p.warrant_company}}
+                      span 还款方式：{{p2p.display_payback_method}}
                     .pdt-progress-warp.clearfix
                       .product-progress.progress-x.fl
-                        .pro-container
-                      .pdt-progress-percent.t-d7.fl.mg-l-s 81.6%
-                    .t-d7.mg-b-s 300万元/￥351,300元 可投
+                        percent = float(p2p.ordered_amount) / p2p.total_amount * 100
+                        .pro-container(style="width:{{percent | percentage}}")
+                      .pdt-progress-percent.t-d7.fl.mg-l-s {{percent | percentage}}
+                    total_amount = p2p.total_amount / 10000
+                    amount = p2p.total_amount - p2p.ordered_amount
+                    .t-d7.mg-b-s {{total_amount}}万元/￥{{amount | money_format_int}}元 可投
                   .product-footer.clearfix
                     .span5
                       span.t-d7.font-s 年化
-                      span.font-ll.t-d2 12.0
-                        span.font-s %+
-                        |2
+                      earning_rate = str(p2p.expected_earning_rate)
+                      span.font-ll.t-d2 {{earning_rate}}
                         span.font-s %
+                        if p2p.activity
+                          span.font-s +
+                          |{{p2p.activity.activity_rule_percent_text}}
+                          span.font-s %
                     .span3.ct
-                      span.font-ll 60
-                      span.font-s.t-d11 天
+                      span.font-ll {{p2p.period}}
+                      span.font-s.t-d11 {{p2p.pay_method|period_unit}}
                     .span4
-                      a.buy-btn-x 立即投资
+                      if p2p.display_status == '抢购中'
+                        statusP2P = '立即投资'
+                        statusClassP2P = 'buy-btn-x'
+                      else
+                        statusP2P = p2p.display_status
+                        statusClassP2P = 'un-buy-btn-x'
+                      a(href="/p2p/detail/{{p2p.id}}/",class='{{statusClassP2P}}') {{statusP2P}}
                 if type == 'progress'
                   .product-line
                 else
                   .product-line.mg-l-r-sm
-            +pdt-list('progress')
-            +pdt-list('')
-            +pdt-list('')
-        +pdtItem('p2p3')
-        +pdtItem('p2p6')
-        +pdtItem('p2p12')
     //product end
 
     .i-mod-wrap.mg-t-sm
