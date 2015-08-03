@@ -626,7 +626,8 @@ class ThousandRedPackAPIView(APIView):
         start_time = timezone.datetime(dt.year, dt.month, dt.day)
         end_time = timezone.datetime(dt.year, dt.month, dt.day, 23, 59, 59)
 
-        if dt > timezone.datetime(2015, 7, 15, 23, 59, 59):
+        #if dt > timezone.datetime(2015, 7, 15, 23, 59, 59):
+        if dt > timezone.datetime(2015, 8, 7, 23, 59, 59):
             return Response({'ret_code': 3003, 'message': u'活动已过期'})
 
         join_log = ActivityJoinLog.objects.filter(channel='all', action_name='thousand_redpack',
