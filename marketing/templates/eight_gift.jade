@@ -59,7 +59,7 @@ html
             dt.bottom-eight.bottom-eight6
           p.eight_gift_backzhong1 说明：用户完成满额投资后，系统自动发送一个礼物到用户账户。
           if user.is_authenticated
-            a(href='https://www.wanglibao.com/p2p/list/' data-num="true").button-eight 立即投资
+            a(href='https://staging.wanglibao.com/p2p/list/' data-num="true").button-eight 立即投资
           else
             a(href='https://staging.wanglibao.com/accounts/login/' data-num="false").button-eight 立即投资
           //a(href='https://www.wanglibao.com/p2p/list/').button-eight 立即投资
@@ -116,7 +116,7 @@ html
           //  a(href='https://www.wanglibao.com/p2p/list/' data-num="true").button-eight 立即投资
           //else
           //  a(href='https://www.wanglibao.com/accounts/login/' data-num="false").button-eight 立即投资
-          a(href='https://www.wanglibao.com/p2p/list/').button-eight 立即投资
+          a(href='https://staging.wanglibao.com/p2p/list/').button-eight 立即投资
       .eight_gift_four
         .eight_gift_biao
         .eight_gift_line
@@ -137,7 +137,7 @@ html
             dt.bottom-eight.bottom-eight2
             dd.eight-gift1 3000元现金红包
           if user.is_authenticated
-            a(href='https://www.wanglibao.com/p2p/list/' data-num="true").button-eight 立即投资
+            a(href='https://staging.wanglibao.com/p2p/list/' data-num="true").button-eight 立即投资
           else
             a(href='https://staging.wanglibao.com/accounts/login/' data-num="false").button-eight 立即投资
           //a(href='https://www.wanglibao.com/p2p/list/').button-eight 立即投资
@@ -215,8 +215,6 @@ html
 script.
   var v = new Date().getTime()
   require(['/static/js/hover.js','/static/js/eight.js?v='+v,'/static/js/advance.js'])
-
-
   var endTimeStr = "2015-08-08 00:00:00";
   var endTime = Date.parse(endTimeStr);
   var toHHMMSS = function (sec_num) {
@@ -241,10 +239,11 @@ script.
       var time = toHHMMSS(t);
       var output = time['days'];
       var time_eight =time["hours"];
+      var time_eight0 =parseInt(time_eight);
       var time_eight1 =time["mins"];
       var time_eight2 =time["secs"];
       document.getElementById("display").innerHTML =  output;
-      document.getElementById("display1").innerHTML = time_eight;
+      document.getElementById("display1").innerHTML = time_eight0;
       document.getElementById("display2").innerHTML = time_eight1;
       document.getElementById("display3").innerHTML = time_eight2;
     }, 1000);
