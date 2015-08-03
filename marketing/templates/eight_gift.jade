@@ -129,11 +129,11 @@ html
           dl
             dd.eight-gift 单笔投资≥20万
             dt.bottom-eight.bottom-eight1
-            dd.eight-gift1 1000元现金红包
+            dd.eight-gift1 2000元现金红包
           dl
             dd.eight-gift 单笔投资≥30万
             dt.bottom-eight.bottom-eight2
-            dd.eight-gift1 1000元现金红包
+            dd.eight-gift1 3000元现金红包
           if user.is_authenticated
             a(href='https://www.wanglibao.com/p2p/list/' data-num="true").button-eight 立即投资
           else
@@ -145,7 +145,7 @@ html
           h3 活动规则
           p.eight_gift_backone 1. 注册网利宝用户，均可在活动期间领取高额红包福利；
           p.eight_gift_backone 2. 每天领取红包均为折扣红包，按投资金额的1%折扣使用，红包有效期至8月11日；
-          p.eight_gift_backone 2. 每天领取红包均为折扣红包，按投资金额的1%折扣使用，红包有效期至8月11日；
+          p.eight_gift_backone 3. 全民有礼活动奖品为满额投资后系统随机发放1个（四选一），奖品发完为止，先到先得。所得奖品不可调换不可升级不可兑现；
           p.eight_gift_backone 4. 投资豪礼奖品为现金红包。活动红包统一以站内信形式通知，完成一次投资回款后即可取现；
           p.eight_gift_backone 5. 所有红包均只能使用一次，使用后是否有余额即失效；
           p.eight_gift_backone 6. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
@@ -213,7 +213,7 @@ html
 script.
   var v = new Date().getTime()
   require(['/static/js/hover.js','/static/js/eight.js?v='+v,'/static/js/advance.js'])
-  var endTimeStr = "2015-08-08 12:00:00";
+  var endTimeStr = "2015-08-08 00:00:00";
   var endTime = Date.parse(endTimeStr);
 
   var toHHMMSS = function (sec_num) {
