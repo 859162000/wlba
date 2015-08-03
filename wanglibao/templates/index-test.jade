@@ -27,36 +27,37 @@ html
             +intro('icon-safe', '保障安全', '民生银行资金托管', '阳光保险承保资金安全')
             +intro('icon-authority', '专业权威', '网贷协会会员单位', '来自世界顶级的金融精英团队')
           .ex-ac-target.mg-t-sm.br-d1.bg-d3
-            .ac-tg-head.span12
-              h3.hd-name.fl 精选推荐
-              .hd-time.fr 距离下场更新：
-                |<span>10</span>时  55</span>分  38秒
-            .ac-tg-cont
-              a(href='/').font-m.t-d10.tg-pro-tit 企业投标保证金（一期）
-              .t-d7
-                span.mg-r-xl 本息保障：恒大担保
-                span 还款方式：按月付息 到期还本
-              .product-progress.progress-xl
-                .pro-container
-              .ac-tg-row.clearfix
-                .tg-list
-                  span.t-d5.font-xll 100
-                    span.font-m 元
-                  .t-d7.tg-bt-text 融资金额
-                .tg-list.profit-warp
-                  .font-xll.t-d2 12.0
-                    span.font-m %+
-                    |2.0
-                    span.font-m %
-                  .t-d7.tg-bt-text 年收益
-                .tg-list
-                  span.t-d5.font-xll 180
-                    span.font-m 天
-                  .t-d7.tg-bt-text 项目期限
-                .fr.buy-warp
-                  span.buy-text-r
-                    a(href="").buy-btn-xl 立即投资
-                    .t-d7.tg-bt-text 剩余金额￥14, 243, 111
+            for recommend_product in recommend_product
+              .ac-tg-head.span12
+                h3.hd-name.fl 精选推荐
+                .hd-time.fr 距离下场更新：
+                  |<span>10</span>时  55</span>分  38秒
+              .ac-tg-cont
+                a(href='/').font-m.t-d10.tg-pro-tit {{recommend_product.name}}
+                .t-d7
+                  span.mg-r-xl 本息保障：恒大担保
+                  span 还款方式：按月付息 到期还本
+                .product-progress.progress-xl
+                  .pro-container
+                .ac-tg-row.clearfix
+                  .tg-list
+                    span.t-d5.font-xll 100
+                      span.font-m 元
+                    .t-d7.tg-bt-text 融资金额
+                  .tg-list.profit-warp
+                    .font-xll.t-d2 12.0
+                      span.font-m %+
+                      |2.0
+                      span.font-m %
+                    .t-d7.tg-bt-text 年收益
+                  .tg-list
+                    span.t-d5.font-xll 180
+                      span.font-m 天
+                    .t-d7.tg-bt-text 项目期限
+                  .fr.buy-warp
+                    span.buy-text-r
+                      a(href="").buy-btn-xl 立即投资
+                      .t-d7.tg-bt-text 剩余金额￥14, 243, 111
             .ac-tg-bg
 
         .ex-rt-cont
