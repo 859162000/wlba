@@ -101,13 +101,16 @@ class IndexView(TemplateView):
         recommend_product_id = misc.get_recommend_product_id()
         recommend_product = P2PProduct.objects.filter(id=recommend_product_id)
 
-        p2p_products = []
+        #p2p_products = []
         # 获取期限小于等于3个月的标，天数为90天(period<=3 or period<=90)
-        p2p_products.extend(self.get_products(period=3, product_id=recommend_product_id))
+        #p2p_products.extend(self.get_products(period=3, product_id=recommend_product_id))
+        p2p_lt3 = self.get_products(period=3, product_id=recommend_product_id)
         # 获取期限大雨3个月小于等于6个月的标，天数为180天(3<period<=6 or 90<period<=180)
-        p2p_products.extend(self.get_products(period=6, product_id=recommend_product_id))
+        #p2p_products.extend(self.get_products(period=6, product_id=recommend_product_id))
+        p2p_lt6 = self.get_products(period=6, product_id=recommend_product_id)
         # 获取期限大于6个月的标(period>6 or period>180)
-        p2p_products.extend(self.get_products(period=9, product_id=recommend_product_id))
+        #p2p_products.extend(self.get_products(period=9, product_id=recommend_product_id))
+        p2p_gt6 = self.get_products(period=9, product_id=recommend_product_id)
 
         getmore = True
 
@@ -126,9 +129,11 @@ class IndexView(TemplateView):
 
         # 公告 前7个
         annos = AnnouncementHomepage()[:7]
-        print annos
         return {
-            "p2p_products": p2p_products,
+            #"p2p_products": p2p_products,
+            "p2p_lt_three": p2p_lt3,
+            "p2p_lt_six": p2p_lt6,
+            "p2p_gt_six": p2p_gt6,
             "news_and_reports": news_and_reports,
             'banners': banners,
             'site_data': site_data,
