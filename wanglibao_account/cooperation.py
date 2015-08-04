@@ -14,10 +14,10 @@ from marketing.utils import set_promo_user
 from wanglibao import settings
 from wanglibao.settings import  YIRUITE_CALL_BACK_URL, \
         TIANMANG_CALL_BACK_URL, WLB_FOR_YIRUITE_KEY, YIRUITE_KEY, BENGBENG_KEY, \
-    WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
-    JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL
+    WLB_FOR_BENGBENG_KEY, WLB_FOR_JINSHAN_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
+    JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL, JINSHAN_CALL_BACK_URL
 from wanglibao_account.models import Binding, IdVerification
-from wanglibao_account.tasks import  yiruite_callback,  common_callback
+from wanglibao_account.tasks import  yiruite_callback, jinshan_callback, common_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord
 from wanglibao_pay.models import Card
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -35,7 +35,7 @@ def get_uid_for_coop(user_id):
     uid = m.hexdigest()
     return uid
 
-def get_username_for_coop(user_id):
+def get_username_for_coo(user_id):
     """
     返回给渠道的用户名
     :param user_id:
@@ -394,9 +394,78 @@ class DouwanRegister(CoopRegister):
     def binding_card_call_back(self, user):
         self.douwan_callback(user, 'step3')
 
+class JinShanRegister(CoopRegister):
+    def __init__(self, request):
+        super(JinShanRegister, self).__init__(request)
+        self.c_code = 'jinshan'
+        self.extra_key = 'extra'
+        self.call_back_url = JINSHAN_CALL_BACK_URL
+
+    @property
+    def channel_extra(self):
+        """
+        渠道扩展参数
+        """
+        return self.request.session.get(self.extra_key, None)
+
+    def save_to_session(self):
+        channel_code  = self.get_channel_code_from_request()
+        channel_user  = self.request.GET.get(self.external_channel_user_key, None)
+        channel_extra = self.request.GET.get(self.extra_key, None)
+        if channel_code:
+            self.request.session[self.internal_channel_key] = channel_code
+            #logger.debug('save to session %s:%s'%(self.internal_channel_key, channel_code))
+
+        if channel_user:
+            self.request.session[self.internal_channel_user_key] = channel_user
+            #logger.debug('save to session %s:%s'%(self.internal_channel_user_key, channel_user))
+
+        if channel_extra:
+            self.request.session[self.extra_key] = channel_extra
+            #logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
+
+    def save_to_binding(self, user):
+        """
+        处理从url获得的渠道参数
+        :param user:
+        :return:
+        """
+        if self.channel_user:
+            binding = Binding()
+            binding.user = user
+            binding.btype = self.channel_name
+            binding.bid = self.channel_user
+            binding.extra = self.channel_extra
+            binding.save()
+            # logger.debug('save user %s to binding'%user)
+
+    def jinshan_call_back(self, user, offer_type, key):
+        binding = Binding.objects.get(user_id=user.id)
+        extra = binding.extra
+        bid = binding.bid
+        sign = hashlib.md5( str(bid) + offer_type + key ).hexdigest()
+        params = {
+            'userid': bid,
+            'offer_type': offer_type,
+            'pass': sign,
+            'extra': extra,
+        }
+        jinshan_callback.apply_async(
+            kwargs={'url': self.call_back_url, 'params': params})
+
+    def register_call_back(self, user):
+        self.jinshan_call_back(user, 'wangli_regist_none', 'ZSEt6lzsK1rigjcOXZhtA6KfbGoS')
+
+    def validate_call_back(self, user):
+        self.jinshan_call_back(user, 'wangli_regist_reward', 'Cp9AhO2o9BQTDhbUBnHxmY0X4Kbg')
+
+    def purchase_call_back(self, user):
+        if P2PRecord.objects.filter(user_id=user.id).count() == 1:
+            self.jinshan_call_back(user, 'wangli_invest_reward', 'pA71ZhBf4DDeet7SLiLlGsT1qTYu')
+
 
 #注册第三方通道
-coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister, JuxiangyouRegister, DouwanRegister]
+coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister, JuxiangyouRegister, DouwanRegister, JinShanRegister]
 
 #######################第三方用户查询#####################
 
