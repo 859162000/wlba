@@ -27,7 +27,7 @@
             .landed-head.clearfix
               img(src='/static/imgs/pc/home/user.jpg').fl
               .head-username.fr.tl
-                .font-m {{user|display_name}}
+                .font-m {{user | display_name}}
                   span.font-s , 你好!
                 .font-s.t-d17 感谢您对网利宝的信任！
             .landed-cont
@@ -35,12 +35,13 @@
                 div 全方位控制项目风险
                 div 业界唯一零坏账平台
               .landed-cont-show.font-m.hide
-                div
-                  span.t-d17.font-xs 可用余额：
-                  span 1856.00
-                div
-                  span.t-d17.font-xs 账户资产：
-                  span 1856.00
+                span.user-data-warp
+                  div
+                    span.t-d17.font-xs 可用余额：
+                    span {{user.margin.margin}}
+                  div
+                    span.t-d17.font-xs 账户资产：
+                    span {{user.margin.margin}}
 
               .landed-cont-btn
                 i.icon.iconfont.icon-eye03
