@@ -61,7 +61,8 @@ from order.utils import OrderHelper
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityRecord
-
+from aes import Crypt_Aes
+from wanglibao.settings import AMORIZATION_AES_KEY
 
 logger = logging.getLogger(__name__)
 
@@ -1207,6 +1208,41 @@ def user_product_contract(request, product_id):
         lines = f.readlines()
         f.close()
         return HttpResponse("\n".join(lines))
+    except ValueError, e:
+        raise Http404
+
+def user_product_contract_kf(request):
+    product_id = request.GET.get('product_id', "").strip()
+    user_id = request.GET.get("user_id", "").strip()
+    if not product_id.isdigit() or not user_id.isdigit():
+        return Response({
+            'message': u'参数错误',
+            'error_number': ErrorNumber.param_error
+        })
+    user = User.objects.filter(id=user_id).get()
+    if not user:
+        return Response({
+            'message': u'用户不存在',
+            'error_number': ErrorNumber.param_error
+        })
+    equity = P2PEquity.objects.filter(user=user, product_id=product_id).prefetch_related('product').first()
+
+    product = equity.product
+    order = OrderHelper.place_order(order_type=u'生成合同文件', status=u'开始', equity_id=equity.id, product_id=product.id)
+
+    if not equity.latest_contract:
+        #create contract file
+        EquityKeeperDecorator(product, order.id).generate_contract_one(equity_id=equity.id, savepoint=False)
+
+    equity_new = P2PEquity.objects.filter(id=equity.id).first()
+    try:
+        f = equity_new.latest_contract
+        lines = f.readlines()
+        f.close()
+        my_aes = Crypt_Aes(AMORIZATION_AES_KEY)
+        result = my_aes.encrypt("\n".join(lines))
+        # return HttpResponse(my_aes.decrypt(result))
+        return HttpResponse(result)
     except ValueError, e:
         raise Http404
 

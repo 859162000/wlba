@@ -504,8 +504,8 @@ org.regist = (function(org){
                 })
 
                 if(!isSubmit) return false
-                var token = '';
-                $invitation.val() === '' ? token =  $('input[name=token]').val() : token = $invitation.val();
+                var tid = org.getQueryStringByName('tid');
+                var token = $invitation.val() === '' ?  $('input[name=token]').val() : $invitation.val();
                 org.ajax({
                     url: '/api/register/',
                     type: 'POST',
@@ -513,7 +513,8 @@ org.regist = (function(org){
                             'identifier':       $identifier.val(),
                             'password':         $password.val(),
                             'validate_code':    $validation.val(),
-                            'invite_code':      token
+                            'invite_code':      token,
+                            'tid' : tid,
                     },
                     beforeSend: function() {
                         $submit.text('注册中,请稍等...');
