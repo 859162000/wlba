@@ -43,7 +43,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
                             DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView,
-                            GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView)
+                            GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView)
 from wanglibao_redpack.views import RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView
 
 from marketing.play_list import InvestmentHistory
@@ -205,6 +205,7 @@ urlpatterns = patterns(
     url(r'^gesture/add/$', GestureAddView.as_view()),
     url(r'^gesture/update/$', GestureUpdateView.as_view()),
     url(r'^gesture/isenabled/$', GestureIsEnabledView.as_view()),
+    url(r'^xunlei/8/check/$', GuestCheckView.as_view()),
 )
 
 urlpatterns += patterns('',

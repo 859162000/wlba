@@ -24,6 +24,7 @@ from marketing.models import PromotionToken, Channels
 from marketing.utils import set_promo_user
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import create_user
+from wanglibao_activity.models import ActivityRecord
 from wanglibao_portfolio.models import UserPortfolio
 from wanglibao_portfolio.serializers import UserPortfolioSerializer
 from wanglibao_rest.serializers import AuthTokenSerializer
@@ -1010,3 +1011,18 @@ class GestureIsEnabledView(APIView):
         u_profile_object.save()
 
         return Response({"ret_code": 0, "message": u"设置成功"})
+
+
+class GuestCheckView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user = self.request.user
+        activity_record = ActivityRecord.objects.filter(user=user, activity__code='xunlei8').first()
+        p2p_record = P2PRecord.objects.filter(user=user, catalog='申购').first()
+
+        data = dict()
+        data['has_invested'] = True if p2p_record else False
+        data['has_rewarded'] = True if activity_record else False
+
+        return Response({"ret_code": 0, "data": data})
