@@ -1,0 +1,401 @@
+@import susy
+@import compass/typography/links
+@import compass/css3
+@import variables
+@import layout
+
+*
+  margin: 0
+  padding: 0
+
+.act-full-container
+  width: 100%
+  height: 40px
+  border-bottom: 1px solid #cccccc
+  background: #fff
+  .act-topbar
+    width: 1100px
+    height: 100%
+    margin:  0 auto
+    line-height: 40px
+    .container
+      .act-user-div
+        position: relative
+        .act-weibo-qr-code
+          position: absolute
+          bottom: 100%
+          top: 13px
+          left: 115px
+          z-index: 9
+          padding-top: 15px
+        .act-weixin-qr-code
+          position: absolute
+          bottom: 100%
+          top: 20px
+          left: 274px
+          z-index: 9
+          width: 164px
+          height: 223px
+          padding-top: 15px
+
+        .act-icon-phone,
+        .act-icon-weibo,
+        .act-icon-mobile-app,
+        .act-icon-weixin
+          display: inline-block
+          overflow: hidden
+          width: $space-m
+          height: $space-m
+          line-height: $space-m
+          background: url("/static/images/cum-tu2.png") no-repeat
+          +border-radius(13px)
+          +transition(all .3s ease-in-out)
+          margin-left: 20px
+          position: relative
+          top: -5px
+        .act-icon-phone
+          background-position: 1px 3px
+          top: 6px
+          left: -10px
+        .act-icon-weibo
+          background-position: -25px 2px
+          top: 6px
+          left: -10px
+
+        .act-weibo-container:hover
+          .icon-weibo
+            background-position: 0 -200px
+            background-color: #ff6102
+
+        .act-icon-weibo:hover
+          background-position: -25px 2px
+          background-color: #ff6102
+
+        .act-icon-weixin
+          background-position: -60px 1px
+          top: 6px
+          left: -10px
+        .act-weixin-container:hover
+          .act-icon-weixin
+            background-position: -61px 0px
+            background-color: #5cff5b
+
+        .act-icon-weixin:hover
+          background-position: -61px 0px
+          background-color: #5cff5b
+
+        .act-margin-left-m
+          margin-left: 30px
+        .act-mobile-app-top
+          float: right
+        .act-icon-mobile-app
+          background-position: -99px 1px
+          top: 6px
+          left: -10px
+
+        .act-mobile-app-top-prompt
+          width: 320px
+          height: 200px
+          background: url("/static/images/app_prompt_bg_01.png") no-repeat -5px -5px
+          position: absolute
+          top: 40px
+          right: -40px
+          z-index: 999
+          display: none
+
+        .act-mobile-app-apple
+          width: 130px
+          height: 40px
+          background: url("/static/images/app_prompt_bg.png") no-repeat -157px -400px
+          display: block
+          margin-top: 30px
+          margin-left: 160px
+          margin-bottom: 10px
+
+          &:hover
+            background-position: -157px -445px
+        .act-mobile-app-android
+          width: 130px
+          height: 40px
+          background: url("/static/images/app_prompt_bg.png") no-repeat -16px -400px
+          display: block
+          margin-left: 160px
+
+          &:hover
+            background-position: -16px -445px
+
+.activity-nav
+  width: 100%
+  height: 90px
+  background: #fff
+  .act-container-login-nav
+    width: 1100px
+    height: 90px
+    margin: 0 auto
+    position: relative
+    .act-logo
+      +inline-block()
+      background: image-url('logo.png')
+      background-repeat: no-repeat
+      background-position: center
+      height: 75px
+      width: 350px
+      display: inline-block
+      margin-top: 8px
+      .svg &
+        background: image-url('logo.png') no-repeat center middle
+    .login-nav
+      position: absolute
+      right: 0
+      height: 100%
+      width: 704px
+      .right-nav
+        height: 20px
+        width: 100%
+      .nav-items
+        ul
+          li
+            float: left
+            list-style: none
+            text-align: center
+            a
+              text-decoration: none
+              color: #7b8288
+              font-size: 16px
+              margin-left: 25px
+            a:hover
+              color: $color-pomegranate
+            a.button-red
+              background: $color-pomegranate
+              color: white
+
+            a.button-account-nav
+              //padding: 10px 15px
+              color: #ffffff
+              +border-radius(5px)
+
+              &:hover
+                background: #bf320d
+                color: #ccc
+            a.button-dif
+              padding: 0 15px
+              color: #ffffff
+              +border-radius(5px)
+
+.modal
+  overflow: hidden
+  border-radius: 0
+  box-shadow: none
+  padding: 0
+
+  #close-modal
+    content: "x"
+
+.act-login
+  width: 316px
+  height: auto
+  position: absolute
+  border-radius: 5px
+  background: #fff
+  top: 45px
+  right: 0
+  text-align: center
+  .act-biaoti
+    color: red
+    line-height: 50px
+    text-align: center
+    margin-top: 8px
+  .act-get
+    display: inline-block
+    margin: 0 auto
+  .act-login-form
+    width: 276px
+    background: #fff
+    margin: 0 auto
+    input
+      line-height: 40px
+      border: none
+      border: 1px solid #ccc
+      width: 100%
+      height: 40px
+      line-height: normal
+    #agreement
+      position: relative
+      top: 2px
+      left: -4px
+      height: 13px
+      width: 13px
+    .act-com-tu
+      background: url(/static/images/xunlei-denglu/xunlei-denglu-tu.png) no-repeat
+      padding-left: 30px
+    .act-tu1
+      background-position: 0 -73px
+    .act-tu2
+      background-position: 0 5px
+    .act-tu3
+      background-position: 0 -32px
+    .act-form-row
+      @extend .row
+      text-align: left
+      position: relative
+      padding-top: 10px
+    .act-form-row-error
+      @extend .row
+      line-height: 1.3
+      color: red
+      label.error
+        font-size: $font-s
+        color: $color-pomegranate
+
+        &:before
+          content: '* '
+        &:empty
+          display: none
+      label
+        font-weight: normal
+    .act-hidden
+      display: none !important
+    .act-show
+      margin-bottom: 10px
+    .act-button-orange
+      background: $color-orange
+      color: $color-white
+      border: none
+      border-radius: 5px
+      &:hover
+        background: #f67313
+    .act-button-large
+      @extend .button
+      font-size: $font-m
+      line-height: 40px
+      padding: 0 1em
+    .act-huoqu-ma
+      padding: 0 10px
+      border: none
+      color: #fff
+      background: #ff461f
+      border-radius: 5px
+      margin-left: 20px
+    .act-huoqu-ma-gray
+      background: #cccccc
+      margin-left: 10px
+    .act-button-account
+      @extend .button-primary !optional
+      font-size: 24px
+      padding: 10px
+    .agreement
+      font-size: $font-s
+      color: $color-dusty-gray
+      text-align: center
+      clear: both
+      margin: 0 auto
+      padding-top: 6px
+  .xun-p
+    text-align: center
+    margin: 0 0 10px 0
+.modal-container
+  width: 470px
+  height: 195px
+  background: #fff
+  border: none
+  box-shadow: none
+  -webkit-box-shadow: none
+  a
+    font-size: 24px
+    color: #ccc!important
+    position: absolute
+    top: 0
+    right: 8px
+    text-decoration: none!important
+    a:hover
+      color: #cccccc!important
+      text-decoration: none!important
+  .modal-header
+    text-align: left
+    height: 50px
+    line-height: 50px
+    font-size: $font-l
+    background-color: #f1f1f1
+    border: none
+    padding-left: 10px
+    .icon-cancel
+      font-size: 1.8em
+      cursor: pointer
+  .modal-content
+    margin-top: 30px
+    text-align: center
+    font-size: $font-s
+    margin-bottom: 25px
+    box-shadow: none
+    -webkit-box-shadow: none
+    border: none
+    h2
+      margin-bottom: 7px
+    p
+      color: $color-text-d4
+  .modal-footer
+    text-align: center
+    border: none
+    a
+      font-size: 16px
+      background: red
+      padding: 9px 40px
+      color: #fff!important
+      text-decoration: none
+      top: 144px
+      right: 160px
+
+#aug-center
+  width: 90%
+  height: auto
+  margin-left: 5%
+  position: absolute
+  top: 29%
+  opacity: 1
+  background: #fff
+  border-radius: 5px
+  padding-bottom: 10px
+  display: none
+  z-index: 10
+  .off-form
+    border-radius: 15px
+    background: #fff
+    font-weight: bold
+    color: #999
+    position: absolute
+    font-size: 21px
+    right: 3px
+    top: 2px
+    cursor: default
+    padding: 0 8px
+  .aut-form
+    padding: 18px 13px
+    .aut-error
+      padding: 0
+    .form-row
+      .aut-captcha
+        width: 123px
+#aug-code
+  width: 100%
+  height: 383px
+  border: 1px solid #000
+  position: absolute
+  z-index: 9
+  background: #000
+  opacity: 0.4
+  filter: alpha(opacity=40)
+  border-radius: 5px
+  display: none
+
+#ganjiwang-model
+  background: #000
+  opacity: 0.4
+  filter: alpha(opacity=40)
+  top: 63px
+  width: 320px
+  height: 256px
+  position: absolute
+  right: 7px
+
+#ganjiwang-welcome
+  top: 50px

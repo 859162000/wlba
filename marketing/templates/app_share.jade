@@ -13,8 +13,8 @@ html
       div.content
         p 您的朋友
           span.red {{ identifier|safe_phone_new }}
-          | 邀请您来网利宝赚钱，首次可获
-          span.red 100元
+          | 邀请您来网利宝赚钱，注册即获
+          span.red 1000元
           | 红包。
         #validate-modal-form
           - csrf_token
@@ -60,13 +60,17 @@ html
         .download-image
       button.downloadApp.download-btn(type="button") 点击下载APP软件
       if reg == "y"
-        p.padding-l-r-s
+        //p.padding-l-r-s
           | 完成首次单笔
           span.red 1000元
           | （含）以上的P2P理财交易，您将获得
           span.red 30元
           | 红包。
-        p.padding-l-r-s.gray 红包将在3个工作日内发放至您的注册手机号。
+        //p.padding-l-r-s.gray 红包将在3个工作日内发放至您的注册手机号。
+        p(style='text-align: left;padding:0 1em') 送您
+            span.red 1000元
+            现金红包，请至APP个人资产-红包中查看
+        p.padding-l-r-s.gray 感谢您对网利宝的信任和支持！
 
     script.
       var v = new Date().getTime()

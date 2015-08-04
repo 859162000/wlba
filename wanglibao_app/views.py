@@ -31,7 +31,7 @@ from wanglibao_rest.utils import split_ua, get_client_ip
 from wanglibao_banner.models import Banner
 from wanglibao_sms.utils import send_validation_code
 
-
+logger = logging.getLogger(__name__)
 
 class AppActivateImageAPIView(APIView):
     """ app端查询启动活动图片 """
@@ -100,7 +100,7 @@ class AppRepaymentAPIView(APIView):
                         income_num += equity.pre_paid_interest
                         income_num += equity.activity_interest
 
-                return Response({'ret_code': 0, 'message': 'ok', 'amount': amount, 'income_num': income_num})
+                return Response({'ret_code': 0, 'message': 'ok', 'amount': float(amount), 'income_num': float(income_num)})
 
             else:
                 # 未登陆用户 查询当月还款金额和当月还款项目
@@ -110,9 +110,9 @@ class AppRepaymentAPIView(APIView):
                 ams = ProductAmortization.objects.filter(settlement_time__range=(start_utc, timezone.now()), settled=True)
                 for x in ams:
                     amount += x.principal + x.interest + x.penal_interest
-                return Response({'ret_code': 0, 'message': 'ok', 'amount': amount, 'income_num': len(ams)})
+                return Response({'ret_code': 0, 'message': 'ok', 'amount': float(amount), 'income_num': len(ams)})
         except Exception, e:
-            logging.error(e.message)
+            logger.error(e.message)
             return Response({'ret_code': 20001, 'message': 'fail'})
 
 
@@ -146,7 +146,9 @@ class AppExploreView(TemplateView):
     template_name = 'discover.jade'
 
     def get_context_data(self, **kwargs):
-        banner = Banner.objects.filter(device='weixin', type='banner', is_used=True).order_by('-priority')
+        #banner = Banner.objects.filter(device='mobile', type='banner', is_used=True).order_by('-priority')
+        banner = Banner.objects.filter(Q(device='mobile'), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now()))).order_by('-priority')
+        print banner
         return {
             'banner': banner,
         }
@@ -198,21 +200,8 @@ class AppRecommendViewSet(PaginatedModelViewSet):
         qs = super(AppRecommendViewSet, self).get_queryset()
 
         misc = MiscRecommendProduction()
-        ids = misc.get_recommend_products()
-        if ids:
-            for id in ids:
-                recommend = qs.filter(hide=False, status=u'正在招标', id=id)
-                if recommend:
-                    return recommend
-        # 自定义查询标
-        productions = qs.filter(hide=False, status=u'正在招标').exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标'))
-        if productions:
-            id_rate = [{'id': q.id, 'rate': q.completion_rate} for q in productions]
-            id_rate = sorted(id_rate, key=lambda x: x['rate'], reverse=True)
-            return qs.filter(id=id_rate[0]['id'])
-
-        else:
-            return qs.filter(hide=False).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time')
+        product_id = misc.get_recommend_product_id()
+        return qs.filter(id=product_id)
 
 
 class RecommendProductManagerView(TemplateView):

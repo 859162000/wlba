@@ -221,8 +221,11 @@ class P2POperator(object):
             "mtype": "loaned"
         })
 
-        # 将标信息从满标的redis列表中挪到还款中的redis列表
         cache_backend = redis_backend()
+        # 更新该标的redis缓存
+        cache_backend.update_detail_cache(product.id)
+
+        # 将标信息从满标的redis列表中挪到还款中的redis列表
         cache_backend.update_list_cache('p2p_products_full', 'p2p_products_repayment', product)
 
     @classmethod
@@ -284,8 +287,11 @@ class P2POperator(object):
                 cls.logger.info("Product [%d] [%s] payed all amortizations, finish it", product.id, product.name)
                 ProductKeeper(product).finish(None)
 
-                # 将标信息从还款中的redis列表中挪到已完成的redis列表
                 cache_backend = redis_backend()
+                # 更新该标的redis缓存
+                cache_backend.update_detail_cache(product.id)
+
+                # 将标信息从还款中的redis列表中挪到已完成的redis列表
                 cache_backend.update_list_cache('p2p_products_repayment', 'p2p_products_finished', product)
 
 

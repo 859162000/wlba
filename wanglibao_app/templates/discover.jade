@@ -9,14 +9,18 @@ html(style='background:#f5f5f5')
       .swiper-container
         .swiper-wrapper
           for item in banner
-            a(href="{{item.link}}").swiper-slide
+            if item.link
+              linkURL = item.link
+            else
+              linkURL = "javascript:void(0)"
+            a(href="{{linkURL}}").swiper-slide
               img(data-src="/media/{{item.image}}", class="swiper-lazy")
               .swiper-lazy-help
         .swiper-pagination
     //activity item
     article.ios-main
       title 最新活动
-      mixin item(url, imgUrl, title, explain, time)
+      mixin item(url, imgUrl, title, explain, time, overdue)
         section.ac-item
           a(href=url)
             img(src=imgUrl)
@@ -24,10 +28,11 @@ html(style='background:#f5f5f5')
               h4.item-h4=title
               p.item-explain=explain
               p.item-time=time
-
-      +item('#', '/static/imgs/app/discover/banner_sml.jpg', '每天送万元大奖', '这里是活动的说明，这里是活动的说明，这里是活动的说明。', '2015.07.03 至 2015.07')
-      +item('#', '/static/imgs/app/discover/banner_sml.jpg', '每天送万元大奖', '这里是活动的说明，这里是活动的说明，这里是活动的说明。', '2015.07.03 至 2015.07')
-      +item('#', '/static/imgs/app/discover/banner_sml.jpg', '每天送万元大奖', '这里是活动的说明，这里是活动的说明，这里是活动的说明。', '2015.07.03 至 2015.07')
+          if not overdue
+            .mask
+      +item('/activity/app_extension/', '/static/imgs/app/discover/discover_2.png', '伸手要钱领千元红包', '红包每日限量3000份，每日一次先到先得。', '2015.07.03 至 2015.07.15', 'open')
+      +item('/activity/app_father/', '/static/imgs/app/discover/discover_4.png', '父亲节活动', '投资满500即送5元微信红包，最高可送5000元。投资满5000加送100元现金红包。', '2015.06.20 至 2015.06.26', 'open')
+      +item('/activity/app_level/', '/static/imgs/app/discover/discover_5.png', '财富擂台赛', '每日投资达3万，即可参加擂台赛，获得额外现金红包，最高1000元。', '2015.06.14 至 2015.07.15', 'open')
 
     // banner javascript
     script(src="/static/scripts/mobile/swiper/swiper.min.js")
