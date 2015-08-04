@@ -521,7 +521,8 @@ org.regist = (function(org){
                     },
                     success:function(data){
                         if(data.ret_code === 0){
-                            window.location.href = '/weixin/regist/succees/';
+                            var next = org.getQueryStringByName('next') == '' ? '/weixin/regist/succees/' : org.getQueryStringByName('next');
+                            window.location.href = next;
                         }else if(data.ret_code > 0){
                             org.ui.showSign(data.message)
                             $submit.text('立即注册 ｜ 领取奖励');

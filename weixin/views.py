@@ -147,8 +147,11 @@ class WeixinLogin(TemplateView):
                 context['openid'] = res.get('openid')
             except WeChatException, e:
                 pass
-
-        return context
+        next = self.request.GET.get('next', '')
+        return {
+            'context' : context,
+            'next'   : next
+            }
 
 
 class WeixinRegister(TemplateView):
@@ -169,10 +172,12 @@ class WeixinRegister(TemplateView):
         else:
             channel = None
         phone = self.request.GET.get('phone', 0)
+        next = self.request.GET.get('next', '')
         return {
             'token': token,
             'channel': channel,
-            'phone': phone
+            'phone': phone,
+            'next' : next
         }
 
 

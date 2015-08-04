@@ -37,8 +37,11 @@ html(style="background: #f5f5f5")
         section.login-submit
           button(type="submit", disabled=true) 登录网利宝
     section.login-for-regist
-      a(href="/weixin/regist/") 免费注册
+      if next == ''
+        a(href="/weixin/regist/") 免费注册
+      else
+        a(href="/weixin/regist/?next={{next}}") 免费注册
     section.bank-safe
       span 账户资金安全由平安银行承保
     include include/tracking
-  script(data-init='login', src="/static/scripts/mobile/mobile.js")
+  script(data-init='login', src="/static/scripts/mobile/dist/mobile.js?v=20150808")
