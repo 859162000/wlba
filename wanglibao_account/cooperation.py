@@ -22,9 +22,9 @@ from wanglibao import settings
 from wanglibao.settings import  YIRUITE_CALL_BACK_URL, \
         TIANMANG_CALL_BACK_URL, WLB_FOR_YIRUITE_KEY, YIRUITE_KEY, BENGBENG_KEY, \
     WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
-    JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL
+    JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL, JINSHAN_CALL_BACK_URL, WLB_FOR_JINSHAN_KEY
 from wanglibao_account.models import Binding, IdVerification
-from wanglibao_account.tasks import  common_callback
+from wanglibao_account.tasks import  common_callback, jinshan_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
 from wanglibao_pay.models import Card
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -466,7 +466,7 @@ class JinShanRegister(CoopRegister):
 
 
 #注册第三方通道
-coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister, JuxiangyouRegister, DouwanRegister]
+coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister, JuxiangyouRegister, DouwanRegister, JinShanRegister]
 
 #######################第三方用户查询#####################
 

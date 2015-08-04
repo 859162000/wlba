@@ -112,7 +112,21 @@ def xicai_send_data_task():
     xicai_send_data()
 
 
-
+@app.task
+def jinshan_callback(url, params):
+    logger.info("Enter jinshan_callback task===>>>")
+    ret = None
+    try:
+        logger.info(params)
+        ret = requests.post(url, data=params)
+        logger.info('jinshan callback url: %s'%(ret.url))
+        logger.info('callback return: %s' % (ret.text))
+    except Exception, e:
+        logger.info(" {'jinshan callback':'failed to connect'} ")
+        logger.info(e)
+    
+    if ret:
+        logger.info(ret.text)
 
 
 
