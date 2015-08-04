@@ -25,7 +25,7 @@ html(style="background:#fef4e0")
       if user.is_authenticated
         a(href='/weixin/list/' data-num="true").button-eight 立即投资
       else
-        a(href='/weixin/login/' data-num="false").button-eight 立即投资
+        a(href='/weixin/login/?next=/weixin/list/' data-num="false").button-eight 立即投资
     .app-eighttwo
       img(src='/static/imgs/mobile_activity/app_eight_gift/two.png').app-eight-img1
       .line
@@ -76,7 +76,7 @@ html(style="background:#fef4e0")
       if user.is_authenticated
         a(href='/weixin/list/' data-num="true").button-eight 立即投资
       else
-        a(href='/weixin/login/' data-num="false").button-eight 立即投资
+        a(href='/weixin/login/?next=/weixin/list/' data-num="false").button-eight 立即投资
     .app-eightfive
       h3 活动规则
       p.app_eight_backone 1. 注册网利宝用户，均可在活动期间领取高额红包福利；
@@ -86,7 +86,22 @@ html(style="background:#fef4e0")
       p.app_eight_backone 5. 所有红包均只能使用一次，使用后是否有余额即失效；
       p.app_eight_backone 6. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
       p.app_eight_backone 7. 网利宝对此活动享有最终解释权。
+#small-zc
+  .wrap(style="background:none")
+    .gold2
+      .seven-success#seven-success
+        span.first-xl-off2 ×
+        span.seven-happy.seven-com.seven-nine 亲，恭喜您
+          br
+          b 今天伸手领钱成功
+        a(href="/").first-user 立即使用
+      #first-redpack-fail
+        span.first-xl-off2 ×
+        p 不符合参加条件
+script(src="/static/js/require.js", data-main="/static/js/header")
+script(src="/static/js/advance.js")
 script.
+
   function TimeTo(dd) {
     var t = new Date(dd),//取得指定时间的总毫秒数
             n = new Date().getTime(),//取得当前毫秒数
