@@ -81,19 +81,17 @@ html
                 span 数据统计
               .dc-time.t-d7.fr 截止至2015-6-21
             .ex-data
-              ul
-                mixin animateNum()
+              ul.font-s
                   li.mg-b-s
-                    p.t-d7 网利宝昨日交易额
-                    label.t-d8
-                      span.num-animate 796
-                      |万&nbsp
-                      span.num-animate 6856
-                      |元
-                +animateNum()
-                +animateNum()
-                +animateNum()
-            .dc-bg
+                    p.t-d7 累计投资人数
+                    .num-space.t-d8(data-number='{{site_data.invest_threshold}}', data-type='man')
+                  li.mg-b-s
+                    p.t-d7 为投资人累计赚取收益
+                    .num-space.t-d8(data-number='{{site_data.p2p_total_earning}}',data-type='amount')
+                  li.mg-b-s
+                    p.t-d7 网利金融累计投资金额
+                    .num-space.t-d8(data-number='{{site_data.p2p_total_trade}}',data-type='amount')
+            i.dc-bg.icon.iconfont.icon-amount
           .ex-download-app.mg-t-sm.padding-sm
             img(src='/static/imgs/pc/home/erweima.jpg').dol-app.mg-r-sm.fl
             .dol-btn.fl

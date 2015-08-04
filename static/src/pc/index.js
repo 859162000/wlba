@@ -9,11 +9,36 @@ require.config({
 });
 
 require(['jquery', 'jquery.animateNumber'], function( $ ) {
-
   //number adminante
-  $('.num-animate').prop('number', 0).animateNumber({
-    number: 5000,
-  },2000);
+  var $num = $('.num-space')
+  $num.each(function( ) {
+    var amount = parseInt($(this).attr('data-number')).toString(),
+        type = $(this).attr('data-type');
+    $(this).append(amountGe(amount, type));
+  })
+  function amountGe(value, type){
+    var len = value.length, str = '', reType = '';
+    reType = type == 'man' ? '人' : '元';
+    if(len > 8){
+      str = isNode(value.substr(0,len-8), '亿') + isNode(value.substr(-8,4), '万') + isNode(value.substr(-4,4), reType);
+    }else{
+      str = isNode(value.substr(0,len-4), '万') + isNode(value.substr(-4,4), reType);
+    }
+    function isNode(substr, text){
+      if(parseInt(substr) > 0){
+        return " <span class='num-animate'>" + parseInt(substr) + '</span> ' + text;
+      }
+      return '';
+    }
+    return str
+  }
+
+  $('.num-animate').each(function(){
+    var key = parseInt($(this).html());
+    $(this).prop('number', 0).animateNumber({
+      number: key,
+    },1000);
+  })
 
 
   //nav fixed

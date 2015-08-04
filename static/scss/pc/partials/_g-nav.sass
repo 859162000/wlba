@@ -24,7 +24,7 @@ $g-nav-height: 80px
   position: fixed
   width: 100%
   z-index: 10
-  +box-shadow(0 3px 6px $bg-d16)
+  +box-shadow(0 3px 6px $bg-d11)
 
 .g-user-warp
   margin-left: 70px
@@ -39,14 +39,23 @@ $g-nav-height: 80px
   .user-nav
     text-align: center
     +line-height(80)
-
+    .user-text
+      display: inline-block
+      vertical-align: middle
+      margin: 0 5px
+    .icon-user
+      font-size: 40px
+      vertical-align: middle
+    .icon-down
+      font-size: $font-xs
+      color: #bfbfbf
   .g-nav-user-nav
     position: absolute
     top: 80px
     right: 0
     background: #fff
     z-index: 11
-    +box-shadow(0 3px 6px $bg-d16)
+    +box-shadow(0 3px 6px $bg-d11)
     a
       display: block
       width: 150px
