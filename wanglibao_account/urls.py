@@ -12,7 +12,7 @@ from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, 
                    AccountTransactionDeposit, AccountRedPacket,
                    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract,
                    Third_login, Third_login_back, MessageView, MessageDetailAPIView, MessageCountAPIView,
-                   MessageListAPIView, AccountRepayment, AddressView, AccountInviteView)#, CjdaoApiView)
+                   MessageListAPIView, AccountRepayment, AddressView, AccountInviteView, user_product_contract_kf)#, CjdaoApiView)
 from django.contrib.auth import views as auth_views
 from views import AutomaticView
 
@@ -27,6 +27,7 @@ urlpatterns = patterns(
     url(r'^p2p/amortization/(?P<product_id>\d+)', login_required(P2PAmortizationView.as_view(),
                                                                  login_url='/accounts/login/')),
     url(r'^p2p/contract/(?P<product_id>\d+)', user_product_contract),
+    url(r'^contract_for_kf',                 user_product_contract_kf),
     url(r'^transaction/fund/$', login_required(AccountTransaction.as_view(),
                                                login_url='/accounts/login/')),
     url(r'^transaction/p2p/$', login_required(AccountTransactionP2P.as_view(), login_url='/accounts/login/')),

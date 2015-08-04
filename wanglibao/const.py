@@ -14,3 +14,4 @@ class ErrorNumber():
     card_isdefault_error = 11
     contract_not_found = 12
     new_user_error = 13
+    param_error=14
