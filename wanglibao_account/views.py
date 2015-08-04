@@ -1105,7 +1105,7 @@ def ajax_register(request):
             res['nick_name'] = user.wanglibaouserprofile.nick_name
         res['message'] = message
         return json.dumps(res)
-
+    print "####################################3"
     if request.method == "POST":
         if request.is_ajax():
             form = EmailOrPhoneRegisterForm(request.POST)
