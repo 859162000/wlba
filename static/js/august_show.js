@@ -100,10 +100,12 @@
       if ($(this).hasClass('aut-notgive')){
         $('#small-zc').show();
       }else{
-        $('#small-zc').show();
-        $('#aug-box1').hide();
-        $('#seven-success').show();
-        $('#xl-aug-success').hide();
+        $.ajax({
+          url: "/api/xunlei/8/check/",
+          type: "GET"
+        }).done(function(data) {
+          console.log(data);
+        });
       }
     })
 
