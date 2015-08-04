@@ -26,7 +26,7 @@ def set_promo_user(request, user, invitecode=''):
         record = Channels.objects.filter(code=invitecode).first()
         if record:
             save_introducedBy_channel(user, record)
-            tid = request.DATA.get('tid')
+            tid = request.DATA.get('tid', '').strip()
             save_to_binding(user, record.name, tid)
         else:
             recordpromo = PromotionToken.objects.filter(token=invitecode).first()
@@ -37,11 +37,6 @@ def set_promo_user(request, user, invitecode=''):
         request.session[settings.PROMO_TOKEN_QUERY_STRING] = None
 
 def save_to_binding(user, btype, bid):
-        """
-        处理从url获得的渠道参数
-        :param user:
-        :return:
-        """
         if btype and bid:
             binding = Binding()
             binding.user = user
