@@ -756,10 +756,6 @@ else:
 WLB_FOR_DOUWANWANG_KEY = '1992'
 DOUWANWANG_CALL_BACK_URL = 'http://mall.366dw.com/interface/reflection'
 
-# 金山
-WLB_FOR_JINSHAN_KEY = '1993'
-JINSHAN_CALL_BACK_URL = 'https://vip.wps.cn/task/api/reward'
-
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100
 }
