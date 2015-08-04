@@ -1,0 +1,120 @@
+
+
+.g-banner-warp
+  position: relative
+  height: 320px
+  overflow: hidden
+.g-banner-slide
+  position: absolute
+  width: 100%
+  height: 320px
+  .g-slide
+    position: relative
+    left: 0
+    top: 0
+    width: 100%
+    height: 100%
+    a
+      position: absolute
+      left: 0
+      top: 0
+      width: 100%
+      height: 100%
+      background-position: center
+      background-repeat: no-repeat
+  .g-slide-anchor
+    position: absolute
+    left: 0
+    bottom: 10px
+    width: 100%
+    text-align: center
+    .slide-anchor
+      width: 16px
+      height: 16px
+      display: inline-block
+      +border-radius(8px)
+      background: #d3d3d3
+      margin: 0 3px
+      text-indent: 9000em
+    .active
+      background: $bg-d6
+.g-banner-login-warp
+  +clearfix()
+  height: 320px
+  .g-banner-login
+    position: relative
+    float: right
+    width: 350px
+    height: 256px
+    margin-top: 32px
+  .g-banner-bg
+    width: 100%
+    height: 100%
+    position: absolute
+    background: $bg-d3
+    width: 100%
+    +abs-pos(0, auto, auto, 0)
+    +opacity(0.8)
+    +border-radius(4px)
+  .g-banner-cont
+    position: relative
+    z-index: 2
+    text-align: center
+    padding: 44px 30px 0 30px
+  .landed-head
+    width: 220px
+    margin: 0 auto
+    img
+      width: 55px
+      height: 55px
+      +border-radius(40px)
+      border: 2px solid #fff
+    .head-username
+      margin-top: 4px
+  .landed-cont
+    position: relative
+    height: 48px
+    margin: 15px 0 25px 0
+    .landed-cont-btn
+      +abs-pos(auto, 15px, 0, auto)
+      width: 25px
+      height: 25px
+      .icon
+        height: 100%
+        width: 100%
+        color: $t-d10
+        &:hover
+          color: $t-d2
+  .unlanded-for-regist
+    width: 130px
+    color: $t-d6
+    background: $bg-d6
+    +line-height(35)
+    text-align: center
+    +border-radius(2px)
+    +inline-block
+    &:hover
+      background: #b72a0a
+  .unlanded-for-login
+    @extend .unlanded-for-regist
+    color: $t-d2
+    background: $bg-d3
+    border: 1px solid $t-d2
+    &:hover
+      background: #ebe9e9
+  .landed-for-chong
+    @extend .unlanded-for-regist
+    background: $bg-d14
+    width: 100px
+    +line-height(40)
+    &:hover
+      background: #4771c4
+  .landed-for-tou
+    @extend .unlanded-for-regist
+    color: $bg-d14
+    border: 1px solid $br-d1
+    background: $bg-d3
+    width: 100px
+    +line-height(40)
+    &:hover
+      background: #e9eaeb

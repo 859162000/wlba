@@ -1,0 +1,64 @@
+
+.g-footer-warp
+  background: $bg-d10
+.g-footer
+  padding-top: 30px
+.footer-container
+  a
+    margin-top: 13px
+    display: block
+    +unstyled-link
+    &:link, &:visited
+      color: $t-d14
+    &:hover, &:active
+      color: $t-d2
+      cursor: pointer
+  .follow
+    .follow-title
+      .icon
+        font-size: $font-xxl
+        margin-right: $space-s
+    .follow-img
+      display: block
+      width: 110px
+      height: 110px
+      +border-radius(4px)
+    .ft-weibo
+      @include home-sprite(ftWeibo)
+    .ft-weixin
+      @include home-sprite(ftErweima)
+  .phone
+    line-height: 1
+  .footer-kefu
+    +line-height(30)
+    .ft-kefu-icon
+      width: 30px
+      height: 30px
+      @include home-sprite(kefu)
+      +inline-block
+    .ft-kefu-text
+      +inline-block
+      margin: 10px 0 0 10px
+.atn-list
+  margin: 0 auto
+  padding: 70px 0
+  width: 750px
+  +clearfix()
+  a
+    float: left
+    width: 130px
+    height: 55px
+  .atn-report
+    @include home-sprite(report)
+  .atn-bank
+    @include home-sprite(bank)
+  .atn-baidu
+    @include home-sprite(baidu)
+  .atn-goodcm
+    @include home-sprite(goodcm)
+  .atn-wosign
+    @include home-sprite(wosign)
+
+
+
+

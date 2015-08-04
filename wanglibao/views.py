@@ -5,6 +5,7 @@ from django.template import loader, Context
 from django.utils import timezone
 from django.views.generic import TemplateView
 from marketing.models import NewsAndReport, SiteData
+from misc.views import MiscRecommendProduction
 from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_banner.models import Banner, Partner
 from itertools import chain
@@ -18,72 +19,122 @@ import pickle
 
 
 class IndexView(TemplateView):
-    template_name = 'index.jade'
+    template_name = 'index-test.jade'
+
+    def _period_3(self, p2p):
+        return p2p.filter(Q(pay_method__contains=u'日计息') & Q(period__lte=90) | ~Q(pay_method__contains=u'日计息') & Q(period__lte=3))
+
+    def _period_6(self, p2p):
+        return p2p.filter(Q(pay_method__contains=u'日计息') & (Q(period__gt=90) | Q(period__lte=180)) | ~Q(pay_method__contains=u'日计息') & (Q(period__gt=3) | Q(period__lte=6)))
+
+    def _period_9(self, p2p):
+        return p2p.filter(Q(pay_method__contains=u'日计息') & Q(period__gt=180) | ~Q(pay_method__contains=u'日计息') & Q(period__gt=6))
+
+    def _filter_product_period(self, p2p, period):
+        if period == 3:
+            p2p = self._period_3(p2p)
+        elif period == 6:
+            p2p = self._period_6(p2p)
+        elif period == 9:
+            p2p = self._period_9(p2p)
+
+        return p2p
+
+    def _full_product_payment(self, period, num, product_id=None):
+        """ 查询满表且已经还款中的标 """
+        p2p = P2PProduct.objects.select_related(
+            'warrant_company', 'activity'
+        ).filter(
+            hide=False,
+            publish_time__lte=timezone.now(),
+            status=u'还款中'
+        )
+        if product_id:
+            p2p = p2p.exclude(id=product_id)
+        return self._filter_product_period(p2p, period).order_by('-soldout_time', '-priority')[:num]
+
+    def _full_product_nonpayment(self, period, num, product_id=None):
+        """ 查询满表但是非还款中的标 """
+        p2p = P2PProduct.objects.select_related(
+            'warrant_company', 'activity'
+        ).filter(
+            hide=False,
+            publish_time__lte=timezone.now(),
+            status__in=[u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核']
+        )
+        if product_id:
+            p2p = p2p.exclude(id=product_id)
+        return self._filter_product_period(p2p, period).order_by('-soldout_time', '-priority')[:num]
+
+    def get_products(self, period, product_id=None):
+        """ 查询符合条件的标列表
+        3:1-3个月（包含3月）
+        6:4-6个月（包含6个月）
+        9:6个月以上
+        """
+        if period not in (3, 6, 9):
+            return []
+        p2p_list = []
+        p2p = P2PProduct.objects.select_related(
+            'warrant_company', 'activity'
+        ).filter(
+            hide=False, publish_time__lte=timezone.now(), status=u'正在招标'
+        )
+
+        if product_id:
+            p2p = p2p.exclude(id=product_id)
+
+        p2p = self._filter_product_period(p2p, period).order_by('-priority', '-total_amount')[:3]
+        p2p_list.extend(p2p)
+        # 使用满标但是未还款的扩充
+        if len(p2p_list) < 3:
+            p2p_list.extend(self._full_product_nonpayment(period=period, num=3-len(p2p), product_id=product_id))
+        # 使用慢标且还款中的扩充
+        if len(p2p_list) < 3:
+            p2p_list.extend(self._full_product_payment(period=period, num=3-len(p2p), product_id=product_id))
+        return p2p_list
 
     def get_context_data(self, **kwargs):
 
-        cache_backend = redis_backend()
+        # 主推标
+        misc = MiscRecommendProduction()
+        recommend_product_id = misc.get_recommend_product_id()
+        recommend_product = P2PProduct.objects.filter(id=recommend_product_id)
 
-        p2p_pre_four = P2PProduct.objects.select_related('warrant_company', 'activity')\
-                                         .filter(hide=False).filter(Q(publish_time__lte=timezone.now()))\
-                                         .filter(status=u'正在招标').order_by('-priority', '-total_amount')[:4]
-
-        p2p_pre_four_list = cache_backend.get_p2p_list_from_objects(p2p_pre_four)
-
-        p2p_products, p2p_full_list, p2p_repayment_list = [], [], []
-
-        #if cache_backend.redis.exists('p2p_products_full'):
-        if cache_backend._exists('p2p_products_full'):
-            #p2p_full_cache = cache_backend.redis.lrange('p2p_products_full', 0, -1)
-            p2p_full_cache = cache_backend._lrange('p2p_products_full', 0, -1)
-            for product in p2p_full_cache:
-                p2p_full_list.extend([pickle.loads(product)])
-        else:
-            p2p_full = P2PProduct.objects.select_related('warrant_company', 'activity') \
-                .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
-                .filter(status__in=[u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核']) \
-                .order_by('-soldout_time', '-priority')
-            p2p_full_list = cache_backend.get_p2p_list_from_objects(p2p_full)
-
-        #if cache_backend.redis.exists('p2p_products_repayment'):
-        #    p2p_repayment_cache = cache_backend.redis.lrange('p2p_products_repayment', 0, 1)
-        if cache_backend._exists('p2p_products_repayment'):
-            p2p_repayment_cache = cache_backend._lrange('p2p_products_repayment', 0, 1)
-
-            for product in p2p_repayment_cache:
-                p2p_repayment_list.extend([pickle.loads(product)])
-        else:
-            p2p_repayment = P2PProduct.objects.select_related('warrant_company', 'activity')\
-                .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
-                .filter(status=u'还款中').order_by('-soldout_time', '-priority')[:2]
-
-            p2p_repayment_list = cache_backend.get_p2p_list_from_objects(p2p_repayment)
-
-        p2p_products.extend(p2p_pre_four_list)
-        p2p_products.extend(p2p_full_list)
-        p2p_products.extend(p2p_repayment_list)
-
+        #p2p_products = []
+        # 获取期限小于等于3个月的标，天数为90天(period<=3 or period<=90)
+        #p2p_products.extend(self.get_products(period=3, product_id=recommend_product_id))
+        p2p_lt3 = self.get_products(period=3, product_id=recommend_product_id)
+        # 获取期限大雨3个月小于等于6个月的标，天数为180天(3<period<=6 or 90<period<=180)
+        #p2p_products.extend(self.get_products(period=6, product_id=recommend_product_id))
+        p2p_lt6 = self.get_products(period=6, product_id=recommend_product_id)
+        # 获取期限大于6个月的标(period>6 or period>180)
+        #p2p_products.extend(self.get_products(period=9, product_id=recommend_product_id))
+        p2p_gt6 = self.get_products(period=9, product_id=recommend_product_id)
         getmore = True
 
-        trade_records = P2PRecord.objects.filter(catalog=u'申购').select_related('user').select_related('user__wanglibaouserprofile')[:20]
+        banners = Banner.objects.filter(Q(device=Banner.PC_2), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now())))
+        # 新闻页面只有4个固定位置
+        news_and_reports = NewsAndReport.objects.all().order_by("-score")[:4]
 
-        banners = cache_backend.get_banners()
-        if not banners:
-            banners = Banner.objects.filter(Q(device=Banner.PC_2), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now())))
-
-        news_and_reports = cache_backend.get_news()
-        if not news_and_reports:
-            news_and_reports = NewsAndReport.objects.all().order_by("-score")[:5]
         site_data = SiteData.objects.all().first()
 
-        partners = cache_backend.get_cache_partners()
-        annos = cache_backend.get_announcement()
-        if not annos:
-            annos = AnnouncementHomepage()
+        # 合作伙伴
+        partners_data = Partner.objects.filter(type='partner')
+        partners = [
+            {'name': partner.name, 'link': partner.link, 'image': partner.image}
+            for partner in partners_data
+        ]
 
+        # 公告 前7个
+        annos = AnnouncementHomepage()[:7]
+        print p2p_gt6
         return {
-            "p2p_products": p2p_products,
-            "trade_records": trade_records,
+            #"p2p_products": p2p_products,
+            "recommend_product": recommend_product,
+            "p2p_lt_three": p2p_lt3,
+            "p2p_lt_six": p2p_lt6,
+            "p2p_gt_six": p2p_gt6,
             "news_and_reports": news_and_reports,
             'banners': banners,
             'site_data': site_data,

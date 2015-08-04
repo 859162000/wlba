@@ -1,0 +1,214 @@
+-load formatters
+-load mathfilters
+
+doctype html
+html
+  head
+    - with '网利宝官网' as title
+    include global/g_head
+    - endwith
+    script(src="/static/src/pc/lib/require.js", data-main="/static/src/pc/config")
+  body
+    include global/g_nav
+    include global/g_banner
+
+    .i-mod-wrap.mg-t-sm
+      .i-mod-exhibition
+        .ex-lf-cont
+          .ex-intro
+            mixin intro(icon, head, cont1, cont2)
+              .intro-item
+                i.iconfont.icon.t-d16(class=icon)
+                .item-text
+                  h4=head
+                  p.t-d4=cont1
+                  p.t-d4=cont2
+            +intro('icon-rocket', '高收益 低门槛', '30倍银行活期收益', '100元起投')
+            +intro('icon-safe', '保障安全', '民生银行资金托管', '阳光保险承保资金安全')
+            +intro('icon-authority', '专业权威', '网贷协会会员单位', '来自世界顶级的金融精英团队')
+          .ex-ac-target.mg-t-sm.br-d1.bg-d3
+            for product in recommend_product
+              .ac-tg-head.span12
+                h3.hd-name.fl 精选推荐
+                .hd-time.fr 距离下场更新：
+                  |<span>10</span>时  55</span>分  38秒
+              .ac-tg-cont
+                a(href='/p2p/detail/{{product.id}}/').font-m.t-d10.tg-pro-tit {{product.name}}
+                .t-d7
+                  span.mg-r-xl 本息保障：{{product.warrant_company}}
+                  span 还款方式：{{product.display_payback_method}}
+                .product-progress.progress-xl
+                  percent = float(product.ordered_amount) / product.total_amount * 100
+                  .pro-container(style="width:{{percent | percentage}}")
+                .ac-tg-row.clearfix
+                  .tg-list.profit-amount
+                    total_amount = product.total_amount / 10000
+                    span.t-d5.font-xll {{total_amount}}
+                      span.font-m 万
+                    .t-d7.tg-bt-text 融资金额
+
+                  .tg-list.profit-warp
+                    earning_rate = str(product.expected_earning_rate)
+                    .font-xll.t-d2 {{earning_rate}}
+                      span.font-m %
+                      if product.activity
+                        span.font-m +
+                        |{{product.activity.activity_rule_percent_text}}
+                        span.font-m %
+                    .t-d7.tg-bt-text 年收益
+                  .tg-list.profit-date
+                    span.t-d5.font-xll {{product.period}}
+                      span.font-m {{product.pay_method|period_unit}}
+                    .t-d7.tg-bt-text 项目期限
+                  .fr.buy-warp
+                    span.buy-text-r
+                      if product.display_status == '抢购中'
+                        status = '立即投资'
+                        statusClass = 'buy-btn-xl'
+                      else
+                        status = product.display_status
+                        statusClass = 'un-buy-btn-xl'
+                      a(href="/p2p/detail/{{product.id}}/", class='{{statusClass}}') {{status}}
+                      amount = product.total_amount - product.ordered_amount
+                      .t-d7.tg-bt-text 剩余金额￥{{amount | money_format_int}}
+            .ac-tg-bg
+
+        .ex-rt-cont
+          .ex-dc.padding-l-r-sm
+            .dc-head
+              .dc-title.font-l
+                i.icon.iconfont.icon-data
+                span 数据统计
+              .dc-time.t-d7.fr 截止至2015-6-21
+            .ex-data
+              ul.font-s
+                  li.mg-b-s
+                    p.t-d7 累计投资人数
+                    .num-space.t-d8(data-number='{{site_data.invest_threshold}}', data-type='man')
+                  li.mg-b-s
+                    p.t-d7 为投资人累计赚取收益
+                    .num-space.t-d8(data-number='{{site_data.p2p_total_earning}}',data-type='amount')
+                  li.mg-b-s
+                    p.t-d7 网利金融累计投资金额
+                    .num-space.t-d8(data-number='{{site_data.p2p_total_trade}}',data-type='amount')
+            i.dc-bg.icon.iconfont.icon-amount
+          .ex-download-app.mg-t-sm.padding-sm
+            img(src='/static/imgs/pc/home/erweima.jpg').dol-app.mg-r-sm.fl
+            .dol-btn.fl
+              .t-d4 网利宝APP－随身理财  随时赚钱
+              a(href='/').dol-btn-warp
+                .span3.android-icon.bg-d8.t-d6
+                  i.icon.iconfont.icon-android
+                .span9.btn-text.bg-d7.font-s Android版下载
+              a(href='/').dol-btn-warp
+                .span3.android-icon.bg-d9.t-d6
+                  i.icon.iconfont.icon-ios
+                .span9.btn-text.bg-d7.font-s iPhone版下载
+    //product start
+    .i-mod-wrap.mg-t-sm
+      .i-mod-product.clearfix
+        p2ptype = [{'title': '短期稳赢', 'period': '标的期限1-3月', 'class': 'p2p3', 'data': p2p_lt_three}, {'title': '中期保收', 'period': '标的期限3-6月', 'class': 'p2p6', 'data': p2p_lt_six}, {'title': '长期优选', 'period': '标的期限6月以上', 'class': 'p2p12', 'data': p2p_gt_six}]
+        for type in p2ptype
+          .pdt-item
+            .pdt-type.padding-sm.br-b-d2(class='{{type.class}}')
+              .font-ll {{type.title}}
+              .font-s.t-d12 {{type.period}}
+            product = enumerate(type['data'])
+            for index, p2p in product
+              .pdt-list
+                .pdt-warp.padding-t-l-r-sm
+                  a(href='/p2p/detail/{{p2p.id}}/').pdt-name.mg-b-s
+                    i.icon.iconfont.icon-car
+                    span.font-l {{p2p.name}}
+                  if index == 0
+                    .t-d7
+                      span.mg-r-xl 本息保障：{{p2p.warrant_company}}
+                      span 还款方式：{{p2p.display_payback_method}}
+                    .pdt-progress-warp.clearfix
+                      .product-progress.progress-x.fl
+                        percent = float(p2p.ordered_amount) / p2p.total_amount * 100
+                        .pro-container(style="width:{{percent | percentage}}")
+                      .pdt-progress-percent.t-d7.fl.mg-l-s {{percent | percentage}}
+                    total_amount = p2p.total_amount / 10000
+                    amount = p2p.total_amount - p2p.ordered_amount
+                    .t-d7.mg-b-s {{total_amount}}万元/￥{{amount | money_format_int}}元 可投
+                  .product-footer.clearfix
+                    .span5
+                      span.t-d7.font-s 年化
+                      earning_rate = str(p2p.expected_earning_rate)
+                      span.font-ll.t-d2 {{earning_rate}}
+                        span.font-s %
+                        if p2p.activity
+                          span.font-s +
+                          |{{p2p.activity.activity_rule_percent_text}}
+                          span.font-s %
+                    .span3.ct
+                      span.font-ll {{p2p.period}}
+                      span.font-s.t-d11 {{p2p.pay_method|period_unit}}
+                    .span4
+                      if p2p.display_status == '抢购中'
+                        statusP2P = '立即投资'
+                        statusClassP2P = 'buy-btn-x'
+                      else
+                        statusP2P = p2p.display_status
+                        statusClassP2P = 'un-buy-btn-x'
+                      a(href="/p2p/detail/{{p2p.id}}/",class='{{statusClassP2P}}') {{statusP2P}}
+                if type == 'progress'
+                  .product-line
+                else
+                  .product-line.mg-l-r-sm
+    //product end
+
+    .i-mod-wrap.mg-t-sm
+      .i-mod-news
+        ul.clearfix
+          li.mg-r-xxl
+            .ns-head
+              i.icon.iconfont.icon-about
+              span.font-l.mg-l-s 关于网利宝
+            .ns-cont
+              .ns-about
+          li.mg-r-xxl
+            .ns-head
+              i.icon.iconfont.icon-notice
+              span.font-l.mg-l-s 平台公告
+            .ns-cont.ns-notice.t-d4
+              for anno in announcements
+                a(href="baiducom").font-ss.clearfix
+                  .span9.notice-body
+                    i.icon-notice-self
+                    | {{anno}}
+                  .span3.tr.notice-time.t-d9 {{anno.createtime | date:"Y-m-d" }}
+          li
+            .ns-head
+              i.icon.iconfont.icon-report
+              span.font-l.mg-l-s 媒体报道
+            .ns-cont.ns-media.t-d4
+              for news in news_and_reports
+                a(href="{{news.link}}",title="{{news.name}}", target='_blank').t-d4.font-ss.clearfix.media-list
+                  img(src="/media/{{news.image}}", alt="{{news.name}}")
+                  .media-txt {{news.name}}
+                  .media-time.t-d9 {{news.created_at | date:"Y-m-d"}}
+    .i-mod-wrap.mg-t-sm
+      .i-mod-cooperation
+        .cn-head.br-b-d2.font-l.clearfix
+          .cn-head-title.fl
+            i.icon.iconfont.icon-cooperation.mg-r-s.t-d7.font-xxl
+            |合作伙伴
+          .cn-head-change.fr.t-d7
+            i.icon.iconfont.icon-flip-left.mg-r-sm.font-xl.un-click.cn-last
+            if partners.length <= 14
+              i.icon.iconfont.icon-flip-right.font-xl.cn-next.un-click
+            else
+              i.icon.iconfont.icon-flip-right.font-xl.cn-next
+        .cn-cont
+          .cn-ul-warp
+            ul.clearfix
+              for partner in partners
+                li
+                  a(href="{{partner.link}}", target="_blank", title="{{partner.name}}", rel="nofollow")
+                    img(src="/media/{{partner.image}}", alt="{{partner.name}}")
+    include global/g_footer
+    script.
+      require(["/static/src/pc/index.js"])
+
