@@ -74,17 +74,6 @@
       $('#first-redpack-fail').hide()
     })
 
-    //banner数字及效果
-//    var clone_view=$('#view').clone(true)
-//    var k='16329';
-//    for (var i=2,len= k.length;i<=len;i++){
-//      $('.scroll').append($('#view').clone(true));
-//    }
-//
-//    for (j=0,len2= k.length;j<=len2;j++){
-//      var this_index=k[j];
-//      $('.long').eq(j).animate({bottom:-this_index*58+'px'},500);
-//    }
     //请求
     $.ajax({
       url: "/api/xunlei/august/count/",
