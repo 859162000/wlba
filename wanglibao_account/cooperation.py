@@ -35,7 +35,7 @@ def get_uid_for_coop(user_id):
     uid = m.hexdigest()
     return uid
 
-def get_username_for_coo(user_id):
+def get_username_for_coop(user_id):
     """
     返回给渠道的用户名
     :param user_id:
@@ -409,17 +409,8 @@ class JinShanRegister(CoopRegister):
         return self.request.session.get(self.extra_key, None)
 
     def save_to_session(self):
-        channel_code  = self.get_channel_code_from_request()
-        channel_user  = self.request.GET.get(self.external_channel_user_key, None)
+        super(JinShanRegister, self).save_to_session()
         channel_extra = self.request.GET.get(self.extra_key, None)
-        if channel_code:
-            self.request.session[self.internal_channel_key] = channel_code
-            #logger.debug('save to session %s:%s'%(self.internal_channel_key, channel_code))
-
-        if channel_user:
-            self.request.session[self.internal_channel_user_key] = channel_user
-            #logger.debug('save to session %s:%s'%(self.internal_channel_user_key, channel_user))
-
         if channel_extra:
             self.request.session[self.extra_key] = channel_extra
             #logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
