@@ -51,7 +51,6 @@ import re
 from celery.execute import send_task
 from wanglibao_redis.backend import redis_backend
 import pickle
-import  aes
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -638,26 +637,6 @@ def preview_contract(request, id):
     product.total_interest_actual = InterestPrecisionBalance.objects.filter(equity__product=product) \
         .aggregate(actual_sum=Sum('interest_actual'))
 
-    return HttpResponse(generate_contract_preview(productAmortizations, product))
-
-
-def preview_contract_for_kefu(request, id):
-    product = P2PProduct.objects.filter(id=id).first()
-    if not product:
-        # if product.status == u'录标' or product.status == u'录标完成':
-        # return HttpResponse(u'<h3 style="color:red;">【录标完成】之后才能进行合同预览！</h3>')
-        # else:
-        return HttpResponse(u'<h3 style="color:red;">没有该产品或产品信息错误！</h3>')
-    equity_all = P2PEquity.objects.select_related('user__wanglibaouserprofile', 'product__contract_template') \
-        .select_related('product').filter(product=product).all()
-    productAmortizations = ProductAmortization.objects.filter(product_id=id).select_related('product').all()
-    contract_info = P2PProductContract.objects.filter(product=product).first()
-    product.contract_info = contract_info
-    product.equity_all = equity_all
-    product.total_interest_actual = InterestPrecisionBalance.objects.filter(equity__product=product) \
-        .aggregate(actual_sum=Sum('interest_actual'))
-
-    # return HttpResponse(aes.encrpt_data(generate_contract_preview(productAmortizations, product)))
     return HttpResponse(generate_contract_preview(productAmortizations, product))
 
 def AuditEquityCreateContract(request, equity_id):
