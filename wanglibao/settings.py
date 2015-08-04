@@ -777,6 +777,10 @@ if ENV == ENV_PRODUCTION:
 else:
     XICAI_LOAD_PAGE = 'https://staging.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
 
+# 金山
+WLB_FOR_JINSHAN_KEY = '1994'
+JINSHAN_CALL_BACK_URL = 'https://vip.wps.cn/task/api/reward'
+
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100
 }
