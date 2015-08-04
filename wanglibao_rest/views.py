@@ -20,10 +20,11 @@ from rest_framework.authtoken.models import Token
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from marketing.models import PromotionToken, Channels
+from marketing.models import PromotionToken, Channels, IntroducedBy
 from marketing.utils import set_promo_user
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import create_user
+from wanglibao_activity.models import ActivityRecord, Activity
 from wanglibao_portfolio.models import UserPortfolio
 from wanglibao_portfolio.serializers import UserPortfolioSerializer
 from wanglibao_rest.serializers import AuthTokenSerializer
@@ -1010,3 +1011,28 @@ class GestureIsEnabledView(APIView):
         u_profile_object.save()
 
         return Response({"ret_code": 0, "message": u"设置成功"})
+
+
+class GuestCheckView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user = self.request.user
+
+        p2p_record = P2PRecord.objects.filter(user=user, catalog='申购').first()
+
+        # 已经购买， 不是新用户
+        if p2p_record:
+            return Response({"ret_code": 1, "message": u"不是新用户，不符合活动标准！"})
+
+        introduced_by = IntroducedBy.objects.filter(user=user, channel__code='xunlei8').first()
+
+        # 渠道是xunlei8
+        if introduced_by:
+            activity_record = ActivityRecord.objects.filter(user=user, activity__code='xunlei8').first()
+            data = dict()
+            data['has_rewarded'] = True if activity_record else False
+            return Response({"ret_code": 0, "data": data})
+        # 渠道不符合标准
+        else:
+            return Response({"ret_code": 2, "message": u"非迅雷8用户，不符合活动标准！"})
