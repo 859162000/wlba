@@ -3,23 +3,22 @@
   .g-nav.mod.clearfix
     a(href="/").g-logo-box
       img(src="/static/imgs/pc/logo/logo.jpg", alt='logo')
-    if user.is_authenticated
-      .g-user-warp.fr
-        .g-user
-          .user-nav
-            i.icon.iconfont.icon-user
-            span.font.s.user-text 我的账户
-            i.icon.iconfont.icon-down
-          ul.hide.g-nav-user-nav
-            mixin liItem(url, text)
-              li
-                a(href=url)=text
-            +liItem('/pay/banks/', '我要充值')
-            +liItem('/pay/withdraw/', '我要提现')
-            +liItem('/accounts/auto_tender/', '自动投标')
-            +liItem('/accounts/transaction/p2p/', '交易纪录')
+    .g-user-warp.fr.hide
+      .g-user
+        .user-nav
+          i.icon.iconfont.icon-user
+          span.font.s.user-text 我的账户
+          i.icon.iconfont.icon-down
+        ul.hide.g-nav-user-nav
+          mixin liItem(url, text)
             li
-              a(href='/accounts/logout?next=/') 退出
+              a(href=url)=text
+          +liItem('/pay/banks/', '我要充值')
+          +liItem('/pay/withdraw/', '我要提现')
+          +liItem('/accounts/auto_tender/', '自动投标')
+          +liItem('/accounts/transaction/p2p/', '交易纪录')
+          li
+            a(href='/accounts/logout?next=/') 退出
     .g-nav-box
       mixin nav-item(name, link)
         if not name

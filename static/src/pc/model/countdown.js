@@ -21,7 +21,7 @@
         }else if (t == 0){
           clearInterval(dateTimer)
         }
-        str = "距离下场更新: " + h + " 时 " + m + " 分 " + s + " 秒 ";
+        str = "距离下场更新：" + h + " 时 " + m + " 分 " + s + " 秒 ";
         self.html(str)
         if(first){
           self.addClass('animated fadeInDown')

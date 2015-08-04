@@ -51,9 +51,10 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function( $ ) {
   $('.recommend_time').countdown(endTime);
 
   //nav fixed
-  var $nav = $('.g-nav-warp');
+  var $nav = $('.g-nav-warp'),
+      $acount = $('.g-user-warp');
   $(window).scroll(function(){
-    $(window).scrollTop() > 500 ? $nav.addClass('g-nav-fixed').animate({'top': 0}, 200) : $nav.stop(!0,!0).removeClass('g-nav-fixed').animate({'top': -80}, 20);
+    $(window).scrollTop() > 400 ? ($nav.addClass('g-nav-fixed').animate({'top': 0}, 200),$acount.removeClass('hide')) : ($nav.stop(!0,!0).removeClass('g-nav-fixed').animate({'top': -80}, 20),$acount.addClass('hide'));
   })
 
   //banner

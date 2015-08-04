@@ -8,9 +8,16 @@
       banners_ = enumerate(banners)
       for index, banner in banners_
         if index == 0
-          a(href='', style="display:block; background-image:url('/media/{{banner.image}}')").slide-banner
+          if banner.type == 'ad'
+            a(href="{{banner.link}}", style="display:block; background-image:url('/media/{{banner.image}}')", target='_blank').slide-banner
+          else
+            .slide-banner(style="display:block; background-image:url('/media/{{banner.image}}')")
         else
-          a(href='', style="display:none; background-image:url('/media/{{banner.image}}')").slide-banner
+          if banner.type == 'ad'
+            a(href="{{banner.link}}", style="display:none; background-image:url('/media/{{banner.image}}')", target='_blank').slide-banner
+          else
+            .slide-banner(style="display:none; background-image:url('/media/{{banner.image}}')")
+
     .g-slide-anchor
       banners_ = enumerate(banners)
       for index, banner in banners_
@@ -55,8 +62,8 @@
             .font-m.t-d4 平均年化收益率
             .font-m.t-d5.mg-t-s.mg-b-sm 账户资金由民生银行全额托管
             .unlanded-btn.font-m
-              a(href="").unlanded-for-regist.mg-r-sm 快速注册
-              a(href="").unlanded-for-login 登陆
+              a(href="/accounts/register/").unlanded-for-regist.mg-r-sm 快速注册
+              a(href="/accounts/login/").unlanded-for-login 登陆
 
 
 

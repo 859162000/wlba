@@ -80,31 +80,31 @@ html
               .dc-title.font-l
                 i.icon.iconfont.icon-data
                 span 数据统计
-              .dc-time.t-d7.fr 截止至{{site_data.updated_at | date:"Y-m-d"}}
+              .dc-time.t-d7.fr 截止至 {{site_data.created_at | date:"Y-m-d"}}
             .ex-data
               ul.font-s
                   li.mg-b-s
                     p.t-d7 累计投资人数
-                    .num-space.t-d8(data-number='{{site_data.invest_threshold}}', data-type='man')
+                    .num-space.t-d8(data-number='{{site_data.user_count}}', data-type='man')
                   li.mg-b-s
                     p.t-d7 为投资人累计赚取收益
-                    .num-space.t-d8(data-number='{{site_data.p2p_total_earning}}',data-type='amount')
+                    .num-space.t-d8(data-number='{{site_data.total_amount}}',data-type='amount')
                   li.mg-b-s
                     p.t-d7 网利金融累计投资金额
-                    .num-space.t-d8(data-number='{{site_data.p2p_total_trade}}',data-type='amount')
+                    .num-space.t-d8(data-number='{{site_data.total_amount}}',data-type='amount')
             i.dc-bg.icon.iconfont.icon-amount
           .ex-download-app.mg-t-sm.padding-sm
             img(src='/static/imgs/pc/home/erweima.jpg').dol-app.mg-r-sm.fl
             .dol-btn.fl
               .t-d4 网利宝APP－随身理财  随时赚钱
-              a(href='/').dol-btn-warp
+              a(href='https://www.wanglibao.com/static/wanglibao1.apk').dol-btn-warp
                 .span3.android-icon.bg-d8.t-d6
                   i.icon.iconfont.icon-android
-                .span9.btn-text.bg-d7.font-s Android版下载
-              a(href='/').dol-btn-warp
+                .span9.btn-text.bg-d7.font-s.t-d11 Android版下载
+              a(href='https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8').dol-btn-warp
                 .span3.android-icon.bg-d9.t-d6
                   i.icon.iconfont.icon-ios
-                .span9.btn-text.bg-d7.font-s iPhone版下载
+                .span9.btn-text.bg-d7.font-s.t-d11 iPhone版下载
     //product start
     .i-mod-wrap.mg-t-sm
       .i-mod-product.clearfix
@@ -142,7 +142,8 @@ html
                         span %
                         if p2p.activity
                           span +
-                          span.font-ll {{p2p.activity.rule.percent_text}}
+                          activityRule = int(p2p.activity.rule.percent_text)
+                          span.font-ll {{activityRule}}
                           span %
                     .span3.ct
                       span.font-ll {{p2p.period}}
@@ -165,13 +166,13 @@ html
       .i-mod-news
         ul.clearfix
           li.mg-r-xxl
-            .ns-head
+            a(href="/about/").ns-head
               i.icon.iconfont.icon-about
               span.font-l.mg-l-s 关于网利宝
             .ns-cont
               .ns-about
           li.mg-r-xxl
-            .ns-head
+            a(href="/announcement/").ns-head
               i.icon.iconfont.icon-notice
               span.font-l.mg-l-s 平台公告
             .ns-cont.ns-notice.t-d4
@@ -179,10 +180,10 @@ html
                 a(href="baiducom").font-ss.clearfix
                   .span9.notice-body
                     i.icon-notice-self
-                    | {{anno}}
+                    |&nbsp{{anno}}
                   .span3.tr.notice-time.t-d9 {{anno.createtime | date:"Y-m-d" }}
           li
-            .ns-head
+            a(href="/news/list/").ns-head
               i.icon.iconfont.icon-report
               span.font-l.mg-l-s 媒体报道
             .ns-cont.ns-media.t-d4

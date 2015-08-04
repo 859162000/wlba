@@ -29,8 +29,8 @@
             .follow-title.font-s
               i.icon.iconfont.icon-weibo
               |关注微博
-            .follow-img.ft-weibo
-      .span5
+            a(href="http://weibo.com/u/5000682691").follow-img.ft-weibo
+      .span5.clearfix
         .footer-ad-warp.fr
           .footer-ad.fl.t-d14
             .footer-kefu.mg-b-s
@@ -47,8 +47,6 @@
       .atn-list
         mixin atnlist(classname)
           a(href="/", class=classname)
-        +atnlist('atn-report')
-        +atnlist('atn-bank')
-        +atnlist('atn-baidu')
-        +atnlist('atn-goodcm')
-        +atnlist('atn-wosign')
+        +atnlist('atn-ssl')
+        +atnlist('atn-internet')
+        +atnlist('atn-trust')
