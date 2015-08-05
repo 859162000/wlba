@@ -26,8 +26,8 @@ def set_promo_user(request, user, invitecode=''):
         record = Channels.objects.filter(code=invitecode).first()
         if record:
             save_introducedBy_channel(user, record)
-            tid = request.DATA.get('tid', '').strip()
-            save_to_binding(user, record.name, tid)
+            # tid = request.DATA.get('tid', '').strip()
+            # save_to_binding(user, record.name, tid)
         else:
             recordpromo = PromotionToken.objects.filter(token=invitecode).first()
             if recordpromo:

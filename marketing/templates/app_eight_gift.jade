@@ -46,7 +46,7 @@ html(style="background:#fef4e0")
       h3
         |第三重【发财大礼】
         p
-          |神秘大礼
+          lable(style='color: #f6cf3f')#shenme 神秘大礼
           span#jinjiang 即将揭晓
       p.app_eight_backone 活动时间
       p.app_eight_backone 8月8日（仅限一天）
@@ -63,9 +63,9 @@ html(style="background:#fef4e0")
         |:
         span#display3
         if user.is_authenticated
-          a(href='#' data-num="true").button-eight 立即投资
+          a(href='/weixin/list/' data-num="true").button-eight#button-eight 立即投资
         else
-          a(href='#' data-num="false").button-eight 立即投资
+          a(href='/weixin/login/?next=/weixin/list/' data-num="false").button-eight#button-eight 立即投资
     .app-eightfour
       img(src='/static/imgs/mobile_activity/app_eight_gift/four.png').app-eight-img1
       .line
@@ -91,9 +91,9 @@ html(style="background:#fef4e0")
     .gold2
       .seven-success#seven-success
         span.first-xl-off2 ×
-        span.seven-happy.seven-com.seven-nine 亲，恭喜您
-          br
-          b 今天伸手领钱成功
+        .seven-happy.seven-com.seven-nine
+          p(style='margin-top: 1rem').eight_app 亲，恭喜您
+          p.eight_app 今天伸手领钱成功
         a(href="/").first-user 立即使用
       #first-redpack-fail
         span.first-xl-off2 ×
@@ -142,10 +142,48 @@ script.
         var mt=date.getMinutes();
         var st=date.getSeconds();
         if(tt>=7&&gt>=7&&ht>=12&&mt>=0&&st>=0){
-             callFunction();
+             document.getElementById('jinjiang').innerHTML = '全场加息４％';
+             document.getElementById('shenme').innerHTML = '';
+
+        }
+        if(tt>=7&&gt>=8&&ht>=0&&mt>=0&&st>=0){
+          document.getElementById('jinjiang').innerHTML = '全场加息４％';
+          document.getElementById('shenme').innerHTML = '';
+          TimeTot('2015/8/8 23:59:59');
+          callFun();
+        }else{
+          document.getElementById('button-eight').href = 'javascript:void(0)';
+          document.getElementById('button-eight').style.background='#3d3d3d';
 
         }
     },1000);
-    function callFunction(){
-       document.getElementById('jinjiang').innerHTML = '全场加息４％';
+
+    function callFun(){
+       document.getElementById('daojishi').innerHTML = '距离结束还有';
     }
+  function TimeTot(dd) {
+    var t = new Date(dd),//取得指定时间的总毫秒数
+            n = new Date().getTime(),//取得当前毫秒数
+            c = t - n;//得到时间差
+    if (c <= 0) {//如果差小于等于0  也就是过期或者正好过期，则推出程序
+      document.getElementById('eight-time').innerHTML = '活动已经结束';
+      document.getElementById('eight-countdown').innerHTML = '';
+      clearInterval(TimeTot('2015/8/8 23:00:00'));//清除计时器
+      return;//结束执行
+    }
+    var ds = 60 * 60 * 24 * 1000,//一天共多少毫秒
+            d = parseInt(c / ds),//总毫秒除以一天的毫秒 得到相差的天数
+            h = parseInt((c - d * ds) / (3600 * 1000)),//然后取完天数之后的余下的毫秒数再除以每小时的毫秒数得到小时
+            m = parseInt((c - d * ds - h * 3600 * 1000) / (60 * 1000)),//减去天数和小时数的毫秒数剩下的毫秒，再除以每分钟的毫秒数，得到分钟数
+            s = parseInt((c - d * ds - h * 3600 * 1000 - m * 60 * 1000) / 1000);//得到最后剩下的毫秒数除以1000 就是秒数，再剩下的毫秒自动忽略即可
+    if(h < 10)
+        h = "0" + h;
+        if(m < 10)
+        m = "0" + m;
+        if(s < 10)
+        s = "0" + s;
+    document.getElementById('display').innerHTML = d;
+    document.getElementById('display1').innerHTML = h;
+    document.getElementById('display2').innerHTML = m;
+    document.getElementById('display3').innerHTML = s;
+  }
