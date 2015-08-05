@@ -433,7 +433,7 @@ class JinShanRegister(CoopRegister):
 
     def save_to_session(self):
         super(JinShanRegister, self).save_to_session()
-        channel_extra = self.request.GET.get(self.extra_key, None)
+        channel_extra = self.request.GET.get(self.extra_key, 'wlb_extra')
         if channel_extra:
             self.request.session[self.extra_key] = channel_extra
             #logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
