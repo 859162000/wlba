@@ -59,9 +59,9 @@ html
             dt.bottom-eight.bottom-eight6
           p.eight_gift_backzhong1 说明：用户完成满额投资后，系统自动发送一个礼物到用户账户。
           if user.is_authenticated
-            a(href='https://www.wanglibao.com/p2p/list/' data-num="true").button-eight 立即投资
+            a(href='/p2p/list/' data-num="true").button-eight 立即投资
           else
-            a(href='https://www.wanglibao.com/accounts/login/' data-num="false").button-eight 立即投资
+            a(href='/accounts/login/' data-num="false").button-eight 立即投资
           //a(href='https://www.wanglibao.com/p2p/list/').button-eight 立即投资
 
       .eight_gift_two
@@ -137,9 +137,9 @@ html
             dt.bottom-eight.bottom-eight2
             dd.eight-gift1 3000元现金红包
           if user.is_authenticated
-            a(href='https://www.wanglibao.com/p2p/list/' data-num="true").button-eight 立即投资
+            a(href='/p2p/list/' data-num="true").button-eight 立即投资
           else
-            a(href='https://www.wanglibao.com/accounts/login/' data-num="false").button-eight 立即投资
+            a(href='/accounts/login/' data-num="false").button-eight 立即投资
           //a(href='https://www.wanglibao.com/p2p/list/').button-eight 立即投资
           p.eight_gift_backzhong1 现金奖励在三个工作日内以红包形式发出，红包类型为现金红包，投资或取现不限门槛。
 
