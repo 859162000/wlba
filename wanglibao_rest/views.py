@@ -47,6 +47,7 @@ from wanglibao.templatetags.formatters import safe_phone_str
 from marketing.tops import Top
 from marketing import tools
 from django.conf import settings
+from wanglibao_account.models import Binding
 
 
 logger = logging.getLogger(__name__)
@@ -211,6 +212,10 @@ class RegisterAPIView(APIView):
         #if not invite_code and ("channel_id" in device and device['channel_id'] == "baidu"):
         #    invite_code = "baidushouji"
 
+        
+        if not invite_code:
+            invite_code = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
+           
         if invite_code:
             try:
                 record = Channels.objects.filter(code=invite_code).first()
@@ -220,15 +225,16 @@ class RegisterAPIView(APIView):
                         raise
             except:
                 return Response({"ret_code": 30016, "message": "邀请码错误"})
-        else:
-            invite_code = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
-
+ 
         user = create_user(identifier, password, "")
         if not user:
             return Response({"ret_code": 30014, "message": u"注册失败"})
 
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
+            if record and record.name != 'weixin':
+                tid = request.DATA.get('tid', "").strip()
+                self.save_to_binding(user, record.name, tid)
 
         if device['device_type'] == "pc":
             auth_user = authenticate(identifier=identifier, password=password)
@@ -239,6 +245,13 @@ class RegisterAPIView(APIView):
 
         return Response({"ret_code": 0, "message": u"注册成功"})
 
+    def save_to_binding(self, user, btype, bid):
+            if btype and bid:
+                binding = Binding()
+                binding.user = user
+                binding.btype = btype
+                binding.bid = bid
+                binding.save()
 
 class WeixinRegisterAPIView(APIView):
     """

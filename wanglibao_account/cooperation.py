@@ -442,18 +442,20 @@ class JinShanRegister(CoopRegister):
             # logger.debug('save user %s to binding'%user)
 
     def jinshan_call_back(self, user, offer_type, key):
-        binding = Binding.objects.get(user_id=user.id)
-        extra = binding.extra
-        bid = binding.bid
-        sign = hashlib.md5( str(bid) + offer_type + key ).hexdigest()
-        params = {
-            'userid': bid,
-            'offer_type': offer_type,
-            'pass': sign,
-            'extra': extra,
-        }
-        jinshan_callback.apply_async(
-            kwargs={'url': self.call_back_url, 'params': params})
+        # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
+        binding = Binding.objects.filter(user_id=user.id).first()
+        if binding:
+            extra = binding.extra
+            bid = binding.bid
+            sign = hashlib.md5( str(bid) + offer_type + key ).hexdigest()
+            params = {
+                'userid': bid,
+                'offer_type': offer_type,
+                'pass': sign,
+                'extra': extra,
+            }
+            jinshan_callback.apply_async(
+                kwargs={'url': self.call_back_url, 'params': params})
 
     def register_call_back(self, user):
         self.jinshan_call_back(user, 'wangli_regist_none', 'ZSEt6lzsK1rigjcOXZhtA6KfbGoS')
