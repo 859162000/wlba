@@ -20,11 +20,12 @@ from rest_framework.authtoken.models import Token
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from marketing.models import PromotionToken, Channels
+from marketing.models import PromotionToken, Channels, IntroducedBy
 from marketing.utils import set_promo_user
 from wanglibao_account.cooperation import CoopRegister
+from wanglibao_account.cooperation import save_to_binding
 from wanglibao_account.utils import create_user
-from wanglibao_activity.models import ActivityRecord
+from wanglibao_activity.models import ActivityRecord, Activity
 from wanglibao_portfolio.models import UserPortfolio
 from wanglibao_portfolio.serializers import UserPortfolioSerializer
 from wanglibao_rest.serializers import AuthTokenSerializer
@@ -232,9 +233,9 @@ class RegisterAPIView(APIView):
 
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
-            if record and record.name != 'weixin':
-                tid = request.DATA.get('tid', "").strip()
-                self.save_to_binding(user, record.name, tid)
+            # 外呼系统登记信息
+            save_to_binding(user, record, request)
+            
 
         if device['device_type'] == "pc":
             auth_user = authenticate(identifier=identifier, password=password)
@@ -245,13 +246,6 @@ class RegisterAPIView(APIView):
 
         return Response({"ret_code": 0, "message": u"注册成功"})
 
-    def save_to_binding(self, user, btype, bid):
-            if btype and bid:
-                binding = Binding()
-                binding.user = user
-                binding.btype = btype
-                binding.bid = bid
-                binding.save()
 
 class WeixinRegisterAPIView(APIView):
     """
@@ -1031,11 +1025,21 @@ class GuestCheckView(APIView):
 
     def get(self, request):
         user = self.request.user
-        activity_record = ActivityRecord.objects.filter(user=user, activity__code='xunlei8').first()
+
         p2p_record = P2PRecord.objects.filter(user=user, catalog='申购').first()
 
-        data = dict()
-        data['has_invested'] = True if p2p_record else False
-        data['has_rewarded'] = True if activity_record else False
+        # 已经购买， 不是新用户
+        if p2p_record:
+            return Response({"ret_code": 1, "message": u"不是新用户，不符合活动标准！"})
 
-        return Response({"ret_code": 0, "data": data})
+        introduced_by = IntroducedBy.objects.filter(user=user, channel__code='xunlei8').first()
+
+        # 渠道是xunlei8
+        if introduced_by:
+            activity_record = ActivityRecord.objects.filter(user=user, activity__code='xunlei8').first()
+            data = dict()
+            data['has_rewarded'] = True if activity_record else False
+            return Response({"ret_code": 0, "data": data})
+        # 渠道不符合标准
+        else:
+            return Response({"ret_code": 2, "message": u"非迅雷8用户，不符合活动标准！"})

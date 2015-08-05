@@ -50,11 +50,13 @@ html(style="background: #f5f5f5")
         span.checkbox.agreement#agreement
           input(type='checkbox',name='agreement', checked=true)
         span.xieyi-btn 同意网利宝注册协议
-        a(href="/weixin/login/").regist-for-login 立即登录
-
+        if next == ''
+          a(href="/weixin/login/").regist-for-login 立即登录
+        else
+          a(href="/weixin/login/?next={{next}}").regist-for-login 立即登录
       //账户安全
       section.regist-safe
-        span 账户资金安全由平安银行承保
+        span 账户资金安全由阳光保险承保
          //注册按钮
       section#regist-submit.login-submit
         button(type="submit", disabled=true) 立即注册 ｜ 领取奖励
@@ -87,4 +89,4 @@ html(style="background: #f5f5f5")
       article.xieyi-cont
         include include/weixin_xieyiFixed
     include include/tracking
-    script(data-init='regist', src="/static/scripts/mobile/dist/mobile.js?v=20150708")
+    script(data-init='regist', src="/static/scripts/mobile/dist/mobile.js?v=20150808")

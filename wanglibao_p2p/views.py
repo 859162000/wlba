@@ -52,7 +52,6 @@ from celery.execute import send_task
 from wanglibao_redis.backend import redis_backend
 import pickle
 
-
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
 
@@ -639,7 +638,6 @@ def preview_contract(request, id):
         .aggregate(actual_sum=Sum('interest_actual'))
 
     return HttpResponse(generate_contract_preview(productAmortizations, product))
-
 
 def AuditEquityCreateContract(request, equity_id):
     equity = P2PEquity.objects.filter(id=equity_id).select_related('product').first()

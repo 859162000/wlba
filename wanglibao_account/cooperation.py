@@ -93,6 +93,18 @@ def get_binding_time_for_coop(user_id):
     except Exception, e:
         return None
 
+def save_to_binding(user, record, request):
+        try:
+            if record and record.name == 'shls':
+                bid = request.DATA.get('tid', "").strip()
+                if bid and len(bid) > 0:
+                    binding = Binding()
+                    binding.user = user
+                    binding.btype = record.name
+                    binding.bid = bid
+                    binding.save()
+        except:
+            pass
 
 #######################第三方用户注册#####################
 
