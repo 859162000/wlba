@@ -22,7 +22,8 @@ from wanglibao import settings
 from wanglibao.settings import  YIRUITE_CALL_BACK_URL, \
         TIANMANG_CALL_BACK_URL, WLB_FOR_YIRUITE_KEY, YIRUITE_KEY, BENGBENG_KEY, \
     WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
-    JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL, JINSHAN_CALL_BACK_URL, WLB_FOR_JINSHAN_KEY
+    JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL, JINSHAN_CALL_BACK_URL, WLB_FOR_JINSHAN_KEY, \
+    WLB_FOR_SHLS_KEY
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import  common_callback, jinshan_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
@@ -464,9 +465,24 @@ class JinShanRegister(CoopRegister):
         if P2PRecord.objects.filter(user_id=user.id).count() == 1:
             self.jinshan_call_back(user, 'wangli_invest_reward', 'pA71ZhBf4DDeet7SLiLlGsT1qTYu')
 
+class WaihuRegister(CoopRegister):
+    def __init__(self, request):
+        super(WaihuRegister, self).__init__(request)
+        self.c_code = 'shls'
+
+    def process_for_register(self, user, invite_code):
+        """
+        用户可以在从渠道跳转后的注册页使用邀请码，优先考虑邀请码
+        """
+        promo_token = super(WaihuRegister, self).channel_code
+        if promo_token:
+            super(WaihuRegister, self).save_to_introduceby(user, invite_code)
+            super(WaihuRegister, self).save_to_binding(user)
+            super(WaihuRegister, self).clear_session()
+
 
 #注册第三方通道
-coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister, JuxiangyouRegister, DouwanRegister, JinShanRegister]
+coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister, JuxiangyouRegister, DouwanRegister, JinShanRegister, WaihuRegister]
 
 #######################第三方用户查询#####################
 

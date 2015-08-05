@@ -781,6 +781,9 @@ else:
 WLB_FOR_JINSHAN_KEY = '1994'
 JINSHAN_CALL_BACK_URL = 'https://vip.wps.cn/task/api/reward'
 
+# 外呼
+WLB_FOR_SHLS_KEY = '1995'
+
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100
 }
