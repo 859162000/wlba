@@ -46,7 +46,7 @@ html(style="background:#fef4e0")
       h3
         |第三重【发财大礼】
         p
-          |神秘大礼
+          lable(style='color: #f6cf3f') 神秘大礼
           span#jinjiang 即将揭晓
       p.app_eight_backone 活动时间
       p.app_eight_backone 8月8日（仅限一天）
@@ -142,10 +142,11 @@ script.
         var mt=date.getMinutes();
         var st=date.getSeconds();
         if(tt>=7&&gt>=7&&ht>=12&&mt>=0&&st>=0){
-             callFunction();
+             document.getElementById('jinjiang').innerHTML = '全场加息４％';
 
         }
         if(tt>=7&&gt>=8&&ht>=0&&mt>=0&&st>=0){
+          document.getElementById('jinjiang').innerHTML = '全场加息４％';
           TimeTot('2015/8/8 23:59:59');
           callFun();
         }else{
@@ -154,9 +155,7 @@ script.
 
         }
     },1000);
-    function callFunction(){
-       document.getElementById('jinjiang').innerHTML = '全场加息４％';
-    }
+
     function callFun(){
        document.getElementById('daojishi').innerHTML = '距离结束还有';
     }
