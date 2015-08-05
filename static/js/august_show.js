@@ -103,8 +103,26 @@
         $.ajax({
           url: "/api/xunlei/8/check/",
           type: "GET"
-        }).done(function(data) {
-          console.log(data);
+        }).done(function(date) {
+          $('#small-zc').show();
+          $('#aug-box1').hide();
+          $('#seven-success').hide();
+          $('#xl-aug-success').hide();
+          if (date['ret_code']==1){
+            $('#first-redpack-fail').children('p').text(date['message']);
+            $('#first-redpack-fail').show();
+          }else if (date['ret_code']==2){
+            $('#first-redpack-fail').children('p').text(date['message']);
+            $('#first-redpack-fail').show();
+          }else if (date['ret_code']==0){
+            if (date['data']['has_rewarded']==false){
+              $('#seven-success').show();
+            }else if (date['data']['has_rewarded']==true){
+              $('#first-redpack-fail').children('p').text('不能重复领取');
+              $('#first-redpack-fail').show();
+            }
+          }
+
         });
       }
     })
