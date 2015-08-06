@@ -80,18 +80,18 @@ html
               .dc-title.font-l
                 i.icon.iconfont.icon-data
                 span 数据统计
-              .dc-time.t-d7.fr 截止至 {{site_data.created_at | date:"Y-m-d"}}
+              .dc-time.t-d7.fr 截止至 {{site_data.updated_at | milldate_format}}
             .ex-data
               ul.font-s
                   li.mg-b-s
                     p.t-d7 累计投资人数
-                    .num-space.t-d8.helvetica(data-number='{{site_data.user_count}}', data-type='man')
+                    .num-space.t-d8.helvetica(data-number='{{site_data.user_number}}', data-type='man')
                   li.mg-b-s
                     p.t-d7 为投资人累计赚取收益
-                    .num-space.t-d8.helvetica(data-number='{{site_data.total_amount}}',data-type='amount')
+                    .num-space.t-d8.helvetica(data-number='{{site_data.user_income}}',data-type='amount')
                   li.mg-b-s
                     p.t-d7 网利金融累计投资金额
-                    .num-space.t-d8.helvetica(data-number='{{site_data.total_amount}}',data-type='amount')
+                    .num-space.t-d8.helvetica(data-number='{{site_data.p2p_amount}}',data-type='amount')
             i.dc-bg.icon.iconfont.icon-amount
           .ex-download-app.mg-t-sm.padding-sm
             img(src='/static/imgs/pc/home/erweima.jpg').dol-app.mg-r-sm.fl
