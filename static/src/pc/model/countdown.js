@@ -7,7 +7,8 @@
        dateTimer = null,
        first = true,
        str = '',
-       t= 0,
+       t = 0,
+       d = 0,
        h = 0,
        m = 0,
        s = 0;
@@ -15,13 +16,14 @@
         var startTime = new Date();
         t = endTimt.getTime() - startTime.getTime();
         if(t > 0){
+          d = Math.floor(t/1000/60/60/24);
           h = Math.floor(t/1000/60/60%24);
           m = Math.floor(t/1000/60%60);
           s = Math.floor(t/1000%60);
         }else if (t == 0){
           clearInterval(dateTimer)
         }
-        str = "距离下场更新：" + h + " 时 " + m + " 分 " + s + " 秒 ";
+        str = "距离下场更新：" + d + " 天 " + h + " 时 " + m + " 分 " + s + " 秒 ";
         self.html(str)
         if(first){
           self.addClass('animated fadeInDown')

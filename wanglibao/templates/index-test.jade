@@ -31,7 +31,7 @@ html
               .ac-tg-head.span12
                 h3.hd-name.fl 精选推荐
                 .hd-time.fr
-                  span.recommend_time(data-update='{{product.publish_time}}')
+                  span.recommend_time(data-update='{{product.end_time}}')
               .ac-tg-cont
                 a(href='/p2p/detail/{{product.id}}/').font-m.t-d10.tg-pro-tit {{product.name}}
                 .t-d7
@@ -43,23 +43,23 @@ html
                 .ac-tg-row.clearfix
                   .tg-list.profit-amount
                     total_amount = product.total_amount / 10000
-                    span.t-d5.font-xll {{total_amount}}
+                    span.t-d5.font-xll.helvetica {{total_amount}}
                       span.font-m 万
                     .t-d7.tg-bt-text 融资金额
 
                   .tg-list.profit-warp
                     earning_rate = str(product.expected_earning_rate)
                     .t-d2.font-m
-                      span.font-xll {{earning_rate}}
+                      span.font-xll.helvetica {{earning_rate}}
                       span %
                       if product.activity
                         span +
-                        span.font-xll {{product.activity.rule.percent_text}}
+                        span.font-xll.helvetica {{product.activity.rule.percent_text}}
                         span %
                     .t-d7.tg-bt-text 年收益
                   .tg-list.profit-date
                     span.t-d5.font-xll {{product.period}}
-                      span.font-m {{product.pay_method|period_unit}}
+                      span.font-m.helvetica {{product.pay_method|period_unit}}
                     .t-d7.tg-bt-text 项目期限
                   .fr.buy-warp
                     span.buy-text-r
@@ -71,7 +71,7 @@ html
                         statusClass = 'un-buy-btn-xl'
                       a(href="/p2p/detail/{{product.id}}/", class='{{statusClass}}') {{status}}
                       amount = product.total_amount - product.ordered_amount
-                      .t-d7.tg-bt-text 剩余金额￥{{amount | money_format_int}}
+                      .t-d7.tg-bt-text 剩余金额 ￥ {{amount | money_format_int}}
             .ac-tg-bg
 
         .ex-rt-cont
@@ -85,13 +85,13 @@ html
               ul.font-s
                   li.mg-b-s
                     p.t-d7 累计投资人数
-                    .num-space.t-d8(data-number='{{site_data.user_count}}', data-type='man')
+                    .num-space.t-d8.helvetica(data-number='{{site_data.user_count}}', data-type='man')
                   li.mg-b-s
                     p.t-d7 为投资人累计赚取收益
-                    .num-space.t-d8(data-number='{{site_data.total_amount}}',data-type='amount')
+                    .num-space.t-d8.helvetica(data-number='{{site_data.total_amount}}',data-type='amount')
                   li.mg-b-s
                     p.t-d7 网利金融累计投资金额
-                    .num-space.t-d8(data-number='{{site_data.total_amount}}',data-type='amount')
+                    .num-space.t-d8.helvetica(data-number='{{site_data.total_amount}}',data-type='amount')
             i.dc-bg.icon.iconfont.icon-amount
           .ex-download-app.mg-t-sm.padding-sm
             img(src='/static/imgs/pc/home/erweima.jpg').dol-app.mg-r-sm.fl
@@ -122,9 +122,9 @@ html
                     i.icon.iconfont.icon-car
                     span.font-l {{p2p.name}}
                   if index == 0
-                    .t-d7
-                      span.mg-r-xl 本息保障：{{p2p.warrant_company}}
-                      span 还款方式：{{p2p.display_payback_method}}
+                    .t-d7.clearfix
+                      .span6.es(title='本息保障：{{p2p.warrant_company}}') 本息保障：{{p2p.warrant_company}}
+                      .span6.es(title='还款方式：{{p2p.display_payback_method}}') 还款方式：{{p2p.display_payback_method}}
                     .pdt-progress-warp.clearfix
                       .product-progress.progress-x.fl
                         percent = float(p2p.ordered_amount) / p2p.total_amount * 100
@@ -138,15 +138,15 @@ html
                       span.t-d7.font-s 年化
                       earning_rate = str(p2p.expected_earning_rate)
                       span.t-d2.font-m
-                        span.font-ll {{earning_rate}}
+                        span.font-ll.helvetica {{earning_rate}}
                         span %
                         if p2p.activity
                           span +
                           activityRule = int(p2p.activity.rule.percent_text)
-                          span.font-ll {{activityRule}}
+                          span.font-ll.helvetica {{activityRule}}
                           span %
                     .span3.ct
-                      span.font-ll {{p2p.period}}
+                      span.font-ll.helvetica {{p2p.period}}
                       span.font-s.t-d11 {{p2p.pay_method|period_unit}}
                     .span4
                       if p2p.display_status == '抢购中'
@@ -170,7 +170,7 @@ html
               i.icon.iconfont.icon-about
               span.font-l.mg-l-s 关于网利宝
             .ns-cont
-              .ns-about
+              img(src='/static/imgs/pc/home/about.gif').ns-about
           li.mg-r-xxl
             a(href="/announcement/").ns-head
               i.icon.iconfont.icon-notice
@@ -192,7 +192,7 @@ html
                   img(src="/media/{{news.image}}", alt="{{news.name}}")
                   .media-txt {{news.name}}
                   .media-time.t-d9 {{news.created_at | date:"Y-m-d"}}
-    .i-mod-wrap.mg-t-sm
+    .i-mod-wrap.mg-t-sm.mg-b-xl
       .i-mod-cooperation
         .cn-head.br-b-d2.font-l.clearfix
           .cn-head-title.fl

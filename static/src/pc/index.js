@@ -47,14 +47,12 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function( $ ) {
   var
     time = $('.recommend_time').attr('data-update'),
     endTime= new Date(time.replace(/-/g,"/"));
-  endTime.setDate(endTime.getDate()+1);
   $('.recommend_time').countdown(endTime);
 
   //nav fixed
-  var $nav = $('.g-nav-warp'),
-      $acount = $('.g-user-warp');
+  var $nav = $('.g-nav-warp');
   $(window).scroll(function(){
-    $(window).scrollTop() > 400 ? ($nav.addClass('g-nav-fixed').animate({'top': 0}, 200),$acount.removeClass('hide')) : ($nav.stop(!0,!0).removeClass('g-nav-fixed').animate({'top': -80}, 20),$acount.addClass('hide'));
+    $(window).scrollTop() > 400 ? $nav.addClass('g-nav-fixed').animate({'top': 0}, 200) : $nav.stop(!0,!0).removeClass('g-nav-fixed').removeAttr('style');
   })
 
   //banner

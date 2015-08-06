@@ -190,7 +190,7 @@ class PartnerView(TemplateView):
 
 
 class SecurityView(TemplateView):
-    template_name = 'security.jade'
+    template_name = 'security_new.jade'
 
     def get_context_data(self, **kwargs):
 
