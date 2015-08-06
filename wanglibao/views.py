@@ -118,8 +118,9 @@ class IndexView(TemplateView):
         news_and_reports = NewsAndReport.objects.all().order_by("-score")[:4]
 
         # 网站数据
-        m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
+        m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA)
         site_data = m.get_recommend_products()[MiscRecommendProduction.KEY_PC_DATA]
+        site_data['updated_at'] = m.get_misc().updated_at
 
         # 合作伙伴
         partners_data = Partner.objects.filter(type='partner')
