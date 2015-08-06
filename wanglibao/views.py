@@ -118,7 +118,8 @@ class IndexView(TemplateView):
         news_and_reports = NewsAndReport.objects.all().order_by("-score")[:4]
 
         # 网站数据
-        site_data = TimelySiteData.objects.order_by('-created_at').first()
+        m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
+        site_data = m.get_recommend_products()[MiscRecommendProduction.KEY_PC_DATA]
 
         # 合作伙伴
         partners_data = Partner.objects.filter(type='partner')
