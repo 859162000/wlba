@@ -31,6 +31,7 @@ urlpatterns = patterns(
     url(r'^transaction/fund/$', login_required(AccountTransaction.as_view(),
                                                login_url='/accounts/login/')),
     url(r'^transaction/p2p/$', login_required(AccountTransactionP2P.as_view(), login_url='/accounts/login/')),
+    url(r'^caipiao/$', login_required(AccountTransactionP2P.as_view(), login_url='/accounts/login/')),
     url(r'^redpacket/(?P<status>\w+)/$', login_required(AccountRedPacket.as_view(), login_url='/accounts/login/')),
 
     url(r'^repayment/$', login_required(AccountRepayment.as_view(), login_url='/accounts/login/')),
