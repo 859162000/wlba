@@ -70,8 +70,11 @@ html(style="background:#fef4e0")
       img(src='/static/imgs/mobile_activity/app_eight_gift/four.png').app-eight-img1
       .line
       h3 第四重【投资豪礼】
-      p.app_eight_backone 活动时间 利上有礼，HIGH翻全场！活动期间内单笔投资额达到10万以上，即可获得额外现金红包奖励！
-      img(src='/static/imgs/mobile_activity/app_eight_gift/hong5.png').app-eight-img2
+      p.app_eight_backone
+        |活动时间 利上有礼，HIGH翻全场！活动期间内单笔投资额达到
+        span(style='color: #f6cf3f') 10万
+        |以上，即可获得额外现金红包奖励！
+      img(src='/static/imgs/mobile_activity/app_eight_gift/hong9.jpg').app-eight-img2
       p.app_eight_gift_backzhong1 现金奖励在三个工作日内以红包形式发出，红包类型为现金红包，投资或取现不限门槛。
       if user.is_authenticated
         a(href='/weixin/list/' data-num="true").button-eight 立即投资
