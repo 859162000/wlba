@@ -7,7 +7,6 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator, PageNotAnInteger
 from marketing.models import IntroducedBy, PromotionToken, ClientData, Channels
 from wanglibao_p2p.models import P2PProduct
-from wanglibao_account.models import Binding
 import logging
 
 
@@ -26,8 +25,6 @@ def set_promo_user(request, user, invitecode=''):
         record = Channels.objects.filter(code=invitecode).first()
         if record:
             save_introducedBy_channel(user, record)
-            # tid = request.DATA.get('tid', '').strip()
-            # save_to_binding(user, record.name, tid)
         else:
             recordpromo = PromotionToken.objects.filter(token=invitecode).first()
             if recordpromo:
@@ -35,14 +32,6 @@ def set_promo_user(request, user, invitecode=''):
                 save_introducedBy(user, introduced_by_user)
 
         request.session[settings.PROMO_TOKEN_QUERY_STRING] = None
-
-def save_to_binding(user, btype, bid):
-        if btype and bid:
-            binding = Binding()
-            binding.user = user
-            binding.btype = btype
-            binding.bid = bid
-            binding.save()
 
 def save_introducedBy(user, introduced_by_user, product_id=0):
     record = IntroducedBy()

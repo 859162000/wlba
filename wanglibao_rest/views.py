@@ -23,6 +23,7 @@ from rest_framework.permissions import IsAuthenticated
 from marketing.models import PromotionToken, Channels, IntroducedBy
 from marketing.utils import set_promo_user
 from wanglibao_account.cooperation import CoopRegister
+from wanglibao_account.cooperation import save_to_binding
 from wanglibao_account.utils import create_user
 from wanglibao_activity.models import ActivityRecord, Activity
 from wanglibao_portfolio.models import UserPortfolio
@@ -47,6 +48,7 @@ from wanglibao.templatetags.formatters import safe_phone_str
 from marketing.tops import Top
 from marketing import tools
 from django.conf import settings
+from wanglibao_account.models import Binding
 
 
 logger = logging.getLogger(__name__)
@@ -211,6 +213,10 @@ class RegisterAPIView(APIView):
         #if not invite_code and ("channel_id" in device and device['channel_id'] == "baidu"):
         #    invite_code = "baidushouji"
 
+        
+        if not invite_code:
+            invite_code = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
+           
         if invite_code:
             try:
                 record = Channels.objects.filter(code=invite_code).first()
@@ -220,15 +226,16 @@ class RegisterAPIView(APIView):
                         raise
             except:
                 return Response({"ret_code": 30016, "message": "邀请码错误"})
-        else:
-            invite_code = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
-
+ 
         user = create_user(identifier, password, "")
         if not user:
             return Response({"ret_code": 30014, "message": u"注册失败"})
 
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
+            # 外呼系统登记信息
+            save_to_binding(user, record, request)
+            
 
         if device['device_type'] == "pc":
             auth_user = authenticate(identifier=identifier, password=password)
