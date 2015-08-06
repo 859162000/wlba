@@ -166,6 +166,7 @@ html
               //.align-center
               //  a.font-s.blue(href="http://act.vip.xunlei.com/vip/2015/p2pcash/#wlb") 【立即领取】
               form#register-modal-form2.login-form.dale(method='post', action='/accounts/register/ajax/')
+                - csrf_token
                 .form-row
                   .form-control-group
                     .span12
