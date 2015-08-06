@@ -2,11 +2,21 @@
 (function() {
   require.config({
     paths: {
-      jquery: 'lib/jquery.min'
+      jquery: 'lib/jquery.min',
+      'jquery.modal': 'lib/jquery.modal.min',
+      'activityRegister': 'activityRegister'
+    },
+    shim: {
+      'jquery.modal': ['jquery']
     }
   });
 
-  require(['jquery'], function($) {
+  require(['jquery','activityRegister'], function($,re) {
+      //注册
+     re.activityRegister.activityRegisterInit({
+        registerTitle :'注册送白金会员+500元红包',    //注册框标语
+        isNOShow : '1'
+     });
       //固定回到顶部
      function backtop(box){
        var k=document.body.clientWidth,
