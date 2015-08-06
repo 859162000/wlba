@@ -20,7 +20,6 @@ def set_promo_user(request, user, invitecode=''):
     if not invitecode:
         invitecode = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
 
-
     if invitecode:
         record = Channels.objects.filter(code=invitecode).first()
         if record:
