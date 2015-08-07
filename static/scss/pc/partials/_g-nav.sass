@@ -1,0 +1,71 @@
+$g-nav-height: 80px
+
+.g-nav-warp
+  height: $g-nav-height
+  background: $bg-d3
+  position: relative
+  z-index: 100
+  -webkit-transform: translateZ(0)
+.g-logo-box
+  width: 360px
+  height: 55px
+  margin-top: 12px
+  float: left
+
+.g-nav-box
+  float: right
+  overflow: hidden
+  a
+    float: left
+    text-align: center
+    font-size: $font-m
+    padding: 0 20px
+    +line-height(80)
+
+.g-nav-fixed
+  position: fixed
+  width: 100%
+  top: -80px
+  z-index: 10
+  +box-shadow(0 3px 6px $bg-d11)
+
+.g-user-warp
+  margin-left: 70px
+  .g-user
+    position: relative
+    font-size: $font-m
+    &:hover, &:active
+      color: $t-d2
+      cursor: pointer
+      .g-nav-user-nav
+        display: block
+  .user-nav
+    text-align: center
+    +line-height(80)
+    display: inline-block
+    .user-text
+      display: inline-block
+      vertical-align: middle
+      margin: 0 5px
+    .icon-user
+      font-size: 40px
+      vertical-align: middle
+    .icon-down
+      font-size: $font-xs
+      color: #bfbfbf
+      vertical-align: middle
+  .g-nav-user-nav
+    position: absolute
+    top: 80px
+    right: 0
+    background: #fff
+    z-index: 11
+    +box-shadow(0 3px 6px $bg-d11)
+    a
+      display: block
+      width: 150px
+      text-align: center
+      +line-height(50)
+      &:hover, &:active
+        background: $bg-d15
+        color: $bg-d1

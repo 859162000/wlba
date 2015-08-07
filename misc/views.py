@@ -4,16 +4,21 @@
 import json
 
 from django.db.models import Q
-from misc.models import Misc
+from misc.models import Misc, timestamp
 from wanglibao_p2p.models import P2PProduct
 
 
 class MiscRecommendProduction(object):
     """ 设置推荐标 """
     KEY = 'recommend_production'
+    DESCRIPTION = u'推荐标记录'
 
-    def __init__(self, key=None):
+    KEY_PC_DATA = 'pc_index_data'
+    DESC_PC_DATA = u'pc网站首页统计数据'
+
+    def __init__(self, key=None, desc=None):
         self.key = key or MiscRecommendProduction.KEY
+        self.description = desc or MiscRecommendProduction.DESCRIPTION
         self.misc = self._init_recommend_product()
 
     def get_misc(self):
@@ -25,7 +30,7 @@ class MiscRecommendProduction(object):
             misc = Misc()
             misc.key = self.key
             misc.value = json.dumps({self.key: []})
-            misc.description = u'推荐标记录'
+            misc.description = self.description
             misc.save()
         return misc
 
@@ -46,6 +51,12 @@ class MiscRecommendProduction(object):
         if product_id in id_list:
             id_list.remove(product_id)
             self._change_product_list(products=id_list)
+            return True
+        return False
+
+    def update_value(self, value):
+        if value:
+            Misc.objects.filter(key=self.key).update(value=json.dumps({self.key: value}), updated_at=timestamp())
             return True
         return False
 
