@@ -792,7 +792,7 @@ def xicai_get_new_p2p():
     获取新标给希财
     :return:
     """
-    now = datetime.datetime.now()
+    now = timezone.now()
     start_time = now - settings.XICAI_UPDATE_TIMEDELTA
     return P2PProduct.objects.filter(publish_time__gte = start_time).filter(publish_time__lt = now).all()
 
