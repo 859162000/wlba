@@ -67,8 +67,8 @@ def depoly_staging():
         with cd(path):
             print green("Please input your github username and password.")
             run("git checkout wanglibao/settings.py")
-            run("git pull origin home_new")
-            run("git checkout home_new")
+            run("git checkout master")
+            run("git pull origin master")
             print yellow('Replacing wanglibao/settings.py ENV')
             run("fab config:'wanglibao/settings.py','ENV \= ENV_DEV','ENV \= %s'" % env.environment)
             json_env = json.dumps({"BROKER_URL":"amqp://wanglibao:wanglibank@localhost/wanglibao"})
