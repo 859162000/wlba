@@ -166,6 +166,7 @@ html
               //.align-center
               //  a.font-s.blue(href="http://act.vip.xunlei.com/vip/2015/p2pcash/#wlb") 【立即领取】
               form#register-modal-form2.login-form.dale(method='post', action='/accounts/register/ajax/')
+                - csrf_token
                 .form-row
                   .form-control-group
                     .span12
@@ -252,11 +253,11 @@ script.
         var mt=date.getMinutes();
         var st=date.getSeconds();
         if(tt>=7&&gt>=7&&ht>=12&&mt>=0&&st>=0){
-             document.getElementById('jinjiang').innerHTML = '全场加息４％';
+             document.getElementById('jinjiang').innerHTML = '全场加息';
 
         }
         if(tt>=7&&gt>=8&&ht>=0&&mt>=0&&st>=0){
-          document.getElementById('jinjiang').innerHTML = '全场加息４％';
+          document.getElementById('jinjiang').innerHTML = '全场加息';
           TimeTot('2015/8/8 23:59:59');
           callFun();
         }else{

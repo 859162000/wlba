@@ -56,7 +56,7 @@ html(style="background:#fef4e0")
         lable#daojishi 距离开始还有
         span(style='color: #f6cf3f;font-size: 2.05rem')#display
         |天
-      p.eight-time
+      p.eight-time#eight-time
         span#display1
         |:
         span#display2
@@ -145,12 +145,12 @@ script.
         var mt=date.getMinutes();
         var st=date.getSeconds();
         if(tt>=7&&gt>=7&&ht>=12&&mt>=0&&st>=0){
-             document.getElementById('jinjiang').innerHTML = '全场加息４％';
+             document.getElementById('jinjiang').innerHTML = '全场加息';
              document.getElementById('shenme').innerHTML = '';
 
         }
         if(tt>=7&&gt>=8&&ht>=0&&mt>=0&&st>=0){
-          document.getElementById('jinjiang').innerHTML = '全场加息４％';
+          document.getElementById('jinjiang').innerHTML = '全场加息';
           document.getElementById('shenme').innerHTML = '';
           TimeTot('2015/8/8 23:59:59');
           callFun();
