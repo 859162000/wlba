@@ -3,7 +3,9 @@ $g-nav-height: 80px
 .g-nav-warp
   height: $g-nav-height
   background: $bg-d3
-  top: -$g-nav-height
+  position: relative
+  z-index: 100
+  -webkit-transform: translateZ(0)
 .g-logo-box
   width: 360px
   height: 55px
@@ -23,6 +25,7 @@ $g-nav-height: 80px
 .g-nav-fixed
   position: fixed
   width: 100%
+  top: -80px
   z-index: 10
   +box-shadow(0 3px 6px $bg-d11)
 
@@ -39,6 +42,7 @@ $g-nav-height: 80px
   .user-nav
     text-align: center
     +line-height(80)
+    display: inline-block
     .user-text
       display: inline-block
       vertical-align: middle
@@ -49,6 +53,7 @@ $g-nav-height: 80px
     .icon-down
       font-size: $font-xs
       color: #bfbfbf
+      vertical-align: middle
   .g-nav-user-nav
     position: absolute
     top: 80px

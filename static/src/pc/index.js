@@ -1,14 +1,16 @@
 
 require.config({
   paths: {
-    'jquery.animateNumber': 'lib/jquery.animateNumber.min'
+    'jquery.animateNumber': 'lib/jquery.animateNumber.min',
+    'countdown' : 'model/countdown'
   },
   shim: {
-    'jquery.animateNumber': ['jquery']
+    'jquery.animateNumber': ['jquery'],
   }
 });
 
-require(['jquery', 'jquery.animateNumber'], function( $ ) {
+require(['jquery', 'jquery.animateNumber', 'countdown'], function( $ ) {
+
   //number adminante
   var $num = $('.num-space')
   $num.each(function( ) {
@@ -41,10 +43,16 @@ require(['jquery', 'jquery.animateNumber'], function( $ ) {
   })
 
 
+  //倒计时
+  var
+    time = $('.recommend_time').attr('data-update'),
+    endTime= new Date(time.replace(/-/g,"/"));
+  $('.recommend_time').countdown(endTime);
+
   //nav fixed
   var $nav = $('.g-nav-warp');
   $(window).scroll(function(){
-    $(window).scrollTop() > 400 ? $nav.addClass('g-nav-fixed').animate({'top': 0}, 200) : $nav.stop(!0,!0).removeClass('g-nav-fixed').animate({'top': -80}, 20);
+    $(window).scrollTop() > 400 ? $nav.addClass('g-nav-fixed').animate({'top': 0}, 200) : $nav.stop(!0,!0).removeClass('g-nav-fixed').removeAttr('style');
   })
 
   //banner

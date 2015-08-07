@@ -16,6 +16,9 @@ a
   &:hover, &:active
     color: $t-d2
     cursor: pointer
+// number famity
+.helvetica
+  font-family: $font-family-number
 
 .input-base
   padding: 5px
@@ -52,12 +55,19 @@ select
 // line-height
 .lh
   line-height: 1
+//justify
+.jy
+  +justify()
 //float
 .fr
   float: right
 .fl
   float: left
-
+//overflow ellipsis
+.es
+  white-space: nowrap
+  text-overflow: ellipsis
+  overflow: hidden
 //grid for span
 $gridColumns: 12 !default
 
@@ -216,6 +226,8 @@ h4
 
 .mg-t-ssm
   margin-top: $space-ssm
+.gm-t-l
+  margin-top: $space-l
 .mg-t-xl
   margin-top: $space-xl
 
@@ -227,6 +239,8 @@ h4
   margin-bottom: $space-s
 .mg-b-sm
   margin-bottom: $space-sm
+.mg-b-xl
+  margin-bottom: $space-xl
 .mg-l-r-sm
   margin-right: $space-sm
   margin-left: $space-sm

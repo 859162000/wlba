@@ -23,6 +23,7 @@
       width: 110px
       height: 110px
       +border-radius(4px)
+      margin: 0
     .ft-weibo
       @include home-sprite(ftWeibo)
     .ft-weixin
@@ -42,23 +43,19 @@
 .atn-list
   margin: 0 auto
   padding: 70px 0
-  width: 750px
+  text-align: center
   +clearfix()
   a
-    float: left
-    width: 130px
-    height: 55px
-  .atn-report
-    @include home-sprite(report)
-  .atn-bank
-    @include home-sprite(bank)
-  .atn-baidu
-    @include home-sprite(baidu)
-  .atn-goodcm
-    @include home-sprite(goodcm)
-  .atn-wosign
-    @include home-sprite(wosign)
-
+    display: inline-block
+    width: 140px
+    height: 50px
+    margin-right: 8px
+  .atn-ssl
+    @include home-sprite(ssl)
+  .atn-internet
+    @include home-sprite(internet)
+  .atn-trust
+    @include home-sprite(trust)
 
 
 

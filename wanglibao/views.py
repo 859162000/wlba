@@ -4,12 +4,13 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader, Context
 from django.utils import timezone
 from django.views.generic import TemplateView
-from marketing.models import NewsAndReport, SiteData
+from marketing.models import NewsAndReport, TimelySiteData
 from misc.views import MiscRecommendProduction
 from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_banner.models import Banner, Partner
 from itertools import chain
 from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2PNew
+from wanglibao_p2p.models import P2PEquity
 from django.core.urlresolvers import reverse
 import re
 import urlparse
@@ -21,11 +22,13 @@ import pickle
 class IndexView(TemplateView):
     template_name = 'index-test.jade'
 
+    PRODUCT_LENGTH = 3
+
     def _period_3(self, p2p):
         return p2p.filter(Q(pay_method__contains=u'日计息') & Q(period__lte=90) | ~Q(pay_method__contains=u'日计息') & Q(period__lte=3))
 
     def _period_6(self, p2p):
-        return p2p.filter(Q(pay_method__contains=u'日计息') & (Q(period__gt=90) | Q(period__lte=180)) | ~Q(pay_method__contains=u'日计息') & (Q(period__gt=3) | Q(period__lte=6)))
+        return p2p.filter(Q(pay_method__contains=u'日计息') & (Q(period__gt=90) & Q(period__lte=180)) | ~Q(pay_method__contains=u'日计息') & (Q(period__gt=3) & Q(period__lte=6)))
 
     def _period_9(self, p2p):
         return p2p.filter(Q(pay_method__contains=u'日计息') & Q(period__gt=180) | ~Q(pay_method__contains=u'日计息') & Q(period__gt=6))
@@ -84,14 +87,14 @@ class IndexView(TemplateView):
         if product_id:
             p2p = p2p.exclude(id=product_id)
 
-        p2p = self._filter_product_period(p2p, period).order_by('-priority', '-total_amount')[:3]
+        p2p = self._filter_product_period(p2p, period).order_by('-priority', '-total_amount')[:self.PRODUCT_LENGTH]
         p2p_list.extend(p2p)
         # 使用满标但是未还款的扩充
-        if len(p2p_list) < 3:
-            p2p_list.extend(self._full_product_nonpayment(period=period, num=3-len(p2p), product_id=product_id))
+        if len(p2p_list) < self.PRODUCT_LENGTH:
+            p2p_list.extend(self._full_product_nonpayment(period=period, num=self.PRODUCT_LENGTH-len(p2p), product_id=product_id))
         # 使用慢标且还款中的扩充
-        if len(p2p_list) < 3:
-            p2p_list.extend(self._full_product_payment(period=period, num=3-len(p2p), product_id=product_id))
+        if len(p2p_list) < self.PRODUCT_LENGTH:
+            p2p_list.extend(self._full_product_payment(period=period, num=self.PRODUCT_LENGTH-len(p2p), product_id=product_id))
         return p2p_list
 
     def get_context_data(self, **kwargs):
@@ -101,15 +104,12 @@ class IndexView(TemplateView):
         recommend_product_id = misc.get_recommend_product_id()
         recommend_product = P2PProduct.objects.filter(id=recommend_product_id)
 
-        #p2p_products = []
+        # p2p_products = []
         # 获取期限小于等于3个月的标，天数为90天(period<=3 or period<=90)
-        #p2p_products.extend(self.get_products(period=3, product_id=recommend_product_id))
         p2p_lt3 = self.get_products(period=3, product_id=recommend_product_id)
         # 获取期限大雨3个月小于等于6个月的标，天数为180天(3<period<=6 or 90<period<=180)
-        #p2p_products.extend(self.get_products(period=6, product_id=recommend_product_id))
         p2p_lt6 = self.get_products(period=6, product_id=recommend_product_id)
         # 获取期限大于6个月的标(period>6 or period>180)
-        #p2p_products.extend(self.get_products(period=9, product_id=recommend_product_id))
         p2p_gt6 = self.get_products(period=9, product_id=recommend_product_id)
         getmore = True
 
@@ -117,7 +117,10 @@ class IndexView(TemplateView):
         # 新闻页面只有4个固定位置
         news_and_reports = NewsAndReport.objects.all().order_by("-score")[:4]
 
-        site_data = SiteData.objects.all().first()
+        # 网站数据
+        m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA)
+        site_data = m.get_recommend_products()[MiscRecommendProduction.KEY_PC_DATA]
+        site_data['updated_at'] = m.get_misc().updated_at
 
         # 合作伙伴
         partners_data = Partner.objects.filter(type='partner')
@@ -128,9 +131,22 @@ class IndexView(TemplateView):
 
         # 公告 前7个
         annos = AnnouncementHomepage()[:7]
-        print p2p_gt6
+
+        # 总资产
+        p2p_total_asset = 0
+        if self.request.user and self.request.user.is_authenticated():
+            user = self.request.user
+            p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
+                u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+            ]).select_related('product')
+
+            unpayed_principle = 0
+            for equity in p2p_equities:
+                if equity.confirm:
+                    unpayed_principle += equity.unpaid_principal
+            p2p_total_asset = user.margin.margin + user.margin.freeze + user.margin.withdrawing + unpayed_principle
+
         return {
-            #"p2p_products": p2p_products,
             "recommend_product": recommend_product,
             "p2p_lt_three": p2p_lt3,
             "p2p_lt_six": p2p_lt6,
@@ -142,6 +158,7 @@ class IndexView(TemplateView):
             'announcements': annos,
             'announcements_p2p': AnnouncementP2PNew,
             'partners': partners,
+            'p2p_total_asset': float(p2p_total_asset)
         }
 
     def get(self, request, *args, **kwargs):
@@ -175,7 +192,7 @@ class PartnerView(TemplateView):
 
 
 class SecurityView(TemplateView):
-    template_name = 'security.jade'
+    template_name = 'security_new.jade'
 
     def get_context_data(self, **kwargs):
 

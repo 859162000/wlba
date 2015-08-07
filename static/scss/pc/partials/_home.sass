@@ -114,11 +114,15 @@
   +clearfix()
   +line-height(50)
   border-bottom: 1px solid $br-d2
+.recommend_time
+  +line-height(20)
+  display: inline-block
 .tg-pro-tit
   margin: 20px 0 10px 0
   +inline-block
 .ac-tg-row
   line-height: 1
+  padding-top: 9px
   .buy-warp
     text-align: right
   .buy-text-r
@@ -227,9 +231,13 @@
       color: $t-d2
   .ns-head
     margin: 10px 0
+    display: block
     .icon
       color: $t-d7
       font-size: $font-xxl
+    &:hover, &:active
+      .icon
+        color: $t-d2
   ul
     @extend .padding-l-r-sm
   li

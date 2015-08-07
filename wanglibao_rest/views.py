@@ -60,6 +60,18 @@ class UserPortfolioView(generics.ListCreateAPIView):
         return self.queryset.filter(user_id=user_pk)
 
 
+class CaptchaValidationCodeView(APIView):
+    """ 单独验证验证码 """
+    permission_classes = ()
+
+    def post(self, request):
+        res, message = verify_captcha(request.POST)
+        if not res:
+            return Response({'message': message, "type": "captcha"}, status=403)
+
+        return Response({'message': '验证码正确'}, status=200)
+
+
 class SendValidationCodeView(APIView):
     """
     The phone validate view which accept a post request and send a validate code to the phone

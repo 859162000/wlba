@@ -8,9 +8,16 @@
       banners_ = enumerate(banners)
       for index, banner in banners_
         if index == 0
-          a(href='', style="display:block; background-image:url('/media/{{banner.image}}')").slide-banner
+          if banner.type == 'ad'
+            a(href="{{banner.link}}", style="display:block; background-image:url('/media/{{banner.image}}')", target='_blank').slide-banner
+          else
+            .slide-banner(style="display:block; background-image:url('/media/{{banner.image}}')")
         else
-          a(href='', style="display:none; background-image:url('/media/{{banner.image}}')").slide-banner
+          if banner.type == 'ad'
+            a(href="{{banner.link}}", style="display:none; background-image:url('/media/{{banner.image}}')", target='_blank').slide-banner
+          else
+            .slide-banner(style="display:none; background-image:url('/media/{{banner.image}}')")
+
     .g-slide-anchor
       banners_ = enumerate(banners)
       for index, banner in banners_
@@ -27,7 +34,7 @@
             .landed-head.clearfix
               img(src='/static/imgs/pc/home/user.jpg').fl
               .head-username.fr.tl
-                .font-m {{user|display_name}}
+                .font-m {{user | display_name}}
                   span.font-s , 你好!
                 .font-s.t-d17 感谢您对网利宝的信任！
             .landed-cont
@@ -35,12 +42,13 @@
                 div 全方位控制项目风险
                 div 业界唯一零坏账平台
               .landed-cont-show.font-m.hide
-                div
-                  span.t-d17.font-xs 可用余额：
-                  span 1856.00
-                div
-                  span.t-d17.font-xs 账户资产：
-                  span 1856.00
+                span.user-data-warp
+                  div
+                    span.t-d17.font-xs 可用余额：
+                    span.helvetica {{user.margin.margin}}
+                  div
+                    span.t-d17.font-xs 账户资产：
+                    span.helvetica {{user.margin.margin}}
 
               .landed-cont-btn
                 i.icon.iconfont.icon-eye03
@@ -50,12 +58,12 @@
               a(href="/p2p/list/").landed-for-tou 投资
         else
           .g-unlanded
-            .font-xxxll.t-d2.lh 13.0%
+            .font-xxxll.t-d2.lh.helvetica 13.0%
             .font-m.t-d4 平均年化收益率
             .font-m.t-d5.mg-t-s.mg-b-sm 账户资金由民生银行全额托管
             .unlanded-btn.font-m
-              a(href="").unlanded-for-regist.mg-r-sm 快速注册
-              a(href="").unlanded-for-login 登陆
+              a(href="/accounts/register/").unlanded-for-regist.mg-r-sm 快速注册
+              a(href="/accounts/login/").unlanded-for-login 登陆
 
 
 
