@@ -23,7 +23,7 @@ from wanglibao.settings import  YIRUITE_CALL_BACK_URL, \
         TIANMANG_CALL_BACK_URL, WLB_FOR_YIRUITE_KEY, YIRUITE_KEY, BENGBENG_KEY, \
     WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
     JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL, JINSHAN_CALL_BACK_URL, WLB_FOR_JINSHAN_KEY, \
-    WLB_FOR_SHLS_KEY
+    WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import  common_callback, jinshan_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
@@ -150,6 +150,13 @@ class CoopRegister(object):
     @property
     def channel_user(self):
         return self.request.session.get(self.internal_channel_user_key, None)
+
+    @property
+    def channel_extra(self):
+        """
+        渠道扩展参数
+        """
+        return self.request.session.get(self.extra_key, 'wlb_extra')
 
     def channel_user_from_db(self, user):
         """
@@ -494,9 +501,54 @@ class WaihuRegister(CoopRegister):
             super(WaihuRegister, self).save_to_binding(user)
             super(WaihuRegister, self).clear_session()
 
+class ShiTouCunRegister(CoopRegister):
+    def __init__(self, request):
+        super(ShiTouCunRegister, self).__init__(request)
+        self.extra_key = 'extra'
+        self.c_code = 'shitoucun'
+        self.call_back_url = SHITOUCUN_CALL_BACK_URL
+
+    def save_to_session(self):
+        super(ShiTouCunRegister, self).save_to_session()
+        channel_extra = self.request.GET.get(self.extra_key, 'wlb_extra')
+        if channel_extra:
+            self.request.session[self.extra_key] = channel_extra
+            #logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
+
+    def save_to_binding(self, user):
+        """
+        处理从url获得的渠道参数
+        :param user:
+        :return:
+        """
+        if self.channel_user:
+            binding = Binding()
+            binding.user = user
+            binding.btype = self.channel_name
+            binding.bid = self.channel_user
+            binding.extra = self.channel_extra
+            binding.save()
+            # logger.debug('save user %s to binding'%user)
+
+    def register_call_back(self, user):
+        # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
+        binding = Binding.objects.filter(user_id=user.id).first()
+        if binding:
+            logo = binding.extra
+            uid = binding.bid
+            uid_for_coop = get_uid_for_coop(user.id)
+            params = {
+                'logo': logo,
+                'uid': uid,
+                'e_uid': uid_for_coop,
+                'e_user': uid_for_coop
+            }
+            common_callback.apply_async(
+                kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+
 
 #注册第三方通道
-coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister, JuxiangyouRegister, DouwanRegister, JinShanRegister, WaihuRegister]
+coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister, JuxiangyouRegister, DouwanRegister, JinShanRegister, ShiTouCunRegister]
 
 #######################第三方用户查询#####################
 
