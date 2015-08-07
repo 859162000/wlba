@@ -94,7 +94,6 @@ urlpatterns = patterns(
     url(r'^tender_agreement/',  AgreementAutoView.as_view(), name="agreement_auto"),
 
 
-    url(r'^loginRegister/', TemplateView.as_view(template_name="loginAndRegister.jade")),
 )
 
 urlpatterns += patterns(

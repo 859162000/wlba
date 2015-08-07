@@ -58,7 +58,11 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
             }else{
                 $('.logonFormDiv').hide();
                 $('.registerFormDiv').show();
-                self.hasClass('selectEd') ? '' : self.addClass('selectEd');
+                if (!self.hasClass('selectEd')){
+                    self.addClass('selectEd');
+                    //初始化注册表单验证
+                    registerInitFun();
+                }
             }
         })
 
@@ -78,13 +82,13 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
             self.attr('placeholder', zhi);
             self.parent().removeClass('selectEdLi')
         })
-
+        //Enter事件
         $(this).keydown(function(event){
             if(event.keyCode == '13'){
                 if($('.minNavLeft').hasClass('curr')){
                     $('#loginSubmit').click();
                 }else{
-                    $('#loginSubmit').click();
+                    $('#registerSubmit').click();
                 }
             }
         });
@@ -142,7 +146,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
     //手机和正则
     checkMobile = function(identifier) {  //验证手机号
       var re = /^1\d{10}$/;
-      return re.test(identifier);bb
+      return re.test(identifier);
     }
     //刷新验证码
     imgCodeRe = function(form){
@@ -185,13 +189,11 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                       remember_me : remember_me
                   }
                 }).done(function() {
-                  var next_url = '';
-                  var arr = /\?next=(\/.+)$/ig.exec(window.location);
-                  if (arr && arr[1]) {
-                    next_url = arr[1];
-                    window.location.href = next_url;
+                  var arr = location.search;
+                  if (arr != '') {
+                      window.location = arr.split('=')[1];
                   } else {
-                    location.reload();
+                      window.location = '/';
                   }
                 }).fail(function(xhr) {
                     var result = JSON.parse(xhr.responseText);
@@ -200,11 +202,96 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                     }else if(result.message.captcha != undefined){
                         $('#loginForm').find('.loginError').text(result.message.captcha[0]);
                     }
+                    imgCodeRe('loginForm');
+                    $('#loginCode').val('');
                 });
             }
         })
     }
-    loginInitFun();
+    //验证图片验证码
+    checkImgCodeFun = function(getCodeBtn){
+        var phoneNumber = $.trim($("#registerMobile").val());
+        var captcha_0 = $('#registerForm').find('input[name="captcha_0"]').val();
+        var captcha_1 = $('#registerForm').find('#registerCode').val();
+        $.ajax({
+            url: "/api/captcha_validation/" + phoneNumber + "/",
+            type: "POST",
+            data: {
+                captcha_0: captcha_0,
+                captcha_1: captcha_1
+            }
+        }).success(function() {
+            getCodeBtn.addClass('getCodeBtnTrue')
+        }).fail(function(xhr) {
+            getCodeBtn.removeClass('getCodeBtnTrue')
+            var result = JSON.parse(xhr.responseText);
+            $('#registerForm').find('.loginError').text(result.message)
+        });
+    }
+    checkSEMFun = function(){
+        var count, element, intervalId, phoneNumber, timerFunction;
+        element = $('.getCodeBtnTrue');
+        phoneNumber = $.trim($("#registerMobile").val());
+        $.ajax({
+            url: "/api/phone_validation_code/register/" + phoneNumber + "/",
+            type: "POST"
+        }).done(function() {
+            count = 5;
+            $(element).attr('disabled', 'disabled').addClass('buttonGray');
+            $('.voiceValidate').attr('disabled', 'disabled');
+            timerFunction = function() {
+                if (count >= 1) {
+                  count--;
+                  return $(element).text('已经发送(' + count + ')');
+                } else {
+                  clearInterval(intervalId);
+                  $(element).text('重新获取').removeAttr('disabled').removeClass('buttonGray');
+                  $('.voice').show();
+                  $('.voiceValidate').removeAttr('disabled');
+                  return $('.voice').html('没有收到验证码？请尝试<a href="" class="voiceValidate">语音验证</a>');
+                }
+            };
+            timerFunction();
+            return intervalId = setInterval(timerFunction, 1000);
+            intervalId;
+        }).fail(function(xhr) {
+            clearInterval(intervalId);
+            $(element).text('重新获取').removeAttr('disabled').removeClass('buttonGray');
+            var result = JSON.parse(xhr.responseText);
+            $('#registerForm').find('.loginError').text(result.message);
+        });
+    }
+    setVoidCodeFun = function(){
+        var element = $('.voice');
+        return $.ajax({
+            url: '/api/ytx/send_voice_code/',
+            type: "POST",
+            data: {
+                phone: $.trim($("#registerMobile").val())
+            }
+        }).success(function(json) {
+            var button, count, intervalId, timerFunction;
+            if (json.ret_code === 0) {
+            count = 60;
+            button = $(".voiceValidate");
+            button.attr('disabled', 'disabled').addClass('buttonGray');
+            timerFunction = function() {
+                if (count >= 1) {
+                    count--;
+                    return element.text('语音验证码已经发送，请注意接听（' + count + '）');
+                } else {
+                    clearInterval(intervalId);
+                    element.html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voiceValidate">语音验证</a>');
+                    button.removeAttr('disabled').removeClass('buttonGray');
+                }
+            };
+            timerFunction();
+            return intervalId = setInterval(timerFunction, 1000);
+            } else {
+            return element.html('系统繁忙请尝试短信验证码');
+            }
+        });
+    }
     registerInitFun = function(){
        //密码type
         $('.pwdStatus').on('click',function(){
@@ -235,23 +322,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         $('#registerCode').on('blur',function() {
             var getCodeBtn = $('.getCodeBtn');
             if(checkCodedFun('registerForm') && checkMobileFun('registerForm')){
-                var phoneNumber = $.trim($("#registerMobile").val());
-                var captcha_0 = $('#registerForm').find('input[name="captcha_0"]').val();
-                var captcha_1 = $('#registerForm').find('#registerCode').val();
-                $.ajax({
-                    url: "/api/captcha_validation/",
-                    type: "POST",
-                    data: {
-                        captcha_0: captcha_0,
-                        captcha_1: captcha_1
-                    }
-                }).success(function() {
-                    getCodeBtn.addClass('getCodeBtnTrue')
-                }).fail(function(xhr) {
-                    getCodeBtn.removeClass('getCodeBtnTrue')
-                    var result = JSON.parse(xhr.responseText);
-                    $('#registerForm').find('.loginError').text(result.message)
-                });
+                checkImgCodeFun(getCodeBtn)
             }else{
                 getCodeBtn.removeClass('getCodeBtnTrue')
             }
@@ -264,114 +335,71 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         $('#registerRefresh').on('click',function(){
             imgCodeRe('registerForm');
         })
+        //初始化图片验证码
+        imgCodeRe('registerForm');
+        //发送短信验证码
+        $('.SMELI').delegate('.getCodeBtnTrue','click',function(){
+            checkSEMFun();
+        })
+        //发送语音验证
+        $('.voice').delegate('.voiceValidate','click',function(e){
+            e.preventDefault();
+            setVoidCodeFun
+        })
+        //提交注册表单
+        $('#registerSubmit').on('click',function(){
+            var error = $('#registerForm').find('.loginError');
+             if(checkMobileFun('registerForm') && checkCodedFun('registerForm') && checkPwdFun('registerForm') && checkCodedFun('registerForm','re')){
+                if($("#agreement").is(':checked')) {
+                    error.text('');
+                    var identifier, captcha_0,captcha_1,password, validate_code,invitecode;
+                    identifier = $('#registerMobile').val();
+                    captcha_0 = $('#registerForm').find('input[name="captcha_0"]').val();
+                    captcha_1 = $('#registerForm').find('#registerCode').val();
+                    password = $('#registerPwd').val();
+                    validate_code = $('#registerSMSCode').val();
+                    invitecode = $('#invitecode').val();
+                    $.ajax({
+                        url: '/accounts/register/ajax/',
+                        type: "POST",
+                        data: {
+                            identifier : identifier,
+                            captcha_0 : captcha_0,
+                            captcha_1 : captcha_1,
+                            password: password,
+                            validate_code: validate_code,
+                            invitecode : invitecode
+                        }
+                    }).done(function () {
+                        window.location = '/'
+                    }).fail(function (xhr) {
+                        var result = JSON.parse(xhr.responseText);
+                        if(result.message.invitecode != undefined){
+                            error.text(result.message.invitecode)
+                        }else if(result.message.identifier != undefined){
+                            error.text(result.message.identifier)
+                        }else if(result.message.captcha_1 != undefined){
+                            error.text(result.message.captcha_1)
+                        }else{
+                            error.text(result.message.validate_code)
+                        }
+                    });
+                }else{
+                    error.text('请查看网利宝注册协议');
+                }
+             }
+        })
     }
 
-
-    imgCodeRe('registerForm');
-
-    $('.SMELI').delegate('.getCodeBtnTrue','click',function(){
-      var count, element, intervalId, phoneNumber, timerFunction;
-      element = $('.getCodeBtnTrue');
-      phoneNumber = $.trim($("#registerMobile").val());
-      $.ajax({
-        url: "/api/phone_validation_code/register/" + phoneNumber + "/",
-        type: "POST"
-      }).done(function() {
-        count = 5;
-        $(element).attr('disabled', 'disabled').addClass('buttonGray');
-        $('.voiceValidate').attr('disabled', 'disabled');
-        timerFunction = function() {
-            if (count >= 1) {
-              count--;
-              return $(element).text('已经发送(' + count + ')');
-            } else {
-              clearInterval(intervalId);
-              $(element).text('重新获取').removeAttr('disabled').removeClass('buttonGray');
-              $('.voice').show();
-              $('.voiceValidate').removeAttr('disabled');
-              return $('.voice').html('没有收到验证码？请尝试<a href="" class="voiceValidate">语音验证</a>');
-            }
-        };
-        timerFunction();
-        return intervalId = setInterval(timerFunction, 1000);
-        intervalId;
-      }).fail(function(xhr) {
-        clearInterval(intervalId);
-        $(element).text('重新获取').removeAttr('disabled').removeClass('buttonGray');
-        var result = JSON.parse(xhr.responseText);
-        $('#registerForm').find('.loginError').text(result.message);
-      });
-    })
-
-    $('.voice').delegate('.voiceValidate','click',function(e){
-        e.preventDefault();
-        var element = $('.voice');
-        return $.ajax({
-            url: '/api/ytx/send_voice_code/',
-            type: "POST",
-            data: {
-                phone: $.trim($("#registerMobile").val())
-            }
-        }).success(function(json) {
-            var button, count, intervalId, timerFunction;
-            if (json.ret_code === 0) {
-                count = 60;
-                button = $(".voiceValidate");
-                button.attr('disabled', 'disabled').addClass('buttonGray');
-                timerFunction = function() {
-                    if (count >= 1) {
-                        count--;
-                        return element.text('语音验证码已经发送，请注意接听（' + count + '）');
-                    } else {
-                        clearInterval(intervalId);
-                        element.html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voiceValidate">语音验证</a>');
-                        button.removeAttr('disabled').removeClass('buttonGray');
-                    }
-                };
-                timerFunction();
-                return intervalId = setInterval(timerFunction, 1000);
-            } else {
-                return element.html('系统繁忙请尝试短信验证码');
-            }
-        });
-    })
-
-    $('#registerSubmit').on('click',function(){
-        var error = $('#registerForm').find('.loginError');
-         if(checkMobileFun('registerForm') && checkCodedFun('registerForm') && checkPwdFun('registerForm') && checkCodedFun('registerForm','re')){
-            if($("#agreement").is(':checked')) {
-                error.text('');
-                var identifier, captcha_0,captcha_1,password, validate_code,invitecode;
-                identifier = $('#registerMobile').val();
-                captcha_0 = $('#registerForm').find('input[name="captcha_0"]').val();
-                captcha_1 = $('#registerForm').find('#registerCode').val();
-                password = $('#registerPwd').val();
-                validate_code = $('#registerSMSCode').val();
-                invitecode = $('#invitecode').val();
-                $.ajax({
-                    url: '/accounts/register/ajax/',
-                    type: "POST",
-                    data: {
-                        identifier : identifier,
-                        captcha_0 : captcha_0,
-                        captcha_1 : captcha_1,
-                        password: password,
-                        validate_code: validate_code,
-                        invitecode : invitecode
-                    }
-                }).done(function () {
-                    location.reload();
-                }).fail(function (xhr) {
-                    var result = JSON.parse(xhr.responseText);
-                    if(result.message.invitecode != undefined){
-                        error.text(result.message.invitecode)
-                    }else{
-                        error.text(result.message.validate_code)
-                    }
-                });
-            }else{
-                error.text('请查看网利宝注册协议');
-            }
-         }
-    })
+    loginInitFun();
+    var href = location.search;
+    if (href.split('=')[1] == '1') {
+        var self = $('.minNavRight');
+        $('.logonFormDiv').hide();
+        $('.registerFormDiv').show();
+        $('.minNavLeft').removeClass('curr');
+        self.addClass('selectEd curr');
+        //初始化注册表单验证
+        registerInitFun();
+    }
 });
