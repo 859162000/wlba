@@ -102,7 +102,7 @@ urlpatterns = patterns(
     url(r'^register/wx/$', WeixinRegisterAPIView.as_view()),
     url(r'^change_password/$', ChangePasswordAPIView.as_view()),
     url(r'^reset_password/$', ResetPasswordAPI.as_view()),
-    url(r'captcha_validation/$', CaptchaValidationCodeView.as_view()),
+    url(r'captcha_validation/(?P<phone>\d{11})/$', CaptchaValidationCodeView.as_view()),
     url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendRegisterValidationCodeView.as_view()),
     url(r'^phone_validation_code/reset_password/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
