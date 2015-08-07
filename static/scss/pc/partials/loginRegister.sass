@@ -1,0 +1,191 @@
+.i-mod-content
+  width: $content-width
+  margin: 0 auto
+  padding-bottom: 30px
+  +clearfix()
+  .loginRegisterLeft
+    padding-left: 45px
+    width: 646px
+    .pageAd
+      width: 601px
+      height: 343px
+      @include loginRegister-sprite(ad)
+    .safeRelevant
+      padding: 0 8px
+      +clearfix()
+      li
+        width: 85px
+        @extend .fl
+        margin-right: 63px
+        span
+          width: 74px
+          height: 73px
+          margin-bottom: 8px
+          +inline-block
+        .safeSpan1
+          @include loginRegister-sprite(safe)
+        .safeSpan2
+          @include loginRegister-sprite(bank)
+        .safeSpan3
+          @include loginRegister-sprite(cup)
+        .safeSpan4
+          @include loginRegister-sprite(safe2)
+        p
+          font-size: 10px
+          +line-height(13)
+          b
+            color: #e7350d
+            font-weight: normal
+      .mr0
+        margin-right: 0
+      .w140
+        width: 140px
+    +clearfix()
+  .loginRegisterRight
+    border: 1px solid #d5d5d5
+    width: 398px
+    margin-top: 53px
+    +clearfix()
+    .minNax
+      height: 59px
+      border-bottom: 1px solid #d5d5d5
+      span
+        color: #3e3e3e
+        line-height: 57px
+        cursor: pointer
+        +inline-block
+      .minNavLeft
+        margin: 0 49px 0 57px
+      .minNavRight
+        margin: 0 57px 0 48px
+      .borderStyle
+        @include loginRegister-sprite(shu)
+        width: 1px
+        height: 43px
+      .curr
+        border-bottom: 2px solid #e7350d
+    .loginForm,.registerForm,.xieyi
+      margin: 0 $space-xxxl
+      i
+        color: #cccccc
+        font-size: $font-xl
+        margin-top: 3px
+        @extend .fl
+      .ml19
+        margin-left: 19px
+      .ml17
+        margin-left: 17px
+      .ml18
+        margin-left: 18px
+      .ml16
+        margin-left: 16px
+      li
+        width: 275px
+        height: 38px
+        border: 1px solid #d5d5d5
+        +border-radius(4px)
+        margin-bottom: 19px
+        input
+          height: 36px
+          line-height: 36px
+          width: 222px
+          @extend .fr
+          border: 0 none
+          font-size: $font-m
+          color: $t-d11
+        .w92
+          width: 114px
+      .checkboxDiv
+        color: #989898
+        font-size: $font-l
+        border: 0 none
+        margin-bottom: 0
+        label
+          font-size: $font-m
+          color: #989898
+          line-height: 33px
+          input
+            width: auto
+            border: 1px solid #d5d5d5
+            float: left
+            margin-top: -1px
+          a
+            color: #4e7cda
+      .w145
+        width: 169px
+        border: 1px solid #d5d5d5
+        position: relative
+        .captchaRefresh
+          font-size: 17px
+          vertical-align: middle
+          color: #999999
+          position: absolute
+          right: -107px
+          top: 2px
+          cursor: pointer
+        .captchaImg
+          position: absolute
+          right: -77px
+          top : 0
+          width: 72px
+          height: 36px
+        .getCodeBtn
+          position: absolute
+          width: 99px
+          height: 37px
+          line-height: 37px
+          +border-radius(2px)
+          background: #ff9900
+          right: -107px
+          top: -1px
+          cursor: pointer
+          border: 0 none
+        .buttonGray
+          background: #d9d9d9
+      .pwdLi
+        position: relative
+        input
+          float: left
+          width: 180px
+          margin-left: 13px
+        .pwdStatus
+          position: absolute
+          right: 7px
+          cursor: pointer
+      .voice
+        border: 0 none
+        height: 20px
+        line-height: 20px
+        .voiceValidate
+          color: #4e7cda
+      .selectEdLi
+        border: 1px solid #e6e6e6
+    .xieyi
+      margin-top: $space-s
+    .registerForm
+      margin-top: 23px
+      li
+        margin-bottom: 9px
+    .submitFormStyle
+      color: #ffffff
+      background: #e7350d
+      +border-radius(4px)
+      height: 40px
+      line-height: 40px
+      margin: 0 $space-xxxl
+      letter-spacing: 1px
+      cursor: pointer
+    .findPwd
+      padding: 13px 0
+      a
+        color: #4e7cda
+        font-size: $font-m
+.loginError
+  color: #ff0000
+  margin: 0 $space-xxxl
+  line-height: 25px
+  font-size: $font-s
+  padding-bottom: $space-xs
+
+
+

@@ -52,9 +52,11 @@ urlpatterns = patterns(
 
     url(r'^login/$', 'django.contrib.auth.views.login',
         {
-            "template_name": "login.jade",
+            "template_name": "loginAndRegister.jade",
             "authentication_form": EmailOrPhoneAuthenticationForm,
         }, name="auth_login"),
+
+
     url(r'^login/callback/$', login_required(Third_login_back.as_view())),
     url(r'^login/(?P<login_type>\w+)/$', login_required(Third_login.as_view())),
 
