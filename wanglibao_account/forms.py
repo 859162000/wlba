@@ -28,8 +28,8 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     account is not activated. When the user clicked the activation link, the account
     will be activated.
     """
-    #captcha_0 = forms.CharField(label='captcha_0', required=False)
-    #captcha_1 = forms.CharField(label='captcha_1', required=False)
+    captcha_0 = forms.CharField(label='captcha_0', required=False)
+    captcha_1 = forms.CharField(label='captcha_1', required=False)
 
     nickname = forms.CharField(label="Nick name", required=False)
     identifier = forms.CharField(label="Email/Phone")
@@ -56,6 +56,39 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
         fields = ("email",)
+
+    def clean_captcha_1(self):
+        captcha_1 = self.cleaned_data['captcha_1']
+        captcha_0 = self.cleaned_data['captcha_0']
+        if not captcha_0 and not captcha_1:
+            self._flag = True
+            return
+
+        if not captcha_0 or not captcha_1:
+            raise forms.ValidationError(
+                self.error_messages['verify_invalid'],
+                code='verify_invalid'
+            )
+
+        record = CaptchaStore.objects.filter(hashkey=captcha_0).first()
+        if not record:
+            raise forms.ValidationError(
+                self.error_messages['verify_error'],
+                code='verify_error'
+            )
+        if captcha_1.lower() == record.response.lower():
+            try:
+                record.delete()
+            except:
+                pass
+
+            self._flag = True
+            return captcha_1.strip()
+        else:
+            raise forms.ValidationError(
+                self.error_messages['verify_error'],
+                code='verify_error'
+            )
 
     #def clean_captcha_1(self):
     #    captcha_1 = self.cleaned_data['captcha_1']
