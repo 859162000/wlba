@@ -20,7 +20,7 @@ html
                         p 账户资金安全
                           br
                           | 由
-                          b 平安保险
+                          b 阳光保险
                           | 承保
                     li
                         span.safeSpan2
@@ -33,7 +33,7 @@ html
                         p
                             b IDG资本
                             br
-                            | 百亿市值
+                            | 百亿市值R
                             b A股上市公司
                             | 入股
                     li.mr0
@@ -58,7 +58,7 @@ html
                                 input#loginPwd.placeholderInput.checkPwd(type="password", name="password", placeholder="请输入密码", autocomplete='off', title="请输入密码")
                             li.w145
                                 i.icon.iconfont.icon-paper-plane.ml17
-                                input(type="hidden", name="captcha_0", autocomplete="off")
+                                input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
                                 input#loginCode.placeholderInput.w92.checkCode(type="text", name="captcha_1", placeholder="验证码", autocomplete='off', title="验证码")
                                 img.captchaImg.fl(alt="captcha", src="")
                                 i#loginRefresh.icon.iconfont.icon-cycle.captchaRefresh.fl
@@ -94,13 +94,13 @@ html
                                 没有收到验证码？请尝试<a href="javascript:void(0)" class="voiceValidate">语音验证</a>
                             li
                                 i.icon.iconfont.icon-share.ml16
-                                input.placeholderInput(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码（选填）")
+                                input#invitecode.placeholderInput(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码（选填）")
                         .loginError
-                        .submitFormStyle.tc.font-l 注册
+                        .submitFormStyle.tc.font-l#registerSubmit 注册
                         ul.xieyi
                             li.checkboxDiv
                                 label.fl
-                                    input.checkboxStyle(type="checkbox", name="")
+                                    input#agreement.checkboxStyle(type="checkbox", name="",checked='checked')
                                     | 我同意
                                     a(href='') 《网利宝注册协议》
 

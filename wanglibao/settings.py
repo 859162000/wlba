@@ -658,8 +658,7 @@ YTX_BACK_RETURN_URL = CALLBACK_HOST + "/api/ytx/voice_back/"
 ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
 if ENV == ENV_DEV:
     ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
-    #STATIC_FILE_HOST = 'http://localhost:8000'
-    STATIC_FILE_HOST = 'http://192.168.1.114:8000'
+    STATIC_FILE_HOST = 'http://localhost:8000'
 
 PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
 PROMO_TOKEN_QUERY_STRING = 'promo_token'
@@ -778,6 +777,13 @@ if ENV == ENV_PRODUCTION:
 else:
     XICAI_LOAD_PAGE = 'https://staging.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
 
+# 金山
+WLB_FOR_JINSHAN_KEY = '1994'
+JINSHAN_CALL_BACK_URL = 'https://vip.wps.cn/task/api/reward'
+
+# 外呼
+WLB_FOR_SHLS_KEY = '1995'
+
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100
 }
@@ -810,3 +816,5 @@ REDIS_DB = 0
 # REDIS_TIMEOUT = 7*24*60*60
 # CUBES_REDIS_TIMEOUT = 60*60
 # NEVER_REDIS_TIMEOUT = 365*24*60*60
+AMORIZATION_AES_IV = '8'*16
+AMORIZATION_AES_KEY = 'tpuyk8#3*09a@!ds8$j6wg$$.r!$pb7h'
