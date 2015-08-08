@@ -784,6 +784,10 @@ JINSHAN_CALL_BACK_URL = 'https://vip.wps.cn/task/api/reward'
 # 外呼
 WLB_FOR_SHLS_KEY = '1995'
 
+# 石头村
+WLB_FOR_SHITOUCUN_KEY = '1996'
+SHITOUCUN_CALL_BACK_URL = 'http://www.stcun.com/task/interface/int'
+
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100
 }

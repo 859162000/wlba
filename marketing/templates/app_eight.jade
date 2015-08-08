@@ -22,29 +22,13 @@ html(style="background:#fef4e0")
           p 投资额≥1000元，可随机获得奖品一份如下：
       img(src='/static/imgs/mobile_activity/app_eight_gift/eight1.jpg').app-eight-img2
       p.app_eight_backzhong1 说明：用户完成满额投资后，系统自动发送一个礼物到用户账户。
-      if user.is_authenticated
-        a(href='/weixin/list/' data-num="true").button-eight 立即投资
-      else
-        a(href='/weixin/login/?next=/weixin/list/' data-num="false").button-eight 立即投资
-    .app-eighttwo
-      img(src='/static/imgs/mobile_activity/app_eight_gift/two.png').app-eight-img1
-      .line
-      h3 第二重【红包重礼】
-      p.app_eight_backone 活动时间
-      p.app_eight_backone 8月3日—8月7日
-      p.app_eight_backone 活动形式
-      p.app_eight_backone 高额红包大福利，限时限量，每天限量5000个，机会难得！（每位用户每天限领一次，红包领完不要灰心，第二天早点来）
-      img(src='/static/imgs/mobile_activity/app_eight_gift/hongbao.png').app-eight-img2
-      p.app_eight_gift_backzhong1 说明：以上红包均按投资额的1%折扣使用（红包有效期至8月11日）。
-      if user.is_authenticated
-        a(data-num="true")#first-btn.button-eight 立即领取
-      else
-        a(href='/weixin/login/?next=/activity/app_eight_gift/' data-num="false")#first-btn.button-eight 立即领取
-    .app-eightthree
-      img(src='/static/imgs/mobile_activity/app_eight_gift/three.png').app-eight-img1
+
+
+    .app-eightthree.app-eightthree1
+      img(src='/static/imgs/mobile_activity/app_eight_gift/threeapp.png').app-eight-img1
       .line
       h3
-        |第三重【发财大礼】
+        |第二重【发财大礼】
         p
           lable(style='color: #f6cf3f')#shenme 神秘大礼
           span#jinjiang 即将揭晓
@@ -62,24 +46,18 @@ html(style="background:#fef4e0")
         span#display2
         |:
         span#display3
-        if user.is_authenticated
-          a(href='/weixin/list/' data-num="true").button-eight#button-eight 立即投资
-        else
-          a(href='/weixin/login/?next=/weixin/list/' data-num="false").button-eight#button-eight 立即投资
+
     .app-eightfour
-      img(src='/static/imgs/mobile_activity/app_eight_gift/four.png').app-eight-img1
+      img(src='/static/imgs/mobile_activity/app_eight_gift/fourapp.png').app-eight-img1
       .line
-      h3 第四重【投资豪礼】
+      h3 第三重【投资豪礼】
       p.app_eight_backone
         |活动时间 利上有礼，HIGH翻全场！活动期间内单笔投资额达到
         span(style='color: #f6cf3f') 10万
         |以上，即可获得额外现金红包奖励！
       img(src='/static/imgs/mobile_activity/app_eight_gift/hong9.jpg').app-eight-img2
       p.app_eight_gift_backzhong1 现金奖励在三个工作日内以红包形式发出，红包类型为现金红包，投资或取现不限门槛。
-      if user.is_authenticated
-        a(href='/weixin/list/' data-num="true").button-eight 立即投资
-      else
-        a(href='/weixin/login/?next=/weixin/list/' data-num="false").button-eight 立即投资
+
     .app-eightfive
       h3 活动规则
       p.app_eight_backone 1. 注册网利宝用户，均可在活动期间领取高额红包福利；
@@ -101,8 +79,6 @@ html(style="background:#fef4e0")
       #first-redpack-fail
         span.first-xl-off2 ×
         p 不符合参加条件
-script(src="/static/js/require.js", data-main="/static/js/header")
-script(src="/static/js/advance.js")
 script.
 
   function TimeTo(dd) {
@@ -155,8 +131,8 @@ script.
           TimeTot('2015/8/8 23:59:59');
           callFun();
         }else{
-          document.getElementById('button-eight').href = 'javascript:void(0)';
-          document.getElementById('button-eight').style.background='#3d3d3d';
+          //document.getElementById('button-eight').href = 'javascript:void(0)';
+          //document.getElementById('button-eight').style.background='#3d3d3d';
 
         }
     },1000);
