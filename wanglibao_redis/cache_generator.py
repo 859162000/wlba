@@ -20,12 +20,12 @@ def cache_generate_detail():
 
     for p2p in p2p_products:
         # 先删除key，再缓存，避免重复
-        cache_backend.redis.delete('p2p_detail_{0}'.format(p2p.id))
+        cache_backend._delete('p2p_detail_{0}'.format(p2p.id))
 
         p2p_detail = cache_backend.get_cache_p2p_detail(p2p.id)
 
         if p2p.status != u'正在招标':
-            cache_backend.redis.set('p2p_detail_{0}'.format(p2p.id), pickle.dumps(p2p_detail))
+            cache_backend._set('p2p_detail_{0}'.format(p2p.id), pickle.dumps(p2p_detail))
 
     return True
 
