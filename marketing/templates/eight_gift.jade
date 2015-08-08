@@ -69,7 +69,7 @@ html
         .eight_gift_line
         .eight_gift_img.eight_gift_img1
         .eight_gift_back
-          h3 第二重【红包中礼】
+          h3 第二重【红包重礼】
           p.eight_gift_backone 活动时间：8月3日—8月7日
           p.eight_gift_backone 活动形式：高额红包大福利，限时限量，每天限量5000个，机会难得！（每位用户每天限领一次，红包领完不要灰心，第二天早点来）
           dl(style='margin:0')
@@ -99,7 +99,7 @@ html
         .eight_gift_back
           h3
             |第三重【发财大礼】
-            span.jinjiang 即将揭晓
+            span#jinjiang 即将揭晓
           p.eight_gift_backone 活动时间：8月8日（仅限一天）
           p.eight_gift_backone 活动形式：逢八必发，超级发财机会仅此一天！
           p.eight-countdown#eight-countdown
@@ -220,8 +220,13 @@ script.
             n = new Date().getTime(),//取得当前毫秒数
             c = t - n;//得到时间差
     if (c <= 0) {//如果差小于等于0  也就是过期或者正好过期，则推出程序
-      document.getElementById('timer').innerHTML = '活动已经结束';
+      //document.getElementById('timer').innerHTML = '活动已经结束';
       clearInterval(window['ttt']);//清除计时器
+      window['ttt2'] = setInterval(function () {
+
+      TimeTot('2015/8/8 23:59:59');
+
+    }, 1000);//定义计时器，每隔1000毫秒 也就是1秒 计算并更新 div的显示
       return;//结束执行
     }
     var ds = 60 * 60 * 24 * 1000,//一天共多少毫秒
@@ -235,6 +240,38 @@ script.
         m = "0" + m;
         if(s < 10)
         s = "0" + s;
+
+    document.getElementById('display').innerHTML = d;
+    document.getElementById('display1').innerHTML = h;
+    document.getElementById('display2').innerHTML = m;
+    document.getElementById('display3').innerHTML = s;
+  }
+
+  function TimeTot(dt) {
+    var t = new Date(dt),//取得指定时间的总毫秒数
+            n = new Date().getTime(),//取得当前毫秒数
+            c = t - n;//得到时间差
+    if (c <= 0) {//如果差小于等于0  也就是过期或者正好过期，则推出程序
+      //document.getElementById('timer').innerHTML = '活动已经结束';
+      clearInterval(window['ttt2']);//清除计时器
+      return;//结束执行
+    }
+    var ds = 60 * 60 * 24 * 1000,//一天共多少毫秒
+            d = parseInt(c / ds),//总毫秒除以一天的毫秒 得到相差的天数
+            h = parseInt((c - d * ds) / (3600 * 1000)),//然后取完天数之后的余下的毫秒数再除以每小时的毫秒数得到小时
+            m = parseInt((c - d * ds - h * 3600 * 1000) / (60 * 1000)),//减去天数和小时数的毫秒数剩下的毫秒，再除以每分钟的毫秒数，得到分钟数
+            s = parseInt((c - d * ds - h * 3600 * 1000 - m * 60 * 1000) / 1000);//得到最后剩下的毫秒数除以1000 就是秒数，再剩下的毫秒自动忽略即可
+
+
+    if(h < 10)
+        h = "0" + h;
+        if(m < 10)
+        m = "0" + m;
+        if(s < 10)
+        s = "0" + s;
+    callFun();
+    console.log(document.getElementById('display'))
+
     document.getElementById('display').innerHTML = d;
     document.getElementById('display1').innerHTML = h;
     document.getElementById('display2').innerHTML = m;
@@ -242,6 +279,30 @@ script.
   }
   (function () {
     window['ttt'] = setInterval(function () {
+
       TimeTo('2015/8/8 00:00:00');//定义倒计时的结束时间，注意格式
+
     }, 1000);//定义计时器，每隔1000毫秒 也就是1秒 计算并更新 div的显示
   })();
+  var timeTask=setInterval(function(){
+        var date=new Date();
+        var tt=date.getMonth();
+        var gt=date.getDate();
+        var ht=date.getHours();
+        var mt=date.getMinutes();
+        var st=date.getSeconds();
+        if(tt>=7&&gt>=7&&ht>=12&&mt>=0&&st>=0){
+             callFunction();
+
+        }
+        if(tt>=7&&gt>=8&&ht>=0&&mt>=0&&st>=0){
+             callFun();
+        }
+    },1000);
+    function callFunction(){
+       document.getElementById('jinjiang').innerHTML = '全场加息４％';
+    }
+    function callFun(){
+       document.getElementById('eight-countdown').innerHTML = '活动已经开始<span　id=display></span>天';
+
+    }
