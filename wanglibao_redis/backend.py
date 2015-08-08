@@ -173,8 +173,9 @@ class redis_backend(object):
                             del extra_data[section_key][item_key]
             p2p_results['extra_data'] = extra_data
 
-            #if p2p.status != u'正在招标':
-            #    self._set('p2p_detail_{0}'.format(product_id), pickle.dumps(p2p_results))
+            if p2p.status != u'正在招标':
+                self._set('p2p_detail_{0}'.format(product_id), pickle.dumps(p2p_results))
+
             return p2p_results
 
     def push_p2p_products(self, p2p):
