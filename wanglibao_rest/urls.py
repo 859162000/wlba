@@ -43,7 +43,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
                             DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView,
-                            GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, CaptchaValidationCodeView)
+                            GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView, CaptchaValidationCodeView)
 from wanglibao_redpack.views import RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView
 
 from marketing.play_list import InvestmentHistory
