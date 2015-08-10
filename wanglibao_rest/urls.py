@@ -43,7 +43,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
                             DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView,
-                            GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView)
+                            GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, CaptchaValidationCodeView)
 from wanglibao_redpack.views import RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView
 
 from marketing.play_list import InvestmentHistory
@@ -102,6 +102,7 @@ urlpatterns = patterns(
     url(r'^register/wx/$', WeixinRegisterAPIView.as_view()),
     url(r'^change_password/$', ChangePasswordAPIView.as_view()),
     url(r'^reset_password/$', ResetPasswordAPI.as_view()),
+    url(r'captcha_validation/(?P<phone>\d{11})/$', CaptchaValidationCodeView.as_view()),
     url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendRegisterValidationCodeView.as_view()),
     url(r'^phone_validation_code/reset_password/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),

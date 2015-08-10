@@ -60,6 +60,25 @@ class UserPortfolioView(generics.ListCreateAPIView):
         return self.queryset.filter(user_id=user_pk)
 
 
+class CaptchaValidationCodeView(APIView):
+    """ 单独验证验证码 """
+    permission_classes = ()
+
+    def post(self, request, phone):
+        phone_number = phone.strip()
+        phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number)
+        if phone_check:
+            return Response({"message": u"该手机号已经被注册，不能重复注册",
+                            "error_number": ErrorNumber.duplicate,
+                            "type":"exists"}, status=400)
+
+        res, message = verify_captcha(dic=request.POST, keep=True)
+        if not res:
+            return Response({'message': message, "type": "captcha"}, status=403)
+
+        return Response({'message': '验证码正确'}, status=200)
+
+
 class SendValidationCodeView(APIView):
     """
     The phone validate view which accept a post request and send a validate code to the phone

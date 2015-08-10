@@ -16,5 +16,46 @@ html(style="background:#fff")
           br
           |真的免费吃？没错！
         p 网利宝联合饿了么推出送早餐活动
+      .ele-meat
+      .ele-phone
+        .extension-submit
+          .submit-body
+            input(type='tel', name='iphone', placeholder="请输入手机号领取").submit-input#submit-put
+            .submit-btn#submit-url 立即申领
+        p 注：活动赠送以用户获得最大奖励为发放标准，不累计。
+      .extension-footer
+        .footer-item
+          img(src="/static/imgs/mobile_activity/extension/extension_xiu1.png")
+          p <em>IDG资本</em>百亿市值<br/><em>A股上市公司</em>入股
+        .footer-item
+          img(src="/static/imgs/mobile_activity/extension/extension_xiu2.png")
+          p 账户资金安全<br/>由<em>阳光保险</em>承保
+        .footer-item
+          img(src="/static/imgs/mobile_activity/extension/extension_xiu3.png")
+          p 第三方<br/><em>100%</em>本息保障
+      h1 投资流程
+      .ele-liucheng
+      h1 活动规则
+        .extension-rules
+        .step-title
+        ol.rules-ol(style="color:#989493;padding:0 0.5rem 2rem 1.075rem")
+          li 活动时间：2015年8月2日-8月12日；
+          li 早餐券的使用规则：多不退少补（比如10元券，支付8元早餐，所需支付的实际金额为0.01元；支付18元早餐，所需支付的实际金额为8元）；
+            br
+            |应用范围： 仅限饿了么早餐使用，每次支付仅可使用一张优惠码；
+          li 本次活动合作城市：北京、上海、广州、深圳、无锡、南京；
+          li 用户投资满额5000元送500元现金红包。此现金红包均为折扣红包，折扣红包按投资额1%折扣，可在网利宝投资理财使用。500元红包包括50元红包2个、100元红包4个（比如用户投资10000元，即可满额使用100元红包）；
+          li 用户完成注册、实名或投资后，对应赠送早餐会在三个工作日内发送到用户饿了么账户，请注意查收，活动赠送以用户获得最大奖励为发放标准，不累计。
+          li 网利宝对此活动享有最终解释权。
+
+      script.
+          var inputDom = document.getElementById('submit-put'),
+              urlDom = document.getElementById('submit-url') ;
+            urlDom.addEventListener('touchend', function () {
+              if (inputDom.value === '') {
+                return alert('请输入手机号!');
+              }
+              window.location.href = '/weixin/regist/?phone='+inputDom.value;
+            });
 
           

@@ -61,6 +61,8 @@ class P2PDetailView(TemplateView):
 
         cache_backend = redis_backend()
         p2p = cache_backend.get_cache_p2p_detail(id)
+        if not p2p:
+            raise Http404(u'您查找的产品不存在')
 
         form = PurchaseForm(initial={'product': p2p.get('id')})
         user = self.request.user
