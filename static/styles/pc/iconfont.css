@@ -28,8 +28,8 @@
 .icon-notice:before { content: "\e627"; }
 .icon-report:before { content: "\e628"; }
 .icon-cooperation:before { content: "\e629"; }
-.icon-weixin:before { content: "\e62a"; }
-.icon-weibo:before { content: "\e62b"; }
+.icon-weixins:before { content: "\e62a"; }
+.icon-weibos:before { content: "\e62b"; }
 .icon-flip-left:before { content: "\e62c"; }
 .icon-flip-right:before { content: "\e62d"; }
 .icon-new-s:before { content: "\e62e"; }
@@ -48,3 +48,4 @@
 .icon-down:before { content: "\e639"; }
 .icon-up:before { content: "\e63a"; }
 .icon-amount:before { content: "\e63b"; }
+.icon-shouyetubiao225:before { content: "\e63c"; }
