@@ -37,13 +37,12 @@ def generate_pc_index_data():
     cursor.close()
     user_income = income[0] + income_pre
     key = 'pc_index_data'
-
-    m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
     data = {
         'p2p_amount': float(p2p_amount),
         'user_number': user_number,
         'user_income': float(user_income)
     }
+    m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA, data=data)
     m.update_value(value={key: data})
 
 

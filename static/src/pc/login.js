@@ -328,6 +328,11 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                 getCodeBtn.removeClass('getCodeBtnTrue')
             }
         })
+        $('.getCodeBtn').on('click',function(){
+            if(!$(this).hasClass('getCodeBtnTrue')){
+              $('#registerCode').blur();
+            }
+        })
         //注册短信验证码
         $('#registerSMSCode').on('blur',function() {
             checkCodedFun('registerForm','re');

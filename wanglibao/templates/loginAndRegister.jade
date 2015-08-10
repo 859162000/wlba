@@ -48,6 +48,7 @@ html
                     .borderStyle.fl.mg-t-s
                     span.font-l.padding-l-r-s.fl.minNavRight.minNavBtn(tag='2') 十秒注册
                 form#loginForm.login-form(method='post', action='/accounts/login/ajax/')
+                    - csrf_token
                     .logonFormDiv
                         ul.loginForm.padding-top-xl
                             li

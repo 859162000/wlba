@@ -1,15 +1,15 @@
 
 .g-nav-warp
-  .g-nav.mod.clearfix
+  .g-nav
     a(href="/").g-logo-box
       img(src="/static/imgs/pc/logo/logo.jpg", alt='logo')
-    .g-user-warp.fr
+    .g-user-warp
       .g-user
         a(href="/accounts/home").user-nav
           i.icon.iconfont.icon-user
-          span.font.s.user-text 我的账户
+          span.user-text 我的账户
           i.icon.iconfont.icon-down
-        ul.hide.g-nav-user-nav
+        ul.g-nav-user-nav
           mixin liItem(url, text)
             li
               a(href=url)=text
@@ -22,13 +22,13 @@
               a(href='/accounts/logout?next=/') 退出
     .g-nav-box
       mixin nav-item(name, link)
-        if not name
+        if activeItem == name
             a.highlight(href=link)= name
         else
             a(href=link)= name
       +nav-item('首页', '/')
       +nav-item('理财专区', '/p2p/list/')
-      +nav-item('优惠活动', '/accounts/auto_tender/ ')
+      +nav-item('新手指引', '#')
       +nav-item('安全保障', '/security')
       +nav-item('帮助中心', '/help')
 
