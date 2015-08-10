@@ -1,0 +1,110 @@
+-load formatters
+-load mathfilters
+
+doctype html
+html
+  head
+    - with '网利宝官网' as title
+    include global/g_head
+    - endwith
+    script(src="/static/src/pc/lib/require.js", data-main="/static/src/pc/config")
+  body
+    include global/g_nav
+    .i-mod-wrap
+        .i-mod-content
+            .i-mod-wrap.loginRegisterLeft.fl
+                .pageAd.mg-t-ssm
+                ul.safeRelevant.tc.mg-t-m.t-d11
+                    li
+                        span.safeSpan1
+                        p 账户资金安全
+                          br
+                          | 由
+                          b 阳光保险
+                          | 承保
+                    li
+                        span.safeSpan2
+                        p
+                            b 招商银行
+                            br
+                            | 全程资金监管
+                    li.w140
+                        span.safeSpan3
+                        p
+                            b IDG资本
+                            br
+                            | 百亿市值R
+                            b A股上市公司
+                            | 入股
+                    li.mr0
+                        span.safeSpan4
+                        p 第三方
+                          br
+                          b 100%
+                          | 本息保障
+            .i-mod-wrap.loginRegisterRight.fr.bg-d3
+                .minNax
+                    span.font-l.padding-l-r-s.fl.minNavLeft.curr.minNavBtn(tag='1') 快速登录
+                    .borderStyle.fl.mg-t-s
+                    span.font-l.padding-l-r-s.fl.minNavRight.minNavBtn(tag='2') 十秒注册
+                form#loginForm.login-form(method='post', action='/accounts/login/ajax/')
+                    - csrf_token
+                    .logonFormDiv
+                        ul.loginForm.padding-top-xl
+                            li
+                                i.icon.iconfont.icon-mobile.ml19
+                                input#loginMobile.placeholderInput.checkMobile(type="text", name="identifier", placeholder="请输入手机号", autocomplete='off', title="请输入手机号")
+                            li
+                                i.icon.iconfont.icon-key.mg-l-sm
+                                input#loginPwd.placeholderInput.checkPwd(type="password", name="password", placeholder="请输入密码", autocomplete='off', title="请输入密码")
+                            li.w145
+                                i.icon.iconfont.icon-paper-plane.ml17
+                                input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
+                                input#loginCode.placeholderInput.w92.checkCode(type="text", name="captcha_1", placeholder="验证码", autocomplete='off', title="验证码")
+                                img.captchaImg.fl(alt="captcha", src="")
+                                i#loginRefresh.icon.iconfont.icon-cycle.captchaRefresh.fl
+                            li.checkboxDiv
+                                label.fl
+                                    input#remember_me.checkboxStyle(type="checkbox", name="remember_me" )
+                                    | 一周内自动登录
+                        .loginError
+                        .submitFormStyle.tc.font-l#loginSubmit 登录
+                        .findPwd.tc
+                            a(href='/accounts/password/reset/identifier/') 忘记密码？
+                form#registerForm.login-form(method='post', action='/accounts/register/ajax/')
+                    .registerFormDiv(style='display:none')
+                        ul.registerForm
+                            li
+                                i.icon.iconfont.icon-mobile.ml19
+                                input#registerMobile.placeholderInput.checkMobile(type="text", name="identifier", placeholder="请输入手机号", autocomplete='off', title="请输入手机号")
+                            li.w145
+                                i.icon.iconfont.icon-paper-plane.ml17
+                                input(type="hidden", name="captcha_0", autocomplete="off")
+                                input#registerCode.w92.placeholderInput.checkCode(type="text", name="captcha_1", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+                                img.captchaImg.fl(alt="captcha", src="")
+                                i#registerRefresh.icon.iconfont.icon-cycle.captchaRefresh.fl
+                            li.pwdLi
+                                i.icon.iconfont.icon-key.mg-l-sm
+                                input#registerPwd.placeholderInput.checkPwd(type="password", name="password", placeholder="请输入密码", autocomplete='off', title="请输入密码")
+                                i.pwdStatus.fl.icon.iconfont.icon-eye03.font-xll
+                            li.w145.SMELI
+                                i.icon.iconfont.icon-lock.ml18
+                                input#registerSMSCode.w92.placeholderInput.checkSEMCode(type="text", name="button-get-validate-code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+                                button.getCodeBtn.t-d6.font-s.tc(type='button') 获取验证码
+                            li.voice(style='display:none')
+                                没有收到验证码？请尝试<a href="javascript:void(0)" class="voiceValidate">语音验证</a>
+                            li
+                                i.icon.iconfont.icon-share.ml16
+                                input#invitecode.placeholderInput(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码（选填）")
+                        .loginError
+                        .submitFormStyle.tc.font-l#registerSubmit 注册
+                        ul.xieyi
+                            li.checkboxDiv
+                                label.fl
+                                    input#agreement.checkboxStyle(type="checkbox", name="",checked='checked')
+                                    | 我同意
+                                    a(href='/agreement/',target='_blank') 《网利宝注册协议》
+
+    include global/g_footer
+    script.
+      require(["/static/src/pc/login.js"])
