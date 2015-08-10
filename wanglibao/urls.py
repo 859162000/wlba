@@ -92,6 +92,7 @@ urlpatterns = patterns(
     url(r'^taojin/', RedirectView.as_view(url="/activity/pan_gold/")),
 
     url(r'^tender_agreement/',  AgreementAutoView.as_view(), name="agreement_auto"),
+    url(r'^lottery/', include('wanglibao_lottery.urls')),
 )
 
 urlpatterns += patterns(
