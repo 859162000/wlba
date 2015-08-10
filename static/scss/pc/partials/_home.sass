@@ -1,0 +1,321 @@
+
+.i-mod-exhibition, .i-mod-news, .i-mod-works, .i-mod-product,.i-mod-cooperation
+  width: $content-width
+  margin: 0 auto
+.ex-intro, .ex-dc, .ex-download-app, .pdt-item, .i-mod-news,.i-mod-cooperation
+  background: $bg-d3
+  @extend .br-d2
+//product btn
+
+.buy-btn-xl
+  position: relative
+  top: 0
+  width: 140px
+  background: $bg-d6
+  color: $t-d6
+  font-size: $font-m
+  text-align: center
+  +line-height(40)
+  +border-radius(4px)
+  +inline-block
+  +box-shadow(0 2px 0 #dadada, 0 -2px 0 #fe7369)
+  transition: all .01s ease-in
+  &:link, &:visited
+    color: $t-d6
+  &:hover
+    color: $t-d6
+    +box-shadow(0 2px 0 #dadada, 0 0 0 #fe7369)
+  &:active
+    color: $t-d6
+    +box-shadow(0 0 0 #dadada, 0 0 0 #fe7369)
+.un-buy-btn-xl
+  position: relative
+  top: 0
+  width: 140px
+  background: $bg-d5
+  color: $t-d6
+  font-size: $font-m
+  text-align: center
+  +line-height(40)
+  +border-radius(4px)
+  +inline-block
+.buy-btn-x
+  @extend .buy-btn-xl
+  width: 100px
+  font-size: $font-s
+  +line-height(30)
+.un-buy-btn-x
+  @extend .un-buy-btn-xl
+  width: 100px
+  color: $t-d6
+  font-size: $font-s
+  +line-height(30)
+  &:link, &:visited
+    color: $t-d6
+
+//exhibition start
+.i-mod-exhibition
+  +clearfix()
+
+.ex-lf-cont
+  float: left
+  width: 728px
+
+.ex-rt-cont
+  float: right
+  width: 354px
+
+.ex-intro
+  +clearfix()
+  .intro-item
+    float: left
+    margin: 18px
+  .icon
+    font-size: 70px
+    +inline-block
+    &:hover
+      color: $t-d2
+  .item-text
+    padding-left: 6px
+    +inline-block
+
+.ex-dc
+  position: relative
+  text-align: left
+  .dc-head
+    +clearfix()
+    +line-height(58)
+  .dc-title
+    float: left
+    height: 58px
+    .icon
+      color: #c7cace
+      font-size: $font-l
+      margin-right: 10px
+  .dc-bg
+    position: absolute
+    right: 20px
+    bottom: 0
+    color: $t-d18
+    font-size: 130px
+    line-height: 1
+  .num-space
+    height: 21px
+    line-height: 1.2
+  .num-animate
+    font-size: $font-l
+  span.num-str
+    font-size: $font-s
+
+.ex-ac-target
+  position: relative
+  padding: 0 24px 20px 50px
+.ac-tg-head
+  +clearfix()
+  +line-height(50)
+  border-bottom: 1px solid $br-d2
+.recommend_time
+  +line-height(20)
+  display: inline-block
+.tg-pro-tit
+  margin: 20px 0 10px 0
+  +inline-block
+.ac-tg-row
+  line-height: 1
+  padding-top: 9px
+  .buy-warp
+    text-align: right
+  .buy-text-r
+    +inline-block
+    text-align: left
+  .tg-list
+    margin-top: 15px
+    margin-right: 60px
+    float: left
+  .profit-warp
+    width: 120px
+  .profit-amount
+    width: 100px
+  .profit-date
+    width: 90px
+    text-align: center
+  .tg-bt-text
+    margin-top: 6px
+
+.ac-tg-bg
+  width: 60px
+  height: 60px
+  @include home-sprite(xianliang)
+  +abs-pos(0, auto, auto, 0)
+.ex-download-app
+  +clearfix()
+  img
+    width: 100px
+    height: 100px
+  .dol-btn-warp
+    display: block
+    width: 180px
+    overflow: hidden
+    text-align: center
+    margin-top: 5px
+    +border-radius(4px)
+    +line-height(36)
+
+.pdt-progress-warp
+  line-height: 1.2
+  .progress-x
+    margin-top: 5px
+.product-progress
+  position: relative
+  height: 4px
+  background: $bg-d7
+  +border-radius(6px)
+  .pro-container
+    width: 60%
+    height: 4px
+    background: $bg-d6
+    +abs-pos(0, auto, auto, 0)
+    +border-radius(6px)
+.progress-x
+  width: 260px
+.progress-xl
+  width: 320px
+//exhibition end
+
+//product start
+.i-mod-product
+  .pdt-item + .pdt-item
+    margin-left: 20px
+  .pdt-item
+    @extend .fl
+    width: 354px
+    .p2p3
+      @include home-sprite(p2p3)
+      background-color: $bg-d11
+    .p2p6
+      @include home-sprite(p2p6)
+      background-color: $bg-d12
+    .p2p12
+      @include home-sprite(p2p12)
+      background-color: $bg-d13
+    .pdt-name
+      line-height: 1
+      +inline-block
+      &:hover
+        .icon
+          color: $t-d2
+    .icon
+      font-size: $font-xxll
+      color: $t-d7
+      margin-right: 4px
+    .product-line
+      margin-top: $space-sm
+      @extend .br-b-d2
+
+  .pdt-list
+    &:last-child
+      .product-line
+        visibility: hidden
+    &:hover
+      background: $bg-d4
+
+
+//product end
+
+//news start
+.i-mod-news
+  a
+    &:link, &:visited
+      color: $t-d4
+    &:hover, &:active
+      color: $t-d2
+  .ns-head
+    margin: 10px 0
+    display: block
+    .icon
+      color: $t-d7
+      font-size: $font-xxl
+    &:hover, &:active
+      .icon
+        color: $t-d2
+  ul
+    @extend .padding-l-r-sm
+  li
+    width: 320px
+    height: 310px
+    @extend .fl
+  .ns-cont
+    height: 210px
+  .ns-about
+    height: 100%
+    background: #ccc
+  .ns-notice
+    .notice-body
+      +line-height(20)
+      margin-bottom: 12px
+      padding-right: 10px
+      overflow: hidden
+      text-overflow: ellipsis
+      white-space: nowrap
+    .icon-notice-self
+      width: 10px
+      height: 20px
+      background: url("/static/imgs/pc/home/notice.jpg") no-repeat center center
+      background-position-y: 5px
+      +inline-block
+
+  .media-list
+    position: relative
+    height: 40px
+    margin-bottom: 16px
+    +clearfix()
+    +inline-block
+    img
+      height: 40px
+      width: 65px
+      float: left
+      margin-right: $space-s
+    .media-txt
+      float: left
+      width: 245px
+      +justify()
+    .media-time
+      +abs-pos(auto, 0 , 0 , auto)
+//news end
+
+//cooperation start
+.i-mod-cooperation
+  .cn-head
+    +line-height(60)
+    padding: 0 50px 0 20px
+  .cn-cont
+    padding: 30px 20px
+    li
+      float: left
+      width: 151px
+      height: 85px
+      border: dotted 1px #b2b2b2
+      a
+        display: block
+        width: 100%
+        height: 100%
+        text-align: center
+      img
+        vertical-align: middle
+        margin-top: 20px
+      &:hover
+        +box-shadow(0px 0px 8px #ccc)
+  .cn-ul-warp
+    position: relative
+    height: 174px
+    width: 100%
+    overflow: hidden
+    ul
+      position: absolute
+      top: 0
+      left: 0
+      margin-top: 2px
+  .un-click
+    color: $bg-d2
+
+//cooperation end

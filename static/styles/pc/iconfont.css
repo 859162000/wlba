@@ -1,0 +1,50 @@
+
+@font-face {font-family: "iconfont";
+  src: url('/static/imgs/pc/iconfont/v2.0/iconfont.eot'); /* IE9*/
+  src: url('/static/imgs/pc/iconfont/v2.0/iconfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('/static/imgs/pc/iconfont/v2.0/iconfont.woff') format('woff'), /* chrome、firefox */
+  url('/static/imgs/pc/iconfont/v2.0/iconfont.ttf') format('truetype'), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/
+  url('/static/imgs/pc/iconfont/v2.0/iconfont.svg#iconfont') format('svg'); /* iOS 4.1- */
+}
+
+.iconfont {
+  font-family:"iconfont" !important;
+  font-size:16px;
+  font-style:normal;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-stroke-width: 0.2px;
+  -moz-osx-font-smoothing: grayscale;
+}
+.icon-share:before { content: "\e637"; }
+.icon-lock:before { content: "\e636"; }
+.icon-cycle:before { content: "\e635"; }
+.icon-right:before { content: "\e634"; }
+.icon-paper-plane:before { content: "\e633"; }
+.icon-key:before { content: "\e632"; }
+.icon-mobile:before { content: "\e631"; }
+.icon-eye03:before { content: "\e630"; }
+.icon-eye02:before { content: "\e62f"; }
+.icon-about:before { content: "\e626"; }
+.icon-notice:before { content: "\e627"; }
+.icon-report:before { content: "\e628"; }
+.icon-cooperation:before { content: "\e629"; }
+.icon-weixin:before { content: "\e62a"; }
+.icon-weibo:before { content: "\e62b"; }
+.icon-flip-left:before { content: "\e62c"; }
+.icon-flip-right:before { content: "\e62d"; }
+.icon-new-s:before { content: "\e62e"; }
+.icon-transfer:before { content: "\e625"; }
+.icon-data:before { content: "\e624"; }
+.icon-android:before { content: "\e623"; }
+.icon-ios:before { content: "\e622"; }
+.icon-house:before { content: "\e621"; }
+.icon-safebox:before { content: "\e620"; }
+.icon-car:before { content: "\e61f"; }
+.icon-qiye:before { content: "\e61e"; }
+.icon-authority:before { content: "\e61c"; }
+.icon-rocket:before { content: "\e617"; }
+.icon-safe:before { content: "\e618"; }
+.icon-user:before { content: "\e638"; }
+.icon-down:before { content: "\e639"; }
+.icon-up:before { content: "\e63a"; }
+.icon-amount:before { content: "\e63b"; }
