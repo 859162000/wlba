@@ -229,7 +229,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         });
     }
     checkSEMFun = function(){
-        var count, element, intervalId, phoneNumber, timerFunction;R
+        var count, element, intervalId, phoneNumber, timerFunction;
         element = $('.getCodeBtnTrue');
         phoneNumber = $.trim($("#registerMobile").val());
         $.ajax({
