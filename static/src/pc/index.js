@@ -19,7 +19,7 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function( $ ) {
     $(this).append(amountGe(amount, type));
   })
   function amountGe(value, type){
-    var len = value.length, str = '', reType = '';
+    var len = value.length, str = '';
     reType = type == 'man' ? '人' : '元';
     if(len > 8){
       str = isNode(value.substr(0,len-8), '亿') + isNode(value.substr(-8,4), '万') + isNode(value.substr(-4,4), reType);
@@ -34,7 +34,6 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function( $ ) {
     }
     return str
   }
-
   $('.num-animate').each(function(){
     var key = parseInt($(this).html());
     $(this).prop('number', 0).animateNumber({
@@ -52,7 +51,7 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function( $ ) {
   //nav fixed
   var $nav = $('.g-nav-warp');
   $(window).scroll(function(){
-    $(window).scrollTop() > 400 ? $nav.addClass('g-nav-fixed').animate({'top': 0}, 200) : $nav.stop(!0,!0).removeClass('g-nav-fixed').removeAttr('style');
+    $(window).scrollTop() > 400 ? $nav.addClass('g-nav-fixed').animate({'top': 0}, 300) : $nav.stop(!0,!0).removeClass('g-nav-fixed').removeAttr('style');
   })
 
   //banner
