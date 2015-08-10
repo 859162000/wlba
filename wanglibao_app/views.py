@@ -70,7 +70,6 @@ class AppActivateImageAPIView(APIView):
 
             if img_url:
                 img_url = '{host}/media/{url}'.format(host=settings.CALLBACK_HOST, url=img_url)
-                # img_url = '{host}/media/{url}'.format(host='http://192.168.1.116:8000', url=img_url)
                 return Response({'ret_code': 0, 'message': 'ok', 'image': img_url})
 
         return Response({'ret_code': 20003, 'message': 'fail'})
@@ -294,3 +293,4 @@ class SendValidationCodeView(APIView):
             return Response({"ret_code": 30044, "message": message})
 
         return Response({"ret_code": 0, "message": u'验证码发送成功'})
+

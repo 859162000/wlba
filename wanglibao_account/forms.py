@@ -28,8 +28,8 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     account is not activated. When the user clicked the activation link, the account
     will be activated.
     """
-    #captcha_0 = forms.CharField(label='captcha_0', required=False)
-    #captcha_1 = forms.CharField(label='captcha_1', required=False)
+    # captcha_0 = forms.CharField(label='captcha_0', required=False)
+    # captcha_1 = forms.CharField(label='captcha_1', required=False)
 
     nickname = forms.CharField(label="Nick name", required=False)
     identifier = forms.CharField(label="Email/Phone")
@@ -175,7 +175,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         return self.cleaned_data
 
 
-def verify_captcha(dic):
+def verify_captcha(dic, keep=False):
     captcha_1 = dic.get('captcha_1', "")
     captcha_0 = dic.get('captcha_0', "")
     if not captcha_0 and not captcha_1:
@@ -189,7 +189,7 @@ def verify_captcha(dic):
     # if captcha_1.lower() == record.challenge.lower():
     if captcha_1.lower() == record.response.lower():
         try:
-            record.delete()
+            if not keep: record.delete()
         except:
             pass
         return True, ""

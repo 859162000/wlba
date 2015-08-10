@@ -31,7 +31,7 @@ from registration.views import RegistrationView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm, IdVerificationForm
+from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm, IdVerificationForm, verify_captcha
 from marketing.models import IntroducedBy, Reward, RewardRecord
 from marketing.utils import set_promo_user, local_to_utc
 from marketing import tools
@@ -1109,6 +1109,11 @@ def ajax_register(request):
 
     if request.method == "POST":
         if request.is_ajax():
+
+            res, message = verify_captcha(dic=request.POST, keep=True)
+            if not res:
+                return HttpResponseForbidden(messenger(message={'captcha_1': u'验证码错误'}))
+
             form = EmailOrPhoneRegisterForm(request.POST)
             if form.is_valid():
                 nickname = form.cleaned_data['nickname']
