@@ -542,9 +542,9 @@ class P2PEquity(models.Model):
         return amortizations
 
 class AmortizationRecord(models.Model):
-    catalog = models.CharField(u'流水类型', max_length=100)
+    catalog = models.CharField(u'流水类型', max_length=100, db_index=True)
     amortization = models.ForeignKey(ProductAmortization, related_name=u'to_users')
-    order_id = models.IntegerField(u'关联订单编号', null=True)
+    order_id = models.IntegerField(u'关联订单编号', null=True, db_index=True)
 
     term = models.IntegerField(u'还款期数')
     principal = models.DecimalField(u'返还本金', max_digits=20, decimal_places=2)
@@ -569,7 +569,7 @@ class AmortizationRecord(models.Model):
 
 class P2PRecord(models.Model):
     catalog = models.CharField(u'流水类型', max_length=100, db_index=True)
-    order_id = models.IntegerField(u'关联订单编号', null=True)
+    order_id = models.IntegerField(u'关联订单编号', null=True, db_index=True)
     amount = models.DecimalField(u'发生数', max_digits=20, decimal_places=2)
 
     product = models.ForeignKey(P2PProduct, help_text=u'标的产品', null=True, on_delete=models.SET_NULL)
@@ -596,7 +596,7 @@ class P2PRecord(models.Model):
 
 class EquityRecord(models.Model):
     catalog = models.CharField(u'流水类型', max_length=100)
-    order_id = models.IntegerField(u'相关流水号', null=True)
+    order_id = models.IntegerField(u'相关流水号', null=True, db_index=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     product = models.ForeignKey(P2PProduct, verbose_name=u'产品', on_delete=models.SET_NULL, null=True)
     amount = models.DecimalField(u'发生数量', max_digits=20, decimal_places=2)
