@@ -67,6 +67,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         })
 
         //文本框的得到和失去光标
+        $('.placeholderInput').placeholder();
         var zhi;
         $('.placeholderInput').on("focus", function () {
             var self = $(this)
