@@ -39,7 +39,7 @@ class AppActivateImageAPIView(APIView):
     permission_classes = ()
 
     SIZE_MAP = {'1': 'img_one', '2': 'img_two', '3': 'img_three', '4': 'img_four'}
-    DEVICE_MAP = {'ios': 'app_iso', 'android': 'app_android'}
+    DEVICE_MAP = {'ios': 'app_iso', 'android': 'app_android', 'act_iso': 'act_iso', 'act_android': 'act_android'}
 
     def post(self, request):
         size = request.DATA.get('size', '').strip()
@@ -50,8 +50,13 @@ class AppActivateImageAPIView(APIView):
         if not device_type or not size:
             return Response({'ret_code': 20001, 'message': u'信息输入不完整'})
 
-        if device_type not in ('ios', 'android') or size not in ('1', '2', '3'):
+        if device_type not in ('ios', 'android') or int(size) not in (x for x in range(1, 9)):
             return Response({'ret_code': 20002, 'message': u'参数不合法'})
+
+        if int(size) in (x for x in range(5, 9)):
+            size = str(int(size) - 4)
+            if device_type == 'ios': device_type = 'act_iso'
+            if device_type == 'android': device_type = 'act_android'
 
         size = self.SIZE_MAP[size]
 
@@ -294,3 +299,31 @@ class SendValidationCodeView(APIView):
 
         return Response({"ret_code": 0, "message": u'验证码发送成功'})
 
+
+class AppIncomeMiscView(TemplateView):
+    """ 设置收益比例参数"""
+    template_name = "app_income_misc.jade"
+
+    def get_context_data(self, **kwargs):
+        data = {'rate_wlb': 100, 'rate_p2p': 80, 'rate_fund': 60, 'rate_bank': 40}
+        m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_INCOME_DATA, desc=MiscRecommendProduction.DESC_INCOME_DATA, data=data)
+        return {'income': m.get_recommend_products()}
+
+    def post(self, request, **kwargs):
+        rate_wlb = request.POST.get('rate_wlb', '')
+        rate_p2p = request.POST.get('rate_p2p', '')
+        rate_fund = request.POST.get('rate_fund', '')
+        rate_bank = request.POST.get('rate_bank', '')
+        if not rate_wlb or not rate_p2p or not rate_fund or not rate_bank:
+            messages.warning(request, u'输入数据不合法')
+            return redirect('./income_misc')
+
+        data = {'rate_wlb': rate_wlb, 'rate_p2p': rate_p2p, 'rate_fund': rate_fund, 'rate_bank': rate_bank}
+        try:
+            m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_INCOME_DATA)
+            m.update_value(value=data)
+            messages.warning(request, u'数据新增(修改)成功')
+            return redirect('./income_misc')
+        except:
+            messages.warning(request, u'系统错误，请联系开发人员')
+            return redirect('./income_misc')

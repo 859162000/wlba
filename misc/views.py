@@ -16,9 +16,13 @@ class MiscRecommendProduction(object):
     KEY_PC_DATA = 'pc_index_data'
     DESC_PC_DATA = u'pc网站首页统计数据'
 
-    def __init__(self, key=None, desc=None):
+    KEY_INCOME_DATA = 'app_income_data'
+    DESC_INCOME_DATA = u'app端收益比例参数'
+
+    def __init__(self, key=None, desc=None, data=None):
         self.key = key or MiscRecommendProduction.KEY
         self.description = desc or MiscRecommendProduction.DESCRIPTION
+        self.data = data or []
         self.misc = self._init_recommend_product()
 
     def get_misc(self):
@@ -29,7 +33,7 @@ class MiscRecommendProduction(object):
         if not misc:
             misc = Misc()
             misc.key = self.key
-            misc.value = json.dumps({self.key: []})
+            misc.value = json.dumps({self.key: self.data})
             misc.description = self.description
             misc.save()
         return misc
