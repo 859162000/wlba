@@ -229,14 +229,14 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         });
     }
     checkSEMFun = function(){
-        var count, element, intervalId, phoneNumber, timerFunction;
+        var count, element, intervalId, phoneNumber, timerFunction;R
         element = $('.getCodeBtnTrue');
         phoneNumber = $.trim($("#registerMobile").val());
         $.ajax({
             url: "/api/phone_validation_code/register/" + phoneNumber + "/",
             type: "POST"
         }).done(function() {
-            count = 5;
+            count = 180;
             $(element).attr('disabled', 'disabled').addClass('buttonGray');
             $('.voiceValidate').attr('disabled', 'disabled');
             timerFunction = function() {
