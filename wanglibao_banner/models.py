@@ -99,17 +99,12 @@ class AppActivate(models.Model):
     class Meta:
         verbose_name_plural = u'app启动页活动'
 
-    IOS = 'app_iso'
-    ANDROID = 'app_android'
-
-    DEVICES = (
-        (IOS, IOS),
-        (ANDROID, ANDROID),
-    )
+    DEVICE_TYPE = ('app_iso', 'app_android', 'activity_iso', 'activity_android')
+    DEVICES = ((x, x) for x in DEVICE_TYPE)
 
     name = models.CharField(u'名称', max_length=30, help_text=u'名称')
-    device = models.CharField(u'设备', max_length=15, choices=DEVICES, help_text=u'活动图片应用的设备')
-    img_one = models.ImageField(u'大图片', upload_to='activity', blank=True,  help_text=u'IOS：5.5，Android：1280，图片名称只允许字母数字下划线组成')
+    device = models.CharField(u'设备', max_length=15, choices=DEVICES, help_text=u'活动图片应用的设备，启动页选择类型app_*，弹出页选择类型activity_*')
+    img_one = models.ImageField(u'大图片', upload_to='activity', blank=True,  help_text=u'IOS：5.5，Android：1280，图片名称只允许字母数字下划线组成<br/> app端活动弹出框图片地址在此处上传')
     img_two = models.ImageField(u'中图片', upload_to='activity', blank=True,  help_text=u'IOS：4.7，Android：720，图片名称只允许字母数字下划线组成')
     img_three = models.ImageField(u'小图片', upload_to='activity', blank=True,  help_text=u'IOS：4.0，Android：480，图片名称只允许字母数字下划线组成')
     img_four = models.ImageField(u'小图片2', upload_to='activity', blank=True,  default='', help_text=u'IOS：3.5，图片名称只允许字母数字下划线组成，ios使用')
