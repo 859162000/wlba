@@ -64,7 +64,7 @@ class Binding(models.Model):
         third app bind table, store bind related
     """
     user = models.ForeignKey(User)
-    btype = models.CharField(max_length=10, choices=(
+    btype = models.CharField(max_length=20, choices=(
         ('xunlei', 'xunlei'),
         ('yiruite', 'yiruite')
     ), verbose_name=u"类型")
