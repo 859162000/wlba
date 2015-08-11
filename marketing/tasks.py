@@ -2,17 +2,16 @@
 from celery.utils.log import get_task_logger
 from datetime import datetime
 from django.contrib.auth.models import User
-from django.db import transaction, connection
+from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
 from marketing.models import TimelySiteData, PlayList, IntroducedByReward, Reward
-from marketing.utils import local_to_utc
+from marketing.utils import local_to_utc, pc_data_generator
 from wanglibao_account import message as inside_message
 from wanglibao.celery import app
 from wanglibao_margin.models import Margin
 from wanglibao_redpack.backends import give_activity_redpack
 from wanglibao_redpack.models import RedPackEvent
-from wanglibao_p2p.models import AmortizationRecord, P2PRecord
 from misc.views import MiscRecommendProduction
 
 
@@ -21,29 +20,9 @@ logger = get_task_logger(__name__)
 
 @app.task
 def generate_pc_index_data():
-    # 累计交易金额
-    p2p_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))['amount__sum']
-    # 累计交易人数
-    user_number = P2PRecord.objects.filter(catalog='申购').values('id').count()
-
-    # 提前还款的收益
-    income_pre = AmortizationRecord.objects.filter(catalog='提前还款').aggregate(Sum('interest'))['interest__sum']
-    income_pre = income_pre if income_pre else 0
-    # 非提前还款的收益（已发收益＋未发收益）
-    sql = "select sum(a.interest) from wanglibao_p2p_useramortization as a left join wanglibao_p2p_productamortization as b on a.product_amortization_id=b.id LEFT JOIN (select distinct product_id from wanglibao_p2p_p2pequity where confirm=True and not exists (select distinct a.product_id from wanglibao_p2p_productamortization a, wanglibao_p2p_amortizationrecord b where a.id=b.amortization_id and b.catalog='提前还款') ) as c on b.product_id=c.product_id;"
-    cursor = connection.cursor()
-    cursor.execute(sql)
-    income = cursor.fetchone()
-    cursor.close()
-    user_income = income[0] + income_pre
-    key = 'pc_index_data'
-    data = {
-        'p2p_amount': float(p2p_amount),
-        'user_number': user_number,
-        'user_income': float(user_income)
-    }
+    data = pc_data_generator()
     m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA, data=data)
-    m.update_value(value={key: data})
+    m.update_value(value={MiscRecommendProduction.KEY_PC_DATA: data})
 
 
 @app.task

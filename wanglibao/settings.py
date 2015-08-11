@@ -494,13 +494,12 @@ CELERYBEAT_SCHEDULE = {
 
     'pc_index_data': {
         'task': 'marketing.tasks.generate_pc_index_data',
-        # 'schedule': crontab(minute=17, hour=23),
-        'schedule': timedelta(minutes=1),
+        'schedule': crontab(minute=10, hour=0),
     },
 
     'all_invite_earning_data': {
         'task': 'marketing.tools.send_income_message_sms',
-        'schedule': timedelta(minutes=5)
+        'schedule': crontab(minute=0, hour=20)
     }
 }
 
