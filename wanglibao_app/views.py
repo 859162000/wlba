@@ -152,7 +152,6 @@ class AppExploreView(TemplateView):
     def get_context_data(self, **kwargs):
         #banner = Banner.objects.filter(device='mobile', type='banner', is_used=True).order_by('-priority')
         banner = Banner.objects.filter(Q(device='mobile'), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now()))).order_by('-priority')
-        print banner
         return {
             'banner': banner,
         }
@@ -300,7 +299,7 @@ class SendValidationCodeView(APIView):
         return Response({"ret_code": 0, "message": u'验证码发送成功'})
 
 
-class AppIncomeMiscView(TemplateView):
+class AppIncomeMiscTemplateView(TemplateView):
     """ 设置收益比例参数"""
     template_name = "app_income_misc.jade"
 
@@ -327,3 +326,20 @@ class AppIncomeMiscView(TemplateView):
         except:
             messages.warning(request, u'系统错误，请联系开发人员')
             return redirect('./income_misc')
+
+
+class AppIncomeRateAPIView(APIView):
+    """ 查询获取收益比例配置信息 """
+    permission_classes = ()
+
+    def post(self, request):
+        try:
+            m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_INCOME_DATA)
+            rate = m.get_recommend_products()
+            if rate:
+                return Response({'ret_code': 0, 'message': '成功', 'rate': rate})
+            else:
+                return Response({'ret_code': 20001, 'message': u'请联系管理员配置收益比例数据'})
+        except Exception, e:
+            logger.error(e.message)
+            return Response({'ret_code': 20002, 'message': 'fail'})
