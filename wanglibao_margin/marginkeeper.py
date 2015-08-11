@@ -48,7 +48,7 @@ class MarginKeeper(KeeperBaseMixin):
         with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
             if amount > margin.freeze:
-                logger.debug('user id is: {} ================================='.format(self.user.id))
+                logger.debug('user id: {}, amount:{}, freeze:{} ========'.format(self.user.id, amount, margin.freeze))
                 raise MarginLack(u'202')
             margin.freeze -= amount
             margin.save()
