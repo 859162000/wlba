@@ -105,7 +105,8 @@ def save_to_binding(user, record, request):
         try:
             if record and record.name == 'shls':
                 bid = request.DATA.get('tid', "").strip()
-                if bid and len(bid) > 0:
+                bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
+                if bid and bid_len >= len(bid) > 0:
                     binding = Binding()
                     binding.user = user
                     binding.btype = record.name
@@ -225,11 +226,13 @@ class CoopRegister(object):
         :param user:
         :return:
         """
-        if self.channel_user:
+        channel_user = self.channel_user
+        bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
+        if channel_user and len(channel_user) <= bid_len:
             binding = Binding()
             binding.user = user
             binding.btype = self.channel_name
-            binding.bid = self.channel_user
+            binding.bid = channel_user
             binding.save()
             # logger.debug('save user %s to binding'%user)
 
@@ -463,12 +466,16 @@ class JinShanRegister(CoopRegister):
         :param user:
         :return:
         """
-        if self.channel_user:
+        channel_user = self.channel_user
+        channel_extra = self.channel_extra
+        bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
+        extra_len = Binding._meta.get_field_by_name('extra')[0].max_length
+        if channel_user and len(channel_user) <= bid_len and len(channel_extra) <= extra_len:
             binding = Binding()
             binding.user = user
             binding.btype = self.channel_name
-            binding.bid = self.channel_user
-            binding.extra = self.channel_extra
+            binding.bid = channel_user
+            binding.extra = channel_extra
             binding.save()
             # logger.debug('save user %s to binding'%user)
 
@@ -535,12 +542,16 @@ class ShiTouCunRegister(CoopRegister):
         :param user:
         :return:
         """
-        if self.channel_user:
+        channel_user = self.channel_user
+        channel_extra = self.channel_extra
+        bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
+        extra_len = Binding._meta.get_field_by_name('extra')[0].max_length
+        if channel_user and len(channel_user) <= bid_len and len(channel_extra) <= extra_len:
             binding = Binding()
             binding.user = user
             binding.btype = self.channel_name
-            binding.bid = self.channel_user
-            binding.extra = self.channel_extra
+            binding.bid = channel_user
+            binding.extra = channel_extra
             binding.save()
             # logger.debug('save user %s to binding'%user)
 
