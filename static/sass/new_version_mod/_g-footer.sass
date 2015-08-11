@@ -5,8 +5,6 @@
   padding-top: 30px
   width: 1102px
   margin: 0 auto
-.ft-mod
-  margin-right: 0
 .footer-container
   +clearfix()
   padding: 0 20px
@@ -19,6 +17,8 @@
     &:hover, &:active
       color: $t-d2
       cursor: pointer
+  .ft-mod
+    margin-right: 0
   .about
     color: $t-d14
   .about-tit
@@ -44,9 +44,9 @@
       +border-radius(4px)
       margin: 0
     .ft-weibo
-      @include home-sprite(ftWeibo)
+      @include footer-sprite(ftWeibo)
     .ft-weixin
-      @include home-sprite(ftErweima)
+      @include footer-sprite(ftErweima)
 
   .footer-ad-warp
     float: right
@@ -59,7 +59,7 @@
   .ft-kefu-icon
     width: 30px
     height: 30px
-    @include home-sprite(kefu)
+    @include footer-sprite(kefu)
     +inline-block
   .ft-kefu-text
     +inline-block
@@ -86,11 +86,11 @@
     height: 50px
     margin-right: 8px
   .atn-ssl
-    @include home-sprite(ssl)
+    @include footer-sprite(ssl)
   .atn-internet
-    @include home-sprite(internet)
+    @include footer-sprite(internet)
   .atn-trust
-    @include home-sprite(trust)
+    @include footer-sprite(trust)
 
 
 
