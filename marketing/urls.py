@@ -17,7 +17,7 @@ urlpatterns = patterns(
     url(r'^agree_xieyi/$', TemplateView.as_view(template_name="agree_xieyi.jade")),
     url(r'^list_level/$', TemplateView.as_view(template_name="list_level.jade")),
     url(r'^father_day/$', TemplateView.as_view(template_name="father_day.jade")),
-    url(r'^newxunlei/$', TemplateView.as_view(template_name="newxunlei.jade")),
+#    url(r'^newxunlei/$', TemplateView.as_view(template_name="newxunlei.jade")),
     url(r'^father/$', TemplateView.as_view(template_name="app_fatherday.jade")),
     url(r'^weipai/$', TemplateView.as_view(template_name="app_share_weipai.jade")),
     url(r'^pan_gold/$', TemplateView.as_view(template_name="pan_gold.jade")),
@@ -65,6 +65,6 @@ urlpatterns += patterns(
     url(r'^investment/$', Investment.as_view(), name='day'),
 )
 
-urlpatterns += patterns('',
-    url(r'^xunlei/july/$', TemplateView.as_view(template_name="xunlei_july.jade"), name='xunlei_july_activity')
-)
+#urlpatterns += patterns('',
+#    url(r'^xunlei/july/$', TemplateView.as_view(template_name="xunlei_july.jade"), name='xunlei_july_activity')
+#)
