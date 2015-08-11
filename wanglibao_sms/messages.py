@@ -156,3 +156,17 @@ def msg_redpack_give_percent(amount, highest_amount, name, dt):
     content = u"网利宝赠送的【%s】红包已发放，抵扣投资额的%s%%，%s请进入投资页面尽快投资赚收益吧！有效期至%s。<br/> <a href='/' target='_blank'>立即使用</a><br/>感谢您对我们的支持与关注。" % (name, amount, str_tmp, dt)
     return title, content
 
+
+# 全民淘金短信站内信模板
+@suffix
+def sms_income(count, amount):
+    return u"今日您共有{}个好友参与投资，为您产生的理财佣金{}元已发放，" \
+           u"请进入我的账户-邀请奖励中查询！感谢您对我们的支持与关注。".format(count, amount)
+
+
+def msg_give_income(count, amount):
+    title = u"理财佣金到账通知"
+    content = u"今日您共有{}个好友参与投资，为您产生的理财佣金{}元已发放，" \
+              u"请进入<a href='/accounts/invite/'>我的账户-邀请奖励</a>中查询。<br/>" \
+              u"感谢您对我们的支持与关注！<br/>网利宝".format(count, amount)
+    return title, content
