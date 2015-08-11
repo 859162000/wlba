@@ -5,7 +5,9 @@
       img(src="/static/imgs/pc/logo/logo.jpg", alt='logo')
     .g-user-warp
       .g-user
-        a(href="/accounts/home").user-nav
+        if activeItem == "我的账户"
+          myacount = 'highlight'
+        a(href="/accounts/home", class='{{myacount}}').user-nav
           i.icon.iconfont.icon-user
           span.user-text 我的账户
           i.icon.iconfont.icon-down
