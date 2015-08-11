@@ -1,10 +1,9 @@
 doctype html
 - with '招贤纳士' as title
-include include/head
+include include/common_head
 - endwith
 body
-  include include/header
-  include include/navigation
+  include global/g_nav
   .container.margin-bottom-xxl
     .siderbar-div
       - with '招贤纳士' as title
@@ -52,7 +51,7 @@ body
                 a.button-middle.button-red.padding-l-r-2em(href="mailto:hr@wanglibank.com") 发送简历
                 a.red-link(href="mailto:hr@wanglibank.com") &nbsp;hr@wanglibank.com
 
-  include include/footer
+  include global/g_footer
   script.
     require(["/static/js/hiring.js"])
 

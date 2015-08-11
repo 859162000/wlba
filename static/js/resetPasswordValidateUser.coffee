@@ -2,6 +2,7 @@ require.config
   paths:
     jquery: 'lib/jquery.min'
     tools: 'lib/modal.tools'
+    'jquery.modal' : 'lib/jquery.modal.min'
 
 require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
   _countDown = ()->

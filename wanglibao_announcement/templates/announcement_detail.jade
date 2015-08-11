@@ -3,11 +3,10 @@
 doctype html
 title1 =  announce.title + u'-网站公告'
 - with title1 as title
-include include/head
+include include/common_head
 - endwith
 body
-  include include/header
-  include include/navigation
+  include global/g_nav
   .container.margin-bottom-xxl
     .siderbar-div
       - with '网站公告' as title
@@ -24,5 +23,5 @@ body
 
 
 
-  include include/footer
+  include global/g_footer
   include include/tracking

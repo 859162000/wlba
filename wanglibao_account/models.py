@@ -85,17 +85,18 @@ class Binding(models.Model):
         verbose_name_plural = u'用户绑定'
 
 message_type = (
-    ("withdraw", "提现通知"),
-    ("pay", "充值通知"),
-    ("amortize", "项目还款"),
-    ("activityintro", "活动介绍"),
-    ("activity", "活动奖励"),
-    ("bids", "流标通知"),
-    ("purchase", "投标通知"),
-    ("fullbid", "满标"), #给管理员发
-    ("loaned", "投标成功"),#给持仓人发
+    ("withdraw", u"提现通知"),
+    ("pay", u"充值通知"),
+    ("amortize", u"项目还款"),
+    ("activityintro", u"活动介绍"),
+    ("activity", u"活动奖励"),
+    ("bids", u"流标通知"),
+    ("purchase", u"投标通知"),
+    ("fullbid", u"满标"), #给管理员发
+    ("loaned", u"投标成功"),#给持仓人发
     #("audited", "满标已审核"),
-    ("public", "发给所有"),
+    ("public", u"发给所有"),
+    ("invite", u"邀请奖励")
 )
 def timestamp():
     return long(time.time())
