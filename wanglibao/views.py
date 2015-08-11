@@ -5,6 +5,7 @@ from django.template import loader, Context
 from django.utils import timezone
 from django.views.generic import TemplateView
 from marketing.models import NewsAndReport, TimelySiteData
+from marketing.utils import pc_data_generator
 from misc.views import MiscRecommendProduction
 from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_banner.models import Banner, Partner
@@ -118,8 +119,14 @@ class IndexView(TemplateView):
         news_and_reports = NewsAndReport.objects.all().order_by("-score")[:4]
 
         # 网站数据
-        m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA)
-        site_data = m.get_recommend_products()[MiscRecommendProduction.KEY_PC_DATA]
+        m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
+        site_data = m.get_recommend_products()
+        if site_data:
+            site_data = site_data[MiscRecommendProduction.KEY_PC_DATA]
+        else:
+            site_data = pc_data_generator()
+            m.update_value(value=site_data)
+
         site_data['updated_at'] = m.get_misc().updated_at
 
         # 合作伙伴
