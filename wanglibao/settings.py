@@ -499,7 +499,7 @@ CELERYBEAT_SCHEDULE = {
 
     'all_invite_earning_data': {
         'task': 'marketing.tools.send_income_message_sms',
-        'schedule': crontab(minute=0, hour=20)
+        'schedule': crontab(minute=15)
     }
 }
 
