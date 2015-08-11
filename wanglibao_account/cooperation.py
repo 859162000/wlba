@@ -710,8 +710,8 @@ def get_rate(product_id_or_instance):
     :return:
     """
     if isinstance(product_id_or_instance, P2PProduct):
-        if product_id_or_instance.activity:
-            return product_id_or_instance.activity.rule_amount + product_id_or_instance.expected_earning_rate
+        if product_id_or_instance.activity and product_id_or_instance.activity.rule:
+            return product_id_or_instance.activity.rule.rule_amount + product_id_or_instance.expected_earning_rate
         else:
             return product_id_or_instance.expected_earning_rate
 

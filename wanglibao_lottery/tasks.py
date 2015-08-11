@@ -16,7 +16,7 @@ def lottery_set_status():
     """
     d = datetime.today()
     yesterday = get_default_timezone().localize(datetime(d.year, d.month, d.day))
-    lotteries = Lottery.objects.filter(open_time__gte=yesterday).fitler(status='已出票').all()
+    lotteries = Lottery.objects.filter(open_time__gte=yesterday).filter(status='已出票').all()
     for lottery in lotteries:
         lottery.status = '未中奖'
         lottery.save()
