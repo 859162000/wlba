@@ -61,7 +61,7 @@ def oss_save(path, file):
     if str(response['status']) == "200":
         return size
     else:
-        raise IOError('IOError while save %s to OSS  with error message: %s and headers: %s'%(path, r.content, headers))
+        raise IOError('IOError while save %s to OSS  with error message: %s and headers: %s'%(path, response.content, headers))
 
 def oss_delete(path):
     date = get_date()
@@ -85,7 +85,7 @@ def oss_open(path):
     http = httplib2.Http()
     response, cont = http.request(get_site_url(path), 'GET', headers=headers)
     if str(response['status']) != "200":
-        raise IOError('IOError while open %s from OSS  with error message: %s and headers: %s'%(path, r.content, headers))
+        raise IOError('IOError while open %s from OSS  with error message: %s and headers: %s'%(path, response.content, headers))
 
     return StringIO.StringIO(cont)
 

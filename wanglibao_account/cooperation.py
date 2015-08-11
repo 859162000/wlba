@@ -323,7 +323,7 @@ class CoopRegister(object):
         if channel_processor:
             channel_processor.binding_card_call_back(user)
 
-    def process_for_purchse(self, user):
+    def process_for_purchase(self, user):
         channel_processor = self.get_user_channel_processor(user)
         if channel_processor:
             channel_processor.purchase_call_back(user)

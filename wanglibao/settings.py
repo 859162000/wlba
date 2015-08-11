@@ -130,7 +130,8 @@ INSTALLED_APPS = (
     'djcelery',  # Use django orm as the backend
     'djsupervisor',
     'adminplus',
-    'file_storage'
+    'file_storage',
+    'wanglibao_lottery',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -401,6 +402,10 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG',
         },
+        'wanglibao_lottery': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG'
+        }
     }
 
 }
@@ -408,6 +413,7 @@ LOGGING = {
 if ENV != ENV_DEV:
     LOGGING['loggers']['django']['level'] = 'INFO'
     LOGGING['loggers']['wanglibao_sms']['level'] = 'INFO'
+    LOGGING['loggers']['wanglibao_lottery']['level'] = 'INFO'
 
     # secure proxy SSL header and secure cookies
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -467,7 +473,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 CELERYBEAT_SCHEDULE = {
     'p2p-watchdog-1-minutes': {
@@ -499,7 +505,7 @@ CELERYBEAT_SCHEDULE = {
 
     'all_invite_earning_data': {
         'task': 'marketing.tools.send_income_message_sms',
-        'schedule': crontab(minute=0, hour=20)
+        'schedule': crontab(minute=15)
     }
 }
 
@@ -797,6 +803,16 @@ WLB_FOR_SHLS_KEY = '1995'
 # 石头村
 WLB_FOR_SHITOUCUN_KEY = '1996'
 SHITOUCUN_CALL_BACK_URL = 'http://www.stcun.com/task/interface/int'
+
+#彩票
+LINGCAIBAO_BASE_ISSUE = 2015090
+LINGCAIBAO_BASE_DATETIME = datetime(2015, 8, 4)
+LINGCAIBAO_CHANNEL_ID = 'wanglibao'
+LINGCAIBAO_KEY = 'wanglibao'
+if ENV == ENV_PRODUCTION:
+    LINGCAIBAO_URL_ORDER = 'http://open.lingcaibao.com/lingcaiapi/order'
+else:
+    LINGCAIBAO_URL_ORDER = 'http://test.lingcaibao.com/lingcaiapi/order'
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100

@@ -22,6 +22,7 @@ from rest_framework.permissions import IsAuthenticated
 from marketing.models import SiteData
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_account.cooperation import CoopRegister
+from wanglibao_lottery.tasks import send_lottery
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.prepayment import PrepaymentHistory
 from wanglibao_p2p.forms import PurchaseForm, BillForm
@@ -181,7 +182,9 @@ class PurchaseP2P(APIView):
                 product_info, margin_info, equity_info = trader.purchase(amount, redpack)
 
                 #处理第三方渠道回调
-                CoopRegister(request).process_for_purchse(request.user)
+                CoopRegister(request).process_for_purchase(request.user)
+                #送彩票
+                send_lottery.apply_async((request.user.id,))
 
                 return Response({
                     'data': product_info.amount,

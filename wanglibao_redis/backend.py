@@ -67,8 +67,6 @@ class redis_backend(object):
 
     def get_cache_partners(self):
 
-        #if self.redis.exists('partners'):
-            #partners = pickle.loads(self.redis.get('partners'))
         if self._is_available() and self._exists('partners'):
             partners = pickle.loads(self._get('partners'))
         else:
@@ -77,15 +75,12 @@ class redis_backend(object):
                 {'name': partner.name, 'link': partner.link, 'image': partner.image}
                 for partner in partners_data
             ]
-            #self.redis.set('partners', pickle.dumps(partners))
             self._set('partners', pickle.dumps(partners))
 
         return partners
 
     def get_cache_p2p_detail(self, product_id):
 
-        #if self.redis.exists('p2p_detail_{0}'.format(product_id)):
-        #    p2p_results = pickle.loads(self.redis.get('p2p_detail_{0}'.format(product_id)))
         if self._is_available() and self._exists('p2p_detail_{0}'.format(product_id)):
             p2p_results = pickle.loads(self._get('p2p_detail_{0}'.format(product_id)))
             return p2p_results
@@ -199,8 +194,9 @@ class redis_backend(object):
         else:
             return None
 
-    def get_list_by_p2p(self, p2p):
-        if p2p:
+    def get_list_by_p2p(self, product):
+        if product:
+            p2p = self.get_p2p_by_id(product.id)
             p2p_dict = {
                 "id": p2p.id,
                 "category": p2p.category,
@@ -239,7 +235,7 @@ class redis_backend(object):
                     "activity_rule_type": p2p.activity.rule.rule_type,
                     "activity_rule_amount": p2p.activity.rule.rule_amount,
                     "activity_rule_percent_text": p2p.activity.rule.percent_text,
-                    } if p2p.activity else {},
+                } if p2p.activity else {},
                 "remain": p2p.remain,
                 "completion_rate": p2p.completion_rate,
                 "limit_amount_per_user": p2p.limit_amount_per_user,
