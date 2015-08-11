@@ -494,8 +494,8 @@ CELERYBEAT_SCHEDULE = {
 
     'pc_index_data': {
         'task': 'marketing.tasks.generate_pc_index_data',
-        # 'schedule': crontab(minute=17, hour=23),
-        'schedule': timedelta(minutes=1),
+        'schedule': crontab(minute=10, hour=1),
+        # 'schedule': timedelta(minutes=1),
     }
 }
 
