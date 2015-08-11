@@ -49,16 +49,17 @@ class LotteryTrade(object):
         except:
             return False
 
-    def order(self, user):
+    def order(self, user, money_type=0.1):
         """
         下单：尽力下单.失败不重试，不记录到数据库.无日志.
         :return:
         """
-        lottery = Lottery.objects.create(user=user)
+        lottery = Lottery.objects.create(user=user, money_type=money_type)
         order_status = self._request_order(lottery, user)
         if order_status:
             lottery.status = "未出票"
             lottery.save()
+            print 'order %s for %s'%(money_type, user)
             return lottery
         else:
             lottery.delete()

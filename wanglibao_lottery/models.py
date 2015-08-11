@@ -9,7 +9,7 @@ class Lottery(models.Model):
     user = models.ForeignKey(User, related_name='lottery',null=False)
     buy_time = models.DateTimeField(help_text="彩票获赠时间", default=timezone.now)
     lottery_type = models.CharField(help_text="彩票类型", default="SSQ", max_length=50)
-    money_type = models.FloatField(help_text="分彩类型", default=0.1)
+    money_type = models.FloatField(help_text="分彩类型", null=False)
     count = models.IntegerField(help_text="获赠注数", default =1, null=False)
     #出票后获得
     bet_number = models.CharField(help_text="投注号码", null=True, max_length=50)

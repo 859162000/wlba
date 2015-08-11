@@ -1,23 +1,39 @@
 # encoding=utf-8
 import traceback
 from django.http.response import HttpResponse
+from django.utils import timezone
 from rest_framework import renderers
-from rest_framework.filters import DjangoFilterBackend
+from rest_framework.fields import DateTimeField
 from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.serializers import ModelSerializer
 from rest_framework.views import APIView
-from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_lottery.lotterytrade import LotteryTrade
+from wanglibao_lottery.models import Lottery
 
+class DateTimeTzAwareField(DateTimeField):
+    def to_native(self, value):
+        value = timezone.localtime(value)
+        return super(DateTimeTzAwareField, self).to_native(value)
+
+class LotterySerializer(ModelSerializer):
+    buy_time = DateTimeTzAwareField(format='%Y%m%d')
+    open_time = DateTimeTzAwareField(format='%Y%m%d')
+    class Meta:
+        model = Lottery
+        fields = ('id', 'buy_time', 'lottery_type', 'money_type', 'count',
+                  'bet_number', 'open_time', 'issue_number', 'status', 'win_number', 'prize')
 
 class LotteryList(ListAPIView):
-    model = LotteryTrade
-    filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('user_id',)
+    permission_classes = ()
+    serializer_class = LotterySerializer
+
+    def get_queryset(self):
+        return Lottery.objects.filter(user=self.request.user)
+
 
 class LotteryDetail(RetrieveAPIView):
-    model = LotteryTrade
-    filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('id',)
+    model = Lottery
+    serializer_class = LotterySerializer
 
 class LotteryIssue(APIView):
     """

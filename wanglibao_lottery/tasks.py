@@ -2,7 +2,10 @@
 from datetime import datetime, timedelta
 from django.utils.timezone import get_default_timezone
 from wanglibao.celery import app
+from wanglibao_account.auth_backends import User
+from wanglibao_lottery.lotterytrade import LotteryTrade
 from wanglibao_lottery.models import Lottery
+from wanglibao_p2p.models import P2PEquity
 
 
 @app.task
@@ -17,6 +20,17 @@ def lottery_set_status():
     for lottery in lotteries:
         lottery.status = '未中奖'
         lottery.save()
+
+@app.task
+def send_lottery(user_id):
+    #彩票规则：针对未投资的用户，首次投资1000元及以上，送1注彩票
+    try:
+        user = User.objects.get(id=user_id)
+        equity = P2PEquity.objects.filter(user=user).get()
+        if equity.equity >= 1000:
+            LotteryTrade().order(user, money_type=1)
+    except:
+        pass
 
 
 
