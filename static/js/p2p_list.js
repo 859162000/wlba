@@ -2,7 +2,8 @@
 (function() {
   require.config({
     paths: {
-      jquery: 'lib/jquery.min'
+      jquery: 'lib/jquery.min',
+      'underscore': 'lib/underscore-min'
     },
     shim: {
       'jquery.modal': ['jquery']
@@ -31,3 +32,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=p2p_list.js.map

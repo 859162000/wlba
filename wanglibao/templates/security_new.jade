@@ -6,7 +6,9 @@ html
     - endwith
     script(src="/static/src/pc/lib/require.js", data-main="/static/src/pc/config")
   body
+    - with '安全保障' as activeItem
     include global/g_nav
+    - endwith
     .i-mod-warp
       .i-security-banner
     .i-mod-warp.i-security-write

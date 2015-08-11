@@ -11,10 +11,12 @@ from wanglibao_account import message as inside_message
 from wanglibao_sms import messages
 from marketing.models import IntroducedBy
 from marketing import utils
-# from wanglibao_sms.tasks import send_messages
+from wanglibao_sms.tasks import send_messages
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity import backends as activity_backends
-#from datetime import datetime
+from wanglibao_redpack.models import Income
+import datetime
+from django.db.models import Sum, Count
 
 @app.task
 def decide_first(user_id, amount, device, product_id=0, is_full=False):
@@ -91,3 +93,34 @@ def calc_broker_commission(product_id):
     with transaction.atomic():
         for equity in product.equities.all():
             redpack_backends.commission(equity.user, product, equity.equity, start, end)
+
+
+@app.task
+def send_income_message_sms():
+    today = datetime.datetime.now()
+    yestoday = today - datetime.timedelta(days=1)
+    start = timezone.datetime(yestoday.year, yestoday.month, yestoday.day, 20, 0, 0)
+    end = timezone.datetime(today.year, today.month, today.day, 20, 0, 0)
+    incomes = Income.objects.filter(created_at__gte=start, created_at__lt=end).values('user')\
+                            .annotate(Count('invite')).annotate(Sum('earning'))
+    phones_list = []
+    messages_list = []
+    if incomes:
+        for income in incomes:
+            phones_list.append(income.user.wanglibaouserprofile.phone)
+            messages_list.append(messages.sms_income(income.invite__count, income.earning__sum))
+
+            # 发送站内信
+            title, content = messages.msg_give_income(income.invite__count, income.earning__sum)
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": income.user.id,
+                "title": title,
+                "content": content,
+                "mtype": "invite"
+            })
+
+        # 批量发送短信
+        send_messages.apply_async(kwargs={
+            "phones": phones_list,
+            "messages": messages_list
+        })

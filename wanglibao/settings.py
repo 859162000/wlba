@@ -500,8 +500,12 @@ CELERYBEAT_SCHEDULE = {
 
     'pc_index_data': {
         'task': 'marketing.tasks.generate_pc_index_data',
-        # 'schedule': crontab(minute=17, hour=23),
-        'schedule': timedelta(minutes=1),
+        'schedule': crontab(minute=10, hour=0),
+    },
+
+    'all_invite_earning_data': {
+        'task': 'marketing.tools.send_income_message_sms',
+        'schedule': crontab(minute=0, hour=20)
     }
 }
 
@@ -670,7 +674,7 @@ YTX_BACK_RETURN_URL = CALLBACK_HOST + "/api/ytx/voice_back/"
 ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
 if ENV == ENV_DEV:
     ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
-    STATIC_FILE_HOST = 'http://localhost:8001'
+    STATIC_FILE_HOST = 'http://localhost:8000'
 
 PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
 PROMO_TOKEN_QUERY_STRING = 'promo_token'

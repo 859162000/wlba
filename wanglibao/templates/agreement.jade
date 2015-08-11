@@ -1,14 +1,13 @@
 doctype html
 - with '注册协议' as title
-include include/head
+include include/common_head
 - endwith
 body
-  include include/header
-  include include/navigation
+  include global/g_nav
   .container
     .agreement-panel
       h1 {{about_us.title}}
       |{{about_us.content|safe}}
       br
 
-  include include/footer
+  include global/g_footer

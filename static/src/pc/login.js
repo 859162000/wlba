@@ -222,9 +222,9 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                 captcha_1: captcha_1
             }
         }).success(function() {
-            getCodeBtn.addClass('getCodeBtnTrue')
+            getCodeBtn.addClass('getCodeBtnTrue').removeClass('buttonGray');
         }).fail(function(xhr) {
-            getCodeBtn.removeClass('getCodeBtnTrue')
+            getCodeBtn.removeClass('getCodeBtnTrue').addClass('buttonGray');
             var result = JSON.parse(xhr.responseText);
             $('#registerForm').find('.loginError').text(result.message)
         });
@@ -312,7 +312,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                 imgCodeRe('registerForm');
                 $('#registerCode').val('');
             }else{
-               $('.getCodeBtn').removeClass('getCodeBtnTrue')
+               $('.getCodeBtn').removeClass('getCodeBtnTrue').addClass('buttonGray');
             }
         })
         //注册密码验证
@@ -325,14 +325,14 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
             if(checkCodedFun('registerForm') && checkMobileFun('registerForm')){
                 checkImgCodeFun(getCodeBtn)
             }else{
-                getCodeBtn.removeClass('getCodeBtnTrue')
+                getCodeBtn.removeClass('getCodeBtnTrue').addClass('buttonGray');
             }
         })
-        $('.getCodeBtn').on('click',function(){
-            if(!$(this).hasClass('getCodeBtnTrue')){
-              $('#registerCode').blur();
-            }
-        })
+        //$('.getCodeBtn').on('click',function(){
+            //if(!$(this).hasClass('getCodeBtnTrue')){
+              //$('#registerCode').blur();
+            //}
+        //})
         //注册短信验证码
         $('#registerSMSCode').on('blur',function() {
             checkCodedFun('registerForm','re');
