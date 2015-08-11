@@ -1,6 +1,7 @@
 require.config
   paths:
     jquery: 'lib/jquery.min'
+    'underscore':'lib/underscore-min'
 
   shim:
     'jquery.modal': ['jquery']

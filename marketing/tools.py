@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # encoding:utf-8
 
-#
-# 用来做各种活动判断
-#
 
 from wanglibao.celery import app
 from django.utils import timezone
@@ -19,7 +16,6 @@ from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity import backends as activity_backends
 #from datetime import datetime
 
-#投资成功
 @app.task
 def decide_first(user_id, amount, device, product_id=0, is_full=False):
     user = User.objects.filter(id=user_id).first()
@@ -37,7 +33,6 @@ def decide_first(user_id, amount, device, product_id=0, is_full=False):
     utils.log_clientinfo(device, "buy", user_id, amount)
 
 
-#注册成功
 @app.task
 def register_ok(user_id, device):
     user = User.objects.filter(id=user_id).first()
@@ -54,7 +49,6 @@ def register_ok(user_id, device):
     activity_backends.check_activity(user, 'register', device_type)
     utils.log_clientinfo(device, "register", user_id)
 
-#实名认证
 @app.task
 def idvalidate_ok(user_id, device):
     user = User.objects.filter(id=user_id).first()
@@ -65,7 +59,6 @@ def idvalidate_ok(user_id, device):
     utils.log_clientinfo(device, "validation", user_id)
 
 
-#充值成功
 def despoit_ok(pay_info, device):
     device_type = device['device_type']
     title, content = messages.msg_pay_ok(pay_info.amount)
@@ -80,7 +73,6 @@ def despoit_ok(pay_info, device):
     utils.log_clientinfo(device, "deposit", pay_info.user_id, pay_info.amount)
 
 
-#全民淘金收益计算
 @app.task
 def calc_broker_commission(product_id):
     if not product_id:

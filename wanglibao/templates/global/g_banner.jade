@@ -1,0 +1,69 @@
+-load formatters
+-load mathfilters
+
+.g-banner-warp
+  .g-banner-slide
+
+    .g-slide
+      banners_ = enumerate(banners)
+      for index, banner in banners_
+        if index == 0
+          if banner.type == 'ad'
+            a(href="{{banner.link}}", style="display:block; background-image:url('/media/{{banner.image}}')", target='_blank').slide-banner
+          else
+            .slide-banner(style="display:block; background-image:url('/media/{{banner.image}}')")
+        else
+          if banner.type == 'ad'
+            a(href="{{banner.link}}", style="display:none; background-image:url('/media/{{banner.image}}')", target='_blank').slide-banner
+          else
+            .slide-banner(style="display:none; background-image:url('/media/{{banner.image}}')")
+
+    .g-slide-anchor
+      banners_ = enumerate(banners)
+      for index, banner in banners_
+        if index == 0
+          a.slide-anchor.active {{index}}
+        else
+          a.slide-anchor {{index}}
+  .g-banner-login-warp.mod
+    .g-banner-login
+      .g-banner-bg
+      .g-banner-cont
+        if user.is_authenticated
+          .g-landed
+            .landed-head.clearfix
+              img(src='/static/imgs/pc/home/user.jpg').fl
+              .head-username.fr.tl
+                .font-m {{user | display_name}}
+                  span.font-s , 你好!
+                .font-s.t-d17 感谢您对网利宝的信任！
+            .landed-cont
+              .landed-cont-hide.font-m
+                div 全方位控制项目风险
+                div 业界唯一零坏账平台
+              .landed-cont-show.font-m.hide
+                span.user-data-warp
+                  div
+                    span.t-d17.font-xs 可用余额：
+                    span.helvetica {{user.margin.margin}}
+                  div
+                    span.t-d17.font-xs 账户资产：
+                    span.helvetica {{user.margin.margin}}
+
+              .landed-cont-btn
+                i.icon.iconfont.icon-eye03
+                i.icon.iconfont.icon-eye02.hide
+            .landed-btn.font-m
+              a(href="/pay/banks/").landed-for-chong.mg-r-l 充值
+              a(href="/p2p/list/").landed-for-tou 投资
+        else
+          .g-unlanded
+            .font-xxxll.t-d2.lh.helvetica 13.0%
+            .font-m.t-d4 平均年化收益率
+            .font-m.t-d5.mg-t-s.mg-b-sm 账户资金由民生银行全额托管
+            .unlanded-btn.font-m
+              a(href="/accounts/login/?flag=1").unlanded-for-regist.mg-r-sm 快速注册
+              a(href="/accounts/login/").unlanded-for-login 登陆
+
+
+

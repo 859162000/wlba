@@ -490,6 +490,12 @@ CELERYBEAT_SCHEDULE = {
     'xicai_send_data': {
         'task': 'wanglibao_account.tasks.xicai_send_data_task',
         'schedule': timedelta(hours=1),
+    },
+
+    'pc_index_data': {
+        'task': 'marketing.tasks.generate_pc_index_data',
+        # 'schedule': crontab(minute=17, hour=23),
+        'schedule': timedelta(minutes=1),
     }
 }
 

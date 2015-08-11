@@ -1,0 +1,293 @@
+//依赖_g-variables
+*
+  +box-sizing(border-box)
+
+body
+  font-family: $font-family
+  font-size: $font-xs
+  line-height: 1.5
+  color: $bg-d1
+  background-color: $bg-d2
+  min-width: 1100px
+a
+  +unstyled-link
+  &:link, &:visited
+    color: $bg-d1
+  &:hover, &:active
+    color: $t-d2
+    cursor: pointer
+// number famity
+.helvetica
+  font-family: $font-family-number
+
+.input-base
+  padding: 5px
+  font-family: $font-family
+  height: 40px
+  width: 100%
+  font-size: $font-m
+select
+  @extend .input-base
+  +border-radius(0)
+
+
+//text fot (center left right)
+.tc
+  text-align: center
+.tl
+  text-align: left
+.tr
+  text-align: right
+//highlight
+.highlight
+  color: $t-d2
+
+//inline-block
+.inline-block
+  +inline-block
+//hide
+.hide
+  display: none
+
+// clearfix
+.clearfix
+  +clearfix()
+// line-height
+.lh
+  line-height: 1
+//justify
+.jy
+  +justify()
+//float
+.fr
+  float: right
+.fl
+  float: left
+//overflow ellipsis
+.es
+  white-space: nowrap
+  text-overflow: ellipsis
+  overflow: hidden
+//grid for span
+$gridColumns: 12 !default
+
+%span-base
+  float: left
+@for $i from 1 through $gridColumns
+  .span#{$i}
+    @extend %span-base
+    width: unquote(($i * 100)/$gridColumns + '%')
+
+//border style
+.br-d1
+  border: 1px solid $br-d1
+.br-d2
+  border: 1px solid $br-d2
+.br-t-d1
+  border-top: 1px solid $br-d1
+.br-b-d1
+  border-bottom: 1px solid $br-d1
+.br-t-d2
+  border-top: 1px solid $br-d2
+.br-b-d2
+  border-bottom: 1px solid $br-d2
+//text color
+.t-d1
+  color: $t-d1
+.t-d2
+  color: $t-d2
+.t-d3
+  color: $t-d3
+.t-d4
+  color: $t-d4
+.t-d5
+  color: $t-d5
+.t-d6
+  color: $t-d6
+.t-d7
+  color: $t-d7
+.t-d8
+  color: $t-d8
+.t-d9
+  color: $t-d9
+.t-d10
+  color: $t-d10
+.t-d11
+  color: $t-d11
+.t-d12
+  color: $t-d12
+.t-d13
+  color: $t-d13
+.t-d14
+  color: $t-d14
+.t-d15
+  color: $t-d15
+.t-d16
+  color: $t-d16
+.t-d17
+  color: $t-d17
+//background style
+.bg-d1
+  background: $bg-d1
+.bg-d2
+  background: $bg-d2
+.bg-d3
+  background: $bg-d3
+.bg-d4
+  background: $bg-d4
+.bg-d5
+  background: $bg-d5
+.bg-d6
+  background: $bg-d6
+.bg-d7
+  background: $bg-d7
+.bg-d8
+  background: $bg-d8
+.bg-d9
+  background: $bg-d9
+.bg-d10
+  background: $bg-d10
+
+
+//font  style
+.font-xs
+  font-size: $font-xs
+.font-ss
+  font-size: $font-ss
+.font-s
+  font-size: $font-s
+.font-m
+  font-size: $font-m
+.font-l
+  font-size: $font-l
+.font-xl
+  font-size: $font-xl
+.font-ll
+  font-size: $font-ll
+.font-xll
+  font-size: $font-xll
+.font-xxl
+  font-size: $font-xxl
+.font-xxll
+  font-size: $font-xxll
+.font-xxlll
+  font-size: $font-xxlll
+.font-xxxl
+  font-size: $font-xxxl
+.font-xxxll
+  font-size: $font-xxxll
+
+//h1 style
+h1
+  font-size: $font-xxl
+
+h2
+  font-size: $font-xl
+
+h3
+  font-size: $font-l
+
+h4
+  font-size: $font-m
+
+//margin style
+.mg-sm
+  margin: $space-sm
+.mg-l-s
+  margin-left: $space-s
+.mg-l-sm
+  margin-left: $space-sm
+.mg-l-m
+  margin-left: $space-m
+
+.mg-l-xl
+  margin-left: $space-xl
+.mg-r-m
+  margin-right: $space-m
+
+.mg-r-s
+  margin-right: $space-s
+.mg-r-sm
+  margin-right: $space-sm
+.mg-r-l
+  margin-right: $space-l
+.mg-r-xl
+  margin-right: $space-xl
+.mg-r-xxl
+  margin-right: $space-xxl
+.mg-t-xs
+  margin-top: $space-xs
+
+.mg-t-s
+  margin-top: $space-s
+
+.mg-t-m
+  margin-top: $space-m
+
+.mg-t-ssm
+  margin-top: $space-ssm
+.gm-t-l
+  margin-top: $space-l
+.mg-t-xl
+  margin-top: $space-xl
+
+.mg-t-sm
+  margin-top: $space-sm
+.mg-b-xs
+  margin-bottom: $space-xs
+.mg-b-s
+  margin-bottom: $space-s
+.mg-b-sm
+  margin-bottom: $space-sm
+.mg-b-xl
+  margin-bottom: $space-xl
+.mg-l-r-sm
+  margin-right: $space-sm
+  margin-left: $space-sm
+
+
+.clear-mg
+  margin: 0
+
+//padding style
+.padding-s
+  padding: $space-s
+
+.padding-m
+  padding: $space-m
+.padding-sm
+  padding: $space-sm
+
+.padding-xl
+  padding: $space-xl
+
+.padding-l-s
+  padding-left: $space-s
+
+.padding-top-xs
+  padding-top: $space-xs
+
+.padding-top-xl
+  padding-top: $space-xl
+
+.padding-top-xxxl
+  padding-top: $space-xxxl
+.padding-l-sm
+  padding-left: $space-sm
+.padding-l-r-s
+  padding-left: $space-s !important
+  padding-right: $space-s !important
+.padding-l-r-sm
+  padding-left: $space-sm
+  padding-right: $space-sm
+
+.padding-l-r-ssm
+  padding-left: $space-ssm
+  padding-right: $space-ssm
+.padding-t-l-r-sm
+  padding-top: $space-sm
+  padding-left: $space-sm
+  padding-right: $space-sm
+
+
+

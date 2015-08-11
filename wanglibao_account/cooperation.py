@@ -20,10 +20,10 @@ from marketing.models import Channels, IntroducedBy, PromotionToken
 from marketing.utils import set_promo_user
 from wanglibao import settings
 from wanglibao.settings import  YIRUITE_CALL_BACK_URL, \
-        TIANMANG_CALL_BACK_URL, WLB_FOR_YIRUITE_KEY, YIRUITE_KEY, BENGBENG_KEY, \
-    WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
-    JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL, JINSHAN_CALL_BACK_URL, WLB_FOR_JINSHAN_KEY, \
-    WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY
+     TIANMANG_CALL_BACK_URL, WLB_FOR_YIRUITE_KEY, YIRUITE_KEY, BENGBENG_KEY, \
+     WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
+     JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL, JINSHAN_CALL_BACK_URL, WLB_FOR_JINSHAN_KEY, \
+     WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import  common_callback, jinshan_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
@@ -32,16 +32,18 @@ from wanglibao_profile.models import WanglibaoUserProfile
 
 logger = logging.getLogger(__name__)
 
+
 def get_uid_for_coop(user_id):
     """
     返回给渠道的用户ID
     :param user_id:
     :return:
     """
-    m= hashlib.md5()
+    m = hashlib.md5()
     m.update('wlb' + str(user_id))
     uid = m.hexdigest()
     return uid
+
 
 def get_username_for_coop(user_id):
     """
@@ -55,12 +57,14 @@ def get_username_for_coop(user_id):
     except:
         return None
 
+
 def get_phone_for_coop(user_id):
     try:
         phone_number = WanglibaoUserProfile.objects.get(user_id=user_id).phone
         return phone_number[:3] + '***' + phone_number[-2:]
     except:
         return None
+
 
 def get_first_investment_for_coop(user_id):
     try:
@@ -72,11 +76,13 @@ def get_first_investment_for_coop(user_id):
     except:
         return None, None, None
 
+
 def get_tid_for_coop(user_id):
     try:
         return Binding.objects.filter(user_id=user_id).get().bid
     except:
         return None
+
 
 def get_validate_time_for_coop(user_id):
     try:
@@ -86,12 +92,14 @@ def get_validate_time_for_coop(user_id):
     except Exception, e:
         return None
 
+
 def get_binding_time_for_coop(user_id):
     try:
-        binding_time  = Card.objects.filter(user_id=user_id).order_by('add_at').first().add_at
+        binding_time = Card.objects.filter(user_id=user_id).order_by('add_at').first().add_at
         return binding_time
     except Exception, e:
         return None
+
 
 def save_to_binding(user, record, request):
         try:
@@ -106,6 +114,7 @@ def save_to_binding(user, record, request):
         except:
             pass
 
+
 #######################第三方用户注册#####################
 
 class CoopRegister(object):
@@ -113,16 +122,16 @@ class CoopRegister(object):
     第三方用户注册api
     """
     def __init__(self, request):
-        #本渠道的名称
+        # 本渠道的名称
         self.c_code = None
         self.request = request
-        #传递渠道邀请码时使用的变量名
+        # 传递渠道邀请码时使用的变量名
         self.external_channel_key = settings.PROMO_TOKEN_QUERY_STRING
         self.internal_channel_key = 'channel_code'
-        #传递渠道用户时使用的变量名
+        # 传递渠道用户时使用的变量名
         self.external_channel_user_key = settings.PROMO_TOKEN_USER_KEY
         self.internal_channel_user_key = 'channel_user'
-        #渠道提供给我们的秘钥
+        # 渠道提供给我们的秘钥
         self.coop_key = None
         self.call_back_url = None
 
@@ -174,10 +183,10 @@ class CoopRegister(object):
         channel_user  = self.request.GET.get(self.external_channel_user_key, None)
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
-            #logger.debug('save to session %s:%s'%(self.internal_channel_key, channel_code))
+            # logger.debug('save to session %s:%s'%(self.internal_channel_key, channel_code))
         if channel_user:
             self.request.session[self.internal_channel_user_key] = channel_user
-            #logger.debug('save to session %s:%s'%(self.internal_channel_user_key, channel_user))
+            # logger.debug('save to session %s:%s'%(self.internal_channel_user_key, channel_user))
 
     def clear_session(self):
         self.request.session.pop(self.internal_channel_key, None)
@@ -188,17 +197,17 @@ class CoopRegister(object):
         处理使用邀请码注册的用户
         """
         set_promo_user(self.request, user, invite_code)
-        #try:
+        # try:
         #    channel = Channels.objects.filter(code=invite_code).get()
         #    introduced_by_record = IntroducedBy()
         #    introduced_by_record.channel = channel
         #    introduced_by_record.user = user
         #    introduced_by_record.save()
         #    logger.debug('save user %s introduced by channel to introducedby ' %user)
-        #except:
+        # except:
         #    pass
-
-        #try:
+        #
+        # try:
         #    user_promote_token = PromotionToken.objects.filter(token=invite_code).get()
         #    #使用user_id查询
         #    introduced_by_user = User.objects.get(pk=user_promote_token.pk)
@@ -207,7 +216,7 @@ class CoopRegister(object):
         #    introduced_by_record.user = user
         #    introduced_by_record.save()
         #    logger.debug('save user %s introduced by user to introducedby ' %user)
-        #except:
+        # except:
         #    pass
 
     def save_to_binding(self, user):
@@ -223,7 +232,6 @@ class CoopRegister(object):
             binding.bid = self.channel_user
             binding.save()
             # logger.debug('save user %s to binding'%user)
-
 
     def register_call_back(self, user):
         """
@@ -283,12 +291,12 @@ class CoopRegister(object):
             invite_code = self.channel_code
         # logger.debug('get invite code %s'%(invite_code))
         if invite_code:
-            #通过渠道注册
+            # 通过渠道注册
             for processor in self.processors:
                 if processor.c_code == processor.channel_code:
                     processor.process_for_register(user, invite_code)
                     return
-            #默认注册
+            # 默认注册
             self.process_for_register(user, invite_code)
 
     def get_user_channel_processor(self, user):
@@ -302,7 +310,6 @@ class CoopRegister(object):
                     return channel_processor
         except:
             return None
-
 
     def process_for_validate(self, user):
         channel_processor = self.get_user_channel_processor(user)
@@ -321,6 +328,7 @@ class CoopRegister(object):
         if channel_processor:
             channel_processor.purchase_call_back(user)
 
+
 class TianMangRegister(CoopRegister):
     def __init__(self, request):
         super(TianMangRegister, self).__init__(request)
@@ -338,6 +346,7 @@ class TianMangRegister(CoopRegister):
         }
         common_callback.apply_async(
             kwargs={'url': self.call_back_url, 'params': params, 'channel': 'tianmang'})
+
 
 class YiRuiTeRegister(CoopRegister):
     def __init__(self, request):
@@ -359,6 +368,7 @@ class YiRuiTeRegister(CoopRegister):
         common_callback.apply_async(
             kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
 
+
 class BengbengRegister(CoopRegister):
     def __init__(self, request):
         super(BengbengRegister, self).__init__(request)
@@ -378,7 +388,8 @@ class BengbengRegister(CoopRegister):
             'idName': get_username_for_coop(user.id)
         }
         common_callback.apply_async(
-            kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+            kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
+
 
 class JuxiangyouRegister(CoopRegister):
     def __init__(self, request):
@@ -398,7 +409,8 @@ class JuxiangyouRegister(CoopRegister):
             'accessKey' : sign
         }
         common_callback.apply_async(
-            kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+            kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
+
 
 class DouwanRegister(CoopRegister):
     def __init__(self, request):
@@ -409,7 +421,7 @@ class DouwanRegister(CoopRegister):
     def douwan_callback(self, user, step):
         params = {
             'tid': get_tid_for_coop(user.id),
-            step : get_uid_for_coop(user.id)
+            step: get_uid_for_coop(user.id)
         }
         common_callback.apply_async(
             kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
@@ -443,7 +455,7 @@ class JinShanRegister(CoopRegister):
         channel_extra = self.request.GET.get(self.extra_key, 'wlb_extra')
         if channel_extra:
             self.request.session[self.extra_key] = channel_extra
-            #logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
+            # logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
 
     def save_to_binding(self, user):
         """
@@ -486,6 +498,7 @@ class JinShanRegister(CoopRegister):
         if P2PRecord.objects.filter(user_id=user.id).count() == 1:
             self.jinshan_call_back(user, 'wangli_invest_reward', 'pA71ZhBf4DDeet7SLiLlGsT1qTYu')
 
+
 class WaihuRegister(CoopRegister):
     def __init__(self, request):
         super(WaihuRegister, self).__init__(request)
@@ -501,6 +514,7 @@ class WaihuRegister(CoopRegister):
             super(WaihuRegister, self).save_to_binding(user)
             super(WaihuRegister, self).clear_session()
 
+
 class ShiTouCunRegister(CoopRegister):
     def __init__(self, request):
         super(ShiTouCunRegister, self).__init__(request)
@@ -513,7 +527,7 @@ class ShiTouCunRegister(CoopRegister):
         channel_extra = self.request.GET.get(self.extra_key, 'wlb_extra')
         if channel_extra:
             self.request.session[self.extra_key] = channel_extra
-            #logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
+            # logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
 
     def save_to_binding(self, user):
         """
@@ -547,8 +561,10 @@ class ShiTouCunRegister(CoopRegister):
                 kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
 
 
-#注册第三方通道
-coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister, JuxiangyouRegister, DouwanRegister, JinShanRegister, ShiTouCunRegister]
+# 注册第三方通道
+coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
+                          JuxiangyouRegister, DouwanRegister, JinShanRegister, ShiTouCunRegister]
+
 
 #######################第三方用户查询#####################
 
@@ -559,13 +575,13 @@ class CoopQuery(APIView):
     permission_classes = ()
     channel = None
 
-    #查询用户的类型
+    # 查询用户的类型
     REGISTERED_USER = 0
     VALIDATED_USER = 1
     BINDING_USER = 2
     INVESTED_USER = 3
 
-    #每一页用户数
+    # 每一页用户数
     PAGE_LENGTH = 20
 
     def get_promo_user(self, channel_code, startday, endday):
@@ -576,12 +592,12 @@ class CoopQuery(APIView):
         :param endday:
         :return:
         """
-        startday= datetime.datetime.strptime(startday, "%Y%m%d")
+        startday = datetime.datetime.strptime(startday, "%Y%m%d")
         endday = datetime.datetime.strptime(endday, "%Y%m%d")
         if startday > endday:
             endday, startday = startday, endday
 
-        #daydelta = datetime.timedelta(days=1)
+        # daydelta = datetime.timedelta(days=1)
         daydelta = datetime.timedelta(hours=23, minutes=59, seconds=59, milliseconds=59)
         endday += daydelta
         promo_list = IntroducedBy.objects.filter(channel__code=channel_code, created_at__gte=startday, created_at__lte=endday)
@@ -645,7 +661,7 @@ class CoopQuery(APIView):
                 return P2PRecord.objects.filter(user_id=user_id, catalog=u'申购').exists()
             coop_users = [u for u in coop_users if is_invested_user(u.user_id)]
 
-        #处理分页
+        # 处理分页
         if page:
             page = int(page)
             start = page * self.PAGE_LENGTH
@@ -684,6 +700,7 @@ class CoopQuery(APIView):
             # logger.debug(result)
             return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
+
 ###########################################希财网对接#####################################################################
 
 def get_rate(product_id_or_instance):
@@ -698,6 +715,7 @@ def get_rate(product_id_or_instance):
         else:
             return product_id_or_instance.expected_earning_rate
 
+
 def get_amortization_time(product_id_or_instance):
     """
     获取还款起始，结束时间
@@ -705,8 +723,9 @@ def get_amortization_time(product_id_or_instance):
     :return: datetime
     """
     if isinstance(product_id_or_instance, P2PProduct):
-        amortizations =  ProductAmortization.objects.filter(product_id = product_id_or_instance.id).order_by('term_date')
+        amortizations = ProductAmortization.objects.filter(product_id=product_id_or_instance.id).order_by('term_date')
         return amortizations.first().term_date, amortizations.last().term_date
+
 
 def get_p2p_info(mproduct):
     product_info = {
@@ -746,12 +765,13 @@ def get_p2p_info(mproduct):
 
     return product_info
 
+
 def xicai_get_token():
-    #希财现在的过期时间在一个月左右
+    # 希财现在的过期时间在一个月左右
     url = settings.XICAI_TOKEN_URL
     client_id = settings.XICAI_CLIENT_ID
     client_secret = settings.XICAI_CLIENT_SECRET
-    response = requests.post(url, data ={'client_id':client_id, 'client_secret': client_secret})
+    response = requests.post(url, data={'client_id':client_id, 'client_secret': client_secret})
     return response.json()['access_token']
 
 
@@ -763,8 +783,8 @@ def xicai_get_p2p_info(mproduct, access_token):
     """
     p2p_info = get_p2p_info(mproduct)
 
-    #希财状态码：-1：已流标，0：筹款中，1.已满标，2.已开始还款，3.预发布，4.还款完成，5.逾期
-    #录标，录标完成，待审核的标均不推送给希财
+    # 希财状态码：-1：已流标，0：筹款中，1.已满标，2.已开始还款，3.预发布，4.还款完成，5.逾期
+    # 录标，录标完成，待审核的标均不推送给希财
     p2p_state_convert_table = {
         # u'录标': u'录标',
         # u'录标完成': u'录标完成',
@@ -779,7 +799,7 @@ def xicai_get_p2p_info(mproduct, access_token):
         u'已完成': 4,
     }
 
-    #希财还款方式码：1.按月付息 到期还本 2.按季付息 到期还本 3.每月等额本息 4.到期本息
+    # 希财还款方式码：1.按月付息 到期还本 2.按季付息 到期还本 3.每月等额本息 4.到期本息
     pay_type_convert_table = {
         u'等额本息': 3,
         u'先息后本': 1,
@@ -812,7 +832,7 @@ def xicai_get_p2p_info(mproduct, access_token):
         'publish_time': format_time(p2p_info['start_time']),
         'repay_start_time': format_time(p2p_info['amortization_start_time']),
         'repay_end_time': format_time(p2p_info['amortization_end_time']),
-        'borrow_type': 4, #都是第三方担保
+        'borrow_type': 4,   # 都是第三方担保
         'pay_type': pay_type_convert_table.get(p2p_info['repayment_type']),
         'start_price': 100,
         'p2p_product_id': p2p_info['id']
@@ -822,10 +842,12 @@ def xicai_get_p2p_info(mproduct, access_token):
         xicai_info['test'] = 1
     return xicai_info
 
+
 def xicai_post_product_info(mproduct, access_token):
     p2p_info = xicai_get_p2p_info(mproduct, access_token)
     url = settings.XICAI_CREATE_P2P_URL
     requests.post(url, data=p2p_info)
+
 
 def xicai_post_updated_product_info(mproduct, access_token):
     p2p_info = xicai_get_p2p_info(mproduct, access_token)
@@ -844,9 +866,9 @@ def xicai_get_new_p2p():
     获取新标给希财
     :return:
     """
-    now = datetime.datetime.now()
+    now = timezone.now()
     start_time = now - settings.XICAI_UPDATE_TIMEDELTA
-    return P2PProduct.objects.filter(publish_time__gte = start_time).filter(publish_time__lt = now).all()
+    return P2PProduct.objects.filter(publish_time__gte=start_time).filter(publish_time__lt=now).all()
 
 
 def xicai_get_updated_p2p():
@@ -854,9 +876,10 @@ def xicai_get_updated_p2p():
     获取有更新的标给希财
     :return:
     """
-    start_time = datetime.datetime.now() - settings.XICAI_UPDATE_TIMEDELTA
+    start_time = timezone.now() - settings.XICAI_UPDATE_TIMEDELTA
     p2p_equity = P2PEquity.objects.filter(created_at__gte = start_time).all()
     return set([p.product for p in p2p_equity])
+
 
 def xicai_send_data():
     """
@@ -864,45 +887,15 @@ def xicai_send_data():
     :return:
     """
     access_token = xicai_get_token()
-    #更新新标数据
+    # 更新新标数据
     for p2p_product in xicai_get_new_p2p():
         xicai_post_product_info(p2p_product, access_token)
-    #更新有变动的标的的数据
+    # 更新有变动的标的的数据
     for p2p_product in xicai_get_updated_p2p():
-        xicai_post_updated_product_info(p2p_product,access_token)
+        xicai_post_updated_product_info(p2p_product, access_token)
 
 
 if __name__ == '__main__':
     print xicai_get_updated_p2p()
     print xicai_get_new_p2p()
     xicai_send_data()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

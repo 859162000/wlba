@@ -11,9 +11,7 @@ html
     meta(name="description", content="网利宝是针对中国中产阶级人群的一站式网络理财服务平台，网利宝把国外传统的“私人银行”模式引入中国，我们通过独有的用户投资专业评估体系和个人理财数据分析算法，利用PC和移动互联网等方式，为客户提供个性化投资产品推荐，降低理财门槛，提高投资者的理财收益水平。")
 
   body
-    include include/header
-    include include/navigation
-
+    include global/g_nav
     include announcement_block
 
     status = p2p['display_status']
@@ -143,7 +141,7 @@ html
                       if user.is_authenticated
                         a.submit-button.span12.button-primary.button-middle.invest#stop(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
                       else
-                        a.submit-button.span12.button-primary.button-middle.invest.notlogin(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+                        a.span12.button-primary.button-middle.invest(href='/accounts/login/?next=/p2p/detail/{{p2p.id}}') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
           if status != '抢购中'
             .sold-out
               p.align-center
@@ -360,6 +358,7 @@ html
     script.
       var v = new Date().getTime()
       require(['/static/js/p2p_detail.js?v='+v, '/static/js/index.js?v='+v])
-    include include/footer
+    include global/g_footer
+
     include include/tracking
     include include/verify

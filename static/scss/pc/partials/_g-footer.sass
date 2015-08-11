@@ -1,0 +1,94 @@
+
+.g-footer-warp
+  background: $bg-d10
+.g-footer
+  padding-top: 30px
+  width: 1102px
+  margin: 0 auto
+.footer-container
+  +clearfix()
+  padding: 0 20px
+  a
+    margin-top: 13px
+    display: block
+    +unstyled-link
+    &:link, &:visited
+      color: $t-d14
+    &:hover, &:active
+      color: $t-d2
+      cursor: pointer
+  .about
+    color: $t-d14
+  .about-tit
+    font-size: 14px
+    color: #fff
+  .about-list
+    float: left
+    margin-right: 40px
+  .follow
+    color: $t-d14
+    .follow-list
+      float: left
+      margin-left: 20px
+    .follow-title
+      font-size: $font-s
+      .icon
+        font-size: $font-xxl
+        margin-right: $space-s
+    .follow-img
+      display: block
+      width: 110px
+      height: 110px
+      +border-radius(4px)
+      margin: 0
+    .ft-weibo
+      @include home-sprite(ftWeibo)
+    .ft-weixin
+      @include home-sprite(ftErweima)
+
+  .footer-ad-warp
+    float: right
+  .footer-ad
+    float: left
+    color: $t-d14
+  .footer-kefu
+    margin-bottom: 10px
+    +line-height(30)
+  .ft-kefu-icon
+    width: 30px
+    height: 30px
+    @include home-sprite(kefu)
+    +inline-block
+  .ft-kefu-text
+    +inline-block
+    margin: 10px 0 0 10px
+    font-size: $font-s
+  .ft-kefu-worktime
+    margin-bottom: 20px
+  .ft-kefu-phone-txt
+    font-size: $font-m
+  .ft-kefu-phone
+    line-height: 1
+    margin-bottom: 20px
+    font-size: $font-xxlll
+  .ft-adress
+    margin-bottom: 5px
+.atn-list
+  margin: 0 auto
+  padding: 70px 0
+  text-align: center
+  +clearfix()
+  a
+    display: inline-block
+    width: 140px
+    height: 50px
+    margin-right: 8px
+  .atn-ssl
+    @include home-sprite(ssl)
+  .atn-internet
+    @include home-sprite(internet)
+  .atn-trust
+    @include home-sprite(trust)
+
+
+
