@@ -402,10 +402,14 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG',
         },
+        'wanglibao_margin': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        },
         'wanglibao_lottery': {
             'handlers': ['console', 'file'],
             'level': 'DEBUG'
-        }
+        },
     }
 
 }
