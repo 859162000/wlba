@@ -17,8 +17,10 @@
         registerTitle :'',    //注册框标语
         isNOShow : '1',      //是否显示
         hasCallBack : false, //回调
+        buttonFont : '',
         initFun : function(){
             $('.biaoyu').text(this.registerTitle);
+            this.buttonFont != undefined ? $('#register_submit').text(this.buttonFont) : $('#register_submit').text('立即注册');
             //cookie
             getCookie = function(name) {
                 var cookie, cookieValue, cookies, i;
@@ -296,6 +298,7 @@
             this.registerTitle = options.registerTitle;
             this.isNOShow = options.isNOShow;
             this.hasCallBack = options.hasCallBack;
+            this.buttonFont = options.buttonFont;
             this.callBack = options.callBack;    //回调函数
 
             if(this.isNOShow == '1'){

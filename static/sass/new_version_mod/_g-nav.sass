@@ -15,6 +15,8 @@ $logo-margin-top-fixed: 2px
     width: 1102px
     margin: 0 auto
     +clearfix()
+    a.highlight
+      color: $t-d2
   .g-logo-box
     width: 360px
     height: 55px
@@ -30,8 +32,7 @@ $logo-margin-top-fixed: 2px
       padding: 0 20px
       line-height: $g-nav-height
       height: $g-nav-height
-    a.highlight
-      color: $t-d2
+
   .g-user-warp
     margin-left: 40px
     float: right
@@ -95,4 +96,4 @@ $logo-margin-top-fixed: 2px
     line-height: $g-nav-height-fixed
     height: $g-nav-height-fixed
   .g-nav-user-nav
-    top: $g-nav-height-fixed
+    top: $g-nav-height-fixed - 1px
