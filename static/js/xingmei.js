@@ -14,7 +14,8 @@
     //注册
     re.activityRegister.activityRegisterInit({
         registerTitle :'注册送10元电影券',    //注册框标语
-        isNOShow : '1'
+        isNOShow : '1',
+        buttonFont: '注册领电影券'
     });
     $('.reg-btn').click(function(){
         $('body,html').animate({scrollTop: 0}, 600);

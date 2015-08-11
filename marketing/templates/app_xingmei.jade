@@ -1,0 +1,56 @@
+- load formatters
+doctype html
+html(style="background:#fff")
+  head
+    title 网利宝
+    include include/app_head
+  body
+    .extension-banner
+      img(src='/static/imgs/mobile_activity/app_xingmei/banner.png')
+    p 半价一折算神马，网利宝狂送10万张电影票！
+      br
+      |机会难得，gogogo~
+    .xingmei-main
+      .one
+        img(src='/static/imgs/mobile_activity/app_xingmei/one.jpg')
+        img(src='/static/imgs/mobile_activity/app_xingmei/two.jpg')
+        img(src='/static/imgs/mobile_activity/app_xingmei/three.jpg')
+      .ele-phone
+        .extension-submit
+          .submit-body
+            input(type='tel', name='iphone', placeholder="请输入手机号领取").submit-input#submit-put
+            .submit-btn#submit-url 领福利
+        p 说明：完成操作奖励自动发放
+      h1(style="margin-top:1rem") 投资流程
+      .ele-liucheng
+      h1 活动规则
+        .extension-rules
+        .step-title
+        ol.rules-ol(style="color:#989493;padding:0 0.5rem 2rem 1.075rem")
+          li 手机号为网利宝唯一账户，所有星美用户均可参加 活动；
+          li 电影票兑换码会在3天内统一以短信的形式发送到用户手机，敬请查收；
+          li 所有福利仅限注册、首次投资获得。首次投资金额100元起；
+          li 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+          li 网利宝对此活动享有最终解释权。
+      .extension-footer(style="padding-bottom:1.2rem;margin:0")
+        .footer-item
+          img(src="/static/imgs/mobile_activity/extension/extension_xiu1.png")
+          p <em>IDG资本</em>百亿市值<br/><em>A股上市公司</em>入股
+        .footer-item
+          img(src="/static/imgs/mobile_activity/extension/extension_xiu2.png")
+          p 账户资金安全<br/>由<em>阳光保险</em>承保
+        .footer-item
+          img(src="/static/imgs/mobile_activity/extension/extension_xiu3.png")
+          p 第三方<br/><em>100%</em>本息保障
+
+      script.
+          var inputDom = document.getElementById('submit-put'),
+              urlDom = document.getElementById('submit-url') ;
+            urlDom.addEventListener('touchend', function () {
+              if (inputDom.value === '') {
+                return alert('请输入手机号!');
+              }
+              window.location.href = '/weixin/regist/?phone='+inputDom.value;
+            });
+
+          
