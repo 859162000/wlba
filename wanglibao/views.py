@@ -7,6 +7,7 @@ from django.views.generic import TemplateView
 from marketing.models import NewsAndReport, TimelySiteData
 from marketing.utils import pc_data_generator
 from misc.views import MiscRecommendProduction
+from wanglibao_buy.models import FundHoldInfo
 from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_banner.models import Banner, Partner
 from itertools import chain
@@ -141,17 +142,22 @@ class IndexView(TemplateView):
 
         # 总资产
         p2p_total_asset = 0
+        fund_total_asset = 0
         if self.request.user and self.request.user.is_authenticated():
             user = self.request.user
-            p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
+            p2p_equities = P2PEquity.objects.filter(user=user, confirm=True).filter(product__status__in=[
                 u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
             ]).select_related('product')
 
             unpayed_principle = 0
             for equity in p2p_equities:
-                if equity.confirm:
-                    unpayed_principle += equity.unpaid_principal
+                unpayed_principle += equity.unpaid_principal
             p2p_total_asset = user.margin.margin + user.margin.freeze + user.margin.withdrawing + unpayed_principle
+
+            fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
+            if fund_hold_info.exists():
+                for hold_info in fund_hold_info:
+                    fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
 
         return {
             "recommend_product": recommend_product,
@@ -165,7 +171,7 @@ class IndexView(TemplateView):
             'announcements': annos,
             'announcements_p2p': AnnouncementP2PNew,
             'partners': partners,
-            'p2p_total_asset': float(p2p_total_asset)
+            'p2p_total_asset': float(p2p_total_asset + fund_total_asset)
         }
 
     def get(self, request, *args, **kwargs):
