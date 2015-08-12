@@ -811,7 +811,7 @@ class AccountTransaction(TemplateView):
 
 
 class AccountTransactionP2P(TemplateView):
-    template_name = 'account_caipiao.jade'
+    template_name = 'account_transaction_p2p.jade'
 
     def get_context_data(self, **kwargs):
         trade_records = P2PRecord.objects.filter(user=self.request.user)
