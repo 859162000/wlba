@@ -17,6 +17,7 @@ from wanglibao_activity import backends as activity_backends
 from wanglibao_redpack.models import Income
 import datetime
 from django.db.models import Sum, Count
+from wanglibao_profile.models import WanglibaoUserProfile
 
 @app.task
 def decide_first(user_id, amount, device, product_id=0, is_full=False):
@@ -107,13 +108,15 @@ def send_income_message_sms():
     messages_list = []
     if incomes:
         for income in incomes:
-            phones_list.append(income.user.wanglibaouserprofile.phone)
-            messages_list.append(messages.sms_income(income.invite__count, income.earning__sum))
+            user_info = User.objects.filter(id=income.get('user'))\
+                .select_related('user__wanglibaouserprofile').values('wanglibaouserprofile__phone')
+            phones_list.append(user_info[0].get('wanglibaouserprofile__phone'))
+            messages_list.append(messages.sms_income(income.get('invite__count'), income.get('earning__sum')))
 
             # 发送站内信
-            title, content = messages.msg_give_income(income.invite__count, income.earning__sum)
+            title, content = messages.msg_give_income(income.get('invite__count'), income.get('earning__sum'))
             inside_message.send_one.apply_async(kwargs={
-                "user_id": income.user.id,
+                "user_id": income.get('user'),
                 "title": title,
                 "content": content,
                 "mtype": "invite"
