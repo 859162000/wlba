@@ -66,7 +66,18 @@ class AliOSSStorage(Storage):
         super(AliOSSStorage, self).__init__()
         self.base_url = settings.MEDIA_URL
 
+    def _get_availble_name(self, name):
+        count = 10
+        while count:
+            count -= 1
+            if File.objects.filter(path=name).exists():
+                dir, name = os.path.split(name)
+                name = os.path.join(dir, '%d_%s' % (random.randrange(0, 100000000), name))
+            else:
+                return name
+
     def save(self, name, content):
+        name = self._get_availble_name(name)
         size = oss_save(name, content.file)
         #如果上传重名则覆盖
         f = File.objects.get_or_create(path=name)[0]
