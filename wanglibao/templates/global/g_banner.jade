@@ -45,10 +45,10 @@
                 span.user-data-warp
                   div
                     span.t-d17.font-xs 可用余额：
-                    span.helvetica {{user.margin.margin}}
+                    span.helvetica {{user.margin.margin | money_format}}
                   div
                     span.t-d17.font-xs 账户资产：
-                    span.helvetica {{p2p_total_asset}}
+                    span.helvetica {{p2p_total_asset | money_format}}
 
               .landed-cont-btn
                 i.icon.iconfont.icon-eye03
