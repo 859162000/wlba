@@ -555,7 +555,9 @@ class ShiTouCunRegister(CoopRegister):
             binding.save()
             # logger.debug('save user %s to binding'%user)
 
-    def register_call_back(self, user):
+    def purchase_call_back(self, user):
+        if P2PRecord.objects.filter(user_id=user.id).count() != 1:
+            return
         # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
         binding = Binding.objects.filter(user_id=user.id).first()
         if binding:
@@ -721,8 +723,8 @@ def get_rate(product_id_or_instance):
     :return:
     """
     if isinstance(product_id_or_instance, P2PProduct):
-        if product_id_or_instance.activity:
-            return product_id_or_instance.activity.rule_amount + product_id_or_instance.expected_earning_rate
+        if product_id_or_instance.activity and product_id_or_instance.activity.rule:
+            return product_id_or_instance.activity.rule.rule_amount + product_id_or_instance.expected_earning_rate
         else:
             return product_id_or_instance.expected_earning_rate
 
@@ -733,9 +735,11 @@ def get_amortization_time(product_id_or_instance):
     :param product_id_or_instance:
     :return: datetime
     """
-    if isinstance(product_id_or_instance, P2PProduct):
+    try:
         amortizations = ProductAmortization.objects.filter(product_id=product_id_or_instance.id).order_by('term_date')
         return amortizations.first().term_date, amortizations.last().term_date
+    except:
+        return None, None
 
 
 def get_p2p_info(mproduct):
