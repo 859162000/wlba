@@ -46,26 +46,6 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
             }
         });
 
-         //切换Nav
-        $('.minNavBtn').on('click',function(){
-            $('.minNax').find('.curr').removeClass('curr');
-            var self = $(this);
-            self.addClass('curr')
-            var tag = self.attr('tag');
-            if(tag == '1'){
-                $('.logonFormDiv').show();
-                $('.registerFormDiv').hide();
-            }else{
-                $('.logonFormDiv').hide();
-                $('.registerFormDiv').show();
-                if (!self.hasClass('selectEd')){
-                    self.addClass('selectEd');
-                    //初始化注册表单验证
-                    registerInitFun();
-                }
-            }
-        })
-
         //文本框的得到和失去光标
         $('.placeholderInput').placeholder();
         var zhi;
@@ -398,16 +378,5 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
              }
         })
     }
-
-    loginInitFun();
-    var href = location.search;
-    if (href.split('=')[1] == '1') {
-        var self = $('.minNavRight');
-        $('.logonFormDiv').hide();
-        $('.registerFormDiv').show();
-        $('.minNavLeft').removeClass('curr');
-        self.addClass('selectEd curr');
-        //初始化注册表单验证
-        registerInitFun();
-    }
+    $('.minNavLeft').hasClass('curr') ? loginInitFun() : registerInitFun();
 });
