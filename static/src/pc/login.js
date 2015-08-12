@@ -129,14 +129,16 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
     }
     //验证码
     checkCodedFun = function(form,re){
-        var checkStatus = false
+        var checkStatus = false,str = ''
         if(re == 're'){
             var self = $.trim($('#'+form).find('#registerSMSCode').val());
+            str = '短信';
         }else{
             var self = $.trim($('#'+form).find('.checkCode').val());
+            str = '图片';
         }
         if(self == '') {
-            $('#'+form).find('.loginError').text('请输入验证码');
+            $('#'+form).find('.loginError').text('请输入'+ str +'验证码');
             checkStatus = false;
         }else{
             $('#'+form).find('.loginError').text('');
@@ -237,7 +239,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
             url: "/api/phone_validation_code/register/" + phoneNumber + "/",
             type: "POST"
         }).done(function() {
-            count = 180;
+            count = 60;
             $(element).attr('disabled', 'disabled').addClass('buttonGray');
             $('.voiceValidate').attr('disabled', 'disabled');
             timerFunction = function() {
