@@ -1,0 +1,54 @@
+extends account_home_base
+
+-load formatters
+
+block head
+  - with '理财交易记录' as title
+    include include/head
+
+block sidebar
+  - with '彩票' as activeItem
+    include include/user_center_sidebar
+
+block main
+  .panel.p2p-record
+    h1
+    .account-home-panel--title-bar__product
+      ul.title-bar--tabs
+        li.title-bar--tab.active
+          a.title-bar--tab--anchor(href="javascript:void(0)") 所有彩票
+        li.title-bar--tab
+          a.title-bar--tab--anchor(href='/accounts/caipiao/out') 已出票
+        li.title-bar--tab
+          a.title-bar--tab--anchor(href='/accounts/caipiao/in') 未出票
+    #caipiao-container.padding-l-r-xl
+      table.table
+        thead
+          tr
+            th.caipiao-left 获赠时间
+            th 彩票类型
+            th 获赠注数
+            th 开奖时间
+            th 状态
+            th.caipiao-right 操作状态
+        tbody
+          each trade_record in trade_records
+            tr
+              td.caipiao-left 2015-10-30 14:00
+              td 双色球 / 2015150期
+              td 20注
+              td 2015-7-31
+              td 中奖
+              td.caipiao-right
+                a(href="javascript:void(0)").caipiao-btn 领奖
+            tr
+              td.caipiao-left 2015-10-30 14:00
+              td 双色球 / 2015150期
+              td 20注
+              td 2015-7-31
+              td 未中奖
+              td.caipiao-right
+                a(href="/accounts/caipiao/detail").caipiao-btn2 详情
+    - with data=trade_records uri='/accounts/transaction/p2p/'
+    include include/pager
+    - endwith

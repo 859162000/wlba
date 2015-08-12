@@ -1,0 +1,19 @@
+extends account_home_base
+
+-load formatters
+
+block head
+  - with '理财交易记录' as title
+    include include/head
+
+block sidebar
+  - with '彩票' as activeItem
+    include include/user_center_sidebar
+
+block main
+  .panel.p2p-record
+    h1 彩票详情
+
+    //- with data=trade_records uri='/accounts/transaction/p2p/'
+    ////include include/pager
+    //- endwith
