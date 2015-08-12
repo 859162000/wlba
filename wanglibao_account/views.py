@@ -68,7 +68,7 @@ logger = logging.getLogger(__name__)
 
 
 class RegisterView(RegistrationView):
-    template_name = "register.jade"
+    template_name = "register_test.jade"
     form_class = EmailOrPhoneRegisterForm
 
     def register(self, request, **cleaned_data):
