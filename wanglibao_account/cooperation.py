@@ -555,7 +555,9 @@ class ShiTouCunRegister(CoopRegister):
             binding.save()
             # logger.debug('save user %s to binding'%user)
 
-    def register_call_back(self, user):
+    def purchase_call_back(self, user):
+        if P2PRecord.objects.filter(user_id=user.id).count() != 1:
+            return
         # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
         binding = Binding.objects.filter(user_id=user.id).first()
         if binding:
