@@ -11,10 +11,18 @@ $logo-margin-top-fixed: 2px
   z-index: 100
   -webkit-transform: translateZ(0)
   border-bottom: 1px solid #e5e5e5
+  font-family: $font-family
+  color: #474e5e
   .g-nav
     width: 1102px
     margin: 0 auto
     +clearfix()
+    a
+      &:link, &:visited
+        color: $bg-d1
+      &:hover, &:active
+        color: $t-d2
+        cursor: pointer
     a.highlight
       color: $t-d2
   .g-logo-box
@@ -32,7 +40,6 @@ $logo-margin-top-fixed: 2px
       padding: 0 20px
       line-height: $g-nav-height
       height: $g-nav-height
-
   .g-user-warp
     margin-left: 40px
     float: right
@@ -40,8 +47,6 @@ $logo-margin-top-fixed: 2px
     position: relative
     font-size: $font-m
     &:hover, &:active
-      color: $t-d2
-      cursor: pointer
       .g-nav-user-nav
         display: block
   .user-nav

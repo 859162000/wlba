@@ -4,6 +4,9 @@ from django.db import transaction
 from models import Margin, MarginRecord
 from exceptions import MarginLack, MarginNotExist
 from order.mixins import KeeperBaseMixin
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class MarginKeeper(KeeperBaseMixin):
@@ -45,6 +48,7 @@ class MarginKeeper(KeeperBaseMixin):
         with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
             if amount > margin.freeze:
+                logger.debug('user id: {}, amount:{}, freeze:{} ========'.format(self.user.id, amount, margin.freeze))
                 raise MarginLack(u'202')
             margin.freeze -= amount
             margin.save()
