@@ -1112,7 +1112,7 @@ def ajax_register(request):
 
             res, message = verify_captcha(dic=request.POST, keep=True)
             if not res:
-                return HttpResponseForbidden(messenger(message={'captcha_1': u'验证码错误'}))
+                return HttpResponseForbidden(messenger(message={'captcha_1': u'图片验证码错误'}))
 
             form = EmailOrPhoneRegisterForm(request.POST)
             if form.is_valid():
