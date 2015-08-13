@@ -8,11 +8,12 @@ from marketing import tools
 #from marketing.models import IntroducedBy, Reward, RewardRecord
 from order.models import Order
 #from wanglibao.templatetags.formatters import safe_phone_str
+from wanglibao.signals import signal_product_first_bought
 from wanglibao_margin.marginkeeper import MarginKeeper
 from order.utils import OrderHelper
 from keeper import ProductKeeper, EquityKeeper, AmortizationKeeper, EquityKeeperDecorator
 from exceptions import P2PException
-from wanglibao_p2p.models import P2PProduct
+from wanglibao_p2p.models import P2PProduct, P2PEquity
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
@@ -74,6 +75,10 @@ class P2PTrader(object):
 
             if product_record.product_balance_after <= 0:
                 is_full = True
+
+        #发送首投信号
+        if P2PEquity.objects.filter(user=self.user).count() == 1:
+            signal_product_first_bought.send(sender=self.__class__, user=self.user)
 
         tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount,
                                                "device": self.device, "product_id": self.product.id,

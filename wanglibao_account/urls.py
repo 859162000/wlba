@@ -56,7 +56,7 @@ urlpatterns = patterns(
 
     url(r'^login/$', 'django.contrib.auth.views.login',
         {
-            "template_name": "loginAndRegister.jade",
+            "template_name": "login_test.jade",
             "authentication_form": EmailOrPhoneAuthenticationForm,
         }, name="auth_login"),
 
