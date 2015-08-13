@@ -49,7 +49,7 @@ from marketing.tops import Top
 from marketing import tools
 from django.conf import settings
 from wanglibao_account.models import Binding
-
+from wanglibao_anti.anti.anti import AntiForAllClient
 
 logger = logging.getLogger(__name__)
 
@@ -90,9 +90,16 @@ class SendValidationCodeView(APIView):
     #throttle_classes = (UserRateThrottle,)
 
     def post(self, request, phone):
+        """
+            modified by: Yihen@20150812
+            descrpition: if...else(line98~line101)的修改，增强验证码后台处理，防止被刷单
+        """
         phone_number = phone.strip()
+        if not AntiForAllClient(request).anti_special_channel():
+            res, message = False, u"请输入验证码"
+        else:
+            res, message = verify_captcha(request.POST)
 
-        res, message = verify_captcha(request.POST)
         if not res:
             return Response({'message': message, "type":"captcha"}, status=403)
 
@@ -132,6 +139,10 @@ class SendRegisterValidationCodeView(APIView):
     # throttle_classes = (UserRateThrottle,)
 
     def post(self, request, phone):
+        """
+            modified by: Yihen@20150812
+            descrpition: if...else(line153~line156)的修改，增强验证码后台处理，防止被刷单
+        """
         phone_number = phone.strip()
         phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number)
         if phone_check:
@@ -139,7 +150,11 @@ class SendRegisterValidationCodeView(APIView):
                             "error_number": ErrorNumber.duplicate,
                             "type":"exists"}, status=400)
 
-        res, message = verify_captcha(request.POST)
+        if not AntiForAllClient(request).anti_special_channel():
+            res, message = False, u"请输入验证码"
+        else:
+            res, message = verify_captcha(request.POST)
+
         if not res:
             return Response({'message': message, "type":"captcha"}, status=403)
 
