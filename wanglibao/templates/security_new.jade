@@ -4,7 +4,6 @@ html
     - with '安全保障－网利宝' as title
     include global/g_head
     - endwith
-    script(src="/static/src/pc/lib/require.js", data-main="/static/src/pc/config")
   body
     - with '安全保障' as activeItem
     include global/g_nav
@@ -34,14 +33,14 @@ html
     .i-mod-warp
       .i-security-item
         .font-xxll.padding-xl
-          span.weight IT风控系统流程“
+          span.weight IT风控数据系统“
           |— 确保贷前项目安全
         .it-head
           span.font-text-icon ”
           span.text-36.weight 三十六层
-          span.font-m把关只为换您一份安心，一百分努力只为看您投得开心！    安全，是我最好的承诺！    投我，是你最好的选择！
+          span.font-m 把关只为换您一份安心，一百分努力只为看您投得开心！    安全，是我最好的承诺！    投我，是你最好的选择！
           span.font-text-icon ”
-        .font-xxll.weight.tl 网利宝IT风控系统流程
+        .font-xxll.weight.tl 网利宝IT风控数据系统
         img(src='/static/imgs/pc/security/security_grid2.jpg').grid2-img
     .i-mod-warp.i-security-write
       .i-security-item
@@ -168,5 +167,5 @@ html
                 +safeItem('身份证')
                 +safeItem('银行卡号')
         .secuity-for-regist
-          a(href="/accounts/login/?flag=1") 免费注册
+          a(href="/accounts/register/") 免费注册
     include global/g_footer
