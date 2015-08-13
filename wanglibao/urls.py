@@ -32,6 +32,7 @@ urlpatterns = patterns(
     '',
     url(r'^$', IndexView.as_view(), name="index"),
     url(r'^security/', SecurityView.as_view(), name="security"),
+    url(r'^guide/', TemplateView.as_view(template_name="guide.jade")),
     url(r'^favicon.ico', RedirectView.as_view(url="/static/favicon.ico")),
 
     url(r'^portfolio/', PortfolioHomeView.as_view(), name="portfolio_home"),

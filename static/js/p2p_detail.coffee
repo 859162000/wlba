@@ -311,11 +311,14 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     ).done (data) ->
       try
         invest_result = $.parseJSON(data)
+
         if(invest_result && invest_result.length > 0)
           if(invest_result.length > 0)
             $('.invest-history-table tbody').append(buildTable(invest_result))
             $('.get-more').show()
             page++
+            if(math.ceil(invest_result.length/30) > page)
+              $('.get-more').hide()
           else
             $('.get-more').hide()
 

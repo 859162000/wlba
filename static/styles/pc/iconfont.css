@@ -49,3 +49,12 @@
 .icon-up:before { content: "\e63a"; }
 .icon-amount:before { content: "\e63b"; }
 .icon-shouyetubiao225:before { content: "\e63c"; }
+.icon-wallet:before { content: "\e645"; }
+.icon-jiantou:before { content: "\e644"; }
+.icon-long-time:before { content: "\e643"; }
+.icon-short-time:before { content: "\e642"; }
+.icon-service:before { content: "\e641"; }
+.icon-investment:before { content: "\e640"; }
+.icon-bankcard:before { content: "\e63f"; }
+.icon-registered:before { content: "\e63e"; }
+.icon-idcard:before { content: "\e63d"; }
