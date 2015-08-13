@@ -735,9 +735,11 @@ def get_amortization_time(product_id_or_instance):
     :param product_id_or_instance:
     :return: datetime
     """
-    if isinstance(product_id_or_instance, P2PProduct):
+    try:
         amortizations = ProductAmortization.objects.filter(product_id=product_id_or_instance.id).order_by('term_date')
         return amortizations.first().term_date, amortizations.last().term_date
+    except:
+        return None, None
 
 
 def get_p2p_info(mproduct):
