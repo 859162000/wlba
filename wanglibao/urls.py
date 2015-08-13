@@ -101,6 +101,11 @@ urlpatterns += patterns(
     url(r'^media/(?P<path>.*)$', 'file_storage.views.serve'),
 )
 
+#add by Yihen@20150813,反作弊的相关接口处理在此
+urlpatterns += patterns(
+    '',
+    url(r'^anti/', include('wanglibao_anti.urls')),
+)
 
 # the admin router about transaciton infdomation
 urlpatterns += patterns(
