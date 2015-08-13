@@ -63,6 +63,7 @@ from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityRecord
 from aes import Crypt_Aes
 from wanglibao.settings import AMORIZATION_AES_KEY
+from wanglibao_anti.anti.anti import AntiForAllClient
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +73,10 @@ class RegisterView(RegistrationView):
     form_class = EmailOrPhoneRegisterForm
 
     def register(self, request, **cleaned_data):
+        """ 
+            modified by: Yihen@20150812
+            descrpition: if(line96~line97)的修改，针对特定的渠道延迟返积分、发红包等行为，防止被刷单
+        """
         nickname = cleaned_data['nickname']
         password = cleaned_data['password']
         identifier = cleaned_data['identifier']
@@ -88,7 +93,9 @@ class RegisterView(RegistrationView):
         auth_user = authenticate(identifier=identifier, password=password)
         auth.login(request, auth_user)
         device = utils.split_ua(request)
-        tools.register_ok.apply_async(kwargs={"user_id": auth_user.id, "device":device})
+        if not AntiForAllClient(request).anti_delay_callback_time(user.id, device):
+            tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
         account_backends.set_source(request, auth_user)
         return user
 
@@ -1100,6 +1107,10 @@ def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
 @csrf_protect
 @never_cache
 def ajax_register(request):
+    """
+        modified by: Yihen@20150812
+        descrpition: if(line1150~line1151)的修改，针对特定的渠道延迟返积分、发红包等行为，防止被刷单
+    """
     def messenger(message, user=None):
         res = dict()
         if user:
@@ -1135,7 +1146,10 @@ def ajax_register(request):
                 auth.login(request, auth_user)
 
                 device = utils.split_ua(request)
-                tools.register_ok.apply_async(kwargs={"user_id": auth_user.id, "device":device})
+
+                if not AntiForAllClient(request).anti_delay_callback_time(user.id, device):
+                    tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
                 account_backends.set_source(request, auth_user)
 
                 return HttpResponse(messenger('done', user=request.user))

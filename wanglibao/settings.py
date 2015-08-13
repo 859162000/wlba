@@ -113,7 +113,7 @@ INSTALLED_APPS = (
     'wanglibao_mobile',
     'weixin',
     'wanglibao_app',
-
+    'wanglibao_anti', #add by yihen@20150813, anti module added
     'report',
     'misc',
 
@@ -515,6 +515,12 @@ CELERYBEAT_SCHEDULE = {
     'lottery_set_status': {
         'task': 'wanglibao_lottery.tasks.lottery_set_status',
         'schedule': crontab(minute=0, hour=5)
+    },
+
+    #add by Yihen@20150913，定时任务，3分钟给特定渠道返积分或发红包
+    'handle_delay_time_data': {
+        'task': 'wanglibao_anti.tasks.handle_delay_time_data',
+        'schedule': timedelta(minutes=3)
     },
 }
 

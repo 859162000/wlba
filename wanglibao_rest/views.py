@@ -209,6 +209,10 @@ class RegisterAPIView(APIView):
     # serializer_class = RegisterUserSerializer
 
     def post(self, request, *args, **kwargs):
+        """ 
+            modified by: Yihen@20150812
+            descrpition: if(line282~line283)的修改，针对特定的渠道延迟返积分、发红包等行为，防止被刷单
+        """
         identifier = request.DATA.get('identifier', "")
         password = request.DATA.get('password', "")
         validate_code = request.DATA.get('validate_code', "")
@@ -275,8 +279,8 @@ class RegisterAPIView(APIView):
             auth_user = authenticate(identifier=identifier, password=password)
             auth_login(request, auth_user)
 
-        tools.register_ok.apply_async(kwargs={"user_id": user.id, 
-                        "device":device})
+        if not AntiForAllClient(request).anti_delay_callback_time(user.id, device):
+            tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
         return Response({"ret_code": 0, "message": u"注册成功"})
 
@@ -288,6 +292,10 @@ class WeixinRegisterAPIView(APIView):
     permission_classes = ()
 
     def post(self, request, *args, **kwargs):
+        """ 
+            modified by: Yihen@20150812
+            descrpition: if(line333~line334)的修改，针对特定的渠道延迟返积分、发红包等行为，防止被刷单
+        """
         identifier = request.DATA.get('identifier', "").strip()
         validate_code = request.DATA.get('validate_code', "").strip()
 
@@ -326,7 +334,9 @@ class WeixinRegisterAPIView(APIView):
         send_rand_pass(identifier, password)
 
         device = split_ua(request)
-        tools.register_ok.apply_async(kwargs={"user_id": user.id, "device":device})
+        if not AntiForAllClient(request).anti_delay_callback_time(user.id, device):
+            tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
         return Response({"ret_code": 0, "message": "注册成功"})
 
 
