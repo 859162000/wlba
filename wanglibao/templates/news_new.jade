@@ -1,0 +1,36 @@
+doctype html
+- with '媒体报道' as title
+include include/common_head
+- endwith
+body
+  include global/g_nav
+  .container.margin-bottom-xxl
+    .siderbar-div
+      - with '媒体报道' as title
+      include include/about_sidebar
+      - endwith
+    .panel-padding.span9-omega
+      .row.announce-content-title
+        .span10
+          h2 网站公告
+      .media-list-body
+        for news in news_list
+          .media-list-content
+            p
+              img(src="/media/{{news.image}}", width="270", height="170")
+            dl
+              dt
+                a(href="{{news.link}}",target="_blank") {{news.name}}
+              dd {{news.description}}
+              dd
+                span.media-time {{news.created_at|date:"Y-m-d H:i"}} &nbsp;&nbsp;
+                //span.media-from 来源：
+                a.media-more.pull-right(href="/news/detail/{{news.id}}",target="_blank") 详细介绍>>
+
+        .pager
+          - with data=news_list uri='/news/list/'
+          include include/pager
+          - endwith
+
+  include include/footer
+  include include/tracking
