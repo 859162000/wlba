@@ -66,7 +66,9 @@ class PrepaymentHistory(object):
                 pname = u"%s,期限%s个月" % (product.name, product.period)
 
             for user_amortization in user_amortizations:
-                user_record = self.get_user_repayment(user_amortization, Decimal(0), repayment_type, payment_date)
+                ### Modify by hb on 2015-08-13
+                #user_record = self.get_user_repayment(user_amortization, Decimal(0), repayment_type, payment_date)
+                user_record = self.get_user_repayment(user_amortization, penal_interest, repayment_type, payment_date)
 
                 user_margin_keeper = MarginKeeper(user_record.user)
                 user_margin_keeper.amortize(user_record.principal, user_record.interest,
@@ -164,12 +166,11 @@ class PrepaymentHistory(object):
     def get_user_repayment(self, amortization, penal_interest, repayment_type, repayment_date):
         principal = self.get_user_principal(amortization)
         interest = self.get_user_interest(amortization, repayment_type, repayment_date)
+        user_penal_interest = self.get_user_penal_interest(amortization, penal_interest)
         return AmortizationRecord(
                 amortization=self.amortization, term=amortization.term, principal=principal, interest=interest,
-                penal_interest=Decimal(0), description=DESCRIPTION, user=amortization.user, catalog=self.catalog, order_id=None
+                penal_interest=user_penal_interest, description=DESCRIPTION, user=amortization.user, catalog=self.catalog, order_id=None
                 )
-
-
 
     def get_product_interest(self, amortization, repayment_type, repayment_date):
         repayment_date = pytz.UTC.localize(repayment_date).date()
@@ -217,4 +218,7 @@ class PrepaymentHistory(object):
         equity = P2PEquity.objects.filter(product=self.product, user=amortization.user).first()
         return equity.equity - principal_paid
 
-
+    # Add by hb on 2015-08-13
+    def get_user_penal_interest(self, amortization, product_penal_interest):
+        equity = P2PEquity.objects.filter(product=self.product, user=amortization.user).first()
+        return (equity.equity / self.product.total_amount) * product_penal_interest
