@@ -1,4 +1,5 @@
 # coding=utf-8
+import logging
 from wanglibao_p2p.models import ProductAmortization, UserAmortization, AmortizationRecord, P2PEquity
 from wanglibao_p2p.amortization_plan import get_daily_interest, get_final_decimal
 from wanglibao_margin.marginkeeper import MarginKeeper
@@ -18,6 +19,8 @@ import pytz
 REPAYMENT_MONTHLY = 'monthly'
 REPAYMENT_DAILY = 'daily'
 DESCRIPTION = u'提前还款'
+
+logger = logging.getLogger(__name__)
 
 class PrepaymentHistory(object):
     def __init__(self, product, payment_date):
@@ -125,7 +128,7 @@ class PrepaymentHistory(object):
             raise PrepaymentException()
         make_loans_time = timezone.localtime(self.product.make_loans_time).date()
 
-        
+
         for index, amortization in enumerate(amortizations):
             term_date = timezone.localtime(amortization.term_date).date()
 
@@ -180,7 +183,7 @@ class PrepaymentHistory(object):
             term_date = timezone.localtime(amortization.term_date).date()
             days = self.days - (term_date - repayment_date).days
             return get_final_decimal(self.product_daily_interest(days))
-    
+
     def get_user_interest(self, amortization, repayment_type, repayment_date):
         repayment_date = pytz.UTC.localize(repayment_date).date()
         if repayment_type == REPAYMENT_MONTHLY:
@@ -221,4 +224,6 @@ class PrepaymentHistory(object):
     # Add by hb on 2015-08-13
     def get_user_penal_interest(self, amortization, product_penal_interest):
         equity = P2PEquity.objects.filter(product=self.product, user=amortization.user).first()
-        return (equity.equity / self.product.total_amount) * product_penal_interest
+        aaa = equity.equity * product_penal_interest / self.product.total_amount
+        logger.error("equity:[%s], product_penal_interest:[%s], total_amount:[%s], aaa:[%s]" % (equity.equity, product_penal_interest, self.product.total_amount, aaa))
+        return aaa
