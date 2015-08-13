@@ -15,6 +15,7 @@ from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, 
                    MessageListAPIView, AccountRepayment, AddressView, AccountInviteView, user_product_contract_kf)#, CjdaoApiView)
 from django.contrib.auth import views as auth_views
 from views import AutomaticView
+from wanglibao_lottery.views import LotteryListTemplateView
 
 urlpatterns = patterns(
     '',
@@ -101,6 +102,7 @@ urlpatterns = patterns(
     url(r'^address/$', login_required(AddressView.as_view(), login_url='/accounts/login/'), name='accounts_address'),
 
     url(r'^auto_tender/$', login_required(AutomaticView.as_view(), login_url='/accounts/login/')),
+    url(r'^caipiao/$', login_required(LotteryListTemplateView.as_view(), login_url='/accounts/login/')),
 )
 
 if settings.DEBUG:

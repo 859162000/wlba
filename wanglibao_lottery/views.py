@@ -1,39 +1,44 @@
 # encoding=utf-8
 import traceback
+from django.core.paginator import Paginator
 from django.http.response import HttpResponse
 from django.utils import timezone
+from django.views.generic.base import TemplateView
 from rest_framework import renderers
 from rest_framework.fields import DateTimeField
 from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from rest_framework.views import APIView
 from wanglibao_lottery.lotterytrade import LotteryTrade
 from wanglibao_lottery.models import Lottery
 
-class DateTimeTzAwareField(DateTimeField):
-    def to_native(self, value):
-        value = timezone.localtime(value)
-        return super(DateTimeTzAwareField, self).to_native(value)
-
-class LotterySerializer(ModelSerializer):
-    buy_time = DateTimeTzAwareField(format='%Y%m%d')
-    open_time = DateTimeTzAwareField(format='%Y%m%d')
-    class Meta:
-        model = Lottery
-        fields = ('id', 'buy_time', 'lottery_type', 'money_type', 'count',
-                  'bet_number', 'open_time', 'issue_number', 'status', 'win_number', 'prize')
-
-class LotteryList(ListAPIView):
-    permission_classes = ()
-    serializer_class = LotterySerializer
-
-    def get_queryset(self):
-        return Lottery.objects.filter(user=self.request.user)
+# class DateTimeTzAwareField(DateTimeField):
+#     def to_native(self, value):
+#         value = timezone.localtime(value)
+#         return super(DateTimeTzAwareField, self).to_native(value)
+#
+# class LotterySerializer(ModelSerializer):
+#     buy_time = DateTimeTzAwareField(format='%Y%m%d')
+#     open_time = DateTimeTzAwareField(format='%Y%m%d')
+#     class Meta:
+#         model = Lottery
+#         fields = ('id', 'buy_time', 'lottery_type', 'money_type', 'count',
+#                   'bet_number', 'open_time', 'issue_number', 'status', 'win_number', 'prize')
 
 
-class LotteryDetail(RetrieveAPIView):
-    model = Lottery
-    serializer_class = LotterySerializer
+class LotteryListTemplateView(TemplateView):
+    template_name = 'account_caipiao.jade'
+
+    def get_context_data(self, **kwargs):
+        lotteries = Lottery.objects.filter(user=self.request.user).all()
+        pager = Paginator(lotteries, 20)
+        page = self.request.GET.get('page')
+        if not page:
+            page = 1
+        lotteries = pager.page(page)
+        return {'lotteries': lotteries}
 
 class LotteryIssue(APIView):
     """
