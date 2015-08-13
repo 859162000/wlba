@@ -510,7 +510,12 @@ CELERYBEAT_SCHEDULE = {
     'all_invite_earning_data': {
         'task': 'marketing.tools.send_income_message_sms',
         'schedule': crontab(minute=0, hour=20)
-    }
+    },
+    #每天五点重置之前未中奖的用户
+    'lottery_set_status': {
+        'task': 'wanglibao_lottery.tasks.lottery_set_status',
+        'schedule': crontab(minute=0, hour=5)
+    },
 }
 
 CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
