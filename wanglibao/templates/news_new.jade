@@ -20,7 +20,8 @@ body
               img(src="/media/{{news.image}}", width="270", height="170")
             dl
               dt
-                a(href="{{news.link}}",target="_blank") {{news.name}}
+                //a(href="{{news.link}}",target="_blank") {{news.name}}
+                div {{news.name}}
               dd {{news.description}}
               dd
                 span.media-time {{news.created_at|date:"Y-m-d H:i"}} &nbsp;&nbsp;
