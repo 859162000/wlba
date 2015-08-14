@@ -1,0 +1,44 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    link(rel="stylesheet",href="/static/stylesheets/qixi.css")
+  body(style="background:#fff")
+    include include/activityTop2
+    .qixi-banner
+    .qix-main
+      .qixi-box1
+        .qixi-time
+          h1 活动时间：2015年8月18日 -- 2015年8月21日
+        .left
+          .left-box1(style="border-right:1px solid #ff80b7")
+            h2 新用户
+              span 专享
+            p 投100元，送15元现金
+              br
+              b 活动期间内在APP端首次投资满100元，
+                br
+                |送15元现金红包
+            .redpack
+          .left-box1
+            h2 老用户
+              span 福利
+            p 投1000元，送50元现金
+              br
+              b 活动期间内在APP端首次投资满1000元，
+                br
+                |送50元现金红包
+            .redpack2
+          p.zhu 注：限活动期间内首次投资赠送，现金以红包的形式发送。
+        .right
+          p.sao-text 扫描下方二维码，下载
+            br
+            |网利宝APP立即投资吧
+          .reweima
+          p 若无法扫描，Android用户前往应用宝
+           br
+           |下载，IOS用户请前往APP store下载。
