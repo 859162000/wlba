@@ -1,4 +1,5 @@
 # encoding=utf-8
+import logging
 import traceback
 from django.core.paginator import Paginator
 from django.http.response import HttpResponse
@@ -27,6 +28,7 @@ from wanglibao_lottery.models import Lottery
 #         fields = ('id', 'buy_time', 'lottery_type', 'money_type', 'count',
 #                   'bet_number', 'open_time', 'issue_number', 'status', 'win_number', 'prize')
 
+logger = logging.getLogger(__name__)
 
 class LotteryListTemplateView(TemplateView):
     template_name = 'account_caipiao.jade'
@@ -49,7 +51,6 @@ class LotteryIssue(APIView):
     permission_classes = ()
 
     def get(self, request):
-        print 'request %s'%request
         data = {
                 'lottery_id': request.GET.get('orderId'),
                 'bet_number': request.GET.get('ballNo'),
@@ -70,7 +71,7 @@ class LotteryIssue(APIView):
             else:
                 raise ValueError('lottery failed to  issue %s'%data['lottery_id'])
         except :
-            traceback.print_exc()
+            logger.exception('lottery failed to issue:')
             result = {
                     'orderId': data['lottery_id'],
                     'result': 2,
@@ -111,7 +112,7 @@ class LotteryOpen(APIView):
             else:
                 raise ValueError('lottery failed to  open %s'%data['lottery_id'])
         except:
-            traceback.print_exc()
+            logger.exception('lottery failed to open:')
             result = {
                     'orderId': data['lottery_id'],
                     'result': 2,

@@ -39,11 +39,6 @@ def send_lottery(user_id):
     except:
         pass
 
-@receiver(signal_product_first_bought)
-def send_lottery_on_first_bouhgt(sender, **kwargs):
-    user_id = kwargs['user'].id
-    print 'recieve signal with user_id:%s'%user_id
-    send_lottery.apply_async((user_id,))
 
 
 

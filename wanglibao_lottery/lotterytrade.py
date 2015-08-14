@@ -13,12 +13,12 @@ logger = logging.getLogger(__name__)
 class LotteryTrade(object):
     def _get_sign(self, mdict):
         sorted_value_list = sorted([str(i) for i in mdict.values() if i is not None])
-        print('lottery string list to sign %s %s'%(sorted_value_list, sorted(mdict.values())))
         text = '[' + ', '.join(sorted_value_list) + ']' +str(settings.LINGCAIBAO_KEY)
-        print text
         m = md5()
         m.update(text)
-        return m.hexdigest()
+        sign = m.hexdigest()
+        logger.debug('lottery api sign:%s'%sign)
+        return sign
 
     def _get_mobile_for_user(self, user):
         try:
@@ -40,8 +40,8 @@ class LotteryTrade(object):
         request_data['sign'] = sign
         try:
             result = requests.get(settings.LINGCAIBAO_URL_ORDER, params=request_data)
-            print('lottery order with para %s with url %s'%(request_data, result.url))
-            print('lottery order with result %s'%result.json())
+            logger.info('lottery order with para %s with url %s'%(request_data, result.url))
+            logger.info('lottery order with result %s'%result.json())
             if result.json()['result'] == '1':
                 return True
             else:
@@ -59,7 +59,6 @@ class LotteryTrade(object):
         if order_status:
             lottery.status = "未出票"
             lottery.save()
-            print 'order %s for %s'%(money_type, user)
             return lottery
         else:
             lottery.delete()
