@@ -35,10 +35,12 @@ def handle_delay_time_data():
         device, uid = JSONEncoder.encoding(record["device"]), record["uid"]
         tools.register_ok.apply_async(kwargs={"user_id": id, "device": device})
         record.status = 1
-        record.save(update_fields=['status'])
+        record.updatetime = int(time.time())
+        record.save(update_fields=['status', 'updatetime'])
         logging.debug(" SUCCESS:%s, %s, %s" % (record.ip, record.uid, record.status))
 
     for record in [list().extend(item) for item in valid_records if len(item) > max_record_for_one_ip]:
         record.status = 2
-        record.save(update_fields=['status'])
+        record.updatetime = int(time.time())
+        record.save(update_fields=['status', 'updatetime'])
         logging.debug(" FAILED:%s, %s, %s" % (record.ip, record.uid, record.status))
