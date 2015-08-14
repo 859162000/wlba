@@ -121,9 +121,9 @@ html
             for index, p2p in product
               .pdt-list
                 .pdt-warp.padding-t-l-r-sm
-                  a(href='/p2p/detail/{{p2p.id}}/', title='{{p2p.name}}').pdt-name.mg-b-s
+                  a(href='/p2p/detail/{{p2p.id}}/', title='{{p2p.name}}').pdt-name.mg-b-s.t-d10
                     //i.icon.iconfont.icon-car
-                    span.font-l.t-d10 {{p2p.name}}
+                    span.font-l {{p2p.name}}
                   if index == 0
                     .t-d7.clearfix
                       .span6.es(title='本息保障：{{p2p.warrant_company}}') 本息保障：{{p2p.warrant_company}}
@@ -146,9 +146,9 @@ html
                           span +
                           span.font-m {{p2p.activity.rule.percent_text}}
                         span %
-                    .span3.ct
+                    .span3.ct.t-d11
                       span.font-ll {{p2p.period}}
-                      span.font-s.t-d11 {{p2p.pay_method|period_unit}}
+                      span.font-s {{p2p.pay_method|period_unit}}
                     .span4
                       if p2p.display_status == '抢购中'
                         statusP2P = '立即投资'
@@ -170,7 +170,7 @@ html
             a(href="/about/").ns-head
               i.icon.iconfont.icon-about
               span.font-l.mg-l-s 关于网利宝
-            .ns-cont
+            a(href="/guide/").ns-cont
               img(src='/static/imgs/pc/home/about.gif').ns-about
           li.mg-r-xxl
             a(href="/announcement/").ns-head
