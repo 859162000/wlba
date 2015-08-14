@@ -23,7 +23,7 @@
         }else if (t == 0){
           clearInterval(dateTimer)
         }
-        str = "距离下场更新：" + d + " 天 " + h + " 时 " + m + " 分 " + s + " 秒 ";
+        str = "投资倒计时：" + d + " 天 " + h + " 时 " + m + " 分 " + s + " 秒 ";
         self.html(str)
         if(first){
           self.addClass('animated fadeInDown')
