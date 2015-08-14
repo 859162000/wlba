@@ -1,0 +1,144 @@
+doctype html
+html
+  head
+    - with '新手指引－网利宝' as title
+    include global/g_head
+    - endwith
+  body
+    ul#menu
+      li(data-menuanchor="Page1")
+        a(href="#Page1")
+      li(data-menuanchor="Page2")
+        a(href="#Page2")
+      li(data-menuanchor="Page3")
+        a(href="#Page3")
+      li(data-menuanchor="Page4")
+        a(href="#Page4")
+      li(data-menuanchor="Page5")
+        a(href="#Page5")
+      li(data-menuanchor="Page6")
+        a(href="#Page6")
+    #fullpage
+      .section
+        .i-mod-warp
+          - with '新手指引' as activeItem
+          include global/g_nav
+          - endwith
+        img(src="/static/imgs/pc/guide/guide_banner.jpg").i-mod-warp.i-guide-banner
+
+      .section.i-mod-warp.i-guide-company
+        .i-guide-item
+          .i-item-cont-warp
+            .guide-title
+              span.guide-tit-1.font-xxl 什么是网利宝？
+            .guide-item-1-txt.t-d11.jy.padding-l-r-sm 网利宝（www.wanglibao.com）是网利金融旗下的在线理财平台，中国第一家互联网私人银行。网利宝在业内独创产融结合的业务模式，凭借丰富的金融行业经验、互联网优势，联合中国领先的金融机构、产业龙头企业进行战略合作，为投资用户提供高收益、安全透明、期限灵活的理财产品。网利宝的金融产品研发团队目前已覆盖全国近二十个省市，执行360度全方位风险控制，确保我们的理财产品安全可靠，为投资者的财富增值保驾护航。
+            img(src="/static/imgs/pc/guide/guide_company.jpg").guide-item-company
+
+      .section.i-mod-warp.i-guide-advantage
+        .i-guide-item
+          .i-item-cont-warp
+            .guide-title
+              span.guide-tit-2.font-xxl 网利宝有什么优势？
+            .guide-advantage-table
+              mixin adItem(classname, icon, title, textArr, ismargin)
+                if ismargin == 'true'
+                  aditem_mg = 'ad-item-mg'
+                else
+                  aditem_mg = ''
+                .ad-item(class=aditem_mg)
+                  .ad-item-head(class=classname)
+                    i.icon.iconfont(class=icon)
+                  .ad-item-cont.font-m
+                    .ad-cont-tit.font-xl=title
+                    for txt in textArr
+                      .ad-cont-small=txt
+              - var safe = ['阳光保险承保', 'IT数据风控系统把关', '合作机构全额担保', '四重身份认证']
+              +adItem('ad-blue', 'icon-safe', '安全保障', safe, 'true')
+
+              - var rocket = ['年化高达10-16%', '30余倍银行活期理财', '打通传统金融行业中间环节', '让利给投资者']
+              +adItem('ad-red', 'icon-rocket', '高收益', rocket, 'true')
+
+              - var authority = ['独创IT数据风控系统', '汇聚华尔街精英金融团队', '专注于垂直细分领域', '打造金融服务新蓝海']
+              +adItem('ad-orange', 'icon-authority', '专业', authority, 'true')
+
+              - var service = ['360度贴心服务', '理财需求快速反应', '客户问题即时解决', '客服服务全年无休']
+              +adItem('ad-green', 'icon-service', '服务', service, 'false')
+
+      .section.i-mod-warp.i-guide-inver-us
+        .i-guide-item
+          .i-item-cont-warp
+            .guide-title
+              span.guide-tit-3.font-xxl 谁投资了我们？
+            .guide-inver-us-cont
+              .inver-us-item
+                .inver-us-logo.inver-us-idg
+                .inver-us-explain 2014年2月，网利宝获得国际知名风投IDG资本A轮投资。自1992年开始，作为最早进入中国市场的国际投资机构之一，IDG资本已投资百度、腾讯、携程等200家优秀企业，并已有超过60家企业在美国、中国香港、中国A股证券市场上市，或通过M&A成功退出。
+              .inver-us-item
+                .inver-us-logo.inver-us-hl
+                .inver-us-explain 2015年5月5日，网利宝获市值百亿上市公司鸿利光电拟共4000万美元B轮融资。作为一家国家级高新技术企业，鸿利光电LED器件在显指、光效、稳定性等方面的指标均达到国内领先水平，是国内率先通过美国环保总署(EPA)认可的第三方IES LM-80测试的LED封装企业，是中国白光LED器件领军者，致力打造中国领先的LED+互联网金融+车联网的生态平台。
+
+      .section.i-mod-warp.i-guide-select
+        .i-guide-item
+          .i-item-cont-warp
+            .guide-title
+              span.guide-tit-4.font-xxl 你可以投哪个？
+            .guide-select-cont
+              mixin selectItme(classname, icon, ptTime, ptTimetxt, productArr, peopleArr)
+                .guide-select-item(class=classname)
+                  .select-left
+                    .left-warp
+                      i.icon.iconfont(class=icon)
+                      .font-xxl=ptTime
+                      .font-s=ptTimetxt
+                  .select-right.font-l.clearfix
+                    .span6.select-rt-product
+                      .rt-warp
+                        .rt-pt-title(class=classname) 产品特点：
+                        for pt in productArr
+                          div=pt
+                    .span6.select-rt-people
+                      .rt-warp
+                        .rt-pt-title(class=classname) 适合人群：
+                        for pt in peopleArr
+                          div=pt
+              - var shortProductArr = ['周期较短', '提现更灵活', '年化收益率相对较低']
+              - var shortPeopleArr = ['1、有短期闲置资金', '2、业余时间较充裕']
+              +selectItme('select-blue', 'icon-short-time', '短期标', '1-3个月', shortProductArr, shortPeopleArr)
+
+              - var longProductArr = ['周期相对较长', '年化收益率相对较高', '一次性理财，省时省心不省息']
+              - var longPeopleArr = ['1、有长期闲置资金', '2、工作繁忙，业余时间很少']
+              +selectItme('select-red', 'icon-long-time', '长期标', '6-12个月', longProductArr, longPeopleArr)
+
+      .section.i-mod-warp.i-guide-invest
+        .i-guide-item
+          .i-item-cont-warp
+            .guide-title
+              span.guide-tit-5.font-xxl 如何投资？
+            .guide-invest-cont
+              mixin investItem(num, title, iconclass)
+                .invest-item
+                  .invest-head
+                    .invest-head-num=num
+                    .invest-head-text.font-xll=title
+                    if num == '4'
+                      .invest-head-text.font-s 邀请好友
+                  .invest-cont
+                    i.icon.iconfont(class=iconclass)
+              mixin rightDiv()
+                .invest-guide-div
+                  i.icon.iconfont.icon-jiantou
+
+              +investItem('1', '注册', 'icon-registered')
+              +rightDiv()
+              +investItem('2', '实名认证', 'icon-idcard')
+              +rightDiv()
+              +investItem('3', '账户充值', 'icon-bankcard')
+              +rightDiv()
+              +investItem('4', '体验投资', 'icon-investment')
+            .guide-invest-footer
+              .invest-ft-title.font-m 开启轻松理财
+              a(href="/accounts/register/").invest-ft-btn
+                i.icon.iconfont.icon-wallet
+                |注册领红包
+    script.
+      require(["/static/src/pc/guide.js"])

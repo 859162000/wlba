@@ -555,9 +555,7 @@ class ShiTouCunRegister(CoopRegister):
             binding.save()
             # logger.debug('save user %s to binding'%user)
 
-    def purchase_call_back(self, user):
-        if P2PRecord.objects.filter(user_id=user.id).count() != 1:
-            return
+    def shitoucun_call_back(self, user):
         # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
         binding = Binding.objects.filter(user_id=user.id).first()
         if binding:
@@ -572,6 +570,15 @@ class ShiTouCunRegister(CoopRegister):
             }
             common_callback.apply_async(
                 kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+
+    def register_call_back(self, user):
+        self.shitoucun_call_back(user)
+
+    def purchase_call_back(self, user):
+        # 判断是否是首次投资
+        if P2PRecord.objects.filter(user_id=user.id).count() != 1:
+            return
+        self.shitoucun_call_back(user)
 
 
 # 注册第三方通道

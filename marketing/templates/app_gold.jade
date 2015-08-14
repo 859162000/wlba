@@ -1,58 +1,48 @@
 - load formatters
 doctype html
-html(style="background:#F8F2CF")
+html(style="background:#fed03b")
   head
-    title 全民淘金
+    title 黄金节
     include include/app_head
   body
-    .m-gold-banner
-      img(src='/static/imgs/mobile_activity/people_gold/gold_banner20150720.jpg')
-    .m-gold-body
-      .gold-body-rule-img
-        .rule-img-title 赚钱流程
-        .rule-img-title2 简单三步，轻松赚现金
-        img(src='/static/imgs/mobile_activity/people_gold/gold_rule1.jpg')
-        img(src='/static/imgs/mobile_activity/people_gold/gold_rule2.jpg')
-      .gold-body-rule-text
-        .rule-text.rule-img-title 活动细则
-        .rule-text-main
-          mixin ruleText(title, items)
-            h2=title
-            each item in items
-              p
-                span —
-                span.item-list=item
-          - var item1 = ['邀请人资格：网利宝注册用户', '被邀请人资格：需在注册时使用邀请人提供的专属链接或专属邀请码，网利宝仅以此确认邀请关系', '邀请关系：活动截止之日前产生的邀请关系均可享受活动邀请奖金']
-          +ruleText('1、邀请规则：', item1)
-          - var item2 = ['用户A邀请新用户B，并享有新用户B每笔投资额3‰的邀请奖金', '用户B再邀请新用户C，则用户B享有新用户C每笔交易额3‰的邀请奖金。同时，用户A也可以享有新用户C每笔投资额3‰的邀请奖金', '用户C再邀请新用户D，则用户C享有新用户D每笔投资额3‰的邀请奖金。同时，用户B也可以享有新用户D每笔投资额3‰的邀请奖金。此时，用户A不再享有新用户D的邀请奖金，以此类推']
-          +ruleText('2、邀请奖金规则', item2)
-          - var item3 = ['按照受邀请人在活动期间每笔投资额的3‰实时计算', '受邀请人投资标满起息日，邀请奖金发放至邀请人账户']
-          +ruleText('3、奖金结算：', item3)
-          - var item4 = ['邀请人所获奖金可提现可投资']
-          +ruleText('4、奖励提取：', item4)
-      .gold-body-explam
-        h2 示例：
-        p 活动期内用户小王新邀请好友30名。30名受邀人活动期内每人投资3月标10万元共三次，同时这些人每人再邀请30人，被邀请（30*30）= 900人每位投资3月标10万元共三次。小王可获邀请奖金：30 x 10 万元 x 3次 x 3‰ + 30 x 30 x 10万元 x3次 x 3‰ = 837,000元
-        p.explam-gle 如果您有300邀请好友，呵呵…………
-        p 您的奖金将是81,270,000元！
-      .gold-body-rule-end
-        .rule-end.rule-img-title 活动规则
-        p 活动有效期：2015年6月23日-2016年6月30日
-        p 本活动可与网利宝其他优惠活动共享
-        p 网利宝两月期(包含两月期)以下的投资产品不参加本活动
-        p 刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予兑现
-        p 本活动不收取任何费用，谨防上当受骗
-        p 网利宝对此活动享有最终解释权
-    .m-gold-footer
-      .up-body
-        span.logo 官方微信：iwanglibao
-        span 理财热线：4008-588-066
-      .bottom-body Copyright©2015 wanglibao.com Inc. All Right Reserved.
-      .bottom-body#ios-show 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关 如有疑问请联系在线客服或拨打4008-588-066
+    .extension-banner
+      img(src="/static/imgs/mobile_activity/app_gold/banner.jpg")
+    .gold-main
+      h1.gold-tit 黄金节是什么?
+      .tu1
+        img(src="/static/imgs/mobile_activity/app_gold/one.jpg")
+      .box1
+        p
+          span 限时
+            b 10天
+          span 限量
+            b 1亿
+          span 8月
+            b 专享
+        a(style="font-size:1.2rem;color:#404980;background:none") 理财专区即可投资
+    .gold-main2
+      h1 8月，投资首选黄金宝！
+      p 8月黄金节，你不可错过的投资盛宴！
+        br
+        |投资网利宝，首选黄金宝！
+      .tu2
+        img(src="/static/imgs/mobile_activity/app_gold/two.jpg")
+    .gold-main(style="height:19.45rem")
+      h3 【活动规则】
+      ul
+        li 1、活动时间：2015年8月13日-8月21日；
+        li 2、黄金节的主打产品为黄金宝，用户可以通过PC端和APP端参与活动投标；
+        li 3、黄金宝所有标期均为2个月，全部标期均加息补贴，限量1亿元标量，先抢先得，抢完为止；
+        li 4、本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑
+        li 5、网利宝对此活动享有最终解释权。
+        li#ios-show(style="display:none") 6、所有活动由网利宝提供，与苹果公司（Apple Inc.）无关 如有疑问请联系在线客服或拨打4008-588-066
     script.
       var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
           iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
           ios = ipad || iphone;
-      if(ios){
-        document.getElementById('ios-show').style.display = 'block';
+      if (ios) {
+          document.getElementById('ios-show').style.display = 'block';
       }
+
+
+

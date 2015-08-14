@@ -2,7 +2,7 @@
 .g-nav-warp
   .g-nav
     a(href="/").g-logo-box
-      img(src="/static/imgs/pc/logo/logo.jpg", alt='logo')
+      img(src="/static/imgs/pc/logo/logo.jpg?v=2", alt='logo')
     .g-user-warp
       .g-user
         if activeItem == "我的账户"
@@ -30,7 +30,7 @@
             a(href=link)= name
       +nav-item('首页', '/')
       +nav-item('理财专区', '/p2p/list/')
-      +nav-item('新手指引', '#')
+      +nav-item('新手指引', '/guide/')
       +nav-item('安全保障', '/security')
       +nav-item('帮助中心', '/help')
 
