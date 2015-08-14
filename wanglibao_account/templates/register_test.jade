@@ -9,6 +9,7 @@ block registerFormPage
         .borderStyle.fl.mg-t-s
         a(href='/accounts/register/').font-l.padding-l-r-s.fl.minNavRight.curr 十秒注册
     #registerForm.login-form
+        - csrf_token
         .registerFormDiv
             ul.registerForm
                 li
