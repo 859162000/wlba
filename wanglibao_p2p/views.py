@@ -22,7 +22,6 @@ from rest_framework.permissions import IsAuthenticated
 from marketing.models import SiteData
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao_account.cooperation import CoopRegister
-from wanglibao_lottery.tasks import send_lottery
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.prepayment import PrepaymentHistory
 from wanglibao_p2p.forms import PurchaseForm, BillForm
