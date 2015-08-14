@@ -90,3 +90,22 @@ class MiscRecommendProduction(object):
         else:
             product = P2PProduct.objects.filter(hide=False).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time').first()
             return product.id
+
+    def get_recommend_product_except_new(self, ids=None):
+        """ 主推标不包含新手标 """
+        ids = self.get_recommend_products()
+        if ids:
+            for id in ids:
+                recommend = P2PProduct.objects.filter(hide=False, status=u'正在招标', id=id).exclude(category=u'新手标')
+                if recommend:
+                    return id
+        # 自定义查询标
+        productions = P2PProduct.objects.filter(hide=False, status=u'正在招标').exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标') | Q(category=u'新手标'))
+        if productions:
+            id_rate = [{'id': q.id, 'rate': q.completion_rate} for q in productions]
+            id_rate = sorted(id_rate, key=lambda x: x['rate'], reverse=True)
+            return id_rate[0]['id']
+
+        else:
+            product = P2PProduct.objects.filter(hide=False).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标') | Q(category=u'新手标')).order_by('-priority', '-publish_time').first()
+            return product.id

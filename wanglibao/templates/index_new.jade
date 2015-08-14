@@ -142,12 +142,10 @@ html
                       earning_rate = str(p2p.expected_earning_rate)
                       span.t-d2.font-m
                         span.font-ll {{earning_rate}}
-                        span %
                         if p2p.activity
                           span +
-                          activityRule = int(p2p.activity.rule.percent_text)
-                          span.font-ll {{activityRule}}
-                          span %
+                          span.font-m {{p2p.activity.rule.percent_text}}
+                        span %
                     .span3.ct
                       span.font-ll {{p2p.period}}
                       span.font-s.t-d11 {{p2p.pay_method|period_unit}}
