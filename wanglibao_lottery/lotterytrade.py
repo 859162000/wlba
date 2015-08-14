@@ -17,14 +17,10 @@ class LotteryTrade(object):
         m = md5()
         m.update(text)
         sign = m.hexdigest()
-        logger.debug('lottery api sign:%s'%sign)
         return sign
 
     def _get_mobile_for_user(self, user):
-        try:
-            return wanglibao_profile.models.WanglibaoUserProfile.objects.get(user_id=user.id).phone
-        except:
-            raise ValueError('failed to get mobile for user %s'%user.id )
+        return wanglibao_profile.models.WanglibaoUserProfile.objects.get(user_id=user.id).phone
 
     def _request_order(self, lottery, user):
         """
@@ -38,16 +34,9 @@ class LotteryTrade(object):
                             channel=settings.LINGCAIBAO_CHANNEL_ID,)
         sign = self._get_sign(request_data)
         request_data['sign'] = sign
-        try:
-            result = requests.get(settings.LINGCAIBAO_URL_ORDER, params=request_data)
-            logger.info('lottery order with para %s with url %s'%(request_data, result.url))
-            logger.info('lottery order with result %s'%result.json())
-            if result.json()['result'] == '1':
-                return True
-            else:
-                return False
-        except:
-            return False
+        result = requests.get(settings.LINGCAIBAO_URL_ORDER, params=request_data)
+        if result.json()['result'] != '1':
+            raise IOError('lottery order failed with para: %s with result: %s'%(request_data, result.json()))
 
     def order(self, user, money_type=0.1):
         """
@@ -55,14 +44,14 @@ class LotteryTrade(object):
         :return:
         """
         lottery = Lottery.objects.create(user=user, money_type=money_type)
-        order_status = self._request_order(lottery, user)
-        if order_status:
+        try:
+            self._request_order(lottery, user)
             lottery.status = "未出票"
             lottery.save()
             return lottery
-        else:
+        except :
             lottery.delete()
-            return None
+            raise
 
     def _get_open_time(self, issue_number):
         issue_delta = int(issue_number) - int(settings.LINGCAIBAO_BASE_ISSUE)
@@ -78,33 +67,31 @@ class LotteryTrade(object):
         出票:设置bet_number, open_time, issue_number, status
         :return:
         """
-        if self._get_sign(data) != sign:
-            return
-        open_time = self._get_open_time(data['issue_number'])
-        try:
-            lottery = Lottery.objects.get(id=data['lottery_id'])
-            lottery.bet_number = data['bet_number']
-            lottery.open_time = self._get_open_time(data['issue_number'])
-            lottery.issue_number = data['issue_number']
-            lottery.status = '已出票'
-            lottery.save()
-            return lottery
-        except:
-            return None
+        right_sign = self._get_sign(data)
+        if right_sign != sign:
+            raise ValueError('lottery sign error with para sign %s and right sign %s'%(sign, right_sign))
+
+        lottery = Lottery.objects.get(id=data['lottery_id'])
+        lottery.bet_number = data['bet_number']
+        lottery.open_time = self._get_open_time(data['issue_number'])
+        lottery.issue_number = data['issue_number']
+        lottery.status = '已出票'
+        lottery.save()
+        return lottery
+
 
     def open(self, data, sign):
         """
         中奖: 设置win_number, prize
         :return:
         """
-        if self._get_sign(data) != sign:
-            return
-        try:
-            lottery = Lottery.objects.get(id=data['lottery_id'])
-            lottery.win_number = data['win_number']
-            lottery.prize = data['prize']
-            lottery.status = '已中奖'
-            lottery.save()
-            return lottery
-        except:
-            return None
+        right_sign = self._get_sign(data)
+        if right_sign != sign:
+            raise ValueError('lottery sign error with para sign %s and right sign %s'%(sign, right_sign))
+
+        lottery = Lottery.objects.get(id=data['lottery_id'])
+        lottery.win_number = data['win_number']
+        lottery.prize = data['prize']
+        lottery.status = '已中奖'
+        lottery.save()
+        return lottery
