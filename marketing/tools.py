@@ -6,6 +6,7 @@ from wanglibao.celery import app
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db import transaction
+from wanglibao_lottery.tasks import send_lottery
 from wanglibao_p2p.models import P2PRecord, P2PProduct
 from wanglibao_account import message as inside_message
 from wanglibao_sms import messages
@@ -35,6 +36,8 @@ def decide_first(user_id, amount, device, product_id=0, is_full=False):
     activity_backends.check_activity(user, 'invest', device_type, amount, product_id, is_full)
     utils.log_clientinfo(device, "buy", user_id, amount)
 
+    #发送红包
+    send_lottery.apply_async((user_id,))
 
 @app.task
 def register_ok(user_id, device):
