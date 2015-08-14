@@ -102,7 +102,6 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
 
         # 主推标
-        recommend_product = None
         recommend_product_id = None
         if self.request.user and self.request.user.is_authenticated():
             user = self.request.user
@@ -118,7 +117,7 @@ class IndexView(TemplateView):
                     misc = MiscRecommendProduction()
                     recommend_product_id = misc.get_recommend_product_except_new()
 
-        if not recommend_product:
+        if not recommend_product_id:
             misc = MiscRecommendProduction()
             recommend_product_id = misc.get_recommend_product_id()
 
