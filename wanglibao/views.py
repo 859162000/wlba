@@ -22,7 +22,7 @@ import pickle
 
 
 class IndexView(TemplateView):
-    template_name = 'index-test.jade'
+    template_name = 'index_new.jade'
 
     PRODUCT_LENGTH = 3
 

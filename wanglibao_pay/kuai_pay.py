@@ -991,8 +991,8 @@ class KuaiShortPay:
         amount = util.fmt_two_amount(amount)
         #if amount < 100 or amount % 100 != 0 or len(str(amount)) > 20:
         #if amount < 10 or amount % 1 != 0 or len(str(amount)) > 20:
-        if amount < 10 or len(str(amount)) > 20:
-            return {"ret_code":20115, 'message':'充值须大于等于10元'}
+        # if amount < 10 or len(str(amount)) > 20:
+        #     return {"ret_code":20115, 'message':'充值须大于等于10元'}
 
         user = request.user
         profile = user.wanglibaouserprofile

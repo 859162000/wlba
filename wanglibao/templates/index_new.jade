@@ -121,7 +121,7 @@ html
             for index, p2p in product
               .pdt-list
                 .pdt-warp.padding-t-l-r-sm
-                  a(href='/p2p/detail/{{p2p.id}}/').pdt-name.mg-b-s
+                  a(href='/p2p/detail/{{p2p.id}}/', title='{{p2p.name}}').pdt-name.mg-b-s
                     i.icon.iconfont.icon-car
                     span.font-l {{p2p.name}}
                   if index == 0

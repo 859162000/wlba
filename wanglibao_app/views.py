@@ -30,6 +30,8 @@ from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_rest.utils import split_ua, get_client_ip
 from wanglibao_banner.models import Banner
 from wanglibao_sms.utils import send_validation_code
+from wanglibao_anti.anti.anti import AntiForAllClient
+from wanglibao_account.forms import verify_captcha
 
 logger = logging.getLogger(__name__)
 
@@ -291,7 +293,18 @@ class SendValidationCodeView(APIView):
     permission_classes = ()
 
     def post(self, request, phone):
+        """
+            modified by: Yihen@20150813
+            descrpition: if(line299~line304)的修改，app端增加图片校验码验证
+        """
         phone_number = phone.strip()
+        if not AntiForAllClient(request).anti_special_channel():
+            res, message = False, u"请输入验证码"
+        else:
+            res, message = verify_captcha(request.POST)
+        if not res:
+            return Response({"ret_code": 40044, "message": message})
+
         status, message = send_validation_code(phone_number, ip=get_client_ip(request))
         if status != 200:
             return Response({"ret_code": 30044, "message": message})
