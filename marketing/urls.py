@@ -52,9 +52,9 @@ urlpatterns += patterns(
     url(r'^app_eight/$', TemplateView.as_view(template_name="app_eight.jade")),
     url(r'^xingmei/$', TemplateView.as_view(template_name="xingmei.jade")),
     url(r'^app_xingmei/$', TemplateView.as_view(template_name="app_xingmei.jade")),
-    url(r'h5_gold/$', TemplateView.as_view(template_name="h5_gold.jade")),
-    url(r'app_qixi/$', TemplateView.as_view(template_name="app_qixi.jade")),
-    url(r'app_gold_day/$', TemplateView.as_view(template_name="app_gold_day.jade")),
+    url(r'^h5_gold/$', TemplateView.as_view(template_name="h5_gold.jade")),
+    url(r'^app_qixi/$', TemplateView.as_view(template_name="app_qixi.jade")),
+    url(r'^app_gold_day/$', TemplateView.as_view(template_name="app_gold_day.jade")),
 
 )
 
