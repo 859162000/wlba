@@ -15,6 +15,7 @@
   color: $t-d6
   font-size: $font-m
   text-align: center
+  font-family: $font-family-button
   +line-height(40)
   +border-radius(4px)
   +inline-block
@@ -35,6 +36,7 @@
   background: $bg-d5
   color: $t-d6
   font-size: $font-m
+  font-family: $font-family-button
   text-align: center
   +line-height(40)
   +border-radius(4px)
@@ -82,6 +84,7 @@
 .ex-dc
   position: relative
   text-align: left
+  height: 215px
   .dc-head
     +clearfix()
     +line-height(58)
@@ -143,7 +146,8 @@
     text-align: center
   .tg-bt-text
     margin-top: 6px
-
+.ex-download-app
+  height: 143px
 .ac-tg-bg
   width: 60px
   height: 60px
@@ -162,11 +166,15 @@
     margin-top: 5px
     +border-radius(4px)
     +line-height(36)
+    .icon
+      font-size: $font-ll
 
 .pdt-progress-warp
   line-height: 1.2
   .progress-x
     margin-top: 5px
+.pdt-progress-percent
+  margin-left: 8px
 .product-progress
   position: relative
   height: 4px
