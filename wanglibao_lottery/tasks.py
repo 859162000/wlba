@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from django.dispatch.dispatcher import receiver
 from django.utils.timezone import get_default_timezone
 from wanglibao.celery import app
-from wanglibao.signals import signal_product_first_bought
 from wanglibao_account.auth_backends import User
 from wanglibao_lottery.lotterytrade import LotteryTrade
 from wanglibao_lottery.models import Lottery
