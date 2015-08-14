@@ -189,7 +189,7 @@ html
               span.font-l.mg-l-s 媒体报道
             .ns-cont.ns-media.t-d4
               for news in news_and_reports
-                a(href="{{news.link}}",title="{{news.name}}", target='_blank').t-d4.font-ss.clearfix.media-list
+                a(href="/news/detail/{{news.id}}", title="{{news.name}}", target='_blank').t-d4.font-ss.clearfix.media-list
                   img(src="/media/{{news.image}}", alt="{{news.name}}")
                   .media-txt {{news.name}}
                   .media-time.t-d9 {{news.created_at | date:"Y-m-d"}}
