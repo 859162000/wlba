@@ -62,14 +62,11 @@ class LotteryIssue(APIView):
             }
         try:
             sign = request.GET.get('sign')
-            lottery = LotteryTrade().issue(data, sign)
-            if lottery:
-                result = {
-                    'orderId': data['lottery_id'],
-                    'result': 1,
-                }
-            else:
-                raise ValueError('lottery failed to  issue %s'%data['lottery_id'])
+            LotteryTrade().issue(data, sign)
+            result = {
+                'orderId': data['lottery_id'],
+                'result': 1,
+            }
         except :
             logger.exception('lottery failed to issue:')
             result = {
@@ -103,14 +100,11 @@ class LotteryOpen(APIView):
                 'tax': request.GET.get('tax'),
             }
             sign = self.request.GET.get('sign')
-            lottery = LotteryTrade().open(data, sign)
-            if lottery:
-                result = {
-                    'orderId': data['lottery_id'],
-                    'result': 1,
-                }
-            else:
-                raise ValueError('lottery failed to  open %s'%data['lottery_id'])
+            LotteryTrade().open(data, sign)
+            result = {
+                'orderId': data['lottery_id'],
+                'result': 1,
+            }
         except:
             logger.exception('lottery failed to open:')
             result = {
