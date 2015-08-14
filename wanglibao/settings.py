@@ -358,6 +358,12 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': '/var/log/wanglibao/mysite.log',
             'formatter': 'verbose'
+        },
+        'anti': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/anti.log',
+            'formatter': 'verbose'
         }
     },
     'loggers': {
@@ -408,6 +414,10 @@ LOGGING = {
         },
         'wanglibao_lottery': {
             'handlers': ['console', 'file'],
+            'level': 'DEBUG'
+        },
+        'wanglibao_anti': {
+            'handlers': ['anti'],
             'level': 'DEBUG'
         },
     }

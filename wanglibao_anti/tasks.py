@@ -36,7 +36,9 @@ def handle_delay_time_data():
         tools.register_ok.apply_async(kwargs={"user_id": id, "device": device})
         record.status = 1
         record.save(update_fields=['status'])
+        logging.debug(" SUCCESS:%s, %s, %s" % (record.ip, record.uid, record.status))
 
     for record in [list().extend(item) for item in valid_records if len(item) > max_record_for_one_ip]:
         record.status = 2
         record.save(update_fields=['status'])
+        logging.debug(" FAILED:%s, %s, %s" % (record.ip, record.uid, record.status))
