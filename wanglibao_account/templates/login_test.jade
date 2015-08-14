@@ -9,7 +9,6 @@ block loginFormPage
         .borderStyle.fl.mg-t-s
         a(href='/accounts/register/').font-l.padding-l-r-s.fl.minNavRight 十秒注册
     form#loginForm.login-form(method='post', action='/accounts/login/ajax/')
-        - csrf_token
         .logonFormDiv
             ul.loginForm.padding-top-xl
                 li
