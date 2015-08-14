@@ -22,7 +22,7 @@ import pickle
 
 
 class IndexView(TemplateView):
-    template_name = 'index-test.jade'
+    template_name = 'index_new.jade'
 
     PRODUCT_LENGTH = 3
 
@@ -102,8 +102,26 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
 
         # 主推标
-        misc = MiscRecommendProduction()
-        recommend_product_id = misc.get_recommend_product_id()
+        recommend_product = None
+        recommend_product_id = None
+        if self.request.user and self.request.user.is_authenticated():
+            user = self.request.user
+            product_new = P2PProduct.objects.filter(hide=False, status=u'正在招标', category=u'新手标')
+            if product_new.exists():
+                if not P2PRecord.objects.filter(user=user).exists():
+                    # 不存在购买记录
+                    id_rate = [{'id': q.id, 'rate': q.completion_rate} for q in product_new]
+                    id_rate = sorted(id_rate, key=lambda x: x['rate'], reverse=True)
+                    recommend_product_id = id_rate[0]['id']
+                else:
+                    # 存在购买记录
+                    misc = MiscRecommendProduction()
+                    recommend_product_id = misc.get_recommend_product_except_new()
+
+        if not recommend_product:
+            misc = MiscRecommendProduction()
+            recommend_product_id = misc.get_recommend_product_id()
+
         recommend_product = P2PProduct.objects.filter(id=recommend_product_id)
 
         # p2p_products = []

@@ -106,7 +106,7 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function( $ ) {
       partnership_H  = $partner.height(),
       $next = $('.cn-next'),
       $last = $('.cn-last'),
-      currentHeight = 170,
+      currentHeight = 172,
       currentPartner = 0,
       speedParner = 100,
       partenrCount = Math.ceil(partnership_H / currentHeight);
