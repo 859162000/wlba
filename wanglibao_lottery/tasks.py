@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from django.dispatch.dispatcher import receiver
 from django.utils.timezone import get_default_timezone
 from wanglibao.celery import app
-from wanglibao.signals import signal_product_first_bought
 from wanglibao_account.auth_backends import User
 from wanglibao_lottery.lotterytrade import LotteryTrade
 from wanglibao_lottery.models import Lottery
@@ -39,11 +38,6 @@ def send_lottery(user_id):
     except:
         pass
 
-@receiver(signal_product_first_bought)
-def send_lottery_on_first_bouhgt(sender, **kwargs):
-    user_id = kwargs['user'].id
-    print 'recieve signal with user_id:%s'%user_id
-    send_lottery.apply_async((user_id,))
 
 
 
