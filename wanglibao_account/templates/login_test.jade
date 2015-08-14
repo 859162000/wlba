@@ -8,8 +8,7 @@ block loginFormPage
         a(href='/accounts/login/').font-l.padding-l-r-s.fl.minNavLeft.curr 快速登录
         .borderStyle.fl.mg-t-s
         a(href='/accounts/register/').font-l.padding-l-r-s.fl.minNavRight 十秒注册
-    form#loginForm.login-form(method='post', action='/accounts/login/ajax/')
-        - csrf_token
+    #loginForm.login-form(method='post', action='/accounts/login/ajax/')
         .logonFormDiv
             ul.loginForm.padding-top-xl
                 li
