@@ -37,6 +37,7 @@ from marketing.utils import set_promo_user, local_to_utc
 from marketing import tools
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
+from wanglibao import settings
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
@@ -72,6 +73,7 @@ class RegisterView(RegistrationView):
     form_class = EmailOrPhoneRegisterForm
 
     def register(self, request, **cleaned_data):
+
         nickname = cleaned_data['nickname']
         password = cleaned_data['password']
         identifier = cleaned_data['identifier']
@@ -98,10 +100,31 @@ class RegisterView(RegistrationView):
         return '/accounts/login/'
 
     def get_context_data(self, **kwargs):
+
+        sign = self.request.GET.get('sign', None)
+        # sign = urllib.urlencode(self.request.GET.get('sign', None))
+
         context = super(RegisterView, self).get_context_data(**kwargs)
         context.update({
             'next': self.request.GET.get('next', '/accounts/login/')
         })
+
+        if sign:
+
+            try:
+                from wanglibao_account.cooperation import get_xicai_user_info
+                key = settings.XICAI_CLIENT_SECRET[0:8]
+                data = get_xicai_user_info(key, sign)
+                phone = data['phone']
+            except Exception, e:
+                print 'get phone error, ', e
+                phone = None
+
+            if phone:
+                context.update({
+                    'phone': phone,
+                })
+
         return context
 
 
