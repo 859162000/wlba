@@ -626,7 +626,7 @@ class CoopQuery(APIView):
 
     def check_sign(self, channel_code, startday, endday, sign):
         m = hashlib.md5()
-        key = getattr(settings, 'WLB_FOR_%s_KEY'%channel_code.upper())
+        key = getattr(settings, 'WLB_FOR_%s_KEY' % channel_code.upper())
         m.update(startday+endday+key)
         local_sign = m.hexdigest()
         if sign != local_sign:
@@ -694,7 +694,7 @@ class CoopQuery(APIView):
                 user_info.append(self.get_user_info_for_coop(user_type, coop_user.user_id, coop_user.created_at))
             except Exception, e:
                 logger.exception(e)
-                logging.debug('get user %s error:%s'%(coop_user.user_id, e))
+                logging.debug('get user %s error:%s' % (coop_user.user_id, e))
 
         return user_info
 
@@ -789,11 +789,11 @@ def get_p2p_info(mproduct):
 
 
 def xicai_get_token():
-    # 希财现在的过期时间在一个月左右
+    # 希财现在的过期时间 10天  864000秒
     url = settings.XICAI_TOKEN_URL
     client_id = settings.XICAI_CLIENT_ID
     client_secret = settings.XICAI_CLIENT_SECRET
-    response = requests.post(url, data={'client_id':client_id, 'client_secret': client_secret})
+    response = requests.post(url, data={'client_id': client_id, 'client_secret': client_secret})
     return response.json()['access_token']
 
 
@@ -915,6 +915,33 @@ def xicai_send_data():
     # 更新有变动的标的的数据
     for p2p_product in xicai_get_updated_p2p():
         xicai_post_updated_product_info(p2p_product, access_token)
+
+
+def get_xicai_user_info(key, sign):
+    """
+    根据希财提供的sign 获取必须的用户信息.
+    如, 手机号, 用户名, (邮箱, 等等)
+    :return:
+    """
+    import base64
+    # pip install pydes --allow-external pydes --allow-unverified pydes
+    from pyDes import des, CBC, PAD_PKCS5
+    k = des(key, CBC, key, pad=None, padmode=PAD_PKCS5)
+
+    # # 加密
+    # d = k.encrypt("phone=13811849325&name=zhoudong&pid=0&t=123456789")
+    # print "Encrypted: %r" % base64.b64encode(d)
+
+    # 解密
+    d = base64.b64decode(sign)
+    source = k.decrypt(d)
+    arg_list = source.split('&')
+    data = dict()
+
+    for arg in arg_list:
+        data[arg.split('=')[0]] = arg.split('=')[1]
+
+    return data
 
 
 if __name__ == '__main__':
