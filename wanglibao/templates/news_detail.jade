@@ -3,9 +3,7 @@ doctype html
 include include/head
 - endwith
 body
-  include include/header
-  include include/navigation
-
+  include global/g_nav
   .space-vertical-ssm
   .media-list-container
     .well
@@ -15,5 +13,5 @@ body
         h3.align-center {{news.name}}
         .content {{news.content|safe}}
 
-  include include/footer
+  include global/g_footer
   include include/tracking

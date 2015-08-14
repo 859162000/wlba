@@ -9,11 +9,15 @@ block registerFormPage
         .borderStyle.fl.mg-t-s
         a(href='/accounts/register/').font-l.padding-l-r-s.fl.minNavRight.curr 十秒注册
     #registerForm.login-form
+        - csrf_token
         .registerFormDiv
             ul.registerForm
                 li
                     i.icon.iconfont.icon-mobile.ml19
-                    input#registerMobile.placeholderInput.checkMobile(type="text", name="identifier", placeholder="请输入手机号", autocomplete='off', title="请输入手机号")
+                    if phone
+                      input#registerMobile.placeholderInput.checkMobile(value='{{ phone }}', type="text",  name="identifier", title="请输入手机号")
+                    else
+                      input#registerMobile.placeholderInput.checkMobile(type="text", name="identifier", placeholder="请输入手机号", autocomplete='off', title="请输入手机号")
                 li.w145
                     i.icon.iconfont.icon-paper-plane.ml17
                     input(type="hidden", name="captcha_0", autocomplete="off")
