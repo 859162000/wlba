@@ -8,8 +8,11 @@
 #########################################################################
 from json import *
 import time
+import logging
 from django.conf import settings
 from wanglibao_anti.models import AntiDelayCallback
+
+logger = logging.getLogger('wanglibao_anti')
 
 
 class GlobalParamsSpace(object):
@@ -31,6 +34,7 @@ class AntiBase(object):
 
         captcha_0 = request.POST.get('captcha_0', "")
         captcha_1 = request.POST.get('captcha_1', "")
+
         if not captcha_0 or not captcha_1:
             return False
         else:
@@ -57,7 +61,7 @@ class AntiForAllClient(AntiBase):
             handler = open("/var/log/wanglibao/anti_special_channel.log", "a")
             handler.write("%s\t%s\n" % (channel, time.strftime('%Y%m%d%H%M%S', time.gmtime())))
         except Exception, reason:
-            pass
+            logger.exception("_write_to_hard_disk Exception:%s" % (reason,))
         pass
 
     def anti_special_channel(self):
