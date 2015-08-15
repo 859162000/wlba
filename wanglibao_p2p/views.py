@@ -52,6 +52,7 @@ from celery.execute import send_task
 from wanglibao_redis.backend import redis_backend
 import pickle
 
+
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
 

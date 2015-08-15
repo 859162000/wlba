@@ -113,7 +113,7 @@ INSTALLED_APPS = (
     'wanglibao_mobile',
     'weixin',
     'wanglibao_app',
-
+    'wanglibao_anti', #add by yihen@20150813, anti module added
     'report',
     'misc',
 
@@ -358,6 +358,12 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': '/var/log/wanglibao/mysite.log',
             'formatter': 'verbose'
+        },
+        'anti': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/anti.log',
+            'formatter': 'verbose'
         }
     },
     'loggers': {
@@ -408,6 +414,10 @@ LOGGING = {
         },
         'wanglibao_lottery': {
             'handlers': ['console', 'file'],
+            'level': 'DEBUG'
+        },
+        'wanglibao_anti': {
+            'handlers': ['anti'],
             'level': 'DEBUG'
         },
     }
@@ -515,6 +525,12 @@ CELERYBEAT_SCHEDULE = {
     'lottery_set_status': {
         'task': 'wanglibao_lottery.tasks.lottery_set_status',
         'schedule': crontab(minute=0, hour=5)
+    },
+
+    #add by Yihen@20150913，定时任务，3分钟给特定渠道返积分或发红包
+    'handle_delay_time_data': {
+        'task': 'wanglibao_anti.tasks.handle_delay_time_data',
+        'schedule': timedelta(minutes=3)
     },
 }
 
@@ -724,8 +740,10 @@ CKEDITOR_CONFIGS = {
 }
 
 #aliyun oss
-ACCESS_KEY_ID = 'ONOxmm1lwPLUyJ6U'
-ACCESS_KEY = 'ainfVHfl2VnnaxlaG7SL9pYPwA6oJU'
+#ACCESS_KEY_ID = 'ONOxmm1lwPLUyJ6U'
+#ACCESS_KEY = 'ainfVHfl2VnnaxlaG7SL9pYPwA6oJU'
+ACCESS_KEY_ID = '9o58bkzjBVRXjUFg'
+ACCESS_KEY = 'nwogz9MF5VjadUSsuDzDM0lKlTN4BN'
 if ENV == ENV_PRODUCTION:
     OSS_ENDPOINT = 'oss-cn-beijing-internal.aliyuncs.com'
     OSS_BUCKET = 'wanglifile'
