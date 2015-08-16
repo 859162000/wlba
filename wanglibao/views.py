@@ -175,7 +175,7 @@ class IndexView(TemplateView):
             if fund_hold_info.exists():
                 for hold_info in fund_hold_info:
                     fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
-
+            print partners
         return {
             "recommend_product": recommend_product,
             "p2p_lt_three": p2p_lt3,

@@ -195,7 +195,7 @@ html
     .i-mod-wrap.mg-t-sm.mg-b-xl
       .i-mod-cooperation
         .cn-head.br-b-d2.font-l.clearfix
-          a(href="").cn-head-title.fl
+          a(href="/partner/").cn-head-title.fl
             i.icon.iconfont.icon-cooperation.mg-r-s.t-d7.font-xxl
             |合作伙伴
           .cn-head-change.fr.t-d7
@@ -203,12 +203,19 @@ html
             i.icon.iconfont.icon-flip-right.font-xl.cn-next
         .cn-cont
           .cn-ul-warp
-            ul.clearfix
-              for partner in partners
+            itemLeng = 14
+            lenarr = range(int((len(partners)+ itemLeng - 1)/ itemLeng))
+            ul
+              for i in lenarr
                 li
-                  a(href="{{partner.link}}", target="_blank", title="{{partner.name}}", rel="nofollow")
-                    img(src="/media/{{partner.image}}", alt="{{partner.name}}")
+                  startItem = i * itemLeng
+                  endItem = (i + 1) * itemLeng
+                  parts = enumerate(partners)
+                  for index, partner in parts
+                    if startItem <= index and index < endItem
+                        a(href="{{partner.link}}",  style="background: url('/media/{{partner.image}}') no-repeat", target="_blank", title="{{partner.name}}",)
     include global/g_footer
     script.
       require(["/static/src/pc/index.js"])
 
+'
