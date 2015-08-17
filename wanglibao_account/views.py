@@ -108,7 +108,7 @@ class RegisterView(RegistrationView):
     def get_context_data(self, **kwargs):
 
         sign = self.request.GET.get('sign', None)
-        sign = urllib.urlencode(self.request.GET.get('sign', None))
+        # sign = urllib.urlencode(self.request.GET.get('sign', None))
 
         context = super(RegisterView, self).get_context_data(**kwargs)
         context.update({
