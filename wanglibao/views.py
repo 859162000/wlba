@@ -27,19 +27,15 @@ class IndexView(TemplateView):
     PRODUCT_LENGTH = 3
 
     def _period_3(self, p2p):
-        # return p2p.filter(Q(pay_method__contains=u'日计息') & Q(period__lte=90) | ~Q(pay_method__contains=u'日计息') & Q(period__lte=3))
-        return p2p.filter(Q(pay_method__contains=u'日计息') & Q(period__lte=60) | ~Q(pay_method__contains=u'日计息') & Q(period__lte=2))
+        return p2p.filter(Q(pay_method__contains=u'日计息') & Q(period__gte=30) & Q(period__lt=90) | ~Q(pay_method__contains=u'日计息') & Q(period__gte=1) & Q(period__lt=3))
 
     def _period_6(self, p2p):
-        # return p2p.filter(Q(pay_method__contains=u'日计息') & (Q(period__gt=90) & Q(period__lte=180)) | ~Q(pay_method__contains=u'日计息') & (Q(period__gt=3) & Q(period__lte=6)))
-        return p2p.filter(Q(pay_method__contains=u'日计息') & (Q(period__gt=60) & Q(period__lte=150)) | ~Q(pay_method__contains=u'日计息') & (Q(period__gt=2) & Q(period__lte=5)))
+        return p2p.filter(Q(pay_method__contains=u'日计息') & (Q(period__gte=90) & Q(period__lt=180)) | ~Q(pay_method__contains=u'日计息') & (Q(period__gte=3) & Q(period__lt=6)))
 
     def _period_9(self, p2p):
-        # return p2p.filter(Q(pay_method__contains=u'日计息') & Q(period__gt=180) | ~Q(pay_method__contains=u'日计息') & Q(period__gt=6))
-        return p2p.filter(Q(pay_method__contains=u'日计息') & Q(period__gt=150) | ~Q(pay_method__contains=u'日计息') & Q(period__gt=5))
+        return p2p.filter(Q(pay_method__contains=u'日计息') & Q(period__gte=180) | ~Q(pay_method__contains=u'日计息') & Q(period__gte=6))
 
-
-    def s_filter_product_period(self, p2p, period):
+    def _filter_product_period(self, p2p, period):
         if period == 3:
             p2p = self._period_3(p2p)
         elif period == 6:
