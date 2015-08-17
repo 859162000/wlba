@@ -917,31 +917,31 @@ def xicai_send_data():
         xicai_post_updated_product_info(p2p_product, access_token)
 
 
-# def get_xicai_user_info(key, sign):
-#     """
-#     根据希财提供的sign 获取必须的用户信息.
-#     如, 手机号, 用户名, (邮箱, 等等)
-#     :return:
-#     """
-#     import base64
-#     # pip install pydes --allow-external pydes --allow-unverified pydes
-#     from pyDes import des, CBC, PAD_PKCS5
-#     k = des(key, CBC, key, pad=None, padmode=PAD_PKCS5)
-#
-#     # # 加密
-#     # d = k.encrypt("phone=13811849325&name=zhoudong&pid=0&t=123456789")
-#     # print "Encrypted: %r" % base64.b64encode(d)
-#
-#     # 解密
-#     d = base64.b64decode(sign)
-#     source = k.decrypt(d)
-#     arg_list = source.split('&')
-#     data = dict()
-#
-#     for arg in arg_list:
-#         data[arg.split('=')[0]] = arg.split('=')[1]
-#
-#     return data
+def get_xicai_user_info(key, sign):
+    """
+    根据希财提供的sign 获取必须的用户信息.
+    如, 手机号, 用户名, (邮箱, 等等)
+    :return:
+    """
+    import base64
+    # pip install pydes --allow-external pydes --allow-unverified pydes
+    from pyDes import des, CBC, PAD_PKCS5
+    k = des(key, CBC, key, pad=None, padmode=PAD_PKCS5)
+
+    # # 加密
+    # d = k.encrypt("phone=13811849325&name=zhoudong&pid=0&t=123456789")
+    # print "Encrypted: %r" % base64.b64encode(d)
+
+    # 解密
+    d = base64.b64decode(sign)
+    source = k.decrypt(d)
+    arg_list = source.split('&')
+    data = dict()
+
+    for arg in arg_list:
+        data[arg.split('=')[0]] = arg.split('=')[1]
+
+    return data
 
 
 if __name__ == '__main__':
