@@ -67,7 +67,7 @@ from wanglibao.settings import AMORIZATION_AES_KEY
 from wanglibao_anti.anti.anti import AntiForAllClient
 
 logger = logging.getLogger(__name__)
-
+logger_anti = logging.getLogger('wanglibao_anti')
 
 class RegisterView(RegistrationView):
     template_name = "register_test.jade"
@@ -108,7 +108,7 @@ class RegisterView(RegistrationView):
     def get_context_data(self, **kwargs):
 
         sign = self.request.GET.get('sign', None)
-        sign = urllib.urlencode(self.request.GET.get('sign', None))
+        # sign = urllib.urlencode(self.request.GET.get('sign', None))
 
         context = super(RegisterView, self).get_context_data(**kwargs)
         context.update({
@@ -1169,6 +1169,7 @@ def ajax_register(request):
 
                 device = utils.split_ua(request)
 
+                logger_anti.debug('yes we will enter the special flow for XINGMEI')
                 if not AntiForAllClient(request).anti_delay_callback_time(user.id, device):
                     tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
