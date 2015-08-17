@@ -45,8 +45,6 @@
 
     .footer-authentication
       .atn-list
-        mixin atnlist(classname)
-          a(href="/", class=classname)
-        +atnlist('atn-ssl')
-        +atnlist('atn-internet')
-        +atnlist('atn-trust')
+        a(href='https://www.instantssl.com/wildcard-ssl.html', class='atn-ssl')
+        a(href='http://www.itrust.org.cn/Home/Index/itrust_certifi?wm=1091876832', class='atn-internet')
+        a(href='https://credit.szfw.org/CX20150611010303010832.html', class='atn-trust')

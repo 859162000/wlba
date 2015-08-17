@@ -30,6 +30,7 @@ html(style='background:#f5f5f5')
               p.item-time=time
           if overdue == 'close'
             img(src='/static/imgs/app/discover/overdue.png').mask
+      +item('/activity/app_gold/', '/static/imgs/app/discover/app_gold.png', '全民淘金季', '邀请好友获3‰的奖金，好友再邀请他人，同样获3‰的双重奖金。', '2015.06.23 至 2016.06.30', 'open')
       +item('/activity/app_father/', '/static/imgs/app/discover/discover_4.png', '父亲节活动', '投资满500即送5元微信红包，最高可送5000元。投资满5000加送100元现金红包。', '2015.06.20 至 2015.06.26', 'close')
       +item('/activity/app_level/', '/static/imgs/app/discover/discover_5.png', '财富擂台赛', '每日投资达3万，即可参加擂台赛，获得额外现金红包，最高1000元。', '2015.06.14 至 2015.07.15', 'close')
 
