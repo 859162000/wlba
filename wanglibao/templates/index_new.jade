@@ -73,7 +73,7 @@ html
                         statusClass = 'un-buy-btn-xl'
                       a(href="/p2p/detail/{{product.id}}/", class='{{statusClass}}') {{status}}
                       amount = product.total_amount - product.ordered_amount
-                      .t-d7.tg-bt-text 剩余金额 ￥ {{amount | money_format_int}}
+                      .t-d7.tg-bt-text 剩余金额 ￥ {{amount | money_format_int}}元
             .ac-tg-bg
 
         .ex-rt-cont
@@ -110,7 +110,7 @@ html
     //product start
     .i-mod-wrap.mg-t-sm
       .i-mod-product.clearfix
-        p2ptype = [{'title': '短期稳赚', 'period': '标的期限1-3月', 'class': 'p2p3', 'data': p2p_lt_three},{'title': '中期保收', 'period': '标的期限3-6月', 'class': 'p2p6', 'data': p2p_lt_six},{'title': '长期增值', 'period': '标的期限6月以上', 'class': 'p2p12', 'data': p2p_gt_six}]
+        p2ptype = [{'title': '短期灵活', 'period': '标的期限1-3月', 'class': 'p2p3', 'data': p2p_lt_three},{'title': '中期稳健', 'period': '标的期限3-6月', 'class': 'p2p6', 'data': p2p_lt_six},{'title': '长期优选', 'period': '标的期限6个月及以上', 'class': 'p2p12', 'data': p2p_gt_six}]
         for type in p2ptype
           .pdt-item
             .pdt-type.padding-sm.br-b-d2(class='{{type.class}}')

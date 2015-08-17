@@ -17,7 +17,7 @@ logger = logging.getLogger('wanglibao_anti')
 
 class GlobalParamsSpace(object):
     DELAY_CHANNELS = ['xingmei']
-
+    ANTI_DEBUG = True
 
 class AntiBase(object):
     '''
@@ -82,6 +82,9 @@ class AntiForAllClient(AntiBase):
         channel = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
         delay_channels = GlobalParamsSpace.DELAY_CHANNELS
 
+        if GlobalParamsSpace.ANTI_DEBUG:
+			logger.debug("xingmei: 进入处理流程, channel: %s; delay_channels:%s;\n" % (channel, delay_channels))
+
         if channel in delay_channels:
             record = AntiDelayCallback()
             record.channel = channel
@@ -92,8 +95,12 @@ class AntiForAllClient(AntiBase):
             record.updatetime = 0
             record.ip = self.request.META['HTTP_X_FORWARD_FOR'] if self.request.META['HTTP_X_FORWARD_FOR'] else self.request.META['REMOTE_ADDR']
             record.save()
+            if GlobalParamsSpace.ANTI_DEBUG:
+                logger.debug("xingmei: save success")
             return True
         else:
+            if GlobalParamsSpace.ANTI_DEBUG:
+                logger.debug("xingmei: save failed, this channel is not in the anti scope")
             return False
 
     def anti_run(self):
