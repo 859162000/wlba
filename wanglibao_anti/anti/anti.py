@@ -50,7 +50,7 @@ class AntiForAllClient(AntiBase):
     '''
     def __init__(self, request):
         self.request = request
-
+        logger.debug("in __init__ request object:{0}".format(self.request.__dict__))
     def _write_to_hard_disk(self, channel):
         '''
             讲数据写文件，方便后期分析
@@ -81,7 +81,7 @@ class AntiForAllClient(AntiBase):
         '''
         channel = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
         delay_channels = GlobalParamsSpace.DELAY_CHANNELS
-
+        logger.debug("info:{0}".format(self.request.__dict__))
         if GlobalParamsSpace.ANTI_DEBUG:
 			logger.debug("request.channel: %s;\n" % (self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING,"")))
 			logger.debug("xingmei: 进入处理流程, channel: %s; delay_channels:%s;\n" % (channel, delay_channels))
