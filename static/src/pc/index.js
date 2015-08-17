@@ -117,7 +117,7 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function( $ ) {
     })
 
     function _amt(page){
-      $partner.animate({'left': - page * 1050}, 100)
+      $partner.animate({'left': - page * 1050}, 200)
     }
   }(
     $('.cn-ul-warp ul'),
