@@ -143,7 +143,8 @@ class IndexView(TemplateView):
             site_data = site_data[MiscRecommendProduction.KEY_PC_DATA]
         else:
             site_data = pc_data_generator()
-            m.update_value(value=site_data)
+            m.update_value(value={MiscRecommendProduction.KEY_PC_DATA: site_data})
+            # m.update_value(value=site_data)
 
         site_data['updated_at'] = m.get_misc().updated_at
 
