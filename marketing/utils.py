@@ -127,6 +127,7 @@ def paginator_factory(obj, page=1, limit=100):
 
 
 def pc_data_generator():
+    down_line_amount = 1355000000.00
     # 累计交易金额
     p2p_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))['amount__sum']
     # 累计交易人数
@@ -145,7 +146,7 @@ def pc_data_generator():
     user_income = income[0] + income_pre
     key = 'pc_index_data'
     return {
-        'p2p_amount': float(p2p_amount),
+        'p2p_amount': float(p2p_amount) + down_line_amount,
         'user_number': user_number,
         'user_income': float(user_income),
         'p2p_register_number':p2p_register_number
