@@ -79,10 +79,12 @@ class AntiForAllClient(AntiBase):
         '''
            针对特定的渠道，进行积分反馈延迟处理, 180s
         '''
-        if GlobalParamsSpace.ANTI_DEBUG:
-            logger.debug("xingmei: 进入处理流程")
         channel = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
         delay_channels = GlobalParamsSpace.DELAY_CHANNELS
+
+        if GlobalParamsSpace.ANTI_DEBUG:
+			logger.debug("request.channel: %s;\n" % (self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING,"")))
+			logger.debug("xingmei: 进入处理流程, channel: %s; delay_channels:%s;\n" % (channel, delay_channels))
 
         if channel in delay_channels:
             record = AntiDelayCallback()

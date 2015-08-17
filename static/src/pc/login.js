@@ -337,7 +337,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         //发送语音验证
         $('.voice').delegate('.voiceValidate','click',function(e){
             e.preventDefault();
-            setVoidCodeFun
+            setVoidCodeFun()
         })
         //提交注册表单
         $('#registerSubmit').on('click',function(){
