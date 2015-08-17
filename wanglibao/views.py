@@ -38,8 +38,7 @@ class IndexView(TemplateView):
         # return p2p.filter(Q(pay_method__contains=u'日计息') & Q(period__gt=180) | ~Q(pay_method__contains=u'日计息') & Q(period__gt=6))
         return p2p.filter(Q(pay_method__contains=u'日计息') & Q(period__gt=150) | ~Q(pay_method__contains=u'日计息') & Q(period__gt=5))
 
-
-    def s_filter_product_period(self, p2p, period):
+    def _filter_product_period(self, p2p, period):
         if period == 3:
             p2p = self._period_3(p2p)
         elif period == 6:
@@ -217,8 +216,13 @@ class PartnerView(TemplateView):
     template_name = 'partner.jade'
 
     def get_context_data(self, **kwargs):
-        cache_backend = redis_backend()
-        partners = cache_backend.get_cache_partners()
+        # cache_backend = redis_backend()
+        # partners = cache_backend.get_cache_partners()
+        partners_data = Partner.objects.filter(type='partner')
+        partners = [
+            {'name': partner.name, 'link': partner.link, 'image': partner.image}
+            for partner in partners_data
+        ]
 
         return {
             'partners': partners
