@@ -102,7 +102,6 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
 
         # 主推标
-        recommend_product = None
         recommend_product_id = None
         if self.request.user and self.request.user.is_authenticated():
             user = self.request.user
@@ -118,7 +117,7 @@ class IndexView(TemplateView):
                     misc = MiscRecommendProduction()
                     recommend_product_id = misc.get_recommend_product_except_new()
 
-        if not recommend_product:
+        if not recommend_product_id:
             misc = MiscRecommendProduction()
             recommend_product_id = misc.get_recommend_product_id()
 
@@ -176,7 +175,7 @@ class IndexView(TemplateView):
             if fund_hold_info.exists():
                 for hold_info in fund_hold_info:
                     fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
-
+            print partners
         return {
             "recommend_product": recommend_product,
             "p2p_lt_three": p2p_lt3,
