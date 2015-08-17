@@ -83,6 +83,7 @@ class AntiForAllClient(AntiBase):
         delay_channels = GlobalParamsSpace.DELAY_CHANNELS
 
         if GlobalParamsSpace.ANTI_DEBUG:
+			logger.debug("request.channel: %s;\n" % (self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING,"")))
 			logger.debug("xingmei: 进入处理流程, channel: %s; delay_channels:%s;\n" % (channel, delay_channels))
 
         if channel in delay_channels:
