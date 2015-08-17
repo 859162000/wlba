@@ -102,34 +102,29 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function( $ ) {
 
 
   //合作伙伴
-  var $partner= $('.cn-ul-warp ul'),
-      partnership_H  = $partner.height(),
-      $next = $('.cn-next'),
-      $last = $('.cn-last'),
-      currentHeight = 170,
-      currentPartner = 0,
-      speedParner = 100,
-      partenrCount = Math.ceil(partnership_H / currentHeight);
+  ~function _initPart($partner, $next, $last, idx, count){
+    $partner.css({'width': $partner.find('li').length * 100 + '%'})
+    $next.on('click',function(){
+      idx++
+      if(idx > count) idx = 0;
+      _amt(idx);
+    })
 
-  $next.on('click',function(){
-    if(currentPartner === partenrCount-1) return
-    currentPartner++
-    $partner.animate({'top': - currentPartner * currentHeight}, speedParner, function(){
-      if(currentPartner === partenrCount-1){
-        $next.addClass('un-click');
-        $last.removeClass('un-click');
-      }
+    $last.on('click',function(){
+      idx--
+      if(idx < 0) idx = count;
+      _amt(idx);
     })
-  })
-  $last.on('click',function(){
-    if(currentPartner === 0) return
-    currentPartner--
-    $partner.animate({'top': currentPartner * currentHeight}, speedParner, function(){
-      if(currentPartner === 0){
-        $next.removeClass('un-click');
-        $last.addClass('un-click');
-      }
-    })
-  })
+
+    function _amt(page){
+      $partner.animate({'left': - page * 1050}, 200)
+    }
+  }(
+    $('.cn-ul-warp ul'),
+    $('.cn-next'),
+    $('.cn-last'),
+    0,
+    $('.cn-ul-warp li').length - 1
+  );
 
 });

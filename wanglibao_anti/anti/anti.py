@@ -8,13 +8,16 @@
 #########################################################################
 from json import *
 import time
+import logging
 from django.conf import settings
 from wanglibao_anti.models import AntiDelayCallback
+
+logger = logging.getLogger('wanglibao_anti')
 
 
 class GlobalParamsSpace(object):
     DELAY_CHANNELS = ['xingmei']
-
+    ANTI_DEBUG = True
 
 class AntiBase(object):
     '''
@@ -31,6 +34,7 @@ class AntiBase(object):
 
         captcha_0 = request.POST.get('captcha_0', "")
         captcha_1 = request.POST.get('captcha_1', "")
+
         if not captcha_0 or not captcha_1:
             return False
         else:
@@ -57,7 +61,7 @@ class AntiForAllClient(AntiBase):
             handler = open("/var/log/wanglibao/anti_special_channel.log", "a")
             handler.write("%s\t%s\n" % (channel, time.strftime('%Y%m%d%H%M%S', time.gmtime())))
         except Exception, reason:
-            pass
+            logger.exception("_write_to_hard_disk Exception:%s" % (reason,))
         pass
 
     def anti_special_channel(self):
@@ -78,6 +82,9 @@ class AntiForAllClient(AntiBase):
         channel = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
         delay_channels = GlobalParamsSpace.DELAY_CHANNELS
 
+        if GlobalParamsSpace.ANTI_DEBUG:
+			logger.debug("xingmei: 进入处理流程, channel: %s; delay_channels:%s;\n" % (channel, delay_channels))
+
         if channel in delay_channels:
             record = AntiDelayCallback()
             record.channel = channel
@@ -88,8 +95,12 @@ class AntiForAllClient(AntiBase):
             record.updatetime = 0
             record.ip = self.request.META['HTTP_X_FORWARD_FOR'] if self.request.META['HTTP_X_FORWARD_FOR'] else self.request.META['REMOTE_ADDR']
             record.save()
+            if GlobalParamsSpace.ANTI_DEBUG:
+                logger.debug("xingmei: save success")
             return True
         else:
+            if GlobalParamsSpace.ANTI_DEBUG:
+                logger.debug("xingmei: save failed, this channel is not in the anti scope")
             return False
 
     def anti_run(self):

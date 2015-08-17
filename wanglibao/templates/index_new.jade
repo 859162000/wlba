@@ -26,9 +26,9 @@ html
                   h4=head
                   p.t-d4=cont1
                   p.t-d4=cont2
-            +intro('icon-rocket', '高收益 低门槛', '30倍银行活期收益', '100元起投')
-            +intro('icon-safe', '保障安全', '民生银行资金托管', '阳光保险承保资金安全')
-            +intro('icon-authority', '专业权威', '网贷协会会员单位', '来自世界顶级的金融精英团队')
+            +intro('icon-rocket', '高收益 低门槛', '30余倍银行活期收益', '100元起投')
+            +intro('icon-safe', '安全保障', '第三方资金托管', '阳光保险承保资金安全')
+            +intro('icon-authority', '专业权威', '华尔街精英金融团队', 'IT数据风控系统')
           .ex-ac-target.mg-t-sm.br-d1.bg-d3
             for product in recommend_product
               .ac-tg-head.span12
@@ -52,14 +52,13 @@ html
 
                   .tg-list.profit-warp
                     earning_rate = str(product.expected_earning_rate)
-                    .t-d2.font-m
+                    .t-d2.font-m.tc
                       span.font-xll {{earning_rate}}
-                      span %
                       if product.activity
                         span +
                         span.font-xll {{product.activity.rule.percent_text}}
-                        span %
-                    .t-d7.tg-bt-text 年收益
+                      span %
+                    .t-d7.tg-bt-text.tc 年化收益
                   .tg-list.profit-date
                     span.t-d5.font-xll {{product.period}}
                       span.font-m {{product.pay_method|period_unit}}
@@ -74,7 +73,7 @@ html
                         statusClass = 'un-buy-btn-xl'
                       a(href="/p2p/detail/{{product.id}}/", class='{{statusClass}}') {{status}}
                       amount = product.total_amount - product.ordered_amount
-                      .t-d7.tg-bt-text 剩余金额 ￥ {{amount | money_format_int}}
+                      .t-d7.tg-bt-text 剩余金额 ￥ {{amount | money_format_int}}元
             .ac-tg-bg
 
         .ex-rt-cont
@@ -87,19 +86,19 @@ html
             .ex-data
               ul.font-s
                   li.mg-b-s
-                    p.t-d7.font-xs 累计投资人数
-                    .num-space.t-d8(data-number='{{site_data.user_number}}', data-type='man')
+                    p.t-d7.font-xs 累计注册人数
+                    .num-space.t-d8(data-number='{{site_data.p2p_register_number}}', data-type='man')
                   li.mg-b-s
-                    p.t-d7.font-xs 为投资人累计赚取收益
+                    p.t-d7.font-xs 累计赚取收益
                     .num-space.t-d8(data-number='{{site_data.user_income}}',data-type='amount')
                   li.mg-b-s
-                    p.t-d7.font-xs 网利金融累计投资金额
+                    p.t-d7.font-xs 累计交易金额
                     .num-space.t-d8(data-number='{{site_data.p2p_amount}}',data-type='amount')
             i.dc-bg.icon.iconfont.icon-amount
           .ex-download-app.mg-t-sm.padding-sm
             img(src='/static/imgs/pc/home/erweima.jpg').dol-app.mg-r-sm.fl
             .dol-btn.fl
-              .t-d4 网利宝APP－随身理财  随时赚钱
+              .t-d4 网利宝APP-随时随地 让钱生钱
               a(href='https://www.wanglibao.com/static/wanglibao1.apk').dol-btn-warp
                 .span3.android-icon.bg-d8.t-d6
                   i.icon.iconfont.icon-android
@@ -111,7 +110,7 @@ html
     //product start
     .i-mod-wrap.mg-t-sm
       .i-mod-product.clearfix
-        p2ptype = [{'title': '短期稳赢', 'period': '标的期限1-3月', 'class': 'p2p3', 'data': p2p_lt_three},{'title': '中期保收', 'period': '标的期限3-6月', 'class': 'p2p6', 'data': p2p_lt_six},{'title': '长期优选', 'period': '标的期限6月以上', 'class': 'p2p12', 'data': p2p_gt_six}]
+        p2ptype = [{'title': '短期灵活', 'period': '标的期限1-3月', 'class': 'p2p3', 'data': p2p_lt_three},{'title': '中期稳健', 'period': '标的期限3-6月', 'class': 'p2p6', 'data': p2p_lt_six},{'title': '长期优选', 'period': '标的期限6个月及以上', 'class': 'p2p12', 'data': p2p_gt_six}]
         for type in p2ptype
           .pdt-item
             .pdt-type.padding-sm.br-b-d2(class='{{type.class}}')
@@ -121,9 +120,9 @@ html
             for index, p2p in product
               .pdt-list
                 .pdt-warp.padding-t-l-r-sm
-                  a(href='/p2p/detail/{{p2p.id}}/', title='{{p2p.name}}').pdt-name.mg-b-s
+                  a(href='/p2p/detail/{{p2p.id}}/', title='{{p2p.name}}').pdt-name.mg-b-s.t-d10
                     //i.icon.iconfont.icon-car
-                    span.font-l.t-d10 {{p2p.name}}
+                    span.font-l {{p2p.name}}
                   if index == 0
                     .t-d7.clearfix
                       .span6.es(title='本息保障：{{p2p.warrant_company}}') 本息保障：{{p2p.warrant_company}}
@@ -146,9 +145,9 @@ html
                           span +
                           span.font-m {{p2p.activity.rule.percent_text}}
                         span %
-                    .span3.ct
+                    .span3.ct.t-d11
                       span.font-ll {{p2p.period}}
-                      span.font-s.t-d11 {{p2p.pay_method|period_unit}}
+                      span.font-s {{p2p.pay_method|period_unit}}
                     .span4
                       if p2p.display_status == '抢购中'
                         statusP2P = '立即投资'
@@ -170,7 +169,7 @@ html
             a(href="/about/").ns-head
               i.icon.iconfont.icon-about
               span.font-l.mg-l-s 关于网利宝
-            .ns-cont
+            a(href="/guide/").ns-cont
               img(src='/static/imgs/pc/home/about.gif').ns-about
           li.mg-r-xxl
             a(href="/announcement/").ns-head
@@ -189,30 +188,34 @@ html
               span.font-l.mg-l-s 媒体报道
             .ns-cont.ns-media.t-d4
               for news in news_and_reports
-                a(href="{{news.link}}",title="{{news.name}}", target='_blank').t-d4.font-ss.clearfix.media-list
+                a(href="/news/detail/{{news.id}}", title="{{news.name}}", target='_blank').t-d4.font-ss.clearfix.media-list
                   img(src="/media/{{news.image}}", alt="{{news.name}}")
                   .media-txt {{news.name}}
                   .media-time.t-d9 {{news.created_at | date:"Y-m-d"}}
     .i-mod-wrap.mg-t-sm.mg-b-xl
       .i-mod-cooperation
         .cn-head.br-b-d2.font-l.clearfix
-          .cn-head-title.fl
+          a(href="/partner/").cn-head-title.fl
             i.icon.iconfont.icon-cooperation.mg-r-s.t-d7.font-xxl
             |合作伙伴
           .cn-head-change.fr.t-d7
-            i.icon.iconfont.icon-flip-left.mg-r-sm.font-xl.un-click.cn-last
-            if partners.length <= 14
-              i.icon.iconfont.icon-flip-right.font-xl.cn-next.un-click
-            else
-              i.icon.iconfont.icon-flip-right.font-xl.cn-next
+            i.icon.iconfont.icon-flip-left.mg-r-sm.font-xl.cn-last
+            i.icon.iconfont.icon-flip-right.font-xl.cn-next
         .cn-cont
           .cn-ul-warp
-            ul.clearfix
-              for partner in partners
+            itemLeng = 14
+            lenarr = range(int((len(partners)+ itemLeng - 1)/ itemLeng))
+            ul
+              for i in lenarr
                 li
-                  a(href="{{partner.link}}", target="_blank", title="{{partner.name}}", rel="nofollow")
-                    img(src="/media/{{partner.image}}", alt="{{partner.name}}")
+                  startItem = i * itemLeng
+                  endItem = (i + 1) * itemLeng
+                  parts = enumerate(partners)
+                  for index, partner in parts
+                    if startItem <= index and index < endItem
+                        a(href="{{partner.link}}",  style="background: url('/media/{{partner.image}}') no-repeat", target="_blank", title="{{partner.name}}",)
     include global/g_footer
     script.
       require(["/static/src/pc/index.js"])
 
+'

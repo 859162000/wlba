@@ -31,7 +31,7 @@ html
           .i-item-cont-warp
             .guide-title
               span.guide-tit-1.font-xxl 什么是网利宝？
-            .guide-item-1-txt.t-d11.jy.padding-l-r-sm 网利宝（www.wanglibao.com）是网利金融旗下的在线理财平台，中国第一家互联网私人银行。网利宝在业内独创产融结合的业务模式，凭借丰富的金融行业经验、互联网优势，联合中国领先的金融机构、产业龙头企业进行战略合作，为投资用户提供高收益、安全透明、期限灵活的理财产品。网利宝的金融产品研发团队目前已覆盖全国近二十个省市，执行360度全方位风险控制，确保我们的理财产品安全可靠，为投资者的财富增值保驾护航。
+            .guide-item-1-txt.t-d11.jy.padding-l-r-sm 网利宝（www.wanglibao.com）是网利金融旗下的在线理财平台，中国第一家互联网私人银行。网利宝在业内独创产融结合的业务模式，凭借丰富的金融行业经验、互联网优势，联合中国领先的金融机构、产业龙头企业进行战略合作，为投资用户提供高收益、安全透明、期限灵活的理财产品。网利宝的金融产品研发团队目前已覆盖全国20多个省市，执行360度全方位风险控制，确保我们的理财产品安全可靠，为投资者的财富增值保驾护航。
             img(src="/static/imgs/pc/guide/guide_company.jpg").guide-item-company
 
       .section.i-mod-warp.i-guide-advantage
@@ -105,9 +105,15 @@ html
               - var shortPeopleArr = ['1、有短期闲置资金', '2、业余时间较充裕']
               +selectItme('select-blue', 'icon-short-time', '短期标', '1-3个月', shortProductArr, shortPeopleArr)
 
+              - var zhongProductArr = ['利率稳定', '平衡收益和周期', '投资选择更灵活']
+              - var zhongPeopleArr = ['1.近半年有闲置资金', '2.期待回款速度和收益的双赢']
+              +selectItme('select-green', 'icon-mid-time', '中期标', '3-6个月', zhongProductArr, zhongPeopleArr)
+
               - var longProductArr = ['周期相对较长', '年化收益率相对较高', '一次性理财，省时省心不省息']
               - var longPeopleArr = ['1、有长期闲置资金', '2、工作繁忙，业余时间很少']
-              +selectItme('select-red', 'icon-long-time', '长期标', '6-12个月', longProductArr, longPeopleArr)
+              +selectItme('select-red', 'icon-long-time', '长期标', '6个月以上', longProductArr, longPeopleArr)
+
+
 
       .section.i-mod-warp.i-guide-invest
         .i-guide-item

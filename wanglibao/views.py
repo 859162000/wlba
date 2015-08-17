@@ -27,13 +27,13 @@ class IndexView(TemplateView):
     PRODUCT_LENGTH = 3
 
     def _period_3(self, p2p):
-        return p2p.filter(Q(pay_method__contains=u'日计息') & Q(period__lte=90) | ~Q(pay_method__contains=u'日计息') & Q(period__lte=3))
+        return p2p.filter(Q(pay_method__contains=u'日计息') & Q(period__gte=30) & Q(period__lt=90) | ~Q(pay_method__contains=u'日计息') & Q(period__gte=1) & Q(period__lt=3))
 
     def _period_6(self, p2p):
-        return p2p.filter(Q(pay_method__contains=u'日计息') & (Q(period__gt=90) & Q(period__lte=180)) | ~Q(pay_method__contains=u'日计息') & (Q(period__gt=3) & Q(period__lte=6)))
+        return p2p.filter(Q(pay_method__contains=u'日计息') & (Q(period__gte=90) & Q(period__lt=180)) | ~Q(pay_method__contains=u'日计息') & (Q(period__gte=3) & Q(period__lt=6)))
 
     def _period_9(self, p2p):
-        return p2p.filter(Q(pay_method__contains=u'日计息') & Q(period__gt=180) | ~Q(pay_method__contains=u'日计息') & Q(period__gt=6))
+        return p2p.filter(Q(pay_method__contains=u'日计息') & Q(period__gte=180) | ~Q(pay_method__contains=u'日计息') & Q(period__gte=6))
 
     def _filter_product_period(self, p2p, period):
         if period == 3:
@@ -102,7 +102,6 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
 
         # 主推标
-        recommend_product = None
         recommend_product_id = None
         if self.request.user and self.request.user.is_authenticated():
             user = self.request.user
@@ -118,7 +117,7 @@ class IndexView(TemplateView):
                     misc = MiscRecommendProduction()
                     recommend_product_id = misc.get_recommend_product_except_new()
 
-        if not recommend_product:
+        if not recommend_product_id:
             misc = MiscRecommendProduction()
             recommend_product_id = misc.get_recommend_product_id()
 
@@ -144,7 +143,8 @@ class IndexView(TemplateView):
             site_data = site_data[MiscRecommendProduction.KEY_PC_DATA]
         else:
             site_data = pc_data_generator()
-            m.update_value(value=site_data)
+            m.update_value(value={MiscRecommendProduction.KEY_PC_DATA: site_data})
+            # m.update_value(value=site_data)
 
         site_data['updated_at'] = m.get_misc().updated_at
 
@@ -176,7 +176,7 @@ class IndexView(TemplateView):
             if fund_hold_info.exists():
                 for hold_info in fund_hold_info:
                     fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
-
+            print partners
         return {
             "recommend_product": recommend_product,
             "p2p_lt_three": p2p_lt3,
@@ -214,8 +214,13 @@ class PartnerView(TemplateView):
     template_name = 'partner.jade'
 
     def get_context_data(self, **kwargs):
-        cache_backend = redis_backend()
-        partners = cache_backend.get_cache_partners()
+        # cache_backend = redis_backend()
+        # partners = cache_backend.get_cache_partners()
+        partners_data = Partner.objects.filter(type='partner')
+        partners = [
+            {'name': partner.name, 'link': partner.link, 'image': partner.image}
+            for partner in partners_data
+        ]
 
         return {
             'partners': partners
