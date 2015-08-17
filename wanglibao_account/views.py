@@ -102,6 +102,8 @@ class RegisterView(RegistrationView):
     def get_context_data(self, **kwargs):
 
         sign = self.request.GET.get('sign', None)
+        promo_token = self.request.GET.get('promo_token', None)
+
         # sign = urllib.urlencode(self.request.GET.get('sign', None))
 
         context = super(RegisterView, self).get_context_data(**kwargs)
@@ -109,7 +111,7 @@ class RegisterView(RegistrationView):
             'next': self.request.GET.get('next', '/accounts/login/')
         })
 
-        if sign:
+        if sign and promo_token == 'csai':
 
             try:
                 from wanglibao_account.cooperation import get_xicai_user_info
