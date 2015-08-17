@@ -9,7 +9,7 @@
 from json import *
 import time
 import logging
-from django.conf import settings
+from wanglibao import settings
 from wanglibao_anti.models import AntiDelayCallback
 
 logger = logging.getLogger('wanglibao_anti')
@@ -50,7 +50,7 @@ class AntiForAllClient(AntiBase):
     '''
     def __init__(self, request):
         self.request = request
-        logger.debug("in __init__ request object:{0}".format(self.request.__dict__))
+
     def _write_to_hard_disk(self, channel):
         '''
             讲数据写文件，方便后期分析
