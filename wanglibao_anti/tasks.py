@@ -17,11 +17,30 @@ from json import JSONEncoder
 
 logger = logging.getLogger('wanglibao_anti')
 
+
+def recover_anti_user_data():
+    """每过3分钟启动一次，处理星美等渠道的红包、积分情况,
+        针对被误打的用户，人工手动干预标记为3，在下次任务启动的时候，重新向用户发送红包积分等
+    """
+    channels = GlobalParamsSpace.DELAY_CHANNELS
+    records = AntiDelayCallback.objects.filter(channel__in=channels, status=3).values("updatetime", "status", "ip", "device", "uid")
+    for record in records:
+        device, uid = JSONEncoder.encoding(record["device"]), record["uid"]
+        tools.register_ok.apply_async(kwargs={"user_id": uid, "device": device})
+        record.status = 1
+        record.updatetime = int(time.time())
+        record.save(update_fields=['status', 'updatetime'])
+        logging.debug(" RECOVER:%s, %s, %s" % (record.ip, record.uid, record.status))
+
+
 @app.task
 def handle_delay_time_data():
     """每过3分钟启动一次，处理星美等渠道的红包、积分情况,
         如果某个IP在过去的3分钟内，申请次数大于max_record_for_one_ip,认为是作弊
     """
+
+    recover_anti_user_data()
+
     channels = GlobalParamsSpace.DELAY_CHANNELS
     max_record_for_one_ip = 20
 
@@ -39,7 +58,7 @@ def handle_delay_time_data():
     [valid_list.extend(value) for value in valid_records.values() if len(value) <= max_record_for_one_ip ]
     for record in valid_list:
         device, uid = JSONEncoder.encoding(record["device"]), record["uid"]
-        tools.register_ok.apply_async(kwargs={"user_id": id, "device": device})
+        tools.register_ok.apply_async(kwargs={"user_id": uid, "device": device})
         record.status = 1
         record.updatetime = int(time.time())
         record.save(update_fields=['status', 'updatetime'])
