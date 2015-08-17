@@ -1171,7 +1171,7 @@ def ajax_register(request):
 
                 device = utils.split_ua(request)
 
-                logger_anti.debug('yes we will enter the special flow for XINGMEI')
+                logger_anti.debug('yes we will enter the special flow for XINGMEI: channel---> %s ' % (request.session.get(settings.PROMO_TOKEN_QUERY_STRING, ""))
                 if not AntiForAllClient(request).anti_delay_callback_time(user.id, device):
                     tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
