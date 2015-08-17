@@ -514,7 +514,8 @@ CELERYBEAT_SCHEDULE = {
 
     'pc_index_data': {
         'task': 'marketing.tasks.generate_pc_index_data',
-        'schedule': crontab(minute=10, hour=0),
+        # 'schedule': crontab(minute=10, hour=0),
+        'schedule': crontab(minute=2),
     },
 
     'all_invite_earning_data': {
