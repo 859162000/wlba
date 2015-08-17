@@ -331,6 +331,9 @@ class UserAmortizationAdmin(ConcurrentModelAdmin):
     def has_add_permission(self, request):
         return False
 
+    def get_readonly_fields(self, request, obj=None):
+        return [f.name for f in self.model._meta.fields]
+
 
 class P2PRecordResource(resources.ModelResource):
     user_name = fields.Field(attribute="user__wanglibaouserprofile__name", column_name=u'姓名')
@@ -455,6 +458,9 @@ class ProductAmortizationAdmin(ReadPermissionModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.list_display
 
 
 class EarningAdmin(admin.ModelAdmin):
