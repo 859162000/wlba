@@ -214,9 +214,15 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         var count, element, intervalId, phoneNumber, timerFunction;
         element = $('.getCodeBtnTrue');
         phoneNumber = $.trim($("#registerMobile").val());
+        var captcha_0 = $('#registerForm').find('input[name="captcha_0"]').val();
+        var captcha_1 = $('#registerForm').find('#registerCode').val();
         $.ajax({
             url: "/api/phone_validation_code/register/" + phoneNumber + "/",
-            type: "POST"
+            type: "POST",
+            data: {
+                captcha_0: captcha_0,
+                captcha_1: captcha_1
+            }
         }).done(function() {
             count = 60;
             $(element).attr('disabled', 'disabled').addClass('buttonGray');
