@@ -245,7 +245,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         }).fail(function(xhr) {
             clearInterval(intervalId);
             var result = JSON.parse(xhr.responseText);
-            //$('#registerForm').find('.loginError').text(result.message);
+            $('#registerForm').find('.loginError').text(result.message);
             imgCodeRe('registerForm');
             $('#registerCode').val('').focus();
             $('.getCodeBtn').addClass('buttonGray').removeClass('getCodeBtnTrue');
@@ -307,11 +307,13 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
             checkPwdFun('registerForm');
         })
         //注册图片验证码
-        $('#registerCode').on('blur',function() {
+        $('#registerCode').on('keyup',function() {
             var getCodeBtn = $('.getCodeBtn');
             if($('#registerCode').val() != ''){
                 checkMobileFun('registerForm');
                 getCodeBtn.removeClass('buttonGray').addClass('getCodeBtnTrue');
+            }else{
+                getCodeBtn.removeClass('getCodeBtnTrue').addClass('buttonGray');
             }
         })
         //注册短信验证码
