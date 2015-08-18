@@ -507,6 +507,7 @@ CELERYBEAT_SCHEDULE = {
     #     'schedule': timedelta(minutes=30)
     # }
 
+    #add by guoya: 希财网渠道数据定时推送
     'xicai_send_data': {
         'task': 'wanglibao_account.tasks.xicai_send_data_task',
         'schedule': timedelta(hours=1),
