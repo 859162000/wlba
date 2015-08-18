@@ -108,6 +108,8 @@ class RegisterView(RegistrationView):
     def get_context_data(self, **kwargs):
 
         sign = self.request.GET.get('sign', None)
+        promo_token = self.request.GET.get('promo_token', None)
+
         # sign = urllib.urlencode(self.request.GET.get('sign', None))
 
         context = super(RegisterView, self).get_context_data(**kwargs)
@@ -115,7 +117,7 @@ class RegisterView(RegistrationView):
             'next': self.request.GET.get('next', '/accounts/login/')
         })
 
-        if sign:
+        if sign and promo_token == 'csai':
 
             try:
                 from wanglibao_account.cooperation import get_xicai_user_info
@@ -1141,6 +1143,7 @@ def ajax_register(request):
         return json.dumps(res)
 
     if request.method == "POST":
+        channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING,"")
         if request.is_ajax():
 
             res, message = verify_captcha(dic=request.POST, keep=True)
@@ -1169,8 +1172,7 @@ def ajax_register(request):
 
                 device = utils.split_ua(request)
 
-                logger_anti.debug('yes we will enter the special flow for XINGMEI: channel---> %s ' % (request.session.get(settings.PROMO_TOKEN_QUERY_STRING, ""))
-                if not AntiForAllClient(request).anti_delay_callback_time(user.id, device):
+                if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
                     tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
                 account_backends.set_source(request, auth_user)
