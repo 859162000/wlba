@@ -127,8 +127,8 @@ html
                     span.font-l {{p2p.name}}
                   if index == 0
                     .t-d7.clearfix
-                      .span5.es(title='合作机构：{{p2p.warrant_company}}') 合作机构：{{p2p.warrant_company}}
-                      .span7.es(title='还款方式：{{p2p.display_payback_method}}') 还款方式：{{p2p.display_payback_method}}
+                      .span5.es 合作机构: {{p2p.warrant_company}}
+                      .span7.es 还款方式: {{p2p.display_payback_method}}
                     .pdt-progress-warp.clearfix
                       .product-progress.progress-x.fl
                         percent = float(p2p.ordered_amount) / p2p.total_amount * 100
