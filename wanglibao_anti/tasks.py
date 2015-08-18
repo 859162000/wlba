@@ -13,7 +13,7 @@ from marketing import tools
 from wanglibao_anti.models import AntiDelayCallback
 from wanglibao_anti.anti.anti import GlobalParamsSpace
 from wanglibao.celery import app
-from json import JSONEncoder
+from json import JSONDecoder
 
 logger = logging.getLogger('wanglibao_anti')
 
@@ -25,7 +25,7 @@ def recover_anti_user_data():
     channels = GlobalParamsSpace.DELAY_CHANNELS
     records = AntiDelayCallback.objects.filter(channel__in=channels, status=3).values("updatetime", "status", "ip", "device", "uid")
     for record in records:
-        device, uid = JSONEncoder.encoding(record["device"]), record["uid"]
+        device, uid = JSONDecoder().decode(record["device"]), record["uid"]
         tools.register_ok.apply_async(kwargs={"user_id": uid, "device": device})
         record.status = 1
         record.updatetime = int(time.time())
@@ -57,7 +57,7 @@ def handle_delay_time_data():
     #处理正常用户
     [valid_list.extend(value) for value in valid_records.values() if len(value) <= max_record_for_one_ip ]
     for record in valid_list:
-        device, uid = JSONEncoder.encoding(record["device"]), record["uid"]
+        device, uid = JSONDecoder().decode(record["device"]), record["uid"]
         tools.register_ok.apply_async(kwargs={"user_id": uid, "device": device})
         record.status = 1
         record.updatetime = int(time.time())
