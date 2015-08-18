@@ -75,11 +75,12 @@ class AntiForAllClient(AntiBase):
 
         return True
 
-    def anti_delay_callback_time(self, uid, device, channel=None):
+    def anti_delay_callback_time(self, uid, device):
         '''
            针对特定的渠道，进行积分反馈延迟处理, 180s
         '''
 
+        channel = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
         delay_channels = GlobalParamsSpace.DELAY_CHANNELS
         if GlobalParamsSpace.ANTI_DEBUG:
 			logger.debug("request.channel: %s;\n" % (channel,))
@@ -87,12 +88,12 @@ class AntiForAllClient(AntiBase):
         if channel in delay_channels:
             record = AntiDelayCallback()
             record.channel = channel
-            record.device = JSONEncoder.encode(device)
+            record.device = JSONEncoder().encode(device)
             record.uid = uid
             record.createtime = int(time.time())
             record.status = 0
             record.updatetime = 0
-            record.ip = self.request.META['HTTP_X_FORWARD_FOR'] if self.request.META['HTTP_X_FORWARD_FOR'] else self.request.META['REMOTE_ADDR']
+            record.ip = self.request.META['HTTP_X_FORWARD_FOR'] if self.request.META.get('HTTP_X_FORWAED_FOR', None) else self.request.META.get('REMOTE_ADDR', "")
             record.save()
             if GlobalParamsSpace.ANTI_DEBUG:
                 logger.debug("xingmei: save success")
