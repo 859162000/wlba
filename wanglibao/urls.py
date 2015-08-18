@@ -24,6 +24,7 @@ from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDate
 from marketing.views import NewsListView, NewsDetailView
 from wanglibao_activity.decorators import decorator_include
 from wanglibao_activity.decorators import wap_activity_manage
+from wanglibao.views import landpage_view
 
 admin.site = AdminSitePlus()
 admin.autodiscover()
@@ -93,6 +94,7 @@ urlpatterns = patterns(
 
     url(r'^tender_agreement/',  AgreementAutoView.as_view(), name="agreement_auto"),
     url(r'^lottery/', include('wanglibao_lottery.urls')),
+    url(r'^landpage/', landpage_view, name='fubaba_view'),
 )
 
 urlpatterns += patterns(
