@@ -224,7 +224,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                 captcha_1: captcha_1
             }
         }).done(function() {
-            count = 5;
+            count = 60;
             $(element).attr('disabled', 'disabled').addClass('buttonGray');
             $('.voiceValidate').attr('disabled', 'disabled');
             timerFunction = function() {
