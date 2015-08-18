@@ -179,7 +179,7 @@ html
               span.font-l.mg-l-s 平台公告
             .ns-cont.ns-notice.t-d4
               for anno in announcements
-                a(href="baiducom").font-ss.clearfix
+                a(href="{{anno.get_absolute_url}}/" target="_blank").font-ss.clearfix
                   .span9.notice-body
                     i.icon-notice-self
                     |&nbsp{{anno}}
