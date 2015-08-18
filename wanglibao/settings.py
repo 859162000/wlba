@@ -699,8 +699,10 @@ CKEDITOR_CONFIGS = {
 }
 
 #aliyun oss
-ACCESS_KEY_ID = 'ONOxmm1lwPLUyJ6U'
-ACCESS_KEY = 'ainfVHfl2VnnaxlaG7SL9pYPwA6oJU'
+#ACCESS_KEY_ID = 'ONOxmm1lwPLUyJ6U'
+#ACCESS_KEY = 'ainfVHfl2VnnaxlaG7SL9pYPwA6oJU'
+ACCESS_KEY_ID = '9o58bkzjBVRXjUFg'
+ACCESS_KEY = 'nwogz9MF5VjadUSsuDzDM0lKlTN4BN'
 if ENV == ENV_PRODUCTION:
     OSS_ENDPOINT = 'oss-cn-beijing-internal.aliyuncs.com'
     OSS_BUCKET = 'wanglifile'

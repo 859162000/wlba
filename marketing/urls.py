@@ -12,7 +12,7 @@ urlpatterns = patterns(
     url(r'^share_regnew_href/$', TemplateView.as_view(template_name="share_regnew_href.jade")),
     url(r'^wap/agreement/$', TemplateView.as_view(template_name="app_agreement.jade")),
     url(r'^full_send/$', TemplateView.as_view(template_name="full_send.jade")),
-    url(r'^ko_movie/$', TemplateView.as_view(template_name="ko_movie.jade")),
+#    url(r'^ko_movie/$', TemplateView.as_view(template_name="ko_movie.jade")),
     url(r'^movie_login/$', TemplateView.as_view(template_name="app_movie_login.jade")),
     url(r'^agree_xieyi/$', TemplateView.as_view(template_name="agree_xieyi.jade")),
     url(r'^list_level/$', TemplateView.as_view(template_name="list_level.jade")),
@@ -29,6 +29,8 @@ urlpatterns = patterns(
     url(r'^singapore/$', TemplateView.as_view(template_name="singapore.jade")),
     url(r'^eight_gift/$', TemplateView.as_view(template_name="eight_gift.jade")),
     url(r'^advance/$', TemplateView.as_view(template_name="advance.jade")),
+    url(r'^gold/$', TemplateView.as_view(template_name="gold.jade")),
+    url(r'^qixi/$', TemplateView.as_view(template_name="qixi.jade")),
 
 
 )
@@ -50,6 +52,9 @@ urlpatterns += patterns(
     url(r'^app_eight/$', TemplateView.as_view(template_name="app_eight.jade")),
     url(r'^xingmei/$', TemplateView.as_view(template_name="xingmei.jade")),
     url(r'^app_xingmei/$', TemplateView.as_view(template_name="app_xingmei.jade")),
+    url(r'^h5_gold/$', TemplateView.as_view(template_name="h5_gold.jade")),
+    url(r'^app_qixi/$', TemplateView.as_view(template_name="app_qixi.jade")),
+    url(r'^app_gold_day/$', TemplateView.as_view(template_name="app_gold_day.jade")),
 
 )
 
