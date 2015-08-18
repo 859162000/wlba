@@ -141,7 +141,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       url: url
       type: "POST"
       data: {
-        phone: $("#button-get-validate-code").attr('data-phone').trim()
+        phone: $("#button-get-code-btn").attr('data-phone').trim()
       }
     .success (json)->
       if(json.ret_code == 0)
@@ -149,7 +149,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
 
         intervalId
         count = 180
-        button = $("#button-get-validate-code")
+        button = $("#button-get-code-btn")
 
         button.attr 'disabled', 'disabled'
         button.addClass 'button-gray'
