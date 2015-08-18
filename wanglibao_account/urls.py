@@ -15,6 +15,7 @@ from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, 
                    MessageListAPIView, AccountRepayment, AddressView, AccountInviteView, user_product_contract_kf)#, CjdaoApiView)
 from django.contrib.auth import views as auth_views
 from views import AutomaticView
+from wanglibao_lottery.views import LotteryListTemplateView
 
 urlpatterns = patterns(
     '',
@@ -36,6 +37,9 @@ urlpatterns = patterns(
     url(r'^repayment/$', login_required(AccountRepayment.as_view(), login_url='/accounts/login/')),
     url(r'^transaction/deposit/$', login_required(AccountTransactionDeposit.as_view(),
                                                   login_url='/accounts/login/')),
+    # 彩票详情页
+    # url(r'^caipiao/detail/$', login_required(AccountTransactionDeposit.as_view(),
+    #                                               login_url='/accounts/login/')),
     url(r'^transaction/withdraw/$', login_required(AccountTransactionWithdraw.as_view(),
                                                    login_url='/accounts/login/')),
     url(r'^bankcard/$', login_required(AccountBankCard.as_view(),
@@ -53,9 +57,11 @@ urlpatterns = patterns(
 
     url(r'^login/$', 'django.contrib.auth.views.login',
         {
-            "template_name": "login.jade",
+            "template_name": "login_test.jade",
             "authentication_form": EmailOrPhoneAuthenticationForm,
         }, name="auth_login"),
+
+
     url(r'^login/callback/$', login_required(Third_login_back.as_view())),
     url(r'^login/(?P<login_type>\w+)/$', login_required(Third_login.as_view())),
 
@@ -99,6 +105,7 @@ urlpatterns = patterns(
     url(r'^address/$', login_required(AddressView.as_view(), login_url='/accounts/login/'), name='accounts_address'),
 
     url(r'^auto_tender/$', login_required(AutomaticView.as_view(), login_url='/accounts/login/')),
+    url(r'^caipiao/$', login_required(LotteryListTemplateView.as_view(), login_url='/accounts/login/')),
 )
 
 if settings.DEBUG:

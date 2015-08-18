@@ -45,18 +45,28 @@ class redis_backend(object):
             return self.redis.get(key)
         return None
 
-    def _lpush(self, key, value):
-        if self.redis:
-            self.redis.lpush(key, value)
-
     def _delete(self, key):
         if self.redis:
             self.redis.delete(key)
 
+    def _lpush(self, key, value):
+        if self.redis:
+            self.redis.lpush(key, value)
+
+    def _rpush(self, key, value):
+        if self.redis:
+            self.redis.rpush(key, value)
+
+    def _lrange(self, key, start, end):
+        if self.redis:
+            return self.redis.lrange(key, start, end)
+
+    def _lrem(self, key, value, count=0):
+        if self.redis:
+            self.redis.lrem(key, value, count)
+
     def get_cache_partners(self):
 
-        #if self.redis.exists('partners'):
-            #partners = pickle.loads(self.redis.get('partners'))
         if self._is_available() and self._exists('partners'):
             partners = pickle.loads(self._get('partners'))
         else:
@@ -65,15 +75,12 @@ class redis_backend(object):
                 {'name': partner.name, 'link': partner.link, 'image': partner.image}
                 for partner in partners_data
             ]
-            #self.redis.set('partners', pickle.dumps(partners))
             self._set('partners', pickle.dumps(partners))
 
         return partners
 
     def get_cache_p2p_detail(self, product_id):
 
-        #if self.redis.exists('p2p_detail_{0}'.format(product_id)):
-        #    p2p_results = pickle.loads(self.redis.get('p2p_detail_{0}'.format(product_id)))
         if self._is_available() and self._exists('p2p_detail_{0}'.format(product_id)):
             p2p_results = pickle.loads(self._get('p2p_detail_{0}'.format(product_id)))
             return p2p_results
@@ -173,12 +180,23 @@ class redis_backend(object):
                             del extra_data[section_key][item_key]
             p2p_results['extra_data'] = extra_data
 
-            #if p2p.status != u'正在招标':
-            #    self._set('p2p_detail_{0}'.format(product_id), pickle.dumps(p2p_results))
+            if p2p.status != u'正在招标':
+                self._set('p2p_detail_{0}'.format(product_id), pickle.dumps(p2p_results))
+
             return p2p_results
 
-    def push_p2p_products(self, p2p):
+    def get_p2p_by_id(self, product_id):
+        p2p = P2PProduct.objects.select_related('activity').exclude(status=u'流标') \
+            .exclude(status=u'录标').filter(pk=product_id, hide=False).first()
+
         if p2p:
+            return p2p
+        else:
+            return None
+
+    def get_list_by_p2p(self, product):
+        if product:
+            p2p = self.get_p2p_by_id(product.id)
             p2p_dict = {
                 "id": p2p.id,
                 "category": p2p.category,
@@ -224,20 +242,10 @@ class redis_backend(object):
                 "current_limit": p2p.current_limit,
                 "available_amount": p2p.available_amout,
             }
-            if p2p.status == u'还款中':
-                # 将还款中的标写入redis
-                #self.redis.lpush('p2p_products_repayment', pickle.dumps(p2p_dict))
-                self._lpush('p2p_products_repayment', pickle.dumps(p2p_dict))
-            elif p2p.status == u'已完成':
-                # 将已完成的标写入redis
-                #self.redis.lpush('p2p_products_finished', pickle.dumps(p2p_dict))
-                self._lpush('p2p_products_finished', pickle.dumps(p2p_dict))
-            else:
-                # 将满标状态的标写入redis
-                #self.redis.lpush('p2p_products_full', pickle.dumps(p2p_dict))
-                self._lpush('p2p_products_full', pickle.dumps(p2p_dict))
+        else:
+            p2p_dict = {}
 
-        return True
+        return p2p_dict
 
     def get_p2p_list_from_objects(self, p2p_products):
 
@@ -294,22 +302,26 @@ class redis_backend(object):
 
         return p2p_list
 
+    def push_p2p_products(self, p2p):
+        if p2p:
+            p2p_dict = self.get_list_by_p2p(p2p)
+            if p2p.status == u'还款中':
+                # 将还款中的标写入redis
+                self._lpush('p2p_products_repayment', pickle.dumps(p2p_dict))
+            elif p2p.status == u'已完成':
+                # 将已完成的标写入redis
+                self._lpush('p2p_products_finished', pickle.dumps(p2p_dict))
+            else:
+                # 将满标状态的标写入redis
+                self._lpush('p2p_products_full', pickle.dumps(p2p_dict))
+
+        return True
+
     def update_detail_cache(self, product_id):
-        #if self.redis.exists('p2p_detail_{0}'.format(product_id)):
-        #    self.redis.delete('p2p_detail_{0}'.format(product_id))
         if self._exists('p2p_detail_{0}'.format(product_id)):
             self._delete('p2p_detail_{0}'.format(product_id))
-            self.get_cache_p2p_detail(product_id)
-        else:
-            self.get_cache_p2p_detail(product_id)
 
-    def _lrange(self, key, start, end):
-        if self.redis:
-            return self.redis.lrange(key, start, end)
-
-    def _lrem(self, key, value, count=0):
-        if self.redis:
-            self.redis.lrem(key, value, count)
+        self.get_cache_p2p_detail(product_id)
 
     def update_list_cache(self, source_key, target_key, product):
         if self._exists(source_key) and self._exists(target_key):
@@ -319,20 +331,10 @@ class redis_backend(object):
                 if source_product.get('id') == product.id:
                     # 删除 source_key 中的元素
                     self._lrem(source_key, source)
-                    # 将删除的元素 push 进 target_key 的列表中
-                    self._lpush(target_key, source)
+                    # 将删除的元素更新后 push 进 target_key 的列表中
+                    p2p_dict = self.get_list_by_p2p(product)
+                    self._lpush(target_key, pickle.dumps(p2p_dict))
                     break
-
-        #if self.redis.exists(source_key) and self.redis.exists(target_key):
-        #    source_cache_list = self.redis.lrange(source_key, 0, -1)
-        #    for source in source_cache_list:
-        #        source_product = pickle.loads(source)
-        #        if source_product.get('id') == product.id:
-        #            # 删除 source_key 中的元素
-        #            self.redis.lrem(source_key, source)
-        #            # 将删除的元素 push 进 target_key 的列表中
-        #            self.redis.lpush(target_key, source)
-        #            break
 
         return True
 

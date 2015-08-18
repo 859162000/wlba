@@ -4,6 +4,7 @@
     paths: {
       jquery: 'lib/jquery.min',
       'jquery.form': 'lib/jquery.form',
+      'jquery.modal': 'lib/jquery.modal.min',
       tools: 'lib/modal.tools'
     },
     shim: {

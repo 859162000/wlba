@@ -206,7 +206,7 @@ class ActivityRecord(models.Model):
     gift_type = models.CharField(u'赠送类型', max_length=20, choices=GIFT_TYPE, default='')
     user = models.ForeignKey(User, verbose_name=u"触发用户")
     income = models.FloatField(u'费用或收益', null=True, blank=True)
-    created_at = models.DateTimeField(auto_now=True, default=timezone.now)
+    created_at = models.DateTimeField(auto_now=True, default=timezone.now, db_index=True)
 
     def __unicode__(self):
         return u'活动触发流水'

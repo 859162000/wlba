@@ -2,6 +2,7 @@ require.config
   paths:
     jquery: 'lib/jquery.min'
     tools: 'lib/modal.tools'
+    'jquery.modal' : 'lib/jquery.modal.min'
 
 require ['jquery', 'tools'], ($, tool)->
   $('#setPasswordButton').click (e)->

@@ -5,8 +5,10 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, PageNotAnInteger
+from django.db import connection
+from django.db.models import Sum
 from marketing.models import IntroducedBy, PromotionToken, ClientData, Channels
-from wanglibao_p2p.models import P2PProduct
+from wanglibao_p2p.models import AmortizationRecord, P2PRecord
 import logging
 
 
@@ -121,3 +123,30 @@ def paginator_factory(obj, page=1, limit=100):
         ins = paginator.page(paginator.num_pages)
 
     return ins
+
+
+def pc_data_generator():
+    down_line_amount = 1355000000.00
+    # 累计交易金额
+    p2p_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))['amount__sum']
+    # 累计交易人数
+    user_number = P2PRecord.objects.filter(catalog='申购').values('id').count()
+    #累计注册人数
+    p2p_register_number = User.objects.all().values('id').count()
+    # 提前还款的收益
+    income_pre = AmortizationRecord.objects.filter(catalog='提前还款').aggregate(Sum('interest'))['interest__sum']
+    income_pre = income_pre if income_pre else 0
+    # 非提前还款的收益（已发收益＋未发收益）
+    sql = "select sum(a.interest) from wanglibao_p2p_useramortization as a left join wanglibao_p2p_productamortization as b on a.product_amortization_id=b.id LEFT JOIN (select distinct product_id from wanglibao_p2p_p2pequity where confirm=True and not exists (select distinct a.product_id from wanglibao_p2p_productamortization a, wanglibao_p2p_amortizationrecord b where a.id=b.amortization_id and b.catalog='提前还款') ) as c on b.product_id=c.product_id;"
+    cursor = connection.cursor()
+    cursor.execute(sql)
+    income = cursor.fetchone()
+    cursor.close()
+    user_income = income[0] + income_pre
+    key = 'pc_index_data'
+    return {
+        'p2p_amount': float(p2p_amount) + down_line_amount,
+        'user_number': user_number,
+        'user_income': float(user_income),
+        'p2p_register_number':p2p_register_number
+    }

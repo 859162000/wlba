@@ -166,14 +166,14 @@
         url: url,
         type: "POST",
         data: {
-          phone: $("#button-get-validate-code").attr('data-phone').trim()
+          phone: $("#button-get-code-btn").attr('data-phone').trim()
         }
       }).success(function(json) {
         var button, count, intervalId, timerFunction;
         if (json.ret_code === 0) {
           intervalId;
           count = 180;
-          button = $("#button-get-validate-code");
+          button = $("#button-get-code-btn");
           button.attr('disabled', 'disabled');
           button.addClass('button-gray');
           $('.voice').addClass('tip');

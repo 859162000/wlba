@@ -1,0 +1,148 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    link(rel="stylesheet",href="/static/stylesheets/xingmei.css")
+  body(style="background:#fbd79b")
+    include include/activityTopNew
+    //baidu
+    .xingmei-content
+      .xl-backtop(style="z-index:99")
+        span.seven-com.seven-ten
+        .backtop.sev-backtop 回到顶部
+        img(src="/static/imgs/pc_activity/xunlei/seven/sev_weixin.png")#xl-weixin
+        a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank")
+          img(src="/static/imgs/pc_activity/xunlei/seven/sev_qq.png",style="margin-top:10px")#xl-qq
+        .erweima
+      h1.xingmei-tit 半价一折算神马，网利宝狂送10万张电影票！机会难得，gogogo~
+        span.xingmei-com.four
+      .xingmei-prize
+        .prize.xingmei-com.one
+          p 注册网利宝送
+            span 10元
+            |电影优惠券
+            br
+            b （数量有限，先到先得）
+        if user.is_authenticated
+          .btn
+            a.reg-btn 立即注册
+        else
+          .btn
+            a.reg 立即注册
+      .xingmei-prize
+        .prize.xingmei-com.two
+          p(style="top:177px") 首次投资网利宝送电影票
+            span 一张
+        if user.is_authenticated
+          .btn
+            a(href="/p2p/list/",target="_blank") 立即投资
+        else
+          .btn
+            a.reg 立即投资
+      .xingmei-prize(style="margin-right:0")
+        .prize.xingmei-com.three
+          p(style="top:177px") 首次投资≥500元送电影票
+            span 两张
+        if user.is_authenticated
+          .btn
+            a(href="/p2p/list/",target="_blank") 立即投资
+        else
+          .btn
+            a.reg 立即投资
+      .xl-box1
+        span.tu.xingmei-com.five
+        h2.xl-jiang
+          .xl-center#seven-center
+            | 投资流程
+        .content-process
+          .content-pptv(style="background:#fbd79b;max-width:1101px")
+            .process-text(style="height:32px;padding:0")
+            .process-list
+              .circle-free.circle-float
+                .close
+                .last
+                .next
+                img(src="/static/images/pptv/free.jpg")
+              .triangle-start
+                .start-cont
+              .circle
+                .circle-body.free
+                .circle-txt 注册网利宝账号
+                .circle-txt2
+              .triangle-center(style="width:0px")
+              .triangle-center#xl-triangle-center
+                .center-cont
+              .circle
+                .circle-body.recharge
+                .circle-txt 充值资金到账户
+              .triangle-center#xl-triangle-center
+                .center-cont
+              .circle
+                .circle-body.tender
+                .circle-txt 选择投资标
+              .triangle-center#xl-triangle-center
+                .center-cont
+              .circle
+                .circle-body.collec
+                .circle-txt 获得收益和奖励
+              .triangle-end(style="width:120px")
+                .end-cont
+      .xl-box1(style="margin-top:0")
+        span.tu2.xingmei-com.six
+        h2.xl-jiang
+          .xl-center#seven-center
+            | 活动规则
+        ol
+          li 手机号为网利宝唯一账户，通过活动新注册网利宝用户均可参与；
+          li 电影票兑换码会在3天内统一以短信的形式发送到用户手机，敬请查收；
+          li 所有福利仅限注册、首次投资获得。首次投资金额100元起；
+          li 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+          li 网利宝对此活动享有最终解释权。
+      .xl-box1
+        .san-new(style="background:#fbd79b")
+          .san-new-content.container(style="padding:10px 0 0")
+            .row.gold-dl-row
+              .san-span
+                dl
+                  dt.com.com-trust(style="background: url('/static/imgs/pc_activity/ganjiwang/safe1.png') no-repeat center")
+                  dd.pp-zi
+                    p
+                      b IDG资本
+                      br
+                      | 百亿市值
+                      b A股上市公司
+                      | 入股
+              .san-span
+                dl
+                  dt.com.com-security(style="background: url('/static/imgs/pc_activity/ganjiwang/safe2.png') no-repeat center")
+                  dd.pp-zi
+                    p 账户资金安全
+                      br
+                      | 由
+                      b 阳光保险
+                      | 承保
+              .san-span
+                dl
+                  dt.com.com-authority(style="background: url('/static/images/xunlei/three.png') no-repeat center")
+                  dd.pp-zi
+                    p 第三方
+                      br
+                      b 100%
+                      | 本息保障
+  .footer(style="background:#fff;margin-top:0")
+    include include/activityFooterTwo
+    include include/tracking
+  #small-zc
+  #xl-aug-success
+    span.first-xl-off2 ×
+    p
+      span.xingmei-com.seven
+      |请您先注册
+    .reg-btn 注册
+  script.
+      var v = new Date().getTime()
+      require(['/static/js/xingmei.js'])
