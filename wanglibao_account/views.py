@@ -1132,8 +1132,13 @@ def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
 @never_cache
 def ajax_register(request):
     """
-        modified by: Yihen@20150812
+        modified-1 by: Yihen@20150812
         descrpition: if(line1150~line1151)的修改，针对特定的渠道延迟返积分、发红包等行为，防止被刷单
+
+        //////////////////////////
+
+        modified-2 by: Yihen@20150818
+        descrpition: if(line1154~line1156)的修改，web端在注册的时候，不需要再次验证图片验证码, code暂留，后期会加上这方面的逻辑
     """
     def messenger(message, user=None):
         res = dict()
@@ -1146,9 +1151,9 @@ def ajax_register(request):
         channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING,"")
         if request.is_ajax():
 
-            res, message = verify_captcha(dic=request.POST, keep=True)
-            if not res:
-                return HttpResponseForbidden(messenger(message={'captcha_1': u'图片验证码错误'}))
+            #res, message = verify_captcha(dic=request.POST, keep=False)
+            #if not res:
+            #    return HttpResponseForbidden(messenger(message={'captcha_1': u'图片验证码错误'}))
 
             form = EmailOrPhoneRegisterForm(request.POST)
             if form.is_valid():
