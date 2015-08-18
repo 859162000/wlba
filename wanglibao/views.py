@@ -93,10 +93,10 @@ class IndexView(TemplateView):
         p2p_list.extend(p2p)
         # 使用满标但是未还款的扩充
         if len(p2p_list) < self.PRODUCT_LENGTH:
-            p2p_list.extend(self._full_product_nonpayment(period=period, num=self.PRODUCT_LENGTH-len(p2p), product_id=product_id))
+            p2p_list.extend(self._full_product_nonpayment(period=period, num=self.PRODUCT_LENGTH-len(p2p_list), product_id=product_id))
         # 使用慢标且还款中的扩充
         if len(p2p_list) < self.PRODUCT_LENGTH:
-            p2p_list.extend(self._full_product_payment(period=period, num=self.PRODUCT_LENGTH-len(p2p), product_id=product_id))
+            p2p_list.extend(self._full_product_payment(period=period, num=self.PRODUCT_LENGTH-len(p2p_list), product_id=product_id))
         return p2p_list
 
     def get_context_data(self, **kwargs):
