@@ -24,10 +24,14 @@ block registerFormPage
                     input#registerCode.w92.placeholderInput.checkCode(type="text", name="captcha_1", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
                     img.captchaImg.fl(alt="captcha", src="")
                     i#registerRefresh.icon.iconfont.icon-cycle.captchaRefresh.fl
-                li.pwdLi
+                li#passWordInput.pwdLi
                     i.icon.iconfont.icon-key.mg-l-sm
-                    input#registerPwd.placeholderInput.checkPwd(type="password", name="password", placeholder="请输入密码", autocomplete='off', title="请输入密码")
+                    input.registerPwd.placeholderInput.checkPwd(type="password", name="password", placeholder="请输入密码", autocomplete='off', title="请输入密码")
                     i.pwdStatus.fl.icon.iconfont.icon-eye03.font-xll
+                li#textPwdInput.pwdLi(style='display:none')
+                    i.icon.iconfont.icon-key.mg-l-sm
+                    input.registerPwd.placeholderInput.checkPwd(type="text", name="password", placeholder="请输入密码", autocomplete='off', title="请输入密码")
+                    i.pwdStatus.fl.icon.iconfont.icon-eye02.font-xll
                 li.w145.SMELI
                     i.icon.iconfont.icon-lock.ml18
                     input#registerSMSCode.w92.placeholderInput.checkSEMCode(type="text", name="button-get-validate-code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
