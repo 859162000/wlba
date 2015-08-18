@@ -916,9 +916,6 @@ def xicai_send_data():
     for p2p_product in xicai_get_updated_p2p():
         xicai_post_updated_product_info(p2p_product, access_token)
 
-
-<<<<<<< HEAD
-=======
 def get_xicai_user_info(key, sign):
     """
     根据希财提供的sign 获取必须的用户信息.
