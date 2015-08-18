@@ -38,11 +38,13 @@ html
               .ac-tg-cont
                 a(href='/p2p/detail/{{product.id}}/').font-m.t-d10.tg-pro-tit {{product.short_name}}
                 .t-d7.ac-style
-                  span.mg-r-xl 本息保障：{{product.warrant_company}}
+                  span.mg-r-xl 合作机构：{{product.warrant_company}}
                   span 还款方式：{{product.display_payback_method}}
-                .product-progress.progress-xl
-                  percent = float(product.ordered_amount) / product.total_amount * 100
-                  .pro-container(style="width:{{percent | percentage}}")
+                .product-progress-warp.clearfix
+                  .product-progress.product-target-progress.progress-xl.fl
+                    percent = float(product.ordered_amount) / product.total_amount * 100
+                    .pro-container(style="width:{{percent | percentage}}")
+                  .pdt-progress-percent.t-d7.fl {{percent | percentage}}
                 .ac-tg-row.clearfix
                   .tg-list.profit-amount
                     total_amount = product.total_amount / 10000
@@ -125,8 +127,8 @@ html
                     span.font-l {{p2p.name}}
                   if index == 0
                     .t-d7.clearfix
-                      .span6.es(title='本息保障：{{p2p.warrant_company}}') 本息保障：{{p2p.warrant_company}}
-                      .span6.es(title='还款方式：{{p2p.display_payback_method}}') 还款方式：{{p2p.display_payback_method}}
+                      .span5.es(title='合作机构：{{p2p.warrant_company}}') 合作机构：{{p2p.warrant_company}}
+                      .span7.es(title='还款方式：{{p2p.display_payback_method}}') 还款方式：{{p2p.display_payback_method}}
                     .pdt-progress-warp.clearfix
                       .product-progress.progress-x.fl
                         percent = float(p2p.ordered_amount) / p2p.total_amount * 100

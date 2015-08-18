@@ -19,13 +19,14 @@
   +line-height(40)
   +border-radius(4px)
   +inline-block
-  +box-shadow(0 2px 0 #dadada, 0 -2px 0 #fe7369)
+  +box-shadow(0 3px 0 #BD332A, 0 6px 1px rgba(0,0,0,.2))
   transition: all .01s ease-in
   &:link, &:visited
     color: $t-d6
   &:hover
+    top: 2px
     color: $t-d6
-    +box-shadow(0 2px 0 #dadada, 0 0 0 #fe7369)
+    +box-shadow(0 1px 0 #BD332A, 0 2px 1px rgba(0,0,0,.2))
   &:active
     color: $t-d6
     +box-shadow(0 0 0 #dadada, 0 0 0 #fe7369)
@@ -113,6 +114,8 @@
 .ex-ac-target
   position: relative
   padding: 0 24px 20px 50px
+  .product-target-progress
+    margin-top: 7px
 .ac-tg-head
   +clearfix()
   +line-height(50)
@@ -121,14 +124,12 @@
   +line-height(20)
   display: inline-block
 .tg-pro-tit
-  margin: 20px 0 4px 0
+  margin: 12px 0 4px 0
   +inline-block
   +singleline-ellipsis(0)
-.ac-style
-  margin-bottom: 6px
 .ac-tg-row
   line-height: 1
-  padding-top: 9px
+  padding-top: 8px
   .buy-warp
     text-align: right
   .buy-text-r
@@ -146,7 +147,7 @@
     width: 90px
     text-align: center
   .tg-bt-text
-    margin-top: 6px
+    margin-top: 7px
 .ex-download-app
   height: 143px
 .ac-tg-bg
