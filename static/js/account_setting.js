@@ -3,14 +3,18 @@
   require.config({
     paths: {
       jquery: 'lib/jquery.min',
-      'jquery.validate': 'lib/jquery.validate.min'
+      'jquery.validate': 'lib/jquery.validate.min',
+      'jquery.modal': 'lib/jquery.modal.min',
+      tools: 'lib/modal.tools'
     },
     shim: {
-      'jquery.validate': ['jquery']
+      'jquery.validate': ['jquery'],
+      'jquery.modal': ['jquery'],
+      "tools": ['jquery.modal']
     }
   });
 
-  require(['jquery', 'jquery.validate', 'lib/backend'], function($, validate, backend) {
+  require(['jquery', 'jquery.validate', 'lib/backend', 'tools'], function($, validate, backend, tool) {
     $('#passwordChangeButton').click(function(e) {
       var params;
       e.preventDefault();
@@ -22,11 +26,21 @@
         };
         return backend.changePassword(params).done(function() {
           $('#passwordChangeForm').find('input').val('');
-          alert('密码修改成功，请重新登录');
-          return window.location.href = '/accounts/logout/?next=/accounts/login/';
+          return tool.modalAlert({
+            btnText: "确认",
+            title: '温馨提示',
+            msg: '密码修改成功，请重新登录',
+            callback_ok: function() {
+              return window.location.href = '/accounts/logout/?next=/accounts/login/';
+            }
+          });
         }).fail(function() {
           console.log('Failed to update password, do it again');
-          return alert('密码修改失败 请重试');
+          return tool.modalAlert({
+            btnText: "确认",
+            title: '温馨提示',
+            msg: '密码修改失败 请重试'
+          });
         });
       }
     });
@@ -61,3 +75,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=account_setting.js.map

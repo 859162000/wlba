@@ -30,6 +30,8 @@ from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_rest.utils import split_ua, get_client_ip
 from wanglibao_banner.models import Banner
 from wanglibao_sms.utils import send_validation_code
+from wanglibao_anti.anti.anti import AntiForAllClient
+from wanglibao_account.forms import verify_captcha
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +41,7 @@ class AppActivateImageAPIView(APIView):
     permission_classes = ()
 
     SIZE_MAP = {'1': 'img_one', '2': 'img_two', '3': 'img_three', '4': 'img_four'}
-    DEVICE_MAP = {'ios': 'app_iso', 'android': 'app_android'}
+    DEVICE_MAP = {'ios': 'app_iso', 'android': 'app_android', 'act_iso': 'act_iso', 'act_android': 'act_android'}
 
     def post(self, request):
         size = request.DATA.get('size', '').strip()
@@ -50,8 +52,13 @@ class AppActivateImageAPIView(APIView):
         if not device_type or not size:
             return Response({'ret_code': 20001, 'message': u'信息输入不完整'})
 
-        if device_type not in ('ios', 'android') or size not in ('1', '2', '3'):
+        if device_type not in ('ios', 'android') or int(size) not in (x for x in range(1, 9)):
             return Response({'ret_code': 20002, 'message': u'参数不合法'})
+
+        if int(size) in (x for x in range(5, 9)):
+            size = str(int(size) - 4)
+            if device_type == 'ios': device_type = 'act_iso'
+            if device_type == 'android': device_type = 'act_android'
 
         size = self.SIZE_MAP[size]
 
@@ -70,7 +77,6 @@ class AppActivateImageAPIView(APIView):
 
             if img_url:
                 img_url = '{host}/media/{url}'.format(host=settings.CALLBACK_HOST, url=img_url)
-                # img_url = '{host}/media/{url}'.format(host='http://192.168.1.116:8000', url=img_url)
                 return Response({'ret_code': 0, 'message': 'ok', 'image': img_url})
 
         return Response({'ret_code': 20003, 'message': 'fail'})
@@ -148,7 +154,6 @@ class AppExploreView(TemplateView):
     def get_context_data(self, **kwargs):
         #banner = Banner.objects.filter(device='mobile', type='banner', is_used=True).order_by('-priority')
         banner = Banner.objects.filter(Q(device='mobile'), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now()))).order_by('-priority')
-        print banner
         return {
             'banner': banner,
         }
@@ -174,15 +179,15 @@ class AppP2PProductViewSet(PaginatedModelViewSet):
         if minid and not maxid:
             pager = Q(id__lt=minid)
 
-        manual = u"FIELD({column}, '正在招标', '满标已审核', '还款中')".format(column='status')
+        manual = u"FIELD({column}, '正在招标', '满标待审核', '满标已审核', '满标待打款', '满标已打款','还款中')".format(column='status')
 
         if pager:
             return qs.filter(hide=False).filter(status__in=[
-                u'满标已审核', u'还款中', u'正在招标'
+                u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
             ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).filter(pager).extra(select={'manual': manual}, order_by=['manual', '-priority', '-publish_time'])
         else:
             return qs.filter(hide=False).filter(status__in=[
-                u'满标已审核', u'还款中', u'正在招标'
+                u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
             ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).extra(select={'manual': manual}, order_by=['manual', '-priority', '-publish_time'])
 
 
@@ -288,9 +293,66 @@ class SendValidationCodeView(APIView):
     permission_classes = ()
 
     def post(self, request, phone):
+        """
+            modified by: Yihen@20150813
+            descrpition: if(line299~line304)的修改，app端增加图片校验码验证
+        """
         phone_number = phone.strip()
+        if not AntiForAllClient(request).anti_special_channel():
+            res, message = False, u"请输入验证码"
+        else:
+            res, message = verify_captcha(request.POST)
+        if not res:
+            return Response({"ret_code": 40044, "message": message})
+
         status, message = send_validation_code(phone_number, ip=get_client_ip(request))
         if status != 200:
             return Response({"ret_code": 30044, "message": message})
 
         return Response({"ret_code": 0, "message": u'验证码发送成功'})
+
+
+class AppIncomeMiscTemplateView(TemplateView):
+    """ 设置收益比例参数"""
+    template_name = "app_income_misc.jade"
+
+    def get_context_data(self, **kwargs):
+        data = {'rate_wlb': 100, 'rate_p2p': 80, 'rate_fund': 60, 'rate_bank': 40}
+        m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_INCOME_DATA, desc=MiscRecommendProduction.DESC_INCOME_DATA, data=data)
+        return {'income': m.get_recommend_products()}
+
+    def post(self, request, **kwargs):
+        rate_wlb = request.POST.get('rate_wlb', '')
+        rate_p2p = request.POST.get('rate_p2p', '')
+        rate_fund = request.POST.get('rate_fund', '')
+        rate_bank = request.POST.get('rate_bank', '')
+        if not rate_wlb or not rate_p2p or not rate_fund or not rate_bank:
+            messages.warning(request, u'输入数据不合法')
+            return redirect('./income_misc')
+
+        data = {'rate_wlb': rate_wlb, 'rate_p2p': rate_p2p, 'rate_fund': rate_fund, 'rate_bank': rate_bank}
+        try:
+            m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_INCOME_DATA)
+            m.update_value(value=data)
+            messages.warning(request, u'数据新增(修改)成功')
+            return redirect('./income_misc')
+        except:
+            messages.warning(request, u'系统错误，请联系开发人员')
+            return redirect('./income_misc')
+
+
+class AppIncomeRateAPIView(APIView):
+    """ 查询获取收益比例配置信息 """
+    permission_classes = ()
+
+    def post(self, request):
+        try:
+            m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_INCOME_DATA)
+            rate = m.get_recommend_products()
+            if rate:
+                return Response({'ret_code': 0, 'message': '成功', 'rate': rate})
+            else:
+                return Response({'ret_code': 20001, 'message': u'请联系管理员配置收益比例数据'})
+        except Exception, e:
+            logger.error(e.message)
+            return Response({'ret_code': 20002, 'message': 'fail'})

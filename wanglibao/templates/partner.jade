@@ -1,10 +1,9 @@
 doctype html
 - with '战略合作伙伴' as title
-include include/head
+include include/common_head
 - endwith
 body
-  include include/header
-  include include/navigation
+  include global/g_nav
   .container.margin-bottom-xxl
     .siderbar-div
       - with '战略合作伙伴' as title
@@ -20,5 +19,5 @@ body
                 a(href="{{partner.link}}",target="_blank", title="{{partner.name}}", rel="nofollow")
                   img(src="/media/{{partner.image}}", alt="{{partner.name}}")
 
-  include include/footer
+  include global/g_footer
   include include/tracking

@@ -1,25 +1,25 @@
 #!/usr/bin/env python
 # encoding:utf-8
 
-#
-# 用来做各种活动判断
-#
 
 from wanglibao.celery import app
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db import transaction
+from wanglibao_lottery.tasks import send_lottery
 from wanglibao_p2p.models import P2PRecord, P2PProduct
 from wanglibao_account import message as inside_message
 from wanglibao_sms import messages
 from marketing.models import IntroducedBy
 from marketing import utils
-# from wanglibao_sms.tasks import send_messages
+from wanglibao_sms.tasks import send_messages
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity import backends as activity_backends
-#from datetime import datetime
+from wanglibao_redpack.models import Income
+import datetime
+from django.db.models import Sum, Count
+from wanglibao_profile.models import WanglibaoUserProfile
 
-#投资成功
 @app.task
 def decide_first(user_id, amount, device, product_id=0, is_full=False):
     user = User.objects.filter(id=user_id).first()
@@ -36,8 +36,9 @@ def decide_first(user_id, amount, device, product_id=0, is_full=False):
     activity_backends.check_activity(user, 'invest', device_type, amount, product_id, is_full)
     utils.log_clientinfo(device, "buy", user_id, amount)
 
+    #发送红包
+    send_lottery.apply_async((user_id,))
 
-#注册成功
 @app.task
 def register_ok(user_id, device):
     user = User.objects.filter(id=user_id).first()
@@ -54,7 +55,6 @@ def register_ok(user_id, device):
     activity_backends.check_activity(user, 'register', device_type)
     utils.log_clientinfo(device, "register", user_id)
 
-#实名认证
 @app.task
 def idvalidate_ok(user_id, device):
     user = User.objects.filter(id=user_id).first()
@@ -65,7 +65,6 @@ def idvalidate_ok(user_id, device):
     utils.log_clientinfo(device, "validation", user_id)
 
 
-#充值成功
 def despoit_ok(pay_info, device):
     device_type = device['device_type']
     title, content = messages.msg_pay_ok(pay_info.amount)
@@ -80,7 +79,6 @@ def despoit_ok(pay_info, device):
     utils.log_clientinfo(device, "deposit", pay_info.user_id, pay_info.amount)
 
 
-#全民淘金收益计算
 @app.task
 def calc_broker_commission(product_id):
     if not product_id:
@@ -99,3 +97,36 @@ def calc_broker_commission(product_id):
     with transaction.atomic():
         for equity in product.equities.all():
             redpack_backends.commission(equity.user, product, equity.equity, start, end)
+
+
+@app.task
+def send_income_message_sms():
+    today = datetime.datetime.now()
+    yestoday = today - datetime.timedelta(days=1)
+    start = timezone.datetime(yestoday.year, yestoday.month, yestoday.day, 20, 0, 0)
+    end = timezone.datetime(today.year, today.month, today.day, 20, 0, 0)
+    incomes = Income.objects.filter(created_at__gte=start, created_at__lt=end).values('user')\
+                            .annotate(Count('invite')).annotate(Sum('earning'))
+    phones_list = []
+    messages_list = []
+    if incomes:
+        for income in incomes:
+            user_info = User.objects.filter(id=income.get('user'))\
+                .select_related('user__wanglibaouserprofile').values('wanglibaouserprofile__phone')
+            phones_list.append(user_info[0].get('wanglibaouserprofile__phone'))
+            messages_list.append(messages.sms_income(income.get('invite__count'), income.get('earning__sum')))
+
+            # 发送站内信
+            title, content = messages.msg_give_income(income.get('invite__count'), income.get('earning__sum'))
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": income.get('user'),
+                "title": title,
+                "content": content,
+                "mtype": "invite"
+            })
+
+        # 批量发送短信
+        send_messages.apply_async(kwargs={
+            "phones": phones_list,
+            "messages": messages_list
+        })

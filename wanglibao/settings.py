@@ -113,7 +113,7 @@ INSTALLED_APPS = (
     'wanglibao_mobile',
     'weixin',
     'wanglibao_app',
-
+    'wanglibao_anti', #add by yihen@20150813, anti module added
     'report',
     'misc',
 
@@ -130,7 +130,8 @@ INSTALLED_APPS = (
     'djcelery',  # Use django orm as the backend
     'djsupervisor',
     'adminplus',
-    'file_storage'
+    'file_storage',
+    'wanglibao_lottery',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -357,6 +358,12 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': '/var/log/wanglibao/mysite.log',
             'formatter': 'verbose'
+        },
+        'anti': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/anti.log',
+            'formatter': 'verbose'
         }
     },
     'loggers': {
@@ -401,6 +408,18 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG',
         },
+        'wanglibao_margin': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+        },
+        'wanglibao_lottery': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG'
+        },
+        'wanglibao_anti': {
+            'handlers': ['anti'],
+            'level': 'DEBUG'
+        },
     }
 
 }
@@ -408,6 +427,7 @@ LOGGING = {
 if ENV != ENV_DEV:
     LOGGING['loggers']['django']['level'] = 'INFO'
     LOGGING['loggers']['wanglibao_sms']['level'] = 'INFO'
+    LOGGING['loggers']['wanglibao_lottery']['level'] = 'INFO'
 
     # secure proxy SSL header and secure cookies
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -467,7 +487,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 CELERYBEAT_SCHEDULE = {
     'p2p-watchdog-1-minutes': {
@@ -487,10 +507,34 @@ CELERYBEAT_SCHEDULE = {
     #     'schedule': timedelta(minutes=30)
     # }
 
+    #add by guoya: 希财网渠道数据定时推送
     'xicai_send_data': {
         'task': 'wanglibao_account.tasks.xicai_send_data_task',
         'schedule': timedelta(hours=1),
-    }
+    },
+
+    #add by zhanghe: PC端WEB首页统计数据
+    'pc_index_data': {
+        'task': 'marketing.tasks.generate_pc_index_data',
+        'schedule': crontab(minute=10, hour=0),
+    },
+
+    #add by lili: 全民佣金收入短信/站内信每日定时发送
+    'all_invite_earning_data': {
+        'task': 'marketing.tools.send_income_message_sms',
+        'schedule': crontab(minute=0, hour=20)
+    },
+    #add by Guoya: 彩票PC版每天五点重置之前未中奖的用户
+    'lottery_set_status': {
+        'task': 'wanglibao_lottery.tasks.lottery_set_status',
+        'schedule': crontab(minute=0, hour=5)
+    },
+
+    #add by Yihen@20150913，定时任务，3分钟给特定渠道返积分或发红包
+    'handle_delay_time_data': {
+        'task': 'wanglibao_anti.tasks.handle_delay_time_data',
+        'schedule': timedelta(minutes=3)
+    },
 }
 
 CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
@@ -772,7 +816,7 @@ XICAI_UPDATE_P2P_URL = 'http://api.csai.cn/api/update_p2p'
 XICAI_CLIENT_ID = '48e37e2cf4124c2c9f5bde3cc88d011c'
 XICAI_CLIENT_SECRET = '2e3dd17e800d48bca50e61b19f8fc11d'
 XICAI_LOAD_PAGE = 'https://www.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
-WLB_FOR_XICAI_KEY = '1993'
+WLB_FOR_CSAI_KEY = '1993'
 XICAI_UPDATE_TIMEDELTA = timedelta(hours=1)
 if ENV == ENV_PRODUCTION:
     XICAI_LOAD_PAGE = 'https://www.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
@@ -789,6 +833,16 @@ WLB_FOR_SHLS_KEY = '1995'
 # 石头村
 WLB_FOR_SHITOUCUN_KEY = '1996'
 SHITOUCUN_CALL_BACK_URL = 'http://www.stcun.com/task/interface/int'
+
+#彩票
+LINGCAIBAO_BASE_ISSUE = 2015090
+LINGCAIBAO_BASE_DATETIME = datetime(2015, 8, 4)
+LINGCAIBAO_CHANNEL_ID = 'wanglibao'
+LINGCAIBAO_KEY = 'wanglibao'
+if ENV == ENV_PRODUCTION:
+    LINGCAIBAO_URL_ORDER = 'http://open.lingcaibao.com/lingcaiapi/order'
+else:
+    LINGCAIBAO_URL_ORDER = 'http://test.lingcaibao.com/lingcaiapi/order'
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100

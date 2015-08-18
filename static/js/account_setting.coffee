@@ -2,11 +2,15 @@ require.config
   paths:
     jquery: 'lib/jquery.min'
     'jquery.validate': 'lib/jquery.validate.min'
+    'jquery.modal': 'lib/jquery.modal.min'
+    tools: 'lib/modal.tools'
 
   shim:
     'jquery.validate': ['jquery']
+    'jquery.modal' : ['jquery']
+    "tools": ['jquery.modal']
 
-require ['jquery', 'jquery.validate', 'lib/backend'], ($, validate, backend)->
+require ['jquery', 'jquery.validate', 'lib/backend', 'tools'], ($, validate, backend, tool)->
   $('#passwordChangeButton').click (e)->
     e.preventDefault()
 
@@ -19,11 +23,12 @@ require ['jquery', 'jquery.validate', 'lib/backend'], ($, validate, backend)->
       backend.changePassword params
       .done ->
         $('#passwordChangeForm').find('input').val('')
-        alert '密码修改成功，请重新登录'
-        window.location.href = '/accounts/logout/?next=/accounts/login/'
+        tool.modalAlert({btnText:"确认", title: '温馨提示', msg: '密码修改成功，请重新登录', callback_ok: ()->
+          window.location.href = '/accounts/logout/?next=/accounts/login/'
+        })
       .fail ->
         console.log 'Failed to update password, do it again'
-        alert '密码修改失败 请重试'
+        tool.modalAlert({btnText:"确认", title: '温馨提示', msg: '密码修改失败 请重试'})
 
   $('#passwordChangeForm').validate
     rules:

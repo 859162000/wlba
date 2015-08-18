@@ -6,15 +6,24 @@ from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
 from marketing.models import TimelySiteData, PlayList, IntroducedByReward, Reward
-from marketing.utils import local_to_utc
+from marketing.utils import local_to_utc, pc_data_generator
 from wanglibao_account import message as inside_message
 from wanglibao.celery import app
 from wanglibao_margin.models import Margin
 from wanglibao_redpack.backends import give_activity_redpack
 from wanglibao_redpack.models import RedPackEvent
+from misc.views import MiscRecommendProduction
 
 
 logger = get_task_logger(__name__)
+
+
+@app.task
+def generate_pc_index_data():
+    data = pc_data_generator()
+    m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA, data=data)
+    m.update_value(value={MiscRecommendProduction.KEY_PC_DATA: data})
+
 
 @app.task
 def generate_site_data():

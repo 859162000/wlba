@@ -32,6 +32,7 @@ urlpatterns = patterns(
     '',
     url(r'^$', IndexView.as_view(), name="index"),
     url(r'^security/', SecurityView.as_view(), name="security"),
+    url(r'^guide/', TemplateView.as_view(template_name="guide.jade")),
     url(r'^favicon.ico', RedirectView.as_view(url="/static/favicon.ico")),
 
     url(r'^portfolio/', PortfolioHomeView.as_view(), name="portfolio_home"),
@@ -92,6 +93,7 @@ urlpatterns = patterns(
     url(r'^taojin/', RedirectView.as_view(url="/activity/pan_gold/")),
 
     url(r'^tender_agreement/',  AgreementAutoView.as_view(), name="agreement_auto"),
+    url(r'^lottery/', include('wanglibao_lottery.urls')),
 )
 
 urlpatterns += patterns(
@@ -100,6 +102,11 @@ urlpatterns += patterns(
     url(r'^media/(?P<path>.*)$', 'file_storage.views.serve'),
 )
 
+#add by Yihen@20150813,反作弊的相关接口处理在此
+urlpatterns += patterns(
+    '',
+    url(r'^anti/', include('wanglibao_anti.urls')),
+)
 
 # the admin router about transaciton infdomation
 urlpatterns += patterns(

@@ -3,7 +3,8 @@
   require.config({
     paths: {
       jquery: 'lib/jquery.min',
-      tools: 'lib/modal.tools'
+      tools: 'lib/modal.tools',
+      'jquery.modal': 'lib/jquery.modal.min'
     }
   });
 
@@ -44,3 +45,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=password_reset.js.map
