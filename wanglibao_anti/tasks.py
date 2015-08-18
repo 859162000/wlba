@@ -18,6 +18,12 @@ from json import JSONDecoder
 logger = logging.getLogger('wanglibao_anti')
 
 
+def kill_register_user_by_admin(*ips):
+    '''针对某些特殊的ip，手工封杀；不管其IP注册数有多少
+    '''
+    pass
+
+
 def recover_anti_user_data():
     """每过3分钟启动一次，处理星美等渠道的红包、积分情况,
         针对被误打的用户，人工手动干预标记为3，在下次任务启动的时候，重新向用户发送红包积分等
