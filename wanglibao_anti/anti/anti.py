@@ -9,7 +9,7 @@
 from json import *
 import time
 import logging
-from django.conf import settings
+from wanglibao import settings
 from wanglibao_anti.models import AntiDelayCallback
 
 logger = logging.getLogger('wanglibao_anti')
@@ -17,7 +17,7 @@ logger = logging.getLogger('wanglibao_anti')
 
 class GlobalParamsSpace(object):
     DELAY_CHANNELS = ['xingmei']
-
+    ANTI_DEBUG = True
 
 class AntiBase(object):
     '''
@@ -75,12 +75,14 @@ class AntiForAllClient(AntiBase):
 
         return True
 
-    def anti_delay_callback_time(self, uid, device):
+    def anti_delay_callback_time(self, uid, device, channel=None):
         '''
            针对特定的渠道，进行积分反馈延迟处理, 180s
         '''
-        channel = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
+
         delay_channels = GlobalParamsSpace.DELAY_CHANNELS
+        if GlobalParamsSpace.ANTI_DEBUG:
+			logger.debug("request.channel: %s;\n" % (channel,))
 
         if channel in delay_channels:
             record = AntiDelayCallback()
@@ -92,8 +94,12 @@ class AntiForAllClient(AntiBase):
             record.updatetime = 0
             record.ip = self.request.META['HTTP_X_FORWARD_FOR'] if self.request.META['HTTP_X_FORWARD_FOR'] else self.request.META['REMOTE_ADDR']
             record.save()
+            if GlobalParamsSpace.ANTI_DEBUG:
+                logger.debug("xingmei: save success")
             return True
         else:
+            if GlobalParamsSpace.ANTI_DEBUG:
+                logger.debug("xingmei: save failed, this channel is not in the anti scope")
             return False
 
     def anti_run(self):

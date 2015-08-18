@@ -123,6 +123,7 @@
 .tg-pro-tit
   margin: 20px 0 4px 0
   +inline-block
+  +singleline-ellipsis(0)
 .ac-style
   margin-bottom: 6px
 .ac-tg-row
@@ -209,9 +210,9 @@
       @include home-sprite(p2p12)
       background-color: $bg-d13
     .pdt-name
-      line-height: 1
       +inline-block
       +singleline-ellipsis()
+      margin-bottom: 4px
       &:hover
         .icon
           color: $t-d2

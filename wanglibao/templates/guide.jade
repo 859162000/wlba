@@ -105,9 +105,15 @@ html
               - var shortPeopleArr = ['1、有短期闲置资金', '2、业余时间较充裕']
               +selectItme('select-blue', 'icon-short-time', '短期标', '1-3个月', shortProductArr, shortPeopleArr)
 
+              - var zhongProductArr = ['利率稳定', '平衡收益和周期', '投资选择更灵活']
+              - var zhongPeopleArr = ['1.近半年有闲置资金', '2.期待回款速度和收益的双赢']
+              +selectItme('select-green', 'icon-mid-time', '中期标', '3-6个月', zhongProductArr, zhongPeopleArr)
+
               - var longProductArr = ['周期相对较长', '年化收益率相对较高', '一次性理财，省时省心不省息']
               - var longPeopleArr = ['1、有长期闲置资金', '2、工作繁忙，业余时间很少']
-              +selectItme('select-red', 'icon-long-time', '长期标', '6-12个月', longProductArr, longPeopleArr)
+              +selectItme('select-red', 'icon-long-time', '长期标', '6个月以上', longProductArr, longPeopleArr)
+
+
 
       .section.i-mod-warp.i-guide-invest
         .i-guide-item
