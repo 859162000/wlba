@@ -224,7 +224,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                 captcha_1: captcha_1
             }
         }).done(function() {
-            count = 60;
+            count = 5;
             $(element).attr('disabled', 'disabled').addClass('buttonGray');
             $('.voiceValidate').attr('disabled', 'disabled');
             timerFunction = function() {
@@ -247,6 +247,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
             $(element).text('重新获取').removeAttr('disabled').removeClass('buttonGray');
             var result = JSON.parse(xhr.responseText);
             $('#registerForm').find('.loginError').text(result.message);
+            imgCodeRe('registerForm');
         });
     }
     setVoidCodeFun = function(){
@@ -294,13 +295,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         })
         //注册手机号验证
         $('#registerMobile').on('blur',function() {
-            checkMobileFun('registerForm');
-            if(checkMobileFun('registerForm') && ($.trim($('#registerCode').val()) != '')){
-                imgCodeRe('registerForm');
-                $('#registerCode').val('');
-            }else{
-               $('.getCodeBtn').removeClass('getCodeBtnTrue').addClass('buttonGray');
-            }
+            checkMobileFun('registerForm')
         })
         //注册密码验证
         $('#registerPwd').on('blur',function() {
@@ -309,10 +304,9 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         //注册图片验证码
         $('#registerCode').on('blur',function() {
             var getCodeBtn = $('.getCodeBtn');
-            if(checkCodedFun('registerForm') && checkMobileFun('registerForm')){
-                checkImgCodeFun(getCodeBtn)
-            }else{
-                getCodeBtn.removeClass('getCodeBtnTrue').addClass('buttonGray');
+            if($('#registerCode').val() != ''){
+                checkMobileFun('registerForm');
+                getCodeBtn.removeClass('buttonGray').addClass('getCodeBtnTrue');
             }
         })
         //$('.getCodeBtn').on('click',function(){
@@ -332,7 +326,9 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         imgCodeRe('registerForm');
         //发送短信验证码
         $('.SMELI').delegate('.getCodeBtnTrue','click',function(){
-            checkSEMFun();
+            if(checkMobileFun('registerForm')){
+                checkSEMFun();
+            }
         })
         //发送语音验证
         $('.voice').delegate('.voiceValidate','click',function(e){
