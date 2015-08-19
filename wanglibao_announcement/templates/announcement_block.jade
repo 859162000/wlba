@@ -4,7 +4,7 @@ mixin announceLoop()
   ul.announcement-block-title
     for announce in announcements
       li
-        a(href="/announcement/detail/{{announce.id}}", target="_blank", id="announcement-block-title") {{announce.title}}
+        a(href="/announcement/detail/{{announce.id}}/", target="_blank", id="announcement-block-title") {{announce.title}}
         span {{announce.createtime|date:'Y-m-d'}}
 
 if announcements
