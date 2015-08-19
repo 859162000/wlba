@@ -32,37 +32,37 @@ html
             .guide-title
               span.guide-tit-1.font-xxl 什么是网利宝？
             .guide-item-1-txt.t-d11.jy.padding-l-r-sm 网利宝（www.wanglibao.com）是网利金融旗下的在线理财平台，中国第一家互联网私人银行。网利宝在业内独创产融结合的业务模式，凭借丰富的金融行业经验、互联网优势，联合中国领先的金融机构、产业龙头企业进行战略合作，为投资用户提供高收益、安全透明、期限灵活的理财产品。网利宝的金融产品研发团队目前已覆盖全国20多个省市，执行360度全方位风险控制，确保我们的理财产品安全可靠，为投资者的财富增值保驾护航。
-            img(src="/static/imgs/pc/guide/guide_company.jpg").guide-item-company
+            img(src="/static/imgs/pc/security/security_grid.jpg").guide-item-company
 
       .section.i-mod-warp.i-guide-advantage
         .i-guide-item
           .i-item-cont-warp
             .guide-title
               span.guide-tit-2.font-xxl 网利宝有什么优势？
-            .guide-advantage-table
+            .guide-extension-table
               mixin adItem(classname, icon, title, textArr, ismargin)
                 if ismargin == 'true'
-                  aditem_mg = 'ad-item-mg'
+                  exitem_mg = 'ex-item-mg'
                 else
-                  aditem_mg = ''
-                .ad-item(class=aditem_mg)
-                  .ad-item-head(class=classname)
+                  exitem_mg = ''
+                .ex-item(class=exitem_mg)
+                  .ex-item-head(class=classname)
                     i.icon.iconfont(class=icon)
-                  .ad-item-cont.font-m
-                    .ad-cont-tit.font-xl=title
+                  .ex-item-cont.font-m
+                    .ex-cont-tit.font-xl=title
                     for txt in textArr
-                      .ad-cont-small=txt
+                      .ex-cont-small=txt
               - var safe = ['阳光保险承保', 'IT数据风控系统把关', '合作机构全额担保', '四重身份认证']
-              +adItem('ad-blue', 'icon-safe', '安全保障', safe, 'true')
+              +adItem('ex-blue', 'icon-safe', '安全保障', safe, 'true')
 
               - var rocket = ['年化高达10-16%', '30余倍银行活期理财', '打通传统金融行业中间环节', '让利给投资者']
-              +adItem('ad-red', 'icon-rocket', '高收益', rocket, 'true')
+              +adItem('ex-red', 'icon-rocket', '高收益', rocket, 'true')
 
               - var authority = ['独创IT数据风控系统', '汇聚华尔街精英金融团队', '专注于垂直细分领域', '打造金融服务新蓝海']
-              +adItem('ad-orange', 'icon-authority', '专业', authority, 'true')
+              +adItem('ex-orange', 'icon-authority', '专业', authority, 'true')
 
               - var service = ['360度贴心服务', '理财需求快速反应', '客户问题即时解决', '客服服务全年无休']
-              +adItem('ad-green', 'icon-service', '服务', service, 'false')
+              +adItem('ex-green', 'icon-service', '服务', service, 'false')
 
       .section.i-mod-warp.i-guide-inver-us
         .i-guide-item
@@ -101,17 +101,17 @@ html
                         .rt-pt-title(class=classname) 适合人群：
                         for pt in peopleArr
                           div=pt
-              - var shortProductArr = ['周期较短', '提现更灵活', '年化收益率相对较低']
+              - var shortProductArr = ['周期较短', '资金更灵活', '年化收益率相对较低']
               - var shortPeopleArr = ['1、有短期闲置资金', '2、业余时间较充裕']
               +selectItme('select-blue', 'icon-short-time', '短期标', '1-3个月', shortProductArr, shortPeopleArr)
 
-              - var zhongProductArr = ['利率稳定', '平衡收益和周期', '投资选择更灵活']
+              - var zhongProductArr = ['利率稳定', '平衡收益与期限', '投资选择更灵活']
               - var zhongPeopleArr = ['1.近半年有闲置资金', '2.期待回款速度和收益的双赢']
               +selectItme('select-green', 'icon-mid-time', '中期标', '3-6个月', zhongProductArr, zhongPeopleArr)
 
-              - var longProductArr = ['周期相对较长', '年化收益率相对较高', '一次性理财，省时省心不省息']
+              - var longProductArr = ['周期相对较长', '年化收益率较高', '一次性理财，省时省心不省息']
               - var longPeopleArr = ['1、有长期闲置资金', '2、工作繁忙，业余时间很少']
-              +selectItme('select-red', 'icon-long-time', '长期标', '6个月以上', longProductArr, longPeopleArr)
+              +selectItme('select-red', 'icon-long-time', '长期标', '6个月及以上', longProductArr, longPeopleArr)
 
 
 
@@ -145,6 +145,6 @@ html
               .invest-ft-title.font-m 开启轻松理财
               a(href="/accounts/register/").invest-ft-btn
                 i.icon.iconfont.icon-wallet
-                |注册领红包
+                |免费注册
     script.
       require(["/static/src/pc/guide.js"])

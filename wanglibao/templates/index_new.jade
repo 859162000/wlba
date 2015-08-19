@@ -171,7 +171,7 @@ html
             a(href="/about/").ns-head
               i.icon.iconfont.icon-about
               span.font-l.mg-l-s 关于网利宝
-            a(href="/guide/").ns-cont
+            a(href="/pc_guide/").ns-cont
               img(src='/static/imgs/pc/home/about.gif').ns-about
           li.mg-r-xxl
             a(href="/announcement/").ns-head
@@ -179,7 +179,7 @@ html
               span.font-l.mg-l-s 平台公告
             .ns-cont.ns-notice.t-d4
               for anno in announcements
-                a(href="baiducom").font-ss.clearfix
+                a(href="{{anno.get_absolute_url}}/" target="_blank").font-ss.clearfix
                   .span9.notice-body
                     i.icon-notice-self
                     |&nbsp{{anno}}
@@ -219,5 +219,4 @@ html
     include global/g_footer
     script.
       require(["/static/src/pc/index.js"])
-
-'
+    include include/tracking

@@ -19,6 +19,7 @@ from wanglibao_redpack.models import Income
 import datetime
 from django.db.models import Sum, Count
 from wanglibao_profile.models import WanglibaoUserProfile
+import time
 
 @app.task
 def decide_first(user_id, amount, device, product_id=0, is_full=False):
@@ -130,3 +131,27 @@ def send_income_message_sms():
             "phones": phones_list,
             "messages": messages_list
         })
+
+
+def send_message_to_all():
+    all_users = User.objects.all().values('id')
+    count = 0
+    for user in all_users:
+        user_id = user.get('id')
+
+        title = u'七夕有礼 好事成双'
+        content = u'【七夕有礼 好事成双】活动：通过APP注册就送10元现金红包；通过APP首次投资满1000元，送20元现金红包。活动有效期：2015年8月18日 — 2015年8月21日。'
+
+        inside_message.send_one.apply_async(kwargs={
+            "user_id": user_id,
+            "title": title,
+            "content": content,
+            "mtype": "activityintro"
+        })
+
+        count += 1
+
+        if count % 1000 == 0:
+            time.sleep(30)
+
+    return count
