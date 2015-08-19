@@ -53,18 +53,18 @@
   .footer-ex
     float: left
     color: $t-d14
-  .footer-kefu
-    margin-bottom: 10px
-    +line-height(30)
   .ft-kefu-icon
     width: 30px
     height: 30px
     @include footer-sprite(kefu)
     +inline-block
-  .ft-kefu-text
-    +inline-block
-    margin: 10px 0 0 10px
-    font-size: $font-s
+    .ft-kefu-text
+      +inline-block
+      font-size: $font-s
+      @include footer-sprite(kefu)
+      text-indent: 40px
+      line-height: 40px
+      margin-top: 0
   .ft-kefu-worktime
     margin-bottom: 20px
   .ft-kefu-phone-txt
