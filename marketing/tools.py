@@ -38,7 +38,7 @@ def decide_first(user_id, amount, device, product_id=0, is_full=False):
     utils.log_clientinfo(device, "buy", user_id, amount)
 
     #发送红包
-    send_lottery.apply_async((user_id,))
+    # send_lottery.apply_async((user_id,))
 
 @app.task
 def register_ok(user_id, device):
