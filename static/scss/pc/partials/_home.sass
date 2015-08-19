@@ -103,13 +103,29 @@
     color: $t-d18
     font-size: 130px
     line-height: 1
-  .num-space
-    height: 21px
-    line-height: 1.2
   .num-animate
-    font-size: $font-l
+    font-size: 28px
+    color: #5384ed
+    vertical-align: top
+    display: inline-block
+  .num-text
+    font-size: $font-m
+    color: #4d4d4d
   span.num-str
     font-size: $font-s
+  .ex-data
+    position: relative
+    z-index: 10
+    font-size: $font-s
+    color: #808080
+    li
+      +line-height(45)
+      .icon
+        color: #cdcdcd
+        font-size: 25px
+        margin-right: $space-s
+
+
 
 .ex-ac-target
   position: relative
@@ -153,8 +169,17 @@
 .ac-tg-bg
   width: 60px
   height: 60px
-  @include home-sprite(xianliang)
   +abs-pos(0, auto, auto, 0)
+
+.ac-targer-uninvest
+  border: 1px solid #f0871d
+  .ac-tg-bg
+    @include home-sprite(uninvest)
+.ac-targer-recommend
+  border: 1px solid $br-d1
+  .ac-tg-bg
+    @include home-sprite(xianliang)
+
 .ex-download-app
   +clearfix()
   img
