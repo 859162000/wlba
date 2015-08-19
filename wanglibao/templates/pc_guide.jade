@@ -39,30 +39,30 @@ html
           .i-item-cont-warp
             .guide-title
               span.guide-tit-2.font-xxl 网利宝有什么优势？
-            .guide-advantage-table
+            .guide-extension-table
               mixin adItem(classname, icon, title, textArr, ismargin)
                 if ismargin == 'true'
-                  aditem_mg = 'ad-item-mg'
+                  exitem_mg = 'ex-item-mg'
                 else
-                  aditem_mg = ''
-                .ad-item(class=aditem_mg)
-                  .ad-item-head(class=classname)
+                  exitem_mg = ''
+                .ex-item(class=exitem_mg)
+                  .ex-item-head(class=classname)
                     i.icon.iconfont(class=icon)
-                  .ad-item-cont.font-m
-                    .ad-cont-tit.font-xl=title
+                  .ex-item-cont.font-m
+                    .ex-cont-tit.font-xl=title
                     for txt in textArr
-                      .ad-cont-small=txt
+                      .ex-cont-small=txt
               - var safe = ['阳光保险承保', 'IT数据风控系统把关', '合作机构全额担保', '四重身份认证']
-              +adItem('ad-blue', 'icon-safe', '安全保障', safe, 'true')
+              +adItem('ex-blue', 'icon-safe', '安全保障', safe, 'true')
 
               - var rocket = ['年化高达10-16%', '30余倍银行活期理财', '打通传统金融行业中间环节', '让利给投资者']
-              +adItem('ad-red', 'icon-rocket', '高收益', rocket, 'true')
+              +adItem('ex-red', 'icon-rocket', '高收益', rocket, 'true')
 
               - var authority = ['独创IT数据风控系统', '汇聚华尔街精英金融团队', '专注于垂直细分领域', '打造金融服务新蓝海']
-              +adItem('ad-orange', 'icon-authority', '专业', authority, 'true')
+              +adItem('ex-orange', 'icon-authority', '专业', authority, 'true')
 
               - var service = ['360度贴心服务', '理财需求快速反应', '客户问题即时解决', '客服服务全年无休']
-              +adItem('ad-green', 'icon-service', '服务', service, 'false')
+              +adItem('ex-green', 'icon-service', '服务', service, 'false')
 
       .section.i-mod-warp.i-guide-inver-us
         .i-guide-item
