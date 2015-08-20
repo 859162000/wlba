@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # encoding:utf-8
+import json
+
 if __name__ == '__main__':
     import os
     import sys
@@ -986,8 +988,10 @@ def xicai_send_data():
     for p2p_product in xicai_get_updated_p2p():
         xicai_post_updated_product_info(p2p_product, access_token)
 
+
 def get_xicai_user_info(key, sign):
     """
+    author: Zhoudong
     根据希财提供的sign 获取必须的用户信息.
     如, 手机号, 用户名, (邮箱, 等等)
     :return:
@@ -1012,7 +1016,226 @@ def get_xicai_user_info(key, sign):
 
     return data
 
+
+class CsaiUserQuery(APIView):
+    """
+    author: Zhoudong
+    希财专用用户信息查询接口
+    """
+    permission_classes = ()
+
+    def check_sign(self):
+
+        t = str(self.request.GET.get('t', None))
+        token = self.request.GET.get('token', None)
+
+        if t and token:
+            from hashlib import md5
+            sign = md5(md5(t).hexdigest() + settings.XICAI_CLIENT_SECRET).hexdigest()
+            if token == sign:
+                return True
+
+    def get(self, request):
+
+        if self.check_sign():
+
+            page = int(self.request.GET.get('page', 1))
+            page_size = int(self.request.GET.get('pagesize', 10))
+            users_list = []
+            ret = dict()
+
+            binds = Binding.objects.filter(btype=u'csai')
+            users = [b.user for b in binds]
+            ret['total'] = len(users)
+
+            # 获取总页数, 和页数不对处理
+            com_page = len(users) / page_size + 1
+            if page > com_page:
+                page = com_page
+            if page < 1:
+                page = 1
+
+            # 获取到对应的页数的所有用户
+            if len(users) / page_size >= page:
+                users = users[(page - 1) * page_size: page * page_size]
+            else:
+                users = users[(page - 1) * page_size:]
+
+            for user in users:
+                user_dict = dict()
+                user_dict['id'] = user.id
+                user_dict['username'] = user.username
+                user_dict['email'] = user.email
+                user_dict['regtime'] = user.date_joined
+
+                # 去用户详情表查
+                user_profile = WanglibaoUserProfile.objects.get(user=user)
+                user_dict['realname'] = user_profile.name
+                user_dict['phone'] = user_profile.phone
+
+                user_dict['totalmoney'] = P2PEquity.objects.filter(user=user).aggregate(sum=Sum('equity'))['sum']
+
+                user_dict['ip'] = None
+                user_dict['qq'] = None
+
+                users_list.append(user_dict)
+
+            ret['list'] = users_list
+            ret['code'] = 0
+
+        else:
+            ret = {
+                'code': 1,
+                'msg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class CsaiInvestmentQuery(APIView):
+    """
+    author: Zhoudong
+    希财专用投资查询接口
+    """
+    permission_classes = ()
+
+    def check_sign(self):
+        t = str(self.request.GET.get('t', None))
+        token = self.request.GET.get('token', None)
+        if t and token:
+            from hashlib import md5
+            sign = md5(md5(t).hexdigest() + settings.XICAI_CLIENT_SECRET).hexdigest()
+            if token == sign:
+                return True
+
+    def get(self, request):
+
+        if self.check_sign():
+
+            page = int(self.request.GET.get('page', 1))
+            page_size = int(self.request.GET.get('pagesize', 10))
+            p2p_list = []
+            ret = dict()
+
+            binds = Binding.objects.filter(btype=u'csai')
+            users = [b.user for b in binds]
+            p2ps = P2PEquity.objects.filter(user__in=users)
+
+            ret['total'] = p2ps.count()
+
+            # 获取总页数, 和页数不对处理
+            com_page = len(p2ps) / page_size + 1
+
+            if page > com_page:
+                page = com_page
+            if page < 1:
+                page = 1
+
+            # 获取到对应的页数的所有用户
+            if len(p2ps) / page_size >= page:
+                p2ps = p2ps[(page - 1) * page_size: page * page_size]
+            else:
+                p2ps = p2ps[(page - 1) * page_size:]
+
+            for p2p in p2ps:
+                p2p_dict = dict()
+                p2p_dict['id'] = p2p.id
+                p2p_dict['pid'] = p2p.product_id
+                p2p_dict['username'] = p2p.user.username
+                p2p_dict['datetime'] = p2p.created_at
+                p2p_dict['money'] = p2p.equity
+                period = p2p.product.period if not p2p.product.pay_method.startswith(u"日计息") \
+                    else p2p.product.period/30.0
+                p2p_dict['commission'] = p2p.equity * period * 0.012 / 12
+
+                p2p_list.append(p2p_dict)
+
+            ret['list'] = p2p_list
+            ret['code'] = 0
+
+        else:
+            ret = {
+                'code': 1,
+                'msg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
 if __name__ == '__main__':
     print xicai_get_updated_p2p()
     print xicai_get_new_p2p()
     xicai_send_data()
+
+
+# 菜苗渠道
+def caimiao_post_platform_info():
+    """
+    author: Zhoudong
+    http请求方式: POST
+    http://121.40.31.143:86/api/JsonsFinancial/PlatformBasic/
+    向菜苗推送我们的平台信息.
+    :return:
+    """
+    url = settings.CAIMIAO_PLATFORM_URL
+
+    post_data = dict()
+
+    key = settings.CAIMIAO_SECRET
+
+    data = {
+        'tits': u'网利宝',
+        'provinces': u'北京市',
+        'zones': u'朝阳区',
+        'terms_scopes_mins': u'3个月',
+        'terms_scopes_maxs': u'6个月',
+        'aprs_mins': u'11%',
+        'aprs_maxs': u'18%',
+        'times_ups': u'2014-08-20',
+        'registered_capitals': u'5000万',
+        'telephones_services': u'4008588066',
+        'types_projects': u'车贷20%, 房贷55%, 银行过桥10%, 供应链15%',
+        'security_mode': u'融资性担保公司, 平台垫付',
+        'legal_persons': u'杨华',
+        'icps': u'京ICP备14014548号',
+        'coms_names': u'北京网利科技有限公司',
+        'coms_scales': u'120人',
+        'coms_address': u'北京市朝阳区东三环北路乙2号1幢海南航空大厦A座7层',
+        'coms_bewrites': u'',
+        'qqs': u'',
+        'websites': u'www.wanglibao.com'
+    }
+
+    # php md5('cmjr'.md5($key.json_encod(主数据)));
+    sign = hashlib.md5('cmjr' + hashlib.md5(key + json.dumps(data)).hexdigest()).hexdigest()
+
+    post_data.update(key=key)
+    post_data.update(sign=sign)
+    post_data.update(data=data)
+
+    # 参数转成json 格式
+    json_data = json.dumps(post_data)
+
+    ret = requests.post(url, data=json_data)
+    return ret
+
+
+def caimiao_post_p2p_info():
+    """
+    author: Zhoudong
+    :return:
+    """
+
+    key = settings.CAIMIAO_SECRET
+
+    now = timezone.now()
+
+    start_time = now - settings.XICAI_UPDATE_TIMEDELTA
+    ps = P2PProduct.objects.filter(publish_time__gte=start_time).filter(publish_time__lt=now).all()
+
+    p2p_equity = P2PEquity.objects.filter(created_at__gte=start_time).all()
+    wangli_products = set([p.product for p in p2p_equity]).update(ps)
+
+    data = dict()
+    data['tits'] = u"网利宝"
+    for product in wangli_products:
+        prod = dict()
+        prod['prods_codes'] = product.pk
