@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # encoding:utf-8
 import json
+from wanglibao_account.utils import str_to_float
 
 if __name__ == '__main__':
     import os
@@ -10,9 +11,10 @@ if __name__ == '__main__':
 
 import hashlib
 import datetime
+import time
 import logging
 from django.contrib.auth.models import User
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.http import HttpResponse
 from django.utils import timezone
 import requests
@@ -1044,7 +1046,20 @@ class CsaiUserQuery(APIView):
             users_list = []
             ret = dict()
 
-            binds = Binding.objects.filter(btype=u'csai')
+            start_date = self.request.GET.get('startdate', None)
+            end_date = self.request.GET.get('enddate', None)
+
+            if not start_date:
+                start_date = '1970-01-01'
+            start = str_to_float(start_date)
+            if end_date:
+                end = str_to_float(end_date)
+            else:
+                end = time.time()
+
+            binds = Binding.objects.filter(
+                (Q(btype=u'csai') | Q(btype=u'xicai')) & Q(created_at__gte=start) & Q(created_at__lte=end))
+
             users = [b.user for b in binds]
             ret['total'] = len(users)
 
@@ -1116,7 +1131,19 @@ class CsaiInvestmentQuery(APIView):
             p2p_list = []
             ret = dict()
 
-            binds = Binding.objects.filter(btype=u'csai')
+            start_date = self.request.GET.get('startdate', None)
+            end_date = self.request.GET.get('enddate', None)
+
+            if not start_date:
+                start_date = '1970-01-01'
+            start = str_to_float(start_date)
+            if end_date:
+                end = str_to_float(end_date)
+            else:
+                end = time.time()
+
+            binds = Binding.objects.filter(
+                (Q(btype=u'csai') | Q(btype=u'xicai')) & Q(created_at__gte=start) & Q(created_at__lte=end))
             users = [b.user for b in binds]
             p2ps = P2PEquity.objects.filter(user__in=users)
 
