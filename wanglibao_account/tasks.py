@@ -132,8 +132,20 @@ def jinshan_callback(url, params):
 @app.task
 def caimiao_platform_post_task():
     """
+    author: Zhoudong
     向菜苗发送平台基本信息
     :return:
     """
     from wanglibao_account.cooperation import caimiao_post_platform_info
     caimiao_post_platform_info()
+
+
+@app.task
+def caimiao_p2p_info_post_task():
+    """
+    author: Zhoudong
+    向菜苗发送新标信息
+    :return:
+    """
+    from wanglibao_account.cooperation import caimiao_post_p2p_info
+    caimiao_post_p2p_info()
