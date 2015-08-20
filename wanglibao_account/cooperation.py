@@ -1203,10 +1203,9 @@ def caimiao_post_platform_info():
     :return:
     """
     url = settings.CAIMIAO_PLATFORM_URL
+    key = settings.CAIMIAO_SECRET
 
     post_data = dict()
-
-    key = settings.CAIMIAO_SECRET
 
     data = {
         'tits': u'网利宝',
@@ -1242,7 +1241,7 @@ def caimiao_post_platform_info():
     json_data = json.dumps(post_data)
 
     ret = requests.post(url, data=json_data)
-    return ret
+    return ret.text
 
 
 def caimiao_post_p2p_info():
@@ -1251,18 +1250,46 @@ def caimiao_post_p2p_info():
     :return:
     """
 
+    url = settings.CAIMIAO_P2P_URL
     key = settings.CAIMIAO_SECRET
+
+    post_data = dict()
 
     now = timezone.now()
 
     start_time = now - settings.XICAI_UPDATE_TIMEDELTA
-    ps = P2PProduct.objects.filter(publish_time__gte=start_time).filter(publish_time__lt=now).all()
-
-    p2p_equity = P2PEquity.objects.filter(created_at__gte=start_time).all()
-    wangli_products = set([p.product for p in p2p_equity]).update(ps)
+    wangli_products = P2PProduct.objects.filter(Q(publish_time__gte=start_time) & Q(publish_time__lt=now))
 
     data = dict()
     data['tits'] = u"网利宝"
+    data['prods'] = []
+
     for product in wangli_products:
         prod = dict()
         prod['prods_codes'] = product.pk
+        prod['prods_tits'] = product.name
+        prod['prods_type'] = product.category
+        prod['borrower'] = product.borrower_name
+        prod['moneys_mains'] = product.total_amount
+        prod['aprs_mins'] = product.expected_earning_rate
+        prod['aprs_maxs'] = product.excess_earning_rate
+        period = product.period if product.pay_method.startswith(u"日计息") else product.period * 30
+        prod['terms_scopes'] = period
+        prod['prods_start'] = product.publish_time.strftime("%Y-%m-%d")
+        prod['prods_end'] = product.soldout_time.strftime("%Y-%m-%d") if product.soldout_time else None
+
+        data['prods'].append(prod)
+
+    # php md5('cmjr'.md5($key.json_encod(主数据)));
+    sign = hashlib.md5('cmjr' + hashlib.md5(key + json.dumps(data)).hexdigest()).hexdigest()
+
+    post_data.update(key=key)
+    post_data.update(sign=sign)
+    post_data.update(data=data)
+
+    # 参数转成json 格式
+    json_data = json.dumps(post_data)
+
+    ret = requests.post(url, data=json_data)
+
+    return ret.text
