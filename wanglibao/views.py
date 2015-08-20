@@ -19,8 +19,9 @@ import urlparse
 from wanglibao_redis.backend import redis_backend
 import json
 import pickle
-import urllib
-
+import datetime
+import hashlib
+from wanglibao.settings import WLB_FOR_FUBABA_KEY
 
 class IndexView(TemplateView):
     template_name = 'index-test.jade'
@@ -222,25 +223,20 @@ def server_error(request):
     template = loader.get_template('html/500.html')
     return HttpResponse(content=template.render(Context()), content_type='text/html; charset=utf-8', status=500)
 
-
+#
 def landpage_view(request):
     # 判断是否为富爸爸来源
-    print "<<<<<<<<<<<<<aaaaaaaaa"
     channel_name = getattr(request, request.method).get('promo_token', None)
-    if channel_name:
-        # 判断来源中是否包含富爸爸cookie
-        print "<<<<<<<<<<<< channel_name"
-        fubaba_cookie = request.COOKIES.get('cps', None)
-        if fubaba_cookie:
-            print "<<<<<<<<<<<<<<<<<bbbbbbbbbb"
-            print repr(fubaba_cookie)
-            fubaba_cookie = urllib.unquote(fubaba_cookie)
-            fubaba_cookie = json.loads(fubaba_cookie)
-            print ">>>>>>>>>>>>>>>>", fubaba_cookie
-            if fubaba_cookie.get('union_id', None) == 'fbaba' and fubaba_cookie.has_key('euid'):
-                print "<<<<<<<<<<<<<<<<<<<<<kkkkkkkkkkkkk"
-                # 生产环境应该改为set_secure_cookie
-                # request.set_secure_cookie('wlb_cps', time.time(), expires=time.time()+30*3600*24)
-                request.set_cookie('wlb_cps', time.time(), expires=time.time()+30*3600*24)
-    print "<<<<<<<<<<<<<<<<ccccccccccc"
+    tid = getattr(request, request.method).get('tid', '1316')
+    sign = getattr(request, request.method).get('sign', None)
+    if channel_name and sign == hashlib.md5(str(tid)+channel_name+str(WLB_FOR_FUBABA_KEY)).hexdigest():
+        redis = redis_backend()
+        land_time_lately = redis._get(tid)
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if land_time_lately:
+            land_time_lately = datetime.datetime.strptime(land_time_lately, '%Y-%m-%d %H:%M:%S')
+            # 如果上次访问的时间是在30天前则不更新访问时间
+            if land_time_lately + datetime.timedelta(seconds=180) <= current_time:
+                return HttpResponseRedirect(reverse('index'))
+        redis._set(tid, current_time)
     return HttpResponseRedirect(reverse('index'))

@@ -30,6 +30,7 @@ from wanglibao_account.tasks import common_callback, jinshan_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
 from wanglibao_pay.models import Card
 from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_redis.backend import redis_backend
 
 logger = logging.getLogger(__name__)
 
@@ -585,7 +586,7 @@ class ShiTouCunRegister(CoopRegister):
 class FuBaBaRegister(CoopRegister):
     def __init__(self, request):
         super(FuBaBaRegister, self).__init__(request)
-        self.c_code = 'fubaba'
+        self.c_code = 'fbaba'
         self.call_back_url = FUBABA_CALL_BACK_URL
         self.coop_id = FUBABA_COOP_ID
         self.coop_key = FUBABA_KEY
@@ -593,7 +594,7 @@ class FuBaBaRegister(CoopRegister):
     @property
     def channel_user(self):
         # 富爸爸需求，如果uid为空，uid设置为1316
-        return self.request.session.COOKIES.get('euid', '1316')
+        return self.request.session.get(self.internal_channel_user_key, '1316')
 
     def purchase_call_back(self, user):
         """
@@ -601,47 +602,48 @@ class FuBaBaRegister(CoopRegister):
         """
         # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
         binding = Binding.objects.filter(user_id=user.id).first()
-        if binding and not binding.extra:
-            p2p_equity = P2PEquity.objects.filter(user_id=user.id).last()
-            if p2p_equity:
-                p2p_equity_ctime = datetime.datetime.strptime(p2p_equity.created_at(), '%Y-%m-%d %H:%M:%S')
-                final_settlement_time = p2p_equity_ctime + datetime.datedelta(days=30)
-                current_time = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
-                if final_settlement_time < current_time:
-                    order_id = p2p_equity.id
-                    goodsprice = p2p_equity.ordered_amount
-                    # goodsname 提供固定值，固定值自定义，但不能为空
-                    goodsname = u"名称:网利宝,类型:产品标,周期:1月"
-                    sig = hashlib.md5(order_id+self.coop_key).hexdigest()
-                    status = u"直投【%s 元:已付款】" % goodsprice
-                    params = {
-                        'action': 'create',
-                        'planid': self.coop_id,
-                        'order': order_id,
-                        'goodsmark': '1',
-                        'goodsprice': goodsprice,
-                        'goodsname': goodsname,
-                        'sig': sig,
-                        'status': status,
-                        'uid': binding.bid,
-                    }
-                    common_callback.apply_async(
-                        kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
-                    binding.update(extra=p2p_equity_ctime)
+        p2p_record = P2PRecord.objects.filter(user_id=user.id).last()
+        if binding and p2p_record:
+            # 如果结算时间过期了则不执行回调
+            earliest_settlement_time = redis_backend()._get(binding.bid)
+            if earliest_settlement_time:
+                earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
+                current_time = datetime.datetime.now()
+                # 如果上次访问的时间是在30天前则不更新访问时间
+                if earliest_settlement_time + datetime.timedelta(seconds=180) <= current_time:
+                    return
 
-
-class YunDuanRegister(CoopRegister):
-    def __init__(self, request):
-        super(YunDuanRegister, self).__init__(request)
-        self.c_code = 'yunduan'
-        self.call_back_url = YUNDUAN_CALL_BACK_URL
-        self.coop_id = YUNDUAN_COOP_ID
-        self.coop_key = YUNDUAN_KEY
+            order_id = p2p_record.id
+            goodsprice = p2p_record.amount
+            # goodsname 提供固定值，固定值自定义，但不能为空
+            goodsname = u"名称:网利宝,类型:产品标,周期:1月"
+            sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
+            status = u"直投【%s 元：已付款】" % goodsprice
+            params = {
+                'action': 'create',
+                'planid': self.coop_id,
+                'order': order_id,
+                'goodsmark': '1',
+                'goodsprice': goodsprice,
+                'goodsname': goodsname,
+                'sig': sig,
+                'status': status,
+                'uid': binding.bid,
+            }
+            common_callback.apply_async(
+                kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+            # 记录开始结算时间
+            if not binding.extra:
+                # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
+                if earliest_settlement_time:
+                    binding.extra=earliest_settlement_time
+                    binding.save()
 
 
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
-                          JuxiangyouRegister, DouwanRegister, JinShanRegister, ShiTouCunRegister]
+                          JuxiangyouRegister, DouwanRegister, JinShanRegister,
+                          ShiTouCunRegister, FuBaBaRegister]
 
 
 #######################第三方用户查询#####################

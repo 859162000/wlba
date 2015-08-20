@@ -824,12 +824,6 @@ if ENV == ENV_PRODUCTION:
 else:
     LINGCAIBAO_URL_ORDER = 'http://test.lingcaibao.com/lingcaiapi/order'
 
-# 云端
-YUNDUAN_COOP_ID = 133
-YUNDUAN_KEY = 'wanglibao@123'
-WLB_FOR_YUNDUAN_KEY = '1997'
-YUNDUAN_CALL_BACK_URL = 'http://www.fbaba.net/track/cps.php'
-
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100
 }
