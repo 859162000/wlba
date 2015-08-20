@@ -255,11 +255,11 @@ def landpage_view(request):
     if channel_name and sign == hashlib.md5(str(tid)+channel_name+str(WLB_FOR_FUBABA_KEY)).hexdigest():
         redis = redis_backend()
         land_time_lately = redis._get(tid)
-        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        current_time = datetime.datetime.now()
         if land_time_lately:
             land_time_lately = datetime.datetime.strptime(land_time_lately, '%Y-%m-%d %H:%M:%S')
             # 如果上次访问的时间是在30天前则不更新访问时间
             if land_time_lately + datetime.timedelta(seconds=180) <= current_time:
-                return HttpResponseRedirect(reverse('index'))
-        redis._set(tid, current_time)
-    return HttpResponseRedirect(reverse('index'))
+                return HttpResponseRedirect(reverse('marketing_gold'))
+        redis._set(tid, current_time.strftime("%Y-%m-%d %H:%M:%S"))
+    return HttpResponseRedirect(reverse('marketing_gold'))
