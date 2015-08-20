@@ -535,6 +535,13 @@ CELERYBEAT_SCHEDULE = {
         'task': 'wanglibao_anti.tasks.handle_delay_time_data',
         'schedule': timedelta(minutes=3)
     },
+
+    # by Zhoudong 菜苗上报平台信息.
+    'caimiao_platform_post': {
+        'task': 'wanglibao_account.tasks.caimiao_platform_post_task',
+        'schedule': crontab(minute=0, hour=0, day_of_month=1)
+    },
+
 }
 
 CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
@@ -822,6 +829,14 @@ if ENV == ENV_PRODUCTION:
     XICAI_LOAD_PAGE = 'https://www.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
 else:
     XICAI_LOAD_PAGE = 'https://staging.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
+
+# 菜苗
+CAIMIAO_SECRET = 'a400f466c02ddfde984f631c66b36c6489e07d55615d07da0d9dd4a6f7bdb888'
+CAIMIAO_PLATFORM_URL = 'http://121.40.31.143:86/api/JsonsFinancial/PlatformBasic/'
+CAIMIAO_P2P_URL = 'http://121.40.31.143:86/api/JsonsFinancial/ProdMain/'
+CAIMIAO_DEAL_AMOUNT_URL = 'http://121.40.31.143:86/api/JsonsFinancial/Volumes/'
+CAIMIAO_RATE_URL = 'http://121.40.31.143:86/api/JsonsFinancial/Rating/'
+
 
 # 金山
 WLB_FOR_JINSHAN_KEY = '1994'
