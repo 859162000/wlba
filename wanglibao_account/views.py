@@ -1149,7 +1149,7 @@ def ajax_register(request):
         return json.dumps(res)
 
     if request.method == "POST":
-        #request_bakup = copy.deepcopy(request)    #add by Yihen@20150818; reason:第三方渠道处理的时候，会更改request中的信息
+        request_bakup = copy.deepcopy(request)    #add by Yihen@20150818; reason:第三方渠道处理的时候，会更改request中的信息
         if request.is_ajax():
 
             #res, message = verify_captcha(dic=request.POST, keep=False)
@@ -1178,8 +1178,8 @@ def ajax_register(request):
 
                 device = utils.split_ua(request)
 
-                #if not AntiForAllClient(request_bakup).anti_delay_callback_time(user.id, device):
-                tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+                if not AntiForAllClient(request_bakup).anti_delay_callback_time(user.id, device):
+                    tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
                 account_backends.set_source(request, auth_user)
 
