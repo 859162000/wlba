@@ -216,6 +216,7 @@ class RegisterAPIView(APIView):
         identifier = request.DATA.get('identifier', "")
         password = request.DATA.get('password', "")
         validate_code = request.DATA.get('validate_code', "")
+        channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
 
         identifier = identifier.strip()
         password = password.strip()
@@ -279,7 +280,7 @@ class RegisterAPIView(APIView):
             auth_user = authenticate(identifier=identifier, password=password)
             auth_login(request, auth_user)
 
-        if not AntiForAllClient(request).anti_delay_callback_time(user.id, device):
+        if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
             tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
         return Response({"ret_code": 0, "message": u"注册成功"})
