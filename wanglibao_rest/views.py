@@ -298,6 +298,7 @@ class WeixinRegisterAPIView(APIView):
         """
         identifier = request.DATA.get('identifier', "").strip()
         validate_code = request.DATA.get('validate_code', "").strip()
+        channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
 
         if not identifier or not validate_code:
             return Response({"ret_code": 30021, "message": "信息输入不完整"})
@@ -334,7 +335,7 @@ class WeixinRegisterAPIView(APIView):
         send_rand_pass(identifier, password)
 
         device = split_ua(request)
-        if not AntiForAllClient(request).anti_delay_callback_time(user.id, device):
+        if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
             tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
         return Response({"ret_code": 0, "message": "注册成功"})
