@@ -134,7 +134,7 @@ class IndexView(TemplateView):
 
         banners = Banner.objects.filter(Q(device=Banner.PC_2), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now())))
         # 新闻页面只有4个固定位置
-        news_and_reports = NewsAndReport.objects.all().order_by("-score")[:4]
+        news_and_reports = NewsAndReport.objects.all().order_by('-score', '-created_at')[:4]
 
         # 网站数据
         m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)

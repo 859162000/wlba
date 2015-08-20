@@ -29,10 +29,17 @@ html
             +intro('icon-rocket', '高收益 低门槛', '30余倍银行活期收益', '100元起投')
             +intro('icon-safe', '安全保障', '第三方资金托管', '阳光保险承保资金安全')
             +intro('icon-authority', '专业权威', '华尔街精英金融团队', 'IT数据风控系统')
-          .ex-ac-target.mg-t-sm.br-d1.bg-d3
-            for product in recommend_product
+          for product in recommend_product
+            if product.category ==  "新手标"
+              invest = 'ac-targer-uninvest'
+            else
+              invest = 'ac-targer-recommend'
+            .ex-ac-target.mg-t-sm.bg-d3(class=invest)
               .ac-tg-head.span12
-                h3.hd-name.fl 精选推荐
+                if product.category == "新手标"
+                  h3.hd-name.fl 新手专属标
+                else
+                  h3.hd-name.fl 精选推荐
                 .hd-time.fr
                   span.recommend_time(data-update='{{product.end_time}}')
               .ac-tg-cont
@@ -76,7 +83,7 @@ html
                       a(href="/p2p/detail/{{product.id}}/", class='{{statusClass}}') {{status}}
                       amount = product.total_amount - product.ordered_amount
                       .t-d7.tg-bt-text 剩余金额 ￥ {{amount | money_format_int}}元
-            .ac-tg-bg
+              .ac-tg-bg
 
         .ex-rt-cont
           .ex-dc.padding-l-r-sm
@@ -86,17 +93,20 @@ html
                 span 数据统计
               .dc-time.t-d7.fr 截至 {{site_data.updated_at | milldate_format}}
             .ex-data
-              ul.font-s
-                  li.mg-b-s
-                    p.t-d7.font-xs 累计注册人数
-                    .num-space.t-d8(data-number='{{site_data.p2p_register_number}}', data-type='man')
-                  li.mg-b-s
-                    p.t-d7.font-xs 累计赚取收益
-                    .num-space.t-d8(data-number='{{site_data.user_income}}',data-type='amount')
-                  li.mg-b-s
-                    p.t-d7.font-xs 累计交易金额
-                    .num-space.t-d8(data-number='{{site_data.p2p_amount}}',data-type='amount')
-            i.dc-bg.icon.iconfont.icon-amount
+              ul
+                li
+                  i.icon.iconfont.icon-data-user
+                  | 已有
+                  span.num-space(data-number='{{site_data.p2p_register_number}}', data-type='man')
+                  | 小伙伴选择了网利宝
+                li
+                  i.icon.iconfont.icon-data-invest
+                  span 小伙伴们共投资
+                  span.num-space(data-number='{{site_data.user_income}}',data-type='amount')
+                li
+                  i.icon.iconfont.icon-data-makemoney
+                  | 小伙伴们赚取了
+                  span.num-space(data-number='{{site_data.p2p_amount}}',data-type='amount')
           .ex-download-app.mg-t-sm.padding-sm
             img(src='/static/imgs/pc/home/erweima.jpg').dol-app.mg-r-sm.fl
             .dol-btn.fl

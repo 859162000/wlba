@@ -21,13 +21,13 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function( $ ) {
     var len = value.length, str = '';
     reType = type == 'man' ? '人' : '元';
     if(len > 8){
-      str = isNode(value.substr(0,len-8), '亿') + isNode(value.substr(-8,4), '万') + isNode(value.substr(-4,4), reType);
+      str = isNode(value.substr(0,len-8), '亿') + isNode(value.substr(-8,4), '万');
     }else{
-      str = isNode(value.substr(0,len-4), '万') + isNode(value.substr(-4,4), reType);
+      str = isNode(value.substr(0,len-4), '万');
     }
     function isNode(substr, text){
       if(parseInt(substr) > 0){
-        return " <span class='num-animate'>" + parseInt(substr) + '</span> ' + text;
+        return " <span class='num-animate'>" + parseInt(substr) + "</span> <span class='num-text'>" + text + '</span>';
       }
       return '';
     }
