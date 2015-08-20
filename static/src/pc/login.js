@@ -7,65 +7,44 @@ require.config({
     }
 });
 require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
+    var  csrfSafeMethod, getCookie,sameOrigin,
+    getCookie = function(name) {
+        var cookie, cookieValue, cookies, i;
+        cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            cookies = document.cookie.split(";");
+            i = 0;
+            while (i < cookies.length) {
+              cookie = $.trim(cookies[i]);
+              if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+              }
+              i++;
+            }
+        }
+        return cookieValue;
+    };
+    csrfSafeMethod = function(method) {
+        return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+    };
+    sameOrigin = function(url) {
+        var host, origin, protocol, sr_origin;
+        host = document.location.host;
+        protocol = document.location.protocol;
+        sr_origin = "//" + host;
+        origin = protocol + sr_origin;
+        return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
+    };
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+              xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+            }
+        }
+    });
     //初始化
     pageInitFun = function(){
-        var  csrfSafeMethod, getCookie,sameOrigin,
-        getCookie = function(name) {
-            var cookie, cookieValue, cookies, i;
-            cookieValue = null;
-            if (document.cookie && document.cookie !== "") {
-                cookies = document.cookie.split(";");
-                i = 0;
-                while (i < cookies.length) {
-                  cookie = $.trim(cookies[i]);
-                  if (cookie.substring(0, name.length + 1) === (name + "=")) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                  }
-                  i++;
-                }
-            }
-            return cookieValue;
-        };
-        csrfSafeMethod = function(method) {
-            return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
-        };
-        sameOrigin = function(url) {
-            var host, origin, protocol, sr_origin;
-            host = document.location.host;
-            protocol = document.location.protocol;
-            sr_origin = "//" + host;
-            origin = protocol + sr_origin;
-            return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
-        };
-        $.ajaxSetup({
-            beforeSend: function(xhr, settings) {
-                if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
-                  xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
-                }
-            }
-        });
-
-         //切换Nav
-        $('.minNavBtn').on('click',function(){
-            $('.minNax').find('.curr').removeClass('curr');
-            var self = $(this);
-            self.addClass('curr')
-            var tag = self.attr('tag');
-            if(tag == '1'){
-                $('.logonFormDiv').show();
-                $('.registerFormDiv').hide();
-            }else{
-                $('.logonFormDiv').hide();
-                $('.registerFormDiv').show();
-                if (!self.hasClass('selectEd')){
-                    self.addClass('selectEd');
-                    //初始化注册表单验证
-                    registerInitFun();
-                }
-            }
-        })
-
         //文本框的得到和失去光标
         $('.placeholderInput').placeholder();
         var zhi;
@@ -129,14 +108,16 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
     }
     //验证码
     checkCodedFun = function(form,re){
-        var checkStatus = false
+        var checkStatus = false,str = ''
         if(re == 're'){
             var self = $.trim($('#'+form).find('#registerSMSCode').val());
+            str = '短信';
         }else{
             var self = $.trim($('#'+form).find('.checkCode').val());
+            str = '图片';
         }
         if(self == '') {
-            $('#'+form).find('.loginError').text('请输入验证码');
+            $('#'+form).find('.loginError').text('请输入'+ str +'验证码');
             checkStatus = false;
         }else{
             $('#'+form).find('.loginError').text('');
@@ -233,11 +214,17 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         var count, element, intervalId, phoneNumber, timerFunction;
         element = $('.getCodeBtnTrue');
         phoneNumber = $.trim($("#registerMobile").val());
+        var captcha_0 = $('#registerForm').find('input[name="captcha_0"]').val();
+        var captcha_1 = $('#registerForm').find('#registerCode').val();
         $.ajax({
             url: "/api/phone_validation_code/register/" + phoneNumber + "/",
-            type: "POST"
+            type: "POST",
+            data: {
+                captcha_0: captcha_0,
+                captcha_1: captcha_1
+            }
         }).done(function() {
-            count = 180;
+            count = 60;
             $(element).attr('disabled', 'disabled').addClass('buttonGray');
             $('.voiceValidate').attr('disabled', 'disabled');
             timerFunction = function() {
@@ -257,9 +244,11 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
             intervalId;
         }).fail(function(xhr) {
             clearInterval(intervalId);
-            $(element).text('重新获取').removeAttr('disabled').removeClass('buttonGray');
             var result = JSON.parse(xhr.responseText);
             $('#registerForm').find('.loginError').text(result.message);
+            imgCodeRe('registerForm');
+            $('#registerCode').val('').focus();
+            $('.getCodeBtn').addClass('buttonGray').removeClass('getCodeBtnTrue');
         });
     }
     setVoidCodeFun = function(){
@@ -298,41 +287,35 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         $('.pwdStatus').on('click',function(){
             var self = $(this);
             if(self.hasClass('icon-eye03')){
-                self.removeClass('icon-eye03').addClass('icon-eye02');
-                $('#registerPwd').attr('type','text')
+                $('#textPwdInput').show();
+                $('#passWordInput').hide();
             }else{
-                self.removeClass('icon-eye02').addClass('icon-eye03');
-                $('#registerPwd').attr('type','password')
+                $('#passWordInput').show();
+                $('#textPwdInput').hide();
             }
+        })
+        $('.registerPwd').on('change',function(){
+            var val = $(this).val();
+            $('#registerForm').find('input[name="password"]').val(val)
         })
         //注册手机号验证
         $('#registerMobile').on('blur',function() {
             checkMobileFun('registerForm');
-            if(checkMobileFun('registerForm') && ($.trim($('#registerCode').val()) != '')){
-                imgCodeRe('registerForm');
-                $('#registerCode').val('');
-            }else{
-               $('.getCodeBtn').removeClass('getCodeBtnTrue').addClass('buttonGray');
-            }
         })
         //注册密码验证
-        $('#registerPwd').on('blur',function() {
+        $('.registerPwd').on('blur',function() {
             checkPwdFun('registerForm');
         })
         //注册图片验证码
-        $('#registerCode').on('blur',function() {
+        $('#registerCode').on('keyup',function() {
             var getCodeBtn = $('.getCodeBtn');
-            if(checkCodedFun('registerForm') && checkMobileFun('registerForm')){
-                checkImgCodeFun(getCodeBtn)
+            if($('#registerCode').val() != ''){
+                checkMobileFun('registerForm');
+                getCodeBtn.removeClass('buttonGray').addClass('getCodeBtnTrue');
             }else{
                 getCodeBtn.removeClass('getCodeBtnTrue').addClass('buttonGray');
             }
         })
-        //$('.getCodeBtn').on('click',function(){
-            //if(!$(this).hasClass('getCodeBtnTrue')){
-              //$('#registerCode').blur();
-            //}
-        //})
         //注册短信验证码
         $('#registerSMSCode').on('blur',function() {
             checkCodedFun('registerForm','re');
@@ -345,12 +328,14 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         imgCodeRe('registerForm');
         //发送短信验证码
         $('.SMELI').delegate('.getCodeBtnTrue','click',function(){
-            checkSEMFun();
+            if(checkMobileFun('registerForm')){
+                checkSEMFun();
+            }
         })
         //发送语音验证
         $('.voice').delegate('.voiceValidate','click',function(e){
             e.preventDefault();
-            setVoidCodeFun
+            setVoidCodeFun()
         })
         //提交注册表单
         $('#registerSubmit').on('click',function(){
@@ -362,7 +347,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                     identifier = $('#registerMobile').val();
                     captcha_0 = $('#registerForm').find('input[name="captcha_0"]').val();
                     captcha_1 = $('#registerForm').find('#registerCode').val();
-                    password = $('#registerPwd').val();
+                    password = $('.registerPwd').val();
                     validate_code = $('#registerSMSCode').val();
                     invitecode = $('#invitecode').val();
                     $.ajax({
@@ -396,16 +381,5 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
              }
         })
     }
-
-    loginInitFun();
-    var href = location.search;
-    if (href.split('=')[1] == '1') {
-        var self = $('.minNavRight');
-        $('.logonFormDiv').hide();
-        $('.registerFormDiv').show();
-        $('.minNavLeft').removeClass('curr');
-        self.addClass('selectEd curr');
-        //初始化注册表单验证
-        registerInitFun();
-    }
+    $('.minNavLeft').hasClass('curr') ? loginInitFun() : registerInitFun();
 });

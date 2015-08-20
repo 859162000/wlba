@@ -1,9 +1,11 @@
 input:focus
   outline: 0
   text-shadow: none
-
+.checkPwd:-ms-reveal
+  display: none
 input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
   -webkit-box-shadow : 0 0 0px 1000px white inset
+  -webkit-text-fill-color: #666
 
 .i-mod-content
   width: $content-width
@@ -23,16 +25,19 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
       li
         width: 85px
         @extend .fl
-        margin-right: 60px
-        span
+        margin-right: 70px
+        a,span
           width: 74px
           height: 73px
           margin-bottom: 8px
           +inline-block
         .safeSpan1
           @include loginRegister-sprite(safe)
+          height: 58px
+          margin: 10px 0 11px
         .safeSpan2
           @include loginRegister-sprite(bank)
+          height: 71px
         .safeSpan3
           @include loginRegister-sprite(cup)
         .safeSpan4
@@ -47,6 +52,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
         margin-right: 0
       .w140
         width: 149px
+        margin: 0 55px
     +clearfix()
   .loginRegisterRight
     border: 1px solid #d5d5d5
@@ -56,7 +62,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
     .minNax
       height: 59px
       border-bottom: 1px solid #d5d5d5
-      span
+      a
         color: #3e3e3e
         line-height: 57px
         cursor: pointer
@@ -93,8 +99,7 @@ input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus
         +border-radius(4px)
         margin-bottom: 19px
         input
-          height: 36px
-          line-height: 36px
+          padding: 8px 0
           width: 222px
           @extend .fr
           border: 0 none

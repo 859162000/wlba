@@ -22,7 +22,6 @@ def set_promo_user(request, user, invitecode=''):
     if not invitecode:
         invitecode = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
 
-
     if invitecode:
         record = Channels.objects.filter(code=invitecode).first()
         if record:
@@ -127,11 +126,13 @@ def paginator_factory(obj, page=1, limit=100):
 
 
 def pc_data_generator():
+    down_line_amount = 1355000000.00
     # 累计交易金额
     p2p_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))['amount__sum']
     # 累计交易人数
     user_number = P2PRecord.objects.filter(catalog='申购').values('id').count()
-
+    #累计注册人数
+    p2p_register_number = User.objects.all().values('id').count()
     # 提前还款的收益
     income_pre = AmortizationRecord.objects.filter(catalog='提前还款').aggregate(Sum('interest'))['interest__sum']
     income_pre = income_pre if income_pre else 0
@@ -144,7 +145,8 @@ def pc_data_generator():
     user_income = income[0] + income_pre
     key = 'pc_index_data'
     return {
-        'p2p_amount': float(p2p_amount),
+        'p2p_amount': float(p2p_amount) + down_line_amount,
         'user_number': user_number,
-        'user_income': float(user_income)
+        'user_income': float(user_income),
+        'p2p_register_number':p2p_register_number
     }

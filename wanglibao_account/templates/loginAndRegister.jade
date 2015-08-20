@@ -1,0 +1,52 @@
+-load formatters
+-load mathfilters
+
+doctype html
+html
+  head
+    - with '网利宝官网' as title
+    include global/g_head
+    - endwith
+    script(src="/static/src/pc/lib/require.js", data-main="/static/src/pc/config")
+  body
+    include global/g_nav
+    .i-mod-wrap
+        .i-mod-content
+            .i-mod-wrap.loginRegisterLeft.fl
+                .pageAd.mg-t-ssm
+                ul.safeRelevant.tc.mg-t-m.t-d11
+                    li
+                        span.safeSpan1
+                        p 账户资金安全
+                          br
+                          | 由
+                          b 阳光保险
+                          | 承保
+                    li.mr0
+                        span.safeSpan2
+                        p
+                            b 招商银行
+                            br
+                            | 全程监管
+                    li.w140
+                        span.safeSpan3
+                        p
+                            b IDG资本
+                            br
+                            | 百亿市值
+                            b A股上市公司
+                            | 入股
+                    li.mr0
+                        span.safeSpan4
+                        p 第三方
+                          br
+                          b 100%
+                          | 本息保障
+            .i-mod-wrap.loginRegisterRight.fr.bg-d3
+
+                block loginFormPage
+                block registerFormPage
+
+    include global/g_footer
+    script.
+      require(["/static/src/pc/login.js"])

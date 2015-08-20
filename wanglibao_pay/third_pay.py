@@ -275,6 +275,7 @@ def card_bind_list(request):
 
             for card in cards:
                 base_dict = {
+                    "card_id": card.id,
                     'bank_id': card.bank.code,
                     'bank_name': card.bank.name,
                     'gate_id': card.bank.gate_id,

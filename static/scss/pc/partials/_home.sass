@@ -15,16 +15,18 @@
   color: $t-d6
   font-size: $font-m
   text-align: center
+  font-family: $font-family-button
   +line-height(40)
   +border-radius(4px)
   +inline-block
-  +box-shadow(0 2px 0 #dadada, 0 -2px 0 #fe7369)
+  +box-shadow(0 3px 0 #BD332A, 0 6px 1px rgba(0,0,0,.2))
   transition: all .01s ease-in
   &:link, &:visited
     color: $t-d6
   &:hover
+    top: 2px
     color: $t-d6
-    +box-shadow(0 2px 0 #dadada, 0 0 0 #fe7369)
+    +box-shadow(0 1px 0 #BD332A, 0 2px 1px rgba(0,0,0,.2))
   &:active
     color: $t-d6
     +box-shadow(0 0 0 #dadada, 0 0 0 #fe7369)
@@ -35,6 +37,7 @@
   background: $bg-d5
   color: $t-d6
   font-size: $font-m
+  font-family: $font-family-button
   text-align: center
   +line-height(40)
   +border-radius(4px)
@@ -82,6 +85,7 @@
 .ex-dc
   position: relative
   text-align: left
+  height: 215px
   .dc-head
     +clearfix()
     +line-height(58)
@@ -99,17 +103,35 @@
     color: $t-d18
     font-size: 130px
     line-height: 1
-  .num-space
-    height: 21px
-    line-height: 1.2
   .num-animate
-    font-size: $font-l
+    font-size: 28px
+    color: #5384ed
+    vertical-align: top
+    display: inline-block
+  .num-text
+    font-size: $font-m
+    color: #4d4d4d
   span.num-str
     font-size: $font-s
+  .ex-data
+    position: relative
+    z-index: 10
+    font-size: $font-s
+    color: #808080
+    li
+      +line-height(45)
+      .icon
+        color: #cdcdcd
+        font-size: 25px
+        margin-right: $space-s
+
+
 
 .ex-ac-target
   position: relative
   padding: 0 24px 20px 50px
+  .product-target-progress
+    margin-top: 7px
 .ac-tg-head
   +clearfix()
   +line-height(50)
@@ -118,13 +140,12 @@
   +line-height(20)
   display: inline-block
 .tg-pro-tit
-  margin: 20px 0 4px 0
+  margin: 12px 0 4px 0
   +inline-block
-.ac-style
-  margin-bottom: 6px
+  +singleline-ellipsis(0)
 .ac-tg-row
   line-height: 1
-  padding-top: 9px
+  padding-top: 8px
   .buy-warp
     text-align: right
   .buy-text-r
@@ -142,13 +163,23 @@
     width: 90px
     text-align: center
   .tg-bt-text
-    margin-top: 6px
-
+    margin-top: 7px
+.ex-download-app
+  height: 143px
 .ac-tg-bg
   width: 60px
   height: 60px
-  @include home-sprite(xianliang)
   +abs-pos(0, auto, auto, 0)
+
+.ac-targer-uninvest
+  border: 1px solid #f0871d
+  .ac-tg-bg
+    @include home-sprite(uninvest)
+.ac-targer-recommend
+  border: 1px solid $br-d1
+  .ac-tg-bg
+    @include home-sprite(xianliang)
+
 .ex-download-app
   +clearfix()
   img
@@ -162,11 +193,15 @@
     margin-top: 5px
     +border-radius(4px)
     +line-height(36)
+    .icon
+      font-size: $font-ll
 
 .pdt-progress-warp
   line-height: 1.2
   .progress-x
     margin-top: 5px
+.pdt-progress-percent
+  margin-left: 8px
 .product-progress
   position: relative
   height: 4px
@@ -201,9 +236,9 @@
       @include home-sprite(p2p12)
       background-color: $bg-d13
     .pdt-name
-      line-height: 1
       +inline-block
       +singleline-ellipsis()
+      margin-bottom: 4px
       &:hover
         .icon
           color: $t-d2
@@ -249,6 +284,7 @@
     @extend .fl
   .ns-cont
     height: 210px
+    display: block
   .ns-about
     height: 100%
     background: #ccc
@@ -291,35 +327,44 @@
   .cn-head
     +line-height(60)
     padding: 0 50px 0 20px
-  .cn-cont
-    padding: 30px 20px
-    li
-      float: left
-      width: 151px
-      height: 85px
-      border: dotted 1px #b2b2b2
-      a
-        display: block
-        width: 100%
-        height: 100%
-        text-align: center
-      img
-        vertical-align: middle
-        width: 100%
-        height: 100%
+  .cn-head-change
+    .icon
       &:hover
-        +box-shadow(0px 0px 8px #ccc)
+        color: #db493f
+        cursor: pointer
+  .cn-head-title
+    &:hover
+      .icon
+        color: #db493f
+  .cn-cont
+    padding: 30px 25px
   .cn-ul-warp
     position: relative
-    height: 174px
     width: 100%
+    height: 180px
+    padding: 5px 0
     overflow: hidden
-    ul
-      position: absolute
-      top: 0
-      left: 0
-      margin-top: 2px
-  .un-click
-    color: $bg-d2
+  ul
+    position: relative
+    top: 0
+    left: 0
+    +clearfix()
+  li
+    float: left
+    width: 1050px
+    margin-bottom: 5px
+    +clearfix()
+    a
+      float: left
+      width: 150px
+      height: 85px
+      border: dotted 1px #b2b2b2
+      &:hover
+        +box-shadow(0px 0px 6px #ccc)
+        position: relative
+        z-index: 10
+
+
+
 
 //cooperation end

@@ -3,6 +3,7 @@ import datetime
 import logging
 import json
 import math
+import copy
 import hashlib
 import urllib
 import urlparse
@@ -37,6 +38,7 @@ from marketing.utils import set_promo_user, local_to_utc
 from marketing import tools
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
+from wanglibao import settings
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
@@ -63,15 +65,20 @@ from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityRecord
 from aes import Crypt_Aes
 from wanglibao.settings import AMORIZATION_AES_KEY
+from wanglibao_anti.anti.anti import AntiForAllClient
 
 logger = logging.getLogger(__name__)
-
+logger_anti = logging.getLogger('wanglibao_anti')
 
 class RegisterView(RegistrationView):
-    template_name = "register.jade"
+    template_name = "register_test.jade"
     form_class = EmailOrPhoneRegisterForm
 
     def register(self, request, **cleaned_data):
+        """ 
+            modified by: Yihen@20150812
+            descrpition: if(line96~line97)的修改，针对特定的渠道延迟返积分、发红包等行为，防止被刷单
+        """
         nickname = cleaned_data['nickname']
         password = cleaned_data['password']
         identifier = cleaned_data['identifier']
@@ -88,7 +95,9 @@ class RegisterView(RegistrationView):
         auth_user = authenticate(identifier=identifier, password=password)
         auth.login(request, auth_user)
         device = utils.split_ua(request)
-        tools.register_ok.apply_async(kwargs={"user_id": auth_user.id, "device":device})
+        if not AntiForAllClient(request).anti_delay_callback_time(user.id, device):
+            tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
         account_backends.set_source(request, auth_user)
         return user
 
@@ -98,10 +107,33 @@ class RegisterView(RegistrationView):
         return '/accounts/login/'
 
     def get_context_data(self, **kwargs):
+
+        sign = self.request.GET.get('sign', None)
+        promo_token = self.request.GET.get('promo_token', None)
+
+        # sign = urllib.urlencode(self.request.GET.get('sign', None))
+
         context = super(RegisterView, self).get_context_data(**kwargs)
         context.update({
             'next': self.request.GET.get('next', '/accounts/login/')
         })
+
+        if sign and promo_token == 'csai':
+
+            try:
+                from wanglibao_account.cooperation import get_xicai_user_info
+                key = settings.XICAI_CLIENT_SECRET[0:8]
+                data = get_xicai_user_info(key, sign)
+                phone = data['phone']
+            except Exception, e:
+                print 'get phone error, ', e
+                phone = None
+
+            if phone:
+                context.update({
+                    'phone': phone,
+                })
+
         return context
 
 
@@ -1100,6 +1132,15 @@ def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
 @csrf_protect
 @never_cache
 def ajax_register(request):
+    """
+        modified-1 by: Yihen@20150812
+        descrpition: if(line1150~line1151)的修改，针对特定的渠道延迟返积分、发红包等行为，防止被刷单
+
+        //////////////////////////
+
+        modified-2 by: Yihen@20150818
+        descrpition: if(line1154~line1156)的修改，web端在注册的时候，不需要再次验证图片验证码, code暂留，后期会加上这方面的逻辑
+    """
     def messenger(message, user=None):
         res = dict()
         if user:
@@ -1108,11 +1149,12 @@ def ajax_register(request):
         return json.dumps(res)
 
     if request.method == "POST":
+        #request_bakup = copy.deepcopy(request)    #add by Yihen@20150818; reason:第三方渠道处理的时候，会更改request中的信息
         if request.is_ajax():
 
-            res, message = verify_captcha(dic=request.POST, keep=True)
-            if not res:
-                return HttpResponseForbidden(messenger(message={'captcha_1': u'验证码错误'}))
+            #res, message = verify_captcha(dic=request.POST, keep=False)
+            #if not res:
+            #    return HttpResponseForbidden(messenger(message={'captcha_1': u'图片验证码错误'}))
 
             form = EmailOrPhoneRegisterForm(request.POST)
             if form.is_valid():
@@ -1135,7 +1177,10 @@ def ajax_register(request):
                 auth.login(request, auth_user)
 
                 device = utils.split_ua(request)
-                tools.register_ok.apply_async(kwargs={"user_id": auth_user.id, "device":device})
+
+                #if not AntiForAllClient(request_bakup).anti_delay_callback_time(user.id, device):
+                tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
                 account_backends.set_source(request, auth_user)
 
                 return HttpResponse(messenger('done', user=request.user))

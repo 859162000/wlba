@@ -21,9 +21,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from marketing.models import SiteData
 from wanglibao.permissions import IsAdminUserOrReadOnly
-from wanglibao.signals import signal_product_first_bought
 from wanglibao_account.cooperation import CoopRegister
-from wanglibao_lottery.tasks import send_lottery
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.prepayment import PrepaymentHistory
 from wanglibao_p2p.forms import PurchaseForm, BillForm
@@ -53,6 +51,7 @@ import re
 from celery.execute import send_task
 from wanglibao_redis.backend import redis_backend
 import pickle
+
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -443,11 +442,11 @@ class P2PProductViewSet(PaginatedModelViewSet):
             pager = Q(id__lt=minid)
 
         if pager:
-            return qs.filter(hide=False).filter(status__in=[
+            return qs.filter(hide=False, publish_time__lte=timezone.now()).filter(status__in=[
                 u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
             ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).filter(pager).order_by('-priority', '-publish_time')
         else:
-            return qs.filter(hide=False).filter(status__in=[
+            return qs.filter(hide=False, publish_time__lte=timezone.now()).filter(status__in=[
                 u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
             ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time')
 

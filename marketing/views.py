@@ -501,10 +501,10 @@ class IntroducedAwardTemplate(TemplateView):
 class NewsListView(TemplateView):
     """ News and Report list page """
 
-    template_name = 'news.jade'
+    template_name = 'news_new.jade'
 
     def get_context_data(self, **kwargs):
-        news = NewsAndReport.objects.filter().order_by('-created_at')
+        news = NewsAndReport.objects.filter().order_by('-score', '-created_at')
 
         news_list = []
         news_list.extend(news)
