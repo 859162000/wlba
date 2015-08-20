@@ -583,7 +583,7 @@ class ShiTouCunRegister(CoopRegister):
 class FuBaBaRegister(CoopRegister):
     def __init__(self, request):
         super(FuBaBaRegister, self).__init__(request)
-        self.c_code = 'fbaba'
+        self.c_code = 'fuba'
         self.call_back_url = FUBABA_CALL_BACK_URL
         self.coop_id = FUBABA_COOP_ID
         self.coop_key = FUBABA_KEY
