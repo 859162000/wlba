@@ -18,7 +18,7 @@ body
       ul.announce-content-list
         for announce in announcements
           li
-            a.span10(href="/announcement/detail/{{announce.id}}", target="_blank") &bull; {{announce.title}}
+            a.span10(href="/announcement/detail/{{announce.id}}/", target="_blank") &bull; {{announce.title}}
             .span2-omega.align-center {{announce.createtime | date:'Y-m-d'}}
       .space-vertical-l
       .row

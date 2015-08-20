@@ -4,7 +4,7 @@
 doctype html
 html
   head
-    - with '网利宝官网' as title
+    - with '网利宝官网--p2p理财--p2p网贷--值得信赖的互联网金融服务平台' as title
     include global/g_head
     - endwith
 
@@ -29,10 +29,17 @@ html
             +intro('icon-rocket', '高收益 低门槛', '30余倍银行活期收益', '100元起投')
             +intro('icon-safe', '安全保障', '第三方资金托管', '阳光保险承保资金安全')
             +intro('icon-authority', '专业权威', '华尔街精英金融团队', 'IT数据风控系统')
-          .ex-ac-target.mg-t-sm.br-d1.bg-d3
-            for product in recommend_product
+          for product in recommend_product
+            if product.category ==  "新手标"
+              invest = 'ac-targer-uninvest'
+            else
+              invest = 'ac-targer-recommend'
+            .ex-ac-target.mg-t-sm.bg-d3(class=invest)
               .ac-tg-head.span12
-                h3.hd-name.fl 精选推荐
+                if product.category == "新手标"
+                  h3.hd-name.fl 新手专属标
+                else
+                  h3.hd-name.fl 精选推荐
                 .hd-time.fr
                   span.recommend_time(data-update='{{product.end_time}}')
               .ac-tg-cont
@@ -76,7 +83,7 @@ html
                       a(href="/p2p/detail/{{product.id}}/", class='{{statusClass}}') {{status}}
                       amount = product.total_amount - product.ordered_amount
                       .t-d7.tg-bt-text 剩余金额 ￥ {{amount | money_format_int}}元
-            .ac-tg-bg
+              .ac-tg-bg
 
         .ex-rt-cont
           .ex-dc.padding-l-r-sm
@@ -86,19 +93,22 @@ html
                 span 数据统计
               .dc-time.t-d7.fr 截至 {{site_data.updated_at | milldate_format}}
             .ex-data
-              ul.font-s
-                  li.mg-b-s
-                    p.t-d7.font-xs 累计注册人数
-                    .num-space.t-d8(data-number='{{site_data.p2p_register_number}}', data-type='man')
-                  li.mg-b-s
-                    p.t-d7.font-xs 累计赚取收益
-                    .num-space.t-d8(data-number='{{site_data.user_income}}',data-type='amount')
-                  li.mg-b-s
-                    p.t-d7.font-xs 累计交易金额
-                    .num-space.t-d8(data-number='{{site_data.p2p_amount}}',data-type='amount')
-            i.dc-bg.icon.iconfont.icon-amount
+              ul
+                li
+                  i.icon.iconfont.icon-data-user
+                  | 已有
+                  span.num-space(data-number='{{site_data.p2p_register_number}}', data-type='man')
+                  | 小伙伴选择了网利宝
+                li
+                  i.icon.iconfont.icon-data-invest
+                  span 小伙伴们共投资
+                  span.num-space(data-number='{{site_data.p2p_amount}}',data-type='amount')
+                li
+                  i.icon.iconfont.icon-data-makemoney
+                  | 小伙伴们赚取了
+                  span.num-space(data-number='{{site_data.user_income}}',data-type='amount')
           .ex-download-app.mg-t-sm.padding-sm
-            img(src='/static/imgs/pc/home/erweima.jpg').dol-app.mg-r-sm.fl
+            img(src='/static/imgs/pc/home/www_erweima.jpg').dol-app.mg-r-sm.fl
             .dol-btn.fl
               .t-d4 网利宝APP-随时随地 让钱生钱
               a(href='https://www.wanglibao.com/static/wanglibao1.apk').dol-btn-warp
@@ -112,7 +122,7 @@ html
     //product start
     .i-mod-wrap.mg-t-sm
       .i-mod-product.clearfix
-        p2ptype = [{'title': '短期灵活', 'period': '标的期限1-3月', 'class': 'p2p3', 'data': p2p_lt_three},{'title': '中期稳健', 'period': '标的期限3-6月', 'class': 'p2p6', 'data': p2p_lt_six},{'title': '长期优选', 'period': '标的期限6月及以上', 'class': 'p2p12', 'data': p2p_gt_six}]
+        p2ptype = [{'title': '短期灵活', 'period': '标的期限1-3个月', 'class': 'p2p3', 'data': p2p_lt_three},{'title': '中期稳健', 'period': '标的期限3-6个月', 'class': 'p2p6', 'data': p2p_lt_six},{'title': '长期优选', 'period': '标的期限6个月及以上', 'class': 'p2p12', 'data': p2p_gt_six}]
         for type in p2ptype
           .pdt-item
             .pdt-type.padding-sm.br-b-d2(class='{{type.class}}')
@@ -171,7 +181,7 @@ html
             a(href="/about/").ns-head
               i.icon.iconfont.icon-about
               span.font-l.mg-l-s 关于网利宝
-            a(href="/guide/").ns-cont
+            a(href="/pc_guide/").ns-cont
               img(src='/static/imgs/pc/home/about.gif').ns-about
           li.mg-r-xxl
             a(href="/announcement/").ns-head
@@ -179,7 +189,7 @@ html
               span.font-l.mg-l-s 平台公告
             .ns-cont.ns-notice.t-d4
               for anno in announcements
-                a(href="baiducom").font-ss.clearfix
+                a(href="{{anno.get_absolute_url}}/" target="_blank").font-ss.clearfix
                   .span9.notice-body
                     i.icon-notice-self
                     |&nbsp{{anno}}
@@ -219,5 +229,4 @@ html
     include global/g_footer
     script.
       require(["/static/src/pc/index.js"])
-
-'
+    include include/tracking

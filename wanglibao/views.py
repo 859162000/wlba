@@ -19,7 +19,9 @@ import urlparse
 from wanglibao_redis.backend import redis_backend
 import json
 import pickle
-
+import datetime
+import hashlib
+from wanglibao.settings import WLB_FOR_FUBABA_KEY
 
 class IndexView(TemplateView):
     template_name = 'index_new.jade'
@@ -134,7 +136,7 @@ class IndexView(TemplateView):
 
         banners = Banner.objects.filter(Q(device=Banner.PC_2), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now())))
         # 新闻页面只有4个固定位置
-        news_and_reports = NewsAndReport.objects.all().order_by("-score")[:4]
+        news_and_reports = NewsAndReport.objects.all().order_by('-score', '-created_at')[:4]
 
         # 网站数据
         m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
@@ -244,3 +246,20 @@ def server_error(request):
     template = loader.get_template('html/500.html')
     return HttpResponse(content=template.render(Context()), content_type='text/html; charset=utf-8', status=500)
 
+#
+def landpage_view(request):
+    # 判断是否为富爸爸来源
+    channel_name = getattr(request, request.method).get('promo_token', None)
+    tid = getattr(request, request.method).get('tid', '1316')
+    sign = getattr(request, request.method).get('sign', None)
+    if channel_name and sign == hashlib.md5(str(tid)+channel_name+str(WLB_FOR_FUBABA_KEY)).hexdigest():
+        redis = redis_backend()
+        land_time_lately = redis._get(tid)
+        current_time = datetime.datetime.now()
+        if land_time_lately:
+            land_time_lately = datetime.datetime.strptime(land_time_lately, '%Y-%m-%d %H:%M:%S')
+            # 如果上次访问的时间是在30天前则不更新访问时间
+            if land_time_lately + datetime.timedelta(seconds=180) <= current_time:
+                return HttpResponseRedirect(reverse('marketing_gold'))
+        redis._set(tid, current_time.strftime("%Y-%m-%d %H:%M:%S"))
+    return HttpResponseRedirect(reverse('marketing_gold'))

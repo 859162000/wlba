@@ -442,11 +442,11 @@ class P2PProductViewSet(PaginatedModelViewSet):
             pager = Q(id__lt=minid)
 
         if pager:
-            return qs.filter(hide=False).filter(status__in=[
+            return qs.filter(hide=False, publish_time__lte=timezone.now()).filter(status__in=[
                 u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
             ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).filter(pager).order_by('-priority', '-publish_time')
         else:
-            return qs.filter(hide=False).filter(status__in=[
+            return qs.filter(hide=False, publish_time__lte=timezone.now()).filter(status__in=[
                 u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
             ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time')
 

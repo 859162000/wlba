@@ -59,3 +59,6 @@
 .icon-ios:before { content: "\e622"; }
 .icon-house:before { content: "\e621"; }
 .icon-car:before { content: "\e61f"; }
+.icon-data-user:before { content: "\e649"; }
+.icon-data-invest:before { content: "\e64a"; }
+.icon-data-makemoney:before { content: "\e64b"; }

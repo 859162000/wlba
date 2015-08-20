@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # encoding:utf-8
+import json
+
 if __name__ == '__main__':
     import os
     import sys
@@ -19,16 +21,18 @@ from rest_framework.views import APIView
 from marketing.models import Channels, IntroducedBy, PromotionToken
 from marketing.utils import set_promo_user
 from wanglibao import settings
-from wanglibao.settings import  YIRUITE_CALL_BACK_URL, \
+from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      TIANMANG_CALL_BACK_URL, WLB_FOR_YIRUITE_KEY, YIRUITE_KEY, BENGBENG_KEY, \
      WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
      JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL, JINSHAN_CALL_BACK_URL, WLB_FOR_JINSHAN_KEY, \
-     WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY
+     WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY, FUBABA_CALL_BACK_URL, WLB_FOR_FUBABA_KEY, \
+     FUBABA_COOP_ID, FUBABA_KEY
 from wanglibao_account.models import Binding, IdVerification
-from wanglibao_account.tasks import  common_callback, jinshan_callback
+from wanglibao_account.tasks import common_callback, jinshan_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
 from wanglibao_pay.models import Card
 from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_redis.backend import redis_backend
 
 logger = logging.getLogger(__name__)
 
@@ -290,17 +294,20 @@ class CoopRegister(object):
         self.save_to_session()
 
     def all_processors_for_user_register(self, user, invite_code):
-        if not invite_code:
-            invite_code = self.channel_code
-        # logger.debug('get invite code %s'%(invite_code))
-        if invite_code:
-            # 通过渠道注册
-            for processor in self.processors:
-                if processor.c_code == processor.channel_code:
-                    processor.process_for_register(user, invite_code)
-                    return
-            # 默认注册
-            self.process_for_register(user, invite_code)
+        try:
+            if not invite_code:
+                invite_code = self.channel_code
+            # logger.debug('get invite code %s'%(invite_code))
+            if invite_code:
+                # 通过渠道注册
+                for processor in self.processors:
+                    if processor.c_code == processor.channel_code:
+                        processor.process_for_register(user, invite_code)
+                        return
+                # 默认注册
+                self.process_for_register(user, invite_code)
+        except:
+            logger.exception('channel register process error for channel %s and user %s'%(invite_code, user.id))
 
     def get_user_channel_processor(self, user):
         """
@@ -315,21 +322,30 @@ class CoopRegister(object):
             return None
 
     def process_for_validate(self, user):
-        channel_processor = self.get_user_channel_processor(user)
-        # logger.debug('channel processor %s'%channel_processor)
-        if channel_processor:
-            channel_processor.validate_call_back(user)
+        try:
+            channel_processor = self.get_user_channel_processor(user)
+            # logger.debug('channel processor %s'%channel_processor)
+            if channel_processor:
+                channel_processor.validate_call_back(user)
+        except:
+            logger.exception('channel validate process error for user %s'%(user.id))
 
     def process_for_binding_card(self, user):
-        channel_processor = self.get_user_channel_processor(user)
-        # logger.debug('channel processor %s'%channel_processor)
-        if channel_processor:
-            channel_processor.binding_card_call_back(user)
+        try:
+            channel_processor = self.get_user_channel_processor(user)
+            # logger.debug('channel processor %s'%channel_processor)
+            if channel_processor:
+                channel_processor.binding_card_call_back(user)
+        except:
+            logger.exception('channel bind card process error for user %s'%(user.id))
 
     def process_for_purchase(self, user):
-        channel_processor = self.get_user_channel_processor(user)
-        if channel_processor:
-            channel_processor.purchase_call_back(user)
+        try:
+            channel_processor = self.get_user_channel_processor(user)
+            if channel_processor:
+                channel_processor.purchase_call_back(user)
+        except:
+            logger.exception('channel bind purchase process error for user %s'%(user.id))
 
 
 class TianMangRegister(CoopRegister):
@@ -382,10 +398,11 @@ class BengbengRegister(CoopRegister):
 
     def binding_card_call_back(self, user):
         uid_for_coop = get_uid_for_coop(user.id)
-        sign = hashlib.md5(self.coop_id + self.channel_user + uid_for_coop + self.coop_key).hexdigest()
+        channel_user = self.channel_user_from_db(user)
+        sign = hashlib.md5(self.coop_id + channel_user + uid_for_coop + self.coop_key).hexdigest()
         params = {
             'adID': self.coop_id,
-            'annalID': self.channel_user,
+            'annalID': channel_user,
             'idCode': uid_for_coop,
             'doukey': sign,
             'idName': get_username_for_coop(user.id)
@@ -566,13 +583,10 @@ class ShiTouCunRegister(CoopRegister):
                 'logo': logo,
                 'uid': uid,
                 'e_uid': uid_for_coop,
-                'e_user': uid_for_coop
+                'e_user': uid_for_coop,
             }
             common_callback.apply_async(
                 kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
-
-    def register_call_back(self, user):
-        self.shitoucun_call_back(user)
 
     def purchase_call_back(self, user):
         # 判断是否是首次投资
@@ -581,9 +595,67 @@ class ShiTouCunRegister(CoopRegister):
         self.shitoucun_call_back(user)
 
 
+class FuBaBaRegister(CoopRegister):
+    def __init__(self, request):
+        super(FuBaBaRegister, self).__init__(request)
+        self.c_code = 'fuba'
+        self.call_back_url = FUBABA_CALL_BACK_URL
+        self.coop_id = FUBABA_COOP_ID
+        self.coop_key = FUBABA_KEY
+
+    @property
+    def channel_user(self):
+        # 富爸爸需求，如果uid为空，uid设置为1316
+        return self.request.session.get(self.internal_channel_user_key, '1316')
+
+    def purchase_call_back(self, user):
+        """
+        投资回调
+        """
+        # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
+        binding = Binding.objects.filter(user_id=user.id).first()
+        p2p_record = P2PRecord.objects.filter(user_id=user.id).last()
+        if binding and p2p_record:
+            # 如果结算时间过期了则不执行回调
+            earliest_settlement_time = redis_backend()._get(binding.bid)
+            if earliest_settlement_time:
+                earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
+                current_time = datetime.datetime.now()
+                # 如果上次访问的时间是在30天前则不更新访问时间
+                if earliest_settlement_time + datetime.timedelta(seconds=180) <= current_time:
+                    return
+
+            order_id = p2p_record.id
+            goodsprice = p2p_record.amount
+            # goodsname 提供固定值，固定值自定义，但不能为空
+            goodsname = u"名称:网利宝,类型:产品标,周期:1月"
+            sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
+            status = u"直投【%s 元：已付款】" % goodsprice
+            params = {
+                'action': 'create',
+                'planid': self.coop_id,
+                'order': order_id,
+                'goodsmark': '1',
+                'goodsprice': goodsprice,
+                'goodsname': goodsname,
+                'sig': sig,
+                'status': status,
+                'uid': binding.bid,
+            }
+            common_callback.apply_async(
+                kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+            # 记录开始结算时间
+            if not binding.extra:
+                # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
+                if earliest_settlement_time:
+                    binding.extra=earliest_settlement_time
+                    binding.save()
+
+
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
-                          JuxiangyouRegister, DouwanRegister, JinShanRegister, ShiTouCunRegister]
+                          JuxiangyouRegister, DouwanRegister, JinShanRegister,
+                          ShiTouCunRegister, FuBaBaRegister]
 
 
 #######################第三方用户查询#####################
@@ -916,8 +988,10 @@ def xicai_send_data():
     for p2p_product in xicai_get_updated_p2p():
         xicai_post_updated_product_info(p2p_product, access_token)
 
+
 def get_xicai_user_info(key, sign):
     """
+    author: Zhoudong
     根据希财提供的sign 获取必须的用户信息.
     如, 手机号, 用户名, (邮箱, 等等)
     :return:
@@ -942,7 +1016,226 @@ def get_xicai_user_info(key, sign):
 
     return data
 
+
+class CsaiUserQuery(APIView):
+    """
+    author: Zhoudong
+    希财专用用户信息查询接口
+    """
+    permission_classes = ()
+
+    def check_sign(self):
+
+        t = str(self.request.GET.get('t', None))
+        token = self.request.GET.get('token', None)
+
+        if t and token:
+            from hashlib import md5
+            sign = md5(md5(t).hexdigest() + settings.XICAI_CLIENT_SECRET).hexdigest()
+            if token == sign:
+                return True
+
+    def get(self, request):
+
+        if self.check_sign():
+
+            page = int(self.request.GET.get('page', 1))
+            page_size = int(self.request.GET.get('pagesize', 10))
+            users_list = []
+            ret = dict()
+
+            binds = Binding.objects.filter(btype=u'csai')
+            users = [b.user for b in binds]
+            ret['total'] = len(users)
+
+            # 获取总页数, 和页数不对处理
+            com_page = len(users) / page_size + 1
+            if page > com_page:
+                page = com_page
+            if page < 1:
+                page = 1
+
+            # 获取到对应的页数的所有用户
+            if len(users) / page_size >= page:
+                users = users[(page - 1) * page_size: page * page_size]
+            else:
+                users = users[(page - 1) * page_size:]
+
+            for user in users:
+                user_dict = dict()
+                user_dict['id'] = user.id
+                user_dict['username'] = user.username
+                user_dict['email'] = user.email
+                user_dict['regtime'] = user.date_joined
+
+                # 去用户详情表查
+                user_profile = WanglibaoUserProfile.objects.get(user=user)
+                user_dict['realname'] = user_profile.name
+                user_dict['phone'] = user_profile.phone
+
+                user_dict['totalmoney'] = P2PEquity.objects.filter(user=user).aggregate(sum=Sum('equity'))['sum']
+
+                user_dict['ip'] = None
+                user_dict['qq'] = None
+
+                users_list.append(user_dict)
+
+            ret['list'] = users_list
+            ret['code'] = 0
+
+        else:
+            ret = {
+                'code': 1,
+                'msg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class CsaiInvestmentQuery(APIView):
+    """
+    author: Zhoudong
+    希财专用投资查询接口
+    """
+    permission_classes = ()
+
+    def check_sign(self):
+        t = str(self.request.GET.get('t', None))
+        token = self.request.GET.get('token', None)
+        if t and token:
+            from hashlib import md5
+            sign = md5(md5(t).hexdigest() + settings.XICAI_CLIENT_SECRET).hexdigest()
+            if token == sign:
+                return True
+
+    def get(self, request):
+
+        if self.check_sign():
+
+            page = int(self.request.GET.get('page', 1))
+            page_size = int(self.request.GET.get('pagesize', 10))
+            p2p_list = []
+            ret = dict()
+
+            binds = Binding.objects.filter(btype=u'csai')
+            users = [b.user for b in binds]
+            p2ps = P2PEquity.objects.filter(user__in=users)
+
+            ret['total'] = p2ps.count()
+
+            # 获取总页数, 和页数不对处理
+            com_page = len(p2ps) / page_size + 1
+
+            if page > com_page:
+                page = com_page
+            if page < 1:
+                page = 1
+
+            # 获取到对应的页数的所有用户
+            if len(p2ps) / page_size >= page:
+                p2ps = p2ps[(page - 1) * page_size: page * page_size]
+            else:
+                p2ps = p2ps[(page - 1) * page_size:]
+
+            for p2p in p2ps:
+                p2p_dict = dict()
+                p2p_dict['id'] = p2p.id
+                p2p_dict['pid'] = p2p.product_id
+                p2p_dict['username'] = p2p.user.username
+                p2p_dict['datetime'] = p2p.created_at
+                p2p_dict['money'] = p2p.equity
+                period = p2p.product.period if not p2p.product.pay_method.startswith(u"日计息") \
+                    else p2p.product.period/30.0
+                p2p_dict['commission'] = p2p.equity * period * 0.012 / 12
+
+                p2p_list.append(p2p_dict)
+
+            ret['list'] = p2p_list
+            ret['code'] = 0
+
+        else:
+            ret = {
+                'code': 1,
+                'msg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
 if __name__ == '__main__':
     print xicai_get_updated_p2p()
     print xicai_get_new_p2p()
     xicai_send_data()
+
+
+# 菜苗渠道
+def caimiao_post_platform_info():
+    """
+    author: Zhoudong
+    http请求方式: POST
+    http://121.40.31.143:86/api/JsonsFinancial/PlatformBasic/
+    向菜苗推送我们的平台信息.
+    :return:
+    """
+    url = settings.CAIMIAO_PLATFORM_URL
+
+    post_data = dict()
+
+    key = settings.CAIMIAO_SECRET
+
+    data = {
+        'tits': u'网利宝',
+        'provinces': u'北京市',
+        'zones': u'朝阳区',
+        'terms_scopes_mins': u'3个月',
+        'terms_scopes_maxs': u'6个月',
+        'aprs_mins': u'11%',
+        'aprs_maxs': u'18%',
+        'times_ups': u'2014-08-20',
+        'registered_capitals': u'5000万',
+        'telephones_services': u'4008588066',
+        'types_projects': u'车贷20%, 房贷55%, 银行过桥10%, 供应链15%',
+        'security_mode': u'融资性担保公司, 平台垫付',
+        'legal_persons': u'杨华',
+        'icps': u'京ICP备14014548号',
+        'coms_names': u'北京网利科技有限公司',
+        'coms_scales': u'120人',
+        'coms_address': u'北京市朝阳区东三环北路乙2号1幢海南航空大厦A座7层',
+        'coms_bewrites': u'',
+        'qqs': u'',
+        'websites': u'www.wanglibao.com'
+    }
+
+    # php md5('cmjr'.md5($key.json_encod(主数据)));
+    sign = hashlib.md5('cmjr' + hashlib.md5(key + json.dumps(data)).hexdigest()).hexdigest()
+
+    post_data.update(key=key)
+    post_data.update(sign=sign)
+    post_data.update(data=data)
+
+    # 参数转成json 格式
+    json_data = json.dumps(post_data)
+
+    ret = requests.post(url, data=json_data)
+    return ret
+
+
+def caimiao_post_p2p_info():
+    """
+    author: Zhoudong
+    :return:
+    """
+
+    key = settings.CAIMIAO_SECRET
+
+    now = timezone.now()
+
+    start_time = now - settings.XICAI_UPDATE_TIMEDELTA
+    ps = P2PProduct.objects.filter(publish_time__gte=start_time).filter(publish_time__lt=now).all()
+
+    p2p_equity = P2PEquity.objects.filter(created_at__gte=start_time).all()
+    wangli_products = set([p.product for p in p2p_equity]).update(ps)
+
+    data = dict()
+    data['tits'] = u"网利宝"
+    for product in wangli_products:
+        prod = dict()
+        prod['prods_codes'] = product.pk
