@@ -834,6 +834,12 @@ WLB_FOR_SHLS_KEY = '1995'
 WLB_FOR_SHITOUCUN_KEY = '1996'
 SHITOUCUN_CALL_BACK_URL = 'http://www.stcun.com/task/interface/int'
 
+# 富爸爸
+FUBABA_COOP_ID = 133
+FUBABA_KEY = 'wanglibao@123'
+WLB_FOR_FUBABA_KEY = '1997'
+FUBABA_CALL_BACK_URL = 'http://www.fbaba.net/track/cps.php'
+
 #彩票
 LINGCAIBAO_BASE_ISSUE = 2015090
 LINGCAIBAO_BASE_DATETIME = datetime(2015, 8, 4)
