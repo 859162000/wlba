@@ -1149,7 +1149,8 @@ class CsaiUserQuery(APIView):
                 user_dict['realname'] = user_profile.name
                 user_dict['phone'] = user_profile.phone
 
-                user_dict['totalmoney'] = P2PEquity.objects.filter(user=user).aggregate(sum=Sum('equity'))['sum']
+                user_dict['totalmoney'] = \
+                    P2PEquity.objects.filter(user=user).aggregate(Sum('equity'))['equity__sum'] or 0
 
                 user_dict['ip'] = None
                 user_dict['qq'] = None
@@ -1258,12 +1259,12 @@ if __name__ == '__main__':
 def caimiao_post_platform_info():
     """
     author: Zhoudong
-    http请求方式: POST
+    http请求方式: POST  平台基本数据
     http://121.40.31.143:86/api/JsonsFinancial/PlatformBasic/
     向菜苗推送我们的平台信息.
     :return:
     """
-    url = settings.CAIMIAO_PLATFORM_URL
+    url = settings.CAIMIAO_PlatformBasic_URL
     key = settings.CAIMIAO_SECRET
 
     post_data = dict()
@@ -1308,10 +1309,12 @@ def caimiao_post_platform_info():
 def caimiao_post_p2p_info():
     """
     author: Zhoudong
+    http请求方式: POST  标的信息
+    http://121.40.31.143:86/api/JsonsFinancial/ProdMain/
     :return:
     """
 
-    url = settings.CAIMIAO_P2P_URL
+    url = settings.CAIMIAO_ProdMain_URL
     key = settings.CAIMIAO_SECRET
 
     post_data = dict()
@@ -1340,6 +1343,90 @@ def caimiao_post_p2p_info():
         prod['prods_end'] = product.soldout_time.strftime("%Y-%m-%d") if product.soldout_time else None
 
         data['prods'].append(prod)
+
+    # php md5('cmjr'.md5($key.json_encod(主数据)));
+    sign = hashlib.md5('cmjr' + hashlib.md5(key + json.dumps(data)).hexdigest()).hexdigest()
+
+    post_data.update(key=key)
+    post_data.update(sign=sign)
+    post_data.update(data=data)
+
+    # 参数转成json 格式
+    json_data = json.dumps(post_data)
+
+    ret = requests.post(url, data=json_data)
+
+    return ret.text
+
+
+def caimiao_post_volumes_info():
+    """
+    author: Zhoudong
+    http请求方式: POST  成交量
+    http://121.40.31.143:86/api/JsonsFinancial/Volumes/
+    :return:
+    """
+
+    url = settings.CAIMIAO_DEAL_Volumes_URL
+    key = settings.CAIMIAO_SECRET
+
+    post_data = dict()
+
+    now = timezone.now()
+    start = now - timezone.timedelta(days=1)
+    equities = P2PEquity.objects.filter(Q(created_at__gte=start) & Q(created_at__lt=now))
+
+    data = dict()
+    data['tits'] = u"网利宝"
+    data['volumes_nows'] = equities.aggregate(Sum('equity'))['equity__sum'] or 0
+    data['investors_number_now'] = equities.values_list('user', flat=True).distinct().count()
+    data['volumes_all'] = P2PEquity.objects.all().aggregate(Sum('equity'))['equity__sum'] or 0
+    data['times'] = timezone.localtime(now).strftime('%Y%m%d')
+
+    # php md5('cmjr'.md5($key.json_encod(主数据)));
+    sign = hashlib.md5('cmjr' + hashlib.md5(key + json.dumps(data)).hexdigest()).hexdigest()
+
+    post_data.update(key=key)
+    post_data.update(sign=sign)
+    post_data.update(data=data)
+
+    # 参数转成json 格式
+    json_data = json.dumps(post_data)
+
+    ret = requests.post(url, data=json_data)
+
+    return ret.text
+
+
+def caimiao_post_rating_info():
+    """
+    author: Zhoudong
+    http请求方式: POST  网贷评级数据
+    http://121.40.31.143:86/api/JsonsFinancial/Rating/
+    :return:
+    """
+
+    url = settings.CAIMIAO_Rating_URL
+    key = settings.CAIMIAO_SECRET
+
+    post_data = dict()
+
+    data = dict()
+    data['tits'] = u"网利宝"
+    data['site_registration_number'] = User.objects.count()
+    data['risk_reserve_fund_sum'] = u'5000万'
+    data['back_amount'] = \
+        ProductAmortization.objects.all().aggregate(Sum('principal'))['principal__sum'] +\
+        ProductAmortization.objects.all().aggregate(Sum('interest'))['interest__sum']
+
+    now = timezone.now()
+    end = now + timezone.timedelta(days=60)
+    product_amortizations = ProductAmortization.objects.filter(Q(term_date__gte=now) & Q(term_date__lt=end))
+
+    data['60days_back_amount'] = \
+        product_amortizations.aggregate(Sum('principal'))['principal__sum'] +\
+        product_amortizations.aggregate(Sum('interest'))['interest__sum']
+    data['times'] = timezone.localtime(now).strftime('%Y%m%d')
 
     # php md5('cmjr'.md5($key.json_encod(主数据)));
     sign = hashlib.md5('cmjr' + hashlib.md5(key + json.dumps(data)).hexdigest()).hexdigest()

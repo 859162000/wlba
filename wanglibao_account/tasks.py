@@ -149,3 +149,25 @@ def caimiao_p2p_info_post_task():
     """
     from wanglibao_account.cooperation import caimiao_post_p2p_info
     caimiao_post_p2p_info()
+
+
+@app.task
+def caimiao_volumes_info_post_task():
+    """
+    author: Zhoudong
+    向菜苗发送成交量
+    :return:
+    """
+    from wanglibao_account.cooperation import caimiao_post_volumes_info
+    caimiao_post_volumes_info()
+
+
+@app.task
+def caimiao_rating_info_post_task():
+    """
+    author: Zhoudong
+    向菜苗发送网贷评级数据
+    :return:
+    """
+    from wanglibao_account.cooperation import caimiao_post_rating_info
+    caimiao_post_rating_info()
