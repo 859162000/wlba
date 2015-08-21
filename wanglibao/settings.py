@@ -854,10 +854,14 @@ WLB_FOR_SHITOUCUN_KEY = '1996'
 SHITOUCUN_CALL_BACK_URL = 'http://www.stcun.com/task/interface/int'
 
 # 富爸爸
-FUBABA_COOP_ID = 133
-FUBABA_KEY = 'wanglibao@123'
-WLB_FOR_FUBABA_KEY = '1997'
-FUBABA_CALL_BACK_URL = 'http://www.fbaba.net/track/cps.php'
+FUBA_COOP_ID = 133
+FUBA_KEY = 'wanglibao@123'
+WLB_FOR_FUBA_KEY = '1997'
+FUBA_CALL_BACK_URL = 'http://www.fbaba.net/track/cps.php'
+FUBA_DEFAULT_TID = '1316'
+FUBA_ACTIVITY_PAGE = 'marketing_gold'
+FUBA_PERIOD = 30
+FUBA_CHANNEL_CODE = 'fuba'
 
 #彩票
 LINGCAIBAO_BASE_ISSUE = 2015090
@@ -868,6 +872,12 @@ if ENV == ENV_PRODUCTION:
     LINGCAIBAO_URL_ORDER = 'http://open.lingcaibao.com/lingcaiapi/order'
 else:
     LINGCAIBAO_URL_ORDER = 'http://test.lingcaibao.com/lingcaiapi/order'
+
+# 云端
+YUNDUAN_COOP_ID = 133
+YUNDUAN_KEY = 'wanglibao@123'
+WLB_FOR_YUNDUAN_KEY = '1998'
+YUNDUAN_CALL_BACK_URL = 'http://www.a.com/track/cps.php'
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100

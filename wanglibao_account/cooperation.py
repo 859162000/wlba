@@ -27,8 +27,9 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      TIANMANG_CALL_BACK_URL, WLB_FOR_YIRUITE_KEY, YIRUITE_KEY, BENGBENG_KEY, \
      WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
      JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL, JINSHAN_CALL_BACK_URL, WLB_FOR_JINSHAN_KEY, \
-     WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY, FUBABA_CALL_BACK_URL, WLB_FOR_FUBABA_KEY, \
-     FUBABA_COOP_ID, FUBABA_KEY
+     WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY, FUBA_CALL_BACK_URL, WLB_FOR_FUBA_KEY, \
+     FUBA_COOP_ID, FUBA_KEY, FUBA_CHANNEL_CODE, YUNDUAN_CALL_BACK_URL, WLB_FOR_YUNDUAN_KEY, YUNDUAN_COOP_ID, \
+     YUNDUAN_KEY
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
@@ -597,13 +598,13 @@ class ShiTouCunRegister(CoopRegister):
         self.shitoucun_call_back(user)
 
 
-class FuBaBaRegister(CoopRegister):
+class FUBARegister(CoopRegister):
     def __init__(self, request):
-        super(FuBaBaRegister, self).__init__(request)
-        self.c_code = 'fuba'
-        self.call_back_url = FUBABA_CALL_BACK_URL
-        self.coop_id = FUBABA_COOP_ID
-        self.coop_key = FUBABA_KEY
+        super(FUBARegister, self).__init__(request)
+        self.c_code = FUBA_CHANNEL_CODE
+        self.call_back_url = FUBA_CALL_BACK_URL
+        self.coop_id = FUBA_COOP_ID
+        self.coop_key = FUBA_KEY
 
     @property
     def channel_user(self):
@@ -619,7 +620,7 @@ class FuBaBaRegister(CoopRegister):
         p2p_record = P2PRecord.objects.filter(user_id=user.id).last()
         if binding and p2p_record:
             # 如果结算时间过期了则不执行回调
-            earliest_settlement_time = redis_backend()._get(binding.bid)
+            earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
             if earliest_settlement_time:
                 earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
                 current_time = datetime.datetime.now()
@@ -654,10 +655,44 @@ class FuBaBaRegister(CoopRegister):
                     binding.save()
 
 
+class YunDuanRegister(CoopRegister):
+    def __init__(self, request):
+        super(YunDuanRegister, self).__init__(request)
+        self.c_code = 'yunduan'
+        self.call_back_url = YUNDUAN_CALL_BACK_URL
+        self.coop_id = YUNDUAN_COOP_ID
+        self.coop_key = YUNDUAN_KEY
+
+    def yunduan_call_back(self, user):
+        # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
+        binding = Binding.objects.filter(user_id=user.id).first()
+        p2p_record = P2PRecord.objects.filter(user_id=user.id).last()
+        if binding and p2p_record:
+            order_id = p2p_record.id
+            sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
+            params = {
+                'action': 'create',
+                'order': order_id,
+                'sig': sig,
+                'planid': self.coop_id,
+                'uid': binding.bid,
+            }
+            common_callback.apply_async(
+                kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+
+    def validate_call_back(self, user):
+        self.yunduan_call_back(user)
+
+    def purchase_call_back(self, user):
+        # 判断是否是首次投资
+        if P2PRecord.objects.filter(user_id=user.id).count() == 1:
+            self.yunduan_call_back(user)
+
+
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
-                          ShiTouCunRegister, FuBaBaRegister]
+                          ShiTouCunRegister, FUBARegister]
 
 
 #######################第三方用户查询#####################
