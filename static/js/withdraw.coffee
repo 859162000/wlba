@@ -106,7 +106,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       $.modal.close()
 
     intervalId
-    count = 180
+    count = 60
 
     $(element).attr 'disabled', 'disabled'
     $(element).addClass('disabled')
@@ -148,7 +148,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
         #TODO
 
         intervalId
-        count = 180
+        count = 60
         button = $("#button-get-code-btn")
 
         button.attr 'disabled', 'disabled'
