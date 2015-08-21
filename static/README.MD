@@ -40,4 +40,17 @@
         
 
             
-            
+## include 文件
+###### makrketing包 －> include
+    1.app_head.jade
+        该文件为app活动页所引用的头部
+###### wanglibao_app －> include
+    1.app_header.jade
+        该文件为android\ios webview所引用的头部  
+###### wanglibao －> global
+    1.g_nav.jade
+        该文件为pc所引用的头部导航,包括pc活动页及 新版pc页面
+    2.g_footer.jade
+        该文件为pc所引用的底部,包括pc活动页及 新版pc页面
+    3.g_head.jade
+        该文件为新版pc所引用的公用资源head里的配置,包括pc活动页及 新版pc页面
