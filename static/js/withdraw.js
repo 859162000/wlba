@@ -133,7 +133,7 @@
         return $.modal.close();
       });
       intervalId;
-      count = 180;
+      count = 60;
       $(element).attr('disabled', 'disabled');
       $(element).addClass('disabled');
       $('.voice-validate').attr('disabled', 'disabled');
@@ -172,7 +172,7 @@
         var button, count, intervalId, timerFunction;
         if (json.ret_code === 0) {
           intervalId;
-          count = 180;
+          count = 60;
           button = $("#button-get-code-btn");
           button.attr('disabled', 'disabled');
           button.addClass('button-gray');
