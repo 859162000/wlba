@@ -274,7 +274,7 @@ def landpage_view(request):
             land_time_lately = redis._get(redis_channel_key)
             current_time = datetime.datetime.now()
             # 如果上次访问的时间是在30天前则不更新访问时间
-            if land_time_lately:
+            if land_time_lately and tid != default_tid:
                 land_time_lately = datetime.datetime.strptime(land_time_lately, '%Y-%m-%d %H:%M:%S')
                 if land_time_lately + datetime.timedelta(seconds=180) <= current_time:
                     return HttpResponseRedirect(reverse(activity_page))
