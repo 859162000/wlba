@@ -260,8 +260,11 @@ def landpage_view(request):
     if channel_code and channel_code == getattr(settings, '%s_CHANNEL_CODE' % channel_code.upper(), None):
         # period 为结算周期，必须以天为单位
         period = getattr(settings, '%s_PERIOD' % channel_code.upper())
+        # 设置tid默认值
         default_tid = getattr(settings, '%s_DEFAULT_TID' % channel_code.upper(), '')
         tid = getattr(request, request.method).get('tid', default_tid)
+        if not tid and default_tid:
+            tid = default_tid
         sign = getattr(request, request.method).get('sign', None)
         wlb_for_channel_key = getattr(settings, 'WLB_FOR_%s_KEY' % channel_code.upper())
         # 确定渠道来源

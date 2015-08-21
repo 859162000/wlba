@@ -28,8 +28,8 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
      JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL, JINSHAN_CALL_BACK_URL, WLB_FOR_JINSHAN_KEY, \
      WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY, FUBA_CALL_BACK_URL, WLB_FOR_FUBA_KEY, \
-     FUBA_COOP_ID, FUBA_KEY, FUBA_CHANNEL_CODE, YUNDUAN_CALL_BACK_URL, WLB_FOR_YUNDUAN_KEY, YUNDUAN_COOP_ID, \
-     YUNDUAN_KEY
+     FUBA_COOP_ID, FUBA_KEY, FUBA_CHANNEL_CODE, FUBA_DEFAULT_TID, YUNDUAN_CALL_BACK_URL, WLB_FOR_YUNDUAN_KEY, \
+     YUNDUAN_COOP_ID, YUNDUAN_KEY
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
@@ -615,7 +615,7 @@ class FUBARegister(CoopRegister):
     @property
     def channel_user(self):
         # 富爸爸需求，如果uid为空，uid设置为1316
-        return self.request.session.get(self.internal_channel_user_key, '1316')
+        return self.request.session.get(self.internal_channel_user_key, FUBA_DEFAULT_TID)
 
     def purchase_call_back(self, user):
         """
