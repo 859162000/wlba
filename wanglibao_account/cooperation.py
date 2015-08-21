@@ -620,6 +620,23 @@ class FUBARegister(CoopRegister):
             channel_user = FUBA_DEFAULT_TID
         return channel_user
 
+    def save_to_binding(self, user):
+        """
+        处理从url获得的渠道参数
+        :param user:
+        :return:
+        """
+        channel_user = self.channel_user
+        bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
+        if len(channel_user) <= bid_len:
+            if channel_user == FUBA_DEFAULT_TID or Binding.objects.filter(bid=channel_user).count() == 0:
+                binding = Binding()
+                binding.user = user
+                binding.btype = self.channel_name
+                binding.bid = channel_user
+                binding.save()
+                # logger.debug('save user %s to binding'%user)
+
     def purchase_call_back(self, user):
         """
         投资回调
