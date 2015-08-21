@@ -28,8 +28,8 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
      JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL, JINSHAN_CALL_BACK_URL, WLB_FOR_JINSHAN_KEY, \
      WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY, FUBA_CALL_BACK_URL, WLB_FOR_FUBA_KEY, \
-     FUBA_COOP_ID, FUBA_KEY, FUBA_CHANNEL_CODE, FUBA_DEFAULT_TID, YUNDUAN_CALL_BACK_URL, WLB_FOR_YUNDUAN_KEY, \
-     YUNDUAN_COOP_ID, YUNDUAN_KEY
+     FUBA_COOP_ID, FUBA_KEY, FUBA_CHANNEL_CODE, FUBA_DEFAULT_TID, FUBA_PERIOD, YUNDUAN_CALL_BACK_URL, \
+    WLB_FOR_YUNDUAN_KEY, YUNDUAN_COOP_ID, YUNDUAN_KEY
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
@@ -651,7 +651,7 @@ class FUBARegister(CoopRegister):
                 earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
                 current_time = datetime.datetime.now()
                 # 如果上次访问的时间是在30天前则不更新访问时间
-                if earliest_settlement_time + datetime.timedelta(seconds=180) <= current_time:
+                if earliest_settlement_time + datetime.timedelta(days=int(FUBA_PERIOD)) <= current_time:
                     return
 
             order_id = p2p_record.id
