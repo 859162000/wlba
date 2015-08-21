@@ -315,7 +315,6 @@ org.lottery = (function(){
             if(!phoneRe.test($.trim(phoneVal))){
               return org.ui.alert('请输入正确的手机号');
             }
-
             org.ajax({
               url: '/api/user_exists/'+ phoneVal + '/',
               type: 'get',
@@ -337,6 +336,22 @@ org.lottery = (function(){
               }
             })
           })
+
+          var $warp = $('.lottery-rules-warp');
+          $('.lotter-from-rules').on('click', function(){
+              $warp.css('display',"block");
+              setTimeout(function(){
+                $warp.css('-webkit-transform', 'translate3d(0, 0, 0)')
+              },200);
+
+          })
+          $('.lottery-rulse-close').on('click', function(){
+              $warp.css('-webkit-transform', 'translate3d(0, 100%, 0)');
+              setTimeout(function(){
+                  $warp.css('display',"none");
+              }, 250);
+          })
+
         }
     };
     return {
