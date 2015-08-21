@@ -1,0 +1,24 @@
+- load formatters
+doctype html
+html(style="background:#FFF29A")
+  head
+    title 彩票领取
+    include include/app_head
+  body
+    .lottery-banner
+      img(src='/static/imgs/mobile_activity/app_lottery/lottery_banner.jpg')
+    .lottery-content
+      .lottery-cont-from-warp
+        .lottery-cont-from
+          .lottery-circle
+            img(src='/static/imgs/mobile_activity/app_lottery/lottery_circle.png')
+          .lottery-from-sign
+            span 彩票已备好！输入手机号马上<br>领取，千万大奖在等着你！
+          .lotter-from-btn
+            input(type='tel', placeholder='请输入手机号', name='phone')
+            button.lottery-submit 我要领彩票
+          a(href="").lotter-from-rules 活动规则 >>
+      .lottery-cont-bg
+      .lottery-cont-logo
+        img(src='/static/imgs/mobile_activity/app_lottery/lottery_bottom.png')
+    script(data-init="lottery", src="/static/scripts/mobile_activity/dist/app_lottery.js?")

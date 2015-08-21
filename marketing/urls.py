@@ -56,6 +56,7 @@ urlpatterns += patterns(
     url(r'^app_qixi/$', TemplateView.as_view(template_name="app_qixi.jade")),
     url(r'^app_gold_day/$', TemplateView.as_view(template_name="app_gold_day.jade")),
     url(r'^app_pc_download/$', TemplateView.as_view(template_name="app_pc_download.jade")),
+    url(r'^app_lottery/$', TemplateView.as_view(template_name="app_lottery.jade")),
 
 )
 
