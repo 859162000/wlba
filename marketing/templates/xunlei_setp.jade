@@ -80,7 +80,10 @@ html
                   span 1
                   span 0
             .side
-            .game-btn
+            if user.is_authenticated
+              .game-btn.go-game
+            else
+              .game-btn
           .game-ri
             h2 中奖名单
             .setp-list
@@ -89,28 +92,37 @@ html
                   span 100元
                   |红包
                 p.hight 恭喜138******90获得
-                  span 100元
+                  span 200元
                   |红包
                 p 恭喜138******90获得
-                  span 100元
+                  span 200元
                   |红包
                 p.hight 恭喜138******90获得
-                  span 100元
+                  span 300元
                   |红包
                 p 恭喜138******90获得
-                  span 100元
+                  span 400元
                   |红包
                 p.hight 恭喜138******90获得
-                  span 100元
+                  span 500元
                   |红包
                 p 恭喜138******90获得
-                  span 100元
+                  span 600元
                   |红包
                 p.hight 恭喜138******90获得
-                  span 100元
+                  span 700元
                   |红包
                 p 恭喜138******90获得
-                  span 100元
+                  span 800元
+                  |红包
+                p.hight 恭喜138******90获得
+                  span 500元
+                  |红包
+                p 恭喜138******90获得
+                  span 600元
+                  |红包
+                p.hight 恭喜138******90获得
+                  span 700元
                   |红包
       .xl-box1.clearfix
         h1 迅雷会员免费送
@@ -136,7 +148,10 @@ html
               |送
               b 1年
               |迅雷白金会员
-          a.setp-btn 领取迅雷会员
+          if user.is_authenticated
+            a.setp-btn.receive 领取迅雷会员
+          else
+            a.setp-btn 领取迅雷会员
           p.zhu 注：完成操作奖品自动发送，详情请留意站内信
         .setp-right
       .xl-box1
@@ -192,7 +207,7 @@ html
     p 终于等到你，还好我没放弃
       br
       span
-        b 100元
+        b#rmb 100元
         |现金红包已在你账户中
     .reg-btn 太棒了
   #xl-aug-fail
@@ -202,6 +217,21 @@ html
     .redpack.model-com.one
     p Sorry~您不符合领奖条件
     .reg-btn 我知道了
+  #xl-aug-prize
+    .bj
+    span.first-xl-off2 ×
+    hr
+    .redpack.model-com.one
+    .people
+    p 你和大奖只是一根头发的距离
+    .reg-btn 再试一次
+  #xl-aug-login
+    .bj
+    span.first-xl-off2 ×
+    hr
+    .redpack.model-com.one
+    p 请您先登录
+    .reg-btn.setplogin 快速登录
   script.
       var v = new Date().getTime()
       require(['/static/js/setp.js'])

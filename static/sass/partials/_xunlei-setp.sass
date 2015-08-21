@@ -159,12 +159,26 @@ body .wrap
           position: absolute
           top: 85px
           right: 136px
+        .side-down
+          width: 70px
+          height: 196px
+          background: url("/static/imgs/pc_activity/sept/down.png") center center no-repeat
+          position: absolute
+          top: 85px
+          right: 136px
         .game-btn
           width: 292px
           height: 86px
           background: url("/static/imgs/pc_activity/sept/btn-up.png") center center no-repeat
           position: absolute
           bottom: 23px
+          left: 116px
+        .game-btn-down
+          width: 292px
+          height: 86px
+          background: url("/static/imgs/pc_activity/sept/btn-down.png") center center no-repeat
+          position: absolute
+          bottom: 10px
           left: 116px
       .game-ri
         width: 339px
@@ -183,7 +197,11 @@ body .wrap
           background: #fff
           margin: 0 auto
           border-radius: 15px
+          position: relative
+          overflow: hidden
           .long-p
+            width: 310px
+            position: absolute
             .hight
               background: #eeeeee
             p
@@ -216,7 +234,7 @@ body .wrap
   background-position: 0px 15px
 .two
   background-position: -284px 2px
-#xl-aug-success,#xl-aug-fail
+#xl-aug-success,#xl-aug-fail,#xl-aug-prize,#xl-aug-login
   width: 565px
   height: 290px
   position: fixed
@@ -250,6 +268,12 @@ body .wrap
     height: 219px
     position: absolute
     bottom: 0
+  .people
+    width: 125px
+    height: 161px
+    position: absolute
+    bottom: 0
+    background: url("/static/imgs/pc_activity/sept/people.png") no-repeat center 14px
   p
     font-size: 24px
     color: #53a3e4
