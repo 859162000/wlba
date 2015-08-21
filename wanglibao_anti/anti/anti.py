@@ -75,12 +75,16 @@ class AntiForAllClient(AntiBase):
 
         return True
 
-    def anti_delay_callback_time(self, uid, device):
+    def anti_delay_callback_time(self, uid, device, where=None):
         '''
            针对特定的渠道，进行积分反馈延迟处理, 180s
         '''
 
-        channel = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
+        if where:
+           channel = where
+        else:
+           channel = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
+
         delay_channels = GlobalParamsSpace.DELAY_CHANNELS
         if GlobalParamsSpace.ANTI_DEBUG:
 			logger.debug("request.channel: %s;\n" % (channel,))

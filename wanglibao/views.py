@@ -19,7 +19,9 @@ import urlparse
 from wanglibao_redis.backend import redis_backend
 import json
 import pickle
-
+import datetime
+import hashlib
+from wanglibao import settings
 
 class IndexView(TemplateView):
     template_name = 'index_new.jade'
@@ -244,3 +246,34 @@ def server_error(request):
     template = loader.get_template('html/500.html')
     return HttpResponse(content=template.render(Context()), content_type='text/html; charset=utf-8', status=500)
 
+#
+def landpage_view(request):
+    """
+    渠道跳转页，
+    确定渠道来源，记录访问时间到redis中，
+    跳转活动页
+    :param request:
+    :return:
+    """
+    channel_code = getattr(request, request.method).get('promo_token', None)
+    activity_page = getattr(settings, '%s_ACTIVITY_PAGE' % channel_code.upper(), 'index')
+    if channel_code and channel_code == getattr(settings, '%s_CHANNEL_CODE' % channel_code.upper(), None):
+        # period 为结算周期，必须以天为单位
+        period = getattr(settings, '%s_PERIOD' % channel_code.upper())
+        default_tid = getattr(settings, '%s_DEFAULT_TID' % channel_code.upper(), '')
+        tid = getattr(request, request.method).get('tid', default_tid)
+        sign = getattr(request, request.method).get('sign', None)
+        wlb_for_channel_key = getattr(settings, 'WLB_FOR_%s_KEY' % channel_code.upper())
+        # 确定渠道来源
+        if tid and sign == hashlib.md5(str(tid)+channel_code+str(wlb_for_channel_key)).hexdigest():
+            redis = redis_backend()
+            redis_channel_key = '%s_%s' % (channel_code, tid)
+            land_time_lately = redis._get(redis_channel_key)
+            current_time = datetime.datetime.now()
+            # 如果上次访问的时间是在30天前则不更新访问时间
+            if land_time_lately:
+                land_time_lately = datetime.datetime.strptime(land_time_lately, '%Y-%m-%d %H:%M:%S')
+                if land_time_lately + datetime.timedelta(seconds=180) <= current_time:
+                    return HttpResponseRedirect(reverse(activity_page))
+            redis._set(redis_channel_key, current_time.strftime("%Y-%m-%d %H:%M:%S"))
+    return HttpResponseRedirect(reverse(activity_page))

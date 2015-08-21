@@ -2,6 +2,8 @@
 import string
 import uuid
 import re
+import datetime
+import time
 from django.conf import settings
 #from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -15,6 +17,8 @@ from registration.models import RegistrationProfile
 from wanglibao_account.backends import TestIDVerifyBackEnd, ProductionIDVerifyBackEnd
 import logging
 import hashlib
+import pytz
+
 from decimal import Decimal
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 
@@ -307,3 +311,26 @@ def str_add_md5(value):
         return m.hexdigest()
     else:
         return ''
+
+
+def str_to_utc(time_str):
+    """
+    :param str:  '2015-08-08'
+    :return:     datetime.datetime(2015, 8, 8, 7, 0, tzinfo=<UTC>)
+    """
+    time_zone = settings.TIME_ZONE
+    local = pytz.timezone(time_zone)
+    naive = datetime.datetime.strptime(time_str, "%Y-%m-%d")
+    local_dt = local.localize(naive, is_dst=None)
+    utc_dt = local_dt.astimezone(pytz.utc)
+
+    return utc_dt
+
+
+def str_to_float(time_str):
+    """
+
+    :param time_str:
+    :return:
+    """
+    return time.mktime(time.strptime(time_str, "%Y-%m-%d"))

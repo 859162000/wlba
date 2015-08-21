@@ -535,6 +535,17 @@ CELERYBEAT_SCHEDULE = {
         'task': 'wanglibao_anti.tasks.handle_delay_time_data',
         'schedule': timedelta(minutes=3)
     },
+
+    # by Zhoudong 菜苗上报平台信息.
+    'caimiao_platform_post': {
+        'task': 'wanglibao_account.tasks.caimiao_platform_post_task',
+        'schedule': crontab(minute=0, hour=0, day_of_month=1)
+    },
+    # by Zhoudong 菜苗上报标的信息.
+    'caimiao_p2p_post': {
+        'task': 'wanglibao_account.tasks.caimiao_p2p_info_post_task',
+        'schedule': timedelta(hours=1)
+    },
 }
 
 CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
@@ -817,11 +828,19 @@ XICAI_CLIENT_ID = '48e37e2cf4124c2c9f5bde3cc88d011c'
 XICAI_CLIENT_SECRET = '2e3dd17e800d48bca50e61b19f8fc11d'
 XICAI_LOAD_PAGE = 'https://www.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
 WLB_FOR_CSAI_KEY = '1993'
-XICAI_UPDATE_TIMEDELTA = timedelta(hours=1)
+XICAI_UPDATE_TIMEDELTA = timedelta(days=4)
 if ENV == ENV_PRODUCTION:
     XICAI_LOAD_PAGE = 'https://www.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
 else:
     XICAI_LOAD_PAGE = 'https://staging.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
+
+# 菜苗
+CAIMIAO_SECRET = 'a400f466c02ddfde984f631c66b36c6489e07d55615d07da0d9dd4a6f7bdb888'
+CAIMIAO_PLATFORM_URL = 'http://121.40.31.143:86/api/JsonsFinancial/PlatformBasic/'
+CAIMIAO_P2P_URL = 'http://121.40.31.143:86/api/JsonsFinancial/ProdMain/'
+CAIMIAO_DEAL_AMOUNT_URL = 'http://121.40.31.143:86/api/JsonsFinancial/Volumes/'
+CAIMIAO_RATE_URL = 'http://121.40.31.143:86/api/JsonsFinancial/Rating/'
+
 
 # 金山
 WLB_FOR_JINSHAN_KEY = '1994'
@@ -834,6 +853,16 @@ WLB_FOR_SHLS_KEY = '1995'
 WLB_FOR_SHITOUCUN_KEY = '1996'
 SHITOUCUN_CALL_BACK_URL = 'http://www.stcun.com/task/interface/int'
 
+# 富爸爸
+FUBA_COOP_ID = 133
+FUBA_KEY = 'wanglibao@123'
+WLB_FOR_FUBA_KEY = '1997'
+FUBA_CALL_BACK_URL = 'http://www.fbaba.net/track/cps.php'
+FUBA_DEFAULT_TID = '1316'
+FUBA_ACTIVITY_PAGE = 'marketing_gold'
+FUBA_PERIOD = 30
+FUBA_CHANNEL_CODE = 'fuba'
+
 #彩票
 LINGCAIBAO_BASE_ISSUE = 2015090
 LINGCAIBAO_BASE_DATETIME = datetime(2015, 8, 4)
@@ -843,6 +872,12 @@ if ENV == ENV_PRODUCTION:
     LINGCAIBAO_URL_ORDER = 'http://open.lingcaibao.com/lingcaiapi/order'
 else:
     LINGCAIBAO_URL_ORDER = 'http://test.lingcaibao.com/lingcaiapi/order'
+
+# 云端
+YUNDUAN_COOP_ID = 133
+YUNDUAN_KEY = 'wanglibao@123'
+WLB_FOR_YUNDUAN_KEY = '1998'
+YUNDUAN_CALL_BACK_URL = 'http://www.a.com/track/cps.php'
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100
