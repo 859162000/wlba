@@ -83,6 +83,13 @@ def get_first_investment_for_coop(user_id):
     except:
         return None, None, None
 
+def get_last_investment_for_coop(user_id):
+    try:
+        p2p_record = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购').order_by('create_time')
+        return p2p_record.last()
+    except:
+        return None
+
 
 def get_tid_for_coop(user_id):
     try:
@@ -522,7 +529,7 @@ class JinShanRegister(CoopRegister):
         self.jinshan_call_back(user, 'wangli_regist_reward', 'Cp9AhO2o9BQTDhbUBnHxmY0X4Kbg')
 
     def purchase_call_back(self, user):
-        if P2PRecord.objects.filter(user_id=user.id).count() == 1:
+        if P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').count() == 1:
             self.jinshan_call_back(user, 'wangli_invest_reward', 'pA71ZhBf4DDeet7SLiLlGsT1qTYu')
 
 
@@ -593,9 +600,8 @@ class ShiTouCunRegister(CoopRegister):
 
     def purchase_call_back(self, user):
         # 判断是否是首次投资
-        if P2PRecord.objects.filter(user_id=user.id).count() != 1:
-            return
-        self.shitoucun_call_back(user)
+        if P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').count() == 1:
+            self.shitoucun_call_back(user)
 
 
 class FUBARegister(CoopRegister):
@@ -617,7 +623,7 @@ class FUBARegister(CoopRegister):
         """
         # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
         binding = Binding.objects.filter(user_id=user.id).first()
-        p2p_record = P2PRecord.objects.filter(user_id=user.id).last()
+        p2p_record = get_last_investment_for_coop(user.id)
         if binding and p2p_record:
             # 如果结算时间过期了则不执行回调
             earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
@@ -685,7 +691,7 @@ class YunDuanRegister(CoopRegister):
 
     def purchase_call_back(self, user):
         # 判断是否是首次投资
-        if P2PRecord.objects.filter(user_id=user.id).count() == 1:
+        if P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').count() == 1:
             self.yunduan_call_back(user)
 
 
