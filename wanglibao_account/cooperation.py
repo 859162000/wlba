@@ -594,10 +594,10 @@ class ShiTouCunRegister(CoopRegister):
                 'uid': uid,
                 'e_uid': uid_for_coop,
                 'e_user': uid_for_coop,
-            }async(
+            }
+            common_callback.apply_async(
                 kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
 
-            common_callback.apply_
     def purchase_call_back(self, user):
         # 判断是否是首次投资
         if P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').count() == 1:
