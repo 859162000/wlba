@@ -11,6 +11,107 @@ html
     include include/activityTopNew
     //baidu
     .setp-content
+      .xl-backtop(style="z-index:99")
+        span.seven-com.seven-ten
+        .backtop.sev-backtop 回到顶部
+        img(src="/static/imgs/pc_activity/sept/wx.png")#xl-weixin
+        a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank")
+          img(src="/static/imgs/pc_activity/sept/qq.png",style="margin-top:10px")#xl-qq
+        .erweima
+      .xl-box1.clearfix
+        h1 幸运摇奖爽不停
+        .game(onselectstart="return false" style="-moz-user-select:none;")
+          .game-le
+            span.ring
+            p.rule 每位新注册用户有
+              b 3次
+              |摇奖机会，幸运红包等你来拿
+              br
+              |您还有
+              a &nbsp3&nbsp
+              |次摇奖机会
+            .sum
+              .view
+                .long-sum
+                  span 9
+                  span 8
+                  span 7
+                  span 6
+                  span 5
+                  span 4
+                  span 3
+                  span 2
+                  span 1
+                  span 0
+              .view
+                .long-sum
+                  span 9
+                  span 8
+                  span 7
+                  span 6
+                  span 5
+                  span 4
+                  span 3
+                  span 2
+                  span 1
+                  span 0
+              .view
+                .long-sum
+                  span 9
+                  span 8
+                  span 7
+                  span 6
+                  span 5
+                  span 4
+                  span 3
+                  span 2
+                  span 1
+                  span 0
+              .view(style="border-right:none")
+                .long-sum
+                  span 9
+                  span 8
+                  span 7
+                  span 6
+                  span 5
+                  span 4
+                  span 3
+                  span 2
+                  span 1
+                  span 0
+            .side
+            .game-btn
+          .game-ri
+            h2 中奖名单
+            .setp-list
+              .long-p
+                p 恭喜138******90获得
+                  span 100元
+                  |红包
+                p.hight 恭喜138******90获得
+                  span 100元
+                  |红包
+                p 恭喜138******90获得
+                  span 100元
+                  |红包
+                p.hight 恭喜138******90获得
+                  span 100元
+                  |红包
+                p 恭喜138******90获得
+                  span 100元
+                  |红包
+                p.hight 恭喜138******90获得
+                  span 100元
+                  |红包
+                p 恭喜138******90获得
+                  span 100元
+                  |红包
+                p.hight 恭喜138******90获得
+                  span 100元
+                  |红包
+                p 恭喜138******90获得
+                  span 100元
+                  |红包
       .xl-box1.clearfix
         h1 迅雷会员免费送
         .setp-left
@@ -79,9 +180,28 @@ html
                       br
                       b 100%
                       | 本息保障
-  .footer(style="background:#fff;margin-top:0")
-    include include/activityFooterTwo
+    include global/g_footer
     include include/tracking
+  #small-zc
+  #xl-aug-success
+    .bj
+    span.first-xl-off2 ×
+    hr
+    .redpack.model-com.one
+    .man.model-com.two
+    p 终于等到你，还好我没放弃
+      br
+      span
+        b 100元
+        |现金红包已在你账户中
+    .reg-btn 太棒了
+  #xl-aug-fail
+    .bj
+    span.first-xl-off2 ×
+    hr
+    .redpack.model-com.one
+    p Sorry~您不符合领奖条件
+    .reg-btn 我知道了
   script.
       var v = new Date().getTime()
       require(['/static/js/setp.js'])

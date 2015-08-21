@@ -48,7 +48,7 @@ urlpatterns += patterns(
     url(r'^app_gold/$', TemplateView.as_view(template_name="app_gold.jade")),
     url(r'^app_july_act/$', TemplateView.as_view(template_name="app_july_act.jade")),
     url(r'^app_extension/$', TemplateView.as_view(template_name="app_extension.jade")),
-    url(r'^app_ele/$', TemplateView.as_view(template_name="app_ele.jade")),
+#    url(r'^app_ele/$', TemplateView.as_view(template_name="app_ele.jade")),
     url(r'^app_eight_gift/$', TemplateView.as_view(template_name="app_eight_gift.jade")),
     url(r'^app_eight/$', TemplateView.as_view(template_name="app_eight.jade")),
     url(r'^xingmei/$', TemplateView.as_view(template_name="xingmei.jade")),
@@ -56,6 +56,7 @@ urlpatterns += patterns(
     url(r'^h5_gold/$', TemplateView.as_view(template_name="h5_gold.jade")),
     url(r'^app_qixi/$', TemplateView.as_view(template_name="app_qixi.jade")),
     url(r'^app_gold_day/$', TemplateView.as_view(template_name="app_gold_day.jade")),
+    url(r'^app_pc_download/$', TemplateView.as_view(template_name="app_pc_download.jade")),
 
 )
 

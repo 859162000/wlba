@@ -17,12 +17,23 @@
         isNOShow : '1',
         buttonFont: '立即注册'
     });
-
+    //回到顶部开始
+    //固定回到顶部,
+     function backtop(box){
+       var k=document.body.clientWidth,
+         e=box.width();
+         q=k-e;
+         w=q/2;
+         r= e+w;
+         a=r+20+'px';
+       return a;
+     }
     var left2;
-    left2=backtop($(".xingmei-content"));
+    left2=backtop($(".setp-content"));
+    console.log(left2)
     //浏览器大小改变触发的事件
     window.onresize = function(){
-      left2 = backtop($(".gjw-gold"));
+      left2 = backtop($(".setp-content"));
     };
     //赋值
     $('.xl-backtop').css({'left':left2});
@@ -50,6 +61,11 @@
       return false
     })
 
+    //回到顶部结束
+
+    //模态口高度
+    var body_h=$('body').height();
+    $('#small-zc').height(body_h);
   });
 
 }).call(this);

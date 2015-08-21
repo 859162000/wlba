@@ -290,17 +290,20 @@ class CoopRegister(object):
         self.save_to_session()
 
     def all_processors_for_user_register(self, user, invite_code):
-        if not invite_code:
-            invite_code = self.channel_code
-        # logger.debug('get invite code %s'%(invite_code))
-        if invite_code:
-            # 通过渠道注册
-            for processor in self.processors:
-                if processor.c_code == processor.channel_code:
-                    processor.process_for_register(user, invite_code)
-                    return
-            # 默认注册
-            self.process_for_register(user, invite_code)
+        try:
+            if not invite_code:
+                invite_code = self.channel_code
+            # logger.debug('get invite code %s'%(invite_code))
+            if invite_code:
+                # 通过渠道注册
+                for processor in self.processors:
+                    if processor.c_code == processor.channel_code:
+                        processor.process_for_register(user, invite_code)
+                        return
+                # 默认注册
+                self.process_for_register(user, invite_code)
+        except:
+            logger.exception('channel register process error for channel %s and user %s'%(invite_code, user.id))
 
     def get_user_channel_processor(self, user):
         """
@@ -315,21 +318,30 @@ class CoopRegister(object):
             return None
 
     def process_for_validate(self, user):
-        channel_processor = self.get_user_channel_processor(user)
-        # logger.debug('channel processor %s'%channel_processor)
-        if channel_processor:
-            channel_processor.validate_call_back(user)
+        try:
+            channel_processor = self.get_user_channel_processor(user)
+            # logger.debug('channel processor %s'%channel_processor)
+            if channel_processor:
+                channel_processor.validate_call_back(user)
+        except:
+            logger.exception('channel validate process error for user %s'%(user.id))
 
     def process_for_binding_card(self, user):
-        channel_processor = self.get_user_channel_processor(user)
-        # logger.debug('channel processor %s'%channel_processor)
-        if channel_processor:
-            channel_processor.binding_card_call_back(user)
+        try:
+            channel_processor = self.get_user_channel_processor(user)
+            # logger.debug('channel processor %s'%channel_processor)
+            if channel_processor:
+                channel_processor.binding_card_call_back(user)
+        except:
+            logger.exception('channel bind card process error for user %s'%(user.id))
 
     def process_for_purchase(self, user):
-        channel_processor = self.get_user_channel_processor(user)
-        if channel_processor:
-            channel_processor.purchase_call_back(user)
+        try:
+            channel_processor = self.get_user_channel_processor(user)
+            if channel_processor:
+                channel_processor.purchase_call_back(user)
+        except:
+            logger.exception('channel bind purchase process error for user %s'%(user.id))
 
 
 class TianMangRegister(CoopRegister):
@@ -382,10 +394,11 @@ class BengbengRegister(CoopRegister):
 
     def binding_card_call_back(self, user):
         uid_for_coop = get_uid_for_coop(user.id)
-        sign = hashlib.md5(self.coop_id + self.channel_user + uid_for_coop + self.coop_key).hexdigest()
+        channel_user = self.channel_user_from_db(user)
+        sign = hashlib.md5(self.coop_id + channel_user + uid_for_coop + self.coop_key).hexdigest()
         params = {
             'adID': self.coop_id,
-            'annalID': self.channel_user,
+            'annalID': channel_user,
             'idCode': uid_for_coop,
             'doukey': sign,
             'idName': get_username_for_coop(user.id)
@@ -915,7 +928,6 @@ def xicai_send_data():
     # 更新有变动的标的的数据
     for p2p_product in xicai_get_updated_p2p():
         xicai_post_updated_product_info(p2p_product, access_token)
-
 
 def get_xicai_user_info(key, sign):
     """
