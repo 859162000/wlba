@@ -94,6 +94,7 @@ class RedPackRecord(models.Model):
     apply_at = models.DateTimeField(verbose_name=u'使用时间', null=True)
     apply_amount = models.FloatField(null=True, default=0.0, verbose_name=u'使用金额')
     order_id = models.IntegerField(verbose_name=u'关联订单', null=True, db_index=True)
+    product_id = models.IntegerField(verbose_name=u'关联产品', null=True, db_index=True)
 
     class Meta:
         verbose_name = u"优惠券流水"
