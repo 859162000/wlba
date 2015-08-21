@@ -32,7 +32,11 @@
         5.pc_activity
             为pc段所有活动页样式资源存放处 
     
-    
+## grunt配置
+####### grunt watch
+    grunt compass 里的config需要根据不用项目手动修改一下
+    sass  --> config.rb
+    scss  --> config_weixin.rb
         
 
             
