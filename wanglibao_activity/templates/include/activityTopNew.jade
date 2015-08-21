@@ -12,7 +12,7 @@ include include/activityTop2
             span {{user|display_name}}
           .space-vertical-m
           .banner-form--row.align-center
-            a.banner-form--button(href="/accounts/home") 进入我的账户
+            a.banner-form--button(href="/accounts/home",style="color:#fff") 进入我的账户
     else
         .denelu-form#denglu
             #aug-center
@@ -39,7 +39,7 @@ include include/activityTop2
                 .span12-omega.hidden.show
                   没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
                 .form-control-group
-                  .span6
+                  .span6(style="width:49%")
                     input#id_validate_code.com-tu.tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
                   .span6-omega
                     button#button-get-validate-code-modal.button-orange.button-large.huoqu-ma.new-btn(type='button',style="display:none") 获取验证码
