@@ -594,10 +594,10 @@ class ShiTouCunRegister(CoopRegister):
                 'uid': uid,
                 'e_uid': uid_for_coop,
                 'e_user': uid_for_coop,
-            }
-            common_callback.apply_async(
+            }async(
                 kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
 
+            common_callback.apply_
     def purchase_call_back(self, user):
         # 判断是否是首次投资
         if P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').count() == 1:
@@ -614,8 +614,11 @@ class FUBARegister(CoopRegister):
 
     @property
     def channel_user(self):
-        # 富爸爸需求，如果uid为空，uid设置为1316
-        return self.request.session.get(self.internal_channel_user_key, FUBA_DEFAULT_TID)
+        # 富爸爸需求，如果uid为空，uid设置为FUBA_DEFAULT_TID
+        channel_user = self.request.session.get(self.internal_channel_user_key)
+        if not channel_user:
+            channel_user = FUBA_DEFAULT_TID
+        return channel_user
 
     def purchase_call_back(self, user):
         """
