@@ -48,7 +48,7 @@ def handle_delay_time_data():
     recover_anti_user_data()
 
     channels = GlobalParamsSpace.DELAY_CHANNELS
-    max_record_for_one_ip = 20
+    max_record_for_one_ip = 5
 
     records = AntiDelayCallback.objects.filter(channel__in=channels, status=0)
     valid_records = dict()

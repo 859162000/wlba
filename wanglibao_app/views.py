@@ -25,7 +25,7 @@ from wanglibao import settings
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_banner.models import AppActivate
-from wanglibao_p2p.models import ProductAmortization, P2PEquity, P2PProduct
+from wanglibao_p2p.models import ProductAmortization, P2PEquity, P2PProduct, P2PRecord
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_rest.utils import split_ua, get_client_ip
 from wanglibao_banner.models import Banner
@@ -204,9 +204,27 @@ class AppRecommendViewSet(PaginatedModelViewSet):
     def get_queryset(self):
         qs = super(AppRecommendViewSet, self).get_queryset()
 
-        misc = MiscRecommendProduction()
-        product_id = misc.get_recommend_product_id()
-        return qs.filter(id=product_id)
+        # 主推标
+        recommend_product_id = None
+        if self.request.user and self.request.user.is_authenticated():
+            user = self.request.user
+            product_new = P2PProduct.objects.filter(hide=False, status=u'正在招标', category=u'新手标')
+            if product_new.exists():
+                if not P2PRecord.objects.filter(user=user).exists():
+                    # 不存在购买记录
+                    id_rate = [{'id': q.id, 'rate': q.completion_rate} for q in product_new]
+                    id_rate = sorted(id_rate, key=lambda x: x['rate'], reverse=True)
+                    recommend_product_id = id_rate[0]['id']
+                else:
+                    # 存在购买记录
+                    misc = MiscRecommendProduction()
+                    recommend_product_id = misc.get_recommend_product_except_new()
+
+        if not recommend_product_id:
+            misc = MiscRecommendProduction()
+            recommend_product_id = misc.get_recommend_product_id()
+
+        return qs.filter(id=recommend_product_id)
 
 
 class RecommendProductManagerView(TemplateView):
