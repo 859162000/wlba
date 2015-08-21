@@ -268,7 +268,7 @@ def landpage_view(request):
         sign = getattr(request, request.method).get('sign', None)
         wlb_for_channel_key = getattr(settings, 'WLB_FOR_%s_KEY' % channel_code.upper())
         # 确定渠道来源
-        if tid and sign == hashlib.md5(channel_code+str(wlb_for_channel_key)).hexdigest():
+        if tid and sign == hashlib.md5(str(tid)+channel_code+str(wlb_for_channel_key)).hexdigest():
             redis = redis_backend()
             redis_channel_key = '%s_%s' % (channel_code, tid)
             land_time_lately = redis._get(redis_channel_key)
