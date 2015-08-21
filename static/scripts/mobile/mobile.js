@@ -549,6 +549,8 @@ org.regist = (function(org){
                     success:function(data){
                         if(data.ret_code === 0){
                             var next = org.getQueryStringByName('next') == '' ? '/weixin/regist/succees/' : org.getQueryStringByName('next');
+                            next = org.getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ org.getQueryStringByName('mobile');
+                            next = org.getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ org.getQueryStringByName('serverId');
                             window.location.href = next;
                         }else if(data.ret_code > 0){
                             org.ui.showSign(data.message)

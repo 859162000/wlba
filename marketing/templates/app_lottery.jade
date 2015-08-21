@@ -1,0 +1,37 @@
+- load formatters
+doctype html
+html(style="background:#FFF29A")
+  head
+    title 彩票领取
+    include include/app_head
+  body
+    .lottery-banner
+      img(src='/static/imgs/mobile_activity/app_lottery/lottery_banner.jpg')
+    .lottery-content
+      .lottery-cont-from-warp
+        .lottery-cont-from
+          .lottery-circle
+            img(src='/static/imgs/mobile_activity/app_lottery/lottery_circle.png')
+          .lottery-from-sign
+            span 彩票已备好！输入手机号马上<br>领取，千万大奖在等着你！
+          .lotter-from-btn
+            input(type='tel', placeholder='请输入手机号', name='phone')
+            button.lottery-submit 我要领彩票
+          .lotter-from-rules 活动规则 >>
+      .lottery-cont-bg
+      .lottery-cont-logo
+        img(src='/static/imgs/mobile_activity/app_lottery/lottery_bottom.png')
+
+    .lottery-rules-warp
+      .lottery-rules
+        .lottery-rules-body
+          p 1.手机号为网利宝唯一账户，本次活动仅限微信端专享；
+          p 2.完成注册/登录即可在活动页面领取彩票；输入“我的彩票”即可查询彩票进度；
+          p 3.用户参加活动领取彩票一注，分享给好友，凑齐5人共同领取此注彩票，该彩票即可出票。获奖后奖金按领取比例分配；
+          p 4.好友领取彩票后，查看彩票详情需关注网利宝微信号；
+          p 5.每位用户仅有一次发起送彩票机会，每个手机号仅能领取一次别人分享的彩票，领奖/提现详情请关注零彩宝页面；
+          p 6.本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+          p 7.网利宝对此活动享有最终解释权。
+      .lottery-rulse-close 关闭
+
+    script(data-init="lottery", src="/static/scripts/mobile_activity/dist/app_lottery.js?")
