@@ -544,7 +544,17 @@ CELERYBEAT_SCHEDULE = {
     # by Zhoudong 菜苗上报标的信息.
     'caimiao_p2p_post': {
         'task': 'wanglibao_account.tasks.caimiao_p2p_info_post_task',
-        'schedule': timedelta(hours=1)
+        'schedule': crontab(minute=0, hour=0)
+    },
+    # by Zhoudong 菜苗上报成交量.
+    'caimiao_volumes_post': {
+        'task': 'wanglibao_account.tasks.caimiao_volumes_info_post_task',
+        'schedule': crontab(minute=0, hour=0)
+    },
+    # by Zhoudong 菜苗上报网贷评级.
+    'caimiao_rating_post': {
+        'task': 'wanglibao_account.tasks.caimiao_rating_info_post_task',
+        'schedule': crontab(minute=0, hour=0)
     },
 }
 
@@ -836,10 +846,10 @@ else:
 
 # 菜苗
 CAIMIAO_SECRET = 'a400f466c02ddfde984f631c66b36c6489e07d55615d07da0d9dd4a6f7bdb888'
-CAIMIAO_PLATFORM_URL = 'http://121.40.31.143:86/api/JsonsFinancial/PlatformBasic/'
-CAIMIAO_P2P_URL = 'http://121.40.31.143:86/api/JsonsFinancial/ProdMain/'
-CAIMIAO_DEAL_AMOUNT_URL = 'http://121.40.31.143:86/api/JsonsFinancial/Volumes/'
-CAIMIAO_RATE_URL = 'http://121.40.31.143:86/api/JsonsFinancial/Rating/'
+CAIMIAO_PlatformBasic_URL = 'http://121.40.31.143:86/api/JsonsFinancial/PlatformBasic/'
+CAIMIAO_ProdMain_URL = 'http://121.40.31.143:86/api/JsonsFinancial/ProdMain/'
+CAIMIAO_Volumes_URL = 'http://121.40.31.143:86/api/JsonsFinancial/Volumes/'
+CAIMIAO_RATING_URL = 'http://121.40.31.143:86/api/JsonsFinancial/Rating/'
 
 
 # 金山
@@ -859,7 +869,7 @@ FUBA_KEY = 'wanglibao@123'
 WLB_FOR_FUBA_KEY = '1997'
 FUBA_CALL_BACK_URL = 'http://www.fbaba.net/track/cps.php'
 FUBA_DEFAULT_TID = '1316'
-FUBA_ACTIVITY_PAGE = 'marketing_gold'
+FUBA_ACTIVITY_PAGE = 'index'
 FUBA_PERIOD = 30
 FUBA_CHANNEL_CODE = 'fuba'
 
