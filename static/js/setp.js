@@ -178,6 +178,18 @@
     }
 
 
+  redpack('ENTER_WEB_PAGE');
+  //抽奖请求
+  function redpack(sum){
+    $.ajax({
+      url: "/api/xunlei/award",
+      type: "POST",
+      data: {action:sum}
+    }).done(function(data) {
+       console.log(data)
+    });
+  }
+
 
 
 }).call(this);
