@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 from django.views.generic import TemplateView, RedirectView
-from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate
+from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate, XunleiAwardView
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 
@@ -31,7 +31,9 @@ urlpatterns = patterns(
     url(r'^advance/$', TemplateView.as_view(template_name="advance.jade")),
     url(r'^gold/$', TemplateView.as_view(template_name="gold.jade"), name='marketing_gold'),
     url(r'^qixi/$', TemplateView.as_view(template_name="qixi.jade")),
-    url(r'^xunlei_setp/$', TemplateView.as_view(template_name="xunlei_setp.jade")),
+    #url(r'^xunlei_setp/$', TemplateView.as_view(template_name="xunlei_setp.jade")),
+    url(r'^xunlei_setp/$', login_required(XunleiAwardView.as_view(),
+                                                  login_url='/activity/xunlei_setp/')),
 
 
 )
