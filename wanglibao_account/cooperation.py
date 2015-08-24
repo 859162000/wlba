@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # encoding:utf-8
 import json
+from wanglibao_account.utils import str_to_float
 
 if __name__ == '__main__':
     import os
@@ -10,9 +11,10 @@ if __name__ == '__main__':
 
 import hashlib
 import datetime
+import time
 import logging
 from django.contrib.auth.models import User
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.http import HttpResponse
 from django.utils import timezone
 import requests
@@ -25,8 +27,9 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      TIANMANG_CALL_BACK_URL, WLB_FOR_YIRUITE_KEY, YIRUITE_KEY, BENGBENG_KEY, \
      WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
      JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL, JINSHAN_CALL_BACK_URL, WLB_FOR_JINSHAN_KEY, \
-     WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY, FUBABA_CALL_BACK_URL, WLB_FOR_FUBABA_KEY, \
-     FUBABA_COOP_ID, FUBABA_KEY
+     WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY, FUBA_CALL_BACK_URL, WLB_FOR_FUBA_KEY, \
+     FUBA_COOP_ID, FUBA_KEY, FUBA_CHANNEL_CODE, FUBA_DEFAULT_TID, FUBA_PERIOD, YUNDUAN_CALL_BACK_URL, \
+    WLB_FOR_YUNDUAN_KEY, YUNDUAN_COOP_ID, YUNDUAN_KEY
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
@@ -79,6 +82,13 @@ def get_first_investment_for_coop(user_id):
         return amount, total_amount, first_invest_time,
     except:
         return None, None, None
+
+def get_last_investment_for_coop(user_id):
+    try:
+        p2p_record = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购').order_by('create_time')
+        return p2p_record.last()
+    except:
+        return None
 
 
 def get_tid_for_coop(user_id):
@@ -519,7 +529,7 @@ class JinShanRegister(CoopRegister):
         self.jinshan_call_back(user, 'wangli_regist_reward', 'Cp9AhO2o9BQTDhbUBnHxmY0X4Kbg')
 
     def purchase_call_back(self, user):
-        if P2PRecord.objects.filter(user_id=user.id).count() == 1:
+        if P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').count() == 1:
             self.jinshan_call_back(user, 'wangli_invest_reward', 'pA71ZhBf4DDeet7SLiLlGsT1qTYu')
 
 
@@ -590,23 +600,42 @@ class ShiTouCunRegister(CoopRegister):
 
     def purchase_call_back(self, user):
         # 判断是否是首次投资
-        if P2PRecord.objects.filter(user_id=user.id).count() != 1:
-            return
-        self.shitoucun_call_back(user)
+        if P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').count() == 1:
+            self.shitoucun_call_back(user)
 
 
-class FuBaBaRegister(CoopRegister):
+class FUBARegister(CoopRegister):
     def __init__(self, request):
-        super(FuBaBaRegister, self).__init__(request)
-        self.c_code = 'fuba'
-        self.call_back_url = FUBABA_CALL_BACK_URL
-        self.coop_id = FUBABA_COOP_ID
-        self.coop_key = FUBABA_KEY
+        super(FUBARegister, self).__init__(request)
+        self.c_code = FUBA_CHANNEL_CODE
+        self.call_back_url = FUBA_CALL_BACK_URL
+        self.coop_id = FUBA_COOP_ID
+        self.coop_key = FUBA_KEY
 
     @property
     def channel_user(self):
-        # 富爸爸需求，如果uid为空，uid设置为1316
-        return self.request.session.get(self.internal_channel_user_key, '1316')
+        # 富爸爸需求，如果uid为空，uid设置为FUBA_DEFAULT_TID
+        channel_user = self.request.session.get(self.internal_channel_user_key)
+        if not channel_user:
+            channel_user = FUBA_DEFAULT_TID
+        return channel_user
+
+    def save_to_binding(self, user):
+        """
+        处理从url获得的渠道参数
+        :param user:
+        :return:
+        """
+        channel_user = self.channel_user
+        bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
+        if len(channel_user) <= bid_len:
+            if channel_user == FUBA_DEFAULT_TID or Binding.objects.filter(bid=channel_user).count() == 0:
+                binding = Binding()
+                binding.user = user
+                binding.btype = self.channel_name
+                binding.bid = channel_user
+                binding.save()
+                # logger.debug('save user %s to binding'%user)
 
     def purchase_call_back(self, user):
         """
@@ -614,15 +643,15 @@ class FuBaBaRegister(CoopRegister):
         """
         # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
         binding = Binding.objects.filter(user_id=user.id).first()
-        p2p_record = P2PRecord.objects.filter(user_id=user.id).last()
+        p2p_record = get_last_investment_for_coop(user.id)
         if binding and p2p_record:
             # 如果结算时间过期了则不执行回调
-            earliest_settlement_time = redis_backend()._get(binding.bid)
+            earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
             if earliest_settlement_time:
                 earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
                 current_time = datetime.datetime.now()
                 # 如果上次访问的时间是在30天前则不更新访问时间
-                if earliest_settlement_time + datetime.timedelta(seconds=180) <= current_time:
+                if earliest_settlement_time + datetime.timedelta(days=int(FUBA_PERIOD)) <= current_time:
                     return
 
             order_id = p2p_record.id
@@ -652,10 +681,44 @@ class FuBaBaRegister(CoopRegister):
                     binding.save()
 
 
+class YunDuanRegister(CoopRegister):
+    def __init__(self, request):
+        super(YunDuanRegister, self).__init__(request)
+        self.c_code = 'yunduan'
+        self.call_back_url = YUNDUAN_CALL_BACK_URL
+        self.coop_id = YUNDUAN_COOP_ID
+        self.coop_key = YUNDUAN_KEY
+
+    def yunduan_call_back(self, user):
+        # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
+        binding = Binding.objects.filter(user_id=user.id).first()
+        p2p_record = P2PRecord.objects.filter(user_id=user.id).last()
+        if binding and p2p_record:
+            order_id = p2p_record.id
+            sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
+            params = {
+                'action': 'create',
+                'order': order_id,
+                'sig': sig,
+                'planid': self.coop_id,
+                'uid': binding.bid,
+            }
+            common_callback.apply_async(
+                kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+
+    def validate_call_back(self, user):
+        self.yunduan_call_back(user)
+
+    def purchase_call_back(self, user):
+        # 判断是否是首次投资
+        if P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').count() == 1:
+            self.yunduan_call_back(user)
+
+
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
-                          ShiTouCunRegister, FuBaBaRegister]
+                          ShiTouCunRegister, FUBARegister]
 
 
 #######################第三方用户查询#####################
@@ -1044,7 +1107,20 @@ class CsaiUserQuery(APIView):
             users_list = []
             ret = dict()
 
-            binds = Binding.objects.filter(btype=u'csai')
+            start_date = self.request.GET.get('startdate', None)
+            end_date = self.request.GET.get('enddate', None)
+
+            if not start_date:
+                start_date = '1970-01-01'
+            start = str_to_float(start_date)
+            if end_date:
+                end = str_to_float(end_date)
+            else:
+                end = time.time()
+
+            binds = Binding.objects.filter(
+                (Q(btype=u'csai') | Q(btype=u'xicai')) & Q(created_at__gte=start) & Q(created_at__lte=end))
+
             users = [b.user for b in binds]
             ret['total'] = len(users)
 
@@ -1073,7 +1149,8 @@ class CsaiUserQuery(APIView):
                 user_dict['realname'] = user_profile.name
                 user_dict['phone'] = user_profile.phone
 
-                user_dict['totalmoney'] = P2PEquity.objects.filter(user=user).aggregate(sum=Sum('equity'))['sum']
+                user_dict['totalmoney'] = \
+                    P2PEquity.objects.filter(user=user).aggregate(Sum('equity'))['equity__sum'] or 0
 
                 user_dict['ip'] = None
                 user_dict['qq'] = None
@@ -1116,7 +1193,19 @@ class CsaiInvestmentQuery(APIView):
             p2p_list = []
             ret = dict()
 
-            binds = Binding.objects.filter(btype=u'csai')
+            start_date = self.request.GET.get('startdate', None)
+            end_date = self.request.GET.get('enddate', None)
+
+            if not start_date:
+                start_date = '1970-01-01'
+            start = str_to_float(start_date)
+            if end_date:
+                end = str_to_float(end_date)
+            else:
+                end = time.time()
+
+            binds = Binding.objects.filter(
+                (Q(btype=u'csai') | Q(btype=u'xicai')) & Q(created_at__gte=start) & Q(created_at__lte=end))
             users = [b.user for b in binds]
             p2ps = P2PEquity.objects.filter(user__in=users)
 
@@ -1170,16 +1259,15 @@ if __name__ == '__main__':
 def caimiao_post_platform_info():
     """
     author: Zhoudong
-    http请求方式: POST
+    http请求方式: POST  平台基本数据
     http://121.40.31.143:86/api/JsonsFinancial/PlatformBasic/
     向菜苗推送我们的平台信息.
     :return:
     """
-    url = settings.CAIMIAO_PLATFORM_URL
+    url = settings.CAIMIAO_PlatformBasic_URL
+    key = settings.CAIMIAO_SECRET
 
     post_data = dict()
-
-    key = settings.CAIMIAO_SECRET
 
     data = {
         'tits': u'网利宝',
@@ -1215,27 +1303,141 @@ def caimiao_post_platform_info():
     json_data = json.dumps(post_data)
 
     ret = requests.post(url, data=json_data)
-    return ret
+    return ret.text
 
 
 def caimiao_post_p2p_info():
     """
     author: Zhoudong
+    http请求方式: POST  标的信息
+    http://121.40.31.143:86/api/JsonsFinancial/ProdMain/
     :return:
     """
 
+    url = settings.CAIMIAO_ProdMain_URL
     key = settings.CAIMIAO_SECRET
+
+    post_data = dict()
 
     now = timezone.now()
 
     start_time = now - settings.XICAI_UPDATE_TIMEDELTA
-    ps = P2PProduct.objects.filter(publish_time__gte=start_time).filter(publish_time__lt=now).all()
-
-    p2p_equity = P2PEquity.objects.filter(created_at__gte=start_time).all()
-    wangli_products = set([p.product for p in p2p_equity]).update(ps)
+    wangli_products = P2PProduct.objects.filter(Q(publish_time__gte=start_time) & Q(publish_time__lt=now))
 
     data = dict()
     data['tits'] = u"网利宝"
+    data['prods'] = []
+
     for product in wangli_products:
         prod = dict()
         prod['prods_codes'] = product.pk
+        prod['prods_tits'] = product.name
+        prod['prods_type'] = product.category
+        prod['borrower'] = product.borrower_name
+        prod['moneys_mains'] = product.total_amount
+        prod['aprs_mins'] = product.expected_earning_rate
+        prod['aprs_maxs'] = product.excess_earning_rate
+        period = product.period if product.pay_method.startswith(u"日计息") else product.period * 30
+        prod['terms_scopes'] = period
+        prod['prods_start'] = product.publish_time.strftime("%Y-%m-%d")
+        prod['prods_end'] = product.soldout_time.strftime("%Y-%m-%d") if product.soldout_time else None
+
+        data['prods'].append(prod)
+
+    # php md5('cmjr'.md5($key.json_encod(主数据)));
+    sign = hashlib.md5('cmjr' + hashlib.md5(key + json.dumps(data)).hexdigest()).hexdigest()
+
+    post_data.update(key=key)
+    post_data.update(sign=sign)
+    post_data.update(data=data)
+
+    # 参数转成json 格式
+    json_data = json.dumps(post_data)
+
+    ret = requests.post(url, data=json_data)
+
+    return ret.text
+
+
+def caimiao_post_volumes_info():
+    """
+    author: Zhoudong
+    http请求方式: POST  成交量
+    http://121.40.31.143:86/api/JsonsFinancial/Volumes/
+    :return:
+    """
+
+    url = settings.CAIMIAO_DEAL_Volumes_URL
+    key = settings.CAIMIAO_SECRET
+
+    post_data = dict()
+
+    now = timezone.now()
+    start = now - timezone.timedelta(days=1)
+    equities = P2PEquity.objects.filter(Q(created_at__gte=start) & Q(created_at__lt=now))
+
+    data = dict()
+    data['tits'] = u"网利宝"
+    data['volumes_nows'] = equities.aggregate(Sum('equity'))['equity__sum'] or 0
+    data['investors_number_now'] = equities.values_list('user', flat=True).distinct().count()
+    data['volumes_all'] = P2PEquity.objects.all().aggregate(Sum('equity'))['equity__sum'] or 0
+    data['times'] = timezone.localtime(now).strftime('%Y%m%d')
+
+    # php md5('cmjr'.md5($key.json_encod(主数据)));
+    sign = hashlib.md5('cmjr' + hashlib.md5(key + json.dumps(data)).hexdigest()).hexdigest()
+
+    post_data.update(key=key)
+    post_data.update(sign=sign)
+    post_data.update(data=data)
+
+    # 参数转成json 格式
+    json_data = json.dumps(post_data)
+
+    ret = requests.post(url, data=json_data)
+
+    return ret.text
+
+
+def caimiao_post_rating_info():
+    """
+    author: Zhoudong
+    http请求方式: POST  网贷评级数据
+    http://121.40.31.143:86/api/JsonsFinancial/Rating/
+    :return:
+    """
+
+    url = settings.CAIMIAO_Rating_URL
+    key = settings.CAIMIAO_SECRET
+
+    post_data = dict()
+
+    data = dict()
+    data['tits'] = u"网利宝"
+    data['site_registration_number'] = User.objects.count()
+    data['risk_reserve_fund_sum'] = u'5000万'
+    data['back_amount'] = \
+        ProductAmortization.objects.all().aggregate(Sum('principal'))['principal__sum'] +\
+        ProductAmortization.objects.all().aggregate(Sum('interest'))['interest__sum']
+
+    now = timezone.now()
+    end = now + timezone.timedelta(days=60)
+    product_amortizations = ProductAmortization.objects.filter(Q(term_date__gte=now) & Q(term_date__lt=end))
+
+    data['60days_back_amount'] = \
+        product_amortizations.aggregate(Sum('principal'))['principal__sum'] +\
+        product_amortizations.aggregate(Sum('interest'))['interest__sum']
+    data['times'] = timezone.localtime(now).strftime('%Y%m%d')
+
+    # php md5('cmjr'.md5($key.json_encod(主数据)));
+    sign = hashlib.md5('cmjr' + hashlib.md5(key + json.dumps(data)).hexdigest()).hexdigest()
+
+    post_data.update(key=key)
+    post_data.update(sign=sign)
+    post_data.update(data=data)
+
+    # 参数转成json 格式
+    json_data = json.dumps(post_data)
+
+    ret = requests.post(url, data=json_data)
+
+    return ret.text

@@ -118,7 +118,7 @@ class RegisterView(RegistrationView):
             'next': self.request.GET.get('next', '/accounts/login/')
         })
 
-        if sign and promo_token == 'csai':
+        if sign and promo_token == 'csai' or 'xicai':
 
             try:
                 from wanglibao_account.cooperation import get_xicai_user_info
