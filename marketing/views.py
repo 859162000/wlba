@@ -614,6 +614,56 @@ class ActivityJoinLogCountAPIView(APIView):
         })
 
 
+class XunleiAwardView(TemplateView):
+    template_name = 'xunlei_setp.jade'
+
+    def get_context_data(self, **kwargs):
+        """
+            进入页面的时候，判断是否生成记录，如果没有则生成并返回剩余刮奖次数3；如果有，则直接返回剩余刮奖次数；
+        """
+        join_log = ActivityJoinLog.objects.filter(user=self.request.user).first()
+        if not join_log:
+            activity = ActivityJoinLog.objects.create(
+                user=self.request.user,
+                action_name=u'get_award',
+                action_type=u'login',
+                action_message=u'迅雷抽奖活动',
+                channel=u'all',
+                gift_name=u'抽得千元大奖',
+                amount=0,
+                join_times=3,
+                create_time=timezone.now(),
+            )
+            print activity.id
+            join_log = ActivityJoinLog.objects.filter(user=self.request.user).first()
+            join_log.amount = self.get_award_mount(activity.id)
+            join_log.save(update_fields=['amount'])
+
+        return Response({
+            'ret_code': 3003,
+            'left': join_log.join_times,  # 还剩几次
+            'amount': int(join_log.amount),  # 奖励的金额
+            'message': u'欢迎刮奖',
+
+        })
+        #to_json_response = {
+        #    'ret_code': 3003,
+        #    'left': join_log.join_times,  # 还剩几次
+        #    'amount': int(join_log.amount),  # 奖励的金额
+        #    'message': u'欢迎刮奖',
+        #}
+        #return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+    def get_award_mount(self, index):
+        index = index%10
+        if index in (0,):
+            return 200
+        if index in(3, 6, 9):
+            return 150
+        if index in(1, 2, 4, 5, 7, 8):
+            return 100
+
+
 class ThunderAwardAPIView(APIView):
     """
         Type: Add
@@ -704,7 +754,7 @@ class ThunderAwardAPIView(APIView):
         """
         join_log = ActivityJoinLog.objects.filter(user=request.user).first()
         if not join_log:
-            user_id = ActivityJoinLog.objects.create(
+            activity = ActivityJoinLog.objects.create(
                 user=self.user,
                 action_name=u'get_award',
                 action_type=u'login',
@@ -717,7 +767,7 @@ class ThunderAwardAPIView(APIView):
             )
 
             join_log = ActivityJoinLog.objects.filter(user=request.user).first()
-            join_log.amount = self.get_award_mount(user_id)
+            join_log.amount = self.get_award_mount(activity.id)
             join_log.save(update_fields=['amount'])
 
         to_json_response = {
