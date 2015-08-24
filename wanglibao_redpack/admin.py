@@ -17,11 +17,11 @@ class RedPackEventAdmin(admin.ModelAdmin):
 
     def red_num(self, obj):
         return obj.value
-    red_num.short_description = u"红包个数"
+    red_num.short_description = u"优惠券个数"
 
     def red_amount(self, obj):
         return obj.amount
-    red_amount.short_description = u"红包金额"
+    red_amount.short_description = u"优惠券金额"
 
 
 class RedPackResource(resources.ModelResource):
@@ -50,8 +50,8 @@ class RedPackAdmin(ExportMixin, admin.ModelAdmin):
 
 class RedPackRecordResource(resources.ModelResource):
     id = fields.Field(attribute="id", column_name=u"流水ID")
-    redpack_id = fields.Field(attribute="redpack__event_id", column_name=u"红包ID")
-    redpack = fields.Field(attribute="redpack__event__name", column_name=u"红包活动名称")
+    redpack_id = fields.Field(attribute="redpack__event_id", column_name=u"优惠券ID")
+    redpack = fields.Field(attribute="redpack__event__name", column_name=u"优惠券活动名称")
     change_platform = fields.Field(attribute="change_platform", column_name=u"兑换平台")
     apply_platform = fields.Field(attribute="apply_platform", column_name=u"使用平台")
     apply_at = fields.Field(attribute="apply_at", column_name=u"使用时间")
@@ -92,7 +92,7 @@ class RedPackRecordAdmin(ExportMixin, admin.ModelAdmin):
 
     def get_export_filename(self, file_format):
         date_str = timezone.now().strftime('%Y-%m-%d')
-        filename = "%s-%s.%s" % (u"红包使用流水".encode('utf-8'),
+        filename = "%s-%s.%s" % (u"优惠券使用流水".encode('utf-8'),
                                  date_str,
                                  file_format.get_extension())
         return filename
