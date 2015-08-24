@@ -159,13 +159,13 @@ class EquityKeeper(KeeperBaseMixin):
             record = self.__tracer(catalog, amount, description)
 
             #酒仙网众筹用户增加额外的记录
-            if self.product.category == u'酒仙众筹标':
-                self.equity_jiuxian, created = P2PEquityJiuxian.objects\
-                    .get_or_create(user=self.user, product=self.product, equity=self.equity)
-                self.equity_jiuxian = P2PEquityJiuxian.objects.select_for_update().filter(pk=self.equity_jiuxian.id).first()
-                self.equity_jiuxian.equity_amount += amount
-                self.equity_jiuxian.created_at = datetime.now()
-                self.equity_jiuxian.save()
+            # if self.product.category == u'酒仙众筹标':
+            #     self.equity_jiuxian, created = P2PEquityJiuxian.objects\
+            #         .get_or_create(user=self.user, product=self.product, equity=self.equity)
+            #     self.equity_jiuxian = P2PEquityJiuxian.objects.select_for_update().filter(pk=self.equity_jiuxian.id).first()
+            #     self.equity_jiuxian.equity_amount += amount
+            #     self.equity_jiuxian.created_at = datetime.now()
+            #     self.equity_jiuxian.save()
 
             return record
 

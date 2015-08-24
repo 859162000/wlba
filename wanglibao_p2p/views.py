@@ -173,7 +173,7 @@ class PurchaseP2P(APIView):
                    }, status=status.HTTP_400_BAD_REQUEST)
             if redpack and not redpack.isdigit():
                 return Response({
-                                    'message': u'请输入有效红包',
+                                    'message': u'请选择有效的优惠券',
                                     'error_number': ErrorNumber.unknown_error
                                 }, status=status.HTTP_400_BAD_REQUEST)
 

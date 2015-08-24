@@ -56,13 +56,14 @@ class P2PTrader(object):
             raise P2PException(u'用户账户已冻结，请联系客服')
         with transaction.atomic():
             if redpack:
-                redpack_order_id = OrderHelper.place_order(self.user, order_type=u'红包消费', redpack=redpack,
-                                                        product_id=self.product.id, status=u'新建').id
-                result = redpack_backends.consume(redpack,amount, self.user, self.order_id, self.device_type)
+                redpack_order_id = OrderHelper.place_order(self.user, order_type=u'优惠券消费', redpack=redpack,
+                                                           product_id=self.product.id, status=u'新建').id
+                result = redpack_backends.consume(redpack, amount, self.user, self.order_id, self.device_type, self.product.id)
                 if result['ret_code'] != 0:
                     raise Exception,result['message']
-                red_record = self.margin_keeper.redpack_deposit(result['deduct'], u"购买P2P抵扣%s元" % result['deduct'], 
-                                                        order_id=redpack_order_id, savepoint=False)
+                if result['increase_interest'] != 'increase_interest':
+                    red_record = self.margin_keeper.redpack_deposit(result['deduct'], u"购买P2P抵扣%s元" % result['deduct'],
+                                                                    order_id=redpack_order_id, savepoint=False)
                 OrderHelper.update_order(Order.objects.get(pk=redpack_order_id), user=self.user, status=u'成功', 
                                         amount=amount, deduct=result['deduct'], redpack=redpack)
 
@@ -95,7 +96,7 @@ class P2PTrader(object):
         })
 
         # 满标给管理员发短信
-        if product_record.product_balance_after <= 0:
+        if is_full:
             from wanglibao_p2p.tasks import full_send_message
 
             full_send_message.apply_async(kwargs={"product_name": self.product.name})

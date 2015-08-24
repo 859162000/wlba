@@ -26,7 +26,7 @@ from marketing.models import IntroducedBy
 
 logger = logging.getLogger(__name__)
 
-REDPACK_RULE = {"direct":"-", "fullcut":"-", "percent":"*"}
+REDPACK_RULE = {"direct": "-", "fullcut": "-", "percent": "*", "interest_coupon": "~"}
 
 def local_datetime(dt):
     return timezone.get_current_timezone().normalize(dt)
@@ -54,14 +54,17 @@ def list_redpack(user, status, device_type):
             if redpack.status == "invalid":
                 continue
             event = x.redpack.event
-            obj = {"name":event.name, "method":REDPACK_RULE[event.rtype], "amount":event.amount,
-                    "id":x.id, "invest_amount":event.invest_amount,
-                    "unavailable_at":stamp(event.unavailable_at), "event_id":event.id,
-                    "highest_amount":event.highest_amount}
-            if event.available_at < timezone.now() < event.unavailable_at:
+
+            start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
+                                                      x.created_at, event.available_at, event.unavailable_at)
+
+            obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
+                    "id": x.id, "invest_amount": event.invest_amount,
+                    "unavailable_at": stamp(end_time), "event_id": event.id,
+                    "highest_amount": event.highest_amount}
+            if start_time < timezone.now() < end_time:
                 if event.apply_platform == "all" or event.apply_platform == device_type:
-                    if obj['method'] == REDPACK_RULE['percent']:
-                        #obj['amount'] = "%.2f" % (obj['amount']/100.0)
+                    if obj['method'] == REDPACK_RULE['percent'] or obj['method'] == REDPACK_RULE['increase_interest']:
                         obj['amount'] = obj['amount']/100.0
                     packages['available'].append(obj)
         packages['available'].sort(key=lambda x:x['unavailable_at'])
@@ -70,12 +73,16 @@ def list_redpack(user, status, device_type):
         records = RedPackRecord.objects.filter(user=user)
         for x in records:
             event = x.redpack.event
-            obj = {"name":event.name, "receive_at":stamp(x.created_at),
-                    "available_at":stamp(event.available_at), "unavailable_at":stamp(event.unavailable_at),
-                    "id":x.id, "invest_amount":event.invest_amount, "amount":event.amount, "event_id":event.id,
-                    "highest_amount":event.highest_amount,
-                    "method":REDPACK_RULE[event.rtype]}
-            if obj['method'] == REDPACK_RULE['percent']:
+
+            start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
+                                                      x.created_at, event.available_at, event.unavailable_at)
+
+            obj = {"name": event.name, "receive_at": stamp(x.created_at),
+                    "available_at": stamp(start_time), "unavailable_at": stamp(end_time),
+                    "id": x.id, "invest_amount": event.invest_amount, "amount": event.amount, "event_id": event.id,
+                    "highest_amount": event.highest_amount,
+                    "method": REDPACK_RULE[event.rtype]}
+            if obj['method'] == REDPACK_RULE['percent'] or obj['method'] == REDPACK_RULE['increase_interest']:
                 obj['amount'] = obj['amount']/100.0
 
             if x.order_id:
@@ -87,7 +94,7 @@ def list_redpack(user, status, device_type):
                 if x.redpack.status == "invalid":
                     packages['invalid'].append(obj)
                 else:
-                    if event.unavailable_at < timezone.now():
+                    if end_time < timezone.now():
                         packages['expires'].append(obj)
                     else:
                         packages['unused'].append(obj)
@@ -279,7 +286,7 @@ def give_activity_redpack(user, event, device_type):
     device_type = _decide_device(device_type)
     redpack = RedPack.objects.filter(event=event, status="unused").first()
     if not redpack:
-        return False,u"没有此红包"
+        return False,u"没有此优惠券"
     if redpack.token != "":
         redpack.status = "used"
         redpack.save()
@@ -292,30 +299,37 @@ def give_activity_redpack(user, event, device_type):
     return True,""
 
 
-def consume(redpack, amount, user, order_id, device_type):
+def consume(redpack, amount, user, order_id, device_type, product_id):
     amount = fmt_two_amount(amount)
     record = RedPackRecord.objects.filter(user=user, id=redpack).first()
     redpack = record.redpack
     event = redpack.event
     device_type = _decide_device(device_type)
+
+    start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
+                                              record.created_at, event.available_at, event.unavailable_at)
     if not record:
-        return {"ret_code":30171, "message":"红包不存在"}
-    if record.order_id:
-        return {"ret_code":30172, "message":"红包已使用"}
+        return {"ret_code": 30171, "message": u"优惠券不存在"}
+    if record.order_id or record.product_id:
+        return {"ret_code": 30172, "message": u"优惠券已使用"}
     if redpack.status == "invalid":
-        return {"ret_code":30173, "message":"红包已作废"}
-    if not event.available_at < timezone.now() < event.unavailable_at:
-        return {"ret_code":30174, "message":"红包不可使用"}
+        return {"ret_code": 30173, "message": u"优惠券已作废"}
+    if not start_time < timezone.now() < end_time:
+        return {"ret_code": 30174, "message": u"优惠券不可使用"}
     if amount < event.invest_amount:
-        return {"ret_code":30175, "message":"投资金额不满足红包规则%s" % event.invest_amount}
+        return {"ret_code": 30175, "message": u"投资金额不满足优惠券规则%s" % event.invest_amount}
     if event.apply_platform != "all" and event.apply_platform != device_type:
-        return {"ret_code":30176, "message":"此红包只能在%s平台使用" % event.apply_platform}
+        return {"ret_code": 30176, "message": u"此优惠券只能在%s平台使用" % event.apply_platform}
 
     rtype = event.rtype
     rule_value = event.amount
-    deduct = _calc_deduct(amount, rtype, rule_value, event)
+    if event.rtype != 'increase_interest':
+        deduct = _calc_deduct(amount, rtype, rule_value, event)
+    else:
+        deduct = 0
 
     record.order_id = order_id
+    record.product_id = product_id
     record.apply_platform = device_type
     record.apply_amount = deduct
     record.apply_at = timezone.now()
@@ -343,7 +357,7 @@ def consume(redpack, amount, user, order_id, device_type):
    # elif REDPACK_RULE[rtype] == "+":
    #     actual_amount = amount + rule_value
 
-    return {"ret_code":0, "message":"ok", "deduct":deduct}
+    return {"ret_code":0, "message":"ok", "deduct":deduct, "rtype": event.rtype}
 
 def _calc_deduct(amount, rtype, rule_value, event):
     if REDPACK_RULE[rtype] == "*":
@@ -538,3 +552,15 @@ def commission(user, product, equity, start, end):
                                 product=product, amount=_amount['amount__sum'],
                                 earning=commission, order_id=second.order_id, paid=True, created_at=timezone.now())
                 income.save()
+
+
+def get_start_end_time(auto, auto_days, created_at, available_at, unavailable_at):
+
+    if auto and auto_days > 0:
+        start_time = created_at
+        end_time = created_at + timezone.timedelta(days=int(auto_days))
+    else:
+        start_time = available_at
+        end_time = unavailable_at
+
+    return start_time, end_time
