@@ -182,9 +182,9 @@
   //抽奖请求
   function redpack(sum){
     $.ajax({
-      url: "/xunlei/award",
+      url: "/api/xunlei/award",
       type: "POST",
-      data: {'action':sum}
+      data: {action:sum}
     }).done(function(data) {
        console.log(data)
     });
