@@ -95,7 +95,7 @@ urlpatterns = patterns(
 
     url(r'^tender_agreement/',  AgreementAutoView.as_view(), name="agreement_auto"),
     url(r'^lottery/', include('wanglibao_lottery.urls')),
-    url(r'^landpage/', landpage_view, name='fubaba_view'),
+    url(r'^landpage/', landpage_view),
 )
 
 urlpatterns += patterns(
