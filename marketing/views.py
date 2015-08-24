@@ -614,6 +614,121 @@ class ActivityJoinLogCountAPIView(APIView):
         })
 
 
+class ThunderAwardAPIView(APIView):
+    """
+        Type: Add
+        Modified By: Yihen@20150821
+        description: 迅雷抽奖活动1.用户有三次摇奖机会，三次摇奖必中奖一次，中奖金额分别为100元（30%）、
+                    150元（60%）、 200元（10%），中奖后提示中奖金额及中奖提示语，非中奖用户提示非中奖提示语。
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+        if not user:
+            to_json_response = {
+                'ret_code': 3000,
+                'message': u'用户没有登陆，请先登陆',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        action = request.POST.get("action", "")
+
+        if action == 'GET_AWARD':
+            response = self.get_award(request)
+
+        if action == 'IGNORE_AWARD':
+            response = self.ignore_award(request)
+
+        if action == 'ENTER_WEB_PAGE':
+            response = self.enter_webpage(request)
+
+        return response
+
+    def get_award(self, request):
+        """
+            直接将剩余刮奖次数置零，并返回结果
+        """
+        join_log = ActivityJoinLog.objects.filter(user=request.user).first()
+        join_log.join_times = 0
+        join_log.save(update_fields=['join_times'])
+        dt = timezone.datetime.now()
+
+        moneys = ['100', '150', '200']
+        for money in moneys:
+            describe = 'thousand_redpack_' + str(money)
+
+        redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,
+                                                    target_channel='xunlei',
+                                                    give_start_at__lt=dt, give_end_at__gt=dt).first()
+
+        if redpack_event:
+            redpack_backends.give_activity_redpack(request.user, redpack_event, 'pc')
+
+        to_json_response = {
+            'ret_code': 3001,
+            'left': join_log.join_times,  # 还剩几次
+            'amount': join_log.amount,  # 奖励的金额
+            'message': u'终于等到你，还好我没放弃',
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+    def ignore_award(self, request):
+        """
+            将剩余的刮奖次数减1，并返回最终结果
+        """
+        join_log = ActivityJoinLog.objects.filter(user=request.user).first()
+        join_log.join_times -= 1
+        join_log.save(update_fields=['join_times'])
+        to_json_response = {
+            'ret_code': 3002,
+            'left': join_log.join_times,  # 还剩几次
+            'amount': join_log.amount,  # 奖励的金额
+            'message': u'你和大奖只是一根头发的距离',
+        }
+
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+    def get_award_mount(self, index):
+        index %= 10
+        if index in (0,):
+            return 200
+        if index in(3, 6, 9):
+            return 150
+        if index in(1, 2, 4, 5, 7, 8):
+            return 100
+
+    def enter_webpage(self, request):
+        """
+            进入页面的时候，判断是否生成记录，如果没有则生成并返回剩余刮奖次数3；如果有，则直接返回剩余刮奖次数；
+        """
+        join_log = ActivityJoinLog.objects.filter(user=request.user).first()
+        if not join_log:
+            user_id = ActivityJoinLog.objects.create(
+                user=self.user,
+                action_name=u'get_award',
+                action_type=u'login',
+                action_message=u'迅雷抽奖活动',
+                channel=u'all',
+                gift_name=u'抽得千元大奖',
+                amount=0,
+                join_times=3,
+                create_time=timezone.now(),
+            )
+
+            join_log = ActivityJoinLog.objects.filter(user=request.user).first()
+            join_log.amount = self.get_award_mount(user_id)
+            join_log.save(update_fields=['amount'])
+
+        to_json_response = {
+            'ret_code': 3003,
+            'left': join_log.join_times,  # 还剩几次
+            'amount': join_log.amount,  # 奖励的金额
+            'message': u'欢迎刮奖',
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+
 class ThousandRedPackAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
@@ -626,7 +741,6 @@ class ThousandRedPackAPIView(APIView):
         start_time = timezone.datetime(dt.year, dt.month, dt.day)
         end_time = timezone.datetime(dt.year, dt.month, dt.day, 23, 59, 59)
 
-        #if dt > timezone.datetime(2015, 7, 15, 23, 59, 59):
         if dt > timezone.datetime(2015, 8, 7, 23, 59, 59):
             return Response({'ret_code': 3003, 'message': u'活动已过期'})
 
