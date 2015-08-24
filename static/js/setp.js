@@ -69,10 +69,11 @@
   });
 
   //关闭弹出框
-  $('.first-xl-off2').on('click',function(){
+  $('.first-xl-off2,.reg-btn').on('click',function(){
     $('#small-zc').hide();
     $('#xl-aug-login').hide();
     $('#xl-aug-success').hide();
+    $('#xl-aug-prize').hide();
   })
 
 
@@ -126,13 +127,23 @@
     },500)
 
     //按钮
+    var num=1;
+    var happy=random();
+    console.log(happy)
+
     $('.game-btn').on('mousedown',function(){
       $('.game-btn').addClass('game-btn-down')
+
     });
     $('.game-btn').on('mouseup',function(){
       $('.game-btn').removeClass('game-btn-down')
       if ($(this).hasClass('go-game')){
-        game();
+        console.log(num)
+        if (num>3){
+          alert('机会已经用完了')
+        }else{
+          game();
+        }
       }else{
         $('#small-zc').show();
         $('#xl-aug-login').show();
@@ -147,7 +158,14 @@
         $('.side').addClass('side-down')
         setTimeout(function(){
           $('.side').removeClass('side-down')
-          star();
+          if (num!=happy){
+            redpack('IGNORE_AWARD');
+            star('0000');
+          }else{
+            redpack('GET_AWARD');
+            star('1314');
+          }
+
         },500)
       },1000)
     }
@@ -155,15 +173,13 @@
 
 
     //开始转动
-    function star(){
+    function star(a){
       var time,j=0;
       time=setInterval(function(){
         $('.long-sum').animate({'bottom':'-1062px'},100,function(){
           $('.long-sum').css({'bottom':'0px'})
         })
       },100)
-
-      var a='1314';
       setTimeout(function(){
         for (var k= 0,len= a.length;k<len;k++){
           var g=9-a[k],b=k+1;
@@ -172,15 +188,29 @@
         clearInterval(time)
         $('#rmb').text(a)
         $('#small-zc').show();
-        $('#xl-aug-success').show();
+        if (a=='0000'){
+          var txt=['你和大奖只是一根头发的距离','天苍苍，野茫茫，中奖的希望太渺茫','太可惜了，你竟然与红包擦肩而过'];
+          var ind=parseInt(Math.random()*3);
+          $('#xl-aug-success').hide();
+          $('#xl-aug-prize p').text(txt[ind]);
+          $('#xl-aug-prize').show();
+        }else{
+          $('#xl-aug-prize').hide();
+          $('#xl-aug-success').show();
+        }
+        num++;
       },3000)
-
+      $('.long-sum').css({'top':''});
+      $('#chance').text(' '+3-num+' ')
     }
 
-
-  redpack('ENTER_WEB_PAGE');
+    //产生随机数,判断用户第几次抽中奖
+    function random(){
+      return parseInt(Math.random()*3+1)
+    }
   //抽奖请求
   function redpack(sum){
+    console.log(sum)
     $.ajax({
       url: "/api/xunlei/award",
       type: "POST",
