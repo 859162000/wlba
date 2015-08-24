@@ -869,7 +869,7 @@ FUBA_KEY = 'wanglibao@123'
 WLB_FOR_FUBA_KEY = '1997'
 FUBA_CALL_BACK_URL = 'http://www.fbaba.net/track/cps.php'
 FUBA_DEFAULT_TID = '1316'
-FUBA_ACTIVITY_PAGE = 'marketing_gold'
+FUBA_ACTIVITY_PAGE = 'index'
 FUBA_PERIOD = 30
 FUBA_CHANNEL_CODE = 'fuba'
 
