@@ -1322,7 +1322,11 @@ def caimiao_post_p2p_info():
     now = timezone.now()
 
     start_time = now - settings.XICAI_UPDATE_TIMEDELTA
-    wangli_products = P2PProduct.objects.filter(Q(publish_time__gte=start_time) & Q(publish_time__lt=now))
+    new_products = P2PProduct.objects.filter(Q(publish_time__gte=start_time) & Q(publish_time__lt=now))
+    # 还需要把更新的标全部推送
+    p2p_equity = P2PEquity.objects.filter(created_at__gte=start_time).all()
+    wangli_products = set([p.product for p in p2p_equity])
+    wangli_products.update(new_products)
 
     data = dict()
     data['tits'] = u"网利宝"
