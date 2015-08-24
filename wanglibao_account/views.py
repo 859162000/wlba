@@ -874,7 +874,7 @@ class AccountRedPacket(TemplateView):
 
         user = self.request.user
         device = utils.split_ua(self.request)
-        result = backends.list_redpack(user, 'all', device['device_type'])
+        result = backends.list_redpack(user, 'all', device['device_type'], 0)
         red_packets = result['packages'].get(status, [])
 
         return {

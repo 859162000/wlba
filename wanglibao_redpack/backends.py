@@ -35,7 +35,7 @@ def stamp(dt):
     return long(time.mktime(local_datetime(dt).timetuple()))
     #return long(time.mktime(dt.timetuple()))
 
-def list_redpack(user, status, device_type):
+def list_redpack(user, status, device_type, product_id=0):
     if status not in ("all", "available"):
         return {"ret_code":30151, "message":"参数错误"}
 
@@ -64,7 +64,7 @@ def list_redpack(user, status, device_type):
                     "highest_amount": event.highest_amount}
             if start_time < timezone.now() < end_time:
                 if event.apply_platform == "all" or event.apply_platform == device_type:
-                    if obj['method'] == REDPACK_RULE['percent'] or obj['method'] == REDPACK_RULE['increase_interest']:
+                    if obj['method'] == REDPACK_RULE['percent'] or obj['method'] == REDPACK_RULE['interest_coupon']:
                         obj['amount'] = obj['amount']/100.0
                     packages['available'].append(obj)
         packages['available'].sort(key=lambda x:x['unavailable_at'])
@@ -82,7 +82,7 @@ def list_redpack(user, status, device_type):
                     "id": x.id, "invest_amount": event.invest_amount, "amount": event.amount, "event_id": event.id,
                     "highest_amount": event.highest_amount,
                     "method": REDPACK_RULE[event.rtype]}
-            if obj['method'] == REDPACK_RULE['percent'] or obj['method'] == REDPACK_RULE['increase_interest']:
+            if obj['method'] == REDPACK_RULE['percent'] or obj['method'] == REDPACK_RULE['interest_coupon']:
                 obj['amount'] = obj['amount']/100.0
 
             if x.order_id:
