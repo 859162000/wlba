@@ -128,7 +128,7 @@
 
     //按钮
     var num=1;
-    var happy=random();
+    var happy=3;
     var change;
     redpack('ENTER_WEB_PAGE');
     $('.game-btn').on('mousedown',function(){
@@ -204,14 +204,9 @@
         num++;
       },3000)
       $('.long-sum').css({'top':''});
-      console.log(change['left'])
       $('#chance').text(' '+change['left']+' ')
     }
 
-    //产生随机数,判断用户第几次抽中奖
-    function random(){
-      return parseInt(Math.random()*3+1)
-    }
 
   //抽奖请求
   function redpack(sum){
@@ -222,14 +217,24 @@
       async: false
     }).done(function(data) {
        change=data
-      console.log(change['left']);
-      $('#chance').text(' '+change['left']+' ');
-    }).fail(function(){
-        $('#chance').text(' '+3+' ');
-      });
+//      console.log(change);
+      if (change['left']){
+        $('#chance').text(' '+change['left']+' ');
+      }else{
+        $('#chance').text(' 3 ');
+      }
+    });
   }
 
+  //抽奖名单
+  $.ajax({
+      url: "/api/xunlei/award/records/",
+      type: "POST",
+      async: true
+    }).done(function(data) {
+       console.log(data)
 
+    });
 
 }).call(this);
 

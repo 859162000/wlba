@@ -641,7 +641,7 @@ def ajax_post(request):
         description:迅雷9月抽奖活动，响应web的ajax请求
     """
     user = request.user
-    if not user:
+    if not user.id:
         to_json_response = {
             'ret_code': 3000,
             'message': u'用户没有登陆，请先登陆',
