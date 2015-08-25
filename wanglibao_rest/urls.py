@@ -230,7 +230,7 @@ urlpatterns += patterns(
     url(r'^thousand/redpack/$', ThousandRedPackAPIView.as_view()),
     url(r'^thousand/redpack/count/$', ThousandRedPackCountAPIView.as_view()),
     url(r'^xunlei/august/count/$', ThunderActivityRewardCounter.as_view()),
-    url(r'^xunlei/award/$', ThunderAwardAPIView.as_view()), #add by Yihen@20150821, 迅雷-网利宝 抽奖活动
+    url(r'^xunlei/award/$', 'marketing.views.ajax_post'), #add by Yihen@20150821, 迅雷-网利宝 抽奖活动
 )
 
 

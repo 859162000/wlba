@@ -215,7 +215,7 @@
   function redpack(sum){
     console.log(sum)
     $.ajax({
-      url: "/api/xunlei/award",
+      url: "/api/xunlei/award/",
       type: "POST",
       data: {action:sum}
     }).done(function(data) {
