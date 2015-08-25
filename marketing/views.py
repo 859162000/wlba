@@ -701,7 +701,8 @@ class ThunderAwardAPIView(APIView):
             将剩余的刮奖次数减1，并返回最终结果
         """
         join_log = ActivityJoinLog.objects.filter(user=request.user).first()
-        join_log.join_times -= 1
+        if join_log.join_times > 0:
+            join_log.join_times -= 1
         join_log.save(update_fields=['join_times'])
         to_json_response = {
             'ret_code': 3002,
