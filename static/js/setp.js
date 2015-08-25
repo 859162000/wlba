@@ -131,7 +131,6 @@
     var happy=random();
     var change;
     redpack('ENTER_WEB_PAGE');
-    $('#chance').text(' '+change['left']+' ');
     $('.game-btn').on('mousedown',function(){
       $('.game-btn').addClass('game-btn-down')
 
@@ -139,7 +138,7 @@
     $('.game-btn').on('mouseup',function(){
       $('.game-btn').removeClass('game-btn-down')
       if ($(this).hasClass('go-game')){
-        if (num>change['left']){
+        if (change['left']<0){
           $('#small-zc').show();
           $('#xl-aug-fail p').text('Sorry~您的抽奖次数已用完')
           $('#xl-aug-fail').show();
@@ -161,9 +160,11 @@
         setTimeout(function(){
           $('.side').removeClass('side-down')
           if (num!=happy){
+            //失败调用
             redpack('IGNORE_AWARD');
             star('0000');
           }else{
+            //成功调用
             redpack('GET_AWARD');
             star('0'+change['amount']);
           }
@@ -188,7 +189,7 @@
           $('.long-sum:eq('+k+')').css({'top':-g*178+'px'})
         }
         clearInterval(time)
-        $('#rmb').text(change['amount'])
+        $('#rmb').text(parseInt(change['amount']));
         $('#small-zc').show();
         if (a=='0000'){
           var txt=['你和大奖只是一根头发的距离','天苍苍，野茫茫，中奖的希望太渺茫','太可惜了，你竟然与红包擦肩而过'];
@@ -203,6 +204,7 @@
         num++;
       },3000)
       $('.long-sum').css({'top':''});
+      console.log(change['left'])
       $('#chance').text(' '+change['left']+' ')
     }
 
@@ -220,8 +222,11 @@
       async: false
     }).done(function(data) {
        change=data
-      console.log(change);
-    });
+      console.log(change['left']);
+      $('#chance').text(' '+change['left']+' ');
+    }).fail(function(){
+        $('#chance').text(' '+3+' ');
+      });
   }
 
 
