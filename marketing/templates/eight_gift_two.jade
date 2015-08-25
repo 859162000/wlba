@@ -1,0 +1,81 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    //link(rel="stylesheet",href="/static/stylesheets/ganjiwang.css")
+    link(rel="stylesheet",href="/static/stylesheets/eight_gift.css")
+  body(style="background:#77aa3f")
+    include include/activityTop2
+    .wrap#eight_gift_two_banner
+    .eight_gift_two-content
+      .eight_gift_two_one
+        p.eight_gift_two_onefont 投资满额，立送现金！
+      .eight_gift_two_two
+        .eight_gift_two_tree
+        p.eight_gift_two_twofont
+          |投资满额送现金奖励，多投多送HIGH翻全场！奖励限
+          span APP专享
+          |（活动期间内单笔投资额达到2万以上，即可获得现金奖励，不限次数多投多得）
+      .eight_gift_two_three
+        .eight_gift_two_tree
+        .eight_gift_two_treeq
+        dl.eight_gift_two_three_one
+          dt
+            |送
+            br
+            |100元现金
+          dd
+            |投资满
+            br
+            |20,000元
+        dl.eight_gift_two_three_one.eight_gift_two_three_oneone
+          dt
+            |送
+            br
+            |300元现金
+          dd
+            |投资满
+            br
+            |50,000元
+        dl.eight_gift_two_three_one.eight_gift_two_three_onetwo
+          dt
+            |送
+            br
+            |700元现金
+          dd
+            |投资满
+            br
+            |100,000元
+        dl.eight_gift_two_three_one.eight_gift_two_three_onethree
+          dt
+            |送
+            br
+            |1600元现金
+          dd
+            |投资满
+            br
+            |200,000元
+      .eight_gift_two_four
+        .eight_gift_two_treeq
+        .eight_gift_two_four_one
+          p 记得现金奖励仅限于APP投资才会发放哦
+        p.eight_gift_two_four_oneone 扫描下方二维码，前往APP进行投资
+        p.eight_gift_two_four_onetwo
+          span 注：
+          |现金奖励在三个工作日内以红包形式发出，红包类型为现金红包，投资或取现不限门槛，真金白银敞开送！
+      .eight_gift_two_five
+        .eight_gift_two_tree
+        h3 活动规则
+        p.eight_gift_backone 1.活动时间：2015年8月25日-8月29日；
+        p.eight_gift_backone 2.投资满额送现金活动，现金发放形式为现金红包，红包统一以站内信形式通知，完成一次投资回款后即可取现，红包有效期至9月31日（例：用户投资10万元，立得700元现金红包，使用700元红包完成一次投资后，即可全额取现700元）；
+        p.eight_gift_backone 3.所有红包均只能使用一次，使用后是否有余额即失效；
+        p.eight_gift_backone 4.本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+        p.eight_gift_backone 5.网利宝对此活动享有最终解释权。
+.footer(style="background:#53913e;margin-top:0")
+  .footer_eight
+    img(src="/static/imgs/pc_activity/eight_gift_two/footer.png")
+  include include/tracking
