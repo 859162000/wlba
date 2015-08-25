@@ -48,7 +48,7 @@ from wanglibao_redpack.views import RedPacketListAPIView, RedPacketChangeAPIView
 
 from marketing.play_list import InvestmentHistory
 from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView,
-                             ThousandRedPackCountAPIView, ThunderActivityRewardCounter)
+                             ThousandRedPackCountAPIView, ThunderActivityRewardCounter, ThunderAwardAPIView,)
 from weixin.views import P2PListWeixin
 
 
@@ -229,7 +229,8 @@ urlpatterns += patterns(
     url(r'^xunlei/join/count/$', ActivityJoinLogCountAPIView.as_view()),
     url(r'^thousand/redpack/$', ThousandRedPackAPIView.as_view()),
     url(r'^thousand/redpack/count/$', ThousandRedPackCountAPIView.as_view()),
-    url(r'^xunlei/august/count/$', ThunderActivityRewardCounter.as_view())
+    url(r'^xunlei/august/count/$', ThunderActivityRewardCounter.as_view()),
+    url(r'^xunlei/award/$', 'marketing.views.ajax_post'), #add by Yihen@20150821, 迅雷-网利宝 抽奖活动
 )
 
 

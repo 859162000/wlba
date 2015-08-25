@@ -126,40 +126,33 @@
     },500)
 
     //按钮
-    $('.game-btn').on('click',function(){
+    $('.game-btn').on('mousedown',function(){
+      $('.game-btn').addClass('game-btn-down')
+    });
+    $('.game-btn').on('mouseup',function(){
+      $('.game-btn').removeClass('game-btn-down')
       if ($(this).hasClass('go-game')){
         game();
       }else{
         $('#small-zc').show();
         $('#xl-aug-login').show();
       }
-    });
+
+    })
 //    game();
     function game(){
       //按钮按下样式
-      $('.game-btn').on('mousedown',function(){
-        $('.game-btn').addClass('game-btn-down')
-      });
-      $('.game-btn').on('mouseup',function(){
-        $('.game-btn').removeClass('game-btn-down')
-        //手柄的样式
+      //手柄的样式
+      setTimeout(function(){
+        $('.side').addClass('side-down')
         setTimeout(function(){
-          $('.side').addClass('side-down')
-          setTimeout(function(){
-            $('.side').removeClass('side-down')
-            star();
-          },500)
-        },1000)
-      })
+          $('.side').removeClass('side-down')
+          star();
+        },500)
+      },1000)
     }
 
-    $('.game-btn').on('mousedown',function(){
-      $('.game-btn').addClass('game-btn-down')
-    });
-    $('.game-btn').on('mouseup',function(){
-      $('.game-btn').removeClass('game-btn-down')
 
-    })
 
     //开始转动
     function star(){
@@ -184,6 +177,18 @@
 
     }
 
+
+  redpack('ENTER_WEB_PAGE');
+  //抽奖请求
+  function redpack(sum){
+    $.ajax({
+      url: "/api/xunlei/award/",
+      type: "POST",
+      data: {action:sum}
+    }).done(function(data) {
+       console.log(data)
+    });
+  }
 
 
 
