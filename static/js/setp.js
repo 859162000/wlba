@@ -30,7 +30,6 @@
      }
     var left2;
     left2=backtop($(".setp-content"));
-    console.log(left2)
     //浏览器大小改变触发的事件
     window.onresize = function(){
       left2 = backtop($(".setp-content"));
@@ -130,8 +129,9 @@
     //按钮
     var num=1;
     var happy=random();
-    console.log(happy)
-
+    var change;
+    redpack('ENTER_WEB_PAGE');
+    $('#chance').text(' '+change['left']+' ');
     $('.game-btn').on('mousedown',function(){
       $('.game-btn').addClass('game-btn-down')
 
@@ -139,8 +139,7 @@
     $('.game-btn').on('mouseup',function(){
       $('.game-btn').removeClass('game-btn-down')
       if ($(this).hasClass('go-game')){
-        console.log(num)
-        if (num>3){
+        if (num>change['left']){
           $('#small-zc').show();
           $('#xl-aug-fail p').text('Sorry~您的抽奖次数已用完')
           $('#xl-aug-fail').show();
@@ -166,7 +165,7 @@
             star('0000');
           }else{
             redpack('GET_AWARD');
-            star('1314');
+            star('0'+change['amount']);
           }
 
         },500)
@@ -189,7 +188,7 @@
           $('.long-sum:eq('+k+')').css({'top':-g*178+'px'})
         }
         clearInterval(time)
-        $('#rmb').text(a)
+        $('#rmb').text(change['amount'])
         $('#small-zc').show();
         if (a=='0000'){
           var txt=['你和大奖只是一根头发的距离','天苍苍，野茫茫，中奖的希望太渺茫','太可惜了，你竟然与红包擦肩而过'];
@@ -204,22 +203,24 @@
         num++;
       },3000)
       $('.long-sum').css({'top':''});
-      $('#chance').text(' '+3-num+' ')
+      $('#chance').text(' '+change['left']+' ')
     }
 
     //产生随机数,判断用户第几次抽中奖
     function random(){
       return parseInt(Math.random()*3+1)
     }
+
   //抽奖请求
   function redpack(sum){
-    console.log(sum)
     $.ajax({
       url: "/api/xunlei/award/",
       type: "POST",
-      data: {action:sum}
+      data: {action:sum},
+      async: false
     }).done(function(data) {
-       console.log(data)
+       change=data
+      console.log(change);
     });
   }
 
