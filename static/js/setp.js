@@ -74,6 +74,7 @@
     $('#xl-aug-login').hide();
     $('#xl-aug-success').hide();
     $('#xl-aug-prize').hide();
+    $('#xl-aug-fail').hide();
   })
 
 
@@ -140,7 +141,9 @@
       if ($(this).hasClass('go-game')){
         console.log(num)
         if (num>3){
-          alert('机会已经用完了')
+          $('#small-zc').show();
+          $('#xl-aug-fail p').text('Sorry~您的抽奖次数已用完')
+          $('#xl-aug-fail').show();
         }else{
           game();
         }
