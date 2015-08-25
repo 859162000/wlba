@@ -614,54 +614,29 @@ class ActivityJoinLogCountAPIView(APIView):
         })
 
 
-class XunleiAwardView(TemplateView):
-    template_name = 'xunlei_setp.jade'
 
-    def get_context_data(self, **kwargs):
-        """
-            进入页面的时候，判断是否生成记录，如果没有则生成并返回剩余刮奖次数3；如果有，则直接返回剩余刮奖次数；
-        """
-        join_log = ActivityJoinLog.objects.filter(user=self.request.user).first()
-        if not join_log:
-            activity = ActivityJoinLog.objects.create(
-                user=self.request.user,
-                action_name=u'get_award',
-                action_type=u'login',
-                action_message=u'迅雷抽奖活动',
-                channel=u'all',
-                gift_name=u'抽得千元大奖',
-                amount=0,
-                join_times=3,
-                create_time=timezone.now(),
-            )
-            print activity.id
-            join_log = ActivityJoinLog.objects.filter(user=self.request.user).first()
-            join_log.amount = self.get_award_mount(activity.id)
-            join_log.save(update_fields=['amount'])
+def ajax_post(request):
+    user = request.user
+    if not user:
+        to_json_response = {
+            'ret_code': 3000,
+            'message': u'用户没有登陆，请先登陆',
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+    if request.method == "POST":
+        obj = ThunderAwardAPIView()
+        action = request.POST.get("action", "")
 
-        return Response({
-            'ret_code': 3003,
-            'left': join_log.join_times,  # 还剩几次
-            'amount': int(join_log.amount),  # 奖励的金额
-            'message': u'欢迎刮奖',
+        if action == 'GET_AWARD':
+            res = obj.get_award(request)
 
-        })
-        #to_json_response = {
-        #    'ret_code': 3003,
-        #    'left': join_log.join_times,  # 还剩几次
-        #    'amount': int(join_log.amount),  # 奖励的金额
-        #    'message': u'欢迎刮奖',
-        #}
-        #return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+        if action == 'IGNORE_AWARD':
+            res = obj.ignore_award(request)
 
-    def get_award_mount(self, index):
-        index = index%10
-        if index in (0,):
-            return 200
-        if index in(3, 6, 9):
-            return 150
-        if index in(1, 2, 4, 5, 7, 8):
-            return 100
+        if action == 'ENTER_WEB_PAGE':
+            res = obj.enter_webpage(request)
+
+        return res
 
 
 class ThunderAwardAPIView(APIView):
@@ -671,29 +646,8 @@ class ThunderAwardAPIView(APIView):
         description: 迅雷抽奖活动1.用户有三次摇奖机会，三次摇奖必中奖一次，中奖金额分别为100元（30%）、
                     150元（60%）、 200元（10%），中奖后提示中奖金额及中奖提示语，非中奖用户提示非中奖提示语。
     """
-    permission_classes = (IsAuthenticated, )
+    #permission_classes = (IsAuthenticated, )
 
-    def post(self, request):
-        user = request.user
-        if not user:
-            to_json_response = {
-                'ret_code': 3000,
-                'message': u'用户没有登陆，请先登陆',
-            }
-            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-
-        action = request.POST.get("action", "")
-
-        if action == 'GET_AWARD':
-            response = self.get_award(request)
-
-        if action == 'IGNORE_AWARD':
-            response = self.ignore_award(request)
-
-        if action == 'ENTER_WEB_PAGE':
-            response = self.enter_webpage(request)
-
-        return response
 
     def get_award(self, request):
         """
@@ -733,7 +687,7 @@ class ThunderAwardAPIView(APIView):
         to_json_response = {
             'ret_code': 3002,
             'left': join_log.join_times,  # 还剩几次
-            'amount': join_log.amount,  # 奖励的金额
+            'amount': str(join_log.amount),  # 奖励的金额
             'message': u'你和大奖只是一根头发的距离',
         }
 
@@ -773,7 +727,7 @@ class ThunderAwardAPIView(APIView):
         to_json_response = {
             'ret_code': 3003,
             'left': join_log.join_times,  # 还剩几次
-            'amount': join_log.amount,  # 奖励的金额
+            'amount': str(join_log.amount),  # 奖励的金额
             'message': u'欢迎刮奖',
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
