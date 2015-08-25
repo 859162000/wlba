@@ -3,7 +3,7 @@ extends account_home_base
 -load formatters
 
 block head
-  - with '红包' as title
+  - with '优惠券' as title
     include include/head
 
 block sidebar
@@ -13,10 +13,7 @@ block sidebar
 
 block main
   .account-home-panel
-    h1(style="font-size:16px;margin-bottom:20px;") 兑换红包
-    .row
-      input(type="text", placeholder="请输入兑换码", style="display:inline-block;width:240px", name="token", autocomplete="off")
-      input(type="button", value="兑换", style="height:40px;margin-left:10px").submit-button.button-primary.button-middle.exchange
+    include include/coupon_exchange
 
   .account-home-panel__no-padding
     .account-home-panel--title-bar__product
@@ -50,7 +47,7 @@ block main
       table.table
         thead
           tr
-            th 红包名称
+            th 加息券名称
             th 金额
             th 使用次数
             th 使用限额
@@ -72,7 +69,7 @@ block main
               if coupon.method == '-'
                 td {{coupon.amount}}元
               else
-                td 投资额{{coupon.amount | percentage_number_two}}%
+                td 加息{{coupon.amount | percentage_number_two}}%
               if coupon.invest_amount == 0
                 td 无
               else
