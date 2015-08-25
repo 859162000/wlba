@@ -641,7 +641,7 @@ def ajax_post(request):
         description:迅雷9月抽奖活动，响应web的ajax请求
     """
     user = request.user
-    if not user:
+    if not user.id:
         to_json_response = {
             'ret_code': 3000,
             'message': u'用户没有登陆，请先登陆',
@@ -649,7 +649,7 @@ def ajax_post(request):
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
     channel = request.session.get(wanglibao_settings.PROMO_TOKEN_QUERY_STRING, "")
-    if channel is not 'xunlei':
+    if channel != 'xunlei':
         to_json_response = {
             'ret_code': 4000,
             'message': u'非迅雷渠道过来的用户',
@@ -679,15 +679,13 @@ class ThunderAwardAPIView(APIView):
         description: 迅雷抽奖活动1.用户有三次摇奖机会，三次摇奖必中奖一次，中奖金额分别为100元（30%）、
                     150元（60%）、 200元（10%），中奖后提示中奖金额及中奖提示语，非中奖用户提示非中奖提示语。
     """
-    #permission_classes = (IsAuthenticated, )
-
 
     def get_award(self, request):
         """
             直接将剩余刮奖次数置零，并返回结果
         """
         join_log = ActivityJoinLog.objects.filter(user=request.user).first()
-        join_log.join_times = 0
+        join_log.join_times -= 1
         join_log.save(update_fields=['join_times'])
         dt = timezone.datetime.now()
         money = self.get_award_mount(join_log.id)
@@ -700,6 +698,7 @@ class ThunderAwardAPIView(APIView):
 
         to_json_response = {
             'ret_code': 3001,
+            'get_time': (join_log.id % 3)+1,  # 第几次抽中
             'left': join_log.join_times,  # 还剩几次
             'amount': join_log.amount,  # 奖励的金额
             'message': u'终于等到你，还好我没放弃',
@@ -716,6 +715,7 @@ class ThunderAwardAPIView(APIView):
         join_log.save(update_fields=['join_times'])
         to_json_response = {
             'ret_code': 3002,
+            'get_time': (join_log.id % 3)+1,  # 第几次抽中
             'left': join_log.join_times,  # 还剩几次
             'amount': str(join_log.amount),  # 奖励的金额
             'message': u'你和大奖只是一根头发的距离',
@@ -756,6 +756,7 @@ class ThunderAwardAPIView(APIView):
 
         to_json_response = {
             'ret_code': 3003,
+            'get_time': (join_log.id % 3)+1,  # 第几次抽中
             'left': join_log.join_times,  # 还剩几次
             'amount': str(join_log.amount),  # 奖励的金额
             'message': u'欢迎刮奖',
