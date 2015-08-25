@@ -217,7 +217,7 @@
       async: false
     }).done(function(data) {
        change=data
-//      console.log(change);
+      console.log(change);
       if (change['left']){
         $('#chance').text(' '+change['left']+' ');
       }else{

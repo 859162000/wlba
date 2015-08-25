@@ -649,7 +649,7 @@ def ajax_post(request):
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
     channel = request.session.get(wanglibao_settings.PROMO_TOKEN_QUERY_STRING, "")
-    if channel is not 'xunlei':
+    if channel != 'xunlei':
         to_json_response = {
             'ret_code': 4000,
             'message': u'非迅雷渠道过来的用户',
