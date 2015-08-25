@@ -614,8 +614,31 @@ class ActivityJoinLogCountAPIView(APIView):
         })
 
 
+def ajax_get_activity_record(request):
+    """
+        author: add by Yihen@20150825
+        description:迅雷9月抽奖活动，获得用户的抽奖记录
+    """
+    records = ActivityJoinLog.objects.filter(action_name='get_award', action_type='login', join_times=0)
+    phones = str()
+    awards = str()
+    for record in records:
+        phones = "".join(phones, str(record.user.phone), ",")
+        awards = "".join(phones, str(record.amount), ",")
+    to_json_response = {
+        'ret_code': 3005,
+        'phones': phones[:-1],
+        'awards': awards[:-1],
+        'message': u'获得抽奖成功用户',
+    }
+    return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
 
 def ajax_post(request):
+    """
+        author: add by Yihen@20150825
+        description:迅雷9月抽奖活动，响应web的ajax请求
+    """
     user = request.user
     if not user:
         to_json_response = {
