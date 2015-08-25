@@ -16,6 +16,7 @@ from django.views.generic import TemplateView
 from django.http.response import HttpResponse, Http404
 from mock_generator import MockGenerator
 from django.conf import settings
+from wanglibao import settings as wanglibao_settings
 from django.db.models.base import ModelState
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from marketing.models import PromotionToken, IntroducedBy, IntroducedByReward, Reward, ActivityJoinLog
@@ -646,6 +647,15 @@ def ajax_post(request):
             'message': u'用户没有登陆，请先登陆',
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+    channel = request.session.get(wanglibao_settings.PROMO_TOKEN_QUERY_STRING, "")
+    if channel is not 'xunlei':
+        to_json_response = {
+            'ret_code': 4000,
+            'message': u'非迅雷渠道过来的用户',
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
     if request.method == "POST":
         obj = ThunderAwardAPIView()
         action = request.POST.get("action", "")
