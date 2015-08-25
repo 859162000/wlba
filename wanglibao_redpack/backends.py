@@ -35,7 +35,7 @@ def stamp(dt):
     return long(time.mktime(local_datetime(dt).timetuple()))
     #return long(time.mktime(dt.timetuple()))
 
-def list_redpack(user, status, device_type, product_id=0):
+def list_redpack(user, status, device_type, product_id=0, rtype='redpack'):
     if status not in ("all", "available"):
         return {"ret_code":30151, "message":"参数错误"}
 
@@ -46,7 +46,8 @@ def list_redpack(user, status, device_type, product_id=0):
     device_type = _decide_device(device_type)
     if status == "available":
         packages = {"available":[]}
-        records = RedPackRecord.objects.filter(user=user, order_id=None)
+        # 红包
+        records = RedPackRecord.objects.filter(user=user, order_id=None).exclude(redpack__event__rtype='interest_coupon')
         for x in records:
             if x.order_id:
                 continue
@@ -64,13 +65,48 @@ def list_redpack(user, status, device_type, product_id=0):
                     "highest_amount": event.highest_amount}
             if start_time < timezone.now() < end_time:
                 if event.apply_platform == "all" or event.apply_platform == device_type:
-                    if obj['method'] == REDPACK_RULE['percent'] or obj['method'] == REDPACK_RULE['interest_coupon']:
+                    if obj['method'] == REDPACK_RULE['percent']:
                         obj['amount'] = obj['amount']/100.0
                     packages['available'].append(obj)
+
+        # 加息券
+        if product_id > 0:
+            records_count = RedPackRecord.objects.filter(user=user, product_id=product_id)\
+                .filter(redpack__event__rtype='interest_coupon').count()
+            if records_count == 0:
+                coupons = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
+                    .filter(redpack__event__rtype='interest_coupon')
+                for coupon in coupons:
+                    if coupon.order_id:
+                        continue
+                    redpack = coupon.redpack
+                    if redpack.status == 'invalid':
+                        continue
+                    event = coupon.redpack.event
+                    start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
+                                                              coupon.created_at, event.available_at, event.unavailable_at)
+
+                    obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
+                           "id": coupon.id, "invest_amount": event.invest_amount,
+                           "unavailable_at": stamp(end_time), "event_id": event.id,
+                           "highest_amount": event.highest_amount}
+                    if start_time < timezone.now() < end_time:
+                        if event.apply_platform == "all" or event.apply_platform == device_type:
+                            if obj['method'] == REDPACK_RULE['interest_coupon']:
+                                obj['amount'] = obj['amount']/100.0
+                            packages['available'].append(obj)
+
+
         packages['available'].sort(key=lambda x:x['unavailable_at'])
     else:
         packages = {"used":[], "unused":[], "expires":[], "invalid":[]}
-        records = RedPackRecord.objects.filter(user=user)
+        if rtype == 'redpack':
+            records = RedPackRecord.objects.filter(user=user).exclude(redpack__event__rtype='interest_coupon')
+        elif rtype == 'coupon':
+            records = RedPackRecord.objects.filter(user=user).filter(redpack__event__rtype='interest_coupon')
+        else:
+            records = RedPackRecord.objects.filter(user=user)
+
         for x in records:
             event = x.redpack.event
 
@@ -323,7 +359,7 @@ def consume(redpack, amount, user, order_id, device_type, product_id):
 
     rtype = event.rtype
     rule_value = event.amount
-    if event.rtype != 'increase_interest':
+    if event.rtype != 'interest_coupon':
         deduct = _calc_deduct(amount, rtype, rule_value, event)
     else:
         deduct = 0

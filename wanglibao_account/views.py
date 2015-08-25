@@ -883,6 +883,26 @@ class AccountRedPacket(TemplateView):
         }
 
 
+class AccountCoupon(TemplateView):
+    template_name = 'coupon_available.jade'
+
+    def get_context_data(self, **kwargs):
+
+        status = kwargs['status']
+        if status not in ('used', 'unused', 'expires'):
+            status = 'unused'
+
+        user = self.request.user
+        device = utils.split_ua(self.request)
+        result = backends.list_redpack(user, 'all', device['device_type'], 0, 'coupon')
+        coupons = result['packages'].get(status, [])
+
+        return {
+            "coupons": coupons,
+            "status": status
+        }
+
+
 class AccountTransactionDeposit(TemplateView):
     template_name = 'account_transaction_deposit.jade'
 
