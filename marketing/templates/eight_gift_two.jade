@@ -6,7 +6,7 @@ html
     - with '网利宝' as title
     include include/common_head
     - endwith
-    //link(rel="stylesheet",href="/static/stylesheets/ganjiwang.css")
+    link(rel="stylesheet",href="/static/stylesheets/ganjiwang.css")
     link(rel="stylesheet",href="/static/stylesheets/eight_gift.css")
   body(style="background:#77aa3f")
     include include/activityTop2
@@ -77,5 +77,8 @@ html
         p.eight_gift_backone 5.网利宝对此活动享有最终解释权。
 .footer(style="background:#53913e;margin-top:0")
   .footer_eight
-    img(src="/static/imgs/pc_activity/eight_gift_two/footer.png")
+    .wry-act-img
+      a.footer-com.footer-five.dif-footer(href="http://www.itrust.org.cn/yz/pjwx.asp?wm=1091876832", target="_blank")
+      a.footer-com.footer-seven.dif-footer(style="width: 80px;height: 60px;",href="http://www.instantssl.com/wildcard-ssl.html", target="_blank")
+    img(src="/static/imgs/pc_activity/eight_gift_two/eight_two_footer.png")
   include include/tracking
