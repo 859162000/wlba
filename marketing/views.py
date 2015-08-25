@@ -657,14 +657,10 @@ class ThunderAwardAPIView(APIView):
         join_log.join_times = 0
         join_log.save(update_fields=['join_times'])
         dt = timezone.datetime.now()
+        money = self.get_award_mount(join_log.id)
+        describe = 'xunlei_sept_' + str(money)
 
-        moneys = ['100', '150', '200']
-        for money in moneys:
-            describe = 'thousand_redpack_' + str(money)
-
-        redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,
-                                                    target_channel='xunlei',
-                                                    give_start_at__lt=dt, give_end_at__gt=dt).first()
+        redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,).first()
 
         if redpack_event:
             redpack_backends.give_activity_redpack(request.user, redpack_event, 'pc')
@@ -709,7 +705,7 @@ class ThunderAwardAPIView(APIView):
         join_log = ActivityJoinLog.objects.filter(user=request.user).first()
         if not join_log:
             activity = ActivityJoinLog.objects.create(
-                user=self.user,
+                user=request.user,
                 action_name=u'get_award',
                 action_type=u'login',
                 action_message=u'迅雷抽奖活动',
