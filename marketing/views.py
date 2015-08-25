@@ -16,6 +16,7 @@ from django.views.generic import TemplateView
 from django.http.response import HttpResponse, Http404
 from mock_generator import MockGenerator
 from django.conf import settings
+from wanglibao import settings as wanglibao_settings
 from django.db.models.base import ModelState
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from marketing.models import PromotionToken, IntroducedBy, IntroducedByReward, Reward, ActivityJoinLog
@@ -614,8 +615,31 @@ class ActivityJoinLogCountAPIView(APIView):
         })
 
 
+def ajax_get_activity_record(request):
+    """
+        author: add by Yihen@20150825
+        description:迅雷9月抽奖活动，获得用户的抽奖记录
+    """
+    records = ActivityJoinLog.objects.filter(action_name='get_award', action_type='login', join_times=0)
+    phones = str()
+    awards = str()
+    for record in records:
+        phones = "".join(phones, str(record.user.phone), ",")
+        awards = "".join(phones, str(record.amount), ",")
+    to_json_response = {
+        'ret_code': 3005,
+        'phones': phones[:-1],
+        'awards': awards[:-1],
+        'message': u'获得抽奖成功用户',
+    }
+    return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
 
 def ajax_post(request):
+    """
+        author: add by Yihen@20150825
+        description:迅雷9月抽奖活动，响应web的ajax请求
+    """
     user = request.user
     if not user:
         to_json_response = {
@@ -623,6 +647,15 @@ def ajax_post(request):
             'message': u'用户没有登陆，请先登陆',
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+    channel = request.session.get(wanglibao_settings.PROMO_TOKEN_QUERY_STRING, "")
+    if channel is not 'xunlei':
+        to_json_response = {
+            'ret_code': 4000,
+            'message': u'非迅雷渠道过来的用户',
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
     if request.method == "POST":
         obj = ThunderAwardAPIView()
         action = request.POST.get("action", "")
@@ -657,14 +690,10 @@ class ThunderAwardAPIView(APIView):
         join_log.join_times = 0
         join_log.save(update_fields=['join_times'])
         dt = timezone.datetime.now()
+        money = self.get_award_mount(join_log.id)
+        describe = 'xunlei_sept_' + str(money)
 
-        moneys = ['100', '150', '200']
-        for money in moneys:
-            describe = 'thousand_redpack_' + str(money)
-
-        redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,
-                                                    target_channel='xunlei',
-                                                    give_start_at__lt=dt, give_end_at__gt=dt).first()
+        redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,).first()
 
         if redpack_event:
             redpack_backends.give_activity_redpack(request.user, redpack_event, 'pc')
@@ -682,7 +711,8 @@ class ThunderAwardAPIView(APIView):
             将剩余的刮奖次数减1，并返回最终结果
         """
         join_log = ActivityJoinLog.objects.filter(user=request.user).first()
-        join_log.join_times -= 1
+        if join_log.join_times > 0:
+            join_log.join_times -= 1
         join_log.save(update_fields=['join_times'])
         to_json_response = {
             'ret_code': 3002,
@@ -709,7 +739,7 @@ class ThunderAwardAPIView(APIView):
         join_log = ActivityJoinLog.objects.filter(user=request.user).first()
         if not join_log:
             activity = ActivityJoinLog.objects.create(
-                user=self.user,
+                user=request.user,
                 action_name=u'get_award',
                 action_type=u'login',
                 action_message=u'迅雷抽奖活动',
