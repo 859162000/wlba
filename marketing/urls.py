@@ -31,8 +31,8 @@ urlpatterns = patterns(
     url(r'^advance/$', TemplateView.as_view(template_name="advance.jade")),
     url(r'^gold/$', TemplateView.as_view(template_name="gold.jade"), name='marketing_gold'),
     url(r'^qixi/$', TemplateView.as_view(template_name="qixi.jade")),
-
-
+    url(r'^xunlei_setp/$', TemplateView.as_view(template_name="xunlei_setp.jade")),
+    url(r'^eight_gift_two/$', TemplateView.as_view(template_name="eight_gift_two.jade")),
 )
 
 # app URL
@@ -56,7 +56,9 @@ urlpatterns += patterns(
     url(r'^app_qixi/$', TemplateView.as_view(template_name="app_qixi.jade")),
     url(r'^app_gold_day/$', TemplateView.as_view(template_name="app_gold_day.jade")),
     url(r'^app_pc_download/$', TemplateView.as_view(template_name="app_pc_download.jade")),
-
+    url(r'^app_lottery/$', TemplateView.as_view(template_name="app_lottery.jade")),
+    url(r'^app_eight_gift_two/$', TemplateView.as_view(template_name="app_eight_gift_two.jade")),
+    url(r'^app_eight_gift_two_h5/$', TemplateView.as_view(template_name="app_eight_gift_two_h5.jade")),
 )
 
 urlpatterns += patterns(
