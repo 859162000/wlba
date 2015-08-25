@@ -57,7 +57,7 @@ class IndexView(TemplateView):
             status=u'还款中'
         )
         if product_id:
-            p2p = p2p.exclude(id=product_id)
+            p2p = p2p.exclude(id__in=product_id)
         return self._filter_product_period(p2p, period).order_by('-soldout_time', '-priority')[:num]
 
     def _full_product_nonpayment(self, period, num, product_id=None):
@@ -70,7 +70,7 @@ class IndexView(TemplateView):
             status__in=[u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核']
         )
         if product_id:
-            p2p = p2p.exclude(id=product_id)
+            p2p = p2p.exclude(id__in=product_id)
         return self._filter_product_period(p2p, period).order_by('-soldout_time', '-priority')[:num]
 
     def get_products(self, period, product_id=None):
@@ -89,7 +89,7 @@ class IndexView(TemplateView):
         )
 
         if product_id:
-            p2p = p2p.exclude(id=product_id)
+            p2p = p2p.exclude(id__in=product_id)
 
         p2p = self._filter_product_period(p2p, period).order_by('-priority', '-total_amount')[:self.PRODUCT_LENGTH]
         p2p_list.extend(p2p)
@@ -102,6 +102,8 @@ class IndexView(TemplateView):
         return p2p_list
 
     def get_context_data(self, **kwargs):
+        # 需要过滤的标id
+        exclude_pid = list()
 
         # 主推标
         recommend_product_id = None
@@ -118,6 +120,8 @@ class IndexView(TemplateView):
                     # 存在购买记录
                     misc = MiscRecommendProduction()
                     recommend_product_id = misc.get_recommend_product_except_new()
+                    # 将所有新手表过滤
+                    exclude_pid += [p.id for p in product_new]
 
         if not recommend_product_id:
             misc = MiscRecommendProduction()
@@ -125,13 +129,16 @@ class IndexView(TemplateView):
 
         recommend_product = P2PProduct.objects.filter(id=recommend_product_id)
 
+        exclude_pid.append(recommend_product_id)
+        exclude_pid = list(set(exclude_pid))
+
         # p2p_products = []
         # 获取期限小于等于3个月的标，天数为90天(period<=3 or period<=90)
-        p2p_lt3 = self.get_products(period=3, product_id=recommend_product_id)
+        p2p_lt3 = self.get_products(period=3, product_id=exclude_pid)
         # 获取期限大雨3个月小于等于6个月的标，天数为180天(3<period<=6 or 90<period<=180)
-        p2p_lt6 = self.get_products(period=6, product_id=recommend_product_id)
+        p2p_lt6 = self.get_products(period=6, product_id=exclude_pid)
         # 获取期限大于6个月的标(period>6 or period>180)
-        p2p_gt6 = self.get_products(period=9, product_id=recommend_product_id)
+        p2p_gt6 = self.get_products(period=9, product_id=exclude_pid)
         getmore = True
 
         banners = Banner.objects.filter(Q(device=Banner.PC_2), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now())))
