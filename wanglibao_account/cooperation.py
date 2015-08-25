@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # encoding:utf-8
+import decimal
 import json
 from wanglibao_account.utils import str_to_float
 
@@ -866,7 +867,8 @@ def get_rate(product_id_or_instance):
     """
     if isinstance(product_id_or_instance, P2PProduct):
         if product_id_or_instance.activity and product_id_or_instance.activity.rule:
-            return product_id_or_instance.activity.rule.rule_amount + product_id_or_instance.expected_earning_rate
+            return product_id_or_instance.activity.rule.rule_amount + \
+                   decimal.Decimal(product_id_or_instance.expected_earning_rate)
         else:
             return product_id_or_instance.expected_earning_rate
 
@@ -973,7 +975,7 @@ def xicai_get_p2p_info(mproduct, access_token):
 
     xicai_info = {
         'access_token': access_token,
-        'product_name': '网利宝',
+        'product_name': p2p_info['name'],
         'isexp': p2p_info['for_freshman'],
         'life_cycle': p2p_info['period'],
         'ev_rate': p2p_info['rate'],
