@@ -622,16 +622,10 @@ def ajax_get_activity_record(request):
         description:迅雷9月抽奖活动，获得用户的抽奖记录
     """
     records = ActivityJoinLog.objects.filter(action_name='get_award', action_type='login', join_times=0)
-    phones = str()
-    awards = str()
-    for record in records:
-        profile = WanglibaoUserProfile.objects.filter(user__exact=record.user)
-        phones = "".join(phones, str(profile.phone), ",")
-        awards = "".join(phones, str(record.amount), ",")
+    data = [{'phone': record.user.wanglibaouserprofile.phone, 'award':str(record.amount)} for record in records]
     to_json_response = {
         'ret_code': 3005,
-        'phones': phones[:-1],
-        'awards': awards[:-1],
+        'data': data,
         'message': u'获得抽奖成功用户',
     }
     return HttpResponse(json.dumps(to_json_response), content_type='application/json')
