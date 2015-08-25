@@ -86,7 +86,7 @@ class P2PDetailView(TemplateView):
 
         device = utils.split_ua(self.request)
         if p2p.get('status') == u'正在招标':
-            red_packets = backends.list_redpack(user, 'available', device['device_type'])
+            red_packets = backends.list_redpack(user, 'available', device['device_type'], p2p.get('id'))
         else:
             red_packets = None
 
