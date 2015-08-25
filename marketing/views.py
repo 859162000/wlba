@@ -17,6 +17,7 @@ from django.http.response import HttpResponse, Http404
 from mock_generator import MockGenerator
 from django.conf import settings
 from wanglibao import settings as wanglibao_settings
+from wanglibao_profile.models import WanglibaoUserProfile
 from django.db.models.base import ModelState
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
 from marketing.models import PromotionToken, IntroducedBy, IntroducedByReward, Reward, ActivityJoinLog
@@ -624,7 +625,8 @@ def ajax_get_activity_record(request):
     phones = str()
     awards = str()
     for record in records:
-        phones = "".join(phones, str(record.user.phone), ",")
+        profile = WanglibaoUserProfile.objects.filter(user__exact=record.user)
+        phones = "".join(phones, str(profile.phone), ",")
         awards = "".join(phones, str(record.amount), ",")
     to_json_response = {
         'ret_code': 3005,
@@ -682,12 +684,11 @@ class ThunderAwardAPIView(APIView):
 
     def get_award(self, request):
         """
-            直接将剩余刮奖次数置零，并返回结果
+            TO-WRITE
         """
         join_log = ActivityJoinLog.objects.filter(user=request.user).first()
         join_log.join_times -= 1
         join_log.save(update_fields=['join_times'])
-        dt = timezone.datetime.now()
         money = self.get_award_mount(join_log.id)
         describe = 'xunlei_sept_' + str(money)
 
@@ -700,7 +701,7 @@ class ThunderAwardAPIView(APIView):
             'ret_code': 3001,
             'get_time': (join_log.id % 3)+1,  # 第几次抽中
             'left': join_log.join_times,  # 还剩几次
-            'amount': join_log.amount,  # 奖励的金额
+            'amount': str(join_log.amount),  # 奖励的金额
             'message': u'终于等到你，还好我没放弃',
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
