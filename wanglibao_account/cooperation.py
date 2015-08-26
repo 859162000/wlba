@@ -978,7 +978,7 @@ def get_p2p_info(mproduct):
     product_info['rate'] = get_rate(mproduct)
     product_info['amount'] = mproduct.total_amount
     product_info['ordered_amount'] = mproduct.ordered_amount
-    product_info['buyer'] = mproduct.equities.all().annotate(Count('user', distinct=True))
+    product_info['buyer'] = mproduct.equities.all().annotate(Count('user', distinct=True)).count()
     product_info['start_time'] = mproduct.publish_time
     product_info['end_time'] = mproduct.end_time
     product_info['state'] = mproduct.status
