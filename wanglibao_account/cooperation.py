@@ -1041,7 +1041,7 @@ def xicai_get_p2p_info(mproduct, access_token):
 
     xicai_info = {
         'access_token': access_token,
-        'product_name': p2p_info['name'],
+        'product_name': mproduct.name,
         'isexp': p2p_info['for_freshman'],
         'life_cycle': p2p_info['period'],
         'ev_rate': p2p_info['rate'],
