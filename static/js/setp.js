@@ -94,6 +94,20 @@
     $('body,html').animate({scrollTop: 0}, 600);
       return false
   })
+  //抽奖名单
+  var str='';
+  $.ajax({
+      url: "/api/xunlei/award/records/",
+      type: "POST",
+      async: false
+    }).done(function(result) {
+       for (var k= 0,len2=result['data'].length;k<len2;k++){
+         var tel=result['data'][k]['phone'].substring(0,3)+"******"+result['data'][k]['phone'].substring(9,11);
+         str+='<p>恭喜'+tel+'获得<span>'+result['data'][k]['awards']+'元</span>红包</p>'
+       }
+      $('.long-p').append(str);
+      $('.long-p p:odd').addClass('hight');
+    });
 
   //无线滚动
   var timer,i= 1,j=2;
@@ -132,8 +146,13 @@
     var change;
     redpack('ENTER_WEB_PAGE');
     var happy=change['get_time'];
-    console.log(happy)
-    $('#chance').text(' '+change['left']+' ');
+    if (change['left']){
+      $('#chance').text(' '+change['left']+' ');
+    }else{
+      $('#chance').text(' '+3+' ');
+    }
+
+
     $('.game-btn').on('mousedown',function(){
       $('.game-btn').addClass('game-btn-down')
 
@@ -221,7 +240,6 @@
       async: false
     }).done(function(data) {
        change=data
-      console.log(change);
       if (change['left']){
         $('#chance').text(' '+change['left']+' ');
       }else{
@@ -230,15 +248,7 @@
     });
   }
 
-  //抽奖名单
-  $.ajax({
-      url: "/api/xunlei/award/records/",
-      type: "POST",
-      async: true
-    }).done(function(data) {
-       console.log(data)
 
-    });
 
 }).call(this);
 
