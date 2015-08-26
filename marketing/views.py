@@ -4,9 +4,8 @@ import decimal
 import pytz
 from datetime import date, timedelta, datetime
 from collections import defaultdict
-from decimal import Decimal, ROUND_DOWN
+from decimal import Decimal
 
-import time
 from django.db.models import Count, Sum
 from django.contrib.auth.decorators import permission_required
 from django.core.paginator import Paginator, PageNotAnInteger
@@ -17,11 +16,9 @@ from django.views.generic import TemplateView
 from django.http.response import HttpResponse, Http404
 from mock_generator import MockGenerator
 from django.conf import settings
-from wanglibao import settings as wanglibao_settings
-from wanglibao_profile.models import WanglibaoUserProfile
 from django.db.models.base import ModelState
-from wanglibao_sms.utils import validate_validation_code, send_validation_code
-from marketing.models import PromotionToken, IntroducedBy, IntroducedByReward, Reward, ActivityJoinLog
+from wanglibao_sms.utils import send_validation_code
+from marketing.models import Channels, PromotionToken, IntroducedBy, IntroducedByReward, Reward, ActivityJoinLog
 from marketing.tops import Top
 from utils import local_to_utc
 
@@ -29,21 +26,19 @@ from utils import local_to_utc
 from django.forms import model_to_dict
 from django.db.models import Q
 from marketing.models import RewardRecord, NewsAndReport
-from wanglibao_sms.tasks import send_messages
 from wanglibao_p2p.models import Earning
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_account import message as inside_message
-from wanglibao_account.models import Binding
 from order.models import Order
 from order.utils import OrderHelper
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
-from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
+from wanglibao_redpack.models import RedPackEvent
 from wanglibao_redpack import backends as redpack_backends
-from wanglibao_activity.models import ActivityRecord, ActivityRule
+from wanglibao_activity.models import ActivityRecord
 
 
 class YaoView(TemplateView):
@@ -646,12 +641,13 @@ def ajax_post(request):
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-    record = Binding.objects.filter(user=user).first()
-    create_time = time.mktime(datetime(2015, 8, 25).timetuple())
-    if record and (record.btype != 'xunlei9' or record.create_at < create_time):
+    record = IntroducedBy.objects.filter(user_id=user.id).first()
+    if record:
+        record = Channels.objects.filter(id=record.channel_id).first()
+    if not record or (record and record.name != 'xunlei9'):
         to_json_response = {
             'ret_code': 4000,
-            'message': u'非8月25号之后迅雷渠道过来的用户',
+            'message': u'非迅雷渠道过来的用户',
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
