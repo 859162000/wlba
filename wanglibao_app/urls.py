@@ -5,7 +5,8 @@ from django.conf.urls import patterns, include, url
 from rest_framework.routers import DefaultRouter
 from wanglibao_app.views import (AppActivateImageAPIView, AppRepaymentAPIView, AppDayListView, AppGuardView,
                                  AppGuideView, AppSecureView, AppExploreView, AppP2PProductViewSet, AppRecommendViewSet,
-                                 SendValidationCodeView, AppIncomeRateAPIView)
+                                 SendValidationCodeView, AppIncomeRateAPIView, AppPhoneBookUploadAPIView,
+                                 AppPhoneBookQueryAPIView, AppPhoneBookAlertApiView,)
 
 router = DefaultRouter()
 
@@ -26,4 +27,7 @@ urlpatterns = patterns(
     url(r'^explore/$', AppExploreView.as_view()),
     url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^rate/$', AppIncomeRateAPIView.as_view()),
+    url(r'^phone/upload/$', AppPhoneBookUploadAPIView.as_view()),
+    url(r'^phone/query/$', AppPhoneBookQueryAPIView.as_view()),
+    url(r'^phone/alert/$', AppPhoneBookAlertApiView.as_view()),
 )
