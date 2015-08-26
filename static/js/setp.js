@@ -128,9 +128,12 @@
 
     //按钮
     var num=1;
-    var happy=3;
+
     var change;
     redpack('ENTER_WEB_PAGE');
+    var happy=change['get_time'];
+    console.log(happy)
+    $('#chance').text(' '+change['left']+' ');
     $('.game-btn').on('mousedown',function(){
       $('.game-btn').addClass('game-btn-down')
 
@@ -138,7 +141,7 @@
     $('.game-btn').on('mouseup',function(){
       $('.game-btn').removeClass('game-btn-down')
       if ($(this).hasClass('go-game')){
-        if (change['left']<0){
+        if (change['left']<=0){
           $('#small-zc').show();
           $('#xl-aug-fail p').text('Sorry~您的抽奖次数已用完')
           $('#xl-aug-fail').show();
@@ -171,6 +174,7 @@
 
         },500)
       },1000)
+
     }
 
 
