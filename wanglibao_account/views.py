@@ -51,7 +51,7 @@ from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, User
 from wanglibao_p2p.tasks import automatic_trade
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
-from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress
+from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress, UserPhoneBook
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
 from wanglibao.templatetags.formatters import safe_phone_str
@@ -549,21 +549,43 @@ class AccountInviteAllGoldAPIView(APIView):
         first_intro = dic['first_intro']
         commission = dic['commission']
         
-
         introduces = IntroducedBy.objects.filter(introduced_by=request.user).select_related("user__wanglibaouserprofile").all()
         keys = commission.keys()
         for x in introduces:
             user_id = x.user.id
+            alert_invest = self._alert_invest_status(user=request.user, phone_user=x.user)
             if user_id in keys:
                 first_intro.append([safe_phone_str(users[user_id].phone), 
-                                commission[user_id]['amount'], commission[user_id]['earning']])
+                                commission[user_id]['amount'], commission[user_id]['earning'], alert_invest])
             else:
-                first_intro.append([safe_phone_str(x.user.wanglibaouserprofile.phone), 0, 0])
+                first_intro.append([safe_phone_str(x.user.wanglibaouserprofile.phone), 0, 0, alert_invest])
 
         return Response({"ret_code":0, "first":{"amount":first_amount, 
                         "earning":first_earning, "count":first_count, "intro":first_intro},
                         "second":{"amount":second_amount, "earning":second_earning,
                         "count":second_count}, "count":len(introduces)})
+
+    def _alert_invest_status(self, user, phone_user):
+        try:
+            profile = phone_user.wanglibaouserprofile
+            phone_book = UserPhoneBook.objects.filter(user=user, phone=profile.phone).first()
+            if phone_book:
+                if not(phone_book.alert_at and phone_book.alert_at > local_to_utc(datetime.datetime.now(), 'min')):
+                    return True
+            else:
+                phone_book = UserPhoneBook()
+                phone_book.user = user
+                phone_book.phone = profile.phone
+                phone_book.name = profile.name
+                phone_book.is_register = True
+                phone_book.is_invite = True
+                phone_book.is_used = True
+                phone_book.save()
+                return True
+            return False
+        except:
+            return False
+
 
 class AccountInviteIncomeAPIView(APIView):
     permission_classes = (IsAuthenticated, )

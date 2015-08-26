@@ -77,14 +77,21 @@
   })
 
 
+  var change;
+  redpack('ENTER_WEB_PAGE');
   //领取会员提示
     $('.setp-btn').on('click',function(){
-      if ($(this).hasClass('receive')){
+      if (change['ret_code']==4000){
+        $('#small-zc').show();
+        $('#xl-aug-fail p').text('Sorry~您的不符合领奖条件');
+        $('#xl-aug-fail').show();
+      }else if ($(this).hasClass('receive')){
         window.location.href="/"
       }else{
         $('#small-zc').show();
         $('#xl-aug-login').show();
       }
+
     })
 
   //回到banner注册
@@ -143,23 +150,23 @@
     //按钮
     var num=1;
 
-    var change;
     redpack('ENTER_WEB_PAGE');
+//    console.log(change)
     var happy=change['get_time'];
     if (change['left']){
       $('#chance').text(' '+change['left']+' ');
     }else{
       $('#chance').text(' '+3+' ');
     }
-
-
     $('.game-btn').on('mousedown',function(){
       $('.game-btn').addClass('game-btn-down')
-
     });
     $('.game-btn').on('mouseup',function(){
-      $('.game-btn').removeClass('game-btn-down')
-      if ($(this).hasClass('go-game')){
+      $('.game-btn').removeClass('game-btn-down');
+      console.log(change)
+      if (change['ret_code']==4000){
+        console.log('Sorry~您不符合抽奖条件')
+      }else if($(this).hasClass('go-game')){
         if (change['left']<=0){
           $('#small-zc').show();
           $('#xl-aug-fail p').text('Sorry~您的抽奖次数已用完')
@@ -171,7 +178,6 @@
         $('#small-zc').show();
         $('#xl-aug-login').show();
       }
-
     })
 //    game();
     function game(){
@@ -239,12 +245,13 @@
       data: {action:sum},
       async: false
     }).done(function(data) {
-       change=data
-      if (change['left']){
-        $('#chance').text(' '+change['left']+' ');
-      }else{
-        $('#chance').text(' 3 ');
-      }
+       change=data;
+       if (change['left']){
+          $('#chance').text(' '+change['left']+' ');
+       }else{
+         $('#chance').text(' 3 ');
+       }
+
     });
   }
 
