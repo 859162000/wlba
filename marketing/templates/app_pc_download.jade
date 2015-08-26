@@ -10,13 +10,15 @@ html(style="background:#FFF29A")
         img(src='/static/imgs/mobile_activity/app_pc_download/download_logo.png')
       .pc-dw-page
         img(src='/static/imgs/mobile_activity/app_pc_download/download_page.png')
+
+      .pc-dw-explan(style='border: 1px dotted #DB493F')
+        span.dw-sign(style='background: #DB493F') 温馨提示
+        p(style="color: #DB493F;font-size: .7rem") 如果您使用微信、QQ打开,点击下载无法跳转，请点击右上角选择在浏览器中打开
+        p(style="color: #DB493F;font-size: .7rem") （iPhone用户选择Safari）
+
       .pc-dw-button
         a(href="https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8").dw-button-iso 下载IOS版本
         a(href="https://www.wanglibao.com/static/wanglibao1.apk").dw-button-android 下载安卓版本
-      .pc-dw-explan
-        span.dw-sign 温馨提示
-        p 如果您使用微信、QQ打开,点击下载无法跳转，请点击右上角选择在浏览器中打开
-        p （iPhone用户选择Safari）
 
     script.
       document.body.addEventListener('touchstart', function () { });
