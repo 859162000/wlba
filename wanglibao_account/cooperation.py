@@ -1039,11 +1039,13 @@ def xicai_get_p2p_info(mproduct, access_token):
         if time:
             return time.strftime('%Y-%m-%d')
 
+    period = mproduct.period if mproduct.pay_method.startswith(u"日计息") else mproduct.period * 30
+
     xicai_info = {
         'access_token': access_token,
         'product_name': mproduct.name,
         'isexp': p2p_info['for_freshman'],
-        'life_cycle': p2p_info['period'],
+        'life_cycle': period,
         'ev_rate': p2p_info['rate'],
         'amount': p2p_info['amount'],
         'invest_amount': p2p_info['ordered_amount'],
