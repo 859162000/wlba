@@ -623,7 +623,6 @@ def ajax_get_activity_record(request):
     """
     records = ActivityJoinLog.objects.filter(action_name='get_award', action_type='login', join_times=0)
     data = [{'phone':record.user.wanglibaouserprofile.phone, 'awards':float(record.amount)} for record in records]
-
     to_json_response = {
         'ret_code': 3005,
         'data':data,
@@ -679,12 +678,11 @@ class ThunderAwardAPIView(APIView):
 
     def get_award(self, request):
         """
-            直接将剩余刮奖次数置零，并返回结果
+            TO-WRITE
         """
         join_log = ActivityJoinLog.objects.filter(user=request.user).first()
         join_log.join_times -= 1
         join_log.save(update_fields=['join_times'])
-        dt = timezone.datetime.now()
         money = self.get_award_mount(join_log.id)
         describe = 'xunlei_sept_' + str(money)
         try:
