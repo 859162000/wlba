@@ -410,14 +410,15 @@ class AppPhoneBookUploadAPIView(APIView):
                     else:
                         phone_book.is_register = False
 
-                    if IntroducedBy.objects.filter(introduced_by=user, user_wanglibaouserprofile__phone=p).exists():
+                    if IntroducedBy.objects.filter(introduced_by=user, user__wanglibaouserprofile__phone=p).exists():
                         phone_book.is_invite = True
                     else:
                         phone_book.is_invite = False
 
                     phone_book.is_used = True
                     phone_new_list.append(phone_book)
-            UserPhoneBook.objects.bulk_create(phone_new_list)
+            if phone_new_list:
+                UserPhoneBook.objects.bulk_create(phone_new_list)
             return Response({'ret_code': 0, 'message': 'success'})
         except Exception, e:
             logger.error(e.message)
