@@ -389,7 +389,7 @@ class AppPhoneBookUploadAPIView(APIView):
     def post(self, request):
         user = request.user
 
-        phones = request.POST.get('phones', '')
+        phones = request.DATA.get('phones', '')
         if not phones:
             return Response({'ret_code': 20001, 'message': u'数据输入不合法'})
         try:
@@ -458,8 +458,8 @@ class AppPhoneBookAlertApiView(APIView):
 
     def post(self, request):
         user = request.user
-        flag = request.POST.get('flag')
-        phone = request.POST.get('phone')
+        flag = request.DATA.get('flag')
+        phone = request.DATA.get('phone')
         if not phone or not flag or (flag and flag not in(1, 2)):
             return Response({'ret_code': 20001, 'message': u'数据输入不合法'})
 
