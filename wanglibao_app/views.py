@@ -392,6 +392,7 @@ class AppPhoneBookUploadAPIView(APIView):
         phones = request.DATA.get('phones', '')
         if not phones:
             return Response({'ret_code': 20001, 'message': u'数据输入不合法'})
+        phones = json.loads(phones)
         try:
             UserPhoneBook.objects.filter(user=user).exclude(phone__in=phones.keys()).update(is_used=False)
             phone_db = [u.get('phone') for u in UserPhoneBook.objects.filter(user=user, phone__in=phones.keys()).values('phone')]
