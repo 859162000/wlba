@@ -29,7 +29,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL, JINSHAN_CALL_BACK_URL, WLB_FOR_JINSHAN_KEY, \
      WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY, FUBA_CALL_BACK_URL, WLB_FOR_FUBA_KEY, \
      FUBA_COOP_ID, FUBA_KEY, FUBA_CHANNEL_CODE, FUBA_DEFAULT_TID, FUBA_PERIOD, \
-     WLB_FOR_YUNDUAN_KEY, YUNDUAN_CALL_BACK_URL, WLB_FOR_YICHE_KEY, YICHE_COOP_ID, \
+     WLB_FOR_YUNDUAN_KEY, YUNDUAN_CALL_BACK_URL, YUNDUAN_COOP_ID, WLB_FOR_YICHE_KEY, YICHE_COOP_ID, \
      YICHE_KEY, YICHE_REGISTER_CALL_BACK_URL, YICHE_VALIDATE_CALL_BACK_URL, YICHE_PURCHASE_CALL_BACK_URL
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback
@@ -686,12 +686,13 @@ class YunDuanRegister(CoopRegister):
     def __init__(self, request):
         super(YunDuanRegister, self).__init__(request)
         self.c_code = 'yunduan'
+        self.coop_id = YUNDUAN_COOP_ID
         self.call_back_url = YUNDUAN_CALL_BACK_URL
 
     def yunduan_call_back(self):
         params = {
             'type': 'ef',
-            'pid': 298,
+            'pid': self.coop_id,
         }
         # 云端跟踪回调
         common_callback.apply_async(

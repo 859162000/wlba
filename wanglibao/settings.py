@@ -887,6 +887,7 @@ else:
 WLB_FOR_YUNDUAN_KEY = '1998'
 YUNDUAN_CALL_BACK_URL = 'http://www.yunduanlm.com/effect.php'
 YUNDUAN_ACTIVITY_PAGE = 'marketing_baidu'
+YUNDUAN_COOP_ID = 298
 
 # 易车
 WLB_FOR_YICHE_KEY = '1999'
