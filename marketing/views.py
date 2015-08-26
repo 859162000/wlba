@@ -6,6 +6,7 @@ from datetime import date, timedelta, datetime
 from collections import defaultdict
 from decimal import Decimal, ROUND_DOWN
 
+import time
 from django.db.models import Count, Sum
 from django.contrib.auth.decorators import permission_required
 from django.core.paginator import Paginator, PageNotAnInteger
@@ -33,6 +34,7 @@ from wanglibao_p2p.models import Earning
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_account import message as inside_message
+from wanglibao_account.models import Binding
 from order.models import Order
 from order.utils import OrderHelper
 from rest_framework.response import Response
@@ -637,18 +639,19 @@ def ajax_post(request):
         description:迅雷9月抽奖活动，响应web的ajax请求
     """
     user = request.user
-    if not user.id:
+    if not user.is_authenticated():
         to_json_response = {
             'ret_code': 3000,
             'message': u'用户没有登陆，请先登陆',
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-    channel = request.session.get(wanglibao_settings.PROMO_TOKEN_QUERY_STRING, "")
-    if channel != 'xunlei':
+    record = Binding.objects.filter(user=user).first()
+    create_time = time.mktime(datetime(2015, 8, 25).timetuple())
+    if record and (record.btype != 'xunlei9' or record.create_at < create_time):
         to_json_response = {
             'ret_code': 4000,
-            'message': u'非迅雷渠道过来的用户',
+            'message': u'非8月25号之后迅雷渠道过来的用户',
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
