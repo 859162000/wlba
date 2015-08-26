@@ -28,10 +28,11 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
      JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL, JINSHAN_CALL_BACK_URL, WLB_FOR_JINSHAN_KEY, \
      WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY, FUBA_CALL_BACK_URL, WLB_FOR_FUBA_KEY, \
-     FUBA_COOP_ID, FUBA_KEY, FUBA_CHANNEL_CODE, FUBA_DEFAULT_TID, FUBA_PERIOD, YUNDUAN_CALL_BACK_URL, \
-    WLB_FOR_YUNDUAN_KEY, YUNDUAN_COOP_ID, YUNDUAN_KEY
+     FUBA_COOP_ID, FUBA_KEY, FUBA_CHANNEL_CODE, FUBA_DEFAULT_TID, FUBA_PERIOD, \
+     WLB_FOR_YUNDUAN_KEY, YUNDUAN_CALL_BACK_URL, WLB_FOR_YICHE_KEY, YICHE_COOP_ID, \
+     YICHE_KEY, YICHE_REGISTER_CALL_BACK_URL, YICHE_VALIDATE_CALL_BACK_URL, YICHE_PURCHASE_CALL_BACK_URL
 from wanglibao_account.models import Binding, IdVerification
-from wanglibao_account.tasks import common_callback, jinshan_callback
+from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
 from wanglibao_pay.models import Card
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -686,39 +687,103 @@ class YunDuanRegister(CoopRegister):
         super(YunDuanRegister, self).__init__(request)
         self.c_code = 'yunduan'
         self.call_back_url = YUNDUAN_CALL_BACK_URL
-        self.coop_id = YUNDUAN_COOP_ID
-        self.coop_key = YUNDUAN_KEY
 
-    def yunduan_call_back(self, user):
-        # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
-        binding = Binding.objects.filter(user_id=user.id).first()
-        p2p_record = P2PRecord.objects.filter(user_id=user.id).last()
-        if binding and p2p_record:
-            order_id = p2p_record.id
-            sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
-            params = {
-                'action': 'create',
-                'order': order_id,
-                'sig': sig,
-                'planid': self.coop_id,
-                'uid': binding.bid,
-            }
-            common_callback.apply_async(
-                kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+    def yunduan_call_back(self):
+        params = {
+            'type': 'ef',
+            'pid': 298,
+        }
+        # 云端跟踪回调
+        common_callback.apply_async(
+            kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+
+        # 云端效果回调
+        params['type'] = 'ec'
+        common_callback.apply_async(
+            kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
 
     def validate_call_back(self, user):
-        self.yunduan_call_back(user)
+        binding = Binding.objects.filter(user_id=user.id).first()
+        if binding:
+            self.yunduan_call_back()
 
     def purchase_call_back(self, user):
         # 判断是否是首次投资
-        if P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').count() == 1:
-            self.yunduan_call_back(user)
+        binding = Binding.objects.filter(user_id=user.id).first()
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
+        if binding and p2p_record.count() == 1:
+            self.yunduan_call_back()
+
+
+class YiCheRegister(CoopRegister):
+    def __init__(self, request):
+        super(YiCheRegister, self).__init__(request)
+        self.c_code = 'yiche'
+        self.register_call_back_url = YICHE_REGISTER_CALL_BACK_URL
+        self.validate_call_back_url = YICHE_VALIDATE_CALL_BACK_URL
+        self.purchase_call_back_url = YICHE_PURCHASE_CALL_BACK_URL
+        self.coop_id = YICHE_COOP_ID
+        self.coop_key = YICHE_KEY
+
+    def yiche_call_back(self, url, params):
+        params['_pid'] = self.coop_id
+        params['format'] = 'xml'
+        params['_ts'] = int(time.time())
+        params_iteritems = sorted(params.iteritems(), key=lambda asd:asd[0], reverse=False)
+        params_iteritems = '&'.join([key.lower()+'='+str(value) for key, value in params_iteritems if value])
+        params['_sign'] = hashlib.md5(params_iteritems+self.coop_key).hexdigest()
+        yiche_callback.apply_async(
+            kwargs={'url': url, 'params': params, 'channel': self.c_code})
+
+    def register_call_back(self, user):
+        binding = Binding.objects.filter(user_id=user.id).first()
+        if binding:
+            url = self.register_call_back_url
+            introduced_by = IntroducedBy.objects.filter(user_id=user.id).first()
+            mobile = get_phone_for_coop(user.id)
+            params = {
+                'userId': binding.bid,
+                'userName': mobile,
+                'realName': '',
+                'mobile': mobile,
+                'companyId': 9,
+                'regTime': introduced_by.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'regSource': 3,
+            }
+            self.yiche_call_back(url, params)
+
+    def validate_call_back(self, user):
+        binding = Binding.objects.filter(user_id=user.id).first()
+        if binding:
+            url = self.validate_call_back_url
+            username = get_username_for_coop(user.id)
+            params = {
+                'userId': binding.bid,
+                'realName': username,
+            }
+            self.yiche_call_back(url, params)
+
+    def purchase_call_back(self, user):
+        # 判断是否是首次投资
+        binding = Binding.objects.filter(user_id=user.id).first()
+        # p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
+        # if binding and p2p_record.count() == 1: FixMe
+        url = self.purchase_call_back_url
+        p2p_record = get_last_investment_for_coop(user.id)
+        params = {
+            'userId': binding.bid,
+            'orderNo': p2p_record.id,
+            'invest': str(p2p_record.amount),
+            'investTime': p2p_record.create_time.strftime('%Y/%m/%d %H:%M:%S'),
+        }
+        self.yiche_call_back(url, params)
 
 
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
-                          ShiTouCunRegister, FUBARegister]
+                          ShiTouCunRegister, FUBARegister, YunDuanRegister,
+                          YiCheRegister]
 
 
 #######################第三方用户查询#####################
