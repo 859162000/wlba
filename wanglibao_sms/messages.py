@@ -170,3 +170,15 @@ def msg_give_income(count, amount):
               u"请进入<a href='/accounts/invite/'>我的账户-全民淘金</a>中查询。<br/>" \
               u"感谢您对我们的支持与关注！<br/>网利宝".format(count, amount)
     return title, content
+
+
+@suffix
+def sms_alert_invest(name):
+    return u"提醒投资：您的好友{}在网利宝看到几个超棒的理财计划，快来投资吧！".format(name)
+
+
+@suffix
+def sms_alert_invite(name, phone):
+    return u"邀请注册：您的好友{}邀请您加入网利宝，快来一起赚钱，速速点击专属链接：" \
+           u"https://www.wanglibao.com/activity/wap/share?phone={}".format(name, phone)
+
