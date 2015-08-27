@@ -903,6 +903,7 @@ else:
     YICHE_REGISTER_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API?method=AddPlatFormFinanceUser'
     YICHE_VALIDATE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API?method=UpdatePlatFormFinanceUser'
     YICHE_PURCHASE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API?method=AddPlatFormFinanceOrder'
+    YICHE_U_PURCHASE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API?method=UpdatePlatFormFinanceOrder'
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100
