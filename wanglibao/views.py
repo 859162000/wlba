@@ -22,7 +22,6 @@ import pickle
 import datetime
 import hashlib
 from wanglibao import settings
-import requests
 
 class IndexView(TemplateView):
     template_name = 'index_new.jade'
