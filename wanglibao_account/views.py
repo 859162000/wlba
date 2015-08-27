@@ -51,7 +51,7 @@ from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, User
 from wanglibao_p2p.tasks import automatic_trade
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code
-from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress, UserPhoneBook
+from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
 from wanglibao.templatetags.formatters import safe_phone_str
@@ -564,28 +564,28 @@ class AccountInviteAllGoldAPIView(APIView):
                         "second":{"amount":second_amount, "earning":second_earning,
                         "count":second_count}, "count":len(introduces)})
 
-    def _alert_invest_status(self, user, phone_user):
-        try:
-            profile = phone_user.wanglibaouserprofile
-            phone_book = UserPhoneBook.objects.filter(user=user, phone=profile.phone).first()
-            if phone_book:
-                if not(phone_book.alert_at and phone_book.alert_at > local_to_utc(datetime.datetime.now(), 'min')):
-                    phone_book.is_used = True
-                    phone_book.save()
-                    return True
-            else:
-                phone_book = UserPhoneBook()
-                phone_book.user = user
-                phone_book.phone = profile.phone
-                phone_book.name = profile.name
-                phone_book.is_register = True
-                phone_book.is_invite = True
-                phone_book.is_used = True
-                phone_book.save()
-                return True
-            return False
-        except:
-            return False
+#    def _alert_invest_status(self, user, phone_user):
+#        try:
+#            profile = phone_user.wanglibaouserprofile
+#            phone_book = UserPhoneBook.objects.filter(user=user, phone=profile.phone).first()
+#            if phone_book:
+#                if not(phone_book.alert_at and phone_book.alert_at > local_to_utc(datetime.datetime.now(), 'min')):
+#                    phone_book.is_used = True
+#                    phone_book.save()
+#                    return True
+#            else:
+#                phone_book = UserPhoneBook()
+#                phone_book.user = user
+#                phone_book.phone = profile.phone
+#                phone_book.name = profile.name
+#                phone_book.is_register = True
+#                phone_book.is_invite = True
+#                phone_book.is_used = True
+#                phone_book.save()
+#                return True
+#            return False
+#        except:
+#            return False
 
 
 class AccountInviteIncomeAPIView(APIView):
