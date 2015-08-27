@@ -258,6 +258,14 @@ class P2PProduct(ProductBase):
     def terms(self):
         return self.amortizations.all().count()
 
+    # Add by hb on 2015-08-27
+    @property
+    def is_taojin(self):
+        if self.period>3 and self.period<30:
+            return True;
+        else:
+            return False;
+
 
     display_payback_mapping = {
         u'等额本息': u'等额本息',
