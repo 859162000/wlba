@@ -83,7 +83,7 @@
     $('.setp-btn').on('click',function(){
       if (change['ret_code']==4000){
         $('#small-zc').show();
-        $('#xl-aug-fail p').text('Sorry~您的不符合领奖条件');
+        $('#xl-aug-fail p').text('Sorry~您不符合领奖条件');
         $('#xl-aug-fail').show();
       }else if ($(this).hasClass('receive')){
         window.location.href="/"
@@ -152,6 +152,8 @@
     var happy=change['get_time'];
     if (change['left']){
       $('#chance').text(' '+change['left']+' ');
+    }else if (change['left']==0){
+      $('#chance').text(' '+change['left']+' ');
     }else{
       $('#chance').text(' '+3+' ');
     }
@@ -162,7 +164,7 @@
       $('.game-btn').removeClass('game-btn-down');
       if (change['ret_code']==4000){
         $('#small-zc').show();
-        $('#xl-aug-fail p').text('Sorry~您的不符合抽奖条件');
+        $('#xl-aug-fail p').text('Sorry~您不符合抽奖条件');
         $('#xl-aug-fail').show();
       }else if($(this).hasClass('go-game')){
         if (change['left']<=0){
@@ -246,7 +248,9 @@
        change=data;
        if (change['left']){
           $('#chance').text(' '+change['left']+' ');
-       }else{
+       }else if (change['left']==0){
+          $('#chance').text(' '+change['left']+' ');
+       }else {
          $('#chance').text(' 3 ');
        }
 
