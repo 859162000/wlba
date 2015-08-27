@@ -1,0 +1,46 @@
+ul.discount--tabs
+  clear: both
+  width: 100%
+  height: 43px
+  position: relative
+  top: 15px
+  li
+    padding: 9px 36px 7px 60px
+    background: #f0f0f0
+    color: #b2b2b2
+    float: left
+    position: relative
+    cursor: pointer
+    line-height: 27px
+  .hover
+    background: #fff
+    color: #e4371f
+  span
+    position: absolute
+    left: 27px
+    top: 9px
+    background-image: url(/static/images/redpacket/discountIcon.png)
+    background-repeat: no-repeat
+    display: block
+    width: 27px
+    height: 27px
+    line-height: 27px
+  .coupon--tab
+    border-top-left-radius: 15px
+    span
+      background-position: 0 0
+
+  .redpacket--tab
+    border-top-right-radius: 15px
+    span
+      background-position: -28px -28px
+
+  .coupon--tab.hover
+    span
+      background-position: 0 -28px
+
+  .redpacket--tab.hover
+    span
+      background-position: -28px 0
+
+
