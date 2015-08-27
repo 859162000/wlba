@@ -31,13 +31,15 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY, FUBA_CALL_BACK_URL, WLB_FOR_FUBA_KEY, \
      FUBA_COOP_ID, FUBA_KEY, FUBA_CHANNEL_CODE, FUBA_DEFAULT_TID, FUBA_PERIOD, \
      WLB_FOR_YUNDUAN_KEY, YUNDUAN_CALL_BACK_URL, YUNDUAN_COOP_ID, WLB_FOR_YICHE_KEY, YICHE_COOP_ID, \
-     YICHE_KEY, YICHE_REGISTER_CALL_BACK_URL, YICHE_VALIDATE_CALL_BACK_URL, YICHE_PURCHASE_CALL_BACK_URL
+     YICHE_KEY, YICHE_REGISTER_CALL_BACK_URL, YICHE_VALIDATE_CALL_BACK_URL, YICHE_PURCHASE_CALL_BACK_URL, \
+     YICHE_U_PURCHASE_CALL_BACK_URL
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
 from wanglibao_pay.models import Card
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_redis.backend import redis_backend
+from dateutil.relativedelta import relativedelta
 
 logger = logging.getLogger(__name__)
 
@@ -196,8 +198,8 @@ class CoopRegister(object):
             return None
 
     def save_to_session(self):
-        channel_code  = self.get_channel_code_from_request()
-        channel_user  = self.request.GET.get(self.external_channel_user_key, None)
+        channel_code = self.get_channel_code_from_request()
+        channel_user = self.request.GET.get(self.external_channel_user_key, None)
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
             # logger.debug('save to session %s:%s'%(self.internal_channel_key, channel_code))
@@ -724,6 +726,7 @@ class YiCheRegister(CoopRegister):
         self.register_call_back_url = YICHE_REGISTER_CALL_BACK_URL
         self.validate_call_back_url = YICHE_VALIDATE_CALL_BACK_URL
         self.purchase_call_back_url = YICHE_PURCHASE_CALL_BACK_URL
+        self.u_purchase_call_back_url = YICHE_U_PURCHASE_CALL_BACK_URL
         self.coop_id = YICHE_COOP_ID
         self.coop_key = YICHE_KEY
 
@@ -742,7 +745,7 @@ class YiCheRegister(CoopRegister):
         if binding:
             url = self.register_call_back_url
             introduced_by = IntroducedBy.objects.filter(user_id=user.id).first()
-            mobile = get_phone_for_coop(user.id)
+            mobile = '******'.join(get_phone_for_coop(user.id).split('***'))
             params = {
                 'userId': binding.bid,
                 'userName': mobile,
@@ -768,18 +771,33 @@ class YiCheRegister(CoopRegister):
     def purchase_call_back(self, user):
         # 判断是否是首次投资
         binding = Binding.objects.filter(user_id=user.id).first()
-        # p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
-        # if binding and p2p_record.count() == 1: FixMe
-        url = self.purchase_call_back_url
-        p2p_record = get_last_investment_for_coop(user.id)
-        params = {
-            'userId': binding.bid,
-            'orderNo': p2p_record.id,
-            'invest': str(p2p_record.amount),
-            'investTime': p2p_record.create_time.strftime('%Y/%m/%d %H:%M:%S'),
-        }
-        self.yiche_call_back(url, params)
+        if binding:
+            url = self.purchase_call_back_url
+            p2p_record = get_last_investment_for_coop(user.id)
+            invest_time = p2p_record.create_time
+            params = {
+                'userId': binding.bid,
+                'orderNo': p2p_record.id,
+                'invest': str(p2p_record.amount),
+                'investTime': invest_time.strftime('%Y/%m/%d %H:%M:%S'),
+            }
+            self.yiche_call_back(url, params)
 
+            url = self.u_purchase_call_back_url
+            period = p2p_record.product.period
+            pay_method = p2p_record.product.pay_method
+            profit_time = None
+            # 根据支付方式判定标周期的单位（天/月）
+            if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
+                profit_time = invest_time + relativedelta(months=period)
+            elif pay_method in [u'日计息一次性还本付息', u'日计息月付息到期还本']:
+                profit_time = invest_time + relativedelta(days=period)
+            params = {
+                'orderNo': p2p_record.id,
+                'profit': '0.01',
+                'profitTime': profit_time.strftime('%Y/%m/%d %H:%M:%S'),
+            }
+            self.yiche_call_back(url, params)
 
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
@@ -1026,7 +1044,7 @@ def xicai_get_p2p_info(mproduct, access_token):
         'ev_rate': p2p_info['rate'],
         'amount': p2p_info['amount'],
         'invest_amount': p2p_info['ordered_amount'],
-        'invest_mans': p2p_info['buyer'],
+        'inverst_mans': mproduct.equities.all().annotate(Count('user', distinct=True)).count(),
         'underlying_start': format_time(p2p_info['start_time']),
         'underlying_end': format_time(p2p_info['end_time']),
         'link_website': settings.XICAI_LOAD_PAGE.format(p2p_id=mproduct.id),
@@ -1050,19 +1068,21 @@ def xicai_get_p2p_info(mproduct, access_token):
 def xicai_post_product_info(mproduct, access_token):
     p2p_info = xicai_get_p2p_info(mproduct, access_token)
     url = settings.XICAI_CREATE_P2P_URL
-    requests.post(url, data=p2p_info)
+    ret = requests.post(url, data=p2p_info)
+    return ret.text
 
 
 def xicai_post_updated_product_info(mproduct, access_token):
     p2p_info = xicai_get_p2p_info(mproduct, access_token)
     updated_p2p_info = {}
     for k in ['access_token', 'invest_amount',
-              'invest_mans', 'underlying_end',
+              'inverst_mans', 'underlying_end',
               'product_state', 'repay_start_time',
               'repay_end_time', 'p2p_product_id']:
         updated_p2p_info[k] = p2p_info[k]
     url = settings.XICAI_UPDATE_P2P_URL
-    requests.post(url, data=updated_p2p_info)
+    ret = requests.post(url, data=updated_p2p_info)
+    return ret.text
 
 
 def xicai_get_new_p2p():

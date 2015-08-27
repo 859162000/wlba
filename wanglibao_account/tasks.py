@@ -128,17 +128,14 @@ def jinshan_callback(url, params):
     if ret:
         logger.info(ret.text)
 
+
 @app.task
 def yiche_callback(url, params, channel):
     logger.info("Enter %s_callback task===>>>" % channel)
     ret = None
     try:
         logger.info(params)
-        params = urllib.urlencode(params)
-        headers = {'Content-Type': 'application/x-www-form-urlencoded',
-                   'Content-Length': len(params),
-                   }
-        ret = requests.post(url, data=params, headers=headers)
+        ret = requests.post(url, data=params)
         logger.info('%s callback url: %s'% (channel, ret.url))
         logger.info('callback return: %s' % (ret.text))
     except Exception, e:

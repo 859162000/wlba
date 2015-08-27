@@ -510,7 +510,7 @@ CELERYBEAT_SCHEDULE = {
     #add by guoya: 希财网渠道数据定时推送
     'xicai_send_data': {
         'task': 'wanglibao_account.tasks.xicai_send_data_task',
-        'schedule': timedelta(minutes=10),
+        'schedule': timedelta(hours=1),
     },
 
     #add by zhanghe: PC端WEB首页统计数据
@@ -903,6 +903,7 @@ else:
     YICHE_REGISTER_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API?method=AddPlatFormFinanceUser'
     YICHE_VALIDATE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API?method=UpdatePlatFormFinanceUser'
     YICHE_PURCHASE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API?method=AddPlatFormFinanceOrder'
+    YICHE_U_PURCHASE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API?method=UpdatePlatFormFinanceOrder'
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100

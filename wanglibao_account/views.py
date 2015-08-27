@@ -570,6 +570,8 @@ class AccountInviteAllGoldAPIView(APIView):
             phone_book = UserPhoneBook.objects.filter(user=user, phone=profile.phone).first()
             if phone_book:
                 if not(phone_book.alert_at and phone_book.alert_at > local_to_utc(datetime.datetime.now(), 'min')):
+                    phone_book.is_used = True
+                    phone_book.save()
                     return True
             else:
                 phone_book = UserPhoneBook()
