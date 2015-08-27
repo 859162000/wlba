@@ -65,25 +65,18 @@ var org = (function(){
                     earning = 0;
                 }
                 earning_elements = (target.attr('data-target')).split(',');
-                fee_elements = (target.attr('fee-target')).split(',');
 
                 for (var i = 0; i < earning_elements.length; i ++) {
                     earning_element = earning_elements[i];
                     if (earning) {
+                        fee_earning = fee_earning ? fee_earning : 0;
                         earning += fee_earning;
                         $(earning_element).text(earning.toFixed(2));
                     } else {
                         $(earning_element).text("0.00");
                     }
                 }
-                for (var j = 0; j < fee_elements.length;  j++) {
-                    fee_element = fee_elements[j];
-                    if (fee_earning) {
-                       $(fee_element).text(fee_earning);
-                    } else {
-                        $(fee_element).text("0.00");
-                    }
-                }
+
                 callback && callback(target);
             });
         },

@@ -130,6 +130,23 @@ def jinshan_callback(url, params):
 
 
 @app.task
+def yiche_callback(url, params, channel):
+    logger.info("Enter %s_callback task===>>>" % channel)
+    ret = None
+    try:
+        logger.info(params)
+        ret = requests.post(url, data=params)
+        logger.info('%s callback url: %s'% (channel, ret.url))
+        logger.info('callback return: %s' % (ret.text))
+    except Exception, e:
+        logger.info(" {'%s callback':'failed to connect'} " % channel)
+        logger.info(e)
+
+    if ret:
+        logger.info(ret.text)
+
+
+@app.task
 def caimiao_platform_post_task():
     """
     author: Zhoudong

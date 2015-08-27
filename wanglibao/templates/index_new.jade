@@ -133,8 +133,10 @@ html
               .pdt-list
                 .pdt-warp.padding-t-l-r-sm
                   a(href='/p2p/detail/{{p2p.id}}/', title='{{p2p.name}}').pdt-name.t-d10
-                    //i.icon.iconfont.icon-car
-                    span.font-l {{p2p.name}}
+                    if p2p.category == "新手标"
+                      span.font-l (新手标){{p2p.name}}
+                    else
+                      span.font-l {{p2p.name}}
                   if index == 0
                     .t-d7.clearfix
                       .span5.es 合作机构: {{p2p.warrant_company}}

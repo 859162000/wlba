@@ -1088,4 +1088,4 @@ class GuestCheckView(APIView):
             return Response({"ret_code": 0, "data": data})
         # 渠道不符合标准
         else:
-            return Response({"ret_code": 2, "message": u"非迅雷8用户，不符合活动标准！"})
+            return Response({"ret_code": 2, "message": u"抱歉，不符合活动标准！"})
