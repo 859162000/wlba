@@ -779,7 +779,7 @@ class YiCheRegister(CoopRegister):
                 'userId': binding.bid,
                 'orderNo': p2p_record.id,
                 'invest': str(p2p_record.amount),
-                'investTime': invest_time.strftime('%Y/%m/%d %H:%M:%S'),
+                'investTime': invest_time.strftime('%Y-%m-%d %H:%M:%S'),
             }
             self.yiche_call_back(url, params)
 
@@ -795,7 +795,7 @@ class YiCheRegister(CoopRegister):
             params = {
                 'orderNo': p2p_record.id,
                 'profit': '0.01',
-                'profitTime': profit_time.strftime('%Y/%m/%d %H:%M:%S'),
+                'profitTime': profit_time.strftime('%Y-%m-%d %H:%M:%S'),
             }
             self.yiche_call_back(url, params)
 
