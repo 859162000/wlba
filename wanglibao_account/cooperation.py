@@ -1044,7 +1044,7 @@ def xicai_get_p2p_info(mproduct, access_token):
         'ev_rate': p2p_info['rate'],
         'amount': p2p_info['amount'],
         'invest_amount': p2p_info['ordered_amount'],
-        'invest_mans': p2p_info['buyer'],
+        'inverst_mans': mproduct.equities.all().annotate(Count('user', distinct=True)).count(),
         'underlying_start': format_time(p2p_info['start_time']),
         'underlying_end': format_time(p2p_info['end_time']),
         'link_website': settings.XICAI_LOAD_PAGE.format(p2p_id=mproduct.id),
@@ -1068,19 +1068,21 @@ def xicai_get_p2p_info(mproduct, access_token):
 def xicai_post_product_info(mproduct, access_token):
     p2p_info = xicai_get_p2p_info(mproduct, access_token)
     url = settings.XICAI_CREATE_P2P_URL
-    requests.post(url, data=p2p_info)
+    ret = requests.post(url, data=p2p_info)
+    return ret.text
 
 
 def xicai_post_updated_product_info(mproduct, access_token):
     p2p_info = xicai_get_p2p_info(mproduct, access_token)
     updated_p2p_info = {}
     for k in ['access_token', 'invest_amount',
-              'invest_mans', 'underlying_end',
+              'inverst_mans', 'underlying_end',
               'product_state', 'repay_start_time',
               'repay_end_time', 'p2p_product_id']:
         updated_p2p_info[k] = p2p_info[k]
     url = settings.XICAI_UPDATE_P2P_URL
-    requests.post(url, data=updated_p2p_info)
+    ret = requests.post(url, data=updated_p2p_info)
+    return ret.text
 
 
 def xicai_get_new_p2p():
