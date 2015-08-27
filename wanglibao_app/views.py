@@ -466,7 +466,7 @@ class AppPhoneBookAlertApiView(APIView):
             return Response({'ret_code': 20001, 'message': u'数据输入不合法'})
 
         try:
-            user_book = UserPhoneBook.objects.filter(user=user, is_used=True, phone=phone).first()
+            user_book = UserPhoneBook.objects.filter(user=user, phone=phone).first()
             if not user_book:
                 return Response({'ret_code': 20002, 'message': u'被提醒用户不存在'})
 
@@ -477,6 +477,7 @@ class AppPhoneBookAlertApiView(APIView):
                 if not (user_book.alert_at and user_book.alert_at > local_to_utc(datetime.now(), 'min')):
                     self._send_sms(phone, sms_messages.sms_alert_invest(name=send_name))
                     user_book.alert_at = timezone.now()
+                    user_book.is_used = True
                     user_book.save()
             # 邀请提醒
             elif int(flag) == 2:
@@ -484,6 +485,7 @@ class AppPhoneBookAlertApiView(APIView):
                     user_book.is_register = True
                     if IntroducedBy.objects.filter(introduced_by=user, user_wanglibaouserprofile__phone=phone).exists():
                         user_book.is_invite = True
+                        user_book.is_used = True
                     user_book.save()
 
                 if not user_book.is_register and not (user_book.invite_at and user_book.invite_at > local_to_utc(datetime.now(), 'min')):
