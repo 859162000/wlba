@@ -462,7 +462,7 @@ class AppPhoneBookAlertApiView(APIView):
         user = request.user
         flag = request.DATA.get('flag')
         phone = request.DATA.get('phone')
-        if not phone or not flag or (flag and flag not in(1, 2)):
+        if not phone or not flag or (flag and int(flag) not in(1, 2)):
             return Response({'ret_code': 20001, 'message': u'数据输入不合法'})
 
         try:
@@ -473,13 +473,13 @@ class AppPhoneBookAlertApiView(APIView):
             profile = user.wanglibaouserprofile
             send_name = profile.name if profile.id_is_valid else safe_phone_str(profile.phone)
             # 投资提醒
-            if flag == 1:
+            if int(flag) == 1:
                 if not (user_book.alert_at and user_book.alert_at > local_to_utc(datetime.now(), 'min')):
                     self._send_sms(phone, sms_messages.sms_alert_invest(name=send_name))
                     user_book.alert_at = timezone.now()
                     user_book.save()
             # 邀请提醒
-            elif flag == 2:
+            elif int(flag) == 2:
                 if User.objects.filter(wanglibaouserprofile__phone=phone).exists():
                     user_book.is_register = True
                     if IntroducedBy.objects.filter(introduced_by=user, user_wanglibaouserprofile__phone=phone).exists():

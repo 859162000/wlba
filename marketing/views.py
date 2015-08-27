@@ -4,9 +4,8 @@ import decimal
 import pytz
 from datetime import date, timedelta, datetime
 from collections import defaultdict
-from decimal import Decimal, ROUND_DOWN
+from decimal import Decimal
 
-import time
 from django.db.models import Count, Sum
 from django.contrib.auth.decorators import permission_required
 from django.core.paginator import Paginator, PageNotAnInteger
@@ -17,11 +16,9 @@ from django.views.generic import TemplateView
 from django.http.response import HttpResponse, Http404
 from mock_generator import MockGenerator
 from django.conf import settings
-from wanglibao import settings as wanglibao_settings
-from wanglibao_profile.models import WanglibaoUserProfile
 from django.db.models.base import ModelState
-from wanglibao_sms.utils import validate_validation_code, send_validation_code
-from marketing.models import PromotionToken, IntroducedBy, IntroducedByReward, Reward, ActivityJoinLog
+from wanglibao_sms.utils import send_validation_code
+from marketing.models import Channels, PromotionToken, IntroducedBy, IntroducedByReward, Reward, ActivityJoinLog
 from marketing.tops import Top
 from utils import local_to_utc
 
@@ -29,21 +26,19 @@ from utils import local_to_utc
 from django.forms import model_to_dict
 from django.db.models import Q
 from marketing.models import RewardRecord, NewsAndReport
-from wanglibao_sms.tasks import send_messages
 from wanglibao_p2p.models import Earning
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_account import message as inside_message
-from wanglibao_account.models import Binding
 from order.models import Order
 from order.utils import OrderHelper
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
-from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
+from wanglibao_redpack.models import RedPackEvent
 from wanglibao_redpack import backends as redpack_backends
-from wanglibao_activity.models import ActivityRecord, ActivityRule
+from wanglibao_activity.models import ActivityRecord
 
 
 class YaoView(TemplateView):
@@ -624,10 +619,10 @@ def ajax_get_activity_record(request):
         description:迅雷9月抽奖活动，获得用户的抽奖记录
     """
     records = ActivityJoinLog.objects.filter(action_name='get_award', action_type='login', join_times=0)
-    data = [{'phone': record.user.wanglibaouserprofile.phone, 'award':str(record.amount)} for record in records]
+    data = [{'phone':record.user.wanglibaouserprofile.phone, 'awards':float(record.amount)} for record in records]
     to_json_response = {
         'ret_code': 3005,
-        'data': data,
+        'data':data,
         'message': u'获得抽奖成功用户',
     }
     return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -646,12 +641,13 @@ def ajax_post(request):
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-    record = Binding.objects.filter(user=user).first()
-    create_time = time.mktime(datetime(2015, 8, 25).timetuple())
-    if record and (record.btype != 'xunlei9' or record.create_at < create_time):
+    record = IntroducedBy.objects.filter(user_id=user.id).first()
+    if record:
+        record = Channels.objects.filter(id=record.channel_id).first()
+    if not record or (record and record.name != 'xunlei9'):
         to_json_response = {
             'ret_code': 4000,
-            'message': u'非8月25号之后迅雷渠道过来的用户',
+            'message': u'非迅雷渠道过来的用户',
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -688,8 +684,10 @@ class ThunderAwardAPIView(APIView):
         join_log.save(update_fields=['join_times'])
         money = self.get_award_mount(join_log.id)
         describe = 'xunlei_sept_' + str(money)
-
-        redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,).first()
+        try:
+            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,).first()
+        except Exception, reason:
+            print reason
 
         if redpack_event:
             redpack_backends.give_activity_redpack(request.user, redpack_event, 'pc')
