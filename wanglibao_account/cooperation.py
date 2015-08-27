@@ -953,40 +953,17 @@ def get_amortization_time(product_id_or_instance):
 
 
 def get_p2p_info(mproduct):
-    product_info = {
-        'for_freshman': 0, #是否新手标
-        'period': 0, #产品周期
-        'rate': 0, #产品收益率
-        'amount': 0, #募集金额
-        'ordered_amount': 0, #已募集金额
-        'buyer': 0, #投资人数
-        'start_time': 0, #标的开始时间
-        'end_time': 0, #标的结束时间
-        'state': '', #产品状态
-        'borrower': '', #借款人名称
-        'guarant_mode': '本息担保', #担保方式
-        'guarantor': '', #担保方名称
-        'amortization_start_time': 0, #还款开始时间
-        'amortization_end_time': 0, #还款结束时间
-        'borrower_guarant_type': '第三方担保', #借款担保方式
-        'repayment_type': '', #还款方式
-        'start_price': 100, #起投金额
-        'id': 0, #产品id
-    }
-    product_info['for_freshman'] = 1 if mproduct.category == '新手标' else 0
-    product_info['period'] = mproduct.period
-    product_info['rate'] = get_rate(mproduct)
-    product_info['amount'] = mproduct.total_amount
-    product_info['ordered_amount'] = mproduct.ordered_amount
-    product_info['buyer'] = mproduct.equities.all().annotate(Count('user', distinct=True))
-    product_info['start_time'] = mproduct.publish_time
-    product_info['end_time'] = mproduct.end_time
-    product_info['state'] = mproduct.status
-    product_info['borrower'] = mproduct.borrower_name
-    product_info['guarantor'] = mproduct.warrant_company
-    product_info['amortization_start_time'], product_info['end_time'] = get_amortization_time(mproduct)
-    product_info['repayment_type'] = mproduct.pay_method
-    product_info['id'] = mproduct.id
+
+    product_info = {'for_freshman': 1 if mproduct.category == '新手标' else 0, 'period': mproduct.period,
+                    'rate': get_rate(mproduct), 'amount': mproduct.total_amount,
+                    'ordered_amount': mproduct.ordered_amount,
+                    'buyer': mproduct.equities.all().annotate(Count('user', distinct=True)).count(),
+                    'start_time': mproduct.publish_time, 'end_time': get_amortization_time(mproduct)[1],
+                    'state': mproduct.status, 'borrower': mproduct.borrower_name, 'guarant_mode': '本息担保',
+                    'guarantor': mproduct.warrant_company,
+                    'amortization_start_time': get_amortization_time(mproduct)[0], 'amortization_end_time': 0,
+                    'borrower_guarant_type': '第三方担保', 'repayment_type': mproduct.pay_method, 'start_price': 100,
+                    'id': mproduct.id}
 
     return product_info
 
@@ -1039,11 +1016,13 @@ def xicai_get_p2p_info(mproduct, access_token):
         if time:
             return time.strftime('%Y-%m-%d')
 
+    period = mproduct.period if mproduct.pay_method.startswith(u"日计息") else mproduct.period * 30
+
     xicai_info = {
         'access_token': access_token,
-        'product_name': p2p_info['name'],
+        'product_name': mproduct.name,
         'isexp': p2p_info['for_freshman'],
-        'life_cycle': p2p_info['period'],
+        'life_cycle': period,
         'ev_rate': p2p_info['rate'],
         'amount': p2p_info['amount'],
         'invest_amount': p2p_info['ordered_amount'],

@@ -149,9 +149,6 @@
 
     //按钮
     var num=1;
-
-    redpack('ENTER_WEB_PAGE');
-//    console.log(change)
     var happy=change['get_time'];
     if (change['left']){
       $('#chance').text(' '+change['left']+' ');
@@ -163,9 +160,10 @@
     });
     $('.game-btn').on('mouseup',function(){
       $('.game-btn').removeClass('game-btn-down');
-      console.log(change)
       if (change['ret_code']==4000){
-        console.log('Sorry~您不符合抽奖条件')
+        $('#small-zc').show();
+        $('#xl-aug-fail p').text('Sorry~您的不符合抽奖条件');
+        $('#xl-aug-fail').show();
       }else if($(this).hasClass('go-game')){
         if (change['left']<=0){
           $('#small-zc').show();

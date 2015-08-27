@@ -389,12 +389,11 @@ class AppPhoneBookUploadAPIView(APIView):
     def post(self, request):
         user = request.user
 
-        phones = request.POST.get('phones', '')
+        phones = request.DATA.get('phones', '')
         if not phones:
             return Response({'ret_code': 20001, 'message': u'数据输入不合法'})
+        phones = json.loads(phones)
         try:
-            phones = json.loads(phones)
-
             UserPhoneBook.objects.filter(user=user).exclude(phone__in=phones.keys()).update(is_used=False)
             phone_db = [u.get('phone') for u in UserPhoneBook.objects.filter(user=user, phone__in=phones.keys()).values('phone')]
 
@@ -412,14 +411,15 @@ class AppPhoneBookUploadAPIView(APIView):
                     else:
                         phone_book.is_register = False
 
-                    if IntroducedBy.objects.filter(introduced_by=user, user_wanglibaouserprofile__phone=p).exists():
+                    if IntroducedBy.objects.filter(introduced_by=user, user__wanglibaouserprofile__phone=p).exists():
                         phone_book.is_invite = True
                     else:
                         phone_book.is_invite = False
 
                     phone_book.is_used = True
                     phone_new_list.append(phone_book)
-            UserPhoneBook.objects.bulk_create(phone_new_list)
+            if phone_new_list:
+                UserPhoneBook.objects.bulk_create(phone_new_list)
             return Response({'ret_code': 0, 'message': 'success'})
         except Exception, e:
             logger.error(e.message)
@@ -460,8 +460,8 @@ class AppPhoneBookAlertApiView(APIView):
 
     def post(self, request):
         user = request.user
-        flag = request.POST.get('flag')
-        phone = request.POST.get('phone')
+        flag = request.DATA.get('flag')
+        phone = request.DATA.get('phone')
         if not phone or not flag or (flag and flag not in(1, 2)):
             return Response({'ret_code': 20001, 'message': u'数据输入不合法'})
 
