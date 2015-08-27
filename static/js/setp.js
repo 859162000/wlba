@@ -30,7 +30,6 @@
      }
     var left2;
     left2=backtop($(".setp-content"));
-    console.log(left2)
     //浏览器大小改变触发的事件
     window.onresize = function(){
       left2 = backtop($(".setp-content"));
@@ -69,21 +68,30 @@
   });
 
   //关闭弹出框
-  $('.first-xl-off2').on('click',function(){
+  $('.first-xl-off2,.reg-btn').on('click',function(){
     $('#small-zc').hide();
     $('#xl-aug-login').hide();
     $('#xl-aug-success').hide();
+    $('#xl-aug-prize').hide();
+    $('#xl-aug-fail').hide();
   })
 
 
+  var change;
+  redpack('ENTER_WEB_PAGE');
   //领取会员提示
     $('.setp-btn').on('click',function(){
-      if ($(this).hasClass('receive')){
+      if (change['ret_code']==4000){
+        $('#small-zc').show();
+        $('#xl-aug-fail p').text('Sorry~您的不符合领奖条件');
+        $('#xl-aug-fail').show();
+      }else if ($(this).hasClass('receive')){
         window.location.href="/"
       }else{
         $('#small-zc').show();
         $('#xl-aug-login').show();
       }
+
     })
 
   //回到banner注册
@@ -93,6 +101,20 @@
     $('body,html').animate({scrollTop: 0}, 600);
       return false
   })
+  //抽奖名单
+  var str='';
+  $.ajax({
+      url: "/api/xunlei/award/records/",
+      type: "POST",
+      async: false
+    }).done(function(result) {
+       for (var k= 0,len2=result['data'].length;k<len2;k++){
+         var tel=result['data'][k]['phone'].substring(0,3)+"******"+result['data'][k]['phone'].substring(9,11);
+         str+='<p>恭喜'+tel+'获得<span>'+result['data'][k]['awards']+'元</span>红包</p>'
+       }
+      $('.long-p').append(str);
+      $('.long-p p:odd').addClass('hight');
+    });
 
   //无线滚动
   var timer,i= 1,j=2;
@@ -126,18 +148,34 @@
     },500)
 
     //按钮
+    var num=1;
+    var happy=change['get_time'];
+    if (change['left']){
+      $('#chance').text(' '+change['left']+' ');
+    }else{
+      $('#chance').text(' '+3+' ');
+    }
     $('.game-btn').on('mousedown',function(){
       $('.game-btn').addClass('game-btn-down')
     });
     $('.game-btn').on('mouseup',function(){
-      $('.game-btn').removeClass('game-btn-down')
-      if ($(this).hasClass('go-game')){
-        game();
+      $('.game-btn').removeClass('game-btn-down');
+      if (change['ret_code']==4000){
+        $('#small-zc').show();
+        $('#xl-aug-fail p').text('Sorry~您的不符合抽奖条件');
+        $('#xl-aug-fail').show();
+      }else if($(this).hasClass('go-game')){
+        if (change['left']<=0){
+          $('#small-zc').show();
+          $('#xl-aug-fail p').text('Sorry~您的抽奖次数已用完')
+          $('#xl-aug-fail').show();
+        }else{
+          game();
+        }
       }else{
         $('#small-zc').show();
         $('#xl-aug-login').show();
       }
-
     })
 //    game();
     function game(){
@@ -147,46 +185,71 @@
         $('.side').addClass('side-down')
         setTimeout(function(){
           $('.side').removeClass('side-down')
-          star();
+          if (num!=happy){
+            //失败调用
+            redpack('IGNORE_AWARD');
+            star('0000');
+          }else{
+            //成功调用
+            redpack('GET_AWARD');
+            star('0'+change['amount']);
+          }
+
         },500)
       },1000)
+
     }
 
 
 
     //开始转动
-    function star(){
+    function star(a){
       var time,j=0;
       time=setInterval(function(){
         $('.long-sum').animate({'bottom':'-1062px'},100,function(){
           $('.long-sum').css({'bottom':'0px'})
         })
       },100)
-
-      var a='1314';
       setTimeout(function(){
         for (var k= 0,len= a.length;k<len;k++){
           var g=9-a[k],b=k+1;
           $('.long-sum:eq('+k+')').css({'top':-g*178+'px'})
         }
         clearInterval(time)
-        $('#rmb').text(a)
+        $('#rmb').text(parseInt(change['amount']));
         $('#small-zc').show();
-        $('#xl-aug-success').show();
+        if (a=='0000'){
+          var txt=['你和大奖只是一根头发的距离','天苍苍，野茫茫，中奖的希望太渺茫','太可惜了，你竟然与红包擦肩而过'];
+          var ind=parseInt(Math.random()*3);
+          $('#xl-aug-success').hide();
+          $('#xl-aug-prize p').text(txt[ind]);
+          $('#xl-aug-prize').show();
+        }else{
+          $('#xl-aug-prize').hide();
+          $('#xl-aug-success').show();
+        }
+        num++;
       },3000)
-
+      $('.long-sum').css({'top':''});
+      $('#chance').text(' '+change['left']+' ')
     }
 
 
-  redpack('ENTER_WEB_PAGE');
   //抽奖请求
   function redpack(sum){
     $.ajax({
       url: "/api/xunlei/award/",
       type: "POST",
-      data: {action:sum}
+      data: {action:sum},
+      async: false
     }).done(function(data) {
-       console.log(data)
+       change=data;
+       if (change['left']){
+          $('#chance').text(' '+change['left']+' ');
+       }else{
+         $('#chance').text(' 3 ');
+       }
+
     });
   }
 

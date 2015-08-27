@@ -619,10 +619,10 @@ def ajax_get_activity_record(request):
         description:迅雷9月抽奖活动，获得用户的抽奖记录
     """
     records = ActivityJoinLog.objects.filter(action_name='get_award', action_type='login', join_times=0)
-    data = [{'phone': record.user.wanglibaouserprofile.phone, 'award':str(record.amount)} for record in records]
+    data = [{'phone':record.user.wanglibaouserprofile.phone, 'awards':float(record.amount)} for record in records]
     to_json_response = {
         'ret_code': 3005,
-        'data': data,
+        'data':data,
         'message': u'获得抽奖成功用户',
     }
     return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -684,8 +684,10 @@ class ThunderAwardAPIView(APIView):
         join_log.save(update_fields=['join_times'])
         money = self.get_award_mount(join_log.id)
         describe = 'xunlei_sept_' + str(money)
-
-        redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,).first()
+        try:
+            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,).first()
+        except Exception, reason:
+            print reason
 
         if redpack_event:
             redpack_backends.give_activity_redpack(request.user, redpack_event, 'pc')
