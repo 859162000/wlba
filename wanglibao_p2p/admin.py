@@ -12,7 +12,7 @@ from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, At
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization, P2PEquityJiuxian
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
-from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization, AdminPrepayment, AdminP2PList
+from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization, AdminP2PList, AdminPrepayment
 from wanglibao.admin import ReadPermissionModelAdmin
 from wanglibao_p2p.forms import RequiredInlineFormSet
 from wanglibao_account.models import UserAddress
@@ -331,6 +331,9 @@ class UserAmortizationAdmin(ConcurrentModelAdmin):
     def has_add_permission(self, request):
         return False
 
+    def get_readonly_fields(self, request, obj=None):
+        return [f.name for f in self.model._meta.fields]
+
 
 class P2PRecordResource(resources.ModelResource):
     user_name = fields.Field(attribute="user__wanglibaouserprofile__name", column_name=u'姓名')
@@ -455,6 +458,9 @@ class ProductAmortizationAdmin(ReadPermissionModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.list_display
 
 
 class EarningAdmin(admin.ModelAdmin):

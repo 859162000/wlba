@@ -20,9 +20,12 @@ from rest_framework.authtoken.models import Token
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from marketing.models import PromotionToken, Channels
+from marketing.models import PromotionToken, Channels, IntroducedBy
 from marketing.utils import set_promo_user
+from wanglibao_account.cooperation import CoopRegister
+from wanglibao_account.cooperation import save_to_binding
 from wanglibao_account.utils import create_user
+from wanglibao_activity.models import ActivityRecord, Activity
 from wanglibao_portfolio.models import UserPortfolio
 from wanglibao_portfolio.serializers import UserPortfolioSerializer
 from wanglibao_rest.serializers import AuthTokenSerializer
@@ -37,7 +40,7 @@ from wanglibao_sms import messages, backends
 from django.utils import timezone
 #from wanglibao_account import message as inside_message
 from misc.models import Misc
-from wanglibao_account.forms import IdVerificationForm
+from wanglibao_account.forms import IdVerificationForm, verify_captcha
 #from marketing.helper import RewardStrategy, which_channel, Channel
 from wanglibao_rest.utils import split_ua, get_client_ip
 from django.http import HttpResponseRedirect
@@ -45,7 +48,8 @@ from wanglibao.templatetags.formatters import safe_phone_str
 from marketing.tops import Top
 from marketing import tools
 from django.conf import settings
-
+from wanglibao_account.models import Binding
+from wanglibao_anti.anti.anti import AntiForAllClient
 
 logger = logging.getLogger(__name__)
 
@@ -59,15 +63,46 @@ class UserPortfolioView(generics.ListCreateAPIView):
         return self.queryset.filter(user_id=user_pk)
 
 
+class CaptchaValidationCodeView(APIView):
+    """ 单独验证验证码 """
+    permission_classes = ()
+
+    def post(self, request, phone):
+        phone_number = phone.strip()
+        phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number)
+        if phone_check:
+            return Response({"message": u"该手机号已经被注册，不能重复注册",
+                            "error_number": ErrorNumber.duplicate,
+                            "type":"exists"}, status=400)
+
+        res, message = verify_captcha(dic=request.POST, keep=True)
+        if not res:
+            return Response({'message': message, "type": "captcha"}, status=403)
+
+        return Response({'message': '验证码正确'}, status=200)
+
+
 class SendValidationCodeView(APIView):
     """
     The phone validate view which accept a post request and send a validate code to the phone
     """
     permission_classes = ()
-    throttle_classes = (UserRateThrottle,)
+    #throttle_classes = (UserRateThrottle,)
 
-    def post(self, request, phone, format=None):
+    def post(self, request, phone):
+        """
+            modified by: Yihen@20150812
+            descrpition: if...else(line98~line101)的修改，增强验证码后台处理，防止被刷单
+        """
         phone_number = phone.strip()
+        if not AntiForAllClient(request).anti_special_channel():
+            res, message = False, u"请输入验证码"
+        else:
+            res, message = verify_captcha(request.POST)
+
+        if not res:
+            return Response({'message': message, "type":"captcha"}, status=403)
+
         status, message = send_validation_code(phone_number, ip=get_client_ip(request))
         return Response({
                             'message': message
@@ -80,12 +115,10 @@ class TestSendRegisterValidationCodeView(APIView):
     def post(self, request, phone):
         phone = phone.strip()
         user = WanglibaoUserProfile.objects.filter(phone=phone).first()
-        print(user)
         if user:
             return Response({"ret_code":-1, "message":"手机号已经注册"})
 
         phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone).first()
-        print(phone_validate_code_item)
 
         if phone_validate_code_item:
             phone_validate_code_item.code_send_count += 1
@@ -105,35 +138,31 @@ class SendRegisterValidationCodeView(APIView):
     permission_classes = ()
     # throttle_classes = (UserRateThrottle,)
 
-    def post(self, request, phone, format=None):
+    def post(self, request, phone):
+        """
+            modified by: Yihen@20150812
+            descrpition: if...else(line153~line156)的修改，增强验证码后台处理，防止被刷单
+        """
         phone_number = phone.strip()
-        #phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number, phone_verified=True)
         phone_check = WanglibaoUserProfile.objects.filter(phone=phone_number)
         if phone_check:
-            return Response({
-                                "message": u"该手机号已经被注册，不能重复注册",
-                                "error_number": ErrorNumber.duplicate
-                            }, status=400)
+            return Response({"message": u"该手机号已经被注册，不能重复注册", 
+                            "error_number": ErrorNumber.duplicate,
+                            "type":"exists"}, status=400)
 
-        #phone_validate_code_item = PhoneValidateCode.objects.filter(phone=phone_number).first()
-        #if phone_validate_code_item:
-        #    count = phone_validate_code_item.code_send_count
-        #    if count > 6:
-        #        return Response({
-        #                            "message": u"该手机号验证次数过于频繁，请联系客服人工注册",
-        #                            "error_number": ErrorNumber.duplicate
-        #                        }, status=400)
+        if not AntiForAllClient(request).anti_special_channel():
+            res, message = False, u"请输入验证码"
+        else:
+            res, message = verify_captcha(request.POST)
+
+        if not res:
+            return Response({'message': message, "type":"captcha"}, status=403)
 
         status, message = send_validation_code(phone_number, ip=get_client_ip(request))
-        return Response({
-                            'message': message
-                        }, status=status)
+        return Response({'message': message, "type":"validation"}, status=status)
 
     def dispatch(self, request, *args, **kwargs):
         return super(SendRegisterValidationCodeView, self).dispatch(request, *args, **kwargs)
-
-
-
 
 class WeixinSendRegisterValidationCodeView(APIView):
     """
@@ -180,9 +209,14 @@ class RegisterAPIView(APIView):
     # serializer_class = RegisterUserSerializer
 
     def post(self, request, *args, **kwargs):
+        """ 
+            modified by: Yihen@20150812
+            descrpition: if(line282~line283)的修改，针对特定的渠道延迟返积分、发红包等行为，防止被刷单
+        """
         identifier = request.DATA.get('identifier', "")
         password = request.DATA.get('password', "")
         validate_code = request.DATA.get('validate_code', "")
+        channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
 
         identifier = identifier.strip()
         password = password.strip()
@@ -206,17 +240,22 @@ class RegisterAPIView(APIView):
 
         device = split_ua(request)
         invite_code = request.DATA.get('invite_code', "")
-        if not invite_code and "channel_id" in device:
-            if device['channel_id'] == "baidu":
-                invite_code = "baidushouji"
-            elif device['channel_id'] == "mi":
-                invite_code = "mi"
-            else:
-                invite_code = ""
+
+        #if not invite_code and "channel_id" in device:
+        #    if device['channel_id'] == "baidu":
+        #        invite_code = "baidushouji"
+        #    elif device['channel_id'] == "mi":
+        #        invite_code = "mi"
+        #    else:
+        #        invite_code = ""
                 #invite_code = device['channel_id']
         #if not invite_code and ("channel_id" in device and device['channel_id'] == "baidu"):
         #    invite_code = "baidushouji"
 
+        
+        if not invite_code:
+            invite_code = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
+           
         if invite_code:
             try:
                 record = Channels.objects.filter(code=invite_code).first()
@@ -226,21 +265,23 @@ class RegisterAPIView(APIView):
                         raise
             except:
                 return Response({"ret_code": 30016, "message": "邀请码错误"})
-        else:
-            invite_code = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
-
+ 
         user = create_user(identifier, password, "")
         if not user:
             return Response({"ret_code": 30014, "message": u"注册失败"})
 
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
+            # 外呼系统登记信息
+            save_to_binding(user, record, request)
+            
 
-        auth_user = authenticate(identifier=identifier, password=password)
-        auth_login(request, auth_user)
+        if device['device_type'] == "pc":
+            auth_user = authenticate(identifier=identifier, password=password)
+            auth_login(request, auth_user)
 
-        tools.register_ok.apply_async(kwargs={"user_id": user.id, 
-                        "device":device})
+        if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
+            tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
         return Response({"ret_code": 0, "message": u"注册成功"})
 
@@ -252,8 +293,13 @@ class WeixinRegisterAPIView(APIView):
     permission_classes = ()
 
     def post(self, request, *args, **kwargs):
+        """ 
+            modified by: Yihen@20150812
+            descrpition: if(line333~line334)的修改，针对特定的渠道延迟返积分、发红包等行为，防止被刷单
+        """
         identifier = request.DATA.get('identifier', "").strip()
         validate_code = request.DATA.get('validate_code', "").strip()
+        channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
 
         if not identifier or not validate_code:
             return Response({"ret_code": 30021, "message": "信息输入不完整"})
@@ -290,7 +336,9 @@ class WeixinRegisterAPIView(APIView):
         send_rand_pass(identifier, password)
 
         device = split_ua(request)
-        tools.register_ok.apply_async(kwargs={"user_id": user.id, "device":device})
+        if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
+            tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
         return Response({"ret_code": 0, "message": "注册成功"})
 
 
@@ -547,7 +595,6 @@ class TopsOfDayView(APIView):
                 isvalid = 0
                 pass
         except Exception, e:
-            print e
             return Response({"ret_code": -1, "records": list()})
 
         return Response({"ret_code": 0, "records": records, "isvalid": isvalid})
@@ -568,7 +615,6 @@ class TopsOfWeekView(APIView):
             if len(records) == 0 and (datetime.utcnow().date() - top.activity_start.date()).days > int(week):
                 isvalid = 0
         except Exception, e:
-            print e
             return Response({"ret_code": -1, "records": list()})
 
         return Response({"ret_code": 0, "records": records, "isvalid": isvalid})
@@ -676,6 +722,10 @@ class IdValidate(APIView):
 
             device = split_ua(request)
             tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+            #处理渠道回调
+            CoopRegister(self.request).process_for_validate(user)
+
             return Response({ "validate": True }, status=200)
 
         else:
@@ -713,8 +763,49 @@ class AdminIdValidate(APIView):
                             "validate": True
                         }, status=200)
 
+class LoginAPIView(APIView):
+    permission_classes = ()
+
+    def post(self, request, *args, **kwargs):
+        identifier = request.DATA.get("identifier", "")
+        password = request.DATA.get("password", "")
+
+        if not identifier or not password:
+            return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
+
+        user = authenticate(identifier=identifier, password=password)
+
+        if not user:
+            return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
+        if not user.is_active:
+            return Response({"token":"false", "message":u"用户已被关闭"}, status=400)
+        if user.wanglibaouserprofile.frozen:
+            return Response({"token":"false", "message":u"用户已被冻结"}, status=400)
+
+        push_user_id = request.DATA.get("user_id", "")
+        push_channel_id = request.DATA.get("channel_id", "")
+        # 设备类型，默认为IOS
+        device_type = request.DATA.get("device_type", "ios")
+        if device_type not in ("ios", "android"):
+            return Response({'message': "device_type error"}, status=status.HTTP_200_OK)
+
+        if push_user_id and push_channel_id:
+            pu = UserPushId.objects.filter(push_user_id=push_user_id).first()
+            exist = False
+            if not pu:
+                pu = UserPushId()
+                pu.device_type = device_type
+                exist = True
+            if exist or pu.user != user or pu.push_channel_id != push_channel_id:
+                pu.user = user
+                pu.push_user_id = push_user_id
+                pu.push_channel_id = push_channel_id
+                pu.save()
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({'token': token.key, "user_id":user.id}, status=status.HTTP_200_OK)
 
 class ObtainAuthTokenCustomized(ObtainAuthToken):
+    permission_classes = ()
     serializer_class = AuthTokenSerializer
 
     def post(self, request, *args, **kwargs):
@@ -973,3 +1064,28 @@ class GestureIsEnabledView(APIView):
         u_profile_object.save()
 
         return Response({"ret_code": 0, "message": u"设置成功"})
+
+
+class GuestCheckView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        user = self.request.user
+
+        p2p_record = P2PRecord.objects.filter(user=user, catalog='申购').first()
+
+        # 已经购买， 不是新用户
+        if p2p_record:
+            return Response({"ret_code": 1, "message": u"不是新用户，不符合活动标准！"})
+
+        introduced_by = IntroducedBy.objects.filter(user=user, channel__code='xunlei8').first()
+
+        # 渠道是xunlei8
+        if introduced_by:
+            activity_record = ActivityRecord.objects.filter(user=user, activity__code='xunlei8').first()
+            data = dict()
+            data['has_rewarded'] = True if activity_record else False
+            return Response({"ret_code": 0, "data": data})
+        # 渠道不符合标准
+        else:
+            return Response({"ret_code": 2, "message": u"抱歉，不符合活动标准！"})

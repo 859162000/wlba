@@ -3,10 +3,12 @@
   require.config({
     paths: {
       jquery: 'lib/jquery.min',
-      'jquery.validate': 'lib/jquery.validate.min'
+      'jquery.validate': 'lib/jquery.validate.min',
+      'jquery.modal': 'lib/jquery.modal.min'
     },
     shim: {
-      'jquery.validate': ['jquery']
+      'jquery.validate': ['jquery'],
+      'jquery.modal': ['jquery']
     },
     waitSeconds: 0
   });
@@ -66,3 +68,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=pay.js.map

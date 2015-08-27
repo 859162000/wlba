@@ -7,6 +7,7 @@ import datetime
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
+from django.utils import timezone
 
 
 class IdVerification(models.Model):
@@ -64,7 +65,7 @@ class Binding(models.Model):
         third app bind table, store bind related
     """
     user = models.ForeignKey(User)
-    btype = models.CharField(max_length=10, choices=(
+    btype = models.CharField(max_length=20, choices=(
         ('xunlei', 'xunlei'),
         ('yiruite', 'yiruite')
     ), verbose_name=u"类型")
@@ -85,17 +86,18 @@ class Binding(models.Model):
         verbose_name_plural = u'用户绑定'
 
 message_type = (
-    ("withdraw", "提现通知"),
-    ("pay", "充值通知"),
-    ("amortize", "项目还款"),
-    ("activityintro", "活动介绍"),
-    ("activity", "活动奖励"),
-    ("bids", "流标通知"),
-    ("purchase", "投标通知"),
-    ("fullbid", "满标"), #给管理员发
-    ("loaned", "投标成功"),#给持仓人发
+    ("withdraw", u"提现通知"),
+    ("pay", u"充值通知"),
+    ("amortize", u"项目还款"),
+    ("activityintro", u"活动介绍"),
+    ("activity", u"活动奖励"),
+    ("bids", u"流标通知"),
+    ("purchase", u"投标通知"),
+    ("fullbid", u"满标"), #给管理员发
+    ("loaned", u"投标成功"),#给持仓人发
     #("audited", "满标已审核"),
-    ("public", "发给所有"),
+    ("public", u"发给所有"),
+    ("invite", u"邀请奖励")
 )
 def timestamp():
     return long(time.time())
@@ -165,6 +167,24 @@ class UserAddress(models.Model):
     postcode = models.CharField(max_length=6, verbose_name=u"邮政编码", blank=True)
     is_default = models.BooleanField(default=False, verbose_name=u"是否为默认")
 
+class UserSource(models.Model):
+    """
+        user baidu source keyword
+    """
+    user = models.ForeignKey(User)
+    keyword = models.CharField(max_length=50, verbose_name=u"收件人姓名", blank=False, null=False, default="")
+
+
+class UserPhoneBook(models.Model):
+    user = models.ForeignKey(User)
+    phone = models.CharField(max_length=64, blank=True, help_text=u'通讯录电话')
+    name = models.CharField(max_length=50, blank=True, verbose_name=u"姓名")
+    is_register = models.BooleanField(default=False, verbose_name=u"是否注册")
+    is_invite = models.BooleanField(default=False, verbose_name=u"是否邀请")
+    invite_at = models.DateTimeField(null=True, blank=True, verbose_name=u'最后一次邀请提醒时间')
+    alert_at = models.DateTimeField(null=True, blank=True, verbose_name=u'最后一次投资提醒时间')
+    created_at = models.DateTimeField(auto_now_add=True, default=timezone.now())
+    is_used = models.BooleanField(default=True, verbose_name=u"是否使用", help_text=u'默认使用')
 
 
 #发给所有人

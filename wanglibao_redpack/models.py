@@ -103,7 +103,7 @@ class RedPack(models.Model):
         verbose_name_plural = u"红包列表"
 
     def __unicode__(self):
-        return u'%s<%s>' % (self.id, self.event.name)
+        return u'%s<%s-%s>' % (self.id, self.event.id, self.event.name)
 
 class RedPackRecord(models.Model):
     redpack = models.ForeignKey(RedPack, verbose_name=u"红包")
@@ -114,7 +114,7 @@ class RedPackRecord(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
     apply_at = models.DateTimeField(verbose_name=u'使用时间', null=True)
     apply_amount = models.FloatField(null=True, default=0.0, verbose_name=u'使用金额')
-    order_id = models.IntegerField(verbose_name=u'关联订单', null=True)
+    order_id = models.IntegerField(verbose_name=u'关联订单', null=True, db_index=True)
 
     class Meta:
         verbose_name = u"红包流水"

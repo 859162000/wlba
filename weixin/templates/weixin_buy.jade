@@ -26,7 +26,7 @@ html
                 amount = int(amount)
                 if amount == 0
                   amount = ''
-                input(type="tel",value="{{amount}}",placeholder="输入100的整数倍金额",p2p-type="{{p2p.category}}",data-max="{{orderable_amount}}",data-role="p2p-calculator",fee-target="#xunlei-vip-income-head",data-target="#expected_income", data-existing="0", data-rate="{{p2p.expected_earning_rate}}", data-period="{{p2p.period}}", data-paymethod="{{p2p.pay_method}}", activity-rate="{{p2p.activity.rule.percent_text}}", maxlength="8").amount.balance-middle
+                input(type="tel",value="{{amount}}",placeholder="输入100的整数倍金额",p2p-type="{{p2p.category}}",data-max="{{orderable_amount}}",data-role="p2p-calculator",fee-target="",data-target="#expected_income", data-existing="0", data-rate="{{p2p.expected_earning_rate}}", data-period="{{p2p.period}}", data-paymethod="{{p2p.pay_method}}", activity-rate="{{p2p.activity.rule.percent_text}}", maxlength="8").amount.balance-middle
                 p.balance-right 元
             .buy-balance-three
               p.balance-left 可用红包
@@ -81,4 +81,5 @@ html
             .callban-url
               a(href="/weixin/list/") 返回首页
               a(href="/weixin/account/") 查看账户
+    include include/tracking
     script(data-init="buy", src="/static/scripts/mobile/dist/mobile.js")

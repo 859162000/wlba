@@ -65,25 +65,18 @@ var org = (function(){
                     earning = 0;
                 }
                 earning_elements = (target.attr('data-target')).split(',');
-                fee_elements = (target.attr('fee-target')).split(',');
 
                 for (var i = 0; i < earning_elements.length; i ++) {
                     earning_element = earning_elements[i];
                     if (earning) {
+                        fee_earning = fee_earning ? fee_earning : 0;
                         earning += fee_earning;
                         $(earning_element).text(earning.toFixed(2));
                     } else {
                         $(earning_element).text("0.00");
                     }
                 }
-                for (var j = 0; j < fee_elements.length;  j++) {
-                    fee_element = fee_elements[j];
-                    if (fee_earning) {
-                       $(fee_element).text(fee_earning);
-                    } else {
-                        $(fee_element).text("0.00");
-                    }
-                }
+
                 callback && callback(target);
             });
         },
@@ -382,8 +375,11 @@ org.login = (function(org){
 
 org.regist = (function(org){
     var lib ={
+        $captcha_img : $('#captcha'),
+        $captcha_key : $('input[name=captcha_0]'),
         init:function(){
-            lib._checkFrom()
+            lib._captcha_refresh();
+            lib._checkFrom();
             lib._animateXieyi();
         },
         _animateXieyi:function(){
@@ -418,13 +414,23 @@ org.regist = (function(org){
                 },200)
             })
         },
+        _captcha_refresh :function(){
+            var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
+            $.get(captcha_refresh_url, function(res) {
+                lib.$captcha_img.attr('src', res['image_url']);
+                lib.$captcha_key.val(res['key']);
+            });
+        },
         _checkFrom:function(){
             var $submit = $('button[type=submit]'),
                 $identifier = $('input[name=identifier]'),
                 $password = $('input[name=password]'),
                 $validation =  $('input[name=validation]'),
                 $invitation = $('input[name=invitation]'),
-                $agreement = $('input[name=agreement]');
+                $agreement = $('input[name=agreement]'),
+                $captcha_0 =  $('input[name=captcha_0]'),
+                $captcha_1 =  $('input[name=captcha_1]');
+
 
             org.ui.focusInput({
                 submit : $submit,
@@ -432,7 +438,8 @@ org.regist = (function(org){
                     {target : $identifier,  required:true},
                     {target :$password,required : true},
                     {target: $validation,required : true},
-                    {target: $invitation, required: false}
+                    {target: $invitation, required: false},
+                    {target: $captcha_1, required: true}
                 ],
                 otherTarget : [{target: $agreement,required: true}]
             });
@@ -441,24 +448,34 @@ org.regist = (function(org){
                 $(this).hasClass('agreement') ?  $(this).find('input').attr('checked','checked') : $(this).find('input').removeAttr('checked');
                 $identifier.trigger('input')
             })
+            //刷新验证码
+            lib.$captcha_img.on('click', function() {
+                lib._captcha_refresh();
+            });
 
-            //验证码
+
+            //手机验证码
             $('.request-check').on('click',function(){
                 var phoneNumber = $identifier.val(),
                     $that = $(this), //保存指针
-                    count = 180,  //180秒倒计时
+                    count = 60,  //60秒倒计时
                     intervalId ; //定时器
 
-                if(!check['identifier'](phoneNumber, 'phone')) return //号码不符合退出
+                if(!check['identifier'](phoneNumber, 'phone')) return  //号码不符合退出
                 $that.attr('disabled', 'disabled').addClass('regist-alreay-request');
                 org.ajax({
                     url : '/api/phone_validation_code/register/' + phoneNumber + '/',
+                    data: {
+                        captcha_0 : $captcha_0.val(),
+                        captcha_1 : $captcha_1.val(),
+                    },
                     type : 'POST',
                     error :function(xhr){
                         clearInterval(intervalId);
                         var result = JSON.parse(xhr.responseText);
                         org.ui.showSign(result.message);
                         $that.text('获取验证码').removeAttr('disabled').removeClass('regist-alreay-request');
+                        lib._captcha_refresh();
                     }
                 });
                 //倒计时
@@ -469,7 +486,7 @@ org.regist = (function(org){
                     } else {
                         clearInterval(intervalId);
                         $that.text('重新获取').removeAttr('disabled').removeClass('regist-alreay-request');
-                        return
+                        return lib._captcha_refresh();
                     }
                 };
                 timerFunction();
@@ -505,23 +522,29 @@ org.regist = (function(org){
                 })
 
                 if(!isSubmit) return false
-                var token = '';
-                $invitation.val() === '' ? token =  $('input[name=token]').val() : token = $invitation.val();
+                var tid = org.getQueryStringByName('tid');
+                var token = $invitation.val() === '' ?  $('input[name=token]').val() : $invitation.val();
                 org.ajax({
                     url: '/api/register/',
                     type: 'POST',
                     data: {
                             'identifier':       $identifier.val(),
                             'password':         $password.val(),
+                            'captcha_0':        $captcha_0.val(),
+                            'captcha_1':        $captcha_1.val(),
                             'validate_code':    $validation.val(),
-                            'invite_code':      token
+                            'invite_code':      token,
+                            'tid' : tid,
                     },
                     beforeSend: function() {
                         $submit.text('注册中,请稍等...');
                     },
                     success:function(data){
                         if(data.ret_code === 0){
-                            window.location.href = '/weixin/regist/succees/';
+                            var next = org.getQueryStringByName('next') == '' ? '/weixin/regist/succees/' : org.getQueryStringByName('next');
+                            next = org.getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ org.getQueryStringByName('mobile');
+                            next = org.getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ org.getQueryStringByName('serverId');
+                            window.location.href = next;
                         }else if(data.ret_code > 0){
                             org.ui.showSign(data.message)
                             $submit.text('立即注册 ｜ 领取奖励');

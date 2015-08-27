@@ -76,13 +76,13 @@ mixin innerFooter()
   else
     class_name = 'footer-bottom'
   div(class="{{class_name}}")
-    .footer-copyright 北京网利科技有限公司（北京市朝阳区霄云路天元港中心 A 座 610 室） Copyright©2014 wanglibao.com Inc. All Right Reserved. 京 ICP 备 14014548号-1
+    .footer-copyright 北京网利科技有限公司（北京市朝阳区东三环北路乙2号海南航空大厦A座7层） Copyright©2015 wanglibao.com Inc. All Right Reserved. 京 ICP 备 14014548号-1
     .footer-auth
       a.icon.icon-auth-itrust(href="http://www.itrust.org.cn/yz/pjwx.asp?wm=1091876832", target="_blank")
       a.icon.icon-auth-ssl(href="http://www.instantssl.com/wildcard-ssl.html", target="_blank")
       a.icon.icon-auth-cx(href="https://search.szfw.org/cert/l/CX20150611010303010832", target="_blank")
 
-  #login-modal(style="display:none")
+  #login-modal(style="display:none;z-index:30")
     .padding-s
       ul.login-modal-tab
         li#tab-login.active 用户登录
@@ -90,6 +90,17 @@ mixin innerFooter()
 
       include include/login_form
       include include/register_form
+  #img-code-div(style="display:none")
+    form#img-code-form.img-code-form(method='post', action='')
+        .form-row
+            label.img-code-label 请输入验证码：
+            input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
+            input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
+            img.captcha.captcha-img(alt="captcha", src="")
+            button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
+        .code-img-error
+        .clearfix.tc
+            span.submit-code-img#submit-code-img1 确定
 
   if not no_footbar
     if not user.is_authenticated
@@ -97,8 +108,8 @@ mixin innerFooter()
         .container.footbar-container
           span.footbar-building
           dl.pingan
-            dt 平安保险全额承保
-            dd 账户资金安全由平安保险全额承保
+            dt 阳光保险承保
+            dd 账户资金安全由阳光保险承保
           dl
             dt 高收益
             dd 收益是银行活期 30 倍以上

@@ -1,10 +1,9 @@
 doctype html
 - with '管理团队' as title
-include include/head
+include include/common_head
 - endwith
 body
-  include include/header
-  include include/navigation
+  include global/g_nav
   .container.margin-bottom-xxl
     .siderbar-div
       - with '核心团队' as title
@@ -17,5 +16,5 @@ body
 
 
 
-  include include/footer
+  include global/g_footer
   include include/tracking

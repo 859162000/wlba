@@ -7,18 +7,60 @@
   });
 
   require(['jquery'], function($) {
+      //固定回到顶部
+     function backtop(box){
+       var k=document.body.clientWidth,
+         e=box.width();
+         q=k-e;
+         w=q/2;
+         r= e+w;
+         a=r+20+'px';
+       return a;
+     }
+
+    var left2;
+    left2=backtop($(".gjw-gold"));
+    //浏览器大小改变触发的事件
+    window.onresize = function(){
+      left2 = backtop($(".gjw-gold"));
+    };
+    //赋值
+    $('.xl-backtop').css({'left':left2});
+
+    //显示微信二维码
+   $('#xl-weixin').on('mouseover',function(){
+     $('.erweima').show();
+   });
+
+    $('#xl-weixin').on('mouseout',function(){
+     $('.erweima').hide();
+   })
+
+    //返回顶部
+    $(window).scroll(function () {
+        if ($(document).scrollTop() > 0) {
+            $(".xl-backtop").fadeIn();
+        } else if ($(document).scrollTop() <= 0) {
+            $('.xl-backtop').stop().fadeOut();
+        }
+    });
+
+    $('.backtop').on('click',function(){
+      $('body,html').animate({scrollTop: 0}, 600);
+      return false
+    })
     //模态口
     var body_h=$('body').height();
     $('#small-zc').height(body_h);
     //关闭模态窗
-    $('.first-xl-off,.first-xl-off2').on('click',function(){
+    $('.first-xl-off,.first-xl-off2,.look,.agin').on('click',function(){
       $('#small-zc').hide();
     });
     $('#small-zc').on('click',function(){
       $('#small-zc').hide();
     });
     //阻止冒泡
-     $('.xl-box1,#seven-success').on('click',function(event){
+     $('.xl-box1,#seven-success,#activity-over,#gjw-success').on('click',function(event){
        if (event.stopPropagation){
          event.stopPropagation();
        }else{
@@ -105,7 +147,113 @@
           })
         }
       }
+
     })
+    //赶集网效果//滑动到相应区域
+    $('#prize-two').on('click',function(){
+      var re_top=$('#recharge').offset().top;
+      $('body,html').animate({scrollTop:re_top}, 600);
+      return false
+    })
+    $('#prize-four').on('click',function(){
+      var re_top2=$('#tour').offset().top;
+      $('body,html').animate({scrollTop:re_top2}, 600);
+      return false
+    })
+
+    //点击领取
+    $('.gjw-reg').on('click',function(){
+      if ($(this).hasClass('reg1')){
+        $('#small-zc').show();
+      }else{
+        $('#seven-success').hide();
+        window.location.href="/";
+      }
+    })
+
+    $('.gjw-reg3').on('click',function(){
+      if ($(this).hasClass('reg2')){
+        $('#small-zc').show();
+      }else{
+        $('#small-zc').show();
+        $('#box1').hide();
+        $('#gjw-success').children('p').text('请到投资页进行投资!')
+        $('#gjw-success').children('ul').show();
+        $('#gjw-success').children('a').hide();
+        $('.fast').text('立即投资');
+        $('#gjw-success').show();
+      }
+
+    })
+    //领取奖品
+    $('.gjw-recharge').on('click',function(){
+      if ($(this).hasClass('gjw-star')){
+        $('#box1').show();
+        $('#gjw-success').hide();
+        $('#small-zc').show();
+      }else if ($(this).hasClass('notouch')){
+        $('#small-zc').show();
+        $('#box1').hide();
+        $('#gjw-success').children('p').text('奖品发放完毕')
+        $('#gjw-success').children('ul').hide();
+        $('#gjw-success').children('a').show();
+        $('#gjw-success').show();
+      }else{
+        $('#small-zc').show();
+        $('#box1').hide();
+        $('#gjw-success').children('p').text('您还没有充值哦!')
+        $('#gjw-success').children('ul').show();
+        $('#gjw-success').children('a').hide();
+        $('.fast').text('立即充值')
+        $('#gjw-success').show();
+      }
+    });
+
+    //控制跳转
+    $('.fast').on('click',function(){
+      if($(this).text()=='立即充值'){
+        window.location.href='/pay/banks/'
+      }
+      if($(this).text()=='立即投资'){
+        window.location.href='/p2p/list/'
+      }
+    })
+
+    //马上报名
+    $('.gjw-small-com').on('click',function(){
+      if ($(this).hasClass('go')){
+        $('#box1').show();
+        $('#gjw-success').hide();
+        $('#small-zc').show();
+      }else{
+        window.location.href="/"
+      }
+
+    })
+    //点击旅游路线
+    $('#tour_line').on('click',function(){
+      $('.gjw-tour').slideToggle(300)
+    })
+
+    //倒计时
+    count_down = function(o) {
+      var sec, timer;
+      sec = (new Date(o.replace(/-/ig, '/')).getTime() - new Date().getTime()) / 1000;
+      sec = parseInt(sec);
+      timer = setTimeout((function() {
+        count_down(o);
+      }), 1000);
+      if (sec <= 0) {
+        console.log('时间到')
+        $('#small-zc').show();
+        $('#box1').hide();
+        $('#activity-over').show();
+      }
+    };
+
+    count_down('2015-09-15 00:00:00')
+
+
   });
 
 }).call(this);

@@ -1,0 +1,54 @@
+- load formatters
+doctype html
+html(style="background:#fff")
+  head
+    title 【七夕节】七夕有礼，好事成双
+    include include/app_head
+  body
+    .extension-banner
+      img(src="/static/imgs/mobile_activity/app_qixi/banner2.jpg")
+    .qixi-main(style="height:19.45rem")
+      .qixi-time
+        img(src="/static/imgs/mobile_activity/app_qixi/tu3.jpg")
+      .qixi-sao
+        p.qixi-zhu 注：限活动期间内首次投资赠送现金以
+          br
+          span 红包的形式发送。
+        .qixi-er#saoma
+          p.text 扫描下方二维码，下载网利宝APP
+            br
+            |立即投资吧！
+          .qixi-ma
+            img(src="/static/imgs/mobile_activity/app_qixi/sao.jpg")
+          p.text(style="font-size:0.7rem") 若无法扫描，Android用户前往应用宝下
+            br
+            |载，IOS用户请前往APP store下载。
+
+      h3 投资流程
+      .qixi-liucheng
+        img(src="/static/imgs/mobile_activity/app_qixi/liucheng.jpg")
+      h3 活动规则
+      ul
+        li 1. 手机号为网利宝唯一账户，本次活动福利仅限APP端专享，新用户为未投资用户；
+        li 2. 活动期间内通过APP注册网利宝，送10元现金红包。在活动期间内用户首次投资满1000元送20元现金红包。此现金红包为APP专享红包；
+        li 3. 奖励红包有效期到2015年9月30日。红包统一以站内信形式通知，完成一次投资回款后即可取现；
+        li 4. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+        li 5、网利宝对此活动享有最终解释权。
+        li#ios-show(style="display:none") 6、所有活动由网利宝提供，与苹果公司（Apple Inc.）无关。
+      a#go.qixi-btn 立即参与
+    script(src="/static/js/lib/jquery.min.js")
+    script.
+      var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+          iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+          ios = ipad || iphone;
+      if (ios) {
+          document.getElementById('ios-show').style.display = 'block';
+      }
+      $('#go').on('click',function(){
+        var re_top=$('#saoma').offset().top;
+        $('body,html').animate({scrollTop:re_top}, 600);
+        return false
+      })
+
+
+

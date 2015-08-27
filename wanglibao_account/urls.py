@@ -4,17 +4,18 @@
 from django.conf import settings
 from django.conf.urls import patterns, url, include
 from django.contrib.auth.decorators import login_required
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 from registration.backends.default.views import ActivationView
 from forms import EmailOrPhoneAuthenticationForm
 from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView, AccountHome,
                    AccountTransaction, AccountBankCard, AccountTransactionP2P, IdVerificationView,
                    AccountTransactionDeposit, AccountRedPacket,
                    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract,
-                   Third_login, Third_login_back, IntroduceRelation, MessageView, MessageDetailAPIView, MessageCountAPIView,
-                   MessageListAPIView, AccountRepayment, AddressView, AccountInviteView)#, CjdaoApiView)
+                   Third_login, Third_login_back, MessageView, MessageDetailAPIView, MessageCountAPIView,
+                   MessageListAPIView, AccountRepayment, AddressView, AccountInviteView, user_product_contract_kf)#, CjdaoApiView)
 from django.contrib.auth import views as auth_views
 from views import AutomaticView
+from wanglibao_lottery.views import LotteryListTemplateView
 
 urlpatterns = patterns(
     '',
@@ -27,6 +28,7 @@ urlpatterns = patterns(
     url(r'^p2p/amortization/(?P<product_id>\d+)', login_required(P2PAmortizationView.as_view(),
                                                                  login_url='/accounts/login/')),
     url(r'^p2p/contract/(?P<product_id>\d+)', user_product_contract),
+    url(r'^contract_for_kf',                 user_product_contract_kf),
     url(r'^transaction/fund/$', login_required(AccountTransaction.as_view(),
                                                login_url='/accounts/login/')),
     url(r'^transaction/p2p/$', login_required(AccountTransactionP2P.as_view(), login_url='/accounts/login/')),
@@ -35,6 +37,9 @@ urlpatterns = patterns(
     url(r'^repayment/$', login_required(AccountRepayment.as_view(), login_url='/accounts/login/')),
     url(r'^transaction/deposit/$', login_required(AccountTransactionDeposit.as_view(),
                                                   login_url='/accounts/login/')),
+    # 彩票详情页
+    # url(r'^caipiao/detail/$', login_required(AccountTransactionDeposit.as_view(),
+    #                                               login_url='/accounts/login/')),
     url(r'^transaction/withdraw/$', login_required(AccountTransactionWithdraw.as_view(),
                                                    login_url='/accounts/login/')),
     url(r'^bankcard/$', login_required(AccountBankCard.as_view(),
@@ -44,7 +49,7 @@ urlpatterns = patterns(
     url(r'^setting/$', login_required(TemplateView.as_view(template_name='account_setting.jade'),
                                       login_url='/accounts/login/')),
     url(r'^id_verify/$', login_required(IdVerificationView.as_view(), login_url='/accounts/login/')),
-    url(r'^add_introduce/$', login_required(IntroduceRelation.as_view(), login_url='/accounts/login/')),
+    #url(r'^add_introduce/$', login_required(IntroduceRelation.as_view(), login_url='/accounts/login/')),
 
     url(r'^invite/$', login_required(AccountInviteView.as_view(), login_url='/accounts/login/')),
 
@@ -52,14 +57,16 @@ urlpatterns = patterns(
 
     url(r'^login/$', 'django.contrib.auth.views.login',
         {
-            "template_name": "login.jade",
+            "template_name": "login_test.jade",
             "authentication_form": EmailOrPhoneAuthenticationForm,
         }, name="auth_login"),
+
+
     url(r'^login/callback/$', login_required(Third_login_back.as_view())),
     url(r'^login/(?P<login_type>\w+)/$', login_required(Third_login.as_view())),
 
     url(r'^register/$', RegisterView.as_view(), name='auth_register'),
-    url(r'^register/wap/$', TemplateView.as_view(template_name='register_wap.jade'), name='wap_register'),
+    url(r'^register/wap/$', RedirectView.as_view(url='/weixin/regist/', permanent=True), name='wap_register'),
     url(r'^register/ajax/$', 'wanglibao_account.views.ajax_register'),
 
     url(r'^message/$', login_required(MessageView.as_view(), login_url='/accounts/login/')),
@@ -98,6 +105,7 @@ urlpatterns = patterns(
     url(r'^address/$', login_required(AddressView.as_view(), login_url='/accounts/login/'), name='accounts_address'),
 
     url(r'^auto_tender/$', login_required(AutomaticView.as_view(), login_url='/accounts/login/')),
+    url(r'^caipiao/$', login_required(LotteryListTemplateView.as_view(), login_url='/accounts/login/')),
 )
 
 if settings.DEBUG:

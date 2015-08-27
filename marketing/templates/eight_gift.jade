@@ -1,0 +1,297 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    link(rel="stylesheet",href="/static/stylesheets/ganjiwang.css")
+    link(rel="stylesheet",href="/static/stylesheets/eight_gift.css")
+  body(style="background:#ee744f")
+    include include/activityTop2
+    .wrap#eight_gift_banner
+      p.bann 活动时间：2015年8月3日——8月8日
+    .eight_gift-content
+      .eight_gift_one
+        .eight_gift_biao
+        .eight_gift_line
+        .eight_gift_img
+        .eight_gift_back
+          h3 第一重【全民有礼】
+          p.eight_gift_backone 活动时间：8月3日—8月8日
+          p.eight_gift_backone 活动形式：全民有礼，特权来袭！活动期间内新注册网利宝首次投资并满额的用户，每天根据发奖先后顺序，均可在四份奖品中随机获得一份，数量有限，先到先得发完为止！
+          .eight_gift_backzhong
+            p 1000元 > 投资额 ≥500元，可随机获得奖品一份如下：
+          dl(style='margin:0')
+            dt.top-eight
+            dd 50Ｇ快盘容量
+            dt.bottom-eight
+          dl
+            dt.top-eight
+            dd 7天风行网会员
+            dt.bottom-eight.bottom-eight1
+          dl
+            dt.top-eight
+            dd 7天爱奇艺会员
+            dt.bottom-eight.bottom-eight2
+          dl
+            dt.top-eight
+            dd 10元扣电影代金券
+            dt.bottom-eight.bottom-eight3
+          .eight_gift_backzhong
+            p 投资额≥1000元，可随机获得奖品一份如下：
+          dl(style='margin:0 0 30px 0')
+            dt.top-eight
+            dd 100Ｇ快盘容量
+            dt.bottom-eight
+          dl
+            dt.top-eight
+            dd 一个月风行网会员
+            dt.bottom-eight.bottom-eight4
+          dl
+            dt.top-eight
+            dd 一个月爱奇艺会员
+            dt.bottom-eight.bottom-eight5
+          dl
+            dt.top-eight
+            dd ２0元扣电影代金券
+            dt.bottom-eight.bottom-eight6
+          p.eight_gift_backzhong1 说明：用户完成满额投资后，系统自动发送一个礼物到用户账户。
+          if user.is_authenticated
+            a(href='/p2p/list/' data-num="true").button-eight 立即投资
+          else
+            a(href='/accounts/login/' data-num="false").button-eight 立即投资
+          //a(href='https://www.wanglibao.com/p2p/list/').button-eight 立即投资
+
+      .eight_gift_two
+        .eight_gift_biao
+        .eight_gift_line
+        .eight_gift_img.eight_gift_img1
+        .eight_gift_back
+          h3 第二重【红包重礼】
+          p.eight_gift_backone 活动时间：8月3日—8月7日
+          p.eight_gift_backone 活动形式：高额红包大福利，限时限量，每天限量5000个，机会难得！（每位用户每天限领一次，红包领完不要灰心，第二天早点来）
+          dl(style='margin:0')
+            //dd 单笔投资≥10万
+            dt.bottom-eight
+          dl
+            //dd 单笔投资≥20万
+            dt.bottom-eight.bottom-eight1
+          dl
+            //dd 单笔投资≥30万
+            dt.bottom-eight.bottom-eight2
+          dl
+            //dd 单笔投资≥30万
+            dt.bottom-eight.bottom-eight3
+          p.eight_gift_backzhong1 说明：以上红包均按投资额的1%折扣使用（红包有效期至8月11日）。
+          if user.is_authenticated
+            a(data-num="true")#first-btn.button-eight 一键领取
+          else
+            a(data-num="false")#first-btn.button-eight 一键领取
+      //.xl-box1(style="height:20px")
+      //    a(href='#').button-eight 一键领取
+
+      .eight_gift_three
+        .eight_gift_biao
+        .eight_gift_line
+        .eight_gift_img.eight_gift_img2
+        .eight_gift_back
+          h3
+            |第三重【发财大礼】
+            span#jinjiang 即将揭晓
+          p.eight_gift_backone 活动时间：8月8日（仅限一天）
+          p.eight_gift_backone 活动形式：逢八必发，超级发财机会仅此一天！
+          p.eight-countdown#eight-countdown
+            |距离开始还有
+            span(style='color: #f6cf3f')#display
+            |天
+          .eight-time#eight-time
+            span#display1
+            |:
+            span#display2
+            |:
+            span#display3
+          if user.is_authenticated
+            a(href='/p2p/list/' data-num="true").button-eight#button-eight 立即投资
+          else
+            a(href='/accounts/login/' data-num="false").button-eight#button-eight 立即投资
+      .eight_gift_four
+        .eight_gift_biao
+        .eight_gift_line
+        .eight_gift_img.eight_gift_img3
+        .eight_gift_back
+          h3 第四重【投资豪礼】
+          p.eight_gift_backone 利上有礼，HIGH翻全场！活动期间内单笔投资额达到10万以上，即可获得额外现金红包奖励！
+          dl(style='margin:0')
+            dd.eight-gift 单笔投资≥10万
+            dt.bottom-eight
+            dd.eight-gift1 1000元现金红包
+          dl
+            dd.eight-gift 单笔投资≥20万
+            dt.bottom-eight.bottom-eight1
+            dd.eight-gift1 2000元现金红包
+          dl
+            dd.eight-gift 单笔投资≥30万
+            dt.bottom-eight.bottom-eight2
+            dd.eight-gift1 3000元现金红包
+          if user.is_authenticated
+            a(href='/p2p/list/' data-num="true").button-eight 立即投资
+          else
+            a(href='/accounts/login/' data-num="false").button-eight 立即投资
+          p.eight_gift_backzhong1 现金奖励在三个工作日内以红包形式发出，红包类型为现金红包，投资或取现不限门槛。
+
+        .eight_gift_five
+          h3 活动规则
+          p.eight_gift_backone 1. 注册网利宝用户，均可在活动期间领取高额红包福利；
+          p.eight_gift_backone 2. 每天领取红包均为折扣红包，按投资金额的1%折扣使用，红包有效期至8月11日；
+          p.eight_gift_backone 3. 全民有礼活动奖品为满额投资后系统随机发放1个（四选一），奖品发完为止，先到先得。所得奖品不可调换不可升级不可兑现；
+          p.eight_gift_backone 4. 投资豪礼奖品为现金红包。活动红包统一以站内信形式通知，完成一次投资回款后即可取现；
+          p.eight_gift_backone 5. 所有红包均只能使用一次，使用后是否有余额即失效；
+          p.eight_gift_backone 6. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+          p.eight_gift_backone 7. 网利宝对此活动享有最终解释权。
+
+
+.footer(style="background:#fff9eb;margin-top:0")
+  include include/activityFooterTwo
+  include include/tracking
+#small-zc
+    .wrap(style="background:none")
+      .gold2
+        .xl-box1#box1
+          .xl-small-zc
+            span.first-xl-off ×
+            .denelu-form(style="top:20px;left:32px")
+              h1.biaoyu  领取1000元现金红包
+              //.align-center
+              //  a.font-s.blue(href="http://act.vip.xunlei.com/vip/2015/p2pcash/#wlb") 【立即领取】
+              form#register-modal-form2.login-form.dale(method='post', action='/accounts/register/ajax/')
+                - csrf_token
+                .form-row
+                  .form-control-group
+                    .span12
+                      input#reg_identifier2.com-tu.tu1(type="text", name="identifier", placeholder="请输入手机号")
+                  .form-row-error
+                .form-row.voice
+                  .span12-omega.hidden.show
+                    没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
+                  .form-control-group
+                    .span6
+                      input#id_validate_code2.com-tu.tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+                    .span6-omega
+                      button#button-get-validate-code-modal2.button-orange.button-large.huoqu-ma.new-btn(type='button',style="top:-2px") 获取验证码
+                  .form-row-error
+                .form-row
+                  input#reg_password4.full-width.com-tu.tu3(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")
+                  .password-strength-container
+                    span.password-strength-1
+                    span.password-strength-2
+                    span.password-strength-3
+                  .form-row-error
+                .form-row
+                  input#reg_password3.com-tu.tu3(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
+                  .form-row-error
+                .form-row.form-bottom-bar
+                  .agreement(style="padding:0 0 10px 10px;text-align:left")
+                    label(for="agreement")
+                      input(type="checkbox", name="agreement", checked="checked", id="agreement2", data-value="agree",style="position: relative;top: 3px;margin-right: 10px;width: 16px;")
+                    | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
+                    .form-row-error
+                  button#register_submit2.button-account.span10.xun-zhuce(type='submit') 立即注册
+                p.xun-p(style="font-size:14px;margin-top:9px") 已有账号,
+                  a(href="/accounts/login/") 立即登录
+                .space-vertical-s
+        .seven-success#seven-success
+          span.first-xl-off2 ×
+          span.seven-happy.seven-com.seven-nine 亲，恭喜您
+            br
+            b 今天伸手领钱成功
+          a(href="/").first-user 立即使用
+        #first-redpack-fail
+          span.first-xl-off2 ×
+          p 不符合参加条件
+script.
+  var v = new Date().getTime()
+  require(['/static/js/hover.js','/static/js/eight.js?v='+v,'/static/js/advance.js'])
+  function TimeTo(dd) {
+    var t = new Date(dd),//取得指定时间的总毫秒数
+            n = new Date().getTime(),//取得当前毫秒数
+            c = t - n;//得到时间差
+    if (c <= 0) {//如果差小于等于0  也就是过期或者正好过期，则推出程序
+      //document.getElementById('timer').innerHTML = '活动已经结束';
+      clearInterval(window['ttt']);//清除计时器
+      return;//结束执行
+    }
+    var ds = 60 * 60 * 24 * 1000,//一天共多少毫秒
+            d = parseInt(c / ds),//总毫秒除以一天的毫秒 得到相差的天数
+            h = parseInt((c - d * ds) / (3600 * 1000)),//然后取完天数之后的余下的毫秒数再除以每小时的毫秒数得到小时
+            m = parseInt((c - d * ds - h * 3600 * 1000) / (60 * 1000)),//减去天数和小时数的毫秒数剩下的毫秒，再除以每分钟的毫秒数，得到分钟数
+            s = parseInt((c - d * ds - h * 3600 * 1000 - m * 60 * 1000) / 1000);//得到最后剩下的毫秒数除以1000 就是秒数，再剩下的毫秒自动忽略即可
+    if(h < 10)
+        h = "0" + h;
+        if(m < 10)
+        m = "0" + m;
+        if(s < 10)
+        s = "0" + s;
+    document.getElementById('display').innerHTML = d;
+    document.getElementById('display1').innerHTML = h;
+    document.getElementById('display2').innerHTML = m;
+    document.getElementById('display3').innerHTML = s;
+  }
+  (function () {
+    window['ttt'] = setInterval(function () {
+
+      TimeTo('2015/8/8 00:00:00');//定义倒计时的结束时间，注意格式
+
+    }, 1000);//定义计时器，每隔1000毫秒 也就是1秒 计算并更新 div的显示
+  })();
+  var timeTask=setInterval(function(){
+        var date=new Date();
+        var tt=date.getMonth();
+        var gt=date.getDate();
+        var ht=date.getHours();
+        var mt=date.getMinutes();
+        var st=date.getSeconds();
+        if(tt>=7&&gt>=7&&ht>=12&&mt>=0&&st>=0){
+             document.getElementById('jinjiang').innerHTML = '全场加息';
+
+        }
+        if(tt>=7&&gt>=8&&ht>=0&&mt>=0&&st>=0){
+          document.getElementById('jinjiang').innerHTML = '全场加息';
+          TimeTot('2015/8/8 23:59:59');
+          callFun();
+        }else{
+          document.getElementById('button-eight').href = 'javascript:void(0)';
+          document.getElementById('button-eight').style.background='#3d3d3d';
+
+        }
+    },1000);
+    function callFun(){
+       document.getElementById('daojishi').innerHTML = '距离结束还有';
+    }
+  function TimeTot(dd) {
+    var t = new Date(dd),//取得指定时间的总毫秒数
+            n = new Date().getTime(),//取得当前毫秒数
+            c = t - n;//得到时间差
+    if (c <= 0) {//如果差小于等于0  也就是过期或者正好过期，则推出程序
+      document.getElementById('eight-time').innerHTML = '活动已经结束';
+      document.getElementById('eight-countdown').innerHTML = '';
+      clearInterval(TimeTot('2015/8/8 23:00:00'));//清除计时器
+      return;//结束执行
+    }
+    var ds = 60 * 60 * 24 * 1000,//一天共多少毫秒
+            d = parseInt(c / ds),//总毫秒除以一天的毫秒 得到相差的天数
+            h = parseInt((c - d * ds) / (3600 * 1000)),//然后取完天数之后的余下的毫秒数再除以每小时的毫秒数得到小时
+            m = parseInt((c - d * ds - h * 3600 * 1000) / (60 * 1000)),//减去天数和小时数的毫秒数剩下的毫秒，再除以每分钟的毫秒数，得到分钟数
+            s = parseInt((c - d * ds - h * 3600 * 1000 - m * 60 * 1000) / 1000);//得到最后剩下的毫秒数除以1000 就是秒数，再剩下的毫秒自动忽略即可
+    if(h < 10)
+        h = "0" + h;
+        if(m < 10)
+        m = "0" + m;
+        if(s < 10)
+        s = "0" + s;
+    document.getElementById('display').innerHTML = d;
+    document.getElementById('display1').innerHTML = h;
+    document.getElementById('display2').innerHTML = m;
+    document.getElementById('display3').innerHTML = s;
+  }

@@ -16,8 +16,22 @@
   });
 
   require(['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.validate', 'tools'], function($, modal, backend, placeholder, validate, tool) {
-    var card_id, _delCard, _showModal;
+    var card_id, url, _delCard, _showModal;
+    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
+    $.getJSON(url, {}, function(json) {
+      $('#withdraw-form').find('input[name="captcha_0"]').val(json.key);
+      return $('#withdraw-form').find('img.captcha').attr('src', json.image_url);
+    });
     $('input, textarea').placeholder();
+    $('.captcha-refresh').click(function() {
+      var $form;
+      $form = $(this).parents('form');
+      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
+      return $.getJSON(url, {}, function(json) {
+        $form.find('input[name="captcha_0"]').val(json.key);
+        return $form.find('img.captcha').attr('src', json.image_url);
+      });
+    });
     $('#add-card-button').click(function(e) {
       if ($('#id-is-valid').val() === 'False') {
         $('#id-validate').modal();
@@ -116,3 +130,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=add_card.js.map

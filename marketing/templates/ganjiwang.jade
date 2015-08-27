@@ -1,0 +1,415 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    //link(rel="stylesheet",href="/static/stylesheets/activity.css")
+    link(rel="stylesheet",href="/static/css/bootstrap.min.css")
+    link(rel="stylesheet",href="/static/stylesheets/ganjiwang.css")
+  body(style="background:#fff")
+    include include/activityTop2
+    .wrap#ganjiwang-banner
+      .gold2
+        if user.is_authenticated
+          #ganjiwang-model
+          .banner-form#ganjiwang-welcome
+            .space-vertical-m
+              h1.banner-form--title 欢迎来网利宝投资理财
+              .space-vertical-s
+              p.banner-form--row.font-s 您的登录账户:
+                span {{user|display_name}}
+              .space-vertical-m
+              .banner-form--row.align-center
+                a.banner-form--button(href="/accounts/home") 进入我的账户
+        else
+          .denelu-form#denglu
+            h1.biaoyu 领取800元现金红包
+            //.align-center
+            //  a.font-s.blue(href="http://act.vip.xunlei.com/vip/2015/p2pcash/#wlb") 【立即领取】
+            form#register-modal-form.login-form.dale(method='post', action='/accounts/register/ajax/')
+              - csrf_token
+              .form-row
+                .form-control-group
+                  .span12
+                    input#reg_identifier.com-tu.tu1(type="text", name="identifier", placeholder="请输入手机号")
+                .form-row-error
+              .form-row.voice
+                .span12-omega.hidden.show
+                  没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
+                .form-control-group
+                  .span6
+                    input#id_validate_code.com-tu.tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+                  .span6-omega
+                    button#button-get-validate-code-modal.button-orange.button-large.huoqu-ma.new-btn(type='button',style="top:-2px") 获取验证码
+                .form-row-error
+              .form-row
+                input#reg_password.full-width.com-tu.tu3(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")
+                .password-strength-container
+                  span.password-strength-1
+                  span.password-strength-2
+                  span.password-strength-3
+                .form-row-error
+              .form-row
+                input#reg_password2.com-tu.tu3(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
+                .form-row-error
+              .form-row.form-bottom-bar
+                .agreement(style="padding:0 0 10px 10px;text-align:left")
+                  label(for="agreement")
+                    input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree",style="position: relative;top: 3px;margin-right: 10px;width: 16px;")
+                  | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
+                  .form-row-error
+                button#register_submit.button-account.span10.xun-zhuce(type='submit') 立即注册
+              .space-vertical-s
+            p.xun-p 已有账号,
+              a(href="/accounts/login/") 立即登录
+    .gjw-wrap
+      .gjw-big
+      .gjw-gold
+        .xl-backtop(style="z-index:99")
+          span.seven-com.seven-ten
+          .backtop.sev-backtop 回到顶部
+          img(src="/static/imgs/pc_activity/xunlei/seven/sev_weixin.png")#xl-weixin
+          a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank")
+            img(src="/static/imgs/pc_activity/xunlei/seven/sev_qq.png",style="margin-top:10px")#xl-qq
+          .erweima
+        h1.gjw-h 活动时间：2015年7月20日——2015年9月20日
+        p.gjw-p
+          span.gjw-font-com.gjw-font-one
+          br
+          | 首次充值网利宝，即可获得领取特权会员奖励！每位新注册用户可任意选择1个好礼领取。
+        .gjw-number-one
+          .gjw-prize.gjw-prize-com.gjw-prize-one
+            if user.is_authenticated
+              a.gjw-reg 点击领取
+            else
+              a.gjw-reg.reg1 点击领取
+            p 特权一：注册送
+              b 800
+              | 元现金红包
+          .gjw-prize.gjw-prize-com.gjw-prize-two
+            a#prize-two 点击领取
+            p 特权二：首次充值送特权会员
+          .gjw-prize.gjw-prize-com.gjw-prize-three
+            if user.is_authenticated
+              a.gjw-reg3 点击领取
+            else
+              a.gjw-reg3.reg2 点击领取
+            p(style="bottom:0") 特权三：单笔投资
+              b ≥3000
+              | 元，送赶
+              br
+              | 集网
+              b 100
+              | 元充值
+          .gjw-prize.gjw-prize-com.gjw-prize-four(style="margin-right:0")
+            a#prize-four 点击领取
+            p 特权四：满额投资就送
+              b(style="color:#f22527") 夏日双人游
+        p(style="top:150px").gjw-p#recharge
+          span.gjw-font-com.gjw-font-two
+          br
+          | 首次充值网利宝，即可随机获得一项特权会员奖励，完成充值自动发送！每天限量1000个！
+        .gjw-girl.gjw-people-com.gjw-people-one
+        .gjw-number-two
+          if user.is_authenticated
+            .gjw-recharge
+              .gjw-over.gjw-tit-com.gjw-center-seven
+              .gjw-title1.gjw-tit-com.gjw-tit-one
+              .gjw-title2.gjw-tit-com.gjw-tit-two
+              h2.gjw-h2 100G快盘容量
+              .gjw-center.gjw-tit-com.gjw-center-one
+            .gjw-recharge
+              .gjw-over.gjw-tit-com.gjw-center-seven
+              .gjw-title1.gjw-tit-com.gjw-tit-one
+              .gjw-title2.gjw-tit-com.gjw-tit-two
+              h2.gjw-h2 七天爱奇艺会员
+              .gjw-center.gjw-tit-com.gjw-center-two
+            .gjw-recharge(style="margin-right:0")
+              .gjw-over.gjw-tit-com.gjw-center-seven
+              .gjw-title1.gjw-tit-com.gjw-tit-one
+              .gjw-title2.gjw-tit-com.gjw-tit-two
+              h2.gjw-h2 抠电影10元代
+                br
+                | 金券
+              .gjw-center.gjw-tit-com.gjw-center-three
+            .gjw-recharge.notouch
+              .gjw-over.gjw-tit-com.gjw-center-seven(style="display:block")
+              .gjw-title1.gjw-tit-com.gjw-tit-two
+              h2.gjw-h2 抠电影20元代
+                br
+                | 金券
+              .gjw-center.gjw-tit-com.gjw-center-four
+            .gjw-recharge
+              .gjw-over.gjw-tit-com.gjw-center-seven
+              .gjw-title1.gjw-tit-com.gjw-tit-one
+              .gjw-title2.gjw-tit-com.gjw-tit-two
+              h2.gjw-h2 一个月风行会员
+              .gjw-center.gjw-tit-com.gjw-center-five
+            .gjw-recharge.notouch(style="margin-right:0")
+              .gjw-over.gjw-tit-com.gjw-center-seven(style="display:block;")
+              .gjw-title1.gjw-tit-com.gjw-tit-two
+              h2.gjw-h2 一年迅雷会员
+              .gjw-center.gjw-tit-com.gjw-center-six
+          else
+            .gjw-recharge.gjw-star
+              .gjw-over.gjw-tit-com.gjw-center-seven
+              .gjw-title1.gjw-tit-com.gjw-tit-one
+              .gjw-title2.gjw-tit-com.gjw-tit-two
+              h2.gjw-h2 100G快盘容量
+              .gjw-center.gjw-tit-com.gjw-center-one
+            .gjw-recharge.gjw-star
+              .gjw-over.gjw-tit-com.gjw-center-seven
+              .gjw-title1.gjw-tit-com.gjw-tit-one
+              .gjw-title2.gjw-tit-com.gjw-tit-two
+              h2.gjw-h2 七天爱奇艺会员
+              .gjw-center.gjw-tit-com.gjw-center-two
+            .gjw-recharge.gjw-star(style="margin-right:0")
+              .gjw-over.gjw-tit-com.gjw-center-seven
+              .gjw-title1.gjw-tit-com.gjw-tit-one
+              .gjw-title2.gjw-tit-com.gjw-tit-two
+              h2.gjw-h2 抠电影10元代
+                br
+                | 金券
+              .gjw-center.gjw-tit-com.gjw-center-three
+            .gjw-recharge.notouch
+              .gjw-over.gjw-tit-com.gjw-center-seven(style="display:block")
+              .gjw-title1.gjw-tit-com.gjw-tit-two
+              h2.gjw-h2 抠电影20元代
+                br
+                | 金券
+              .gjw-center.gjw-tit-com.gjw-center-four
+            .gjw-recharge.gjw-star
+              .gjw-over.gjw-tit-com.gjw-center-seven
+              .gjw-title1.gjw-tit-com.gjw-tit-one
+              .gjw-title2.gjw-tit-com.gjw-tit-two
+              h2.gjw-h2 一个月风行会员
+              .gjw-center.gjw-tit-com.gjw-center-five
+            .gjw-recharge.notouch(style="margin-right:0")
+              .gjw-over.gjw-tit-com.gjw-center-seven(style="display:block;")
+              .gjw-title1.gjw-tit-com.gjw-tit-two
+              h2.gjw-h2 一年迅雷会员
+              .gjw-center.gjw-tit-com.gjw-center-six
+        p(style="top:254px").gjw-p#tour
+          span.gjw-font-com.gjw-font-three
+          br
+          | 注册送红包，投资网利宝，还送你夏日旅游双人游大奖！没有比这更美的事了！
+        .gjw-number-three
+          dl
+            dt
+            dd
+              h3 ￥6560
+                span
+                  b.gjw-small-com.gjw-small-one
+                  | 港澳双人游
+              if user.is_authenticated
+                a.gjw-small-com.gjw-small-two
+              else
+                a.gjw-small-com.gjw-small-two.go
+          dl
+            dt.yunnan
+            dd
+              h3 ￥2160
+                span
+                  b.gjw-small-com.gjw-small-three
+                  | 云南双人游
+              if user.is_authenticated
+                a.gjw-small-com.gjw-small-two
+              else
+                a.gjw-small-com.gjw-small-two.go
+          dl(style="margin-right:0")
+            dt.hainan
+            dd
+              h3 ￥2360
+                span
+                  b.gjw-small-com.gjw-small-four
+                  | 海南双人游
+              if user.is_authenticated
+                a.gjw-small-com.gjw-small-two
+              else
+                a.gjw-small-com.gjw-small-two.go
+        .gjw-number-four
+          h1 免费旅游 投资1万元即送
+          p 投资网利宝单笔满10000元可获得1次免费旅游机会
+            br
+            | 港澳、云南、海南任你选，还是双人游哦
+            br
+            | 每个用户只能报名1次，把握机会别错过！
+          h1#tour_line
+            a 点击查看旅游线路及报名须知 >
+          .man.gjw-people-com.gjw-people-two
+      .bj
+      .gjw-tour
+        .jiao
+        .tour-big
+          .tour-small
+            .tour-erwm
+            ul
+              li 港澳5天4晚游（限35—55岁），
+                a(href="http://huwaiquan.org/thread-2106-1-1.html",target="_blank") 详情介绍>>
+              li(style="margin-right:0") 云南6天5晚游（限25-54岁），
+                a(href="http://huwaiquan.org/thread-2103-1-1.html",target="_blank") 详情介绍>>
+              li 云南9天8晚游（限25-54岁），
+                a(href="http://huwaiquan.org/thread-2105-1-1.html",target="_blank") 详情介绍>>
+              li(style="margin-right:0") 海南5天4晚游（限19—60岁），
+                a(href="http://huwaiquan.org/thread-2118-1-1.html",target="_blank") 详情介绍>>
+            p 或扫码关注户外圈微信，回复关键字“云南游、海南游、港澳游”查看线路
+            h1 报名须知
+            p 请仔细查看“详情介绍”中的导游小费、保证金、保证金交款方式、年龄限制、地区限制、出行人数要求、进店购物等细则说明后决定是否报名。旅游产品由户外圈网提供，网利宝只负责提供中奖资格，不参与您与旅游公司的相关后续事宜。活动结束后网利宝将统一给户外圈网提供中奖用户姓名和手机号，由户外圈网与您联系。户外圈旅游线路必须双人游。户外圈客服电话：0571-87139581    客服在线时间：周一至周五  早九晚六
+      .xl-box1(style="height:auto;top:-223px")
+        h2.xl-jiang
+          .xl-center#seven-center(style="color:#cf0027")
+            | 投资流程
+        .content-process
+          .content-pptv(style="background:#f8f2ce")
+            .process-text(style="height:32px;padding:0")
+            .process-list
+              .circle-free.circle-float
+                .close
+                .last
+                .next
+                img(src="/static/images/pptv/free.jpg")
+              .triangle-start
+                .start-cont
+              .circle
+                .circle-body.free
+                .circle-txt 注册网利宝账户
+                .circle-txt2
+              .triangle-center(style="width:0px")
+              .triangle-center#xl-triangle-center
+                .center-cont
+              .circle
+                .circle-body.recharge
+                .circle-txt 充值资金到账户
+              .triangle-center#xl-triangle-center
+                .center-cont
+              .circle
+                .circle-body.tender
+                .circle-txt 使用红包
+              .triangle-center#xl-triangle-center
+                .center-cont
+              .circle
+                .circle-body.collec
+                .circle-txt 获得收益和奖励
+              .triangle-end(style="width:120px")
+                .end-cont
+      .gjw-rule
+        h4 活动规则
+        ul
+          li 1. 手机号为网利宝唯一账户，本期活动仅限于赶集网注册新用户参与；
+          li 2. 新用户注册即送800元现金红包。此现金红包为组合红包，其中含50元的直抵红包和750元抵扣红包（750元折扣红包包含3张100元+1张200元+1张250元），投资满300元可使用50元直抵红包，折扣红包则按投资额1%抵扣使用（比如用户投资10000元，即可满额使用100元红包）；
+          li 3.赶集网付费用户注册+实名+投资网利宝，并且单笔投资≥3000元送赶集网100充值金，每个账户只限一次；
+          li 4. 免费旅游机会有效期截至到2015年9月30日，过期失效；获得免费旅游机会的用户将在活动结束后收到电话通知，与您核实信息并确认行程细节；
+          li 5. 请您在出游前与户外圈网仔细确认行程细节，网利宝不参与您与户外圈网任何的信息沟通，您向户外圈网确认参加旅游后，旅途过程中产生的所有问题都与网利宝无关。
+          li 6. 红包统一以站内信形式通知，完成一次投资回款后即可取现；
+          li 7. 现金红包有效期：2015年7月15日-2015年10月1日；
+          li 8. 网利宝对此活动享有最终解释权。
+      .xl-box1
+        .san-new(style="background:#f8f2ce")
+          .san-new-content.container(style="padding:0")
+            .row.gold-dl-row
+              .san-span
+                dl
+                  dt.com.com-trust(style="background: url('/static/imgs/pc_activity/ganjiwang/safe1.png') no-repeat center")
+                  dd.pp-zi
+                    p
+                      b IDG资本
+                      br
+                      | 百亿市值
+                      b A股上市公司
+                      | 入股
+              .san-span
+                dl
+                  dt.com.com-security(style="background: url('/static/imgs/pc_activity/ganjiwang/safe2.png') no-repeat center")
+                  dd.pp-zi
+                    p 账户资金安全
+                      br
+                      | 由
+                      b 阳光保险
+                      | 承保
+              .san-span
+                dl
+                  dt.com.com-authority(style="background: url('/static/images/xunlei/three.png') no-repeat center")
+                  dd.pp-zi
+                    p 第三方
+                      br
+                      b 100%
+                      | 本息保障
+  .footer(style="background:#f8f2ce;margin-top:0")
+    include include/activityFooterTwo
+    include include/tracking
+  #small-zc
+    .wrap(style="background:none")
+      .gold2
+        .xl-box1#box1
+          .xl-small-zc
+            span.first-xl-off ×
+            .denelu-form(style="top:20px;left:32px")
+              h1.biaoyu  领取800元现金红包
+              //.align-center
+              //  a.font-s.blue(href="http://act.vip.xunlei.com/vip/2015/p2pcash/#wlb") 【立即领取】
+              form#register-modal-form2.login-form.dale(method='post', action='/accounts/register/ajax/')
+                .form-row
+                  .form-control-group
+                    .span12
+                      input#reg_identifier2.com-tu.tu1(type="text", name="identifier", placeholder="请输入手机号")
+                  .form-row-error
+                .form-row.voice
+                  .span12-omega.hidden.show
+                    没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
+                  .form-control-group
+                    .span6
+                      input#id_validate_code2.com-tu.tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+                    .span6-omega
+                      button#button-get-validate-code-modal2.button-orange.button-large.huoqu-ma.new-btn(type='button',style="top:-2px") 获取验证码
+                  .form-row-error
+                .form-row
+                  input#reg_password4.full-width.com-tu.tu3(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")
+                  .password-strength-container
+                    span.password-strength-1
+                    span.password-strength-2
+                    span.password-strength-3
+                  .form-row-error
+                .form-row
+                  input#reg_password3.com-tu.tu3(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
+                  .form-row-error
+                .form-row.form-bottom-bar
+                  .agreement(style="padding:0 0 10px 10px;text-align:left")
+                    label(for="agreement")
+                      input(type="checkbox", name="agreement", checked="checked", id="agreement2", data-value="agree",style="position: relative;top: 3px;margin-right: 10px;width: 16px;")
+                    | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
+                    .form-row-error
+                  button#register_submit2.button-account.span10.xun-zhuce(type='submit') 立即注册
+                p.xun-p(style="font-size:14px;margin-top:9px") 已有账号,
+                  a(href="/accounts/login/") 立即登录
+                .space-vertical-s
+        .seven-success#seven-success
+          span.first-xl-off2 ×
+          span.seven-happy.seven-com.seven-nine 亲，恭喜您
+          p(style="margin:63px 0 0 30px") 800元现金组合红包已发送到亲的账户，
+            br
+            | 落袋为安妥妥哒！
+          a(href="/",style="margin:122px 0 0 50px").first-user 立即使用
+        #first-redpack-fail
+          span.first-xl-off2 ×
+          p 不符合参加条件
+        #activity-over
+          span.first-xl-off2 ×
+          h1
+            span.gjw-people-com.gjw-people-three
+            b 活动结束
+          p 本期活动已结束
+            br
+            | 敬请期待下期惊喜！
+        #gjw-success
+          span.first-xl-off2 ×
+          p 您还没有充值哦!
+          ul
+            li.look 我再看看
+            li.fast 立刻充值
+          a.agin 我再看看
+  script.
+      var v = new Date().getTime()
+      require(['/static/js/hover.js','/static/js/ganjiwang-regist.js?v='+v,'/static/js/ganji_show.js'])

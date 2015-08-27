@@ -1,14 +1,19 @@
 # coding=utf-8
+from datetime import date, timedelta
+from hashlib import  md5
 from urlparse import urlparse
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
+from mock import MagicMock
 
 from forms import EmailOrPhoneRegisterForm
+from marketing.models import IntroducedBy, Channels
 from utils import detect_identifier_type, verify_id, create_user
 from wanglibao_account.backends import parse_id_verify_response
-from wanglibao_account.cooperation import CoopRegister
+from wanglibao_account.cooperation import CoopRegister, CoopQuery
+from wanglibao_account.models import Binding
+from wanglibao_account.test_util import prepare_user, has_user, delete_user, get_user, clear_db
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao_sms.utils import send_validation_code
 
@@ -152,6 +157,7 @@ class UtilityTestCase(TestCase):
         self.assertEqual('unknown', type)
 
 
+
 class EndToEndTestCase(TestCase):
     def test_register_with_email(self):
         self.client.post("/accounts/register/", {
@@ -276,7 +282,90 @@ class IdVerificationTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
+class TestUtilTestCase(TestCase):
+    def test_user(self):
+        prepare_user()
+        assert has_user()
+        delete_user()
+        assert not has_user()
+
 class CooperationTestCase(TestCase):
     def setUp(self):
-        coop_register = CoopRegister()
+        self.request = MagicMock()
+
+
     def test_all_processors_for_session(self):
+        #for yiruite
+        self.request.GET = {'promo_token':'yiruite', 'tid':'123456'}
+        self.request.session = {}
+        coop_reg = CoopRegister(self.request)
+        coop_reg.all_processors_for_session()
+        assert self.request.session == {'channel_code':'yiruite', 'channel_user':'123456'}
+        #for default
+        self.request.GET = {'promo_token': 'pptv'}
+        self.request.session = {}
+        coop_reg = CoopRegister(self.request)
+        coop_reg.all_processors_for_session()
+        assert self.request.session == {'channel_code': 'pptv'}
+
+
+    def test_all_processors_for_register_for_default(self):
+        self.request.GET = {'promo_token':'pptv'}
+        self.request.session = {}
+        coop_reg = CoopRegister(self.request)
+        coop_reg.all_processors_for_session()
+
+        #prepare user data
+        prepare_user()
+        #prepare channel data
+        Channels(code='pptv',name='pptv').save()
+
+        coop_reg.all_processors_for_user_register(get_user(),None)
+
+        introduced_by = IntroducedBy.objects.filter(user = get_user()).get()
+
+        clear_db(Channels, User, IntroducedBy)
+
+    def test_all_processors_for_register_for_yiruite(self):
+        self.request.GET = {'promo_token':'yiruite', 'tid':'123456'}
+        self.request.session = {}
+        coop_reg = CoopRegister(self.request)
+        coop_reg.all_processors_for_session()
+
+        #prepare user data
+        prepare_user()
+        #prepare channel data
+        Channels(code='yiruite',name='yiruite').save()
+
+        coop_reg.all_processors_for_user_register(get_user(),None)
+
+        today = date.today()
+        start_day = (today - timedelta(days=1)).strftime('%Y%m%d')
+        end_day = (today + timedelta(days=1)).strftime('%Y%m%d')
+        md5_sign = md5()
+        md5_sign.update(start_day+end_day+settings.WLB_FOR_YIRUITE_KEY)
+        sign = md5_sign.hexdigest()
+        print start_day, end_day, sign
+        assert CoopQuery().get_all_user_info_for_coop('yiruite', 0, start_day, end_day, sign)[0]['tid'] == '123456'
+
+        clear_db(Channels, User, IntroducedBy)
+
+    def test_get_user_channel_processor(self):
+        self.request.GET = {'promo_token':'yiruite', 'tid':'123456'}
+        self.request.session = {}
+        coop_reg = CoopRegister(self.request)
+        coop_reg.all_processors_for_session()
+
+        #prepare user data
+        prepare_user()
+        #prepare channel data
+        Channels(code='yiruite',name='yiruite').save()
+
+        coop_reg.all_processors_for_user_register(get_user(),None)
+        assert coop_reg.get_user_channel_processor(get_user()).c_code == 'yiruite'
+
+        clear_db(Channels, User, IntroducedBy)
+
+
+
+

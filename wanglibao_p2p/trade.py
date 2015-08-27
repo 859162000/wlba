@@ -12,7 +12,7 @@ from wanglibao_margin.marginkeeper import MarginKeeper
 from order.utils import OrderHelper
 from keeper import ProductKeeper, EquityKeeper, AmortizationKeeper, EquityKeeperDecorator
 from exceptions import P2PException
-from wanglibao_p2p.models import P2PProduct
+from wanglibao_p2p.models import P2PProduct, P2PEquity
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
@@ -21,6 +21,7 @@ from wanglibao_redpack import backends as redpack_backends
 # from wanglibao_account.tasks import cjdao_callback
 # from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
 import re
+from wanglibao_redis.backend import redis_backend
 
 from wanglibao_rest.utils import split_ua
 
@@ -93,12 +94,19 @@ class P2PTrader(object):
             "mtype": "purchase"
         })
 
-
         # 满标给管理员发短信
         if product_record.product_balance_after <= 0:
             from wanglibao_p2p.tasks import full_send_message
 
             full_send_message.apply_async(kwargs={"product_name": self.product.name})
+            # 满标将标信息写入redis
+            cache_backend = redis_backend()
+            if not cache_backend.redis.exists("p2p_detail_{0}".format(self.product.id)):
+                cache_backend.get_cache_p2p_detail(self.product.id)
+
+            # 将标写入redis list
+            cache_backend.push_p2p_products(self.product)
+
         return product_record, margin_record, equity
 
 
@@ -193,13 +201,12 @@ class P2POperator(object):
             product.save()
 
         phones = {}.fromkeys(phones).keys()
-        user_ids = {}.fromkeys(user_ids).keys()
-
         send_messages.apply_async(kwargs={
             "phones": phones,
             "messages": [messages.product_settled(product, timezone.now())]
         })
 
+        user_ids = {}.fromkeys(user_ids).keys()
 
         matches = re.search(u'日计息', product.pay_method)
         if matches and matches.group():
@@ -213,6 +220,13 @@ class P2POperator(object):
             "content": content,
             "mtype": "loaned"
         })
+
+        cache_backend = redis_backend()
+        # 更新该标的redis缓存
+        cache_backend.update_detail_cache(product.id)
+
+        # 将标信息从满标的redis列表中挪到还款中的redis列表
+        cache_backend.update_list_cache('p2p_products_full', 'p2p_products_repayment', product)
 
     @classmethod
     def fail(cls, product):
@@ -273,13 +287,21 @@ class P2POperator(object):
                 cls.logger.info("Product [%d] [%s] payed all amortizations, finish it", product.id, product.name)
                 ProductKeeper(product).finish(None)
 
+                cache_backend = redis_backend()
+                # 更新该标的redis缓存
+                cache_backend.update_detail_cache(product.id)
+
+                # 将标信息从还款中的redis列表中挪到已完成的redis列表
+                cache_backend.update_list_cache('p2p_products_repayment', 'p2p_products_finished', product)
+
+
     @classmethod
     def settle_hike(cls, product):
         result = redpack_backends.settle_hike(product)
         if not result:
             return
         for x in result:
-            order_id = OrderHelper.place_order(x.user, order_type=u'加息', product_id=product.id, status=u'新建').id
-            margin_keeper = MarginKeeper(user=x.user, order_id=order_id)
-            margin_keeper.hike_deposit(x.amount, u"加息存入%s元" % x.amount, savepoint=False)
-            OrderHelper.update_order(Order.objects.get(pk=order_id), user=x.user, status=u'成功', amount=x.amount)
+            order_id = OrderHelper.place_order(x['user'], order_type=u'加息', product_id=product.id, status=u'新建').id
+            margin_keeper = MarginKeeper(user=x['user'], order_id=order_id)
+            margin_keeper.hike_deposit(x['amount'], u"加息存入%s元" % x['amount'], savepoint=False)
+            OrderHelper.update_order(Order.objects.get(pk=order_id), user=x['user'], status=u'成功', amount=x['amount'])

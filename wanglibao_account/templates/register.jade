@@ -23,18 +23,20 @@ html
               .span5-omega
                 button.ispan4-omega#button-get-validate-code.button-orange.button-large(type='button') 获取验证码
               if form.identifier.errors
-                label.form-row-error.error
+                label.form-row-error.error.error-label
                   for error in form.identifier.errors
                     #{ error }
+              .form-row-error
             .form-row.voice.hidden
               .span12-omega
                 没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
             #validate-code-container.form-row
-              - render_field form.validate_code class+="ispan6 clear-margin" placeholder="* 请输入验证码" autocomplete='off' title="* 请输入验证码"
+              - render_field form.validate_code class+="ispan6 clear-margin" placeholder="* 请输入短信验证码" autocomplete='off' title="* 请输入短信验证码"
               if form.validate_code.errors
                 label.form-row-error.error
                   for error in form.validate_code.errors
                     #{ error }
+              .form-row-error
             .form-row
               - render_field form.password class+="input-large" placeholder="* 请输入密码" autocomplete='off' title="* 请输入密码" maxlength="20"
               .password-strength-container
@@ -45,8 +47,9 @@ html
                 label.form-row-error.error
                   for error in form.password.errors
                     #{ error }
+              .form-row-error
             .form-row
-              input.input-large(type="password", name="password2", placeholder="* 请确认密码", autocomplete='off', title="* 请确认密码")
+                input.input-large(type="password", name="password2", placeholder="* 请确认密码", autocomplete='off', title="* 请确认密码")
                 .form-row-error
             .form-row
               input(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码")
@@ -54,8 +57,9 @@ html
                 label.form-row-error.error
                   for error in form.invitecode.errors
                     #{ error }
+              .form-row-error
             .form-row.form-bottom-bar
-              button#register_submit.button-red.button-middle.span12(type='button') 注 册
+              button#register_submit.button-red.button-middle.span12(type='submit') 注 册
               .agreement
                 label(for="agreement")
                 input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree")
@@ -68,6 +72,17 @@ html
             p.slogan 网利宝 收益好
             p.hot-line 在线咨询 <span>400-8588-066<span>
 
+    #img-code-div1(style="display:none")
+        form#img-code-form.img-code-form(method='post', action='')
+            .form-row
+                label.img-code-label 请输入验证码：
+                input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
+                input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
+                img.captcha.captcha-img(alt="captcha", src="")
+                button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
+            .code-img-error
+            .clearfix.tc
+                span.submit-code-img#submit-code-img 确定
 
     - with 1 as no_margin
     include include/footer

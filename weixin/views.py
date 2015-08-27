@@ -34,12 +34,8 @@ from weixin.common.wx import generate_js_wxpay
 from .models import Account, WeixinUser, WeixinAccounts
 from .common.wechat import tuling
 from decimal import Decimal
-from shumi_backend.exception import *
-from shumi_backend.fetch import UserInfoFetcher
-from wanglibao_buy.models import BindBank
 from wanglibao_pay.models import Card
-from wanglibao_announcement.utility import AnnouncementAccounts
-from marketing.tops import Top
+from marketing.models import Channels
 import datetime
 import json
 import time
@@ -151,8 +147,11 @@ class WeixinLogin(TemplateView):
                 context['openid'] = res.get('openid')
             except WeChatException, e:
                 pass
-
-        return context
+        next = self.request.GET.get('next', '')
+        return {
+            'context' : context,
+            'next'   : next
+            }
 
 
 class WeixinRegister(TemplateView):
@@ -160,11 +159,25 @@ class WeixinRegister(TemplateView):
 
     def get_context_data(self, **kwargs):
         token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
-        if not token:
-            token = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, 'weixin')
+        token_session = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+        if token:
+            token = token
+        elif token_session:
+            token = token_session
+        else:
+            token = 'weixin'
 
+        if token:
+            channel = Channels.objects.filter(code=token).first()
+        else:
+            channel = None
+        phone = self.request.GET.get('phone', 0)
+        next = self.request.GET.get('next', '')
         return {
             'token': token,
+            'channel': channel,
+            'phone': phone,
+            'next' : next
         }
 
 
@@ -284,12 +297,11 @@ class WeixinPayNotify(View):
         return HttpResponse(ret_xml)
 
 
-
 class P2PListView(TemplateView):
     template_name = 'weixin_list.jade'
 
     def get_context_data(self, **kwargs):
-        p2p_lists = P2PProduct.objects.filter(hide=False).filter(status__in=[
+        p2p_lists = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now()).filter(status__in=[
             u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
         ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time')[:10]
 

@@ -4,7 +4,7 @@ import decimal
 import pytz
 from datetime import date, timedelta, datetime
 from collections import defaultdict
-from decimal import Decimal, ROUND_DOWN
+from decimal import Decimal
 
 from django.db.models import Count, Sum
 from django.contrib.auth.decorators import permission_required
@@ -17,15 +17,15 @@ from django.http.response import HttpResponse, Http404
 from mock_generator import MockGenerator
 from django.conf import settings
 from django.db.models.base import ModelState
-from wanglibao_sms.utils import validate_validation_code, send_validation_code
-from marketing.models import PromotionToken, IntroducedBy, IntroducedByReward, Reward, ActivityJoinLog
+from wanglibao_sms.utils import send_validation_code
+from marketing.models import Channels, PromotionToken, IntroducedBy, IntroducedByReward, Reward, ActivityJoinLog
 from marketing.tops import Top
 from utils import local_to_utc
 
 # used for reward
 from django.forms import model_to_dict
+from django.db.models import Q
 from marketing.models import RewardRecord, NewsAndReport
-from wanglibao_sms.tasks import send_messages
 from wanglibao_p2p.models import Earning
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao.templatetags.formatters import safe_phone_str
@@ -36,8 +36,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
-from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
+from wanglibao_redpack.models import RedPackEvent
 from wanglibao_redpack import backends as redpack_backends
+from wanglibao_activity.models import ActivityRecord
 
 
 class YaoView(TemplateView):
@@ -450,12 +451,12 @@ class IntroducedAwardTemplate(TemplateView):
     def reward_user(user, introduced_by, reward_type, got_amount, product, only_show):
         reward = Reward.objects.filter(is_used=False, type=reward_type).first()
 
-        text_content = u"【网利宝】您在邀请好友送收益的活动中，获得%s元收益，收益已经发放至您的网利宝账户。请注意查收。回复TD退订4008-588-066【网利宝】" % got_amount
-        if only_show is not True:
-            send_messages.apply_async(kwargs={
-                "phones": [introduced_by.wanglibaouserprofile.phone],
-                "messages": [text_content]
-            })
+        # text_content = u"【网利宝】您在邀请好友送收益的活动中，获得%s元收益，收益已经发放至您的网利宝账户。请注意查收。" % got_amount
+        # if only_show is not True:
+        #     send_messages.apply_async(kwargs={
+        #         "phones": [introduced_by.wanglibaouserprofile.phone],
+        #         "messages": [text_content]
+        #     })
 
         if only_show is not True:
             earning = Earning()
@@ -493,16 +494,16 @@ class IntroducedAwardTemplate(TemplateView):
             print message_content
             print introduced_by.wanglibaouserprofile.name
             print safe_phone_str(user.wanglibaouserprofile.phone)
-            print text_content
+            # print text_content
 
 
 class NewsListView(TemplateView):
     """ News and Report list page """
 
-    template_name = 'news.jade'
+    template_name = 'news_new.jade'
 
     def get_context_data(self, **kwargs):
-        news = NewsAndReport.objects.filter().order_by('-created_at')
+        news = NewsAndReport.objects.filter().order_by('-score', '-created_at')
 
         news_list = []
         news_list.extend(news)
@@ -555,6 +556,10 @@ class ActivityJoinLogAPIView(APIView):
             return Response({'ret_code': 3001, 'message': u'用户没有登陆，请先登陆'})
 
         start_time = timezone.datetime(2015, 6, 29)
+        dt = timezone.datetime.now()
+        if dt > timezone.datetime(2015, 8, 4, 23, 59, 59):
+            return Response({'ret_code': 3002, 'message': u'活动已过期'})
+
         user_ib = IntroducedBy.objects.filter(user=user, channel__name='xunlei', created_at__gt=start_time).first()
         if user_ib:
             has_log = ActivityJoinLog.objects.filter(user=user, action_name='xunlei_july').first()
@@ -582,9 +587,9 @@ class ActivityJoinLogAPIView(APIView):
                     numbers = numbers + [remainder]
                     for number in numbers:
                         describe = 'xunlei_july_' + str(number)
-                        redpack_event = RedPackEvent.objects.filter(invalid=False,
-                                                                    describe=describe,
-                                                                    target_channel='xunlei').first()
+                        redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,
+                                                                    target_channel='xunlei',
+                                                                    give_start_at__lt=dt, give_end_at__gt=dt).first()
                         if redpack_event:
                             redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
 
@@ -608,6 +613,153 @@ class ActivityJoinLogCountAPIView(APIView):
         })
 
 
+def ajax_get_activity_record(request):
+    """
+        author: add by Yihen@20150825
+        description:迅雷9月抽奖活动，获得用户的抽奖记录
+    """
+    records = ActivityJoinLog.objects.filter(action_name='get_award', action_type='login', join_times=0)
+    data = [{'phone':record.user.wanglibaouserprofile.phone, 'awards':float(record.amount)} for record in records]
+    to_json_response = {
+        'ret_code': 3005,
+        'data':data,
+        'message': u'获得抽奖成功用户',
+    }
+    return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+
+def ajax_post(request):
+    """
+        author: add by Yihen@20150825
+        description:迅雷9月抽奖活动，响应web的ajax请求
+    """
+    user = request.user
+    if not user.is_authenticated():
+        to_json_response = {
+            'ret_code': 3000,
+            'message': u'用户没有登陆，请先登陆',
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+    record = IntroducedBy.objects.filter(user_id=user.id).first()
+    if record:
+        record = Channels.objects.filter(id=record.channel_id).first()
+    if not record or (record and record.name != 'xunlei9'):
+        to_json_response = {
+            'ret_code': 4000,
+            'message': u'非迅雷渠道过来的用户',
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+    if request.method == "POST":
+        obj = ThunderAwardAPIView()
+        action = request.POST.get("action", "")
+
+        if action == 'GET_AWARD':
+            res = obj.get_award(request)
+
+        if action == 'IGNORE_AWARD':
+            res = obj.ignore_award(request)
+
+        if action == 'ENTER_WEB_PAGE':
+            res = obj.enter_webpage(request)
+
+        return res
+
+
+class ThunderAwardAPIView(APIView):
+    """
+        Type: Add
+        Modified By: Yihen@20150821
+        description: 迅雷抽奖活动1.用户有三次摇奖机会，三次摇奖必中奖一次，中奖金额分别为100元（30%）、
+                    150元（60%）、 200元（10%），中奖后提示中奖金额及中奖提示语，非中奖用户提示非中奖提示语。
+    """
+
+    def get_award(self, request):
+        """
+            TO-WRITE
+        """
+        join_log = ActivityJoinLog.objects.filter(user=request.user).first()
+        join_log.join_times -= 1
+        join_log.save(update_fields=['join_times'])
+        money = self.get_award_mount(join_log.id)
+        describe = 'xunlei_sept_' + str(money)
+        try:
+            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,).first()
+        except Exception, reason:
+            print reason
+
+        if redpack_event:
+            redpack_backends.give_activity_redpack(request.user, redpack_event, 'pc')
+
+        to_json_response = {
+            'ret_code': 3001,
+            'get_time': (join_log.id % 3)+1,  # 第几次抽中
+            'left': join_log.join_times,  # 还剩几次
+            'amount': str(join_log.amount),  # 奖励的金额
+            'message': u'终于等到你，还好我没放弃',
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+    def ignore_award(self, request):
+        """
+            将剩余的刮奖次数减1，并返回最终结果
+        """
+        join_log = ActivityJoinLog.objects.filter(user=request.user).first()
+        if join_log.join_times > 0:
+            join_log.join_times -= 1
+        join_log.save(update_fields=['join_times'])
+        to_json_response = {
+            'ret_code': 3002,
+            'get_time': (join_log.id % 3)+1,  # 第几次抽中
+            'left': join_log.join_times,  # 还剩几次
+            'amount': str(join_log.amount),  # 奖励的金额
+            'message': u'你和大奖只是一根头发的距离',
+        }
+
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+    def get_award_mount(self, index):
+        index %= 10
+        if index in (0,):
+            return 200
+        if index in(3, 6, 9):
+            return 150
+        if index in(1, 2, 4, 5, 7, 8):
+            return 100
+
+    def enter_webpage(self, request):
+        """
+            进入页面的时候，判断是否生成记录，如果没有则生成并返回剩余刮奖次数3；如果有，则直接返回剩余刮奖次数；
+        """
+        join_log = ActivityJoinLog.objects.filter(user=request.user).first()
+        if not join_log:
+            activity = ActivityJoinLog.objects.create(
+                user=request.user,
+                action_name=u'get_award',
+                action_type=u'login',
+                action_message=u'迅雷抽奖活动',
+                channel=u'all',
+                gift_name=u'抽得千元大奖',
+                amount=0,
+                join_times=3,
+                create_time=timezone.now(),
+            )
+
+            join_log = ActivityJoinLog.objects.filter(user=request.user).first()
+            join_log.amount = self.get_award_mount(activity.id)
+            join_log.save(update_fields=['amount'])
+
+        to_json_response = {
+            'ret_code': 3003,
+            'get_time': (join_log.id % 3)+1,  # 第几次抽中
+            'left': join_log.join_times,  # 还剩几次
+            'amount': str(join_log.amount),  # 奖励的金额
+            'message': u'欢迎刮奖',
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+
 class ThousandRedPackAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
@@ -619,6 +771,9 @@ class ThousandRedPackAPIView(APIView):
         dt = timezone.datetime.now()
         start_time = timezone.datetime(dt.year, dt.month, dt.day)
         end_time = timezone.datetime(dt.year, dt.month, dt.day, 23, 59, 59)
+
+        if dt > timezone.datetime(2015, 8, 7, 23, 59, 59):
+            return Response({'ret_code': 3003, 'message': u'活动已过期'})
 
         join_log = ActivityJoinLog.objects.filter(channel='all', action_name='thousand_redpack',
                                                   create_time__gt=start_time, create_time__lt=end_time)\
@@ -645,7 +800,8 @@ class ThousandRedPackAPIView(APIView):
             numbers = ['100', '200', '300', '400']
             for number in numbers:
                 describe = 'thousand_redpack_' + str(number)
-                redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe).first()
+                redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,
+                                                            give_start_at__lt=dt, give_end_at__gt=dt).first()
                 if redpack_event:
                     redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
 
@@ -661,4 +817,20 @@ class ThousandRedPackCountAPIView(APIView):
 
         return Response({'ret_code': 0,
                          'redpack_total': int(join_log['user_count'] * 4) if join_log['user_count'] else 0,
+        })
+
+class ThunderActivityRewardCounter(APIView):
+    """ 迅雷八月份活动统计迅雷会员发放个数，首次投资和首次充值发放迅雷会员"""
+    permission_classes = ()
+
+    def get(self, request):
+        record = ActivityRecord.objects.filter(
+            trigger_node__in=['first_pay', 'first_buy'],
+            activity__code='xunlei8'
+        ).filter(
+            Q(activity__is_stopped=True) & Q(activity__stopped_at__gte=timezone.now()) | Q(activity__is_stopped=False) & Q(activity__start_at__lte=timezone.now()) & Q(activity__end_at__gte=timezone.now())
+        ).aggregate(num=Count('id'))
+        return Response({
+            'ret_code': 0,
+            'num': int(record['num']) if record['num'] else 0,
         })

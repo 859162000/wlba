@@ -5,13 +5,14 @@ form#register-modal-form.login-form(method='post', action='/accounts/register/aj
       .span7
         input#reg_identifier(type="text", name="identifier", placeholder="请输入手机号")
       .span5-omega
-        button#button-get-validate-code-modal.button-orange.button-large(type='button',style="top:-2px") 获取验证码
+        button#button-get-validate-code-modal.button-orange.button-large(type='button',style="display:none") 获取验证码
+        button#img-code.button-orange.button-large(type='button') 获取验证码
     .form-row-error
   .form-row.voice.hidden
     .span12-omega
       没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
   #validate-code-container.form-row
-    input#id_validate_code(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+    input#id_validate_code(type="text", name="validate_code", placeholder="请输入短信验证码", autocomplete='off', title="请输入短信验证码")
     .form-row-error
   .form-row
     input#reg_password.full-width(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")

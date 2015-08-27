@@ -493,7 +493,6 @@ def get_hike(user, product_id):
         hike = ""
     return hike
 
-#获取加息次数
 def get_hike_nums(user):
     _nums = InterestHike.objects.filter(user=user, invalid=False).aggregate(Sum('intro_total'))
     if _nums['intro_total__sum']:
@@ -502,7 +501,6 @@ def get_hike_nums(user):
         nums = 0
     return nums
 
-#获取加息总额
 def get_hike_amount(user):
     _amount = InterestHike.objects.filter(user=user, invalid=False, paid=True).aggregate(Sum('amount'))
     if not _amount['amount__sum']:
