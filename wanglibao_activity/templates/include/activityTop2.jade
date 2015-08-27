@@ -1,75 +1,12 @@
-
-- load formatters
-.act-full-container
-  .act-topbar
-    .container.row
-      .act-user-div
-        i(style="padding:0px;margin:0px;border:0px;font:inherit;").act-icon-phone.font-l &nbsp;
-        span 客服热线：
-        span 4008-588-066
-        span.act-margin-left-m 关注我们：
-        a.topbar-anchor.act-icon.act-icon-weibo(href="http://weibo.com/u/5000682691", target="_blank", data-role="hover", data-target="#qrweibo-top")
-        a.topbar-anchor.act-icon.act-icon-weixin(href="javascript:void(0)", data-role="hover", data-target="#qrcode-top")
-        a#qrweibo-top.act-weibo-qr-code(href="http://weibo.com/u/5000682691", target="_blank",  data-name="hoverbox",style="display:none")
-          img.act-weibo-qr-code(src="/static/images/weibo-nqr.png")
-        img#qrcode-top.act-icon.act-weixin-qr-code(src="/static/images/weixin-nqr.png", style="display:none",data-name="hoverbox")
-        span.act-mobile-app-top
-          span.act-icon.act-icon-mobile-app
-          span 手机网利宝
-          .act-mobile-app-top-prompt
-            div(style="height:30px; top:-20px; position:relative;")
-            a.act-mobile-app-apple(href="https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8", target="_blank", title="iPhone版")
-            a.act-mobile-app-android(href="https://www.wanglibao.com/static/wanglibao1.apk", title="Android版")
-.activity-nav
-  .act-container-login-nav
-    a(href='/')
-      .act-logo(style="background:url('/static/imgs/pc_activity/ganjiwang/new-logo.png');background-repeat:no-repeat;background-position:left;height:75px;width:350px;display:inline-block")
-    .login-nav
-      .right-nav
-      include include/nav_common
-
-
-  //script(src="/static/js/require.js", data-main="/static/js/header")
-  script(src="/static/js/lib/jquery.min.js")
-  //script(src="/static/js/login_modal.js")
-  script.
-    $('.act-mobile-app-top').bind('mouseenter', function(e) {
-      return $('.act-mobile-app-top-prompt').show();
-    }).bind('mouseleave', function(e) {
-      return $('.act-mobile-app-top-prompt').hide();
-    });
-    $('.act-mobile-app-top-prompt').bind('mouseenter', function(e) {
-      return $(this).show();
-    }).bind('mouseleave', function(e) {
-      return $(this).hide();
-    });
-    $('.act-icon-weixin').bind('mouseenter',function(){
-      $('#qrcode-top').show();
-    }).bind('mouseleave',function(){
-      $('#qrcode-top').hide();
-    })
-    $('#qrcode-top').bind('mouseenter', function(e) {
-      return $(this).show();
-    }).bind('mouseleave', function(e) {
-      return $(this).hide();
-    });
-
-    $('.act-icon-weibo').bind('mouseenter',function(){
-      $('#qrweibo-top').show();
-    }).bind('mouseleave',function(){
-      $('#qrweibo-top').hide();
-    })
-    $('#qrweibo-top').bind('mouseenter', function(e) {
-      return $(this).show();
-    }).bind('mouseleave', function(e) {
-      return $(this).hide();
-    });
-    $('.nologin').on('click',function(){
-      {% if user.is_authenticated == False %}
-        window.location.href='/accounts/home/'
-      {% endif %}
-      {% if user.is_authenticated == True %}
-        window.location.href='/accounts/login/'
-      {% endif %}
-    });
-
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝官网' as title
+    include global/g_head
+    - endwith
+  body
+    - with '首页' as activeItem
+    include global/g_nav
+    - endwith
