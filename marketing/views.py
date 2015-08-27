@@ -5,7 +5,8 @@ import pytz
 from datetime import date, timedelta, datetime
 from collections import defaultdict
 from decimal import Decimal
-
+import time
+from wanglibao_p2p.models import P2PEquity
 from django.db.models import Count, Sum
 from django.contrib.auth.decorators import permission_required
 from django.core.paginator import Paginator, PageNotAnInteger
@@ -18,7 +19,7 @@ from mock_generator import MockGenerator
 from django.conf import settings
 from django.db.models.base import ModelState
 from wanglibao_sms.utils import send_validation_code
-from marketing.models import Channels, PromotionToken, IntroducedBy, IntroducedByReward, Reward, ActivityJoinLog
+from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, IntroducedBy, IntroducedByReward, Reward, ActivityJoinLog
 from marketing.tops import Top
 from utils import local_to_utc
 
@@ -832,3 +833,80 @@ class ThunderActivityRewardCounter(APIView):
             'ret_code': 0,
             'num': int(record['num']) if record['num'] else 0,
         })
+
+def celebrate_ajax(request):
+    user = request.user
+    if not user.is_authenticated():
+        to_json_response = {
+            'ret_code': 4000,
+            'message': u'用户没有登陆，请先登陆',
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+    record = IntroducedBy.objects.filter(user_id=user.id).first()
+    if record:
+        record = Channels.objects.filter(id=record.channel_id).first()
+    if record.name:
+        to_json_response = {
+            'ret_code': 4000,
+            'message': u'渠道用户不允许参加这个活动',
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+    if request.method == 'POST':
+        pass
+
+
+class WanglibaoAwardActivity(APIView):
+    """
+        Author: add by Yihen@20150827
+        Description: 网利宝公司活动
+    """
+    def __init__(self):
+        pass
+
+    def is_valid_user(self, request):
+        """
+            Description:判断用户是不是在活动期间内注册的新用户
+        """
+        record = IntroducedBy.objects.filter(user_id=request.user.id).first()
+        time_array = time.strptime(record.create_at, "%Y-%m-%d %H:%M:%S")
+        create_at = int(time.mktime(time_array))  # 用户注册的时间戳
+        activity_start = time.mktime(datetime(2015, 9, 1).timetuple())  # 活动开始时间
+
+        if activity_start > create_at:
+            return Response({
+                'ret_code': 3000,
+                'message': u'非活动期注册用户',
+            })
+        else:
+            return Response({
+                'ret_code': 3001,
+                'message': u'活动期注册用户',
+            })
+
+    def update_total_chances_and_awards(self, request):
+        """
+            每次进入转盘页面，会更新一下用户的抽奖机会和获奖机会
+        """
+        activity_start = datetime(2015, 9, 1, 0, 0)
+        record = P2PEquity.objects.filter(equity__gte=5000, create_at__gt=activity_start, user_id=request.user.id).aggregate(counts=Count('id'))
+        if record:
+            user_activity = WanglibaoActivityReward.objects.filter(user=request.user.id).first()
+            user_activity.total_chances = record['counts']
+            user_activity.total_awards = record['counts']
+            user_activity.save(updates=['total_chances', 'total_awards'])
+
+    def add_user_activity_logs(self, request):
+        """
+            更新用户的红包记录
+        """
+        activity_start = datetime(2015, 9, 1, 0, 0)
+        record = P2PEquity.objects.filter(equity__gte=5000, create_at__gt=activity_start, user_id=request.user.id).aggregate(counts=Count('id'))
+        activity = ActivityJoinLog.objects.filter(user_id=request.user.id).aggregate(user_count=Count('id'))
+        if activity.user_count < record.counts:
+            pass
+            # TODO 加入红包
+
+    def response_activity(self):
+        pass
