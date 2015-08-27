@@ -15,14 +15,15 @@ block main
   .account-home-panel
     include include/coupon_exchange
 
+  ul.discount--tabs
+    li.coupon--tab
+        a(href="/accounts/redpacket/unused") 红包
+            span
+    li.redpacket--tab.hover
+        a(href="/accounts/coupon/unused") 加息券
+            span
   .account-home-panel__no-padding
     .account-home-panel--title-bar__product
-      ul.title-bar--tabs
-        li.title-bar--tab
-          a.title-bar--tab--anchor(href="/accounts/redpacket/unused") 红包
-        li.title-bar--tab.active
-          a.title-bar--tab--anchor(href="/accounts/coupon/unused") 加息券
-    
     .account-home-panel--title-bar__product
       ul.title-bar--tabs
         if status == 'unused'
