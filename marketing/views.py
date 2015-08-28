@@ -888,14 +888,14 @@ class WanglibaoAwardActivity(APIView):
     def __init__(self, request):
         self.request = request
         activity_start = datetime(2015, 9, 1, 0, 0)
-        self.record = P2PEquity.objects.filter(equity__gte=5000, create_at__gt=activity_start, user_id=request.user.id).aggregate(counts=Count('id'))
+        self.record = P2PEquity.objects.filter(equity__gte=5000, created_at__gt=activity_start, user_id=request.user.id).aggregate(counts=Count('id'))
 
     def is_valid_user(self):
         """
             Description:判断用户是不是在活动期间内注册的新用户
         """
         record = IntroducedBy.objects.filter(user_id=self.request.user.id).first()
-        time_array = time.strptime(record.create_at, "%Y-%m-%d %H:%M:%S")
+        time_array = time.strptime(record.created_at, "%Y-%m-%d %H:%M:%S")
         create_at = int(time.mktime(time_array))  # 用户注册的时间戳
         activity_start = time.mktime(datetime(2015, 9, 1).timetuple())  # 活动开始时间
 
