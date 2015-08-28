@@ -14,6 +14,7 @@ class Order(models.Model):
     PAY_ORDER = 'pay'
     WITHDRAW_ORDER = 'withdraw'
     ACTIVITY = 'activity'
+    INTEREST_COUPON = 'interest_coupon'
 
     type = models.CharField(max_length=64, verbose_name=u'订单类型')
     status = models.CharField(max_length=64, verbose_name=u'订单状态')

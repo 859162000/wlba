@@ -851,6 +851,8 @@ CAIMIAO_ProdMain_URL = 'http://121.40.31.143:86/api/JsonsFinancial/ProdMain/'
 CAIMIAO_Volumes_URL = 'http://121.40.31.143:86/api/JsonsFinancial/Volumes/'
 CAIMIAO_RATING_URL = 'http://121.40.31.143:86/api/JsonsFinancial/Rating/'
 
+# 众牛
+ZHONGNIU_SECRET = 'N9ecZSqh'
 
 # 金山
 WLB_FOR_JINSHAN_KEY = '1994'
@@ -884,10 +886,27 @@ else:
     LINGCAIBAO_URL_ORDER = 'http://test.lingcaibao.com/lingcaiapi/order'
 
 # 云端
-YUNDUAN_COOP_ID = 133
-YUNDUAN_KEY = 'wanglibao@123'
 WLB_FOR_YUNDUAN_KEY = '1998'
-YUNDUAN_CALL_BACK_URL = 'http://www.a.com/track/cps.php'
+YUNDUAN_CALL_BACK_URL = 'http://www.yunduanlm.com/effect.php'
+YUNDUAN_ACTIVITY_PAGE = 'marketing_baidu'
+YUNDUAN_COOP_ID = 298
+
+# 易车
+WLB_FOR_YICHE_KEY = '1999'
+if ENV == ENV_PRODUCTION:
+    YICHE_COOP_ID = None
+    YICHE_KEY = None
+    YICHE_REGISTER_CALL_BACK_URL = None
+    YICHE_VALIDATE_CALL_BACK_URL = None
+    YICHE_PURCHASE_CALL_BACK_URL = None
+    YICHE_U_PURCHASE_CALL_BACK_URL = None
+else:
+    YICHE_COOP_ID = 200104
+    YICHE_KEY = '0dae7d5bbcd493785f057bc1'
+    YICHE_REGISTER_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API?method=AddPlatFormFinanceUser'
+    YICHE_VALIDATE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API?method=UpdatePlatFormFinanceUser'
+    YICHE_PURCHASE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API?method=AddPlatFormFinanceOrder'
+    YICHE_U_PURCHASE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API?method=UpdatePlatFormFinanceOrder'
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100

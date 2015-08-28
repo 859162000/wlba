@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # encoding:utf-8
+import decimal
 import json
 from wanglibao_account.utils import str_to_float
 
@@ -14,7 +15,7 @@ import datetime
 import time
 import logging
 from django.contrib.auth.models import User
-from django.db.models import Sum, Q
+from django.db.models import Sum, Q, Count
 from django.http import HttpResponse
 from django.utils import timezone
 import requests
@@ -28,14 +29,17 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
      JUXIANGYOU_CALL_BACK_URL, TINMANG_KEY, DOUWANWANG_CALL_BACK_URL, JINSHAN_CALL_BACK_URL, WLB_FOR_JINSHAN_KEY, \
      WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY, FUBA_CALL_BACK_URL, WLB_FOR_FUBA_KEY, \
-     FUBA_COOP_ID, FUBA_KEY, FUBA_CHANNEL_CODE, FUBA_DEFAULT_TID, FUBA_PERIOD, YUNDUAN_CALL_BACK_URL, \
-    WLB_FOR_YUNDUAN_KEY, YUNDUAN_COOP_ID, YUNDUAN_KEY
+     FUBA_COOP_ID, FUBA_KEY, FUBA_CHANNEL_CODE, FUBA_DEFAULT_TID, FUBA_PERIOD, \
+     WLB_FOR_YUNDUAN_KEY, YUNDUAN_CALL_BACK_URL, YUNDUAN_COOP_ID, WLB_FOR_YICHE_KEY, YICHE_COOP_ID, \
+     YICHE_KEY, YICHE_REGISTER_CALL_BACK_URL, YICHE_VALIDATE_CALL_BACK_URL, YICHE_PURCHASE_CALL_BACK_URL, \
+     YICHE_U_PURCHASE_CALL_BACK_URL
 from wanglibao_account.models import Binding, IdVerification
-from wanglibao_account.tasks import common_callback, jinshan_callback
+from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
 from wanglibao_pay.models import Card
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_redis.backend import redis_backend
+from dateutil.relativedelta import relativedelta
 
 logger = logging.getLogger(__name__)
 
@@ -194,8 +198,8 @@ class CoopRegister(object):
             return None
 
     def save_to_session(self):
-        channel_code  = self.get_channel_code_from_request()
-        channel_user  = self.request.GET.get(self.external_channel_user_key, None)
+        channel_code = self.get_channel_code_from_request()
+        channel_user = self.request.GET.get(self.external_channel_user_key, None)
         if channel_code:
             self.request.session[self.internal_channel_key] = channel_code
             # logger.debug('save to session %s:%s'%(self.internal_channel_key, channel_code))
@@ -685,40 +689,121 @@ class YunDuanRegister(CoopRegister):
     def __init__(self, request):
         super(YunDuanRegister, self).__init__(request)
         self.c_code = 'yunduan'
-        self.call_back_url = YUNDUAN_CALL_BACK_URL
         self.coop_id = YUNDUAN_COOP_ID
-        self.coop_key = YUNDUAN_KEY
+        self.call_back_url = YUNDUAN_CALL_BACK_URL
 
-    def yunduan_call_back(self, user):
-        # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
-        binding = Binding.objects.filter(user_id=user.id).first()
-        p2p_record = P2PRecord.objects.filter(user_id=user.id).last()
-        if binding and p2p_record:
-            order_id = p2p_record.id
-            sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
-            params = {
-                'action': 'create',
-                'order': order_id,
-                'sig': sig,
-                'planid': self.coop_id,
-                'uid': binding.bid,
-            }
-            common_callback.apply_async(
-                kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+    def yunduan_call_back(self):
+        params = {
+            'type': 'ef',
+            'pid': self.coop_id,
+        }
+        # 云端跟踪回调
+        common_callback.apply_async(
+            kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+
+        # 云端效果回调
+        params['type'] = 'ec'
+        common_callback.apply_async(
+            kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
 
     def validate_call_back(self, user):
-        self.yunduan_call_back(user)
+        binding = Binding.objects.filter(user_id=user.id).first()
+        if binding:
+            self.yunduan_call_back()
 
     def purchase_call_back(self, user):
         # 判断是否是首次投资
-        if P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').count() == 1:
-            self.yunduan_call_back(user)
+        binding = Binding.objects.filter(user_id=user.id).first()
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
+        if binding and p2p_record.count() == 1:
+            self.yunduan_call_back()
 
+
+class YiCheRegister(CoopRegister):
+    def __init__(self, request):
+        super(YiCheRegister, self).__init__(request)
+        self.c_code = 'yiche'
+        self.register_call_back_url = YICHE_REGISTER_CALL_BACK_URL
+        self.validate_call_back_url = YICHE_VALIDATE_CALL_BACK_URL
+        self.purchase_call_back_url = YICHE_PURCHASE_CALL_BACK_URL
+        self.u_purchase_call_back_url = YICHE_U_PURCHASE_CALL_BACK_URL
+        self.coop_id = YICHE_COOP_ID
+        self.coop_key = YICHE_KEY
+
+    def yiche_call_back(self, url, params):
+        params['_pid'] = self.coop_id
+        params['format'] = 'xml'
+        params['_ts'] = int(time.time())
+        params_iteritems = sorted(params.iteritems(), key=lambda asd:asd[0], reverse=False)
+        params_iteritems = '&'.join([key.lower()+'='+str(value) for key, value in params_iteritems if value])
+        params['_sign'] = hashlib.md5(params_iteritems+self.coop_key).hexdigest()
+        yiche_callback.apply_async(
+            kwargs={'url': url, 'params': params, 'channel': self.c_code})
+
+    def register_call_back(self, user):
+        binding = Binding.objects.filter(user_id=user.id).first()
+        if binding:
+            url = self.register_call_back_url
+            introduced_by = IntroducedBy.objects.filter(user_id=user.id).first()
+            mobile = '******'.join(get_phone_for_coop(user.id).split('***'))
+            params = {
+                'userId': binding.bid,
+                'userName': mobile,
+                'realName': '',
+                'mobile': mobile,
+                'companyId': 9,
+                'regTime': introduced_by.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'regSource': 3,
+            }
+            self.yiche_call_back(url, params)
+
+    def validate_call_back(self, user):
+        binding = Binding.objects.filter(user_id=user.id).first()
+        if binding:
+            url = self.validate_call_back_url
+            username = get_username_for_coop(user.id)
+            params = {
+                'userId': binding.bid,
+                'realName': username,
+            }
+            self.yiche_call_back(url, params)
+
+    def purchase_call_back(self, user):
+        # 判断是否是首次投资
+        binding = Binding.objects.filter(user_id=user.id).first()
+        if binding:
+            url = self.purchase_call_back_url
+            p2p_record = get_last_investment_for_coop(user.id)
+            invest_time = p2p_record.create_time
+            params = {
+                'userId': binding.bid,
+                'orderNo': p2p_record.id,
+                'invest': str(p2p_record.amount),
+                'investTime': invest_time.strftime('%Y-%m-%d %H:%M:%S'),
+            }
+            self.yiche_call_back(url, params)
+
+            url = self.u_purchase_call_back_url
+            period = p2p_record.product.period
+            pay_method = p2p_record.product.pay_method
+            profit_time = None
+            # 根据支付方式判定标周期的单位（天/月）
+            if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
+                profit_time = invest_time + relativedelta(months=period)
+            elif pay_method in [u'日计息一次性还本付息', u'日计息月付息到期还本']:
+                profit_time = invest_time + relativedelta(days=period)
+            params = {
+                'orderNo': p2p_record.id,
+                'profit': '0.01',
+                'profitTime': profit_time.strftime('%Y-%m-%d %H:%M:%S'),
+            }
+            self.yiche_call_back(url, params)
 
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
-                          ShiTouCunRegister, FUBARegister]
+                          ShiTouCunRegister, FUBARegister, YunDuanRegister,
+                          YiCheRegister]
 
 
 #######################第三方用户查询#####################
@@ -866,7 +951,8 @@ def get_rate(product_id_or_instance):
     """
     if isinstance(product_id_or_instance, P2PProduct):
         if product_id_or_instance.activity and product_id_or_instance.activity.rule:
-            return product_id_or_instance.activity.rule.rule_amount + product_id_or_instance.expected_earning_rate
+            return product_id_or_instance.activity.rule.rule_amount + \
+                   decimal.Decimal(product_id_or_instance.expected_earning_rate)
         else:
             return product_id_or_instance.expected_earning_rate
 
@@ -885,40 +971,17 @@ def get_amortization_time(product_id_or_instance):
 
 
 def get_p2p_info(mproduct):
-    product_info = {
-        'for_freshman': 0, #是否新手标
-        'period': 0, #产品周期
-        'rate': 0, #产品收益率
-        'amount': 0, #募集金额
-        'ordered_amount': 0, #已募集金额
-        'buyer': 0, #投资人数
-        'start_time': 0, #标的开始时间
-        'end_time': 0, #标的结束时间
-        'state': '', #产品状态
-        'borrower': '', #借款人名称
-        'guarant_mode': '本息担保', #担保方式
-        'guarantor': '', #担保方名称
-        'amortization_start_time': 0, #还款开始时间
-        'amortization_end_time': 0, #还款结束时间
-        'borrower_guarant_type': '第三方担保', #借款担保方式
-        'repayment_type': '', #还款方式
-        'start_price': 100, #起投金额
-        'id': 0, #产品id
-    }
-    product_info['for_freshman'] = 1 if mproduct.category == '新手标' else 0
-    product_info['period'] = mproduct.period
-    product_info['rate'] = get_rate(mproduct)
-    product_info['amount'] = mproduct.total_amount
-    product_info['ordered_amount'] = mproduct.ordered_amount
-    product_info['buyer'] = mproduct.bought_people_count
-    product_info['start_time'] = mproduct.publish_time
-    product_info['end_time'] = mproduct.end_time
-    product_info['state'] = mproduct.status
-    product_info['borrower'] = mproduct.borrower_name
-    product_info['guarantor'] = mproduct.warrant_company
-    product_info['amortization_start_time'], product_info['end_time'] = get_amortization_time(mproduct)
-    product_info['repayment_type'] = mproduct.pay_method
-    product_info['id'] = mproduct.id
+
+    product_info = {'for_freshman': 1 if mproduct.category == '新手标' else 0, 'period': mproduct.period,
+                    'rate': get_rate(mproduct), 'amount': mproduct.total_amount,
+                    'ordered_amount': mproduct.ordered_amount,
+                    'buyer': mproduct.equities.all().annotate(Count('user', distinct=True)).count(),
+                    'start_time': mproduct.publish_time, 'end_time': get_amortization_time(mproduct)[1],
+                    'state': mproduct.status, 'borrower': mproduct.borrower_name, 'guarant_mode': '本息担保',
+                    'guarantor': mproduct.warrant_company,
+                    'amortization_start_time': get_amortization_time(mproduct)[0], 'amortization_end_time': 0,
+                    'borrower_guarant_type': '第三方担保', 'repayment_type': mproduct.pay_method, 'start_price': 100,
+                    'id': mproduct.id}
 
     return product_info
 
@@ -971,15 +1034,17 @@ def xicai_get_p2p_info(mproduct, access_token):
         if time:
             return time.strftime('%Y-%m-%d')
 
+    period = mproduct.period if mproduct.pay_method.startswith(u"日计息") else mproduct.period * 30
+
     xicai_info = {
         'access_token': access_token,
-        'product_name': '网利宝',
+        'product_name': mproduct.name,
         'isexp': p2p_info['for_freshman'],
-        'life_cycle': p2p_info['period'],
+        'life_cycle': period,
         'ev_rate': p2p_info['rate'],
         'amount': p2p_info['amount'],
         'invest_amount': p2p_info['ordered_amount'],
-        'invest_mans': p2p_info['buyer'],
+        'inverst_mans': mproduct.equities.all().annotate(Count('user', distinct=True)).count(),
         'underlying_start': format_time(p2p_info['start_time']),
         'underlying_end': format_time(p2p_info['end_time']),
         'link_website': settings.XICAI_LOAD_PAGE.format(p2p_id=mproduct.id),
@@ -1003,19 +1068,21 @@ def xicai_get_p2p_info(mproduct, access_token):
 def xicai_post_product_info(mproduct, access_token):
     p2p_info = xicai_get_p2p_info(mproduct, access_token)
     url = settings.XICAI_CREATE_P2P_URL
-    requests.post(url, data=p2p_info)
+    ret = requests.post(url, data=p2p_info)
+    return ret.text
 
 
 def xicai_post_updated_product_info(mproduct, access_token):
     p2p_info = xicai_get_p2p_info(mproduct, access_token)
     updated_p2p_info = {}
     for k in ['access_token', 'invest_amount',
-              'invest_mans', 'underlying_end',
+              'inverst_mans', 'underlying_end',
               'product_state', 'repay_start_time',
               'repay_end_time', 'p2p_product_id']:
         updated_p2p_info[k] = p2p_info[k]
     url = settings.XICAI_UPDATE_P2P_URL
-    requests.post(url, data=updated_p2p_info)
+    ret = requests.post(url, data=updated_p2p_info)
+    return ret.text
 
 
 def xicai_get_new_p2p():
@@ -1445,3 +1512,143 @@ def caimiao_post_rating_info():
     ret = requests.post(url, data=json_data)
 
     return ret.text
+
+
+# 众牛的API
+class ZhongniuP2PQuery(APIView):
+    """
+    author: Zhoudong
+    http请求方式: GET  获取请求当天发布并且当天结束的项目（防止漏掉秒杀标）及系统中所有未完成（预投标，投标中）的项目列表。
+    http://xxxxxx.com/getList
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    def check_sign(self):
+
+        pwd = str(self.request.GET.get('pwd', None))
+        if pwd and pwd == settings.ZHONGNIU_SECRET:
+            return True
+
+    def get(self, request):
+
+        if self.check_sign():
+            ret = dict()
+            ret['data'] = []
+            products = P2PProduct.objects.filter(
+                Q(status=u'录标') | Q(status=u'录标完成') | Q(status=u'待审核') | Q(status=u'正在招标'))
+
+            products = set(products)
+
+            now = timezone.now()
+            start = now - timezone.timedelta(days=1)
+            end = now + timezone.timedelta(days=1)
+
+            # 我们的秒杀标的规则是什么. 周期一天内的显示.
+            sec_kill_products = P2PProduct.objects.filter(Q(publish_time__lt=now) & Q(publish_time__gte=start) &
+                                                          Q(end_time__lt=end) & Q(end_time__gte=now))
+
+            for p in sec_kill_products:
+                if p.end_time - p.publish_time <= timezone.timedelta(days=1):
+                    products.add(p)
+
+            if len(products) > 0:
+                ret['status'] = 0
+                for product in products:
+                    data = dict()
+                    data['pid'] = product.pk
+                    data['status'] = product.status
+                    data['amounted'] = product.ordered_amount
+                    data['progress'] = product.completion_rate
+                    ret['data'].append(data)
+            else:
+                ret['status'] = 1
+
+        else:
+            ret = {
+                'status': 2,
+                'msg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class ZhongniuP2PDataQuery(APIView):
+    """
+    author: Zhoudong
+    http请求方式: GET  获取请求指定pid的项目详情数据（请求中会附带pid参数）
+    http://xxxxxx.com/getData/pid/123456
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    def check_sign(self):
+
+        pwd = str(self.request.GET.get('pwd', None))
+        if pwd and pwd == settings.ZHONGNIU_SECRET:
+            return True
+
+    def get(self, request, pid):
+
+        ret = dict()
+
+        if self.check_sign():
+            if pid:
+                try:
+                    product = P2PProduct.objects.get(pk=pid)
+                except Exception, e:
+                    ret['status'] = 2
+                    ret['msg'] = u'%s' % e
+                    return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+            if product:
+                ret['status'] = 1
+                data = dict()
+                data['pid'] = product.pk
+                data['name'] = product.name
+                # 根据不同环境对应不同的url
+                if settings.ENV == 'debug':
+                    base_url = 'http://127.0.0.1:8000'
+                if settings.ENV == 'staging':
+                    base_url = 'https://staging.wanglibao.com'
+                if settings.ENV == 'production':
+                    base_url = 'https://www.wanglibao.com'
+                data['url'] = base_url + '/p2p/detail/' + str(product.pk)
+                data['type'] = product.category
+                data['yield'] = product.expected_earning_rate
+                data['duration'] = product.period
+                data['repaytype'] = product.pay_method
+                data['guaranttype'] = product.warrant_company.name
+                data['threshold'] = 100
+                data['status'] = product.status
+                data['amount'] = product.total_amount
+                data['amounted'] = product.ordered_amount
+                data['progress'] = "%.2f" % product.completion_rate
+
+                # Attachment 重中的图片
+                detail = list()
+                detail.append({'title': product.name})
+                detail.append({'content': product.usage})
+
+                attachments = product.attachment_set.all()
+                for attachment in attachments:
+                    url = base_url + attachment.file.url
+                    detail.append({'image': url})
+                data['detail'] = detail
+
+                data['startdate'] = product.publish_time
+                data['enddate'] = product.end_time
+                data['publishtime'] = product.publish_time
+
+                ret['data'] = data
+
+            else:
+                ret['status'] = 1
+
+        else:
+            ret = {
+                'status': 2,
+                'msg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))

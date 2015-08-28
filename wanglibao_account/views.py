@@ -549,14 +549,12 @@ class AccountInviteAllGoldAPIView(APIView):
         first_intro = dic['first_intro']
         commission = dic['commission']
         
-
         introduces = IntroducedBy.objects.filter(introduced_by=request.user).select_related("user__wanglibaouserprofile").all()
         keys = commission.keys()
         for x in introduces:
             user_id = x.user.id
             if user_id in keys:
-                first_intro.append([safe_phone_str(users[user_id].phone), 
-                                commission[user_id]['amount'], commission[user_id]['earning']])
+                first_intro.append([safe_phone_str(users[user_id].phone), commission[user_id]['amount'], commission[user_id]['earning']])
             else:
                 first_intro.append([safe_phone_str(x.user.wanglibaouserprofile.phone), 0, 0])
 
@@ -564,6 +562,7 @@ class AccountInviteAllGoldAPIView(APIView):
                         "earning":first_earning, "count":first_count, "intro":first_intro},
                         "second":{"amount":second_amount, "earning":second_earning,
                         "count":second_count}, "count":len(introduces)})
+
 
 class AccountInviteIncomeAPIView(APIView):
     permission_classes = (IsAuthenticated, )
@@ -874,11 +873,31 @@ class AccountRedPacket(TemplateView):
 
         user = self.request.user
         device = utils.split_ua(self.request)
-        result = backends.list_redpack(user, 'all', device['device_type'])
+        result = backends.list_redpack(user, 'all', device['device_type'], 0)
         red_packets = result['packages'].get(status, [])
 
         return {
             "red_packets": red_packets,
+            "status": status
+        }
+
+
+class AccountCoupon(TemplateView):
+    template_name = 'coupon_available.jade'
+
+    def get_context_data(self, **kwargs):
+
+        status = kwargs['status']
+        if status not in ('used', 'unused', 'expires'):
+            status = 'unused'
+
+        user = self.request.user
+        device = utils.split_ua(self.request)
+        result = backends.list_redpack(user, 'all', device['device_type'], 0, 'coupon')
+        coupons = result['packages'].get(status, [])
+
+        return {
+            "coupons": coupons,
             "status": status
         }
 

@@ -56,13 +56,14 @@ class P2PTrader(object):
             raise P2PException(u'用户账户已冻结，请联系客服')
         with transaction.atomic():
             if redpack:
-                redpack_order_id = OrderHelper.place_order(self.user, order_type=u'红包消费', redpack=redpack,
-                                                        product_id=self.product.id, status=u'新建').id
-                result = redpack_backends.consume(redpack,amount, self.user, self.order_id, self.device_type)
+                redpack_order_id = OrderHelper.place_order(self.user, order_type=u'优惠券消费', redpack=redpack,
+                                                           product_id=self.product.id, status=u'新建').id
+                result = redpack_backends.consume(redpack, amount, self.user, self.order_id, self.device_type, self.product.id)
                 if result['ret_code'] != 0:
                     raise Exception,result['message']
-                red_record = self.margin_keeper.redpack_deposit(result['deduct'], u"购买P2P抵扣%s元" % result['deduct'], 
-                                                        order_id=redpack_order_id, savepoint=False)
+                if result['rtype'] != 'interest_coupon':
+                    red_record = self.margin_keeper.redpack_deposit(result['deduct'], u"购买P2P抵扣%s元" % result['deduct'],
+                                                                    order_id=redpack_order_id, savepoint=False)
                 OrderHelper.update_order(Order.objects.get(pk=redpack_order_id), user=self.user, status=u'成功', 
                                         amount=amount, deduct=result['deduct'], redpack=redpack)
 
@@ -95,7 +96,7 @@ class P2PTrader(object):
         })
 
         # 满标给管理员发短信
-        if product_record.product_balance_after <= 0:
+        if is_full:
             from wanglibao_p2p.tasks import full_send_message
 
             full_send_message.apply_async(kwargs={"product_name": self.product.name})
@@ -149,13 +150,11 @@ class P2POperator(object):
             except P2PException, e:
                 cls.logger.error(u'%s, %s' % (amortization, e.message))
 
-
         ## 停止在watchdog中每分钟循环自动投标，减轻celery任务
         ## 将自动投标入口改在两处，一是标状态变成“正在招标”，二是用户保存并启用自动投标配置
         print('Getting automation trades')
         from wanglibao_p2p.automatic import Automatic
         Automatic().auto_trade()
-
 
     @classmethod
     #@transaction.commit_manually
@@ -281,8 +280,8 @@ class P2POperator(object):
             all_settled = reduce(lambda flag, a: flag & a.settled, product.amortizations.all(), True)
 
             if all_settled:
-                cls.settle_hike(product)
-                cls.logger.info("Product [%s] [%s] paid hike", product.id, product.name)
+                # cls.settle_hike(product)
+                # cls.logger.info("Product [%s] [%s] paid hike", product.id, product.name)
 
                 cls.logger.info("Product [%d] [%s] payed all amortizations, finish it", product.id, product.name)
                 ProductKeeper(product).finish(None)
@@ -293,7 +292,6 @@ class P2POperator(object):
 
                 # 将标信息从还款中的redis列表中挪到已完成的redis列表
                 cache_backend.update_list_cache('p2p_products_repayment', 'p2p_products_finished', product)
-
 
     @classmethod
     def settle_hike(cls, product):

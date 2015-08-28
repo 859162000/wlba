@@ -92,10 +92,11 @@ def handler_paginator(request, objs, page_size=20, page_index=1):
 
 class AmortizationCalculator():
 
-    def __init__(self, paymethod, amount, year_rate, period):
+    def __init__(self, paymethod, amount, year_rate, period, coupon_year_rate):
         self.paymethod = paymethod
         self.amount = amount
         self.year_rate = year_rate
+        self.coupon_year_rate = coupon_year_rate
         self.period = period
         self.choice = {
             '1': self.debxmethod,
@@ -114,27 +115,33 @@ class AmortizationCalculator():
 
     def debxmethod(self):
         """ 等额本息 """
-        return MatchingPrincipalAndInterest.generate(self.amount, self.year_rate, timezone.now(), period=self.period)
+        return MatchingPrincipalAndInterest.generate(self.amount, self.year_rate, timezone.now(),
+                                                     period=self.period, coupon_year_rate=self.coupon_year_rate)
 
     def ayfxdqhbfxmethod(self):
         """ 按月付息到期还本 """
-        return MonthlyInterest.generate(self.amount, self.year_rate, timezone.now(), period=self.period)
+        return MonthlyInterest.generate(self.amount, self.year_rate, timezone.now(),
+                                        period=self.period, coupon_year_rate=self.coupon_year_rate)
 
     def dqhbfxmethod(self):
         """ 到期还本付息 """
-        return DisposablePayOff.generate(self.amount, self.year_rate, timezone.now(), period=self.period)
+        return DisposablePayOff.generate(self.amount, self.year_rate, timezone.now(),
+                                         period=self.period, coupon_year_rate=self.coupon_year_rate)
 
     def ajdfxmethod(self):
 
         """ 按季度付息 """
-        return QuarterlyInterest.generate(self.amount, self.year_rate, timezone.now(), period=self.period)
+        return QuarterlyInterest.generate(self.amount, self.year_rate, timezone.now(),
+                                          period=self.period, coupon_year_rate=self.coupon_year_rate)
 
     def rjycxmethod(self):
 
         """ 日计息一次性还本付息 """
-        return DailyInterest.generate(self.amount, self.year_rate, timezone.now(), period=self.period)
+        return DailyInterest.generate(self.amount, self.year_rate, timezone.now(), period=self.period,
+                                      coupon_year_rate=self.coupon_year_rate)
 
     def rjyfxmethod(self):
 
         """ 日计息月付息到期还本 """
-        return DailyInterestMonthly.generate(self.amount, self.year_rate, timezone.now(), period=self.period)
+        return DailyInterestMonthly.generate(self.amount, self.year_rate, timezone.now(), period=self.period,
+                                             coupon_year_rate=self.coupon_year_rate)

@@ -74,8 +74,8 @@ class PrepaymentHistory(object):
                 user_record = self.get_user_repayment(user_amortization, penal_interest, repayment_type, payment_date)
 
                 user_margin_keeper = MarginKeeper(user_record.user)
-                user_margin_keeper.amortize(user_record.principal, user_record.interest,
-                        user_record.penal_interest, savepoint=False, description=self.description)
+                user_margin_keeper.amortize(user_record.principal, user_record.interest, user_record.penal_interest,
+                                            user_record.coupon_interest, savepoint=False, description=self.description)
 
                 order_id = OrderHelper.place_order(user_record.user, order_type=self.catalog, product_id=self.product.id, status=u'新建').id
 

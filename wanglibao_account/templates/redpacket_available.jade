@@ -3,22 +3,27 @@ extends account_home_base
 -load formatters
 
 block head
-  - with '红包' as title
+  - with '优惠券' as title
     include include/head
 
 block sidebar
-  - with '红包' as activeItem
+  - with '优惠券' as activeItem
   include include/user_center_sidebar
   - endwith
 
 block main
   .account-home-panel
-    h1(style="font-size:16px;margin-bottom:20px;") 兑换红包
-    .row
-      input(type="text", placeholder="请输入兑换码", style="display:inline-block;width:240px", name="token", autocomplete="off")
-      input(type="button", value="兑换", style="height:40px;margin-left:10px").submit-button.button-primary.button-middle.exchange
+    include include/coupon_exchange
 
+  ul.discount--tabs
+        li.coupon--tab.hover
+          a(href="/accounts/redpacket/unused") 红包
+            span
+        li.redpacket--tab
+          a(href="/accounts/coupon/unused") 加息券
+            span
   .account-home-panel__no-padding
+    .account-home-panel--title-bar__product
     .account-home-panel--title-bar__product
       ul.title-bar--tabs
         if status == 'unused'
