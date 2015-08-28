@@ -59,6 +59,18 @@
         $.modal.close()
     })
 
+    $.ajax({
+        url: '/api/celebrate/awards',
+        type: "POST",
+        data: {
+            action : 'IS_VALID'
+        }
+    }).done(function () {
+
+    }).fail(function (xhr) {
+
+    });
+
     //无线滚动
     var timer,i= 1,j=2;
     timer=setInterval(function(){
