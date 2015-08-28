@@ -151,7 +151,7 @@ urlpatterns += patterns(
     url(r'^api/csai/investment/', CsaiInvestmentQuery.as_view()),
 
     url(r'^api/zhongniu/products/', ZhongniuP2PQuery.as_view()),
-    url(r'^api/zhongniu/getData/pid/(?P<pid>[0-9]*)/$', ZhongniuP2PDataQuery.as_view()),
+    url(r'^api/zhongniu/getData/$', ZhongniuP2PDataQuery.as_view()),
 )
 
 # 微信

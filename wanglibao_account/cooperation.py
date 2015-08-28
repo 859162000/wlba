@@ -1595,9 +1595,11 @@ class ZhongniuP2PDataQuery(APIView):
         if pwd and pwd == settings.ZHONGNIU_SECRET:
             return True
 
-    def get(self, request, pid):
+    def get(self, request):
 
         ret = dict()
+
+        pid = str(self.request.GET.get('pid', None))
 
         if self.check_sign():
             if pid:
@@ -1666,7 +1668,7 @@ class ZhongniuP2PDataQuery(APIView):
 
                 data['startdate'] = product.publish_time.strftime("%Y-%m-%d")
                 data['enddate'] = product.end_time.strftime("%Y-%m-%d")
-                data['publishtime'] = product.publish_time.strftime("%Y-%m-%d")
+                data['publishtime'] = product.publish_time.strftime("Y-%m-%d %H:%M:%S")
 
                 ret['data'] = data
 
