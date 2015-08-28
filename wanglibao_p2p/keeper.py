@@ -282,7 +282,6 @@ class AmortizationKeeper(KeeperBaseMixin):
             
             self.__generate_user_amortization(equities)
 
-
     def __generate_product_amortization(self, product):
         product_amo = ProductAmortization.objects.filter(product_id=product.pk).values('id')
         if product_amo:
@@ -320,7 +319,6 @@ class AmortizationKeeper(KeeperBaseMixin):
 
         return product.amortizations
 
-
     def __generate_user_amortization(self, equities):
 
         product = self.product
@@ -356,13 +354,13 @@ class AmortizationKeeper(KeeperBaseMixin):
                 amortization.description = u'第%d期' % (index + 1)
                 amortization.principal = term[1]
                 amortization.interest = term[2]
-                amortization.coupon_interest = term[6]
+                amortization.coupon_interest = term[4]
                 amortization.term = index + 1
                 amortization.user = equity.user
                 amortization.product_amortization = product_amortizations[index] 
 
-                if len(term) == 6:
-                    amortization.term_date = term[5]
+                if len(term) == 7:
+                    amortization.term_date = term[6]
                 else:
                     amortization.term_date = timezone.now()
 
@@ -374,64 +372,61 @@ class AmortizationKeeper(KeeperBaseMixin):
                 interest_precision = InterestPrecisionBalance(**args)
                 interest_precisions.append(interest_precision)
 
-
         UserAmortization.objects.bulk_create(user_amos)
         InterestPrecisionBalance.objects.bulk_create(interest_precisions)
 
-
-    def __generate_useramortization(self, equities):
-        """
-        :param equities: 批量生成用户还款计划提高数据库存储性能
-        :return:
-        """
-        user_amos = list()
-        interest_precisions = list()
-        exp = Decimal('0.00000001')
-
-        total_actual = Decimal('0')
-
-        for equity in equities:
-            total_principal = equity.equity
-            # total_interest = self.product_interest * equity.ratio
-            paid_principal = Decimal('0')
-            # paid_interest = Decimal('0')
-            count = len(self.amortizations)
-            for i, amo in enumerate(self.amortizations):
-                if i+1 != count:
-                    principal = equity.ratio * amo.principal
-
-                # paid_interest += interest
-                    paid_principal += principal
-                else:
-                    principal = total_principal - paid_principal
-                    # interest = total_interest - paid_interest
-
-                interest = equity.ratio * amo.interest
-                principal_actual = principal.quantize(Decimal('.01'))
-                interest_actual = interest.quantize(Decimal('.01'), ROUND_DOWN)
-
-                total_actual += interest_actual
-
-                user_amo = UserAmortization(
-                    product_amortization=amo, user=equity.user, term=amo.term, term_date=amo.term_date,
-                    principal=principal_actual, interest=interest_actual
-                )
-
-                interest_precision = InterestPrecisionBalance(
-                    equity=equity, principal=principal.quantize(exp),
-                    interest_actual=interest_actual, interest_receivable=interest,
-                    interest_precision_balance=(interest-interest_actual).quantize(exp)
-                )
-
-                user_amos.append(user_amo)
-                interest_precisions.append(interest_precision)
-
-        #记录某个标的总精度差额 author:hetao
-        self.__precision(total_actual)
-
-        UserAmortization.objects.bulk_create(user_amos)
-        InterestPrecisionBalance.objects.bulk_create(interest_precisions)
-
+    # def __generate_useramortization(self, equities):
+    #     """
+    #     :param equities: 批量生成用户还款计划提高数据库存储性能
+    #     :return:
+    #     """
+    #     user_amos = list()
+    #     interest_precisions = list()
+    #     exp = Decimal('0.00000001')
+    #
+    #     total_actual = Decimal('0')
+    #
+    #     for equity in equities:
+    #         total_principal = equity.equity
+    #         # total_interest = self.product_interest * equity.ratio
+    #         paid_principal = Decimal('0')
+    #         # paid_interest = Decimal('0')
+    #         count = len(self.amortizations)
+    #         for i, amo in enumerate(self.amortizations):
+    #             if i+1 != count:
+    #                 principal = equity.ratio * amo.principal
+    #
+    #             # paid_interest += interest
+    #                 paid_principal += principal
+    #             else:
+    #                 principal = total_principal - paid_principal
+    #                 # interest = total_interest - paid_interest
+    #
+    #             interest = equity.ratio * amo.interest
+    #             principal_actual = principal.quantize(Decimal('.01'))
+    #             interest_actual = interest.quantize(Decimal('.01'), ROUND_DOWN)
+    #
+    #             total_actual += interest_actual
+    #
+    #             user_amo = UserAmortization(
+    #                 product_amortization=amo, user=equity.user, term=amo.term, term_date=amo.term_date,
+    #                 principal=principal_actual, interest=interest_actual
+    #             )
+    #
+    #             interest_precision = InterestPrecisionBalance(
+    #                 equity=equity, principal=principal.quantize(exp),
+    #                 interest_actual=interest_actual, interest_receivable=interest,
+    #                 interest_precision_balance=(interest-interest_actual).quantize(exp)
+    #             )
+    #
+    #             user_amos.append(user_amo)
+    #             interest_precisions.append(interest_precision)
+    #
+    #     #记录某个标的总精度差额 author:hetao
+    #     self.__precision(total_actual)
+    #
+    #     UserAmortization.objects.bulk_create(user_amos)
+    #     InterestPrecisionBalance.objects.bulk_create(interest_precisions)
 
     def __precision(self, interest_actual):
         """
