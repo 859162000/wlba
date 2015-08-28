@@ -371,9 +371,10 @@
     if ($('.red-pack').size() > 0) {
       return $(document).ready(function() {
         $.post('/api/redpacket/', {
-          status: 'available'
+          status: 'available',
+          product_id: $('input[name=product]').val()
         }).done(function(data) {
-          var amount, available_time, availables, data2, datetime, desc, highest_amount, obj, _i, _len;
+          var amount, available_time, availables, data2, datetime, desc, highest_amount, obj, text, _i, _len;
           data2 = data;
           availables = data.packages.available;
           ddData.push({
@@ -403,8 +404,13 @@
             if (obj.highest_amount) {
               highest_amount = obj.highest_amount;
             }
+            if (obj.method === '~') {
+              text = [obj.name, ' 加息', obj.amount * 100, '%'].join('');
+            } else {
+              text = [obj.name, ' ', amount, '元'].join('');
+            }
             ddData.push({
-              text: [obj.name, ' ', amount, '元'].join(''),
+              text: text,
               value: obj.id,
               method: obj.method,
               selected: false,

@@ -379,6 +379,7 @@ class UserAmortization(models.Model):
     principal = models.DecimalField(u'本金', max_digits=20, decimal_places=2)
     interest = models.DecimalField(u'利息', max_digits=20, decimal_places=2)
     penal_interest = models.DecimalField(u'罚息', max_digits=20, decimal_places=2, default=Decimal('0.00'))
+    coupon_interest = models.DecimalField(u'加息', max_digits=20, decimal_places=2, default=Decimal('0.00'))
 
     settled = models.BooleanField(u'已结算', default=False)
     settlement_time = models.DateTimeField(u'结算时间', auto_now=True)
@@ -558,6 +559,7 @@ class AmortizationRecord(models.Model):
     principal = models.DecimalField(u'返还本金', max_digits=20, decimal_places=2)
     interest = models.DecimalField(u'返还利息', max_digits=20, decimal_places=2)
     penal_interest = models.DecimalField(u'额外罚息', max_digits=20, decimal_places=2)
+    coupon_interest = models.DecimalField(u'加息(加息券)', max_digits=20, decimal_places=2, default=Decimal('0.00'))
 
     user = models.ForeignKey(User, null=True)
     created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
