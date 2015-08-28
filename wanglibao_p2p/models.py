@@ -261,7 +261,7 @@ class P2PProduct(ProductBase):
     # Add by hb on 2015-08-27
     @property
     def is_taojin(self):
-        if self.period>3 and self.period<30:
+        if (self.period>=3 and self.period<30) or self.period>=90:
             return True;
         else:
             return False;

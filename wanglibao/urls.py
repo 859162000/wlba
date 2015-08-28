@@ -9,7 +9,8 @@ from django.views.generic import TemplateView, RedirectView
 from wanglibao.views import IndexView, SecurityView, PartnerView
 # from wanglibao_account.cooperation import YiruiteQuery, TianmangRegisterQuery, TianmangIDVerificationQuery, \
     # TianmangInvestQuery, TianmangInvestNotConfirmQuery, TianmangCardBindQuery, BengbengQuery, CoopQuery
-from wanglibao_account.cooperation import CoopQuery, CsaiUserQuery, CsaiInvestmentQuery
+from wanglibao_account.cooperation import CoopQuery, CsaiUserQuery, CsaiInvestmentQuery, ZhongniuP2PQuery, \
+    ZhongniuP2PDataQuery
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
@@ -96,7 +97,6 @@ urlpatterns = patterns(
     url(r'^tender_agreement/',  AgreementAutoView.as_view(), name="agreement_auto"),
     url(r'^lottery/', include('wanglibao_lottery.urls')),
     url(r'^landpage/', landpage_view),
-    url(r'^yunduan/', landpage_view),
 )
 
 urlpatterns += patterns(
@@ -149,6 +149,9 @@ urlpatterns += patterns(
 
     url(r'^api/csai/users/', CsaiUserQuery.as_view()),
     url(r'^api/csai/investment/', CsaiInvestmentQuery.as_view()),
+
+    url(r'^api/zhongniu/products/', ZhongniuP2PQuery.as_view()),
+    url(r'^api/zhongniu/getData/pid/(?P<pid>[0-9]*)/$', ZhongniuP2PDataQuery.as_view()),
 )
 
 # 微信
