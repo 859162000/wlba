@@ -21,6 +21,7 @@ block main
         th 还款时间
         th 本金
         th 利息
+        th 加息
         th 总计
 
       for amortization in amortizations
@@ -30,5 +31,7 @@ block main
           td {{amount_principal | money_format}}
           amount_interest = amortization.interest
           td {{amount_interest | money_format}}
-          amount = amount_principal + amount_interest
+          coupon_interest = amortization.coupon_interest
+          td {{coupon_interest | money_format}}
+          amount = amount_principal + amount_interest + coupon_interest
           td {{amount | money_format}}

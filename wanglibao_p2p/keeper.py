@@ -19,6 +19,7 @@ from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_redpack import backends as redpack_backends
+from wanglibao_redpack.models import RedPackRecord
 import re
 
 logger = logging.getLogger(__name__)
@@ -159,13 +160,13 @@ class EquityKeeper(KeeperBaseMixin):
             record = self.__tracer(catalog, amount, description)
 
             #酒仙网众筹用户增加额外的记录
-            if self.product.category == u'酒仙众筹标':
-                self.equity_jiuxian, created = P2PEquityJiuxian.objects\
-                    .get_or_create(user=self.user, product=self.product, equity=self.equity)
-                self.equity_jiuxian = P2PEquityJiuxian.objects.select_for_update().filter(pk=self.equity_jiuxian.id).first()
-                self.equity_jiuxian.equity_amount += amount
-                self.equity_jiuxian.created_at = datetime.now()
-                self.equity_jiuxian.save()
+            # if self.product.category == u'酒仙众筹标':
+            #     self.equity_jiuxian, created = P2PEquityJiuxian.objects\
+            #         .get_or_create(user=self.user, product=self.product, equity=self.equity)
+            #     self.equity_jiuxian = P2PEquityJiuxian.objects.select_for_update().filter(pk=self.equity_jiuxian.id).first()
+            #     self.equity_jiuxian.equity_amount += amount
+            #     self.equity_jiuxian.created_at = datetime.now()
+            #     self.equity_jiuxian.save()
 
             return record
 
@@ -190,10 +191,10 @@ class EquityKeeper(KeeperBaseMixin):
                     if result['ret_code'] == 0:
                         user_margin_keeper.redpack_return(result['deduct'], description=u"%s 流标 红包退回%s元" % (self.product.short_name, result['deduct']))
             #酒仙网流标后删除酒仙标用户持仓记录
-            if self.product.category == u'酒仙众筹标':
-                equity_jiuxian = P2PEquityJiuxian.objects.select_for_update().filter(user=self.user, product=self.product).first()
-                if equity_jiuxian and equity_jiuxian.confirm is False:
-                    equity_jiuxian.delete()
+            # if self.product.category == u'酒仙众筹标':
+            #     equity_jiuxian = P2PEquityJiuxian.objects.select_for_update().filter(user=self.user, product=self.product).first()
+            #     if equity_jiuxian and equity_jiuxian.confirm is False:
+            #         equity_jiuxian.delete()
             return record
 
     def settle(self, savepoint=True):
@@ -212,12 +213,12 @@ class EquityKeeper(KeeperBaseMixin):
             user_margin_keeper.settle(equity.equity, savepoint=False)
 
             #酒仙网众筹用户增加额外的记录
-            if self.product.category == u'酒仙众筹标':
-                equity_jiuxian = P2PEquityJiuxian.objects.filter(user=self.user, product=self.product).first()
-                if equity_jiuxian:
-                    equity_jiuxian.confirm = True
-                    equity_jiuxian.confirm_at = datetime.now()
-                    equity_jiuxian.save()
+            # if self.product.category == u'酒仙众筹标':
+            #     equity_jiuxian = P2PEquityJiuxian.objects.filter(user=self.user, product=self.product).first()
+            #     if equity_jiuxian:
+            #         equity_jiuxian.confirm = True
+            #         equity_jiuxian.confirm_at = datetime.now()
+            #         equity_jiuxian.save()
 
     def generate_contract(self, savepoint=True):
         with transaction.atomic(savepoint=savepoint):
@@ -262,7 +263,6 @@ class AmortizationKeeper(KeeperBaseMixin):
         if self.product.status != u'满标已打款':
             raise P2PException('invalid product status.')
 
-
         get_amortization_plan(self.product.pay_method).calculate_term_date(self.product) #每期还款日期不在单独生成
 
         # Delete all old user amortizations
@@ -281,7 +281,6 @@ class AmortizationKeeper(KeeperBaseMixin):
             #self.__generate_useramortization(equities)
             
             self.__generate_user_amortization(equities)
-
 
     def __generate_product_amortization(self, product):
         product_amo = ProductAmortization.objects.filter(product_id=product.pk).values('id')
@@ -320,7 +319,6 @@ class AmortizationKeeper(KeeperBaseMixin):
 
         return product.amortizations
 
-
     def __generate_user_amortization(self, equities):
 
         product = self.product
@@ -338,24 +336,31 @@ class AmortizationKeeper(KeeperBaseMixin):
 
         pay_method = product.pay_method
         subscription_date = None
-
-
         product_interest = Decimal(0)
 
         for equity in equities:
-            terms = amortization_cls.generate(equity.equity, product.expected_earning_rate / 100, product_interest_start, product.period)
+            # 查询用户是否使用加息券
+            coupon = RedPackRecord.objects.filter(user=equity.user, product_id=product.id).first()
+            if coupon:
+                coupon_year_rate = coupon.redpack.event.amount
+            else:
+                coupon_year_rate = 0
+
+            terms = amortization_cls.generate(equity.equity, product.expected_earning_rate / 100,
+                                              product_interest_start, product.period, coupon_year_rate / 100)
 
             for index, term in enumerate(terms['terms']):
                 amortization = UserAmortization()
                 amortization.description = u'第%d期' % (index + 1)
                 amortization.principal = term[1]
                 amortization.interest = term[2]
+                amortization.coupon_interest = term[4]
                 amortization.term = index + 1
                 amortization.user = equity.user
                 amortization.product_amortization = product_amortizations[index] 
 
-                if len(term) == 6:
-                    amortization.term_date = term[5]
+                if len(term) == 7:
+                    amortization.term_date = term[6]
                 else:
                     amortization.term_date = timezone.now()
 
@@ -367,64 +372,61 @@ class AmortizationKeeper(KeeperBaseMixin):
                 interest_precision = InterestPrecisionBalance(**args)
                 interest_precisions.append(interest_precision)
 
-
         UserAmortization.objects.bulk_create(user_amos)
         InterestPrecisionBalance.objects.bulk_create(interest_precisions)
 
-
-    def __generate_useramortization(self, equities):
-        """
-        :param equities: 批量生成用户还款计划提高数据库存储性能
-        :return:
-        """
-        user_amos = list()
-        interest_precisions = list()
-        exp = Decimal('0.00000001')
-
-        total_actual = Decimal('0')
-
-        for equity in equities:
-            total_principal = equity.equity
-            # total_interest = self.product_interest * equity.ratio
-            paid_principal = Decimal('0')
-            # paid_interest = Decimal('0')
-            count = len(self.amortizations)
-            for i, amo in enumerate(self.amortizations):
-                if i+1 != count:
-                    principal = equity.ratio * amo.principal
-
-                # paid_interest += interest
-                    paid_principal += principal
-                else:
-                    principal = total_principal - paid_principal
-                    # interest = total_interest - paid_interest
-
-                interest = equity.ratio * amo.interest
-                principal_actual = principal.quantize(Decimal('.01'))
-                interest_actual = interest.quantize(Decimal('.01'), ROUND_DOWN)
-
-                total_actual += interest_actual
-
-                user_amo = UserAmortization(
-                    product_amortization=amo, user=equity.user, term=amo.term, term_date=amo.term_date,
-                    principal=principal_actual, interest=interest_actual
-                )
-
-                interest_precision = InterestPrecisionBalance(
-                    equity=equity, principal=principal.quantize(exp),
-                    interest_actual=interest_actual, interest_receivable=interest,
-                    interest_precision_balance=(interest-interest_actual).quantize(exp)
-                )
-
-                user_amos.append(user_amo)
-                interest_precisions.append(interest_precision)
-
-        #记录某个标的总精度差额 author:hetao
-        self.__precision(total_actual)
-
-        UserAmortization.objects.bulk_create(user_amos)
-        InterestPrecisionBalance.objects.bulk_create(interest_precisions)
-
+    # def __generate_useramortization(self, equities):
+    #     """
+    #     :param equities: 批量生成用户还款计划提高数据库存储性能
+    #     :return:
+    #     """
+    #     user_amos = list()
+    #     interest_precisions = list()
+    #     exp = Decimal('0.00000001')
+    #
+    #     total_actual = Decimal('0')
+    #
+    #     for equity in equities:
+    #         total_principal = equity.equity
+    #         # total_interest = self.product_interest * equity.ratio
+    #         paid_principal = Decimal('0')
+    #         # paid_interest = Decimal('0')
+    #         count = len(self.amortizations)
+    #         for i, amo in enumerate(self.amortizations):
+    #             if i+1 != count:
+    #                 principal = equity.ratio * amo.principal
+    #
+    #             # paid_interest += interest
+    #                 paid_principal += principal
+    #             else:
+    #                 principal = total_principal - paid_principal
+    #                 # interest = total_interest - paid_interest
+    #
+    #             interest = equity.ratio * amo.interest
+    #             principal_actual = principal.quantize(Decimal('.01'))
+    #             interest_actual = interest.quantize(Decimal('.01'), ROUND_DOWN)
+    #
+    #             total_actual += interest_actual
+    #
+    #             user_amo = UserAmortization(
+    #                 product_amortization=amo, user=equity.user, term=amo.term, term_date=amo.term_date,
+    #                 principal=principal_actual, interest=interest_actual
+    #             )
+    #
+    #             interest_precision = InterestPrecisionBalance(
+    #                 equity=equity, principal=principal.quantize(exp),
+    #                 interest_actual=interest_actual, interest_receivable=interest,
+    #                 interest_precision_balance=(interest-interest_actual).quantize(exp)
+    #             )
+    #
+    #             user_amos.append(user_amo)
+    #             interest_precisions.append(interest_precision)
+    #
+    #     #记录某个标的总精度差额 author:hetao
+    #     self.__precision(total_actual)
+    #
+    #     UserAmortization.objects.bulk_create(user_amos)
+    #     InterestPrecisionBalance.objects.bulk_create(interest_precisions)
 
     def __precision(self, interest_actual):
         """
@@ -447,7 +449,6 @@ class AmortizationKeeper(KeeperBaseMixin):
             interest_precision_balance=total_precision
         )
         product_precision.save()
-
 
     def __dispatch(self, equity):
         total_principal = equity.equity
@@ -475,10 +476,7 @@ class AmortizationKeeper(KeeperBaseMixin):
             user_amos.append(user_amo)
             #user_amo.save()
 
-
         UserAmortization.objects.bulk_create(user_amos)
-
-
 
     @classmethod
     def get_ready_for_settle(self):
@@ -504,29 +502,28 @@ class AmortizationKeeper(KeeperBaseMixin):
             message_list = list()
             for sub_amo in sub_amortizations:
                 user_margin_keeper = MarginKeeper(sub_amo.user)
-                user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest,
-                                            sub_amo.penal_interest, savepoint=False, description=description)
+                user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
+                                            sub_amo.coupon_interest, savepoint=False, description=description)
 
                 sub_amo.settled = True
                 sub_amo.settlement_time = timezone.now()
                 sub_amo.save()
                 
-                amo_amount = sub_amo.principal + sub_amo.interest + sub_amo.penal_interest
+                amo_amount = sub_amo.principal + sub_amo.interest + sub_amo.penal_interest + sub_amo.coupon_interest
 
                 phone_list.append(sub_amo.user.wanglibaouserprofile.phone)
                 message_list.append(messages.product_amortize(amortization.product, sub_amo.settlement_time, amo_amount))
 
-
-                title,content = messages.msg_bid_amortize(pname, timezone.now(), amo_amount)
+                title, content = messages.msg_bid_amortize(pname, timezone.now(), amo_amount)
                 inside_message.send_one.apply_async(kwargs={
-                    "user_id":sub_amo.user.id,
-                    "title":title,
-                    "content":content,
-                    "mtype":"amortize"
+                    "user_id": sub_amo.user.id,
+                    "title": title,
+                    "content": content,
+                    "mtype": "amortize"
                 })
 
                 self.__tracer(catalog, sub_amo.user, sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
-                              amortization, description)
+                              amortization, description, sub_amo.coupon_interest)
 
             amortization.settled = True
             amortization.save()
@@ -534,16 +531,16 @@ class AmortizationKeeper(KeeperBaseMixin):
 
             send_messages.apply_async(kwargs={
                 "phones": phone_list,
-                #"messages": [messages.product_amortize(amortization.product, sub_amo.settlement_time, sub_amo.principal + sub_amo.interest + sub_amo.penal_interest)]
                 "messages": message_list
             })
 
             self.__tracer(catalog, None, amortization.principal, amortization.interest, amortization.penal_interest, amortization)
 
-    def __tracer(self, catalog, user, principal, interest, penal_interest, amortization, description=u''):
+    def __tracer(self, catalog, user, principal, interest, penal_interest, amortization, description=u'', coupon_interest=0):
         trace = AmortizationRecord(
             amortization=amortization, term=amortization.term, principal=principal, interest=interest,
-            penal_interest=penal_interest, description=description, user=user, catalog=catalog, order_id=self.order_id
+            penal_interest=penal_interest, coupon_interest=coupon_interest, description=description,
+            user=user, catalog=catalog, order_id=self.order_id
         )
         trace.save()
         return trace

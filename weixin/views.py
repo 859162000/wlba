@@ -404,7 +404,7 @@ class P2PDetailView(TemplateView):
                 current_equity = equity_record.equity
 
             device = utils.split_ua(self.request)
-            result = backends.list_redpack(user, 'available', device['device_type'])
+            result = backends.list_redpack(user, 'available', device['device_type'], p2p.id)
             redpacks = result['packages'].get('available', [])
 
         orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
