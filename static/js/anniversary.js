@@ -17,6 +17,7 @@
 
   require(['jquery','jqueryRotate','jquery.easing','script',"tools"], function($,jqueryRotate,easing,script,tool) {
     $('.wanglibao').removeClass('wanglibaoHover');
+    //转盘
     $(".rotateImg").rotate({
 		bind:{
 			click:function(){
@@ -42,19 +43,15 @@
 			}
 		}
 	});
-
-    $('.winningDiv span').on('click',function(){
+    //关闭中奖遮罩
+    $('.spanBtn,.againBtn').on('click',function(){
         $('.page,.winningDiv').hide();
     })
-
-    $('#againBtn').on('click',function(){
-        $('.winningDiv span').click();
-    })
-
+    //非法用户
     $('#checkUserStatus').on('click',function(){
         $('.errorWin').modal();
     })
-
+    //关闭弹框
     $('#closeWin').on('click',function(){
         $.modal.close()
     })
