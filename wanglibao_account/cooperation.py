@@ -1535,7 +1535,7 @@ class ZhongniuP2PQuery(APIView):
 
         if self.check_sign():
             ret = dict()
-            ret['data'] = []
+            ret['list'] = []
             products = P2PProduct.objects.filter(
                 Q(status=u'录标') | Q(status=u'录标完成') | Q(status=u'待审核') | Q(status=u'正在招标'))
 
@@ -1556,12 +1556,18 @@ class ZhongniuP2PQuery(APIView):
             if len(products) > 0:
                 ret['status'] = 0
                 for product in products:
+                    if product.status in [u'录标', u'录标完成', u'待审核']:
+                        status = 0
+                    elif product.status == u'正在招标':
+                        status = 1
+                    else:
+                        status = 2
                     data = dict()
                     data['pid'] = product.pk
-                    data['status'] = product.status
+                    data['status'] = status
                     data['amounted'] = product.ordered_amount
                     data['progress'] = product.completion_rate
-                    ret['data'].append(data)
+                    ret['list'].append(data)
             else:
                 ret['status'] = 1
 
@@ -1615,13 +1621,34 @@ class ZhongniuP2PDataQuery(APIView):
                 if settings.ENV == 'production':
                     base_url = 'https://www.wanglibao.com'
                 data['url'] = base_url + '/p2p/detail/' + str(product.pk)
-                data['type'] = product.category
+
+                data['type'] = 2
+
                 data['yield'] = product.expected_earning_rate
                 data['duration'] = product.period
-                data['repaytype'] = product.pay_method
-                data['guaranttype'] = product.warrant_company.name
+
+                if product.pay_method == u'等额本息':
+                    pay_method = 3
+                elif product.pay_method == u'按月付息':
+                    pay_method = 1
+                elif product.pay_method == u'到期还本付息':
+                    pay_method = 4
+                else:
+                    pay_method = 9
+                data['repaytype'] = pay_method
+
+                data['guaranttype'] = 1
+
                 data['threshold'] = 100
-                data['status'] = product.status
+
+                if product.status in [u'录标', u'录标完成', u'待审核']:
+                    status = 0
+                elif product.status == u'正在招标':
+                    status = 1
+                else:
+                    status = 2
+                data['status'] = status
+
                 data['amount'] = product.total_amount
                 data['amounted'] = product.ordered_amount
                 data['progress'] = "%.2f" % product.completion_rate
@@ -1637,9 +1664,9 @@ class ZhongniuP2PDataQuery(APIView):
                     detail.append({'image': url})
                 data['detail'] = detail
 
-                data['startdate'] = product.publish_time
-                data['enddate'] = product.end_time
-                data['publishtime'] = product.publish_time
+                data['startdate'] = product.publish_time.strftime("%Y-%m-%d")
+                data['enddate'] = product.end_time.strftime("%Y-%m-%d")
+                data['publishtime'] = product.publish_time.strftime("%Y-%m-%d")
 
                 ret['data'] = data
 
