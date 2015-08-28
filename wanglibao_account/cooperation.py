@@ -1611,7 +1611,7 @@ class ZhongniuP2PDataQuery(APIView):
                     return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
             if product:
-                ret['status'] = 1
+                ret['status'] = 0
                 data = dict()
                 data['pid'] = product.pk
                 data['name'] = product.name
