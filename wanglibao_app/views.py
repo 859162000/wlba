@@ -434,7 +434,7 @@ class AppPhoneBookQueryAPIView(APIView):
     def post(self, request):
         phone_book = UserPhoneBook.objects.filter(user=request.user, is_used=True, is_register=False)
 
-        books = register_list = list()
+        books, register_list = list(), list()
         for book in phone_book:
             if User.objects.filter(wanglibaouserprofile__phone=book.phone).exists():
                 register_list.append(book.phone)
