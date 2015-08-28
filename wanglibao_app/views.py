@@ -441,7 +441,7 @@ class AppPhoneBookQueryAPIView(APIView):
                 books.append({
                     'name': book.name,
                     'phone': book.phone,
-                    'status': True if book.invite_at and book.invite_at > local_to_utc(datetime.now(), 'min') else False,
+                    'status': True if not(book.invite_at and book.invite_at > local_to_utc(datetime.now(), 'min')) else False,
                     }
                 )
 
