@@ -19,6 +19,7 @@ from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_redpack import backends as redpack_backends
+from wanglibao_redpack.models import RedPackRecord
 import re
 
 logger = logging.getLogger(__name__)
@@ -262,7 +263,6 @@ class AmortizationKeeper(KeeperBaseMixin):
         if self.product.status != u'满标已打款':
             raise P2PException('invalid product status.')
 
-
         get_amortization_plan(self.product.pay_method).calculate_term_date(self.product) #每期还款日期不在单独生成
 
         # Delete all old user amortizations
@@ -338,18 +338,25 @@ class AmortizationKeeper(KeeperBaseMixin):
 
         pay_method = product.pay_method
         subscription_date = None
-
-
         product_interest = Decimal(0)
 
         for equity in equities:
-            terms = amortization_cls.generate(equity.equity, product.expected_earning_rate / 100, product_interest_start, product.period)
+            # 查询用户是否使用加息券
+            coupon = RedPackRecord.objects.filter(user=equity.user, product_id=product.id).first()
+            if coupon:
+                coupon_year_rate = coupon.redpack.event.amount
+            else:
+                coupon_year_rate = 0
+
+            terms = amortization_cls.generate(equity.equity, product.expected_earning_rate / 100,
+                                              product_interest_start, product.period, coupon_year_rate / 100)
 
             for index, term in enumerate(terms['terms']):
                 amortization = UserAmortization()
                 amortization.description = u'第%d期' % (index + 1)
                 amortization.principal = term[1]
                 amortization.interest = term[2]
+                amortization.coupon_interest = term[6]
                 amortization.term = index + 1
                 amortization.user = equity.user
                 amortization.product_amortization = product_amortizations[index] 

@@ -590,19 +590,21 @@ class AdminAmortization(TemplateView):
             paymethod = request.POST.get('paymethod')
             amount = request.POST.get('amount')
             year_rate = float(request.POST.get('year_rate')) / 100
+            coupon_year_rate = float(request.POST.get('coupon_year_rate')) / 100
             period = int(request.POST.get('period'))
         except:
             messages.warning(request, u'输入错误, 请重新检测')
             return redirect('./amortization')
 
         if amount and year_rate and period:
-            ac = AmortizationCalculator(paymethod, amount, year_rate, period)
+            ac = AmortizationCalculator(paymethod, amount, year_rate, period, coupon_year_rate)
             acs = ac.generate()
             total = acs['total']
+            coupon_total = acs['coupon_total']
             terms = acs['terms']
-            key = ('term_amount', 'principal', 'interest', 'principal_left')
+            key = ('term_amount', 'principal', 'interest', 'principal_left', 'coupon_interest')
             newterms = [dict(zip(key, term)) for term in terms]
-            return render_to_response('admin_amortization.jade', {'total': total, 'newterms': newterms},
+            return render_to_response('admin_amortization.jade', {'total': total, 'coupon_total': coupon_total, 'newterms': newterms},
                     context_instance=RequestContext(request))
         else:
             messages.warning(request, u'查询错误')
