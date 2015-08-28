@@ -564,7 +564,9 @@ class AccountInviteAllGoldAPIView(APIView):
                         "second":{"amount":second_amount, "earning":second_earning,
                         "count":second_count}, "count":len(introduces)})
 
-#    def _alert_invest_status(self, user, phone_user):
+    def _alert_invest_status(self, user, phone_user):
+# Modify by hb on 2015-08-28
+        return False
 #        try:
 #            profile = phone_user.wanglibaouserprofile
 #            phone_book = UserPhoneBook.objects.filter(user=user, phone=profile.phone).first()
