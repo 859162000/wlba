@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from wanglibao import settings
 import wanglibao_account
 
 
@@ -109,7 +110,8 @@ def xicai_send_data_task():
     :return:
     """
     from wanglibao_account.cooperation import xicai_send_data
-    xicai_send_data()
+    if settings.ENV == 'production':
+        xicai_send_data()
 
 
 @app.task
