@@ -524,9 +524,11 @@ class AppInviteAllGoldAPIView(APIView):
             user_id = x.user.id
             alert_invest = self._alert_invest_status(user=request.user, phone_user=x.user)
             if user_id in keys:
-                first_intro.append([users[user_id].phone, commission[user_id]['amount'], commission[user_id]['earning'], alert_invest])
+                first_intro.append([users[user_id].phone, commission[user_id]['amount'], commission[user_id]['earning'], alert_invest, x.created_at])
             else:
-                first_intro.append([x.user.wanglibaouserprofile.phone, 0, 0, alert_invest])
+                first_intro.append([x.user.wanglibaouserprofile.phone, 0, 0, alert_invest, x.created_at])
+
+        first_intro = sorted(first_intro, key=lambda l: (l[1], l[4]), reverse=True)
 
         return Response({"ret_code":0, "first":{"amount":first_amount,
                         "earning":first_earning, "count":first_count, "intro":first_intro},
