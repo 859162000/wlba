@@ -1668,7 +1668,7 @@ class ZhongniuP2PDataQuery(APIView):
 
                 data['startdate'] = product.publish_time.strftime("%Y-%m-%d")
                 data['enddate'] = product.end_time.strftime("%Y-%m-%d")
-                data['publishtime'] = product.publish_time.strftime("Y-%m-%d %H:%M:%S")
+                data['publishtime'] = product.publish_time.strftime("%Y-%m-%d %H:%M:%S")
 
                 ret['data'] = data
 
