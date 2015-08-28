@@ -779,7 +779,7 @@ class YiCheRegister(CoopRegister):
                 'userId': binding.bid,
                 'orderNo': p2p_record.id,
                 'invest': str(p2p_record.amount),
-                'investTime': invest_time.strftime('%Y/%m/%d %H:%M:%S'),
+                'investTime': invest_time.strftime('%Y-%m-%d %H:%M:%S'),
             }
             self.yiche_call_back(url, params)
 
@@ -795,7 +795,7 @@ class YiCheRegister(CoopRegister):
             params = {
                 'orderNo': p2p_record.id,
                 'profit': '0.01',
-                'profitTime': profit_time.strftime('%Y/%m/%d %H:%M:%S'),
+                'profitTime': profit_time.strftime('%Y-%m-%d %H:%M:%S'),
             }
             self.yiche_call_back(url, params)
 
@@ -1512,3 +1512,143 @@ def caimiao_post_rating_info():
     ret = requests.post(url, data=json_data)
 
     return ret.text
+
+
+# 众牛的API
+class ZhongniuP2PQuery(APIView):
+    """
+    author: Zhoudong
+    http请求方式: GET  获取请求当天发布并且当天结束的项目（防止漏掉秒杀标）及系统中所有未完成（预投标，投标中）的项目列表。
+    http://xxxxxx.com/getList
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    def check_sign(self):
+
+        pwd = str(self.request.GET.get('pwd', None))
+        if pwd and pwd == settings.ZHONGNIU_SECRET:
+            return True
+
+    def get(self, request):
+
+        if self.check_sign():
+            ret = dict()
+            ret['data'] = []
+            products = P2PProduct.objects.filter(
+                Q(status=u'录标') | Q(status=u'录标完成') | Q(status=u'待审核') | Q(status=u'正在招标'))
+
+            products = set(products)
+
+            now = timezone.now()
+            start = now - timezone.timedelta(days=1)
+            end = now + timezone.timedelta(days=1)
+
+            # 我们的秒杀标的规则是什么. 周期一天内的显示.
+            sec_kill_products = P2PProduct.objects.filter(Q(publish_time__lt=now) & Q(publish_time__gte=start) &
+                                                          Q(end_time__lt=end) & Q(end_time__gte=now))
+
+            for p in sec_kill_products:
+                if p.end_time - p.publish_time <= timezone.timedelta(days=1):
+                    products.add(p)
+
+            if len(products) > 0:
+                ret['status'] = 0
+                for product in products:
+                    data = dict()
+                    data['pid'] = product.pk
+                    data['status'] = product.status
+                    data['amounted'] = product.ordered_amount
+                    data['progress'] = product.completion_rate
+                    ret['data'].append(data)
+            else:
+                ret['status'] = 1
+
+        else:
+            ret = {
+                'status': 2,
+                'msg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class ZhongniuP2PDataQuery(APIView):
+    """
+    author: Zhoudong
+    http请求方式: GET  获取请求指定pid的项目详情数据（请求中会附带pid参数）
+    http://xxxxxx.com/getData/pid/123456
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    def check_sign(self):
+
+        pwd = str(self.request.GET.get('pwd', None))
+        if pwd and pwd == settings.ZHONGNIU_SECRET:
+            return True
+
+    def get(self, request, pid):
+
+        ret = dict()
+
+        if self.check_sign():
+            if pid:
+                try:
+                    product = P2PProduct.objects.get(pk=pid)
+                except Exception, e:
+                    ret['status'] = 2
+                    ret['msg'] = u'%s' % e
+                    return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+            if product:
+                ret['status'] = 1
+                data = dict()
+                data['pid'] = product.pk
+                data['name'] = product.name
+                # 根据不同环境对应不同的url
+                if settings.ENV == 'debug':
+                    base_url = 'http://127.0.0.1:8000'
+                if settings.ENV == 'staging':
+                    base_url = 'https://staging.wanglibao.com'
+                if settings.ENV == 'production':
+                    base_url = 'https://www.wanglibao.com'
+                data['url'] = base_url + '/p2p/detail/' + str(product.pk)
+                data['type'] = product.category
+                data['yield'] = product.expected_earning_rate
+                data['duration'] = product.period
+                data['repaytype'] = product.pay_method
+                data['guaranttype'] = product.warrant_company.name
+                data['threshold'] = 100
+                data['status'] = product.status
+                data['amount'] = product.total_amount
+                data['amounted'] = product.ordered_amount
+                data['progress'] = "%.2f" % product.completion_rate
+
+                # Attachment 重中的图片
+                detail = list()
+                detail.append({'title': product.name})
+                detail.append({'content': product.usage})
+
+                attachments = product.attachment_set.all()
+                for attachment in attachments:
+                    url = base_url + attachment.file.url
+                    detail.append({'image': url})
+                data['detail'] = detail
+
+                data['startdate'] = product.publish_time
+                data['enddate'] = product.end_time
+                data['publishtime'] = product.publish_time
+
+                ret['data'] = data
+
+            else:
+                ret['status'] = 1
+
+        else:
+            ret = {
+                'status': 2,
+                'msg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))

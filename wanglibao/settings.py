@@ -851,6 +851,8 @@ CAIMIAO_ProdMain_URL = 'http://121.40.31.143:86/api/JsonsFinancial/ProdMain/'
 CAIMIAO_Volumes_URL = 'http://121.40.31.143:86/api/JsonsFinancial/Volumes/'
 CAIMIAO_RATING_URL = 'http://121.40.31.143:86/api/JsonsFinancial/Rating/'
 
+# 众牛
+ZHONGNIU_SECRET = 'N9ecZSqh'
 
 # 金山
 WLB_FOR_JINSHAN_KEY = '1994'
@@ -897,6 +899,7 @@ if ENV == ENV_PRODUCTION:
     YICHE_REGISTER_CALL_BACK_URL = None
     YICHE_VALIDATE_CALL_BACK_URL = None
     YICHE_PURCHASE_CALL_BACK_URL = None
+    YICHE_U_PURCHASE_CALL_BACK_URL = None
 else:
     YICHE_COOP_ID = 200104
     YICHE_KEY = '0dae7d5bbcd493785f057bc1'

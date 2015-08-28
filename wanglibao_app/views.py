@@ -26,6 +26,7 @@ from rest_framework.views import APIView
 from wanglibao import settings
 from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_account.models import UserPhoneBook
+from wanglibao_account import backends as account_backends
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_banner.models import AppActivate
@@ -441,7 +442,7 @@ class AppPhoneBookQueryAPIView(APIView):
                 books.append({
                     'name': book.name,
                     'phone': book.phone,
-                    'status': True if book.invite_at and book.invite_at > local_to_utc(datetime.now(), 'min') else False,
+                    'status': True if not(book.invite_at and book.invite_at > local_to_utc(datetime.now(), 'min')) else False,
                     }
                 )
 
@@ -466,7 +467,7 @@ class AppPhoneBookAlertApiView(APIView):
             return Response({'ret_code': 20001, 'message': u'数据输入不合法'})
 
         try:
-            user_book = UserPhoneBook.objects.filter(user=user, is_used=True, phone=phone).first()
+            user_book = UserPhoneBook.objects.filter(user=user, phone=phone).first()
             if not user_book:
                 return Response({'ret_code': 20002, 'message': u'被提醒用户不存在'})
 
@@ -477,6 +478,7 @@ class AppPhoneBookAlertApiView(APIView):
                 if not (user_book.alert_at and user_book.alert_at > local_to_utc(datetime.now(), 'min')):
                     self._send_sms(phone, sms_messages.sms_alert_invest(name=send_name))
                     user_book.alert_at = timezone.now()
+                    user_book.is_used = True
                     user_book.save()
             # 邀请提醒
             elif int(flag) == 2:
@@ -484,6 +486,7 @@ class AppPhoneBookAlertApiView(APIView):
                     user_book.is_register = True
                     if IntroducedBy.objects.filter(introduced_by=user, user_wanglibaouserprofile__phone=phone).exists():
                         user_book.is_invite = True
+                        user_book.is_used = True
                     user_book.save()
 
                 if not user_book.is_register and not (user_book.invite_at and user_book.invite_at > local_to_utc(datetime.now(), 'min')):
@@ -501,3 +504,54 @@ class AppPhoneBookAlertApiView(APIView):
             'phones': [phone],
             'messages': [sms]
         })
+
+
+class AppInviteAllGoldAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, **kwargs):
+        dic = account_backends.broker_invite_list(request.user)
+        users = dic['users']
+        first_amount, first_earning, second_amount, second_earning = dic['first_amount'],\
+                dic['first_earning'], dic['second_amount'], dic['second_earning']
+        first_count, second_count = dic['first_count'], dic['second_count']
+        first_intro = dic['first_intro']
+        commission = dic['commission']
+
+        introduces = IntroducedBy.objects.filter(introduced_by=request.user).select_related("user__wanglibaouserprofile").all()
+        keys = commission.keys()
+        for x in introduces:
+            user_id = x.user.id
+            alert_invest = self._alert_invest_status(user=request.user, phone_user=x.user)
+            if user_id in keys:
+                first_intro.append([users[user_id].phone, commission[user_id]['amount'], commission[user_id]['earning'], alert_invest])
+            else:
+                first_intro.append([x.user.wanglibaouserprofile.phone, 0, 0, alert_invest])
+
+        return Response({"ret_code":0, "first":{"amount":first_amount,
+                        "earning":first_earning, "count":first_count, "intro":first_intro},
+                        "second":{"amount":second_amount, "earning":second_earning,
+                        "count":second_count}, "count":len(introduces)})
+
+    def _alert_invest_status(self, user, phone_user):
+        try:
+            profile = phone_user.wanglibaouserprofile
+            phone_book = UserPhoneBook.objects.filter(user=user, phone=profile.phone).first()
+            if phone_book:
+                if not(phone_book.alert_at and phone_book.alert_at > local_to_utc(datetime.datetime.now(), 'min')):
+                    phone_book.is_used = True
+                    phone_book.save()
+                    return True
+            else:
+                phone_book = UserPhoneBook()
+                phone_book.user = user
+                phone_book.phone = profile.phone
+                phone_book.name = profile.name
+                phone_book.is_register = True
+                phone_book.is_invite = True
+                phone_book.is_used = True
+                phone_book.save()
+                return True
+            return False
+        except:
+            return False
