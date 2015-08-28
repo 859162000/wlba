@@ -78,7 +78,7 @@ class RedPackRecordResource(resources.ModelResource):
 class RedPackRecordAdmin(ExportMixin, admin.ModelAdmin):
     actions = None
     list_display = ("id", "redpack", "user", "change_platform", "apply_platform", "created_at",
-                    "apply_amount", "apply_at", "order_id")
+                    "apply_amount", "apply_at", "order_id", "product_id")
     search_fields = ('user__wanglibaouserprofile__phone', 'redpack__event__name')
     raw_id_fields = ('user', "redpack")
     list_filter = ('change_platform', 'apply_platform', "apply_at", "created_at")

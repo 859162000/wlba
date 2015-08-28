@@ -45,29 +45,34 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack'):
 
     device_type = _decide_device(device_type)
     if status == "available":
-        packages = {"available":[]}
-        # 红包
-        records = RedPackRecord.objects.filter(user=user, order_id=None).exclude(redpack__event__rtype='interest_coupon')
-        for x in records:
-            if x.order_id:
-                continue
-            redpack = x.redpack
-            if redpack.status == "invalid":
-                continue
-            event = x.redpack.event
+        packages = {"available": []}
 
-            start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
-                                                      x.created_at, event.available_at, event.unavailable_at)
+        records_count = RedPackRecord.objects.filter(user=user, product_id=product_id) \
+            .filter(redpack__event__rtype='interest_coupon').count()
 
-            obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
-                    "id": x.id, "invest_amount": event.invest_amount,
-                    "unavailable_at": stamp(end_time), "event_id": event.id,
-                    "highest_amount": event.highest_amount}
-            if start_time < timezone.now() < end_time:
-                if event.apply_platform == "all" or event.apply_platform == device_type:
-                    if obj['method'] == REDPACK_RULE['percent']:
-                        obj['amount'] = obj['amount']/100.0
-                    packages['available'].append(obj)
+        if records_count == 0:
+            # 红包
+            records = RedPackRecord.objects.filter(user=user, order_id=None).exclude(redpack__event__rtype='interest_coupon')
+            for x in records:
+                if x.order_id:
+                    continue
+                redpack = x.redpack
+                if redpack.status == "invalid":
+                    continue
+                event = x.redpack.event
+
+                start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
+                                                          x.created_at, event.available_at, event.unavailable_at)
+
+                obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
+                        "id": x.id, "invest_amount": event.invest_amount,
+                        "unavailable_at": stamp(end_time), "event_id": event.id,
+                        "highest_amount": event.highest_amount}
+                if start_time < timezone.now() < end_time:
+                    if event.apply_platform == "all" or event.apply_platform == device_type:
+                        if obj['method'] == REDPACK_RULE['percent']:
+                            obj['amount'] = obj['amount']/100.0
+                        packages['available'].append(obj)
 
         # 加息券
         if product_id > 0:
@@ -414,6 +419,8 @@ def _calc_deduct(amount, rtype, rule_value, event):
                 deduct = amount
             else:
                 deduct = decimal.Decimal(str(rule_value))
+    elif REDPACK_RULE[rtype] == "~":
+        deduct = decimal.Decimal(0)
     real_deduct = deduct.quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_HALF_DOWN)
     return real_deduct
 
@@ -422,7 +429,7 @@ def restore(order_id, amount, user):
         amount = fmt_two_amount(amount)
     record = RedPackRecord.objects.filter(user=user, order_id=order_id).first()
     if not record:
-        return {"ret_code":-1, "message":"redpack not exists"}
+        return {"ret_code": -1, "message": "redpack not exists"}
     record.apply_platform = ""
     record.apply_at = None
     record.order_id = None
@@ -431,35 +438,13 @@ def restore(order_id, amount, user):
     event = record.redpack.event
     rtype = event.rtype
     rule_value = event.amount
-    deduct = event.amount
+    # deduct = event.amount
     deduct = _calc_deduct(amount, rtype, rule_value, event)
-   # if REDPACK_RULE[rtype] == "*":
-   #     #return {"ret_code":30176, "message":"目前不支持百分比红包"}
-
-   #     #rule_value = float("%.2f" % (rule_value/100.0))
-   #     #actual_amount = amount + amount * rule_value
-   #     #deduct = round(amount * rule_value)
-   #     rule_value = rule_value/100.0
-   #     deduct = fmt_two_amount(amount * rule_value)
-   #     actual_amount = amount + deduct
-   # elif REDPACK_RULE[rtype] == "-":
-   #     if event.id == 7:
-   #         t5 = amount * 0.005
-   #         if t5 >= rule_value:
-   #             deduct = rule_value
-   #         else:
-   #             deduct = t5
-   #         deduct = fmt_two_amount(deduct)
-   #     else:
-   #         if amount <= rule_value:
-   #             actual_amount = amount
-   #             deduct = amount
-   #         else:
-   #             actual_amount = amount - rule_value
-   # elif REDPACK_RULE[rtype] == "+":
-   #     actual_amount = amount + rule_value
-    logger.info(u"%s--%s 退回账户 %s" % (event.name, record.id, timezone.now()))
-    return {"ret_code":0, "deduct":deduct}
+    if rtype == "interest_coupon":
+        return {"ret_code": 1, "deduct": deduct}
+    else:
+        logger.info(u"%s--%s 退回账户 %s" % (event.name, record.id, timezone.now()))
+        return {"ret_code": 0, "deduct": deduct}
 
 def deduct_calc(amount, redpack_amount):
     if not amount or not redpack_amount:

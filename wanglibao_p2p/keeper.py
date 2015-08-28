@@ -191,10 +191,10 @@ class EquityKeeper(KeeperBaseMixin):
                     if result['ret_code'] == 0:
                         user_margin_keeper.redpack_return(result['deduct'], description=u"%s 流标 红包退回%s元" % (self.product.short_name, result['deduct']))
             #酒仙网流标后删除酒仙标用户持仓记录
-            if self.product.category == u'酒仙众筹标':
-                equity_jiuxian = P2PEquityJiuxian.objects.select_for_update().filter(user=self.user, product=self.product).first()
-                if equity_jiuxian and equity_jiuxian.confirm is False:
-                    equity_jiuxian.delete()
+            # if self.product.category == u'酒仙众筹标':
+            #     equity_jiuxian = P2PEquityJiuxian.objects.select_for_update().filter(user=self.user, product=self.product).first()
+            #     if equity_jiuxian and equity_jiuxian.confirm is False:
+            #         equity_jiuxian.delete()
             return record
 
     def settle(self, savepoint=True):
@@ -213,12 +213,12 @@ class EquityKeeper(KeeperBaseMixin):
             user_margin_keeper.settle(equity.equity, savepoint=False)
 
             #酒仙网众筹用户增加额外的记录
-            if self.product.category == u'酒仙众筹标':
-                equity_jiuxian = P2PEquityJiuxian.objects.filter(user=self.user, product=self.product).first()
-                if equity_jiuxian:
-                    equity_jiuxian.confirm = True
-                    equity_jiuxian.confirm_at = datetime.now()
-                    equity_jiuxian.save()
+            # if self.product.category == u'酒仙众筹标':
+            #     equity_jiuxian = P2PEquityJiuxian.objects.filter(user=self.user, product=self.product).first()
+            #     if equity_jiuxian:
+            #         equity_jiuxian.confirm = True
+            #         equity_jiuxian.confirm_at = datetime.now()
+            #         equity_jiuxian.save()
 
     def generate_contract(self, savepoint=True):
         with transaction.atomic(savepoint=savepoint):
@@ -450,7 +450,6 @@ class AmortizationKeeper(KeeperBaseMixin):
         )
         product_precision.save()
 
-
     def __dispatch(self, equity):
         total_principal = equity.equity
         total_interest = self.product_interest * equity.ratio
@@ -477,10 +476,7 @@ class AmortizationKeeper(KeeperBaseMixin):
             user_amos.append(user_amo)
             #user_amo.save()
 
-
         UserAmortization.objects.bulk_create(user_amos)
-
-
 
     @classmethod
     def get_ready_for_settle(self):
@@ -506,29 +502,28 @@ class AmortizationKeeper(KeeperBaseMixin):
             message_list = list()
             for sub_amo in sub_amortizations:
                 user_margin_keeper = MarginKeeper(sub_amo.user)
-                user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest,
-                                            sub_amo.penal_interest, savepoint=False, description=description)
+                user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
+                                            sub_amo.coupon_interest, savepoint=False, description=description)
 
                 sub_amo.settled = True
                 sub_amo.settlement_time = timezone.now()
                 sub_amo.save()
                 
-                amo_amount = sub_amo.principal + sub_amo.interest + sub_amo.penal_interest
+                amo_amount = sub_amo.principal + sub_amo.interest + sub_amo.penal_interest + sub_amo.coupon_interest
 
                 phone_list.append(sub_amo.user.wanglibaouserprofile.phone)
                 message_list.append(messages.product_amortize(amortization.product, sub_amo.settlement_time, amo_amount))
 
-
-                title,content = messages.msg_bid_amortize(pname, timezone.now(), amo_amount)
+                title, content = messages.msg_bid_amortize(pname, timezone.now(), amo_amount)
                 inside_message.send_one.apply_async(kwargs={
-                    "user_id":sub_amo.user.id,
-                    "title":title,
-                    "content":content,
-                    "mtype":"amortize"
+                    "user_id": sub_amo.user.id,
+                    "title": title,
+                    "content": content,
+                    "mtype": "amortize"
                 })
 
                 self.__tracer(catalog, sub_amo.user, sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
-                              amortization, description)
+                              amortization, description, sub_amo.coupon_interest)
 
             amortization.settled = True
             amortization.save()
@@ -536,16 +531,16 @@ class AmortizationKeeper(KeeperBaseMixin):
 
             send_messages.apply_async(kwargs={
                 "phones": phone_list,
-                #"messages": [messages.product_amortize(amortization.product, sub_amo.settlement_time, sub_amo.principal + sub_amo.interest + sub_amo.penal_interest)]
                 "messages": message_list
             })
 
             self.__tracer(catalog, None, amortization.principal, amortization.interest, amortization.penal_interest, amortization)
 
-    def __tracer(self, catalog, user, principal, interest, penal_interest, amortization, description=u''):
+    def __tracer(self, catalog, user, principal, interest, penal_interest, amortization, description=u'', coupon_interest=0):
         trace = AmortizationRecord(
             amortization=amortization, term=amortization.term, principal=principal, interest=interest,
-            penal_interest=penal_interest, description=description, user=user, catalog=catalog, order_id=self.order_id
+            penal_interest=penal_interest, coupon_interest=coupon_interest, description=description,
+            user=user, catalog=catalog, order_id=self.order_id
         )
         trace.save()
         return trace

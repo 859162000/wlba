@@ -150,13 +150,11 @@ class P2POperator(object):
             except P2PException, e:
                 cls.logger.error(u'%s, %s' % (amortization, e.message))
 
-
         ## 停止在watchdog中每分钟循环自动投标，减轻celery任务
         ## 将自动投标入口改在两处，一是标状态变成“正在招标”，二是用户保存并启用自动投标配置
         print('Getting automation trades')
         from wanglibao_p2p.automatic import Automatic
         Automatic().auto_trade()
-
 
     @classmethod
     #@transaction.commit_manually
@@ -294,7 +292,6 @@ class P2POperator(object):
 
                 # 将标信息从还款中的redis列表中挪到已完成的redis列表
                 cache_backend.update_list_cache('p2p_products_repayment', 'p2p_products_finished', product)
-
 
     @classmethod
     def settle_hike(cls, product):
