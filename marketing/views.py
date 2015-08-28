@@ -846,9 +846,12 @@ def celebrate_ajax(request):
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
     record = IntroducedBy.objects.filter(user_id=user.id).first()
-    if record:
-        record = Channels.objects.filter(id=record.channel_id).first()
-    if record.name:
+    if record is not None:
+        channel = Channels.objects.filter(id=record.channel).first()
+    else:
+        channel = None
+
+    if channel is not None and channel.name:
         to_json_response = {
             'ret_code': 4000,
             'message': u'渠道用户不允许参加这个活动',
@@ -869,7 +872,12 @@ def celebrate_ajax(request):
             })
 
         if action == 'AWARD_DONE':
-            activity.response_activity()
+            return activity.response_activity()
+    else:
+        return Response({
+            'ret_code': 3007,
+            'message': u'请以ajax方式交互，并用post请求',
+        })
 
 
 class WanglibaoAwardActivity(APIView):
@@ -969,7 +977,7 @@ class WanglibaoAwardActivity(APIView):
             join_log.save(update_fields=['amount'])
             count += 1
 
-    def response_activity(self ):
+    def response_activity(self):
         join_log = ActivityJoinLog.objects.filter(user=self.request.user, action_name='celebrate_award', join_times__gt=0).first()
         join_log.join_times -= 1
         join_log.save(update_fields=['join_times'])
