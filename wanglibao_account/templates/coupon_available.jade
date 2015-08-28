@@ -16,11 +16,11 @@ block main
     include include/coupon_exchange
 
   ul.discount--tabs
-        li.coupon--tab.hover
-          a(href="/accounts/redpacket/unused") 红包
+    li.coupon--tab
+        a(href="/accounts/redpacket/unused") 红包
             span
-        li.redpacket--tab
-          a(href="/accounts/coupon/unused") 加息券
+    li.redpacket--tab.hover
+        a(href="/accounts/coupon/unused") 加息券
             span
   .account-home-panel__no-padding
     .account-home-panel--title-bar__product
@@ -28,27 +28,27 @@ block main
       ul.title-bar--tabs
         if status == 'unused'
           li.title-bar--tab.active
-            a.title-bar--tab--anchor(href="/accounts/redpacket/unused") 可使用
+            a.title-bar--tab--anchor(href="/accounts/coupon/unused") 可使用
         else
           li.title-bar--tab
-            a.title-bar--tab--anchor(href="/accounts/redpacket/unused") 可使用
+            a.title-bar--tab--anchor(href="/accounts/coupon/unused") 可使用
         if status == 'used'
           li.title-bar--tab.active
-            a.title-bar--tab--anchor(href='/accounts/redpacket/used/') 已使用
+            a.title-bar--tab--anchor(href='/accounts/coupon/used/') 已使用
         else
           li.title-bar--tab
-            a.title-bar--tab--anchor(href='/accounts/redpacket/used/') 已使用
+            a.title-bar--tab--anchor(href='/accounts/coupon/used/') 已使用
         if status == 'expires'
           li.title-bar--tab.active
-            a.title-bar--tab--anchor(href='/accounts/redpacket/expires/') 已过期
+            a.title-bar--tab--anchor(href='/accounts/coupon/expires/') 已过期
         else
           li.title-bar--tab
-            a.title-bar--tab--anchor(href='/accounts/redpacket/expires/') 已过期
+            a.title-bar--tab--anchor(href='/accounts/coupon/expires/') 已过期
     .panel-container.padding-xl(style="padding-top:0px")
       table.table
         thead
           tr
-            th 红包名称
+            th 加息券名称
             th 金额
             th 使用次数
             th 使用限额
@@ -59,25 +59,25 @@ block main
             else
               th 使用范围
         tbody
-          each red_packet in red_packets
+          each coupon in coupons
             tr
-              td {{red_packet.name}}
-              if red_packet.method == '-'
-                td {{red_packet.amount}}元
+              td {{coupon.name}}
+              if coupon.method == '-'
+                td {{coupon.amount}}元
               else
-                td {{red_packet.highest_amount}}元
+                td {{coupon.highest_amount}}元
               td 仅限一次
-              if red_packet.method == '-'
-                td {{red_packet.amount}}元
+              if coupon.method == '-'
+                td {{coupon.amount}}元
               else
-                td 投资额{{red_packet.amount | percentage_number_two}}%
-              if red_packet.invest_amount == 0
+                td 加息{{coupon.amount | percentage_number_two}}%
+              if coupon.invest_amount == 0
                 td 无
               else
-                td {{red_packet.invest_amount}}元
-              td {{red_packet.available_at | milldate_format}} 至 {{red_packet.unavailable_at | milldate_format}}
+                td {{coupon.invest_amount}}元
+              td {{coupon.available_at | milldate_format}} 至 {{coupon.unavailable_at | milldate_format}}
               if status == 'used'
-                td {{red_packet.product}} <br/> {{red_packet.apply_at | milltime_format }}
+                td {{coupon.product}} <br/> {{coupon.apply_at | milltime_format }}
               else
                 td P2P理财
 
