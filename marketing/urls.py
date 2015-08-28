@@ -31,7 +31,7 @@ urlpatterns = patterns(
     url(r'^xunlei_setp/$', TemplateView.as_view(template_name="xunlei_setp.jade")),
     url(r'^eight_gift_two/$', TemplateView.as_view(template_name="eight_gift_two.jade")),
     url(r'^xingmei/$', TemplateView.as_view(template_name="xingmei.jade")),
-
+    url(r'^september_activity/$', TemplateView.as_view(template_name="september_activity.jade")),
 
 )
 
