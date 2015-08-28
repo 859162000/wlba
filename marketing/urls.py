@@ -32,6 +32,7 @@ urlpatterns = patterns(
     url(r'^gold/$', TemplateView.as_view(template_name="gold.jade"), name='marketing_gold'),
     url(r'^qixi/$', TemplateView.as_view(template_name="qixi.jade")),
     url(r'^xunlei_setp/$', TemplateView.as_view(template_name="xunlei_setp.jade")),
+    url(r'^anniversary/$', TemplateView.as_view(template_name="anniversary.jade")),
 
 
 )
