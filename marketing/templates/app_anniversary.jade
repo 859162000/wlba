@@ -3,7 +3,7 @@ doctype html
 html(style="background:#fff")
   head
     meta(name="format-detection" content="telephone=no,email=no")
-    title 父亲节
+    title 一周年
     meta(charset="utf-8")
     meta(content="telephone=no,email=no" ,name="format-detection")
     meta(content="yes" ,name="apple-mobile-web-app-capable")
@@ -11,3 +11,8 @@ html(style="background:#fff")
       (function(){var b=navigator.userAgent;ipad=b.match(/(iPad).*OS\s([\d_]+)/)?true:false;iphone=!ipad&&b.match(/(iPhone\sOS)\s([\d_]+)/)?true:false;uc=navigator.userAgent.indexOf("UCBrowser")>-1?true:false;ios=ipad||iphone;var d=1,a=1,c;if(ios){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}else{if(uc){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}}c='<meta name="viewport" content="initial-scale='+d+", maximum-scale="+d+", minimum-scale="+d+', width=device-width, user-scalable=no" />';document.write(c);document.documentElement.style.fontSize=20*a+"px"})();
     link(href="/static/styles/mobile_activity/app.css", rel="stylesheet")
   body
+    .bannerAnniversary
+        img(src='/static/imgs/mobile_activity/app_anniversary/banner.jpg')
+        img(src='/static/imgs/mobile_activity/app_anniversary/bannerFont.png').bannerFonts
+
+ script(data-init='anniversary', src="/static/scripts/mobile/mobile.js")
