@@ -57,7 +57,7 @@
     })
 
     $.ajax({
-        url: '/api/celebrate/awards',
+        url: '/api/celebrate/awards/',
         type: "POST",
         data: {
             action : 'IS_VALID'

@@ -38,15 +38,16 @@ html
                     span 三重豪礼：海量豪礼，幸运转转赚
                 .luckDrawContent.clearfix
                     .luckDrawLeft
-                        .luckDrawImgBg
+                        .prize-light1
+                        .prize-light2
                         .luckDrawImg
                             .luckDrawButton
                                 if user.is_authenticated
                                     a(href='javascript:void(0)')
-                                        img(src='/static/imgs/pc/anniversary/button.png').rotateImg
+                                        img(src='/static/imgs/pc_activity/anniversary/button.png').rotateImg
                                 else
                                     a(href='/accounts/register/?next=/activity/anniversary')
-                                        img(src='/static/imgs/pc/anniversary/button.png')
+                                        img(src='/static/imgs/pc_activity/anniversary/button.png')
                     .luckDrawRight.clearfix
                         .luckDrawRightTop.clearfix
                             h3 中奖名单
