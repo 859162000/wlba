@@ -3,7 +3,7 @@ extends account_home_base
 -load formatters
 
 block head
-  - with '优惠券' as title
+  - with '红包' as title
     include include/head
 
 block sidebar
@@ -16,11 +16,11 @@ block main
     include include/coupon_exchange
 
   ul.discount--tabs
-        li.coupon--tab.hover
-          a(href="/accounts/redpacket/unused") 红包
-            span
-        li.redpacket--tab
+        li.coupon--tab
           a(href="/accounts/coupon/unused") 加息券
+            span
+        li.redpacket--tab.hover
+          a(href="/accounts/redpacket/unused") 红包
             span
   .account-home-panel__no-padding
     .account-home-panel--title-bar__product
