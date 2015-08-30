@@ -340,8 +340,6 @@ class AccountHome(TemplateView):
             obj = {"equity": equity}
             if earning_map.get(equity.product_id):
                 obj["earning"] = earning_map.get(equity.product_id)
-            #加息
-            obj['hike'] = backends.get_hike(user, equity.product_id)
 
             result.append(obj)
 
