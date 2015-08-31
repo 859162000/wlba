@@ -97,7 +97,8 @@ message_type = (
     ("loaned", u"投标成功"),#给持仓人发
     #("audited", "满标已审核"),
     ("public", u"发给所有"),
-    ("invite", u"邀请奖励")
+    ("invite", u"邀请奖励"),
+    ("coupon", u"加息奖励")
 )
 def timestamp():
     return long(time.time())
