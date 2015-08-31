@@ -21,10 +21,83 @@
   50%
     opacity: 1
 
-@-o-keyframes light
+@-o-keyframes rotateStyle
   0%
+    -webkit-transform: rotate(360deg) scale(1.5,1.5)
+    -moz-transform: rotate(360deg) scale(1.5,1.5)
+    -o-transform: rotate(360deg) scale(1.5,1.5)
+    -ms-transform: rotate(360deg) scale(1.5,1.5)
+    transform: rotate(360deg) scale(1.5,1.5)
     opacity: 0
-  50%
+  100%
+    -webkit-transform: rotate(0deg) scale(1,1)
+    -moz-transform: rotate(0deg) scale(1,1)
+    -o-transform: rotate(0deg) scale(1,1)
+    -ms-transform: rotate(0deg) scale(1,1)
+    transform: rotate(0deg) scale(1,1)
+    opacity: 1
+
+@keyframes rotateStyle
+  0%
+    -webkit-transform: rotate(360deg) scale(1.5,1.5)
+    -moz-transform: rotate(360deg) scale(1.5,1.5)
+    -o-transform: rotate(360deg) scale(1.5,1.5)
+    -ms-transform: rotate(360deg) scale(1.5,1.5)
+    transform: rotate(360deg) scale(1.5,1.5)
+    opacity: 0
+  100%
+    -webkit-transform: rotate(0deg) scale(1,1)
+    -moz-transform: rotate(0deg) scale(1,1)
+    -o-transform: rotate(0deg) scale(1,1)
+    -ms-transform: rotate(0deg) scale(1,1)
+    transform: rotate(0deg) scale(1,1)
+    opacity: 1
+@-moz-keyframes rotateStyle
+  0%
+    -webkit-transform: rotate(360deg) scale(1.5,1.5)
+    -moz-transform: rotate(360deg) scale(1.5,1.5)
+    -o-transform: rotate(360deg) scale(1.5,1.5)
+    -ms-transform: rotate(360deg) scale(1.5,1.5)
+    transform: rotate(360deg) scale(1.5,1.5)
+    opacity: 0
+  100%
+    -webkit-transform: rotate(0deg) scale(1,1)
+    -moz-transform: rotate(0deg) scale(1,1)
+    -o-transform: rotate(0deg) scale(1,1)
+    -ms-transform: rotate(0deg) scale(1,1)
+    transform: rotate(0deg) scale(1,1)
+    opacity: 1
+
+@-webkit-keyframes rotateStyle
+  0%
+    -webkit-transform: rotate(360deg) scale(1.5,1.5)
+    -moz-transform: rotate(360deg) scale(1.5,1.5)
+    -o-transform: rotate(360deg) scale(1.5,1.5)
+    -ms-transform: rotate(360deg) scale(1.5,1.5)
+    transform: rotate(360deg) scale(1.5,1.5)
+    opacity: 0
+  100%
+    -webkit-transform: rotate(0deg) scale(1,1)
+    -moz-transform: rotate(0deg) scale(1,1)
+    -o-transform: rotate(0deg) scale(1,1)
+    -ms-transform: rotate(0deg) scale(1,1)
+    transform: rotate(0deg) scale(1,1)
+    opacity: 1
+
+@-o-keyframes rotateStyle
+  0%
+    -webkit-transform: rotate(360deg) scale(1.5,1.5)
+    -moz-transform: rotate(360deg) scale(1.5,1.5)
+    -o-transform: rotate(360deg) scale(1.5,1.5)
+    -ms-transform: rotate(360deg) scale(1.5,1.5)
+    transform: rotate(360deg) scale(1.5,1.5)
+    opacity: 0
+  100%
+    -webkit-transform: rotate(0deg) scale(1,1)
+    -moz-transform: rotate(0deg) scale(1,1)
+    -o-transform: rotate(0deg) scale(1,1)
+    -ms-transform: rotate(0deg) scale(1,1)
+    transform: rotate(0deg) scale(1,1)
     opacity: 1
 
 .anniversaryBanner
@@ -49,17 +122,11 @@
       left: 149px
       top: 127px
       background: url(/static/imgs/pc_activity/anniversary/wanglibao.png) no-repeat
-      -webkit-transition: all 1s ease-in-out
-      -moz-transition: all 1s ease-in-out
-      -o-transition: all 1s ease-in-out
-      -ms-transition: all 1s ease-in-out
-      transition: all 1s ease-in-out
-    .wanglibaoHover
-      -webkit-transform: rotate(360deg) scale(1.5,1.5)
-      -moz-transform: rotate(360deg) scale(1.5,1.5)
-      -o-transform: rotate(360deg) scale(1.5,1.5)
-      -ms-transform: rotate(360deg) scale(1.5,1.5)
-      transform: rotate(360deg) scale(1.5,1.5)
+      animation: rotateStyle 1s linear 0.3s 1 normal
+      -moz-animation: rotateStyle 1s linear 0.3s 1 normal
+      -webkit-animation: rotateStyle 1s linear 0.3s 1 normal
+      -o-animation: rotateStyle 1s linear 0.3s 1 normal
+
     .balloon1
       position: absolute
       top: 335px

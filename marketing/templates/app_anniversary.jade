@@ -24,13 +24,19 @@ html(style="background:#fff")
         .activityOneDiv
             .span 一重豪礼：周年庆典，签到有礼
         .activityOneBtn
-            a(href='javascript:void(0)')#checkUserStatus 立即注册领现金
+            if user.is_authenticated
+                a(href='javascript:void(0)')#checkUserStatus 立即注册领现金
+            else
+                a(href='/weixin/regist/?next=/activity/app_anniversary/') 立即注册领现金
     .activityTwo
         .activityTwoDiv
             .span 二重豪礼：全场加息
         img(src='/static/imgs/mobile_activity/app_anniversary/two.jpg')
         .activityTwoBtn
-            a(href='') 立即去投资
+            if user.is_authenticated
+                a(href='/weixin/list/') 立即去投资
+            else
+                a(href='/weixin/regist/?next=/activity/app_anniversary/') 立即去投资
     .activityThree
         .activityThreeDiv
             .span 三重豪礼：海量豪礼，幸运转转赚
@@ -42,8 +48,12 @@ html(style="background:#fff")
             .centerStyle
                 .luckDrawImg
                     .luckDrawButton
-                        a(href='javascript:void(0)')
-                            img(src='/static/imgs/mobile_activity/app_anniversary/button.png').rotateImg
+                        if user.is_authenticated
+                            a(href='javascript:void(0)')
+                                img(src='/static/imgs/mobile_activity/app_anniversary/button.png').rotateImg
+                        else
+                            a(href='/weixin/regist/?next=/activity/app_anniversary/')
+                                img(src='/static/imgs/mobile_activity/app_anniversary/button.png')
         .luckDrawRightTop.clearfix
             h3 中奖名单
             p 网利宝周年庆抽奖已有xx份奖品被转走
@@ -104,7 +114,10 @@ html(style="background:#fff")
         p.fonts1 单笔投资5000元，立享中奖机会！
         p.fonts2 *本轮抽奖9月15日24点结束
         .activityThreeBtn
-            a(href='') 立即注册领现金
+            if user.is_authenticated
+                a(href='/weixin/list/') 立即去投资
+            else
+                a(href='/weixin/regist/?next=/activity/app_anniversary/') 立即去投资
     .activityFour
         .activityThreeDiv
             .span 四重豪礼：满额投资送~
@@ -123,7 +136,10 @@ html(style="background:#fff")
         .fourImg
             img(src='/static/imgs/mobile_activity/app_anniversary/four.jpg')
         .activityOneBtn
-            a(href='') 立即去投资
+            if user.is_authenticated
+                a(href='/weixin/list/') 立即去投资
+            else
+                a(href='/weixin/regist/?next=/activity/app_anniversary/') 立即去投资
         p.remarkContent 注：现金奖励在三个工作日内以红包形式发出，请留意站内信。
     .activityRuleCont
         h5 活动规则

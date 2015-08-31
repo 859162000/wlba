@@ -14,7 +14,6 @@
   });
 
   require(['jquery','jqueryRotate','script',"tools"], function($,jqueryRotate,script,tool) {
-    $('.wanglibao').removeClass('wanglibaoHover');
     //转盘
     $(".rotateImg").rotate({
 		bind:{

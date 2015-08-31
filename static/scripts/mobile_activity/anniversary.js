@@ -67,7 +67,11 @@ var org = (function(){
 org.anniversary = (function(org){
     var lib = {
         init:function(){
-            $('.bannerFonts').addClass('bannerFontsHover');
+            lib._scrollFun();
+            lib._gameFun();
+            lib._aboutPageFun();
+        },
+        _scrollFun:function(){
             //无线滚动
             var timer,i= 1,j=2;
             timer=setInterval(function(){
@@ -80,8 +84,9 @@ org.anniversary = (function(org){
                 $('#users').css({'top':-i+'px'})
               }
             },30)
-
-                //转盘
+        },
+        _gameFun:function(){
+            //转盘
             $(".rotateImg").rotate({
                 bind:{
                     click:function(){
@@ -106,6 +111,9 @@ org.anniversary = (function(org){
                     }
                 }
             });
+        },
+        _aboutPageFun:function(){
+            $('.bannerFonts').addClass('bannerFontsHover');
             //关闭中奖遮罩
             $('.spanBtn,.againBtn').on('click',function(){
                 $('.page,.winningDiv').hide();
@@ -120,6 +128,33 @@ org.anniversary = (function(org){
         init : lib.init
     }
 })(org);
+
+org.anniversaryWap = (function(org){
+    var lib = {
+        init:function(){
+            $('.bannerFonts').addClass('bannerFontsHover');
+            $('.rotateImg').on('click',function(){
+                 alert($('.errorWinDiv').html())
+            })
+            //无线滚动
+            var timer,i= 1,j=2;
+            timer=setInterval(function(){
+              if (-parseInt($('#users').css('top'))>=$('#users li').height()){
+                $('#users li').eq(0).appendTo($('#users'));
+                $('#users').css({'top':'0px'})
+                i=0
+              }else{
+                i++
+                $('#users').css({'top':-i+'px'})
+              }
+            },30)
+        }
+    }
+    return {
+        init : lib.init
+    }
+})(org);
+
 
 ;(function(org){
     $.each($('script'), function(){
