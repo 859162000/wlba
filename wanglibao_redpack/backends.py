@@ -76,8 +76,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack'):
 
         # 加息券
         if product_id > 0:
-            records_count = RedPackRecord.objects.filter(user=user, product_id=product_id)\
-                .filter(redpack__event__rtype='interest_coupon').count()
+            records_count = RedPackRecord.objects.filter(user=user, product_id=product_id).count()
             if records_count == 0:
                 coupons = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
                     .filter(redpack__event__rtype='interest_coupon')
