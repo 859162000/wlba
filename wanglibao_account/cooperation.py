@@ -31,8 +31,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY, FUBA_CALL_BACK_URL, WLB_FOR_FUBA_KEY, \
      FUBA_COOP_ID, FUBA_KEY, FUBA_CHANNEL_CODE, FUBA_DEFAULT_TID, FUBA_PERIOD, \
      WLB_FOR_YUNDUAN_KEY, YUNDUAN_CALL_BACK_URL, YUNDUAN_COOP_ID, WLB_FOR_YICHE_KEY, YICHE_COOP_ID, \
-     YICHE_KEY, YICHE_REGISTER_CALL_BACK_URL, YICHE_VALIDATE_CALL_BACK_URL, YICHE_PURCHASE_CALL_BACK_URL, \
-     YICHE_U_PURCHASE_CALL_BACK_URL
+     YICHE_KEY, YICHE_CALL_BACK_URL, WLB_FOR_ZHITUI_KEY, ZHITUI_COOP_ID, ZHITUI_CALL_BACK_URL
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
@@ -40,6 +39,7 @@ from wanglibao_pay.models import Card
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_redis.backend import redis_backend
 from dateutil.relativedelta import relativedelta
+from decimal import Decimal
 
 logger = logging.getLogger(__name__)
 
@@ -723,10 +723,7 @@ class YiCheRegister(CoopRegister):
     def __init__(self, request):
         super(YiCheRegister, self).__init__(request)
         self.c_code = 'yiche'
-        self.register_call_back_url = YICHE_REGISTER_CALL_BACK_URL
-        self.validate_call_back_url = YICHE_VALIDATE_CALL_BACK_URL
-        self.purchase_call_back_url = YICHE_PURCHASE_CALL_BACK_URL
-        self.u_purchase_call_back_url = YICHE_U_PURCHASE_CALL_BACK_URL
+        self.call_back_url = YICHE_CALL_BACK_URL
         self.coop_id = YICHE_COOP_ID
         self.coop_key = YICHE_KEY
 
@@ -743,13 +740,12 @@ class YiCheRegister(CoopRegister):
     def register_call_back(self, user):
         binding = Binding.objects.filter(user_id=user.id).first()
         if binding:
-            url = self.register_call_back_url
+            url = self.call_back_url + '?method=AddPlatFormFinanceUser'
             introduced_by = IntroducedBy.objects.filter(user_id=user.id).first()
             mobile = '******'.join(get_phone_for_coop(user.id).split('***'))
             params = {
                 'userId': binding.bid,
                 'userName': mobile,
-                'realName': '',
                 'mobile': mobile,
                 'companyId': 9,
                 'regTime': introduced_by.created_at.strftime('%Y-%m-%d %H:%M:%S'),
@@ -760,30 +756,31 @@ class YiCheRegister(CoopRegister):
     def validate_call_back(self, user):
         binding = Binding.objects.filter(user_id=user.id).first()
         if binding:
-            url = self.validate_call_back_url
+            url = self.call_back_url + '?method=UpdatePlatFormFinanceUser'
             username = get_username_for_coop(user.id)
             params = {
                 'userId': binding.bid,
                 'realName': username,
+                'companyId': 9,
             }
             self.yiche_call_back(url, params)
 
     def purchase_call_back(self, user):
-        # 判断是否是首次投资
         binding = Binding.objects.filter(user_id=user.id).first()
-        if binding:
-            url = self.purchase_call_back_url
-            p2p_record = get_last_investment_for_coop(user.id)
+        p2p_record = get_last_investment_for_coop(user.id)
+        if binding and p2p_record:
+            url = self.call_back_url + '?method=AddPlatFormFinanceOrder'
             invest_time = p2p_record.create_time
             params = {
                 'userId': binding.bid,
                 'orderNo': p2p_record.id,
                 'invest': str(p2p_record.amount),
                 'investTime': invest_time.strftime('%Y-%m-%d %H:%M:%S'),
+                'companyId': 9,
             }
             self.yiche_call_back(url, params)
 
-            url = self.u_purchase_call_back_url
+            url = self.call_back_url + '?method=UpdatePlatFormFinanceOrder'
             period = p2p_record.product.period
             pay_method = p2p_record.product.pay_method
             profit_time = None
@@ -799,11 +796,48 @@ class YiCheRegister(CoopRegister):
             }
             self.yiche_call_back(url, params)
 
+
+class ZhiTuiRegister(CoopRegister):
+    def __init__(self, request):
+        super(ZhiTuiRegister, self).__init__(request)
+        self.c_code = 'zhitui'
+        self.coop_id = ZHITUI_COOP_ID
+        self.call_back_url = ZHITUI_CALL_BACK_URL
+
+    def purchase_call_back(self, user):
+        binding = Binding.objects.filter(user_id=user.id).first()
+        p2p_record = get_last_investment_for_coop(user.id)
+        if binding and p2p_record:
+            invest_time = p2p_record.create_time
+            invest_amount = p2p_record.amount
+            period = p2p_record.product.period
+            pay_method = p2p_record.product.pay_method
+            # 根据支付方式判定标周期的单位（天/月）,如果是单位为月则转换为天
+            if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
+                period = (invest_time + relativedelta(months=period) - invest_time).days
+
+            params = {
+                'a_id': self.coop_id,
+                'subid': binding.bid,
+                'o_cd': p2p_record.id,
+                'p_cd': '',
+                'price': invest_amount,
+                'it_cnt': 1,
+                'o_date': invest_time.strftime('%Y%m%d%H%M%S'),
+                'rate': round(invest_amount * int(period) * Decimal(0.01) / Decimal(365), 2),
+                'rate_memo': '',
+                'status': 1,
+                'note': '',
+            }
+            common_callback.apply_async(
+            kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
+
+
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
-                          YiCheRegister]
+                          YiCheRegister, ZhiTuiRegister]
 
 
 #######################第三方用户查询#####################
@@ -1535,7 +1569,7 @@ class ZhongniuP2PQuery(APIView):
 
         if self.check_sign():
             ret = dict()
-            ret['data'] = []
+            ret['list'] = []
             products = P2PProduct.objects.filter(
                 Q(status=u'录标') | Q(status=u'录标完成') | Q(status=u'待审核') | Q(status=u'正在招标'))
 
@@ -1556,12 +1590,18 @@ class ZhongniuP2PQuery(APIView):
             if len(products) > 0:
                 ret['status'] = 0
                 for product in products:
+                    if product.status in [u'录标', u'录标完成', u'待审核']:
+                        status = 0
+                    elif product.status == u'正在招标':
+                        status = 1
+                    else:
+                        status = 2
                     data = dict()
                     data['pid'] = product.pk
-                    data['status'] = product.status
+                    data['status'] = status
                     data['amounted'] = product.ordered_amount
                     data['progress'] = product.completion_rate
-                    ret['data'].append(data)
+                    ret['list'].append(data)
             else:
                 ret['status'] = 1
 
@@ -1589,9 +1629,11 @@ class ZhongniuP2PDataQuery(APIView):
         if pwd and pwd == settings.ZHONGNIU_SECRET:
             return True
 
-    def get(self, request, pid):
+    def get(self, request):
 
         ret = dict()
+
+        pid = str(self.request.GET.get('pid', None))
 
         if self.check_sign():
             if pid:
@@ -1603,7 +1645,7 @@ class ZhongniuP2PDataQuery(APIView):
                     return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
             if product:
-                ret['status'] = 1
+                ret['status'] = 0
                 data = dict()
                 data['pid'] = product.pk
                 data['name'] = product.name
@@ -1615,13 +1657,34 @@ class ZhongniuP2PDataQuery(APIView):
                 if settings.ENV == 'production':
                     base_url = 'https://www.wanglibao.com'
                 data['url'] = base_url + '/p2p/detail/' + str(product.pk)
-                data['type'] = product.category
+
+                data['type'] = 2
+
                 data['yield'] = product.expected_earning_rate
                 data['duration'] = product.period
-                data['repaytype'] = product.pay_method
-                data['guaranttype'] = product.warrant_company.name
+
+                if product.pay_method == u'等额本息':
+                    pay_method = 3
+                elif product.pay_method == u'按月付息':
+                    pay_method = 1
+                elif product.pay_method == u'到期还本付息':
+                    pay_method = 4
+                else:
+                    pay_method = 9
+                data['repaytype'] = pay_method
+
+                data['guaranttype'] = 1
+
                 data['threshold'] = 100
-                data['status'] = product.status
+
+                if product.status in [u'录标', u'录标完成', u'待审核']:
+                    status = 0
+                elif product.status == u'正在招标':
+                    status = 1
+                else:
+                    status = 2
+                data['status'] = status
+
                 data['amount'] = product.total_amount
                 data['amounted'] = product.ordered_amount
                 data['progress'] = "%.2f" % product.completion_rate
@@ -1637,9 +1700,9 @@ class ZhongniuP2PDataQuery(APIView):
                     detail.append({'image': url})
                 data['detail'] = detail
 
-                data['startdate'] = product.publish_time
-                data['enddate'] = product.end_time
-                data['publishtime'] = product.publish_time
+                data['startdate'] = product.publish_time.strftime("%Y-%m-%d")
+                data['enddate'] = product.end_time.strftime("%Y-%m-%d")
+                data['publishtime'] = product.publish_time.strftime("%Y-%m-%d %H:%M:%S")
 
                 ret['data'] = data
 
