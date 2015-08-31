@@ -807,7 +807,6 @@ class ThousandRedPackAPIView(APIView):
 
             return Response({'ret_code': 0, 'message': u'红包发放成功，请到用户中心查看'})
 
-
 class ThousandRedPackCountAPIView(APIView):
     permission_classes = ()
 
@@ -878,7 +877,6 @@ def celebrate_ajax(request):
             'message': u'请以ajax方式交互，并用post请求',
         })
 
-
 class WanglibaoAwardActivity(APIView):
     """
         Author: add by Yihen@20150827
@@ -886,6 +884,7 @@ class WanglibaoAwardActivity(APIView):
     """
     def __init__(self, request):
         self.request = request
+        self.user = self.request.user
         activity_start = datetime(2015, 9, 1, 0, 0)
         self.record = P2PEquity.objects.filter(equity__gte=5000, created_at__gt=activity_start, user_id=request.user.id).aggregate(counts=Count('id'))
 
@@ -893,9 +892,7 @@ class WanglibaoAwardActivity(APIView):
         """
             Description:判断用户是不是在活动期间内注册的新用户
         """
-        record = IntroducedBy.objects.filter(user_id=self.request.user.id).first()
-        time_array = time.strptime(record.created_at, "%Y-%m-%d %H:%M:%S")
-        create_at = int(time.mktime(time_array))  # 用户注册的时间戳
+        create_at = int(time.mktime(self.user.date_joined.date().timetuple()))  # 用户注册的时间戳
         activity_start = time.mktime(datetime(2015, 9, 1).timetuple())  # 活动开始时间
 
         if activity_start > create_at:
