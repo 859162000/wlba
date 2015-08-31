@@ -34,26 +34,23 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
   showPayInfo = (actual_payment, red_pack_payment) ->
     return ['红包使用<i class="blue">', red_pack_payment, '</i>元，实际支付<i class="blue">', actual_payment, '</i>元'].join('')
-
+  showPayIncrease = (redpack_amount, increase) ->
+    return ['额外加息<i class="blue">', redpack_amount * 100, '% </i>, 预期额外收益<i class="blue">', increase, '</i>元'].join('')
   getRedAmount = (method, red_pack_amount, event_id, highest_amount) ->
-    amount = $('#id_amount').val()
-    if event_id*1 == 7
-      flag = amount*0.005
-      if flag <= 30
-        final_redpack = flag
-      else
-        final_redpack = 30
-
-      return {
-        red_pack: getFormatedNumber(final_redpack)
-        actual_amount: getActualAmount(amount, final_redpack)
-      }
+    $amount  = $('#id_amount')
+    amount = $amount.val()
     if method == '*'
-      final_redpack = amount*red_pack_amount
+      final_redpack = amount * red_pack_amount
       if highest_amount && highest_amount < final_redpack
         final_redpack = highest_amount
-    else
+    else if method == '-'
       final_redpack = red_pack_amount
+    else
+      p2p_data = {
+        period : $amount.attr('data-period') * 1 ,
+        method : $amount.attr('data-paymethod') ,
+      }
+      final_redpack = calculator(amount, red_pack_amount, p2p_data.period, p2p_data.method)
 
     return {
       red_pack: getFormatedNumber(final_redpack)
@@ -83,7 +80,10 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     if redPack.highest_amount
       highest_amount = redPack.highest_amount
     redPackInfo = getRedAmount(redPack.method, redPack.amount, redPack.event_id, highest_amount)
-    html = showPayInfo(redPackInfo.actual_amount, redPackInfo.red_pack)
+    if redPack.method == '~'
+      html  = showPayIncrease(redPack.amount, redPackInfo.red_pack)
+    else
+      html = showPayInfo(redPackInfo.actual_amount, redPackInfo.red_pack)
     $('.payment').html(html).show()
 
   $.validator.addMethod 'dividableBy100', (value, element)->
@@ -357,9 +357,13 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           if obj.method == '*'
             amount = obj.highest_amount
             desc = ['抵', obj.amount*100, '%投资额'].join('')
-          else
+          else if obj.method == '-'
             amount = obj.amount
             desc = (if obj.invest_amount and obj.invest_amount > 0 then [obj.invest_amount, "元起用"].join('') else "无投资门槛")
+          else
+            amount = ''
+            desc = (if obj.invest_amount and obj.invest_amount > 0 then [obj.invest_amount, "元起用"].join('') else "无投资门槛")
+
 
           if obj.highest_amount
             highest_amount = obj.highest_amount

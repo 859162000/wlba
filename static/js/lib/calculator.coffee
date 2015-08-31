@@ -98,5 +98,6 @@ define ['jquery'], ($)->
       else
         $(fee_element).text "0.00"
 
-
   $('input[data-role=p2p-calculator]').keyup()
+  return calculate
+
