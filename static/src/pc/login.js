@@ -362,7 +362,12 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                             invitecode : invitecode
                         }
                     }).done(function () {
-                        window.location = '/'
+                          var arr = location.search;
+                          if (arr != '') {
+                              window.location = arr.split('=')[1];
+                          } else {
+                              window.location = '/';
+                          }
                     }).fail(function (xhr) {
                         var result = JSON.parse(xhr.responseText);
                         if(result.message.invitecode != undefined){

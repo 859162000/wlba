@@ -321,7 +321,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
 
 class UserAmortizationAdmin(ConcurrentModelAdmin):
     actions = None
-    list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest')
+    list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest', 'coupon_interest')
     search_fields = ('user__wanglibaouserprofile__phone', 'product_amortization__product__name')
     raw_id_fields = ('product_amortization', 'user')
 
@@ -384,7 +384,8 @@ class WarrantAdmin(admin.ModelAdmin):
 class AmortizationRecordAdmin(admin.ModelAdmin):
     actions = None
     list_display = (
-        'catalog', 'order_id', 'amortization', 'user', 'term', 'principal', 'interest', 'penal_interest', 'description')
+        'catalog', 'order_id', 'amortization', 'user', 'term',
+        'principal', 'interest', 'penal_interest', 'coupon_interest', 'description')
     search_fields = ('user__wanglibaouserprofile__phone',)
     raw_id_fields = ('amortization', 'user')
 

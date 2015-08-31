@@ -9,7 +9,7 @@ from registration.backends.default.views import ActivationView
 from forms import EmailOrPhoneAuthenticationForm
 from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView, AccountHome,
                    AccountTransaction, AccountBankCard, AccountTransactionP2P, IdVerificationView,
-                   AccountTransactionDeposit, AccountRedPacket,
+                   AccountTransactionDeposit, AccountRedPacket, AccountCoupon,
                    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract,
                    Third_login, Third_login_back, MessageView, MessageDetailAPIView, MessageCountAPIView,
                    MessageListAPIView, AccountRepayment, AddressView, AccountInviteView, user_product_contract_kf)#, CjdaoApiView)
@@ -33,6 +33,7 @@ urlpatterns = patterns(
                                                login_url='/accounts/login/')),
     url(r'^transaction/p2p/$', login_required(AccountTransactionP2P.as_view(), login_url='/accounts/login/')),
     url(r'^redpacket/(?P<status>\w+)/$', login_required(AccountRedPacket.as_view(), login_url='/accounts/login/')),
+    url(r'^coupon/(?P<status>\w+)/$', login_required(AccountCoupon.as_view(), login_url='/accounts/login/')),
 
     url(r'^repayment/$', login_required(AccountRepayment.as_view(), login_url='/accounts/login/')),
     url(r'^transaction/deposit/$', login_required(AccountTransactionDeposit.as_view(),
