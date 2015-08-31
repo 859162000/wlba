@@ -54,3 +54,15 @@ class RedPacketDeductAPIView(APIView):
         redpack_amount = request.DATA.get("rpa", "").strip()
         result = backends.deduct_calc(amount, redpack_amount)
         return Response(result)
+
+
+class RedPacketSelectAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+        product_id = request.DATA.get("product_id", "").strip()
+        if not product_id:
+            return Response({"ret_code": 3001, "message": u"产品ID错误"})
+        result = backends.get_interest_coupon(user, product_id)
+        return Response(request)

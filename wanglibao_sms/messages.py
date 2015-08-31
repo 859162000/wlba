@@ -182,3 +182,10 @@ def sms_alert_invite(name, phone):
     return u"邀请注册：您的好友{}邀请您加入网利宝，快来一起赚钱，速速点击专属链接：" \
            u"https://www.wanglibao.com/activity/wap/share?phone={}".format(name, phone)
 
+
+def msg_give_coupon(name, amount, end_time):
+    title = u"参与活动送加息券"
+    content = u"网利宝赠送的【{}】加息券已发放，加息额度{}%，请进入投资页面尽快投资赚收益吧！有效期至{}。" \
+              u"<a href='/'>立即使用</a>。<br/>" \
+              u"感谢您对我们的支持与关注！<br/>网利宝".format(name, amount, end_time)
+    return title, content
