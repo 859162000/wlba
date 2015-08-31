@@ -39,10 +39,11 @@ class RedPacketListAPIView(APIView):
 
     def post(self, request):
         status = request.DATA.get("status", "")
+        rtype = request.DATA.get("rtype", "")
         product_id = request.DATA.get("product_id", "")
         device = utils.split_ua(request)
         user = request.user
-        result = backends.list_redpack(user, status, device['device_type'], product_id)
+        result = backends.list_redpack(user, status, device['device_type'], product_id, rtype)
         return Response(result)
 
 class RedPacketDeductAPIView(APIView):
