@@ -1,0 +1,41 @@
+
+
+
+.team-banner
+  img
+    display: block
+    width: 100%
+    height: auto
+
+.team-dongshi
+  background: url("/static/imgs/app/management/team_title1.png") no-repeat center
+  background-size: auto
+  height: 2rem
+  width: 100%
+.team-mange
+  @extend .team-dongshi
+  background: url("/static/imgs/app/management/team_title2.png") no-repeat center
+
+.team-item
+  display: -webkit-box
+  -webkit-box-align: center
+  padding: .5rem .75rem
+  border-bottom: 1px dashed #E5E5E5
+.dongshi-item, .mange-item
+  .team-item
+    &:last-child
+      border: 0
+.team-img
+  width: 3.75rem
+  height: 3.75rem
+  display: block
+  margin-right: .25rem
+.team-dec
+  -webkit-box-flex: 1
+  .team-title
+    font-size: $font-size14
+    color: #666
+    margin-bottom: .25rem
+  .team-decs
+    font-size: $font-size12
+    color: #999

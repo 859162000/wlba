@@ -380,7 +380,7 @@
           data2 = data;
           availables = data.packages.available;
           ddData.push({
-            text: '不使用红包',
+            text: '不使用优惠券',
             value: '',
             selected: true,
             method: '',
@@ -388,7 +388,7 @@
             invest_amount: 0,
             highest_amount: 0,
             event_id: 0,
-            description: '不使用红包'
+            description: '不使用优惠券'
           });
           for (j = 0, len1 = availables.length; j < len1; j++) {
             obj = availables[j];
