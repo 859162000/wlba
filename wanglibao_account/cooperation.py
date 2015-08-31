@@ -797,9 +797,9 @@ class YiCheRegister(CoopRegister):
             self.yiche_call_back(url, params)
 
 
-class ZhiTuiRegesiter(CoopRegister):
+class ZhiTuiRegister(CoopRegister):
     def __init__(self, request):
-        super(ZhiTuiRegesiter, self).__init__(request)
+        super(ZhiTuiRegister, self).__init__(request)
         self.c_code = 'zhitui'
         self.coop_id = ZHITUI_COOP_ID
         self.call_back_url = ZHITUI_CALL_BACK_URL
@@ -837,7 +837,7 @@ class ZhiTuiRegesiter(CoopRegister):
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
-                          YiCheRegister, ZhiTuiRegesiter]
+                          YiCheRegister, ZhiTuiRegister]
 
 
 #######################第三方用户查询#####################
