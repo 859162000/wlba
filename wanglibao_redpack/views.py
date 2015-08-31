@@ -63,6 +63,6 @@ class RedPacketSelectAPIView(APIView):
         user = request.user
         product_id = request.DATA.get("product_id", "").strip()
         if not product_id:
-            return Response({"ret_code": 30190, "message": u"产品ID错误"})
+            return Response({"ret_code": 3001, "message": u"产品ID错误"})
         result = backends.get_interest_coupon(user, product_id)
         return Response(request)
