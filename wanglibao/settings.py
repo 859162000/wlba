@@ -892,19 +892,19 @@ YUNDUAN_COOP_ID = 298
 # 易车
 WLB_FOR_YICHE_KEY = '1999'
 if ENV == ENV_PRODUCTION:
-    YICHE_COOP_ID = None
-    YICHE_KEY = None
-    YICHE_REGISTER_CALL_BACK_URL = None
-    YICHE_VALIDATE_CALL_BACK_URL = None
-    YICHE_PURCHASE_CALL_BACK_URL = None
-    YICHE_U_PURCHASE_CALL_BACK_URL = None
+    YICHE_COOP_ID = 200104
+    YICHE_KEY = '0dae7d5bbcd493785f057bc1'
+    YICHE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API'
 else:
     YICHE_COOP_ID = 200104
     YICHE_KEY = '0dae7d5bbcd493785f057bc1'
-    YICHE_REGISTER_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API?method=AddPlatFormFinanceUser'
-    YICHE_VALIDATE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API?method=UpdatePlatFormFinanceUser'
-    YICHE_PURCHASE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API?method=AddPlatFormFinanceOrder'
-    YICHE_U_PURCHASE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API?method=UpdatePlatFormFinanceOrder'
+    YICHE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API'
+
+# 智推
+WLB_FOR_ZHITUI_KEY = '2000'
+ZHITUI_COOP_ID = '370'
+ZHITUI_CALL_BACK_URL = 'http://api.zhitui.com/wanglibao/recive.php'
+
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100
