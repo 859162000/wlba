@@ -4,18 +4,16 @@
         jquery: 'lib/jquery.min',
         'jquery.modal': 'lib/jquery.modal.min',
         'jqueryRotate' : 'jQueryRotate.2.2',
-        'jquery.easing' : 'jquery.easing.min',
         'script' : 'script',
         tools: 'lib/modal.tools'
     },
     shim: {
       'jquery.modal': ['jquery'],
-      'jquery.easing' : ['jquery'],
       'jqueryRotate' : ['jquery']
     }
   });
 
-  require(['jquery','jqueryRotate','jquery.easing','script',"tools"], function($,jqueryRotate,easing,script,tool) {
+  require(['jquery','jqueryRotate','script',"tools"], function($,jqueryRotate,script,tool) {
     $('.wanglibao').removeClass('wanglibaoHover');
     //转盘
     $(".rotateImg").rotate({
@@ -26,7 +24,6 @@
 					 	duration:3000,
 					 	angle: 0,
             			animateTo:1440+a.angle,
-						easing: $.easing.easeOutSine,
 						callback: function(){
                             $('.page,.winningDiv').show();
                             $('#moeny').text(a.prize);
