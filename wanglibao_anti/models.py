@@ -1,11 +1,10 @@
-from django.db import models
+# encoding: utf-8
 
 #from __future__ import unicode_literals
 
 from django.db import models
 
 class AntiDelayCallback(models.Model):
-    id = models.IntegerField(primary_key=True)
     uid = models.IntegerField()
     createtime = models.IntegerField()
     updatetime = models.IntegerField()
@@ -13,9 +12,7 @@ class AntiDelayCallback(models.Model):
     status = models.IntegerField()
     device = models.CharField(max_length=1024)
     ip = models.CharField(max_length=32)
-    class Meta:
-        managed = False
-        db_table = 'anti_delay_callback'
 
+    def __unicode__(self):
+        return u"反作弊"
 
-# Create your models here.
