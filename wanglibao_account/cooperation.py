@@ -1183,6 +1183,8 @@ def xicai_get_p2p_info(mproduct, access_token):
 
     if settings.ENV != settings.ENV_PRODUCTION:
         xicai_info['test'] = 1
+    else:
+        xicai_info['test'] = 0
     return xicai_info
 
 
