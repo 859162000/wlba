@@ -372,12 +372,16 @@
     ddData = [];
     if ($('.red-pack').size() > 0) {
       return $(document).ready(function() {
+        $.post('/api/redpacket/selected/', {
+          product_id: $('input[name=product]').val()
+        }).done(function(data) {
+          return console.log(data);
+        });
         $.post('/api/redpacket/', {
           status: 'available',
           product_id: $('input[name=product]').val()
         }).done(function(data) {
-          var amount, available_time, availables, data2, datetime, desc, highest_amount, j, len1, obj, text;
-          data2 = data;
+          var amount, available_time, availables, datetime, desc, highest_amount, imageSrc, j, len1, obj, text;
           availables = data.packages.available;
           ddData.push({
             text: '不使用优惠券',
@@ -411,8 +415,10 @@
             }
             if (obj.method === '~') {
               text = [obj.name, ' 加息', obj.amount * 100, '%'].join('');
+              imageSrc = '/static/imgs/pc/p2p_detail/icon_jiaxi.png';
             } else {
               text = [obj.name, ' ', amount, '元'].join('');
+              imageSrc = '/static/imgs/pc/p2p_detail/icon_redpack.png';
             }
             ddData.push({
               text: text,
@@ -423,13 +429,14 @@
               invest_amount: obj.invest_amount,
               event_id: obj.event_id,
               highest_amount: highest_amount,
-              description: desc + ', ' + available_time + '过期'
+              description: desc + ', ' + available_time + '过期',
+              imageSrc: imageSrc
             });
           }
           return $('.red-pack').ddslick({
             data: ddData,
             width: 194,
-            imagePosition: "left",
+            imagePosition: "right",
             selectText: "请选择红包",
             onSelected: function(data) {
               if (validator.checkForm() && $('.dd-selected-value').val() !== '') {
