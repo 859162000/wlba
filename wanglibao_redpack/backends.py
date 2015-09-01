@@ -76,8 +76,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack'):
 
         # 加息券
         if product_id > 0:
-            records_count = RedPackRecord.objects.filter(user=user, product_id=product_id)\
-                .filter(redpack__event__rtype='interest_coupon').count()
+            records_count = RedPackRecord.objects.filter(user=user, product_id=product_id).count()
             if records_count == 0:
                 coupons = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
                     .filter(redpack__event__rtype='interest_coupon')
@@ -239,6 +238,7 @@ def exchange_redpack(token, device_type, user):
 def _send_message(user, event):
     fmt_str = "%Y年%m月%d日"
     give_time = timezone.localtime(event.unavailable_at).strftime(fmt_str)
+    mtype = 'activity'
     if event.rtype == 'percent':
         pass
         #send_messages.apply_async(kwargs={
@@ -253,13 +253,17 @@ def _send_message(user, event):
         #})
     if event.rtype == 'percent':
         title, content = messages.msg_redpack_give_percent(event.amount, event.highest_amount, event.name, give_time)
+    elif event.rtype == 'interest_coupon':
+        # TODO 此处需要根据获得加息券的时间来处理到期时间，可能需要新增加参数来获得加息券的发送时间
+        title, content = messages.msg_give_coupon(event.name, event.amount, give_time)
+        mtype = 'coupon'
     else:
         title, content = messages.msg_redpack_give(event.amount, event.name, give_time)
     inside_message.send_one.apply_async(kwargs={
         "user_id": user.id,
         "title": title,
         "content": content,
-        "mtype": "activity"
+        "mtype": mtype
     })
 
 def _decide_device(device_type):
@@ -286,20 +290,20 @@ def give_first_buy_redpack(user, device_type):
     _give_redpack(user, "first_buy", device_type)
 
 
-def give_buy_redpack(user, device_type, rtype='buy', describe=''):
+def give_buy_redpack(user, device_type, give_mode='buy', describe=''):
     now = timezone.now()
-    rps = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, give_start_at__lt=now, give_end_at__gt=now)
+    rps = RedPackEvent.objects.filter(give_mode=give_mode, invalid=False, give_start_at__lt=now, give_end_at__gt=now)
     if describe:
         rps = rps.filter(describe=describe)
     for x in rps:
         give_activity_redpack(user=user, event=x, device_type=device_type)
 
 
-def _give_redpack(user, rtype, device_type):
+def _give_redpack(user, give_mode, device_type):
     now = timezone.now()
     user_ch = helper.which_channel(user)
     device_type = _decide_device(device_type)
-    rps = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, give_start_at__lt=now, give_end_at__gt=now)
+    rps = RedPackEvent.objects.filter(give_mode=give_mode, invalid=False, give_start_at__lt=now, give_end_at__gt=now)
     for x in rps:
         #if x.target_channel != "" and user_ch != x.target_channel:
         if x.target_channel != "":
@@ -376,28 +380,6 @@ def consume(redpack, amount, user, order_id, device_type, product_id):
     record.apply_at = timezone.now()
     record.save()
 
-   # if REDPACK_RULE[rtype] == "*":
-   #     #return {"ret_code":30176, "message":"目前不支付百分比红包"}
-   #     rule_value = rule_value/100.0
-   #     deduct = fmt_two_amount(amount * rule_value)
-   #     actual_amount = amount + deduct
-   # elif REDPACK_RULE[rtype] == "-":
-   #     if event.id == 7:
-   #         t5 = amount * 0.005
-   #         if t5 >= rule_value:
-   #             deduct = rule_value
-   #         else:
-   #             deduct = t5
-   #         deduct = fmt_two_amount(deduct)
-   #     else:
-   #         if amount <= rule_value:
-   #             actual_amount = amount
-   #             deduct = amount
-   #         else:
-   #             actual_amount = amount - rule_value
-   # elif REDPACK_RULE[rtype] == "+":
-   #     actual_amount = amount + rule_value
-
     return {"ret_code":0, "message":"ok", "deduct":deduct, "rtype": event.rtype}
 
 def _calc_deduct(amount, rtype, rule_value, event):
@@ -466,67 +448,64 @@ def deduct_calc(amount, redpack_amount):
     return {"ret_code":0, "deduct":real_deduct}
 
 
-def increase_hike(user, product_id):
-    if not user or not product_id:
-        return
-    product = P2PProduct.objects.filter(id=product_id).first()
-    if not product:
-        return
-    pr = P2PRecord.objects.filter(user=user, product=product).first()
-    if not pr:
-        return
-    if (timezone.now() - pr.create_time).days > 10:
-        return
-    #InterestHike.objects.select_for_update().filter(user=user, product=product, invalid=False).first()
-    record = InterestHike.objects.filter(user=user, product=product, invalid=False).first()
-    if not record:
-        record = InterestHike()
-        record.user = user
-        record.product = product
-        record.rate = decimal.Decimal("0.001")
-    record.intro_total += 1
-    record.save()
-    return {"ret_code":0, "message":"ok"}
+# def increase_hike(user, product_id):
+#     if not user or not product_id:
+#         return
+#     product = P2PProduct.objects.filter(id=product_id).first()
+#     if not product:
+#         return
+#     pr = P2PRecord.objects.filter(user=user, product=product).first()
+#     if not pr:
+#         return
+#     if (timezone.now() - pr.create_time).days > 10:
+#         return
+#     #InterestHike.objects.select_for_update().filter(user=user, product=product, invalid=False).first()
+#     record = InterestHike.objects.filter(user=user, product=product, invalid=False).first()
+#     if not record:
+#         record = InterestHike()
+#         record.user = user
+#         record.product = product
+#         record.rate = decimal.Decimal("0.001")
+#     record.intro_total += 1
+#     record.save()
+#     return {"ret_code":0, "message":"ok"}
+#
+# def settle_hike(product):
+#     if not product:
+#         return None
+#     if product.pay_method.startswith(u"日计息"):
+#         term = decimal.Decimal(product.period) / decimal.Decimal(360)
+#     else:
+#         term = decimal.Decimal(product.period) / decimal.Decimal(12)
+#
+#     hike_list = []
+#     #records = InterestHike.objects.filter(product=product, invalid=False, paid=False).first()
+#     records = InterestHike.objects.filter(product=product, invalid=False, paid=False)
+#     for x in records:
+#         equity = P2PEquity.objects.filter(user=x.user, product=product).first()
+#         if equity:
+#             intro_total = x.intro_total
+#             if x.intro_total > 20:
+#                 intro_total = 20
+#             amount = equity.equity * term * x.rate * intro_total
+#             amount = amount.quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_HALF_DOWN)
+#             x.amount = amount
+#             x.paid = True
+#             x.updated_at = timezone.now()
+#             x.save()
+#             hike_list.append({"user":x.user, "amount":amount})
+#     return hike_list
 
-def settle_hike(product):
-    if not product:
-        return None
-    if product.pay_method.startswith(u"日计息"):
-        term = decimal.Decimal(product.period) / decimal.Decimal(360)
+
+def get_interest_coupon(user, product_id):
+    records = RedPackRecord.objects.filter(user=user, product_id=product_id) \
+        .filter(redpack__event__rtype='interest_coupon').first()
+    if records:
+        amount = records.redpack.event.amount
+        return {"ret_code": 0, "amount": amount}
     else:
-        term = decimal.Decimal(product.period) / decimal.Decimal(12)
+        return {"ret_code": 3002, "message": u"没有选择加息券"}
 
-    hike_list = []
-    #records = InterestHike.objects.filter(product=product, invalid=False, paid=False).first()
-    records = InterestHike.objects.filter(product=product, invalid=False, paid=False)
-    for x in records:
-        equity = P2PEquity.objects.filter(user=x.user, product=product).first()
-        if equity:
-            intro_total = x.intro_total
-            if x.intro_total > 20:
-                intro_total = 20
-            amount = equity.equity * term * x.rate * intro_total
-            amount = amount.quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_HALF_DOWN)
-            x.amount = amount
-            x.paid = True
-            x.updated_at = timezone.now()
-            x.save()
-            hike_list.append({"user":x.user, "amount":amount})
-    return hike_list
-
-def get_hike(user, product_id):
-    _hike = InterestHike.objects.filter(user=user, product=product_id, invalid=False).first()
-    if _hike:
-        if _hike.paid:
-            hike = _hike.amount
-        else:
-            if _hike.intro_total > 20:
-                hike = "%.2f%%" % (_hike.rate * 20 * 100) 
-            else:
-                hike = "%.2f%%" % (_hike.rate * _hike.intro_total * 100) 
-    else:
-        hike = ""
-    return hike
 
 def get_hike_nums(user):
     _nums = InterestHike.objects.filter(user=user, invalid=False).aggregate(Sum('intro_total'))

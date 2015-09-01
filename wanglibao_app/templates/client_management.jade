@@ -1,0 +1,44 @@
+doctype html
+html
+  head
+    title 管理团队介绍
+    include include/app_header.jade
+  body
+    article.team-banner
+      img(src='/static/imgs/app/management/team_banner.jpg')
+    mixin teamItem(itemImg, itemTit, itemDecArr)
+      section.team-item
+        img(src=itemImg).team-img
+        .team-dec
+          .team-title=itemTit
+          each decs in itemDecArr
+            .team-decs=decs
+
+    hgroup.team-dongshi
+    .dongshi-item
+      - var zrl = ['曾就职于摩根斯坦利等世界级知名投行', '创立中国版Facebook“友林网”', '与前美林主席刘二飞创办中国概念基金']
+      +teamItem('/static/imgs/app/management/team_zrl.png', '赵润龙', zrl)
+
+      - var lrf = ['中国著名金融家，国际知名投资银行家', '曾任美银美林中国区主席', '30余年资深金融经验']
+      +teamItem('/static/imgs/app/management/team_lef.png', '刘二飞', lrf)
+
+      - var lf = ['前IDG资本合伙人，国际知名投资银行家', '互联网金融行业投资专家', '侧重于高科技等相关领域的投资']
+      +teamItem('/static/imgs/app/management/team_lf.png', '李丰', lf)
+
+      - var lgp = ['广州市鸿利光电股份有限公司董事长', '广东省江西商会常务副会长', '创办广州市鸿利光电子有限公司']
+      +teamItem('/static/imgs/app/management/team_lgp.png', '李国平', lgp)
+
+    hgroup.team-mange
+    .mange-item
+      - var lxy = ['华夏基金前CIO', '中国大陆首支ETF产品核心设计成员', '参与公募基金行业创新']
+      +teamItem('/static/imgs/app/management/team_lxy.png', '陆晓野', lxy)
+
+      - var lpq = ['曾任淡马锡旗下风投机构祥峰投资总经理', '曾任EDB中国区总负责人', '曾任摩托罗拉中国投资战略总负责人']
+      +teamItem('/static/imgs/app/management/team_lpq.png', '李培勤', lpq)
+
+      - var cjz = ['曾任沃尔玛中国财务总监', '曾任五星控股投资副总裁', '曾任华润集团财务公司副总']
+      +teamItem('/static/imgs/app/management/team_cjz.png', '蔡景钟', cjz)
+
+      - var xht = ['曾任南京证券深圳首席证券分析师', '曾任CICC投资经理', '曾任广州证券资产管理总部营销总监']
+      +teamItem('/static/imgs/app/management/team_xht.png', '徐海通', xht)
+    include include/discover_footer
