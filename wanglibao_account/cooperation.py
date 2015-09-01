@@ -122,18 +122,11 @@ def get_binding_time_for_coop(user_id):
 
 
 def save_to_binding(user, record, request):
-        try:
-            if record and record.name == 'shls' or record.name == 'zhitui1':
-                bid = request.DATA.get('tid', "").strip()
-                bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
-                if bid and bid_len >= len(bid) > 0:
-                    binding = Binding()
-                    binding.user = user
-                    binding.btype = record.name
-                    binding.bid = bid
-                    binding.save()
-        except:
-            pass
+    try:
+        if record and record.name == 'shls' or record.name == 'zhitui1':
+            CoopRegister(request).save_to_binding(user)
+    except:
+        pass
 
 
 #判断网站来自mobile还是pc
@@ -600,16 +593,6 @@ class WaihuRegister(CoopRegister):
         super(WaihuRegister, self).__init__(request)
         self.c_code = 'shls'
 
-    def process_for_register(self, user, invite_code):
-        """
-        用户可以在从渠道跳转后的注册页使用邀请码，优先考虑邀请码
-        """
-        promo_token = super(WaihuRegister, self).channel_code
-        if promo_token:
-            super(WaihuRegister, self).save_to_introduceby(user, invite_code)
-            super(WaihuRegister, self).save_to_binding(user)
-            super(WaihuRegister, self).clear_session()
-
 
 class ShiTouCunRegister(CoopRegister):
     def __init__(self, request):
@@ -941,7 +924,7 @@ class ChinaTelecomRegister(CoopRegister):
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
-                          YiCheRegister, ZhiTuiRegister]
+                          YiCheRegister, ZhiTuiRegister, WaihuRegister]
 
 
 #######################第三方用户查询#####################
