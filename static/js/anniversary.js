@@ -14,31 +14,41 @@
   });
 
   require(['jquery','jqueryRotate','script',"tools"], function($,jqueryRotate,script,tool) {
-    //转盘
-    $(".rotateImg").rotate({
-		bind:{
-			click:function(){
-				var a = runzp(3);
-				 $(this).rotate({
-					 	duration:3000,
-					 	angle: 0,
-            			animateTo:1440+a.angle,
-						callback: function(){
-                            $('.page,.winningDiv').show();
-                            $('#moeny').text(a.prize);
-                            var top = $('.luckDrawLeft').offset().top;
-                            var left = $('.luckDrawLeft').offset().left;
-                            $('.winningDiv').css({
-                                'top' :top+122,
-                                'left':left+164
-                            })
-                            $('.page').width(document.body.clientWidth);
-                            $('.page').height(document.body.clientHeight);
-						}
-				 });
-			}
-		}
-	});
+      //转盘
+      $(".rotateImg").rotate({
+          bind: {
+              click: function () {
+                   $.ajax({
+                        url: '/api/celebrate/awards/',
+                        type: "POST",
+                        data: {
+                            action : 'ENTER_WEB_PAGE'
+                        }
+                     }).done(function (xhr) {
+                        var a = runzp(3);
+                        $(this).rotate({
+                          duration: 3000,
+                          angle: 0,
+                          animateTo: 1440 + a.angle,
+                          callback: function () {
+                              $('.page,.winningDiv').show();
+                              $('#moeny').text(a.prize);
+                              var top = $('.luckDrawLeft').offset().top;
+                              var left = $('.luckDrawLeft').offset().left;
+                              $('.winningDiv').css({
+                                  'top': top + 122,
+                                  'left': left + 164
+                              })
+                              $('.page').width(document.body.clientWidth);
+                              $('.page').height(document.body.clientHeight);
+                          }
+                        });
+                     }).fail(function (xhr) {
+
+                     });
+              }
+          }
+      });
     //关闭中奖遮罩
     $('.spanBtn,.againBtn').on('click',function(){
         $('.page,.winningDiv').hide();
@@ -58,11 +68,46 @@
         data: {
             action : 'IS_VALID'
         }
-    }).done(function () {
+    }).done(function (xhr) {
+       if(xhr.ret_code == '3001'){
+         $.ajax({
+            url: '/api/celebrate/awards/',
+            type: "POST",
+            data: {
+                action : 'ENTER_WEB_PAGE'
+            }
+         }).done(function () {
+            $('.rotateImgBtn').removeClass('rotateImgBtn').addClass('rotateImg');
+         }).fail(function (xhr) {
 
+         });
+       }else if(xhr.ret_code == '3000'){
+        $('.errorWin').find('#errorContent').text(xhr.message);
+        $('.rotateImg').removeClass('rotateImg').addClass('rotateImgBtn');
+       }
     }).fail(function (xhr) {
 
     });
+
+    $('.rotateImgBtn').on('click',function(){
+        $('.errorWin').modal();
+    })
+
+    $.ajax({
+        url: '/api/xunlei/award/records/',
+        type: "POST",
+        data: {
+            action : 'ENTER_WEB_PAGE'
+        },
+        async: false
+     }).done(function (xhr) {
+        var htmlStr = '';
+        $.each(xhr.data,function(i,o){
+            i % 2 == 0 ? oddStyle = 'odd' : oddStyle ='';
+;           htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>'+ o.phone.substring(0,3) +'******'+  o.phone.substring(9,11) +'</em>获得</span><label>'+ o.awards +'元红包</label></li>'
+        })
+        $('#users').append(htmlStr);
+     })
 
     //无线滚动
     var timer,i= 1,j=2;
