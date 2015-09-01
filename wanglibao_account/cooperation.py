@@ -31,7 +31,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY, FUBA_CALL_BACK_URL, WLB_FOR_FUBA_KEY, \
      FUBA_COOP_ID, FUBA_KEY, FUBA_CHANNEL_CODE, FUBA_DEFAULT_TID, FUBA_PERIOD, \
      WLB_FOR_YUNDUAN_KEY, YUNDUAN_CALL_BACK_URL, YUNDUAN_COOP_ID, WLB_FOR_YICHE_KEY, YICHE_COOP_ID, \
-     YICHE_KEY, YICHE_CALL_BACK_URL, WLB_FOR_ZHITUI_KEY, ZHITUI_COOP_ID, ZHITUI_CALL_BACK_URL
+     YICHE_KEY, YICHE_CALL_BACK_URL, WLB_FOR_ZHITUI1_KEY, ZHITUI_COOP_ID, ZHITUI_CALL_BACK_URL
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
@@ -121,7 +121,7 @@ def get_binding_time_for_coop(user_id):
 
 def save_to_binding(user, record, request):
         try:
-            if record and record.name == 'shls':
+            if record and record.name == 'shls' or record.name == 'zhitui1':
                 bid = request.DATA.get('tid', "").strip()
                 bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
                 if bid and bid_len >= len(bid) > 0:
@@ -800,7 +800,7 @@ class YiCheRegister(CoopRegister):
 class ZhiTuiRegister(CoopRegister):
     def __init__(self, request):
         super(ZhiTuiRegister, self).__init__(request)
-        self.c_code = 'zhitui'
+        self.c_code = 'zhitui1'
         self.coop_id = ZHITUI_COOP_ID
         self.call_back_url = ZHITUI_CALL_BACK_URL
 

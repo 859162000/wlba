@@ -903,7 +903,7 @@ else:
     YICHE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API'
 
 # 智推
-WLB_FOR_ZHITUI_KEY = '2000'
+WLB_FOR_ZHITUI1_KEY = '2000'
 ZHITUI_COOP_ID = '370'
 ZHITUI_CALL_BACK_URL = 'http://api.zhitui.com/wanglibao/recive.php'
 
