@@ -25,8 +25,9 @@
                             action : 'ENTER_WEB_PAGE'
                         }
                      }).done(function (xhr) {
+                       if(xhr.left > 0){
                         var a = runzp(3);
-                        $(this).rotate({
+                        $('.rotateImg').rotate({
                           duration: 3000,
                           angle: 0,
                           animateTo: 1440 + a.angle,
@@ -43,6 +44,10 @@
                               $('.page').height(document.body.clientHeight);
                           }
                         });
+                       }else{
+                           $('.errorWin').find('#errorContent').text('抱歉～您不符合参加规则');
+                           $('.errorWin').modal();
+                       }
                      }).fail(function (xhr) {
 
                      });
@@ -55,6 +60,11 @@
     })
     //非法用户
     $('#checkUserStatus').on('click',function(){
+        if($(this).hasClass('newUser')){
+          $('.errorWin').find('#errorContent').text('不能重复领取～亲');
+        }else{
+          $('.errorWin').find('#errorContent').text('抱歉～您不符合参加规则');
+        }
         $('.errorWin').modal();
     })
     //关闭弹框
@@ -81,17 +91,13 @@
          }).fail(function (xhr) {
 
          });
+         $('#checkUserStatus').addClass('newUser')
        }else if(xhr.ret_code == '3000'){
-        $('.errorWin').find('#errorContent').text(xhr.message);
-        $('.rotateImg').removeClass('rotateImg').addClass('rotateImgBtn');
+        $('#checkUserStatus').addClass('oldUser')
        }
     }).fail(function (xhr) {
 
     });
-
-    $('.rotateImgBtn').on('click',function(){
-        $('.errorWin').modal();
-    })
 
     $.ajax({
         url: '/api/xunlei/award/records/',
