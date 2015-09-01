@@ -14,31 +14,45 @@
   });
 
   require(['jquery','jqueryRotate','script',"tools"], function($,jqueryRotate,script,tool) {
-    //转盘
-    $(".rotateImg").rotate({
-		bind:{
-			click:function(){
-				var a = runzp(3);
-				 $(this).rotate({
-					 	duration:3000,
-					 	angle: 0,
-            			animateTo:1440+a.angle,
-						callback: function(){
-                            $('.page,.winningDiv').show();
-                            $('#moeny').text(a.prize);
-                            var top = $('.luckDrawLeft').offset().top;
-                            var left = $('.luckDrawLeft').offset().left;
-                            $('.winningDiv').css({
-                                'top' :top+122,
-                                'left':left+164
-                            })
-                            $('.page').width(document.body.clientWidth);
-                            $('.page').height(document.body.clientHeight);
-						}
-				 });
-			}
-		}
-	});
+
+  $(".rotateImgBtn").on('click',function() {
+      $.ajax({
+          url: '/api/celebrate/awards/',
+          type: "POST",
+          data: {
+              action: 'IS_VALID'
+          }
+      }).done(function () {
+
+      }).fail(function (xhr) {
+          $(".rotateImgBtn").removeClass('.rotateImgBtn').addClass('rotateImg');
+          //转盘
+          $(".rotateImg").rotate({
+              bind: {
+                  click: function () {
+                      var a = runzp(3);
+                      $(this).rotate({
+                          duration: 3000,
+                          angle: 0,
+                          animateTo: 1440 + a.angle,
+                          callback: function () {
+                              $('.page,.winningDiv').show();
+                              $('#moeny').text(a.prize);
+                              var top = $('.luckDrawLeft').offset().top;
+                              var left = $('.luckDrawLeft').offset().left;
+                              $('.winningDiv').css({
+                                  'top': top + 122,
+                                  'left': left + 164
+                              })
+                              $('.page').width(document.body.clientWidth);
+                              $('.page').height(document.body.clientHeight);
+                          }
+                      });
+                  }
+              }
+          });
+      });
+    })
     //关闭中奖遮罩
     $('.spanBtn,.againBtn').on('click',function(){
         $('.page,.winningDiv').hide();
