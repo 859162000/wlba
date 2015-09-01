@@ -898,15 +898,16 @@ class WanglibaoAwardActivity(APIView):
         activity_start = time.mktime(datetime(2015, 9, 1).timetuple())  # 活动开始时间
 
         if activity_start > create_at:
-            return Response({
+            to_json_response = {
                 'ret_code': 3000,
                 'message': u'非活动期注册用户',
-            })
+            }
         else:
-            return Response({
+            to_json_response = {
                 'ret_code': 3001,
                 'message': u'活动期注册用户',
-            })
+            }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json' )
 
     def update_record_data(self):
         self.update_total_chances_and_awards()
