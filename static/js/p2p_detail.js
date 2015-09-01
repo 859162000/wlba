@@ -372,12 +372,16 @@
     ddData = [];
     if ($('.red-pack').size() > 0) {
       return $(document).ready(function() {
+        $.post('/api/redpacket/selected/', {
+          product_id: $('input[name=product]').val()
+        }).done(function(data) {
+          return console.log(data);
+        });
         $.post('/api/redpacket/', {
           status: 'available',
           product_id: $('input[name=product]').val()
         }).done(function(data) {
-          var amount, available_time, availables, data2, datetime, desc, highest_amount, j, len1, obj, text;
-          data2 = data;
+          var amount, available_time, availables, datetime, desc, highest_amount, j, len1, obj, text;
           availables = data.packages.available;
           ddData.push({
             text: '不使用优惠券',

@@ -331,11 +331,16 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
   ddData = []
   if $('.red-pack').size() > 0
     $(document).ready () ->
+      $.post('/api/redpacket/selected/'
+        product_id: $('input[name=product]').val()
+      ).done (data) ->
+        console.log(data)
+
+
       $.post('/api/redpacket/'
         status: 'available'
         product_id: $('input[name=product]').val()
       ).done (data) ->
-        data2=data
         availables = data.packages.available
         ddData.push(
           text: '不使用优惠券'
