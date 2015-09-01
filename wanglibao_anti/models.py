@@ -5,10 +5,10 @@
 from django.db import models
 
 STATUS = (
-    ("0", "监控中"),
-    ("1", "正常用户"),
-    ("2", "作弊用户"),
-    ("3", "误击用户"),
+    (0, "监控中"),
+    (1, "正常用户"),
+    (2, "作弊用户"),
+    (3, "误击用户"),
 )
 
 class AntiDelayCallback(models.Model):
@@ -16,7 +16,7 @@ class AntiDelayCallback(models.Model):
     createtime = models.IntegerField()
     updatetime = models.IntegerField()
     channel = models.CharField(max_length=32, verbose_name='渠道标号')
-    status = models.IntegerField(verbose_name='状态', choices=STATUS)
+    status = models.IntegerField(verbose_name='状态', default='正常用户', choices=STATUS)
     device = models.CharField(max_length=1024)
     ip = models.CharField(max_length=32, verbose_name='IP地址')
 
