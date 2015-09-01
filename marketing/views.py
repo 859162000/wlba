@@ -864,18 +864,20 @@ def celebrate_ajax(request):
 
         if action == 'ENTER_WEB_PAGE':
             activity.update_record_data()
-            return Response({
+            to_json_response = {
                 'ret_code': 3005,
                 'message': u'更新记录数据成功',
-            })
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json' )
 
         if action == 'AWARD_DONE':
             return activity.response_activity()
     else:
-        return Response({
+        to_json_response = {
             'ret_code': 3007,
             'message': u'请以ajax方式交互，并用post请求',
-        })
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json' )
 
 class WanglibaoAwardActivity(APIView):
     """
