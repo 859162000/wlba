@@ -838,7 +838,7 @@ XICAI_CLIENT_ID = '48e37e2cf4124c2c9f5bde3cc88d011c'
 XICAI_CLIENT_SECRET = '2e3dd17e800d48bca50e61b19f8fc11d'
 XICAI_LOAD_PAGE = 'https://www.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
 WLB_FOR_CSAI_KEY = '1993'
-XICAI_UPDATE_TIMEDELTA = timedelta(days=4)
+XICAI_UPDATE_TIMEDELTA = timedelta(hours=1)
 if ENV == ENV_PRODUCTION:
     XICAI_LOAD_PAGE = 'https://www.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
 else:
