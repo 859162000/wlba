@@ -907,6 +907,9 @@ WLB_FOR_ZHITUI1_KEY = '2000'
 ZHITUI_COOP_ID = '370'
 ZHITUI_CALL_BACK_URL = 'http://api.zhitui.com/wanglibao/recive.php'
 
+# 中国电信
+WLB_FOR_ZGDX_KEY = '2001'
+ZGDX_CALL_BACK_URL = ''
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100
