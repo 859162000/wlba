@@ -896,7 +896,7 @@ class WanglibaoAwardActivity(APIView):
             Description:判断用户是不是在活动期间内注册的新用户
         """
         create_at = int(time.mktime(self.user.date_joined.date().timetuple()))  # 用户注册的时间戳
-        activity_start = time.mktime(datetime(2015, 9, 1).timetuple())  # 活动开始时间
+        activity_start = time.mktime(datetime(2014, 9, 1).timetuple())  # 活动开始时间
 
         if activity_start > create_at:
             to_json_response = {
@@ -913,7 +913,10 @@ class WanglibaoAwardActivity(APIView):
     def update_record_data(self):
         total, used = self.update_total_chances_and_awards()
         self.update_user_activity_logs()
-        return total - used
+        if total is not None and used is not None:
+            return total - used
+        else:
+            return None
 
     def update_total_chances_and_awards(self):
         """
@@ -925,16 +928,18 @@ class WanglibaoAwardActivity(APIView):
             if user_activity:
                 user_activity.total_chances = self.record['counts']
                 user_activity.total_awards = self.record['counts']
-                user_activity.save(updates=['total_chances', 'total_awards'])
-                return user_activity.total_awards, user_activity.used_awards
+                user_activity.save(update_fields=['total_chances', 'total_awards'])
             else:
-                WanglibaoActivityReward.objects.create(
+                user_activity = WanglibaoActivityReward.objects.create(
                     user=self.request.user,
                     activity_id='one_year_celebrate',
                     total_chances=self.record['counts'],
                     used_chances=0,
                     total_awards=self.record['counts'],
                     used_awards=0)
+            return user_activity.total_awards, user_activity.used_awards
+        else:
+            return None, None
 
     def get_award_mount(self, activity_id):
         award_amount = {
@@ -971,7 +976,7 @@ class WanglibaoAwardActivity(APIView):
         """
         activity = ActivityJoinLog.objects.filter(action_name='celebrate_award', user_id=self.request.user.id).aggregate(user_count=Count('id'))
         count = 0
-        while activity.user_count + count < self.record.counts:
+        while activity["user_count"] + count < self.record["counts"]:
             activity = ActivityJoinLog.objects.create(
                 user=self.request.user,
                 action_name=u'celebrate_award',
