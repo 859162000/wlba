@@ -373,7 +373,7 @@
     if ($('.red-pack').size() > 0) {
       return $(document).ready(function() {
         $.post('/api/redpacket/selected/', {
-          product_id: $('input[name=product]').val()
+          product_id: $('input[name=product]').val() * 1
         }).done(function(data) {
           return console.log(data);
         });
@@ -384,7 +384,7 @@
           var amount, available_time, availables, datetime, desc, highest_amount, imageSrc, j, len1, obj, text;
           availables = data.packages.available;
           ddData.push({
-            text: '不使用优惠券',
+            text: '不使用理财券',
             value: '',
             selected: true,
             method: '',
@@ -392,7 +392,7 @@
             invest_amount: 0,
             highest_amount: 0,
             event_id: 0,
-            description: '不使用优惠券'
+            description: '不使用理财券'
           });
           for (j = 0, len1 = availables.length; j < len1; j++) {
             obj = availables[j];
@@ -437,7 +437,7 @@
             data: ddData,
             width: 194,
             imagePosition: "right",
-            selectText: "请选择红包",
+            selectText: "请选择理财券",
             onSelected: function(data) {
               if (validator.checkForm() && $('.dd-selected-value').val() !== '') {
                 $('#purchase-form').trigger('redpack');

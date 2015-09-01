@@ -332,7 +332,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
   if $('.red-pack').size() > 0
     $(document).ready () ->
       $.post('/api/redpacket/selected/'
-        product_id: $('input[name=product]').val()
+        product_id: $('input[name=product]').val() * 1
       ).done (data) ->
         console.log(data)
 
@@ -342,7 +342,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       ).done (data) ->
         availables = data.packages.available
         ddData.push(
-          text: '不使用优惠券'
+          text: '不使用理财券'
           value: ''
           selected: true
           method: ''
@@ -350,7 +350,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           invest_amount: 0
           highest_amount: 0
           event_id: 0
-          description: '不使用优惠券'
+          description: '不使用理财券'
         )
         for obj in availables
           datetime = new Date()
@@ -395,7 +395,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           data: ddData
           width: 194
           imagePosition: "right"
-          selectText: "请选择红包"
+          selectText: "请选择理财券"
           onSelected: (data) ->
             if validator.checkForm() && $('.dd-selected-value').val() != ''
               $('#purchase-form').trigger('redpack')
