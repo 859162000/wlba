@@ -836,7 +836,7 @@ class ThunderActivityRewardCounter(APIView):
 
 def celebrate_ajax(request):
     user = request.user
-    action = request.DATA.get('action',)
+    action = request.POST.get('action',)
     if action == 'GET_AWARD':
         return ajax_get_activity_record('celebrate_award')
     if not user.is_authenticated():
@@ -977,7 +977,7 @@ class WanglibaoAwardActivity(APIView):
         """
             更新用户的红包记录
         """
-        activity = ActivityJoinLog.objects.filter(action_name='celebrate_award', user_id=self.request.user.id).aggregate(user_count=Count('id'))
+        activity = ActivityJoinLog.objects.filter(action_name='celebrate_award', user_id=self.request.user.id, join_times__gt=0).aggregate(user_count=Count('id'))
         count = 0
         user_count = activity["user_count"] if activity else 0
         while user_count + count < self.record["counts"]:
@@ -1015,13 +1015,14 @@ class WanglibaoAwardActivity(APIView):
 
         #  更新奖品表相应字段值
         user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
-        user_activity.used_chances -= 1
-        user_activity.used_awards -= 1
+        user_activity.used_chances += 1
+        user_activity.used_awards += 1
         user_activity.save(update_fields=['used_chances', 'used_awards'])
 
         to_json_response = {
             'ret_code': 3006,
             'amount': str(money),
+            'left': user_activity.total_chances - user_activity.used_chances,
             'message': u'终于等到你，还好我没放弃',
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
