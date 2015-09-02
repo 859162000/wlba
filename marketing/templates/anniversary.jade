@@ -113,7 +113,7 @@ html
                                                 | 获得
                                             label 1000元红包
                         h4 单笔投资5000元，立享中奖机会！
-                        p.remarks *本轮抽奖9月15日24点结束
+                        p.remarks *本轮抽奖9月21日24点结束
                         .luckDrawA
                             if user.is_authenticated
                                 a(href='/p2p/list/')
@@ -150,7 +150,13 @@ html
                 p ⑥ 所有获奖红包以站内信形式通知，完成一次投资回款后即可取现；
                 p ⑦ 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
                 .wanglibaoRule * 网利宝对此活动享有最终解释权
-
+    .xl-backtop(style="z-index:99")
+      span.seven-com.seven-ten
+      .backtop.sev-backtop 回到顶部
+      img(src="/static/imgs/pc_activity/xunlei/seven/sev_weixin.png")#xl-weixin
+      a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank")
+        img(src="/static/imgs/pc_activity/xunlei/seven/sev_qq.png",style="margin-top:10px")#xl-qq
+      .erweima
     include global/g_footer
     .page(style='display:none')
     .errorWin(style='display:none')
