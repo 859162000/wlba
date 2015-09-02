@@ -67,6 +67,7 @@ var org = (function(){
 org.anniversary = (function(org){
     var lib = {
         init:function(){
+            var index = 0,left = 0;
             lib._scrollFun();
             lib._gameFun();
             lib._aboutPageFun();
@@ -91,37 +92,53 @@ org.anniversary = (function(org){
             $(".rotateImg").rotate({
                 bind:{
                     click:function(){
-                        $.ajax({
-                        url: '/api/celebrate/awards/',
-                        type: "POST",
-                        data: {
-                            action : 'AWARD_DONE'
-                            }
-                        }).done(function (xhr) {
-                            if (xhr.left > 0) {
-                                var a = runzp(3);
-                                $(this).rotate({
-                                    duration: 3000,
-                                    angle: 0,
-                                    animateTo: 1440 + a.angle,
-                                    callback: function () {
-                                        $('.page,.winningDiv').show();
-                                        $('#moeny').text(a.prize);
-                                        var top = $('.zhuanpanDiv').offset().top;
-                                        var left = $('.zhuanpanDiv').offset().left;
-                                        $('.winningDiv').css({
-                                            'top': top,
-                                            'left': left
-                                        })
-                                        $('.page').width(document.body.clientWidth);
-                                        $('.page').height(document.body.clientHeight);
+                        if(left > 0) {
+                            $.ajax({
+                                url: '/api/celebrate/awards/',
+                                type: "POST",
+                                data: {
+                                    action: 'AWARD_DONE'
+                                }
+                            }).done(function (xhr) {
+                                if (xhr.left >= 0) {
+                                    if(xhr.left >= 0){
+                                        if(xhr.amount == 50.00){
+                                            index = 3
+                                        }else if(xhr.amount == 200.00){
+                                            index = 2
+                                        }else if(xhr.amount == 500.00){
+                                            index = 1
+                                        }else if(xhr.amount == 1000.00){
+                                            index = 0
+                                        }
+                                        var a = runzp(index);
+                                        $(this).rotate({
+                                            duration: 3000,
+                                            angle: 0,
+                                            animateTo: 1440 + a.angle,
+                                            callback: function () {
+                                                $('.page,.winningDiv').show();
+                                                $('#moeny').text(a.prize);
+                                                var top = $('.zhuanpanDiv').offset().top;
+                                                var left = $('.zhuanpanDiv').offset().left;
+                                                $('.winningDiv').css({
+                                                    'top': top,
+                                                    'left': left
+                                                })
+                                                $('.page').width(document.body.clientWidth);
+                                                $('.page').height(document.body.clientHeight);
+                                            }
+                                        });
+                                    } else {
+                                        $('.errorWin').find('#errorContent').text('抱歉～您不符合参加规则');
+                                        alert($('.errorWinDiv').html())
                                     }
-                                });
-                            }else{
-                               $('.errorWin').find('#errorContent').text('抱歉～您不符合参加规则');
-                               alert($('.errorWinDiv').html())
-                            }
-                        })
+                                }
+                            })
+                        }else{
+                          $('.errorWin').find('#errorContent').text('抱歉～您不符合参加规则');
+                          alert($('.errorWinDiv').html())
+                        }
                     }
                 }
             });
@@ -158,8 +175,8 @@ org.anniversary = (function(org){
                     data: {
                         action : 'ENTER_WEB_PAGE'
                     }
-                 }).done(function () {
-                    $('.rotateImgBtn').removeClass('rotateImgBtn').addClass('rotateImg');
+                 }).done(function (xhr) {
+                     left = xhr.left;
                  })
                  $('#checkUserStatus').addClass('newUser')
                }else if(xhr.ret_code == '3000'){

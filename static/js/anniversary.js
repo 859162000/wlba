@@ -14,19 +14,30 @@
   });
 
   require(['jquery','jqueryRotate','script',"tools"], function($,jqueryRotate,script,tool) {
+      var index = 0,left = 0;
       //转盘
       $(".rotateImg").rotate({
           bind: {
               click: function () {
-                   $.ajax({
+                  if(left > 0){
+                     $.ajax({
                         url: '/api/celebrate/awards/',
                         type: "POST",
                         data: {
                             action : 'AWARD_DONE'
                         }
                      }).done(function (xhr) {
-                       if(xhr.left > 0){
-                        var a = runzp(3);
+                       if(xhr.left >= 0){
+                        if(xhr.amount == 50.00){
+                            index = 3
+                        }else if(xhr.amount == 200.00){
+                            index = 2
+                        }else if(xhr.amount == 500.00){
+                            index = 1
+                        }else if(xhr.amount == 1000.00){
+                            index = 0
+                        }
+                        var a = runzp(index);
                         $('.rotateImg').rotate({
                           duration: 3000,
                           angle: 0,
@@ -48,9 +59,11 @@
                            $('.errorWin').find('#errorContent').text('抱歉～您不符合参加规则');
                            $('.errorWin').modal();
                        }
-                     }).fail(function (xhr) {
-
-                     });
+                     })
+                  }else{
+                     $('.errorWin').find('#errorContent').text('抱歉～您不符合参加规则');
+                     $('.errorWin').modal();
+                  }
               }
           }
       });
@@ -88,11 +101,9 @@
             data: {
                 action : 'ENTER_WEB_PAGE'
             }
-         }).done(function () {
-            $('.rotateImgBtn').removeClass('rotateImgBtn').addClass('rotateImg');
-         }).fail(function (xhr) {
-
-         });
+         }).done(function (xhr) {
+             left = xhr.left;
+         })
          $('#checkUserStatus').addClass('newUser')
        }else if(xhr.ret_code == '3000'){
         //非法用户
