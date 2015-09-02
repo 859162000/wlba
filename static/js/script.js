@@ -21,7 +21,7 @@ function runzp(index) {
 		var angle0 = [ 212, 245 ];
 		var angle1 = [ 120, 160 ];
 		var angle2 = [ 25, 65 ];
-        var angle3 = [ 294, 330 ];
+        var angle3 = [ 298, 330 ];
 		switch (index) {
 		case 0:// 一等奖
 			var r0 = randomnum(angle0[0], angle0[1]);
