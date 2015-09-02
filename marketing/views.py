@@ -614,12 +614,12 @@ class ActivityJoinLogCountAPIView(APIView):
         })
 
 
-def ajax_get_activity_record(request):
+def ajax_get_activity_record(request, action='get_award'):
     """
         author: add by Yihen@20150825
         description:迅雷9月抽奖活动，获得用户的抽奖记录
     """
-    records = ActivityJoinLog.objects.filter(action_name='get_award', action_type='login', join_times=0)
+    records = ActivityJoinLog.objects.filter(action_name=action, action_type='login', join_times=0)
     data = [{'phone':record.user.wanglibaouserprofile.phone, 'awards':float(record.amount)} for record in records]
     to_json_response = {
         'ret_code': 3005,
@@ -863,19 +863,25 @@ def celebrate_ajax(request):
             return activity.is_valid_user()
 
         if action == 'ENTER_WEB_PAGE':
-            activity.update_record_data()
-            return Response({
+            left = activity.update_record_data()
+            to_json_response = {
                 'ret_code': 3005,
+                'left': left,
                 'message': u'更新记录数据成功',
-            })
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json' )
 
         if action == 'AWARD_DONE':
             return activity.response_activity()
+
+        if action == 'GET_AWARD':
+            return activity.ajax_get_activity_record('celebrate_award')
     else:
-        return Response({
+        to_json_response = {
             'ret_code': 3007,
             'message': u'请以ajax方式交互，并用post请求',
-        })
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json' )
 
 class WanglibaoAwardActivity(APIView):
     """
@@ -893,32 +899,50 @@ class WanglibaoAwardActivity(APIView):
             Description:判断用户是不是在活动期间内注册的新用户
         """
         create_at = int(time.mktime(self.user.date_joined.date().timetuple()))  # 用户注册的时间戳
-        activity_start = time.mktime(datetime(2015, 9, 1).timetuple())  # 活动开始时间
+        activity_start = time.mktime(datetime(2014, 9, 1).timetuple())  # 活动开始时间
 
         if activity_start > create_at:
-            return Response({
+            to_json_response = {
                 'ret_code': 3000,
                 'message': u'非活动期注册用户',
-            })
+            }
         else:
-            return Response({
+            to_json_response = {
                 'ret_code': 3001,
                 'message': u'活动期注册用户',
-            })
+            }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json' )
 
     def update_record_data(self):
-        self.update_total_chances_and_awards()
+        total, used = self.update_total_chances_and_awards()
         self.update_user_activity_logs()
+        if total is not None and used is not None:
+            return total - used
+        else:
+            return None
 
     def update_total_chances_and_awards(self):
         """
-            每次进入转盘页面，会更新一下用户的抽奖机会和获奖机会
+            每次进入转盘页面，会更新一下用户的抽奖机会和获奖机会, 如果用户是第一次玩，
+            需要在获奖表里，给用户增加一条记录
         """
         if self.record:
             user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
-            user_activity.total_chances = self.record['counts']
-            user_activity.total_awards = self.record['counts']
-            user_activity.save(updates=['total_chances', 'total_awards'])
+            if user_activity:
+                user_activity.total_chances = self.record['counts']
+                user_activity.total_awards = self.record['counts']
+                user_activity.save(update_fields=['total_chances', 'total_awards'])
+            else:
+                user_activity = WanglibaoActivityReward.objects.create(
+                    user=self.request.user,
+                    activity_id='one_year_celebrate',
+                    total_chances=self.record['counts'],
+                    used_chances=0,
+                    total_awards=self.record['counts'],
+                    used_awards=0)
+            return user_activity.total_awards, user_activity.used_awards
+        else:
+            return None, None
 
     def get_award_mount(self, activity_id):
         award_amount = {
@@ -955,7 +979,8 @@ class WanglibaoAwardActivity(APIView):
         """
         activity = ActivityJoinLog.objects.filter(action_name='celebrate_award', user_id=self.request.user.id).aggregate(user_count=Count('id'))
         count = 0
-        while activity.user_count + count < self.record.counts:
+        user_count = activity["user_count"] if activity else 0
+        while user_count + count < self.record["counts"]:
             activity = ActivityJoinLog.objects.create(
                 user=self.request.user,
                 action_name=u'celebrate_award',
@@ -990,7 +1015,22 @@ class WanglibaoAwardActivity(APIView):
 
         to_json_response = {
             'ret_code': 3006,
+            'amount': money,
             'message': u'终于等到你，还好我没放弃',
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+    def ajax_get_activity_record(action='get_award'):
+        """
+            author: add by Yihen@20150901
+            description:获得用户的抽奖记录
+        """
+        records = ActivityJoinLog.objects.filter(action_name=action, action_type='login', join_times=0)
+        data = [{'phone': record.user.wanglibaouserprofile.phone, 'awards': float(record.amount)} for record in records]
+        to_json_response = {
+            'ret_code': 3009,
+            'data': data,
+            'message': u'获得抽奖成功用户',
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 

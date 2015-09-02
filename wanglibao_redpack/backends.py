@@ -504,7 +504,7 @@ def get_interest_coupon(user, product_id):
         amount = records.redpack.event.amount
         return {"ret_code": 0, "amount": amount}
     else:
-        return {"ret_code": 3002, "message": u"没有选择加息券"}
+        return {"ret_code": 3002, "message": u"还未使用加息券"}
 
 
 def get_hike_nums(user):
