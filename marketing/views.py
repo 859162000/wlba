@@ -1013,14 +1013,20 @@ class WanglibaoAwardActivity(APIView):
         if redpack_event:
             redpack_backends.give_activity_redpack(self.request.user, redpack_event, 'pc')
 
+        #  更新奖品表相应字段值
+        user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
+        user_activity.used_chances -= 1
+        user_activity.used_awards -= 1
+        user_activity.save(update_fields=['used_chances', 'used_awards'])
+
         to_json_response = {
             'ret_code': 3006,
-            'amount': money,
+            'amount': str(money),
             'message': u'终于等到你，还好我没放弃',
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-    def ajax_get_activity_record(action='get_award'):
+    def ajax_get_activity_record(self, action='get_award'):
         """
             author: add by Yihen@20150901
             description:获得用户的抽奖记录
