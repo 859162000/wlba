@@ -71,7 +71,7 @@
       rate = target.attr('data-rate');
       rate = rate / 100;
       pay_method = target.attr('data-paymethod');
-      activity_rate = parseFloat(target.attr('activity-rate'));
+      activity_rate = parseFloat(target.attr('activity-rate')) ? parseFloat(target.attr('activity-rate')) : 0;
       activity_jiaxi = parseFloat(target.attr('activity-jiaxi'));
       activity_rate = (activity_rate + activity_jiaxi) / 100;
       amount = parseFloat(target.val()) || 0;
@@ -99,7 +99,8 @@
       for (i = _j = 0, _len1 = fee_elements.length; _j < _len1; i = ++_j) {
         fee_element = fee_elements[i];
         if (fee_earning && $.isNumeric(fee_earning)) {
-          _results.push($(fee_element).text(fee_earning));
+          $(fee_element).text(fee_earning);
+          _results.push($('#vip-income-warp').show());
         } else {
           _results.push($(fee_element).text("0.00"));
         }

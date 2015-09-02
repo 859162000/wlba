@@ -836,6 +836,9 @@ class ThunderActivityRewardCounter(APIView):
 
 def celebrate_ajax(request):
     user = request.user
+    action = request.DATA.get('action',)
+    if action == 'GET_AWARD':
+        return ajax_get_activity_record('celebrate_award')
     if not user.is_authenticated():
         to_json_response = {
             'ret_code': 4000,
@@ -857,7 +860,6 @@ def celebrate_ajax(request):
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
     if request.is_ajax() and request.method == 'POST':
-        action = request.POST.get('action',)
         activity = WanglibaoAwardActivity(request)
         if action == 'IS_VALID':
             return activity.is_valid_user()
@@ -874,8 +876,6 @@ def celebrate_ajax(request):
         if action == 'AWARD_DONE':
             return activity.response_activity()
 
-        if action == 'GET_AWARD':
-            return activity.ajax_get_activity_record('celebrate_award')
     else:
         to_json_response = {
             'ret_code': 3007,
@@ -1023,20 +1023,6 @@ class WanglibaoAwardActivity(APIView):
             'ret_code': 3006,
             'amount': str(money),
             'message': u'终于等到你，还好我没放弃',
-        }
-        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-
-    def ajax_get_activity_record(self, action='get_award'):
-        """
-            author: add by Yihen@20150901
-            description:获得用户的抽奖记录
-        """
-        records = ActivityJoinLog.objects.filter(action_name=action, action_type='login', join_times=0)
-        data = [{'phone': record.user.wanglibaouserprofile.phone, 'awards': float(record.amount)} for record in records]
-        to_json_response = {
-            'ret_code': 3009,
-            'data': data,
-            'message': u'获得抽奖成功用户',
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
