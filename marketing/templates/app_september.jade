@@ -1,0 +1,63 @@
+- load formatters
+doctype html
+html
+  head
+    title
+    include include/app_head
+  body(style="background-color:#ffd200;")
+    .sep-banner#banner
+    .sep-main#sep-main
+      .welfare1
+        img(src="/static/imgs/mobile_activity/app_september/welfare1.png")
+        //.welfare-txt
+        //  p.welfare-tit 福利一：
+        //  p.welfare-cont 新手注册并实名即送20元红包<br />
+        //    | ①注册  ②实名认证
+        p.btn-box
+          a(href="javascript:void(0);").btn.receive-red 注册领红包
+      .welfare2.mtpx
+        img(src="/static/imgs/mobile_activity/app_september/welfare2.png")
+        p.btn-box
+          a(href="#").btn 注册充值
+      .welfare3.mtpx
+        img(src="/static/imgs/mobile_activity/app_september/welfare3.png")
+        p.btn-box
+          a(href="#").btn 我要理财
+    .promote-new
+      h3.use-tit 新手任务攻略
+      .use-cont
+        p 1、新手注册及实名认证成功即获得20元红包（投资300元可直减使用）；
+        p 2、新手首次充值成功即获得100元红包（投资2000元可直减使用）；
+        p 3、新手首次投资满额即可获得红包奖励，规则如下：
+        p a).用户首次投资单笔达到10,000元以上（包含）即获得200元红包（二次投资20000元可直减使用）；
+        p b).用户首次投资单笔达到20,000元以上（包含）即获得400元红包（二次投资40000元可直减使用）。
+      h3.use-tit.mt40px 投资流程
+      .use-cont
+        p.txt-center 注册网利宝账号 → 充值资金到账户→<br />
+          | 选择投资标 → 获得收益和奖励
+
+    .red-use
+      h3.use-tit 【红包使用规则】
+      .use-cont
+        p 1、手机号为网利宝唯一账户，红包仅限通过官网、APP、微信渠道主动注册用户领取。通过好友邀请注册则无法享受此新手活动福利；
+        p 2、红包统一以站内信形式通知，完成一次投资汇款后即可取现，每个红包仅限使用一次，无论是否有余额均失效；
+        p 3、首次单笔投资满额所赠红包为直抵红包，二次投资满额即可直抵使用。红包有效期限截止到2015年10月30日。
+        p 4、网利宝对此活动享有最终解释权。
+    .alert-page
+    //error
+    .alert-error.alert-box
+      span.alert-close
+      .alert-cont Sorry~您不是新用户
+      p.txt-center.mt1r
+        a(href="javascript:void(0)").alert-btn 知道了
+    //ok
+    .alert-ok.alert-box
+      span.alert-close
+      .alert-cont
+        | 奖励已发放<br />
+        | 请在官网-我的账户中查看
+      p.txt-center.mt1r
+        a(href="javascript:void(0)").alert-btn 知道了
+
+    script(src="/static/js/require.js", data-main="/static/js/header")
+    script(src="/static/js/app_september.js")
