@@ -614,12 +614,12 @@ class ActivityJoinLogCountAPIView(APIView):
         })
 
 
-def ajax_get_activity_record(request):
+def ajax_get_activity_record(request, action='get_award'):
     """
         author: add by Yihen@20150825
         description:迅雷9月抽奖活动，获得用户的抽奖记录
     """
-    records = ActivityJoinLog.objects.filter(action_name='get_award', action_type='login', join_times=0)
+    records = ActivityJoinLog.objects.filter(action_name=action, action_type='login', join_times=0)
     data = [{'phone':record.user.wanglibaouserprofile.phone, 'awards':float(record.amount)} for record in records]
     to_json_response = {
         'ret_code': 3005,
@@ -873,6 +873,9 @@ def celebrate_ajax(request):
 
         if action == 'AWARD_DONE':
             return activity.response_activity()
+
+        if action == 'GET_AWARD':
+            return activity.ajax_get_activity_record('celebrate_award')
     else:
         to_json_response = {
             'ret_code': 3007,
@@ -976,7 +979,8 @@ class WanglibaoAwardActivity(APIView):
         """
         activity = ActivityJoinLog.objects.filter(action_name='celebrate_award', user_id=self.request.user.id).aggregate(user_count=Count('id'))
         count = 0
-        while activity["user_count"] + count < self.record["counts"]:
+        user_count = activity["user_count"] if activity else 0
+        while user_count + count < self.record["counts"]:
             activity = ActivityJoinLog.objects.create(
                 user=self.request.user,
                 action_name=u'celebrate_award',
@@ -1011,7 +1015,22 @@ class WanglibaoAwardActivity(APIView):
 
         to_json_response = {
             'ret_code': 3006,
+            'amount': money,
             'message': u'终于等到你，还好我没放弃',
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+    def ajax_get_activity_record(action='get_award'):
+        """
+            author: add by Yihen@20150901
+            description:获得用户的抽奖记录
+        """
+        records = ActivityJoinLog.objects.filter(action_name=action, action_type='login', join_times=0)
+        data = [{'phone': record.user.wanglibaouserprofile.phone, 'awards': float(record.amount)} for record in records]
+        to_json_response = {
+            'ret_code': 3009,
+            'data': data,
+            'message': u'获得抽奖成功用户',
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
