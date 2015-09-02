@@ -22,7 +22,7 @@
                         url: '/api/celebrate/awards/',
                         type: "POST",
                         data: {
-                            action : 'ENTER_WEB_PAGE'
+                            action : 'AWARD_DONE'
                         }
                      }).done(function (xhr) {
                        if(xhr.left > 0){
@@ -72,6 +72,7 @@
         $.modal.close()
     })
 
+    //初始化数据
     $.ajax({
         url: '/api/celebrate/awards/',
         type: "POST",
@@ -79,6 +80,7 @@
             action : 'IS_VALID'
         }
     }).done(function (xhr) {
+       //有效用户
        if(xhr.ret_code == '3001'){
          $.ajax({
             url: '/api/celebrate/awards/',
@@ -93,17 +95,17 @@
          });
          $('#checkUserStatus').addClass('newUser')
        }else if(xhr.ret_code == '3000'){
+        //非法用户
         $('#checkUserStatus').addClass('oldUser')
        }
-    }).fail(function (xhr) {
+    })
 
-    });
-
+    //中奖名单
     $.ajax({
-        url: '/api/xunlei/award/records/',
+        url: '/api/celebrate/awards/',
         type: "POST",
         data: {
-            action : 'ENTER_WEB_PAGE'
+            action : 'GET_AWARD'
         },
         async: false
      }).done(function (xhr) {

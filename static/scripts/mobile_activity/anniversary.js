@@ -120,6 +120,11 @@ org.anniversary = (function(org){
             })
             //非法用户
             $('#checkUserStatus').on('click',function(){
+                if($(this).hasClass('newUser')){
+                  $('.errorWin').find('#errorContent').text('不能重复领取～亲');
+                }else{
+                  $('.errorWin').find('#errorContent').text('抱歉～您不符合参加规则');
+                }
                 alert($('.errorWinDiv').html())
             })
         }
