@@ -70,6 +70,7 @@ org.anniversary = (function(org){
             lib._scrollFun();
             lib._gameFun();
             lib._aboutPageFun();
+            lib._winningList();
         },
         _scrollFun:function(){
             //无线滚动
@@ -90,28 +91,42 @@ org.anniversary = (function(org){
             $(".rotateImg").rotate({
                 bind:{
                     click:function(){
-                        var a = runzp(3);
-                         $(this).rotate({
-                                duration:3000,
-                                angle: 0,
-                                animateTo:1440+a.angle,
-                                callback: function(){
-                                    $('.page,.winningDiv').show();
-                                    $('#moeny').text(a.prize);
-                                    var top = $('.zhuanpanDiv').offset().top;
-                                    var left = $('.zhuanpanDiv').offset().left;
-                                    $('.winningDiv').css({
-                                        'top' :top,
-                                        'left':left
-                                    })
-                                    $('.page').width(document.body.clientWidth);
-                                    $('.page').height(document.body.clientHeight);
-                                }
-                         });
+                        $.ajax({
+                        url: '/api/celebrate/awards/',
+                        type: "POST",
+                        data: {
+                            action : 'AWARD_DONE'
+                            }
+                        }).done(function (xhr) {
+                            if (xhr.left > 0) {
+                                var a = runzp(3);
+                                $(this).rotate({
+                                    duration: 3000,
+                                    angle: 0,
+                                    animateTo: 1440 + a.angle,
+                                    callback: function () {
+                                        $('.page,.winningDiv').show();
+                                        $('#moeny').text(a.prize);
+                                        var top = $('.zhuanpanDiv').offset().top;
+                                        var left = $('.zhuanpanDiv').offset().left;
+                                        $('.winningDiv').css({
+                                            'top': top,
+                                            'left': left
+                                        })
+                                        $('.page').width(document.body.clientWidth);
+                                        $('.page').height(document.body.clientHeight);
+                                    }
+                                });
+                            }else{
+                               $('.errorWin').find('#errorContent').text('抱歉～您不符合参加规则');
+                               alert($('.errorWinDiv').html())
+                            }
+                        })
                     }
                 }
             });
         },
+        //页面初始化
         _aboutPageFun:function(){
             $('.bannerFonts').addClass('bannerFontsHover');
             //关闭中奖遮罩
@@ -127,6 +142,48 @@ org.anniversary = (function(org){
                 }
                 alert($('.errorWinDiv').html())
             })
+            //初始化数据
+            $.ajax({
+                url: '/api/celebrate/awards/',
+                type: "POST",
+                data: {
+                    action : 'IS_VALID'
+                }
+            }).done(function (xhr) {
+               //有效用户
+               if(xhr.ret_code == '3001'){
+                 $.ajax({
+                    url: '/api/celebrate/awards/',
+                    type: "POST",
+                    data: {
+                        action : 'ENTER_WEB_PAGE'
+                    }
+                 }).done(function () {
+                    $('.rotateImgBtn').removeClass('rotateImgBtn').addClass('rotateImg');
+                 })
+                 $('#checkUserStatus').addClass('newUser')
+               }else if(xhr.ret_code == '3000'){
+                //非法用户
+                $('#checkUserStatus').addClass('oldUser')
+               }
+            })
+        },
+        _winningList:function(){
+            $.ajax({
+                url: '/api/celebrate/awards/',
+                type: "POST",
+                data: {
+                    action : 'GET_AWARD'
+                },
+                async: false
+             }).done(function (xhr) {
+                var htmlStr = '';
+                $.each(xhr.data,function(i,o){
+                    i % 2 == 0 ? oddStyle = 'odd' : oddStyle ='';
+        ;           htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>'+ o.phone.substring(0,3) +'******'+  o.phone.substring(9,11) +'</em>获得</span><label>'+ o.awards +'元红包</label></li>'
+                })
+                $('#users').append(htmlStr);
+             })
         }
     }
     return {
