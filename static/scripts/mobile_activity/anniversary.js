@@ -178,11 +178,14 @@ org.anniversary = (function(org){
                 async: false
              }).done(function (xhr) {
                 var htmlStr = '';
-                $.each(xhr.data,function(i,o){
-                    i % 2 == 0 ? oddStyle = 'odd' : oddStyle ='';
-        ;           htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>'+ o.phone.substring(0,3) +'******'+  o.phone.substring(9,11) +'</em>获得</span><label>'+ o.awards +'元红包</label></li>'
-                })
-                $('#users').append(htmlStr);
+                if(xhr.data.length > 0) {
+                    $.each(xhr.data, function (i, o) {
+                        i % 2 == 0 ? oddStyle = 'odd' : oddStyle = '';
+                        ;
+                        htmlStr += '<li class=' + oddStyle + '><span>恭喜<em>' + o.phone.substring(0, 3) + '******' + o.phone.substring(9, 11) + '</em>获得</span><label>' + o.awards + '元红包</label></li>'
+                    })
+                    $('#users').append(htmlStr);
+                }
              })
         }
     }
