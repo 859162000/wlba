@@ -62,7 +62,7 @@ define ['jquery'], ($)->
     rate = target.attr 'data-rate'
     rate = rate/100
     pay_method = target.attr 'data-paymethod'
-    activity_rate = parseFloat(target.attr('activity-rate'))
+    activity_rate = if parseFloat(target.attr('activity-rate')) then parseFloat(target.attr('activity-rate')) else 0
     activity_jiaxi = parseFloat(target.attr('activity-jiaxi'))
     activity_rate = (activity_rate + activity_jiaxi)/100
 
@@ -90,6 +90,7 @@ define ['jquery'], ($)->
     for fee_element, i in fee_elements
       if fee_earning and $.isNumeric(fee_earning)
         $(fee_element).text fee_earning
+        $('#vip-income-warp').show()
       else
         $(fee_element).text "0.00"
 
