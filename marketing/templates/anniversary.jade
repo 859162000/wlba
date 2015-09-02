@@ -10,12 +10,18 @@ html
   body
     .anniversary.clearfix
         .anniversaryBanner
-            .loginDiv
-                a(href='/').logoImg
-                .wanglibao
-                .balloon1
-                .balloon2
-        .redPacket
+            img(src='/static/imgs/pc_activity/anniversary/banner.jpg')#banner
+            .loginDivContent
+                .loginDiv
+                    .logoImgDiv
+                        a(href='/').logoImg
+                    .wanglibao
+                        img(src='/static/imgs/pc_activity/anniversary/wanglibao.png')
+                    .balloonDiv
+                        .balloon1
+                        .balloon2
+        .redPacket.clearfix
+            img(src='/static/imgs/pc_activity/anniversary/hongbao.jpg')
             .titleStyle
                 span 一重豪礼：周年庆典，签到有礼
             .registerBtn
