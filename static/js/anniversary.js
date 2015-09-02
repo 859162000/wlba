@@ -14,19 +14,30 @@
   });
 
   require(['jquery','jqueryRotate','script',"tools"], function($,jqueryRotate,script,tool) {
+      var index = 0,left = 0;
       //转盘
       $(".rotateImg").rotate({
           bind: {
               click: function () {
-                   $.ajax({
+                  if(left > 0){
+                     $.ajax({
                         url: '/api/celebrate/awards/',
                         type: "POST",
                         data: {
-                            action : 'ENTER_WEB_PAGE'
+                            action : 'AWARD_DONE'
                         }
                      }).done(function (xhr) {
-                       if(xhr.left > 0){
-                        var a = runzp(3);
+                       if(xhr.left >= 0){
+                        if(xhr.amount == 50.00){
+                            index = 3
+                        }else if(xhr.amount == 200.00){
+                            index = 2
+                        }else if(xhr.amount == 500.00){
+                            index = 1
+                        }else if(xhr.amount == 1000.00){
+                            index = 0
+                        }
+                        var a = runzp(index);
                         $('.rotateImg').rotate({
                           duration: 3000,
                           angle: 0,
@@ -48,9 +59,11 @@
                            $('.errorWin').find('#errorContent').text('抱歉～您不符合参加规则');
                            $('.errorWin').modal();
                        }
-                     }).fail(function (xhr) {
-
-                     });
+                     })
+                  }else{
+                     $('.errorWin').find('#errorContent').text('抱歉～您不符合参加规则');
+                     $('.errorWin').modal();
+                  }
               }
           }
       });
@@ -72,6 +85,7 @@
         $.modal.close()
     })
 
+    //初始化数据
     $.ajax({
         url: '/api/celebrate/awards/',
         type: "POST",
@@ -79,6 +93,7 @@
             action : 'IS_VALID'
         }
     }).done(function (xhr) {
+       //有效用户
        if(xhr.ret_code == '3001'){
          $.ajax({
             url: '/api/celebrate/awards/',
@@ -86,33 +101,33 @@
             data: {
                 action : 'ENTER_WEB_PAGE'
             }
-         }).done(function () {
-            $('.rotateImgBtn').removeClass('rotateImgBtn').addClass('rotateImg');
-         }).fail(function (xhr) {
-
-         });
+         }).done(function (xhr) {
+             left = xhr.left;
+         })
          $('#checkUserStatus').addClass('newUser')
        }else if(xhr.ret_code == '3000'){
+        //非法用户
         $('#checkUserStatus').addClass('oldUser')
        }
-    }).fail(function (xhr) {
+    })
 
-    });
-
+    //中奖名单
     $.ajax({
-        url: '/api/xunlei/award/records/',
+        url: '/api/celebrate/awards/',
         type: "POST",
         data: {
-            action : 'ENTER_WEB_PAGE'
+            action : 'GET_AWARD'
         },
         async: false
      }).done(function (xhr) {
         var htmlStr = '';
-        $.each(xhr.data,function(i,o){
-            i % 2 == 0 ? oddStyle = 'odd' : oddStyle ='';
-;           htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>'+ o.phone.substring(0,3) +'******'+  o.phone.substring(9,11) +'</em>获得</span><label>'+ o.awards +'元红包</label></li>'
-        })
-        $('#users').append(htmlStr);
+        if(xhr.data.length > 0){
+            $.each(xhr.data,function(i,o){
+                i % 2 == 0 ? oddStyle = 'odd' : oddStyle ='';
+                htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>'+ o.phone.substring(0,3) +'******'+  o.phone.substring(9,11) +'</em>获得</span><label>'+ o.awards +'元红包</label></li>';
+            })
+            $('#users').append(htmlStr);
+        }
      })
 
     //无线滚动

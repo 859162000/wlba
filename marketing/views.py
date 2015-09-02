@@ -614,7 +614,7 @@ class ActivityJoinLogCountAPIView(APIView):
         })
 
 
-def ajax_get_activity_record(request, action='get_award'):
+def ajax_get_activity_record(action='get_award'):
     """
         author: add by Yihen@20150825
         description:迅雷9月抽奖活动，获得用户的抽奖记录
@@ -993,7 +993,7 @@ class WanglibaoAwardActivity(APIView):
                 create_time=timezone.now(),
             )
 
-            join_log = ActivityJoinLog.objects.filter(action_name='celebrate_award', user=self.request.user).order_by('-create_time').first()
+            join_log = ActivityJoinLog.objects.filter(action_name='celebrate_award', user=self.request.user, amount=0).order_by('-create_time').first()
             join_log.amount = self.get_award_mount(activity.id)
             join_log.save(update_fields=['amount'])
             count += 1
