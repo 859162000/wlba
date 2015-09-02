@@ -854,6 +854,13 @@ CAIMIAO_RATING_URL = 'http://121.40.31.143:86/api/JsonsFinancial/Rating/'
 # 众牛
 ZHONGNIU_SECRET = 'N9ecZSqh'
 
+# 中金
+ZHONGJIN_ID = 15
+ZHONGJIN_P2P_URL = 'http://open.rong.cnfol.com/product.html'
+ZHONGJIN_P2P_TEST_URL = 'http://test.finance.cnfol.com/product.html'    # 未确定
+ZHONGJIN_SECRET = '2CF7AC2A27CC9B48C4EFCD7E356CD95F'
+ZHONGJIN_UPDATE_TIMEDELTA = timedelta(hours=1)
+
 # 金山
 WLB_FOR_JINSHAN_KEY = '1994'
 JINSHAN_CALL_BACK_URL = 'https://vip.wps.cn/task/api/reward'

@@ -2,6 +2,8 @@
 # encoding:utf-8
 import decimal
 import json
+import urllib2
+from django.utils.http import urlencode
 from wanglibao_account.utils import str_to_float
 
 if __name__ == '__main__':
@@ -1804,3 +1806,124 @@ class ZhongniuP2PDataQuery(APIView):
                 'msg': u"没有权限访问"
             }
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+# 中金在线
+def zhongjin_get_products():
+    """
+    author: Zhoudong
+    :return: 返回所有需要处理的 p2p 产品
+    """
+
+    now = timezone.now()
+
+    wangli_products = set()
+    start_time = now - settings.ZHONGJIN_UPDATE_TIMEDELTA
+    new_products = P2PProduct.objects.filter(Q(publish_time__gte=start_time) & Q(publish_time__lt=now))
+    wangli_products.update(new_products)
+    # 还需要把更新的标全部推送
+    p2p_equity = P2PEquity.objects.filter(created_at__gte=start_time).all()
+    updated_products = set([p.product for p in p2p_equity])
+    wangli_products.update(updated_products)
+
+    prods = []
+
+    for product in wangli_products:
+        prod = dict()
+        prod['method'] = 'add'
+        # else:
+        #     if product.status in [u'录标', u'录标完成', u'待审核', u'正在招标']:
+        #         prod['method'] = 'update'
+        #     else:
+        #         prod['method'] = 'down'
+
+        prod['classId'] = 1
+        # prod['productId'] = product.pk    # productId 不是我们的id, 是他们返回的用来修改对应的
+        prod['productName'] = product.name
+        prod['borrowMoney'] = product.total_amount
+        prod['investmentMoney'] = 100
+        period = product.period if product.pay_method.startswith(u"日计息")/30 else product.period
+        prod['investmentPeriod'] = period
+
+        prod['completeness'] = "%.2f" % product.completion_rate
+        prod['stopTime'] = \
+            product.soldout_time.strftime("%Y-%m-%d") if product.soldout_time else product.end_time.strftime("%Y-%m-%d")
+        prod['riskPreference'] = 2
+        prod['expectedYield'] = product.expected_earning_rate
+
+        # 根据不同环境对应不同的url
+        if settings.ENV == 'debug':
+            base_url = 'http://127.0.0.1:8000'
+        if settings.ENV == 'staging':
+            base_url = 'https://staging.wanglibao.com'
+        if settings.ENV == 'production':
+            base_url = 'https://www.wanglibao.com'
+        prod['linkProfiles'] = base_url + '/p2p/detail/' + str(product.pk)
+
+        prod['enterpriseId'] = settings.ZHONGJIN_ID
+        prod['dt'] = int(time.time())
+
+        prods.append(prod)
+
+    return prods
+
+
+def zhongjin_get_sign(args_dict):
+    """
+    author: Zhoudong
+    md5 加密方式: 待传参数 aid=1&bid=2&cid=3 那么加密串为：aid=1||bid=2||cid=32CF7AC2A27CC9B48C4EFCD7E356CD95F
+    http://open.rong.cnfol.com/product.html
+    根据参数获取对应的 sign, 然后拼成需要去请求的url
+    :return:
+    """
+    if settings.ENV == settings.ENV_PRODUCTION:
+        url = settings.ZHONGJIN_P2P_URL
+    else:
+        url = settings.ZHONGJIN_P2P_TEST_URL
+    key = settings.ZHONGJIN_SECRET
+
+    url += '?' + urlencode(args_dict)
+
+    l = urlencode(args_dict).split('&')
+    l.sort()
+
+    md5_str = ''
+    for i in l:
+        md5_str += i + '||'
+
+    md5_str = md5_str[0:-2] + key
+
+    sign = hashlib.md5(md5_str).hexdigest()
+    url += '&sign=' + sign
+
+    return url
+
+
+def zhongjin_post_p2p_info():
+    """
+    author: Zhoudong
+    去请求对应的地址
+    :return:
+    """
+    prods = zhongjin_get_products()
+    for args_dict in prods:
+        url = zhongjin_get_sign(args_dict)
+        print url
+        urllib2.urlopen(url)
+
+
+def zhongjin_list_p2p():
+    """
+    author: Zhoudong
+    查看所有数据
+    :return:
+    """
+    args_dict = dict()
+    args_dict['method'] = 'list'
+    args_dict['dt'] = int(time.time())
+    args_dict['enterpriseId'] = settings.ZHONGJIN_ID
+    args_dict['classId'] = 1
+
+    url = zhongjin_get_sign(args_dict)
+
+    return url
