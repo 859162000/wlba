@@ -5,7 +5,7 @@ require.config
     tools: 'lib/modal.tools'
     "jquery.validate": 'lib/jquery.validate.min'
     'jquery.modal': 'lib/jquery.modal.min'
-    ddslick: 'lib/jquery.ddslick.min'
+    ddslick: 'lib/jquery.ddslick'
 
   shims:
     "jquery.validate": ['jquery']
@@ -34,8 +34,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
   showPayInfo = (actual_payment, red_pack_payment) ->
     return ['红包使用<i class="blue">', red_pack_payment, '</i>元，实际支付<i class="blue">', actual_payment, '</i>元'].join('')
-  showPayIncrease = (redpack_amount, increase) ->
-    return ['额外加息<i class="blue">', redpack_amount * 100, '% </i>, 预期额外收益<i class="blue">', increase, '</i>元'].join('')
   getRedAmount = (method, red_pack_amount, event_id, highest_amount) ->
     $amount  = $('#id_amount')
     amount = $amount.val()
@@ -43,14 +41,8 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       final_redpack = amount * red_pack_amount
       if highest_amount && highest_amount < final_redpack
         final_redpack = highest_amount
-    else if method == '-'
-      final_redpack = red_pack_amount
     else
-      p2p_data = {
-        period : $amount.attr('data-period') * 1 ,
-        method : $amount.attr('data-paymethod') ,
-      }
-      final_redpack = calculator(amount, red_pack_amount, p2p_data.period, p2p_data.method)
+      final_redpack = red_pack_amount
 
     return {
       red_pack: getFormatedNumber(final_redpack)
@@ -79,10 +71,11 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     highest_amount = 0
     if redPack.highest_amount
       highest_amount = redPack.highest_amount
-    redPackInfo = getRedAmount(redPack.method, redPack.amount, redPack.event_id, highest_amount)
     if redPack.method == '~'
-      html  = showPayIncrease(redPack.amount, redPackInfo.red_pack)
+      $('#id_amount').attr('activity-jiaxi', redPack.amount*100)
+      return calculator.p2pCalculate()
     else
+      redPackInfo = getRedAmount(redPack.method, redPack.amount, redPack.event_id, highest_amount)
       html = showPayInfo(redPackInfo.actual_amount, redPackInfo.red_pack)
     $('.payment').html(html).show()
 
@@ -328,14 +321,17 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
   $(".xunlei-binding-modal").click () ->
     $('#xunlei-binding-modal').modal()
 
+  #加息券接口
+  $.post('/api/redpacket/selected/'
+    product_id: $('input[name=product]').val() * 1
+  ).done (data) ->
+    code = data.ret_code
+    if code == 0
+      $('.use-jiaxi').show()
+
   ddData = []
   if $('.red-pack').size() > 0
     $(document).ready () ->
-      $.post('/api/redpacket/selected/'
-        product_id: $('input[name=product]').val() * 1
-      ).done (data) ->
-        console.log(data)
-
       $.post('/api/redpacket/'
         status: 'available'
         product_id: $('input[name=product]').val()
@@ -401,6 +397,13 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
               $('#purchase-form').trigger('redpack')
             else
               $('.payment').hide()
+
+
+            if validator.checkForm() && $('.dd-selected-value').val() != '' && data.selectedData.method == '~'
+               $('.payment').hide()
+            else
+              $('#id_amount').attr('activity-jiaxi', 0)
+              calculator.p2pCalculate()
 
             if !isFirst
               $('#purchase-form').valid()

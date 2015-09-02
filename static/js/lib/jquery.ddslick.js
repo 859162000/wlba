@@ -58,6 +58,7 @@
                 '.dd-selected-description-truncated { text-overflow: ellipsis; white-space:nowrap; display:none}' +
                 '.dd-option-selected { background:#f6f6f6; }' +
                 '.dd-option-image, .dd-selected-image { vertical-align:middle; float:left; max-width:64px;}' +
+                '.dd-selected-image { display:none; }' +
                 '.dd-image-right { float:right; margin-top: 2px; width: 16px; height: 38px}' +
                 '.dd-container{ position:relative;}​ .dd-selected-text { font-weight:bold}​</style>';
 
