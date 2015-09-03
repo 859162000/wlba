@@ -845,13 +845,18 @@ def celebrate_ajax(request):
             'message': u'用户没有登陆，请先登陆',
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-    try:
-        record = IntroducedBy.objects.filter(user_id=user.id).first()
-    except Exception, reason:
-        record = None
+
+    record = IntroducedBy.objects.filter(user_id=user.id).first()
 
     if record is not None:
-        channel = Channels.objects.filter(id=record.channel).first()
+        try:
+            channel = Channels.objects.filter(id=record.channel).first()
+        except Exception, reason:
+            to_json_response = {
+                'ret_code': 4000,
+                'message': u'渠道用户不允许参加这个活动',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
     else:
         channel = None
 
