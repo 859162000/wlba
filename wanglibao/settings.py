@@ -417,7 +417,11 @@ LOGGING = {
             'level': 'DEBUG'
         },
         'wanglibao_anti': {
-            'handlers': ['anti'],
+            'handlers': ['anti', 'console'],
+            'level': 'DEBUG'
+        },
+        'marketing': {
+            'handlers': ['file', 'console'],
             'level': 'DEBUG'
         },
     }

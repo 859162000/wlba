@@ -41,7 +41,7 @@ from wanglibao_redpack.models import RedPackEvent
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity.models import ActivityRecord
 import logging
-logger = logging.getLogger('wanglibao_anti')
+logger = logging.getLogger('marketing')
 
 class YaoView(TemplateView):
     template_name = 'yaoqing.jade'
