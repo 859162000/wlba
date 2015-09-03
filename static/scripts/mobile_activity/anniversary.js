@@ -191,7 +191,7 @@ var org = (function(){
 
 
 org.anniversary = (function(org){
-    var index = 0,left = 0;
+    var index = 0,leftM = 0;
     var lib = {
         init:function(){
             lib._scrollFun();
@@ -219,7 +219,7 @@ org.anniversary = (function(org){
                 bind:{
                     click:function(){
                         if(!$(".rotateImg").hasClass('rotateImgNo')) {
-                            if (left > 0) {
+                            if (leftM > 0) {
                                 org.ajax({
                                     url: '/api/celebrate/awards/',
                                     type: "POST",
@@ -256,6 +256,7 @@ org.anniversary = (function(org){
                                                         $('.page').width(document.body.clientWidth);
                                                         $('.page').height(document.body.clientHeight);
                                                         $(".rotateImg").removeClass('rotateImgNo');
+                                                        leftM --;
                                                     }
                                                 });
                                             } else {
@@ -307,7 +308,7 @@ org.anniversary = (function(org){
                                 action: 'ENTER_WEB_PAGE'
                             },
                             success: function (xhr) {
-                                left = xhr.left;
+                                leftM = xhr.left;
                             }
                         })
                         $('#checkUserStatus').addClass('newUser')

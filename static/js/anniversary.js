@@ -14,13 +14,13 @@
   });
 
   require(['jquery','jqueryRotate','script',"tools"], function($,jqueryRotate,script,tool) {
-      var index = 0,left = 0;
+      var index = 0,leftM = 0;
       //转盘
       $(".rotateImg").rotate({
           bind: {
               click: function () {
                   if(!$(".rotateImg").hasClass('rotateImgNo')){
-                      if(left > 0) {
+                      if(leftM > 0) {
                          $.ajax({
                             url: '/api/celebrate/awards/',
                             type: "POST",
@@ -56,6 +56,7 @@
                                   $('.page').width(document.body.clientWidth);
                                   $('.page').height(document.body.clientHeight);
                                   $(".rotateImg").removeClass('rotateImgNo');
+                                  leftM --
                               }
                             });
                            }else{
@@ -106,7 +107,7 @@
                 action : 'ENTER_WEB_PAGE'
             }
          }).done(function (xhr) {
-             left = xhr.left;
+             leftM = xhr.left;
          })
          $('#checkUserStatus').addClass('newUser')
        }else if(xhr.ret_code == '3000'){
