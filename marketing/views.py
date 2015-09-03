@@ -845,8 +845,11 @@ def celebrate_ajax(request):
             'message': u'用户没有登陆，请先登陆',
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+    try:
+        record = IntroducedBy.objects.filter(user_id=user.id).first()
+    except Exception, reason:
+        record = None
 
-    record = IntroducedBy.objects.filter(user_id=user.id).first()
     if record is not None:
         channel = Channels.objects.filter(id=record.channel).first()
     else:
