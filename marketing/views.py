@@ -40,7 +40,8 @@ from django.utils import timezone
 from wanglibao_redpack.models import RedPackEvent
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity.models import ActivityRecord
-
+import logging
+logger = logging.getLogger('wanglibao_anti')
 
 class YaoView(TemplateView):
     template_name = 'yaoqing.jade'
@@ -1015,8 +1016,9 @@ class WanglibaoAwardActivity(APIView):
         try:
             dt = timezone.datetime.now()
             redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe, give_start_at__lt=dt, give_end_at__gt=dt).first()
+            logger.debug("redpack_event: %s " % (redpack_event.__dict__))
         except Exception, reason:
-            print reason
+            logger.debug("exception reason: %s " % (reason))
 
         if redpack_event:
             redpack_backends.give_activity_redpack(self.request.user, redpack_event, 'pc')
