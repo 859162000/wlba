@@ -364,6 +364,12 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': '/var/log/wanglibao/anti.log',
             'formatter': 'verbose'
+        },
+        'marketing': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/marketing.log',
+            'formatter': 'verbose'
         }
     },
     'loggers': {
@@ -421,7 +427,7 @@ LOGGING = {
             'level': 'DEBUG'
         },
         'marketing': {
-            'handlers': ['file', 'console'],
+            'handlers': ['marketing', 'console'],
             'level': 'DEBUG'
         },
     }
