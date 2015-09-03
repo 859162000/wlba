@@ -37,7 +37,7 @@
                         }else if(xhr.amount == 1000.00){
                             index = 0
                         }
-                        var a = runzp(0);
+                        var a = runzp(index);
                         $('.rotateImg').rotate({
                           duration: 3000,
                           angle: 0,
