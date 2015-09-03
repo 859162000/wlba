@@ -1012,10 +1012,10 @@ class WanglibaoAwardActivity(APIView):
         join_log.join_times -= 1
         join_log.save(update_fields=['join_times'])
         money = join_log.amount
-        describe = 'celebrate_year_' + str(money)
+        describe = 'celebrate_year_' + str(int(money))
         try:
-            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe).first()
-            logger.debug("redpack_event: %s " % (redpack_event.__dict__))
+            dt = timezone.datetime.now()
+            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
         except Exception, reason:
             logger.debug("exception reason: %s " % (reason))
 
