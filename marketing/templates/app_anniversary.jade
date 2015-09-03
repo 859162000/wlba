@@ -13,9 +13,6 @@ html(style="background:#fff")
     link(href="/static/styles/mobile_activity/app.css", rel="stylesheet")
     - csrf_token
 
-    script(src="/static/js/lib/jquery.min.js")
-    script(src="/static/js/jQueryRotate.2.2.js")
-    script(src="/static/js/script.js")
     body
     .bannerAnniversary
         img(src='/static/imgs/mobile_activity/app_anniversary/banner.jpg')
@@ -169,7 +166,10 @@ html(style="background:#fff")
           | 元现金红包
         .winningBtn
             a(href='javascript:void(0)').againBtn 再抽一次
-      script(data-init='anniversary', src="/static/scripts/mobile_activity/anniversary.js")
+
+    script(src="/static/scripts/mobile_activity/jQueryRotate.2.2.js")
+    script(src="/static/js/script.js")
+    script(data-init='anniversary', src="/static/scripts/mobile_activity/anniversary.js")
 
 
 
