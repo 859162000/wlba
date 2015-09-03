@@ -1015,7 +1015,7 @@ class WanglibaoAwardActivity(APIView):
         describe = 'celebrate_year_' + str(money)
         try:
             dt = timezone.datetime.now()
-            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe, give_start_at__lt=dt, give_end_at__gt=dt).first()
+            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe).first()
             logger.debug("redpack_event: %s " % (redpack_event.__dict__))
         except Exception, reason:
             logger.debug("exception reason: %s " % (reason))
