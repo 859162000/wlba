@@ -1,4 +1,5 @@
-- load formatters
+-load formatters
+-load mathfilters
 doctype html
 html(style="background:#fff")
   head
@@ -10,10 +11,8 @@ html(style="background:#fff")
     script.
       (function(){var b=navigator.userAgent;ipad=b.match(/(iPad).*OS\s([\d_]+)/)?true:false;iphone=!ipad&&b.match(/(iPhone\sOS)\s([\d_]+)/)?true:false;uc=navigator.userAgent.indexOf("UCBrowser")>-1?true:false;ios=ipad||iphone;var d=1,a=1,c;if(ios){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}else{if(uc){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}}c='<meta name="viewport" content="initial-scale='+d+", maximum-scale="+d+", minimum-scale="+d+', width=device-width, user-scalable=no" />';document.write(c);document.documentElement.style.fontSize=20*a+"px"})();
     link(href="/static/styles/mobile_activity/app.css", rel="stylesheet")
+    - csrf_token
 
-    script(src="/static/js/lib/jquery.min.js")
-    script(src="/static/js/jQueryRotate.2.2.js")
-    script(src="/static/js/script.js")
     body
     .bannerAnniversary
         img(src='/static/imgs/mobile_activity/app_anniversary/banner.jpg')
@@ -167,7 +166,10 @@ html(style="background:#fff")
           | 元现金红包
         .winningBtn
             a(href='javascript:void(0)').againBtn 再抽一次
-      script(data-init='anniversary', src="/static/scripts/mobile_activity/anniversary.js")
+
+    script(src="/static/scripts/mobile_activity/jQueryRotate.2.2.js")
+    script(src="/static/js/script.js")
+    script(data-init='anniversary', src="/static/scripts/mobile_activity/anniversary.js")
 
 
 
