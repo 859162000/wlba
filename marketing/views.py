@@ -836,6 +836,10 @@ class ThunderActivityRewardCounter(APIView):
         })
 
 def celebrate_ajax(request):
+    """
+        Author: add by Yihen@20150827
+        Description: 网利宝公司活动 ,大转盘
+    """
     user = request.user
     action = request.POST.get('action',)
     if action == 'GET_AWARD':
@@ -965,17 +969,17 @@ class WanglibaoAwardActivity(APIView):
 
         result = {key: get_counts(value) for key, value in award_amount.iteritems()}
 
-        if activity_id % 1000 == 0:
+        if activity_id % 100 == 0:
             for award in (1000, 500, 200):
                 if result[award] < award_amount[award]:
                     return award
 
-        if activity_id % 500 == 0:
+        if activity_id % 49 == 0:
             for award in (500, 200):
                 if result[award] < award_amount[award]:
                     return award
 
-        if activity_id % 200 == 0:
+        if activity_id % 48 == 0:
             for award in (200,):
                 if result[award] < award_amount[award]:
                     return award
