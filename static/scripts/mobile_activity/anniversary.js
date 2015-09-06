@@ -296,16 +296,13 @@ org.anniversary = (function(org){
                 }
             });
             wx.ready(function(){
-                var $productName = $('.product-name'),
-                    $earningRate = $('.profit-txt'),
-                    $period = $('.time-txt');
 
                 var host = 'https://www.wanglibao.com',
-                    shareName = $productName.attr('data-name'),
+                    shareName = '网利宝周年庆喊你领红包',
                     shareImg = host + '/static/imgs/mobile/share_logo.png',
-                    shareLink = host + '/weixin/detail/'+$productName.attr('data-productID'),
-                    shareMainTit = '我在网利宝发现一个不错的投资标的，快来看看吧',
-                    shareBody = shareName + ',年收益' + $earningRate.attr('data-earn') + '%,期限' + $period.attr('data-period');
+                    shareLink = host + '/activity/anniversary/',
+                    shareMainTit = '网利宝周年庆喊你领红包',
+                    shareBody = '四重豪礼倾情钜惠，千万现金红包、全场加息High不停！速速去领>>'
                 //分享给微信好友
                 org.onMenuShareAppMessage({
                     title: shareMainTit,
