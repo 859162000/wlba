@@ -262,11 +262,38 @@ org.anniversary = (function(org){
                 },
                 async: false,
                 success: function (xhr) {
-                    var htmlStr = '';
-                    if (xhr.data.length > 0) {
-                        $.each(xhr.data, function (i, o) {
-                            i % 2 == 0 ? oddStyle = 'odd' : oddStyle = '';
-                            htmlStr += '<li class=' + oddStyle + '><span>恭喜<em>' + o.phone.substring(0, 3) + '****' + o.phone.substring(8, 12) + '</em>获得</span><label>' + o.awards + '元红包</label></li>'
+                     var htmlStr = '',j = 0;
+                    if(xhr.data.length > 0){
+                        $.each(xhr.data,function(i,o){
+                            i % 2 == 0 ? oddStyle = 'odd' : oddStyle ='';
+                            if( i != 0 ){
+                                if(i % 5 == 0){
+                                    j++;
+                                    if(j == 1){
+                                       htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>135****2035</em>获得</span><label>200元红包</label></li>';
+                                    }else if(j == 2){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>186****0386</em>获得</span><label>500元红包</label></li>';
+                                    }else if(j == 3){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>150****7917</em>获得</span><label>Beats耳机</label></li>';
+                                    }else if(j == 4){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>189****2528</em>获得</span><label>电动滑板车</label></li>';
+                                    }else if(j == 5){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>133****0525</em>获得</span><label>Beats耳机</label></li>';
+                                    }else if(j == 6){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>182****7831</em>获得</span><label>500元红包</label></li>';
+                                    }else if(j == 7){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>188****5117</em>获得</span><label>乐视电视</label></li>';
+                                    }else if(j == 8){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>138****1219</em>获得</span><label>1000元红包</label></li>';
+                                         j = 0;
+                                         return true;
+                                    }
+                                }else{
+                                     htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>'+ o.phone.substring(0,3) +'****'+  o.phone.substring(7,12) +'</em>获得</span><label>'+ o.awards +'元红包</label></li>';
+                                }
+                            }else{
+                                htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>'+ o.phone.substring(0,3) +'****'+  o.phone.substring(7,12) +'</em>获得</span><label>'+ o.awards +'元红包</label></li>';
+                            }
                         })
                         $('#users').append(htmlStr);
                     }
@@ -357,12 +384,38 @@ org.anniversaryWap = (function(org){
                 },
                 async: false,
                 success: function (xhr) {
-                    var htmlStr = '';
-                    if (xhr.data.length > 0) {
-                        $.each(xhr.data, function (i, o) {
-                            i % 2 == 0 ? oddStyle = 'odd' : oddStyle = '';
-                            ;
-                            htmlStr += '<li class=' + oddStyle + '><span>恭喜<em>' + o.phone.substring(0, 3) + '****' + o.phone.substring(8, 12) + '</em>获得</span><label>' + o.awards + '元红包</label></li>'
+                    var htmlStr = '',j = 0;
+                    if(xhr.data.length > 0){
+                        $.each(xhr.data,function(i,o){
+                            i % 2 == 0 ? oddStyle = 'odd' : oddStyle ='';
+                            if( i != 0 ){
+                                if(i % 5 == 0){
+                                    j++;
+                                    if(j == 1){
+                                       htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>135****2035</em>获得</span><label>200元红包</label></li>';
+                                    }else if(j == 2){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>186****0386</em>获得</span><label>500元红包</label></li>';
+                                    }else if(j == 3){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>150****7917</em>获得</span><label>Beats耳机</label></li>';
+                                    }else if(j == 4){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>189****2528</em>获得</span><label>电动滑板车</label></li>';
+                                    }else if(j == 5){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>133****0525</em>获得</span><label>Beats耳机</label></li>';
+                                    }else if(j == 6){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>182****7831</em>获得</span><label>500元红包</label></li>';
+                                    }else if(j == 7){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>188****5117</em>获得</span><label>乐视电视</label></li>';
+                                    }else if(j == 8){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>138****1219</em>获得</span><label>1000元红包</label></li>';
+                                         j = 0;
+                                         return true;
+                                    }
+                                }else{
+                                     htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>'+ o.phone.substring(0,3) +'****'+  o.phone.substring(7,12) +'</em>获得</span><label>'+ o.awards +'元红包</label></li>';
+                                }
+                            }else{
+                                htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>'+ o.phone.substring(0,3) +'****'+  o.phone.substring(7,12) +'</em>获得</span><label>'+ o.awards +'元红包</label></li>';
+                            }
                         })
                         $('#users').append(htmlStr);
                     }
