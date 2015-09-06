@@ -566,6 +566,12 @@ CELERYBEAT_SCHEDULE = {
         'task': 'wanglibao_account.tasks.caimiao_rating_info_post_task',
         'schedule': crontab(minute=0, hour=0)
     },
+
+    # by Zhoudong 中金标的推送(包含新标, 更新, 下架)
+    'zhongjin_send_data': {
+        'task': 'wanglibao_account.tasks.zhongjin_post_task',
+        'schedule': timedelta(hours=1),
+    },
 }
 
 CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
