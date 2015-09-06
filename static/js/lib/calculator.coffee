@@ -54,19 +54,17 @@ define ['jquery'], ($)->
 
   $('input[data-role=fee-calculator]').keyup()
 
-  $('input[data-role=p2p-calculator]').keyup (e)->
-    target = $(e.target)
-    total_amount = parseFloat(target.attr 'data-total-amount')
-    total_earning = parseFloat(target.attr 'data-total-earning')
-    fee_total_earning = parseFloat(target.attr 'total-fee-earning')
+  p2pCalculate = () ->
+    target = $('input[data-role=p2p-calculator]')
     existing = parseFloat(target.attr 'data-existing')
 
     period = target.attr 'data-period'
     rate = target.attr 'data-rate'
     rate = rate/100
     pay_method = target.attr 'data-paymethod'
-    activity_rate = target.attr 'activity-rate'
-    activity_rate = activity_rate/100
+    activity_rate = if parseFloat(target.attr('activity-rate')) then parseFloat(target.attr('activity-rate')) else 0
+    activity_jiaxi = parseFloat(target.attr('activity-jiaxi'))
+    activity_rate = (activity_rate + activity_jiaxi)/100
 
     amount = parseFloat(target.val()) || 0
 
@@ -76,11 +74,8 @@ define ['jquery'], ($)->
 
     amount = parseFloat(existing) + parseFloat(amount)
 
-    #earning = ((amount / total_amount) * total_earning).toFixed(2)
-    #fee_earning = ((amount / total_amount) * fee_total_earning).toFixed(2)
     earning = calculate(amount, rate, period, pay_method)
     fee_earning = calculate(amount, activity_rate, period, pay_method)
-
     if earning < 0
       earning = 0
 
@@ -95,9 +90,16 @@ define ['jquery'], ($)->
     for fee_element, i in fee_elements
       if fee_earning and $.isNumeric(fee_earning)
         $(fee_element).text fee_earning
+        $('#vip-income-warp').show()
       else
         $(fee_element).text "0.00"
 
+  $('input[data-role=p2p-calculator]').keyup (e)->
+    p2pCalculate()
+
   $('input[data-role=p2p-calculator]').keyup()
-  return calculate
+  return {
+    calculate : calculate,
+    p2pCalculate :p2pCalculate,
+  }
 

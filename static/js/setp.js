@@ -160,32 +160,37 @@
         $('.game-btn').addClass('game-btn-down')
       });
       $('.game-btn').on('mouseup',function(){
-        $('.game-btn').removeClass('game-btn-down');
-        if (change['ret_code']==4000){
-          $('#small-zc').show();
-          $('#xl-aug-fail p').text('Sorry~您不符合抽奖条件');
-          $('#xl-aug-fail').show();
-        }else if($(this).hasClass('go-game')){
-          if (change['left']<=0){
-            $('#small-zc').show();
-            $('#xl-aug-fail p').text('Sorry~您的抽奖次数已用完')
-            $('#xl-aug-fail').show();
-          }else{
-            game();
-          }
-        }else{
-          $('#small-zc').show();
-          $('#xl-aug-login').show();
+        if(!$('.go-game').hasClass('noClick')) {
+            $('.game-btn').removeClass('game-btn-down');
+            if (change['ret_code'] == 4000) {
+                $('#small-zc').show();
+                $('#xl-aug-fail p').text('Sorry~您不符合抽奖条件');
+                $('#xl-aug-fail').show();
+            } else if ($(this).hasClass('go-game')) {
+                if (change['left'] <= 0) {
+                    $('#small-zc').show();
+                    $('#xl-aug-fail p').text('Sorry~您的抽奖次数已用完')
+                    $('#xl-aug-fail').show();
+                } else {
+                    game();
+                }
+            } else {
+                $('#small-zc').show();
+                $('#xl-aug-login').show();
+            }
+            //game();
         }
       })
   //    game();
       function game(){
+        $('.go-game').addClass('noClick');
         //按钮按下样式
         //手柄的样式
         setTimeout(function(){
           $('.side').addClass('side-down')
           setTimeout(function(){
             $('.side').removeClass('side-down')
+          },50)
             if (num!=happy){
               //失败调用
               redpack('IGNORE_AWARD');
@@ -195,9 +200,7 @@
               redpack('GET_AWARD');
               star('0'+change['amount']);
             }
-
-          },500)
-        },1000)
+        },10)
 
       }
 
@@ -216,7 +219,8 @@
             var g=9-a[k],b=k+1;
             $('.long-sum:eq('+k+')').css({'top':-g*178+'px'})
           }
-          clearInterval(time)
+          clearInterval(time);
+          $('.go-game').removeClass('noClick');
           $('#rmb').text(parseInt(change['amount']));
           $('#small-zc').show();
           if (a=='0000'){
