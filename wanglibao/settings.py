@@ -364,6 +364,12 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': '/var/log/wanglibao/anti.log',
             'formatter': 'verbose'
+        },
+        'marketing': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/marketing.log',
+            'formatter': 'verbose'
         }
     },
     'loggers': {
@@ -417,7 +423,11 @@ LOGGING = {
             'level': 'DEBUG'
         },
         'wanglibao_anti': {
-            'handlers': ['anti'],
+            'handlers': ['anti', 'console'],
+            'level': 'DEBUG'
+        },
+        'marketing': {
+            'handlers': ['marketing', 'console'],
             'level': 'DEBUG'
         },
     }
@@ -854,6 +864,13 @@ CAIMIAO_RATING_URL = 'http://121.40.31.143:86/api/JsonsFinancial/Rating/'
 # 众牛
 ZHONGNIU_SECRET = 'N9ecZSqh'
 
+# 中金
+ZHONGJIN_ID = 15
+ZHONGJIN_P2P_URL = 'http://open.rong.cnfol.com/product.html'
+ZHONGJIN_P2P_TEST_URL = 'http://test.finance.cnfol.com/product.html'    # 未确定
+ZHONGJIN_SECRET = '2CF7AC2A27CC9B48C4EFCD7E356CD95F'
+ZHONGJIN_UPDATE_TIMEDELTA = timedelta(hours=1)
+
 # 金山
 WLB_FOR_JINSHAN_KEY = '1994'
 JINSHAN_CALL_BACK_URL = 'https://vip.wps.cn/task/api/reward'
@@ -909,7 +926,25 @@ ZHITUI_CALL_BACK_URL = 'http://api.zhitui.com/wanglibao/recive.php'
 
 # 中国电信
 WLB_FOR_ZGDX_KEY = '2001'
-ZGDX_CALL_BACK_URL = ''
+if ENV == ENV_PRODUCTION:
+    ZGDX_CALL_BACK_URL = 'http://118.123.170.72:8888/fps/flowService.do'
+    ZGDX_PARTNER_NO = '100054374'
+    ZGDX_SERVICE_CODE = 'FS0001'
+    ZGDX_CONTRACT_ID = 'test20150901165440'
+    ZGDX_ACTIVITY_ID = '100785'
+    ZGDX_PLAT_OFFER_ID = '103050'
+    ZGDX_KEY = 'H5gOs1ZshKZ6WikN'
+    ZGDX_IV = '8888159601152533'
+else:
+    ZGDX_CALL_BACK_URL = 'http://118.123.170.72:8888/fps/flowService.do'
+    ZGDX_PARTNER_NO = '100054374'
+    ZGDX_SERVICE_CODE = 'FS0001'
+    ZGDX_CONTRACT_ID = 'test20150901165440'
+    ZGDX_ACTIVITY_ID = '100785'
+    ZGDX_PLAT_OFFER_ID = '103050'
+    ZGDX_KEY = 'H5gOs1ZshKZ6WikN'
+    ZGDX_IV = '8888159601152533'
+
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100

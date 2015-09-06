@@ -372,4 +372,5 @@ class WanglibaoActivityReward(models.Model):
     used_awards = models.IntegerField(default=0, verbose_name=u'已获奖数')
 
     class Meta:
+        verbose_name = u'网利宝发奖活动表'
         verbose_name_plural = u'网利宝发奖活动表'
