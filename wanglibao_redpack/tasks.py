@@ -8,6 +8,8 @@ import logging
 from wanglibao.celery import app
 from django.db import transaction
 from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent
+from django.conf import settings
+from decimal import Decimal
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +56,20 @@ def create_update_redpack(event_id):
                             x.save()
             except:
                 logger.debug("redpackevent %s to update list error." % event_id)
+@app.task
+def update_robot_earning():
+    f = file(settings.BASE_DIR+'/wanglibao_redpack/data/topearnings.txt', 'r')
+    lines = f.readlines()
+    f.close()
+    write_str = ""
+    for line in lines:
+        phone, amount_str = line.split(",")
+        amount = Decimal(amount_str)
+        amount += Decimal(random.randrange(100, 600))
+        write_str += "%s,%s\n" % (phone, amount)
+    f = file(settings.BASE_DIR + '/wanglibao_redpack/data/topearnings.txt', 'w')
+    f.write(write_str)
+    f.close()
 
 def get_unused_token():
     while True:
