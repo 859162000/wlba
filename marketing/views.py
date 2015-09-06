@@ -853,9 +853,9 @@ def celebrate_ajax(request):
 
     record = IntroducedBy.objects.filter(user_id=user.id).first()
 
-    if record is not None and record.channel != 18:
+    if record is not None and record.channel_id != 18:
         try:
-            channel = Channels.objects.filter(id=record.channel).first()
+            channel = Channels.objects.filter(id=record.channel_id).first()
         except Exception, reason:
             to_json_response = {
                 'ret_code': 4000,
