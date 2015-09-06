@@ -25,7 +25,11 @@ def which_channel(user, intro=None):
         ib = IntroducedBy.objects.filter(user=user).first()
     else:
         ib = intro
-    if not ib or not ib.channel:
+
+    if not ib:
+        return Channel.WANGLIBAOOTHER
+
+    if not ib.channel:
         return Channel.WANGLIBAO
 
     name = ib.channel.name
