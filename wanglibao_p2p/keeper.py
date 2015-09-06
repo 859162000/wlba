@@ -340,7 +340,8 @@ class AmortizationKeeper(KeeperBaseMixin):
 
         for equity in equities:
             # 查询用户是否使用加息券
-            coupon = RedPackRecord.objects.filter(user=equity.user, product_id=product.id).first()
+            coupon = RedPackRecord.objects.filter(user=equity.user, product_id=product.id)\
+                .filter(redpack__event__rtype='interest_coupon').first()
             if coupon:
                 coupon_year_rate = coupon.redpack.event.amount
             else:

@@ -571,6 +571,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'wanglibao_redpack.tasks.update_robot_earning',
         'schedule': crontab(minute=0, hour=0)
     },
+    # by Zhoudong 中金标的推送(包含新标, 更新, 下架)
+    'zhongjin_send_data': {
+        'task': 'wanglibao_account.tasks.zhongjin_post_task',
+        'schedule': timedelta(hours=1),
+    },
 }
 
 CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
@@ -868,6 +873,15 @@ CAIMIAO_RATING_URL = 'http://121.40.31.143:86/api/JsonsFinancial/Rating/'
 
 # 众牛
 ZHONGNIU_SECRET = 'N9ecZSqh'
+
+# 中金
+ZHONGJIN_ID = 15
+ZHONGJIN_TEST_ID = 34
+ZHONGJIN_P2P_URL = 'http://open.rong.cnfol.com/product.html'
+ZHONGJIN_P2P_TEST_URL = 'http://test.open.finance.cnfol.com/product.html'    # 未确定
+ZHONGJIN_SECRET = '2CF7AC2A27CC9B48C4EFCD7E356CD95F'
+ZHONGJIN_TEST_SECRET = '348BB1C9A2032B2DA855D082151E8B8E'
+ZHONGJIN_UPDATE_TIMEDELTA = timedelta(hours=1)
 
 # 金山
 WLB_FOR_JINSHAN_KEY = '1994'
