@@ -16,7 +16,7 @@ $logo-margin-top-fixed: 2px
     width: 1102px
     margin: 0 auto
     +clearfix()
-    a 
+    a
       &:link, &:visited
         color: $bg-d1
       &:hover, &:active
@@ -29,6 +29,10 @@ $logo-margin-top-fixed: 2px
     height: 60px
     margin-top: $logo-margin-top
     float: left
+    .logo
+      width: 100%
+      height: 100%
+      display: none
     img.logo1
       width: 168px
       height: 60px
@@ -101,6 +105,10 @@ $logo-margin-top-fixed: 2px
     width: 296px
     height: 43px
     margin-top: 8px
+    .logo
+      display: block
+    .logo1, .logo2
+      display: none
   .g-nav-box
     a
       line-height: $g-nav-height-fixed
