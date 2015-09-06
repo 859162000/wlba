@@ -50,6 +50,7 @@ from marketing import tools
 from django.conf import settings
 from wanglibao_account.models import Binding
 from wanglibao_anti.anti.anti import AntiForAllClient
+from wanglibao_redpack.models import Income
 
 logger = logging.getLogger(__name__)
 
@@ -618,6 +619,20 @@ class TopsOfWeekView(APIView):
             return Response({"ret_code": -1, "records": list()})
 
         return Response({"ret_code": 0, "records": records, "isvalid": isvalid})
+
+class TopsOfEaringView(APIView):
+    """
+        得到全民淘金前十
+    """
+    permission_classes = ()
+    def post(self, request):
+        try:
+            records = Income.objects.select_related('user').select_related('user__wanglibaouserprofile').values('user__wanglibaouserprofile__phone').annotate(sum_amount=Sum('earning')).order_by('-sum_amount')[:10]
+            for record in records:
+                record['user__wanglibaouserprofile__phone']=safe_phone_str(record['user__wanglibaouserprofile__phone'])
+        except Exception, e:
+            return Response({"ret_code": -1, "records": list()})
+        return Response({"ret_code": 0, "records": records})
 
 class TopsOfMonthView(APIView):
     """
