@@ -328,6 +328,8 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     code = data.ret_code
     if code == 0
       $('.use-jiaxi').show()
+      $('#id_amount').attr('activity-jiaxi', data.amount)
+
 
   ddData = []
   if $('.red-pack').size() > 0
