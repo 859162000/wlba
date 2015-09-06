@@ -253,7 +253,8 @@ class WanglibaoActivityRewardAdmin(admin.ModelAdmin):
     """
     action = None
     list_display = ('user', 'total_chances', 'used_chances', 'total_awards', 'used_awards')
-    readonly_fields = ('user', 'total_chances', 'used_chances', 'total_awards', 'used_awards')
+    #readonly_fields = ('user', 'total_chances', 'used_chances', 'total_awards', 'used_awards')
+    readonly_fields = ('user', 'total_chances', 'total_awards', )
 
 
 admin.site.register(WanglibaoActivityReward, WanglibaoActivityRewardAdmin) # add by Yihen@20150901
