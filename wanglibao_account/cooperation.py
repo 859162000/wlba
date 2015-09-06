@@ -1884,6 +1884,7 @@ def zhongjin_get_products():
 
     wangli_products = set()
     start_time = now - settings.ZHONGJIN_UPDATE_TIMEDELTA
+
     new_products = P2PProduct.objects.filter(Q(publish_time__gte=start_time) & Q(publish_time__lt=now))
     wangli_products.update(new_products)
     # 还需要把更新的标全部推送
@@ -1895,37 +1896,42 @@ def zhongjin_get_products():
 
     for product in wangli_products:
         prod = dict()
-        prod['method'] = 'add'
-        # else:
-        #     if product.status in [u'录标', u'录标完成', u'待审核', u'正在招标']:
-        #         prod['method'] = 'update'
-        #     else:
-        #         prod['method'] = 'down'
+        if product in new_products:
+            prod['method'] = 'add'
+        else:
+            if product.status in [u'录标', u'录标完成', u'待审核', u'正在招标']:
+                prod['method'] = 'update'
+            else:
+                prod['method'] = 'down'
 
         prod['classId'] = 1
-        # prod['productId'] = product.pk    # productId 不是我们的id, 是他们返回的用来修改对应的
-        prod['productName'] = product.name
-        prod['borrowMoney'] = product.total_amount
-        prod['investmentMoney'] = 100
-        period = product.period if product.pay_method.startswith(u"日计息")/30 else product.period
-        prod['investmentPeriod'] = period
+        if not prod['method'] == 'add':
+            prod['productId'] = product.pk    # productId 不是我们的id, 是他们返回的用来修改对应的
+        if prod['method'] == 'add':
+            prod['productName'] = product.name
+            prod['borrowMoney'] = product.total_amount
+            prod['investmentMoney'] = 100
+            period = product.period if product.pay_method.startswith(u"日计息")/30 else product.period
+            prod['investmentPeriod'] = period
 
-        prod['completeness'] = "%.2f" % product.completion_rate
-        prod['stopTime'] = \
-            product.soldout_time.strftime("%Y-%m-%d") if product.soldout_time else product.end_time.strftime("%Y-%m-%d")
-        prod['riskPreference'] = 2
-        prod['expectedYield'] = product.expected_earning_rate
+            prod['completeness'] = "%.2f" % product.completion_rate
+            prod['stopTime'] = product.soldout_time.strftime("%Y-%m-%d") \
+                if product.soldout_time else product.end_time.strftime("%Y-%m-%d")
+            prod['riskPreference'] = 2
+            prod['expectedYield'] = product.expected_earning_rate
 
-        # 根据不同环境对应不同的url
-        if settings.ENV == 'debug':
-            base_url = 'http://127.0.0.1:8000'
-        if settings.ENV == 'staging':
-            base_url = 'https://staging.wanglibao.com'
-        if settings.ENV == 'production':
-            base_url = 'https://www.wanglibao.com'
-        prod['linkProfiles'] = base_url + '/p2p/detail/' + str(product.pk)
+            # 根据不同环境对应不同的url
+            if settings.ENV == 'debug':
+                prod['enterpriseId'] = settings.ZHONGJIN_TEST_ID
+                base_url = 'http://127.0.0.1:8000'
+            if settings.ENV == 'staging':
+                prod['enterpriseId'] = settings.ZHONGJIN_TEST_ID
+                base_url = 'https://staging.wanglibao.com'
+            if settings.ENV == 'production':
+                prod['enterpriseId'] = settings.ZHONGJIN_ID
+                base_url = 'https://www.wanglibao.com'
+            prod['linkProfiles'] = base_url + '/p2p/detail/' + str(product.pk)
 
-        prod['enterpriseId'] = settings.ZHONGJIN_ID
         prod['dt'] = int(time.time())
 
         prods.append(prod)
@@ -1943,9 +1949,10 @@ def zhongjin_get_sign(args_dict):
     """
     if settings.ENV == settings.ENV_PRODUCTION:
         url = settings.ZHONGJIN_P2P_URL
+        key = settings.ZHONGJIN_SECRET
     else:
         url = settings.ZHONGJIN_P2P_TEST_URL
-    key = settings.ZHONGJIN_SECRET
+        key = settings.ZHONGJIN_TEST_SECRET
 
     url += '?' + urlencode(args_dict)
 
@@ -1986,7 +1993,12 @@ def zhongjin_list_p2p():
     args_dict = dict()
     args_dict['method'] = 'list'
     args_dict['dt'] = int(time.time())
-    args_dict['enterpriseId'] = settings.ZHONGJIN_ID
+    # 根据不同环境对应不同的url
+    if settings.ENV == 'production':
+        args_dict['enterpriseId'] = settings.ZHONGJIN_ID
+    else:
+        args_dict['enterpriseId'] = settings.ZHONGJIN_TEST_ID
+
     args_dict['classId'] = 1
 
     url = zhongjin_get_sign(args_dict)
