@@ -862,6 +862,7 @@ def celebrate_ajax(request):
                 'message': u'渠道用户不允许参加这个活动',
             }
             logger.debug("Exception:渠道用户不允许参加, Reason:%s" % ( reason, ) )
+            logger.debug("Exception:渠道用户不允许参加, record.__dict__:%s" % (record.__dict__ , ) )
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
     else:
         channel = None
