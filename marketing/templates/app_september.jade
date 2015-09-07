@@ -14,15 +14,24 @@ html
         //  p.welfare-cont 新手注册并实名即送20元红包<br />
         //    | ①注册  ②实名认证
         p.btn-box
-          a(href="javascript:void(0);").btn.receive-red 注册领红包
+          if user.is_authenticated
+            a(href="javascript:void(0);").btn.receive-red 注册领红包
+          else
+            a(href="/weixin/regist/?next=/activity/app_september/").btn 注册领红包
       .welfare2.mtpx
         img(src="/static/imgs/mobile_activity/app_september/welfare2.png")
         p.btn-box
-          a(href="#").btn 注册充值
+          if user.is_authenticated
+            a(href="/weixin/recharge/?rechargeNext=/weixin/account/").btn 注册充值
+          else
+            a(href="/weixin/regist/?next=/activity/app_september/").btn 注册充值
       .welfare3.mtpx
         img(src="/static/imgs/mobile_activity/app_september/welfare3.png")
         p.btn-box
-          a(href="#").btn 我要理财
+          if user.is_authenticated
+            a(href="/weixin/list/?next=/activity/app_september/").btn 我要理财
+          else
+            a(href="/weixin/regist/?next=/activity/app_september/").btn 我要理财
     .promote-new
       h3.use-tit 新手任务攻略
       .use-cont

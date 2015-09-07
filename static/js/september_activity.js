@@ -25,7 +25,7 @@
             animateTo:1440+a.angle,
 			easing: $.easing.easeOutSine,
 			callback: function(){
-              $('.page,.winningDiv').show();
+              $('.page,.errorWin').show();
               $('#moeny').text(a.prize);
               var top = $('.luckDrawLeft').offset().top;
               var left = $('.luckDrawLeft').offset().left;
@@ -41,18 +41,21 @@
 	  }
 	});
 
-    //关闭中奖遮罩
+    function closeAlert(tp){//关闭弹层
+      tp.hide();
+      $('.page').hide();
+    }
+    function backTop(){
+      $('body,html').animate({scrollTop: 0}, 600);
+    }
+    //关闭 抽奖 遮罩\弹框
     $('.spanBtn,.againBtn').on('click',function(){
-        $('.page,.winningDiv').hide();
-    })
+      closeAlert($(this).parents("div.alert-box"))
+    });
     //非法用户
     $('#checkUserStatus').on('click',function(){
         $('.errorWin').modal();
-    })
-    //关闭弹框
-    $('#closeWin').on('click',function(){
-        $.modal.close()
-    })
+    });
 
 
     //返回顶部
@@ -71,7 +74,7 @@
     });
 
     topDom.on('click',function(){
-      $('body,html').animate({scrollTop: 0}, 600);
+      backTop();
       return false
     });
 
@@ -91,6 +94,18 @@
       scroll();
     },30);
 
-
+    //返回banner处
+    $(".to-register").on("click",function(){
+      $('.page,.promote-register').show();
+    });
+    //返回banner处
+    $("a.banner-register").on("click",function(){
+      closeAlert($(this).parents(".alert-box"));
+      backTop();
+    });
+    //立即注册 btn
+    $(".now-register").on("click",function(){
+      backTop();
+    });
   });
 }).call(this);

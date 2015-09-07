@@ -17,6 +17,7 @@ from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_redpack import backends as redpack_backends
+from wanglibao_redpack.models import RedPackRecord
 # from wanglibao_account.utils import CjdaoUtils
 # from wanglibao_account.tasks import cjdao_callback
 # from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
@@ -56,6 +57,19 @@ class P2PTrader(object):
             raise P2PException(u'用户账户已冻结，请联系客服')
         with transaction.atomic():
             if redpack:
+                # 为防止用户同时打开两个浏览器同时使用加息券和红包，须先检测
+                coupons = RedPackRecord.objects.filter(user=self.user, product_id=self.product.id) \
+                    .filter(redpack__event__rtype='interest_coupon')
+                if coupons:
+                    raise P2PException(u'已经选择过加息券，不能重复或叠加使用')
+                else:
+                    this_redpack = RedPackRecord.objects.filter(pk=redpack).first()
+                    this_rtype = this_redpack.redpack.event.rtype
+                    coupons = RedPackRecord.objects.filter(user=self.user, product_id=self.product.id) \
+                        .exclude(redpack__event__rtype='interest_coupon')
+                    if coupons and this_rtype == 'interest_coupon':
+                        raise P2PException(u'红包和加息券不能同时叠加使用')
+
                 redpack_order_id = OrderHelper.place_order(self.user, order_type=u'优惠券消费', redpack=redpack,
                                                            product_id=self.product.id, status=u'新建').id
                 result = redpack_backends.consume(redpack, amount, self.user, self.order_id, self.device_type, self.product.id)
