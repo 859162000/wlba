@@ -35,7 +35,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_YUNDUAN_KEY, YUNDUAN_CALL_BACK_URL, YUNDUAN_COOP_ID, WLB_FOR_YICHE_KEY, YICHE_COOP_ID, \
      YICHE_KEY, YICHE_CALL_BACK_URL, WLB_FOR_ZHITUI1_KEY, ZHITUI_COOP_ID, ZHITUI_CALL_BACK_URL
 from wanglibao_account.models import Binding, IdVerification
-from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback
+from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
 from wanglibao_pay.models import Card
 from wanglibao_profile.models import WanglibaoUserProfile
