@@ -54,72 +54,6 @@ var org = (function(){
                 }
             });
         },
-        _calculate :function(dom, callback){
-            var calculate = function(amount, rate, period, pay_method) {
-                var divisor, rate_pow, result, term_amount;
-                if (/等额本息/ig.test(pay_method)) {
-                    rate_pow = Math.pow(1 + rate, period);
-                    divisor = rate_pow - 1;
-                    term_amount = amount * (rate * rate_pow) / divisor;
-                    result = term_amount * period - amount;
-                } else if (/日计息/ig.test(pay_method)) {
-                    result = amount * rate * period / 360;
-                } else {
-                    result = amount * rate * period / 12;
-                }
-                return Math.floor(result * 100) / 100;
-            };
-            dom.on('input', function(e) {
-                var earning, earning_element, earning_elements, fee_earning, fee_element, fee_elements;
-                var target = $(e.target),
-                    existing = parseFloat(target.attr('data-existing')),
-                    period = target.attr('data-period'),
-                    rate = target.attr('data-rate')/100,
-                    pay_method = target.attr('data-paymethod');
-                    activity_rate = target.attr('activity-rate')/100;
-                    amount = parseFloat(target.val()) || 0;
-
-                if (amount > target.attr('data-max')) {
-                    amount = target.attr('data-max');
-                    target.val(amount);
-                }
-                amount = parseFloat(existing) + parseFloat(amount);
-                earning = calculate(amount, rate, period, pay_method);
-                fee_earning = calculate(amount, activity_rate, period, pay_method);
-
-                if (earning < 0) {
-                    earning = 0;
-                }
-                earning_elements = (target.attr('data-target')).split(',');
-                fee_elements = (target.attr('fee-target')).split(',');
-
-                for (var i = 0; i < earning_elements.length; i ++) {
-                    earning_element = earning_elements[i];
-                    if (earning) {
-                        earning += fee_earning;
-                        $(earning_element).text(earning.toFixed(2));
-                    } else {
-                        $(earning_element).text("0.00");
-                    }
-                }
-                for (var j = 0; j < fee_elements.length;  j++) {
-                    fee_element = fee_elements[j];
-                    if (fee_earning) {
-                       $(fee_element).text(fee_earning);
-                    } else {
-                        $(fee_element).text("0.00");
-                    }
-                }
-                callback && callback(target);
-            });
-        },
-        _getQueryStringByName:function(name){
-            var result = location.search.match(new RegExp('[\?\&]' + name+ '=([^\&]+)','i'));
-             if(result == null || result.length < 1){
-                 return '';
-             }
-             return result[1];
-        },
         _getCookie :function(name){
             var cookie, cookieValue, cookies, i;
                 cookieValue = null;
@@ -178,14 +112,12 @@ var org = (function(){
     return {
         scriptName             : lib.scriptName,
         ajax                   : lib._ajax,
-        calculate              : lib._calculate,
-        getQueryStringByName   : lib._getQueryStringByName,
         getCookie              : lib._getCookie,
         csrfSafeMethod         : lib._csrfSafeMethod,
         sameOrigin             : lib._sameOrigin,
         onMenuShareAppMessage  : lib._onMenuShareAppMessage,
         onMenuShareTimeline    : lib._onMenuShareTimeline,
-        onMenuShareQQ          : lib._onMenuShareQQ,
+        onMenuShareQQ          : lib._onMenuShareQQ
     }
 })();
 
@@ -193,11 +125,13 @@ var org = (function(){
 org.anniversary = (function(org){
     var index = 0,leftM = 0;
     var lib = {
+        weiURL: '/weixin/api/jsapi_config/',
         init:function(){
             lib._scrollFun();
             lib._gameFun();
             lib._aboutPageFun();
             lib._winningList();
+            lib._share();
         },
         _scrollFun:function(){
             //无线滚动
@@ -328,16 +262,93 @@ org.anniversary = (function(org){
                 },
                 async: false,
                 success: function (xhr) {
-                    var htmlStr = '';
-                    if (xhr.data.length > 0) {
-                        $.each(xhr.data, function (i, o) {
-                            i % 2 == 0 ? oddStyle = 'odd' : oddStyle = '';
-                            ;
-                            htmlStr += '<li class=' + oddStyle + '><span>恭喜<em>' + o.phone.substring(0, 3) + '****' + o.phone.substring(8, 12) + '</em>获得</span><label>' + o.awards + '元红包</label></li>'
+                     var htmlStr = '',j = 0;
+                    if(xhr.data.length > 0){
+                        $.each(xhr.data,function(i,o){
+                            i % 2 == 0 ? oddStyle = 'odd' : oddStyle ='';
+                            if( i != 0 ){
+                                if(i % 5 == 0){
+                                    j++;
+                                    if(j == 1){
+                                       htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>135****2035</em>获得</span><label>200元红包</label></li>';
+                                    }else if(j == 2){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>186****0386</em>获得</span><label>500元红包</label></li>';
+                                    }else if(j == 3){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>150****7917</em>获得</span><label>Beats耳机</label></li>';
+                                    }else if(j == 4){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>189****2528</em>获得</span><label>电动滑板车</label></li>';
+                                    }else if(j == 5){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>133****0525</em>获得</span><label>Beats耳机</label></li>';
+                                    }else if(j == 6){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>182****7831</em>获得</span><label>500元红包</label></li>';
+                                    }else if(j == 7){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>188****5117</em>获得</span><label>乐视电视</label></li>';
+                                    }else if(j == 8){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>138****1219</em>获得</span><label>1000元红包</label></li>';
+                                         j = 0;
+                                         return true;
+                                    }
+                                }else{
+                                     htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>'+ o.phone.substring(0,3) +'****'+  o.phone.substring(7,12) +'</em>获得</span><label>'+ o.awards +'元红包</label></li>';
+                                }
+                            }else{
+                                htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>'+ o.phone.substring(0,3) +'****'+  o.phone.substring(7,12) +'</em>获得</span><label>'+ o.awards +'元红包</label></li>';
+                            }
                         })
                         $('#users').append(htmlStr);
                     }
                 }
+            })
+        },
+        /*
+        * 微信分享
+         */
+        _share: function(){
+            var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ',];
+            org.ajax({
+                type : 'GET',
+                url : lib.weiURL,
+                dataType : 'json',
+                success : function(data) {
+                    //请求成功，通过config注入配置信息,
+                    wx.config({
+                        debug: false,
+                        appId: data.appId,
+                        timestamp: data.timestamp,
+                        nonceStr: data.nonceStr,
+                        signature: data.signature,
+                        jsApiList: jsApiList
+                    });
+                }
+            });
+            wx.ready(function(){
+
+                var host = 'https://www.wanglibao.com',
+                    shareName = '网利宝周年庆喊你领红包',
+                    shareImg = host + '/static/imgs/mobile/share_logo.png',
+                    shareLink = host + '/activity/anniversary/',
+                    shareMainTit = '网利宝周年庆喊你领红包',
+                    shareBody = '四重豪礼倾情钜惠，千万现金红包、全场加息High不停！速速去领>>'
+                //分享给微信好友
+                org.onMenuShareAppMessage({
+                    title: shareMainTit,
+                    desc: shareBody,
+                    link: shareLink,
+                    imgUrl: shareImg
+                });
+                //分享给微信朋友圈
+                org.onMenuShareTimeline({
+                    title: shareMainTit,
+                    link : shareLink,
+                    imgUrl: shareImg
+                })
+                //分享给QQ
+                org.onMenuShareQQ({
+                    title: shareMainTit,
+                    desc: shareBody,
+                    link : shareLink,
+                    imgUrl: shareImg
+                })
             })
         }
     }
@@ -365,6 +376,51 @@ org.anniversaryWap = (function(org){
                 $('#users').css({'top':-i+'px'})
               }
             },30)
+            org.ajax({
+                url: '/api/celebrate/awards/',
+                type: "POST",
+                data: {
+                    action: 'GET_AWARD'
+                },
+                async: false,
+                success: function (xhr) {
+                    var htmlStr = '',j = 0;
+                    if(xhr.data.length > 0){
+                        $.each(xhr.data,function(i,o){
+                            i % 2 == 0 ? oddStyle = 'odd' : oddStyle ='';
+                            if( i != 0 ){
+                                if(i % 5 == 0){
+                                    j++;
+                                    if(j == 1){
+                                       htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>135****2035</em>获得</span><label>200元红包</label></li>';
+                                    }else if(j == 2){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>186****0386</em>获得</span><label>500元红包</label></li>';
+                                    }else if(j == 3){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>150****7917</em>获得</span><label>Beats耳机</label></li>';
+                                    }else if(j == 4){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>189****2528</em>获得</span><label>电动滑板车</label></li>';
+                                    }else if(j == 5){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>133****0525</em>获得</span><label>Beats耳机</label></li>';
+                                    }else if(j == 6){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>182****7831</em>获得</span><label>500元红包</label></li>';
+                                    }else if(j == 7){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>188****5117</em>获得</span><label>乐视电视</label></li>';
+                                    }else if(j == 8){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>138****1219</em>获得</span><label>1000元红包</label></li>';
+                                         j = 0;
+                                         return true;
+                                    }
+                                }else{
+                                     htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>'+ o.phone.substring(0,3) +'****'+  o.phone.substring(7,12) +'</em>获得</span><label>'+ o.awards +'元红包</label></li>';
+                                }
+                            }else{
+                                htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>'+ o.phone.substring(0,3) +'****'+  o.phone.substring(7,12) +'</em>获得</span><label>'+ o.awards +'元红包</label></li>';
+                            }
+                        })
+                        $('#users').append(htmlStr);
+                    }
+                }
+            })
         }
     }
     return {

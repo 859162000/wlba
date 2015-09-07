@@ -367,7 +367,9 @@
       var code;
       code = data.ret_code;
       if (code === 0) {
-        return $('.use-jiaxi').show();
+        $('.use-jiaxi').show();
+        $('.use-jiaxi-amount').text(data.amount + '% ');
+        return $('#id_amount').attr('activity-jiaxi', data.amount);
       }
     });
     ddData = [];
