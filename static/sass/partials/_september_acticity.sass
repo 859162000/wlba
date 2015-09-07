@@ -390,13 +390,16 @@ $mt50: 50px
     a.close-modal
       line-height: 30px
       color: #fff
-.winningDiv
-  position: absolute
+.winningDiv,.alert-box
+  position: fixed
   width: 400px
   z-index: 100
   background: #fff
   padding: 40px 20px 30px
   +border-radius(10px)
+  top: 50%
+  left: 50%
+  margin: -90px 0 0 -200px
   em
     font-style: normal
   .winningImg
