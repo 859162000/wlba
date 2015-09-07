@@ -262,12 +262,38 @@ org.anniversary = (function(org){
                 },
                 async: false,
                 success: function (xhr) {
-                    var htmlStr = '';
-                    if (xhr.data.length > 0) {
-                        $.each(xhr.data, function (i, o) {
-                            i % 2 == 0 ? oddStyle = 'odd' : oddStyle = '';
-                            ;
-                            htmlStr += '<li class=' + oddStyle + '><span>恭喜<em>' + o.phone.substring(0, 3) + '****' + o.phone.substring(8, 12) + '</em>获得</span><label>' + o.awards + '元红包</label></li>'
+                     var htmlStr = '',j = 0;
+                    if(xhr.data.length > 0){
+                        $.each(xhr.data,function(i,o){
+                            i % 2 == 0 ? oddStyle = 'odd' : oddStyle ='';
+                            if( i != 0 ){
+                                if(i % 5 == 0){
+                                    j++;
+                                    if(j == 1){
+                                       htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>135****2035</em>获得</span><label>200元红包</label></li>';
+                                    }else if(j == 2){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>186****0386</em>获得</span><label>500元红包</label></li>';
+                                    }else if(j == 3){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>150****7917</em>获得</span><label>Beats耳机</label></li>';
+                                    }else if(j == 4){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>189****2528</em>获得</span><label>电动滑板车</label></li>';
+                                    }else if(j == 5){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>133****0525</em>获得</span><label>Beats耳机</label></li>';
+                                    }else if(j == 6){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>182****7831</em>获得</span><label>500元红包</label></li>';
+                                    }else if(j == 7){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>188****5117</em>获得</span><label>乐视电视</label></li>';
+                                    }else if(j == 8){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>138****1219</em>获得</span><label>1000元红包</label></li>';
+                                         j = 0;
+                                         return true;
+                                    }
+                                }else{
+                                     htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>'+ o.phone.substring(0,3) +'****'+  o.phone.substring(7,12) +'</em>获得</span><label>'+ o.awards +'元红包</label></li>';
+                                }
+                            }else{
+                                htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>'+ o.phone.substring(0,3) +'****'+  o.phone.substring(7,12) +'</em>获得</span><label>'+ o.awards +'元红包</label></li>';
+                            }
                         })
                         $('#users').append(htmlStr);
                     }
@@ -296,16 +322,13 @@ org.anniversary = (function(org){
                 }
             });
             wx.ready(function(){
-                var $productName = $('.product-name'),
-                    $earningRate = $('.profit-txt'),
-                    $period = $('.time-txt');
 
                 var host = 'https://www.wanglibao.com',
-                    shareName = $productName.attr('data-name'),
+                    shareName = '网利宝周年庆喊你领红包',
                     shareImg = host + '/static/imgs/mobile/share_logo.png',
-                    shareLink = host + '/weixin/detail/'+$productName.attr('data-productID'),
-                    shareMainTit = '我在网利宝发现一个不错的投资标的，快来看看吧',
-                    shareBody = shareName + ',年收益' + $earningRate.attr('data-earn') + '%,期限' + $period.attr('data-period');
+                    shareLink = host + '/activity/anniversary/',
+                    shareMainTit = '网利宝周年庆喊你领红包',
+                    shareBody = '四重豪礼倾情钜惠，千万现金红包、全场加息High不停！速速去领>>'
                 //分享给微信好友
                 org.onMenuShareAppMessage({
                     title: shareMainTit,
@@ -361,12 +384,38 @@ org.anniversaryWap = (function(org){
                 },
                 async: false,
                 success: function (xhr) {
-                    var htmlStr = '';
-                    if (xhr.data.length > 0) {
-                        $.each(xhr.data, function (i, o) {
-                            i % 2 == 0 ? oddStyle = 'odd' : oddStyle = '';
-                            ;
-                            htmlStr += '<li class=' + oddStyle + '><span>恭喜<em>' + o.phone.substring(0, 3) + '****' + o.phone.substring(8, 12) + '</em>获得</span><label>' + o.awards + '元红包</label></li>'
+                    var htmlStr = '',j = 0;
+                    if(xhr.data.length > 0){
+                        $.each(xhr.data,function(i,o){
+                            i % 2 == 0 ? oddStyle = 'odd' : oddStyle ='';
+                            if( i != 0 ){
+                                if(i % 5 == 0){
+                                    j++;
+                                    if(j == 1){
+                                       htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>135****2035</em>获得</span><label>200元红包</label></li>';
+                                    }else if(j == 2){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>186****0386</em>获得</span><label>500元红包</label></li>';
+                                    }else if(j == 3){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>150****7917</em>获得</span><label>Beats耳机</label></li>';
+                                    }else if(j == 4){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>189****2528</em>获得</span><label>电动滑板车</label></li>';
+                                    }else if(j == 5){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>133****0525</em>获得</span><label>Beats耳机</label></li>';
+                                    }else if(j == 6){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>182****7831</em>获得</span><label>500元红包</label></li>';
+                                    }else if(j == 7){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>188****5117</em>获得</span><label>乐视电视</label></li>';
+                                    }else if(j == 8){
+                                         htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>138****1219</em>获得</span><label>1000元红包</label></li>';
+                                         j = 0;
+                                         return true;
+                                    }
+                                }else{
+                                     htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>'+ o.phone.substring(0,3) +'****'+  o.phone.substring(7,12) +'</em>获得</span><label>'+ o.awards +'元红包</label></li>';
+                                }
+                            }else{
+                                htmlStr+='<li class='+ oddStyle +'><span>恭喜<em>'+ o.phone.substring(0,3) +'****'+  o.phone.substring(7,12) +'</em>获得</span><label>'+ o.awards +'元红包</label></li>';
+                            }
                         })
                         $('#users').append(htmlStr);
                     }

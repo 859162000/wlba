@@ -190,3 +190,14 @@ def caimiao_rating_info_post_task():
     """
     from wanglibao_account.cooperation import caimiao_post_rating_info
     caimiao_post_rating_info()
+
+
+@app.task
+def zhongjin_post_task():
+    """
+    author: Zhoudong
+    向中金发送p2p 数据
+    :return:
+    """
+    from wanglibao_account.cooperation import zhongjin_post_p2p_info
+    zhongjin_post_p2p_info()

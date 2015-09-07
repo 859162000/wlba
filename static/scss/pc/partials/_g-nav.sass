@@ -25,13 +25,21 @@ $logo-margin-top-fixed: 2px
     a.highlight
       color: $t-d2
   .g-logo-box
-    width: 360px
-    height: 55px
+    width: 380px
+    height: 60px
     margin-top: $logo-margin-top
     float: left
-    img
+    .logo
       width: 100%
       height: 100%
+      display: none
+    img.logo1
+      width: 168px
+      height: 60px
+    img.logo2
+      width: 177px
+      height: 52px
+      margin: 0 0 4px 20px
   .g-nav-box
     float: right
     overflow: hidden
@@ -97,6 +105,10 @@ $logo-margin-top-fixed: 2px
     width: 296px
     height: 43px
     margin-top: 8px
+    .logo
+      display: block
+    .logo1, .logo2
+      display: none
   .g-nav-box
     a
       line-height: $g-nav-height-fixed

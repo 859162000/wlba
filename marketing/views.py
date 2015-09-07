@@ -851,26 +851,29 @@ def celebrate_ajax(request):
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-    record = IntroducedBy.objects.filter(user_id=user.id).first()
+    # delete by Yihen@20150906, 需求有变更，放开所有的渠道
+    #record = IntroducedBy.objects.filter(user_id=user.id).first()
 
-    if record is not None:
-        try:
-            channel = Channels.objects.filter(id=record.channel).first()
-        except Exception, reason:
-            to_json_response = {
-                'ret_code': 4000,
-                'message': u'渠道用户不允许参加这个活动',
-            }
-            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-    else:
-        channel = None
+    #if record is not None and record.channel_id != 18:
+    #    try:
+    #        channel = Channels.objects.filter(id=record.channel_id).first()
+    #    except Exception, reason:
+    #        to_json_response = {
+    #            'ret_code': 4000,
+    #            'message': u'渠道用户不允许参加这个活动',
+    #        }
+    #        logger.debug("Exception:渠道用户不允许参加, Reason:%s" % ( reason, ) )
+    #        logger.debug("Exception:渠道用户不允许参加, record.__dict__:%s" % (record.__dict__ , ) )
+    #        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+    #else:
+    #    channel = None
 
-    if channel is not None and channel.name:
-        to_json_response = {
-            'ret_code': 4000,
-            'message': u'渠道用户不允许参加这个活动',
-        }
-        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+    #if channel is not None and channel.name and channel.id != 18:
+    #    to_json_response = {
+    #        'ret_code': 4000,
+    #        'message': u'渠道用户不允许参加这个活动',
+    #    }
+    #    return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
     if request.is_ajax() and request.method == 'POST':
         activity = WanglibaoAwardActivity(request)
@@ -904,7 +907,7 @@ class WanglibaoAwardActivity(APIView):
     def __init__(self, request):
         self.request = request
         self.user = self.request.user
-        activity_start = datetime(2015, 9, 1, 0, 0)
+        activity_start = datetime(2015, 9, 6, 0, 0)
         self.record = P2PEquity.objects.filter(equity__gte=5000, created_at__gt=activity_start, user_id=request.user.id).aggregate(counts=Count('id'))
 
     def is_valid_user(self):
@@ -912,7 +915,7 @@ class WanglibaoAwardActivity(APIView):
             Description:判断用户是不是在活动期间内注册的新用户
         """
         create_at = int(time.mktime(self.user.date_joined.date().timetuple()))  # 用户注册的时间戳
-        activity_start = time.mktime(datetime(2015, 9, 1).timetuple())  # 活动开始时间
+        activity_start = time.mktime(datetime(2014, 8, 1).timetuple())  # 活动开始时间
 
         if activity_start > create_at:
             to_json_response = {
