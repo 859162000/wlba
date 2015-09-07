@@ -1898,15 +1898,21 @@ def zhongjin_get_products():
         prod = dict()
         if product in new_products:
             prod['method'] = 'add'
-        else:
-            if product.status in [u'录标', u'录标完成', u'待审核', u'正在招标']:
-                prod['method'] = 'update'
-            else:
-                prod['method'] = 'down'
+
+        # # 如果用他们的id的话, 我们不做更新和下架
+        # else:
+        #     if product.status in [u'录标', u'录标完成', u'待审核', u'正在招标']:
+        #         prod['method'] = 'update'
+        #     else:
+        #         prod['method'] = 'down'
 
         prod['classId'] = 1
-        if not prod['method'] == 'add':
-            prod['productId'] = product.pk    # productId 不是我们的id, 是他们返回的用来修改对应的
+
+        # # 如果用他们的id的话, 我们不做更新和下架
+        # if not prod['method'] == 'add':
+        #     prod['productId'] = None
+        #     # prod['productId'] = product.pk    # productId 不是我们的id, 是他们返回的用来修改对应的
+
         if prod['method'] == 'add':
             prod['productName'] = product.name
             prod['borrowMoney'] = product.total_amount
