@@ -70,7 +70,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack'):
                 obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
                         "id": x.id, "invest_amount": event.invest_amount,
                         "unavailable_at": stamp(end_time), "event_id": event.id,
-                        "highest_amount": event.highest_amount}
+                        "highest_amount": event.highest_amount, "order_by": 2}
                 if start_time < timezone.now() < end_time:
                     if event.apply_platform == "all" or event.apply_platform == device_type:
                         if obj['method'] == REDPACK_RULE['percent']:
@@ -96,15 +96,15 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack'):
                     obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
                            "id": coupon.id, "invest_amount": event.invest_amount,
                            "unavailable_at": stamp(end_time), "event_id": event.id,
-                           "highest_amount": event.highest_amount}
+                           "highest_amount": event.highest_amount, "order_by": 1}
                     if start_time < timezone.now() < end_time:
                         if event.apply_platform == "all" or event.apply_platform == device_type:
                             if obj['method'] == REDPACK_RULE['interest_coupon']:
                                 obj['amount'] = obj['amount']/100.0
                             packages['available'].append(obj)
 
-
-        packages['available'].sort(key=lambda x:x['unavailable_at'])
+        packages['available'].sort(key=lambda x: x['unavailable_at'])
+        packages['available'].sort(key=lambda x: x['order_by'])
     else:
         packages = {"used":[], "unused":[], "expires":[], "invalid":[]}
         if rtype == 'redpack':
@@ -116,7 +116,10 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack'):
 
         for x in records:
             event = x.redpack.event
-
+            if event.rtype == 'interest_coupon':
+                order_by = 1
+            else:
+                order_by = 2
             start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
                                                       x.created_at, event.available_at, event.unavailable_at)
 
@@ -124,7 +127,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack'):
                     "available_at": stamp(start_time), "unavailable_at": stamp(end_time),
                     "id": x.id, "invest_amount": event.invest_amount, "amount": event.amount, "event_id": event.id,
                     "highest_amount": event.highest_amount,
-                    "method": REDPACK_RULE[event.rtype]}
+                    "method": REDPACK_RULE[event.rtype], "order_by": order_by}
             if obj['method'] == REDPACK_RULE['percent'] or obj['method'] == REDPACK_RULE['interest_coupon']:
                 obj['amount'] = obj['amount']/100.0
 
@@ -141,6 +144,8 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack'):
                         packages['expires'].append(obj)
                     else:
                         packages['unused'].append(obj)
+        packages['available'].sort(key=lambda x: x['unavailable_at'])
+        packages['available'].sort(key=lambda x: x['order_by'])
     return {"ret_code":0, "packages":packages}
 
 

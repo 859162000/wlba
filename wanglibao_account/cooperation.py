@@ -33,21 +33,16 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY, FUBA_CALL_BACK_URL, WLB_FOR_FUBA_KEY, \
      FUBA_COOP_ID, FUBA_KEY, FUBA_CHANNEL_CODE, FUBA_DEFAULT_TID, FUBA_PERIOD, \
      WLB_FOR_YUNDUAN_KEY, YUNDUAN_CALL_BACK_URL, YUNDUAN_COOP_ID, WLB_FOR_YICHE_KEY, YICHE_COOP_ID, \
-     YICHE_KEY, YICHE_CALL_BACK_URL, WLB_FOR_ZHITUI1_KEY, ZHITUI_COOP_ID, ZHITUI_CALL_BACK_URL, \
-     WLB_FOR_ZGDX_KEY, ZGDX_CALL_BACK_URL, ZGDX_PARTNER_NO, ZGDX_SERVICE_CODE, ZGDX_CONTRACT_ID, \
-     ZGDX_ACTIVITY_ID, ZGDX_PLAT_OFFER_ID, ZGDX_KEY, ZGDX_IV
+     YICHE_KEY, YICHE_CALL_BACK_URL, WLB_FOR_ZHITUI1_KEY, ZHITUI_COOP_ID, ZHITUI_CALL_BACK_URL
 from wanglibao_account.models import Binding, IdVerification
-from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback
+from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
 from wanglibao_pay.models import Card
 from wanglibao_profile.models import WanglibaoUserProfile
-from wanglibao_account.models import UserThreeOrder
 from wanglibao_redis.backend import redis_backend
 from dateutil.relativedelta import relativedelta
-from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes, hex2bin
 from decimal import Decimal
 import re
-import json
 
 logger = logging.getLogger(__name__)
 
@@ -919,71 +914,6 @@ class ZhiTuiRegister(CoopRegister):
             }
             common_callback.apply_async(
                 kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
-
-
-class ZGDXRegister(CoopRegister):
-    def __init__(self, request):
-        super(ZGDXRegister, self).__init__(request)
-        self.c_code = 'zgdx'
-        self.call_back_url = ZGDX_CALL_BACK_URL
-        self.partner_no = ZGDX_PARTNER_NO
-        self.service_code = ZGDX_SERVICE_CODE
-        self.contract_id = ZGDX_CONTRACT_ID
-        self.activity_id = ZGDX_ACTIVITY_ID
-        self.plat_offer_id = ZGDX_PLAT_OFFER_ID
-        self.coop_key = ZGDX_KEY
-        self.iv = ZGDX_IV
-
-    def zgdx_call_back(self, request_no, phone_id, user, binding):
-        if datetime.datetime.now().day >= 28:
-            effect_type = '1'
-        else:
-            effect_type = '0'
-        code = {
-            'request_no': request_no,
-            'phone_id': phone_id,
-            'service_code': self.service_code,
-            'contract_id': self.contract_id,
-            'activity_id': self.activity_id,
-            'order_type': '1',
-            'plat_offer_id': self.plat_offer_id,
-            'effect_type': effect_type,
-        }
-        encrypt_str = encrypt_mode_cbc(json.dumps(code), self.coop_key, self.iv)
-        params = {
-            'code': encodeBytes(hex2bin(encrypt_str)),
-            'partner_no': self.partner_no,
-        }
-
-        # 创建订单记录
-        channel_recode = Channels.objects.filter(code=binding.btype).first()
-        order = UserThreeOrder(user=user, order_on=channel_recode, request_no=request_no)
-        order.save()
-
-        # 异步回调
-        zgdx_callback.apply_async(
-            kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
-
-    def binding_card_call_back(self, user):
-        binding = Binding.objects.filter(user_id=user.id).first()
-
-        # 判定是否首次绑卡
-        if binding and binding.extra != '1':
-            phone_id = WanglibaoUserProfile.objects.get(user_id=user.id).phone
-            request_no = get_uid_for_coop(str(user.id)+'wlb_bk')[8:-8]
-            binding.extra = '1'
-            binding.save()
-            self.zgdx_call_back(request_no, phone_id, user, binding)
-
-    def purchase_call_back(self, user):
-        # 判断是否是首次投资
-        binding = Binding.objects.filter(user_id=user.id).first()
-        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
-        # if binding and p2p_record.count() == 1:
-
-        phone_id = WanglibaoUserProfile.objects.get(user_id=user.id).phone
-        request_no = get_uid_for_coop(str(user.id)+'wlb_tz')[8:-8]
-        self.zgdx_call_back(request_no, phone_id, user, binding)
 
 
 # 注册第三方通道

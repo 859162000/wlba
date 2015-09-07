@@ -1,4 +1,5 @@
 -load formatters
+-load mathfilters
 doctype html
 html
   head
@@ -26,19 +27,6 @@ html
                   .landed-cont-hide.font-m
                     div 全方位风险控制
                     div 第三方100%本息保障
-                  .landed-cont-show.font-m.hide
-                    span.user-data-warp
-                      div
-                        span.t-d17.font-xs 可用余额：
-                        span {{user.margin.margin | money_format}}
-                        span.font-xs &nbsp元
-                      div
-                        span.t-d17.font-xs 账户资产：
-                        span {{p2p_total_asset | money_format}}
-                        span.font-xs &nbsp元
-                  .landed-cont-btn
-                    i.icon.iconfont.icon-eye03
-                    i.icon.iconfont.icon-eye02.hide
                 .landed-btn.font-m
                   a(href="/pay/banks/").landed-for-chong.mg-r-l 充值
                   a(href="/p2p/list/").landed-for-tou 投资
@@ -49,7 +37,7 @@ html
                 .font-m.t-d4 平均年化收益率
                 .font-m.t-d5.mg-t-s.mg-b-sm 账户资金由民生银行全额托管
                 .unlanded-btn.font-m
-                  a(href="/accounts/register/").unlanded-for-regist.mg-r-sm 快速注册
+                  a(href="/accounts/register/?next=/activity/september_activity/").unlanded-for-regist.mg-r-sm 快速注册
                   a(href="/accounts/login/").unlanded-for-login 登录
     //01
     .sep-part.sep-part1
@@ -119,7 +107,10 @@ html
               i 50
             | 元直抵红包
           .btn-box.text-center
-            a(href="#").red-btn 立即注册
+            if user.is_authenticated
+              a(href="javascript:void(0)").red-btn.now-register 立即注册
+            else
+              a(href="javascript:void(0)").red-btn.now-register 立即注册
         .sep-part-rht
           img(src="/static/imgs/pc_activity/september/red-packet.png")
     //03
@@ -138,7 +129,10 @@ html
               i 150
             | 元折扣红包
           .btn-box.text-center
-            a(href="#").red-btn 立即充值
+            if user.is_authenticated
+              a(href="/pay/banks/").red-btn 立即充值
+            else
+              a(href="javascript:void(0)").red-btn.to-register 立即充值
           .promote.text-center 注：完成操作奖励自动发放
     //04
     .sep-part.sep-part4
@@ -154,7 +148,10 @@ html
               i 50
             | 元现金红包
           .btn-box.text-center
-            a(href="#").red-btn 立即投资
+            if user.is_authenticated
+              a(href="/p2p/list/").red-btn 立即投资
+            else
+              a(href="javascript:void(0)").red-btn.to-register 立即投资
           .promote.text-center 注：完成操作奖励自动发放
         .sep-part-rht
           img(src="/static/imgs/pc_activity/september/purse.png")
@@ -212,20 +209,23 @@ html
       a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank").footer-qq.inline-block
 
     .page(style='display:none')
-    .errorWin(style='display:none')
-        p.p1 对不起，亲~
-        p.p2 您不符合参加规则
-        p
-            span
-        p
-            a(href='javascript:void(0)')#closeWin 知道了
-    .winningDiv(style='display:none')
+    .errorWin.alert-box(style='display:none')
+        p 抱歉~您不符合参加规则
+        p.winningBtn
+          a(href='javascript:void(0)').spanBtn 好吧
+    .winningDiv.alert-box(style='display:none')
         //.winningImg
         span.spanBtn
         p 恭喜您获得
           em#moeny
         .winningBtn
             a(href='javascript:void(0)').againBtn 再抽一次
+
+    .promote-register.alert-box(style='display:none')
+      span.spanBtn
+      p 您需要先注册
+      p.winningBtn
+        a(href='javascript:void(0)').banner-register 立即去注册
     script.
       require(['/static/js/september_activity.js'])
 
