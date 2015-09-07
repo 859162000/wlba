@@ -22,7 +22,7 @@ urlpatterns = patterns(
     #url(r'^act_invite/$', TemplateView.as_view(template_name="act_invite.jade")),
     url(r'^ganjiwang/$', TemplateView.as_view(template_name="ganjiwang.jade")),
     url(r'^baidu/$', TemplateView.as_view(template_name="baidu.jade"), name='marketing_baidu'),
-    url(r'^xunlei_august/$', TemplateView.as_view(template_name="xunlei-august.jade")),
+    #url(r'^xunlei_august/$', TemplateView.as_view(template_name="xunlei-august.jade")),
     url(r'^singapore/$', TemplateView.as_view(template_name="singapore.jade")),
     url(r'^eight_gift/$', TemplateView.as_view(template_name="eight_gift.jade")),
     #url(r'^advance/$', TemplateView.as_view(template_name="advance.jade")),
@@ -30,6 +30,7 @@ urlpatterns = patterns(
     #url(r'^qixi/$', TemplateView.as_view(template_name="qixi.jade")),
     url(r'^xunlei_setp/$', TemplateView.as_view(template_name="xunlei_setp.jade")),
     url(r'^anniversary/$', TemplateView.as_view(template_name="anniversary.jade")),
+    url(r'^app_anniversary/$', TemplateView.as_view(template_name="app_anniversary.jade")),
     url(r'^eight_gift_two/$', TemplateView.as_view(template_name="eight_gift_two.jade")),
     url(r'^xingmei/$', TemplateView.as_view(template_name="xingmei.jade")),
 
@@ -60,8 +61,8 @@ urlpatterns += patterns(
     url(r'^app_eight_gift_two/$', TemplateView.as_view(template_name="app_eight_gift_two.jade")),
     url(r'^app_eight_gift_two_h5/$', TemplateView.as_view(template_name="app_eight_gift_two_h5.jade")),
 
+    url(r'^wx_anniversary/$', TemplateView.as_view(template_name="wx_anniversary.jade")),
     url(r'^app_anniversary/$', TemplateView.as_view(template_name="app_anniversary.jade")),
-    url(r'^wap_anniversary/$', TemplateView.as_view(template_name="anniversary_wap.jade")),
 
 )
 
