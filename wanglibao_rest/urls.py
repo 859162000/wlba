@@ -44,7 +44,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
                             DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView,
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
-                            CaptchaValidationCodeView)
+                            CaptchaValidationCodeView, TopsOfEaringView)
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
 
@@ -189,6 +189,7 @@ urlpatterns = patterns(
     url(r'^shareurl/$', ShareUrlAPIView.as_view()),
     url(r'^gettopofday/$', TopsOfDayView.as_view()),
     url(r'^gettopofweek/$', TopsOfWeekView.as_view()),
+    url(r'^gettopofearings/', TopsOfEaringView.as_view()),
 
     url(r'^redpacket/$', RedPacketListAPIView.as_view()),
     url(r'^redpacket/exchange/$', RedPacketChangeAPIView.as_view()),

@@ -566,7 +566,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'wanglibao_account.tasks.caimiao_rating_info_post_task',
         'schedule': crontab(minute=0, hour=0)
     },
-
+    #add by Huomeimei  每日更新虚拟全民淘金账号数据
+    'update_robot_earning': {
+        'task': 'wanglibao_redpack.tasks.update_robot_earning',
+        'schedule': crontab(minute=0, hour=0)
+    },
     # by Zhoudong 中金标的推送(包含新标, 更新, 下架)
     'zhongjin_send_data': {
         'task': 'wanglibao_account.tasks.zhongjin_post_task',
