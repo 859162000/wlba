@@ -331,7 +331,6 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       $('.use-jiaxi-amount').text(data.amount + '% ');
       $('#id_amount').attr('activity-jiaxi', data.amount)
 
-
   ddData = []
   if $('.red-pack').size() > 0
     $(document).ready () ->
