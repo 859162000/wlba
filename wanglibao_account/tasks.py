@@ -8,6 +8,7 @@ __author__ = 'rsj217'
 import requests
 import urllib
 import logging
+import json
 from wanglibao.celery import app
 
 from wanglibao_account.models import Binding
@@ -149,6 +150,23 @@ def yiche_callback(url, params, channel):
 
 
 @app.task
+def zgdx_callback(url, params, channel):
+    logger.info("Enter %s_callback task===>>>" % channel)
+    ret = None
+    try:
+        logger.info(params)
+        ret = requests.post(url, data=json.dumps(params))
+        logger.info('%s callback url: %s'% (channel, ret.url))
+        logger.info('callback return: %s' % (ret.text))
+    except Exception, e:
+        logger.info(" {'%s callback':'failed to connect'} " % channel)
+        logger.info(e)
+
+    if ret:
+        logger.info(ret.text)
+
+
+@app.task
 def caimiao_platform_post_task():
     """
     author: Zhoudong
@@ -190,3 +208,14 @@ def caimiao_rating_info_post_task():
     """
     from wanglibao_account.cooperation import caimiao_post_rating_info
     caimiao_post_rating_info()
+
+
+@app.task
+def zhongjin_post_task():
+    """
+    author: Zhoudong
+    向中金发送p2p 数据
+    :return:
+    """
+    from wanglibao_account.cooperation import zhongjin_post_p2p_info
+    zhongjin_post_p2p_info()

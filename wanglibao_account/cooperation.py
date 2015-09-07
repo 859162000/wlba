@@ -2,6 +2,8 @@
 # encoding:utf-8
 import decimal
 import json
+import urllib2
+from django.utils.http import urlencode
 from wanglibao_account.utils import str_to_float
 
 if __name__ == '__main__':
@@ -35,15 +37,17 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_ZGDX_KEY, ZGDX_CALL_BACK_URL, ZGDX_PARTNER_NO, ZGDX_SERVICE_CODE, ZGDX_CONTRACT_ID, \
      ZGDX_ACTIVITY_ID, ZGDX_PLAT_OFFER_ID, ZGDX_KEY, ZGDX_IV
 from wanglibao_account.models import Binding, IdVerification
-from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback
+from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
 from wanglibao_pay.models import Card
 from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_account.models import UserThreeOrder
 from wanglibao_redis.backend import redis_backend
 from dateutil.relativedelta import relativedelta
+from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes, hex2bin
 from decimal import Decimal
 import re
-from M2Crypto.EVP import Cipher
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -134,19 +138,7 @@ def save_to_binding(user, record, request):
         pass
 
 
-def generate_Encrypt(key, iv, mode, data):
-    mode = mode.lower()
-    cipher = Cipher(alg=mode, key=key, iv=iv, op=1)
-    buf = cipher.update(data)
-    buf = buf + cipher.final()
-    del cipher
-    # 将明文从字节流转为16进制
-    output = ''
-    for i in buf:
-        output += '%02X' % (ord(i))
-    return output
-
-#判断网站来自mobile还是pc
+# 判断网站来自mobile还是pc
 def check_mobile(request):
     """
     demo :
@@ -739,7 +731,7 @@ class FUBARegister(CoopRegister):
             if not binding.extra:
                 # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
                 if earliest_settlement_time:
-                    binding.extra=earliest_settlement_time
+                    binding.extra = earliest_settlement_time
                     binding.save()
 
 
@@ -919,7 +911,7 @@ class ZhiTuiRegister(CoopRegister):
                 'p_cd': '',
                 'price': invest_amount,
                 'it_cnt': 1,
-                'o_date': invest_time.strftime('%Y%m%d%H%M%S'),
+                'o_date': timezone.localtime(invest_time).strftime('%Y%m%d%H%M%S'),
                 'rate': round(invest_amount * int(period) * Decimal(0.01) / Decimal(365), 2),
                 'rate_memo': '',
                 'status': 1,
@@ -942,47 +934,56 @@ class ZGDXRegister(CoopRegister):
         self.coop_key = ZGDX_KEY
         self.iv = ZGDX_IV
 
-    def zgdx_call_back(self, params):
-        params['partner_no'] = self.partner_no,
-        params_code = params['code']
-        params_code['service_code'] = self.service_code,
-        params_code['contract_id'] = self.contract_id,
-        params_code['activity_id'] = self.activity_id,
-        params_code['order_type'] = 1,
-        params_code['plat_offer_id'] = self.plat_offer_id,
+    def zgdx_call_back(self, request_no, phone_id, user, binding):
         if datetime.datetime.now().day >= 28:
-            params_code['effect_type'] = 1,
+            effect_type = '1'
         else:
-            params_code['effect_type'] = 0,
-        params['code'] = generate_Encrypt(self.coop_key, self.iv, 'aes_128_ecb', params_code)
-        common_callback.apply_async(
+            effect_type = '0'
+        code = {
+            'request_no': request_no,
+            'phone_id': phone_id,
+            'service_code': self.service_code,
+            'contract_id': self.contract_id,
+            'activity_id': self.activity_id,
+            'order_type': '1',
+            'plat_offer_id': self.plat_offer_id,
+            'effect_type': effect_type,
+        }
+        encrypt_str = encrypt_mode_cbc(json.dumps(code), self.coop_key, self.iv)
+        params = {
+            'code': encodeBytes(hex2bin(encrypt_str)),
+            'partner_no': self.partner_no,
+        }
+
+        # 创建订单记录
+        channel_recode = Channels.objects.filter(code=binding.btype).first()
+        order = UserThreeOrder(user=user, order_on=channel_recode, request_no=request_no)
+        order.save()
+
+        # 异步回调
+        zgdx_callback.apply_async(
             kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
     def binding_card_call_back(self, user):
         binding = Binding.objects.filter(user_id=user.id).first()
-        if binding:
-            phone_number = WanglibaoUserProfile.objects.get(user_id=user.id).phone
-            params = {
-                'code': {
-                    'request_no': get_username_for_coop(str(user.id)+'1'),
-                    'phone_id': phone_number,
-                },
-            }
-            self.zgdx_call_back(params)
+
+        # 判定是否首次绑卡
+        if binding and binding.extra != '1':
+            phone_id = WanglibaoUserProfile.objects.get(user_id=user.id).phone
+            request_no = get_uid_for_coop(str(user.id)+'wlb_bk')[8:-8]
+            binding.extra = '1'
+            binding.save()
+            self.zgdx_call_back(request_no, phone_id, user, binding)
 
     def purchase_call_back(self, user):
         # 判断是否是首次投资
         binding = Binding.objects.filter(user_id=user.id).first()
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
         # if binding and p2p_record.count() == 1:
-        phone_number = WanglibaoUserProfile.objects.get(user_id=user.id).phone
-        params = {
-            'code': {
-                'request_no': get_username_for_coop(str(user.id)+'2'),
-                'phone_id': phone_number,
-            },
-        }
-        self.zgdx_call_back(params)
+
+        phone_id = WanglibaoUserProfile.objects.get(user_id=user.id).phone
+        request_no = get_uid_for_coop(str(user.id)+'wlb_tz')[8:-8]
+        self.zgdx_call_back(request_no, phone_id, user, binding)
 
 
 # 注册第三方通道
@@ -1869,3 +1870,142 @@ class ZhongniuP2PDataQuery(APIView):
                 'msg': u"没有权限访问"
             }
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+# 中金在线
+def zhongjin_get_products():
+    """
+    author: Zhoudong
+    :return: 返回所有需要处理的 p2p 产品
+    """
+
+    now = timezone.now()
+
+    wangli_products = set()
+    start_time = now - settings.ZHONGJIN_UPDATE_TIMEDELTA
+
+    new_products = P2PProduct.objects.filter(Q(publish_time__gte=start_time) & Q(publish_time__lt=now))
+    wangli_products.update(new_products)
+    # 还需要把更新的标全部推送
+    p2p_equity = P2PEquity.objects.filter(created_at__gte=start_time).all()
+    updated_products = set([p.product for p in p2p_equity])
+    wangli_products.update(updated_products)
+
+    prods = []
+
+    for product in wangli_products:
+        prod = dict()
+        if product in new_products:
+            prod['method'] = 'add'
+
+        # # 如果用他们的id的话, 我们不做更新和下架
+        # else:
+        #     if product.status in [u'录标', u'录标完成', u'待审核', u'正在招标']:
+        #         prod['method'] = 'update'
+        #     else:
+        #         prod['method'] = 'down'
+
+        prod['classId'] = 1
+
+        # # 如果用他们的id的话, 我们不做更新和下架
+        # if not prod['method'] == 'add':
+        #     prod['productId'] = None
+        #     # prod['productId'] = product.pk    # productId 不是我们的id, 是他们返回的用来修改对应的
+
+        if prod['method'] == 'add':
+            prod['productName'] = product.name
+            prod['borrowMoney'] = product.total_amount
+            prod['investmentMoney'] = 100
+            period = product.period if product.pay_method.startswith(u"日计息")/30 else product.period
+            prod['investmentPeriod'] = period
+
+            prod['completeness'] = "%.2f" % product.completion_rate
+            prod['stopTime'] = product.soldout_time.strftime("%Y-%m-%d") \
+                if product.soldout_time else product.end_time.strftime("%Y-%m-%d")
+            prod['riskPreference'] = 2
+            prod['expectedYield'] = product.expected_earning_rate
+
+            # 根据不同环境对应不同的url
+            if settings.ENV == 'debug':
+                prod['enterpriseId'] = settings.ZHONGJIN_TEST_ID
+                base_url = 'http://127.0.0.1:8000'
+            if settings.ENV == 'staging':
+                prod['enterpriseId'] = settings.ZHONGJIN_TEST_ID
+                base_url = 'https://staging.wanglibao.com'
+            if settings.ENV == 'production':
+                prod['enterpriseId'] = settings.ZHONGJIN_ID
+                base_url = 'https://www.wanglibao.com'
+            prod['linkProfiles'] = base_url + '/p2p/detail/' + str(product.pk)
+
+        prod['dt'] = int(time.time())
+
+        prods.append(prod)
+
+    return prods
+
+
+def zhongjin_get_sign(args_dict):
+    """
+    author: Zhoudong
+    md5 加密方式: 待传参数 aid=1&bid=2&cid=3 那么加密串为：aid=1||bid=2||cid=32CF7AC2A27CC9B48C4EFCD7E356CD95F
+    http://open.rong.cnfol.com/product.html
+    根据参数获取对应的 sign, 然后拼成需要去请求的url
+    :return:
+    """
+    if settings.ENV == settings.ENV_PRODUCTION:
+        url = settings.ZHONGJIN_P2P_URL
+        key = settings.ZHONGJIN_SECRET
+    else:
+        url = settings.ZHONGJIN_P2P_TEST_URL
+        key = settings.ZHONGJIN_TEST_SECRET
+
+    url += '?' + urlencode(args_dict)
+
+    l = urlencode(args_dict).split('&')
+    l.sort()
+
+    md5_str = ''
+    for i in l:
+        md5_str += i + '||'
+
+    md5_str = md5_str[0:-2] + key
+
+    sign = hashlib.md5(md5_str).hexdigest()
+    url += '&sign=' + sign
+
+    return url
+
+
+def zhongjin_post_p2p_info():
+    """
+    author: Zhoudong
+    去请求对应的地址
+    :return:
+    """
+    prods = zhongjin_get_products()
+    for args_dict in prods:
+        url = zhongjin_get_sign(args_dict)
+        print url
+        urllib2.urlopen(url)
+
+
+def zhongjin_list_p2p():
+    """
+    author: Zhoudong
+    查看所有数据
+    :return:
+    """
+    args_dict = dict()
+    args_dict['method'] = 'list'
+    args_dict['dt'] = int(time.time())
+    # 根据不同环境对应不同的url
+    if settings.ENV == 'production':
+        args_dict['enterpriseId'] = settings.ZHONGJIN_ID
+    else:
+        args_dict['enterpriseId'] = settings.ZHONGJIN_TEST_ID
+
+    args_dict['classId'] = 1
+
+    url = zhongjin_get_sign(args_dict)
+
+    return url

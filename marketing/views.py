@@ -40,7 +40,8 @@ from django.utils import timezone
 from wanglibao_redpack.models import RedPackEvent
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity.models import ActivityRecord
-
+import logging
+logger = logging.getLogger('marketing')
 
 class YaoView(TemplateView):
     template_name = 'yaoqing.jade'
@@ -614,7 +615,7 @@ class ActivityJoinLogCountAPIView(APIView):
         })
 
 
-def ajax_get_activity_record(request, action='get_award'):
+def ajax_get_activity_record(action='get_award'):
     """
         author: add by Yihen@20150825
         description:迅雷9月抽奖活动，获得用户的抽奖记录
@@ -835,6 +836,10 @@ class ThunderActivityRewardCounter(APIView):
         })
 
 def celebrate_ajax(request):
+    """
+        Author: add by Yihen@20150827
+        Description: 网利宝公司活动 ,大转盘
+    """
     user = request.user
     action = request.POST.get('action',)
     if action == 'GET_AWARD':
@@ -846,18 +851,29 @@ def celebrate_ajax(request):
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-    record = IntroducedBy.objects.filter(user_id=user.id).first()
-    if record is not None:
-        channel = Channels.objects.filter(id=record.channel).first()
-    else:
-        channel = None
+    # delete by Yihen@20150906, 需求有变更，放开所有的渠道
+    #record = IntroducedBy.objects.filter(user_id=user.id).first()
 
-    if channel is not None and channel.name:
-        to_json_response = {
-            'ret_code': 4000,
-            'message': u'渠道用户不允许参加这个活动',
-        }
-        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+    #if record is not None and record.channel_id != 18:
+    #    try:
+    #        channel = Channels.objects.filter(id=record.channel_id).first()
+    #    except Exception, reason:
+    #        to_json_response = {
+    #            'ret_code': 4000,
+    #            'message': u'渠道用户不允许参加这个活动',
+    #        }
+    #        logger.debug("Exception:渠道用户不允许参加, Reason:%s" % ( reason, ) )
+    #        logger.debug("Exception:渠道用户不允许参加, record.__dict__:%s" % (record.__dict__ , ) )
+    #        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+    #else:
+    #    channel = None
+
+    #if channel is not None and channel.name and channel.id != 18:
+    #    to_json_response = {
+    #        'ret_code': 4000,
+    #        'message': u'渠道用户不允许参加这个活动',
+    #    }
+    #    return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
     if request.is_ajax() and request.method == 'POST':
         activity = WanglibaoAwardActivity(request)
@@ -891,7 +907,7 @@ class WanglibaoAwardActivity(APIView):
     def __init__(self, request):
         self.request = request
         self.user = self.request.user
-        activity_start = datetime(2015, 9, 1, 0, 0)
+        activity_start = datetime(2015, 9, 6, 0, 0)
         self.record = P2PEquity.objects.filter(equity__gte=5000, created_at__gt=activity_start, user_id=request.user.id).aggregate(counts=Count('id'))
 
     def is_valid_user(self):
@@ -899,7 +915,7 @@ class WanglibaoAwardActivity(APIView):
             Description:判断用户是不是在活动期间内注册的新用户
         """
         create_at = int(time.mktime(self.user.date_joined.date().timetuple()))  # 用户注册的时间戳
-        activity_start = time.mktime(datetime(2014, 9, 1).timetuple())  # 活动开始时间
+        activity_start = time.mktime(datetime(2014, 8, 1).timetuple())  # 活动开始时间
 
         if activity_start > create_at:
             to_json_response = {
@@ -956,17 +972,17 @@ class WanglibaoAwardActivity(APIView):
 
         result = {key: get_counts(value) for key, value in award_amount.iteritems()}
 
-        if activity_id % 1000 == 0:
+        if activity_id % 100 == 0:
             for award in (1000, 500, 200):
                 if result[award] < award_amount[award]:
                     return award
 
-        if activity_id % 500 == 0:
+        if activity_id % 49 == 0:
             for award in (500, 200):
                 if result[award] < award_amount[award]:
                     return award
 
-        if activity_id % 200 == 0:
+        if activity_id % 48 == 0:
             for award in (200,):
                 if result[award] < award_amount[award]:
                     return award
@@ -993,7 +1009,7 @@ class WanglibaoAwardActivity(APIView):
                 create_time=timezone.now(),
             )
 
-            join_log = ActivityJoinLog.objects.filter(action_name='celebrate_award', user=self.request.user).order_by('-create_time').first()
+            join_log = ActivityJoinLog.objects.filter(action_name='celebrate_award', user=self.request.user, amount=0).order_by('-create_time').first()
             join_log.amount = self.get_award_mount(activity.id)
             join_log.save(update_fields=['amount'])
             count += 1
@@ -1003,12 +1019,12 @@ class WanglibaoAwardActivity(APIView):
         join_log.join_times -= 1
         join_log.save(update_fields=['join_times'])
         money = join_log.amount
-        describe = 'celebrate_year_' + str(money)
+        describe = 'celebrate_year_' + str(int(money))
         try:
             dt = timezone.datetime.now()
-            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe, give_start_at__lt=dt, give_end_at__gt=dt).first()
+            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
         except Exception, reason:
-            print reason
+            logger.debug("exception reason: %s " % (reason))
 
         if redpack_event:
             redpack_backends.give_activity_redpack(self.request.user, redpack_event, 'pc')

@@ -50,6 +50,8 @@ from marketing import tools
 from django.conf import settings
 from wanglibao_account.models import Binding
 from wanglibao_anti.anti.anti import AntiForAllClient
+from wanglibao_redpack.models import Income
+from decimal import Decimal
 
 logger = logging.getLogger(__name__)
 
@@ -618,6 +620,33 @@ class TopsOfWeekView(APIView):
             return Response({"ret_code": -1, "records": list()})
 
         return Response({"ret_code": 0, "records": records, "isvalid": isvalid})
+
+import random
+import operator
+
+class TopsOfEaringView(APIView):
+    """
+        得到全民淘金前十
+    """
+    permission_classes = ()
+    def post(self, request):
+        try:
+            records = []
+            f = file(settings.BASE_DIR+'/wanglibao_redpack/data/topearnings.txt', 'r')
+            lines = f.readlines()
+            f.close()
+            for line in lines:
+                phone, amount_str = line.split(",")
+                amount = Decimal(amount_str)
+                records.append({'phone':phone, 'amount':amount})
+            incomes = Income.objects.select_related('user').select_related('user__wanglibaouserprofile').values('user__wanglibaouserprofile__phone').annotate(sum_amount=Sum('earning')).order_by('-sum_amount')[0]
+
+            records.append({'phone':safe_phone_str(incomes['user__wanglibaouserprofile__phone']), 'amount':incomes['sum_amount']})
+            records.sort(key=operator.itemgetter('amount'), reverse=True)
+        except Exception, e:
+            print e
+            return Response({"ret_code": -1, "records": list()})
+        return Response({"ret_code": 0, "records": records})
 
 class TopsOfMonthView(APIView):
     """

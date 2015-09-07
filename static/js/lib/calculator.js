@@ -64,7 +64,11 @@
     });
     $('input[data-role=fee-calculator]').keyup();
     p2pCalculate = function() {
+<<<<<<< HEAD
       var activity_jiaxi, activity_rate, amount, earning, earning_element, earning_elements, existing, fee_earning, fee_element, fee_elements, i, j, k, len, len1, pay_method, period, rate, results, target;
+=======
+      var activity_jiaxi, activity_rate, amount, earning, earning_element, earning_elements, existing, fee_earning, fee_element, fee_elements, i, pay_method, period, rate, target, _i, _j, _len, _len1, _results;
+>>>>>>> wanglibao/master
       target = $('input[data-role=p2p-calculator]');
       existing = parseFloat(target.attr('data-existing'));
       period = target.attr('data-period');
@@ -100,12 +104,20 @@
         fee_element = fee_elements[i];
         if (fee_earning && $.isNumeric(fee_earning)) {
           $(fee_element).text(fee_earning);
+<<<<<<< HEAD
           results.push($('#vip-income-warp').show());
+=======
+          _results.push($('#vip-income-warp').show());
+>>>>>>> wanglibao/master
         } else {
           results.push($(fee_element).text("0.00"));
         }
       }
+<<<<<<< HEAD
       return results;
+=======
+      return _results;
+>>>>>>> wanglibao/master
     };
     $('input[data-role=p2p-calculator]').keyup(function(e) {
       return p2pCalculate();
@@ -118,3 +130,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=calculator.js.map
