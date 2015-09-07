@@ -66,6 +66,8 @@ from wanglibao_activity.models import ActivityRecord
 from aes import Crypt_Aes
 from wanglibao.settings import AMORIZATION_AES_KEY
 from wanglibao_anti.anti.anti import AntiForAllClient
+from wanglibao_account.utils import get_client_ip
+from wanglibao_account.models import UserThreeOrder
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
@@ -75,7 +77,7 @@ class RegisterView(RegistrationView):
     form_class = EmailOrPhoneRegisterForm
 
     def register(self, request, **cleaned_data):
-        """ 
+        """
             modified by: Yihen@20150812
             descrpition: if(line96~line97)的修改，针对特定的渠道延迟返积分、发红包等行为，防止被刷单
         """
@@ -448,9 +450,9 @@ class AccountHomeAPIView(APIView):
 
         today = timezone.datetime.today()
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_week = DailyIncome.objects.filter(user=user, 
+        fund_income_week = DailyIncome.objects.filter(user=user,
                             date__gt=today + datetime.timedelta(days=-8)).aggregate(Sum('income'))[ 'income__sum'] or 0
-        fund_income_month = DailyIncome.objects.filter(user=user, 
+        fund_income_month = DailyIncome.objects.filter(user=user,
                             date__gt=today + datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
 
         res = {
@@ -546,7 +548,7 @@ class AccountInviteAllGoldAPIView(APIView):
         first_count, second_count = dic['first_count'], dic['second_count']
         first_intro = dic['first_intro']
         commission = dic['commission']
-        
+
         introduces = IntroducedBy.objects.filter(introduced_by=request.user).select_related("user__wanglibaouserprofile").all()
         keys = commission.keys()
         for x in introduces:
@@ -556,7 +558,7 @@ class AccountInviteAllGoldAPIView(APIView):
             else:
                 first_intro.append([safe_phone_str(x.user.wanglibaouserprofile.phone), 0, 0])
 
-        return Response({"ret_code":0, "first":{"amount":first_amount, 
+        return Response({"ret_code":0, "first":{"amount":first_amount,
                         "earning":first_earning, "count":first_count, "intro":first_intro},
                         "second":{"amount":second_amount, "earning":second_earning,
                         "count":second_count}, "count":len(introduces)})
@@ -1719,3 +1721,35 @@ class AutomaticApiView(APIView):
             })
         except:
             return Response({'ret_code': 3009, 'message': u'用户设置自动投标计划失败'})
+
+
+def three_order_view(request):
+    """
+    记录来自第三方回调的订单状态
+    :param request:
+    :return:
+    """
+    trust_ip = settings.TRUST_IP
+    if len(trust_ip) > 0:
+        if get_client_ip(request) in trust_ip:
+            params = getattr(request, request.method)
+            request_no = params.get('request_no', None)
+            result_code = params.get('result_code', None)
+            if request_no and result_code:
+                try:
+                    order = UserThreeOrder.objects.get(request_no=request_no)
+                except Exception, e:
+                    return HttpResponseForbidden(u'订单流水号不存在')
+                if order:
+                    try:
+                        msg = params.get('msg_id', None)
+                        order.request_no = request_no
+                        order.result_code = result_code
+                        if msg:
+                            order.msg = msg
+                        order.save()
+                    except Exception, e:
+                        return HttpResponseForbidden(u'非法参数')
+                    return HttpResponse(1)
+            return HttpResponseForbidden(u'参数缺失')
+    return HttpResponseForbidden(u'不受信任的来源！！！')

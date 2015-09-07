@@ -378,3 +378,12 @@ def encodeBytes(bytelist):
         ret.append(chr(((byte >> 4) & 0xF) + 97))
         ret.append(chr((byte & 0xF) + 97))
     return ''.join(ret)
+
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[-1].strip()
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
