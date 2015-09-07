@@ -1,0 +1,142 @@
+@mixin btn
+  display: inline-block
+  padding: 0.3rem 1rem
+  border-radius: 1rem
+  background: #f5462e
+  color: #fff
+  font-size: 0.8rem
+  width: 6rem
+  text-align: center
+body
+  position: relative
+.txt-center
+  text-align: center
+//banner
+.sep-banner
+  width: 100%
+  overflow: hidden
+  background: #f6462f center top url("/static/imgs/mobile_activity/app_september/banner.jpg") no-repeat
+  background-size: 100% auto
+  &.min-banner
+    background-position: center bottom
+//mian
+.sep-main
+  background: #ffd200 1rem 4.5rem url("/static/imgs/mobile_activity/app_september/way-bg.png") no-repeat
+  background-size: 100% auto
+  padding: 0 0.5rem
+  width: 100%
+  box-sizing: border-box
+  margin: 0 auto
+  overflow: hidden
+  .btn-box
+    margin: 0.5rem 0
+    height: 1.5rem
+  .btn
+    +btn
+    box-shadow: 0 0.15rem 0 rgba(0,0,0,0.15)
+    margin-left: 6.65%
+    &:active
+      background: #e0402b
+  img
+    width: 95%
+  .welfare1
+    padding-top: 0.8rem
+    padding-left: 0.55rem
+  .welfare2
+    text-align: right
+    margin-top: 1.8rem
+    position: relative
+    z-index: 1
+    .btn-box
+      position: absolute
+      bottom: 30px
+      width: 100%
+      margin: 0
+      .btn
+        margin-right: 8.885%
+  .welfare3
+    padding: 20px
+    margin-top: 0.5rem
+    .btn
+      margin-left: 2.8%
+.promote-new
+  margin-top: 0.5rem
+  background: url("/static/imgs/mobile_activity/app_september/promote-new.jpg") no-repeat
+  background-size: 100% 100%
+  padding: 10% 0 8.9%
+  .use-cont
+    color: #d97819
+    width: 82%
+    margin: 0 auto
+.promote-new,.red-use
+  .use-tit
+    font-size: 0.7rem
+    text-align: center
+  .use-cont
+    font-size: 0.6rem
+    line-height: 1rem
+    p
+      margin-top: 0.5rem
+  .mt40px
+    margin-top: 1rem
+
+.red-use
+  margin-top: 1rem
+  padding-bottom: 2rem
+  .use-cont
+    color: #646464
+    padding: 0 1rem
+@media screen and (min-width: 701px)
+  .sep-main
+    background-position: 1rem 5.8rem
+//弹层
+.alert-page
+  position: absolute
+  top: 0
+  left: 0
+  height: 100%
+  width: 100%
+  background: #000
+  opacity: 0.6
+  filter: alpha(opacity=60)
+  z-index: 999
+  display: none
+.alert-box
+  background: #fff
+  border-radius: 0.5rem
+  height: 7rem
+  width: 11rem
+  padding: 0.8rem 0.5rem 0.8rem
+  position: fixed
+  top: 50%
+  left: 50%
+  margin: -3.5rem 0 0 -5.5rem
+  z-index: 9999
+  display: none
+  .mt1r
+    margin-top: 0.5rem
+  .alert-btn
+    +btn
+    padding: 0.3rem 1.5rem
+    &:active
+      background: #e0402b
+  .alert-close
+    cursor: pointer
+    width: 0.8rem
+    height: 0.8rem
+    background: url("/static/imgs/mobile_activity/app_september/alert-close.png") center center no-repeat
+    background-size: contain
+    position: absolute
+    top: 0.5rem
+    right: 0.5rem
+  .alert-cont
+    line-height: 1.5rem
+    font-size: 0.8rem
+    text-align: center
+    height: 3rem
+  &.alert-error
+    .alert-cont
+      padding-top: 1rem
+
+
+

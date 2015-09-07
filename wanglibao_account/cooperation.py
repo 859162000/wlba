@@ -966,6 +966,7 @@ class ZGDXRegister(CoopRegister):
 
     def binding_card_call_back(self, user):
         binding = Binding.objects.filter(user_id=user.id).first()
+
         # 判定是否首次绑卡
         if binding and binding.extra != '1':
             phone_id = WanglibaoUserProfile.objects.get(user_id=user.id).phone
@@ -979,6 +980,7 @@ class ZGDXRegister(CoopRegister):
         binding = Binding.objects.filter(user_id=user.id).first()
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
         # if binding and p2p_record.count() == 1:
+
         phone_id = WanglibaoUserProfile.objects.get(user_id=user.id).phone
         request_no = get_uid_for_coop(str(user.id)+'wlb_tz')[8:-8]
         self.zgdx_call_back(request_no, phone_id, user, binding)
