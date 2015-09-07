@@ -33,7 +33,7 @@ urlpatterns = patterns(
     url(r'^app_anniversary/$', TemplateView.as_view(template_name="app_anniversary.jade")),
     url(r'^eight_gift_two/$', TemplateView.as_view(template_name="eight_gift_two.jade")),
     url(r'^xingmei/$', TemplateView.as_view(template_name="xingmei.jade")),
-
+    url(r'^september_activity/$', TemplateView.as_view(template_name="september_activity.jade")),
 
 )
 
@@ -60,7 +60,8 @@ urlpatterns += patterns(
     url(r'^app_lottery/$', TemplateView.as_view(template_name="app_lottery.jade")),
     url(r'^app_eight_gift_two/$', TemplateView.as_view(template_name="app_eight_gift_two.jade")),
     url(r'^app_eight_gift_two_h5/$', TemplateView.as_view(template_name="app_eight_gift_two_h5.jade")),
-
+    url(r'^app_september/$', TemplateView.as_view(template_name="app_september.jade")),
+    url(r'^app_september_h5/$', TemplateView.as_view(template_name="app_september_h5.jade")),
     url(r'^wx_anniversary/$', TemplateView.as_view(template_name="wx_anniversary.jade")),
     url(r'^app_anniversary/$', TemplateView.as_view(template_name="app_anniversary.jade")),
     url(r'^app_colorpage/$', TemplateView.as_view(template_name="app_colorpage.jade")),
