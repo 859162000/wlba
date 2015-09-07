@@ -131,7 +131,7 @@ class AppRepaymentAPIView(APIView):
 
 class AppDayListView(TemplateView):
     """ app端榜单 """
-    template_name = 'day-list.jade'
+    template_name = 'client_daylist.jade'
 
     def get_context_data(self, **kwargs):
 
@@ -144,11 +144,11 @@ class AppDayListView(TemplateView):
 
 class AppGuardView(TemplateView):
     """ app保障页面 """
-    template_name = 'secure.jade'
+    template_name = 'client_secure.jade'
 
 class AppGuideView(TemplateView):
     """ app新手引导页面 """
-    template_name = 'guide.jade'
+    template_name = 'client_guide.jade'
 
 class AppSecureView(TemplateView):
     """ app安全保障页面"""
@@ -156,7 +156,7 @@ class AppSecureView(TemplateView):
 
 class AppExploreView(TemplateView):
     """ app发现页面 """
-    template_name = 'discover.jade'
+    template_name = 'client_discover.jade'
 
     def get_context_data(self, **kwargs):
         #banner = Banner.objects.filter(device='mobile', type='banner', is_used=True).order_by('-priority')
@@ -165,6 +165,13 @@ class AppExploreView(TemplateView):
             'banner': banner,
         }
 
+class AppManagementView(TemplateView):
+    """ app管理团队 """
+    template_name = 'client_management.jade'
+
+class AppAboutView(TemplateView):
+    """ app关于网利宝 """
+    template_name = 'client_about.jade'
 
 class AppP2PProductViewSet(PaginatedModelViewSet):
     """ app查询标列表接口 """
@@ -236,7 +243,7 @@ class AppRecommendViewSet(PaginatedModelViewSet):
 
 class RecommendProductManagerView(TemplateView):
     """ 推荐标的管理 """
-    template_name = 'recommend_production.jade'
+    template_name = 'client_recommend_production.jade'
 
     def _get_product(self, id):
         if isinstance(id, list):
@@ -339,7 +346,7 @@ class SendValidationCodeView(APIView):
 
 class AppIncomeMiscTemplateView(TemplateView):
     """ 设置收益比例参数"""
-    template_name = "app_income_misc.jade"
+    template_name = "client_income_misc.jade"
 
     def get_context_data(self, **kwargs):
         data = {'rate_wlb': 100, 'rate_p2p': 80, 'rate_fund': 60, 'rate_bank': 40}
