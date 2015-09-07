@@ -1,0 +1,231 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝官网' as title
+    include include/common_head
+    - endwith
+    link(rel="stylesheet",href="/static/styles/pc/pc.css")
+    link(rel="stylesheet",href="/static/stylesheets/september.css")
+  body(style="background:#fff")
+    include global/g_nav
+    .wrap#sep_acticity_banner
+      .g-banner-login-warp.mod
+        .g-banner-login
+          .g-banner-bg
+          .g-banner-cont
+            if user.is_authenticated
+              .g-landed
+                .landed-head.clearfix
+                  img(src='/static/imgs/pc/home/user.jpg').fl
+                  .head-username.fr.tl
+                    .font-m {{user | display_name}}
+                      span.font-s , 您好!
+                    .font-s.t-d17 感谢您对网利宝的信任！
+                .landed-cont
+                  .landed-cont-hide.font-m
+                    div 全方位风险控制
+                    div 第三方100%本息保障
+                .landed-btn.font-m
+                  a(href="/pay/banks/").landed-for-chong.mg-r-l 充值
+                  a(href="/p2p/list/").landed-for-tou 投资
+            else
+              .g-unlanded
+                .font-xl.t-d2.lh 注册送50元直抵红包
+                .font-xxxll.t-d2.lh.mg-t-s 13.0%
+                .font-m.t-d4 平均年化收益率
+                .font-m.t-d5.mg-t-s.mg-b-sm 账户资金由民生银行全额托管
+                .unlanded-btn.font-m
+                  a(href="/accounts/register/?next=/activity/september_activity/").unlanded-for-regist.mg-r-sm 快速注册
+                  a(href="/accounts/login/").unlanded-for-login 登录
+    //01
+    .sep-part.sep-part1
+      .sep-wrap.clearfix
+        .sep-part-lft
+          .sep-title.t-d2
+            span.sep-num 01
+            | 幸运大翻转
+          .lft-main
+            .prize-box.luckDrawLeft
+              .prize-light1
+              .prize-light2
+              .prize-list
+              .prize-arr-box
+                a(href="javascript:void(0);").prize-arr
+                  img(src="/static/imgs/pc_activity/september/prize-arr.png",style="width:140px;").rotateImg
+        .sep-part-rht
+          .winning-box
+            .winning-box-t
+              h2 中奖名单
+              .winning-list
+                .winning-list-child
+                  ul#users
+                    li.winning-item 恭喜138******90获得
+                      span 100元
+                      | 红包
+                    li.winning-item.even 恭喜138******90获得
+                      span 100元
+                      | 红包
+                    li.winning-item 恭喜138******90获得
+                      span 100元
+                      | 红包
+                    li.winning-item.even 恭喜138******90获得
+                      span 100元
+                      | 红包
+                    li.winning-item 恭喜138******90获得
+                      span 100元
+                      | 红包
+                    li.winning-item.even 恭喜138******90获得
+                      span 100元
+                      | 红包
+                    li.winning-item 恭喜138******90获得
+                      span 100元
+                      | 红包
+                    li.winning-item.even 恭喜138******90获得
+                      span 100元
+                      | 红包
+                    li.winning-item 恭喜138******90获得
+                      span 100元
+                      | 红包
+                    li.winning-item.even 恭喜138******90获得
+                      span 100元
+                      | 红包
+            .winning-box-b
+
+    //02
+    .sep-part.sep-part2
+      .sep-part-bg
+      .sep-wrap.clearfix
+        .sep-part-lft
+          .sep-title.t-d2
+            span.sep-num 02
+            | 注册送
+          .lft-main.text-center
+            | 新手注册送
+            span.money-box
+              i 50
+            | 元直抵红包
+          .btn-box.text-center
+            if user.is_authenticated
+              a(href="javascript:void(0)").red-btn.now-register 立即注册
+            else
+              a(href="javascript:void(0)").red-btn.now-register 立即注册
+        .sep-part-rht
+          img(src="/static/imgs/pc_activity/september/red-packet.png")
+    //03
+    .sep-part.sep-part3
+      .sep-part-bg
+      .sep-wrap.clearfix
+        .sep-part-rht
+          img(src="/static/imgs/pc_activity/september/wallet.png")
+        .sep-part-lft
+          .sep-title.t-d6
+            span.sep-num 03
+            | 首次充值送
+          .lft-main.text-center
+            | 首次充值送
+            span.money-box
+              i 150
+            | 元折扣红包
+          .btn-box.text-center
+            if user.is_authenticated
+              a(href="/pay/banks/").red-btn 立即充值
+            else
+              a(href="javascript:void(0)").red-btn.to-register 立即充值
+          .promote.text-center 注：完成操作奖励自动发放
+    //04
+    .sep-part.sep-part4
+      .sep-part-bg
+      .sep-wrap.clearfix
+        .sep-part-lft
+          .sep-title.t-d6
+            span.sep-num 04
+            | 单笔投资满额送
+          .lft-main.text-center
+            | 单笔投资满5000元再送
+            span.money-box
+              i 50
+            | 元现金红包
+          .btn-box.text-center
+            if user.is_authenticated
+              a(href="/p2p/list/").red-btn 立即投资
+            else
+              a(href="javascript:void(0)").red-btn.to-register 立即投资
+          .promote.text-center 注：完成操作奖励自动发放
+        .sep-part-rht
+          img(src="/static/imgs/pc_activity/september/purse.png")
+    //05
+    .sep-part.sep-part5
+      .sep-part-bg
+      .sep-part5-mian.sep-wrap
+        .sep-activity-info
+          h3 活动规则
+          ol
+            li 手机号为网利宝唯一账户，通过活动新注册网利宝用户均可参与；
+            li 红包有效期至2015年10月31日；
+            li 新用户注册即送50元红包，此现金红包为直抵红包，投资满1000元即可抵扣使用；<br />
+              | 首次充值满150元红包（首次充值100元起），红包类型为折扣红包，折扣红包则按投资额0.5%抵扣使用（比如用户投资30000元，即可满额使用150元红包）；
+              | 单笔投资满额5000元再送50元红包，50元红包为折扣红包，折扣红包按投资额0.5%抵扣使用；
+            li 幸运大翻转红包均为抵扣红包，按投资额0.5%抵扣使用；
+            li 红包统一以站内信形式通知，完成一次投资回款后即可提现；
+            li 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+            li 网利宝对此活动享有最终解释权。
+        .gold-dl-row.clearfix
+          dl.san-span
+            dt.com.com-trust(style="background: url('/static/imgs/pc_activity/september/safe1.png') no-repeat center")
+            dd.pp-zi
+              b IDG资本
+              br
+              | 百亿市值
+              b A股上市公司
+              | 入股
+          dl.san-span
+            dt.com.com-security(style="background: url('/static/imgs/pc_activity/september/safe2.png') no-repeat center")
+            dd.pp-zi
+              | 账户资金安全
+              br
+              | 由
+              b 阳光保险
+              | 承保
+          dl.san-span
+            dt.com.com-authority(style="background: url('/static/imgs/pc_activity/september/safe3.png') no-repeat center")
+            dd.pp-zi
+              | 第三方
+              br
+              b 100%
+              | 本息保障
+    .footer#sep-footer
+      include include/activityFooterTwo
+      include include/tracking
+    //back top
+    .backtop
+      a(href="javascript:;").backtop-box.inline-block.xl-backtop
+        i.backtop-icon.inline-block
+        span.backtop-txt.inline-block 回到顶部
+      a.footer-weixin.inline-block
+        span.weixin-code.inline-block
+        span.weixin-icon.inline-block
+      a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank").footer-qq.inline-block
+
+    .page(style='display:none')
+    .errorWin.alert-box(style='display:none')
+        p 抱歉~您不符合参加规则
+        p.winningBtn
+          a(href='javascript:void(0)').spanBtn 好吧
+    .winningDiv.alert-box(style='display:none')
+        //.winningImg
+        span.spanBtn
+        p 恭喜您获得
+          em#moeny
+        .winningBtn
+            a(href='javascript:void(0)').againBtn 再抽一次
+
+    .promote-register.alert-box(style='display:none')
+      span.spanBtn
+      p 您需要先注册
+      p.winningBtn
+        a(href='javascript:void(0)').banner-register 立即去注册
+    script.
+      require(['/static/js/september_activity.js'])
+

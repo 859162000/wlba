@@ -40,11 +40,11 @@ def stamp(dt):
 
 def list_redpack(user, status, device_type, product_id=0, rtype='redpack'):
     if status not in ("all", "available"):
-        return {"ret_code":30151, "message":"参数错误"}
+        return {"ret_code": 30151, "message": u"参数错误"}
 
     if not user.is_authenticated():
-        packages = {"available":[]}
-        return {"ret_code":0, "packages":packages}
+        packages = {"available": []}
+        return {"ret_code": 0, "packages": packages}
 
     device_type = _decide_device(device_type)
     if status == "available":
@@ -70,7 +70,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack'):
                 obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
                         "id": x.id, "invest_amount": event.invest_amount,
                         "unavailable_at": stamp(end_time), "event_id": event.id,
-                        "highest_amount": event.highest_amount}
+                        "highest_amount": event.highest_amount, "order_by": 2}
                 if start_time < timezone.now() < end_time:
                     if event.apply_platform == "all" or event.apply_platform == device_type:
                         if obj['method'] == REDPACK_RULE['percent']:
@@ -96,17 +96,17 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack'):
                     obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
                            "id": coupon.id, "invest_amount": event.invest_amount,
                            "unavailable_at": stamp(end_time), "event_id": event.id,
-                           "highest_amount": event.highest_amount}
+                           "highest_amount": event.highest_amount, "order_by": 1}
                     if start_time < timezone.now() < end_time:
                         if event.apply_platform == "all" or event.apply_platform == device_type:
                             if obj['method'] == REDPACK_RULE['interest_coupon']:
                                 obj['amount'] = obj['amount']/100.0
                             packages['available'].append(obj)
 
-
-        packages['available'].sort(key=lambda x:x['unavailable_at'])
+        packages['available'].sort(key=lambda x: x['unavailable_at'])
+        packages['available'].sort(key=lambda x: x['order_by'])
     else:
-        packages = {"used":[], "unused":[], "expires":[], "invalid":[]}
+        packages = {"used": [], "unused": [], "expires": [], "invalid": []}
         if rtype == 'redpack':
             records = RedPackRecord.objects.filter(user=user).exclude(redpack__event__rtype='interest_coupon')
         elif rtype == 'coupon':
@@ -116,7 +116,10 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack'):
 
         for x in records:
             event = x.redpack.event
-
+            if event.rtype == 'interest_coupon':
+                order_by = 1
+            else:
+                order_by = 2
             start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
                                                       x.created_at, event.available_at, event.unavailable_at)
 
@@ -124,7 +127,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack'):
                     "available_at": stamp(start_time), "unavailable_at": stamp(end_time),
                     "id": x.id, "invest_amount": event.invest_amount, "amount": event.amount, "event_id": event.id,
                     "highest_amount": event.highest_amount,
-                    "method": REDPACK_RULE[event.rtype]}
+                    "method": REDPACK_RULE[event.rtype], "order_by": order_by}
             if obj['method'] == REDPACK_RULE['percent'] or obj['method'] == REDPACK_RULE['interest_coupon']:
                 obj['amount'] = obj['amount']/100.0
 
@@ -133,15 +136,24 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack'):
                 obj.update({"product":pr.product.name, "apply_at":stamp(x.apply_at),
                             "apply_platform":x.apply_platform})
                 packages['used'].append(obj)
+                packages['used'].sort(key=lambda x: x['unavailable_at'])
+                packages['used'].sort(key=lambda x: x['order_by'])
             else:
                 if x.redpack.status == "invalid":
                     packages['invalid'].append(obj)
+                    packages['invalid'].sort(key=lambda x: x['unavailable_at'])
+                    packages['invalid'].sort(key=lambda x: x['order_by'])
                 else:
                     if end_time < timezone.now():
                         packages['expires'].append(obj)
+                        packages['expires'].sort(key=lambda x: x['unavailable_at'])
+                        packages['expires'].sort(key=lambda x: x['order_by'])
                     else:
                         packages['unused'].append(obj)
-    return {"ret_code":0, "packages":packages}
+                        packages['unused'].sort(key=lambda x: x['unavailable_at'])
+                        packages['unused'].sort(key=lambda x: x['order_by'])
+
+    return {"ret_code": 0, "packages": packages}
 
 
 def utc_transform(dt):
@@ -386,6 +398,7 @@ def restore(order_id, amount, user):
     record.apply_platform = ""
     record.apply_at = None
     record.order_id = None
+    record.product_id = None
     record.save()
 
     event = record.redpack.event
@@ -394,6 +407,7 @@ def restore(order_id, amount, user):
     # deduct = event.amount
     deduct = _calc_deduct(amount, rtype, rule_value, event)
     if rtype == "interest_coupon":
+        logger.info(u"%s--%s 退回加息券 %s" % (event.name, record.id, timezone.now()))
         return {"ret_code": 1, "deduct": deduct}
     else:
         logger.info(u"%s--%s 退回账户 %s" % (event.name, record.id, timezone.now()))
