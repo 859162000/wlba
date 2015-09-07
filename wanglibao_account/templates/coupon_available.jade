@@ -3,11 +3,11 @@ extends account_home_base
 -load formatters
 
 block head
-  - with '优惠券' as title
+  - with '加息券' as title
     include include/head
 
 block sidebar
-  - with '优惠券' as activeItem
+  - with '理财券' as activeItem
   include include/user_center_sidebar
   - endwith
 
@@ -16,12 +16,12 @@ block main
     include include/coupon_exchange
 
   ul.discount--tabs
-    li.coupon--tab
-        a(href="/accounts/redpacket/unused") 红包
-            span
-    li.redpacket--tab.hover
-        a(href="/accounts/coupon/unused") 加息券
-            span
+    li.coupon--tab.hover
+      a(href="/accounts/coupon/unused") 加息券
+        span
+    li.redpacket--tab
+      a(href="/accounts/redpacket/unused") 红包
+        span
   .account-home-panel__no-padding
     .account-home-panel--title-bar__product
     .account-home-panel--title-bar__product
@@ -49,7 +49,7 @@ block main
         thead
           tr
             th 加息券名称
-            th 金额
+            th 加息利率
             th 使用次数
             th 使用限额
             th 使用门槛
@@ -62,15 +62,9 @@ block main
           each coupon in coupons
             tr
               td {{coupon.name}}
-              if coupon.method == '-'
-                td {{coupon.amount}}元
-              else
-                td {{coupon.highest_amount}}元
+              td {{coupon.amount | percentage_number_two}}%
               td 仅限一次
-              if coupon.method == '-'
-                td {{coupon.amount}}元
-              else
-                td 加息{{coupon.amount | percentage_number_two}}%
+              td --
               if coupon.invest_amount == 0
                 td 无
               else

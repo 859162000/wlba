@@ -43,6 +43,15 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
             }
         }
     });
+
+    _getQueryStringByName = function(name){
+            var result = location.search.match(new RegExp('[\?\&]' + name+ '=([^\&]+)','i'));
+             if(result == null || result.length < 1){
+                 return '';
+             }
+             return result[1];
+    }
+
     //初始化
     pageInitFun = function(){
         //文本框的得到和失去光标
@@ -171,12 +180,14 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                       remember_me : remember_me
                   }
                 }).done(function() {
-                  var arr = location.search;
+                  /*var arr = location.search;
                   if (arr != '') {
                       window.location = arr.split('=')[1];
                   } else {
                       window.location = '/';
-                  }
+                  }*/
+                  var next = _getQueryStringByName('next') == '' ? '/' : _getQueryStringByName('next');
+                  window.location.href = next;
                 }).fail(function(xhr) {
                     var result = JSON.parse(xhr.responseText);
                     if(result.message.__all__ != undefined){
@@ -362,12 +373,18 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                             invitecode : invitecode
                         }
                     }).done(function () {
+                        //window.location = '/';
+                        /*
                           var arr = location.search;
                           if (arr != '') {
                               window.location = arr.split('=')[1];
                           } else {
                               window.location = '/';
                           }
+                         */
+                        var next = _getQueryStringByName('next') == '' ? '/' : _getQueryStringByName('next');
+                        window.location.href = next;
+
                     }).fail(function (xhr) {
                         var result = JSON.parse(xhr.responseText);
                         if(result.message.invitecode != undefined){

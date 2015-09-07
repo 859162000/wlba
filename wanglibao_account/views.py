@@ -340,8 +340,6 @@ class AccountHome(TemplateView):
             obj = {"equity": equity}
             if earning_map.get(equity.product_id):
                 obj["earning"] = earning_map.get(equity.product_id)
-            #加息
-            obj['hike'] = backends.get_hike(user, equity.product_id)
 
             result.append(obj)
 
@@ -1244,12 +1242,12 @@ class P2PAmortizationAPI(APIView):
                                                         product_amortization__product_id=product_id)
 
         amortization_record = [{
-                                   'amortization_term_date': timezone.localtime(amortization.term_date).strftime(
-                                       "%Y-%m-%d %H:%M:%S"),  # 还款时间
-                                   'amortization_principal': float(amortization.principal),  # 本金
-                                   'amortization_amount_interest': float(amortization.interest),  # 利息
-                                   'amortization_amount': float(amortization.principal + amortization.interest),  # 总记
-                               } for amortization in amortizations]
+            'amortization_term_date': timezone.localtime(amortization.term_date).strftime("%Y-%m-%d %H:%M:%S"),  # 还款时间
+            'amortization_principal': float(amortization.principal),  # 本金
+            'amortization_amount_interest': float(amortization.interest),  # 利息
+            'amortization_amount': float(amortization.principal + amortization.interest + amortization.coupon_interest),  # 本息总和
+            'amortization_coupon_interest': float(amortization.coupon_interest),  # 加息券利息
+        } for amortization in amortizations]
 
         res = {
             'equity_product_short_name': equity.product.short_name,  # 还款标题

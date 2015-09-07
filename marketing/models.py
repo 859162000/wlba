@@ -365,11 +365,11 @@ class WanglibaoActivityReward(models.Model):
         Description:网利宝发奖活动表
     """
     user = models.ForeignKey(User)
-    activity_id = models.CharField(u'活动唯一表示', max_length=128)
-    total_chances = models.IntegerField(u'用户共有几次抽奖机会', default=0)
-    used_chances = models.IntegerField(u'用户已经使用了几次抽奖机会', default=0)
-    total_awards = models.IntegerField(u'用户共有几次获奖机会', default=0)
-    used_awards = models.IntegerField(u'用户已经获得了几个奖品', default=0)
+    activity_id = models.CharField(max_length=128, verbose_name=u'活动编号')
+    total_chances = models.IntegerField(default=0, verbose_name=u'共有获奖机会')
+    used_chances = models.IntegerField(default=0, verbose_name=u'已用获奖机会')
+    total_awards = models.IntegerField(default=0, verbose_name=u'共有奖品数')
+    used_awards = models.IntegerField(default=0, verbose_name=u'已获奖数')
 
     class Meta:
         verbose_name_plural = u'网利宝发奖活动表'

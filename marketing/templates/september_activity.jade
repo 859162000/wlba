@@ -3,8 +3,9 @@ doctype html
 html
   head
     - with '网利宝官网' as title
-    include global/g_head
+    include include/common_head
     - endwith
+    link(rel="stylesheet",href="/static/styles/pc/pc.css")
     link(rel="stylesheet",href="/static/stylesheets/september.css")
   body(style="background:#fff")
     include global/g_nav
@@ -43,9 +44,10 @@ html
                   a(href="/p2p/list/").landed-for-tou 投资
             else
               .g-unlanded
+                .font-xl.t-d2.lh 注册送50元直抵红包
                 .font-xxxll.t-d2.lh 13.0%
                 .font-m.t-d4 平均年化收益率
-                .font-m.t-d5.mg-t-s.mg-b-sm 第三方本息担保
+                .font-m.t-d5.mg-t-s.mg-b-sm 账户资金由民生银行全额托管
                 .unlanded-btn.font-m
                   a(href="/accounts/register/").unlanded-for-regist.mg-r-sm 快速注册
                   a(href="/accounts/login/").unlanded-for-login 登录
@@ -57,46 +59,50 @@ html
             span.sep-num 01
             | 幸运大翻转
           .lft-main
-            .prize-box
+            .prize-box.luckDrawLeft
               .prize-light1
               .prize-light2
               .prize-list
-              .prize-arr
+              .prize-arr-box
+                a(href="javascript:void(0);").prize-arr
+                  img(src="/static/imgs/pc_activity/september/prize-arr.png",style="width:140px;").rotateImg
         .sep-part-rht
           .winning-box
             .winning-box-t
               h2 中奖名单
-              ul.winning-list
-                li.winning-item 恭喜138******90获得
-                  span 100元
-                  | 红包
-                li.winning-item 恭喜138******90获得
-                  span 100元
-                  | 红包
-                li.winning-item 恭喜138******90获得
-                  span 100元
-                  | 红包
-                li.winning-item 恭喜138******90获得
-                  span 100元
-                  | 红包
-                li.winning-item 恭喜138******90获得
-                  span 100元
-                  | 红包
-                li.winning-item 恭喜138******90获得
-                  span 100元
-                  | 红包
-                li.winning-item 恭喜138******90获得
-                  span 100元
-                  | 红包
-                li.winning-item 恭喜138******90获得
-                  span 100元
-                  | 红包
-                li.winning-item 恭喜138******90获得
-                  span 100元
-                  | 红包
-                li.winning-item 恭喜138******90获得
-                  span 100元
-                  | 红包
+              .winning-list
+                .winning-list-child
+                  ul#users
+                    li.winning-item 恭喜138******90获得
+                      span 100元
+                      | 红包
+                    li.winning-item.even 恭喜138******90获得
+                      span 100元
+                      | 红包
+                    li.winning-item 恭喜138******90获得
+                      span 100元
+                      | 红包
+                    li.winning-item.even 恭喜138******90获得
+                      span 100元
+                      | 红包
+                    li.winning-item 恭喜138******90获得
+                      span 100元
+                      | 红包
+                    li.winning-item.even 恭喜138******90获得
+                      span 100元
+                      | 红包
+                    li.winning-item 恭喜138******90获得
+                      span 100元
+                      | 红包
+                    li.winning-item.even 恭喜138******90获得
+                      span 100元
+                      | 红包
+                    li.winning-item 恭喜138******90获得
+                      span 100元
+                      | 红包
+                    li.winning-item.even 恭喜138******90获得
+                      span 100元
+                      | 红包
             .winning-box-b
 
     //02
@@ -205,33 +211,21 @@ html
         span.weixin-icon.inline-block
       a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank").footer-qq.inline-block
 
+    .page(style='display:none')
+    .errorWin(style='display:none')
+        p.p1 对不起，亲~
+        p.p2 您不符合参加规则
+        p
+            span
+        p
+            a(href='javascript:void(0)')#closeWin 知道了
+    .winningDiv(style='display:none')
+        //.winningImg
+        span.spanBtn
+        p 恭喜您获得
+          em#moeny
+        .winningBtn
+            a(href='javascript:void(0)').againBtn 再抽一次
     script.
-      (function(){
-        require.config({
-          paths: {
-            jquery: 'lib/jquery.min'
-          }
-        })
-        require(['jquery'],function($){
-          //返回顶部
-          var topDom = $("a.xl-backtop");
-          var backDom = topDom.parents("div.backtop");
-          function showDom(){
-            if ($(document).scrollTop() > 0) {
-              backDom.addClass("show-backtop");
-            } else if ($(document).scrollTop() <= 0) {
-              backDom.removeClass("show-backtop");
-            }
-          }
-          showDom();
-          $(window).scroll(function () {
-            showDom();
-          });
-
-          topDom.on('click',function(){
-            $('body,html').animate({scrollTop: 0}, 600);
-            return false
-          });
-        });
-      })();
+      require(['/static/js/september_activity.js'])
 

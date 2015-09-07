@@ -12,7 +12,7 @@ html
         .anniversaryBanner
             .loginDiv
                 a(href='/').logoImg
-                .wanglibao.wanglibaoHover
+                .wanglibao
                 .balloon1
                 .balloon2
         .redPacket
@@ -25,7 +25,7 @@ html
                     a(href='/accounts/register/?next=/activity/anniversary/')
         .interest
             .titleStyle
-                span 二重豪礼：全场加息3%
+                span 二重豪礼：全场加息
             .interestDetail
             .interestBtn
                if user.is_authenticated
@@ -38,15 +38,16 @@ html
                     span 三重豪礼：海量豪礼，幸运转转赚
                 .luckDrawContent.clearfix
                     .luckDrawLeft
-                        .luckDrawImgBg
+                        .prize-light1
+                        .prize-light2
                         .luckDrawImg
                             .luckDrawButton
                                 if user.is_authenticated
                                     a(href='javascript:void(0)')
-                                        img(src='/static/imgs/pc/anniversary/button.png').rotateImg
+                                        img(src='/static/imgs/pc_activity/anniversary/button.png').rotateImg
                                 else
                                     a(href='/accounts/register/?next=/activity/anniversary')
-                                        img(src='/static/imgs/pc/anniversary/button.png')
+                                        img(src='/static/imgs/pc_activity/anniversary/button.png')
                     .luckDrawRight.clearfix
                         .luckDrawRightTop.clearfix
                             h3 中奖名单
@@ -119,13 +120,13 @@ html
                 p 在活动期间大额投资，单笔投资满额即可实现即刻返现！最高返现30000元！
                 .tableStyle
                     .tableFonts
-                        p 单笔投资≥10万元，返现300元；
-                        p 单笔投资≥20万元，返现600元；
-                        p 单笔投资≥40万元，返现1600元；
-                        p 单笔投资≥60万元，返现2400元；
-                        p 单笔投资≥100万元，返现5000元；
-                        p 单笔投资≥200万元，返现10000元；
-                        p 单笔投资≥500万元，返现30000元；
+                        p 单笔投资≥10万元，返现500元；
+                        p 单笔投资≥20万元，返现1000元；
+                        p 单笔投资≥40万元，返现2400元；
+                        p 单笔投资≥60万元，返现3600元；
+                        p 单笔投资≥100万元，返现7000元；
+                        p 单笔投资≥200万元，返现14000元；
+                        p 单笔投资≥500万元，返现40000元；
                 .activityFourBtn
                     if user.is_authenticated
                         a(href='/p2p/list/')
@@ -148,7 +149,7 @@ html
     .page(style='display:none')
     .errorWin(style='display:none')
         p.p1 对不起，亲~
-        p.p2 您不符合参加规则
+        p.p2#errorContent 您不符合参加规则
         p
             span
         p

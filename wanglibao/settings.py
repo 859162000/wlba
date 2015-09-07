@@ -838,7 +838,7 @@ XICAI_CLIENT_ID = '48e37e2cf4124c2c9f5bde3cc88d011c'
 XICAI_CLIENT_SECRET = '2e3dd17e800d48bca50e61b19f8fc11d'
 XICAI_LOAD_PAGE = 'https://www.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
 WLB_FOR_CSAI_KEY = '1993'
-XICAI_UPDATE_TIMEDELTA = timedelta(days=4)
+XICAI_UPDATE_TIMEDELTA = timedelta(hours=1)
 if ENV == ENV_PRODUCTION:
     XICAI_LOAD_PAGE = 'https://www.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
 else:
@@ -894,19 +894,40 @@ YUNDUAN_COOP_ID = 298
 # 易车
 WLB_FOR_YICHE_KEY = '1999'
 if ENV == ENV_PRODUCTION:
-    YICHE_COOP_ID = None
-    YICHE_KEY = None
-    YICHE_REGISTER_CALL_BACK_URL = None
-    YICHE_VALIDATE_CALL_BACK_URL = None
-    YICHE_PURCHASE_CALL_BACK_URL = None
-    YICHE_U_PURCHASE_CALL_BACK_URL = None
+    YICHE_COOP_ID = 200104
+    YICHE_KEY = '0dae7d5bbcd493785f057bc1'
+    YICHE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API'
 else:
     YICHE_COOP_ID = 200104
     YICHE_KEY = '0dae7d5bbcd493785f057bc1'
-    YICHE_REGISTER_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API?method=AddPlatFormFinanceUser'
-    YICHE_VALIDATE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API?method=UpdatePlatFormFinanceUser'
-    YICHE_PURCHASE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API?method=AddPlatFormFinanceOrder'
-    YICHE_U_PURCHASE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API?method=UpdatePlatFormFinanceOrder'
+    YICHE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API'
+
+# 智推
+WLB_FOR_ZHITUI1_KEY = '2000'
+ZHITUI_COOP_ID = '370'
+ZHITUI_CALL_BACK_URL = 'http://api.zhitui.com/wanglibao/recive.php'
+
+# 中国电信
+WLB_FOR_ZGDX_KEY = '2001'
+if ENV == ENV_PRODUCTION:
+    ZGDX_CALL_BACK_URL = 'http://118.123.170.72:8888/fps/flowService.do'
+    ZGDX_PARTNER_NO = '100054374'
+    ZGDX_SERVICE_CODE = 'FS0001'
+    ZGDX_CONTRACT_ID = 'test20150901165440'
+    ZGDX_ACTIVITY_ID = '100785'
+    ZGDX_PLAT_OFFER_ID = '103050'
+    ZGDX_KEY = 'H5gOs1ZshKZ6WikN'
+    ZGDX_IV = '8888159601152533'
+else:
+    ZGDX_CALL_BACK_URL = 'http://118.123.170.72:8888/fps/flowService.do'
+    ZGDX_PARTNER_NO = '100054374'
+    ZGDX_SERVICE_CODE = 'FS0001'
+    ZGDX_CONTRACT_ID = 'test20150901165440'
+    ZGDX_ACTIVITY_ID = '100785'
+    ZGDX_PLAT_OFFER_ID = '103050'
+    ZGDX_KEY = 'H5gOs1ZshKZ6WikN'
+    ZGDX_IV = '8888159601152533'
+
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100
