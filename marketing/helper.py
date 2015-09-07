@@ -23,13 +23,12 @@ def which_channel(user, intro=None):
     """ 渠道判断 """
     if not intro:
         ib = IntroducedBy.objects.filter(user=user).first()
+        if not ib:
+            return Channel.WANGLIBAOOTHER
     else:
         ib = intro
 
-    if not ib:
-        return Channel.WANGLIBAOOTHER
-
-    if not ib.channel:
+    if not ib or not ib.channel:
         return Channel.WANGLIBAO
 
     name = ib.channel.name
