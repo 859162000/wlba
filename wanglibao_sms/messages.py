@@ -161,12 +161,31 @@ def msg_redpack_give_percent(amount, highest_amount, name, dt):
 @suffix
 def sms_income(count, amount):
     return u"今日您共有{}个好友参与投资，为您产生的理财佣金{}元已发放，" \
-           u"请进入我的账户-邀请奖励中查询！感谢您对我们的支持与关注。".format(count, amount)
+           u"请进入我的账户-全民淘金中查询！感谢您对我们的支持与关注。".format(count, amount)
 
 
 def msg_give_income(count, amount):
     title = u"理财佣金到账通知"
     content = u"今日您共有{}个好友参与投资，为您产生的理财佣金{}元已发放，" \
-              u"请进入<a href='/accounts/invite/'>我的账户-邀请奖励</a>中查询。<br/>" \
+              u"请进入<a href='/accounts/invite/'>我的账户-全民淘金</a>中查询。<br/>" \
               u"感谢您对我们的支持与关注！<br/>网利宝".format(count, amount)
+    return title, content
+
+
+@suffix
+def sms_alert_invest(name):
+    return u"提醒投资：您的好友{}在网利宝看到几个超棒的理财计划，快来投资吧！".format(name)
+
+
+@suffix
+def sms_alert_invite(name, phone):
+    return u"邀请注册：您的好友{}邀请您加入网利宝，快来一起赚钱，速速点击专属链接：" \
+           u"https://www.wanglibao.com/activity/wap/share?phone={}".format(name, phone)
+
+
+def msg_give_coupon(name, amount, end_time):
+    title = u"参与活动送加息券"
+    content = u"网利宝赠送的【{}】加息券已发放，加息额度{}%，请进入投资页面尽快投资赚收益吧！有效期至{}。" \
+              u"<a href='/'>立即使用</a>。<br/>" \
+              u"感谢您对我们的支持与关注！<br/>网利宝".format(name, amount, end_time)
     return title, content

@@ -33,6 +33,7 @@ block main
             th 时间
             th 期数
             th 金额(元)
+            th 加息金额(元)
         tbody
           each repayment_record in repayment_records
             amount = repayment_record.principal + repayment_record.interest
@@ -44,6 +45,7 @@ block main
               td {{repayment_record.created_time | date:"Y-m-d H:i:s"}}
               td 第{{repayment_record.term}}期 </br> (共{{repayment_record.amortization.product.amortization_count}}期)
               td {{amount}}
+              td {{repayment_record.coupon_interest}}
     - with data=repayment_records uri='/accounts/repayment/'
     include include/pager
     - endwith

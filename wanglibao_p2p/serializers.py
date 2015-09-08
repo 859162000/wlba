@@ -38,6 +38,9 @@ class P2PProductSerializer(ModelSerializerExtended):
 
     activity = serializers.SerializerMethodField('activity_format')
 
+    # add by hb on 2015-08-27
+    is_taojin = serializers.SerializerMethodField('is_taojin_format')
+
     class Meta:
         model = P2PProduct
         depth = 1
@@ -50,7 +53,7 @@ class P2PProductSerializer(ModelSerializerExtended):
                   "borrower_bankcard_bank_code", "borrower_bankcard_bank_province", "borrower_bankcard_bank_city",
                   "borrower_bankcard_bank_branch", "total_amount", "ordered_amount", "extra_data", "publish_time",
                   "end_time", "soldout_time", "limit_per_user", "warrant_company", "usage", "short_usage",
-                  "display_status", "product_amortization", "activity")
+                  "display_status", "is_taojin", "product_amortization", "activity")
 
 
     def total_earning_joined(self, obj):
@@ -73,6 +76,10 @@ class P2PProductSerializer(ModelSerializerExtended):
 
     def display_status_format(self, obj):
         return obj.display_status
+
+    # add by hb on 2015-08-27
+    def is_taojin_format(self, obj):
+        return obj.is_taojin
 
     def transform_extra_data(self, obj, value):
         if value is None:

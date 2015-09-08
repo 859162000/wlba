@@ -50,6 +50,8 @@ from marketing import tools
 from django.conf import settings
 from wanglibao_account.models import Binding
 from wanglibao_anti.anti.anti import AntiForAllClient
+from wanglibao_redpack.models import Income
+from decimal import Decimal
 
 logger = logging.getLogger(__name__)
 
@@ -216,6 +218,7 @@ class RegisterAPIView(APIView):
         identifier = request.DATA.get('identifier', "")
         password = request.DATA.get('password', "")
         validate_code = request.DATA.get('validate_code', "")
+        channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
 
         identifier = identifier.strip()
         password = password.strip()
@@ -279,7 +282,7 @@ class RegisterAPIView(APIView):
             auth_user = authenticate(identifier=identifier, password=password)
             auth_login(request, auth_user)
 
-        if not AntiForAllClient(request).anti_delay_callback_time(user.id, device):
+        if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
             tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
         return Response({"ret_code": 0, "message": u"注册成功"})
@@ -298,6 +301,7 @@ class WeixinRegisterAPIView(APIView):
         """
         identifier = request.DATA.get('identifier', "").strip()
         validate_code = request.DATA.get('validate_code', "").strip()
+        channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
 
         if not identifier or not validate_code:
             return Response({"ret_code": 30021, "message": "信息输入不完整"})
@@ -334,7 +338,7 @@ class WeixinRegisterAPIView(APIView):
         send_rand_pass(identifier, password)
 
         device = split_ua(request)
-        if not AntiForAllClient(request).anti_delay_callback_time(user.id, device):
+        if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
             tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
         return Response({"ret_code": 0, "message": "注册成功"})
@@ -616,6 +620,33 @@ class TopsOfWeekView(APIView):
             return Response({"ret_code": -1, "records": list()})
 
         return Response({"ret_code": 0, "records": records, "isvalid": isvalid})
+
+import random
+import operator
+
+class TopsOfEaringView(APIView):
+    """
+        得到全民淘金前十
+    """
+    permission_classes = ()
+    def post(self, request):
+        try:
+            records = []
+            f = file(settings.BASE_DIR+'/wanglibao_redpack/data/topearnings.txt', 'r')
+            lines = f.readlines()
+            f.close()
+            for line in lines:
+                phone, amount_str = line.split(",")
+                amount = Decimal(amount_str)
+                records.append({'phone':phone, 'amount':amount})
+            incomes = Income.objects.select_related('user').select_related('user__wanglibaouserprofile').values('user__wanglibaouserprofile__phone').annotate(sum_amount=Sum('earning')).order_by('-sum_amount')[0]
+
+            records.append({'phone':safe_phone_str(incomes['user__wanglibaouserprofile__phone']), 'amount':incomes['sum_amount']})
+            records.sort(key=operator.itemgetter('amount'), reverse=True)
+        except Exception, e:
+            print e
+            return Response({"ret_code": -1, "records": list()})
+        return Response({"ret_code": 0, "records": records})
 
 class TopsOfMonthView(APIView):
     """
@@ -1086,4 +1117,4 @@ class GuestCheckView(APIView):
             return Response({"ret_code": 0, "data": data})
         # 渠道不符合标准
         else:
-            return Response({"ret_code": 2, "message": u"非迅雷8用户，不符合活动标准！"})
+            return Response({"ret_code": 2, "message": u"抱歉，不符合活动标准！"})

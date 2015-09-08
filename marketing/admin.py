@@ -6,7 +6,7 @@ from django.utils import timezone
 from views import AggregateView, MarketingView, TvView, TopsView, IntroducedAwardTemplate, YaoView
 from play_list import InvestmentRewardView
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, \
-    Activity, ActivityRule, Reward, RewardRecord, Channels, IntroducedByReward, PlayList, ActivityJoinLog
+    Activity, ActivityRule, Reward, RewardRecord, Channels, IntroducedByReward, PlayList, ActivityJoinLog, WanglibaoActivityReward
 from marketing.views import GennaeratorCode
 
 from import_export import resources
@@ -247,6 +247,17 @@ class ActivityJoinLogAdmin(admin.ModelAdmin):
         return False
 
 
+class WanglibaoActivityRewardAdmin(admin.ModelAdmin):
+    """
+       add by yihen@20150901
+    """
+    action = None
+    list_display = ('user', 'total_chances', 'used_chances', 'total_awards', 'used_awards')
+    #readonly_fields = ('user', 'total_chances', 'used_chances', 'total_awards', 'used_awards')
+    readonly_fields = ('user', 'total_chances', 'total_awards', )
+
+
+admin.site.register(WanglibaoActivityReward, WanglibaoActivityRewardAdmin) # add by Yihen@20150901
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
 admin.site.register(SiteData, SiteDataAdmin)
 admin.site.register(PromotionToken, PromotionTokenAdmin)

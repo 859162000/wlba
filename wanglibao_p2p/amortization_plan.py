@@ -80,13 +80,13 @@ class MonthlyInterest(AmortizationPlan):
     def generate(cls, amount, year_rate, interest_begin_date, period=None, coupon_year_rate=0):
         amount = Decimal(amount)
         year_rate = Decimal(str(year_rate))
-        coupon_year_rate = Decimal(coupon_year_rate)
+        coupon_year_rate = Decimal(str(coupon_year_rate))
 
         interest = get_interest_monthly(amount, year_rate, Decimal(period))
         month_interest = get_interest_monthly(amount, year_rate)['actual']
 
-        coupon_interest = get_interest_monthly(amount, coupon_year_rate)
-        # coupon_month_interest = get_interest_monthly(amount, coupon_year_rate)['actual']
+        coupon_interest = get_interest_monthly(amount, coupon_year_rate, Decimal(period))
+        coupon_month_interest = get_interest_monthly(amount, coupon_year_rate)['actual']
 
         total = interest['actual'] + amount
         coupon_total = coupon_interest['actual']
@@ -94,11 +94,12 @@ class MonthlyInterest(AmortizationPlan):
         result = []
 
         for i in xrange(0, period - 1):
-            result.append((month_interest, Decimal(0), month_interest, amount, Decimal(0),
+            result.append((month_interest, Decimal(0), month_interest, amount, coupon_month_interest,
                            total - month_interest * (i + 1), interest_begin_date + relativedelta(months=i + 1)))
 
         last_interest = interest['actual'] - month_interest * (period - 1)
-        result.append((last_interest + amount, amount, last_interest, Decimal(0), coupon_total, Decimal(0),
+        last_interest_coupon = coupon_interest['actual'] - coupon_month_interest * (period - 1)
+        result.append((last_interest + amount, amount, last_interest, Decimal(0), last_interest_coupon, Decimal(0),
                        interest_begin_date + relativedelta(months=period)))
 
         return {
@@ -159,7 +160,7 @@ class DisposablePayOff(AmortizationPlan):
         amount = Decimal(amount)
         year_rate = Decimal(str(year_rate))
 
-        coupon_year_rate = Decimal(coupon_year_rate)
+        coupon_year_rate = Decimal(str(coupon_year_rate))
         coupon_total_interest = get_interest_monthly(amount, coupon_year_rate, Decimal(period))
 
         total_interest = get_interest_monthly(amount, year_rate, Decimal(period))
@@ -225,7 +226,6 @@ class QuarterlyInterest(AmortizationPlan):
             "interest_precision": Decimal(0)
         }
 
-
     @classmethod
     def calculate_term_date(cls, product):
         amortizations = product.amortizations.all()
@@ -255,7 +255,7 @@ class DailyInterest(AmortizationPlan):
 
         #total_interest = (daily_interest * period).quantize(Decimal('.01'), rounding=ROUND_DOWN)
         total_interest = get_interest_daily(amount, year_rate, period)
-        coupon_total_interest = get_interest_daily(amount, Decimal(coupon_year_rate), period)
+        coupon_total_interest = get_interest_daily(amount, Decimal(str(coupon_year_rate)), period)
 
         total = total_interest['actual'] + amount
 
@@ -278,7 +278,6 @@ class DailyInterest(AmortizationPlan):
             }
         }
 
-
     @classmethod
     def calculate_term_date(cls, product):
         amortization = product.amortizations.all().first()
@@ -291,6 +290,7 @@ class DailyInterest(AmortizationPlan):
 
 class DailyInterestInAdvance(AmortizationPlan):
     name = u'按日计息一次性还本付息T+N'
+
     @classmethod
     def generate(cls, amount, year_rate, interest_begin_date, period=None, coupon_year_rate=0, **kwargs):
         amount = Decimal(amount)
@@ -339,6 +339,7 @@ class DailyInterestMonthly(AmortizationPlan):
     def generate(cls, amount, year_rate, interest_begin_date, period=None, coupon_year_rate=0):
         amount = Decimal(amount)
         year_rate = Decimal(str(year_rate))
+        coupon_year_rate = Decimal(str(coupon_year_rate))
 
         interest_start = interest_begin_date
         term_date = interest_start + timedelta(days=period)
@@ -350,7 +351,7 @@ class DailyInterestMonthly(AmortizationPlan):
         result = []
         left_interest = Decimal(0)
         all_interest = get_interest_daily(amount, year_rate, period)
-        coupon_total_interest = get_interest_daily(amount, Decimal(coupon_year_rate), period)
+        coupon_total_interest = get_interest_daily(amount, coupon_year_rate, period)
 
         i = 0
         while term_dates[i] < term_date:
@@ -361,8 +362,9 @@ class DailyInterestMonthly(AmortizationPlan):
                 term_period = term_dates[i] - term_dates[i-1]
                 #total_interest = (daily_interest * period - left_interest).quantize(Decimal('.01'), rounding=ROUND_DOWN)
                 total_interest = all_interest['actual'] - left_interest
+                coupon_interest = coupon_total_interest['actual'] - left_interest
                 result.append((total_interest+amount, amount, total_interest, Decimal(0),
-                              coupon_total_interest['actual'], Decimal(0), term_dates[i]))
+                              coupon_interest, Decimal(0), term_dates[i]))
 
             else:
                 anchor = interest_start + relativedelta(months=i)
@@ -370,9 +372,10 @@ class DailyInterestMonthly(AmortizationPlan):
                 term_period = term_dates[i] - term_dates[i-1]
                 #total_interest = (daily_interest * term_period.days).quantize(Decimal('.01'), rounding=ROUND_DOWN)
                 total_interest = get_interest_daily(amount, year_rate, term_period.days)
+                coupon_interest = get_interest_daily(amount, coupon_year_rate, term_period.days)
                 left_interest += total_interest['actual']
                 result.append((total_interest['actual'], Decimal(0), total_interest['actual'], Decimal(0),
-                               Decimal(0), Decimal(0), term_dates[i]))
+                               coupon_interest['actual'], Decimal(0), term_dates[i]))
 
         total = all_interest['actual'] + amount
 
@@ -399,7 +402,7 @@ class DailyInterestMonthly(AmortizationPlan):
 
         i = 0
         while term_dates[i] < term_date:
-            i = i + 1
+            i += 1
             if interest_start + relativedelta(months=i) > term_date:
                 anchor = term_date
                 term_dates.append(anchor)

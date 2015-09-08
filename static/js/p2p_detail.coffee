@@ -5,7 +5,7 @@ require.config
     tools: 'lib/modal.tools'
     "jquery.validate": 'lib/jquery.validate.min'
     'jquery.modal': 'lib/jquery.modal.min'
-    ddslick: 'lib/jquery.ddslick.min'
+    ddslick: 'lib/jquery.ddslick'
 
   shims:
     "jquery.validate": ['jquery']
@@ -34,22 +34,11 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
   showPayInfo = (actual_payment, red_pack_payment) ->
     return ['红包使用<i class="blue">', red_pack_payment, '</i>元，实际支付<i class="blue">', actual_payment, '</i>元'].join('')
-
   getRedAmount = (method, red_pack_amount, event_id, highest_amount) ->
-    amount = $('#id_amount').val()
-    if event_id*1 == 7
-      flag = amount*0.005
-      if flag <= 30
-        final_redpack = flag
-      else
-        final_redpack = 30
-
-      return {
-        red_pack: getFormatedNumber(final_redpack)
-        actual_amount: getActualAmount(amount, final_redpack)
-      }
+    $amount  = $('#id_amount')
+    amount = $amount.val()
     if method == '*'
-      final_redpack = amount*red_pack_amount
+      final_redpack = amount * red_pack_amount
       if highest_amount && highest_amount < final_redpack
         final_redpack = highest_amount
     else
@@ -82,8 +71,12 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     highest_amount = 0
     if redPack.highest_amount
       highest_amount = redPack.highest_amount
-    redPackInfo = getRedAmount(redPack.method, redPack.amount, redPack.event_id, highest_amount)
-    html = showPayInfo(redPackInfo.actual_amount, redPackInfo.red_pack)
+    if redPack.method == '~'
+      $('#id_amount').attr('activity-jiaxi', redPack.amount*100)
+      return calculator.p2pCalculate()
+    else
+      redPackInfo = getRedAmount(redPack.method, redPack.amount, redPack.event_id, highest_amount)
+      html = showPayInfo(redPackInfo.actual_amount, redPackInfo.red_pack)
     $('.payment').html(html).show()
 
   $.validator.addMethod 'dividableBy100', (value, element)->
@@ -328,6 +321,17 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
   $(".xunlei-binding-modal").click () ->
     $('#xunlei-binding-modal').modal()
 
+  #加息券接口
+  $.post('/api/redpacket/selected/'
+    product_id: $('input[name=product]').val() * 1
+  ).done (data) ->
+    code = data.ret_code
+    if code == 0
+      $('.use-jiaxi').show()
+      $('.use-jiaxi-amount').text(data.amount + '% ');
+      $('#id_amount').attr('activity-jiaxi', data.amount)
+
+
   ddData = []
   if $('.red-pack').size() > 0
     $(document).ready () ->
@@ -335,10 +339,9 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
         status: 'available'
         product_id: $('input[name=product]').val()
       ).done (data) ->
-        data2=data
         availables = data.packages.available
         ddData.push(
-          text: '不使用红包'
+          text: '不使用理财券'
           value: ''
           selected: true
           method: ''
@@ -346,7 +349,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           invest_amount: 0
           highest_amount: 0
           event_id: 0
-          description: '不使用红包'
+          description: '不使用理财券'
         )
         for obj in availables
           datetime = new Date()
@@ -357,17 +360,23 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
           if obj.method == '*'
             amount = obj.highest_amount
             desc = ['抵', obj.amount*100, '%投资额'].join('')
-          else
+          else if obj.method == '-'
             amount = obj.amount
             desc = (if obj.invest_amount and obj.invest_amount > 0 then [obj.invest_amount, "元起用"].join('') else "无投资门槛")
+          else
+            amount = ''
+            desc = (if obj.invest_amount and obj.invest_amount > 0 then [obj.invest_amount, "元起用"].join('') else "无投资门槛")
+
 
           if obj.highest_amount
             highest_amount = obj.highest_amount
 
           if obj.method == '~'
             text = [obj.name, ' 加息', obj.amount*100, '%'].join('')
+            imageSrc = '/static/imgs/pc/p2p_detail/icon_jiaxi.png';
           else
             text = [obj.name, ' ', amount, '元'].join('')
+            imageSrc = '/static/imgs/pc/p2p_detail/icon_redpack.png';
 
           ddData.push(
             text: text
@@ -379,17 +388,25 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
             event_id: obj.event_id
             highest_amount: highest_amount
             description: desc + ', ' + available_time + '过期'
+            imageSrc: imageSrc
           )
         $('.red-pack').ddslick
           data: ddData
           width: 194
-          imagePosition: "left"
-          selectText: "请选择红包"
+          imagePosition: "right"
+          selectText: "请选择理财券"
           onSelected: (data) ->
             if validator.checkForm() && $('.dd-selected-value').val() != ''
               $('#purchase-form').trigger('redpack')
             else
               $('.payment').hide()
+
+
+            if validator.checkForm() && $('.dd-selected-value').val() != '' && data.selectedData.method == '~'
+               $('.payment').hide()
+            else
+              $('#id_amount').attr('activity-jiaxi', 0)
+              calculator.p2pCalculate()
 
             if !isFirst
               $('#purchase-form').valid()
