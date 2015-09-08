@@ -237,6 +237,7 @@ urlpatterns += patterns(
     url(r'^xunlei/award/$', 'marketing.views.ajax_post'), #add by Yihen@20150821, 迅雷-网利宝 抽奖活动
     url(r'^xunlei/award/records/$', 'marketing.views.ajax_get_activity_record'), #add by Yihen@20150825, 迅雷-网利宝 抽奖活动记录
     url(r'^celebrate/awards/$', 'marketing.views.celebrate_ajax'), #add by Yihen@20150828, 网利宝一周年大转盘活动
+    url(r'^award/common_september/$', 'marketing.views.september_award_ajax'), #add by Yihen@20150907,9月PC常规
 )
 
 
