@@ -1083,13 +1083,20 @@ class CommonAward(object):
         self.request = request
         self.user = self.request.user
 
-    def is_valid_user(self):
-        to_json_response = self.is_register_in_activity_period()
-        return HttpResponse(json.dumps(to_json_response), content_type='application/json' )
+    #def is_valid_user(self):
+    #    to_json_response = self.is_register_in_activity_period()
+    #    return HttpResponse(json.dumps(to_json_response), content_type='application/json' )
 
     def is_valid_channel_register_user(self):
-        channels = Activity.objects.filter(code="9yuechangguiPC").first().channel
-        channels = channels.split(",")
+        channels = Activity.objects.filter(code="9yuechangguiPC").first()
+        if not channels:
+            to_json_response = {
+                'ret_code': 3030,
+                'message': u'There is no channel seted',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json' )
+
+        channels = channels.channel.split(",")
         invite_code = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
         if invite_code not in channels:
             to_json_response = {
@@ -1156,6 +1163,8 @@ class CommonAward(object):
                     return award[index]
                 else:
                     return u"None"
+        else:
+            return u"None"
 
     def ignore_user_action(self):
         user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
@@ -1209,7 +1218,8 @@ class CommonAward(object):
         """
             每次进入转盘页面，如果用户是第一次玩，会创建WanglibaoActivityReward记录
         """
-        user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
+        user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user).first()
+        print self.request.user.id
         if not user_activity:
             user_activity = WanglibaoActivityReward.objects.create(
                 user=self.request.user,
@@ -1221,7 +1231,7 @@ class CommonAward(object):
 
             activity = ActivityJoinLog.objects.create(
                 user=self.request.user,
-                action_name=u'common_award_september',
+                action_name=u'common_award_sepetember',
                 action_type=u'login',
                 action_message=u'九月PC常规活动',
                 channel=u'all',
@@ -1237,7 +1247,7 @@ class CommonAward(object):
 
             activity = ActivityJoinLog.objects.create(
                 user=self.request.user,
-                action_name=u'common_award_september',
+                action_name=u'common_award_sepetember',
                 action_type=u'login',
                 action_message=u'九月PC常规活动',
                 channel=u'all',
@@ -1248,7 +1258,7 @@ class CommonAward(object):
             )
 
             gift = ActivityJoinLog.objects.filter(action_name='common_award_sepetember', user=self.request.user, gift_name=u"None").order_by('-create_time').first()
-            gift.gift_name = self.getaward_gift(activity.id)
+            gift.gift_name = self.get_award_gift(activity.id)
             if gift.gift_name != u"None":
                 gift.join_times = 1
                 gift.save(update_fields=['join_times', 'gift_name'])
@@ -1265,7 +1275,7 @@ class CommonAward(object):
             'ret_code': 3012,
             'total_chances': user_activity.total_chances,
             'used_chances': user_activity.used_chances,
-            'amount': join_log.amount,
+            'amount': str(join_log.amount),
             'amount_left': join_log.join_times,
             'gift': gift.gift_name,
             'gift_left':gift.join_times,
