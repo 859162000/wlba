@@ -641,7 +641,7 @@ class TopsOfEaringView(APIView):
             if rs:
                 virtual_incomes = json.loads(rs.value)
                 for virtual_income in virtual_incomes['virtual_incomes']:
-                    records.append({'phone':virtual_income[0], 'amount':Decimal(virtual_income[1])})
+                    records.append({'phone':virtual_income[0], 'amount':Decimal(virtual_income[1]).quantize(Decimal('0.0'))})
 
             else:
                 misc = Misc()
