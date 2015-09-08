@@ -1,11 +1,15 @@
 (function() {
   require.config({
     paths: {
-        jquery: 'lib/jquery.min'
+        jquery: 'lib/jquery.min',
+        'jquery.animateNumber': 'lib/jquery.animateNumber.min'
+    },
+    shim: {
+        'jquery.animateNumber': ['jquery']
     }
   });
 
-  require(['jquery'], function($) {
+  require(['jquery','jquery.animateNumber'], function($){
     var  csrfSafeMethod, getCookie,sameOrigin,
     getCookie = function(name) {
         var cookie, cookieValue, cookies, i;
@@ -42,6 +46,8 @@
             }
         }
     });
+    var $num = $('.num-space');
+    var is_animate = true;
     $.ajax({
         url: '/api/gettopofearings/',
         type: "POST"
@@ -54,10 +60,10 @@
             if(json_one!=''){
                 if(i<=2){
                     rankingList_phone.push(['<li class="front">'+json_one.phone+'</li>'].join(''));
-                    rankingList_amount.push(['<li class="front">'+json_one.amount+'</li>'].join(''));
+                    rankingList_amount.push(['<li class="front num-animate">'+json_one.amount+'</li>'].join(''));
                 }else{
                     rankingList_phone.push(['<li>'+json_one.phone+'</li>'].join(''));
-                    rankingList_amount.push(['<li>'+json_one.amount+'</li>'].join(''));
+                    rankingList_amount.push(['<li class="num-animate">'+json_one.amount+'</li>'].join(''));
                 }
             }else{
                 rankingList_phone.push(['<li>虚位以待</li>'].join(''));
@@ -67,8 +73,23 @@
         }
         $('.rankingList ul.two').html(rankingList_phone.join(''));
         $('.rankingList ul.three').html(rankingList_amount.join(''));
+
+        $(window).scroll(function(){
+            if($(window).scrollTop()>=300&&is_animate){
+                $('.num-animate').each(function(){
+                    var key = parseInt($(this).html());
+                    $(this).prop('number', 0).animateNumber({
+                      number: key,
+                    },1000);
+                    is_animate = false;
+                })
+            }
+        });
+
+
        })
     })
+
 }).call(this);
 
 

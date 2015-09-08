@@ -214,13 +214,20 @@ html
         p 抱歉~您不符合参加规则
         p.winningBtn
           a(href='javascript:void(0)').spanBtn 好吧
+
+    .no-win.alert-box(style='display:none')
+        p 前世500次回眸才换得一次中奖，淡定！
+        p.winningBtn
+          a(href='javascript:void(0)').spanBtn 再来一次
+
     .winningDiv.alert-box(style='display:none')
         //.winningImg
         span.spanBtn
-        p 恭喜您获得
-          em#moeny
+        p 终于等到你，还好我没放弃<br/>
+          | 恭喜您获得
+          em.gift-box#moeny
         .winningBtn
-            a(href='javascript:void(0)').againBtn 再抽一次
+            a(href='javascript:void(0)').againBtn 再来一次
 
     .promote-register.alert-box(style='display:none')
       span.spanBtn

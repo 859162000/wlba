@@ -5,7 +5,7 @@
 }
 
 function runzp(index) {
-	var data = '[{"id":1,"prize":"1月爱奇艺会员","v":1.0},{"id":2,"prize":"扣电影50元代金券","v":1.0},{"id":3,"prize":"200元现金红包","v":2.0},{"id":4,"prize":"150元现金红包","v":3.0},{"id":5,"prize":"100元现金红包","v":4.0}]';// 奖项json
+	var data = '[{"id":1,"prize":"爱奇艺会员","v":1.0},{"id":2,"prize":"扣电影代金券","v":1.0},{"id":3,"prize":"200元现金红包","v":2.0},{"id":4,"prize":"150元现金红包","v":3.0},{"id":5,"prize":"100元现金红包","v":4.0}]';// 奖项json
 	var obj = eval('(' + data + ')');
 	var result = randomnum(1, 100);
 	var line = 0;
@@ -16,7 +16,7 @@ function runzp(index) {
 	var angle = 330;
 	var message = "";
 	var myreturn = new Object;
-	if (returnobj != "0") {// 有奖
+	if (index != "") {// 有奖
 		message = "恭喜中奖了";
 		var angle0 = [ 210, 250 ];
 		var angle1 = [ 255, 292 ];
