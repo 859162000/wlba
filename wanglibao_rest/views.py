@@ -44,7 +44,7 @@ from wanglibao_account.forms import IdVerificationForm, verify_captcha
 #from marketing.helper import RewardStrategy, which_channel, Channel
 from wanglibao_rest.utils import split_ua, get_client_ip
 from django.http import HttpResponseRedirect
-from wanglibao.templatetags.formatters import safe_phone_str
+from wanglibao.templatetags.formatters import safe_phone_str1
 from marketing.tops import Top
 from marketing import tools
 from django.conf import settings
@@ -650,11 +650,11 @@ class TopsOfEaringView(APIView):
                 misc.description = "全民淘金排行虚拟数据"
                 misc.save()
                 for data in init_datas:
-                    records.append({'phone':data[0], 'amount':Decimal(data[1])})
+                    records.append({'phone':data[0], 'amount':Decimal(data[1]).quantize(Decimal('0.0'))})
 
             incomes = Income.objects.select_related('user').select_related('user__wanglibaouserprofile').values('user__wanglibaouserprofile__phone').annotate(sum_amount=Sum('earning')).order_by('-sum_amount')[0]
 
-            records.append({'phone':safe_phone_str(incomes['user__wanglibaouserprofile__phone']), 'amount':incomes['sum_amount']})
+            records.append({'phone':safe_phone_str1(incomes['user__wanglibaouserprofile__phone']), 'amount':incomes['sum_amount']})
             records.sort(key=operator.itemgetter('amount'), reverse=True)
         except Exception, e:
             return Response({"ret_code": -1, "records": list()})
