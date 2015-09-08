@@ -1056,10 +1056,14 @@ def september_award_ajax(request):
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
+    activity = CommonAward(request)
+    if action == 'IS_VALID_USER':
+        return activity.is_register_in_activity_period()
+
+    if action == 'IS_VALID_CHANNEL':
+        return activity.is_valid_channel_register_user()
+
     if request.is_ajax() and request.method == 'POST':
-        activity = CommonAward(request)
-        if action == 'IS_VALID':
-            return activity.is_valid_user()
         if action == "ENTER_WEB_PAGE":
             return activity.update_total_chances_and_awards()
         if action == 'GET_GIFT':
