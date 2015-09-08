@@ -118,7 +118,7 @@ class RegisterView(RegistrationView):
             'next': self.request.GET.get('next', '/accounts/login/')
         })
 
-        if sign and promo_token == 'csai':
+        if sign and (promo_token == 'csai' or promo_token == 'xicai'):
 
             try:
                 from wanglibao_account.cooperation import get_xicai_user_info
@@ -340,8 +340,6 @@ class AccountHome(TemplateView):
             obj = {"equity": equity}
             if earning_map.get(equity.product_id):
                 obj["earning"] = earning_map.get(equity.product_id)
-            #加息
-            obj['hike'] = backends.get_hike(user, equity.product_id)
 
             result.append(obj)
 
@@ -549,14 +547,12 @@ class AccountInviteAllGoldAPIView(APIView):
         first_intro = dic['first_intro']
         commission = dic['commission']
         
-
         introduces = IntroducedBy.objects.filter(introduced_by=request.user).select_related("user__wanglibaouserprofile").all()
         keys = commission.keys()
         for x in introduces:
             user_id = x.user.id
             if user_id in keys:
-                first_intro.append([safe_phone_str(users[user_id].phone), 
-                                commission[user_id]['amount'], commission[user_id]['earning']])
+                first_intro.append([safe_phone_str(users[user_id].phone), commission[user_id]['amount'], commission[user_id]['earning']])
             else:
                 first_intro.append([safe_phone_str(x.user.wanglibaouserprofile.phone), 0, 0])
 
@@ -564,6 +560,7 @@ class AccountInviteAllGoldAPIView(APIView):
                         "earning":first_earning, "count":first_count, "intro":first_intro},
                         "second":{"amount":second_amount, "earning":second_earning,
                         "count":second_count}, "count":len(introduces)})
+
 
 class AccountInviteIncomeAPIView(APIView):
     permission_classes = (IsAuthenticated, )
@@ -1169,7 +1166,7 @@ def ajax_register(request):
         return json.dumps(res)
 
     if request.method == "POST":
-        #request_bakup = copy.deepcopy(request)    #add by Yihen@20150818; reason:第三方渠道处理的时候，会更改request中的信息
+        channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")    #add by Yihen@20150818; reason:第三方渠道处理的时候，会更改request中的信息
         if request.is_ajax():
 
             #res, message = verify_captcha(dic=request.POST, keep=False)
@@ -1198,8 +1195,8 @@ def ajax_register(request):
 
                 device = utils.split_ua(request)
 
-                #if not AntiForAllClient(request_bakup).anti_delay_callback_time(user.id, device):
-                tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+                if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
+                    tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
                 account_backends.set_source(request, auth_user)
 
@@ -1245,12 +1242,12 @@ class P2PAmortizationAPI(APIView):
                                                         product_amortization__product_id=product_id)
 
         amortization_record = [{
-                                   'amortization_term_date': timezone.localtime(amortization.term_date).strftime(
-                                       "%Y-%m-%d %H:%M:%S"),  # 还款时间
-                                   'amortization_principal': float(amortization.principal),  # 本金
-                                   'amortization_amount_interest': float(amortization.interest),  # 利息
-                                   'amortization_amount': float(amortization.principal + amortization.interest),  # 总记
-                               } for amortization in amortizations]
+            'amortization_term_date': timezone.localtime(amortization.term_date).strftime("%Y-%m-%d %H:%M:%S"),  # 还款时间
+            'amortization_principal': float(amortization.principal),  # 本金
+            'amortization_amount_interest': float(amortization.interest),  # 利息
+            'amortization_amount': float(amortization.principal + amortization.interest + amortization.coupon_interest),  # 本息总和
+            'amortization_coupon_interest': float(amortization.coupon_interest),  # 加息券利息
+        } for amortization in amortizations]
 
         res = {
             'equity_product_short_name': equity.product.short_name,  # 还款标题

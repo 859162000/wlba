@@ -5,46 +5,74 @@ require.config
     'jquery.modal' : 'lib/jquery.modal.min'
 
 require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
-  _countDown = ()->
-    element = $('#sendValidateCodeButton')
-    count = 180
-    $(element).prop 'disabled', true
+  $('.captcha-refresh').click ->
+    $form = $(this).parents('form')
+    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v="+(+new Date())
+    $.getJSON url, {}, (json)->
+      $form.find('input[name="captcha_0"]').val(json.key)
+      $form.find('img.captcha').attr('src', json.image_url)
 
-    $('.voice').attr 'disabled','disabled'
-    $('.voice-validate').attr 'disabled','disabled'
+  $('#sendValidateCodeButton').click ()->
+    $('#img-code-div2').modal()
+    $('#img-code-div2').find('#id_captcha_1').val('')
+    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v="+(+new Date())
+    $.getJSON url, {}, (json)->
+      $('input[name="captcha_0"]').val(json.key)
+      $('img.captcha').attr('src', json.image_url)
+
+  $("#submit-code-img4").click () ->
+    element = $('#sendValidateCodeButton')
+    if $(element).attr 'disabled'
+      return;
+    phoneNumber = $(element).attr("data-phone")
+    captcha_0 = $(this).parents('form').find('#id_captcha_0').val()
+    captcha_1 = $(this).parents('form').find('.captcha').val()
+    $.ajax
+      url: "/api/phone_validation_code/" + phoneNumber + "/"
+      type: "POST"
+      data: {
+        captcha_0 : captcha_0
+        captcha_1 : captcha_1
+      }
+    .fail (xhr) ->
+      clearInterval(intervalId)
+      $(element).text('重新获取')
+      $(element).removeAttr 'disabled'
+      if (xhr.status >= 400)
+        result = JSON.parse xhr.responseText
+        tool.modalAlert({
+          title: '温馨提示',
+          msg: result.message
+        });
+        $(element).html('重新获取');
+        $(element).prop('disabled', false);
+        $(element).removeClass("disabled");
+    .success ->
+      element.attr 'disabled', 'disabled'
+      $('.voice-validate').attr 'disabled', 'disabled'
+      $.modal.close()
+
+    intervalId
+    count = 60
+
+    $(element).attr 'disabled', 'disabled'
+    $(element).addClass('disabled')
+    $('.voice-validate').attr 'disabled', 'disabled'
     timerFunction = ()->
       if count >= 1
         count--
-        $(element).html('已经发送(' + count + ')')
-        $(element).addClass("disabled")
+        $(element).text('重新获取(' + count + ')')
       else
         clearInterval(intervalId)
-        $(element).html('重新获取')
-        $(element).prop 'disabled', false
-        $(element).removeClass("disabled")
+        $(element).text('重新获取')
+        $(element).removeAttr 'disabled'
+        $(element).removeClass('disabled')
         $('.voice').removeClass('hidden')
         $('.voice-validate').removeAttr 'disabled'
-        $('.voice  .reset-inner').html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/2/" class="voice-validate">语音验证</a>')
+        $('.voice  .span12-omega').html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/2/" class="voice-validate">语音验证</a>')
 
-    # Fire now and future
     timerFunction()
     intervalId = setInterval timerFunction, 1000
-
-  $('#sendValidateCodeButton').click (event)->
-    element = $('#sendValidateCodeButton')
-    target = $(event.target).attr('data-url')
-    $.post target
-    .done ->
-      $('#nextStep').prop('disabled', false)
-    .fail (xhr)->
-      if xhr.status >= 400
-        tool.modalAlert({title: '温馨提示', msg: xhr.message})
-        $(element).html('重新获取')
-        $(element).prop 'disabled', false
-        $(element).removeClass("disabled")
-
-
-    _countDown()
 
 
   $('#nextStep').click (e)->
@@ -68,7 +96,7 @@ require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
   $('#validate_form').on 'submit', (e) ->
     e.preventDefault()
     $('#nextStep').click()
-#  _countDown()
+
 
   $(".voice").on 'click', '.voice-validate', (e)->
     e.preventDefault()
@@ -90,7 +118,7 @@ require ['jquery', 'lib/backend', 'tools'], ($, backend, tool)->
         #TODO
 
         intervalId
-        count = 180
+        count = 60
         button = $("#sendValidateCodeButton")
 
         button.attr 'disabled', 'disabled'

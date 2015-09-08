@@ -102,13 +102,13 @@ html
                 li
                   i.icon.iconfont.icon-data-invest
                   span 小伙伴们共投资
-                  span.num-space(data-number='{{site_data.user_income}}',data-type='amount')
+                  span.num-space(data-number='{{site_data.p2p_amount}}',data-type='amount')
                 li
                   i.icon.iconfont.icon-data-makemoney
                   | 小伙伴们赚取了
-                  span.num-space(data-number='{{site_data.p2p_amount}}',data-type='amount')
+                  span.num-space(data-number='{{site_data.user_income}}',data-type='amount')
           .ex-download-app.mg-t-sm.padding-sm
-            img(src='/static/imgs/pc/home/erweima.jpg').dol-app.mg-r-sm.fl
+            img(src='/static/imgs/pc/home/www_erweima.jpg').dol-app.mg-r-sm.fl
             .dol-btn.fl
               .t-d4 网利宝APP-随时随地 让钱生钱
               a(href='https://www.wanglibao.com/static/wanglibao1.apk').dol-btn-warp
@@ -123,18 +123,24 @@ html
     .i-mod-wrap.mg-t-sm
       .i-mod-product.clearfix
         p2ptype = [{'title': '短期灵活', 'period': '标的期限1-3个月', 'class': 'p2p3', 'data': p2p_lt_three},{'title': '中期稳健', 'period': '标的期限3-6个月', 'class': 'p2p6', 'data': p2p_lt_six},{'title': '长期优选', 'period': '标的期限6个月及以上', 'class': 'p2p12', 'data': p2p_gt_six}]
-        for type in p2ptype
+        p2ptype_i = enumerate(p2ptype)
+        for idx, type in p2ptype_i
           .pdt-item
             .pdt-type.padding-sm.br-b-d2(class='{{type.class}}')
-              .font-ll {{type.title}}
-              .font-s.t-d12 {{type.period}}
+              .font-ll.padding-l-sm {{type.title}}
+              .font-s.t-d12.padding-l-sm {{type.period}}{{idx}}
+              if idx >= 1
+                .pdf-type-qmtj
+
             product = enumerate(type['data'])
             for index, p2p in product
               .pdt-list
                 .pdt-warp.padding-t-l-r-sm
                   a(href='/p2p/detail/{{p2p.id}}/', title='{{p2p.name}}').pdt-name.t-d10
-                    //i.icon.iconfont.icon-car
-                    span.font-l {{p2p.name}}
+                    if p2p.category == "新手标"
+                      span.font-l (新手标){{p2p.name}}
+                    else
+                      span.font-l {{p2p.name}}
                   if index == 0
                     .t-d7.clearfix
                       .span5.es 合作机构: {{p2p.warrant_company}}

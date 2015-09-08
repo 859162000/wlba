@@ -97,13 +97,13 @@ class RedPackRecordAdmin(ExportMixin, admin.ModelAdmin):
                                  file_format.get_extension())
         return filename
 
-class InterestHikeAdmin(admin.ModelAdmin):
-    list_display = ("id", "user", "product", "rate", "intro_total", "invalid", "paid", 
-                    "amount", "created_at")
-    search_fields = ('user__wanglibaouserprofile__phone', 'product__name')
-    raw_id_fields = ("user", "product")
+# class InterestHikeAdmin(admin.ModelAdmin):
+#     list_display = ("id", "user", "product", "rate", "intro_total", "invalid", "paid",
+#                     "amount", "created_at")
+#     search_fields = ('user__wanglibaouserprofile__phone', 'product__name')
+#     raw_id_fields = ("user", "product")
 
 admin.site.register(RedPack, RedPackAdmin)
 admin.site.register(RedPackEvent, RedPackEventAdmin)
 admin.site.register(RedPackRecord, RedPackRecordAdmin)
-admin.site.register(InterestHike, InterestHikeAdmin)
+# admin.site.register(InterestHike, InterestHikeAdmin)

@@ -364,6 +364,12 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': '/var/log/wanglibao/anti.log',
             'formatter': 'verbose'
+        },
+        'marketing': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/marketing.log',
+            'formatter': 'verbose'
         }
     },
     'loggers': {
@@ -417,7 +423,11 @@ LOGGING = {
             'level': 'DEBUG'
         },
         'wanglibao_anti': {
-            'handlers': ['anti'],
+            'handlers': ['anti', 'console'],
+            'level': 'DEBUG'
+        },
+        'marketing': {
+            'handlers': ['marketing', 'console'],
             'level': 'DEBUG'
         },
     }
@@ -534,6 +544,37 @@ CELERYBEAT_SCHEDULE = {
     'handle_delay_time_data': {
         'task': 'wanglibao_anti.tasks.handle_delay_time_data',
         'schedule': timedelta(minutes=3)
+    },
+
+    # by Zhoudong 菜苗上报平台信息.
+    'caimiao_platform_post': {
+        'task': 'wanglibao_account.tasks.caimiao_platform_post_task',
+        'schedule': crontab(minute=0, hour=0, day_of_month=1)
+    },
+    # by Zhoudong 菜苗上报标的信息.
+    'caimiao_p2p_post': {
+        'task': 'wanglibao_account.tasks.caimiao_p2p_info_post_task',
+        'schedule': crontab(minute=0, hour=0)
+    },
+    # by Zhoudong 菜苗上报成交量.
+    'caimiao_volumes_post': {
+        'task': 'wanglibao_account.tasks.caimiao_volumes_info_post_task',
+        'schedule': crontab(minute=0, hour=0)
+    },
+    # by Zhoudong 菜苗上报网贷评级.
+    'caimiao_rating_post': {
+        'task': 'wanglibao_account.tasks.caimiao_rating_info_post_task',
+        'schedule': crontab(minute=0, hour=0)
+    },
+    #add by Huomeimei  每日更新虚拟全民淘金账号数据
+    'update_robot_earning': {
+        'task': 'wanglibao_redpack.tasks.update_robot_earning',
+        'schedule': crontab(minute=0, hour=0)
+    },
+    # by Zhoudong 中金标的推送(包含新标, 更新, 下架)
+    'zhongjin_send_data': {
+        'task': 'wanglibao_account.tasks.zhongjin_post_task',
+        'schedule': timedelta(hours=1),
     },
 }
 
@@ -823,6 +864,25 @@ if ENV == ENV_PRODUCTION:
 else:
     XICAI_LOAD_PAGE = 'https://staging.wanglibao.com/p2p/detail/{p2p_id}/?promo_token=xicai'
 
+# 菜苗
+CAIMIAO_SECRET = 'a400f466c02ddfde984f631c66b36c6489e07d55615d07da0d9dd4a6f7bdb888'
+CAIMIAO_PlatformBasic_URL = 'http://121.40.31.143:86/api/JsonsFinancial/PlatformBasic/'
+CAIMIAO_ProdMain_URL = 'http://121.40.31.143:86/api/JsonsFinancial/ProdMain/'
+CAIMIAO_Volumes_URL = 'http://121.40.31.143:86/api/JsonsFinancial/Volumes/'
+CAIMIAO_RATING_URL = 'http://121.40.31.143:86/api/JsonsFinancial/Rating/'
+
+# 众牛
+ZHONGNIU_SECRET = 'N9ecZSqh'
+
+# 中金
+ZHONGJIN_ID = 15
+ZHONGJIN_TEST_ID = 34
+ZHONGJIN_P2P_URL = 'http://open.rong.cnfol.com/product.html'
+ZHONGJIN_P2P_TEST_URL = 'http://test.open.finance.cnfol.com/product.html'    # 未确定
+ZHONGJIN_SECRET = '2CF7AC2A27CC9B48C4EFCD7E356CD95F'
+ZHONGJIN_TEST_SECRET = '348BB1C9A2032B2DA855D082151E8B8E'
+ZHONGJIN_UPDATE_TIMEDELTA = timedelta(hours=1)
+
 # 金山
 WLB_FOR_JINSHAN_KEY = '1994'
 JINSHAN_CALL_BACK_URL = 'https://vip.wps.cn/task/api/reward'
@@ -834,6 +894,16 @@ WLB_FOR_SHLS_KEY = '1995'
 WLB_FOR_SHITOUCUN_KEY = '1996'
 SHITOUCUN_CALL_BACK_URL = 'http://www.stcun.com/task/interface/int'
 
+# 富爸爸
+FUBA_COOP_ID = 133
+FUBA_KEY = 'wanglibao@123'
+WLB_FOR_FUBA_KEY = '1997'
+FUBA_CALL_BACK_URL = 'http://www.fbaba.net/track/cps.php'
+FUBA_DEFAULT_TID = '1316'
+FUBA_ACTIVITY_PAGE = 'index'
+FUBA_PERIOD = 30
+FUBA_CHANNEL_CODE = 'fuba'
+
 #彩票
 LINGCAIBAO_BASE_ISSUE = 2015090
 LINGCAIBAO_BASE_DATETIME = datetime(2015, 8, 4)
@@ -843,6 +913,50 @@ if ENV == ENV_PRODUCTION:
     LINGCAIBAO_URL_ORDER = 'http://open.lingcaibao.com/lingcaiapi/order'
 else:
     LINGCAIBAO_URL_ORDER = 'http://test.lingcaibao.com/lingcaiapi/order'
+
+# 云端
+WLB_FOR_YUNDUAN_KEY = '1998'
+YUNDUAN_CALL_BACK_URL = 'http://www.yunduanlm.com/effect.php'
+YUNDUAN_ACTIVITY_PAGE = 'marketing_baidu'
+YUNDUAN_COOP_ID = 298
+
+# 易车
+WLB_FOR_YICHE_KEY = '1999'
+if ENV == ENV_PRODUCTION:
+    YICHE_COOP_ID = 200104
+    YICHE_KEY = '0dae7d5bbcd493785f057bc1'
+    YICHE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API'
+else:
+    YICHE_COOP_ID = 200104
+    YICHE_KEY = '0dae7d5bbcd493785f057bc1'
+    YICHE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API'
+
+# 智推
+WLB_FOR_ZHITUI1_KEY = '2000'
+ZHITUI_COOP_ID = '370'
+ZHITUI_CALL_BACK_URL = 'http://api.zhitui.com/wanglibao/recive.php'
+
+# 中国电信
+WLB_FOR_ZGDX_KEY = '2001'
+if ENV == ENV_PRODUCTION:
+    ZGDX_CALL_BACK_URL = 'http://118.123.170.72:8888/fps/flowService.do'
+    ZGDX_PARTNER_NO = '100054374'
+    ZGDX_SERVICE_CODE = 'FS0001'
+    ZGDX_CONTRACT_ID = 'test20150901165440'
+    ZGDX_ACTIVITY_ID = '100785'
+    ZGDX_PLAT_OFFER_ID = '103050'
+    ZGDX_KEY = 'H5gOs1ZshKZ6WikN'
+    ZGDX_IV = '8888159601152533'
+else:
+    ZGDX_CALL_BACK_URL = 'http://118.123.170.72:8888/fps/flowService.do'
+    ZGDX_PARTNER_NO = '100054374'
+    ZGDX_SERVICE_CODE = 'FS0001'
+    ZGDX_CONTRACT_ID = 'test20150901165440'
+    ZGDX_ACTIVITY_ID = '100785'
+    ZGDX_PLAT_OFFER_ID = '103050'
+    ZGDX_KEY = 'H5gOs1ZshKZ6WikN'
+    ZGDX_IV = '8888159601152533'
+
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100
