@@ -7,15 +7,16 @@ from django.contrib import admin
 from django.conf import settings
 from django.views.generic import TemplateView, RedirectView
 from wanglibao.views import IndexView, SecurityView, PartnerView
-from wanglibao_account.cooperation import YiruiteQuery, TianmangRegisterQuery, TianmangIDVerificationQuery, \
-    TianmangInvestQuery, TianmangInvestNotConfirmQuery, TianmangCardBindQuery, BengbengQuery
+# from wanglibao_account.cooperation import YiruiteQuery, TianmangRegisterQuery, TianmangIDVerificationQuery, \
+    # TianmangInvestQuery, TianmangInvestNotConfirmQuery, TianmangCardBindQuery, BengbengQuery, CoopQuery
+from wanglibao_account.cooperation import CoopQuery, CsaiUserQuery, CsaiInvestmentQuery, ZhongniuP2PQuery, \
+    ZhongniuP2PDataQuery
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
-# from wanglibao_account.views import CjdaoApiView
 from wanglibao_banner.views import HiringView, AboutView, CompanyView, TeamView, MilestoneView, \
     ResponsibilityView, ContactView, AgreementView, DirectorateView, AgreementAutoView
 
@@ -24,6 +25,7 @@ from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDate
 from marketing.views import NewsListView, NewsDetailView
 from wanglibao_activity.decorators import decorator_include
 from wanglibao_activity.decorators import wap_activity_manage
+from wanglibao.views import landpage_view
 
 admin.site = AdminSitePlus()
 admin.autodiscover()
@@ -32,6 +34,7 @@ urlpatterns = patterns(
     '',
     url(r'^$', IndexView.as_view(), name="index"),
     url(r'^security/', SecurityView.as_view(), name="security"),
+    url(r'^pc_guide/', TemplateView.as_view(template_name="pc_guide.jade")),
     url(r'^favicon.ico', RedirectView.as_view(url="/static/favicon.ico")),
 
     url(r'^portfolio/', PortfolioHomeView.as_view(), name="portfolio_home"),
@@ -62,6 +65,7 @@ urlpatterns = patterns(
     url(r'^accounts/', include('wanglibao_account.urls')),
     url(r'^shumi/', include('shumi_backend.urls')),
     url(r'^pay/', include('wanglibao_pay.urls')),
+    url(r'app/', include('wanglibao_app.urls')),
 
     # url(r'^howto/', TemplateView.as_view(template_name="howto.jade")),
     url(r'^hiring/', HiringView.as_view(), name="hiring"),
@@ -91,14 +95,21 @@ urlpatterns = patterns(
     url(r'^taojin/', RedirectView.as_view(url="/activity/pan_gold/")),
 
     url(r'^tender_agreement/',  AgreementAutoView.as_view(), name="agreement_auto"),
+    url(r'^lottery/', include('wanglibao_lottery.urls')),
+    url(r'^landpage/', landpage_view),
 )
 
 urlpatterns += patterns(
     '',
     url(r'^captcha/', include('captcha.urls')),
-    url(r'^media/(?P<path>.*)$', 'file_storage.views.serve')
+    url(r'^media/(?P<path>.*)$', 'file_storage.views.serve'),
 )
 
+#add by Yihen@20150813,反作弊的相关接口处理在此
+urlpatterns += patterns(
+    '',
+    url(r'^anti/', include('wanglibao_anti.urls')),
+)
 
 # the admin router about transaciton infdomation
 urlpatterns += patterns(
@@ -123,18 +134,24 @@ urlpatterns += patterns(
     # 迅雷
     url(r'^api/xunlei/getProjectList/$', XunleiP2PListAPIView.as_view()),
     url(r'^api/xunlei/getXLUserInvestInfo/$', XunleiP2PbyUser.as_view()),
-    # 财经道
-    # url(r'^accounts/cjdao/$', CjdaoApiView.as_view(), name='cjdao'),
-    # 天芒云
-    url(r'^api/tmyun/getRegisterList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangRegisterQuery.as_view()),
-    url(r'^api/tmyun/getIDVerificationList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangIDVerificationQuery.as_view()),
-    url(r'^api/tmyun/getInvestList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangInvestQuery.as_view()),
-    url(r'^api/tmyun/getInvestListNotConfirm/(?P<startday>.*)/(?P<endday>.*)/$', TianmangInvestNotConfirmQuery.as_view()),
-    url(r'^api/tmyun/getCardBindList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangCardBindQuery.as_view()),
-    # 易瑞特
-    url(r'^api/yiruite/getInfoList/(?P<startday>.*)/(?P<endday>.*)/(?P<sign>.*)/$', YiruiteQuery.as_view()),
-    # 蹦蹦网
-    url(r'^api/bengbeng/getInfoList/(?P<startday>.*)/(?P<endday>.*)/(?P<sign>.*)/$', BengbengQuery.as_view())
+    # # 天芒云
+    # url(r'^api/tmyun/getRegisterList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangRegisterQuery.as_view()),
+    # url(r'^api/tmyun/getIDVerificationList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangIDVerificationQuery.as_view()),
+    # url(r'^api/tmyun/getInvestList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangInvestQuery.as_view()),
+    # url(r'^api/tmyun/getInvestListNotConfirm/(?P<startday>.*)/(?P<endday>.*)/$', TianmangInvestNotConfirmQuery.as_view()),
+    # url(r'^api/tmyun/getCardBindList/(?P<startday>.*)/(?P<endday>.*)/$', TianmangCardBindQuery.as_view()),
+    # # 易瑞特
+    # url(r'^api/yiruite/getInfoList/(?P<startday>.*)/(?P<endday>.*)/(?P<sign>.*)/$', YiruiteQuery.as_view()),
+    # # 蹦蹦网
+    # url(r'^api/bengbeng/getInfoList/(?P<startday>.*)/(?P<endday>.*)/(?P<sign>.*)/$', BengbengQuery.as_view())
+    url(r'^api/coopinfo/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<user_type>[a-z0-9A-Z_]*)/(?P<start_day>[0-9]*)/(?P<end_day>[0-9]*)/(?P<sign>[a-z0-9A-Z_]*)/$', CoopQuery.as_view()),
+    url(r'^api/coopinfo/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<user_type>[a-z0-9A-Z_]*)/(?P<start_day>[0-9]*)/(?P<end_day>[0-9]*)/(?P<sign>[a-z0-9A-Z_]*)/(?P<page>[0-9]*)/$', CoopQuery.as_view()),
+
+    url(r'^api/csai/users/', CsaiUserQuery.as_view()),
+    url(r'^api/csai/investment/', CsaiInvestmentQuery.as_view()),
+
+    url(r'^api/zhongniu/products/', ZhongniuP2PQuery.as_view()),
+    url(r'^api/zhongniu/getData/$', ZhongniuP2PDataQuery.as_view()),
 )
 
 # 微信

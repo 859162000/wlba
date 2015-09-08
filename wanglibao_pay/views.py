@@ -23,6 +23,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from order.models import Order
 from order.utils import OrderHelper
+from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_pay.models import Bank, Card, PayResult, PayInfo
@@ -41,6 +42,7 @@ from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
 from django.conf import settings
 from wanglibao_announcement.utility import AnnouncementAccounts
+#from wanglibao_account.forms import verify_captcha
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -189,6 +191,12 @@ class WithdrawCompleteView(TemplateView):
 
     @method_decorator(transaction.atomic)
     def post(self, request, *args, **kwargs):
+        #result, message = verify_captcha(request.POST)
+        #if not result:
+        #    return self.render_to_response({
+        #        'result': message
+        #    })
+
         if not request.user.wanglibaouserprofile.id_is_valid:
             return self.render_to_response({
                 'result': u'请先进行实名认证'
@@ -198,7 +206,7 @@ class WithdrawCompleteView(TemplateView):
         status, message = validate_validation_code(phone, code)
         if status != 200:
             return self.render_to_response({
-                'result': u'验证码输入错误'
+                'result': u'短信验证码输入错误'
             })
 
         result = PayResult.WITHDRAW_SUCCESS
@@ -348,6 +356,9 @@ class CardViewSet(ModelViewSet):
                             }, status=status.HTTP_400_BAD_REQUEST)
 
         card.save()
+
+        #处理第三方渠道回调
+        CoopRegister(request).process_for_binding_card(request.user)
 
         return Response({
             'id': card.pk,
@@ -696,6 +707,7 @@ class BankCardAddView(APIView):
 
     def post(self, request):
         result = third_pay.add_bank_card(request)
+
         return Response(result)
 
 

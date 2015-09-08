@@ -2,10 +2,10 @@ extends account_home_base
 - load formatters
 - load mathfilters
 block head
-  - with '邀请奖励' as title
+  - with '全民淘金' as title
     include include/head
 block sidebar
-  - with '邀请奖励' as activeItem
+  - with '全民淘金' as activeItem
     include include/user_center_sidebar
 block main
   .account-home-panel
@@ -34,16 +34,30 @@ block main
                         好友的好友/投资额（元）
   .account-home-panel
     .well-s.lh-m
-      dl.font-s
-        dt.font-xl.dark-text 邀请小伙伴理财，可享30元话费
-
-        dd 活动时间：2015年6月20日- 2015年7月15日。
-        dd 1、小伙伴邀请以身份证号为唯一识别标识。
-        dd 2、通过以下任一方式邀请，小伙伴需通过邀请链接注册网利宝，或注册时输入您的邀请码。
-        dd.highlight 3、小伙伴受邀注册可享50元现金红包，投资满300元即可使用。
-        dd.highlight 4、小伙伴购买理财产品，完成首次单笔200元（含）以上交易，邀请关系建立，你可享30元话费。
-        dd 5、赠送话费将于好友理财成功后3个工作日内发放至您的交易手机号。
-        dd 6、此次活动解释权归网利宝官网所有。
+      dl.font-s.inviteDl
+        dt.font-xl.dark-text 邀请小伙伴理财，躺着赚钱不是梦！
+        dd 活动有效期：2015年8月1日-2015年9月15日
+        dd
+            span 1、
+            label 小伙伴邀请以身份证号为唯一识别标识；
+        dd
+            span 2、
+            label 小伙伴受邀需通过您的邀请链接注册网利宝，或注册时输入您的专属邀请码；
+        dd.highlight
+            span 3、
+            label 小伙伴受邀注册即送总额1000元红包，按投资额的0.2%折扣使用；
+        dd.highlight
+            span 4、
+            label 小伙伴购买理财产品，完成首次单笔500元（含）以上投资，您可获得30元现金红包；
+        dd
+            span 5、
+            label 小伙伴购买三个月（含三个月）以上的理财产品，您即可获额外理财佣金（相当于小伙伴每笔投资额千分之三），多邀多投多送上不封顶！
+        dd
+            span 6、
+            label 红包统一以站内信形式通知，完成一次投资回款后即可取现；
+        dd
+            span 7、
+            label 此次活动解释权归网利宝官网所有。
 
       .space-vertical-l
       .invite-container.clearfix
@@ -63,7 +77,7 @@ block main
         .pull-right.invite-content
           .invite-title-bgcolor 这是您的专用邀请链接，您可点击【复制】按钮，将本文粘贴并发送给您的好友：
           .invite-textarea
-            |来网利宝投资，让钱生钱！现在受邀注册理财即可获得50元现金红包，还可尊享16%新手标礼遇。IDG资本、百亿A股上市公司超4000万美金投资平台，100%本息保障，100元起投资，立即去看看～
+            |来网利宝投资，让钱生钱！现在受邀注册理财即可获得1000元现金红包，还可尊享16%新手标礼遇。IDG资本、百亿A股上市公司超4000万美金投资平台，100%本息保障，100元起投资，立即去看看～
             |戳这里>>
             span.blue https://www.wanglibao.com/?promo_token={{user.promotiontoken.token}}
           input.pull-right.button.button-red.inviteCopyButton(type="button",value="复制",data-target="invite-textarea")
@@ -119,7 +133,7 @@ block main
   script(src="/static/js/lib/jquery.modal.min.js")
   script.
     var _share_title = encodeURI('“邀请好友送话费”活动');
-    var _share_content = encodeURI('来网利宝投资，让钱生钱！现在受邀注册理财即可获得50元现金红包，还可尊享16%新手标礼遇。IDG资本、百亿A股上市公司超4000万美金投资平台，100%本息保障，100元起投资，立即去看看～https://www.wanglibao.com/?promo_token={{user.promotiontoken.token}}');
+    var _share_content = encodeURI('来网利宝投资，让钱生钱！现在受邀注册理财即可获得1000元现金红包，还可尊享16%新手标礼遇。IDG资本、百亿A股上市公司超4000万美金投资平台，100%本息保障，100元起投资，立即去看看～https://www.wanglibao.com/?promo_token={{user.promotiontoken.token}}');
     var _activity_url = encodeURIComponent('https://www.wanglibao.com/activity/invite/');
     var _share_url = encodeURIComponent('https://www.wanglibao.com/?promo_token={{user.promotiontoken.token}}');
     var _share_pic = 'https://staging.wanglibao.com/static/images/share_pic.jpg';

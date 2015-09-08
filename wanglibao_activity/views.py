@@ -14,8 +14,8 @@ class TemplatesFormatTemplate(TemplateView):
         include = {
             "1": "include/activity_time.jade",
             "2": "include/activity_prize.jade",
-            "3": "include/activity_friends.jade",
-            "4": "include/activity_process.jade",
+#            "3": "include/activity_friends.jade",
+#            "4": "include/activity_process.jade",
             "5": "include/activity_use_rule.jade",
             "6": "include/activity_act_rule.jade",
             "7": "include/activity_prize_rule.jade",

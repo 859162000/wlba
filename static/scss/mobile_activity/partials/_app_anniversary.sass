@@ -1,0 +1,423 @@
+@mixin light($dTime:0.25s)
+  animation: light linear 0.5s $dTime infinite both
+  -moz-animation: light linear 0.5s $dTime infinite both
+  -webkit-animation: light linear 0.5s $dTime infinite both
+  -o-animation: light linear 0.5s $dTime infinite both
+
+@keyframes light
+  0%
+    opacity: 0
+  50%
+    opacity: 1
+@-moz-keyframes light
+  0%
+    opacity: 0
+  50%
+    opacity: 1
+
+@-webkit-keyframes light
+  0%
+    opacity: 0
+  50%
+    opacity: 1
+
+@-o-keyframes light
+  0%
+    opacity: 0
+  50%
+    opacity: 1
+.bannerAnniversary
+  width: 100%
+  position: relative
+  img
+    width: 100%
+    display: block
+  .imgDiv
+    position: absolute
+    top: 3.85rem
+    left: 0
+    text-align: center
+    width: 100%
+    .bannerFonts
+      height: 4.5rem
+      width: 13.95rem
+      margin: 0 auto
+      -webkit-transition: all 0.5s ease-in-out
+      -moz-transition: all 0.5s ease-in-out
+      -o-transition: all 0.5s ease-in-out
+      -ms-transition: all 0.5s ease-in-out
+      transition: all 0.5s ease-in-out
+      -webkit-transform: rotate(360deg) scale(1.5,1.5)
+      -moz-transform: rotate(360deg) scale(1.5,1.5)
+      -o-transform: rotate(360deg) scale(1.5,1.5)
+      -ms-transform: rotate(360deg) scale(1.5,1.5)
+      transform: rotate(360deg) scale(1.5,1.5)
+    .bannerFontsHover
+      -webkit-transform: rotate(0deg) scale(1,1)
+      -moz-transform: rotate(0deg) scale(1,1)
+      -o-transform: rotate(0deg) scale(1,1)
+      -ms-transform: rotate(0deg) scale(1,1)
+      transform: rotate(0deg) scale(1,1)
+.activityOne
+  width: 100%
+  position: relative
+  img
+    width: 100%
+    display: block
+  .activityOneDiv
+    position: absolute
+    width: 100%
+    text-align: center
+    top: 0
+    left: 0
+    .span
+      width: 15.025rem
+      height: 1.6rem
+      line-height: 1.6rem
+      margin-top: 2.075rem
+      background: url('/static/imgs/mobile_activity/app_anniversary/title.png') no-repeat left center
+      background-size: 100%
+      display: inline-block
+      color: #ffffff
+      font-size: 0.8rem
+  .activityOneBtn
+    position: absolute
+    bottom: 2.225rem
+    text-align: center
+    width: 100%
+    a
+      color: #974400
+      font-size: 0.9rem
+      background: #ffe400
+      border-radius: 30px
+      display: inline-block
+      width: 8.2rem
+      height: 1.675rem
+      margin: 0 auto
+      line-height: 1.675rem
+.activityTwo
+  background: #fce12b
+  width: 100%
+  .activityTwoDiv
+    width: 100%
+    text-align: center
+    .span
+      width: 15.025rem
+      height: 1.6rem
+      line-height: 1.6rem
+      margin-top: 2.075rem
+      background: url('/static/imgs/mobile_activity/app_anniversary/title.png') no-repeat left center
+      background-size: 100%
+      display: inline-block
+      color: #ffffff
+      font-size: 0.8rem
+  img
+    width: 100%
+    display: block
+    margin-top: 1.275rem
+  .activityTwoBtn
+    text-align: center
+    width: 100%
+    margin-top: -3rem
+    padding-bottom: 1.5rem
+    a
+      color: #fff100
+      font-size: 0.9rem
+      background: #e73f3f
+      border-radius: 30px
+      display: inline-block
+      width: 8.2rem
+      height: 1.675rem
+      margin: 0 auto
+      line-height: 1.675rem
+.activityThree
+  background: #fc716a
+  .activityThreeDiv
+    width: 100%
+    text-align: center
+    .span
+      width: 15.025rem
+      height: 1.6rem
+      line-height: 1.6rem
+      margin-top: 2.075rem
+      background: url('/static/imgs/mobile_activity/app_anniversary/title.png') no-repeat left center
+      background-size: 100%
+      display: inline-block
+      color: #ffffff
+      font-size: 0.8rem
+  .zhuanpanDiv
+    text-align: center
+    margin: 1.15rem 0 0.725rem
+    width: 100%
+    height: 14.1rem
+    position: relative
+    .centerStyle
+      position: absolute
+      left: 0
+      top: 0
+      text-align: center
+      width: 100%
+      .luckDrawImg,.prize-light1,.prize-light2
+        background: url('/static/imgs/mobile_activity/app_anniversary/zhuanpan.png') no-repeat left center
+        background-size: 100%
+        width: 14.1rem
+        height: 14.1rem
+        margin: 0 auto
+        .luckDrawButton
+          position: absolute
+          top: 4.775rem
+          width: 100%
+          left: 0
+          text-align: center
+          z-index: 30
+          img
+            width: 3.8rem
+            height: 4.475rem
+            display: block
+            margin: 0 auto
+      .prize-light1
+        background: url('/static/imgs/mobile_activity/app_anniversary/prize-light1.png') no-repeat left center
+        +light
+        background-size: 100%
+        z-index: 10
+      .prize-light2
+        background: url('/static/imgs/mobile_activity/app_anniversary/prize-light2.png') no-repeat left center
+        +light
+        background-size: 100%
+        z-index: 10
+    .zIndex
+      z-index: 20
+  .luckDrawRightTop
+    background: #ee464d
+    width: 12.45rem
+    border-radius: 0.25rem
+    height: 12.05rem
+    text-align: center
+    margin: 0 auto
+    h3
+      color: #fce12b
+      font-size: 0.8rem
+      margin: 0
+      padding-top: 0.65rem
+    p
+      font-size: 0.6rem
+      color: #ffffff
+      margin: 0
+      padding: 0
+    .borderShadow
+      -moz-box-shadow: 0 5px 5px #cdcdcd inset
+      -webkit-box-shadow: 0 5px 5px #cdcdcd inset
+      box-shadow: 0 5px 5px #cdcdcd inset
+      width: 11.375rem
+      border-radius: 0.25rem
+      background: #ffffff
+      height: 8.025rem
+      margin: 0 auto
+      padding-top: 0.3rem
+      .ulDiv
+        position: relative
+        overflow: hidden
+        width: 11.375rem
+        height: 7.725rem
+        ul
+          position: absolute
+          left: 0
+          width: 11.375rem
+          font-size: 0.5rem
+          padding: 5px 0.425rem 0
+          li
+            list-style-type: none
+            height: 1.55rem
+            line-height: 1.55rem
+            span
+              float: left
+              display: inline-block
+              color: #666666
+              width: 7rem
+              padding-left: 0.425rem
+              em
+                color: #3c80fe
+                font-style: normal
+            label
+              float: left
+              display: inline-block
+              color: #ee464d
+              text-align: left
+              width: 3rem
+          .odd
+            background: #f6f6f6
+  .fonts1
+    color: #ffffff
+    font-size: 0.7rem
+    text-align: center
+    padding: 0.675rem 0 0.4rem
+    em
+      color: #ffef01
+      font-style: normal
+  .fonts2
+    color: #bb363c
+    font-size: 0.5rem
+    text-align: center
+  .activityThreeBtn
+    text-align: center
+    width: 100%
+    padding: 0.4rem 0 1.5rem
+    a
+      color: #fff100
+      font-size: 0.9rem
+      background: #e73f3f
+      border-radius: 30px
+      display: inline-block
+      width: 8.2rem
+      height: 1.675rem
+      margin: 0 auto
+      line-height: 1.675rem
+.activityFour
+  background: #903faf
+  .activityThreeDiv
+    width: 100%
+    text-align: center
+    .span
+      width: 15.025rem
+      height: 1.6rem
+      line-height: 1.6rem
+      margin-top: 2.075rem
+      background: url('/static/imgs/mobile_activity/app_anniversary/title.png') no-repeat left center
+      background-size: 100%
+      display: inline-block
+      color: #ffffff
+      font-size: 0.8rem
+  .fourFonts
+    padding: 0.7rem 0
+    p
+      color: #ffea00
+      font-size: 0.8rem
+      text-align: center
+      line-height: 1.25rem
+  .aboutMoney
+    font-size: 0.65rem
+    color: #ffffff
+    line-height: 1.25rem
+    width: 10.9rem
+    margin: 0 auto
+    text-align: left
+  .fourImg
+    text-align: center
+    padding-top: 0.875rem
+    img
+      width: 15.05rem
+  .activityOneBtn
+    text-align: center
+    width: 100%
+    margin-top: 0.2rem
+    a
+      color: #974400
+      font-size: 0.9rem
+      background: #ffe400
+      border-radius: 30px
+      display: inline-block
+      width: 8.2rem
+      height: 1.675rem
+      margin: 0 auto
+      line-height: 1.675rem
+  .remarkContent
+    color: #ffffff
+    font-size: 0.45rem
+    text-align: center
+    padding: 0.3rem 0 1.65rem
+.activityRuleCont
+  background: #ffe400
+  padding: 1.7rem 0.6rem 2.075rem
+  h5
+    color: #ec6a18
+    font-size: 0.8rem
+    text-align: center
+  p
+    color: #b66626
+    font-size: 0.6rem
+    margin-top: 0.575rem
+  .grayFont
+    color: #969696
+    font-size: 0.45rem
+    margin-top: 0.575rem
+
+.winningDiv
+  position: absolute
+  width: 100%
+  z-index: 100
+  text-align: center
+  em
+    font-style: normal
+  .winningImg
+    img
+      width: 8.825rem
+      margin: 0 auto
+  p
+    text-align: center
+    font-size: 0.7rem
+    color: #ffffff
+    margin-top: -1rem
+  .winningBtn
+    text-align: center
+    margin-top: 0.5rem
+    a
+      width: 5.3rem
+      height: 1.225rem
+      line-height: 1.225rem
+      color: #ffffff
+      font-size: 0.7rem
+      display: inline-block
+      background: #f33535
+      color: #ffd31d
+      border-radius: 30px
+      text-decoration: none
+  .spanBtn
+    width: 0.75rem
+    display: inline-block
+    position: absolute
+    top: 0
+    right: 3.025rem
+    cursor: pointer
+.errorWin
+  text-align: center
+  padding: 1.25rem 0 0
+  .p1
+    font-size: 0.8rem
+    color: #3f3f41
+  .p2
+    font-size: 0.7rem
+    color: #6abcec
+  img
+    width: 3.425rem
+    height: 3.425rem
+    display: inline-block
+    margin: 0.475rem 0
+.page
+  top: 0px
+  right: 0px
+  bottom: 0px
+  left: 0px
+  width: 100%
+  height: 100%
+  position: fixed
+  z-index: 99
+  opacity: 0.6
+  background: rgb(0, 0, 0)
+  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70)
+.modal a.close-modal
+  background: #d1d1d1
+  color: #ffffff
+  top: 10px
+  right: 17px
+  line-height: 30px
+  font-size: 30px
+  width: 30px
+  position: absolute
+  text-decoration: none
+  height: 30px
+
+
+
+
+
+

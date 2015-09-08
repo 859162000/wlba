@@ -258,6 +258,14 @@ class P2PProduct(ProductBase):
     def terms(self):
         return self.amortizations.all().count()
 
+    # Add by hb on 2015-08-27
+    @property
+    def is_taojin(self):
+        if (self.period>=3 and self.period<30) or self.period>=90:
+            return True;
+        else:
+            return False;
+
 
     display_payback_mapping = {
         u'等额本息': u'等额本息',
@@ -371,6 +379,7 @@ class UserAmortization(models.Model):
     principal = models.DecimalField(u'本金', max_digits=20, decimal_places=2)
     interest = models.DecimalField(u'利息', max_digits=20, decimal_places=2)
     penal_interest = models.DecimalField(u'罚息', max_digits=20, decimal_places=2, default=Decimal('0.00'))
+    coupon_interest = models.DecimalField(u'加息', max_digits=20, decimal_places=2, default=Decimal('0.00'))
 
     settled = models.BooleanField(u'已结算', default=False)
     settlement_time = models.DateTimeField(u'结算时间', auto_now=True)
@@ -520,6 +529,50 @@ class P2PEquity(models.Model):
         return self.equity - self.paid_principal
 
     @property
+    def total_coupon_interest(self):
+        if not self.confirm:
+            return Decimal('0')
+        amortizations = self.__get_amortizations()
+        if not amortizations:
+            return Decimal('0')
+        coupon_interest = amortizations.aggregate(Sum('coupon_interest'))['coupon_interest__sum']
+        return coupon_interest
+
+    @property
+    def paid_coupon_interest(self):
+        if not self.confirm:
+            return Decimal('0')
+        amortizations = self.__get_amortizations(settled_only=True)
+        if not amortizations:
+            return Decimal('0')
+        coupon_interest = amortizations.aggregate(Sum('coupon_interest'))['coupon_interest__sum']
+        return coupon_interest
+
+    @property
+    def pre_total_coupon_interest(self):
+        if not self.is_p2precord:
+            return self.total_coupon_interest
+        if not self.confirm:
+            return Decimal('0')
+        amortizations = self.__pre_get_amortizations()
+        if not amortizations:
+            return Decimal('0')
+        coupon_interest = amortizations.aggregate(Sum('coupon_interest'))['coupon_interest__sum']
+        return coupon_interest
+
+    @property
+    def pre_paid_coupon_interest(self):
+        if not self.is_p2precord:
+            return self.paid_coupon_interest
+        if not self.confirm:
+            return Decimal('0')
+        amortizations = self.__pre_get_amortizations()
+        if not amortizations:
+            return Decimal('0')
+        coupon_interest = amortizations.aggregate(Sum('coupon_interest'))['coupon_interest__sum']
+        return coupon_interest
+
+    @property
     def amortizations(self):
         return self.__get_amortizations()
 
@@ -542,14 +595,15 @@ class P2PEquity(models.Model):
         return amortizations
 
 class AmortizationRecord(models.Model):
-    catalog = models.CharField(u'流水类型', max_length=100)
+    catalog = models.CharField(u'流水类型', max_length=100, db_index=True)
     amortization = models.ForeignKey(ProductAmortization, related_name=u'to_users')
-    order_id = models.IntegerField(u'关联订单编号', null=True)
+    order_id = models.IntegerField(u'关联订单编号', null=True, db_index=True)
 
     term = models.IntegerField(u'还款期数')
     principal = models.DecimalField(u'返还本金', max_digits=20, decimal_places=2)
     interest = models.DecimalField(u'返还利息', max_digits=20, decimal_places=2)
     penal_interest = models.DecimalField(u'额外罚息', max_digits=20, decimal_places=2)
+    coupon_interest = models.DecimalField(u'加息(加息券)', max_digits=20, decimal_places=2, default=Decimal('0.00'))
 
     user = models.ForeignKey(User, null=True)
     created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
@@ -569,7 +623,7 @@ class AmortizationRecord(models.Model):
 
 class P2PRecord(models.Model):
     catalog = models.CharField(u'流水类型', max_length=100, db_index=True)
-    order_id = models.IntegerField(u'关联订单编号', null=True)
+    order_id = models.IntegerField(u'关联订单编号', null=True, db_index=True)
     amount = models.DecimalField(u'发生数', max_digits=20, decimal_places=2)
 
     product = models.ForeignKey(P2PProduct, help_text=u'标的产品', null=True, on_delete=models.SET_NULL)
@@ -596,7 +650,7 @@ class P2PRecord(models.Model):
 
 class EquityRecord(models.Model):
     catalog = models.CharField(u'流水类型', max_length=100)
-    order_id = models.IntegerField(u'相关流水号', null=True)
+    order_id = models.IntegerField(u'相关流水号', null=True, db_index=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     product = models.ForeignKey(P2PProduct, verbose_name=u'产品', on_delete=models.SET_NULL, null=True)
     amount = models.DecimalField(u'发生数量', max_digits=20, decimal_places=2)

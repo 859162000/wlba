@@ -3,6 +3,7 @@ import datetime
 import logging
 import json
 import math
+import copy
 import hashlib
 import urllib
 import urlparse
@@ -31,12 +32,13 @@ from registration.views import RegistrationView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm, IdVerificationForm
+from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm, IdVerificationForm, verify_captcha
 from marketing.models import IntroducedBy, Reward, RewardRecord
-from marketing.utils import set_promo_user
+from marketing.utils import set_promo_user, local_to_utc
 from marketing import tools
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
+from wanglibao import settings
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
@@ -61,16 +63,22 @@ from order.utils import OrderHelper
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityRecord
-
+from aes import Crypt_Aes
+from wanglibao.settings import AMORIZATION_AES_KEY
+from wanglibao_anti.anti.anti import AntiForAllClient
 
 logger = logging.getLogger(__name__)
-
+logger_anti = logging.getLogger('wanglibao_anti')
 
 class RegisterView(RegistrationView):
-    template_name = "register.jade"
+    template_name = "register_test.jade"
     form_class = EmailOrPhoneRegisterForm
 
     def register(self, request, **cleaned_data):
+        """ 
+            modified by: Yihen@20150812
+            descrpition: if(line96~line97)的修改，针对特定的渠道延迟返积分、发红包等行为，防止被刷单
+        """
         nickname = cleaned_data['nickname']
         password = cleaned_data['password']
         identifier = cleaned_data['identifier']
@@ -87,7 +95,10 @@ class RegisterView(RegistrationView):
         auth_user = authenticate(identifier=identifier, password=password)
         auth.login(request, auth_user)
         device = utils.split_ua(request)
-        tools.register_ok.apply_async(kwargs={"user_id": auth_user.id, "device":device})
+        if not AntiForAllClient(request).anti_delay_callback_time(user.id, device):
+            tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+        account_backends.set_source(request, auth_user)
         return user
 
     def get_success_url(self, request=None, user=None):
@@ -96,10 +107,33 @@ class RegisterView(RegistrationView):
         return '/accounts/login/'
 
     def get_context_data(self, **kwargs):
+
+        sign = self.request.GET.get('sign', None)
+        promo_token = self.request.GET.get('promo_token', None)
+
+        # sign = urllib.urlencode(self.request.GET.get('sign', None))
+
         context = super(RegisterView, self).get_context_data(**kwargs)
         context.update({
             'next': self.request.GET.get('next', '/accounts/login/')
         })
+
+        if sign and (promo_token == 'csai' or promo_token == 'xicai'):
+
+            try:
+                from wanglibao_account.cooperation import get_xicai_user_info
+                key = settings.XICAI_CLIENT_SECRET[0:8]
+                data = get_xicai_user_info(key, sign)
+                phone = data['phone']
+            except Exception, e:
+                print 'get phone error, ', e
+                phone = None
+
+            if phone:
+                context.update({
+                    'phone': phone,
+                })
+
         return context
 
 
@@ -306,8 +340,6 @@ class AccountHome(TemplateView):
             obj = {"equity": equity}
             if earning_map.get(equity.product_id):
                 obj["earning"] = earning_map.get(equity.product_id)
-            #加息
-            obj['hike'] = backends.get_hike(user, equity.product_id)
 
             result.append(obj)
 
@@ -330,19 +362,6 @@ class AccountHome(TemplateView):
 
         #xunlei_vip = Binding.objects.filter(user=user).filter(btype='xunlei').first()
 
-        #酒仙众筹用户
-        tab_jiuxian = False
-        jiuxian_selected = False
-        equity_jiuxian = P2PEquityJiuxian.objects.filter(user=user).filter(product__category=u'酒仙众筹标').first()
-        if equity_jiuxian:
-            tab_jiuxian = True
-            if equity_jiuxian.selected_at:
-                jiuxian_selected = True
-            # mode = 'jiuxian'
-
-        if self.request.path.rstrip('/').split('/')[-1] == 'jiuxian':
-            mode = 'jiuxian'
-
         return {
             'message': message,
             'result': result,
@@ -356,9 +375,6 @@ class AccountHome(TemplateView):
             'total_asset': total_asset,
             'mode': mode,
             'announcements': AnnouncementAccounts,
-            'tab_jiuxian': tab_jiuxian,
-            'equity_jiuxian': equity_jiuxian,
-            'jiuxian_selected': jiuxian_selected
         }
 
     def post(self, request):
@@ -382,11 +398,13 @@ class AccountHomeAPIView(APIView):
             u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
         ]).select_related('product')
 
+        start_utc = local_to_utc(datetime.datetime.now(), 'min')
         unpayed_principle = 0
         p2p_total_paid_interest = 0
         p2p_total_unpaid_interest = 0
         p2p_total_interest = 0
         p2p_activity_interest = 0
+        p2p_income_today = 0
         for equity in p2p_equities:
             if equity.confirm:
                 unpayed_principle += equity.unpaid_principal  # 待收本金
@@ -394,6 +412,10 @@ class AccountHomeAPIView(APIView):
                 p2p_total_unpaid_interest += equity.unpaid_interest  # 待收益
                 p2p_total_interest += equity.pre_total_interest  # 总收益
                 p2p_activity_interest += equity.activity_interest  # 活动收益
+
+                if equity.confirm_at >= start_utc:
+                    p2p_income_today += equity.pre_paid_interest
+                    p2p_income_today += equity.activity_interest
 
         p2p_margin = user.margin.margin  # P2P余额
         p2p_freeze = user.margin.freeze  # P2P投资中冻结金额
@@ -430,6 +452,8 @@ class AccountHomeAPIView(APIView):
             'fund_total_income': float(total_income),  # 基金累积收益
             'fund_income_week': float(fund_income_week),  # 基金近一周收益(元)
             'fund_income_month': float(fund_income_month),  # 基金近一月收益(元)
+
+            'p2p_income_today': float(p2p_income_today),  # 今日收益
 
         }
 
@@ -507,14 +531,12 @@ class AccountInviteAllGoldAPIView(APIView):
         first_intro = dic['first_intro']
         commission = dic['commission']
         
-
         introduces = IntroducedBy.objects.filter(introduced_by=request.user).select_related("user__wanglibaouserprofile").all()
         keys = commission.keys()
         for x in introduces:
             user_id = x.user.id
             if user_id in keys:
-                first_intro.append([safe_phone_str(users[user_id].phone), 
-                                commission[user_id]['amount'], commission[user_id]['earning']])
+                first_intro.append([safe_phone_str(users[user_id].phone), commission[user_id]['amount'], commission[user_id]['earning']])
             else:
                 first_intro.append([safe_phone_str(x.user.wanglibaouserprofile.phone), 0, 0])
 
@@ -522,6 +544,7 @@ class AccountInviteAllGoldAPIView(APIView):
                         "earning":first_earning, "count":first_count, "intro":first_intro},
                         "second":{"amount":second_amount, "earning":second_earning,
                         "count":second_count}, "count":len(introduces)})
+
 
 class AccountInviteIncomeAPIView(APIView):
     permission_classes = (IsAuthenticated, )
@@ -593,8 +616,10 @@ class AccountP2PRecordAPI(APIView):
                            'equity_product_display_status': equity.product.display_status,  # 状态
                            'equity_term': equity.term,  # 还款期
                            'equity_product_amortization_count': equity.product.amortization_count,  # 还款期数
-                           'equity_paid_interest': float(equity.pre_paid_interest),  # 单个已经收益
+                           'equity_paid_interest': float(equity.pre_paid_interest),  # 单个已收收益
                            'equity_total_interest': float(equity.pre_total_interest),  # 单个预期收益
+                           'equity_paid_coupon_interest': float(equity.pre_paid_coupon_interest),  # 加息券单个已收收益
+                           'equity_total_coupon_interest': float(equity.pre_total_coupon_interest),  # 加息券单个预期收益
                            'equity_contract': 'https://%s/api/p2p/contract/%s/' % (
                                request.get_host(), equity.product.id),  # 合同
                            'product_id': equity.product_id
@@ -832,11 +857,31 @@ class AccountRedPacket(TemplateView):
 
         user = self.request.user
         device = utils.split_ua(self.request)
-        result = backends.list_redpack(user, 'all', device['device_type'])
+        result = backends.list_redpack(user, 'all', device['device_type'], 0)
         red_packets = result['packages'].get(status, [])
 
         return {
             "red_packets": red_packets,
+            "status": status
+        }
+
+
+class AccountCoupon(TemplateView):
+    template_name = 'coupon_available.jade'
+
+    def get_context_data(self, **kwargs):
+
+        status = kwargs['status']
+        if status not in ('used', 'unused', 'expires'):
+            status = 'unused'
+
+        user = self.request.user
+        device = utils.split_ua(self.request)
+        result = backends.list_redpack(user, 'all', device['device_type'], 0, 'coupon')
+        coupons = result['packages'].get(status, [])
+
+        return {
+            "coupons": coupons,
             "status": status
         }
 
@@ -1090,6 +1135,15 @@ def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
 @csrf_protect
 @never_cache
 def ajax_register(request):
+    """
+        modified-1 by: Yihen@20150812
+        descrpition: if(line1150~line1151)的修改，针对特定的渠道延迟返积分、发红包等行为，防止被刷单
+
+        //////////////////////////
+
+        modified-2 by: Yihen@20150818
+        descrpition: if(line1154~line1156)的修改，web端在注册的时候，不需要再次验证图片验证码, code暂留，后期会加上这方面的逻辑
+    """
     def messenger(message, user=None):
         res = dict()
         if user:
@@ -1098,7 +1152,13 @@ def ajax_register(request):
         return json.dumps(res)
 
     if request.method == "POST":
+        channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")    #add by Yihen@20150818; reason:第三方渠道处理的时候，会更改request中的信息
         if request.is_ajax():
+
+            #res, message = verify_captcha(dic=request.POST, keep=False)
+            #if not res:
+            #    return HttpResponseForbidden(messenger(message={'captcha_1': u'图片验证码错误'}))
+
             form = EmailOrPhoneRegisterForm(request.POST)
             if form.is_valid():
                 nickname = form.cleaned_data['nickname']
@@ -1106,7 +1166,7 @@ def ajax_register(request):
                 identifier = form.cleaned_data['identifier']
                 invitecode = form.cleaned_data['invitecode']
 
-                if User.objects.filter(wanglibaouserprofile__phone=identifier).first():
+                if User.objects.filter(wanglibaouserprofile__phone=identifier).values("id"):
                     return HttpResponse(messenger('error'))
 
                 user = create_user(identifier, password, nickname)
@@ -1120,7 +1180,11 @@ def ajax_register(request):
                 auth.login(request, auth_user)
 
                 device = utils.split_ua(request)
-                tools.register_ok.apply_async(kwargs={"user_id": auth_user.id, "device":device})
+
+                if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
+                    tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+                account_backends.set_source(request, auth_user)
 
                 return HttpResponse(messenger('done', user=request.user))
             else:
@@ -1164,12 +1228,12 @@ class P2PAmortizationAPI(APIView):
                                                         product_amortization__product_id=product_id)
 
         amortization_record = [{
-                                   'amortization_term_date': timezone.localtime(amortization.term_date).strftime(
-                                       "%Y-%m-%d %H:%M:%S"),  # 还款时间
-                                   'amortization_principal': float(amortization.principal),  # 本金
-                                   'amortization_amount_interest': float(amortization.interest),  # 利息
-                                   'amortization_amount': float(amortization.principal + amortization.interest),  # 总记
-                               } for amortization in amortizations]
+            'amortization_term_date': timezone.localtime(amortization.term_date).strftime("%Y-%m-%d %H:%M:%S"),  # 还款时间
+            'amortization_principal': float(amortization.principal),  # 本金
+            'amortization_amount_interest': float(amortization.interest),  # 利息
+            'amortization_amount': float(amortization.principal + amortization.interest + amortization.coupon_interest),  # 本息总和
+            'amortization_coupon_interest': float(amortization.coupon_interest),  # 加息券利息
+        } for amortization in amortizations]
 
         res = {
             'equity_product_short_name': equity.product.short_name,  # 还款标题
@@ -1197,6 +1261,41 @@ def user_product_contract(request, product_id):
         lines = f.readlines()
         f.close()
         return HttpResponse("\n".join(lines))
+    except ValueError, e:
+        raise Http404
+
+def user_product_contract_kf(request):
+    product_id = request.GET.get('product_id', "").strip()
+    user_id = request.GET.get("user_id", "").strip()
+    if not product_id.isdigit() or not user_id.isdigit():
+        return Response({
+            'message': u'参数错误',
+            'error_number': ErrorNumber.param_error
+        })
+    user = User.objects.filter(id=user_id).get()
+    if not user:
+        return Response({
+            'message': u'用户不存在',
+            'error_number': ErrorNumber.param_error
+        })
+    equity = P2PEquity.objects.filter(user=user, product_id=product_id).prefetch_related('product').first()
+
+    product = equity.product
+    order = OrderHelper.place_order(order_type=u'生成合同文件', status=u'开始', equity_id=equity.id, product_id=product.id)
+
+    if not equity.latest_contract:
+        #create contract file
+        EquityKeeperDecorator(product, order.id).generate_contract_one(equity_id=equity.id, savepoint=False)
+
+    equity_new = P2PEquity.objects.filter(id=equity.id).first()
+    try:
+        f = equity_new.latest_contract
+        lines = f.readlines()
+        f.close()
+        my_aes = Crypt_Aes(AMORIZATION_AES_KEY)
+        result = my_aes.encrypt("\n".join(lines))
+        # return HttpResponse(my_aes.decrypt(result))
+        return HttpResponse(result)
     except ValueError, e:
         raise Http404
 
@@ -1267,7 +1366,6 @@ class IdVerificationView(TemplateView):
 
         return super(IdVerificationView, self).form_valid(form)
 
-
 class AdminIdVerificationView(TemplateView):
     template_name = 'admin_verify_id.jade'
 
@@ -1299,54 +1397,54 @@ class AdminSendMessageAPIView(APIView):
         return Response({"ret_code": 0, "message": "发送成功"})
 
 
-class IntroduceRelation(TemplateView):
-    template_name = 'introduce_add.jade'
-
-    def post(self, request):
-        user_phone = request.POST.get('user_phone', '').strip()
-        introduced_by_phone = request.POST.get('introduced_by_phone', '').strip()
-        bought_at = request.POST.get('bought_at', '').strip()
-        gift_send_at = request.POST.get('gift_send_at', '').strip()
-        try:
-            user = User.objects.get(wanglibaouserprofile__phone=user_phone)
-        except User.DoesNotExist:
-            return HttpResponse({
-                u"没有找到 %s 该记录" % user_phone
-            })
-        try:
-            introduced_by = User.objects.get(wanglibaouserprofile__phone=introduced_by_phone)
-        except User.DoesNotExist:
-            return HttpResponse({
-                u"没有找到 %s 该记录" % user_phone
-            })
-        try:
-            introduce = IntroducedBy.objects.get(user=user, introduced_by=introduced_by)
-        except IntroducedBy.DoesNotExist:
-            record = IntroducedBy()
-            record.introduced_by = introduced_by
-            record.user = user
-            if bought_at:
-                print(bought_at)
-                record.bought_at = bought_at
-            if gift_send_at:
-                print(gift_send_at)
-                record.gift_send_at = gift_send_at
-            record.created_by = request.user
-            record.save()
-            return HttpResponse({
-                u" %s与%s的邀请关系已经确定" % (user_phone, introduced_by)
-            })
-
-        return HttpResponse({
-            u" %s与%s的邀请关系已经存在" % (user_phone, introduced_by)
-        })
-
-    @method_decorator(permission_required('marketing.add_introducedby'))
-    def dispatch(self, request, *args, **kwargs):
-        """
-        Only user with change payinfo permission can call this view
-        """
-        return super(IntroduceRelation, self).dispatch(request, *args, **kwargs)
+#class IntroduceRelation(TemplateView):
+#    template_name = 'introduce_add.jade'
+#
+#    def post(self, request):
+#        user_phone = request.POST.get('user_phone', '').strip()
+#        introduced_by_phone = request.POST.get('introduced_by_phone', '').strip()
+#        bought_at = request.POST.get('bought_at', '').strip()
+#        gift_send_at = request.POST.get('gift_send_at', '').strip()
+#        try:
+#            user = User.objects.get(wanglibaouserprofile__phone=user_phone)
+#        except User.DoesNotExist:
+#            return HttpResponse({
+#                u"没有找到 %s 该记录" % user_phone
+#            })
+#        try:
+#            introduced_by = User.objects.get(wanglibaouserprofile__phone=introduced_by_phone)
+#        except User.DoesNotExist:
+#            return HttpResponse({
+#                u"没有找到 %s 该记录" % user_phone
+#            })
+#        try:
+#            introduce = IntroducedBy.objects.get(user=user, introduced_by=introduced_by)
+#        except IntroducedBy.DoesNotExist:
+#            record = IntroducedBy()
+#            record.introduced_by = introduced_by
+#            record.user = user
+#            if bought_at:
+#                print(bought_at)
+#                record.bought_at = bought_at
+#            if gift_send_at:
+#                print(gift_send_at)
+#                record.gift_send_at = gift_send_at
+#            record.created_by = request.user
+#            record.save()
+#            return HttpResponse({
+#                u" %s与%s的邀请关系已经确定" % (user_phone, introduced_by)
+#            })
+#
+#        return HttpResponse({
+#            u" %s与%s的邀请关系已经存在" % (user_phone, introduced_by)
+#        })
+#
+#    @method_decorator(permission_required('marketing.add_introducedby'))
+#    def dispatch(self, request, *args, **kwargs):
+#        """
+#        Only user with change payinfo permission can call this view
+#        """
+#        return super(IntroduceRelation, self).dispatch(request, *args, **kwargs)
 
 
 class AddressView(TemplateView):
@@ -1607,60 +1705,3 @@ class AutomaticApiView(APIView):
             })
         except:
             return Response({'ret_code': 3009, 'message': u'用户设置自动投标计划失败'})
-
-
-# class CjdaoApiView(APIView):
-#
-#     """
-#         财经道入口
-#     """
-#
-#     permission_classes = ()
-#
-#     def get(self, request):
-#         uaccount = request.GET.get('uaccount')
-#         phone = request.GET.get('phone')
-#         companyid = request.GET.get('companyid')
-#         thirdproductid = request.GET.get('thirdproductid')
-#
-#         user = CjdaoUtils.get_wluser_by_phone(phone)
-#
-#         cjdaoinfo = {
-#             'uaccount': uaccount,
-#             'companyid': companyid,
-#             'usertype': 0,
-#         }
-#         # 保存到 session
-#         request.session['cjdaoinfo'] = cjdaoinfo
-#
-#         if thirdproductid:
-#             try:
-#                 p2p = P2PProduct.objects.select_related('activity').get(pk=int(thirdproductid), hide=False)
-#             except P2PProduct.DoesNotExist:
-#                 raise Http404(u'您查找的产品不存在')
-#
-#             request.session.get('cjdaoinfo').update(thirdproductid=int(thirdproductid))
-#
-#             if user:
-#                 request.session.get('cjdaoinfo').update(usertype=1)
-#                 return render_to_response('cjdao_login_product.jade', {'p2p': p2p, 'phone': phone})
-#             else:
-#                 return render_to_response('cjdao_register_product.jade', {'p2p': p2p, 'phone': phone})
-#         else:
-#
-#             if user:
-#                 request.session.get('cjdaoinfo').update(usertype=1)
-#                 return render_to_response('cjdao_login.jade', {'uaccount': uaccount, 'phone': phone})
-#             else:
-#                 return render_to_response('cjdao_register.jade', {'uaccount': uaccount, 'phone': phone})
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-

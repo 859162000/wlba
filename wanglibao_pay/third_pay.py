@@ -113,7 +113,9 @@ def del_bank_card_new(request):
 
     # 删除快捷支付信息
     res = _unbind_common(request, card, card.bank)
-    if res['ret_code'] != 0: return res
+    # if res['ret_code'] != 0: return res
+    if res['ret_code'] != 0:
+        logger.error(res)
 
     card.delete()
     return {"ret_code": 0, "message": "删除成功"}
@@ -137,11 +139,11 @@ def list_bank_new(request):
     rs = []
     for bank in banks:
         obj = {"name": bank.name, "gate_id": bank.gate_id, "bank_id": bank.code, "bank_channel": bank.channel}
-        if bank.kuai_limit:
+        if bank.channel == 'kuaipay' and bank.kuai_limit:
             obj.update(util.handle_kuai_bank_limit(bank.kuai_limit))
-        elif bank.huifu_bind_limit:
+        elif bank.channel == 'huifu' and bank.huifu_bind_limit:
             obj.update(util.handle_kuai_bank_limit(bank.huifu_bind_limit))
-        elif bank.yee_bind_limit:
+        elif bank.channel == 'yeepay' and bank.yee_bind_limit:
             obj.update(util.handle_kuai_bank_limit(bank.yee_bind_limit))
 
         rs.append(obj)
@@ -233,9 +235,39 @@ def withdraw(request):
 
 def card_bind_list(request):
     # 查询已经绑定支付渠道的银行卡列表
+    user = request.user
+    if not user.wanglibaouserprofile.id_is_valid:
+        return {"ret_code": 20071, "message": "请先进行实名认证"}
+
     try:
+        # 查询易宝已经绑定卡
+        res = YeeShortPay().bind_card_query(user=user)
+        if res['ret_code'] not in (0, 20011): return res
+        if 'data' in res and 'cardlist' in res['data']:
+            yee_card_no_list = []
+            for car in res['data']['cardlist']:
+                card = Card.objects.filter(user=user, no__startswith=car['card_top'], no__endswith=car['card_last']).first()
+                if card:
+                    yee_card_no_list.append(card.no)
+            if yee_card_no_list:
+                Card.objects.filter(user=user, no__in=yee_card_no_list).update(is_bind_yee=True)
+                Card.objects.filter(user=user).exclude(no__in=yee_card_no_list).update(is_bind_yee=False)
+
+        # 查询块钱已经绑定卡
+        res = KuaiShortPay().query_bind_new(user.id)
+        if res['ret_code'] != 0: return res
+        if 'cards' in res:
+            kuai_card_no_list = []
+            for car in res['cards']:
+                card = Card.objects.filter(user=user, no__startswith=car[:6], no__endswith=car[-4:]).first()
+                if card:
+                    kuai_card_no_list.append(card.no)
+            if kuai_card_no_list:
+                Card.objects.filter(user=user, no__in=kuai_card_no_list).update(is_bind_kuai=True)
+                Card.objects.filter(user=user).exclude(no__in=kuai_card_no_list).update(is_bind_kuai=False)
+
         card_list = []
-        cards = Card.objects.filter(Q(user=request.user), Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True)).select_related('bank').order_by('-last_update')
+        cards = Card.objects.filter(Q(user=user), Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True)).select_related('bank').order_by('-last_update')
         if cards.exists():
             # 排序
             bank_list = [card.bank.gate_id for card in cards]
@@ -243,6 +275,7 @@ def card_bind_list(request):
 
             for card in cards:
                 base_dict = {
+                    "card_id": card.id,
                     'bank_id': card.bank.code,
                     'bank_name': card.bank.name,
                     'gate_id': card.bank.gate_id,

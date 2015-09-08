@@ -43,12 +43,16 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             SendVoiceCodeTwoAPIView, MobileDownloadAPIView, Statistics, KuaipanPurchaseListAPIView,
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
                             DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView,
-                            GestureAddView, GestureUpdateView, GestureIsEnabledView)
-from wanglibao_redpack.views import RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView
+                            GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
+                            CaptchaValidationCodeView, TopsOfEaringView)
+from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
+                                     RedPacketSelectAPIView)
 
 from marketing.play_list import InvestmentHistory
-from marketing.views import ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView, ThousandRedPackCountAPIView
+from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView,
+                             ThousandRedPackCountAPIView, ThunderActivityRewardCounter, ThunderAwardAPIView,)
 from weixin.views import P2PListWeixin
+
 
 router = DefaultRouter()
 
@@ -100,6 +104,7 @@ urlpatterns = patterns(
     url(r'^register/wx/$', WeixinRegisterAPIView.as_view()),
     url(r'^change_password/$', ChangePasswordAPIView.as_view()),
     url(r'^reset_password/$', ResetPasswordAPI.as_view()),
+    url(r'captcha_validation/(?P<phone>\d{11})/$', CaptchaValidationCodeView.as_view()),
     url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendRegisterValidationCodeView.as_view()),
     url(r'^phone_validation_code/reset_password/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
@@ -184,10 +189,12 @@ urlpatterns = patterns(
     url(r'^shareurl/$', ShareUrlAPIView.as_view()),
     url(r'^gettopofday/$', TopsOfDayView.as_view()),
     url(r'^gettopofweek/$', TopsOfWeekView.as_view()),
+    url(r'^gettopofearings/', TopsOfEaringView.as_view()),
 
     url(r'^redpacket/$', RedPacketListAPIView.as_view()),
     url(r'^redpacket/exchange/$', RedPacketChangeAPIView.as_view()),
     url(r'^redpacket/deduct/$', RedPacketDeductAPIView.as_view()),
+    url(r'^redpacket/selected/$', RedPacketSelectAPIView.as_view()),
 
     url(r'^message/count/$', MessageCountAPIView.as_view()),
     url(r'^message/(?P<message_id>\d+)/$', MessageDetailAPIView.as_view()), 
@@ -203,10 +210,12 @@ urlpatterns = patterns(
     url(r'^gesture/add/$', GestureAddView.as_view()),
     url(r'^gesture/update/$', GestureUpdateView.as_view()),
     url(r'^gesture/isenabled/$', GestureIsEnabledView.as_view()),
+    url(r'^xunlei/8/check/$', GuestCheckView.as_view()),
 )
 
 urlpatterns += patterns('',
-    url(r'^api-token-auth/', 'wanglibao_rest.views.obtain_auth_token'),
+    #url(r'^api-token-auth/', 'wanglibao_rest.views.obtain_auth_token'),
+    url(r'^api-token-auth/', LoginAPIView.as_view()),
     url(r'wrapper/', 'drf_wrapper.views.wrapper_view'),
 )
 
@@ -224,4 +233,16 @@ urlpatterns += patterns(
     url(r'^xunlei/join/count/$', ActivityJoinLogCountAPIView.as_view()),
     url(r'^thousand/redpack/$', ThousandRedPackAPIView.as_view()),
     url(r'^thousand/redpack/count/$', ThousandRedPackCountAPIView.as_view()),
+    url(r'^xunlei/august/count/$', ThunderActivityRewardCounter.as_view()),
+    url(r'^xunlei/award/$', 'marketing.views.ajax_post'), #add by Yihen@20150821, 迅雷-网利宝 抽奖活动
+    url(r'^xunlei/award/records/$', 'marketing.views.ajax_get_activity_record'), #add by Yihen@20150825, 迅雷-网利宝 抽奖活动记录
+    url(r'^celebrate/awards/$', 'marketing.views.celebrate_ajax'), #add by Yihen@20150828, 网利宝一周年大转盘活动
+    url(r'^award/common_september/$', 'marketing.views.september_award_ajax'), #add by Yihen@20150907,9月PC常规
+)
+
+
+# app端改版新接口
+urlpatterns += patterns(
+    '',
+    url(r'^m/', include('wanglibao_app.urls')),
 )

@@ -12,15 +12,17 @@ from wanglibao_margin.marginkeeper import MarginKeeper
 from order.utils import OrderHelper
 from keeper import ProductKeeper, EquityKeeper, AmortizationKeeper, EquityKeeperDecorator
 from exceptions import P2PException
-from wanglibao_p2p.models import P2PProduct
+from wanglibao_p2p.models import P2PProduct, P2PEquity
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_redpack import backends as redpack_backends
+from wanglibao_redpack.models import RedPackRecord
 # from wanglibao_account.utils import CjdaoUtils
 # from wanglibao_account.tasks import cjdao_callback
 # from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
 import re
+from wanglibao_redis.backend import redis_backend
 
 from wanglibao_rest.utils import split_ua
 
@@ -55,13 +57,27 @@ class P2PTrader(object):
             raise P2PException(u'用户账户已冻结，请联系客服')
         with transaction.atomic():
             if redpack:
-                redpack_order_id = OrderHelper.place_order(self.user, order_type=u'红包消费', redpack=redpack,
-                                                        product_id=self.product.id, status=u'新建').id
-                result = redpack_backends.consume(redpack,amount, self.user, self.order_id, self.device_type)
+                # 为防止用户同时打开两个浏览器同时使用加息券和红包，须先检测
+                coupons = RedPackRecord.objects.filter(user=self.user, product_id=self.product.id) \
+                    .filter(redpack__event__rtype='interest_coupon')
+                if coupons:
+                    raise P2PException(u'已经选择过加息券，不能重复或叠加使用')
+                else:
+                    this_redpack = RedPackRecord.objects.filter(pk=redpack).first()
+                    this_rtype = this_redpack.redpack.event.rtype
+                    coupons = RedPackRecord.objects.filter(user=self.user, product_id=self.product.id) \
+                        .exclude(redpack__event__rtype='interest_coupon')
+                    if coupons and this_rtype == 'interest_coupon':
+                        raise P2PException(u'红包和加息券不能同时叠加使用')
+
+                redpack_order_id = OrderHelper.place_order(self.user, order_type=u'优惠券消费', redpack=redpack,
+                                                           product_id=self.product.id, status=u'新建').id
+                result = redpack_backends.consume(redpack, amount, self.user, self.order_id, self.device_type, self.product.id)
                 if result['ret_code'] != 0:
                     raise Exception,result['message']
-                red_record = self.margin_keeper.redpack_deposit(result['deduct'], u"购买P2P抵扣%s元" % result['deduct'], 
-                                                        order_id=redpack_order_id, savepoint=False)
+                if result['rtype'] != 'interest_coupon':
+                    red_record = self.margin_keeper.redpack_deposit(result['deduct'], u"购买P2P抵扣%s元" % result['deduct'],
+                                                                    order_id=redpack_order_id, savepoint=False)
                 OrderHelper.update_order(Order.objects.get(pk=redpack_order_id), user=self.user, status=u'成功', 
                                         amount=amount, deduct=result['deduct'], redpack=redpack)
 
@@ -93,12 +109,19 @@ class P2PTrader(object):
             "mtype": "purchase"
         })
 
-
         # 满标给管理员发短信
-        if product_record.product_balance_after <= 0:
+        if is_full:
             from wanglibao_p2p.tasks import full_send_message
 
             full_send_message.apply_async(kwargs={"product_name": self.product.name})
+            # 满标将标信息写入redis
+            cache_backend = redis_backend()
+            if not cache_backend.redis.exists("p2p_detail_{0}".format(self.product.id)):
+                cache_backend.get_cache_p2p_detail(self.product.id)
+
+            # 将标写入redis list
+            cache_backend.push_p2p_products(self.product)
+
         return product_record, margin_record, equity
 
 
@@ -141,13 +164,11 @@ class P2POperator(object):
             except P2PException, e:
                 cls.logger.error(u'%s, %s' % (amortization, e.message))
 
-
         ## 停止在watchdog中每分钟循环自动投标，减轻celery任务
         ## 将自动投标入口改在两处，一是标状态变成“正在招标”，二是用户保存并启用自动投标配置
         print('Getting automation trades')
         from wanglibao_p2p.automatic import Automatic
         Automatic().auto_trade()
-
 
     @classmethod
     #@transaction.commit_manually
@@ -193,13 +214,12 @@ class P2POperator(object):
             product.save()
 
         phones = {}.fromkeys(phones).keys()
-        user_ids = {}.fromkeys(user_ids).keys()
-
         send_messages.apply_async(kwargs={
             "phones": phones,
             "messages": [messages.product_settled(product, timezone.now())]
         })
 
+        user_ids = {}.fromkeys(user_ids).keys()
 
         matches = re.search(u'日计息', product.pay_method)
         if matches and matches.group():
@@ -213,6 +233,13 @@ class P2POperator(object):
             "content": content,
             "mtype": "loaned"
         })
+
+        cache_backend = redis_backend()
+        # 更新该标的redis缓存
+        cache_backend.update_detail_cache(product.id)
+
+        # 将标信息从满标的redis列表中挪到还款中的redis列表
+        cache_backend.update_list_cache('p2p_products_full', 'p2p_products_repayment', product)
 
     @classmethod
     def fail(cls, product):
@@ -267,11 +294,18 @@ class P2POperator(object):
             all_settled = reduce(lambda flag, a: flag & a.settled, product.amortizations.all(), True)
 
             if all_settled:
-                cls.settle_hike(product)
-                cls.logger.info("Product [%s] [%s] paid hike", product.id, product.name)
+                # cls.settle_hike(product)
+                # cls.logger.info("Product [%s] [%s] paid hike", product.id, product.name)
 
                 cls.logger.info("Product [%d] [%s] payed all amortizations, finish it", product.id, product.name)
                 ProductKeeper(product).finish(None)
+
+                cache_backend = redis_backend()
+                # 更新该标的redis缓存
+                cache_backend.update_detail_cache(product.id)
+
+                # 将标信息从还款中的redis列表中挪到已完成的redis列表
+                cache_backend.update_list_cache('p2p_products_repayment', 'p2p_products_finished', product)
 
     @classmethod
     def settle_hike(cls, product):
@@ -279,7 +313,7 @@ class P2POperator(object):
         if not result:
             return
         for x in result:
-            order_id = OrderHelper.place_order(x.user, order_type=u'加息', product_id=product.id, status=u'新建').id
-            margin_keeper = MarginKeeper(user=x.user, order_id=order_id)
-            margin_keeper.hike_deposit(x.amount, u"加息存入%s元" % x.amount, savepoint=False)
-            OrderHelper.update_order(Order.objects.get(pk=order_id), user=x.user, status=u'成功', amount=x.amount)
+            order_id = OrderHelper.place_order(x['user'], order_type=u'加息', product_id=product.id, status=u'新建').id
+            margin_keeper = MarginKeeper(user=x['user'], order_id=order_id)
+            margin_keeper.hike_deposit(x['amount'], u"加息存入%s元" % x['amount'], savepoint=False)
+            OrderHelper.update_order(Order.objects.get(pk=order_id), user=x['user'], status=u'成功', amount=x['amount'])

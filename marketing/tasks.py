@@ -6,15 +6,24 @@ from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
 from marketing.models import TimelySiteData, PlayList, IntroducedByReward, Reward
-from marketing.utils import local_to_utc
+from marketing.utils import local_to_utc, pc_data_generator
 from wanglibao_account import message as inside_message
 from wanglibao.celery import app
 from wanglibao_margin.models import Margin
 from wanglibao_redpack.backends import give_activity_redpack
 from wanglibao_redpack.models import RedPackEvent
+from misc.views import MiscRecommendProduction
 
 
 logger = get_task_logger(__name__)
+
+
+@app.task
+def generate_pc_index_data():
+    data = pc_data_generator()
+    m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA, data=data)
+    m.update_value(value={MiscRecommendProduction.KEY_PC_DATA: data})
+
 
 @app.task
 def generate_site_data():
@@ -189,11 +198,11 @@ def send_reward(start, end, amount_min, percent):
         reward = Reward.objects.filter(is_used=False, type=reward_type).first()
 
         # 发送短信
-        text_content = u"【网利宝】您在邀请好友送收益的活动中，获得%s元收益，收益已经发放至您的网利宝账户。请注意查收。回复TD退订4008-588-066【网利宝】" % got_amount
-        send_messages.apply_async(kwargs={
-            "phones": [introduced_by.wanglibaouserprofile.phone],
-            "messages": [text_content]
-        })
+        # text_content = u"【网利宝】您在邀请好友送收益的活动中，获得%s元收益，收益已经发放至您的网利宝账户。请注意查收。" % got_amount
+        # send_messages.apply_async(kwargs={
+        #     "phones": [introduced_by.wanglibaouserprofile.phone],
+        #     "messages": [text_content]
+        # })
 
         # 发放收益
         earning = Earning()
@@ -369,11 +378,11 @@ def send_reward_all(start, end, amount_min, percent):
     phone_user = list(set(phone_user))
     if phone_user:
         # 发送短信
-        text_content = u'好友邀请收益已经到账，请在个人账户中进行查看。'
-        send_messages.apply_async(kwargs={
-            "phones": phone_user,
-            "messages": [text_content]
-        })
+        # text_content = u'好友邀请收益已经到账，请在个人账户中进行查看。'
+        # send_messages.apply_async(kwargs={
+        #     "phones": phone_user,
+        #     "messages": [text_content]
+        # })
 
         # 发放站内信
         inside_message.send_batch.apply_async(kwargs={

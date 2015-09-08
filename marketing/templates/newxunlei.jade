@@ -8,7 +8,7 @@ html
     include include/common_head
     - endwith
     link(rel="stylesheet",href="/static/stylesheets/activity.css")
-    link(rel="stylesheet",href="/static/css/bootstrap.min.css")
+    //link(rel="stylesheet",href="/static/css/bootstrap.min.css")
     link(rel="stylesheet",href="/static/stylesheets/newxunlei.css")
 
   body(style="background:#fff")
@@ -41,8 +41,9 @@ html
         a(href='/',style="position: absolute;left: 0;")
           .act-logo
         .login-nav
+          .right-nav
           .nav-items
-            ul
+            ul(style="margin-bottom:10px")
               mixin nav-item(name, link, new_class, free)
                 if activeItem == name
                   li.nav-item.active
@@ -70,7 +71,7 @@ html
     .wrap#new-xl-banner
       .gold2
          .xl-text.xl-com.xl-ele#xl-text
-         .denelu-form
+         .denelu-form(style="padding:13px 0")
             h1.biaoyu 轻松拿380元红包
             //.align-center
             //  a.font-s.blue(href="http://act.vip.xunlei.com/vip/2015/p2pcash/#wlb") 【立即领取】
@@ -391,7 +392,7 @@ html
                    p 账户资金安全
                     br
                     |由
-                    b 平安保险
+                    b 阳光保险
                     |承保
               .san-span
                 dl

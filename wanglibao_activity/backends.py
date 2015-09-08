@@ -43,13 +43,17 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_f
         return
     channel = helper.which_channel(user)
     #查询符合条件的活动
-    # TODO: 需要将渠道判断重写，从sql中去掉
     # TODO: 需要将渠道的判断的范围从渠道name缩小为渠道code
     activity_list = Activity.objects.filter(start_at__lt=now, end_at__gt=now, is_stopped=False)\
-                                    .filter(Q(channel__contains=channel) | Q(is_all_channel=True))\
                                     .filter(Q(platform=device_type) | Q(platform=u'all')).order_by('-id')
     if activity_list:
         for activity in activity_list:
+            if activity.is_all_channel is False:
+                if activity.channel != "":
+                    channel_list = activity.channel.split(",")
+                    channel_list = [ch for ch in channel_list if ch.strip() != ""]
+                    if channel not in channel_list:
+                        continue
             #查询活动规则
             if trigger_node == 'invest':
                 activity_rules = ActivityRule.objects.filter(activity=activity,  is_used=True)\
@@ -113,9 +117,6 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
                     _check_buy_product(user, rule, device_type, amount, product_id, is_full)
             else:
                 _check_buy_product(user, rule, device_type, amount, product_id, is_full)
-            #if user_ib:
-            #    pid = _check_introduced_by_product(user)
-            #    redpack_backends.increase_hike(user_ib, pid)
 
     #购买
     elif trigger_node == 'buy':
@@ -142,7 +143,7 @@ def _send_gift(user, rule, device_type, is_full, amount=0):
         reward_name = rule.reward
         _send_gift_reward(user, rule, rtype, reward_name, device_type, amount, is_full)
 
-    #送红包
+    #送优惠券，红包
     if rule.gift_type == 'redpack':
         redpack_id = int(rule.redpack)
         #此处后期要加上检测红包数量的逻辑，数量不够就记录下没有发送的用户，并通知市场相关人员
@@ -169,6 +170,7 @@ def _check_introduced_by(user, start_dt, is_invite_in_date):
         return ib.introduced_by
     else:
         return None
+
 
 def _check_introduced_by_product(user):
     ib = IntroducedBy.objects.filter(user=user).first()
@@ -481,7 +483,7 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
             _save_activity_record(rule, user_introduced_by, 'message', content, True)
         if sms_template:
             sms = Template(sms_template)
-            content = sms.render(context) + u'回复TD退订 4008-588-066【网利宝】'
+            content = sms.render(context)
             _send_sms_template(user_introduced_by.wanglibaouserprofile.phone, content)
             _save_activity_record(rule, user_introduced_by, 'sms', content, True)
     else:
@@ -502,7 +504,7 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
             _save_activity_record(rule, user, 'message', content)
         if sms_template:
             sms = Template(sms_template)
-            content = sms.render(context) + u'回复TD退订 4008-588-066【网利宝】'
+            content = sms.render(context)
             _send_sms_template(mobile, content)
             _save_activity_record(rule, user, 'sms', content)
 

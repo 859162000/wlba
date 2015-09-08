@@ -123,11 +123,15 @@ html
     .i-mod-wrap.mg-t-sm
       .i-mod-product.clearfix
         p2ptype = [{'title': '短期灵活', 'period': '标的期限1-3个月', 'class': 'p2p3', 'data': p2p_lt_three},{'title': '中期稳健', 'period': '标的期限3-6个月', 'class': 'p2p6', 'data': p2p_lt_six},{'title': '长期优选', 'period': '标的期限6个月及以上', 'class': 'p2p12', 'data': p2p_gt_six}]
-        for type in p2ptype
+        p2ptype_i = enumerate(p2ptype)
+        for idx, type in p2ptype_i
           .pdt-item
             .pdt-type.padding-sm.br-b-d2(class='{{type.class}}')
-              .font-ll {{type.title}}
-              .font-s.t-d12 {{type.period}}
+              .font-ll.padding-l-sm {{type.title}}
+              .font-s.t-d12.padding-l-sm {{type.period}}{{idx}}
+              if idx >= 1
+                .pdf-type-qmtj
+
             product = enumerate(type['data'])
             for index, p2p in product
               .pdt-list

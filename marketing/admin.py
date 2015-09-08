@@ -6,7 +6,7 @@ from django.utils import timezone
 from views import AggregateView, MarketingView, TvView, TopsView, IntroducedAwardTemplate, YaoView
 from play_list import InvestmentRewardView
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, \
-    Activity, ActivityRule, Reward, RewardRecord, Channels, IntroducedByReward, PlayList, ActivityJoinLog
+    Activity, ActivityRule, Reward, RewardRecord, Channels, IntroducedByReward, PlayList, ActivityJoinLog, WanglibaoActivityReward
 from marketing.views import GennaeratorCode
 
 from import_export import resources
@@ -74,9 +74,10 @@ class IntroducedByResource(resources.ModelResource):
 class IntroducedByAdmin(ReadPermissionModelAdmin):
     actions = None
     list_display = ("id", "user", "introduced_by", "channel", "created_at", "bought_at", "gift_send_at")
-    list_editable = ("gift_send_at",)
+    # list_editable = ("gift_send_at",)
     search_fields = ("user__wanglibaouserprofile__phone", "introduced_by__wanglibaouserprofile__phone")
     raw_id_fields = ('user', 'introduced_by', 'created_by')
+    list_filter = ('channel__code', 'channel__name')
     resource_class = IntroducedByResource
 
     def get_queryset(self, request):
@@ -88,7 +89,7 @@ class IntroducedByAdmin(ReadPermissionModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         # if not request.user.has_perm('marketing.view_introducedby'):
         #     return ("bought_at", "user", "introduced_by")
-        return ("bought_at", "user", "introduced_by", 'created_by')
+        return ("bought_at", "user", "introduced_by", 'created_by', 'channel', 'gift_send_at', 'product_id')
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -200,9 +201,9 @@ class ChannelsAdmin(admin.ModelAdmin):
     search_fields = ("name",)
     list_filter = ("name",)
 
-    def __init__(self, *args, **kwargs):
-        super(ChannelsAdmin, self).__init__(*args, **kwargs)
-        self.list_display_links = (None, )
+    # def __init__(self, *args, **kwargs):
+    #     super(ChannelsAdmin, self).__init__(*args, **kwargs)
+    #     self.list_display_links = (None, )
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -246,6 +247,16 @@ class ActivityJoinLogAdmin(admin.ModelAdmin):
         return False
 
 
+class WanglibaoActivityRewardAdmin(admin.ModelAdmin):
+    """
+       add by yihen@20150901
+    """
+    action = None
+    list_display = ('user', 'total_chances', 'used_chances', 'total_awards', 'used_awards')
+    #readonly_fields = ('user', 'total_chances', 'used_chances', 'total_awards', 'used_awards')
+    readonly_fields = ('user', 'total_chances', 'total_awards', )
+
+admin.site.register(WanglibaoActivityReward, WanglibaoActivityRewardAdmin) # add by Yihen@20150901
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
 admin.site.register(SiteData, SiteDataAdmin)
 admin.site.register(PromotionToken, PromotionTokenAdmin)
@@ -271,5 +282,5 @@ admin.site.register_view('marketing/generatorcode', view=GennaeratorCode.as_view
 
 admin.site.register_view('statistics/aggregate', view=AggregateView.as_view(), name=u'累计购买金额统计单')
 # 停止邀请收益统计使用
-admin.site.register_view('statistics/introduced_by', view=IntroducedAwardTemplate.as_view(), name=u'邀请收益统计')
+# admin.site.register_view('statistics/introduced_by', view=IntroducedAwardTemplate.as_view(), name=u'邀请收益统计')
 admin.site.register_view('statistics/investment_reward', view=InvestmentRewardView.as_view(), name=u'打榜统计发红包')

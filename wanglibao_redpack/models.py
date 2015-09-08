@@ -9,33 +9,6 @@ from django.db.models.signals import post_save
 from wanglibao_p2p.models import P2PProduct
 
 
-#class Rule(models.Model):
-#    """
-#        The red packet rule, create a different amount of it
-#    """
-#    name = models.CharField(max_length=20, verbose_name=u'红包名字')
-#    rtype = models.CharField(max_length=30, verbose_name=u'类型', choices=(
-#                ("direct", "直抵红包"),
-#                ("fullcut", "满减红包/最低投资额"),
-#                ("percent", "投资百分比红包"),))
-#    amount = models.IntegerField(null=False, default=0, verbose_name=u'红包金额(百分比也为整数0-100)')
-#    invest_amount = models.IntegerField(null=False, default=0, verbose_name=u"投资金额")
-#    extra = models.CharField(max_length=30, verbose_name=u'扩展', default="", blank=True)
-#    created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
-#
-#    class Meta:
-#        verbose_name = u"红包规则"
-#        verbose_name_plural = u"红包规则"
-#
-#    def __unicode__(self):
-#        if self.rtype == "direct":
-#            return u'<%s> 直抵' % self.name
-#        elif self.rtype == "fullcut":
-#            return u'<%s> 满减' % self.name
-#        else:
-#            return u'<%s> 百分比' % self.name
-
-
 PLATFORM = (
     ("all", "全平台"),
     ("ios", "ios"),
@@ -43,22 +16,22 @@ PLATFORM = (
     ("pc", "pc"),
 )
 
+
 class RedPackEvent(models.Model):
     """
         根据红包规则创建不同的派发红包活动，创建有/无兑换码的活动
         兑换码红包不搞自动派发，如果是自动派发兑换码红包，需要更多的考虑(如前几名有红包，派发完就没有了)
     """
-    name = models.CharField(max_length=30, verbose_name=u'红包活动名字')
-    #rule = models.ForeignKey(Rule)
-    rtype = models.CharField(max_length=20, verbose_name=u'红包类型', choices=(
-                            ("direct", "直抵红包"),
-                            #("fullcut", "满减红包/最低投资额"),
-                            ("percent", "投资百分比红包"),), default="直抵红包")
-    #amount = models.IntegerField(null=False, default=0, verbose_name=u'红包金额(百分比也为整数0-100)')
-    amount = models.FloatField(null=False, default=0.0, verbose_name=u'红包金额(百分比也为0-100)')
+    name = models.CharField(max_length=30, verbose_name=u'优惠券活动名字')
+    rtype = models.CharField(max_length=20, verbose_name=u'优惠券类型', choices=(
+                            ("direct", u"直抵红包"),
+                            ("percent", u"投资百分比红包"),
+                            ("interest_coupon", u"加息券")
+    ), default="直抵红包")
+    amount = models.FloatField(null=False, default=0.0, verbose_name=u'优惠券金额(百分比也为0-100)')
     invest_amount = models.IntegerField(null=False, default=0, verbose_name=u"投资门槛")
     highest_amount = models.IntegerField(null=False, default=0, verbose_name=u"最高抵扣金额(百分比使用0无限制)")
-    value = models.IntegerField(null=False, default=0, verbose_name=u"红包个数(不生成兑换码无需修改)")
+    value = models.IntegerField(null=False, default=0, verbose_name=u"优惠券个数(不生成兑换码无需修改)")
     describe = models.CharField(max_length=20, verbose_name=u"标注渠道批次等信息", default="")
     give_mode = models.CharField(max_length=20, verbose_name=u"发放方式", db_index=True, choices=(
                                 ("nil", u"零门槛(兑换码)"),
@@ -77,15 +50,20 @@ class RedPackEvent(models.Model):
     give_end_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"发放/兑换结束时间")
     available_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"生效时间")
     unavailable_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"失效时间")
+    auto_extension = models.BooleanField(default=False, verbose_name=u"自动延长生效时间",
+                                         help_text=u"选择此项后系统会将失效时间设置为具体发放日期加上延长天数")
+    auto_extension_days = models.IntegerField(verbose_name=u"生效延长天数", default=0, null=False,
+                                              help_text=u"请填写活动持续的天数")
     invalid = models.BooleanField(default=False, verbose_name=u"是否作废")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
 
     class Meta:
-        verbose_name = u"红包活动"
-        verbose_name_plural = u"红包活动"
+        verbose_name = u"优惠券活动"
+        verbose_name_plural = u"优惠券活动"
 
     def __unicode__(self):
         return u'%s <%s>' % (self.id, self.name)
+
 
 class RedPack(models.Model):
     """
@@ -99,14 +77,15 @@ class RedPack(models.Model):
                                 ("unused", "未兑换"),), default="unused")
 
     class Meta:
-        verbose_name = u"红包列表"
-        verbose_name_plural = u"红包列表"
+        verbose_name = u"优惠券列表"
+        verbose_name_plural = u"优惠券列表"
 
     def __unicode__(self):
-        return u'%s<%s>' % (self.id, self.event.name)
+        return u'%s<%s-%s>' % (self.id, self.event.id, self.event.name)
+
 
 class RedPackRecord(models.Model):
-    redpack = models.ForeignKey(RedPack, verbose_name=u"红包")
+    redpack = models.ForeignKey(RedPack, verbose_name=u"优惠券")
     user = models.ForeignKey(User, verbose_name=u"用户")
     #rule = models.ForeignKey(Rule, verbose_name=u"规则")
     change_platform = models.CharField(max_length=20, null=False, default="", choices=PLATFORM, verbose_name=u"兑换平台")
@@ -114,11 +93,13 @@ class RedPackRecord(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
     apply_at = models.DateTimeField(verbose_name=u'使用时间', null=True)
     apply_amount = models.FloatField(null=True, default=0.0, verbose_name=u'使用金额')
-    order_id = models.IntegerField(verbose_name=u'关联订单', null=True)
+    order_id = models.IntegerField(verbose_name=u'关联订单', null=True, db_index=True)
+    product_id = models.IntegerField(verbose_name=u'关联产品', null=True, db_index=True)
 
     class Meta:
-        verbose_name = u"红包流水"
-        verbose_name_plural = u"红包流水"
+        verbose_name = u"优惠券流水"
+        verbose_name_plural = u"优惠券流水"
+
 
 class InterestHike(models.Model):
     user = models.ForeignKey(User, verbose_name=u"用户")

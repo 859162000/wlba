@@ -3,6 +3,7 @@ from views import P2PDetailView, audit_product_view, P2PListView, preview_contra
     audit_amortization_view, audit_equity_view
 from views import AuditEquityCreateContract
 
+
 urlpatterns = patterns('',
     url(r'^detail/(?P<id>\w+)', P2PDetailView.as_view(), name='p2p detail'),
     url(r'^audit/(?P<id>\w+)', audit_product_view, name='p2p audit'),

@@ -12,7 +12,7 @@ from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, At
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization, P2PEquityJiuxian
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
-from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization, AdminPrepayment, AdminP2PList
+from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization, AdminP2PList, AdminPrepayment
 from wanglibao.admin import ReadPermissionModelAdmin
 from wanglibao_p2p.forms import RequiredInlineFormSet
 from wanglibao_account.models import UserAddress
@@ -321,7 +321,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
 
 class UserAmortizationAdmin(ConcurrentModelAdmin):
     actions = None
-    list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest')
+    list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest', 'coupon_interest')
     search_fields = ('user__wanglibaouserprofile__phone', 'product_amortization__product__name')
     raw_id_fields = ('product_amortization', 'user')
 
@@ -330,6 +330,9 @@ class UserAmortizationAdmin(ConcurrentModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return [f.name for f in self.model._meta.fields]
 
 
 class P2PRecordResource(resources.ModelResource):
@@ -381,7 +384,8 @@ class WarrantAdmin(admin.ModelAdmin):
 class AmortizationRecordAdmin(admin.ModelAdmin):
     actions = None
     list_display = (
-        'catalog', 'order_id', 'amortization', 'user', 'term', 'principal', 'interest', 'penal_interest', 'description')
+        'catalog', 'order_id', 'amortization', 'user', 'term',
+        'principal', 'interest', 'penal_interest', 'coupon_interest', 'description')
     search_fields = ('user__wanglibaouserprofile__phone',)
     raw_id_fields = ('amortization', 'user')
 
@@ -455,6 +459,9 @@ class ProductAmortizationAdmin(ReadPermissionModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.list_display
 
 
 class EarningAdmin(admin.ModelAdmin):

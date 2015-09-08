@@ -441,6 +441,11 @@ class YeeShortPay:
         res = requests.post(url, post)
         return self._response_data_change(res=json.loads(res.text))
 
+    def _request_yee_get(self, url, data):
+        post = self._format_post(data)
+        res = requests.get(url, params=post)
+        return self._response_data_change(res=json.loads(res.text))
+
     def _response_data_change(self, res):
         """ 将易宝返回的数据格式化成程序通用数据 """
         if 'error_code' in res:
@@ -452,12 +457,14 @@ class YeeShortPay:
             return {'ret_code': 20012, 'message': '易宝数据有误'}
 
         flag, data = self._response_decode(res=res)
-        if not flag:
-            return {'ret_code': 20011, 'message': '签名验证失败'}
 
         if 'error_code' in data:
             logger.error(data)
             return {'ret_code': data['error_code'], 'message': data['error_msg'], 'data': data}
+
+        if not flag:
+            logger.error(data)
+            return {'ret_code': 20011, 'message': '签名验证失败', 'data': data}
 
         return {'ret_code': 0, 'message': 'ok', 'data': data}
 
@@ -470,6 +477,8 @@ class YeeShortPay:
                 sign = data.pop('sign')
                 if self._verify(data, sign):
                     return True, data
+                else:
+                    return False, data
         return False, res
 
     def _bind_card_request(self, request, phone, card_no, request_id):
@@ -506,7 +515,7 @@ class YeeShortPay:
         post['merchantaccount'] = self.MER_ID
         post['identityid'] = str(user.wanglibaouserprofile.id_number)
         post['identitytype'] = 5
-        return self._request_yee(url=self.BIND_CARD_QUERY, data=post)
+        return self._request_yee_get(url=self.BIND_CARD_QUERY, data=post)
 
     def delete_bind(self, user, card, bank):
         """ 解绑银行卡 """
@@ -578,8 +587,8 @@ class YeeShortPay:
         # if amount < 10 or len(str(amount)) > 20:
         #     return {"ret_code": 20115, 'message': '充值须大于等于10元'}
 
-        if amount > 1 or len(str(amount)) > 20:
-            return {"ret_code": 20115, 'message': '真实交易金额大hold不住'}
+        if len(str(amount)) > 20:
+            return {"ret_code": 20115, 'message': '充值金额太大'}
 
         user = request.user
         profile = user.wanglibaouserprofile
@@ -800,7 +809,16 @@ class YeeShortPay:
         if pay_info.status == PayInfo.SUCCESS:
             return {"ret_code": 0, "message": PayResult.DEPOSIT_SUCCESS, "amount": amount}
 
-        pay_info.error_message = str(params['status'])
+        #pay_info.error_message = str(params['status'])
+        if "errorcode" in params:
+            errorcode = params['errorcode']
+        else:
+            errorcode = "0"
+        if "errormsg" in params:
+            errormsg = params['errormsg']
+        else:
+            errormsg = "success"
+        pay_info.error_message = "%s:%s" % (errorcode, errormsg)
         pay_info.response = "%s" % params
         pay_info.response_ip = util.get_client_ip(request)
 

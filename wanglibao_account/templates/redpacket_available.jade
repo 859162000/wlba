@@ -1,90 +1,80 @@
 extends account_home_base
-
 -load formatters
-
 block head
-  - with '优惠劵' as title
-    include include/head
-
-block sidebar
-  - with '优惠劵' as activeItem
-  include include/user_center_sidebar
-  - endwith
-
+- with '红包' as title
+include include/head
+    block sidebar
+- with '优惠券' as activeItem
+include include/user_center_sidebar
+- endwith
 block main
-  .account-home-panel
-    h1(style="font-size:16px;margin-bottom:20px;") 兑换红包
-    .row
-      input(type="text", placeholder="请输入兑换码", style="display:inline-block;width:240px", name="token", autocomplete="off")
-      input(type="button", value="兑换", style="height:40px;margin-left:10px").submit-button.button-primary.button-middle.exchange
-
-  ul.discount--tabs
-    li.coupon--tab.hover(data-tabName="coupon") 加息劵
-        span
-
-    li.redpacket--tab(data-tabName="redpacket") 红包
-        span
-
-  .account-home-panel__no-padding
-    .coupon
-        .account-home-panel--title-bar__product
-          ul.title-bar--tabs
+.account-home-panel
+    include include/coupon_exchange
+        ul.discount--tabs
+    li.coupon--tab
+        a(href="/accounts/coupon/unused") 加息券
+            span
+    li.redpacket--tab.hover
+        a(href="/accounts/redpacket/unused") 红包
+            span
+.account-home-panel__no-padding
+    .account-home-panel--title-bar__product
+    .account-home-panel--title-bar__product
+        ul.title-bar--tabs
             if status == 'unused'
-              li.title-bar--tab.active
-                a.title-bar--tab--anchor(href="/accounts/redpacket/unused") 可使用
+                li.title-bar--tab.active
+                    a.title-bar--tab--anchor(href="/accounts/redpacket/unused") 可使用
             else
-              li.title-bar--tab
-                a.title-bar--tab--anchor(href="/accounts/redpacket/unused") 可使用
+                li.title-bar--tab
+                    a.title-bar--tab--anchor(href="/accounts/redpacket/unused") 可使用
             if status == 'used'
-              li.title-bar--tab.active
-                a.title-bar--tab--anchor(href='/accounts/redpacket/used/') 已使用
+                li.title-bar--tab.active
+                    a.title-bar--tab--anchor(href='/accounts/redpacket/used/') 已使用
             else
-              li.title-bar--tab
-                a.title-bar--tab--anchor(href='/accounts/redpacket/used/') 已使用
+                li.title-bar--tab
+                    a.title-bar--tab--anchor(href='/accounts/redpacket/used/') 已使用
             if status == 'expires'
-              li.title-bar--tab.active
-                a.title-bar--tab--anchor(href='/accounts/redpacket/expires/') 已过期
+                li.title-bar--tab.active
+                    a.title-bar--tab--anchor(href='/accounts/redpacket/expires/') 已过期
             else
-              li.title-bar--tab
-                a.title-bar--tab--anchor(href='/accounts/redpacket/expires/') 已过期
-        .panel-container.padding-xl(style="padding-top:0px")
-          table.table
+                li.title-bar--tab
+                    a.title-bar--tab--anchor(href='/accounts/redpacket/expires/') 已过期
+    .panel-container.padding-xl(style="padding-top:0px")
+        table.table
             thead
-              tr
-                th 红包名称
-                th 金额
-                th 使用次数
-                th 使用限额
-                th 使用门槛
-                th(width='20%') 有效期
-                if status == 'used'
-                  th 使用详情
-                else
-                  th 使用范围
-            tbody
-              each red_packet in red_packets
                 tr
-                  td {{red_packet.name}}
-                  if red_packet.method == '-'
-                    td {{red_packet.amount}}元
-                  else
-                    td {{red_packet.highest_amount}}元
-                  td 仅限一次
-                  if red_packet.method == '-'
-                    td {{red_packet.amount}}元
-                  else
-                    td 投资额{{red_packet.amount | percentage_number_two}}%
-                  if red_packet.invest_amount == 0
-                    td 无
-                  else
-                    td {{red_packet.invest_amount}}元
-                  td {{red_packet.available_at | milldate_format}} 至 {{red_packet.unavailable_at | milldate_format}}
-                  if status == 'used'
-                    td {{red_packet.product}} <br/> {{red_packet.apply_at | milltime_format }}
-                  else
-                    td P2P理财
-    .redpacket
-
-    script.
-      var v = new Date().getTime()
-      require(['/static/js/accounts_redpack.js?v='+v,'/static/js/discount_tabs.js'])
+                    th 红包名称
+                    th 金额
+                    th 使用次数
+                    th 使用限额
+                    th 使用门槛
+                    th(width='20%') 有效期
+                    if status == 'used'
+                        th 使用详情
+                    else
+                        th 使用范围
+            tbody
+                each red_packet in red_packets
+                    tr
+                        td {{red_packet.name}}
+                        if red_packet.method == '-'
+                            td {{red_packet.amount}}元
+                        else
+                            td {{red_packet.highest_amount}}元
+                        td 仅限一次
+                        if red_packet.method == '-'
+                            td {{red_packet.amount}}元
+                        else
+                            td 投资额{{red_packet.amount | percentage_number_two}}%
+                        if red_packet.invest_amount == 0
+                            td 无
+                        else
+                            td {{red_packet.invest_amount}}元
+                        td {{red_packet.available_at | milldate_format}} 至 {{red_packet.unavailable_at | milldate_format}}
+                        if status == 'used'
+                            td {{red_packet.product}} <br/> {{red_packet.apply_at | milltime_format }}
+                        else
+                            td P2P理财
+                                script.
+        var v = new Date().getTime()
+        require(['/static/js/accounts_redpack.js?v='+v])

@@ -7,8 +7,6 @@ from wanglibao_pay.models import PayInfo
 from wanglibao_pay import util
 from wanglibao_p2p.models import UserAmortization, AmortizationRecord
 from wanglibao_margin.models import MarginRecord
-import logging
-logger = logging.getLogger('p2p')
 
 def detect(request):
     stype = request.DATA.get("type", "").strip()
@@ -83,15 +81,18 @@ def _amo_record(user, pagesize, pagenum, product_id):
         amos_record = amos_record.filter(amortization__product__id=product_id)
     amos_record = amos_record[(pagenum-1)*pagesize:pagenum*pagesize]
     for x in amos_record:
-        obj = {"id":x.id,
-                "name":x.amortization.product.name, "term":x.term,
-                "total_term":x.amortization.product.amortization_count,
-                "term_date":util.fmt_dt_normal(util.local_datetime(x.created_time)),
-                "principal":x.principal, "interest":x.interest,
-                "penal_interest":x.penal_interest,
-                "total_amount":(x.principal+x.interest+x.penal_interest),
-                "settlement_time":util.fmt_date_normal(util.local_datetime(x.created_time))
-                }
+        obj = {
+            "id": x.id,
+            "name": x.amortization.product.name,
+            "term": x.term,
+            "total_term": x.amortization.product.amortization_count,
+            "term_date": util.fmt_dt_normal(util.local_datetime(x.created_time)),
+            "principal": x.principal,
+            "interest": x.interest,
+            "penal_interest": x.penal_interest,
+            "coupon_interest": x.coupon_interest,
+            "total_amount": (x.principal + x.interest + x.penal_interest + x.coupon_interest),
+            "settlement_time": util.fmt_date_normal(util.local_datetime(x.created_time))
+        }
         res.append(obj)
-    logger.info("return amo_record ===>>>: %s" % res)
     return res

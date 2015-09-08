@@ -1,5 +1,6 @@
 # encoding: utf-8
 from captcha.fields import CaptchaField
+from captcha.models import CaptchaStore
 
 from django import forms
 from django.contrib.auth import get_user_model, authenticate
@@ -27,13 +28,17 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     account is not activated. When the user clicked the activation link, the account
     will be activated.
     """
+    # captcha_0 = forms.CharField(label='captcha_0', required=False)
+    # captcha_1 = forms.CharField(label='captcha_1', required=False)
+
     nickname = forms.CharField(label="Nick name", required=False)
     identifier = forms.CharField(label="Email/Phone")
+    invitecode = forms.CharField(label="Invitecode", required=False)
     validate_code = forms.CharField(label="Validate code for phone", required=True)
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
-    invitecode = forms.CharField(label="Invitecode", required=False)
 
     MlGb = forms.CharField(label='MlGb', required=False)
+    _flag = False
 
     error_messages = {
         'duplicate_username': u'该邮箱或手机号已经注册',
@@ -43,12 +48,45 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         'validate code not exist': u'没有发送验证码',
         'validate must not be null': u'验证码不能为空',
         'invite code not match': u'邀请码错误',
-        'mlgb error': u'注册成功'
+        'mlgb error': u'注册成功',
+        'verify_invalid': u'请输入验证码',
+        'verify_error': u'短信验证码错误',
     }
 
     class Meta:
         model = get_user_model()
         fields = ("email",)
+
+    #def clean_captcha_1(self):
+    #    captcha_1 = self.cleaned_data['captcha_1']
+    #    captcha_0 = self.cleaned_data['captcha_0']
+    #    if not captcha_0 and not captcha_1:
+    #        self._flag = True
+    #        return
+
+    #    if not captcha_0 or not captcha_1:
+    #        raise forms.ValidationError(
+    #            self.error_messages['verify_invalid'],
+    #            code='verify_invalid'
+    #        )
+    #    record = CaptchaStore.objects.filter(hashkey=captcha_0).first()
+    #    if not record:
+    #        raise forms.ValidationError(
+    #            self.error_messages['verify_error'],
+    #            code='verify_error'
+    #        )
+    #    if captcha_1.lower() == record.response.lower():
+    #        try:
+    #            record.delete()
+    #        except:
+    #            pass
+    #        self._flag = True
+    #        return captcha_1.strip()
+    #    else:
+    #        raise forms.ValidationError(
+    #            self.error_messages['verify_error'],
+    #            code='verify_error'
+    #        )
 
     def clean_identifier(self):
         """
@@ -92,7 +130,9 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
                             self.error_messages['invite code not match'],
                             code='invite code not match',
                         )
+            self._flag = True
             return invite_code
+        self._flag = True
 
     def clean_MlGb(self):
         MlGb_src = self.cleaned_data.get('MlGb')
@@ -112,6 +152,8 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         """
 
     def clean_validate_code(self):
+        if not self._flag:
+            return
         if 'identifier' in self.cleaned_data:
             identifier = self.cleaned_data["identifier"]
             identifier_type = detect_identifier_type(identifier)
@@ -133,7 +175,26 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         return self.cleaned_data
 
 
+def verify_captcha(dic, keep=False):
+    captcha_1 = dic.get('captcha_1', "")
+    captcha_0 = dic.get('captcha_0', "")
+    if not captcha_0 and not captcha_1:
+        return True, ""
 
+    if not captcha_0 or not captcha_1:
+        return False, u"请输入验证码"
+    record = CaptchaStore.objects.filter(hashkey=captcha_0).first()
+    if not record:
+        return False, u"图片验证码错误"
+    # if captcha_1.lower() == record.challenge.lower():
+    if captcha_1.lower() == record.response.lower():
+        try:
+            if not keep: record.delete()
+        except:
+            pass
+        return True, ""
+    else:
+        return False, u"图片验证码错误"
 
 class EmailOrPhoneAuthenticationForm(forms.Form):
     """

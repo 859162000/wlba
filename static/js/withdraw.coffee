@@ -4,6 +4,7 @@ require.config(
     'jquery.modal': 'lib/jquery.modal.min'
     'jquery.placeholder': 'lib/jquery.placeholder'
     'jquery.validate': 'lib/jquery.validate.min'
+    tools: 'lib/modal.tools'
 
   shim:
     'jquery.modal': ['jquery']
@@ -11,7 +12,7 @@ require.config(
     'jquery.validate': ['jquery']
 )
 
-require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calculator', 'jquery.validate'], ($, modal, backend, placeholder, validate)->
+require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator', 'jquery.validate'], ($, modal, backend, tool, placeholder, validate)->
 
   $.validator.addMethod "balance", (value, element)->
     return backend.checkBalance(value, element)
@@ -41,6 +42,9 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calcul
         required: true
       validate_code:
         required: true
+      captcha_1:
+        required: true
+        minlength: 1
 
     messages:
       amount:
@@ -53,29 +57,56 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calcul
         required: '请选择银行卡'
       validate_code:
         required: '请输入验证码'
+      captcha_1:
+        required: '不能为空'
+        minlength: $.format("验证码至少输入1位")
 
   if $('#id-is-valid').val() == 'False'
     $('#id-validate').modal()
 
-  $("#button-get-validate-code").click (e) ->
-    e.preventDefault()
+  $('#button-get-code-btn').click () ->
+    $('#img-code-div2').modal()
+    $('#img-code-div2').find('#id_captcha_1').val('')
+    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v="+(+new Date())
+    $.getJSON url, {}, (json)->
+      $('input[name="captcha_0"]').val(json.key)
+      $('img.captcha').attr('src', json.image_url)
 
-    element = this
-
-    e.preventDefault()
+  $("#submit-code-img4").click (e) ->
+    element = $('#button-get-code-btn')
     if $(element).attr 'disabled'
       return;
-
     phoneNumber = $(element).attr("data-phone")
+    captcha_0 = $(this).parents('form').find('#id_captcha_0').val()
+    captcha_1 = $(this).parents('form').find('.captcha').val()
     $.ajax
       url: "/api/phone_validation_code/" + phoneNumber + "/"
       type: "POST"
+      data: {
+        captcha_0 : captcha_0
+        captcha_1 : captcha_1
+      }
     .fail (xhr)->
-      if xhr.status > 400
-        tool.modalAlert({title: '温馨提示', msg: result.message})
+      clearInterval(intervalId)
+      $(element).text('重新获取')
+      $(element).removeAttr 'disabled'
+      $(element).addClass 'button-red'
+      $(element).removeClass 'button-gray'
+      result = JSON.parse xhr.responseText
+      if result.type == 'captcha'
+        $("#submit-code-img4").parent().parent().find('.code-img-error').html(result.message)
+      else
+        if xhr.status >= 400
+          tool.modalAlert({title: '温馨提示', msg: result.message})
+    .success ->
+      element.attr 'disabled', 'disabled'
+      element.removeClass 'button-red'
+      element.addClass 'button-gray'
+      $('.voice-validate').attr 'disabled', 'disabled'
+      $.modal.close()
 
     intervalId
-    count = 180
+    count = 60
 
     $(element).attr 'disabled', 'disabled'
     $(element).addClass('disabled')
@@ -89,6 +120,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calcul
         $(element).text('重新获取')
         $(element).removeAttr 'disabled'
         $(element).removeClass('disabled')
+        $(element).removeClass('button-gray')
         $('.voice').removeClass('hidden')
         $('.voice-validate').removeAttr 'disabled'
         $('.voice  .span12-omega').html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/2/" class="voice-validate">语音验证</a>')
@@ -110,15 +142,15 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'lib/calcul
       url: url
       type: "POST"
       data: {
-        phone: $("#button-get-validate-code").attr('data-phone').trim()
+        phone: $("#button-get-code-btn").attr('data-phone').trim()
       }
     .success (json)->
       if(json.ret_code == 0)
         #TODO
 
         intervalId
-        count = 180
-        button = $("#button-get-validate-code")
+        count = 60
+        button = $("#button-get-code-btn")
 
         button.attr 'disabled', 'disabled'
         button.addClass 'button-gray'

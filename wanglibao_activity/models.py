@@ -41,7 +41,7 @@ TRIGGER_NODE = (
 )
 GIFT_TYPE = (
     ('reward', u'奖品'),
-    ('redpack', u'红包'),
+    ('redpack', u'优惠券'),
     # ('income', u'收益'),
     ('phonefare', u'手机话费')
 )
@@ -136,8 +136,8 @@ class ActivityRule(models.Model):
     share_type = models.CharField(u'选择参与赠送的人员', max_length=20, choices=SHARE_TYPE, blank=True, default='')
     is_invite_in_date = models.BooleanField(u'判断是否在活动区间内邀请好友', default=False,
                                             help_text=u'勾选此项则，则会先判断邀请关系的成立时间是否在活动期间，是就触发该规则，不是则不做处理')
-    redpack = models.CharField(u'红包活动ID', max_length=60, blank=True,
-                               help_text=u'红包活动ID一定要和红包活动中的ID保持一致，否则会导致无法发放红包')
+    redpack = models.CharField(u'优惠券活动ID', max_length=60, blank=True,
+                               help_text=u'优惠券活动ID一定要和优惠券活动中的ID保持一致，否则会导致无法发放')
     reward = models.CharField(u'奖品类型名称', max_length=60, blank=True,
                               help_text=u'奖品类型名称一定要和奖品中的类型保持一致，否则会导致无法发放奖品')
     income = models.FloatField(u'金额或比率', default=0, blank=True,
@@ -161,7 +161,7 @@ class ActivityRule(models.Model):
                                               内置：注册人手机：“{{mobile}}，奖品激活码：{{reward}}，截止日期{{end_date}}<br/>\
                                               邀请人：{{inviter}}，被邀请人：{{invited}}，赠送金额/比率{{income}}<br/>\
                                               活动名称：{{name}}，红包最高抵扣金额：{{highest_amount}}，充值/投资金额{{amount}}<br/>\
-                                              红包金额/百分比：{{redpack_amount}}，红包投资门槛：{{invest_amount}}”')
+                                              优惠券金额/百分比：{{redpack_amount}}，优惠券投资门槛：{{invest_amount}}”')
     sms_template = models.TextField(u'短信模板（不填则不发）', blank=True,
                                     help_text=u'短信模板不填写则触发该规则时不发手机短信，变量写在2个大括号之间，变量：同上')
     msg_template_introduce = models.TextField(u'邀请人站内信模板', blank=True,
@@ -183,7 +183,7 @@ class ActivityRule(models.Model):
         if self.gift_type == 'reward' and not self.reward:
             raise ValidationError(u'赠送类型为“奖品”时，必须填写“奖品类型名称”')
         if self.gift_type == 'redpack' and not self.redpack:
-            raise ValidationError(u'赠送类型为“红包”时，必须填写“红包类型ID”')
+            raise ValidationError(u'赠送类型为“优惠券”时，必须填写“优惠券活动ID”')
         if self.gift_type == 'income' or self.gift_type == 'phonefare':
             if self.income <= 0:
                 raise ValidationError(u'选择送收益或手机话费时要填写“金额或比率”')
@@ -206,7 +206,7 @@ class ActivityRecord(models.Model):
     gift_type = models.CharField(u'赠送类型', max_length=20, choices=GIFT_TYPE, default='')
     user = models.ForeignKey(User, verbose_name=u"触发用户")
     income = models.FloatField(u'费用或收益', null=True, blank=True)
-    created_at = models.DateTimeField(auto_now=True, default=timezone.now)
+    created_at = models.DateTimeField(auto_now=True, default=timezone.now, db_index=True)
 
     def __unicode__(self):
         return u'活动触发流水'
