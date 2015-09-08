@@ -362,19 +362,6 @@ class AccountHome(TemplateView):
 
         #xunlei_vip = Binding.objects.filter(user=user).filter(btype='xunlei').first()
 
-        #酒仙众筹用户
-        tab_jiuxian = False
-        jiuxian_selected = False
-        equity_jiuxian = P2PEquityJiuxian.objects.filter(user=user).filter(product__category=u'酒仙众筹标').first()
-        if equity_jiuxian:
-            tab_jiuxian = True
-            if equity_jiuxian.selected_at:
-                jiuxian_selected = True
-            # mode = 'jiuxian'
-
-        if self.request.path.rstrip('/').split('/')[-1] == 'jiuxian':
-            mode = 'jiuxian'
-
         return {
             'message': message,
             'result': result,
@@ -388,9 +375,6 @@ class AccountHome(TemplateView):
             'total_asset': total_asset,
             'mode': mode,
             'announcements': AnnouncementAccounts,
-            'tab_jiuxian': tab_jiuxian,
-            'equity_jiuxian': equity_jiuxian,
-            'jiuxian_selected': jiuxian_selected
         }
 
     def post(self, request):
@@ -632,8 +616,10 @@ class AccountP2PRecordAPI(APIView):
                            'equity_product_display_status': equity.product.display_status,  # 状态
                            'equity_term': equity.term,  # 还款期
                            'equity_product_amortization_count': equity.product.amortization_count,  # 还款期数
-                           'equity_paid_interest': float(equity.pre_paid_interest),  # 单个已经收益
+                           'equity_paid_interest': float(equity.pre_paid_interest),  # 单个已收收益
                            'equity_total_interest': float(equity.pre_total_interest),  # 单个预期收益
+                           'equity_paid_coupon_interest': float(equity.pre_paid_coupon_interest),  # 加息券单个已收收益
+                           'equity_total_coupon_interest': float(equity.pre_total_coupon_interest),  # 加息券单个预期收益
                            'equity_contract': 'https://%s/api/p2p/contract/%s/' % (
                                request.get_host(), equity.product.id),  # 合同
                            'product_id': equity.product_id
