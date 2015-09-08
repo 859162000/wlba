@@ -623,12 +623,12 @@ def ajax_get_activity_record(action='get_award', *gifts):
     records = ActivityJoinLog.objects.filter(action_name=action, action_type='login', join_times=0, amount__gt=0)
     data = [{'phone': record.user.wanglibaouserprofile.phone, 'awards': float(record.amount)} for record in records]
     if gifts:
-        records = ActivityJoinLog.objects.filter(action_name=action, action_type='login', join_times=0, Q(gift_name=u'爱奇艺')|Q(gift_name=u'抠电影'))
+        records = ActivityJoinLog.objects.filter(Q(gift_name=u'爱奇艺')|Q(gift_name=u'抠电影'), action_name=action, action_type='login', join_times=0)
         gift = [{'phone': record.user.wanglibaouserprofile.phone, 'awards': record.gift_name} for record in records]
     to_json_response = {
         'ret_code': 3005,
         'data': data,
-        'gift': gift,
+        'gift': gift if gifts else "None",
         'message': u'获得抽奖成功用户',
     }
     return HttpResponse(json.dumps(to_json_response), content_type='application/json')
