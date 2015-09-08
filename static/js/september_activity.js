@@ -108,4 +108,16 @@
       backTop();
     });
   });
+
+  (function(){
+    $.ajax({
+      type: "post",
+      url: "/api/award/common_september",
+      dataType: "json",
+      data: {action: "GET_AWARD"},
+      success: function(data){
+        console.log(data);
+      }
+    })
+  })();
 }).call(this);
