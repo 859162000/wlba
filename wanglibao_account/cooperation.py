@@ -33,9 +33,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY, FUBA_CALL_BACK_URL, WLB_FOR_FUBA_KEY, \
      FUBA_COOP_ID, FUBA_KEY, FUBA_CHANNEL_CODE, FUBA_DEFAULT_TID, FUBA_PERIOD, \
      WLB_FOR_YUNDUAN_KEY, YUNDUAN_CALL_BACK_URL, YUNDUAN_COOP_ID, WLB_FOR_YICHE_KEY, YICHE_COOP_ID, \
-     YICHE_KEY, YICHE_CALL_BACK_URL, WLB_FOR_ZHITUI1_KEY, ZHITUI_COOP_ID, ZHITUI_CALL_BACK_URL, \
-     WLB_FOR_ZGDX_KEY, ZGDX_CALL_BACK_URL, ZGDX_PARTNER_NO, ZGDX_SERVICE_CODE, ZGDX_CONTRACT_ID, \
-     ZGDX_ACTIVITY_ID, ZGDX_PLAT_OFFER_ID, ZGDX_KEY, ZGDX_IV
+     YICHE_KEY, YICHE_CALL_BACK_URL, WLB_FOR_ZHITUI1_KEY, ZHITUI_COOP_ID, ZHITUI_CALL_BACK_URL
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
@@ -45,7 +43,6 @@ from wanglibao_redis.backend import redis_backend
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 import re
-from M2Crypto.EVP import Cipher
 
 logger = logging.getLogger(__name__)
 
@@ -136,19 +133,7 @@ def save_to_binding(user, record, request):
         pass
 
 
-def generate_Encrypt(key, iv, mode, data):
-    mode = mode.lower()
-    cipher = Cipher(alg=mode, key=key, iv=iv, op=1)
-    buf = cipher.update(data)
-    buf = buf + cipher.final()
-    del cipher
-    # 将明文从字节流转为16进制
-    output = ''
-    for i in buf:
-        output += '%02X' % (ord(i))
-    return output
-
-#判断网站来自mobile还是pc
+# 判断网站来自mobile还是pc
 def check_mobile(request):
     """
     demo :
@@ -741,7 +726,7 @@ class FUBARegister(CoopRegister):
             if not binding.extra:
                 # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
                 if earliest_settlement_time:
-                    binding.extra=earliest_settlement_time
+                    binding.extra = earliest_settlement_time
                     binding.save()
 
 
@@ -921,7 +906,7 @@ class ZhiTuiRegister(CoopRegister):
                 'p_cd': '',
                 'price': invest_amount,
                 'it_cnt': 1,
-                'o_date': invest_time.strftime('%Y%m%d%H%M%S'),
+                'o_date': timezone.localtime(invest_time).strftime('%Y%m%d%H%M%S'),
                 'rate': round(invest_amount * int(period) * Decimal(0.01) / Decimal(365), 2),
                 'rate_memo': '',
                 'status': 1,
@@ -929,62 +914,6 @@ class ZhiTuiRegister(CoopRegister):
             }
             common_callback.apply_async(
                 kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
-
-
-class ZGDXRegister(CoopRegister):
-    def __init__(self, request):
-        super(ZGDXRegister, self).__init__(request)
-        self.c_code = 'zgdx'
-        self.call_back_url = ZGDX_CALL_BACK_URL
-        self.partner_no = ZGDX_PARTNER_NO
-        self.service_code = ZGDX_SERVICE_CODE
-        self.contract_id = ZGDX_CONTRACT_ID
-        self.activity_id = ZGDX_ACTIVITY_ID
-        self.plat_offer_id = ZGDX_PLAT_OFFER_ID
-        self.coop_key = ZGDX_KEY
-        self.iv = ZGDX_IV
-
-    def zgdx_call_back(self, params):
-        params['partner_no'] = self.partner_no,
-        params_code = params['code']
-        params_code['service_code'] = self.service_code,
-        params_code['contract_id'] = self.contract_id,
-        params_code['activity_id'] = self.activity_id,
-        params_code['order_type'] = 1,
-        params_code['plat_offer_id'] = self.plat_offer_id,
-        if datetime.datetime.now().day >= 28:
-            params_code['effect_type'] = 1,
-        else:
-            params_code['effect_type'] = 0,
-        params['code'] = generate_Encrypt(self.coop_key, self.iv, 'aes_128_ecb', params_code)
-        common_callback.apply_async(
-            kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
-
-    def binding_card_call_back(self, user):
-        binding = Binding.objects.filter(user_id=user.id).first()
-        if binding:
-            phone_number = WanglibaoUserProfile.objects.get(user_id=user.id).phone
-            params = {
-                'code': {
-                    'request_no': get_username_for_coop(str(user.id)+'1'),
-                    'phone_id': phone_number,
-                },
-            }
-            self.zgdx_call_back(params)
-
-    def purchase_call_back(self, user):
-        # 判断是否是首次投资
-        binding = Binding.objects.filter(user_id=user.id).first()
-        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
-        # if binding and p2p_record.count() == 1:
-        phone_number = WanglibaoUserProfile.objects.get(user_id=user.id).phone
-        params = {
-            'code': {
-                'request_no': get_username_for_coop(str(user.id)+'2'),
-                'phone_id': phone_number,
-            },
-        }
-        self.zgdx_call_back(params)
 
 
 # 注册第三方通道
@@ -1898,15 +1827,21 @@ def zhongjin_get_products():
         prod = dict()
         if product in new_products:
             prod['method'] = 'add'
-        else:
-            if product.status in [u'录标', u'录标完成', u'待审核', u'正在招标']:
-                prod['method'] = 'update'
-            else:
-                prod['method'] = 'down'
+
+        # # 如果用他们的id的话, 我们不做更新和下架
+        # else:
+        #     if product.status in [u'录标', u'录标完成', u'待审核', u'正在招标']:
+        #         prod['method'] = 'update'
+        #     else:
+        #         prod['method'] = 'down'
 
         prod['classId'] = 1
-        if not prod['method'] == 'add':
-            prod['productId'] = product.pk    # productId 不是我们的id, 是他们返回的用来修改对应的
+
+        # # 如果用他们的id的话, 我们不做更新和下架
+        # if not prod['method'] == 'add':
+        #     prod['productId'] = None
+        #     # prod['productId'] = product.pk    # productId 不是我们的id, 是他们返回的用来修改对应的
+
         if prod['method'] == 'add':
             prod['productName'] = product.name
             prod['borrowMoney'] = product.total_amount
