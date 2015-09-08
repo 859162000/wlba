@@ -1,0 +1,22 @@
+-load formatters
+doctype html
+html
+  head
+    include include/app_header.jade
+  body
+    article.guide-main
+      section.guide-line
+      section.guide-body
+        mixin item(imgName, title, explain)
+          section.guide-item
+            .img-icon(class=imgName)
+            .guide-text
+              div.text-center
+                h4.guide-item-h4=title
+                p.guide-item-explain=explain
+
+        +item('guide-regist', '1.注册网利宝', '您可以通过网利宝手机App或Web等方式，30秒轻松注册成为会员。')
+        +item('guide-authentication', '2.完成实名认证', '完成实名方便您投资、提现等。保障您的账户安全。')
+        +item('guide-recharge', '3.账户充值', '您可以通过App或Web等完成在线充值，全程免手续费。')
+        +item('guide-buy', '4.投标购买', '根据您的资金状况，选择适合您的借款标进行购买。')
+        +item('guide-payment', '5.自动回款，轻松享收益', '借款标满期后自动回款到您的账户，让您轻松享收益。')

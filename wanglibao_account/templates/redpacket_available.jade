@@ -1,7 +1,5 @@
 extends account_home_base
-
 -load formatters
-
 block head
   - with '红包' as title
     include include/head
@@ -16,14 +14,13 @@ block main
     include include/coupon_exchange
 
   ul.discount--tabs
-        li.coupon--tab
-          a(href="/accounts/coupon/unused") 加息券
-            span
-        li.redpacket--tab.hover
-          a(href="/accounts/redpacket/unused") 红包
-            span
+    li.coupon--tab
+      a(href="/accounts/coupon/unused") 加息券
+        span
+    li.redpacket--tab.hover
+      a(href="/accounts/redpacket/unused") 红包
+        span
   .account-home-panel__no-padding
-    .account-home-panel--title-bar__product
     .account-home-panel--title-bar__product
       ul.title-bar--tabs
         if status == 'unused'
