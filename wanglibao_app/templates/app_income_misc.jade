@@ -1,0 +1,70 @@
+//
+   Created by zhanghe on 15-7-15.
+
+-load formatters
+doctype html
+html
+  head
+  include include/admin_head_meta
+  style
+      .zuo {float:left}.ju{margin-bottom:20px}
+      .btn-cha {padding:10px 40px;margin-top:20px}
+      .btn-cha2 {margin-left:400px;padding:10px 40px;margin-top:20px}
+      .bac { background:#fff}
+      .liang { margin-bottom:20px}
+  body(role="document")
+    include include/admin_menu
+    #wrapper
+      nav.navbar.navbar-default.navbar-static-top(role="navigation", style="margin-bottom:0px")
+        .navbar-header
+          a.navbar-brand(href="?") 网利宝统计数据
+        - with '查询和设置收益比例参数' as activeItem
+        include include/admin_menu
+        - endwith
+      #page-wrapper
+        .row
+          .col-lg-12
+            h1.page-header 收益比例参数
+        .row
+          .col-lg-12
+            .panel.panel-default
+              .panel-heading 收益比例参数
+                if messages
+                  for message in messages
+                    h3(style="text-align: center; color: red;") {{ message }}
+              .panel-body
+                .row
+                  form.navbar-form.navbar-left(method="POST" action='/{{ "" | admin_address}}/app/income_misc')
+                    - csrf_token
+                    .form-group
+                      .liang.col-lg-5
+                        .input-group.ju
+                          span.input-group-addon 网利宝:
+                          input(type="text",name="rate_wlb",placeholder="填写1-100整数", required=true).form-control
+                        .input-group
+                          span.input-group-addon 其它P2P:
+                          input(type="text",name="rate_p2p",placeholder="填写1-100整数", required=true).form-control
+                      .liang.col-lg-5
+                        .input-group.ju
+                          span.input-group-addon 货币基金:
+                          input(type="text",name="rate_fund",placeholder="填写1-100整数", required=true).form-control
+                        .input-group
+                          span.input-group-addon 银行活期:
+                          input(type="text",name="rate_bank",placeholder="填写1-100整数", required=true).form-control
+                    .form-group
+                      button(type="submit", name="manager", value='add').btn.btn-primary 增加(修改)
+                .table-responsive
+                  table.table.table-striped.table-bordered.table-hover
+                    thead
+                      tr
+                        th(rowspan="1") 网利宝
+                        th(rowspan="1") 其它P2P
+                        th(rowspan="1") 货币基金
+                        th(rowspan='1') 银行活期
+                    tbody
+                      if income
+                        tr
+                          td {{ income.rate_wlb }}
+                          td {{ income.rate_p2p }}
+                          td {{ income.rate_fund }}
+                          td {{ income.rate_bank }}

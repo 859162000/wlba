@@ -27,7 +27,6 @@ urlpatterns = patterns(
     url(r'^explore/$', AppExploreView.as_view()),
     url(r'^about/$', AppAboutView.as_view()),
     url(r'^team/$', AppManagementView.as_view()),
-
     url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^rate/$', AppIncomeRateAPIView.as_view()),
     url(r'^phone/upload/$', AppPhoneBookUploadAPIView.as_view()),

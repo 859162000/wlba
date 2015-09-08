@@ -55,7 +55,8 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack'):
 
         if records_count == 0:
             # 红包
-            records = RedPackRecord.objects.filter(user=user, order_id=None).exclude(redpack__event__rtype='interest_coupon')
+            records = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
+                .exclude(redpack__event__rtype='interest_coupon')
             for x in records:
                 if x.order_id:
                     continue
