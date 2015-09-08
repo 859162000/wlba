@@ -1051,6 +1051,8 @@ class WanglibaoAwardActivity(APIView):
 
 
 def september_award_ajax(request):
+    activity = CommonAward(request)
+    temp = activity.get_award_gift(770)
     user = request.user
     action = request.POST.get('action',)
     if action == 'GET_AWARD':
@@ -1143,7 +1145,7 @@ class CommonAward(object):
 
     def get_counts(self, gift):
         join_log = ActivityJoinLog.objects.filter(action_name='common_award_sepetember', gift_name=gift).aggregate(counts=Count('id'))
-        return join_log.Counts
+        return join_log["counts"]
 
     def get_award_index(self, activity_id):
         while activity_id%10 == 0:
