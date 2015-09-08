@@ -377,15 +377,15 @@ class AccountHome(TemplateView):
             'announcements': AnnouncementAccounts,
         }
 
-    def post(self, request):
-        select_type = request.POST.get('select_type')
-        equity_jiuxian = P2PEquityJiuxian.objects.filter(user=self.request.user)\
-            .filter(product__category=u'酒仙众筹标').first()
-        if equity_jiuxian:
-            equity_jiuxian.selected_type = select_type
-            equity_jiuxian.selected_at = timezone.now()
-            equity_jiuxian.save()
-        return HttpResponseRedirect(reverse('accounts_address'))
+    # def post(self, request):
+    #     select_type = request.POST.get('select_type')
+    #     equity_jiuxian = P2PEquityJiuxian.objects.filter(user=self.request.user)\
+    #         .filter(product__category=u'酒仙众筹标').first()
+    #     if equity_jiuxian:
+    #         equity_jiuxian.selected_type = select_type
+    #         equity_jiuxian.selected_at = timezone.now()
+    #         equity_jiuxian.save()
+    #     return HttpResponseRedirect(reverse('accounts_address'))
 
 
 class AccountHomeAPIView(APIView):
@@ -404,6 +404,9 @@ class AccountHomeAPIView(APIView):
         p2p_total_unpaid_interest = 0
         p2p_total_interest = 0
         p2p_activity_interest = 0
+        p2p_total_coupon_interest = 0
+        p2p_total_paid_coupon_interest = 0
+        p2p_total_unpaid_coupon_interest = 0
         p2p_income_today = 0
         for equity in p2p_equities:
             if equity.confirm:
@@ -411,10 +414,14 @@ class AccountHomeAPIView(APIView):
                 p2p_total_paid_interest += equity.pre_paid_interest  # 累积收益
                 p2p_total_unpaid_interest += equity.unpaid_interest  # 待收益
                 p2p_total_interest += equity.pre_total_interest  # 总收益
+                p2p_total_coupon_interest += equity.pre_total_coupon_interest  # 加息券总收益
+                p2p_total_paid_coupon_interest += equity.pre_paid_coupon_interest  # 加息券已收总收益
+                p2p_total_unpaid_coupon_interest += equity.pre_unpaid_coupon_interest  # 加息券待收总收益
                 p2p_activity_interest += equity.activity_interest  # 活动收益
 
                 if equity.confirm_at >= start_utc:
                     p2p_income_today += equity.pre_paid_interest
+                    p2p_income_today += equity.pre_paid_coupon_interest
                     p2p_income_today += equity.activity_interest
 
         p2p_margin = user.margin.margin  # P2P余额
@@ -433,7 +440,7 @@ class AccountHomeAPIView(APIView):
         today = timezone.datetime.today()
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
         fund_income_week = DailyIncome.objects.filter(user=user, 
-                            date__gt=today + datetime.timedelta(days=-8)).aggregate(Sum('income'))[ 'income__sum'] or 0
+                            date__gt=today + datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
         fund_income_month = DailyIncome.objects.filter(user=user, 
                             date__gt=today + datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
 
@@ -444,9 +451,9 @@ class AccountHomeAPIView(APIView):
             'p2p_freeze': float(p2p_freeze),  # P2P投资中冻结金额
             'p2p_withdrawing': float(p2p_withdrawing),  # P2P提现中冻结金额
             'p2p_unpayed_principle': float(p2p_unpayed_principle),  # P2P待收本金
-            'p2p_total_unpaid_interest': float(p2p_total_unpaid_interest),  # p2p总待收益
-            'p2p_total_paid_interest': float(p2p_total_paid_interest + p2p_activity_interest),  # P2P总累积收益
-            'p2p_total_interest': float(p2p_total_interest),  # P2P总收益
+            'p2p_total_unpaid_interest': float(p2p_total_unpaid_interest + p2p_total_unpaid_coupon_interest),  # p2p总待收益
+            'p2p_total_paid_interest': float(p2p_total_paid_interest + p2p_activity_interest + p2p_total_paid_coupon_interest),  # P2P总累积收益
+            'p2p_total_interest': float(p2p_total_interest + p2p_total_coupon_interest),  # P2P总收益
 
             'fund_total_asset': float(fund_total_asset),  # 基金总资产
             'fund_total_income': float(total_income),  # 基金累积收益
