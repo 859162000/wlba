@@ -549,6 +549,10 @@ class P2PEquity(models.Model):
         return coupon_interest
 
     @property
+    def unpaid_coupon_interest(self):
+        return self.total_coupon_interest - self.paid_coupon_interest
+
+    @property
     def pre_total_coupon_interest(self):
         if not self.is_p2precord:
             return self.total_coupon_interest

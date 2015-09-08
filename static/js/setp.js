@@ -201,7 +201,6 @@
               star('0'+change['amount']);
             }
         },10)
-
       }
 
 

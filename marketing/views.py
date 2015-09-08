@@ -615,16 +615,20 @@ class ActivityJoinLogCountAPIView(APIView):
         })
 
 
-def ajax_get_activity_record(action='get_award'):
+def ajax_get_activity_record(action='get_award', *gifts):
     """
         author: add by Yihen@20150825
         description:迅雷9月抽奖活动，获得用户的抽奖记录
     """
-    records = ActivityJoinLog.objects.filter(action_name=action, action_type='login', join_times=0)
-    data = [{'phone':record.user.wanglibaouserprofile.phone, 'awards':float(record.amount)} for record in records]
+    records = ActivityJoinLog.objects.filter(action_name=action, action_type='login', join_times=0, amount__gt=0)
+    data = [{'phone': record.user.wanglibaouserprofile.phone, 'awards': float(record.amount)} for record in records]
+    if gifts:
+        records = ActivityJoinLog.objects.filter(action_name=action, action_type='login', join_times=0, Q(gift_name=u'爱奇艺')|Q(gift_name=u'抠电影'))
+        gift = [{'phone': record.user.wanglibaouserprofile.phone, 'awards': record.gift_name} for record in records]
     to_json_response = {
         'ret_code': 3005,
-        'data':data,
+        'data': data,
+        'gift': gift,
         'message': u'获得抽奖成功用户',
     }
     return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -961,6 +965,7 @@ class WanglibaoAwardActivity(APIView):
             return None, None
 
     def get_award_mount(self, activity_id):
+        return 50
         award_amount = {
             1000: 10,  # 1000元红包，10个
             500: 20,  # 500元红包，20个
@@ -968,7 +973,8 @@ class WanglibaoAwardActivity(APIView):
         }
 
         def get_counts(money):
-            ActivityJoinLog.objects.filter(action_name='celebrate_award', amount=money).aggregate(counts=Count('id'))
+            count = ActivityJoinLog.objects.filter(action_name='celebrate_award', amount=money).aggregate(counts=Count('id'))
+            return count["counts"]
 
         result = {key: get_counts(value) for key, value in award_amount.iteritems()}
 
@@ -1083,13 +1089,20 @@ class CommonAward(object):
         self.request = request
         self.user = self.request.user
 
-    def is_valid_user(self):
-        to_json_response = self.is_register_in_activity_period()
-        return HttpResponse(json.dumps(to_json_response), content_type='application/json' )
+    #def is_valid_user(self):
+    #    to_json_response = self.is_register_in_activity_period()
+    #    return HttpResponse(json.dumps(to_json_response), content_type='application/json' )
 
     def is_valid_channel_register_user(self):
-        channels = Activity.objects.filter(code="9yuechangguiPC").first().channel
-        channels = channels.split(",")
+        channels = Activity.objects.filter(code="9yuechangguiPC").first()
+        if not channels:
+            to_json_response = {
+                'ret_code': 3030,
+                'message': u'There is no channel seted',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json' )
+
+        channels = channels.channel.split(",")
         invite_code = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
         if invite_code not in channels:
             to_json_response = {
@@ -1130,7 +1143,7 @@ class CommonAward(object):
 
     def get_counts(self, gift):
         join_log = ActivityJoinLog.objects.filter(action_name='common_award_sepetember', gift_name=gift).aggregate(counts=Count('id'))
-        return  join_log.Counts
+        return join_log.Counts
 
     def get_award_index(self, activity_id):
         while activity_id%10 == 0:
@@ -1156,6 +1169,8 @@ class CommonAward(object):
                     return award[index]
                 else:
                     return u"None"
+        else:
+            return u"None"
 
     def ignore_user_action(self):
         user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
@@ -1200,7 +1215,7 @@ class CommonAward(object):
             'ret_code': 3015,
             'total_chances': user_activity.total_chances,
             'used_chances': user_activity.used_chances,
-            'money': join_log.amount,
+            'money': str(join_log.amount),
             'message': u'获得现金奖项',
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -1209,7 +1224,8 @@ class CommonAward(object):
         """
             每次进入转盘页面，如果用户是第一次玩，会创建WanglibaoActivityReward记录
         """
-        user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
+        user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user).first()
+        print self.request.user.id
         if not user_activity:
             user_activity = WanglibaoActivityReward.objects.create(
                 user=self.request.user,
@@ -1221,7 +1237,7 @@ class CommonAward(object):
 
             activity = ActivityJoinLog.objects.create(
                 user=self.request.user,
-                action_name=u'common_award_september',
+                action_name=u'common_award_sepetember',
                 action_type=u'login',
                 action_message=u'九月PC常规活动',
                 channel=u'all',
@@ -1237,7 +1253,7 @@ class CommonAward(object):
 
             activity = ActivityJoinLog.objects.create(
                 user=self.request.user,
-                action_name=u'common_award_september',
+                action_name=u'common_award_sepetember',
                 action_type=u'login',
                 action_message=u'九月PC常规活动',
                 channel=u'all',
@@ -1248,7 +1264,7 @@ class CommonAward(object):
             )
 
             gift = ActivityJoinLog.objects.filter(action_name='common_award_sepetember', user=self.request.user, gift_name=u"None").order_by('-create_time').first()
-            gift.gift_name = self.getaward_gift(activity.id)
+            gift.gift_name = self.get_award_gift(activity.id)
             if gift.gift_name != u"None":
                 gift.join_times = 1
                 gift.save(update_fields=['join_times', 'gift_name'])
@@ -1265,7 +1281,7 @@ class CommonAward(object):
             'ret_code': 3012,
             'total_chances': user_activity.total_chances,
             'used_chances': user_activity.used_chances,
-            'amount': join_log.amount,
+            'amount': str(join_log.amount),
             'amount_left': join_log.join_times,
             'gift': gift.gift_name,
             'gift_left':gift.join_times,

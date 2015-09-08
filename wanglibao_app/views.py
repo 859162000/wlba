@@ -108,9 +108,11 @@ class AppRepaymentAPIView(APIView):
                 ]).select_related('product')
                 for equity in p2p_equities:
                     amount += equity.pre_paid_interest  # 累积收益
+                    amount += equity.pre_paid_coupon_interest  # 加息券加息收益
                     amount += equity.activity_interest  # 活动收益
                     if equity.confirm_at >= start_utc:
                         income_num += equity.pre_paid_interest
+                        income_num += equity.pre_paid_coupon_interest
                         income_num += equity.activity_interest
 
                 return Response({'ret_code': 0, 'message': 'ok', 'amount': float(amount), 'income_num': float(income_num)})
@@ -156,6 +158,7 @@ class AppSecureView(TemplateView):
 
 class AppExploreView(TemplateView):
     """ app发现页面 """
+
     template_name = 'client_discover.jade'
 
     def get_context_data(self, **kwargs):
@@ -164,6 +167,7 @@ class AppExploreView(TemplateView):
         return {
             'banner': banner,
         }
+
 
 class AppManagementView(TemplateView):
     """ app管理团队 """

@@ -19,24 +19,35 @@
       bind:{
         click:function(){
 		  var a = runzp(3);
-		  $(this).rotate({
-		    duration:3000,
-			angle: 0,
-            animateTo:1440+a.angle,
-			easing: $.easing.easeOutSine,
-			callback: function(){
-              $('.page,.errorWin').show();
-              $('#moeny').text(a.prize);
-              var top = $('.luckDrawLeft').offset().top;
-              var left = $('.luckDrawLeft').offset().left;
-              $('.winningDiv').css({
-                'top' :top+122,
-                'left':left+164
+          var $t = $(this);
+          $.ajax({
+            type: "post",
+            url: "/api/award/common_september/",
+            dataType: "json",
+            data: {action: "ENTER_WEB_PAGE"},
+            success: function(data){
+              console.log(data);
+              $t.rotate({
+                duration:3000,
+                angle: 0,
+                animateTo:1440+a.angle,
+                easing: $.easing.easeOutSine,
+                callback: function(){
+                  $('.page,.winningDiv').show();
+                  $('#moeny').text(a.prize);
+                  //var top = $('.luckDrawLeft').offset().top;
+                  //var left = $('.luckDrawLeft').offset().left;
+                  //$('.winningDiv').css({
+                  //  'top' :top+122,
+                  //  'left':left+164
+                  //});
+                  $('.page').width(document.body.clientWidth);
+                  $('.page').height(document.body.clientHeight);
+                }
               });
-              $('.page').width(document.body.clientWidth);
-              $('.page').height(document.body.clientHeight);
-			}
+            }
           });
+
 		}
 	  }
 	});
@@ -108,4 +119,49 @@
       backTop();
     });
   });
+
+  //非法用户弹层
+  $("a.prize-arr").on("click",".user-no-alert",function(){
+    $('.page,.errorWin').show();
+  });
+
+  (function(){
+    //中奖名单
+    $.ajax({
+      type: "post",
+      url: "/api/award/common_september/",
+      dataType: "json",
+      data: {action: "GET_AWARD"},
+      success: function(data){
+        //console.log(data,"中奖名单");
+      }
+    });
+
+    //是不是合法用户
+    $.ajax({
+      type: "post",
+      url: "/api/award/common_september/",
+      dataType: "json",
+      data: {action: "IS_VALID_USER"},
+      success: function(data){
+        //console.log(data);
+        if(data.ret_code == 3001){
+          $.ajax({//
+            type: "post",
+            url: "/api/award/common_september/",
+            dataType: "json",
+            data: {action: "IS_VALID_CHANNEL"},
+            success: function(data){
+              //console.log(data,"是不是合法用户");
+              if(data.ret_code != 3011){
+                $("a.prize-arr img").removeClass("rotateImg").addClass("user-no-alert");
+              }
+            }
+          });
+        }
+      }
+    });
+
+  })();
+
 }).call(this);
