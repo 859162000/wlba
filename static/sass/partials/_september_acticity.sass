@@ -359,7 +359,7 @@ $mt50: 50px
   background: rgb(0, 0, 0)
   filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70)
 //错误提示
-.errorWin
+.errorWin,.promote-register
   text-align: center
   width: 354px
   border-radius: 30px
@@ -401,12 +401,13 @@ $mt50: 50px
   +border-radius(10px)
   top: 50%
   left: 50%
-  margin: -90px 0 0 -200px
+  margin: -192px 0 0 -200px
   em
     color: #ff5252
     font-style: normal
   .winningImg
-    background: url(/static/imgs/pc/anniversary/icon.png) -186px -70px
+    background: url(/static/imgs/pc_activity/september/has-gift.png) center center no-repeat
+    background-size: contain
     width: 331px
     height: 354px
   p
@@ -414,7 +415,6 @@ $mt50: 50px
     font-size: 24px
     //color: #ffffff
   .winningBtn
-    margin-top: 20px
     text-align: center
     a
       width: 200px
@@ -423,12 +423,12 @@ $mt50: 50px
       color: #ffffff
       font-size: 32px
       display: inline-block
-      background: #f33535
-      color: #ffd31d
+      background: #ff5252
+      color: #fff
       font-size: 20px
-      border-radius: 30px
+      border-radius: 10px
       text-decoration: none
-  span
+  .close-modal
     background: url(/static/imgs/pc/anniversary/icon.png) -725px -70px
     width: 20px
     height: 20px
@@ -437,3 +437,51 @@ $mt50: 50px
     top: 15px
     right: 15px
     cursor: pointer
+.no-win
+  padding-top: 70px
+  width: 430px
+  height: 230px
+  margin: -130px 0 0 -215px
+  .no-gift-icon
+    background: url(/static/imgs/pc_activity/september/no-gift.png) center center no-repeat
+    position: absolute
+    top: -60px
+    left: 0px
+    width: 100%
+    height: 110px
+    background-size: contain
+    z-index: 1
+  .p1
+    font-size: 20px
+  .p2
+    font-size: 18px
+    color: #6ebbe8
+    margin: 15px 0
+  .close-modal
+    top: -30px
+    right: 0
+    z-index: 999
+  .winningBtn
+    a
+      color: #ffd31d
+.winningDiv
+  background: none
+  width: 448px
+  height: 500px
+  margin: -350px 0 0 -275px
+  .winningImg
+    width: 448px
+    height: 479px
+    background-repeat: no-repeat
+  p
+    font-size: 16px
+    color: #d72e2e
+    position: absolute
+    bottom: 86px
+    width: 100%
+  .close-modal
+    top: -280px
+    z-index: 999
+  .winningBtn
+    a
+      color: #ffd31d
