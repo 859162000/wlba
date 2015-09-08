@@ -7,10 +7,9 @@ head
     include include/common_head
     - endwith
     link(rel="stylesheet",href="/static/stylesheets/gold_season.css")
+    - csrf_token
 body
-    - with '首页' as activeItem
-    include include/navigation
-    - endwith
+    include include/activityTop2
     .goldSeason
         img.goldSeasonBanner(src='/static/imgs/pc_activity/gold_season/banner.jpg')
         .rankingList
