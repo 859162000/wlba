@@ -529,6 +529,50 @@ class P2PEquity(models.Model):
         return self.equity - self.paid_principal
 
     @property
+    def total_coupon_interest(self):
+        if not self.confirm:
+            return Decimal('0')
+        amortizations = self.__get_amortizations()
+        if not amortizations:
+            return Decimal('0')
+        coupon_interest = amortizations.aggregate(Sum('coupon_interest'))['coupon_interest__sum']
+        return coupon_interest
+
+    @property
+    def paid_coupon_interest(self):
+        if not self.confirm:
+            return Decimal('0')
+        amortizations = self.__get_amortizations(settled_only=True)
+        if not amortizations:
+            return Decimal('0')
+        coupon_interest = amortizations.aggregate(Sum('coupon_interest'))['coupon_interest__sum']
+        return coupon_interest
+
+    @property
+    def pre_total_coupon_interest(self):
+        if not self.is_p2precord:
+            return self.total_coupon_interest
+        if not self.confirm:
+            return Decimal('0')
+        amortizations = self.__pre_get_amortizations()
+        if not amortizations:
+            return Decimal('0')
+        coupon_interest = amortizations.aggregate(Sum('coupon_interest'))['coupon_interest__sum']
+        return coupon_interest
+
+    @property
+    def pre_paid_coupon_interest(self):
+        if not self.is_p2precord:
+            return self.paid_coupon_interest
+        if not self.confirm:
+            return Decimal('0')
+        amortizations = self.__pre_get_amortizations()
+        if not amortizations:
+            return Decimal('0')
+        coupon_interest = amortizations.aggregate(Sum('coupon_interest'))['coupon_interest__sum']
+        return coupon_interest
+
+    @property
     def amortizations(self):
         return self.__get_amortizations()
 

@@ -98,7 +98,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
         selectedData = obj
         break
     return if selectedData then $('#id_amount').val() - selectedData.invest_amount >= 0 else true
-  , '投资金额未达到红包使用门槛'
+  , '投资金额未达到理财券门槛'
 
   if $('#id_amount').attr('p2p-type') == '票据'
     opt =
