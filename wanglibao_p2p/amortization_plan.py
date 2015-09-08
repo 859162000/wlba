@@ -350,6 +350,7 @@ class DailyInterestMonthly(AmortizationPlan):
 
         result = []
         left_interest = Decimal(0)
+        left_coupon_interest = Decimal(0)
         all_interest = get_interest_daily(amount, year_rate, period)
         coupon_total_interest = get_interest_daily(amount, coupon_year_rate, period)
 
@@ -362,7 +363,7 @@ class DailyInterestMonthly(AmortizationPlan):
                 term_period = term_dates[i] - term_dates[i-1]
                 #total_interest = (daily_interest * period - left_interest).quantize(Decimal('.01'), rounding=ROUND_DOWN)
                 total_interest = all_interest['actual'] - left_interest
-                coupon_interest = coupon_total_interest['actual'] - left_interest
+                coupon_interest = coupon_total_interest['actual'] - left_coupon_interest
                 result.append((total_interest+amount, amount, total_interest, Decimal(0),
                               coupon_interest, Decimal(0), term_dates[i]))
 
@@ -374,6 +375,7 @@ class DailyInterestMonthly(AmortizationPlan):
                 total_interest = get_interest_daily(amount, year_rate, term_period.days)
                 coupon_interest = get_interest_daily(amount, coupon_year_rate, term_period.days)
                 left_interest += total_interest['actual']
+                left_coupon_interest += coupon_interest['actual']
                 result.append((total_interest['actual'], Decimal(0), total_interest['actual'], Decimal(0),
                                coupon_interest['actual'], Decimal(0), term_dates[i]))
 
