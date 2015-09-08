@@ -211,27 +211,41 @@ html
 
     .page(style='display:none')
     .errorWin.alert-box(style='display:none')
-        p 抱歉~您不符合参加规则
+        p.p1 对不起，亲~
+        p.p2#errorContent 您不符合参加规则
+        p
+          span
         p.winningBtn
           a(href='javascript:void(0)').spanBtn 好吧
+        p
+          a(href="javascript:void(0)").close-modal.spanBtn
 
     .no-win.alert-box(style='display:none')
-        p 前世500次回眸才换得一次中奖，淡定！
-        p.winningBtn
-          a(href='javascript:void(0)').spanBtn 再来一次
+      p
+          a(href="javascript:void(0)").close-modal.spanBtn
+      p.no-gift-icon
+      p.p1 亲！很遗憾没有中奖
+      p.p2 前世500次回眸才换得一次中奖，淡定！
+      p.winningBtn
+        a(href='javascript:void(0)').spanBtn 再来一次
 
     .winningDiv.alert-box(style='display:none')
-        //.winningImg
+        p
+          a(href="javascript:void(0)").close-modal.spanBtn
+        .winningImg
         span.spanBtn
-        p 终于等到你，还好我没放弃<br/>
-          | 恭喜您获得
+        p 恭喜您获得
           em.gift-box#moeny
         .winningBtn
             a(href='javascript:void(0)').againBtn 再来一次
 
     .promote-register.alert-box(style='display:none')
-      span.spanBtn
-      p 您需要先注册
+      p
+          a(href="javascript:void(0)").close-modal.spanBtn
+      p.p1 对不起，亲~
+      p.p2#errorContent 您需要先注册
+      p
+        span
       p.winningBtn
         a(href='javascript:void(0)').banner-register 立即去注册
     script.
