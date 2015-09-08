@@ -124,7 +124,7 @@
       } else {
         return true;
       }
-    }, '投资金额未达到红包使用门槛');
+    }, '投资金额未达到理财券使用门槛');
     if ($('#id_amount').attr('p2p-type') === '票据') {
       opt = {
         required: true,
