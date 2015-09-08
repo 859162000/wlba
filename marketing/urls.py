@@ -33,6 +33,7 @@ urlpatterns = patterns(
     url(r'^app_anniversary/$', TemplateView.as_view(template_name="app_anniversary.jade")),
     url(r'^eight_gift_two/$', TemplateView.as_view(template_name="eight_gift_two.jade")),
     url(r'^xingmei/$', TemplateView.as_view(template_name="xingmei.jade")),
+    url(r'^pc_caipiao/$', TemplateView.as_view(template_name="pc_caipiao.jade")),
 
 
 )
