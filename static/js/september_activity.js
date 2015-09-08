@@ -110,14 +110,28 @@
   });
 
   (function(){
+    //中奖名单
     $.ajax({
       type: "post",
-      url: "/api/award/common_september",
+      url: "/api/award/common_september/",
       dataType: "json",
       data: {action: "GET_AWARD"},
       success: function(data){
+        console.log(data,"中奖名单");
+      }
+    });
+
+    //是不是合法用户
+    $.ajax({
+      type: "post",
+      url: "/api/award/common_september/",
+      dataType: "json",
+      data: {action: "IS_VALID"},
+      success: function(data){
         console.log(data);
       }
-    })
+    });
+
   })();
+
 }).call(this);

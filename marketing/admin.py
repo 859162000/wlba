@@ -237,7 +237,7 @@ class PlayListAdmin(admin.ModelAdmin):
 class ActivityJoinLogAdmin(admin.ModelAdmin):
     actions = None
     raw_id_fields = ('user',)
-    list_display = ('id', 'user', 'action_name', 'action_type', 'gift_name', 'amount', 'action_message', 'join_times', 'create_time')
+    list_display = ('id', 'user', 'action_type', 'gift_name', 'amount', 'action_message', 'join_times', 'create_time')
     search_fields = ('user', 'action_name')
 
     def get_readonly_fields(self, request, obj=None):

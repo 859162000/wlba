@@ -53,7 +53,10 @@ html
               .prize-list
               .prize-arr-box
                 a(href="javascript:void(0);").prize-arr
+                if user.is_authenticated
                   img(src="/static/imgs/pc_activity/september/prize-arr.png",style="width:140px;").rotateImg
+                else
+                  img(src="/static/imgs/pc_activity/september/prize-arr.png",style="width:140px;").to-register
         .sep-part-rht
           .winning-box
             .winning-box-t
