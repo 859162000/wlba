@@ -631,20 +631,32 @@ class TopsOfEaringView(APIView):
     permission_classes = ()
     def post(self, request):
         try:
+
+            init_datas = [("133*****423",143203),("139*****254",138902),("138*****098",121001.4),
+                          ("133*****409",109923),("137*****534",99407),("137*****341",84203.6),
+                          ("186*****908",78002),("130*****691",73032),("139*****582",50367)]
             records = []
-            f = file(settings.BASE_DIR+'/wanglibao_redpack/data/topearnings.txt', 'r')
-            lines = f.readlines()
-            f.close()
-            for line in lines:
-                phone, amount_str = line.split(",")
-                amount = Decimal(amount_str)
-                records.append({'phone':phone, 'amount':amount})
+            key = 'virtual_incomes'
+            rs = Misc.objects.filter(key=key).first()
+            if rs:
+                virtual_incomes = json.loads(rs.value)
+                for virtual_income in virtual_incomes['virtual_incomes']:
+                    records.append({'phone':virtual_income[0], 'amount':Decimal(virtual_income[1])})
+
+            else:
+                misc = Misc()
+                misc.key = 'virtual_incomes'
+                misc.value = json.dumps({key:init_datas})
+                misc.description = "全民淘金排行虚拟数据"
+                misc.save()
+                for data in init_datas:
+                    records.append({'phone':data[0], 'amount':Decimal(data[1])})
+
             incomes = Income.objects.select_related('user').select_related('user__wanglibaouserprofile').values('user__wanglibaouserprofile__phone').annotate(sum_amount=Sum('earning')).order_by('-sum_amount')[0]
 
             records.append({'phone':safe_phone_str(incomes['user__wanglibaouserprofile__phone']), 'amount':incomes['sum_amount']})
             records.sort(key=operator.itemgetter('amount'), reverse=True)
         except Exception, e:
-            print e
             return Response({"ret_code": -1, "records": list()})
         return Response({"ret_code": 0, "records": records})
 

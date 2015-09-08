@@ -1,0 +1,55 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include global/g_head
+    - endwith
+    link(rel="stylesheet",href="/static/styles/pc_activity/pc_activity.css")
+  body(style="background:#fff")
+    include global/g_nav
+    .cp-wrap
+      .cp-banner
+        .txt
+          .txt-img
+      .cp-main
+        h1 参与流程
+        .cp-liucheng
+        .erweima
+        p.cp-er-zhu 注：扫描上方二维码，进入领彩票页面输入手机号后确认领取，即可获得一注彩票。高达20%中奖率，每位注册网利宝用户只有一次分彩机会。
+        .cp-page
+          .page1
+            h2 1.关注“网利宝”公众号
+              br
+              span 点击“我要领彩票”按钮立即参加
+            img(src="/static/imgs/pc_activity/wx-caipiao/page1.jpg")
+          .page1
+            h2 2.点击分享活动
+              br
+              span 立即邀请，得百万大奖
+            img(src="/static/imgs/pc_activity/wx-caipiao/page2.jpg")
+          .page1(style="margin-right:0")
+            h2 3.查看彩票详情
+              br
+              span 与小伙伴们一起分钱
+            img(src="/static/imgs/pc_activity/wx-caipiao/page3.jpg")
+          p.cp-zhu2 注：参与活动的小伙伴需关注网利宝公众号。领奖/提现详情请关注零彩宝页面。
+        h1 活动规则
+        ul
+          li 1、手机号为网利宝唯一账户，本次活动仅限微信端专享。关注“网利宝”微信公众账号（wanglibao400）获取活动图文消息；
+          li 2、用户参加活动领取彩票一注，分享给好友，凑齐5人共同领取此注彩票，每注彩票多人共有；每送出一注彩票，申请人将默认领取该彩票税后奖金的随机比例，剩余比例将随机
+            br
+            |&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp分配给好友，当领取人数达到要求，彩票领取成功；
+          li 3、每位用户仅有一次发起送彩票机会，每个微信号仅能领取一次别人分享的彩票；
+          li 4、完成注册／登录即可在活动页面领取彩票；好友领取彩票后查看详情需关注网利宝微信号；
+          li 5、用户可通过网利宝微信号回复关键字“我的彩票”查询彩票进度；回复“彩票提现”进行中奖奖金提现；
+          li 6、彩票详情、中奖结果、奖金提现等由合作方零彩宝提供，详情咨询零彩宝客服：400 088 7568；
+          li 7、刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+          li 8、网利宝对此活动享有最终解释权。
+        a.btn 立即参与
+    include global/g_footer
+    include include/tracking
+  script.
+      var v = new Date().getTime()
+      require(['/static/js/pc_caipiao.js?v='+v])

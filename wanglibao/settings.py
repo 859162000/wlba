@@ -567,8 +567,8 @@ CELERYBEAT_SCHEDULE = {
         'schedule': crontab(minute=0, hour=0)
     },
     #add by Huomeimei  每日更新虚拟全民淘金账号数据
-    'update_robot_earning': {
-        'task': 'wanglibao_redpack.tasks.update_robot_earning',
+    'update_virtual_earning': {
+        'task': 'wanglibao_redpack.tasks.update_virtual_earning',
         'schedule': crontab(minute=0, hour=0)
     },
     # by Zhoudong 中金标的推送(包含新标, 更新, 下架)
@@ -956,6 +956,10 @@ else:
     ZGDX_PLAT_OFFER_ID = '103050'
     ZGDX_KEY = 'H5gOs1ZshKZ6WikN'
     ZGDX_IV = '8888159601152533'
+
+
+# 对第三方回调做IP鉴权所信任的IP列表
+TRUST_IP = []
 
 
 SUIT_CONFIG = {
