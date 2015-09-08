@@ -961,6 +961,7 @@ class WanglibaoAwardActivity(APIView):
             return None, None
 
     def get_award_mount(self, activity_id):
+        return 50
         award_amount = {
             1000: 10,  # 1000元红包，10个
             500: 20,  # 500元红包，20个
@@ -968,7 +969,8 @@ class WanglibaoAwardActivity(APIView):
         }
 
         def get_counts(money):
-            ActivityJoinLog.objects.filter(action_name='celebrate_award', amount=money).aggregate(counts=Count('id'))
+            count = ActivityJoinLog.objects.filter(action_name='celebrate_award', amount=money).aggregate(counts=Count('id'))
+            return count["counts"]
 
         result = {key: get_counts(value) for key, value in award_amount.iteritems()}
 
