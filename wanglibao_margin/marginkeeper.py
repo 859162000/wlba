@@ -77,9 +77,12 @@ class MarginKeeper(KeeperBaseMixin):
                 margin.margin += penal_interest
                 self.__tracer(catalog, penal_interest, margin.margin, u'罚息入账')
             if coupon_interest > 0:
+                margin.margin += coupon_interest
+                description = u"加息存入{}元".format(coupon_interest)
                 order_id = OrderHelper.place_order(self.user, order_type=Order.INTEREST_COUPON,
                                                    status=u'新建', amount=coupon_interest).id
-                self.hike_deposit(coupon_interest, u"加息存入{}元".format(coupon_interest), order_id, savepoint=False)
+                # self.hike_deposit(coupon_interest, u"加息存入{}元".format(coupon_interest), order_id, savepoint=False)
+                self.__tracer(u"加息存入", coupon_interest, margin.margin, description, order_id)
                 OrderHelper.update_order(Order.objects.get(pk=order_id), user=self.user,
                                          status=u'成功', amount=coupon_interest)
             margin.save()
