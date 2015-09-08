@@ -615,16 +615,20 @@ class ActivityJoinLogCountAPIView(APIView):
         })
 
 
-def ajax_get_activity_record(action='get_award'):
+def ajax_get_activity_record(action='get_award', *gifts):
     """
         author: add by Yihen@20150825
         description:迅雷9月抽奖活动，获得用户的抽奖记录
     """
-    records = ActivityJoinLog.objects.filter(action_name=action, action_type='login', join_times=0)
-    data = [{'phone':record.user.wanglibaouserprofile.phone, 'awards':float(record.amount)} for record in records]
+    records = ActivityJoinLog.objects.filter(action_name=action, action_type='login', join_times=0, amount__gt=0)
+    data = [{'phone': record.user.wanglibaouserprofile.phone, 'awards': float(record.amount)} for record in records]
+    if gifts:
+        records = ActivityJoinLog.objects.filter(action_name=action, action_type='login', join_times=0, Q(gift_name=u'爱奇艺')|Q(gift_name=u'抠电影'))
+        gift = [{'phone': record.user.wanglibaouserprofile.phone, 'awards': record.gift_name} for record in records]
     to_json_response = {
         'ret_code': 3005,
-        'data':data,
+        'data': data,
+        'gift': gift,
         'message': u'获得抽奖成功用户',
     }
     return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -1139,7 +1143,7 @@ class CommonAward(object):
 
     def get_counts(self, gift):
         join_log = ActivityJoinLog.objects.filter(action_name='common_award_sepetember', gift_name=gift).aggregate(counts=Count('id'))
-        return  join_log.Counts
+        return join_log.Counts
 
     def get_award_index(self, activity_id):
         while activity_id%10 == 0:
@@ -1211,7 +1215,7 @@ class CommonAward(object):
             'ret_code': 3015,
             'total_chances': user_activity.total_chances,
             'used_chances': user_activity.used_chances,
-            'money': join_log.amount,
+            'money': str(join_log.amount),
             'message': u'获得现金奖项',
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
