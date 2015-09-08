@@ -2,16 +2,101 @@
 -load mathfilters
 doctype html
 html
-    head
-        - with '网利宝' as title
-        include include/common_head
-        - endwith
-        link(href="/static/stylesheets/activity.css", media="screen, projection", rel="stylesheet", type="text/css")
-        link(href="/static/stylesheets/gold_season.css", media="screen, projection", rel="stylesheet", type="text/css")
-    body
-        .goldSeason
-            .goldSeasonBanner
-
-
-
-
+head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    link(rel="stylesheet",href="/static/stylesheets/gold_season.css")
+body
+    - with '首页' as activeItem
+    include include/navigation
+    - endwith
+    .goldSeason
+        img.goldSeasonBanner(src='/static/imgs/pc_activity/gold_season/banner.jpg')
+        .rankingList
+            ul.table
+                li.one 排行
+                li.two 用户
+                li.three 累计佣金
+            .list
+                ul.one
+                    li
+                        span.one
+                    li
+                        span.two
+                    li
+                        span.three
+                    li
+                        span.round 4
+                    li
+                        span.round 5
+                    li
+                        span.round 6
+                    li
+                        span.round 7
+                    li
+                        span.round 8
+                    li
+                        span.round 9
+                    li
+                        span.round 10
+                ul.two
+                ul.three
+        img.label(src='/static/imgs/pc_activity/gold_season/label.png')
+        .order
+            .text1.text http://www.wanglibao.com
+            .text2.text "登录" -- "我的账户"
+            .text3.text 个人账户页面 -- "全民淘金" -- 分享专属邀请码及<br>专属链接给好友.
+            .text4.text 好友通过邀请码或专属链接注册并登录后,即可坐享丰厚佣金.
+            .title1.title 访问网利宝官网
+            .title2.title 进入个人账户页
+            .title3.title 分享专属链接
+            .title4.title 坐享佣金
+        a.button(href='accounts/invite/') 立即邀请好友
+        img.explainImg(src='/static/imgs/pc_activity/gold_season/explainImg.png')
+        .explain
+            .main
+                dl
+                    dt 1、邀请规则：
+                    dd &nbsp;&nbsp;&nbsp;&nbsp;- 邀请人资格：网利宝注册用户
+                    dd &nbsp;&nbsp;&nbsp;&nbsp;- 被邀请人资格：需在注册时使用邀请人提供的专属链接或专属邀请码，网利宝仅以此确认邀请关系
+                    dd &nbsp;&nbsp;&nbsp;&nbsp;- 邀请佣金：活动截止日之前产生邀请关系，且被邀请人成功投资后，邀请人可获得邀请佣金
+                dl
+                    dt 2、邀请佣金细则：
+                    dd!=' &nbsp;&nbsp;&nbsp;&nbsp;-  用户A邀请新用户B注册并投资，用户A享有用户B在活动期间内<span>每笔投资额3‰</span>的邀请佣金（用户B投资项目期限≥三个月）'
+                    dd!=' &nbsp;&nbsp;&nbsp;&nbsp;-  若用户B再邀请新用户C注册并投资，用户B享有用户C在活动期间内<span>每笔投资额3‰</span>的直接邀请佣金的同时，用户A也可以享有用户C在活动期间内<span>每笔投资额3‰</span>的间接邀请佣金（用户C投资项目期限≥三个月）'
+                    dd!=' &nbsp;&nbsp;&nbsp;&nbsp;- 若用户C再邀请新用户D注册并投资，则用户C享有用户D在活动期间内<span>每笔投资额3‰</span>的直接邀请佣金，用户B享有用户D在活动期间内<span>每笔投资额3‰</span>的间接邀请佣金（用户D投资项目期限≥三个月）。用户A将不再享有用户D的邀请佣金，以此类推'
+                    dd &nbsp;&nbsp;&nbsp;&nbsp;- 活动期间内，邀请人获得的邀请佣金累计无上限；被邀请人受邀注册后，将获得1000元现金红包
+        .example
+            img.leftImg(src='/static/imgs/pc_activity/gold_season/chestnutsImg.png')
+            .rightMain
+                p.title 活动期内用户A邀请用户B注册并投资3个月标10万元，用户B又邀请用户C注册并投资3个月标10万元。则用户A获得邀请佣金为：10万元*3‰+10万*3‰=600元，用户B获得邀请佣金为: 10万元*3‰=300元。
+                .example1
+                    p.text 用户A的邀请佣金 ( 元 ):
+                    .number
+                        span.bold 600 &nbsp;&nbsp;=
+                        dl
+                            dt.bold 300
+                            dd 用户B投资所得的佣金<br>10万*3‰
+                        span.bold +
+                        dl
+                            dt.bold 300
+                            dd 用户C投资所得的佣金<br>10万*3‰
+                .example2
+                    p.text 用户C的邀请佣金 ( 元 ):
+                    .number
+                        dl
+                            dt 300
+                            dd 用户B投资所得的佣金<br>10万*3‰
+        dl.rule
+            dt 活动规则
+            dd 1、活动有效期 2015年6月23日-2016年6月30日;
+            dd 2、本活动可与网利宝其他优惠活动共享;
+            dd 3、刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予兑现;
+            dd 4、本活动不收取任何费用，谨防上当受骗;
+            dd 5、两个月（含两个月）以下的投资项目不参与全民淘金活动;
+            dd 6、网利宝对此活动享有最终解释权。
+    include global/g_footer
+script.
+    require(['/static/js/gold_season.js'])
+                                                        
