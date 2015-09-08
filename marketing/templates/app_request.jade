@@ -1,0 +1,39 @@
+- load formatters
+doctype html
+html(style="background:#fef4e0")
+  head
+    title 邀请好友
+    include include/app_head
+  body
+    .m-gold-banner
+      img(src='/static/imgs/mobile_activity/app_request/app_request_banner.jpg')
+    p.request-time 活动时间：2015年7月16日—7月31日
+    .m-gold-body
+      h2.request-reward 活动奖励
+      .request-img
+        img(src='/static/imgs/mobile_activity/app_request/jiang1.jpg').img1
+        img(src='/static/imgs/mobile_activity/app_request/jiang2.jpg')
+      .gold-body-rule-text
+        .request-text-main
+          h2.request-reward 红包使用规则：
+          p.request-p 1、红包在完成注册后即刻发放，请在我的账户里-红包里面查看；
+          p.request-p 2、红包投资不可叠加使用，一次回款后可提现；
+          p.request-p
+            |3、红包可在
+            span(style='color: #e75a2d') 2015年8月5日
+            |前投资使用；
+          p.request-p 4、每个红包只能使用一次，无论是否有余额即失效；
+
+      .gold-body-rule-text
+        .request-text-main
+          mixin ruleText(title, items)
+            h2=title
+            each item in items
+              p
+                span.item-list=item
+
+          - var item1 = ['1、手机号为网利宝唯一账户，每个身份证号只可绑定一个网利宝账号；', '2、被推荐人注册送100元红包，投资满1000元即可使用', '（100元红包完成一次投资后可提现）', '3、被推荐人首次投资满1000元即成功建立邀请关系。推荐人获30元红包，多邀多送上不封顶！', '4、奖品信息将发送至您的网利宝站内信；', '5、刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；', '6、网利宝对此活动享有最终解释权。']
+          +ruleText('活动规则：', item1)
+    .footer
+      详请关注网利宝官网：
+      a(href="https://www.wanglibao.com") www.wanglibao.com

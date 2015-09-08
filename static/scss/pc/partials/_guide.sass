@@ -1,0 +1,229 @@
+
+.i-guide-company, .i-guide-inver-us, .i-guide-invest
+  background: $bg-d3
+
+.i-guide-advantage, .i-guide-select
+  background: #f0f4f7
+.section
+  overflow: hidden
+.i-guide-item
+  width: $content-width
+  margin: 0 auto
+  padding: 10px 0
+  height: 100%
+  overflow: hidden
+  display: table
+.i-item-cont-warp
+  vertical-align: middle
+  display: table-cell
+.i-guide-banner
+  width: 100%
+  height: auto
+
+.guide-title
+  text-align: center
+  span
+    display: inline-block
+    height: 40px
+    padding-left: 55px
+  @for $i from 1 through 5
+    .guide-tit-#{$i}
+      @include guide-sprite(guide_tit_#{$i})
+
+.guide-item-1-txt
+  line-height: 30px
+  margin-top: $space-sm
+
+.guide-item-company
+  margin: 0 auto
+  display: block
+
+.guide-extension-table
+  +clearfix()
+  margin-top: 50px
+  .ex-item
+    width: 240px
+    height: 420px
+    float: left
+    overflow: hidden
+    +border-radius(8px)
+    background: #fff
+    border: 1px solid #dfe3e6
+  .ex-item-mg
+    margin-right: 45px
+  .ex-item-head
+    height: 160px
+    line-height: 160px
+    text-align: center
+    .icon
+      font-size: 95px
+      color: #fff
+  .ex-blue
+    background: #5384ed
+  .ex-red
+    background: #ec5349
+  .ex-orange
+    background: #fc874d
+  .ex-green
+    background: #46b380
+
+  .ex-item-cont
+    padding: 50px 0
+    text-align: center
+  .ex-cont-tit
+    color: #657595
+    margin-bottom: $space-s
+  .ex-cont-small
+
+    color: #909aad
+    line-height: 30px
+
+.guide-inver-us-cont
+  width: 750px
+  margin: 50px auto 0 auto
+  .inver-us-item
+    margin-bottom: 60px
+  .inver-us-logo
+    width: 170px
+    height: 56px
+    margin-bottom: $space-sm
+  .inver-us-idg
+    @include guide-sprite(guide_idg)
+  .inver-us-hl
+    @include guide-sprite(guide_hl)
+
+  .inver-us-explain
+    line-height: 30px
+    font-size: $font-s
+    color: #676767
+
+.guide-select-item
+  width: 1020px
+  background: #fff
+  margin-top: 20px
+  +clearfix()
+  +border-radius(8px)
+  overflow: hidden
+  .left-warp
+    line-height: 1.4
+    color: #fff
+    vertical-align: middle
+    display: table-cell
+    .icon
+      font-size: 65px
+  .select-left
+    float: left
+    width: 210px
+    height: 180px
+    display: table
+    text-align: center
+  .select-right
+    float: left
+    width: 810px
+    height: 180px
+    color: #909aad
+  .select-rt-product
+    border-right: 1px dotted #e5e5e5
+  .select-rt-people, .select-rt-product
+    display: table
+    height: 100%
+  .rt-warp
+    vertical-align: middle
+    display: table-cell
+    padding-left: 100px
+.select-blue
+  .select-left
+    background: $bg-d14
+  .rt-pt-title
+    color: $bg-d14
+.select-green
+  .select-left
+    background: #46b380
+  .rt-pt-title
+    color: #46b380
+.select-red
+  .select-left
+    background: #ec5349
+  .rt-pt-title
+    color: #ec5349
+
+.guide-invest-cont
+  +clearfix()
+  margin: 50px auto 40px auto
+  .invest-item
+    float: left
+    width: 240px
+    height: 360px
+    border: 1px solid #dfe3e6
+    +border-radius(8px)
+  .invest-head
+    height: 134px
+    border-bottom: 1px solid #dfe3e6
+    background: #f0f4f7
+    text-align: center
+    padding-top: 30px
+  .invest-head-num
+    height: 25px
+    width: 25px
+    line-height: 25px
+    +border-radius(13px)
+    border: 1px solid #4e5a73
+    font-size: $font-l
+    margin: 0 auto 10px auto
+  .invest-cont
+    +line-height(225)
+    text-align: center
+    .icon
+      font-size: 95px
+      color: #4c7ad4
+
+  .invest-guide-div
+    width: 45px
+    +line-height(360)
+    float: left
+    text-align: center
+    .icon
+      color: #4c7ad4
+      font-size: $font-xs
+
+.invest-ft-title
+  text-align: center
+.invest-ft-btn
+  display: block
+  width: 260px
+  +line-height(55)
+  text-align: center
+  margin: 10px  auto 0 auto
+  color: #fff
+  background: #ec5349
+  font-size: 26px
+  +border-radius(6px)
+  .icon
+    font-size: 26px
+    margin-right: 10px
+  &:link, &:visited
+    color: #fff
+  &:hover, &:active
+    background: #E84136
+
+#menu
+  position: fixed
+  top: 50%
+  right: 4%
+  height: 180px
+  margin-top: -90px
+  z-index: 100
+  li
+    margin-bottom: 10px
+    a
+      width: 14px
+      height: 14px
+      display: block
+      border: 2px solid #d0d3d5
+      +border-radius(7px)
+
+  .active
+    a
+      border: 2px solid #f87b00
+
+

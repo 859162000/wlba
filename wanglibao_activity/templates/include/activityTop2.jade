@@ -1,0 +1,12 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝官网' as title
+    include global/g_head
+    - endwith
+  body
+    - with '首页' as activeItem
+    include global/g_nav
+    - endwith

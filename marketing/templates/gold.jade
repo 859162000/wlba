@@ -1,0 +1,95 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    link(rel="stylesheet",href="/static/stylesheets/august-gold.css")
+  body(style="background:#fed03c")
+    .activity-nav
+      .act-container-login-nav
+        a(href='/',style="position: absolute;left: 0;")
+          .act-logo
+        .login-nav
+          .right-nav(style="height:30px")
+          .nav-items
+            ul
+              mixin nav-item(name, link, new_class, free)
+                if activeItem == name
+                  li.nav-item.active
+                    a.nav-item-anchor(href=link, class=new_class)= name
+                    if free == 'yes'
+                      span.icon.icon-free 免费
+                else
+                  li.nav-item
+                    a.nav-item-anchor(href=link, class=new_class)= name
+                    if free == 'yes'
+                      span.icon.icon-free 免费
+
+              +nav-item('首页', '/', '', '')
+              +nav-item('理财专区', '/p2p/list/', '', '')
+              +nav-item('基金', '/fund/products', '', '')
+
+              +nav-item('安全保障', '/security', 'left-line', '')
+              +nav-item('帮助中心', '/help', '', '')
+
+              if user.is_authenticated
+                +nav-item('我的账户', '/accounts/home', 'button button-red button-account-nav button-dif')
+              else
+                +nav-item('我的账户', '/accounts/home', 'button button-red button-account-nav button-dif nologin')
+    .banner
+    .box1
+      h1 黄金节是什么?
+      p.tu
+        img(src="/static/imgs/pc_activity/gold/one3.jpg")
+        img(src="/static/imgs/pc_activity/gold/two2.jpg")
+        img(src="/static/imgs/pc_activity/gold/three2.jpg")
+      .small-box
+        p.text
+          span 限时
+            b 10 天
+          span 限量
+            b 1 亿
+          span 8 月
+            b 专享
+        a(href="/p2p/list/",target="_blank") 立即投标
+    .gold-main
+      .box2
+        h1 8月，投资首选黄金宝！
+        p 8月黄金节，你不可错过的投资盛宴！投资网利宝，首选黄金宝！
+        .tu2
+          img(src="/static/imgs/pc_activity/gold/gold.jpg")
+          p
+            b 首选理由一：实物黄金抵押
+            br
+            |价值1.3亿黄金实物抵押，担保无忧。
+        .tu2
+          img(src="/static/imgs/pc_activity/gold/bao.jpg")
+          p
+            b 首选理由二：权威机构全额承保
+            br
+            |人保全额承保，投资0风险，承保更靠谱。
+        .tu2
+          img(src="/static/imgs/pc_activity/gold/people.jpg")
+          p
+            b 首选理由三：黄金节高额加息HIGH不停
+            br
+            |专项加息，高额补贴，多投多得！
+    .box1(style="height:440px;")
+      h2 扫一扫网利宝app，享更多惊喜
+      img(src="/static/imgs/pc_activity/gold/erweima.jpg").erweima
+      h3 【活动规则】
+      ul.rule
+        li 1、活动时间：2015年8月14日-8月23日；
+        li 2、黄金节的主打产品为黄金宝，用户可以通过PC端和APP端参与活动投标；
+        li 3、黄金宝所有标期均为2个月，全部标期均加息补贴，限量1亿元标量，先抢先得，抢完为止；
+        li 4、本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+        li 5、网利宝对此活动享有最终解释权。
+    .footer
+      .footer-img
+    include include/tracking
+
+
+

@@ -1,0 +1,231 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    link(rel="stylesheet",href="/static/stylesheets/xunlei-setp.css")
+  body(style="background:#fff")
+    include include/activityTopNew
+    //baidu
+    .setp-content
+      .xl-backtop(style="z-index:99")
+        span.seven-com.seven-ten
+        .backtop.sev-backtop 回到顶部
+        img(src="/static/imgs/pc_activity/sept/wx.png")#xl-weixin
+        a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank")
+          img(src="/static/imgs/pc_activity/sept/qq.png",style="margin-top:10px")#xl-qq
+        .erweima
+      .xl-box1.clearfix
+        h1 幸运摇奖爽不停
+        .game(onselectstart="return false" style="-moz-user-select:none;")
+          .game-le
+            span.ring
+            p.rule 每位新注册用户有
+              b 3次
+              |摇奖机会，幸运红包等你来拿
+              br
+              |您还有
+              a#chance &nbsp3&nbsp
+              |次摇奖机会
+            .sum
+              .view
+                .long-sum
+                  span 9
+                  span 8
+                  span 7
+                  span 6
+                  span 5
+                  span 4
+                  span 3
+                  span 2
+                  span 1
+                  span 0
+              .view
+                .long-sum
+                  span 9
+                  span 8
+                  span 7
+                  span 6
+                  span 5
+                  span 4
+                  span 3
+                  span 2
+                  span 1
+                  span 0
+              .view
+                .long-sum
+                  span 9
+                  span 8
+                  span 7
+                  span 6
+                  span 5
+                  span 4
+                  span 3
+                  span 2
+                  span 1
+                  span 0
+              .view(style="border-right:none")
+                .long-sum
+                  span 9
+                  span 8
+                  span 7
+                  span 6
+                  span 5
+                  span 4
+                  span 3
+                  span 2
+                  span 1
+                  span 0
+            .side
+            if user.is_authenticated
+              .game-btn.go-game
+            else
+              .game-btn
+          .game-ri
+            h2 中奖名单
+            .setp-list
+              .long-p
+                p 恭喜130******71获得
+                  span 100元
+                  |红包
+                p 恭喜157******31获得
+                  span 100元
+                  |红包
+                p 恭喜188******95获得
+                  span 150元
+                  |红包
+                p 恭喜182******88获得
+                  span 100元
+                  |红包
+                p 恭喜158******56获得
+                  span 200元
+                  |红包
+                p 恭喜130******07获得
+                  span 100元
+                  |红包
+                p 恭喜156******13获得
+                  span 150元
+                  |红包
+                p 恭喜133******59获得
+                  span 100元
+                  |红包
+                p 恭喜153******66获得
+                  span 200元
+                  |红包
+                p 恭喜188******89获得
+                  span 150元
+                  |红包
+      .xl-box1.clearfix
+        h1 迅雷会员免费送
+        .setp-left
+          dl.prize
+            dt.setp-com.prize1
+            dd
+              br &nbsp
+              |注册送
+              b 300元
+              |新用户红包
+          dl.prize
+            dt.setp-com.prize2
+            dd 首次充值
+              br
+              |送
+              b 7天
+              |迅雷白金会员
+          dl.prize
+            dt.setp-com.prize3
+            dd 首次投资
+              br
+              |送
+              b 1年
+              |迅雷白金会员
+          if user.is_authenticated
+            a.setp-btn.receive 领取迅雷会员
+          else
+            a.setp-btn 领取迅雷会员
+          p.zhu 注：完成操作奖品自动发送，详情请留意站内信
+        .setp-right
+      .xl-box1
+        h1 活动规则
+        ul
+          li 1. 手机号为网利宝唯一账户，本期迅雷活动仅限于迅雷新注册用户参与，用户首次充值、首次投资最低为100元方可获得相关迅雷福利；
+          li 2. 新用户注册即送300元现金红包，其中100元直抵红包以及两个100元折扣红包（投资满1000元可使用100元直抵红包，100元折扣红包按投资额1%抵扣使用）；
+          li 3. 摇奖红包均按照投资额1%抵扣使用；
+          li 4. 获奖红包统一以站内信形式通知，完成一次投资回款后即可取现；
+          li 5. 红包有效期：2015年9月1日-2015年11月1日；
+          li 6. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+          li 7. 网利宝对此活动享有最终解释权。
+      .xl-box1
+        .san-new(style="background:#fff")
+          .san-new-content.container(style="padding:10px 0 0")
+            .row.gold-dl-row
+              .san-span
+                dl
+                  dt.com.com-trust(style="background: url('/static/imgs/pc_activity/ganjiwang/safe1.png') no-repeat center")
+                  dd.pp-zi
+                    p
+                      b IDG资本
+                      br
+                      | 百亿市值
+                      b A股上市公司
+                      | 入股
+              .san-span
+                dl
+                  dt.com.com-security(style="background: url('/static/imgs/pc_activity/ganjiwang/safe2.png') no-repeat center")
+                  dd.pp-zi
+                    p 账户资金安全
+                      br
+                      | 由
+                      b 阳光保险
+                      | 承保
+              .san-span
+                dl
+                  dt.com.com-authority(style="background: url('/static/images/xunlei/three.png') no-repeat center")
+                  dd.pp-zi
+                    p 第三方
+                      br
+                      b 100%
+                      | 本息保障
+    include global/g_footer
+    include include/tracking
+  #small-zc
+  #xl-aug-success
+    .bj
+    span.first-xl-off2
+    hr
+    .redpack.model-com.one
+    .man.model-com.two
+    p 终于等到你，还好我没放弃
+      br
+      span
+        b#rmb 100元
+        |现金红包已在你账户中
+    .reg-btn 太棒了
+  #xl-aug-fail
+    .bj
+    span.first-xl-off2
+    hr
+    .redpack.model-com.one
+    p Sorry~您不符合领奖条件
+    .reg-btn 我知道了
+  #xl-aug-prize
+    .bj
+    span.first-xl-off2
+    hr
+    .redpack.model-com.one
+    .people
+    p 你和大奖只是一根头发的距离
+    .reg-btn 再试一次
+  #xl-aug-login
+    .bj
+    span.first-xl-off2
+    hr
+    .redpack.model-com.one
+    p 请您先登录
+    .reg-btn.setplogin 快速登录
+  script.
+      var v = new Date().getTime()
+      require(['/static/js/setp.js'])

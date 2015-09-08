@@ -1,0 +1,144 @@
+
+.extension-banner
+  img
+    display: block
+    width: 100%
+
+.extension-main
+  margin: 0 1.25rem
+
+.extension-title
+  text-align: center
+  font-size: $font-size12
+  line-height: 1rem
+  margin: .75rem 0 .6rem 0
+
+.step-title
+  font-size: $font-size14
+  color: #666
+  margin: .5rem 0
+.step-item-parent
+  text-align: center
+  +clearfix
+  .step-item-list
+    float: left
+    width: 50%
+    margin-bottom: 0.7rem
+    img
+      width: 6.5rem
+      display: inline-block
+
+.report-title
+  font-size: $font-size24
+  color: #ff5a5a
+  text-align: center
+  margin-bottom: .5rem
+.report-title-min
+  font-size: .5rem
+  color: #666
+  text-align: center
+
+
+
+.report-table,.process-imgs
+  width: 100%
+  img
+    width: 100%
+    display: block
+
+.report-circle
+  position: relative
+  @extend .report-table
+  text-align: right
+  img
+    display: block
+    width: 6rem
+    margin: .25rem auto
+  .report-rectangular
+    position: absolute
+    right: 0
+    top: 0
+    color: #fff
+    background: #ff5a5a
+    font-size: .5rem
+    width: 3.5rem
+    padding: 0.2rem 0 .2rem .4rem
+    text-align: left
+    &:before
+      content: ''
+      display: inline-block
+      width: .4rem
+      height: .4rem
+      background: #fff
+      margin-right: .25rem
+  .green-rectangular
+    @extend .report-rectangular
+    top: 1.2rem
+    background: #8cc152
+
+.report-showtime
+  font-size: .5rem
+  color: #ff5a5a
+  margin: .5rem 0
+
+.rules-ol
+  list-style: decimal
+  padding-left: 1rem
+  font-size: .5rem
+  color: #666
+  li
+    line-height: 1.2rem
+    text-align: Justify
+.extension-footer
+  display: -webkit-box
+  margin: 1.2rem 0
+  .footer-item
+    -webkit-box-flex: 1
+    text-align: center
+    img
+      width: 3.25rem
+      margin: 0 auto .5rem auto
+    p
+      font-size: .5rem
+      color: #666
+      em
+        font-style: normal
+        color: #ea5152
+
+
+.extension-submit
+  margin-right: .5rem
+  margin-bottom: 1rem
+  .submit-body
+    display: -webkit-box
+    font-size: $font-size12
+  .submit-input
+    -webkit-appearance: none
+    -webkit-box-flex: 1
+    display: block
+    outline: none
+    border: 0
+    height: 2.1rem
+    line-height: 2.1rem
+    background: #f9f9f9
+    border-top-left-radius: .3rem
+    border-bottom-left-radius: .3rem
+    -webkit-box-shadow: 0 .3rem 0 #e5e3e5
+    padding: .4rem 0 .4rem 1rem
+    color: #666
+    &::-webkit-input-placeholder
+      font-size: $font-size12
+      color: #666
+  .submit-btn
+    display: block
+    width: 30%
+    height: 2.1rem
+    line-height: 2.1rem
+    text-align: center
+    background: #ff5a5a
+    color: #fff
+    border-top-right-radius: .3rem
+    border-bottom-right-radius: .3rem
+    -webkit-box-shadow: 0 .3rem 0 #f22527
+    &:active
+      background: #f22527
