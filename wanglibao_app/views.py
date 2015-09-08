@@ -156,6 +156,7 @@ class AppSecureView(TemplateView):
 
 class AppExploreView(TemplateView):
     """ app发现页面 """
+
     template_name = 'client_discover.jade'
 
     def get_context_data(self, **kwargs):
@@ -164,6 +165,7 @@ class AppExploreView(TemplateView):
         return {
             'banner': banner,
         }
+
 
 class AppManagementView(TemplateView):
     """ app管理团队 """
