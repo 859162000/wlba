@@ -46,8 +46,41 @@
             }
         }
     });
-    var $num = $('.num-space');
     var is_animate = true;
+    function fmoney(s, type) {
+        if (/[^0-9\.]/.test(s))
+            return "0";
+        if (s == null || s == "")
+            return "0";
+        s = s.toString().replace(/^(\d*)$/, "$1.");
+        s = (s + "00").replace(/(\d*\.\d\d)\d*/, "$1");
+        s = s.replace(".", ",");
+        var re = /(\d)(\d{3},)/;
+        while (re.test(s))
+            s = s.replace(re, "$1,$2");
+        s = s.replace(/,(\d\d)$/, ".$1");
+        if (type == 0) {// 不带小数位(默认是有小数位)
+            var a = s.split(".");
+            if (a[1] == "00") {
+                s = a[0];
+            }
+        }
+        return s;
+    }
+    function page_scroll(){
+        if($(window).scrollTop()>=200&&is_animate){
+            $('.num-animate').each(function(){
+                var comma_separator_number_step = $.animateNumber.numberStepFactories.separator(',')
+                var key = parseInt($(this).attr('data-num'));
+                $(this).prop('number', 0).animateNumber({
+                    number: key,
+                    numberStep: comma_separator_number_step
+                },1000);
+                is_animate = false;
+            })
+        }
+    }
+
     $.ajax({
         url: '/api/gettopofearings/',
         type: "POST"
@@ -58,13 +91,15 @@
         for(var i=0; i<json.records.length; i++){
             json_one = json.records[i];
             if(json_one!=''){
+                var number = fmoney(json_one.amount, 0);
                 if(i<=2){
                     rankingList_phone.push(['<li class="front">'+json_one.phone+'</li>'].join(''));
-                    rankingList_amount.push(['<li class="front num-animate">'+json_one.amount+'</li>'].join(''));
+                    rankingList_amount.push(['<li class="front"><span class="num-animate" data-num="'+json_one.amount+'">0</span> 元</li>'].join(''));
                 }else{
                     rankingList_phone.push(['<li>'+json_one.phone+'</li>'].join(''));
-                    rankingList_amount.push(['<li class="num-animate">'+json_one.amount+'</li>'].join(''));
+                    rankingList_amount.push(['<li><span class="num-animate" data-num="'+json_one.amount+'">0</span> 元</li>'].join(''));
                 }
+
             }else{
                 rankingList_phone.push(['<li>虚位以待</li>'].join(''));
                 rankingList_amount.push(['<li>虚位以待</li>'].join(''));
@@ -73,23 +108,12 @@
         }
         $('.rankingList ul.two').html(rankingList_phone.join(''));
         $('.rankingList ul.three').html(rankingList_amount.join(''));
-
+        page_scroll();
         $(window).scroll(function(){
-            if($(window).scrollTop()>=300&&is_animate){
-                $('.num-animate').each(function(){
-                    var key = parseInt($(this).html());
-                    $(this).prop('number', 0).animateNumber({
-                      number: key,
-                    },1000);
-                    is_animate = false;
-                })
-            }
+            page_scroll();
         });
-
-
        })
     })
-
 }).call(this);
 
 
