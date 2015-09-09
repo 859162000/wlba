@@ -65,6 +65,7 @@ urlpatterns += patterns(
     url(r'^wx_anniversary/$', TemplateView.as_view(template_name="wx_anniversary.jade")),
     url(r'^app_anniversary/$', TemplateView.as_view(template_name="app_anniversary.jade")),
     url(r'^app_colorpage/$', TemplateView.as_view(template_name="app_colorpage.jade")),
+    url(r'^app_fullpage/$', TemplateView.as_view(template_name="app_fullpage.jade")),
 
 )
 
