@@ -84,16 +84,18 @@
           var errorWin = $(".errorWin");
           var errorContent = $(".errorWin").find("#errorContent");
           var urlData = "IGNORE";
-          if(used_chances >= 3 || dataCode != 3011){
-            if(used_chances >= 3){
-              errorContent.text("您没有抽奖机会了");
-            }else{
-              errorContent.text("您不符合参加规则");
-            }
+          if(used_chances >= 3 && dataCode == 3011){
+            errorContent.text("您没有抽奖机会了");
+            errorWin.show();
+            $page.show();
+            return false;
+          }else if(dataCode != 3011){
+            errorContent.text("您不符合参加规则");
             errorWin.show();
             $page.show();
             return false;
           }
+
           giftInx = Math.floor((Math.random()*giftArr.length));
           a = runzp(giftArr[giftInx]);
           if(giftArr[giftInx] > 1){
