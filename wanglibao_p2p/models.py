@@ -209,7 +209,7 @@ class P2PProduct(ProductBase):
         return min(self.remain, self.limit_amount_per_user)
 
     @property
-    def available_amout(self):
+    def available_amount(self):
         return self.total_amount - self.ordered_amount
 
     def has_amount(self, amount):
@@ -265,7 +265,6 @@ class P2PProduct(ProductBase):
             return False
         else:
             return True
-
 
     display_payback_mapping = {
         u'等额本息': u'等额本息',
@@ -420,7 +419,6 @@ class P2PEquity(models.Model):
                 return self.equity_contract.contract_path
         except Exception:
             return None
-
 
     @property
     def related_orders(self):

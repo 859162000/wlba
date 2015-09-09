@@ -536,9 +536,9 @@ class P2PListView(TemplateView):
         show_slider = False
         if p2p_done:
             show_slider = True
-            p2p_earning = sorted(p2p_done, key=lambda x: (-x.expected_earning_rate, x.available_amout))
-            p2p_period = sorted(p2p_done, key=lambda x: (x.period, x.available_amout))
-            p2p_amount = sorted(p2p_done, key=attrgetter('available_amout'))
+            p2p_earning = sorted(p2p_done, key=lambda x: (-x.expected_earning_rate, x.available_amount))
+            p2p_period = sorted(p2p_done, key=lambda x: (x.period, x.available_amount))
+            p2p_amount = sorted(p2p_done, key=attrgetter('available_amount'))
         else:
             p2p_earning = p2p_period = p2p_amount = []
 
