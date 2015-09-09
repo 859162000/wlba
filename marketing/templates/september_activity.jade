@@ -147,7 +147,7 @@ html
             | 单笔投资满5000元再送
             span.money-box
               i 50
-            | 元现金红包
+            | 元折扣红包
           .btn-box.text-center
             if user.is_authenticated
               a(href="/p2p/list/").red-btn 立即投资
@@ -224,8 +224,12 @@ html
       p
           a(href="javascript:void(0)").close-modal.spanBtn
       p.no-gift-icon
-      p.p1 亲！很遗憾没有中奖
-      p.p2 前世500次回眸才换得一次中奖，淡定！
+      .no-win-cont
+        p.p1 亲！很遗憾没有中奖
+        p.p2 前世500次回眸才换得一次中奖，淡定！
+        p.chance-box 您还有
+          span.chance-num
+          | 次抽奖机会
       p.winningBtn
         a(href='javascript:void(0)').spanBtn 再来一次
 
@@ -236,6 +240,9 @@ html
         span.spanBtn
         p.promote 恭喜您获得
           em.gift-box#moeny
+        p.chance-box 您还有
+          span.chance-num
+          | 次抽奖机会
         .winningBtn
             a(href='javascript:void(0)').againBtn 再来一次
 
