@@ -14,6 +14,7 @@ body
         table.table
           thead
             tr
+              th 序号
               th 唯一编号
               th 用户手机号码
               th 用户姓名
@@ -21,8 +22,10 @@ body
               th 金额
               th 类型
           tbody
-          for payinfo in payinfos
+          each payinfo, index in payinfos
+            index = index + 1
             tr
+              td {{index}}
               td {{payinfo.uuid}}
               td {{payinfo.user | safe_phone}}
               td {{payinfo.user.wanglibaouserprofile.name | safe_name}}
@@ -32,6 +35,11 @@ body
                 td 充值
               else
                 td 提现
+          tfoot
+            tr
+              td(align="right", colspan=5) 金额总计：
+              td {{ total_amount }}
+              td &nbsp;
 
         form.form(method="POST", action="?action=confirm")
           - csrf_token
