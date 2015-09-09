@@ -429,8 +429,18 @@ class CopyContractTemplateView(TemplateView):
         id = kwargs.get('id')
         ct = ContractTemplate.objects.get(pk=id)
         return {"ct":ct}
+    def post(self, request, **kwargs):
+        id = kwargs.get('id')
+        ct = ContractTemplate.objects.get(pk=id)
+        new_ct = ContractTemplate()
+        new_ct.name = ct.name + u"复制" + get_a_uuid()
+        new_ct.content = ct.content
+        new_ct.content_preview = ct.content_preview
+        new_ct.save()
+        return HttpResponseRedirect('/' + settings.ADMIN_ADDRESS + '/wanglibao_p2p/contracttemplate/')
 
 copy_contract_template_view = staff_member_required(CopyContractTemplateView.as_view())
+
 class P2PProductViewSet(PaginatedModelViewSet):
     model = P2PProduct
     permission_classes = (IsAdminUserOrReadOnly,)
