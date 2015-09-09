@@ -651,6 +651,7 @@ class AutomaticManagerAdmin(admin.ModelAdmin):
 
 class ContractTemplateAdmin(admin.ModelAdmin):
     actions = None
+    list_display = ("copy_link", 'name')
 
 
 class WarrantCompanyAdmin(admin.ModelAdmin):
