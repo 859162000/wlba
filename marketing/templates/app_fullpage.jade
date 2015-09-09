@@ -14,7 +14,7 @@ html
       //http://wanglibao1.oss-cn-beijing.aliyuncs.com/better.mp3
       //src 换成上面链接
       audio#music
-        source(type="audio/mpeg", src="/static/imgs/mobile_activity/app_fullpage/better.mp3?v=20150909")
+        source(type="audio/mpeg", src="/static/imgs/mobile_activity/app_fullpage/better.mp3?v=20150909" , loop='loop')
       .loadPage#loadPage
         .load-warp
           .logo
@@ -80,7 +80,7 @@ html
             a(href='/activity/app_pc_download/').last-download
           img(src='/static/imgs/mobile_activity/app_fullpage/last_footer.png').last-footer
 
-      span.start#arrow
+      span.start#arrow(style='pointer-events: none;')
         b
     script(src="/static/scripts/mobile_activity/dist/fullpage.js")
     script.
