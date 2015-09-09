@@ -16,6 +16,27 @@ $mt50: 50px
   animation: light linear 0.5s $dTime infinite both
   -moz-animation: light linear 0.5s $dTime infinite both
   -webkit-animation: light linear 0.5s $dTime infinite both
+@mixin close-modal
+  background: url(/static/imgs/pc/anniversary/icon.png) -725px -70px
+  width: 20px
+  height: 20px
+  display: inline-block
+  position: absolute
+  top: 15px
+  right: 15px
+  cursor: pointer
+@mixin winningBtn-a
+  width: 200px
+  height: 46px
+  line-height: 46px
+  color: #ffffff
+  font-size: 32px
+  display: inline-block
+  background: #ff5252
+  color: #fff
+  font-size: 20px
+  border-radius: 10px
+  text-decoration: none
 
 @keyframes light
   0%
@@ -392,7 +413,7 @@ $mt50: 50px
     a.close-modal
       line-height: 30px
       color: #fff
-.winningDiv,.alert-box
+.alert-box
   position: fixed
   width: 400px
   z-index: 100
@@ -417,26 +438,9 @@ $mt50: 50px
   .winningBtn
     text-align: center
     a
-      width: 200px
-      height: 46px
-      line-height: 46px
-      color: #ffffff
-      font-size: 32px
-      display: inline-block
-      background: #ff5252
-      color: #fff
-      font-size: 20px
-      border-radius: 10px
-      text-decoration: none
+      +winningBtn-a
   .close-modal
-    background: url(/static/imgs/pc/anniversary/icon.png) -725px -70px
-    width: 20px
-    height: 20px
-    display: inline-block
-    position: absolute
-    top: 15px
-    right: 15px
-    cursor: pointer
+    +close-modal
 .no-win
   padding-top: 70px
   width: 430px
@@ -465,23 +469,32 @@ $mt50: 50px
     a
       color: #ffd31d
 .winningDiv
+  position: absolute
   background: none
   width: 448px
-  height: 500px
-  margin: -350px 0 0 -275px
+  height: 479px
+  z-index: 999999
   .winningImg
+    background: url(/static/imgs/pc_activity/september/has-gift.png) center center no-repeat
+    background-size: contain
     width: 448px
     height: 479px
-    background-repeat: no-repeat
-  p
+  p.promote
     font-size: 16px
     color: #d72e2e
     position: absolute
-    bottom: 86px
+    bottom: 104px
     width: 100%
+    text-align: center
   .close-modal
-    top: -280px
+    +close-modal
+    top: 100px
     z-index: 999
   .winningBtn
+    position: absolute
+    text-align: center
+    width: 100%
+    bottom: 0
     a
+      +winningBtn-a
       color: #ffd31d

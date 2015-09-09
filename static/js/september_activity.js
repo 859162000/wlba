@@ -21,6 +21,7 @@
         used_chances = 3;
     var giftArr = [""];
     var giftInx;
+    var dataCode = 3011;
 
     //ajax
     function ajaxFun(action,fun){
@@ -74,14 +75,14 @@
     ajaxFun("ENTER_WEB_PAGE",giftOk);
 
     //转盘
-    $(".rotateImg").rotate({
+    $(".prize-arr .rotateImg").rotate({
       bind:{
         click:function(){
 		  var a;
           var $t = $(this);
           var $page = $('.page');
           var urlData = "IGNORE";
-          if(used_chances >= 3){
+          if(used_chances >= 3 || dataCode != 3011){
             $('.page,.errorWin').show();
             return false;
           }
@@ -104,6 +105,12 @@
               if(giftArr[giftInx] != ""){
                 $('.winningDiv').show();
                 $('#moeny').text(a.prize);
+                var top = $('.luckDrawLeft').offset().top;
+                var left = $('.luckDrawLeft').offset().left;
+                $('.winningDiv').css({
+                    'top': top + 10,
+                    'left': left + 30
+                });
               }else{
                 $(".no-win").show();
               }
@@ -128,7 +135,14 @@
     }
     //关闭 抽奖 遮罩\弹框
     $('.spanBtn,.againBtn').on('click',function(){
-      closeAlert($(this).parents("div.alert-box"))
+      var $t = $(this);
+      var tp = $t.parents("div.alert-box");
+      if(tp.length > 0){
+        closeAlert(tp);
+      }else{
+        closeAlert($t.parents("div.winningDiv"));
+      }
+
     });
 
     //返回顶部
@@ -182,9 +196,11 @@
     });
 
     //非法用户弹层
-    $("a.prize-arr").on("click",".user-no-alert",function(){
-      $('.page,.errorWin').show();
-    });
+    //$("a.prize-arr").on("click",".user-no-alert",function(event){
+    //  event.stopPropagation();
+    //  event.preventDefault();
+    //  $('.page,.errorWin').show();
+    //});
 
     //中奖名单
     function userList(data){
@@ -219,9 +235,10 @@
 
     //是否是正确渠道
     function isRoute(data){
-      if(data.ret_code != 3011){
-        $("a.prize-arr img").removeClass("rotateImg").addClass("user-no-alert");
-      }
+      dataCode = data.ret_code;
+      //if(dataCode != 3011){
+      //  $("a.prize-arr img").removeClass("rotateImg").addClass("user-no-alert");
+      //}
     }
     //是不是合法用户
     function isUser(data){
