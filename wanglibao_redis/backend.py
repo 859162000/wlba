@@ -166,7 +166,7 @@ class redis_backend(object):
                 "completion_rate": p2p.completion_rate,
                 "limit_amount_per_user": p2p.limit_amount_per_user,
                 "current_limit": p2p.current_limit,
-                "available_amount": p2p.available_amout,
+                "available_amount": p2p.available_amount,
                 'total_earning': total_earning,
                 'total_fee_earning': total_fee_earning,
                 "is_taojin": p2p.is_taojin,
@@ -298,7 +298,7 @@ class redis_backend(object):
                 "completion_rate": p2p.completion_rate,
                 "limit_amount_per_user": p2p.limit_amount_per_user,
                 "current_limit": p2p.current_limit,
-                "available_amount": p2p.available_amout,
+                "available_amount": p2p.available_amount,
                 "is_taojin": p2p.is_taojin,
             } for p2p in p2p_products
         ]

@@ -165,7 +165,7 @@ html
                             em.font-weight {{ p2p.period }}
                             span.font-l {{p2p.pay_method|period_unit}}
                           .span5-omega.p2pinfo-ceil
-                            em {{ p2p.available_amout | money_format_int }} 元可投
+                            em {{ p2p.available_amount | money_format_int }} 元可投
 
                         .p2pinfo-flow(id="earing_{{ forloop.counter }}")
                           .row.p2pinfo-flow-top
@@ -231,7 +231,7 @@ html
                             em.p2pinfo-active.highlight.font-weight {{ p2p.period }}
                             span.font-l {{p2p.pay_method|period_unit}}
                           .span5-omega.p2pinfo-ceil
-                            em {{ p2p.available_amout | money_format_int }} 元可投
+                            em {{ p2p.available_amount | money_format_int }} 元可投
 
                         .p2pinfo-flow(id="period_{{ forloop.counter }}")
                           .row.p2pinfo-flow-top
@@ -295,7 +295,7 @@ html
                             em.font-weight {{ p2p.period }}
                             span.font-l {{p2p.pay_method|period_unit}}
                           .span5-omega.p2pinfo-ceil
-                            em.p2pinfo-active.highlight {{ p2p.available_amout | money_format_int }}
+                            em.p2pinfo-active.highlight {{ p2p.available_amount | money_format_int }}
                             | &nbsp;元可投
 
                         .p2pinfo-flow(id="amount_{{ forloop.counter }}")
