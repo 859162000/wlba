@@ -441,20 +441,29 @@ $mt50: 50px
       +winningBtn-a
   .close-modal
     +close-modal
+  .chance-box
+    text-align: center
+    font-size: 14px
 .no-win
-  padding-top: 70px
+  padding: 0
   width: 430px
-  height: 230px
-  margin: -130px 0 0 -215px
+  height: 300px
+  margin: -150px 0 0 -215px
+  background: none
   .no-gift-icon
     background: url(/static/imgs/pc_activity/september/no-gift.png) center center no-repeat
     position: absolute
-    top: -60px
+    top: -78px
     left: 0px
     width: 100%
     height: 110px
     background-size: contain
     z-index: 1
+  .no-win-cont
+    background: #fff
+    +border-radius(10px)
+    padding: 60px 0 40px
+    margin-bottom: 30px
   .p1
     font-size: 20px
   .p2
@@ -463,7 +472,7 @@ $mt50: 50px
     margin: 15px 0
   .close-modal
     top: -30px
-    right: 0
+    right: -10px
     z-index: 999
   .winningBtn
     a
@@ -498,3 +507,10 @@ $mt50: 50px
     a
       +winningBtn-a
       color: #ffd31d
+  .chance-box
+    text-align: center
+    color: #fff
+    font-size: 14px
+    position: absolute
+    width: 100%
+    bottom: 50px
