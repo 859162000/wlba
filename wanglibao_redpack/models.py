@@ -6,7 +6,8 @@ from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
-from wanglibao_p2p.models import P2PProduct
+from wanglibao_p2p.models import P2PProduct, ProductType
+from django.core.exceptions import ValidationError
 
 
 PLATFORM = (
@@ -30,6 +31,10 @@ class RedPackEvent(models.Model):
     ), default="直抵红包")
     amount = models.FloatField(null=False, default=0.0, verbose_name=u'优惠券金额(百分比也为0-100)')
     invest_amount = models.IntegerField(null=False, default=0, verbose_name=u"投资门槛")
+    p2p_types = models.ForeignKey(ProductType, verbose_name=u"限定P2P分类", blank=True, null=True, on_delete=models.SET_NULL)
+    pay_method = models.CharField(verbose_name=u'限定P2P还款方式', max_length=32, blank=True, null=True,
+                                  choices=P2PProduct.PAY_METHOD_CHOICES)
+    period = models.IntegerField(default=0, verbose_name=u'限定产品期限(月/天)', blank=True, help_text=u"须结合还款方式")
     highest_amount = models.IntegerField(null=False, default=0, verbose_name=u"最高抵扣金额(百分比使用0无限制)")
     value = models.IntegerField(null=False, default=0, verbose_name=u"优惠券个数(不生成兑换码无需修改)")
     describe = models.CharField(max_length=20, verbose_name=u"标注渠道批次等信息", default="")
@@ -63,6 +68,10 @@ class RedPackEvent(models.Model):
 
     def __unicode__(self):
         return u'%s <%s>' % (self.id, self.name)
+
+    def clean(self):
+        if self.period > 0 and not self.pay_method:
+            raise ValidationError(u'当优惠券需要限定产品期限时，需要先选择还款方式')
 
 
 class RedPack(models.Model):

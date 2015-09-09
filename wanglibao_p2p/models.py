@@ -39,10 +39,22 @@ class ContractTemplate(models.Model):
     content = models.TextField(u'模板内容（真实合同）', default='')
     content_preview = models.TextField(verbose_name=u'模板内容（预览合同）', default='')
 
-
     class Meta:
         verbose_name = u'借款合同'
         verbose_name_plural = u'借款合同'
+
+    def __unicode__(self):
+        return self.name
+
+
+class ProductType(models.Model):
+    name = models.CharField(u'分类名称', max_length=60)
+    description = models.TextField(verbose_name=u'描述', blank=True)
+    priority = models.IntegerField(verbose_name=u'优先级*', default=0, help_text=u'越大越优先', blank=False)
+
+    class Meta:
+        verbose_name = u'P2P分类'
+        verbose_name_plural = u'P2P分类'
 
     def __unicode__(self):
         return self.name
@@ -115,10 +127,8 @@ class P2PProduct(ProductBase):
     )
 
     version = IntegerVersionField()
-    category = models.CharField(max_length=16, default=u'普通',
-                              choices=CATEGORY_CHOICES,
-                              verbose_name=u'产品类别*')
-
+    category = models.CharField(max_length=16, default=u'普通', choices=CATEGORY_CHOICES, verbose_name=u'产品类别*')
+    types = models.ForeignKey(ProductType, verbose_name=u"产品分类(新)", null=True, on_delete=SET_NULL)
     hide = models.BooleanField(u'隐藏', default=False)
 
     name = models.CharField(max_length=256, verbose_name=u'名字*', blank=False)
@@ -137,7 +147,8 @@ class P2PProduct(ProductBase):
     excess_earning_rate = models.FloatField(default=0, verbose_name=u'超额收益(%)*')
     excess_earning_description = models.CharField(u'超额收益描述', max_length=100, blank=True, null=True)
 
-    pay_method = models.CharField(verbose_name=u'支付方式*', max_length=32, blank=False, default=u'等额本息', choices=PAY_METHOD_CHOICES)
+    pay_method = models.CharField(verbose_name=u'还款方式*', max_length=32, blank=False, default=u'等额本息',
+                                  choices=PAY_METHOD_CHOICES)
     amortization_count = models.IntegerField(u'还款期数', default=0)
     repaying_source = models.TextField(verbose_name=u'还款资金来源(合同用)', blank=True)
 
@@ -182,7 +193,6 @@ class P2PProduct(ProductBase):
 
     #author: hetao; datetime: 2014.10.27; description: 活动是否参加活动
     activity = models.ForeignKey(Activity, on_delete=SET_NULL, null=True, blank=True, verbose_name=u'返现活动')
-
 
     class Meta:
         verbose_name_plural = u'P2P产品'
