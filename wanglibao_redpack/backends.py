@@ -178,10 +178,6 @@ def local_transform_str(dt):
 
 
 def exchange_redpack(token, device_type, user, app_version=''):
-    device_type = _decide_device(device_type)
-    if device_type == 'ios' or device_type == 'android':
-        if app_version < "2.5.3":
-            return {"ret_code": 30160, "message": u"版本过低，不支持使用加息券，赶快升级"}
     if token == "":
         return {"ret_code": 30161, "message": u"请输入兑换码"}
     token = token.replace("'", "").replace('"', "").replace("`", "")
@@ -194,6 +190,11 @@ def exchange_redpack(token, device_type, user, app_version=''):
     elif redpack.status == "invalid":
         return {"ret_code": 30164, "message": u"请输入有效的兑换码"}
     event = redpack.event
+    device_type = _decide_device(device_type)
+    if event.rtype == 'interest_coupon':
+        if device_type == 'ios' or device_type == 'android':
+            if app_version < "2.5.3":
+                return {"ret_code": 30160, "message": u"版本过低，不支持使用加息券，赶快升级"}
     now = timezone.now()
     if event.give_start_at > now:
         return {"ret_code": 30165, "message": u"请在%s之后兑换" % local_datetime(event.give_start_at).strftime("%Y-%m-%d %H:%M:%S")}
