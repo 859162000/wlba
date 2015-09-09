@@ -40,6 +40,7 @@ from django.utils import timezone
 from wanglibao_redpack.models import RedPackEvent
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity.models import ActivityRecord, Activity
+from wanglibao_account import message as inside_message
 import logging
 logger = logging.getLogger('marketing')
 
@@ -691,7 +692,8 @@ class ThunderAwardAPIView(APIView):
         money = self.get_award_mount(join_log.id)
         describe = 'xunlei_sept_' + str(money)
         try:
-            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,).first()
+            dt = timezone.datetime.now()
+            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,give_start_at__lte=dt, give_end_at__gte=dt).first()
         except Exception, reason:
             print reason
 
@@ -965,7 +967,6 @@ class WanglibaoAwardActivity(APIView):
             return None, None
 
     def get_award_mount(self, activity_id):
-        return 50
         award_amount = {
             1000: 10,  # 1000元红包，10个
             500: 20,  # 500元红包，20个
@@ -1052,7 +1053,6 @@ class WanglibaoAwardActivity(APIView):
 
 def september_award_ajax(request):
     activity = CommonAward(request)
-    temp = activity.get_award_gift(770)
     user = request.user
     action = request.POST.get('action',)
     if action == 'GET_AWARD':
@@ -1091,10 +1091,6 @@ class CommonAward(object):
         self.request = request
         self.user = self.request.user
 
-    #def is_valid_user(self):
-    #    to_json_response = self.is_register_in_activity_period()
-    #    return HttpResponse(json.dumps(to_json_response), content_type='application/json' )
-
     def is_valid_channel_register_user(self):
         channels = Activity.objects.filter(code="9yuechangguiPC").first()
         if not channels:
@@ -1102,6 +1098,7 @@ class CommonAward(object):
                 'ret_code': 3030,
                 'message': u'There is no channel seted',
             }
+            logger.debug("user_id:%d, check valid channel flow, no channel set" %(self.request.user.id))
             return HttpResponse(json.dumps(to_json_response), content_type='application/json' )
 
         channels = channels.channel.split(",")
@@ -1116,7 +1113,7 @@ class CommonAward(object):
                 'ret_code': 3011,
                 'message': u'渠道用户从对应的渠道过来',
             }
-
+        logger.debug("user_id:%d, check invite_code flow,ret_code:%d, message:%s " %(self.request.user.id, to_json_response["ret_code"], to_json_response["message"]))
         return HttpResponse(json.dumps(to_json_response), content_type='application/json' )
 
     def is_register_in_activity_period(self):
@@ -1136,6 +1133,7 @@ class CommonAward(object):
                 'ret_code': 3001,
                 'message': u'活动期注册用户',
             }
+        logger.debug("user_id:%d, check invite_code flow,ret_code:%d, message:%s " %(self.request.user.id, to_json_response["ret_code"], to_json_response["message"]))
         return HttpResponse(json.dumps(to_json_response), content_type='application/json' )
 
     def get_award_mount(self, activity_id):
@@ -1195,6 +1193,26 @@ class CommonAward(object):
         user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
         user_activity.used_chances += 1
         user_activity.save(update_fields=["used_chances"])
+        now = timezone.now()
+
+        #发放奖品
+
+        if gift:
+            gift_name = "9月pc常规"+gift.gift_name
+        else:
+            gift_name = "None"
+
+        reward = Reward.objects.filter(type=gift_name,
+                                       is_used=False,
+                                       end_time__gte=now).first()
+
+        inside_message.send_one.apply_async(kwargs={
+            "user_id": self.request.user.id,
+            "title": reward.description,
+            "content": reward.content,
+            "mtype": "activity"
+        })
+
         to_json_response = {
             'ret_code': 3014,
             'total_chances': user_activity.total_chances,
@@ -1213,6 +1231,17 @@ class CommonAward(object):
         user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
         user_activity.used_chances += 1
         user_activity.save(update_fields=["used_chances"])
+
+        describe = 'common_september_' + str(join_log.amount)
+        try:
+            dt = timezone.datetime.now()
+            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,give_start_at__lte=dt, give_end_at__gte=dt).first()
+        except Exception, reason:
+            logger.debug("send redpack Exception, msg:%s" % (reason,))
+
+        if redpack_event:
+            redpack_backends.give_activity_redpack(self.request.user, redpack_event, 'pc')
+
         to_json_response = {
             'ret_code': 3015,
             'total_chances': user_activity.total_chances,
