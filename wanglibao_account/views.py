@@ -416,7 +416,7 @@ class AccountHomeAPIView(APIView):
                 p2p_total_interest += equity.pre_total_interest  # 总收益
                 p2p_total_coupon_interest += equity.pre_total_coupon_interest  # 加息券总收益
                 p2p_total_paid_coupon_interest += equity.pre_paid_coupon_interest  # 加息券已收总收益
-                p2p_total_unpaid_coupon_interest += equity.pre_unpaid_coupon_interest  # 加息券待收总收益
+                p2p_total_unpaid_coupon_interest += equity.unpaid_coupon_interest  # 加息券待收总收益
                 p2p_activity_interest += equity.activity_interest  # 活动收益
 
                 if equity.confirm_at >= start_utc:
