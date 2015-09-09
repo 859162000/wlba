@@ -407,14 +407,16 @@ class WanglibaoUserGift(models.Model):
     )
     SEND = (
         (0, u'YES'),
-        (1, u'NO')
+        (1, u'NO'),
+        (2, u'INVALID')
     )
     user = models.ForeignKey(User)
+    rules = models.ForeignKey(WanglibaoActivityGift)
     activity = models.CharField(max_length=128, default="", verbose_name=u'活动代码')
     index = models.IntegerField(default=0, verbose_name=u'特定活动内的奖品编号')
     type = models.IntegerField(choices=TYPE, default=0, verbose_name=u'奖品类型')
     name = models.CharField(max_length=128, default=u'红包', verbose_name=u'奖品名称', help_text=u'例如：红包、加息券、优惠券等')
-    valid = models.BooleanField(default=1, choices=SEND, verbose_name=u'奖品是否启动')
+    valid = models.BooleanField(default=1, choices=SEND, verbose_name=u'奖品是否已发')
     class Meta:
         verbose_name = u'用户活动获奖记录'
         verbose_name_plural = u'用户活动获奖记录'

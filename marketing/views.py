@@ -1103,7 +1103,7 @@ class CommonAward(object):
         channels = channels.channel.split(",")
         record = IntroducedBy.objects.filter(user_id=self.request.user.id).first()
 
-        if record and record.channel.name not in channels:
+        if not record or (record and record.channel.name not in channels):
             to_json_response = {
                 'ret_code': 3010,
                 'message': u'渠道用户不是从对应的渠道过来',
