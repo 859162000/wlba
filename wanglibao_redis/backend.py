@@ -169,6 +169,7 @@ class redis_backend(object):
                 "available_amount": p2p.available_amout,
                 'total_earning': total_earning,
                 'total_fee_earning': total_fee_earning,
+                "is_taojin": p2p.is_taojin,
             }
             extra_data = p2p.extra_data
 
@@ -241,6 +242,7 @@ class redis_backend(object):
                 "limit_amount_per_user": p2p.limit_amount_per_user,
                 "current_limit": p2p.current_limit,
                 "available_amount": p2p.available_amout,
+                "is_taojin": p2p.is_taojin,
             }
         else:
             p2p_dict = {}
@@ -297,6 +299,7 @@ class redis_backend(object):
                 "limit_amount_per_user": p2p.limit_amount_per_user,
                 "current_limit": p2p.current_limit,
                 "available_amount": p2p.available_amout,
+                "is_taojin": p2p.is_taojin,
             } for p2p in p2p_products
         ]
 
