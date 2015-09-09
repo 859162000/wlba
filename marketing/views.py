@@ -1052,7 +1052,6 @@ class WanglibaoAwardActivity(APIView):
 
 
 def september_award_ajax(request):
-    activity = CommonAward(request)
     user = request.user
     action = request.POST.get('action',)
     if action == 'GET_AWARD':
@@ -1232,10 +1231,10 @@ class CommonAward(object):
         user_activity.used_chances += 1
         user_activity.save(update_fields=["used_chances"])
 
-        describe = 'common_september_' + str(join_log.amount)
+        describe = 'common_september_' + str(int(join_log.amount))
         try:
             dt = timezone.datetime.now()
-            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,give_start_at__lte=dt, give_end_at__gte=dt).first()
+            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
         except Exception, reason:
             logger.debug("send redpack Exception, msg:%s" % (reason,))
 
