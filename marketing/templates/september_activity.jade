@@ -53,7 +53,10 @@ html
               .prize-list
               .prize-arr-box
                 a(href="javascript:void(0);").prize-arr
-                  img(src="/static/imgs/pc_activity/september/prize-arr.png",style="width:140px;").rotateImg
+                  if user.is_authenticated
+                    img(src="/static/imgs/pc_activity/september/prize-arr.png",style="width:140px;").rotateImg
+                  else
+                    img(src="/static/imgs/pc_activity/september/prize-arr.png",style="width:140px;").to-register
         .sep-part-rht
           .winning-box
             .winning-box-t
@@ -71,11 +74,9 @@ html
                       span 100元
                       | 红包
                     li.winning-item.even 恭喜138******90获得
-                      span 100元
-                      | 红包
+                      span 扣电影代金券
                     li.winning-item 恭喜138******90获得
-                      span 100元
-                      | 红包
+                      span 爱奇艺会员
                     li.winning-item.even 恭喜138******90获得
                       span 100元
                       | 红包
@@ -210,20 +211,41 @@ html
 
     .page(style='display:none')
     .errorWin.alert-box(style='display:none')
-        p 抱歉~您不符合参加规则
+        p.p1 对不起，亲~
+        p.p2#errorContent 您不符合参加规则
+        p
+          span
         p.winningBtn
           a(href='javascript:void(0)').spanBtn 好吧
-    .winningDiv.alert-box(style='display:none')
-        //.winningImg
+        p
+          a(href="javascript:void(0)").close-modal.spanBtn
+
+    .no-win.alert-box(style='display:none')
+      p
+          a(href="javascript:void(0)").close-modal.spanBtn
+      p.no-gift-icon
+      p.p1 亲！很遗憾没有中奖
+      p.p2 前世500次回眸才换得一次中奖，淡定！
+      p.winningBtn
+        a(href='javascript:void(0)').spanBtn 再来一次
+
+    .winningDiv(style='display:none')
+        p
+          a(href="javascript:void(0)").close-modal.spanBtn
+        .winningImg
         span.spanBtn
-        p 恭喜您获得
-          em#moeny
+        p.promote 恭喜您获得
+          em.gift-box#moeny
         .winningBtn
-            a(href='javascript:void(0)').againBtn 再抽一次
+            a(href='javascript:void(0)').againBtn 再来一次
 
     .promote-register.alert-box(style='display:none')
-      span.spanBtn
-      p 您需要先注册
+      p
+          a(href="javascript:void(0)").close-modal.spanBtn
+      p.p1 对不起，亲~
+      p.p2#errorContent 您需要先注册
+      p
+        span
       p.winningBtn
         a(href='javascript:void(0)').banner-register 立即去注册
     script.
