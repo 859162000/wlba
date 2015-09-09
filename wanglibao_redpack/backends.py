@@ -15,7 +15,7 @@ from django.utils import timezone
 from django.db.models import Sum
 from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent, InterestHike, Income
 from wanglibao_p2p.models import P2PRecord, P2PProduct, P2PEquity
-from marketing import  helper
+from marketing import helper
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
@@ -23,6 +23,7 @@ from wanglibao_pay.util import fmt_two_amount
 from misc.models import Misc
 from wanglibao_margin.marginkeeper import MarginKeeper
 from marketing.models import IntroducedBy
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +39,7 @@ def stamp(dt):
     #return long(time.mktime(dt.timetuple()))
 
 
-def list_redpack(user, status, device_type, product_id=0, rtype='redpack'):
+def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_version=''):
     if status not in ("all", "available"):
         return {"ret_code": 30151, "message": u"参数错误"}
 
@@ -79,30 +80,36 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack'):
                         packages['available'].append(obj)
 
         # 加息券
-        if product_id > 0:
-            records_count = RedPackRecord.objects.filter(user=user, product_id=product_id).count()
-            if records_count == 0:
-                coupons = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
-                    .filter(redpack__event__rtype='interest_coupon')
-                for coupon in coupons:
-                    if coupon.order_id:
-                        continue
-                    redpack = coupon.redpack
-                    if redpack.status == 'invalid':
-                        continue
-                    event = coupon.redpack.event
-                    start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
-                                                              coupon.created_at, event.available_at, event.unavailable_at)
+        # 检测app版本号，小于2.5.2版本不返回加息券列表
+        is_show = True
+        if device_type == 'ios' or device_type == 'android':
+            if app_version < "2.5.3":
+                is_show = False
+        if is_show:
+            if product_id > 0:
+                records_count = RedPackRecord.objects.filter(user=user, product_id=product_id).count()
+                if records_count == 0:
+                    coupons = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
+                        .filter(redpack__event__rtype='interest_coupon')
+                    for coupon in coupons:
+                        if coupon.order_id:
+                            continue
+                        redpack = coupon.redpack
+                        if redpack.status == 'invalid':
+                            continue
+                        event = coupon.redpack.event
+                        start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
+                                                                  coupon.created_at, event.available_at, event.unavailable_at)
 
-                    obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
-                           "id": coupon.id, "invest_amount": event.invest_amount,
-                           "unavailable_at": stamp(end_time), "event_id": event.id,
-                           "highest_amount": event.highest_amount, "order_by": 1}
-                    if start_time < timezone.now() < end_time:
-                        if event.apply_platform == "all" or event.apply_platform == device_type:
-                            if obj['method'] == REDPACK_RULE['interest_coupon']:
-                                obj['amount'] = obj['amount']/100.0
-                            packages['available'].append(obj)
+                        obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
+                               "id": coupon.id, "invest_amount": event.invest_amount,
+                               "unavailable_at": stamp(end_time), "event_id": event.id,
+                               "highest_amount": event.highest_amount, "order_by": 1}
+                        if start_time < timezone.now() < end_time:
+                            if event.apply_platform == "all" or event.apply_platform == device_type:
+                                if obj['method'] == REDPACK_RULE['interest_coupon']:
+                                    obj['amount'] = obj['amount']/100.0
+                                packages['available'].append(obj)
 
         packages['available'].sort(key=lambda x: x['unavailable_at'])
         packages['available'].sort(key=lambda x: x['order_by'])
@@ -170,13 +177,16 @@ def local_transform_str(dt):
     return newdt.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S")
 
 
-def exchange_redpack(token, device_type, user):
+def exchange_redpack(token, device_type, user, app_version):
+    device_type = _decide_device(device_type)
+    if device_type == 'ios' or device_type == 'android':
+        if app_version < "2.5.3":
+            return {"ret_code": 30160, "message": u"版本过低，不支持使用加息券，赶快升级"}
     if token == "":
         return {"ret_code": 30161, "message": u"请输入兑换码"}
     token = token.replace("'", "").replace('"', "").replace("`", "")
     #redpack = RedPack.objects.filter(token=token).first()
     redpack = RedPack.objects.extra(where=["binary token='%s'" % token]).first()
-    device_type = _decide_device(device_type)
     if not redpack:
         return {"ret_code": 30162, "message": u"请输入正确的兑换码"}
     if redpack.status == "used":
@@ -552,3 +562,7 @@ def get_start_end_time(auto, auto_days, created_at, available_at, unavailable_at
         start_time = available_at
         end_time = unavailable_at
     return start_time, end_time
+
+
+def get_app_version():
+    misc = Misc.objects.filter(key='android_update').first()
