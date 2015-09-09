@@ -40,10 +40,19 @@ body
                     li
                         span.round 10
                 ul.two
+                    - var item1 = ['','','','','','','','','','']
+                    each item in item1
+                        li= item
                 ul.three
+                    li.front 0 元
+                    li.front 0 元
+                    li.front 0 元
+                    - var item1 = ['0 元','0 元','0 元','0 元','0 元','0 元','0 元']
+                    each item in item1
+                        li= item
         img.label(src='/static/imgs/pc_activity/gold_season/label.png')
         .order
-            .text1.text http://www.wanglibao.com
+            .text1.text https://www.wanglibao.com
             .text2.text "登录" -- "我的账户"
             .text3.text 个人账户页面 -- "全民淘金" -- 分享专属邀请码及<br>专属链接给好友.
             .text4.text 好友通过邀请码或专属链接注册并登录后,即可坐享丰厚佣金.
