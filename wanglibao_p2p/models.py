@@ -261,10 +261,10 @@ class P2PProduct(ProductBase):
     # Add by hb on 2015-08-27
     @property
     def is_taojin(self):
-        if (self.period>=3 and self.period<30) or self.period>=90:
-            return True;
+        if self.pay_method.startswith(u"日计息") and self.period <= 61 or self.period <= 2:
+            return False
         else:
-            return False;
+            return True
 
 
     display_payback_mapping = {
