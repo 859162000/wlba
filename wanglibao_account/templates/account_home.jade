@@ -133,7 +133,9 @@ block main
                     td {{row.equity.product.display_status}}{{row.equity.term}}/{{row.equity.product.amortization_count}}
 
                   if row.equity.product.display_status == '还款中' or row.equity.product.display_status == '已完成'
-                    td <span class="highlight">{{row.equity.paid_interest | money_format}}</span> / {{row.equity.total_interest | money_format}}
+                    paid_interest = row['equity'].paid_interest + row['equity'].paid_coupon_interest
+                    total_interest = row['equity'].total_interest + row['equity'].total_coupon_interest
+                    td <span class="highlight">{{paid_interest | money_format}}</span> / {{total_interest | money_format}}
                   else
                     td -
 
