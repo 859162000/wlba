@@ -177,7 +177,7 @@ def local_transform_str(dt):
     return newdt.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S")
 
 
-def exchange_redpack(token, device_type, user, app_version):
+def exchange_redpack(token, device_type, user, app_version=''):
     device_type = _decide_device(device_type)
     if device_type == 'ios' or device_type == 'android':
         if app_version < "2.5.3":
