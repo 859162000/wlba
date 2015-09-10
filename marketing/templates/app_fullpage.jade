@@ -7,12 +7,14 @@ html
     meta(content="telephone=no,email=no" ,name="format-detection")
     meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
     meta(content="yes" ,name="apple-mobile-web-app-capable")
-    link(href="/static/styles/mobile_activity/app_fullpage.css?v=20150909", rel="stylesheet")
+    link(href="/static/styles/mobile_activity/app_fullpage.css?v=201509091", rel="stylesheet")
   body
     .wp
       #play
-      audio#music
-        source(type="audio/mpeg", src="/static/imgs/mobile_activity/app_fullpage/better.mp3")
+      //http://wanglibao1.oss-cn-beijing.aliyuncs.com/better.mp3
+      //src 换成上面链接
+      audio#music(loop='loop',style='width:0;height:0;position:absolute;top:0;')
+        source(type="audio/mpeg", src="/static/imgs/mobile_activity/app_fullpage/betters.mp3?v=20150909" )
       .loadPage#loadPage
         .load-warp
           .logo
@@ -71,14 +73,13 @@ html
         .page.page7
           .sketch
           img(src='/static/imgs/mobile_activity/app_fullpage/last_logo.png').logo
-          img(src='/static/imgs/mobile_activity/app_fullpage/share.jpg').share
           .footer-warp
             img(src='/static/imgs/mobile_activity/app_fullpage/last_titi2.png').last-title
-            img(src='/static/imgs/mobile_activity/app_fullpage/last_erweima.png').last-erweima
-            a(href='/activity/app_pc_download/').last-download
-          img(src='/static/imgs/mobile_activity/app_fullpage/last_footer.png').last-footer
+            //img(src='/static/imgs/mobile_activity/app_fullpage/last_erweima.png').last-erweima
 
-      span.start#arrow
+            img(src='/static/imgs/mobile_activity/app_fullpage/last_footer.png').last-footer
+            a(href='/activity/app_pc_download/').last-download
+      span.start#arrow(style='pointer-events: none;')
         b
     script(src="/static/scripts/mobile_activity/dist/fullpage.js")
     script.
