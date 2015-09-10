@@ -105,7 +105,7 @@
           }
           //success
           ajaxFun(urlData,rotateFun);
-
+          console.log(retCode);
           if(retCode == 3024 && dataCode == 3011){
             errorContent.text("您没有抽奖机会了");
             errorWin.show();
