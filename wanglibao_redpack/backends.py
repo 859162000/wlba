@@ -545,11 +545,15 @@ def deduct_calc(amount, redpack_amount):
 def get_interest_coupon(user, product_id):
     records = RedPackRecord.objects.filter(user=user, product_id=product_id) \
         .filter(redpack__event__rtype='interest_coupon').first()
+    redpack_records = RedPackRecord.objects.filter(user=user, product_id=product_id) \
+        .exclude(redpack__event__rtype='interest_coupon').first()
     if records:
         amount = records.redpack.event.amount
-        return {"ret_code": 0, "amount": amount}
+        return {"ret_code": 0, "used_type": u"coupon", "amount": amount}
+    elif redpack_records:
+        return {"ret_code": 0, "used_type": u"redpack", "message": u'已经用过红包，不能再使用加息券'}
     else:
-        return {"ret_code": 3002, "message": u"还未使用加息券"}
+        return {"ret_code": 3002, "message": u"还未使用理财券"}
 
 
 def get_hike_nums(user):

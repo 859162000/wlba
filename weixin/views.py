@@ -574,9 +574,9 @@ class WeixinTransaction(TemplateView):
             'equity_product_display_status': equity.product.display_status,  # 状态
             'equity_term': equity.term,  # 还款期
             'equity_product_amortization_count': equity.product.amortization_count,  # 还款期数
-            'equity_paid_interest': float(equity.pre_paid_interest),  # 单个已经收益
-            'equity_total_interest': float(equity.pre_total_interest),  # 单个预期收益
-            'equity_will_interest': float(equity.pre_total_interest - equity.pre_paid_interest),
+            'equity_paid_interest': float(equity.pre_paid_interest + equity.pre_paid_coupon_interest),  # 单个已经收益
+            'equity_total_interest': float(equity.pre_total_interest + equity.pre_total_coupon_interest),  # 单个预期收益
+            'equity_will_interest': float(equity.pre_total_interest - equity.pre_paid_interest + equity.unpaid_coupon_interest),
             'equity_contract': 'https://%s/api/p2p/contract/%s/' % (
                 self.request.get_host(), equity.product.id),  # 合同
             'product_id': equity.product_id,
