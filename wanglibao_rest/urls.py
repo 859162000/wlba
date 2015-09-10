@@ -44,8 +44,9 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
                             DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView,
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
-                            CaptchaValidationCodeView)
-from wanglibao_redpack.views import RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView
+                            CaptchaValidationCodeView, TopsOfEaringView)
+from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
+                                     RedPacketSelectAPIView)
 
 from marketing.play_list import InvestmentHistory
 from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView,
@@ -188,10 +189,12 @@ urlpatterns = patterns(
     url(r'^shareurl/$', ShareUrlAPIView.as_view()),
     url(r'^gettopofday/$', TopsOfDayView.as_view()),
     url(r'^gettopofweek/$', TopsOfWeekView.as_view()),
+    url(r'^gettopofearings/', TopsOfEaringView.as_view()),
 
     url(r'^redpacket/$', RedPacketListAPIView.as_view()),
     url(r'^redpacket/exchange/$', RedPacketChangeAPIView.as_view()),
     url(r'^redpacket/deduct/$', RedPacketDeductAPIView.as_view()),
+    url(r'^redpacket/selected/$', RedPacketSelectAPIView.as_view()),
 
     url(r'^message/count/$', MessageCountAPIView.as_view()),
     url(r'^message/(?P<message_id>\d+)/$', MessageDetailAPIView.as_view()), 
@@ -234,6 +237,7 @@ urlpatterns += patterns(
     url(r'^xunlei/award/$', 'marketing.views.ajax_post'), #add by Yihen@20150821, 迅雷-网利宝 抽奖活动
     url(r'^xunlei/award/records/$', 'marketing.views.ajax_get_activity_record'), #add by Yihen@20150825, 迅雷-网利宝 抽奖活动记录
     url(r'^celebrate/awards/$', 'marketing.views.celebrate_ajax'), #add by Yihen@20150828, 网利宝一周年大转盘活动
+    url(r'^award/common_september/$', 'marketing.views.september_award_ajax'), #add by Yihen@20150907,9月PC常规
 )
 
 

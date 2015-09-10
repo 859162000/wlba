@@ -7,11 +7,13 @@ import logging
 import json
 
 from datetime import datetime
+from marketing.models import IntroducedBy
 from marketing.tops import Top
 from marketing.utils import local_to_utc
 from misc.views import MiscRecommendProduction
 
 from django.contrib import messages
+from django.contrib.auth.models import User
 from django.db.models import Q
 from django.shortcuts import redirect, render_to_response
 from django.template import RequestContext
@@ -22,6 +24,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from wanglibao import settings
+from wanglibao.templatetags.formatters import safe_phone_str
+from wanglibao_account.models import UserPhoneBook
+from wanglibao_account import backends as account_backends
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_banner.models import AppActivate
@@ -29,7 +34,9 @@ from wanglibao_p2p.models import ProductAmortization, P2PEquity, P2PProduct, P2P
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_rest.utils import split_ua, get_client_ip
 from wanglibao_banner.models import Banner
+from wanglibao_sms import messages as sms_messages
 from wanglibao_sms.utils import send_validation_code
+from wanglibao_sms.tasks import send_messages
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.forms import verify_captcha
 
@@ -101,9 +108,11 @@ class AppRepaymentAPIView(APIView):
                 ]).select_related('product')
                 for equity in p2p_equities:
                     amount += equity.pre_paid_interest  # 累积收益
+                    amount += equity.pre_paid_coupon_interest  # 加息券加息收益
                     amount += equity.activity_interest  # 活动收益
                     if equity.confirm_at >= start_utc:
                         income_num += equity.pre_paid_interest
+                        income_num += equity.pre_paid_coupon_interest
                         income_num += equity.activity_interest
 
                 return Response({'ret_code': 0, 'message': 'ok', 'amount': float(amount), 'income_num': float(income_num)})
@@ -124,7 +133,7 @@ class AppRepaymentAPIView(APIView):
 
 class AppDayListView(TemplateView):
     """ app端榜单 """
-    template_name = 'day-list.jade'
+    template_name = 'client_daylist.jade'
 
     def get_context_data(self, **kwargs):
 
@@ -137,11 +146,11 @@ class AppDayListView(TemplateView):
 
 class AppGuardView(TemplateView):
     """ app保障页面 """
-    template_name = 'secure.jade'
+    template_name = 'client_secure.jade'
 
 class AppGuideView(TemplateView):
     """ app新手引导页面 """
-    template_name = 'guide.jade'
+    template_name = 'client_guide.jade'
 
 class AppSecureView(TemplateView):
     """ app安全保障页面"""
@@ -149,7 +158,8 @@ class AppSecureView(TemplateView):
 
 class AppExploreView(TemplateView):
     """ app发现页面 """
-    template_name = 'discover.jade'
+
+    template_name = 'client_discover.jade'
 
     def get_context_data(self, **kwargs):
         #banner = Banner.objects.filter(device='mobile', type='banner', is_used=True).order_by('-priority')
@@ -158,6 +168,14 @@ class AppExploreView(TemplateView):
             'banner': banner,
         }
 
+
+class AppManagementView(TemplateView):
+    """ app管理团队 """
+    template_name = 'client_management.jade'
+
+class AppAboutView(TemplateView):
+    """ app关于网利宝 """
+    template_name = 'client_about.jade'
 
 class AppP2PProductViewSet(PaginatedModelViewSet):
     """ app查询标列表接口 """
@@ -229,7 +247,7 @@ class AppRecommendViewSet(PaginatedModelViewSet):
 
 class RecommendProductManagerView(TemplateView):
     """ 推荐标的管理 """
-    template_name = 'recommend_production.jade'
+    template_name = 'client_recommend_production.jade'
 
     def _get_product(self, id):
         if isinstance(id, list):
@@ -332,7 +350,7 @@ class SendValidationCodeView(APIView):
 
 class AppIncomeMiscTemplateView(TemplateView):
     """ 设置收益比例参数"""
-    template_name = "app_income_misc.jade"
+    template_name = "client_income_misc.jade"
 
     def get_context_data(self, **kwargs):
         data = {'rate_wlb': 100, 'rate_p2p': 80, 'rate_fund': 60, 'rate_bank': 40}
@@ -374,3 +392,179 @@ class AppIncomeRateAPIView(APIView):
         except Exception, e:
             logger.error(e.message)
             return Response({'ret_code': 20002, 'message': 'fail'})
+
+
+class AppPhoneBookUploadAPIView(APIView):
+    """ user uploading phone book """
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+
+        phones = request.DATA.get('phones', '')
+        if not phones:
+            return Response({'ret_code': 20001, 'message': u'数据输入不合法'})
+        phones = json.loads(phones)
+        try:
+            UserPhoneBook.objects.filter(user=user).exclude(phone__in=phones.keys()).update(is_used=False)
+            phone_db = [u.get('phone') for u in UserPhoneBook.objects.filter(user=user, phone__in=phones.keys()).values('phone')]
+
+            phone_new_list = []
+            for p in phones.keys():
+                if p in phone_db:
+                    UserPhoneBook.objects.filter(user=user, phone=p).update(name=phones.get(p), is_used=True)
+                else:
+                    phone_book = UserPhoneBook()
+                    phone_book.user = user
+                    phone_book.phone = p
+                    phone_book.name = phones.get(p)
+                    if User.objects.filter(wanglibaouserprofile__phone=p).exists():
+                        phone_book.is_register = True
+                    else:
+                        phone_book.is_register = False
+
+                    if IntroducedBy.objects.filter(introduced_by=user, user__wanglibaouserprofile__phone=p).exists():
+                        phone_book.is_invite = True
+                    else:
+                        phone_book.is_invite = False
+
+                    phone_book.is_used = True
+                    phone_new_list.append(phone_book)
+            if phone_new_list:
+                UserPhoneBook.objects.bulk_create(phone_new_list)
+            return Response({'ret_code': 0, 'message': 'success'})
+        except Exception, e:
+            logger.error(e.message)
+            return Response({'ret_code': 20002, 'message': u'同步通讯录错误'})
+
+
+class AppPhoneBookQueryAPIView(APIView):
+    """ 查询未邀请好友，即用户未注册 """
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        phone_book = UserPhoneBook.objects.filter(user=request.user, is_used=True, is_register=False)
+
+        books, register_list = list(), list()
+        for book in phone_book:
+            if User.objects.filter(wanglibaouserprofile__phone=book.phone).exists():
+                register_list.append(book.phone)
+            else:
+                books.append({
+                    'name': book.name,
+                    'phone': book.phone,
+                    'status': True if not(book.invite_at and book.invite_at > local_to_utc(datetime.now(), 'min')) else False,
+                    }
+                )
+
+        if register_list:
+            UserPhoneBook.objects.filter(user=request.user, phone__in=register_list).update(is_register=True)
+
+        return Response({'ret_code': 0, 'message': 'success', 'books': books})
+
+
+class AppPhoneBookAlertApiView(APIView):
+    """ 邀请注册和提醒投资接口
+    flag:   1 invite user to register
+            2 alert user to invest
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+        flag = request.DATA.get('flag')
+        phone = request.DATA.get('phone')
+        if not phone or not flag or (flag and int(flag) not in(1, 2)):
+            return Response({'ret_code': 20001, 'message': u'数据输入不合法'})
+
+        try:
+            user_book = UserPhoneBook.objects.filter(user=user, phone=phone).first()
+            if not user_book:
+                return Response({'ret_code': 20002, 'message': u'被提醒用户不存在'})
+
+            profile = user.wanglibaouserprofile
+            send_name = profile.name if profile.id_is_valid else safe_phone_str(profile.phone)
+            # 投资提醒
+            if int(flag) == 1:
+                if not (user_book.alert_at and user_book.alert_at > local_to_utc(datetime.now(), 'min')):
+                    self._send_sms(phone, sms_messages.sms_alert_invest(name=send_name))
+                    user_book.alert_at = timezone.now()
+                    user_book.is_used = True
+                    user_book.save()
+            # 邀请提醒
+            elif int(flag) == 2:
+                if User.objects.filter(wanglibaouserprofile__phone=phone).exists():
+                    user_book.is_register = True
+                    if IntroducedBy.objects.filter(introduced_by=user, user_wanglibaouserprofile__phone=phone).exists():
+                        user_book.is_invite = True
+                        user_book.is_used = True
+                    user_book.save()
+
+                if not user_book.is_register and not (user_book.invite_at and user_book.invite_at > local_to_utc(datetime.now(), 'min')):
+                    self._send_sms(phone, sms_messages.sms_alert_invite(name=send_name, phone=profile.phone))
+                    user_book.invite_at = timezone.now()
+                    user_book.save()
+
+            return Response({'ret_code': 0, 'message': 'ok'})
+        except Exception, e:
+            logger.error(e.message)
+            return Response({'ret_code': 20003, 'message': u'内部程序错误'})
+
+    def _send_sms(self, phone, sms):
+        send_messages.apply_async(kwargs={
+            'phones': [phone],
+            'messages': [sms]
+        })
+
+
+class AppInviteAllGoldAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request, **kwargs):
+        dic = account_backends.broker_invite_list(request.user)
+        users = dic['users']
+        first_amount, first_earning, second_amount, second_earning = dic['first_amount'],\
+                dic['first_earning'], dic['second_amount'], dic['second_earning']
+        first_count, second_count = dic['first_count'], dic['second_count']
+        first_intro = dic['first_intro']
+        commission = dic['commission']
+
+        introduces = IntroducedBy.objects.filter(introduced_by=request.user).select_related("user__wanglibaouserprofile").all()
+        keys = commission.keys()
+        for x in introduces:
+            user_id = x.user.id
+            alert_invest = self._alert_invest_status(user=request.user, phone_user=x.user)
+            if user_id in keys:
+                first_intro.append([users[user_id].phone, commission[user_id]['amount'], commission[user_id]['earning'], alert_invest, x.created_at])
+            else:
+                first_intro.append([x.user.wanglibaouserprofile.phone, 0, 0, alert_invest, x.created_at])
+
+        first_intro = sorted(first_intro, key=lambda l: (l[1], l[4]), reverse=True)
+
+        return Response({"ret_code":0, "first":{"amount":first_amount,
+                        "earning":first_earning, "count":first_count, "intro":first_intro},
+                        "second":{"amount":second_amount, "earning":second_earning,
+                        "count":second_count}, "count":len(introduces)})
+
+    def _alert_invest_status(self, user, phone_user):
+        try:
+            profile = phone_user.wanglibaouserprofile
+            phone_book = UserPhoneBook.objects.filter(user=user, phone=profile.phone).first()
+            if phone_book:
+                if not(phone_book.alert_at and phone_book.alert_at > local_to_utc(datetime.datetime.now(), 'min')):
+                    phone_book.is_used = True
+                    phone_book.save()
+                    return True
+            else:
+                phone_book = UserPhoneBook()
+                phone_book.user = user
+                phone_book.phone = profile.phone
+                phone_book.name = profile.name
+                phone_book.is_register = True
+                phone_book.is_invite = True
+                phone_book.is_used = True
+                phone_book.save()
+                return True
+            return False
+        except:
+            return False

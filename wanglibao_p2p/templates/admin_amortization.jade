@@ -49,10 +49,15 @@ head
                 .span9-omega
                   input(type="text", name="year_rate", placeholder="请输入年化率（%）")
               .form-row
+                .span3(style="line-height:40px")
+                  label 加息年化率
+                .span9-omega
+                  input(type="text", name="coupon_year_rate", value="0", placeholder="请输入加息年化率（%）")
+              .form-row
                 button#validate_id_button.button-primary.prefix3.span9-omega(type="submit") 查询
           .row
             if newterms
-              h3(style="margin: 50px;") 还款总额 {{ total }} 元
+              h3(style="margin: 50px;") 还款总额 {{ total }} 元，加息总额 {{ coupon_total }} 元
               table.table
                 thead
                   tr
@@ -60,6 +65,7 @@ head
                     th 偿还本息
                     th 偿还本金
                     th 偿还利息
+                    th 加息利息
                     th 剩余本金
                 tbody
                 term = 0
@@ -70,4 +76,5 @@ head
                     td {{ newterm.term_amount }}
                     td {{ newterm.principal }}
                     td {{ newterm.interest }}
+                    td {{ newterm.coupon_interest }}
                     td {{ newterm.principal_left }}

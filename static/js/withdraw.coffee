@@ -106,7 +106,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       $.modal.close()
 
     intervalId
-    count = 180
+    count = 60
 
     $(element).attr 'disabled', 'disabled'
     $(element).addClass('disabled')
@@ -120,6 +120,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
         $(element).text('重新获取')
         $(element).removeAttr 'disabled'
         $(element).removeClass('disabled')
+        $(element).removeClass('button-gray')
         $('.voice').removeClass('hidden')
         $('.voice-validate').removeAttr 'disabled'
         $('.voice  .span12-omega').html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/2/" class="voice-validate">语音验证</a>')
@@ -148,7 +149,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
         #TODO
 
         intervalId
-        count = 180
+        count = 60
         button = $("#button-get-code-btn")
 
         button.attr 'disabled', 'disabled'

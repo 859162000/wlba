@@ -22,18 +22,21 @@ html
           for product in p2p_products
             status = product['display_status']
             .panel-p2p-product
-              if product.category == '新手标'
-                .new-user 新手福利
               .shadow-inner
                 .panel-title-bar
                   if product.category == '票据'
                     .bill-icon.di 票
                   elif product.warrant_company
                     .warrant-icon.di 担
-                  a(href="/p2p/detail/{{product.id}}") {{product.name}}
+                  a(href="/p2p/detail/{{product.id}}")
+                    if product.category == '新手标'
+                        .new-user 新手福利
+                    | {{product.name}}
                   if product.category == '证大速贷'
                     span.tip 满标后持满180天即可债权转让
                 .panel-content
+                  if product.is_taojin
+                    .goldIcon
                   .row
                     .span2.align-center
                       p
@@ -163,7 +166,7 @@ html
                             em.font-weight {{ p2p.period }}
                             span.font-l {{p2p.pay_method|period_unit}}
                           .span5-omega.p2pinfo-ceil
-                            em {{ p2p.available_amout | money_format_int }} 元可投
+                            em {{ p2p.available_amount | money_format_int }} 元可投
 
                         .p2pinfo-flow(id="earing_{{ forloop.counter }}")
                           .row.p2pinfo-flow-top
@@ -229,7 +232,7 @@ html
                             em.p2pinfo-active.highlight.font-weight {{ p2p.period }}
                             span.font-l {{p2p.pay_method|period_unit}}
                           .span5-omega.p2pinfo-ceil
-                            em {{ p2p.available_amout | money_format_int }} 元可投
+                            em {{ p2p.available_amount | money_format_int }} 元可投
 
                         .p2pinfo-flow(id="period_{{ forloop.counter }}")
                           .row.p2pinfo-flow-top
@@ -293,7 +296,7 @@ html
                             em.font-weight {{ p2p.period }}
                             span.font-l {{p2p.pay_method|period_unit}}
                           .span5-omega.p2pinfo-ceil
-                            em.p2pinfo-active.highlight {{ p2p.available_amout | money_format_int }}
+                            em.p2pinfo-active.highlight {{ p2p.available_amount | money_format_int }}
                             | &nbsp;元可投
 
                         .p2pinfo-flow(id="amount_{{ forloop.counter }}")

@@ -50,7 +50,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         'invite code not match': u'邀请码错误',
         'mlgb error': u'注册成功',
         'verify_invalid': u'请输入验证码',
-        'verify_error': u'验证码错误',
+        'verify_error': u'短信验证码错误',
     }
 
     class Meta:
@@ -182,10 +182,10 @@ def verify_captcha(dic, keep=False):
         return True, ""
 
     if not captcha_0 or not captcha_1:
-        return False,u"请输入验证码"
+        return False, u"请输入验证码"
     record = CaptchaStore.objects.filter(hashkey=captcha_0).first()
     if not record:
-        return False,u"验证码错误"
+        return False, u"图片验证码错误"
     # if captcha_1.lower() == record.challenge.lower():
     if captcha_1.lower() == record.response.lower():
         try:
@@ -194,7 +194,7 @@ def verify_captcha(dic, keep=False):
             pass
         return True, ""
     else:
-        return False,u"验证码错误"
+        return False, u"图片验证码错误"
 
 class EmailOrPhoneAuthenticationForm(forms.Form):
     """
