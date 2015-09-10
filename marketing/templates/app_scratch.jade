@@ -1,0 +1,59 @@
+doctype html
+html
+      head
+            title 刮刮乐翻天
+            include include/app_head
+      body
+            .scratch_continer
+                  img.img_banner(src="/static/imgs/mobile_activity/app_scratch/gg_banner.png")
+                  span.search_logo
+            .scratch_box
+                  .scratch_envelope
+                        img.img_envelope(src="/static/imgs/mobile_activity/app_scratch/gg_hongbao.png")
+                  if user.is_authenticated
+                        .unAuthenticated 您也注册
+                  else
+                        .scratch_tub
+                              .sceatch_text
+                                    span.tub
+                                    input.txt#zctext(type="text",placeholder="请输入你的手机号码")
+                              a.scratch_btn#scratch_btn(href="/weixin/regist/?next=/activity/app_scratch/&phone=") 立即注册
+                  .sceatch_opportunity#opportunity 注册用户有3次刮奖机会
+                  .sceatch_mouth
+                        img(src="/static/imgs/mobile_activity/app_scratch/gg_kuajq.png")
+                  .main#main
+                        .demo#demo
+                              img.imgs(src="/static/imgs/mobile_activity/app_scratch/gg_Img.png")
+                              span#spans.spans
+                              canvas
+                  a.sceatch_continue#continue(href="javascript:;") 再来一次
+                  .sceatch_information
+                        img(src="/static/imgs/mobile_activity/app_scratch/gg_wlbank.png")
+                  .sceatch_information
+                        img(src="/static/imgs/mobile_activity/app_scratch/gg_touzi.png")
+                  .sceatch_information
+                        img(src="/static/imgs/mobile_activity/app_scratch/gg_hbguize.png")
+                        .textbox.clear
+                              span 1.
+                              p 手机号为网利宝唯一账户，通过活动新注册网利宝用户均可参与；
+                              span 2.
+                              p 红包有效期至2015年10月31日。
+                              span 3.
+                              p 新用户注册即送50元红包，此现金红包为直抵红包，投资满1000元即可抵扣使用；首次投资送200元红包（首次投资100元起），红包类型为折扣红包，折扣红包则按投资额0.5%抵扣使用（比如用户投资40000元，即可满额使用200元红包）;刮刮乐红包均为抵扣红包，按投资额0.5%抵扣使用;
+                              span 5.
+                              p 红包统一以站内信形式通知，完成一次投资回款后即可取现;
+                              span 6.
+                              p 本活动不收取任何费用，谨慎上当受骗;刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑;
+                              span 7.
+                              p 网利宝对此活动享有最终解释权。与苹果公司（Apple Inc）无关，如有疑问请联系在线客服或拨打400-588-066
+                  footer.sceatch_foot
+                        span.foot_copyright
+                              img(src="/static/imgs/mobile_activity/app_scratch/gg_banquan.png")
+                        a.foot_crbtn 下载APP 注册有礼
+                              img(src="/static/imgs/mobile_activity/app_scratch/gg_btn.png")
+            .dask#dask
+                  .delog#delog
+                        h3 150元红包以发送！请留意站内信！
+                        a#ok(href="javascript:;") 好的
+                        span.close#close
+                  script(data-init="canvas", src='/static/scripts/mobile_activity/mobile_canvas.js?')
