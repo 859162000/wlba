@@ -1022,6 +1022,16 @@ class WanglibaoAwardActivity(APIView):
             count += 1
 
     def response_activity(self):
+        user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
+        if user_activity.total_chances <= user_activity.used_chances:
+            to_json_response = {
+                'ret_code': 3016,
+                'amount': 0,
+                'left': user_activity.total_chances - user_activity.used_chances,
+                'message': u'您的抽奖机会已经用完',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
         join_log = ActivityJoinLog.objects.filter(user=self.request.user, action_name='celebrate_award', join_times__gt=0).first()
         join_log.join_times -= 1
         join_log.save(update_fields=['join_times'])
@@ -1037,7 +1047,6 @@ class WanglibaoAwardActivity(APIView):
             redpack_backends.give_activity_redpack(self.request.user, redpack_event, 'pc')
 
         #  更新奖品表相应字段值
-        user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
         user_activity.used_chances += 1
         user_activity.used_awards += 1
         user_activity.save(update_fields=['used_chances', 'used_awards'])
