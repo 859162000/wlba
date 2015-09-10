@@ -222,6 +222,10 @@ class P2PProduct(ProductBase):
     def available_amount(self):
         return self.total_amount - self.ordered_amount
 
+    @property
+    def available_amout(self):
+        return self.total_amount - self.ordered_amount
+
     def has_amount(self, amount):
         if amount <= self.remain:
             return True
