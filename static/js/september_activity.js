@@ -22,6 +22,7 @@
     var giftArr = [""];
     var giftInx;
     var dataCode = 3011;
+    var retCode = 3013;
 
     //ajax
     function ajaxFun(action,fun){
@@ -30,6 +31,7 @@
         url: "/api/award/common_september/",
         dataType: "json",
         data: {action: action},
+        async: false,
         success: function(data){
           if(typeof fun === "function"){
             fun(data);
@@ -75,16 +77,36 @@
     ajaxFun("ENTER_WEB_PAGE",giftOk);
 
     //转盘
+    function rotateFun(data){
+      used_chances = data.used_chances;
+      retCode = data.ret_code;
+    }
     $(".prize-arr .rotateImg").rotate({
       bind:{
         click:function(){
-		  var a;
+		  var a = 0;
           var $t = $(this);
           var $page = $('.page');
           var errorWin = $(".errorWin");
           var errorContent = $(".errorWin").find("#errorContent");
           var urlData = "IGNORE";
-          if(used_chances >= 3 && dataCode == 3011){
+          giftInx = Math.floor((Math.random()*giftArr.length));
+          if(giftArr.length < 1){
+            urlData = "IGNORE";
+          }else{
+            a = runzp(giftArr[giftInx]);
+            if(giftArr[giftInx] > 1){
+              urlData = "GET_MONEY";
+            }else if(giftArr[giftInx] === 1 || giftArr[giftInx] === 0){
+              urlData = "GET_GIFT";
+            }else{
+              urlData = "IGNORE";
+            }
+          }
+          //success
+          ajaxFun(urlData,rotateFun);
+
+          if(retCode == 3024 && dataCode == 3011){
             errorContent.text("您没有抽奖机会了");
             errorWin.show();
             $page.show();
@@ -96,15 +118,6 @@
             return false;
           }
 
-          giftInx = Math.floor((Math.random()*giftArr.length));
-          a = runzp(giftArr[giftInx]);
-          if(giftArr[giftInx] > 1){
-            urlData = "GET_MONEY";
-          }else if(giftArr[giftInx] === 1 || giftArr[giftInx] === 0){
-            urlData = "GET_GIFT";
-          }else{
-            urlData = "IGNORE";
-          }
           $t.rotate({
             duration:3000,
             angle: 0,
@@ -112,8 +125,9 @@
             easing: $.easing.easeOutSine,
             callback: function(){
               $page.show();
-               used_chances++;
-              $("span.chance-num").text(3 - used_chances);
+              //used_chances++;
+              var hasChances = 3 - used_chances;
+              $("span.chance-num").text(hasChances >= 0 ? hasChances : 0);
               if(giftArr[giftInx] != ""){
                 $('.winningDiv').show();
                 $('#moeny').text(a.prize);
@@ -131,8 +145,7 @@
               giftArr.splice(giftInx,1);
             }
           });
-          //success
-          ajaxFun(urlData)
+
 		}
 	  }
 	});
