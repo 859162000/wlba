@@ -977,7 +977,7 @@ class WanglibaoAwardActivity(APIView):
             count = ActivityJoinLog.objects.filter(action_name='celebrate_award', amount=money).aggregate(counts=Count('id'))
             return count["counts"]
 
-        result = {key: get_counts(value) for key, value in award_amount.iteritems()}
+        result = {key: get_counts(key) for key, value in award_amount.iteritems()}
 
         if activity_id % 100 == 0:
             for award in (1000, 500, 200):
