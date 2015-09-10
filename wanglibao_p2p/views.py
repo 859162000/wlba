@@ -433,7 +433,7 @@ class CopyContractTemplateView(TemplateView):
         id = kwargs.get('id')
         ct = ContractTemplate.objects.get(pk=id)
         new_ct = ContractTemplate()
-        new_ct.name = ct.name + u"复制" + get_a_uuid()
+        new_ct.name = (ct.name[:8] + u" 复制 " + get_a_uuid()[:18])
         new_ct.content = ct.content
         new_ct.content_preview = ct.content_preview
         new_ct.save()

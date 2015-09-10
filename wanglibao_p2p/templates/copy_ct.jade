@@ -15,69 +15,13 @@ html
     include include/navigation
 
     include announcement_block
-
-    status = p2p.display_status
     .space-m
     .full-container-home.clearfix
       .p2p-container.dark-gray.border-all
         .span8.p2p-detail-container
-          .p2p-detail-bar.clearfix
-            .row
-              .span9
-                .p2p-detail-title.pull-left.text-overflow-hidden(title="{{p2p.name}}") {{p2p.name}}
-                if p2p.category == '证大速贷'
-                  span.tip 满标后持满180天即可债权转让
-              .span3-omega
-                div.pull-right.p2p-warrant-way
-                  span.icon-check-shield
-                  a(href="/security/", target="_blank") 第三方本息保障
-          .p2p-detail-content
-            .row
-              .span4
-                p.dark-gray.font-xxl {{p2p.total_amount | money_format_int}}
-                p 投资金额（元）
-              .span5
-                p.dark-gray
-                  span.font-xxl {{p2p.period}}
-                  span.font-xl 个月
-                p 还款期限
-              .span3-omega
-                p.highlight
-                  earning_rate = str(p2p.expected_earning_rate)
-                  //if p2p.excess_earning_rate > 0
-                  //  earning_rate = str(p2p.expected_earning_rate - p2p.excess_earning_rate) + '+' + str(p2p.excess_earning_rate)
-                  span.font-xxl {{earning_rate}}
-                  span.font-xl %
-                  //if p2p.excess_earning_description
-                  //  span.detail-icon(title="{{p2p.excess_earning_description}}")
-                  if p2p.activity
-                    em.font-xxl +
-                    span.xunlei-vip-rate-detail(title="{{p2p.activity.name}}") {{p2p.activity.rule.percent_text}}
-                      span.font-xl %
-                      span.xunlei-vip-tip-detail(title="{{p2p.activity.name}}") {{p2p.activity.name}}
-                p 年化收益
-          .p2p-detail-footer
-            .row
-              .span4
-                |还款方式：
-                span.dark-gray {{p2p.display_payback_method}}
-              .span4
-                span.pull-right 进度：
-                  .progress-container
-                    percent = float(p2p.ordered_amount) / p2p.total_amount * 100
-                    .progress-indicator(style="width:{{percent | percentage}}")
-                  span.highlight &nbsp;&nbsp; {{percent | percentage}}
-              if status == '抢购中'
-                .span4-omega.p2p-detail-endtime.align-right(data-role="countdown", data-left="{{p2p.end_time | timedelta_now}}", data-target="#countdown") 剩余：
-                  span#countdown{{p2p.end_time | timedelta_now_day }}
-
-          dl.p2p-detail-intro.clearfix
-            dt 借款描述：
-            dd {% autoescape off %}{{p2p.short_usage}}{% endautoescape %}
-            if p2p.category == '证大速贷'
-              dt 债权转让：
-              dd 选择“债权转让”后，即可提前赎回未到期债权，但您需承担提前赎回本金0-5%不等的年化收益率折让费（由提前赎回投资人自行设置），折让费将转给下一个接收投资人，投资人相应权利义务同时转移。
-
+            p {{ct.name}}
+            .copp {{ct.content|safe}}
+            p#dii
         .span4-omega.invest-form.border-left
           form(method="POST", action="{{request.url}}").pull-left
             -csrf_token
@@ -85,162 +29,15 @@ html
             .space-vertical-xxxl
             button.button-primary(type="submit") 复制
 
-            a.button-primary.margin-left-m(href='/{{ "" | admin_address}}/wanglibao_p2p/p2pproduct/') 返回
-
-    .space-m
-    .full-container-home.clearfix
-      .p2p-container
-        .span8.p2p-detail-container
-          if p2p.extra_data
-            r = p2p.extra_data.items()
-            for section_name, section_values in r
-              .p2p-detail-list.clearfix
-                h1 {{section_name}}
-                if user.is_authenticated
-                  for item_name in section_values
-                    dl
-                      dt.span2.align-left {{item_name}}
-
-                      item_value = section_values[item_name]
-                      dd.span10-omega {{item_value|linebreaksbr}}
-                else
-                  .row
-                    .span2
-                      for item_name in section_values
-                        dt {{item_name}}
-
-                    .p2p-no-login
-                      li
-                        | 只有
-                        a.register-modal.blue(href="#login-modal") 注册用户
-                        |才能看到，现在
-                        a.login-modal.blue(href="#login-modal") 登录
-
-          if attachments and user.is_authenticated
-            .p2p-detail-list.clearfix
-              h1 相关文件
-
-              for attachment in attachments
-                .img-container
-                  img(src="/media/{{attachment.file}}")
-                  h2 {{attachment.name}}
-
-        .span4-omega.border-left.clearfix
-          .p2p-detail-container.guarantee-company
-            h1 担保机构审核清单
-            table
-              warrants = p2p.warrant_set.all()
-              length = len(warrants)
-
-              if length > 0
-                caption {{p2p.warrant_company.name}}
-                tbody
-                    for warrant in warrants
-                      tr
-                        td {{warrant.name}}
-                        td
-                          span
-                          span.icon.icon-approve
-                          | 认证通过
-              else
-                caption.nowarrant {{p2p.warrant_company.name}}
-                if p2p.category == "证大速贷"
-                  tbody
-                    tr
-                      td 身份证
-                      td
-                        span
-                        span.icon.icon-approve
-                        | 认证通过
-                    tr
-                      td 信用报告
-                      td
-                        span
-                        span.icon.icon-approve
-                        | 认证通过
-                    tr
-                      td 工作证明
-                      td
-                        span
-                        span.icon.icon-approve
-                        | 认证通过
-                    tr
-                      td 收入证明
-                      td
-                        span
-                        span.icon.icon-approve
-                        | 认证通过
-          .clearfix
-            .p2p-detail-container
-              script.
-                var invest_result = [];
-
-              h1 投资记录
-                trade_records = p2p.p2precord_set.filter(catalog=u'申购')
-                more_list = trade_records[30:]
-                for trade in more_list
-                  script.
-                    invest_result.push({
-                      create_time: '{{trade.create_time | date:"Y-m-d"}}',
-                      user: '{{trade.user | safe_phone}}',
-                      amount: '{{trade.amount|money_format_int}}'
-                    });
-              table.invest-history-table
-                colgroup
-                  col(width="35%")
-                  col(width="30%")
-                  col(width="35%")
-                thead
-                  tr
-                    th 申购时间
-                    th 投资人
-                    th 金额
-                tbody
-                  show_list = trade_records[0:30]
-                  for trade in show_list
-                    tr
-                      td
-                        p {{trade.create_time | date:"Y-m-d"}}
-                      td
-                        em {{trade.user | safe_phone}}
-                      td.invest-num
-                        span.money-highlight {{trade.amount|money_format_int}}
-                          span 元
+            a.button-primary.margin-left-m(href='/{{ "" | admin_address}}/wanglibao_p2p/contracttemplate/') 返回
 
 
-              if trade_records.count > 30
-                .row
-                  a.get-more(href="#") 查看更多
 
-    .space-vertical-sm
-    if p2p.activity
-      if user.is_authenticated and not xunlei_vip.isvip
-        #xunlei-binding-modal(style="display:none;")
-          .modal-header
-            .modal-title-bar
-              .modal-title 绑定迅雷会员
-          .modal-body
-            .modal-content-padding
-              p.align-center
-                img(src="/static/images/activity/xunlei_wanglibao.png")
-              ul.clearfix
-                li &bull; 绑定迅雷会员后，投资指定P2P产品，即可额外获得
-                  span.blue {{p2p.activity.rule.percent_text}}%
-                  |年化收益！
-                li &bull; 奖励收益将在满标后2个工作日内发放。
-              .space-vertical-l
-              .row
-                .span7
-                  a.button.button-account(href='/accounts/login/xunlei', target="_blank")
-                    span.font-s.padding-l-r-m 立即绑定迅雷会员
-                .span5-omega.padding-top-xs.align-center.font-s
-                  span 我还不是会员，
-                  a.blue(href="http://act.vip.xunlei.com/vip/2014/xlhyk/?referfrom=wlb", target="_blank") 立即开通
-            .space-vertical-s
 
     script.
-      var v = new Date().getTime()
-      require(['/static/js/p2p_detail.js?v='+v])
+        //document.getElementById('dii').innerHTML={{ct.content|safe}};
+       // alert(a);
+
     include include/footer
     include include/tracking
     include include/verify
