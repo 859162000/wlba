@@ -5,7 +5,7 @@
 }
 
 function runzp(index) {
-	var data = '[{"id":1,"prize":"爱奇艺会员","v":1.0},{"id":2,"prize":"扣电影代金券","v":1.0},{"id":3,"prize":"200元现金红包","v":2.0},{"id":4,"prize":"150元现金红包","v":3.0},{"id":5,"prize":"100元现金红包","v":4.0}]';// 奖项json
+	var data = '[{"id":1,"prize":"爱奇艺会员","v":1.0},{"id":2,"prize":"抠电影代金券","v":1.0},{"id":3,"prize":"200元现金红包","v":2.0},{"id":4,"prize":"150元现金红包","v":3.0},{"id":5,"prize":"100元现金红包","v":4.0}]';// 奖项json
 	var obj = eval('(' + data + ')');
 	var result = randomnum(1, 100);
 	var line = 0;
@@ -49,7 +49,7 @@ function runzp(index) {
 		message = "再接再厉";
 		var angle5 = [ -22, 19 ];
 		var angle6 = [ 165, 205 ];
-		var r = randomnum(5, 6);
+		var r = randomnum(6, 7);
 		var angle;
 		switch (r) {
 		case 6:
