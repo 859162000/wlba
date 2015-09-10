@@ -52,7 +52,10 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
         packages = {"available": []}
         # if not product_id or product_id == 0:
         #     return {"ret_code": 30151, "message": u"产品ID错误"}
-        product = P2PProduct.objects.filter(pk=product_id).values('period', 'types_id').first()
+        try:
+            product = P2PProduct.objects.filter(pk=product_id).values('period', 'types_id').first()
+        except Exception:
+            product = None
         records_count = RedPackRecord.objects.filter(user=user, product_id=product_id) \
             .filter(redpack__event__rtype='interest_coupon').count()
 
