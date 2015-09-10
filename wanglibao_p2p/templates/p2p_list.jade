@@ -22,15 +22,16 @@ html
           for product in p2p_products
             status = product['display_status']
             .panel-p2p-product
-              if product.category == '新手标'
-                .new-user 新手福利
               .shadow-inner
                 .panel-title-bar
                   if product.category == '票据'
                     .bill-icon.di 票
                   elif product.warrant_company
                     .warrant-icon.di 担
-                  a(href="/p2p/detail/{{product.id}}") {{product.name}}
+                  a(href="/p2p/detail/{{product.id}}")
+                    if product.category == '新手标'
+                        .new-user 新手福利
+                    | {{product.name}}
                   if product.category == '证大速贷'
                     span.tip 满标后持满180天即可债权转让
                 .panel-content

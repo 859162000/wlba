@@ -246,6 +246,8 @@
       +inline-block
       +singleline-ellipsis()
       margin-bottom: 4px
+      span
+        line-height: 30px
       &:hover
         .icon
           color: $t-d2
@@ -263,7 +265,18 @@
         visibility: hidden
     &:hover
       background: $bg-d4
-
+    .new-user
+      width: 78px
+      height: 25px
+      float: left
+      margin-right: 4px
+      color: $bg-d13
+      font-size: $font-xs
+      padding-right: 3px
+      text-align: right
+      line-height: 33px
+      vertical-align: middle
+      @include home-sprite(new_user)
 
 //product end
 

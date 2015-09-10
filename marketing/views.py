@@ -1052,7 +1052,6 @@ class WanglibaoAwardActivity(APIView):
 
 
 def september_award_ajax(request):
-    activity = CommonAward(request)
     user = request.user
     action = request.POST.get('action',)
     if action == 'GET_AWARD':
@@ -1102,8 +1101,9 @@ class CommonAward(object):
             return HttpResponse(json.dumps(to_json_response), content_type='application/json' )
 
         channels = channels.channel.split(",")
-        invite_code = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
-        if invite_code not in channels:
+        record = IntroducedBy.objects.filter(user_id=self.request.user.id).first()
+
+        if not record or (record and record.channel.name not in channels):
             to_json_response = {
                 'ret_code': 3010,
                 'message': u'渠道用户不是从对应的渠道过来',
@@ -1232,10 +1232,10 @@ class CommonAward(object):
         user_activity.used_chances += 1
         user_activity.save(update_fields=["used_chances"])
 
-        describe = 'common_september_' + str(join_log.amount)
+        describe = 'common_september_' + str(int(join_log.amount))
         try:
             dt = timezone.datetime.now()
-            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,give_start_at__lte=dt, give_end_at__gte=dt).first()
+            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
         except Exception, reason:
             logger.debug("send redpack Exception, msg:%s" % (reason,))
 

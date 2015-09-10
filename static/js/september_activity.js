@@ -81,11 +81,21 @@
 		  var a;
           var $t = $(this);
           var $page = $('.page');
+          var errorWin = $(".errorWin");
+          var errorContent = $(".errorWin").find("#errorContent");
           var urlData = "IGNORE";
-          if(used_chances >= 3 || dataCode != 3011){
-            $('.page,.errorWin').show();
+          if(used_chances >= 3 && dataCode == 3011){
+            errorContent.text("您没有抽奖机会了");
+            errorWin.show();
+            $page.show();
+            return false;
+          }else if(dataCode != 3011){
+            errorContent.text("您不符合参加规则");
+            errorWin.show();
+            $page.show();
             return false;
           }
+
           giftInx = Math.floor((Math.random()*giftArr.length));
           a = runzp(giftArr[giftInx]);
           if(giftArr[giftInx] > 1){
@@ -93,7 +103,7 @@
           }else if(giftArr[giftInx] === 1 || giftArr[giftInx] === 0){
             urlData = "GET_GIFT";
           }else{
-            var urlData = "IGNORE";
+            urlData = "IGNORE";
           }
           $t.rotate({
             duration:3000,
@@ -102,6 +112,8 @@
             easing: $.easing.easeOutSine,
             callback: function(){
               $page.show();
+               used_chances++;
+              $("span.chance-num").text(3 - used_chances);
               if(giftArr[giftInx] != ""){
                 $('.winningDiv').show();
                 $('#moeny').text(a.prize);
@@ -117,7 +129,6 @@
               $page.width(document.body.clientWidth);
               $page.height(document.body.clientHeight);
               giftArr.splice(giftInx,1);
-              used_chances++;
             }
           });
           //success

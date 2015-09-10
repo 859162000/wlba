@@ -374,3 +374,49 @@ class WanglibaoActivityReward(models.Model):
     class Meta:
         verbose_name = u'网利宝发奖活动表'
         verbose_name_plural = u'网利宝发奖活动表'
+
+
+class WanglibaoActivityGift(models.Model):
+    """ 活动发奖配置表 """
+    TYPE = (
+        (0, u'红包'),
+        (1, u'加息券'),
+        (2, u'优惠券'),
+    )
+    type = models.IntegerField(choices=TYPE, default=0, verbose_name=u'奖品类型')
+    name = models.CharField(max_length=128, default=u'红包', verbose_name=u'奖品名称', help_text=u'例如：红包、加息券、优惠券等')
+    code = models.CharField(max_length=128, default="", verbose_name=u'奖品代码')
+    rate = models.IntegerField(default=0, verbose_name=u'获奖概率', help_text=u"获奖概率请直接填写数字，例如：获奖概率为20%，填写 20")
+    activity = models.CharField(max_length=128, default="", verbose_name=u'活动代码')
+    count = models.IntegerField(default=0, verbose_name=u'奖品个数', help_text=u'如果为0，表示不限个数')
+    channels = models.CharField(max_length=128, verbose_name=u'奖品发放渠道', help_text=u'各个渠道之间用空格分开; 如果为空，表示全渠道')
+    valid = models.BooleanField(default=True, verbose_name=u'该奖项是否启动', help_text=u'奖项默认是启用的')
+    class Meta:
+        verbose_name = u'活动奖品配置'
+        verbose_name_plural = u'活动奖品配置'
+
+
+class WanglibaoUserGift(models.Model):
+    """
+        用户获奖记录
+    """
+    TYPE = (
+        (0, u'红包'),
+        (1, u'加息券'),
+        (2, u'优惠券'),
+    )
+    SEND = (
+        (0, u'YES'),
+        (1, u'NO'),
+        (2, u'INVALID')
+    )
+    user = models.ForeignKey(User)
+    rules = models.ForeignKey(WanglibaoActivityGift)
+    activity = models.CharField(max_length=128, default="", verbose_name=u'活动代码')
+    index = models.IntegerField(default=0, verbose_name=u'特定活动内的奖品编号')
+    type = models.IntegerField(choices=TYPE, default=0, verbose_name=u'奖品类型')
+    name = models.CharField(max_length=128, default=u'红包', verbose_name=u'奖品名称', help_text=u'例如：红包、加息券、优惠券等')
+    valid = models.BooleanField(default=1, choices=SEND, verbose_name=u'奖品是否已发')
+    class Meta:
+        verbose_name = u'用户活动获奖记录'
+        verbose_name_plural = u'用户活动获奖记录'
