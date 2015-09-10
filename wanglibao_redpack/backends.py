@@ -56,8 +56,12 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
             product = P2PProduct.objects.filter(pk=product_id).values('period', 'types_id').first()
         except Exception:
             product = None
-        records_count = RedPackRecord.objects.filter(user=user, product_id=product_id) \
-            .filter(redpack__event__rtype='interest_coupon').count()
+
+        try:
+            records_count = RedPackRecord.objects.filter(user=user, product_id=product_id) \
+                .filter(redpack__event__rtype='interest_coupon').count()
+        except Exception:
+            records_count = 0
 
         if records_count == 0:
             # 红包
