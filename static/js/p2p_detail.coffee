@@ -369,9 +369,9 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
           if obj.highest_amount
             highest_amount = obj.highest_amount
-
+            
           if obj.method == '~'
-            text = [obj.name, ' 加息', obj.amount*100, '%'].join('')
+            text = [obj.name, ' 加息', Number((obj.amount * 100).toFixed(3)), '%'].join('')
             imageSrc = '/static/imgs/pc/p2p_detail/icon_jiaxi.png';
           else
             text = [obj.name, ' ', amount, '元'].join('')
