@@ -105,6 +105,10 @@
           }else{
             urlData = "IGNORE";
           }
+          //success
+          ajaxFun(urlData,function(data){
+            console.log(data);
+          });
           $t.rotate({
             duration:3000,
             angle: 0,
@@ -131,8 +135,7 @@
               giftArr.splice(giftInx,1);
             }
           });
-          //success
-          ajaxFun(urlData)
+
 		}
 	  }
 	});
@@ -247,6 +250,7 @@
     //是否是正确渠道
     function isRoute(data){
       dataCode = data.ret_code;
+      console.log(data);
       //if(dataCode != 3011){
       //  $("a.prize-arr img").removeClass("rotateImg").addClass("user-no-alert");
       //}
