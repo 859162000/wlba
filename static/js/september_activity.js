@@ -98,7 +98,7 @@
             a = runzp(giftArr[giftInx]);
             if(giftArr[giftInx] > 1){
               urlData = "GET_MONEY";
-            }else if(giftArr[giftInx] === 1 || giftArr[giftInx] === 0){
+            }else if(giftArr[giftInx] === 1 || giftArr[giftInx] === 2){
               urlData = "GET_GIFT";
             }else{
               urlData = "IGNORE";
@@ -117,7 +117,6 @@
             $page.show();
             return false;
           }
-
           $t.rotate({
             duration:3000,
             angle: 0,
@@ -218,13 +217,6 @@
     $(".now-register").on("click",function(){
       backTop();
     });
-
-    //非法用户弹层
-    //$("a.prize-arr").on("click",".user-no-alert",function(event){
-    //  event.stopPropagation();
-    //  event.preventDefault();
-    //  $('.page,.errorWin').show();
-    //});
 
     //中奖名单
     function userList(data){
