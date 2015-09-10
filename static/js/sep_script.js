@@ -12,7 +12,6 @@ function runzp(index) {
 	var temp = 0;
 	var returnobj = "1";
 	var index = index;
-	console.log(index,"index");
 	var angle = 330;
 	var message = "";
 	var myreturn = new Object;
