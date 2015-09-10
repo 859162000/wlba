@@ -75,6 +75,9 @@
     ajaxFun("ENTER_WEB_PAGE",giftOk);
 
     //转盘
+    function rotateFun(data){
+      console.log(data);
+    }
     $(".prize-arr .rotateImg").rotate({
       bind:{
         click:function(){
@@ -84,6 +87,22 @@
           var errorWin = $(".errorWin");
           var errorContent = $(".errorWin").find("#errorContent");
           var urlData = "IGNORE";
+          giftInx = Math.floor((Math.random()*giftArr.length));
+          if(giftArr.length < 1){
+            urlData = "IGNORE";
+          }else{
+            a = runzp(giftArr[giftInx]);
+            if(giftArr[giftInx] > 1){
+              urlData = "GET_MONEY";
+            }else if(giftArr[giftInx] === 1 || giftArr[giftInx] === 0){
+              urlData = "GET_GIFT";
+            }else{
+              urlData = "IGNORE";
+            }
+          }
+          //success
+          ajaxFun(urlData,rotateFun);
+
           if(used_chances >= 3 && dataCode == 3011){
             errorContent.text("您没有抽奖机会了");
             errorWin.show();
@@ -96,19 +115,7 @@
             return false;
           }
 
-          giftInx = Math.floor((Math.random()*giftArr.length));
-          a = runzp(giftArr[giftInx]);
-          if(giftArr[giftInx] > 1){
-            urlData = "GET_MONEY";
-          }else if(giftArr[giftInx] === 1 || giftArr[giftInx] === 0){
-            urlData = "GET_GIFT";
-          }else{
-            urlData = "IGNORE";
-          }
-          //success
-          ajaxFun(urlData,function(data){
-            console.log(data);
-          });
+
           $t.rotate({
             duration:3000,
             angle: 0,
