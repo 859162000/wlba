@@ -241,7 +241,7 @@ class redis_backend(object):
                 "completion_rate": p2p.completion_rate,
                 "limit_amount_per_user": p2p.limit_amount_per_user,
                 "current_limit": p2p.current_limit,
-                "available_amount": p2p.available_amout,
+                "available_amount": p2p.available_amount,
                 "is_taojin": p2p.is_taojin,
             }
         else:
