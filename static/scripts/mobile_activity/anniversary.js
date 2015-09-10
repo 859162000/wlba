@@ -163,7 +163,7 @@ org.anniversary = (function(org){
                                     success: function (xhr) {
                                         $(".rotateImg").addClass('rotateImgNo');
                                         if(xhr.ret_code == '3016') {
-                                            $('.errorWin').find('#errorContent').text('抱歉～您已经没有抽奖机会');
+                                            $('.errorWin').find('#errorContent').text('抱歉～您不符合参加规则');
                                             $('.errorWin').modal();
                                         }else {
                                             if (xhr.left >= 0) {

@@ -52,7 +52,8 @@ block main
             th 加息利率
             th 使用次数
             th 使用限额
-            th 使用门槛
+            th 投资门槛
+            th 使用范围<br/>期限(月/天)
             th(width='20%') 有效期
             if status == 'used'
               th 使用详情
@@ -69,6 +70,15 @@ block main
                 td 无
               else
                 td {{coupon.invest_amount}}元
+              td
+                if coupon.p2p_types_name
+                  | {{coupon.p2p_types_name}}
+                if coupon.p2p_types_name and coupon.period
+                  |  /
+                if not coupon.p2p_types_name and not coupon.period
+                  | 无
+                if coupon.period
+                  | {{coupon.period}}
               td {{coupon.available_at | milldate_format}} 至 {{coupon.unavailable_at | milldate_format}}
               if status == 'used'
                 td {{coupon.product}} <br/> {{coupon.apply_at | milltime_format }}
