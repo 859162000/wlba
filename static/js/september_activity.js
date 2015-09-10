@@ -22,6 +22,7 @@
     var giftArr = [""];
     var giftInx;
     var dataCode = 3011;
+    var retCode = 3013;
 
     //ajax
     function ajaxFun(action,fun){
@@ -30,6 +31,7 @@
         url: "/api/award/common_september/",
         dataType: "json",
         data: {action: action},
+        async: false,
         success: function(data){
           if(typeof fun === "function"){
             fun(data);
@@ -76,12 +78,13 @@
 
     //转盘
     function rotateFun(data){
-      console.log(data);
+      used_chances = data.used_chances;
+      retCode = data.ret_code;
     }
     $(".prize-arr .rotateImg").rotate({
       bind:{
         click:function(){
-		  var a;
+		  var a = 0;
           var $t = $(this);
           var $page = $('.page');
           var errorWin = $(".errorWin");
@@ -103,7 +106,7 @@
           //success
           ajaxFun(urlData,rotateFun);
 
-          if(used_chances >= 3 && dataCode == 3011){
+          if(retCode == 3024 && dataCode == 3011){
             errorContent.text("您没有抽奖机会了");
             errorWin.show();
             $page.show();
@@ -115,7 +118,6 @@
             return false;
           }
 
-
           $t.rotate({
             duration:3000,
             angle: 0,
@@ -123,8 +125,9 @@
             easing: $.easing.easeOutSine,
             callback: function(){
               $page.show();
-               used_chances++;
-              $("span.chance-num").text(3 - used_chances);
+              //used_chances++;
+              var hasChances = 3 - used_chances;
+              $("span.chance-num").text(hasChances >= 0 ? hasChances : 0);
               if(giftArr[giftInx] != ""){
                 $('.winningDiv').show();
                 $('#moeny').text(a.prize);
@@ -257,7 +260,6 @@
     //是否是正确渠道
     function isRoute(data){
       dataCode = data.ret_code;
-      console.log(data);
       //if(dataCode != 3011){
       //  $("a.prize-arr img").removeClass("rotateImg").addClass("user-no-alert");
       //}
