@@ -161,6 +161,9 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
             event = x.redpack.event
             if event.rtype == 'interest_coupon':
                 order_by = 1
+                if device_type == 'ios' or device_type == 'android':
+                    if app_version < "2.5.3":
+                        continue
             else:
                 order_by = 2
             start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
