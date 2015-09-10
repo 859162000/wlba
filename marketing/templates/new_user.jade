@@ -1,0 +1,11 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝官网' as title
+    include include/common_head
+    - endwith
+    link(rel="stylesheet",href="/static/styles/pc/pc.css")
+    link(rel="stylesheet",href="/static/stylesheets/new_user.sass.css")
+  body(style="background:#ffd200")
