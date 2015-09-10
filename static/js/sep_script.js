@@ -12,7 +12,6 @@ function runzp(index) {
 	var temp = 0;
 	var returnobj = "1";
 	var index = index;
-
 	var angle = 330;
 	var message = "";
 	var myreturn = new Object;
@@ -24,28 +23,28 @@ function runzp(index) {
         var angle3 = [ 298, 335 ];
 		var angle4 = [ 23, 65 ];
 		switch (index) {
-		  case 0:// 一等奖
+		  case 1:// 一等奖
 			var r0 = randomnum(angle0[0], angle0[1]);
 			angle = r0;
 			break;
-		  case 1:// 二等奖
+		  case 2:// 二等奖
 			var r1 = randomnum(angle1[0], angle1[1]);
 			angle = r1;
 			break;
-		  case 2:// 三等奖
+		  case 3:// 三等奖
 			var r2 = randomnum(angle2[0], angle2[1]);
 			angle = r2;
 			break;
-          case 3:// 四等奖
+          case 4:// 四等奖
 			var r3 = randomnum(angle3[0], angle3[1]);
 			angle = r3;
 			break;
-		  case 4:// 4等奖
+		  case 5:// 4等奖
 			var r4 = randomnum(angle4[0], angle4[1]);
 			angle = r4;
 			break;
 		}
-		myreturn.prize = obj[index].prize;
+		myreturn.prize = obj[index-1].prize;
 	} else {// 没有
 		message = "再接再厉";
 		var angle5 = [ -22, 19 ];
@@ -53,11 +52,11 @@ function runzp(index) {
 		var r = randomnum(5, 6);
 		var angle;
 		switch (r) {
-		case 5:
+		case 6:
 			var r5 = randomnum(angle5[0], angle5[1]);
 			angle = r5;
 			break;
-		case 6:
+		case 7:
 			var r6 = randomnum(angle6[0], angle6[1]);
 			angle = r6;
 			break;
