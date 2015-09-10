@@ -1,0 +1,54 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝官网' as title
+    include include/common_head
+    - endwith
+    link(rel="stylesheet",href="/static/styles/pc/pc.css")
+    link(rel="stylesheet",href="/static/stylesheets/new_user.css")
+  body(style="background:#ffd200")
+    .banner
+    .main-part
+      .welfare1.clearfix
+        span.welfare-icon
+        .welfare-box
+          p.welfare-tit 福利一：
+          p.welfare-cont
+            | 新手注册并实名即送20元红包 <br />
+            | ①注册 &nbsp;&nbsp; ②实名认证
+          p.btn-box
+            a(href="#").red-btn 注册领红包
+        img(src="/static/imgs/pc_activity/new_user/welfare-img1.png").welfare-img
+
+      .welfare2.clearfix
+        img(src="/static/imgs/pc_activity/new_user/welfare-img2.png").welfare-img
+        .welfare-box
+          p.welfare-tit 福利二：
+          p.welfare-cont
+            | 新手首次完成充值， <br />
+            | 即送100元红包。
+          p.btn-box
+            a(href="#").red-btn 注册充值
+        span.welfare-icon
+
+      .welfare3.clearfix
+        span.welfare-icon
+        .welfare-box
+          p.welfare-tit 福利三：
+          p.welfare-cont
+            | 新手投资理财最高送400元红包 <br />
+            | 首次单笔投资≥10000元 送200元 <br />
+            | 首次单笔投资≥30000元 送400元
+          p.btn-box
+            a(href="#").red-btn 我要理财
+        img(src="/static/imgs/pc_activity/new_user/welfare-img3.png").welfare-img
+    .rule-box
+      .rule-tit 【新手任务攻略】
+      .rule-cont
+        p.p1 1、新手注册及实名认证成功即获得20元红包（投资300元可直减使用）；
+        p.p1 2、新手首次充值成功即获得100元红包（投资2000元可直减使用）；
+        p.p1 3、新手首次投资满额即可获得红包奖励，规则如下：
+        p.p2 a).用户首次投资单笔达到10,000元以上（包含）即获得200元红包（二次投资20000元可直减使用）；
+        p.p2 b).用户首次投资单笔达到20,000元以上（包含）即获得400元红包（二次投资40000元可直减使用）。

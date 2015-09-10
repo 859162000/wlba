@@ -374,3 +374,5 @@ class WanglibaoActivityReward(models.Model):
     class Meta:
         verbose_name = u'网利宝发奖活动表'
         verbose_name_plural = u'网利宝发奖活动表'
+
+

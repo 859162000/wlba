@@ -31,7 +31,11 @@ class RedPacketChangeAPIView(APIView):
         token = request.DATA.get("token", "")
         device = utils.split_ua(request)
         user = request.user
-        result = backends.exchange_redpack(token, device['device_type'], user)
+        try:
+            app_version = device['app_version']
+        except KeyError:
+            app_version = ''
+        result = backends.exchange_redpack(token, device['device_type'], user, app_version)
         return Response(result)
 
 class RedPacketListAPIView(APIView):
@@ -43,7 +47,11 @@ class RedPacketListAPIView(APIView):
         product_id = request.DATA.get("product_id", "")
         device = utils.split_ua(request)
         user = request.user
-        result = backends.list_redpack(user, status, device['device_type'], product_id, rtype)
+        try:
+            app_version = device['app_version']
+        except KeyError:
+            app_version = ''
+        result = backends.list_redpack(user, status, device['device_type'], product_id, rtype, app_version)
         return Response(result)
 
 class RedPacketDeductAPIView(APIView):

@@ -147,7 +147,7 @@ html
             | 单笔投资满5000元再送
             span.money-box
               i 50
-            | 元现金红包
+            | 元折扣红包
           .btn-box.text-center
             if user.is_authenticated
               a(href="/p2p/list/").red-btn 立即投资
@@ -166,10 +166,10 @@ html
             li 手机号为网利宝唯一账户，通过活动新注册网利宝用户均可参与；
             li 红包有效期至2015年10月31日；
             li 新用户注册即送50元红包，此现金红包为直抵红包，投资满1000元即可抵扣使用；<br />
-              | 首次充值满150元红包（首次充值100元起），红包类型为折扣红包，折扣红包则按投资额0.5%抵扣使用（比如用户投资30000元，即可满额使用150元红包）；
+              | 首次充值送150元红包（首次充值100元起），红包类型为折扣红包，折扣红包则按投资额0.5%抵扣使用（比如用户投资30000元，即可满额使用150元红包）；<br />
               | 单笔投资满额5000元再送50元红包，50元红包为折扣红包，折扣红包按投资额0.5%抵扣使用；
             li 幸运大翻转红包均为抵扣红包，按投资额0.5%抵扣使用；
-            li 红包统一以站内信形式通知，完成一次投资回款后即可提现；
+            li 红包统一以站内信形式通知，完成一次投资回款后即可取现；
             li 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
             li 网利宝对此活动享有最终解释权。
         .gold-dl-row.clearfix
@@ -211,20 +211,48 @@ html
 
     .page(style='display:none')
     .errorWin.alert-box(style='display:none')
-        p 抱歉~您不符合参加规则
+        p.p1 对不起，亲~
+        p.p2#errorContent 您不符合参加规则
+        p
+          span
         p.winningBtn
           a(href='javascript:void(0)').spanBtn 好吧
-    .winningDiv.alert-box(style='display:none')
-        //.winningImg
+        p
+          a(href="javascript:void(0)").close-modal.spanBtn
+
+    .no-win.alert-box(style='display:none')
+      p
+          a(href="javascript:void(0)").close-modal.spanBtn
+      p.no-gift-icon
+      .no-win-cont
+        p.p1 亲！很遗憾没有中奖
+        p.p2 前世500次回眸才换得一次中奖，淡定！
+        p.chance-box 您还有
+          span.chance-num
+          | 次抽奖机会
+      p.winningBtn
+        a(href='javascript:void(0)').spanBtn 再来一次
+
+    .winningDiv(style='display:none')
+        p
+          a(href="javascript:void(0)").close-modal.spanBtn
+        .winningImg
         span.spanBtn
-        p 恭喜您获得
-          em#moeny
+        p.promote 恭喜您获得
+          em.gift-box#moeny
+        p.chance-box 您还有
+          span.chance-num
+          | 次抽奖机会
         .winningBtn
-            a(href='javascript:void(0)').againBtn 再抽一次
+            a(href='javascript:void(0)').againBtn 再来一次
 
     .promote-register.alert-box(style='display:none')
-      span.spanBtn
-      p 您需要先注册
+      p
+          a(href="javascript:void(0)").close-modal.spanBtn
+      p.p1 对不起，亲~
+      p.p2#errorContent 您需要先注册
+      p
+        span
       p.winningBtn
         a(href='javascript:void(0)').banner-register 立即去注册
     script.
