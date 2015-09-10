@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from wanglibao import settings
 import wanglibao_account
 
 
@@ -7,6 +8,7 @@ __author__ = 'rsj217'
 import requests
 import urllib
 import logging
+import json
 from wanglibao.celery import app
 
 from wanglibao_account.models import Binding
@@ -109,7 +111,8 @@ def xicai_send_data_task():
     :return:
     """
     from wanglibao_account.cooperation import xicai_send_data
-    xicai_send_data()
+    if settings.ENV == 'production':
+        xicai_send_data()
 
 
 @app.task
@@ -125,6 +128,40 @@ def jinshan_callback(url, params):
         logger.info(" {'jinshan callback':'failed to connect'} ")
         logger.info(e)
     
+    if ret:
+        logger.info(ret.text)
+
+
+@app.task
+def yiche_callback(url, params, channel):
+    logger.info("Enter %s_callback task===>>>" % channel)
+    ret = None
+    try:
+        logger.info(params)
+        ret = requests.post(url, data=params)
+        logger.info('%s callback url: %s'% (channel, ret.url))
+        logger.info('callback return: %s' % (ret.text))
+    except Exception, e:
+        logger.info(" {'%s callback':'failed to connect'} " % channel)
+        logger.info(e)
+
+    if ret:
+        logger.info(ret.text)
+
+
+@app.task
+def zgdx_callback(url, params, channel):
+    logger.info("Enter %s_callback task===>>>" % channel)
+    ret = None
+    try:
+        logger.info(params)
+        ret = requests.post(url, data=json.dumps(params))
+        logger.info('%s callback url: %s'% (channel, ret.url))
+        logger.info('callback return: %s' % (ret.text))
+    except Exception, e:
+        logger.info(" {'%s callback':'failed to connect'} " % channel)
+        logger.info(e)
+
     if ret:
         logger.info(ret.text)
 
@@ -171,3 +208,14 @@ def caimiao_rating_info_post_task():
     """
     from wanglibao_account.cooperation import caimiao_post_rating_info
     caimiao_post_rating_info()
+
+
+@app.task
+def zhongjin_post_task():
+    """
+    author: Zhoudong
+    向中金发送p2p 数据
+    :return:
+    """
+    from wanglibao_account.cooperation import zhongjin_post_p2p_info
+    zhongjin_post_p2p_info()

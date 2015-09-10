@@ -357,3 +357,22 @@ class ActivityJoinLog(models.Model):
 
     def __unicode__(self):
         return self.action_name
+
+
+class WanglibaoActivityReward(models.Model):
+    """
+        Author: add by Yihen@20150825
+        Description:网利宝发奖活动表
+    """
+    user = models.ForeignKey(User)
+    activity_id = models.CharField(max_length=128, verbose_name=u'活动编号')
+    total_chances = models.IntegerField(default=0, verbose_name=u'共有获奖机会')
+    used_chances = models.IntegerField(default=0, verbose_name=u'已用获奖机会')
+    total_awards = models.IntegerField(default=0, verbose_name=u'共有奖品数')
+    used_awards = models.IntegerField(default=0, verbose_name=u'已获奖数')
+
+    class Meta:
+        verbose_name = u'网利宝发奖活动表'
+        verbose_name_plural = u'网利宝发奖活动表'
+
+

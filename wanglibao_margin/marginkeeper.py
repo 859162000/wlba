@@ -4,6 +4,8 @@ from django.db import transaction
 from models import Margin, MarginRecord
 from exceptions import MarginLack, MarginNotExist
 from order.mixins import KeeperBaseMixin
+from order.models import Order
+from order.utils import OrderHelper
 import logging
 
 logger = logging.getLogger(__name__)
@@ -56,13 +58,14 @@ class MarginKeeper(KeeperBaseMixin):
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
-    def amortize(self, principal, interest, penal_interest, description=u'', savepoint=True):
+    def amortize(self, principal, interest, penal_interest, coupon_interest, description=u'', savepoint=True):
         check_amount(principal)
         check_amount(interest)
         check_amount(penal_interest)
         principal = Decimal(principal)
         interest = Decimal(interest)
         penal_interest = Decimal(penal_interest)
+        coupon_interest = Decimal(coupon_interest)
         with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
             catalog = u'还款入账'
@@ -73,6 +76,15 @@ class MarginKeeper(KeeperBaseMixin):
             if penal_interest > 0:
                 margin.margin += penal_interest
                 self.__tracer(catalog, penal_interest, margin.margin, u'罚息入账')
+            if coupon_interest > 0:
+                margin.margin += coupon_interest
+                description = u"加息存入{}元".format(coupon_interest)
+                order_id = OrderHelper.place_order(self.user, order_type=Order.INTEREST_COUPON,
+                                                   status=u'新建', amount=coupon_interest).id
+                # self.hike_deposit(coupon_interest, u"加息存入{}元".format(coupon_interest), order_id, savepoint=False)
+                self.__tracer(u"加息存入", coupon_interest, margin.margin, description, order_id)
+                OrderHelper.update_order(Order.objects.get(pk=order_id), user=self.user,
+                                         status=u'成功', amount=coupon_interest)
             margin.save()
 
     def withdraw_pre_freeze(self, amount, description=u'', savepoint=True):

@@ -8,7 +8,8 @@ from django.forms import formsets
 from django.utils import timezone
 from reversion.admin import VersionAdmin
 from models import P2PProduct, Warrant, WarrantCompany, P2PRecord, P2PEquity, Attachment, ContractTemplate, Earning,\
-    P2PProductContract, InterestPrecisionBalance, ProductInterestPrecision, InterestInAdvance, AutomaticPlan, AutomaticManager
+    P2PProductContract, InterestPrecisionBalance, ProductInterestPrecision, InterestInAdvance, AutomaticPlan,\
+    AutomaticManager, ProductType
 from models import AmortizationRecord, ProductAmortization, EquityRecord, UserAmortization, P2PEquityJiuxian
 from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
@@ -321,7 +322,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
 
 class UserAmortizationAdmin(ConcurrentModelAdmin):
     actions = None
-    list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest')
+    list_display = ('product_amortization', 'user', 'principal', 'interest', 'penal_interest', 'coupon_interest')
     search_fields = ('user__wanglibaouserprofile__phone', 'product_amortization__product__name')
     raw_id_fields = ('product_amortization', 'user')
 
@@ -384,7 +385,8 @@ class WarrantAdmin(admin.ModelAdmin):
 class AmortizationRecordAdmin(admin.ModelAdmin):
     actions = None
     list_display = (
-        'catalog', 'order_id', 'amortization', 'user', 'term', 'principal', 'interest', 'penal_interest', 'description')
+        'catalog', 'order_id', 'amortization', 'user', 'term',
+        'principal', 'interest', 'penal_interest', 'coupon_interest', 'description')
     search_fields = ('user__wanglibaouserprofile__phone',)
     raw_id_fields = ('amortization', 'user')
 
@@ -651,9 +653,23 @@ class AutomaticManagerAdmin(admin.ModelAdmin):
 class ContractTemplateAdmin(admin.ModelAdmin):
     actions = None
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class WarrantCompanyAdmin(admin.ModelAdmin):
     actions = None
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+class ProductTypeAdmin(admin.ModelAdmin):
+    actions = None
+    list_display = ('name', 'description', 'priority')
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 admin.site.register(P2PProduct, P2PProductAdmin)
@@ -674,6 +690,7 @@ admin.site.register(ProductInterestPrecision, ProductInterestPrecisionAdmin)
 admin.site.register(P2PEquityJiuxian, P2PEquityJiuxianAdmin)
 admin.site.register(AutomaticPlan, AutomaticPlanAdmin)
 admin.site.register(AutomaticManager, AutomaticManagerAdmin)
+admin.site.register(ProductType, ProductTypeAdmin)
 
 admin.site.register_view('p2p/userreport', view=GenP2PUserProfileReport.as_view(), name=u'生成p2p用户表')
 admin.site.register_view('p2p/amortization', view=AdminAmortization.as_view(), name=u'还款计算器')

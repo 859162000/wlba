@@ -42,20 +42,27 @@ var org = (function(){
                 }
                 return Math.floor(result * 100) / 100;
             };
-            dom.on('input', function(e) {
-                var earning, earning_element, earning_elements, fee_earning, fee_element, fee_elements;
-                var target = $(e.target),
+
+            dom.on('input', function() {
+                _inputCallback();
+            });
+
+            function _inputCallback(){
+                var earning, earning_element, earning_elements, fee_earning;
+                var target = $('input[data-role=p2p-calculator]'),
                     existing = parseFloat(target.attr('data-existing')),
                     period = target.attr('data-period'),
                     rate = target.attr('data-rate')/100,
                     pay_method = target.attr('data-paymethod');
                     activity_rate = target.attr('activity-rate')/100;
+                    activity_jiaxi = target.attr('activity-jiaxi')/100;
                     amount = parseFloat(target.val()) || 0;
 
                 if (amount > target.attr('data-max')) {
                     amount = target.attr('data-max');
                     target.val(amount);
                 }
+                activity_rate += activity_jiaxi;
                 amount = parseFloat(existing) + parseFloat(amount);
                 earning = calculate(amount, rate, period, pay_method);
                 fee_earning = calculate(amount, activity_rate, period, pay_method);
@@ -64,27 +71,19 @@ var org = (function(){
                     earning = 0;
                 }
                 earning_elements = (target.attr('data-target')).split(',');
-                fee_elements = (target.attr('fee-target')).split(',');
 
                 for (var i = 0; i < earning_elements.length; i ++) {
                     earning_element = earning_elements[i];
                     if (earning) {
+                        fee_earning = fee_earning ? fee_earning : 0;
                         earning += fee_earning;
                         $(earning_element).text(earning.toFixed(2));
                     } else {
                         $(earning_element).text("0.00");
                     }
                 }
-                for (var j = 0; j < fee_elements.length;  j++) {
-                    fee_element = fee_elements[j];
-                    if (fee_earning) {
-                       $(fee_element).text(fee_earning);
-                    } else {
-                        $(fee_element).text("0.00");
-                    }
-                }
-                callback && callback(target);
-            });
+                callback && callback();
+            }
         },
         _getQueryStringByName:function(name){
             var result = location.search.match(new RegExp('[\?\&]' + name+ '=([^\&]+)','i'));
@@ -774,8 +773,23 @@ org.buy=(function(org){
         redPackAmount: 0,
         isBuy: true, //防止多次请求，后期可修改布局用button的disable，代码罗辑会少一点
         init :function(){
+            lib._checkRedpack();
             lib._calculate();
             lib._buy();
+        },
+        _checkRedpack: function(){
+            var productID = $(".invest-one").attr('data-protuctid');
+            org.ajax({
+                type: 'POST',
+                url: '/api/redpacket/selected/',
+                data: {product_id: productID},
+                success: function(data){
+                    if(data.ret_code === 0 ){
+                        lib.amountInout.attr('activity-jiaxi', data.amount);
+                        $('.redpack-already').show().find('.already-amount').text(data.amount + '%');
+                    }
+                }
+            });
         },
         /*
         * 购买页收益计算器
@@ -801,33 +815,40 @@ org.buy=(function(org){
                 senderAmount = 0; //实际支付金额;
             lib.redPackAmountNew = 0 ;
             if(redPackVal){ //如果选择了红包
-                console.log(inputAmount)
                 if(!inputAmount){
                     $(".redpack-investamount").hide();//未达到红包使用门槛
                     lib.$redpackSign.hide();//红包直抵提示
                     return
                 }
+
                 if(inputAmount < redPackInvestamount){
                     lib.$redpackSign.hide();//红包直抵提示
                     lib.$redpackForAmount.hide();//请输入投资金额
                     return $(".redpack-investamount").show();//未达到红包使用门槛
                 }else{
+                    lib.amountInout.attr('activity-jiaxi', 0);
                     if(redPackMethod == '*'){ //百分比红包
                         //如果反回来的百分比需要除于100 就把下面if改成if (inputAmount * redPackAmount/100 > redPackHighest_amount)
-                        if(inputAmount * redPackAmount >= redPackHighest_amount){//是否超过最高抵扣
+                        if(inputAmount * redPackAmount >= redPackHighest_amount && redPackHighest_amount > 0){//是否超过最高抵扣
                            repPackDikou = redPackHighest_amount;
                         }else{//没有超过最高抵扣
                             repPackDikou = inputAmount * redPackAmount;
                         }
+                    }else if(redPackMethod == '~'){
+                        lib.amountInout.attr('activity-jiaxi', redPackAmount * 100);
+                        repPackDikou = 0;
+                        lib.$redpackSign.hide();
                     }else{  //直抵红包
                         repPackDikou = parseInt(redPackAmount);
                     }
                     senderAmount = inputAmount - repPackDikou;
                     lib.redPackAmountNew = repPackDikou;
-                    lib.showredPackAmount.text(repPackDikou);//红包抵扣金额
-                    lib.showAmount.text(senderAmount);//实际支付金额
+                    if(redPackMethod != '~'){
+                        lib.showredPackAmount.text(repPackDikou);//红包抵扣金额
+                        lib.showAmount.text(senderAmount);//实际支付金额
+                        lib.$redpackSign.show();//红包直抵提示
+                    }
                     $(".redpack-investamount").hide();//未达到红包使用门槛
-                    lib.$redpackSign.show();//红包直抵提示
                 }
             }else{
                 lib.$redpackSign.hide();//红包直抵提示
@@ -837,24 +858,24 @@ org.buy=(function(org){
         },
         _buy:function(){
             var $buyButton = $('.snap-up'),
-                $redpack = $("#gifts-package"), redpackAmount,
-                reg =/^\d+(\.\d+)?$/;
+                $redpack = $("#gifts-package");
             //红包select事件
             $redpack.on("change",function(){
                 if($(this).val() != ''){
-                    lib.amountInout.val() == '' ? $('.redpack-for-amount').show() : lib._setRedpack();
+                    lib.amountInout.val() == '' ?  $('.redpack-for-amount').show(): lib._setRedpack();
                 }else{
+                    lib.amountInout.attr('activity-jiaxi', 0);
                     $(".redpack-investamount").hide();//未达到红包使用门槛
                     lib.$redpackSign.hide();
                 }
+                return lib.amountInout.trigger('input');
             });
 
             $buyButton.on('click',function(){
                 var $buySufficient = $('.buy-sufficient'),
                     balance = parseFloat($("#balance").attr("data-value")),
                     amount = $('.amount').val() *1,
-                    productID = $(".invest-one").attr('data-protuctid'),
-                    redPackAmount = 0;
+                    productID = $(".invest-one").attr('data-protuctid');
                 if(amount){
                     if(amount % 100 !== 0) return org.ui.alert('请输入100的倍数金额');
                     if(amount > balance)  return $buySufficient.show();
@@ -864,10 +885,8 @@ org.buy=(function(org){
                 var redpackValue = $redpack[0].options[$redpack[0].options.selectedIndex].value;
                 if(!redpackValue || redpackValue == ''){
                     redpackValue = null;
-                }else{
-                    redPackAmount = parseInt(lib.redPackSelect.find('option').eq(lib.redPackSelect.get(0).selectedIndex).attr('data-amount'));
-                    redPackAmount ? "" : redPackAmount = 0;
                 }
+
                 if(lib.isBuy){
                    if(confirm("购买金额为" + amount)){
                         org.ajax({
@@ -905,7 +924,6 @@ org.buy=(function(org){
                                         org.ui.alert("登录超时，请重新登录！",function(){
                                             return window.location.href = '/weixin/login/?next=/weixin/view/buy/' + productID + '/';
                                         });
-
                                     }
                                 }
                             },

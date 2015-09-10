@@ -111,12 +111,12 @@ html
                           user_limit = u"1元起投"
                         else
                           user_limit = u"100的整数倍"
-                        -render_field form.amount class+="span12" type="text" style="line-height:40px" placeholder=user_limit p2p-type=p2p.category data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning data-rate=p2p.expected_earning_rate data-period=p2p.period data-paymethod=p2p.pay_method activity-rate=p2p.activity.activity_rule_percent_text maxlength="8"
+                        -render_field form.amount class+="span12" type="text" style="line-height:40px" placeholder=user_limit activity-jiaxi='0' p2p-type=p2p.category data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning data-rate=p2p.expected_earning_rate data-period=p2p.period data-paymethod=p2p.pay_method activity-rate=p2p.activity.activity_rule_percent_text maxlength="8"
                       .form-row-error
 
                   if user.is_authenticated and red_packets > 0
                     .row.margin-top-s
-                      span.span4 可用红包
+                      span.span4 可用理财券
                       span.span8-omega
                         .red-pack
 
@@ -127,13 +127,21 @@ html
                       | 元
                       if p2p.activity
                         if user.is_authenticated
-                          //if xunlei_vip.isvip == True
-                          span.font-m +&nbsp;
-                          span.blue.font-m#xunlei-vip-income-head 0.00
+                          acStyle = 'display:inline-block'
+                        else
+                          acStyle = 'display:none'
+                      else
+                        acStyle = 'display:none'
+                      span#vip-income-warp(style="{{acStyle}}")
+                        span.font-m +&nbsp;
+                        span.blue.font-m#xunlei-vip-income-head 0.00
 
                   .row.redpack_tip(style="line-height:24px")
                     span.span12.payment(style="padding-left:24px;display:none")
                       红包使用200元,实际支付2元
+                    span.span12.blue.use-jiaxi(style="padding-left:24px;color:red;font-size:12px;display:none") 您已使用过&nbsp
+                      span.blue.use-jiaxi-amount
+                      |加息券，继续享有加息，不可使用其他理财券
                   .row
                     span.span4
                       //author: hetao; time: 2014.10.11 target: 用户未登陆时先弹出登陆框
@@ -356,8 +364,7 @@ html
             .space-vertical-s
 
     script.
-      var v = new Date().getTime()
-      require(['/static/js/p2p_detail.js?v='+v, '/static/js/index.js?v='+v])
+      require(['/static/js/p2p_detail.js'])
     include global/g_footer
 
     include include/tracking

@@ -1,0 +1,166 @@
+doctype html
+html
+  head
+    meta(name="format-detection" content="telephone=no,email=no")
+    title 你最喜欢什么样的自己？
+    meta(charset="utf-8")
+    meta(content="telephone=no,email=no" ,name="format-detection")
+    meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
+    meta(content="yes" ,name="apple-mobile-web-app-capable")
+    link(href="/static/styles/mobile_activity/app_fullpage.css?v=201509091", rel="stylesheet")
+  body
+    .wp
+      #play
+      //http://wanglibao1.oss-cn-beijing.aliyuncs.com/better.mp3
+      //src 换成上面链接
+      audio#music(loop='loop',style='width:0;height:0;position:absolute;top:0;')
+        source(type="audio/mpeg", src="/static/imgs/mobile_activity/app_fullpage/betters.mp3?v=20150909" )
+      .loadPage#loadPage
+        .load-warp
+          .logo
+          .process 0%
+
+      .wp-inner#fullpage-warp
+        .page.page1
+          .sketch
+          .mask.fadeIn
+
+        .page.page2
+          .sketch
+          .people.fadeIn
+          .mask.fadeIn
+          .ele1.fadeIn
+          .ele2.moveUp
+          .title1.zoomIn
+          .title2.moveUp
+
+        .page.page3
+          .sketch
+          .people.fadeIn
+          .mask.fadeIn
+          .ele1.fadeIn
+          .ele2.moveUp
+          .title1.moveDown
+          .title2.moveLeft
+
+        .page.page4
+          .sketch
+          .people.fadeIn
+          .mask.fadeIn
+          .ele1.moveDown
+          .ele2.fadeIn
+          .title1.moveDown
+          .title2.moveLeft
+
+        .page.page5
+          .sketch
+          .people.fadeIn
+          .mask.fadeIn
+          .ele1.moveUp
+          .title1.moveDown
+          .title2.moveLeft
+
+        .page.page6
+          .sketch
+          .people.fadeIn
+          .mask.fadeIn
+          .ele1.moveUp
+          .ele2.moveDown
+          .title1.moveDown
+          .title2.moveLeft
+          .title3.zoomIn
+
+        .page.page7
+          .sketch
+          img(src='/static/imgs/mobile_activity/app_fullpage/last_logo.png').logo
+          img(src='/static/imgs/mobile_activity/app_fullpage/share.jpg').share
+          .footer-warp
+            img(src='/static/imgs/mobile_activity/app_fullpage/last_titi2.png').last-title
+            //img(src='/static/imgs/mobile_activity/app_fullpage/last_erweima.png').last-erweima
+
+            img(src='/static/imgs/mobile_activity/app_fullpage/last_footer.png').last-footer
+            a(href='/activity/app_pc_download/').last-download
+      span.start#arrow(style='pointer-events: none;')
+        b
+    script(src="/static/scripts/mobile_activity/dist/fullpage.js")
+    script.
+      $(function(){
+          var _ = $('#fullpage-warp'), loading = $('#loadPage'), arrow = $('#arrow'),
+                  play = $('#play'), music = document.getElementById('music');
+          play.on('click', function (e) {
+            if (music.paused) {
+              music.play();
+              play.addClass('play').removeClass('close');
+            } else {
+              music.pause();
+              play.addClass('close').removeClass('play');
+            }
+          })
+          music.play();
+          $(document).one('touchstart', function () {
+            music.play();
+          })
+          _.fullpage({
+            page: '.page',
+            change: function (data) {
+              data.cur + 1 === _.find('.page').size() ? arrow.hide() : arrow.show();
+            }
+          });
+          var queue = new createjs.LoadQueue();
+          queue.on('progress', function () {
+            var num = Math.floor(queue.progress * 100);
+            $('.process').text(num + '%');
+          }, this);
+          queue.on('complete', function () {
+            loading.remove();
+          }, this);
+          queue.loadManifest([
+            {id: 'image1', src: '/static/imgs/mobile_activity/app_fullpage/music.png'},
+            {id: 'image2', src: '/static/imgs/mobile_activity/app_fullpage/arrow.png'},
+            {id: 'image3', src: '/static/imgs/mobile_activity/app_fullpage/first_page.jpg'},
+            {id: 'image4', src: '/static/imgs/mobile_activity/app_fullpage/first_title320.png'},
+            {id: 'image5', src: '/static/imgs/mobile_activity/app_fullpage/me_1.jpg'},
+            {id: 'image6', src: '/static/imgs/mobile_activity/app_fullpage/me_2.jpg'},
+            {id: 'image7', src: '/static/imgs/mobile_activity/app_fullpage/me_mask.png'},
+            {id: 'image8', src: '/static/imgs/mobile_activity/app_fullpage/me_4.png'},
+            {id: 'image9', src: '/static/imgs/mobile_activity/app_fullpage/me_5.png'},
+            {id: 'image10', src: '/static/imgs/mobile_activity/app_fullpage/me_3.png'},
+            {id: 'image11', src: '/static/imgs/mobile_activity/app_fullpage/me_tit2.png'},
+            {id: 'image12', src: '/static/imgs/mobile_activity/app_fullpage/j_1.jpg'},
+            {id: 'image13', src: '/static/imgs/mobile_activity/app_fullpage/j_2.jpg'},
+            {id: 'image14', src: '/static/imgs/mobile_activity/app_fullpage/j_3.png'},
+            {id: 'image15', src: '/static/imgs/mobile_activity/app_fullpage/j_4.png'},
+            {id: 'image16', src: '/static/imgs/mobile_activity/app_fullpage/j_mask.png'},
+            {id: 'image17', src: '/static/imgs/mobile_activity/app_fullpage/j_title1.png'},
+            {id: 'image18', src: '/static/imgs/mobile_activity/app_fullpage/j_title2.png'},
+            {id: 'image19', src: '/static/imgs/mobile_activity/app_fullpage/j_title3.png'},
+            {id: 'image20', src: '/static/imgs/mobile_activity/app_fullpage/t_1.jpg'},
+            {id: 'image21', src: '/static/imgs/mobile_activity/app_fullpage/t_2.jpg'},
+            {id: 'image22', src: '/static/imgs/mobile_activity/app_fullpage/t_3.png'},
+            {id: 'image23', src: '/static/imgs/mobile_activity/app_fullpage/t_mask.png'},
+            {id: 'image24', src: '/static/imgs/mobile_activity/app_fullpage/t_title1.png'},
+            {id: 'image25', src: '/static/imgs/mobile_activity/app_fullpage/t_title2.png'},
+            {id: 'image26', src: '/static/imgs/mobile_activity/app_fullpage/m_1.jpg'},
+            {id: 'image27', src: '/static/imgs/mobile_activity/app_fullpage/m_2.jpg'},
+            {id: 'image28', src: '/static/imgs/mobile_activity/app_fullpage/m_3.png'},
+            {id: 'image29', src: '/static/imgs/mobile_activity/app_fullpage/m_4.png'},
+            {id: 'image30', src: '/static/imgs/mobile_activity/app_fullpage/m_mask.png'},
+            {id: 'image31', src: '/static/imgs/mobile_activity/app_fullpage/m_title1.png'},
+            {id: 'image32', src: '/static/imgs/mobile_activity/app_fullpage/m_title2.png'},
+            {id: 'image33', src: '/static/imgs/mobile_activity/app_fullpage/q_1.jpg'},
+            {id: 'image34', src: '/static/imgs/mobile_activity/app_fullpage/q_2.jpg'},
+            {id: 'image35', src: '/static/imgs/mobile_activity/app_fullpage/q_3.png'},
+            {id: 'image36', src: '/static/imgs/mobile_activity/app_fullpage/q_4.png'},
+            {id: 'image37', src: '/static/imgs/mobile_activity/app_fullpage/q_mask.png'},
+            {id: 'image38', src: '/static/imgs/mobile_activity/app_fullpage/q_title1.png'},
+            {id: 'image39', src: '/static/imgs/mobile_activity/app_fullpage/q_title2.png'},
+            {id: 'image40', src: '/static/imgs/mobile_activity/app_fullpage/last_titi3.png'},
+            {id: 'image41', src: '/static/imgs/mobile_activity/app_fullpage/last_logo.png'},
+            {id: 'image42', src: '/static/imgs/mobile_activity/app_fullpage/last_titi2.png'},
+            {id: 'image43', src: '/static/imgs/mobile_activity/app_fullpage/last_erweima.png'},
+            {id: 'image44', src: '/static/imgs/mobile_activity/app_fullpage/last_footer.png'},
+            {id: 'image44', src: '/static/imgs/mobile_activity/app_fullpage/share.jpg'},
+
+          ]);
+
+      })

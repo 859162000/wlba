@@ -5,8 +5,6 @@
     height: auto
     display: block
 
-
-
 .lottery-content
   position: relative
   width: 100%
@@ -87,10 +85,11 @@
     img
       width: 100%
       height: auto
+      max-height: 8rem
       display: block
 
 
-.lottery-rules-warp
+.lottery-rules-warp 
   position: fixed
   top: 0
   bottom: 0
@@ -102,8 +101,8 @@
   text-align: justify
   line-height: 1.5rem
   -webkit-transition: -webkit-transform 200ms ease-out
-
   -webkit-transform: translate3d(0, 100%, 0)
+  font-size: $font-size12
   display: none
   p
     margin-bottom: .5rem
@@ -111,6 +110,12 @@
     height: 100%
     overflow-y: auto
     -webkit-overflow-scrolling: touch
+    h4
+      text-align: center
+    .red-rules
+      color: red
+    .rules-center
+      text-align: center
   .lottery-rulse-close
     position: fixed
     top: 0
