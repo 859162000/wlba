@@ -1,0 +1,43 @@
+-load formatters
+-load mathfilters
+-load widget_tweaks
+
+doctype html
+html
+  head
+    title = ct.name
+    include include/common_head
+    meta(name="keywords", content="网利宝")
+    meta(name="description", content="网利宝是针对中国中产阶级人群的一站式网络理财服务平台，网利宝把国外传统的“私人银行”模式引入中国，我们通过独有的用户投资专业评估体系和个人理财数据分析算法，利用PC和移动互联网等方式，为客户提供个性化投资产品推荐，降低理财门槛，提高投资者的理财收益水平。")
+
+  body
+    include include/header
+    include include/navigation
+
+    include announcement_block
+    .space-m
+    .full-container-home.clearfix
+      .p2p-container.dark-gray.border-all
+        .span8.p2p-detail-container
+            p {{ct.name}}
+            .copp {{ct.content|safe}}
+            p#dii
+        .span4-omega.invest-form.border-left
+          form(method="POST", action="{{request.url}}").pull-left
+            -csrf_token
+            .space-vertical-xxxl
+            .space-vertical-xxxl
+            button.button-primary(type="submit") 复制
+
+            a.button-primary.margin-left-m(href='/{{ "" | admin_address}}/wanglibao_p2p/contracttemplate/') 返回
+
+
+
+
+    script.
+        //document.getElementById('dii').innerHTML={{ct.content|safe}};
+       // alert(a);
+
+    include include/footer
+    include include/tracking
+    include include/verify

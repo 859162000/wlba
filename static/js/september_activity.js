@@ -96,7 +96,7 @@
             urlData = "IGNORE";
           }else{
             a = runzp(giftArr[giftInx]);
-            if(giftArr[giftInx] > 1){
+            if(giftArr[giftInx] > 2){
               urlData = "GET_MONEY";
             }else if(giftArr[giftInx] === 1 || giftArr[giftInx] === 2){
               urlData = "GET_GIFT";

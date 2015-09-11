@@ -780,6 +780,11 @@ CKEDITOR_CONFIGS = {
             ['Smiley', 'SpecialChar'],
         ],
         'toolbar': 'custom',
+    },
+    "mini":{
+        'toolbar': [
+                {'items': ['Source']},
+            ]
     }
 }
 
