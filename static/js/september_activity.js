@@ -41,6 +41,27 @@
       });
     }
 
+    function isGift(str){
+      var inx;
+      switch (str){
+        case 100:
+          inx = 5;
+          break;
+        case 150:
+          inx = 4;
+          break;
+        case 200:
+          inx = 3;
+          break;
+        case "抠电影":
+          inx = 2;
+          break;
+        case "爱奇艺":
+          inx = 1;
+          break;
+      }
+      return inx;
+    }
     //用户抽奖信息
     function giftOk(data){
       var inx = 0;
@@ -50,27 +71,12 @@
       amount_left = data.amount_left;
       used_chances = data.used_chances;
       if(amount != "None" && amount_left != 0){
-        switch (amount){
-          case 100:
-            inx = 5;
-            break;
-          case 150:
-            inx = 4;
-            break;
-          case 200:
-            inx = 3;
-            break;
-        }
-        giftArr.push(inx);
+        giftArr.push(isGift(amount));
       }else{
         giftArr.push("");
       }
       if(gift != "None" && gift_left != 0){
-        if(gift == "抠电影"){
-          giftArr.push(2);
-        }else if(gift == "爱奇艺"){
-          giftArr.push(1);
-        }
+        giftArr.push(isGift(gift));
       }else{
         giftArr.push("");
       }
@@ -79,9 +85,27 @@
 
     //转盘
     function rotateFun(data){
+      console.log(data);
       used_chances = data.used_chances;
       retCode = data.ret_code;
+      if(data.money && retCode === 3025){
+        for(var i=0; i< giftArr.length; i++){
+          if(giftArr[i] > 2){
+            giftArr.splice(i,1);
+            break;
+          }
+        }
+      }
+      if(data.gift && retCode === 3025){
+        for(var i=0; i< giftArr.length; i++){
+          if(giftArr[i] > 0 && giftArr[i] <= 2){
+            giftArr.splice(i,1);
+            break;
+          }
+        }
+      }
     }
+    var clickB = true;
     $(".prize-arr .rotateImg").rotate({
       bind:{
         click:function(){
@@ -91,6 +115,7 @@
           var errorWin = $(".errorWin");
           var errorContent = $(".errorWin").find("#errorContent");
           var urlData = "IGNORE";
+
           giftInx = Math.floor((Math.random()*giftArr.length));
           if(giftArr.length < 1){
             urlData = "IGNORE";
@@ -117,12 +142,19 @@
             $page.show();
             return false;
           }
+          if(clickB){
+            clickB = false;
+          }else{
+            return false;
+          }
+
           $t.rotate({
             duration:3000,
             angle: 0,
             animateTo:1440+a.angle,
             easing: $.easing.easeOutSine,
             callback: function(){
+              clickB = true;
               $page.show();
               //used_chances++;
               var hasChances = 3 - used_chances;
