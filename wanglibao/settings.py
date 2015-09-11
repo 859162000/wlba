@@ -780,6 +780,11 @@ CKEDITOR_CONFIGS = {
             ['Smiley', 'SpecialChar'],
         ],
         'toolbar': 'custom',
+    },
+    "mini":{
+        'toolbar': [
+                {'items': ['Source']},
+            ]
     }
 }
 
@@ -957,10 +962,8 @@ else:
     ZGDX_KEY = 'H5gOs1ZshKZ6WikN'
     ZGDX_IV = '8888159601152533'
 
-
 # 对第三方回调做IP鉴权所信任的IP列表
 TRUST_IP = []
-
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100

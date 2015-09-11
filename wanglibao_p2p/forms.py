@@ -3,6 +3,7 @@ from captcha.fields import CaptchaField
 import django.forms as forms
 from django.forms.models import BaseInlineFormSet
 from wanglibao_p2p.models import P2PProduct
+from ckeditor.widgets import CKEditorWidget
 
 
 class PurchaseForm(forms.Form):
@@ -48,3 +49,9 @@ class RequiredInlineFormSet(BaseInlineFormSet):
         form = super(RequiredInlineFormSet, self)._construct_form(i, **kwargs)
         form.empty_permitted = False
         return form
+
+
+
+class ContractTemplateForm(forms.ModelForm):
+    content = forms.CharField(widget=CKEditorWidget(config_name="mini"))
+    content_preview = forms.CharField(widget=CKEditorWidget(config_name="mini"))

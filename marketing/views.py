@@ -1062,6 +1062,7 @@ class WanglibaoAwardActivity(APIView):
 def september_award_ajax(request):
     user = request.user
     action = request.POST.get('action',)
+    logger.debug("in activity common_award_september, User Action: %s" % (action,))
     if action == 'GET_AWARD':
         return ajax_get_activity_record('common_award_sepetember')
     if not user.is_authenticated():
@@ -1069,6 +1070,7 @@ def september_award_ajax(request):
             'ret_code': 4000,
             'message': u'用户没有登陆，请先登陆',
         }
+        logger.debug("in activity common_award_september, User NO LOG IN")
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
     activity = CommonAward(request)
@@ -1109,6 +1111,7 @@ class CommonAward(object):
             return HttpResponse(json.dumps(to_json_response), content_type='application/json' )
 
         channels = channels.channel.split(",")
+        logger.debug("in activity common_award_september, set Channels: %s")
         record = IntroducedBy.objects.filter(user_id=self.request.user.id).first()
 
         if not record or (record and record.channel.name not in channels):
@@ -1182,6 +1185,16 @@ class CommonAward(object):
 
     def ignore_user_action(self):
         user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
+        if user_activity.total_chances <= user_activity.used_chances:
+            to_json_response = {
+                'ret_code': 3024,
+                'total_chances': user_activity.total_chances,
+                'used_chances': user_activity.used_chances,
+                'gift': u'None',
+                'message': u'您的抽奖机会已经用完了',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
         user_activity.used_chances += 1
         user_activity.save(update_fields=["used_chances"])
         to_json_response = {
@@ -1210,7 +1223,8 @@ class CommonAward(object):
             gift.save(update_fields=["join_times"])
 
         user_activity.used_chances += 1
-        user_activity.save(update_fields=["used_chances"])
+        user_activity.used_awards += 1
+        user_activity.save(update_fields=["used_chances", "used_awards"])
         now = timezone.now()
 
         #发放奖品
@@ -1259,7 +1273,8 @@ class CommonAward(object):
 
         user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
         user_activity.used_chances += 1
-        user_activity.save(update_fields=["used_chances"])
+        user_activity.used_awards += 1
+        user_activity.save(update_fields=["used_chances", "used_awards"])
 
         describe = 'common_september_' + str(int(join_log.amount))
         try:
@@ -1285,7 +1300,6 @@ class CommonAward(object):
             每次进入转盘页面，如果用户是第一次玩，会创建WanglibaoActivityReward记录
         """
         user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user).first()
-        print self.request.user.id
         if not user_activity:
             user_activity = WanglibaoActivityReward.objects.create(
                 user=self.request.user,

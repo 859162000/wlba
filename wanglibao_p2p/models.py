@@ -39,6 +39,11 @@ class ContractTemplate(models.Model):
     content = models.TextField(u'模板内容（真实合同）', default='')
     content_preview = models.TextField(verbose_name=u'模板内容（预览合同）', default='')
 
+    def copy_link(self):
+        return u'<a href="/p2p/ct/copy/%s" target="_blank">复制</a>' % str(self.id)
+    copy_link.short_description = u'复制'
+    copy_link.allow_tags = True
+
     class Meta:
         verbose_name = u'借款合同'
         verbose_name_plural = u'借款合同'

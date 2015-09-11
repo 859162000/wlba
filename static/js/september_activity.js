@@ -19,6 +19,7 @@
         amount = '',
         amount_left = 0,
         used_chances = 3;
+
     var giftArr = [""];
     var giftInx;
     var dataCode = 3011;
@@ -51,13 +52,13 @@
       if(amount != "None" && amount_left != 0){
         switch (amount){
           case 100:
-            inx = 4;
+            inx = 5;
             break;
           case 150:
-            inx = 3;
+            inx = 4;
             break;
           case 200:
-            inx = 2;
+            inx = 3;
             break;
         }
         giftArr.push(inx);
@@ -66,9 +67,9 @@
       }
       if(gift != "None" && gift_left != 0){
         if(gift == "抠电影"){
-          giftArr.push(1);
+          giftArr.push(2);
         }else if(gift == "爱奇艺"){
-          giftArr.push(0);
+          giftArr.push(1);
         }
       }else{
         giftArr.push("");
@@ -84,7 +85,7 @@
     $(".prize-arr .rotateImg").rotate({
       bind:{
         click:function(){
-		  var a = 0;
+          var a = {};
           var $t = $(this);
           var $page = $('.page');
           var errorWin = $(".errorWin");
@@ -95,9 +96,9 @@
             urlData = "IGNORE";
           }else{
             a = runzp(giftArr[giftInx]);
-            if(giftArr[giftInx] > 1){
+            if(giftArr[giftInx] > 2){
               urlData = "GET_MONEY";
-            }else if(giftArr[giftInx] === 1 || giftArr[giftInx] === 0){
+            }else if(giftArr[giftInx] === 1 || giftArr[giftInx] === 2){
               urlData = "GET_GIFT";
             }else{
               urlData = "IGNORE";
@@ -105,7 +106,6 @@
           }
           //success
           ajaxFun(urlData,rotateFun);
-
           if(retCode == 3024 && dataCode == 3011){
             errorContent.text("您没有抽奖机会了");
             errorWin.show();
@@ -117,7 +117,6 @@
             $page.show();
             return false;
           }
-
           $t.rotate({
             duration:3000,
             angle: 0,
@@ -218,13 +217,6 @@
     $(".now-register").on("click",function(){
       backTop();
     });
-
-    //非法用户弹层
-    //$("a.prize-arr").on("click",".user-no-alert",function(event){
-    //  event.stopPropagation();
-    //  event.preventDefault();
-    //  $('.page,.errorWin').show();
-    //});
 
     //中奖名单
     function userList(data){
