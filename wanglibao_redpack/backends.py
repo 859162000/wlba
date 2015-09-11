@@ -552,10 +552,18 @@ def deduct_calc(amount, redpack_amount):
 
 
 def get_interest_coupon(user, product_id):
-    records = RedPackRecord.objects.filter(user=user, product_id=product_id) \
-        .filter(redpack__event__rtype='interest_coupon').first()
-    redpack_records = RedPackRecord.objects.filter(user=user, product_id=product_id) \
-        .exclude(redpack__event__rtype='interest_coupon').first()
+    try:
+        records = RedPackRecord.objects.filter(user=user, product_id=product_id) \
+            .filter(redpack__event__rtype='interest_coupon').first()
+    except Exception:
+        records = None
+
+    try:
+        redpack_records = RedPackRecord.objects.filter(user=user, product_id=product_id) \
+            .exclude(redpack__event__rtype='interest_coupon').first()
+    except Exception:
+        redpack_records = None
+
     if records:
         amount = records.redpack.event.amount
         return {"ret_code": 0, "used_type": u"coupon", "amount": amount}

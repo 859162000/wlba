@@ -44,6 +44,9 @@ class WanglibaoUserProfile(models.Model):
     gesture_pwd = models.CharField(u'手势密码', max_length=9, default='')
     gesture_is_enabled = models.BooleanField(u'手势密码是否启用', default=False)
 
+    trade_pwd = models.CharField(u'交易密码', max_length=128, default='')
+    trade_pwd_failed_count = models.IntegerField(help_text=u'交易密码连续输入错误次数', default=0)
+    trade_pwd_last_failed_time = models.IntegerField(help_text=u'交易密码最后一次输入失败的时间',default=0)
 
     def __unicode__(self):
         return "phone: %s nickname: %s  %s" % (self.phone, self.nick_name, self.user.username)

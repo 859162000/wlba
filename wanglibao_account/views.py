@@ -29,6 +29,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView, View
 from registration.views import RegistrationView
+from rest_framework import status
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -173,6 +174,25 @@ def password_change(request,
     # TODO find a proper status value and return error message
     return HttpResponse(status=400)
 
+class PasswordCheckView(APIView):
+    permission_classes = ()
+    def post(self, request, **kwargs):
+        identifier = request.DATA.get("identifier", "")
+        password = request.DATA.get("password", "")
+
+        if not identifier or not password:
+            return Response({"token":False, "message":u"用户名或密码错误"})
+
+        user = authenticate(identifier=identifier, password=password)
+
+        if not user:
+            return Response({"token":False, "message":u"用户名或密码错误"})
+        if not user.is_active:
+            return Response({"token":False, "message":u"用户已被关闭"})
+        if user.wanglibaouserprofile.frozen:
+            return Response({"token":False, "message":u"用户已被冻结"})
+
+        return Response({'token':True, 'message':u'用户认证成功'})
 
 class PasswordResetValidateView(TemplateView):
     template_name = 'password_reset_phone.jade'
@@ -1389,7 +1409,7 @@ class AdminSendMessageAPIView(APIView):
         phone = request.DATA.get("phone", "")
         title = request.DATA.get("title", "")
         content = request.DATA.get("content", "")
-        mtype = request.DATA.get("mtype", "")
+        mtype = request.DATA.get("mtype", "activity")
         if not phone or not title or not content or not mtype:
             return Response({"ret_code": 1, "message": "信息输入不完整"})
         user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
