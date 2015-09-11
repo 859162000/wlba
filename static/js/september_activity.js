@@ -118,6 +118,9 @@
           var errorWin = $(".errorWin");
           var errorContent = $(".errorWin").find("#errorContent");
           var urlData = "IGNORE";
+          
+          giftArr = [];
+          ajaxFun("ENTER_WEB_PAGE",giftOk);
 
           giftInx = Math.floor((Math.random()*giftArr.length));
           if(giftArr.length < 1){
