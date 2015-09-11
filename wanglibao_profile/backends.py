@@ -44,7 +44,7 @@ def _trade_pwd_lock_is_locked(profile):
     if profile.trade_pwd_failed_count >= TRADE_PWD_LOCK_MAX_RETRY and trade_pwd_in_lock_time:
         return True
     else:
-        False
+        return False
 
 def _trade_pwd_lock_touch(profile):
     '''
