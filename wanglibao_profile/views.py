@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from wanglibao_profile.backends import trade_pwd_is_set, trade_pwd_set
 from wanglibao_profile.serializers import ProfileSerializer
 from wanglibao_account.models import VerifyCounter
 from wanglibao.const import ErrorNumber
@@ -57,7 +58,8 @@ class ProfileView(APIView):
             "cards_number":len(cards),
             "gesture_pwd": str_add_md5(str(profile.gesture_pwd)),
             "gesture_is_enabled": profile.gesture_is_enabled,
-            "promo_token":user.promotiontoken.token
+            "promo_token":user.promotiontoken.token,
+            'trade_pwd_is_set': trade_pwd_is_set(profile.user_id)
         }
         return Response(dic)
         #serializer = ProfileSerializer(user.wanglibaouserprofile)
@@ -96,3 +98,27 @@ class ProfileView(APIView):
 
         profile_serializer.save()
         return Response(profile_serializer.data, status=status.HTTP_200_OK)
+
+class TradePasswordView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        '''
+        前段post的参数
+        action_type: =1.设置初始密码；=2.使用旧交易密码修改新交易密码；=3.同时使用银行卡和身份证修改旧交易密码
+        old_trade_pwd: 交易密码
+        new_trade_pwd: 新交易密码
+        card_id:   银行卡号
+        citizen_id: 身份证号
+	    requirement_check:是否只进行设置条件检查
+        :param request:
+        :return:
+        '''
+        # def trade_pwd_set(user_id, action_type, new_trade_pwd=None, old_trade_pwd=None,  card_id=None, citizen_id=None):
+        result = trade_pwd_set(request.user.id,
+                               request.DATA.get('action_type'),
+                               new_trade_pwd= request.DATA.get('new_trade_pwd'),
+                               old_trade_pwd=request.DATA.get('old_trade_pwd'),
+                               card_id=request.DATA.get('card_id'),
+                               citizen_id=request.DATA.get('citizen_id'))
+        return Response(result)
