@@ -55,8 +55,11 @@ def _trade_pwd_lock_touch(profile):
     profile.trade_pwd_last_failed_time = time.time()
 
 def trade_pwd_is_set(user_id):
-    profile = WanglibaoUserProfile.objects.get(user__id=user_id)
-    return True if profile.trade_pwd else False
+    profile = WanglibaoUserProfile.objects.filter(user__id=user_id).first()
+    if profile and profile.trade_pwd:
+        return True
+    else:
+        return False
 
 def trade_pwd_set(user_id, action_type, new_trade_pwd=None, old_trade_pwd=None,  card_id=None, citizen_id=None):
     '''
@@ -77,8 +80,12 @@ def trade_pwd_set(user_id, action_type, new_trade_pwd=None, old_trade_pwd=None, 
         {'ret_code':1, 'message': '旧交易密码错误，交易密码设置失败'}
         {'ret_code':2, 'message': '银行卡或身份证信息有误，交易密码设置失败'}
         {'ret_code':3, 'message': '交易密码已经存在，初始交易密码设置失败'}
+        {'ret_code':4, 'message': '用户ID错误，无法获取用户身份'}
     '''
-    profile = WanglibaoUserProfile.objects.get(user__id=user_id)
+
+    profile = WanglibaoUserProfile.objects.filter(user__id=user_id).first()
+    if not profile:
+        return {'ret_code':4, 'message': '用户ID错误，无法获取用户身份'}
 
     if action_type == 1 and profile.trade_pwd:
         return {'ret_code':3, 'message': '交易密码已经存在，初始交易密码设置失败'}
@@ -108,7 +115,9 @@ def trade_pwd_check(user_id, raw_trade_pwd):
             {'ret_code':30048,'message':'重试次数过多，交易密码被锁定’, 'retry_count':1}
             {'ret_code’:30049,'message':'交易密码校验发生未知错误'，'retry_count':1 }
     '''
-    profile = WanglibaoUserProfile.objects.get(user__id=user_id)
+    profile = WanglibaoUserProfile.objects.filter(user__id=user_id).first()
+    if not profile:
+        return {'ret_code':4, 'message': '用户ID错误，无法获取用户身份'}
 
     if not profile.trade_pwd:
         return {'ret_code':30046,'message':'未设置交易密码', 'retry_count':TRADE_PWD_LOCK_MAX_RETRY}

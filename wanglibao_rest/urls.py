@@ -12,7 +12,7 @@ from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIV
                             AddressGetAPIView, AccountInviteAPIView, MessageListAPIView,
                             MessageCountAPIView, MessageDetailAPIView,
                             AutomaticApiView, AccountInviteHikeAPIView,AccountInviteAllGoldAPIView,
-                            AccountInviteIncomeAPIView)
+                            AccountInviteIncomeAPIView, password_change,  PasswordCheckView)
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -105,6 +105,7 @@ urlpatterns = patterns(
     url(r'^register/wx/$', WeixinRegisterAPIView.as_view()),
     url(r'^change_password/$', ChangePasswordAPIView.as_view()),
     url(r'^reset_password/$', ResetPasswordAPI.as_view()),
+    url(r'^check_password/$', PasswordCheckView.as_view()),
     url(r'captcha_validation/(?P<phone>\d{11})/$', CaptchaValidationCodeView.as_view()),
     url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendRegisterValidationCodeView.as_view()),
