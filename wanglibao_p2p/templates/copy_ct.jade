@@ -9,28 +9,36 @@ html
     include include/common_head
     meta(name="keywords", content="网利宝")
     meta(name="description", content="网利宝是针对中国中产阶级人群的一站式网络理财服务平台，网利宝把国外传统的“私人银行”模式引入中国，我们通过独有的用户投资专业评估体系和个人理财数据分析算法，利用PC和移动互联网等方式，为客户提供个性化投资产品推荐，降低理财门槛，提高投资者的理财收益水平。")
-
+    link(rel="stylesheet",href="/static/stylesheets/ct.css")
   body
     include include/header
     include include/navigation
 
     include announcement_block
     .space-m
-    .full-container-home.clearfix
+    .ct-back
+    .full-container-home.ct-height.clearfix(style='position: relative')
       .p2p-container.dark-gray.border-all
         .span8.p2p-detail-container
           .ct-big(style='width: 107%;border-right: 1px solid #e7e7e7;')
             p(style='text-align: center;font-size: 20px;color: #000000;line-height: 94px;') {{ct.name}}
             .copp(style='color: #000000;padding: 21px;') {{ct.content|safe}}
             .ct#dii
-        .span4-omega.invest-form.border-left(style='border-left: none;border-left: none;background: #ffffff;border-bottom: solid 1px #d9d9d9;')
+        .span4-omega.invest-form.border-left.ct-e(style='border-left: none;border-left: none;background: #ffffff;border-bottom: solid 1px #d9d9d9;')
           form(method="POST", action="{{request.url}}").pull-left(style='margin-left: 44px;')
             -csrf_token
             .space-vertical-xxxl
             .space-vertical-xxxl
-            button.button-primary(type="submit") 复制
+            .button-primary.ct-button 复制
+            .tan
+              p 你确定要复制么？
+              button.ct-shi 是
+              .ct-fou 否
 
             a.button-primary.margin-left-m(href='/{{ "" | admin_address}}/wanglibao_p2p/contracttemplate/') 返回
+    script.
+      var v = new Date().getTime()
+      require(['/static/js/ct.js?v='+v])
 
     include include/footer
     include include/tracking
