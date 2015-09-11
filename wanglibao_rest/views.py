@@ -44,7 +44,7 @@ from wanglibao_account.forms import IdVerificationForm, verify_captcha
 #from marketing.helper import RewardStrategy, which_channel, Channel
 from wanglibao_rest.utils import split_ua, get_client_ip
 from django.http import HttpResponseRedirect
-from wanglibao.templatetags.formatters import safe_phone_str1
+from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
 from marketing.tops import Top
 from marketing import tools
 from django.conf import settings
