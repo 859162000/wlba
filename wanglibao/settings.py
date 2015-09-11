@@ -970,6 +970,7 @@ else:
     local_ip = '127.0.0.1'
 TRUST_IP = [
     local_ip,
+    # 中国电信出口ip
     '182.140.241.10',
 ]
 
