@@ -19,9 +19,11 @@
         amount = '',
         amount_left = 0,
         used_chances = 3;
+
     var giftArr = [""];
     var giftInx;
     var dataCode = 3011;
+    var retCode = 3013;
 
     //ajax
     function ajaxFun(action,fun){
@@ -30,6 +32,7 @@
         url: "/api/award/common_september/",
         dataType: "json",
         data: {action: action},
+        async: false,
         success: function(data){
           if(typeof fun === "function"){
             fun(data);
@@ -49,13 +52,13 @@
       if(amount != "None" && amount_left != 0){
         switch (amount){
           case 100:
-            inx = 4;
+            inx = 5;
             break;
           case 150:
-            inx = 3;
+            inx = 4;
             break;
           case 200:
-            inx = 2;
+            inx = 3;
             break;
         }
         giftArr.push(inx);
@@ -64,9 +67,9 @@
       }
       if(gift != "None" && gift_left != 0){
         if(gift == "抠电影"){
-          giftArr.push(1);
+          giftArr.push(2);
         }else if(gift == "爱奇艺"){
-          giftArr.push(0);
+          giftArr.push(1);
         }
       }else{
         giftArr.push("");
@@ -75,25 +78,44 @@
     ajaxFun("ENTER_WEB_PAGE",giftOk);
 
     //转盘
+    function rotateFun(data){
+      used_chances = data.used_chances;
+      retCode = data.ret_code;
+    }
     $(".prize-arr .rotateImg").rotate({
       bind:{
         click:function(){
-		  var a;
+          var a = {};
           var $t = $(this);
           var $page = $('.page');
+          var errorWin = $(".errorWin");
+          var errorContent = $(".errorWin").find("#errorContent");
           var urlData = "IGNORE";
-          if(used_chances >= 3 || dataCode != 3011){
-            $('.page,.errorWin').show();
-            return false;
-          }
           giftInx = Math.floor((Math.random()*giftArr.length));
-          a = runzp(giftArr[giftInx]);
-          if(giftArr[giftInx] > 1){
-            urlData = "GET_MONEY";
-          }else if(giftArr[giftInx] === 1 || giftArr[giftInx] === 0){
-            urlData = "GET_GIFT";
+          if(giftArr.length < 1){
+            urlData = "IGNORE";
           }else{
-            var urlData = "IGNORE";
+            a = runzp(giftArr[giftInx]);
+            if(giftArr[giftInx] > 1){
+              urlData = "GET_MONEY";
+            }else if(giftArr[giftInx] === 1 || giftArr[giftInx] === 2){
+              urlData = "GET_GIFT";
+            }else{
+              urlData = "IGNORE";
+            }
+          }
+          //success
+          ajaxFun(urlData,rotateFun);
+          if(retCode == 3024 && dataCode == 3011){
+            errorContent.text("您没有抽奖机会了");
+            errorWin.show();
+            $page.show();
+            return false;
+          }else if(dataCode != 3011){
+            errorContent.text("您不符合参加规则");
+            errorWin.show();
+            $page.show();
+            return false;
           }
           $t.rotate({
             duration:3000,
@@ -102,6 +124,9 @@
             easing: $.easing.easeOutSine,
             callback: function(){
               $page.show();
+              //used_chances++;
+              var hasChances = 3 - used_chances;
+              $("span.chance-num").text(hasChances >= 0 ? hasChances : 0);
               if(giftArr[giftInx] != ""){
                 $('.winningDiv').show();
                 $('#moeny').text(a.prize);
@@ -117,11 +142,9 @@
               $page.width(document.body.clientWidth);
               $page.height(document.body.clientHeight);
               giftArr.splice(giftInx,1);
-              used_chances++;
             }
           });
-          //success
-          ajaxFun(urlData)
+
 		}
 	  }
 	});
@@ -194,13 +217,6 @@
     $(".now-register").on("click",function(){
       backTop();
     });
-
-    //非法用户弹层
-    //$("a.prize-arr").on("click",".user-no-alert",function(event){
-    //  event.stopPropagation();
-    //  event.preventDefault();
-    //  $('.page,.errorWin').show();
-    //});
 
     //中奖名单
     function userList(data){

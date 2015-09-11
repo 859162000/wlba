@@ -133,7 +133,6 @@ def save_to_binding(user, record, request):
         pass
 
 
-# 判断网站来自mobile还是pc
 def check_mobile(request):
     """
     demo :
@@ -915,7 +914,6 @@ class ZhiTuiRegister(CoopRegister):
             common_callback.apply_async(
                 kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
-
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
@@ -1674,7 +1672,6 @@ class ZhongniuP2PQuery(APIView):
             if len(products) > 0:
                 ret['status'] = 0
                 for product in products:
-                    # 现在是招标前不往对方推送. 0状态不会被匹配.
                     if product.status in [u'录标', u'录标完成', u'待审核']:
                         status = 0
                     elif product.status == u'正在招标':

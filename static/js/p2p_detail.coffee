@@ -325,11 +325,16 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
   $.post('/api/redpacket/selected/'
     product_id: $('input[name=product]').val() * 1
   ).done (data) ->
-    code = data.ret_code
-    if code == 0
-      $('.use-jiaxi').show()
-      $('.use-jiaxi-amount').text(data.amount + '% ');
-      $('#id_amount').attr('activity-jiaxi', data.amount)
+    if data.ret_code == 0
+      if data.used_type == "redpack"
+
+        $('.use-jiaxi').html(data.message).show()
+
+      else if  data.used_type == "coupon"
+
+        $('.use-jiaxi-amount').text(data.amount + '% ');
+        $('#id_amount').attr('activity-jiaxi', data.amount)
+        $('.use-jiaxi').show()
 
   ddData = []
   if $('.red-pack').size() > 0
@@ -369,9 +374,9 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
 
           if obj.highest_amount
             highest_amount = obj.highest_amount
-
+            
           if obj.method == '~'
-            text = [obj.name, ' 加息', obj.amount*100, '%'].join('')
+            text = [obj.name, ' 加息', Number((obj.amount * 100).toFixed(3)), '%'].join('')
             imageSrc = '/static/imgs/pc/p2p_detail/icon_jiaxi.png';
           else
             text = [obj.name, ' ', amount, '元'].join('')

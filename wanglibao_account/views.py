@@ -526,6 +526,7 @@ class AccountInviteAPIView(APIView):
             res.append(invite)
         return Response({"ret_code":0, "data":res})
 
+
 class AccountInviteAllGoldAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
@@ -537,7 +538,7 @@ class AccountInviteAllGoldAPIView(APIView):
         first_count, second_count = dic['first_count'], dic['second_count']
         first_intro = dic['first_intro']
         commission = dic['commission']
-        
+
         introduces = IntroducedBy.objects.filter(introduced_by=request.user).select_related("user__wanglibaouserprofile").all()
         keys = commission.keys()
         for x in introduces:
@@ -547,7 +548,7 @@ class AccountInviteAllGoldAPIView(APIView):
             else:
                 first_intro.append([safe_phone_str(x.user.wanglibaouserprofile.phone), 0, 0])
 
-        return Response({"ret_code":0, "first":{"amount":first_amount, 
+        return Response({"ret_code":0, "first":{"amount":first_amount,
                         "earning":first_earning, "count":first_count, "intro":first_intro},
                         "second":{"amount":second_amount, "earning":second_earning,
                         "count":second_count}, "count":len(introduces)})
