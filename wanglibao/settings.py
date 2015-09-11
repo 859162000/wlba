@@ -782,6 +782,7 @@ CKEDITOR_CONFIGS = {
         'toolbar': 'custom',
     },
     "mini":{
+        'entities':False,
         'toolbar': [
                 {'items': ['Source']},
             ]
