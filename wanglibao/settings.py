@@ -782,6 +782,7 @@ CKEDITOR_CONFIGS = {
         'toolbar': 'custom',
     },
     "mini":{
+        'entities':False,
         'toolbar': [
                 {'items': ['Source']},
             ]
@@ -943,6 +944,7 @@ ZHITUI_CALL_BACK_URL = 'http://api.zhitui.com/wanglibao/recive.php'
 
 # 中国电信
 WLB_FOR_ZGDX_KEY = '2001'
+ZGDX_QUERY_INTERFACE_URL = 'http://182.140.241.47:8080/ESB/flowService.do'
 if ENV == ENV_PRODUCTION:
     ZGDX_CALL_BACK_URL = 'http://118.123.170.72:8888/fps/flowService.do'
     ZGDX_PARTNER_NO = '100054374'
@@ -963,7 +965,15 @@ else:
     ZGDX_IV = '8888159601152533'
 
 # 对第三方回调做IP鉴权所信任的IP列表
-TRUST_IP = []
+if ENV == ENV_PRODUCTION:
+    local_ip = None
+else:
+    local_ip = '127.0.0.1'
+TRUST_IP = [
+    local_ip,
+    # 中国电信出口ip
+    '182.140.241.10',
+]
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100

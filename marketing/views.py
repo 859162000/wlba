@@ -921,7 +921,7 @@ class WanglibaoAwardActivity(APIView):
             Description:判断用户是不是在活动期间内注册的新用户
         """
         create_at = int(time.mktime(self.user.date_joined.date().timetuple()))  # 用户注册的时间戳
-        activity_start = time.mktime(datetime(2014, 8, 1).timetuple())  # 活动开始时间
+        activity_start = time.mktime(datetime(2014, 1, 1).timetuple())  # 活动开始时间
 
         if activity_start > create_at:
             to_json_response = {
@@ -1219,9 +1219,12 @@ class CommonAward(object):
         else:
             gift = ActivityJoinLog.objects.filter(action_name='common_award_sepetember', user=self.request.user).exclude(Q(gift_name=u'现金红包')|Q(gift_name=u"None")).first()
             if gift and gift.join_times == 0:
+                user_activity.used_chances += 1
+                user_activity.save(update_fields=["used_chances"])
                 to_json_response = {
                     'ret_code': 3025,
                     'type': "gift",
+                    'used_chances': user_activity.used_chances,
                     'message': u'您的奖品已经被领走了',
                 }
                 return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -1277,9 +1280,12 @@ class CommonAward(object):
         else:
             join_log = ActivityJoinLog.objects.filter(action_name='common_award_sepetember', user=self.request.user, amount__gt=0).first()
             if join_log and join_log.join_times == 0:
+                user_activity.used_chances += 1
+                user_activity.save(update_fields=["used_chances"])
                 to_json_response = {
                     'ret_code': 3025,
                     'type': "money",
+                    'used_chances': user_activity.used_chances,
                     'message': u'您的奖品已经被领走了',
                 }
                 return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -1290,7 +1296,6 @@ class CommonAward(object):
             join_log.join_times = 0
             join_log.save(update_fields=["join_times"])
 
-        user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
         user_activity.used_chances += 1
         user_activity.used_awards += 1
         user_activity.save(update_fields=["used_chances", "used_awards"])

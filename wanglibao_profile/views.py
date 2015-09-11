@@ -110,15 +110,21 @@ class TradePasswordView(APIView):
         new_trade_pwd: 新交易密码
         card_id:   银行卡号
         citizen_id: 身份证号
-	    requirement_check:是否只进行设置条件检查
+	    requirement_check:requirement_check: =1只进行条件检查，校验旧密码或是银行卡，身份证时使用该参数， =0进行条件检查和设置交易密码
         :param request:
         :return:
         '''
         # def trade_pwd_set(user_id, action_type, new_trade_pwd=None, old_trade_pwd=None,  card_id=None, citizen_id=None):
+        if request.DATA.get('requirement_check') == '1':
+            requirement_check = True
+        else:
+            requirement_check = False
+
         result = trade_pwd_set(request.user.id,
                                request.DATA.get('action_type'),
                                new_trade_pwd= request.DATA.get('new_trade_pwd'),
                                old_trade_pwd=request.DATA.get('old_trade_pwd'),
                                card_id=request.DATA.get('card_id'),
-                               citizen_id=request.DATA.get('citizen_id'))
+                               citizen_id=request.DATA.get('citizen_id'),
+                               only_requirement_check=requirement_check)
         return Response(result)

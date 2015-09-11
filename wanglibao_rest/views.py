@@ -275,7 +275,7 @@ class RegisterAPIView(APIView):
         if invite_code:
             set_promo_user(request, user, invitecode=invite_code)
             # 外呼系统登记信息
-            save_to_binding(user, record, request)
+            save_to_binding(user, request)
             
 
         if device['device_type'] == "pc":
