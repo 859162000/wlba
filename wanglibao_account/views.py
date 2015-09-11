@@ -1409,7 +1409,7 @@ class AdminSendMessageAPIView(APIView):
         phone = request.DATA.get("phone", "")
         title = request.DATA.get("title", "")
         content = request.DATA.get("content", "")
-        mtype = request.DATA.get("mtype", "")
+        mtype = request.DATA.get("mtype", "activity")
         if not phone or not title or not content or not mtype:
             return Response({"ret_code": 1, "message": "信息输入不完整"})
         user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
