@@ -1062,6 +1062,7 @@ class WanglibaoAwardActivity(APIView):
 def september_award_ajax(request):
     user = request.user
     action = request.POST.get('action',)
+    logger.debug("in activity common_award_september, User Action: %s" % (action,))
     if action == 'GET_AWARD':
         return ajax_get_activity_record('common_award_sepetember')
     if not user.is_authenticated():
@@ -1069,6 +1070,7 @@ def september_award_ajax(request):
             'ret_code': 4000,
             'message': u'用户没有登陆，请先登陆',
         }
+        logger.debug("in activity common_award_september, User NO LOG IN")
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
     activity = CommonAward(request)
@@ -1109,6 +1111,7 @@ class CommonAward(object):
             return HttpResponse(json.dumps(to_json_response), content_type='application/json' )
 
         channels = channels.channel.split(",")
+        logger.debug("in activity common_award_september, set Channels: %s")
         record = IntroducedBy.objects.filter(user_id=self.request.user.id).first()
 
         if not record or (record and record.channel.name not in channels):
