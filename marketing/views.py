@@ -977,8 +977,7 @@ class WanglibaoAwardActivity(APIView):
             count = ActivityJoinLog.objects.filter(action_name='celebrate_award', amount=money).aggregate(counts=Count('id'))
             return count["counts"]
 
-        result = {key: get_counts(value) for key, value in award_amount.iteritems()}
-
+        result = {key: get_counts(key) for key in award_amount.keys()}
         if activity_id % 100 == 0:
             for award in (1000, 500, 200):
                 if result[award] < award_amount[award]:
@@ -1183,6 +1182,16 @@ class CommonAward(object):
 
     def ignore_user_action(self):
         user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
+        if user_activity.total_chances <= user_activity.used_chances:
+            to_json_response = {
+                'ret_code': 3024,
+                'total_chances': user_activity.total_chances,
+                'used_chances': user_activity.used_chances,
+                'gift': u'None',
+                'message': u'您的抽奖机会已经用完了',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
         user_activity.used_chances += 1
         user_activity.save(update_fields=["used_chances"])
         to_json_response = {
@@ -1211,7 +1220,8 @@ class CommonAward(object):
             gift.save(update_fields=["join_times"])
 
         user_activity.used_chances += 1
-        user_activity.save(update_fields=["used_chances"])
+        user_activity.used_awards += 1
+        user_activity.save(update_fields=["used_chances", "used_awards"])
         now = timezone.now()
 
         #发放奖品
@@ -1260,7 +1270,8 @@ class CommonAward(object):
 
         user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
         user_activity.used_chances += 1
-        user_activity.save(update_fields=["used_chances"])
+        user_activity.used_awards += 1
+        user_activity.save(update_fields=["used_chances", "used_awards"])
 
         describe = 'common_september_' + str(int(join_log.amount))
         try:
@@ -1286,7 +1297,6 @@ class CommonAward(object):
             每次进入转盘页面，如果用户是第一次玩，会创建WanglibaoActivityReward记录
         """
         user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user).first()
-        print self.request.user.id
         if not user_activity:
             user_activity = WanglibaoActivityReward.objects.create(
                 user=self.request.user,

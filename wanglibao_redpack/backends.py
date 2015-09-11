@@ -50,11 +50,18 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
     device_type = _decide_device(device_type)
     if status == "available":
         packages = {"available": []}
-        if not product_id or product_id == 0:
-            return {"ret_code": 30151, "message": u"产品ID错误"}
-        product = P2PProduct.objects.filter(pk=product_id).values('period', 'types_id').first()
-        records_count = RedPackRecord.objects.filter(user=user, product_id=product_id) \
-            .filter(redpack__event__rtype='interest_coupon').count()
+        # if not product_id or product_id == 0:
+        #     return {"ret_code": 30151, "message": u"产品ID错误"}
+        try:
+            product = P2PProduct.objects.filter(pk=product_id).values('period', 'types_id').first()
+        except Exception:
+            product = None
+
+        try:
+            records_count = RedPackRecord.objects.filter(user=user, product_id=product_id) \
+                .filter(redpack__event__rtype='interest_coupon').count()
+        except Exception:
+            records_count = 0
 
         if records_count == 0:
             # 红包
@@ -68,19 +75,21 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                     continue
                 event = x.redpack.event
                 redpack_period = int(event.period)
-                if redpack_period > 0:
-                    if redpack_period != int(product['period']):
-                        continue
-                print event.p2p_types
-                if event.p2p_types:
-                    p2p_types_id = int(event.p2p_types.id)
-                    if product['types_id']:
-                        print(p2p_types_id)
-                        print(product['types_id'], 'product_id')
-                        if product['types_id'] != p2p_types_id:
+                p2p_types_id = 0
+                p2p_types_name = ''
+                if product:
+                    if redpack_period > 0:
+                        if redpack_period != int(product['period']):
                             continue
-                else:
-                    p2p_types_id = 0
+                    print event.p2p_types
+                    if event.p2p_types:
+                        p2p_types_id = int(event.p2p_types.id)
+                        p2p_types_name = event.p2p_types.name
+                        if product['types_id']:
+                            print(p2p_types_id)
+                            print(product['types_id'], 'product_id')
+                            if product['types_id'] != p2p_types_id:
+                                continue
 
                 start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
                                                           x.created_at, event.available_at, event.unavailable_at)
@@ -88,7 +97,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                 obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
                         "id": x.id, "invest_amount": event.invest_amount,
                         "unavailable_at": stamp(end_time), "event_id": event.id,
-                        "period": event.period, "p2p_types_id": p2p_types_id,
+                        "period": event.period, "p2p_types_id": p2p_types_id, "p2p_types_name": p2p_types_name,
                         "highest_amount": event.highest_amount, "order_by": 2}
                 if start_time < timezone.now() < end_time:
                     if event.apply_platform == "all" or event.apply_platform == device_type:
@@ -545,11 +554,15 @@ def deduct_calc(amount, redpack_amount):
 def get_interest_coupon(user, product_id):
     records = RedPackRecord.objects.filter(user=user, product_id=product_id) \
         .filter(redpack__event__rtype='interest_coupon').first()
+    redpack_records = RedPackRecord.objects.filter(user=user, product_id=product_id) \
+        .exclude(redpack__event__rtype='interest_coupon').first()
     if records:
         amount = records.redpack.event.amount
-        return {"ret_code": 0, "amount": amount}
+        return {"ret_code": 0, "used_type": u"coupon", "amount": amount}
+    elif redpack_records:
+        return {"ret_code": 0, "used_type": u"redpack", "message": u'已经用过红包，不能再使用加息券'}
     else:
-        return {"ret_code": 3002, "message": u"还未使用加息券"}
+        return {"ret_code": 3002, "message": u"还未使用理财券"}
 
 
 def get_hike_nums(user):
