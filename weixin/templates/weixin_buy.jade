@@ -28,16 +28,16 @@ html
                   amount = ''
                 input(type="tel",value="{{amount}}",placeholder="输入100的整数倍金额",p2p-type="{{p2p.category}}", activity-jiaxi='0', data-max="{{orderable_amount}}",data-role="p2p-calculator",fee-target="",data-target="#expected_income", data-existing="0", data-rate="{{p2p.expected_earning_rate}}", data-period="{{p2p.period}}", data-paymethod="{{p2p.pay_method}}", activity-rate="{{p2p.activity.rule.percent_text}}", maxlength="8").amount.balance-middle
                 p.balance-right 元
-            if redpacks
-              .buy-balance-three
-                p.balance-left 可用红包
-                .balance-middle
-                  .balance-middle-select
-                    select(name="redpack", type='select')#gifts-package.balance-middle-select-select
-                      //amount 金额（可能百分比） ，method（红包类型  “-” 直抵 /  “*”  百分比）
-                      //投资门槛investamount
-                      //百分比有个最高抵扣金额highest_amount
-                      option(value = '')  不使用红包
+            .buy-balance-three
+              p.balance-left 理财券
+              .balance-middle
+                .balance-middle-select
+                  select(name="redpack", type='select')#gifts-package.balance-middle-select-select
+                    //amount 金额（可能百分比） ，method（红包类型  “-” 直抵 /  “*”  百分比）
+                    //投资门槛investamount
+                    //百分比有个最高抵扣金额highest_amount
+                    if redpacks
+                      option(value = '')  不使用理财券
                       redpack_num = len(redpacks)
                       each redpack in redpacks
                         if redpack.method == "-"
@@ -47,10 +47,11 @@ html
                           red_amountSet = redpack['amount'] * 100
                           pack_unit = '%'
                         option(value="{{redpack.id}}", data-amount="{{redpack.amount}}", data-method="{{redpack.method}}", data-investamount='{{redpack.invest_amount}}', data-highest_amount="{{redpack.highest_amount}}") {{redpack.name}}/{{red_amountSet}}{{pack_unit}}/{{redpack.invest_amount}}元起投
-
+                    else
+                      option(value = '')  无可用理财券
 
         .buy-earnings
-            p.redpack-already(style='display:none') *您已使用过
+            p.redpack-already *您已使用过
               span.already-amount
               |加息券，继续享有加息，不可使用其他理财券
             p.redpack-investamount * 未达到红包使用门槛
@@ -84,4 +85,4 @@ html
               a(href="/weixin/list/") 返回首页
               a(href="/weixin/account/") 查看账户
     include include/tracking
-    script(data-init="buy", src="/static/scripts/mobile/mobile.js")
+    script(data-init="buy", src="/static/scripts/mobile/dist/mobile.js?v=20150911")

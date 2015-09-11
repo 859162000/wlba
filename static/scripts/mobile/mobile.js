@@ -786,8 +786,13 @@ org.buy=(function(org){
                 data: {product_id: productID},
                 success: function(data){
                     if(data.ret_code === 0 ){
-                        lib.amountInout.attr('activity-jiaxi', data.amount);
-                        $('.redpack-already').show().find('.already-amount').text(data.amount + '%');
+                        if(data.used_type == 'redpack')
+                             $('.redpack-already').html(data.message).show();
+                        else if (data.used_type == 'coupon'){
+                            lib.amountInout.attr('activity-jiaxi', data.amount);
+                            $('.redpack-already').show().find('.already-amount').text(data.amount + '%');
+                        }
+
                     }
                 }
             });
@@ -1409,18 +1414,6 @@ org.bankcardAdd = (function(org){
         init : lib.init
     }
 })(org);
-
-org.anniversary = (function(org){
-    var lib = {
-        init:function(){
-            $('.bannerFonts').addClass('bannerFontsHover');
-        }
-    }
-    return {
-        init : lib.init
-    }
-})(org);
-
 
 ;(function(org){
     $.each($('script'), function(){

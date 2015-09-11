@@ -29,6 +29,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView, View
 from registration.views import RegistrationView
+from rest_framework import status
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -177,6 +178,25 @@ def password_change(request,
     # TODO find a proper status value and return error message
     return HttpResponse(status=400)
 
+class PasswordCheckView(APIView):
+    permission_classes = ()
+    def post(self, request, **kwargs):
+        identifier = request.DATA.get("identifier", "")
+        password = request.DATA.get("password", "")
+
+        if not identifier or not password:
+            return Response({"token":False, "message":u"用户名或密码错误"})
+
+        user = authenticate(identifier=identifier, password=password)
+
+        if not user:
+            return Response({"token":False, "message":u"用户名或密码错误"})
+        if not user.is_active:
+            return Response({"token":False, "message":u"用户已被关闭"})
+        if user.wanglibaouserprofile.frozen:
+            return Response({"token":False, "message":u"用户已被冻结"})
+
+        return Response({'token':True, 'message':u'用户认证成功'})
 
 class PasswordResetValidateView(TemplateView):
     template_name = 'password_reset_phone.jade'
@@ -366,19 +386,6 @@ class AccountHome(TemplateView):
 
         #xunlei_vip = Binding.objects.filter(user=user).filter(btype='xunlei').first()
 
-        #酒仙众筹用户
-        tab_jiuxian = False
-        jiuxian_selected = False
-        equity_jiuxian = P2PEquityJiuxian.objects.filter(user=user).filter(product__category=u'酒仙众筹标').first()
-        if equity_jiuxian:
-            tab_jiuxian = True
-            if equity_jiuxian.selected_at:
-                jiuxian_selected = True
-            # mode = 'jiuxian'
-
-        if self.request.path.rstrip('/').split('/')[-1] == 'jiuxian':
-            mode = 'jiuxian'
-
         return {
             'message': message,
             'result': result,
@@ -392,20 +399,17 @@ class AccountHome(TemplateView):
             'total_asset': total_asset,
             'mode': mode,
             'announcements': AnnouncementAccounts,
-            'tab_jiuxian': tab_jiuxian,
-            'equity_jiuxian': equity_jiuxian,
-            'jiuxian_selected': jiuxian_selected
         }
 
-    def post(self, request):
-        select_type = request.POST.get('select_type')
-        equity_jiuxian = P2PEquityJiuxian.objects.filter(user=self.request.user)\
-            .filter(product__category=u'酒仙众筹标').first()
-        if equity_jiuxian:
-            equity_jiuxian.selected_type = select_type
-            equity_jiuxian.selected_at = timezone.now()
-            equity_jiuxian.save()
-        return HttpResponseRedirect(reverse('accounts_address'))
+    # def post(self, request):
+    #     select_type = request.POST.get('select_type')
+    #     equity_jiuxian = P2PEquityJiuxian.objects.filter(user=self.request.user)\
+    #         .filter(product__category=u'酒仙众筹标').first()
+    #     if equity_jiuxian:
+    #         equity_jiuxian.selected_type = select_type
+    #         equity_jiuxian.selected_at = timezone.now()
+    #         equity_jiuxian.save()
+    #     return HttpResponseRedirect(reverse('accounts_address'))
 
 
 class AccountHomeAPIView(APIView):
@@ -424,6 +428,9 @@ class AccountHomeAPIView(APIView):
         p2p_total_unpaid_interest = 0
         p2p_total_interest = 0
         p2p_activity_interest = 0
+        p2p_total_coupon_interest = 0
+        p2p_total_paid_coupon_interest = 0
+        p2p_total_unpaid_coupon_interest = 0
         p2p_income_today = 0
         for equity in p2p_equities:
             if equity.confirm:
@@ -431,10 +438,14 @@ class AccountHomeAPIView(APIView):
                 p2p_total_paid_interest += equity.pre_paid_interest  # 累积收益
                 p2p_total_unpaid_interest += equity.unpaid_interest  # 待收益
                 p2p_total_interest += equity.pre_total_interest  # 总收益
+                p2p_total_coupon_interest += equity.pre_total_coupon_interest  # 加息券总收益
+                p2p_total_paid_coupon_interest += equity.pre_paid_coupon_interest  # 加息券已收总收益
+                p2p_total_unpaid_coupon_interest += equity.unpaid_coupon_interest  # 加息券待收总收益
                 p2p_activity_interest += equity.activity_interest  # 活动收益
 
                 if equity.confirm_at >= start_utc:
                     p2p_income_today += equity.pre_paid_interest
+                    p2p_income_today += equity.pre_paid_coupon_interest
                     p2p_income_today += equity.activity_interest
 
         p2p_margin = user.margin.margin  # P2P余额
@@ -453,8 +464,8 @@ class AccountHomeAPIView(APIView):
         today = timezone.datetime.today()
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
         fund_income_week = DailyIncome.objects.filter(user=user,
-                            date__gt=today + datetime.timedelta(days=-8)).aggregate(Sum('income'))[ 'income__sum'] or 0
-        fund_income_month = DailyIncome.objects.filter(user=user,
+                            date__gt=today + datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
+        fund_income_month = DailyIncome.objects.filter(user=user, 
                             date__gt=today + datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
 
         res = {
@@ -464,9 +475,9 @@ class AccountHomeAPIView(APIView):
             'p2p_freeze': float(p2p_freeze),  # P2P投资中冻结金额
             'p2p_withdrawing': float(p2p_withdrawing),  # P2P提现中冻结金额
             'p2p_unpayed_principle': float(p2p_unpayed_principle),  # P2P待收本金
-            'p2p_total_unpaid_interest': float(p2p_total_unpaid_interest),  # p2p总待收益
-            'p2p_total_paid_interest': float(p2p_total_paid_interest + p2p_activity_interest),  # P2P总累积收益
-            'p2p_total_interest': float(p2p_total_interest),  # P2P总收益
+            'p2p_total_unpaid_interest': float(p2p_total_unpaid_interest + p2p_total_unpaid_coupon_interest),  # p2p总待收益
+            'p2p_total_paid_interest': float(p2p_total_paid_interest + p2p_activity_interest + p2p_total_paid_coupon_interest),  # P2P总累积收益
+            'p2p_total_interest': float(p2p_total_interest + p2p_total_coupon_interest),  # P2P总收益
 
             'fund_total_asset': float(fund_total_asset),  # 基金总资产
             'fund_total_income': float(total_income),  # 基金累积收益
@@ -538,6 +549,7 @@ class AccountInviteAPIView(APIView):
                 invite['buy'] = True
             res.append(invite)
         return Response({"ret_code":0, "data":res})
+
 
 class AccountInviteAllGoldAPIView(APIView):
     permission_classes = (IsAuthenticated, )
@@ -636,8 +648,10 @@ class AccountP2PRecordAPI(APIView):
                            'equity_product_display_status': equity.product.display_status,  # 状态
                            'equity_term': equity.term,  # 还款期
                            'equity_product_amortization_count': equity.product.amortization_count,  # 还款期数
-                           'equity_paid_interest': float(equity.pre_paid_interest),  # 单个已经收益
+                           'equity_paid_interest': float(equity.pre_paid_interest),  # 单个已收收益
                            'equity_total_interest': float(equity.pre_total_interest),  # 单个预期收益
+                           'equity_paid_coupon_interest': float(equity.pre_paid_coupon_interest),  # 加息券单个已收收益
+                           'equity_total_coupon_interest': float(equity.pre_total_coupon_interest),  # 加息券单个预期收益
                            'equity_contract': 'https://%s/api/p2p/contract/%s/' % (
                                request.get_host(), equity.product.id),  # 合同
                            'product_id': equity.product_id
@@ -1399,7 +1413,7 @@ class AdminSendMessageAPIView(APIView):
         phone = request.DATA.get("phone", "")
         title = request.DATA.get("title", "")
         content = request.DATA.get("content", "")
-        mtype = request.DATA.get("mtype", "")
+        mtype = request.DATA.get("mtype", "activity")
         if not phone or not title or not content or not mtype:
             return Response({"ret_code": 1, "message": "信息输入不完整"})
         user = User.objects.filter(wanglibaouserprofile__phone=phone).first()

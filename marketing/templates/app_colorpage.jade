@@ -1,0 +1,52 @@
+- load formatters
+doctype html
+html(style="background:#fff8e3")
+  head
+    title 微信彩页
+    include include/app_head
+  body
+    .colorpage-banner
+      img(src='/static/imgs/mobile_activity/app_colorpage/app_banner.jpg')
+    .app-colorpage
+      h3 参与流程
+      img(src='/static/imgs/mobile_activity/app_colorpage/liucheng.png')
+    .colorpage-er
+      img(src='/static/imgs/mobile_activity/app_colorpage/er.png')
+      p 微信公众账号（wanglibao400）
+      h2 注：扫描上方二维码，进入领彩票页面输入手机号后确认领取，即可获得一注彩票。高达20%中奖率，每位注册网利宝用户只有一次分彩机会。
+    .colorpage-liu
+      h1 1.关注“网利宝”公众号
+      p 点击“我要领彩票”按钮立即参加
+      img(src='/static/imgs/mobile_activity/app_colorpage/zhongxin.jpg')
+    .colorpage-liu
+      h1 2.点击分享活动
+      p 立即邀请，得百万大奖
+      img(src='/static/imgs/mobile_activity/app_colorpage/zhongxin1.jpg')
+    .colorpage-liu
+      h1 3.查看彩票详情
+      p 与小伙伴们一起分钱
+      img(src='/static/imgs/mobile_activity/app_colorpage/zhongxin2.jpg')
+      p 注：参与活动的小伙伴需关注网利宝公众号。
+      p 领奖/提现详情请关注零彩宝页面。
+    .colorpage-rules
+      h3 活动规则
+      p 1、手机号为网利宝唯一账户，本次活动仅限微信端专享。关注“网利宝”微信公众账号（wanglibao400）获取活动图文消息；
+      p 2、用户参加活动领取彩票一注，分享给好友，凑齐5人共同领取此注彩票，每注彩票多人共有；每送出一注彩票，申请人将默认领取该彩票税后奖金的随机比例，剩余比例将随机分配给好友，当领取人数达到要求，彩票领取成功；
+      p 3、每位用户仅有一次发起送彩票机会，每个微信号仅能领取一次别人分享的彩票；
+      p 4、完成注册／登录即可在活动页面领取彩票；好友领取彩票后查看详情需关注网利宝微信号；
+      p 5、用户可通过网利宝微信号回复关键字“我的彩票”查询彩票进度；回复“彩票提现”进行中奖奖金提现；
+      p
+        | 6、彩票详情、中奖结果、奖金提现等由合作方零彩宝提供，详情咨询零彩宝客服：
+        a(href='tel:400 088 7568') 400 088 7568；
+      p 7、刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+      p 8、网利宝对此活动享有最终解释权。
+      p.app_eight_backone#ios-show(style="display:none")
+        | 9、 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关 如有疑问请联系在线客服或拨打
+        a(href='tel:4008-588-066') 4008-588-066
+    script.
+      var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+              iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+              ios = ipad || iphone;
+      if (ios) {
+        document.getElementById('ios-show').style.display = 'block';
+      }

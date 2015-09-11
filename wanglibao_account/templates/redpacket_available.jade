@@ -1,13 +1,11 @@
 extends account_home_base
-
 -load formatters
-
 block head
   - with '红包' as title
     include include/head
 
 block sidebar
-  - with '优惠券' as activeItem
+  - with '理财券' as activeItem
   include include/user_center_sidebar
   - endwith
 
@@ -16,14 +14,13 @@ block main
     include include/coupon_exchange
 
   ul.discount--tabs
-        li.coupon--tab
-          a(href="/accounts/coupon/unused") 加息券
-            span
-        li.redpacket--tab.hover
-          a(href="/accounts/redpacket/unused") 红包
-            span
+    li.coupon--tab
+      a(href="/accounts/coupon/unused") 加息券
+        span
+    li.redpacket--tab.hover
+      a(href="/accounts/redpacket/unused") 红包
+        span
   .account-home-panel__no-padding
-    .account-home-panel--title-bar__product
     .account-home-panel--title-bar__product
       ul.title-bar--tabs
         if status == 'unused'
@@ -52,7 +49,8 @@ block main
             th 金额
             th 使用次数
             th 使用限额
-            th 使用门槛
+            th 投资门槛
+            th 使用范围<br/>期限(月/天)
             th(width='20%') 有效期
             if status == 'used'
               th 使用详情
@@ -75,6 +73,15 @@ block main
                 td 无
               else
                 td {{red_packet.invest_amount}}元
+              td
+                if red_packet.p2p_types_name
+                  | {{red_packet.p2p_types_name}}
+                if red_packet.p2p_types_name and red_packet.period
+                  |  /
+                if not red_packet.p2p_types_name and not red_packet.period
+                  | 无
+                if red_packet.period
+                  | {{red_packet.period}}
               td {{red_packet.available_at | milldate_format}} 至 {{red_packet.unavailable_at | milldate_format}}
               if status == 'used'
                 td {{red_packet.product}} <br/> {{red_packet.apply_at | milltime_format }}

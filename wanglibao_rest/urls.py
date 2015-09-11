@@ -12,7 +12,7 @@ from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIV
                             AddressGetAPIView, AccountInviteAPIView, MessageListAPIView,
                             MessageCountAPIView, MessageDetailAPIView,
                             AutomaticApiView, AccountInviteHikeAPIView,AccountInviteAllGoldAPIView,
-                            AccountInviteIncomeAPIView)
+                            AccountInviteIncomeAPIView, password_change,  PasswordCheckView)
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -35,7 +35,8 @@ from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView,
 
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
-from wanglibao_profile.views import ProfileView
+from wanglibao_profile.backends import require_trade_pwd
+from wanglibao_profile.views import ProfileView, TradePasswordView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView, 
                             UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
                             WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
@@ -105,6 +106,7 @@ urlpatterns = patterns(
     url(r'^register/wx/$', WeixinRegisterAPIView.as_view()),
     url(r'^change_password/$', ChangePasswordAPIView.as_view()),
     url(r'^reset_password/$', ResetPasswordAPI.as_view()),
+    url(r'^check_password/$', PasswordCheckView.as_view()),
     url(r'captcha_validation/(?P<phone>\d{11})/$', CaptchaValidationCodeView.as_view()),
     url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendRegisterValidationCodeView.as_view()),
@@ -118,7 +120,7 @@ urlpatterns = patterns(
     url(r'^profile/', ProfileView.as_view()),
     url(r'^total_income', TotalIncome.as_view()),
     url(r'^p2p/purchase/$', PurchaseP2P.as_view()),
-    url(r'^p2p/purchase/mobile/$', PurchaseP2PMobile.as_view()),
+    url(r'^p2p/purchase/mobile/$', require_trade_pwd(PurchaseP2PMobile.as_view())),
     url(r'^p2ps/(?P<product_id>\d+)/records/', RecordView.as_view()),
 
     # url(r'^p2ps/$', P2PProductListView.as_view()),
@@ -153,11 +155,11 @@ urlpatterns = patterns(
     url(r'^trade_record/', TradeRecordAPIView.as_view()),
 
     url(r'^p2p/contract/(?P<product_id>\d+)', UserProductContract.as_view()),
-    url(r'^withdraw/$', WithdrawAPIView.as_view(), name="withdraw-api-view"),
+    url(r'^withdraw/$', require_trade_pwd(WithdrawAPIView.as_view()), name="withdraw-api-view"),
     url(r'^fee/$', FEEAPIView.as_view(), name="withdraw-api-view"),
 
     url(r'^pay/gate/$', DepositGateAPIView.as_view(), name="pay-gate-api-view"),
-    url(r'^pay/yee/app/deposit/$', YeePayAppPayView.as_view(), name="yee-deposit-view"),
+    url(r'^pay/yee/app/deposit/$', require_trade_pwd(YeePayAppPayView.as_view()), name="yee-deposit-view"),
     url(r'^pay/yee/app/deposit/callback/$', YeePayAppPayCallbackView.as_view(), name="yee-deposit-callback"),
     url(r'^pay/yee/app/deposit/complete/$', YeePayAppPayCompleteView.as_view(), name="yee-deposit-fcallback"),
 
@@ -169,8 +171,8 @@ urlpatterns = patterns(
     # 切换支付渠道重新
     url(r'^pay/cnp/list_new/$', BindCardQueryView.as_view()),
     url(r'^pay/cnp/delete_new/$', UnbindCardView.as_view()),
-    url(r'^pay/cnp/dynnum_new/$', BindPayDynnumNewView.as_view()),
-    url(r'^pay/deposit_new/$', BindPayDepositView.as_view()),
+    url(r'^pay/cnp/dynnum_new/$', require_trade_pwd(BindPayDynnumNewView.as_view())),
+    url(r'^pay/deposit_new/$', require_trade_pwd(BindPayDepositView.as_view())),
     url(r'^pay/cnp/yee/callback/$', YeeShortPayCallbackView.as_view(), name="yee-deposit-callback"),
 
     #url(r'^pay/deposit/callback/$', KuaiPayCallbackView.as_view(), name="kuai-deposit-callback"),
@@ -212,6 +214,7 @@ urlpatterns = patterns(
     url(r'^gesture/update/$', GestureUpdateView.as_view()),
     url(r'^gesture/isenabled/$', GestureIsEnabledView.as_view()),
     url(r'^xunlei/8/check/$', GuestCheckView.as_view()),
+    url(r'^trade_pwd/$', TradePasswordView.as_view()),
 )
 
 urlpatterns += patterns('',
@@ -238,6 +241,7 @@ urlpatterns += patterns(
     url(r'^xunlei/award/$', 'marketing.views.ajax_post'), #add by Yihen@20150821, 迅雷-网利宝 抽奖活动
     url(r'^xunlei/award/records/$', 'marketing.views.ajax_get_activity_record'), #add by Yihen@20150825, 迅雷-网利宝 抽奖活动记录
     url(r'^celebrate/awards/$', 'marketing.views.celebrate_ajax'), #add by Yihen@20150828, 网利宝一周年大转盘活动
+    url(r'^award/common_september/$', 'marketing.views.september_award_ajax'), #add by Yihen@20150907,9月PC常规
 )
 
 

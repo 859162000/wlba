@@ -1,5 +1,4 @@
 # encoding: utf-8
-
 #from __future__ import unicode_literals
 
 from django.db import models
@@ -26,4 +25,3 @@ class AntiDelayCallback(models.Model):
 
     def __unicode__(self):
         return u"反作弊"
-

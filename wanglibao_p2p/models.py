@@ -39,10 +39,27 @@ class ContractTemplate(models.Model):
     content = models.TextField(u'模板内容（真实合同）', default='')
     content_preview = models.TextField(verbose_name=u'模板内容（预览合同）', default='')
 
+    def copy_link(self):
+        return u'<a href="/p2p/ct/copy/%s" target="_blank">复制</a>' % str(self.id)
+    copy_link.short_description = u'复制'
+    copy_link.allow_tags = True
 
     class Meta:
         verbose_name = u'借款合同'
         verbose_name_plural = u'借款合同'
+
+    def __unicode__(self):
+        return self.name
+
+
+class ProductType(models.Model):
+    name = models.CharField(u'分类名称', max_length=60)
+    description = models.TextField(verbose_name=u'描述', blank=True)
+    priority = models.IntegerField(verbose_name=u'优先级*', default=0, help_text=u'越大越优先', blank=False)
+
+    class Meta:
+        verbose_name = u'P2P分类'
+        verbose_name_plural = u'P2P分类'
 
     def __unicode__(self):
         return self.name
@@ -115,10 +132,8 @@ class P2PProduct(ProductBase):
     )
 
     version = IntegerVersionField()
-    category = models.CharField(max_length=16, default=u'普通',
-                              choices=CATEGORY_CHOICES,
-                              verbose_name=u'产品类别*')
-
+    category = models.CharField(max_length=16, default=u'普通', choices=CATEGORY_CHOICES, verbose_name=u'产品类别*')
+    types = models.ForeignKey(ProductType, verbose_name=u"产品分类(新)", null=True, on_delete=SET_NULL)
     hide = models.BooleanField(u'隐藏', default=False)
 
     name = models.CharField(max_length=256, verbose_name=u'名字*', blank=False)
@@ -137,7 +152,8 @@ class P2PProduct(ProductBase):
     excess_earning_rate = models.FloatField(default=0, verbose_name=u'超额收益(%)*')
     excess_earning_description = models.CharField(u'超额收益描述', max_length=100, blank=True, null=True)
 
-    pay_method = models.CharField(verbose_name=u'支付方式*', max_length=32, blank=False, default=u'等额本息', choices=PAY_METHOD_CHOICES)
+    pay_method = models.CharField(verbose_name=u'还款方式*', max_length=32, blank=False, default=u'等额本息',
+                                  choices=PAY_METHOD_CHOICES)
     amortization_count = models.IntegerField(u'还款期数', default=0)
     repaying_source = models.TextField(verbose_name=u'还款资金来源(合同用)', blank=True)
 
@@ -183,7 +199,6 @@ class P2PProduct(ProductBase):
     #author: hetao; datetime: 2014.10.27; description: 活动是否参加活动
     activity = models.ForeignKey(Activity, on_delete=SET_NULL, null=True, blank=True, verbose_name=u'返现活动')
 
-
     class Meta:
         verbose_name_plural = u'P2P产品'
 
@@ -207,6 +222,10 @@ class P2PProduct(ProductBase):
     @property
     def current_limit(self):
         return min(self.remain, self.limit_amount_per_user)
+
+    @property
+    def available_amount(self):
+        return self.total_amount - self.ordered_amount
 
     @property
     def available_amout(self):
@@ -261,11 +280,10 @@ class P2PProduct(ProductBase):
     # Add by hb on 2015-08-27
     @property
     def is_taojin(self):
-        if (self.period>=3 and self.period<30) or self.period>=90:
-            return True;
+        if self.pay_method.startswith(u"日计息") and self.period <= 61 or self.period <= 2:
+            return False
         else:
-            return False;
-
+            return True
 
     display_payback_mapping = {
         u'等额本息': u'等额本息',
@@ -421,7 +439,6 @@ class P2PEquity(models.Model):
         except Exception:
             return None
 
-
     @property
     def related_orders(self):
         records = list()
@@ -527,6 +544,54 @@ class P2PEquity(models.Model):
     @property
     def unpaid_principal(self):
         return self.equity - self.paid_principal
+
+    @property
+    def total_coupon_interest(self):
+        if not self.confirm:
+            return Decimal('0')
+        amortizations = self.__get_amortizations()
+        if not amortizations:
+            return Decimal('0')
+        coupon_interest = amortizations.aggregate(Sum('coupon_interest'))['coupon_interest__sum']
+        return coupon_interest
+
+    @property
+    def paid_coupon_interest(self):
+        if not self.confirm:
+            return Decimal('0')
+        amortizations = self.__get_amortizations(settled_only=True)
+        if not amortizations:
+            return Decimal('0')
+        coupon_interest = amortizations.aggregate(Sum('coupon_interest'))['coupon_interest__sum']
+        return coupon_interest
+
+    @property
+    def unpaid_coupon_interest(self):
+        return self.total_coupon_interest - self.paid_coupon_interest
+
+    @property
+    def pre_total_coupon_interest(self):
+        if not self.is_p2precord:
+            return self.total_coupon_interest
+        if not self.confirm:
+            return Decimal('0')
+        amortizations = self.__pre_get_amortizations()
+        if not amortizations:
+            return Decimal('0')
+        coupon_interest = amortizations.aggregate(Sum('coupon_interest'))['coupon_interest__sum']
+        return coupon_interest
+
+    @property
+    def pre_paid_coupon_interest(self):
+        if not self.is_p2precord:
+            return self.paid_coupon_interest
+        if not self.confirm:
+            return Decimal('0')
+        amortizations = self.__pre_get_amortizations()
+        if not amortizations:
+            return Decimal('0')
+        coupon_interest = amortizations.aggregate(Sum('coupon_interest'))['coupon_interest__sum']
+        return coupon_interest
 
     @property
     def amortizations(self):

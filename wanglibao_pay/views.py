@@ -4,6 +4,7 @@
 import logging
 import re
 import socket
+from django.db.models import Sum
 from django.contrib.auth.decorators import permission_required
 from django.core.paginator import Paginator
 from django.db import transaction
@@ -400,6 +401,7 @@ class WithdrawTransactions(TemplateView):
             return self.render_to_response(
                 {
                     'payinfos': payinfos,
+                    'total_amount': payinfos.aggregate(Sum("amount"))['amount__sum'],
                     'transaction_uuids': uuids_param
                 }
             )

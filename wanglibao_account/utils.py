@@ -337,7 +337,6 @@ def str_to_float(time_str):
     return time.mktime(time.strptime(time_str, "%Y-%m-%d"))
 
 
-
 def encrypt_mode_cbc(data, key, iv):
     """
     aes加密得到16进制串
@@ -353,6 +352,7 @@ def encrypt_mode_cbc(data, key, iv):
     result = obj.encrypt(data)
     return result.encode('hex')
 
+
 def hex2bin(string_num):
     """
     aes加密得到16进制串转2进制
@@ -361,6 +361,7 @@ def hex2bin(string_num):
     """
     return dec2bin(hex2dec(string_num.upper()))
 
+
 def hex2dec(string_num):
     """
     十六进制 to 十进制
@@ -368,6 +369,7 @@ def hex2dec(string_num):
     :return:
     """
     return str(int(string_num.upper(), 16))
+
 
 base = [str(x) for x in range(10)] + [ chr(x) for x in range(ord('A'), ord('A')+6)]
 def dec2bin(string_num):

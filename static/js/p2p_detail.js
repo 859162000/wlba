@@ -124,7 +124,7 @@
       } else {
         return true;
       }
-    }, '投资金额未达到红包使用门槛');
+    }, '投资金额未达到理财券门槛');
     if ($('#id_amount').attr('p2p-type') === '票据') {
       opt = {
         required: true,
@@ -364,12 +364,14 @@
     $.post('/api/redpacket/selected/', {
       product_id: $('input[name=product]').val() * 1
     }).done(function(data) {
-      var code;
-      code = data.ret_code;
-      if (code === 0) {
-        $('.use-jiaxi').show();
-        $('.use-jiaxi-amount').text(data.amount + '% ');
-        return $('#id_amount').attr('activity-jiaxi', data.amount);
+      if (data.ret_code === 0) {
+        if (data.used_type === "redpack") {
+          return $('.use-jiaxi').html(data.message).show();
+        } else if (data.used_type === "coupon") {
+          $('.use-jiaxi-amount').text(data.amount + '% ');
+          $('#id_amount').attr('activity-jiaxi', data.amount);
+          return $('.use-jiaxi').show();
+        }
       }
     });
     ddData = [];
@@ -412,7 +414,7 @@
               highest_amount = obj.highest_amount;
             }
             if (obj.method === '~') {
-              text = [obj.name, ' 加息', obj.amount * 100, '%'].join('');
+              text = [obj.name, ' 加息', Number((obj.amount * 100).toFixed(3)), '%'].join('');
               imageSrc = '/static/imgs/pc/p2p_detail/icon_jiaxi.png';
             } else {
               text = [obj.name, ' ', amount, '元'].join('');
