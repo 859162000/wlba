@@ -786,7 +786,7 @@ org.buy=(function(org){
                 success: function(data){
                     if(data.ret_code === 0 ){
                         if(data.used_type == 'redpack')
-                             $('.redpack-already').html(data.message);
+                             $('.redpack-already').html(data.message).show();
                         else if (data.used_type == 'coupon'){
                             lib.amountInout.attr('activity-jiaxi', data.amount);
                             $('.redpack-already').find('.already-amount').text(data.amount + '%').show();
