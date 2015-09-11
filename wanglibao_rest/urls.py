@@ -52,7 +52,7 @@ from marketing.play_list import InvestmentHistory
 from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView,
                              ThousandRedPackCountAPIView, ThunderActivityRewardCounter, ThunderAwardAPIView,)
 from weixin.views import P2PListWeixin
-from wanglibao_account.views import three_order_view
+from wanglibao_account.views import three_order_view, three_order_query_view
 
 
 router = DefaultRouter()
@@ -248,8 +248,9 @@ urlpatterns += patterns(
 )
 
 
-# 接收第三方渠道回调的接口
+# 第三方渠道业务接口
 urlpatterns += patterns(
     '',
     url(r'^coop/order/receive/$', three_order_view),
+    url(r'^coop/order/query/', three_order_query_view),
 )

@@ -338,8 +338,14 @@ def str_to_float(time_str):
 
 
 
-# aes加密得到16进制串
 def encrypt_mode_cbc(data, key, iv):
+    """
+    aes加密得到16进制串
+    :param data:
+    :param key:
+    :param iv:
+    :return:
+    """
     lenth = len(data)
     num = lenth % 16
     data = data.ljust(lenth + 16 - num,chr(16 - num))
@@ -347,16 +353,29 @@ def encrypt_mode_cbc(data, key, iv):
     result = obj.encrypt(data)
     return result.encode('hex')
 
-#aes加密得到16进制串转2进制
 def hex2bin(string_num):
+    """
+    aes加密得到16进制串转2进制
+    :param string_num:
+    :return:
+    """
     return dec2bin(hex2dec(string_num.upper()))
 
-# 十六进制 to 十进制
 def hex2dec(string_num):
+    """
+    十六进制 to 十进制
+    :param string_num:
+    :return:
+    """
     return str(int(string_num.upper(), 16))
 
 base = [str(x) for x in range(10)] + [ chr(x) for x in range(ord('A'), ord('A')+6)]
 def dec2bin(string_num):
+    """
+    十进制转二进制
+    :param string_num:
+    :return:
+    """
     global base
     num = int(string_num)
     mid = []
@@ -367,9 +386,12 @@ def dec2bin(string_num):
         mid.append(base[rem])
     return ''.join([str(x) for x in mid[::-1]])
 
-
-#2进制按电信规则16进制加密
 def encodeBytes(bytelist):
+    """
+    2进制按电信规则16进制加密
+    :param bytelist:
+    :return:
+    """
     pieces = len(bytelist) / 8
     in_list = [int(bytelist[i*8:(i+1)*8],2) for i in range(pieces)]
 
@@ -381,6 +403,11 @@ def encodeBytes(bytelist):
 
 
 def get_client_ip(request):
+    """
+    获取客户端ip
+    :param request:
+    :return:
+    """
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
         ip = x_forwarded_for.split(',')[-1].strip()

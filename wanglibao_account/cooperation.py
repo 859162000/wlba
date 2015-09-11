@@ -47,7 +47,6 @@ from dateutil.relativedelta import relativedelta
 from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes, hex2bin
 from decimal import Decimal
 import re
-import json
 import uuid
 
 logger = logging.getLogger(__name__)
@@ -128,13 +127,12 @@ def get_binding_time_for_coop(user_id):
         return None
 
 
-def save_to_binding(user, record, request):
+def save_to_binding(user, request):
     try:
-        if record and record.name == 'shls' or record.name == 'zhitui1':
-            coop = CoopRegister(request)
-            for processor in coop.processors:
-                if processor.c_code == processor.channel_code:
-                    processor.save_to_binding(user)
+        coop = CoopRegister(request)
+        for processor in coop.processors:
+            if processor.c_code == processor.channel_code:
+                processor.save_to_binding(user)
     except:
         pass
 
@@ -979,8 +977,8 @@ class ZGDXRegister(CoopRegister):
         # 判断是否是首次投资
         binding = Binding.objects.filter(user_id=user.id).first()
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
-        # if binding and p2p_record.count() == 1:
-        self.zgdx_call_back(user, binding)
+        if binding and p2p_record.count() == 1:
+            self.zgdx_call_back(user, binding)
 
 
 # 注册第三方通道
