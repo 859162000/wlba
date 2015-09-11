@@ -19,24 +19,18 @@ html
     .full-container-home.clearfix
       .p2p-container.dark-gray.border-all
         .span8.p2p-detail-container
-            p {{ct.name}}
-            .copp {{ct.content|safe}}
-            p#dii
-        .span4-omega.invest-form.border-left
-          form(method="POST", action="{{request.url}}").pull-left
+          .ct-big(style='width: 107%;border-right: 1px solid #e7e7e7;')
+            p(style='text-align: center;font-size: 20px;color: #000000;line-height: 94px;') {{ct.name}}
+            .copp(style='color: #000000;padding: 21px;') {{ct.content|safe}}
+            .ct#dii
+        .span4-omega.invest-form.border-left(style='border-left: none;border-left: none;background: #ffffff;border-bottom: solid 1px #d9d9d9;')
+          form(method="POST", action="{{request.url}}").pull-left(style='margin-left: 44px;')
             -csrf_token
             .space-vertical-xxxl
             .space-vertical-xxxl
             button.button-primary(type="submit") 复制
 
             a.button-primary.margin-left-m(href='/{{ "" | admin_address}}/wanglibao_p2p/contracttemplate/') 返回
-
-
-
-
-    script.
-        //document.getElementById('dii').innerHTML={{ct.content|safe}};
-       // alert(a);
 
     include include/footer
     include include/tracking
