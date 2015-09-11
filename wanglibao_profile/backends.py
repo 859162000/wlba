@@ -61,7 +61,13 @@ def trade_pwd_is_set(user_id):
     else:
         return False
 
-def trade_pwd_set(user_id, action_type, new_trade_pwd=None, old_trade_pwd=None,  card_id=None, citizen_id=None):
+def trade_pwd_set(user_id,
+                  action_type,
+                  new_trade_pwd=None,
+                  old_trade_pwd=None,
+                  card_id=None,
+                  citizen_id=None,
+                  only_requirement_check=False):
     '''
     设置交易密码或是修改交易密码
     action_type: =1.设置初始密码，post 参数new_trade_pwd
@@ -81,6 +87,7 @@ def trade_pwd_set(user_id, action_type, new_trade_pwd=None, old_trade_pwd=None, 
         {'ret_code':2, 'message': '银行卡或身份证信息有误，交易密码设置失败'}
         {'ret_code':3, 'message': '交易密码已经存在，初始交易密码设置失败'}
         {'ret_code':4, 'message': '用户ID错误，无法获取用户身份'}
+        {'ret_code':5, 'message': '交易密码条件验证成功'}
     '''
 
     profile = WanglibaoUserProfile.objects.filter(user__id=user_id).first()
@@ -96,6 +103,9 @@ def trade_pwd_set(user_id, action_type, new_trade_pwd=None, old_trade_pwd=None, 
         is_id_right = (profile.id_number == citizen_id)
         if not (is_card_right and is_id_right):
             return {'ret_code':2, 'message': '银行卡或身份证信息有误，交易密码设置失败'}
+
+    if only_requirement_check:
+        return {'ret_code':5, 'message': '交易密码条件验证成功'}
 
     profile.trade_pwd = _get_pwd(new_trade_pwd)
     _trade_pwd_lock_clear(profile)
