@@ -325,11 +325,16 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
   $.post('/api/redpacket/selected/'
     product_id: $('input[name=product]').val() * 1
   ).done (data) ->
-    code = data.ret_code
-    if code == 0
-      $('.use-jiaxi').show()
-      $('.use-jiaxi-amount').text(data.amount + '% ');
-      $('#id_amount').attr('activity-jiaxi', data.amount)
+    if data.ret_code == 0
+      if data.used_type == "redpack"
+
+        $('.use-jiaxi').html(data.message).show()
+
+      else if  data.used_type == "coupon"
+
+        $('.use-jiaxi-amount').text(data.amount + '% ');
+        $('#id_amount').attr('activity-jiaxi', data.amount)
+        $('.use-jiaxi').show()
 
   ddData = []
   if $('.red-pack').size() > 0

@@ -6,7 +6,7 @@ from wanglibao.celery import app
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db import transaction
-from wanglibao_lottery.tasks import send_lottery
+# from wanglibao_lottery.tasks import send_lottery
 from wanglibao_p2p.models import P2PRecord, P2PProduct
 from wanglibao_account import message as inside_message
 from wanglibao_sms import messages

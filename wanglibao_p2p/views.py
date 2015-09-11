@@ -27,7 +27,7 @@ from wanglibao_p2p.prepayment import PrepaymentHistory
 from wanglibao_p2p.forms import PurchaseForm, BillForm
 from wanglibao_p2p.keeper import ProductKeeper, EquityKeeperDecorator
 from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant, UserAmortization, \
-    P2PProductContract, InterestPrecisionBalance, P2PRecord
+    P2PProductContract, InterestPrecisionBalance, P2PRecord, ContractTemplate
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags, AmortizationCalculator
@@ -51,6 +51,7 @@ import re
 from celery.execute import send_task
 from wanglibao_redis.backend import redis_backend
 import pickle
+
 
 
 class P2PDetailView(TemplateView):
@@ -422,6 +423,23 @@ class CopyProductView(TemplateView):
 
 copy_product_view = staff_member_required(CopyProductView.as_view())
 
+class CopyContractTemplateView(TemplateView):
+    template_name = "copy_ct.jade"
+    def get_context_data(self, **kwargs):
+        id = kwargs.get('id')
+        ct = ContractTemplate.objects.get(pk=id)
+        return {"ct":ct}
+    def post(self, request, **kwargs):
+        id = kwargs.get('id')
+        ct = ContractTemplate.objects.get(pk=id)
+        new_ct = ContractTemplate()
+        new_ct.name = (ct.name[:8] + u" 复制 " + get_a_uuid()[:18])
+        new_ct.content = ct.content
+        new_ct.content_preview = ct.content_preview
+        new_ct.save()
+        return HttpResponseRedirect('/' + settings.ADMIN_ADDRESS + '/wanglibao_p2p/contracttemplate/')
+
+copy_contract_template_view = staff_member_required(CopyContractTemplateView.as_view())
 
 class P2PProductViewSet(PaginatedModelViewSet):
     model = P2PProduct

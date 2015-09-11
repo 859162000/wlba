@@ -19,10 +19,12 @@
         amount = '',
         amount_left = 0,
         used_chances = 3;
-    var giftArr = [""];
+
+    var giftArr = new Array(3);
     var giftInx;
     var dataCode = 3011;
     var retCode = 3013;
+    var a = {};
 
     //ajax
     function ajaxFun(action,fun){
@@ -40,38 +42,42 @@
       });
     }
 
+    function isGift(str){
+      var inx;
+      switch (str){
+        case 100:
+          inx = 5;
+          break;
+        case 150:
+          inx = 4;
+          break;
+        case 200:
+          inx = 3;
+          break;
+        case "抠电影":
+          inx = 2;
+          break;
+        case "爱奇艺":
+          inx = 1;
+          break;
+      }
+      return inx;
+    }
     //用户抽奖信息
     function giftOk(data){
-      var inx = 0;
       gift = data.gift;
       gift_left = data.gift_left;
       amount = parseInt(data.amount);
       amount_left = data.amount_left;
       used_chances = data.used_chances;
+      giftArr = new Array(3-used_chances);
       if(amount != "None" && amount_left != 0){
-        switch (amount){
-          case 100:
-            inx = 4;
-            break;
-          case 150:
-            inx = 3;
-            break;
-          case 200:
-            inx = 2;
-            break;
-        }
-        giftArr.push(inx);
-      }else{
-        giftArr.push("");
+        giftArr.push(isGift(amount));
+        giftArr.shift();
       }
       if(gift != "None" && gift_left != 0){
-        if(gift == "抠电影"){
-          giftArr.push(1);
-        }else if(gift == "爱奇艺"){
-          giftArr.push(0);
-        }
-      }else{
-        giftArr.push("");
+        giftArr.push(isGift(gift));
+        giftArr.shift();
       }
     }
     ajaxFun("ENTER_WEB_PAGE",giftOk);
@@ -80,24 +86,47 @@
     function rotateFun(data){
       used_chances = data.used_chances;
       retCode = data.ret_code;
+      if(data.type === "money" && retCode === 3025){
+        for(var i=0; i< giftArr.length; i++){
+          if(giftArr[i] > 2){
+            giftArr.splice(i,1);
+            giftInx = Math.floor((Math.random()*giftArr.length));
+            break;
+          }
+        }
+      }
+      if(data.type === "gift" && retCode === 3025){
+        for(var i=0; i< giftArr.length; i++){
+          if(giftArr[i] > 0 && giftArr[i] <= 2){
+            giftArr.splice(i,1);
+            giftInx = Math.floor((Math.random()*giftArr.length));
+            break;
+          }
+        }
+      }
+
+      if(giftArr.length > 0){
+        a = runzp(giftArr[giftInx] ? giftArr[giftInx] : "");
+      }
     }
+    var clickB = true;
     $(".prize-arr .rotateImg").rotate({
       bind:{
         click:function(){
-		  var a = 0;
           var $t = $(this);
           var $page = $('.page');
           var errorWin = $(".errorWin");
           var errorContent = $(".errorWin").find("#errorContent");
           var urlData = "IGNORE";
+
           giftInx = Math.floor((Math.random()*giftArr.length));
           if(giftArr.length < 1){
             urlData = "IGNORE";
           }else{
-            a = runzp(giftArr[giftInx]);
-            if(giftArr[giftInx] > 1){
+            a = runzp(giftArr[giftInx] ? giftArr[giftInx] : "");
+            if(giftArr[giftInx] > 2){
               urlData = "GET_MONEY";
-            }else if(giftArr[giftInx] === 1 || giftArr[giftInx] === 0){
+            }else if(giftArr[giftInx] === 1 || giftArr[giftInx] === 2){
               urlData = "GET_GIFT";
             }else{
               urlData = "IGNORE";
@@ -106,7 +135,7 @@
           //success
           ajaxFun(urlData,rotateFun);
 
-          if(retCode == 3024 && dataCode == 3011){
+          if(retCode == 3024 && dataCode == 3011 && used_chances >= 3){
             errorContent.text("您没有抽奖机会了");
             errorWin.show();
             $page.show();
@@ -117,18 +146,23 @@
             $page.show();
             return false;
           }
-
+          if(clickB){
+            clickB = false;
+          }else{
+            return false;
+          }
           $t.rotate({
             duration:3000,
             angle: 0,
             animateTo:1440+a.angle,
             easing: $.easing.easeOutSine,
             callback: function(){
+              clickB = true;
               $page.show();
               //used_chances++;
               var hasChances = 3 - used_chances;
               $("span.chance-num").text(hasChances >= 0 ? hasChances : 0);
-              if(giftArr[giftInx] != ""){
+              if((giftArr[giftInx] != undefined && giftArr[giftInx] != "") && giftArr.length > 0){
                 $('.winningDiv').show();
                 $('#moeny').text(a.prize);
                 var top = $('.luckDrawLeft').offset().top;
@@ -218,13 +252,6 @@
     $(".now-register").on("click",function(){
       backTop();
     });
-
-    //非法用户弹层
-    //$("a.prize-arr").on("click",".user-no-alert",function(event){
-    //  event.stopPropagation();
-    //  event.preventDefault();
-    //  $('.page,.errorWin').show();
-    //});
 
     //中奖名单
     function userList(data){

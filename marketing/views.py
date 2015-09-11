@@ -921,7 +921,7 @@ class WanglibaoAwardActivity(APIView):
             Description:判断用户是不是在活动期间内注册的新用户
         """
         create_at = int(time.mktime(self.user.date_joined.date().timetuple()))  # 用户注册的时间戳
-        activity_start = time.mktime(datetime(2014, 8, 1).timetuple())  # 活动开始时间
+        activity_start = time.mktime(datetime(2014, 1, 1).timetuple())  # 活动开始时间
 
         if activity_start > create_at:
             to_json_response = {
@@ -1062,6 +1062,7 @@ class WanglibaoAwardActivity(APIView):
 def september_award_ajax(request):
     user = request.user
     action = request.POST.get('action',)
+    logger.debug("in activity common_award_september, User Action: %s" % (action,))
     if action == 'GET_AWARD':
         return ajax_get_activity_record('common_award_sepetember')
     if not user.is_authenticated():
@@ -1069,6 +1070,7 @@ def september_award_ajax(request):
             'ret_code': 4000,
             'message': u'用户没有登陆，请先登陆',
         }
+        logger.debug("in activity common_award_september, User NO LOG IN")
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
     activity = CommonAward(request)
@@ -1109,6 +1111,7 @@ class CommonAward(object):
             return HttpResponse(json.dumps(to_json_response), content_type='application/json' )
 
         channels = channels.channel.split(",")
+        logger.debug("in activity common_award_september, set Channels: %s")
         record = IntroducedBy.objects.filter(user_id=self.request.user.id).first()
 
         if not record or (record and record.channel.name not in channels):
@@ -1129,7 +1132,7 @@ class CommonAward(object):
             Description:判断用户是不是在活动期间内注册的新用户
         """
         create_at = int(time.mktime(self.user.date_joined.date().timetuple()))  # 用户注册的时间戳
-        activity_start = time.mktime(datetime(2014, 9, 10).timetuple())  # 活动开始时间
+        activity_start = time.mktime(datetime(2014, 1, 1).timetuple())  # 活动开始时间
 
         if activity_start > create_at:
             to_json_response = {
@@ -1182,6 +1185,16 @@ class CommonAward(object):
 
     def ignore_user_action(self):
         user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
+        if user_activity.total_chances <= user_activity.used_chances:
+            to_json_response = {
+                'ret_code': 3024,
+                'total_chances': user_activity.total_chances,
+                'used_chances': user_activity.used_chances,
+                'gift': u'None',
+                'message': u'您的抽奖机会已经用完了',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
         user_activity.used_chances += 1
         user_activity.save(update_fields=["used_chances"])
         to_json_response = {
@@ -1203,6 +1216,18 @@ class CommonAward(object):
                 'message': u'您的抽奖机会已经用完了',
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+        else:
+            gift = ActivityJoinLog.objects.filter(action_name='common_award_sepetember', user=self.request.user).exclude(Q(gift_name=u'现金红包')|Q(gift_name=u"None")).first()
+            if gift and gift.join_times == 0:
+                user_activity.used_chances += 1
+                user_activity.save(update_fields=["used_chances"])
+                to_json_response = {
+                    'ret_code': 3025,
+                    'type': "gift",
+                    'used_chances': user_activity.used_chances,
+                    'message': u'您的奖品已经被领走了',
+                }
+                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
         gift = ActivityJoinLog.objects.filter(action_name='common_award_sepetember', user=self.request.user, join_times=1).exclude(gift_name=u'现金红包').first()
         if gift:
@@ -1210,7 +1235,8 @@ class CommonAward(object):
             gift.save(update_fields=["join_times"])
 
         user_activity.used_chances += 1
-        user_activity.save(update_fields=["used_chances"])
+        user_activity.used_awards += 1
+        user_activity.save(update_fields=["used_chances", "used_awards"])
         now = timezone.now()
 
         #发放奖品
@@ -1251,15 +1277,28 @@ class CommonAward(object):
                 'message': u'您的抽奖机会已经用完了',
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+        else:
+            join_log = ActivityJoinLog.objects.filter(action_name='common_award_sepetember', user=self.request.user, amount__gt=0).first()
+            if join_log and join_log.join_times == 0:
+                user_activity.used_chances += 1
+                user_activity.save(update_fields=["used_chances"])
+                to_json_response = {
+                    'ret_code': 3025,
+                    'type': "money",
+                    'used_chances': user_activity.used_chances,
+                    'message': u'您的奖品已经被领走了',
+                }
+                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
 
         join_log = ActivityJoinLog.objects.filter(action_name='common_award_sepetember', user=self.request.user, amount__gt=0).first()
         if join_log:
             join_log.join_times = 0
             join_log.save(update_fields=["join_times"])
 
-        user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
         user_activity.used_chances += 1
-        user_activity.save(update_fields=["used_chances"])
+        user_activity.used_awards += 1
+        user_activity.save(update_fields=["used_chances", "used_awards"])
 
         describe = 'common_september_' + str(int(join_log.amount))
         try:
@@ -1285,7 +1324,6 @@ class CommonAward(object):
             每次进入转盘页面，如果用户是第一次玩，会创建WanglibaoActivityReward记录
         """
         user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user).first()
-        print self.request.user.id
         if not user_activity:
             user_activity = WanglibaoActivityReward.objects.create(
                 user=self.request.user,

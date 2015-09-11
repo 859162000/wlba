@@ -364,12 +364,14 @@
     $.post('/api/redpacket/selected/', {
       product_id: $('input[name=product]').val() * 1
     }).done(function(data) {
-      var code;
-      code = data.ret_code;
-      if (code === 0) {
-        $('.use-jiaxi').show();
-        $('.use-jiaxi-amount').text(data.amount + '% ');
-        return $('#id_amount').attr('activity-jiaxi', data.amount);
+      if (data.ret_code === 0) {
+        if (data.used_type === "redpack") {
+          return $('.use-jiaxi').html(data.message).show();
+        } else if (data.used_type === "coupon") {
+          $('.use-jiaxi-amount').text(data.amount + '% ');
+          $('#id_amount').attr('activity-jiaxi', data.amount);
+          return $('.use-jiaxi').show();
+        }
       }
     });
     ddData = [];

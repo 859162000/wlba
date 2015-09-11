@@ -300,8 +300,7 @@ org.ui = (function(){
 })();
 
 
-org.canvas = (function(){
-
+org.canvas = (function(org){
     var lib = {
         init :function(){
             lib._drawing();
@@ -313,43 +312,61 @@ org.canvas = (function(){
             bodyStyle.mozUserSelect = 'none';
             bodyStyle.webkitUserSelect = 'none';
 
-            var idx= 4,
+            var idx= 3,
                 img = new Image(),
                 canvas = document.querySelector('canvas'),
                 spans=document.getElementById("spans"),
                 min=document.getElementById("main"),
                 $portunity=$("#opportunity"),
                 demo=document.getElementById("demo").getElementsByTagName("img")[0],
-                str = ["150元","抽前吼三吼，大奖跟我走","50元","红包何时有，把酒问青天","10元","大奖下回见，网利宝天天见","20元","佛说：前世500次回眸才能换得一次中奖，淡定"],
-                num = Math.floor(Math.random()*8),
-                text=str[num],
+                str = ["爱奇艺会员","扣电影代金券","100元现金红包","150元现金红包","200元现金红包","抽前吼三吼，大奖跟我走","红包何时有，把酒问青天","大奖下回见，网利宝天天见","佛说：前世500次回眸才能换得一次中奖，淡定"],
+                num,text,giftInx,
+                /*num = Math.floor(Math.random()*8),
+                text=str[num],*/
                 timer=null;
+
            // console.log(str[num]+"   "+num)
             canvas.style.backgroundColor='transparent';
             canvas.style.position = 'absolute';
             canvas.style.left = 0;
             canvas.style.top = 0;
             img.src = "/static/imgs/mobile_activity/app_scratch/gg_guajiang.png";
+            //判断用户是否登录
+            function jugde(){
+                var clsName=$("#untub").attr("className");
+                if(clsName=="scratch_tub"){
+                    text="注册帐号后即可刮奖";
+                    spans.innerHTML=text;
+                }else if(clsName=="unAuthenticated"){
 
+                    idx--;
+                    num = Math.floor(Math.random()*8);
+                    text=str[num];
+                    spans.innerHTML=text;
+                }
+            }
 
+            //渲染蒙层
             img.addEventListener('load',evendrawImg)
+            jugde();
             function evendrawImg(e){
                 var ctx;
                 var w = demo.width,
                     h = demo.height;
-                var offsetX = canvas.offsetLeft,
-                    offsetY = canvas.offsetTop;
+
                 var mousedown = false;
 
                 function layer(ctx) {
                     ctx.drawImage(img,0,0,w,h);
                     $("#continue").attr("data-cj","yy")
                 }
+                //当手指按下的时候
                 function eventDown(e){
                     e.preventDefault();
                     mousedown=true;
                     clearInterval(timer)
                 }
+                //当手指松开的时候
                 function eventUp(e){
                     e.preventDefault();
                     mousedown=false;
@@ -363,6 +380,7 @@ org.canvas = (function(){
                     }
 
                 }
+                //当手指移动的时候
                 function eventMove(e){
                     e.preventDefault();
                     if(mousedown) {
@@ -376,7 +394,6 @@ org.canvas = (function(){
                              arc(x, y, 20, 0, Math.PI * 2);
                              fill();
                          }
-
                     }
                 }
                 function timers(){
@@ -388,7 +405,8 @@ org.canvas = (function(){
                 canvas.height=h;
                 ctx=canvas.getContext('2d');
                 layer(ctx);
-                spans.innerHTML=text;
+
+
                 ctx.globalCompositeOperation = 'destination-out';
                 canvas.addEventListener('touchstart', eventDown);
                 canvas.addEventListener('touchend', eventUp);
@@ -402,16 +420,12 @@ org.canvas = (function(){
 
             };
             function numText(){
-                idx--;
-                num = Math.floor(Math.random()*8);
-                text=str[num];
-                spans.innerHTML=text;
+
             }
-            idx--;
+            //判断他是否中奖
             $portunity.html("注册用户有"+idx+"次刮奖机会")
             $("#continue").on('click',porttunclick )
             function porttunclick(){
-                console.log(idx)
                 if(idx>0){
                     if(num==0 || num==2 || num==4 || num==6){
                         if($("#continue").html()=="领奖"){
@@ -426,13 +440,13 @@ org.canvas = (function(){
                         }else{
                             evendrawImg()
                             $portunity.html("注册用户有"+idx+"次刮奖机会")
-                            numText()
+                            jugde()
                         }
 
                     }else{
                        evendrawImg()
                        $portunity.html("注册用户有"+idx+"次刮奖机会")
-                        numText()
+                        jugde()
                     }
 
                     clearInterval(timer)
@@ -444,20 +458,124 @@ org.canvas = (function(){
                         $("#close,#ok").on('click',function(){
                             $("#dask").css({"display":"none"});
                             $("#continue").html("再来一次");
+                            evendrawImg()
                             $portunity.html("你的刮奖次数以用完");
                             spans.innerHTML = "你的刮奖次数以用完";
                         })
                     }
 
                 }else{
+                    evendrawImg()
                    $portunity.html("你的刮奖次数以用完");
                    spans.innerHTML = "你的刮奖次数以用完";
                 }
+
             }
+            function Interface(){
+                var dataCode=3011;
+                var retCode;
+                var dataArr=[];
+                var gift,gift_left,
+                    used_chances,
+                    amount,amount_left;
+                //ajax请求数据
+                function ajaxFun(action,fun){
+                  org.ajax({
+                     type: "post",
+                     url: "/api/award/common_september/",
+                     dataType: "json",
+                     data: {action: action},
+                     async: false,
+                     success: function(data){
+                       if(typeof fun === "function"){
+                         fun(data);
+                       }
+                    }
+                  });
+                }
+                //判断是否为正确渠道
+                function isChannel(data){
+                    dataCode=data.reg_code;
+
+                }
+                //判断是否为合法渠道
+                function isUser(data){
+                    if(data.reg_code===3001){
+                        ajaxFun("IS_VALID_CHANNEL",isChannel)
+                    }
+
+                }
+
+                ajaxFun("IS_VALID_USER",isUser)
+                //用户抽奖信息
+                function lotterInfo(data){
+                    var idx= 0;
+                    gift=data.gift,
+                    gift_left=data.gift_left,
+                    used_chances=data.used_chances,
+                    amount=data.amount,
+                    amount_left=data.amount_left;
+                    console.log(data)
+                    if(gift != "None" && gift_left !=0){
+                        if(gift=="抠电影"){
+                            dataArr.push(1)
+                        }else if(gift=="爱奇艺"){
+                             dataArr.push(0)
+                        }
+                    }
+                    if(amount != 'None' && amount_left != 0){
+                        switch(amount){
+                            case 100:
+                                idx=2;
+                                break;
+                            case 150:
+                                idx=3;
+                                break;
+                            case 200:
+                                idx=4;
+                                break;
+                        }
+                        dataArr.push(idx);
+                    }else{
+                        dataArr.push("")
+                    }
+                    console.log(dataArr)
+                }
+                ajaxFun("ENTER_WEB_PAGE",lotterInfo)
+                function rotateFun(data){
+                  used_chances = data.used_chances;
+                  retCode = data.ret_code;
+
+                }
+                $("#continue").on("click",Judge)
+                function Judge(){
+                    giftInx = Math.floor((Math.random()*dataArr.length));
+                   var urlData = "IGNORE";
+                    if(dataArr.length<1){
+                        urlData="IGNORE";
+                    }else{
+                        if(dataArr[giftInx] <2){
+                            urlData="GET_GIFT";
+                        }else if(dataArr[giftInx] <5 && dataArr<1){
+                            urlData="GET_MONEY";
+                        }else{
+                            urlData="IGNORE";
+                        }
+                    }
+                        ajaxFun(urlData,rotateFun)
+                }
+
+                if(retCode==3024 && dataCode==3013){
+                    spans.innerHTML="你的刮奖次数以用完";
+                }else if(dataCode != 3011){
+                    spans="你不符合参加规则";
+                }
+            }
+
 
         },
         Registered:function(){
-
+            //判断输入的手机号是否正确
             $("#scratch_btn").on('click',function(e){
                 var val=$("#zctext").val();
                 e.preventDefault();

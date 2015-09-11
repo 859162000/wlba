@@ -785,8 +785,13 @@ org.buy=(function(org){
                 data: {product_id: productID},
                 success: function(data){
                     if(data.ret_code === 0 ){
-                        lib.amountInout.attr('activity-jiaxi', data.amount);
-                        $('.redpack-already').show().find('.already-amount').text(data.amount + '%');
+                        if(data.used_type == 'redpack')
+                             $('.redpack-already').html(data.message).show();
+                        else if (data.used_type == 'coupon'){
+                            lib.amountInout.attr('activity-jiaxi', data.amount);
+                            $('.redpack-already').show().find('.already-amount').text(data.amount + '%');
+                        }
+
                     }
                 }
             });

@@ -37,7 +37,7 @@ html
                     //投资门槛investamount
                     //百分比有个最高抵扣金额highest_amount
                     if redpacks
-                      option(value = '')  不使用红包
+                      option(value = '')  不使用理财券
                       redpack_num = len(redpacks)
                       each redpack in redpacks
                         if redpack.method == "-"
@@ -48,7 +48,7 @@ html
                           pack_unit = '%'
                         option(value="{{redpack.id}}", data-amount="{{redpack.amount}}", data-method="{{redpack.method}}", data-investamount='{{redpack.invest_amount}}', data-highest_amount="{{redpack.highest_amount}}") {{redpack.name}}/{{red_amountSet}}{{pack_unit}}/{{redpack.invest_amount}}元起投
                     else
-                      option(value = '')  无可用红包
+                      option(value = '')  无可用理财券
 
         .buy-earnings
             p.redpack-already *您已使用过
@@ -85,4 +85,4 @@ html
               a(href="/weixin/list/") 返回首页
               a(href="/weixin/account/") 查看账户
     include include/tracking
-    script(data-init="buy", src="/static/scripts/mobile/dist/mobile.js?v=20150910")
+    script(data-init="buy", src="/static/scripts/mobile/dist/mobile.js?v=20150911")
