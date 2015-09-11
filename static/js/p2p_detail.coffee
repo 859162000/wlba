@@ -327,8 +327,11 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
   ).done (data) ->
     if data.ret_code == 0
       if data.used_type == "redpack"
+
         $('.use-jiaxi').html(data.message).show()
+
       else if  data.used_type == "coupon"
+
         $('.use-jiaxi-amount').text(data.amount + '% ');
         $('#id_amount').attr('activity-jiaxi', data.amount)
         $('.use-jiaxi').show()
