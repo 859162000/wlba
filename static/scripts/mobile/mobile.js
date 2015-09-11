@@ -790,7 +790,7 @@ org.buy=(function(org){
                              $('.redpack-already').html(data.message).show();
                         else if (data.used_type == 'coupon'){
                             lib.amountInout.attr('activity-jiaxi', data.amount);
-                            $('.redpack-already').find('.already-amount').text(data.amount + '%').show();
+                            $('.redpack-already').show().find('.already-amount').text(data.amount + '%');
                         }
 
                     }
