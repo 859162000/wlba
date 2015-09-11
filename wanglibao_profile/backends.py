@@ -114,14 +114,14 @@ def trade_pwd_check(user_id, raw_trade_pwd):
             {'ret_code':30047,'message':'交易密码错误','retry_count':1}
             {'ret_code':30048,'message':'重试次数过多，交易密码被锁定’, 'retry_count':1}
             {'ret_code’:30049,'message':'交易密码校验发生未知错误'，'retry_count':1 }
+            {'ret_code’:30050,'message':'用户ID错误，无法获取用户身份'，'retry_count':0 }
     '''
     profile = WanglibaoUserProfile.objects.filter(user__id=user_id).first()
     if not profile:
-        return {'ret_code':4, 'message': '用户ID错误，无法获取用户身份'}
+        return {'ret_code':30050, 'message':'用户ID错误,无法获取用户身份','retry_count':0 }
 
     if not profile.trade_pwd:
         return {'ret_code':30046,'message':'未设置交易密码', 'retry_count':TRADE_PWD_LOCK_MAX_RETRY}
-
     if _trade_pwd_lock_is_locked(profile):
         # 锁定中
         return {'ret_code':30048, 'message': '重试次数过多，交易密码被锁定', 'retry_count': 0}
