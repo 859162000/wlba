@@ -1216,6 +1216,15 @@ class CommonAward(object):
                 'message': u'您的抽奖机会已经用完了',
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+        else:
+            gift = ActivityJoinLog.objects.filter(action_name='common_award_sepetember', user=self.request.user).exclude(Q(gift_name=u'现金红包')|Q(gift_name=u"None")).first()
+            if gift and gift.join_times == 0:
+                to_json_response = {
+                    'ret_code': 3025,
+                    'type': "gift",
+                    'message': u'您的奖品已经被领走了',
+                }
+                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
         gift = ActivityJoinLog.objects.filter(action_name='common_award_sepetember', user=self.request.user, join_times=1).exclude(gift_name=u'现金红包').first()
         if gift:
@@ -1265,6 +1274,16 @@ class CommonAward(object):
                 'message': u'您的抽奖机会已经用完了',
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+        else:
+            join_log = ActivityJoinLog.objects.filter(action_name='common_award_sepetember', user=self.request.user, amount__gt=0).first()
+            if join_log and join_log.join_times == 0:
+                to_json_response = {
+                    'ret_code': 3025,
+                    'type': "money",
+                    'message': u'您的奖品已经被领走了',
+                }
+                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
 
         join_log = ActivityJoinLog.objects.filter(action_name='common_award_sepetember', user=self.request.user, amount__gt=0).first()
         if join_log:
