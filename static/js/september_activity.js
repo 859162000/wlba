@@ -88,27 +88,27 @@
     function rotateFun(data){
       used_chances = data.used_chances;
       retCode = data.ret_code;
-      if(data.type === "money" && retCode === 3025){
-        for(var i=0; i< giftArr.length; i++){
-          if(giftArr[i] > 2){
-            giftArr.splice(i,1);
-            giftInx = Math.floor((Math.random()*giftArr.length));
-            break;
-          }
-        }
-      }
-      if(data.type === "gift" && retCode === 3025){
-        for(var i=0; i< giftArr.length; i++){
-          if(giftArr[i] > 0 && giftArr[i] <= 2){
-            giftArr.splice(i,1);
-            giftInx = Math.floor((Math.random()*giftArr.length));
-            break;
-          }
-        }
-      }
-      if(giftArr.length > 0){
-        a = runzp(giftArr[giftInx] ? giftArr[giftInx] : "");
-      }
+      //if(data.type === "money" && retCode === 3025){
+      //  for(var i=0; i< giftArr.length; i++){
+      //    if(giftArr[i] > 2){
+      //      giftArr.splice(i,1);
+      //      giftInx = Math.floor((Math.random()*giftArr.length));
+      //      break;
+      //    }
+      //  }
+      //}
+      //if(data.type === "gift" && retCode === 3025){
+      //  for(var i=0; i< giftArr.length; i++){
+      //    if(giftArr[i] > 0 && giftArr[i] <= 2){
+      //      giftArr.splice(i,1);
+      //      giftInx = Math.floor((Math.random()*giftArr.length));
+      //      break;
+      //    }
+      //  }
+      //}
+      //if(giftArr.length > 0){
+      //  a = runzp(giftArr[giftInx] ? giftArr[giftInx] : "");
+      //}
     }
     var clickB = true;
     $(".prize-arr .rotateImg").rotate({
@@ -119,19 +119,31 @@
           var errorWin = $(".errorWin");
           var errorContent = $(".errorWin").find("#errorContent");
           var urlData = "IGNORE";
+          var gInx;
 
-          //giftArr = [];
-          //ajaxFun("ENTER_WEB_PAGE",giftOk);
+          giftArr = [];
+          ajaxFun("ENTER_WEB_PAGE",giftOk);
+
+
+          //if(giftArr.length != hasChances){
+          //  console.log("hree");
+          //  for(var i= 0,j=0; i<giftArr.length,j<giftArr.length; i++,j++){
+          //    if(giftArr[i] == "" || giftArr[i] == undefined){
+          //      giftArr.splice(i,1);
+          //    }
+          //  }
+          //}
 
           giftInx = Math.floor((Math.random()*giftArr.length));
+          console.log(a,"length:"+giftArr.length,"hasChances:"+hasChances,giftArr,giftArr[giftInx],giftInx,"a");
           if(giftArr.length < 1){
             urlData = "IGNORE";
           }else{
-            a = runzp(giftArr[giftInx] ? giftArr[giftInx] : "");
-            //console.log(a,"fa");
-            if(giftArr[giftInx] > 2){
+            gInx = giftArr[giftInx];
+            a = runzp(gInx ? gInx : "");
+            if(gInx > 2){
               urlData = "GET_MONEY";
-            }else if(giftArr[giftInx] === 1 || giftArr[giftInx] === 2){
+            }else if(gInx === 1 || gInx === 2){
               urlData = "GET_GIFT";
             }else{
               urlData = "IGNORE";
@@ -156,17 +168,8 @@
           }else{
             return false;
           }
-
           var hasChances = 3 - used_chances;
-          //if(giftArr.length != hasChances){
-          //  console.log("hree");
-          //  for(var i= 0,j=0; i<giftArr.length,j<giftArr.length; i++,j++){
-          //    if(giftArr[i] == "" || giftArr[i] == undefined){
-          //      giftArr.splice(i,1);
-          //    }
-          //  }
-          //}
-          //console.log(a,"length:"+giftArr.length,"hasChances:"+hasChances,giftArr,giftArr[giftInx],giftInx,"b");
+          console.log(a,"length:"+giftArr.length,"hasChances:"+hasChances,giftArr,gInx,giftInx,"b");
           $t.rotate({
             duration:3000,
             angle: 0,
@@ -177,7 +180,7 @@
               $page.show();
               //used_chances++;
               $("span.chance-num").text(hasChances >= 0 ? hasChances : 0);
-              if((giftArr[giftInx] != undefined && giftArr[giftInx] != "") && giftArr.length > 0){
+              if((gInx != undefined && gInx != "") && giftArr.length > 0){
                 $('.winningDiv').show();
                 $('#moeny').text(a.prize);
                 var top = $('.luckDrawLeft').offset().top;
