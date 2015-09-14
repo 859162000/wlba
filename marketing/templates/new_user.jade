@@ -74,3 +74,29 @@ html
 
     include global/g_footer
     include include/tracking
+
+    .alert-page#alert-page
+    //不是新用户 您不符合参加规则
+    .alert-box.no-new-user
+      span.alert-close
+      .alert-cont.pt Sorry~您不是新用户
+      p.txt-center.mt1r
+        a(href="javascript:void(0)").alert-btn 我知道了
+
+    //充值后
+    .alert-box.go-money
+      span.alert-close
+      .alert-cont.pt 充值后，奖励自动发放
+      p.txt-center.mt1r
+        a(href="javascript:void(0)").alert-btn 去充值
+
+    //奖励已发放
+    .alert-box.no-new-user
+      span.alert-close
+      .alert-cont 奖励已发放， <br />
+        | 请在<a href="#" class="blue-txt">站内信</a>中查看。
+      p.txt-center.mt1r
+        a(href="javascript:void(0)").alert-btn 我知道了
+
+    script.
+      require(['/static/js/new_user_activity.js'])

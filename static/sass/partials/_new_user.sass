@@ -1,6 +1,18 @@
 @charset "utf-8"
 
-.text-center
+@mixin redBtn
+  display: inline-block
+  width: 220px
+  text-align: center
+  color: #fff
+  font-size: 22px
+  background: #f5462e
+  padding: 8px 0
+  border-radius: 50px
+  &:hover
+    background: #e0402b
+
+.text-center,.txt-center
   text-align: center
 .mt50px
   margin-top: 50px
@@ -26,17 +38,9 @@
   .btn-box
     margin-top: 15px
   .red-btn
-    display: inline-block
-    width: 220px
-    text-align: center
-    color: #fff
-    font-size: 22px
-    background: #f5462e
-    padding: 8px 0
-    border-radius: 50px
+    +redBtn
     box-shadow: 0 3px 0 rgba(0,0,0,0.15)
-    &:hover
-      background: #e0402b
+
   .welfare-icon
     display: block
     width: 110px
@@ -92,3 +96,57 @@
   line-height: 24px
   .use-rule-tit
     font-size: 16px
+
+//弹层
+.alert-page
+  position: fixed
+  top: 0
+  left: 0
+  height: 100%
+  width: 100%
+  background: #000
+  opacity: 0.6
+  filter: alpha(opacity=60)
+  z-index: 999
+  display: none
+.alert-box
+  background: #fff
+  border-radius: 20px
+  height: 200px
+  width: 360px
+  padding: 30px 20px
+  position: fixed
+  top: 50%
+  left: 50%
+  margin: -100px 0 0 -180px
+  z-index: 9999
+  display: none
+  .mt1r
+    margin-top: 15px
+  .alert-btn
+    +redBtn
+    padding: 5px 0
+    width: 200px
+    &:active
+      background: #e0402b
+  .alert-close
+    cursor: pointer
+    width: 20px
+    height: 20px
+    background: url("/static/imgs/pc_activity/new_user/close-btn.png") center center no-repeat
+    background-size: contain
+    position: absolute
+    top: 15px
+    right: 15px
+  .alert-cont
+    line-height: 35px
+    font-size: 24px
+    text-align: center
+    height: 70px
+    .blue-txt
+      color: #2da4d9
+  .pt
+    padding-top: 35px
+  &.alert-error
+    .alert-cont
+    padding-top: 35px
