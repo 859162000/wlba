@@ -10,6 +10,7 @@ var org = (function(){
                 type: options.type,
                 data: options.data,
                 dataType : options.dataType,
+                async : options.async,
                 beforeSend: function(xhr, settings) {
                     options.beforeSend && options.beforeSend(xhr);
                     //django配置post请求
@@ -306,6 +307,7 @@ org.canvas = (function(org){
             lib._drawing();
             lib.Registered();
         },
+
         _drawing:function(){
             var bodyStyle = document.body.style;
 
@@ -319,13 +321,12 @@ org.canvas = (function(org){
                 min=document.getElementById("main"),
                 $portunity=$("#opportunity"),
                 demo=document.getElementById("demo").getElementsByTagName("img")[0],
-                str = ["爱奇艺会员","扣电影代金券","100元现金红包","150元现金红包","200元现金红包","抽前吼三吼，大奖跟我走","红包何时有，把酒问青天","大奖下回见，网利宝天天见","佛说：前世500次回眸才能换得一次中奖，淡定"],
+                str = ["100元现金红包","150元现金红包","200元现金红包","爱奇艺会员","扣电影代金券","抽前吼三吼，大奖跟我走","红包何时有，把酒问青天","大奖下回见，网利宝天天见","佛说：前世500次回眸才能换得一次中奖，淡定"],
                 num,text,giftInx,
                 /*num = Math.floor(Math.random()*8),
                 text=str[num],*/
                 timer=null;
 
-           // console.log(str[num]+"   "+num)
             canvas.style.backgroundColor='transparent';
             canvas.style.position = 'absolute';
             canvas.style.left = 0;
@@ -339,16 +340,14 @@ org.canvas = (function(org){
                     spans.innerHTML=text;
                 }else if(clsName=="unAuthenticated"){
 
-                    idx--;
-                    num = Math.floor(Math.random()*8);
-                    text=str[num];
-                    spans.innerHTML=text;
+
                 }
             }
 
             //渲染蒙层
             img.addEventListener('load',evendrawImg)
             jugde();
+            Interface();
             function evendrawImg(e){
                 var ctx;
                 var w = demo.width,
@@ -398,7 +397,6 @@ org.canvas = (function(org){
                 }
                 function timers(){
                     ctx.drawImage(img,0,0,w,h);
-
                 }
 
                 canvas.width=w;
@@ -419,22 +417,23 @@ org.canvas = (function(org){
                 };
 
             };
-            function numText(){
-
-            }
             //判断他是否中奖
-            $portunity.html("注册用户有"+idx+"次刮奖机会")
-            $("#continue").on('click',porttunclick )
+            //$portunity.html("注册用户有"+idx+"次刮奖机会")
+
             function porttunclick(){
                 if(idx>0){
-                    if(num==0 || num==2 || num==4 || num==6){
+                    idx--;
+                    num = Math.floor(3+Math.random()*6);
+                    text=str[num];
+                    spans.innerHTML=text;
+                    console.log(num)
+                    if(num==0 || num==1 || num==2 || num==3 ||num==4){
                         if($("#continue").html()=="领奖"){
                             $("#dask").css({"display":"block"});
                             $("#delog").find("h3").html(text+"红包以发送！请留意站内信！");
                             $("#close,#ok").on('click',function(){
                                 $("#dask").css({"display":"none"});
                                 $("#continue").html("再来一次");
-                                $("#continue").attr("data-cj","")
                                 evendrawImg()();
                             })
                         }else{
@@ -450,7 +449,7 @@ org.canvas = (function(org){
                     }
 
                     clearInterval(timer)
-                }else if(idx==0 && $("#continue").html()=="领奖"){
+                }/*else if(idx==0 && $("#continue").html()=="领奖"){
                     idx--;
                     if(num==0 || num==2 || num==4 || num==6) {
                         $("#dask").css({"display":"block"});
@@ -468,109 +467,117 @@ org.canvas = (function(org){
                     evendrawImg()
                    $portunity.html("你的刮奖次数以用完");
                    spans.innerHTML = "你的刮奖次数以用完";
-                }
+                }*/
 
             }
-            function Interface(){
-                var dataCode=3011;
-                var retCode;
-                var dataArr=[];
-                var gift,gift_left,
-                    used_chances,
-                    amount,amount_left;
-                //ajax请求数据
-                function ajaxFun(action,fun){
-                  org.ajax({
-                     type: "post",
-                     url: "/api/award/common_september/",
-                     dataType: "json",
-                     data: {action: action},
-                     async: false,
-                     success: function(data){
-                       if(typeof fun === "function"){
-                         fun(data);
-                       }
-                    }
-                  });
-                }
-                //判断是否为正确渠道
-                function isChannel(data){
-                    dataCode=data.reg_code;
+        function Interface(){
 
-                }
-                //判断是否为合法渠道
-                function isUser(data){
-                    if(data.reg_code===3001){
-                        ajaxFun("IS_VALID_CHANNEL",isChannel)
-                    }
-
-                }
-
-                ajaxFun("IS_VALID_USER",isUser)
-                //用户抽奖信息
-                function lotterInfo(data){
-                    var idx= 0;
-                    gift=data.gift,
-                    gift_left=data.gift_left,
-                    used_chances=data.used_chances,
-                    amount=data.amount,
-                    amount_left=data.amount_left;
-                    console.log(data)
-                    if(gift != "None" && gift_left !=0){
-                        if(gift=="抠电影"){
-                            dataArr.push(1)
-                        }else if(gift=="爱奇艺"){
-                             dataArr.push(0)
+            var dataArr = [];
+            var gift, gift_left,
+                used_chances,
+                amount, amount_left, dataCode, retCode,
+                urlData = "IGNORE";
+            //ajax请求数据
+            function ajaxFun(action, fun) {
+                org.ajax({
+                    type: "post",
+                    url: "/api/award/common_september/",
+                    dataType: "json",
+                    data: {action: action},
+                    async: false,
+                    success: function (data) {
+                        if (typeof fun === "function") {
+                            fun(data);
+                            console.log(data)
                         }
                     }
-                    if(amount != 'None' && amount_left != 0){
-                        switch(amount){
-                            case 100:
-                                idx=2;
-                                break;
-                            case 150:
-                                idx=3;
-                                break;
-                            case 200:
-                                idx=4;
-                                break;
-                        }
-                        dataArr.push(idx);
-                    }else{
-                        dataArr.push("")
-                    }
-                    console.log(dataArr)
-                }
-                ajaxFun("ENTER_WEB_PAGE",lotterInfo)
-                function rotateFun(data){
-                  used_chances = data.used_chances;
-                  retCode = data.ret_code;
+                });
+            }
+            //判断是否为正确渠道
+            function isChannel(data) {
+                dataCode = data.ret_code;
+            }
 
-                }
-                $("#continue").on("click",Judge)
-                function Judge(){
-                    giftInx = Math.floor((Math.random()*dataArr.length));
-                   var urlData = "IGNORE";
-                    if(dataArr.length<1){
-                        urlData="IGNORE";
-                    }else{
-                        if(dataArr[giftInx] <2){
-                            urlData="GET_GIFT";
-                        }else if(dataArr[giftInx] <5 && dataArr<1){
-                            urlData="GET_MONEY";
-                        }else{
-                            urlData="IGNORE";
-                        }
-                    }
-                        ajaxFun(urlData,rotateFun)
-                }
-
-                if(retCode==3024 && dataCode==3013){
-                    spans.innerHTML="你的刮奖次数以用完";
-                }else if(dataCode != 3011){
-                    spans="你不符合参加规则";
+            //判断是否为合法渠道
+            function isUser(data) {
+                if (data.ret_code === 3001) {
+                    ajaxFun("IS_VALID_CHANNEL", isChannel);
                 }
             }
+
+            ajaxFun("IS_VALID_USER", isUser);
+            //用户抽奖信息
+            function lotterInfo(data) {
+                var idx = 0;
+                gift = data.gift,
+                    gift_left = data.gift_left,
+                    used_chances = data.used_chances,
+                    amount = parseInt(data.amount),
+                    amount_left = data.amount_left;
+                if (gift != "None" && gift_left != 0) {
+                    if (gift == "抠电影") {
+                        dataArr.push(3)
+                    } else if (gift == "爱奇艺") {
+                        dataArr.push(4)
+                    }
+                }
+                if (amount != 'None' && amount_left != 0) {
+                    switch (amount) {
+                        case 100:
+                            idx = 0;
+                            break;
+                        case 150:
+                            idx = 1;
+                            break;
+                        case 200:
+                            idx = 2;
+                            break;
+                    }
+                    dataArr.push(idx);
+                } else {
+                    dataArr.push("")
+                }
+            }
+
+            ajaxFun("ENTER_WEB_PAGE", lotterInfo);
+            function rotateFun(data) {
+                used_chances = data.used_chances;
+                retCode = data.ret_code;
+            }
+
+            $("#continue").on("click", Judge);
+            function Judge() {
+                giftInx = Math.floor((Math.random() * dataArr.length));
+                console.log(dataArr)
+                if (dataArr.length < 1) {
+                    urlData = "IGNORE";
+                } else {
+                    if (dataArr[giftInx] > 2 && dataArr[giftInx] < 5) {
+                        urlData = "GET_GIFT";
+                    } else if (dataArr[giftInx] >= 0 && dataArr[giftInx] < 3) {
+                        urlData = "GET_MONEY";
+                    } else {
+                        urlData = "IGNORE";
+                    }
+                }
+                console.log(urlData)
+                ajaxFun(urlData, rotateFun)
+            }
+
+            if (retCode == 3024 && dataCode == 3011 && used_chances >= 3) {
+                spans.innerHTML = "你的刮奖次数以用完";
+                $portunity.html("你的刮奖次数以用完");
+            } else if (dataCode != 3011) {
+                spans.innerHTML = "你不符合参加规则";
+
+            } else {
+                var len = dataArr[dataArr.length - 1];
+                spans.innerHTML = str[len];
+                $("#continue").on('click',porttunclick )
+                Judge()
+            }
+        }
+
 
 
         },
@@ -588,8 +595,6 @@ org.canvas = (function(org){
                 }
             })
         }
-
-
     }
     return {
         init : lib.init
