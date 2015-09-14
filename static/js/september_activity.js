@@ -235,7 +235,7 @@
     $(window).scroll(function () {
     showDom();
     });
-
+ 
     topDom.on('click',function(){
       backTop();
       return false
