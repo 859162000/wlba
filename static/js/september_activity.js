@@ -120,6 +120,9 @@
           var errorContent = $(".errorWin").find("#errorContent");
           var urlData = "IGNORE";
           var gInx;
+          if(clickB){
+            clickB = false;
+
 
           giftArr = [];
           ajaxFun("ENTER_WEB_PAGE",giftOk);
@@ -135,7 +138,7 @@
           //}
 
           giftInx = Math.floor((Math.random()*giftArr.length));
-          console.log(a,"length:"+giftArr.length,"hasChances:"+hasChances,giftArr,giftArr[giftInx],giftInx,"a");
+          //console.log(a,"length:"+giftArr.length,"hasChances:"+hasChances,giftArr,giftArr[giftInx],giftInx,"a");
           if(giftArr.length < 1){
             urlData = "IGNORE";
           }else{
@@ -156,27 +159,24 @@
             errorContent.text("您没有抽奖机会了");
             errorWin.show();
             $page.show();
+            clickB = true;
             return false;
           }else if(dataCode != 3011){
             errorContent.text("您不符合参加规则");
             errorWin.show();
             $page.show();
+            clickB = true;
             return false;
           }
-          if(clickB){
-            clickB = false;
-          }else{
-            return false;
-          }
+
           var hasChances = 3 - used_chances;
-          console.log(a,"length:"+giftArr.length,"hasChances:"+hasChances,giftArr,gInx,giftInx,"b");
+          //console.log(a,"length:"+giftArr.length,"hasChances:"+hasChances,giftArr,gInx,giftInx,"b");
           $t.rotate({
             duration:3000,
             angle: 0,
             animateTo:1440+a.angle,
             easing: $.easing.easeOutSine,
             callback: function(){
-              clickB = true;
               $page.show();
               //used_chances++;
               $("span.chance-num").text(hasChances >= 0 ? hasChances : 0);
@@ -195,9 +195,10 @@
               $page.width(document.body.clientWidth);
               $page.height(document.body.clientHeight);
               giftArr.splice(giftInx,1);
+              clickB = true;
             }
           });
-
+          }
 		}
 	  }
 	});
@@ -235,7 +236,7 @@
     $(window).scroll(function () {
     showDom();
     });
- 
+
     topDom.on('click',function(){
       backTop();
       return false
