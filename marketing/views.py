@@ -1246,13 +1246,10 @@ class CommonAward(object):
         else:
             gift_name = "None"
 
-        logger.debug("发放奖品:%s" %(gift_name))
-
-        reward = Reward.objects.filter(type=gift_name,
+        reward = Reward.objects.filter(type=gift_name.strip(),
                                        is_used=False,
                                        end_time__gte=now).first()
 
-        logger.debug("reward.__dict__:%s" %(reward.__dict__))
         inside_message.send_one.apply_async(kwargs={
             "user_id": self.request.user.id,
             "title": reward.description,
