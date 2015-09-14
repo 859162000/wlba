@@ -152,7 +152,7 @@ def require_trade_pwd(view_func):
     @wraps(view_func, assigned=available_attrs(view_func))
     def _wrapped_view(request, *args, **kwargs):
         check_result = trade_pwd_check(request.user.id, request.POST.get('trade_pwd'))
-        if check_result.ret_code == 0:
+        if check_result.get('ret_code') == 0:
             return view_func(request, *args, **kwargs)
         else:
             return check_result
