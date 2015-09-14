@@ -1,10 +1,12 @@
 # encoding=utf-8
 from functools import wraps
 from django.contrib.auth.hashers import make_password, check_password
+from django.http.response import HttpResponse
 from django.utils.decorators import available_attrs
 from wanglibao_pay.models import Card
 from wanglibao_profile.models import WanglibaoUserProfile
 import time
+import json
 
 #最多重试三次
 TRADE_PWD_LOCK_MAX_RETRY = 3
@@ -155,7 +157,7 @@ def require_trade_pwd(view_func):
         if check_result.get('ret_code') == 0:
             return view_func(request, *args, **kwargs)
         else:
-            return check_result
+            return HttpResponse(json.dumps(check_result), content_type="application/json")
 
     return _wrapped_view
 
