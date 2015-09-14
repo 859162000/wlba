@@ -80,7 +80,9 @@
         giftArr.shift();
       }
     }
-    ajaxFun("ENTER_WEB_PAGE",giftOk);
+    if(!$("a.prize-arr img").hasClass("to-register")){
+      ajaxFun("ENTER_WEB_PAGE",giftOk);
+    }
 
     //转盘
     function rotateFun(data){
@@ -104,7 +106,6 @@
           }
         }
       }
-
       if(giftArr.length > 0){
         a = runzp(giftArr[giftInx] ? giftArr[giftInx] : "");
       }
@@ -118,15 +119,16 @@
           var errorWin = $(".errorWin");
           var errorContent = $(".errorWin").find("#errorContent");
           var urlData = "IGNORE";
-          
-          giftArr = [];
-          ajaxFun("ENTER_WEB_PAGE",giftOk);
+
+          //giftArr = [];
+          //ajaxFun("ENTER_WEB_PAGE",giftOk);
 
           giftInx = Math.floor((Math.random()*giftArr.length));
           if(giftArr.length < 1){
             urlData = "IGNORE";
           }else{
             a = runzp(giftArr[giftInx] ? giftArr[giftInx] : "");
+            //console.log(a,"fa");
             if(giftArr[giftInx] > 2){
               urlData = "GET_MONEY";
             }else if(giftArr[giftInx] === 1 || giftArr[giftInx] === 2){
@@ -154,6 +156,17 @@
           }else{
             return false;
           }
+
+          var hasChances = 3 - used_chances;
+          //if(giftArr.length != hasChances){
+          //  console.log("hree");
+          //  for(var i= 0,j=0; i<giftArr.length,j<giftArr.length; i++,j++){
+          //    if(giftArr[i] == "" || giftArr[i] == undefined){
+          //      giftArr.splice(i,1);
+          //    }
+          //  }
+          //}
+          //console.log(a,"length:"+giftArr.length,"hasChances:"+hasChances,giftArr,giftArr[giftInx],giftInx,"b");
           $t.rotate({
             duration:3000,
             angle: 0,
@@ -163,7 +176,6 @@
               clickB = true;
               $page.show();
               //used_chances++;
-              var hasChances = 3 - used_chances;
               $("span.chance-num").text(hasChances >= 0 ? hasChances : 0);
               if((giftArr[giftInx] != undefined && giftArr[giftInx] != "") && giftArr.length > 0){
                 $('.winningDiv').show();
