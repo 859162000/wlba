@@ -15,7 +15,7 @@ function runzp(index) {
 	var angle = 330;
 	var message = "";
 	var myreturn = new Object;
-	if (index != "") {// 有奖
+	if (index != "" && index != undefined) {// 有奖
 		message = "恭喜中奖了";
 		var angle0 = [ 210, 250 ];
 		var angle1 = [ 255, 292 ];
