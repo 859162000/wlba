@@ -153,13 +153,10 @@ def require_trade_pwd(view_func):
     装饰器， 进行交易密码校验
     '''
     @wraps(view_func, assigned=available_attrs(view_func))
-    def _wrapped_view(request, *args, **kwargs):
-        print request.POST, request.META, request.user
-        #使用rest的request以便获取认证后的用户
-        request = Request(request)
-        check_result = trade_pwd_check(request.user.id, request.POST.get('trade_pwd'))
+    def _wrapped_view(self, request, *args, **kwargs):
+        check_result = trade_pwd_check(request, request.POST.get('trade_pwd'))
         if check_result.get('ret_code') == 0:
-            return view_func(request._request, *args, **kwargs)
+            return view_func(self, request, *args, **kwargs)
         else:
             return HttpResponse(json.dumps(check_result), content_type="application/json")
 

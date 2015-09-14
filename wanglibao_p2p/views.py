@@ -43,6 +43,7 @@ from django.contrib import messages
 from django.shortcuts import redirect, render_to_response
 #from marketing.tops import Top
 from order.utils import OrderHelper
+from wanglibao_profile.backends import require_trade_pwd
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from exceptions import PrepaymentException
@@ -208,6 +209,7 @@ class PurchaseP2PMobile(APIView):
     def allowed_methods(self):
         return ['POST']
 
+    @require_trade_pwd
     def post(self, request):
 
         if not request.user.is_authenticated():
