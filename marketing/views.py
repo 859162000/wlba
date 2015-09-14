@@ -1252,6 +1252,7 @@ class CommonAward(object):
                                        is_used=False,
                                        end_time__gte=now).first()
 
+        logger.debug("reward.__dict__:%s" %(reward.__dict__))
         inside_message.send_one.apply_async(kwargs={
             "user_id": self.request.user.id,
             "title": reward.description,
