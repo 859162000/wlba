@@ -106,10 +106,19 @@ class redis_backend(object):
                     p2p.total_amount * p2p.activity.rule.rule_amount * (Decimal(p2p.period) / Decimal(12)))\
                     .quantize(Decimal('0.01'))
 
+            if p2p.types:
+                types_id = p2p.types.id
+                types_name = p2p.types.name
+            else:
+                types_id = 0
+                types_name = ''
+
             p2p_results = {
                 "id": p2p.id,
                 "version": p2p.version,
                 "category": p2p.category,
+                "types_id": types_id,
+                "types_name": types_name,
                 "hide": p2p.hide,
                 "name": p2p.name,
                 "short_name": p2p.short_name,
@@ -198,9 +207,19 @@ class redis_backend(object):
     def get_list_by_p2p(self, product):
         if product:
             p2p = self.get_p2p_by_id(product.id)
+
+            if p2p.types:
+                types_id = p2p.types.id
+                types_name = p2p.types.name
+            else:
+                types_id = 0
+                types_name = ''
+
             p2p_dict = {
                 "id": p2p.id,
                 "category": p2p.category,
+                "types_id": types_id,
+                "types_name": types_name,
                 "hide": p2p.hide,
                 "name": p2p.name,
                 "short_name": p2p.short_name,
@@ -258,6 +277,8 @@ class redis_backend(object):
             {
                 "id": p2p.id,
                 "category": p2p.category,
+                "types_id": p2p.types.id if p2p.types else 0,
+                "types_name": p2p.types.name if p2p.types else '',
                 "hide": p2p.hide,
                 "name": p2p.name,
                 "short_name": p2p.short_name,

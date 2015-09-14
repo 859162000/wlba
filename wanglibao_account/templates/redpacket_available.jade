@@ -49,7 +49,8 @@ block main
             th 金额
             th 使用次数
             th 使用限额
-            th 使用门槛
+            th 投资门槛
+            th 使用范围<br/>期限(月/天)
             th(width='20%') 有效期
             if status == 'used'
               th 使用详情
@@ -72,6 +73,15 @@ block main
                 td 无
               else
                 td {{red_packet.invest_amount}}元
+              td
+                if red_packet.p2p_types_name
+                  | {{red_packet.p2p_types_name}}
+                if red_packet.p2p_types_name and red_packet.period
+                  |  /
+                if not red_packet.p2p_types_name and not red_packet.period
+                  | 无
+                if red_packet.period
+                  | {{red_packet.period}}
               td {{red_packet.available_at | milldate_format}} 至 {{red_packet.unavailable_at | milldate_format}}
               if status == 'used'
                 td {{red_packet.product}} <br/> {{red_packet.apply_at | milltime_format }}

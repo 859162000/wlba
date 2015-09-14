@@ -22,21 +22,21 @@ def lottery_set_status():
         lottery.status = '未中奖'
         lottery.save()
 
-@app.task
-def send_lottery(user_id):
-    """
-    信号任务：给用户派发彩票
-    :param user_id:
-    :return:
-    """
-    #彩票规则：针对未投资的用户，首次投资1000元及以上，送1注彩票
-    try:
-        user = User.objects.get(id=user_id)
-        equity = P2PEquity.objects.filter(user=user).get()
-        if equity.equity >= 1000:
-            LotteryTrade().order(user, money_type=1)
-    except:
-        pass
+# @app.task
+# def send_lottery(user_id):
+#     """
+#     信号任务：给用户派发彩票
+#     :param user_id:
+#     :return:
+#     """
+#     #彩票规则：针对未投资的用户，首次投资1000元及以上，送1注彩票
+#     try:
+#         user = User.objects.get(id=user_id)
+#         equity = P2PEquity.objects.filter(user=user).get()
+#         if equity.equity >= 1000:
+#             LotteryTrade().order(user, money_type=1)
+#     except:
+#         pass
 
 
 

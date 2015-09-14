@@ -15,7 +15,7 @@ from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
 from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization, AdminP2PList, AdminPrepayment
 from wanglibao.admin import ReadPermissionModelAdmin
-from wanglibao_p2p.forms import RequiredInlineFormSet
+from wanglibao_p2p.forms import RequiredInlineFormSet,ContractTemplateForm
 from wanglibao_account.models import UserAddress
 from wanglibao_p2p.tasks import automatic_trade
 
@@ -652,6 +652,8 @@ class AutomaticManagerAdmin(admin.ModelAdmin):
 
 class ContractTemplateAdmin(admin.ModelAdmin):
     actions = None
+    list_display = ('name', "copy_link")
+    form = ContractTemplateForm
 
     def has_delete_permission(self, request, obj=None):
         return False

@@ -162,40 +162,45 @@ org.anniversary = (function(org){
                                     },
                                     success: function (xhr) {
                                         $(".rotateImg").addClass('rotateImgNo');
-                                        if (xhr.left >= 0) {
+                                        if(xhr.ret_code == '3016') {
+                                            $('.errorWin').find('#errorContent').text('抱歉～您不符合参加规则');
+                                            $('.errorWin').modal();
+                                        }else {
                                             if (xhr.left >= 0) {
-                                                if (xhr.amount == 50.00) {
-                                                    index = 3
-                                                } else if (xhr.amount == 200.00) {
-                                                    index = 2
-                                                } else if (xhr.amount == 500.00) {
-                                                    index = 1
-                                                } else if (xhr.amount == 1000.00) {
-                                                    index = 0
-                                                }
-                                                var a = runzp(index);
-                                                $('.rotateImg').rotate({
-                                                    duration: 3000,
-                                                    angle: 0,
-                                                    animateTo: 1440 + a.angle,
-                                                    callback: function () {
-                                                        $('.page,.winningDiv').show();
-                                                        $('#moeny').text(a.prize);
-                                                        var top = $('.zhuanpanDiv').offset().top;
-                                                        var left = $('.zhuanpanDiv').offset().left;
-                                                        $('.winningDiv').css({
-                                                            'top': top,
-                                                            'left': left
-                                                        })
-                                                        $('.page').width(document.body.clientWidth);
-                                                        $('.page').height(document.body.clientHeight);
-                                                        $(".rotateImg").removeClass('rotateImgNo');
-                                                        leftM --;
+                                                if (xhr.left >= 0) {
+                                                    if (xhr.amount == 50.00) {
+                                                        index = 3
+                                                    } else if (xhr.amount == 200.00) {
+                                                        index = 2
+                                                    } else if (xhr.amount == 500.00) {
+                                                        index = 1
+                                                    } else if (xhr.amount == 1000.00) {
+                                                        index = 0
                                                     }
-                                                });
-                                            } else {
-                                                $('.errorWin').find('#errorContent').text('抱歉～您不符合参加规则');
-                                                alert($('.errorWinDiv').html())
+                                                    var a = runzp(index);
+                                                    $('.rotateImg').rotate({
+                                                        duration: 3000,
+                                                        angle: 0,
+                                                        animateTo: 1440 + a.angle,
+                                                        callback: function () {
+                                                            $('.page,.winningDiv').show();
+                                                            $('#moeny').text(a.prize);
+                                                            var top = $('.zhuanpanDiv').offset().top;
+                                                            var left = $('.zhuanpanDiv').offset().left;
+                                                            $('.winningDiv').css({
+                                                                'top': top,
+                                                                'left': left
+                                                            })
+                                                            $('.page').width(document.body.clientWidth);
+                                                            $('.page').height(document.body.clientHeight);
+                                                            $(".rotateImg").removeClass('rotateImgNo');
+                                                            leftM--;
+                                                        }
+                                                    });
+                                                } else {
+                                                    $('.errorWin').find('#errorContent').text('抱歉～您不符合参加规则');
+                                                    alert($('.errorWinDiv').html())
+                                                }
                                             }
                                         }
                                     }
