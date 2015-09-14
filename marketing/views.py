@@ -1246,9 +1246,7 @@ class CommonAward(object):
         else:
             gift_name = "None"
 
-        logger.debug("发放奖品:%s" %(gift_name))
-
-        reward = Reward.objects.filter(type=gift_name,
+        reward = Reward.objects.filter(type=gift_name.strip(),
                                        is_used=False,
                                        end_time__gte=now).first()
 
