@@ -64,6 +64,9 @@ class TradePasswdTest(TestCase):
         self.profile.trade_pwd_last_failed_time = self.profile.trade_pwd_last_failed_time - 3600*3
         self.profile.save()
         self.assertEqual(trade_pwd_check(self.profile.user_id, '123456'), {'ret_code': 0, 'message': '交易密码正确', 'retry_count': 3})
+        #测试使用旧交易密码设定新交易密码
+        self.assertEqual(trade_pwd_set(self.profile.user_id, 2, new_trade_pwd='12345', old_trade_pwd='123456')['ret_code'], 0)
+        self.assertEqual(trade_pwd_set(self.profile.user_id, 2, new_trade_pwd='12345', old_trade_pwd='123456')['ret_code'], 1)
 
 
 
