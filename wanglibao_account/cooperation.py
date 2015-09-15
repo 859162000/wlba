@@ -344,14 +344,6 @@ class CoopRegister(object):
         """
         pass
 
-    def deposit_call_back(self, user):
-        """
-        用户首次充值回调接口
-        :param user:
-        :return:
-        """
-        pass
-
     def process_for_register(self, user, invite_code):
         """
         用户可以在从渠道跳转后的注册页使用邀请码，优先考虑邀请码
@@ -409,14 +401,6 @@ class CoopRegister(object):
                 channel_processor.validate_call_back(user)
         except:
             logger.exception('channel validate process error for user %s'%(user.id))
-
-    def process_for_deposit(self, user):
-        try:
-            channel_processor = self.get_user_channel_processor(user)
-            if channel_processor:
-                channel_processor.deposit_call_back(user)
-        except:
-            logger.exception('channel deposit process error for user %s'%(user.id))
 
     def process_for_binding_card(self, user):
         try:
@@ -996,31 +980,12 @@ class ZGDXRegister(CoopRegister):
             self.zgdx_call_back(user, binding)
 
 
-class WanglibaoSelfRegister(CoopRegister):
-    """
-     Author: add by Yihen@20150915
-     Description: 新手注册送豪礼最高520
-    """
-    def purchase_call_back(self, user):
-        # 首次投标回调接口
-        binding = Binding.objects.filter(user_id=user.id).first()
-        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
-        if binding and p2p_record.count() == 1:
-            self.yunduan_call_back()
-
-    def validate_call_back(self, user):
-        # 实名认证接口回调
-        pass
-
-    def deposit_call_back(self, user):
-        pass
-
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
                           YiCheRegister, ZhiTuiRegister, WaihuRegister,
-                          ZGDXRegister, WanglibaoSelfRegister]
+                          ZGDXRegister]
 
 
 #######################第三方用户查询#####################
