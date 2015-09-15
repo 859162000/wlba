@@ -249,10 +249,11 @@
         $('#small-zc').show();
         $('#box1').hide();
         $('#activity-over').show();
+        clearTimeout(timer)
       }
     };
 
-    count_down('2015-09-15 00:00:00')
+    count_down('2015-09-20:00:00')
 
 
   });
