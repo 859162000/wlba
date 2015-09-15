@@ -58,7 +58,7 @@ def _trade_pwd_lock_touch(profile):
     profile.trade_pwd_last_failed_time = time.time()
 
 def trade_pwd_is_set(user_id):
-    profile = WanglibaoUserProfile.objects.filter(user__id=user_id).first()
+    profile = WanglibaoUserProfile.objects.filter(user_id=user_id).first()
     if profile and profile.trade_pwd:
         return True
     else:
@@ -93,16 +93,17 @@ def trade_pwd_set(user_id,
         {'ret_code':5, 'message': '交易密码条件验证成功'}
     '''
 
-    profile = WanglibaoUserProfile.objects.filter(user__id=user_id).first()
+    profile = WanglibaoUserProfile.objects.filter(user_id=user_id).first()
     if not profile:
         return {'ret_code':4, 'message': '用户ID错误，无法获取用户身份'}
 
     if action_type == 1 and profile.trade_pwd:
         return {'ret_code':3, 'message': '交易密码已经存在，初始交易密码设置失败'}
-    elif action_type == 2 and not _check_pwd(old_trade_pwd, profile.trade_pwd):
+    elif action_type == 2 and not _check_pwd(str(old_trade_pwd), profile.trade_pwd):
+        print old_trade_pwd, type(old_trade_pwd), profile.trade_pwd, _check_pwd(old_trade_pwd, profile.trade_pwd)
         return {'ret_code':1, 'message': '旧交易密码错误，交易密码设置失败'}
     elif action_type == 3:
-        is_card_right = Card.objects.filter(user__id=profile.user__id, no=card_id).exists()
+        is_card_right = Card.objects.filter(user__id=profile.user_id, no=card_id).exists()
         is_id_right = (profile.id_number == citizen_id)
         if not (is_card_right and is_id_right):
             return {'ret_code':2, 'message': '银行卡或身份证信息有误，交易密码设置失败'}
@@ -129,7 +130,7 @@ def trade_pwd_check(user_id, raw_trade_pwd):
             {'ret_code’:30049,'message':'交易密码校验发生未知错误'，'retry_count':1 }
             {'ret_code’:30050,'message':'用户ID错误，无法获取用户身份'，'retry_count':0 }
     '''
-    profile = WanglibaoUserProfile.objects.filter(user__id=user_id).first()
+    profile = WanglibaoUserProfile.objects.filter(user_id=user_id).first()
     if not profile:
         return {'ret_code':30050, 'message':'用户ID错误,无法获取用户身份','retry_count':0 }
 
