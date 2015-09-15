@@ -1,0 +1,124 @@
+@keyframes myfirst {
+  0% {
+    top: -325px; }
+  30% {
+    top: 60px; }
+  60% {
+    top: -5px; }
+  100% {
+    top: 60px; } }
+@-moz-keyframes myfirst {
+  0% {
+    top: -325px; }
+  30% {
+    top: 60px; }
+  60% {
+    top: -5px; }
+  100% {
+    top: 60px; } }
+@-webkit-keyframes myfirst {
+  0% {
+    top: -325px; }
+  30% {
+    top: 60px; }
+  60% {
+    top: -5px; }
+  100% {
+    top: 60px; } }
+.cp-wrap {
+  background: #fff8e3; }
+  .cp-wrap .cp-banner {
+    background: url("/static/imgs/pc_activity/wx-caipiao/banner.jpg") no-repeat center center;
+    height: 952px; }
+    .cp-wrap .cp-banner .txt {
+      width: 1100px;
+      height: 100%;
+      margin: 0 auto;
+      position: relative; }
+      .cp-wrap .cp-banner .txt .txt-img {
+        width: 941px;
+        height: 320px;
+        background: url("/static/imgs/pc_activity/wx-caipiao/banner-text.png") no-repeat center center;
+        position: absolute;
+        top: 60px;
+        left: 65px;
+        animation: myfirst 1s linear 0s;
+        -moz-animation: myfirst 1s linear 0s;
+        -webkit-animation: myfirst 1s linear 0s;
+        -o-animation: myfirst 1s linear 0s; }
+  .cp-wrap .cp-main {
+    width: 1100px;
+    height: auto;
+    margin: 0 auto; }
+    .cp-wrap .cp-main h1 {
+      font-size: 25px;
+      color: #656668;
+      line-height: 60px; }
+    .cp-wrap .cp-main .cp-liucheng {
+      width: 100%;
+      background: url("/static/imgs/pc_activity/wx-caipiao/liucheng1.jpg") no-repeat center center;
+      height: 205px; }
+      .cp-wrap .cp-main .cp-liucheng .lc-btn {
+        width: 130px;
+        height: 30px;
+        background: #ff9501;
+        color: #fff;
+        font-size: 14px;
+        line-height: 30px;
+        margin-left: 122px;
+        margin-top: 132px;
+        cursor: default; }
+      .cp-wrap .cp-main .cp-liucheng .lc-btn-two {
+        margin-left: 233px; }
+    .cp-wrap .cp-main .erweima {
+      width: 506px;
+      height: 505px;
+      background: url("/static/imgs/pc_activity/wx-caipiao/erweima.jpg") no-repeat center center;
+      margin: 35px auto; }
+    .cp-wrap .cp-main .cp-er-zhu {
+      width: 505px;
+      font-size: 12px;
+      color: #5b5351;
+      margin: 0 auto;
+      text-align: center;
+      line-height: 24px; }
+    .cp-wrap .cp-main .cp-page {
+      height: auto;
+      width: 100%;
+      margin-top: 60px; }
+      .cp-wrap .cp-main .cp-page .page1 {
+        width: 348px;
+        display: inline-block;
+        margin-right: 23px; }
+        .cp-wrap .cp-main .cp-page .page1 h2 {
+          font-size: 24px;
+          color: #f85c46;
+          text-align: center;
+          margin-bottom: 10px; }
+          .cp-wrap .cp-main .cp-page .page1 h2 span {
+            color: #6a655f;
+            font-size: 18px; }
+      .cp-wrap .cp-main .cp-page .cp-zhu2 {
+        font-size: 12px;
+        color: #5b5351;
+        margin: 40px auto;
+        text-align: center;
+        line-height: 24px; }
+    .cp-wrap .cp-main ul li {
+      font-size: 14px;
+      color: #5b5351;
+      line-height: 25px; }
+    .cp-wrap .cp-main .btn {
+      font-size: 24px;
+      display: inline-block;
+      width: 252px;
+      height: 60px;
+      color: #fff;
+      line-height: 60px;
+      text-align: center;
+      margin: 60px 0;
+      background: #f35b47;
+      border-radius: 5px;
+      margin-left: 415px; }
+
+/*# sourceMappingURL=pc_activity.css.map */

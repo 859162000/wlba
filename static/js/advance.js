@@ -245,9 +245,10 @@
       }), 1000);
       if (sec <= 0) {
         console.log('时间到')
-        $('#small-zc').show();
-        $('#box1').hide();
-        $('#activity-over').show();
+        //$('#small-zc').show();
+        //$('#box1').hide();
+        //$('#activity-over').show();
+        clearTimeout(timer);
       }
     };
 
