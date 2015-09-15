@@ -671,3 +671,45 @@ class WeixinAccountBankCardAdd(TemplateView):
         return {
             'banks': banks,
         }
+
+import traceback
+
+import logging
+logger = logging.getLogger(__name__)
+
+class AuthorizeUser(APIView):
+    permission_classes = ()
+    def get(self, request):
+        logger.info('=========================================entering AuthorizeUser')
+        code = request.GET.get('code')
+        user_info = {}
+        if code:
+            account_id = request.GET.get('state')
+            try:
+                account = Account()#Account.objects.get(pk=account_id)
+            except Account.DoesNotExist:
+                return HttpResponseNotFound()
+            try:
+                account.app_id = 'wx896485cecdb4111d'
+                account.app_secret = 'b1e152144e4a4974cd06b8716faa98e1'
+                oauth = WeChatOAuth(account.app_id, account.app_secret)
+                res = oauth.fetch_access_token(code)
+                account.oauth_access_token = res.get('access_token')
+                account.oauth_access_token_expires_in = res.get('expires_in')
+                account.oauth_refresh_token = res.get('refresh_token')
+                # account.save()
+                openid=res.get('openid')
+                user_info = oauth.get_user_info(openid, account.access_token)
+                # WeixinUser.objects.get_or_create(openid=res.get('openid'))
+                # context['openid'] = res.get('openid')
+            except WeChatException, e:
+                exstr = traceback.format_exc()
+                logger.debug('=====================AuthorizeUser=================%s'%exstr)
+                return Response({'user_info':exstr})
+
+        logger.info('==================AuthorizeUser==========================')
+        logger.info(user_info)
+
+        return Response({
+            'user_info' : user_info,
+            })
