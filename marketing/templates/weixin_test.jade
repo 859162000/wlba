@@ -53,7 +53,7 @@ html
                 url: '/weixin/api/test/',
                 data: {'code': code},
                 complete:function(data){
-                  $('#id').html(data)
+                  $('#id').html(json.stringify(data));
                 }
             })
 
