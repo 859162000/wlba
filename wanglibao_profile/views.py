@@ -121,7 +121,7 @@ class TradePasswordView(APIView):
             requirement_check = False
 
         result = trade_pwd_set(request.user.id,
-                               request.DATA.get('action_type'),
+                               int(request.DATA.get('action_type')),
                                new_trade_pwd= request.DATA.get('new_trade_pwd'),
                                old_trade_pwd=request.DATA.get('old_trade_pwd'),
                                card_id=request.DATA.get('card_id'),
