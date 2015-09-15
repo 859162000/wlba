@@ -33,6 +33,9 @@ html
         h1 code
         #code.str null
 
+        h1 review URL
+        #url.str null
+
         script(src="/static/scripts/mobile_activity/lib/zepto.js")
         script.
 
@@ -46,13 +49,13 @@ html
             })('code');
 
             $('#code').html(code);
-
+            $('#url').html(localtion.href)
             $.ajax({
                 type: 'GET',
-                url: '/weixin/api/authorize/userinfo/',
-                data: {'code': code},
+                url: 'https://api.weixin.qq.com/sns/oauth2/access_token',
+                data: {'appid': 'wx896485cecdb4111d','secret': 'b1e152144e4a4974cd06b8716faa98e1', 'code': code, 'grant_type': 'authorization_code'},
                 complete:function(data){
-                  $('#id').html(data)
+                  $('#id').html(json.stringify(data));
                 }
             })
 
