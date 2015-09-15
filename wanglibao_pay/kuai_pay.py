@@ -1063,7 +1063,8 @@ class KuaiShortPay:
                 url = self.DYNNUM_URL
 
             res = self._request(data, url)
-
+            logger.error("kuai pay request result")
+            logger.error(res.content)
             if len(card_no) == 10:
                 result = self._handle_pay_result(res)
                 if not result:
