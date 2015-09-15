@@ -1,6 +1,7 @@
 # encoding=utf-8
 from functools import wraps
 from django.contrib.auth.hashers import make_password, check_password
+from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse
 from django.utils.decorators import available_attrs
 from rest_framework.request import Request
@@ -138,7 +139,7 @@ def trade_pwd_check(user_id, raw_trade_pwd):
         return {'ret_code':30046,'message':'未设置交易密码', 'retry_count':TRADE_PWD_LOCK_MAX_RETRY}
     if _trade_pwd_lock_is_locked(profile):
         # 锁定中
-        return {'ret_code':30048, 'message': '重试次数过多，交易密码被锁定', 'retry_count': 0}
+            return {'ret_code':30048, 'message': '重试次数过多，交易密码被锁定', 'retry_count': 0}
     else:
         if _check_pwd(raw_trade_pwd, profile.trade_pwd):
             _trade_pwd_lock_clear(profile)
@@ -147,7 +148,11 @@ def trade_pwd_check(user_id, raw_trade_pwd):
         else:
             _trade_pwd_lock_touch(profile)
             profile.save()
-            return {'ret_code': 30047, 'message': '交易密码错误', 'retry_count': _trade_pwd_lock_retry_count(profile)}
+            retry_count = _trade_pwd_lock_retry_count(profile)
+            if retry_count == 0:
+                return {'ret_code':30048, 'message': '重试次数过多，交易密码被锁定', 'retry_count': 0}
+            else:
+                return {'ret_code': 30047, 'message': '交易密码错误', 'retry_count': _trade_pwd_lock_retry_count(profile)}
 
 def require_trade_pwd(view_func):
     '''
@@ -155,8 +160,12 @@ def require_trade_pwd(view_func):
     '''
     @wraps(view_func, assigned=available_attrs(view_func))
     def _wrapped_view(self, request, *args, **kwargs):
+        no_need_trade_pwd = (request.path == reverse('deposit-new') and len(request.POST.get('card_no')) != 10)
+        if no_need_trade_pwd:
+            return view_func(self, request, *args, **kwargs)
+
         check_result = trade_pwd_check(request.user.id, request.POST.get('trade_pwd'))
-        if check_result.get('ret_code') == 0:
+        if check_result.get('ret_code') == 0 :
             return view_func(self, request, *args, **kwargs)
         else:
             return HttpResponse(json.dumps(check_result), content_type="application/json")
