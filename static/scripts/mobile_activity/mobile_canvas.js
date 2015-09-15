@@ -400,11 +400,11 @@ org.canvas = (function(org){
                          }
                          var x = (e.clientX + document.body.scrollLeft || e.pageX) - min.offsetLeft || 0,
                              y = (e.clientY + document.body.scrollTop || e.pageY) - min.offsetTop-min.scrollHeight+20 || 0;
-                         //with(ctx) {
-                            ctx. beginPath();
-                             ctx.arc(x, y, 20, 0, Math.PI * 2);
-                             ctx.fill();
-                         //}
+                         with(ctx) {
+                             beginPath();
+                             arc(x, y, 20, 0, Math.PI * 2);
+                             fill();
+                         }
                     }
                 }
                 function timers(){
@@ -497,18 +497,25 @@ org.canvas = (function(org){
             //判断是否为正确渠道
             function isChannel(data) {
                 dataCode = data.ret_code;
+
             }
 
             //判断是否为合法渠道
             function isUser(data) {
                 if (data.ret_code === 3001) {
                     ajaxFun("IS_VALID_CHANNEL", isChannel);
+                    if(dataCode===3011){
+                        isdataCode()
+                    }else{
+                        spans.innerHTML = "你不符合参加规则";
+                    }
                 }
             }
 
             ajaxFun("IS_VALID_USER", isUser);
             //用户抽奖信息
-            function lotterInfo(data) {
+            function isdataCode(){
+                function lotterInfo(data) {
                 var idxs = 0;
                 gift = data.gift;
                 gift_left = data.gift_left;
@@ -540,8 +547,8 @@ org.canvas = (function(org){
                 used_chances = data.used_chances;
                 retCode = data.ret_code;
                 console.log(data.type+"  "+retCode);
-                if(data.type==="money" && retCode === 3025){
-                    /*if(gift!="None"  && gift_left != 0){
+                /*if(data.type==="money" && retCode === 3025){
+                    if(gift!="None"  && gift_left != 0){
                         if (gift == "抠电影") {
                             spans.innerHTML="抠电影代金券";
                         } else if (gift == "爱奇艺") {
@@ -551,7 +558,7 @@ org.canvas = (function(org){
                         num = Math.floor(5+Math.random()*3);
                         text=str[num];
                         spans.innerHTML=text;
-                    }*/
+                    }
                 }
                 if(data.type === "gift" && retCode === 3025){
                     if(used_chances<1){
@@ -561,7 +568,7 @@ org.canvas = (function(org){
                         text=str[num];
                         spans.innerHTML=text;
                     }
-                }
+                }*/
             }
 
                 giftInx = Math.floor((Math.random() * dataArr.length));
@@ -588,9 +595,10 @@ org.canvas = (function(org){
             } else if(clsName=="scratch_tub"){
                 spans.innerHTML = "注册后即可抽奖";
             } else {
-                var len = dataArr[dataArr.length - 1];
+                //var len = dataArr[dataArr.length - 1];
                 if(used_chances<1){
-                    spans.innerHTML = str[len];
+                    //console.log(amount)
+                    spans.innerHTML = amount+"元现金红包";
                 }else if(gift!="None" && used_chances==2 && gift_left != 0){
                     if (gift == "抠电影") {
                         spans.innerHTML="抠电影代金券";
@@ -603,6 +611,8 @@ org.canvas = (function(org){
                     spans.innerHTML=text;
                 }
             }
+            }
+
         }
 
 
