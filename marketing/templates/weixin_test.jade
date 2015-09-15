@@ -49,7 +49,7 @@ html
 
             $.ajax({
                 type: 'GET',
-                url: 'api/authorize/userinfo/',
+                url: '/weixin/api/authorize/userinfo/',
                 data: {'code': code},
                 complete:function(data){
                   $('#id').html(data)
