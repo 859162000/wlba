@@ -120,7 +120,7 @@ urlpatterns = patterns(
     url(r'^profile/', ProfileView.as_view()),
     url(r'^total_income', TotalIncome.as_view()),
     url(r'^p2p/purchase/$', PurchaseP2P.as_view()),
-    url(r'^p2p/purchase/mobile/$', require_trade_pwd(PurchaseP2PMobile.as_view())),
+    url(r'^p2p/purchase/mobile/$', PurchaseP2PMobile.as_view()),
     url(r'^p2ps/(?P<product_id>\d+)/records/', RecordView.as_view()),
 
     # url(r'^p2ps/$', P2PProductListView.as_view()),
@@ -155,11 +155,11 @@ urlpatterns = patterns(
     url(r'^trade_record/', TradeRecordAPIView.as_view()),
 
     url(r'^p2p/contract/(?P<product_id>\d+)', UserProductContract.as_view()),
-    url(r'^withdraw/$', require_trade_pwd(WithdrawAPIView.as_view()), name="withdraw-api-view"),
+    url(r'^withdraw/$', WithdrawAPIView.as_view(), name="withdraw-api-view"),
     url(r'^fee/$', FEEAPIView.as_view(), name="withdraw-api-view"),
 
     url(r'^pay/gate/$', DepositGateAPIView.as_view(), name="pay-gate-api-view"),
-    url(r'^pay/yee/app/deposit/$', require_trade_pwd(YeePayAppPayView.as_view()), name="yee-deposit-view"),
+    url(r'^pay/yee/app/deposit/$', YeePayAppPayView.as_view(), name="yee-deposit-view"),
     url(r'^pay/yee/app/deposit/callback/$', YeePayAppPayCallbackView.as_view(), name="yee-deposit-callback"),
     url(r'^pay/yee/app/deposit/complete/$', YeePayAppPayCompleteView.as_view(), name="yee-deposit-fcallback"),
 
@@ -171,8 +171,8 @@ urlpatterns = patterns(
     # 切换支付渠道重新
     url(r'^pay/cnp/list_new/$', BindCardQueryView.as_view()),
     url(r'^pay/cnp/delete_new/$', UnbindCardView.as_view()),
-    url(r'^pay/cnp/dynnum_new/$', require_trade_pwd(BindPayDynnumNewView.as_view())),
-    url(r'^pay/deposit_new/$', require_trade_pwd(BindPayDepositView.as_view())),
+    url(r'^pay/cnp/dynnum_new/$', BindPayDynnumNewView.as_view()),
+    url(r'^pay/deposit_new/$', BindPayDepositView.as_view()),
     url(r'^pay/cnp/yee/callback/$', YeeShortPayCallbackView.as_view(), name="yee-deposit-callback"),
 
     #url(r'^pay/deposit/callback/$', KuaiPayCallbackView.as_view(), name="kuai-deposit-callback"),

@@ -35,6 +35,7 @@ import decimal
 from wanglibao_pay.serializers import CardSerializer
 from wanglibao_pay.util import get_client_ip
 from wanglibao_pay import util
+from wanglibao_profile.backends import require_trade_pwd
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
@@ -629,6 +630,7 @@ class AdminTransactionDeposit(TemplateView):
 class YeePayAppPayView(APIView):
     permission_classes = (IsAuthenticated, )
 
+    @require_trade_pwd
     def post(self, request):
         yeepay = third_pay.YeePay()
         result = yeepay.app_pay(request)
@@ -766,6 +768,7 @@ class TradeRecordAPIView(APIView):
 class WithdrawAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
+    @require_trade_pwd
     def post(self, request):
         result = third_pay.withdraw(request)
         if not result['ret_code']:
@@ -806,6 +809,7 @@ class BindPayDepositView(APIView):
     """ 获取验证码或快捷支付 """
     permission_classes = (IsAuthenticated, )
 
+    @require_trade_pwd
     def post(self, request):
         result = third_pay.bind_pay_deposit(request)
         return Response(result)
@@ -814,6 +818,7 @@ class BindPayDynnumNewView(APIView):
     """ 确认支付 """
     permission_classes = (IsAuthenticated, )
 
+    @require_trade_pwd
     def post(self, request):
         result = third_pay.bind_pay_dynnum(request)
         return Response(result)

@@ -39,6 +39,8 @@ urlpatterns = patterns(
     url(r'^xingmei/$', TemplateView.as_view(template_name="xingmei.jade")),
     url(r'^pc_caipiao/$', TemplateView.as_view(template_name="pc_caipiao.jade")),
     url(r'^september_activity/$', TemplateView.as_view(template_name="september_activity.jade")),
+    url(r'^web-view/$', TemplateView.as_view(template_name="webView.html")),
+    url(r'^android-view/$', TemplateView.as_view(template_name="android_view.html")),
     url(r'^new_user/$', TemplateView.as_view(template_name="new_user.jade")),
 
 )
