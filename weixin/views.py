@@ -682,10 +682,12 @@ class AuthorizeUser(APIView):
         if code:
             account_id = request.GET.get('state')
             try:
-                account = Account.objects.get(pk=account_id)
+                account = Account()#Account.objects.get(pk=account_id)
             except Account.DoesNotExist:
                 return HttpResponseNotFound()
             try:
+                account.app_id = 'wx896485cecdb4111d'
+                account.app_secret = 'b1e152144e4a4974cd06b8716faa98e1'
                 oauth = WeChatOAuth(account.app_id, account.app_secret)
                 res = oauth.fetch_access_token(code)
                 account.oauth_access_token = res.get('access_token')
