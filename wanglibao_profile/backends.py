@@ -11,6 +11,8 @@ import time
 import json
 
 #最多重试三次
+from wanglibao_rest.utils import split_ua
+
 TRADE_PWD_LOCK_MAX_RETRY = 3
 #最多锁定三小时
 TRADE_PWD_LOCK_MAX_TIME = 3600 * 3
@@ -139,7 +141,7 @@ def trade_pwd_check(user_id, raw_trade_pwd):
         return {'ret_code':30046,'message':'未设置交易密码', 'retry_count':TRADE_PWD_LOCK_MAX_RETRY}
     if _trade_pwd_lock_is_locked(profile):
         # 锁定中
-            return {'ret_code':30048, 'message': '重试次数过多，交易密码被锁定', 'retry_count': 0}
+        return {'ret_code':30048, 'message': '重试次数过多，交易密码被锁定', 'retry_count': 0}
     else:
         if _check_pwd(raw_trade_pwd, profile.trade_pwd):
             _trade_pwd_lock_clear(profile)
@@ -154,6 +156,44 @@ def trade_pwd_check(user_id, raw_trade_pwd):
             else:
                 return {'ret_code': 30047, 'message': '交易密码错误', 'retry_count': _trade_pwd_lock_retry_count(profile)}
 
+def _version_to_num(version_str):
+    '''
+    将版本号转化为权重
+    :param version_str:
+    :return:
+    '''
+    l = version_str.split('.')
+    sum = 0
+    for i in l:
+        sum = sum * 10000 + int(i)
+    return sum
+
+def _above_version(version_str, version_standard):
+    '''
+    判断version_str的版本是否高于(>=)version_standard
+    :param version_str:
+    :param version_standard:
+    :return:
+    '''
+
+    if _version_to_num(version_str) >= version_standard:
+        return True
+    else:
+        return False
+
+def _is_version_satisfied(request):
+        # return {"device_type":device_type, "app_version":arr[0],
+        #     "channel_id":arr[2], "model":arr[1],
+        #     "os_version":arr[3], "network":arr[4]}
+    device = split_ua(request)
+    if device['device_type'] == 'ios' and _above_version(device['app_version'], '2.6.0'):
+        # 2.6.0版本起，支持交易密码
+        return True
+    if device['device_type'] == 'android' and _above_version(device['app_version'], '2.5.3'):
+        #2.5.3版本起，支持交易密码
+        return True
+    return False
+
 def require_trade_pwd(view_func):
     '''
     装饰器， 进行交易密码校验
@@ -161,6 +201,8 @@ def require_trade_pwd(view_func):
     @wraps(view_func, assigned=available_attrs(view_func))
     def _wrapped_view(self, request, *args, **kwargs):
         no_need_trade_pwd = (request.path == reverse('deposit-new') and len(request.POST.get('card_no')) != 10)
+        if not _is_version_satisfied():
+            no_need_trade_pwd = True
         if no_need_trade_pwd:
             return view_func(self, request, *args, **kwargs)
 
