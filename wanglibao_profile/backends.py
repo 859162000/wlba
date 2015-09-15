@@ -96,7 +96,7 @@ def trade_pwd_set(user_id,
 
     if action_type == 1 and profile.trade_pwd:
         return {'ret_code':3, 'message': '交易密码已经存在，初始交易密码设置失败'}
-    elif action_type == 2 and profile.trade_pwd != _get_pwd(old_trade_pwd):
+    elif action_type == 2 and not _check_pwd(old_trade_pwd, profile.trade_pwd):
         return {'ret_code':1, 'message': '旧交易密码错误，交易密码设置失败'}
     elif action_type == 3:
         is_card_right = Card.objects.filter(user__id=profile.user__id, no=card_id).exists()
