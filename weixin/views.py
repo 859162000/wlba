@@ -671,3 +671,34 @@ class WeixinAccountBankCardAdd(TemplateView):
         return {
             'banks': banks,
         }
+
+
+class AuthorizeUser(APIView):
+
+    def get(self, request):
+
+        code = request.GET.get('code')
+        user_info = {}
+        if code:
+            account_id = request.GET.get('state')
+            try:
+                account = Account.objects.get(pk=account_id)
+            except Account.DoesNotExist:
+                return HttpResponseNotFound()
+            try:
+                oauth = WeChatOAuth(account.app_id, account.app_secret)
+                res = oauth.fetch_access_token(code)
+                account.oauth_access_token = res.get('access_token')
+                account.oauth_access_token_expires_in = res.get('expires_in')
+                account.oauth_refresh_token = res.get('refresh_token')
+                # account.save()
+                openid=res.get('openid')
+                user_info = oauth.get_user_info(openid, account.access_token)
+                # WeixinUser.objects.get_or_create(openid=res.get('openid'))
+                # context['openid'] = res.get('openid')
+            except WeChatException, e:
+                pass
+
+        return {
+            'user_info' : user_info,
+            }
