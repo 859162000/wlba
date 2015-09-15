@@ -678,7 +678,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class AuthorizeUser(APIView):
-
+    permission_classes = ()
     def get(self, request):
         logger.info('=========================================entering AuthorizeUser')
         code = request.GET.get('code')
