@@ -694,18 +694,22 @@ class AuthorizeUser(APIView):
                 account.app_secret = 'b1e152144e4a4974cd06b8716faa98e1'
                 oauth = WeChatOAuth(account.app_id, account.app_secret)
                 res = oauth.fetch_access_token(code)
+                user_info['res_fetch_token'] = res
                 account.oauth_access_token = res.get('access_token')
                 account.oauth_access_token_expires_in = res.get('expires_in')
                 account.oauth_refresh_token = res.get('refresh_token')
                 # account.save()
                 openid=res.get('openid')
-                user_info = oauth.get_user_info(openid, account.access_token)
+                res = oauth.get_user_info(openid, account.access_token)
+                user_info['res_user_info']=res
+
                 # WeixinUser.objects.get_or_create(openid=res.get('openid'))
                 # context['openid'] = res.get('openid')
             except WeChatException, e:
                 exstr = traceback.format_exc()
                 logger.debug('=====================AuthorizeUser=================%s'%exstr)
-                return Response({'user_info':exstr})
+                user_info['exstr']=exstr
+                return Response({'user_info':user_info})
 
         logger.info('==================AuthorizeUser==========================')
         logger.info(user_info)
