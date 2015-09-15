@@ -47,13 +47,12 @@ html
 
             })('code');
 
-            /*$.ajax({
+            $.ajax({
                 type: 'GET',
-                url: 'https://api.weixin.qq.com/sns/oauth2/access_token',
-                data: { appid: 'wx896485cecdb4111d', secret: 'b1e152144e4a4974cd06b8716faa98e1', 'code': '0011f2aa942f2de1f15e77cffbb5df3v', grant_type: 'authorization_code'},
-                dataType: 'jsonp',
+                url: '/weixin/api/test/',
+                data: {code : code},
                 success:function(data){
-                  $('#id').html(JSON.stringify(data));
+                  $('#userimg').attr('src',data.user_info.res_user_info.headimgurl);
                 },
                 error : function(xhr,data){
                   $('#id').html('error');

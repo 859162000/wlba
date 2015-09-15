@@ -700,20 +700,23 @@ class AuthorizeUser(APIView):
                 account.oauth_refresh_token = res.get('refresh_token')
                 # account.save()
                 openid=res.get('openid')
-                res = oauth.get_user_info(openid, account.access_token)
+                res = oauth.get_user_info(openid, account.oauth_access_token)
                 user_info['res_user_info']=res
 
                 # WeixinUser.objects.get_or_create(openid=res.get('openid'))
                 # context['openid'] = res.get('openid')
             except WeChatException, e:
+                print '-----------------------------1'
+                print user_info
                 exstr = traceback.format_exc()
                 logger.debug('=====================AuthorizeUser=================%s'%exstr)
                 user_info['exstr']=exstr
+                # print user_info
                 return Response({'user_info':user_info})
 
         logger.info('==================AuthorizeUser==========================')
         logger.info(user_info)
-
+        print user_info
         return Response({
             'user_info' : user_info,
             })
