@@ -35,7 +35,6 @@ from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView,
 
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
-from wanglibao_profile.backends import require_trade_pwd
 from wanglibao_profile.views import ProfileView, TradePasswordView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView, 
                             UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
@@ -54,6 +53,7 @@ from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView
                              ThousandRedPackCountAPIView, ThunderActivityRewardCounter, ThunderAwardAPIView,)
 from weixin.views import P2PListWeixin
 from wanglibao_account.views import three_order_view, three_order_query_view
+from marketing.views import UserActivityStatusAPIView
 
 
 router = DefaultRouter()
@@ -172,7 +172,7 @@ urlpatterns = patterns(
     url(r'^pay/cnp/list_new/$', BindCardQueryView.as_view()),
     url(r'^pay/cnp/delete_new/$', UnbindCardView.as_view()),
     url(r'^pay/cnp/dynnum_new/$', BindPayDynnumNewView.as_view()),
-    url(r'^pay/deposit_new/$', BindPayDepositView.as_view()),
+    url(r'^pay/deposit_new/$', BindPayDepositView.as_view(), name='deposit-new'),
     url(r'^pay/cnp/yee/callback/$', YeeShortPayCallbackView.as_view(), name="yee-deposit-callback"),
 
     #url(r'^pay/deposit/callback/$', KuaiPayCallbackView.as_view(), name="kuai-deposit-callback"),
@@ -257,4 +257,11 @@ urlpatterns += patterns(
     '',
     url(r'^coop/order/receive/$', three_order_view),
     url(r'^coop/order/query/', three_order_query_view),
+)
+
+
+# 官方主动注册用户活动状态查询接口
+urlpatterns += patterns(
+    '',
+    url(r'^activity/joinInfo/$', UserActivityStatusAPIView.as_view()),
 )
