@@ -671,8 +671,12 @@ class WeixinAccountBankCardAdd(TemplateView):
         return {
             'banks': banks,
         }
+
+import traceback
+
 import logging
 logger = logging.getLogger(__name__)
+
 class AuthorizeUser(APIView):
     permission_classes = ()
     def get(self, request):
@@ -699,10 +703,13 @@ class AuthorizeUser(APIView):
                 # WeixinUser.objects.get_or_create(openid=res.get('openid'))
                 # context['openid'] = res.get('openid')
             except WeChatException, e:
-                logger.debug('=====================AuthorizeUser=================%s'%e)
-                pass
+                exstr = traceback.format_exc()
+                logger.debug('=====================AuthorizeUser=================%s'%exstr)
+                return Response({'user_info':exstr})
+
         logger.info('==================AuthorizeUser==========================')
         logger.info(user_info)
+
         return Response({
             'user_info' : user_info,
             })

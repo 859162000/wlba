@@ -38,7 +38,6 @@ html
 
         script(src="/static/scripts/mobile_activity/lib/zepto.js")
         script.
-
             var code = (function(name){
                 var result = location.search.match(new RegExp('[\?\&]' + name+ '=([^\&]+)','i'));
                 if(result == null || result.length < 1){
@@ -47,14 +46,14 @@ html
                 return result[1];
 
             })('code');
-
             $('#code').html(code);
+
             $.ajax({
                 type: 'GET',
-                url: 'https://api.weixin.qq.com/sns/oauth2/access_token',
-                data: {'appid': 'wx896485cecdb4111d','secret': 'b1e152144e4a4974cd06b8716faa98e1', 'code': code, 'grant_type': 'authorization_code'},
+                url: '/weixin/api/test/',
+                data: {'code': code},
                 complete:function(data){
-                  $('#id').html(json.stringify(data));
+                  $('#id').html(data)
                 }
             })
 
