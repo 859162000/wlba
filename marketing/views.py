@@ -1246,7 +1246,7 @@ class CommonAward(object):
         else:
             gift_name = "None"
 
-        reward = Reward.objects.filter(type=gift_name,
+        reward = Reward.objects.filter(type=gift_name.strip(),
                                        is_used=False,
                                        end_time__gte=now).first()
 
@@ -1256,6 +1256,8 @@ class CommonAward(object):
             "content": reward.content,
             "mtype": "activity"
         })
+        reward.is_used = True
+        reward.save()
 
         to_json_response = {
             'ret_code': 3014,
