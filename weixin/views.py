@@ -671,8 +671,7 @@ class WeixinAccountBankCardAdd(TemplateView):
         return {
             'banks': banks,
         }
-
-
+import traceback
 class AuthorizeUser(APIView):
 
     def get(self, request):
@@ -699,7 +698,8 @@ class AuthorizeUser(APIView):
                 # WeixinUser.objects.get_or_create(openid=res.get('openid'))
                 # context['openid'] = res.get('openid')
             except WeChatException, e:
-                pass
+                exstr = traceback.format_exc()
+                return Response({'user_info':exstr})
 
         return Response({
             'user_info' : user_info,
