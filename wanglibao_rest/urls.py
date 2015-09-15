@@ -53,6 +53,7 @@ from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView
                              ThousandRedPackCountAPIView, ThunderActivityRewardCounter, ThunderAwardAPIView,)
 from weixin.views import P2PListWeixin
 from wanglibao_account.views import three_order_view, three_order_query_view
+from marketing.views import UserActivityStatusAPIView
 
 
 router = DefaultRouter()
@@ -256,4 +257,11 @@ urlpatterns += patterns(
     '',
     url(r'^coop/order/receive/$', three_order_view),
     url(r'^coop/order/query/', three_order_query_view),
+)
+
+
+# 官方主动注册用户活动状态查询接口
+urlpatterns += patterns(
+    '',
+    url(r'^activity/joinInfo/$', UserActivityStatusAPIView.as_view()),
 )
