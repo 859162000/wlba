@@ -48,11 +48,11 @@ html
             $('#code').html(code);
 
             $.ajax({
-                type: '',
-                url: '',
+                type: 'GET',
+                url: 'api/authorize/userinfo/',
                 data: {'code': code},
                 complete:function(data){
-
+                  $('#id').html(data)
                 }
             })
 
