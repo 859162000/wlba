@@ -818,7 +818,6 @@ class BindPayDynnumNewView(APIView):
     """ 确认支付 """
     permission_classes = (IsAuthenticated, )
 
-    @require_trade_pwd
     def post(self, request):
         result = third_pay.bind_pay_dynnum(request)
         return Response(result)
