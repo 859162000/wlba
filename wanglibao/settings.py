@@ -114,6 +114,7 @@ INSTALLED_APPS = (
     'weixin',
     'wanglibao_app',
     'wanglibao_anti', #add by yihen@20150813, anti module added
+    'wanglibao_reward', #add by yihen@20150910
     'report',
     'misc',
 

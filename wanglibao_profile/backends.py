@@ -3,6 +3,7 @@ from functools import wraps
 from django.contrib.auth.hashers import make_password, check_password
 from django.http.response import HttpResponse
 from django.utils.decorators import available_attrs
+from rest_framework.request import Request
 from wanglibao_pay.models import Card
 from wanglibao_profile.models import WanglibaoUserProfile
 import time
@@ -98,7 +99,7 @@ def trade_pwd_set(user_id,
 
     if action_type == 1 and profile.trade_pwd:
         return {'ret_code':3, 'message': '交易密码已经存在，初始交易密码设置失败'}
-    elif action_type == 2 and profile.trade_pwd != _get_pwd(old_trade_pwd):
+    elif action_type == 2 and not _check_pwd(old_trade_pwd, profile.trade_pwd):
         return {'ret_code':1, 'message': '旧交易密码错误，交易密码设置失败'}
     elif action_type == 3:
         is_card_right = Card.objects.filter(user__id=profile.user__id, no=card_id).exists()
@@ -152,10 +153,10 @@ def require_trade_pwd(view_func):
     装饰器， 进行交易密码校验
     '''
     @wraps(view_func, assigned=available_attrs(view_func))
-    def _wrapped_view(request, *args, **kwargs):
+    def _wrapped_view(self, request, *args, **kwargs):
         check_result = trade_pwd_check(request.user.id, request.POST.get('trade_pwd'))
         if check_result.get('ret_code') == 0:
-            return view_func(request, *args, **kwargs)
+            return view_func(self, request, *args, **kwargs)
         else:
             return HttpResponse(json.dumps(check_result), content_type="application/json")
 
