@@ -699,6 +699,6 @@ class AuthorizeUser(APIView):
             except WeChatException, e:
                 pass
 
-        return {
+        return Response({
             'user_info' : user_info,
-            }
+            })
