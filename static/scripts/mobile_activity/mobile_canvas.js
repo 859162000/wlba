@@ -480,6 +480,7 @@ org.canvas = (function(org){
                     success: function (data) {
                         if (typeof fun === "function") {
                             fun(data);
+                            console.log(data)
                         }
                     }
                 });
@@ -545,14 +546,17 @@ org.canvas = (function(org){
                     $portunity.html("你的刮奖次数以用完");
                 }else {
                     if(used_chances==0 && amount != 'None' && amount_left != 0){
+                        console.log(amount)
                         spans.innerHTML = amount+"元现金红包";
                     }else if(gift != 'None' && gift_left != 0 && used_chances==1){
+                        console.log(gift+"  "+gift_left)
                         if (gift == "抠电影") {
                             spans.innerHTML="抠电影代金券";
                         } else if (gift == "爱奇艺") {
                             spans.innerHTML="爱奇艺会员";
                         }
                     }else{
+                        console.log(1);
                         num = Math.floor(5+Math.random()*3);
                         text=str[num];
                         spans.innerHTML=text;
