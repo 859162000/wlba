@@ -323,28 +323,21 @@ org.canvas = (function(org){
                 demo=document.getElementById("demo").getElementsByTagName("img")[0],
                 str = ["100元现金红包","150元现金红包","200元现金红包","爱奇艺会员","扣电影代金券","抽前吼三吼，大奖跟我走","红包何时有，把酒问青天","大奖下回见，网利宝天天见","佛说：前世500次回眸才能换得一次中奖，淡定"],
                 num,text,used_chances,clsName,dataCode,
+                end=false,
                 gift="None",
                 gift_left=0,
                 amount="None",
                 amount_left= 0,
-                i = 0,timer=null;
-            var _timer = {};
+                i = 0,
+                clicks= 1,
+                timer=null;
 
             canvas.style.backgroundColor='transparent';
             canvas.style.position = 'absolute';
             canvas.style.left = 0;
             canvas.style.top = 0;
             img.src = "/static/imgs/mobile_activity/app_scratch/gg_guajiang.png";
-            function delay_till_last(id, fn, wait) {
-                if (_timer[id]) {
-                     window.clearTimeout(_timer[id]);
-                    delete _timer[id];
-                 }
-                return _timer[id] = window.setTimeout(function() {
-                fn();
-                delete _timer[id];
-            }, wait);
-}
+
             //判断用户是否登录
             function jugde(){
                 clsName=$("#untub").attr("className");
@@ -375,6 +368,7 @@ org.canvas = (function(org){
                 function eventDown(e){
                     e.preventDefault();
                     mousedown=true;
+                    end=true;
                     clearInterval(timer);
                 }
                 //当手指松开的时候
@@ -387,10 +381,10 @@ org.canvas = (function(org){
                     timer=setInterval(function(){
                         timers();
                     },2000);
-                     if(amount != 'None' && amount_left != 0 || gift_left!=0 && gift!="None"){
+                     if(amount != 'None' && amount_left != 0 && clicks==1 || gift_left!=0 && gift!="None"&& clicks==1){
                          $("#continue").html("领奖");
                     }
-                    if(i==1 && amount != "None" && used_chances <3){
+                    if(i==1 && amount != "None" && used_chances <=3){
                         idx--;
                         $portunity.html("注册用户有"+idx+"次刮奖机会");
                         i++;
@@ -422,7 +416,6 @@ org.canvas = (function(org){
                 ctx=canvas.getContext('2d');
                 layer(ctx);
 
-
                 ctx.globalCompositeOperation = 'destination-out';
                 canvas.addEventListener('touchstart', eventDown);
                 canvas.addEventListener('touchend', eventUp);
@@ -433,16 +426,15 @@ org.canvas = (function(org){
                 return function(){
                     return ctx.drawImage(img,0,0,w,h);
                 };
+            }
 
-            };
-            $("#continue").on('click', function() {
-                delay_till_last('id', function() {//注意 id 是唯一的
-                    porttunclick();
-                }, 200);
-            });
+                $("#continue").on('click',function(){
+                    if(end){
+                       porttunclick();
+                    }
+                });
 
             function porttunclick(){
-
                 if(used_chances<3){
                     if($("#continue").html()=="领奖"){
                         $("#dask").css({"display":"block"});
@@ -450,15 +442,16 @@ org.canvas = (function(org){
                         $("#close,#ok").on('click',function(){
                             $("#dask").css({"display":"none"});
                             $("#continue").html("再来一次");
+                            clicks=2;
                             evendrawImg()();
                         })
-
                     }else{
                         Interface();
                         evendrawImg();
                         i=0;
+                        end=false;
+                        clicks=1;
                     }
-
                     clearInterval(timer);
                 }else if (dataCode != 3011 && clsName=="unAuthenticated") {
                     spans.innerHTML = "你不符合参加规则";
@@ -466,8 +459,8 @@ org.canvas = (function(org){
                     spans.innerHTML = "注册帐号后即可刮奖";
                 }else{
                     evendrawImg();
-                   $portunity.html("你的刮奖次数以用完");
-                   spans.innerHTML = "你的刮奖次数以用完";
+                   $portunity.html("你的刮奖次数已用完");
+                   spans.innerHTML = "你的刮奖次数已用完";
                 }
 
             }
@@ -476,6 +469,7 @@ org.canvas = (function(org){
             var dataArr = [];
             var retCode,
                 urlData = "IGNORE";
+
             //ajax请求数据
             function ajaxFun(action, fun) {
                 org.ajax({
@@ -514,7 +508,6 @@ org.canvas = (function(org){
             //用户抽奖信息
             function isdataCode(){
                 function lotterInfo(data) {
-                    var idxs = 0;
                     gift = data.gift;
                     gift_left = data.gift_left;
                     used_chances = data.used_chances;
@@ -549,8 +542,8 @@ org.canvas = (function(org){
                 ajaxFun(urlData, rotateFun);
 
                 if (retCode == 3024 && dataCode == 3011 && used_chances > 2) {
-                    spans.innerHTML = "你的刮奖次数以用完";
-                    $portunity.html("你的刮奖次数以用完");
+                    spans.innerHTML = "你的刮奖次数已用完";
+                    $portunity.html("你的刮奖次数已用完");
                 }else {
                     if(amount != 'None' && amount_left != 0){
                         console.log(amount)
@@ -569,9 +562,7 @@ org.canvas = (function(org){
                         spans.innerHTML=text;
                     }
                 }
-
             }
-
         }
 
 
