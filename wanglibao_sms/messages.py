@@ -13,6 +13,12 @@ def suffix(f):
     return wrapper
 
 
+def suffix_td(f):
+    def wrapper(*args, **kwargs):
+        return unicode(f(*args, **kwargs)) + u'退订回TD【网利科技】'
+    return wrapper
+
+
 @suffix
 def deposit_succeed(amount):
     return u'充值操作成功，充值金额%s元。' % str(amount)
@@ -172,14 +178,14 @@ def msg_give_income(count, amount):
     return title, content
 
 
-@suffix
+@suffix_td
 def sms_alert_invest(name):
-    return u"提醒投资：您的好友{}在网利宝看到几个超棒的理财计划，快来投资吧！".format(name)
+    return u"提醒投资：我（{}）在网利宝看到几个超棒的理财计划，你也赶紧去投资，不要再错失良机啦！".format(name)
 
 
-@suffix
+@suffix_td
 def sms_alert_invite(name, phone):
-    return u"邀请注册：您的好友{}邀请您加入网利宝，快来一起赚钱，速速点击专属链接：" \
+    return u"邀请注册：您的好友{}邀请您加入网利宝一起投资赚钱，注册就有惊喜。速速点击专属链接：" \
            u"https://www.wanglibao.com/activity/wap/share?phone={}".format(name, phone)
 
 
@@ -189,3 +195,8 @@ def msg_give_coupon(name, amount, end_time):
               u"<a href='/'>立即使用</a>。<br/>" \
               u"感谢您对我们的支持与关注！<br/>网利宝".format(name, amount, end_time)
     return title, content
+
+
+if __name__ == "__main__":
+    print sms_alert_invest('test')
+    print sms_alert_invite('test', '12000000000')
