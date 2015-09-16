@@ -322,7 +322,11 @@ org.canvas = (function(org){
                 $portunity=$("#opportunity"),
                 demo=document.getElementById("demo").getElementsByTagName("img")[0],
                 str = ["100元现金红包","150元现金红包","200元现金红包","爱奇艺会员","扣电影代金券","抽前吼三吼，大奖跟我走","红包何时有，把酒问青天","大奖下回见，网利宝天天见","佛说：前世500次回眸才能换得一次中奖，淡定"],
-                num,text,giftInx,used_chances,gift,clsName,dataCode,amount,amount_left,gift_left,
+                num,text,used_chances,clsName,dataCode,
+                gift="None",
+                gift_left=0,
+                amount="None",
+                amount_left= 0,
                 i = 0,timer=null;
             var _timer = {};
 
@@ -383,10 +387,10 @@ org.canvas = (function(org){
                     timer=setInterval(function(){
                         timers();
                     },2000);
-                     if((amount != 'None' && amount_left != 0) || (gift_left!=0 && gift!="None")){
+                     if(amount != 'None' && amount_left != 0 || gift_left!=0 && gift!="None"){
                          $("#continue").html("领奖");
                     }
-                    if(i==1){
+                    if(i==1 && amount != "None" && used_chances <3){
                         idx--;
                         $portunity.html("注册用户有"+idx+"次刮奖机会");
                         i++;
