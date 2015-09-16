@@ -182,8 +182,8 @@ class P2PProduct(ProductBase):
 
     extra_data = JSONFieldUtf8(blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
 
-    publish_time = models.DateTimeField(default=timezone.now, verbose_name=u'发布时间*', blank=False)
-    end_time = models.DateTimeField(default=lambda :timezone.now() + timezone.timedelta(days=7), verbose_name=u'终止时间*', blank=False)
+    publish_time = models.DateTimeField(default=lambda: timezone.now() + timezone.timedelta(days=10), verbose_name=u'发布时间*', blank=False)
+    end_time = models.DateTimeField(default=lambda: timezone.now() + timezone.timedelta(days=17), verbose_name=u'终止时间*', blank=False)
     soldout_time = models.DateTimeField(u'售完时间', null=True, blank=True)
 
     make_loans_time = models.DateTimeField(u'放款时间', null=True, blank=True)
