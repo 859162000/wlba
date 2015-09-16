@@ -200,7 +200,7 @@ def require_trade_pwd(view_func):
     '''
     @wraps(view_func, assigned=available_attrs(view_func))
     def _wrapped_view(self, request, *args, **kwargs):
-        import logging;logging.getLogger('django').error('trade request %s'%request.POST)
+        import logging;logging.getLogger('django').error('trade request POST %s header %s'%(request.POST, request.META))
         no_need_trade_pwd = False
         #为了获取验证码
         if request.path == reverse('deposit-new') and len(request.POST.get('card_no')) != 10:
