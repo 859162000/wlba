@@ -38,7 +38,7 @@
         });
         //显示弹层
         function showAlert(obj,txt){
-            if(!txt){
+            if(txt){
                obj.find(".alert-cont").html(txt);
             }
             obj.show();
@@ -48,22 +48,28 @@
             "register": function(data){
                 var ret_code = data.ret_code;
                 console.log(data,"register");
-                if(ret_code == 00001){
-                   showAlert($(".no-new-user"));
+                if(ret_code === "00000"){
+                   showAlert($(".no-new-user"),"Sorry~您不符合参加规则");
+                }else if(ret_code === "10000"){
+                   showAlert($(".running"));
                 }
             },
             "firstPay": function(data){
                 var ret_code = data.ret_code;
                 console.log(data,"firstPay");
-                if(ret_code == 00001){
+                if(ret_code === "00001"){
                    showAlert($(".go-money"));
+                }else if(ret_code === "10000"){
+                   //showAlert($(".go-money"));
                 }
             },
             "firstBuy": function(data){
                 var ret_code = data.ret_code;
                 console.log(data,"firstBuy");
-                if(ret_code == 00001){
-                   showAlert($(".running"));
+                if(ret_code === "00001"){
+                    showAlert($(".to-invest"));
+                }else if(ret_code === "10000"){
+                    showAlert($(".running"));
                 }
             }
         }
