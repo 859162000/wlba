@@ -171,7 +171,7 @@ urlpatterns = patterns(
     # 切换支付渠道重新
     url(r'^pay/cnp/list_new/$', BindCardQueryView.as_view()),
     url(r'^pay/cnp/delete_new/$', UnbindCardView.as_view()),
-    url(r'^pay/cnp/dynnum_new/$', BindPayDynnumNewView.as_view()),
+    url(r'^pay/cnp/dynnum_new/$', BindPayDynnumNewView.as_view(), name='dynnum-new'),
     url(r'^pay/deposit_new/$', BindPayDepositView.as_view(), name='deposit-new'),
     url(r'^pay/cnp/yee/callback/$', YeeShortPayCallbackView.as_view(), name="yee-deposit-callback"),
 

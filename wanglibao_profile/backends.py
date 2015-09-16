@@ -200,10 +200,17 @@ def require_trade_pwd(view_func):
     '''
     @wraps(view_func, assigned=available_attrs(view_func))
     def _wrapped_view(self, request, *args, **kwargs):
-        import logging;logging.getLogger('django').error('trade request %s'%request.POST)
-        no_need_trade_pwd = (request.path == reverse('deposit-new') and len(request.POST.get('card_no')) != 10)
+        import logging;logging.getLogger('django').error('trade request POST %s header %s'%(request.POST, request.META))
+        no_need_trade_pwd = False
+        #为了获取验证码
+        if request.path == reverse('deposit-new') and len(request.POST.get('card_no')) != 10:
+            no_need_trade_pwd = True
+        #为了绑卡进行的绑卡充值
+        if request.path == reverse('dynnum-new') and int(request.POST.get('amount')) < 1:
+            no_need_trade_pwd = True
         if not _is_version_satisfied(request):
             no_need_trade_pwd = True
+        logging.getLogger('django').error('trade request no_need_trade_pwd %s'%no_need_trade_pwd)
         if no_need_trade_pwd:
             return view_func(self, request, *args, **kwargs)
 
