@@ -81,13 +81,10 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                     if redpack_period > 0:
                         if redpack_period != int(product['period']):
                             continue
-                    print event.p2p_types
                     if event.p2p_types:
                         p2p_types_id = int(event.p2p_types.id)
                         p2p_types_name = event.p2p_types.name
                         if product['types_id']:
-                            print(p2p_types_id)
-                            print(product['types_id'], 'product_id')
                             if product['types_id'] != p2p_types_id:
                                 continue
 
@@ -132,8 +129,6 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                         p2p_types_id = int(event.p2p_types.id)
                         p2p_types_name = event.p2p_types.name
                         if product['types_id']:
-                            print(int(p2p_types_id))
-                            print(product['types_id'], 'product_id')
                             if product['types_id'] != p2p_types_id:
                                 continue
                     else:

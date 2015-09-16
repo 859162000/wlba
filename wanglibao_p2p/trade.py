@@ -113,6 +113,11 @@ class P2PTrader(object):
         if is_full:
             from wanglibao_p2p.tasks import full_send_message
 
+            from celery.execute import send_task
+            send_task("wanglibao_p2p.tasks.p2p_auto_published_by_publish_time", kwargs={
+                'p2p_type': self.product.types,
+            })
+
             full_send_message.apply_async(kwargs={"product_name": self.product.name})
             # 满标将标信息写入redis
             cache_backend = redis_backend()
