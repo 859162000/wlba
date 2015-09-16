@@ -13,10 +13,10 @@
         }
     });
     require(['jquery', 'jqueryRotate', "tools"], function ($, jqueryRotate, tool) {
-        var activityId = 65;
+        var activityId = 37; //activity id
         function ajaxFun(url,data,fn){
             $.ajax({
-                type: "post",
+                type: "get",
                 url: url,
                 dataType: "json",
                 data: data,
@@ -47,18 +47,26 @@
         var funs = {
             "register": function(data){
                 var ret_code = data.ret_code;
+                console.log(data);
                 if(ret_code == 00001){
                    showAlert($(".no-new-user"));
+                }
+            },
+            "firstPay": function(data){
+                var ret_code = data.ret_code;
+                console.log(data);
+                if(ret_code == 00001){
+                   showAlert($(".go-money"));
                 }
             }
         }
         //注册领红包
         $(".receive-red").on('click',function(){
-            ajaxFun(url,{"activity_id":activityId,"trigger_node":"register","action": "is_activity"},funs.register);
+            ajaxFun("/api/activity/joinInfo/",{"activity_id":activityId,"trigger_node":"register"},funs.register);
         });
         //充值
         $(".recharge").on("click",function(){
-            showAlert($(".go-money"));
+            ajaxFun("/api/activity/joinInfo/",{"activity_id":activityId,"trigger_node":"first_pay"},funs.firstPay);
         });
         //理财
         $(".manage-money").on("click",function(){
