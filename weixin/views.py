@@ -695,7 +695,7 @@ class AuthorizeCode(APIView):
                 return Response({"user_info":user_info})
             else:
                 print('======================================================4')
-                HttpResponseRedirect('/weixin/api/test/?auth=1')
+                return redirect('/weixin/api/test/?auth=1')
 
 class AuthorizeUser(APIView):
     permission_classes = ()
@@ -711,7 +711,8 @@ class AuthorizeUser(APIView):
             print('======================================================2')
             oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri='/api/test1?reurl=/api/test3')
         # res = oauth._get(oauth.authorize_url)
-        HttpResponseRedirect(oauth.authorize_url)
+        # HttpResponseRedirect(oauth.authorize_url)
+        return redirect(oauth.authorize_url)
 
 
 # class AuthorizeUser(APIView):
