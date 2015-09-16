@@ -22,9 +22,20 @@ module.exports = function( grunt ) {
         },
         uglify: {
             mobile: {
-                files: {
-                    'scripts/mobile/dist/mobile.js': ['scripts/mobile/mobile.js']
-                }
+                files: [
+                    {
+                        expand: true,
+                        cwd: 'scripts/mobile_activity/',
+                        src: '*.js',
+                        dest: 'scripts/mobile_activity/dist/'
+                    },
+                    {
+                        expand: true,
+                        cwd: 'scripts/mobile/',
+                        src: '*.js',
+                        dest: 'scripts/mobile/dist/'
+                    },
+                ]
 
             }
         },
