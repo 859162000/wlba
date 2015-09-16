@@ -53,19 +53,21 @@
             "register": function(data){
                 var ret_code = data.ret_code;
                 console.log(data,"register");
-                if(ret_code === "00000"){
-                   showAlert($(".no-new-user"),"Sorry~您不符合参加规则");
-                }else if(ret_code === "10000"){
-                   showAlert($(".running"));
+                if(ret_code === "10000"){
+                    showAlert($(".running"));
+                }else{
+                    showAlert($(".no-new-user"),"Sorry~您不符合参加规则");
                 }
             },
             "firstPay": function(data){
                 var ret_code = data.ret_code;
                 console.log(data,"firstPay");
                 if(ret_code === "00001"){
-                   showAlert($(".go-money"));
+                    showAlert($(".go-money"));
                 }else if(ret_code === "10000"){
-                   //showAlert($(".go-money"));
+                    showAlert($(".running"));
+                }else{
+                    showAlert($(".no-new-user"),"Sorry~您不符合参加规则");
                 }
             },
             "firstBuy": function(data){
@@ -75,6 +77,8 @@
                     showAlert($(".to-invest"));
                 }else if(ret_code === "10000"){
                     showAlert($(".running"));
+                }else{
+                    showAlert($(".no-new-user"),"Sorry~您不符合参加规则");
                 }
             }
         }

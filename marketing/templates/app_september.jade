@@ -17,21 +17,21 @@ html
           if user.is_authenticated
             a(href="javascript:void(0);").red-btn.receive-red 注册领红包
           else
-            a(href="/accounts/register/?next=/activity/new_user/").red-btn.for-red 注册领红包
+            a(href="/weixin/regist/?next=/activity/app_new_user/").red-btn.for-red 注册领红包
       .welfare2.mtpx
         img(src="/static/imgs/mobile_activity/app_september/welfare2.png")
         p.btn-box
           if user.is_authenticated
             a(href="javascript:void(0);").red-btn.recharge 注册充值
           else
-            a(href="/accounts/register/?next=/activity/new_user/").red-btn 注册充值
+            a(href="/weixin/regist/?next=/activity/app_new_user/").red-btn 注册充值
       .welfare3.mtpx
         img(src="/static/imgs/mobile_activity/app_september/welfare3.png")
         p.btn-box
           if user.is_authenticated
             a(href="javascript:void(0);").red-btn.manage-money 我要理财
           else
-            a(href="/accounts/register/?next=/activity/new_user/").red-btn 我要理财
+            a(href="/weixin/regist/?next=/activity/app_new_user/").red-btn 我要理财
     .promote-new
       h3.use-tit 新手任务攻略
       .use-cont
@@ -65,14 +65,14 @@ html
       span.alert-close
       .alert-cont.pt 充值后，奖励自动发放
       p.txt-center.mt1r
-        a(href="/pay/banks/").alert-btn 去充值
+        a(href="/weixin/recharge/?rechargeNext=/weixin/account/").alert-btn 去充值
 
     //投资后
     .alert-box.to-invest
       span.alert-close
       .alert-cont.pt 投资后，奖励自动发放
       p.txt-center.mt1r
-        a(href="/p2p/list/").alert-btn 去投资
+        a(href="/weixin/list/").alert-btn 去投资
 
     //奖励已发放
     .alert-box.running
