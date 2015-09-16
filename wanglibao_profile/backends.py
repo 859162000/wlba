@@ -200,6 +200,7 @@ def require_trade_pwd(view_func):
     '''
     @wraps(view_func, assigned=available_attrs(view_func))
     def _wrapped_view(self, request, *args, **kwargs):
+        import logging;logging.getLogger('django').error('trade request %s'%request.POST)
         no_need_trade_pwd = (request.path == reverse('deposit-new') and len(request.POST.get('card_no')) != 10)
         if not _is_version_satisfied(request):
             no_need_trade_pwd = True
