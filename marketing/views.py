@@ -799,19 +799,19 @@ class UserActivityStatusAPIView(APIView):
         json_response = {}
         if not activity_id:
             json_response = {
-                'ret_code': 20002,
+                'ret_code': '20002',
                 'message': u'activity_id参数缺失'
             }
 
         if not trigger_node:
             json_response = {
-                'ret_code': 20003,
+                'ret_code': '20003',
                 'message': u'trigger_node参数缺失'
             }
 
         elif trigger_node not in TRIGGER_NODE:
             json_response = {
-                'ret_code': 30003,
+                'ret_code': '30003',
                 'message': u'不存在的trigger_node'
             }
 
@@ -833,12 +833,12 @@ class UserActivityStatusAPIView(APIView):
     def get_activity_user_registration_status(self, activity_record):
         if activity_record:
             json_response = {
-                'ret_code': 10000,
+                'ret_code': '10000',
                 'message': u'用户已参加过活动'
             }
         else:
             json_response = {
-                'ret_code': 00000,
+                'ret_code': '00000',
                 'message': u'用户未参加活动，已达到活动条件'
             }
         return json_response
@@ -849,18 +849,18 @@ class UserActivityStatusAPIView(APIView):
         if activity_record:
             if cost_record:
                 json_response = {
-                    'ret_code': 10000,
+                    'ret_code': '10000',
                     'message': u'用户已参加活动',
                 }
         else:
             if cost_record and amount >= activity_record.activityrule.min_amount:
                 json_response = {
-                    'ret_code': 00000,
+                    'ret_code': '00000',
                     'message': u'用户未参加活动，已达到活动条件',
                 }
             else:
                 json_response = {
-                    'ret_code': 00001,
+                    'ret_code': '00001',
                     'message': u'用户未参加活动且未达到活动条件',
                 }
         return json_response
@@ -876,7 +876,7 @@ class UserActivityStatusAPIView(APIView):
             activity_info = self.get_activity_info(activity_id)
             if not activity_info:
                 json_response = {
-                    'ret_code': 30002,
+                    'ret_code': '30002',
                     'message': u'不存在的activity_id'
                 }
 
@@ -892,7 +892,7 @@ class UserActivityStatusAPIView(APIView):
 
         if not json_response:
             json_response = {
-                'ret_code': 50000,
+                'ret_code': '50000',
                 'message': u'异常查询'
             }
         return HttpResponse(json.dumps(json_response), content_type='application/json')

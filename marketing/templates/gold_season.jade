@@ -6,7 +6,7 @@ head
     - with '网利宝' as title
     include include/common_head
     - endwith
-    link(rel="stylesheet",href="/static/stylesheets/gold_season.css")
+    link(rel="stylesheet",href="/static/stylesheets/gold_season.css?")
     - csrf_token
 body(style="background: #ffe6a6")
     include include/activityTop2
@@ -63,13 +63,13 @@ body(style="background: #ffe6a6")
                 img(src='/static/imgs/pc_activity/gold_season/orderImg2.png')
                 dl
                     dt 进入个人账户页面
-                    dd "登录" - "我的账户"
+                    dd "登录" -- "我的账户"
             .arrow
             .box
                 img(src='/static/imgs/pc_activity/gold_season/orderImg3.png')
                 dl
                     dt 分享专属链接
-                    dd 个人账户页面 - "全民淘金" - 分享<br>专属邀请码或专属链接给好友
+                    dd 个人账户页面 -- "全民淘金" - 分享<br>专属邀请码或专属链接给好友
             .arrow
             .box
                 img(src='/static/imgs/pc_activity/gold_season/orderImg4.png')
@@ -126,5 +126,5 @@ body(style="background: #ffe6a6")
     include global/g_footer
 
 script.
-    require(['/static/js/gold_season.js'])
+    require(['/static/js/gold_season.js?'])
                                                         
