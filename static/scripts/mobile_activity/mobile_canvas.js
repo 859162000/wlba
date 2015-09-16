@@ -322,7 +322,7 @@ org.canvas = (function(org){
                 $portunity=$("#opportunity"),
                 demo=document.getElementById("demo").getElementsByTagName("img")[0],
                 str = ["100元现金红包","150元现金红包","200元现金红包","爱奇艺会员","扣电影代金券","抽前吼三吼，大奖跟我走","红包何时有，把酒问青天","大奖下回见，网利宝天天见","佛说：前世500次回眸才能换得一次中奖，淡定"],
-                num,text,giftInx,used_chances,gift,clsName,dataCode,total,
+                num,text,giftInx,used_chances,gift,clsName,dataCode,amount,amount_left,gift_left,
                 /*num = Math.floor(Math.random()*8),
                 text=str[num],*/
                 timer=null;
@@ -333,13 +333,11 @@ org.canvas = (function(org){
             canvas.style.left = 0;
             canvas.style.top = 0;
             img.src = "/static/imgs/mobile_activity/app_scratch/gg_guajiang.png";
-
             function delay_till_last(id, fn, wait) {
                 if (_timer[id]) {
                      window.clearTimeout(_timer[id]);
                     delete _timer[id];
                  }
-
                 return _timer[id] = window.setTimeout(function() {
                 fn();
                 delete _timer[id];
@@ -386,10 +384,9 @@ org.canvas = (function(org){
                     timer=setInterval(function(){
                         timers();
                     },2000);
-                     if(used_chances==0 || (used_chances==2 && gift!="None")){
+                     if((amount != 'None' && amount_left != 0) || (gift_left!=0 && gift!="None")){
                          $("#continue").html("领奖");
                     }
-
                 }
                 //当手指移动的时候
                 function eventMove(e){
@@ -429,11 +426,6 @@ org.canvas = (function(org){
                 };
 
             };
-            //判断他是否中奖
-            //$portunity.html("注册用户有"+idx+"次刮奖机会")
-
-
-                //$("#continue").on('click',porttunclick);
             $("#continue").on('click', function() {
                 delay_till_last('id', function() {//注意 id 是唯一的
                     porttunclick();
@@ -443,7 +435,6 @@ org.canvas = (function(org){
             function porttunclick(){
 
                 if(used_chances<3){
-                    console.log(text);
                     if($("#continue").html()=="领奖"){
                         $("#dask").css({"display":"block"});
                         $("#delog").find("h3").html(text+"以发送！请留意站内信！");
@@ -465,7 +456,7 @@ org.canvas = (function(org){
                 } else if(clsName=="scratch_tub"){
                     spans.innerHTML = "注册帐号后即可刮奖";
                 }else{
-                    evendrawImg()
+                    evendrawImg();
                    $portunity.html("你的刮奖次数以用完");
                    spans.innerHTML = "你的刮奖次数以用完";
                 }
@@ -474,8 +465,7 @@ org.canvas = (function(org){
         function Interface(){
 
             var dataArr = [];
-            var gift_left,
-                amount, amount_left, retCode,
+            var retCode,
                 urlData = "IGNORE";
             //ajax请求数据
             function ajaxFun(action, fun) {
@@ -488,7 +478,6 @@ org.canvas = (function(org){
                     success: function (data) {
                         if (typeof fun === "function") {
                             fun(data);
-
                             console.log(data)
                         }
                     }
@@ -505,7 +494,7 @@ org.canvas = (function(org){
                 if (data.ret_code === 3001) {
                     ajaxFun("IS_VALID_CHANNEL", isChannel);
                     if(dataCode===3011){
-                        isdataCode()
+                        isdataCode();
                     }else{
                         spans.innerHTML = "你不符合参加规则";
                     }
@@ -522,95 +511,56 @@ org.canvas = (function(org){
                     used_chances = data.used_chances;
                     amount = parseInt(data.amount);
                     amount_left = data.amount_left;
-
                     if (amount != 'None' && amount_left != 0) {
-                        switch (amount) {
-                            case 100:
-                                idxs = 0;
-                                break;
-                            case 150:
-                                idxs = 1;
-                                break;
-                            case 200:
-                                idxs = 2;
-                                break;
-                        }
-                        dataArr.push(idxs);
-                    } else {
+                        dataArr.push(1);
+                    }
+                    if(gift != 'None' && gift_left != 0){
+                        dataArr.push(2);
+                    }else{
                         dataArr.push("");
                     }
-
                 }
-
                 ajaxFun("ENTER_WEB_PAGE", lotterInfo);
+
                 function rotateFun(data) {
                     used_chances = data.used_chances;
                     retCode = data.ret_code;
-                    console.log(data.type+"  "+retCode);
-                    /*if(data.type==="money" && retCode === 3025){
-                        if(gift!="None"  && gift_left != 0){
-                            if (gift == "抠电影") {
-                                spans.innerHTML="抠电影代金券";
-                            } else if (gift == "爱奇艺") {
-                                spans.innerHTML="爱奇艺会员";
-                            }
-                        }else{
-                            num = Math.floor(5+Math.random()*3);
-                            text=str[num];
-                            spans.innerHTML=text;
-                        }
-                    }
-                    if(data.type === "gift" && retCode === 3025){
-                        if(used_chances<1){
-                            spans.innerHTML = str[len];
-                        }else{
-                             num = Math.floor(5+Math.random()*3);
-                            text=str[num];
-                            spans.innerHTML=text;
-                        }
-                    }*/
                 }
-
-                    giftInx = Math.floor((Math.random() * dataArr.length));
-                    if (dataArr.length < 1) {
-                        urlData = "IGNORE";
+                if (dataArr.length < 1) {
+                    urlData = "IGNORE";
+                } else {
+                    if (dataArr[0]==1) {
+                        urlData = "GET_MONEY";
+                    } else if (dataArr[0]==2) {
+                        urlData = "GET_GIFT";
                     } else {
-                        if (dataArr[giftInx] > 2 && dataArr[giftInx] < 5) {
-                            urlData = "GET_GIFT";
-                        } else if (dataArr[giftInx] >= 0 && dataArr[giftInx] < 3) {
-                            urlData = "GET_MONEY";
-                        } else {
-                            urlData = "IGNORE";
-                        }
+                        urlData = "IGNORE";
                     }
-
-                //}
+                }
                 ajaxFun(urlData, rotateFun);
-                console.log(dataArr)
-                if (retCode == 3024 && dataCode == 3011 && used_chances >= 3) {
+
+                if (retCode == 3024 && dataCode == 3011 && used_chances > 2) {
                     spans.innerHTML = "你的刮奖次数以用完";
                     $portunity.html("你的刮奖次数以用完");
-                } else if (dataCode != 3011) {
-                    spans.innerHTML = "你不符合参加规则";
-                } else if(clsName=="scratch_tub"){
-                    spans.innerHTML = "注册后即可抽奖";
-                } else {
-                    //var len = dataArr[dataArr.length - 1];
-                    if(used_chances==0 && amount!="None" && amount_left!=0){
-                        //console.log(amount)
+                }else {
+                    if(amount != 'None' && amount_left != 0){
+                        console.log(amount)
                         spans.innerHTML = amount+"元现金红包";
-                    }else if(gift!="None" && used_chances==2 && gift_left != 0){
+                    }else if(gift != 'None' && gift_left != 0){
+                        console.log(gift+"  "+gift_left)
                         if (gift == "抠电影") {
                             spans.innerHTML="抠电影代金券";
                         } else if (gift == "爱奇艺") {
                             spans.innerHTML="爱奇艺会员";
                         }
                     }else{
+                        console.log(1);
                         num = Math.floor(5+Math.random()*3);
                         text=str[num];
                         spans.innerHTML=text;
                     }
                 }
+
             }
 
         }

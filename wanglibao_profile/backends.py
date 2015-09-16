@@ -189,8 +189,8 @@ def _is_version_satisfied(request):
     if device['device_type'] == 'ios' and _above_version(device['app_version'], '2.6.0'):
         # 2.6.0版本起，支持交易密码
         return True
-    if device['device_type'] == 'android' and _above_version(device['app_version'], '2.5.3'):
-        #2.5.3版本起，支持交易密码
+    if device['device_type'] == 'android' and _above_version(device['app_version'], '2.6.0'):
+        #2.6.0版本起，支持交易密码
         return True
     return False
 
@@ -200,6 +200,7 @@ def require_trade_pwd(view_func):
     '''
     @wraps(view_func, assigned=available_attrs(view_func))
     def _wrapped_view(self, request, *args, **kwargs):
+        import logging;logging.getLogger('django').error('trade request %s'%request.POST)
         no_need_trade_pwd = (request.path == reverse('deposit-new') and len(request.POST.get('card_no')) != 10)
         if not _is_version_satisfied(request):
             no_need_trade_pwd = True
