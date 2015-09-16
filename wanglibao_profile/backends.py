@@ -177,7 +177,7 @@ def _above_version(version_str, version_standard):
     :return:
     '''
 
-    if _version_to_num(version_str) >= version_standard:
+    if _version_to_num(version_str) >= _version_to_num(version_standard):
         return True
     else:
         return False
