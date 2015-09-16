@@ -322,10 +322,12 @@ org.canvas = (function(org){
                 $portunity=$("#opportunity"),
                 demo=document.getElementById("demo").getElementsByTagName("img")[0],
                 str = ["100元现金红包","150元现金红包","200元现金红包","爱奇艺会员","扣电影代金券","抽前吼三吼，大奖跟我走","红包何时有，把酒问青天","大奖下回见，网利宝天天见","佛说：前世500次回眸才能换得一次中奖，淡定"],
-                num,text,giftInx,used_chances,gift,clsName,dataCode,amount,amount_left,gift_left,
-                /*num = Math.floor(Math.random()*8),
-                text=str[num],*/
-                timer=null;
+                num,text,used_chances,clsName,dataCode,
+                gift="None",
+                gift_left=0,
+                amount="None",
+                amount_left= 0,
+                i = 0,timer=null;
             var _timer = {};
 
             canvas.style.backgroundColor='transparent';
@@ -378,15 +380,22 @@ org.canvas = (function(org){
                 //当手指松开的时候
                 function eventUp(e){
                     e.preventDefault();
+                    i++;
                     mousedown=false;
                     clearInterval(timer);
                     text=spans.innerHTML;
                     timer=setInterval(function(){
                         timers();
                     },2000);
-                     if((amount != 'None' && amount_left != 0) || (gift_left!=0 && gift!="None")){
+                     if(amount != 'None' && amount_left != 0 || gift_left!=0 && gift!="None"){
                          $("#continue").html("领奖");
                     }
+                    if(i==1 && amount != "None" && used_chances <3){
+                        idx--;
+                        $portunity.html("注册用户有"+idx+"次刮奖机会");
+                        i++;
+                    }
+
                 }
                 //当手指移动的时候
                 function eventMove(e){
@@ -446,10 +455,10 @@ org.canvas = (function(org){
 
                     }else{
                         Interface();
-                        idx--;
                         evendrawImg();
+                        i=0;
                     }
-                    $portunity.html("注册用户有"+idx+"次刮奖机会");
+
                     clearInterval(timer);
                 }else if (dataCode != 3011 && clsName=="unAuthenticated") {
                     spans.innerHTML = "你不符合参加规则";
