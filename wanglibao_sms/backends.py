@@ -60,6 +60,12 @@ class ManDaoSMSBackEnd(SMSBackEnd):
         #if len(phones) > 1 and len(messages) == 1:
         if len(phones) > 1 and len(messages) > 1:
             url = settings.SMS_MANDAO_MULTICAST_URL
+        try:
+            ext = int(ext)
+            if ext < 1 or ext > 999:
+                ext = ''
+        except ValueError:
+            ext = ''
         params = {
             'sn': settings.SMS_MANDAO_SN,
             'pwd': settings.SMS_MANDAO_MD5_PWD,
