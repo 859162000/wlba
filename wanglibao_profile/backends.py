@@ -9,6 +9,7 @@ from wanglibao_pay.models import Card
 from wanglibao_profile.models import WanglibaoUserProfile
 import time
 import json
+import logging
 
 #最多重试三次
 from wanglibao_rest.utils import split_ua
@@ -186,6 +187,7 @@ def _is_version_satisfied(request):
         #     "channel_id":arr[2], "model":arr[1],
         #     "os_version":arr[3], "network":arr[4]}
     device = split_ua(request)
+    logging.getLogger('django').error('trade request device %s'%device)
     if device['device_type'] == 'ios' and _above_version(device['app_version'], '2.6.0'):
         # 2.6.0版本起，支持交易密码
         return True
@@ -200,7 +202,7 @@ def require_trade_pwd(view_func):
     '''
     @wraps(view_func, assigned=available_attrs(view_func))
     def _wrapped_view(self, request, *args, **kwargs):
-        import logging;logging.getLogger('django').error('trade request POST %s header %s'%(request.POST, request.META))
+        logging.getLogger('django').error('trade request POST %s header %s'%(request.POST, request.META))
         no_need_trade_pwd = False
         #为了获取验证码
         if request.path == reverse('deposit-new') and len(request.POST.get('card_no')) != 10:
