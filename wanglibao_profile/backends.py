@@ -210,7 +210,7 @@ def require_trade_pwd(view_func):
             no_need_trade_pwd = True
         if not _is_version_satisfied(request):
             no_need_trade_pwd = True
-
+        logging.getLogger('django').error('trade request no_need_trade_pwd %s'%no_need_trade_pwd)
         if no_need_trade_pwd:
             return view_func(self, request, *args, **kwargs)
 
