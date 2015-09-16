@@ -27,7 +27,12 @@
             });
         }
         //banner
-        $("#banner").height($(window).height());
+        var banDom = $("#banner");
+        var winh = $(window).height();
+        banDom.height(winh);
+        if(winh < 970){
+            banDom.addClass("min-banner");
+        }
         //关闭弹层
         function closeAlert(tp){
           tp.hide();
