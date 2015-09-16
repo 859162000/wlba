@@ -122,7 +122,7 @@ class P2PTrader(object):
             send_task("wanglibao_p2p.tasks.p2p_auto_published_by_publish_time", kwargs={
                 'p2p_type': self.product.types.id,
             })
-            
+
             # 满标将标信息写入redis
             cache_backend = redis_backend()
             if cache_backend._is_available():
