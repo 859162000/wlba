@@ -514,7 +514,7 @@ class AppPhoneBookAlertApiView(APIView):
         send_messages.apply_async(kwargs={
             'phones': [phone],
             'messages': [sms],
-            'ext': 'wangli_yx'
+            'ext': 666  # 营销类短信发送必须增加ext参数,值为666
         })
 
 
