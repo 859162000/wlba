@@ -1,6 +1,7 @@
 # encoding=utf-8
 from functools import wraps
 from django.contrib.auth.hashers import make_password, check_password
+from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse
 from django.utils.decorators import available_attrs
 from rest_framework.request import Request
@@ -10,6 +11,8 @@ import time
 import json
 
 #最多重试三次
+from wanglibao_rest.utils import split_ua
+
 TRADE_PWD_LOCK_MAX_RETRY = 3
 #最多锁定三小时
 TRADE_PWD_LOCK_MAX_TIME = 3600 * 3
@@ -58,7 +61,7 @@ def _trade_pwd_lock_touch(profile):
     profile.trade_pwd_last_failed_time = time.time()
 
 def trade_pwd_is_set(user_id):
-    profile = WanglibaoUserProfile.objects.filter(user__id=user_id).first()
+    profile = WanglibaoUserProfile.objects.filter(user_id=user_id).first()
     if profile and profile.trade_pwd:
         return True
     else:
@@ -93,16 +96,17 @@ def trade_pwd_set(user_id,
         {'ret_code':5, 'message': '交易密码条件验证成功'}
     '''
 
-    profile = WanglibaoUserProfile.objects.filter(user__id=user_id).first()
+    profile = WanglibaoUserProfile.objects.filter(user_id=user_id).first()
     if not profile:
         return {'ret_code':4, 'message': '用户ID错误，无法获取用户身份'}
 
     if action_type == 1 and profile.trade_pwd:
         return {'ret_code':3, 'message': '交易密码已经存在，初始交易密码设置失败'}
-    elif action_type == 2 and not _check_pwd(old_trade_pwd, profile.trade_pwd):
+    elif action_type == 2 and not _check_pwd(str(old_trade_pwd), profile.trade_pwd):
+        print old_trade_pwd, type(old_trade_pwd), profile.trade_pwd, _check_pwd(old_trade_pwd, profile.trade_pwd)
         return {'ret_code':1, 'message': '旧交易密码错误，交易密码设置失败'}
     elif action_type == 3:
-        is_card_right = Card.objects.filter(user__id=profile.user__id, no=card_id).exists()
+        is_card_right = Card.objects.filter(user__id=profile.user_id, no=card_id).exists()
         is_id_right = (profile.id_number == citizen_id)
         if not (is_card_right and is_id_right):
             return {'ret_code':2, 'message': '银行卡或身份证信息有误，交易密码设置失败'}
@@ -129,7 +133,7 @@ def trade_pwd_check(user_id, raw_trade_pwd):
             {'ret_code’:30049,'message':'交易密码校验发生未知错误'，'retry_count':1 }
             {'ret_code’:30050,'message':'用户ID错误，无法获取用户身份'，'retry_count':0 }
     '''
-    profile = WanglibaoUserProfile.objects.filter(user__id=user_id).first()
+    profile = WanglibaoUserProfile.objects.filter(user_id=user_id).first()
     if not profile:
         return {'ret_code':30050, 'message':'用户ID错误,无法获取用户身份','retry_count':0 }
 
@@ -146,7 +150,49 @@ def trade_pwd_check(user_id, raw_trade_pwd):
         else:
             _trade_pwd_lock_touch(profile)
             profile.save()
-            return {'ret_code': 30047, 'message': '交易密码错误', 'retry_count': _trade_pwd_lock_retry_count(profile)}
+            retry_count = _trade_pwd_lock_retry_count(profile)
+            if retry_count == 0:
+                return {'ret_code':30048, 'message': '重试次数过多，交易密码被锁定', 'retry_count': 0}
+            else:
+                return {'ret_code': 30047, 'message': '交易密码错误', 'retry_count': _trade_pwd_lock_retry_count(profile)}
+
+def _version_to_num(version_str):
+    '''
+    将版本号转化为权重
+    :param version_str:
+    :return:
+    '''
+    l = version_str.split('.')
+    sum = 0
+    for i in l:
+        sum = sum * 10000 + int(i)
+    return sum
+
+def _above_version(version_str, version_standard):
+    '''
+    判断version_str的版本是否高于(>=)version_standard
+    :param version_str:
+    :param version_standard:
+    :return:
+    '''
+
+    if _version_to_num(version_str) >= version_standard:
+        return True
+    else:
+        return False
+
+def _is_version_satisfied(request):
+        # return {"device_type":device_type, "app_version":arr[0],
+        #     "channel_id":arr[2], "model":arr[1],
+        #     "os_version":arr[3], "network":arr[4]}
+    device = split_ua(request)
+    if device['device_type'] == 'ios' and _above_version(device['app_version'], '2.6.0'):
+        # 2.6.0版本起，支持交易密码
+        return True
+    if device['device_type'] == 'android' and _above_version(device['app_version'], '2.5.3'):
+        #2.5.3版本起，支持交易密码
+        return True
+    return False
 
 def require_trade_pwd(view_func):
     '''
@@ -154,8 +200,14 @@ def require_trade_pwd(view_func):
     '''
     @wraps(view_func, assigned=available_attrs(view_func))
     def _wrapped_view(self, request, *args, **kwargs):
+        no_need_trade_pwd = (request.path == reverse('deposit-new') and len(request.POST.get('card_no')) != 10)
+        if not _is_version_satisfied(request):
+            no_need_trade_pwd = True
+        if no_need_trade_pwd:
+            return view_func(self, request, *args, **kwargs)
+
         check_result = trade_pwd_check(request.user.id, request.POST.get('trade_pwd'))
-        if check_result.get('ret_code') == 0:
+        if check_result.get('ret_code') == 0 :
             return view_func(self, request, *args, **kwargs)
         else:
             return HttpResponse(json.dumps(check_result), content_type="application/json")
