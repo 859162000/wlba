@@ -1,8 +1,6 @@
 module.exports = function( grunt ) {
     "use strict";
 
-    //var mozjpeg = require('imagemin-mozjpeg');
-
     grunt.initConfig({
         compass: {
             dist: {
@@ -11,15 +9,21 @@ module.exports = function( grunt ) {
                 }
             }
         },
+
         concat: {
             options: {
                 separator: ';'
             },
-            dist: {
+            weixin: {
                 src: ['src/mobile/lib/zepto/zepto.js', 'src/mobile/mobile.js'],
                 dest: 'scripts/mobile/mobile.js',
+            },
+            acOne: {
+                src: ['src/mobile_activity/lib/zepto.min.js', 'src/mobile_activity/lib/ac_mod.js', 'src/mobile_activity/activityName.js'],
+                dest: 'scripts/mobile_activity/activityName.js',
             }
         },
+
         uglify: {
             mobile: {
                 files: [
@@ -39,6 +43,7 @@ module.exports = function( grunt ) {
 
             }
         },
+
         watch: {
           css: {
             files: [
@@ -49,22 +54,12 @@ module.exports = function( grunt ) {
           },
           js: {
               files: [
-                 'src/mobile/mobile.js',
+                  'src/mobile/mobile.js',
+                  'src/mobile_activity/*.js',
               ],
               tasks: ['concat']
           }
-        },
-        /*
-        imagemin: {
-            static: {
-                options: {
-                    optimizationLevel: 3,
-                    svgoPlugins: [{ removeViewBox: false }],
-                    use: [mozjpeg()]
-                }
-            }
         }
-        */
 
     });
 
@@ -73,6 +68,4 @@ module.exports = function( grunt ) {
     grunt.loadNpmTasks('grunt-contrib-compass');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    //grunt.loadNpmTasks('grunt-contrib-imagemin');
-
 };
