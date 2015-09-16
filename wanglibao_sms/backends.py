@@ -50,7 +50,7 @@ class ManDaoSMSBackEnd(SMSBackEnd):
         return cls.send_messages([phone], [text])
 
     @classmethod
-    def send_messages(cls, phones, messages):
+    def send_messages(cls, phones, messages, ext=''):
 
         phone = ",".join(phones)
         text = ",".join(messages)
@@ -65,7 +65,7 @@ class ManDaoSMSBackEnd(SMSBackEnd):
             'pwd': settings.SMS_MANDAO_MD5_PWD,
             'mobile': phone,
             'content': text,
-            'ext': '',
+            'ext': ext,
             'stime': '',
             'rrid': '',
             'msgfmt': ''

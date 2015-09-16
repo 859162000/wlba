@@ -513,7 +513,8 @@ class AppPhoneBookAlertApiView(APIView):
     def _send_sms(self, phone, sms):
         send_messages.apply_async(kwargs={
             'phones': [phone],
-            'messages': [sms]
+            'messages': [sms],
+            'ext': 'wangli_yx'
         })
 
 
