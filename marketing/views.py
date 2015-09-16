@@ -784,11 +784,10 @@ def get_first_pay_info(user_id, start_time, end_time):
 
 class UserActivityStatusAPIView(APIView):
     """
-    判断是否完成活动任务
-    :param APIView:
-    :return: status_code
+    查询已验证登陆用户的活动完成状态
     """
     permission_classes = (IsAuthenticated, )
+
     def get_activity_info(self, activity_id):
         try:
             activity_info = Activity.objects.get(id=activity_id)
@@ -800,19 +799,19 @@ class UserActivityStatusAPIView(APIView):
         json_response = {}
         if not activity_id:
             json_response = {
-                'ret_code': 20002,
+                'ret_code': '20002',
                 'message': u'activity_id参数缺失'
             }
 
         if not trigger_node:
             json_response = {
-                'ret_code': 20003,
+                'ret_code': '20003',
                 'message': u'trigger_node参数缺失'
             }
 
         elif trigger_node not in TRIGGER_NODE:
             json_response = {
-                'ret_code': 30003,
+                'ret_code': '30003',
                 'message': u'不存在的trigger_node'
             }
 
@@ -831,24 +830,37 @@ class UserActivityStatusAPIView(APIView):
             pass
         return cost_info
 
+    def get_activity_user_registration_status(self, activity_record):
+        if activity_record:
+            json_response = {
+                'ret_code': '10000',
+                'message': u'用户已参加过活动'
+            }
+        else:
+            json_response = {
+                'ret_code': '00000',
+                'message': u'用户未参加活动，已达到活动条件'
+            }
+        return json_response
+
     def get_activity_user_first_cost_status(self, activity_record, cost_record):
         amount = cost_record.amount if cost_record else None
         json_response = {}
         if activity_record:
             if cost_record:
                 json_response = {
-                    'ret_code': 10000,
+                    'ret_code': '10000',
                     'message': u'用户已参加活动',
                 }
         else:
             if cost_record and amount >= activity_record.activityrule.min_amount:
                 json_response = {
-                    'ret_code': 00000,
+                    'ret_code': '00000',
                     'message': u'用户未参加活动，已达到活动条件',
                 }
             else:
                 json_response = {
-                    'ret_code': 00001,
+                    'ret_code': '00001',
                     'message': u'用户未参加活动且未达到活动条件',
                 }
         return json_response
@@ -864,27 +876,23 @@ class UserActivityStatusAPIView(APIView):
             activity_info = self.get_activity_info(activity_id)
             if not activity_info:
                 json_response = {
-                    'ret_code': 30002,
+                    'ret_code': '30002',
                     'message': u'不存在的activity_id'
                 }
 
         if not json_response:
             activity_record = ActivityRecord.objects.filter(user_id=user.id, activity__id=activity_id,
                                                             trigger_node=trigger_node).first()
-            if activity_record:
-                if trigger_node in ('register', 'validation'):
-                    json_response = {
-                        'ret_code': 10000,
-                        'message': u'用户已参加过活动'
-                    }
-                elif trigger_node in ('first_pay', 'first_buy'):
-                    cost_record = self.get_activity_first_cost_info(user.id, trigger_node,
-                                                                    activity_info.start_at, activity_info.end_at)
-                    json_response = self.get_activity_user_first_cost_status(activity_record, cost_record)
+            if trigger_node in ('register', 'validation'):
+                json_response = self.get_activity_user_registration_status(activity_record)
+            elif trigger_node in ('first_pay', 'first_buy'):
+                cost_record = self.get_activity_first_cost_info(user.id, trigger_node,
+                                                                activity_info.start_at, activity_info.end_at)
+                json_response = self.get_activity_user_first_cost_status(activity_record, cost_record)
 
         if not json_response:
             json_response = {
-                'ret_code': 50000,
+                'ret_code': '50000',
                 'message': u'异常查询'
             }
         return HttpResponse(json.dumps(json_response), content_type='application/json')
