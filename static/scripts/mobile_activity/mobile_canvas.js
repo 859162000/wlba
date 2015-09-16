@@ -546,7 +546,7 @@ org.canvas = (function(org){
                 }else {
                     if(used_chances==0 && amount != 'None' && amount_left != 0){
                         spans.innerHTML = amount+"元现金红包";
-                    }else if(gift != 'None' && gift_left != 0 && used_chances==1){\
+                    }else if(gift != 'None' && gift_left != 0 && used_chances==1){
                         if (gift == "抠电影") {
                             spans.innerHTML="抠电影代金券";
                         } else if (gift == "爱奇艺") {
