@@ -47,16 +47,23 @@
         var funs = {
             "register": function(data){
                 var ret_code = data.ret_code;
-                console.log(data);
+                console.log(data,"register");
                 if(ret_code == 00001){
                    showAlert($(".no-new-user"));
                 }
             },
             "firstPay": function(data){
                 var ret_code = data.ret_code;
-                console.log(data);
+                console.log(data,"firstPay");
                 if(ret_code == 00001){
                    showAlert($(".go-money"));
+                }
+            },
+            "firstBuy": function(data){
+                var ret_code = data.ret_code;
+                console.log(data,"firstBuy");
+                if(ret_code == 00001){
+                   showAlert($(".running"));
                 }
             }
         }
@@ -70,7 +77,7 @@
         });
         //理财
         $(".manage-money").on("click",function(){
-            showAlert($(".running"));
+            ajaxFun("/api/activity/joinInfo/",{"activity_id":activityId,"trigger_node":"first_buy"},funs.firstBuy);
         });
     });
 }).call(this);
