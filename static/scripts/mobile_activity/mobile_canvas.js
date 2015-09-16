@@ -545,10 +545,10 @@ org.canvas = (function(org){
                     spans.innerHTML = "你的刮奖次数以用完";
                     $portunity.html("你的刮奖次数以用完");
                 }else {
-                    if(used_chances==0 && amount != 'None' && amount_left != 0){
+                    if(amount != 'None' && amount_left != 0){
                         console.log(amount)
                         spans.innerHTML = amount+"元现金红包";
-                    }else if(gift != 'None' && gift_left != 0 && used_chances==1){
+                    }else if(gift != 'None' && gift_left != 0){
                         console.log(gift+"  "+gift_left)
                         if (gift == "抠电影") {
                             spans.innerHTML="抠电影代金券";
