@@ -39,7 +39,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from wanglibao_redpack.models import RedPackEvent
 from wanglibao_redpack import backends as redpack_backends
-from wanglibao_activity.models import ActivityRecord, Activity
+from wanglibao_activity.models import ActivityRecord, Activity, ActivityRule
 from wanglibao_account import message as inside_message
 from wanglibao_pay.models import PayInfo
 from wanglibao_activity.models import TRIGGER_NODE
@@ -784,7 +784,7 @@ def get_first_pay_info(user_id, start_time, end_time):
 
 class UserActivityStatusAPIView(APIView):
     """
-    查询已验证登陆用户的活动完成状态
+    官方主动注册用户活动状态查询接口
     """
     permission_classes = (IsAuthenticated, )
 
@@ -817,7 +817,16 @@ class UserActivityStatusAPIView(APIView):
 
         return json_response
 
+    def get_activitys_rule_min_amount(self, activity_id):
+        min_amount = None
+        try:
+            min_amount = ActivityRule.objects.filter(activity_id=activity_id).order_by('min_amount')[0]
+        except:
+            pass
+        return min_amount
+
     def get_activity_first_cost_info(self, user_id, trigger_node, starttime, endtime):
+        # 获取用户活动期间内的首次支付以及首次投资的记录
         cost_info = None
         try:
             if trigger_node == 'first_pay':
@@ -831,6 +840,7 @@ class UserActivityStatusAPIView(APIView):
         return cost_info
 
     def get_activity_user_registration_status(self, activity_record):
+        #　判断用户是否在活动期间注册及实名，并生成返回信息
         if activity_record:
             json_response = {
                 'ret_code': '10000',
@@ -843,7 +853,8 @@ class UserActivityStatusAPIView(APIView):
             }
         return json_response
 
-    def get_activity_user_first_cost_status(self, activity_record, cost_record):
+    def get_activity_user_first_cost_status(self, activity_record, cost_record, activity_id):
+        # 判断用户是否在活动期间完成首次支付或者首投的动作，是否满足活动条件，并生成返回信息
         amount = cost_record.amount if cost_record else None
         json_response = {}
         if activity_record:
@@ -853,7 +864,8 @@ class UserActivityStatusAPIView(APIView):
                     'message': u'用户已参加活动',
                 }
         else:
-            if cost_record and amount >= activity_record.activityrule.min_amount:
+            min_pay_amount = self.get_activitys_rule_min_amount(activity_id)
+            if cost_record and min_pay_amount and amount >= min_pay_amount:
                 json_response = {
                     'ret_code': '00000',
                     'message': u'用户未参加活动，已达到活动条件',
@@ -888,7 +900,7 @@ class UserActivityStatusAPIView(APIView):
             elif trigger_node in ('first_pay', 'first_buy'):
                 cost_record = self.get_activity_first_cost_info(user.id, trigger_node,
                                                                 activity_info.start_at, activity_info.end_at)
-                json_response = self.get_activity_user_first_cost_status(activity_record, cost_record)
+                json_response = self.get_activity_user_first_cost_status(activity_record, cost_record, activity_id)
 
         if not json_response:
             json_response = {

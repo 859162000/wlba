@@ -263,7 +263,8 @@ class PurchaseP2PMobile(APIView):
                                 url = "?user_id=%s&order_id=%s"%(request.user.id, order_id)
                 return Response({
                     'data': product_info.amount,
-                    'share_info':[shareShow, url],
+                    'share_show': shareShow,
+                    'share_url': url,
                 })
             except Exception, e:
                 return Response({
