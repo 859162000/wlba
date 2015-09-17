@@ -1,0 +1,10 @@
+#!/usr/bin/env python
+# encoding:utf-8
+
+from django.conf.urls import url, patterns
+import views
+urlpatterns = patterns(
+    '',
+    #url(r'^share/(?P<phone_num>\d+)/((?P<openid>\d+)/?P<product_id>\d+)/$', views.WeixinShareView.as_view(), ),
+    url(r'^share/(?P<phone_num>\d+)/(?P<openid>\d+)/(?P<product_id>\d+)/(?P<activity>[\w,"_"]+)/$', views.WeixinShareView.as_view(), ),
+)
