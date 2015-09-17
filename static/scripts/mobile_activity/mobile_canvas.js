@@ -346,13 +346,8 @@ org.canvas = (function(org){
                 }else if(clsName=="unAuthenticated"){
                     Interface();
                     if(used_chances<3){
-                        if(used_chances==2){
-                            ss=total-used_chances;
-                            $portunity.html("您有"+(ss+1)+"次刮奖机会");
-                        }else{
-                            ss=total-used_chances;
-                            $portunity.html("您有"+ss+"次刮奖机会");
-                        }
+                        ss=total-used_chances;
+                        $portunity.html("您有"+ss+"次刮奖机会");
                     }
                 }
             }
@@ -394,11 +389,7 @@ org.canvas = (function(org){
                          $("#continue").html("领奖");
                     }
                     if(i==1 && amount != "None" ){
-                        if(used_chances==0){
-                           $portunity.html("您有"+(ss-1)+"次刮奖机会");
-                        }else{
-                            $portunity.html("您有"+ss+"次刮奖机会");
-                        }
+                        $portunity.html("您有"+ss+"次刮奖机会");
                         i++;
                     }
                     if(used_chances == 3){
