@@ -23,7 +23,7 @@ module.exports = function( grunt ) {
         },
 
         uglify: {
-            mobile: {
+            build: {
                 files: [
                     {
                         expand: true,
@@ -73,6 +73,12 @@ module.exports = function( grunt ) {
     grunt.initConfig(config);
 
     grunt.registerTask('default', ['watch', 'compass', 'concat', 'uglify']);
+
+    grunt.registerTask(
+        'build',
+        'build the javaScript files.',
+        [ 'uglify:build' ]
+    );
 
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-compass');
