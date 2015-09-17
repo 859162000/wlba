@@ -1,9 +1,7 @@
 module.exports = function( grunt ) {
     "use strict";
 
-    //var mozjpeg = require('imagemin-mozjpeg');
-
-    grunt.initConfig({
+    var config =  {
         compass: {
             dist: {
                 options: {
@@ -11,17 +9,21 @@ module.exports = function( grunt ) {
                 }
             }
         },
+        activityMod: ['src/mobile_activity/lib/zepto.util.js', 'src/mobile_activity/lib/activity.util.js'],
+
         concat: {
             options: {
                 separator: ';'
             },
-            dist: {
-                src: ['src/mobile/lib/zepto/zepto.js', 'src/mobile/mobile.js'],
-                dest: 'scripts/mobile/mobile.js',
+            basic:{
+                files: {
+                    'scripts/mobile/mobile.js': ['src/mobile/lib/zepto/zepto.js', 'src/mobile/mobile.js'],
+                }
             }
         },
+
         uglify: {
-            mobile: {
+            build: {
                 files: [
                     {
                         expand: true,
@@ -39,6 +41,7 @@ module.exports = function( grunt ) {
 
             }
         },
+
         watch: {
           css: {
             files: [
@@ -49,30 +52,36 @@ module.exports = function( grunt ) {
           },
           js: {
               files: [
-                 'src/mobile/mobile.js',
+                  'src/mobile/mobile.js',
+                  'src/mobile_activity/*.js',
               ],
               tasks: ['concat']
           }
-        },
-        /*
-        imagemin: {
-            static: {
-                options: {
-                    optimizationLevel: 3,
-                    svgoPlugins: [{ removeViewBox: false }],
-                    use: [mozjpeg()]
-                }
-            }
         }
-        */
 
-    });
+    };
+
+
+    grunt.file.recurse('src/mobile_activity/', function(abspath, rootdir, subdir, filename){
+        if(abspath.indexOf(subdir) < 0){
+            var key  = 'scripts/mobile_activity/'+filename
+            config.concat.basic.files[key] = ['<%= activityMod %>', abspath]
+        }
+        return
+    })
+
+    grunt.initConfig(config);
 
     grunt.registerTask('default', ['watch', 'compass', 'concat', 'uglify']);
+
+    grunt.registerTask(
+        'build',
+        'build the javaScript files.',
+        [ 'uglify:build' ]
+    );
+
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-compass');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    //grunt.loadNpmTasks('grunt-contrib-imagemin');
-
 };
