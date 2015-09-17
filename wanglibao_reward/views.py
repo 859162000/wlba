@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.http.response import HttpResponse
 from django.db.models import Count, Q
 from datetime import datetime
-from wanglibao_redpack.models import RedPackEvent
+from django.contrib.auth.models import User
 from wanglibao_redpack import backends as redpack_backends
 import inspect
 import time
@@ -20,6 +20,7 @@ from marketing.models import IntroducedBy, Reward
 from wanglibao_reward.models import WanglibaoActivityGift, WanglibaoUserGift, WanglibaoActivityGiftGlobalCfg
 from wanglibao_redpack.models import RedPackEvent
 from wanglibao_activity.models import Activity, ActivityRule
+from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_p2p.models import P2PRecord
 from django.views.generic import View
 from django.http import HttpResponse, Http404
@@ -171,7 +172,7 @@ class WanglibaoReward(object):
     def distribute_one_reward(self, name, counts):
         gift = WanglibaoUserGift.objects.create(
             user=self.request.user,
-            rules=WanglibaoActivityGift.objects.filter(activity=self.activity, name=reward["name"]),
+            #rules=WanglibaoActivityGift.objects.filter(activity=self.activity, name=reward["name"]),
             activity=self.activity,
             index=self.get_reward_max_index()+1,
             name=name,
@@ -345,6 +346,7 @@ class WeixinShareView(View):
                     redpack=redpack,
                     name=redpack.rtype,
                     total_count=redpack.value,  #这个地方很关键,优惠券个数
+                    valid=True
                     )
                     activity_gift.type = redpack_type[redpack.rtype]
                     activity_gift.save()
@@ -368,18 +370,46 @@ class WeixinShareView(View):
         """
             根据概率，分发奖品
         """
-        pass
+        if not self.activity:
+            self.get_activity_by_id(activity)
 
-    def get_distribute_status(self, product_id):
-        """
-            获得用户领奖信息
-        """
         try:
-            gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=product_id, activity=self.activity)
-            return gifts
+            gift = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity, valid=True).first()
         except Exception, reason:
-            self.exception_msg(reason, u'获取已领奖用户信息失败')
+            self.exception_msg(reason, u'获得待发奖项抛异常')
             return None
+
+        if gift:
+            gift.valid = False
+            gift.save()
+            user_profile = WanglibaoUserProfile.objects.filter(phone=phone_num).first()
+            WanglibaoUserGift.objects.create(
+                rules=gift,
+                user=user_profile.user if user_profile else None,
+                identity=phone_num,
+                activity=self.activity
+            )
+            WanglibaoUserGift.objects.create(
+                rules=gift,
+                user=user_profile.user if user_profile else None,
+                identity=openid,
+                activity=self.activity
+            )
+            return gift
+
+    def get_distribute_status(self, product_id, activity):
+            """
+                获得用户领奖信息
+            """
+            if not self.activity:
+                self.get_activity_by_id(activity)
+
+            try:
+                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=product_id, activity=self.activity)
+                return gifts
+            except Exception, reason:
+                self.exception_msg(reason, u'获取已领奖用户信息失败')
+                return None
 
     def get_global_cfg(self, activity):
         """
@@ -414,26 +444,23 @@ class WeixinShareView(View):
         phone_num = args["phone_num"]
         product_id = args["product_id"]
         activity = args["activity"]
-        """if not self.is_valid_user_auth(product_id, activity):
+        if not self.is_valid_user_auth(product_id, activity):
             to_json_response = {
                 'ret_code': 9000,
                 'message': u'用户投资没有达到%s元;' %(self.global_cfg.amount),
             }
+
             self.debug_msg(to_json_response["message"])
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-        """
-        # 判断是否已经生成了组合红包,并生成组合红包
+
         if not self.has_combine_redpack(product_id, activity):
             self.generate_combine_redpack(product_id, activity)
 
-        # 判断用户是否已经领取了红包
         if not self.has_got_redpack(phone_num, openid, activity, product_id):
             self.distribute_redpack(phone_num, openid, activity, product_id)
-    #判断用户是否达到分享的标准，投资满1000
-    #调用梅梅的接口，判断是否已经获取了用户的openid等信息
-    # （1类红包看成是组合红包的特例）,
-    # 分发用户红包
-    # 获得组合红包的分发情况，返回给前端
-        return HttpResponse(activity)
+
+        response = self.get_distribute_status(product_id, activity)
+        return HttpResponse(response)
+
 # vim: set noexpandtab ts=4 sts=4 sw=4 :
 

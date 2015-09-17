@@ -67,7 +67,7 @@ class WanglibaoUserGift(models.Model):
         (2, u'INVALID')
     )
     activity = models.ForeignKey(Activity)
-    user = models.ForeignKey(User, default=None)
+    user = models.ForeignKey(User, default=None, null=True)
     rules = models.ForeignKey(WanglibaoActivityGift, default=None)
     identity = models.CharField(max_length=64, verbose_name=u'用户标号', help_text=u'例如手机号')
     index = models.IntegerField(default=0, verbose_name=u'特定活动内的奖品编号')
