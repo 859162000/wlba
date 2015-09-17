@@ -1,7 +1,7 @@
 module.exports = function( grunt ) {
     "use strict";
 
-    grunt.initConfig({
+    var config =  {
         compass: {
             dist: {
                 options: {
@@ -9,18 +9,16 @@ module.exports = function( grunt ) {
                 }
             }
         },
+        activityMod: ['src/mobile_activity/lib/zepto.util.js', 'src/mobile_activity/lib/activity.util.js'],
 
         concat: {
             options: {
                 separator: ';'
             },
-            weixin: {
-                src: ['src/mobile/lib/zepto/zepto.js', 'src/mobile/mobile.js'],
-                dest: 'scripts/mobile/mobile.js',
-            },
-            acOne: {
-                src: ['src/mobile_activity/lib/zepto.min.js', 'src/mobile_activity/lib/ac_mod.js', 'src/mobile_activity/activityName.js'],
-                dest: 'scripts/mobile_activity/activityName.js',
+            basic:{
+                files: {
+                    'scripts/mobile/mobile.js': ['src/mobile/lib/zepto/zepto.js', 'src/mobile/mobile.js'],
+                }
             }
         },
 
@@ -61,9 +59,21 @@ module.exports = function( grunt ) {
           }
         }
 
-    });
+    };
+
+
+    grunt.file.recurse('src/mobile_activity/', function(abspath, rootdir, subdir, filename){
+        if(abspath.indexOf(subdir) < 0){
+            var key  = 'scripts/mobile_activity/'+filename
+            config.concat.basic.files[key] = ['<%= activityMod %>', abspath]
+        }
+        return
+    })
+
+    grunt.initConfig(config);
 
     grunt.registerTask('default', ['watch', 'compass', 'concat', 'uglify']);
+
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-compass');
     grunt.loadNpmTasks('grunt-contrib-concat');
