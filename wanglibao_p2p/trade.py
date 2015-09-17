@@ -107,25 +107,30 @@ class P2PTrader(object):
             "title": title,
             "content": content,
             "mtype": "purchase"
+
         })
+
 
         # 满标给管理员发短信
         if is_full:
             from wanglibao_p2p.tasks import full_send_message
+            full_send_message.apply_async(kwargs={"product_name": self.product.name})
 
+            # 检测是否有同类型的正在招标状态的标,有的话按照发布时间的顺序更改第一个标的发布时间为当前时间
             from celery.execute import send_task
+            print self.product.types
             send_task("wanglibao_p2p.tasks.p2p_auto_published_by_publish_time", kwargs={
-                'p2p_type': self.product.types,
+                'p2p_type': self.product.types.id,
             })
 
-            full_send_message.apply_async(kwargs={"product_name": self.product.name})
             # 满标将标信息写入redis
             cache_backend = redis_backend()
-            if not cache_backend.redis.exists("p2p_detail_{0}".format(self.product.id)):
-                cache_backend.get_cache_p2p_detail(self.product.id)
+            if cache_backend._is_available():
+                if not cache_backend.redis.exists("p2p_detail_{0}".format(self.product.id)):
+                    cache_backend.get_cache_p2p_detail(self.product.id)
 
-            # 将标写入redis list
-            cache_backend.push_p2p_products(self.product)
+                # 将标写入redis list
+                cache_backend.push_p2p_products(self.product)
 
         return product_record, margin_record, equity
 

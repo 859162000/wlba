@@ -27,7 +27,7 @@ from wanglibao_pay.models import Bank
 from weixin.wechatpy import WeChatClient, parse_message, create_reply
 from weixin.wechatpy.replies import TransferCustomerServiceReply
 from weixin.wechatpy.utils import check_signature
-from weixin.wechatpy.exceptions import InvalidSignatureException, WeChatException
+from weixin.wechatpy.exceptions import InvalidSignatureException, WeChatException,WeChatOAuthException
 from weixin.wechatpy.oauth import WeChatOAuth
 from weixin.common.decorators import weixin_api_error
 from weixin.common.wx import generate_js_wxpay
@@ -689,7 +689,12 @@ class AuthorizeCode(APIView):
         if code:
             res = oauth.fetch_access_token(code)
             openid=res.get('openid')
-            user_info = oauth.get_user_info(openid, account.oauth_access_token)
+            user_info = {}
+            try:
+                user_info = oauth.get_user_info(openid, res.get('access_token'))
+            except WeChatOAuthException, e:
+                print('======================================================5')
+                return redirect('/weixin/api/test/?auth=1')
             if user_info.get('openid', None):
                 print('======================================================3')
                 return Response({"user_info":user_info})
@@ -704,12 +709,12 @@ class AuthorizeUser(APIView):
         account.app_id = 'wx896485cecdb4111d'
         account.app_secret = 'b1e152144e4a4974cd06b8716faa98e1'
         auth = request.GET.get('auth')
-        if auth and auth==1:
+        if auth and auth=='1':
             print('======================================================1')
-            oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri='/api/test1?reurl=/api/test3', scope='snsapi_userinfo')
+            oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri='http://4ba3541e.ngrok.io/weixin/api/test1?reurl=/api/test3', scope='snsapi_userinfo')
         else:
             print('======================================================2')
-            oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri='/api/test1?reurl=/api/test3')
+            oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri='http://4ba3541e.ngrok.io/weixin/api/test1?reurl=/api/test3')
         # res = oauth._get(oauth.authorize_url)
         # HttpResponseRedirect(oauth.authorize_url)
         return redirect(oauth.authorize_url)
