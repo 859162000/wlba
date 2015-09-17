@@ -263,8 +263,9 @@ def landpage_view(request):
     :return:
     """
     channel_code = getattr(request, request.method).get('promo_token', None)
-    activity_page = getattr(settings, '%s_ACTIVITY_PAGE' % channel_code.upper(), 'index')
+    url = reverse('index')
     if channel_code:
+        activity_page = getattr(settings, '%s_ACTIVITY_PAGE' % channel_code.upper(), 'index')
         if channel_code == getattr(settings, '%s_CHANNEL_CODE' % channel_code.upper(), None):
             # period 为结算周期，必须以天为单位
             period = getattr(settings, '%s_PERIOD' % channel_code.upper())

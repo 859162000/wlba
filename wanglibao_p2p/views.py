@@ -420,8 +420,8 @@ class CopyProductView(TemplateView):
         new_p2p.borrower_bankcard_bank_branch = p2p.borrower_bankcard_bank_branch
         new_p2p.total_amount = p2p.total_amount
         new_p2p.extra_data = p2p.extra_data
-        new_p2p.publish_time = timezone.now()
-        new_p2p.end_time = timezone.now() + timezone.timedelta(days=7)
+        new_p2p.publish_time = timezone.now() + timezone.timedelta(days=10)
+        new_p2p.end_time = timezone.now() + timezone.timedelta(days=17)
         new_p2p.limit_per_user = p2p.limit_per_user
         new_p2p.warrant_company = p2p.warrant_company
         new_p2p.usage = p2p.usage
