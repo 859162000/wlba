@@ -306,6 +306,7 @@ org.canvas = (function(org){
         init :function(){
             lib._drawing();
             lib.Registered();
+            lib.iSAndiOS();
         },
 
         _drawing:function(){
@@ -386,7 +387,7 @@ org.canvas = (function(org){
                     }
                     if(i==1 && amount != "None" && used_chances <=3){
                         idx--;
-                        $portunity.html("注册用户有"+idx+"次刮奖机会");
+                        $portunity.html("你有"+idx+"次刮奖机会");
                         i++;
                     }
 
@@ -438,7 +439,7 @@ org.canvas = (function(org){
                 if(used_chances<3){
                     if($("#continue").html()=="领奖"){
                         $("#dask").css({"display":"block"});
-                        $("#delog").find("h3").html(text+"以发送！请留意站内信！");
+                        $("#delog").find("h3").html(text+"已发送！请留意站内信！");
                         $("#close,#ok").on('click',function(){
                             $("#dask").css({"display":"none"});
                             $("#continue").html("再来一次");
@@ -565,7 +566,6 @@ org.canvas = (function(org){
             }
         }
 
-
         },
         Registered:function(){
             //判断输入的手机号是否正确
@@ -580,6 +580,14 @@ org.canvas = (function(org){
                     window.location.href="/weixin/regist/?next=/activity/app_scratch/&phone="+val;
                 }
             })
+        },
+        //判断是否是iOS
+        iSAndiOS:function(){
+            var u = navigator.userAgent, app = navigator.appVersion;
+            var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+            if(isiOS){
+                $("#textbox").append("<span>6.</span><p>网利宝对此活动享有最终解释权。与苹果公司（Apple Inc）无关，如有疑问请联系在线客服或拨打400-588-066</p>")
+            }
         }
     }
     return {

@@ -96,7 +96,7 @@ def trade_pwd_set(user_id,
         {'ret_code':4, 'message': '用户ID错误，无法获取用户身份'}
         {'ret_code':5, 'message': '交易密码条件验证成功'}
     '''
-
+    logging.getLogger('django').error('trade request set pass %s %s'%(user_id, new_trade_pwd))
     profile = WanglibaoUserProfile.objects.filter(user_id=user_id).first()
     if not profile:
         return {'ret_code':4, 'message': '用户ID错误，无法获取用户身份'}
