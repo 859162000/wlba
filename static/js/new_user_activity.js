@@ -52,7 +52,7 @@
         var funs = {
             "register": function(data){
                 var ret_code = data.ret_code;
-                //console.log(data,"register");
+                console.log(data,"register");
                 if(ret_code === "10000"){
                     showAlert($(".running"));
                 }else{
@@ -61,8 +61,8 @@
             },
             "firstPay": function(data){
                 var ret_code = data.ret_code;
-                //console.log(data,"firstPay");
-                if(ret_code === "00001"){
+                console.log(data,"firstPay");
+                if(ret_code === "00002"){
                     showAlert($(".go-money"));
                 }else if(ret_code === "10000"){
                     showAlert($(".running"));
@@ -72,8 +72,8 @@
             },
             "firstBuy": function(data){
                 var ret_code = data.ret_code;
-                //console.log(data,"firstBuy");
-                if(ret_code === "00001"){
+                console.log(data,"firstBuy");
+                if(ret_code === "00002"){
                     showAlert($(".to-invest"));
                 }else if(ret_code === "10000"){
                     showAlert($(".running"));
