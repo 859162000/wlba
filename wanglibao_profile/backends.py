@@ -205,10 +205,10 @@ def require_trade_pwd(view_func):
         logging.getLogger('django').error('trade request POST %s header %s'%(request.POST, request.META))
         no_need_trade_pwd = False
         #为了获取验证码
-        if request.path == reverse('deposit-new') and len(request.POST.get('card_no')) != 10:
+        if request.path == reverse('deposit-new') and len(request.POST.get('card_no', '')) != 10:
             no_need_trade_pwd = True
         #为了绑卡进行的绑卡充值
-        if request.path == reverse('dynnum-new') and int(request.POST.get('amount')) < 1:
+        if request.path == reverse('dynnum-new') and int(request.POST.get('amount', 0)) < 1:
             no_need_trade_pwd = True
         if not _is_version_satisfied(request):
             no_need_trade_pwd = True
@@ -217,7 +217,7 @@ def require_trade_pwd(view_func):
             return view_func(self, request, *args, **kwargs)
 
         logging.getLogger('django').error('trade request user %s pwd %s %s'%(request.user.id, request.POST.get('trade_pwd'), len(request.POST.get('trade_pwd'))))
-        check_result = trade_pwd_check(request.user.id, request.POST.get('trade_pwd'))
+        check_result = trade_pwd_check(request.user.id, request.POST.get('trade_pwd', ''))
         if check_result.get('ret_code') == 0 :
             return view_func(self, request, *args, **kwargs)
         else:
