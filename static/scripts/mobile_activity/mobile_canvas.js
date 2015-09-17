@@ -308,28 +308,26 @@ org.canvas = (function(org){
             lib.Registered();
             lib.iSAndiOS();
         },
-
         _drawing:function(){
             var bodyStyle = document.body.style;
 
             bodyStyle.mozUserSelect = 'none';
             bodyStyle.webkitUserSelect = 'none';
 
-            var idx=3,
-                img = new Image(),
+            var img = new Image(),idx= 4,
                 canvas = document.querySelector('canvas'),
                 spans=document.getElementById("spans"),
                 min=document.getElementById("main"),
                 $portunity=$("#opportunity"),
                 demo=document.getElementById("demo").getElementsByTagName("img")[0],
                 str = ["100元现金红包","150元现金红包","200元现金红包","爱奇艺会员","扣电影代金券","抽前吼三吼，大奖跟我走","红包何时有，把酒问青天","大奖下回见，网利宝天天见","佛说：前世500次回眸才能换得一次中奖，淡定"],
-                num,text,used_chances,clsName,dataCode,
+                num,text,used_chances,clsName,dataCode,total,
                 end=false,
                 gift="None",
                 gift_left=0,
                 amount="None",
                 amount_left= 0,
-                i = 0,
+                i = 0,ss,
                 clicks= 1,
                 timer=null;
 
@@ -347,6 +345,10 @@ org.canvas = (function(org){
                     spans.innerHTML=text;
                 }else if(clsName=="unAuthenticated"){
                     Interface();
+                    if(used_chances<3){
+                        ss=idx-used_chances;
+                        console.log(ss);
+                    }
                 }
             }
 
@@ -379,6 +381,7 @@ org.canvas = (function(org){
                     mousedown=false;
                     clearInterval(timer);
                     text=spans.innerHTML;
+                    ss=idx-used_chances;
                     timer=setInterval(function(){
                         timers();
                     },2000);
@@ -386,8 +389,11 @@ org.canvas = (function(org){
                          $("#continue").html("领奖");
                     }
                     if(i==1 && amount != "None" ){
-                        idx--;
-                        $portunity.html("您有"+idx+"次刮奖机会");
+                        if(used_chances==0){
+                           $portunity.html("您有"+(ss-1)+"次刮奖机会");
+                        }else{
+                            $portunity.html("您有"+ss+"次刮奖机会");
+                        }
                         i++;
                     }
                     if(used_chances == 3){
@@ -464,106 +470,104 @@ org.canvas = (function(org){
                    $portunity.html("您的刮奖次数已用完");
                    spans.innerHTML = "您的刮奖次数已用完";
                 }
-
             }
-        function Interface(){
+            function Interface(){
 
-            var dataArr = [];
-            var retCode,
-                urlData = "IGNORE";
-
-            //ajax请求数据
-            function ajaxFun(action, fun) {
-                org.ajax({
-                    type: "post",
-                    url: "/api/award/common_september/",
-                    dataType: "json",
-                    data: {action: action},
-                    async: false,
-                    success: function (data) {
-                        if (typeof fun === "function") {
-                            fun(data);
-                            console.log(data)
-                        }
-                    }
-                });
-            }
-            //判断是否为正确渠道
-            function isChannel(data) {
-                dataCode = data.ret_code;
-            }
-            //判断是否为合法渠道
-            function isUser(data) {
-                if (data.ret_code === 3001) {
-                    ajaxFun("IS_VALID_CHANNEL", isChannel);
-                    if(dataCode===3011){
-                        isdataCode();
-                    }else{
-                        spans.innerHTML = "您不符合参加规则";
-                    }
-                }
-            }
-            ajaxFun("IS_VALID_USER", isUser);
-            //用户抽奖信息
-            function isdataCode(){
-                function lotterInfo(data) {
-                    gift = data.gift;
-                    gift_left = data.gift_left;
-                    used_chances = data.used_chances;
-                    amount = parseInt(data.amount);
-                    amount_left = data.amount_left;
-                    if (amount != 'None' && amount_left != 0) {
-                        dataArr.push(1);
-                    }
-                    if(gift != 'None' && gift_left != 0){
-                        dataArr.push(2);
-                    }else{
-                        dataArr.push("");
-                    }
-                }
-                ajaxFun("ENTER_WEB_PAGE", lotterInfo);
-
-                function rotateFun(data) {
-                    used_chances = data.used_chances;
-                    retCode = data.ret_code;
-                }
-                if (dataArr.length < 1) {
+                var dataArr = [];
+                var retCode,
                     urlData = "IGNORE";
-                } else {
-                    if (dataArr[0]==1) {
-                        urlData = "GET_MONEY";
-                    } else if (dataArr[0]==2) {
-                        urlData = "GET_GIFT";
-                    } else {
-                        urlData = "IGNORE";
+
+                //ajax请求数据
+                function ajaxFun(action, fun) {
+                    org.ajax({
+                        type: "post",
+                        url: "/api/award/common_september/",
+                        dataType: "json",
+                        data: {action: action},
+                        async: false,
+                        success: function (data) {
+                            if (typeof fun === "function") {
+                                fun(data);
+                                console.log(data)
+                            }
+                        }
+                    });
+                }
+                //判断是否为正确渠道
+                function isChannel(data) {
+                    dataCode = data.ret_code;
+                }
+                //判断是否为合法渠道
+                function isUser(data) {
+                    if (data.ret_code === 3001) {
+                        ajaxFun("IS_VALID_CHANNEL", isChannel);
+                        if(dataCode===3011){
+                            isdataCode();
+                        }else{
+                            spans.innerHTML = "您不符合参加规则";
+                        }
                     }
                 }
-                ajaxFun(urlData, rotateFun);
-
-                if (retCode == 3024 && dataCode == 3011 && used_chances > 2) {
-                    spans.innerHTML = "您的刮奖次数已用完";
-                    $portunity.html("您的刮奖次数已用完");
-                }else {
-                    if(amount != 'None' && amount_left != 0){
-                        console.log(amount)
-                        spans.innerHTML = amount+"元现金红包";
-                    }else if(gift != 'None' && gift_left != 0){
-                        console.log(gift+"  "+gift_left)
-                        if (gift == "抠电影") {
-                            spans.innerHTML="抠电影代金券";
-                        } else if (gift == "爱奇艺") {
-                            spans.innerHTML="爱奇艺会员";
+                ajaxFun("IS_VALID_USER", isUser);
+                //用户抽奖信息
+                function isdataCode(){
+                    function lotterInfo(data) {
+                        gift = data.gift;
+                        gift_left = data.gift_left;
+                        used_chances = data.used_chances;
+                        amount = parseInt(data.amount);
+                        amount_left = data.amount_left;
+                        total=data.total_chances;
+                        if (amount != 'None' && amount_left != 0) {
+                            dataArr.push(1);
                         }
-                    }else{
-                        console.log(1);
-                        num = Math.floor(5+Math.random()*3);
-                        text=str[num];
-                        spans.innerHTML=text;
+                        if(gift != 'None' && gift_left != 0){
+                            dataArr.push(2);
+                        }else{
+                            dataArr.push("");
+                        }
+                    }
+                    ajaxFun("ENTER_WEB_PAGE", lotterInfo);
+
+                    function rotateFun(data) {
+                        used_chances = data.used_chances;
+                        retCode = data.ret_code;
+                    }
+                    if (dataArr.length < 1) {
+                        urlData = "IGNORE";
+                    } else {
+                        if (dataArr[0]==1) {
+                            urlData = "GET_MONEY";
+                        } else if (dataArr[0]==2) {
+                            urlData = "GET_GIFT";
+                        } else {
+                            urlData = "IGNORE";
+                        }
+                    }
+                    ajaxFun(urlData, rotateFun);
+
+                    if (retCode == 3024 && dataCode == 3011 && used_chances > 2) {
+                        spans.innerHTML = "您的刮奖次数已用完";
+                        $portunity.html("您的刮奖次数已用完");
+                    }else {
+                        if(amount != 'None' && amount_left != 0){
+                            console.log(amount)
+                            spans.innerHTML = amount+"元现金红包";
+                        }else if(gift != 'None' && gift_left != 0){
+                            console.log(gift+"  "+gift_left)
+                            if (gift == "抠电影") {
+                                spans.innerHTML="抠电影代金券";
+                            } else if (gift == "爱奇艺") {
+                                spans.innerHTML="爱奇艺会员";
+                            }
+                        }else{
+                            num = Math.floor(5+Math.random()*3);
+                            text=str[num];
+                            spans.innerHTML=text;
+                        }
                     }
                 }
             }
-        }
-
         },
         Registered:function(){
             //判断输入的手机号是否正确
