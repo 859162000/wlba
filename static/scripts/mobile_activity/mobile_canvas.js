@@ -301,7 +301,7 @@ org.ui = (function(){
 })();
 
 
-    org.canvas = (function(org){
+org.canvas = (function(org){
     var lib = {
         init :function(){
             lib._drawing();
