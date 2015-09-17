@@ -314,7 +314,7 @@ org.canvas = (function(org){
             bodyStyle.mozUserSelect = 'none';
             bodyStyle.webkitUserSelect = 'none';
 
-            var img = new Image(),idx= 2,
+            var img = new Image(),idx= 4,
                 canvas = document.querySelector('canvas'),
                 spans=document.getElementById("spans"),
                 min=document.getElementById("main"),
@@ -346,13 +346,8 @@ org.canvas = (function(org){
                 }else if(clsName=="unAuthenticated"){
                     Interface();
                     if(used_chances<3){
-                        if(used_chances==2){
-                            ss=total-used_chances;
-                            $portunity.html("您有"+(ss+1)+"次刮奖机会");
-                        }else{
-                            ss=total-used_chances;
-                            $portunity.html("您有"+ss+"次刮奖机会");
-                        }
+                        ss=idx-used_chances;
+                        console.log(ss);
                     }
                 }
             }
@@ -386,7 +381,7 @@ org.canvas = (function(org){
                     mousedown=false;
                     clearInterval(timer);
                     text=spans.innerHTML;
-                    ss=total-used_chances;
+                    ss=idx-used_chances;
                     timer=setInterval(function(){
                         timers();
                     },2000);
