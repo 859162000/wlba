@@ -389,7 +389,7 @@ org.canvas = (function(org){
                          $("#continue").html("领奖");
                     }
                     if(i==1 && amount != "None" ){
-                        if(used_chances==1){
+                        if(used_chances==1 || used_chances==2){
                             $portunity.html("您有"+(ss-1)+"次刮奖机会");
                         }else{
                            $portunity.html("您有"+ss+"次刮奖机会");
