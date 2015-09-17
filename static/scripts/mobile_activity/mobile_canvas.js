@@ -301,7 +301,7 @@ org.ui = (function(){
 })();
 
 
-org.canvas = (function(org){
+    org.canvas = (function(org){
     var lib = {
         init :function(){
             lib._drawing();
@@ -385,10 +385,13 @@ org.canvas = (function(org){
                      if(amount != 'None' && amount_left != 0 && clicks==1 || gift_left!=0 && gift!="None"&& clicks==1){
                          $("#continue").html("领奖");
                     }
-                    if(i==1 && amount != "None" && used_chances <=3){
+                    if(i==1 && amount != "None" ){
                         idx--;
-                        $portunity.html("你有"+idx+"次刮奖机会");
+                        $portunity.html("您有"+idx+"次刮奖机会");
                         i++;
+                    }
+                    if(used_chances == 3){
+                        $portunity.html("您的刮奖次数已用完");
                     }
 
                 }
@@ -428,13 +431,11 @@ org.canvas = (function(org){
                     return ctx.drawImage(img,0,0,w,h);
                 };
             }
-
-                $("#continue").on('click',function(){
-                    if(end){
-                       porttunclick();
-                    }
-                });
-
+            $("#continue").on('click',function(){
+                if(end){
+                    porttunclick();
+                }
+            });
             function porttunclick(){
                 if(used_chances<3){
                     if($("#continue").html()=="领奖"){
@@ -455,13 +456,13 @@ org.canvas = (function(org){
                     }
                     clearInterval(timer);
                 }else if (dataCode != 3011 && clsName=="unAuthenticated") {
-                    spans.innerHTML = "你不符合参加规则";
+                    spans.innerHTML = "您不符合参加规则";
                 } else if(clsName=="scratch_tub"){
                     spans.innerHTML = "注册帐号后即可刮奖";
                 }else{
                     evendrawImg();
-                   $portunity.html("你的刮奖次数已用完");
-                   spans.innerHTML = "你的刮奖次数已用完";
+                   $portunity.html("您的刮奖次数已用完");
+                   spans.innerHTML = "您的刮奖次数已用完";
                 }
 
             }
@@ -490,9 +491,7 @@ org.canvas = (function(org){
             //判断是否为正确渠道
             function isChannel(data) {
                 dataCode = data.ret_code;
-
             }
-
             //判断是否为合法渠道
             function isUser(data) {
                 if (data.ret_code === 3001) {
@@ -500,11 +499,10 @@ org.canvas = (function(org){
                     if(dataCode===3011){
                         isdataCode();
                     }else{
-                        spans.innerHTML = "你不符合参加规则";
+                        spans.innerHTML = "您不符合参加规则";
                     }
                 }
             }
-
             ajaxFun("IS_VALID_USER", isUser);
             //用户抽奖信息
             function isdataCode(){
@@ -543,8 +541,8 @@ org.canvas = (function(org){
                 ajaxFun(urlData, rotateFun);
 
                 if (retCode == 3024 && dataCode == 3011 && used_chances > 2) {
-                    spans.innerHTML = "你的刮奖次数已用完";
-                    $portunity.html("你的刮奖次数已用完");
+                    spans.innerHTML = "您的刮奖次数已用完";
+                    $portunity.html("您的刮奖次数已用完");
                 }else {
                     if(amount != 'None' && amount_left != 0){
                         console.log(amount)
