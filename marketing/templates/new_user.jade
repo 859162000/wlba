@@ -9,7 +9,7 @@ html
     link(rel="stylesheet",href="/static/styles/pc/pc.css")
     link(rel="stylesheet",href="/static/stylesheets/new_user.css")
   body(style="background:#ffd200")
-    .banner
+    .banner#banner
     .main-part
       .welfare1.clearfix
         span.welfare-icon
@@ -46,7 +46,7 @@ html
           p.welfare-cont
             | 新手投资理财最高送400元红包 <br />
             | 首次单笔投资≥10000元 送200元 <br />
-            | 首次单笔投资≥30000元 送400元
+            | 首次单笔投资≥20000元 送400元
           p.btn-box
             if user.is_authenticated
               a(href="javascript:void(0);").red-btn.manage-money 我要理财
@@ -57,7 +57,7 @@ html
       .rule-tit 【新手任务攻略】
       .rule-cont
         p.p1 1、新手注册及实名认证成功即获得20元红包（投资300元可直减使用）；
-        p.p1 2、新手首次充值成功即获得100元红包（投资2000元可直减使用）；
+        p.p1 2、新手首次充值（充值金额≥100元）成功即获得100元红包（投资2000元可直减使用）；
         p.p1 3、新手首次投资满额即可获得红包奖励，规则如下：
         p.p2 a).用户首次投资单笔达到10,000元以上（包含）即获得200元红包（二次投资20000元可直减使用）；
         p.p2 b).用户首次投资单笔达到20,000元以上（包含）即获得400元红包（二次投资40000元可直减使用）。
@@ -74,3 +74,36 @@ html
 
     include global/g_footer
     include include/tracking
+
+    .alert-page#alert-page
+    //不是新用户 您不符合参加规则
+    .alert-box.no-new-user
+      span.alert-close
+      .alert-cont.pt Sorry~您不是新用户
+      p.txt-center.mt1r
+        a(href="javascript:void(0)").alert-btn.close-per 我知道了
+
+    //充值后
+    .alert-box.go-money
+      span.alert-close
+      .alert-cont.pt 充值后，奖励自动发放
+      p.txt-center.mt1r
+        a(href="/pay/banks/").alert-btn 去充值
+
+    //投资后
+    .alert-box.to-invest
+      span.alert-close
+      .alert-cont.pt 投资后，奖励自动发放
+      p.txt-center.mt1r
+        a(href="/p2p/list/").alert-btn 去投资
+
+    //奖励已发放
+    .alert-box.running
+      span.alert-close
+      .alert-cont 奖励已发放， <br />
+        | 请在<a href="/accounts/message/" class="blue-txt">站内信</a>中查看。
+      p.txt-center.mt1r
+        a(href="javascript:void(0)").alert-btn.close-per 我知道了
+
+    script.
+      require(['/static/js/new_user_activity.js'])

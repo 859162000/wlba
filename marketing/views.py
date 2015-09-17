@@ -817,10 +817,11 @@ class UserActivityStatusAPIView(APIView):
 
         return json_response
 
-    def get_activitys_rule_min_amount(self, activity_id):
+    def get_activitys_rule_min_amount(self, activity_id, trigger_node):
         min_amount = None
         try:
-            min_amount = ActivityRule.objects.filter(activity_id=activity_id).order_by('min_amount')[0]
+            min_amount = ActivityRule.objects.filter(activity_id=activity_id, trigger_node=trigger_node,
+                                                     is_used=True).order_by('min_amount')[0]
         except:
             pass
         return min_amount
@@ -853,7 +854,7 @@ class UserActivityStatusAPIView(APIView):
             }
         return json_response
 
-    def get_activity_user_first_cost_status(self, activity_record, cost_record, activity_id):
+    def get_activity_user_first_cost_status(self, activity_record, cost_record, activity_id, trigger_node):
         # 判断用户是否在活动期间完成首次支付或者首投的动作，是否满足活动条件，并生成返回信息
         amount = cost_record.amount if cost_record else None
         json_response = {}
@@ -864,16 +865,22 @@ class UserActivityStatusAPIView(APIView):
                     'message': u'用户已参加活动',
                 }
         else:
-            min_pay_amount = self.get_activitys_rule_min_amount(activity_id)
-            if cost_record and min_pay_amount and amount >= min_pay_amount:
-                json_response = {
-                    'ret_code': '00000',
-                    'message': u'用户未参加活动，已达到活动条件',
-                }
+            min_pay_amount = self.get_activitys_rule_min_amount(activity_id, trigger_node)
+            if cost_record:
+                if min_pay_amount and amount >= min_pay_amount:
+                    json_response = {
+                        'ret_code': '00000',
+                        'message': u'用户未参加活动，已达到活动条件',
+                    }
+                else:
+                    json_response = {
+                        'ret_code': '00001',
+                        'message': u'用户未参加活动且未达到活动条件',
+                    }
             else:
                 json_response = {
-                    'ret_code': '00001',
-                    'message': u'用户未参加活动且未达到活动条件',
+                    'ret_code': '00002',
+                    'message': u'用户没有开销记录',
                 }
         return json_response
 
@@ -900,7 +907,8 @@ class UserActivityStatusAPIView(APIView):
             elif trigger_node in ('first_pay', 'first_buy'):
                 cost_record = self.get_activity_first_cost_info(user.id, trigger_node,
                                                                 activity_info.start_at, activity_info.end_at)
-                json_response = self.get_activity_user_first_cost_status(activity_record, cost_record, activity_id)
+                json_response = self.get_activity_user_first_cost_status(activity_record, cost_record,
+                                                                         activity_id, trigger_node)
 
         if not json_response:
             json_response = {
