@@ -854,7 +854,7 @@ class UserActivityStatusAPIView(APIView):
             }
         return json_response
 
-    def get_activity_user_first_cost_status(self, activity_record, cost_record, activity_id):
+    def get_activity_user_first_cost_status(self, activity_record, cost_record, activity_id, trigger_node):
         # 判断用户是否在活动期间完成首次支付或者首投的动作，是否满足活动条件，并生成返回信息
         amount = cost_record.amount if cost_record else None
         json_response = {}
@@ -865,7 +865,7 @@ class UserActivityStatusAPIView(APIView):
                     'message': u'用户已参加活动',
                 }
         else:
-            min_pay_amount = self.get_activitys_rule_min_amount(activity_id)
+            min_pay_amount = self.get_activitys_rule_min_amount(activity_id, trigger_node)
             if cost_record:
                 if min_pay_amount and amount >= min_pay_amount:
                     json_response = {
@@ -907,7 +907,8 @@ class UserActivityStatusAPIView(APIView):
             elif trigger_node in ('first_pay', 'first_buy'):
                 cost_record = self.get_activity_first_cost_info(user.id, trigger_node,
                                                                 activity_info.start_at, activity_info.end_at)
-                json_response = self.get_activity_user_first_cost_status(activity_record, cost_record, activity_id)
+                json_response = self.get_activity_user_first_cost_status(activity_record, cost_record,
+                                                                         activity_id, trigger_node)
 
         if not json_response:
             json_response = {
