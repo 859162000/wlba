@@ -921,7 +921,7 @@ class WanglibaoAwardActivity(APIView):
             Description:判断用户是不是在活动期间内注册的新用户
         """
         create_at = int(time.mktime(self.user.date_joined.date().timetuple()))  # 用户注册的时间戳
-        activity_start = time.mktime(datetime(2014, 8, 1).timetuple())  # 活动开始时间
+        activity_start = time.mktime(datetime(2014, 1, 1).timetuple())  # 活动开始时间
 
         if activity_start > create_at:
             to_json_response = {
