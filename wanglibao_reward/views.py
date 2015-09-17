@@ -357,8 +357,12 @@ class WeixinShareView(View):
         """
         if not self.activity:
             self.activity = self.get_activity_by_id(activity)
-        user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=product_id, identity__in=(str(phone_num),str(openid)), activity=self.activity)
-        return user_gift if user_gift else None
+        try:
+            user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=product_id, identity__in=(str(phone_num),str(openid)), activity=self.activity)
+            return user_gift
+        except Exception, reason:
+            self.exception_msg(reason, u'判断用户领奖，数据库查询出错')
+            return None
 
     def distribute_redpack(self, phone_num, openid, activity, product_id):
         """
