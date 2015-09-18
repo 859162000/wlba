@@ -1418,10 +1418,8 @@ class AdminSendMessageView(TemplateView):
                 }
             )
         phone_list = phones.split('\r\n')
-        print phone_list
         phone_list = [phone for phone in phone_list if phone.strip() != ""]
         print(phone_list)
-        send_result = []
         for phone in phone_list:
             user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
             if not user:
