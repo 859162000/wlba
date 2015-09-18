@@ -24,7 +24,7 @@ body
       display: block
       margin: 0 auto
       background: url(/static/imgs/pc_activity/gold_season/rankingListBg.png)
-      height: 618px
+      height: 628px
       .table
         width: 765px
         margin: 0 auto
@@ -72,26 +72,24 @@ body
             display: block
             margin: 0 90px 0 130px
             width: 20px
+            position: relative
+            z-index: 1
           span.one
             background: url(/static/imgs/pc_activity/gold_season/ico.png) no-repeat 0 0
             height: 32px
-            position: relative
             top: 4px
           span.two
             background: url(/static/imgs/pc_activity/gold_season/ico.png) no-repeat 0 -32px
             height: 32px
-            position: relative
             top: 4px
           span.three
             background: url(/static/imgs/pc_activity/gold_season/ico.png) no-repeat 0 -64px
             height: 32px
-            position: relative
             top: 4px
           .round
             text-align: center
             border-radius: 50%
             background: #ccc
-            position: relative
             top: 10px
             color: #fff
             height: 20px
@@ -128,23 +126,35 @@ body
         padding-top: 68px
         height: 104px
         background: url(/static/imgs/pc_activity/gold_season/orderArrow.png) no-repeat 0 bottom
-    .button
-      margin: 0px auto 40px
-      width: 246px
-      height: 56px
-      background: #ec551d
-      color: #fff
-      font-size: 18px
-      display: block
-      line-height: 56px
-      border-radius: 8px
-      -webkit-transition: all 0.3s ease
-      -moz-transition: all 0.3s ease
-      -ms-transition: all 0.3s ease
-      -o-transition: all 0.3s ease
-      transition: all 0.3s ease
-    .button:hover
-      background: #274FB4
+    .fixBox
+      width: 100%
+      position: relative
+      left: 0
+      bottom : 0px
+      padding: 20px 0
+      z-index: 9999
+      height: 76px
+      background: rgba(255,255,255,0.8)
+      .button
+        position: absolute
+        left: 50%
+        bottom: 10px
+        margin: 0px 0 0 -123px
+        width: 246px
+        height: 56px
+        background: #ec551d
+        color: #fff
+        font-size: 18px
+        display: block
+        line-height: 56px
+        border-radius: 8px
+        -webkit-transition: all 0.3s ease
+        -moz-transition: all 0.3s ease
+        -ms-transition: all 0.3s ease
+        -o-transition: all 0.3s ease
+        transition: all 0.3s ease
+      .button:hover
+        background: #274FB4
     .explain
       background: url(/static/imgs/pc_activity/gold_season/explainBg.png) no-repeat 0 0
       width: 1104px
@@ -153,6 +163,7 @@ body
       display: inline-block
       position: relative
       left: 50%
+      z-index: 1
       .main
         border: 10px #fa742d solid
         border-top: none
@@ -182,6 +193,7 @@ body
         position: relative
         top: 41px
         left: -1px
+        z-index: 1
       .rightMain
         float: left
         display: block
@@ -206,12 +218,14 @@ body
           span.add
             position: relative
             left: -10px
+            z-index: 1
           dl
             float: left
             display: block
             text-align: center
             position: relative
             left: -10px
+            z-index: 1
             dt
               font-size: 24px
               color: #666
@@ -228,6 +242,7 @@ body
             position: relative
             left: 30px
             width: 180px
+            z-index: 1
         .example1
           float: left
           width: 400px
@@ -243,9 +258,10 @@ body
     .cheats
       background: url(/static/imgs/pc_activity/gold_season/cheatsBg.png) no-repeat 0 0
       width: 1100px
-      margin: 0 auto 40px
+      margin: 0 auto
       height: 716px
       position: relative
+      z-index: 1
       .title
         width: 256px
         text-align: center
@@ -278,3 +294,5 @@ body
           font-size: 12px
         .calculation
           color: #ec551d
+  .g-footer-warp
+    margin-top: 15px

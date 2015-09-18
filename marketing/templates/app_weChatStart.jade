@@ -1,0 +1,16 @@
+
+extends ./app_shareBase
+
+block content
+	.default-user
+		img(src='/static/imgs/mobile_activity/app_wechat/default_user.png').default-img
+		.default-message
+			.message-icon
+			.message-body 我在网利宝成功投标啦。和我一起拼手气，必中高额度加息券。
+	.webchat-redpack
+		.redpack-bg
+	.webchat-submit
+		input(type='tel', placeholder='输入手机号拼手气').webchat-input
+		a(href="/activity/app_wechatdetail/").webpack-btn-red 立即开奖
+
+	script(data-init='weChatStart', src='/static/scripts/mobile_activity/weChart_share.js')

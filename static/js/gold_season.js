@@ -81,6 +81,25 @@
         }
     }
 
+
+    var windowHeight = $("body").height();
+    var cheatseight = $(".cheats").height();
+    var footerHeight = $(".cheats").height();
+    var juli = windowHeight - cheatseight - footerHeight/2 - 76;
+    function button_fix(){
+        if($(window).scrollTop()>=juli){
+            $('.fixBox').css({'position':'relative','background':'none'});
+            $(".cheats").css('height','706');
+        }else{
+            $('.fixBox').css({'position':'fixed','background':'rgba(255,255,255,0.8)'});
+            $(".cheats").css('height','782px');
+        }
+    }
+    button_fix();
+    $(window).scroll(function(){
+        button_fix();
+    });
+
     $.ajax({
         url: '/api/gettopofearings/',
         type: "POST"
@@ -109,11 +128,15 @@
         $('.rankingList ul.two').html(rankingList_phone.join(''));
         $('.rankingList ul.three').html(rankingList_amount.join(''));
         page_scroll();
+
+
         $(window).scroll(function(){
             page_scroll();
         });
-       })
     })
+
+  })
+
 }).call(this);
 
 
