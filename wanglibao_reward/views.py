@@ -532,7 +532,16 @@ class WeixinShareStartView(TemplateView):
     def get_context_data(self, **kwargs):
         openid = self.request.GET.get('openid')
         order_id = self.request.GET.get('url_id')
+        nick_name = self.request.GET.get('nick_name')
+        img_url = self.request.GET.get('head_img_url')
         record = WanglibaoWeixinRelative.objects.filter(openid=openid)
+
+        if not record:
+            WanglibaoWeixinRelative.objects.create(
+               openid=openid,
+               nick_name=nick_name,
+               img=img_url
+            )
 
         if not self.is_valid_user_auth(order_id):
            return {
