@@ -347,7 +347,12 @@ org.canvas = (function(org){
                     Interface();
                     if(used_chances<3){
                         ss=idx-used_chances;
-                        $portunity.html("您有"+ss+"次刮奖机会");
+                        if(used_chances==1 && gift != "None"){
+                            $portunity.html("您有"+(ss-1)+"次刮奖机会");
+                        }else{
+                            $portunity.html("您有"+ss+"次刮奖机会");
+                        }
+
                     }
                 }
             }
@@ -537,7 +542,7 @@ org.canvas = (function(org){
                             urlData = "IGNORE";
                         }
                     }
-                    console.log(dataArr+"  "+urlData);
+                    console.log(dataArr);
                     ajaxFun(urlData, rotateFun);
 
                     if (retCode == 3024 && dataCode == 3011 && used_chances > 2) {
