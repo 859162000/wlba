@@ -132,3 +132,14 @@ def build_earning(product_id):
 def automatic_trade(product_id=None, plan_id=None):
     Automatic().auto_trade(product_id=product_id, plan_id=plan_id)
 
+
+@app.task
+def p2p_auto_published_by_publish_time(p2p_type):
+    if not p2p_type:
+        return
+
+    products = P2PProduct.objects.filter(types=p2p_type, status=u"正在招标",
+                                         publish_time__gt=timezone.now()).order_by('publish_time').first()
+    if products:
+        products.publish_time = timezone.now()
+        products.save()

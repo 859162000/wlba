@@ -100,47 +100,36 @@ body
       margin: 40px auto
       display: block
     .order
-      background: url(/static/imgs/pc_activity/gold_season/orderBg.png) no-repeat 0 0
-      width: 1099px
-      height: 1529px
+      width: 1100px
       margin: 0 auto
-      position: relative
-      .text
-        font-size: 18px
-        color: #666
-        line-height: 30px
-        position: absolute
-      .title
-        font-size: 18px
-        color: #e8471b
-        line-height: 30px
-        position: absolute
-      .text1
-        left: 550px
-        top: 130px
-      .title1
-        left: 88px
-        top: 320px
-      .text2
-        left: 330px
-        top: 555px
-      .title2
-        left: 896px
-        top: 736px
-      .text3
-        left: 466px
-        top: 910px
-      .title3
-        left: 94px
-        top: 1086px
-      .text4
-        left: 176px
-        top: 1304px
-      .title4
-        left: 922px
-        top: 1500px
+      height: 298px
+      .box
+        width: 191px
+        display: block
+        float: left
+        img
+          padding-bottom: 7px
+          margin: 0 auto
+          display: block
+        dl
+          width: 100%
+          text-align: center
+          dt
+            font-size: 16px
+            line-height: 34px
+          dd
+            color: #e8471b
+            font-size: 12px
+            line-height: 18px
+      .arrow
+        margin: 0 45px
+        float: left
+        width: 22px
+        padding-top: 68px
+        height: 104px
+        background: url(/static/imgs/pc_activity/gold_season/orderArrow.png) no-repeat 0 bottom
     .button
-      margin: 20px auto 40px
+      margin: 0px auto 40px
       width: 246px
       height: 56px
       background: #ec551d
@@ -156,10 +145,6 @@ body
       transition: all 0.3s ease
     .button:hover
       background: #274FB4
-    .explainImg
-      width: 1100px
-      margin: 0 auto 80px
-      display: block
     .explain
       background: url(/static/imgs/pc_activity/gold_season/explainBg.png) no-repeat 0 0
       width: 1104px
@@ -187,8 +172,8 @@ body
       clear: both
       border: 6px #f0651f solid
       border-radius: 14px
-      width: 1088px
-      margin: 38px auto 0
+      width: 860px
+      margin: 6px auto
       display: block
       height: 202px
       .leftImg
@@ -201,14 +186,14 @@ body
         float: left
         display: block
         margin-left: 12px
-        width: 892px
+        width: 660px
         p.title
           padding-top: 16px
           line-height: 26px
           font-size: 14px
           text-align: left
         p.text
-          font-size: 18px
+          font-size: 16px
           line-height: 40px
           font-weight: bold
         .number
@@ -218,41 +203,78 @@ body
             font-size: 24px
             color: #666
             line-height: 24px
+          span.add
+            position: relative
+            left: -10px
           dl
             float: left
             display: block
             text-align: center
             position: relative
-            left: -3px
+            left: -10px
             dt
               font-size: 24px
               color: #666
               line-height: 24px
               font-weight: bold
+              padding: 0
             dd
               padding-top: 5px
               font-size: 12px
               color: #f0651f
               line-height: 18px
+              padding: 0
+          dl.right
+            position: relative
+            left: 30px
+            width: 180px
         .example1
           float: left
-          width: 500px
+          width: 400px
           .number
             margin-left: 26px
         .example2
           float: left
-          width: 350px
+          width: 260px
           dl
             float: none
             margin: 0 auto
-    .rule
-      clear: both
-      margin: 36px auto 28px
-      width: 1088px
-      dt
-        font-size: 26px
-        color: #666
-        line-height: 34px
-      dd
-        line-height: 24px
-        font-size: 13px
+
+    .cheats
+      background: url(/static/imgs/pc_activity/gold_season/cheatsBg.png) no-repeat 0 0
+      width: 1100px
+      margin: 0 auto 40px
+      height: 716px
+      position: relative
+      .title
+        width: 256px
+        text-align: center
+        height: 54px
+        position: absolute
+        right: 176px
+        top: 105px
+        color: #fff
+        font-size: 18px
+        padding: 0
+        line-height: 54px
+      .text
+        position: absolute
+        color: #ec551d
+        font-size: 18px
+        height: 30px
+        line-height: 30px
+      .text1
+        left: 238px
+        top: 76px
+      .text2
+        left: 180px
+        top: 148px
+      .rule
+        padding: 560px 0 0 110px
+        width: 980px
+        p
+          color: #666
+          line-height: 18px
+          font-size: 12px
+        .calculation
+          color: #ec551d

@@ -1,0 +1,64 @@
+- load formatters
+doctype html
+html
+    head
+        title 全民淘金
+        include include/app_head
+        style.
+          h1{
+            font-size: 1.2rem;
+            text-align: center;
+            margin: 2rem 0 .5rem 0;
+          }
+          .str{
+            font-size: 1rem;
+            text-align: center;
+            color: red;
+          }
+          img{
+            width: 200px;
+            height: 200px;
+            background: red;
+            display: block;
+            margin: 0 auto;
+            border-radius: .4rem;
+          }
+    body
+        h1 微信头像
+        img()#userimg
+        h1 微信名称
+        #name.str null
+        h1 微信id
+        #id.str null
+        h1 code
+        #code.str null
+
+        h1 review URL
+        #url.str null
+
+        script(src="/static/scripts/mobile_activity/lib/zepto.js")
+        script.
+            var code = (function(name){
+                var result = location.search.match(new RegExp('[\?\&]' + name+ '=([^\&]+)','i'));
+                if(result == null || result.length < 1){
+                     return '';
+                }
+                return result[1];
+
+            })('code');
+
+            $.ajax({
+                type: 'GET',
+                url: '/weixin/api/test/',
+                data: {code : code},
+                success:function(data){
+                  $('#userimg').attr('src',data.user_info.res_user_info.headimgurl);
+                },
+                error : function(xhr,data){
+                  $('#id').html('error');
+                }
+            })
+
+
+
+

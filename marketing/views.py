@@ -39,10 +39,14 @@ from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from wanglibao_redpack.models import RedPackEvent
 from wanglibao_redpack import backends as redpack_backends
-from wanglibao_activity.models import ActivityRecord, Activity
+from wanglibao_activity.models import ActivityRecord, Activity, ActivityRule
 from wanglibao_account import message as inside_message
+from wanglibao_pay.models import PayInfo
+from wanglibao_activity.models import TRIGGER_NODE
+from wanglibao_p2p.models import EquityRecord
 import logging
 logger = logging.getLogger('marketing')
+TRIGGER_NODE = [i for i, j in TRIGGER_NODE]
 
 class YaoView(TemplateView):
     template_name = 'yaoqing.jade'
@@ -766,6 +770,152 @@ class ThunderAwardAPIView(APIView):
             'message': u'欢迎刮奖',
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+
+def get_first_pay_info(user_id, start_time, end_time):
+    try:
+        payinfo = PayInfo.objects.filter(user_id=user_id, create_time__gte=start_time,
+                                         create_time__lte=end_time).order_by('create_time')
+        first_pay_info = payinfo[0]
+    except:
+        first_pay_info = None
+    return first_pay_info
+
+
+class UserActivityStatusAPIView(APIView):
+    """
+    官方主动注册用户活动状态查询接口
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def get_activity_info(self, activity_id):
+        try:
+            activity_info = Activity.objects.get(id=activity_id)
+        except:
+            activity_info = None
+        return activity_info
+
+    def check_params(self, activity_id, trigger_node):
+        json_response = {}
+        if not activity_id:
+            json_response = {
+                'ret_code': '20002',
+                'message': u'activity_id参数缺失'
+            }
+
+        if not trigger_node:
+            json_response = {
+                'ret_code': '20003',
+                'message': u'trigger_node参数缺失'
+            }
+
+        elif trigger_node not in TRIGGER_NODE:
+            json_response = {
+                'ret_code': '30003',
+                'message': u'不存在的trigger_node'
+            }
+
+        return json_response
+
+    def get_activitys_rule_min_amount(self, activity_id, trigger_node):
+        min_amount = None
+        try:
+            min_amount = ActivityRule.objects.filter(activity_id=activity_id, trigger_node=trigger_node,
+                                                     is_used=True).order_by('min_amount')[0]
+        except:
+            pass
+        return min_amount
+
+    def get_activity_first_cost_info(self, user_id, trigger_node, starttime, endtime):
+        # 获取用户活动期间内的首次支付以及首次投资的记录
+        cost_info = None
+        try:
+            if trigger_node == 'first_pay':
+                cost_info = PayInfo.objects.filter(user_id=user_id, create_time__gte=starttime,
+                                                   create_time__lte=endtime).order_by('create_time')[0]
+            elif trigger_node == 'first_buy':
+                cost_info = EquityRecord.objects.filter(user_id=user_id, create_time__gte=starttime,
+                                                        create_time__lte=endtime).order_by('create_time')[0]
+        except:
+            pass
+        return cost_info
+
+    def get_activity_user_registration_status(self, activity_record):
+        #　判断用户是否在活动期间注册及实名，并生成返回信息
+        if activity_record:
+            json_response = {
+                'ret_code': '10000',
+                'message': u'用户已参加过活动'
+            }
+        else:
+            json_response = {
+                'ret_code': '00000',
+                'message': u'用户未参加活动，已达到活动条件'
+            }
+        return json_response
+
+    def get_activity_user_first_cost_status(self, activity_record, cost_record, activity_id):
+        # 判断用户是否在活动期间完成首次支付或者首投的动作，是否满足活动条件，并生成返回信息
+        amount = cost_record.amount if cost_record else None
+        json_response = {}
+        if activity_record:
+            if cost_record:
+                json_response = {
+                    'ret_code': '10000',
+                    'message': u'用户已参加活动',
+                }
+        else:
+            min_pay_amount = self.get_activitys_rule_min_amount(activity_id)
+            if cost_record:
+                if min_pay_amount and amount >= min_pay_amount:
+                    json_response = {
+                        'ret_code': '00000',
+                        'message': u'用户未参加活动，已达到活动条件',
+                    }
+                else:
+                    json_response = {
+                        'ret_code': '00001',
+                        'message': u'用户未参加活动且未达到活动条件',
+                    }
+            else:
+                json_response = {
+                    'ret_code': '00002',
+                    'message': u'用户没有开销记录',
+                }
+        return json_response
+
+    def get(self, request):
+        activity_id = request.GET.get('activity_id', None)
+        trigger_node = request.GET.get('trigger_node', None)
+        user = request.user
+        activity_info = None
+        # 校验参数是否有效
+        json_response = self.check_params(activity_id, trigger_node)
+        if not json_response:
+            activity_info = self.get_activity_info(activity_id)
+            if not activity_info:
+                json_response = {
+                    'ret_code': '30002',
+                    'message': u'不存在的activity_id'
+                }
+
+        if not json_response:
+            activity_record = ActivityRecord.objects.filter(user_id=user.id, activity__id=activity_id,
+                                                            trigger_node=trigger_node).first()
+            if trigger_node in ('register', 'validation'):
+                json_response = self.get_activity_user_registration_status(activity_record)
+            elif trigger_node in ('first_pay', 'first_buy'):
+                cost_record = self.get_activity_first_cost_info(user.id, trigger_node,
+                                                                activity_info.start_at, activity_info.end_at)
+                json_response = self.get_activity_user_first_cost_status(activity_record, cost_record, activity_id)
+
+        if not json_response:
+            json_response = {
+                'ret_code': '50000',
+                'message': u'异常查询'
+            }
+        return HttpResponse(json.dumps(json_response), content_type='application/json')
+
 
 class ThousandRedPackAPIView(APIView):
     permission_classes = (IsAuthenticated, )

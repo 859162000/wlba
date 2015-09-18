@@ -280,10 +280,11 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
     inlines = [
         P2PProductContractInline, WarrantInline, AttachementInline, AmortizationInline#, P2PEquityInline
     ]
-    list_display = ('id', 'name', 'total_amount', 'brief', 'status', 'pay_method', 'end_time', 'warrant_company', 'audit_link', 'preview_link', 'preview_contract', 'copy_link', 'priority')
+    list_display = ('id', 'name', 'total_amount', 'types', 'brief', 'status', 'pay_method', 'end_time',
+                    'warrant_company', 'audit_link', 'preview_link', 'preview_contract', 'copy_link', 'priority')
     list_editable = ('priority',)
-    list_filter = ('status', )
-    search_fields = ('name',)
+    list_filter = ('status', 'types', 'period')
+    search_fields = ('name', )
     resource_class = P2PProductResource
     change_list_template = 'change_list.html'
     from_encoding = 'utf-8'

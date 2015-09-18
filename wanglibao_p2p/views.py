@@ -52,6 +52,8 @@ import re
 from celery.execute import send_task
 from wanglibao_redis.backend import redis_backend
 import pickle
+from misc.models import Misc
+import json
 
 
 
@@ -245,9 +247,24 @@ class PurchaseP2PMobile(APIView):
             try:
                 trader = P2PTrader(product=p2p, user=request.user, request=request)
                 product_info, margin_info, equity_info = trader.purchase(amount, redpack)
-
+                order_id = margin_info.order_id
+                shareShow=0
+                key = 'share_redpack'
+                url = ""
+                shareconfig = Misc.objects.filter(key=key).first()
+                if shareconfig:
+                    shareconfig = json.loads(shareconfig.value)
+                    if type(shareconfig) == dict:
+                        is_open = shareconfig.get('is_open', 'false')
+                        if is_open=='true':
+                            amount = Decimal(shareconfig.get('amount', 1000))
+                            if product_info.amount >= amount:
+                                shareShow = 1
+                                url = "?user_id=%s&order_id=%s"%(request.user.id, order_id)
                 return Response({
-                    'data': product_info.amount
+                    'data': product_info.amount,
+                    'share_show': shareShow,
+                    'share_url': url,
                 })
             except Exception, e:
                 return Response({
@@ -403,8 +420,8 @@ class CopyProductView(TemplateView):
         new_p2p.borrower_bankcard_bank_branch = p2p.borrower_bankcard_bank_branch
         new_p2p.total_amount = p2p.total_amount
         new_p2p.extra_data = p2p.extra_data
-        new_p2p.publish_time = timezone.now()
-        new_p2p.end_time = timezone.now() + timezone.timedelta(days=7)
+        new_p2p.publish_time = timezone.now() + timezone.timedelta(days=10)
+        new_p2p.end_time = timezone.now() + timezone.timedelta(days=17)
         new_p2p.limit_per_user = p2p.limit_per_user
         new_p2p.warrant_company = p2p.warrant_company
         new_p2p.usage = p2p.usage
