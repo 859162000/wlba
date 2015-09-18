@@ -6,10 +6,8 @@
 # Description: 策划活动中的红包、奖品、加息券等用户奖励行为，独立在这个文件中
 #########################################################################
 from django.utils import timezone
-from django.http.response import HttpResponse
 from django.db.models import Count, Q
 from datetime import datetime
-from django.contrib.auth.models import User
 from wanglibao_redpack import backends as redpack_backends
 import inspect
 import time
@@ -17,13 +15,13 @@ import json
 import logging
 from wanglibao_account import message as inside_message
 from marketing.models import IntroducedBy, Reward
-from wanglibao_reward.models import WanglibaoActivityGift, WanglibaoUserGift, WanglibaoActivityGiftGlobalCfg
+from wanglibao_reward.models import WanglibaoActivityGift, WanglibaoUserGift, WanglibaoActivityGiftGlobalCfg, WanglibaoWeixinRelative
 from wanglibao_redpack.models import RedPackEvent
 from wanglibao_activity.models import Activity, ActivityRule
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_p2p.models import P2PRecord
-from django.views.generic import View
-from django.http import HttpResponse, Http404
+from django.views.generic import View, TemplateView
+from django.http import HttpResponse
 from django.shortcuts import render_to_response, redirect
 
 logger = logging.getLogger('wanglibao_reward')
@@ -388,13 +386,17 @@ class WeixinShareView(View):
                 rules=gift,
                 user=user_profile.user if user_profile else None,
                 identity=phone_num,
-                activity=self.activity
+                activity=self.activity,
+                amount=gift.rules.redpack.amount,
+                valid=0,
             )
             WanglibaoUserGift.objects.create(
                 rules=gift,
                 user=user_profile.user if user_profile else None,
                 identity=openid,
-                activity=self.activity
+                activity=self.activity,
+                amount=gift.rules.redpack.amount,
+                valid=1,
             )
             return gift
 
@@ -406,7 +408,7 @@ class WeixinShareView(View):
                 self.get_activity_by_id(activity)
 
             try:
-                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=product_id, activity=self.activity)
+                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=product_id, activity__in=activity, valid=0)
                 return gifts
             except Exception, reason:
                 self.exception_msg(reason, u'获取已领奖用户信息失败')
@@ -426,7 +428,7 @@ class WeixinShareView(View):
             self.exception_msg(reason, u'获取全局配置抛出异常')
             return None
 
-    def is_valid_user_auth(self, product_id, activity):
+    def is_valid_user_auth(self, order_id, activity):
         if not self.activity:
             self.get_activity_by_id(activity)
 
@@ -434,39 +436,67 @@ class WeixinShareView(View):
             self.get_global_cfg(activity)
 
         try:
-            p2p_record = P2PRecord.objects.filter(order_id=product_id, amount__gte=self.global_cfg.amount)
+            p2p_record = P2PRecord.objects.filter(order_id=order_id, amount__gte=self.global_cfg.amount)
             return p2p_record
         except Exception, reason:
             self.exception_msg(reason, u"判断用户投资额度抛异常")
             return None
 
+    def format_response_data(self, gifts, types=None):
+        if types == 'gift':
+            user_info = {gift.identity: gift.amount for gift in gifts}
+            QSet = WanglibaoWeixinRelative.objects.filter(phone__in=user_info.keys()).values("phone", "nick", "img")
+            weixins = {item["phone"]: item for item in QSet}
+
+
     def get(self, request, **args):
         openid = args["openid"]
         if not openid:
             reurl = request.path
-            redirect_url = reverse("weixin_authorize_code")+'?reurl=%s'%reurl
-            redirect_url = '/weixin/api/test?reurl=%s'%reurl
+            #redirect_url = reverse("weixin_authorize_code")+'?reurl=%s'%reurl
+            redirect_url = '/weixin/api/test?reurl=%s' % (reurl, )
             return redirect(redirect_url)
-        phone_num = args["phone_num"]
-        product_id = args["product_id"]
-        activity = args["activity"]
-        if not self.is_valid_user_auth(product_id, activity):
+
+        phone_num = request.GET.get("phone", "")
+        order_id = request.GET.get("url_id", "")
+        activity = request.GET.get("activity", "")
+        if not activity:
+            pass
+
+        if not self.is_valid_user_auth(order_id, activity):
             to_json_response = {
                 'ret_code': 9000,
-                'message': u'用户投资没有达到%s元;' %(self.global_cfg.amount),
+                'message': u'用户投资没有达到%s元;' % (self.global_cfg.amount, ),
             }
 
             self.debug_msg(to_json_response["message"])
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-        if not self.has_combine_redpack(product_id, activity):
-            self.generate_combine_redpack(product_id, activity)
+        if not self.has_combine_redpack(order_id, activity):
+            self.generate_combine_redpack(order_id, activity)
 
-        if not self.has_got_redpack(phone_num, openid, activity, product_id):
-            self.distribute_redpack(phone_num, openid, activity, product_id)
-
-        response = self.get_distribute_status(product_id, activity)
+        user_gift = self.has_got_redpack(phone_num, openid, activity, order_id)
+        if not user_gift:
+            user_gift = self.distribute_redpack(phone_num, openid, activity, order_id)
+        else:
+            self.format_response_data(user_gift, 'gift')
+        response = self.get_distribute_status(order_id, activity)
         return HttpResponse(response)
 
-# vim: set noexpandtab ts=4 sts=4 sw=4 :
 
+class WeixinShareStartView(TemplateView):
+    template_name = 'app_weChatStart.jade'
+
+    def get_context_data(self, **kwargs):
+        if not openid:
+            reurl = request.path
+            #redirect_url = reverse("weixin_authorize_code")+'?reurl=%s'%reurl
+            redirect_url = '/weixin/api/test?reurl=%s' % (reurl, )
+            return redirect(redirect_url)
+
+        return {
+            'phone': u"手机号不能为空"
+        }
+        pass
+
+# vim: set noexpandtab ts=4 sts=4 sw=4 :
