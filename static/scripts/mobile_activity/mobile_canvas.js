@@ -389,9 +389,12 @@ org.canvas = (function(org){
                     if(i==1 && amount != "None"){
                         console.log(ss+"="+idx+"-"+used_chances)
                         if(used_chances==1 || used_chances==2){
-                                $portunity.html("您有"+(ss-1)+"次刮奖机会")
-                        }else{
-                           $portunity.html("您有"+ss+"次刮奖机会");
+                            if(used_chances==1 && gift != "None"){
+                                $portunity.html("您有"+(ss-2)+"次刮奖机会");
+                            }else{
+                               $portunity.html("您有"+(ss-1)+"次刮奖机会");
+                            }
+
                         }
                         i++;
                     }
@@ -480,7 +483,7 @@ org.canvas = (function(org){
                         success: function (data) {
                             if (typeof fun === "function") {
                                 fun(data);
-                                console.log(data)
+                                console.log(data);
                             }
                         }
                     });
@@ -521,7 +524,6 @@ org.canvas = (function(org){
                     ajaxFun("ENTER_WEB_PAGE", lotterInfo);
 
                     function rotateFun(data) {
-
                         used_chances = data.used_chances;
                         retCode = data.ret_code;
                     }
