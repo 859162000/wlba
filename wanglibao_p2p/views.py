@@ -260,7 +260,8 @@ class PurchaseP2PMobile(APIView):
                             amount = Decimal(shareconfig.get('amount', 1000))
                             if product_info.amount >= amount:
                                 shareShow = 1
-                                url = "/weixin_activity/share/%s/%s/"%(request.user.wanglibaouserprofile.phone, order_id)
+                                url = reverse('weixin_share_order_gift')+"?phone=%s&url_id=%s"%(request.user.wanglibaouserprofile.phone, order_id)
+
                 return Response({
                     'data': product_info.amount,
                     'share_show': shareShow,

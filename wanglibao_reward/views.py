@@ -23,6 +23,7 @@ from wanglibao_p2p.models import P2PRecord
 from django.views.generic import View, TemplateView
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, redirect
+from django.core.urlresolvers import reverse
 
 logger = logging.getLogger('wanglibao_reward')
 
@@ -243,7 +244,8 @@ class WanglibaoReward(object):
         """
         pass
 
-class WeixinShareView(View):
+class WeixinShareView(TemplateView):
+    template_name = 'app_weChatDetail.jade'
 
     def __init__(self):
         self.activity = None
@@ -449,17 +451,19 @@ class WeixinShareView(View):
             weixins = {item["phone"]: item for item in QSet}
 
 
-    def get(self, request, **args):
-        openid = args["openid"]
+    #def get(self, request, **args):
+
+    def get_context_data(self, **kwargs):
+        openid = kwargs["openid"]
         if not openid:
-            reurl = request.path
-            #redirect_url = reverse("weixin_authorize_code")+'?reurl=%s'%reurl
-            redirect_url = '/weixin/api/test?reurl=%s' % (reurl, )
+            reurl = self.request.path
+            redirect_url = reverse("weixin_authorize_code")+'?reurl=%s'%reurl
             return redirect(redirect_url)
 
-        phone_num = request.GET.get("phone", "")
-        order_id = request.GET.get("url_id", "")
-        activity = request.GET.get("activity", "")
+        phone_num = kwargs['phone_num']
+        order_id = kwargs['order_id']
+        activity = kwargs['activity']
+
         if not activity:
             pass
 
@@ -488,15 +492,20 @@ class WeixinShareStartView(TemplateView):
     template_name = 'app_weChatStart.jade'
 
     def get_context_data(self, **kwargs):
+        openid = self.request.GET.get('openid')
+        order_id = self.request.GET.get('url_id')
+
         if not openid:
-            reurl = request.path
-            #redirect_url = reverse("weixin_authorize_code")+'?reurl=%s'%reurl
+            reurl = self.request.path
             redirect_url = '/weixin/api/test?reurl=%s' % (reurl, )
             return redirect(redirect_url)
 
+        record = WanglibaoWeixinRelative.objects.filter(openid=openid)
+
         return {
-            'phone': u"手机号不能为空"
+            'openid': openid,
+            'order_id': order_id,
+            'phone': record.phone if record else u'None'
         }
-        pass
 
 # vim: set noexpandtab ts=4 sts=4 sw=4 :
