@@ -89,8 +89,10 @@
     function button_fix(){
         if($(window).scrollTop()>=juli){
             $('.fixBox').css({'position':'relative','background':'none'});
+            $(".cheats").css('height','706');
         }else{
             $('.fixBox').css({'position':'fixed','background':'rgba(255,255,255,0.8)'});
+            $(".cheats").css('height','782px');
         }
     }
     button_fix();

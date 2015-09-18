@@ -204,10 +204,13 @@ def _is_version_satisfied(request):
     return False
 
 def _is_just_bind_card(request):
-    order_id = int(request.POST.get('order_id'))
-    amount = PayInfo.objects.get(order__id=order_id).amount
-    if amount < 1:
-        return True
+    if request.path == reverse('dynnum-new'):
+        order_id = int(request.POST.get('order_id'))
+        amount = PayInfo.objects.get(order__id=order_id).amount
+        if amount < 1:
+            return True
+        else:
+            return False
     else:
         return False
 

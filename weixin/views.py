@@ -683,33 +683,29 @@ class AuthorizeUser(APIView):
     permission_classes = ()
     def get(self, request):
         code = request.GET.get('code')
-        reurl = request.GET.get('reurl')
-        order_id=request.GET.get('order_id')
+        url_id = request.GET.get('url_id')
         account = Account()
         account.app_id = 'wx896485cecdb4111d'
         account.app_secret = 'b1e152144e4a4974cd06b8716faa98e1'
         oauth = WeChatOAuth(account.app_id, account.app_secret, )
         if code:
             res = oauth.fetch_access_token(code)
+            print res
             openid=res.get('openid')
             nick_name=""
             head_img_url=""
             user_info = {}
             try:
                 wx_user = WanglibaoWeixinRelative.objects.filter(openid=openid)
-                if wx_user.exist():
-                    return redirect(reurl+'&openid=%s'%openid)#Response({"user_info":user_info})
+                if wx_user.exists():
+                    return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,nick_name,head_img_url))
                 else:
                     user_info = oauth.get_user_info(openid, res.get('access_token'))
+                    nick_name = user_info['nickname']
+                    head_img_url = user_info['headimgurl']
             except WeChatException, e:
-                return redirect('/weixin/api/test/?auth=1')
-            return redirect(reurl+'&openid=%s'%openid)    #Response({"user_info":user_info})#redirect("")
-            # print user_info
-            # if user_info.get('openid', None):
-            #     return Response({"user_info":user_info})#redirect(reurl, openid=openid, nick_name=nick_name, head_img_url=head_img_url)#
-            # else:
-            #     # return redirect(reverse('weixin_authorize_code'), {'auth': 1})
-            #     return redirect('/weixin/api/test/?auth=1')
+                return redirect(reverse("weixin_authorize_code")+'?auth=1')
+            return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,nick_name,head_img_url))
 
 
 class AuthorizeCode(APIView):
@@ -719,13 +715,15 @@ class AuthorizeCode(APIView):
         account.app_id = 'wx896485cecdb4111d'
         account.app_secret = 'b1e152144e4a4974cd06b8716faa98e1'
         auth = request.GET.get('auth')
-        reurl = request.GET.get('reurl')
-        redirect_uri = "http://ac6dc702.ngrok.io" + reverse("weixin_authorize_user_info")+'&reurl=%s'%reurl#"http://ac6dc702.ngrok.io/weixin/api/test1?reurl=%s"%reurl {'reurl':reurl}
-        print redirect_uri
+        url_id = request.GET.get('url_id')
+
+        redirect_uri = "http://ac6dc702.ngrok.io" + reverse("weixin_authorize_user_info")+'?url_id=%s'%url_id#"http://ac6dc702.ngrok.io/weixin/api/test1?reurl=%s"%reurl {'reurl':reurl}
+        # print redirect_uri
         if auth and auth=='1':
-            oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, scope='snsapi_userinfo', state=1)
+            oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, scope='snsapi_userinfo', state='1')
         else:
-            oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, state=1)#'http://ac6dc702.ngrok.io/weixin/api/test1?reurl=/api/test3'
+            oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, state='1')#'http://ac6dc702.ngrok.io/weixin/api/test1?reurl=/api/test3'
+        # print oauth.authorize_url
         return redirect(oauth.authorize_url)
 
 
