@@ -841,14 +841,14 @@ class UserActivityStatusAPIView(APIView):
             pass
         return cost_info
 
-    def get_activity_user_validation_status(self, activity_record, user_id):
+    def get_activity_user_validation_status(self, activity_record, user):
         # 判断用户是否在活动期间实名，并生成返回信息
         if activity_record:
             json_response = {
                 'ret_code': '10000',
                 'message': u'用户已参加过活动'
             }
-        elif WanglibaoUserProfile.objects.get(user_id).id_is_valid:
+        elif user.wanglibaouserprofile.id_is_valid:
             json_response = {
                 'ret_code': '00003',
                 'message': u'实名时间不符合活动条件'
@@ -925,7 +925,7 @@ class UserActivityStatusAPIView(APIView):
             if trigger_node == 'register':
                 json_response = self.get_activity_user_register_status(activity_record)
             elif trigger_node == 'validation':
-                json_response = self.get_activity_user_validation_status(activity_record, user.id)
+                json_response = self.get_activity_user_validation_status(activity_record, user)
             elif trigger_node in ('first_pay', 'first_buy'):
                 cost_record = self.get_activity_first_cost_info(user.id, trigger_node,
                                                                 activity_info.start_at, activity_info.end_at)
