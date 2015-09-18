@@ -24,6 +24,7 @@ from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_p2p.models import P2PRecord
 from django.views.generic import View
 from django.http import HttpResponse, Http404
+from django.shortcuts import render_to_response, redirect
 
 logger = logging.getLogger('wanglibao_reward')
 
@@ -441,6 +442,11 @@ class WeixinShareView(View):
 
     def get(self, request, **args):
         openid = args["openid"]
+        if not openid:
+            reurl = request.path
+            redirect_url = reverse("weixin_authorize_code")+'?reurl=%s'%reurl
+            redirect_url = '/weixin/api/test?reurl=%s'%reurl
+            return redirect(redirect_url)
         phone_num = args["phone_num"]
         product_id = args["product_id"]
         activity = args["activity"]
