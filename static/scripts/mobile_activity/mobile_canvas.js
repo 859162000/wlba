@@ -347,11 +347,7 @@ org.canvas = (function(org){
                     Interface();
                     if(used_chances<3){
                         ss=idx-used_chances;
-                        if(used_chances==1 && gift != "None"){
-                            $portunity.html("您有"+(ss-1)+"次刮奖机会")
-                        }else{
-                           $portunity.html("您有"+ss+"次刮奖机会");
-                        }
+                        $portunity.html("您有"+ss+"次刮奖机会");
                     }
                 }
             }
@@ -396,7 +392,7 @@ org.canvas = (function(org){
                         if(used_chances==1 || used_chances==2){
                             $portunity.html("您有"+(ss-1)+"次刮奖机会");
                         }else{
-                           $portunity.html("您有"+ss+"次刮奖机会");
+                            $portunity.html("您有"+ss+"次刮奖机会");
                         }
                         i++;
                     }
@@ -535,12 +531,13 @@ org.canvas = (function(org){
                     } else {
                         if (dataArr[0]==1) {
                             urlData = "GET_MONEY";
-                        } else if (dataArr[0]==2 || dataArr[len-1]==2) {
+                        } else if (dataArr[1]==2) {
                             urlData = "GET_GIFT";
                         } else {
                             urlData = "IGNORE";
                         }
                     }
+                    console.log(dataArr[1]);
                     ajaxFun(urlData, rotateFun);
 
                     if (retCode == 3024 && dataCode == 3011 && used_chances > 2) {
