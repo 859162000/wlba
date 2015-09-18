@@ -963,12 +963,23 @@ class ZGDXRegister(CoopRegister):
             self.zgdx_call_back(user, binding)
 
 
+class WeixinRedpackRegister(CoopRegister):
+    def __init__(self, request):
+        super(WeixinRedpackRegister, self).__init__(request)
+        self.c_code = 'weixin_redpack'
+        #self.channel_code = 'weixin_redpack'
+        self.invite_code = 'weixin_redpack'
+
+    def register_call_back(self, user):
+        #扫描数据表，没有发红包的，开始下发
+        pass
+
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
                           YiCheRegister, ZhiTuiRegister, WaihuRegister,
-                          ZGDXRegister]
+                          ZGDXRegister, WeixinRedpackRegister]
 
 
 #######################第三方用户查询#####################

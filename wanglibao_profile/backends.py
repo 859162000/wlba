@@ -80,6 +80,8 @@ def trade_pwd_set(user_id,
     action_type: =1.设置初始密码，post 参数new_trade_pwd
     action_type: =2.使用旧交易密码修改新交易密码， post参数old_trade_pwd，new_trade_pwd
     action_type: =3.同时使用银行卡和身份证修改旧交易密码， post参数new_trade_pwd，card_id，citizen_id
+    action_type: =4.使用银行卡修改旧交易密码， post参数new_trade_pwd，card_id
+
 
     :param user_id
     :param new_trade_pwd: 新交易密码
@@ -101,8 +103,9 @@ def trade_pwd_set(user_id,
     if not profile:
         return {'ret_code':4, 'message': '用户ID错误，无法获取用户身份'}
 
+    assert action_type in [1, 2, 3, 4]
     if action_type == 1 and profile.trade_pwd:
-        return {'ret_code':3, 'message': '交易密码已经存在，初始交易密码设置失败'}
+        return {'ret_code':3, 'message': '您已设置过交易密码，请使用原密码即可'}
     elif action_type == 2 and not _check_pwd(str(old_trade_pwd), profile.trade_pwd):
         print old_trade_pwd, type(old_trade_pwd), profile.trade_pwd, _check_pwd(old_trade_pwd, profile.trade_pwd)
         return {'ret_code':1, 'message': '旧交易密码错误，交易密码设置失败'}
@@ -110,6 +113,10 @@ def trade_pwd_set(user_id,
         is_card_right = Card.objects.filter(user__id=profile.user_id, no=card_id).exists()
         is_id_right = (profile.id_number == citizen_id)
         if not (is_card_right and is_id_right):
+            return {'ret_code':2, 'message': '银行卡或身份证信息有误，交易密码设置失败'}
+    elif action_type == 4:
+        is_card_right = Card.objects.filter(user__id=profile.user_id, no=card_id).exists()
+        if not is_card_right:
             return {'ret_code':2, 'message': '银行卡或身份证信息有误，交易密码设置失败'}
 
     if only_requirement_check:
@@ -205,10 +212,10 @@ def require_trade_pwd(view_func):
         logging.getLogger('django').error('trade request POST %s header %s'%(request.POST, request.META))
         no_need_trade_pwd = False
         #为了获取验证码
-        if request.path == reverse('deposit-new') and len(request.POST.get('card_no')) != 10:
+        if request.path == reverse('deposit-new') and len(request.POST.get('card_no', '')) != 10:
             no_need_trade_pwd = True
         #为了绑卡进行的绑卡充值
-        if request.path == reverse('dynnum-new') and int(request.POST.get('amount')) < 1:
+        if request.path == reverse('dynnum-new') and int(request.POST.get('amount', 0)) < 1:
             no_need_trade_pwd = True
         if not _is_version_satisfied(request):
             no_need_trade_pwd = True
@@ -217,7 +224,7 @@ def require_trade_pwd(view_func):
             return view_func(self, request, *args, **kwargs)
 
         logging.getLogger('django').error('trade request user %s pwd %s %s'%(request.user.id, request.POST.get('trade_pwd'), len(request.POST.get('trade_pwd'))))
-        check_result = trade_pwd_check(request.user.id, request.POST.get('trade_pwd'))
+        check_result = trade_pwd_check(request.user.id, request.POST.get('trade_pwd', ''))
         if check_result.get('ret_code') == 0 :
             return view_func(self, request, *args, **kwargs)
         else:
