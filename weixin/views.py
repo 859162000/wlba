@@ -698,12 +698,14 @@ class AuthorizeUser(APIView):
             try:
                 wx_user = WanglibaoWeixinRelative.objects.filter(openid=openid)
                 if wx_user.exists():
-                    return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s'%(url_id,openid))
+                    return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,nick_name,head_img_url))
                 else:
                     user_info = oauth.get_user_info(openid, res.get('access_token'))
+                    nick_name = user_info['nickname']
+                    head_img_url = user_info['headimgurl']
             except WeChatException, e:
                 return redirect(reverse("weixin_authorize_code")+'?auth=1')
-            return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s'%(url_id,openid))
+            return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,nick_name,head_img_url))
 
 
 class AuthorizeCode(APIView):

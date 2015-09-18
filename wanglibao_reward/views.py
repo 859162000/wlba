@@ -362,7 +362,7 @@ class WeixinShareView(TemplateView):
         if not self.activity:
             self.activity = self.get_activity_by_id(activity)
         try:
-            user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=product_id, identity__in=(str(phone_num),str(openid)), activity=self.activity)
+            user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=product_id, identity__in=(str(phone_num),str(openid)), activity=self.activity).first()
             return user_gift
         except Exception, reason:
             self.exception_msg(reason, u'判断用户领奖，数据库查询出错')
@@ -413,7 +413,9 @@ class WeixinShareView(TemplateView):
                 if redpack_event:
                     redpack_backends.give_activity_redpack(self.request.user, redpack_event, 'pc')
 
-            return gift
+            return sending_gift
+        else:
+            return None
 
     def get_distribute_status(self, product_id, activity):
             """
@@ -458,16 +460,28 @@ class WeixinShareView(TemplateView):
             return None
 
     def format_response_data(self, gifts, types=None):
-        if types == 'gift':
+        if gifts == None:
+            return None
+
+        if types == 'alone':
+            QSet = WanglibaoWeixinRelative.objects.filter(phone=gifts.identity).values("phone", "nick_name", "img").first()
+            if QSet:
+                return [gifts.amount, QSet["nick_name"], QSet["img"]]
+            else:
+                return None
+
+        if types == 'gifts':
             user_info = {gift.identity: gift.amount for gift in gifts}
-            QSet = WanglibaoWeixinRelative.objects.filter(phone__in=user_info.keys()).values("phone", "nick", "img")
+            QSet = WanglibaoWeixinRelative.objects.filter(phone__in=user_info.keys()).values("phone", "nick_name", "img")
             weixins = {item["phone"]: item for item in QSet}
+            ret_value = list()
+            for key in user_info.keys():
+                ret_value.append([user_info[key], weixins[key]["nick_name"], weixins[key]["img"]])
 
     def update_weixin_wanglibao_relative(self, openid, phone_num):
         relative = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
         relative.phone = phone_num
         relative.save()
-
 
     def get_context_data(self, **kwargs):
         openid = kwargs["openid"]
@@ -475,23 +489,22 @@ class WeixinShareView(TemplateView):
         order_id = kwargs['order_id']
         activity = kwargs['activity']
 
-        self.update_weixin_wanglibao_relative(openid, phone_num)
+        #self.update_weixin_wanglibao_relative(openid, phone_num)
 
         if not self.has_combine_redpack(order_id, activity):
             self.generate_combine_redpack(order_id, activity)
 
         user_gift = self.has_got_redpack(phone_num, openid, activity, order_id)
+
         if not user_gift:
             user_gift = self.distribute_redpack(phone_num, openid, activity, order_id)
-        else:
-            self.format_response_data(user_gift, 'gift')
-        response = self.get_distribute_status(order_id, activity)
+
+        gifts = self.get_distribute_status(order_id, activity)
         return {
             "ret_code": 9005,
-            "self_gift": list(),
-            "all_gift": list(list())
+            "self_gift": self.format_response_data(user_gift, 'alone'),
+            "all_gift": self.format_response_data(gifts, 'gifts')
         }
-
 
 class WeixinShareStartView(TemplateView):
     template_name = 'app_weChatStart.jade'
@@ -519,7 +532,16 @@ class WeixinShareStartView(TemplateView):
     def get_context_data(self, **kwargs):
         openid = self.request.GET.get('openid')
         order_id = self.request.GET.get('url_id')
+        nick_name = self.request.GET.get('nick_name')
+        img_url = self.request.GET.get('head_img_url')
         record = WanglibaoWeixinRelative.objects.filter(openid=openid)
+
+        if not record:
+            WanglibaoWeixinRelative.objects.create(
+               openid=openid,
+               nick_name=nick_name,
+               img=img_url
+            )
 
         if not self.is_valid_user_auth(order_id):
            return {
