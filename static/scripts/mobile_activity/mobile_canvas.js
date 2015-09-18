@@ -347,7 +347,7 @@ org.canvas = (function(org){
                     Interface();
                     if(used_chances<3){
                         ss=idx-used_chances;
-                        if(used_chances==1 && gift != "None"){
+                        if(used_chances==2 && gift != "None"){
                             $portunity.html("您有"+(ss-1)+"次刮奖机会");
                         }else{
                             $portunity.html("您有"+ss+"次刮奖机会");
