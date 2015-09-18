@@ -80,7 +80,9 @@ urlpatterns += patterns(
     url(r'^app_fullpage/$', TemplateView.as_view(template_name="app_fullpage.jade")),
     url(r'^gold_season/$', TemplateView.as_view(template_name="gold_season.jade")),
 
-    url(r'^weixin-test/$', TemplateView.as_view(template_name="weixin_test.jade")),
+    url(r'^app_wechatstart/$', TemplateView.as_view(template_name="app_weChatStart.jade")),
+    url(r'^app_wechatdetail/$', TemplateView.as_view(template_name="app_weChatDetail.jade")),
+    url(r'^app_wechatend/$', TemplateView.as_view(template_name="app_weChatEnd.jade")),
 )
 
 urlpatterns += patterns(
