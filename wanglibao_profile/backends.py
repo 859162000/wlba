@@ -105,7 +105,7 @@ def trade_pwd_set(user_id,
 
     assert action_type in [1, 2, 3, 4]
     if action_type == 1 and profile.trade_pwd:
-        return {'ret_code':3, 'message': '交易密码已经存在，初始交易密码设置失败'}
+        return {'ret_code':3, 'message': '您已设置过交易密码，请使用原密码即可'}
     elif action_type == 2 and not _check_pwd(str(old_trade_pwd), profile.trade_pwd):
         print old_trade_pwd, type(old_trade_pwd), profile.trade_pwd, _check_pwd(old_trade_pwd, profile.trade_pwd)
         return {'ret_code':1, 'message': '旧交易密码错误，交易密码设置失败'}

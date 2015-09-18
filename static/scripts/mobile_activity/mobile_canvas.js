@@ -347,7 +347,7 @@ org.canvas = (function(org){
                     Interface();
                     if(used_chances<3){
                         ss=idx-used_chances;
-                        console.log(ss);
+                        $portunity.html("您有"+ss+"次刮奖机会");
                     }
                 }
             }
@@ -389,11 +389,12 @@ org.canvas = (function(org){
                          $("#continue").html("领奖");
                     }
                     if(i==1 && amount != "None" ){
-                        if(used_chances==0){
-                           $portunity.html("您有"+(ss-1)+"次刮奖机会");
+                        if(used_chances==1 || used_chances==2){
+                            $portunity.html("您有"+(ss-1)+"次刮奖机会");
                         }else{
-                            $portunity.html("您有"+ss+"次刮奖机会");
+                           $portunity.html("您有"+ss+"次刮奖机会");
                         }
+
                         i++;
                     }
                     if(used_chances == 3){
@@ -420,12 +421,10 @@ org.canvas = (function(org){
                 function timers(){
                     ctx.drawImage(img,0,0,w,h);
                 }
-
                 canvas.width=w;
                 canvas.height=h;
                 ctx=canvas.getContext('2d');
                 layer(ctx);
-
                 ctx.globalCompositeOperation = 'destination-out';
                 canvas.addEventListener('touchstart', eventDown);
                 canvas.addEventListener('touchend', eventUp);
