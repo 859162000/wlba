@@ -463,23 +463,19 @@ class WeixinShareView(TemplateView):
             QSet = WanglibaoWeixinRelative.objects.filter(phone__in=user_info.keys()).values("phone", "nick", "img")
             weixins = {item["phone"]: item for item in QSet}
 
+    def update_weixin_wanglibao_relative(self, openid, phone_num):
+        relative = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
+        relative.phone = phone_num
+        relative.save()
+
+
     def get_context_data(self, **kwargs):
         openid = kwargs["openid"]
         phone_num = kwargs['phone_num']
         order_id = kwargs['order_id']
         activity = kwargs['activity']
 
-        if not activity:
-            pass
-
-        if not self.is_valid_user_auth(order_id, activity):
-            to_json_response = {
-                'ret_code': 9000,
-                'message': u'用户投资没有达到%s元;' % (self.global_cfg.amount, ),
-            }
-
-            self.debug_msg(to_json_response["message"])
-            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+        self.update_weixin_wanglibao_relative(openid, phone_num)
 
         if not self.has_combine_redpack(order_id, activity):
             self.generate_combine_redpack(order_id, activity)
@@ -490,30 +486,53 @@ class WeixinShareView(TemplateView):
         else:
             self.format_response_data(user_gift, 'gift')
         response = self.get_distribute_status(order_id, activity)
-        return HttpResponse(response)
+        return {
+            "ret_code": 9005,
+            "self_gift": list(),
+            "all_gift": list(list())
+        }
 
 
 class WeixinShareStartView(TemplateView):
     template_name = 'app_weChatStart.jade'
 
-    def get_context_data(self, **kwargs):
-        openid = self.request.GET.get('openid')
-        order_id = self.request.GET.get('url_id')
-        record = WanglibaoWeixinRelative.objects.filter(openid=openid)
-
+    def activity_id(self, index=None):
         try:
             misc_record = Misc.objects.filter(key='wechat_activity').first()
         except Exception, reason:
             logger.exception('get misc record exception, msg:%s' % (reason,))
             raise
         else:
-            activity = misc_record.value.split(",")[0]
+            activitys = misc_record.value.split(",")
+            if index is None:
+                index = int(time.time()) % len(activitys)
+            return activitys[index]
+
+    def is_valid_user_auth(self, order_id):
+        try:
+            p2p_record = P2PRecord.objects.filter(order_id=order_id, amount__gte=1000)
+            return p2p_record
+        except Exception, reason:
+            self.exception_msg(reason, u"判断用户投资额度抛异常")
+            return None
+
+    def get_context_data(self, **kwargs):
+        openid = self.request.GET.get('openid')
+        order_id = self.request.GET.get('url_id')
+        record = WanglibaoWeixinRelative.objects.filter(openid=openid)
+
+        if not self.is_valid_user_auth(order_id):
+           return {
+                'ret_code': 9000,
+                'message': u'用户投资没有达到%s元;' % (1000, ),
+            }
 
         return {
+            'ret_code': 9001,
             'openid': openid,
             'order_id': order_id,
             'phone': record.phone if record else u'None',
-            'activity': activity
+            'activity': self.activity_id(0)
         }
 
     def dispatch(self, request, *args, **kwargs):
