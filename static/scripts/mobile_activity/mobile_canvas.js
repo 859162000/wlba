@@ -385,14 +385,16 @@ org.canvas = (function(org){
                     timer=setInterval(function(){
                         timers();
                     },2000);
-                     if(amount != 'None' && amount_left != 0 && clicks==1 || gift_left!=0 && gift!="None"&& clicks==1)$("#continue").html("领奖");
+                     if(amount != 'None' && amount_left != 0 && clicks==1 || gift_left!=0 && gift!="None"&& clicks==1) $("#continue").html("领奖");
                     if(i==1 && amount != "None"){
                         console.log(ss+"="+idx+"-"+used_chances)
-
                         if(used_chances==1 || used_chances==2){
-                            $portunity.html("您有"+(ss-1)+"次刮奖机会");
-                        }else{
-                            $portunity.html("您有"+ss+"次刮奖机会");
+                            if(used_chances==1 && gift != "None"){
+                                $portunity.html("您有"+(ss-2)+"次刮奖机会");
+                            }else{
+                               $portunity.html("您有"+(ss-1)+"次刮奖机会");
+                            }
+
                         }
                         i++;
                     }
@@ -432,7 +434,7 @@ org.canvas = (function(org){
                 };
             }
             $("#continue").on('click',function(){
-                if(end)porttunclick();
+                if(end) porttunclick();
             });
             function porttunclick(){
                 if(used_chances<3){
@@ -481,7 +483,7 @@ org.canvas = (function(org){
                         success: function (data) {
                             if (typeof fun === "function") {
                                 fun(data);
-                                console.log(data)
+                                console.log(data);
                             }
                         }
                     });
@@ -522,7 +524,6 @@ org.canvas = (function(org){
                     ajaxFun("ENTER_WEB_PAGE", lotterInfo);
 
                     function rotateFun(data) {
-
                         used_chances = data.used_chances;
                         retCode = data.ret_code;
                     }
@@ -537,9 +538,8 @@ org.canvas = (function(org){
                             urlData = "IGNORE";
                         }
                     }
-                    console.log(dataArr+"  "+urlData);
                     ajaxFun(urlData, rotateFun);
-
+                    console.log(dataArr+"  "+urlData)
                     if (retCode == 3024 && dataCode == 3011 && used_chances > 2) {
                         spans.innerHTML = "您的刮奖次数已用完";
                         $portunity.html("您的刮奖次数已用完");
@@ -581,7 +581,7 @@ org.canvas = (function(org){
         iSAndiOS:function(){
             var u = navigator.userAgent, app = navigator.appVersion;
             var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
-            if(isiOS)$("#textbox").append("<span>6.</span><p>网利宝对此活动享有最终解释权。与苹果公司（Apple Inc）无关，如有疑问请联系在线客服或拨打400-588-066</p>");
+            if(isiOS) $("#textbox").append("<span>6.</span><p>网利宝对此活动享有最终解释权。与苹果公司（Apple Inc）无关，如有疑问请联系在线客服或拨打400-588-066</p>");
         }
     }
     return {

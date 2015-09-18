@@ -8,7 +8,7 @@ from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIV
                             AccountHomeAPIView, AccountP2PRecordAPI, AccountFundRecordAPI, AccountP2PAssetAPI,
                             AccountFundAssetAPI,
                             P2PAmortizationAPI, UserProductContract, ChangePasswordAPIView,
-                            AdminSendMessageAPIView, AddressAPIView, AddressListAPIView, AddressDeleteAPIView,
+                            AddressAPIView, AddressListAPIView, AddressDeleteAPIView,
                             AddressGetAPIView, AccountInviteAPIView, MessageListAPIView,
                             MessageCountAPIView, MessageDetailAPIView,
                             AutomaticApiView, AccountInviteHikeAPIView,AccountInviteAllGoldAPIView,
@@ -139,7 +139,6 @@ urlpatterns = patterns(
 
     url(r'^id_validate/', IdValidate.as_view()),
     url(r'^admin_id_validate/$', AdminIdValidate.as_view()),
-    url(r'^admin_send_message/$', AdminSendMessageAPIView.as_view()),
 
     url(r'^home/$', AccountHomeAPIView.as_view()),
     url(r'^home/p2precord', AccountP2PRecordAPI.as_view()),
