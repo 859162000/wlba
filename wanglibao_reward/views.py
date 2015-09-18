@@ -21,7 +21,7 @@ from wanglibao_activity.models import Activity, ActivityRule
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_p2p.models import P2PRecord
 from django.views.generic import View, TemplateView
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, redirect
 from django.core.urlresolvers import reverse
 
@@ -494,11 +494,7 @@ class WeixinShareStartView(TemplateView):
     def get_context_data(self, **kwargs):
         openid = self.request.GET.get('openid')
         order_id = self.request.GET.get('url_id')
-
-        if not openid:
-            reurl = self.request.path
-            redirect_url = '/weixin/api/test?reurl=%s' % (reurl, )
-            return redirect(redirect_url)
+        phone = self.request.GET.get('phone')
 
         record = WanglibaoWeixinRelative.objects.filter(openid=openid)
 
@@ -507,5 +503,13 @@ class WeixinShareStartView(TemplateView):
             'order_id': order_id,
             'phone': record.phone if record else u'None'
         }
+    def dispatch(self, request, *args, **kwargs):
+        openid = self.request.GET.get('openid')
+        order_id = self.request.GET.get('url_id')
 
-# vim: set noexpandtab ts=4 sts=4 sw=4 :
+        if not openid:
+            redirect_url = reverse('weixin_authorize_code')+'?url_id=%s' % order_id
+            print redirect_url
+            return HttpResponseRedirect(redirect_url)#redirect(redirect_url)
+
+        return super(WeixinShareStartView, self).dispatch(request, *args, **kwargs)

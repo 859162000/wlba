@@ -80,7 +80,6 @@ class WeChatOAuth(object):
         :return: An url
         """
         redirect_uri = quote(self.redirect_uri)#six.moves.urllib.parse.quote(self.redirect_uri)
-        print 'redirect_uri:::::', redirect_uri
         url_list = [
             self.OAUTH_BASE_URL,
             'oauth2/authorize?appid=',
