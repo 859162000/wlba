@@ -6,7 +6,7 @@ head
     - with '网利宝' as title
     include include/common_head
     - endwith
-    link(rel="stylesheet",href="/static/stylesheets/gold_season.css")
+    link(rel="stylesheet",href="/static/stylesheets/gold_season.css?v=20150918")
     - csrf_token
 body(style="background: #ffe6a6")
     include include/activityTop2
@@ -126,5 +126,5 @@ body(style="background: #ffe6a6")
     include global/g_footer
 
 script.
-    require(['/static/js/gold_season.js'])
+    require(['/static/js/gold_season.js?v=20150918'])
                                                         
