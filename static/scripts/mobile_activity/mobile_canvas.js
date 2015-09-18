@@ -531,15 +531,13 @@ org.canvas = (function(org){
                     } else {
                         if (dataArr[0]==1) {
                             urlData = "GET_MONEY";
-                            dataArr.shift();
                         } else if (dataArr[0]==2) {
                             urlData = "GET_GIFT";
-                            dataArr.shift();
                         } else {
                             urlData = "IGNORE";
                         }
                     }
-                    console.log(dataArr);
+                    console.log(dataArr+"  "+urlData);
                     ajaxFun(urlData, rotateFun);
 
                     if (retCode == 3024 && dataCode == 3011 && used_chances > 2) {
