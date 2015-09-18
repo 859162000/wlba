@@ -76,8 +76,6 @@ body(style="background: #ffe6a6")
                 dl
                     dt 分享佣金
                     dd 好友通过邀请码或专属链接<br>注册登录后投资三个月(含<br>三个月)以上的投资项目,即<br>可坐享丰厚佣金。
-
-        a.button.clear(href='/accounts/invite/') 立即邀请好友
         .explain
             .main
                 dl
@@ -123,6 +121,8 @@ body(style="background: #ffe6a6")
                 p!='如果你邀请了30个好友，他们每人在活动期间内投资3个月标10万元共3次，那你的直接邀请佣金为：<span class="calculation">27000=30*10万元*3次投资*0.3%</span>'
                 p <br>如果你邀请的30个好友每人又邀请了30人，那么你就拥有900个间接邀请人。同样，他们每人在活动期间内投资3个月标10万元共3次，那你的间接邀请佣金为：
                 p.calculation 810000=900*10万元*3次投资*0.3%
+        .fixBox
+            a.button.clear(href='/accounts/invite/') 立即邀请好友
     include global/g_footer
 
 script.
