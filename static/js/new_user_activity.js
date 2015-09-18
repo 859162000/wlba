@@ -13,7 +13,7 @@
         }
     });
     require(['jquery', 'jqueryRotate', "tools"], function ($, jqueryRotate, tool) {
-        var activityId = 37; //activity id l:37 65
+        var activityId = 65; //activity id l:37 65
         function ajaxFun(url,data,fn){
             $.ajax({
                 type: "get",
