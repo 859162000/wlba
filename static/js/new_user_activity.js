@@ -55,7 +55,7 @@
                 //console.log(data,"register");
                 if(ret_code === "10000"){
                     showAlert($(".running"));
-                }else if(ret_code === "00003") {
+                }else if(ret_code === "00000") {
                     showAlert($(".to-realName"));
                 }else{
                     showAlert($(".no-new-user"),"Sorry~您不符合参加规则");
