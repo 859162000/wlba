@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse
 from django.utils.decorators import available_attrs
 from rest_framework.request import Request
-from wanglibao_pay.models import Card
+from wanglibao_pay.models import Card, PayInfo
 from wanglibao_profile.models import WanglibaoUserProfile
 import time
 import json
@@ -203,6 +203,14 @@ def _is_version_satisfied(request):
         return True
     return False
 
+def _is_just_bind_card(request):
+    order_id = int(request.POST.get('order_id'))
+    amount = PayInfo.objects.get(order__id=order_id).amount
+    if amount < 1:
+        return True
+    else:
+        return False
+
 def require_trade_pwd(view_func):
     '''
     装饰器， 进行交易密码校验
@@ -215,7 +223,7 @@ def require_trade_pwd(view_func):
         if request.path == reverse('deposit-new') and len(request.POST.get('card_no', '')) != 10:
             no_need_trade_pwd = True
         #为了绑卡进行的绑卡充值
-        if request.path == reverse('dynnum-new') and int(request.POST.get('amount', 0)) < 1:
+        if _is_just_bind_card(request):
             no_need_trade_pwd = True
         if not _is_version_satisfied(request):
             no_need_trade_pwd = True
