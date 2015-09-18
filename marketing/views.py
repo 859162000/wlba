@@ -44,6 +44,7 @@ from wanglibao_account import message as inside_message
 from wanglibao_pay.models import PayInfo
 from wanglibao_activity.models import TRIGGER_NODE
 from wanglibao_p2p.models import EquityRecord
+from wanglibao_profile.models import WanglibaoUserProfile
 import logging
 logger = logging.getLogger('marketing')
 TRIGGER_NODE = [i for i, j in TRIGGER_NODE]
@@ -840,8 +841,27 @@ class UserActivityStatusAPIView(APIView):
             pass
         return cost_info
 
-    def get_activity_user_registration_status(self, activity_record):
-        #　判断用户是否在活动期间注册及实名，并生成返回信息
+    def get_activity_user_validation_status(self, activity_record, user_id):
+        # 判断用户是否在活动期间实名，并生成返回信息
+        if activity_record:
+            json_response = {
+                'ret_code': '10000',
+                'message': u'用户已参加过活动'
+            }
+        elif WanglibaoUserProfile.objects.get(user_id).id_is_valid:
+            json_response = {
+                'ret_code': '00003',
+                'message': u'实名时间不符合活动条件'
+            }
+        else:
+            json_response = {
+                'ret_code': '00000',
+                'message': u'用户未实名'
+            }
+        return json_response
+
+    def get_activity_user_register_status(self, activity_record):
+        # 判断用户是否在活动期间注册，并生成返回信息
         if activity_record:
             json_response = {
                 'ret_code': '10000',
@@ -850,7 +870,7 @@ class UserActivityStatusAPIView(APIView):
         else:
             json_response = {
                 'ret_code': '00000',
-                'message': u'用户未参加活动，已达到活动条件'
+                'message': u'用户未达到活动条件'
             }
         return json_response
 
@@ -902,8 +922,10 @@ class UserActivityStatusAPIView(APIView):
         if not json_response:
             activity_record = ActivityRecord.objects.filter(user_id=user.id, activity__id=activity_id,
                                                             trigger_node=trigger_node).first()
-            if trigger_node in ('register', 'validation'):
-                json_response = self.get_activity_user_registration_status(activity_record)
+            if trigger_node == 'register':
+                json_response = self.get_activity_user_register_status(activity_record)
+            elif trigger_node == 'validation':
+                json_response = self.get_activity_user_validation_status(activity_record, user.id)
             elif trigger_node in ('first_pay', 'first_buy'):
                 cost_record = self.get_activity_first_cost_info(user.id, trigger_node,
                                                                 activity_info.start_at, activity_info.end_at)
