@@ -9,7 +9,9 @@ html
     link(rel="stylesheet",href="/static/styles/pc/pc.css")
     link(rel="stylesheet",href="/static/stylesheets/new_user.css")
   body(style="background:#ffd200")
-    .banner#banner
+    include global/g_nav
+
+    .banner.pc-banner#banner
     .main-part
       .welfare1.clearfix
         span.welfare-icon
@@ -112,5 +114,16 @@ html
       p.txt-center.mt1r
         a(href="javascript:void(0)").alert-btn.close-per 我知道了
 
+    //back top
+    .backtop
+      a(href="javascript:;").backtop-box.inline-block.xl-backtop
+        i.backtop-icon.inline-block
+        span.backtop-txt.inline-block 回到顶部
+      a.footer-weixin.inline-block
+        span.weixin-code.inline-block
+        span.weixin-icon.inline-block
+      a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank").footer-qq.inline-block
+
     script.
       require(['/static/js/new_user_activity.js'])
+
