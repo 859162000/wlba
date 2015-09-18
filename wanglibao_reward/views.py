@@ -20,6 +20,7 @@ from wanglibao_redpack.models import RedPackEvent
 from wanglibao_activity.models import Activity, ActivityRule
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_p2p.models import P2PRecord
+from misc.models import Misc
 from django.views.generic import View, TemplateView
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, redirect
@@ -384,7 +385,7 @@ class WeixinShareView(TemplateView):
             gift.valid = False
             gift.save()
             user_profile = WanglibaoUserProfile.objects.filter(phone=phone_num).first()
-            WanglibaoUserGift.objects.create(
+            sending_gift = WanglibaoUserGift.objects.create(
                 rules=gift,
                 user=user_profile.user if user_profile else None,
                 identity=phone_num,
@@ -398,8 +399,20 @@ class WeixinShareView(TemplateView):
                 identity=openid,
                 activity=self.activity,
                 amount=gift.rules.redpack.amount,
-                valid=1,
+                valid=2,
             )
+            if user_profile:
+                try:
+                    dt = timezone.datetime.now()
+                    redpack_event = RedPackEvent.objects.filter(invalid=False, describe=sending_gift.redpack.describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
+                    sending_gift.valid = 1
+                    sending_gift.save()
+                except Exception, reason:
+                    logger.debug("send redpack Exception, msg:%s" % (reason,))
+
+                if redpack_event:
+                    redpack_backends.give_activity_redpack(self.request.user, redpack_event, 'pc')
+
             return gift
 
     def get_distribute_status(self, product_id, activity):
@@ -410,7 +423,7 @@ class WeixinShareView(TemplateView):
                 self.get_activity_by_id(activity)
 
             try:
-                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=product_id, activity__in=activity, valid=0)
+                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=product_id, activity__in=activity, valid__in=(0, 1,))
                 return gifts
             except Exception, reason:
                 self.exception_msg(reason, u'获取已领奖用户信息失败')
@@ -450,16 +463,8 @@ class WeixinShareView(TemplateView):
             QSet = WanglibaoWeixinRelative.objects.filter(phone__in=user_info.keys()).values("phone", "nick", "img")
             weixins = {item["phone"]: item for item in QSet}
 
-
-    #def get(self, request, **args):
-
     def get_context_data(self, **kwargs):
         openid = kwargs["openid"]
-        if not openid:
-            reurl = self.request.path
-            redirect_url = reverse("weixin_authorize_code")+'?reurl=%s'%reurl
-            return redirect(redirect_url)
-
         phone_num = kwargs['phone_num']
         order_id = kwargs['order_id']
         activity = kwargs['activity']
@@ -499,13 +504,21 @@ class WeixinShareStartView(TemplateView):
             reurl = self.request.path
             redirect_url = '/weixin/api/test?reurl=%s' % (reurl, )
             return redirect(redirect_url)
-
         record = WanglibaoWeixinRelative.objects.filter(openid=openid)
+
+        try:
+            misc_record = Misc.objects.filter(key='wechat_activity').first()
+        except Exception, reason:
+            logger.exception('get misc record exception, msg:%s' % (reason,))
+            raise
+        else:
+            activity = misc_record.value.split(",")[0]
 
         return {
             'openid': openid,
             'order_id': order_id,
-            'phone': record.phone if record else u'None'
+            'phone': record.phone if record else u'None',
+            'activity': activity
         }
 
 # vim: set noexpandtab ts=4 sts=4 sw=4 :
