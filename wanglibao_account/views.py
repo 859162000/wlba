@@ -1417,8 +1417,10 @@ class AdminSendMessageView(TemplateView):
                     "message": "信息输入不完整"
                 }
             )
-        phone_list = phones.split('\n')
+        phone_list = phones.split('\r\n')
+        print phone_list
         phone_list = [phone for phone in phone_list if phone.strip() != ""]
+        print(phone_list)
         send_result = []
         for phone in phone_list:
             user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
