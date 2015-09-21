@@ -81,6 +81,11 @@ urlpatterns += patterns(
     url(r'^gold_season/$', TemplateView.as_view(template_name="gold_season.jade")),
 
     url(r'^weixin-test/$', TemplateView.as_view(template_name="weixin_test.jade")),
+
+    url(r'^share/index/$', TemplateView.as_view(template_name="share_index.jade")),
+    url(r'^share/code/$', TemplateView.as_view(template_name="share_code.jade")),
+    url(r'^share/old/$', TemplateView.as_view(template_name="share_old_user.jade")),
+    url(r'^share/new/$', TemplateView.as_view(template_name="share_new_user.jade")),
 )
 
 urlpatterns += patterns(
