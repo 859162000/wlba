@@ -39,10 +39,15 @@ from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from wanglibao_redpack.models import RedPackEvent
 from wanglibao_redpack import backends as redpack_backends
-from wanglibao_activity.models import ActivityRecord, Activity
+from wanglibao_activity.models import ActivityRecord, Activity, ActivityRule
 from wanglibao_account import message as inside_message
+from wanglibao_pay.models import PayInfo
+from wanglibao_activity.models import TRIGGER_NODE
+from wanglibao_p2p.models import EquityRecord
+from wanglibao_profile.models import WanglibaoUserProfile
 import logging
 logger = logging.getLogger('marketing')
+TRIGGER_NODE = [i for i, j in TRIGGER_NODE]
 
 class YaoView(TemplateView):
     template_name = 'yaoqing.jade'
@@ -767,6 +772,220 @@ class ThunderAwardAPIView(APIView):
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
+
+def get_first_pay_info(user_id, start_time, end_time):
+    try:
+        payinfo = PayInfo.objects.filter(user_id=user_id, create_time__gte=start_time,
+                                         create_time__lte=end_time).order_by('create_time')
+        first_pay_info = payinfo[0]
+    except:
+        first_pay_info = None
+    return first_pay_info
+
+
+class UserActivityStatusAPIView(APIView):
+    """
+    用户活动状态查询接口
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def get_activity_info(self, activity_id):
+        try:
+            activity_info = Activity.objects.get(id=activity_id)
+        except:
+            activity_info = None
+        return activity_info
+
+    def check_params(self, activity_id, trigger_node):
+        json_response = {}
+        if not activity_id:
+            json_response = {
+                'ret_code': '20002',
+                'message': u'activity_id参数缺失'
+            }
+
+        if not trigger_node:
+            json_response = {
+                'ret_code': '20003',
+                'message': u'trigger_node参数缺失'
+            }
+
+        elif trigger_node not in TRIGGER_NODE:
+            json_response = {
+                'ret_code': '30003',
+                'message': u'不存在的trigger_node'
+            }
+
+        return json_response
+
+    def get_activitys_rule_min_amount(self, activity_id, trigger_node):
+        min_amount = None
+        try:
+            min_amount = ActivityRule.objects.filter(activity_id=activity_id, trigger_node=trigger_node,
+                                                     is_used=True).order_by('min_amount')[0]
+        except:
+            pass
+        return min_amount
+
+    def get_user_cost_info(self, user_id, trigger_node):
+        # 获取用户支付或投资的记录
+        cost_info = None
+        if trigger_node == 'first_pay':
+            cost_info = PayInfo.objects.filter(user_id=user_id)
+        elif trigger_node == 'first_buy':
+            cost_info = P2PRecord.objects.filter(user_id=user_id)
+        return cost_info
+
+    def get_activity_user_validation_status(self, activity_record, user, activity_starttime):
+        # 判断用户是否在活动期间实名，并生成返回信息
+        userprofile = user.wanglibaouserprofile
+        if activity_record:
+            json_response = {
+                'ret_code': '10001',
+                'message': u'用户已参加过活动'
+            }
+        elif userprofile.id_is_valid:
+            if userprofile.id_valid_time < activity_starttime:
+                json_response = {
+                    'ret_code': '00003',
+                    'message': u'实名时间不符合活动条件'
+                }
+            else:
+                json_response = {
+                    'ret_code': '00001',
+                    'message': u'用户未参加活动，已达到活动条件'
+                }
+        else:
+            json_response = {
+                'ret_code': '00000',
+                'message': u'用户未实名'
+            }
+        return json_response
+
+    def get_activity_user_register_status(self, activity_record):
+        # 判断用户是否在活动期间注册，并生成返回信息
+        if activity_record:
+            json_response = {
+                'ret_code': '10001',
+                'message': u'用户已参加过活动'
+            }
+        else:
+            json_response = {
+                'ret_code': '00000',
+                'message': u'用户未达到活动条件'
+            }
+        return json_response
+
+    def get_activity_user_first_cost_status(self, activity_record, activity_info,
+                                            cost_record, activity_id, trigger_node):
+        # 获取用户活动期间内的首次支付以及首次投资的记录
+        json_response = {}
+        starttime = activity_info.start_at
+        endtime = activity_info.end_at
+        try:
+            frist_cost_record = cost_record.filter(create_time__gte=starttime,
+                                                   create_time__lte=endtime).order_by('create_time')[0]
+        except:
+            frist_cost_record = None
+
+        # 判断用户是否在活动期间完成首次支付或者首投的动作，是否满足活动条件，并生成返回信息
+        amount = frist_cost_record.amount if frist_cost_record else None
+        if activity_record:
+            if frist_cost_record:
+                json_response = {
+                    'ret_code': '10001',
+                    'message': u'用户已参加活动',
+                }
+        else:
+            min_pay_amount = self.get_activitys_rule_min_amount(activity_id, trigger_node)
+            if frist_cost_record:
+                if min_pay_amount and amount >= min_pay_amount:
+                    json_response = {
+                        'ret_code': '00001',
+                        'message': u'用户未参加活动，已达到活动条件',
+                    }
+                else:
+                    json_response = {
+                        'ret_code': '00000',
+                        'message': u'用户未达到活动条件',
+                    }
+            else:
+                json_response = {
+                    'ret_code': '00002',
+                    'message': u'用户活动期内没有开销记录',
+                }
+        return json_response
+
+    def get_user_channel(self, user_id):
+        # 判断用户是否属于活动指定渠道用户
+        channel = Channels.objects.filter(introducedby__user_id=user_id).first()
+        if channel:
+            channel_code = channel.name
+            if not channel_code:
+                channel_code = 'wanglibao'
+        else:
+            channel_code = 'wanglibao-other'
+        return channel_code
+
+
+
+    def get(self, request):
+        activity_id = request.GET.get('activity_id', None)
+        trigger_node = request.GET.get('trigger_node', None)
+        user = request.user
+        activity_info = None
+        # 校验参数是否有效
+        json_response = self.check_params(activity_id, trigger_node)
+        if not json_response:
+            activity_info = self.get_activity_info(activity_id)
+            if activity_info:
+                channel_code = self.get_user_channel(user.id)
+                activity_channel = activity_info.channel
+                if not activity_info.is_all_channel:
+                    if activity_channel and channel_code not in activity_channel.split(','):
+                        json_response = {
+                            'ret_code': '00005',
+                            'message': u'非活动指定渠道用户'
+                        }
+            else:
+                json_response = {
+                    'ret_code': '30002',
+                    'message': u'不存在的activity_id'
+                }
+
+        if not json_response:
+            activity_record = ActivityRecord.objects.filter(user_id=user.id, activity__id=activity_id,
+                                                            trigger_node=trigger_node).first()
+            if trigger_node == 'register':
+                json_response = self.get_activity_user_register_status(activity_record)
+            elif trigger_node == 'validation':
+                json_response = self.get_activity_user_validation_status(activity_record, user,
+                                                                         activity_info.start_at)
+            elif trigger_node in ('first_pay', 'first_buy'):
+                cost_record = self.get_user_cost_info(user.id, trigger_node)
+                if cost_record.exists():
+                    if cost_record.filter(create_time__lt=activity_info.start_at).exists():
+                        json_response = {
+                            'ret_code': '00000',
+                            'message': u'用户未达到活动条件'
+                        }
+                    else:
+                        json_response = self.get_activity_user_first_cost_status(activity_record, activity_info,
+                                                                                 cost_record, activity_id, trigger_node)
+                else:
+                    json_response = {
+                        'ret_code': '00002',
+                        'message': u'用户没有开销记录'
+                    }
+
+        if not json_response:
+            json_response = {
+                'ret_code': '50000',
+                'message': u'异常查询'
+            }
+        return HttpResponse(json.dumps(json_response), content_type='application/json')
+
+
 class ThousandRedPackAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
@@ -1219,9 +1438,12 @@ class CommonAward(object):
         else:
             gift = ActivityJoinLog.objects.filter(action_name='common_award_sepetember', user=self.request.user).exclude(Q(gift_name=u'现金红包')|Q(gift_name=u"None")).first()
             if gift and gift.join_times == 0:
+                user_activity.used_chances += 1
+                user_activity.save(update_fields=["used_chances"])
                 to_json_response = {
                     'ret_code': 3025,
                     'type': "gift",
+                    'used_chances': user_activity.used_chances,
                     'message': u'您的奖品已经被领走了',
                 }
                 return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -1243,7 +1465,7 @@ class CommonAward(object):
         else:
             gift_name = "None"
 
-        reward = Reward.objects.filter(type=gift_name,
+        reward = Reward.objects.filter(type=gift_name.strip(),
                                        is_used=False,
                                        end_time__gte=now).first()
 
@@ -1253,6 +1475,8 @@ class CommonAward(object):
             "content": reward.content,
             "mtype": "activity"
         })
+        reward.is_used = True
+        reward.save()
 
         to_json_response = {
             'ret_code': 3014,
@@ -1277,9 +1501,12 @@ class CommonAward(object):
         else:
             join_log = ActivityJoinLog.objects.filter(action_name='common_award_sepetember', user=self.request.user, amount__gt=0).first()
             if join_log and join_log.join_times == 0:
+                user_activity.used_chances += 1
+                user_activity.save(update_fields=["used_chances"])
                 to_json_response = {
                     'ret_code': 3025,
                     'type': "money",
+                    'used_chances': user_activity.used_chances,
                     'message': u'您的奖品已经被领走了',
                 }
                 return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -1290,13 +1517,15 @@ class CommonAward(object):
             join_log.join_times = 0
             join_log.save(update_fields=["join_times"])
 
-        user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
         user_activity.used_chances += 1
         user_activity.used_awards += 1
         user_activity.save(update_fields=["used_chances", "used_awards"])
 
         describe = 'common_september_' + str(int(join_log.amount))
         try:
+            print "*"*20
+            print describe
+            print "*"*20
             dt = timezone.datetime.now()
             redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
         except Exception, reason:

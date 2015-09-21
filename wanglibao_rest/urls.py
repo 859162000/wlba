@@ -52,7 +52,7 @@ from marketing.play_list import InvestmentHistory
 from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView,
                              ThousandRedPackCountAPIView, ThunderActivityRewardCounter, ThunderAwardAPIView,)
 from weixin.views import P2PListWeixin
-
+from marketing.views import UserActivityStatusAPIView
 
 router = DefaultRouter()
 
@@ -244,4 +244,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^m/', include('wanglibao_app.urls')),
+)
+
+# 用户活动状态查询接口
+urlpatterns += patterns(
+    '',
+    url(r'^activity/joinInfo/$', UserActivityStatusAPIView.as_view()),
 )
