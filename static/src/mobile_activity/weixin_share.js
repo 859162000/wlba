@@ -56,7 +56,7 @@
 
     wx.ready(function(){
 
-        var host = 'https://www.staging.wanglibao.com',
+        var host = 'https://staging.wanglibao.com',
             shareName = '有个红包一直拽在手里，今天我想要送给你',
             shareImg = host + '/static/imgs/mobile/share_logo.png',
             shareLink = host + '/activity/share/index/?parentPhone='+phoneNum,
