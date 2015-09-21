@@ -32,7 +32,7 @@ html
         .welfare-box
           p.welfare-tit 福利二：
           p.welfare-cont
-            | 新手首次完成充值， <br />
+            | 注册后首次完成充值， <br />
             | 即送100元红包。
           p.btn-box
             if user.is_authenticated
@@ -90,7 +90,7 @@ html
       span.alert-close
       .alert-cont.pt 实名认证后，奖励自动发放
       p.txt-center.mt1r
-        a(href="/pay/banks/").alert-btn 去实名认证
+        a(href="/accounts/id_verify/").alert-btn 去实名认证
 
     //充值后
     .alert-box.go-money

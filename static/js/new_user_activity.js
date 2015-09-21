@@ -14,6 +14,7 @@
     });
     require(['jquery', 'jqueryRotate', "tools"], function ($, jqueryRotate, tool) {
         var activityId = 65; //activity id l:37 65
+        var payId = 69;
         function ajaxFun(url,data,fn){
             $.ajax({
                 type: "get",
@@ -95,11 +96,11 @@
         });
         //充值
         $(".recharge").on("click",function(){
-            ajaxFun("/api/activity/joinInfo/",{"activity_id":activityId,"trigger_node":"first_pay"},funs.firstPay);
+            ajaxFun("/api/activity/joinInfo/",{"activity_id":payId,"trigger_node":"first_pay"},funs.firstPay);
         });
         //理财
         $(".manage-money").on("click",function(){
-            ajaxFun("/api/activity/joinInfo/",{"activity_id":activityId,"trigger_node":"first_buy"},funs.firstBuy);
+            ajaxFun("/api/activity/joinInfo/",{"activity_id":payId,"trigger_node":"first_buy"},funs.firstBuy);
         });
 
         //返回顶部
