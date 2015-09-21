@@ -114,6 +114,7 @@ INSTALLED_APPS = (
     'weixin',
     'wanglibao_app',
     'wanglibao_anti', #add by yihen@20150813, anti module added
+    'wanglibao_reward', #add by yihen@20150910
     'report',
     'misc',
 
@@ -370,7 +371,13 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': '/var/log/wanglibao/marketing.log',
             'formatter': 'verbose'
-        }
+        },
+        'wanglibao_reward':{  #add by yihen@20150915
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/wanglibao_reward.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
@@ -428,6 +435,10 @@ LOGGING = {
         },
         'marketing': {
             'handlers': ['marketing', 'console'],
+            'level': 'DEBUG'
+        },
+        'wanglibao_reward': { #add by yihen@20150915
+            'handlers': ['wanglibao_reward', 'console'],
             'level': 'DEBUG'
         },
     }
@@ -782,6 +793,7 @@ CKEDITOR_CONFIGS = {
         'toolbar': 'custom',
     },
     "mini":{
+        'entities':False,
         'toolbar': [
                 {'items': ['Source']},
             ]

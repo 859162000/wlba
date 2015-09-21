@@ -5,6 +5,7 @@ body
     clear: both
   .wanglibaologo
     margin-top: 15px
+
   .activity-nav
     .act-container-login-nav
       .login-nav
@@ -23,7 +24,7 @@ body
       display: block
       margin: 0 auto
       background: url(/static/imgs/pc_activity/gold_season/rankingListBg.png)
-      height: 618px
+      height: 628px
       .table
         width: 765px
         margin: 0 auto
@@ -71,26 +72,24 @@ body
             display: block
             margin: 0 90px 0 130px
             width: 20px
+            position: relative
+            z-index: 1
           span.one
             background: url(/static/imgs/pc_activity/gold_season/ico.png) no-repeat 0 0
             height: 32px
-            position: relative
             top: 4px
           span.two
             background: url(/static/imgs/pc_activity/gold_season/ico.png) no-repeat 0 -32px
             height: 32px
-            position: relative
             top: 4px
           span.three
             background: url(/static/imgs/pc_activity/gold_season/ico.png) no-repeat 0 -64px
             height: 32px
-            position: relative
             top: 4px
           .round
             text-align: center
             border-radius: 50%
             background: #ccc
-            position: relative
             top: 10px
             color: #fff
             height: 20px
@@ -99,66 +98,63 @@ body
       margin: 40px auto
       display: block
     .order
-      background: url(/static/imgs/pc_activity/gold_season/orderBg.png) no-repeat 0 0
-      width: 1099px
-      height: 1529px
-      margin: 0 auto
-      position: relative
-      .text
-        font-size: 18px
-        color: #666
-        line-height: 30px
-        position: absolute
-      .title
-        font-size: 18px
-        color: #e8471b
-        line-height: 30px
-        position: absolute
-      .text1
-        left: 550px
-        top: 130px
-      .title1
-        left: 88px
-        top: 320px
-      .text2
-        left: 330px
-        top: 555px
-      .title2
-        left: 896px
-        top: 736px
-      .text3
-        left: 466px
-        top: 910px
-      .title3
-        left: 94px
-        top: 1086px
-      .text4
-        left: 176px
-        top: 1304px
-      .title4
-        left: 922px
-        top: 1500px
-    .button
-      margin: 20px auto 40px
-      width: 246px
-      height: 56px
-      background: #ec551d
-      color: #fff
-      font-size: 18px
-      display: block
-      line-height: 56px
-      border-radius: 8px
-      -webkit-transition: all 0.3s ease
-      -moz-transition: all 0.3s ease
-      -ms-transition: all 0.3s ease
-      -o-transition: all 0.3s ease
-      transition: all 0.3s ease
-    .button:hover
-      background: #274FB4
-    .explainImg
       width: 1100px
-      margin: 0 auto 80px
-      display: block
+      margin: 0 auto
+      height: 298px
+      .box
+        width: 191px
+        display: block
+        float: left
+        img
+          padding-bottom: 7px
+          margin: 0 auto
+          display: block
+        dl
+          width: 100%
+          text-align: center
+          dt
+            font-size: 16px
+            line-height: 34px
+          dd
+            color: #e8471b
+            font-size: 12px
+            line-height: 18px
+      .arrow
+        margin: 0 45px
+        float: left
+        width: 22px
+        padding-top: 68px
+        height: 104px
+        background: url(/static/imgs/pc_activity/gold_season/orderArrow.png) no-repeat 0 bottom
+    .fixBox
+      width: 100%
+      position: relative
+      left: 0
+      bottom : 0px
+      padding: 20px 0
+      z-index: 9999
+      height: 76px
+      background: rgba(255,255,255,0.8)
+      .button
+        position: absolute
+        left: 50%
+        bottom: 10px
+        margin: 0px 0 0 -123px
+        width: 246px
+        height: 56px
+        background: #ec551d
+        color: #fff
+        font-size: 18px
+        display: block
+        line-height: 56px
+        border-radius: 8px
+        -webkit-transition: all 0.3s ease
+        -moz-transition: all 0.3s ease
+        -ms-transition: all 0.3s ease
+        -o-transition: all 0.3s ease
+        transition: all 0.3s ease
+      .button:hover
+        background: #274FB4
     .explain
       background: url(/static/imgs/pc_activity/gold_season/explainBg.png) no-repeat 0 0
       width: 1104px
@@ -167,6 +163,7 @@ body
       display: inline-block
       position: relative
       left: 50%
+      z-index: 1
       .main
         border: 10px #fa742d solid
         border-top: none
@@ -186,8 +183,8 @@ body
       clear: both
       border: 6px #f0651f solid
       border-radius: 14px
-      width: 1088px
-      margin: 38px auto 0
+      width: 860px
+      margin: 6px auto
       display: block
       height: 202px
       .leftImg
@@ -196,18 +193,19 @@ body
         position: relative
         top: 41px
         left: -1px
+        z-index: 1
       .rightMain
         float: left
         display: block
         margin-left: 12px
-        width: 892px
+        width: 660px
         p.title
           padding-top: 16px
           line-height: 26px
           font-size: 14px
           text-align: left
         p.text
-          font-size: 18px
+          font-size: 16px
           line-height: 40px
           font-weight: bold
         .number
@@ -217,41 +215,85 @@ body
             font-size: 24px
             color: #666
             line-height: 24px
+          span.add
+            position: relative
+            left: -10px
+            z-index: 1
           dl
             float: left
             display: block
             text-align: center
             position: relative
-            left: -3px
+            left: -10px
+            z-index: 1
             dt
+
               font-size: 24px
               color: #666
               line-height: 24px
               font-weight: bold
+              padding: 0
             dd
               padding-top: 5px
               font-size: 12px
               color: #f0651f
               line-height: 18px
+              padding: 0
+          dl.right
+            position: relative
+            left: 30px
+            width: 180px
+            z-index: 1
         .example1
           float: left
-          width: 500px
+          width: 400px
           .number
             margin-left: 26px
         .example2
           float: left
-          width: 350px
+          width: 260px
           dl
             float: none
             margin: 0 auto
-    .rule
-      clear: both
-      margin: 36px auto 28px
-      width: 1088px
-      dt
-        font-size: 26px
-        color: #666
-        line-height: 34px
-      dd
-        line-height: 24px
-        font-size: 13px
+
+    .cheats
+      background: url(/static/imgs/pc_activity/gold_season/cheatsBg.png) no-repeat 0 0
+      width: 1100px
+      margin: 0 auto
+      height: 716px
+      position: relative
+      z-index: 1
+      .title
+        width: 256px
+        text-align: center
+        height: 54px
+        position: absolute
+        right: 176px
+        top: 105px
+        color: #fff
+        font-size: 18px
+        padding: 0
+        line-height: 54px
+      .text
+        position: absolute
+        color: #ec551d
+        font-size: 18px
+        height: 30px
+        line-height: 30px
+      .text1
+        left: 238px
+        top: 76px
+      .text2
+        left: 180px
+        top: 148px
+      .rule
+        padding: 560px 0 0 110px
+        width: 980px
+        p
+          color: #666
+          line-height: 18px
+          font-size: 12px
+        .calculation
+          color: #ec551d
+  .g-footer-warp
+    margin-top: 15px

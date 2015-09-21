@@ -16,7 +16,7 @@ urlpatterns = patterns(
     url(r'^login/$', views.WeixinLogin.as_view(), name='weixin_login'),
     url(r'^oauth/login/$', views.WeixinOauthLoginRedirect.as_view(), name='weixin_oauth_login_redirect'),
     url(r'^regist/$', views.WeixinRegister.as_view(), name="weixin_register"),
-    url(r'^regist/succees/$', TemplateView.as_view(template_name="weixin_regist_succees.jade")),
+    url(r'^regist/succees/$', TemplateView.as_view(template_name="weixin_regist_succees_new.jade")),
     url(r'^security/$', login_required(views.WeixinAccountSecurity.as_view(), login_url='/weixin/login/'), name='weixin_security'),
     url(r'^authentication/', TemplateView.as_view(template_name="weixin_authentication.jade")),
     url(r'^recharge/$', login_required(views.WeixinRecharge.as_view(), login_url='/weixin/login/'), name='weixin_recharge_first'),
@@ -32,6 +32,8 @@ urlpatterns = patterns(
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
     url(r'^api/login/$', views.WeixinLoginAPI.as_view(), name='weixin_login_api'),
     url(r'^api/pay/order/$', views.WeixinPayOrder.as_view(), name='weixin_pay_order_api'),
+    url(r'api/test/$', views.AuthorizeCode.as_view(), name='weixin_authorize_code'),
+    url(r'api/test1/$', views.AuthorizeUser.as_view(), name='weixin_authorize_user_info'),
 )
 
 # 微信管理后台

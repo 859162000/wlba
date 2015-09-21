@@ -66,7 +66,8 @@ html(style="background:#fef4e0")
       p.app_eight_backone 4. 投资豪礼奖品为现金红包。活动红包统一以站内信形式通知，完成一次投资回款后即可取现；
       p.app_eight_backone 5. 所有红包均只能使用一次，使用后是否有余额即失效；
       p.app_eight_backone 6. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
-      p.app_eight_backone 7. 网利宝对此活动享有最终解释权。
+      p.app_eight_backone#ios-show(style="display:none") 7. 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关 如有疑问请联系在线客服或拨打4008-588-066
+      p.app_eight_backone 8. 网利宝对此活动享有最终解释权。
 #small-zc
   .wrap(style="background:none")
     .gold2
@@ -80,89 +81,98 @@ html(style="background:#fef4e0")
         span.first-xl-off2 ×
         p 不符合参加条件
 script.
+  var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+      iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+      ios = ipad || iphone;
+  if (ios) {
+      document.getElementById('ios-show').style.display = 'block';
+  }
 
   function TimeTo(dd) {
-    var t = new Date(dd),//取得指定时间的总毫秒数
-            n = new Date().getTime(),//取得当前毫秒数
-            c = t - n;//得到时间差
-    if (c <= 0) {//如果差小于等于0  也就是过期或者正好过期，则推出程序
-      //document.getElementById('timer').innerHTML = '活动已经结束';
-      clearInterval(window['ttt']);//清除计时器
-      return;//结束执行
-    }
-    var ds = 60 * 60 * 24 * 1000,//一天共多少毫秒
-            d = parseInt(c / ds),//总毫秒除以一天的毫秒 得到相差的天数
-            h = parseInt((c - d * ds) / (3600 * 1000)),//然后取完天数之后的余下的毫秒数再除以每小时的毫秒数得到小时
-            m = parseInt((c - d * ds - h * 3600 * 1000) / (60 * 1000)),//减去天数和小时数的毫秒数剩下的毫秒，再除以每分钟的毫秒数，得到分钟数
-            s = parseInt((c - d * ds - h * 3600 * 1000 - m * 60 * 1000) / 1000);//得到最后剩下的毫秒数除以1000 就是秒数，再剩下的毫秒自动忽略即可
-    if(h < 10)
-        h = "0" + h;
-        if(m < 10)
-        m = "0" + m;
-        if(s < 10)
-        s = "0" + s;
-    document.getElementById('display').innerHTML = d;
-    document.getElementById('display1').innerHTML = h;
-    document.getElementById('display2').innerHTML = m;
-    document.getElementById('display3').innerHTML = s;
-  }
-  (function () {
-    window['ttt'] = setInterval(function () {
-
-      TimeTo('2015/8/8 00:00:00');//定义倒计时的结束时间，注意格式
-
-    }, 1000);//定义计时器，每隔1000毫秒 也就是1秒 计算并更新 div的显示
-  })();
-  var timeTask=setInterval(function(){
-        var date=new Date();
-        var tt=date.getMonth();
-        var gt=date.getDate();
-        var ht=date.getHours();
-        var mt=date.getMinutes();
-        var st=date.getSeconds();
-        if(tt>=7&&gt>=7&&ht>=12&&mt>=0&&st>=0){
-             document.getElementById('jinjiang').innerHTML = '全场加息';
-             document.getElementById('shenme').innerHTML = '';
-
+        var t = new Date(dd),//取得指定时间的总毫秒数
+                n = new Date().getTime(),//取得当前毫秒数
+                c = t - n;//得到时间差
+        if (c <= 0) {//如果差小于等于0  也就是过期或者正好过期，则推出程序
+          //document.getElementById('timer').innerHTML = '活动已经结束';
+          clearInterval(window['ttt']);//清除计时器
+          return;//结束执行
         }
-        if(tt>=7&&gt>=8&&ht>=0&&mt>=0&&st>=0){
-          document.getElementById('jinjiang').innerHTML = '全场加息';
-          document.getElementById('shenme').innerHTML = '';
-          TimeTot('2015/8/8 23:59:59');
-          callFun();
-        }else{
-          //document.getElementById('button-eight').href = 'javascript:void(0)';
-          //document.getElementById('button-eight').style.background='#3d3d3d';
+        var ds = 60 * 60 * 24 * 1000,//一天共多少毫秒
+                d = parseInt(c / ds),//总毫秒除以一天的毫秒 得到相差的天数
+                h = parseInt((c - d * ds) / (3600 * 1000)),//然后取完天数之后的余下的毫秒数再除以每小时的毫秒数得到小时
+                m = parseInt((c - d * ds - h * 3600 * 1000) / (60 * 1000)),//减去天数和小时数的毫秒数剩下的毫秒，再除以每分钟的毫秒数，得到分钟数
+                s = parseInt((c - d * ds - h * 3600 * 1000 - m * 60 * 1000) / 1000);//得到最后剩下的毫秒数除以1000 就是秒数，再剩下的毫秒自动忽略即可
+        if(h < 10)
+            h = "0" + h;
+            if(m < 10)
+            m = "0" + m;
+            if(s < 10)
+            s = "0" + s;
+        document.getElementById('display').innerHTML = d;
+        document.getElementById('display1').innerHTML = h;
+        document.getElementById('display2').innerHTML = m;
+        document.getElementById('display3').innerHTML = s;
+      }
+      (function () {
+        window['ttt'] = setInterval(function () {
 
+          TimeTo('2015/8/8 00:00:00');//定义倒计时的结束时间，注意格式
+
+        }, 1000);//定义计时器，每隔1000毫秒 也就是1秒 计算并更新 div的显示
+      })();
+      var timeTask=setInterval(function(){
+            var date=new Date();
+            var tt=date.getMonth();
+            var gt=date.getDate();
+            var ht=date.getHours();
+            var mt=date.getMinutes();
+            var st=date.getSeconds();
+            if(tt>=7&&gt>=7&&ht>=12&&mt>=0&&st>=0){
+                 document.getElementById('jinjiang').innerHTML = '全场加息';
+                 document.getElementById('shenme').innerHTML = '';
+
+            }
+            if((tt>=7&&gt>=8&&ht>=0&&mt>=0&&st>=0)&&(tt>=7&&gt>=8&&ht<=23&&mt<=59&&st<=59)){
+              document.getElementById('jinjiang').innerHTML = '全场加息';
+              document.getElementById('shenme').innerHTML = '';
+
+            }else{
+              //document.getElementById('daojishi').innerHTML = '';
+              document.getElementById('button-eight').href = 'javascript:void(0)';
+              document.getElementById('button-eight').style.background='#3d3d3d';
+
+            }
+        },1000);
+      function TimeTotq(ff) {
+        var t = new Date(ff),//取得指定时间的总毫秒数
+                n = new Date().getTime(),//取得当前毫秒数
+                c = t - n;//得到时间差
+        if (c <= 0) {//如果差小于等于0  也就是过期或者正好过期，则推出程序
+          document.getElementById('eight-time').innerHTML = '活动已经结束';
+          document.getElementById('daojishi').innerHTML = '';
+          document.getElementById('eight-countdown').innerHTML = '';
+          clearInterval(window['ooo']);//清除计时器
+          return;//结束执行
         }
-    },1000);
-
-    function callFun(){
-       document.getElementById('daojishi').innerHTML = '距离结束还有';
-    }
-  function TimeTot(dd) {
-    var t = new Date(dd),//取得指定时间的总毫秒数
-            n = new Date().getTime(),//取得当前毫秒数
-            c = t - n;//得到时间差
-    if (c <= 0) {//如果差小于等于0  也就是过期或者正好过期，则推出程序
-      document.getElementById('eight-time').innerHTML = '活动已经结束';
-      document.getElementById('eight-countdown').innerHTML = '';
-      clearInterval(TimeTot('2015/8/8 23:00:00'));//清除计时器
-      return;//结束执行
-    }
-    var ds = 60 * 60 * 24 * 1000,//一天共多少毫秒
-            d = parseInt(c / ds),//总毫秒除以一天的毫秒 得到相差的天数
-            h = parseInt((c - d * ds) / (3600 * 1000)),//然后取完天数之后的余下的毫秒数再除以每小时的毫秒数得到小时
-            m = parseInt((c - d * ds - h * 3600 * 1000) / (60 * 1000)),//减去天数和小时数的毫秒数剩下的毫秒，再除以每分钟的毫秒数，得到分钟数
-            s = parseInt((c - d * ds - h * 3600 * 1000 - m * 60 * 1000) / 1000);//得到最后剩下的毫秒数除以1000 就是秒数，再剩下的毫秒自动忽略即可
-    if(h < 10)
-        h = "0" + h;
-        if(m < 10)
-        m = "0" + m;
-        if(s < 10)
-        s = "0" + s;
-    document.getElementById('display').innerHTML = d;
-    document.getElementById('display1').innerHTML = h;
-    document.getElementById('display2').innerHTML = m;
-    document.getElementById('display3').innerHTML = s;
-  }
+        var ds = 60 * 60 * 24 * 1000,//一天共多少毫秒
+                d = parseInt(c / ds),//总毫秒除以一天的毫秒 得到相差的天数
+                h = parseInt((c - d * ds) / (3600 * 1000)),//然后取完天数之后的余下的毫秒数再除以每小时的毫秒数得到小时
+                m = parseInt((c - d * ds - h * 3600 * 1000) / (60 * 1000)),//减去天数和小时数的毫秒数剩下的毫秒，再除以每分钟的毫秒数，得到分钟数
+                s = parseInt((c - d * ds - h * 3600 * 1000 - m * 60 * 1000) / 1000);//得到最后剩下的毫秒数除以1000 就是秒数，再剩下的毫秒自动忽略即可
+        if(h < 10)
+            h = "0" + h;
+            if(m < 10)
+            m = "0" + m;
+            if(s < 10)
+            s = "0" + s;
+        document.getElementById('daojishi').innerHTML = '距离结束还有';
+        document.getElementById('display').innerHTML = d;
+        document.getElementById('display1').innerHTML = h;
+        document.getElementById('display2').innerHTML = m;
+        document.getElementById('display3').innerHTML = s;
+      }
+      (function () {
+        window['ooo'] = setInterval(function () {
+          TimeTotq('2015/8/8 23:59:59');//定义倒计时的结束时间，注意格式
+        }, 1000);//定义计时器，每隔1000毫秒 也就是1秒 计算并更新 div的显示
+      })();

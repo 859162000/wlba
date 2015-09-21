@@ -16,18 +16,18 @@ def generate_validate_code():
     return "%d" % (random.randrange(100000, 1000000))
 
 #channel sms, 0:auto 1:mandao 2:yimei
-def send_messages(phones, messages, channel=0):
+def send_messages(phones, messages, channel=0, ext=''):
     # short_message = ShortMessage()
 
     if channel == 0:
-        status, context = backends.ManDaoSMSBackEnd.send_messages(phones, messages)
+        status, context = backends.ManDaoSMSBackEnd.send_messages(phones, messages, ext)
         channel_val = u"慢道"
         #失败使用emay重发
         if status != 200:
             status, context = backends.EmaySMS.send_messages(phones, messages)
             channel_val = u"亿美"
     elif channel == 1:
-        status, context = backends.ManDaoSMSBackEnd.send_messages(phones, messages)
+        status, context = backends.ManDaoSMSBackEnd.send_messages(phones, messages, ext)
         channel_val = u'慢道'
     else:
         status, context = backends.EmaySMS.send_messages(phones, messages)

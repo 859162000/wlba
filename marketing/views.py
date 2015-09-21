@@ -1140,7 +1140,7 @@ class WanglibaoAwardActivity(APIView):
             Description:判断用户是不是在活动期间内注册的新用户
         """
         create_at = int(time.mktime(self.user.date_joined.date().timetuple()))  # 用户注册的时间戳
-        activity_start = time.mktime(datetime(2014, 8, 1).timetuple())  # 活动开始时间
+        activity_start = time.mktime(datetime(2014, 1, 1).timetuple())  # 活动开始时间
 
         if activity_start > create_at:
             to_json_response = {
@@ -1438,9 +1438,12 @@ class CommonAward(object):
         else:
             gift = ActivityJoinLog.objects.filter(action_name='common_award_sepetember', user=self.request.user).exclude(Q(gift_name=u'现金红包')|Q(gift_name=u"None")).first()
             if gift and gift.join_times == 0:
+                user_activity.used_chances += 1
+                user_activity.save(update_fields=["used_chances"])
                 to_json_response = {
                     'ret_code': 3025,
                     'type': "gift",
+                    'used_chances': user_activity.used_chances,
                     'message': u'您的奖品已经被领走了',
                 }
                 return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -1462,7 +1465,7 @@ class CommonAward(object):
         else:
             gift_name = "None"
 
-        reward = Reward.objects.filter(type=gift_name,
+        reward = Reward.objects.filter(type=gift_name.strip(),
                                        is_used=False,
                                        end_time__gte=now).first()
 
@@ -1472,6 +1475,8 @@ class CommonAward(object):
             "content": reward.content,
             "mtype": "activity"
         })
+        reward.is_used = True
+        reward.save()
 
         to_json_response = {
             'ret_code': 3014,
@@ -1496,9 +1501,12 @@ class CommonAward(object):
         else:
             join_log = ActivityJoinLog.objects.filter(action_name='common_award_sepetember', user=self.request.user, amount__gt=0).first()
             if join_log and join_log.join_times == 0:
+                user_activity.used_chances += 1
+                user_activity.save(update_fields=["used_chances"])
                 to_json_response = {
                     'ret_code': 3025,
                     'type': "money",
+                    'used_chances': user_activity.used_chances,
                     'message': u'您的奖品已经被领走了',
                 }
                 return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -1509,13 +1517,15 @@ class CommonAward(object):
             join_log.join_times = 0
             join_log.save(update_fields=["join_times"])
 
-        user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
         user_activity.used_chances += 1
         user_activity.used_awards += 1
         user_activity.save(update_fields=["used_chances", "used_awards"])
 
         describe = 'common_september_' + str(int(join_log.amount))
         try:
+            print "*"*20
+            print describe
+            print "*"*20
             dt = timezone.datetime.now()
             redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
         except Exception, reason:

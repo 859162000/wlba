@@ -14,7 +14,7 @@ import requests
 
 from weixin.wechatpy._compat import json
 from weixin.wechatpy.exceptions import WeChatOAuthException
-
+from urllib import urlencode,quote
 
 class WeChatOAuth(object):
     """ 微信公众平台 OAuth 网页授权 """
@@ -79,7 +79,7 @@ class WeChatOAuth(object):
         """Generate authorize url
         :return: An url
         """
-        redirect_uri = six.moves.urllib.parse.quote(self.redirect_uri)
+        redirect_uri = quote(self.redirect_uri)#six.moves.urllib.parse.quote(self.redirect_uri)
         url_list = [
             self.OAUTH_BASE_URL,
             'oauth2/authorize?appid=',

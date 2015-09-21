@@ -8,7 +8,7 @@ html
     - endwith
     //link(rel="stylesheet",href="/static/stylesheets/activity.css")
     link(rel="stylesheet",href="/static/css/bootstrap.min.css")
-    link(rel="stylesheet",href="/static/stylesheets/ganjiwang.css")
+    link(rel="stylesheet",href="/static/stylesheets/ganjiwang.css?v=20150915")
   body(style="background:#fff")
     include include/activityTop2
     .wrap#ganjiwang-banner
@@ -26,7 +26,7 @@ html
                 a.banner-form--button(href="/accounts/home") 进入我的账户
         else
           .denelu-form#denglu
-            h1.biaoyu 领取800元现金红包
+            h1.biaoyu(style="padding-top:10px") 领取800元现金红包
             //.align-center
             //  a.font-s.blue(href="http://act.vip.xunlei.com/vip/2015/p2pcash/#wlb") 【立即领取】
             form#register-modal-form.login-form.dale(method='post', action='/accounts/register/ajax/')
@@ -40,7 +40,7 @@ html
                 .span12-omega.hidden.show
                   没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
                 .form-control-group
-                  .span6
+                  .span6(style="width:49%")
                     input#id_validate_code.com-tu.tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
                   .span6-omega
                     button#button-get-validate-code-modal.button-orange.button-large.huoqu-ma.new-btn(type='button',style="top:-2px") 获取验证码
@@ -70,7 +70,7 @@ html
       .gjw-gold
         .xl-backtop(style="z-index:99")
           span.seven-com.seven-ten
-          .backtop.sev-backtop 回到顶部
+          .backtop.sev-backtop(style="font-size:14px") 回到顶部
           img(src="/static/imgs/pc_activity/xunlei/seven/sev_weixin.png")#xl-weixin
           a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank")
             img(src="/static/imgs/pc_activity/xunlei/seven/sev_qq.png",style="margin-top:10px")#xl-qq
@@ -86,18 +86,18 @@ html
               a.gjw-reg 点击领取
             else
               a.gjw-reg.reg1 点击领取
-            p 特权一：注册送
+            p.ganji-p 特权一：注册送
               b 800
               | 元现金红包
           .gjw-prize.gjw-prize-com.gjw-prize-two
             a#prize-two 点击领取
-            p 特权二：首次充值送特权会员
+            p.ganji-p 特权二：首次充值送特权会员
           .gjw-prize.gjw-prize-com.gjw-prize-three
             if user.is_authenticated
               a.gjw-reg3 点击领取
             else
               a.gjw-reg3.reg2 点击领取
-            p(style="bottom:0") 特权三：单笔投资
+            p.ganji-p(style="bottom:8px") 特权三：单笔投资
               b ≥3000
               | 元，送赶
               br
@@ -106,7 +106,7 @@ html
               | 元充值
           .gjw-prize.gjw-prize-com.gjw-prize-four(style="margin-right:0")
             a#prize-four 点击领取
-            p 特权四：满额投资就送
+            p.ganji-p 特权四：满额投资就送
               b(style="color:#f22527") 夏日双人游
         p(style="top:150px").gjw-p#recharge
           span.gjw-font-com.gjw-font-two
@@ -412,4 +412,4 @@ html
           a.agin 我再看看
   script.
       var v = new Date().getTime()
-      require(['/static/js/hover.js','/static/js/ganjiwang-regist.js?v='+v,'/static/js/ganji_show.js'])
+      require(['/static/js/hover.js','/static/js/ganjiwang-regist.js?v='+v,'/static/js/ganji_show.js?v='+v])
