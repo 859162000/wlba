@@ -68,7 +68,7 @@ class TradePasswdTest(TestCase):
         self.assertEqual(trade_pwd_set(self.profile.user_id, 2, new_trade_pwd='12345', old_trade_pwd='123456')['ret_code'], 0)
         self.assertEqual(trade_pwd_set(self.profile.user_id, 2, new_trade_pwd='12345', old_trade_pwd='123456')['ret_code'], 1)
         #测试使用身份证，银行卡设定交易密码
-        self.assertEqual(trade_pwd_set(self.profile.user_id, 3, new_trade_pwd='12345', card_id='123456',citizen_id='12345')['ret_code'], 0)
+        self.assertEqual(trade_pwd_set(self.profile.user_id, 3, new_trade_pwd='12345', card_id='123456',citizen_id='123456')['ret_code'], 0)
 
 
 
