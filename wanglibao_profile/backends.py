@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse
 from django.utils.decorators import available_attrs
 from rest_framework.request import Request
-from wanglibao_pay.models import Card
+from wanglibao_pay.models import Card, PayInfo
 from wanglibao_profile.models import WanglibaoUserProfile
 import time
 import json
@@ -149,7 +149,7 @@ def trade_pwd_check(user_id, raw_trade_pwd):
         return {'ret_code':30046,'message':'未设置交易密码', 'retry_count':TRADE_PWD_LOCK_MAX_RETRY}
     if _trade_pwd_lock_is_locked(profile):
         # 锁定中
-        return {'ret_code':30048, 'message': '重试次数过多，交易密码被锁定', 'retry_count': 0}
+        return {'ret_code':30048, 'message': '交易密码已被锁定，请3小时后再试', 'retry_count': 0}
     else:
         if _check_pwd(raw_trade_pwd, profile.trade_pwd):
             _trade_pwd_lock_clear(profile)
@@ -160,7 +160,7 @@ def trade_pwd_check(user_id, raw_trade_pwd):
             profile.save()
             retry_count = _trade_pwd_lock_retry_count(profile)
             if retry_count == 0:
-                return {'ret_code':30048, 'message': '重试次数过多，交易密码被锁定', 'retry_count': 0}
+                return {'ret_code':30048, 'message': '交易密码已被锁定，请3小时后再试', 'retry_count': 0}
             else:
                 return {'ret_code': 30047, 'message': '交易密码错误', 'retry_count': _trade_pwd_lock_retry_count(profile)}
 
@@ -203,6 +203,17 @@ def _is_version_satisfied(request):
         return True
     return False
 
+def _is_just_bind_card(request):
+    if request.path == reverse('dynnum-new'):
+        order_id = int(request.POST.get('order_id'))
+        amount = PayInfo.objects.get(order__id=order_id).amount
+        if amount < 1:
+            return True
+        else:
+            return False
+    else:
+        return False
+
 def require_trade_pwd(view_func):
     '''
     装饰器， 进行交易密码校验
@@ -215,7 +226,7 @@ def require_trade_pwd(view_func):
         if request.path == reverse('deposit-new') and len(request.POST.get('card_no', '')) != 10:
             no_need_trade_pwd = True
         #为了绑卡进行的绑卡充值
-        if request.path == reverse('dynnum-new') and int(request.POST.get('amount', 0)) < 1:
+        if _is_just_bind_card(request):
             no_need_trade_pwd = True
         if not _is_version_satisfied(request):
             no_need_trade_pwd = True

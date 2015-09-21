@@ -40,7 +40,9 @@ class ShortMessage(models.Model):
     how many messages we send and send to whom
     """
 
-    phones = models.TextField(u'号码')
+    # Modify by hb on 2015-09-18
+#    phones = models.TextField(u'号码')
+    phones = models.CharField(u'号码', max_length=64, db_index=True)
     contents = models.TextField(u'内容')
     type = models.CharField(u'类型', max_length=8, choices=(
         (u'手动', u'手动'),
@@ -56,7 +58,7 @@ class ShortMessage(models.Model):
         (u'慢道', u'慢道'),
         (u'亿美', u'亿美'),
     ), default=u'慢道')
-    created_at = models.DateTimeField(u'发送时间', auto_now_add=True)
+    created_at = models.DateTimeField(u'发送时间', auto_now_add=True, db_index=True)
 
     class Meta:
         verbose_name_plural = u'已发送短信'

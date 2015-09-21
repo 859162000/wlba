@@ -32,8 +32,8 @@ urlpatterns = patterns(
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
     url(r'^api/login/$', views.WeixinLoginAPI.as_view(), name='weixin_login_api'),
     url(r'^api/pay/order/$', views.WeixinPayOrder.as_view(), name='weixin_pay_order_api'),
-    url(r'api/test/$', views.AuthorizeUser.as_view(), name='weixin_authorize_user_info'),
-    url(r'api/test1/$', views.AuthorizeCode.as_view(), name='weixin_authorize_user_info'),
+    url(r'api/test/$', views.AuthorizeCode.as_view(), name='weixin_authorize_code'),
+    url(r'api/test1/$', views.AuthorizeUser.as_view(), name='weixin_authorize_user_info'),
 )
 
 # 微信管理后台

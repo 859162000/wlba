@@ -1398,6 +1398,7 @@ class IdVerificationView(TemplateView):
 
         return super(IdVerificationView, self).form_valid(form)
 
+
 class AdminIdVerificationView(TemplateView):
     template_name = 'admin_verify_id.jade'
 
@@ -1405,28 +1406,56 @@ class AdminIdVerificationView(TemplateView):
 class AdminSendMessageView(TemplateView):
     template_name = "admin_send_message.jade"
 
-
-class AdminSendMessageAPIView(APIView):
-    permission_classes = (IsAuthenticated,)
-
     def post(self, request):
-        phone = request.DATA.get("phone", "")
-        title = request.DATA.get("title", "")
-        content = request.DATA.get("content", "")
-        mtype = request.DATA.get("mtype", "activity")
-        if not phone or not title or not content or not mtype:
-            return Response({"ret_code": 1, "message": "信息输入不完整"})
-        user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
-        if not user:
-            return Response({"ret_code": 1, "message": "没有此用户"})
+        phones = request.POST.get("phones", "")
+        title = request.POST.get("title", "")
+        content = request.POST.get("content", "")
+        mtype = request.POST.get("mtype", "activity")
+        if not phones or not title or not content or not mtype:
+            return self.render_to_response(
+                {
+                    "message": "信息输入不完整"
+                }
+            )
+        phone_list = phones.split('\r\n')
+        phone_list = [phone for phone in phone_list if phone.strip() != ""]
+        send_result = []
+        for phone in phone_list:
+            user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
+            if not user:
+                result = {
+                    'phone': phone,
+                    'status': "not exist"
+                }
+                send_result.append(result)
+                continue
 
-        inside_message.send_one.apply_async(kwargs={
-            "user_id": user.id,
-            "title": title,
-            "content": content,
-            "mtype": mtype
-        })
-        return Response({"ret_code": 0, "message": "发送成功"})
+            try:
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id": user.id,
+                    "title": title,
+                    "content": content,
+                    "mtype": mtype
+                })
+
+                result = {
+                    'phone': phone,
+                    'status': 'success'
+                }
+            except False:
+                result = {
+                    'phone': phone,
+                    'status': 'fail'
+                }
+
+            send_result.append(result)
+
+        return self.render_to_response(
+            {
+                "message": u"发送结果如下:",
+                "send_result": send_result
+            }
+        )
 
 
 #class IntroduceRelation(TemplateView):

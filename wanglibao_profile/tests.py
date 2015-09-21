@@ -57,8 +57,8 @@ class TradePasswdTest(TestCase):
         #测试锁定次数
         self.assertEqual(trade_pwd_check(self.profile.user_id, '0123456'), {'ret_code': 30047, 'message': '交易密码错误', 'retry_count': 2})
         self.assertEqual(trade_pwd_check(self.profile.user_id, '0123456'), {'ret_code': 30047, 'message': '交易密码错误', 'retry_count': 1})
-        self.assertEqual(trade_pwd_check(self.profile.user_id, '0123456'), {'ret_code':30048, 'message': '重试次数过多，交易密码被锁定', 'retry_count': 0})
-        self.assertEqual(trade_pwd_check(self.profile.user_id, '123456'), {'ret_code':30048, 'message': '重试次数过多，交易密码被锁定', 'retry_count': 0})
+        self.assertEqual(trade_pwd_check(self.profile.user_id, '0123456'), {'ret_code':30048, 'message': '交易密码已被锁定，请3小时后再试', 'retry_count': 0})
+        self.assertEqual(trade_pwd_check(self.profile.user_id, '123456'), {'ret_code':30048, 'message': '交易密码已被锁定，请3小时后再试', 'retry_count': 0})
         #测试锁定时间
         self.profile = WanglibaoUserProfile.objects.get(user__id=self.profile.user_id)
         self.profile.trade_pwd_last_failed_time = self.profile.trade_pwd_last_failed_time - 3600*3
