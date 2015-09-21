@@ -132,6 +132,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         return result[1];
     }
 
+    //微信分享
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ',];
     org.ajax({
         type : 'GET',
@@ -199,6 +200,7 @@ org.shareIndex = (function(org){
         init:function(){
             lib.phoneFun();
             lib.receiveFun();
+            lib.ruleSelect();
         },
         phoneFun:function(){
             $('#iphone').on('focus',function(){
@@ -219,30 +221,40 @@ org.shareIndex = (function(org){
         receiveFun:function(){
             var parentPhone = lib._getQueryStringByName('parentPhone') == '' ? '' : lib._getQueryStringByName('parentPhone');
             $('#receive').on('click',function(){
-                var phone = $.trim($('#iphone').val());
-                if(phone == '' || phone == '输入手机号'){
-                    $('.error').text('请输入手机号');
-                }else{
-                    if(!/^(13[0-9]|14[0-9]|15[0-9]|18[0-9])\d{8}$/i.test(phone)){
-                         $('.error').text('手机号格式不正确');
+                if(!$('#ruleLabel span').hasClass('noChecked')){
+                    var phone = $.trim($('#iphone').val());
+                    if(phone == '' || phone == '输入手机号'){
+                        $('.error').text('请输入手机号');
                     }else{
-                        $('.error').text('');
-                        org.ajax({
-                            url: '/api/user_exists/'+phone+'/',
-                            type: 'GET',
-                            data: {},
-                            success:function(data){
-                                if(data.existing){
-                                    window.location.href = '/activity/share/old/?phone='+phone;
-                                }else{
-                                    window.location.href = '/activity/share/new/?parentPhone='+parentPhone+'&phone='+phone;
+                        if(!/^(13[0-9]|14[0-9]|15[0-9]|18[0-9])\d{8}$/i.test(phone)){
+                             $('.error').text('手机号格式不正确');
+                        }else{
+                            $('.error').text('');
+                            org.ajax({
+                                url: '/api/user_exists/'+phone+'/',
+                                type: 'GET',
+                                data: {},
+                                success:function(data){
+                                    if(data.existing){
+                                        window.location.href = '/activity/share/old/?phone='+phone;
+                                    }else{
+                                        window.location.href = '/activity/share/new/?parentPhone='+parentPhone+'&phone='+phone;
+                                    }
+                                },
+                                error: function (xhr) {
                                 }
-                            },
-                            error: function (xhr) {
-                            }
-                        });
+                            });
+                        }
                     }
+                }else{
+                    alert('<div class="alertFont">请查看活动规则</div>');
                 }
+            })
+        },
+        ruleSelect:function(){
+            $('#ruleLabel').on('click',function(){
+                var span = $(this).find('span');
+                span.hasClass('noChecked') ? span.removeClass('noChecked') : span.addClass('noChecked');
             })
         },
         _getQueryStringByName:function(name){
