@@ -121,6 +121,7 @@ class P2PTrader(object):
             print self.product.types
             send_task("wanglibao_p2p.tasks.p2p_auto_published_by_publish_time", kwargs={
                 'p2p_type': self.product.types.id,
+                'period': self.product.period
             })
 
             # 满标将标信息写入redis
