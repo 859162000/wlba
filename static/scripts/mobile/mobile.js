@@ -517,6 +517,7 @@ org.regist = (function(org){
             var checkList = [$identifier, $password],
                 isSubmit = true;
 
+            var invite_phone = org.getQueryStringByName('parentPhone') == '' ? '' : org.getQueryStringByName('parentPhone');
             $submit.on('click',function(){
                 isSubmit =  true;
                 //校验主函数
@@ -541,6 +542,7 @@ org.regist = (function(org){
                             'validate_code':    $validation.val(),
                             'invite_code':      token,
                             'tid' : tid,
+                            'invite_phone' : invite_phone
                     },
                     beforeSend: function() {
                         $submit.text('注册中,请稍等...');
