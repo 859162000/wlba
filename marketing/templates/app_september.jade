@@ -15,31 +15,31 @@ html
         //    | ①注册  ②实名认证
         p.btn-box
           if user.is_authenticated
-            a(href="javascript:void(0);").red-btn.receive-red 注册领红包
+            a(href="javascript:void(0);").red-btn.receive-red 实名领红包
           else
-            a(href="/weixin/regist/?next=/activity/app_new_user/").red-btn.for-red 注册领红包
+            a(href="/weixin/regist/?next=/weixin/authentication/").red-btn.for-red 注册领红包
       .welfare2.mtpx
         img(src="/static/imgs/mobile_activity/app_september/welfare2.png")
         p.btn-box
           if user.is_authenticated
             a(href="javascript:void(0);").red-btn.recharge 注册充值
           else
-            a(href="/weixin/regist/?next=/activity/app_new_user/").red-btn 注册充值
+            a(href="/weixin/regist/?next=/activity/wx_new_user/").red-btn 注册充值
       .welfare3.mtpx
         img(src="/static/imgs/mobile_activity/app_september/welfare3.png")
         p.btn-box
           if user.is_authenticated
             a(href="javascript:void(0);").red-btn.manage-money 我要理财
           else
-            a(href="/weixin/regist/?next=/activity/app_new_user/").red-btn 我要理财
+            a(href="/weixin/regist/?next=/activity/wx_new_user/").red-btn 我要理财
     .promote-new
       h3.use-tit 新手任务攻略
       .use-cont
-        p 1、新手注册及实名认证成功即获得20元红包（投资300元可直减使用）；
-        p 2、新手首次充值（充值金额≥100元）成功即获得100元红包（投资2000元可直减使用）；
-        p 3、新手首次投资满额即可获得红包奖励，规则如下：
-        p a).用户首次投资单笔达到10,000元以上（包含）即获得200元红包（二次投资20000元可直减使用）；
-        p b).用户首次投资单笔达到20,000元以上（包含）即获得400元红包（二次投资40000元可直减使用）。
+        p 1、活动期间注册并实名认证成功即获得20元红包（投资500元可直减使用）；
+        p 2、注册后首次充值（充值金额≥100元）成功即获得100元红包（投资2000元可直减使用）；
+        p 3、注册后首次投资满额即可获得红包奖励，规则如下（奖励二选一）：
+        p a).注册后首次投资单笔达到10,000元以上（包含）即获得200元红包（二次投资20000元既可直减使用）；
+        p b).注册后首次投资单笔达到20,000元以上（包含）即获得400元红包（二次投资40000元既可直减使用）。
       h3.use-tit.mt40px 投资流程
       .use-cont
         p.txt-center 注册网利宝账号 → 充值资金到账户→<br />
@@ -48,10 +48,10 @@ html
     .red-use
       h3.use-tit 【红包使用规则】
       .use-cont
-        p 1、手机号为网利宝唯一账户，红包仅限通过官网、APP、微信渠道主动注册用户领取。通过好友邀请注册则无法享受此新手活动福利；
-        p 2、红包统一以站内信形式通知，完成一次投资汇款后即可取现，每个红包仅限使用一次，无论是否有余额均失效；
-        p 3、首次单笔投资满额所赠红包为直抵红包，二次投资满额即可直抵使用。红包有效期限截止到2015年10月30日。
-        p 4、网利宝对此活动享有最终解释权。
+        p 1、手机号为网利宝唯一账户，通过网利宝电脑官网、手机客户端、官方微信号主动新注册用户均可享受活动红包福利；
+        p 2、红包统一以站内信形式通知，完成一次投资回款后即可取现，每个红包仅限使用一次，无论是否有余额均失效；
+        p 3、首次单笔投资满额所赠红包为直抵红包，二次投资满额即可直抵使用。红包有效期自发放日起15天内有效。
+        p 4、部分合作渠道来源用户无法享受此活动奖励，网利宝对此活动享有最终解释权。
         p#ios-show(style="display:none") 5、所有活动由网利宝提供，与苹果公司（Apple Inc.）无关 网利宝对此活动享有最终解释权。
     .alert-page#alert-page
       //不是新用户 您不符合参加规则
@@ -60,6 +60,13 @@ html
       .alert-cont.pt Sorry~您不是新用户
       p.txt-center.mt1r
         a(href="javascript:void(0)").alert-btn.close-per 我知道了
+
+    //实名认证后
+    .alert-box.to-realName
+      span.alert-close
+      .alert-cont.pt 实名认证后，奖励自动发放
+      p.txt-center.mt1r
+        a(href="/pay/banks/").alert-btn 去实名认证
 
     //充值后
     .alert-box.go-money

@@ -13,7 +13,7 @@
         }
     });
     require(['jquery', 'jqueryRotate', "tools"], function ($, jqueryRotate, tool) {
-        var activityId = 65; //activity id
+        var activityId = 65; //activity id l:37 65
         function ajaxFun(url,data,fn){
             $.ajax({
                 type: "get",
@@ -27,12 +27,17 @@
             });
         }
         //banner
-        var banDom = $("#banner");
-        var winh = $(window).height();
-        banDom.height(winh);
-        if(winh < 970){
-            banDom.addClass("min-banner");
+        function telBan(){
+            var banDom = $("#banner");
+            var winh = $(window).height();
+            if(!banDom.hasClass("pc-banner")){
+                if(winh < 970){
+                    banDom.addClass("min-banner");
+                }
+                banDom.height(winh);
+            }
         }
+        telBan();
         //关闭弹层
         function closeAlert(tp){
           tp.hide();
@@ -50,11 +55,13 @@
             $("#alert-page").show();
         }
         var funs = {
-            "register": function(data){
+            "validation": function(data){
                 var ret_code = data.ret_code;
                 //console.log(data,"register");
                 if(ret_code === "10000"){
                     showAlert($(".running"));
+                }else if(ret_code === "00000") {
+                    showAlert($(".to-realName"));
                 }else{
                     showAlert($(".no-new-user"),"Sorry~您不符合参加规则");
                 }
@@ -84,7 +91,7 @@
         }
         //注册领红包
         $(".receive-red").on('click',function(){
-            ajaxFun("/api/activity/joinInfo/",{"activity_id":activityId,"trigger_node":"register"},funs.register);
+            ajaxFun("/api/activity/joinInfo/",{"activity_id":activityId,"trigger_node":"validation"},funs.validation);
         });
         //充值
         $(".recharge").on("click",function(){
@@ -93,6 +100,29 @@
         //理财
         $(".manage-money").on("click",function(){
             ajaxFun("/api/activity/joinInfo/",{"activity_id":activityId,"trigger_node":"first_buy"},funs.firstBuy);
+        });
+
+        //返回顶部
+        function backTop(){
+          $('body,html').animate({scrollTop: 0}, 600);
+        }
+        var topDom = $("a.xl-backtop");
+        var backDom = topDom.parents("div.backtop");
+        function showDom(){
+          if ($(document).scrollTop() > 0) {
+            backDom.addClass("show-backtop");
+          } else if ($(document).scrollTop() <= 0) {
+            backDom.removeClass("show-backtop");
+          }
+        }
+        showDom();
+        $(window).scroll(function () {
+        showDom();
+        });
+
+        topDom.on('click',function(){
+          backTop();
+          return false
         });
     });
 }).call(this);

@@ -1477,6 +1477,9 @@ class CommonAward(object):
 
         describe = 'common_september_' + str(int(join_log.amount))
         try:
+            print "*"*20
+            print describe
+            print "*"*20
             dt = timezone.datetime.now()
             redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
         except Exception, reason:
