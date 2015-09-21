@@ -200,13 +200,15 @@ class AppP2PProductViewSet(PaginatedModelViewSet):
         manual = u"FIELD({column}, '正在招标', '满标待审核', '满标已审核', '满标待打款', '满标已打款','还款中')".format(column='status')
 
         if pager:
-            return qs.filter(hide=False).filter(status__in=[
+            return qs.filter(hide=False, publish_time__lte=timezone.now()).filter(status__in=[
                 u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-            ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).filter(pager).extra(select={'manual': manual}, order_by=['manual', '-priority', '-publish_time'])
+            ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).filter(pager)\
+                .extra(select={'manual': manual}, order_by=['manual', '-priority', '-publish_time'])
         else:
-            return qs.filter(hide=False).filter(status__in=[
+            return qs.filter(hide=False, publish_time__lte=timezone.now()).filter(status__in=[
                 u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-            ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).extra(select={'manual': manual}, order_by=['manual', '-priority', '-publish_time'])
+            ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标'))\
+                .extra(select={'manual': manual}, order_by=['manual', '-priority', '-publish_time'])
 
 
 class AppRecommendViewSet(PaginatedModelViewSet):
@@ -226,7 +228,8 @@ class AppRecommendViewSet(PaginatedModelViewSet):
         recommend_product_id = None
         if self.request.user and self.request.user.is_authenticated():
             user = self.request.user
-            product_new = P2PProduct.objects.filter(hide=False, status=u'正在招标', category=u'新手标')
+            product_new = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now(),
+                                                    status=u'正在招标', category=u'新手标')
             if product_new.exists():
                 if not P2PRecord.objects.filter(user=user).exists():
                     # 不存在购买记录
@@ -251,16 +254,16 @@ class RecommendProductManagerView(TemplateView):
 
     def _get_product(self, id):
         if isinstance(id, list):
-            return P2PProduct.objects.filter(id__in=id).order_by('-id')
+            return P2PProduct.objects.filter(id__in=id, publish_time__lte=timezone.now()).order_by('-id')
         else:
-            return P2PProduct.objects.filter(id=id).order_by('-id')
+            return P2PProduct.objects.filter(id=id, publish_time__lte=timezone.now()).order_by('-id')
 
     def get_context_data(self, **kwargs):
         p2p_list = []
         misc = MiscRecommendProduction()
         ids = misc.get_recommend_products()
         if ids:
-            products = P2PProduct.objects.filter(id__in=ids)
+            products = P2PProduct.objects.filter(id__in=ids, publish_time__lte=timezone.now())
             for product in products:
                 p2p_list.append({
                     'id': product.id,
