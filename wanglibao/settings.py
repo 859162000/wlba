@@ -892,8 +892,11 @@ ZHONGJIN_UPDATE_TIMEDELTA = timedelta(hours=1)
 WLB_FOR_JINSHAN_KEY = '1994'
 JINSHAN_CALL_BACK_URL = 'https://vip.wps.cn/task/api/reward'
 
-# 外呼
+# 上海外呼
 WLB_FOR_SHLS_KEY = '1995'
+
+# 南京外呼
+WLB_FOR_NJWH_KEY = '2002'
 
 # 石头村
 WLB_FOR_SHITOUCUN_KEY = '1996'
@@ -928,9 +931,9 @@ YUNDUAN_COOP_ID = 298
 # 易车
 WLB_FOR_YICHE_KEY = '1999'
 if ENV == ENV_PRODUCTION:
-    YICHE_COOP_ID = 200104
-    YICHE_KEY = '0dae7d5bbcd493785f057bc1'
-    YICHE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API'
+    YICHE_COOP_ID = 200116
+    YICHE_KEY = '2305fb3ee0c47140f0ea6b7e'
+    YICHE_CALL_BACK_URL = 'http://openapi.chedai.bitauto.com/PlatForm/API'
 else:
     YICHE_COOP_ID = 200104
     YICHE_KEY = '0dae7d5bbcd493785f057bc1'
