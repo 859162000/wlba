@@ -393,6 +393,14 @@ def bind_pay_deposit(request):
     if not bank:
         return {"ret_code": 20002, "message": "银行ID不正确"}
 
+    amount = request.DATA.get('amount', '').strip()
+    try:
+        amount = float(amount)
+        if amount < 0:
+            raise ValueError()
+    except:
+        return {"ret_code": 20114, 'message': '金额格式错误'}
+
     if bank.channel == 'huifu':
         return HuifuShortPay().pre_pay(request)
 
