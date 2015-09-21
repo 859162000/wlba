@@ -8,6 +8,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 type: options.type,
                 data: options.data,
                 dataType : options.dataType,
+                async : options.asyunc || true,
                 beforeSend: function(xhr, settings) {
                     options.beforeSend && options.beforeSend(xhr);
                     //django配置post请求
@@ -149,7 +150,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         }else{*/
                             $portunity.html("您有"+ss+"次刮奖机会");
                         //}
-
                     }
                 }
             }

@@ -50,7 +50,6 @@ org.canvas = (function(org){
                         }else{*/
                             $portunity.html("您有"+ss+"次刮奖机会");
                         //}
-
                     }
                 }
             }
