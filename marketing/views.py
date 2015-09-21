@@ -942,7 +942,7 @@ class UserActivityStatusAPIView(APIView):
                 channel_code = self.get_user_channel(user.id)
                 activity_channel = activity_info.channel
                 if not activity_info.is_all_channel:
-                    if activity_channel and channel_code in activity_channel.split(','):
+                    if activity_channel and channel_code not in activity_channel.split(','):
                         json_response = {
                             'ret_code': '00005',
                             'message': u'非活动指定渠道用户'
