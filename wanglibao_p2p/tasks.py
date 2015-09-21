@@ -8,7 +8,7 @@ from order.utils import OrderHelper
 
 from wanglibao.celery import app
 from wanglibao_margin.marginkeeper import MarginKeeper
-from wanglibao_p2p.models import P2PProduct, P2PRecord, Earning, ProductAmortization
+from wanglibao_p2p.models import P2PProduct, P2PRecord, Earning, ProductAmortization, ProductType
 from wanglibao_p2p.trade import P2POperator
 from wanglibao_p2p.automatic import Automatic
 from django.db.models import Sum
@@ -124,7 +124,6 @@ def build_earning(product_id):
     #                 "messages": [messages.earning_message(rule.percent_text)]
     #             })
 
-
     Earning.objects.bulk_create(earning_list)
 
 
@@ -134,11 +133,15 @@ def automatic_trade(product_id=None, plan_id=None):
 
 
 @app.task
-def p2p_auto_published_by_publish_time(p2p_type):
+def p2p_auto_published_by_publish_time(p2p_type, period):
     if not p2p_type:
         return
 
-    products = P2PProduct.objects.filter(types=p2p_type, status=u"正在招标",
+    types = ProductType.objects.filter(pk=p2p_type).first()
+    if types and types.name == u'其他':
+        return
+
+    products = P2PProduct.objects.filter(period=period, status=u"正在招标",
                                          publish_time__gt=timezone.now()).order_by('publish_time').first()
     if products:
         products.publish_time = timezone.now()
