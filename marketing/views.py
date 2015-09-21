@@ -920,7 +920,7 @@ class UserActivityStatusAPIView(APIView):
         # 判断用户是否属于活动指定渠道用户
         channel = Channels.objects.filter(introducedby__user_id=user_id).first()
         if channel:
-            channel_code = channel.channel_id
+            channel_code = channel.name
             if not channel_code:
                 channel_code = 'wanglibao'
         else:
