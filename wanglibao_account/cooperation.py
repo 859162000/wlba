@@ -33,7 +33,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY, FUBA_CALL_BACK_URL, WLB_FOR_FUBA_KEY, \
      FUBA_COOP_ID, FUBA_KEY, FUBA_CHANNEL_CODE, FUBA_DEFAULT_TID, FUBA_PERIOD, \
      WLB_FOR_YUNDUAN_KEY, YUNDUAN_CALL_BACK_URL, YUNDUAN_COOP_ID, WLB_FOR_YICHE_KEY, YICHE_COOP_ID, \
-     YICHE_KEY, YICHE_CALL_BACK_URL, WLB_FOR_ZHITUI1_KEY, ZHITUI_COOP_ID, ZHITUI_CALL_BACK_URL
+     YICHE_KEY, YICHE_CALL_BACK_URL, WLB_FOR_ZHITUI1_KEY, ZHITUI_COOP_ID, ZHITUI_CALL_BACK_URL, WLB_FOR_NJWH_KEY
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
@@ -121,17 +121,14 @@ def get_binding_time_for_coop(user_id):
     except Exception, e:
         return None
 
-
-def save_to_binding(user, record, request):
+def save_to_binding(user, request):
     try:
-        if record and record.name == 'shls' or record.name == 'zhitui1':
-            coop = CoopRegister(request)
-            for processor in coop.processors:
-                if processor.c_code == processor.channel_code:
-                    processor.save_to_binding(user)
+        coop = CoopRegister(request)
+        for processor in coop.processors:
+            if processor.c_code == processor.channel_code:
+                processor.save_to_binding(user)
     except:
         pass
-
 
 def check_mobile(request):
     """
@@ -596,6 +593,10 @@ class WaihuRegister(CoopRegister):
         super(WaihuRegister, self).__init__(request)
         self.c_code = 'shls'
 
+class NanjingWaihuRegister(CoopRegister):
+    def __init__(self, request):
+        super(NanjingWaihuRegister, self).__init__(request)
+        self.c_code = 'njwh'
 
 class ShiTouCunRegister(CoopRegister):
     def __init__(self, request):
@@ -918,7 +919,7 @@ class ZhiTuiRegister(CoopRegister):
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
-                          YiCheRegister, ZhiTuiRegister, WaihuRegister]
+                          YiCheRegister, ZhiTuiRegister, WaihuRegister, NanjingWaihuRegister]
 
 
 #######################第三方用户查询#####################
