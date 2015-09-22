@@ -98,211 +98,305 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;(function(){
-    window.alert = function(txt, callback){
-        if(document.getElementById("alert-cont")){
-            document.getElementById("alertTxt").innerHTML = txt;
-            document.getElementById("popubMask").style.display = "block";
-            document.getElementById("alert-cont").style.display = "block";
-        }else{
-            var shield = document.createElement("DIV");
-            shield.id = "popubMask";
-            shield.style.cssText="position:fixed;bottom:0;top:0;width:100%; background:rgba(0,0,0,0.5); z-index:1000000;";
-            var alertFram = document.createElement("DIV");
-            alertFram.id="alert-cont";
-            alertFram.style.cssText="position:fixed; top:35%;left:40%; width:18rem; margin:-2.75rem 0 0 -7rem; background:#fafafa; border-radius:.3rem;z-index:1000001;";
-            strHtml = "<div id='alertTxt' class='popub-txt' style='color:#333;font-size: .9rem!important;padding: 1.25rem .75rem;'>"+txt+"</div>";
-            strHtml +=" <div class=\"popub-footer\" style=\"width: 100%;padding: .5rem 0;font-size: .9rem;text-align: center;color: #4391da;border-top: 1px solid #d8d8d8;border-bottom-left-radius: .25rem;border-bottom-right-radius: .25rem;\" onclick=\"doOk()\">确认</div>";
-            alertFram.innerHTML = strHtml;
-            document.body.appendChild(alertFram);
-            document.body.appendChild(shield);
-            this.doOk = function(){
-                alertFram.style.display = "none";
-                shield.style.display = "none";
-                callback && callback();
-            };
-        }
-        document.body.onselectstart = function(){return false;};
-    };
-
-    function getQueryStringByName(name){
-        var result = location.search.match(new RegExp('[\?\&]' + name+ '=([^\&]+)','i'));
-        if(result == null || result.length < 1){
-         return '';
-        }
-        return result[1];
-    }
-
-    //微信分享
-    var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ',];
-    org.ajax({
-        type : 'GET',
-        url : '/weixin/api/jsapi_config/',
-        dataType : 'json',
-        success : function(data) {
-            //请求成功，通过config注入配置信息,
-            wx.config({
-                debug: false,
-                appId: data.appId,
-                timestamp: data.timestamp,
-                nonceStr: data.nonceStr,
-                signature: data.signature,
-                jsApiList: jsApiList
-            });
-        }
-    });
-
-    var phoneNum = getQueryStringByName('phone') == '' ? '' : getQueryStringByName('phone');
-
-    wx.ready(function(){
-
-        var host = 'https://staging.wanglibao.com',
-            shareName = '有个红包一直拽在手里，今天我想要送给你',
-            shareImg = host + '/static/imgs/mobile/share_logo.png',
-            shareLink = host + '/activity/share/index/?parentPhone='+phoneNum,
-            shareMainTit = '有个红包一直拽在手里，今天我想要送给你',
-            shareBody = '领取网利宝520元特权红包，同时可为好友赢得30元红包奖励'
-        //分享给微信好友
-        org.onMenuShareAppMessage({
-            title: shareMainTit,
-            desc: shareBody,
-            link: shareLink,
-            imgUrl: shareImg
-        });
-        //分享给微信朋友圈
-        org.onMenuShareTimeline({
-            title: '我已获得网利宝私人银行特权，享520元专属红包',
-            link : shareLink,
-            imgUrl: shareImg
-        })
-        //分享给QQ
-        org.onMenuShareQQ({
-            title: shareMainTit,
-            desc: shareBody,
-            link : shareLink,
-            imgUrl: shareImg
-        })
-    })
-
-    $('#rule').on('click',function(){
-        alert($('.rule-win').html())
-    })
-
-    $('#more').on('click',function(){
-        $('.alertWin,.page').show();
-    })
-    $('.page').on('click',function(){
-        $('.alertWin,.page').hide();
-    })
-})();
-
-org.shareIndex = (function(org){
+;org.canvas = (function(org){
     var lib = {
-        init:function(){
-            lib.phoneFun();
-            lib.receiveFun();
-            lib.ruleSelect();
+        init :function(){
+            lib._drawing();
+            lib.Registered();
+            lib.iSAndiOS();
         },
-        phoneFun:function(){
-            $('#iphone').on('focus',function(){
-                var phone = $.trim($('#iphone').val());
-                if(phone == '输入手机号') {
-                    $('#iphone').val('');
+        _drawing:function(){
+            var bodyStyle = document.body.style;
+
+            bodyStyle.mozUserSelect = 'none';
+            bodyStyle.webkitUserSelect = 'none';
+
+            var img = new Image(),idx= 4,
+                canvas = document.querySelector('canvas'),
+                spans=document.getElementById("spans"),
+                min=document.getElementById("main"),
+                $portunity=$("#opportunity"),
+                demo=document.getElementById("demo").getElementsByTagName("img")[0],
+                str = ["100元现金红包","150元现金红包","200元现金红包","爱奇艺会员","扣电影代金券","抽前吼三吼，大奖跟我走","红包何时有，把酒问青天","大奖下回见，网利宝天天见","佛说：前世500次回眸才能换得一次中奖，淡定"],
+                num,text,used_chances,clsName,dataCode,total,
+                start=1,
+                end=false,
+                gift="None",
+                gift_left=0,
+                amount="None",
+                amount_left= 0,
+                i = 0,ss,
+                clicks= 1,
+                timer=null;
+
+            canvas.style.backgroundColor='transparent';
+            canvas.style.position = 'absolute';
+            canvas.style.left = 0;
+            canvas.style.top = 0;
+            img.src = "/static/imgs/mobile_activity/app_scratch/gg_guajiang.png";
+
+            //判断用户是否登录
+            function jugde(){
+                clsName=$("#untub").attr("className");
+                if(clsName=="scratch_tub"){
+                    text="注册帐号后即可刮奖";
+                    spans.innerHTML=text;
+                }else if(clsName=="unAuthenticated"){
+                    Interface();
+                    if(used_chances<3){
+                        ss=idx-used_chances;/*
+                        if(used_chances==2 && gift != "None"){
+                            $portunity.html("您有"+(ss-1)+"次刮奖机会");
+                        }else{*/
+                            $portunity.html("您有"+ss+"次刮奖机会");
+                        //}
+                    }
                 }
-            })
-            $('#iphone').on('blur',function(){
-                var phone = $.trim($('#iphone').val());
-                if(phone == '输入手机号' || phone == '') {
-                    $('#iphone').val('输入手机号');
-                }else{
-                    $('.error').text('');
+            }
+
+            //渲染蒙层
+            img.addEventListener('load',evendrawImg);
+            jugde();
+
+            function evendrawImg(e){
+                var ctx;
+                var w = demo.width,
+                    h = demo.height;
+
+                var mousedown = false;
+
+                function layer(ctx) {
+                    ctx.drawImage(img,0,0,w,h);
+                    $("#continue").attr("data-cj","yy");
                 }
-            })
-        },
-        receiveFun:function(){
-            var parentPhone = lib._getQueryStringByName('parentPhone') == '' ? '' : lib._getQueryStringByName('parentPhone');
-            $('#receive').on('click',function(){
-                if(!$('#ruleLabel span').hasClass('noChecked')){
-                    var phone = $.trim($('#iphone').val());
-                    if(phone == '' || phone == '输入手机号'){
-                        $('.error').text('请输入手机号');
+                //当手指按下的时候
+                function eventDown(e){
+                    e.preventDefault();
+                    mousedown=true;
+                    end=true;
+                    clearInterval(timer);
+                    start=2;
+                }
+                //当手指松开的时候
+                function eventUp(e){
+                    e.preventDefault();
+                    i++;
+                    mousedown=false;
+                    clearInterval(timer);
+                    text=spans.innerHTML;
+                    ss=idx-used_chances;
+                    timer=setInterval(function(){
+                        timers();
+                    },2000);
+                     if(amount != 'None' && amount_left != 0 && clicks==1 || gift_left!=0 && gift!="None"&& clicks==1) $("#continue").html("领奖");
+                    if(i==1 && amount != "None"){
+                        console.log(ss+"="+idx+"-"+used_chances);
+                        if(used_chances==1 || used_chances==2){
+                            /*if(used_chances==2 && gift !="None"){
+                                $portunity.html("您有"+(ss-2)+"次刮奖机会");
+                            }else{*/
+                               $portunity.html("您有"+(ss-1)+"次刮奖机会");
+                           // }
+                        }
+                        i++;
+                    }
+                    if(used_chances == 3)$portunity.html("您的刮奖次数已用完");
+
+                }
+                //当手指移动的时候
+                function eventMove(e){
+                    e.preventDefault();
+                    if(mousedown) {
+                         if(e.changedTouches) e=e.changedTouches[e.changedTouches.length-1];
+                         var x = (e.clientX + document.body.scrollLeft || e.pageX) - min.offsetLeft || 0,
+                             y = (e.clientY + document.body.scrollTop || e.pageY) - min.offsetTop-min.scrollHeight+20 || 0;
+                         with(ctx) {
+                             beginPath();
+                             arc(x, y, 20, 0, Math.PI * 2);
+                             fill();
+                         }
+                    }
+                }
+                function timers(){
+                    ctx.drawImage(img,0,0,w,h);
+                }
+                canvas.width=w;
+                canvas.height=h;
+                ctx=canvas.getContext('2d');
+                layer(ctx);
+                ctx.globalCompositeOperation = 'destination-out';
+                canvas.addEventListener('touchstart', eventDown);
+                canvas.addEventListener('touchend', eventUp);
+                canvas.addEventListener('touchmove', eventMove);
+                canvas.addEventListener('mousedown', eventDown);
+                canvas.addEventListener('mouseup', eventUp);
+                canvas.addEventListener('mousemove', eventMove);
+                return function(){
+                    return ctx.drawImage(img,0,0,w,h);
+                };
+            }
+            $("#continue").on('click',function(){
+                if(end) porttunclick();
+            });
+            function porttunclick(){
+                if(used_chances<3){
+                    if($("#continue").html()=="领奖"){
+                        $("#dask").css({"display":"block"});
+                        $("#delog").find("h3").html(text+"已发送！请留意站内信！");
+                        $("#close,#ok").on('click',function(){
+                            $("#dask").css({"display":"none"});
+                            $("#continue").html("再来一次");
+                            clicks=2;
+                            evendrawImg()();
+                        })
                     }else{
-                        if(!/^(13[0-9]|14[0-9]|15[0-9]|18[0-9])\d{8}$/i.test(phone)){
-                             $('.error').text('手机号格式不正确');
+                        Interface();
+                        evendrawImg();
+                        i=0;
+                        end=false;
+                        clicks=1;
+                    }
+                    clearInterval(timer);
+                }else if (dataCode != 3011 && clsName=="unAuthenticated") {
+                    spans.innerHTML = "您不符合参加规则";
+                } else if(clsName=="scratch_tub"){
+                    spans.innerHTML = "注册帐号后即可刮奖";
+                }else{
+                    evendrawImg();
+                   $portunity.html("您的刮奖次数已用完");
+                   spans.innerHTML = "您的刮奖次数已用完";
+                }
+            }
+            function Interface(){
+
+                var dataArr = [];
+                var retCode,
+                    urlData = "IGNORE",
+                    len=dataArr.length;
+
+                //ajax请求数据
+                function ajaxFun(action, fun) {
+                    org.ajax({
+                        type: "post",
+                        url: "/api/award/common_september/",
+                        dataType: "json",
+                        data: {action: action},
+                        async: false,
+                        success: function (data) {
+                            if (typeof fun === "function") {
+                                fun(data);
+                                console.log(data);
+                            }
+                        }
+                    });
+                }
+                //判断是否为正确渠道
+                function isChannel(data) {
+                    dataCode = data.ret_code;
+                }
+                //判断是否为合法渠道
+                function isUser(data) {
+                    if (data.ret_code === 3001) {
+                        ajaxFun("IS_VALID_CHANNEL", isChannel);
+                        if(dataCode===3011 && start==2){
+                            isdataCode();
                         }else{
-                            $('.error').text('');
-                            org.ajax({
-                                url: '/api/user_exists/'+phone+'/',
-                                type: 'GET',
-                                data: {},
-                                success:function(data){
-                                    if(data.existing){
-                                        window.location.href = '/activity/share/old/?phone='+phone;
-                                    }else{
-                                        window.location.href = '/activity/share/new/?parentPhone='+parentPhone+'&phone='+phone;
-                                    }
-                                },
-                                error: function (xhr) {
-                                }
-                            });
+                            spans.innerHTML = "您不符合参加规则";
                         }
                     }
+                }
+                ajaxFun("IS_VALID_USER", isUser);
+                //用户抽奖信息
+                function isdataCode(){
+                    function lotterInfo(data) {
+                        gift = data.gift;
+                        gift_left = data.gift_left;
+                        used_chances = data.used_chances;
+                        amount = parseInt(data.amount);
+                        amount_left = data.amount_left;
+                        total=data.total_chances;
+
+                        if (amount != 'None' && amount_left != 0) dataArr.push(1);
+                        if(gift != 'None' && gift_left != 0){
+                            dataArr.push(2);
+                        }else{
+                            dataArr.push("");
+                        }
+                    }
+                    ajaxFun("ENTER_WEB_PAGE", lotterInfo);
+
+                    function rotateFun(data) {
+                        used_chances = data.used_chances;
+                        retCode = data.ret_code;
+                    }
+                    if (dataArr.length < 1) {
+                        urlData = "IGNORE";
+                    } else {
+                        if (dataArr[0]==1) {
+                            urlData = "GET_MONEY";
+                        } else if (dataArr[0]==2) {
+                            urlData = "GET_GIFT";
+                        } else {
+                            urlData = "IGNORE";
+                        }
+                    }
+                    ajaxFun(urlData, rotateFun);
+                    console.log(dataArr+"  "+urlData)
+                    if (retCode == 3024 && dataCode == 3011 && used_chances > 2) {
+                        spans.innerHTML = "您的刮奖次数已用完";
+                        $portunity.html("您的刮奖次数已用完");
+                    }else {
+                        if(amount != 'None' && amount_left != 0){
+                            console.log(amount)
+                            spans.innerHTML = amount+"元现金红包";
+                        }else if(gift != 'None' && gift_left != 0){
+                            console.log(gift+"  "+gift_left)
+                            if (gift == "抠电影") {
+                                spans.innerHTML="抠电影代金券";
+                            } else if (gift == "爱奇艺") {
+                                spans.innerHTML="爱奇艺会员";
+                            }
+                        }else{
+                            num = Math.floor(5+Math.random()*3);
+                            text=str[num];
+                            spans.innerHTML=text;
+                        }
+                    }
+                }
+            }
+        },
+        Registered:function(){
+            //判断输入的手机号是否正确
+            $("#scratch_btn").on('click',function(e){
+                var val=$("#zctext").val();
+                e.preventDefault();
+                if(val==""){
+                    alert("请输入手机号");
+                }else if(!/^1{1}[3578]{1}\d{9}$/.test(val)){
+                    alert("请输入正确的手机号");
                 }else{
-                    alert('<div class="alertFont">请查看活动规则</div>');
+                    window.location.href="/weixin/regist/?next=/activity/app_scratch/&phone="+val;
                 }
             })
         },
-        ruleSelect:function(){
-            $('#ruleLabel').on('click',function(){
-                var span = $(this).find('span');
-                span.hasClass('noChecked') ? span.removeClass('noChecked') : span.addClass('noChecked');
-            })
-        },
-        _getQueryStringByName:function(name){
-            var result = location.search.match(new RegExp('[\?\&]' + name+ '=([^\&]+)','i'));
-            if(result == null || result.length < 1){
-             return '';
-            }
-            return result[1];
+        //判断是否是iOS
+        iSAndiOS:function(){
+            var u = navigator.userAgent, app = navigator.appVersion;
+            var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+            if(isiOS) $("#textbox").append("<span>6.</span><p>网利宝对此活动享有最终解释权。与苹果公司（Apple Inc）无关，如有疑问请联系在线客服或拨打400-588-066</p>");
         }
     }
     return {
-        init :lib.init
+        init : lib.init
     }
 })(org);
-
-org.newUser = (function(org){
-    var lib = {
-        init:function(){
-            var phone = lib._getQueryStringByName('phone') == '' ? '' :  lib._getQueryStringByName('phone');
-            var parentPhone = lib._getQueryStringByName('parentPhone') == '' ? '' :  lib._getQueryStringByName('parentPhone');
-            $('#iphoneVal').text(phone);
-            $('#goRegister').on('click',function(){
-                window.location.href = 'weixin/regist/?parentPhone='+parentPhone+'&phone='+phone;
-            })
-        },
-        _getQueryStringByName:function(name){
-            var result = location.search.match(new RegExp('[\?\&]' + name+ '=([^\&]+)','i'));
-            if(result == null || result.length < 1){
-             return '';
-            }
-            return result[1];
-        }
-    }
-    return {
-        init :lib.init
-    }
-})(org);
-
 ;(function(org){
     $.each($('script'), function(){
         var src = $(this).attr('src');
-        if(src){
+        if( src ){
             if($(this).attr('data-init') && org[$(this).attr('data-init')]){
                 org[$(this).attr('data-init')].init();
             }
         }
     })
 })(org);
-
-
