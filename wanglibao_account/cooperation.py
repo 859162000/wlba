@@ -26,6 +26,7 @@ from rest_framework.views import APIView
 from marketing.models import Channels, IntroducedBy, PromotionToken
 from marketing.utils import set_promo_user
 from wanglibao import settings
+from wanglibao_redpack import backends as redpack_backends
 from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      TIANMANG_CALL_BACK_URL, WLB_FOR_YIRUITE_KEY, YIRUITE_KEY, BENGBENG_KEY, \
      WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
@@ -46,6 +47,7 @@ from wanglibao_redis.backend import redis_backend
 from dateutil.relativedelta import relativedelta
 from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes, hex2bin
 from decimal import Decimal
+from wanglibao_reward.models import WanglibaoUserGift
 import re
 import uuid
 
@@ -976,15 +978,18 @@ class WeixinRedpackRegister(CoopRegister):
         self.invite_code = 'weixin_redpack'
 
     def register_call_back(self, user):
-        #扫描数据表，没有发红包的，开始下发
-        pass
+        phone = self.request.GET.get('phone',)
+        record = WanglibaoUserGift.objects.filter(valid=0, identity=phone).first()
+        redpack_backends.give_activity_redpack(self.request.user, record.rules.redpack, 'pc')
+        record.valid = 1
+        record.save()
 
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
-                          ZGDXRegister, NanjingWaihuRegister]
+                          ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister]
 
 
 #######################第三方用户查询#####################

@@ -75,6 +75,7 @@ class WanglibaoUserGift(models.Model):
     name = models.CharField(max_length=128, default=u'红包', verbose_name=u'奖品名称', help_text=u'例如：红包、加息券、优惠券等')
     valid = models.BooleanField(default=1, choices=SEND, verbose_name=u'奖品是否已发')
     amount = models.FloatField(default=0, verbose_name=u'奖品额度')
+    get_time = models.DateTimeField(auto_now_add=True, verbose_name=u'用户领奖的时间')
 
     class Meta:
         verbose_name = u'用户活动获奖记录'
@@ -86,7 +87,7 @@ class WanglibaoWeixinRelative(models.Model):
         手机号-网利宝用户-微信openid关系表
     """
     user = models.ForeignKey(User, default=None, blank=True, null=True, on_delete=models.SET_NULL)
-    phone = models.IntegerField(default=0, verbose_name=u'电话号码')
+    phone = models.CharField(max_length=32, default="", verbose_name=u'电话号码')
     nick_name = models.CharField(max_length=128, default=u'', verbose_name=u'微信昵称')
     openid = models.CharField(max_length=128, default=u'', verbose_name=u'')
     img = models.ImageField(verbose_name=u'微信头像',upload_to=u'./')
