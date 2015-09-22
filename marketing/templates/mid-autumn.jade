@@ -1,0 +1,144 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝官网' as title
+    include global/g_head
+    - endwith
+    link(rel="stylesheet",href="/static/styles/pc_activity/mid-autumn.css")
+    link(href="{{host}}/static/stylesheets/screen.css?v=20150910", media="screen, projection", rel="stylesheet", type="text/css")
+  body(style="background:#000c58")
+    include global/g_nav
+    .mid-autumn-banner
+    .autumn-gold
+      h1
+      .autumn-main1
+        p.autumn-txt 为回馈首批天使用户，中秋节开通
+         b 免费
+         |体验通道，
+         span 80000个
+         b 加息
+         |名额中秋无门槛特供，每人仅有一次机会～
+        a.btn 立即领取
+        span.autumn-rule 加息券规则
+        ul.ul-rule
+          li
+           span ①
+           |加息券有效期：9月25日-9月30日；
+          li
+           span ②
+           |加息券使用范围：限2月标（含）以上投资使用；
+          li
+           span ③
+           |苹果手机端目前版本无法支持加息券使用，敬请期待下个版本。安卓手机端用户和电脑端用户均可使用。
+          li
+            span ④
+            |购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+          li
+            span ⑤
+            |投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+          li
+            span ⑥
+            |使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+          li
+            span ⑦
+            |使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+      h2
+      .autumn-main2
+        dl
+          dt
+            h3 1. 单笔投资
+              span 5000元
+              |，赠送
+              span 1.5%
+              |加息券一张
+          dd
+            a 立即投资领取
+        dl(style="border:none")
+          dt.quan2
+            h3 1. 单笔投资
+              span 10000元
+              |，赠送
+              span 2%
+              |加息券一张
+          dd
+            a 立即投资领取
+        p 注：投资完成后站内信自动发送加息券，下次投资即可使用，一券一标永久加息！速速抢投哦
+        span.autumn-rule 加息券规则
+        ul.ul-rule
+          li
+           span ①
+           |加息券有效期：9月25日-9月30日；
+          li
+           span ②
+           |加息券使用范围：限2月标（含）以上投资使用；
+          li
+           span ③
+           |苹果手机端目前版本无法支持加息券使用，敬请期待下个版本。安卓手机端用户和电脑端用户均可使用。
+          li
+            span ④
+            |购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+          li
+            span ⑤
+            |投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+          li
+            span ⑥
+            |使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+          li
+            span ⑦
+            |使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+      .autumn-main2
+        .xl-box1(style="height:auto;top:-223px")
+            .xl-center#seven-center(style="color:#cf0027")
+              | 投资流程
+          .content-process
+            .content-pptv(style="background:#273071")
+              .process-text(style="height:32px;padding:0")
+              .process-list#process-list
+                .circle-free.circle-float
+                  .close
+                  .last
+                  .next
+                .triangle-start#triangle-start
+                  .start-cont
+                .circle
+                  .circle-body.free
+                  .circle-txt 领取加息券
+                  .circle-txt2
+                .triangle-center(style="width:0px")
+                .triangle-center#xl-triangle-center
+                  .center-cont
+                .circle
+                  .circle-body.recharge
+                  .circle-txt 投标选择使用
+                .triangle-center#xl-triangle-center
+                  .center-cont
+                .circle
+                  .circle-body.tender
+                  .circle-txt 投标成功加息生效
+                .triangle-center#xl-triangle-center
+                  .center-cont
+                .circle
+                  .circle-body.collec
+                  .circle-txt 获得收益和奖励
+                .triangle-end#triangle-end
+                  .end-cont
+      .autumn-main2
+        .xl-center#seven-center(style="color:#cf0027")
+          | 活动规则
+        ul.autumn-act-rule
+          li
+           span ①
+           |加息券有效期：9月25日-9月30日；
+          li
+           span ②
+           |加息券使用范围：限2月标（含）以上投资使用；
+          li
+           span ③
+           |苹果手机端目前版本无法支持加息券使用，敬请期待下个版本。安卓手机端用户和电脑端用户均可使用。
+
+
+  script.
+      var v = new Date().getTime()
+      require(['/static/js/setp.js'])
