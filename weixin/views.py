@@ -685,7 +685,6 @@ class AuthorizeUser(APIView):
         oauth = WeChatOAuth(account.app_id, account.app_secret, )
         if code:
             res = oauth.fetch_access_token(code)
-            print res
             openid=res.get('openid')
             nick_name=""
             head_img_url=""
