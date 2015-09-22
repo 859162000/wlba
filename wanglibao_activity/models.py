@@ -12,7 +12,6 @@ PLATFORM = (
     ("android", u"android"),
     ("pc", u"pc"),
     ('weixin', u"weixin"),
-    ('app', u"移动端"),
 )
 ACTIVITY_CATEGORY = (
     ('wanglibao', u'站内活动'),
@@ -39,7 +38,7 @@ TRIGGER_NODE = (
     ('first_pay', u'首次充值'),
     ('first_buy', u'首次投资'),
     ('p2p_audit', u'满标审核'),
-    ('repa', u'还款')
+    ('repaid', u'还款')
 )
 GIFT_TYPE = (
     ('reward', u'奖品'),
