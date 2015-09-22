@@ -19,7 +19,6 @@ org.canvas = (function(org){
                 demo=document.getElementById("demo").getElementsByTagName("img")[0],
                 str = ["100元现金红包","150元现金红包","200元现金红包","爱奇艺会员","扣电影代金券","抽前吼三吼，大奖跟我走","红包何时有，把酒问青天","大奖下回见，网利宝天天见","佛说：前世500次回眸才能换得一次中奖，淡定"],
                 num,text,used_chances,clsName,dataCode,total,
-                start=1,
                 end=false,
                 gift="None",
                 gift_left=0,
@@ -44,25 +43,18 @@ org.canvas = (function(org){
                 }else if(clsName=="unAuthenticated"){
                     Interface();
                     if(used_chances<3){
-                        ss=idx-used_chances;/*
-                        if(used_chances==2 && gift != "None"){
-                            $portunity.html("您有"+(ss-1)+"次刮奖机会");
-                        }else{*/
-                            $portunity.html("您有"+ss+"次刮奖机会");
-                        //}
+                        ss=idx-used_chances;
+                        $portunity.html("您有"+ss+"次刮奖机会");
                     }
                 }
             }
-
             //渲染蒙层
             img.addEventListener('load',evendrawImg);
             jugde();
-
             function evendrawImg(e){
                 var ctx;
                 var w = demo.width,
                     h = demo.height;
-
                 var mousedown = false;
 
                 function layer(ctx) {
@@ -75,7 +67,6 @@ org.canvas = (function(org){
                     mousedown=true;
                     end=true;
                     clearInterval(timer);
-                    start=2;
                 }
                 //当手指松开的时候
                 function eventUp(e){
@@ -89,17 +80,8 @@ org.canvas = (function(org){
                         timers();
                     },2000);
                      if(amount != 'None' && amount_left != 0 && clicks==1 || gift_left!=0 && gift!="None"&& clicks==1) $("#continue").html("领奖");
-                    if(i==1 && amount != "None"){
-                        console.log(ss+"="+idx+"-"+used_chances);
-                        if(used_chances==1 || used_chances==2){
-                            /*if(used_chances==2 && gift !="None"){
-                                $portunity.html("您有"+(ss-2)+"次刮奖机会");
-                            }else{*/
-                               $portunity.html("您有"+(ss-1)+"次刮奖机会");
-                           // }
-                        }
-                        i++;
-                    }
+                    $portunity.html("您有"+(ss-1)+"次刮奖机会");
+
                     if(used_chances == 3)$portunity.html("您的刮奖次数已用完");
 
                 }
@@ -173,7 +155,6 @@ org.canvas = (function(org){
                 var retCode,
                     urlData = "IGNORE",
                     len=dataArr.length;
-
                 //ajax请求数据
                 function ajaxFun(action, fun) {
                     org.ajax({
@@ -198,7 +179,7 @@ org.canvas = (function(org){
                 function isUser(data) {
                     if (data.ret_code === 3001) {
                         ajaxFun("IS_VALID_CHANNEL", isChannel);
-                        if(dataCode===3011 && start==2){
+                        if(dataCode===3011){
                             isdataCode();
                         }else{
                             spans.innerHTML = "您不符合参加规则";
@@ -206,6 +187,7 @@ org.canvas = (function(org){
                     }
                 }
                 ajaxFun("IS_VALID_USER", isUser);
+
                 //用户抽奖信息
                 function isdataCode(){
                     function lotterInfo(data) {
