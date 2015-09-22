@@ -516,6 +516,7 @@ org.regist = (function(org){
             var checkList = [$identifier, $password],
                 isSubmit = true;
 
+            var invite_phone = org.getQueryStringByName('parentPhone') == '' ? '' : org.getQueryStringByName('parentPhone');
             $submit.on('click',function(){
                 isSubmit =  true;
                 //校验主函数
@@ -540,13 +541,14 @@ org.regist = (function(org){
                             'validate_code':    $validation.val(),
                             'invite_code':      token,
                             'tid' : tid,
+                            'invite_phone' : invite_phone
                     },
                     beforeSend: function() {
                         $submit.text('注册中,请稍等...');
                     },
                     success:function(data){
                         if(data.ret_code === 0){
-                            var next = org.getQueryStringByName('next') == '' ? '/weixin/regist/succees/' : org.getQueryStringByName('next');
+                            var next = org.getQueryStringByName('next') == '' ? '/weixin/regist/succees/?phone='+$identifier.val() : org.getQueryStringByName('next');
                             next = org.getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ org.getQueryStringByName('mobile');
                             next = org.getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ org.getQueryStringByName('serverId');
                             window.location.href = next;

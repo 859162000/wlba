@@ -85,7 +85,7 @@ class WanglibaoWeixinRelative(models.Model):
     """
         手机号-网利宝用户-微信openid关系表
     """
-    user = models.ForeignKey(User, default=None)
+    user = models.ForeignKey(User, default=None, blank=True, null=True, on_delete=models.SET_NULL)
     phone = models.IntegerField(default=0, verbose_name=u'电话号码')
     nick_name = models.CharField(max_length=128, default=u'', verbose_name=u'微信昵称')
     openid = models.CharField(max_length=128, default=u'', verbose_name=u'')
