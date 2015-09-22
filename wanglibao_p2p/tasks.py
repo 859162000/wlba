@@ -137,12 +137,8 @@ def p2p_auto_published_by_publish_time(p2p_type, period):
     if not p2p_type:
         return
 
-    types = ProductType.objects.filter(pk=p2p_type).first()
-    if types and types.name == u'其他':
-        return
-
-    products = P2PProduct.objects.filter(period=period, status=u"正在招标",
-                                         publish_time__gt=timezone.now()).order_by('publish_time').first()
+    products = P2PProduct.objects.filter(period=period, status=u"正在招标", publish_time__gt=timezone.now())\
+        .exclude(types__name=u'其他').order_by('publish_time').first()
     if products:
         products.publish_time = timezone.now()
         products.save()
