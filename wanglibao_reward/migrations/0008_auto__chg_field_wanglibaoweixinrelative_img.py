@@ -8,16 +8,14 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'WanglibaoUserGift.get_time'
-        db.add_column(u'wanglibao_reward_wanglibaousergift', 'get_time',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2015, 9, 22, 0, 0), blank=True),
-                      keep_default=False)
 
+        # Changing field 'WanglibaoWeixinRelative.img'
+        db.alter_column(u'wanglibao_reward_wanglibaoweixinrelative', 'img', self.gf('django.db.models.fields.CharField')(max_length=255))
 
     def backwards(self, orm):
-        # Deleting field 'WanglibaoUserGift.get_time'
-        db.delete_column(u'wanglibao_reward_wanglibaousergift', 'get_time')
 
+        # Changing field 'WanglibaoWeixinRelative.img'
+        db.alter_column(u'wanglibao_reward_wanglibaoweixinrelative', 'img', self.gf('django.db.models.fields.files.ImageField')(max_length=100))
 
     models = {
         u'auth.group': {
@@ -153,10 +151,10 @@ class Migration(SchemaMigration):
         u'wanglibao_reward.wanglibaoweixinrelative': {
             'Meta': {'object_name': 'WanglibaoWeixinRelative'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'img': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
+            'img': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '255'}),
             'nick_name': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '128'}),
             'openid': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '128'}),
-            'phone': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'phone': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '32'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['auth.User']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'})
         }
     }
