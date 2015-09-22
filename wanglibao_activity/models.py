@@ -12,6 +12,7 @@ PLATFORM = (
     ("android", u"android"),
     ("pc", u"pc"),
     ('weixin', u"weixin"),
+    ('app', u"移动端"),
 )
 ACTIVITY_CATEGORY = (
     ('wanglibao', u'站内活动'),
@@ -37,7 +38,8 @@ TRIGGER_NODE = (
     ('buy', u'投资'),
     ('first_pay', u'首次充值'),
     ('first_buy', u'首次投资'),
-    ('p2p_audit', u'满标审核')
+    ('p2p_audit', u'满标审核'),
+    ('repa', u'还款')
 )
 GIFT_TYPE = (
     ('reward', u'奖品'),
@@ -74,7 +76,7 @@ class Activity(models.Model):
                                    help_text=u"如果有多个产品，则产品ID之间用英文逗号分割")
     description = models.TextField(u'描述', null=True, blank=True)
     channel = models.CharField(u'渠道名称', max_length=200, blank=True,
-                               help_text=u'如果是对应渠道的活动，则填入对应渠道的渠道名称代码，默认为wanglibao，多个渠道用英文逗号间隔')
+                               help_text=u'如果是对应渠道的活动，则填入对应渠道的渠道名称代码，默认为wanglibao-other，多个渠道用英文逗号间隔')
     is_all_channel = models.BooleanField(u'所有渠道', default=False, help_text=u'如果勾选“所有渠道”，则系统不再限定渠道')
     start_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"活动开始时间*")
     end_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"活动结束时间*")
@@ -97,7 +99,7 @@ class Activity(models.Model):
         if self.category == 'channel' and not self.channel:
             raise ValidationError(u'当活动类型为渠道时，要填入channel代码')
         if self.category == 'wanglibao' and not self.channel:
-            self.channel = 'wanglibao'
+            self.channel = 'wanglibao-other'
         if self.start_at >= self.end_at:
             raise ValidationError(u'开始时间不能大于或等于结束时间')
         if self.product_cats == 'ids' and (self.product_ids == '0' or not self.product_ids):
@@ -131,8 +133,6 @@ class ActivityRule(models.Model):
                                      help_text=u'勾选此项，则会以活动的起止时间来判断首次投资或充值的动作，否则不做时间判断')
     is_introduced = models.BooleanField(u'邀请好友时才启用', default=False,
                                         help_text=u'勾选此项，则会先判断用户是否被别人邀请，是就触发该规则，不是则不做处理')
-    both_share = models.BooleanField(u'参与邀请共享赠送礼品', default=False,
-                                     help_text=u'【废弃字段】，则用户在满足规则的条件内邀请别人，双方共享选定“赠送类型”中的礼品')
     share_type = models.CharField(u'选择参与赠送的人员', max_length=20, choices=SHARE_TYPE, blank=True, default='')
     is_invite_in_date = models.BooleanField(u'判断是否在活动区间内邀请好友', default=False,
                                             help_text=u'勾选此项则，则会先判断邀请关系的成立时间是否在活动期间，是就触发该规则，不是则不做处理')
