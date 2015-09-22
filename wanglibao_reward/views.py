@@ -459,6 +459,18 @@ class WeixinShareView(TemplateView):
             self.exception_msg(reason, u"判断用户投资额度抛异常")
             return None
 
+    def get_react_text(self, index):
+        text = [u'感谢土豪，加息券已到手！',
+                u'这次，终于让我抢到啦！',
+                u'哈哈，轻松一点，加息到手！',
+                u'下次一定抢到2%加息券！',
+                u'我去使用加息券喽，拜拜~',
+                u'大家手气如何啊？！',
+                u'太险了，差一点没抢到。',
+                u'感谢土豪，带我飞。',
+                ]
+        return text[index]
+
     def format_response_data(self, gifts, types=None):
         if gifts == None:
             return None
@@ -475,8 +487,11 @@ class WeixinShareView(TemplateView):
             QSet = WanglibaoWeixinRelative.objects.filter(phone__in=user_info.keys()).values("phone", "nick_name", "img")
             weixins = {item["phone"]: item for item in QSet}
             ret_value = list()
+            index = 0
             for key in user_info.keys():
-                ret_value.append([user_info[key], weixins[key]["nick_name"], weixins[key]["img"]])
+                ret_value.append([user_info[key], weixins[key]["nick_name"], weixins[key]["img"], self.get_react_text(index)])
+                index += 1
+            return ret_value
 
     def update_weixin_wanglibao_relative(self, openid, phone_num):
         relative = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
@@ -501,7 +516,7 @@ class WeixinShareView(TemplateView):
             activity = record.activity.code if record else activitys[index]
 
         #更新用户的手机号
-        self.update_weixin_wanglibao_relative(openid, phone_num)
+        #self.update_weixin_wanglibao_relative(openid, phone_num)
 
         if not self.has_combine_redpack(order_id, activity):
             self.generate_combine_redpack(order_id, activity)
