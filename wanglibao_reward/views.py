@@ -445,6 +445,7 @@ class WeixinShareView(TemplateView):
             return None
 
     def is_valid_user_auth(self, order_id, activity):
+        return True
         if not self.activity:
             self.get_activity_by_id(activity)
 
@@ -528,6 +529,7 @@ class WeixinShareView(TemplateView):
         user_gift = self.has_got_redpack(phone_num, openid, activity, order_id)
 
         if not user_gift:
+            #pass
             user_gift = self.distribute_redpack(phone_num, openid, activity, order_id)
 
         gifts = self.get_distribute_status(order_id, activity)
@@ -545,19 +547,21 @@ class WeixinShareStartView(TemplateView):
     template_name = 'app_weChatStart.jade'
 
     def is_valid_user_auth(self, order_id):
-        try:
-            p2p_record = P2PRecord.objects.filter(order_id=order_id, amount__gte=1000)
-            return p2p_record
-        except Exception, reason:
-            self.exception_msg(reason, u"判断用户投资额度抛异常")
-            return None
+        if False:
+            try:
+                p2p_record = P2PRecord.objects.filter(order_id=order_id, amount__gte=1000)
+                return p2p_record
+            except Exception, reason:
+                self.exception_msg(reason, u"判断用户投资额度抛异常")
+                return None
+        return True
 
     def get_context_data(self, **kwargs):
         openid = self.request.GET.get('openid')
         order_id = self.request.GET.get('url_id')
         nick_name = self.request.GET.get('nick_name')
         img_url = self.request.GET.get('head_img_url')
-        record = WanglibaoWeixinRelative.objects.filter(openid=openid)
+        record = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
 
         if not record:
             WanglibaoWeixinRelative.objects.create(
@@ -565,13 +569,6 @@ class WeixinShareStartView(TemplateView):
                nick_name=nick_name,
                img=img_url
             )
-
-        if not self.is_valid_user_auth(order_id):
-           return {
-                'ret_code': 9000,
-                'message': u'用户投资没有达到%s元;' % (1000, ),
-            }
-
         return {
             'ret_code': 9001,
             'openid': openid,
@@ -583,6 +580,12 @@ class WeixinShareStartView(TemplateView):
         openid = self.request.GET.get('openid')
         order_id = self.request.GET.get('url_id')
 
+        if not self.is_valid_user_auth(order_id):
+           data = {
+                'ret_code': 9000,
+                'message': u'用户投资没有达到%s元;' % (1000, ),
+            }
+           return HttpResponse(json.dumps(data), content_type='application/json')
         if not openid:
             redirect_url = reverse('weixin_authorize_code')+'?url_id=%s' % order_id
             print redirect_url

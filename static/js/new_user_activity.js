@@ -32,9 +32,9 @@
             var banDom = $("#banner");
             var winh = $(window).height();
             if(!banDom.hasClass("pc-banner")){
-                if(winh < 970){
-                    banDom.addClass("min-banner");
-                }
+                //if(winh < 1056){
+                //    banDom.addClass("min-banner");
+                //}
                 banDom.height(winh);
             }
         }
