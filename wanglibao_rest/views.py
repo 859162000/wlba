@@ -256,8 +256,8 @@ class RegisterAPIView(APIView):
         #    invite_code = "baidushouji"
 
         
-        if not invite_code:
-            # Modify by hb on 2015-09-21
+        # Modify by hb on 2015-09-21
+        if not invite_code or invite_code==u'weixin':
             invite_phone = request.DATA.get('invite_phone', "")
             if invite_phone:
                 invite_code = PromotionToken.objects.filter(user__wanglibaouserprofile__phone=invite_phone).first()

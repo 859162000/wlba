@@ -56,10 +56,10 @@
 
     wx.ready(function(){
 
-        var host = 'https://www.wanglibao.com',
+        var host = 'https://staging.wanglibao.com',
             shareName = '有个红包一直拽在手里，今天我想要送给你',
             shareImg = host + '/static/imgs/mobile/share_logo.png',
-            shareLink = host + '/activity/share/index/?phone='+phoneNum,
+            shareLink = host + '/activity/share/index/?parentPhone='+phoneNum,
             shareMainTit = '有个红包一直拽在手里，今天我想要送给你',
             shareBody = '领取网利宝520元特权红包，同时可为好友赢得30元红包奖励'
         //分享给微信好友
