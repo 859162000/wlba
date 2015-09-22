@@ -97,7 +97,8 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                         "period": event.period, "p2p_types_id": p2p_types_id, "p2p_types_name": p2p_types_name,
                         "highest_amount": event.highest_amount, "order_by": 2}
                 if start_time < timezone.now() < end_time:
-                    if event.apply_platform == "all" or event.apply_platform == device_type:
+                    if event.apply_platform == "all" or event.apply_platform == device_type or \
+                            (device_type in ('ios', 'android') and event.apply_platform == 'app'):
                         if obj['method'] == REDPACK_RULE['percent']:
                             obj['amount'] = obj['amount']/100.0
                         packages['available'].append(obj)
@@ -145,7 +146,8 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                            "highest_amount": event.highest_amount, "order_by": 1}
 
                     if start_time < timezone.now() < end_time:
-                        if event.apply_platform == "all" or event.apply_platform == device_type:
+                        if event.apply_platform == "all" or event.apply_platform == device_type or \
+                                (device_type in ('ios', 'android') and event.apply_platform == 'app'):
                             if obj['method'] == REDPACK_RULE['interest_coupon']:
                                 obj['amount'] = obj['amount']/100.0
                             packages['available'].append(obj)
@@ -255,7 +257,7 @@ def exchange_redpack(token, device_type, user, app_version=''):
         ch = helper.which_channel(user)
         if ch != event.target_channel:
             return {"ret_code": 30167, "message": u"不符合领取条件"}
-    if event.give_platform != "all" and event.give_platform != device_type:
+    if event.give_platform != "all" and (event.give_platform != device_type or (event.give_platform == 'app' and device_type not in ('ios', 'android'))):
         return {"ret_code": 30168, "message": u"不符合领取条件"}
 
     if event.amount == 0:
@@ -407,7 +409,7 @@ def consume(redpack, amount, user, order_id, device_type, product_id):
         return {"ret_code": 30174, "message": u"优惠券不可使用"}
     if amount < event.invest_amount:
         return {"ret_code": 30175, "message": u"投资金额不满足优惠券规则%s" % event.invest_amount}
-    if event.apply_platform != "all" and event.apply_platform != device_type:
+    if event.apply_platform != "all" and (event.apply_platform != device_type or (event.give_platform == 'app' and device_type not in ('ios', 'android'))):
         return {"ret_code": 30176, "message": u"此优惠券只能在%s平台使用" % event.apply_platform}
 
     rtype = event.rtype

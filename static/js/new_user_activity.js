@@ -13,7 +13,8 @@
         }
     });
     require(['jquery', 'jqueryRotate', "tools"], function ($, jqueryRotate, tool) {
-        var activityId = 65; //activity id l:37 65
+        var activityId = 72; //activity id l:37 s:65&69 w:72
+        var payId = 72;
         function ajaxFun(url,data,fn){
             $.ajax({
                 type: "get",
@@ -31,9 +32,9 @@
             var banDom = $("#banner");
             var winh = $(window).height();
             if(!banDom.hasClass("pc-banner")){
-                if(winh < 970){
-                    banDom.addClass("min-banner");
-                }
+                //if(winh < 1056){
+                //    banDom.addClass("min-banner");
+                //}
                 banDom.height(winh);
             }
         }
@@ -58,7 +59,7 @@
             "validation": function(data){
                 var ret_code = data.ret_code;
                 //console.log(data,"register");
-                if(ret_code === "10000"){
+                if(ret_code === "10001" || ret_code === "00001"){
                     showAlert($(".running"));
                 }else if(ret_code === "00000") {
                     showAlert($(".to-realName"));
@@ -71,7 +72,7 @@
                 //console.log(data,"firstPay");
                 if(ret_code === "00002"){
                     showAlert($(".go-money"));
-                }else if(ret_code === "10000"){
+                }else if(ret_code === "10001" || ret_code === "00001"){
                     showAlert($(".running"));
                 }else{
                     showAlert($(".no-new-user"),"Sorry~您不符合参加规则");
@@ -82,24 +83,24 @@
                 //console.log(data,"firstBuy");
                 if(ret_code === "00002"){
                     showAlert($(".to-invest"));
-                }else if(ret_code === "10000"){
+                }else if(ret_code === "10001" || ret_code === "00001"){
                     showAlert($(".running"));
                 }else{
                     showAlert($(".no-new-user"),"Sorry~您不符合参加规则");
                 }
             }
-        }
+        };
         //注册领红包
         $(".receive-red").on('click',function(){
             ajaxFun("/api/activity/joinInfo/",{"activity_id":activityId,"trigger_node":"validation"},funs.validation);
         });
         //充值
         $(".recharge").on("click",function(){
-            ajaxFun("/api/activity/joinInfo/",{"activity_id":activityId,"trigger_node":"first_pay"},funs.firstPay);
+            ajaxFun("/api/activity/joinInfo/",{"activity_id":payId,"trigger_node":"first_pay"},funs.firstPay);
         });
         //理财
         $(".manage-money").on("click",function(){
-            ajaxFun("/api/activity/joinInfo/",{"activity_id":activityId,"trigger_node":"first_buy"},funs.firstBuy);
+            ajaxFun("/api/activity/joinInfo/",{"activity_id":payId,"trigger_node":"first_buy"},funs.firstBuy);
         });
 
         //返回顶部

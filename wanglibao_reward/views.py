@@ -459,6 +459,18 @@ class WeixinShareView(TemplateView):
             self.exception_msg(reason, u"判断用户投资额度抛异常")
             return None
 
+    def get_react_text(self, index):
+        text = [u'感谢土豪，加息券已到手！',
+                u'这次，终于让我抢到啦！',
+                u'哈哈，轻松一点，加息到手！',
+                u'下次一定抢到2%加息券！',
+                u'我去使用加息券喽，拜拜~',
+                u'大家手气如何啊？！',
+                u'太险了，差一点没抢到。',
+                u'感谢土豪，带我飞。',
+                ]
+        return text[index]
+
     def format_response_data(self, gifts, types=None):
         if gifts == None:
             return None
@@ -475,8 +487,11 @@ class WeixinShareView(TemplateView):
             QSet = WanglibaoWeixinRelative.objects.filter(phone__in=user_info.keys()).values("phone", "nick_name", "img")
             weixins = {item["phone"]: item for item in QSet}
             ret_value = list()
+            index = 0
             for key in user_info.keys():
-                ret_value.append([user_info[key], weixins[key]["nick_name"], weixins[key]["img"]])
+                ret_value.append([user_info[key], weixins[key]["nick_name"], weixins[key]["img"], self.get_react_text(index)])
+                index += 1
+            return ret_value
 
     def update_weixin_wanglibao_relative(self, openid, phone_num):
         relative = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
@@ -489,6 +504,18 @@ class WeixinShareView(TemplateView):
         order_id = kwargs['order_id']
         activity = kwargs['activity']
 
+        try:
+            misc_record = Misc.objects.filter(key='wechat_activity').first()
+        except Exception, reason:
+            logger.exception('get misc record exception, msg:%s' % (reason,))
+            raise
+        else:
+            activitys = misc_record.value.split(",")
+            index = int(time.time()) % len(activitys)
+            record = WanglibaoActivityGift.objects.filter(gift_id=order_id).first()
+            activity = record.activity.code if record else activitys[index]
+
+        #更新用户的手机号
         #self.update_weixin_wanglibao_relative(openid, phone_num)
 
         if not self.has_combine_redpack(order_id, activity):
@@ -508,18 +535,6 @@ class WeixinShareView(TemplateView):
 
 class WeixinShareStartView(TemplateView):
     template_name = 'app_weChatStart.jade'
-
-    def activity_id(self, index=None):
-        try:
-            misc_record = Misc.objects.filter(key='wechat_activity').first()
-        except Exception, reason:
-            logger.exception('get misc record exception, msg:%s' % (reason,))
-            raise
-        else:
-            activitys = misc_record.value.split(",")
-            if index is None:
-                index = int(time.time()) % len(activitys)
-            return activitys[index]
 
     def is_valid_user_auth(self, order_id):
         try:
@@ -554,7 +569,6 @@ class WeixinShareStartView(TemplateView):
             'openid': openid,
             'order_id': order_id,
             'phone': record.phone if record else u'None',
-            'activity': self.activity_id(0)
         }
 
     def dispatch(self, request, *args, **kwargs):
