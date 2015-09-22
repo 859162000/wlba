@@ -21,9 +21,8 @@ from wanglibao_activity.models import Activity, ActivityRule
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_p2p.models import P2PRecord
 from misc.models import Misc
-from django.views.generic import View, TemplateView
+from django.views.generic import TemplateView
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response, redirect
 from django.core.urlresolvers import reverse
 
 logger = logging.getLogger('wanglibao_reward')
@@ -362,7 +361,7 @@ class WeixinShareView(TemplateView):
         if not self.activity:
             self.activity = self.get_activity_by_id(activity)
         try:
-            user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=product_id, identity__in=(str(phone_num),str(openid)), activity=self.activity).first()
+            user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=product_id, identity__in=(str(phone_num),), activity=self.activity).first()
             return user_gift
         except Exception, reason:
             self.exception_msg(reason, u'判断用户领奖，数据库查询出错')
@@ -425,7 +424,7 @@ class WeixinShareView(TemplateView):
                 self.get_activity_by_id(activity)
 
             try:
-                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=product_id, activity__in=activity, valid__in=(0, 1,))
+                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=product_id, activity=self.activity, valid__in=(0, 1)).all()
                 return gifts
             except Exception, reason:
                 self.exception_msg(reason, u'获取已领奖用户信息失败')
@@ -469,6 +468,8 @@ class WeixinShareView(TemplateView):
                 u'大家手气如何啊？！',
                 u'太险了，差一点没抢到。',
                 u'感谢土豪，带我飞。',
+                u'投资就能发加息福袋啦？',
+                u'土豪，传授下投资经验吧'
                 ]
         return text[index]
 
@@ -484,13 +485,16 @@ class WeixinShareView(TemplateView):
                 return None
 
         if types == 'gifts':
-            user_info = {gift.identity: gift.amount for gift in gifts}
-            QSet = WanglibaoWeixinRelative.objects.filter(phone__in=user_info.keys()).values("phone", "nick_name", "img")
-            weixins = {item["phone"]: item for item in QSet}
+            user_info = {gift.identity: gift for gift in gifts}
+            key=user_info.keys()
+            QSet = WanglibaoWeixinRelative.objects.filter(phone__in=user_info.keys())# .values("phone", "nick_name", "img").all()
+            weixins = {item.phone: item for item in QSet}
             ret_value = list()
             index = 0
-            for key in user_info.keys():
-                ret_value.append([user_info[key], weixins[key]["nick_name"], weixins[key]["img"], self.get_react_text(index)])
+            for key in weixins.keys():
+                print user_info[key].amount
+                print weixins[key].nick_name
+                ret_value.append([user_info[key].amount, user_info[key].get_time, weixins[key].nick_name, weixins[key].img, self.get_react_text(index)])
                 index += 1
             return ret_value
 
@@ -529,8 +533,12 @@ class WeixinShareView(TemplateView):
             user_gift = self.distribute_redpack(phone_num, openid, activity, order_id)
 
         gifts = self.get_distribute_status(order_id, activity)
+        #one = self.format_response_data(user_gift,'alone')
+        #all = self.format_response_data(gifts,'gifts')
+        #print "one"
+        #print "all"
         return {
-            "ret_code": 9005,
+            "ret_code": 0,
             "self_gift": self.format_response_data(user_gift, 'alone'),
             "all_gift": self.format_response_data(gifts, 'gifts')
         }
