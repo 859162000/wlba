@@ -926,9 +926,9 @@ YUNDUAN_COOP_ID = 298
 # 易车
 WLB_FOR_YICHE_KEY = '1999'
 if ENV == ENV_PRODUCTION:
-    YICHE_COOP_ID = 200104
-    YICHE_KEY = '0dae7d5bbcd493785f057bc1'
-    YICHE_CALL_BACK_URL = 'http://debug.openapi.chedai.com:8002/PlatForm/API'
+    YICHE_COOP_ID = 200116
+    YICHE_KEY = '2305fb3ee0c47140f0ea6b7e'
+    YICHE_CALL_BACK_URL = 'http://openapi.chedai.bitauto.com/PlatForm/API'
 else:
     YICHE_COOP_ID = 200104
     YICHE_KEY = '0dae7d5bbcd493785f057bc1'
