@@ -279,7 +279,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 function isUser(data) {
                     if (data.ret_code === 3001) {
                         ajaxFun("IS_VALID_CHANNEL", isChannel);
-                        alert(dataCode)
                         if(dataCode===3011){
                             isdataCode();
                         }else{
