@@ -117,11 +117,8 @@ class P2PTrader(object):
 
             if self.product.types.name != u'其他':
                 # 检测是否有同类型的正在招标状态的标,有的话按照发布时间的顺序更改第一个标的发布时间为当前时间
-                from celery.execute import send_task
-                send_task("wanglibao_p2p.tasks.p2p_auto_published_by_publish_time", kwargs={
-                    'p2p_type': self.product.types.id,
-                    'period': self.product.period
-                })
+                from wanglibao_p2p.tasks import p2p_auto_published_by_publish_time
+                p2p_auto_published_by_publish_time(self.product.pay_method, self.product.period)
 
             # 满标将标信息写入redis
             cache_backend = redis_backend()
