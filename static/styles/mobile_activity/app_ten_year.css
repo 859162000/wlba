@@ -1,0 +1,243 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+#wrap{
+
+}
+
+img{
+    position: absolute;
+    display: block;
+    z-index: 1;
+}
+.slideDown{
+    width: 6.5626%;
+    bottom: 7.4823944%;
+    left: 50%;
+    margin-left: -3.2813%;
+}
+.section {
+    position: relative;
+    overflow: hidden;
+}
+.bg {
+    background:url("/static/imgs/mobile_activity/app_ten_year/bg.jpg");
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: -3;
+    display: block;
+}
+.mask{
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: -2;
+    display: block;
+}
+.small_theme{
+    position: fixed;
+    width: 15.3125%;
+    right: 8.90625%;
+    top: 4.7410009%;
+    z-index: -1;
+}
+.section1 .theme{
+    width: 55.78125%;
+    top: 20.1584507%;
+    left: 21.5625%;
+    
+}
+.section1 .text1{
+    width: 9.0625%;
+    top : 15.7570423%;
+    right: 18.4375%;
+}
+.section1 .text2{
+    width: 52.8125%;
+    bottom: 17.9577465%;
+    left: 23.59375%;
+}
+
+.section2 .text{
+    width: 71.09375%;
+    top: 12.7640845%;
+    left: 14.53125%;
+}
+.section2 .young{
+    width: 39.6875%;
+    bottom: 0%;
+    left: 0%;
+}
+.section2 .old{
+    width: 39.21875%;
+    bottom: 0%;
+    right: 3.125%;
+}
+@media screen and (max-height: 550px){
+    .section2 .old{
+        position: absolute;
+        width: 39.21875%;
+        bottom: -10%;
+        right: 3.125%;
+    }
+}
+.meteor{
+    width: 9.0625%;
+}
+.meteor1{
+    left: 18.75%;
+    top: 37.5768218%;
+}
+.meteor2{
+    left: 53.125%;
+    top: 71.9929763%;
+}
+.meteor3{
+    left: 0%;
+    top: 78.4021071%;
+}
+.bottom_meteor{
+    width: 5%;
+    left: 55.3125%;
+    bottom: 0%;
+}
+.shadow{
+    width: 100%;
+    left: 0%;
+    bottom: 0%;
+}
+
+.section3 .talk{
+    width: 83.90625%;
+    left: 11.71875%;
+    top: 7.834507%;
+}
+.section3 .boy{
+    width: 56.5625%;
+    left: 0%;
+    bottom: 0%;
+}
+.section3 .man{
+    width: 54.21875%;
+    right: 0%;
+    bottom: 0%;
+}
+.section3 .talk{
+    width: 83.90625%;
+    left : 11.5625%;
+    top: 7.7260755%;
+    z-index: 2;
+}
+.section3 .line{
+    background:url("/static/imgs/mobile_activity/app_ten_year/page3_line.png");
+    background-size: cover;
+    width: 45%;
+    left : 35.9375%;
+    bottom: 30.5457746%;
+    z-index: 3;
+    display: block;
+}
+@media screen and (max-height: 550px){
+    .section3 .talk{
+        width: 77.90625%;
+        top: 9.7260755%;
+    }
+    .section3 .boy{
+        bottom: -5%;
+    }
+    .section3 .man{
+        bottom: -5%;
+    }
+}
+.section4 .man1{
+    width: 58.125%;
+    left : 0%;
+    bottom: 0%;
+    z-index: 2;
+}
+.section4 .man2{
+    width: 80.9375%;
+    right : 0%;
+    bottom: 0%;
+    z-index: 3;
+}
+.section4 .talk{
+    width: 85.46875%;
+    left : 7.03125%;
+    top: 10.5355575%;
+    z-index: 4;
+}
+.section4 .math{
+    width: 47.1875%;
+    left : 1.5625%;
+    bottom: 38.028169%;
+    z-index: 1;
+}
+.section4 .line{
+    width: 45.625%;
+    left : 32.34375%;
+    bottom: 25.0880282%;
+    z-index: 5;
+}
+@media screen and (max-height: 550px){
+    .section4 .man1{
+        width: 53.125%;
+    }
+    .section4 .man2{
+        width: 75.9375%;
+    }
+    .section4 .line{
+        width: 45.625%;
+        left : 32.34375%;
+        bottom: 26.0880282%;
+    }
+    .section4 .talk{
+        width: 75.46875%;
+        left : 12.03125%;
+        top: 10.5355575%;
+        z-index: 4;
+    }
+}
+.section5 .talk{
+    width: 85.15625%;
+    left : 8.90625%;
+    top: 12.3239437%;
+    z-index: 5;
+}
+.bamboo{
+    width: 48.75%;
+    left : 0%;
+    bottom: 29.8415493%;
+    z-index: 1;
+}
+.section5 .line{
+    width: 51.5625%;
+    left : 31.5625%;
+    bottom: 19.8943662%;
+    z-index: 4;
+}
+.section5 .woman1{
+    width: 49.0625%;
+    left : 0%;
+    bottom: 0;
+    z-index: 2;
+}
+.section5 .woman2{
+    width: 78.90625%;
+    right : 0%;
+    bottom: 0;
+    z-index: 3;
+}
+@media screen and (max-height: 550px){
+    .section5 .line{
+        bottom: 22.8943662%;
+    }
+    .section5 .talk{
+        width: 79.15625%;
+        left : 11.90625%;
+        top: 10.3239437%;
+    }
+}

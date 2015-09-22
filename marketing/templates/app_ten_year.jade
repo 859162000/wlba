@@ -1,0 +1,63 @@
+doctype html
+html
+    head
+        meta(name="format-detection" content="telephone=no,email=no")
+        title 你最喜欢什么样的自己？
+        meta(charset="utf-8")
+        meta(content="telephone=no,email=no" ,name="format-detection")
+        meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
+        meta(content="yes" ,name="apple-mobile-web-app-capable")
+        link(href="/static/styles/mobile_activity/jquery.fullPage.css?v=20150921", rel="stylesheet")
+
+        link(href="/static/styles/mobile_activity/app_ten_year.css?v=20150921", rel="stylesheet")
+    body
+        .bg
+        img(src="/static/imgs/mobile_activity/app_ten_year/small_theme.png").small_theme
+        img(src="/static/imgs/mobile_activity/app_ten_year/mask.png").mask
+        #wrap
+            .section.section1
+                img(src="/static/imgs/mobile_activity/app_ten_year/big_theme.png").theme
+                img(src="/static/imgs/mobile_activity/app_ten_year/page1_text1.png").text1
+                img(src="/static/imgs/mobile_activity/app_ten_year/page1_text2.png").text2
+                img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").slideDown
+                .mask
+            .section.section2
+                img(src="/static/imgs/mobile_activity/app_ten_year/page2_text.png").text
+                img(src="/static/imgs/mobile_activity/app_ten_year/page2_img1.png").young
+                img(src="/static/imgs/mobile_activity/app_ten_year/page2_img2.png").old
+                img(src="/static/imgs/mobile_activity/app_ten_year/page2_shadow.png").shadow
+                img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").slideDown
+                img(src="/static/imgs/mobile_activity/app_ten_year/meteor1.png").meteor.meteor1
+                img(src="/static/imgs/mobile_activity/app_ten_year/meteor1.png").meteor.meteor2
+                img(src="/static/imgs/mobile_activity/app_ten_year/meteor1.png").meteor.meteor3
+                img(src="/static/imgs/mobile_activity/app_ten_year/meteor2.png").bottom_meteor
+            .section.section3
+                img(src="/static/imgs/mobile_activity/app_ten_year/page3_talk.png").talk
+                img(src="/static/imgs/mobile_activity/app_ten_year/page3_boy.png").boy
+                img(src="/static/imgs/mobile_activity/app_ten_year/page3_man.png").man
+                img(src="/static/imgs/mobile_activity/app_ten_year/page3_line.png").line
+            .section.section4
+                img(src="/static/imgs/mobile_activity/app_ten_year/page4_man1.png").man1
+                img(src="/static/imgs/mobile_activity/app_ten_year/page4_man2.png").man2
+                img(src="/static/imgs/mobile_activity/app_ten_year/page4_talk.png").talk
+                img(src="/static/imgs/mobile_activity/app_ten_year/page4_math.png").math
+                img(src="/static/imgs/mobile_activity/app_ten_year/page4_line.png").line
+            .section.section5
+                img(src="/static/imgs/mobile_activity/app_ten_year/page5_woman1.png").woman1
+                img(src="/static/imgs/mobile_activity/app_ten_year/page5_woman2.png").woman2
+                img(src="/static/imgs/mobile_activity/app_ten_year/page5_talk.png").talk
+                img(src="/static/imgs/mobile_activity/app_ten_year/page5_bamboo.png").bamboo
+                img(src="/static/imgs/mobile_activity/app_ten_year/page5_line.png").line
+        script(src="/static/js/lib/jquery.min.js")
+        script(src="/static/scripts/mobile_activity/dist/jquery.fullPage.min.js")
+        script.
+            $(function(){
+
+                $('#wrap').fullpage({
+                    slidesColor: ['#000','#000','#000','#000','#000'],
+                    afterLoad: function(anchorLink, index) {
+                    }
+                })
+            })
+
+
