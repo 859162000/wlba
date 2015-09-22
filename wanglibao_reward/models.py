@@ -89,7 +89,7 @@ class WanglibaoWeixinRelative(models.Model):
     phone = models.IntegerField(default=0, verbose_name=u'电话号码')
     nick_name = models.CharField(max_length=128, default=u'', verbose_name=u'微信昵称')
     openid = models.CharField(max_length=128, default=u'', verbose_name=u'')
-    img = models.CharField(max_length=255, default=u'', verbose_name=u'微信头像')gi
+    img = models.CharField(max_length=255, default=u'', verbose_name=u'微信头像')
 
     class Meta:
         verbose_name = u'微信网利宝关系表'
