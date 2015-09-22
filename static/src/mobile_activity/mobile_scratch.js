@@ -80,7 +80,10 @@ org.canvas = (function(org){
                         timers();
                     },2000);
                      if(amount != 'None' && amount_left != 0 && clicks==1 || gift_left!=0 && gift!="None"&& clicks==1) $("#continue").html("领奖");
-                    $portunity.html("您有"+(ss-1)+"次刮奖机会");
+                    if(used_chances<3){
+                        $portunity.html("您有"+(ss-1)+"次刮奖机会");
+                    }
+
 
                     if(used_chances == 3)$portunity.html("您的刮奖次数已用完");
 
