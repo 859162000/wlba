@@ -549,7 +549,8 @@ class WeixinShareStartView(TemplateView):
     def is_valid_user_auth(self, order_id):
         try:
             p2p_record = P2PRecord.objects.filter(order_id=order_id, amount__gte=1000)
-            return p2p_record
+            return True
+            # return p2p_record
         except Exception, reason:
             self.exception_msg(reason, u"判断用户投资额度抛异常")
             return None
