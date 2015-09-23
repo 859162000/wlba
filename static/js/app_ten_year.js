@@ -118,12 +118,12 @@ $(function(){
                 $('.section4 img,.section4 .line_img').not('.slideDown').addClass('animate');
             }
             if(index == 5){
-                $('.shadow').animate({'bottom':'0'},500);
+                $('.shadow').animate({'opacity':'1'},500);
                 $('.section4 img,.section4 .line_img,.section6 img,.section6 input').not('.slideDown').removeClass('animate');
                 $('.section5 .line_img,.section5 img').not('.slideDown').addClass('animate');
             }
             if(index == 6){
-                $('.shadow').animate({'bottom':'-5%'},500);
+                $('.shadow').animate({'opacity':'0'},500);
                 $('.section7 .horn').animate({'opacity':'0'},100);
                 $('.section5 img,.section5 .line_img,.section7 img,.section7 .text,.section7 .title').removeClass('animate');
                 $('.section6 img,.section6 input').not('.slideDown').addClass('animate');
