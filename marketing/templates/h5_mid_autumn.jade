@@ -1,0 +1,167 @@
+- load formatters
+doctype html
+html(style="background:#000c58")
+  head
+    title 中秋节
+    include include/app_head
+    link(rel="stylesheet",href="/static/styles/mobile_activity/app_mid_autumn.css")
+  body
+    .extension-banner
+      img(src="/static/imgs/mobile_activity/app-mid-autumn/banner.jpg")
+    .mid-gold
+      h1.title 中秋节见面礼，加息券首次发布！
+      .mid-img
+        img(src="/static/imgs/mobile_activity/app-mid-autumn/free.jpg")
+      if user.is_authenticated
+        .git-btn.git-btn-fast 立即领取
+      else
+        .git-btn.git-btn-fast(data-num="1") 立即领取
+      .quan-rule#quan-rule1 加息券规则
+      ul.ul-rule#ul-rule1
+        li
+          span ①
+          b 加息券有效期：9月25日-9月30日；
+        li
+          span ②
+          b 加息券使用范围：限2月标（含）以上投资使用；
+        li
+          span ③
+          b 苹果手机端目前版本无法支持加息券使用，敬请期待下个版本。安卓手机端用户和电脑端用户均可使用。
+        li
+          span ④
+          b 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+        li
+          span ⑤
+          b 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+        li
+          span ⑥
+          b 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+        li
+          span ⑦
+          b  使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+    .mid-tit
+    .mid-gold
+      h1.title 单笔投资满额即可领取最高2%加息券，多投多送！
+      p.touzi1 1. 单笔投资
+        span 5000元
+        |，赠送
+        span 1.5%
+        |加息券一张
+      .quan1
+        img(src="/static/imgs/mobile_activity/app-mid-autumn/quan1.5.jpg")
+      if user.is_authenticated
+        .git-btn.touzi-btn 立即投资领取
+      else
+        .git-btn.touzi-btn(data-num="1") 立即投资领取
+      p.touzi1 2. 单笔投资
+        span 10000元
+        |，赠送
+        span 2%
+        |加息券一张
+      .quan1
+        img(src="/static/imgs/mobile_activity/app-mid-autumn/quan2.jpg")
+      if user.is_authenticated
+        .git-btn.touzi-btn2 立即投资领取
+      else
+        .git-btn.touzi-btn2(data-num="1") 立即投资领取
+      p.zhu 注：投资完成后站内信自动发送加息券，下次投资即可使用，一券一标永久加息！速速抢投哦～
+      .quan-rule#quan-rule2 加息券规则
+      ul.ul-rule#ul-rule2
+        li
+          span ①
+          b 加息券有效期：9月25日-9月30日；
+        li
+          span ②
+          b 加息券使用范围：限2月标（含）以上投资使用；
+        li
+          span ③
+          b 苹果手机端目前版本无法支持加息券使用，敬请期待下个版本。安卓手机端用户和电脑端用户均可使用。
+        li
+          span ④
+          b 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+        li
+          span ⑤
+          b 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+        li
+          span ⑥
+          b 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+        li
+          span ⑦
+          b  使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+    .mid-gold
+      h2.liucheng-tit 加息券使用流程
+      .mid-liucheng
+        img(src="/static/imgs/mobile_activity/app-mid-autumn/liucheng.jpg")
+    .mid-gold
+      h2.liucheng-tit 活动规则
+      ul.ul-rule#ul-rule3
+        li
+          span ①
+          b 活动时间：9月25日-9月27日；
+        li
+          span ②
+          b 1%加息券为中秋节福利，用户可免费领取，每人限领一次。加息券统一会以站内信通知，收到后可立即使用（苹果手机端暂不支持加息券使用）。详情请看
+            a#quan-rule4 加息券使用规则
+            |；
+        li
+          span ③
+          b 高额加息券需用户投资满额后获得。加息券有效期9月25日至9月30日；
+        li
+          span ④
+          b 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑。
+        li#ios-show(style="display:none")
+          span ⑤
+          b 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关 如有疑问请联系在线客服或拨打4008-588-066
+      ul.ul-rule#ul-rule4
+        li
+          span ①
+          b 加息券有效期：9月25日-9月30日；
+        li
+          span ②
+          b 加息券使用范围：限2月标（含）以上投资使用；
+        li
+          span ③
+          b 苹果手机端目前版本无法支持加息券使用，敬请期待下个版本。安卓手机端用户和电脑端用户均可使用。
+        li
+          span ④
+          b 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+        li
+          span ⑤
+          b 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+        li
+          span ⑥
+          b 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+        li
+          span ⑦
+          b  使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+      p.mid-p * 网利宝对此活动享有最终解释权
+    .mid-footer
+      img(src="/static/imgs/mobile_activity/app-mid-autumn/footer.jpg")
+    .mid-modle
+      .mid-success
+        span.mid-off X
+        p.txt1
+          span
+          |投资完成后
+          br
+          |站内信自动发送加息券
+        p.txt2 下次投资即可使用，一券一标永久加息！速速抢投哦～
+        .success-img
+        .success-btn(href="/weixin/list/") 立即去投资
+      .mid-fail#mid-fail
+        span.mid-off X
+        p.txt1#text 亲，不可重复领取
+        p.txt2 在［我的账户-理财券］中查看
+        .success-img
+        .success-btn 我知道了
+    script(src="/static/scripts/mobile_activity/mid-autumn.js")
+    script.
+      var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+          iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+          ios = ipad || iphone;
+      if (ios) {
+          document.getElementById('ios-show').style.display = 'block';
+      }
+
+
+

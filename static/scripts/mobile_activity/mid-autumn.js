@@ -217,297 +217,96 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;org.canvas = (function(org){
-    var lib = {
-        init :function(){
-            lib._drawing();
-            lib.Registered();
-            lib.iSAndiOS();
-        },
-        _drawing:function(){
-            var bodyStyle = document.body.style;
+;(function(){
+  //加息券规则
+  $('#quan-rule1').on('click',function(){
+    Down($('#ul-rule1'))
+  })
 
-            bodyStyle.mozUserSelect = 'none';
-            bodyStyle.webkitUserSelect = 'none';
+  $('#quan-rule2').on('click',function(){
+    Down($('#ul-rule2'))
+  })
+  $('#quan-rule4').on('click',function(){
+    Down($('#ul-rule4'))
+  })
 
-            var img = new Image(),idx= 4,
-                canvas = document.querySelector('canvas'),
-                spans=document.getElementById("spans"),
-                min=document.getElementById("main"),
-                $portunity=$("#opportunity"),
-                demo=document.getElementById("demo").getElementsByTagName("img")[0],
-                str = ["100元现金红包","150元现金红包","200元现金红包","爱奇艺会员","扣电影代金券","抽前吼三吼，大奖跟我走","红包何时有，把酒问青天","大奖下回见，网利宝天天见","佛说：前世500次回眸才能换得一次中奖，淡定"],
-                num,text,used_chances,clsName,dataCode,total,
-                end=false,cls=false,
-                gift="None",
-                gift_left=0,
-                amount="None",
-                amount_left= 0,
-                i = 0,ss,
-                clicks= 1,
-                timer=null;
-
-            canvas.style.backgroundColor='transparent';
-            canvas.style.position = 'absolute';
-            canvas.style.left = 0;
-            canvas.style.top = 0;
-            img.src = "/static/imgs/mobile_activity/app_scratch/gg_guajiang.png";
-            $("#continue").hide();
-            //判断用户是否登录
-            function jugde(){
-                clsName=$("#untub").attr("className");
-                if(clsName=="scratch_tub"){
-                    text="注册帐号后即可刮奖";
-                    spans.innerHTML=text;
-                }else if(clsName=="unAuthenticated"){
-                    if(!cls){
-                       $portunity.html("点击开始即可刮奖");
-                    }
-                    $("#btn_go").on("click",function(){
-                        Interface();
-                        evendrawImg();
-                        if(used_chances<=3){
-                            ss=idx-used_chances;
-                            $portunity.html("您有"+ss+"次刮奖机会");
-                        }
-                        $(this).hide().next().show();
-                        cls=true;
-                    })
-                }
-            }
-            //渲染蒙层
-            img.addEventListener('load',evendrawImg);
-            jugde();
-            function evendrawImg(e){
-                var ctx;
-                var w = demo.width,
-                    h = demo.height;
-                var mousedown = false;
-
-                function layer(ctx) {
-                    ctx.drawImage(img,0,0,w,h);
-                }
-                //当手指按下的时候
-                function eventDown(e){
-                    e.preventDefault();
-                    mousedown=true;
-                    end=true;
-                    clearInterval(timer);
-                }
-                //当手指松开的时候
-                function eventUp(e){
-                    e.preventDefault();
-                    i++;
-                    mousedown=false;
-                    clearInterval(timer);
-                    text=spans.innerHTML;
-                    ss=idx-used_chances;
-                    if(cls){
-                        timer=setInterval(function(){
-                            timers();
-                        },2000);
-                    }
-                    if(amount != 'None' && amount_left != 0 && clicks==1 || gift_left!=0 && gift!="None"&& clicks==1) $("#continue").html("领奖");
-                    if(used_chances<3){
-                        $portunity.html("您有"+(ss-1)+"次刮奖机会");
-                    }
-                    if(used_chances == 3)$portunity.html("您的刮奖次数已用完");
-
-                }
-                //当手指移动的时候
-                function eventMove(e){
-                    e.preventDefault();
-                    if(mousedown && cls) {
-                         if(e.changedTouches) e=e.changedTouches[e.changedTouches.length-1];
-                         var x = (e.clientX + document.body.scrollLeft || e.pageX) - min.offsetLeft || 0,
-                             y = (e.clientY + document.body.scrollTop || e.pageY) - min.offsetTop-min.scrollHeight+20 || 0;
-                         with(ctx) {
-                             beginPath();
-                             arc(x, y, 20, 0, Math.PI * 2);
-                             fill();
-                         }
-                    }
-                }
-                function timers(){
-                    ctx.drawImage(img,0,0,w,h);
-                }
-                canvas.width=w;
-                canvas.height=h;
-                ctx=canvas.getContext('2d');
-                layer(ctx);
-                ctx.globalCompositeOperation = 'destination-out';
-                canvas.addEventListener('touchstart', eventDown);
-                canvas.addEventListener('touchend', eventUp);
-                canvas.addEventListener('touchmove', eventMove);
-                canvas.addEventListener('mousedown', eventDown);
-                canvas.addEventListener('mouseup', eventUp);
-                canvas.addEventListener('mousemove', eventMove);
-                return function(){
-                    return ctx.drawImage(img,0,0,w,h);
-                };
-            }
-            $("#continue").on('click',function(){
-                if(end) porttunclick();
-            });
-            function porttunclick(){
-                if(used_chances<3){
-                    if($("#continue").html()=="领奖"){
-                        $("#dask").css({"display":"block"});
-                        $("#delog").find("h3").html(text+"已发送！请留意站内信！");
-                        $("#close,#ok").on('click',function(){
-                            $("#dask").css({"display":"none"});
-                            $("#continue").html("再来一次");
-                            clicks=2;
-                            evendrawImg()();
-                        })
-                    }else{
-                        Interface();
-                        evendrawImg();
-                        i=0;
-                        end=false;
-                        clicks=1;
-                    }
-                    clearInterval(timer);
-                }else if (dataCode != 3011 && clsName=="unAuthenticated") {
-                    spans.innerHTML = "您不符合参加规则";
-                } else if(clsName=="scratch_tub"){
-                    spans.innerHTML = "注册帐号后即可刮奖";
-                }else{
-                    evendrawImg();
-                   $portunity.html("您的刮奖次数已用完");
-                   spans.innerHTML = "您的刮奖次数已用完";
-                }
-            }
-            function Interface(){
-
-                var dataArr = [];
-                var retCode,
-                    urlData = "IGNORE",
-                    len=dataArr.length;
-                //ajax请求数据
-                function ajaxFun(action, fun) {
-                    org.ajax({
-                        type: "post",
-                        url: "/api/award/common_september/",
-                        dataType: "json",
-                        data: {action: action},
-                        async: false,
-                        success: function (data) {
-                            if (typeof fun === "function") {
-                                fun(data);
-                                console.log(data);
-                            }
-                        }
-                    });
-                }
-                //判断是否为正确渠道
-                function isChannel(data) {
-                    dataCode = data.ret_code;
-                }
-                //判断是否为合法渠道
-                function isUser(data) {
-                    if (data.ret_code === 3001) {
-                        ajaxFun("IS_VALID_CHANNEL", isChannel);
-                        if(dataCode===3011){
-                            isdataCode();
-                        }else{
-                            spans.innerHTML = "您不符合参加规则";
-                        }
-                    }
-                }
-                ajaxFun("IS_VALID_USER", isUser);
-
-                //用户抽奖信息
-                function isdataCode(){
-                    function lotterInfo(data) {
-                        gift = data.gift;
-                        gift_left = data.gift_left;
-                        used_chances = data.used_chances;
-                        amount = parseInt(data.amount);
-                        amount_left = data.amount_left;
-                        total=data.total_chances;
-
-                        if (amount != 'None' && amount_left != 0) dataArr.push(1);
-                        if(gift != 'None' && gift_left != 0){
-                            dataArr.push(2);
-                        }else{
-                            dataArr.push("");
-                        }
-                    }
-                    ajaxFun("ENTER_WEB_PAGE", lotterInfo);
-
-                    function rotateFun(data) {
-                        used_chances = data.used_chances;
-                        retCode = data.ret_code;
-                    }
-                    if (dataArr.length < 1) {
-                        urlData = "IGNORE";
-                    } else {
-                        if (dataArr[0]==1) {
-                            urlData = "GET_MONEY";
-                        } else if (dataArr[0]==2) {
-                            urlData = "GET_GIFT";
-                        } else {
-                            urlData = "IGNORE";
-                        }
-                    }
-                    ajaxFun(urlData, rotateFun);
-                    console.log(dataArr+"  "+urlData)
-                    if (retCode == 3024 && dataCode == 3011 && used_chances > 2) {
-                        spans.innerHTML = "您的刮奖次数已用完";
-                        $portunity.html("您的刮奖次数已用完");
-                    }else {
-                        if(amount != 'None' && amount_left != 0){
-                            console.log(amount)
-                            spans.innerHTML = amount+"元现金红包";
-                        }else if(gift != 'None' && gift_left != 0){
-                            console.log(gift+"  "+gift_left);
-                            if (gift == "抠电影") {
-                                spans.innerHTML="抠电影代金券";
-                            } else if (gift == "爱奇艺") {
-                                spans.innerHTML="爱奇艺会员";
-                            }
-                        }else{
-                            num = Math.floor(5+Math.random()*3);
-                            text=str[num];
-                            spans.innerHTML=text;
-                        }
-                    }
-                }
-            }
-        },
-        Registered:function(){
-            //判断输入的手机号是否正确
-            $("#scratch_btn").on('click',function(e){
-                var val=$("#zctext").val();
-                e.preventDefault();
-                if(val==""){
-                    alert("请输入手机号");
-                }else if(!/^1{1}[3578]{1}\d{9}$/.test(val)){
-                    alert("请输入正确的手机号");
-                }else{
-                    window.location.href="/weixin/regist/?next=/activity/app_scratch/&phone="+val;
-                }
-            })
-        },
-        //判断是否是iOS
-        iSAndiOS:function(){
-            var u = navigator.userAgent, app = navigator.appVersion;
-            var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
-            if(isiOS) $("#textbox").append("<span>6.</span><p>网利宝对此活动享有最终解释权。与苹果公司（Apple Inc）无关，如有疑问请联系在线客服或拨打400-588-066</p>");
-        }
+  //下滑动画函数
+  function Down(ele){
+    var curHeight = ele.height();
+    var autoHeight = ele.css('height', 'auto').height();
+    if (!ele.hasClass('down')){
+      ele.height(curHeight).animate({height: autoHeight},600,function(){
+        ele.addClass('down')
+      });
+    }else{
+      ele.height(curHeight).animate({height: 0},600,function(){
+        ele.removeClass('down')
+      });
     }
-    return {
-        init : lib.init
-    }
-})(org);
-;(function(org){
-    $.each($('script'), function(){
-        var src = $(this).attr('src');
-        if( src ){
-            if($(this).attr('data-init') && org[$(this).attr('data-init')]){
-                org[$(this).attr('data-init')].init();
+  }
+
+  //点击立即领取
+  $('.git-btn-fast').on('click',function(){
+    if ($(this).attr('data-num')){
+        window.location.href="/weixin/regist/?next=/activity/h5_mid_autumn/"
+    }else{
+      org.ajax({
+          url: "/redpacket/apply/",
+          type: "POST",
+          data: { redpack_event_name : "2015中秋节80000加息券"},
+          success: function(date){
+            if (date['status']=='true'){
+              $('.mid-modle').show();
+              $('.mid-success').hide();
+              $('#text').text('恭喜您～领取成功');
+              $('#mid-fail').show();
+            }else{
+              $('.mid-modle').show();
+              $('.mid-success').hide();
+              $('#text').text('亲，不可重复领取');
+              $('#mid-fail').show();
             }
-        }
-    })
-})(org);
+          }
+        })
+
+    }
+  })
+
+  //立即投资按钮
+  $('.touzi-btn').on('click',function(){
+    if ($(this).attr('data-num')){
+        window.location.href="/weixin/regist/?next=/activity/h5_mid_autumn/"
+    }else{
+      $('.mid-modle').show();
+      $('#mid-fail').hide();
+      $('.mid-success').show();
+    }
+  })
+
+  $('.touzi-btn2').on('click',function(){
+    if ($(this).attr('data-num')){
+        window.location.href="/weixin/regist/?next=/activity/h5_mid_autumn/"
+    }else{
+      $('.mid-modle').show();
+      $('#mid-fail').hide();
+      $('.mid-success').show();
+    }
+  })
+
+  //跳转投资页
+  $('.success-btn').on('click',function(){
+    window.location.href="/weixin/list/?next=/activity/h5_mid_autumn/"
+  })
+
+  //关闭模态框
+
+  $('.mid-off,.success-btn').on('click',function(){
+    $('.mid-modle').hide();
+    $('#mid-fail').hide();
+  })
+
+
+
+
+
+})();
