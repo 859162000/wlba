@@ -41,6 +41,51 @@
       return false
     })
 
+    // 展开效果
+    $('#rule1').on('click',function(){
+      $('#ul-rule1').slideToggle();
+    })
+    $('#rule2').on('click',function(){
+      $('#ul-rule2').slideToggle();
+    })
+    $('#rule3').on('click',function(){
+      $('#ul-rule3').slideToggle();
+    })
+
+    //立即领取
+    $('.git-btn').on('click',function(){
+      if ($(this).attr('data-num')){
+        window.location.href="/accounts/login/?next=/activity/mid-autumn/"
+      }else {
+        $('#small-zc').show();
+        $('#first-redpack-fail').hide();
+        $('#happy').text('恭喜您～领取成功');
+        $('#seven-success').show();
+      }
+
+    })
+
+    //立即投资领取
+    $('.touzi-btn').on('click',function(){
+      if ($(this).attr('data-num')){
+        window.location.href="/accounts/login/?next=/activity/mid-autumn/"
+      }else {
+        $('#small-zc').show();
+        $('#seven-success').hide();
+        $('#first-redpack-fail').show();
+      }
+    })
+
+    $('.touzi-btn2').on('click',function(){
+      if ($(this).attr('data-num')){
+        window.location.href="/accounts/login/?next=/activity/mid-autumn/"
+      }else {
+        $('#small-zc').show();
+        $('#seven-success').hide();
+        $('#first-redpack-fail').show();
+      }
+    })
+
   });
 
 }).call(this);

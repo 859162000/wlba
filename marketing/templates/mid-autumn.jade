@@ -20,9 +20,12 @@ html
          span 80000个
          b 加息
          |名额中秋无门槛特供，每人仅有一次机会～
-        a.btn 立即领取
-        span.autumn-rule 加息券规则
-        ul.ul-rule
+        if user.is_authenticated
+          a.btn.git-btn 立即领取
+        else
+          a.btn.git-btn(data-num='1') 立即领取
+        span.autumn-rule#rule1 加息券规则
+        ul.ul-rule#ul-rule1
           li
            span ①
            |加息券有效期：9月25日-9月30日；
@@ -54,7 +57,10 @@ html
               span 1.5%
               |加息券一张
           dd
-            a 立即投资领取
+            if user.is_authenticated
+              a.touzi-btn 立即投资领取
+            else
+              a.touzi-btn(data-num="1") 立即投资领取
         dl(style="border:none")
           dt.quan2
             h3 1. 单笔投资
@@ -63,10 +69,13 @@ html
               span 2%
               |加息券一张
           dd
-            a 立即投资领取
+            if user.is_authenticated
+              a.touzi-btn2 立即投资领取
+            else
+              a.touzi-btn2(data-num="1") 立即投资领取
         p 注：投资完成后站内信自动发送加息券，下次投资即可使用，一券一标永久加息！速速抢投哦
-        span.autumn-rule 加息券规则
-        ul.ul-rule
+        span.autumn-rule#rule2 加息券规则
+        ul.ul-rule#ul-rule2
           li
            span ①
            |加息券有效期：9月25日-9月30日；
@@ -134,7 +143,7 @@ html
           li
            span ②
            |1%加息券为中秋节福利，用户可免费领取，每人限领一次。加息券统一会以站内信通知，收到后可立即使用（苹果手机端暂不支持加息券使用）。详情请看
-           a 加息券使用规则
+           a#rule3 加息券使用规则
            |；
           li
            span ③
@@ -142,11 +151,33 @@ html
           li
            span ④
            |本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑。
+        ul.ul-rule#ul-rule3
+          li
+           span ①
+           |加息券有效期：9月25日-9月30日；
+          li
+           span ②
+           |加息券使用范围：限2月标（含）以上投资使用；
+          li
+           span ③
+           |苹果手机端目前版本无法支持加息券使用，敬请期待下个版本。安卓手机端用户和电脑端用户均可使用。
+          li
+            span ④
+            |购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+          li
+            span ⑤
+            |投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+          li
+            span ⑥
+            |使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+          li
+            span ⑦
+            |使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
         p.p-style * 网利宝对此活动享有最终解释权
     .autumn-footer
       .footer-img
     #small-zc
-      .seven-success#seven-success
+      .seven-success#first-redpack-fail
         span.first-xl-off2 ×
         p.seven-happy
           span
@@ -154,25 +185,31 @@ html
           br
           |站内信自动发送加息券
         p.txt  下次投资即可使用,一券一票永久加息!速速抢购哦~~
-        a(href="/",style="margin:122px 0 0 50px").first-user 立即使用
-      #first-redpack-fail
+        .success-img
+        a(href="/p2p/list/").first-user#list-btn 立即去投资
+      .seven-success#seven-success
         span.first-xl-off2 ×
-        p 不符合参加条件
-      #activity-over
-        span.first-xl-off2 ×
-        h1
-          span.gjw-people-com.gjw-people-three
-          b 活动结束
-        p 本期活动已结束
-          br
-          | 敬请期待下期惊喜！
-      #gjw-success
-        span.first-xl-off2 ×
-        p 您还没有充值哦!
-        ul
-          li.look 我再看看
-          li.fast 立刻充值
-        a.agin 我再看看
+        p.seven-happy#happy 亲，不可重复领取
+        p.txt  在
+          a(href="/accounts/message/") ［站内信］
+          |中查看
+        .success-img
+        a.first-user.look 我知道了
+      //#activity-over
+      //  span.first-xl-off2 ×
+      //  h1
+      //    span.gjw-people-com.gjw-people-three
+      //    b 活动结束
+      //  p 本期活动已结束
+      //    br
+      //    | 敬请期待下期惊喜！
+      //#gjw-success
+      //  span.first-xl-off2 ×
+      //  p 您还没有充值哦!
+      //  ul
+      //    li.look 我再看看
+      //    li.fast 立刻充值
+      //  a.agin 我再看看
 
 
   script.

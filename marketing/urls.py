@@ -32,7 +32,7 @@ urlpatterns = patterns(
     url(r'^gold/$', TemplateView.as_view(template_name="gold.jade"), name='marketing_gold'),
     url(r'^qixi/$', TemplateView.as_view(template_name="qixi.jade")),
     url(r'^xunlei_setp/$', TemplateView.as_view(template_name="xunlei_setp.jade")),
-    url(r'^mid-autumn/$', TemplateView.as_view(template_name="mid-autumn.jade")),
+    url(r'^mid_autumn/$', TemplateView.as_view(template_name="mid-autumn.jade")),
 
     url(r'^anniversary/$', TemplateView.as_view(template_name="anniversary.jade")),
     url(r'^app_anniversary/$', TemplateView.as_view(template_name="app_anniversary.jade")),
@@ -88,6 +88,7 @@ urlpatterns += patterns(
     url(r'^app_wechatstart/$', TemplateView.as_view(template_name="app_weChatStart.jade")),
     url(r'^app_wechatdetail/$', TemplateView.as_view(template_name="app_weChatDetail.jade")),
     url(r'^app_wechatend/$', TemplateView.as_view(template_name="app_weChatEnd.jade")),
+    url(r'^app_mid_autumn/$', TemplateView.as_view(template_name="app_mid-autumn.jade")),
 )
 
 urlpatterns += patterns(
