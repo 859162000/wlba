@@ -694,9 +694,9 @@ class AuthorizeUser(APIView):
                 wx_user = WanglibaoWeixinRelative.objects.filter(openid=openid)
                 if wx_user.exists():
                     #如果用户已经了，直接跳转到详情页
-                    user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=url_id, identity__in=wx_user.phone,).first()
+                    user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=url_id, identity__in=wx_user.first().phone,).first()
                     if user_gift.exists():
-                        return redirect(reverse('weixin_share_order_detail')+'?order_id=%s&openid=%s&phone_num=%s&activity=share'%(url_id, openid, wx_user.phone))
+                        return redirect(reverse('weixin_share_order_detail')+'?order_id=%s&openid=%s&phone_num=%s&activity=share'%(url_id, openid, wx_user.first().phone))
                     else:
                         return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,nick_name,head_img_url))
                 else:
