@@ -58,7 +58,7 @@ def _trade_pwd_lock_touch(profile):
     交易密码校验失败，上锁一次
     :return:
     '''
-    if profile.trade_pwd_failed_count == 3:
+    if profile.trade_pwd_failed_count >= 3:
         profile.trade_pwd_failed_count = 0
     profile.trade_pwd_failed_count += 1
     profile.trade_pwd_last_failed_time = time.time()

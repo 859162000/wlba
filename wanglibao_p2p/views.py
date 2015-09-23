@@ -54,7 +54,7 @@ from wanglibao_redis.backend import redis_backend
 import pickle
 from misc.models import Misc
 import json
-
+from wanglibao_activity import backends as activity_backends
 
 
 class P2PDetailView(TemplateView):
@@ -260,7 +260,7 @@ class PurchaseP2PMobile(APIView):
                             amount = Decimal(shareconfig.get('amount', 1000))
                             if product_info.amount >= amount:
                                 shareShow = 1
-                                url = reverse('weixin_share_order_gift')+"?url_id=%s"%order_id
+                                url = settings.WEIXIN_CALLBACK_URL + reverse('weixin_share_order_gift')+"?url_id=%s"%order_id
 
                 return Response({
                     'data': product_info.amount,
@@ -311,6 +311,9 @@ class AuditProductView(TemplateView):
         send_task("marketing.tools.calc_broker_commission", kwargs={
             "product_id": pk
         })
+
+        # 满标审核时检测活动规则
+        activity_backends.check_activity(request.user, 'p2p_audit', 'all', 0, pk)
 
         return HttpResponseRedirect('/' + settings.ADMIN_ADDRESS + '/wanglibao_p2p/p2pproduct/')
 

@@ -29,12 +29,10 @@ $(function(){
     });
 
     var say;
-    var say_num
-    $('.button').click(function(){
-        say = $('input').val();
-        $('#name').text(say);
-        $('body').unbind('touchmove');
-        say_num = parseInt(18*Math.random());
+    var say_num;
+    say_num = parseInt(18*Math.random());
+    say_text(say_num);
+    function say_text(say_num){
         switch(say_num){
             case 1:
                 $('#say').text('去旅游');
@@ -91,73 +89,67 @@ $(function(){
                 $('#say').text('买买买');
                 break;
         }
+    }
+    $('.button').click(function(){
+        say = $('input').val();
+        $('#name').text(say);
+        $('body').unbind('touchmove');
+        say_num = parseInt(18*Math.random());
+        say_text(say_num);
     });
 
     $('#wrap').fullpage({
         anchors: ['page1','page2','page3','page4','page5','page6','page7','page8'],
         afterLoad: function(anchorLink, index) {
             if(index == 1){
-                $('.section1 .theme,.section1 .text1,.section1 .text2').css('opacity','1').addClass('animate');
-                $('.section2 .young,.section2 .text').css('opacity','0');
+                $('.section2 img').not('.slideDown').removeClass('animate');
+                $('.section1 img').not('.slideDown').addClass('animate');
             }
             if(index == 2){
-                $('.theme,.section1 .text1,.section1 .text2,.section3 .boy_before,.section3 .line_img,.section3 .talk').css('opacity','0');
-                $('.section2 .young,.section2 .text,.section2 .old').css('opacity','1').addClass('animate');
+                $('.section1 img,.section3 img,.line_img').not('.slideDown').removeClass('animate');
+                $('.section2 img').not('.slideDown').addClass('animate');
             }
             if(index == 3){
-                $('.section2 .young,.section2 .text,.section4 .line_img,.section4 .talk,.section4 .man1_before,.math').css('opacity','0');
-                $('.section3 .boy_before,.section3 .line_img,.section3 .talk').css('opacity','1').addClass('animate');
+                $('.section2 img,.section4 img,.section4 .line_img').not('.slideDown').removeClass('animate');
+                $('.section3 img,.section3 .line_img').not('.slideDown').addClass('animate');
             }
             if(index == 4){
-                $('.section3 .boy_before,.section3 .line_img,.section3 .talk,.section5 .line_img,.section5 .talk,.woman1_before,.bamboo').css('opacity','0');
-                $('.section4 .line_img,.section4 .talk,.section4 .man1_before,.math').css('opacity','1').addClass('animate');
+                $('.section3 img,.section5 img,.section3 .line_img,.section5 .line_img').not('.slideDown').removeClass('animate');
+                $('.section4 img,.section4 .line_img').not('.slideDown').addClass('animate');
             }
             if(index == 5){
-                $('.section4 .line_img,.section4 .talk,.section4 .man1_before,.math').css('opacity','0');
-                $('.section5 .line_img,.section5 .talk,.woman1_before,.bamboo').css('opacity','1').addClass('animate');
+                $('.section4 img,.section4 .line_img,.section6 img,.section6 input').not('.slideDown').removeClass('animate');
+                $('.section5 .line_img,.section5 img').not('.slideDown').addClass('animate');
             }
             if(index == 6){
-                $('.section5 .line_img,.section5 .talk,.woman1_before,.bamboo').css('opacity','0')
-                $('.section6 .fly').addClass('animate');
+                $('.section7 .horn').animate({'opacity':'0'},100);
+                $('.section5 img,.section5 .line_img,.section7 img,.section7 .text,.section7 .title').removeClass('animate');
+                $('.section6 img,.section6 input').not('.slideDown').addClass('animate');
                 say = $('input').val();
+                //alert(say);
                 if(say==''||say==undefined){
-                    $('body').bind("touchmove", function(e) {e.preventDefault();}, false);
+                    //$('body').bind("touchmove", function (e) {e.preventDefault()});
+                    //document.addEventListener('touchmove', function (e) { e.preventDefault(); },false);
+                    document.ontouchmove = function(e){e.preventDefault();}
+                    //alert('2');
                 }else{
-                    $('body').unbind('touchmove');
+                    //$('body').unbind('touchmove');
                 }
             }
             if(index == 7){
-                $('.section7 .fly').addClass('animate');
+                $('.section7 .horn').delay(1000).animate({'opacity':'1'},500);
+                $('.section6 img,.section6 input,.section8 img,.button').not('.slideDown').removeClass('animate');
+                $('.section7 img,.section7 .text,.section7 .title').not('.slideDown').addClass('animate');
             }
             if(index == 8){
-                $('.section8 .fly').addClass('animate');
+                $('.section7 .horn').animate({'opacity':'0'},100);
+                $('.section7 img,.section7 .text,.section7 .title').not('.slideDown').removeClass('animate');
+                $('.section8 img,.button').not('.slideDown').addClass('animate');
             }
         },
-        onLeave: function(index, direction) {
-            if(index == 1){
-                $('.section1 .theme,.section1 .text1,.section1 .text2').removeClass('animate');
-
-            }
-            if(index == 2){
-                $('.section2 .young,.section2 .text,.section2 .old').removeClass('animate');
-            }
-            if(index == 3){
-                $('.section3 .boy_before,.section3 .line_img,.section3 .talk').removeClass('animate');
-            }
-            if(index == 4){
-                $('.section4 .line_img,.section4 .talk,.section4 .man1_before,.math').removeClass('animate');
-            }
-            if(index == 5){
-                $('.section5 .line_img,.section5 .talk,.woman1_before,.bamboo').removeClass('animate');
-            }
-            if(index == 6){
-                $('.section6 .fly').removeClass('animate');
-            }
+        onLeave: function(anchorLink, index) {
             if(index == 7){
-                $('.section7 .fly').removeClass('animate');
-            }
-            if(index == 8){
-                $('.section8 .fly').removeClass('animate');
+                //$('.section7 .horn').delay(1000).animate({'opacity':'0'},100);
             }
         }
     })

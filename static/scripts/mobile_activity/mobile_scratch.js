@@ -8,7 +8,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 type: options.type,
                 data: options.data,
                 dataType : options.dataType,
-                async : options.async,
+                async : options.async=="undefined" ? true : false,
                 beforeSend: function(xhr, settings) {
                     options.beforeSend && options.beforeSend(xhr);
                     //django配置post请求
@@ -119,8 +119,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 demo=document.getElementById("demo").getElementsByTagName("img")[0],
                 str = ["100元现金红包","150元现金红包","200元现金红包","爱奇艺会员","扣电影代金券","抽前吼三吼，大奖跟我走","红包何时有，把酒问青天","大奖下回见，网利宝天天见","佛说：前世500次回眸才能换得一次中奖，淡定"],
                 num,text,used_chances,clsName,dataCode,total,
-                start=1,
-                end=false,
+                end=false,cls=false,
                 gift="None",
                 gift_left=0,
                 amount="None",
@@ -134,7 +133,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             canvas.style.left = 0;
             canvas.style.top = 0;
             img.src = "/static/imgs/mobile_activity/app_scratch/gg_guajiang.png";
-
+            $("#continue").hide();
             //判断用户是否登录
             function jugde(){
                 clsName=$("#untub").attr("className");
@@ -142,32 +141,32 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     text="注册帐号后即可刮奖";
                     spans.innerHTML=text;
                 }else if(clsName=="unAuthenticated"){
-                    Interface();
-                    if(used_chances<3){
-                        ss=idx-used_chances;/*
-                        if(used_chances==2 && gift != "None"){
-                            $portunity.html("您有"+(ss-1)+"次刮奖机会");
-                        }else{*/
-                            $portunity.html("您有"+ss+"次刮奖机会");
-                        //}
+                    if(!cls){
+                       $portunity.html("点击开始即可刮奖");
                     }
+                    $("#btn_go").on("click",function(){
+                        Interface();
+                        evendrawImg();
+                        if(used_chances<=3){
+                            ss=idx-used_chances;
+                            $portunity.html("您有"+ss+"次刮奖机会");
+                        }
+                        $(this).hide().next().show();
+                        cls=true;
+                    })
                 }
             }
-
             //渲染蒙层
             img.addEventListener('load',evendrawImg);
             jugde();
-
             function evendrawImg(e){
                 var ctx;
                 var w = demo.width,
                     h = demo.height;
-
                 var mousedown = false;
 
                 function layer(ctx) {
                     ctx.drawImage(img,0,0,w,h);
-                    $("#continue").attr("data-cj","yy");
                 }
                 //当手指按下的时候
                 function eventDown(e){
@@ -175,7 +174,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     mousedown=true;
                     end=true;
                     clearInterval(timer);
-                    start=2;
                 }
                 //当手指松开的时候
                 function eventUp(e){
@@ -185,20 +183,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     clearInterval(timer);
                     text=spans.innerHTML;
                     ss=idx-used_chances;
-                    timer=setInterval(function(){
-                        timers();
-                    },2000);
-                     if(amount != 'None' && amount_left != 0 && clicks==1 || gift_left!=0 && gift!="None"&& clicks==1) $("#continue").html("领奖");
-                    if(i==1 && amount != "None"){
-                        console.log(ss+"="+idx+"-"+used_chances);
-                        if(used_chances==1 || used_chances==2){
-                            /*if(used_chances==2 && gift !="None"){
-                                $portunity.html("您有"+(ss-2)+"次刮奖机会");
-                            }else{*/
-                               $portunity.html("您有"+(ss-1)+"次刮奖机会");
-                           // }
-                        }
-                        i++;
+                    if(cls){
+                        timer=setInterval(function(){
+                            timers();
+                        },2000);
+                    }
+                    if(amount != 'None' && amount_left != 0 && clicks==1 || gift_left!=0 && gift!="None"&& clicks==1) $("#continue").html("领奖");
+                    if(used_chances<3){
+                        $portunity.html("您有"+(ss-1)+"次刮奖机会");
                     }
                     if(used_chances == 3)$portunity.html("您的刮奖次数已用完");
 
@@ -206,7 +198,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 //当手指移动的时候
                 function eventMove(e){
                     e.preventDefault();
-                    if(mousedown) {
+                    if(mousedown && cls) {
                          if(e.changedTouches) e=e.changedTouches[e.changedTouches.length-1];
                          var x = (e.clientX + document.body.scrollLeft || e.pageX) - min.offsetLeft || 0,
                              y = (e.clientY + document.body.scrollTop || e.pageY) - min.offsetTop-min.scrollHeight+20 || 0;
@@ -273,7 +265,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 var retCode,
                     urlData = "IGNORE",
                     len=dataArr.length;
-
                 //ajax请求数据
                 function ajaxFun(action, fun) {
                     org.ajax({
@@ -298,7 +289,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 function isUser(data) {
                     if (data.ret_code === 3001) {
                         ajaxFun("IS_VALID_CHANNEL", isChannel);
-                        if(dataCode===3011 && start==2){
+                        if(dataCode===3011){
                             isdataCode();
                         }else{
                             spans.innerHTML = "您不符合参加规则";
@@ -306,6 +297,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     }
                 }
                 ajaxFun("IS_VALID_USER", isUser);
+
                 //用户抽奖信息
                 function isdataCode(){
                     function lotterInfo(data) {
@@ -350,7 +342,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                             console.log(amount)
                             spans.innerHTML = amount+"元现金红包";
                         }else if(gift != 'None' && gift_left != 0){
-                            console.log(gift+"  "+gift_left)
+                            console.log(gift+"  "+gift_left);
                             if (gift == "抠电影") {
                                 spans.innerHTML="抠电影代金券";
                             } else if (gift == "爱奇艺") {

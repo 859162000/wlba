@@ -9,9 +9,9 @@
     var banDom = $("#banner");
     var winh = $(window).height();
     banDom.height(winh);
-    if(winh < 970){
-        banDom.addClass("min-banner");
-    }
+    //if(winh < 1056){
+    //    banDom.addClass("min-banner");
+    //}
 
     var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
         iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
