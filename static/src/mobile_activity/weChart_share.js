@@ -20,7 +20,7 @@ org.weChatStart = (function(org){
                 }
 
                 if(!lib._checkPhone(ops.phone)) return ;
-                window.location.href = 'http://192.168.1.39:8888/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
+                window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
             });
 
         },
