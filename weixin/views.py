@@ -28,6 +28,7 @@ from weixin.wechatpy import WeChatClient, parse_message, create_reply
 from weixin.wechatpy.replies import TransferCustomerServiceReply
 from weixin.wechatpy.utils import check_signature
 from weixin.wechatpy.exceptions import InvalidSignatureException, WeChatException,WeChatOAuthException
+from wanglibao_reward.models import WanglibaoUserGift
 from weixin.wechatpy.oauth import WeChatOAuth
 from weixin.common.decorators import weixin_api_error
 from weixin.common.wx import generate_js_wxpay
@@ -692,7 +693,12 @@ class AuthorizeUser(APIView):
             try:
                 wx_user = WanglibaoWeixinRelative.objects.filter(openid=openid)
                 if wx_user.exists():
-                    return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,nick_name,head_img_url))
+                    #如果用户已经了，直接跳转到详情页
+                    user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=url_id, identity__in=wx_user.phone,).first()
+                    if user_gift.exists():
+                        return redirect(reverse('weixin_share_order_detail')+'?order_id=%s&openid=%s&phone_num=%s&activity=share'%(url_id, openid, wx_user.phone))
+                    else:
+                        return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,nick_name,head_img_url))
                 else:
                     user_info = oauth.get_user_info(openid, res.get('access_token'))
                     nick_name = user_info['nickname']
