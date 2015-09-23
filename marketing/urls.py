@@ -43,6 +43,7 @@ urlpatterns = patterns(
     url(r'^web-view/$', TemplateView.as_view(template_name="webView.html")),
     url(r'^android-view/$', TemplateView.as_view(template_name="android_view.html")),
     url(r'^new_user/$', TemplateView.as_view(template_name="new_user.jade")),
+    url(r'^recommended/$', TemplateView.as_view(template_name="recommended.jade")),
 
 )
 
@@ -87,7 +88,7 @@ urlpatterns += patterns(
     url(r'^share/new/$', TemplateView.as_view(template_name="share_new_user.jade")),
     url(r'^app_wechatstart/$', TemplateView.as_view(template_name="app_weChatStart.jade")),
     url(r'^app_wechatdetail/$', TemplateView.as_view(template_name="app_weChatDetail.jade")),
-    url(r'^app_wechatend/$', TemplateView.as_view(template_name="app_weChatEnd.jade")),
+    url(r'^app_recommended/$', TemplateView.as_view(template_name="app_recommended.jade")),
 )
 
 urlpatterns += patterns(

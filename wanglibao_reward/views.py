@@ -23,6 +23,7 @@ from wanglibao_p2p.models import P2PRecord
 from misc.models import Misc
 from django.views.generic import TemplateView
 from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 
 logger = logging.getLogger('wanglibao_reward')
@@ -244,7 +245,7 @@ class WanglibaoReward(object):
         """
         pass
 
-class WeixinShareView(TemplateView):
+class WeixinShareDetailView(TemplateView):
     template_name = 'app_weChatDetail.jade'
 
     def __init__(self):
@@ -280,8 +281,7 @@ class WeixinShareView(TemplateView):
         try:
             self.activity = Activity.objects.filter(code=activity_id).first()
         except Exception, reason:
-            self.exception_msg(reason)
-
+            self.exception_msg(reason, u'获得activity的实体报异常')
 
     def get_redpack_id(self, activity):
         """
@@ -336,8 +336,9 @@ class WeixinShareView(TemplateView):
             if ids:
                 redpacks = self.get_redpack_by_id(ids)
             else:
-                self.debug_msg(u"生成组合红包时错误")
+                self.debug_msg(u"获得配置红包id失败")
                 return None
+            self.debug_msg("红包编号为：%s" % (ids, ))
             for redpack in redpacks:
                 try:
                     activity_gift = WanglibaoActivityGift.objects.create(
@@ -351,17 +352,18 @@ class WeixinShareView(TemplateView):
                     )
                     activity_gift.type = redpack_type[redpack.rtype]
                     activity_gift.save()
+                    self.debug_msg("生成红包 %s 成功; 奖励类型:%s" % (redpack.id, redpack.rtype))
                 except Exception, reason:
                     self.exception_msg(reason, '组合红包入库报错')
 
-    def has_got_redpack(self, phone_num, openid, activity, product_id):
+    def has_got_redpack(self, phone_num, activity, product_id):
         """
             判断用户是否已经领完奖品了
         """
         if not self.activity:
             self.activity = self.get_activity_by_id(activity)
         try:
-            user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=product_id, identity__in=(str(phone_num),), activity=self.activity).first()
+            user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=product_id, identity__in=str(phone_num), activity=self.activity).first()
             return user_gift
         except Exception, reason:
             self.exception_msg(reason, u'判断用户领奖，数据库查询出错')
@@ -414,7 +416,7 @@ class WeixinShareView(TemplateView):
 
             return sending_gift
         else:
-            return None
+            return 'No Reward'
 
     def get_distribute_status(self, product_id, activity):
             """
@@ -441,7 +443,7 @@ class WeixinShareView(TemplateView):
             self.global_cfg = WanglibaoActivityGiftGlobalCfg.objects.filter(activity=self.activity).get()
             return self.global_cfg
         except Exception, reason:
-            self.exception_msg(reason, u'获取全局配置抛出异常')
+            self.exception_msg(reason, u'配置全局配置抛出异常, activity:%s' % (activity,))
             return None
 
     def is_valid_user_auth(self, order_id, activity):
@@ -480,34 +482,49 @@ class WeixinShareView(TemplateView):
         if types == 'alone':
             QSet = WanglibaoWeixinRelative.objects.filter(phone=gifts.identity).values("phone", "nick_name", "img").first()
             if QSet:
-                return [gifts.amount, QSet["nick_name"], QSet["img"]]
+                ret_val = {"amount": gifts.amount, "name": QSet["nick_name"], "img": QSet["img"], "phone": QSet["phone"]}
             else:
-                return None
+                ret_val = {"amount": 0, "name": "", "img": "", "phone": ""}
+            self.debug_msg('个人获奖信息返回前端:%s' % (ret_val,))
+            return ret_val
 
         if types == 'gifts':
             user_info = {gift.identity: gift for gift in gifts}
-            key=user_info.keys()
-            QSet = WanglibaoWeixinRelative.objects.filter(phone__in=user_info.keys())# .values("phone", "nick_name", "img").all()
+            self.debug_msg("format_response_data, 已经领取的 奖品 的key值序列：%s" %(user_info.keys(),))
+            QSet = WanglibaoWeixinRelative.objects.filter(phone__in=user_info.keys())
             weixins = {item.phone: item for item in QSet}
+            self.debug_msg("format_response_data, 已经领取的 用户 的key值序列：%s" %(weixins.keys(),))
             ret_value = list()
             index = 0
             for key in weixins.keys():
                 print user_info[key].amount
                 print weixins[key].nick_name
-                ret_value.append([user_info[key].amount, user_info[key].get_time, weixins[key].nick_name, weixins[key].img, self.get_react_text(index)])
+                ret_value.append({"amount": user_info[key].amount,
+                                  "time": user_info[key].get_time,
+                                  "name": weixins[key].nick_name,
+                                  "img": weixins[key].img,
+                                  "message": self.get_react_text(index)})
                 index += 1
+            self.debug_msg('所有获奖信息返回前端:%s' % (ret_value,))
             return ret_value
 
     def update_weixin_wanglibao_relative(self, openid, phone_num):
-        relative = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
-        relative.phone = phone_num
-        relative.save()
+        try:
+            relative = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
+            if relative:
+                relative.phone = phone_num
+                relative.save()
+            else:
+                self.debug_msg("待更新的微信网利宝用户关系记录为空")
+        except Exception, reason:
+            self.exception_msg(reason, "weixin-wanglibao-realitive table 更新用户的手机号报异常")
 
     def get_context_data(self, **kwargs):
         openid = kwargs["openid"]
         phone_num = kwargs['phone_num']
         order_id = kwargs['order_id']
         activity = kwargs['activity']
+        self.debug_msg("openid:%s, phone:%s, order_id:%s, activity:%s " % (openid, phone_num, order_id, activity))
 
         try:
             misc_record = Misc.objects.filter(key='wechat_activity').first()
@@ -519,9 +536,9 @@ class WeixinShareView(TemplateView):
             index = int(time.time()) % len(activitys)
             record = WanglibaoActivityGift.objects.filter(gift_id=order_id).first()
             activity = record.activity.code if record else activitys[index]
-
+            logger.debug("misc配置的activity有:%s, 本次使用的activity是：%s" % (activitys, activity))
         #更新用户的手机号
-        #self.update_weixin_wanglibao_relative(openid, phone_num)
+        self.update_weixin_wanglibao_relative(openid, phone_num)
 
         if not self.has_combine_redpack(order_id, activity):
             self.generate_combine_redpack(order_id, activity)
@@ -529,19 +546,37 @@ class WeixinShareView(TemplateView):
         user_gift = self.has_got_redpack(phone_num, openid, activity, order_id)
 
         if not user_gift:
-            #pass
+            self.debug_msg('phone:%s 没有领取过奖品' %(phone_num,) )
             user_gift = self.distribute_redpack(phone_num, openid, activity, order_id)
 
+            if "No Reward" == user_gift:
+                self.debug_msg('奖品已经发完了，用户:%s 没有领到奖品' %(phone_num,))
+                redirect_url = reverse('weixin_share_end')
+                return HttpResponseRedirect(redirect_url)
+        else:
+            self.debug_msg('phone:%s 已经领取过奖品' %(phone_num,))
+            gifts = self.get_distribute_status(order_id, activity)
+            redirect_url = reverse("weixin_has_got_reward")
+            render_to_response(redirect_url,
+                               {"ret_code": 0,
+                                "self_gift": self.format_response_data(user_gift, 'alone'),
+                                "all_gift": self.format_response_data(gifts, 'gifts')
+                               })
+
         gifts = self.get_distribute_status(order_id, activity)
-        #one = self.format_response_data(user_gift,'alone')
-        #all = self.format_response_data(gifts,'gifts')
-        #print "one"
-        #print "all"
         return {
             "ret_code": 0,
             "self_gift": self.format_response_data(user_gift, 'alone'),
             "all_gift": self.format_response_data(gifts, 'gifts')
         }
+
+
+class WeixinShareEndView(TemplateView):
+    template_name = 'app_weChatEnd.jade'
+
+    def get_context_data(self, **kwargs):
+        pass
+
 
 class WeixinShareStartView(TemplateView):
     template_name = 'app_weChatStart.jade'
@@ -552,7 +587,7 @@ class WeixinShareStartView(TemplateView):
             return True
             # return p2p_record
         except Exception, reason:
-            self.exception_msg(reason, u"判断用户投资额度抛异常")
+            logger.exception(u"判断用户投资额度抛异常 %s" %(reason,) )
             return None
 
     def get_context_data(self, **kwargs):
@@ -568,6 +603,7 @@ class WeixinShareStartView(TemplateView):
                nick_name=nick_name,
                img=img_url
             )
+
         return {
             'ret_code': 9001,
             'openid': openid,
