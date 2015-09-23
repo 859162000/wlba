@@ -76,7 +76,7 @@ class RedPacketSelectAPIView(APIView):
         result = backends.get_interest_coupon(user, product_id)
         return Response(result)
 
-class RequestPacketAPIView(APIView):
+class ApplyRedPacketAPIView(APIView):
     """
     用户主动领取某个红包活动的红包
     """
