@@ -9,6 +9,7 @@ html
     link(rel="stylesheet",href="/static/styles/pc_activity/mid-autumn.css")
     link(href="{{host}}/static/stylesheets/screen.css?v=20150910", media="screen, projection", rel="stylesheet", type="text/css")
   body(style="background:#000c58")
+    - csrf_token
     include global/g_nav
     .mid-autumn-banner
     .autumn-gold
@@ -190,28 +191,12 @@ html
       .seven-success#seven-success
         span.first-xl-off2 ×
         p.seven-happy#happy 亲，不可重复领取
-        p.txt  在
+        p.txt#txt  在
           a(href="/accounts/coupon/unused/") ［理财券］
           |中查看
         .success-img
         a.first-user.look 我知道了
-      //#activity-over
-      //  span.first-xl-off2 ×
-      //  h1
-      //    span.gjw-people-com.gjw-people-three
-      //    b 活动结束
-      //  p 本期活动已结束
-      //    br
-      //    | 敬请期待下期惊喜！
-      //#gjw-success
-      //  span.first-xl-off2 ×
-      //  p 您还没有充值哦!
-      //  ul
-      //    li.look 我再看看
-      //    li.fast 立刻充值
-      //  a.agin 我再看看
-
 
   script.
       var v = new Date().getTime()
-      require(['/static/js/mid-autumn.js'])
+      require(['/static/js/mid_autumn.js'])

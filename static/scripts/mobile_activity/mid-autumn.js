@@ -248,12 +248,27 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
   //点击立即领取
   $('.git-btn-fast').on('click',function(){
     if ($(this).attr('data-num')){
-        window.location.href="/weixin/regist/?next=/activity/app_mid_autumn/"
+        window.location.href="/weixin/regist/?next=/activity/h5_mid_autumn/"
     }else{
-      $('.mid-modle').show();
-      $('.mid-success').hide();
-      $('#text').text('恭喜您～领取成功');
-      $('#mid-fail').show();
+      org.ajax({
+          url: "/redpacket/apply/",
+          type: "POST",
+          data: { redpack_event_name : "2015中秋节80000加息券"},
+          success: function(date){
+            if (date['status']=='true'){
+              $('.mid-modle').show();
+              $('.mid-success').hide();
+              $('#text').text('恭喜您～领取成功');
+              $('#mid-fail').show();
+            }else{
+              $('.mid-modle').show();
+              $('.mid-success').hide();
+              $('#text').text('亲，不可重复领取');
+              $('#mid-fail').show();
+            }
+          }
+        })
+
     }
   })
 
@@ -280,7 +295,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
   //跳转投资页
   $('.success-btn').on('click',function(){
-    window.location.href="/weixin/list/?next=/activity/app_mid_autumn/"
+    window.location.href="/weixin/list/?next=/activity/h5_mid_autumn/"
   })
 
   //关闭模态框
