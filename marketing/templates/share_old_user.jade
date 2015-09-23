@@ -1,0 +1,57 @@
+- load formatters
+doctype html
+html(style="background:#090c0b")
+    head
+        meta(name="format-detection" content="telephone=no,email=no")
+        title 网利红包
+        meta(charset="utf-8")
+        meta(content="telephone=no,email=no" ,name="format-detection")
+        meta(content="yes" ,name="apple-mobile-web-app-capable")
+        script.
+            (function(){var b=navigator.userAgent;ipad=b.match(/(iPad).*OS\s([\d_]+)/)?true:false;iphone=!ipad&&b.match(/(iPhone\sOS)\s([\d_]+)/)?true:false;uc=navigator.userAgent.indexOf("UCBrowser")>-1?true:false;ios=ipad||iphone;var d=1,a=1,c;if(ios){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}else{if(uc){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}}c='<meta name="viewport" content="initial-scale='+d+", maximum-scale="+d+", minimum-scale="+d+', width=device-width, user-scalable=no" />';document.write(c);document.documentElement.style.fontSize=20*a+"px"})();
+        link(href="/static/styles/mobile_activity/wx_share.css", rel="stylesheet")
+        body
+            .share.share-code
+                a(href='/').wx
+                .logo
+                    img(src='/static/imgs/mobile_activity/share/logo.png')
+                p.profit 已注册用户
+                p.profit 不能领取520元新人现金红包
+                .operation
+                    a(href='javascript:void(0)')#more 分享赚红包
+                p.invitation 每位好友成功领取你分享的520元新人红包，你可获得一个30元红包，奖励自动放入你的网利账户，24小时内到账。
+                .rule
+                    label
+                        span
+                        | 我已阅读并同意网利宝的
+                    a(href='javascript:void(0)')#rule [活动规则]
+            .rule-win(style='display:none')
+                .rule-win-content
+                    p.title 活动规则
+                    p ① 同一手机号，同一账户号，同一设备号，同一链接内仅限领取一个红包
+                    p ② 本次所领红包注册后方可生效，15天后失效，投资满额时可直抵使用，二次投资回款即可提现
+                    p ③ 用户可在网利宝微信账户上使用红包，也可下载APP和登录官网查看、使用
+                    p ④ 通过邀请人链接注册的好友，在完成投资后，邀请人可获得神秘奖励，邀请人好友的好友再投资，邀请人还可以再获得神秘奖励 5. 分享和邀请前务必输入手机号领取红包，或登陆网利宝微信账户，否则成功邀请好友，也无法获得红包奖励
+                    p ⑤ 分享和邀请前请务必输入手机号领取红包，或登陆网利宝微信账户，成功邀请好友后，才能获得红包奖励
+                    p ⑥ 网利宝对本次活动享有最终解释权
+                    p#ios-show(style="display:none") ⑦ 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关 如有疑问请联系在线客服或拨打4008-588-066
+        .alertWin(style='display:none')
+            .share-icon
+            .share-content
+                p 给好友发
+                  span 520
+                  | 元新人现金红包
+                p 每一位好友成功领取
+                p 你都将同时获得一个
+                  span 30元
+                  | 的红包奖励
+        .page(style='display:none')
+        script(src="/static/src/mobile/lib/weixin/wx.js")
+        script(data-init='shareFun',src="/static/scripts/mobile_activity/weixin_share.js")
+        script.
+          var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+              iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+              ios = ipad || iphone;
+          if (ios) {
+              document.getElementById('ios-show').style.display = 'block';
+          }

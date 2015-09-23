@@ -26,6 +26,7 @@ from rest_framework.views import APIView
 from marketing.models import Channels, IntroducedBy, PromotionToken
 from marketing.utils import set_promo_user
 from wanglibao import settings
+from wanglibao_redpack import backends as redpack_backends
 from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      TIANMANG_CALL_BACK_URL, WLB_FOR_YIRUITE_KEY, YIRUITE_KEY, BENGBENG_KEY, \
      WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
@@ -35,7 +36,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_YUNDUAN_KEY, YUNDUAN_CALL_BACK_URL, YUNDUAN_COOP_ID, WLB_FOR_YICHE_KEY, YICHE_COOP_ID, \
      YICHE_KEY, YICHE_CALL_BACK_URL, WLB_FOR_ZHITUI1_KEY, ZHITUI_COOP_ID, ZHITUI_CALL_BACK_URL, \
      WLB_FOR_ZGDX_KEY, ZGDX_CALL_BACK_URL, ZGDX_PARTNER_NO, ZGDX_SERVICE_CODE, ZGDX_CONTRACT_ID, \
-     ZGDX_ACTIVITY_ID, ZGDX_PLAT_OFFER_ID, ZGDX_KEY, ZGDX_IV
+     ZGDX_ACTIVITY_ID, ZGDX_PLAT_OFFER_ID, ZGDX_KEY, ZGDX_IV, WLB_FOR_NJWH_KEY
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
@@ -46,6 +47,7 @@ from wanglibao_redis.backend import redis_backend
 from dateutil.relativedelta import relativedelta
 from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes, hex2bin
 from decimal import Decimal
+from wanglibao_reward.models import WanglibaoUserGift
 import re
 import uuid
 
@@ -595,10 +597,15 @@ class JinShanRegister(CoopRegister):
             self.jinshan_call_back(user, 'wangli_invest_reward', 'pA71ZhBf4DDeet7SLiLlGsT1qTYu')
 
 
-class WaihuRegister(CoopRegister):
+class ShanghaiWaihuRegister(CoopRegister):
     def __init__(self, request):
-        super(WaihuRegister, self).__init__(request)
+        super(ShanghaiWaihuRegister, self).__init__(request)
         self.c_code = 'shls'
+
+class NanjingWaihuRegister(CoopRegister):
+    def __init__(self, request):
+        super(NanjingWaihuRegister, self).__init__(request)
+        self.c_code = 'njwh'
 
 
 class ShiTouCunRegister(CoopRegister):
@@ -648,7 +655,7 @@ class ShiTouCunRegister(CoopRegister):
                 'e_user': uid_for_coop,
             }
             common_callback.apply_async(
-                kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+                kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
     def purchase_call_back(self, user):
         # 判断是否是首次投资
@@ -971,15 +978,18 @@ class WeixinRedpackRegister(CoopRegister):
         self.invite_code = 'weixin_redpack'
 
     def register_call_back(self, user):
-        #扫描数据表，没有发红包的，开始下发
-        pass
+        phone = self.request.GET.get('phone',)
+        record = WanglibaoUserGift.objects.filter(valid=0, identity=phone).first()
+        redpack_backends.give_activity_redpack(self.request.user, record.rules.redpack, 'pc')
+        record.valid = 1
+        record.save()
 
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
-                          YiCheRegister, ZhiTuiRegister, WaihuRegister,
-                          ZGDXRegister, WeixinRedpackRegister]
+                          YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
+                          ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister]
 
 
 #######################第三方用户查询#####################

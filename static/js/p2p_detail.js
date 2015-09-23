@@ -16,7 +16,7 @@
   });
 
   require(['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown', 'tools', 'lib/modal', "jquery.validate", 'ddslick'], function($, _, backend, calculator, countdown, tool, modal) {
-    var buildTable, clearToShow, ddData, getActualAmount, getFormatedNumber, getRedAmount, getRedPack, hideEmptyLabel, isFirst, opt, page, showPayInfo, showPayTip, validator;
+    var $target_more, acount_product, buildTable, clearToShow, ddData, getActualAmount, getFormatedNumber, getRedAmount, getRedPack, hideEmptyLabel, isFirst, opt, page, showPayInfo, showPayTip, validator;
     isFirst = true;
     getFormatedNumber = function(num) {
       return Math.round(num * 100) / 100;
@@ -329,7 +329,9 @@
       return html.join("");
     };
     page = 2;
-    $('.get-more').click(function(e) {
+    $target_more = $('.get-more');
+    acount_product = $target_more.attr('data-total') * 1;
+    $target_more.click(function(e) {
       var id;
       e.preventDefault();
       id = $(this).attr('data-product');
@@ -341,20 +343,19 @@
         try {
           invest_result = $.parseJSON(data);
           if (invest_result && invest_result.length > 0) {
-            if (invest_result.length > 0) {
-              if (math.ceil(invest_result.length / 30) < page) {
-                return $('.get-more').hide();
-              }
-              $('.invest-history-table tbody').append(buildTable(invest_result));
-              $('.get-more').show();
-              page++;
+            $('.invest-history-table tbody').append(buildTable(invest_result));
+            if (Math.ceil(acount_product / 30) <= page) {
+              $target_more.hide();
             } else {
-              $('.get-more').hide();
+              $target_more.show();
+              page++;
             }
+          } else {
+            $target_more.hide();
           }
         } catch (_error) {
           e = _error;
-          $('.get-more').hide();
+          $target_more.hide();
         }
       });
     });

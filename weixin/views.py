@@ -36,6 +36,7 @@ from .common.wechat import tuling
 from decimal import Decimal
 from wanglibao_pay.models import Card
 from marketing.models import Channels
+from wanglibao_reward.models import WanglibaoWeixinRelative
 import datetime
 import json
 import time
@@ -672,12 +673,6 @@ class WeixinAccountBankCardAdd(TemplateView):
             'banks': banks,
         }
 
-import traceback
-
-import logging
-logger = logging.getLogger(__name__)
-
-from wanglibao_reward.models import WanglibaoWeixinRelative
 
 class AuthorizeUser(APIView):
     permission_classes = ()
@@ -690,7 +685,6 @@ class AuthorizeUser(APIView):
         oauth = WeChatOAuth(account.app_id, account.app_secret, )
         if code:
             res = oauth.fetch_access_token(code)
-            print res
             openid=res.get('openid')
             nick_name=""
             head_img_url=""
@@ -717,57 +711,11 @@ class AuthorizeCode(APIView):
         auth = request.GET.get('auth')
         url_id = request.GET.get('url_id')
 
-        redirect_uri = "http://ac6dc702.ngrok.io" + reverse("weixin_authorize_user_info")+'?url_id=%s'%url_id#"http://ac6dc702.ngrok.io/weixin/api/test1?reurl=%s"%reurl {'reurl':reurl}
+        redirect_uri = settings.WEIXIN_CALLBACK_URL + reverse("weixin_authorize_user_info")+'?url_id=%s'%url_id
         # print redirect_uri
         if auth and auth=='1':
             oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, scope='snsapi_userinfo', state='1')
         else:
-            oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, state='1')#'http://ac6dc702.ngrok.io/weixin/api/test1?reurl=/api/test3'
+            oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, state='1')
         # print oauth.authorize_url
         return redirect(oauth.authorize_url)
-
-
-# class AuthorizeUser(APIView):
-#     permission_classes = ()
-#     def get(self, request):
-#
-#         logger.info('=========================================entering AuthorizeUser')
-#         code = request.GET.get('code')
-#         user_info = {}
-#         if code:
-#             account_id = request.GET.get('state')
-#             try:
-#                 account = Account()#Account.objects.get(pk=account_id)
-#             except Account.DoesNotExist:
-#                 return HttpResponseNotFound()
-#             try:
-#                 account.app_id = 'wx896485cecdb4111d'
-#                 account.app_secret = 'b1e152144e4a4974cd06b8716faa98e1'
-#                 oauth = WeChatOAuth(account.app_id, account.app_secret, )
-#                 res = oauth.fetch_access_token(code)
-#                 user_info['res_fetch_token'] = res
-#                 account.oauth_access_token = res.get('access_token')
-#                 account.oauth_access_token_expires_in = res.get('expires_in')
-#                 account.oauth_refresh_token = res.get('refresh_token')
-#                 # account.save()
-#                 openid=res.get('openid')
-#                 res = oauth.get_user_info(openid, account.oauth_access_token)
-#                 user_info['res_user_info']=res
-#
-#                 # WeixinUser.objects.get_or_create(openid=res.get('openid'))
-#                 # context['openid'] = res.get('openid')
-#             except WeChatException, e:
-#                 print '-----------------------------1'
-#                 print user_info
-#                 exstr = traceback.format_exc()
-#                 logger.debug('=====================AuthorizeUser=================%s'%exstr)
-#                 user_info['exstr']=exstr
-#                 # print user_info
-#                 return Response({'user_info':user_info})
-#
-#         logger.info('==================AuthorizeUser==========================')
-#         logger.info(user_info)
-#         print user_info
-#         return Response({
-#             'user_info' : user_info,
-#             })

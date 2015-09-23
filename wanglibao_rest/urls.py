@@ -259,7 +259,7 @@ urlpatterns += patterns(
 )
 
 
-# 官方主动注册用户活动状态查询接口
+# 用户活动状态查询接口
 urlpatterns += patterns(
     '',
     url(r'^activity/joinInfo/$', UserActivityStatusAPIView.as_view()),

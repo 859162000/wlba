@@ -16,7 +16,7 @@ from marketing.models import IntroducedBy, Reward, RewardRecord
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
 from wanglibao_pay.models import PayInfo
-from wanglibao_p2p.models import P2PRecord
+from wanglibao_p2p.models import P2PRecord, P2PEquity
 from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_sms.tasks import send_messages
@@ -48,13 +48,13 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_f
                                     .filter(Q(platform=device_type) | Q(platform=u'all')).order_by('-id')
     if activity_list:
         for activity in activity_list:
-            if activity.is_all_channel is False:
+            if activity.is_all_channel is False and trigger_node not in ('p2p_audit', 'repaid'):
                 if activity.channel != "":
                     channel_list = activity.channel.split(",")
                     channel_list = [ch for ch in channel_list if ch.strip() != ""]
                     if channel not in channel_list:
                         continue
-            #查询活动规则
+            # 查询活动规则
             if trigger_node == 'invest':
                 activity_rules = ActivityRule.objects.filter(activity=activity,  is_used=True)\
                     .filter(Q(trigger_node='buy') | Q(trigger_node='first_buy')).order_by('-id')
@@ -82,12 +82,12 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_f
 def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, user_ib=None):
     """ check the trigger node """
     product_id = int(product_id)
-    #注册 或 实名认证
+    # 注册 或 实名认证
     if trigger_node in ('register', 'validation'):
         _send_gift(user, rule, device_type, is_full)
-    #首次充值
+    # 首次充值
     elif trigger_node == 'first_pay':
-        #check first pay
+        # check first pay
         if rule.is_in_date:
             first_pay_num = PayInfo.objects.filter(user=user, type='D',
                                                    update_time__gt=rule.activity.start_at,
@@ -97,12 +97,12 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
                                                    status=PayInfo.SUCCESS).count()
         if first_pay_num == 1:
             _check_trade_amount(user, rule, device_type, amount, is_full)
-    #充值
+    # 充值
     elif trigger_node == 'pay':
         _check_trade_amount(user, rule, device_type, amount, is_full)
-    #首次购买
+    # 首次购买
     elif trigger_node == 'first_buy':
-        #check first pay
+        # check first pay
         if rule.is_in_date:
             first_buy_num = P2PRecord.objects.filter(user=user,
                                                      create_time__gt=rule.activity.start_at).count()
@@ -110,7 +110,7 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
             first_buy_num = P2PRecord.objects.filter(user=user).count()
 
         if first_buy_num == 1:
-            #判断当前购买产品id是否在活动设置的id中
+            # 判断当前购买产品id是否在活动设置的id中
             if product_id > 0 and rule.activity.product_ids:
                 is_product = _check_product_id(product_id, rule.activity.product_ids)
                 if is_product:
@@ -118,7 +118,7 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
             else:
                 _check_buy_product(user, rule, device_type, amount, product_id, is_full)
 
-    #购买
+    # 购买
     elif trigger_node == 'buy':
         if product_id > 0 and rule.activity.product_ids:
             is_product = _check_product_id(product_id, rule.activity.product_ids)
@@ -126,11 +126,18 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
                 _check_buy_product(user, rule, device_type, amount, product_id, is_full)
         else:
             _check_buy_product(user, rule, device_type, amount, product_id, is_full)
-    #满标审核
+    # 满标审核
+    # 满标审核时,是给所有的持仓用户发放奖励,金额为持仓金额
     elif trigger_node == 'p2p_audit':
-        #delay
-        # _send_gift(user, rule, device_type)
-        return
+        # 根据product_id查询出该产品中所有的持仓用户
+        equities = P2PEquity.objects.filter(product=product_id, confirm=True)
+        if equities:
+            for equity in equities:
+                _send_gift(equity.user, rule, device_type, is_full, equity.equity)
+    # 还款
+    # 还款时,是给所有的持仓用户发放奖励,金额为还款本金
+    elif trigger_node == 'repaid':
+        _send_gift(user, rule, device_type, is_full, amount)
     else:
         return
 
