@@ -678,11 +678,13 @@ class WeixinAccountBankCardAdd(TemplateView):
 class AuthorizeUser(APIView):
     permission_classes = ()
     def get(self, request):
+        account_id = self.request.GET.get('state')
+        try:
+            account = Account.objects.get(pk=account_id)
+        except Account.DoesNotExist:
+            return HttpResponseNotFound()
         code = request.GET.get('code')
         url_id = request.GET.get('url_id')
-        account = Account()
-        account.app_id = 'wx896485cecdb4111d'
-        account.app_secret = 'b1e152144e4a4974cd06b8716faa98e1'
         oauth = WeChatOAuth(account.app_id, account.app_secret, )
         if code:
             res = oauth.fetch_access_token(code)
@@ -704,24 +706,27 @@ class AuthorizeUser(APIView):
                     nick_name = user_info['nickname']
                     head_img_url = user_info['headimgurl']
             except WeChatException, e:
-                return redirect(reverse("weixin_authorize_code")+'?auth=1')
+                auth_code_url = reverse("weixin_authorize_code")+'?auth=1&state=%s'%account_id
+                return redirect(auth_code_url)
             return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,nick_name,head_img_url))
 
 
 class AuthorizeCode(APIView):
     permission_classes = ()
     def get(self, request):
-        account = Account()
-        account.app_id = 'wx896485cecdb4111d'
-        account.app_secret = 'b1e152144e4a4974cd06b8716faa98e1'
+        account_id = self.request.GET.get('state')
+        try:
+            account = Account.objects.get(pk=account_id)
+        except Account.DoesNotExist:
+            return HttpResponseNotFound()
         auth = request.GET.get('auth')
         url_id = request.GET.get('url_id')
 
         redirect_uri = settings.WEIXIN_CALLBACK_URL + reverse("weixin_authorize_user_info")+'?url_id=%s'%url_id
         # print redirect_uri
         if auth and auth=='1':
-            oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, scope='snsapi_userinfo', state='1')
+            oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, scope='snsapi_userinfo', state=account_id)
         else:
-            oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, state='1')
+            oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, state=account_id)
         # print oauth.authorize_url
         return redirect(oauth.authorize_url)
