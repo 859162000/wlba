@@ -364,6 +364,7 @@ class WeixinShareDetailView(TemplateView):
             self.activity = self.get_activity_by_id(activity)
         try:
             user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=product_id, identity__in=str(phone_num), activity=self.activity).first()
+
             return user_gift
         except Exception, reason:
             self.exception_msg(reason, u'判断用户领奖，数据库查询出错')
@@ -563,6 +564,10 @@ class WeixinShareDetailView(TemplateView):
                                })
 
         gifts = self.get_distribute_status(order_id, activity)
+        #one = self.format_response_data(user_gift,'alone')
+        #all = self.format_response_data(gifts,'gifts')
+        #print "one"
+        #print "all"
         return {
             "ret_code": 0,
             "self_gift": self.format_response_data(user_gift, 'alone'),
@@ -601,7 +606,6 @@ class WeixinShareStartView(TemplateView):
                nick_name=nick_name,
                img=img_url
             )
-
         return {
             'ret_code': 9001,
             'openid': openid,
