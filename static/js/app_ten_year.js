@@ -1,21 +1,19 @@
 $(function(){
-    var mp3 = document.getElementById("music");
+    var mp3 = document.getElementById("music"),play = $('#play');
+    play.on('click', function (e) {
+        if (mp3.paused) {
+            mp3.play();
+            $('#play').addClass('play_music').removeClass('close_music');
+        } else {
+            mp3.pause();
+            $('#play').addClass('close_music').removeClass('play_music');
+        }
+    });
+
     mp3.play();
     $(document).one('touchstart', function () {
         mp3.play();
-    })
-	var mp3_open = true;
-	$('#play').click(function(){
-		if(mp3_open){
-			mp3.pause();
-			mp3_open = false;
-			$('#play').addClass('close_music').removeClass('play_music');
-		}else{
-			mp3.play();
-			mp3_open = true;
-			$('#play').addClass('play_music').removeClass('close_music');
-		}
-	});
+    });
 
     $('.section3 .line').load(function(){
         var s3line_height = $('.section3 .line').height();
