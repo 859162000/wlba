@@ -373,14 +373,35 @@ def _give_redpack(user, give_mode, device_type):
 
 
 #发放奖励类型的红包
-def give_activity_redpack(user, event, device_type):
+def give_activity_redpack(user, event, device_type, just_one_packet=False, check_issue_time=False):
+    """
+
+    :param user:
+    :param event: 支持RedPackEevent对象或是一个event的名字
+    :param device_type:
+    :param just_one_packet: 置为True，对于某个红包活动用户只能获得一个红包，不能获得多个
+    :param check_issue_time：检查发放时间，超期不发放
+    :return:
+    """
     device_type = _decide_device(device_type)
+    # 后台设置必须保证红包的event不重名
+    if not isinstance(event, RedPackEvent):
+        try:
+            event = RedPackEvent.objects.get(name=event)
+        except:
+            return False, u"活动名称错误"
+    #检查红包发放时间
+    now = timezone.now()
+    if now < event.give_start_at or now > event.give_end_at:
+        return False, u'活动已过期'
     redpack = RedPack.objects.filter(event=event, status="unused").first()
     if not redpack:
         return False, u"没有此优惠券"
     if redpack.token != "":
         redpack.status = "used"
         redpack.save()
+    if just_one_packet and RedPackRecord.objects.filter(redpack=redpack, user=user).exists():
+        return False, u"限领一个红包"
     record = RedPackRecord()
     record.user = user
     record.redpack = redpack
