@@ -6,11 +6,13 @@ block content
 		img(src='/static/imgs/mobile_activity/app_wechat/default_user.png').default-img
 		.default-message
 			.message-icon
-			.message-body 我在网利宝成功投标啦。和我一起拼手气，必中高额度加息券。{{ret_code}}
+			.message-body 我在网利宝成功投标啦。和我一起拼手气，必中高额度加息券。
 	.webchat-redpack
 		.redpack-bg
 	.webchat-submit
-		input(type='tel', placeholder='输入手机号拼手气').webchat-input
-		a(href="/activity/app_wechatdetail/").webpack-btn-red 立即开奖
+		input(type='tel', name='phone' ,placeholder='输入手机号拼手气', value="{{phone}}").webchat-input
+		.phone-sign-warp
+			p.phone-sign 请输入正确的手机号
+		a(href="javascript:void(0)",data-openid="2",data-activity="share", data-orderid="1").webpack-btn-red 立即开奖
 
 	script(data-init='weChatStart', src='/static/scripts/mobile_activity/weChart_share.js')

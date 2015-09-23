@@ -11,14 +11,13 @@ from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_p2p.models import P2PProduct, P2PRecord, Earning, ProductAmortization, ProductType
 from wanglibao_p2p.trade import P2POperator
 from wanglibao_p2p.automatic import Automatic
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.contrib.auth.models import User
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import period_unit
 import time
-
 
 
 @app.task
@@ -132,17 +131,39 @@ def automatic_trade(product_id=None, plan_id=None):
     Automatic().auto_trade(product_id=product_id, plan_id=plan_id)
 
 
-@app.task
-def p2p_auto_published_by_publish_time(p2p_type, period):
-    if not p2p_type:
+def p2p_auto_published_by_publish_time(pay_method, period):
+    if not pay_method or not period:
         return
 
-    types = ProductType.objects.filter(pk=p2p_type).first()
-    if types and types.name == u'其他':
-        return
+    if pay_method.startswith(u'日计息'):
+        if period < 90:
+            _period = 3
+        elif period < 180:
+            _period = 6
+        else:
+            _period = 9
+    else:
+        if period < 3:
+            _period = 3
+        elif period < 6:
+            _period = 6
+        else:
+            _period = 9
 
-    products = P2PProduct.objects.filter(period=period, status=u"正在招标",
-                                         publish_time__gt=timezone.now()).order_by('publish_time').first()
+    if _period == 3:
+        products = P2PProduct.objects.filter(status=u"正在招标", publish_time__gt=timezone.now())\
+            .filter(Q(pay_method__contains=u'日计息') & Q(period__lt=90) | ~Q(pay_method__contains=u'日计息') & Q(period__lt=3))\
+            .exclude(types__name=u'其他').order_by('publish_time').first()
+    elif _period == 6:
+        products = P2PProduct.objects.filter(status=u"正在招标", publish_time__gt=timezone.now()) \
+            .filter(Q(pay_method__contains=u'日计息') & Q(period__gte=90) & Q(period__lt=180) | ~Q(pay_method__contains=u'日计息') & Q(period__gte=3) & Q(period__lt=6)) \
+            .exclude(types__name=u'其他').order_by('publish_time').first()
+    else:
+        products = P2PProduct.objects.filter(status=u"正在招标", publish_time__gt=timezone.now()) \
+            .filter(Q(pay_method__contains=u'日计息') & Q(period__gte=180) | ~Q(pay_method__contains=u'日计息') & Q(period__gte=6)) \
+            .exclude(types__name=u'其他').order_by('publish_time').first()
+
     if products:
         products.publish_time = timezone.now()
         products.save()
+
