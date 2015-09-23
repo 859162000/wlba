@@ -166,7 +166,7 @@ class AppShareView(TemplateView):
         reg = self.request.GET.get('reg')
 
         return {
-            'identifier': identifier,
+            'identifier': identifier.strip(),
             'reg': reg
         }
 
@@ -175,8 +175,8 @@ class AppShareRegView(TemplateView):
     template_name = 'app_share_reg.jade'
 
     def get_context_data(self, **kwargs):
-        identifier = self.request.GET.get('identifier')
-        friend_identifier = self.request.GET.get('friend_identifier')
+        identifier = self.request.GET.get('identifier').strip()
+        friend_identifier = self.request.GET.get('friend_identifier').strip()
 
         if friend_identifier:
             try:

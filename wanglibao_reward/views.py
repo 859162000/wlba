@@ -556,6 +556,10 @@ class WeixinShareDetailView(TemplateView):
         else:
             self.debug_msg('phone:%s 已经领取过奖品' %(phone_num,))
         gifts = self.get_distribute_status(order_id, activity)
+        #one = self.format_response_data(user_gift,'alone')
+        #all = self.format_response_data(gifts,'gifts')
+        #print "one"
+        #print "all"
         return {
             "ret_code": 0,
             "self_gift": self.format_response_data(user_gift, 'alone'),
@@ -595,7 +599,6 @@ class WeixinShareStartView(TemplateView):
                nick_name=nick_name,
                img=img_url
             )
-
         return {
             'ret_code': 9001,
             'openid': openid,
