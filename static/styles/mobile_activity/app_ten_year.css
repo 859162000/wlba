@@ -1050,34 +1050,34 @@ img{
 }
 @-webkit-keyframes s7fly_start{
     0%{
-        top: 18.8380282%;
-        right: 27.8125%;
-        -webkit-transform: rotate(10deg);
+        top: 73.6795775%;
+        left: 55.3125%;
+        -webkit-transform: rotate(190deg);
     }
     20%{
-        top: 20.8380282%;
-        right: 29.8125%;
-        -webkit-transform: rotate(50deg);
+        top: 76.6795775%;
+        left: 58.3125%;
+        -webkit-transform: rotate(230deg);
     }
     40%{
-        top: 20.8380282%;
-        right: 25.8125%;
-        -webkit-transform: rotate(30deg);
+        top: 71.6795775%;
+        left: 61.3125%;
+        -webkit-transform: rotate(210deg);
     }
     60%{
-        top: 19.8380282%;
-        right: 27.8125%;
-        -webkit-transform: rotate(10deg);
+        top: 69.6795775%;
+        left: 62.3125%;
+        -webkit-transform: rotate(190deg);
     }
     80%{
-        top: 17.8380282%;
-        right: 26.8125%;
-        -webkit-transform: rotate(40deg);
+        top: 70.6795775%;
+        left: 58.3125%;
+        -webkit-transform: rotate(170deg);
     }
     100%{
-        top: 18.8380282%;
-        right: 27.8125%;
-        -webkit-transform: rotate(0deg);
+        top: 73.6795775%;
+        left: 55.3125%;
+        -webkit-transform: rotate(180deg);
     }
 }
 .section7 .horn{
@@ -1235,34 +1235,34 @@ img{
 }
 @-webkit-keyframes s8fly_start{
     0%{
-        top: 18.8380282%;
-        right: 27.8125%;
-        -webkit-transform: rotate(10deg);
+        top: 57.2183099%;
+        left: 46.40625%;
+        -webkit-transform: rotate(170deg);
     }
     20%{
-        top: 20.8380282%;
-        right: 29.8125%;
-        -webkit-transform: rotate(50deg);
+        top: 60.2183099%;
+        left: 49.40625%;
+        -webkit-transform: rotate(230deg);
     }
     40%{
-        top: 20.8380282%;
-        right: 25.8125%;
-        -webkit-transform: rotate(30deg);
+        top: 59.2183099%;
+        left: 51.40625%;
+        -webkit-transform: rotate(210deg);
     }
     60%{
-        top: 19.8380282%;
-        right: 27.8125%;
-        -webkit-transform: rotate(10deg);
+        top: 60.2183099%;
+        left: 50.40625%;
+        -webkit-transform: rotate(190deg);
     }
     80%{
-        top: 17.8380282%;
-        right: 26.8125%;
-        -webkit-transform: rotate(40deg);
+        top: 58.2183099%;
+        left: 48.40625%;
+        -webkit-transform: rotate(200deg);
     }
     100%{
-        top: 18.8380282%;
-        right: 27.8125%;
-        -webkit-transform: rotate(0deg);
+        top: 57.2183099%;
+        left: 46.40625%;
+        -webkit-transform: rotate(170deg);
     }
 }
 .section8 .button{
