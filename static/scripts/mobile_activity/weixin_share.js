@@ -156,7 +156,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
     wx.ready(function(){
 
-        var host = 'https://staging.wanglibao.com',
+        var host = 'https://www.wanglibao.com',
             shareName = '有个红包一直拽在手里，今天我想要送给你',
             shareImg = host + '/static/imgs/mobile/share_logo.png',
             shareLink = host + '/activity/share/index/?parentPhone='+phoneNum,
