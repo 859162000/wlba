@@ -118,10 +118,12 @@ $(function(){
                 $('.section4 img,.section4 .line_img').not('.slideDown').addClass('animate');
             }
             if(index == 5){
+                $('.shadow').animate({'bottom':'0'},500);
                 $('.section4 img,.section4 .line_img,.section6 img,.section6 input').not('.slideDown').removeClass('animate');
                 $('.section5 .line_img,.section5 img').not('.slideDown').addClass('animate');
             }
             if(index == 6){
+                $('.shadow').animate({'bottom':'-5%'},500);
                 $('.section7 .horn').animate({'opacity':'0'},100);
                 $('.section5 img,.section5 .line_img,.section7 img,.section7 .text,.section7 .title').removeClass('animate');
                 $('.section6 img,.section6 input').not('.slideDown').addClass('animate');
@@ -137,21 +139,14 @@ $(function(){
                 }
             }
             if(index == 7){
-                $('.shadow').animate({'bottom':'0'},500);
                 $('.section7 .horn').delay(1000).animate({'opacity':'1'},500);
                 $('.section6 img,.section6 input,.section8 img,.button').not('.slideDown').removeClass('animate');
                 $('.section7 img,.section7 .text,.section7 .title').not('.slideDown').addClass('animate');
             }
             if(index == 8){
-                $('.shadow').animate({'bottom':'-5%'},500);
                 $('.section7 .horn').animate({'opacity':'0'},100);
                 $('.section7 img,.section7 .text,.section7 .title').not('.slideDown').removeClass('animate');
                 $('.section8 img,.button').not('.slideDown').addClass('animate');
-            }
-        },
-        onLeave: function(anchorLink, index) {
-            if(index == 8){
-                $('.shadow').animate({'bottom':'0'},500);
             }
         }
     })
