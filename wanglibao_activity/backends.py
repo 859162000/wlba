@@ -127,7 +127,9 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
         else:
             _check_buy_product(user, rule, device_type, amount, product_id, is_full)
     # 满标审核
+
     # 满标审核时,是给所有的持仓用户发放奖励,金额为持仓金额
+
     elif trigger_node == 'p2p_audit':
         # 根据product_id查询出该产品中所有的持仓用户
         equities = P2PEquity.objects.filter(product=product_id, confirm=True)
@@ -135,9 +137,11 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
             for equity in equities:
                 _send_gift(equity.user, rule, device_type, is_full, equity.equity)
     # 还款
+
     # 还款时,是给所有的持仓用户发放奖励,金额为还款本金
     elif trigger_node == 'repaid':
         _send_gift(user, rule, device_type, is_full, amount)
+
     else:
         return
 
