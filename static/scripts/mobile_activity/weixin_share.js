@@ -110,8 +110,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             shield.style.cssText="position:fixed;bottom:0;top:0;width:100%; background:rgba(0,0,0,0.5); z-index:1000000;";
             var alertFram = document.createElement("DIV");
             alertFram.id="alert-cont";
-            alertFram.style.cssText="position:fixed;bottom:4rem;left:50%; width:14rem; margin:-2.75rem 0 0 -7rem; background:#fafafa; border-radius:.3rem;z-index:1000001;";
-            strHtml = "<div id='alertTxt' class='popub-txt' style='color:#333;font-size: .9rem!important;padding: 0.8rem .75rem;'>"+txt+"</div>";
+            alertFram.style.cssText="position:fixed;bottom:20%;left:50%; width:14rem; margin:-2.75rem 0 0 -7rem; background:#fafafa; border-radius:.3rem;z-index:1000001;";
+            strHtml = "<div id='alertTxt' class='popub-txt' style='color:#333;font-size: .9rem!important;padding: 0.8rem .75rem;overflow-y:auto;height:15rem;margin-top:.3rem'>"+txt+"</div>";
             strHtml +=" <div class=\"popub-footer\" style=\"width: 100%;padding: .5rem 0;font-size: .9rem;text-align: center;color: #4391da;border-top: 1px solid #d8d8d8;border-bottom-left-radius: .25rem;border-bottom-right-radius: .25rem;\" onclick=\"doOk()\">确认</div>";
             alertFram.innerHTML = strHtml;
             document.body.appendChild(alertFram);
@@ -202,6 +202,8 @@ org.shareIndex = (function(org){
             lib.phoneFun();
             lib.receiveFun();
             lib.ruleSelect();
+            var height = window.innerHeight;
+            $('.share').css({'min-height': height});
         },
         phoneFun:function(){
             $('#iphone').on('focus',function(){
@@ -280,6 +282,10 @@ org.newUser = (function(org){
             $('#goRegister').on('click',function(){
                 window.location.href = 'weixin/regist/?parentPhone='+parentPhone+'&phone='+phone;
             })
+            var height = window.innerHeight;
+            if(height >= 1136){
+                $('.wanglibao').css({'margin-top':'20%'});
+            }
         },
         _getQueryStringByName:function(name){
             var result = location.search.match(new RegExp('[\?\&]' + name+ '=([^\&]+)','i'));
@@ -288,6 +294,20 @@ org.newUser = (function(org){
             }
             return result[1];
         }
+    }
+    return {
+        init :lib.init
+    }
+})(org);
+
+org.shareFun = (function(org){
+    var lib = {
+        init:function(){
+            var height = window.innerHeight;
+            if(height >= 1136){
+                $('.wanglibao').css({'margin-top':'20%'});
+            }
+        },
     }
     return {
         init :lib.init
