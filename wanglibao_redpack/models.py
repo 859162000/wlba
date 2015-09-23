@@ -15,6 +15,7 @@ PLATFORM = (
     ("ios", "ios"),
     ("android", "android"),
     ("pc", "pc"),
+    ("app", "移动端"),
 )
 
 

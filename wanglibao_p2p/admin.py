@@ -284,7 +284,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
                     'warrant_company', 'audit_link', 'preview_link', 'preview_contract', 'copy_link', 'priority')
     list_editable = ('priority',)
     list_filter = ('status', 'types', 'period')
-    search_fields = ('name', )
+    search_fields = ('name', 'serial_number', 'warrant_company__name')
     resource_class = P2PProductResource
     change_list_template = 'change_list.html'
     from_encoding = 'utf-8'

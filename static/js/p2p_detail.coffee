@@ -295,7 +295,9 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
     html.join ""
 
   page = 2
-  $('.get-more').click (e) ->
+  $target_more =  $('.get-more');
+  acount_product = $target_more.attr('data-total') * 1
+  $target_more.click (e) ->
     e.preventDefault()
     id = $(this).attr('data-product')
     $.post('/api/p2p/investrecord'
@@ -305,18 +307,16 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
       try
         invest_result = $.parseJSON(data)
         if(invest_result && invest_result.length > 0)
-          if(invest_result.length > 0)
-            if(math.ceil(invest_result.length/30) < page)
-              return $('.get-more').hide()
             $('.invest-history-table tbody').append(buildTable(invest_result))
-            $('.get-more').show()
-            page++
-
-          else
-            $('.get-more').hide()
-
+            if(Math.ceil(acount_product/30) <= page)
+              $target_more.hide()
+            else
+              $target_more.show()
+              page++
+        else
+          $target_more.hide()
       catch e
-        $('.get-more').hide()
+        $target_more.hide()
       return
   $(".xunlei-binding-modal").click () ->
     $('#xunlei-binding-modal').modal()

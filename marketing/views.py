@@ -785,7 +785,7 @@ def get_first_pay_info(user_id, start_time, end_time):
 
 class UserActivityStatusAPIView(APIView):
     """
-    官方主动注册用户活动状态查询接口
+    用户活动状态查询接口
     """
     permission_classes = (IsAuthenticated, )
 
@@ -827,32 +827,34 @@ class UserActivityStatusAPIView(APIView):
             pass
         return min_amount
 
-    def get_activity_first_cost_info(self, user_id, trigger_node, starttime, endtime):
-        # 获取用户活动期间内的首次支付以及首次投资的记录
+    def get_user_cost_info(self, user_id, trigger_node):
+        # 获取用户支付或投资的记录
         cost_info = None
-        try:
-            if trigger_node == 'first_pay':
-                cost_info = PayInfo.objects.filter(user_id=user_id, create_time__gte=starttime,
-                                                   create_time__lte=endtime).order_by('create_time')[0]
-            elif trigger_node == 'first_buy':
-                cost_info = EquityRecord.objects.filter(user_id=user_id, create_time__gte=starttime,
-                                                        create_time__lte=endtime).order_by('create_time')[0]
-        except:
-            pass
+        if trigger_node == 'first_pay':
+            cost_info = PayInfo.objects.filter(user_id=user_id)
+        elif trigger_node == 'first_buy':
+            cost_info = P2PRecord.objects.filter(user_id=user_id)
         return cost_info
 
-    def get_activity_user_validation_status(self, activity_record, user):
+    def get_activity_user_validation_status(self, activity_record, user, activity_starttime):
         # 判断用户是否在活动期间实名，并生成返回信息
+        userprofile = user.wanglibaouserprofile
         if activity_record:
             json_response = {
-                'ret_code': '10000',
+                'ret_code': '10001',
                 'message': u'用户已参加过活动'
             }
-        elif user.wanglibaouserprofile.id_is_valid:
-            json_response = {
-                'ret_code': '00003',
-                'message': u'实名时间不符合活动条件'
-            }
+        elif userprofile.id_is_valid:
+            if userprofile.id_valid_time < activity_starttime:
+                json_response = {
+                    'ret_code': '00003',
+                    'message': u'实名时间不符合活动条件'
+                }
+            else:
+                json_response = {
+                    'ret_code': '00001',
+                    'message': u'用户未参加活动，已达到活动条件'
+                }
         else:
             json_response = {
                 'ret_code': '00000',
@@ -864,7 +866,7 @@ class UserActivityStatusAPIView(APIView):
         # 判断用户是否在活动期间注册，并生成返回信息
         if activity_record:
             json_response = {
-                'ret_code': '10000',
+                'ret_code': '10001',
                 'message': u'用户已参加过活动'
             }
         else:
@@ -874,35 +876,58 @@ class UserActivityStatusAPIView(APIView):
             }
         return json_response
 
-    def get_activity_user_first_cost_status(self, activity_record, cost_record, activity_id, trigger_node):
-        # 判断用户是否在活动期间完成首次支付或者首投的动作，是否满足活动条件，并生成返回信息
-        amount = cost_record.amount if cost_record else None
+    def get_activity_user_first_cost_status(self, activity_record, activity_info,
+                                            cost_record, activity_id, trigger_node):
+        # 获取用户活动期间内的首次支付以及首次投资的记录
         json_response = {}
+        starttime = activity_info.start_at
+        endtime = activity_info.end_at
+        try:
+            frist_cost_record = cost_record.filter(create_time__gte=starttime,
+                                                   create_time__lte=endtime).order_by('create_time')[0]
+        except:
+            frist_cost_record = None
+
+        # 判断用户是否在活动期间完成首次支付或者首投的动作，是否满足活动条件，并生成返回信息
+        amount = frist_cost_record.amount if frist_cost_record else None
         if activity_record:
-            if cost_record:
+            if frist_cost_record:
                 json_response = {
-                    'ret_code': '10000',
+                    'ret_code': '10001',
                     'message': u'用户已参加活动',
                 }
         else:
             min_pay_amount = self.get_activitys_rule_min_amount(activity_id, trigger_node)
-            if cost_record:
+            if frist_cost_record:
                 if min_pay_amount and amount >= min_pay_amount:
                     json_response = {
-                        'ret_code': '00000',
+                        'ret_code': '00001',
                         'message': u'用户未参加活动，已达到活动条件',
                     }
                 else:
                     json_response = {
-                        'ret_code': '00001',
-                        'message': u'用户未参加活动且未达到活动条件',
+                        'ret_code': '00000',
+                        'message': u'用户未达到活动条件',
                     }
             else:
                 json_response = {
                     'ret_code': '00002',
-                    'message': u'用户没有开销记录',
+                    'message': u'用户活动期内没有开销记录',
                 }
         return json_response
+
+    def get_user_channel(self, user_id):
+        # 判断用户是否属于活动指定渠道用户
+        channel = Channels.objects.filter(introducedby__user_id=user_id).first()
+        if channel:
+            channel_code = channel.name
+            if not channel_code:
+                channel_code = 'wanglibao'
+        else:
+            channel_code = 'wanglibao-other'
+        return channel_code
+
+
 
     def get(self, request):
         activity_id = request.GET.get('activity_id', None)
@@ -913,7 +938,16 @@ class UserActivityStatusAPIView(APIView):
         json_response = self.check_params(activity_id, trigger_node)
         if not json_response:
             activity_info = self.get_activity_info(activity_id)
-            if not activity_info:
+            if activity_info:
+                channel_code = self.get_user_channel(user.id)
+                activity_channel = activity_info.channel
+                if not activity_info.is_all_channel:
+                    if activity_channel and channel_code not in activity_channel.split(','):
+                        json_response = {
+                            'ret_code': '00005',
+                            'message': u'非活动指定渠道用户'
+                        }
+            else:
                 json_response = {
                     'ret_code': '30002',
                     'message': u'不存在的activity_id'
@@ -925,12 +959,24 @@ class UserActivityStatusAPIView(APIView):
             if trigger_node == 'register':
                 json_response = self.get_activity_user_register_status(activity_record)
             elif trigger_node == 'validation':
-                json_response = self.get_activity_user_validation_status(activity_record, user)
+                json_response = self.get_activity_user_validation_status(activity_record, user,
+                                                                         activity_info.start_at)
             elif trigger_node in ('first_pay', 'first_buy'):
-                cost_record = self.get_activity_first_cost_info(user.id, trigger_node,
-                                                                activity_info.start_at, activity_info.end_at)
-                json_response = self.get_activity_user_first_cost_status(activity_record, cost_record,
-                                                                         activity_id, trigger_node)
+                cost_record = self.get_user_cost_info(user.id, trigger_node)
+                if cost_record.exists():
+                    if cost_record.filter(create_time__lt=activity_info.start_at).exists():
+                        json_response = {
+                            'ret_code': '00000',
+                            'message': u'用户未达到活动条件'
+                        }
+                    else:
+                        json_response = self.get_activity_user_first_cost_status(activity_record, activity_info,
+                                                                                 cost_record, activity_id, trigger_node)
+                else:
+                    json_response = {
+                        'ret_code': '00002',
+                        'message': u'用户没有开销记录'
+                    }
 
         if not json_response:
             json_response = {
@@ -1477,6 +1523,9 @@ class CommonAward(object):
 
         describe = 'common_september_' + str(int(join_log.amount))
         try:
+            print "*"*20
+            print describe
+            print "*"*20
             dt = timezone.datetime.now()
             redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
         except Exception, reason:
