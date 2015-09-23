@@ -356,15 +356,14 @@ class WeixinShareDetailView(TemplateView):
                 except Exception, reason:
                     self.exception_msg(reason, '组合红包入库报错')
 
-    def has_got_redpack(self, phone_num, activity, product_id):
+    def has_got_redpack(self, phone_num, activity, order_id):
         """
             判断用户是否已经领完奖品了
         """
         if not self.activity:
             self.activity = self.get_activity_by_id(activity)
         try:
-            user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=product_id, identity__in=str(phone_num), activity=self.activity).first()
-
+            user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity=str(phone_num), activity=self.activity).first()
             return user_gift
         except Exception, reason:
             self.exception_msg(reason, u'判断用户领奖，数据库查询出错')
@@ -448,7 +447,6 @@ class WeixinShareDetailView(TemplateView):
             return None
 
     def is_valid_user_auth(self, order_id, activity):
-        return True
         if not self.activity:
             self.get_activity_by_id(activity)
 
@@ -544,7 +542,7 @@ class WeixinShareDetailView(TemplateView):
         if not self.has_combine_redpack(order_id, activity):
             self.generate_combine_redpack(order_id, activity)
 
-        user_gift = self.has_got_redpack(phone_num, openid, activity, order_id)
+        user_gift = self.has_got_redpack(phone_num, activity, order_id)
 
         if not user_gift:
             self.debug_msg('phone:%s 没有领取过奖品' %(phone_num,) )
@@ -556,14 +554,6 @@ class WeixinShareDetailView(TemplateView):
                 return HttpResponseRedirect(redirect_url)
         else:
             self.debug_msg('phone:%s 已经领取过奖品' %(phone_num,))
-            gifts = self.get_distribute_status(order_id, activity)
-            redirect_url = reverse("weixin_has_got_reward")
-            render_to_response(redirect_url,
-                               {"ret_code": 0,
-                                "self_gift": self.format_response_data(user_gift, 'alone'),
-                                "all_gift": self.format_response_data(gifts, 'gifts')
-                               })
-
         gifts = self.get_distribute_status(order_id, activity)
         #one = self.format_response_data(user_gift,'alone')
         #all = self.format_response_data(gifts,'gifts')
@@ -586,11 +576,10 @@ class WeixinShareEndView(TemplateView):
 class WeixinShareStartView(TemplateView):
     template_name = 'app_weChatStart.jade'
 
-    def is_valid_user_auth(self, order_id):
+    def is_valid_user_auth(self, order_id, amount):
         try:
-            p2p_record = P2PRecord.objects.filter(order_id=order_id, amount__gte=1000)
-            return True
-            # return p2p_record
+            p2p_record = P2PRecord.objects.filter(order_id=order_id, amount__gte=amount)
+            return p2p_record
         except Exception, reason:
             logger.exception(u"判断用户投资额度抛异常 %s" %(reason,) )
             return None
@@ -618,15 +607,23 @@ class WeixinShareStartView(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         openid = self.request.GET.get('openid')
         order_id = self.request.GET.get('url_id')
-
-        if not self.is_valid_user_auth(order_id):
+        amount=1000
+        account_id=2
+        key = 'share_redpack'
+        shareconfig = Misc.objects.filter(key=key).first()
+        if shareconfig:
+            shareconfig = json.loads(shareconfig.value)
+            if type(shareconfig) == dict:
+                amount=int(shareconfig['amount'])
+                account_id=shareconfig['account_id']
+        if not self.is_valid_user_auth(order_id, amount) and False:
            data = {
                 'ret_code': 9000,
                 'message': u'用户投资没有达到%s元;' % (1000, ),
             }
            return HttpResponse(json.dumps(data), content_type='application/json')
         if not openid:
-            redirect_url = reverse('weixin_authorize_code')+'?url_id=%s' % order_id
+            redirect_url = reverse('weixin_authorize_code')+'?url_id=%s&state=%s' % (order_id, account_id)
             print redirect_url
             return HttpResponseRedirect(redirect_url)#redirect(redirect_url)
 
