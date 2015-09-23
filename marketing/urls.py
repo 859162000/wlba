@@ -81,14 +81,16 @@ urlpatterns += patterns(
     url(r'^app_colorpage/$', TemplateView.as_view(template_name="app_colorpage.jade")),
     url(r'^app_fullpage/$', TemplateView.as_view(template_name="app_fullpage.jade")),
     url(r'^gold_season/$', TemplateView.as_view(template_name="gold_season.jade")),
-
     url(r'^share/index/$', TemplateView.as_view(template_name="share_index.jade")),
     url(r'^share/code/$', TemplateView.as_view(template_name="share_code.jade")),
     url(r'^share/old/$', TemplateView.as_view(template_name="share_old_user.jade")),
     url(r'^share/new/$', TemplateView.as_view(template_name="share_new_user.jade")),
     url(r'^app_wechatstart/$', TemplateView.as_view(template_name="app_weChatStart.jade")),
     url(r'^app_wechatdetail/$', TemplateView.as_view(template_name="app_weChatDetail.jade")),
+    url(r'^app_wechatend/$', TemplateView.as_view(template_name="app_weChatEnd.jade")),
+    url(r'^app_ten_year/$', TemplateView.as_view(template_name="app_ten_year.jade")),
     url(r'^app_recommended/$', TemplateView.as_view(template_name="app_recommended.jade")),
+
 )
 
 urlpatterns += patterns(

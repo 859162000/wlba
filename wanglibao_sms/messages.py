@@ -186,7 +186,7 @@ def sms_alert_invest(name):
 @suffix_td
 def sms_alert_invite(name, phone):
     return u"邀请注册：您的好友{}邀请您加入网利宝一起投资赚钱，注册就有惊喜。速速点击专属链接：" \
-           u"https://www.wanglibao.com/activity/wap/share?phone={}".format(name, phone)
+           u"https://www.wanglibao.com/activity/wap/share?phone={} ".format(name, phone)
 
 
 def msg_give_coupon(name, amount, end_time):
@@ -199,4 +199,4 @@ def msg_give_coupon(name, amount, end_time):
 
 if __name__ == "__main__":
     print sms_alert_invest('test')
-    print sms_alert_invite('test', '12000000000')
+    print sms_alert_invite('test', '15038038823')
