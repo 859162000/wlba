@@ -1,8 +1,6 @@
 $(function(){
     var mp3 = document.getElementById("music");
-    mp3.load(function(){
-        mp3.play();
-    });
+    mp3.play();
 	var mp3_open = true;
 	$('#play').click(function(){
 		if(mp3_open){
