@@ -239,6 +239,7 @@ org.weChatStart = (function(org){
                 }
 
                 if(!lib._checkPhone(ops.phone)) return ;
+
                 window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
             });
 

@@ -1,0 +1,82 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    link(rel="stylesheet",href="/static/stylesheets/recommended.css")
+  body(style="background:#ee744f")
+    include include/activityTop2
+    .recommended
+    .recommended-main
+      .recommended-center
+        .recommended-centertop
+          .centertop-left
+            img(src='/static/imgs/pc_activity/recommended/recommended-piao1.png')
+          .centertop-right
+            h3 30元红包
+            p
+              |邀请好友成功注册并实名，邀请人直送30元红包
+              span （app专享）
+        .recommended-centermiddle
+          .centermiddle-left
+            h3 520元红包
+            p 受邀成功被邀请人最高可获得520元红包
+          .centermiddle-right
+            img(src='/static/imgs/pc_activity/recommended/recommended-piao.png')
+        .recommended-centerhuojian
+          p 送钱，就是这么任性
+        .recommended-centerfooter
+          dl
+            dt.centerfooter
+            dd 邀请好友
+          dl
+            dt.centerfooteroo ＞
+          dl
+            dt.centerfooter.centerfooter1
+            dd 成功注册并认证
+          dl
+            dt.centerfooteroo ＞
+          dl
+            dt.centerfooter.centerfooter2
+            dd 获得30元现金红包
+          dl
+            dt.centerfooteroo ＞
+          dl
+            dt.centerfooter.centerfooter3
+            dd 投资可提现
+        .recommended-centerfoo
+          img(src='/static/imgs/pc_activity/recommended/recommended-die.png').feidie
+          h3 拒绝死工资，全民来淘金
+          p 邀请好友不仅立送现金，好友投资更有现金返现！
+        .recommended-centerbutton
+          p 立即戳一戳，围观推荐好友赚现金升级版：前往全民淘金季
+          a(href='/activity/gold_season/') 全民来淘金
+        .recommended-centerguizhe
+          h3 推荐福利攻略
+          ul
+            li 1、邀请人送30元现金红包（投资1000元可直减使用，APP专享发放、使用）；
+            li 2、被邀请人注册并实名认证成功即获得20元红包（投资1000元可直减使用）；
+            li 3、被邀请人首次充值（充值金额≥100元）成功即获得100元红包（投资2000元可直减使用，APP专享发放、使用）；
+            li 4、新手首次投资满额即可获得红包奖励，规则如下：
+              p
+                span &nbsp&nbsp&nbsp·
+                |用户首次投资单笔达到10,000元以上（包含）即获得200元红包（二次投资20000元可直减使用，APP专享发放、使用）；
+              p
+                span &nbsp&nbsp&nbsp·
+                |用户首次投资单笔达到20,000元以上（包含）即获得400元红包（二次投资40000元可直减使用，APP专享发放、使用）。
+        .recommended-centergui
+          h3 红包使用规则
+          ul
+            li 1、活动时间9月16日-9月30日；
+            li 2、手机号为网利宝唯一账户，被邀请人完成注册并实名认证，即建立邀请关系；
+            li 3、红包统一以站内信形式通知，完成一次投资回款后即可取现，每个红包仅限使用一次，无论是否有余额均失效；
+            li 4、邀请送30元红包限手机端发放和投资使用；被邀请人所获红包使用方法详情请见推荐福利攻略板块；
+            li 5、被邀请人首次单笔投资满额所赠红包为直抵红包，二次投资时可用，红包有使用限额；
+            li 7、本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑。
+              p *网利宝对此活动享有最终解释权
+    .footer(style="margin-top:0")
+      include include/tracking
+

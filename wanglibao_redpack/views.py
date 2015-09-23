@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.response import Response
+from wanglibao_redpack.backends import give_activity_redpack
 from wanglibao_redpack.models import RedPack, RedPackRecord, RedPackEvent
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
@@ -74,3 +75,18 @@ class RedPacketSelectAPIView(APIView):
             return Response({"ret_code": 3001, "message": u"产品ID错误"})
         result = backends.get_interest_coupon(user, product_id)
         return Response(result)
+
+class ApplyRedPacketAPIView(APIView):
+    """
+    用户主动领取某个红包活动的红包
+    """
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        #必填
+        user = request.user
+        event = request.DATA.get("redpack_event_name")
+        #选填
+        device_type = request.DATA.get("device_type", "all")
+        status, message = give_activity_redpack(user, event, device_type, just_one_packet=True)
+        return Response(dict(status=status, message=message))

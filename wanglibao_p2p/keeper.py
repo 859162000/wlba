@@ -20,6 +20,7 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_redpack.models import RedPackRecord
+from wanglibao_activity import backends as activity_backends
 import re
 
 logger = logging.getLogger(__name__)
@@ -525,6 +526,9 @@ class AmortizationKeeper(KeeperBaseMixin):
 
                 self.__tracer(catalog, sub_amo.user, sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
                               amortization, description, sub_amo.coupon_interest)
+
+                # 标的每一期还款完成后,检测该用户还款的金额是否有符合活动的规则,有的话触发活动规则
+                activity_backends.check_activity(sub_amo.user, 'repaid', 'pc', sub_amo.principal)
 
             amortization.settled = True
             amortization.save()

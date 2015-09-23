@@ -86,6 +86,15 @@
       }
     })
 
+    $.ajax({
+        url: "/api/redpacket/apply/",
+        type: "POST",
+        data: {redpack_event_name:'2015中秋节80000加息券'}
+      }).done(function(date) {
+        console.log(date)
+
+      })
+
   });
 
 }).call(this);
