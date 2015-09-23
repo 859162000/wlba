@@ -137,19 +137,21 @@ $(function(){
                 }
             }
             if(index == 7){
+                $('.shadow').animate({'bottom':'0'},500);
                 $('.section7 .horn').delay(1000).animate({'opacity':'1'},500);
                 $('.section6 img,.section6 input,.section8 img,.button').not('.slideDown').removeClass('animate');
                 $('.section7 img,.section7 .text,.section7 .title').not('.slideDown').addClass('animate');
             }
             if(index == 8){
+                $('.shadow').animate({'bottom':'-5%'},500);
                 $('.section7 .horn').animate({'opacity':'0'},100);
                 $('.section7 img,.section7 .text,.section7 .title').not('.slideDown').removeClass('animate');
                 $('.section8 img,.button').not('.slideDown').addClass('animate');
             }
         },
         onLeave: function(anchorLink, index) {
-            if(index == 7){
-                //$('.section7 .horn').delay(1000).animate({'opacity':'0'},100);
+            if(index == 8){
+                $('.shadow').animate({'bottom':'0'},500);
             }
         }
     })
