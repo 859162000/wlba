@@ -7,7 +7,7 @@ block content
     img(src='/static/imgs/mobile_activity/app_wechat/default_user.png').default-img
     .default-message
       .message-icon
-      .message-body 哎呦你的手气还不错哦，快去使用吧，和我一起变身土豪。
+      .message-body 哎呦你的手气还不错哦，快去使用吧，和我一起变身土豪。{{all_gift}}
 
   .webchat-redpack-detail
     img(src='/static/imgs/mobile_activity/app_wechat/redpack.png').detail-redpack
@@ -39,6 +39,7 @@ block content
               span.fried-name {{gift.name}}&nbsp
               span.take-time {{gift.time}}
             .friend-taking {{gift.message}}
+
           dd.item-right
             em#amount.friend-list {{gift.amount}}%
             span.jiaxi-text 加息券
