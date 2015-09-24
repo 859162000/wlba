@@ -32,7 +32,7 @@ urlpatterns = patterns(
     url(r'^gold/$', TemplateView.as_view(template_name="gold.jade"), name='marketing_gold'),
     url(r'^qixi/$', TemplateView.as_view(template_name="qixi.jade")),
     url(r'^xunlei_setp/$', TemplateView.as_view(template_name="xunlei_setp.jade")),
-    url(r'^mid-autumn/$', TemplateView.as_view(template_name="mid-autumn.jade")),
+    url(r'^mid_autumn/$', TemplateView.as_view(template_name="mid-autumn.jade")),
 
     url(r'^anniversary/$', TemplateView.as_view(template_name="anniversary.jade")),
     url(r'^app_anniversary/$', TemplateView.as_view(template_name="app_anniversary.jade")),
@@ -43,6 +43,7 @@ urlpatterns = patterns(
     url(r'^web-view/$', TemplateView.as_view(template_name="webView.html")),
     url(r'^android-view/$', TemplateView.as_view(template_name="android_view.html")),
     url(r'^new_user/$', TemplateView.as_view(template_name="new_user.jade")),
+    url(r'^recommended/$', TemplateView.as_view(template_name="recommended.jade")),
 
 )
 
@@ -80,7 +81,6 @@ urlpatterns += patterns(
     url(r'^app_colorpage/$', TemplateView.as_view(template_name="app_colorpage.jade")),
     url(r'^app_fullpage/$', TemplateView.as_view(template_name="app_fullpage.jade")),
     url(r'^gold_season/$', TemplateView.as_view(template_name="gold_season.jade")),
-
     url(r'^share/index/$', TemplateView.as_view(template_name="share_index.jade")),
     url(r'^share/code/$', TemplateView.as_view(template_name="share_code.jade")),
     url(r'^share/old/$', TemplateView.as_view(template_name="share_old_user.jade")),
@@ -88,6 +88,10 @@ urlpatterns += patterns(
     url(r'^app_wechatstart/$', TemplateView.as_view(template_name="app_weChatStart.jade")),
     url(r'^app_wechatdetail/$', TemplateView.as_view(template_name="app_weChatDetail.jade")),
     url(r'^app_wechatend/$', TemplateView.as_view(template_name="app_weChatEnd.jade")),
+    url(r'^h5_mid_autumn/$', TemplateView.as_view(template_name="h5_mid_autumn.jade")),
+    url(r'^app_mid_autumn/$', TemplateView.as_view(template_name="app_mid_autumn.jade")),
+    url(r'^app_ten_year/$', TemplateView.as_view(template_name="app_ten_year.jade")),
+    url(r'^app_recommended/$', TemplateView.as_view(template_name="app_recommended.jade")),
 )
 
 urlpatterns += patterns(

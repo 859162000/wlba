@@ -47,6 +47,7 @@ from django.http import HttpResponseRedirect
 from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
 from marketing.tops import Top
 from marketing import tools
+from marketing.models import PromotionToken
 from django.conf import settings
 from wanglibao_account.models import Binding
 from wanglibao_anti.anti.anti import AntiForAllClient
@@ -255,8 +256,14 @@ class RegisterAPIView(APIView):
         #    invite_code = "baidushouji"
 
         
-        if not invite_code:
-            invite_code = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
+        # Modify by hb on 2015-09-21
+        if not invite_code or invite_code==u'weixin':
+            invite_phone = request.DATA.get('invite_phone', "")
+            if invite_phone:
+                invite_code = PromotionToken.objects.filter(user__wanglibaouserprofile__phone=invite_phone).first()
+                logger.error("invite_phone=[%s], invite_code=[%s]" % (invite_phone, invite_code))
+            if not invite_code:
+                invite_code = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
            
         if invite_code:
             try:
@@ -276,6 +283,7 @@ class RegisterAPIView(APIView):
             set_promo_user(request, user, invitecode=invite_code)
             # 外呼系统登记信息
             save_to_binding(user, request)
+            
 
         if device['device_type'] == "pc":
             auth_user = authenticate(identifier=identifier, password=password)
