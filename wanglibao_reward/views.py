@@ -409,7 +409,7 @@ class WeixinShareDetailView(TemplateView):
                     logger.debug("send redpack Exception, msg:%s" % (reason,))
 
                 if redpack_event:
-                    redpack_backends.give_activity_redpack(self.request.user, redpack_event, 'pc')
+                    redpack_backends.give_activity_redpack(user_profile.user, redpack_event, 'pc')
                     sending_gift.valid = 1
                     sending_gift.save()
 
