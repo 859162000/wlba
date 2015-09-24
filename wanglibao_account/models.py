@@ -179,11 +179,11 @@ class UserSource(models.Model):
 
 class UserPhoneBook(models.Model):
     user = models.ForeignKey(User)
-    phone = models.CharField(max_length=64, blank=True, help_text=u'通讯录电话')
+    phone = models.CharField(max_length=64, blank=True, help_text=u'通讯录电话', db_index=True)
     name = models.CharField(max_length=50, blank=True, verbose_name=u"姓名")
     is_register = models.BooleanField(default=False, verbose_name=u"是否注册")
     is_invite = models.BooleanField(default=False, verbose_name=u"是否邀请")
-    invite_at = models.DateTimeField(null=True, blank=True, verbose_name=u'最后一次邀请提醒时间')
+    invite_at = models.DateTimeField(null=True, blank=True, verbose_name=u'最后一次邀请提醒时间', db_index=True)
     alert_at = models.DateTimeField(null=True, blank=True, verbose_name=u'最后一次投资提醒时间')
     created_at = models.DateTimeField(auto_now_add=True, default=timezone.now())
     is_used = models.BooleanField(default=True, verbose_name=u"是否使用", help_text=u'默认使用')

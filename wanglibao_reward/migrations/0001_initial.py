@@ -15,6 +15,7 @@ class Migration(SchemaMigration):
             ('chances', self.gf('django.db.models.fields.IntegerField')(default=3)),
             ('when_register', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
             ('terminal_type', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('amount', self.gf('django.db.models.fields.IntegerField')(default=0)),
         ))
         db.send_create_signal(u'wanglibao_reward', ['WanglibaoActivityGiftGlobalCfg'])
 
@@ -41,25 +42,26 @@ class Migration(SchemaMigration):
         db.create_table(u'wanglibao_reward_wanglibaousergift', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('activity', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_activity.Activity'])),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['auth.User'])),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['auth.User'], null=True)),
             ('rules', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['wanglibao_reward.WanglibaoActivityGift'])),
-            ('identity', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('identity', self.gf('django.db.models.fields.CharField')(max_length=64)),
             ('index', self.gf('django.db.models.fields.IntegerField')(default=0)),
             ('type', self.gf('django.db.models.fields.IntegerField')(default=0)),
             ('name', self.gf('django.db.models.fields.CharField')(default=u'\u7ea2\u5305', max_length=128)),
             ('valid', self.gf('django.db.models.fields.BooleanField')(default=True)),
             ('amount', self.gf('django.db.models.fields.FloatField')(default=0)),
+            ('get_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
         ))
         db.send_create_signal(u'wanglibao_reward', ['WanglibaoUserGift'])
 
         # Adding model 'WanglibaoWeixinRelative'
         db.create_table(u'wanglibao_reward_wanglibaoweixinrelative', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['auth.User'])),
-            ('phone', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['auth.User'], null=True, on_delete=models.SET_NULL, blank=True)),
+            ('phone', self.gf('django.db.models.fields.CharField')(default='', max_length=32)),
             ('nick_name', self.gf('django.db.models.fields.CharField')(default=u'', max_length=128)),
             ('openid', self.gf('django.db.models.fields.CharField')(default=u'', max_length=128)),
-            ('img', self.gf('django.db.models.fields.files.ImageField')(max_length=100)),
+            ('img', self.gf('django.db.models.fields.CharField')(default=u'', max_length=255)),
         ))
         db.send_create_signal(u'wanglibao_reward', ['WanglibaoWeixinRelative'])
 
@@ -189,6 +191,7 @@ class Migration(SchemaMigration):
         u'wanglibao_reward.wanglibaoactivitygiftglobalcfg': {
             'Meta': {'object_name': 'WanglibaoActivityGiftGlobalCfg'},
             'activity': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['wanglibao_activity.Activity']"}),
+            'amount': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'chances': ('django.db.models.fields.IntegerField', [], {'default': '3'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'terminal_type': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
@@ -198,23 +201,24 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'WanglibaoUserGift'},
             'activity': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_activity.Activity']"}),
             'amount': ('django.db.models.fields.FloatField', [], {'default': '0'}),
+            'get_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'identity': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'identity': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
             'index': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'name': ('django.db.models.fields.CharField', [], {'default': "u'\\u7ea2\\u5305'", 'max_length': '128'}),
             'rules': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['wanglibao_reward.WanglibaoActivityGift']"}),
             'type': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['auth.User']"}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['auth.User']", 'null': 'True'}),
             'valid': ('django.db.models.fields.BooleanField', [], {'default': 'True'})
         },
         u'wanglibao_reward.wanglibaoweixinrelative': {
             'Meta': {'object_name': 'WanglibaoWeixinRelative'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'img': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
+            'img': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '255'}),
             'nick_name': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '128'}),
             'openid': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '128'}),
-            'phone': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['auth.User']"})
+            'phone': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '32'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': u"orm['auth.User']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'})
         }
     }
 

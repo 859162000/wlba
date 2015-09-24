@@ -6,7 +6,7 @@ from django.conf import settings
 
 
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ('name', 'classify', 'connect_url', 'connect_token', 'oauth_login_url', 'manage_url')
+    list_display = ('id', 'name', 'classify', 'connect_url', 'connect_token', 'oauth_login_url', 'manage_url')
     search_fields = ('name',)
     fields = ('name', 'classify', 'app_id', 'app_secret')
 

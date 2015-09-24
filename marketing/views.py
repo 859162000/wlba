@@ -167,7 +167,7 @@ class AppShareView(TemplateView):
         reg = self.request.GET.get('reg')
 
         return {
-            'identifier': identifier,
+            'identifier': identifier.strip(),
             'reg': reg
         }
 
@@ -176,8 +176,8 @@ class AppShareRegView(TemplateView):
     template_name = 'app_share_reg.jade'
 
     def get_context_data(self, **kwargs):
-        identifier = self.request.GET.get('identifier')
-        friend_identifier = self.request.GET.get('friend_identifier')
+        identifier = self.request.GET.get('identifier').strip()
+        friend_identifier = self.request.GET.get('friend_identifier').strip()
 
         if friend_identifier:
             try:
@@ -1521,9 +1521,6 @@ class CommonAward(object):
 
         describe = 'common_september_' + str(int(join_log.amount))
         try:
-            print "*"*20
-            print describe
-            print "*"*20
             dt = timezone.datetime.now()
             redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
         except Exception, reason:
