@@ -28,7 +28,7 @@ from weixin.wechatpy import WeChatClient, parse_message, create_reply
 from weixin.wechatpy.replies import TransferCustomerServiceReply
 from weixin.wechatpy.utils import check_signature
 from weixin.wechatpy.exceptions import InvalidSignatureException, WeChatException,WeChatOAuthException
-from wanglibao_reward.models import WanglibaoUserGift
+from wanglibao_reward.models import WanglibaoUserGift, WanglibaoWeixinRelative, WanglibaoActivityGift
 from weixin.wechatpy.oauth import WeChatOAuth
 from weixin.common.decorators import weixin_api_error
 from weixin.common.wx import generate_js_wxpay
@@ -38,7 +38,6 @@ from decimal import Decimal
 from wanglibao_pay.models import Card
 from marketing.models import Channels
 from marketing.utils import get_channel_record
-from wanglibao_reward.models import WanglibaoWeixinRelative
 import datetime
 import json
 import time
@@ -702,7 +701,10 @@ class AuthorizeUser(APIView):
                     logger.debug("获得用户授权openid is: %s, phone is :%s" %(openid,phone))
                     logger.debug("product id:%s" %(url_id))
                     user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=url_id, identity__in=phone,).first()
-                    logger.debug("用户抽奖信息是：%s" % (user_gift))
+                    logger.debug("用户抽奖信息是：%s" % (user_gift,))
+                    counts = WanglibaoActivityGift.objects.filter(gift_id=url_id, valid=False).count()
+                    if counts == 10:
+                        return redirect("/weixin_activity/share/end/")
                     if not user_gift and phone:
                         #如果用户已经了，直接跳转到详情页
                         logger.debug("openid:%s, phone:%s, product_id:%s,用户已经存在了，直接跳转页面" %(openid, phone, url_id,))
