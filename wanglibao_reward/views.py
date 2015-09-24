@@ -603,7 +603,7 @@ class WeixinShareStartView(TemplateView):
             'ret_code': 9001,
             'openid': openid,
             'order_id': order_id,
-            'phone': record.phone if record else u'None',
+            'phone': record.phone if record else '',
         }
 
     def dispatch(self, request, *args, **kwargs):
