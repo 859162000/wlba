@@ -24,6 +24,7 @@ from misc.models import Misc
 from django.views.generic import TemplateView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from marketing.utils import get_user_channel_record
 
 logger = logging.getLogger('wanglibao_reward')
 
@@ -105,15 +106,14 @@ class WanglibaoReward(object):
         else:
             channels = channels.channel.split(",")
 
-        record = IntroducedBy.objects.filter(user_id=self.request.user.id).first()
-
+        record = get_user_channel_record(self.request.user.id)
         if not record:
             to_json_response = {
                 'ret_code': 3001,
                 'message': u'非渠道用户',
             }
         else:
-            if record.channel.name not in channels:
+            if record.name not in channels:
                 to_json_response = {
                     'ret_code': 3002,
                     'message': u'渠道用户不是从对应的渠道过来',
@@ -391,6 +391,7 @@ class WeixinShareDetailView(TemplateView):
                 identity=phone_num,
                 activity=self.activity,
                 amount=gift.redpack.amount,
+                type=gift.type,
                 valid=0,
             )
             WanglibaoUserGift.objects.create(
@@ -399,6 +400,7 @@ class WeixinShareDetailView(TemplateView):
                 identity=openid,
                 activity=self.activity,
                 amount=gift.redpack.amount,
+                type=gift.type,
                 valid=2,
             )
             if user_profile:
@@ -409,7 +411,7 @@ class WeixinShareDetailView(TemplateView):
                     logger.debug("send redpack Exception, msg:%s" % (reason,))
 
                 if redpack_event:
-                    redpack_backends.give_activity_redpack(self.request.user, redpack_event, 'pc')
+                    redpack_backends.give_activity_redpack(user_profile.user, redpack_event, 'pc')
                     sending_gift.valid = 1
                     sending_gift.save()
 
@@ -417,7 +419,7 @@ class WeixinShareDetailView(TemplateView):
         else:
             return 'No Reward'
 
-    def get_distribute_status(self, product_id, activity):
+    def get_distribute_status(self, order_id, activity):
             """
                 获得用户领奖信息
             """
@@ -425,7 +427,7 @@ class WeixinShareDetailView(TemplateView):
                 self.get_activity_by_id(activity)
 
             try:
-                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=product_id, activity=self.activity, valid__in=(0, 1)).all()
+                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity, valid__in=(0, 1)).all()
                 return gifts
             except Exception, reason:
                 self.exception_msg(reason, u'获取已领奖用户信息失败')
@@ -537,7 +539,11 @@ class WeixinShareDetailView(TemplateView):
         else:
             activitys = activitys.split(",")
             index = int(time.time()) % len(activitys)
-            record = WanglibaoActivityGift.objects.filter(gift_id=order_id).first()
+            try:
+                record = WanglibaoActivityGift.objects.filter(gift_id=order_id).first()
+            except Exception, reason:
+                record = None
+                self.exception_msg("获得activity报异常， order_id:%s" %(order_id,), reason)
             activity = record.activity.code if record else activitys[index]
             logger.debug("misc配置的activity有:%s, 本次使用的activity是：%s" % (activitys, activity))
 
@@ -592,11 +598,14 @@ class WeixinShareStartView(TemplateView):
         record = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
 
         if not record:
+            logger.debug('入库微信授权信息, nick_name:%s, openid:%s, img:%s ' %(nick_name, openid, img_url))
             WanglibaoWeixinRelative.objects.create(
                openid=openid,
                nick_name=nick_name,
                img=img_url
             )
+        else:
+            logger.debug('微信授权信息很早就已经入库, nick_name:%s, openid:%s, img:%s ' %(nick_name, openid, img_url))
         return {
             'ret_code': 9001,
             'openid': openid,
