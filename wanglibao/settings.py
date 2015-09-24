@@ -46,6 +46,7 @@ ENV = ENV_DEV
 
 if ENV != ENV_DEV:
     DEBUG = False
+DEBUG = True
 
 ADMINS = (
     ('Shuo Li', 'lishuo@wanglibank.com'),
@@ -1023,4 +1024,8 @@ REDIS_DB = 0
 # NEVER_REDIS_TIMEOUT = 365*24*60*60
 AMORIZATION_AES_IV = '8'*16
 AMORIZATION_AES_KEY = 'tpuyk8#3*09a@!ds8$j6wg$$.r!$pb7h'
-WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
+if ENV == ENV_PRODUCTION:
+    WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
+else:
+    WEIXIN_CALLBACK_URL = 'https://staging.wanglibao.com'
+

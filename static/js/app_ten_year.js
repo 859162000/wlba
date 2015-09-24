@@ -1,19 +1,19 @@
 $(function(){
+    var mp3 = document.getElementById("music"),play = $('#play');
+    play.on('click', function (e) {
+        if (mp3.paused) {
+            mp3.play();
+            $('#play').addClass('play_music').removeClass('close_music');
+        } else {
+            mp3.pause();
+            $('#play').addClass('close_music').removeClass('play_music');
+        }
+    });
 
-    var mp3 = document.getElementById("music");
     mp3.play();
-	var mp3_open = true;
-	$('#play').click(function(){
-		if(mp3_open){
-			mp3.pause();
-			mp3_open = false;
-			$('#play').addClass('close_music').removeClass('play_music');
-		}else{
-			mp3.play();
-			mp3_open = true;
-			$('#play').addClass('play_music').removeClass('close_music');
-		}
-	});
+    $(document).one('touchstart', function () {
+        mp3.play();
+    });
 
     $('.section3 .line').load(function(){
         var s3line_height = $('.section3 .line').height();
@@ -118,10 +118,12 @@ $(function(){
                 $('.section4 img,.section4 .line_img').not('.slideDown').addClass('animate');
             }
             if(index == 5){
+                $('.shadow').animate({'opacity':'1'},500);
                 $('.section4 img,.section4 .line_img,.section6 img,.section6 input').not('.slideDown').removeClass('animate');
                 $('.section5 .line_img,.section5 img').not('.slideDown').addClass('animate');
             }
             if(index == 6){
+                $('.shadow').animate({'opacity':'0'},500);
                 $('.section7 .horn').animate({'opacity':'0'},100);
                 $('.section5 img,.section5 .line_img,.section7 img,.section7 .text,.section7 .title').removeClass('animate');
                 $('.section6 img,.section6 input').not('.slideDown').addClass('animate');
@@ -137,21 +139,14 @@ $(function(){
                 }
             }
             if(index == 7){
-                $('.shadow').animate({'bottom':'0'},500);
                 $('.section7 .horn').delay(1000).animate({'opacity':'1'},500);
                 $('.section6 img,.section6 input,.section8 img,.button').not('.slideDown').removeClass('animate');
                 $('.section7 img,.section7 .text,.section7 .title').not('.slideDown').addClass('animate');
             }
             if(index == 8){
-                $('.shadow').animate({'bottom':'-5%'},500);
                 $('.section7 .horn').animate({'opacity':'0'},100);
                 $('.section7 img,.section7 .text,.section7 .title').not('.slideDown').removeClass('animate');
                 $('.section8 img,.button').not('.slideDown').addClass('animate');
-            }
-        },
-        onLeave: function(anchorLink, index) {
-            if(index == 8){
-                $('.shadow').animate({'bottom':'0'},500);
             }
         }
     })

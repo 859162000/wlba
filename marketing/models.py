@@ -98,6 +98,73 @@ class Channels(models.Model):
     def __unicode__(self):
         return self.name
 
+
+class ChannelsNew(models.Model):
+    """
+        渠道信息
+    """
+    _FROM = (
+        ('full', u'全平台'),
+        ('pc', u'电脑端'),
+        ('mobile', u'移动端'),
+        ('ios', u'苹果'),
+        ('android', u'安卓'),
+        ('ios+pc', u'苹果和电脑端'),
+        ('android+pc', u'安卓和电脑端')
+    )
+
+    _CLASS = (
+        ('----', '----'),
+        ('CPC', u'按点击计费'),
+        ('CPD', u'按天计费'),
+        ('CPT', u'按时间计费'),
+        ('CPA', u'按行为计费'),
+        ('CPS', u'按销售计费')
+    )
+
+    _STATUS = (
+        (0, u'正常'),
+        (1, u'暂停拉新'),
+        (2, u'暂停合作')
+    )
+
+    _CALLBACK = (
+        ('register', u'注册'),
+        ('validation', u'实名'),
+        ('binding', u'绑卡'),
+        ('first_investment', u'首投'),
+        ('investment', u'投资'),
+        ('first_pay', u'首充'),
+        ('pay', u'充值')
+    )
+
+    code = models.CharField(u'渠道代码', max_length=12, db_index=True, unique=True)
+    name = models.CharField(u'渠道名字', max_length=20, default="")
+    description = models.CharField(u'渠道描述', max_length=50, default="", blank=True)
+    coop_status = models.IntegerField(u'合作状态', max_length=2, default='coop', choices=_STATUS)
+    classification = models.CharField(u'渠道分类', max_length=20, default="----", choices=_CLASS)
+    platform = models.CharField(u'渠道平台', max_length=20, default="full", choices=_FROM)
+    start_at = models.DateTimeField(u'合作开始时间', blank=True, null=True, help_text=u'*可为空')
+    end_at = models.DateTimeField(u'合作结束时间', blank=True, null=True, help_text=u'*可为空')
+    created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
+    image = models.ImageField(upload_to='channel', blank=True, default='',
+                              verbose_name=u'渠道图片', help_text=u'主要用于渠道落地页的banner图片')
+    is_abandoned = models.BooleanField(u'是否废弃', default=False)
+
+    class Meta:
+        verbose_name_plural = u"渠道_新"
+
+    def clean(self):
+        if len(self.code) == 6:
+            raise ValidationError(u'为避免和邀请码重复，渠道代码长度不能等于6位')
+
+        if self.classification == '----':
+            raise ValidationError(u'请选择渠道分类')
+
+    def __unicode__(self):
+        return self.name
+
+
 class IntroducedBy(models.Model):
     """ user: 被邀请人
         introduced_by: 邀请人
@@ -151,6 +218,7 @@ class TimelySiteData(models.Model):
     class Meta:
         ordering = ['-created_at']
         verbose_name_plural = u'交易数据'
+
 
 class ActivityRule(models.Model):
     """ author: hetao
@@ -375,69 +443,3 @@ class WanglibaoActivityReward(models.Model):
         verbose_name = u'网利宝发奖活动表'
         verbose_name_plural = u'网利宝发奖活动表'
 
-
-class ChannelsNew(models.Model):
-    """
-        渠道信息
-    """
-    _FROM = (
-        ('full', u'全平台'),
-        ('pc', u'电脑端'),
-        ('mobile', u'移动端'),
-        ('ios', u'苹果'),
-        ('android', u'安卓'),
-        ('ios+pc', u'苹果和电脑端'),
-        ('android+pc', u'安卓和电脑端')
-    )
-
-    _CLASS = (
-        ('----', '----'),
-        ('CPC', u'按点击计费'),
-        ('CPD', u'按天计费'),
-        ('CPT', u'按时间计费'),
-        ('CPA', u'按行为计费'),
-        ('CPS', u'按销售计费')
-    )
-
-    _STATUS = (
-        ('regular', u'正常'),
-        ('stop_new', u'暂停拉新'),
-        ('stop_coop', u'暂停合作')
-    )
-
-    _CALLBACK = (
-        ('register', u'注册'),
-        ('validation', u'实名'),
-        ('binding', u'绑卡'),
-        ('first_investment', u'首投'),
-        ('investment', u'投资'),
-        ('first_pay', u'首充'),
-        ('pay', u'充值')
-    )
-
-    code = models.CharField(u'渠道代码', max_length=12, db_index=True, unique=True)
-    name = models.CharField(u'渠道名字', max_length=20, default="")
-    description = models.CharField(u'渠道描述', max_length=50, default="", blank=True)
-    coop_status = models.CharField(u'合作状态', max_length=20, default='coop', choices=_STATUS)
-    classification = models.CharField(u'渠道分类', max_length=20, default="----", choices=_CLASS)
-    platform = models.CharField(u'渠道平台', max_length=20, default="full", choices=_FROM)
-    callback = models.CharField(u'渠道回调', max_length=100, choices=_CALLBACK)#, choices=_CALLBACK
-    start_at = models.DateTimeField(u'合作开始时间', blank=True, null=True, help_text=u'*可为空')
-    end_at = models.DateTimeField(u'合作结束时间', blank=True, null=True, help_text=u'*可为空')
-    created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
-    image = models.ImageField(upload_to='channel', blank=True, default='',
-                              verbose_name=u'渠道图片', help_text=u'主要用于渠道落地页的banner图片')
-    is_abandoned = models.BooleanField(u'是否废弃', default=False)
-
-    class Meta:
-        verbose_name_plural = u"渠道_新"
-
-    def clean(self):
-        if len(self.code) == 6:
-            raise ValidationError(u'为避免和邀请码重复，渠道代码长度不能等于6位')
-
-    def __unicode__(self):
-        return self.name
-
-    # def save(self, force_insert=False, force_update=False, using=None,
-    #          update_fields=None):
