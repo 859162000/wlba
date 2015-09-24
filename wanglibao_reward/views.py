@@ -25,7 +25,7 @@ from django.views.generic import TemplateView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from marketing.utils import get_user_channel_record
-
+from django.shortcuts import redirect
 logger = logging.getLogger('wanglibao_reward')
 
 def ajax_response_reward(request):
@@ -562,7 +562,7 @@ class WeixinShareDetailView(TemplateView):
             if "No Reward" == user_gift:
                 self.debug_msg('奖品已经发完了，用户:%s 没有领到奖品' %(phone_num,))
                 redirect_url = reverse('weixin_share_end')
-                return HttpResponseRedirect(redirect_url)
+                return redirect(redirect_url)
         else:
             self.debug_msg('phone:%s 已经领取过奖品' %(phone_num,))
         gifts = self.get_distribute_status(order_id, activity)
