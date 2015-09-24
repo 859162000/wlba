@@ -36,6 +36,7 @@ from .common.wechat import tuling
 from decimal import Decimal
 from wanglibao_pay.models import Card
 from marketing.models import Channels
+from marketing.utils import get_channel_record
 import datetime
 import json
 import time
@@ -168,7 +169,7 @@ class WeixinRegister(TemplateView):
             token = 'weixin'
 
         if token:
-            channel = Channels.objects.filter(code=token).first()
+            channel = get_channel_record(token)
         else:
             channel = None
         phone = self.request.GET.get('phone', 0)
