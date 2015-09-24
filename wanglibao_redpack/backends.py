@@ -74,12 +74,14 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                 if redpack.status == "invalid":
                     continue
                 event = x.redpack.event
-                redpack_period = int(event.period)
                 p2p_types_id = 0
                 p2p_types_name = ''
                 if product:
-                    if redpack_period > 0:
-                        if redpack_period != int(product['period']):
+                    if event.period != '' or event.period != 0:
+                        redpack_period = event.period.split(',')
+                        redpack_period = [int(period) for period in redpack_period if period.strip() != ""]
+                        product_period = product['period']
+                        if redpack_period and redpack_period[0] != 0 and (product_period not in redpack_period):
                             continue
                     if event.p2p_types:
                         p2p_types_id = int(event.p2p_types.id)
@@ -121,10 +123,13 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                     if redpack.status == 'invalid':
                         continue
                     event = coupon.redpack.event
-                    redpack_period = int(event.period)
-                    if redpack_period > 0:
-                        if redpack_period != int(product['period']):
-                            continue
+                    if product:
+                        if event.period != "" or event.period != 0:
+                            coupon_period = event.period.split(',')
+                            coupon_period = [int(period) for period in coupon_period if period.strip() != ""]
+                            product_period = product['period']
+                            if coupon_period and coupon_period[0] != 0 and (product_period not in coupon_period):
+                                continue
 
                     if event.p2p_types:
                         p2p_types_id = int(event.p2p_types.id)

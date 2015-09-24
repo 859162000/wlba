@@ -9,7 +9,7 @@ from wanglibao_pay.models import Card, PayInfo
 from wanglibao_profile.models import WanglibaoUserProfile
 import time
 import json
-import logging
+# import logging
 
 #最多重试三次
 from wanglibao_rest.utils import split_ua
@@ -100,7 +100,7 @@ def trade_pwd_set(user_id,
         {'ret_code':4, 'message': '用户ID错误，无法获取用户身份'}
         {'ret_code':5, 'message': '交易密码条件验证成功'}
     '''
-    logging.getLogger('django').error('trade request set pass %s %s'%(user_id, new_trade_pwd))
+    # logging.getLogger('django').error('trade request set pass %s %s'%(user_id, new_trade_pwd))
     profile = WanglibaoUserProfile.objects.filter(user_id=user_id).first()
     if not profile:
         return {'ret_code':4, 'message': '用户ID错误，无法获取用户身份'}
@@ -196,7 +196,7 @@ def _is_version_satisfied(request):
         #     "channel_id":arr[2], "model":arr[1],
         #     "os_version":arr[3], "network":arr[4]}
     device = split_ua(request)
-    logging.getLogger('django').error('trade request device %s'%device)
+    # logging.getLogger('django').error('trade request device %s'%device)
     if device['device_type'] == 'ios' and _above_version(device['app_version'], '2.6.0'):
         # 2.6.0版本起，支持交易密码
         return True
@@ -222,7 +222,7 @@ def require_trade_pwd(view_func):
     '''
     @wraps(view_func, assigned=available_attrs(view_func))
     def _wrapped_view(self, request, *args, **kwargs):
-        logging.getLogger('django').error('trade request POST %s header %s'%(request.POST, request.META))
+        # logging.getLogger('django').error('trade request POST %s header %s'%(request.POST, request.META))
         no_need_trade_pwd = False
         #为了获取验证码
         if request.path == reverse('deposit-new') and len(request.POST.get('card_no', '')) != 10:
@@ -232,11 +232,11 @@ def require_trade_pwd(view_func):
             no_need_trade_pwd = True
         if not _is_version_satisfied(request):
             no_need_trade_pwd = True
-        logging.getLogger('django').error('trade request no_need_trade_pwd %s'%no_need_trade_pwd)
+        # logging.getLogger('django').error('trade request no_need_trade_pwd %s'%no_need_trade_pwd)
         if no_need_trade_pwd:
             return view_func(self, request, *args, **kwargs)
 
-        logging.getLogger('django').error('trade request user %s pwd %s %s'%(request.user.id, request.POST.get('trade_pwd'), len(request.POST.get('trade_pwd'))))
+        # logging.getLogger('django').error('trade request user %s pwd %s %s'%(request.user.id, request.POST.get('trade_pwd'), len(request.POST.get('trade_pwd'))))
         check_result = trade_pwd_check(request.user.id, request.POST.get('trade_pwd', ''))
         if check_result.get('ret_code') == 0 :
             return view_func(self, request, *args, **kwargs)

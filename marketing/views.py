@@ -43,6 +43,7 @@ from wanglibao_activity.models import ActivityRecord, Activity, ActivityRule
 from wanglibao_account import message as inside_message
 from wanglibao_pay.models import PayInfo
 from wanglibao_activity.models import TRIGGER_NODE
+from marketing.utils import get_user_channel_record
 from wanglibao_p2p.models import EquityRecord
 from wanglibao_profile.models import WanglibaoUserProfile
 import logging
@@ -653,9 +654,7 @@ def ajax_post(request):
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-    record = IntroducedBy.objects.filter(user_id=user.id).first()
-    if record:
-        record = Channels.objects.filter(id=record.channel_id).first()
+    record = get_user_channel_record(user.id)
     if not record or (record and record.name != 'xunlei9'):
         to_json_response = {
             'ret_code': 4000,
@@ -918,16 +917,15 @@ class UserActivityStatusAPIView(APIView):
 
     def get_user_channel(self, user_id):
         # 判断用户是否属于活动指定渠道用户
-        channel = Channels.objects.filter(introducedby__user_id=user_id).first()
-        if channel:
-            channel_code = channel.name
-            if not channel_code:
-                channel_code = 'wanglibao'
+        Introducedby = IntroducedBy.objects.filter(user_id=user_id)
+        if Introducedby:
+            if Introducedby.channel:
+                channel_name = Introducedby.channel.name
+            if not Introducedby.channel_id:
+                channel_name = 'wanglibao'
         else:
-            channel_code = 'wanglibao-other'
-        return channel_code
-
-
+            channel_name = 'wanglibao-other'
+        return channel_name
 
     def get(self, request):
         activity_id = request.GET.get('activity_id', None)
