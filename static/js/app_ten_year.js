@@ -1,4 +1,60 @@
 $(function(){
+    var loading = $('#loadPage');
+
+        var queue = new createjs.LoadQueue();
+        queue.on('progress', function () {
+            var num = Math.floor(queue.progress * 100);
+            $('.process').text(num + '%');
+        }, this);
+        queue.on('complete', function () {
+            loading.remove();
+        }, this);
+        queue.loadManifest([
+            {id: 'image1', src: '/static/imgs/mobile_activity/app_ten_year/bg.jpg'},
+            {id: 'image2', src: '/static/imgs/mobile_activity/app_ten_year/big_theme.png'},
+            {id: 'image3', src: '/static/imgs/mobile_activity/app_ten_year/mask.png'},
+            {id: 'image4', src: '/static/imgs/mobile_activity/app_ten_year/meteor1.png'},
+            {id: 'image5', src: '/static/imgs/mobile_activity/app_ten_year/meteor2.png'},
+            {id: 'image6', src: '/static/imgs/mobile_activity/app_ten_year/music.png'},
+            {id: 'image7', src: '/static/imgs/mobile_activity/app_ten_year/page1_text1.png'},
+            {id: 'image8', src: '/static/imgs/mobile_activity/app_ten_year/page1_text2.png'},
+            {id: 'image9', src: '/static/imgs/mobile_activity/app_ten_year/page2_img1.png'},
+            {id: 'image10', src: '/static/imgs/mobile_activity/app_ten_year/page2_img2.png'},
+            {id: 'image11', src: '/static/imgs/mobile_activity/app_ten_year/page2_img11.png'},
+            {id: 'image12', src: '/static/imgs/mobile_activity/app_ten_year/page2_img21.png'},
+            {id: 'image13', src: '/static/imgs/mobile_activity/app_ten_year/page2_shadow.png'},
+            {id: 'image14', src: '/static/imgs/mobile_activity/app_ten_year/page2_text.png'},
+            {id: 'image15', src: '/static/imgs/mobile_activity/app_ten_year/page3_boy.png'},
+            {id: 'image16', src: '/static/imgs/mobile_activity/app_ten_year/page3_boy2.png'},
+            {id: 'image17', src: '/static/imgs/mobile_activity/app_ten_year/page3_line.png'},
+            {id: 'image18', src: '/static/imgs/mobile_activity/app_ten_year/page3_man.png'},
+            {id: 'image19', src: '/static/imgs/mobile_activity/app_ten_year/page3_talk.png'},
+            {id: 'image20', src: '/static/imgs/mobile_activity/app_ten_year/page4_line.png'},
+            {id: 'image21', src: '/static/imgs/mobile_activity/app_ten_year/page4_man1.png'},
+            {id: 'image22', src: '/static/imgs/mobile_activity/app_ten_year/page4_man2.png'},
+            {id: 'image23', src: '/static/imgs/mobile_activity/app_ten_year/page4_man12.png'},
+            {id: 'image24', src: '/static/imgs/mobile_activity/app_ten_year/page4_math.png'},
+            {id: 'image25', src: '/static/imgs/mobile_activity/app_ten_year/page4_talk.png'},
+            {id: 'image26', src: '/static/imgs/mobile_activity/app_ten_year/page5_bamboo.png'},
+            {id: 'image27', src: '/static/imgs/mobile_activity/app_ten_year/page5_line.png'},
+            {id: 'image28', src: '/static/imgs/mobile_activity/app_ten_year/page5_talk.png'},
+            {id: 'image29', src: '/static/imgs/mobile_activity/app_ten_year/page5_woman1.png'},
+            {id: 'image30', src: '/static/imgs/mobile_activity/app_ten_year/page5_woman2.png'},
+            {id: 'image31', src: '/static/imgs/mobile_activity/app_ten_year/page5_woman12.png'},
+            {id: 'image32', src: '/static/imgs/mobile_activity/app_ten_year/page6_fly.png'},
+            {id: 'image33', src: '/static/imgs/mobile_activity/app_ten_year/page6_img1.png'},
+            {id: 'image34', src: '/static/imgs/mobile_activity/app_ten_year/page6_img2.png'},
+            {id: 'image35', src: '/static/imgs/mobile_activity/app_ten_year/page6_text.png'},
+            {id: 'image36', src: '/static/imgs/mobile_activity/app_ten_year/page7_img.png'},
+            {id: 'image37', src: '/static/imgs/mobile_activity/app_ten_year/page8_text1.png'},
+            {id: 'image38', src: '/static/imgs/mobile_activity/app_ten_year/page8_text2.png'},
+            {id: 'image39', src: '/static/imgs/mobile_activity/app_ten_year/shadow_bottom.png'},
+            {id: 'image40', src: '/static/imgs/mobile_activity/app_ten_year/slideDown.png'},
+            {id: 'image41', src: '/static/imgs/mobile_activity/app_ten_year/small_theme.png'},
+            {id: 'image42', src: '/static/imgs/mobile_activity/app_ten_year/ten_year.mp3'},
+            {id: 'image43', src: '/static/imgs/mobile_activity/app_ten_year/logo.png'}
+        ]);
+
     var mp3 = document.getElementById("music"),play = $('#play');
     play.on('click', function (e) {
         if (mp3.paused) {
