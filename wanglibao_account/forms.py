@@ -12,6 +12,7 @@ from wanglibao_account.models import VerifyCounter, IdVerification
 from wanglibao_sms.utils import validate_validation_code
 from marketing.models import InviteCode, PromotionToken, Channels
 from wanglibao_account.utils import mlgb_md5
+from marketing.utils import get_channel_record
 
 User = get_user_model()
 
@@ -119,7 +120,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
 
         if invite_code:
             try:
-                record = Channels.objects.filter(code=invite_code).first()
+                record = get_channel_record(invite_code)
                 if not record:
                     #p = PromotionToken.objects.get(token=invite_code)
                     p = PromotionToken.objects.filter(token=invite_code).first()
