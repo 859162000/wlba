@@ -39,6 +39,11 @@ class ContractTemplate(models.Model):
     content = models.TextField(u'模板内容（真实合同）', default='')
     content_preview = models.TextField(verbose_name=u'模板内容（预览合同）', default='')
 
+    def copy_link(self):
+        return u'<a href="/p2p/ct/copy/%s" target="_blank">复制</a>' % str(self.id)
+    copy_link.short_description = u'复制'
+    copy_link.allow_tags = True
+
     class Meta:
         verbose_name = u'借款合同'
         verbose_name_plural = u'借款合同'
@@ -178,7 +183,7 @@ class P2PProduct(ProductBase):
     extra_data = JSONFieldUtf8(blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
 
     publish_time = models.DateTimeField(default=lambda: timezone.now() + timezone.timedelta(days=10), verbose_name=u'发布时间*', blank=False)
-    end_time = models.DateTimeField(default=lambda: timezone.now() + timezone.timedelta(days=17), verbose_name=u'终止时间*', blank=False)
+    end_time = models.DateTimeField(default=lambda: timezone.now() + timezone.timedelta(days=20), verbose_name=u'终止时间*', blank=False)
     soldout_time = models.DateTimeField(u'售完时间', null=True, blank=True)
 
     make_loans_time = models.DateTimeField(u'放款时间', null=True, blank=True)

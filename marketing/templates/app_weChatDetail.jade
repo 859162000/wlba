@@ -1,0 +1,48 @@
+extends ./app_weChatBase
+
+
+block content
+
+  .default-user
+    img(src='/static/imgs/mobile_activity/app_wechat/default_user.png').default-img
+    .default-message
+      .message-icon
+      .message-body 哎呦你的手气还不错哦，快去使用吧，和我一起变身土豪。
+
+  .webchat-redpack-detail
+    img(src='/static/imgs/mobile_activity/app_wechat/redpack.png').detail-redpack
+    .redpack-message
+      em#amount {{self_gift.amount}}
+      em.baifen %
+      .amount-name 加息券
+
+  .webchat-redpack-result
+    p.result-amount 恭喜您抽到了
+      span {{self_gift.amount}}%
+      |的加息券
+    p.result-phone 加息券已存入
+      span {{self_gift.phone}}
+      |的账户下，注册登录后可查看
+  .webchat-submit-end
+    a(href="/activity/app_pc_download/").webpack-btn-red 立即使用
+
+  .webchar-friend-list
+    .webchar-list-head
+      span 看朋友们手气如何
+    .webchar-list-item
+      for gift in all_gift
+        dl
+          dt.item-start
+            img(src='{{gift.img}}')
+          dd.item-cont
+            .friend-warp
+              span.fried-name {{gift.name}}&nbsp
+              span.take-time {{gift.time}}
+            .friend-taking {{gift.message}}
+
+          dd.item-right
+            em#amount.friend-list {{gift.amount}}%
+            span.jiaxi-text 加息券
+  .webchar-deatil-footer
+    img(src='/static/imgs/mobile_activity/app_wechat/detail_footer.png')
+

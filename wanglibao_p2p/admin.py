@@ -15,7 +15,7 @@ from import_export import resources, fields
 from import_export.admin import ImportExportModelAdmin, ExportMixin
 from wanglibao_p2p.views import GenP2PUserProfileReport, AdminAmortization, AdminP2PList, AdminPrepayment
 from wanglibao.admin import ReadPermissionModelAdmin
-from wanglibao_p2p.forms import RequiredInlineFormSet
+from wanglibao_p2p.forms import RequiredInlineFormSet,ContractTemplateForm
 from wanglibao_account.models import UserAddress
 from wanglibao_p2p.tasks import automatic_trade
 
@@ -284,14 +284,12 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
                     'warrant_company', 'audit_link', 'preview_link', 'preview_contract', 'copy_link', 'priority')
     list_editable = ('priority',)
     list_filter = ('status', 'types', 'period')
-    search_fields = ('name',)
+    search_fields = ('name', 'serial_number', 'warrant_company__name')
     resource_class = P2PProductResource
     change_list_template = 'change_list.html'
     from_encoding = 'utf-8'
 
-
     form = P2PProductForm
-
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_p2p.view_p2pproduct'):
@@ -653,6 +651,8 @@ class AutomaticManagerAdmin(admin.ModelAdmin):
 
 class ContractTemplateAdmin(admin.ModelAdmin):
     actions = None
+    list_display = ('name', "copy_link")
+    form = ContractTemplateForm
 
     def has_delete_permission(self, request, obj=None):
         return False

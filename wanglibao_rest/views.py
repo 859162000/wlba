@@ -21,7 +21,7 @@ from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from marketing.models import PromotionToken, Channels, IntroducedBy
-from marketing.utils import set_promo_user
+from marketing.utils import set_promo_user, get_channel_record
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.cooperation import save_to_binding
 from wanglibao_account.utils import create_user
@@ -267,7 +267,7 @@ class RegisterAPIView(APIView):
            
         if invite_code:
             try:
-                record = Channels.objects.filter(code=invite_code).first()
+                record = get_channel_record(invite_code)
                 if not record:
                     p = PromotionToken.objects.filter(token=invite_code).first()
                     if not p:

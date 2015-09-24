@@ -8,7 +8,7 @@ from order.utils import OrderHelper
 
 from wanglibao.celery import app
 from wanglibao_margin.marginkeeper import MarginKeeper
-from wanglibao_p2p.models import P2PProduct, P2PRecord, Earning, ProductAmortization
+from wanglibao_p2p.models import P2PProduct, P2PRecord, Earning, ProductAmortization, ProductType
 from wanglibao_p2p.trade import P2POperator
 from wanglibao_p2p.automatic import Automatic
 from django.db.models import Sum, Q

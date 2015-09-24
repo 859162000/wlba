@@ -12,7 +12,7 @@ from wanglibao_account.views import (UserViewSet, ResetPasswordAPI, FundInfoAPIV
                             AddressGetAPIView, AccountInviteAPIView, MessageListAPIView,
                             MessageCountAPIView, MessageDetailAPIView,
                             AutomaticApiView, AccountInviteHikeAPIView,AccountInviteAllGoldAPIView,
-                            AccountInviteIncomeAPIView)
+                            AccountInviteIncomeAPIView, password_change,  PasswordCheckView)
 from wanglibao_bank_financing.views import BankFinancingViewSet, BankViewSet
 from wanglibao_banner.views import BannerViewSet
 from wanglibao_buy.views import TradeInfoViewSet, DailyIncomeViewSet, TotalIncome
@@ -35,7 +35,7 @@ from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView,
 
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
-from wanglibao_profile.views import ProfileView
+from wanglibao_profile.views import ProfileView, TradePasswordView
 from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView, 
                             UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
                             WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
@@ -52,7 +52,9 @@ from marketing.play_list import InvestmentHistory
 from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView,
                              ThousandRedPackCountAPIView, ThunderActivityRewardCounter, ThunderAwardAPIView,)
 from weixin.views import P2PListWeixin
+from wanglibao_account.views import three_order_view, three_order_query_view
 from marketing.views import UserActivityStatusAPIView
+
 
 router = DefaultRouter()
 
@@ -104,6 +106,7 @@ urlpatterns = patterns(
     url(r'^register/wx/$', WeixinRegisterAPIView.as_view()),
     url(r'^change_password/$', ChangePasswordAPIView.as_view()),
     url(r'^reset_password/$', ResetPasswordAPI.as_view()),
+    url(r'^check_password/$', PasswordCheckView.as_view()),
     url(r'captcha_validation/(?P<phone>\d{11})/$', CaptchaValidationCodeView.as_view()),
     url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
     url(r'^phone_validation_code/register/(?P<phone>\d{11})/$', SendRegisterValidationCodeView.as_view()),
@@ -167,8 +170,8 @@ urlpatterns = patterns(
     # 切换支付渠道重新
     url(r'^pay/cnp/list_new/$', BindCardQueryView.as_view()),
     url(r'^pay/cnp/delete_new/$', UnbindCardView.as_view()),
-    url(r'^pay/cnp/dynnum_new/$', BindPayDynnumNewView.as_view()),
-    url(r'^pay/deposit_new/$', BindPayDepositView.as_view()),
+    url(r'^pay/cnp/dynnum_new/$', BindPayDynnumNewView.as_view(), name='dynnum-new'),
+    url(r'^pay/deposit_new/$', BindPayDepositView.as_view(), name='deposit-new'),
     url(r'^pay/cnp/yee/callback/$', YeeShortPayCallbackView.as_view(), name="yee-deposit-callback"),
 
     #url(r'^pay/deposit/callback/$', KuaiPayCallbackView.as_view(), name="kuai-deposit-callback"),
@@ -210,6 +213,7 @@ urlpatterns = patterns(
     url(r'^gesture/update/$', GestureUpdateView.as_view()),
     url(r'^gesture/isenabled/$', GestureIsEnabledView.as_view()),
     url(r'^xunlei/8/check/$', GuestCheckView.as_view()),
+    url(r'^trade_pwd/$', TradePasswordView.as_view()),
 )
 
 urlpatterns += patterns('',
@@ -244,6 +248,13 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^m/', include('wanglibao_app.urls')),
+)
+
+# 第三方渠道业务接口
+urlpatterns += patterns(
+    '',
+    url(r'^coop/order/receive/$', three_order_view),
+    url(r'^coop/order/query/', three_order_query_view),
 )
 
 # 用户活动状态查询接口

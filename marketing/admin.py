@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin
+from django import forms
 from django.utils import timezone
 
 from views import AggregateView, MarketingView, TvView, TopsView, IntroducedAwardTemplate, YaoView
 from play_list import InvestmentRewardView
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, \
-    Activity, ActivityRule, Reward, RewardRecord, Channels, IntroducedByReward, PlayList, ActivityJoinLog, WanglibaoActivityReward
+    Activity, ActivityRule, Reward, RewardRecord, Channels, ChannelsNew, IntroducedByReward, PlayList, \
+    ActivityJoinLog, WanglibaoActivityReward
 from marketing.views import GennaeratorCode
 
 from import_export import resources
@@ -255,6 +257,17 @@ class WanglibaoActivityRewardAdmin(admin.ModelAdmin):
     list_display = ('user', 'total_chances', 'used_chances', 'total_awards', 'used_awards')
     readonly_fields = ('user', 'total_chances', 'total_awards', )
 
+
+class ChannelsNewAdmin(admin.ModelAdmin):
+    actions = None
+    list_display = ("id", "code", "name", "description")
+    search_fields = ("name",)
+    list_filter = ("name",)
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 admin.site.register(WanglibaoActivityReward, WanglibaoActivityRewardAdmin)  # add by Yihen@20150901
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
 admin.site.register(SiteData, SiteDataAdmin)
@@ -267,6 +280,7 @@ admin.site.register(Reward, RewardAdmin)
 admin.site.register(RewardRecord, RewardRecordAdmin)
 #admin.site.register(ClientData, ClientDataAdmin)
 admin.site.register(Channels, ChannelsAdmin)
+admin.site.register(ChannelsNew, ChannelsNewAdmin)
 admin.site.register(IntroducedByReward, IntroducedByRewardAdmin)
 admin.site.register(ActivityJoinLog, ActivityJoinLogAdmin)
 admin.site.register(PlayList, PlayListAdmin)

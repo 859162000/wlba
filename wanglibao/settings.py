@@ -46,6 +46,7 @@ ENV = ENV_DEV
 
 if ENV != ENV_DEV:
     DEBUG = False
+DEBUG = True
 
 ADMINS = (
     ('Shuo Li', 'lishuo@wanglibank.com'),
@@ -114,6 +115,7 @@ INSTALLED_APPS = (
     'weixin',
     'wanglibao_app',
     'wanglibao_anti', #add by yihen@20150813, anti module added
+    'wanglibao_reward', #add by yihen@20150910
     'report',
     'misc',
 
@@ -370,7 +372,13 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': '/var/log/wanglibao/marketing.log',
             'formatter': 'verbose'
-        }
+        },
+        'wanglibao_reward':{  #add by yihen@20150915
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/wanglibao_reward.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
@@ -428,6 +436,10 @@ LOGGING = {
         },
         'marketing': {
             'handlers': ['marketing', 'console'],
+            'level': 'DEBUG'
+        },
+        'wanglibao_reward': { #add by yihen@20150915
+            'handlers': ['wanglibao_reward', 'console'],
             'level': 'DEBUG'
         },
     }
@@ -780,6 +792,12 @@ CKEDITOR_CONFIGS = {
             ['Smiley', 'SpecialChar'],
         ],
         'toolbar': 'custom',
+    },
+    "mini":{
+        'entities':False,
+        'toolbar': [
+                {'items': ['Source']},
+            ]
     }
 }
 
@@ -887,7 +905,7 @@ ZHONGJIN_UPDATE_TIMEDELTA = timedelta(hours=1)
 WLB_FOR_JINSHAN_KEY = '1994'
 JINSHAN_CALL_BACK_URL = 'https://vip.wps.cn/task/api/reward'
 
-# 外呼
+# 上海外呼
 WLB_FOR_SHLS_KEY = '1995'
 
 # 南京外呼
@@ -941,27 +959,34 @@ ZHITUI_CALL_BACK_URL = 'http://api.zhitui.com/wanglibao/recive.php'
 
 # 中国电信
 WLB_FOR_ZGDX_KEY = '2001'
+ZGDX_QUERY_INTERFACE_URL = 'http://182.140.241.47:8080/ESB/flowService.do'
 if ENV == ENV_PRODUCTION:
-    ZGDX_CALL_BACK_URL = 'http://118.123.170.72:8888/fps/flowService.do'
-    ZGDX_PARTNER_NO = '100054374'
+    ZGDX_CALL_BACK_URL = 'http://182.140.241.47:8080/fps/flowService.do'
+    ZGDX_PARTNER_NO = '102139887'
     ZGDX_SERVICE_CODE = 'FS0001'
-    ZGDX_CONTRACT_ID = 'test20150901165440'
-    ZGDX_ACTIVITY_ID = '100785'
-    ZGDX_PLAT_OFFER_ID = '103050'
-    ZGDX_KEY = 'H5gOs1ZshKZ6WikN'
-    ZGDX_IV = '8888159601152533'
+    ZGDX_CONTRACT_ID = '101062'
+    ZGDX_ACTIVITY_ID = '102292'
+    ZGDX_KEY = 'hwDmXQLqdzJ4wozz'
+    ZGDX_IV = '7988680669963722'
 else:
     ZGDX_CALL_BACK_URL = 'http://118.123.170.72:8888/fps/flowService.do'
     ZGDX_PARTNER_NO = '100054374'
     ZGDX_SERVICE_CODE = 'FS0001'
     ZGDX_CONTRACT_ID = 'test20150901165440'
     ZGDX_ACTIVITY_ID = '100785'
-    ZGDX_PLAT_OFFER_ID = '103050'
     ZGDX_KEY = 'H5gOs1ZshKZ6WikN'
     ZGDX_IV = '8888159601152533'
 
 # 对第三方回调做IP鉴权所信任的IP列表
-TRUST_IP = []
+if ENV == ENV_PRODUCTION:
+    local_ip = None
+else:
+    local_ip = '127.0.0.1'
+TRUST_IP = [
+    local_ip,
+    # 中国电信出口ip
+    '182.140.241.10',
+]
 
 SUIT_CONFIG = {
     'LIST_PER_PAGE': 100
@@ -997,3 +1022,9 @@ REDIS_DB = 0
 # NEVER_REDIS_TIMEOUT = 365*24*60*60
 AMORIZATION_AES_IV = '8'*16
 AMORIZATION_AES_KEY = 'tpuyk8#3*09a@!ds8$j6wg$$.r!$pb7h'
+THREE_DEFAULT_CHANNEL_CODE = 'wanglibao-three'
+if ENV == ENV_PRODUCTION:
+    WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
+else:
+    WEIXIN_CALLBACK_URL = 'https://staging.wanglibao.com'
+

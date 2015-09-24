@@ -157,7 +157,8 @@ urlpatterns += patterns(
 # 微信
 urlpatterns += patterns(
     '',
-    url(r'weixin/', include('weixin.urls'))
+    url(r'weixin/', include('weixin.urls')),
+    url(r'weixin_activity/', include('wanglibao_reward.urls')),
 )
 
 if settings.DEBUG:

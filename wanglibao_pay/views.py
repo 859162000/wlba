@@ -35,6 +35,7 @@ import decimal
 from wanglibao_pay.serializers import CardSerializer
 from wanglibao_pay.util import get_client_ip
 from wanglibao_pay import util
+from wanglibao_profile.backends import require_trade_pwd
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
@@ -217,7 +218,8 @@ class WithdrawCompleteView(TemplateView):
             amount = decimal.Decimal(amount_str). \
                 quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
             margin = self.request.user.margin.margin
-            if amount > 50000 or amount <= 0:
+            # Modify by hb on 2015-09-23 for 50000 => 100000
+            if amount > 100000 or amount <= 0:
                 raise decimal.DecimalException
             if amount < 50:
                 if amount != margin:
@@ -263,7 +265,7 @@ class WithdrawCompleteView(TemplateView):
                 "mtype": "withdraw"
             })
         except decimal.DecimalException:
-            result = u'提款金额在0～50000之间'
+            result = u'提款金额在0～100000之间'
         except Card.DoesNotExist:
             result = u'请选择有效的银行卡'
         except MarginLack as e:
@@ -629,6 +631,7 @@ class AdminTransactionDeposit(TemplateView):
 class YeePayAppPayView(APIView):
     permission_classes = (IsAuthenticated, )
 
+    @require_trade_pwd
     def post(self, request):
         yeepay = third_pay.YeePay()
         result = yeepay.app_pay(request)
@@ -766,6 +769,7 @@ class TradeRecordAPIView(APIView):
 class WithdrawAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
+    @require_trade_pwd
     def post(self, request):
         result = third_pay.withdraw(request)
         if not result['ret_code']:
@@ -806,6 +810,7 @@ class BindPayDepositView(APIView):
     """ 获取验证码或快捷支付 """
     permission_classes = (IsAuthenticated, )
 
+    @require_trade_pwd
     def post(self, request):
         result = third_pay.bind_pay_deposit(request)
         return Response(result)
@@ -814,6 +819,7 @@ class BindPayDynnumNewView(APIView):
     """ 确认支付 """
     permission_classes = (IsAuthenticated, )
 
+    @require_trade_pwd
     def post(self, request):
         result = third_pay.bind_pay_dynnum(request)
         return Response(result)

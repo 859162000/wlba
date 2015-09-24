@@ -185,8 +185,9 @@ def withdraw(request):
     amount = util.fmt_two_amount(amount)
     if len(str(amount)) > 20:
         return {"ret_code":20068, 'message':'金额格式错误，大于100元且为100倍数'}
-    if not 0 <= amount <= 50000:
-        return {"ret_code":20064, 'message':u'提款金额在0～50000之间'}
+    # Modify by hb on 2015-09-23 for 50000 => 100000
+    if not 0 <= amount <= 100000:
+        return {"ret_code":20064, 'message':u'提款金额在0～100000之间'}
 
     margin = user.margin.margin
     if amount > margin:
@@ -392,6 +393,14 @@ def bind_pay_deposit(request):
 
     if not bank:
         return {"ret_code": 20002, "message": "银行ID不正确"}
+
+    amount = request.DATA.get('amount', '').strip()
+    try:
+        amount = float(amount)
+        if amount < 0:
+            raise ValueError()
+    except:
+        return {"ret_code": 20114, 'message': '金额格式错误'}
 
     if bank.channel == 'huifu':
         return HuifuShortPay().pre_pay(request)

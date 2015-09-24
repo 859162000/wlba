@@ -27,7 +27,7 @@ from wanglibao_p2p.prepayment import PrepaymentHistory
 from wanglibao_p2p.forms import PurchaseForm, BillForm
 from wanglibao_p2p.keeper import ProductKeeper, EquityKeeperDecorator
 from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, Warrant, UserAmortization, \
-    P2PProductContract, InterestPrecisionBalance, P2PRecord
+    P2PProductContract, InterestPrecisionBalance, P2PRecord, ContractTemplate
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
 from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags, AmortizationCalculator
@@ -43,6 +43,7 @@ from django.contrib import messages
 from django.shortcuts import redirect, render_to_response
 #from marketing.tops import Top
 from order.utils import OrderHelper
+from wanglibao_profile.backends import require_trade_pwd
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from exceptions import PrepaymentException
@@ -51,6 +52,9 @@ import re
 from celery.execute import send_task
 from wanglibao_redis.backend import redis_backend
 import pickle
+from misc.models import Misc
+import json
+from wanglibao_activity import backends as activity_backends
 
 
 class P2PDetailView(TemplateView):
@@ -207,6 +211,7 @@ class PurchaseP2PMobile(APIView):
     def allowed_methods(self):
         return ['POST']
 
+    @require_trade_pwd
     def post(self, request):
 
         if not request.user.is_authenticated():
@@ -242,9 +247,31 @@ class PurchaseP2PMobile(APIView):
             try:
                 trader = P2PTrader(product=p2p, user=request.user, request=request)
                 product_info, margin_info, equity_info = trader.purchase(amount, redpack)
+                order_id = margin_info.order_id
+                shareShow=0
+                key = 'share_redpack'
+                url = ""
+                shareTitle=""
+                shareContent=""
+                shareconfig = Misc.objects.filter(key=key).first()
+                if shareconfig:
+                    shareconfig = json.loads(shareconfig.value)
+                    if type(shareconfig) == dict:
+                        is_open = shareconfig.get('is_open', 'false')
+                        shareTitle=shareconfig.get('share_title', "")
+                        shareContent=shareconfig.get('share_content', "")
+                        if is_open=='true':
+                            amount = Decimal(shareconfig.get('amount', 1000))
+                            if product_info.amount >= amount:
+                                shareShow = 1
+                                url = settings.WEIXIN_CALLBACK_URL + reverse('weixin_share_order_gift')+"?url_id=%s"%order_id
 
                 return Response({
-                    'data': product_info.amount
+                    'data': product_info.amount,
+                    'share_show': shareShow,
+                    'share_url': url,
+                    "shareTitle":shareTitle,
+                    "shareContent":shareContent,
                 })
             except Exception, e:
                 return Response({
@@ -290,6 +317,9 @@ class AuditProductView(TemplateView):
         send_task("marketing.tools.calc_broker_commission", kwargs={
             "product_id": pk
         })
+
+        # 满标审核时检测活动规则
+        activity_backends.check_activity(request.user, 'p2p_audit', 'all', 0, pk)
 
         return HttpResponseRedirect('/' + settings.ADMIN_ADDRESS + '/wanglibao_p2p/p2pproduct/')
 
@@ -422,6 +452,23 @@ class CopyProductView(TemplateView):
 
 copy_product_view = staff_member_required(CopyProductView.as_view())
 
+class CopyContractTemplateView(TemplateView):
+    template_name = "copy_ct.jade"
+    def get_context_data(self, **kwargs):
+        id = kwargs.get('id')
+        ct = ContractTemplate.objects.get(pk=id)
+        return {"ct":ct}
+    def post(self, request, **kwargs):
+        id = kwargs.get('id')
+        ct = ContractTemplate.objects.get(pk=id)
+        new_ct = ContractTemplate()
+        new_ct.name = (ct.name[:8] + u" 复制 " + get_a_uuid()[:18])
+        new_ct.content = ct.content
+        new_ct.content_preview = ct.content_preview
+        new_ct.save()
+        return HttpResponseRedirect('/' + settings.ADMIN_ADDRESS + '/wanglibao_p2p/contracttemplate/')
+
+copy_contract_template_view = staff_member_required(CopyContractTemplateView.as_view())
 
 class P2PProductViewSet(PaginatedModelViewSet):
     model = P2PProduct

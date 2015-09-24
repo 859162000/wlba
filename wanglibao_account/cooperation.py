@@ -24,8 +24,9 @@ import requests
 from rest_framework import renderers
 from rest_framework.views import APIView
 from marketing.models import Channels, IntroducedBy, PromotionToken
-from marketing.utils import set_promo_user
+from marketing.utils import set_promo_user, get_channel_record, get_user_channel_record
 from wanglibao import settings
+from wanglibao_redpack import backends as redpack_backends
 from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      TIANMANG_CALL_BACK_URL, WLB_FOR_YIRUITE_KEY, YIRUITE_KEY, BENGBENG_KEY, \
      WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
@@ -33,16 +34,22 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_SHLS_KEY, SHITOUCUN_CALL_BACK_URL, WLB_FOR_SHITOUCUN_KEY, FUBA_CALL_BACK_URL, WLB_FOR_FUBA_KEY, \
      FUBA_COOP_ID, FUBA_KEY, FUBA_CHANNEL_CODE, FUBA_DEFAULT_TID, FUBA_PERIOD, \
      WLB_FOR_YUNDUAN_KEY, YUNDUAN_CALL_BACK_URL, YUNDUAN_COOP_ID, WLB_FOR_YICHE_KEY, YICHE_COOP_ID, \
-     YICHE_KEY, YICHE_CALL_BACK_URL, WLB_FOR_ZHITUI1_KEY, ZHITUI_COOP_ID, ZHITUI_CALL_BACK_URL, WLB_FOR_NJWH_KEY
+     YICHE_KEY, YICHE_CALL_BACK_URL, WLB_FOR_ZHITUI1_KEY, ZHITUI_COOP_ID, ZHITUI_CALL_BACK_URL, \
+     WLB_FOR_ZGDX_KEY, ZGDX_CALL_BACK_URL, ZGDX_PARTNER_NO, ZGDX_SERVICE_CODE, ZGDX_CONTRACT_ID, \
+     ZGDX_ACTIVITY_ID, ZGDX_KEY, ZGDX_IV, WLB_FOR_NJWH_KEY, ENV, ENV_PRODUCTION
 from wanglibao_account.models import Binding, IdVerification
-from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback
+from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
 from wanglibao_pay.models import Card
 from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_account.models import UserThreeOrder
 from wanglibao_redis.backend import redis_backend
 from dateutil.relativedelta import relativedelta
+from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes, hex2bin
 from decimal import Decimal
+from wanglibao_reward.models import WanglibaoUserGift
 import re
+import uuid
 
 logger = logging.getLogger(__name__)
 
@@ -220,9 +227,10 @@ class CoopRegister(object):
         """
         渠道名
         """
-        try:
-            channel_name = Channels.objects.filter(code=self.channel_code).get().name
-        except:
+        channel = get_channel_record(self.channel_code)
+        if channel:
+            channel_name = channel.name
+        else:
             channel_name = None
         return channel_name
 
@@ -296,11 +304,12 @@ class CoopRegister(object):
         :return:
         """
         channel_user = self.channel_user
+        channel_name = self.channel_name
         bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
-        if channel_user and len(channel_user) <= bid_len:
+        if channel_name and channel_user and len(channel_user) <= bid_len:
             binding = Binding()
             binding.user = user
-            binding.btype = self.channel_name
+            binding.btype = channel_name
             binding.bid = channel_user
             binding.save()
             # logger.debug('save user %s to binding'%user)
@@ -378,13 +387,12 @@ class CoopRegister(object):
         """
         返回该用户的渠道处理器
         """
-        try:
-            channel_code = Channels.objects.filter(introducedby__user_id = user.id).get().code
+        channel = get_user_channel_record(user.id)
+        if channel:
+            channel_code = channel.code
             for channel_processor in self.processors:
                 if channel_processor.c_code == channel_code:
                     return channel_processor
-        except:
-            return None
 
     def process_for_validate(self, user):
         try:
@@ -550,12 +558,13 @@ class JinShanRegister(CoopRegister):
         """
         channel_user = self.channel_user
         channel_extra = self.channel_extra
+        channel_name = self.channel_name
         bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
         extra_len = Binding._meta.get_field_by_name('extra')[0].max_length
-        if channel_user and len(channel_user) <= bid_len and len(channel_extra) <= extra_len:
+        if channel_name and channel_user and len(channel_user) <= bid_len and len(channel_extra) <= extra_len:
             binding = Binding()
             binding.user = user
-            binding.btype = self.channel_name
+            binding.btype = channel_name
             binding.bid = channel_user
             binding.extra = channel_extra
             binding.save()
@@ -588,9 +597,9 @@ class JinShanRegister(CoopRegister):
             self.jinshan_call_back(user, 'wangli_invest_reward', 'pA71ZhBf4DDeet7SLiLlGsT1qTYu')
 
 
-class WaihuRegister(CoopRegister):
+class ShanghaiWaihuRegister(CoopRegister):
     def __init__(self, request):
-        super(WaihuRegister, self).__init__(request)
+        super(ShanghaiWaihuRegister, self).__init__(request)
         self.c_code = 'shls'
 
 class NanjingWaihuRegister(CoopRegister):
@@ -619,13 +628,14 @@ class ShiTouCunRegister(CoopRegister):
         :return:
         """
         channel_user = self.channel_user
+        channel_name = self.channel_name
         channel_extra = self.channel_extra
         bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
         extra_len = Binding._meta.get_field_by_name('extra')[0].max_length
-        if channel_user and len(channel_user) <= bid_len and len(channel_extra) <= extra_len:
+        if channel_name and channel_user and len(channel_user) <= bid_len and len(channel_extra) <= extra_len:
             binding = Binding()
             binding.user = user
-            binding.btype = self.channel_name
+            binding.btype = channel_name
             binding.bid = channel_user
             binding.extra = channel_extra
             binding.save()
@@ -645,7 +655,7 @@ class ShiTouCunRegister(CoopRegister):
                 'e_user': uid_for_coop,
             }
             common_callback.apply_async(
-                kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+                kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
     def purchase_call_back(self, user):
         # 判断是否是首次投资
@@ -854,13 +864,14 @@ class ZhiTuiRegister(CoopRegister):
         :return:
         """
         channel_user = self.channel_user
+        channel_name = self.channel_name
         channel_extra = self.channel_extra
         bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
         extra_len = Binding._meta.get_field_by_name('extra')[0].max_length
-        if channel_user and len(channel_user) <= bid_len and len(channel_extra) <= extra_len:
+        if channel_name and channel_user and len(channel_user) <= bid_len and len(channel_extra) <= extra_len:
             binding = Binding()
             binding.user = user
-            binding.btype = self.channel_name
+            binding.btype = channel_name
             binding.bid = channel_user
             binding.extra = channel_extra
             binding.save()
@@ -898,11 +909,100 @@ class ZhiTuiRegister(CoopRegister):
             common_callback.apply_async(
                 kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
+
+class ZGDXRegister(CoopRegister):
+    def __init__(self, request):
+        super(ZGDXRegister, self).__init__(request)
+        self.c_code = 'zgdx'
+        self.call_back_url = ZGDX_CALL_BACK_URL
+        self.partner_no = ZGDX_PARTNER_NO
+        self.service_code = ZGDX_SERVICE_CODE
+        self.contract_id = ZGDX_CONTRACT_ID
+        self.activity_id = ZGDX_ACTIVITY_ID
+        self.coop_key = ZGDX_KEY
+        self.iv = ZGDX_IV
+
+    def zgdx_call_back(self, user, plat_offer_id):
+        if datetime.datetime.now().day >= 28:
+            effect_type = '1'
+        else:
+            effect_type = '0'
+        request_no = hashlib.md5(str(uuid.uuid1())).hexdigest()[1:-1]
+        phone_id = WanglibaoUserProfile.objects.get(user_id=user.id).phone
+        code = {
+            'request_no': request_no,
+            'phone_id': phone_id,
+            'service_code': self.service_code,
+            'contract_id': self.contract_id,
+            'activity_id': self.activity_id,
+            'order_type': '1',
+            'plat_offer_id': plat_offer_id,
+            'effect_type': effect_type,
+        }
+        encrypt_str = encrypt_mode_cbc(json.dumps(code), self.coop_key, self.iv)
+        params = {
+            'code': encodeBytes(hex2bin(encrypt_str)),
+            'partner_no': self.partner_no,
+        }
+
+        # 创建渠道订单记录
+        channel_recode = get_user_channel_record(user.id)
+        order = UserThreeOrder(user=user, order_on=channel_recode, request_no=request_no)
+        order.save()
+
+        # 异步回调
+        zgdx_callback.apply_async(
+            kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
+
+    def binding_card_call_back(self, user):
+        binding = Binding.objects.filter(user_id=user.id).first()
+        # 判定是否首次绑卡
+        if binding and binding.extra != '1':
+            if ENV == ENV_PRODUCTION:
+                plat_offer_id = '104369'
+            else:
+                plat_offer_id = '103050'
+            self.zgdx_call_back(user, plat_offer_id)
+            binding.extra = '1'
+            binding.save()
+
+    def purchase_call_back(self, user):
+        # 判断是否是首次投资
+        binding = Binding.objects.filter(user_id=user.id).first()
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
+        if binding and p2p_record.count() == 1:
+            p2p_amount = int(p2p_record.first().amount)
+            if p2p_amount >= 1000:
+                if ENV == ENV_PRODUCTION:
+                    if 1000 <= p2p_amount < 2000:
+                        plat_offer_id = '104371'
+                    else:
+                        plat_offer_id = '104372'
+                else:
+                    plat_offer_id = '103050'
+                self.zgdx_call_back(user, plat_offer_id)
+
+
+class WeixinRedpackRegister(CoopRegister):
+    def __init__(self, request):
+        super(WeixinRedpackRegister, self).__init__(request)
+        self.c_code = 'weixin_redpack'
+        #self.channel_code = 'weixin_redpack'
+        self.invite_code = 'weixin_redpack'
+
+    def register_call_back(self, user):
+        phone = self.request.GET.get('phone',)
+        record = WanglibaoUserGift.objects.filter(valid=0, identity=phone).first()
+        redpack_backends.give_activity_redpack(self.request.user, record.rules.redpack, 'pc')
+        record.valid = 1
+        record.save()
+
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
-                          YiCheRegister, ZhiTuiRegister, WaihuRegister, NanjingWaihuRegister]
+                          YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
+                          ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister]
 
 
 #######################第三方用户查询#####################

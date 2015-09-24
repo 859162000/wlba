@@ -29,6 +29,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView, View
 from registration.views import RegistrationView
+from rest_framework import status
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -66,6 +67,10 @@ from wanglibao_activity.models import ActivityRecord
 from aes import Crypt_Aes
 from wanglibao.settings import AMORIZATION_AES_KEY
 from wanglibao_anti.anti.anti import AntiForAllClient
+from wanglibao_account.utils import get_client_ip
+from wanglibao_account.models import UserThreeOrder
+from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes, hex2bin
+import requests
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
@@ -75,7 +80,7 @@ class RegisterView(RegistrationView):
     form_class = EmailOrPhoneRegisterForm
 
     def register(self, request, **cleaned_data):
-        """ 
+        """
             modified by: Yihen@20150812
             descrpition: if(line96~line97)的修改，针对特定的渠道延迟返积分、发红包等行为，防止被刷单
         """
@@ -173,6 +178,25 @@ def password_change(request,
     # TODO find a proper status value and return error message
     return HttpResponse(status=400)
 
+class PasswordCheckView(APIView):
+    permission_classes = ()
+    def post(self, request, **kwargs):
+        identifier = request.DATA.get("identifier", "")
+        password = request.DATA.get("password", "")
+
+        if not identifier or not password:
+            return Response({"token":False, "message":u"用户名或密码错误"})
+
+        user = authenticate(identifier=identifier, password=password)
+
+        if not user:
+            return Response({"token":False, "message":u"用户名或密码错误"})
+        if not user.is_active:
+            return Response({"token":False, "message":u"用户已被关闭"})
+        if user.wanglibaouserprofile.frozen:
+            return Response({"token":False, "message":u"用户已被冻结"})
+
+        return Response({'token':True, 'message':u'用户认证成功'})
 
 class PasswordResetValidateView(TemplateView):
     template_name = 'password_reset_phone.jade'
@@ -439,7 +463,7 @@ class AccountHomeAPIView(APIView):
 
         today = timezone.datetime.today()
         total_income = DailyIncome.objects.filter(user=user).aggregate(Sum('income'))['income__sum'] or 0
-        fund_income_week = DailyIncome.objects.filter(user=user, 
+        fund_income_week = DailyIncome.objects.filter(user=user,
                             date__gt=today + datetime.timedelta(days=-8)).aggregate(Sum('income'))['income__sum'] or 0
         fund_income_month = DailyIncome.objects.filter(user=user, 
                             date__gt=today + datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
@@ -1742,3 +1766,88 @@ class AutomaticApiView(APIView):
             })
         except:
             return Response({'ret_code': 3009, 'message': u'用户设置自动投标计划失败'})
+
+
+@csrf_protect
+def three_order_view(request):
+    """
+    记录来自第三方回调的订单状态
+    :param request:
+    :return:
+    """
+    if request.method == "POST":
+        trust_ip = settings.TRUST_IP
+        if len(trust_ip) > 0:
+            if get_client_ip(request) in trust_ip:
+                params = request.POST
+                request_no = params.get('request_no', None)
+                result_code = params.get('result_code', None)
+                if request_no and result_code:
+                    try:
+                        order = UserThreeOrder.objects.get(request_no=request_no)
+                    except Exception, e:
+                        return HttpResponseForbidden(u'订单流水号不存在')
+                    if order:
+                        try:
+                            msg = params.get('msg_id', None)
+                            order.request_no = request_no
+                            order.result_code = result_code
+                            if msg:
+                                order.msg = msg
+                            order.save()
+                        except Exception, e:
+                            return HttpResponseForbidden(u'非法参数')
+                        return HttpResponse(1)
+                return HttpResponseForbidden(u'参数缺失')
+        return HttpResponseForbidden(u'不受信任的来源！！！')
+    return HttpResponseNotAllowed(u'不允许的HTTP方法！！！')
+
+def zgdx_order_query(url, params):
+    """
+    中国电信业务查询
+    :param url:
+    :param params:
+    :return:
+    """
+    try:
+        coop_key = getattr(settings, 'ZGDX_KEY')
+        iv = getattr(settings, 'ZGDX_IV', None)
+    except Exception:
+        return 'api error.'
+    code = {
+        'phone_id': params.get('phone_id', None),
+        'service_code': params.get('service_code', None),
+        'request_no': params.get('request_no', None),
+        'start_time': params.get('start_time', None),
+        'end_time': params.get('end_time', None),
+    }
+    encrypt_str = encrypt_mode_cbc(json.dumps(code), coop_key, iv)
+    params = {
+        'code': encodeBytes(hex2bin(encrypt_str)),
+        'partner_no': params.get('partner_no', None),
+    }
+    res = requests.post(url, data=json.dumps(params))
+    return res.text
+
+
+@csrf_protect
+def three_order_query_view(request):
+    """
+    第三方订单查询接口
+    :param request:
+    :return:
+    """
+    params = getattr(request, request.method)
+    channel_code = params.get('promo_token', None)
+    if channel_code:
+        try:
+            url = getattr(settings, '%s_QUERY_INTERFACE_URL' % channel_code.upper())
+        except KeyError:
+            return HttpResponseForbidden(u'无效渠道码')
+        if url:
+            try:
+                order_query_fun = locals().get('%s_order_query' % channel_code.lower())
+                return HttpResponse(order_query_fun(url, params))
+            except Exception, e:
+                return HttpResponseForbidden('api error.')
+    return HttpResponseForbidden(u'渠道码缺失')

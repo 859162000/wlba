@@ -27,7 +27,8 @@ from wanglibao_pay.models import Bank
 from weixin.wechatpy import WeChatClient, parse_message, create_reply
 from weixin.wechatpy.replies import TransferCustomerServiceReply
 from weixin.wechatpy.utils import check_signature
-from weixin.wechatpy.exceptions import InvalidSignatureException, WeChatException
+from weixin.wechatpy.exceptions import InvalidSignatureException, WeChatException,WeChatOAuthException
+from wanglibao_reward.models import WanglibaoUserGift, WanglibaoWeixinRelative, WanglibaoActivityGift
 from weixin.wechatpy.oauth import WeChatOAuth
 from weixin.common.decorators import weixin_api_error
 from weixin.common.wx import generate_js_wxpay
@@ -36,13 +37,16 @@ from .common.wechat import tuling
 from decimal import Decimal
 from wanglibao_pay.models import Card
 from marketing.models import Channels
+from marketing.utils import get_channel_record
 import datetime
 import json
 import time
 import uuid
 import urllib
 import math
+import  logging
 
+logger = logging.getLogger('wanglibao_reward')
 
 class WeixinJoinView(View):
     account = None
@@ -168,7 +172,7 @@ class WeixinRegister(TemplateView):
             token = 'weixin'
 
         if token:
-            channel = Channels.objects.filter(code=token).first()
+            channel = get_channel_record(token)
         else:
             channel = None
         phone = self.request.GET.get('phone', 0)
@@ -671,3 +675,68 @@ class WeixinAccountBankCardAdd(TemplateView):
         return {
             'banks': banks,
         }
+
+
+class AuthorizeUser(APIView):
+    permission_classes = ()
+    def get(self, request):
+        account_id = self.request.GET.get('state')
+        try:
+            account = Account.objects.get(pk=account_id)
+        except Account.DoesNotExist:
+            return HttpResponseNotFound()
+        code = request.GET.get('code')
+        url_id = request.GET.get('url_id')
+        oauth = WeChatOAuth(account.app_id, account.app_secret, )
+        if code:
+            res = oauth.fetch_access_token(code)
+            openid=res.get('openid')
+            nick_name=""
+            head_img_url=""
+            user_info = {}
+            try:
+                wx_user = WanglibaoWeixinRelative.objects.filter(openid=openid)
+                if wx_user.exists():
+                    phone = wx_user.first().phone
+                    logger.debug("获得用户授权openid is: %s, phone is :%s" %(openid,phone))
+                    logger.debug("product id:%s" %(url_id))
+                    user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=url_id, identity__in=phone,).first()
+                    logger.debug("用户抽奖信息是：%s" % (user_gift,))
+                    counts = WanglibaoActivityGift.objects.filter(gift_id=url_id, valid=False).count()
+                    if counts == 10:
+                        return redirect("/weixin_activity/share/end/")
+                    if not user_gift and phone:
+                        #如果用户已经了，直接跳转到详情页
+                        logger.debug("openid:%s, phone:%s, product_id:%s,用户已经存在了，直接跳转页面" %(openid, phone, url_id,))
+                        return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, url_id))
+                    else:
+                        return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,nick_name,head_img_url))
+                else:
+                    user_info = oauth.get_user_info(openid, res.get('access_token'))
+                    nick_name = user_info['nickname']
+                    head_img_url = user_info['headimgurl']
+            except WeChatException, e:
+                auth_code_url = reverse("weixin_authorize_code")+'?auth=1&state=%s'%account_id
+                return redirect(auth_code_url)
+            return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,nick_name,head_img_url))
+
+
+class AuthorizeCode(APIView):
+    permission_classes = ()
+    def get(self, request):
+        account_id = self.request.GET.get('state')
+        try:
+            account = Account.objects.get(pk=account_id)
+        except Account.DoesNotExist:
+            return HttpResponseNotFound()
+        auth = request.GET.get('auth')
+        url_id = request.GET.get('url_id')
+
+        redirect_uri = settings.WEIXIN_CALLBACK_URL + reverse("weixin_authorize_user_info")+'?url_id=%s'%url_id
+        # print redirect_uri
+        if auth and auth=='1':
+            oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, scope='snsapi_userinfo', state=account_id)
+        else:
+            oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, state=account_id)
+        # print oauth.authorize_url
+        return redirect(oauth.authorize_url)

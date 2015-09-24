@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.utils import timezone
-from marketing.models import Channels
+from marketing.models import Channels, ChannelsNew
 
 
 class IdVerification(models.Model):
@@ -179,11 +179,11 @@ class UserSource(models.Model):
 
 class UserPhoneBook(models.Model):
     user = models.ForeignKey(User)
-    phone = models.CharField(max_length=64, blank=True, help_text=u'通讯录电话')
+    phone = models.CharField(max_length=64, blank=True, help_text=u'通讯录电话', db_index=True)
     name = models.CharField(max_length=50, blank=True, verbose_name=u"姓名")
     is_register = models.BooleanField(default=False, verbose_name=u"是否注册")
     is_invite = models.BooleanField(default=False, verbose_name=u"是否邀请")
-    invite_at = models.DateTimeField(null=True, blank=True, verbose_name=u'最后一次邀请提醒时间')
+    invite_at = models.DateTimeField(null=True, blank=True, verbose_name=u'最后一次邀请提醒时间', db_index=True)
     alert_at = models.DateTimeField(null=True, blank=True, verbose_name=u'最后一次投资提醒时间')
     created_at = models.DateTimeField(auto_now_add=True, default=timezone.now())
     is_used = models.BooleanField(default=True, verbose_name=u"是否使用", help_text=u'默认使用')
@@ -192,7 +192,7 @@ class UserPhoneBook(models.Model):
 class UserThreeOrder(models.Model):
     user = models.ForeignKey(User)
     order_on = models.ForeignKey(Channels, verbose_name=u'订单渠道')
-    request_no = models.CharField(max_length=30, verbose_name=u'请求流水号')
+    request_no = models.CharField(unique=True, max_length=30, verbose_name=u'请求流水号')
     result_code = models.CharField(max_length=30, blank=True, verbose_name=u'受理结果编码')
     msg = models.CharField(max_length=255, blank=True, verbose_name=u'受理结果消息')
     created_at = models.DateTimeField(u'下单时间', auto_now_add=True)

@@ -107,6 +107,7 @@ class P2PTrader(object):
             "title": title,
             "content": content,
             "mtype": "purchase"
+
         })
 
         # 满标给管理员发短信
@@ -121,11 +122,12 @@ class P2PTrader(object):
 
             # 满标将标信息写入redis
             cache_backend = redis_backend()
-            if not cache_backend.redis.exists("p2p_detail_{0}".format(self.product.id)):
-                cache_backend.get_cache_p2p_detail(self.product.id)
+            if cache_backend._is_available():
+                if not cache_backend.redis.exists("p2p_detail_{0}".format(self.product.id)):
+                    cache_backend.get_cache_p2p_detail(self.product.id)
 
-            # 将标写入redis list
-            cache_backend.push_p2p_products(self.product)
+                # 将标写入redis list
+                cache_backend.push_p2p_products(self.product)
 
         return product_record, margin_record, equity
 
