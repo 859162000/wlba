@@ -406,13 +406,13 @@ class WeixinShareDetailView(TemplateView):
                 try:
                     dt = timezone.datetime.now()
                     redpack_event = RedPackEvent.objects.filter(invalid=False, describe=sending_gift.redpack.describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
-                    sending_gift.valid = 1
-                    sending_gift.save()
                 except Exception, reason:
                     logger.debug("send redpack Exception, msg:%s" % (reason,))
 
                 if redpack_event:
                     redpack_backends.give_activity_redpack(self.request.user, redpack_event, 'pc')
+                    sending_gift.valid = 1
+                    sending_gift.save()
 
             return sending_gift
         else:
@@ -536,6 +536,7 @@ class WeixinShareDetailView(TemplateView):
             record = WanglibaoActivityGift.objects.filter(gift_id=order_id).first()
             activity = record.activity.code if record else activitys[index]
             logger.debug("misc配置的activity有:%s, 本次使用的activity是：%s" % (activitys, activity))
+
         #更新用户的手机号
         self.update_weixin_wanglibao_relative(openid, phone_num)
 
@@ -555,10 +556,6 @@ class WeixinShareDetailView(TemplateView):
         else:
             self.debug_msg('phone:%s 已经领取过奖品' %(phone_num,))
         gifts = self.get_distribute_status(order_id, activity)
-        #one = self.format_response_data(user_gift,'alone')
-        #all = self.format_response_data(gifts,'gifts')
-        #print "one"
-        #print "all"
         return {
             "ret_code": 0,
             "self_gift": self.format_response_data(user_gift, 'alone'),
