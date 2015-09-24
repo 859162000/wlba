@@ -393,9 +393,6 @@ class CoopRegister(object):
             for channel_processor in self.processors:
                 if channel_processor.c_code == channel_code:
                     return channel_processor
-        else:
-            channel_code = None
-        return channel_code
 
     def process_for_validate(self, user):
         try:
