@@ -1808,12 +1808,12 @@ def zhongjin_get_products():
         if product in new_products:
             prod['method'] = 'add'
 
-        # # 如果用他们的id的话, 我们不做更新和下架
-        # else:
-        #     if product.status in [u'录标', u'录标完成', u'待审核', u'正在招标']:
-        #         prod['method'] = 'update'
-        #     else:
-        #         prod['method'] = 'down'
+        # 如果用他们的id的话, 我们不做更新和下架
+        else:
+            if product.status == u'正在招标':
+                prod['method'] = 'update'
+            else:
+                prod['method'] = 'down'
 
         prod['classId'] = 1
 
