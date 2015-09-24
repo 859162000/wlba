@@ -696,8 +696,8 @@ class AuthorizeUser(APIView):
             user_info = {}
             try:
                 wx_user = WanglibaoWeixinRelative.objects.filter(openid=openid)
-                logger.debug("获得用户授权openid is: %s, phone is :%s" %(openid,wx_user.first().phone))
                 if wx_user.exists():
+                    logger.debug("获得用户授权openid is: %s, phone is :%s" %(openid,wx_user.first().phone))
                     logger.debug("product id:%s" %(url_id))
                     user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=url_id, identity__in=wx_user.first().phone,).first()
                     logger.debug("用户抽奖信息是：%s" % (user_gift))
