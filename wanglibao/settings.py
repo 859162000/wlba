@@ -46,6 +46,7 @@ ENV = ENV_DEV
 
 if ENV != ENV_DEV:
     DEBUG = False
+DEBUG = True
 
 ADMINS = (
     ('Shuo Li', 'lishuo@wanglibank.com'),

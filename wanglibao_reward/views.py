@@ -621,7 +621,7 @@ class WeixinShareStartView(TemplateView):
         if not self.is_valid_user_auth(order_id, amount) and False:
            data = {
                 'ret_code': 9000,
-                'message': u'用户投资没有达到%s元;' % (1000, ),
+                'message': u'用户投资没有达到%s元;' % (amount, ),
             }
            return HttpResponse(json.dumps(data), content_type='application/json')
         if not openid:

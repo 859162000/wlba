@@ -101,7 +101,7 @@
           type: "POST",
           data: { redpack_event_name : "2015中秋节80000加息券"}
         }).done(function(date) {
-          if (date['status']=='true'){
+          if (date['status']== true){
             $('#small-zc').show();
             $('#first-redpack-fail').hide();
             $('#txt').show();
