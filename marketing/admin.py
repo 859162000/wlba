@@ -258,37 +258,15 @@ class WanglibaoActivityRewardAdmin(admin.ModelAdmin):
     readonly_fields = ('user', 'total_chances', 'total_awards', )
 
 
-class ChannelsNewForm(forms.ModelForm):
-    _CALLBACK = (
-        ('register', u'注册'),
-        ('validation', u'实名'),
-        ('binding', u'绑卡'),
-        ('first_investment', u'首投'),
-        ('investment', u'投资'),
-        ('first_pay', u'首充'),
-        ('pay', u'充值')
-    )
-
-    callback = forms.MultipleChoiceField(
-        required=True,
-        label=u'渠道回调',
-        choices=_CALLBACK,
-        widget=forms.CheckboxSelectMultiple()
-    )
-
-    class Meta:
-        forms.model = ChannelsNew
-
-
 class ChannelsNewAdmin(admin.ModelAdmin):
     actions = None
     list_display = ("id", "code", "name", "description")
     search_fields = ("name",)
     list_filter = ("name",)
-    form = ChannelsNewForm
 
     def has_delete_permission(self, request, obj=None):
         return False
+
 
 admin.site.register(WanglibaoActivityReward, WanglibaoActivityRewardAdmin)  # add by Yihen@20150901
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
