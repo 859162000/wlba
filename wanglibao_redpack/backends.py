@@ -79,9 +79,9 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                 if product:
                     if event.period != '' or event.period != 0:
                         redpack_period = event.period.split(',')
-                        redpack_period = [period for period in redpack_period if period.strip() != ""]
+                        redpack_period = [int(period) for period in redpack_period if period.strip() != ""]
                         product_period = product['period']
-                        if redpack_period and (product_period not in redpack_period):
+                        if redpack_period and redpack_period[0] != 0 and (product_period not in redpack_period):
                             continue
                     if event.p2p_types:
                         p2p_types_id = int(event.p2p_types.id)
@@ -125,10 +125,10 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                     event = coupon.redpack.event
                     if product:
                         if event.period != "" or event.period != 0:
-                            redpack_period = event.period.split(',')
-                            redpack_period = [period for period in redpack_period if period.strip() != ""]
+                            coupon_period = event.period.split(',')
+                            coupon_period = [int(period) for period in coupon_period if period.strip() != ""]
                             product_period = product['period']
-                            if redpack_period and (product_period not in redpack_period):
+                            if coupon_period and coupon_period[0] != 0 and (product_period not in coupon_period):
                                 continue
 
                     if event.p2p_types:
