@@ -11,6 +11,31 @@ body {
     -ms-user-select: none;
     user-select: none;
 }
+.loadPage {
+	display: -webkit-box;
+	-webkit-box-pack: center;
+	-webkit-box-align: center;
+	background: #fff;
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	z-index: 9999
+}
+
+.loadPage .process {
+	color: #000;
+	font-size: 16px;
+	text-align: center;
+	margin-top: 10px
+}
+
+.loadPage .logo {
+	width: 100px;
+	height: 100px;
+	background:url("/static/imgs/mobile_activity/app_ten_year/logo.png") no-repeat;
+	background-size: cover;
+
+}
 input:focus,input:active,a{
     outline: none;
 }
