@@ -154,6 +154,12 @@ urlpatterns += patterns(
     url(r'^api/zhongniu/getData/$', ZhongniuP2PDataQuery.as_view()),
 )
 
+# 短信
+urlpatterns += patterns(
+    '',
+    url(r'wanglibao_sms/', include('wanglibao_sms.urls'))
+)
+
 # 微信
 urlpatterns += patterns(
     '',
