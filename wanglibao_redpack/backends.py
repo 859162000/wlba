@@ -74,13 +74,14 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                 if redpack.status == "invalid":
                     continue
                 event = x.redpack.event
-                redpack_period = int(event.period)
+                redpack_period = event.period.split(',')
+                redpack_period = [period for period in redpack_period if period.strip() != ""]
                 p2p_types_id = 0
                 p2p_types_name = ''
                 if product:
-                    if redpack_period > 0:
-                        if redpack_period != int(product['period']):
-                            continue
+                    product_period = product['period']
+                    if redpack_period and (product_period not in redpack_period):
+                        continue
                     if event.p2p_types:
                         p2p_types_id = int(event.p2p_types.id)
                         p2p_types_name = event.p2p_types.name
