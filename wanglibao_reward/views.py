@@ -23,7 +23,6 @@ from wanglibao_p2p.models import P2PRecord
 from misc.models import Misc
 from django.views.generic import TemplateView
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 
 logger = logging.getLogger('wanglibao_reward')
@@ -405,7 +404,7 @@ class WeixinShareDetailView(TemplateView):
             if user_profile:
                 try:
                     dt = timezone.datetime.now()
-                    redpack_event = RedPackEvent.objects.filter(invalid=False, describe=sending_gift.redpack.describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
+                    redpack_event = RedPackEvent.objects.filter(invalid=False, describe=sending_gift.rules.redpack.describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
                 except Exception, reason:
                     logger.debug("send redpack Exception, msg:%s" % (reason,))
 
@@ -584,7 +583,6 @@ class WeixinShareStartView(TemplateView):
             return p2p_record
         except Exception, reason:
             logger.exception(u"判断用户投资额度抛异常 %s" %(reason,) )
-            return None
 
     def get_context_data(self, **kwargs):
         openid = self.request.GET.get('openid')

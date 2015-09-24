@@ -257,6 +257,27 @@ org.weChatStart = (function(org){
     }
 })(org);
 
+org.weChatDetail = (function(org){
+    var lib = {
+        init:function(){
+            console.log('detail')
+        },
+    }
+    return {
+        init : lib.init
+    }
+})(org);
+
+org.weChatEnd = (function(org){
+    var lib = {
+        init:function(){
+            console.log('end')
+        },
+    }
+    return {
+        init : lib.init
+    }
+})(org);
 
 ;(function(org){
     $.each($('script'), function(){
