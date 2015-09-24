@@ -409,7 +409,7 @@ class WeixinShareDetailView(TemplateView):
                     logger.debug("send redpack Exception, msg:%s" % (reason,))
 
                 if redpack_event:
-                    redpack_backends.give_activity_redpack(self.request.user, redpack_event, 'pc')
+                    redpack_backends.give_activity_redpack(user_profile.user, redpack_event, 'pc')
                     sending_gift.valid = 1
                     sending_gift.save()
 
@@ -417,7 +417,7 @@ class WeixinShareDetailView(TemplateView):
         else:
             return 'No Reward'
 
-    def get_distribute_status(self, product_id, activity):
+    def get_distribute_status(self, order_id, activity):
             """
                 获得用户领奖信息
             """
@@ -425,7 +425,7 @@ class WeixinShareDetailView(TemplateView):
                 self.get_activity_by_id(activity)
 
             try:
-                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=product_id, activity=self.activity, valid__in=(0, 1)).all()
+                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity, valid__in=(0, 1)).all()
                 return gifts
             except Exception, reason:
                 self.exception_msg(reason, u'获取已领奖用户信息失败')
