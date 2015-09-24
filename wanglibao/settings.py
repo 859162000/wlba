@@ -1026,5 +1026,5 @@ THREE_DEFAULT_CHANNEL_CODE = 'wanglibao-three'
 if ENV == ENV_PRODUCTION:
     WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
 else:
-    WEIXIN_CALLBACK_URL = 'http://1d270643.ngrok.io' #'https://staging.wanglibao.com'
+    WEIXIN_CALLBACK_URL = 'https://staging.wanglibao.com'
 
