@@ -592,11 +592,14 @@ class WeixinShareStartView(TemplateView):
         record = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
 
         if not record:
+            logger.debug('入库微信授权信息, nick_name:%s, openid:%s, img:%s ' %(nick_name, openid, img_url))
             WanglibaoWeixinRelative.objects.create(
                openid=openid,
                nick_name=nick_name,
                img=img_url
             )
+        else:
+            logger.debug('微信授权信息很早就已经入库, nick_name:%s, openid:%s, img:%s ' %(nick_name, openid, img_url))
         return {
             'ret_code': 9001,
             'openid': openid,
