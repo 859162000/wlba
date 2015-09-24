@@ -24,6 +24,7 @@ from misc.models import Misc
 from django.views.generic import TemplateView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from marketing.utils import get_user_channel_record
 
 logger = logging.getLogger('wanglibao_reward')
 
@@ -105,15 +106,14 @@ class WanglibaoReward(object):
         else:
             channels = channels.channel.split(",")
 
-        record = IntroducedBy.objects.filter(user_id=self.request.user.id).first()
-
+        record = get_user_channel_record(self.request.user.id)
         if not record:
             to_json_response = {
                 'ret_code': 3001,
                 'message': u'非渠道用户',
             }
         else:
-            if record.channel.name not in channels:
+            if record.name not in channels:
                 to_json_response = {
                     'ret_code': 3002,
                     'message': u'渠道用户不是从对应的渠道过来',

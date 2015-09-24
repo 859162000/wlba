@@ -7,13 +7,26 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator, PageNotAnInteger
 from django.db import connection
 from django.db.models import Sum
-from marketing.models import IntroducedBy, PromotionToken, ClientData, Channels
+from marketing.models import IntroducedBy, PromotionToken, ClientData, Channels, ChannelsNew
 from wanglibao_p2p.models import AmortizationRecord, P2PRecord
+from wanglibao.settings import THREE_DEFAULT_CHANNEL_CODE
 import logging
 
 
 logger = logging.getLogger('p2p')
 
+def get_channel_record(channel_code):
+    record = Channels.objects.filter(code=channel_code).first()
+    # if record:
+    #     if record.is_abandoned or record.coop_status > 0:
+    #         record = Channels.objects.get(code=THREE_DEFAULT_CHANNEL_CODE)
+    #     else:
+    #         record = None
+    return record
+
+def get_user_channel_record(user_id):
+    channel = Channels.objects.filter(introducedby__user_id=user_id).first()
+    return channel
 
 def set_promo_user(request, user, invitecode=''):
     if not user:
@@ -23,7 +36,7 @@ def set_promo_user(request, user, invitecode=''):
         invitecode = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
 
     if invitecode:
-        record = Channels.objects.filter(code=invitecode).first()
+        record = get_channel_record(invitecode)
         if record:
             save_introducedBy_channel(user, record)
         else:
