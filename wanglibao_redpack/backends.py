@@ -74,20 +74,19 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                 if redpack.status == "invalid":
                     continue
                 event = x.redpack.event
-                redpack_period = int(event.period)
                 p2p_types_id = 0
                 p2p_types_name = ''
                 if product:
-                    if redpack_period > 0:
-                        if redpack_period != int(product['period']):
+                    if event.period != '' or event.period != 0:
+                        redpack_period = event.period.split(',')
+                        redpack_period = [int(period) for period in redpack_period if period.strip() != ""]
+                        product_period = product['period']
+                        if redpack_period and redpack_period[0] != 0 and (product_period not in redpack_period):
                             continue
-                    print event.p2p_types
                     if event.p2p_types:
                         p2p_types_id = int(event.p2p_types.id)
                         p2p_types_name = event.p2p_types.name
                         if product['types_id']:
-                            print(p2p_types_id)
-                            print(product['types_id'], 'product_id')
                             if product['types_id'] != p2p_types_id:
                                 continue
 
@@ -100,7 +99,8 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                         "period": event.period, "p2p_types_id": p2p_types_id, "p2p_types_name": p2p_types_name,
                         "highest_amount": event.highest_amount, "order_by": 2}
                 if start_time < timezone.now() < end_time:
-                    if event.apply_platform == "all" or event.apply_platform == device_type:
+                    if event.apply_platform == "all" or event.apply_platform == device_type or \
+                            (device_type in ('ios', 'android') and event.apply_platform == 'app'):
                         if obj['method'] == REDPACK_RULE['percent']:
                             obj['amount'] = obj['amount']/100.0
                         packages['available'].append(obj)
@@ -123,17 +123,18 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                     if redpack.status == 'invalid':
                         continue
                     event = coupon.redpack.event
-                    redpack_period = int(event.period)
-                    if redpack_period > 0:
-                        if redpack_period != int(product['period']):
-                            continue
+                    if product:
+                        if event.period != "" or event.period != 0:
+                            coupon_period = event.period.split(',')
+                            coupon_period = [int(period) for period in coupon_period if period.strip() != ""]
+                            product_period = product['period']
+                            if coupon_period and coupon_period[0] != 0 and (product_period not in coupon_period):
+                                continue
 
                     if event.p2p_types:
                         p2p_types_id = int(event.p2p_types.id)
                         p2p_types_name = event.p2p_types.name
                         if product['types_id']:
-                            print(int(p2p_types_id))
-                            print(product['types_id'], 'product_id')
                             if product['types_id'] != p2p_types_id:
                                 continue
                     else:
@@ -150,7 +151,8 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                            "highest_amount": event.highest_amount, "order_by": 1}
 
                     if start_time < timezone.now() < end_time:
-                        if event.apply_platform == "all" or event.apply_platform == device_type:
+                        if event.apply_platform == "all" or event.apply_platform == device_type or \
+                                (device_type in ('ios', 'android') and event.apply_platform == 'app'):
                             if obj['method'] == REDPACK_RULE['interest_coupon']:
                                 obj['amount'] = obj['amount']/100.0
                             packages['available'].append(obj)
@@ -260,7 +262,7 @@ def exchange_redpack(token, device_type, user, app_version=''):
         ch = helper.which_channel(user)
         if ch != event.target_channel:
             return {"ret_code": 30167, "message": u"不符合领取条件"}
-    if event.give_platform != "all" and event.give_platform != device_type:
+    if event.give_platform != "all" and (event.give_platform != device_type or (event.give_platform == 'app' and device_type not in ('ios', 'android'))):
         return {"ret_code": 30168, "message": u"不符合领取条件"}
 
     if event.amount == 0:
@@ -376,14 +378,35 @@ def _give_redpack(user, give_mode, device_type):
 
 
 #发放奖励类型的红包
-def give_activity_redpack(user, event, device_type):
+def give_activity_redpack(user, event, device_type, just_one_packet=False, check_issue_time=False):
+    """
+
+    :param user:
+    :param event: 支持RedPackEevent对象或是一个event的名字
+    :param device_type:
+    :param just_one_packet: 置为True，对于某个红包活动用户只能获得一个红包，不能获得多个
+    :param check_issue_time：检查发放时间，超期不发放
+    :return:
+    """
     device_type = _decide_device(device_type)
+    # 后台设置必须保证红包的event不重名
+    if not isinstance(event, RedPackEvent):
+        try:
+            event = RedPackEvent.objects.get(name=event)
+        except:
+            return False, u"活动名称错误"
+    #检查红包发放时间
+    now = timezone.now()
+    if now < event.give_start_at or now > event.give_end_at:
+        return False, u'活动已过期'
     redpack = RedPack.objects.filter(event=event, status="unused").first()
     if not redpack:
         return False, u"没有此优惠券"
     if redpack.token != "":
         redpack.status = "used"
         redpack.save()
+    if just_one_packet and RedPackRecord.objects.filter(redpack=redpack, user=user).exists():
+        return False, u"限领一个红包"
     record = RedPackRecord()
     record.user = user
     record.redpack = redpack
@@ -412,7 +435,7 @@ def consume(redpack, amount, user, order_id, device_type, product_id):
         return {"ret_code": 30174, "message": u"优惠券不可使用"}
     if amount < event.invest_amount:
         return {"ret_code": 30175, "message": u"投资金额不满足优惠券规则%s" % event.invest_amount}
-    if event.apply_platform != "all" and event.apply_platform != device_type:
+    if event.apply_platform != "all" and (event.apply_platform != device_type or (event.give_platform == 'app' and device_type not in ('ios', 'android'))):
         return {"ret_code": 30176, "message": u"此优惠券只能在%s平台使用" % event.apply_platform}
 
     rtype = event.rtype
