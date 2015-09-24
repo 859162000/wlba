@@ -391,7 +391,7 @@ class WeixinShareDetailView(TemplateView):
                 identity=phone_num,
                 activity=self.activity,
                 amount=gift.redpack.amount,
-                type=gift.rules.type,
+                type=gift.type,
                 valid=0,
             )
             WanglibaoUserGift.objects.create(
@@ -400,7 +400,7 @@ class WeixinShareDetailView(TemplateView):
                 identity=openid,
                 activity=self.activity,
                 amount=gift.redpack.amount,
-                type=gift.rules.type,
+                type=gift.type,
                 valid=2,
             )
             if user_profile:
