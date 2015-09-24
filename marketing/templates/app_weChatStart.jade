@@ -13,6 +13,6 @@ block content
 		input(type='tel', name='phone' ,placeholder='输入手机号拼手气', value="{{phone}}").webchat-input
 		.phone-sign-warp
 			p.phone-sign 请输入正确的手机号
-		a(href="javascript:void(0)",data-openid="2",data-activity="share", data-orderid="1").webpack-btn-red 立即开奖
+		a(href="javascript:void(0)",data-openid="{{openid}}",data-activity="share", data-orderid="{{order_id}}").webpack-btn-red 立即开奖
 
 	script(data-init='weChatStart', src='/static/scripts/mobile_activity/weChart_share.js')
