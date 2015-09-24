@@ -23,8 +23,8 @@ from wanglibao_p2p.models import P2PRecord
 from misc.models import Misc
 from django.views.generic import TemplateView
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
+from marketing.utils import get_user_channel_record
 
 logger = logging.getLogger('wanglibao_reward')
 
@@ -106,15 +106,14 @@ class WanglibaoReward(object):
         else:
             channels = channels.channel.split(",")
 
-        record = IntroducedBy.objects.filter(user_id=self.request.user.id).first()
-
+        record = get_user_channel_record(self.request.user.id)
         if not record:
             to_json_response = {
                 'ret_code': 3001,
                 'message': u'非渠道用户',
             }
         else:
-            if record.channel.name not in channels:
+            if record.name not in channels:
                 to_json_response = {
                     'ret_code': 3002,
                     'message': u'渠道用户不是从对应的渠道过来',
@@ -405,7 +404,7 @@ class WeixinShareDetailView(TemplateView):
             if user_profile:
                 try:
                     dt = timezone.datetime.now()
-                    redpack_event = RedPackEvent.objects.filter(invalid=False, describe=sending_gift.redpack.describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
+                    redpack_event = RedPackEvent.objects.filter(invalid=False, describe=sending_gift.rules.redpack.describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
                 except Exception, reason:
                     logger.debug("send redpack Exception, msg:%s" % (reason,))
 
@@ -584,7 +583,6 @@ class WeixinShareStartView(TemplateView):
             return p2p_record
         except Exception, reason:
             logger.exception(u"判断用户投资额度抛异常 %s" %(reason,) )
-            return None
 
     def get_context_data(self, **kwargs):
         openid = self.request.GET.get('openid')
@@ -594,16 +592,19 @@ class WeixinShareStartView(TemplateView):
         record = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
 
         if not record:
+            logger.debug('入库微信授权信息, nick_name:%s, openid:%s, img:%s ' %(nick_name, openid, img_url))
             WanglibaoWeixinRelative.objects.create(
                openid=openid,
                nick_name=nick_name,
                img=img_url
             )
+        else:
+            logger.debug('微信授权信息很早就已经入库, nick_name:%s, openid:%s, img:%s ' %(nick_name, openid, img_url))
         return {
             'ret_code': 9001,
             'openid': openid,
             'order_id': order_id,
-            'phone': record.phone if record else u'None',
+            'phone': record.phone if record else '',
         }
 
     def dispatch(self, request, *args, **kwargs):

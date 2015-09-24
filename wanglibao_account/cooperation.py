@@ -24,7 +24,7 @@ import requests
 from rest_framework import renderers
 from rest_framework.views import APIView
 from marketing.models import Channels, IntroducedBy, PromotionToken
-from marketing.utils import set_promo_user
+from marketing.utils import set_promo_user, get_channel_record, get_user_channel_record
 from wanglibao import settings
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
@@ -36,7 +36,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_YUNDUAN_KEY, YUNDUAN_CALL_BACK_URL, YUNDUAN_COOP_ID, WLB_FOR_YICHE_KEY, YICHE_COOP_ID, \
      YICHE_KEY, YICHE_CALL_BACK_URL, WLB_FOR_ZHITUI1_KEY, ZHITUI_COOP_ID, ZHITUI_CALL_BACK_URL, \
      WLB_FOR_ZGDX_KEY, ZGDX_CALL_BACK_URL, ZGDX_PARTNER_NO, ZGDX_SERVICE_CODE, ZGDX_CONTRACT_ID, \
-     ZGDX_ACTIVITY_ID, ZGDX_PLAT_OFFER_ID, ZGDX_KEY, ZGDX_IV, WLB_FOR_NJWH_KEY
+     ZGDX_ACTIVITY_ID, ZGDX_KEY, ZGDX_IV, WLB_FOR_NJWH_KEY, ENV, ENV_PRODUCTION
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
@@ -229,9 +229,10 @@ class CoopRegister(object):
         """
         渠道名
         """
-        try:
-            channel_name = Channels.objects.filter(code=self.channel_code).get().name
-        except:
+        channel = get_channel_record(self.channel_code)
+        if channel:
+            channel_name = channel.name
+        else:
             channel_name = None
         return channel_name
 
@@ -305,11 +306,12 @@ class CoopRegister(object):
         :return:
         """
         channel_user = self.channel_user
+        channel_name = self.channel_name
         bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
-        if channel_user and len(channel_user) <= bid_len:
+        if channel_name and channel_user and len(channel_user) <= bid_len:
             binding = Binding()
             binding.user = user
-            binding.btype = self.channel_name
+            binding.btype = channel_name
             binding.bid = channel_user
             binding.save()
             # logger.debug('save user %s to binding'%user)
@@ -387,13 +389,12 @@ class CoopRegister(object):
         """
         返回该用户的渠道处理器
         """
-        try:
-            channel_code = Channels.objects.filter(introducedby__user_id = user.id).get().code
+        channel = get_user_channel_record(user.id)
+        if channel:
+            channel_code = channel.code
             for channel_processor in self.processors:
                 if channel_processor.c_code == channel_code:
                     return channel_processor
-        except:
-            return None
 
     def process_for_validate(self, user):
         try:
@@ -559,12 +560,13 @@ class JinShanRegister(CoopRegister):
         """
         channel_user = self.channel_user
         channel_extra = self.channel_extra
+        channel_name = self.channel_name
         bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
         extra_len = Binding._meta.get_field_by_name('extra')[0].max_length
-        if channel_user and len(channel_user) <= bid_len and len(channel_extra) <= extra_len:
+        if channel_name and channel_user and len(channel_user) <= bid_len and len(channel_extra) <= extra_len:
             binding = Binding()
             binding.user = user
-            binding.btype = self.channel_name
+            binding.btype = channel_name
             binding.bid = channel_user
             binding.extra = channel_extra
             binding.save()
@@ -629,13 +631,14 @@ class ShiTouCunRegister(CoopRegister):
         :return:
         """
         channel_user = self.channel_user
+        channel_name = self.channel_name
         channel_extra = self.channel_extra
         bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
         extra_len = Binding._meta.get_field_by_name('extra')[0].max_length
-        if channel_user and len(channel_user) <= bid_len and len(channel_extra) <= extra_len:
+        if channel_name and channel_user and len(channel_user) <= bid_len and len(channel_extra) <= extra_len:
             binding = Binding()
             binding.user = user
-            binding.btype = self.channel_name
+            binding.btype = channel_name
             binding.bid = channel_user
             binding.extra = channel_extra
             binding.save()
@@ -864,13 +867,14 @@ class ZhiTuiRegister(CoopRegister):
         :return:
         """
         channel_user = self.channel_user
+        channel_name = self.channel_name
         channel_extra = self.channel_extra
         bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
         extra_len = Binding._meta.get_field_by_name('extra')[0].max_length
-        if channel_user and len(channel_user) <= bid_len and len(channel_extra) <= extra_len:
+        if channel_name and channel_user and len(channel_user) <= bid_len and len(channel_extra) <= extra_len:
             binding = Binding()
             binding.user = user
-            binding.btype = self.channel_name
+            binding.btype = channel_name
             binding.bid = channel_user
             binding.extra = channel_extra
             binding.save()
@@ -918,11 +922,10 @@ class ZGDXRegister(CoopRegister):
         self.service_code = ZGDX_SERVICE_CODE
         self.contract_id = ZGDX_CONTRACT_ID
         self.activity_id = ZGDX_ACTIVITY_ID
-        self.plat_offer_id = ZGDX_PLAT_OFFER_ID
         self.coop_key = ZGDX_KEY
         self.iv = ZGDX_IV
 
-    def zgdx_call_back(self, user, binding):
+    def zgdx_call_back(self, user, plat_offer_id):
         if datetime.datetime.now().day >= 28:
             effect_type = '1'
         else:
@@ -936,7 +939,7 @@ class ZGDXRegister(CoopRegister):
             'contract_id': self.contract_id,
             'activity_id': self.activity_id,
             'order_type': '1',
-            'plat_offer_id': self.plat_offer_id,
+            'plat_offer_id': plat_offer_id,
             'effect_type': effect_type,
         }
         encrypt_str = encrypt_mode_cbc(json.dumps(code), self.coop_key, self.iv)
@@ -946,7 +949,7 @@ class ZGDXRegister(CoopRegister):
         }
 
         # 创建渠道订单记录
-        channel_recode = Channels.objects.filter(code=binding.btype).first()
+        channel_recode = get_user_channel_record(user.id)
         order = UserThreeOrder(user=user, order_on=channel_recode, request_no=request_no)
         order.save()
 
@@ -958,7 +961,11 @@ class ZGDXRegister(CoopRegister):
         binding = Binding.objects.filter(user_id=user.id).first()
         # 判定是否首次绑卡
         if binding and binding.extra != '1':
-            self.zgdx_call_back(user, binding)
+            if ENV == ENV_PRODUCTION:
+                plat_offer_id = '104369'
+            else:
+                plat_offer_id = '103050'
+            self.zgdx_call_back(user, plat_offer_id)
             binding.extra = '1'
             binding.save()
 
@@ -967,7 +974,16 @@ class ZGDXRegister(CoopRegister):
         binding = Binding.objects.filter(user_id=user.id).first()
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
         if binding and p2p_record.count() == 1:
-            self.zgdx_call_back(user, binding)
+            p2p_amount = int(p2p_record.first().amount)
+            if p2p_amount >= 1000:
+                if ENV == ENV_PRODUCTION:
+                    if 1000 <= p2p_amount < 2000:
+                        plat_offer_id = '104371'
+                    else:
+                        plat_offer_id = '104372'
+                else:
+                    plat_offer_id = '103050'
+                self.zgdx_call_back(user, plat_offer_id)
 
 
 class WeixinRedpackRegister(CoopRegister):

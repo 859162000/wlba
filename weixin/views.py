@@ -37,6 +37,7 @@ from .common.wechat import tuling
 from decimal import Decimal
 from wanglibao_pay.models import Card
 from marketing.models import Channels
+from marketing.utils import get_channel_record
 from wanglibao_reward.models import WanglibaoWeixinRelative
 import datetime
 import json
@@ -172,7 +173,7 @@ class WeixinRegister(TemplateView):
             token = 'weixin'
 
         if token:
-            channel = Channels.objects.filter(code=token).first()
+            channel = get_channel_record(token)
         else:
             channel = None
         phone = self.request.GET.get('phone', 0)
@@ -697,14 +698,15 @@ class AuthorizeUser(APIView):
             try:
                 wx_user = WanglibaoWeixinRelative.objects.filter(openid=openid)
                 if wx_user.exists():
-                    logger.debug("获得用户授权openid is: %s, phone is :%s" %(openid,wx_user.first().phone))
+                    phone = wx_user.first().phone
+                    logger.debug("获得用户授权openid is: %s, phone is :%s" %(openid,phone))
                     logger.debug("product id:%s" %(url_id))
-                    user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=url_id, identity__in=wx_user.first().phone,).first()
+                    user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=url_id, identity__in=phone,).first()
                     logger.debug("用户抽奖信息是：%s" % (user_gift))
-                    if not user_gift:
+                    if not user_gift and phone:
                         #如果用户已经了，直接跳转到详情页
-                        logger.debug("openid:%s, phone:%s, product_id:%s,用户已经存在了，直接跳转页面" %(openid, wx_user.first().phone, url_id,))
-                        return redirect("/weixin_activity/share/%s/%s/%s/share/" %(wx_user.first().phone, openid, url_id))
+                        logger.debug("openid:%s, phone:%s, product_id:%s,用户已经存在了，直接跳转页面" %(openid, phone, url_id,))
+                        return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, url_id))
                     else:
                         return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,nick_name,head_img_url))
                 else:
