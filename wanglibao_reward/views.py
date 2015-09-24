@@ -526,12 +526,17 @@ class WeixinShareDetailView(TemplateView):
         self.debug_msg("openid:%s, phone:%s, order_id:%s, activity:%s " % (openid, phone_num, order_id, activity))
 
         try:
-            misc_record = Misc.objects.filter(key='wechat_activity').first()
+            key = 'share_redpack'
+            shareconfig = Misc.objects.filter(key=key).first()
+            if shareconfig:
+                shareconfig = json.loads(shareconfig.value)
+                if type(shareconfig) == dict:
+                    activitys=shareconfig['activity']
         except Exception, reason:
             logger.exception('get misc record exception, msg:%s' % (reason,))
             raise
         else:
-            activitys = misc_record.value.split(",")
+            activitys = activitys.split(",")
             index = int(time.time()) % len(activitys)
             record = WanglibaoActivityGift.objects.filter(gift_id=order_id).first()
             activity = record.activity.code if record else activitys[index]

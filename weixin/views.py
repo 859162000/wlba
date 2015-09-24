@@ -696,8 +696,8 @@ class AuthorizeUser(APIView):
             user_info = {}
             try:
                 wx_user = WanglibaoWeixinRelative.objects.filter(openid=openid)
-                logger.debug("获得用户授权openid is: %s, phone is :%s" %(openid,wx_user.first().phone))
                 if wx_user.exists():
+                    logger.debug("获得用户授权openid is: %s, phone is :%s" %(openid,wx_user.first().phone))
                     logger.debug("product id:%s" %(url_id))
                     user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=url_id, identity__in=wx_user.first().phone,).first()
                     logger.debug("用户抽奖信息是：%s" % (user_gift))
@@ -708,7 +708,6 @@ class AuthorizeUser(APIView):
                     else:
                         return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,nick_name,head_img_url))
                 else:
-                    logger.debug("openid:%s, phone:%s, product_id:%s,用户未存在，跳转到开奖页面" %(openid, wx_user.first().phone, url_id,))
                     user_info = oauth.get_user_info(openid, res.get('access_token'))
                     nick_name = user_info['nickname']
                     head_img_url = user_info['headimgurl']

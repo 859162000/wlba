@@ -218,7 +218,8 @@ class WithdrawCompleteView(TemplateView):
             amount = decimal.Decimal(amount_str). \
                 quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
             margin = self.request.user.margin.margin
-            if amount > 50000 or amount <= 0:
+            # Modify by hb on 2015-09-23 for 50000 => 100000
+            if amount > 100000 or amount <= 0:
                 raise decimal.DecimalException
             if amount < 50:
                 if amount != margin:
@@ -264,7 +265,7 @@ class WithdrawCompleteView(TemplateView):
                 "mtype": "withdraw"
             })
         except decimal.DecimalException:
-            result = u'提款金额在0～50000之间'
+            result = u'提款金额在0～100000之间'
         except Card.DoesNotExist:
             result = u'请选择有效的银行卡'
         except MarginLack as e:
