@@ -102,6 +102,8 @@ org.shareIndex = (function(org){
             lib.phoneFun();
             lib.receiveFun();
             lib.ruleSelect();
+            var height = window.innerHeight;
+            $('.share').css({'min-height': height});
         },
         phoneFun:function(){
             $('#iphone').on('focus',function(){
@@ -180,6 +182,10 @@ org.newUser = (function(org){
             $('#goRegister').on('click',function(){
                 window.location.href = 'weixin/regist/?parentPhone='+parentPhone+'&phone='+phone;
             })
+            var height = window.innerHeight;
+            if(height >= 1136){
+                $('.wanglibao').css({'margin-top':'20%'});
+            }
         },
         _getQueryStringByName:function(name){
             var result = location.search.match(new RegExp('[\?\&]' + name+ '=([^\&]+)','i'));
@@ -187,6 +193,20 @@ org.newUser = (function(org){
              return '';
             }
             return result[1];
+        }
+    }
+    return {
+        init :lib.init
+    }
+})(org);
+
+org.shareFun = (function(org){
+    var lib = {
+        init:function(){
+            var height = window.innerHeight;
+            if(height >= 1136){
+                $('.wanglibao').css({'margin-top':'20%'});
+            }
         }
     }
     return {
