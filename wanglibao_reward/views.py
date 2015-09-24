@@ -391,6 +391,7 @@ class WeixinShareDetailView(TemplateView):
                 identity=phone_num,
                 activity=self.activity,
                 amount=gift.redpack.amount,
+                type=gift.rules.type,
                 valid=0,
             )
             WanglibaoUserGift.objects.create(
@@ -399,6 +400,7 @@ class WeixinShareDetailView(TemplateView):
                 identity=openid,
                 activity=self.activity,
                 amount=gift.redpack.amount,
+                type=gift.rules.type,
                 valid=2,
             )
             if user_profile:
@@ -537,7 +539,11 @@ class WeixinShareDetailView(TemplateView):
         else:
             activitys = activitys.split(",")
             index = int(time.time()) % len(activitys)
-            record = WanglibaoActivityGift.objects.filter(gift_id=order_id).first()
+            try:
+                record = WanglibaoActivityGift.objects.filter(gift_id=order_id).first()
+            except Exception, reason:
+                record = None
+                self.exception_msg("获得activity报异常， order_id:%s" %(order_id,), reason)
             activity = record.activity.code if record else activitys[index]
             logger.debug("misc配置的activity有:%s, 本次使用的activity是：%s" % (activitys, activity))
 
