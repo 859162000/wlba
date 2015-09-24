@@ -147,13 +147,13 @@ html(style="background:#000c58")
           |站内信自动发送加息券
         p.txt2 下次投资即可使用，一券一标永久加息！速速抢投哦～
         .success-img
-        .success-btn(href="/weixin/list/") 立即去投资
+        .success-btn#success-btn(href="/weixin/list/") 立即去投资
       .mid-fail#mid-fail
         span.mid-off X
         p.txt1#text 亲，不可重复领取
         p.txt2 在［我的账户-理财券］中查看
         .success-img
-        .success-btn 我知道了
+        .success-btn.fail-btn 我知道了
     script(src="/static/scripts/mobile_activity/mid-autumn.js")
     script.
       var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,

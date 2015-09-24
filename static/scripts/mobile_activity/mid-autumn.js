@@ -294,13 +294,13 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
   })
 
   //跳转投资页
-  $('.success-btn').on('click',function(){
+  $('#success-btn').on('click',function(){
     window.location.href="/weixin/list/?next=/activity/h5_mid_autumn/"
   })
 
   //关闭模态框
 
-  $('.mid-off,.success-btn').on('click',function(){
+  $('.mid-off,.fail-btn').on('click',function(){
     $('.mid-modle').hide();
     $('#mid-fail').hide();
   })
