@@ -36,7 +36,7 @@
           type: "POST",
           data: { redpack_event_name : "2015中秋节80000加息券"},
           success: function(date){
-            if (date['status']=='true'){
+            if (date['status']==true){
               $('.mid-modle').show();
               $('.mid-success').hide();
               $('#text').text('恭喜您～领取成功');
