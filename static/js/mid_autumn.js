@@ -94,7 +94,7 @@
     //立即领取
     $('.git-btn').on('click',function(){
       if ($(this).attr('data-num')){
-        window.location.href="/accounts/login/?next=/activity/mid-autumn/"
+        window.location.href="/accounts/login/?next=/activity/mid_autumn/"
       }else {
         $.ajax({
           url: "/redpacket/apply/",
