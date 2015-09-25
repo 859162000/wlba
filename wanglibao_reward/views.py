@@ -577,6 +577,22 @@ class WeixinShareDetailView(TemplateView):
             "all_gift": self.format_response_data(gifts, 'gifts')
         }
 
+    def dispatch(self, request, *args, **kwargs):
+        key = 'share_redpack'
+        is_open = False
+        shareconfig = Misc.objects.filter(key=key).first()
+        if shareconfig:
+            shareconfig = json.loads(shareconfig.value)
+            if type(shareconfig) == dict and shareconfig['is_open'] == 'true':
+                is_open = True
+
+        if not is_open:
+            data = {
+                'ret_code': 9010,
+                'message': u'配置开关关闭，分享无效;',
+            }
+            return HttpResponse(json.dumps(data), content_type='application/json')
+        return super(WeixinShareDetailView, self).dispatch(request, *args, **kwargs)
 
 class WeixinShareEndView(TemplateView):
     template_name = 'app_weChatEnd.jade'
@@ -621,15 +637,25 @@ class WeixinShareStartView(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         openid = self.request.GET.get('openid')
         order_id = self.request.GET.get('url_id')
-        amount=1000
-        account_id=2
+        amount = 1000
+        account_id = 2
         key = 'share_redpack'
+        is_open = False
         shareconfig = Misc.objects.filter(key=key).first()
         if shareconfig:
             shareconfig = json.loads(shareconfig.value)
             if type(shareconfig) == dict:
-                amount=int(shareconfig['amount'])
-                account_id=shareconfig['account_id']
+                amount = int(shareconfig['amount'])
+                account_id = shareconfig['account_id']
+                if shareconfig['is_open'] == 'true':
+                    is_open = True
+        if not is_open:
+            data = {
+                'ret_code': 9010,
+                'message': u'配置开关关闭，分享无效;',
+            }
+            return HttpResponse(json.dumps(data), content_type='application/json')
+
         if not self.is_valid_user_auth(order_id, amount) and False:
            data = {
                 'ret_code': 9000,
