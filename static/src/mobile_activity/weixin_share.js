@@ -61,7 +61,7 @@
             shareImg = host + '/static/imgs/mobile/share_logo.png',
             shareLink = host + '/activity/share/index/?parentPhone='+phoneNum,
             shareMainTit = '有个红包一直拽在手里，今天我想要送给你',
-            shareBody = '领取网利宝520元特权红包，同时可为好友赢得30元红包奖励'
+            shareBody = '领取网利宝520元现金红包,同时可为好友赢得30元红包奖励'
         //分享给微信好友
         org.onMenuShareAppMessage({
             title: shareMainTit,
@@ -71,7 +71,7 @@
         });
         //分享给微信朋友圈
         org.onMenuShareTimeline({
-            title: '我已获得网利宝私人银行特权，享520元专属红包',
+            title: '[有人@我]给我们的友情添点真金白银，一人￥520',
             link : shareLink,
             imgUrl: shareImg
         })
