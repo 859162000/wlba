@@ -3,33 +3,53 @@
     padding: 0;
     box-sizing:border-box;
 }
-.loadPage {
-	display: -webkit-box;
-	-webkit-box-pack: center;
-	-webkit-box-align: center;
-	background: #fff;
-	position: fixed;
-	width: 100%;
-	height: 100%;
-	z-index: 9999
-}
-
-.loadPage .process {
-	color: #000;
-	font-size: 16px;
-	text-align: center;
-	margin-top: 10px
-}
-
-.loadPage .logo {
-	width: 100px;
-	height: 100px;
-	background:url("/static/imgs/mobile_activity/app_ten_year/logo.png") no-repeat;
-	background-size: cover;
+body{
+    background: #febf34;
 }
 #wrap{
     font-family: Microsoft YaHei;
+    color: #fff;
 }
-.bit_title{
-
+.head_box{
+    width:100%;
+    text-align: center;
+    position: relative;
+}
+.bg{
+    width:100%;
+    display:block;
+}
+.head_box .small_title{
+    position: absolute;
+    left:0;
+    top:24.9602446%;
+    width:100%;
+    color: #febf34;
+    font-size: 11px;
+}
+.main{
+    width:82%;
+    margin: 0 auto;
+}
+.main p.bit_title{
+    color:#a86118;
+    font-size:18px;
+    text-align: center;
+}
+.main p.small_title{
+    padding:10px 0;
+    color:#ff8106;
+    font-size:14px;
+}
+dl{
+    color:#fff;
+    padding:10px 0;
+    font-size:14px;
+}
+dt{
+    padding-bottom:6px;
+    font-size:16px;
+}
+dd{
+    padding-bottom:4px;
 }
