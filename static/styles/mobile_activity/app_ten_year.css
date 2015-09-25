@@ -323,9 +323,9 @@ img{
     100%{transform: rotate(360deg);}
 }
 @-webkit-keyframes rotation_music{
-    0% { transfrom: rotate(0deg);}
-    50%{transform: rotate(180deg);}
-    100%{transform: rotate(360deg);}
+    0% { -webkit-transfrom: rotate(0deg);}
+    50%{ -webkit-transform: rotate(180deg);}
+    100%{ -webkit-transform: rotate(360deg);}
 }
 .section1 .theme{
     width: 55.78125%;
@@ -340,13 +340,13 @@ img{
 }
 @keyframes theme_start{
     0% { transfrom: scale(1); opacity:0;}
-    50%{transform: scale(1.2);}
-    100%{transform: scale(1); opacity:1;}
+    50%{ transform: scale(1.2);}
+    100%{ transform: scale(1); opacity:1;}
 }
 @-webkit-keyframes theme_start{
-    0% { transfrom: scale(1); opacity:0;}
-    50%{transform: scale(1.2);}
-    100%{transform: scale(1); opacity:1;}
+    0% { -webkit-transfrom: scale(1); opacity:0;}
+    50%{ -webkit-transform: scale(1.2);}
+    100%{ -webkit-transform: scale(1); opacity:1;}
 }
 .section1 .text1{
     width: 9.0625%;
@@ -654,8 +654,8 @@ img{
     100%{ transform: scale(1); top: 10.5355575%; }
 }
 @-webkit-keyframes s4talk_start{
-    0%{ transform: scale(0); top: 31.5355575%;}
-    100%{ transform: scale(1); top: 10.5355575%;}
+    0%{ -webkit-transform: scale(0); top: 31.5355575%;}
+    100%{ -webkit-transform: scale(1); top: 10.5355575%;}
 }
 .section4 .math{
     width: 47.1875%;
@@ -742,8 +742,8 @@ img{
     100%{ transform: scale(1); top: 9.3239437%; }
 }
 @-webkit-keyframes s5talk_start{
-    0%{ transform: scale(0); top: 23.3239437%;}
-    100%{ transform: scale(1); top: 9.3239437%;}
+    0%{ -webkit-transform: scale(0); top: 23.3239437%;}
+    100%{ -webkit-transform: scale(1); top: 9.3239437%;}
 }
 .bamboo{
     width: 48.75%;
@@ -1179,7 +1179,7 @@ img{
 }
 @-webkit-keyframes sayText_start{
     0%{ -webkit-transform: rotate(0deg) scale(0); }
-    99%{ transform: rotate(720deg) scale(1.03); }
+    99%{ -webkit-transform: rotate(720deg) scale(1.03); }
     100%{ -webkit-transform: rotate(0deg) scale(1); }
 }
 .section8 .text1{
