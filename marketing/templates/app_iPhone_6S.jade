@@ -19,9 +19,11 @@ html
                 p.small_title iPhone6s plus、iPhone6s 、iPad air 2、千元现金红包均投资满额100%直接送，不限数量多投多得！
                 dl
                     dt 一、活动详情：
+                    dd!= '【仅限投<span>3月标（含）以上</span>标期】160万≤单日累计投资，送iPhone6s plus 128G版本 一台 （价值7788元）'
+                    dd!= '【仅限投<span>3月标（含）以上</span>标期】140万≤单日累计投资，送iPhone6s plus 64G版本 一台 或 iPhone6s 128G版本 一台 （价值6888元）'
                     dd!= '【仅限投<span>3月标（含）以上</span>标期】120万≤单日累计投资，送iPhone6s plus 16G版本 一台 （价值6088元）'
-                    dd!= '【仅限投<span>3月标（含）以上</span>标期】100万≤单日累计投资＜120万，送iPhone6s 16G版本 一台（价值5288元）'
-                    dd!= '【仅限投<span>3月标（含）以上</span>标期】70万≤单日累计投资＜100万，送iPad air2 WIFI 16G版本 一台（价值3588元）'
+                    dd!= '【仅限投<span>3月标（含）以上</span>标期】100万≤单日累计投资＜120万，送iPhone6s 16G版本 一台 （价值5288元）'
+                    dd!= '【仅限投<span>3月标（含）以上</span>标期】70万≤单日累计投资＜100万，送iPad air2 WIFI 16G版本 一台 （价值3588元）'
                     dd!= '【仅限投<span>3月标（含）以上</span>标期】30万≤单日累计投资＜70万，送1500元现金红包'
                     dd!= '【仅限投<span>3月标（含）以上</span>标期】20万≤单日累计投资＜30万，送1000元现金红包'
                     dd!= '【仅限投<span>3月标（含）以上</span>标期】10万≤单日累计投资＜20万，送500元现金红包'
@@ -34,6 +36,14 @@ html
                     dd 1.活动时间：2015年9月25日-2015年10月8日，新老用户均可参与；
                     dd!= ' 2.投资满额奖励仅限投<span>3月标（含）以上</span>标期，请意向参加活动的用户务必投<span>3月标（含）以上</span>标期；'
                     dd 3.获得实物奖励资格的用户，需在用户中心里完善收货信息，在活动结束后7个工作日内会有客服人员与您联系，请保持手机畅通，所有实物奖品均会在11月15日前发放完毕；
-                    dd 4.实物奖可补差价兑换更高配置奖品（同类别），也可兑换等额网利宝现金红包；
+                    dd 4.实物奖可兑换等额网利宝现金红包；
                     dd 5.本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
                     dd 6.网利宝对此活动享有最终解释权。
+                p#ios-show(style="display:none") ⑧ 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关 如有疑问请联系在线客服或拨打4008-588-066
+        script.
+            var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+                iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+                ios = ipad || iphone;
+            if (ios) {
+                document.getElementById('ios-show').style.display = 'block';
+            }
