@@ -415,14 +415,14 @@ img{
     animation: young_start 2.5s linear 0.8s both;
 }
 @keyframes young_start{
-    0% { left:-150px; opacity:1;}
+    0% { left:-165px; opacity:1;}
     24% { left:80px; opacity:1;}
     25% { left:80px; opacity:0.6;}
     30% { left:0px; opacity:1;}
     100%{ left:0px; opacity:1;}
 }
 @-webkit-keyframes young_start{
-    0% { left:-150px; opacity:1;}
+    0% { left:-165px; opacity:1;}
     24% { left:80px; opacity:1;}
     25% { left:80px; opacity:0.6;}
     30% { left:0px; opacity:1;}
@@ -456,7 +456,7 @@ img{
 .section3 .talk{
     width: 83.90625%;
     left: 11.71875%;
-    top: 11.834507%;
+    top: 15.834507%;
     opacity: 0;
     z-index: 4;
 }
@@ -466,12 +466,12 @@ img{
     animation: s3talk_start 0.5s ease-in 1.7s both;
 }
 @keyframes s3talk_start{
-    0%{ transform: scale(0); top: 38.834507%; }
-    100%{ transform: translateX(1); top: 11.834507%; }
+    0%{ opacity:0; top: 15.834507%; }
+    100%{ opacity:1;  top: 11.834507%; }
 }
 @-webkit-keyframes s3talk_start{
-    0%{ transform: scale(0); top: 38.834507%;}
-    100%{ transform: translateX(1); top: 11.834507%;}
+    0%{ opacity:0; top: 15.834507%; }
+    100%{ opacity:1;  top: 11.834507%; }
 }
 .section3 .boy{
     width: 56.5625%;
@@ -641,21 +641,21 @@ img{
 .section4 .talk{
     width: 85.46875%;
     left : 7.03125%;
-    top: 31.5355575%;
+    top: 15.5355575%;
     z-index: 4;
-    transform: scale(0);
+    opacity:0;
 }
 .section4 .talk.animate{
     -webkit-animation: s4talk_start 0.7s ease-in 3s both;
     animation: s4talk_start 0.7s ease-in 3s both;
 }
 @keyframes s4talk_start{
-    0%{ transform: scale(0); top: 31.5355575%; }
-    100%{ transform: scale(1); top: 10.5355575%; }
+    0%{ opacity:0; top: 15.5355575%; }
+    100%{ opacity:1; top: 10.5355575%; }
 }
 @-webkit-keyframes s4talk_start{
-    0%{ -webkit-transform: scale(0); top: 31.5355575%;}
-    100%{ -webkit-transform: scale(1); top: 10.5355575%;}
+    0%{ opacity:0; top: 15.5355575%;}
+    100%{ opacity:1; top: 10.5355575%;}
 }
 .section4 .math{
     width: 47.1875%;
@@ -729,21 +729,21 @@ img{
 .section5 .talk{
     width: 85.15625%;
     left : 8.90625%;
-    transform: scale(0);
-    top: 23.3239437%;
+    top: 14.3239437%;
     z-index: 5;
+    opacity:0;
 }
 .section5 .talk.animate{
     -webkit-animation: s5talk_start 0.7s ease-in 2.7s both;
     animation: s5talk_start 0.7s ease-in 2.7s both;
 }
 @keyframes s5talk_start{
-    0%{ transform: scale(0); top: 23.3239437%; }
-    100%{ transform: scale(1); top: 9.3239437%; }
+    0%{ opacity:0; top: 14.3239437%; }
+    100%{ opacity:1; top: 9.3239437%; }
 }
 @-webkit-keyframes s5talk_start{
-    0%{ -webkit-transform: scale(0); top: 23.3239437%;}
-    100%{ -webkit-transform: scale(1); top: 9.3239437%;}
+    0%{ opacity:0; top: 14.3239437%;}
+    100%{ opacity:1; top: 9.3239437%;}
 }
 .bamboo{
     width: 48.75%;
