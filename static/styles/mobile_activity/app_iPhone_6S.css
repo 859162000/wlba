@@ -42,7 +42,7 @@ body{
     font-size:14px;
 }
 dl{
-    color:#fff;
+    color:#a86118;
     padding:10px 0;
     font-size:14px;
 }
@@ -54,5 +54,10 @@ dd{
     padding-bottom:4px;
 }
 dd span{
-    color:#ff8106;
+    color:#ec3e4a;
+}
+#ios-show{
+    font-size:12px;
+    padding-bottom:20px;
+    color: #666;
 }
