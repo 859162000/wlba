@@ -917,7 +917,7 @@ class UserActivityStatusAPIView(APIView):
 
     def get_user_channel(self, user_id):
         # 判断用户是否属于活动指定渠道用户
-        Introducedby = IntroducedBy.objects.filter(user_id=user_id)
+        Introducedby = IntroducedBy.objects.filter(user_id=user_id).first()
         if Introducedby:
             if Introducedby.channel:
                 channel_name = Introducedby.channel.name
