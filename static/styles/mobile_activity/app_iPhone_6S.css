@@ -1,0 +1,58 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing:border-box;
+}
+body{
+    background: #febf34;
+}
+#wrap{
+    font-family: Microsoft YaHei;
+    color: #fff;
+}
+.head_box{
+    width:100%;
+    text-align: center;
+    position: relative;
+}
+.bg{
+    width:100%;
+    display:block;
+}
+.head_box .small_title{
+    position: absolute;
+    left:0;
+    top:24.9602446%;
+    width:100%;
+    color: #febf34;
+    font-size: 11px;
+}
+.main{
+    width:82%;
+    margin: 0 auto;
+}
+.main p.bit_title{
+    color:#a86118;
+    font-size:18px;
+    text-align: center;
+}
+.main p.small_title{
+    padding:10px 0;
+    color:#ff8106;
+    font-size:14px;
+}
+dl{
+    color:#a86118;
+    padding:10px 0;
+    font-size:14px;
+}
+dt{
+    padding-bottom:6px;
+    font-size:16px;
+}
+dd{
+    padding-bottom:4px;
+}
+dd span{
+    color:#ec3e4a;
+}
