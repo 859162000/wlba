@@ -46,11 +46,10 @@ ENV = ENV_DEV
 
 if ENV != ENV_DEV:
     DEBUG = False
-DEBUG = True
 
 ADMINS = (
-    ('Shuo Li', 'lishuo@wanglibank.com'),
-    ('Zhang Ding Liang', 'zhangdingliang@wanglibank.com')
+    ('Li Li', 'lili@wanglibank.com'),
+    ('Huang bo', 'huangbo@wanglibank.com')
 )
 
 ALLOWED_HOSTS = ['*']

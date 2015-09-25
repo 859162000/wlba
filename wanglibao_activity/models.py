@@ -38,7 +38,8 @@ TRIGGER_NODE = (
     ('first_pay', u'首次充值'),
     ('first_buy', u'首次投资'),
     ('p2p_audit', u'满标审核'),
-    ('repaid', u'还款')
+    ('repaid', u'还款'),
+    ('activity', u'活动奖励')
 )
 GIFT_TYPE = (
     ('reward', u'奖品'),

@@ -166,4 +166,3 @@ def p2p_auto_published_by_publish_time(pay_method, period):
     if products:
         products.publish_time = timezone.now()
         products.save()
-

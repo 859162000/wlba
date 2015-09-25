@@ -128,7 +128,6 @@ def get_binding_time_for_coop(user_id):
     except Exception, e:
         return None
 
-
 def save_to_binding(user, request):
     try:
         coop = CoopRegister(request)
@@ -137,7 +136,6 @@ def save_to_binding(user, request):
                 processor.save_to_binding(user)
     except:
         pass
-
 
 def check_mobile(request):
     """
@@ -608,7 +606,6 @@ class NanjingWaihuRegister(CoopRegister):
     def __init__(self, request):
         super(NanjingWaihuRegister, self).__init__(request)
         self.c_code = 'njwh'
-
 
 class ShiTouCunRegister(CoopRegister):
     def __init__(self, request):
@@ -1911,12 +1908,12 @@ def zhongjin_get_products():
         if product in new_products:
             prod['method'] = 'add'
 
-        # # 如果用他们的id的话, 我们不做更新和下架
-        # else:
-        #     if product.status in [u'录标', u'录标完成', u'待审核', u'正在招标']:
-        #         prod['method'] = 'update'
-        #     else:
-        #         prod['method'] = 'down'
+        # 如果用他们的id的话, 我们不做更新和下架
+        else:
+            if product.status == u'正在招标':
+                prod['method'] = 'update'
+            else:
+                prod['method'] = 'down'
 
         prod['classId'] = 1
 
