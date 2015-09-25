@@ -56,6 +56,7 @@ img{
     -webkit-animation: slideDown 1.5s infinite ease-in-out;
 	animation: slideDown 1.5s infinite ease-in-out;
     z-index: 998;
+    pointer-events: none;
 }
 @-webkit-keyframes slideDown {
 	0%,30% {
@@ -116,6 +117,7 @@ img{
     left: 0%;
     bottom: 0%;
     z-index: 999;
+    pointer-events: none;
 }
 .meteor{
     width: 9.0625%;
@@ -292,7 +294,9 @@ img{
         opacity: 0;
     }
 }
-
+.hide{
+    opacity:0;
+}
 #play {
     position: fixed;
     z-index: 9998;
@@ -319,9 +323,9 @@ img{
     100%{transform: rotate(360deg);}
 }
 @-webkit-keyframes rotation_music{
-    0% { transfrom: rotate(0deg);}
-    50%{transform: rotate(180deg);}
-    100%{transform: rotate(360deg);}
+    0% { -webkit-transfrom: rotate(0deg);}
+    50%{ -webkit-transform: rotate(180deg);}
+    100%{ -webkit-transform: rotate(360deg);}
 }
 .section1 .theme{
     width: 55.78125%;
@@ -336,13 +340,13 @@ img{
 }
 @keyframes theme_start{
     0% { transfrom: scale(1); opacity:0;}
-    50%{transform: scale(1.2);}
-    100%{transform: scale(1); opacity:1;}
+    50%{ transform: scale(1.2);}
+    100%{ transform: scale(1); opacity:1;}
 }
 @-webkit-keyframes theme_start{
-    0% { transfrom: scale(1); opacity:0;}
-    50%{transform: scale(1.2);}
-    100%{transform: scale(1); opacity:1;}
+    0% { -webkit-transfrom: scale(1); opacity:0;}
+    50%{ -webkit-transform: scale(1.2);}
+    100%{ -webkit-transform: scale(1); opacity:1;}
 }
 .section1 .text1{
     width: 9.0625%;
@@ -411,14 +415,14 @@ img{
     animation: young_start 2.5s linear 0.8s both;
 }
 @keyframes young_start{
-    0% { left:-150px; opacity:1;}
+    0% { left:-165px; opacity:1;}
     24% { left:80px; opacity:1;}
     25% { left:80px; opacity:0.6;}
     30% { left:0px; opacity:1;}
     100%{ left:0px; opacity:1;}
 }
 @-webkit-keyframes young_start{
-    0% { left:-150px; opacity:1;}
+    0% { left:-165px; opacity:1;}
     24% { left:80px; opacity:1;}
     25% { left:80px; opacity:0.6;}
     30% { left:0px; opacity:1;}
@@ -450,9 +454,9 @@ img{
     }
 }
 .section3 .talk{
-    width: 83.90625%;
+    width: 74.90625%;
     left: 11.71875%;
-    top: 11.834507%;
+    top: 15.834507%;
     opacity: 0;
     z-index: 4;
 }
@@ -462,12 +466,12 @@ img{
     animation: s3talk_start 0.5s ease-in 1.7s both;
 }
 @keyframes s3talk_start{
-    0%{ transform: scale(0); top: 38.834507%; }
-    100%{ transform: translateX(1); top: 11.834507%; }
+    0%{ opacity:0; top: 15.834507%; }
+    100%{ opacity:1;  top: 9.834507%; }
 }
 @-webkit-keyframes s3talk_start{
-    0%{ transform: scale(0); top: 38.834507%;}
-    100%{ transform: translateX(1); top: 11.834507%;}
+    0%{ opacity:0; top: 15.834507%; }
+    100%{ opacity:1;  top: 9.834507%; }
 }
 .section3 .boy{
     width: 56.5625%;
@@ -557,22 +561,14 @@ img{
 }
 @media screen and (max-height: 550px){
     .section3 .talk{
-        width: 77.90625%;
-        top: 9.7260755%;
+        width: 70.90625%;
+        top: 9.834507%;
     }
     .section3 .boy,.section3 .boy_before{
         bottom: -5%;
     }
     .section3 .man{
         bottom: -5%;
-    }
-    @keyframes s3talk_start{
-        0%{ transform: scale(0); top: 38.834507%; }
-        100%{ transform: translateX(1); top: 9.834507%; }
-    }
-    @-webkit-keyframes s3talk_start{
-        0%{ transform: scale(0); top: 38.834507%;}
-        100%{ transform: translateX(1); top: 9.834507%;}
     }
 }
 .section4 .man1{
@@ -635,23 +631,23 @@ img{
     100%{ bottom: 0%; }
 }
 .section4 .talk{
-    width: 85.46875%;
+    width: 80.46875%;
     left : 7.03125%;
-    top: 31.5355575%;
+    top: 13.5355575%;
     z-index: 4;
-    transform: scale(0);
+    opacity:0;
 }
 .section4 .talk.animate{
     -webkit-animation: s4talk_start 0.7s ease-in 3s both;
     animation: s4talk_start 0.7s ease-in 3s both;
 }
 @keyframes s4talk_start{
-    0%{ transform: scale(0); top: 31.5355575%; }
-    100%{ transform: scale(1); top: 10.5355575%; }
+    0%{ opacity:0; top: 13.5355575%; }
+    100%{ opacity:1; top: 7.5355575%; }
 }
 @-webkit-keyframes s4talk_start{
-    0%{ transform: scale(0); top: 31.5355575%;}
-    100%{ transform: scale(1); top: 10.5355575%;}
+    0%{ opacity:0; top: 13.5355575%;}
+    100%{ opacity:1; top: 7.5355575%;}
 }
 .section4 .math{
     width: 47.1875%;
@@ -716,30 +712,38 @@ img{
         bottom: 26.0880282%;
     }
     .section4 .talk{
-        width: 75.46875%;
+        width: 72.46875%;
         left : 12.03125%;
         top: 10.5355575%;
         z-index: 4;
     }
+    @keyframes s4talk_start{
+        0%{ opacity:0; top: 10.5355575%; }
+        100%{ opacity:1; top: 8.5355575%; }
+    }
+    @-webkit-keyframes s4talk_start{
+        0%{ opacity:0; top: 10.5355575%;}
+        100%{ opacity:1; top: 8.5355575%;}
+    }
 }
 .section5 .talk{
-    width: 85.15625%;
+    width: 80.15625%;
     left : 8.90625%;
-    transform: scale(0);
-    top: 23.3239437%;
+    top: 14.3239437%;
     z-index: 5;
+    opacity:0;
 }
 .section5 .talk.animate{
     -webkit-animation: s5talk_start 0.7s ease-in 2.7s both;
     animation: s5talk_start 0.7s ease-in 2.7s both;
 }
 @keyframes s5talk_start{
-    0%{ transform: scale(0); top: 23.3239437%; }
-    100%{ transform: scale(1); top: 9.3239437%; }
+    0%{ opacity:0; top: 14.3239437%; }
+    100%{ opacity:1; top: 9.3239437%; }
 }
 @-webkit-keyframes s5talk_start{
-    0%{ transform: scale(0); top: 23.3239437%;}
-    100%{ transform: scale(1); top: 9.3239437%;}
+    0%{ opacity:0; top: 14.3239437%;}
+    100%{ opacity:1; top: 9.3239437%;}
 }
 .bamboo{
     width: 48.75%;
@@ -854,9 +858,17 @@ img{
         bottom: 22.8943662%;
     }
     .section5 .talk{
-        width: 79.15625%;
+        width: 72.15625%;
         left : 11.90625%;
-        top: 9.3239437%;
+        top: 14.3239437%;
+    }
+    @keyframes s5talk_start{
+        0%{ opacity:0; top: 14.3239437%; }
+        100%{ opacity:1; top: 8.3239437%; }
+    }
+    @-webkit-keyframes s5talk_start{
+        0%{ opacity:0; top: 14.3239437%;}
+        100%{ opacity:1; top: 8.3239437%;}
     }
 }
 .section6 .fly{
@@ -1175,7 +1187,7 @@ img{
 }
 @-webkit-keyframes sayText_start{
     0%{ -webkit-transform: rotate(0deg) scale(0); }
-    99%{ transform: rotate(720deg) scale(1.03); }
+    99%{ -webkit-transform: rotate(720deg) scale(1.03); }
     100%{ -webkit-transform: rotate(0deg) scale(1); }
 }
 .section8 .text1{

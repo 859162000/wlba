@@ -25,7 +25,7 @@ from django.views.generic import TemplateView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from marketing.utils import get_user_channel_record
-
+from django.shortcuts import redirect
 logger = logging.getLogger('wanglibao_reward')
 
 def ajax_response_reward(request):
@@ -327,8 +327,7 @@ class WeixinShareDetailView(TemplateView):
         "percent": 2}
         if not self.global_cfg:
             if not self.get_global_cfg(activity):
-                self.debug_msg(u'对应的全局红包活动配置没有配，请先配置')
-                return None
+                self.throw_exception(u'对应的全局红包活动配置没有配，请先配置')
 
         if not self.has_combine_redpack(product_id, activity):
             ids = self.get_redpack_id(activity)
@@ -519,6 +518,9 @@ class WeixinShareDetailView(TemplateView):
         except Exception, reason:
             self.exception_msg(reason, "weixin-wanglibao-realitive table 更新用户的手机号报异常")
 
+    def throw_exception(self, msg):
+        raise Exception(msg)
+
     def get_context_data(self, **kwargs):
         openid = kwargs["openid"]
         phone_num = kwargs['phone_num']
@@ -538,6 +540,9 @@ class WeixinShareDetailView(TemplateView):
             raise
         else:
             activitys = activitys.split(",")
+            if len(activitys) == 0:
+                self.throw_exception("Misc中, activity没有配置")
+
             index = int(time.time()) % len(activitys)
             try:
                 record = WanglibaoActivityGift.objects.filter(gift_id=order_id).first()
@@ -562,7 +567,7 @@ class WeixinShareDetailView(TemplateView):
             if "No Reward" == user_gift:
                 self.debug_msg('奖品已经发完了，用户:%s 没有领到奖品' %(phone_num,))
                 redirect_url = reverse('weixin_share_end')
-                return HttpResponseRedirect(redirect_url)
+                return redirect(redirect_url)
         else:
             self.debug_msg('phone:%s 已经领取过奖品' %(phone_num,))
         gifts = self.get_distribute_status(order_id, activity)

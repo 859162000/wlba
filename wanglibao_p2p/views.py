@@ -251,11 +251,15 @@ class PurchaseP2PMobile(APIView):
                 shareShow=0
                 key = 'share_redpack'
                 url = ""
+                shareTitle=""
+                shareContent=""
                 shareconfig = Misc.objects.filter(key=key).first()
                 if shareconfig:
                     shareconfig = json.loads(shareconfig.value)
                     if type(shareconfig) == dict:
                         is_open = shareconfig.get('is_open', 'false')
+                        shareTitle=shareconfig.get('share_title', "")
+                        shareContent=shareconfig.get('share_content', "")
                         if is_open=='true':
                             amount = Decimal(shareconfig.get('amount', 1000))
                             if product_info.amount >= amount:
@@ -266,6 +270,8 @@ class PurchaseP2PMobile(APIView):
                     'data': product_info.amount,
                     'share_show': shareShow,
                     'share_url': url,
+                    "shareTitle":shareTitle,
+                    "shareContent":shareContent,
                 })
             except Exception, e:
                 return Response({
