@@ -185,12 +185,12 @@ class PasswordCheckView(APIView):
         password = request.DATA.get("password", "")
 
         if not identifier or not password:
-            return Response({"token":False, "message":u"用户名或密码错误"})
+            return Response({"token":False, "message":u"登录密码错误，请重试"})
 
         user = authenticate(identifier=identifier, password=password)
 
         if not user:
-            return Response({"token":False, "message":u"用户名或密码错误"})
+            return Response({"token":False, "message":u"登录密码错误，请重试"})
         if not user.is_active:
             return Response({"token":False, "message":u"用户已被关闭"})
         if user.wanglibaouserprofile.frozen:
