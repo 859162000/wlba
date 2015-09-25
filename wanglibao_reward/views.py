@@ -606,7 +606,7 @@ class WeixinShareStartView(TemplateView):
             logger.debug('入库微信授权信息, nick_name:%s, openid:%s, img:%s ' %(nick_name, openid, img_url))
             WanglibaoWeixinRelative.objects.create(
                openid=openid,
-               nick_name=nick_name.encode('utf8'),
+               nick_name=nick_name,
                img=img_url
             )
         else:
