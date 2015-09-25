@@ -917,7 +917,7 @@ class UserActivityStatusAPIView(APIView):
 
     def get_user_channel(self, user_id):
         # 判断用户是否属于活动指定渠道用户
-        Introducedby = IntroducedBy.objects.filter(user_id=user_id)
+        Introducedby = IntroducedBy.objects.filter(user_id=user_id).first()
         if Introducedby:
             if Introducedby.channel:
                 channel_name = Introducedby.channel.name
@@ -1521,9 +1521,6 @@ class CommonAward(object):
 
         describe = 'common_september_' + str(int(join_log.amount))
         try:
-            print "*"*20
-            print describe
-            print "*"*20
             dt = timezone.datetime.now()
             redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
         except Exception, reason:
