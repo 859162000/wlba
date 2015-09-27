@@ -22,30 +22,24 @@ html(style="background:#FFF29A")
 
       .pc-dw-button#ios-android-client
         a(href="javascript:void(0)")#dw-button 下载网利宝手机APP
-      .pc-dw-button#other-client
-        a(href="https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8").dw-button-ios 下载ios版本
-        a(href="https://www.wanglibao.com/static/wanglibao1.apk").dw-button-android 下载安卓版本
-
     script.
-      document.body.addEventListener('touchstart', function () { });
-
       var u = navigator.userAgent,
+          ua = navigator.userAgent.toLowerCase(),
           target = document.getElementById('dw-button'),
-          iosAndroid_client = document.getElementById('ios-android-client'),
-          other_client = document.getElementById('other-client');
-
-      var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1;
-      var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
-
+          isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1,
+          isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
 
       target.onclick = function(){
-
-        if(isiOS){
-          window.location.href = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao&g_f=991653';
-        }else if(isAndroid){
-          window.location.href = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao';
+        if (ua.match(/MicroMessenger/i) == "micromessenger") {
+            window.location.href = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao&g_f=991653';
         }else{
-          iosAndroid_client.style.display = 'none';
-          other_client.style.display = 'block';
+          if(isiOS){
+            window.location.href = 'https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8';
+          }else if(isAndroid) {
+            window.location.href = 'https://www.wanglibao.com/static/wanglibao1.apk';
+          }else{
+            window.location.href = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao&g_f=991653';
+          }
         }
+
       }
