@@ -58,7 +58,7 @@ def product_failed(product):
 
 @suffix
 def product_amortize(product, amortize_time, amount):
-    return u'您投资的%s项目收到还款%s元，已到帐。，请登录您的网利宝账户进行查看。' % (product.short_name, str(amount))
+    return u'您投资的%s项目收到还款%s元，已到帐。请登录您的网利宝账户进行查看。' % (product.short_name, str(amount))
 
 
 @suffix
@@ -94,13 +94,13 @@ def msg_bid_purchase(order_id, product_name, amount):
 
 def msg_bid_earning(product_name, activity_name, term, time, earning_percent, earning_aoumnt, unit):
     title = u"活动收益"
-    content = u"借款项目“%s(%s）,期限%s%s”于%s赠送【%s%s】活动收益【%s】元，请注意查收。 查看账户余额 感谢您对我们的支持与关注。" % (product_name, activity_name, term, unit, time, earning_percent, u"%", earning_aoumnt)
+    content = u"借款项目“%s(%s），期限%s%s”于%s赠送【%s%s】活动收益【%s】元，请注意查收。 查看账户余额 感谢您对我们的支持与关注。" % (product_name, activity_name, term, unit, time, earning_percent, u"%", earning_aoumnt)
     return title, content
 
 
 def msg_bid_fail(product_name):
     title = u"流标通知"
-    content = u"感谢您投资 借款项目“%s”，该项目在有效期内未满标，视为流标，您的该笔投资金额已取消冻结，您可继续投资其他理财产品。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注！<br/>网利宝" % product_name
+    content = u"感谢您投资借款项目“%s”，该项目在有效期内未满标，视为流标，您的该笔投资金额已取消冻结，您可继续投资其他理财产品。<br/><a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注！<br/>网利宝" % product_name
     return title, content
 
 
