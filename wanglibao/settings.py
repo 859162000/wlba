@@ -976,6 +976,9 @@ else:
     ZGDX_KEY = 'H5gOs1ZshKZ6WikN'
     ZGDX_IV = '8888159601152533'
 
+# 返利投
+WLB_FOR_FANLITOU_KEY = '2002'
+
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
     local_ip = None
