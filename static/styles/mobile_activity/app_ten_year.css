@@ -61,6 +61,7 @@ img{
 @-webkit-keyframes slideDown {
 	0%,30% {
 		opacity: 0.2;
+
 		-webkit-transform: translate(0, -5px)
 	}
 	60% {
@@ -78,6 +79,7 @@ img{
 		transform: translate(0, -5px)
 	}
 	60% {
+
 		opacity: 1;
 		transform: translate(0, 0)
 	}
@@ -602,6 +604,7 @@ img{
     opacity: 0;
 }
 .section4 .man1_before.animate{
+    opacity: 1;
     -webkit-animation: man1_before_start 4s ease-in 0.5s both;
     animation: man1_before_start 4s ease-in 0.5s both;
 }
@@ -642,6 +645,7 @@ img{
     opacity:0;
 }
 .section4 .talk.animate{
+    opacity: 1;
     -webkit-animation: s4talk_start 0.7s ease-in 3s both;
     animation: s4talk_start 0.7s ease-in 3s both;
 }
@@ -738,6 +742,7 @@ img{
     opacity:0;
 }
 .section5 .talk.animate{
+    opacity: 1;
     -webkit-animation: s5talk_start 0.7s ease-in 2.7s both;
     animation: s5talk_start 0.7s ease-in 2.7s both;
 }
@@ -1177,22 +1182,24 @@ img{
     left: 0;
     text-align: center;
     transform: rotate(0deg) scale(0);
+    opacity:0;
     height: 36px;
     line-height: 36px;
 }
 .section7 .text.animate{
+    opacity: 1;
     -webkit-animation: sayText_start 1.5s ease-in 1s both;
     animation: sayText_start 1.5s ease-in 1s both;
 }
 @keyframes sayText_start{
-    0%{ transform: rotate(0deg) scale(0); }
+    0%{ opacity:1; transform: rotate(0deg) scale(0); }
     99%{ transform: rotate(7200deg) scale(1.03); }
-    100%{ transform: rotate(0deg) scale(1); }
+    100%{ opacity:1; transform: rotate(0deg) scale(1); }
 }
 @-webkit-keyframes sayText_start{
-    0%{ -webkit-transform: rotate(0deg) scale(0); }
+    0%{ opacity:1; -webkit-transform: rotate(0deg) scale(0); }
     99%{ -webkit-transform: rotate(720deg) scale(1.03); }
-    100%{ -webkit-transform: rotate(0deg) scale(1); }
+    100%{ opacity:1; -webkit-transform: rotate(0deg) scale(1); }
 }
 .section8 .text1{
     width: 50%;
