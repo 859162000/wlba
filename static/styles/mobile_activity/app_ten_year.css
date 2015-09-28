@@ -430,7 +430,7 @@ img{
 }
 .section2 .old{
     width: 39.21875%;
-    bottom: 0%;
+    bottom: -7%;
     right: 0%;
 }
 .section2 .old.animate{
@@ -452,11 +452,6 @@ img{
 @media screen and (max-height: 550px){
     .section2 .old{
         bottom: -13%;
-    }
-}
-@media screen and (max-height: 630px){
-    .section2 .old{
-        bottom: -7%;
     }
 }
 .section3 .talk{
