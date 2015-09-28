@@ -995,6 +995,7 @@ img{
     height: 42px;
     line-height: 42px;
     border:none;
+    box-shadow: none;
 }
 .section6 input.animate{
     -webkit-animation: input_start 1s ease-in both;
