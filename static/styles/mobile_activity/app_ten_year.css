@@ -296,6 +296,7 @@ img{
 }
 .hide{
     opacity:0;
+    z-index:-10;
 }
 #play {
     position: fixed;
@@ -451,6 +452,11 @@ img{
 @media screen and (max-height: 550px){
     .section2 .old{
         bottom: -13%;
+    }
+}
+@media screen and (max-height: 630px){
+    .section2 .old{
+        bottom: -7%;
     }
 }
 .section3 .talk{
