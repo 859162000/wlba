@@ -61,6 +61,7 @@ img{
 @-webkit-keyframes slideDown {
 	0%,30% {
 		opacity: 0.2;
+
 		-webkit-transform: translate(0, -5px)
 	}
 	60% {
@@ -78,6 +79,7 @@ img{
 		transform: translate(0, -5px)
 	}
 	60% {
+
 		opacity: 1;
 		transform: translate(0, 0)
 	}
@@ -296,6 +298,10 @@ img{
 }
 .hide{
     opacity:0;
+    position: absolute;
+    left:-100%;
+    z-index:-10;
+    top:-100%;
 }
 #play {
     position: fixed;
@@ -429,7 +435,7 @@ img{
 }
 .section2 .old{
     width: 39.21875%;
-    bottom: 0%;
+    bottom: -7%;
     right: 0%;
 }
 .section2 .old.animate{
@@ -448,10 +454,8 @@ img{
     95%{ right: 2.125%; opacity: 0.6;}
     100%{ right: 3.125%; opacity: 1;}
 }
-@media screen and (max-height: 550px){
-    .section2 .old{
-        bottom: -10%;
-    }
+.section2 .old{
+    bottom: -13%;
 }
 .section3 .talk{
     width: 74.90625%;
@@ -461,7 +465,6 @@ img{
     z-index: 4;
 }
 .section3 .talk.animate{
-    opacity: 1;
     -webkit-animation: s3talk_start 0.5s ease-in 1.7s both;
     animation: s3talk_start 0.5s ease-in 1.7s both;
 }
@@ -559,18 +562,18 @@ img{
     0%{ width:0; }
     100%{ width: 45%;}
 }
-@media screen and (max-height: 550px){
-    .section3 .talk{
-        width: 70.90625%;
-        top: 9.834507%;
-    }
-    .section3 .boy,.section3 .boy_before{
-        bottom: -5%;
-    }
-    .section3 .man{
-        bottom: -5%;
-    }
+
+.section3 .talk{
+    width: 70.90625%;
+    top: 9.834507%;
 }
+.section3 .boy,.section3 .boy_before{
+    bottom: -5%;
+}
+.section3 .man{
+    bottom: -5%;
+}
+
 .section4 .man1{
     width: 58.125%;
     left : 0%;
@@ -657,7 +660,6 @@ img{
     z-index: 1;
 }
 .section4 .math.animate{
-    opacity: 1;
     -webkit-animation: s4math_start 1.7s ease-in both;
     animation: s4math_start 1.7s ease-in both;
 }
@@ -699,32 +701,30 @@ img{
     100%{ width: 45.625%; }
 }
 
-@media screen and (max-height: 550px){
-    .section4 .man1,.section4 .man1_before{
-        width: 53.125%;
-    }
-    .section4 .man2{
-        width: 75.9375%;
-    }
-    .section4 .line{
-        width: 45.625%;
-        left : 32.34375%;
-        bottom: 26.0880282%;
-    }
-    .section4 .talk{
-        width: 72.46875%;
-        left : 12.03125%;
-        top: 10.5355575%;
-        z-index: 4;
-    }
-    @keyframes s4talk_start{
-        0%{ opacity:0; top: 10.5355575%; }
-        100%{ opacity:1; top: 8.5355575%; }
-    }
-    @-webkit-keyframes s4talk_start{
-        0%{ opacity:0; top: 10.5355575%;}
-        100%{ opacity:1; top: 8.5355575%;}
-    }
+.section4 .man1,.section4 .man1_before{
+    width: 53.125%;
+}
+.section4 .man2{
+    width: 75.9375%;
+}
+.section4 .line{
+    width: 45.625%;
+    left : 32.34375%;
+    bottom: 26.0880282%;
+}
+.section4 .talk{
+    width: 72.46875%;
+    left : 12.03125%;
+    top: 10.5355575%;
+    z-index: 4;
+}
+@keyframes s4talk_start{
+    0%{ opacity:0; top: 10.5355575%; }
+    100%{ opacity:1; top: 8.5355575%; }
+}
+@-webkit-keyframes s4talk_start{
+    0%{ opacity:0; top: 10.5355575%;}
+    100%{ opacity:1; top: 8.5355575%;}
 }
 .section5 .talk{
     width: 80.15625%;
@@ -753,7 +753,6 @@ img{
     z-index: 1;
 }
 .section5 .bamboo.animate{
-    opacity: 1;
     -webkit-animation: s5bamboo_start 2s ease-in 0.3s both;
     animation: s5bamboo_start 2s ease-in 0.3s both;
 }
@@ -853,23 +852,21 @@ img{
     0%{ bottom: -100%; right : -100%; }
     100%{ bottom: 0%; right : 0%; }
 }
-@media screen and (max-height: 550px){
-    .section5 .line,.section5 .line_img{
-        bottom: 22.8943662%;
-    }
-    .section5 .talk{
-        width: 72.15625%;
-        left : 11.90625%;
-        top: 14.3239437%;
-    }
-    @keyframes s5talk_start{
-        0%{ opacity:0; top: 14.3239437%; }
-        100%{ opacity:1; top: 8.3239437%; }
-    }
-    @-webkit-keyframes s5talk_start{
-        0%{ opacity:0; top: 14.3239437%;}
-        100%{ opacity:1; top: 8.3239437%;}
-    }
+.section5 .line,.section5 .line_img{
+    bottom: 22.8943662%;
+}
+.section5 .talk{
+    width: 72.15625%;
+    left : 11.90625%;
+    top: 14.3239437%;
+}
+@keyframes s5talk_start{
+    0%{ opacity:0; top: 14.3239437%; }
+    100%{ opacity:1; top: 8.3239437%; }
+}
+@-webkit-keyframes s5talk_start{
+    0%{ opacity:0; top: 14.3239437%;}
+    100%{ opacity:1; top: 8.3239437%;}
 }
 .section6 .fly{
     width: 6.71875%;
@@ -997,6 +994,8 @@ img{
     color: #222;
     height: 42px;
     line-height: 42px;
+    border:none;
+    box-shadow: none;
 }
 .section6 input.animate{
     -webkit-animation: input_start 1s ease-in both;
@@ -1037,6 +1036,7 @@ img{
 .section6 .button:active,{
     background: #ea3d3d;
 }
+
 .section6 .button:visited{
     background: #3d90fe;
 }
@@ -1173,22 +1173,24 @@ img{
     left: 0;
     text-align: center;
     transform: rotate(0deg) scale(0);
+    opacity:0;
     height: 36px;
     line-height: 36px;
 }
 .section7 .text.animate{
+    opacity: 1;
     -webkit-animation: sayText_start 1.5s ease-in 1s both;
     animation: sayText_start 1.5s ease-in 1s both;
 }
 @keyframes sayText_start{
-    0%{ transform: rotate(0deg) scale(0); }
+    0%{ opacity:1; transform: rotate(0deg) scale(0); }
     99%{ transform: rotate(7200deg) scale(1.03); }
-    100%{ transform: rotate(0deg) scale(1); }
+    100%{ opacity:1; transform: rotate(0deg) scale(1); }
 }
 @-webkit-keyframes sayText_start{
-    0%{ -webkit-transform: rotate(0deg) scale(0); }
+    0%{ opacity:1; -webkit-transform: rotate(0deg) scale(0); }
     99%{ -webkit-transform: rotate(720deg) scale(1.03); }
-    100%{ -webkit-transform: rotate(0deg) scale(1); }
+    100%{ opacity:1; -webkit-transform: rotate(0deg) scale(1); }
 }
 .section8 .text1{
     width: 50%;

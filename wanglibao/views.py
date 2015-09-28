@@ -109,7 +109,8 @@ class IndexView(TemplateView):
         recommend_product_id = None
         if self.request.user and self.request.user.is_authenticated():
             user = self.request.user
-            product_new = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now(), status=u'正在招标', category=u'新手标')
+            product_new = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now(),
+                                                    status=u'正在招标', category=u'新手标')
             if product_new.exists():
                 if not P2PRecord.objects.filter(user=user).exists():
                     # 不存在购买记录

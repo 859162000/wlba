@@ -289,9 +289,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
     change_list_template = 'change_list.html'
     from_encoding = 'utf-8'
 
-
     form = P2PProductForm
-
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_p2p.view_p2pproduct'):

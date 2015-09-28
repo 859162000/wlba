@@ -46,11 +46,10 @@ ENV = ENV_DEV
 
 if ENV != ENV_DEV:
     DEBUG = False
-DEBUG = True
 
 ADMINS = (
-    ('Shuo Li', 'lishuo@wanglibank.com'),
-    ('Zhang Ding Liang', 'zhangdingliang@wanglibank.com')
+    ('Li Li', 'lili@wanglibank.com'),
+    ('Huang bo', 'huangbo@wanglibank.com')
 )
 
 ALLOWED_HOSTS = ['*']
@@ -976,6 +975,9 @@ else:
     ZGDX_ACTIVITY_ID = '100785'
     ZGDX_KEY = 'H5gOs1ZshKZ6WikN'
     ZGDX_IV = '8888159601152533'
+
+# 返利投
+WLB_FOR_FANLITOU_KEY = '2002'
 
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:

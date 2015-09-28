@@ -67,17 +67,20 @@ def idvalidate_ok(user_id, device):
 
 
 def despoit_ok(pay_info, device):
-    device_type = device['device_type']
-    title, content = messages.msg_pay_ok(pay_info.amount)
-    inside_message.send_one.apply_async(kwargs={
-        "user_id": pay_info.user.id,
-        "title": title,
-        "content": content,
-        "mtype": "activityintro"
-    })
+    try:
+        device_type = device['device_type']
+        title, content = messages.msg_pay_ok(pay_info.amount)
+        inside_message.send_one.apply_async(kwargs={
+            "user_id": pay_info.user.id,
+            "title": title,
+            "content": content,
+            "mtype": "activityintro"
+        })
 
-    activity_backends.check_activity(pay_info.user, 'recharge', device_type, pay_info.amount)
-    utils.log_clientinfo(device, "deposit", pay_info.user_id, pay_info.amount)
+        activity_backends.check_activity(pay_info.user, 'recharge', device_type, pay_info.amount)
+        utils.log_clientinfo(device, "deposit", pay_info.user_id, pay_info.amount)
+    except Exception:
+        pass
 
 
 @app.task
