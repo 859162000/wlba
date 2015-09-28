@@ -8,6 +8,7 @@ $(function(){
         }, this);
         queue.on('complete', function () {
             loading.remove();
+
         }, this);
         queue.loadManifest([
             {id: 'image1', src: '/static/imgs/mobile_activity/app_ten_year/bg.jpg'},
