@@ -38,6 +38,37 @@ class MockGenerator(object):
         logging.debug('code inserted has been done')
 
     @classmethod
+    def check_and_generate_codes(cls, check_counts=10000, item_counts=5000):
+        total_num = InviteCode.objects.filter(is_used=False).count()
+        if total_num < check_counts:
+            letters = 'abcdefghijkmnpqrstuvwxyz'
+            digits = '23456789'
+            insert_list = []
+            generate_list = [salt for salt in list(set([''.join(random.sample(letters + digits, 6))
+                                                        for i in range(item_counts)]))]
+            num = 0
+            for code in generate_list:
+                try:
+                    InviteCode.objects.get(code=code)
+                except InviteCode.DoesNotExist:
+                    insert_list.append(InviteCode(code=code))
+                    num += 1
+
+            InviteCode.objects.bulk_create(insert_list)
+
+            # 发送提醒短信
+            from wanglibao_sms.tasks import send_messages
+            message = u'原始邀请码少于{}条,系统已重新生成{}条'.format(check_counts, num)
+            phones_list = ['15038038823', '18612250386']
+            messages_list = [message]
+            send_messages.apply_async(kwargs={
+                "phones": phones_list,
+                "messages": messages_list
+            })
+
+            logging.debug('code inserted has been done, total items: {}'.format(num))
+
+    @classmethod
     def generate_reward(cls, item_counts, type, description):
         """ type=u'一个月迅雷会员'
             description=u'迅雷活动赠送会员'
