@@ -980,6 +980,9 @@ else:
 # 返利投
 WLB_FOR_FANLITOU_KEY = '2002'
 
+# 迅雷VIP
+
+
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
     local_ip = None
