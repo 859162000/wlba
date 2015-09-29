@@ -705,7 +705,7 @@ class AuthorizeUser(APIView):
                     counts = WanglibaoActivityGift.objects.filter(gift_id=url_id, valid=False).count()
                     if counts == 2 and not user_gift:
                         return redirect("/weixin_activity/share/end/")
-                    if not user_gift and phone:
+                    if user_gift and phone:
                         #如果用户已经了，直接跳转到详情页
                         logger.debug("openid:%s, phone:%s, product_id:%s,用户已经存在了，直接跳转页面" %(openid, phone, url_id,))
                         return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, url_id))
