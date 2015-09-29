@@ -13,6 +13,7 @@ import inspect
 import time
 import json
 import logging
+import base64
 from wanglibao_account import message as inside_message
 from marketing.models import IntroducedBy, Reward
 from wanglibao_reward.models import WanglibaoActivityGift, WanglibaoUserGift, WanglibaoActivityGiftGlobalCfg, WanglibaoWeixinRelative
@@ -615,6 +616,10 @@ class WeixinShareStartView(TemplateView):
         openid = self.request.GET.get('openid')
         order_id = self.request.GET.get('url_id')
         nick_name = self.request.GET.get('nick_name')
+        if nick_name:
+            nick_name = base64.decode(nick_name)
+        else:
+            raise Exception(u'没有得到nick name')
         img_url = self.request.GET.get('head_img_url')
         record = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
 
