@@ -363,6 +363,8 @@ class ProductAmortization(models.Model):
     settlement_time = models.DateTimeField(u'结算时间', auto_now=True)
 
     ready_for_settle = models.BooleanField(u'是否可以开始结算', default=False)
+    # 是否由任务tasks.p2p_auto_ready_for_settle结算
+    is_auto_ready_for_settle = models.BooleanField(u'是否自动结算', default=False)
 
     created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
     description = models.CharField(u'摘要', max_length=500, blank=True)
