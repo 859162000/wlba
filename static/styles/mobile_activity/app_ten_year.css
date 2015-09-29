@@ -678,10 +678,10 @@ img {
 		opacity: 1;
 	}
 }
-@media screen and (max-width: 320px){
+@media only screen and (min-width:320px) and (max-width:480px) {
     .section2 .text {
-        width: 62.09375%;
-        left: 10.03125%;
+        width: 66.59375%;
+        left: 14.53125%;
     }
     .section2 .old{
         width: 30.21875%;
@@ -937,12 +937,13 @@ img {
 	width: 70.90625%;
 	top: 9.834507%;
 }
-@media screen and (max-width: 320px){
+@media only screen and (min-width:320px) and (max-width:480px) {
     .section3 .talk {
         width: 61.90625%;
-        left: 6.21875%;
+        left: 16.21875%;
     }
 }
+
 .section4 .man1 {
 	width: 58.125%;
 	left: 0%;
@@ -1275,15 +1276,15 @@ img {
 		top: 8.5355575%;
 	}
 }
-@media screen and (max-width: 320px){
+@media only screen and (min-width:320px) and (max-width:480px) {
     .section4 .talk {
         width: 63.46875%;
-        left: 7.53125%;
+        left: 16.53125%;
     }
 }
 .section5 .talk {
-	width: 80.15625%;
-	left: 8.90625%;
+	width: 72.15625%;
+	left: 11.90625%;
 	top: 14.3239437%;
 	z-index: 5;
 	opacity: 0;
@@ -1585,13 +1586,7 @@ img {
 }
 
 .section5 .line,.section5 .line_img {
-	bottom: 22.8943662%;
-}
-
-.section5 .talk {
-	width: 72.15625%;
-	left: 11.90625%;
-	top: 14.3239437%;
+    bottom: 22.8943662%;
 }
 
 @keyframes s5talk_start {
@@ -1617,7 +1612,12 @@ img {
 		top: 8.3239437%;
 	}
 }
-
+@media only screen and (min-width:320px) and (max-width:480px) {
+    .section5 .talk {
+        width: 67.65625%;
+	    left: 16.40625%;
+    }
+}
 .section6 .fly {
 	width: 6.71875%;
 	top: 18.8380282%;
