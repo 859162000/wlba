@@ -703,7 +703,7 @@ class AuthorizeUser(APIView):
                     user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=url_id, identity__in=phone,).first()
                     logger.debug("用户抽奖信息是：%s" % (user_gift,))
                     counts = WanglibaoActivityGift.objects.filter(gift_id=url_id, valid=False).count()
-                    if counts == 2:
+                    if counts == 2 and not user_gift:
                         return redirect("/weixin_activity/share/end/")
                     if not user_gift and phone:
                         #如果用户已经了，直接跳转到详情页
