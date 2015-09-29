@@ -3,10 +3,10 @@ html
   head
     title 国庆亿元让利
     include include/app_head
-  body
+  body(style="background:#5f1e94")
     .national_continer
       .national_banner
-        img(src="/static/imgs/mobile_activity/app_national/2.png")
+        img(src="/static/imgs/mobile_activity/app_national/1.png")
       .national_xialu
         img(src="/static/imgs/mobile_activity/app_national/19.png")
       .national_textbox
@@ -41,7 +41,7 @@ html
           span 1.
           p 加息券有效期：9月28日-10月15日；
           span 2.
-          p 加息券使用范围：限手机APP端投资获得，加息券使用不限平台。
+          p 加息券使用范围：加息券使用不限平台。
           span 3.
           p 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
           span 4.
@@ -76,21 +76,37 @@ html
             .flow_border2
         h4.national_titles2
           img(src="/static/imgs/mobile_activity/app_national/17.png")
-        #rulebox.national_rulebox.clear
+        #rulebox2.national_rulebox2.clear
           span 1.
-          p 活动时间：9月29日-10月8日；
+          p 活动时间：9月30日-10月8日；
           span 2.
-          p 用户手机APP端单笔投资满额，即可获得国庆专场加息券一张，加息券统一会以站内信通知，收到后可立即使用。详情请看
-            a 加息券使用规则（链接弹窗）
+          p 用户单笔投资满额，即可获得国庆专场加息券一张，加息券统一会以站内信通知，收到后可立即使用。详情请看
+            a#btns 加息券使用规则（链接弹窗）
           span 3.
           p 国庆专场加息券加息券有效期至10月15日，请在有效期内使用，过期不补；
           span 4.
           p 在法律规定范围内，平台保留活动最终解释权。如有疑问请联系在线客服或拨打4008-588-066。
+        #rulebox3.national_rulebox.clear
+          span 1.
+          p 加息券有效期：9月28日-10月15日；
+          span 2.
+          p 加息券使用范围：加息券使用不限平台。
+          span 3.
+          p 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+          span 4.
+          p 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+          span 5.
+          p 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+          span 6.
+          p 使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
         p.national_zhu *网利宝对此活动享有最终解释权
     .national_footer
       img(src="/static/imgs/mobile_activity/app_national/18.png")
 script(src="/static/js/national.js")
 script
-  var rule=document.getElementById("rule");
-  var rulebox=document.getElementById("rulebox");
+  var rule=document.getElementById("rule"),
+      rulebox=document.getElementById("rulebox"),
+      btns=document.getElementById("btns"),
+      rulebox3=document.getElementById("rulebox3");
   heightshow(rule,rulebox);
+  heightshow(btns,rulebox3);

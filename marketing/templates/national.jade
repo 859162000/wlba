@@ -22,10 +22,10 @@ html
           .pna_quan
           if user.is_authenticated
             a.pan_quanbtn(href="/p2p/list/")
-              img(src="/static/imgs/pc_activity/img_national/9.jpg")
+              img(src="/static/imgs/pc_activity/img_national/9.png")
           else
             a.pan_quanbtn(href="/accounts/login/?next=/activity/mid_autumn/")
-              img(src="/static/imgs/pc_activity/img_national/9.jpg")
+              img(src="/static/imgs/pc_activity/img_national/9.png")
       .pna_minbox
         .pna_img.pna_img2
         .pan_con.pan_con2
@@ -33,10 +33,10 @@ html
           .pna_quan
           if user.is_authenticated
             a.pan_quanbtn(href="/p2p/list/")
-              img(src="/static/imgs/pc_activity/img_national/9.jpg")
+              img(src="/static/imgs/pc_activity/img_national/9.png")
           else
             a.pan_quanbtn(href="/accounts/login/?next=/activity/mid_autumn/")
-              img(src="/static/imgs/pc_activity/img_national/9.jpg")
+              img(src="/static/imgs/pc_activity/img_national/9.png")
       .pna_minbox
         .pna_img.pna_img3
         .pan_con.pan_con3
@@ -44,17 +44,17 @@ html
           .pna_quan
           if user.is_authenticated
             a.pan_quanbtn(href="/p2p/list/")
-              img(src="/static/imgs/pc_activity/img_national/9.jpg")
+              img(src="/static/imgs/pc_activity/img_national/9.png")
           else
             a.pan_quanbtn(href="/accounts/login/?next=/activity/mid_autumn/")
-              img(src="/static/imgs/pc_activity/img_national/9.jpg")
+              img(src="/static/imgs/pc_activity/img_national/9.png")
     h6.pnation_text 新老用户均可参与，单标投资额无上限，一券一标永久加息！加息券不限平台均可使用。
-    a.pnation_dbtn#dbtn 加载更多
+    a.pnation_dbtn#dbtn 加息券更多
      span.pna_spans
     p.pantion_dluo#dluo
       span 1. 加息券有效期：9月28日-10月15日；
       br
-      span 2. 加息券使用范围：限手机APP端投资获得，加息券使用不限平台。
+      span 2. 加息券使用范围：加息券使用不限平台。
       br
       span 3. 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
       br
@@ -88,18 +88,33 @@ html
         .flow_border2
     h3.pnation_titles.titles3
     p.pantion_dluo2
-      span 1. 活动时间：9月29日-10月8日；
+      span 1. 活动时间：9月30日-10月8日；
       br
-      span 2. 用户手机APP端单笔投资满额，即可获得国庆专场加息券一张，不限平台使用。加息券统一会以站内信通知，收到后可立即使用。详情请看
-      a.ashref 加息券使用规则（链接弹窗）
+      span 2. 用户单笔投资满额，即可获得国庆专场加息券一张，不限平台使用。加息券统一会以站内信通知，收到后可立即使用。详情请看
+      a.ashref#ashref 加息券使用规则链接弹窗;
       br
       span 3. 国庆专场加息券加息券有效期至10月15日，请在有效期内使用，过期不补；
       br
       span 4. 在法律规定范围内，平台保留活动最终解释权。如有疑问请联系在线客服或拨打4008-588-066。
+    p.pantion_dluo#dluo2
+      span 1. 加息券有效期：9月28日-10月15日；
+      br
+      span 2. 加息券使用范围：加息券使用不限平台。
+      br
+      span 3. 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+      br
+      span 4. 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+      br
+      span 5. 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+      br
+      span 6. 使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
     p.wlbqu  *网利宝对此活动享有最终解释权
     .pnation_footer
 script(src="/static/js/national.js")
 script
   var p_btn=document.getElementById("dbtn");
   var p_box=document.getElementById("dluo");
+  var p_btn2=document.getElementById("ashref");
+  var p_box2=document.getElementById("dluo2");
   heightshow(p_btn,p_box);
+  heightshow(p_btn2,p_box2);
