@@ -217,34 +217,24 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;function toggles(ele){
-    var data = ele.attr("data");
-    if (!data) {
-        ele.animate({height: "11.8rem"},600);
-        ele.attr("data","1");
-    } else {
-        ele.animate({height: 0},600,'linear');
-         ele.removeAttr("data");
-    }
-}
-function Down(ele){
+;function Down(ele){
     var curHeight = ele.height();
     var autoHeight = ele.css('height', 'auto').height();
     if (!ele.hasClass('down')){
-      ele.height(curHeight).animate({height: autoHeight},600,function(){
+      ele.height(curHeight).animate({height: autoHeight},500,function(){
         ele.addClass('down')
       });
     }else{
-      ele.height(curHeight).animate({height: 0},600,function(){
+      ele.height(curHeight).animate({height: 0},500,function(){
         ele.removeClass('down')
       });
     }
   }
-$("#rule").on("click", function () {
+$("#rule").on("touchend", function () {
     Down($("#rulebox"));
 });
 
-$("#btns").on("click", function () {
+$("#btns").on("touchend", function () {
     Down($("#rulebox3"));
 });
 
