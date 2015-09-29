@@ -462,6 +462,7 @@ img{
     left: 11.71875%;
     top: 15.834507%;
     z-index: 4;
+    opacity: 0;
 }
 .section3 .talk.animate{
     -webkit-animation-name: s3talk_start;
@@ -476,7 +477,6 @@ img{
 	backface-visibility: visible !important;
     -webkit-animation-fill-mode: both;
     animation-fill-mode: both;
-
 }
 @keyframes s3talk_start{
     0%{ opacity:0; top: 15.834507%; }
@@ -589,6 +589,7 @@ img{
     left : 0%;
     bottom: 0%;
     z-index: 2;
+    opacity: 0;
 }
 .section4 .man1.animate{
     -webkit-animation-name: man1_start;
@@ -617,6 +618,7 @@ img{
     left : 0%;
     bottom: 0%;
     z-index: 3;
+    opacity: 0;
 }
 .section4 .man1_before.animate{
     -webkit-animation-name: man1_before_start;
@@ -666,6 +668,7 @@ img{
     left : 7.03125%;
     top: 13.5355575%;
     z-index: 4;
+    opacity: 0;
 }
 .section4 .talk.animate{
     -webkit-animation: s4talk_start 0.7s ease-in 3s;
@@ -757,6 +760,7 @@ img{
     left : 8.90625%;
     top: 14.3239437%;
     z-index: 5;
+    opacity: 0;
 }
 .section5 .talk.animate{
     -webkit-animation-name: s5talk_start;
