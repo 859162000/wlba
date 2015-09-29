@@ -464,8 +464,19 @@ img{
     z-index: 4;
 }
 .section3 .talk.animate{
-    -webkit-animation: s3talk_start 0.5s ease-in 1.7s;
-    animation: s3talk_start 0.5s ease-in 1.7s;
+    -webkit-animation-name: s3talk_start;
+    animation-name: s3talk_start;
+    -webkit-animation-duration: 0.5s;
+    animation-duration: 0.5s;
+	-webkit-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-delay: 1.7s;
+	animation-delay: 1.7s;
+    -webkit-backface-visibility: visible !important;
+	backface-visibility: visible !important;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+
 }
 @keyframes s3talk_start{
     0%{ opacity:0; top: 15.834507%; }
@@ -578,11 +589,20 @@ img{
     left : 0%;
     bottom: 0%;
     z-index: 2;
-    opacity: 0;
 }
 .section4 .man1.animate{
-    -webkit-animation: man1_start 0.5s ease-in 0.5s both;
-    animation: man1_start 0.5s ease-in 0.5s both;
+    -webkit-animation-name: man1_start;
+    animation-name: man1_start;
+    -webkit-animation-duration: 0.5s;
+    animation-duration: 0.5s;
+	-webkit-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-delay: 0.5s;
+	animation-delay: 0.5s;
+    -webkit-backface-visibility: visible !important;
+	backface-visibility: visible !important;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
 }
 @keyframes man1_start{
     0%{ opacity: 0; }
@@ -599,8 +619,18 @@ img{
     z-index: 3;
 }
 .section4 .man1_before.animate{
-    -webkit-animation: man1_before_start 4s ease-in 0.5s;
-    animation: man1_before_start 4s ease-in 0.5s;
+    -webkit-animation-name: man1_before_start;
+    animation-name: man1_before_start;
+    -webkit-animation-duration: 4s;
+    animation-duration: 4s;
+	-webkit-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-delay: 0.5s;
+	animation-delay: 0.5s;
+    -webkit-backface-visibility: visible !important;
+	backface-visibility: visible !important;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
 }
 @keyframes man1_before_start{
     0%{ opacity: 0; }
@@ -729,8 +759,18 @@ img{
     z-index: 5;
 }
 .section5 .talk.animate{
-    -webkit-animation: s5talk_start 0.7s ease-in 2.7s;
-    animation: s5talk_start 0.7s ease-in 2.7s;
+    -webkit-animation-name: s5talk_start;
+    animation-name: s5talk_start;
+    -webkit-animation-duration: 0.7s;
+    animation-duration: 0.7s;
+	-webkit-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-delay: 2.7s;
+	animation-delay: 2.7s;
+    -webkit-backface-visibility: visible !important;
+	backface-visibility: visible !important;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
 }
 @keyframes s5talk_start{
     0%{ opacity:0; top: 14.3239437%; }
@@ -1173,9 +1213,18 @@ img{
     line-height: 36px;
 }
 .section7 .text.animate{
-    opacity: 1;
-    -webkit-animation: sayText_start 1.5s ease-in 1s;
-    animation: sayText_start 1.5s ease-in 1s;
+    -webkit-animation-name: sayText_start;
+    animation-name: sayText_start;
+    -webkit-animation-duration: 1.5s;
+    animation-duration: 1.5s;
+	-webkit-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-delay: 1s;
+	animation-delay: 1s;
+    -webkit-backface-visibility: visible !important;
+	backface-visibility: visible !important;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
 }
 @keyframes sayText_start{
     0%{ opacity:1; transform: rotate(0deg) scale(0); }
