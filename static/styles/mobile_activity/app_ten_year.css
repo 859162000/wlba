@@ -461,12 +461,11 @@ img{
     width: 74.90625%;
     left: 11.71875%;
     top: 15.834507%;
-    opacity: 0;
     z-index: 4;
 }
 .section3 .talk.animate{
-    -webkit-animation: s3talk_start 0.5s ease-in 1.7s both;
-    animation: s3talk_start 0.5s ease-in 1.7s both;
+    -webkit-animation: s3talk_start 0.5s ease-in 1.7s;
+    animation: s3talk_start 0.5s ease-in 1.7s;
 }
 @keyframes s3talk_start{
     0%{ opacity:0; top: 15.834507%; }
@@ -598,11 +597,10 @@ img{
     left : 0%;
     bottom: 0%;
     z-index: 3;
-    opacity: 0;
 }
 .section4 .man1_before.animate{
-    -webkit-animation: man1_before_start 4s ease-in 0.5s both;
-    animation: man1_before_start 4s ease-in 0.5s both;
+    -webkit-animation: man1_before_start 4s ease-in 0.5s;
+    animation: man1_before_start 4s ease-in 0.5s;
 }
 @keyframes man1_before_start{
     0%{ opacity: 0; }
@@ -638,11 +636,10 @@ img{
     left : 7.03125%;
     top: 13.5355575%;
     z-index: 4;
-    opacity:0;
 }
 .section4 .talk.animate{
-    -webkit-animation: s4talk_start 0.7s ease-in 3s both;
-    animation: s4talk_start 0.7s ease-in 3s both;
+    -webkit-animation: s4talk_start 0.7s ease-in 3s;
+    animation: s4talk_start 0.7s ease-in 3s;
 }
 @keyframes s4talk_start{
     0%{ opacity:0; top: 13.5355575%; }
@@ -656,12 +653,11 @@ img{
     width: 47.1875%;
     left : 1.5625%;
     bottom: -20.028169%;
-    opacity:0;
     z-index: 1;
 }
 .section4 .math.animate{
-    -webkit-animation: s4math_start 1.7s ease-in both;
-    animation: s4math_start 1.7s ease-in both;
+    -webkit-animation: s4math_start 1.7s ease-in;
+    animation: s4math_start 1.7s ease-in;
 }
 @keyframes s4math_start{
     0%{ bottom: -20.028169%; opacity:0; }
@@ -731,11 +727,10 @@ img{
     left : 8.90625%;
     top: 14.3239437%;
     z-index: 5;
-    opacity:0;
 }
 .section5 .talk.animate{
-    -webkit-animation: s5talk_start 0.7s ease-in 2.7s both;
-    animation: s5talk_start 0.7s ease-in 2.7s both;
+    -webkit-animation: s5talk_start 0.7s ease-in 2.7s;
+    animation: s5talk_start 0.7s ease-in 2.7s;
 }
 @keyframes s5talk_start{
     0%{ opacity:0; top: 14.3239437%; }
@@ -1179,8 +1174,8 @@ img{
 }
 .section7 .text.animate{
     opacity: 1;
-    -webkit-animation: sayText_start 1.5s ease-in 1s both;
-    animation: sayText_start 1.5s ease-in 1s both;
+    -webkit-animation: sayText_start 1.5s ease-in 1s;
+    animation: sayText_start 1.5s ease-in 1s;
 }
 @keyframes sayText_start{
     0%{ opacity:1; transform: rotate(0deg) scale(0); }
@@ -1348,4 +1343,3 @@ img{
 .section8 .button:visited{
     background: #3d90fe;
 }
-
