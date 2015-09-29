@@ -21,56 +21,51 @@ $(function(){
             {id: 'image8', src: '/static/imgs/mobile_activity/app_ten_year/page1_text2.png'},
             {id: 'image9', src: '/static/imgs/mobile_activity/app_ten_year/page2_img1.png'},
             {id: 'image10', src: '/static/imgs/mobile_activity/app_ten_year/page2_img2.png'},
-            {id: 'image11', src: '/static/imgs/mobile_activity/app_ten_year/page2_img11.png'},
-            {id: 'image12', src: '/static/imgs/mobile_activity/app_ten_year/page2_img21.png'},
-            {id: 'image13', src: '/static/imgs/mobile_activity/app_ten_year/page2_shadow.png'},
-            {id: 'image14', src: '/static/imgs/mobile_activity/app_ten_year/page2_text.png'},
-            {id: 'image15', src: '/static/imgs/mobile_activity/app_ten_year/page3_boy.png'},
-            {id: 'image16', src: '/static/imgs/mobile_activity/app_ten_year/page3_boy2.png'},
-            {id: 'image17', src: '/static/imgs/mobile_activity/app_ten_year/page3_line.png'},
-            {id: 'image18', src: '/static/imgs/mobile_activity/app_ten_year/page3_man.png'},
-            {id: 'image19', src: '/static/imgs/mobile_activity/app_ten_year/page3_talk.png'},
-            {id: 'image20', src: '/static/imgs/mobile_activity/app_ten_year/page4_line.png'},
-            {id: 'image21', src: '/static/imgs/mobile_activity/app_ten_year/page4_man1.png'},
-            {id: 'image22', src: '/static/imgs/mobile_activity/app_ten_year/page4_man2.png'},
-            {id: 'image23', src: '/static/imgs/mobile_activity/app_ten_year/page4_man12.png'},
-            {id: 'image24', src: '/static/imgs/mobile_activity/app_ten_year/page4_math.png'},
-            {id: 'image25', src: '/static/imgs/mobile_activity/app_ten_year/page4_talk.png'},
-            {id: 'image26', src: '/static/imgs/mobile_activity/app_ten_year/page5_bamboo.png'},
-            {id: 'image27', src: '/static/imgs/mobile_activity/app_ten_year/page5_line.png'},
-            {id: 'image28', src: '/static/imgs/mobile_activity/app_ten_year/page5_talk.png'},
-            {id: 'image29', src: '/static/imgs/mobile_activity/app_ten_year/page5_woman1.png'},
-            {id: 'image30', src: '/static/imgs/mobile_activity/app_ten_year/page5_woman2.png'},
-            {id: 'image31', src: '/static/imgs/mobile_activity/app_ten_year/page5_woman12.png'},
-            {id: 'image32', src: '/static/imgs/mobile_activity/app_ten_year/page6_fly.png'},
-            {id: 'image33', src: '/static/imgs/mobile_activity/app_ten_year/page6_img1.png'},
-            {id: 'image34', src: '/static/imgs/mobile_activity/app_ten_year/page6_img2.png'},
-            {id: 'image35', src: '/static/imgs/mobile_activity/app_ten_year/page6_text.png'},
-            {id: 'image36', src: '/static/imgs/mobile_activity/app_ten_year/page7_img.png'},
-            {id: 'image37', src: '/static/imgs/mobile_activity/app_ten_year/page8_text1.png'},
-            {id: 'image38', src: '/static/imgs/mobile_activity/app_ten_year/page8_text2.png'},
-            {id: 'image39', src: '/static/imgs/mobile_activity/app_ten_year/shadow_bottom.png'},
-            {id: 'image40', src: '/static/imgs/mobile_activity/app_ten_year/slideDown.png'},
-            {id: 'image41', src: '/static/imgs/mobile_activity/app_ten_year/small_theme.png'},
-            {id: 'image42', src: '/static/imgs/mobile_activity/app_ten_year/ten_year.mp3'},
-            {id: 'image43', src: '/static/imgs/mobile_activity/app_ten_year/logo.png'}
+            {id: 'image11', src: '/static/imgs/mobile_activity/app_ten_year/page2_shadow.png'},
+            {id: 'image12', src: '/static/imgs/mobile_activity/app_ten_year/page2_text.png'},
+            {id: 'image13', src: '/static/imgs/mobile_activity/app_ten_year/page3_boy.png'},
+            {id: 'image14', src: '/static/imgs/mobile_activity/app_ten_year/page3_line.png'},
+            {id: 'image15', src: '/static/imgs/mobile_activity/app_ten_year/page3_man.png'},
+            {id: 'image16', src: '/static/imgs/mobile_activity/app_ten_year/page3_talk.png'},
+            {id: 'image17', src: '/static/imgs/mobile_activity/app_ten_year/page4_line.png'},
+            {id: 'image18', src: '/static/imgs/mobile_activity/app_ten_year/page4_man1.png'},
+            {id: 'image19', src: '/static/imgs/mobile_activity/app_ten_year/page4_man2.png'},
+            {id: 'image20', src: '/static/imgs/mobile_activity/app_ten_year/page4_math.png'},
+            {id: 'image21', src: '/static/imgs/mobile_activity/app_ten_year/page4_talk.png'},
+            {id: 'image22', src: '/static/imgs/mobile_activity/app_ten_year/page5_bamboo.png'},
+            {id: 'image23', src: '/static/imgs/mobile_activity/app_ten_year/page5_line.png'},
+            {id: 'image24', src: '/static/imgs/mobile_activity/app_ten_year/page5_talk.png'},
+            {id: 'image25', src: '/static/imgs/mobile_activity/app_ten_year/page5_woman1.png'},
+            {id: 'image26', src: '/static/imgs/mobile_activity/app_ten_year/page5_woman2.png'},
+            {id: 'image27', src: '/static/imgs/mobile_activity/app_ten_year/page6_fly.png'},
+            {id: 'image28', src: '/static/imgs/mobile_activity/app_ten_year/page6_img1.png'},
+            {id: 'image29', src: '/static/imgs/mobile_activity/app_ten_year/page6_img2.png'},
+            {id: 'image30', src: '/static/imgs/mobile_activity/app_ten_year/page6_text.png'},
+            {id: 'image31', src: '/static/imgs/mobile_activity/app_ten_year/page7_img.png'},
+            {id: 'image32', src: '/static/imgs/mobile_activity/app_ten_year/page8_text1.png'},
+            {id: 'image33', src: '/static/imgs/mobile_activity/app_ten_year/page8_text2.png'},
+            {id: 'image34', src: '/static/imgs/mobile_activity/app_ten_year/shadow_bottom.png'},
+            {id: 'image35', src: '/static/imgs/mobile_activity/app_ten_year/slideDown.png'},
+            {id: 'image36', src: '/static/imgs/mobile_activity/app_ten_year/small_theme.png'},
+            {id: 'image37', src: '/static/imgs/mobile_activity/app_ten_year/ten_year.mp3'},
+            {id: 'image38', src: '/static/imgs/mobile_activity/app_ten_year/logo.png'}
         ]);
 
-    //var mp3 = document.getElementById("music"),play = $('#play');
-    //play.on('click', function (e) {
-    //    if (mp3.paused) {
-    //        mp3.play();
-    //        $('#play').addClass('play_music').removeClass('close_music');
-    //    } else {
-    //        mp3.pause();
-    //        $('#play').addClass('close_music').removeClass('play_music');
-    //    }
-    //});
-    //
-    //mp3.play();
-    //$(document).one('touchstart', function () {
-    //    mp3.play();
-    //});
+    var mp3 = document.getElementById("music"),play = $('#play');
+    play.on('click', function (e) {
+        if (mp3.paused) {
+            mp3.play();
+            $('#play').addClass('play_music').removeClass('close_music');
+        } else {
+            mp3.pause();
+            $('#play').addClass('close_music').removeClass('play_music');
+        }
+    });
+
+    mp3.play();
+    $(document).one('touchstart', function () {
+        mp3.play();
+    });
 
     /*解决iphone一开始没音乐问题*/
     var g_audio = window.g_audio = new Audio();  //创建一个audio播放器
@@ -165,20 +160,6 @@ $(function(){
     });//绑定事件
     /*解决iphone一开始没音乐问题结束*/
 
-
-    $('.section3 .line').load(function(){
-        var s3line_height = $('.section3 .line').height();
-        $('.section3 .line_img').css('height',s3line_height);
-    });
-    $('.section4 .line').load(function(){
-        var s4line_height = $('.section4 .line').height();
-        $('.section4 .line_img').css('height',s4line_height);
-    });
-    $('.section5 .line').load(function(){
-        var s5line_height = $('.section5 .line').height();
-        $('.section5 .line_img').css('height',s5line_height);
-    });
-
     var say;
     var say_num;
     say_num = parseInt(12*Math.random());
@@ -239,30 +220,30 @@ $(function(){
         anchors: ['page1','page2','page3','page4','page5','page6','page7','page8'],
         afterLoad: function(anchorLink, index) {
             if(index == 1){
-                $('.section2 img').not('.slideDown').removeClass('animate');
-                $('.section1 img').not('.slideDown').addClass('animate');
+                $('.section2 div').removeClass('animate');
+                $('.section1 div').addClass('animate');
             }
             if(index == 2){
-                $('.section1 img,.section3 img,.line_img').not('.slideDown').removeClass('animate');
-                $('.section2 img').not('.slideDown').addClass('animate');
+                $('.section3 div,.section1 div').removeClass('animate');
+                $('.section2 div').addClass('animate');
             }
             if(index == 3){
-                $('.section2 img,.section4 img,.section4 .line_img').not('.slideDown').removeClass('animate');
-                $('.section3 img,.section3 .line_img').not('.slideDown').addClass('animate');
+                $('.section2 div,.section4 div').removeClass('animate');
+                $('.section3 div').addClass('animate');
             }
             if(index == 4){
-                $('.section3 img,.section5 img,.section3 .line_img,.section5 .line_img').not('.slideDown').removeClass('animate');
-                $('.section4 img,.section4 .line_img').not('.slideDown').addClass('animate');
+                $('.section3 div,.section5 div').removeClass('animate');
+                $('.section4 div').addClass('animate');
             }
             if(index == 5){
                 $('.shadow').animate({'opacity':'1'},500);
-                $('.section4 img,.section4 .line_img,.section6 img,.section6 input').not('.slideDown').removeClass('animate');
-                $('.section5 .line_img,.section5 img').not('.slideDown').addClass('animate');
+                $('.section4 div,.section6 img,.section6 input').not('.slideDown').removeClass('animate');
+                $('.section5 div').addClass('animate');
             }
             if(index == 6){
                 $('.shadow').animate({'opacity':'0'},500);
                 $('.section7 .horn').animate({'opacity':'0'},100);
-                $('.section5 img,.section5 .line_img,.section7 img,.section7 .text,.section7 .title').removeClass('animate');
+                $('.section5 div,.section7 img,.section7 .text,.section7 .title').removeClass('animate');
                 $('.section6 img,.section6 input').not('.slideDown').addClass('animate');
                 say = $('input').val();
                 //alert(say);
