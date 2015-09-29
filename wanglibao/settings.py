@@ -528,6 +528,11 @@ CELERYBEAT_SCHEDULE = {
     #     'schedule': timedelta(minutes=30)
     # }
 
+    'p2p_auto_ready_for_settle': {
+        'task': 'wanglibao_p2p.tasks.p2p_auto_ready_for_settle',
+        'schedule': crontab(hour=16),
+    },
+
     #add by guoya: 希财网渠道数据定时推送
     'xicai_send_data': {
         'task': 'wanglibao_account.tasks.xicai_send_data_task',
