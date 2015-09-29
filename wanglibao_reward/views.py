@@ -273,7 +273,7 @@ class WeixinShareDetailView(TemplateView):
         try:
             combine_redpack = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity)
         except Exception, reason:
-            self.exception_msg(reason, u'判断组合红包生成报异常')
+            self.exception_msg(reason, u'判断组合红包生成报异常, gift_id:%s, activity:%s' %(product_id, self.activity))
         return True if combine_redpack else False
 
     def get_activity_by_id(self, activity_id):

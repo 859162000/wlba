@@ -703,8 +703,15 @@ class AuthorizeUser(APIView):
                     user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=url_id, identity=phone,).first()
                     logger.debug("用户抽奖信息是：%s" % (user_gift,))
                     counts = WanglibaoActivityGift.objects.filter(gift_id=url_id, valid=False).count()
-                    if counts == 2 and not user_gift:
-                        return redirect("/weixin_activity/share/end/")
+                    logger.debug("奖品有 %s 个已经被不同用户领走了" %(counts, ))
+                    if counts == 2:
+                        if user_gift:
+                            logger.debug(u"用户已经令完奖品，而且所有的奖品已经发放完毕")
+                            return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, url_id))
+                        else:
+                            logger.debug(u"所有的奖品已经发完，该用户没有领到奖品")
+                            return redirect("/weixin_activity/share/end/")
+
                     if user_gift and phone:
                         #如果用户已经了，直接跳转到详情页
                         logger.debug("openid:%s, phone:%s, product_id:%s,用户已经存在了，直接跳转页面" %(openid, phone, url_id,))
