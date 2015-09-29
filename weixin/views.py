@@ -700,7 +700,7 @@ class AuthorizeUser(APIView):
                     phone = wx_user.first().phone
                     logger.debug("获得用户授权openid is: %s, phone is :%s" %(openid,phone))
                     logger.debug("product id:%s" %(url_id))
-                    user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=url_id, identity__in=phone,).first()
+                    user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=url_id, identity=phone,).first()
                     logger.debug("用户抽奖信息是：%s" % (user_gift,))
                     counts = WanglibaoActivityGift.objects.filter(gift_id=url_id, valid=False).count()
                     if counts == 2 and not user_gift:
