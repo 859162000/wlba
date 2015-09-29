@@ -1943,13 +1943,12 @@ img {
 .section7 .text {
 	position: absolute;
 	width: 100%;
-	font-size: 36px;
+	font-size: 28px;
 	top: 52.6408451%;
 	left: 0;
 	text-align: center;
 	transform: rotate(0deg) scale(0);
 	opacity: 0;
-	height: 36px;
 	line-height: 36px;
 }
 
@@ -2007,7 +2006,6 @@ img {
     .section7 .text {
         font-size: 46px;
         top: 56.6408451%;
-        height: 46px;
         line-height: 46px;
     }
 }
