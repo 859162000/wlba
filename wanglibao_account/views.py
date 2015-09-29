@@ -1768,86 +1768,160 @@ class AutomaticApiView(APIView):
             return Response({'ret_code': 3009, 'message': u'用户设置自动投标计划失败'})
 
 
-@csrf_protect
-def three_order_view(request):
+class ThirdOrdeApiView(APIView):
     """
     记录来自第三方回调的订单状态
-    :param request:
-    :return:
     """
-    if request.method == "POST":
-        trust_ip = settings.TRUST_IP
-        if len(trust_ip) > 0:
-            if get_client_ip(request) in trust_ip:
-                params = request.POST
-                request_no = params.get('request_no', None)
-                result_code = params.get('result_code', None)
-                if request_no and result_code:
-                    try:
-                        order = UserThreeOrder.objects.get(request_no=request_no)
-                    except Exception, e:
-                        return HttpResponseForbidden(u'订单流水号不存在')
-                    if order:
-                        try:
-                            msg = params.get('msg_id', None)
-                            order.request_no = request_no
-                            order.result_code = result_code
-                            if msg:
-                                order.msg = msg
-                            order.save()
-                        except Exception, e:
-                            return HttpResponseForbidden(u'非法参数')
-                        return HttpResponse(1)
-                return HttpResponseForbidden(u'参数缺失')
-        return HttpResponseForbidden(u'不受信任的来源！！！')
-    return HttpResponseNotAllowed(u'不允许的HTTP方法！！！')
 
-def zgdx_order_query(url, params):
-    """
-    中国电信业务查询
-    :param url:
-    :param params:
-    :return:
-    """
-    try:
-        coop_key = getattr(settings, 'ZGDX_KEY')
-        iv = getattr(settings, 'ZGDX_IV', None)
-    except Exception:
-        return 'api error.'
-    code = {
-        'phone_id': params.get('phone_id', None),
-        'service_code': params.get('service_code', None),
-        'request_no': params.get('request_no', None),
-        'start_time': params.get('start_time', None),
-        'end_time': params.get('end_time', None),
-    }
-    encrypt_str = encrypt_mode_cbc(json.dumps(code), coop_key, iv)
-    params = {
-        'code': encodeBytes(hex2bin(encrypt_str)),
-        'partner_no': params.get('partner_no', None),
-    }
-    res = requests.post(url, data=json.dumps(params))
-    return res.text
+    permission_classes = ()
+
+    def check_params(self, request_no, result_code, msg_id):
+        json_response = {}
+        if not request_no:
+            json_response = {
+                'ret_code': 20001,
+                'message': u'request_no参数缺失'
+            }
+        elif len(request_no) > UserThreeOrder._meta.get_field_by_name('request_no')[0].max_length:
+            json_response = {
+                'ret_code': 20003,
+                'message': u'request_no长度超出'
+            }
+
+        if not result_code:
+            json_response = {
+                'ret_code': 20004,
+                'message': u'result_code参数缺失'
+            }
+        elif len(result_code) > UserThreeOrder._meta.get_field_by_name('result_code')[0].max_length:
+            json_response = {
+                'ret_code': 20006,
+                'message': u'result_code长度超出'
+            }
+
+        if msg_id and len(msg_id) > UserThreeOrder._meta.get_field_by_name('msg_id')[0].max_length:
+            json_response = {
+                'ret_code': 20007,
+                'message': u'msg_id长度超出'
+            }
+
+        return json_response
+
+    def is_trust_ip(self, trust_ip_list, request):
+        json_response = {}
+        if not (len(trust_ip_list) > 0 and get_client_ip(request) in trust_ip_list):
+            json_response = {
+                'ret_code': 10001,
+                'message': u'不受信任的来源！！！'
+            }
+
+        return json_response
+
+    def post(self, request):
+        json_response = self.is_trust_ip(settings.TRUST_IP, request)
+        if not json_response:
+            params = request.POST
+            request_no = params.get('request_no', None)
+            result_code = params.get('result_code', None)
+            msg_id = params.get('msg_id', '')
+            json_response = self.check_params(request_no, result_code, msg_id)
+            if not json_response:
+                order = UserThreeOrder.objects.filter(request_no=request_no).first()
+                if not order:
+                    json_response = {
+                        'ret_code': 20002,
+                        'message': u'订单流水号不存在'
+                    }
+                else:
+                    order.request_no = request_no
+                    order.result_code = result_code
+                    order.msg = msg_id
+                    order.save()
+                    json_response = {
+                        'ret_code': 1,
+                        'message': 'sucess'
+                    }
+
+        return HttpResponse(json.dumps(json_response), content_type='application/json')
 
 
-@csrf_protect
-def three_order_query_view(request):
+class ThirdOrderQueryApiView(APIView):
     """
     第三方订单查询接口
-    :param request:
-    :return:
     """
-    params = getattr(request, request.method)
-    channel_code = params.get('promo_token', None)
-    if channel_code:
-        try:
-            url = getattr(settings, '%s_QUERY_INTERFACE_URL' % channel_code.upper())
-        except KeyError:
-            return HttpResponseForbidden(u'无效渠道码')
-        if url:
+
+    permission_classes = ()
+
+    def get(self, request):
+        params = getattr(request, request.method)
+        channel_code = params.get('promo_token', None)
+        if channel_code:
+            url = getattr(settings, '%s_QUERY_URL' % channel_code.upper(), None)
+            if url:
+                order_query_fun = getattr(self, '%s_order_query' % channel_code.lower(), None)
+                if order_query_fun:
+                    json_response = order_query_fun(url, params)
+                else:
+                    json_response = {
+                        'ret_code': 20001,
+                        'message': 'api error'
+                    }
+            else:
+                json_response = {
+                    'ret_code': 10001,
+                    'message': u'无效渠道码'
+                }
+        else:
+            json_response = {
+                'ret_code': 10002,
+                'message': u'渠道码缺失'
+            }
+
+        return HttpResponse(json.dumps(json_response), content_type='application/json')
+
+    def zgdx_order_query(self, url, params):
+        """
+        中国电信业务查询
+        """
+        coop_key = getattr(settings, 'ZGDX_KEY', None)
+        iv = getattr(settings, 'ZGDX_IV', None)
+        if coop_key or iv:
+            code = {
+                'phone_id': params.get('phone_id', ''),
+                'service_code': params.get('service_code', ''),
+                'request_no': params.get('request_no', ''),
+                'start_time': params.get('start_time', ''),
+                'end_time': params.get('end_time', ''),
+            }
+            encrypt_str = encrypt_mode_cbc(json.dumps(code), coop_key, iv)
+            params = {
+                'code': encodeBytes(hex2bin(encrypt_str)),
+                'partner_no': params.get('partner_no', None),
+            }
             try:
-                order_query_fun = locals().get('%s_order_query' % channel_code.lower())
-                return HttpResponse(order_query_fun(url, params))
+                res = requests.post(url, data=json.dumps(params)).json()
+                res_code = res.get('result_code', '')
+                result = res.get('result', '')
+                if res_code == '00000':
+                    json_response = {
+                        'ret_code': 0,
+                        'message': 'sucess',
+                        'data': result
+                    }
+                else:
+                    json_response = {
+                        'ret_code': res_code,
+                        'message': result
+                    }
             except Exception, e:
-                return HttpResponseForbidden('api error.')
-    return HttpResponseForbidden(u'渠道码缺失')
+                json_response = {
+                    'ret_code': 20001,
+                    'message': 'api error'
+                }
+        else:
+            json_response = {
+                'ret_code': 20001,
+                'message': 'api error'
+            }
+
+        return json_response
