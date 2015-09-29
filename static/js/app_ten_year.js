@@ -267,64 +267,56 @@ $(function(){
         }
     })
 
-    var lineLink    = "https://staging.wanglibao.com/activity/app_ten_year/";
-    var imgUrl      = "/static/imgs/mobile_activity/app_ten_year/weixin_img_300.jpg";
-    var shareTitle  = "遇见10年前的你";
-    var descContent = "关注网利宝，遇见10年前的你";
-    var appid       = '';
+
+    //微信分享
+    var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ',];
+    $.ajax({
+        type : 'GET',
+        url : '/weixin/api/jsapi_config/',
+        dataType : 'json',
+        success : function(data) {
+            //请求成功，通过config注入配置信息,
+            wx.config({
+                debug: false,
+                appId: data.appId,
+                timestamp: data.timestamp,
+                nonceStr: data.nonceStr,
+                signature: data.signature,
+                jsApiList: jsApiList
+            });
+        }
+    });
 
 
-    function wx_shareFriend() {
-      WeixinJSBridge.invoke('sendAppMessage',{
-         "appid": appid,
-         "img_url": imgUrl,
-         "img_width": "300",
-         "img_height": "300",
-         "link": lineLink,
-         "desc": descContent,
-         "title": shareTitle
-         }, function(res) {
-           //alert(res.err_msg);
-         })
-    }
 
-    function wx_shareTimeline() {
-      WeixinJSBridge.invoke('shareTimeline',{
-        "img_url": imgUrl,
-        "img_width": "300",
-        "img_height": "300",
-        "link": lineLink,
-        "desc": descContent,
-        "title": shareTitle
-        }, function(res) {
-           //alert(res.err_msg);
+    wx.ready(function(){
+
+        var host = 'https://www.wanglibao.com',
+            shareName = '有个红包一直拽在手里，今天我想要送给你',
+            shareImg = host + '/static/imgs/mobile_activity/app_ten_year/weixin_img_300.jpg',
+            shareLink = host + '/activity/app_ten_year/',
+            shareMainTit = '遇见10年前的你',
+            shareBody = '关注网利宝，遇见10年前的你'
+        //分享给微信好友
+        org.onMenuShareAppMessage({
+            title: shareMainTit,
+            desc: shareBody,
+            link: shareLink,
+            imgUrl: shareImg
         });
-    }
-
-    function wx_shareWeibo() {
-      WeixinJSBridge.invoke('shareWeibo',{
-        "content": descContent,
-        "url": lineLink
-        }, function(res) {
-          //alert(res.err_msg);
-        });
-    }
-
-    function onBridgeReady(){
-      WeixinJSBridge.on('menu:share:appmessage', wx_shareFriend);
-      WeixinJSBridge.on('menu:share:timeline',   wx_shareTimeline);
-      WeixinJSBridge.on('menu:share:weibo',      wx_shareWeibo);
-    }
-
-    if (typeof WeixinJSBridge == "undefined"){
-      if( document.addEventListener ){
-          document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
-      }else if (document.attachEvent){
-          document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
-          document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
-      }
-    }else{
-      onBridgeReady();
-    }
+        //分享给微信朋友圈
+        org.onMenuShareTimeline({
+            title: '遇见10年前的你',
+            link : shareLink,
+            imgUrl: shareImg
+        })
+        //分享给QQ
+        org.onMenuShareQQ({
+            title: shareMainTit,
+            desc: shareBody,
+            link : shareLink,
+            imgUrl: shareImg
+        })
+    })
 
 });

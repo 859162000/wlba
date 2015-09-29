@@ -1,166 +1,93 @@
 doctype html
 html
-  head
-    meta(name="format-detection" content="telephone=no,email=no")
-    title 你最喜欢什么样的自己？
-    meta(charset="utf-8")
-    meta(content="telephone=no,email=no" ,name="format-detection")
-    meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
-    meta(content="yes" ,name="apple-mobile-web-app-capable")
-    link(href="/static/styles/mobile_activity/app_fullpage.css?v=201509091", rel="stylesheet")
-  body
-    .wp
-      #play
-      //http://wanglibao1.oss-cn-beijing.aliyuncs.com/better.mp3
-      //src 换成上面链接
-      audio#music(loop='loop',style='width:0;height:0;position:absolute;top:0;')
-        source(type="audio/mpeg", src="/static/imgs/mobile_activity/app_fullpage/betters.mp3?v=20150909" )
-      .loadPage#loadPage
-        .load-warp
-          .logo
-          .process 0%
-
-      .wp-inner#fullpage-warp
-        .page.page1
-          .sketch
-          .mask.fadeIn
-
-        .page.page2
-          .sketch
-          .people.fadeIn
-          .mask.fadeIn
-          .ele1.fadeIn
-          .ele2.moveUp
-          .title1.zoomIn
-          .title2.moveUp
-
-        .page.page3
-          .sketch
-          .people.fadeIn
-          .mask.fadeIn
-          .ele1.fadeIn
-          .ele2.moveUp
-          .title1.moveDown
-          .title2.moveLeft
-
-        .page.page4
-          .sketch
-          .people.fadeIn
-          .mask.fadeIn
-          .ele1.moveDown
-          .ele2.fadeIn
-          .title1.moveDown
-          .title2.moveLeft
-
-        .page.page5
-          .sketch
-          .people.fadeIn
-          .mask.fadeIn
-          .ele1.moveUp
-          .title1.moveDown
-          .title2.moveLeft
-
-        .page.page6
-          .sketch
-          .people.fadeIn
-          .mask.fadeIn
-          .ele1.moveUp
-          .ele2.moveDown
-          .title1.moveDown
-          .title2.moveLeft
-          .title3.zoomIn
-
-        .page.page7
-          .sketch
-          img(src='/static/imgs/mobile_activity/app_fullpage/last_logo.png').logo
-          img(src='/static/imgs/mobile_activity/app_fullpage/share.jpg').share
-          .footer-warp
-            img(src='/static/imgs/mobile_activity/app_fullpage/last_titi2.png').last-title
-            //img(src='/static/imgs/mobile_activity/app_fullpage/last_erweima.png').last-erweima
-
-            img(src='/static/imgs/mobile_activity/app_fullpage/last_footer.png').last-footer
-            a(href='/activity/app_pc_download/').last-download
-      span.start#arrow(style='pointer-events: none;')
-        b
-    script(src="/static/scripts/mobile_activity/dist/fullpage.js")
-    script.
-      $(function(){
-          var _ = $('#fullpage-warp'), loading = $('#loadPage'), arrow = $('#arrow'),
-                  play = $('#play'), music = document.getElementById('music');
-          play.on('click', function (e) {
-            if (music.paused) {
-              music.play();
-              play.addClass('play').removeClass('close');
-            } else {
-              music.pause();
-              play.addClass('close').removeClass('play');
-            }
-          })
-          music.play();
-          $(document).one('touchstart', function () {
-            music.play();
-          })
-          _.fullpage({
-            page: '.page',
-            change: function (data) {
-              data.cur + 1 === _.find('.page').size() ? arrow.hide() : arrow.show();
-            }
-          });
-          var queue = new createjs.LoadQueue();
-          queue.on('progress', function () {
-            var num = Math.floor(queue.progress * 100);
-            $('.process').text(num + '%');
-          }, this);
-          queue.on('complete', function () {
-            loading.remove();
-          }, this);
-          queue.loadManifest([
-            {id: 'image1', src: '/static/imgs/mobile_activity/app_fullpage/music.png'},
-            {id: 'image2', src: '/static/imgs/mobile_activity/app_fullpage/arrow.png'},
-            {id: 'image3', src: '/static/imgs/mobile_activity/app_fullpage/first_page.jpg'},
-            {id: 'image4', src: '/static/imgs/mobile_activity/app_fullpage/first_title320.png'},
-            {id: 'image5', src: '/static/imgs/mobile_activity/app_fullpage/me_1.jpg'},
-            {id: 'image6', src: '/static/imgs/mobile_activity/app_fullpage/me_2.jpg'},
-            {id: 'image7', src: '/static/imgs/mobile_activity/app_fullpage/me_mask.png'},
-            {id: 'image8', src: '/static/imgs/mobile_activity/app_fullpage/me_4.png'},
-            {id: 'image9', src: '/static/imgs/mobile_activity/app_fullpage/me_5.png'},
-            {id: 'image10', src: '/static/imgs/mobile_activity/app_fullpage/me_3.png'},
-            {id: 'image11', src: '/static/imgs/mobile_activity/app_fullpage/me_tit2.png'},
-            {id: 'image12', src: '/static/imgs/mobile_activity/app_fullpage/j_1.jpg'},
-            {id: 'image13', src: '/static/imgs/mobile_activity/app_fullpage/j_2.jpg'},
-            {id: 'image14', src: '/static/imgs/mobile_activity/app_fullpage/j_3.png'},
-            {id: 'image15', src: '/static/imgs/mobile_activity/app_fullpage/j_4.png'},
-            {id: 'image16', src: '/static/imgs/mobile_activity/app_fullpage/j_mask.png'},
-            {id: 'image17', src: '/static/imgs/mobile_activity/app_fullpage/j_title1.png'},
-            {id: 'image18', src: '/static/imgs/mobile_activity/app_fullpage/j_title2.png'},
-            {id: 'image19', src: '/static/imgs/mobile_activity/app_fullpage/j_title3.png'},
-            {id: 'image20', src: '/static/imgs/mobile_activity/app_fullpage/t_1.jpg'},
-            {id: 'image21', src: '/static/imgs/mobile_activity/app_fullpage/t_2.jpg'},
-            {id: 'image22', src: '/static/imgs/mobile_activity/app_fullpage/t_3.png'},
-            {id: 'image23', src: '/static/imgs/mobile_activity/app_fullpage/t_mask.png'},
-            {id: 'image24', src: '/static/imgs/mobile_activity/app_fullpage/t_title1.png'},
-            {id: 'image25', src: '/static/imgs/mobile_activity/app_fullpage/t_title2.png'},
-            {id: 'image26', src: '/static/imgs/mobile_activity/app_fullpage/m_1.jpg'},
-            {id: 'image27', src: '/static/imgs/mobile_activity/app_fullpage/m_2.jpg'},
-            {id: 'image28', src: '/static/imgs/mobile_activity/app_fullpage/m_3.png'},
-            {id: 'image29', src: '/static/imgs/mobile_activity/app_fullpage/m_4.png'},
-            {id: 'image30', src: '/static/imgs/mobile_activity/app_fullpage/m_mask.png'},
-            {id: 'image31', src: '/static/imgs/mobile_activity/app_fullpage/m_title1.png'},
-            {id: 'image32', src: '/static/imgs/mobile_activity/app_fullpage/m_title2.png'},
-            {id: 'image33', src: '/static/imgs/mobile_activity/app_fullpage/q_1.jpg'},
-            {id: 'image34', src: '/static/imgs/mobile_activity/app_fullpage/q_2.jpg'},
-            {id: 'image35', src: '/static/imgs/mobile_activity/app_fullpage/q_3.png'},
-            {id: 'image36', src: '/static/imgs/mobile_activity/app_fullpage/q_4.png'},
-            {id: 'image37', src: '/static/imgs/mobile_activity/app_fullpage/q_mask.png'},
-            {id: 'image38', src: '/static/imgs/mobile_activity/app_fullpage/q_title1.png'},
-            {id: 'image39', src: '/static/imgs/mobile_activity/app_fullpage/q_title2.png'},
-            {id: 'image40', src: '/static/imgs/mobile_activity/app_fullpage/last_titi3.png'},
-            {id: 'image41', src: '/static/imgs/mobile_activity/app_fullpage/last_logo.png'},
-            {id: 'image42', src: '/static/imgs/mobile_activity/app_fullpage/last_titi2.png'},
-            {id: 'image43', src: '/static/imgs/mobile_activity/app_fullpage/last_erweima.png'},
-            {id: 'image44', src: '/static/imgs/mobile_activity/app_fullpage/last_footer.png'},
-            {id: 'image44', src: '/static/imgs/mobile_activity/app_fullpage/share.jpg'},
-
-          ]);
-
-      })
+    head
+        meta(name="format-detection" content="telephone=no,email=no")
+        title 遇见10年前的你
+        meta(name="viewport" content="minimal-ui")
+        meta(charset="utf-8")
+        meta(content="telephone=no,email=no" ,name="format-detection")
+        meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
+        meta(content="yes" ,name="apple-mobile-web-app-capable")
+        link(href="/static/styles/mobile_activity/jquery.fullPage.css?v=20150921", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_ten_year.css?v=201509295", rel="stylesheet")
+    body
+        .loadPage#loadPage
+            .load-warp
+                .logo
+                .process 0%
+        .bg
+        img(src="/static/imgs/mobile_activity/app_ten_year/weixin_img_300.jpg").hide
+        img(src="/static/imgs/mobile_activity/app_ten_year/shadow_bottom.png").shadow
+        img(src="/static/imgs/mobile_activity/app_ten_year/mask.png").mask
+        img(src="/static/imgs/mobile_activity/app_ten_year/meteor1.png").meteor.meteor1
+        img(src="/static/imgs/mobile_activity/app_ten_year/meteor1.png").meteor.meteor2
+        img(src="/static/imgs/mobile_activity/app_ten_year/meteor1.png").meteor.meteor3
+        img(src="/static/imgs/mobile_activity/app_ten_year/meteor2.png").bottom_meteor
+        #play.play_music
+        audio#music(loop='loop',style='width:0;height:0;',autoplay='autoplay')
+            source(type="audio/mpeg", src="/static/imgs/mobile_activity/app_ten_year/ten_year.mp3")
+        #wrap
+            .section.section1
+                .img.theme.animate
+                .img.text1.animate
+                .img.text2.animate
+                .mask
+                img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").slideDown
+            .section.section2
+                .img.small_theme
+                .img.text
+                .img.young
+                .img.old
+                img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").slideDown
+            .section.section3
+                .img.talk
+                .img.boy
+                .img.man
+                .img.line_img
+                img(src="/static/imgs/mobile_activity/app_ten_year/small_theme.png").small_theme
+                img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").slideDown
+            .section.section4
+                .img.man1
+                .img.man2
+                .img.talk
+                .img.math
+                .img.line_img
+                img(src="/static/imgs/mobile_activity/app_ten_year/small_theme.png").small_theme
+                img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").slideDown
+            .section.section5
+                .img.woman1
+                .img.woman2
+                .img.talk
+                .img.bamboo
+                .img.line_img
+                img(src="/static/imgs/mobile_activity/app_ten_year/small_theme.png").small_theme
+                img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").slideDown
+            .section.section6
+                img(src="/static/imgs/mobile_activity/app_ten_year/small_theme.png").small_theme
+                img(src="/static/imgs/mobile_activity/app_ten_year/page6_fly.png").fly
+                img(src="/static/imgs/mobile_activity/app_ten_year/page6_img1.png").horn
+                img(src="/static/imgs/mobile_activity/app_ten_year/page6_img2.png").sound
+                .form
+                    img(src="/static/imgs/mobile_activity/app_ten_year/page6_text.png").text
+                    input( maxlength="8")
+                    a.button(href="#page7") 确 定
+                img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").slideDown
+            .section.section7
+                img(src="/static/imgs/mobile_activity/app_ten_year/small_theme.png").small_theme
+                img(src="/static/imgs/mobile_activity/app_ten_year/page6_fly.png").fly
+                img(src="/static/imgs/mobile_activity/app_ten_year/page7_img.png").horn
+                .title!='你对十年前的<span id="name">自己</span>说:'
+                .text!='"<span id="say">去旅游，去邂逅</span>"'
+                img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").slideDown
+            .section.section8
+                img(src="/static/imgs/mobile_activity/app_ten_year/small_theme.png").small_theme
+                img(src="/static/imgs/mobile_activity/app_ten_year/page6_fly.png").fly
+                img(src="/static/imgs/mobile_activity/app_ten_year/page8_text1.png").text1
+                img(src="/static/imgs/mobile_activity/app_ten_year/page8_text2.png").text2
+                a.button(href="/weixin/regist/?next=/weixin/authentication/") 到网利宝领取
+                    script(src="/static/js/lib/jquery.min.js")
+        script(src="/static/src/mobile/lib/weixin/wx.js")
+        script(src="/static/scripts/mobile_activity/dist/jquery.fullPage.min.js")
+        script(src="/static/js/app_ten_year_loading.js")
+        script(src="/static/js/app_ten_year.js")
+                                        
