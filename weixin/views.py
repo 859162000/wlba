@@ -723,6 +723,7 @@ class AuthorizeUser(APIView):
                     user_info = oauth.get_user_info(openid, res.get('access_token'))
                     nick_name = user_info['nickname']
                     head_img_url = user_info['headimgurl']
+                    self.request.session['nick_name']=nick_name
             except WeChatException, e:
                 auth_code_url = reverse("weixin_authorize_code")+'?auth=1&state=%s&url_id=%s'%(account_id, url_id)
                 return redirect(auth_code_url)
