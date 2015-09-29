@@ -227,12 +227,25 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
          ele.removeAttr("data");
     }
 }
+function Down(ele){
+    var curHeight = ele.height();
+    var autoHeight = ele.css('height', 'auto').height();
+    if (!ele.hasClass('down')){
+      ele.height(curHeight).animate({height: autoHeight},600,function(){
+        ele.addClass('down')
+      });
+    }else{
+      ele.height(curHeight).animate({height: 0},600,function(){
+        ele.removeClass('down')
+      });
+    }
+  }
 $("#rule").on("click", function () {
-    toggles($("#rulebox"));
+    Down($("#rulebox"));
 });
 
 $("#btns").on("click", function () {
-    toggles($("#rulebox3"));
+    Down($("#rulebox3"));
 });
 
 
