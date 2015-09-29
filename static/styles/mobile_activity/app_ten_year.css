@@ -73,6 +73,9 @@ img {
 	animation: slideDown 1.5s infinite ease-in-out;
 	z-index: 998;
 	pointer-events: none;
+    -webkit-transform: translate(0, -5px);
+    transform: translate(0, -5px);
+
 }
 
 @-webkit-keyframes slideDown {
@@ -95,17 +98,17 @@ img {
 @keyframes slideDown {
 	0%,30% {
 		opacity: 0.2;
-		transform: translate(0, -5px)
+		transform: translate(0, -5px);
 	}
 
 	60% {
 		opacity: 1;
-		transform: translate(0, 0)
+		transform: translate(0, 0);
 	}
 
 	100% {
 		opacity: 0.2;
-		transform: translate(0, 10px)
+		transform: translate(0, 10px);
 	}
 }
 
@@ -163,6 +166,7 @@ img {
 
 @keyframes bottom_meteor {
 	0% {
+
 		right: 12.8125%;
 		bottom: 12.8521127%;
 		opacity: 0;
@@ -503,7 +507,6 @@ img {
 .section1 .text2 {
     background: url("/static/imgs/mobile_activity/app_ten_year/page1_text2.png");
     background-size: cover;
-
 	bottom: 0%;
 	left: 0%;
 	opacity: 0;
@@ -785,9 +788,10 @@ img {
 .section3 .boy {
     background: url("/static/imgs/mobile_activity/app_ten_year/page3_boy.png");
     background-size: cover;
-	left: -100%;
 	bottom: 0%;
 	z-index: 1;
+    -webkit-transform: translateX(-100%);
+    transform: translateX(-100%);
 }
 
 .section3 .boy.animate {
@@ -804,31 +808,28 @@ img {
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
-
-@keyframes boy_start {
-	0% {
-		left: -100%;
-	}
-
-	100% {
-		left: 0;
-	}
-}
-
 @-webkit-keyframes boy_start {
 	0% {
-		left: -100%;
+		-webkit-transform: translateX(-100%);
 	}
 
 	100% {
-		left: 0;
+		-webkit-transform: translateX(0%);
 	}
 }
+@keyframes boy_start {
+	0% {
+        transform: translateX(-100%);
+	}
 
+	100% {
+		transform: translateX(0%);
+	}
+}
 .section3 .man {
     background: url("/static/imgs/mobile_activity/app_ten_year/page3_man.png");
     background-size: cover;
-	right: -100%;
+	transform: translateX(100%);
 	bottom: 0%;
 	z-index: 3;
 }
@@ -848,23 +849,13 @@ img {
 	animation-fill-mode: both;
 }
 
-@keyframes man_start {
-	0% {
-		right: -100%;
-	}
-
-	100% {
-		right: 0%;
-	}
-}
-
 @-webkit-keyframes man_start {
 	0% {
-		lright: -100%;
+		-webkit-transform: translateX(100%);
 	}
 
 	100% {
-		right: 0%;
+		-webkit-transform: translateX(0%);
 	}
 }
 
@@ -878,7 +869,15 @@ img {
 	display: block;
     opacity: 0;
 }
+@keyframes man_start {
+	0% {
+        transform: translateX(100%);
+	}
 
+	100% {
+        transform: translateX(0%);
+	}
+}
 .section3 .line_img.animate {
 	-webkit-animation-name: line_img_start;
 	animation-name: line_img_start;
@@ -893,7 +892,15 @@ img {
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
+@-webkit-keyframes line_img_start {
+	0% {
+		opacity: 0;
+	}
 
+	100% {
+		opacity: 1;
+	}
+}
 @keyframes line_img_start {
 	0% {
 		opacity: 0;
@@ -904,15 +911,7 @@ img {
 	}
 }
 
-@-webkit-keyframes line_img_start {
-	0% {
-		opacity: 0;
-	}
 
-	100% {
-		opacity: 1;
-	}
-}
 @media screen and (min-width: 700px) {
     .section3 .boy {
         background-position: 0 -100px;
@@ -947,17 +946,6 @@ img {
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
-
-@keyframes man1_start {
-	0% {
-		opacity: 0;
-	}
-
-	100% {
-		opacity: 1;
-	}
-}
-
 @-webkit-keyframes man1_start {
 	0% {
 		opacity: 0;
@@ -967,13 +955,22 @@ img {
 		opacity: 1;
 	}
 }
+@keyframes man1_start {
+	0% {
+		opacity: 0;
+	}
 
+	100% {
+		opacity: 1;
+	}
+}
 .section4 .man2 {
 	background: url("/static/imgs/mobile_activity/app_ten_year/page4_man2.png");
     background-size: cover;
 	right: 0%;
-	bottom: -100%;
 	z-index: 3;
+    -webkit-transform: translateY(100%);
+    transform: translateY(100%);
 }
 
 .section4 .man2.animate {
@@ -990,27 +987,24 @@ img {
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
-
-@keyframes man2_start {
-	0% {
-		bottom: -100%;
-	}
-
-	100% {
-		bottom: 0%;
-	}
-}
-
 @-webkit-keyframes man2_start {
 	0% {
-		bottom: -100%;
+        -webkit-transform: translateY(100%);
 	}
 
 	100% {
-		bottom: 0%;
+		-webkit-transform: translateY(-50%);
 	}
 }
+@keyframes man2_start {
+	0% {
+        transform: translateY(100%);
+	}
 
+	100% {
+		transform: translateY(-50%);
+	}
+}
 .section4 .talk {
     background: url("/static/imgs/mobile_activity/app_ten_year/page4_talk.png");
     background-size: cover;
@@ -1034,6 +1028,17 @@ img {
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
+@-webkit-keyframes s4talk_start {
+	0% {
+		opacity: 0;
+		-webkit-transform: translateY(20px);
+	}
+
+	100% {
+		opacity: 1;
+		-webkit-transform: translateY(0px);
+	}
+}
 
 @keyframes s4talk_start {
 	0% {
@@ -1047,17 +1052,6 @@ img {
 	}
 }
 
-@-webkit-keyframes s4talk_start {
-	0% {
-		opacity: 0;
-		-webkit-transform: translateY(20px);
-	}
-
-	100% {
-		opacity: 1;
-		-webkit-transform: translateY(0px);
-	}
-}
 
 .section4 .math {
     background: url("/static/imgs/mobile_activity/app_ten_year/page4_math.png");
@@ -1082,19 +1076,6 @@ img {
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
-
-@keyframes s4math_start {
-	0% {
-		transform: translateY(20px);
-		opacity: 0;
-	}
-
-	100% {
-		transform: translateY(0px);
-		opacity: 1;
-	}
-}
-
 @-webkit-keyframes s4math_start {
 	0% {
 		-webkit-transform: translateY(20px);
@@ -1106,7 +1087,17 @@ img {
 		opacity: 1;
 	}
 }
+@keyframes s4math_start {
+	0% {
+		transform: translateY(20px);
+		opacity: 0;
+	}
 
+	100% {
+		transform: translateY(0px);
+		opacity: 1;
+	}
+}
 .section4 .line_img {
 	background: url("/static/imgs/mobile_activity/app_ten_year/page4_line.png");
 	background-size: cover;
@@ -1132,6 +1123,15 @@ img {
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
+@-webkit-keyframes s4line_img_start {
+	0% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}
 
 @keyframes s4line_img_start {
 	0% {
@@ -1143,15 +1143,6 @@ img {
 	}
 }
 
-@-webkit-keyframes s4line_img_start {
-	0% {
-		opacity: 0;
-	}
-
-	100% {
-		opacity: 1;
-	}
-}
 
 .section4 .talk {
     background: url("/static/imgs/mobile_activity/app_ten_year/page4_talk.png");
@@ -1159,8 +1150,20 @@ img {
 	left: 0%;
 	top: 0%;
 	z-index: 4;
+    -webkit-transform: translateY(20px);
+    transform: translateY(20px);
 }
+@-webkit-keyframes s4talk_start {
+	0% {
+		opacity: 0;
+		-webkit-transform: translateY(20px);
+	}
 
+	100% {
+		opacity: 1;
+		-webkit-transform: translateY(0px);
+	}
+}
 @keyframes s4talk_start {
 	0% {
 		opacity: 0;
@@ -1173,17 +1176,7 @@ img {
 	}
 }
 
-@-webkit-keyframes s4talk_start {
-	0% {
-		opacity: 0;
-		-webkit-transform: translateY(20px);
-	}
 
-	100% {
-		opacity: 1;
-		-webkit-transform: translateY(0px);
-	}
-}
 @media screen and (min-width: 700px) {
     .section4 .man1 {
         background-position: 0 -100px;
@@ -1224,19 +1217,6 @@ img {
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
-
-@keyframes s5talk_start {
-	0% {
-		opacity: 0;
-		transform: translateY(20px);
-	}
-
-	100% {
-		opacity: 1;
-		transform: translateY(0px);
-	}
-}
-
 @-webkit-keyframes s5talk_start {
 	0% {
 		opacity: 0;
@@ -1249,6 +1229,17 @@ img {
 	}
 }
 
+@keyframes s5talk_start {
+	0% {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+
+	100% {
+		opacity: 1;
+		transform: translateY(0px);
+	}
+}
 .bamboo {
     background: url("/static/imgs/mobile_activity/app_ten_year/page5_bamboo.png");
 	background-size: cover;
@@ -1256,6 +1247,8 @@ img {
 	bottom: 0%;
 	opacity: 0;
 	z-index: 1;
+    -webkit-transform: translateY(20px);
+    transform: translateY(20px);
 }
 
 .section5 .bamboo.animate {
@@ -1272,6 +1265,17 @@ img {
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
+@-webkit-keyframes s5bamboo_start {
+	0% {
+		-webkit-transform: translateY(20px);
+		opacity: 0;
+	}
+
+	100% {
+		-webkit-transform: translateY(0px);
+		opacity: 1;
+	}
+}
 
 @keyframes s5bamboo_start {
 	0% {
@@ -1285,17 +1289,7 @@ img {
 	}
 }
 
-@-webkit-keyframes s5bamboo_start {
-	0% {
-		-webkit-transform: translateY(20px);
-		opacity: 0;
-	}
 
-	100% {
-		-webkit-transform: translateY(0px);
-		opacity: 1;
-	}
-}
 
 .section5 .line_img {
 	background: url("/static/imgs/mobile_activity/app_ten_year/page5_line.png");
@@ -1323,7 +1317,7 @@ img {
 	animation-fill-mode: both;
 }
 
-@keyframes s5line_img_start {
+@-webkit-keyframes s5line_img_start {
 	0% {
 		opacity: 0;
 	}
@@ -1333,7 +1327,7 @@ img {
 	}
 }
 
-@-webkit-keyframes s5line_img_start {
+@keyframes s5line_img_start {
 	0% {
 		opacity: 0;
 	}
@@ -1347,7 +1341,6 @@ img {
     background: url("/static/imgs/mobile_activity/app_ten_year/page5_woman1.png");
 	background-size: cover;
 	left: 0%;
-	bottom: -100%;
 	z-index: 2;
 }
 
@@ -1365,32 +1358,26 @@ img {
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
-
-@keyframes woman1_start {
-	0% {
-		bottom: -100%;
-	}
-
-	100% {
-		bottom: 0%;
-	}
-}
-
 @-webkit-keyframes woman1_start {
 	0% {
-		bottom: -100%;
+		-webkit-transform: translateY(100%);
 	}
-
 	100% {
-		bottom: 0%;
+		-webkit-transform: translateY(-50%);
 	}
 }
-
+@keyframes woman1_start {
+	0% {
+        transform: translateY(100%);
+	}
+	100% {
+		transform: translateY(-50%);
+	}
+}
 .section5 .woman2 {
     background: url("/static/imgs/mobile_activity/app_ten_year/page5_woman2.png");
 	background-size: cover;
-	right: -100%;
-	bottom: -100%;
+	transform: translate(100%,100%);
 	z-index: 3;
 }
 
@@ -1408,30 +1395,26 @@ img {
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
-
-@keyframes woman2_start {
-	0% {
-		bottom: -100%;
-		right: -100%;
-	}
-
-	100% {
-		bottom: 0%;
-		right: 0%;
-	}
-}
-
 @-webkit-keyframes woman2_start {
 	0% {
-		bottom: -100%;
-		right: -100%;
+		-webkit-transform: translate(100%,100%);
 	}
 
 	100% {
-		bottom: 0%;
-		right: 0%;
+		-webkit-transform: translate(0%,-50%);
 	}
 }
+@keyframes woman2_start {
+	0% {
+		transform: translate(100%,100%);
+	}
+
+	100% {
+		transform: translate(0%,-50%);
+	}
+}
+
+
 @media screen and (min-width: 700px) {
     .section5 .woman1 {
         background-position: 0 -100px;
@@ -1637,6 +1620,7 @@ img {
 	line-height: 42px;
 	border: none;
 	box-shadow: none;
+    font-size:40px;
 }
 
 .section6 input.animate {
@@ -1734,6 +1718,7 @@ img {
 }
 @media screen and (min-width: 700px) {
     .section6 input{
+        font-size:50px;
         height:72px;
         line-height: 64px;
     }
