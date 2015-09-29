@@ -134,7 +134,7 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function( $ ) {
       if($scroll > ($(document).height()*0.4)) {
         $('.bonus-icon').css({'top': '30%'})
       }else{
-        $('.bonus-icon').css({'top': '50%'})
+        $('.bonus-icon').css({'top': '60%'})
       }
   });
   $('.bonus-icon').on('click',function(){
@@ -143,4 +143,13 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function( $ ) {
   $('.close').on('click',function(){
     $('.bonus-img,.page').hide();
   })
+  function wxShareIcon(){
+    var docleft = document.body.clientWidth;
+    var left = (docleft - $('.i-mod-exhibition').width())/2 + $('.i-mod-exhibition').width();
+    $('.bonus-icon').css({'left':left})
+  }
+  wxShareIcon()
+  window.onresize = function(){
+      wxShareIcon();
+  };
 });
