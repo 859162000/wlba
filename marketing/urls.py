@@ -44,6 +44,7 @@ urlpatterns = patterns(
     url(r'^android-view/$', TemplateView.as_view(template_name="android_view.html")),
     url(r'^new_user/$', TemplateView.as_view(template_name="new_user.jade")),
     url(r'^recommended/$', TemplateView.as_view(template_name="recommended.jade")),
+    url(r'^national/$', TemplateView.as_view(template_name="national.jade")),
 
 )
 
@@ -70,6 +71,7 @@ urlpatterns += patterns(
     url(r'^app_pc_download/$', TemplateView.as_view(template_name="app_pc_download.jade")),
     url(r'^app_lottery/$', TemplateView.as_view(template_name="app_lottery.jade")),
     url(r'^app_scratch/$', TemplateView.as_view(template_name="app_scratch.jade")),
+    url(r'^app_national/$', TemplateView.as_view(template_name="app_national.jade")),
 
 
     url(r'^app_eight_gift_two/$', TemplateView.as_view(template_name="app_eight_gift_two.jade")),
