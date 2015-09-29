@@ -417,8 +417,8 @@ img{
 }
 .section2 .young.animate{
     opacity: 1;
-    -webkit-animation: young_start 2.5s linear 0.8s both;
-    animation: young_start 2.5s linear 0.8s both;
+    -webkit-animation: young_start 2.5s ease 0.8s both;
+    animation: young_start 2.5s ease 0.8s both;
 }
 @keyframes young_start{
     0% { left:-165px; opacity:1;}
@@ -493,8 +493,18 @@ img{
     z-index: 1;
 }
 .section3 .boy.animate{
-    -webkit-animation: boy_start 0.7s ease-in both;
-    animation: boy_start 0.7s ease-in both;
+    -webkit-animation-name: boy_start;
+    animation-name: boy_start;
+    -webkit-animation-duration: 0.7s;
+    animation-duration: 0.7s;
+	-webkit-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-delay: 0s;
+	animation-delay: 0s;
+    -webkit-backface-visibility: visible !important;
+	backface-visibility: visible !important;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
 }
 @keyframes boy_start{
     0%{ left: -56.5625%; }
@@ -511,8 +521,18 @@ img{
     z-index: 2;
 }
 .section3 .boy_before.animate{
-    -webkit-animation: boy_before_start 1.4s ease-in both;
-    animation: boy_before_start 1.4s ease-in both;
+    -webkit-animation-name: boy_before_start;
+    animation-name: boy_before_start;
+    -webkit-animation-duration: 1.4s;
+    animation-duration: 1.4s;
+	-webkit-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-delay: 0s;
+	animation-delay: 0s;
+    -webkit-backface-visibility: visible !important;
+	backface-visibility: visible !important;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
 }
 @keyframes boy_before_start{
     0%{ left: -56.5625%; opacity: 1; }
@@ -531,8 +551,18 @@ img{
     z-index: 3;
 }
 .section3 .man.animate{
-    -webkit-animation: man_start 0.5s ease-in 0.5s both;
-    animation: man_start 0.5s ease-in 0.5s both;
+    -webkit-animation-name: man_start;
+    animation-name: man_start;
+    -webkit-animation-duration: 0.5s;
+    animation-duration: 0.5s;
+	-webkit-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-delay: 0.5s;
+	animation-delay: 0.5s;
+    -webkit-backface-visibility: visible !important;
+	backface-visibility: visible !important;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
 }
 @keyframes man_start{
     0%{ right: -54.21875%; }
@@ -561,8 +591,18 @@ img{
     display: block;
 }
 .section3 .line_img.animate{
-    -webkit-animation: line_img_start 0.7s ease-in 1s both;
-    animation: line_img_start 0.7s ease-in 1s both;
+    -webkit-animation-name: line_img_start;
+    animation-name: line_img_start;
+    -webkit-animation-duration: 0.7s;
+    animation-duration: 0.7s;
+	-webkit-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-delay: 1s;
+	animation-delay: 1s;
+    -webkit-backface-visibility: visible !important;
+	backface-visibility: visible !important;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
 }
 @keyframes line_img_start{
     0%{ width:0; }
@@ -652,8 +692,18 @@ img{
     z-index: 3;
 }
 .section4 .man2.animate{
-    -webkit-animation: man2_start 1.5s ease-in 0.5s both;
-    animation: man2_start 1.5s ease-in 0.5s both;
+    -webkit-animation-name: man2_start;
+    animation-name: man2_start;
+    -webkit-animation-duration: 1.5s;
+    animation-duration: 1.5s;
+	-webkit-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-delay: 0.5s;
+	animation-delay: 0.5s;
+    -webkit-backface-visibility: visible !important;
+	backface-visibility: visible !important;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
 }
 @keyframes man2_start{
     0%{ bottom: -100%; }
@@ -671,8 +721,18 @@ img{
     opacity: 0;
 }
 .section4 .talk.animate{
-    -webkit-animation: s4talk_start 0.7s ease-in 3s;
-    animation: s4talk_start 0.7s ease-in 3s;
+    -webkit-animation-name: s4talk_start;
+    animation-name: s4talk_start;
+    -webkit-animation-duration: 0.7s;
+    animation-duration: 0.7s;
+	-webkit-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-delay: 3s;
+	animation-delay: 3s;
+    -webkit-backface-visibility: visible !important;
+	backface-visibility: visible !important;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
 }
 @keyframes s4talk_start{
     0%{ opacity:0; top: 13.5355575%; }
@@ -687,10 +747,22 @@ img{
     left : 1.5625%;
     bottom: -20.028169%;
     z-index: 1;
+    opacity:0;
 }
 .section4 .math.animate{
-    -webkit-animation: s4math_start 1.7s ease-in;
-    animation: s4math_start 1.7s ease-in;
+    -webkit-animation-name: s4math_start;
+    animation-name: s4math_start;
+    -webkit-animation-duration: 1.7s;
+    animation-duration: 1.7s;
+	-webkit-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-delay: 0s;
+	animation-delay: 0s;
+    -webkit-backface-visibility: visible !important;
+	backface-visibility: visible !important;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+
 }
 @keyframes s4math_start{
     0%{ bottom: -20.028169%; opacity:0; }
@@ -718,8 +790,18 @@ img{
     display: block;
 }
 .section4 .line_img.animate{
-    -webkit-animation: s4line_img_start 0.7s ease-in 2s both;
-    animation: s4line_img_start 0.7s ease-in 2s both;
+    -webkit-animation-name: s4line_img_start;
+    animation-name: s4line_img_start;
+    -webkit-animation-duration: 0.7s;
+    animation-duration: 0.7s;
+	-webkit-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-delay: 2s;
+	animation-delay: 2s;
+    -webkit-backface-visibility: visible !important;
+	backface-visibility: visible !important;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
 }
 @keyframes s4line_img_start{
     0%{ width:0; }
@@ -792,8 +874,18 @@ img{
     z-index: 1;
 }
 .section5 .bamboo.animate{
-    -webkit-animation: s5bamboo_start 2s ease-in 0.3s both;
-    animation: s5bamboo_start 2s ease-in 0.3s both;
+    -webkit-animation-name: s5bamboo_start;
+    animation-name: s5bamboo_start;
+    -webkit-animation-duration: 2s;
+    animation-duration: 2s;
+	-webkit-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-delay: 0.3s;
+	animation-delay: 0.3s;
+    -webkit-backface-visibility: visible !important;
+	backface-visibility: visible !important;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
 }
 @keyframes s5bamboo_start{
     0%{ bottom: -9.8415493%; opacity:0; }
@@ -821,8 +913,18 @@ img{
     display: block;
 }
 .section5 .line_img.animate{
-    -webkit-animation: s5line_img_start 0.7s ease-in 2.3s both;
-    animation: s5line_img_start 0.7s ease-in 2.3s both;
+    -webkit-animation-name: s5line_img_start;
+    animation-name: s5line_img_start;
+    -webkit-animation-duration: 0.7s;
+    animation-duration: 0.7s;
+	-webkit-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-delay: 2.3s;
+	animation-delay: 2.3s;
+    -webkit-backface-visibility: visible !important;
+	backface-visibility: visible !important;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
 }
 @keyframes s5line_img_start{
     0%{ width:0; }
@@ -839,8 +941,18 @@ img{
     z-index: 2;
 }
 .section5 .woman1.animate{
-    -webkit-animation: woman1_start 1s ease-in both;
-    animation: woman1_start 1s ease-in both;
+    -webkit-animation-name: woman1_start;
+    animation-name: woman1_start;
+    -webkit-animation-duration: 1s;
+    animation-duration: 1s;
+	-webkit-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-delay: 0s;
+	animation-delay: 0s;
+    -webkit-backface-visibility: visible !important;
+	backface-visibility: visible !important;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
 }
 @keyframes woman1_start{
     0%{ bottom: -100%; }
@@ -858,8 +970,18 @@ img{
     opacity: 1;
 }
 .section5 .woman1_before.animate{
-    -webkit-animation: woman1_before_start 4s ease-in both;
-    animation: woman1_before_start 4s ease-in both;
+    -webkit-animation-name: woman1_before_start;
+    animation-name: woman1_before_start;
+    -webkit-animation-duration: 4s;
+    animation-duration: 4s;
+	-webkit-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-delay: 0s;
+	animation-delay: 0s;
+    -webkit-backface-visibility: visible !important;
+	backface-visibility: visible !important;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
 }
 @keyframes woman1_before_start{
     0%{ bottom: -100%; opacity: 1; }
@@ -880,8 +1002,19 @@ img{
     z-index: 3;
 }
 .section5 .woman2.animate{
-    -webkit-animation: woman2_start 1.5s ease-in 0.7s both;
-    animation: woman2_start 1.5s ease-in 0.7s both;
+    -webkit-animation-name: woman2_start;
+    animation-name: woman2_start;
+    -webkit-animation-duration: 1.5s;
+    animation-duration: 1.5s;
+	-webkit-animation-timing-function: ease-in;
+    animation-timing-function: ease-in;
+    -webkit-animation-delay: 0.7s;
+	animation-delay: 0.7s;
+    -webkit-backface-visibility: visible !important;
+	backface-visibility: visible !important;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+
 }
 @keyframes woman2_start{
     0%{ bottom: -100%; right : -100%; }
@@ -1189,8 +1322,18 @@ img{
     line-height: 36px;
 }
 .section7 .title.animate{
-    -webkit-animation: title_start 1s ease-in-out both;
-    animation: title_start 1s ease-in-out both;
+    -webkit-animation-name: title_start;
+    animation-name: title_start;
+    -webkit-animation-duration: 1s;
+    animation-duration: 1s;
+	-webkit-animation-timing-function: ease-in-out;
+    animation-timing-function: ease-in-out;
+    -webkit-animation-delay: 0s;
+	animation-delay: 0s;
+    -webkit-backface-visibility: visible !important;
+	backface-visibility: visible !important;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
 }
 @keyframes title_start{
     0%{ top: -100%; }
