@@ -255,7 +255,7 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^coop/order/receive/$', ThirdOrdeApiView.as_view()),
-    url(r'^coop/order/query/', ThirdOrderQueryApiView.as_view()),
+    url(r'^coop/order/query/$', ThirdOrderQueryApiView.as_view()),
 )
 
 
