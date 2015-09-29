@@ -18,7 +18,8 @@ html
       .pna_minbox
         .pna_img.pna_img1
         .pan_con.pan_con1
-          h5 投资单笔5000元立送一张
+          h5 5000元≤单笔投资金额<10000元
+          span 立送一张
           .pna_quan
           if user.is_authenticated
             a.pan_quanbtn(href="/p2p/list/")
@@ -29,7 +30,8 @@ html
       .pna_minbox
         .pna_img.pna_img2
         .pan_con.pan_con2
-          h5 投资单笔10000元立送一张
+          h5 10000元≤单笔投资金额<20000元
+          span 立送一张
           .pna_quan
           if user.is_authenticated
             a.pan_quanbtn(href="/p2p/list/")
@@ -40,7 +42,8 @@ html
       .pna_minbox
         .pna_img.pna_img3
         .pan_con.pan_con3
-          h5 投资单笔20000元立送一张
+          h5 20000元≤单笔投资金额
+          span 立送一张
           .pna_quan
           if user.is_authenticated
             a.pan_quanbtn(href="/p2p/list/")
@@ -49,7 +52,7 @@ html
             a.pan_quanbtn(href="/accounts/login/?next=/activity/mid_autumn/")
               img(src="/static/imgs/pc_activity/img_national/9.png")
     h6.pnation_text 新老用户均可参与，单标投资额无上限，一券一标永久加息！加息券不限平台均可使用。
-    a.pnation_dbtn#dbtn 加息券更多
+    a.pnation_dbtn#dbtn 加息券规则
      span.pna_spans
     p.pantion_dluo#dluo
       span 1. 加息券有效期：9月28日-10月15日；
@@ -110,11 +113,5 @@ html
       span 6. 使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
     p.wlbqu  *网利宝对此活动享有最终解释权
     .pnation_footer
-script(src="/static/js/national.js")
-script
-  var p_btn=document.getElementById("dbtn");
-  var p_box=document.getElementById("dluo");
-  var p_btn2=document.getElementById("ashref");
-  var p_box2=document.getElementById("dluo2");
-  heightshow(p_btn,p_box);
-  heightshow(p_btn2,p_box2);
+script.
+      require(['/static/js/national.js'])
