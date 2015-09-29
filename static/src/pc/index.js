@@ -145,7 +145,7 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function( $ ) {
   })
   function wxShareIcon(){
     var docleft = document.body.clientWidth;
-    var left = (docleft - $('.i-mod-exhibition').width())/2 + $('.i-mod-exhibition').width();
+    var left = (docleft - $('.i-mod-exhibition').width())/2 + $('.i-mod-exhibition').width() - 30;
     $('.bonus-icon').css({'left':left})
   }
   wxShareIcon()

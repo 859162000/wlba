@@ -1633,7 +1633,7 @@ img {
 	background: #fff;
 	padding: 4px 10px;
 	color: #222;
-	height: 42px;
+	height: 50px;
 	line-height: 42px;
 	border: none;
 	box-shadow: none;
@@ -1734,7 +1734,7 @@ img {
 }
 @media screen and (min-width: 700px) {
     .section6 input{
-        height:64px;
+        height:72px;
         line-height: 64px;
     }
     .section6 .button{
