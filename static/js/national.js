@@ -1,8 +1,11 @@
-function heightshow(ele,box){
+/*function heightshow(ele,box){
     box.setAttribute("data",1)
     ele.onclick=function(){
-        var data=box.getAttribute("data");
-        if(data==1){
+        var data=box.getAttribute("data"),
+            h=box.offsetHeight,
+            w=box.offsetWidth;
+        console.log(w+"  "+h);
+        if(h>0){
             box.style.display="block"
             box.setAttribute("data",2)
         }else{
@@ -10,31 +13,32 @@ function heightshow(ele,box){
             box.setAttribute("data",1)
         }
     }
-}
+}*/
 
 
 
-/*require.config({
+require.config({
     paths: {
         jquery : "lib/jquery.min"
     }
 });
 require(["jquery"],function($){
-    function heightshow($ele,$box){
-        $ele.on('click',function(){
-            var dis=$box.attr("display");
-            if(dis=="block"){
-                $box.hide();
-                $box.attr("display","none");
-            }else{
-                $box.show();
-                $box.attr("display","block");
-            }
-
-        })
+    function toggles(obj){
+        obj.slideToggle()
     }
-    heightshow($("#dbtn"),$("#dluo"))
+    $("#dbtn").on("click",function(){
+        toggles($("#dluo"));
+    })
+    $("#ashref").on("click",function(){
+        toggles($("#dluo2"));
+    })
+    $("#rule").on("click",function(){
+        toggles($("#relebox"));
+    })
+    $("#btns").on("click",function(){
+        toggles($("#relebox3"));
+    })
 
-})*/
+})
 
 
