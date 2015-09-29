@@ -617,7 +617,7 @@ class WeixinShareStartView(TemplateView):
         order_id = self.request.GET.get('url_id')
         nick_name = self.request.GET.get('nick_name')
         if nick_name:
-            nick_name = base64.decode(nick_name)
+            nick_name = base64.b64decode(nick_name)
         else:
             raise Exception(u'没有得到nick name')
         img_url = self.request.GET.get('head_img_url')

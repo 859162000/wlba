@@ -718,7 +718,7 @@ class AuthorizeUser(APIView):
                         logger.debug("openid:%s, phone:%s, product_id:%s,用户已经存在了，直接跳转页面" %(openid, phone, url_id,))
                         return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, url_id))
                     else:
-                        return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,base64.encode(nick_name),head_img_url))
+                        return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,base64.b64encode(nick_name),head_img_url))
                 else:
                     user_info = oauth.get_user_info(openid, res.get('access_token'))
                     nick_name = user_info['nickname']
