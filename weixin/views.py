@@ -723,7 +723,7 @@ class AuthorizeUser(APIView):
                     nick_name = user_info['nickname']
                     head_img_url = user_info['headimgurl']
             except WeChatException, e:
-                auth_code_url = reverse("weixin_authorize_code")+'?auth=1&state=%s'%account_id
+                auth_code_url = reverse("weixin_authorize_code")+'?auth=1&state=%s&url_id=%s'%(account_id, url_id)
                 return redirect(auth_code_url)
             return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,nick_name,head_img_url))
 

@@ -5,6 +5,7 @@ require.config({
   },
   shim: {
     'jquery.animateNumber': ['jquery'],
+    'jquery.modal': ['jquery']
   }
 });
 
@@ -127,4 +128,19 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function( $ ) {
     $('.cn-ul-warp li').length - 1
   );
 
+  //扫描送红包
+  $(window).scroll(function () {
+      var $scroll = $(document).scrollTop();
+      if($scroll > ($(document).height()*0.4)) {
+        $('.bonus-icon').css({'top': '30%'})
+      }else{
+        $('.bonus-icon').css({'top': '50%'})
+      }
+  });
+  $('.bonus-icon').on('click',function(){
+    $('.bonus-img,.page').show();
+  });
+  $('.close').on('click',function(){
+    $('.bonus-img,.page').hide();
+  })
 });

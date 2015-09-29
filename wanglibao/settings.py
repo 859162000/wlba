@@ -587,6 +587,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'wanglibao_account.tasks.zhongjin_post_task',
         'schedule': timedelta(hours=1),
     },
+    # 每天定时检测和生成原始邀请码
+    'check_and_generate_codes': {
+        'task': 'marketing.tools.check_and_generate_codes',
+        'schedule': crontab(minute=0, hour=3)
+    }
 }
 
 CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
