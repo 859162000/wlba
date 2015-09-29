@@ -2,6 +2,7 @@
 from django.db import models
 from django.utils import timezone
 from django.db.models.signals import post_save
+from redisco import models as rmodels
 
 
 class PhoneValidateCode(models.Model):
@@ -89,6 +90,18 @@ class ArrivedRate(models.Model):
         verbose_name = u'到达率记录'
         verbose_name_plural = u'到达率记录'
         ordering = ['-created_at']
+
+
+class MessageInRedis(rmodels.Model):
+
+    message_for = rmodels.CharField(required=True, unique=True)
+    title = rmodels.CharField()
+    content = rmodels.Attribute()
+
+    class Meta:
+        verbose_name = u'短信模板'
+        verbose_name_plural = u'短信模板'
+        ordering = ['message_for']
 
 
 def send_manual_message(sender, instance, **kwargs):

@@ -64,9 +64,9 @@ class Migration(SchemaMigration):
             'channel': ('django.db.models.fields.CharField', [], {'default': "u'\\u6162\\u9053'", 'max_length': '10'}),
             'contents': ('django.db.models.fields.TextField', [], {}),
             'context': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'db_index': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'phones': ('django.db.models.fields.TextField', [], {}),
+            'phones': ('django.db.models.fields.CharField', [], {'max_length': '64', 'db_index': 'True'}),
             'status': ('django.db.models.fields.CharField', [], {'default': "u'\\u53d1\\u9001\\u4e2d'", 'max_length': '8'}),
             'type': ('django.db.models.fields.CharField', [], {'default': "u'\\u7cfb\\u7edf'", 'max_length': '8'})
         }

@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
+from django.core.urlresolvers import reverse
 from django.db.models import Sum
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, HttpResponseRedirect
 from django.utils import timezone
+from django.views.generic import TemplateView
 import pytz
 from rest_framework import renderers
 from rest_framework.response import Response
@@ -12,7 +14,7 @@ from rest_framework.views import APIView
 import time
 from wanglibao import settings
 from wanglibao.permissions import IsAdminUserOrReadOnly
-from wanglibao_sms.models import ArrivedRate
+from wanglibao_sms.models import ArrivedRate, MessageInRedis
 
 
 class AchievedMessages(APIView):
@@ -25,7 +27,10 @@ class AchievedMessages(APIView):
 
     def post(self, request):
 
-        data = self.request.POST.get('args', '123456,62891,138****065,ceshi01,2015-09-24 15:51:05;4464023,62891,139****404,test02,2015-09-23 15:51:17')
+        # 开发测试用数据
+        # data = self.request.POST.get('args', '123456,62891,138****065,ceshi01,2015-09-24 15:51:05;\
+        #                                       4464023,62891,139****404,test02,2015-09-23 15:51:17')
+        data = self.request.POST.get('args', None)
         if data:
             file_name = time.strftime('%Y-%m-%d' + '.log', time.localtime())
             try:
@@ -63,7 +68,10 @@ class ReportMessages(APIView):
 
     def post(self, request):
 
-        data = self.request.POST.get('args', '123456,62891,159*404,564687,DELIVRD,2015-09-24 13:01:36;123456,62891,189*404,420937,DELIVRD,2015-09-23 13:01:42')
+        # 开发测试用数据
+        # data = self.request.POST.get('args', '123456,62891,159*404,564687,DELIVRD,2015-09-24 13:01:36; \
+        #                                       123456,62891,189*404,420937,DELIVRD,2015-09-23 13:01:42')
+        data = self.request.POST.get('args', None)
         if data:
             file_name = time.strftime('%Y-%m-%d' + '.log', time.localtime())
             try:
@@ -159,3 +167,50 @@ class ArriveRate(APIView):
             }
 
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+
+
+class MessageList(TemplateView):
+    """
+    author: Zhoudong
+    显示所有短信用于编辑
+    """
+    template_name = 'messages.jade'
+    permission_classes = (IsAdminUserOrReadOnly,)
+
+    def get_context_data(self, **kwargs):
+
+        messages = MessageInRedis.objects.all()
+
+        return {
+            "messages": messages
+        }
+
+
+class MessageEdit(APIView):
+    """
+    author: Zhoudong
+    根据时间段, 获取到达率
+    method: GET.
+    改成定期执行加入数据库, 统计一定时间段的到达率
+    """
+    permission_classes = (IsAdminUserOrReadOnly,)
+
+    def get(self, request):
+
+        redirect_url = reverse('wanglibao:message_for_admin')
+
+        mid = int(self.request.GET.get('mid', None))
+        message_for = self.request.GET.get('message_for', None)
+        title = self.request.GET.get('title', None)
+        content = self.request.GET.get('content', None)
+
+        try:
+            message = MessageInRedis.objects.get_by_id(id=mid)
+            message.message_for = message_for
+            message.title = title
+            message.content = content
+            message.save()
+        except Exception, e:
+            print e
+
+        return HttpResponseRedirect(redirect_url)
