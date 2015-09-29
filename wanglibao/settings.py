@@ -590,7 +590,7 @@ CELERYBEAT_SCHEDULE = {
     # 每天定时检测和生成原始邀请码
     'check_and_generate_codes': {
         'task': 'marketing.tools.check_and_generate_codes',
-        'schedule': crontab(minute=0, hour=22)
+        'schedule': crontab(minute=0, hour=3)
     }
 }
 
