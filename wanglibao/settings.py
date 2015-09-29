@@ -528,6 +528,11 @@ CELERYBEAT_SCHEDULE = {
     #     'schedule': timedelta(minutes=30)
     # }
 
+    'p2p_auto_ready_for_settle': {
+        'task': 'wanglibao_p2p.tasks.p2p_auto_ready_for_settle',
+        'schedule': crontab(hour=16),
+    },
+
     #add by guoya: 希财网渠道数据定时推送
     'xicai_send_data': {
         'task': 'wanglibao_account.tasks.xicai_send_data_task',
@@ -587,6 +592,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'wanglibao_account.tasks.zhongjin_post_task',
         'schedule': timedelta(hours=1),
     },
+    # 每天定时检测和生成原始邀请码
+    'check_and_generate_codes': {
+        'task': 'marketing.tools.check_and_generate_codes',
+        'schedule': crontab(minute=0, hour=3)
+    }
 }
 
 CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
@@ -975,6 +985,9 @@ else:
     ZGDX_ACTIVITY_ID = '100785'
     ZGDX_KEY = 'H5gOs1ZshKZ6WikN'
     ZGDX_IV = '8888159601152533'
+
+# 返利投
+WLB_FOR_FANLITOU_KEY = '2002'
 
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:

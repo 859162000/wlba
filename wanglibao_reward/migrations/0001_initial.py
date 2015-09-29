@@ -165,7 +165,7 @@ class Migration(SchemaMigration):
             'invest_amount': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'p2p_types': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.ProductType']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
-            'period': ('django.db.models.fields.IntegerField', [], {'default': '0', 'blank': 'True'}),
+            'period': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '200', 'blank': 'True'}),
             'rtype': ('django.db.models.fields.CharField', [], {'default': "'\\xe7\\x9b\\xb4\\xe6\\x8a\\xb5\\xe7\\xba\\xa2\\xe5\\x8c\\x85'", 'max_length': '20'}),
             'target_channel': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '1000', 'blank': 'True'}),
             'unavailable_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
