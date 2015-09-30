@@ -254,7 +254,7 @@ urlpatterns += patterns(
 # 第三方渠道业务接口
 urlpatterns += patterns(
     '',
-    url(r'^coop/order/receive/$', ThirdOrdeApiView.as_view()),
+    url(r'^coop/order/receive/(?P<channel_code>[a-z0-9A-Z_]*)/$', ThirdOrdeApiView.as_view()),
     url(r'^coop/order/query/$', ThirdOrderQueryApiView.as_view()),
 )
 

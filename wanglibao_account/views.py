@@ -35,7 +35,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm, IdVerificationForm, verify_captcha
 from marketing.models import IntroducedBy, Reward, RewardRecord
-from marketing.utils import set_promo_user, local_to_utc
+from marketing.utils import set_promo_user, local_to_utc, get_channel_record
 from marketing import tools
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
@@ -1775,74 +1775,91 @@ class ThirdOrdeApiView(APIView):
 
     permission_classes = ()
 
-    def check_params(self, request_no, result_code, msg_id):
+    def check_params_length(self, param, field_name):
+        if len(param) <= UserThreeOrder._meta.get_field_by_name(field_name)[0].max_length:
+            return True
+
+    def check_params(self, request_no, result_code, msg):
         json_response = {}
-        if not request_no:
+        if request_no is None:
             json_response = {
                 'ret_code': 20001,
                 'message': u'request_no参数缺失'
             }
-        elif len(request_no) > UserThreeOrder._meta.get_field_by_name('request_no')[0].max_length:
+        elif not self.check_params_length(request_no, 'request_no'):
             json_response = {
                 'ret_code': 20003,
                 'message': u'request_no长度超出'
             }
 
-        if not result_code:
+        if result_code is None:
             json_response = {
                 'ret_code': 20004,
                 'message': u'result_code参数缺失'
             }
-        elif len(result_code) > UserThreeOrder._meta.get_field_by_name('result_code')[0].max_length:
+        elif not self.check_params_length(result_code, 'result_code'):
             json_response = {
                 'ret_code': 20006,
                 'message': u'result_code长度超出'
             }
 
-        if msg_id and len(msg_id) > UserThreeOrder._meta.get_field_by_name('msg_id')[0].max_length:
+        if not self.check_params_length(msg, 'msg'):
             json_response = {
                 'ret_code': 20007,
-                'message': u'msg_id长度超出'
+                'message': u'result_code长度超出'
             }
 
         return json_response
 
     def is_trust_ip(self, trust_ip_list, request):
-        json_response = {}
-        if not (len(trust_ip_list) > 0 and get_client_ip(request) in trust_ip_list):
+        if len(trust_ip_list) > 0 and get_client_ip(request) in trust_ip_list:
+            return True
+
+    def post(self, request, channel_code):
+        if self.is_trust_ip(settings.TRUST_IP, request):
+            if get_channel_record(channel_code):
+                params = request.POST
+                request_no = params.get('request_no', None)
+                result_code = params.get('result_code', None)
+                msg = params.get('message', '')
+                json_response = self.check_params(request_no, result_code, msg)
+                if not json_response:
+                    order = UserThreeOrder.objects.filter(request_no=request_no, order_on__code=channel_code).first()
+                    if order:
+                        if not order.answer_at:
+                            order.request_no = request_no
+                            order.result_code = result_code
+                            order.msg = msg
+                            order.answer_at = datetime.datetime.now()
+                            if channel_code == 'zgdx':
+                                msg_id = params.get('msg_id', '')
+                                if len(msg_id) <= UserThreeOrder._meta.get_field_by_name('extra')[0].max_length:
+                                    order.extra = msg_id
+                            order.save()
+                        json_response = {
+                            'ret_code': 1,
+                            'message': 'sucess'
+                        }
+                    else:
+                        json_response = {
+                            'ret_code': 20002,
+                            'message': u'订单流水号不存在'
+                        }
+            else:
+                json_response = {
+                    'ret_code': 10001,
+                    'message': u'无效渠道码'
+                }
+        else:
             json_response = {
-                'ret_code': 10001,
+                'ret_code': 30001,
                 'message': u'不受信任的来源！！！'
             }
 
-        return json_response
-
-    def post(self, request):
-        json_response = self.is_trust_ip(settings.TRUST_IP, request)
-        if not json_response:
-            params = request.POST
-            request_no = params.get('request_no', None)
-            result_code = params.get('result_code', None)
-            msg_id = params.get('msg_id', '')
-            json_response = self.check_params(request_no, result_code, msg_id)
-            if not json_response:
-                order = UserThreeOrder.objects.filter(request_no=request_no).first()
-                if not order:
-                    json_response = {
-                        'ret_code': 20002,
-                        'message': u'订单流水号不存在'
-                    }
-                else:
-                    order.request_no = request_no
-                    order.result_code = result_code
-                    order.msg = msg_id
-                    order.save()
-                    json_response = {
-                        'ret_code': 1,
-                        'message': 'sucess'
-                    }
-
-        return HttpResponse(json.dumps(json_response), content_type='application/json')
+        if channel_code == 'zgdx':
+            return HttpResponse(json_response['ret_code'])
+        else:
+            return HttpResponse(json.dumps(json_response), content_type='application/json')
 
 
 class ThirdOrderQueryApiView(APIView):
@@ -1863,7 +1880,7 @@ class ThirdOrderQueryApiView(APIView):
                     json_response = order_query_fun(url, params)
                 else:
                     json_response = {
-                        'ret_code': 20001,
+                        'ret_code': 50001,
                         'message': 'api error'
                     }
             else:
@@ -1915,12 +1932,12 @@ class ThirdOrderQueryApiView(APIView):
                     }
             except Exception, e:
                 json_response = {
-                    'ret_code': 20001,
+                    'ret_code': 50001,
                     'message': 'api error'
                 }
         else:
             json_response = {
-                'ret_code': 20001,
+                'ret_code': 50001,
                 'message': 'api error'
             }
 
