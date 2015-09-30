@@ -4,7 +4,7 @@ import time
 import datetime
 import json
 import logging
-import decimal
+from decimal import Decimal
 from django.utils import timezone
 from django.db.models import Q, Sum
 from django.db import transaction
@@ -88,12 +88,13 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
     # 首次充值
     elif trigger_node == 'first_pay':
         # check first pay
+        penny = Decimal(0.01).quantize(Decimal('.01'))
         if rule.is_in_date:
-            first_pay_num = PayInfo.objects.filter(user=user, type='D',
+            first_pay_num = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
                                                    update_time__gt=rule.activity.start_at,
                                                    status=PayInfo.SUCCESS).count()
         else:
-            first_pay_num = PayInfo.objects.filter(user=user, type='D',
+            first_pay_num = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
                                                    status=PayInfo.SUCCESS).count()
         if first_pay_num == 1:
             _check_trade_amount(user, rule, device_type, amount, is_full)

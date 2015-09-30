@@ -13,6 +13,7 @@ import inspect
 import time
 import json
 import logging
+import base64
 from wanglibao_account import message as inside_message
 from marketing.models import IntroducedBy, Reward
 from wanglibao_reward.models import WanglibaoActivityGift, WanglibaoUserGift, WanglibaoActivityGiftGlobalCfg, WanglibaoWeixinRelative
@@ -273,7 +274,7 @@ class WeixinShareDetailView(TemplateView):
         try:
             combine_redpack = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity)
         except Exception, reason:
-            self.exception_msg(reason, u'判断组合红包生成报异常')
+            self.exception_msg(reason, u'判断组合红包生成报异常, gift_id:%s, activity:%s' %(product_id, self.activity))
         return True if combine_redpack else False
 
     def get_activity_by_id(self, activity_id):
@@ -614,7 +615,9 @@ class WeixinShareStartView(TemplateView):
     def get_context_data(self, **kwargs):
         openid = self.request.GET.get('openid')
         order_id = self.request.GET.get('url_id')
-        nick_name = self.request.GET.get('nick_name')
+        #nick_name = self.request.GET.get('nick_name')
+        nick_name = self.request.session.get("nick_name")
+
         img_url = self.request.GET.get('head_img_url')
         record = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
 

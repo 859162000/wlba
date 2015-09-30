@@ -1,0 +1,105 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝官网' as title
+    include global/g_head
+    - endwith
+    link(rel="stylesheet",href="/static/styles/pc_activity/national.css")
+    //link(href="{{host}}/static/stylesheets/screen.css?v=20150910", media="screen, projection", rel="stylesheet", type="text/css")
+  body(style="background:#5f1e94")
+    - csrf_token
+    include global/g_nav
+    .pnation_continer
+    h3.pnation_titles.titles1
+    h6.pnation_text 国庆去哪儿？网利宝给你支招，哪儿加息就去哪儿！单笔投资满额，即可获得专场加息券一张！多投多送哦~
+    .pnation_box
+      .pna_minbox
+        .pna_img.pna_img1
+        .pan_con.pan_con1
+          h5 5000元≤单笔投资金额<10000元
+          span 立送一张
+          .pna_quan
+          a.pan_quanbtn(href="/p2p/list/")
+            img(src="/static/imgs/pc_activity/img_national/9.png")
+      .pna_minbox
+        .pna_img.pna_img2
+        .pan_con.pan_con2
+          h5 10000元≤单笔投资金额<20000元
+          span 立送一张
+          .pna_quan
+          a.pan_quanbtn(href="/p2p/list/")
+            img(src="/static/imgs/pc_activity/img_national/9.png")
+      .pna_minbox
+        .pna_img.pna_img3
+        .pan_con.pan_con3
+          h5 20000元≤单笔投资金额
+          span 立送一张
+          .pna_quan
+          a.pan_quanbtn(href="/p2p/list/")
+              img(src="/static/imgs/pc_activity/img_national/9.png")
+    h6.pnation_text 新老用户均可参与，单标投资额无上限，一券一标永久加息！加息券不限平台均可使用。
+    a.pnation_dbtn#dbtn 加息券规则
+     span.pna_spans
+    p.pantion_dluo#dluo
+      span 1. 加息券有效期：9月28日-10月15日；
+      br
+      span 2. 加息券使用范围：加息券使用不限平台。
+      br
+      span 3. 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得加息；
+      br
+      span 4. 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+      br
+      span 5. 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+      br
+      span 6. 使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+    h3.pnation_titles.titles2
+    .national_flow.clear
+      .flow1
+        .flow_border
+        .flow_xian
+        .flowbox.flowbox1
+        span.flowtext 投资获得加息券
+      .flow1
+        .flow_border
+        .flow_xian
+        .flowbox.flowbox2
+        span.flowtext 投标选择使用
+      .flow1
+        .flow_border
+        .flow_xian
+        .flowbox.flowbox3
+        span.flowtext 投标成功加息生效
+      .flow1
+        .flow_border
+        .flow_xian
+        .flowbox.flowbox4
+        span.flowtext 获得收益和奖励
+        .flow_border2
+    h3.pnation_titles.titles3
+    p.pantion_dluo2
+      span 1. 活动时间：9月30日-10月8日；
+      br
+      span 2. 用户单笔投资满额，即可获得国庆专场加息券一张，不限平台使用。加息券统一会以站内信通知，收到后可立即使用。详情请看
+      a.ashref#ashref 加息券使用规则;
+      br
+      span 3. 国庆专场加息券有效期至10月15日，请在有效期内使用，过期不补；
+      br
+      span 4. 在法律规定范围内，平台保留活动最终解释权。如有疑问请联系在线客服或拨打4008-588-066。
+    p.pantion_dluo#dluo2
+      span 1. 加息券有效期：9月28日-10月15日；
+      br
+      span 2. 加息券使用范围：加息券使用不限平台。
+      br
+      span 3. 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得加息；
+      br
+      span 4. 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+      br
+      span 5. 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+      br
+      span 6. 使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+    p.wlbqu  *网利宝对此活动享有最终解释权
+    .pnation_footer
+script.
+      require(['/static/js/national.js'])
