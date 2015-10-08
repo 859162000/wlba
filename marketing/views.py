@@ -19,6 +19,8 @@ from mock_generator import MockGenerator
 from django.conf import settings
 from django.db.models.base import ModelState
 from wanglibao_sms.utils import send_validation_code
+from misc.models import Misc
+from wanglibao_sms.models import *
 from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, IntroducedBy, IntroducedByReward, Reward, ActivityJoinLog
 from marketing.tops import Top
 from utils import local_to_utc
@@ -655,10 +657,22 @@ def ajax_post(request):
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
     record = get_user_channel_record(user.id)
-    if not record or (record and record.name != 'xunlei9'):
+    try:
+        key = 'xunlei_event'
+        event = Misc.objects.filter(key=key).first()
+        if event:
+            event = json.loads(event.value)
+            if type(event) == dict:
+                channel = event['channel']
+    except Exception, reason:
+        logger.exception('get misc record exception, msg:%s' % (reason,))
+        raise
+    if not record or (record and record.name != channel):
+        channel = request.GET.get('promo_token',"None")
         to_json_response = {
             'ret_code': 4000,
             'message': u'非迅雷渠道过来的用户',
+    #        'message': u'非迅雷渠道(%s)过来的用户' %(eval(request.GET.get('prom_token',"None")),)
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
