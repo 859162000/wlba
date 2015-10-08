@@ -27,7 +27,6 @@ html
             .bg
                 img(src="/static/imgs/mobile_activity/app_ten_year/weixin_img_300.jpg").hide
                 img(src="/static/imgs/mobile_activity/app_ten_year/shadow_bottom.png").shadow
-                img(src="/static/imgs/mobile_activity/app_ten_year/mask.png").mask
                 img(src="/static/imgs/mobile_activity/app_ten_year/meteor1.png").meteor.meteor1
                 img(src="/static/imgs/mobile_activity/app_ten_year/meteor1.png").meteor.meteor2
                 img(src="/static/imgs/mobile_activity/app_ten_year/meteor1.png").meteor.meteor3
@@ -149,7 +148,7 @@ html
                     }
                 }
 
-                $('.button').on('click', function (e) {
+                $('.page6 .button').on('click', function (e) {
 
                     say = $('input').val();
                     if (say == '') {
@@ -168,18 +167,14 @@ html
 
                 var mp3 = document.getElementById("music"),play = $('#play');
                 play.on('click', function (e) {
-                    if (mp3.paused) {
-                        mp3.play();
-                        $('#play').addClass('play_music').removeClass('close_music');
-                    } else {
-                        mp3.pause();
-                        $('#play').addClass('close_music').removeClass('play_music');
-                    }
+
                 });
 
                 mp3.play();
                 $(document).one('touchstart', function () {
                     mp3.play();
                 });
+
+
             })
 
