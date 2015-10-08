@@ -13,7 +13,19 @@ html
             .loadPage#loadPage
                 .load-warp
                     .logo
-                    .process 0%
+                    .sk-circle
+                      .sk-child.sk-circle1
+                      .sk-child.sk-circle2
+                      .sk-child.sk-circle3
+                      .sk-child.sk-circle4
+                      .sk-child.sk-circle5
+                      .sk-child.sk-circle6
+                      .sk-child.sk-circle7
+                      .sk-child.sk-circle8
+                      .sk-child.sk-circle9
+                      .sk-child.sk-circle10
+                      .sk-child.sk-circle11
+                      .sk-child.sk-circle12
             .bg
                 img(src="/static/imgs/mobile_activity/app_ten_year/weixin_img_300.jpg").hide
                 img(src="/static/imgs/mobile_activity/app_ten_year/shadow_bottom.png").shadow
@@ -76,61 +88,14 @@ html
                     img(src="/static/imgs/mobile_activity/app_ten_year/page8_text2.png").text2.p8text2
                     a.button.p8button(href="/weixin/regist/?next=/weixin/authentication/") 到网利宝领取
             img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").arrowDown
-        script(src="/static/scripts/mobile_activity/dist/fullpage.js")
+        script(src="/static/js/app_ten_year.js")
         //里面最后几行自带Loading
         script.
             $(function () {
-
                 /*loading*/
-                var loading = $('#loadPage');
-                var queue = new createjs.LoadQueue();
-                queue.on('progress', function () {
-                    var num = Math.floor(queue.progress * 100);
-                    $('.process').text(num + '%');
-                }, this);
-                queue.on('complete', function () {
-                    loading.remove();
-                }, this);
-                queue.loadManifest([
-                    {id: 'image1', src: '/static/imgs/mobile_activity/app_ten_year/bg.jpg'},
-                    {id: 'image2', src: '/static/imgs/mobile_activity/app_ten_year/big_theme.png'},
-                    {id: 'image3', src: '/static/imgs/mobile_activity/app_ten_year/mask.png'},
-                    {id: 'image4', src: '/static/imgs/mobile_activity/app_ten_year/meteor1.png'},
-                    {id: 'image5', src: '/static/imgs/mobile_activity/app_ten_year/meteor2.png'},
-                    {id: 'image6', src: '/static/imgs/mobile_activity/app_ten_year/music.png'},
-                    {id: 'image7', src: '/static/imgs/mobile_activity/app_ten_year/page1_text1.png'},
-                    {id: 'image8', src: '/static/imgs/mobile_activity/app_ten_year/page1_text2.png'},
-                    {id: 'image9', src: '/static/imgs/mobile_activity/app_ten_year/page2_img1.png'},
-                    {id: 'image10', src: '/static/imgs/mobile_activity/app_ten_year/page2_img2.png'},
-                    {id: 'image11', src: '/static/imgs/mobile_activity/app_ten_year/page2_shadow.png'},
-                    {id: 'image12', src: '/static/imgs/mobile_activity/app_ten_year/page2_text.png'},
-                    {id: 'image13', src: '/static/imgs/mobile_activity/app_ten_year/page3_boy.png'},
-                    {id: 'image14', src: '/static/imgs/mobile_activity/app_ten_year/page3_line.png'},
-                    {id: 'image15', src: '/static/imgs/mobile_activity/app_ten_year/page3_man.png'},
-                    {id: 'image16', src: '/static/imgs/mobile_activity/app_ten_year/page3_talk.png'},
-                    {id: 'image17', src: '/static/imgs/mobile_activity/app_ten_year/page4_line.png'},
-                    {id: 'image18', src: '/static/imgs/mobile_activity/app_ten_year/page4_man1.png'},
-                    {id: 'image19', src: '/static/imgs/mobile_activity/app_ten_year/page4_man2.png'},
-                    {id: 'image20', src: '/static/imgs/mobile_activity/app_ten_year/page4_math.png'},
-                    {id: 'image21', src: '/static/imgs/mobile_activity/app_ten_year/page4_talk.png'},
-                    {id: 'image22', src: '/static/imgs/mobile_activity/app_ten_year/page5_bamboo.png'},
-                    {id: 'image23', src: '/static/imgs/mobile_activity/app_ten_year/page5_line.png'},
-                    {id: 'image24', src: '/static/imgs/mobile_activity/app_ten_year/page5_talk.png'},
-                    {id: 'image25', src: '/static/imgs/mobile_activity/app_ten_year/page5_woman1.png'},
-                    {id: 'image26', src: '/static/imgs/mobile_activity/app_ten_year/page5_woman2.png'},
-                    {id: 'image27', src: '/static/imgs/mobile_activity/app_ten_year/page6_fly.png'},
-                    {id: 'image28', src: '/static/imgs/mobile_activity/app_ten_year/page6_img1.png'},
-                    {id: 'image29', src: '/static/imgs/mobile_activity/app_ten_year/page6_img2.png'},
-                    {id: 'image30', src: '/static/imgs/mobile_activity/app_ten_year/page6_text.png'},
-                    {id: 'image31', src: '/static/imgs/mobile_activity/app_ten_year/page7_img.png'},
-                    {id: 'image32', src: '/static/imgs/mobile_activity/app_ten_year/page8_text1.png'},
-                    {id: 'image33', src: '/static/imgs/mobile_activity/app_ten_year/page8_text2.png'},
-                    {id: 'image34', src: '/static/imgs/mobile_activity/app_ten_year/shadow_bottom.png'},
-                    {id: 'image35', src: '/static/imgs/mobile_activity/app_ten_year/slideDown.png'},
-                    {id: 'image36', src: '/static/imgs/mobile_activity/app_ten_year/small_theme.png'},
-                    {id: 'image37', src: '/static/imgs/mobile_activity/app_ten_year/ten_year.mp3'},
-                    {id: 'image38', src: '/static/imgs/mobile_activity/app_ten_year/logo.png'}
-                ]);
+                window.onload=function(){
+                    $('#loadPage').hide(500);
+                }
                 /*loading结束*/
                 /*fullpage*/
                 var wrap = $('#wrap'), arrow = $('.arrowDown');
@@ -296,6 +261,13 @@ html
 
                     if(/i(Phone|P(o|a)d)/.test(navigator.userAgent)){
                     $(document).one('touchstart', function (e) {
+                        if (mp3.paused) {
+                        mp3.play();
+                        $('#play').addClass('play_music').removeClass('close_music');
+                    } else {
+                        mp3.pause();
+                        $('#play').addClass('close_music').removeClass('play_music');
+                    }
                     g_audio.touchstart = true;
                     g_audio.play();
                     g_audio.pause();
