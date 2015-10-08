@@ -1003,8 +1003,8 @@ img {
 	animation-duration: 0.5s;
 	-webkit-animation-timing-function: ease-in;
 	animation-timing-function: ease-in;
-	-webkit-animation-delay: 0.5s;
-	animation-delay: 0.5s;
+	-webkit-animation-delay: 0.8s;
+	animation-delay: 0.8s;
 	-webkit-backface-visibility: visible !important;
 	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
@@ -1018,6 +1018,15 @@ img {
 
 	100% {
 		-webkit-transform: translateX(0%);
+	}
+}
+@keyframes man_start {
+	0% {
+		transform: translateX(100%);
+	}
+
+	100% {
+		transform: translateX(0%);
 	}
 }
 
