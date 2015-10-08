@@ -139,7 +139,6 @@ html
                         data.cur + 1 === wrap.find('.page').size() ? arrow.hide() : arrow.show();
                     }
                 });
-<<<<<<< HEAD
                 var say;
                 var say_num;
                 say_num = parseInt(12 * Math.random());
@@ -200,6 +199,7 @@ html
                 });
                 /*fullpage结束*/
 
+
                 var mp3 = document.getElementById("music"),play = $('#play');
                 play.on('click', function (e) {
                     if (mp3.paused) {
@@ -215,67 +215,98 @@ html
                 $(document).one('touchstart', function () {
                     mp3.play();
                 });
-            })
-=======
 
-                var say;
-                var say_num;
-                say_num = parseInt(12*Math.random());
-                say_text(say_num);
-                function say_text(say_num){
-                    switch(say_num){
-                        case 1:
-                            $('#say').text('去旅游，去邂逅');
-                            break;
-                        case 2:
-                            $('#say').text('少睡觉，多看书');
-                            break;
-                        case 3:
-                            $('#say').text('少玩游戏，多赚钱');
-                            break;
-                        case 4:
-                            $('#say').text('养只宠物，解解闷');
-                            break;
-                        case 5:
-                            $('#say').text('多锻炼，保持好身材');
-                            break;
-                        case 6:
-                            $('#say').text('一切都会过去，好好爱自己 ');
-                            break;
-                        case 7:
-                            $('#say').text('别做梦，学一项技能');
-                            break;
-                        case 8:
-                            $('#say').text('好好听课，不要留遗憾');
-                            break;
-                        case 9:
-                            $('#say').text('对自己好一点，买买买');
-                            break;
-                        case 10:
-                            $('#say').text('学好英语，看看世界');
-                            break;
-                        case 11:
-                            $('#say').text('尝试新事物，遇见新朋友');
-                            break;
-                        case 12:
-                            $('#say').text('再努力一下，挺住意味着一切');
-                            break;
+                /*解决iphone一开始没音乐问题*/
+                var g_audio = window.g_audio = new Audio();  //创建一个audio播放器
+                var g_event = window.g_event =new function(){
+                    var events = ['load','abort','canplay','canplaythrough',
+                    'durationchange','emptied','ended','error',
+                    'loadeddata','loadedmetadata','loadstart',
+                    'pause','play','playing','progress',
+                    'ratechange','seeked','seeking','stalled',
+                    'suspend','timeupdate','volumechange','waiting', 'mediachange'];
+                    g_audio.loop = true;
+                    g_audio.autoplay = true;
+                    g_audio.isLoadedmetadata = false;
+                    g_audio.touchstart = true;
+                    g_audio.audio = true;
+                    g_audio.elems = {};
+                    g_audio.isSupportAudio = function(type){
+                    type=type||'audio/mpeg';
+                    try{
+                        var r=g_audio.canPlayType(type);
+                        return g_audio.canPlayType&&(r=='maybe'||r=='probably')
+                    }catch(e){return false;}
+                    };
+                    g_audio.push = function(meta){
+                    g_audio.previousId = g_audio.id;
+                    g_audio.id = meta.song_id;
+                    g_audio.previousSrc = g_audio.src;
+                    g_audio.previousTime = 0.00;
+                    g_audio.src = g_audio.currentSrc = meta.song_fileUrl;
+                    g_audio.isLoadedmetadata = false;
+                    g_audio.autobuffer = true;
+                    g_audio.load();
+                    g_audio.play();
+                    if(g_audio.previousSrc !== g_audio.src){
+                        g_audio.play();
                     }
-                }
-                $('.button').on('click',function(e){
-                    say = $('input').val();
-                    if(say==''){
-                        $('#name').text('自己');
-                    }else {
-                        $('#name').text(say);
+                    };
+                    for(var i = 0, l = events.length; i < l; i++){
+                        (function(e){
+                            var fs = [];
+                            this[e] = function(fn){
+                                if(typeof fn!=='function'){
+                                    for (var k = 0; k<fs.length; k++){
+                                        fs[k].apply(g_audio);
+                                    }
+                                    return ;
+                                }
+                    fs.push(fn);
+                    g_audio.addEventListener(e, function(){
+                    fn.apply(this);
+                    });
+                    };
+                    }).apply(this, [events[i]]);
                     }
-                    $('body').unbind('touchmove');
-                    say_num = parseInt(18*Math.random());
-                    say_text(say_num);
-                    e.preventDefault();
-                    $.fn.fullpage[$(this).data('dir')](true);
-                });
-                /*fullpage结束*/
+                    this.ended(function(){  //播放结束
+                    });
+                    this.load(function(){  //加载
+                    this.pause();
+                    this.play();
+                    });
+                    this.loadeddata(function(){
+                    this.pause();
+                    this.play();
+                    });
+                    this.loadedmetadata(function(){
+                    this.isLoadedmetadata = true;
+                    });
+                    this.error(function(){   //请求资源时遇到错误
+                    });
+                    this.pause(function(){  //歌曲暂停播放
+                    });
+                    this.play(function(){  //歌曲播放
+                    });
+                };
+
+
+                    if(/i(Phone|P(o|a)d)/.test(navigator.userAgent)){
+                    $(document).one('touchstart', function (e) {
+                    g_audio.touchstart = true;
+                    g_audio.play();
+                    g_audio.pause();
+                    return false;
+                    });
+                    }
+
+                //audio使用:
+                $('#music').unbind('click').bind('click',function(){
+                //gid 表示歌曲id,只是一个表示，没有值不影响播放
+                //song_fileUrl :播放歌曲地址，不能为空，有效地址
+                g_audio.elems["id"] = gid;
+                g_audio.push({song_id:gid,song_fileUrl:"/static/imgs/mobile_activity/app_ten_year/ten_year.mp3"});
+                });//绑定事件
+                /*解决iphone一开始没音乐问题结束*/
             })
-                                                                                                  
->>>>>>> wanglibao/master
+

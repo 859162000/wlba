@@ -1020,7 +1020,6 @@ img {
 		-webkit-transform: translateX(0%);
 	}
 }
-<<<<<<< HEAD
 @keyframes man_start {
 	0% {
 		transform: translateX(100%);
@@ -1042,20 +1041,6 @@ img {
 	opacity: 0;
 }
 
-=======
-
-.page3 .line_img {
-	background: url("/static/imgs/mobile_activity/app_ten_year/page3_line.png");
-	background-size: cover;
-	position: absolute;
-	left: 0;
-	top: 0;
-	z-index: 4;
-	display: block;
-	opacity: 0;
-}
-
->>>>>>> wanglibao/master
 .cur .line_img {
 	-webkit-animation-name: line_img_start;
 	animation-name: line_img_start;
@@ -1105,7 +1090,7 @@ img {
 	.page3 .line_img {
 		background-position: 0 -50px;
 	}
-<<<<<<< HEAD
+
 }
 
 @media screen and (min-width: 700px) and (min-height: 700px) {
@@ -1125,27 +1110,6 @@ img {
 	}
 }
 
-=======
-}
-
-@media screen and (min-width: 700px) and (min-height: 700px) {
-	.page3 .talk {
-		background-position: 0 -40px;
-	}
-    .page3 .boy {
-		background-position: 0 -120px;
-	}
-
-	.page3 .man {
-		background-position: 0 -120px;
-	}
-
-	.page3 .line_img {
-		background-position: 0 -120px;
-	}
-}
-
->>>>>>> wanglibao/master
 .page4 .man1 {
 	background: url("/static/imgs/mobile_activity/app_ten_year/page4_man1.png");
 	background-size: cover;
@@ -1405,19 +1369,11 @@ img {
 	.page4 .man1 {
 		background-position: 0 -160px;
 	}
-<<<<<<< HEAD
 
 	.page4 .man2 {
 		background-position: 0 -160px;
 	}
 
-=======
-
-	.page4 .man2 {
-		background-position: 0 -160px;
-	}
-
->>>>>>> wanglibao/master
 	.page4 .line_img {
 		background-position: 0 -160px;
 	}
