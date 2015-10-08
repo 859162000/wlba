@@ -2,93 +2,200 @@ doctype html
 html
     head
         meta(name="format-detection" content="telephone=no,email=no")
-        title 遇见10年前的你
-        meta(name="apple-mobile-web-app-status-bar-style" content="black-translucent")
-        meta(name="viewport" content="minimal-ui")
+        title 遇到十年前的自己？
         meta(charset="utf-8")
         meta(content="telephone=no,email=no" ,name="format-detection")
         meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
         meta(content="yes" ,name="apple-mobile-web-app-capable")
-        link(href="/static/styles/mobile_activity/jquery.fullPage.css?v=20150921", rel="stylesheet")
-        link(href="/static/styles/mobile_activity/app_ten_year.css?v=201509295", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_ten_year.css?v=20150930", rel="stylesheet")
     body
-        .loadPage#loadPage
-            .load-warp
-                .logo
-                .process 0%
-        .bg
-        img(src="/static/imgs/mobile_activity/app_ten_year/weixin_img_300.jpg").hide
-        img(src="/static/imgs/mobile_activity/app_ten_year/shadow_bottom.png").shadow
-        img(src="/static/imgs/mobile_activity/app_ten_year/mask.png").mask
-        img(src="/static/imgs/mobile_activity/app_ten_year/meteor1.png").meteor.meteor1
-        img(src="/static/imgs/mobile_activity/app_ten_year/meteor1.png").meteor.meteor2
-        img(src="/static/imgs/mobile_activity/app_ten_year/meteor1.png").meteor.meteor3
-        img(src="/static/imgs/mobile_activity/app_ten_year/meteor2.png").bottom_meteor
-        #play.play_music
-        audio#music(loop='loop',style='width:0;height:0;',autoplay='autoplay')
-            source(type="audio/mpeg", src="/static/imgs/mobile_activity/app_ten_year/ten_year.mp3")
-        #wrap
-            .section.section1
-                .img.theme.animate
-                .img.text1.animate
-                .img.text2.animate
-                .mask
-                img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").slideDown
-            .section.section2
-                .img.small_theme
-                .img.text
-                .img.young
-                .img.old
-                img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").slideDown
-            .section.section3
-                .img.talk
-                .img.boy
-                .img.man
-                .img.line_img
-                img(src="/static/imgs/mobile_activity/app_ten_year/small_theme.png").small_theme
-                img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").slideDown
-            .section.section4
-                .img.man1
-                .img.man2
-                .img.talk
-                .img.math
-                .img.line_img
-                img(src="/static/imgs/mobile_activity/app_ten_year/small_theme.png").small_theme
-                img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").slideDown
-            .section.section5
-                .img.woman1
-                .img.woman2
-                .img.talk
-                .img.bamboo
-                .img.line_img
-                img(src="/static/imgs/mobile_activity/app_ten_year/small_theme.png").small_theme
-                img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").slideDown
-            .section.section6
-                img(src="/static/imgs/mobile_activity/app_ten_year/small_theme.png").small_theme
-                img(src="/static/imgs/mobile_activity/app_ten_year/page6_fly.png").fly
-                img(src="/static/imgs/mobile_activity/app_ten_year/page6_img1.png").horn
-                img(src="/static/imgs/mobile_activity/app_ten_year/page6_img2.png").sound
-                .form
-                    img(src="/static/imgs/mobile_activity/app_ten_year/page6_text.png").text
-                    input( maxlength="8")
-                    a.button(href="#page7") 确 定
-                img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").slideDown
-            .section.section7
-                img(src="/static/imgs/mobile_activity/app_ten_year/small_theme.png").small_theme
-                img(src="/static/imgs/mobile_activity/app_ten_year/page6_fly.png").fly
-                img(src="/static/imgs/mobile_activity/app_ten_year/page7_img.png").horn
-                .title!='你对十年前的<span id="name">自己</span>说:'
-                .text!='"<span id="say">去旅游，去邂逅</span>"'
-                img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").slideDown
-            .section.section8
-                img(src="/static/imgs/mobile_activity/app_ten_year/small_theme.png").small_theme
-                img(src="/static/imgs/mobile_activity/app_ten_year/page6_fly.png").fly
-                img(src="/static/imgs/mobile_activity/app_ten_year/page8_text1.png").text1
-                img(src="/static/imgs/mobile_activity/app_ten_year/page8_text2.png").text2
-                a.button(href="/weixin/regist/?next=/weixin/authentication/") 到网利宝领取
+        .wp
+            .loadPage#loadPage
+                .load-warp
+                    .logo
+                    .process 0%
+            .bg
+                img(src="/static/imgs/mobile_activity/app_ten_year/weixin_img_300.jpg").hide
+                img(src="/static/imgs/mobile_activity/app_ten_year/shadow_bottom.png").shadow
+                img(src="/static/imgs/mobile_activity/app_ten_year/mask.png").mask
+                img(src="/static/imgs/mobile_activity/app_ten_year/meteor1.png").meteor.meteor1
+                img(src="/static/imgs/mobile_activity/app_ten_year/meteor1.png").meteor.meteor2
+                img(src="/static/imgs/mobile_activity/app_ten_year/meteor1.png").meteor.meteor3
+                img(src="/static/imgs/mobile_activity/app_ten_year/meteor2.png").bottom_meteor
+            #play.play_music
+            audio#music(loop='loop',style='width:0;height:0;',autoplay='autoplay')
+                source(type="audio/mpeg", src="/static/imgs/mobile_activity/app_ten_year/ten_year.mp3")
+            #wrap
+                .page.page1
+                    .img.theme.ccc
+                    .img.text1.text1_animate
+                    .img.text2.text2_animate
+                .page.page2
+                    .img.text.moveUp
+                    .img.young.young_animate
+                    .img.old.old_animate
+                .page.page3
+                    img(src="/static/imgs/mobile_activity/app_ten_year/small_theme.png").small_theme
+                    .img.talk.moveUp2
+                    .img.boy.boy_animate
+                    .img.man.man_animate
+                    .img.line_img.line_animate
+                .page.page4
+                    .img.man1.man1_animate
+                    .img.man2.man2_animate
+                    .img.talk.p4talk_animate
+                    .img.math.math_animate
+                    .img.line_img.p4line_animate
+                    img(src="/static/imgs/mobile_activity/app_ten_year/small_theme.png").small_theme
+                .page.page5
+                    .img.woman1.woman1_animate
+                    .img.woman2.woman2_animate
+                    .img.talk.p5talk_animate
+                    .img.bamboo.bamboo_animate
+                    .img.line_img.p5line_img
+                    img(src="/static/imgs/mobile_activity/app_ten_year/small_theme.png").small_theme
+                .page.page6
+                    img(src="/static/imgs/mobile_activity/app_ten_year/small_theme.png").small_theme
+                    img(src="/static/imgs/mobile_activity/app_ten_year/page6_fly.png").fly.p6fly_animate
+                    img(src="/static/imgs/mobile_activity/app_ten_year/page6_img1.png").horn.p6horn_animate
+                    img(src="/static/imgs/mobile_activity/app_ten_year/page6_img2.png").sound.p6sound
+                    .form
+                        img(src="/static/imgs/mobile_activity/app_ten_year/page6_text.png").text
+                        input( maxlength="8").p6input
+                        a.button( data-dir="moveNext") 确 定
+                .page.page7
+                    img(src="/static/imgs/mobile_activity/app_ten_year/small_theme.png").small_theme
+                    img(src="/static/imgs/mobile_activity/app_ten_year/page6_fly.png").fly.p7fly_animate
+                    img(src="/static/imgs/mobile_activity/app_ten_year/page7_img.png").horn.p7horn
+                    .title.p7title!='你对十年前的<span id="name">自己</span>说:'
+                    .text.p7text!='"<span id="say">去旅游，去邂逅</span>"'
+                .page.page8
+                    img(src="/static/imgs/mobile_activity/app_ten_year/small_theme.png").small_theme
+                    img(src="/static/imgs/mobile_activity/app_ten_year/page6_fly.png").fly.p8fly_animate
+                    img(src="/static/imgs/mobile_activity/app_ten_year/page8_text1.png").text1.p8text1
+                    img(src="/static/imgs/mobile_activity/app_ten_year/page8_text2.png").text2.p8text2
+                    a.button.p8button(href="/weixin/regist/?next=/weixin/authentication/") 到网利宝领取
+            img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").arrowDown
+        script(src="/static/scripts/mobile_activity/dist/fullpage.js")
+        //里面最后几行自带Loading
+        script.
+            $(function () {
+                /*loading*/
+                var loading = $('#loadPage');
+                var queue = new createjs.LoadQueue();
+                queue.on('progress', function () {
+                    var num = Math.floor(queue.progress * 100);
+                    $('.process').text(num + '%');
+                }, this);
+                queue.on('complete', function () {
+                    loading.remove();
+                }, this);
+                queue.loadManifest([
+                    {id: 'image1', src: '/static/imgs/mobile_activity/app_ten_year/bg.jpg'},
+                    {id: 'image2', src: '/static/imgs/mobile_activity/app_ten_year/big_theme.png'},
+                    {id: 'image3', src: '/static/imgs/mobile_activity/app_ten_year/mask.png'},
+                    {id: 'image4', src: '/static/imgs/mobile_activity/app_ten_year/meteor1.png'},
+                    {id: 'image5', src: '/static/imgs/mobile_activity/app_ten_year/meteor2.png'},
+                    {id: 'image6', src: '/static/imgs/mobile_activity/app_ten_year/music.png'},
+                    {id: 'image7', src: '/static/imgs/mobile_activity/app_ten_year/page1_text1.png'},
+                    {id: 'image8', src: '/static/imgs/mobile_activity/app_ten_year/page1_text2.png'},
+                    {id: 'image9', src: '/static/imgs/mobile_activity/app_ten_year/page2_img1.png'},
+                    {id: 'image10', src: '/static/imgs/mobile_activity/app_ten_year/page2_img2.png'},
+                    {id: 'image11', src: '/static/imgs/mobile_activity/app_ten_year/page2_shadow.png'},
+                    {id: 'image12', src: '/static/imgs/mobile_activity/app_ten_year/page2_text.png'},
+                    {id: 'image13', src: '/static/imgs/mobile_activity/app_ten_year/page3_boy.png'},
+                    {id: 'image14', src: '/static/imgs/mobile_activity/app_ten_year/page3_line.png'},
+                    {id: 'image15', src: '/static/imgs/mobile_activity/app_ten_year/page3_man.png'},
+                    {id: 'image16', src: '/static/imgs/mobile_activity/app_ten_year/page3_talk.png'},
+                    {id: 'image17', src: '/static/imgs/mobile_activity/app_ten_year/page4_line.png'},
+                    {id: 'image18', src: '/static/imgs/mobile_activity/app_ten_year/page4_man1.png'},
+                    {id: 'image19', src: '/static/imgs/mobile_activity/app_ten_year/page4_man2.png'},
+                    {id: 'image20', src: '/static/imgs/mobile_activity/app_ten_year/page4_math.png'},
+                    {id: 'image21', src: '/static/imgs/mobile_activity/app_ten_year/page4_talk.png'},
+                    {id: 'image22', src: '/static/imgs/mobile_activity/app_ten_year/page5_bamboo.png'},
+                    {id: 'image23', src: '/static/imgs/mobile_activity/app_ten_year/page5_line.png'},
+                    {id: 'image24', src: '/static/imgs/mobile_activity/app_ten_year/page5_talk.png'},
+                    {id: 'image25', src: '/static/imgs/mobile_activity/app_ten_year/page5_woman1.png'},
+                    {id: 'image26', src: '/static/imgs/mobile_activity/app_ten_year/page5_woman2.png'},
+                    {id: 'image27', src: '/static/imgs/mobile_activity/app_ten_year/page6_fly.png'},
+                    {id: 'image28', src: '/static/imgs/mobile_activity/app_ten_year/page6_img1.png'},
+                    {id: 'image29', src: '/static/imgs/mobile_activity/app_ten_year/page6_img2.png'},
+                    {id: 'image30', src: '/static/imgs/mobile_activity/app_ten_year/page6_text.png'},
+                    {id: 'image31', src: '/static/imgs/mobile_activity/app_ten_year/page7_img.png'},
+                    {id: 'image32', src: '/static/imgs/mobile_activity/app_ten_year/page8_text1.png'},
+                    {id: 'image33', src: '/static/imgs/mobile_activity/app_ten_year/page8_text2.png'},
+                    {id: 'image34', src: '/static/imgs/mobile_activity/app_ten_year/shadow_bottom.png'},
+                    {id: 'image35', src: '/static/imgs/mobile_activity/app_ten_year/slideDown.png'},
+                    {id: 'image36', src: '/static/imgs/mobile_activity/app_ten_year/small_theme.png'},
+                    {id: 'image37', src: '/static/imgs/mobile_activity/app_ten_year/ten_year.mp3'},
+                    {id: 'image38', src: '/static/imgs/mobile_activity/app_ten_year/logo.png'}
+                ]);
+                /*loading结束*/
+                /*fullpage*/
+                var wrap = $('#wrap'), arrow = $('.slideDown');
+                wrap.fullpage({
+                    page: '.page',
+                    change: function (data) {
+                        data.cur + 1 === wrap.find('.page').size() ? arrow.hide() : arrow.show();
+                    }
+                });
+                var say;
+                var say_num;
+                say_num = parseInt(12 * Math.random());
+                say_text(say_num);
+                function say_text(say_num) {
+                    switch (say_num) {
+                        case 1:
+                            $('#say').text('去旅游，去邂逅');
+                            break;
+                        case 2:
+                            $('#say').text('少睡觉，多看书');
+                            break;
+                        case 3:
+                            $('#say').text('少玩游戏，多赚钱');
+                            break;
+                        case 4:
+                            $('#say').text('养只宠物，解解闷');
+                            break;
+                        case 5:
+                            $('#say').text('多锻炼，保持好身材');
+                            break;
+                        case 6:
+                            $('#say').text('一切都会过去，好好爱自己 ');
+                            break;
+                        case 7:
+                            $('#say').text('别做梦，学一项技能');
+                            break;
+                        case 8:
+                            $('#say').text('好好听课，不要留遗憾');
+                            break;
+                        case 9:
+                            $('#say').text('对自己好一点，买买买');
+                            break;
+                        case 10:
+                            $('#say').text('学好英语，看看世界');
+                            break;
+                        case 11:
+                            $('#say').text('尝试新事物，遇见新朋友');
+                            break;
+                        case 12:
+                            $('#say').text('再努力一下，挺住意味着一切');
+                            break;
+                    }
+                }
 
-        script(src="/static/js/lib/jquery.min.js")
-        script(src="/static/scripts/mobile_activity/dist/jquery.fullPage.min.js")
-        script(src="/static/js/app_ten_year_loading.js")
-        script(src="/static/js/app_ten_year.js")
-
+                $('.button').on('click', function (e) {
+                    say = $('input').val();
+                    if (say == '') {
+                        $('#name').text('自己');
+                    } else {
+                        $('#name').text(say);
+                    }
+                    $('body').unbind('touchmove');
+                    say_num = parseInt(18 * Math.random());
+                    say_text(say_num);
+                    e.preventDefault();
+                    $.fn.fullpage[$(this).data('dir')](true);
+                });
+                /*fullpage结束*/
+            })
