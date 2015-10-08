@@ -4,6 +4,7 @@ from concurrency.admin import ConcurrentModelAdmin
 import datetime
 from django.contrib import admin, messages
 from django import forms
+from django.contrib.admin.filters import DateFieldListFilter
 from django.forms import formsets
 from django.utils import timezone
 from reversion.admin import VersionAdmin
@@ -289,9 +290,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
     change_list_template = 'change_list.html'
     from_encoding = 'utf-8'
 
-
     form = P2PProductForm
-
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_p2p.view_p2pproduct'):
@@ -444,7 +443,8 @@ class EquityRecordAdmin(ReadPermissionModelAdmin):
 class ProductAmortizationAdmin(ReadPermissionModelAdmin):
     actions = None
     list_display = ('id', 'product', 'term', 'term_date', 'principal', 'interest', 'penal_interest', 'settled',
-                    'settlement_time', 'created_time', 'status', 'description', )
+                    'is_auto_ready_for_settle', 'settlement_time', 'created_time', 'status', 'description', )
+    list_filter = (('term_date', DateFieldListFilter), 'is_auto_ready_for_settle')
 
     search_fields = ('product__name', 'product__serial_number')
 

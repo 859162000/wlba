@@ -3,6 +3,7 @@
 
 from django.forms import model_to_dict
 from django.utils import timezone
+from django.utils.timezone import get_current_timezone
 from order.models import Order
 from order.utils import OrderHelper
 
@@ -17,7 +18,7 @@ from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import period_unit
-import time
+import time, datetime
 
 
 @app.task
@@ -166,4 +167,24 @@ def p2p_auto_published_by_publish_time(pay_method, period):
     if products:
         products.publish_time = timezone.now()
         products.save()
+
+@app.task
+def p2p_auto_ready_for_settle():
+    """
+    每天十六点自动将当天到期的还款计划的ready_for_settle字段置为True
+    :return:
+    """
+    today = datetime.datetime.today()
+    time_zone = get_current_timezone()
+    today_0 = time_zone.localize(datetime.datetime.combine(today.date(), today.min.time()))
+    today_24 = time_zone.localize(datetime.datetime.combine(today.date(), today.max.time()))
+
+    ProductAmortization.objects.filter(product__status=u'还款中',
+                                       term_date__gte=today_0,
+                                       term_date__lte=today_24,
+                                       ready_for_settle=False,
+                                       settled=False
+    ).update(ready_for_settle=True, is_auto_ready_for_settle=True)
+
+
 

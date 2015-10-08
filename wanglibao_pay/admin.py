@@ -5,6 +5,65 @@ from django.utils import timezone
 from wanglibao_pay.models import Bank, PayInfo, Card
 from wanglibao_pay.views import WithdrawTransactions, WithdrawRollback, \
     AdminTransaction
+# , 'channel', 'type'
+
+
+class PayInfoStatusFilter(admin.SimpleListFilter):
+    title = u'状态'
+    parameter_name = u'status'
+
+    def lookups(self, request, model_admin):
+        return (
+            (u'处理中', u'处理中'),
+            (u'失败', u'失败'),
+            (u'已受理', u'已受理'),
+            (u'异常', u'异常'),
+            (u'成功', u'成功')
+        )
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(status__exact=self.value())
+        else:
+            return queryset
+
+
+class PayInfoChannelFilter(admin.SimpleListFilter):
+    title = u'支付渠道'
+    parameter_name = u'channel'
+
+    def lookups(self, request, model_admin):
+        return (
+            (u'huifu', u'huifu'),
+            (u'huifu_bind', u'huifu_bind'),
+            (u'yeepay', u'yeepay'),
+            (u'yeepay_bind', u'yeepay_bind'),
+            (u'app', u'app'),
+            (u'kuaipay', u'kuaipay')
+        )
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(channel__exact=self.value())
+        else:
+            return queryset
+
+
+class PayInfoTypeFilter(admin.SimpleListFilter):
+    title = u'支付类型'
+    parameter_name = u'type'
+
+    def lookups(self, request, model_admin):
+        return (
+            (u'D', u'充值'),
+            (u'W', u'提现'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(type__exact=self.value())
+        else:
+            return queryset
 
 
 class PayInfoAdmin(admin.ModelAdmin):
@@ -12,7 +71,9 @@ class PayInfoAdmin(admin.ModelAdmin):
     list_display = ('id', 'get_phone', 'get_name', 'type', 'total_amount', 'fee', 'bank', 'card_no', 'status', 'create_time', 'update_time', 'error_message', 'channel')
     search_fields = ['=user__wanglibaouserprofile__phone', '=id']
     raw_id_fields = ('order', 'margin_record', "user")
-    list_filter = ('status', 'channel', 'type')
+    list_filter = (
+        PayInfoStatusFilter, PayInfoChannelFilter, PayInfoTypeFilter
+    )
     list_per_page = 100
 
     def get_phone(self, obj):

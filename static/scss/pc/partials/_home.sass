@@ -383,8 +383,40 @@
         +box-shadow(0px 0px 6px #ccc)
         position: relative
         z-index: 10
-
-
-
+.bonus-icon
+  background: url("/static/imgs/pc/home/bonus.gif")
+  width: 93px
+  height: 118px
+  position: fixed
+  right: 0
+  top: 60%
+.bonus-img
+  @include home-sprite(bouns-img)
+  height: 520px
+  width: 764px
+  position: fixed
+  left: 28%
+  bottom: 18%
+  z-index: 100000
+  .close
+    @include home-sprite(close)
+    width: 41px
+    height: 42px
+    position: absolute
+    cursor: pointer
+    right: 80px
+    top: 50px
+.page
+  top: 0px
+  right: 0px
+  bottom: 0px
+  left: 0px
+  width: 100%
+  height: 100%
+  position: fixed
+  z-index: 101
+  opacity: 0.8
+  background: rgb(0, 0, 0)
+  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=80)
 
 //cooperation end

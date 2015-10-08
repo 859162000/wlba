@@ -67,17 +67,20 @@ def idvalidate_ok(user_id, device):
 
 
 def despoit_ok(pay_info, device):
-    device_type = device['device_type']
-    title, content = messages.msg_pay_ok(pay_info.amount)
-    inside_message.send_one.apply_async(kwargs={
-        "user_id": pay_info.user.id,
-        "title": title,
-        "content": content,
-        "mtype": "activityintro"
-    })
+    try:
+        device_type = device['device_type']
+        title, content = messages.msg_pay_ok(pay_info.amount)
+        inside_message.send_one.apply_async(kwargs={
+            "user_id": pay_info.user.id,
+            "title": title,
+            "content": content,
+            "mtype": "activityintro"
+        })
 
-    activity_backends.check_activity(pay_info.user, 'recharge', device_type, pay_info.amount)
-    utils.log_clientinfo(device, "deposit", pay_info.user_id, pay_info.amount)
+        activity_backends.check_activity(pay_info.user, 'recharge', device_type, pay_info.amount)
+        utils.log_clientinfo(device, "deposit", pay_info.user_id, pay_info.amount)
+    except Exception:
+        pass
 
 
 @app.task
@@ -133,25 +136,32 @@ def send_income_message_sms():
         })
 
 
-def send_message_to_all():
-    all_users = User.objects.all().values('id')
-    count = 0
-    for user in all_users:
-        user_id = user.get('id')
+@app.task
+def check_and_generate_codes():
+    from marketing.mock_generator import MockGenerator
+    generate = MockGenerator()
+    generate.check_and_generate_codes()
 
-        title = u'七夕有礼 好事成双'
-        content = u'【七夕有礼 好事成双】活动：通过APP注册就送10元现金红包；通过APP首次投资满1000元，送20元现金红包。活动有效期：2015年8月18日 — 2015年8月21日。'
 
-        inside_message.send_one.apply_async(kwargs={
-            "user_id": user_id,
-            "title": title,
-            "content": content,
-            "mtype": "activityintro"
-        })
-
-        count += 1
-
-        if count % 1000 == 0:
-            time.sleep(30)
-
-    return count
+# def send_message_to_all():
+#     all_users = User.objects.all().values('id')
+#     count = 0
+#     for user in all_users:
+#         user_id = user.get('id')
+#
+#         title = u'七夕有礼 好事成双'
+#         content = u'【七夕有礼 好事成双】活动：通过APP注册就送10元现金红包；通过APP首次投资满1000元，送20元现金红包。活动有效期：2015年8月18日 — 2015年8月21日。'
+#
+#         inside_message.send_one.apply_async(kwargs={
+#             "user_id": user_id,
+#             "title": title,
+#             "content": content,
+#             "mtype": "activityintro"
+#         })
+#
+#         count += 1
+#
+#         if count % 1000 == 0:
+#             time.sleep(30)
+#
+#     return count

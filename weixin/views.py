@@ -39,6 +39,7 @@ from wanglibao_pay.models import Card
 from marketing.models import Channels
 from marketing.utils import get_channel_record
 import datetime
+import base64
 import json
 import time
 import uuid
@@ -700,23 +701,31 @@ class AuthorizeUser(APIView):
                     phone = wx_user.first().phone
                     logger.debug("获得用户授权openid is: %s, phone is :%s" %(openid,phone))
                     logger.debug("product id:%s" %(url_id))
-                    user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=url_id, identity__in=phone,).first()
+                    user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=url_id, identity=phone,).first()
                     logger.debug("用户抽奖信息是：%s" % (user_gift,))
                     counts = WanglibaoActivityGift.objects.filter(gift_id=url_id, valid=False).count()
+                    logger.debug("奖品有 %s 个已经被不同用户领走了" %(counts, ))
                     if counts == 10:
-                        return redirect("/weixin_activity/share/end/")
-                    if not user_gift and phone:
+                        if user_gift:
+                            logger.debug(u"用户已经令完奖品，而且所有的奖品已经发放完毕")
+                            return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, url_id))
+                        else:
+                            logger.debug(u"所有的奖品已经发完，该用户没有领到奖品")
+                            return redirect("/weixin_activity/share/end/")
+
+                    if user_gift and phone:
                         #如果用户已经了，直接跳转到详情页
                         logger.debug("openid:%s, phone:%s, product_id:%s,用户已经存在了，直接跳转页面" %(openid, phone, url_id,))
                         return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, url_id))
                     else:
-                        return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,nick_name,head_img_url))
+                        return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,base64.b64encode(nick_name),head_img_url))
                 else:
                     user_info = oauth.get_user_info(openid, res.get('access_token'))
                     nick_name = user_info['nickname']
                     head_img_url = user_info['headimgurl']
+                    self.request.session['nick_name']=nick_name
             except WeChatException, e:
-                auth_code_url = reverse("weixin_authorize_code")+'?auth=1&state=%s'%account_id
+                auth_code_url = reverse("weixin_authorize_code")+'?auth=1&state=%s&url_id=%s'%(account_id, url_id)
                 return redirect(auth_code_url)
             return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,nick_name,head_img_url))
 
