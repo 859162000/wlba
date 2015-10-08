@@ -28,6 +28,7 @@ org.canvas = (function(org){
                 clicks= 1,
                 timer=null;
 
+
             canvas.style.backgroundColor='transparent';
             canvas.style.position = 'absolute';
             canvas.style.left = 0;
@@ -74,6 +75,7 @@ org.canvas = (function(org){
                     mousedown=true;
                     end=true;
                     clearInterval(timer);
+
                 }
                 //当手指松开的时候
                 function eventUp(e){
@@ -130,6 +132,7 @@ org.canvas = (function(org){
             $("#continue").on('click',function(){
                 if(end) porttunclick();
             });
+
             function porttunclick(){
                 if(used_chances<3){
                     if($("#continue").html()=="领奖"){
@@ -159,28 +162,27 @@ org.canvas = (function(org){
                    spans.innerHTML = "您的刮奖次数已用完";
                 }
             }
-            function Interface(){
-
-                var dataArr = [];
-                var retCode,
-                    urlData = "IGNORE",
-                    len=dataArr.length;
-                //ajax请求数据
-                function ajaxFun(action, fun) {
-                    org.ajax({
-                        type: "post",
-                        url: "/api/award/common_september/",
-                        dataType: "json",
-                        data: {action: action},
-                        async: false,
-                        success: function (data) {
-                            if (typeof fun === "function") {
-                                fun(data);
-                                console.log(data);
-                            }
+            //ajax请求数据
+            function ajaxFun(action, fun) {
+                org.ajax({
+                    type: "post",
+                    url: "/api/award/common_september/",
+                    dataType: "json",
+                    data: {action: action},
+                    async: false,
+                    success: function (data) {
+                        if (typeof fun === "function") {
+                            fun(data);
+                            console.log(data);
                         }
-                    });
-                }
+                    }
+                });
+            }
+            function Interface(){
+                var dataArr = [],
+                    retCode,
+                    urlData;
+
                 //判断是否为正确渠道
                 function isChannel(data) {
                     dataCode = data.ret_code;
@@ -216,7 +218,6 @@ org.canvas = (function(org){
                         }
                     }
                     ajaxFun("ENTER_WEB_PAGE", lotterInfo);
-
                     function rotateFun(data) {
                         used_chances = data.used_chances;
                         retCode = data.ret_code;
@@ -234,6 +235,7 @@ org.canvas = (function(org){
                     }
                     ajaxFun(urlData, rotateFun);
                     console.log(dataArr+"  "+urlData)
+
                     if (retCode == 3024 && dataCode == 3011 && used_chances > 2) {
                         spans.innerHTML = "您的刮奖次数已用完";
                         $portunity.html("您的刮奖次数已用完");
