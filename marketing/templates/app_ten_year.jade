@@ -139,6 +139,7 @@ html
                         data.cur + 1 === wrap.find('.page').size() ? arrow.hide() : arrow.show();
                     }
                 });
+<<<<<<< HEAD
                 var say;
                 var say_num;
                 say_num = parseInt(12 * Math.random());
@@ -215,3 +216,66 @@ html
                     mp3.play();
                 });
             })
+=======
+
+                var say;
+                var say_num;
+                say_num = parseInt(12*Math.random());
+                say_text(say_num);
+                function say_text(say_num){
+                    switch(say_num){
+                        case 1:
+                            $('#say').text('去旅游，去邂逅');
+                            break;
+                        case 2:
+                            $('#say').text('少睡觉，多看书');
+                            break;
+                        case 3:
+                            $('#say').text('少玩游戏，多赚钱');
+                            break;
+                        case 4:
+                            $('#say').text('养只宠物，解解闷');
+                            break;
+                        case 5:
+                            $('#say').text('多锻炼，保持好身材');
+                            break;
+                        case 6:
+                            $('#say').text('一切都会过去，好好爱自己 ');
+                            break;
+                        case 7:
+                            $('#say').text('别做梦，学一项技能');
+                            break;
+                        case 8:
+                            $('#say').text('好好听课，不要留遗憾');
+                            break;
+                        case 9:
+                            $('#say').text('对自己好一点，买买买');
+                            break;
+                        case 10:
+                            $('#say').text('学好英语，看看世界');
+                            break;
+                        case 11:
+                            $('#say').text('尝试新事物，遇见新朋友');
+                            break;
+                        case 12:
+                            $('#say').text('再努力一下，挺住意味着一切');
+                            break;
+                    }
+                }
+                $('.button').on('click',function(e){
+                    say = $('input').val();
+                    if(say==''){
+                        $('#name').text('自己');
+                    }else {
+                        $('#name').text(say);
+                    }
+                    $('body').unbind('touchmove');
+                    say_num = parseInt(18*Math.random());
+                    say_text(say_num);
+                    e.preventDefault();
+                    $.fn.fullpage[$(this).data('dir')](true);
+                });
+                /*fullpage结束*/
+            })
+                                                                                                  
+>>>>>>> wanglibao/master

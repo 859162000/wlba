@@ -1306,6 +1306,8 @@ def september_award_ajax(request):
             return activity.get_money_action()
         if action == 'IGNORE':
             return activity.ignore_user_action()
+        if action == 'REPEAT':
+            return activity.user_repeat_action()
 
 class CommonAward(object):
     """
@@ -1399,6 +1401,26 @@ class CommonAward(object):
                     return u"None"
         else:
             return u"None"
+
+    def user_repeat_action(self):
+        user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
+        if user_activity.total_chances <= user_activity.used_chances:
+            to_json_response = {
+                'ret_code': 3024,
+                'total_chances': user_activity.total_chances,
+                'used_chances': user_activity.used_chances,
+                'gift': u'None',
+                'message': u'您的抽奖机会已经用完了',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        to_json_response = {
+            'ret_code': 3033,
+            'total_chances': user_activity.total_chances,
+            'used_chances': user_activity.used_chances,
+            'message': u'app端，重复刮卡请求',
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
     def ignore_user_action(self):
         user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
