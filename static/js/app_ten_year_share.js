@@ -1,4 +1,6 @@
-$(function() {
+jQuery.noConflict();
+jQuery(function() {
+    alert('1');
     //微信分享
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ',];
     $.ajax({
