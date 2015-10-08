@@ -187,8 +187,6 @@ img {
 	animation-duration: 1.5s;
 	-webkit-animation-timing-function: ease-in-out;
 	animation-timing-function: ease-in-out;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
     -webkit-animation-iteration-count:infinite;
@@ -272,14 +270,13 @@ img {
 	right: 12.8125%;
 	bottom: 0%;
 	z-index: -1;
+    opacity: 0;
     -webkit-animation-name: bottom_meteor;
     animation-name: bottom_meteor;
 	-webkit-animation-duration: 9s;
 	animation-duration: 9s;
 	-webkit-animation-timing-function: ease;
 	animation-timing-function: ease;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
     -webkit-animation-iteration-count:infinite;
@@ -332,14 +329,13 @@ img {
 .meteor1 {
 	left: 18.75%;
 	top: 37.5768218%;
+    opacity: 0;
     -webkit-animation-name: meteor1;
     animation-name: meteor1;
 	-webkit-animation-duration: 3s;
 	animation-duration: 3s;
 	-webkit-animation-timing-function: ease;
 	animation-timing-function: ease;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
     -webkit-animation-iteration-count:infinite;
@@ -393,14 +389,13 @@ img {
 .meteor2 {
 	left: 53.125%;
 	top: 71.9929763%;
+    opacity: 0;
     -webkit-animation-name: meteor2;
     animation-name: meteor2;
 	-webkit-animation-duration: 4.5s;
 	animation-duration: 4.5s;
 	-webkit-animation-timing-function: ease;
 	animation-timing-function: ease;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
     -webkit-animation-iteration-count:infinite;
@@ -450,6 +445,7 @@ img {
 }
 
 .meteor3 {
+    opacity: 0;
 	left: 0%;
 	top: 78.4021071%;
     -webkit-animation-name: meteor3;
@@ -458,8 +454,6 @@ img {
 	animation-duration: 6s;
 	-webkit-animation-timing-function: ease;
 	animation-timing-function: ease;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
     -webkit-animation-iteration-count:infinite;
@@ -537,8 +531,6 @@ img {
 	animation-duration: 3s;
 	-webkit-animation-timing-function: linear;
 	animation-timing-function: linear;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
     -webkit-animation-iteration-count:infinite;
@@ -586,15 +578,13 @@ img {
 }
 
 .cur .theme {
-	opacity: 1;
+	opacity: 0;
     -webkit-animation-name: theme_start;
     animation-name: theme_start;
 	-webkit-animation-duration: 0.7s;
 	animation-duration: 0.7s;
 	-webkit-animation-timing-function: ease;
 	animation-timing-function: ease;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -652,8 +642,6 @@ img {
 	animation-timing-function: ease-in;
     -webkit-animation-delay:0.6s;
     animation-delay:0.6s;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -693,7 +681,6 @@ img {
 }
 
 .cur .text2_animate {
-	opacity: 1;
     -webkit-animation-name: s1text2_start;
     animation-name: s1text2_start;
 	-webkit-animation-duration: 0.7s;
@@ -702,8 +689,6 @@ img {
 	animation-timing-function: ease-in;
     -webkit-animation-delay:1.2s;
     animation-delay:1.2s;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -771,8 +756,6 @@ img {
 	animation-timing-function: ease;
     -webkit-animation-delay:2s;
     animation-delay:2s;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -810,7 +793,6 @@ img {
 }
 
 .cur .young_animate {
-	opacity: 1;
     -webkit-animation-name: young_start;
     animation-name: young_start;
 	-webkit-animation-duration: 2.5s;
@@ -819,8 +801,6 @@ img {
 	animation-timing-function: ease;
     -webkit-animation-delay:0.8s;
     animation-delay:0.8s;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -882,6 +862,7 @@ img {
     background-size: cover;
 	bottom: 0;
 	right: 0%;
+    opacity: 1;
 }
 
 .cur .old_animate {
@@ -891,8 +872,6 @@ img {
 	animation-duration: 1.4s;
 	-webkit-animation-timing-function: ease;
 	animation-timing-function: ease;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -983,8 +962,6 @@ img {
 	animation-timing-function: ease;
     -webkit-animation-delay:2s;
     animation-delay:2s;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -1030,8 +1007,8 @@ img {
 	animation-timing-function: ease-in;
 	-webkit-animation-delay: 0s;
 	animation-delay: 0s;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
+	  
+	  
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -1074,8 +1051,8 @@ img {
 	animation-timing-function: ease-in;
 	-webkit-animation-delay: 0.8s;
 	animation-delay: 0.8s;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
+	  
+	  
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -1119,8 +1096,6 @@ img {
 	animation-timing-function: ease-in;
 	-webkit-animation-delay: 1s;
 	animation-delay: 1s;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -1197,8 +1172,6 @@ img {
 	animation-timing-function: ease-in;
 	-webkit-animation-delay: 0.5s;
 	animation-delay: 0.5s;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -1241,8 +1214,8 @@ img {
 	animation-timing-function: ease-in;
 	-webkit-animation-delay: 0.3s;
 	animation-delay: 0.3s;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
+	  
+	  
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -1287,8 +1260,6 @@ img {
 	animation-timing-function: ease-in;
 	-webkit-animation-delay: 2.5s;
 	animation-delay: 2.5s;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -1335,8 +1306,6 @@ img {
 	animation-timing-function: ease-in;
 	-webkit-animation-delay: 0s;
 	animation-delay: 0s;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -1385,8 +1354,6 @@ img {
 	animation-timing-function: ease-in;
 	-webkit-animation-delay: 1.7s;
 	animation-delay: 1.7s;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -1476,8 +1443,6 @@ img {
 	animation-timing-function: ease-in;
 	-webkit-animation-delay: 2.7s;
 	animation-delay: 2.7s;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -1526,8 +1491,6 @@ img {
 	animation-timing-function: ease-in;
 	-webkit-animation-delay: 0.3s;
 	animation-delay: 0.3s;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -1576,8 +1539,6 @@ img {
 	animation-timing-function: ease-in;
 	-webkit-animation-delay: 2.3s;
 	animation-delay: 2.3s;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -1620,8 +1581,8 @@ img {
 	animation-timing-function: ease-in;
 	-webkit-animation-delay: 0s;
 	animation-delay: 0s;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
+	 
+	  
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -1663,8 +1624,6 @@ img {
 	animation-timing-function: ease-in;
 	-webkit-animation-delay: 0.7s;
 	animation-delay: 0.7s;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -2165,8 +2124,8 @@ img {
 	animation-timing-function: ease-in-out;
 	-webkit-animation-delay: 0s;
 	animation-delay: 0s;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
+	  
+	  
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
@@ -2228,8 +2187,6 @@ img {
 	animation-timing-function: ease-in;
 	-webkit-animation-delay: 1s;
 	animation-delay: 1s;
-	-webkit-backface-visibility: visible !important;
-	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
 	animation-fill-mode: both;
 }
