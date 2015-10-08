@@ -992,6 +992,7 @@ img {
 	background: url("/static/imgs/mobile_activity/app_ten_year/page3_man.png");
 	background-size: cover;
 	transform: translateX(100%);
+    right:0%;
 	bottom: 0%;
 	z-index: 3;
 }
@@ -1003,8 +1004,8 @@ img {
 	animation-duration: 0.5s;
 	-webkit-animation-timing-function: ease-in;
 	animation-timing-function: ease-in;
-	-webkit-animation-delay: 0.5s;
-	animation-delay: 0.5s;
+	-webkit-animation-delay: 0.8s;
+	animation-delay: 0.8s;
 	-webkit-backface-visibility: visible !important;
 	backface-visibility: visible !important;
 	-webkit-animation-fill-mode: both;
@@ -1018,6 +1019,15 @@ img {
 
 	100% {
 		-webkit-transform: translateX(0%);
+	}
+}
+@keyframes man_start {
+	0% {
+		transform: translateX(100%);
+	}
+
+	100% {
+		transform: translateX(0%);
 	}
 }
 
@@ -1081,6 +1091,7 @@ img {
 	.page3 .line_img {
 		background-position: 0 -50px;
 	}
+
 }
 
 @media screen and (min-width: 700px) and (min-height: 700px) {
@@ -1667,77 +1678,53 @@ img {
 
 @keyframes s6fly_start {
 	0% {
-		top: 18.8380282%;
-		right: 27.8125%;
-		transform: rotate(10deg);
+		transform: translate(0%,0%) rotate(0deg);
 	}
 
 	20% {
-		top: 20.8380282%;
-		right: 29.8125%;
-		transform: rotate(50deg);
+		transform: translate(20px,20px) rotate(50deg);
 	}
 
 	40% {
-		top: 20.8380282%;
-		right: 25.8125%;
-		transform: rotate(30deg);
+		transform: translate(20px,50px) rotate(30deg);
 	}
 
 	60% {
-		top: 19.8380282%;
-		right: 27.8125%;
-		transform: rotate(10deg);
+		transform: translate(10px,0px) rotate(10deg);
 	}
 
 	80% {
-		top: 17.8380282%;
-		right: 26.8125%;
-		transform: rotate(40deg);
+        transform: translate(-20px,-10px) rotate(40deg);
 	}
 
 	100% {
-		top: 18.8380282%;
-		right: 27.8125%;
-		transform: rotate(0deg);
+        transform: translate(0px,0px) rotate(0deg);
 	}
 }
 
 @-webkit-keyframes s6fly_start {
 	0% {
-		top: 18.8380282%;
-		right: 27.8125%;
-		-webkit-transform: rotate(10deg);
+		-webkit-transform: translate(0%,0%) rotate(0deg);
 	}
 
 	20% {
-		top: 20.8380282%;
-		right: 29.8125%;
-		-webkit-transform: rotate(50deg);
+		-webkit-transform: translate(20px,20px) rotate(50deg);
 	}
 
 	40% {
-		top: 20.8380282%;
-		right: 25.8125%;
-		-webkit-transform: rotate(30deg);
+		-webkit-transform: translate(20px,50px) rotate(30deg);
 	}
 
 	60% {
-		top: 19.8380282%;
-		right: 27.8125%;
-		-webkit-transform: rotate(10deg);
+		-webkit-transform: translate(10px,0px) rotate(10deg);
 	}
 
 	80% {
-		top: 17.8380282%;
-		right: 26.8125%;
-		-webkit-transform: rotate(40deg);
+        -webkit-transform: translate(-20px,-10px) rotate(40deg);
 	}
 
 	100% {
-		top: 18.8380282%;
-		right: 27.8125%;
-		-webkit-transform: rotate(0deg);
+        -webkit-transform: translate(0px,0px) rotate(0deg);
 	}
 }
 

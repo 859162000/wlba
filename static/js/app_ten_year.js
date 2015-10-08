@@ -1,5 +1,9 @@
 $(function(){
 
+<<<<<<< HEAD
+
+});
+=======
     var mp3 = document.getElementById("music"),play = $('#play');
     play.on('click', function (e) {
         if (mp3.paused) {
@@ -113,3 +117,4 @@ $(function(){
 
 
 });
+>>>>>>> wanglibao/master
