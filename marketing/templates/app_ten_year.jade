@@ -86,10 +86,53 @@ html
                     a.button.p8button(href="/weixin/regist/?next=/weixin/authentication/") 到网利宝领取
             img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").arrowDown
         script(src="/static/js/app_ten_year.js")
-        script(src="/static/src/mobile/lib/weixin/wx.js")
         //里面最后几行自带Loading
         script.
             $(function () {
+
+
+                //微信分享
+                alert('1');
+                document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
+                    window.shareData = {
+                        "timeLineLink": "/activity/app_ten_year/",
+                        "sendFriendLink": "/activity/app_ten_year/",
+                        "weiboLink": "/activity/app_ten_year/",
+                        "tTitle": "遇到十年前的自己",
+                        "tContent": "我刚遇到十年前的自己，你也来试试把...",
+                        "fTitle": "遇到十年前的自己",
+                        "fContent": "我刚遇到十年前的自己，你也来试试把...",
+                        "wContent": "我刚遇到十年前的自己，你也来试试把..."
+                    };
+                    // 发送给好友
+                    WeixinJSBridge.on('menu:share:appmessage', function (argv) {
+                        WeixinJSBridge.invoke('sendAppMessage', {
+                            "img_url": "/static/imgs/mobile_activity/app_ten_year/weixin_img_300.jpg",
+                            "img_width": "300",
+                            "img_height": "300",
+                            "link": window.shareData.sendFriendLink,
+                            "desc": window.shareData.fContent,
+                            "title": window.shareData.fTitle
+                        }, function (res) {
+                            _report('send_msg', res.err_msg);
+                        })
+                    });
+                    // 分享到朋友圈
+                    WeixinJSBridge.on('menu:share:timeline', function (argv) {
+                        WeixinJSBridge.invoke('shareTimeline', {
+                            "img_url": "/static/imgs/mobile_activity/app_ten_year/weixin_img_300.jpg",
+                            "img_width": "300",
+                            "img_height": "300",
+                            "link": window.shareData.timeLineLink,
+                            "desc": window.shareData.tContent,
+                            "title": window.shareData.tTitle
+                        }, function (res) {
+                            _report('timeline', res.err_msg);
+                        });
+                    });
+                }, false)
+
+
                 /*loading*/
                 window.onload=function(){
                     $('#loadPage').hide(500);
@@ -182,39 +225,5 @@ html
                     mp3.play();
                 });
 
-                //微信分享
-                var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ',];
-                    $.ajax({
-                        type: 'GET',
-                        url:'/weixin/api/jsapi_config/',
-                        dataType:'json',
-                        success:
-                    function (data) {
-                        //请求成功，通过config注入配置信息,
-                        wx.config({debug:false,appId:data.appId,timestamp:data.timestamp,nonceStr: data.nonceStr, signature: data.signature, jsApiList: jsApiList
-                    });
 
-                    }
-                });
-                wx.ready(function () {
-
-                    var host = 'https://staging.wanglibao.com',
-
-                    shareName = '我刚遇到十年前的自己，你也来试试把...',
-                            shareImg = host + '/static/imgs/mobile_activity/app_ten_year/weixin_img_300.jpg',
-                            shareLink = host + '/activity/app_ten_year/',
-                            shareMainTit = '我刚遇到十年前的自己，你也来试试把...',
-                            shareBody = '我刚遇到十年前的自己，你也来试试把...' - //分享给微信好友
-                            org.onMenuShareAppMessage({ title: shareMainTit, desc: shareBody, link: shareLink, imgUrl: shareImg
-                    });  //分享给微信朋友圈
-                        org.onMenuShareTimeline({  title: '我刚遇到十年前的自己，你也来试试把...',
-                        link: shareLink,
-                        imgUrl: shareImg
-                })  //分享给QQ
-                        org.onMenuShareQQ({  title: shareMainTit,
-                        desc: shareBody,
-                        link: shareLink,
-                        imgUrl: shareImg
-                })
-            })
             })
