@@ -1,6 +1,5 @@
 jQuery.noConflict();
-jQuery(function() {
-    alert('1');
+var org = jQuery(function() {
     //微信分享
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ',];
     $.ajax({
@@ -48,3 +47,4 @@ jQuery(function() {
         })
     })
 })
+
