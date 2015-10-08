@@ -86,53 +86,9 @@ html
                     a.button.p8button(href="/weixin/regist/?next=/weixin/authentication/") 到网利宝领取
             img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").arrowDown
         script(src="/static/js/app_ten_year.js")
-        //里面最后几行自带Loading
+        script(src="/static/src/mobile/lib/weixin/wx.js")
+        script(src="/static/js/app_ten_year_share.js")
         script.
-            $(function () {
-
-
-                //微信分享
-                alert('1');
-                document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
-                    window.shareData = {
-                        "timeLineLink": "/activity/app_ten_year/",
-                        "sendFriendLink": "/activity/app_ten_year/",
-                        "weiboLink": "/activity/app_ten_year/",
-                        "tTitle": "遇到十年前的自己",
-                        "tContent": "我刚遇到十年前的自己，你也来试试把...",
-                        "fTitle": "遇到十年前的自己",
-                        "fContent": "我刚遇到十年前的自己，你也来试试把...",
-                        "wContent": "我刚遇到十年前的自己，你也来试试把..."
-                    };
-                    // 发送给好友
-                    WeixinJSBridge.on('menu:share:appmessage', function (argv) {
-                        WeixinJSBridge.invoke('sendAppMessage', {
-                            "img_url": "/static/imgs/mobile_activity/app_ten_year/weixin_img_300.jpg",
-                            "img_width": "300",
-                            "img_height": "300",
-                            "link": window.shareData.sendFriendLink,
-                            "desc": window.shareData.fContent,
-                            "title": window.shareData.fTitle
-                        }, function (res) {
-                            _report('send_msg', res.err_msg);
-                        })
-                    });
-                    // 分享到朋友圈
-                    WeixinJSBridge.on('menu:share:timeline', function (argv) {
-                        WeixinJSBridge.invoke('shareTimeline', {
-                            "img_url": "/static/imgs/mobile_activity/app_ten_year/weixin_img_300.jpg",
-                            "img_width": "300",
-                            "img_height": "300",
-                            "link": window.shareData.timeLineLink,
-                            "desc": window.shareData.tContent,
-                            "title": window.shareData.tTitle
-                        }, function (res) {
-                            _report('timeline', res.err_msg);
-                        });
-                    });
-                }, false)
-
-
                 /*loading*/
                 window.onload=function(){
                     $('#loadPage').hide(500);
