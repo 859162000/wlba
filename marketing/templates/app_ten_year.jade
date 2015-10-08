@@ -205,8 +205,6 @@ html
 
                 var mp3 = document.getElementById("music"),play = $('#play');
                 play.on('click', function (e) {
-                    alert(document.body.clientWidth);
-                    alert(window.innerHeight);
                     if (mp3.paused) {
                         mp3.play();
                         $('#play').addClass('play_music').removeClass('close_music');
