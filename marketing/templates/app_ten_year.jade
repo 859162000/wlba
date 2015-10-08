@@ -85,14 +85,19 @@ html
                     img(src="/static/imgs/mobile_activity/app_ten_year/page8_text2.png").text2.p8text2
                     a.button.p8button(href="/weixin/regist/?next=/weixin/authentication/") 到网利宝领取
             img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").arrowDown
+
+
         script(src="/static/js/app_ten_year.js")
-        script(src="/static/src/mobile/lib/weixin/wx.js")
-        script(src="/static/js/app_ten_year_share.js")
+        //里面最后几行自带Loading
         script.
+
+            window.onload=function(){
+                $('#loadPage').hide(500);
+            }
+
+            $(function () {
                 /*loading*/
-                window.onload=function(){
-                    $('#loadPage').hide(500);
-                }
+
                 /*loading结束*/
                 /*fullpage*/
                 var wrap = $('#wrap'), arrow = $('.arrowDown');
@@ -183,3 +188,6 @@ html
 
 
             })
+        script(src="/static/js/lib/jquery.min.js")
+        script(src="/static/src/mobile/lib/weixin/wx.js")
+        script(src="/static/js/app_ten_year_share.js")
