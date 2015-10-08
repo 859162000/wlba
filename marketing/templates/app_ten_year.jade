@@ -7,7 +7,7 @@ html
         meta(content="telephone=no,email=no" ,name="format-detection")
         meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
         meta(content="yes" ,name="apple-mobile-web-app-capable")
-        link(href="/static/styles/mobile_activity/app_ten_year.css?v=20150930", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_ten_year.css?v=20151008", rel="stylesheet")
     body
         .wp
             .loadPage#loadPage
@@ -80,6 +80,7 @@ html
         //里面最后几行自带Loading
         script.
             $(function () {
+
                 /*loading*/
                 var loading = $('#loadPage');
                 var queue = new createjs.LoadQueue();
@@ -137,6 +138,7 @@ html
                     page: '.page',
                     change: function (data) {
                         data.cur + 1 === wrap.find('.page').size() ? arrow.hide() : arrow.show();
+
                     }
                 });
                 var say;
@@ -185,6 +187,7 @@ html
                 }
 
                 $('.button').on('click', function (e) {
+
                     say = $('input').val();
                     if (say == '') {
                         $('#name').text('自己');
@@ -202,6 +205,8 @@ html
 
                 var mp3 = document.getElementById("music"),play = $('#play');
                 play.on('click', function (e) {
+                    alert(document.body.clientWidth);
+                    alert(window.innerHeight);
                     if (mp3.paused) {
                         mp3.play();
                         $('#play').addClass('play_music').removeClass('close_music');
