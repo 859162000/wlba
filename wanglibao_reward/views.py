@@ -27,6 +27,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from marketing.utils import get_user_channel_record
 from django.shortcuts import redirect
+from decimal import Decimal
+from django.conf import settings
 logger = logging.getLogger('wanglibao_reward')
 
 def ajax_response_reward(request):
@@ -567,15 +569,17 @@ class WeixinShareDetailView(TemplateView):
 
             if "No Reward" == user_gift:
                 self.debug_msg('奖品已经发完了，用户:%s 没有领到奖品' %(phone_num,))
-                redirect_url = reverse('weixin_share_end')
+                redirect_url = reverse('weixin_share_end')+'?url_id=%s'%order_id
                 return redirect(redirect_url)
         else:
             self.debug_msg('phone:%s 已经领取过奖品' %(phone_num,))
         gifts = self.get_distribute_status(order_id, activity)
+        shareTitle, shareContent, url = get_share_infos(order_id)
         return {
             "ret_code": 0,
             "self_gift": self.format_response_data(user_gift, 'alone'),
-            "all_gift": self.format_response_data(gifts, 'gifts')
+            "all_gift": self.format_response_data(gifts, 'gifts'),
+             "share":{'content':shareContent,'title':shareTitle, 'url':url}
         }
 
     def dispatch(self, request, *args, **kwargs):
@@ -599,7 +603,11 @@ class WeixinShareEndView(TemplateView):
     template_name = 'app_weChatEnd.jade'
 
     def get_context_data(self, **kwargs):
-        pass
+        order_id = self.request.GET.get('url_id')
+        shareTitle, shareContent, url = get_share_infos(order_id)
+        return {
+         "share":{'content':shareContent,'title':shareTitle, 'url':url}
+        }
 
 
 class WeixinShareStartView(TemplateView):
@@ -630,11 +638,13 @@ class WeixinShareStartView(TemplateView):
             )
         else:
             logger.debug('微信授权信息很早就已经入库, nick_name:%s, openid:%s, img:%s ' %(nick_name, openid, img_url))
+        shareTitle, shareContent, url = get_share_infos(order_id)
         return {
             'ret_code': 9001,
             'openid': openid,
             'order_id': order_id,
             'phone': record.phone if record else '',
+            "share":{'content':shareContent,'title':shareTitle, 'url':url}
         }
 
     def dispatch(self, request, *args, **kwargs):
@@ -671,3 +681,18 @@ class WeixinShareStartView(TemplateView):
             return HttpResponseRedirect(redirect_url)#redirect(redirect_url)
 
         return super(WeixinShareStartView, self).dispatch(request, *args, **kwargs)
+
+def get_share_infos(order_id):
+    key = 'share_redpack'
+    url = ""
+    shareTitle=""
+    shareContent=""
+    shareconfig = Misc.objects.filter(key=key).first()
+    if shareconfig:
+        shareconfig = json.loads(shareconfig.value)
+        if type(shareconfig) == dict:
+            is_open = shareconfig.get('is_open', 'false')
+            shareTitle=shareconfig.get('share_title', "")
+            shareContent=shareconfig.get('share_content', "")
+            url = settings.WEIXIN_CALLBACK_URL + reverse('weixin_share_order_gift')+"?url_id=%s"%order_id
+    return shareTitle, shareContent, url
