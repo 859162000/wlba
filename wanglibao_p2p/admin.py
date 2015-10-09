@@ -654,7 +654,7 @@ class AutomaticManagerAdmin(admin.ModelAdmin):
 class ContractTemplateAdmin(admin.ModelAdmin):
     actions = None
     list_display = ('name', "copy_link")
-    form = ContractTemplateForm
+    # form = ContractTemplateForm
 
     def has_delete_permission(self, request, obj=None):
         return False
