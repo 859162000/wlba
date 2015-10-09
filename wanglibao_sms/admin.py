@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+from daterange_filter.filter import DateRangeFilter
 from django.contrib import admin
-from wanglibao_sms.models import PhoneValidateCode, ShortMessage
+from wanglibao_sms.models import PhoneValidateCode, ShortMessage, ArrivedRate, MessageInRedis
 
 
 class PhoneValidateCodeAdmin(admin.ModelAdmin):
@@ -39,4 +41,54 @@ class ShortMessageAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         return self.list_display + ('channel',)
 
+
+class ArrivedRateAdmin(admin.ModelAdmin):
+    actions = None
+    list_display = ('id', 'channel', 'achieved', 'total_amount', 'rate', 'start', 'end', 'created_at')
+    list_display_links = ('id',)
+    readonly_fields = ('channel', 'achieved', 'total_amount', 'rate', 'start', 'end', 'created_at')
+    search_fields = ('achieved', 'total_amount', 'rate', 'start', 'end')
+    list_filter = (
+        'channel',
+        # ('created_at', DateFieldListFilter),  # 默认只有距离今天的天, 周, 月
+        ('created_at', DateRangeFilter),
+    )
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
+        return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.list_display + ('channel',)
+
+
+# class MessageInRedisAdmin(admin.ModelAdmin):
+#     actions = None
+#     list_display = ('id', 'message_for', 'title', 'content')
+#     list_display_links = ('id', 'message_for',)
+#     readonly_fields = ('message_for',)
+#     search_fields = ('message_for', 'title', 'content')
+#     list_filter = (
+#         'message_for',
+#         'title',
+#         'content',
+#     )
+#
+#     def has_delete_permission(self, request, obj=None):
+#         return False
+#
+#     def has_add_permission(self, request):
+#         return False
+#
+#     def has_update_permission(self, request):
+#         return True
+#
+#     def get_readonly_fields(self, request, obj=None):
+#         return self.list_display + ('channel',)
+
+
 admin.site.register(ShortMessage, ShortMessageAdmin)
+admin.site.register(ArrivedRate, ArrivedRateAdmin)
+# admin.site.register(MessageInRedis, MessageInRedisAdmin)
