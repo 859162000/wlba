@@ -407,17 +407,16 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     used_chances = data.used_chances;
                     retCode = data.ret_code;
                  }
-                 if (dataArr.length < 1) {
+                if (amount != 'None' && amount_left != 0) {
+                    urlData = "GET_MONEY";
+                    //dataArr.shift();
+                } else if (gift != 'None' && gift_left != 0) {
+                    urlData = "GET_GIFT";
+                    //dataArr.shift();
+                } else {
                     urlData = "IGNORE";
-                 } else {
-                    if (dataArr[0]==1) {
-                        urlData = "GET_MONEY";
-                    } else if (dataArr[0]==2) {
-                        urlData = "GET_GIFT";
-                    } else {
-                        urlData = "IGNORE";
-                    }
-                 }
+                }
+
                 ajaxFun(urlData, rotateFun);
                 console.log(dataArr+"  "+urlData)
             }
@@ -450,12 +449,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         amount_left = data.amount_left;
                         total=data.total_chances;
 
-                        if (amount != 'None' && amount_left != 0) dataArr.push(1);
-                        if(gift != 'None' && gift_left != 0){
-                            dataArr.push(2);
-                        }else{
-                            dataArr.push("");
-                        }
                     }
                     ajaxFun("ENTER_WEB_PAGE", lotterInfo);
                     if (retCode == 3024 && dataCode == 3011 && used_chances > 2) {
