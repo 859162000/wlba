@@ -239,7 +239,7 @@ var weChatShare = (function(org){
         });
         wx.ready(function(){
             var host = 'https://staging.wanglibao.com',
-                shareImg = '/static/imgs/mobile/share_logo.png',
+                shareImg = host + '/static/imgs/mobile/share_logo.png',
                 shareLink = $('input[name=url]').val(),
                 shareMainTit = $('input[name=title]').val(),
                 shareBody = $('input[name=content]').val();
