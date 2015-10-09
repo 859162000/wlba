@@ -81,10 +81,12 @@ class AppActivateImageAPIView(APIView):
                 img_url = activate.img_four
             else:
                 img_url = ''
+            jump_state = activate.jump_state
+            link_dest = activate.link_dest
 
             if img_url:
                 img_url = '{host}/media/{url}'.format(host=settings.CALLBACK_HOST, url=img_url)
-                return Response({'ret_code': 0, 'message': 'ok', 'image': img_url})
+                return Response({'ret_code': 0, 'message': 'ok', 'image': img_url, 'jump_state': jump_state, 'link_dest':link_dest})
 
         return Response({'ret_code': 20003, 'message': 'fail'})
 
