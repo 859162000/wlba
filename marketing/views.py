@@ -662,6 +662,7 @@ def ajax_post(request):
             event = json.loads(event.value)
             if type(event) == dict:
                 channel = event['channel']
+                reward = event['reward']
     except Exception, reason:
         logger.exception('get misc record exception, msg:%s' % (reason,))
         raise
@@ -677,7 +678,7 @@ def ajax_post(request):
         action = request.POST.get("action", "")
 
         if action == 'GET_AWARD':
-            res = obj.get_award(request)
+            res = obj.get_award(request, reward)
 
         if action == 'IGNORE_AWARD':
             res = obj.ignore_award(request)
@@ -694,7 +695,7 @@ class ThunderAwardAPIView(APIView):
                     150元（60%）、 200元（10%），中奖后提示中奖金额及中奖提示语，非中奖用户提示非中奖提示语。
     """
 
-    def get_award(self, request):
+    def get_award(self, request, reward):
         """
             TO-WRITE
         """
@@ -711,10 +712,10 @@ class ThunderAwardAPIView(APIView):
         join_log.join_times -= 1
         join_log.save(update_fields=['join_times'])
         money = self.get_award_mount(join_log.id)
-        describe = 'xunlei_sept_' + str(money)
+        describe = str(reward) + str(money)
         try:
             dt = timezone.datetime.now()
-            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,give_start_at__lte=dt, give_end_at__gte=dt).first()
+            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
         except Exception, reason:
             print reason
 
@@ -1306,6 +1307,7 @@ class WanglibaoAwardActivity(APIView):
 def september_award_ajax(request):
     user = request.user
     action = request.POST.get('action',)
+    print "Action from Application:%s" % (action,)
     logger.debug("in activity common_award_september, User Action: %s" % (action,))
     if action == 'GET_AWARD':
         return ajax_get_activity_record('common_award_sepetember')
