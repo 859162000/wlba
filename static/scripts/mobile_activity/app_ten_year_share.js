@@ -217,12 +217,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;
-(function() {
+;(function() {
     //微信分享
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ',];
     org.ajax({
-
         type: 'GET',
         url: '/weixin/api/jsapi_config/',
         dataType: 'json',

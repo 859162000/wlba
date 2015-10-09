@@ -2,6 +2,7 @@
     //微信分享
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ',];
     org.ajax({
+
         type: 'GET',
         url: '/weixin/api/jsapi_config/',
         dataType: 'json',
