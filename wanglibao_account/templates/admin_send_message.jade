@@ -12,17 +12,39 @@ head
             | 发送站内信
             a(href='/{{ "" | admin_address}}')
               button.button-home-action(type='submit') 返回
+        .panel-title-bar__no-border
+          .panel-title
+            if flag == 'different_batch'
+              a(href='/{{ "" | admin_address}}/accounts/message/')
+                button.button-default 相同站内信批量发
+              | &nbsp;&nbsp;
+              a(href='/{{ "" | admin_address}}/accounts/message/?flag=different_batch')
+                button.button-default.button-primary 不同站内信批量发
+            else
+              a(href='/{{ "" | admin_address}}/accounts/message/')
+                button.button-default.button-primary 相同站内信批量发
+              | &nbsp;&nbsp;
+              a(href='/{{ "" | admin_address}}/accounts/message/?flag=different_batch')
+                button.button-default 不同站内信批量发
         .space-vertical-s
           if not message
             .panel-content.padding-l-r-sm
               form(method="post", name="message_send_form", action="")
                 - csrf_token
+                input(type="hidden", value="{{flag}}" name="flag")
                 .span6
                   .span3(style="line-height:40px")
                       label 用户手机号
                   .span4
-                      textarea#phones(name='phones', placeholder='手机号码,一行一个', style="width:200px;height:100px")
+                      textarea#phones(name='phones', placeholder='手机号码,一行一个', style="width:200px;height:120px")
                       span 一行一个(可一个或多个)
+                if flag == 'different_batch'
+                  .span6
+                    .span3(style="line-height:40px")
+                      label 兑换码/奖品码
+                    .span4
+                      textarea#exchange_codes(name='exchange_codes', placeholder='兑换码/兑换码,一行一个', style="width:200px;height:120px")
+                      span(style="color:red") 兑换码/奖品码的数量必须和手机号的数量一致(一行一个)
                 .span6(style="margin-top:10px")
                   .span3(style="line-height:40px")
                       label 站内信标题

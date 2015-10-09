@@ -1406,15 +1406,36 @@ class AdminIdVerificationView(TemplateView):
 class AdminSendMessageView(TemplateView):
     template_name = "admin_send_message.jade"
 
+    def get_context_data(self, **kwargs):
+        flag = self.request.GET.get('flag', '')
+
+        return {
+            'flag': flag
+        }
+
     def post(self, request):
         phones = request.POST.get("phones", "")
         title = request.POST.get("title", "")
         content = request.POST.get("content", "")
         mtype = request.POST.get("mtype", "activity")
+        exchange_codes = request.POST.get("exchange_codes", "")
+        flag = request.POST.get('flag', '')
         if not phones or not title or not content or not mtype:
             return self.render_to_response(
                 {
                     "message": "信息输入不完整"
+                }
+            )
+        if flag and flag != 'different_batch':
+            return self.render_to_response(
+                {
+                    "message": "参数不正确"
+                }
+            )
+        if flag and not exchange_codes:
+            return self.render_to_response(
+                {
+                    "message": "兑换码信息输入不完整"
                 }
             )
         phone_list = phones.split('\r\n')
@@ -1453,7 +1474,8 @@ class AdminSendMessageView(TemplateView):
         return self.render_to_response(
             {
                 "message": u"发送结果如下:",
-                "send_result": send_result
+                "send_result": send_result,
+                'flag': flag
             }
         )
 
