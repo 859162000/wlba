@@ -4,7 +4,6 @@
 	box-sizing: border-box;
     list-style: none;
 }
-
 body {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -27,7 +26,7 @@ body .clear {
 	clear: both
 }
 .goldSeason {
-	display: block;
+	display: inline-block;
 }
 .goldSeason .goldSeasonBanner {
 	width: 100%;
@@ -39,7 +38,7 @@ body .clear {
 	display: inline-block;
     position: relative;
     font-size:0;
-
+    margin-top:5px;
 }
 .goldSeason .rankingList .bg1{
     width:100%;
@@ -88,7 +87,7 @@ body .clear {
 	line-height: 40px;
 	text-align: center;
 	color: #333;
-	font-size: 15px
+	font-size: 20px
 }
 
 .goldSeason .rankingList .list ul li:nth-child(odd) {
@@ -115,22 +114,22 @@ body .clear {
 .goldSeason .rankingList .list ul.one span {
 	display: block;
 	margin: 0 auto;
-	width: 20px;
+	width: 30px;
 	position: relative;
-	z-index: 1
+	z-index: 1;
 }
 .goldSeason .rankingList .list ul.one span.one {
-	background: url(/static/imgs/pc_activity/gold_season/ico.png) no-repeat 0 0;
+	background: url(/static/imgs/pc_activity/gold_season/ico.png) no-repeat center 0;
 	height: 32px;
 	top: 4px
 }
 .goldSeason .rankingList .list ul.one span.two {
-	background: url(/static/imgs/pc_activity/gold_season/ico.png) no-repeat 0 -32px;
+	background: url(/static/imgs/pc_activity/gold_season/ico.png) no-repeat center -32px;
 	height: 32px;
 	top: 4px;
 }
 .goldSeason .rankingList .list ul.one span.three {
-	background: url(/static/imgs/pc_activity/gold_season/ico.png) no-repeat 0 -64px;
+	background: url(/static/imgs/pc_activity/gold_season/ico.png) no-repeat center -64px;
 	height: 32px;
 	top: 4px
 }
@@ -139,9 +138,10 @@ body .clear {
 	border-radius: 50%;
 	background: #ccc;
 	top: 10px;
+    font-size:18px;
 	color: #fff;
-	height: 20px;
-	line-height: 20px
+	height: 30px;
+	line-height: 30px;
 }
 .goldSeason .rankingList .bg3{
     width:100%;
@@ -150,7 +150,7 @@ body .clear {
     top:-12px;
 }
 .goldSeason img.label {
-	margin: 30px auto;
+	margin: 40px auto;
 	display: block
 }
 .goldSeason .order {
@@ -176,7 +176,7 @@ body .clear {
 	width: 100%;
 }
 .goldSeason .order .box dl dt {
-	font-size: 24px;
+	font-size: 26px;
 	line-height: 34px;
     color: #e8471b;
     text-align: center;
@@ -185,7 +185,7 @@ body .clear {
 	color: #666;
     padding-top:12px;
 	font-size: 18px;
-	line-height: 18px
+	line-height: 22px
 }
 .goldSeason .order .arrow {
 	margin: 0 2.1%;
@@ -197,14 +197,186 @@ body .clear {
 }
 .explain{
     width:100%;
+    margin-top:35px;
 }
 .explain .bg1{
     width:100%;
     display:block;
 }
 .explain .main{
+    padding: 20px 5.3%;
     width:100%;
     background: url(/static/imgs/mobile_activity/app_gold_season/explain2.png);
     display:inline-block;
     background-size: 100% 100%;
+}
+.goldSeason .explain .main dt,.goldSeason .explain .main dd {
+    max-height: 999999999rem;
+	color: #666;
+	padding: 0 8px;
+	font-size: 24px;
+    line-height: 42px;
+}
+.goldSeason .explain .main dt span,.goldSeason .explain .main dd span {
+	color: #ec551d
+}
+.goldSeason .example {
+	clear: both;
+	border: 1px #f0651f solid;
+	border-radius: 14px;
+	width: 860px;
+	margin: 6px auto;
+	display: inline-block;
+}
+.goldSeason .example .leftImg {
+	float: left;
+	display: block;
+	position: relative;
+	top: 41px;
+	left: -1px;
+	z-index: 1
+}
+.goldSeason .example .rightMain {
+	float: left;
+	display: block;
+	margin-left: 12px;
+	width: 660px
+}
+.goldSeason .example .rightMain p.title {
+	line-height: 32px;
+	font-size: 18px;
+	text-align: left;
+    color:#666;
+}
+.goldSeason .example .rightMain p.text {
+	font-size: 24px;
+	line-height: 46px;
+    color:#666;
+    font-weight: bold;
+}
+.goldSeason .example .rightMain .number span {
+	float: left;
+    margin:0 10px 0 25px;
+    font-weight: bold;
+	display: block;
+	font-size: 30px;
+	color: #666;
+	line-height: 30px;
+}
+.goldSeason .example .rightMain .number span.add {
+}
+.goldSeason .example .rightMain .number dl {
+	float: left;
+	display: block;
+	text-align: center;
+    margin-left:20px;
+}
+body .goldSeason .example .rightMain .number dl dt {
+	font-size: 30px;
+	color: #666;
+	line-height: 30px;
+	font-weight: bold;
+	padding: 0
+}
+.goldSeason .example .rightMain .number dl dd {
+	padding-top: 10px;
+	font-size: 16px;
+	color: #f0651f;
+	line-height: 18px;
+}
+.goldSeason .example .rightMain .number dl.right {
+	position: relative;
+	left: 30px;
+	width: 180px;
+	z-index: 1
+}
+.goldSeason .example .rightMain .example1 {
+	width: 100%;
+
+}
+.goldSeason .example .rightMain .example1 .number {
+	margin-left: 30px
+}
+.goldSeason .example .rightMain .example2 {
+	width: 100%; clear:both;
+}
+.goldSeason .example .rightMain .example2 .number{
+    position: relative;
+    top:-15px;
+}
+.goldSeason .example .rightMain .example2 dl {
+	float: none;
+	margin: 0 auto
+}
+.goldSeason .cheats {
+	width: 100%;
+    display: inline-block;
+    font-size:0;
+}
+.goldSeason .cheats .img{
+    position:relative;
+    display: block;
+    width:100%;
+}
+.goldSeason .cheats .bg1 {
+    display:block;
+	width: 100%;
+}
+
+.goldSeason .cheats .title {
+	width: 29.3%;
+	text-align: center;
+	height: 54px;
+	position: absolute;
+	right: 8.8%;
+	top: 15.6147541%;
+	color: #fff;
+    font-weight: bold;
+	font-size: 30px;
+	padding: 0;
+	line-height: 34px
+}
+.goldSeason .cheats .text {
+	position: absolute;
+	color: #ec551d;
+	font-size: 26px;
+	height: 60px;
+	line-height: 60px
+}
+.goldSeason .cheats .text1 {
+	left: 6.9333333%;
+	top: 6.1349693%;
+}
+.goldSeason .cheats .text2 {
+	left: 12.2666667%;
+	top: 24.6639344%;
+}
+.goldSeason .cheats .rule {
+	background: url(/static/imgs/mobile_activity/app_gold_season/cheats_bg2.png);
+    background-size: 100% 100%;
+    display: inline-block;
+    width:100%;
+    padding: 30px 4.75% 0;
+}
+.goldSeason .cheats .rule p {
+	color: #666;
+	line-height: 42px;
+    max-height: 999999999rem;
+	font-size: 24px
+}
+.goldSeason .cheats .rule .calculation {
+	color: #ec551d
+}
+.g-footer-warp {
+	margin-top: 15px
+}
+.footer{
+    margin-top:45px;
+    padding:10px 0;
+    width:100%;
+    background:#db3b0f;
+    text-align: center;
+    color: #fff;
+    font-size:24px;
+    line-height: 38px;
 }
