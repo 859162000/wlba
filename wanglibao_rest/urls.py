@@ -52,7 +52,7 @@ from marketing.play_list import InvestmentHistory
 from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView,
                              ThousandRedPackCountAPIView, ThunderActivityRewardCounter, ThunderAwardAPIView,)
 from weixin.views import P2PListWeixin
-from wanglibao_account.views import three_order_view, three_order_query_view
+from wanglibao_account.views import ThirdOrdeApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
 
 
@@ -253,8 +253,8 @@ urlpatterns += patterns(
 # 第三方渠道业务接口
 urlpatterns += patterns(
     '',
-    url(r'^coop/order/receive/$', three_order_view),
-    url(r'^coop/order/query/', three_order_query_view),
+    url(r'^coop/order/receive/(?P<channel_code>[a-z0-9A-Z_]*)/$', ThirdOrdeApiView.as_view()),
+    url(r'^coop/order/query/$', ThirdOrderQueryApiView.as_view()),
 )
 
 # 用户活动状态查询接口
