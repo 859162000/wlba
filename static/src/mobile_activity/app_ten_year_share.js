@@ -1,9 +1,7 @@
-jQuery.noConflict();
-var org = jQuery(function() {
+(function() {
     //微信分享
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ',];
-    $.ajax({
-
+    org.ajax({
         type: 'GET',
         url: '/weixin/api/jsapi_config/',
         dataType: 'json',
