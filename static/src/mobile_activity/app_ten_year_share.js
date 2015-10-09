@@ -1,6 +1,6 @@
 (function() {
     //微信分享
-    var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ',];
+    var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ'];
     org.ajax({
         type: 'GET',
         url: '/weixin/api/jsapi_config/',
@@ -44,5 +44,5 @@
             imgUrl: shareImg
         })
     })
-})
+});
 

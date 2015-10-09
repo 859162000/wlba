@@ -219,7 +219,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 })();
 ;(function() {
     //微信分享
-    var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ',];
+    var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ'];
     org.ajax({
         type: 'GET',
         url: '/weixin/api/jsapi_config/',
@@ -239,7 +239,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     });
     wx.ready(function () {
 
-        var host = 'https://www.wanglibao.com',
+        var host = 'https://staging.wanglibao.com',
             shareName = '我刚遇到十年前的自己，你也来试试把...',
             shareImg = host + '/static/imgs/mobile_activity/app_ten_year/weixin_img_300.jpg',
             shareLink = host + '/activity/app_ten_year/',
@@ -263,5 +263,5 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             imgUrl: shareImg
         })
     })
-})
+});
 
