@@ -532,7 +532,7 @@ class XunleiP2PbyUser(APIView):
             obj = {
                 'id': p2pproduct.id,
                 'title': p2pproduct.name,
-                'title_url': 'https://{}/p2p/detail/{}?xluid={}&promo_token=xunlei'.format(reqeust.get_host(), p2pproduct.id, uid),
+                'title_url': 'https://{}/p2p/detail/{}?xluid={}&promo_token=xunlei9'.format(reqeust.get_host(), p2pproduct.id, uid),
                 'finance_start_time': time.mktime(timezone.localtime(p2pproduct.publish_time).timetuple()),
                 'finance_end_time': time.mktime(timezone.localtime(p2pproduct.end_time).timetuple()),
                 'expected_income': float(expected_income),
