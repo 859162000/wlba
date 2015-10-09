@@ -1307,6 +1307,7 @@ class WanglibaoAwardActivity(APIView):
 def september_award_ajax(request):
     user = request.user
     action = request.POST.get('action',)
+    print "Action from Application:%s" % (action,)
     logger.debug("in activity common_award_september, User Action: %s" % (action,))
     if action == 'GET_AWARD':
         return ajax_get_activity_record('common_award_sepetember')
