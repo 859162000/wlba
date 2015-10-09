@@ -685,42 +685,44 @@ class FUBARegister(CoopRegister):
         """
         # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
         binding = Binding.objects.filter(user_id=user.id).first()
-        p2p_record = get_last_investment_for_coop(user.id)
-        if binding and p2p_record:
-            # 如果结算时间过期了则不执行回调
-            earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
-            if earliest_settlement_time:
-                earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
-                current_time = datetime.datetime.now()
-                # 如果上次访问的时间是在30天前则不更新访问时间
-                if earliest_settlement_time + datetime.timedelta(days=int(FUBA_PERIOD)) <= current_time:
-                    return
-
-            order_id = p2p_record.id
-            goodsprice = p2p_record.amount
-            # goodsname 提供固定值，固定值自定义，但不能为空
-            goodsname = u"名称:网利宝,类型:产品标,周期:1月"
-            sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
-            status = u"直投【%s 元：已付款】" % goodsprice
-            params = {
-                'action': 'create',
-                'planid': self.coop_id,
-                'order': order_id,
-                'goodsmark': '1',
-                'goodsprice': goodsprice,
-                'goodsname': goodsname,
-                'sig': sig,
-                'status': status,
-                'uid': binding.bid,
-            }
-            common_callback.apply_async(
-                kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
-            # 记录开始结算时间
-            if not binding.extra:
-                # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
+        p2p_record_set = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
+        if binding and p2p_record_set.count() == 1:
+            p2p_record = p2p_record_set.first()
+            if int(p2p_record.amount) >= 1000:
+                # 如果结算时间过期了则不执行回调
+                earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
                 if earliest_settlement_time:
-                    binding.extra = earliest_settlement_time
-                    binding.save()
+                    earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
+                    current_time = datetime.datetime.now()
+                    # 如果上次访问的时间是在30天前则不更新访问时间
+                    if earliest_settlement_time + datetime.timedelta(days=int(FUBA_PERIOD)) <= current_time:
+                        return
+
+                order_id = p2p_record.id
+                goodsprice = 80
+                # goodsname 提供固定值，固定值自定义，但不能为空
+                goodsname = u"名称:网利宝,类型:产品标,周期:1月"
+                sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
+                status = u"首单【%s 元：已付款】" % goodsprice
+                params = {
+                    'action': 'create',
+                    'planid': self.coop_id,
+                    'order': order_id,
+                    'goodsmark': '1',
+                    'goodsprice': goodsprice,
+                    'goodsname': goodsname,
+                    'sig': sig,
+                    'status': status,
+                    'uid': binding.bid,
+                }
+                common_callback.apply_async(
+                    kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+                # 记录开始结算时间
+                if not binding.extra:
+                    # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
+                    if earliest_settlement_time:
+                        binding.extra = earliest_settlement_time
+                        binding.save()
 
 
 class YunDuanRegister(CoopRegister):
@@ -776,13 +778,12 @@ class YiCheRegister(CoopRegister):
             kwargs={'url': url, 'params': params, 'channel': self.c_code})
 
     def register_call_back(self, user):
-        binding = Binding.objects.filter(user_id=user.id).first()
-        if binding:
+        introduced_by = IntroducedBy.objects.filter(user_id=user.id).first()
+        if introduced_by:
             url = self.call_back_url + '?method=AddPlatFormFinanceUser'
-            introduced_by = IntroducedBy.objects.filter(user_id=user.id).first()
             mobile = '******'.join(get_phone_for_coop(user.id).split('***'))
             params = {
-                'userId': binding.bid,
+                'userId': get_uid_for_coop(user.id),
                 'userName': mobile,
                 'mobile': mobile,
                 'companyId': 9,
@@ -792,25 +793,25 @@ class YiCheRegister(CoopRegister):
             self.yiche_call_back(url, params)
 
     def validate_call_back(self, user):
-        binding = Binding.objects.filter(user_id=user.id).first()
-        if binding:
+        introduced_by = IntroducedBy.objects.filter(user_id=user.id).first()
+        if introduced_by:
             url = self.call_back_url + '?method=UpdatePlatFormFinanceUser'
             username = get_username_for_coop(user.id)
             params = {
-                'userId': binding.bid,
+                'userId': get_uid_for_coop(user.id),
                 'realName': username,
                 'companyId': 9,
             }
             self.yiche_call_back(url, params)
 
     def purchase_call_back(self, user):
-        binding = Binding.objects.filter(user_id=user.id).first()
+        introduced_by = IntroducedBy.objects.filter(user_id=user.id).first()
         p2p_record = get_last_investment_for_coop(user.id)
-        if binding and p2p_record:
+        if introduced_by and p2p_record:
             url = self.call_back_url + '?method=AddPlatFormFinanceOrder'
             invest_time = p2p_record.create_time
             params = {
-                'userId': binding.bid,
+                'userId': get_uid_for_coop(user.id),
                 'orderNo': p2p_record.id,
                 'invest': str(p2p_record.amount),
                 'investTime': invest_time.strftime('%Y-%m-%d %H:%M:%S'),

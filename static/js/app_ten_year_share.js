@@ -1,8 +1,7 @@
-jQuery.noConflict();
-var org = jQuery(function() {
+(function() {
     //微信分享
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage', 'onMenuShareTimeline', 'onMenuShareQQ',];
-    $.ajax({
+    org.ajax({
         type: 'GET',
         url: '/weixin/api/jsapi_config/',
         dataType: 'json',
@@ -21,8 +20,7 @@ var org = jQuery(function() {
     });
     wx.ready(function () {
 
-        var host = 'https://www.wanglibao.com',
-
+        var host = 'https://staging.wanglibao.com',
             shareName = '我刚遇到十年前的自己，你也来试试把...',
             shareImg = host + '/static/imgs/mobile_activity/app_ten_year/weixin_img_300.jpg',
             shareLink = host + '/activity/app_ten_year/',

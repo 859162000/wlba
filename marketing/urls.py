@@ -95,6 +95,7 @@ urlpatterns += patterns(
     url(r'^app_ten_year/$', TemplateView.as_view(template_name="app_ten_year.jade")),
     url(r'^app_recommended/$', TemplateView.as_view(template_name="app_recommended.jade")),
     url(r'^app_iPhone_6S/$', TemplateView.as_view(template_name="app_iPhone_6S.jade")),
+    url(r'^app_gold_season/$', TemplateView.as_view(template_name="app_gold_season.jade")),
 )
 
 urlpatterns += patterns(

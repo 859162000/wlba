@@ -260,7 +260,7 @@ class WanglibaoActivityRewardAdmin(admin.ModelAdmin):
 
 class ChannelsNewAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ("id", "code", "name", "description")
+    list_display = ("id", "code", "name", "description", "coop_status")
     search_fields = ("name",)
     list_filter = ("name",)
 
