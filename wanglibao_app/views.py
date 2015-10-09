@@ -523,7 +523,6 @@ class AppPhoneBookAlertApiView(APIView):
 
 class AppInviteAllGoldAPIView(APIView):
     permission_classes = (IsAuthenticated, )
-
     def post(self, request, **kwargs):
         dic = account_backends.broker_invite_list(request.user)
         users = dic['users']
@@ -555,7 +554,7 @@ class AppInviteAllGoldAPIView(APIView):
             profile = phone_user.wanglibaouserprofile
             phone_book = UserPhoneBook.objects.filter(user=user, phone=profile.phone).first()
             if phone_book:
-                if not(phone_book.alert_at and phone_book.alert_at > local_to_utc(datetime.datetime.now(), 'min')):
+                if not(phone_book.alert_at and phone_book.alert_at > local_to_utc(datetime.now(), 'min')):
                     phone_book.is_used = True
                     phone_book.save()
                     return True
@@ -570,5 +569,5 @@ class AppInviteAllGoldAPIView(APIView):
                 phone_book.save()
                 return True
             return False
-        except:
+        except Exception, e:
             return False
