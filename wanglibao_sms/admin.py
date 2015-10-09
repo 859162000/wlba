@@ -26,7 +26,9 @@ class ShortMessageAdmin(admin.ModelAdmin):
     list_display = ('id', 'phones', 'contents', 'type', 'status', 'created_at', 'context')
     list_display_links = ('id',)
     readonly_fields = ('status', 'context')
-    search_fields = ('phones', 'contents')
+    # Modify by hb on 2015-10-09 : remove search for "contents"
+    #search_fields = ('phones', 'contents')
+    search_fields = ('=phones', )
 
     def has_delete_permission(self, request, obj=None):
         return False
