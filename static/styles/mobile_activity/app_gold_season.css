@@ -168,7 +168,7 @@ body .clear {
 }
 .goldSeason .order .box img {
 	padding-bottom: 7px;
-    width:100%;
+    width:95%;
 	margin: 0 auto;
 	display: block
 }
@@ -183,6 +183,7 @@ body .clear {
 }
 .goldSeason .order .box dl dd {
 	color: #666;
+    padding-top:12px;
 	font-size: 18px;
 	line-height: 18px
 }
@@ -193,4 +194,17 @@ body .clear {
 	padding-top: 108px;
 	height: 104px;
 	background: url(/static/imgs/mobile_activity/app_gold_season/orderArrow.png) no-repeat 0 bottom
+}
+.explain{
+    width:100%;
+}
+.explain .bg1{
+    width:100%;
+    display:block;
+}
+.explain .main{
+    width:100%;
+    background: url(/static/imgs/mobile_activity/app_gold_season/explain2.png);
+    display:inline-block;
+    background-size: 100% 100%;
 }
