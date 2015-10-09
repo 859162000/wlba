@@ -2,7 +2,7 @@ doctype html
 html
     head
         meta(name="format-detection" content="telephone=no,email=no")
-        title 遇到十年前的自己？
+        title 遇到十年前的自己
         meta(charset="utf-8")
         meta(content="telephone=no,email=no" ,name="format-detection")
         meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
@@ -83,17 +83,19 @@ html
                     img(src="/static/imgs/mobile_activity/app_ten_year/page6_fly.png").fly.p8fly_animate
                     img(src="/static/imgs/mobile_activity/app_ten_year/page8_text1.png").text1.p8text1
                     img(src="/static/imgs/mobile_activity/app_ten_year/page8_text2.png").text2.p8text2
-                    a.button.p8button(href="/weixin/regist/?next=/weixin/authentication/") 到网利宝领取
+                    a.button.p8button(href="/weixin/regist/?promo_token=h5chuanbo") 到网利宝领取
             img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").arrowDown
+
+
         script(src="/static/js/app_ten_year.js")
         //里面最后几行自带Loading
         script.
+
+            window.onload=function(){
+                $('#loadPage').hide(500);
+            }
+
             $(function () {
-                /*loading*/
-                window.onload=function(){
-                    $('#loadPage').hide(500);
-                }
-                /*loading结束*/
                 /*fullpage*/
                 var wrap = $('#wrap'), arrow = $('.arrowDown');
                 wrap.fullpage({
@@ -180,7 +182,6 @@ html
                 $(document).one('touchstart', function () {
                     mp3.play();
                 });
-
-
             })
-
+        script(src="/static/src/mobile/lib/weixin/wx.js")
+        script(src="/static/scripts/mobile_activity/dist/app_ten_year_share.js?v=20151009")

@@ -1,0 +1,179 @@
+- load formatters
+doctype html
+html(style="background:#fff")
+    head
+        meta(name="format-detection" content="telephone=no,email=no")
+        title 网利宝
+        meta(charset="utf-8")
+        meta(content="telephone=no,email=no" ,name="format-detection")
+        meta(content="yes" ,name="apple-mobile-web-app-capable")
+        link(href="/static/styles/mobile_activity/app_gold_season.css", rel="stylesheet")
+        body
+            .goldSeason
+                img.goldSeasonBanner(src='/static/imgs/mobile_activity/app_gold_season/banner.jpg')
+                .rankingList
+                    img(src='/static/imgs/mobile_activity/app_gold_season/rankingList1.png').bg1
+                    .wrap_list
+                        ul.table
+                            li.one 排行
+                            li.two 用户
+                            li.three 累计佣金
+                        .list
+                            ul.one
+                                li
+                                    span.one
+                                li
+                                    span.two
+                                li
+                                    span.three
+                                li
+                                    span.round 4
+                                li
+                                    span.round 5
+                                li
+                                    span.round 6
+                                li
+                                    span.round 7
+                                li
+                                    span.round 8
+                                li
+                                    span.round 9
+                                li
+                                    span.round 10
+                            ul.two
+                                - var item1 = ['','','','','','','','','','']
+                                each item in item1
+                                    li= item
+                            ul.three
+                                li.front 0 元
+                                li.front 0 元
+                                li.front 0 元
+                                - var item1 = ['0 元','0 元','0 元','0 元','0 元','0 元','0 元']
+                                each item in item1
+                                    li= item
+                    img(src='/static/imgs/mobile_activity/app_gold_season/rankingList3.png').bg3
+                img(src='/static/imgs/mobile_activity/app_gold_season/label1.png').label
+                .order
+                    .box.one
+                        img(src='/static/imgs/mobile_activity/app_gold_season/orderImg1.png')
+                        dl
+                            dt 下载网利宝APP
+                            dd
+                                img(src='/static/imgs/mobile_activity/app_gold_season/erweima.jpg')
+                    .arrow
+                    .box
+                        img(src='/static/imgs/mobile_activity/app_gold_season/orderImg2.png')
+                        dl
+                            dt 进入个人<br>账户页面
+                            dd "登录" -- "我的账户"
+                    .arrow
+                    .box
+                        img(src='/static/imgs/mobile_activity/app_gold_season/orderImg3.png')
+                        dl
+                            dt 分享专属链接
+                            dd 账户页面 -- "全民淘金" -- "马上邀请" 分享专属邀请链接给好友
+                    .arrow
+                    .box
+                        img(src='/static/imgs/mobile_activity/app_gold_season/orderImg4.png')
+                        dl
+                            dt 分享佣金
+                            dd 好友通过邀请链接注册并投资三个月(含三个月)以上的投资项目,即可坐享丰厚佣金
+                .explain
+                    img(src='/static/imgs/mobile_activity/app_gold_season/explain1.png').bg1
+                    .main
+                        dl
+                            dt 1、活动时间： 2015年6月23日-2016年6月30日
+            script(src="/static/js/lib/jquery.min.js")
+            script(src="/static/js/lib/jquery.animateNumber.min.js")
+            script.
+                $(function(){
+                    var is_animate = true;
+                    function fmoney(s, type) {
+                        if (/[^0-9\.]/.test(s))
+                            return "0";
+                        if (s == null || s == "")
+                            return "0";
+                        s = s.toString().replace(/^(\d*)$/, "$1.");
+                        s = (s + "00").replace(/(\d*\.\d\d)\d*/, "$1");
+                        s = s.replace(".", ",");
+                        var re = /(\d)(\d{3},)/;
+                        while (re.test(s))
+                            s = s.replace(re, "$1,$2");
+                        s = s.replace(/,(\d\d)$/, ".$1");
+                        if (type == 0) {// 不带小数位(默认是有小数位)
+                            var a = s.split(".");
+                            if (a[1] == "00") {
+                                s = a[0];
+                            }
+                        }
+                        return s;
+                    }
+                    function page_scroll(){
+                        if($(window).scrollTop()>=200&&is_animate){
+                            $('.num-animate').each(function(){
+                                var comma_separator_number_step = $.animateNumber.numberStepFactories.separator(',')
+                                var key = parseInt($(this).attr('data-num'));
+                                $(this).prop('number', 0).animateNumber({
+                                    number: key,
+                                    numberStep: comma_separator_number_step
+                                },1000);
+                                is_animate = false;
+                            })
+                        }
+                    }
+
+
+                    var windowHeight = $("body").height();
+                    var cheatseight = $(".cheats").height();
+                    var footerHeight = $(".cheats").height();
+                    var juli = windowHeight - cheatseight - footerHeight/2 - 76;
+                    function button_fix(){
+                        if($(window).scrollTop()>=juli){
+                            $('.fixBox').css({'position':'relative','background':'none'});
+                            $(".cheats").css('height','706');
+                        }else{
+                            $('.fixBox').css({'position':'fixed','background':'rgba(255,255,255,0.8)'});
+                            $(".cheats").css('height','782px');
+                        }
+                    }
+                    button_fix();
+                    $(window).scroll(function(){
+                        button_fix();
+                    });
+
+                    $.ajax({
+                        url: '/api/gettopofearings/',
+                        type: "POST"
+                    }).done(function (json) {
+                        var rankingList_phone = [];
+                        var rankingList_amount = [];
+                        var json_one;
+                        for(var i=0; i<json.records.length; i++){
+                            json_one = json.records[i];
+                            if(json_one!=''){
+                                var number = fmoney(json_one.amount, 0);
+                                if(i<=2){
+                                    rankingList_phone.push(['<li class="front">'+json_one.phone+'</li>'].join(''));
+                                    rankingList_amount.push(['<li class="front"><span class="num-animate" data-num="'+json_one.amount+'">0</span> 元</li>'].join(''));
+                                }else{
+                                    rankingList_phone.push(['<li>'+json_one.phone+'</li>'].join(''));
+                                    rankingList_amount.push(['<li><span class="num-animate" data-num="'+json_one.amount+'">0</span> 元</li>'].join(''));
+                                }
+
+                            }else{
+                                rankingList_phone.push(['<li>虚位以待</li>'].join(''));
+                                rankingList_amount.push(['<li>虚位以待</li>'].join(''));
+                            }
+
+                        }
+                        $('.rankingList ul.two').html(rankingList_phone.join(''));
+                        $('.rankingList ul.three').html(rankingList_amount.join(''));
+                        page_scroll();
+
+
+                        $(window).scroll(function(){
+                            page_scroll();
+                        });
+                    })
+
+                  })
