@@ -1,0 +1,20 @@
+- load formatters
+doctype html
+html(style="background:#fff")
+    head
+        meta(name="format-detection" content="telephone=no,email=no")
+        title 网利宝
+        meta(charset="utf-8")
+        meta(content="telephone=no,email=no" ,name="format-detection")
+        meta(content="yes" ,name="apple-mobile-web-app-capable")
+        link(href="/static/styles/mobile_activity/app_gold_season.css", rel="stylesheet")
+        body
+            .goldSeason
+                img.goldSeasonBanner(src='/static/imgs/mobile_activity/app_gold_season/banner.jpg')
+                .rankingList
+                    img.bg(src='/static/imgs/mobile_activity/gold_season/rankingListBg.png')
+                    ul.table
+                        li.one 排行
+                        li.two 用户
+                        li.three 累计佣金
+                    .list

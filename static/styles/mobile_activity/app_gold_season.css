@@ -1,0 +1,67 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	font-family: Microsoft YaHei;
+}
+
+input:focus,input:active,a {
+	outline: none;
+}
+
+a {
+	text-decoration: none;
+}
+body .clear {
+	clear: both
+}
+.goldSeason {
+	display: block
+}
+.goldSeason .goldSeasonBanner {
+	width: 100%;
+	display: block;
+}
+.goldSeason .rankingList {
+	width: 100%;
+	display: block;
+}
+.goldSeason .rankingList{
+    position:absolute;
+    left:0;
+    top:0;
+    z-index: -1;
+    width:100%;
+    display:block;
+}
+.goldSeason .rankingList .table {
+	width: 765px;
+	margin: 0 auto
+}
+.goldSeason .rankingList .table li {
+	float: left;
+	font-size: 22px;
+	color: #666;
+	height: 40px;
+	line-height: 40px;
+	text-align: center
+}
+body .goldSeason .rankingList .table li.one {
+	padding: 0 70px 0 110px;
+	width: 240px
+}
+body .goldSeason .rankingList .table li.two {
+	width: 258px
+}
+body .goldSeason .rankingList .table li.three {
+	width: 242px
+}
