@@ -51,9 +51,13 @@ org.canvas = (function(org){
                     $("#btn_go").on("click",function(){
                         down=true;                        Interface();
                         //evendrawImg();
-                        if(used_chances<=3){
+                        if(used_chances<3){
                             ss=idx-used_chances;
                             $portunity.html("您有"+ss+"次刮奖机会");
+                        }
+                        if(used_chances==3){
+                            $portunity.html("您的刮奖次数已用完");
+                            spans.innerHTML = "您的刮奖次数已用完";
                         }
                         $(this).hide().next().show();
                         cls=true;
