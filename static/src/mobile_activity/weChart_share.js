@@ -1,6 +1,6 @@
 
 
-weChatShare = (function(org){
+var weChatShare = (function(org){
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ',];
         org.ajax({
             type : 'GET',

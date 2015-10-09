@@ -219,7 +219,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 })();
 ;
 
-weChatShare = (function(org){
+var weChatShare = (function(org){
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ',];
         org.ajax({
             type : 'GET',
