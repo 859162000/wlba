@@ -778,13 +778,12 @@ class YiCheRegister(CoopRegister):
             kwargs={'url': url, 'params': params, 'channel': self.c_code})
 
     def register_call_back(self, user):
-        binding = Binding.objects.filter(user_id=user.id).first()
-        if binding:
+        introduced_by = IntroducedBy.objects.filter(user_id=user.id).first()
+        if introduced_by:
             url = self.call_back_url + '?method=AddPlatFormFinanceUser'
-            introduced_by = IntroducedBy.objects.filter(user_id=user.id).first()
             mobile = '******'.join(get_phone_for_coop(user.id).split('***'))
             params = {
-                'userId': binding.bid,
+                'userId': get_uid_for_coop(user.id),
                 'userName': mobile,
                 'mobile': mobile,
                 'companyId': 9,
@@ -794,25 +793,25 @@ class YiCheRegister(CoopRegister):
             self.yiche_call_back(url, params)
 
     def validate_call_back(self, user):
-        binding = Binding.objects.filter(user_id=user.id).first()
-        if binding:
+        introduced_by = IntroducedBy.objects.filter(user_id=user.id).first()
+        if introduced_by:
             url = self.call_back_url + '?method=UpdatePlatFormFinanceUser'
             username = get_username_for_coop(user.id)
             params = {
-                'userId': binding.bid,
+                'userId': get_uid_for_coop(user.id),
                 'realName': username,
                 'companyId': 9,
             }
             self.yiche_call_back(url, params)
 
     def purchase_call_back(self, user):
-        binding = Binding.objects.filter(user_id=user.id).first()
+        introduced_by = IntroducedBy.objects.filter(user_id=user.id).first()
         p2p_record = get_last_investment_for_coop(user.id)
-        if binding and p2p_record:
+        if introduced_by and p2p_record:
             url = self.call_back_url + '?method=AddPlatFormFinanceOrder'
             invest_time = p2p_record.create_time
             params = {
-                'userId': binding.bid,
+                'userId': get_uid_for_coop(user.id),
                 'orderNo': p2p_record.id,
                 'invest': str(p2p_record.amount),
                 'investTime': invest_time.strftime('%Y-%m-%d %H:%M:%S'),
