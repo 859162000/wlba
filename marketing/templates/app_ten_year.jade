@@ -2,22 +2,31 @@ doctype html
 html
     head
         meta(name="format-detection" content="telephone=no,email=no")
-        title 遇到十年前的自己？
+        title 遇到十年前的自己
         meta(charset="utf-8")
         meta(content="telephone=no,email=no" ,name="format-detection")
         meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
         meta(content="yes" ,name="apple-mobile-web-app-capable")
-        link(href="/static/styles/mobile_activity/app_ten_year.css?v=20151008", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_ten_year.css?v=201510083", rel="stylesheet")
     body
         .wp
             .loadPage#loadPage
                 .load-warp
                     .logo
-                    .process 0%
+                    .text
+                        span.letter L
+                        span.letter O
+                        span.letter A
+                        span.letter D
+                        span.letter I
+                        span.letter N
+                        span.letter G
+                        span.letter .
+                        span.letter .
+                        span.letter .
             .bg
                 img(src="/static/imgs/mobile_activity/app_ten_year/weixin_img_300.jpg").hide
                 img(src="/static/imgs/mobile_activity/app_ten_year/shadow_bottom.png").shadow
-                img(src="/static/imgs/mobile_activity/app_ten_year/mask.png").mask
                 img(src="/static/imgs/mobile_activity/app_ten_year/meteor1.png").meteor.meteor1
                 img(src="/static/imgs/mobile_activity/app_ten_year/meteor1.png").meteor.meteor2
                 img(src="/static/imgs/mobile_activity/app_ten_year/meteor1.png").meteor.meteor3
@@ -76,62 +85,17 @@ html
                     img(src="/static/imgs/mobile_activity/app_ten_year/page8_text2.png").text2.p8text2
                     a.button.p8button(href="/weixin/regist/?next=/weixin/authentication/") 到网利宝领取
             img(src="/static/imgs/mobile_activity/app_ten_year/slideDown.png").arrowDown
-        script(src="/static/scripts/mobile_activity/dist/fullpage.js")
+
+
+        script(src="/static/js/app_ten_year.js")
         //里面最后几行自带Loading
         script.
-            $(function () {
 
-                /*loading*/
-                var loading = $('#loadPage');
-                var queue = new createjs.LoadQueue();
-                queue.on('progress', function () {
-                    var num = Math.floor(queue.progress * 100);
-                    $('.process').text(num + '%');
-                }, this);
-                queue.on('complete', function () {
-                    loading.remove();
-                }, this);
-                queue.loadManifest([
-                    {id: 'image1', src: '/static/imgs/mobile_activity/app_ten_year/bg.jpg'},
-                    {id: 'image2', src: '/static/imgs/mobile_activity/app_ten_year/big_theme.png'},
-                    {id: 'image3', src: '/static/imgs/mobile_activity/app_ten_year/mask.png'},
-                    {id: 'image4', src: '/static/imgs/mobile_activity/app_ten_year/meteor1.png'},
-                    {id: 'image5', src: '/static/imgs/mobile_activity/app_ten_year/meteor2.png'},
-                    {id: 'image6', src: '/static/imgs/mobile_activity/app_ten_year/music.png'},
-                    {id: 'image7', src: '/static/imgs/mobile_activity/app_ten_year/page1_text1.png'},
-                    {id: 'image8', src: '/static/imgs/mobile_activity/app_ten_year/page1_text2.png'},
-                    {id: 'image9', src: '/static/imgs/mobile_activity/app_ten_year/page2_img1.png'},
-                    {id: 'image10', src: '/static/imgs/mobile_activity/app_ten_year/page2_img2.png'},
-                    {id: 'image11', src: '/static/imgs/mobile_activity/app_ten_year/page2_shadow.png'},
-                    {id: 'image12', src: '/static/imgs/mobile_activity/app_ten_year/page2_text.png'},
-                    {id: 'image13', src: '/static/imgs/mobile_activity/app_ten_year/page3_boy.png'},
-                    {id: 'image14', src: '/static/imgs/mobile_activity/app_ten_year/page3_line.png'},
-                    {id: 'image15', src: '/static/imgs/mobile_activity/app_ten_year/page3_man.png'},
-                    {id: 'image16', src: '/static/imgs/mobile_activity/app_ten_year/page3_talk.png'},
-                    {id: 'image17', src: '/static/imgs/mobile_activity/app_ten_year/page4_line.png'},
-                    {id: 'image18', src: '/static/imgs/mobile_activity/app_ten_year/page4_man1.png'},
-                    {id: 'image19', src: '/static/imgs/mobile_activity/app_ten_year/page4_man2.png'},
-                    {id: 'image20', src: '/static/imgs/mobile_activity/app_ten_year/page4_math.png'},
-                    {id: 'image21', src: '/static/imgs/mobile_activity/app_ten_year/page4_talk.png'},
-                    {id: 'image22', src: '/static/imgs/mobile_activity/app_ten_year/page5_bamboo.png'},
-                    {id: 'image23', src: '/static/imgs/mobile_activity/app_ten_year/page5_line.png'},
-                    {id: 'image24', src: '/static/imgs/mobile_activity/app_ten_year/page5_talk.png'},
-                    {id: 'image25', src: '/static/imgs/mobile_activity/app_ten_year/page5_woman1.png'},
-                    {id: 'image26', src: '/static/imgs/mobile_activity/app_ten_year/page5_woman2.png'},
-                    {id: 'image27', src: '/static/imgs/mobile_activity/app_ten_year/page6_fly.png'},
-                    {id: 'image28', src: '/static/imgs/mobile_activity/app_ten_year/page6_img1.png'},
-                    {id: 'image29', src: '/static/imgs/mobile_activity/app_ten_year/page6_img2.png'},
-                    {id: 'image30', src: '/static/imgs/mobile_activity/app_ten_year/page6_text.png'},
-                    {id: 'image31', src: '/static/imgs/mobile_activity/app_ten_year/page7_img.png'},
-                    {id: 'image32', src: '/static/imgs/mobile_activity/app_ten_year/page8_text1.png'},
-                    {id: 'image33', src: '/static/imgs/mobile_activity/app_ten_year/page8_text2.png'},
-                    {id: 'image34', src: '/static/imgs/mobile_activity/app_ten_year/shadow_bottom.png'},
-                    {id: 'image35', src: '/static/imgs/mobile_activity/app_ten_year/slideDown.png'},
-                    {id: 'image36', src: '/static/imgs/mobile_activity/app_ten_year/small_theme.png'},
-                    {id: 'image37', src: '/static/imgs/mobile_activity/app_ten_year/ten_year.mp3'},
-                    {id: 'image38', src: '/static/imgs/mobile_activity/app_ten_year/logo.png'}
-                ]);
-                /*loading结束*/
+            window.onload=function(){
+                $('#loadPage').hide(500);
+            }
+
+            $(function () {
                 /*fullpage*/
                 var wrap = $('#wrap'), arrow = $('.arrowDown');
                 wrap.fullpage({
@@ -186,7 +150,7 @@ html
                     }
                 }
 
-                $('.button').on('click', function (e) {
+                $('.page6 .button').on('click', function (e) {
 
                     say = $('input').val();
                     if (say == '') {
@@ -218,98 +182,6 @@ html
                 $(document).one('touchstart', function () {
                     mp3.play();
                 });
-
-                /*解决iphone一开始没音乐问题*/
-                var g_audio = window.g_audio = new Audio();  //创建一个audio播放器
-                var g_event = window.g_event =new function(){
-                    var events = ['load','abort','canplay','canplaythrough',
-                    'durationchange','emptied','ended','error',
-                    'loadeddata','loadedmetadata','loadstart',
-                    'pause','play','playing','progress',
-                    'ratechange','seeked','seeking','stalled',
-                    'suspend','timeupdate','volumechange','waiting', 'mediachange'];
-                    g_audio.loop = true;
-                    g_audio.autoplay = true;
-                    g_audio.isLoadedmetadata = false;
-                    g_audio.touchstart = true;
-                    g_audio.audio = true;
-                    g_audio.elems = {};
-                    g_audio.isSupportAudio = function(type){
-                    type=type||'audio/mpeg';
-                    try{
-                        var r=g_audio.canPlayType(type);
-                        return g_audio.canPlayType&&(r=='maybe'||r=='probably')
-                    }catch(e){return false;}
-                    };
-                    g_audio.push = function(meta){
-                    g_audio.previousId = g_audio.id;
-                    g_audio.id = meta.song_id;
-                    g_audio.previousSrc = g_audio.src;
-                    g_audio.previousTime = 0.00;
-                    g_audio.src = g_audio.currentSrc = meta.song_fileUrl;
-                    g_audio.isLoadedmetadata = false;
-                    g_audio.autobuffer = true;
-                    g_audio.load();
-                    g_audio.play();
-                    if(g_audio.previousSrc !== g_audio.src){
-                        g_audio.play();
-                    }
-                    };
-                    for(var i = 0, l = events.length; i < l; i++){
-                        (function(e){
-                            var fs = [];
-                            this[e] = function(fn){
-                                if(typeof fn!=='function'){
-                                    for (var k = 0; k<fs.length; k++){
-                                        fs[k].apply(g_audio);
-                                    }
-                                    return ;
-                                }
-                    fs.push(fn);
-                    g_audio.addEventListener(e, function(){
-                    fn.apply(this);
-                    });
-                    };
-                    }).apply(this, [events[i]]);
-                    }
-                    this.ended(function(){  //播放结束
-                    });
-                    this.load(function(){  //加载
-                    this.pause();
-                    this.play();
-                    });
-                    this.loadeddata(function(){
-                    this.pause();
-                    this.play();
-                    });
-                    this.loadedmetadata(function(){
-                    this.isLoadedmetadata = true;
-                    });
-                    this.error(function(){   //请求资源时遇到错误
-                    });
-                    this.pause(function(){  //歌曲暂停播放
-                    });
-                    this.play(function(){  //歌曲播放
-                    });
-                };
-
-
-                    if(/i(Phone|P(o|a)d)/.test(navigator.userAgent)){
-                    $(document).one('touchstart', function (e) {
-                    g_audio.touchstart = true;
-                    g_audio.play();
-                    g_audio.pause();
-                    return false;
-                    });
-                    }
-
-                //audio使用:
-                $('#music').unbind('click').bind('click',function(){
-                //gid 表示歌曲id,只是一个表示，没有值不影响播放
-                //song_fileUrl :播放歌曲地址，不能为空，有效地址
-                g_audio.elems["id"] = gid;
-                g_audio.push({song_id:gid,song_fileUrl:"/static/imgs/mobile_activity/app_ten_year/ten_year.mp3"});
-                });//绑定事件
-                /*解决iphone一开始没音乐问题结束*/
             })
-
+        script(src="/static/src/mobile/lib/weixin/wx.js")
+        script(src="/static/scripts/mobile_activity/app_ten_year_share.js?v=2015100903")
