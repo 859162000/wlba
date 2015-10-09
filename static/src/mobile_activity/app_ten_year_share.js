@@ -22,10 +22,10 @@
     wx.ready(function(){
 
         var host = 'https://www.wanglibao.com',
-            shareName = '我刚遇到十年前的自己，你也来试试把...',
+            shareName = '遇到十年前的自己',
             shareImg = host + '/static/imgs/mobile_activity/app_ten_year/weixin_img_300.jpg',
             shareLink = host + '/activity/app_ten_year/',
-            shareMainTit = '我刚遇到十年前的自己，你也来试试把...',
+            shareMainTit = '遇到十年前的自己',
             shareBody = '我刚遇到十年前的自己，你也来试试把...'
         //分享给微信好友
         org.onMenuShareAppMessage({
