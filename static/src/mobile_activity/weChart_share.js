@@ -1,10 +1,10 @@
 
 
-weCHatShare = (function(org){
+weChatShare = (function(org){
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ',];
         org.ajax({
             type : 'GET',
-            url : lib.weiURL,
+            url : '/weixin/api/jsapi_config/',
             dataType : 'json',
             success : function(data) {
                 //请求成功，通过config注入配置信息,
@@ -20,10 +20,10 @@ weCHatShare = (function(org){
         });
         wx.ready(function(){
             var host = 'https://staging.wanglibao.com',
-                shareImg = host + '/static/imgs/mobile/share_logo.png',
-                shareLink = host + '/weixin/detail/'+$productName.attr('data-productID'),
-                shareMainTit = '来我的加息福袋抽取加息券吧，抢最高加息券！',
-                shareBody = "投标成功即可拥有自己的专属加息福袋，好友通过加息福袋可抽取加息券，数量有限，快来试下手气吧。";
+                shareImg = '/static/imgs/mobile/share_logo.png',
+                shareLink = $('input[name=url]').val(),
+                shareMainTit = $('input[name=title]').val(),
+                shareBody = $('input[name=content]').val();
             //分享给微信好友
             org.onMenuShareAppMessage({
                 title: shareMainTit,
