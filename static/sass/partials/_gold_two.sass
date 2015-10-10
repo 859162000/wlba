@@ -1,0 +1,297 @@
+@charset "utf-8"
+
+$yellow: #ffe400
+$brown: #6a2b00
+$blue: #404980
+
+@mixin icon1
+  background: url("/static/imgs/pc_activity/gold_two/gold-icon1.png") no-repeat
+@mixin icon2
+  background: url("/static/imgs/pc_activity/gold_two/circle-icon.png") no-repeat
+  display: inline-block
+  width: 116px
+  height: 116px
+  position: absolute
+  top: -70px
+  left: 50%
+  margin-left: -58px
+@mixin icon3
+  background: url("/static/imgs/pc_activity/gold_two/r-icon.png") no-repeat
+  display: inline-block
+  width: 251px
+  height: 133px
+
+@mixin text-center
+  text-align: center
+
+@mixin shadow-tit
+  color: $blue
+  text-shadow: 0px 1px 0px #fff
+
+@mixin btn
+  width: 430px
+  height: 50px
+  line-height: 50px
+  display: inline-block
+  font-size: 30px
+
+.gold-wrap
+  width: 982px
+  margin: 0 auto
+.left
+  float: left
+.right
+  float: right
+.relative
+  position: relative
+.mr60px
+  margin-right: 60px
+
+.banner
+  background: url("/static/imgs/pc_activity/gold_two/banner.jpg") center center no-repeat
+  width: 100%
+  height: 612px
+
+.nav-tit
+  width: 100%
+  background: url("/static/imgs/pc_activity/gold_two/redLine-bg.png") left top repeat-x
+  height: 168px
+  .gold-wrap
+    padding-top: 32px
+    font-size: 28px
+    color: #fff
+    position: relative
+    .lft-icon
+      width: 104px
+      height: 104px
+      +icon1
+      background-position: 0 0
+      margin-left: 55px
+    .rht-icon
+      display: inline-block
+      width: 14px
+      height: 14px
+      margin-left: 15px
+      vertical-align: top
+      +icon1
+      background-position: -124px 0
+    .text
+      margin-left: 30px
+      line-height: 40px
+      padding-top: 10px
+    .text-big
+      font-size: 34px
+      color: $yellow
+
+.gold-main
+  padding: 60px 0
+  .prompt-tit
+    +text-center
+    color: $brown
+    line-height: 35px
+  .prompt-tit-b
+    font-size: 34px
+  .prompt-tit-l
+    font-size: 20px
+  .main-quan
+    background: #f0c333
+    border-radius: 10px
+    padding: 20px 0
+    margin-top: 30px
+    .tit
+      +shadow-tit
+      font-size: 18px
+      +text-center
+      padding-bottom: 20px
+      .big
+        font-size: 24px
+    .quan-prompt
+      width: 620px
+      margin: 0 auto
+    .quan-box
+      +icon1
+      background-position: 0 -124px
+      width: 246px
+      height: 125px
+      line-height: 120px
+      font-size: 26px
+      color: #fff
+      +text-center
+      .yellow
+        color: $yellow
+        margin-right: 10px
+      .big
+        font-size: 48px
+    .quan-tit
+      +text-center
+      font-size: 16px
+      line-height: 30px
+      color: $brown
+
+.gold-info
+  border: 1px dotted #4f547b
+  border-radius: 10px
+  padding: 20px 140px
+  .info-tit
+    +shadow-tit
+    +text-center
+    font-size: 34px
+    .big
+      font-size: 60px
+  .btn-box
+    +text-center
+    .btn
+      +btn
+      background: #fb6d0d
+      color: #fff
+      border-radius: 5px
+      box-shadow: 0 -2px 0 #fc9624,0 2px 0 #e75e02
+      &:hover
+        box-shadow: none
+        background: #fb5b0d
+  .info-prompt
+    +text-center
+    color: $brown
+    font-size: 16px
+    margin-top: 10px
+    line-height: 30px
+  .click-prompt
+    +text-center
+    margin-top: 0
+    a
+      color: $brown
+      text-decoration: underline
+  .info-box
+    list-style: decimal outside
+    color: $brown
+    font-size: 14px
+    line-height: 28px
+    li
+      list-style: decimal outside
+.gold-what
+  background: #61238f
+  width: 100%
+  padding: 60px 0
+  margin-top: 60px
+  .gold-wrap
+    width: 1072px
+  .what-tit
+    +text-center
+    font-size: 34px
+    font-weight: bold
+    color: #fff
+  .gold-what-ul
+    margin-top: 20px
+    li
+      +text-center
+      margin-top: 70px
+      width: 300px
+      height: 176px
+      background: #fff
+      border-radius: 10px
+      line-height: 35px
+      float: left
+      margin-left: 45px
+      .big
+        font-size: 30px
+        color: #ce4942
+        padding-top: 55px
+      .litter
+        color: #404980
+        font-size: 22px
+      &.what-info1
+        .what-icon
+          +icon2
+          background-position: 0 0
+      &.what-info2
+        .what-icon
+          +icon2
+          background-position: -146px 0
+      &.what-info3
+        .what-icon
+          +icon2
+          background-position: -292px 0
+  .handle-box
+    width: 982px
+    margin: 30px auto
+    border: 1px dotted #f3eff7
+    border-radius: 10px
+    +text-center
+    .prompt
+      color: #fff
+      font-size: 34px
+      margin-top: 30px
+      .big
+        font-size: 60px
+    .btn-box
+      +text-center
+      margin: 10px 0 30px
+      .btn
+        +btn
+        background: #fed03b
+        color: $brown
+        border-radius: 5px
+        box-shadow: 0 -2px 0 #fee069,0 2px 0 #dbaf21
+        &:hover
+          box-shadow: none
+          background: #fed03b
+.gold-reasion
+  background: #fb6d0d
+  .gold-wrap
+    width: 1100px
+    padding: 60px 0
+    .reasion-tit
+      +text-center
+      font-size: 34px
+      color: #fff
+    .reasion-tit-l
+      +text-center
+      font-size: 20px
+      color: $brown
+    .gold-reasion-ul
+      margin-top: 30px
+      .item
+        +text-center
+        float: left
+        width: 33.33%
+        color: #fff
+        .img-icon
+          +icon3
+        .img-box
+          +text-center
+        &.reasion1
+          .img-icon
+            background-position: 0 0
+        &.reasion2
+          .img-icon
+            background-position: 0 -153px
+        &.reasion3
+          .img-icon
+            background-position: 0 -286px
+        .big
+          font-size: 18px
+        .litter
+          font-size: 16px
+.gold-rule-box
+  padding: 50px 0 60px
+  color: $brown
+  line-height: 30px
+  .tit
+    font-size: 16px
+  ul
+    font-size: 14px
+    list-style: decimal outside
+    margin-left: 25px
+.gold-footer
+  background: #333
+  width: 100%
+  height: 260px
+  .gold-wrap
+    width: 1100px
+    img
+      position: absolute
+      top: -28px
+
+
+
+
