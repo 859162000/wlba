@@ -45,6 +45,7 @@ urlpatterns = patterns(
     url(r'^new_user/$', TemplateView.as_view(template_name="new_user.jade")),
     url(r'^recommended/$', TemplateView.as_view(template_name="recommended.jade")),
     url(r'^national/$', TemplateView.as_view(template_name="national.jade")),
+    url(r'^gold_two/$', TemplateView.as_view(template_name="gold_two.jade")),
 
 )
 
@@ -96,6 +97,8 @@ urlpatterns += patterns(
     url(r'^app_recommended/$', TemplateView.as_view(template_name="app_recommended.jade")),
     url(r'^app_iPhone_6S/$', TemplateView.as_view(template_name="app_iPhone_6S.jade")),
     url(r'^app_gold_season/$', TemplateView.as_view(template_name="app_gold_season.jade")),
+    url(r'^wx_gold_two/$', TemplateView.as_view(template_name="h5_gold_two.jade")),
+    url(r'^app_gold_two/$', TemplateView.as_view(template_name="app_gold_two.jade")),
 )
 
 urlpatterns += patterns(
