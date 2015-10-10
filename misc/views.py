@@ -88,7 +88,7 @@ class MiscRecommendProduction(object):
             return id_rate[0]['id']
 
         else:
-            product = P2PProduct.objects.filter(hide=False).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time').first()
+            product = P2PProduct.objects.filter(hide=False, status=u'满标待打款').exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-soldout_time').first()
             return product.id
 
     def get_recommend_product_except_new(self, ids=None):
