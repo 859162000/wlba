@@ -56,7 +56,8 @@ head
                   .span8
                     textarea#content(name='content', placeholder='站内信内容', style="width:500px;height:100px")
                     if flag == 'different_batch'
-                      span(style="color:red") 站内信内容中用"&nreward}}"代替要替换的兑换码
+                      reward = '{{code}}'
+                      span(style="color:red") 站内信内容中用"{{reward}}"代替要替换的兑换码
                 .span6(style="margin-top:20px")
                   .span3(style="line-height:40px")
                     label 站内信类型
