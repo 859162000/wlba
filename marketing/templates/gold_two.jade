@@ -1,0 +1,113 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝官网' as title
+    include include/common_head
+    - endwith
+    link(rel="stylesheet",href="/static/styles/pc/pc.css")
+    link(rel="stylesheet",href="/static/stylesheets/gold_two.css")
+  body(style="background:#fed03b")
+    include global/g_nav
+    .banner.pc-banner#banner
+    .nav-tit
+      .gold-wrap.clearfix
+        .lft-icon.left
+        .text.left
+          p.text-big
+            | 网利宝隆重推出重磅豪标！
+            i.rht-icon
+          p 10月黄金节，专属黄金宝！黄金实物抵押额=投资额x134%
+
+    .gold-wrap.gold-main
+      .prompt-tit-b.prompt-tit 黄金节专享，霸道加息劵来袭
+      .prompt-tit-l.prompt-tit 黄金节第一季意犹未尽？第二季活动重磅来袭！更加安全，更多加息，霸道更厚道！
+      .main-quan
+        .tit
+          | 投资即
+          | <span class="big"> 送2张 </span>
+          | 高额加息券，双重礼遇high翻全场！
+        .clearfix.quan-prompt
+          .quan1.left
+            .quan-box
+              | <span class="yellow"><span class="big">1</span>%</span>
+              | 加息券
+            .quan-tit 投资5000元起用
+          .quan2.right
+            .quan-box
+              | <span class="yellow"><span class="big">2</span>%</span>
+              | 加息券
+            .quan-tit 投资10000元起用
+    .gold-wrap.gold-info
+      .info-tit
+        | 投一次
+        | <span class="big"> 送2张 </span>
+      .btn-box
+        a.btn(href="/p2p/list/") 立即投标领券
+      .info-prompt 注：新老用户均可参与，投资无门槛，单标投资额无上限，一券一标永久加息！
+      .click-prompt.info-prompt
+        a(href="javascript:void(0);")#click-prompt 加息券规则 >>
+      ul.info-box#click-info(style="display:none")
+        li 加息券有效期：1%加息券自领取日起5天内有效，2%加息券自领取日起10天内有效；
+        li 加息券不限平台均可使用，单笔投资不限门槛（100元起投）立送1%和2%加息券各一张，二次投资时可用；
+        li 加息券仅限投黄金宝专享使用（不可在非黄金宝使用），投标时选择加息券才会进行加息，没有选择则无法加息。<br />请在购买时勾选相应的加息券，才能获得相应的加息；
+        li 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+        li 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+        li 使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+    .gold-what
+      .gold-wrap
+        .what-tit 黄金节是什么?
+        ul.clearfix.gold-what-ul
+          li.what-info1.relative
+            i.what-icon
+            p.big 中国人民财产保险<br />全额承保
+            p.litter 银行金库黄金实物抵押
+          li.what-info2.relative
+            i.what-icon
+            p.big 专享1-3月标
+            p.litter 期限适中，投期灵活
+          li.what-info3.relative
+            i.what-icon
+            p.big 高额加息券
+            p.litter 投资直送，高额加息
+        .handle-box
+          p.prompt
+            | <span class="mr60px">限时<span class="big">10天</span></span>
+            | <span class="mr60px">限量<span class="big">1亿</span></span>
+            | <span>10月<span class="big">专享</span></span>
+          p.btn-box
+            a.btn(href="/p2p/list/") 立即投标领券
+    .gold-reasion
+      .gold-wrap
+        .reasion-tit 10月，投资首选黄金宝！
+        .reasion-tit-l 10月黄金节隆重推出第二季，更多惊喜，双重礼遇，你不可错过的投资盛宴！
+        ul.clearfix.gold-reasion-ul
+          li.item.reasion1
+            p.img-box
+              i.img-icon
+            p.big 首选理由一：实物黄金抵押
+            p.litter 价值1.3亿黄金实物抵押，担保无忧。
+          li.item.reasion2
+            p.img-box
+              i.img-icon
+            p.big 首选理由二：权威机构全额承保
+            p.litter 人保全额承保，投资0风险，承保更靠谱。
+          li.item.reasion3
+            p.img-box
+              i.img-icon
+            p.big 首选理由三：黄金节高额加息HIGH不停
+            p.litter 专项加息，高额补贴，多投多得！
+    .gold-rule-box.gold-wrap
+      p.tit 【活动规则】
+      ul
+        li 活动时间：2015年10月11日-10月21日；
+        li 黄金节的主打产品为黄金宝标，用户可以通过手机端、电脑端参与活动投标；
+        li 黄金贷所有标期为1~3个月，单笔任意投资（100元起投）即送2张加息券，二次投资时可用，加息券限黄金标使用，限量1亿元标量，先抢先得，抢完为止；
+        li 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+        li 网利宝对此活动享有最终解释权。
+    .gold-footer
+      .gold-wrap.relative
+        img(src="/static/imgs/pc_activity/gold_two/footer.png")
+    script.
+      require(['/static/js/gold_two.js'])
