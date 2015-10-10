@@ -1406,21 +1406,51 @@ class AdminIdVerificationView(TemplateView):
 class AdminSendMessageView(TemplateView):
     template_name = "admin_send_message.jade"
 
+    def get_context_data(self, **kwargs):
+        flag = self.request.GET.get('flag', '')
+
+        return {
+            'flag': flag
+        }
+
     def post(self, request):
         phones = request.POST.get("phones", "")
         title = request.POST.get("title", "")
         content = request.POST.get("content", "")
         mtype = request.POST.get("mtype", "activity")
+        exchange_codes = request.POST.get("exchange_codes", "")
+        flag = request.POST.get('flag', '')
         if not phones or not title or not content or not mtype:
             return self.render_to_response(
                 {
-                    "message": "信息输入不完整"
+                    "message": u"信息输入不完整"
+                }
+            )
+        if flag and flag != 'different_batch':
+            return self.render_to_response(
+                {
+                    "message": u"参数不正确"
+                }
+            )
+        if flag and not exchange_codes:
+            return self.render_to_response(
+                {
+                    "message": u"兑换码信息输入不完整"
                 }
             )
         phone_list = phones.split('\r\n')
         phone_list = [phone for phone in phone_list if phone.strip() != ""]
+        codes_list = exchange_codes.split('\r\n')
+        codes_list = [code for code in codes_list if code.strip() != ""]
+        if flag and len(phone_list) != len(codes_list):
+            return self.render_to_response(
+                {
+                    "message": u"手机号码和兑换码的数量不一致"
+                }
+            )
         send_result = []
-        for phone in phone_list:
+        code = ''
+        for index, phone in enumerate(phone_list):
             user = User.objects.filter(wanglibaouserprofile__phone=phone).first()
             if not user:
                 result = {
@@ -1429,6 +1459,15 @@ class AdminSendMessageView(TemplateView):
                 }
                 send_result.append(result)
                 continue
+
+            if flag == 'different_batch':
+                from django.template import Template, Context
+                code = codes_list[index]
+                context = Context({
+                    'code': code
+                })
+                tmp_template = Template(content)
+                content = tmp_template.render(context)
 
             try:
                 inside_message.send_one.apply_async(kwargs={
@@ -1439,7 +1478,7 @@ class AdminSendMessageView(TemplateView):
                 })
 
                 result = {
-                    'phone': phone,
+                    'phone': "{}, {}".format(phone, code),
                     'status': 'success'
                 }
             except False:
@@ -1453,7 +1492,8 @@ class AdminSendMessageView(TemplateView):
         return self.render_to_response(
             {
                 "message": u"发送结果如下:",
-                "send_result": send_result
+                "send_result": send_result,
+                'flag': flag
             }
         )
 

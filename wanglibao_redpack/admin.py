@@ -23,6 +23,9 @@ class RedPackEventAdmin(admin.ModelAdmin):
         return obj.amount
     red_amount.short_description = u"优惠券金额"
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class RedPackResource(resources.ModelResource):
 
