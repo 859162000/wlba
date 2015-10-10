@@ -308,9 +308,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                          }
                     }
                 }
-                function timers(){
-                    ctx.drawImage(img,0,0,w,h);
-                }
                 canvas.width=w;
                 canvas.height=h;
                 ctx=canvas.getContext('2d');
@@ -340,11 +337,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 clearInterval(timer);
                 text=spans.innerHTML;
                 ss=idx-used_chances;
-                if(cls){
-                    timer=setInterval(function(){
-                        timers();
-                    },2000);
-                }
                 if(amount != 'None' && amount_left != 0 && clicks==1 || gift_left!=0 && gift!="None"&& clicks==1) $("#continue").html("领奖");
                 if(used_chances<3){
                     $portunity.html("您有"+ss+"次刮奖机会");
