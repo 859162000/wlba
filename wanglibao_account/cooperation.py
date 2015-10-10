@@ -435,6 +435,14 @@ class CoopRegister(object):
         except:
             logger.exception('channel bind purchase process error for user %s'%(user.id))
 
+    def process_for_recharge(self, user):
+        try:
+            channel_processor = self.get_user_channel_processor(user)
+            if channel_processor:
+                channel_processor.recharge_call_back(user)
+        except:
+            logger.exception('channel recharge process error for user %s'%(user.id))
+
 
 class TianMangRegister(CoopRegister):
     def __init__(self, request):
@@ -1025,9 +1033,8 @@ class XunleiVipRegister(CoopRegister):
 
     def generate_sign(self, data, key):
         sorted_data = sorted(data.iteritems(), key=lambda asd:asd[0], reverse=False)
-        sorted_data_str = '&'.join([key.lower()+'='+str(value) for key, value in sorted_data if value])
-        encode_data_str = urlencode(sorted_data_str)
-        sign = hashlib.md5(encode_data_str+str(key)).hexdigest()
+        join_data = '&'.join([key+'='+str(value) for key, value in sorted_data if value])
+        sign = hashlib.md5(join_data+str(key)).hexdigest()
         return sign
 
     def xunlei_call_back(self, user, tid, data, url):
@@ -1054,7 +1061,7 @@ class XunleiVipRegister(CoopRegister):
             data = {
                 'coop': 'wanglibao',
                 'xluserid': binding.bid,
-                'regtime': time.mktime(timezone.localtime(user.date_joined))
+                'regtime': int(time.mktime(user.date_joined.date().timetuple()))
             }
             sign = self.generate_sign(data, self.coop_register_key)
             params = dict({'sign': sign}, **data)
@@ -1086,7 +1093,7 @@ class XunleiVipRegister(CoopRegister):
             pay_amount = int(p2p_record.first().amount)
             if pay_amount >= 100:
                 data = {
-                    'send_type': 0,
+                    'send_type': '0',
                     'num1': 12,
                     'act': 5170
                 }
@@ -1097,7 +1104,8 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
-                          ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister]
+                          ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
+                          XunleiVipRegister]
 
 
 #######################第三方用户查询#####################
