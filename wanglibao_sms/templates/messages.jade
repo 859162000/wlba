@@ -1,0 +1,21 @@
+- load formatters
+doctype html
+head
+  - with '短信模板编辑' as title
+  include include/common_head
+  - endwith
+  body
+    .panel
+      .well
+        .panel-title-bar__no-border
+          .panel-title 短信模板编辑
+        .space-vertical-s
+        .panel-content.padding-l-r-sm
+          .space-vertical-l
+          a(href='/{{ "" | admin_address}}')
+            button.button-home-action(type='submit') 返回
+          .space-vertical-l
+          .space-vertical-l
+          if messages
+            for message in messages
+              h3(style="text-align: center; color: red;") {{ message.id }}
