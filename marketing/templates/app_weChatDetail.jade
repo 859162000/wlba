@@ -30,19 +30,20 @@ block content
     .webchar-list-head
       span 看朋友们手气如何
     .webchar-list-item
-      for gift in all_gift
-        dl
-          dt.item-start
-            img(src='{{gift.img}}')
-          dd.item-cont
-            .friend-warp
-              span.fried-name {{gift.name}}&nbsp
-              span.take-time {{gift.time}}
-            .friend-taking {{gift.message}}
+      if all_gift
+        for gift in all_gift
+          dl
+            dt.item-start
+              img(src='{{gift.img}}')
+            dd.item-cont
+              .friend-warp
+                span.fried-name {{gift.name}}&nbsp
+                span.take-time {{gift.time}}
+              .friend-taking {{gift.message}}
 
-          dd.item-right
-            em#amount.friend-list {{gift.amount}}%
-            span.jiaxi-text 加息券
+            dd.item-right
+              em#amount.friend-list {{gift.amount}}%
+              span.jiaxi-text 加息券
   .webchar-deatil-footer
     img(src='/static/imgs/mobile_activity/app_wechat/detail_footer.png')
   script(src="/static/src/mobile/lib/weixin/wx.js")

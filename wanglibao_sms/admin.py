@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from daterange_filter.filter import DateRangeFilter
 from django.contrib import admin
-from wanglibao_sms.models import PhoneValidateCode, ShortMessage, ArrivedRate, MessageInRedis
+from wanglibao_sms.models import PhoneValidateCode, ShortMessage, ArrivedRate, MessageInRedis, MessageTemplate
 
 
 class PhoneValidateCodeAdmin(admin.ModelAdmin):
@@ -64,31 +64,26 @@ class ArrivedRateAdmin(admin.ModelAdmin):
         return self.list_display + ('channel',)
 
 
-# class MessageInRedisAdmin(admin.ModelAdmin):
-#     actions = None
-#     list_display = ('id', 'message_for', 'title', 'content')
-#     list_display_links = ('id', 'message_for',)
-#     readonly_fields = ('message_for',)
-#     search_fields = ('message_for', 'title', 'content')
-#     list_filter = (
-#         'message_for',
-#         'title',
-#         'content',
-#     )
-#
-#     def has_delete_permission(self, request, obj=None):
-#         return False
-#
-#     def has_add_permission(self, request):
-#         return False
-#
-#     def has_update_permission(self, request):
-#         return True
-#
-#     def get_readonly_fields(self, request, obj=None):
-#         return self.list_display + ('channel',)
+class MessageTemplateAdmin(admin.ModelAdmin):
+    actions = None
+    list_display = ('id', 'message_for', 'title', 'content')
+    list_display_links = ('id', 'message_for',)
+    readonly_fields = ('message_for',)
+    search_fields = ('message_for', 'title', 'content')
+    list_filter = (
+        'message_for',
+        'title',
+        'content',
+    )
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
+        return False
 
 
 admin.site.register(ShortMessage, ShortMessageAdmin)
 admin.site.register(ArrivedRate, ArrivedRateAdmin)
+admin.site.register(MessageTemplate, MessageTemplateAdmin)
 # admin.site.register(MessageInRedis, MessageInRedisAdmin)

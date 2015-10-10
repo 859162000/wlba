@@ -21,29 +21,30 @@ class AchievedMessages(APIView):
     """
     author: Zhoudong
     获取客户发送的短信参数, 保存到DB.
-    method: POST.
+    # https 方式用get方法给我们传参
+    method: GET.
     """
     permission_classes = ()
 
-    def post(self, request):
+    def get(self, request):
 
         # 开发测试用数据
-        # data = self.request.POST.get('args', '123456,62891,138****065,ceshi01,2015-09-24 15:51:05;\
+        # data = self.request.GET.get('args', '123456,62891,138****065,ceshi01,2015-09-24 15:51:05;\
         #                                       4464023,62891,139****404,test02,2015-09-23 15:51:17')
-        data = self.request.POST.get('args', None)
+        data = self.request.GET.get('args', None)
         if data:
             file_name = time.strftime('%Y-%m-%d' + '.log', time.localtime())
             try:
-                os.makedirs('%s%s' % (os.getcwd(), '/log/user_message/'))
+                os.mkdir('/var/log/wanglibao/user_message/')
             except Exception, e:
                 print e
             try:
-                os.system('touch %s%s%s' % (os.getcwd(), '/log/user_message/', file_name))
+                os.system('touch %s%s' % ('/var/log/wanglibao/user_message/', file_name))
             except Exception, e:
                 print e
 
             try:
-                f = open(os.getcwd() + '/log/user_message/' + file_name, 'a+')
+                f = open('/var/log/wanglibao/user_message/' + file_name, 'a+')
                 args_list = data.split(';')
                 for args in args_list:
                     # 保留所有参数
@@ -62,29 +63,29 @@ class ReportMessages(APIView):
     """
     author: Zhoudong
     获取短信回执参数, 保存到DB.
-    method: POST.
+    method: GET.
     """
     permission_classes = ()
 
-    def post(self, request):
+    def get(self, request):
 
         # 开发测试用数据
-        # data = self.request.POST.get('args', '123456,62891,159*404,564687,DELIVRD,2015-09-24 13:01:36; \
+        # data = self.request.GET.get('args', '123456,62891,159*404,564687,DELIVRD,2015-09-24 13:01:36; \
         #                                       123456,62891,189*404,420937,DELIVRD,2015-09-23 13:01:42')
-        data = self.request.POST.get('args', None)
+        data = self.request.GET.get('args', None)
         if data:
             file_name = time.strftime('%Y-%m-%d' + '.log', time.localtime())
             try:
-                os.makedirs('%s%s' % (os.getcwd(), '/log/report_message/'))
+                os.mkdir('/var/log/wanglibao/report_message/')
             except Exception, e:
                 print e
             try:
-                os.system('touch %s%s%s' % (os.getcwd(), '/log/report_message/', file_name))
+                os.system('touch %s%s' % ('/var/log/wanglibao/report_message/', file_name))
             except Exception, e:
                 print e
 
             try:
-                f = open(os.getcwd() + '/log/report_message/' + file_name, 'a+')
+                f = open('/var/log/wanglibao/report_message/' + file_name, 'a+')
                 args_list = data.split(';')
                 for args in args_list:
                     # 保留所有参数
@@ -114,7 +115,7 @@ def count_message_arrived_rate():
     achieved = 0
 
     file_name = time.strftime('%Y-%m-%d' + '.log', time.localtime())
-    f = open(os.getcwd() + '/log/report_message/' + file_name, 'r')
+    f = open('/var/log/wanglibao/report_message/' + file_name, 'r')
     lines = f.readlines()
 
     for line in lines:
