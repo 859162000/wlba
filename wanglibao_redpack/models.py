@@ -45,7 +45,9 @@ class RedPackEvent(models.Model):
                                 ("first_buy", u"首次投资"),
                                 ("first_pay", u"首次充值"),
                                 ('buy', u'投资'),
-                                ('pay', u'充值')), default=u"注册")
+                                ('pay', u'充值'),
+                                ('p2p_audit', u'满标审核'),
+                                ('repaid', u'还款')), default=u"注册")
     give_platform = models.CharField(max_length=10, verbose_name=u"发放平台", default="全平台", choices=PLATFORM)
     apply_platform = models.CharField(max_length=10, verbose_name=u"使用平台", default="全平台", choices=PLATFORM)
     target_channel = models.CharField(max_length=1000, verbose_name=u"渠道(非邀请码)", blank=True, default="",
