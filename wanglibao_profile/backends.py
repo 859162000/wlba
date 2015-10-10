@@ -109,16 +109,21 @@ def trade_pwd_set(user_id,
     if action_type == 1 and profile.trade_pwd:
         return {'ret_code':3, 'message': '您已设置过交易密码，请使用原密码即可'}
     elif action_type == 2 and not _check_pwd(str(old_trade_pwd), profile.trade_pwd):
-        print old_trade_pwd, type(old_trade_pwd), profile.trade_pwd, _check_pwd(old_trade_pwd, profile.trade_pwd)
+        if only_requirement_check:
+            return {'ret_code':1, 'message': '旧交易密码错误'}
         return {'ret_code':1, 'message': '旧交易密码错误，交易密码设置失败'}
     elif action_type == 3:
         is_card_right = Card.objects.filter(user__id=profile.user_id, no=card_id).exists()
         is_id_right = (profile.id_number == citizen_id)
         if not (is_card_right and is_id_right):
+            if only_requirement_check:
+                return {'ret_code':2, 'message': '银行卡或身份证信息有误'}
             return {'ret_code':2, 'message': '银行卡或身份证信息有误，交易密码设置失败'}
     elif action_type == 4:
         is_card_right = Card.objects.filter(user__id=profile.user_id, no=card_id).exists()
         if not is_card_right:
+            if only_requirement_check:
+                return {'ret_code':2, 'message': '银行卡或身份证信息有误'}
             return {'ret_code':2, 'message': '银行卡或身份证信息有误，交易密码设置失败'}
 
     if only_requirement_check:
