@@ -44,7 +44,7 @@ class P2PProductSerializer(ModelSerializerExtended):
     class Meta:
         model = P2PProduct
         depth = 1
-        fields = ("total_earning", "id", "version", "category", "hide", "name", "short_name", "serial_number",
+        fields = ("total_earning", "id", "version", "category", "hide", "is_app_exclusive", "name", "short_name", "serial_number",
                   "contract_serial_number", "status", "priority", "period", "brief", "expected_earning_rate",
                   "excess_earning_rate", "excess_earning_description", "pay_method", "amortization_count",
                   "repaying_source", "baoli_original_contract_number", "baoli_original_contract_name",
