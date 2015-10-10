@@ -109,5 +109,17 @@ html
     .gold-footer
       .gold-wrap.relative
         img(src="/static/imgs/pc_activity/gold_two/footer.png")
+    include global/g_footer
+    include include/tracking
+    //back top
+    .backtop
+      a(href="javascript:;").backtop-box.inline-block.xl-backtop
+        i.backtop-icon.inline-block
+        span.backtop-txt.inline-block 回到顶部
+      a.footer-weixin.inline-block
+        span.weixin-code.inline-block
+        span.weixin-icon.inline-block
+      a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank").footer-qq.inline-block
+
     script.
       require(['/static/js/gold_two.js'])
