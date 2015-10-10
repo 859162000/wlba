@@ -92,6 +92,28 @@ class ArrivedRate(models.Model):
         ordering = ['-created_at']
 
 
+class MessageTemplate(models.Model):
+
+    message_for = models.CharField(u'对应短信', max_length=32, unique=True, db_index=True)
+    title = models.CharField(u'短信标题', max_length=32, blank=True)
+    content = models.TextField(u'短信内容')
+
+    class Meta:
+        verbose_name = u'短信模板'
+        verbose_name_plural = u'短信模板'
+        ordering = ['id']
+
+    def save(self, *args, **kwargs):
+        """
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        # TODO
+        # save to redis as {message_for: '{'title':title, 'content':content}'}
+        return super(MessageTemplate, self).save(*args, **kwargs)
+
+
 class MessageInRedis(rmodels.Model):
 
     message_for = rmodels.CharField(required=True, unique=True)
