@@ -107,10 +107,6 @@ def get_last_investment_for_coop(user_id):
     except:
         return None
 
-def get_first_pay_info(user_id):
-    payinfo = PayInfo.objects.filter(user_id=user_id).order_by('create_time')
-    return payinfo.first()
-
 def get_tid_for_coop(user_id):
     try:
         return Binding.objects.filter(user_id=user_id).get().bid
