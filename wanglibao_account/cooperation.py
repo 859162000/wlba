@@ -707,7 +707,7 @@ class FUBARegister(CoopRegister):
                 # goodsname 提供固定值，固定值自定义，但不能为空
                 goodsname = u"名称:网利宝,类型:产品标,周期:1月"
                 sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
-                status = u"首单【%s：已付款】" % p2p_amount
+                status = u"首单【%s元：已付款】" % p2p_amount
                 params = {
                     'action': 'create',
                     'planid': self.coop_id,
