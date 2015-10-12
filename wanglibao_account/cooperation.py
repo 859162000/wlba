@@ -691,7 +691,8 @@ class FUBARegister(CoopRegister):
         p2p_record_set = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
         if binding and p2p_record_set.count() == 1:
             p2p_record = p2p_record_set.first()
-            if int(p2p_record.amount) >= 1000:
+            p2p_amount = int(p2p_record.amount)
+            if p2p_amount >= 1000:
                 # 如果结算时间过期了则不执行回调
                 earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
                 if earliest_settlement_time:
@@ -706,7 +707,7 @@ class FUBARegister(CoopRegister):
                 # goodsname 提供固定值，固定值自定义，但不能为空
                 goodsname = u"名称:网利宝,类型:产品标,周期:1月"
                 sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
-                status = u"首单【投资额：已付款】"
+                status = u"首单【%s：已付款】" % p2p_amount
                 params = {
                     'action': 'create',
                     'planid': self.coop_id,
