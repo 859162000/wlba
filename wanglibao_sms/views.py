@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os
+import logging
 import urllib2
 from django.core.urlresolvers import reverse
 from django.db.models import Sum
@@ -8,11 +8,8 @@ from django.utils import timezone
 from django.views.generic import TemplateView
 import pytz
 from rest_framework import renderers
-from rest_framework.response import Response
 from rest_framework.views import APIView
 
-# from models import AchievedMessage, ReportMessage
-import time
 from wanglibao import settings
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao.settings import SMS_MANDAO_USER_URL, SMS_MANDAO_SN, SMS_MANDAO_MD5_PWD, SMS_MANDAO_REPORT_URL
@@ -21,63 +18,52 @@ from wanglibao_sms.models import ArrivedRate, MessageInRedis
 
 def get_user_messages():
     """
-    ret = '<?xml version="1.0" encoding="utf-8"?>\r\n<string xmlns="http://tempuri.org/">1012152831454,245633,13718331021,%c9%cf%d0%d0%401%2c%b9%fe%b9%fe,2015-10-12 15:27:48\r\n1012152837601,245633,13718331021,%c9%cf%d0%d02%ba%df%df%f3%df%f3,2015-10-12 15:27:54\r\n1012152841454,245633,13718331021,%c9%cf%d0%d03,2015-10-12 15:27:58</string>'
-    :return:
+    author: zhoudong
+    write user's messages into the log file in '/var/log/wanglibao/user_message/*.log'
     """
+    logger = logging.getLogger('get_user_messages')
+
     url = SMS_MANDAO_USER_URL + '?sn=%s&pwd=%s' % (SMS_MANDAO_SN, SMS_MANDAO_MD5_PWD)
     ret = urllib2.urlopen(url).read()
     ret = ret.rsplit('</string>')[0].split('<string xmlns="http://tempuri.org/">')[1]
 
     if len(ret) < 10:
-        pass
+        try:
+            logger.debug(u'本阶段没数据\n')
+        except Exception, e:
+            print logger.debug(e)
     else:
-        ret += '\n'
-        file_name = time.strftime('%Y-%m-%d' + '.log', time.localtime())
-
         try:
-            os.mkdir('/var/log/wanglibao/user_message/', 0777)
+            ret = '\n' + ret + '\n'
+            logger.debug(ret)
         except Exception, e:
-            print e
-        try:
-            os.system('touch %s%s' % ('/var/log/wanglibao/user_message/', file_name))
-            os.system("chmod 777 /var/log/wanglibao/user_message/" + file_name)
-        except Exception, e:
-            print e
-
-        f = open('/var/log/wanglibao/user_message/' + file_name, 'a+')
-        f.writelines(ret)
-        f.close()
-
+            print logger.debug(e)
     return ret
 
 
 def get_report_messages():
     """
-    ?sn=%s&pwd=%s&maxid=1
-    :return:
+    author: zhoudong
+    write user's messages into the log file in '/var/log/wanglibao/report_message/*.log'
+    and save to the DB every 10 minutes
     """
+    logger = logging.getLogger('get_report_messages')
+
     url = SMS_MANDAO_REPORT_URL + '?sn=%s&pwd=%s&maxid=1' % (SMS_MANDAO_SN, SMS_MANDAO_MD5_PWD)
     ret = urllib2.urlopen(url).read()
     ret = ret.rsplit('</string>')[0].split('<string xmlns="http://tempuri.org/">')[1]
 
     if len(ret) < 10:
-        pass
+        try:
+            logger.info(u'本阶段没数据\n')
+        except Exception, e:
+            print logger.info(e)
     else:
-        ret += '\r\n'
-        file_name = time.strftime('%Y-%m-%d' + '.log', time.localtime())
+        ret = '\n' + ret + '\r\n'
         try:
-            os.mkdir('/var/log/wanglibao/report_message/', 0777)
+            logger.info(ret)
         except Exception, e:
-            print e
-        try:
-            os.system('touch %s%s' % ('/var/log/wanglibao/report_message/', file_name))
-            os.system("chmod 777 /var/log/wanglibao/report_message/" + file_name)
-        except Exception, e:
-            print e
-
-        f = open('/var/log/wanglibao/report_message/' + file_name, 'a+')
-        f.writelines(ret)
-        f.close()
+            print logger.info(e)
 
         achieved = ret.count('DELIVRD') + ret.count(',0,')
         total = ret.count('\r\n')

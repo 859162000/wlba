@@ -13,6 +13,7 @@ from __future__ import absolute_import
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import json
+import time
 from celery.schedules import crontab
 from Crypto.PublicKey import RSA
 
@@ -381,6 +382,19 @@ LOGGING = {
             'filename': '/var/log/wanglibao/wanglibao_reward.log',
             'formatter': 'verbose'
         },
+        # zhoudong
+        'wanglibao_sms_user_message': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/user_message/' + time.strftime('%Y-%m-%d', time.localtime()) + '.log',
+            'formatter': 'verbose'
+        },
+        'wanglibao_sms_report_message': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/report_message/' + time.strftime('%Y-%m-%d', time.localtime()) + '.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
@@ -443,6 +457,23 @@ LOGGING = {
         'wanglibao_reward': { #add by yihen@20150915
             'handlers': ['wanglibao_reward', 'console'],
             'level': 'DEBUG'
+        },
+        # zhoudong
+        # 'wanglibao_sms_user_message': {
+        #     'level': 'DEBUG',
+        #     'class': 'logging.FileHandler',
+        #     'filename': '/var/log/wanglibao/' + time.strftime('%Y-%m-%d', time.localtime()) + '.log',
+        #     'formatter': 'verbose'
+        # },
+        'get_user_messages': {
+            'handlers': ['wanglibao_sms_user_message'],
+            'level': 'DEBUG',
+            'propagate': True
+        },
+        'get_report_messages': {
+            'handlers': ['wanglibao_sms_report_message'],
+            'level': 'INFO',
+            'propagate': True
         },
     }
 
