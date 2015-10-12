@@ -378,7 +378,14 @@ class WeixinShareDetailView(TemplateView):
             self.get_activity_by_id(activity)
 
         try:
-            gift = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity, valid=True).first()
+            gifts = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity, valid=True)
+            counts = gifts.count()
+            if counts == 0:
+                gift = None
+            else:
+                index = int(time.time())%counts
+                gift = gifts[index]
+
         except Exception, reason:
             self.exception_msg(reason, u'获得待发奖项抛异常')
             return None
@@ -567,10 +574,10 @@ class WeixinShareDetailView(TemplateView):
             self.debug_msg('phone:%s 没有领取过奖品' %(phone_num,) )
             user_gift = self.distribute_redpack(phone_num, openid, activity, order_id)
 
-            if "No Reward" == user_gift:
-                self.debug_msg('奖品已经发完了，用户:%s 没有领到奖品' %(phone_num,))
-                redirect_url = reverse('weixin_share_end')+'?url_id=%s'%order_id
-                return redirect(redirect_url)
+            #if "No Reward" == user_gift:
+            #    self.debug_msg('奖品已经发完了，用户:%s 没有领到奖品' %(phone_num,))
+            #    redirect_url = reverse('weixin_share_end')+'?url_id=%s'%order_id
+            #    return redirect(redirect_url)
         else:
             self.debug_msg('phone:%s 已经领取过奖品' %(phone_num,))
         gifts = self.get_distribute_status(order_id, activity)
