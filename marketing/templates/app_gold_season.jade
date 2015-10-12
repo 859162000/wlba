@@ -1,0 +1,217 @@
+doctype html
+html
+    head
+        meta(name="format-detection" content="telephone=no,email=no")
+        title 网利宝
+        meta(charset="utf-8")
+        meta(content="telephone=no,email=no" ,name="format-detection")
+        meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
+        meta(content="yes" ,name="apple-mobile-web-app-capable")
+        link(href="/static/styles/mobile_activity/app_gold_season.css", rel="stylesheet")
+        body
+            .goldSeason
+                img.goldSeasonBanner(src='/static/imgs/mobile_activity/app_gold_season/banner.jpg')
+                .rankingList
+                    img(src='/static/imgs/mobile_activity/app_gold_season/rankingList1.png').bg1
+                    .wrap_list
+                        ul.table
+                            li.one 排行
+                            li.two 用户
+                            li.three 累计佣金
+                        .list
+                            ul.one
+                                li
+                                    span.one
+                                li
+                                    span.two
+                                li
+                                    span.three
+                                li
+                                    span.round 4
+                                li
+                                    span.round 5
+                                li
+                                    span.round 6
+                                li
+                                    span.round 7
+                                li
+                                    span.round 8
+                                li
+                                    span.round 9
+                                li
+                                    span.round 10
+                            ul.two
+                                - var item1 = ['','','','','','','','','','']
+                                each item in item1
+                                    li= item
+                            ul.three
+                                li.front 0 元
+                                li.front 0 元
+                                li.front 0 元
+                                - var item1 = ['0 元','0 元','0 元','0 元','0 元','0 元','0 元']
+                                each item in item1
+                                    li= item
+                    img(src='/static/imgs/mobile_activity/app_gold_season/rankingList3.png').bg3
+                img(src='/static/imgs/mobile_activity/app_gold_season/label1.png').label
+                .order
+                    .box.one
+                        img(src='/static/imgs/mobile_activity/app_gold_season/orderImg1.png')
+                        dl
+                            dt 下载网利宝APP
+                            dd
+                                img(src='/static/imgs/mobile_activity/app_gold_season/erweima.jpg')
+                    img(src='/static/imgs/mobile_activity/app_gold_season/orderArrow.png').arrow
+                    .box
+                        img(src='/static/imgs/mobile_activity/app_gold_season/orderImg2.png')
+                        dl
+                            dt 进入个人<br>账户页面
+                            dd "登录" -- "我的账户"
+                    img(src='/static/imgs/mobile_activity/app_gold_season/orderArrow.png').arrow
+                    .box
+                        img(src='/static/imgs/mobile_activity/app_gold_season/orderImg3.png')
+                        dl
+                            dt 分享专属链接
+                            dd 账户页面 -- "全民淘金" -- "马上邀请" 分享专属邀请链接给好友
+                    img(src='/static/imgs/mobile_activity/app_gold_season/orderArrow.png').arrow
+                    .box
+                        img(src='/static/imgs/mobile_activity/app_gold_season/orderImg4.png')
+                        dl
+                            dt 分享佣金
+                            dd 好友通过邀请链接注册并投资三个月(含三个月)以上的投资项目,即可坐享丰厚佣金
+                .explain
+                    img(src='/static/imgs/mobile_activity/app_gold_season/explain1.png').bg1
+                    .main
+                        dl
+                            dt 1、活动时间： 2015年6月23日-2016年6月30日
+                        dl
+                            dt 2、活动说明:
+                            dd &nbsp;&nbsp;&nbsp;&nbsp;- 邀请好友注册网利宝，若好友注册后，投资3个月以上（含3个月）项目，则享有好友投资额3‰作为邀请佣金；若好友再邀请他人注册并投资3个月以上（含3个月）项目，可与好友一起享有投资额的3‰作为邀请佣金；
+                            dd!=' &nbsp;&nbsp;&nbsp;&nbsp;-  例如：用户A邀请新用户B注册并投资，则A享有B在活动时间内<span>每笔投资额3‰</span>的邀请佣金；用户B再邀请新用户C注册并投资，则A与B同时享有C在活动时间内<span>每笔投资额3‰</span>的邀请佣金； 用户C再邀请新用户D注册并投资，则Ｂ与C同时享有D在活动时间内<span>每笔投资额3‰</span>的邀请佣金； A不再享有D的佣金。以此类推。（其中B、C、D每笔投资项目期限须<span>≥3个月</span>）；'
+                        img.exampleImg(src='/static/imgs/mobile_activity/app_gold_season/cheats_img.png')
+                        //.example
+                        //    img.leftImg(src='/static/imgs/mobile_activity/app_gold_season/chestnutsImg.png')
+                        //    .rightMain
+                        //        p.title 活动期内用户A邀请用户B注册并投资3个月标10万元，用户B又邀请用户C注册并投资3个月标10万元。则用户A获得邀请佣金为：10万元*3‰+10万*3‰=600元，用户B获得邀请佣金为: 10万元*3‰=300元。
+                        //        .example1
+                        //            p.text 用户A的邀请佣金 ( 元 ):
+                        //            .number
+                        //                span.bold 600 &nbsp;=
+                        //                dl
+                        //                    dt.bold 300
+                        //                    dd 用户B投资所得的佣金<br>10万*3‰
+                        //                span.add.bold +
+                        //                dl
+                        //                    dt.bold 300
+                        //                    dd 用户C投资所得的佣金<br>10万*3‰
+                        //        .example2
+                        //            p.text 用户B的邀请佣金 ( 元 ):
+                        //            .number
+                        //                dl.right
+                        //                    dt 300
+                        //                    dd 用户C投资所得的佣金<br>10万*3‰
+                        dl
+                            dd &nbsp;&nbsp;&nbsp;&nbsp;-  被邀请人注册时须使用邀请人提供的专属链接或专属邀请码，活动邀请关系方成立，网利宝仅以此确认邀请关系；
+                            dd &nbsp;&nbsp;&nbsp;&nbsp;-  活动期间内，邀请人获得的邀请佣金累计无上限；被邀请人受邀注册后，将获得520元现金红包。
+                        dl
+                            dt 3、本活动可与网利宝其他优惠活动同时享用。
+                        dl
+                            dt 4、刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予兑现，网利宝对此活动享有最终解释权。
+                    img(src='/static/imgs/mobile_activity/app_gold_season/explain3.png').bg1
+                img(src='/static/imgs/pc_activity/gold_season/label2.png').label
+                .cheats
+                    .img
+                        img(src='/static/imgs/mobile_activity/app_gold_season/cheats_bg1.png').bg1
+                        //.text1.text 间接邀请佣金：810000
+                        //.text2.text 直接邀请佣金：27000
+                        //.title 邀请佣金共为：<br>837000
+                    .rule
+                        p!='如果你邀请了30个好友，他们每人在活动期间内投资3个月标10万元共3次，那你的直接邀请佣金为：<span class="calculation">27000=30*10万元*3次投资*0.3%</span>'
+                        p <br>如果你邀请的30个好友每人又邀请了30人，那么你就拥有900个间接邀请人。同样，他们每人在活动期间内投资3个月标10万元共3次，那你的间接邀请佣金为：
+                        p.calculation 810000=900*10万元*3次投资*0.3%
+                    img(src='/static/imgs/mobile_activity/app_gold_season/cheats_bg3.png').bg1
+                .footer 所有活动由网利宝提供，与苹果公司（Apple Inc）无关，<br>如有疑问请联系在线客服或拨打4008-588-066。
+            script(src="/static/js/lib/jquery.min.js")
+            script(src="/static/js/lib/jquery.animateNumber.min.js")
+            script.
+                $(function(){
+                    var is_animate = true;
+                    function fmoney(s, type) {
+                        if (/[^0-9\.]/.test(s))
+                            return "0";
+                        if (s == null || s == "")
+                            return "0";
+                        s = s.toString().replace(/^(\d*)$/, "$1.");
+                        s = (s + "00").replace(/(\d*\.\d\d)\d*/, "$1");
+                        s = s.replace(".", ",");
+                        var re = /(\d)(\d{3},)/;
+                        while (re.test(s))
+                            s = s.replace(re, "$1,$2");
+                        s = s.replace(/,(\d\d)$/, ".$1");
+                        if (type == 0) {// 不带小数位(默认是有小数位)
+                            var a = s.split(".");
+                            if (a[1] == "00") {
+                                s = a[0];
+                            }
+                        }
+                        return s;
+                    }
+                    function page_scroll(){
+                        $('.num-animate').each(function(){
+                            var comma_separator_number_step = $.animateNumber.numberStepFactories.separator(',')
+                            var key = parseInt($(this).attr('data-num'));
+                            $(this).prop('number', 0).animateNumber({
+                                number: key,
+                                numberStep: comma_separator_number_step
+                            },1000);
+                            is_animate = false;
+                        })
+                    }
+
+
+                    var windowHeight = $("body").height();
+                    var cheatseight = $(".cheats").height();
+                    var footerHeight = $(".cheats").height();
+                    var juli = windowHeight - cheatseight - footerHeight/2 - 76;
+                    function button_fix(){
+                        if($(window).scrollTop()>=juli){
+                            $('.fixBox').css({'position':'relative','background':'none'});
+                        }else{
+                            $('.fixBox').css({'position':'fixed','background':'rgba(255,255,255,0.8)'});
+                        }
+                    }
+                    button_fix();
+                    $(window).scroll(function(){
+                        button_fix();
+                    });
+
+                    $.ajax({
+                        url: '/api/gettopofearings/',
+                        type: "POST"
+                    }).done(function (json) {
+                        var rankingList_phone = [];
+                        var rankingList_amount = [];
+                        var json_one;
+                        for(var i=0; i<json.records.length; i++){
+                            json_one = json.records[i];
+                            if(json_one!=''){
+                                var number = fmoney(json_one.amount, 0);
+                                if(i<=2){
+                                    rankingList_phone.push(['<li class="front">'+json_one.phone+'</li>'].join(''));
+                                    rankingList_amount.push(['<li class="front"><span class="num-animate" data-num="'+json_one.amount+'">0</span> 元</li>'].join(''));
+                                }else{
+                                    rankingList_phone.push(['<li>'+json_one.phone+'</li>'].join(''));
+                                    rankingList_amount.push(['<li><span class="num-animate" data-num="'+json_one.amount+'">0</span> 元</li>'].join(''));
+                                }
+
+                            }else{
+                                rankingList_phone.push(['<li>虚位以待</li>'].join(''));
+                                rankingList_amount.push(['<li>虚位以待</li>'].join(''));
+                            }
+
+                        }
+                        $('.rankingList ul.two').html(rankingList_phone.join(''));
+                        $('.rankingList ul.three').html(rankingList_amount.join(''));
+                        page_scroll();
+                    })
+
+                  })

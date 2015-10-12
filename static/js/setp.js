@@ -76,7 +76,7 @@
     })
 
 
-    var change;
+    var change = [];
     redpack('ENTER_WEB_PAGE');
     //领取会员提示
       $('.setp-btn').on('click',function(){
@@ -117,7 +117,7 @@
 
     //无线滚动
     var timer,i= 1,j=2;
-    timer=setInterval(function(){
+    timer = setInterval(function(){
       scroll();
     },30)
 
@@ -147,8 +147,7 @@
       },500)
 
       //按钮
-      var num=1;
-      var happy=change['get_time'];
+
       if (change['left']){
         $('#chance').text(' '+change['left']+' ');
       }else if (change['left']==0){
@@ -160,29 +159,35 @@
         $('.game-btn').addClass('game-btn-down')
       });
       $('.game-btn').on('mouseup',function(){
-        if(!$('.go-game').hasClass('noClick')) {
+        redpack('ENTER_WEB_PAGE', function(data){
+
+          if(!$('.go-game').hasClass('noClick')) {
             $('.game-btn').removeClass('game-btn-down');
-            if (change['ret_code'] == 4000) {
+            if (data['ret_code'] == 4000) {
                 $('#small-zc').show();
                 $('#xl-aug-fail p').text('Sorry~您不符合抽奖条件');
                 $('#xl-aug-fail').show();
-            } else if ($(this).hasClass('go-game')) {
+            } else if (data['ret_code'] == 3003) {
                 if (change['left'] <= 0) {
                     $('#small-zc').show();
                     $('#xl-aug-fail p').text('Sorry~您的抽奖次数已用完')
                     $('#xl-aug-fail').show();
                 } else {
+                  if(data['left'] == data['get_time']){
+                    game(data['get_time']);
+                  }else{
                     game();
+                  }
+
                 }
-            } else {
+            } else if(data['ret_code'] == 3000){
                 $('#small-zc').show();
                 $('#xl-aug-login').show();
             }
-            //game();
-        }
+          }
+        })
       })
-  //    game();
-      function game(){
+      function game(isGet){
         $('.go-game').addClass('noClick');
         //按钮按下样式
         //手柄的样式
@@ -191,14 +196,14 @@
           setTimeout(function(){
             $('.side').removeClass('side-down')
           },50)
-            if (num!=happy){
-              //失败调用
-              redpack('IGNORE_AWARD');
-              star('0000');
-            }else{
+            if (isGet){
               //成功调用
               redpack('GET_AWARD');
               star('0'+change['amount']);
+            }else{
+              //失败调用
+              redpack('IGNORE_AWARD');
+              star('0000');
             }
         },10)
       }
@@ -207,8 +212,8 @@
 
       //开始转动
       function star(a){
-        var time,j=0;
-        time=setInterval(function(){
+        var time ;
+        time= setInterval(function(){
           $('.long-sum').animate({'bottom':'-1062px'},100,function(){
             $('.long-sum').css({'bottom':'0px'})
           })
@@ -222,7 +227,7 @@
           $('.go-game').removeClass('noClick');
           $('#rmb').text(parseInt(change['amount']));
           $('#small-zc').show();
-          if (a=='0000'){
+          if (a =='0000'){
             var txt=['你和大奖只是一根头发的距离','天苍苍，野茫茫，中奖的希望太渺茫','太可惜了，你竟然与红包擦肩而过'];
             var ind=parseInt(Math.random()*3);
             $('#xl-aug-success').hide();
@@ -232,7 +237,6 @@
             $('#xl-aug-prize').hide();
             $('#xl-aug-success').show();
           }
-          num++;
         },3000)
         $('.long-sum').css({'top':''});
         $('#chance').text(' '+change['left']+' ')
@@ -240,21 +244,17 @@
 
 
     //抽奖请求
-    function redpack(sum){
+    function redpack(sum, callback){
       $.ajax({
         url: "/api/xunlei/award/",
         type: "POST",
         data: {action:sum},
         async: false
       }).done(function(data) {
-         change=data;
-         if (change['left']){
-            $('#chance').text(' '+change['left']+' ');
-         }else if (change['left']==0){
-            $('#chance').text(' '+change['left']+' ');
-         }else {
-           $('#chance').text(' 3 ');
-         }
+         change = data;
+        $('#chance').text(change['left']);
+
+        callback && callback(data);
 
       });
     }

@@ -26,6 +26,7 @@ from marketing.views import NewsListView, NewsDetailView
 from wanglibao_activity.decorators import decorator_include
 from wanglibao_activity.decorators import wap_activity_manage
 from wanglibao.views import landpage_view
+from wanglibao_sms.views import ArriveRate, MessageEdit, MessageList
 
 admin.site = AdminSitePlus()
 admin.autodiscover()
@@ -152,6 +153,16 @@ urlpatterns += patterns(
 
     url(r'^api/zhongniu/products/', ZhongniuP2PQuery.as_view()),
     url(r'^api/zhongniu/getData/$', ZhongniuP2PDataQuery.as_view()),
+
+    url(r'^AK7WtEQ4Q9KPs8Io_zOncw/wanglibao_sms/arrive_rate/$', ArriveRate.as_view(), name='arrive_rate'),
+    url(r'^AK7WtEQ4Q9KPs8Io_zOncw/wanglibao_sms/messages/$', MessageList.as_view(), name='messages'),
+    url(r'^AK7WtEQ4Q9KPs8Io_zOncw/wanglibao_sms/message/edit/$', MessageEdit.as_view(), name='message_for_admin'),
+)
+
+# 短信
+urlpatterns += patterns(
+    '',
+    url(r'wanglibao_sms/', include('wanglibao_sms.urls'))
 )
 
 # 微信

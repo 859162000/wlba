@@ -81,10 +81,12 @@ class AppActivateImageAPIView(APIView):
                 img_url = activate.img_four
             else:
                 img_url = ''
+            jump_state = activate.jump_state
+            link_dest = activate.link_dest
 
             if img_url:
                 img_url = '{host}/media/{url}'.format(host=settings.CALLBACK_HOST, url=img_url)
-                return Response({'ret_code': 0, 'message': 'ok', 'image': img_url})
+                return Response({'ret_code': 0, 'message': 'ok', 'image': img_url, 'jump_state': jump_state, 'link_dest':link_dest})
 
         return Response({'ret_code': 20003, 'message': 'fail'})
 
@@ -523,7 +525,6 @@ class AppPhoneBookAlertApiView(APIView):
 
 class AppInviteAllGoldAPIView(APIView):
     permission_classes = (IsAuthenticated, )
-
     def post(self, request, **kwargs):
         dic = account_backends.broker_invite_list(request.user)
         users = dic['users']
@@ -555,7 +556,7 @@ class AppInviteAllGoldAPIView(APIView):
             profile = phone_user.wanglibaouserprofile
             phone_book = UserPhoneBook.objects.filter(user=user, phone=profile.phone).first()
             if phone_book:
-                if not(phone_book.alert_at and phone_book.alert_at > local_to_utc(datetime.datetime.now(), 'min')):
+                if not(phone_book.alert_at and phone_book.alert_at > local_to_utc(datetime.now(), 'min')):
                     phone_book.is_used = True
                     phone_book.save()
                     return True
@@ -570,5 +571,5 @@ class AppInviteAllGoldAPIView(APIView):
                 phone_book.save()
                 return True
             return False
-        except:
+        except Exception, e:
             return False

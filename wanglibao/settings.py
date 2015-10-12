@@ -133,6 +133,7 @@ INSTALLED_APPS = (
     'adminplus',
     'file_storage',
     'wanglibao_lottery',
+    'daterange_filter',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -596,7 +597,12 @@ CELERYBEAT_SCHEDULE = {
     'check_and_generate_codes': {
         'task': 'marketing.tools.check_and_generate_codes',
         'schedule': crontab(minute=0, hour=3)
-    }
+    },
+    # by Zhoudong 发送短信时间统计
+    'message_arrived_rate_statistics': {
+        'task': 'wanglibao_sms.tasks.message_arrived_rate_task',
+        'schedule': timedelta(minutes=10),
+    },
 }
 
 CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
@@ -968,7 +974,7 @@ ZHITUI_CALL_BACK_URL = 'http://api.zhitui.com/wanglibao/recive.php'
 
 # 中国电信
 WLB_FOR_ZGDX_KEY = '2001'
-ZGDX_QUERY_INTERFACE_URL = 'http://182.140.241.47:8080/ESB/flowService.do'
+ZGDX_QUERY_URL = 'http://182.140.241.47:8080/ESB/flowService.do'
 if ENV == ENV_PRODUCTION:
     ZGDX_CALL_BACK_URL = 'http://182.140.241.47:8080/fps/flowService.do'
     ZGDX_PARTNER_NO = '102139887'
@@ -1040,3 +1046,6 @@ if ENV == ENV_PRODUCTION:
 else:
     WEIXIN_CALLBACK_URL = 'https://staging.wanglibao.com'
 
+
+# 短信到达率统计时间间隔
+MESSAGE_TIME_DELTA = timedelta(minutes=10)

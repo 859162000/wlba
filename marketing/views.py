@@ -19,6 +19,8 @@ from mock_generator import MockGenerator
 from django.conf import settings
 from django.db.models.base import ModelState
 from wanglibao_sms.utils import send_validation_code
+from misc.models import Misc
+from wanglibao_sms.models import *
 from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, IntroducedBy, IntroducedByReward, Reward, ActivityJoinLog
 from marketing.tops import Top
 from utils import local_to_utc
@@ -624,7 +626,6 @@ class ActivityJoinLogCountAPIView(APIView):
 
 def ajax_get_activity_record(action='get_award', *gifts):
     """
-        author: add by Yihen@20150825
         description:迅雷9月抽奖活动，获得用户的抽奖记录
     """
     records = ActivityJoinLog.objects.filter(action_name=action, action_type='login', join_times=0, amount__gt=0)
@@ -643,7 +644,6 @@ def ajax_get_activity_record(action='get_award', *gifts):
 
 def ajax_post(request):
     """
-        author: add by Yihen@20150825
         description:迅雷9月抽奖活动，响应web的ajax请求
     """
     user = request.user
@@ -655,10 +655,21 @@ def ajax_post(request):
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
     record = get_user_channel_record(user.id)
-    if not record or (record and record.name != 'xunlei9'):
+    try:
+        key = 'xunlei_event'
+        event = Misc.objects.filter(key=key).first()
+        if event:
+            event = json.loads(event.value)
+            if type(event) == dict:
+                channel = event['channel']
+                reward = event['reward']
+    except Exception, reason:
+        logger.exception('get misc record exception, msg:%s' % (reason,))
+        raise
+    if not record or (record and record.name != channel):
         to_json_response = {
             'ret_code': 4000,
-            'message': u'非迅雷渠道过来的用户',
+            'message': u'非迅雷渠道(%s)过来的用户' %(eval(request.GET.get('prom_token',"None")),)
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -667,7 +678,7 @@ def ajax_post(request):
         action = request.POST.get("action", "")
 
         if action == 'GET_AWARD':
-            res = obj.get_award(request)
+            res = obj.get_award(request, reward)
 
         if action == 'IGNORE_AWARD':
             res = obj.ignore_award(request)
@@ -680,24 +691,31 @@ def ajax_post(request):
 
 class ThunderAwardAPIView(APIView):
     """
-        Type: Add
-        Modified By: Yihen@20150821
         description: 迅雷抽奖活动1.用户有三次摇奖机会，三次摇奖必中奖一次，中奖金额分别为100元（30%）、
                     150元（60%）、 200元（10%），中奖后提示中奖金额及中奖提示语，非中奖用户提示非中奖提示语。
     """
 
-    def get_award(self, request):
+    def get_award(self, request, reward):
         """
             TO-WRITE
         """
         join_log = ActivityJoinLog.objects.filter(user=request.user).first()
+        if join_log.join_times == 0:
+            to_json_response = {
+                'ret_code': 3100,
+                'get_time': (join_log.id % 3)+1,  # 第几次抽中
+                'left': join_log.join_times,  # 还剩几次
+                'amount': str(join_log.amount),  # 奖励的金额
+                'message': u'抽奖机会已经用完了',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
         join_log.join_times -= 1
         join_log.save(update_fields=['join_times'])
         money = self.get_award_mount(join_log.id)
-        describe = 'xunlei_sept_' + str(money)
+        describe = str(reward) + str(money)
         try:
             dt = timezone.datetime.now()
-            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe,give_start_at__lte=dt, give_end_at__gte=dt).first()
+            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
         except Exception, reason:
             print reason
 
@@ -720,6 +738,16 @@ class ThunderAwardAPIView(APIView):
         join_log = ActivityJoinLog.objects.filter(user=request.user).first()
         if join_log.join_times > 0:
             join_log.join_times -= 1
+        else:
+            to_json_response = {
+                'ret_code': 3100,
+                'get_time': (join_log.id % 3)+1,  # 第几次抽中
+                'left': join_log.join_times,  # 还剩几次
+                'amount': str(join_log.amount),  # 奖励的金额
+                'message': u'抽奖机会已经用完了',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
         join_log.save(update_fields=['join_times'])
         to_json_response = {
             'ret_code': 3002,
@@ -1279,6 +1307,7 @@ class WanglibaoAwardActivity(APIView):
 def september_award_ajax(request):
     user = request.user
     action = request.POST.get('action',)
+    print "Action from Application:%s" % (action,)
     logger.debug("in activity common_award_september, User Action: %s" % (action,))
     if action == 'GET_AWARD':
         return ajax_get_activity_record('common_award_sepetember')
@@ -1306,6 +1335,8 @@ def september_award_ajax(request):
             return activity.get_money_action()
         if action == 'IGNORE':
             return activity.ignore_user_action()
+        if action == 'REPEAT':
+            return activity.user_repeat_action()
 
 class CommonAward(object):
     """
@@ -1399,6 +1430,26 @@ class CommonAward(object):
                     return u"None"
         else:
             return u"None"
+
+    def user_repeat_action(self):
+        user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()
+        if user_activity.total_chances <= user_activity.used_chances:
+            to_json_response = {
+                'ret_code': 3024,
+                'total_chances': user_activity.total_chances,
+                'used_chances': user_activity.used_chances,
+                'gift': u'None',
+                'message': u'您的抽奖机会已经用完了',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        to_json_response = {
+            'ret_code': 3033,
+            'total_chances': user_activity.total_chances,
+            'used_chances': user_activity.used_chances,
+            'message': u'app端，重复刮卡请求',
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
     def ignore_user_action(self):
         user_activity = WanglibaoActivityReward.objects.filter(user=self.request.user.id).first()

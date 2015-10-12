@@ -685,42 +685,44 @@ class FUBARegister(CoopRegister):
         """
         # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
         binding = Binding.objects.filter(user_id=user.id).first()
-        p2p_record = get_last_investment_for_coop(user.id)
-        if binding and p2p_record:
-            # 如果结算时间过期了则不执行回调
-            earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
-            if earliest_settlement_time:
-                earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
-                current_time = datetime.datetime.now()
-                # 如果上次访问的时间是在30天前则不更新访问时间
-                if earliest_settlement_time + datetime.timedelta(days=int(FUBA_PERIOD)) <= current_time:
-                    return
-
-            order_id = p2p_record.id
-            goodsprice = p2p_record.amount
-            # goodsname 提供固定值，固定值自定义，但不能为空
-            goodsname = u"名称:网利宝,类型:产品标,周期:1月"
-            sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
-            status = u"直投【%s 元：已付款】" % goodsprice
-            params = {
-                'action': 'create',
-                'planid': self.coop_id,
-                'order': order_id,
-                'goodsmark': '1',
-                'goodsprice': goodsprice,
-                'goodsname': goodsname,
-                'sig': sig,
-                'status': status,
-                'uid': binding.bid,
-            }
-            common_callback.apply_async(
-                kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
-            # 记录开始结算时间
-            if not binding.extra:
-                # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
+        p2p_record_set = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
+        if binding and p2p_record_set.count() == 1:
+            p2p_record = p2p_record_set.first()
+            if int(p2p_record.amount) >= 1000:
+                # 如果结算时间过期了则不执行回调
+                earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
                 if earliest_settlement_time:
-                    binding.extra = earliest_settlement_time
-                    binding.save()
+                    earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
+                    current_time = datetime.datetime.now()
+                    # 如果上次访问的时间是在30天前则不更新访问时间
+                    if earliest_settlement_time + datetime.timedelta(days=int(FUBA_PERIOD)) <= current_time:
+                        return
+
+                order_id = p2p_record.id
+                goodsprice = 80
+                # goodsname 提供固定值，固定值自定义，但不能为空
+                goodsname = u"名称:网利宝,类型:产品标,周期:1月"
+                sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
+                status = u"首单【%s 元：已付款】" % goodsprice
+                params = {
+                    'action': 'create',
+                    'planid': self.coop_id,
+                    'order': order_id,
+                    'goodsmark': '1',
+                    'goodsprice': goodsprice,
+                    'goodsname': goodsname,
+                    'sig': sig,
+                    'status': status,
+                    'uid': binding.bid,
+                }
+                common_callback.apply_async(
+                    kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+                # 记录开始结算时间
+                if not binding.extra:
+                    # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
+                    if earliest_settlement_time:
+                        binding.extra = earliest_settlement_time
+                        binding.save()
 
 
 class YunDuanRegister(CoopRegister):
@@ -776,13 +778,12 @@ class YiCheRegister(CoopRegister):
             kwargs={'url': url, 'params': params, 'channel': self.c_code})
 
     def register_call_back(self, user):
-        binding = Binding.objects.filter(user_id=user.id).first()
-        if binding:
+        introduced_by = IntroducedBy.objects.filter(user_id=user.id).first()
+        if introduced_by:
             url = self.call_back_url + '?method=AddPlatFormFinanceUser'
-            introduced_by = IntroducedBy.objects.filter(user_id=user.id).first()
             mobile = '******'.join(get_phone_for_coop(user.id).split('***'))
             params = {
-                'userId': binding.bid,
+                'userId': get_uid_for_coop(user.id),
                 'userName': mobile,
                 'mobile': mobile,
                 'companyId': 9,
@@ -792,25 +793,25 @@ class YiCheRegister(CoopRegister):
             self.yiche_call_back(url, params)
 
     def validate_call_back(self, user):
-        binding = Binding.objects.filter(user_id=user.id).first()
-        if binding:
+        introduced_by = IntroducedBy.objects.filter(user_id=user.id).first()
+        if introduced_by:
             url = self.call_back_url + '?method=UpdatePlatFormFinanceUser'
             username = get_username_for_coop(user.id)
             params = {
-                'userId': binding.bid,
+                'userId': get_uid_for_coop(user.id),
                 'realName': username,
                 'companyId': 9,
             }
             self.yiche_call_back(url, params)
 
     def purchase_call_back(self, user):
-        binding = Binding.objects.filter(user_id=user.id).first()
+        introduced_by = IntroducedBy.objects.filter(user_id=user.id).first()
         p2p_record = get_last_investment_for_coop(user.id)
-        if binding and p2p_record:
+        if introduced_by and p2p_record:
             url = self.call_back_url + '?method=AddPlatFormFinanceOrder'
             invest_time = p2p_record.create_time
             params = {
-                'userId': binding.bid,
+                'userId': get_uid_for_coop(user.id),
                 'orderNo': p2p_record.id,
                 'invest': str(p2p_record.amount),
                 'investTime': invest_time.strftime('%Y-%m-%d %H:%M:%S'),
@@ -1639,7 +1640,7 @@ def caimiao_post_volumes_info():
     :return:
     """
 
-    url = settings.CAIMIAO_DEAL_Volumes_URL
+    url = settings.CAIMIAO_Volumes_URL
     key = settings.CAIMIAO_SECRET
 
     post_data = dict()
@@ -1678,7 +1679,7 @@ def caimiao_post_rating_info():
     :return:
     """
 
-    url = settings.CAIMIAO_Rating_URL
+    url = settings.CAIMIAO_RATING_URL
     key = settings.CAIMIAO_SECRET
 
     post_data = dict()
@@ -1810,69 +1811,70 @@ class ZhongniuP2PDataQuery(APIView):
                     ret['msg'] = u'%s' % e
                     return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
-            if product:
-                ret['status'] = 0
-                data = dict()
-                data['pid'] = product.pk
-                data['name'] = product.name
-                # 根据不同环境对应不同的url
-                if settings.ENV == 'debug':
-                    base_url = 'http://127.0.0.1:8000'
-                if settings.ENV == 'staging':
-                    base_url = 'https://staging.wanglibao.com'
-                if settings.ENV == 'production':
-                    base_url = 'https://www.wanglibao.com'
-                data['url'] = base_url + '/p2p/detail/' + str(product.pk)
+                if product:
+                    ret['status'] = 0
+                    data = dict()
+                    data['pid'] = product.pk
+                    data['name'] = product.name
+                    # 根据不同环境对应不同的url
+                    base_url = ''
+                    if settings.ENV == 'debug':
+                        base_url = 'http://127.0.0.1:8000'
+                    if settings.ENV == 'staging':
+                        base_url = 'https://staging.wanglibao.com'
+                    if settings.ENV == 'production':
+                        base_url = 'https://www.wanglibao.com'
+                    data['url'] = base_url + '/p2p/detail/' + str(product.pk)
 
-                data['type'] = 2
-                data['yield'] = product.expected_earning_rate
-                data['duration'] = product.period
+                    data['type'] = 2
+                    data['yield'] = product.expected_earning_rate
+                    data['duration'] = product.period
 
-                if product.pay_method == u'等额本息':
-                    pay_method = 3
-                elif product.pay_method == u'按月付息':
-                    pay_method = 1
-                elif product.pay_method == u'到期还本付息':
-                    pay_method = 4
+                    if product.pay_method == u'等额本息':
+                        pay_method = 3
+                    elif product.pay_method == u'按月付息':
+                        pay_method = 1
+                    elif product.pay_method == u'到期还本付息':
+                        pay_method = 4
+                    else:
+                        pay_method = 9
+                    data['repaytype'] = pay_method
+
+                    data['guaranttype'] = 1
+                    data['threshold'] = 100
+
+                    # 现在是招标前不往对方推送. 0状态不会被匹配.
+                    if product.status in [u'录标', u'录标完成', u'待审核']:
+                        status = 0
+                    elif product.status == u'正在招标':
+                        status = 1
+                    else:
+                        status = 2
+                    data['status'] = status
+
+                    data['amount'] = product.total_amount
+                    data['amounted'] = product.ordered_amount
+                    data['progress'] = "%.2f" % product.completion_rate
+
+                    # Attachment 重中的图片
+                    detail = list()
+                    detail.append({'title': product.name})
+                    detail.append({'content': product.usage})
+
+                    attachments = product.attachment_set.all()
+                    for attachment in attachments:
+                        url = base_url + attachment.file.url
+                        detail.append({'image': url})
+                    data['detail'] = detail
+
+                    data['startdate'] = product.publish_time.strftime("%Y-%m-%d")
+                    data['enddate'] = product.end_time.strftime("%Y-%m-%d")
+                    data['publishtime'] = product.publish_time.strftime("%Y-%m-%d %H:%M:%S")
+
+                    ret['data'] = data
+
                 else:
-                    pay_method = 9
-                data['repaytype'] = pay_method
-
-                data['guaranttype'] = 1
-                data['threshold'] = 100
-
-                # 现在是招标前不往对方推送. 0状态不会被匹配.
-                if product.status in [u'录标', u'录标完成', u'待审核']:
-                    status = 0
-                elif product.status == u'正在招标':
-                    status = 1
-                else:
-                    status = 2
-                data['status'] = status
-
-                data['amount'] = product.total_amount
-                data['amounted'] = product.ordered_amount
-                data['progress'] = "%.2f" % product.completion_rate
-
-                # Attachment 重中的图片
-                detail = list()
-                detail.append({'title': product.name})
-                detail.append({'content': product.usage})
-
-                attachments = product.attachment_set.all()
-                for attachment in attachments:
-                    url = base_url + attachment.file.url
-                    detail.append({'image': url})
-                data['detail'] = detail
-
-                data['startdate'] = product.publish_time.strftime("%Y-%m-%d")
-                data['enddate'] = product.end_time.strftime("%Y-%m-%d")
-                data['publishtime'] = product.publish_time.strftime("%Y-%m-%d %H:%M:%S")
-
-                ret['data'] = data
-
-            else:
-                ret['status'] = 1
+                    ret['status'] = 1
 
         else:
             ret = {
@@ -1905,10 +1907,18 @@ def zhongjin_get_products():
 
     for product in wangli_products:
         prod = dict()
+        prod['wangli_id'] = product.pk
         if product in new_products:
-            prod['method'] = 'add'
 
-        # 如果用他们的id的话, 我们不做更新和下架
+            # 以下针对开发测试环境的手动数据处理对应id.
+            redis = redis_backend()
+            if not redis._get('wangli_id_'+str(product.pk)):
+                prod['method'] = 'add'
+            else:
+                if product.status == u'正在招标':
+                    prod['method'] = 'update'
+                else:
+                    prod['method'] = 'down'
         else:
             if product.status == u'正在招标':
                 prod['method'] = 'update'
@@ -1917,35 +1927,35 @@ def zhongjin_get_products():
 
         prod['classId'] = 1
 
-        # # 如果用他们的id的话, 我们不做更新和下架
-        # if not prod['method'] == 'add':
-        #     prod['productId'] = None
-        #     # prod['productId'] = product.pk    # productId 不是我们的id, 是他们返回的用来修改对应的
+        # 从redis 读对应他们的id
+        if not prod['method'] == 'add':
+            redis = redis_backend()
+            prod['productId'] = int(redis._get('wangli_id_'+str(product.pk)))
 
-        if prod['method'] == 'add':
-            prod['productName'] = product.name
-            prod['borrowMoney'] = product.total_amount
-            prod['investmentMoney'] = 100
-            period = product.period if product.pay_method.startswith(u"日计息")/30 else product.period
-            prod['investmentPeriod'] = period
+        prod['productName'] = product.name
+        prod['borrowMoney'] = product.total_amount
+        prod['investmentMoney'] = 100
+        period = product.period if product.pay_method.startswith(u"日计息")/30 else product.period
+        prod['investmentPeriod'] = period
 
-            prod['completeness'] = "%.2f" % product.completion_rate
-            prod['stopTime'] = product.soldout_time.strftime("%Y-%m-%d") \
-                if product.soldout_time else product.end_time.strftime("%Y-%m-%d")
-            prod['riskPreference'] = 2
-            prod['expectedYield'] = product.expected_earning_rate
+        prod['completeness'] = "%.2f" % product.completion_rate
+        prod['stopTime'] = product.soldout_time.strftime("%Y-%m-%d") \
+            if product.soldout_time else product.end_time.strftime("%Y-%m-%d")
+        prod['riskPreference'] = 2
+        prod['expectedYield'] = product.expected_earning_rate
 
-            # 根据不同环境对应不同的url
-            if settings.ENV == 'debug':
-                prod['enterpriseId'] = settings.ZHONGJIN_TEST_ID
-                base_url = 'http://127.0.0.1:8000'
-            if settings.ENV == 'staging':
-                prod['enterpriseId'] = settings.ZHONGJIN_TEST_ID
-                base_url = 'https://staging.wanglibao.com'
-            if settings.ENV == 'production':
-                prod['enterpriseId'] = settings.ZHONGJIN_ID
-                base_url = 'https://www.wanglibao.com'
-            prod['linkProfiles'] = base_url + '/p2p/detail/' + str(product.pk)
+        # 根据不同环境对应不同的url
+        base_url = ''
+        if settings.ENV == 'debug':
+            prod['enterpriseId'] = settings.ZHONGJIN_TEST_ID
+            base_url = 'http://127.0.0.1:8000'
+        if settings.ENV == 'staging':
+            prod['enterpriseId'] = settings.ZHONGJIN_TEST_ID
+            base_url = 'https://staging.wanglibao.com'
+        if settings.ENV == 'production':
+            prod['enterpriseId'] = settings.ZHONGJIN_ID
+            base_url = 'https://www.wanglibao.com'
+        prod['linkProfiles'] = base_url + '/p2p/detail/' + str(product.pk)
 
         prod['dt'] = int(time.time())
 
@@ -1995,8 +2005,16 @@ def zhongjin_post_p2p_info():
     prods = zhongjin_get_products()
     for args_dict in prods:
         url = zhongjin_get_sign(args_dict)
-        print url
-        urllib2.urlopen(url)
+        ret = eval(urllib2.urlopen(url).read())
+
+        # 把中金的产品 id 存到redis
+        if ret['flag'] == '1000':
+            zhongjin_pid = ret['msg']
+            wangli_id = args_dict['wangli_id']
+            redis = redis_backend()
+            if not redis._get('wangli_id_'+str(wangli_id)):
+                redis._set('wangli_id_'+str(wangli_id), zhongjin_pid)
+                redis.redis.expire('wangli_id_'+str(wangli_id), 24*60*60*7)
 
 
 def zhongjin_list_p2p():

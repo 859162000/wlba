@@ -134,6 +134,7 @@ class P2PProduct(ProductBase):
     version = IntegerVersionField()
     category = models.CharField(max_length=16, default=u'普通', choices=CATEGORY_CHOICES, verbose_name=u'产品类别*')
     types = models.ForeignKey(ProductType, verbose_name=u"产品分类(新)", null=True, on_delete=SET_NULL)
+    is_app_exclusive = models.BooleanField(u'是否app专享', default=False, help_text=u'默认不是app专享')
     hide = models.BooleanField(u'隐藏', default=False)
 
     name = models.CharField(max_length=256, verbose_name=u'名字*', blank=False)

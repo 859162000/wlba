@@ -40,12 +40,13 @@ urlpatterns = patterns(
     url(r'^eight_gift_two/$', TemplateView.as_view(template_name="eight_gift_two.jade")),
     url(r'^xingmei/$', TemplateView.as_view(template_name="xingmei.jade")),
     url(r'^pc_caipiao/$', TemplateView.as_view(template_name="pc_caipiao.jade")),
-    url(r'^september_activity/$', TemplateView.as_view(template_name="september_activity.jade")),
+    #url(r'^september_activity/$', TemplateView.as_view(template_name="september_activity.jade")),
     url(r'^web-view/$', TemplateView.as_view(template_name="webView.html")),
     url(r'^android-view/$', TemplateView.as_view(template_name="android_view.html")),
     url(r'^new_user/$', TemplateView.as_view(template_name="new_user.jade")),
     url(r'^recommended/$', TemplateView.as_view(template_name="recommended.jade")),
     url(r'^national/$', TemplateView.as_view(template_name="national.jade")),
+    url(r'^gold_two/$', TemplateView.as_view(template_name="gold_two.jade")),
 
 )
 
@@ -71,7 +72,7 @@ urlpatterns += patterns(
     url(r'^app_gold_day/$', TemplateView.as_view(template_name="app_gold_day.jade")),
     url(r'^app_pc_download/$', TemplateView.as_view(template_name="app_pc_download.jade")),
     url(r'^app_lottery/$', TemplateView.as_view(template_name="app_lottery.jade")),
-    url(r'^app_scratch/$', TemplateView.as_view(template_name="app_scratch.jade")),
+    #url(r'^app_scratch/$', TemplateView.as_view(template_name="app_scratch.jade")),
     url(r'^app_national/$', TemplateView.as_view(template_name="app_national.jade")),
 
 
@@ -96,6 +97,9 @@ urlpatterns += patterns(
     url(r'^app_ten_year/$', TemplateView.as_view(template_name="app_ten_year.jade")),
     url(r'^app_recommended/$', TemplateView.as_view(template_name="app_recommended.jade")),
     url(r'^app_iPhone_6S/$', TemplateView.as_view(template_name="app_iPhone_6S.jade")),
+    #url(r'^app_gold_season/$', TemplateView.as_view(template_name="app_gold_season.jade")),
+    url(r'^wx_gold_two/$', TemplateView.as_view(template_name="h5_gold_two.jade")),
+    url(r'^app_gold_two/$', TemplateView.as_view(template_name="app_gold_two.jade")),
 )
 
 urlpatterns += patterns(
