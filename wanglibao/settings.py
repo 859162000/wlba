@@ -995,6 +995,14 @@ else:
 # 返利投
 WLB_FOR_FANLITOU_KEY = '2002'
 
+# 迅雷VIP
+WLB_FOR_XUNLEIVIP_KEY = '2003'
+XUNLEIVIP_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/xljinku/sendvip/'
+XUNLEIVIP_REGISTER_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_report.php'
+XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
+XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
+
+
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
     local_ip = None
@@ -1004,6 +1012,9 @@ TRUST_IP = [
     local_ip,
     # 中国电信出口ip
     '182.140.241.10',
+    # 迅雷VIP
+    '123.150.216.177',
+    '111.161.125.177',
 ]
 
 SUIT_CONFIG = {
