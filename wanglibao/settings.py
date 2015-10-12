@@ -985,10 +985,8 @@ WLB_FOR_XUNLEIVIP_KEY = '2003'
 XUNLEIVIP_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/xljinku/sendvip/'
 XUNLEIVIP_REGISTER_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_report.php'
 XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
-if ENV == ENV_PRODUCTION:
-    XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
-else:
-    XUNLEIVIP_KEY = 'abcde'
+XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
+
 
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:

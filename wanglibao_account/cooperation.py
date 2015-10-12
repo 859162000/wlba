@@ -52,6 +52,7 @@ from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift
 import re
 import uuid
+import urllib
 
 logger = logging.getLogger(__name__)
 
@@ -1033,12 +1034,12 @@ class XunleiVipRegister(CoopRegister):
 
     def generate_sign(self, data, key):
         sorted_data = sorted(data.iteritems(), key=lambda asd:asd[0], reverse=False)
-        join_data = '&'.join([key+'='+str(value) for key, value in sorted_data if value])
-        sign = hashlib.md5(join_data+str(key)).hexdigest()
+        encode_data = urllib.urlencode(sorted_data)
+        sign = hashlib.md5(encode_data+str(key)).hexdigest()
         return sign
 
     def xunlei_call_back(self, user, tid, data, url):
-        order_id = hashlib.md5(str(uuid.uuid1())).hexdigest()[1:-1]
+        order_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')+'_'+str(data['act'])
         data['uid'] = tid
         data['orderid'] = order_id
         data['type'] = 'baijin'
