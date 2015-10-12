@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import urllib2
 from django.core.urlresolvers import reverse
 from django.db.models import Sum
 from django.http.response import HttpResponse, HttpResponseRedirect
@@ -14,123 +15,81 @@ from rest_framework.views import APIView
 import time
 from wanglibao import settings
 from wanglibao.permissions import IsAdminUserOrReadOnly
+from wanglibao.settings import SMS_MANDAO_USER_URL, SMS_MANDAO_SN, SMS_MANDAO_MD5_PWD, SMS_MANDAO_REPORT_URL
 from wanglibao_sms.models import ArrivedRate, MessageInRedis
 
 
-class AchievedMessages(APIView):
+def get_user_messages():
     """
-    author: Zhoudong
-    获取客户发送的短信参数, 保存到DB.
-    # https 方式用get方法给我们传参
-    method: GET.
-    """
-    permission_classes = ()
-
-    def get(self, request):
-
-        # 开发测试用数据
-        # data = self.request.GET.get('args', '123456,62891,138****065,ceshi01,2015-09-24 15:51:05;\
-        #                                       4464023,62891,139****404,test02,2015-09-23 15:51:17')
-        data = self.request.GET.get('args', None)
-        if data:
-            file_name = time.strftime('%Y-%m-%d' + '.log', time.localtime())
-            try:
-                os.mkdir('/var/log/wanglibao/user_message/')
-            except Exception, e:
-                print e
-            try:
-                os.system('touch %s%s' % ('/var/log/wanglibao/user_message/', file_name))
-            except Exception, e:
-                print e
-
-            try:
-                f = open('/var/log/wanglibao/user_message/' + file_name, 'a+')
-                args_list = data.split(';')
-                for args in args_list:
-                    # 保留所有参数
-                    params = args.replace(',', '\t') + '\n'
-                    # 保留需要的参数
-                    # params = '\t'.join(args.split(',')[1:5]) + '\n'
-                    f.write(params)
-                f.close()
-            except Exception, e:
-                Response(str(e))
-
-        return Response(data)
-
-
-class ReportMessages(APIView):
-    """
-    author: Zhoudong
-    获取短信回执参数, 保存到DB.
-    method: GET.
-    """
-    permission_classes = ()
-
-    def get(self, request):
-
-        # 开发测试用数据
-        # data = self.request.GET.get('args', '123456,62891,159*404,564687,DELIVRD,2015-09-24 13:01:36; \
-        #                                       123456,62891,189*404,420937,DELIVRD,2015-09-23 13:01:42')
-        data = self.request.GET.get('args', None)
-        if data:
-            file_name = time.strftime('%Y-%m-%d' + '.log', time.localtime())
-            try:
-                os.mkdir('/var/log/wanglibao/report_message/')
-            except Exception, e:
-                print e
-            try:
-                os.system('touch %s%s' % ('/var/log/wanglibao/report_message/', file_name))
-            except Exception, e:
-                print e
-
-            try:
-                f = open('/var/log/wanglibao/report_message/' + file_name, 'a+')
-                args_list = data.split(';')
-                for args in args_list:
-                    # 保留所有参数
-                    params = args.replace(',', '\t') + '\n'
-                    # 保留需要的参数
-                    # params = '\t'.join(args.split(',')[1:5]) + '\n'
-                    f.write(params)
-                f.close()
-            except Exception, e:
-                Response(str(e))
-
-        return Response(data)
-
-
-def count_message_arrived_rate():
-    """
-    author: Zhoudong
-    定时统计到达率
+    ret = '<?xml version="1.0" encoding="utf-8"?>\r\n<string xmlns="http://tempuri.org/">1012152831454,245633,13718331021,%c9%cf%d0%d0%401%2c%b9%fe%b9%fe,2015-10-12 15:27:48\r\n1012152837601,245633,13718331021,%c9%cf%d0%d02%ba%df%df%f3%df%f3,2015-10-12 15:27:54\r\n1012152841454,245633,13718331021,%c9%cf%d0%d03,2015-10-12 15:27:58</string>'
     :return:
     """
-    now = timezone.now()
-    local_now = timezone.localtime(now).replace(tzinfo=pytz.timezone(settings.TIME_ZONE))
-    delta = settings.MESSAGE_TIME_DELTA
-    start = local_now - delta
+    url = SMS_MANDAO_USER_URL + '?sn=%s&pwd=%s' % (SMS_MANDAO_SN, SMS_MANDAO_MD5_PWD)
+    ret = urllib2.urlopen(url).read()
+    ret = ret.rsplit('</string>')[0].split('<string xmlns="http://tempuri.org/">')[1]
+    print ret
 
-    total = 0
-    achieved = 0
+    if len(ret) < 10:
+        pass
+    else:
+        ret += '\n'
+        file_name = time.strftime('%Y-%m-%d' + '.log', time.localtime())
 
-    file_name = time.strftime('%Y-%m-%d' + '.log', time.localtime())
-    f = open('/var/log/wanglibao/report_message/' + file_name, 'r')
-    lines = f.readlines()
+        try:
+            os.mkdir('/var/log/wanglibao/user_message/')
+        except Exception, e:
+            print e
+        try:
+            os.system('touch %s%s' % ('/var/log/wanglibao/user_message/', file_name))
+        except Exception, e:
+            print e
 
-    for line in lines:
-        time_str = line.split('\t')[-1].split('\n')[0]
-        check_time = \
-            timezone.datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.timezone(settings.TIME_ZONE))
+        f = open('/var/log/wanglibao/user_message/' + file_name, 'a+')
+        f.writelines(ret)
+        f.close()
 
-        if start < check_time < local_now:
-            total += 1
-            if line.split('\t')[4] == 0 or line.split('\t')[4] == 'DELIVRD':
-                achieved += 1
+    return ret
 
-    if total > 0:
+
+def get_report_messages():
+    """
+    ?sn=%s&pwd=%s&maxid=1
+    :return:
+    """
+    url = SMS_MANDAO_REPORT_URL + '?sn=%s&pwd=%s&maxid=1' % (SMS_MANDAO_SN, SMS_MANDAO_MD5_PWD)
+    ret = urllib2.urlopen(url).read()
+    ret = ret.rsplit('</string>')[0].split('<string xmlns="http://tempuri.org/">')[1]
+
+    if len(ret) < 10:
+        pass
+    else:
+        ret += '\r\n'
+        file_name = time.strftime('%Y-%m-%d' + '.log', time.localtime())
+        try:
+            os.mkdir('/var/log/wanglibao/report_message/')
+        except Exception, e:
+            print e
+        try:
+            os.system('touch %s%s' % ('/var/log/wanglibao/report_message/', file_name))
+        except Exception, e:
+            print e
+
+        f = open('/var/log/wanglibao/report_message/' + file_name, 'a+')
+        f.writelines(ret)
+        f.close()
+
+        achieved = ret.count('DELIVRD') + ret.count(',0,')
+        total = ret.count('\r\n')
+
+        now = timezone.now()
+        local_now = timezone.localtime(now).replace(tzinfo=pytz.timezone(settings.TIME_ZONE))
+        delta = settings.MESSAGE_TIME_DELTA
+        start = local_now - delta
+
         ArrivedRate.objects.create(channel=u'慢道', achieved=achieved, total_amount=total,
                                    rate=float(achieved)/total*100, start=start, end=local_now)
+
+    return ret
 
 
 class ArriveRate(APIView):
