@@ -32,7 +32,7 @@ html
                     if product.category == '新手标'
                         .new-user.mt12 新手福利
                     else
-                        if p2p.is_app_exclusive
+                        if product.is_app_exclusive
                             .app-icon.mt9 APP专享
                     | {{product.name}}
                   if product.category == '证大速贷'
