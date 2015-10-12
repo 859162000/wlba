@@ -36,11 +36,13 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_YUNDUAN_KEY, YUNDUAN_CALL_BACK_URL, YUNDUAN_COOP_ID, WLB_FOR_YICHE_KEY, YICHE_COOP_ID, \
      YICHE_KEY, YICHE_CALL_BACK_URL, WLB_FOR_ZHITUI1_KEY, ZHITUI_COOP_ID, ZHITUI_CALL_BACK_URL, \
      WLB_FOR_ZGDX_KEY, ZGDX_CALL_BACK_URL, ZGDX_PARTNER_NO, ZGDX_SERVICE_CODE, ZGDX_CONTRACT_ID, \
-     ZGDX_ACTIVITY_ID, ZGDX_KEY, ZGDX_IV, WLB_FOR_NJWH_KEY, ENV, ENV_PRODUCTION, WLB_FOR_FANLITOU_KEY
+     ZGDX_ACTIVITY_ID, ZGDX_KEY, ZGDX_IV, WLB_FOR_NJWH_KEY, ENV, ENV_PRODUCTION, WLB_FOR_FANLITOU_KEY, \
+     WLB_FOR_XUNLEIVIP_KEY, XUNLEIVIP_CALL_BACK_URL, XUNLEIVIP_KEY, XUNLEIVIP_REGISTER_CALL_BACK_URL, \
+     XUNLEIVIP_REGISTER_KEY
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
-from wanglibao_pay.models import Card
+from wanglibao_pay.models import Card, PayInfo
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import UserThreeOrder
 from wanglibao_redis.backend import redis_backend
@@ -50,6 +52,7 @@ from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift
 import re
 import uuid
+import urllib
 
 logger = logging.getLogger(__name__)
 
@@ -104,6 +107,9 @@ def get_last_investment_for_coop(user_id):
     except:
         return None
 
+def get_first_pay_info(user_id):
+    payinfo = PayInfo.objects.filter(user_id=user_id).order_by('create_time')
+    return payinfo.first()
 
 def get_tid_for_coop(user_id):
     try:
@@ -348,6 +354,14 @@ class CoopRegister(object):
         """
         pass
 
+    def recharge_call_back(self, user):
+        """
+        用户充值后回调，一般用于用户首次充值之后回调第三方接口
+        :param user:
+        :return:
+        """
+        pass
+
     def process_for_register(self, user, invite_code):
         """
         用户可以在从渠道跳转后的注册页使用邀请码，优先考虑邀请码
@@ -421,6 +435,14 @@ class CoopRegister(object):
                 channel_processor.purchase_call_back(user)
         except:
             logger.exception('channel bind purchase process error for user %s'%(user.id))
+
+    def process_for_recharge(self, user):
+        try:
+            channel_processor = self.get_user_channel_processor(user)
+            if channel_processor:
+                channel_processor.recharge_call_back(user)
+        except:
+            logger.exception('channel recharge process error for user %s'%(user.id))
 
 
 class TianMangRegister(CoopRegister):
@@ -1002,12 +1024,91 @@ class WeixinRedpackRegister(CoopRegister):
         record.valid = 1
         record.save()
 
+
+class XunleiVipRegister(CoopRegister):
+    def __init__(self, request):
+        super(XunleiVipRegister, self).__init__(request)
+        self.c_code = 'xunlei9'
+        self.call_back_url = XUNLEIVIP_CALL_BACK_URL
+        self.register_call_back_url = XUNLEIVIP_REGISTER_CALL_BACK_URL
+        self.coop_key = XUNLEIVIP_KEY
+        self.coop_register_key = XUNLEIVIP_REGISTER_KEY
+
+    def generate_sign(self, data, key):
+        sorted_data = sorted(data.iteritems(), key=lambda asd:asd[0], reverse=False)
+        encode_data = urllib.urlencode(sorted_data)
+        sign = hashlib.md5(encode_data+str(key)).hexdigest()
+        return sign
+
+    def xunlei_call_back(self, user, tid, data, url):
+        order_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')+'_'+str(data['act'])
+        data['uid'] = tid
+        data['orderid'] = order_id
+        data['type'] = 'baijin'
+        sign = self.generate_sign(data, self.coop_key)
+        params = dict({'sign': sign}, **data)
+
+        # 创建渠道订单记录
+        channel_recode = get_user_channel_record(user.id)
+        order = UserThreeOrder(user=user, order_on=channel_recode, request_no=order_id)
+        order.save()
+
+        # 异步回调
+        common_callback.apply_async(
+            kwargs={'url': url, 'params': params, 'channel': self.c_code})
+
+    def register_call_back(self, user):
+        # 判断用户是否绑定
+        binding = Binding.objects.filter(user_id=user.id).first()
+        if binding:
+            data = {
+                'coop': 'wanglibao',
+                'xluserid': binding.bid,
+                'regtime': int(time.mktime(user.date_joined.date().timetuple()))
+            }
+            sign = self.generate_sign(data, self.coop_register_key)
+            params = dict({'sign': sign}, **data)
+            # 异步回调
+            common_callback.apply_async(
+                kwargs={'url': self.register_call_back_url, 'params': params, 'channel': self.c_code})
+
+    def recharge_call_back(self, user):
+        # 判断用户是否绑定和首次充值
+        binding = Binding.objects.filter(user_id=user.id).first()
+        pay_info = PayInfo.objects.filter(user_id=user.id).order_by('create_time')
+        if binding and pay_info.count() == 1:
+            # 判断充值金额是否大于100
+            pay_amount = int(pay_info.first().amount)
+            if pay_amount >= 100:
+                data = {
+                    'send_type': 1,
+                    'num1': 7,
+                    'act': 5171
+                }
+                self.xunlei_call_back(user, binding.bid, data, self.call_back_url)
+
+    def purchase_call_back(self, user):
+        # 判断用户是否绑定和首次投资
+        binding = Binding.objects.filter(user_id=user.id).first()
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
+        if binding and p2p_record.count() == 1:
+            # 判断投资金额是否大于100
+            pay_amount = int(p2p_record.first().amount)
+            if pay_amount >= 100:
+                data = {
+                    'send_type': '0',
+                    'num1': 12,
+                    'act': 5170
+                }
+                self.xunlei_call_back(user, binding.bid, data, self.call_back_url)
+
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
-                          ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister]
+                          ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
+                          XunleiVipRegister]
 
 
 #######################第三方用户查询#####################
