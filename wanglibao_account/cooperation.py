@@ -1242,6 +1242,124 @@ class CoopQuery(APIView):
             return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
 
 
+class CoopInvestmentQuery(APIView):
+    permission_classes = ()
+    channel = None
+
+    # 每一页用户数
+    PAGE_LENGTH = 20
+
+    def is_invested_user(self, user_id):
+        return P2PRecord.objects.filter(user_id=user_id, catalog=u'申购').exists()
+
+    def get_phone_for_coop(self, user_id):
+        try:
+            phone_number = WanglibaoUserProfile.objects.get(user_id=user_id).phone
+            return phone_number
+        except:
+            return None
+
+    def get_promo_user(self, channel_code, startday, endday):
+        """
+        :param channel_code: like "tianmang"
+        :param startday: 日期格式20050606
+        :param endday:
+        :return:
+        """
+        startday = datetime.datetime.strptime(startday, "%Y%m%d")
+        endday = datetime.datetime.strptime(endday, "%Y%m%d")
+        if startday > endday:
+            endday, startday = startday, endday
+
+        # daydelta = datetime.timedelta(days=1)
+        daydelta = datetime.timedelta(hours=23, minutes=59, seconds=59, milliseconds=59)
+        endday += daydelta
+        promo_list = IntroducedBy.objects.filter(channel__code=channel_code, created_at__gte=startday, created_at__lte=endday)
+        # logger.debug("promo user:%s"%[promo_user.user for promo_user in promo_list])
+        return promo_list
+
+    def check_sign(self, channel_code, startday, endday, sign):
+        m = hashlib.md5()
+        key = getattr(settings, 'WLB_FOR_%s_KEY' % channel_code.upper())
+        m.update(startday+endday+key)
+        local_sign = m.hexdigest()
+        if sign != local_sign:
+            # logger.debug('正确的渠道校验参数%s'%local_sign)
+            logger.error(u"渠道查询接口，sign参数校验失败")
+            return False
+        return True
+
+    def get_user_info_for_coop(self, user_id):
+        user_info = {
+            'uid': get_uid_for_coop(user_id),
+            'uname': get_username_for_coop(user_id),
+            'phone': self.get_phone_for_coop(user_id),
+            'tid': get_tid_for_coop(user_id),
+        }
+
+        user_info_set = []
+        p2p_record_set = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购').order_by('create_time')
+        for p2p_record in p2p_record_set:
+            user_p2p_info = {
+                'investment': p2p_record.amount,
+                'time': p2p_record.create_time,
+                'pid': p2p_record.product_id
+            }
+
+            if user_p2p_info['time']:
+                user_p2p_info['time'] = timezone.localtime(user_p2p_info['time']).strftime('%Y-%m-%d %H:%M:%S')
+
+            user_info_set.append(dict(user_info, **user_p2p_info))
+
+        return user_info_set
+
+    def get_all_user_info_for_coop(self, channel_code, start_day, end_day, sign, page):
+        if not self.check_sign(channel_code, start_day, end_day, sign):
+            raise ValueError('wrong signature.')
+
+        coop_users = self.get_promo_user(channel_code, start_day, end_day)
+        coop_users = [u for u in coop_users if self.is_invested_user(u.user_id)]
+
+        # 处理分页
+        if page:
+            page = int(page)
+            start = page * self.PAGE_LENGTH
+            end = start + self.PAGE_LENGTH
+            coop_users = coop_users[start:end]
+
+        user_info = []
+        for coop_user in coop_users:
+            try:
+                user_info += self.get_user_info_for_coop(coop_user.user_id)
+            except Exception, e:
+                logger.exception(e)
+                logging.debug('get user %s error:%s' % (coop_user.user_id, e))
+
+        return user_info
+
+    def get(self, request, channel_code, start_day, end_day, sign, page=None):
+        try:
+            result = {
+                'errorcode': 0,
+                'errormsg': 'sucess',
+                'info': self.get_all_user_info_for_coop(channel_code, start_day, end_day, sign, page)
+            }
+        except ValueError, e:
+            result = {
+                'errorcode': 2,
+                'errormsg': 'sign error',
+            }
+        except Exception, e:
+            logger.exception(e.message)
+            result = {
+                'errorcode': 1,
+                'errormsg': 'api error'
+            }
+        finally:
+            # logger.debug(result)
+            return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+
+
 ###########################################希财网对接#####################################################################
 
 def get_rate(product_id_or_instance):
