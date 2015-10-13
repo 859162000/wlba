@@ -419,6 +419,7 @@ class WeixinShareDetailView(TemplateView):
 
                 if redpack_event:
                     redpack_backends.give_activity_redpack(user_profile.user, redpack_event, 'pc')
+                    logger.debug("给用户 %s 发了红包，红包大小：%s, 红包组合是:%s, 购标订单号：%s" % (phone_num,redpack_event.amount, activity, product_id))
                     sending_gift.valid = 1
                     sending_gift.save()
 
