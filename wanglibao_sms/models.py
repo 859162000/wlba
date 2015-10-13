@@ -24,7 +24,8 @@ class PhoneValidateCode(models.Model):
     validate_code = models.CharField(verbose_name="Validate code", max_length=6)
     validate_type = models.CharField(max_length=64)
     is_validated = models.BooleanField(default=False)
-    last_send_time = models.DateTimeField()
+    # Modify by hb on 2015-10-13 : add 'db_index' for last_send_time
+    last_send_time = models.DateTimeField(db_index=True)
     code_send_count = models.IntegerField(default=0)
     vcount = models.IntegerField(u"验证次数", null=False, blank=False, default=0)
     data = models.TextField(default="")
