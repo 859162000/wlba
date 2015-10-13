@@ -13,7 +13,7 @@ import inspect
 import time
 import json
 import logging
-import base64
+from django.views.decorators.csrf import csrf_protect
 from wanglibao_account import message as inside_message
 from marketing.models import IntroducedBy, Reward
 from wanglibao_reward.models import WanglibaoActivityGift, WanglibaoUserGift, WanglibaoActivityGiftGlobalCfg, WanglibaoWeixinRelative
@@ -26,8 +26,6 @@ from django.views.generic import TemplateView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from marketing.utils import get_user_channel_record
-from django.shortcuts import redirect
-from decimal import Decimal
 from django.conf import settings
 logger = logging.getLogger('wanglibao_reward')
 
@@ -378,7 +376,14 @@ class WeixinShareDetailView(TemplateView):
             self.get_activity_by_id(activity)
 
         try:
-            gift = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity, valid=True).first()
+            gifts = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity, valid=True)
+            counts = gifts.count()
+            if counts == 0:
+                gift = None
+            else:
+                index = int(time.time())%counts
+                gift = gifts[index]
+
         except Exception, reason:
             self.exception_msg(reason, u'获得待发奖项抛异常')
             return None
@@ -524,6 +529,7 @@ class WeixinShareDetailView(TemplateView):
     def throw_exception(self, msg):
         raise Exception(msg)
 
+    @csrf_protect
     def get_context_data(self, **kwargs):
         openid = kwargs["openid"]
         phone_num = kwargs['phone_num']
@@ -567,10 +573,10 @@ class WeixinShareDetailView(TemplateView):
             self.debug_msg('phone:%s 没有领取过奖品' %(phone_num,) )
             user_gift = self.distribute_redpack(phone_num, openid, activity, order_id)
 
-            if "No Reward" == user_gift:
-                self.debug_msg('奖品已经发完了，用户:%s 没有领到奖品' %(phone_num,))
-                redirect_url = reverse('weixin_share_end')+'?url_id=%s'%order_id
-                return redirect(redirect_url)
+            #if "No Reward" == user_gift:
+            #    self.debug_msg('奖品已经发完了，用户:%s 没有领到奖品' %(phone_num,))
+            #    redirect_url = reverse('weixin_share_end')+'?url_id=%s'%order_id
+            #    return redirect(redirect_url)
         else:
             self.debug_msg('phone:%s 已经领取过奖品' %(phone_num,))
         gifts = self.get_distribute_status(order_id, activity)
@@ -602,6 +608,7 @@ class WeixinShareDetailView(TemplateView):
 class WeixinShareEndView(TemplateView):
     template_name = 'app_weChatEnd.jade'
 
+    @csrf_protect
     def get_context_data(self, **kwargs):
         order_id = self.request.GET.get('url_id')
         shareTitle, shareContent, url = get_share_infos(order_id)
@@ -620,6 +627,7 @@ class WeixinShareStartView(TemplateView):
         except Exception, reason:
             logger.exception(u"判断用户投资额度抛异常 %s" %(reason,) )
 
+    @csrf_protect
     def get_context_data(self, **kwargs):
         openid = self.request.GET.get('openid')
         order_id = self.request.GET.get('url_id')

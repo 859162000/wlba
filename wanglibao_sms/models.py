@@ -1,8 +1,10 @@
 # coding=utf-8
+import cPickle
 from django.db import models
 from django.utils import timezone
 from django.db.models.signals import post_save
 from redisco import models as rmodels
+from wanglibao_redis.backend import redis_backend
 
 
 class PhoneValidateCode(models.Model):
@@ -81,7 +83,7 @@ class ArrivedRate(models.Model):
     channel = models.CharField(u'短信网关', max_length=20, db_index=True)
     achieved = models.IntegerField(u'到达数')
     total_amount = models.IntegerField(u'发送总数')
-    rate = models.DecimalField(u'到达率', max_digits=4, decimal_places=2)
+    rate = models.DecimalField(u'到达率', max_digits=5, decimal_places=2)  # 100.00 % bug fixed.
     start = models.CharField(u'统计开始时间', max_length=64)
     end = models.CharField(u'统计结束时间', max_length=64)
     created_at = models.DateTimeField(u'报告创建时间', auto_now_add=True, db_index=True)
@@ -97,6 +99,8 @@ class MessageTemplate(models.Model):
     message_for = models.CharField(u'对应短信', max_length=32, unique=True, db_index=True)
     title = models.CharField(u'短信标题', max_length=32, blank=True)
     content = models.TextField(u'短信内容')
+    args_num = models.IntegerField(u'参数个数', default=0)
+    args_tips = models.CharField(u'参数提示', max_length=64, blank=True)
 
     class Meta:
         verbose_name = u'短信模板'
@@ -105,12 +109,17 @@ class MessageTemplate(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        :param args:
-        :param kwargs:
+        author: Zhoudong
+        save to redis as {message_for: '{'title':title, 'content':content}'}
         :return:
         """
-        # TODO
-        # save to redis as {message_for: '{'title':title, 'content':content}'}
+        redis = redis_backend()
+
+        value = dict()
+        value['title'] = self.title
+        value['content'] = self.content
+
+        redis._set(self.message_for, cPickle.dumps(value))
         return super(MessageTemplate, self).save(*args, **kwargs)
 
 

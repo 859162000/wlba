@@ -142,7 +142,12 @@ html
                         em.new-user 新手福利
                         | {{p2p.name}}
                     else
-                      span.font-l {{p2p.name}}
+                      if p2p.is_app_exclusive
+                          span.font-l
+                            em.app-icon APP专享
+                            | {{p2p.name}}
+                      else
+                        span.font-l {{p2p.name}}
                   if index == 0
                     .t-d7.clearfix
                       .span5.es 合作机构: {{p2p.warrant_company}}
