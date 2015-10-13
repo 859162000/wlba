@@ -1,7 +1,10 @@
 # coding=utf-8
+import cPickle
 from django.db import models
 from django.utils import timezone
 from django.db.models.signals import post_save
+from redisco import models as rmodels
+from wanglibao_redis.backend import redis_backend
 
 
 class PhoneValidateCode(models.Model):
@@ -21,7 +24,8 @@ class PhoneValidateCode(models.Model):
     validate_code = models.CharField(verbose_name="Validate code", max_length=6)
     validate_type = models.CharField(max_length=64)
     is_validated = models.BooleanField(default=False)
-    last_send_time = models.DateTimeField()
+    # Modify by hb on 2015-10-13 : add 'db_index' for last_send_time
+    last_send_time = models.DateTimeField(db_index=True)
     code_send_count = models.IntegerField(default=0)
     vcount = models.IntegerField(u"验证次数", null=False, blank=False, default=0)
     data = models.TextField(default="")
@@ -67,11 +71,69 @@ class ShortMessage(models.Model):
     def __unicode__(self):
         return u'手机号：%s 内容：%s' % (self.phones, self.contents)
 
+
 class RateThrottle(models.Model):
     ip = models.CharField(u'ip', max_length=24, db_index=True)
     max_count = models.IntegerField(u"最大发送次数", null=False, blank=False, default=10)
     send_count = models.IntegerField(u"已发送次数", null=False, blank=False, default=0)
     last_send_time = models.DateTimeField(default=timezone.now)
+
+
+class ArrivedRate(models.Model):
+
+    channel = models.CharField(u'短信网关', max_length=20, db_index=True)
+    achieved = models.IntegerField(u'到达数')
+    total_amount = models.IntegerField(u'发送总数')
+    rate = models.DecimalField(u'到达率', max_digits=5, decimal_places=2)  # 100.00 % bug fixed.
+    start = models.CharField(u'统计开始时间', max_length=64)
+    end = models.CharField(u'统计结束时间', max_length=64)
+    created_at = models.DateTimeField(u'报告创建时间', auto_now_add=True, db_index=True)
+
+    class Meta:
+        verbose_name = u'到达率记录'
+        verbose_name_plural = u'到达率记录'
+        ordering = ['-created_at']
+
+
+class MessageTemplate(models.Model):
+
+    message_for = models.CharField(u'对应短信', max_length=32, unique=True, db_index=True)
+    title = models.CharField(u'短信标题', max_length=32, blank=True)
+    content = models.TextField(u'短信内容')
+    args_num = models.IntegerField(u'参数个数', default=0)
+    args_tips = models.CharField(u'参数提示', max_length=64, blank=True)
+
+    class Meta:
+        verbose_name = u'短信模板'
+        verbose_name_plural = u'短信模板'
+        ordering = ['id']
+
+    def save(self, *args, **kwargs):
+        """
+        author: Zhoudong
+        save to redis as {message_for: '{'title':title, 'content':content}'}
+        :return:
+        """
+        redis = redis_backend()
+
+        value = dict()
+        value['title'] = self.title
+        value['content'] = self.content
+
+        redis._set(self.message_for, cPickle.dumps(value))
+        return super(MessageTemplate, self).save(*args, **kwargs)
+
+
+class MessageInRedis(rmodels.Model):
+
+    message_for = rmodels.CharField(required=True, unique=True)
+    title = rmodels.CharField()
+    content = rmodels.Attribute()
+
+    class Meta:
+        verbose_name = u'短信模板'
+        verbose_name_plural = u'短信模板'
+        ordering = ['message_for']
 
 
 def send_manual_message(sender, instance, **kwargs):
