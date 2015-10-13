@@ -62,7 +62,7 @@ urlpatterns = patterns(
     url(r'^' + settings.ADMIN_ADDRESS + '/', include('weixin.admin_urls')),
     url(r'^' + settings.ADMIN_ADDRESS + '/', include(admin.site.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    # url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
+    url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
     url(r'^accounts/', include('wanglibao_account.urls')),
     url(r'^shumi/', include('shumi_backend.urls')),
     url(r'^pay/', include('wanglibao_pay.urls')),

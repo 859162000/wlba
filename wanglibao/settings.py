@@ -306,6 +306,8 @@ DEFAULT_FROM_EMAIL = 'noreply@wanglibao.com'
 # 新的漫道请求设置
 SMS_MANDAO_URL = 'http://sdk.entinfo.cn:8061/webservice.asmx/mdsmssend'
 SMS_MANDAO_MULTICAST_URL = 'http://sdk2.entinfo.cn:8061/webservice.asmx/mdgxsend'
+SMS_MANDAO_USER_URL = 'http://sdk.entinfo.cn:8060/webservice.asmx/mo'
+SMS_MANDAO_REPORT_URL = 'http://report.zucp.net:8060/reportservice.asmx/report'
 SMS_MANDAO_SN = 'SDK-SKY-010-02839'
 SMS_MANDAO_MD5_PWD = '1FE15236BBEB705A8F5D221F47164693'
 
@@ -1001,6 +1003,7 @@ XUNLEIVIP_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/xljinku/sendvip/'
 XUNLEIVIP_REGISTER_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_report.php'
 XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
 XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
+XUNLEI9_ACTIVITY_PAGE = 'marketing_xunlei_setp'
 
 
 # 对第三方回调做IP鉴权所信任的IP列表

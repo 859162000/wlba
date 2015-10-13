@@ -13,7 +13,7 @@ import inspect
 import time
 import json
 import logging
-import base64
+from django.views.decorators.csrf import csrf_protect
 from wanglibao_account import message as inside_message
 from marketing.models import IntroducedBy, Reward
 from wanglibao_reward.models import WanglibaoActivityGift, WanglibaoUserGift, WanglibaoActivityGiftGlobalCfg, WanglibaoWeixinRelative
@@ -26,8 +26,6 @@ from django.views.generic import TemplateView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from marketing.utils import get_user_channel_record
-from django.shortcuts import redirect
-from decimal import Decimal
 from django.conf import settings
 logger = logging.getLogger('wanglibao_reward')
 
@@ -531,6 +529,7 @@ class WeixinShareDetailView(TemplateView):
     def throw_exception(self, msg):
         raise Exception(msg)
 
+    @csrf_protect
     def get_context_data(self, **kwargs):
         openid = kwargs["openid"]
         phone_num = kwargs['phone_num']
@@ -609,6 +608,7 @@ class WeixinShareDetailView(TemplateView):
 class WeixinShareEndView(TemplateView):
     template_name = 'app_weChatEnd.jade'
 
+    @csrf_protect
     def get_context_data(self, **kwargs):
         order_id = self.request.GET.get('url_id')
         shareTitle, shareContent, url = get_share_infos(order_id)
@@ -627,6 +627,7 @@ class WeixinShareStartView(TemplateView):
         except Exception, reason:
             logger.exception(u"判断用户投资额度抛异常 %s" %(reason,) )
 
+    @csrf_protect
     def get_context_data(self, **kwargs):
         openid = self.request.GET.get('openid')
         order_id = self.request.GET.get('url_id')

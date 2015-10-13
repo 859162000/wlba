@@ -211,24 +211,28 @@ body .clear {
 .explain{
     width:100%;
     margin-top:3.5em;
+    font-size:0;
 }
 .explain .bg1{
     width:100%;
     display:block;
 }
 .explain .main{
-    padding: 2em 5.3%;
+    padding: 0.8rem 5.3%;
     width:100%;
     background: url(/static/imgs/mobile_activity/app_gold_season/explain2.png);
     display:inline-block;
     background-size: 100% 100%;
+    font-size:0;
+}
+.explain .main dl{
+    display:inline-block;
 }
 .goldSeason .explain .main dt,.goldSeason .explain .main dd {
-    max-height: 999999999rem;
 	color: #666;
-	padding: 0 0.8em;
-	font-size: 1.2em;
-    line-height: 2em;
+	padding: 0 0.2rem;
+	font-size: 0.6rem;
+    line-height: 1.2rem;
 }
 .goldSeason .explain .main dt span,.goldSeason .explain .main dd span {
 	color: #ec551d
@@ -243,7 +247,8 @@ body .clear {
 }
 .goldSeason .exampleImg{
     width:100%;
-    display:block;
+    display:inline-block;
+    padding:0.8rem 0;
 }
 .goldSeason .example .leftImg {
 	float: left;
@@ -328,11 +333,11 @@ body .goldSeason .example .rightMain .number dl dt {
 }
 .goldSeason .cheats {
 	width: 100%;
-    display: inline-block;
+    font-size:0;
 }
 .goldSeason .cheats .img{
     position:relative;
-    display: block;
+    display:inline-block;
     width:100%;
 }
 .goldSeason .cheats .bg1 {
@@ -373,13 +378,13 @@ body .goldSeason .example .rightMain .number dl dt {
     background-size: 100% 100%;
     display: inline-block;
     width:100%;
-    padding: 3em 4.75% 0;
+    padding: 1rem 4.75% 0;
 }
 .goldSeason .cheats .rule p {
+    display:inline-block;
 	color: #666;
-	line-height: 2em;
-    max-height: 999999999rem;
-	font-size: 1.2em;
+	line-height: 1.2rem;
+	font-size: 0.6rem;
 }
 .goldSeason .cheats .rule .calculation {
 	color: #ec551d
@@ -396,4 +401,18 @@ body .goldSeason .example .rightMain .number dl dt {
     color: #fff;
     font-size:1.2em;
     line-height: 1.6em;
+}
+@media screen and (min-width: 700px) and (min-height: 700px) {
+    .explain .main{
+        padding: 0.8rem 5.3%;
+    }
+    .goldSeason .explain .main dt, .goldSeason .explain .main dd {
+        padding: 0 0.4rem;
+        font-size: 1.2rem;
+        line-height: 2.4rem;
+    }
+    .goldSeason .cheats .rule p {
+        line-height: 1.67rem;
+        font-size: 1.2rem;
+    }
 }

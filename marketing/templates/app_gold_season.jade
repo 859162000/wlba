@@ -7,7 +7,7 @@ html
         meta(content="telephone=no,email=no" ,name="format-detection")
         meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
         meta(content="yes" ,name="apple-mobile-web-app-capable")
-        link(href="/static/styles/mobile_activity/app_gold_season.css", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_gold_season.css?v=201510131", rel="stylesheet")
         body
             .goldSeason
                 img.goldSeasonBanner(src='/static/imgs/mobile_activity/app_gold_season/banner.jpg')
@@ -88,27 +88,7 @@ html
                             dd &nbsp;&nbsp;&nbsp;&nbsp;- 邀请好友注册网利宝，若好友注册后，投资3个月以上（含3个月）项目，则享有好友投资额3‰作为邀请佣金；若好友再邀请他人注册并投资3个月以上（含3个月）项目，可与好友一起享有投资额的3‰作为邀请佣金；
                             dd!=' &nbsp;&nbsp;&nbsp;&nbsp;-  例如：用户A邀请新用户B注册并投资，则A享有B在活动时间内<span>每笔投资额3‰</span>的邀请佣金；用户B再邀请新用户C注册并投资，则A与B同时享有C在活动时间内<span>每笔投资额3‰</span>的邀请佣金； 用户C再邀请新用户D注册并投资，则Ｂ与C同时享有D在活动时间内<span>每笔投资额3‰</span>的邀请佣金； A不再享有D的佣金。以此类推。（其中B、C、D每笔投资项目期限须<span>≥3个月</span>）；'
                         img.exampleImg(src='/static/imgs/mobile_activity/app_gold_season/cheats_img.png')
-                        //.example
-                        //    img.leftImg(src='/static/imgs/mobile_activity/app_gold_season/chestnutsImg.png')
-                        //    .rightMain
-                        //        p.title 活动期内用户A邀请用户B注册并投资3个月标10万元，用户B又邀请用户C注册并投资3个月标10万元。则用户A获得邀请佣金为：10万元*3‰+10万*3‰=600元，用户B获得邀请佣金为: 10万元*3‰=300元。
-                        //        .example1
-                        //            p.text 用户A的邀请佣金 ( 元 ):
-                        //            .number
-                        //                span.bold 600 &nbsp;=
-                        //                dl
-                        //                    dt.bold 300
-                        //                    dd 用户B投资所得的佣金<br>10万*3‰
-                        //                span.add.bold +
-                        //                dl
-                        //                    dt.bold 300
-                        //                    dd 用户C投资所得的佣金<br>10万*3‰
-                        //        .example2
-                        //            p.text 用户B的邀请佣金 ( 元 ):
-                        //            .number
-                        //                dl.right
-                        //                    dt 300
-                        //                    dd 用户C投资所得的佣金<br>10万*3‰
+
                         dl
                             dd &nbsp;&nbsp;&nbsp;&nbsp;-  被邀请人注册时须使用邀请人提供的专属链接或专属邀请码，活动邀请关系方成立，网利宝仅以此确认邀请关系；
                             dd &nbsp;&nbsp;&nbsp;&nbsp;-  活动期间内，邀请人获得的邀请佣金累计无上限；被邀请人受邀注册后，将获得520元现金红包。
@@ -121,9 +101,7 @@ html
                 .cheats
                     .img
                         img(src='/static/imgs/mobile_activity/app_gold_season/cheats_bg1.png').bg1
-                        //.text1.text 间接邀请佣金：810000
-                        //.text2.text 直接邀请佣金：27000
-                        //.title 邀请佣金共为：<br>837000
+
                     .rule
                         p!='如果你邀请了30个好友，他们每人在活动期间内投资3个月标10万元共3次，那你的直接邀请佣金为：<span class="calculation">27000=30*10万元*3次投资*0.3%</span>'
                         p <br>如果你邀请的30个好友每人又邀请了30人，那么你就拥有900个间接邀请人。同样，他们每人在活动期间内投资3个月标10万元共3次，那你的间接邀请佣金为：
@@ -166,8 +144,6 @@ html
                             is_animate = false;
                         })
                     }
-
-
                     var windowHeight = $("body").height();
                     var cheatseight = $(".cheats").height();
                     var footerHeight = $(".cheats").height();
@@ -183,7 +159,6 @@ html
                     $(window).scroll(function(){
                         button_fix();
                     });
-
                     $.ajax({
                         url: '/api/gettopofearings/',
                         type: "POST"
@@ -213,5 +188,4 @@ html
                         $('.rankingList ul.three').html(rankingList_amount.join(''));
                         page_scroll();
                     })
-
                   })
