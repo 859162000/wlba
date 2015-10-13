@@ -30,10 +30,10 @@ html
                     .warrant-icon.di 担
                   a(href="/p2p/detail/{{product.id}}")
                     if product.category == '新手标'
-                        .new-user.mt12 新手福利
+                        .new-user.mt12
                     else
                         if product.is_app_exclusive
-                            .app-icon.mt9 APP专享
+                            .app-icon.mt9
                     | {{product.name}}
                   if product.category == '证大速贷'
                     span.tip 满标后持满180天即可债权转让
