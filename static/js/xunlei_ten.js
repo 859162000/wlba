@@ -68,15 +68,25 @@
         $('#small-zc').height(body_h);
 
         //关闭弹出框
-        var times=0;
+        var change = [];
+        redpack('ENTER_WEB_PAGE');
+        var times = 0;
         $('.first-xl-off2,.reg-btn').on('click', function () {
             //window.location.reload();
-            if(times==0){
-              $('.left-box').addClass("small-box-open");
-            }else {
-              $('.right-box').addClass("small-box-open1");
+            if (times == 0) {
+                $('.left-box').addClass("small-box-open");
+            } else if (times >= 1) {
+                $('.right-box').addClass("small-box-open1");
             }
             times++;
+            if (change['ret_code'] == 4000) {
+                $('.left-box').removeClass("small-box-open");
+                $('.right-box').removeClass("small-box-open1");
+            }
+            if (change['ret_code'] == 3000) {
+                $('.left-box').removeClass("small-box-open");
+                $('.right-box').removeClass("small-box-open1");
+            }
             if (change['left'] == 0) {
                 $('.center-box').addClass("big-box-open");
                 $('.left-box').addClass("small-box-open");
@@ -87,7 +97,7 @@
 
             $('#small-zc').hide();
             $('#xl-aug-login').hide();
-            $('#xl-aug-success').hide();
+            $('#xl-aug-success11').hide();
             $('#xl-aug-prize').hide();
             $('#xl-aug-fail').hide();
         })
@@ -109,8 +119,8 @@
                 $('.money').css({'top': '135px', 'left': '-97px', 'display': 'block'})
             })
         }, 1000)
-        var change = [];
-        redpack('ENTER_WEB_PAGE');
+        //var change = [];
+        //redpack('ENTER_WEB_PAGE');
 
         $('.ten-txtbutn').on('click', function () {
             if (change['ret_code'] == 4000) {
@@ -133,19 +143,6 @@
             $('body,html').animate({scrollTop: 0}, 600);
             return false
         })
-        //$('.open-box-btn').on('click', function () {
-        //    if ($(this).hasClass('received')) {
-        //        $('.center-box').addClass("big-box-open");
-        //        $('.right-box').addClass("small-box-open1");
-        //        //.big-box-open  small-box-open  .left-box  .right-box
-        //    } else {
-        //        $('#small-zc').show();
-        //        $('#xl-aug-login').show();
-        //    }
-        //
-        //})
-
-
         if (change['left'] == 2) {
             $('.left-box').addClass("small-box-open");
         } else if (change['left'] == 1) {
@@ -159,11 +156,16 @@
         else {
             $('.center-box').removeClass("big-box-open");
         }
+        //宝箱点击
         $('.open-box-btn').on('click', function () {
 
 
             redpack('ENTER_WEB_PAGE', function (data) {
-
+                if (data['ret_code'] == 4000) {
+                    $('.center-box').removeClass("big-box-open");
+                } else {
+                    $('.center-box').addClass("big-box-open");
+                }
                 if (!$('.go-game').hasClass('noClick')) {
                     if (data['ret_code'] == 4000) {
                         $('#small-zc').show();
@@ -179,6 +181,7 @@
                                 game(data['get_time']);
                             } else {
                                 game();
+                                $('.center-box').addClass("big-box-open");
                             }
 
                         }
@@ -207,7 +210,7 @@
         }
 
 
-        //开始转动
+        //提示语
         function star(a) {
             setTimeout(function () {
                 $('#rmb').text(parseInt(change['amount']));
@@ -216,13 +219,16 @@
                     $('.center-box').addClass("big-box-open");
                     var txt = ['佛说：前世的500次回眸才换得一次中奖，淡定', '奖品何时有，把酒问青天', '大奖下回见，网利宝天天见/**/'];
                     var ind = parseInt(Math.random() * 3);
-                    $('#xl-aug-success').hide();
+                    $('#xl-aug-success11').hide();
                     $('#xl-aug-prize p').text(txt[ind]);
                     $('#xl-aug-prize').show();
 
                 } else {
                     $('#xl-aug-prize').hide();
-                    $('#xl-aug-success').show();
+                    var txtg = ['人世间最美好的事情莫过于如此，1%加息券', '人品大爆发，1%加息券', '终于等到你，还好我没放弃，1%加息券'];
+                    var indw = parseInt(Math.random() * 3);
+                    $('#xl-aug-success11 p .xl-aug').text(txtg[indw]);
+                    $('#xl-aug-success11').show();
                 }
             }, 1000)
 
@@ -232,13 +238,13 @@
         //请求宝箱接口
         function redpack(sum, callback) {
             $.ajax({
-                url: "/api/xunlei/award/",
+                url: "/api/xunlei/award/action/",
                 type: "POST",
                 data: {action: sum},
                 async: false
             }).done(function (data) {
                 change = data;
-                $('#chance').text(change['left']);
+                console.log(change);
 
                 callback && callback(data);
 
