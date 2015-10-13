@@ -337,11 +337,11 @@ body .goldSeason .example .rightMain .number dl dt {
 }
 .goldSeason .cheats .img{
     position:relative;
-    display: block;
+    display:inline-block;
     width:100%;
 }
 .goldSeason .cheats .bg1 {
-    display:inline-block;
+    display:block;
 	width: 100%;
 }
 
@@ -381,9 +381,9 @@ body .goldSeason .example .rightMain .number dl dt {
     padding: 1rem 4.75% 0;
 }
 .goldSeason .cheats .rule p {
+    display:inline-block;
 	color: #666;
 	line-height: 1.2rem;
-    max-height: 999999999rem;
 	font-size: 0.6rem;
 }
 .goldSeason .cheats .rule .calculation {
