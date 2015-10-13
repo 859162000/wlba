@@ -341,7 +341,7 @@ body .goldSeason .example .rightMain .number dl dt {
     width:100%;
 }
 .goldSeason .cheats .bg1 {
-    display:block;
+    display:inline-block;
 	width: 100%;
 }
 
@@ -401,4 +401,18 @@ body .goldSeason .example .rightMain .number dl dt {
     color: #fff;
     font-size:1.2em;
     line-height: 1.6em;
+}
+@media screen and (min-width: 700px) and (min-height: 700px) {
+    .explain .main{
+        padding: 0.8rem 5.3%;
+    }
+    .goldSeason .explain .main dt, .goldSeason .explain .main dd {
+        padding: 0 0.4rem;
+        font-size: 1.2rem;
+        line-height: 2.4rem;
+    }
+    .goldSeason .cheats .rule p {
+        line-height: 1.67rem;
+        font-size: 1.2rem;
+    }
 }
