@@ -93,6 +93,60 @@
         $('.money').css({'top':'135px','left':'-97px','display':'block'})
       })
     },1000)
+    var change = [];
+    redpack('ENTER_WEB_PAGE');
+    $('.open-box-btn').on('click',function(){
+        if ($(this).hasClass('received')){
+            $('.center-box').addClass("big-box-open");
+            $('.right-box').addClass("small-box-open1");
+            //.big-box-open  small-box-open  .left-box  .right-box
+        }else{
+          $('#small-zc').show();
+          $('#xl-aug-login').show();
+        }
+
+    })
+    $('.ten-txtbutn').on('click',function(){
+        if (change['ret_code']==4000){
+          $('#small-zc').show();
+          $('#xl-aug-fail p').text('Sorry~您不符合领奖条件');
+          $('#xl-aug-fail').show();
+        }else
+        if ($(this).hasClass('received')){
+          window.location.href="/"
+        }else{
+          $('#small-zc').show();
+          $('#xl-aug-login').show();
+        }
+
+      })
+
+    //回到banner注册
+    $('.setplogin').on('click',function(){
+      $('#small-zc').hide();
+      $('#xl-aug-login').hide();
+      $('body,html').animate({scrollTop: 0}, 600);
+        return false
+    })
+
+
+      //请求宝箱接口
+      redpack();
+    function redpack(sum, callback){
+      $.ajax({
+        url: "/api/xunlei/award/",
+        type: "POST",
+        data: {action:sum},
+        async: false
+      }).done(function(data) {
+         change = data;
+          console.log(change);
+        $('#chance').text(change['left']);
+
+        callback && callback(data);
+
+      });
+    }
 
 
   });

@@ -26,30 +26,48 @@ html
       .ten-main
         .box
           .ten-box
-            .left-box.small-box-open
-            .center-box.big-box-open
+            .left-box
+            .center-box
             .right-box
           .ten-prize 还剩
             b 1000
             |份奖品
-          .open-box-btn
-            span.ten-com.box-key
-            |开启宝箱
+          if user.is_authenticated
+            .open-box-btn.received
+              span.ten-com.box-key
+              |开启宝箱
+          else
+            .open-box-btn
+              span.ten-com.box-key
+              |开启宝箱
+
           p.ten-zhu 注：每位新注册用户有3次开宝箱机会，幸运等你开启
         .prize-box
           h1.tit.ten-com.ten-tit 好礼连连
           dl.prize-dl
             dt.ten-com.ten-prize1
-            dd 领取加息券
+            if user.is_authenticated
+              dd.ten-txtbutn.received 领取加息券
+            else
+              dd.ten-txtbutn 领取加息券
           dl.prize-dl
             dt.ten-com.ten-prize2
-            dd 领取100元红包
+            if user.is_authenticated
+              dd.ten-txtbutn.received 领取100元红包
+            else
+              dd.ten-txtbutn 领取100元红包
           dl.prize-dl
             dt.ten-com.ten-prize3
-            dd 领取7天迅雷会员
+            if user.is_authenticated
+              dd.ten-txtbutn.received 领取7天迅雷会员
+            else
+              dd.ten-txtbutn 领取7天迅雷会员
           dl.prize-dl(style="margin-right:0px")
             dt.ten-com.ten-prize4
-            dd 领取1年迅雷会员
+            if user.is_authenticated
+              dd.ten-txtbutn.received 领取1年迅雷会员
+            else
+              dd.ten-txtbutn 领取1年迅雷会员
         .prize-box
           h1.tit.ten-com.ten-tit 加息券使用流程
           .liucheng
