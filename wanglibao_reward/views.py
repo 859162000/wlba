@@ -529,7 +529,6 @@ class WeixinShareDetailView(TemplateView):
     def throw_exception(self, msg):
         raise Exception(msg)
 
-    @csrf_protect
     def get_context_data(self, **kwargs):
         openid = kwargs["openid"]
         phone_num = kwargs['phone_num']
@@ -608,7 +607,6 @@ class WeixinShareDetailView(TemplateView):
 class WeixinShareEndView(TemplateView):
     template_name = 'app_weChatEnd.jade'
 
-    @csrf_protect
     def get_context_data(self, **kwargs):
         order_id = self.request.GET.get('url_id')
         shareTitle, shareContent, url = get_share_infos(order_id)
@@ -627,7 +625,6 @@ class WeixinShareStartView(TemplateView):
         except Exception, reason:
             logger.exception(u"判断用户投资额度抛异常 %s" %(reason,) )
 
-    @csrf_protect
     def get_context_data(self, **kwargs):
         openid = self.request.GET.get('openid')
         order_id = self.request.GET.get('url_id')

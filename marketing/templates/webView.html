@@ -49,12 +49,16 @@
 		})
 
         // webview 侦听 testJavascriptHandler，ios触发testJavascriptHandler之后，webview响应该事件
-		bridge.registerHandler('testJavascriptHandler', function(data, responseCallback) {
-			var responseData = { 'Javascript Says':'Right back atcha!' }
-			log('客户端调用webview', data);
-			responseCallback(responseData)
-		})
+		//bridge.registerHandler('shareData', function(data, responseCallback) {
+		//	var responseData = { title:'this title', content: 'content' };
+			//push data
+        //    responseCallback(responseData)
+		//})
 
+        // push data for client
+        bridge.callHandler('firstLoadWebView',{ name: 'activity-name'}, function() {
+            log('succees push productid ');
+        });
 
         var button = document.getElementById('buttons');
 		button.onclick = function(e) {

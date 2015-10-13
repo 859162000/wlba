@@ -27,7 +27,6 @@ def get_user_messages():
     url = SMS_MANDAO_USER_URL + '?sn=%s&pwd=%s' % (SMS_MANDAO_SN, SMS_MANDAO_MD5_PWD)
     ret = urllib2.urlopen(url).read()
     ret = ret.rsplit('</string>')[0].split('<string xmlns="http://tempuri.org/">')[1]
-    print ret
 
     if len(ret) < 10:
         pass
@@ -36,11 +35,12 @@ def get_user_messages():
         file_name = time.strftime('%Y-%m-%d' + '.log', time.localtime())
 
         try:
-            os.mkdir('/var/log/wanglibao/user_message/')
+            os.mkdir('/var/log/wanglibao/user_message/', 0777)
         except Exception, e:
             print e
         try:
             os.system('touch %s%s' % ('/var/log/wanglibao/user_message/', file_name))
+            os.system("chmod 777 /var/log/wanglibao/user_message/" + file_name)
         except Exception, e:
             print e
 
@@ -66,11 +66,12 @@ def get_report_messages():
         ret += '\r\n'
         file_name = time.strftime('%Y-%m-%d' + '.log', time.localtime())
         try:
-            os.mkdir('/var/log/wanglibao/report_message/')
+            os.mkdir('/var/log/wanglibao/report_message/', 0777)
         except Exception, e:
             print e
         try:
             os.system('touch %s%s' % ('/var/log/wanglibao/report_message/', file_name))
+            os.system("chmod 777 /var/log/wanglibao/report_message/" + file_name)
         except Exception, e:
             print e
 
