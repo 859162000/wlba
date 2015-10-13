@@ -276,13 +276,20 @@ def exchange_redpack(token, device_type, user, app_version=''):
         redpack.save()
         record.save()
 
-    _send_message(user, event)
+    start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
+                                              record.created_at, event.available_at, event.unavailable_at)
+
+    _send_message(user, event, end_time)
     return {"ret_code": 0, "message": u"兑换成功"}
 
 
-def _send_message(user, event):
+def _send_message(user, event, end_time):
     fmt_str = "%Y年%m月%d日"
-    give_time = timezone.localtime(event.unavailable_at).strftime(fmt_str)
+    if end_time:
+        unavailable_at = end_time
+    else:
+        unavailable_at = event.unavailable_at
+    give_time = timezone.localtime(unavailable_at).strftime(fmt_str)
     mtype = 'activity'
     if event.rtype == 'percent':
         pass
@@ -299,7 +306,6 @@ def _send_message(user, event):
     if event.rtype == 'percent':
         title, content = messages.msg_redpack_give_percent(event.amount, event.highest_amount, event.name, give_time)
     elif event.rtype == 'interest_coupon':
-        # TODO 此处需要根据获得加息券的时间来处理到期时间，可能需要新增加参数来获得加息券的发送时间
         title, content = messages.msg_give_coupon(event.name, event.amount, give_time)
         mtype = 'coupon'
     else:
@@ -374,7 +380,10 @@ def _give_redpack(user, give_mode, device_type):
                 record.redpack = redpack
                 record.change_platform = device_type
                 record.save()
-                _send_message(user, event)
+
+                start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
+                                                          record.created_at, event.available_at, event.unavailable_at)
+                _send_message(user, event, end_time)
 
 
 #发放奖励类型的红包
@@ -412,7 +421,10 @@ def give_activity_redpack(user, event, device_type, just_one_packet=False, check
     record.redpack = redpack
     record.change_platform = device_type
     record.save()
-    _send_message(user, event)
+
+    start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
+                                              record.created_at, event.available_at, event.unavailable_at)
+    _send_message(user, event, end_time)
     return True,""
 
 
@@ -650,6 +662,9 @@ def get_start_end_time(auto, auto_days, created_at, available_at, unavailable_at
     if auto and auto_days > 0:
         start_time = created_at
         end_time = created_at + timezone.timedelta(days=int(auto_days))
+        # 如果加上延期天数后还小于截止时间,则还以截止时间为准
+        if end_time < unavailable_at:
+            end_time = unavailable_at
     else:
         start_time = available_at
         end_time = unavailable_at
