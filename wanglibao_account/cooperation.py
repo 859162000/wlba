@@ -945,6 +945,10 @@ class ZGDXRegister(CoopRegister):
         self.coop_key = ZGDX_KEY
         self.iv = ZGDX_IV
 
+    @property
+    def channel_user(self):
+        return self.request.session.get(self.internal_channel_user_key, '00000')
+
     def zgdx_call_back(self, user, plat_offer_id):
         if datetime.datetime.now().day >= 28:
             effect_type = '1'
