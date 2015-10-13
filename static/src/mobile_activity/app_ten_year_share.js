@@ -26,7 +26,7 @@
             shareImg = host + '/static/imgs/mobile_activity/app_ten_year/weixin_img_300.jpg',
             shareLink = host + '/activity/app_ten_year/',
             shareMainTit = '遇到十年前的自己',
-            shareBody = '我刚遇到十年前的自己，你也来试试把...'
+            shareBody = '我刚遇到十年前的自己，你也来试试吧...'
         //分享给微信好友
         org.onMenuShareAppMessage({
             title: shareMainTit,
@@ -36,7 +36,7 @@
         });
         //分享给微信朋友圈
         org.onMenuShareTimeline({
-            title: '我刚遇到十年前的自己，你也来试试把...',
+            title: '我刚遇到十年前的自己，你也来试试吧...',
             link : shareLink,
             imgUrl: shareImg
         })

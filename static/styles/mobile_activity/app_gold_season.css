@@ -207,4 +207,196 @@ body .clear {
     background: url(/static/imgs/mobile_activity/app_gold_season/explain2.png);
     display:inline-block;
     background-size: 100% 100%;
+    font-size:0;
+}
+.explain .main dl{
+    display:inline-block;
+}
+.goldSeason .explain .main dt,.goldSeason .explain .main dd {
+	color: #666;
+	padding: 0 0.2rem;
+	font-size: 0.6rem;
+    line-height: 1.2rem;
+}
+.goldSeason .explain .main dt span,.goldSeason .explain .main dd span {
+	color: #ec551d
+}
+.goldSeason .example {
+	clear: both;
+	border: 0.1em #f0651f solid;
+	border-radius: 1.4em;
+	width: 100%;
+	margin: 0.6em auto;
+	display: inline-block;
+}
+.goldSeason .exampleImg{
+    width:100%;
+    display:inline-block;
+    padding:0.8rem 0;
+}
+.goldSeason .example .leftImg {
+	float: left;
+	display: block;
+	position: relative;
+	top: 4.1em;
+	left: -0.1em;
+	z-index: 1;
+    width:25.8258258%;
+}
+.goldSeason .example .rightMain {
+	float: left;
+	display: block;
+	margin-left: 1.2em;
+	width: 69%;
+}
+.goldSeason .example .rightMain p.title {
+    padding-top:0.5em;
+	line-height: 1.6em;
+	font-size: 1em;
+	text-align: left;
+    color:#666;
+}
+.goldSeason .example .rightMain p.text {
+	font-size: 1.1em;
+	line-height: 2.6em;
+    color:#666;
+    font-weight: bold;
+}
+.goldSeason .example .rightMain .number span {
+	float: left;
+    font-weight: bold;
+	display: block;
+	font-size: 1.5em;
+	color: #666;
+	line-height: 3em;
+}
+.goldSeason .example .rightMain .number span.add {
+}
+.goldSeason .example .rightMain .number dl {
+	float: left;
+	display: block;
+	text-align: center;
+    margin-left:0.5em;
+}
+body .goldSeason .example .rightMain .number dl dt {
+	font-size: 1.5em;
+	color: #666;
+	line-height: 3em;
+	font-weight: bold;
+	padding: 0
+}
+.goldSeason .example .rightMain .number dl dd {
+	padding-top: 1em;
+	font-size: 1em;
+	color: #f0651f;
+	line-height: 1.8em;
+}
+.goldSeason .example .rightMain .number dl.right {
+	position: relative;
+	left: 3em;
+	width: 18em;
+	z-index: 1
+}
+.goldSeason .example .rightMain .example1 {
+	width: 100%;
+
+}
+.goldSeason .example .rightMain .example1 .number {
+	margin-left: 3em
+}
+.goldSeason .example .rightMain .example2 {
+	width: 100%; clear:both;
+}
+.goldSeason .example .rightMain .example2 .number{
+    position: relative;
+    top:-1.5em;
+}
+.goldSeason .example .rightMain .example2 dl {
+	float: none;
+	margin: 0 auto
+}
+.goldSeason .cheats {
+	width: 100%;
+    font-size:0;
+}
+.goldSeason .cheats .img{
+    position:relative;
+    display:inline-block;
+    width:100%;
+}
+.goldSeason .cheats .bg1 {
+    display:block;
+	width: 100%;
+}
+
+.goldSeason .cheats .title {
+	width: 29.3%;
+    text-align: center;
+    height: 2.6em;
+    position: absolute;
+    right: 8.8%;
+    top: 13.6147541%;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.1em;
+    padding: 0;
+    line-height: 1.4em;
+}
+.goldSeason .cheats .text {
+	position: absolute;
+	color: #ec551d;
+	font-size: 1.1em;
+	height: 3em;
+	line-height: 3em
+}
+.goldSeason .cheats .text1 {
+	left: 6.9333333%;
+	top: 5.1349693%;
+}
+.goldSeason .cheats .text2 {
+	left: 12.2666667%;
+	top: 22.6639344%;
+}
+.goldSeason .cheats .rule {
+	background: url(/static/imgs/mobile_activity/app_gold_season/cheats_bg2.png);
+    background-size: 100% 100%;
+    display: inline-block;
+    width:100%;
+    padding: 1rem 4.75% 0;
+}
+.goldSeason .cheats .rule p {
+    display:inline-block;
+	color: #666;
+	line-height: 1.2rem;
+	font-size: 0.6rem;
+}
+.goldSeason .cheats .rule .calculation {
+	color: #ec551d
+}
+.g-footer-warp {
+	margin-top: 1.5em
+}
+.footer{
+    margin-top:2.5em;
+    padding:1em 0;
+    width:100%;
+    background:#db3b0f;
+    text-align: center;
+    color: #fff;
+    font-size:1.2em;
+    line-height: 1.6em;
+}
+@media screen and (min-width: 700px) and (min-height: 700px) {
+    .explain .main{
+        padding: 0.8rem 5.3%;
+    }
+    .goldSeason .explain .main dt, .goldSeason .explain .main dd {
+        padding: 0 0.4rem;
+        font-size: 1.2rem;
+        line-height: 2.4rem;
+    }
+    .goldSeason .cheats .rule p {
+        line-height: 1.67rem;
+        font-size: 1.2rem;
+    }
 }
