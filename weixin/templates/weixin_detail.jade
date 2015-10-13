@@ -87,11 +87,14 @@ html
       statusClass = 'footerBtn-red'
 
     .detail-footerBtn(class=statusClass)
-      if status == '抢购中'
-        a(href="/weixin/view/calculator/{{p2p.id}}/").icon
-        a(href="/weixin/view/buy/{{p2p.id}}/").new-pay {{status}}
+      if p2p.is_app_exclusive
+        a(href="javascript:void(0)").new-pay#down-btn 本标仅限网利宝APP可投
       else
-        p {{status}}
+          if status == '抢购中'
+            a(href="/weixin/view/calculator/{{p2p.id}}/").icon
+            a(href="/weixin/view/buy/{{p2p.id}}/").new-pay {{status}}
+          else
+            p {{status}}
   include include/tracking
   script(src="/static/src/mobile/lib/weixin/wx.js")
   script(data-init='detail', src="/static/scripts/mobile/dist/mobile.js")

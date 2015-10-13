@@ -19,6 +19,9 @@ for product in results
     a(href="/weixin/view/detail/{{product.id}}/").section-head
       if product.category == '新手标'
         span.head-prompt  新手福利
+      else
+          if product.is_app_exclusive
+            span.head-prompt  APP专享
       span.head-tit {{product.name}}
     .section-body
       a(href="/weixin/view/detail/{{product.id}}/").body-left
