@@ -402,7 +402,9 @@ class WeixinShareDetailView(TemplateView):
                 type=gift.type,
                 valid=0,
             )
-            WanglibaoUserGift.objects.create(
+            sending_gift.save()
+            logger.debug("生成发奖记录--0")
+            invalid_gift = WanglibaoUserGift.objects.create(
                 rules=gift,
                 user=user_profile.user if user_profile else None,
                 identity=openid,
@@ -411,6 +413,8 @@ class WeixinShareDetailView(TemplateView):
                 type=gift.type,
                 valid=2,
             )
+            invalid_gift.save()
+            logger.debug("生成发奖记录--1")
             if user_profile:
                 try:
                     dt = timezone.datetime.now()
