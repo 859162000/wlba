@@ -603,10 +603,10 @@ CELERYBEAT_SCHEDULE = {
         'schedule': timedelta(minutes=10),
     },
     # by Zhoudong 发送短信时间统计
-    'message_arrived_rate_check': {
-        'task': 'wanglibao_sms.tasks.check_arrived_rate_task',
-        'schedule': crontab(minute=0, hour=0),
-    },
+    #'message_arrived_rate_check': {
+    #    'task': 'wanglibao_sms.tasks.check_arrived_rate_task',
+    #    'schedule': crontab(minute=0, hour=0),
+    #},
 }
 
 CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
