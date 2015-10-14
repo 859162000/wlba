@@ -270,19 +270,19 @@ img {
 	right: 12.8125%;
 	bottom: 0%;
 	z-index: -1;
-    opacity: 0;
-    -webkit-animation-name: bottom_meteor;
-    animation-name: bottom_meteor;
-	-webkit-animation-duration: 9s;
-	animation-duration: 9s;
-	-webkit-animation-timing-function: ease;
-	animation-timing-function: ease;
-    -webkit-animation-delay:4s;
-    animation-delay:4s;
-	-webkit-animation-fill-mode: both;
-	animation-fill-mode: both;
-    -webkit-animation-iteration-count:infinite;
-    animation-iteration-count:infinite;
+    opacity: 1;
+    /*-webkit-animation-name: bottom_meteor;*/
+    /*animation-name: bottom_meteor;*/
+	/*-webkit-animation-duration: 9s;*/
+	/*animation-duration: 9s;*/
+	/*-webkit-animation-timing-function: ease;*/
+	/*animation-timing-function: ease;*/
+    /*-webkit-animation-delay:4s;*/
+    /*animation-delay:4s;*/
+	/*-webkit-animation-fill-mode: both;*/
+	/*animation-fill-mode: both;*/
+    /*-webkit-animation-iteration-count:infinite;*/
+    /*animation-iteration-count:infinite;*/
 }
 @-webkit-keyframes bottom_meteor {
 	0% {
@@ -327,19 +327,19 @@ img {
 .meteor1 {
 	left: 18.75%;
 	top: 37.5768218%;
-    opacity: 0;
-    -webkit-animation-name: meteor1;
-    animation-name: meteor1;
-	-webkit-animation-duration: 5s;
-	animation-duration: 5s;
-	-webkit-animation-timing-function: ease;
-	animation-timing-function: ease;
-    -webkit-animation-delay:3.8s;
-    animation-delay:3.8s;
-	-webkit-animation-fill-mode: both;
-	animation-fill-mode: both;
-    -webkit-animation-iteration-count:infinite;
-    animation-iteration-count:infinite;
+    opacity: 1;
+    /*-webkit-animation-name: meteor1;*/
+    /*animation-name: meteor1;*/
+	/*-webkit-animation-duration: 5s;*/
+	/*animation-duration: 5s;*/
+	/*-webkit-animation-timing-function: ease;*/
+	/*animation-timing-function: ease;*/
+    /*-webkit-animation-delay:3.8s;*/
+    /*animation-delay:3.8s;*/
+	/*-webkit-animation-fill-mode: both;*/
+	/*animation-fill-mode: both;*/
+    /*-webkit-animation-iteration-count:infinite;*/
+    /*animation-iteration-count:infinite;*/
 }
 @-webkit-keyframes meteor1 {
 	0% {
@@ -383,19 +383,19 @@ img {
 .meteor2 {
 	left: 53.125%;
 	top: 71.9929763%;
-    opacity: 0;
-    -webkit-animation-name: meteor2;
-    animation-name: meteor2;
-	-webkit-animation-duration: 4.5s;
-	animation-duration: 4.5s;
-	-webkit-animation-timing-function: ease;
-	animation-timing-function: ease;
-    -webkit-animation-delay:4.2s;
-    animation-delay:4.2s;
-	-webkit-animation-fill-mode: both;
-	animation-fill-mode: both;
-    -webkit-animation-iteration-count:infinite;
-    animation-iteration-count:infinite;
+    opacity: 1;
+    /*-webkit-animation-name: meteor2;*/
+    /*animation-name: meteor2;*/
+	/*-webkit-animation-duration: 4.5s;*/
+	/*animation-duration: 4.5s;*/
+	/*-webkit-animation-timing-function: ease;*/
+	/*animation-timing-function: ease;*/
+    /*-webkit-animation-delay:4.2s;*/
+    /*animation-delay:4.2s;*/
+	/*-webkit-animation-fill-mode: both;*/
+	/*animation-fill-mode: both;*/
+    /*-webkit-animation-iteration-count:infinite;*/
+    /*animation-iteration-count:infinite;*/
 }
 @-webkit-keyframes meteor2 {
 	0% {
@@ -437,21 +437,21 @@ img {
 }
 
 .meteor3 {
-    opacity: 0;
+    opacity: 1;
 	left: 0%;
 	top: 78.4021071%;
-    -webkit-animation-name: meteor3;
-    animation-name: meteor3;
-	-webkit-animation-duration: 6s;
-	animation-duration: 6s;
-	-webkit-animation-timing-function: ease;
-	animation-timing-function: ease;
-    -webkit-animation-delay:4.6s;
-    animation-delay:4.6s;
-	-webkit-animation-fill-mode: both;
-	animation-fill-mode: both;
-    -webkit-animation-iteration-count:infinite;
-    animation-iteration-count:infinite;
+    /*-webkit-animation-name: meteor3;*/
+    /*animation-name: meteor3;*/
+	/*-webkit-animation-duration: 6s;*/
+	/*animation-duration: 6s;*/
+	/*-webkit-animation-timing-function: ease;*/
+	/*animation-timing-function: ease;*/
+    /*-webkit-animation-delay:4.6s;*/
+    /*animation-delay:4.6s;*/
+	/*-webkit-animation-fill-mode: both;*/
+	/*animation-fill-mode: both;*/
+    /*-webkit-animation-iteration-count:infinite;*/
+    /*animation-iteration-count:infinite;*/
 }
 
 @-webkit-keyframes meteor3 {
