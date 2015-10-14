@@ -678,7 +678,7 @@ def ajax_xunlei(request):
     if request.method == "POST":
         obj = ThunderInterestAwardAPIView()
         action = request.POST.get("action", "")
-
+        logger.debug("迅雷10月  action type:%s" %(action,))
         if action == 'GET_RECORD':
             obj.get_reward_record(request, 'oct_get_award')
 
@@ -851,6 +851,7 @@ def ajax_post(request):
     if request.method == "POST":
         obj = ThunderAwardAPIView()
         action = request.POST.get("action", "")
+        logger.debug("迅雷9月  action type:%s" %(action,))
 
         if action == 'GET_AWARD':
             res = obj.get_award(request, reward)
