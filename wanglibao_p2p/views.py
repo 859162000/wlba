@@ -1,6 +1,6 @@
 # encoding: utf8
 
-from operator import attrgetter
+from operator import itemgetter
 from decimal import Decimal
 import datetime
 
@@ -535,57 +535,16 @@ class P2PListView(TemplateView):
     template_name = 'p2p_list.jade'
 
     def get_context_data(self, **kwargs):
-        cache_backend = redis_backend()
+        p2p_products = []
 
-        p2p_done = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(
-            Q(publish_time__lte=timezone.now())) \
-            .filter(status=u'正在招标').order_by('-publish_time')
-
-        p2p_done_list = cache_backend.get_p2p_list_from_objects(p2p_done)
-
-        p2p_products, p2p_full_list, p2p_repayment_list, p2p_finished_list = [], [], [], []
-
-        if cache_backend._is_available() and cache_backend._exists('p2p_products_full'):
-            p2p_full_cache = cache_backend._lrange('p2p_products_full', 0, -1)
-            for product in p2p_full_cache:
-                p2p_full_list.extend([pickle.loads(product)])
-        else:
-            p2p_full = P2PProduct.objects.select_related('warrant_company', 'activity') \
-                .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
-                .filter(status__in=[u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核']) \
-                .order_by('-soldout_time', '-priority')
-            p2p_full_list = cache_backend.get_p2p_list_from_objects(p2p_full)
-
-        if cache_backend._is_available() and cache_backend._exists('p2p_products_repayment'):
-            p2p_repayment_cache = cache_backend._lrange('p2p_products_repayment', 0, -1)
-
-            for product in p2p_repayment_cache:
-                p2p_repayment_list.extend([pickle.loads(product)])
-        else:
-            p2p_repayment = P2PProduct.objects.select_related('warrant_company', 'activity') \
-                .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
-                .filter(status=u'还款中').order_by('-soldout_time', '-priority')
-
-            p2p_repayment_list = cache_backend.get_p2p_list_from_objects(p2p_repayment)
-
-        if cache_backend._is_available() and cache_backend._exists('p2p_products_finished'):
-            p2p_finished_cache = cache_backend._lrange('p2p_products_finished', 0, -1)
-
-            for product in p2p_finished_cache:
-                p2p_finished_list.extend([pickle.loads(product)])
-        else:
-            p2p_finished = P2PProduct.objects.select_related('warrant_company', 'activity') \
-                .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
-                .filter(status=u'已完成').order_by('-soldout_time', '-priority')
-
-            p2p_finished_list = cache_backend.get_p2p_list_from_objects(p2p_finished)
+        p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list = get_p2p_list()
 
         show_slider = False
-        if p2p_done:
+        if p2p_done_list:
             show_slider = True
-            p2p_earning = sorted(p2p_done, key=lambda x: (-x.expected_earning_rate, x.available_amount))
-            p2p_period = sorted(p2p_done, key=lambda x: (x.period, x.available_amount))
-            p2p_amount = sorted(p2p_done, key=attrgetter('available_amount'))
+            p2p_earning = sorted(p2p_done_list, key=lambda x: (-x['expected_earning_rate'], x['available_amount']))
+            p2p_period = sorted(p2p_done_list, key=lambda x: (x['period'], x['available_amount']))
+            p2p_amount = sorted(p2p_done_list, key=itemgetter('completion_rate'), reverse=True)
         else:
             p2p_earning = p2p_period = p2p_amount = []
 
@@ -799,3 +758,53 @@ def check_invalid_new_user_product(p2p, user):
     """
     error_new_user = (p2p.category == '新手标' and user.wanglibaouserprofile.is_invested)
     return error_new_user
+
+
+def get_p2p_list():
+
+    cache_backend = redis_backend()
+
+    p2p_done = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(
+        Q(publish_time__lte=timezone.now())) \
+        .filter(status=u'正在招标').order_by('-publish_time')
+
+    p2p_done_list = cache_backend.get_p2p_list_from_objects(p2p_done)
+
+    p2p_full_list, p2p_repayment_list, p2p_finished_list = [], [], []
+
+    if cache_backend._is_available() and cache_backend._exists('p2p_products_full'):
+        p2p_full_cache = cache_backend._lrange('p2p_products_full', 0, -1)
+        for product in p2p_full_cache:
+            p2p_full_list.extend([pickle.loads(product)])
+    else:
+        p2p_full = P2PProduct.objects.select_related('warrant_company', 'activity') \
+            .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
+            .filter(status__in=[u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核']) \
+            .order_by('-soldout_time', '-priority')
+        p2p_full_list = cache_backend.get_p2p_list_from_objects(p2p_full)
+
+    if cache_backend._is_available() and cache_backend._exists('p2p_products_repayment'):
+        p2p_repayment_cache = cache_backend._lrange('p2p_products_repayment', 0, -1)
+
+        for product in p2p_repayment_cache:
+            p2p_repayment_list.extend([pickle.loads(product)])
+    else:
+        p2p_repayment = P2PProduct.objects.select_related('warrant_company', 'activity') \
+            .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
+            .filter(status=u'还款中').order_by('-soldout_time', '-priority')
+
+        p2p_repayment_list = cache_backend.get_p2p_list_from_objects(p2p_repayment)
+
+    if cache_backend._is_available() and cache_backend._exists('p2p_products_finished'):
+        p2p_finished_cache = cache_backend._lrange('p2p_products_finished', 0, -1)
+
+        for product in p2p_finished_cache:
+            p2p_finished_list.extend([pickle.loads(product)])
+    else:
+        p2p_finished = P2PProduct.objects.select_related('warrant_company', 'activity') \
+            .filter(hide=False).filter(Q(publish_time__lte=timezone.now())) \
+            .filter(status=u'已完成').order_by('-soldout_time', '-priority')
+
+        p2p_finished_list = cache_backend.get_p2p_list_from_objects(p2p_finished)
+
+    return p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list
