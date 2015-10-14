@@ -132,8 +132,8 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
     # 满标审核时,是给所有的持仓用户发放奖励,金额为持仓金额
 
     elif trigger_node == 'p2p_audit':
-        # 根据product_id查询出该产品中所有的持仓用户
-        equities = P2PEquity.objects.filter(product=product_id, confirm=True)
+        # 根据product_id查询出该产品中所有的持仓用户,因为持仓确认是通过任务定时执行的,因此此处不查询confirm=True
+        equities = P2PEquity.objects.filter(product=product_id)
         if equities:
             for equity in equities:
                 _send_gift(equity.user, rule, device_type, is_full, equity.equity)
