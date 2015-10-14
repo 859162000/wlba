@@ -719,11 +719,13 @@ class ThunderInterestAwardAPIView(APIView):
         describe = str(reward) + str(money)
         try:
             dt = timezone.datetime.now()
+            logger.debug("select condition-- invalid:False, describe:%s, give_start&give_end:%s",(describe, dt,))
             redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
         except Exception, reason:
             print reason
 
         if redpack_event:
+            logger.debug("发送出去的加息券, user:%s, redpack:%s" %(request.user, redpack_event,))
             redpack_backends.give_activity_redpack(request.user, redpack_event, 'pc')
 
         to_json_response = {
