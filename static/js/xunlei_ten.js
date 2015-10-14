@@ -138,7 +138,12 @@
                 $('#xl-aug-fail').show();
             } else if ($(this).hasClass('received')) {
                 window.location.href = "/"
-            } else {
+            }
+            else if($(this).hasClass('receiveg')){
+                window.location.href = "/pay/banks/"
+            }else if($(this).hasClass('receiveh')){
+                window.location.href = "/p2p/list/"
+            }else {
                 $('#small-zc').show();
                 $('#xl-aug-login').show();
             }
