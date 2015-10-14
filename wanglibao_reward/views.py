@@ -580,9 +580,11 @@ class WeixinShareDetailView(TemplateView):
 
             if "No Reward" == user_gift:
                 self.debug_msg('奖品已经发完了，用户:%s 没有领到奖品' %(phone_num,))
-                global template_name
-                template_name = 'app_weChatEnd.jade'
-
+                self.template_name = 'app_weChatEnd.jade'
+                shareTitle, shareContent, url = get_share_infos(order_id)
+                return {
+                    "share":{'content':shareContent,'title':shareTitle, 'url':url}
+                }
                 #redirect_url = reverse('weixin_share_end')+'?url_id=%s'%order_id
                 #return redirect(redirect_url)
         else:
