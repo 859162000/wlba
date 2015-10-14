@@ -661,6 +661,7 @@ def ajax_xunlei(request):
         event = Misc.objects.filter(key=key).first()
         if event:
             event = json.loads(event.value)
+            logger.debug("event value:%s" %(event,))
             if type(event) == dict:
                 channel = event['channel']
                 reward = event['reward']
