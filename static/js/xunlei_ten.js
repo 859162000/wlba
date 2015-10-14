@@ -235,11 +235,11 @@
                     $('#xl-aug-prize p').text(txt[ind]);
                     $('#xl-aug-prize').show();
 
-                } else {
+                } else if (change['ret_code'] == 3001) {
                     $('#xl-aug-prize').hide();
-                    var txtg = ['人世间最美好的事情莫过于如此，1%加息券', '人品大爆发，1%加息券', '终于等到你，还好我没放弃，1%加息券'];
-                    var indw = parseInt(Math.random() * 3);
-                    $('#xl-aug-success11 p .xl-aug').text(txtg[indw]);
+                    var xii= ['人世间最美好的事情莫过于如此，1%加息券', '人品大爆发，1%加息券', '终于等到你，还好我没放弃，1%加息券'];
+                    var shu= parseInt(Math.random() * 3);
+                    $('#xl-aug-success11 p .xl-aug').text(xii[shu]);
                     $('#xl-aug-success11').show();
                 }
             //}, 1000)
