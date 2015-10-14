@@ -249,11 +249,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
           });
         }
     }
-    $(".ruleF").on("touchend", function () {
+    $(".ruleF").on("click", function () {
         Down($(".ruleC"));
     });
 
-    $(".ruleF2").on("touchend", function () {
+    $(".ruleF2").on("click", function () {
         Down($(".ruleC2"));
     });
 
