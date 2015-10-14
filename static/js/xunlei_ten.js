@@ -128,9 +128,8 @@
                 $('.money').css({'top': '135px', 'left': '-97px', 'display': 'block'})
             })
         }, 1000)
-        //var change = [];
-        //redpack('ENTER_WEB_PAGE');
 
+        //送加息 会员
         $('.ten-txtbutn').on('click', function () {
             if (change['ret_code'] == 4000) {
                 $('#small-zc').show();
@@ -139,11 +138,11 @@
             } else if ($(this).hasClass('received')) {
                 window.location.href = "/"
             }
-            else if($(this).hasClass('receiveg')){
+            else if ($(this).hasClass('receiveg')) {
                 window.location.href = "/pay/banks/"
-            }else if($(this).hasClass('receiveh')){
+            } else if ($(this).hasClass('receiveh')) {
                 window.location.href = "/p2p/list/"
-            }else {
+            } else {
                 $('#small-zc').show();
                 $('#xl-aug-login').show();
             }
@@ -172,15 +171,7 @@
         }
         //宝箱点击
         $('.open-box-btn').on('click', function () {
-
-
             redpack('ENTER_WEB_PAGE', function (data) {
-                //if (data['ret_code'] == 4000) {
-                //
-                //} else {
-                //
-                //}
-                //if (!$('.open-box-btn').hasClass('noClick')) {
                 if (data['ret_code'] == 4000) {
                     $('.center-box').removeClass("big-box-open");
                     $('#small-zc').show();
@@ -207,47 +198,43 @@
                     $('#xl-aug-login').show();
                     $('.center-box').addClass("big-box-open");
                 }
-                //}
             })
         })
 
 
         function game(isGet) {
-            //setTimeout(function () {
-                if (isGet) {
-                    //成功调用
-                    redpack('GET_AWARD');
-                    star('0' + change['amount']);
-                } else {
-                    //失败调用
-                    redpack('IGNORE_AWARD');
-                    star();
-                }
-            //}, 10)
+
+            if (isGet) {
+                //成功调用
+                redpack('GET_AWARD');
+                star('0' + change['amount']);
+            } else {
+                //失败调用
+                redpack('IGNORE_AWARD');
+                star();
+            }
         }
 
 
         //提示语
         function star() {
-            //setTimeout(function () {
-                $('#rmb').text(parseInt(change['amount']));
-                $('#small-zc').show();
-                if (change['ret_code'] == 3002) {
-                    $('.center-box').addClass("big-box-open");
-                    var txt = ['佛说：前世的500次回眸才换得一次中奖，淡定', '奖品何时有，把酒问青天', '大奖下回见，网利宝天天见/**/'];
-                    var ind = parseInt(Math.random() * 3);
-                    $('#xl-aug-success11').hide();
-                    $('#xl-aug-prize p').text(txt[ind]);
-                    $('#xl-aug-prize').show();
+            $('#rmb').text(parseInt(change['amount']));
+            $('#small-zc').show();
+            if (change['ret_code'] == 3002) {
+                $('.center-box').addClass("big-box-open");
+                var txt = ['佛说：前世的500次回眸才换得一次中奖，淡定', '奖品何时有，把酒问青天', '大奖下回见，网利宝天天见/**/'];
+                var ind = parseInt(Math.random() * 3);
+                $('#xl-aug-success11').hide();
+                $('#xl-aug-prize p').text(txt[ind]);
+                $('#xl-aug-prize').show();
 
-                } else if (change['ret_code'] == 3001) {
-                    $('#xl-aug-prize').hide();
-                    var xii= ['人世间最美好的事情莫过于如此，1%加息券', '人品大爆发，1%加息券', '终于等到你，还好我没放弃，1%加息券'];
-                    var shu= parseInt(Math.random() * 3);
-                    $('#xl-aug-success11 p .xl-aug').text(xii[shu]);
-                    $('#xl-aug-success11').show();
-                }
-            //}, 1000)
+            } else if (change['ret_code'] == 3001) {
+                $('#xl-aug-prize').hide();
+                var xii = ['人世间最美好的事情莫过于如此，1%加息券', '人品大爆发，1%加息券', '终于等到你，还好我没放弃，1%加息券'];
+                var shu = parseInt(Math.random() * 3);
+                $('#xl-aug-success11 p .xl-aug').text(xii[shu]);
+                $('#xl-aug-success11').show();
+            }
 
         }
 
