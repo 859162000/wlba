@@ -1016,11 +1016,15 @@ class WeixinRedpackRegister(CoopRegister):
         self.invite_code = 'weixin_redpack'
 
     def register_call_back(self, user):
-        phone = self.request.GET.get('phone',)
+        phone = user.wanglibaouserprofile.phone
         logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
         record = WanglibaoUserGift.objects.filter(valid=0, identity=phone).first()
-        redpack_backends.give_activity_redpack(self.request.user, record.rules.redpack, 'pc')
-        logger.debug('发送红包完毕,user:%s, redpack:%s' % (self.request.user, record.rules.redpack,))
+        try:
+            redpack_backends.give_activity_redpack(self.request.user, record.rules.redpack, 'pc')
+        except Exception, reason:
+            logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
+        else:
+            logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (self.request.user, record.rules.redpack,))
         record.valid = 1
         record.save()
 
