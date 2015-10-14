@@ -10,7 +10,7 @@ from wanglibao.views import IndexView, SecurityView, PartnerView
 # from wanglibao_account.cooperation import YiruiteQuery, TianmangRegisterQuery, TianmangIDVerificationQuery, \
     # TianmangInvestQuery, TianmangInvestNotConfirmQuery, TianmangCardBindQuery, BengbengQuery, CoopQuery
 from wanglibao_account.cooperation import CoopQuery, CsaiUserQuery, CsaiInvestmentQuery, ZhongniuP2PQuery, \
-    ZhongniuP2PDataQuery
+    ZhongniuP2PDataQuery, CoopInvestmentQuery
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
@@ -26,6 +26,7 @@ from marketing.views import NewsListView, NewsDetailView
 from wanglibao_activity.decorators import decorator_include
 from wanglibao_activity.decorators import wap_activity_manage
 from wanglibao.views import landpage_view
+from wanglibao_sms.views import ArriveRate
 
 admin.site = AdminSitePlus()
 admin.autodiscover()
@@ -61,7 +62,7 @@ urlpatterns = patterns(
     url(r'^' + settings.ADMIN_ADDRESS + '/', include('weixin.admin_urls')),
     url(r'^' + settings.ADMIN_ADDRESS + '/', include(admin.site.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    # url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
+    url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
     url(r'^accounts/', include('wanglibao_account.urls')),
     url(r'^shumi/', include('shumi_backend.urls')),
     url(r'^pay/', include('wanglibao_pay.urls')),
@@ -146,12 +147,21 @@ urlpatterns += patterns(
     # url(r'^api/bengbeng/getInfoList/(?P<startday>.*)/(?P<endday>.*)/(?P<sign>.*)/$', BengbengQuery.as_view())
     url(r'^api/coopinfo/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<user_type>[a-z0-9A-Z_]*)/(?P<start_day>[0-9]*)/(?P<end_day>[0-9]*)/(?P<sign>[a-z0-9A-Z_]*)/$', CoopQuery.as_view()),
     url(r'^api/coopinfo/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<user_type>[a-z0-9A-Z_]*)/(?P<start_day>[0-9]*)/(?P<end_day>[0-9]*)/(?P<sign>[a-z0-9A-Z_]*)/(?P<page>[0-9]*)/$', CoopQuery.as_view()),
+    url(r'^api/coopinvestinfo/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<start_day>[0-9]*)/(?P<end_day>[0-9]*)/(?P<sign>[a-z0-9A-Z_]*)/$', CoopInvestmentQuery.as_view()),
 
     url(r'^api/csai/users/', CsaiUserQuery.as_view()),
     url(r'^api/csai/investment/', CsaiInvestmentQuery.as_view()),
 
     url(r'^api/zhongniu/products/', ZhongniuP2PQuery.as_view()),
     url(r'^api/zhongniu/getData/$', ZhongniuP2PDataQuery.as_view()),
+
+    url(r'^AK7WtEQ4Q9KPs8Io_zOncw/wanglibao_sms/arrive_rate/$', ArriveRate.as_view(), name='arrive_rate'),
+)
+
+# 短信
+urlpatterns += patterns(
+    '',
+    url(r'wanglibao_sms/', include('wanglibao_sms.urls'))
 )
 
 # 微信

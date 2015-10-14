@@ -36,11 +36,13 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_YUNDUAN_KEY, YUNDUAN_CALL_BACK_URL, YUNDUAN_COOP_ID, WLB_FOR_YICHE_KEY, YICHE_COOP_ID, \
      YICHE_KEY, YICHE_CALL_BACK_URL, WLB_FOR_ZHITUI1_KEY, ZHITUI_COOP_ID, ZHITUI_CALL_BACK_URL, \
      WLB_FOR_ZGDX_KEY, ZGDX_CALL_BACK_URL, ZGDX_PARTNER_NO, ZGDX_SERVICE_CODE, ZGDX_CONTRACT_ID, \
-     ZGDX_ACTIVITY_ID, ZGDX_KEY, ZGDX_IV, WLB_FOR_NJWH_KEY, ENV, ENV_PRODUCTION, WLB_FOR_FANLITOU_KEY
+     ZGDX_ACTIVITY_ID, ZGDX_KEY, ZGDX_IV, WLB_FOR_NJWH_KEY, ENV, ENV_PRODUCTION, WLB_FOR_FANLITOU_KEY, \
+     WLB_FOR_XUNLEIVIP_KEY, XUNLEIVIP_CALL_BACK_URL, XUNLEIVIP_KEY, XUNLEIVIP_REGISTER_CALL_BACK_URL, \
+     XUNLEIVIP_REGISTER_KEY
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
-from wanglibao_pay.models import Card
+from wanglibao_pay.models import Card, PayInfo
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import UserThreeOrder
 from wanglibao_redis.backend import redis_backend
@@ -50,6 +52,7 @@ from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift
 import re
 import uuid
+import urllib
 
 logger = logging.getLogger(__name__)
 
@@ -103,7 +106,6 @@ def get_last_investment_for_coop(user_id):
         return p2p_record.last()
     except:
         return None
-
 
 def get_tid_for_coop(user_id):
     try:
@@ -346,6 +348,14 @@ class CoopRegister(object):
         """
         pass
 
+    def recharge_call_back(self, user):
+        """
+        用户充值后回调，一般用于用户首次充值之后回调第三方接口
+        :param user:
+        :return:
+        """
+        pass
+
     def process_for_register(self, user, invite_code):
         """
         用户可以在从渠道跳转后的注册页使用邀请码，优先考虑邀请码
@@ -367,7 +377,26 @@ class CoopRegister(object):
                 return
         self.save_to_session()
 
+    def weixin_redpack_distribute(self, user):
+        phone = user.wanglibaouserprofile.phone
+        logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
+        records = WanglibaoUserGift.objects.filter(valid=0, identity=phone)
+        for record in records:
+            try:
+                redpack_backends.give_activity_redpack(user, record.rules.redpack, 'pc')
+            except Exception, reason:
+                logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
+            else:
+                logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (self.request.user, record.rules.redpack,))
+            record.valid = 1
+            record.save()
+
     def all_processors_for_user_register(self, user, invite_code):
+        try:
+            self.weixin_redpack_distribute(user)
+        except Exception, reason:
+            pass
+
         try:
             if not invite_code:
                 invite_code = self.channel_code
@@ -419,6 +448,14 @@ class CoopRegister(object):
                 channel_processor.purchase_call_back(user)
         except:
             logger.exception('channel bind purchase process error for user %s'%(user.id))
+
+    def process_for_recharge(self, user):
+        try:
+            channel_processor = self.get_user_channel_processor(user)
+            if channel_processor:
+                channel_processor.recharge_call_back(user)
+        except:
+            logger.exception('channel recharge process error for user %s'%(user.id))
 
 
 class TianMangRegister(CoopRegister):
@@ -997,18 +1034,103 @@ class WeixinRedpackRegister(CoopRegister):
         self.invite_code = 'weixin_redpack'
 
     def register_call_back(self, user):
-        phone = self.request.GET.get('phone',)
+        phone = user.wanglibaouserprofile.phone
+        logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
         record = WanglibaoUserGift.objects.filter(valid=0, identity=phone).first()
-        redpack_backends.give_activity_redpack(self.request.user, record.rules.redpack, 'pc')
+        try:
+            redpack_backends.give_activity_redpack(user, record.rules.redpack, 'pc')
+        except Exception, reason:
+            logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
+        else:
+            logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (self.request.user, record.rules.redpack,))
         record.valid = 1
         record.save()
+
+
+class XunleiVipRegister(CoopRegister):
+    def __init__(self, request):
+        super(XunleiVipRegister, self).__init__(request)
+        self.c_code = 'xunlei9'
+        self.call_back_url = XUNLEIVIP_CALL_BACK_URL
+        self.register_call_back_url = XUNLEIVIP_REGISTER_CALL_BACK_URL
+        self.coop_key = XUNLEIVIP_KEY
+        self.coop_register_key = XUNLEIVIP_REGISTER_KEY
+
+    def generate_sign(self, data, key):
+        sorted_data = sorted(data.iteritems(), key=lambda asd:asd[0], reverse=False)
+        encode_data = urllib.urlencode(sorted_data)
+        sign = hashlib.md5(encode_data+str(key)).hexdigest()
+        return sign
+
+    def xunlei_call_back(self, user, tid, data, url):
+        order_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')+'_'+str(data['act'])
+        data['uid'] = tid
+        data['orderid'] = order_id
+        data['type'] = 'baijin'
+        sign = self.generate_sign(data, self.coop_key)
+        params = dict({'sign': sign}, **data)
+
+        # 创建渠道订单记录
+        channel_recode = get_user_channel_record(user.id)
+        order = UserThreeOrder(user=user, order_on=channel_recode, request_no=order_id)
+        order.save()
+
+        # 异步回调
+        common_callback.apply_async(
+            kwargs={'url': url, 'params': params, 'channel': self.c_code})
+
+    def register_call_back(self, user):
+        # 判断用户是否绑定
+        binding = Binding.objects.filter(user_id=user.id).first()
+        if binding:
+            data = {
+                'coop': 'wanglibao',
+                'xluserid': binding.bid,
+                'regtime': int(time.mktime(user.date_joined.date().timetuple()))
+            }
+            sign = self.generate_sign(data, self.coop_register_key)
+            params = dict({'sign': sign}, **data)
+            # 异步回调
+            common_callback.apply_async(
+                kwargs={'url': self.register_call_back_url, 'params': params, 'channel': self.c_code})
+
+    def recharge_call_back(self, user):
+        # 判断用户是否绑定和首次充值
+        binding = Binding.objects.filter(user_id=user.id).first()
+        pay_info = PayInfo.objects.filter(user_id=user.id).order_by('create_time')
+        if binding and pay_info.count() == 1:
+            # 判断充值金额是否大于100
+            pay_amount = int(pay_info.first().amount)
+            if pay_amount >= 100:
+                data = {
+                    'send_type': 1,
+                    'num1': 7,
+                    'act': 5171
+                }
+                self.xunlei_call_back(user, binding.bid, data, self.call_back_url)
+
+    def purchase_call_back(self, user):
+        # 判断用户是否绑定和首次投资
+        binding = Binding.objects.filter(user_id=user.id).first()
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
+        if binding and p2p_record.count() == 1:
+            # 判断投资金额是否大于100
+            pay_amount = int(p2p_record.first().amount)
+            if pay_amount >= 100:
+                data = {
+                    'send_type': '0',
+                    'num1': 12,
+                    'act': 5170
+                }
+                self.xunlei_call_back(user, binding.bid, data, self.call_back_url)
 
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
-                          ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister]
+                          ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
+                          XunleiVipRegister]
 
 
 #######################第三方用户查询#####################
@@ -1129,6 +1251,124 @@ class CoopQuery(APIView):
                 'errorcode': 0,
                 'errormsg': 'sucess',
                 'info': self.get_all_user_info_for_coop(channel_code, int(user_type), start_day, end_day, sign, page)
+            }
+        except ValueError, e:
+            result = {
+                'errorcode': 2,
+                'errormsg': 'sign error',
+            }
+        except Exception, e:
+            logger.exception(e.message)
+            result = {
+                'errorcode': 1,
+                'errormsg': 'api error'
+            }
+        finally:
+            # logger.debug(result)
+            return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
+
+
+class CoopInvestmentQuery(APIView):
+    permission_classes = ()
+    channel = None
+
+    # 每一页用户数
+    PAGE_LENGTH = 20
+
+    def is_invested_user(self, user_id):
+        return P2PRecord.objects.filter(user_id=user_id, catalog=u'申购').exists()
+
+    def get_phone_for_coop(self, user_id):
+        try:
+            phone_number = WanglibaoUserProfile.objects.get(user_id=user_id).phone
+            return phone_number
+        except:
+            return None
+
+    def get_promo_user(self, channel_code, startday, endday):
+        """
+        :param channel_code: like "tianmang"
+        :param startday: 日期格式20050606
+        :param endday:
+        :return:
+        """
+        startday = datetime.datetime.strptime(startday, "%Y%m%d")
+        endday = datetime.datetime.strptime(endday, "%Y%m%d")
+        if startday > endday:
+            endday, startday = startday, endday
+
+        # daydelta = datetime.timedelta(days=1)
+        daydelta = datetime.timedelta(hours=23, minutes=59, seconds=59, milliseconds=59)
+        endday += daydelta
+        promo_list = IntroducedBy.objects.filter(channel__code=channel_code, created_at__gte=startday, created_at__lte=endday)
+        # logger.debug("promo user:%s"%[promo_user.user for promo_user in promo_list])
+        return promo_list
+
+    def check_sign(self, channel_code, startday, endday, sign):
+        m = hashlib.md5()
+        key = getattr(settings, 'WLB_FOR_%s_KEY' % channel_code.upper())
+        m.update(startday+endday+key)
+        local_sign = m.hexdigest()
+        if sign != local_sign:
+            # logger.debug('正确的渠道校验参数%s'%local_sign)
+            logger.error(u"渠道查询接口，sign参数校验失败")
+            return False
+        return True
+
+    def get_user_info_for_coop(self, user_id):
+        user_info = {
+            'uid': get_uid_for_coop(user_id),
+            'uname': get_username_for_coop(user_id),
+            'phone': self.get_phone_for_coop(user_id),
+            'tid': get_tid_for_coop(user_id),
+        }
+
+        user_info_set = []
+        p2p_record_set = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购').order_by('create_time')
+        for p2p_record in p2p_record_set:
+            user_p2p_info = {
+                'investment': p2p_record.amount,
+                'time': p2p_record.create_time,
+                'pid': p2p_record.product_id
+            }
+
+            if user_p2p_info['time']:
+                user_p2p_info['time'] = timezone.localtime(user_p2p_info['time']).strftime('%Y-%m-%d %H:%M:%S')
+
+            user_info_set.append(dict(user_info, **user_p2p_info))
+
+        return user_info_set
+
+    def get_all_user_info_for_coop(self, channel_code, start_day, end_day, sign, page):
+        if not self.check_sign(channel_code, start_day, end_day, sign):
+            raise ValueError('wrong signature.')
+
+        coop_users = self.get_promo_user(channel_code, start_day, end_day)
+        coop_users = [u for u in coop_users if self.is_invested_user(u.user_id)]
+
+        # 处理分页
+        if page:
+            page = int(page)
+            start = page * self.PAGE_LENGTH
+            end = start + self.PAGE_LENGTH
+            coop_users = coop_users[start:end]
+
+        user_info = []
+        for coop_user in coop_users:
+            try:
+                user_info += self.get_user_info_for_coop(coop_user.user_id)
+            except Exception, e:
+                logger.exception(e)
+                logging.debug('get user %s error:%s' % (coop_user.user_id, e))
+
+        return user_info
+
+    def get(self, request, channel_code, start_day, end_day, sign, page=None):
+        try:
+            result = {
+                'errorcode': 0,
+                'errormsg': 'sucess',
+                'info': self.get_all_user_info_for_coop(channel_code, start_day, end_day, sign, page)
             }
         except ValueError, e:
             result = {
