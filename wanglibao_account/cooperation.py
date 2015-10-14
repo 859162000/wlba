@@ -378,7 +378,7 @@ class CoopRegister(object):
                 return
         self.save_to_session()
 
-    def  weixin_redpack_distribute(self, user):
+    def weixin_redpack_distribute(self, user):
         phone = user.wanglibaouserprofile.phone
         logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
         records = WanglibaoUserGift.objects.filter(valid=0, identity=phone)
@@ -395,6 +395,10 @@ class CoopRegister(object):
     def all_processors_for_user_register(self, user, invite_code):
         try:
             self.weixin_redpack_distribute(user)
+        except Exception, reason:
+            pass
+
+        try:
             if not invite_code:
                 invite_code = self.channel_code
             # logger.debug('get invite code %s'%(invite_code))
