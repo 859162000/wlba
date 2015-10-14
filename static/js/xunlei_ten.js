@@ -248,7 +248,6 @@
                 async: false
             }).done(function (data) {
                 change = data;
-                console.log(change);
                 callback && callback(data);
 
             });
