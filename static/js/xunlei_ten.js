@@ -71,6 +71,10 @@
             $(".ten-rule").slideToggle();
 
         });
+        $('#guizhexunlei').on('click', function () {
+            $(".xianshi").slideToggle();
+
+        });
 
         //关闭弹出框
         var change = [];
@@ -166,22 +170,25 @@
 
 
             redpack('ENTER_WEB_PAGE', function (data) {
-                if (data['ret_code'] == 4000) {
-                    $('.center-box').removeClass("big-box-open");
-                } else {
-                    $('.center-box').addClass("big-box-open");
-                }
+                //if (data['ret_code'] == 4000) {
+                //
+                //} else {
+                //
+                //}
                 //if (!$('.open-box-btn').hasClass('noClick')) {
                 if (data['ret_code'] == 4000) {
+                    $('.center-box').removeClass("big-box-open");
                     $('#small-zc').show();
                     $('#xl-aug-fail p').text('Sorry~您不符合抽奖条件');
                     $('#xl-aug-fail').show();
                 } else if (data['ret_code'] == 3003) {
+                    $('.center-box').addClass("big-box-open");
                     if (change['left'] <= 0) {
                         $('#small-zc').show();
                         $('#xl-aug-fail p').text('Sorry~您的抽奖次数已用完')
                         $('#xl-aug-fail').show();
                     } else {
+                        $('.center-box').addClass("big-box-open");
                         if (data['left'] == data['get_time']) {
                             game(data['get_time']);
                         } else {
@@ -201,7 +208,7 @@
 
 
         function game(isGet) {
-            setTimeout(function () {
+            //setTimeout(function () {
                 if (isGet) {
                     //成功调用
                     redpack('GET_AWARD');
@@ -209,18 +216,18 @@
                 } else {
                     //失败调用
                     redpack('IGNORE_AWARD');
-                    star('0000');
+                    star();
                 }
-            }, 10)
+            //}, 10)
         }
 
 
         //提示语
-        function star(a) {
-            setTimeout(function () {
+        function star() {
+            //setTimeout(function () {
                 $('#rmb').text(parseInt(change['amount']));
                 $('#small-zc').show();
-                if (a == '0000') {
+                if (change['ret_code'] == 3002) {
                     $('.center-box').addClass("big-box-open");
                     var txt = ['佛说：前世的500次回眸才换得一次中奖，淡定', '奖品何时有，把酒问青天', '大奖下回见，网利宝天天见/**/'];
                     var ind = parseInt(Math.random() * 3);
@@ -235,7 +242,7 @@
                     $('#xl-aug-success11 p .xl-aug').text(txtg[indw]);
                     $('#xl-aug-success11').show();
                 }
-            }, 1000)
+            //}, 1000)
 
         }
 
@@ -249,6 +256,7 @@
                 async: false
             }).done(function (data) {
                 change = data;
+                console.log(change);
                 callback && callback(data);
 
             });
