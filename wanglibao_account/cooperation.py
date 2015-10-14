@@ -1020,7 +1020,7 @@ class WeixinRedpackRegister(CoopRegister):
         logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
         record = WanglibaoUserGift.objects.filter(valid=0, identity=phone).first()
         try:
-            redpack_backends.give_activity_redpack(self.request.user, record.rules.redpack, 'pc')
+            redpack_backends.give_activity_redpack(user, record.rules.redpack, 'pc')
         except Exception, reason:
             logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
         else:
