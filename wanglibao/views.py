@@ -29,7 +29,7 @@ class IndexView(TemplateView):
     PRODUCT_LENGTH = 3
 
     def _period_3(self, p2p):
-        return p2p.filter(Q(pay_method__contains=u'日计息') & Q(period__gte=30) & Q(period__lt=90) | ~Q(pay_method__contains=u'日计息') & Q(period__gte=1) & Q(period__lt=3))
+        return p2p.filter(Q(pay_method__contains=u'日计息') & Q(period__gte=1) & Q(period__lt=90) | ~Q(pay_method__contains=u'日计息') & Q(period__gte=1) & Q(period__lt=3))
 
     def _period_6(self, p2p):
         return p2p.filter(Q(pay_method__contains=u'日计息') & (Q(period__gte=90) & Q(period__lt=180)) | ~Q(pay_method__contains=u'日计息') & (Q(period__gte=3) & Q(period__lt=6)))

@@ -464,7 +464,8 @@ class XunleiP2PListAPIView(APIView):
             obj = {
                 'id': p2pproduct.id,
                 'title': p2pproduct.name,
-                'title_url': 'https://{}/p2p/detail/{}'.format(request.get_host(), p2pproduct.id),
+                #'title_url': 'https://{}/p2p/detail/{}'.format(request.get_host(), p2pproduct.id),
+                'title_url': 'https://www.wanglibao.com/activity/xunlei_setp/?promo_token=xunlei9',
                 'rate_year': p2pproduct.expected_earning_rate,
                 'rate_vip': float(rate_vip),
                 'income': income,
@@ -476,7 +477,8 @@ class XunleiP2PListAPIView(APIView):
                 'repayment_period': p2pproduct.period * 30,
                 'repayment_type': XUNLEI_PAY_WAY.get(p2pproduct.pay_method, 0),
                 #'buy_url': 'https://{}/p2p/detail/{}?promo_token=xunlei'.format(request.get_host(), p2pproduct.id),
-                'buy_url': 'https://www.wanglibao.com/activity/xunleidenglu/?promo_token=xunlei9',
+                #'buy_url': 'https://www.wanglibao.com/activity/xunleidenglu/?promo_token=xunlei9',
+                'buy_url': 'https://www.wanglibao.com/activity/xunlei_setp/?promo_token=xunlei9',
                 'finance_start_time': time.mktime(timezone.localtime(p2pproduct.publish_time).timetuple()),
                 'finance_end_time': time.mktime(timezone.localtime(p2pproduct.end_time).timetuple()),
                 'status': p2pproduct.status

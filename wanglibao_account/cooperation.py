@@ -54,7 +54,8 @@ import re
 import uuid
 import urllib
 
-logger = logging.getLogger(__name__)
+#logger = logging.getLogger(__name__)
+logger = logging.getLogger('wanglibao_reward')
 
 
 def get_uid_for_coop(user_id):
@@ -377,7 +378,26 @@ class CoopRegister(object):
                 return
         self.save_to_session()
 
+    def weixin_redpack_distribute(self, user):
+        phone = user.wanglibaouserprofile.phone
+        logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
+        records = WanglibaoUserGift.objects.filter(valid=0, identity=phone)
+        for record in records:
+            try:
+                redpack_backends.give_activity_redpack(user, record.rules.redpack, 'pc')
+            except Exception, reason:
+                logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
+            else:
+                logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (self.request.user, record.rules.redpack,))
+            record.valid = 1
+            record.save()
+
     def all_processors_for_user_register(self, user, invite_code):
+        try:
+            self.weixin_redpack_distribute(user)
+        except Exception, reason:
+            pass
+
         try:
             if not invite_code:
                 invite_code = self.channel_code
@@ -1015,9 +1035,15 @@ class WeixinRedpackRegister(CoopRegister):
         self.invite_code = 'weixin_redpack'
 
     def register_call_back(self, user):
-        phone = self.request.GET.get('phone',)
+        phone = user.wanglibaouserprofile.phone
+        logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
         record = WanglibaoUserGift.objects.filter(valid=0, identity=phone).first()
-        redpack_backends.give_activity_redpack(self.request.user, record.rules.redpack, 'pc')
+        try:
+            redpack_backends.give_activity_redpack(user, record.rules.redpack, 'pc')
+        except Exception, reason:
+            logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
+        else:
+            logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (self.request.user, record.rules.redpack,))
         record.valid = 1
         record.save()
 

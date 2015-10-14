@@ -306,8 +306,6 @@ DEFAULT_FROM_EMAIL = 'noreply@wanglibao.com'
 # 新的漫道请求设置
 SMS_MANDAO_URL = 'http://sdk.entinfo.cn:8061/webservice.asmx/mdsmssend'
 SMS_MANDAO_MULTICAST_URL = 'http://sdk2.entinfo.cn:8061/webservice.asmx/mdgxsend'
-SMS_MANDAO_USER_URL = 'http://sdk.entinfo.cn:8060/webservice.asmx/mo'
-SMS_MANDAO_REPORT_URL = 'http://report.zucp.net:8060/reportservice.asmx/report'
 SMS_MANDAO_SN = 'SDK-SKY-010-02839'
 SMS_MANDAO_MD5_PWD = '1FE15236BBEB705A8F5D221F47164693'
 
@@ -445,7 +443,6 @@ LOGGING = {
             'level': 'DEBUG'
         },
     }
-
 }
 
 if ENV != ENV_DEV:
@@ -604,6 +601,11 @@ CELERYBEAT_SCHEDULE = {
     'message_arrived_rate_statistics': {
         'task': 'wanglibao_sms.tasks.message_arrived_rate_task',
         'schedule': timedelta(minutes=10),
+    },
+    # by Zhoudong 发送短信时间统计
+    'message_arrived_rate_check': {
+        'task': 'wanglibao_sms.tasks.check_arrived_rate_task',
+        'schedule': crontab(minute=0, hour=0),
     },
 }
 
@@ -1059,7 +1061,6 @@ if ENV == ENV_PRODUCTION:
     WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
 else:
     WEIXIN_CALLBACK_URL = 'https://staging.wanglibao.com'
-    DEBUG=True
 
 
 # 短信到达率统计时间间隔

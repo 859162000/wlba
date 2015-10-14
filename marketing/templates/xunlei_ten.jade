@@ -26,30 +26,48 @@ html
       .ten-main
         .box
           .ten-box
-            .left-box.small-box-open
-            .center-box.big-box-open
+            .left-box
+            .center-box
             .right-box
           .ten-prize 还剩
             b 1000
             |份奖品
-          .open-box-btn
-            span.ten-com.box-key
-            |开启宝箱
+          if user.is_authenticated
+            .open-box-btn.received
+              span.ten-com.box-key
+              |开启宝箱
+          else
+            .open-box-btn
+              span.ten-com.box-key
+              |开启宝箱
+
           p.ten-zhu 注：每位新注册用户有3次开宝箱机会，幸运等你开启
         .prize-box
           h1.tit.ten-com.ten-tit 好礼连连
           dl.prize-dl
             dt.ten-com.ten-prize1
-            dd 领取加息券
+            if user.is_authenticated
+              dd.ten-txtbutn.received 领取加息券
+            else
+              dd.ten-txtbutn 领取加息券
           dl.prize-dl
             dt.ten-com.ten-prize2
-            dd 领取100元红包
+            if user.is_authenticated
+              dd.ten-txtbutn.received 领取100元红包
+            else
+              dd.ten-txtbutn 领取100元红包
           dl.prize-dl
             dt.ten-com.ten-prize3
-            dd 领取7天迅雷会员
+            if user.is_authenticated
+              dd.ten-txtbutn.receiveg 领取7天迅雷会员
+            else
+              dd.ten-txtbutn 领取7天迅雷会员
           dl.prize-dl(style="margin-right:0px")
             dt.ten-com.ten-prize4
-            dd 领取1年迅雷会员
+            if user.is_authenticated
+              dd.ten-txtbutn.receiveh 领取1年迅雷会员
+            else
+              dd.ten-txtbutn 领取1年迅雷会员
         .prize-box
           h1.tit.ten-com.ten-tit 加息券使用流程
           .liucheng
@@ -75,7 +93,7 @@ html
             .ten-txt 获得收益和奖励
             span.end-span
             b.end-b
-          h2 加息券规则
+          h2.xuntenxia 加息券规则
              span
           .ten-rule
             ul#rule1
@@ -90,10 +108,16 @@ html
             li 活动时间：2015年10月1日-2015年11月1日；
             li 手机号为网利宝唯一账户，本期迅雷活动仅限于迅雷新注册用户参与，用户首次充值、首次投资最低为100元方可获得相关迅雷福利；
             li 新用户注册送1%加息券及100元现金红包，其中加息券使用规则见
-              span 加息券规则
+              span#guizhexunlei(style='cursor: pointer') 加息券规则
               |，100元现金红包为直抵红包（投资满2000元方可抵扣使用）；
             li 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
             li 网利宝对此活动享有最终解释权。
+          ul#rule2.xianshi(style='display: none')
+              li 1. 加息券有效期：10月1日-11月1日；
+              li 2. 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+              li 3. 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+              li 4. 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+              li 5. 使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
 
 
       .xl-box1
@@ -136,15 +160,16 @@ html
     include global/g_footer
     include include/tracking
   #small-zc
-  #xl-aug-success
+  #xl-aug-success11
     .bj
     span.first-xl-off2
     hr
     .redpack.model-com.one
     .man.model-com.two
-    p 人品大爆发,1%加息券
-      br
-      |已在您的账户中
+    p
+     label.xl-aug 人世间最美好的事情莫过于如此，1%加息券
+     br
+     label 已在您的账户中
     .reg-btn 太棒了
   #xl-aug-fail
     .bj
