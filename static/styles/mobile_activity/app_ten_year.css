@@ -2292,7 +2292,7 @@ img {
 	transform: rotate(170deg);
 }
 
-.page8 .p8fly {
+.cur .p8fly_animate {
 	-webkit-animation: s8fly_start 15s ease-in infinite;
 	animation: s8fly_start 15s ease-in infinite;
 }
