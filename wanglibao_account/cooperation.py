@@ -1129,8 +1129,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
-                          ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
-                          XunleiVipRegister]
+                          ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister]
 
 
 #######################第三方用户查询#####################
