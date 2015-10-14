@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pytz
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, PageNotAnInteger
@@ -140,8 +140,13 @@ def paginator_factory(obj, page=1, limit=100):
 
 def pc_data_generator():
     down_line_amount = 1355000000.00
+    yesterday = datetime.now()-timedelta(1)
+    yesterday_start = local_to_utc(yesterday, 'min')
+    yesterday_end = local_to_utc(yesterday, 'max')
     # 累计交易金额
     p2p_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))['amount__sum']
+    # 昨日交易总额
+    p2p_amount_yesterday = P2PRecord.objects.filter(catalog='申购', create_time__gt=yesterday_start, create_time__lt=yesterday_end).aggregate(Sum('amount'))['amount__sum']
     # 累计交易人数
     user_number = P2PRecord.objects.filter(catalog='申购').values('id').count()
     #累计注册人数
@@ -161,5 +166,6 @@ def pc_data_generator():
         'p2p_amount': float(p2p_amount) + down_line_amount,
         'user_number': user_number,
         'user_income': float(user_income),
-        'p2p_register_number':p2p_register_number
+        'p2p_register_number':p2p_register_number,
+        "p2p_amount_yesterday":p2p_amount_yesterday
     }
