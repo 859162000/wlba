@@ -1,82 +1,130 @@
 # -*- coding: utf-8 -*-
 import logging
 import urllib2
-from django.core.urlresolvers import reverse
+import datetime
 from django.db.models import Sum
-from django.http.response import HttpResponse, HttpResponseRedirect
+from django.http.response import HttpResponse
 from django.utils import timezone
-from django.views.generic import TemplateView
 import pytz
+import time
 from rest_framework import renderers
 from rest_framework.views import APIView
 
 from wanglibao import settings
 from wanglibao.permissions import IsAdminUserOrReadOnly
-from wanglibao.settings import SMS_MANDAO_USER_URL, SMS_MANDAO_SN, SMS_MANDAO_MD5_PWD, SMS_MANDAO_REPORT_URL
-from wanglibao_sms.models import ArrivedRate, MessageInRedis
+from wanglibao_sms.models import ArrivedRate
 
 
-def get_user_messages():
+def count_messages_arrived_rate():
     """
-    author: zhoudong
-    write user's messages into the log file in '/var/log/wanglibao/user_message/*.log'
+    author: Zhoudong
+    定时统计到达率
+    :return:
     """
-    logger = logging.getLogger('get_user_messages')
+    now = timezone.now()
+    local_now = timezone.localtime(now)
 
-    url = SMS_MANDAO_USER_URL + '?sn=%s&pwd=%s' % (SMS_MANDAO_SN, SMS_MANDAO_MD5_PWD)
-    ret = urllib2.urlopen(url).read()
-    ret = ret.rsplit('</string>')[0].split('<string xmlns="http://tempuri.org/">')[1]
-
-    if len(ret) < 10:
-        try:
-            logger.debug(u'本阶段没数据\n')
-        except Exception, e:
-            print logger.debug(e)
+    minute = local_now.minute
+    if minute % 10 == 0:
+        pass
     else:
-        try:
-            ret = '\n' + ret + '\n'
-            logger.debug(ret)
-        except Exception, e:
-            print logger.debug(e)
-    return ret
+        minute = minute / 10 * 10
+
+    end = datetime.datetime(year=local_now.year,
+                            month=local_now.month,
+                            day=local_now.day,
+                            hour=local_now.hour,
+                            minute=minute,
+                            second=0).replace(tzinfo=pytz.timezone(settings.TIME_ZONE))
+
+    delta = settings.MESSAGE_TIME_DELTA
+    start = end - delta
+
+    total = 0
+    achieved = 0
+
+    file_name = time.strftime('%Y-%m-%d' + '.log', time.localtime())
+    try:
+        f = open('/var/log/wanglibao/report_messages/' + file_name, 'r')
+        lines = f.readlines()
+
+        for line in lines:
+            s = line.split(',')[-1]
+            time_str = s.split()[0] + ' ' + s.split()[1]
+            check_time = \
+                timezone.datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.timezone(settings.TIME_ZONE))
+
+            if start < check_time < end:
+                total += 1
+                if line.split(',')[4] == 0 or line.split(',')[4] == 'DELIVRD':
+                    achieved += 1
+
+        if total > 0:
+            ArrivedRate.objects.get_or_create(channel=u'慢道', achieved=achieved, total_amount=total,
+                                              rate=float(achieved) / total * 100, start=start, end=end)
+    except Exception, e:
+        print e
 
 
-def get_report_messages():
+def check_arrived_rate_tasks(period=2):
     """
-    author: zhoudong
-    write user's messages into the log file in '/var/log/wanglibao/report_message/*.log'
-    and save to the DB every 10 minutes
+    检查是不是有任务跳过了没有执行.
+    :param period: 检查的天数
+    :return:
     """
-    logger = logging.getLogger('get_report_messages')
+    now = timezone.now()
+    local_now = timezone.localtime(now)
 
-    url = SMS_MANDAO_REPORT_URL + '?sn=%s&pwd=%s&maxid=1' % (SMS_MANDAO_SN, SMS_MANDAO_MD5_PWD)
-    ret = urllib2.urlopen(url).read()
-    ret = ret.rsplit('</string>')[0].split('<string xmlns="http://tempuri.org/">')[1]
-
-    if len(ret) < 10:
-        try:
-            logger.info(u'本阶段没数据\n')
-        except Exception, e:
-            print logger.info(e)
+    minute = local_now.minute
+    if minute % 10 == 0:
+        pass
     else:
-        ret = '\n' + ret + '\r\n'
+        minute = minute / 10 * 10
+
+    end = datetime.datetime(year=local_now.year,
+                            month=local_now.month,
+                            day=local_now.day,
+                            hour=local_now.hour,
+                            minute=minute,
+                            second=0).replace(tzinfo=pytz.timezone(settings.TIME_ZONE))
+
+    start_0 = end - datetime.timedelta(days=period)
+    delta = settings.MESSAGE_TIME_DELTA
+    start_1 = end - delta
+
+    start = start_0
+    while start < start_1:
         try:
-            logger.info(ret)
+            ArrivedRate.objects.get(start=start)
         except Exception, e:
-            print logger.info(e)
+            print 'get_error: ', e
+            total = 0
+            achieved = 0
+            end = start + delta
 
-        achieved = ret.count('DELIVRD') + ret.count(',0,')
-        total = ret.count('\r\n')
+            file_name = str(start.year) + '-' + str(start.month) + '-' + str(start.day) + '.log'
+            try:
+                f = open('/var/log/wanglibao/report_messages/' + file_name, 'r')
+                lines = f.readlines()
 
-        now = timezone.now()
-        local_now = timezone.localtime(now).replace(tzinfo=pytz.timezone(settings.TIME_ZONE))
-        delta = settings.MESSAGE_TIME_DELTA
-        start = local_now - delta
+                for line in lines:
+                    s = line.split(',')[-1]
+                    time_str = s.split()[0] + ' ' + s.split()[1]
+                    check_time = \
+                        timezone.datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=pytz.timezone(settings.TIME_ZONE))
 
-        ArrivedRate.objects.create(channel=u'慢道', achieved=achieved, total_amount=total,
-                                   rate=float(achieved)/total*100, start=start, end=local_now)
+                    if start < check_time < end:
+                        total += 1
+                        if line.split(',')[4] == 0 or line.split(',')[4] == 'DELIVRD':
+                            achieved += 1
 
-    return ret
+                if total > 0:
+                    ArrivedRate.objects.get_or_create(channel=u'慢道', achieved=achieved, total_amount=total,
+                                                      rate=float(achieved) / total * 100, start=start, end=end)
+            except Exception, e:
+                print e
+
+        start += datetime.timedelta(minutes=10)
 
 
 class ArriveRate(APIView):
@@ -114,50 +162,3 @@ class ArriveRate(APIView):
             }
 
         return HttpResponse(renderers.JSONRenderer().render(result, 'application/json'))
-
-
-class MessageList(TemplateView):
-    """
-    author: Zhoudong
-    显示所有短信用于编辑
-    """
-    template_name = 'messages.jade'
-    permission_classes = (IsAdminUserOrReadOnly,)
-
-    def get_context_data(self, **kwargs):
-
-        messages = MessageInRedis.objects.all()
-
-        return {
-            "messages": messages
-        }
-
-
-class MessageEdit(APIView):
-    """
-    author: Zhoudong
-    根据时间段, 获取到达率
-    method: GET.
-    改成定期执行加入数据库, 统计一定时间段的到达率
-    """
-    permission_classes = (IsAdminUserOrReadOnly,)
-
-    def get(self, request):
-
-        redirect_url = reverse('wanglibao:message_for_admin')
-
-        mid = int(self.request.GET.get('mid', None))
-        message_for = self.request.GET.get('message_for', None)
-        title = self.request.GET.get('title', None)
-        content = self.request.GET.get('content', None)
-
-        try:
-            message = MessageInRedis.objects.get_by_id(id=mid)
-            message.message_for = message_for
-            message.title = title
-            message.content = content
-            message.save()
-        except Exception, e:
-            print e
-
-        return HttpResponseRedirect(redirect_url)

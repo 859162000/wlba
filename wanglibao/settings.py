@@ -13,7 +13,6 @@ from __future__ import absolute_import
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import json
-import time
 from celery.schedules import crontab
 from Crypto.PublicKey import RSA
 
@@ -307,8 +306,6 @@ DEFAULT_FROM_EMAIL = 'noreply@wanglibao.com'
 # 新的漫道请求设置
 SMS_MANDAO_URL = 'http://sdk.entinfo.cn:8061/webservice.asmx/mdsmssend'
 SMS_MANDAO_MULTICAST_URL = 'http://sdk2.entinfo.cn:8061/webservice.asmx/mdgxsend'
-SMS_MANDAO_USER_URL = 'http://sdk.entinfo.cn:8060/webservice.asmx/mo'
-SMS_MANDAO_REPORT_URL = 'http://report.zucp.net:8060/reportservice.asmx/report'
 SMS_MANDAO_SN = 'SDK-SKY-010-02839'
 SMS_MANDAO_MD5_PWD = '1FE15236BBEB705A8F5D221F47164693'
 
@@ -382,19 +379,6 @@ LOGGING = {
             'filename': '/var/log/wanglibao/wanglibao_reward.log',
             'formatter': 'verbose'
         },
-        # zhoudong
-        'wanglibao_sms_user_message': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': '/var/log/wanglibao/user_message/' + time.strftime('%Y-%m-%d', time.localtime()) + '.log',
-            'formatter': 'verbose'
-        },
-        'wanglibao_sms_report_message': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': '/var/log/wanglibao/report_message/' + time.strftime('%Y-%m-%d', time.localtime()) + '.log',
-            'formatter': 'verbose'
-        },
     },
     'loggers': {
         'django': {
@@ -458,25 +442,7 @@ LOGGING = {
             'handlers': ['wanglibao_reward', 'console'],
             'level': 'DEBUG'
         },
-        # zhoudong
-        # 'wanglibao_sms_user_message': {
-        #     'level': 'DEBUG',
-        #     'class': 'logging.FileHandler',
-        #     'filename': '/var/log/wanglibao/' + time.strftime('%Y-%m-%d', time.localtime()) + '.log',
-        #     'formatter': 'verbose'
-        # },
-        'get_user_messages': {
-            'handlers': ['wanglibao_sms_user_message'],
-            'level': 'DEBUG',
-            'propagate': True
-        },
-        'get_report_messages': {
-            'handlers': ['wanglibao_sms_report_message'],
-            'level': 'INFO',
-            'propagate': True
-        },
     }
-
 }
 
 if ENV != ENV_DEV:
@@ -635,6 +601,11 @@ CELERYBEAT_SCHEDULE = {
     'message_arrived_rate_statistics': {
         'task': 'wanglibao_sms.tasks.message_arrived_rate_task',
         'schedule': timedelta(minutes=10),
+    },
+    # by Zhoudong 发送短信时间统计
+    'message_arrived_rate_check': {
+        'task': 'wanglibao_sms.tasks.check_arrived_rate_task',
+        'schedule': crontab(minute=0, hour=0),
     },
 }
 
