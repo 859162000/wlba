@@ -8,6 +8,7 @@ from django.db import transaction
 from decimal import *
 from ckeditor.fields import RichTextField
 from django.core.exceptions import ValidationError
+from rest_framework.authtoken.models import Token
 
 
 class NewsAndReport(models.Model):
@@ -443,3 +444,14 @@ class WanglibaoActivityReward(models.Model):
         verbose_name = u'网利宝发奖活动表'
         verbose_name_plural = u'网利宝发奖活动表'
 
+
+class LoginAccessToken(models.Model):
+    """
+     by huo meimei
+    """
+    token = models.ForeignKey(Token)
+    access_token = models.CharField(max_length=40, verbose_name='登录令牌', unique=True)
+    client_ts = models.CharField(max_length=40, verbose_name='客户端时间')
+    update_at = models.BigIntegerField(default=None, verbose_name=u"时间戳", blank=True)
+    class Meta:
+        verbose_name_plural = u'h5用户令牌登录表'
