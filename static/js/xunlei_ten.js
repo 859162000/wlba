@@ -66,6 +66,11 @@
         //模态口高度
         var body_h = $('body').height();
         $('#small-zc').height(body_h);
+        //点击显示规则
+        $('.xuntenxia').on('click', function () {
+            $(".ten-rule").slideToggle();
+
+        });
 
         //关闭弹出框
         var change = [];
@@ -166,31 +171,31 @@
                 } else {
                     $('.center-box').addClass("big-box-open");
                 }
-                if (!$('.open-box-btn').hasClass('noClick')) {
-                    if (data['ret_code'] == 4000) {
+                //if (!$('.open-box-btn').hasClass('noClick')) {
+                if (data['ret_code'] == 4000) {
+                    $('#small-zc').show();
+                    $('#xl-aug-fail p').text('Sorry~您不符合抽奖条件');
+                    $('#xl-aug-fail').show();
+                } else if (data['ret_code'] == 3003) {
+                    if (change['left'] <= 0) {
                         $('#small-zc').show();
-                        $('#xl-aug-fail p').text('Sorry~您不符合抽奖条件');
+                        $('#xl-aug-fail p').text('Sorry~您的抽奖次数已用完')
                         $('#xl-aug-fail').show();
-                    } else if (data['ret_code'] == 3003) {
-                        if (change['left'] <= 0) {
-                            $('#small-zc').show();
-                            $('#xl-aug-fail p').text('Sorry~您的抽奖次数已用完')
-                            $('#xl-aug-fail').show();
+                    } else {
+                        if (data['left'] == data['get_time']) {
+                            game(data['get_time']);
                         } else {
-                            if (data['left'] == data['get_time']) {
-                                game(data['get_time']);
-                            } else {
-                                game();
-                                $('.center-box').addClass("big-box-open");
-                            }
-
+                            game();
+                            $('.center-box').addClass("big-box-open");
                         }
-                    } else if (data['ret_code'] == 3000) {
-                        $('#small-zc').show();
-                        $('#xl-aug-login').show();
-                        $('.center-box').addClass("big-box-open");
+
                     }
+                } else if (data['ret_code'] == 3000) {
+                    $('#small-zc').show();
+                    $('#xl-aug-login').show();
+                    $('.center-box').addClass("big-box-open");
                 }
+                //}
             })
         })
 
