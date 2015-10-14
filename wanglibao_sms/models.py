@@ -90,6 +90,7 @@ class ArrivedRate(models.Model):
     created_at = models.DateTimeField(u'报告创建时间', auto_now_add=True, db_index=True)
 
     class Meta:
+        unique_together = ("channel", "start")
         verbose_name = u'到达率记录'
         verbose_name_plural = u'到达率记录'
         ordering = ['-created_at']
