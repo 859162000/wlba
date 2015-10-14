@@ -52,7 +52,7 @@ def weixin_redpack_distribute(user):
         except Exception, reason:
             logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
         else:
-            logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (self.request.user, record.rules.redpack,))
+            logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (user, record.rules.redpack,))
         record.valid = 1
         record.save()
 
@@ -60,7 +60,10 @@ def weixin_redpack_distribute(user):
 def register_ok(user_id, device):
     user = User.objects.filter(id=user_id).first()
     device_type = device['device_type']
-    weixin_redpack_distribute(user)
+    try:
+        weixin_redpack_distribute(user)
+    except Exception, reason:
+        pass
     title, content = messages.msg_register()
     inside_message.send_one.apply_async(kwargs={
         "user_id": user_id,
