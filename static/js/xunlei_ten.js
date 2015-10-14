@@ -166,7 +166,7 @@
                 } else {
                     $('.center-box').addClass("big-box-open");
                 }
-                if (!$('.go-game').hasClass('noClick')) {
+                if (!$('.open-box-btn').hasClass('noClick')) {
                     if (data['ret_code'] == 4000) {
                         $('#small-zc').show();
                         $('#xl-aug-fail p').text('Sorry~您不符合抽奖条件');
@@ -244,7 +244,6 @@
                 async: false
             }).done(function (data) {
                 change = data;
-
                 callback && callback(data);
 
             });
