@@ -33,9 +33,10 @@ require ['jquery', 'lib/countdown'], ($, countdown)->
       return null
 
   # set cookie
+  # {number} day (cookie time)
   setCookie  = (key, value, day) ->
     date = new Date()
-    date.setTime(date.getTime() + day*24*60*60*1000);
+    date.setTime(date.getTime() + day * 24 * 60 * 60 * 1000);
     document.cookie = key + "=" + value+";expires="+date.toGMTString()
     console.log(document.cookie)
 

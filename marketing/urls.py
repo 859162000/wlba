@@ -49,6 +49,8 @@ urlpatterns = patterns(
     url(r'^gold_two/$', TemplateView.as_view(template_name="gold_two.jade")),
     url(r'^seckill/$', TemplateView.as_view(template_name="seckill.jade")),
 
+    url(r'^audio/$', TemplateView.as_view(template_name="audio.html")),
+
 )
 
 # app URL
