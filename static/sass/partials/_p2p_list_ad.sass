@@ -1,0 +1,32 @@
+$body-width: 700px
+$body-height: 571px
+
+.p2p-mask-warp
+  position: fixed
+  width: 100%
+  top: 0
+  bottom: 0
+  z-index: 100
+  display: none
+  .p2p-mask
+    position: absolute
+    background: #000
+    opacity: 0.8
+    width: 100%
+    height: 100%
+  .p2p-body-warp
+    position: absolute
+    top: 50%
+    left: 50%
+    margin: (-$body-height/2) 0px 0px  (-$body-width/2)
+    width: $body-width
+    height: $body-height
+    background: url("/static/imgs/pc/p2p_list/p2p_body.png") no-repeat center
+  .p2p-body-close
+    position: absolute
+    top: 0
+    right: 0
+    cursor: pointer
+    width: 41px
+    height: 42px
+    background: url("/static/imgs/pc/p2p_list/close.png") no-repeat center
