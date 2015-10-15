@@ -645,7 +645,7 @@ def ajax_get_activity_record(action='get_award', *gifts):
 
 def ajax_xunlei(request):
     """
-        description:迅雷9月抽奖活动，响应web的ajax请求
+        description:迅雷抽奖活动，响应web的ajax请求
     """
     user = request.user
     if not user.is_authenticated():
@@ -678,7 +678,7 @@ def ajax_xunlei(request):
     if request.method == "POST":
         obj = ThunderInterestAwardAPIView()
         action = request.POST.get("action", "")
-
+        logger.debug("迅雷10月  action type:%s" %(action,))
         if action == 'GET_RECORD':
             obj.get_reward_record(request, 'oct_get_award')
 
@@ -851,6 +851,7 @@ def ajax_post(request):
     if request.method == "POST":
         obj = ThunderAwardAPIView()
         action = request.POST.get("action", "")
+        logger.debug("迅雷9月  action type:%s" %(action,))
 
         if action == 'GET_AWARD':
             res = obj.get_award(request, reward)

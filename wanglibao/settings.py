@@ -1062,6 +1062,5 @@ if ENV == ENV_PRODUCTION:
 else:
     WEIXIN_CALLBACK_URL = 'https://staging.wanglibao.com'
 
-
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)

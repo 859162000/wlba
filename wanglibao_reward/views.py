@@ -6,6 +6,7 @@
 # Description: 策划活动中的红包、奖品、加息券等用户奖励行为，独立在这个文件中
 #########################################################################
 from django.utils import timezone
+from django.db import transaction
 from django.db.models import Count, Q
 from datetime import datetime
 from wanglibao_redpack import backends as redpack_backends
@@ -576,7 +577,8 @@ class WeixinShareDetailView(TemplateView):
 
         if not user_gift:
             self.debug_msg('phone:%s 没有领取过奖品' %(phone_num,) )
-            user_gift = self.distribute_redpack(phone_num, openid, activity, order_id)
+            with transaction.atomic():
+                user_gift = self.distribute_redpack(phone_num, openid, activity, order_id)
 
             if "No Reward" == user_gift:
                 self.debug_msg('奖品已经发完了，用户:%s 没有领到奖品' %(phone_num,))
