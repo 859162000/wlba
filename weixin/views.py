@@ -757,7 +757,7 @@ class AuthorizeUser(APIView):
                             return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, url_id))
                         else:
                             logger.debug(u"所有的奖品已经发完，该用户没有领到奖品")
-                            return redirect("/weixin_activity/share/end/")
+                            return redirect("/weixin_activity/share/end/?url_id=%s" % (url_id))
 
                     if user_gift and phone:
                         #如果用户已经领取了，直接跳转到详情页
