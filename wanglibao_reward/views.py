@@ -637,6 +637,7 @@ class WeixinShareEndView(TemplateView):
     def get_context_data(self, **kwargs):
         order_id = self.request.GET.get('url_id')
         shareTitle, shareContent, url = get_share_infos(order_id)
+        logger.debug("抵达End页面，order_id:%s, URL:%s" %(order_id, url))
         return {
          "share":{'content':shareContent,'title':shareTitle, 'url':url}
         }
