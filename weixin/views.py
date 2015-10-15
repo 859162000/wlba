@@ -745,21 +745,26 @@ class AuthorizeUser(APIView):
                     phone = wx_user.first().phone
                     logger.debug("获得用户授权openid is: %s, phone is :%s" %(openid,phone))
                     logger.debug("product id:%s" %(url_id))
-                    user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=url_id, identity=phone,).first()
+                    # modify by hb on 2015-10-15
+                    #user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=url_id, identity=phone,).first()
+                    user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=url_id, identity=openid,).first()
                     logger.debug("用户抽奖信息是：%s" % (user_gift,))
-                    counts = WanglibaoActivityGift.objects.filter(gift_id=url_id).count()
+                    # comment by hb on 2015-10-15 : do it for what ?
+                    #counts = WanglibaoActivityGift.objects.filter(gift_id=url_id).count()
                     #logger.debug("奖品有 %s 个已经被不同用户领走了" %(counts, ))
                     left_counts = WanglibaoActivityGift.objects.filter(gift_id=url_id, valid=True).count()
                     logger.debug("奖品有 %s 个还没有被用户领走了" %(left_counts, ))
-                    if left_counts == 0 and counts > 0:
+                    if left_counts == 0 :
                         if user_gift:
-                            logger.debug(u"用户已经令完奖品，而且所有的奖品已经发放完毕")
+                            logger.debug(u"用户已经领完奖品，而且所有的奖品已经发放完毕")
                             return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, url_id))
                         else:
                             logger.debug(u"所有的奖品已经发完，该用户没有领到奖品")
                             return redirect("/weixin_activity/share/end/?url_id=%s" % (url_id))
 
-                    if user_gift and phone:
+                    #Modify by hb on 2015-10-15
+                    #if user_gift and phone:
+                    if user_gift:
                         #如果用户已经领取了，直接跳转到详情页
                         logger.debug("openid:%s, phone:%s, product_id:%s,用户已经存在了，直接跳转页面" %(openid, phone, url_id,))
                         return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, url_id))
