@@ -493,9 +493,10 @@ class WeixinShareDetailView(TemplateView):
 
         if types == 'alone':
             logger.debug("整理用户的数据返回前端，phone:%s" %(gifts.identity,))
-            QSet = WanglibaoWeixinRelative.objects.filter(phone=gifts.identity).values("phone", "nick_name", "img").first()
+            QSet = WanglibaoWeixinRelative.objects.filter(phone=gifts.identity).values("phone", "nick_name", "img", "openid").first()
+            phone = WanglibaoUserGift.objects.filter(user=gifts.user, activity=gifts.activity, rules=gifts.rules).exclude(identity=QSet["openid"]).first().identity
             if QSet:
-                ret_val = {"amount": gifts.amount, "name": QSet["nick_name"], "img": QSet["img"], "phone": QSet["phone"]}
+                ret_val = {"amount": gifts.amount, "name": QSet["nick_name"], "img": QSet["img"], "phone": phone}
             else:
                 ret_val = {"amount": 0, "name": "", "img": "", "phone": ""}
             self.debug_msg('个人获奖信息返回前端:%s' % (ret_val,))
