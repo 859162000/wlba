@@ -363,11 +363,14 @@ class WeixinShareDetailView(TemplateView):
         if not self.activity:
             self.activity = self.get_activity_by_id(activity)
         try:
-            user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity__in=(str(phone_num), str(openid),), activity=self.activity).first()
+            user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity__in=(str(phone_num), str(openid),), activity=self.activity).exclude(identity=str(openid)).first()
             if not user_gift:
                 logger.debug("没有从数据库里查到用户(%s)的领奖记录, openid:%s, order_id:%s" %(phone_num, openid, order_id))
             else:
                 logger.debug("已经从数据库里查到用户(%s)的领奖记录, openid:%s, order_id:%s" %(phone_num, openid, order_id))
+                # 用户有可能更改了自己的手机，如果已经领取了，就更新为最新的手机号
+                user_gift.identity = phone_num
+                user_gift.save()
             return user_gift
         except Exception, reason:
             self.exception_msg(reason, u'判断用户领奖，数据库查询出错')
@@ -498,6 +501,7 @@ class WeixinShareDetailView(TemplateView):
             return None
 
         if types == 'alone':
+            logger.debug("整理用户的数据返回前端，phone:%s" %(gifts.identity,))
             QSet = WanglibaoWeixinRelative.objects.filter(phone=gifts.identity).values("phone", "nick_name", "img").first()
             if QSet:
                 ret_val = {"amount": gifts.amount, "name": QSet["nick_name"], "img": QSet["img"], "phone": QSet["phone"]}
