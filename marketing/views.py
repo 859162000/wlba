@@ -8,7 +8,7 @@ from collections import defaultdict
 from decimal import Decimal
 import time
 from wanglibao_p2p.models import P2PEquity
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, connection
 from django.contrib.auth.decorators import permission_required
 from django.core.paginator import Paginator, PageNotAnInteger
 from django.utils.decorators import method_decorator
