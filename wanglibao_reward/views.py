@@ -621,8 +621,8 @@ class WeixinShareDetailView(TemplateView):
         shareTitle, shareContent, url = get_share_infos(order_id)
         return {
             "ret_code": 0,
-            "self_gift": self.format_response_data(user_gift, 'alone', openid),
-            "all_gift": self.format_response_data(gifts, 'gifts', openid),
+            "self_gift": self.format_response_data(user_gift, openid, 'alone'),
+            "all_gift": self.format_response_data(gifts, openid, 'gifts'),
              "share":{'content':shareContent,'title':shareTitle, 'url':url}
         }
 
