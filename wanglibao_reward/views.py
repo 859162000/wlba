@@ -421,14 +421,8 @@ class WeixinShareDetailView(TemplateView):
             invalid_gift.save()
             logger.debug("生成发奖记录1:gift:%s, redpack:%s, redpack_amount:%s, redpack_describe:%s" %(gift, gift.redpack, gift.redpack.amount, gift.redpack.describe))
             if user_profile:
-                try:
-                    dt = timezone.datetime.now()
-                    redpack_event = RedPackEvent.objects.filter(invalid=False, describe=sending_gift.rules.redpack.describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
-                except Exception, reason:
-                    logger.debug("send redpack Exception, msg:%s" % (reason,))
-
-                if redpack_event:
-                    redpack_backends.give_activity_redpack(user_profile.user, redpack_event, 'pc')
+                if gift.redpack:
+                    redpack_backends.give_activity_redpack(user_profile.user, gift.redpack, 'pc')
                     logger.debug("给用户 %s 发了红包，红包大小：%s, 红包组合是:%s, 购标订单号：%s" % (phone_num,redpack_event.amount, activity, product_id))
                     sending_gift.valid = 1
                     sending_gift.save()
