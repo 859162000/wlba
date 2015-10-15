@@ -105,8 +105,8 @@ html
                   span.num-space(data-number='{{site_data.p2p_amount}}',data-type='amount')
                 li
                   i.icon.iconfont.icon-data-makemoney
-                  | 小伙伴们赚取了
-                  span.num-space(data-number='{{site_data.user_income}}',data-type='amount')
+                  | 小伙伴们昨日共投资
+                  span.num-space(data-number='{{site_data.p2p_amount_yesterday}}',data-type='amount')
           .ex-download-app.mg-t-sm.padding-sm
             img(src='/static/imgs/pc/home/www_erweima.jpg').dol-app.mg-r-sm.fl
             .dol-btn.fl
@@ -139,10 +139,15 @@ html
                   a(href='/p2p/detail/{{p2p.id}}/', title='{{p2p.name}}').pdt-name.t-d10
                     if p2p.category == "新手标"
                       span.font-l
-                        em.new-user 新手福利
+                        em.new-user
                         | {{p2p.name}}
                     else
-                      span.font-l {{p2p.name}}
+                      if p2p.is_app_exclusive
+                          span.font-l
+                            em.app-icon
+                            | {{p2p.name}}
+                      else
+                        span.font-l {{p2p.name}}
                   if index == 0
                     .t-d7.clearfix
                       .span5.es 合作机构: {{p2p.warrant_company}}
