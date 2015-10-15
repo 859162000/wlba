@@ -33,13 +33,16 @@ require ['jquery', 'lib/countdown'], ($, countdown)->
       return null
 
   # set cookie
-  setCookie  = (key, value) ->
-    document.cookie = key + "=" + value
+  setCookie  = (key, value, day) ->
+    date = new Date()
+    date.setTime(date.getTime() + day*24*60*60*1000);
+    document.cookie = key + "=" + value+";expires="+date.toGMTString()
+    console.log(document.cookie)
 
   #addEventListen close , set cookie
   $('.p2p-body-close').on('click', () ->
     $('.p2p-mask-warp').hide()
-    setCookie('p2p_mask', 'show');
+    setCookie('p2p_mask', 'show', 15);
   )
 
   # judge show or hide

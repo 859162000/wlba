@@ -39,12 +39,16 @@
         return null;
       }
     };
-    setCookie = function(key, value) {
-      return document.cookie = key + "=" + value;
+    setCookie = function(key, value, day) {
+      var date;
+      date = new Date();
+      date.setTime(date.getTime() + day * 24 * 60 * 60 * 1000);
+      document.cookie = key + "=" + value + ";expires=" + date.toGMTString();
+      return console.log(document.cookie);
     };
     $('.p2p-body-close').on('click', function() {
       $('.p2p-mask-warp').hide();
-      return setCookie('p2p_mask', 'show');
+      return setCookie('p2p_mask', 'show', 15);
     });
     return (function(canShow) {
       if (!canShow) {
