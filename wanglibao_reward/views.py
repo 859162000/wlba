@@ -368,9 +368,6 @@ class WeixinShareDetailView(TemplateView):
                 logger.debug("没有从数据库里查到用户(%s)的领奖记录, openid:%s, order_id:%s" %(phone_num, openid, order_id))
             else:
                 logger.debug("已经从数据库里查到用户(%s)的领奖记录, openid:%s, order_id:%s" %(phone_num, openid, order_id))
-                # 用户有可能更改了自己的手机，如果已经领取了，就更新为最新的手机号
-                user_gift.identity = phone_num
-                user_gift.save()
             return user_gift
         except Exception, reason:
             self.exception_msg(reason, u'判断用户领奖，数据库查询出错')
@@ -604,6 +601,9 @@ class WeixinShareDetailView(TemplateView):
                 #redirect_url = reverse('weixin_share_end')+'?url_id=%s'%order_id
                 #return redirect(redirect_url)
         else:
+            # 用户有可能更改了自己的手机，如果已经领取了，就更新为最新的手机号
+            user_gift.identity = phone_num
+            user_gift.save()
             self.debug_msg('phone:%s 已经领取过奖品, gift:%s' %(phone_num, user_gift, ))
         gifts = self.get_distribute_status(order_id, activity)
         shareTitle, shareContent, url = get_share_infos(order_id)
