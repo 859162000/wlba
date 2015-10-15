@@ -542,7 +542,8 @@ CELERYBEAT_SCHEDULE = {
     #add by zhanghe: PC端WEB首页统计数据
     'pc_index_data': {
         'task': 'marketing.tasks.generate_pc_index_data',
-        'schedule': crontab(minute=10, hour=0),
+        #'schedule': crontab(minute=10, hour=0),
+        'schedule': timedelta(minutes=5),
     },
 
     #add by lili: 全民佣金收入短信/站内信每日定时发送
