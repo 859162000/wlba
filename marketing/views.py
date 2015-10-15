@@ -645,7 +645,7 @@ def ajax_get_activity_record(action='get_award', *gifts):
 
 def ajax_xunlei(request):
     """
-        description:迅雷9月抽奖活动，响应web的ajax请求
+        description:迅雷抽奖活动，响应web的ajax请求
     """
     user = request.user
     if not user.is_authenticated():
