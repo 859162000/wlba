@@ -363,7 +363,7 @@ class WeixinShareDetailView(TemplateView):
         if not self.activity:
             self.activity = self.get_activity_by_id(activity)
         try:
-            user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity__in=(str(phone_num), str(openid),), activity=self.activity).exclude(identity=str(openid)).first()
+            user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity=(str(phone_num)), activity=self.activity).first()
             if not user_gift:
                 logger.debug("没有从数据库里查到用户(%s)的领奖记录, openid:%s, order_id:%s" %(phone_num, openid, order_id))
             else:
@@ -533,14 +533,19 @@ class WeixinShareDetailView(TemplateView):
     def update_weixin_wanglibao_relative(self, openid, phone_num):
         try:
             relative = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
+            old = None
             if relative:
+                old = relative.phone
                 relative.phone = phone_num
                 relative.save()
                 self.debug_msg("用户更新自己的手机号为:%s, openid:%s" %(phone_num, openid))
+                return old
             else:
                 self.debug_msg("待更新的微信网利宝用户关系记录为空")
+                return None
         except Exception, reason:
             self.exception_msg(reason, "weixin-wanglibao-realitive table 更新用户的手机号报异常")
+            return None
 
     def throw_exception(self, msg):
         raise Exception(msg)
@@ -577,12 +582,12 @@ class WeixinShareDetailView(TemplateView):
             logger.debug("misc配置的activity有:%s, 本次使用的activity是：%s" % (activitys, activity))
 
         #更新用户的手机号
-        self.update_weixin_wanglibao_relative(openid, phone_num)
+        old_phone = self.update_weixin_wanglibao_relative(openid, phone_num)
 
         if not self.has_combine_redpack(order_id, activity):
             self.generate_combine_redpack(order_id, activity)
 
-        user_gift = self.has_got_redpack(phone_num, activity, order_id, openid)
+        user_gift = self.has_got_redpack(old_phone, activity, order_id, openid)
 
         if not user_gift:
             self.debug_msg('phone:%s 没有领取过奖品' %(phone_num,) )
