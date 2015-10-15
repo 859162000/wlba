@@ -364,6 +364,10 @@ class WeixinShareDetailView(TemplateView):
             self.activity = self.get_activity_by_id(activity)
         try:
             user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity__in=(str(phone_num), str(openid),), activity=self.activity).first()
+            if not user_gift:
+                logger.debug("没有从数据库里查到用户(%s)的领奖记录, openid:%s, order_id:%s" %(phone_num, openid, order_id))
+            else:
+                logger.debug("已经从数据库里查到用户(%s)的领奖记录, openid:%s, order_id:%s" %(phone_num, openid, order_id))
             return user_gift
         except Exception, reason:
             self.exception_msg(reason, u'判断用户领奖，数据库查询出错')
@@ -528,6 +532,7 @@ class WeixinShareDetailView(TemplateView):
             if relative:
                 relative.phone = phone_num
                 relative.save()
+                self.debug_msg("用户更新自己的手机号为:%s, openid:%s" %(phone_num, openid))
             else:
                 self.debug_msg("待更新的微信网利宝用户关系记录为空")
         except Exception, reason:
@@ -590,7 +595,7 @@ class WeixinShareDetailView(TemplateView):
                 #redirect_url = reverse('weixin_share_end')+'?url_id=%s'%order_id
                 #return redirect(redirect_url)
         else:
-            self.debug_msg('phone:%s 已经领取过奖品' %(phone_num,))
+            self.debug_msg('phone:%s 已经领取过奖品, gift:%s' %(phone_num, user_gift, ))
         gifts = self.get_distribute_status(order_id, activity)
         shareTitle, shareContent, url = get_share_infos(order_id)
         return {
