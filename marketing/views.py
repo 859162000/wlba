@@ -181,8 +181,11 @@ class AppShareViewShort(TemplateView):
     template_name = 'app_share.jade'
 
     def get_context_data(self, **kwargs):
-        identifier = self.request.GET.get('p')
-        identifier = base64.b64decode(identifier)
+        try:
+            identifier = self.request.GET.get('p')
+            identifier = base64.b64decode(identifier)
+        except:
+            identifier = self.request.GET.get('phone')
         reg = self.request.GET.get('reg')
 
         return {
