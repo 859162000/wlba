@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_buy.models import FundHoldInfo
 from wanglibao_banner.models import Banner
-from wanglibao_p2p.models import P2PProduct, P2PEquity
+from wanglibao_p2p.models import P2PProduct, P2PEquity, Attachment
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_margin.models import Margin
 from wanglibao_redpack import backends
@@ -45,9 +45,15 @@ import time
 import uuid
 import urllib
 import math
-import  logging
+import logging
+from django.core.paginator import Paginator
+from django.core.paginator import PageNotAnInteger
+from wanglibao_p2p.views import get_p2p_list
+from wanglibao_redis.backend import redis_backend
+import pickle
 
 logger = logging.getLogger('wanglibao_reward')
+
 
 class WeixinJoinView(View):
     account = None
@@ -306,14 +312,30 @@ class P2PListView(TemplateView):
     template_name = 'weixin_list.jade'
 
     def get_context_data(self, **kwargs):
-        p2p_lists = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now()).filter(status__in=[
-            u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-        ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time')[:10]
+        p2p_products = []
+
+        p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list = get_p2p_list()
+
+        p2p_products.extend(p2p_done_list)
+        p2p_products.extend(p2p_full_list)
+        p2p_products.extend(p2p_repayment_list)
+        p2p_products.extend(p2p_finished_list)
+
+        limit = 10
+        paginator = Paginator(p2p_products, limit)
+        page = self.request.GET.get('page')
+
+        try:
+            p2p_products = paginator.page(page)
+        except PageNotAnInteger:
+            p2p_products = paginator.page(1)
+        except Exception:
+            p2p_products = paginator.page(paginator.num_pages)
 
         banner = Banner.objects.filter(device='weixin', type='banner', is_used=True).order_by('-priority')
 
         return {
-            'results': p2p_lists,
+            'results': p2p_products[:10],
             'banner': banner,
         }
 
@@ -341,17 +363,30 @@ class P2PListWeixin(APIView):
 
     def get(self, request):
 
+        p2p_products = []
+
+        p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list = get_p2p_list()
+
+        p2p_products.extend(p2p_done_list)
+        p2p_products.extend(p2p_full_list)
+        p2p_products.extend(p2p_repayment_list)
+        p2p_products.extend(p2p_finished_list)
+
         page = request.GET.get('page', 1)
         pagesize = request.GET.get('pagesize', 10)
         page = int(page)
         pagesize = int(pagesize)
 
-        p2p_lists = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now())\
-            .filter(status__in=[u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'])\
-            .exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标'))\
-            .order_by('-priority', '-publish_time')[(page-1)*pagesize:page*pagesize]
+        paginator = Paginator(p2p_products, pagesize)
 
-        html_data = _generate_ajax_template(p2p_lists, 'include/ajax/ajax_list.jade')
+        try:
+            p2p_products = paginator.page(page)
+        except PageNotAnInteger:
+            p2p_products = paginator.page(1)
+        except Exception:
+            p2p_products = paginator.page(paginator.num_pages)
+
+        html_data = _generate_ajax_template(p2p_products, 'include/ajax/ajax_list.jade')
 
         return Response({
             'html_data': html_data,
@@ -376,27 +411,36 @@ class P2PDetailView(TemplateView):
     def get_context_data(self, id, **kwargs):
         context = super(P2PDetailView, self).get_context_data(**kwargs)
 
-        try:
-            p2p = P2PProduct.objects.select_related('activity').exclude(status=u'流标').exclude(status=u'录标')\
-                .get(pk=id, hide=False)
-
-            if p2p.soldout_time:
-                end_time = p2p.soldout_time
-            else:
-                end_time = p2p.end_time
-        except P2PProduct.DoesNotExist:
+        # try:
+        #     p2p = P2PProduct.objects.select_related('activity').exclude(status=u'流标').exclude(status=u'录标')\
+        #         .get(pk=id, hide=False)
+        #
+        #     if p2p.soldout_time:
+        #         end_time = p2p.soldout_time
+        #     else:
+        #         end_time = p2p.end_time
+        # except P2PProduct.DoesNotExist:
+        #     raise Http404(u'您查找的产品不存在')
+        cache_backend = redis_backend()
+        p2p = cache_backend.get_cache_p2p_detail(id)
+        if not p2p:
             raise Http404(u'您查找的产品不存在')
 
-        terms = get_amortization_plan(p2p.pay_method).generate(p2p.total_amount,
-                                                               p2p.expected_earning_rate / 100,
+        if p2p['soldout_time']:
+            end_time = p2p['soldout_time']
+        else:
+            end_time = p2p['end_time']
+
+        terms = get_amortization_plan(p2p['pay_method']).generate(p2p['total_amount'],
+                                                               p2p['expected_earning_rate'] / 100,
                                                                datetime.datetime.now(),
-                                                               p2p.period)
-        total_earning = terms.get('total') - p2p.total_amount
+                                                               p2p['period'])
+        total_earning = terms.get('total') - p2p['total_amount']
         total_fee_earning = 0
 
-        if p2p.activity:
-            total_fee_earning = Decimal(p2p.total_amount * p2p.activity.rule.rule_amount *
-                                        (Decimal(p2p.period) / Decimal(12))).quantize(Decimal('0.01'))
+        if p2p['activity']:
+            total_fee_earning = Decimal(p2p['total_amount'] * p2p['activity']['activity_rule_amount'] *
+                                        (Decimal(p2p['period']) / Decimal(12))).quantize(Decimal('0.01'))
 
         user_margin = 0
         current_equity = 0
@@ -404,16 +448,16 @@ class P2PDetailView(TemplateView):
         user = self.request.user
         if user.is_authenticated():
             user_margin = user.margin.margin
-            equity_record = p2p.equities.filter(user=user).first()
+            equity_record = P2PEquity.objects.filter(product=p2p['id']).filter(user=user).first()
             if equity_record is not None:
                 current_equity = equity_record.equity
 
             device = utils.split_ua(self.request)
-            result = backends.list_redpack(user, 'available', device['device_type'], p2p.id)
+            result = backends.list_redpack(user, 'available', device['device_type'], p2p['id'])
             redpacks = result['packages'].get('available', [])
 
-        orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
-        total_buy_user = P2PEquity.objects.filter(product=p2p).count()
+        orderable_amount = min(p2p['limit_amount_per_user'] - current_equity, p2p['remain'])
+        total_buy_user = P2PEquity.objects.filter(product=p2p['id']).count()
 
         amount = self.request.GET.get('amount', 0)
         amount_profit = self.request.GET.get('amount_profit', 0)
@@ -424,7 +468,7 @@ class P2PDetailView(TemplateView):
             'orderable_amount': orderable_amount,
             'total_earning': total_earning,
             'current_equity': current_equity,
-            'attachments': p2p.attachment_set.all(),
+            'attachments': p2p['attachments'],
             'total_fee_earning': total_fee_earning,
             'total_buy_user': total_buy_user,
             'margin': float(user_margin),

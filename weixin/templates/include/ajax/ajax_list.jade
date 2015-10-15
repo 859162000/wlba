@@ -2,7 +2,7 @@
 -load mathfilters
 
 for product in results
-  status = product.display_status
+  status = product['display_status']
   if status == '抢购中'
     listClass = 'profit-blue'
     btnClass = 'btn-blue'
@@ -28,12 +28,12 @@ for product in results
         .body-Profit
           span.profit-cont
             .profit-math(class=listClass)
-              earning_rate = str(product.expected_earning_rate)
+              earning_rate = str(product['expected_earning_rate'])
               span.profit-num {{earning_rate}}
               span.profit-sign %
               if product.activity
                 span.prpfit-add +
-                span.profit-addNum {{product.activity.rule.percent_text}}
+                span.profit-addNum {{product.activity.activity_rule_percent_text}}
                 span.profit-addNumsign %
             .profit-tit 年化收益
         .body-time
@@ -46,6 +46,6 @@ for product in results
           a(href="/weixin/view/buy/{{product.id}}/?next=/weixin/list/").btn-body(class=btnClass) {{status}}
         else
           a(href="/weixin/view/detail/{{product.id}}/").btn-body(class=btnClass) {{status}}
-    percent = float(product.ordered_amount) / product.total_amount * 100
+    percent = float(product['ordered_amount']) / product['total_amount'] * 100
     if status == '抢购中'
       .section-progressd(style="width:{{percent | percentage}}")

@@ -54,8 +54,7 @@ import re
 import uuid
 import urllib
 
-#logger = logging.getLogger(__name__)
-logger = logging.getLogger('wanglibao_reward')
+logger = logging.getLogger(__name__)
 
 
 def get_uid_for_coop(user_id):
