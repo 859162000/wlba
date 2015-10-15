@@ -167,5 +167,5 @@ def pc_data_generator():
         'user_number': user_number,
         'user_income': float(user_income),
         'p2p_register_number':p2p_register_number,
-        "p2p_amount_yesterday":p2p_amount_yesterday
+        "p2p_amount_yesterday":float(p2p_amount_yesterday)
     }
