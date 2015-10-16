@@ -750,11 +750,11 @@ class AuthorizeUser(APIView):
                     user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=url_id, identity=openid,).first()
                     logger.debug("用户抽奖信息是：%s" % (user_gift,))
                     # comment by hb on 2015-10-15 : do it for what ?
-                    #counts = WanglibaoActivityGift.objects.filter(gift_id=url_id).count()
+                    counts = WanglibaoActivityGift.objects.filter(gift_id=url_id).count()
                     #logger.debug("奖品有 %s 个已经被不同用户领走了" %(counts, ))
                     left_counts = WanglibaoActivityGift.objects.filter(gift_id=url_id, valid=True).count()
                     logger.debug("奖品有 %s 个还没有被用户领走了" %(left_counts, ))
-                    if left_counts == 0 :
+                    if left_counts == 0 and counts>0 :
                         if user_gift:
                             logger.debug(u"用户已经领完奖品，而且所有的奖品已经发放完毕")
                             return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, url_id))
