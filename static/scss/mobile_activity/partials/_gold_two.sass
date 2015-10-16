@@ -1,0 +1,332 @@
+@charset "utf-8"
+
+$yellow: #ffe400
+$brown: #6a2b00
+$blue: #404980
+
+@mixin icon1
+  background: url("/static/imgs/mobile_activity/app_gold_two/gold-icon1.png") no-repeat
+@mixin icon2
+  background-repeat: no-repeat
+  display: inline-block
+  width: 4.04rem
+  height: 4.04rem
+  position: absolute
+  top: -2.05rem
+  left: 50%
+  margin-left: -2.02rem
+  background-size: contain
+@mixin icon-f
+  background: url("/static/imgs/mobile_activity/app_gold_two/footer.png") no-repeat
+  display: inline-block
+
+@mixin text-center
+  text-align: center
+
+@mixin shadow-tit
+  color: $blue
+  text-shadow: 0px 1px 0px #fff
+
+@mixin btn
+  width: 10.75rem
+  height: 1.25rem
+  line-height: 1.25rem
+  display: inline-block
+  font-size: 0.75rem
+
+.gold-two
+  width: 100%
+  overflow-x: hidden
+  .gold-wrap
+    width: 100%
+    margin: 0 auto
+    overflow: hidden
+  .left
+    float: left
+  .right
+    float: right
+  .relative
+    position: relative
+  .mr60px
+    margin-right: 0.4rem
+  .clearfix
+    zoom: 1
+    &:after,&:before
+      clear: both
+      display: table
+      content: ""
+  .mtb20px
+    margin: 0.5rem 0
+  .mt10px
+    margin-top: 0.25rem
+
+  .banner
+    background: url("/static/imgs/mobile_activity/app_gold_two/banner.jpg") center center no-repeat
+    width: 100%
+    height: 15rem
+    background-size: cover
+    text-indent: -9999rem
+    img
+      display: inline-block
+  .nav-tit
+    width: 100%
+    background: url("/static/imgs/mobile_activity/app_gold_two/redLine-bg.jpg") left top repeat
+    .gold-wrap
+      padding-top: 0.75rem
+      font-size: 0.7rem
+      color: #fff
+      position: relative
+      .lft-icon
+        width: 18.6%
+        height: 2.675rem
+        background: url("/static/imgs/mobile_activity/app_gold_two/laba.png") center center no-repeat
+        background-size: contain
+        margin-left: 4.4%
+      .rht-icon
+        display: inline-block
+        width: 14px
+        height: 14px
+        margin-left: 15px
+        vertical-align: top
+        +icon1
+        background-position: -139px 0
+      .text
+        padding: 0 0 0.75rem 0.75rem
+        line-height: 1rem
+        width: 76%
+        float: left
+      .text-big
+        font-size: 0.85rem
+        color: $yellow
+
+  .gold-main
+    padding: 1.5rem 0
+    height: auto
+    margin: 0 0.5rem
+    width: auto
+    .prompt-tit
+      +text-center
+      color: $brown
+      line-height: 0.85rem
+    .prompt-tit-b
+      font-size: 0.85rem
+    .prompt-tit-l
+      font-size: 0.5rem
+      margin-top: 0.25rem
+    .main-quan
+      background: #f0c333
+      border-radius: 0.25rem
+      padding: 0.5rem 0
+      margin-top: 0.75rem
+      .tit
+        +shadow-tit
+        font-size: 0.7rem
+        +text-center
+        padding-bottom: 0.5rem
+        .big
+          font-size: 0.9rem
+      .quan-prompt
+        margin: 0 auto
+      .quan-box
+        background: url("/static/imgs/mobile_activity/app_gold_two/quan-bg.png") center center no-repeat
+        background-size: contain
+        height: 4.425rem
+        line-height: 4.4rem
+        font-size: 0.95rem
+        color: #fff
+        +text-center
+        .yellow
+          color: $yellow
+          margin-right: 10px
+        .big
+          font-size: 1.7rem
+      .quan-tit
+        +text-center
+        font-size: 0.7rem
+        line-height: 1.5rem
+        color: $brown
+
+  .gold-info
+    border: 1px dotted #4f547b
+    border-radius: 10px
+    padding: 0.75rem 0.5rem
+    margin: 0 0.5rem
+    width: auto
+    .info-tit
+      +shadow-tit
+      +text-center
+      font-size: 0.75rem
+      .big
+        font-size: 1.25rem
+    .btn-box
+      +text-center
+      .btnTit
+        font-size: 0.9rem
+        color: #fb6f0a
+      .btn
+        +btn
+        background: #fb6d0d
+        color: #fff
+        border-radius: 5px
+        box-shadow: 0 -2px 0 #fc9624,0 2px 0 #e75e02
+        &:hover
+          box-shadow: none
+          background: #fb5b0d
+    .info-prompt
+      +text-center
+      color: $brown
+      font-size: 0.7rem
+      margin: 0.5rem
+      line-height: 1.2rem
+    .click-prompt
+      +text-center
+      a
+        color: $brown
+        text-decoration: underline
+    .info-box
+      color: $brown
+      font-size: 0.7rem
+      line-height: 1.2rem
+      li
+        position: relative
+        padding-left: 1rem
+        span
+          position: absolute
+          font-style: normal
+          font-size: 0.7rem
+          left: 0
+  .gold-what
+    background: #61238f
+    width: 100%
+    padding: 60px 0
+    margin-top: 60px
+    .what-tit
+      +text-center
+      font-size: 0.85rem
+      font-weight: bold
+      color: #fff
+    .gold-what-ul
+      li
+        +text-center
+        margin: 3rem 1rem 0
+        height: 6rem
+        background: #fff
+        border-radius: 10px
+        line-height: 1.1rem
+        .big
+          font-size: 1.1rem
+          color: #ce4942
+          padding-top: 2.5rem
+        .litter
+          color: #404980
+          font-size: 0.8rem
+        &.what-info1
+          .what-icon
+            +icon2
+            background-image: url("/static/imgs/mobile_activity/app_gold_two/c-icon1.png")
+        &.what-info2
+          .what-icon
+            +icon2
+            background-image: url("/static/imgs/mobile_activity/app_gold_two/c-icon2.png")
+        &.what-info3
+          .what-icon
+            +icon2
+            background-image: url("/static/imgs/mobile_activity/app_gold_two/c-icon3.png")
+    .handle-box
+      margin: 1rem 0.5rem
+      border: 1px dotted #f3eff7
+      border-radius: 10px
+      +text-center
+      .prompt
+        color: #fff
+        font-size: 0.75rem
+        margin-top: 0.75rem
+        .big
+          font-size: 1.25rem
+      .btn-box
+        padding: 0.75rem
+        +text-center
+        .btnTit
+          font-size: 0.9rem
+          color: #fb6f0a
+        .btn
+          +btn
+          background: #fed03b
+          color: $brown
+          border-radius: 5px
+          box-shadow: 0 -2px 0 #fee069,0 2px 0 #dbaf21
+          &:hover
+            box-shadow: none
+            background: #fed03b
+  .gold-reasion
+    background: #fb6d0d
+    .gold-wrap
+      padding: 1.5rem 0
+      margin: 0 0.5rem
+      width: auto
+      .reasion-tit
+        +text-center
+        font-size: 0.95rem
+        color: #fff
+      .reasion-tit-l
+        +text-center
+        font-size: 0.7rem
+        color: $brown
+        margin-top: 0.25rem
+      .gold-reasion-ul
+        .item
+          +text-center
+          color: #fff
+          margin-top: 1rem
+          .img-box
+            +text-center
+            img
+              max-width: 100%
+          .big
+            font-size: 0.85rem
+          .litter
+            font-size: 0.7rem
+  .gold-rule-box
+    padding: 1rem 0 1.5rem
+    color: $brown
+    line-height: 1rem
+    margin: 0 1rem
+    .tit
+      font-size: 0.8rem
+    ul
+      font-size:  0.6rem
+      margin-left: 0.4rem
+      li
+        position: relative
+        padding-left: 1rem
+        max-height: 9999rem
+        margin-top: 0.5rem
+        span
+          position: absolute
+          font-style: normal
+          font-size: 0.6rem
+          left: 0
+  .gold-footer
+    background: #333
+    width: 100%
+    img
+      margin-top: -1rem
+      left: 0px
+      width: 100%
+    .footer-lft
+      +icon-f
+      position: absolute
+      top: -27px
+      left: 0
+      width: 480px
+      height: 200px
+    .footer-rht
+      +icon-f
+      width: 130px
+      height: 180px
+      background-position: right -27px
+      float: right
+
+
+
+

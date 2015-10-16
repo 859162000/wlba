@@ -1,0 +1,198 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    link(rel="stylesheet",href="/static/stylesheets/xunlei-setp.css")
+    link(rel="stylesheet",href="/static/styles/pc_activity/xunlei_ten.css")
+  body(style="background:#ffeec3")
+    include include/activityTopNew
+    //baidu
+    .ten-gif
+      .gif
+        .ten-yun
+        .money
+    .setp-content
+      .xl-backtop(style="z-index:99")
+        span.seven-com.seven-ten
+        .backtop.sev-backtop 回到顶部
+        img(src="/static/imgs/pc_activity/xunlei_ten/wx.png")#xl-weixin
+        a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank")
+          img(src="/static/imgs/pc_activity/xunlei_ten/red-qq.png",style="margin-top:10px")#xl-qq
+        .erweima
+      .ten-main
+        .box
+          .ten-box
+            .left-box
+            .center-box
+            .right-box
+          .ten-prize 还剩
+            b 1000
+            |份奖品
+          if user.is_authenticated
+            .open-box-btn.received
+              span.ten-com.box-key
+              |开启宝箱
+          else
+            .open-box-btn
+              span.ten-com.box-key
+              |开启宝箱
+
+          p.ten-zhu 注：每位新注册用户有3次开宝箱机会，幸运等你开启
+        .prize-box
+          h1.tit.ten-com.ten-tit 好礼连连
+          dl.prize-dl
+            dt.ten-com.ten-prize1
+            if user.is_authenticated
+              dd.ten-txtbutn.received 领取加息券
+            else
+              dd.ten-txtbutn 领取加息券
+          dl.prize-dl
+            dt.ten-com.ten-prize2
+            if user.is_authenticated
+              dd.ten-txtbutn.received 领取100元红包
+            else
+              dd.ten-txtbutn 领取100元红包
+          dl.prize-dl
+            dt.ten-com.ten-prize3
+            if user.is_authenticated
+              dd.ten-txtbutn.receiveg 领取7天迅雷会员
+            else
+              dd.ten-txtbutn 领取7天迅雷会员
+          dl.prize-dl(style="margin-right:0px")
+            dt.ten-com.ten-prize4
+            if user.is_authenticated
+              dd.ten-txtbutn.receiveh 领取1年迅雷会员
+            else
+              dd.ten-txtbutn 领取1年迅雷会员
+        .prize-box
+          h1.tit.ten-com.ten-tit 加息券使用流程
+          .liucheng
+            b
+            span
+            .liucheng-box
+              .lc-box1.ten-com.ten-liucheng1
+            .ten-txt 领取加息券
+          .liucheng
+            span.center-span
+            .liucheng-box
+              .lc-box1.ten-com.ten-liucheng2
+            .ten-txt 投标选择使用
+          .liucheng
+            span.center-span
+            .liucheng-box
+              .lc-box1.ten-com.ten-liucheng3
+            .ten-txt 投标成功加息生效
+          .liucheng
+            span.center-span
+            .liucheng-box
+              .lc-box1.ten-com.ten-liucheng4
+            .ten-txt 获得收益和奖励
+            span.end-span
+            b.end-b
+          h2.xuntenxia 加息券规则
+             span
+          .ten-rule
+            ul#rule1
+              li 1. 加息券有效期：10月1日-11月1日；
+              li 2. 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+              li 3. 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+              li 4. 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+              li 5. 使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+        .prize-box
+          h1.tit.ten-com.ten-tit 活动规则
+          ul#rule2
+            li 活动时间：2015年10月1日-2015年11月1日；
+            li 手机号为网利宝唯一账户，本期迅雷活动仅限于迅雷新注册用户参与，用户首次充值、首次投资最低为100元方可获得相关迅雷福利；
+            li 新用户注册送1%加息券及100元现金红包，其中加息券使用规则见
+              span#guizhexunlei(style='cursor: pointer') 加息券规则
+              |，100元现金红包为直抵红包（投资满2000元方可抵扣使用）；
+            li 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+            li 网利宝对此活动享有最终解释权。
+          ul#rule2.xianshi(style='display: none')
+              li 1. 加息券有效期：10月1日-11月1日；
+              li 2. 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+              li 3. 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+              li 4. 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+              li 5. 使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+
+
+      .xl-box1
+        .san-new(style="background:#ffeec3")
+          .san-new-content.container(style="padding:10px 0 0")
+            .row.gold-dl-row
+              .san-span
+                dl
+                  dt.com.com-trust(style="background: url('/static/imgs/pc_activity/ganjiwang/safe1.png') no-repeat center")
+                  dd.pp-zi
+                    h2 信赖
+                    p
+                      b IDG资本投资A轮融资
+                      br
+                      | 鸿利光电投资B轮融资
+              .san-span
+                dl
+                  dt.com.com-security(style="background: url('/static/imgs/pc_activity/ganjiwang/safe2.png') no-repeat center")
+                  dd.pp-zi
+                    h2 安全
+                    p 第三方资金托管
+                      br
+                      | 阳光保险承保资金安全
+              .san-span
+                dl
+                  dt.com.com-authority(style="background: url('/static/imgs/pc_activity/xunlei_ten/hand.jpg') no-repeat center")
+                  dd.pp-zi
+                    h2 权威
+                    p 华尔街精英金融团队
+                      br
+                      b IT数据风控系统
+              .san-span
+                dl
+                  dt.com.com-authority(style="background: url('/static/imgs/pc_activity/xunlei_ten/shouyi.jpg') no-repeat center")
+                  dd.pp-zi
+                    h2 高收益
+                    p 30余倍银行活期收益
+                      br
+                      b 100元起投
+    include global/g_footer
+    include include/tracking
+  #small-zc
+  #xl-aug-success11
+    .bj
+    span.first-xl-off2
+    hr
+    .redpack.model-com.one
+    .man.model-com.two
+    p
+     label.xl-aug 人世间最美好的事情莫过于如此，1%加息券
+     br
+     label 已在您的账户中
+    .reg-btn 太棒了
+  #xl-aug-fail
+    .bj
+    span.first-xl-off2
+    hr
+    .redpack.model-com.one
+    p Sorry~您不符合领奖条件
+    .reg-btn 我知道了
+  #xl-aug-prize
+    .bj
+    span.first-xl-off2
+    hr
+    .redpack.model-com.one
+    .people
+    p 你和大奖只是一根头发的距离
+    .reg-btn 再试一次
+  #xl-aug-login
+    .bj
+    span.first-xl-off2
+    hr
+    .redpack.model-com.one
+    p 请您先登录
+    .reg-btn.setplogin 快速登录
+  script.
+      var v = new Date().getTime()
+      require(['/static/js/xunlei_ten.js?v='+v])
