@@ -182,7 +182,7 @@ class AppShareViewShort(TemplateView):
 
     def get_context_data(self, **kwargs):
         try:
-            identifier = self.request.GET.get('p')
+            identifier = self.request.GET.get('p') + '='
             identifier = base64.b64decode(identifier)
         except:
             identifier = self.request.GET.get('phone')
