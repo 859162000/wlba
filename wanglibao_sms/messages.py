@@ -192,7 +192,7 @@ def sms_alert_invest(name):
 @suffix_td
 def sms_alert_invite(name, phone):
     return u"邀请注册：您的好友{}邀请您加入网利宝一起投资赚钱，注册就有惊喜。速速点击专属链接：" \
-           u"https://www.wanglibao.com/aws?p={} ".format(name, base64.b64encode(phone))
+           u"https://www.wanglibao.com/aws?p={} ".format(name, base64.b64encode(phone)[0:-1])
     # u"https://www.wanglibao.com/activity/wap/share?phone={} ".format(name, phone)
 
 
