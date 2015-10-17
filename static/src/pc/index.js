@@ -129,27 +129,36 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function( $ ) {
   );
 
   //扫描送红包
-  $(window).scroll(function () {
-      var $scroll = $(document).scrollTop();
-      if($scroll > ($(document).height()*0.4)) {
-        $('.bonus-icon').css({'top': '30%'})
-      }else{
-        $('.bonus-icon').css({'top': '60%'})
-      }
+  var scrollTimer = null;
+  $(window).on('scroll', function () {
+        if (scrollTimer) {
+            clearTimeout(scrollTimer)
+        }
+        scrollTimer = setTimeout(function(){
+            var $scroll = $(document).scrollTop();
+            if($scroll > ($(document).height() * 0.4)) {
+              $('.bonus-icon').animate({'top': '30%'},200);
+            }else{
+              $('.bonus-icon').animate({'top': '60%'},200);
+            }
+        }, 200);
   });
+
+
   $('.bonus-icon').on('click',function(){
     $('.bonus-img,.page').show();
   });
   $('.close').on('click',function(){
     $('.bonus-img,.page').hide();
-  })
+  });
+
   function wxShareIcon(){
     var docleft = document.body.clientWidth;
-    var left = (docleft - $('.i-mod-exhibition').width())/2 + $('.i-mod-exhibition').width() - 30;
-    $('.bonus-icon').css({'left':left})
+    var left = (docleft - $('.bonus-icon').width());
+    $('.bonus-icon').css({ 'left' : left});
   }
-  wxShareIcon()
+  //wxShareIcon()
   window.onresize = function(){
-      wxShareIcon();
+     wxShareIcon();
   };
 });

@@ -1,4 +1,6 @@
 # encoding:utf-8
+import base64
+import hashlib
 import os
 import json
 import decimal
@@ -8,7 +10,7 @@ from collections import defaultdict
 from decimal import Decimal
 import time
 from wanglibao_p2p.models import P2PEquity
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, connection
 from django.contrib.auth.decorators import permission_required
 from django.core.paginator import Paginator, PageNotAnInteger
 from django.utils.decorators import method_decorator
@@ -167,6 +169,23 @@ class AppShareView(TemplateView):
 
     def get_context_data(self, **kwargs):
         identifier = self.request.GET.get('phone')
+        reg = self.request.GET.get('reg')
+
+        return {
+            'identifier': identifier.strip(),
+            'reg': reg
+        }
+
+
+class AppShareViewShort(TemplateView):
+    template_name = 'app_share.jade'
+
+    def get_context_data(self, **kwargs):
+        try:
+            identifier = self.request.GET.get('p') + '='
+            identifier = base64.b64decode(identifier)
+        except:
+            identifier = self.request.GET.get('phone')
         reg = self.request.GET.get('reg')
 
         return {
@@ -645,7 +664,7 @@ def ajax_get_activity_record(action='get_award', *gifts):
 
 def ajax_xunlei(request):
     """
-        description:迅雷9月抽奖活动，响应web的ajax请求
+        description:迅雷抽奖活动，响应web的ajax请求
     """
     user = request.user
     if not user.is_authenticated():

@@ -722,8 +722,6 @@ class WeixinAccountBankCardAdd(TemplateView):
         }
 
 import time
-
-
 class AuthorizeCode(APIView):
     permission_classes = ()
 
@@ -846,7 +844,6 @@ class GetAuthUserInfo(APIView):
         try:
             oauth = WeChatOAuth(account.app_id, account.app_secret, )
             if not w_user.auth_info.check_access_token():
-                print '----------------------------------------'
                 res = oauth.refresh_access_token(w_user.auth_info.refresh_token)
                 w_user.auth_info.access_token = res['access_token']
                 w_user.auth_info.refresh_token = res['refresh_token']

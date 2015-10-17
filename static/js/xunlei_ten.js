@@ -222,7 +222,7 @@
             $('#small-zc').show();
             if (change['ret_code'] == 3002) {
                 $('.center-box').addClass("big-box-open");
-                var txt = ['佛说：前世的500次回眸才换得一次中奖，淡定', '奖品何时有，把酒问青天', '大奖下回见，网利宝天天见/**/'];
+                var txt = ['佛说：前世的500次回眸才换得一次中奖，淡定', '奖品何时有，把酒问青天', '大奖下回见，网利宝天天见'];
                 var ind = parseInt(Math.random() * 3);
                 $('#xl-aug-success11').hide();
                 $('#xl-aug-prize p').text(txt[ind]);
