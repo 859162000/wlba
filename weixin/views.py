@@ -32,7 +32,7 @@ from wanglibao_reward.models import WanglibaoUserGift, WanglibaoWeixinRelative, 
 from weixin.wechatpy.oauth import WeChatOAuth
 from weixin.common.decorators import weixin_api_error
 from weixin.common.wx import generate_js_wxpay
-from .models import Account, WeixinUser, WeixinAccounts
+from .models import Account, WeixinUser, WeixinAccounts, AuthorizeInfo
 from .common.wechat import tuling
 from decimal import Decimal
 from wanglibao_pay.models import Card
@@ -721,73 +721,31 @@ class WeixinAccountBankCardAdd(TemplateView):
             'banks': banks,
         }
 
-
-class AuthorizeUser(APIView):
-    permission_classes = ()
-    def get(self, request):
-        account_id = self.request.GET.get('state')
-        try:
-            account = Account.objects.get(pk=account_id)
-        except Account.DoesNotExist:
-            return HttpResponseNotFound()
-        code = request.GET.get('code')
-        url_id = request.GET.get('url_id')
-        oauth = WeChatOAuth(account.app_id, account.app_secret, )
-        if code:
-            res = oauth.fetch_access_token(code)
-            openid=res.get('openid')
-            nick_name=""
-            head_img_url=""
-            user_info = {}
-            try:
-                wx_user = WanglibaoWeixinRelative.objects.filter(openid=openid)
-                if wx_user.exists():
-                    phone = wx_user.first().phone
-                    logger.debug("获得用户授权openid is: %s, phone is :%s" %(openid,phone))
-                    logger.debug("product id:%s" %(url_id))
-                    user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=url_id, identity=phone,).first()
-                    logger.debug("用户抽奖信息是：%s" % (user_gift,))
-                    counts = WanglibaoActivityGift.objects.filter(gift_id=url_id).count()
-                    #logger.debug("奖品有 %s 个已经被不同用户领走了" %(counts, ))
-                    left_counts = WanglibaoActivityGift.objects.filter(gift_id=url_id, valid=True).count()
-                    logger.debug("奖品有 %s 个还没有被用户领走了" %(left_counts, ))
-                    if left_counts == 0 and counts > 0:
-                        if user_gift:
-                            logger.debug(u"用户已经令完奖品，而且所有的奖品已经发放完毕")
-                            return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, url_id))
-                        else:
-                            logger.debug(u"所有的奖品已经发完，该用户没有领到奖品")
-                            return redirect("/weixin_activity/share/end/")
-
-                    if user_gift and phone:
-                        #如果用户已经领取了，直接跳转到详情页
-                        logger.debug("openid:%s, phone:%s, product_id:%s,用户已经存在了，直接跳转页面" %(openid, phone, url_id,))
-                        return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, url_id))
-                    else:
-                        return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,base64.b64encode(nick_name),head_img_url))
-                else:
-                    user_info = oauth.get_user_info(openid, res.get('access_token'))
-                    nick_name = user_info['nickname']
-                    head_img_url = user_info['headimgurl']
-                    self.request.session['nick_name']=nick_name
-            except WeChatException, e:
-                auth_code_url = reverse("weixin_authorize_code")+'?auth=1&state=%s&url_id=%s'%(account_id, url_id)
-                return redirect(auth_code_url)
-            return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,nick_name,head_img_url))
+import time
 
 
 class AuthorizeCode(APIView):
     permission_classes = ()
+
     def get(self, request):
+        # print '======================',request.META.get('QUERY_STRING')
         account_id = self.request.GET.get('state')
         try:
             account = Account.objects.get(pk=account_id)
         except Account.DoesNotExist:
             return HttpResponseNotFound()
         auth = request.GET.get('auth')
-        url_id = request.GET.get('url_id')
+        redirect_uri = settings.WEIXIN_CALLBACK_URL + reverse("weixin_authorize_user_info")
+        count = 0
+        for key in request.GET.keys():
+            if key == u'state':
+                continue
+            if count == 0:
+                redirect_uri += '?%s=%s'%(key, request.GET.get(key))
+            else:
+                redirect_uri += "&%s=%s"%(key, request.GET.get(key))
+            count += 1
 
-        redirect_uri = settings.WEIXIN_CALLBACK_URL + reverse("weixin_authorize_user_info")+'?url_id=%s'%url_id
         # print redirect_uri
         if auth and auth=='1':
             oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, scope='snsapi_userinfo', state=account_id)
@@ -795,3 +753,118 @@ class AuthorizeCode(APIView):
             oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, state=account_id)
         # print oauth.authorize_url
         return redirect(oauth.authorize_url)
+
+
+class AuthorizeUser(APIView):
+    permission_classes = ()
+    def get(self, request):
+        print request.__dict__
+        print request.GET
+        print request.GET.keys()
+        account_id = self.request.GET.get('state')
+        try:
+            account = Account.objects.get(pk=account_id)
+        except Account.DoesNotExist:
+            return HttpResponseNotFound()
+        redirect_uri = self.request.GET.get('redirect_uri')
+        redirect_url = ''
+        if redirect_uri:
+            redirect_url = urllib.unquote(redirect_uri)
+        if not redirect_url:
+            return Response({'errcode':-1,  'errmsg':'need a redirect_uri'})
+        code = request.GET.get('code')
+        oauth = WeChatOAuth(account.app_id, account.app_secret, )
+        if code:
+            try:
+                res = oauth.fetch_access_token(code)
+            except WeChatException, e:
+                return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
+            openid = res.get('openid')
+            w_user = WeixinUser.objects.filter(openid=openid).first()
+            save_user = False
+
+            if not w_user:
+                w_user = WeixinUser()
+                w_user.account_original_id = account.original_id
+                w_user.openid = openid
+                save_user = True
+
+            if w_user.account_original_id != account.original_id:
+                w_user.account_original_id = account.original_id
+                save_user = True
+
+            if not w_user.auth_info:
+                auth_info = AuthorizeInfo()
+                auth_info.access_token = res.get('access_token')
+                auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
+                auth_info.refresh_token = res.get('refresh_token')
+                auth_info.save()
+                w_user.auth_info = auth_info
+                save_user = True
+            else:
+                w_user.auth_info.access_token = res.get('access_token')
+                w_user.auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
+                w_user.auth_info.refresh_token = res.get('refresh_token')
+                w_user.auth_info.save()
+            if save_user:
+                w_user.save()
+            if redirect_url.find('?') == -1:
+                redirect_url += '?openid=%s'%openid
+            else:
+                redirect_url += '&openid=%s'%openid
+            return redirect(redirect_url)
+        return Response({'errcode':-2, 'errmsg':'code is null'})
+
+
+class GetAuthUserInfo(APIView):
+    permission_classes = ()
+    def get(self, request):
+        openid = request.GET.get('openid')
+        if not openid:
+            return Response({'errcode':-3, 'errmsg':'openid is null'})
+        w_user = WeixinUser.objects.filter(openid=openid).first()
+        if not w_user:
+            return {'errcode':-4, 'errmsg':'openid is not exist'}
+        if w_user.nickname:
+
+            return Response({
+                       "openid":openid,
+                       " nickname": w_user.nickname,
+                       "sex": w_user.sex,
+                       "province": w_user.province,
+                       "city": w_user.city,
+                       "country": w_user.country,
+                        "headimgurl": w_user.headimgurl,
+                        "unionid": w_user.unionid,
+                    })
+        if not w_user.auth_info:
+            return Response({'errcode':-5, 'errmsg':'openid auth info is null'})
+        # print w_user.account_original_id
+        account = Account.objects.get(original_id=w_user.account_original_id)
+        if not account:
+            return Response({'errcode':-6, 'errmsg':u'公众号信息错误或者不存在'})
+        try:
+            oauth = WeChatOAuth(account.app_id, account.app_secret, )
+            if not w_user.auth_info.check_access_token():
+                print '----------------------------------------'
+                res = oauth.refresh_access_token(w_user.auth_info.refresh_token)
+                w_user.auth_info.access_token = res['access_token']
+                w_user.auth_info.refresh_token = res['refresh_token']
+                w_user.auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
+                w_user.auth_info.save()
+            user_info = oauth.get_user_info(w_user.openid, w_user.auth_info.access_token)
+            w_user.nickname = user_info.get('nickname')
+            w_user.sex = user_info.get('sex')
+            w_user.city = user_info.get('city')
+            w_user.country = user_info.get('country')
+            w_user.headimgurl = user_info.get('headimgurl')
+            w_user.unionid =  user_info.get('unionid') if user_info.get('unionid') else ''
+            w_user.province = user_info.get('province')
+            w_user.save()
+            return Response(user_info)
+        except WeChatException, e:
+            return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
+
+
+
+
