@@ -321,7 +321,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             }
                 //当手指按下的时候
             function eventDown(e){
-                e.preventDefault();
+                e.preventDefault()
                 if(down == true) Ignoreate();
                 mousedown=true;
                 end=true;
