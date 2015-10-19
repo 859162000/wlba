@@ -16,6 +16,8 @@ import json
 import logging
 import random
 from django.views.decorators.csrf import csrf_protect
+from django.shortcuts import redirect
+from wanglibao.settings import CALLBACK_HOST
 from wanglibao_account import message as inside_message
 from marketing.models import IntroducedBy, Reward
 from wanglibao_reward.models import WanglibaoActivityGift, WanglibaoUserGift, WanglibaoActivityGiftGlobalCfg, WanglibaoWeixinRelative
@@ -28,7 +30,6 @@ from django.views.generic import TemplateView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from marketing.utils import get_user_channel_record
-from django.conf import settings
 from weixin.models import WeixinUser
 import requests
 from urllib import urlencode,quote
@@ -632,6 +633,8 @@ class WeixinShareDetailView(TemplateView):
         }
 
     def dispatch(self, request, *args, **kwargs):
+        openid = kwargs["openid"]
+        order_id = kwargs['order_id']
         key = 'share_redpack'
         is_open = False
         shareconfig = Misc.objects.filter(key=key).first()
@@ -646,6 +649,24 @@ class WeixinShareDetailView(TemplateView):
                 'message': u'配置开关关闭，分享无效;',
             }
             return HttpResponse(json.dumps(data), content_type='application/json')
+
+        try:
+            wx_user = WanglibaoWeixinRelative.objects.filter(openid=openid)
+            if wx_user.exists():
+                #phone = wx_user.first().phone
+                QSet = WanglibaoActivityGift.objects.filter(gift_id=order_id)
+                counts = QSet.count()
+                left_counts = QSet.filter(valid=True).count()
+                if left_counts == 0 and counts > 0:
+                    return redirect("/weixin_activity/share/end/?url_id=%s" % (order_id,))
+                #else:
+                #    logger.debug("phone:%s 用户没有领奖，马上进入领奖流程" % (phone,))
+                #    return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, order_id))
+            else:
+                logger.debug("relative表中没有用户的信息")
+        except Exception, e:
+            logger.exception("share-detail-view dispatch 跳转的时候报异常")
+
         return super(WeixinShareDetailView, self).dispatch(request, *args, **kwargs)
 
 class WeixinShareEndView(TemplateView):
@@ -673,28 +694,16 @@ class WeixinShareStartView(TemplateView):
     def get_context_data(self, **kwargs):
         openid = self.request.GET.get('openid')
         order_id = self.request.GET.get('url_id')
-        #nick_name = self.request.GET.get('nick_name')
-        nick_name = self.request.session.get("nick_name")
 
-        img_url = self.request.GET.get('head_img_url')
         record = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
 
-        if not record:
-            logger.debug('入库微信授权信息, nick_name:%s, openid:%s, img:%s ' %(nick_name, openid, img_url))
-            WanglibaoWeixinRelative.objects.create(
-               openid=openid,
-               nick_name=nick_name,
-               img=img_url
-            )
-        else:
-            logger.debug('微信授权信息很早就已经入库, nick_name:%s, openid:%s, img:%s ' %(nick_name, openid, img_url))
-        shareTitle, shareContent, url = get_share_infos(order_id)
+        share_title, share_content, url = get_share_infos(order_id)
         return {
             'ret_code': 9001,
             'openid': openid,
             'order_id': order_id,
             'phone': record.phone if record else '',
-            "share":{'content':shareContent,'title':shareTitle, 'url':url}
+            "share": {'content': share_title, 'title': share_title, 'url': url}
         }
 
     def dispatch(self, request, *args, **kwargs):
@@ -720,7 +729,7 @@ class WeixinShareStartView(TemplateView):
             #TODO: 界面显示不友好
             return HttpResponse(json.dumps(data), content_type='application/json')
 
-        if not self.is_valid_user_auth(order_id, amount) and False:
+        if not self.is_valid_user_auth(order_id, amount):
            data = {
                 'ret_code': 9000,
                 'message': u'用户投资没有达到%s元;' % (amount, ),
@@ -729,7 +738,7 @@ class WeixinShareStartView(TemplateView):
            return HttpResponse(json.dumps(data), content_type='application/json')
 
 
-        redirect_uri = settings.WEIXIN_CALLBACK_URL + reverse("weixin_share_order_gift")
+        redirect_uri = CALLBACK_HOST + reverse("weixin_share_order_gift")
         count = 0
         for key in request.GET.keys():
             if key == u'openid':
@@ -745,77 +754,44 @@ class WeixinShareStartView(TemplateView):
             w_user = WeixinUser.objects.filter(openid=openid).first()
 
         if not openid or not w_user:
-            redirect_url = reverse('weixin_authorize_code')+'?url_id=%s&state=%s&redirect_uri=%s' % (order_id, account_id,redirect_uri)
+            redirect_url = reverse('weixin_authorize_code')+'?state=%s&redirect_uri=%s' % (account_id, redirect_uri)
             # print redirect_url
             return HttpResponseRedirect(redirect_url)#redirect(redirect_url)
 
         if not w_user.nickname:
             res = requests.request(
                     method='get',
-                    url='http://127.0.0.1:8000' + reverse('weixin_get_user_info')+'?openid=%s'%openid,#settings.WEIXIN_CALLBACK_URL+
+                    url=CALLBACK_HOST + reverse('weixin_get_user_info')+'?openid=%s'%openid,#settings.WEIXIN_CALLBACK_URL+
                 )
             result = res.json()
             if result.get('errcode'):
-                redirect_url = reverse('weixin_authorize_code')+'?url_id=%s&state=%s&auth=1&redirect_uri=%s' % (order_id, account_id, redirect_uri)
+                redirect_url = reverse('weixin_authorize_code')+'?state=%s&auth=1&redirect_uri=%s' % (account_id, redirect_uri)
+                logger.debug("获取微信用户信息出错:%s" % (result.get('errcode')),)
                 # print redirect_url
                 return HttpResponseRedirect(redirect_url)#redirect(redirect_url)
+            else:
+                nick_name = result.get('nickname')
+                head_img_url = result.get('headimgurl')
+                self.request.session['nick_name'] = nick_name
 
-            # def get(self, request):
-            #     account_id = self.request.GET.get('state')
-            #     try:
-            #         account = Account.objects.get(pk=account_id)
-            #     except Account.DoesNotExist:
-            #         return HttpResponseNotFound()
-            #     code = request.GET.get('code')
-            #     url_id = request.GET.get('url_id')
-            #     oauth = WeChatOAuth(account.app_id, account.app_secret, )
-            #     if code:
-            #         res = oauth.fetch_access_token(code)
-            #         openid=res.get('openid')
-            #         nick_name=""
-            #         head_img_url=""
-            #         user_info = {}
-            #         try:
-            #             wx_user = WanglibaoWeixinRelative.objects.filter(openid=openid)
-            #             if wx_user.exists():
-            #                 phone = wx_user.first().phone
-            #                 logger.debug("获得用户授权openid is: %s, phone is :%s" %(openid,phone))
-            #                 logger.debug("product id:%s" %(url_id))
-            #                 # modify by hb on 2015-10-15
-            #                 #user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=url_id, identity=phone,).first()
-            #                 user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=url_id, identity=openid,).first()
-            #                 logger.debug("用户抽奖信息是：%s" % (user_gift,))
-            #                 # comment by hb on 2015-10-15 : do it for what ?
-            #                 counts = WanglibaoActivityGift.objects.filter(gift_id=url_id).count()
-            #                 #logger.debug("奖品有 %s 个已经被不同用户领走了" %(counts, ))
-            #                 left_counts = WanglibaoActivityGift.objects.filter(gift_id=url_id, valid=True).count()
-            #                 logger.debug("奖品有 %s 个还没有被用户领走了" %(left_counts, ))
-            #                 if left_counts == 0 and counts>0 :
-            #                     if user_gift:
-            #                         logger.debug(u"用户已经领完奖品，而且所有的奖品已经发放完毕")
-            #                         return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, url_id))
-            #                     else:
-            #                         logger.debug(u"所有的奖品已经发完，该用户没有领到奖品")
-            #                         return redirect("/weixin_activity/share/end/?url_id=%s" % (url_id))
-            #
-            #                 #Modify by hb on 2015-10-15
-            #                 #if user_gift and phone:
-            #                 if user_gift:
-            #                     #如果用户已经领取了，直接跳转到详情页
-            #                     logger.debug("openid:%s, phone:%s, product_id:%s,用户已经存在了，直接跳转页面" %(openid, phone, url_id,))
-            #                     return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, url_id))
-            #                 else:
-            #                     return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,base64.b64encode(nick_name),head_img_url))
-            #             else:
-            #                 user_info = oauth.get_user_info(openid, res.get('access_token'))
-            #                 nick_name = user_info['nickname']
-            #                 head_img_url = user_info['headimgurl']
-            #                 self.request.session['nick_name']=nick_name
-            #         except WeChatException, e:
-            #             auth_code_url = reverse("weixin_authorize_code")+'?auth=1&state=%s&url_id=%s'%(account_id, url_id)
-            #             return redirect(auth_code_url)
-            #         return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,nick_name,head_img_url))
+        try:
+             wx_user = WanglibaoWeixinRelative.objects.filter(openid=openid)
+             if wx_user.exists():
+                 phone = wx_user.first().phone
+                 user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=order_id, identity=openid,).first()
+                 logger.debug("用户抽奖信息是：%s" % (user_gift,))
+                 if user_gift:
+                     logger.debug("openid:%s, phone:%s, product_id:%s,用户已经存在了，直接跳转页面" %(openid, phone, order_id,))
+                     return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, order_id))
+             else:
+                WanglibaoWeixinRelative.objects.create(
+                    openid=openid,
+                    nick_name=nick_name,
+                    img=head_img_url
+                )
 
+        except Exception, e:
+            logger.exception("share-start-view dispatch 跳转的时候报异常")
 
         return super(WeixinShareStartView, self).dispatch(request, *args, **kwargs)
 
@@ -831,5 +807,5 @@ def get_share_infos(order_id):
             is_open = shareconfig.get('is_open', 'false')
             shareTitle=shareconfig.get('share_title', "")
             shareContent=shareconfig.get('share_content', "")
-            url = settings.WEIXIN_CALLBACK_URL + reverse('weixin_share_order_gift')+"?url_id=%s"%order_id
+            url = CALLBACK_HOST + reverse('weixin_share_order_gift')+"?url_id=%s"%order_id
     return shareTitle, shareContent, url
