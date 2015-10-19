@@ -726,7 +726,6 @@ class AuthorizeCode(APIView):
     permission_classes = ()
 
     def get(self, request):
-        # print '======================',request.META.get('QUERY_STRING')
         account_id = self.request.GET.get('state')
         try:
             account = Account.objects.get(pk=account_id)
@@ -756,9 +755,6 @@ class AuthorizeCode(APIView):
 class AuthorizeUser(APIView):
     permission_classes = ()
     def get(self, request):
-        print request.__dict__
-        print request.GET
-        print request.GET.keys()
         account_id = self.request.GET.get('state')
         try:
             account = Account.objects.get(pk=account_id)
