@@ -653,14 +653,15 @@ class WeixinShareDetailView(TemplateView):
         try:
             wx_user = WanglibaoWeixinRelative.objects.filter(openid=openid)
             if wx_user.exists():
-                phone = wx_user.first().phone
+                #phone = wx_user.first().phone
                 QSet = WanglibaoActivityGift.objects.filter(gift_id=order_id)
                 counts = QSet.count()
                 left_counts = QSet.filter(valid=True).count()
                 if left_counts == 0 and counts > 0:
                     return redirect("/weixin_activity/share/end/?url_id=%s" % (order_id,))
-                else:
-                    return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, order_id))
+                #else:
+                #    logger.debug("phone:%s 用户没有领奖，马上进入领奖流程" % (phone,))
+                #    return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, order_id))
             else:
                 logger.debug("relative表中没有用户的信息")
         except Exception, e:
