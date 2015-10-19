@@ -613,7 +613,7 @@ class JinShanRegister(CoopRegister):
         if binding:
             extra = binding.extra
             bid = binding.bid
-            sign = hashlib.md5( str(bid) + offer_type + key ).hexdigest()
+            sign = hashlib.md5(str(bid) + offer_type + key).hexdigest()
             params = {
                 'userid': bid,
                 'offer_type': offer_type,
@@ -623,15 +623,23 @@ class JinShanRegister(CoopRegister):
             jinshan_callback.apply_async(
                 kwargs={'url': self.call_back_url, 'params': params})
 
-    def register_call_back(self, user):
-        self.jinshan_call_back(user, 'wangli_regist_none', 'ZSEt6lzsK1rigjcOXZhtA6KfbGoS')
+    # def register_call_back(self, user):
+    #     self.jinshan_call_back(user, 'wangli_regist_none', 'ZSEt6lzsK1rigjcOXZhtA6KfbGoS')
 
     def validate_call_back(self, user):
         self.jinshan_call_back(user, 'wangli_regist_reward', 'Cp9AhO2o9BQTDhbUBnHxmY0X4Kbg')
 
     def purchase_call_back(self, user):
-        if P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').count() == 1:
-            self.jinshan_call_back(user, 'wangli_invest_reward', 'pA71ZhBf4DDeet7SLiLlGsT1qTYu')
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
+        if p2p_record.count() == 1:
+            p2p_amount = int(p2p_record.first().amount)
+            if p2p_amount >= 100:
+                if p2p_amount <= 999:
+                    self.jinshan_call_back(user, 'wangli_invest_reward', 'pA71ZhBf4DDeet7SLiLlGsT1qTYu')
+                elif p2p_amount <= 1999:
+                    self.jinshan_call_back(user, 'wangli_invest1000_reward', '4ss7mIRAjsqgOuLp5ezzDVp4Xu5x')
+                else:
+                    self.jinshan_call_back(user, 'wangli_invest2000_reward', 'uRfzjHGGpxfIZFZN9JbfYLPBGdGC')
 
 
 class ShanghaiWaihuRegister(CoopRegister):
