@@ -650,23 +650,6 @@ class WeixinShareDetailView(TemplateView):
             }
             return HttpResponse(json.dumps(data), content_type='application/json')
 
-        try:
-            wx_user = WanglibaoWeixinRelative.objects.filter(openid=openid)
-            if wx_user.exists():
-                #phone = wx_user.first().phone
-                QSet = WanglibaoActivityGift.objects.filter(gift_id=order_id)
-                counts = QSet.count()
-                left_counts = QSet.filter(valid=True).count()
-                if left_counts == 0 and counts > 0:
-                    return redirect("/weixin_activity/share/end/?url_id=%s" % (order_id,))
-                #else:
-                #    logger.debug("phone:%s 用户没有领奖，马上进入领奖流程" % (phone,))
-                #    return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, order_id))
-            else:
-                logger.debug("relative表中没有用户的信息")
-        except Exception, e:
-            logger.exception("share-detail-view dispatch 跳转的时候报异常")
-
         return super(WeixinShareDetailView, self).dispatch(request, *args, **kwargs)
 
 class WeixinShareEndView(TemplateView):
@@ -696,7 +679,7 @@ class WeixinShareStartView(TemplateView):
         order_id = self.request.GET.get('url_id')
 
         record = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
-
+        logger.debug("start页面，openid 是:%s" % (openid,))
         share_title, share_content, url = get_share_infos(order_id)
         return {
             'ret_code': 9001,
@@ -780,6 +763,13 @@ class WeixinShareStartView(TemplateView):
                  phone = wx_user.first().phone
                  user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=order_id, identity=openid,).first()
                  logger.debug("用户抽奖信息是：%s" % (user_gift,))
+
+                 QSet = WanglibaoActivityGift.objects.filter(gift_id=order_id)
+                 counts = QSet.count()
+                 left_counts = QSet.filter(valid=True).count()
+                 if left_counts == 0 and counts > 0:
+                    return redirect("/weixin_activity/share/end/?url_id=%s" % (order_id,))
+
                  if user_gift:
                      logger.debug("openid:%s, phone:%s, product_id:%s,用户已经存在了，直接跳转页面" %(openid, phone, order_id,))
                      return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, order_id))
