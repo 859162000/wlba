@@ -120,6 +120,8 @@ class PayView(TemplateView):
             pay_info.status = PayInfo.PROCESSING
             pay_info.save()
             OrderHelper.update_order(order, request.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
+
+            # 处理第三方渠道的用户充值回调
             CoopRegister(request).process_for_recharge(request.user)
         except decimal.DecimalException:
             message = u'金额格式错误'

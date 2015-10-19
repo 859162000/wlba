@@ -185,7 +185,7 @@ class PurchaseP2P(APIView):
                 trader = P2PTrader(product=p2p, user=request.user, request=request)
                 product_info, margin_info, equity_info = trader.purchase(amount, redpack)
 
-                #处理第三方渠道回调
+                # 处理第三方渠道用户投资回调
                 CoopRegister(request).process_for_purchase(request.user)
 
                 return Response({
@@ -247,6 +247,10 @@ class PurchaseP2PMobile(APIView):
             try:
                 trader = P2PTrader(product=p2p, user=request.user, request=request)
                 product_info, margin_info, equity_info = trader.purchase(amount, redpack)
+
+                # 处理第三方渠道用户投资回调
+                CoopRegister(request).process_for_purchase(request.user)
+
                 order_id = margin_info.order_id
                 shareShow=0
                 key = 'share_redpack'

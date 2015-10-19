@@ -23,7 +23,7 @@ from rest_framework.permissions import IsAuthenticated
 from marketing.models import PromotionToken, Channels, IntroducedBy
 from marketing.utils import set_promo_user, get_channel_record
 from wanglibao_account.cooperation import CoopRegister
-from wanglibao_account.cooperation import save_to_binding
+# from wanglibao_account.cooperation import save_to_binding
 from wanglibao_account.utils import create_user
 from wanglibao_activity.models import ActivityRecord, Activity
 from wanglibao_portfolio.models import UserPortfolio
@@ -38,10 +38,10 @@ from wanglibao_p2p.models import P2PRecord, ProductAmortization, P2PProduct
 from wanglibao_account.utils import verify_id, detect_identifier_type
 from wanglibao_sms import messages, backends
 from django.utils import timezone
-#from wanglibao_account import message as inside_message
+# from wanglibao_account import message as inside_message
 from misc.models import Misc
 from wanglibao_account.forms import IdVerificationForm, verify_captcha
-#from marketing.helper import RewardStrategy, which_channel, Channel
+# from marketing.helper import RewardStrategy, which_channel, Channel
 from wanglibao_rest.utils import split_ua, get_client_ip
 from django.http import HttpResponseRedirect
 from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
@@ -280,10 +280,10 @@ class RegisterAPIView(APIView):
             return Response({"ret_code": 30014, "message": u"注册失败"})
 
         if invite_code:
-            set_promo_user(request, user, invitecode=invite_code)
-            # 外呼系统登记信息
-            save_to_binding(user, request)
-            
+            # 处理第三方渠道的用户信息
+            CoopRegister(request).all_processors_for_user_register(user, invite_code)
+            # set_promo_user(request, user, invitecode=invite_code)
+            # save_to_binding(user, request)
 
         if device['device_type'] == "pc":
             auth_user = authenticate(identifier=identifier, password=password)
