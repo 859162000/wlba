@@ -764,15 +764,16 @@ class WeixinShareStartView(TemplateView):
                  user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=order_id, identity=openid,).first()
                  logger.debug("用户抽奖信息是：%s" % (user_gift,))
 
+                 if user_gift:
+                     logger.debug("openid:%s, phone:%s, product_id:%s,用户已经存在了，直接跳转页面" %(openid, phone, order_id,))
+                     return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, order_id))
+
                  QSet = WanglibaoActivityGift.objects.filter(gift_id=order_id)
                  counts = QSet.count()
                  left_counts = QSet.filter(valid=True).count()
                  if left_counts == 0 and counts > 0:
-                    return redirect("/weixin_activity/share/end/?url_id=%s" % (order_id,))
+                     return redirect("/weixin_activity/share/end/?url_id=%s" % (order_id,))
 
-                 if user_gift:
-                     logger.debug("openid:%s, phone:%s, product_id:%s,用户已经存在了，直接跳转页面" %(openid, phone, order_id,))
-                     return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, order_id))
              else:
                 WanglibaoWeixinRelative.objects.create(
                     openid=openid,
