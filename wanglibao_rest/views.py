@@ -24,6 +24,8 @@ from marketing.models import PromotionToken, Channels, IntroducedBy
 from marketing.utils import set_promo_user, get_channel_record
 from wanglibao_account.cooperation import CoopRegister
 # from wanglibao_account.cooperation import save_to_binding
+from random import randint
+from wanglibao_sms.tasks import send_messages
 from wanglibao_account.utils import create_user
 from wanglibao_activity.models import ActivityRecord, Activity
 from wanglibao_portfolio.models import UserPortfolio
@@ -208,8 +210,18 @@ class WeixinSendRegisterValidationCodeView(APIView):
 
 class RegisterAPIView(APIView):
     permission_classes = ()
-    # throttle_classes = (UserRateThrottle,)
-    # serializer_class = RegisterUserSerializer
+
+    def generate_random_password(self, length):
+        if length < 0:
+            raise Exception("生成随机密码的长度有误")
+
+        random_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        password = list()
+        index = 0
+        while index < length:
+            password.append(random_list[randint(0,len(random_list))])
+            index += 1
+        return str(random_list)
 
     def post(self, request, *args, **kwargs):
         """ 
@@ -229,6 +241,9 @@ class RegisterAPIView(APIView):
 
         if not 6 <= len(password) <= 20:
             return Response({"ret_code": 30012, "message": u"密码需要在6-20位之间"})
+
+        if request.DATA.get('IGNORE_PWD', '') and not password:
+            password = self.generate_random_password(6)
 
         identifier_type = detect_identifier_type(identifier)
         if identifier_type != 'phone':
@@ -291,6 +306,13 @@ class RegisterAPIView(APIView):
 
         if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
             tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+        #add by Yihen@20151020, 用户填写手机号不写密码即可完成注册, 给用户发短信,不要放到register_ok中去，保持原功能向前兼容
+        if request.DATA.get('IGNORE_PWD') and not password:
+            send_messages.apply_async(kwargs={
+                "phones": [identifier,],
+                "messages": [password,]
+            })
 
         return Response({"ret_code": 0, "message": u"注册成功"})
 

@@ -1,0 +1,20 @@
+- load formatters
+doctype html
+html(style="background: #f6f6f6")
+  head
+    title 网利宝
+    include include/app_head
+  body
+    .maimai-banner
+      img(src='/static/imgs/mobile_activity/app_maimai/banner.png')
+      a(href='/activity/maimai_rules/').maimai-rule 活动规则
+    .maimai-form
+      input(type='tel', name='phone', placeholder='输入手机号').maimai-phone
+      .maimai-form-sign 请输入正确的手机号
+      .maimai-form-margin.maimai-sign-margin
+      .phone-check
+        input(type='tel', name='checkcode', placeholder='输入验证码').check-input
+        button.check-submit 数字验证码
+      .maimai-form-margin
+      .maimai-form-btn 领 取
+    script(data-init='mmIndex', src="/static/scripts/mobile_activity/maimai.js?v=20150707")
