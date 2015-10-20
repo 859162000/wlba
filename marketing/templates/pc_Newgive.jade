@@ -1,17 +1,16 @@
 -load formatters
+-load mathfilters
 doctype html
 html
   head
     - with '网利宝' as title
-    include include/pc_acHead
-    //include include/common_head
+    include include/pc_screen
     - endwith
-    //link(href="http://localhost:8000/static/stylesheets/screen.css?v=20151010", media="screen, projection", rel="stylesheet", type="text/css")
     link(rel="stylesheet", href="/static/styles/pc_activity/pc_Newgive.css")
-  body
+  body(style="background:#fff")
     include global/g_nav
-    //include include/activityTopNew
-    .ng_conban
+    include include/activityTopNew2
+    //.ng_conban
     h3.gv_tls <span></span>数据统计 <a>截止2015-10-21</a>
     ul.gv_info
       li
@@ -19,10 +18,10 @@ html
         h5 <b>796,235</b>位小伙伴
       li
         p.gv_touz2 <span></span> 小伙伴们总共投资额
-        h5 <b>796,235</b>位小伙伴
+        h5 <b>81</b>亿<b>2480</b>万<b>2480</b>元
       li.bornone
         p.gv_touz3 <span></span> 小伙伴们总共赚取了
-        h5 <b>796,235</b>位小伙伴
+        h5 <b>4464</b>万<b>9000</b>元
     mixin gv_title(content)
       h2.gv_tstls
         span=content
@@ -83,19 +82,18 @@ html
 
     +gv_title("关于网利宝")
     .gv_about.clear
-      mixin fn_about(title, test, text, img)
+      mixin fn_about(title, test, text, icon)
         dl.gv_abdls
-          dt
-            img(src=img)
+          dt.about_dts(class=icon)
           dd
             h5= title
             span= test
             br
             span=text
-      +fn_about('信赖', 'IDG资本投资A轮融资', '鸿利光电投资B轮融资', '/static/imgs/pc_activity/newgive/luc1.jpg')
-      +fn_about("安全", "第三方资金托管", "阳光保险承担资金安全", "/static/imgs/pc_activity/newgive/luc2.jpg")
-      +fn_about("权威", "华尔街精英金融团队", "IT数据风控系统", "/static/imgs/pc_activity/newgive/luc3.jpg")
-      +fn_about("高收益", "30余倍活期银行收益", "100元起投", "/static/imgs/pc_activity/newgive/luc4.jpg")
+      +fn_about('信赖', 'IDG资本投资A轮融资', '鸿利光电投资B轮融资', 'about_dts1')
+      +fn_about("安全", "第三方资金托管", "阳光保险承担资金安全", "about_dts2")
+      +fn_about("权威", "华尔街精英金融团队", "IT数据风控系统", "about_dts3")
+      +fn_about("高收益", "30余倍活期银行收益", "100元起投", "about_dts4")
     .gv_focal
       span.btn_left#btn_left
       ul#fal_box
@@ -123,6 +121,6 @@ html
           span 7.本活动不收取任何费用，谨慎上当受骗; 刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承诺;<br>
           span 8.网利宝对此活动享有最终解释权。
     include global/g_footer
-
   script.
-    require(["/static/js/newgive.js?v=20151019"])
+    var v = new Date().getTime()
+    require(["/static/js/newgive.js?v=20151020"])
