@@ -118,8 +118,9 @@ INSTALLED_APPS = (
     'report',
     'misc',
 
-    'provider',
-    'provider.oauth2',
+    # 'provider',
+    # 'provider.oauth2',
+    'oauth2',
 
     'widget_tweaks',
     'mathfilters',
