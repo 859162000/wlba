@@ -43,7 +43,11 @@ html
                 .hd-time.fr
                   span.recommend_time(data-update='{{product.end_time}}')
               .ac-tg-cont
-                a(href='/p2p/detail/{{product.id}}/').font-m.t-d10.tg-pro-tit {{product.short_name}}
+                a(href='/p2p/detail/{{product.id}}/').font-m.t-d10.tg-pro-tit
+                    if product.is_app_exclusive
+                        span.font-l
+                            em.app-icon
+                    |{{product.short_name}}
                 .t-d7.ac-style
                   span.mg-r-xl 合作机构：{{product.warrant_company}}
                   span 还款方式：{{product.display_payback_method}}

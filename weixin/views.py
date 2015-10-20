@@ -726,7 +726,6 @@ class AuthorizeCode(APIView):
     permission_classes = ()
 
     def get(self, request):
-        # print '======================',request.META.get('QUERY_STRING')
         account_id = self.request.GET.get('state')
         try:
             account = Account.objects.get(pk=account_id)
@@ -756,9 +755,6 @@ class AuthorizeCode(APIView):
 class AuthorizeUser(APIView):
     permission_classes = ()
     def get(self, request):
-        print request.__dict__
-        print request.GET
-        print request.GET.keys()
         account_id = self.request.GET.get('state')
         try:
             account = Account.objects.get(pk=account_id)
@@ -850,13 +846,13 @@ class GetAuthUserInfo(APIView):
                 w_user.auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
                 w_user.auth_info.save()
             user_info = oauth.get_user_info(w_user.openid, w_user.auth_info.access_token)
-            w_user.nickname = user_info.get('nickname')
+            w_user.nickname = user_info.get('nickname', "")
             w_user.sex = user_info.get('sex')
-            w_user.city = user_info.get('city')
-            w_user.country = user_info.get('country')
-            w_user.headimgurl = user_info.get('headimgurl')
-            w_user.unionid =  user_info.get('unionid') if user_info.get('unionid') else ''
-            w_user.province = user_info.get('province')
+            w_user.city = user_info.get('city', "")
+            w_user.country = user_info.get('country', "")
+            w_user.headimgurl = user_info.get('headimgurl', "")
+            w_user.unionid =  user_info.get('unionid', '')
+            w_user.province = user_info.get('province', '')
             w_user.save()
             return Response(user_info)
         except WeChatException, e:
