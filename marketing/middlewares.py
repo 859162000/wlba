@@ -4,6 +4,7 @@ from .models import PromotionToken
 from wanglibao_account.cooperation import CoopRegister
 
 
+
 class PromotionTokenMiddleWare(object):
     def process_request(self, request):
         token = request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, None)
