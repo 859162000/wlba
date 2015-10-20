@@ -266,3 +266,61 @@ class IdVerificationForm(forms.Form):
         super(IdVerificationForm, self).__init__(*args, **kwargs)
         self._user = user
 
+
+class TokenSecretSignAuthenticationForm(forms.Form):
+    """
+    Base class for authenticating users. Extend this to get a form that accepts
+    token/secret sign logins.
+    """
+    token = forms.CharField(max_length=40, error_messages={'required': u'请输入token'})
+    secret_sign = forms.CharField(label="secret_sign", error_messages={'required': u'请输入密码'})
+    ts = forms.CharField(max_length=40, error_messages={'required': u'请输入token'})
+
+    error_messages = {
+        1: u'error',
+        2: u'error',
+        3: u'error',
+        4: u'error',
+        5: u'error',
+        'frozen': u"用户账户已被冻结",
+    }
+
+    def __init__(self, request=None, *args, **kwargs):
+        """
+        The 'request' parameter is set for custom auth use by subclasses.
+        The form data comes in via the standard 'data' kwarg.
+        """
+        self.request = request
+        self.user_cache = None
+        super(TokenSecretSignAuthenticationForm, self).__init__(*args, **kwargs)
+
+        self._errors = None
+
+    def clean(self):
+        token = self.cleaned_data.get('token')
+        secret_sign = self.cleaned_data.get('secret_sign')
+        ts = self.cleaned_data.get('ts')
+
+        if token and secret_sign and ts:
+            rc, self.user_cache = authenticate(token=token, secret_sign=secret_sign, ts=ts)
+            if self.user_cache is None:
+                raise forms.ValidationError(
+                    self.error_messages[rc],
+                    code=rc,
+                )
+            else:
+                if self.user_cache.wanglibaouserprofile.frozen:
+                    raise forms.ValidationError(
+                        self.error_messages['frozen'],
+                        code='frozen',
+                    )
+        return self.cleaned_data
+
+    def get_user_id(self):
+        if self.user_cache:
+            return self.user_cache.id
+        return None
+
+    def get_user(self):
+        return self.user_cache
+

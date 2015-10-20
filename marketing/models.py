@@ -450,8 +450,8 @@ class LoginAccessToken(models.Model):
      by huo meimei
     """
     token = models.OneToOneField(Token, primary_key=True)
-    access_token = models.CharField(max_length=40, verbose_name='登录令牌', unique=True)
+    secret_sign = models.CharField(max_length=40, verbose_name='登录令牌', unique=True)
     # client_ts = models.CharField(max_length=40, verbose_name='客户端时间')
-    update_at = models.BigIntegerField(default=None, verbose_name=u"时间戳", blank=True)
+    expire_at = models.BigIntegerField(default=None, verbose_name=u"时间戳", blank=True)
     class Meta:
         verbose_name_plural = u'h5用户令牌登录表'
