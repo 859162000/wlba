@@ -4,10 +4,13 @@ html
   head
     - with '网利宝' as title
     include include/pc_acHead
+    //include include/common_head
     - endwith
+    //link(href="http://localhost:8000/static/stylesheets/screen.css?v=20151010", media="screen, projection", rel="stylesheet", type="text/css")
     link(rel="stylesheet", href="/static/styles/pc_activity/pc_Newgive.css")
   body
     include global/g_nav
+    //include include/activityTopNew
     .ng_conban
     h3.gv_tls <span></span>数据统计 <a>截止2015-10-21</a>
     ul.gv_info
