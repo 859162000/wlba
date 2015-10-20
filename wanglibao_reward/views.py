@@ -538,7 +538,7 @@ class WeixinShareDetailView(TemplateView):
                                   "message": self.get_react_text(index)})
                 index += 1
             self.debug_msg('所有获奖信息返回前端:%s' % (ret_value,))
-            sorted(ret_value, key=lambda item: int(time.mktime(time.strptime(str(item["time"]), '%Y-%m-%d %H:%M:%S'))))
+            sorted(ret_value, key=lambda item: int(time.mktime(time.strptime(str(item["time"]), '%Y-%m-%d %H:%M:%S+00:00'))))
             return ret_value
 
     def update_weixin_wanglibao_relative(self, openid, phone_num):
