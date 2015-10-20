@@ -17,6 +17,7 @@ from order.models import Order
 from wanglibao_margin.marginkeeper import MarginKeeper
 from marketing import tools
 from wanglibao_rest.utils import split_ua
+from wanglibao_account.cooperation import CoopRegister
 
 logger = logging.getLogger(__name__)
 
@@ -1012,6 +1013,9 @@ class KuaiShortPay:
         if not card:
             card = self.add_card_unbind(user, card_no, bank)
 
+            # 处理第三方渠道用户绑卡回调
+            CoopRegister(request).binding_card_call_back(user)
+
         if not card and not bank:
             return {"ret_code":201152, "message":"卡号不存在或银行不存在"}
 
@@ -1041,6 +1045,9 @@ class KuaiShortPay:
             pay_info.account_name = profile.name
             pay_info.save()
             OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
+
+            # 处理第三方渠道的用户充值回调
+            CoopRegister(request).process_for_recharge(request.user)
 
             dic = {"user_id":user.id, "order_id":order.id, "id_number":profile.id_number.upper(),
                     "phone":input_phone, "name":profile.name, "amount":amount,
