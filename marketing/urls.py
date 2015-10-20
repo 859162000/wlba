@@ -47,7 +47,10 @@ urlpatterns = patterns(
     url(r'^recommended/$', TemplateView.as_view(template_name="recommended.jade")),
     url(r'^national/$', TemplateView.as_view(template_name="national.jade")),
     url(r'^gold_two/$', TemplateView.as_view(template_name="gold_two.jade")),
+
+    url(r'^pc_Newgive/$', TemplateView.as_view(template_name="pc_Newgive.jade")),
     url(r'^seckill/$', TemplateView.as_view(template_name="seckill.jade")),
+
 
 )
 
