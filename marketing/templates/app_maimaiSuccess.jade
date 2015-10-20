@@ -1,0 +1,44 @@
+- load formatters
+doctype html
+html(style='background: #2679b7')
+  head
+    title 网利宝福袋
+    include include/app_head
+  body
+    .maimai-success
+      .maimai-title 成功领取
+      .maimai-money 价值120元红包
+
+      .maimai-animate
+        .maimai-at-head
+          .use-rule 使用说明
+          .head-logo
+        .maimai-at-body
+          .swiper-container
+            .swiper-wrapper
+              .swiper-slide
+                .slide-title 1. 注册/登录网利宝
+                .slide-img
+                  img(src='/static/imgs/mobile_activity/app_maimai/slide_1.png')
+              .swiper-slide
+                .slide-title 2. 完成规则，奖励自动发放
+                .slide-img
+                  img(src='/static/imgs/mobile_activity/app_maimai/slide_2.png')
+              .swiper-slide
+                .slide-title 3. 投资标的时，选择使用红包
+                .slide-img
+                  img(src='/static/imgs/mobile_activity/app_maimai/slide_3.png')
+              .swiper-slide
+                .slide-title 4. 坐收收益和奖励
+                .slide-img
+                  img(src='/static/imgs/mobile_activity/app_maimai/slide_4.png')
+        .swiper-pagination-maimai
+      .maimai-animate-sign 左右滑动查看说明
+      .maimai-url-warp
+        a(href='/activity/maimai_rules/').maimai-for-rule 红包详细规则>>
+      .maimai-use-btn 立即使用
+    script(src="/static/scripts/mobile/swiper/swiper.min.js")
+    script.
+      var mySwiper = new Swiper('.swiper-container', {
+        pagination: '.swiper-pagination-maimai',
+      })
