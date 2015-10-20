@@ -94,8 +94,8 @@ html
       +fn_about("权威", "华尔街精英金融团队", "IT数据风控系统", "/static/imgs/pc_activity/newgive/luc3.jpg")
       +fn_about("高收益", "30余倍活期银行收益", "100元起投", "/static/imgs/pc_activity/newgive/luc4.jpg")
     .gv_focal
-      span.btn_left
-      ul
+      span.btn_left#btn_left
+      ul#fal_box
         li.idx
           img(src="/static/imgs/pc_activity/newgive/lub1.jpg")
         li
@@ -104,7 +104,7 @@ html
           img(src="/static/imgs/pc_activity/newgive/lub3.jpg")
         li
           img(src="/static/imgs/pc_activity/newgive/lub4.jpg")
-      span.btn_right
+      span.btn_right#btn_right
     .gv_explain
       .explain
         +gv_title("活动说明")
@@ -120,3 +120,6 @@ html
           span 7.本活动不收取任何费用，谨慎上当受骗; 刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承诺;<br>
           span 8.网利宝对此活动享有最终解释权。
     include global/g_footer
+
+  script.
+    require(["/static/js/newgive.js?v=20151019"])
