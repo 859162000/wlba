@@ -132,16 +132,42 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
     # 满标审核时,是给所有的持仓用户发放奖励,金额为持仓金额
 
     elif trigger_node == 'p2p_audit':
-        # 根据product_id查询出该产品中所有的持仓用户
-        equities = P2PEquity.objects.filter(product=product_id, confirm=True)
-        if equities:
-            for equity in equities:
-                _send_gift(equity.user, rule, device_type, is_full, equity.equity)
+        # 根据product_id查询出该产品中所有的持仓用户,因为持仓确认是通过任务定时执行的,因此此处不查询confirm=True
+        if product_id > 0:
+            if rule.activity.product_ids:
+                # 检查产品是否符合条件
+                is_product = _check_product_id(product_id, rule.activity.product_ids)
+                if is_product:
+                    equities = P2PEquity.objects.filter(product=product_id)
+                    if equities:
+                        for equity in equities:
+                            # 检查持仓金额是否满足
+                            is_amount = _check_amount(rule.min_amount, rule.max_amount, equity.equity)
+                            if is_amount:
+                                _send_gift(equity.user, rule, device_type, is_full, equity.equity)
+            else:
+                equities = P2PEquity.objects.filter(product=product_id)
+                if equities:
+                    for equity in equities:
+                        is_amount = _check_amount(rule.min_amount, rule.max_amount, equity.equity)
+                        if is_amount:
+                            _send_gift(equity.user, rule, device_type, is_full, equity.equity)
     # 还款
 
     # 还款时,是给所有的持仓用户发放奖励,金额为还款本金
     elif trigger_node == 'repaid':
-        _send_gift(user, rule, device_type, is_full, amount)
+        if product_id > 0:
+            if rule.activity.product_ids:
+                is_product = _check_product_id(product_id, rule.activity.product_ids)
+                if is_product:
+                    # 检查还款本金是否满足
+                    is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
+                    if is_amount:
+                        _send_gift(user, rule, device_type, is_full, amount)
+            else:
+                is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
+                if is_amount:
+                    _send_gift(user, rule, device_type, is_full, amount)
 
     else:
         return

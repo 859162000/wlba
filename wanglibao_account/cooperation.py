@@ -100,12 +100,14 @@ def get_first_investment_for_coop(user_id):
     except:
         return None, None, None
 
+
 def get_last_investment_for_coop(user_id):
     try:
         p2p_record = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购').order_by('create_time')
         return p2p_record.last()
     except:
         return None
+
 
 def get_tid_for_coop(user_id):
     try:
@@ -130,14 +132,16 @@ def get_binding_time_for_coop(user_id):
     except Exception, e:
         return None
 
-def save_to_binding(user, request):
-    try:
-        coop = CoopRegister(request)
-        for processor in coop.processors:
-            if processor.c_code == processor.channel_code:
-                processor.save_to_binding(user)
-    except:
-        pass
+
+# def save_to_binding(user, request):
+#     try:
+#         coop = CoopRegister(request)
+#         for processor in coop.processors:
+#             if processor.c_code == processor.channel_code:
+#                 processor.save_to_binding(user)
+#     except:
+#         pass
+
 
 def check_mobile(request):
     """
@@ -377,7 +381,26 @@ class CoopRegister(object):
                 return
         self.save_to_session()
 
+    def weixin_redpack_distribute(self, user):
+        phone = user.wanglibaouserprofile.phone
+        logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
+        records = WanglibaoUserGift.objects.filter(valid=0, identity=phone)
+        for record in records:
+            try:
+                redpack_backends.give_activity_redpack(user, record.rules.redpack, 'pc')
+            except Exception, reason:
+                logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
+            else:
+                logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (self.request.user, record.rules.redpack,))
+            record.valid = 1
+            record.save()
+
     def all_processors_for_user_register(self, user, invite_code):
+        try:
+            self.weixin_redpack_distribute(user)
+        except Exception, reason:
+            pass
+
         try:
             if not invite_code:
                 invite_code = self.channel_code
@@ -594,7 +617,7 @@ class JinShanRegister(CoopRegister):
         if binding:
             extra = binding.extra
             bid = binding.bid
-            sign = hashlib.md5( str(bid) + offer_type + key ).hexdigest()
+            sign = hashlib.md5(str(bid) + offer_type + key).hexdigest()
             params = {
                 'userid': bid,
                 'offer_type': offer_type,
@@ -604,15 +627,23 @@ class JinShanRegister(CoopRegister):
             jinshan_callback.apply_async(
                 kwargs={'url': self.call_back_url, 'params': params})
 
-    def register_call_back(self, user):
-        self.jinshan_call_back(user, 'wangli_regist_none', 'ZSEt6lzsK1rigjcOXZhtA6KfbGoS')
+    # def register_call_back(self, user):
+    #     self.jinshan_call_back(user, 'wangli_regist_none', 'ZSEt6lzsK1rigjcOXZhtA6KfbGoS')
 
     def validate_call_back(self, user):
         self.jinshan_call_back(user, 'wangli_regist_reward', 'Cp9AhO2o9BQTDhbUBnHxmY0X4Kbg')
 
     def purchase_call_back(self, user):
-        if P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').count() == 1:
-            self.jinshan_call_back(user, 'wangli_invest_reward', 'pA71ZhBf4DDeet7SLiLlGsT1qTYu')
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
+        if p2p_record.count() == 1:
+            p2p_amount = int(p2p_record.first().amount)
+            if p2p_amount >= 100:
+                if p2p_amount <= 999:
+                    self.jinshan_call_back(user, 'wangli_invest_reward', 'pA71ZhBf4DDeet7SLiLlGsT1qTYu')
+                elif p2p_amount <= 1999:
+                    self.jinshan_call_back(user, 'wangli_invest1000_reward', '4ss7mIRAjsqgOuLp5ezzDVp4Xu5x')
+                else:
+                    self.jinshan_call_back(user, 'wangli_invest2000_reward', 'uRfzjHGGpxfIZFZN9JbfYLPBGdGC')
 
 
 class ShanghaiWaihuRegister(CoopRegister):
@@ -1015,9 +1046,15 @@ class WeixinRedpackRegister(CoopRegister):
         self.invite_code = 'weixin_redpack'
 
     def register_call_back(self, user):
-        phone = self.request.GET.get('phone',)
+        phone = user.wanglibaouserprofile.phone
+        logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
         record = WanglibaoUserGift.objects.filter(valid=0, identity=phone).first()
-        redpack_backends.give_activity_redpack(self.request.user, record.rules.redpack, 'pc')
+        try:
+            redpack_backends.give_activity_redpack(user, record.rules.redpack, 'pc')
+        except Exception, reason:
+            logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
+        else:
+            logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (self.request.user, record.rules.redpack,))
         record.valid = 1
         record.save()
 

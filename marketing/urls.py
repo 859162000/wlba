@@ -47,7 +47,10 @@ urlpatterns = patterns(
     url(r'^recommended/$', TemplateView.as_view(template_name="recommended.jade")),
     url(r'^national/$', TemplateView.as_view(template_name="national.jade")),
     url(r'^gold_two/$', TemplateView.as_view(template_name="gold_two.jade")),
+
     url(r'^pc_Newgive/$', TemplateView.as_view(template_name="pc_Newgive.jade")),
+    url(r'^seckill/$', TemplateView.as_view(template_name="seckill.jade")),
+
 
 )
 
@@ -81,6 +84,7 @@ urlpatterns += patterns(
     url(r'^app_eight_gift_two_h5/$', TemplateView.as_view(template_name="app_eight_gift_two_h5.jade")),
     url(r'^wx_new_user/$', TemplateView.as_view(template_name="app_september.jade")),
     url(r'^app_new_user/$', TemplateView.as_view(template_name="app_september_h5.jade")),
+    url(r'^channel_new_user/$', TemplateView.as_view(template_name="channel_new_user.jade")),
     url(r'^wx_anniversary/$', TemplateView.as_view(template_name="wx_anniversary.jade")),
     url(r'^app_anniversary/$', TemplateView.as_view(template_name="app_anniversary.jade")),
     url(r'^app_colorpage/$', TemplateView.as_view(template_name="app_colorpage.jade")),
@@ -101,6 +105,7 @@ urlpatterns += patterns(
     url(r'^app_gold_season/$', TemplateView.as_view(template_name="app_gold_season.jade")),
     url(r'^wx_gold_two/$', TemplateView.as_view(template_name="h5_gold_two.jade")),
     url(r'^app_gold_two/$', TemplateView.as_view(template_name="app_gold_two.jade")),
+    url(r'^app_seckill/$', TemplateView.as_view(template_name="app_seckill.jade")),
 )
 
 urlpatterns += patterns(

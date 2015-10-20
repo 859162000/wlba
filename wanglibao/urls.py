@@ -22,11 +22,11 @@ from wanglibao_banner.views import HiringView, AboutView, CompanyView, TeamView,
 
 from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
-from marketing.views import NewsListView, NewsDetailView
+from marketing.views import NewsListView, NewsDetailView, AppShareViewShort
 from wanglibao_activity.decorators import decorator_include
 from wanglibao_activity.decorators import wap_activity_manage
 from wanglibao.views import landpage_view
-from wanglibao_sms.views import ArriveRate, MessageEdit, MessageList
+from wanglibao_sms.views import ArriveRate
 
 admin.site = AdminSitePlus()
 admin.autodiscover()
@@ -156,8 +156,8 @@ urlpatterns += patterns(
     url(r'^api/zhongniu/getData/$', ZhongniuP2PDataQuery.as_view()),
 
     url(r'^AK7WtEQ4Q9KPs8Io_zOncw/wanglibao_sms/arrive_rate/$', ArriveRate.as_view(), name='arrive_rate'),
-    url(r'^AK7WtEQ4Q9KPs8Io_zOncw/wanglibao_sms/messages/$', MessageList.as_view(), name='messages'),
-    url(r'^AK7WtEQ4Q9KPs8Io_zOncw/wanglibao_sms/message/edit/$', MessageEdit.as_view(), name='message_for_admin'),
+
+    url(r'^aws/$', AppShareViewShort.as_view(), name="app_share"),
 )
 
 # 短信

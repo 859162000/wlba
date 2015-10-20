@@ -6,7 +6,7 @@ from wanglibao.celery import app
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db import transaction
-# from wanglibao_lottery.tasks import send_lottery
+from wanglibao_reward.models import WanglibaoUserGift
 from wanglibao_p2p.models import P2PRecord, P2PProduct
 from wanglibao_account import message as inside_message
 from wanglibao_sms import messages
@@ -20,6 +20,8 @@ import datetime
 from django.db.models import Sum, Count
 from wanglibao_profile.models import WanglibaoUserProfile
 import time
+import logging
+logger = logging.getLogger('wanglibao_reward')
 
 @app.task
 def decide_first(user_id, amount, device, product_id=0, is_full=False):
@@ -40,11 +42,28 @@ def decide_first(user_id, amount, device, product_id=0, is_full=False):
     #发送红包
     # send_lottery.apply_async((user_id,))
 
+def weixin_redpack_distribute(user):
+    phone = user.wanglibaouserprofile.phone
+    logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
+    records = WanglibaoUserGift.objects.filter(valid=0, identity=phone)
+    for record in records:
+        try:
+            redpack_backends.give_activity_redpack(user, record.rules.redpack, 'pc')
+        except Exception, reason:
+            logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
+        else:
+            logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (user, record.rules.redpack,))
+        record.valid = 1
+        record.save()
+
 @app.task
 def register_ok(user_id, device):
     user = User.objects.filter(id=user_id).first()
     device_type = device['device_type']
-
+    try:
+        weixin_redpack_distribute(user)
+    except Exception, reason:
+        pass
     title, content = messages.msg_register()
     inside_message.send_one.apply_async(kwargs={
         "user_id": user_id,

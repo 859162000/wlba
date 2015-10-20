@@ -143,9 +143,9 @@ class ActivityRule(models.Model):
     income = models.FloatField(u'金额或比率', default=0, blank=True,
                                help_text=u'选择收益或话费时填写，固定金额时填写大于1的数字，收益率时填写0-1之间的小数')
     min_amount = models.IntegerField(u'最小金额', default=0,
-                                     help_text=u'投资或充值，大于该金额（>），当只有最小金额时为大于等于该金额（>=）')
+                                     help_text=u'投资/充值/持仓/还款本金，大于该金额（>），当只有最小金额时为大于等于该金额（>=）')
     max_amount = models.IntegerField(u'最大金额', default=0,
-                                     help_text=u'投资或充值，小于等于该金额（<=）')
+                                     help_text=u'投资/充值/持仓/还款本金，小于等于该金额（<=）')
     is_total_invest = models.BooleanField(u'启用满标累计投资', default=False,
                                           help_text=u'勾选该选项，则最大、最小金额视为累计投资金额，系统会在满标时检测用户在当前标的中的累计投资金额')
     total_invest_order = models.IntegerField(u'满标累计投资排名', blank=True, default=0,

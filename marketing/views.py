@@ -1,4 +1,6 @@
 # encoding:utf-8
+import base64
+import hashlib
 import os
 import json
 import decimal
@@ -8,7 +10,7 @@ from collections import defaultdict
 from decimal import Decimal
 import time
 from wanglibao_p2p.models import P2PEquity
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, connection
 from django.contrib.auth.decorators import permission_required
 from django.core.paginator import Paginator, PageNotAnInteger
 from django.utils.decorators import method_decorator
@@ -167,6 +169,23 @@ class AppShareView(TemplateView):
 
     def get_context_data(self, **kwargs):
         identifier = self.request.GET.get('phone')
+        reg = self.request.GET.get('reg')
+
+        return {
+            'identifier': identifier.strip(),
+            'reg': reg
+        }
+
+
+class AppShareViewShort(TemplateView):
+    template_name = 'app_share.jade'
+
+    def get_context_data(self, **kwargs):
+        try:
+            identifier = self.request.GET.get('p') + '='
+            identifier = base64.b64decode(identifier)
+        except:
+            identifier = self.request.GET.get('phone')
         reg = self.request.GET.get('reg')
 
         return {
@@ -645,7 +664,7 @@ def ajax_get_activity_record(action='get_award', *gifts):
 
 def ajax_xunlei(request):
     """
-        description:迅雷9月抽奖活动，响应web的ajax请求
+        description:迅雷抽奖活动，响应web的ajax请求
     """
     user = request.user
     if not user.is_authenticated():
@@ -661,6 +680,7 @@ def ajax_xunlei(request):
         event = Misc.objects.filter(key=key).first()
         if event:
             event = json.loads(event.value)
+            logger.debug("event value:%s" %(event,))
             if type(event) == dict:
                 channel = event['channel']
                 reward = event['reward']
@@ -677,7 +697,7 @@ def ajax_xunlei(request):
     if request.method == "POST":
         obj = ThunderInterestAwardAPIView()
         action = request.POST.get("action", "")
-
+        logger.debug("迅雷10月  action type:%s" %(action,))
         if action == 'GET_RECORD':
             obj.get_reward_record(request, 'oct_get_award')
 
@@ -719,11 +739,13 @@ class ThunderInterestAwardAPIView(APIView):
         describe = str(reward) + str(money)
         try:
             dt = timezone.datetime.now()
+            logger.debug("select condition-- invalid:False, describe:%s, give_start&give_end:%s",(describe, dt,))
             redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
         except Exception, reason:
             print reason
 
         if redpack_event:
+            logger.debug("发送出去的加息券, user:%s, redpack:%s" %(request.user, redpack_event,))
             redpack_backends.give_activity_redpack(request.user, redpack_event, 'pc')
 
         to_json_response = {
@@ -848,6 +870,7 @@ def ajax_post(request):
     if request.method == "POST":
         obj = ThunderAwardAPIView()
         action = request.POST.get("action", "")
+        logger.debug("迅雷9月  action type:%s" %(action,))
 
         if action == 'GET_AWARD':
             res = obj.get_award(request, reward)
