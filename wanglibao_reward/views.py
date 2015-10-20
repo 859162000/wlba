@@ -15,6 +15,7 @@ import time
 import json
 import logging
 import random
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.shortcuts import redirect
 from wanglibao.settings import CALLBACK_HOST
@@ -388,7 +389,7 @@ class WeixinShareDetailView(TemplateView):
             self.exception_msg(reason, u'判断用户领奖，数据库查询出错')
             return None
 
-    ###@method_decorator(transaction.atomic)
+    @method_decorator(transaction.atomic)
     def distribute_redpack(self, phone_num, openid, activity, product_id):
         """
             根据概率，分发奖品
