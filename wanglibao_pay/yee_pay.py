@@ -27,6 +27,7 @@ from Crypto.Signature import PKCS1_v1_5 as pk
 from Crypto.Cipher import PKCS1_v1_5, AES
 import base64
 from wanglibao_rest.utils import split_ua
+from wanglibao_account.cooperation import CoopRegister
 
 logger = logging.getLogger(__name__)
 
@@ -606,6 +607,9 @@ class YeeShortPay:
         if not card:
             card = self.add_card_unbind(user, card_no, bank)
 
+            # 处理第三方渠道用户绑卡回调
+            CoopRegister(request).binding_card_call_back(user)
+
         if not card and not bank:
             return {'ret_code': 200117, 'message': '卡号不存在或银行不存在'}
 
@@ -652,6 +656,9 @@ class YeeShortPay:
             pay_info.account_name = profile.name
             pay_info.save()
             OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
+
+            # 处理第三方渠道的用户充值回调
+            CoopRegister(request).process_for_recharge(request.user)
 
             if len(card_no) == 10:
                 # 直接支付交易，已经绑定了银行卡，直接进行支付操作
