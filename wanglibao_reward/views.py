@@ -668,7 +668,7 @@ class WeixinShareStartView(TemplateView):
             p2p_record = P2PRecord.objects.filter(order_id=order_id, amount__gte=amount)
             return p2p_record
         except Exception, reason:
-            logger.exception(u"判断用户投资额度抛异常 %s" %(reason,) )
+            logger.exception(u"判断用户投资额度抛异常 %s, order_id:%s, amount:%s " %(reason, order_id, amount) )
 
     def get_context_data(self, **kwargs):
         openid = self.request.GET.get('openid')
