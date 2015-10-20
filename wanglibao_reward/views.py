@@ -460,7 +460,6 @@ class WeixinShareDetailView(TemplateView):
 
             try:
                 # modify by hb on 2015-10-15 : 只查询微信号关联记录
-                #gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity, valid__in=(0, 1)).all()
                 gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity, valid=2).all()
                 return gifts
             except Exception, reason:
@@ -515,10 +514,7 @@ class WeixinShareDetailView(TemplateView):
 
         if types == 'alone':
             logger.debug("整理用户的数据返回前端，phone:%s" %(gifts.identity,))
-            # modify by hb on 2015-10-15
-            #QSet = WanglibaoWeixinRelative.objects.filter(phone=gifts.identity).values("phone", "nick_name", "img", "openid").first()
             QSet = WanglibaoWeixinRelative.objects.filter(openid=openid).values("phone", "nick_name", "img", "openid").first()
-            phone = WanglibaoUserGift.objects.filter(user=gifts.user, activity=gifts.activity, rules=gifts.rules).exclude(identity=QSet["openid"]).first().identity
             if QSet:
                 ret_val = {"amount": gifts.amount, "name": QSet["nick_name"], "img": QSet["img"], "phone": gifts.identity}
             else:
@@ -529,9 +525,6 @@ class WeixinShareDetailView(TemplateView):
         if types == 'gifts':
             user_info = {gift.identity: gift for gift in gifts}
             self.debug_msg("format_response_data, 已经领取的 奖品 的key值序列：%s" %(user_info.keys(),))
-            # modify by hb on 2015-10-15
-            #QSet = WanglibaoWeixinRelative.objects.filter(phone__in=user_info.keys())
-            #weixins = {item.phone: item for item in QSet}
             QSet = WanglibaoWeixinRelative.objects.filter(openid__in=user_info.keys())
             weixins = {item.openid: item for item in QSet}
             self.debug_msg("format_response_data, 已经领取的 用户 的key值序列：%s" %(weixins.keys(),))
@@ -633,8 +626,6 @@ class WeixinShareDetailView(TemplateView):
         }
 
     def dispatch(self, request, *args, **kwargs):
-        openid = kwargs["openid"]
-        order_id = kwargs['order_id']
         key = 'share_redpack'
         is_open = False
         shareconfig = Misc.objects.filter(key=key).first()
@@ -657,10 +648,10 @@ class WeixinShareEndView(TemplateView):
 
     def get_context_data(self, **kwargs):
         order_id = self.request.GET.get('url_id')
-        shareTitle, shareContent, url = get_share_infos(order_id)
+        share_title, share_content, url = get_share_infos(order_id)
         logger.debug("抵达End页面，order_id:%s, URL:%s" %(order_id, url))
         return {
-         "share":{'content':shareContent,'title':shareTitle, 'url':url}
+         "share": {'content': share_content, 'title': share_title, 'url': url}
         }
 
 
