@@ -535,10 +535,13 @@ class WeixinShareDetailView(TemplateView):
                                   "time": user_info[key].get_time,
                                   "name": weixins[key].nick_name,
                                   "img": weixins[key].img,
-                                  "message": self.get_react_text(index)})
+                                  "message": self.get_react_text(index),
+                                  "sort_by": int(time.mktime(time.strptime(str(user_info[key].get_time), '%Y-%m-%d %H:%M:%S+00:00')))})
                 index += 1
+
+            tmp_dict = {item["sort_by"]: item for item in ret_value}
+            ret_value = [tmp_dict[key] for key in sorted(tmp_dict.keys())]
             self.debug_msg('所有获奖信息返回前端:%s' % (ret_value,))
-            sorted(ret_value, key=lambda item: int(time.mktime(time.strptime(str(item["time"]), '%Y-%m-%d %H:%M:%S+00:00'))))
             return ret_value
 
     def update_weixin_wanglibao_relative(self, openid, phone_num):
