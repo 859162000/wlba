@@ -111,7 +111,7 @@
 
           $('.boy').find('img').parent().children().each(function(i){
 
-              $('.boy img').eq(i).delay(200).show(1).siblings().delay(200).hide(1);
+              $('.boy img').eq(i).delay(500).show(1).siblings().delay(500).hide(1);
               if(i==8){
                   i=9;
               }
