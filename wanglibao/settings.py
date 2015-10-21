@@ -396,7 +396,7 @@ LOGGING = {
             'level': 'DEBUG'
         },
         'wanglibao_pay': {
-            'handlers': ['file'],
+            'handlers': ['file', 'console'],
             'level': 'DEBUG',
         },
         'wanglibao_activity': {
@@ -514,7 +514,7 @@ from datetime import timedelta, datetime
 CELERYBEAT_SCHEDULE = {
     'p2p-watchdog-1-minutes': {
         'task': 'wanglibao_p2p.tasks.p2p_watchdog',
-        'schedule': timedelta(minutes=1),
+        'schedule': timedelta(minutes=5),
     },
     'report-generate': {
         'task': 'report.tasks.generate_report',
@@ -776,6 +776,7 @@ YEE_PAY_BACK_RETURN_URL = CALLBACK_HOST + '/api/pay/yee/app/deposit/callback/'
 #快钱回调地址
 KUAI_PAY_RETURN_URL = CALLBACK_HOST + '/api/pay/deposit/complete/'
 KUAI_PAY_BACK_RETURN_URL = CALLBACK_HOST + '/api/pay/deposit/callback/'
+KUAI_PAY_TR3_SIGNATURE = ''
 
 #语音验证码参数
 YTX_SID = "aaf98f89495b3f3801497488ebbe0f3f"

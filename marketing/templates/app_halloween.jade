@@ -1,0 +1,42 @@
+doctype html
+html
+    head
+        meta(name="format-detection" content="telephone=no,email=no")
+        title 你最喜欢什么样的自己？
+        meta(charset="utf-8")
+        meta(content="telephone=no,email=no" ,name="format-detection")
+        meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
+        meta(content="yes" ,name="apple-mobile-web-app-capable")
+        link(href="/static/styles/mobile_activity/app_halloween.css?v=2015102101", rel="stylesheet")
+        script(src="/static/js/require.js")
+    body
+        #wrap
+            .bg_after.bg_after_animate1
+            .bg_front_wrap
+                .main
+                    img.title(src="/static/imgs/mobile_activity/app_halloween/title.png")
+            .tree1_wrap.tree1_wrap_animate
+                .main
+                    img.tree1(src="/static/imgs/mobile_activity/app_halloween/tree_after1.png")
+                    .owl
+                    img.deadman(src="/static/imgs/mobile_activity/app_halloween/deadman.png")
+            img.moon(src="/static/imgs/mobile_activity/app_halloween/moon.png")
+            img.cloud(src="/static/imgs/mobile_activity/app_halloween/cloud.png")
+            .bat1
+                img(src="/static/imgs/mobile_activity/app_halloween/bat1.png")
+            .boy
+                .main
+                    img.first(src="/static/imgs/mobile_activity/app_halloween/renzou0.png")
+                    img(src="/static/imgs/mobile_activity/app_halloween/renzou1.png")
+                    img(src="/static/imgs/mobile_activity/app_halloween/renzou2.png")
+                    img(src="/static/imgs/mobile_activity/app_halloween/renzou3.png")
+                    img(src="/static/imgs/mobile_activity/app_halloween/renzou4.png")
+                    img(src="/static/imgs/mobile_activity/app_halloween/renzou5.png")
+                    img(src="/static/imgs/mobile_activity/app_halloween/renzou6.png")
+                    img(src="/static/imgs/mobile_activity/app_halloween/renzou7.png")
+                    img(src="/static/imgs/mobile_activity/app_halloween/renzou8.png")
+            .choice
+                .button.choice1 选择1
+                .button.choice2 选择2
+        script.
+            require(['/static/src/mobile_activity/app_halloween.js?v=2015102102'])

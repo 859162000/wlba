@@ -1,0 +1,404 @@
+*
+  padding: 0
+  margin: 0
+  list-style: none
+
+body
+  position: relative
+  font-family: "微软雅黑"
+  margin: 0 auto
+
+#wrap
+  position: relative
+  width: 100%
+
+.title
+  position: absolute
+  left: 3%
+  top: 20%
+  z-index: 2
+  width: 91.2%
+  display: block
+  -webkit-animation-name: title
+  animation-name: title
+  -webkit-animation-duration: 4s
+  animation-duration: 4s
+  -webkit-animation-timing-function: linear
+  animation-timing-function: linear
+  -webkit-animation-delay: 3.2s
+  animation-delay: 3.2s
+  -webkit-animation-fill-mode: forwards
+  animation-fill-mode: forwards
+
+@-webkit-keyframes title
+  0%
+    transform: translateX(0px)
+    opacity: 1
+
+  100%
+    transform: translateX(-50%)
+    opacity: 0
+
+
+@keyframes title
+  0%
+    transform: translateX(0px)
+    opacity: 1
+
+  100%
+    transform: translateX(-50%)
+    opacity: 0
+
+
+.moon
+  position: absolute
+  right: 7.5%
+  top: 0%
+  width: 32%
+  z-index: 2
+  display: block
+  -webkit-animation-name: moon
+  animation-name: moon
+  -webkit-animation-duration: 4.8s
+  animation-duration: 4.8s
+  -webkit-animation-timing-function: linear
+  animation-timing-function: linear
+  -webkit-animation-delay: 3.2s
+  animation-delay: 3.2s
+  -webkit-animation-fill-mode: forwards
+  animation-fill-mode: forwards
+
+@-webkit-keyframes moon
+  0%
+    transform: translateX(0px)
+
+  100%
+    transform: translateX(-30px)
+
+
+@keyframes moon
+  0%
+    transform: translateX(0px)
+
+  100%
+    transform: translateX(-30px)
+
+
+.cloud
+  position: absolute
+  left: 0%
+  top: 0%
+  width: 300%
+  z-index: 3
+  display: block
+  -webkit-animation-name: cloud
+  animation-name: cloud
+  -webkit-animation-duration: 4.8s
+  animation-duration: 4.8s
+  -webkit-animation-timing-function: linear
+  animation-timing-function: linear
+  -webkit-animation-delay: 3.2s
+  animation-delay: 3.2s
+  -webkit-animation-fill-mode: forwards
+  animation-fill-mode: forwards
+
+@-webkit-keyframes cloud
+  0%
+    -webkit-transform: translateX(0px)
+
+  100%
+    -webkit-transform: translateX(-3%)
+
+
+@keyframes cloud
+  0%
+    transform: translateX(0px)
+
+  100%
+    transform: translateX(-3%)
+
+
+.bg_after
+  background: url("/static/imgs/mobile_activity/app_halloween/bg_after.jpg")
+  background-size: cover
+  width: 100%
+  height: 100%
+
+.bg_after_animate1
+  -webkit-animation-name: bg_after_animate1
+  animation-name: bg_after_animate1
+  -webkit-animation-duration: 4.8s
+  animation-duration: 4.8s
+  -webkit-animation-timing-function: linear
+  animation-timing-function: linear
+  -webkit-animation-delay: 3.2s
+  animation-delay: 3.2s
+  -webkit-animation-fill-mode: forwards
+  animation-fill-mode: forwards
+
+@-webkit-keyframes bg_after_animate1
+  0%
+    background-position: 0% 0%
+
+  100%
+    background-position: 10% 0%
+
+
+@keyframes bg_after_animate1
+  0%
+    background-position: 0 0
+
+  100%
+    background-position: 10% 0
+
+
+.bg_front_wrap
+  position: absolute
+  left: 0
+  top: 0
+  z-index: 4
+  background: url("/static/imgs/mobile_activity/app_halloween/bg_front.png") no-repeat
+  background-size: cover
+  background-position: 0% 0%
+  height: 100%
+  width: 100%
+  overflow: hidden
+  -webkit-animation-name: bg_front_wrap
+  animation-name: bg_front_wrap
+  -webkit-animation-duration: 4.8s
+  animation-duration: 4.8s
+  -webkit-animation-timing-function: linear
+  animation-timing-function: linear
+  -webkit-animation-delay: 3.2s
+  animation-delay: 3.2s
+  -webkit-animation-fill-mode: forwards
+  animation-fill-mode: forwards
+  /*          -webkit-animation-iteration-count:infinite;
+   *          animation-iteration-count:infinite;
+  .main
+    width: 100%
+    height: 100%
+    position: relative
+@-webkit-keyframes bg_front_wrap
+  0%
+    background-position: 0% 0%
+
+  100%
+    background-position: 15% 0%
+
+
+@keyframes bg_front_wrap
+  0%
+    background-position: 0 0
+
+  100%
+    background-position: 15% 0
+
+
+.bat1
+  position: absolute
+  left: 8%
+  top: 22%
+  z-index: 2
+  width: 54%
+  display: block
+  -webkit-transform: translate(150%, 120%)
+  transform: translate(150%, 120%)
+  opacity: 1
+  -webkit-animation-name: bat1
+  animation-name: bat1
+  -webkit-animation-duration: 2s
+  animation-duration: 2s
+  -webkit-animation-timing-function: linear
+  animation-timing-function: linear
+  -webkit-animation-delay: 8s
+  animation-delay: 8s
+  -webkit-animation-fill-mode: forwards
+  animation-fill-mode: forwards
+  img
+    width: 100%
+    display: block
+
+@-webkit-keyframes bat1
+  0%
+    -webkit-transform: translate(150%, 120%)
+    opacity: 1
+
+  100%
+    -webkit-transform: translate(-150%, -150%)
+    opacity: 1
+
+
+@keyframes bat1
+  0%
+    transform: translate(150%, 120%)
+    opacity: 1
+
+  100%
+    transform: translate(-150%, -150%)
+    opacity: 1
+
+
+.tree1_wrap
+  position: absolute
+  left: 125%
+  bottom: 11%
+  z-index: 1
+  width: 95%
+  display: block
+  -webkit-transform: translateX(0)
+  transform: translateX(0)
+
+.tree1_wrap_animate
+  -webkit-animation-name: tree1_wrap
+  animation-name: tree1_wrap
+  -webkit-animation-duration: 4.8s
+  animation-duration: 4.8s
+  -webkit-animation-timing-function: linear
+  animation-timing-function: linear
+  -webkit-animation-delay: 3.2s
+  animation-delay: 3.2s
+  -webkit-animation-fill-mode: forwards
+  animation-fill-mode: forwards
+
+@-webkit-keyframes tree1_wrap
+  0%
+    -webkit-transform: translateX(0)
+    opacity: 1
+
+  100%
+    -webkit-transform: translatex(-120%)
+    opacity: 1
+
+
+@keyframes tree1_wrap
+  0%
+    -webkit-transform: translateX(0)
+    opacity: 1
+
+  100%
+    transform: translatex(-120%)
+    opacity: 1
+
+
+.tree1_wrap
+  .tree1
+    width: 100%
+    display: block
+  .main
+    width: 100%
+    height: 100%
+    position: relative
+  .owl
+    position: absolute
+    top: 0
+    right: 14.2657343%
+    width: 9%
+    height: 50%
+    display: block
+    background: url("/static/imgs/mobile_activity/app_halloween/owl1.png") no-repeat
+    background-size: 100%
+  .deadman
+    width: 7.5524476%
+    display: block
+    position: absolute
+    bottom: 25.282167%
+    right: 26.013986%
+
+.boy
+  width: 19.3%
+  position: absolute
+  z-index: 3
+  left: 8.75%
+  bottom: 14%
+
+  .main
+    position: relative
+    width: 100%
+    height: 100%
+    display: inline-block
+    height: 300px
+    img
+      position: absolute
+      left: 0
+      bottom: 0
+      width: 100%
+      display: none
+      &.first
+        display: block
+.boy_animate
+  -webkit-animation-name: boy_animate
+  animation-name: boy_animate
+  -webkit-animation-duration: 4.8s
+  animation-duration: 4.8s
+  -webkit-animation-timing-function: linear
+  animation-timing-function: linear
+  -webkit-animation-delay: 3.2s
+  animation-delay: 3.2s
+  -webkit-animation-fill-mode: forwards
+  animation-fill-mode: forwards
+@-webkit-keyframes boy_animate
+  0%
+    background-position: 0px 0
+  12.5%
+    background-position: -145px 0
+  25%
+    background-position: -290px 0
+  37.5%
+    background-position: -435px 0
+  50%
+    background-position: -580px 0
+  62.5%
+    background-position: -725px 0
+  75%
+    background-position: -870px 0
+  87.5%
+    background-position: -1015px 0
+  100%
+    background-position: 0px 0
+
+
+@keyframes boy_animate
+  0%
+    background-position: 0px 0
+  12.5%
+    background-position: -145px 0
+  25%
+    background-position: -290px 0
+  37.5%
+    background-position: -435px 0
+  50%
+    background-position: -580px 0
+  62.5%
+    background-position: -725px 0
+  75%
+    background-position: -870px 0
+  87.5%
+    background-position: -1015px 0
+  100%
+    background-position: 0px 0
+.choice
+  position: fixed
+  left: 0
+  bottom: 5%
+  z-index: 999
+  width: 76%
+  height: 40px
+  padding: 5px 12%
+  display: none
+
+.button
+  width: 28%
+  height: 40px
+  text-align: center
+  color: #fff
+  line-height: 40px
+
+.choice1
+  background: red
+  float: left
+
+.choice2
+  background: blue
+  float: right
+

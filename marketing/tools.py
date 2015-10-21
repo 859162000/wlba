@@ -85,21 +85,21 @@ def idvalidate_ok(user_id, device):
     activity_backends.check_activity(user, 'validation', device_type)
     utils.log_clientinfo(device, "validation", user_id)
 
-
-def despoit_ok(pay_info, device):
+@app.task
+def deposit_ok(user_id, amount, device):
     try:
         device_type = device['device_type']
-        title, content = messages.msg_pay_ok(pay_info.amount)
+        title, content = messages.msg_pay_ok(amount)
         inside_message.send_one.apply_async(kwargs={
-            "user_id": pay_info.user.id,
+            "user_id": user_id,
             "title": title,
             "content": content,
             "mtype": "activityintro"
         })
-
-        activity_backends.check_activity(pay_info.user, 'recharge', device_type, pay_info.amount)
-        utils.log_clientinfo(device, "deposit", pay_info.user_id, pay_info.amount)
-    except Exception:
+        user = User.objects.get(id=user_id)
+        activity_backends.check_activity(user, 'recharge', device_type, amount)
+        utils.log_clientinfo(device, "deposit", user_id, amount)
+    except:
         pass
 
 
@@ -138,7 +138,9 @@ def send_income_message_sms():
             user_info = User.objects.filter(id=income.get('user'))\
                 .select_related('user__wanglibaouserprofile').values('wanglibaouserprofile__phone')
             phones_list.append(user_info[0].get('wanglibaouserprofile__phone'))
-            messages_list.append(messages.sms_income(income.get('invite__count'), income.get('earning__sum')))
+            messages_list.append(messages.sms_income(user_info[0].get('wanglibaouserprofile__name'),
+                                                     income.get('invite__count'),
+                                                     income.get('earning__sum')))
 
             # 发送站内信
             title, content = messages.msg_give_income(income.get('invite__count'), income.get('earning__sum'))
@@ -182,8 +184,9 @@ def check_invested_status(delta=timezone.timedelta(days=3)):
             print e
             pass
     send_messages.apply_async(kwargs={
-        "phones": phones_list,
-        "messages": [messages.user_invest_alert()]
+        'phones': phones_list,
+        'messages': [messages.user_invest_alert()],
+        'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
     })
 
 
@@ -218,8 +221,9 @@ def check_redpack_status(delta=timezone.timedelta(days=50)):
             print e
             pass
     send_messages.apply_async(kwargs={
-        "phones": phones_list,
-        "messages": messages_list,
+        'phones': phones_list,
+        'messages': messages_list,
+        'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
     })
 
 
