@@ -54,7 +54,7 @@ urlpatterns = patterns(
     url(r'^baidu_finance/$', BaiduFinanceView.as_view(), name="baidu_finance"),
     url(r'^seckill/$', TemplateView.as_view(template_name="seckill.jade")),
 
-    url(r'^youku/$', TemplateView.as_view(template_name="youku_test.jade")),
+    #url(r'^youku/$', TemplateView.as_view(template_name="youku_test.jade")),
 )
 
 # app URL
