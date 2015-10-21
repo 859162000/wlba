@@ -99,7 +99,7 @@ class AccessTokenBackend(object):
 class BajinsheBackend(object):
     def authenticate(self, request=None):
         client_id = request.POST.get('appid').strip()
-        signature = request.POST.get('appid').strip()
+        signature = request.POST.get('signature').strip()
         usn = request.POST.get('usn').strip()
 
         if client_id:
@@ -109,7 +109,6 @@ class BajinsheBackend(object):
                     'signature': signature,
                     'usn': usn,
                     })
-
                 if form.is_valid():
                     return form.cleaned_data.get('client')
                 return None

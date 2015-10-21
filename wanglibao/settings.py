@@ -120,7 +120,7 @@ INSTALLED_APPS = (
 
     # 'provider',
     # 'provider.oauth2',
-    'oauth2',
+    'wanglibao_oauth2',
 
     'widget_tweaks',
     'mathfilters',

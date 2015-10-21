@@ -13,7 +13,7 @@ class GrantAdmin(admin.ModelAdmin):
 
 
 class ClientAdmin(admin.ModelAdmin):
-    list_display = ('url', 'user', 'redirect_uri', 'client_id', 'client_type')
+    list_display = ('client_id', 'url', 'user', 'redirect_uri', 'client_type')
     raw_id_fields = ('user',)
 
 admin.site.register(AccessToken, AccessTokenAdmin)

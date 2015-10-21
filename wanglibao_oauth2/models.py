@@ -45,7 +45,7 @@ class Client(models.Model):
     client_type = models.IntegerField(choices=CLIENT_TYPES)
 
     def __unicode__(self):
-        return self.redirect_uri
+        return self.client_id
 
     def get_default_token_expiry(self):
         public = (self.client_type == 1)

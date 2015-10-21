@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 from . import scope
@@ -120,19 +121,38 @@ class BajinsheClientAuthForm(forms.Form):
 
     def clean(self):
         data = self.cleaned_data
+        client = Client.objects.filter(client_id=data.get('client_id')).first()
+        if client:
+            client_secret = client.client_secret
+            sign = hashlib.md5(data.get('client_id')+str(data.get('usn'))+client_secret).hexdigest()
+            if sign == data.get('signature'):
+                data['client'] = client
+                return data
+
+        raise forms.ValidationError(_("Client could not be validated with "
+                                    "key pair."))
+
+
+class UserAuthForm(forms.Form):
+    """
+    User authentication form. Required to make sure that we're dealing with a
+    real client. Form is used in :attr:`provider.oauth2.backends` to validate
+    the user.
+    """
+    p_user_id = forms.IntegerField()
+    usn = forms.IntegerField()
+
+    def clean(self):
+        data = self.cleaned_data
         try:
-            client = Client.objects.filter(client_id=data.get('client_id')).first()
-        except Client.DoesNotExist:
-            raise forms.ValidationError(_("Client could not be validated with "
-                                        "key pair."))
-        client_secret = client.client_secret
-        sign = hashlib.md5(str(self.client_id)+str(self.usn)+client_secret).hexdigest()
-        if sign == self.signature:
-            data['client'] = client
-            return data
-        else:
-            raise forms.ValidationError(_("Client could not be validated with "
-                                        "key pair."))
+            user = User.objects.get(id=data.get('p_user_id'),
+                                    wanglibaouserprofile__phone=data.get('usn'),
+                                    )
+        except User.DoesNotExist:
+            raise forms.ValidationError(_("p_user_id could not be validated."))
+
+        data['user'] = user
+        return data
 
 
 class ScopeChoiceField(forms.ChoiceField):

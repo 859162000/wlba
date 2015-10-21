@@ -22,11 +22,10 @@ from wanglibao_banner.views import HiringView, AboutView, CompanyView, TeamView,
 
 from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
-from marketing.views import NewsListView, NewsDetailView, AppShareViewShort
+from marketing.views import NewsListView, NewsDetailView
 from wanglibao_activity.decorators import decorator_include
 from wanglibao_activity.decorators import wap_activity_manage
 from wanglibao.views import landpage_view
-from wanglibao_sms.views import ArriveRate
 
 admin.site = AdminSitePlus()
 admin.autodiscover()
@@ -62,7 +61,8 @@ urlpatterns = patterns(
     url(r'^' + settings.ADMIN_ADDRESS + '/', include('weixin.admin_urls')),
     url(r'^' + settings.ADMIN_ADDRESS + '/', include(admin.site.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
+    # url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2')),
+    url(r'^oauth2/', include('wanglibao_oauth2.urls', namespace='oauth2')),
     url(r'^accounts/', include('wanglibao_account.urls')),
     url(r'^shumi/', include('shumi_backend.urls')),
     url(r'^pay/', include('wanglibao_pay.urls')),
@@ -154,16 +154,6 @@ urlpatterns += patterns(
 
     url(r'^api/zhongniu/products/', ZhongniuP2PQuery.as_view()),
     url(r'^api/zhongniu/getData/$', ZhongniuP2PDataQuery.as_view()),
-
-    url(r'^AK7WtEQ4Q9KPs8Io_zOncw/wanglibao_sms/arrive_rate/$', ArriveRate.as_view(), name='arrive_rate'),
-
-    url(r'^aws/$', AppShareViewShort.as_view(), name="app_share"),
-)
-
-# 短信
-urlpatterns += patterns(
-    '',
-    url(r'wanglibao_sms/', include('wanglibao_sms.urls'))
 )
 
 # 微信

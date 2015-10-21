@@ -39,7 +39,7 @@ that are meant for client (as defined in :rfc:`1`) interaction.
 from django.conf.urls import patterns, url
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-from .views import Authorize, Redirect, Capture, AccessTokenView
+from .views import Authorize, Redirect, Capture, AccessTokenView, BajinsheAccessTokenView
 
 
 urlpatterns = patterns('',
@@ -54,5 +54,8 @@ urlpatterns = patterns('',
         name='redirect'),
     url('^access_token/?$',
         csrf_exempt(AccessTokenView.as_view()),
+        name='access_token'),
+    url('^bajinshe/access_token/?$',
+        csrf_exempt(BajinsheAccessTokenView.as_view()),
         name='access_token'),
 )
