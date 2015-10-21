@@ -61,10 +61,10 @@ urlpatterns = patterns(
             "template_name": "login_test.jade",
             "authentication_form": EmailOrPhoneAuthenticationForm,
         }, name="auth_login"),
-
-    url(r'^/token_login/$', 'django.contrib.auth.views.login',
+    url(r'^token/login/ajax/$', 'wanglibao_account.views.ajax_token_login'),
+    url(r'^token_login/$', 'django.contrib.auth.views.login',
         {
-            "template_name": "login_test.jade",
+            "template_name": "token_test.jade",
             "authentication_form": TokenSecretSignAuthenticationForm,
         }, name="token_login"),
 
