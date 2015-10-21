@@ -138,7 +138,9 @@ def send_income_message_sms():
             user_info = User.objects.filter(id=income.get('user'))\
                 .select_related('user__wanglibaouserprofile').values('wanglibaouserprofile__phone')
             phones_list.append(user_info[0].get('wanglibaouserprofile__phone'))
-            messages_list.append(messages.sms_income(income.get('invite__count'), income.get('earning__sum')))
+            messages_list.append(messages.sms_income(user_info[0].get('wanglibaouserprofile__name'),
+                                                     income.get('invite__count'),
+                                                     income.get('earning__sum')))
 
             # 发送站内信
             title, content = messages.msg_give_income(income.get('invite__count'), income.get('earning__sum'))
@@ -182,8 +184,9 @@ def check_invested_status(delta=timezone.timedelta(days=3)):
             print e
             pass
     send_messages.apply_async(kwargs={
-        "phones": phones_list,
-        "messages": [messages.user_invest_alert()]
+        'phones': phones_list,
+        'messages': [messages.user_invest_alert()],
+        'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
     })
 
 
@@ -218,8 +221,9 @@ def check_redpack_status(delta=timezone.timedelta(days=50)):
             print e
             pass
     send_messages.apply_async(kwargs={
-        "phones": phones_list,
-        "messages": messages_list,
+        'phones': phones_list,
+        'messages': messages_list,
+        'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
     })
 
 
