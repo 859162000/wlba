@@ -9,12 +9,31 @@ org.mmIndex = (function(org){
         _fetchPack: function(){
             var
                 $submit  = $('.maimai-form-btn'),
-                phoneVal = $('input[name=phone]'),
+                $phoneVal = $('input[name=phone]'),
                 $sign =  $('.maimai-form-sign'),
-                $nbsp = $('.maimai-sign-margin');
+                $nbsp = $('.maimai-sign-margin'),
+                scrollTimer = null;
+
+            //listen input
+            $phoneVal.on('input',function(){
+                var _ = $(this);
+                if (scrollTimer) {
+                    clearTimeout(scrollTimer)
+                }
+                scrollTimer = setTimeout(function(){
+                    var phone = _.val();
+                    if(lib._checkPhone(phone)){
+                        _.addClass('maimai-load');
+                        lib.user_exists(phone)
+                    }else{
+                        _.removeClass('maimai-load');
+                    }
+
+                }, 350);
+            });
 
             $submit.on('click', function(){
-                phone = phoneVal.val();
+                phone = $phoneVal.val();
 
                 if(lib._checkPhone(phone)){
                   $sign.hide();
@@ -24,10 +43,26 @@ org.mmIndex = (function(org){
                   $nbsp.hide();
                   return
                 }
-              //$(this).addClass('btn-activity')
+              $(this).addClass('btn-activity')
             });
 
         },
+        user_exists :function(identifier){
+            org.ajax({
+                url:'/api/user_exists/' + identifier + '/',
+                success: function(data){
+                    console.log(data)
+                    if(data.existing){
+                        console.log(data.existing)
+                        $('.maimai-form').removeAttr('disabled');
+                    }
+                },
+                error: function (data) {
+                    console.log(data)
+                }
+            })
+        },
+
         _checkPhone : function(val){
             var isRight = false,
                 $sign = $('.phone-sign'),

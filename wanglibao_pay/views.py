@@ -44,7 +44,7 @@ from wanglibao.const import ErrorNumber
 from wanglibao_sms.utils import validate_validation_code
 from django.conf import settings
 from wanglibao_announcement.utility import AnnouncementAccounts
-#from wanglibao_account.forms import verify_captcha
+# from wanglibao_account.forms import verify_captcha
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -256,9 +256,14 @@ class WithdrawCompleteView(TemplateView):
 
             pay_info.save()
 
+            # 短信通知添加用户名
+            user = request.user
+            name = user.wanglibaouserprofile.name or u'用户'
+
             send_messages.apply_async(kwargs={
                 'phones': [request.user.wanglibaouserprofile.phone],
-                'messages': [messages.withdraw_submitted(amount, timezone.now())]
+                # 'messages': [messages.withdraw_submitted(amount, timezone.now())]
+                'messages': [messages.withdraw_submitted(name)]
             })
             title, content = messages.msg_withdraw(timezone.now(), amount)
             inside_message.send_one.apply_async(kwargs={
@@ -432,6 +437,11 @@ class WithdrawTransactions(TemplateView):
                         "content": content,
                         "mtype": "withdraw"
                     })
+                    send_messages.apply_async(kwargs={
+                        "phones": [payinfo.user.wanglibaouserprofile.phone],
+                        "messages": [messages.withdraw_confirmed(payinfo.user.wanglibaouserprofile.name,
+                                                                 payinfo.amount)]
+                    })
             return HttpResponse({
                 u"所有的取款请求已经处理完毕 %s" % uuids_param
             })
@@ -472,9 +482,13 @@ class WithdrawRollback(TemplateView):
         payinfo.confirm_time = None
         payinfo.save()
 
+        # 短信通知添加用户名
+        user = request.user
+        name = user.wanglibaouserprofile.name or u'用户'
+
         send_messages.apply_async(kwargs={
             "phones": [payinfo.user.wanglibaouserprofile.phone],
-            "messages": [messages.withdraw_failed(error_message)]
+            "messages": [messages.withdraw_failed(name, error_message)]
         })
 
         title, content = messages.msg_withdraw_fail(timezone.now(), payinfo.amount)
@@ -693,13 +707,25 @@ class BindPayView(APIView):
         result = pay.pre_pay(request)
         return Response(result)
 
-class BindPayCallbackView(APIView):
-    permission_classes = (IsAuthenticated, )
+class KuaiShortPayCallbackView(APIView):
+    """
+    快付TR3应答API
+    """
+    permission_classes = ()
 
     def post(self, request):
-        pay = third_pay.KuaiPay()
-        result = pay.pay_callback(request)
+        pay = third_pay.KuaiShortPay()
+        pm = pay.handle_pay_result(request.body)
+        result = pay.pay_callback(pm['user_id'],
+                                  pm['amount'],
+                                  pm['ret_code'],
+                                  pm['message'],
+                                  pm['order_id'],
+                                  pm['ref_number'],
+                                  pm['res_content'],
+                                  pm['signature'])
         return Response(result)
+
 
 class BindPayDynNumView(APIView):
     permission_classes = (IsAuthenticated, )
@@ -775,10 +801,15 @@ class WithdrawAPIView(APIView):
     @require_trade_pwd
     def post(self, request):
         result = third_pay.withdraw(request)
+
+        # 短信通知添加用户名
+        user = request.user
+        name = user.wanglibaouserprofile.name or u'用户'
+
         if not result['ret_code']:
             send_messages.apply_async(kwargs={
                 'phones': [result['phone']],
-                'messages': [messages.withdraw_submitted(result['amount'], timezone.now())]
+                'messages': [messages.withdraw_submitted(name)]
             })
 
             title, content = messages.msg_withdraw(timezone.now(), result['amount'])

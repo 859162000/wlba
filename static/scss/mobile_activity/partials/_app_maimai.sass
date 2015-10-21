@@ -28,6 +28,7 @@
   color: $color
   -webkit-transition: all 1s
   margin: 0 auto
+  border: 0
   //&:hover
     box-shadow: 0 0 100rem rgba(0,0,0,.2) inset
 
@@ -45,7 +46,15 @@
 
 .maimai-form
   padding: 4rem 2rem
+  .maimai-form-btn
+    +btn(#2380c4, #fff)
 
+  input[name='submit']
+    &:disabled
+      +btn(#b4d2e7, #fff)
+.maimai-check-body
+  height: 0
+  overflow: hidden
 .maimai-phone
   border: none
   -webkit-appearance: none
@@ -60,6 +69,12 @@
   text-align: center
   border-radius: .3rem
   padding: 0 .25rem 0 1.8rem
+.maimai-load
+  @extend .maimai-phone
+  background: url("/static/imgs/mobile_activity/app_maimai/load.gif") no-repeat
+  background-size: .9rem
+  background-position: .4rem center
+  background-color: #fff
 .maimai-form-sign
   margin: .5rem 0
   text-align: center
@@ -67,9 +82,13 @@
   font-size: .6rem
   display: none
 
+
+
+
 .maimai-form-margin
   height: .7rem
   width: 100%
+
 
 .phone-check
   display: -webkit-box
@@ -93,9 +112,6 @@
     border-radius: .3rem
     border: 0
     margin-left: .25rem
-
-.maimai-form-btn
-  +btn(#2380c4, #fff)
 
 
 .maimai-itme

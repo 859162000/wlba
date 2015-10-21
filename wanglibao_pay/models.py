@@ -119,6 +119,11 @@ class PayInfo(models.Model):
         ("app", "App"), #app取现使用
         ("kuaipay", "Kuaipay") #快钱
     ))
+    device = models.CharField(u'设备类型', max_length=20, blank=True, default='', choices=(
+        ('pc', 'pc'),
+        ('android', 'android'),
+        ('ios', 'ios')
+    ))
 
     def __unicode__(self):
         return u'%s' % self.pk
@@ -126,6 +131,15 @@ class PayInfo(models.Model):
     def toJSON(self):
         import simplejson
         return simplejson.dumps(dict([(attr, getattr(self, attr)) for attr in [f.name for f in self._meta.fields]]))
+
+    def save_error(self, error_code, error_message, is_inner_error=False):
+        self.error_code = str(error_code)
+        self.error_message = error_message
+        if is_inner_error:
+            self.status = self.EXCEPTION
+        else:
+            self.status = self.FAIL
+        self.save()
 
 
 class PayResult(object):
