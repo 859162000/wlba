@@ -602,10 +602,20 @@ CELERYBEAT_SCHEDULE = {
         'task': 'wanglibao_sms.tasks.message_arrived_rate_task',
         'schedule': timedelta(minutes=10),
     },
-    # by Zhoudong 发送短信时间统计
+    # by Zhoudong 短信到达率统计
     'message_arrived_rate_check': {
         'task': 'wanglibao_sms.tasks.check_arrived_rate_task',
         'schedule': crontab(minute=0, hour=0),
+    },
+    # by Zhoudong 定期检查没有投资的新用户, 提醒投资
+    'invested_status_task_check': {
+        'task': 'marketing.tools.check_invested_status',
+        'schedule': crontab(minute=0, hour=10),
+    },
+    # by Zhoudong 定期检查用户优惠券没使用,发送提醒
+    'redpack_status_task_check': {
+        'task': 'marketing.tools.check_redpack_status',
+        'schedule': crontab(minute=0, hour=11),
     },
 }
 

@@ -15,14 +15,14 @@ logger = logging.getLogger(__name__)
 def generate_validate_code():
     return "%d" % (random.randrange(100000, 1000000))
 
-#channel sms, 0:auto 1:mandao 2:yimei
+
+# channel sms, 0:auto 1:mandao 2:yimei
 def send_messages(phones, messages, channel=0, ext=''):
     # short_message = ShortMessage()
-
     if channel == 0:
         status, context = backends.ManDaoSMSBackEnd.send_messages(phones, messages, ext)
         channel_val = u"慢道"
-        #失败使用emay重发
+        # 失败使用emay重发
         if status != 200:
             status, context = backends.EmaySMS.send_messages(phones, messages)
             channel_val = u"亿美"
@@ -42,7 +42,7 @@ def send_messages(phones, messages, channel=0, ext=''):
     arr = []
     if len(phones) != len(messages):
         messages = messages * len(phones)
-    for k,phone in enumerate(phones):
+    for k, phone in enumerate(phones):
         arr.append(
             ShortMessage(phones=phone, contents=messages[k], channel=channel_val, status=result, context=context)
         )
@@ -53,8 +53,10 @@ def send_messages(phones, messages, channel=0, ext=''):
 def send_sms(phone, message):
     return send_messages([phone], [message])
 
+
 def send_rand_pass(phone, password):
     return send_messages([phone], [messages.rand_pass(password)])
+
 
 def check_rate(ip):
     if not ip:
@@ -80,6 +82,7 @@ def check_rate(ip):
             rate.last_send_time = now
         rate.save()
         return True
+
 
 def send_validation_code(phone, validate_code=None, ip=""):
     if validate_code is None:

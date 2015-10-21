@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 import logging
+from django.contrib.auth.models import User
 
 from django.db import transaction
 from django.utils import timezone
@@ -209,6 +210,7 @@ class P2POperator(object):
             raise P2PException(u'产品状态(%s)不是(满标已审核)' % product.status)
 
         phones = []
+        messages_list = []
         user_ids = []
         with transaction.atomic():
             for equity in product.equities.all():
@@ -217,13 +219,16 @@ class P2POperator(object):
 
                 user_ids.append(equity.user.id)
                 phones.append(equity.user.wanglibaouserprofile.phone)
+                name = equity.user.wanglibaouserprofile.name
+                messages_list.append(messages.product_settled(name, equity, product, timezone.now()))
+
             product.status = u'还款中'
             product.save()
 
         phones = {}.fromkeys(phones).keys()
         send_messages.apply_async(kwargs={
             "phones": phones,
-            "messages": [messages.product_settled(product, timezone.now())]
+            "messages": messages_list,
         })
 
         user_ids = {}.fromkeys(user_ids).keys()
@@ -256,6 +261,7 @@ class P2POperator(object):
         cls.logger.info(u"Product [%d] [%s] not able to reach 100%%" % (product.id, product.name))
         user_ids = []
         phones = []
+        messages_list = []
 
         with transaction.atomic():
             for equity in product.equities.all():
@@ -264,6 +270,7 @@ class P2POperator(object):
 
                 user_ids.append(equity.user.id)
                 phones.append(equity.user.wanglibaouserprofile.phone)
+                messages_list.append(messages.product_failed(equity.user.wanglibaouserprofile.name, product))
             ProductKeeper(product).fail()
 
         phones = {}.fromkeys(phones).keys()
@@ -271,7 +278,7 @@ class P2POperator(object):
         if phones:
             send_messages.apply_async(kwargs={
                 "phones": phones,
-                "messages": [messages.product_failed(product)]
+                "messages": messages_list,
             })
 
             matches = re.search(u'日计息', product.pay_method)
