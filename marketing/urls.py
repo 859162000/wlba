@@ -3,7 +3,7 @@ from django.views.generic import TemplateView, RedirectView
 from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
-from wanglibao.views import BaiduFinanceView
+# from wanglibao.views import BaiduFinanceView
 
 urlpatterns = patterns(
     '',
