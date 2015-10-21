@@ -657,9 +657,6 @@ class YeeShortPay:
             pay_info.save()
             OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
 
-            # 处理第三方渠道的用户充值回调
-            CoopRegister(request).process_for_recharge(request.user)
-
             if len(card_no) == 10:
                 # 直接支付交易，已经绑定了银行卡，直接进行支付操作
                 res = self._pay_request(request, order.id, card, pay_info)
@@ -672,10 +669,16 @@ class YeeShortPay:
                     pay_info.save()
                     return res
 
+                # 处理第三方渠道的用户充值回调
+                CoopRegister(request).process_for_recharge(request.user)
+
                 margin = Margin.objects.filter(user=user).first()
                 return {"ret_code": 22000, "message": u"充值申请已提交，请稍候查询余额。", "amount": amount, "margin": margin.margin}
 
             else:
+
+                # 处理第三方渠道的用户充值回调
+                CoopRegister(request).process_for_recharge(request.user)
 
                 return {"ret_code": 0, "message": "ok", "order_id": order.id, "token": request_id}
 
@@ -733,6 +736,9 @@ class YeeShortPay:
                 pay_info.response = res['data']
             pay_info.save()
             return res
+
+        # 处理第三方渠道的用户充值回调
+        CoopRegister(request).process_for_recharge(request.user)
 
         margin = Margin.objects.filter(user=user).first()
         return {"ret_code": 22000, "message": u"充值申请已提交，请稍候查询余额。", "amount": pay_info.amount, "margin": margin.margin}
