@@ -296,7 +296,10 @@ class YeePay:
         pay_info.save()
         if rs['ret_code'] == 0:
             device = split_ua(request)
-            tools.despoit_ok(pay_info, device)
+            try:
+                tools.deposit_ok.apply_async(kwargs={"user_id":pay_info.user.id, "amount":pay_info.amount, "device":device})
+            except:
+                pass
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs
 
@@ -767,7 +770,10 @@ class YeeShortPay:
 
         pay_info.save()
         if rs['ret_code'] == 0:
-            tools.despoit_ok(pay_info, device)
+            try:
+                tools.deposit_ok.apply_async(kwargs={"user_id":pay_info.user.id, "amount":pay_info.amount, "device":device})
+            except:
+                pass
 
             # 充值成功后，更新本次银行使用的时间
             if len(pay_info.card_no) == 10:
@@ -857,7 +863,13 @@ class YeeShortPay:
         pay_info.save()
         if rs['ret_code'] == 0:
             device = split_ua(request)
-            tools.despoit_ok(pay_info, device)
+            try:
+                try:
+                    tools.deposit_ok.apply_async(kwargs={"user_id":pay_info.user.id, "amount":pay_info.amount, "device":device})
+                except:
+                    pass
+            except:
+                pass
 
             # 充值成功后，更新本次银行使用的时间
             if len(pay_info.card_no) == 10:

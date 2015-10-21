@@ -3,7 +3,8 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 import simplejson
-from wanglibao_account.test_util import prepare_user_with_profile
+
+from wanglibao.test_util import prepare_user_with_profile
 from wanglibao_profile.backends import trade_pwd_set, trade_pwd_is_set, trade_pwd_check
 from wanglibao_profile.models import WanglibaoUserProfile
 

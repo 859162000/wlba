@@ -65,21 +65,21 @@ def idvalidate_ok(user_id, device):
     activity_backends.check_activity(user, 'validation', device_type)
     utils.log_clientinfo(device, "validation", user_id)
 
-
-def despoit_ok(pay_info, device):
+@app.task
+def deposit_ok(user_id, amount, device):
     try:
         device_type = device['device_type']
-        title, content = messages.msg_pay_ok(pay_info.amount)
+        title, content = messages.msg_pay_ok(amount)
         inside_message.send_one.apply_async(kwargs={
-            "user_id": pay_info.user.id,
+            "user_id": user_id,
             "title": title,
             "content": content,
             "mtype": "activityintro"
         })
-
-        activity_backends.check_activity(pay_info.user, 'recharge', device_type, pay_info.amount)
-        utils.log_clientinfo(device, "deposit", pay_info.user_id, pay_info.amount)
-    except Exception:
+        user = User.objects.get(id=user_id)
+        activity_backends.check_activity(user, 'recharge', device_type, amount)
+        utils.log_clientinfo(device, "deposit", user_id, amount)
+    except:
         pass
 
 
