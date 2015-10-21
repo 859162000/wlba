@@ -2186,8 +2186,12 @@ def zhongjin_get_products():
 
         # 从redis 读对应他们的id
         if not prod['method'] == 'add':
-            redis = redis_backend()
-            prod['productId'] = int(redis._get('wangli_id_'+str(product.pk)))
+            try:
+                redis = redis_backend()
+                prod['productId'] = int(redis._get('wangli_id_'+str(product.pk)))
+            except Exception, e:
+                print e
+                prod['productId'] = -1
 
         prod['productName'] = product.name
         prod['borrowMoney'] = product.total_amount
