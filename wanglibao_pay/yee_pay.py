@@ -744,12 +744,13 @@ class YeeShortPay:
         return {"ret_code": 22000, "message": u"充值申请已提交，请稍候查询余额。", "amount": pay_info.amount, "margin": margin.margin}
 
     @method_decorator(transaction.atomic)
-    def handle_margin(self, amount, order_id, user_id, ip, response_content, device):
+    def handle_margin(self, request, amount, order_id, user_id, ip, response_content, device):
         try:
             pay_info = PayInfo.objects.select_for_update().filter(order_id=order_id).first()
         except Exception:
             logger.error("orderId:%s, order not exist, handle margin, try error" % order_id)
             return {"ret_code": 20085, "message": "order not exist, handle margin, try error"}
+
         if not pay_info:
             return {"ret_code": 20131, "message": "order not exist"}
         if pay_info.status == PayInfo.SUCCESS:
