@@ -84,19 +84,22 @@ class PrepaymentHistory(object):
 
                 amortization_records.append(user_record)
 
-                #提前还款短信
+                # 提前还款短信
                 amo_amount = user_record.principal + user_record.interest + user_record.penal_interest
 
                 phone_list.append(user_amortization.user.wanglibaouserprofile.phone)
-                message_list.append(messages.product_prepayment(amortization.product, user_amortization.settlement_time, amo_amount))
+                message_list.append(messages.product_prepayment(user_amortization.user.wanglibaouserprofile.name,
+                                                                amortization.product,
+                                                                # user_amortization.settlement_time,
+                                                                amo_amount))
 
-                #提前还款站内信
-                title,content = messages.msg_bid_prepayment(pname, timezone.now(), amo_amount)
+                # 提前还款站内信
+                title, content = messages.msg_bid_prepayment(pname, timezone.now(), amo_amount)
                 inside_message.send_one.apply_async(kwargs={
-                    "user_id":user_amortization.user.id,
-                    "title":title,
-                    "content":content,
-                    "mtype":"amortize"
+                    "user_id": user_amortization.user.id,
+                    "title": title,
+                    "content": content,
+                    "mtype": "amortize"
                 })
 
             amortization_records.append(product_record)

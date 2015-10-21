@@ -647,7 +647,8 @@ org.detail = (function(org){
             lib._tab();
             lib._animate();
             lib._share();
-            lib.countDown.length > 0 && lib._countDown(lib.countDown)
+            lib.countDown.length > 0 && lib._countDown(lib.countDown);
+            lib._downPage();
         },
         /*
         * 页面动画
@@ -758,6 +759,27 @@ org.detail = (function(org){
             window['interval']= setInterval(function(){
                 TimeTo(endTimeList);
             },1000);
+        },
+        _downPage:function(){
+          var
+              u = navigator.userAgent,
+              ua = navigator.userAgent.toLowerCase(),
+              footer  =  document.getElementById('footer-down'),
+              isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1,
+              isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+          $('#down-btn').on('click',function(){
+            if (ua.match(/MicroMessenger/i) == "micromessenger") {
+                window.location.href = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao&g_f=991653';
+            }else{
+              if(isiOS){
+                window.location.href = 'https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8';
+              }else if(isAndroid) {
+                window.location.href = 'https://www.wanglibao.com/static/wanglibao1.apk';
+              }else{
+                window.location.href = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao&g_f=991653';
+              }
+            }
+          })
         }
     }
     return {

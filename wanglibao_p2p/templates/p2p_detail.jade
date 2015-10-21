@@ -20,7 +20,10 @@ html
       .p2p-container.dark-gray.border-all
         .span8.p2p-detail-container
           if p2p.category == '新手标'
-            .new-user 新手福利
+            .new-user
+          else
+              if p2p.is_app_exclusive
+                .app-icon
           .p2p-detail-bar.clearfix
             .row
               .span9
@@ -96,59 +99,79 @@ html
                     span.span4 已投资金额
                     span.span8-omega
                       span.dark-gray.font-m {{current_equity|money_format_int}}元
-
-                .row
-                  span.span4 可投资金额
-                  span.span8-omega
-                    span.dark-gray.font-m {{orderable_amount|money_format_int}}元
-                if orderable_amount > 0
-                  .form-row.form-row__middle
-                    span.span4 投资金额
-                    span.span8-omega
-                      .row
-                        period = p2p['period'] * 30
-                        if p2p.category == '票据'
-                          user_limit = u"1元起投"
-                        else
-                          user_limit = u"100的整数倍"
-                        -render_field form.amount class+="span12" type="text" style="line-height:40px" placeholder=user_limit activity-jiaxi='0' p2p-type=p2p.category data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning data-rate=p2p.expected_earning_rate data-period=p2p.period data-paymethod=p2p.pay_method activity-rate=p2p.activity.activity_rule_percent_text maxlength="8"
-                      .form-row-error
-
-                  if user.is_authenticated and red_packets > 0
-                    .row.margin-top-s
-                      span.span4 可用理财券
+                if p2p.is_app_exclusive
+                    .row.lineHeight20
+                      span.moneyT 可投资金额
                       span.span8-omega
-                        .red-pack
+                        span.dark-gray.font-m {{orderable_amount|money_format_int}}元
+                    p.app-remark 本标仅限网利宝APP可投 请扫码下载
+                    .ex-download-app.mg-t-sm.padding-sm
+                        img(src='/static/images/detail_erweima.jpg?v=20151019').dol-app.mg-r-sm
+                        .dol-btn
+                          .t-d4
+                            p.titles 网利宝APP
+                            p 随时随地 让钱生钱
+                          a(href='https://www.wanglibao.com/static/wanglibao1.apk').dol-btn-warp.mt16
+                            .span3.android-icon.bg-d8.t-d6
+                              i.icon.iconfont.icon-android
+                            .span9.btn-text.bg-d7.font-s.t-d11 Android版下载
+                          a(href='https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8').dol-btn-warp
+                            .span44.android-icon.bg-d9.t-d6
+                              i.icon.iconfont.icon-ios
+                            .span9.btn-text.bg-d7.font-s.t-d11 iPhone版下载
+                else
+                    .row
+                      span.span4 可投资金额
+                      span.span8-omega
+                        span.dark-gray.font-m {{orderable_amount|money_format_int}}元
+                    if orderable_amount > 0
+                      .form-row.form-row__middle
+                        span.span4 投资金额
+                        span.span8-omega
+                          .row
+                            period = p2p['period'] * 30
+                            if p2p.category == '票据'
+                              user_limit = u"1元起投"
+                            else
+                              user_limit = u"100的整数倍"
+                            -render_field form.amount class+="span12" type="text" style="line-height:40px" placeholder=user_limit activity-jiaxi='0' p2p-type=p2p.category data-max=orderable_amount data-role="p2p-calculator" fee-target="#xunlei-vip-income-head" data-target="#expected_income" data-total-earning=total_earning data-total-amount=p2p.total_amount data-existing=0 total-fee-earning=total_fee_earning data-rate=p2p.expected_earning_rate data-period=p2p.period data-paymethod=p2p.pay_method activity-rate=p2p.activity.activity_rule_percent_text maxlength="8"
+                          .form-row-error
 
-                  .row
-                    span.span4 预期收益
-                    span.span8-omega
-                      span.highlight.font-m.invest#expected_income 0.00
-                      | 元
-                      if p2p.activity
-                        if user.is_authenticated
-                          acStyle = 'display:inline-block'
-                        else
-                          acStyle = 'display:none'
-                      else
-                        acStyle = 'display:none'
-                      span#vip-income-warp(style="{{acStyle}}")
-                        span.font-m +&nbsp;
-                        span.blue.font-m#xunlei-vip-income-head 0.00
+                      if user.is_authenticated and red_packets > 0
+                        .row.margin-top-s
+                          span.span4 可用理财券
+                          span.span8-omega
+                            .red-pack
 
-                  .row.redpack_tip(style="line-height:24px")
-                    span.span12.payment(style="padding-left:24px;display:none")
-                    span.span12.blue.use-jiaxi(style="padding-left:24px;color:red;font-size:12px;display:none") 您已使用过&nbsp
-                      span.blue.use-jiaxi-amount
-                      |加息券，继续享有加息，不可使用其他理财券
-                  .row
-                    span.span4
-                      //author: hetao; time: 2014.10.11 target: 用户未登陆时先弹出登陆框
-                    span.span8-omega
-                      if user.is_authenticated
-                        a.submit-button.span12.button-primary.button-middle.invest#stop(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
-                      else
-                        a.submit-bu-20150818.span12.button-primary.button-middle.invest(href='/accounts/login/?next=/p2p/detail/{{p2p.id}}') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+                      .row
+                        span.span4 预期收益
+                        span.span8-omega
+                          span.highlight.font-m.invest#expected_income 0.00
+                          | 元
+                          if p2p.activity
+                            if user.is_authenticated
+                              acStyle = 'display:inline-block'
+                            else
+                              acStyle = 'display:none'
+                          else
+                            acStyle = 'display:none'
+                          span#vip-income-warp(style="{{acStyle}}")
+                            span.font-m +&nbsp;
+                            span.blue.font-m#xunlei-vip-income-head 0.00
+
+                      .row.redpack_tip(style="line-height:24px")
+                        span.span12.payment(style="padding-left:24px;display:none")
+                        span.span12.blue.use-jiaxi(style="padding-left:24px;color:red;font-size:12px;display:none") 您已使用过&nbsp
+                          span.blue.use-jiaxi-amount
+                          |加息券，继续享有加息，不可使用其他理财券
+                      .row
+                        span.span4
+                          //author: hetao; time: 2014.10.11 target: 用户未登陆时先弹出登陆框
+                        span.span8-omega
+                          if user.is_authenticated
+                            a.submit-button.span12.button-primary.button-middle.invest#stop(href='javascript:void(0)') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
+                          else
+                            a.submit-bu-20150818.span12.button-primary.button-middle.invest(href='/accounts/login/?next=/p2p/detail/{{p2p.id}}') 抢&nbsp;&nbsp;&nbsp;&nbsp;购
           if status != '抢购中'
             .sold-out
               p.align-center
@@ -362,7 +385,7 @@ html
             .space-vertical-s
 
     script.
-      require(['/static/js/p2p_detail.js?v=20150921'])
+      require(['/static/js/p2p_detail.js?v=20151015'])
     include global/g_footer
 
     include include/tracking

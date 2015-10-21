@@ -1,0 +1,125 @@
+- load formatters
+doctype html
+html(style="background:#fde59f")
+    head
+        meta(name="format-detection" content="telephone=no,email=no")
+        title 秒杀
+        meta(charset="utf-8")
+        meta(content="telephone=no,email=no" ,name="format-detection")
+        meta(content="yes" ,name="apple-mobile-web-app-capable")
+        script.
+            (function(){var b=navigator.userAgent;ipad=b.match(/(iPad).*OS\s([\d_]+)/)?true:false;iphone=!ipad&&b.match(/(iPhone\sOS)\s([\d_]+)/)?true:false;uc=navigator.userAgent.indexOf("UCBrowser")>-1?true:false;ios=ipad||iphone;var d=1,a=1,c;if(ios){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}else{if(uc){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}}c='<meta name="viewport" content="initial-scale='+d+", maximum-scale="+d+", minimum-scale="+d+', width=device-width, user-scalable=no" />';document.write(c);document.documentElement.style.fontSize=20*a+"px"})();
+        link(href="/static/styles/mobile_activity/app_seckill.css?v=20151019", rel="stylesheet")
+        body
+            .seckill
+                .banner
+                    img(src='/static/imgs/mobile_activity/seckill/banner.jpg?v=20151019')
+                    a(href='javascript:void(0)')#page1
+                .content
+                    .part1#page1Pos
+                        span.p1
+                        .part1C
+                            p.part1F 10月23日加息
+                              em 秒杀日
+                            p 单笔投资满额5万，立送2%加息券一张！限时限量尖叫来袭！
+                    .page1
+                        img(src='/static/imgs/mobile_activity/seckill/page1.jpg?v=20151019')
+                        p 备注：新老用户均可参与，加息券有效期1天，不限起投门
+                        p 槛，一券一标永久加息。满额投资多投多送哦！
+                        p
+                            span.ruleF 加息券规则 >>
+                    .pageRemark.ruleC
+                        .borderS
+                        .remarkC
+                            p
+                                span 1.
+                                label 用户单笔投资满额5万元，即可获得一张2%加息券，加息券使用不限平台均可使用，有效期限活动当日有效，过期不补；
+                            p
+                                span 2.
+                                label 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+                            p
+                                span 3.
+                                label 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+                            p
+                                span 4.
+                                label 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+                            p
+                                span 5.
+                                label 使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+                    .part1.mt
+                        span.p2
+                        .part1C.part2 今天
+                            em 领取加息券
+                            | 的人
+                    .part2Img
+                        img(src='/static/imgs/mobile_activity/seckill/page2.jpg')
+                    p.pop 理财专区即可投资
+                    p.titleStyleBg
+                        span 加息券使用流程
+                    .national_flow.clear
+                      .flow1
+                        .flow_border
+                        .flow_xian
+                        .flowbox.flowbox1
+                        span.flowtext
+                            p 投资获得
+                            p 加息券
+                      .flow1
+                        .flow_border
+                        .flow_xian
+                        .flowbox.flowbox2
+                        span.flowtext
+                            p 投标选择
+                            p 使用
+                      .flow1
+                        .flow_border
+                        .flow_xian
+                        .flowbox.flowbox3
+                        span.flowtext
+                            p 投标成功
+                            p 加息生效
+                      .flow1
+                        .flow_border
+                        .flow_xian
+                        .flowbox.flowbox4
+                        span.flowtext
+                            p 获得收益
+                            p 和奖励
+                        .flow_border2
+                    p.titleStyleBg
+                        span 活动规则
+                    .ruleContent
+                        p
+                            span 1.
+                            span.item-list 活动日期：仅限10月23日0:00-23:59全天参与抢投赢取；
+                        p
+                            span 2.
+                            span.item-list 用户单笔投资满额5万元，即可获得一张2%加息券，加息券使用不限平台均可使用，有效期限领取日当日有效，过期不补；
+                        p
+                            span 3.
+                            span.item-list 加息券统一会以站内信通知，收到后可立即使用。详情请看
+                                           br
+                                           em.ruleF2 加息券使用规则；
+                        p
+                            span 4.
+                            span.item-list 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑。
+                        .jiaxiRule.ruleC2
+                            p
+                                span 1.
+                                span.item-list 用户单笔投资满额5万元，即可获得一张2%加息券，加息券使用不限平台均可使用，有效期限活动当日有效，过期不补；
+                            p
+                                span 2.
+                                span.item-list 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+                            p
+                                span 3.
+                                span.item-list 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+                            p
+                                span 4.
+                                span.item-list 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+                            p
+                                span 5.
+                                span.item-list 使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+                        .pops * 网利宝对此活动享有最终解释权
+                .footerDiv
+                    img(src='/static/imgs/mobile_activity/seckill/foot.png')
+                script(src="/static/scripts/mobile_activity/seckill.js")

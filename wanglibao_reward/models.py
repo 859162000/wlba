@@ -73,7 +73,7 @@ class WanglibaoUserGift(models.Model):
     index = models.IntegerField(default=0, verbose_name=u'特定活动内的奖品编号')
     type = models.IntegerField(choices=TYPE, default=0, verbose_name=u'奖品类型')
     name = models.CharField(max_length=128, default=u'红包', verbose_name=u'奖品名称', help_text=u'例如：红包、加息券、优惠券等')
-    valid = models.BooleanField(default=1, choices=SEND, verbose_name=u'奖品是否已发')
+    valid = models.IntegerField(default=1, choices=SEND, verbose_name=u'奖品是否已发')
     amount = models.FloatField(default=0, verbose_name=u'奖品额度')
     get_time = models.DateTimeField(auto_now_add=True, verbose_name=u'用户领奖的时间')
 
@@ -81,6 +81,13 @@ class WanglibaoUserGift(models.Model):
         verbose_name = u'用户活动获奖记录'
         verbose_name_plural = u'用户活动获奖记录'
 
+class WanglibaoActivityGiftOrder(models.Model):
+    valid_amount = models.IntegerField(default=0, verbose_name=u'此次分享剩余的抽奖机会')
+    order_id = models.IntegerField(default=0, verbose_name=u'订单号')
+
+    class Meta:
+        verbose_name = u'订单分享表'
+        verbose_name_plural = u'订单分享表'
 
 class WanglibaoWeixinRelative(models.Model):
     """

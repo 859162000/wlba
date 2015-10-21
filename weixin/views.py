@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_buy.models import FundHoldInfo
 from wanglibao_banner.models import Banner
-from wanglibao_p2p.models import P2PProduct, P2PEquity
+from wanglibao_p2p.models import P2PProduct, P2PEquity, Attachment
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_margin.models import Margin
 from wanglibao_redpack import backends
@@ -32,7 +32,7 @@ from wanglibao_reward.models import WanglibaoUserGift, WanglibaoWeixinRelative, 
 from weixin.wechatpy.oauth import WeChatOAuth
 from weixin.common.decorators import weixin_api_error
 from weixin.common.wx import generate_js_wxpay
-from .models import Account, WeixinUser, WeixinAccounts
+from .models import Account, WeixinUser, WeixinAccounts, AuthorizeInfo
 from .common.wechat import tuling
 from decimal import Decimal
 from wanglibao_pay.models import Card
@@ -45,9 +45,15 @@ import time
 import uuid
 import urllib
 import math
-import  logging
+import logging
+from django.core.paginator import Paginator
+from django.core.paginator import PageNotAnInteger
+from wanglibao_p2p.views import get_p2p_list
+from wanglibao_redis.backend import redis_backend
+import pickle
 
 logger = logging.getLogger('wanglibao_reward')
+
 
 class WeixinJoinView(View):
     account = None
@@ -306,14 +312,30 @@ class P2PListView(TemplateView):
     template_name = 'weixin_list.jade'
 
     def get_context_data(self, **kwargs):
-        p2p_lists = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now()).filter(status__in=[
-            u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'
-        ]).exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标')).order_by('-priority', '-publish_time')[:10]
+        p2p_products = []
+
+        p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list = get_p2p_list()
+
+        p2p_products.extend(p2p_done_list)
+        p2p_products.extend(p2p_full_list)
+        p2p_products.extend(p2p_repayment_list)
+        p2p_products.extend(p2p_finished_list)
+
+        limit = 10
+        paginator = Paginator(p2p_products, limit)
+        page = self.request.GET.get('page')
+
+        try:
+            p2p_products = paginator.page(page)
+        except PageNotAnInteger:
+            p2p_products = paginator.page(1)
+        except Exception:
+            p2p_products = paginator.page(paginator.num_pages)
 
         banner = Banner.objects.filter(device='weixin', type='banner', is_used=True).order_by('-priority')
 
         return {
-            'results': p2p_lists,
+            'results': p2p_products[:10],
             'banner': banner,
         }
 
@@ -341,17 +363,30 @@ class P2PListWeixin(APIView):
 
     def get(self, request):
 
+        p2p_products = []
+
+        p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list = get_p2p_list()
+
+        p2p_products.extend(p2p_done_list)
+        p2p_products.extend(p2p_full_list)
+        p2p_products.extend(p2p_repayment_list)
+        p2p_products.extend(p2p_finished_list)
+
         page = request.GET.get('page', 1)
         pagesize = request.GET.get('pagesize', 10)
         page = int(page)
         pagesize = int(pagesize)
 
-        p2p_lists = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now())\
-            .filter(status__in=[u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标'])\
-            .exclude(Q(category=u'票据') | Q(category=u'酒仙众筹标'))\
-            .order_by('-priority', '-publish_time')[(page-1)*pagesize:page*pagesize]
+        paginator = Paginator(p2p_products, pagesize)
 
-        html_data = _generate_ajax_template(p2p_lists, 'include/ajax/ajax_list.jade')
+        try:
+            p2p_products = paginator.page(page)
+        except PageNotAnInteger:
+            p2p_products = paginator.page(1)
+        except Exception:
+            p2p_products = paginator.page(paginator.num_pages)
+
+        html_data = _generate_ajax_template(p2p_products, 'include/ajax/ajax_list.jade')
 
         return Response({
             'html_data': html_data,
@@ -376,27 +411,36 @@ class P2PDetailView(TemplateView):
     def get_context_data(self, id, **kwargs):
         context = super(P2PDetailView, self).get_context_data(**kwargs)
 
-        try:
-            p2p = P2PProduct.objects.select_related('activity').exclude(status=u'流标').exclude(status=u'录标')\
-                .get(pk=id, hide=False)
-
-            if p2p.soldout_time:
-                end_time = p2p.soldout_time
-            else:
-                end_time = p2p.end_time
-        except P2PProduct.DoesNotExist:
+        # try:
+        #     p2p = P2PProduct.objects.select_related('activity').exclude(status=u'流标').exclude(status=u'录标')\
+        #         .get(pk=id, hide=False)
+        #
+        #     if p2p.soldout_time:
+        #         end_time = p2p.soldout_time
+        #     else:
+        #         end_time = p2p.end_time
+        # except P2PProduct.DoesNotExist:
+        #     raise Http404(u'您查找的产品不存在')
+        cache_backend = redis_backend()
+        p2p = cache_backend.get_cache_p2p_detail(id)
+        if not p2p:
             raise Http404(u'您查找的产品不存在')
 
-        terms = get_amortization_plan(p2p.pay_method).generate(p2p.total_amount,
-                                                               p2p.expected_earning_rate / 100,
+        if p2p['soldout_time']:
+            end_time = p2p['soldout_time']
+        else:
+            end_time = p2p['end_time']
+
+        terms = get_amortization_plan(p2p['pay_method']).generate(p2p['total_amount'],
+                                                               p2p['expected_earning_rate'] / 100,
                                                                datetime.datetime.now(),
-                                                               p2p.period)
-        total_earning = terms.get('total') - p2p.total_amount
+                                                               p2p['period'])
+        total_earning = terms.get('total') - p2p['total_amount']
         total_fee_earning = 0
 
-        if p2p.activity:
-            total_fee_earning = Decimal(p2p.total_amount * p2p.activity.rule.rule_amount *
-                                        (Decimal(p2p.period) / Decimal(12))).quantize(Decimal('0.01'))
+        if p2p['activity']:
+            total_fee_earning = Decimal(p2p['total_amount'] * p2p['activity']['activity_rule_amount'] *
+                                        (Decimal(p2p['period']) / Decimal(12))).quantize(Decimal('0.01'))
 
         user_margin = 0
         current_equity = 0
@@ -404,16 +448,16 @@ class P2PDetailView(TemplateView):
         user = self.request.user
         if user.is_authenticated():
             user_margin = user.margin.margin
-            equity_record = p2p.equities.filter(user=user).first()
+            equity_record = P2PEquity.objects.filter(product=p2p['id']).filter(user=user).first()
             if equity_record is not None:
                 current_equity = equity_record.equity
 
             device = utils.split_ua(self.request)
-            result = backends.list_redpack(user, 'available', device['device_type'], p2p.id)
+            result = backends.list_redpack(user, 'available', device['device_type'], p2p['id'])
             redpacks = result['packages'].get('available', [])
 
-        orderable_amount = min(p2p.limit_amount_per_user - current_equity, p2p.remain)
-        total_buy_user = P2PEquity.objects.filter(product=p2p).count()
+        orderable_amount = min(p2p['limit_amount_per_user'] - current_equity, p2p['remain'])
+        total_buy_user = P2PEquity.objects.filter(product=p2p['id']).count()
 
         amount = self.request.GET.get('amount', 0)
         amount_profit = self.request.GET.get('amount_profit', 0)
@@ -424,7 +468,7 @@ class P2PDetailView(TemplateView):
             'orderable_amount': orderable_amount,
             'total_earning': total_earning,
             'current_equity': current_equity,
-            'attachments': p2p.attachment_set.all(),
+            'attachments': p2p['attachments'],
             'total_fee_earning': total_fee_earning,
             'total_buy_user': total_buy_user,
             'margin': float(user_margin),
@@ -677,6 +721,36 @@ class WeixinAccountBankCardAdd(TemplateView):
             'banks': banks,
         }
 
+import time
+class AuthorizeCode(APIView):
+    permission_classes = ()
+
+    def get(self, request):
+        account_id = self.request.GET.get('state')
+        try:
+            account = Account.objects.get(pk=account_id)
+        except Account.DoesNotExist:
+            return HttpResponseNotFound()
+        auth = request.GET.get('auth')
+        redirect_uri = settings.WEIXIN_CALLBACK_URL + reverse("weixin_authorize_user_info")
+        count = 0
+        for key in request.GET.keys():
+            if key == u'state':
+                continue
+            if count == 0:
+                redirect_uri += '?%s=%s'%(key, request.GET.get(key))
+            else:
+                redirect_uri += "&%s=%s"%(key, request.GET.get(key))
+            count += 1
+
+        # print redirect_uri
+        if auth and auth=='1':
+            oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, scope='snsapi_userinfo', state=account_id)
+        else:
+            oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, state=account_id)
+        # print oauth.authorize_url
+        return redirect(oauth.authorize_url)
+
 
 class AuthorizeUser(APIView):
     permission_classes = ()
@@ -686,66 +760,104 @@ class AuthorizeUser(APIView):
             account = Account.objects.get(pk=account_id)
         except Account.DoesNotExist:
             return HttpResponseNotFound()
+        redirect_uri = self.request.GET.get('redirect_uri')
+        redirect_url = ''
+        if redirect_uri:
+            redirect_url = urllib.unquote(redirect_uri)
+        if not redirect_url:
+            return Response({'errcode':-1,  'errmsg':'need a redirect_uri'})
         code = request.GET.get('code')
-        url_id = request.GET.get('url_id')
         oauth = WeChatOAuth(account.app_id, account.app_secret, )
         if code:
-            res = oauth.fetch_access_token(code)
-            openid=res.get('openid')
-            nick_name=""
-            head_img_url=""
-            user_info = {}
             try:
-                wx_user = WanglibaoWeixinRelative.objects.filter(openid=openid)
-                if wx_user.exists():
-                    phone = wx_user.first().phone
-                    logger.debug("获得用户授权openid is: %s, phone is :%s" %(openid,phone))
-                    logger.debug("product id:%s" %(url_id))
-                    user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=url_id, identity=phone,).first()
-                    logger.debug("用户抽奖信息是：%s" % (user_gift,))
-                    counts = WanglibaoActivityGift.objects.filter(gift_id=url_id, valid=False).count()
-                    logger.debug("奖品有 %s 个已经被不同用户领走了" %(counts, ))
-                    if counts == 10:
-                        if user_gift:
-                            logger.debug(u"用户已经令完奖品，而且所有的奖品已经发放完毕")
-                            return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, url_id))
-                        else:
-                            logger.debug(u"所有的奖品已经发完，该用户没有领到奖品")
-                            return redirect("/weixin_activity/share/end/")
-
-                    if user_gift and phone:
-                        #如果用户已经了，直接跳转到详情页
-                        logger.debug("openid:%s, phone:%s, product_id:%s,用户已经存在了，直接跳转页面" %(openid, phone, url_id,))
-                        return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, url_id))
-                    else:
-                        return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,base64.b64encode(nick_name),head_img_url))
-                else:
-                    user_info = oauth.get_user_info(openid, res.get('access_token'))
-                    nick_name = user_info['nickname']
-                    head_img_url = user_info['headimgurl']
-                    self.request.session['nick_name']=nick_name
+                res = oauth.fetch_access_token(code)
             except WeChatException, e:
-                auth_code_url = reverse("weixin_authorize_code")+'?auth=1&state=%s&url_id=%s'%(account_id, url_id)
-                return redirect(auth_code_url)
-            return redirect(reverse('weixin_share_order_gift')+'?url_id=%s&openid=%s&nick_name=%s&head_img_url=%s'%(url_id,openid,nick_name,head_img_url))
+                return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
+            openid = res.get('openid')
+            w_user = WeixinUser.objects.filter(openid=openid).first()
+            save_user = False
+
+            if not w_user:
+                w_user = WeixinUser()
+                w_user.account_original_id = account.original_id
+                w_user.openid = openid
+                save_user = True
+
+            if w_user.account_original_id != account.original_id:
+                w_user.account_original_id = account.original_id
+                save_user = True
+
+            if not w_user.auth_info:
+                auth_info = AuthorizeInfo()
+                auth_info.access_token = res.get('access_token')
+                auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
+                auth_info.refresh_token = res.get('refresh_token')
+                auth_info.save()
+                w_user.auth_info = auth_info
+                save_user = True
+            else:
+                w_user.auth_info.access_token = res.get('access_token')
+                w_user.auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
+                w_user.auth_info.refresh_token = res.get('refresh_token')
+                w_user.auth_info.save()
+            if save_user:
+                w_user.save()
+            if redirect_url.find('?') == -1:
+                redirect_url += '?openid=%s'%openid
+            else:
+                redirect_url += '&openid=%s'%openid
+            return redirect(redirect_url)
+        return Response({'errcode':-2, 'errmsg':'code is null'})
 
 
-class AuthorizeCode(APIView):
+class GetAuthUserInfo(APIView):
     permission_classes = ()
     def get(self, request):
-        account_id = self.request.GET.get('state')
-        try:
-            account = Account.objects.get(pk=account_id)
-        except Account.DoesNotExist:
-            return HttpResponseNotFound()
-        auth = request.GET.get('auth')
-        url_id = request.GET.get('url_id')
+        openid = request.GET.get('openid')
+        if not openid:
+            return Response({'errcode':-3, 'errmsg':'openid is null'})
+        w_user = WeixinUser.objects.filter(openid=openid).first()
+        if not w_user:
+            return {'errcode':-4, 'errmsg':'openid is not exist'}
+        if w_user.nickname:
 
-        redirect_uri = settings.WEIXIN_CALLBACK_URL + reverse("weixin_authorize_user_info")+'?url_id=%s'%url_id
-        # print redirect_uri
-        if auth and auth=='1':
-            oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, scope='snsapi_userinfo', state=account_id)
-        else:
-            oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, state=account_id)
-        # print oauth.authorize_url
-        return redirect(oauth.authorize_url)
+            return Response({
+                       "openid":openid,
+                       " nickname": w_user.nickname,
+                       "sex": w_user.sex,
+                       "province": w_user.province,
+                       "city": w_user.city,
+                       "country": w_user.country,
+                        "headimgurl": w_user.headimgurl,
+                        "unionid": w_user.unionid,
+                    })
+        if not w_user.auth_info:
+            return Response({'errcode':-5, 'errmsg':'openid auth info is null'})
+        # print w_user.account_original_id
+        account = Account.objects.get(original_id=w_user.account_original_id)
+        if not account:
+            return Response({'errcode':-6, 'errmsg':u'公众号信息错误或者不存在'})
+        try:
+            oauth = WeChatOAuth(account.app_id, account.app_secret, )
+            if not w_user.auth_info.check_access_token():
+                res = oauth.refresh_access_token(w_user.auth_info.refresh_token)
+                w_user.auth_info.access_token = res['access_token']
+                w_user.auth_info.refresh_token = res['refresh_token']
+                w_user.auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
+                w_user.auth_info.save()
+            user_info = oauth.get_user_info(w_user.openid, w_user.auth_info.access_token)
+            w_user.nickname = user_info.get('nickname', "")
+            w_user.sex = user_info.get('sex')
+            w_user.city = user_info.get('city', "")
+            w_user.country = user_info.get('country', "")
+            w_user.headimgurl = user_info.get('headimgurl', "")
+            w_user.unionid =  user_info.get('unionid', '')
+            w_user.province = user_info.get('province', '')
+            w_user.save()
+            return Response(user_info)
+        except WeChatException, e:
+            return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
+
+
+
+

@@ -132,16 +132,42 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
     # 满标审核时,是给所有的持仓用户发放奖励,金额为持仓金额
 
     elif trigger_node == 'p2p_audit':
-        # 根据product_id查询出该产品中所有的持仓用户
-        equities = P2PEquity.objects.filter(product=product_id, confirm=True)
-        if equities:
-            for equity in equities:
-                _send_gift(equity.user, rule, device_type, is_full, equity.equity)
+        # 根据product_id查询出该产品中所有的持仓用户,因为持仓确认是通过任务定时执行的,因此此处不查询confirm=True
+        if product_id > 0:
+            if rule.activity.product_ids:
+                # 检查产品是否符合条件
+                is_product = _check_product_id(product_id, rule.activity.product_ids)
+                if is_product:
+                    equities = P2PEquity.objects.filter(product=product_id)
+                    if equities:
+                        for equity in equities:
+                            # 检查持仓金额是否满足
+                            is_amount = _check_amount(rule.min_amount, rule.max_amount, equity.equity)
+                            if is_amount:
+                                _send_gift(equity.user, rule, device_type, is_full, equity.equity)
+            else:
+                equities = P2PEquity.objects.filter(product=product_id)
+                if equities:
+                    for equity in equities:
+                        is_amount = _check_amount(rule.min_amount, rule.max_amount, equity.equity)
+                        if is_amount:
+                            _send_gift(equity.user, rule, device_type, is_full, equity.equity)
     # 还款
 
     # 还款时,是给所有的持仓用户发放奖励,金额为还款本金
     elif trigger_node == 'repaid':
-        _send_gift(user, rule, device_type, is_full, amount)
+        if product_id > 0:
+            if rule.activity.product_ids:
+                is_product = _check_product_id(product_id, rule.activity.product_ids)
+                if is_product:
+                    # 检查还款本金是否满足
+                    is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
+                    if is_amount:
+                        _send_gift(user, rule, device_type, is_full, amount)
+            else:
+                is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
+                if is_amount:
+                    _send_gift(user, rule, device_type, is_full, amount)
 
     else:
         return
@@ -402,8 +428,8 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
                 return
         redpack = RedPack.objects.filter(event=rps, status="unused").first()
         if redpack:
-            event = redpack.event
-            give_pf = event.give_platform
+            # event = redpack.event
+            give_pf = rps.give_platform
             if give_pf == "all" or give_pf == device_type:
                 if redpack.token != "":
                     redpack.status = "used"
@@ -414,9 +440,9 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
                 record.change_platform = device_type
                 record.save()
                 if user_ib:
-                    _send_message_sms(user, rule, user_ib, None, amount)
+                    _send_message_sms(user, rule, user_ib, None, amount, rps, record.created_at)
                 else:
-                    _send_message_sms(user, rule, None, None, amount)
+                    _send_message_sms(user, rule, None, None, amount, rps, record.created_at)
 
 
 def _save_activity_record(rule, user, msg_type, msg_content='', introduced_by=False, is_full=False):
@@ -445,7 +471,7 @@ def _save_activity_record(rule, user, msg_type, msg_content='', introduced_by=Fa
     record.save()
 
 
-def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0):
+def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0, redpack_event=None, created_at=None):
     """
         inviter: 邀请人
         invited： 被邀请人
@@ -459,14 +485,18 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
         reward_content = reward.content
         end_date = timezone.localtime(reward.end_time).strftime(fmt_str)
         name = reward.type
-    if rule.redpack:
-        red_pack = RedPackEvent.objects.filter(id=int(rule.redpack)).first()
-        if red_pack:
-            redpack_amount = red_pack.amount
-            invest_amount = red_pack.invest_amount
-            highest_amount = red_pack.highest_amount
-            name = red_pack.name
-            end_date = timezone.localtime(red_pack.unavailable_at).strftime(fmt_str)
+    if redpack_event:
+        redpack_amount = redpack_event.amount
+        invest_amount = redpack_event.invest_amount
+        highest_amount = redpack_event.highest_amount
+        name = redpack_event.name
+        if redpack_event.auto_extension and redpack_event.auto_extension_days > 0 and created_at:
+            unavailable_at = created_at + datetime.timedelta(days=int(redpack_event.auto_extension_days))
+            if unavailable_at < redpack_event.unavailable_at:
+                unavailable_at = redpack_event.unavailable_at
+        else:
+            unavailable_at = redpack_event.unavailable_at
+        end_date = timezone.localtime(unavailable_at).strftime(fmt_str)
     context = Context({
         'mobile': safe_phone_str(mobile),
         'reward': reward_content,

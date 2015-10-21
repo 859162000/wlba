@@ -11,10 +11,10 @@ html
       a(href="/weixin/list/")
         span 返回
     .detail-animate
-      earning_rate = float(p2p.expected_earning_rate)
-      percent = float(p2p.ordered_amount) / p2p.total_amount * 100
+      earning_rate = float(p2p['expected_earning_rate'])
+      percent = float(p2p['ordered_amount']) / p2p['total_amount'] * 100
       if p2p.activity
-        earning_rate = earning_rate + float(p2p.activity.rule.percent_text)
+        earning_rate = earning_rate + float(p2p['activity']['activity_rule_percent_text'])
       span.circle-profit
         .profit-txt(data-earn="{{earning_rate}}")
           em {{earning_rate}}
@@ -41,7 +41,7 @@ html
           p 融资金额
         .surplus-money
           p
-            amount = p2p.total_amount - p2p.ordered_amount
+            amount = p2p['total_amount'] - p2p['ordered_amount']
             em {{amount | money_format_int}}
             |元
           p 剩余可投金额
@@ -64,7 +64,7 @@ html
             |人参与
     .detail-toggle
       if p2p.extra_data
-        r = p2p.extra_data.items()
+        r = p2p['extra_data'].items()
         for section_name, section_values in r
           .detail-toggle-list
             h4.toggleTab {{section_name}}
@@ -76,7 +76,7 @@ html
                  |{{item_name}}
                 item_value = section_values[item_name]
                 dd {{item_value|linebreaksbr}}
-    status = p2p.display_status
+    status = p2p['display_status']
     if status == '抢购中'
       statusClass = 'footerBtn-buy'
     elif status == '已还款'
@@ -87,11 +87,14 @@ html
       statusClass = 'footerBtn-red'
 
     .detail-footerBtn(class=statusClass)
-      if status == '抢购中'
-        a(href="/weixin/view/calculator/{{p2p.id}}/").icon
-        a(href="/weixin/view/buy/{{p2p.id}}/").new-pay {{status}}
+      if p2p.is_app_exclusive
+        a(href="javascript:void(0)").new-pay#down-btn 本标仅限网利宝APP可投
       else
-        p {{status}}
+          if status == '抢购中'
+            a(href="/weixin/view/calculator/{{p2p.id}}/").icon
+            a(href="/weixin/view/buy/{{p2p.id}}/").new-pay {{status}}
+          else
+            p {{status}}
   include include/tracking
   script(src="/static/src/mobile/lib/weixin/wx.js")
   script(data-init='detail', src="/static/scripts/mobile/dist/mobile.js")

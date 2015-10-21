@@ -443,7 +443,6 @@ LOGGING = {
             'level': 'DEBUG'
         },
     }
-
 }
 
 if ENV != ENV_DEV:
@@ -602,6 +601,21 @@ CELERYBEAT_SCHEDULE = {
     'message_arrived_rate_statistics': {
         'task': 'wanglibao_sms.tasks.message_arrived_rate_task',
         'schedule': timedelta(minutes=10),
+    },
+    # by Zhoudong 短信到达率统计
+    'message_arrived_rate_check': {
+        'task': 'wanglibao_sms.tasks.check_arrived_rate_task',
+        'schedule': crontab(minute=0, hour=0),
+    },
+    # by Zhoudong 定期检查没有投资的新用户, 提醒投资
+    'invested_status_task_check': {
+        'task': 'marketing.tools.check_invested_status',
+        'schedule': crontab(minute=0, hour=10),
+    },
+    # by Zhoudong 定期检查用户优惠券没使用,发送提醒
+    'redpack_status_task_check': {
+        'task': 'marketing.tools.check_redpack_status',
+        'schedule': crontab(minute=0, hour=11),
     },
 }
 
@@ -996,6 +1010,15 @@ else:
 # 返利投
 WLB_FOR_FANLITOU_KEY = '2002'
 
+# 迅雷VIP
+WLB_FOR_XUNLEIVIP_KEY = '2003'
+XUNLEIVIP_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/xljinku/sendvip/'
+XUNLEIVIP_REGISTER_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_report.php'
+XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
+XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
+XUNLEI9_ACTIVITY_PAGE = 'marketing_xunlei_setp'
+
+
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
     local_ip = None
@@ -1005,6 +1028,9 @@ TRUST_IP = [
     local_ip,
     # 中国电信出口ip
     '182.140.241.10',
+    # 迅雷VIP
+    '123.150.216.177',
+    '111.161.125.177',
 ]
 
 SUIT_CONFIG = {
@@ -1046,7 +1072,6 @@ if ENV == ENV_PRODUCTION:
     WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
 else:
     WEIXIN_CALLBACK_URL = 'https://staging.wanglibao.com'
-
 
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)

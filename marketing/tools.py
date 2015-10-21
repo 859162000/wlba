@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # encoding:utf-8
-
+import pytz
 
 from wanglibao.celery import app
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db import transaction
-# from wanglibao_lottery.tasks import send_lottery
+from wanglibao_margin.models import Margin
+from wanglibao_reward.models import WanglibaoUserGift
 from wanglibao_p2p.models import P2PRecord, P2PProduct
 from wanglibao_account import message as inside_message
 from wanglibao_sms import messages
@@ -15,11 +16,13 @@ from marketing import utils
 from wanglibao_sms.tasks import send_messages
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity import backends as activity_backends
-from wanglibao_redpack.models import Income
+from wanglibao_redpack.models import Income, RedPackEvent, RedPack, RedPackRecord
 import datetime
 from django.db.models import Sum, Count
 from wanglibao_profile.models import WanglibaoUserProfile
 import time
+import logging
+logger = logging.getLogger('wanglibao_reward')
 
 @app.task
 def decide_first(user_id, amount, device, product_id=0, is_full=False):
@@ -40,11 +43,28 @@ def decide_first(user_id, amount, device, product_id=0, is_full=False):
     #发送红包
     # send_lottery.apply_async((user_id,))
 
+def weixin_redpack_distribute(user):
+    phone = user.wanglibaouserprofile.phone
+    logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
+    records = WanglibaoUserGift.objects.filter(valid=0, identity=phone)
+    for record in records:
+        try:
+            redpack_backends.give_activity_redpack(user, record.rules.redpack, 'pc')
+        except Exception, reason:
+            logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
+        else:
+            logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (user, record.rules.redpack,))
+        record.valid = 1
+        record.save()
+
 @app.task
 def register_ok(user_id, device):
     user = User.objects.filter(id=user_id).first()
     device_type = device['device_type']
-
+    try:
+        weixin_redpack_distribute(user)
+    except Exception, reason:
+        pass
     title, content = messages.msg_register()
     inside_message.send_one.apply_async(kwargs={
         "user_id": user_id,
@@ -134,6 +154,73 @@ def send_income_message_sms():
             "phones": phones_list,
             "messages": messages_list
         })
+
+
+@app.task
+def check_invested_status(delta=timezone.timedelta(days=3)):
+    """
+    每天一次检查3天没投资的用户.发短息提醒投资.
+    """
+    check_date = timezone.now() - delta
+    start = timezone.datetime(year=check_date.year, month=check_date.month, day=check_date.day).replace(tzinfo=pytz.UTC)
+    end = start + timezone.timedelta(days=1)
+
+    # 三天前注册的用户
+    registered_users = User.objects.filter(date_joined__gte=start, date_joined__lt=end)
+    # 获取投资过的uid
+    margins = Margin.objects.filter(user__in=registered_users).annotate(Count('user', distinct=True))
+    ids = [margin.user.id for margin in margins]
+
+    # 获取没有投资的用户
+    users = registered_users.exclude(id__in=ids)
+
+    phones_list = []
+    for user in users:
+        try:
+            phones_list.append(user.wanglibaouserprofile.phone)
+        except Exception, e:
+            print e
+            pass
+    send_messages.apply_async(kwargs={
+        "phones": phones_list,
+        "messages": [messages.user_invest_alert()]
+    })
+
+
+@app.task
+def check_redpack_status(delta=timezone.timedelta(days=50)):
+    """
+    每天一次检查3天后到期的红包优惠券.发短息提醒投资.
+    """
+    check_date = timezone.now() - delta
+    start = timezone.datetime(year=check_date.year, month=check_date.month, day=check_date.day).replace(tzinfo=pytz.UTC)
+    end = start + timezone.timedelta(days=50)
+
+    # 有效期为3天的优惠券
+    redpacks = RedPackEvent.objects.filter(give_end_at__gte=start, give_end_at__lt=end)
+    # 未使用过的
+    available = RedPack.objects.filter(event__in=redpacks, status='unused')
+    # 三天未使用优惠券对应的红包记录
+    records = RedPackRecord.objects.filter(redpack__in=available)
+
+    ids = [record.user.id for record in records]
+
+    # 获取需要发送提醒的用户
+    users = User.objects.filter(id__in=ids)
+
+    phones_list = []
+    messages_list = []
+    for user in users:
+        try:
+            phones_list.append(user.wanglibaouserprofile.phone)
+            messages_list.append(messages.red_packet_invalid_alert())
+        except Exception, e:
+            print e
+            pass
+    send_messages.apply_async(kwargs={
+        "phones": phones_list,
+        "messages": messages_list,
+    })
 
 
 @app.task

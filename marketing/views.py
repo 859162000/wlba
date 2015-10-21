@@ -1,4 +1,7 @@
 # encoding:utf-8
+import base64
+import hashlib
+import os
 import json
 import decimal
 import pytz
@@ -7,7 +10,7 @@ from collections import defaultdict
 from decimal import Decimal
 import time
 from wanglibao_p2p.models import P2PEquity
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, connection
 from django.contrib.auth.decorators import permission_required
 from django.core.paginator import Paginator, PageNotAnInteger
 from django.utils.decorators import method_decorator
@@ -166,6 +169,23 @@ class AppShareView(TemplateView):
 
     def get_context_data(self, **kwargs):
         identifier = self.request.GET.get('phone')
+        reg = self.request.GET.get('reg')
+
+        return {
+            'identifier': identifier.strip(),
+            'reg': reg
+        }
+
+
+class AppShareViewShort(TemplateView):
+    template_name = 'app_share.jade'
+
+    def get_context_data(self, **kwargs):
+        try:
+            identifier = self.request.GET.get('p') + '='
+            identifier = base64.b64decode(identifier)
+        except:
+            identifier = self.request.GET.get('phone')
         reg = self.request.GET.get('reg')
 
         return {
@@ -642,6 +662,180 @@ def ajax_get_activity_record(action='get_award', *gifts):
     return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
 
+def ajax_xunlei(request):
+    """
+        description:迅雷抽奖活动，响应web的ajax请求
+    """
+    user = request.user
+    if not user.is_authenticated():
+        to_json_response = {
+            'ret_code': 3000,
+            'message': u'用户没有登陆，请先登陆',
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+    record = get_user_channel_record(user.id)
+    try:
+        key = 'xunlei_event'
+        event = Misc.objects.filter(key=key).first()
+        if event:
+            event = json.loads(event.value)
+            logger.debug("event value:%s" %(event,))
+            if type(event) == dict:
+                channel = event['channel']
+                reward = event['reward']
+    except Exception, reason:
+        logger.exception('get misc record exception, msg:%s' % (reason,))
+        raise
+    if not record or (record and record.name != channel):
+        to_json_response = {
+            'ret_code': 4000,
+            'message': u'非迅雷渠道过来的用户',
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+    if request.method == "POST":
+        obj = ThunderInterestAwardAPIView()
+        action = request.POST.get("action", "")
+        logger.debug("迅雷10月  action type:%s" %(action,))
+        if action == 'GET_RECORD':
+            obj.get_reward_record(request, 'oct_get_award')
+
+        if action == 'GET_AWARD':
+            res = obj.get_award(request, reward)
+
+        if action == 'IGNORE_AWARD':
+            res = obj.ignore_award(request)
+
+        if action == 'ENTER_WEB_PAGE':
+            res = obj.enter_webpage(request)
+
+        return res
+
+
+class ThunderInterestAwardAPIView(APIView):
+    """
+        description: 迅雷抽奖活动1.用户有三次摇奖机会，三次摇奖必中奖一次，中奖内容为加息券，
+                    中奖后提示中奖金额及中奖提示语，非中奖用户提示非中奖提示语。
+    """
+
+    def get_award(self, request, reward):
+        """
+            TO-WRITE
+        """
+        join_log = ActivityJoinLog.objects.filter(user=request.user).first()
+        if join_log.join_times == 0:
+            to_json_response = {
+                'ret_code': 3100,
+                'get_time': (join_log.id % 3)+1,  # 第几次抽中
+                'left': join_log.join_times,  # 还剩几次
+                'amount': str(join_log.amount),  # 加息额度
+                'message': u'抽奖机会已经用完了',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+        join_log.join_times -= 1
+        join_log.save(update_fields=['join_times'])
+        money = self.get_award_mount(join_log.id)
+        describe = str(reward) + str(money)
+        try:
+            dt = timezone.datetime.now()
+            logger.debug("select condition-- invalid:False, describe:%s, give_start&give_end:%s",(describe, dt,))
+            redpack_event = RedPackEvent.objects.filter(invalid=False, describe=describe, give_start_at__lte=dt, give_end_at__gte=dt).first()
+        except Exception, reason:
+            print reason
+
+        if redpack_event:
+            logger.debug("发送出去的加息券, user:%s, redpack:%s" %(request.user, redpack_event,))
+            redpack_backends.give_activity_redpack(request.user, redpack_event, 'pc')
+
+        to_json_response = {
+            'ret_code': 3001,
+            'get_time': (join_log.id % 3)+1,  # 第几次抽中
+            'left': join_log.join_times,  # 还剩几次
+            'amount': str(join_log.amount),  # 加息额度
+            'message': u'终于等到你，还好我没放弃',
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+    def get_reward_record(self, request, action):
+        records = ActivityJoinLog.objects.filter(action_name=action, action_type='login', join_times=0, amount__gt=0)
+        data = [{'phone': record.user.wanglibaouserprofile.phone, 'awards': float(record.amount)} for record in records]
+        to_json_response = {
+            'ret_code': 3005,
+            'data': data,
+            'message': u'获得抽奖成功用户',
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+    def ignore_award(self, request):
+        """
+            将剩余的刮奖次数减1，并返回最终结果
+        """
+        join_log = ActivityJoinLog.objects.filter(user=request.user).first()
+        if join_log.join_times > 0:
+            join_log.join_times -= 1
+        else:
+            to_json_response = {
+                'ret_code': 3100,
+                'get_time': (join_log.id % 3)+1,  # 第几次抽中
+                'left': join_log.join_times,  # 还剩几次
+                'amount': str(join_log.amount),  # 加息额度
+                'message': u'抽奖机会已经用完了',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        join_log.save(update_fields=['join_times'])
+        to_json_response = {
+            'ret_code': 3002,
+            'get_time': (join_log.id % 3)+1,  # 第几次抽中
+            'left': join_log.join_times,  # 还剩几次
+            'amount': str(join_log.amount),  # 加息额度
+            'message': u'你和大奖只是一根头发的距离',
+        }
+
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+    def get_award_mount(self, index):
+        index %= 10
+        if index in (0,):
+            return 1
+        if index in(3, 6, 9):
+            return 1
+        if index in(1, 2, 4, 5, 7, 8):
+            return 1
+
+    def enter_webpage(self, request):
+        """
+            进入页面的时候，判断是否生成记录，如果没有则生成并返回剩余刮奖次数3；如果有，则直接返回剩余刮奖次数；
+        """
+        join_log = ActivityJoinLog.objects.filter(user=request.user).first()
+        if not join_log:
+            activity = ActivityJoinLog.objects.create(
+                user=request.user,
+                action_name=u'oct_get_award',
+                action_type=u'login',
+                action_message=u'迅雷抽奖活动',
+                channel=u'all',
+                gift_name=u'抽得加息券',
+                amount=0,
+                join_times=3,
+                create_time=timezone.now(),
+            )
+
+            join_log = ActivityJoinLog.objects.filter(user=request.user, action_name='get_award').first()
+            join_log.amount = self.get_award_mount(activity.id)
+            join_log.save(update_fields=['amount'])
+
+        to_json_response = {
+            'ret_code': 3003,
+            'get_time': (join_log.id % 3)+1,  # 第几次抽中
+            'left': join_log.join_times,  # 还剩几次
+            'amount': str(join_log.amount),  # 加息额度
+            'message': u'欢迎刮奖',
+        }
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+
 def ajax_post(request):
     """
         description:迅雷9月抽奖活动，响应web的ajax请求
@@ -676,6 +870,7 @@ def ajax_post(request):
     if request.method == "POST":
         obj = ThunderAwardAPIView()
         action = request.POST.get("action", "")
+        logger.debug("迅雷9月  action type:%s" %(action,))
 
         if action == 'GET_AWARD':
             res = obj.get_award(request, reward)
