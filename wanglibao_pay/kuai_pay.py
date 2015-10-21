@@ -509,8 +509,12 @@ class KuaiPay:
         if not result:
             return {"ret_code":20123, "message":"信息不匹配"}
         elif result['ret_code'] == 51:
-            #余额不足也进行绑定卡信息
+            # 余额不足也进行绑定卡信息
             self.bind_card(pay_info)
+
+            # 处理第三方渠道用户绑卡回调
+            CoopRegister(request).binding_card_call_back(user)
+
             return {"ret_code":201241, "message":result['message']}
         elif result['ret_code'] > 0:
             return {"ret_code":20124, "message":result['message']}
@@ -1046,9 +1050,6 @@ class KuaiShortPay:
             pay_info.save()
             OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
 
-            # 处理第三方渠道的用户充值回调
-            CoopRegister(request).process_for_recharge(request.user)
-
             dic = {"user_id":user.id, "order_id":order.id, "id_number":profile.id_number.upper(),
                     "phone":input_phone, "name":profile.name, "amount":amount,
                     "card_no":pay_info.card_no}
@@ -1081,6 +1082,10 @@ class KuaiShortPay:
                     pay_info.response = res.content
                     pay_info.save()
                     return {"ret_code":201181, "message":result['message']}
+
+                # 处理第三方渠道的用户充值回调
+                CoopRegister(request).process_for_recharge(request.user)
+
                 device = split_ua(request)
                 ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device)
 
@@ -1093,6 +1098,9 @@ class KuaiShortPay:
                     pay_info.error_message = token['message']
                     pay_info.save()
                     return {"ret_code":201182, "message":token['message']}
+
+                # 处理第三方渠道的用户充值回调
+                CoopRegister(request).process_for_recharge(request.user)
 
                 return {"ret_code":0, "message":"ok", "order_id":order.id, "token":token['token']}
         except Exception, e:
@@ -1141,6 +1149,10 @@ class KuaiShortPay:
             return {"ret_code":201241, "message":result['message']}
         elif result['ret_code'] > 0:
             return {"ret_code":20124, "message":result['message']}
+
+        # 处理第三方渠道的用户充值回调
+        CoopRegister(request).process_for_recharge(request.user)
+
         device = split_ua(request)
         ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device)
         return ms
