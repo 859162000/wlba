@@ -133,14 +133,14 @@ def get_binding_time_for_coop(user_id):
         return None
 
 
-# def save_to_binding(user, request):
-#     try:
-#         coop = CoopRegister(request)
-#         for processor in coop.processors:
-#             if processor.c_code == processor.channel_code:
-#                 processor.save_to_binding(user)
-#     except:
-#         pass
+def save_to_binding(user, request):
+    try:
+        coop = CoopRegister(request)
+        for processor in coop.processors:
+            if processor.c_code == processor.channel_code:
+                processor.save_to_binding(user)
+    except:
+        pass
 
 
 def check_mobile(request):
