@@ -514,7 +514,10 @@ class AmortizationKeeper(KeeperBaseMixin):
                 amo_amount = sub_amo.principal + sub_amo.interest + sub_amo.penal_interest + sub_amo.coupon_interest
 
                 phone_list.append(sub_amo.user.wanglibaouserprofile.phone)
-                message_list.append(messages.product_amortize(amortization.product, sub_amo.settlement_time, amo_amount))
+                message_list.append(messages.product_amortize(sub_amo.user.wanglibaouserprofile.name,
+                                                              amortization.product,
+                                                              # sub_amo.settlement_time,
+                                                              amo_amount))
 
                 title, content = messages.msg_bid_amortize(pname, timezone.now(), amo_amount)
                 inside_message.send_one.apply_async(kwargs={
@@ -554,4 +557,3 @@ class AmortizationKeeper(KeeperBaseMixin):
 
 def check_amount(amount):
     pass
-
