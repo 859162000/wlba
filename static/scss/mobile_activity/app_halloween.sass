@@ -311,16 +311,72 @@ body
   z-index: 3
   left: 8.75%
   bottom: 14%
-  background: url("/static/imgs/mobile_activity/app_halloween/renzou.png") no-repeat
-  background-size: cover
-  display: inline-block
-  img
-    display: none
-    width: 100%
-    &.first
-      opacity: 0
-      display: block
 
+  .main
+    position: relative
+    width: 100%
+    height: 100%
+    display: inline-block
+    height: 300px
+    img
+      position: absolute
+      left: 0
+      bottom: 0
+      width: 100%
+      display: none
+      &.first
+        display: block
+.boy_animate
+  -webkit-animation-name: boy_animate
+  animation-name: boy_animate
+  -webkit-animation-duration: 4.8s
+  animation-duration: 4.8s
+  -webkit-animation-timing-function: linear
+  animation-timing-function: linear
+  -webkit-animation-delay: 3.2s
+  animation-delay: 3.2s
+  -webkit-animation-fill-mode: forwards
+  animation-fill-mode: forwards
+@-webkit-keyframes boy_animate
+  0%
+    background-position: 0px 0
+  12.5%
+    background-position: -145px 0
+  25%
+    background-position: -290px 0
+  37.5%
+    background-position: -435px 0
+  50%
+    background-position: -580px 0
+  62.5%
+    background-position: -725px 0
+  75%
+    background-position: -870px 0
+  87.5%
+    background-position: -1015px 0
+  100%
+    background-position: 0px 0
+
+
+@keyframes boy_animate
+  0%
+    background-position: 0px 0
+  12.5%
+    background-position: -145px 0
+  25%
+    background-position: -290px 0
+  37.5%
+    background-position: -435px 0
+  50%
+    background-position: -580px 0
+  62.5%
+    background-position: -725px 0
+  75%
+    background-position: -870px 0
+  87.5%
+    background-position: -1015px 0
+  100%
+    background-position: 0px 0
 .choice
   position: fixed
   left: 0
