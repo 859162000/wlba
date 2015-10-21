@@ -108,6 +108,7 @@ urlpatterns += patterns(
     url(r'^wx_gold_two/$', TemplateView.as_view(template_name="h5_gold_two.jade")),
     url(r'^app_gold_two/$', TemplateView.as_view(template_name="app_gold_two.jade")),
     url(r'^app_seckill/$', TemplateView.as_view(template_name="app_seckill.jade")),
+    url(r'^app_halloween/$', TemplateView.as_view(template_name="app_halloween.jade")),
 
     url(r'^maimai_index/$', TemplateView.as_view(template_name="app_maimaiIndex.jade")),
     url(r'^maimai_rules/$', TemplateView.as_view(template_name="app_maimaiRule.jade")),
