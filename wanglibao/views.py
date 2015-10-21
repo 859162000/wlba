@@ -312,7 +312,7 @@ class BaiduFinanceView(TemplateView):
             .order_by('-expected_earning_rate', 'period')
         p2p_list = []
         p2p_list.extend(p2p)
-        if p2p_list and len(p2p_list) >= 3:
+        if len(p2p_list) >= 3:
             p2p_list = p2p_list[:3]
         else:
             p2p_other = P2PProduct.objects.select_related('warrant_company', 'activity')\
@@ -320,11 +320,11 @@ class BaiduFinanceView(TemplateView):
                         publish_time__lte=timezone.now(),
                         status__in=[u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中'])\
                 .order_by('-soldout_time', '-priority')[:3]
-            p2p_list = p2p_list.extend(p2p_other)
+            p2p_list.extend(p2p_other)
 
         return {
             'site_data': site_data,
-            'p2p_one': p2p_list[0:1],
+            'p2p_one': p2p_list[:1],
             'p2p_two': p2p_list[1:2],
             'p2p_three': p2p_list[2:3]
         }
