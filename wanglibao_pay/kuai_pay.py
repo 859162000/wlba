@@ -455,7 +455,7 @@ class KuaiPay:
                     pay_info.save()
                     return {"ret_code":201181, "message":result['message']}
                 device = split_ua(request)
-                ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device)
+                ms = self.handle_margin(request, result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device)
 
                 return ms
             else:
@@ -519,11 +519,11 @@ class KuaiPay:
         elif result['ret_code'] > 0:
             return {"ret_code":20124, "message":result['message']}
         device = split_ua(request)
-        ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device)
+        ms = self.handle_margin(request, result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device)
         return ms
 
     @method_decorator(transaction.atomic)
-    def handle_margin(self, amount, order_id, user_id, ip, response_content, device):
+    def handle_margin(self, request, amount, order_id, user_id, ip, response_content, device):
         pay_info = PayInfo.objects.filter(order_id=order_id).first()
         if not pay_info:
             return {"ret_code":20131, "message":"order not exist"}
@@ -574,6 +574,9 @@ class KuaiPay:
                 Card.objects.filter(user=pay_info.user, no__startswith=pay_info.card_no[:6], no__endswith=pay_info.card_no[-4:]).update(last_update=timezone.now(), is_bind_kuai=True)
             else:
                 Card.objects.filter(user=pay_info.user, no=pay_info.card_no).update(last_update=timezone.now(), is_bind_kuai=True)
+
+            # 处理第三方渠道用户绑卡回调
+            CoopRegister(request).binding_card_call_back(request.user)
 
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs
@@ -1087,7 +1090,7 @@ class KuaiShortPay:
                 CoopRegister(request).process_for_recharge(request.user)
 
                 device = split_ua(request)
-                ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device)
+                ms = self.handle_margin(request, result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device)
 
                 return ms
             else:
@@ -1154,11 +1157,11 @@ class KuaiShortPay:
         CoopRegister(request).process_for_recharge(request.user)
 
         device = split_ua(request)
-        ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device)
+        ms = self.handle_margin(request, result['amount'], result['order_id'], result['user_id'], util.get_client_ip(request), res.content, device)
         return ms
 
     @method_decorator(transaction.atomic)
-    def handle_margin(self, amount, order_id, user_id, ip, response_content, device):
+    def handle_margin(self, request, amount, order_id, user_id, ip, response_content, device):
         pay_info = PayInfo.objects.filter(order_id=order_id).first()
         if not pay_info:
             return {"ret_code":20131, "message":"order not exist"}
