@@ -220,86 +220,72 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 ;
 
 
-org.mmIndex = (function(org){
+org.test = (function(org){
     var lib = {
         init:function(){
-            lib._fetchPack();
-        },
-        _fetchPack: function(){
-            var
-                $submit  = $('.maimai-form-btn'),
-                $phoneVal = $('input[name=phone]'),
-                $sign =  $('.maimai-form-sign'),
-                $nbsp = $('.maimai-sign-margin'),
-                scrollTimer = null;
-
-            //listen input
-            $phoneVal.on('input',function(){
-                var _ = $(this);
-                if (scrollTimer) {
-                    clearTimeout(scrollTimer)
-                }
-                scrollTimer = setTimeout(function(){
-                    var phone = _.val();
-                    if(lib._checkPhone(phone)){
-                        _.addClass('maimai-load');
-                        lib.user_exists(phone)
-                    }else{
-                        _.removeClass('maimai-load');
-                    }
-
-                }, 350);
-            });
-
-            $submit.on('click', function(){
-                phone = $phoneVal.val();
-
-                if(lib._checkPhone(phone)){
-                  $sign.hide();
-                  $nbsp.show();
-                }else{
-                  $sign.show();
-                  $nbsp.hide();
-                  return
-                }
-              $(this).addClass('btn-activity')
-            });
-
-        },
-        user_exists :function(identifier){
+          var test = {"secretToken":"cd0d8da1be93f30e213a347886af3e73","ts":"1445409483.325864","ph":"15110253648","tk":"8331f0f403f0e82dd6695a90dc046885df92fc3f"}
             org.ajax({
-                url:'/api/user_exists/' + identifier + '/',
-                success: function(data){
-                    console.log(data)
-                    if(data.existing){
-                        console.log(data.existing)
-                        $('.maimai-form').removeAttr('disabled');
-                    }
+                url: '/accounts/token/login/ajax/',
+                type: 'post',
+                data:{
+                  token: test.tk,
+                  secret_key: test.secretToken,
+                  ts: test.ts
                 },
-                error: function (data) {
-                    console.log(data)
+                success: function(data){
+                  console.log(data)
                 }
             })
         },
+        webview: function(){
 
-        _checkPhone : function(val){
-            var isRight = false,
-                $sign = $('.phone-sign'),
-                re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
-            re.test($.trim(val)) ? ($sign.hide(), isRight = true) : ($sign.show(),isRight = false);
-            return isRight;
+          function connectWebViewJavascriptBridge(callback) {
+            if (window.WebViewJavascriptBridge) {
+              callback(WebViewJavascriptBridge)
+            } else {
+              document.addEventListener('WebViewJavascriptBridgeReady', function() {
+                callback(WebViewJavascriptBridge)
+              }, false)
+            }
+          }
+
+          connectWebViewJavascriptBridge(function(bridge) {
+            var uniqueId = 1
+            function log(message, data) {
+              var log = document.getElementById('log')
+              var el = document.createElement('div')
+              el.className = 'logLine'
+              el.innerHTML = uniqueId++ + '. ' + message + ':<br/>' + JSON.stringify(data)
+              if (log.children.length) { log.insertBefore(el, log.children[0]) }
+              else { log.appendChild(el) }
+            }
+
+            bridge.init(function(message, responseCallback) {
+              log('JS got a message', message)
+              var data = { 'Javascript Responds':'收到' }
+              log('JS responding with', data)
+              responseCallback(data)
+            })
+
+            log('user-Agent', navigator.userAgent);
+
+            bridge.callHandler('sendUserInfo', {'1': '1'}, function (response) {
+              log('JS', response)
+              $.ajax({
+                url: '/accounts/token/login/ajax/',
+                type: 'post',
+                data:{
+                  token: response.tk,
+                  secret_key: response.secretToken,
+                  ts: response.ts
+                },
+                success: function(data){
+                  log('success')
+                }
+              })
+            });
+          })
         }
-    }
-    return {
-        init : lib.init
-    }
-})(org);
-
-org.mmSuccess = (function(org){
-    var lib = {
-        init:function(){
-            console.log('end')
-        },
     }
     return {
         init : lib.init
