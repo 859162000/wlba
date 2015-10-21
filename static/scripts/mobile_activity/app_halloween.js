@@ -304,8 +304,24 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             }
 
             function boy_animate(){
-                $('.boy').find('img').parent().children().each(function(i, o){
-                    $('.boy img').eq(i).delay(200).show(1).siblings().delay(200).hide(1);
+                //var boy_position = 145;
+                //for(var i=1; i<=8; i++){
+                //    var boy_position1 = i * boy_position;
+                //    var j=1;
+                //    var timer = setInterval(function(){
+                //        j--;
+                //        if(j===0){
+                //            clearInterval(timer);
+                //            $('.boy').css('background-position','+boy_position1+',0);
+                //        }
+                //    },200);
+                //
+                //}
+
+
+                $('.boy').find('img').parent().children().each(function(i){
+
+                    $('.boy img').eq(i).delay(300).show(1).siblings().delay(300).hide(1);
                     if(i==8){
                         i=9;
                     }
