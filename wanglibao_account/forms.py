@@ -14,6 +14,12 @@ from marketing.models import InviteCode, PromotionToken, Channels
 from wanglibao_account.utils import mlgb_md5
 from marketing.utils import get_channel_record
 
+import time
+from hashlib import md5
+from rest_framework.authtoken.models import Token
+from marketing.models import LoginAccessToken
+from django.conf import settings
+
 User = get_user_model()
 
 
@@ -266,23 +272,23 @@ class IdVerificationForm(forms.Form):
         super(IdVerificationForm, self).__init__(*args, **kwargs)
         self._user = user
 
-
+def timestamp():
+    return long(time.time())
 class TokenSecretSignAuthenticationForm(forms.Form):
     """
     Base class for authenticating users. Extend this to get a form that accepts
     token/secret sign logins.
     """
-    token = forms.CharField(max_length=40, error_messages={'required': u'请输入token'})
-    secret_sign = forms.CharField(label="secret_sign", error_messages={'required': u'请输入密码'})
-    ts = forms.CharField(max_length=40, error_messages={'required': u'请输入token'})
+    # token = forms.CharField(max_length=40, error_messages={'required': u'请输入token'})
+    # secret_sign = forms.CharField(label="secret_sign", error_messages={'required': u'请输入secret_sign'})
+    # ts = forms.CharField(max_length=40, error_messages={'required': u'请输入ts'})
 
     error_messages = {
-        1: u'error',
-        2: u'error',
-        3: u'error',
-        4: u'error',
-        5: u'error',
-        'frozen': u"用户账户已被冻结",
+        'token_is_null': '1',
+        "secret_key_error": '2',
+        "secret_key_expired": '3',
+        "user_not_exist": '4',
+        "user_frozen": '5',
     }
 
     def __init__(self, request=None, *args, **kwargs):
@@ -297,23 +303,57 @@ class TokenSecretSignAuthenticationForm(forms.Form):
         self._errors = None
 
     def clean(self):
-        token = self.cleaned_data.get('token')
-        secret_sign = self.cleaned_data.get('secret_sign')
-        ts = self.cleaned_data.get('ts')
+        token_key = self.request.POST.get('token')
+        secret_sign = self.request.POST.get('secret_key')
+        ts = self.request.POST.get('ts')
 
-        if token and secret_sign and ts:
-            rc, self.user_cache = authenticate(token=token, secret_sign=secret_sign, ts=ts)
-            if self.user_cache is None:
-                raise forms.ValidationError(
-                    self.error_messages[rc],
-                    code=rc,
-                )
-            else:
-                if self.user_cache.wanglibaouserprofile.frozen:
-                    raise forms.ValidationError(
-                        self.error_messages['frozen'],
-                        code='frozen',
+        if token_key and secret_sign and ts:
+            token = Token.objects.get(pk=token_key)
+
+        if not token:
+            raise forms.ValidationError(
+                self.error_messages["token_is_null"],
+                code="token_is_null",
                     )
+        user_id = token.user.id
+        if secret_sign != md5(str(token.user.id)+settings.WANGLIBAO_ACCESS_TOKEN_KEY+str(ts)).hexdigest():
+            raise forms.ValidationError(
+                self.error_messages["secret_key_error"],
+                code="secret_key_error",
+                    )
+        loginaccesstoken = LoginAccessToken.objects.filter(token=token).first()
+        if loginaccesstoken:
+            db_secret_sign = token.loginaccesstoken.secret_sign
+            if db_secret_sign == secret_sign:
+                now = timestamp()
+                if token.loginaccesstoken.expire_at < now:
+                    raise forms.ValidationError(
+                        self.error_messages["secret_key_expired"],
+                        code="secret_key_expired"
+                    )
+            else:
+                token.loginaccesstoken.secret_sign = secret_sign
+                token.loginaccesstoken.expire_at = timestamp() + 10 * 60
+                token.loginaccesstoken.save()
+        else:
+            login_access_token = LoginAccessToken()
+            login_access_token.secret_sign = secret_sign
+            login_access_token.expire_at = timestamp() + 10 * 60
+            login_access_token.token = token
+            login_access_token.save()
+
+        self.user_cache = authenticate(token=token, secret_sign=secret_sign, ts=ts)
+        if self.user_cache is None:
+            raise forms.ValidationError(
+                self.error_messages["user_not_exist"],
+                code="user_not_exist",
+            )
+        else:
+            if self.user_cache.wanglibaouserprofile.frozen:
+                raise forms.ValidationError(
+                    self.error_messages["user_frozen"],
+                    code="user_frozen",
+                )
         return self.cleaned_data
 
     def get_user_id(self):

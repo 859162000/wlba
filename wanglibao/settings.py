@@ -210,6 +210,7 @@ LOCALE_PATHS = (
 AUTHENTICATION_BACKENDS = (
     'wanglibao_account.auth_backends.EmailPhoneUsernameAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
 )
 
 # Template loader

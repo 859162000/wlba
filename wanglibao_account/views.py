@@ -1164,7 +1164,8 @@ def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
     else:
         return HttpResponseNotAllowed(["GET"])
 
-
+from django import forms
+from django.shortcuts import redirect
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
@@ -1182,11 +1183,7 @@ def ajax_token_login(request, authentication_form=TokenSecretSignAuthenticationF
             form = authentication_form(request, data=request.POST)
             if form.is_valid():
                 auth_login(request, form.get_user())
-
-                if request.POST.has_key('remember_me'):
-                    request.session.set_expiry(604800)
-                else:
-                    request.session.set_expiry(1800)
+                request.session.set_expiry(1800)
                 return HttpResponse(messenger('done', user=request.user))
             else:
                 return HttpResponseForbidden(messenger(form.errors))

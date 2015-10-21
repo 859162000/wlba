@@ -64,7 +64,7 @@ urlpatterns = patterns(
     url(r'^token/login/ajax/$', 'wanglibao_account.views.ajax_token_login'),
     url(r'^token_login/$', 'django.contrib.auth.views.login',
         {
-            "template_name": "token_test.jade",
+            "template_name": "fetchtoken.jade",
             "authentication_form": TokenSecretSignAuthenticationForm,
         }, name="token_login"),
 
