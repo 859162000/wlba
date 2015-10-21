@@ -53,7 +53,7 @@ urlpatterns = patterns(
     url(r'^pc_Newgive/$', TemplateView.as_view(template_name="pc_Newgive.jade")),
     url(r'^seckill/$', TemplateView.as_view(template_name="seckill.jade")),
 
-
+    url(r'^youku/$', TemplateView.as_view(template_name="youku_test.jade")),
 )
 
 # app URL
