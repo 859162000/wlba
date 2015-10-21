@@ -129,14 +129,14 @@ def product_settled(name, equity, product, settled_time):
                 format_datetime(settled_time, u'%Y年%m月%d日'), product.period, stand)
         except Exception, e:
             print e
-            return u'off 亲爱的{}，您已成功投资{}项目 {}元，并于{}开始计息，期限{}{}，感谢您的支持！'.format(
+            return u'亲爱的{}，您已成功投资{}项目 {}元，并于{}开始计息，期限{}{}，感谢您的支持！'.format(
                 name, product.serial_number, equity.equity,
                 format_datetime(settled_time, u'%Y年%m月%d日'), product.period, stand
             )
     else:
         # return u'%s[%s]已投资成功，并于%s开始计息。' \
         #        % (product.short_name, product.serial_number, format_datetime(settled_time, u'%Y年%m月%d日'))
-        return u'off 亲爱的{}，您已成功投资{}项目 {}元，并于{}开始计息，期限{}{}，感谢您的支持！'.format(
+        return u'亲爱的{}，您已成功投资{}项目 {}元，并于{}开始计息，期限{}{}，感谢您的支持！'.format(
             name, product.serial_number, equity.equity,
             format_datetime(settled_time, u'%Y年%m月%d日'), product.period, stand
         )
@@ -289,9 +289,9 @@ def red_packet_get_alert(event_name):
             return content.format(event_name)
         except Exception, e:
             print e
-            return u'{}的加息券/红包已经存入您的账户，登录网利宝账户进行查看。退订回TD'.format(event_name)
+            return u'{}的加息券/红包已经存入您的账户，登录网利宝账户进行查看。'.format(event_name)
     else:
-        return u'{}的加息券/红包已经存入您的账户，登录网利宝账户进行查看。退订回TD'.format(event_name)
+        return u'{}的加息券/红包已经存入您的账户，登录网利宝账户进行查看。'.format(event_name)
 
 
 @suffix_td
@@ -307,9 +307,9 @@ def red_packet_invalid_alert(event_name):
             return content.format(event_name)
         except Exception, e:
             print e
-            return u'{}的加息券/红包还有3天就要过期了，请尽快登录网利宝官网或者app使用！退订回TD'.format(event_name)
+            return u'{}的加息券/红包还有3天就要过期了，请尽快登录网利宝官网或者app使用！'.format(event_name)
     else:
-        return u'{}的加息券/红包还有3天就要过期了，请尽快登录网利宝官网或者app使用！退订回TD'.format(event_name)
+        return u'{}的加息券/红包还有3天就要过期了，请尽快登录网利宝官网或者app使用！'.format(event_name)
 
 
 @suffix_td
