@@ -184,7 +184,7 @@ def p2p_auto_ready_for_settle():
                                        term_date__lte=today_24,
                                        ready_for_settle=False,
                                        settled=False
-    ).update(ready_for_settle=True, is_auto_ready_for_settle=True)
+    ).update(ready_for_settle=True, settlement_time=timezone.now(), is_auto_ready_for_settle=True)
 
 
 
