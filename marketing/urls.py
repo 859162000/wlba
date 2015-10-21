@@ -3,6 +3,7 @@ from django.views.generic import TemplateView, RedirectView
 from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
+from wanglibao.views import BaiduFinanceView
 
 urlpatterns = patterns(
     '',
@@ -50,7 +51,7 @@ urlpatterns = patterns(
     url(r'^national/$', TemplateView.as_view(template_name="national.jade")),
     url(r'^gold_two/$', TemplateView.as_view(template_name="gold_two.jade")),
 
-    url(r'^pc_Newgive/$', TemplateView.as_view(template_name="pc_Newgive.jade")),
+    url(r'^baidu_finance/$', BaiduFinanceView.as_view(), name="baidu_finance"),
     url(r'^seckill/$', TemplateView.as_view(template_name="seckill.jade")),
 
 
