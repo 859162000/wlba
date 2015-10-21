@@ -1,0 +1,64 @@
+- load formatters
+doctype html
+html
+  head
+    title 中间页
+    include include/app_head
+    style.
+      html { font-family:Helvetica; color:#222; }
+      .logLine { border-bottom:1px solid #ccc; padding:4px 2px; font-family:courier; font-size:1rem; }
+  body
+    section.weChat-conent 中间页获取数据
+    div#log(style='color:#000')
+    script(src='/static/scripts/mobile_activity/lib/zepto.js')
+    script.
+      window.onerror = function(err) {
+        log('window.onerror: ' + err)
+      }
+      function connectWebViewJavascriptBridge(callback) {
+        if (window.WebViewJavascriptBridge) {
+          callback(WebViewJavascriptBridge)
+        } else {
+          document.addEventListener('WebViewJavascriptBridgeReady', function() {
+            callback(WebViewJavascriptBridge)
+          }, false)
+        }
+      }
+
+      connectWebViewJavascriptBridge(function(bridge) {
+        var uniqueId = 1
+        function log(message, data) {
+          var log = document.getElementById('log')
+          var el = document.createElement('div')
+          el.className = 'logLine'
+          el.innerHTML = uniqueId++ + '. ' + message + ':<br/>' + JSON.stringify(data)
+          if (log.children.length) { log.insertBefore(el, log.children[0]) }
+          else { log.appendChild(el) }
+        }
+
+        bridge.init(function(message, responseCallback) {
+          log('JS got a message', message)
+          var data = { 'Javascript Responds':'收到' }
+          log('JS responding with', data)
+          responseCallback(data)
+        })
+
+        log('user-Agent', navigator.userAgent);
+
+        bridge.callHandler('sendUserInfo', {'1': '1'}, function (response) {
+          log('JS', response)
+          $.ajax({
+            url: '/accounts/token/login/ajax/',
+            type: 'post',
+            data:{
+              token: response.tk,
+              secret_key: response.secretToken,
+              ts: response.ts
+            },
+            success: function(data){
+              log('success')
+            }
+          })
+        });
+
+      })

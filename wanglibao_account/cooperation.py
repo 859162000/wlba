@@ -100,12 +100,14 @@ def get_first_investment_for_coop(user_id):
     except:
         return None, None, None
 
+
 def get_last_investment_for_coop(user_id):
     try:
         p2p_record = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购').order_by('create_time')
         return p2p_record.last()
     except:
         return None
+
 
 def get_tid_for_coop(user_id):
     try:
@@ -130,14 +132,16 @@ def get_binding_time_for_coop(user_id):
     except Exception, e:
         return None
 
-def save_to_binding(user, request):
-    try:
-        coop = CoopRegister(request)
-        for processor in coop.processors:
-            if processor.c_code == processor.channel_code:
-                processor.save_to_binding(user)
-    except:
-        pass
+
+# def save_to_binding(user, request):
+#     try:
+#         coop = CoopRegister(request)
+#         for processor in coop.processors:
+#             if processor.c_code == processor.channel_code:
+#                 processor.save_to_binding(user)
+#     except:
+#         pass
+
 
 def check_mobile(request):
     """

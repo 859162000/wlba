@@ -8,6 +8,7 @@ import hashlib
 import urllib
 import urlparse
 
+from random import randint
 from decimal import Decimal
 from django.contrib import auth
 from django.contrib.auth import login as auth_login
@@ -37,6 +38,7 @@ from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm, IdVe
 from marketing.models import IntroducedBy, Reward, RewardRecord
 from marketing.utils import set_promo_user, local_to_utc, get_channel_record
 from marketing import tools
+from wanglibao_sms.tasks import send_messages
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from wanglibao import settings
@@ -1215,13 +1217,21 @@ def ajax_register(request):
         res['message'] = message
         return json.dumps(res)
 
+    def generate_random_password(length):
+        if length < 0:
+            raise Exception("生成随机密码的长度有误")
+
+        random_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        password = list()
+        index = 0
+        while index < length:
+            password.append(random_list[randint(0,len(random_list))])
+            index += 1
+        return str(random_list)
+
     if request.method == "POST":
         channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")    #add by Yihen@20150818; reason:第三方渠道处理的时候，会更改request中的信息
         if request.is_ajax():
-
-            #res, message = verify_captcha(dic=request.POST, keep=False)
-            #if not res:
-            #    return HttpResponseForbidden(messenger(message={'captcha_1': u'图片验证码错误'}))
 
             form = EmailOrPhoneRegisterForm(request.POST)
             if form.is_valid():
@@ -1230,6 +1240,9 @@ def ajax_register(request):
                 identifier = form.cleaned_data['identifier']
                 invitecode = form.cleaned_data['invitecode']
 
+                if request.POST.get('IGNORE_PWD', '') and not password:
+                    password = generate_random_password(6)
+
                 if User.objects.filter(wanglibaouserprofile__phone=identifier).values("id"):
                     return HttpResponse(messenger('error'))
 
@@ -1237,7 +1250,7 @@ def ajax_register(request):
                 if not user:
                     return HttpResponse(messenger('error'))
 
-                #处理第三方渠道的用户信息
+                # 处理第三方渠道的用户信息
                 CoopRegister(request).all_processors_for_user_register(user, invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
 
@@ -1247,6 +1260,13 @@ def ajax_register(request):
 
                 if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
                     tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+                #  add by Yihen@20151020, 用户填写手机号不写密码即可完成注册, 给用户发短信,不要放到register_ok中去，保持原功能向前兼容
+                if request.POST.get('IGNORE_PWD', '') and not password:
+                    send_messages.apply_async(kwargs={
+                        "phones": [identifier, ],
+                        "messages": [password, ]
+                    })
 
                 account_backends.set_source(request, auth_user)
 

@@ -15,12 +15,13 @@ import time
 import json
 import logging
 import random
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.shortcuts import redirect
 from wanglibao.settings import CALLBACK_HOST
 from wanglibao_account import message as inside_message
 from marketing.models import IntroducedBy, Reward
-from wanglibao_reward.models import WanglibaoActivityGift, WanglibaoUserGift, WanglibaoActivityGiftGlobalCfg, WanglibaoWeixinRelative
+from wanglibao_reward.models import WanglibaoActivityGift, WanglibaoUserGift, WanglibaoActivityGiftGlobalCfg, WanglibaoWeixinRelative, WanglibaoActivityGiftOrder
 from wanglibao_redpack.models import RedPackEvent
 from wanglibao_activity.models import Activity, ActivityRule
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -337,30 +338,34 @@ class WeixinShareDetailView(TemplateView):
             if not self.get_global_cfg(activity):
                 self.throw_exception(u'对应的全局红包活动配置没有配，请先配置')
 
-        if not self.has_combine_redpack(product_id, activity):
-            ids = self.get_redpack_id(activity)
-            if ids:
-                redpacks = self.get_redpack_by_id(ids)
-            else:
-                self.debug_msg(u"获得配置红包id失败")
-                return None
-            self.debug_msg("红包编号为：%s" % (ids, ))
-            for redpack in redpacks:
-                try:
-                    activity_gift = WanglibaoActivityGift.objects.create(
-                    cfg=self.global_cfg,
-                    gift_id=product_id,
-                    activity=self.activity,
-                    redpack=redpack,
-                    name=redpack.rtype,
-                    total_count=redpack.value,  #这个地方很关键,优惠券个数
-                    valid=True
-                    )
-                    activity_gift.type = redpack_type[redpack.rtype]
-                    activity_gift.save()
-                    self.debug_msg("生成红包 %s 成功; 奖励类型:%s" % (redpack.id, redpack.rtype))
-                except Exception, reason:
-                    self.exception_msg(reason, '组合红包入库报错')
+        ids = self.get_redpack_id(activity)
+        if ids:
+            redpacks = self.get_redpack_by_id(ids)
+        else:
+            self.debug_msg(u"获得配置红包id失败")
+            return None
+        self.debug_msg("红包编号为：%s" % (ids, ))
+        for redpack in redpacks:
+            try:
+                activity_gift = WanglibaoActivityGift.objects.create(
+                cfg=self.global_cfg,
+                gift_id=product_id,
+                activity=self.activity,
+                redpack=redpack,
+                name=redpack.rtype,
+                total_count=redpack.value,  #这个地方很关键,优惠券个数
+                valid=True
+                )
+                activity_gift.type = redpack_type[redpack.rtype]
+                activity_gift.save()
+                self.debug_msg("生成红包 %s 成功; 奖励类型:%s" % (redpack.id, redpack.rtype))
+            except Exception, reason:
+                self.exception_msg(reason, '组合红包入库报错')
+
+        WanglibaoActivityGiftOrder.objects.create(
+            valid_amount=len(redpacks),
+            order_id=product_id
+        )
 
     def has_got_redpack(self, phone_num, activity, order_id, openid):
         """
@@ -384,7 +389,7 @@ class WeixinShareDetailView(TemplateView):
             self.exception_msg(reason, u'判断用户领奖，数据库查询出错')
             return None
 
-    ###@method_decorator(transaction.atomic)
+    @method_decorator(transaction.atomic)
     def distribute_redpack(self, phone_num, openid, activity, product_id):
         """
             根据概率，分发奖品
@@ -393,22 +398,19 @@ class WeixinShareDetailView(TemplateView):
             self.get_activity_by_id(activity)
 
         try:
-            #TODO：当多人并发的时候，会出现发多了(一个加息券发给了两个及多个人)；
             #TODO: 增加分享记录表，用于计数和加锁
-            #giftOrder = WanglibaoActivityGiftOrder.objects.select_for_update().filter(order_id=product_id).first()
-            #if giftOrder.avalid_cout>0:
-            #...
-            #giftOrder.avlid_count+=1
-            #giftOrder.save()
-            gifts = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity, valid=True)
-            counts = gifts.count()
-            if counts == 0:
-                gift = None
-            else:
-                #modify by hb on 2015-10-15
-                #index = int(time.time())%counts
-                index = random.randint(0,counts-1)
+            gift_order = WanglibaoActivityGiftOrder.objects.select_for_update().filter(order_id=product_id).first()
+            if gift_order.valid_amount > 0:
+                gifts = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity, valid=True)
+                counts = gifts.count()
+                index = random.randint(0, counts-1)
                 gift = gifts[index]
+                gift_order.valid_amount -= 1
+            else:
+                gift = None
+
+            gift_order.save()
+
 
         except Exception, reason:
             self.exception_msg(reason, u'获得待发奖项抛异常')
@@ -460,7 +462,6 @@ class WeixinShareDetailView(TemplateView):
 
             try:
                 # modify by hb on 2015-10-15 : 只查询微信号关联记录
-                #gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity, valid__in=(0, 1)).all()
                 gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity, valid=2).all()
                 return gifts
             except Exception, reason:
@@ -515,10 +516,7 @@ class WeixinShareDetailView(TemplateView):
 
         if types == 'alone':
             logger.debug("整理用户的数据返回前端，phone:%s" %(gifts.identity,))
-            # modify by hb on 2015-10-15
-            #QSet = WanglibaoWeixinRelative.objects.filter(phone=gifts.identity).values("phone", "nick_name", "img", "openid").first()
             QSet = WanglibaoWeixinRelative.objects.filter(openid=openid).values("phone", "nick_name", "img", "openid").first()
-            phone = WanglibaoUserGift.objects.filter(user=gifts.user, activity=gifts.activity, rules=gifts.rules).exclude(identity=QSet["openid"]).first().identity
             if QSet:
                 ret_val = {"amount": gifts.amount, "name": QSet["nick_name"], "img": QSet["img"], "phone": gifts.identity}
             else:
@@ -529,9 +527,6 @@ class WeixinShareDetailView(TemplateView):
         if types == 'gifts':
             user_info = {gift.identity: gift for gift in gifts}
             self.debug_msg("format_response_data, 已经领取的 奖品 的key值序列：%s" %(user_info.keys(),))
-            # modify by hb on 2015-10-15
-            #QSet = WanglibaoWeixinRelative.objects.filter(phone__in=user_info.keys())
-            #weixins = {item.phone: item for item in QSet}
             QSet = WanglibaoWeixinRelative.objects.filter(openid__in=user_info.keys())
             weixins = {item.openid: item for item in QSet}
             self.debug_msg("format_response_data, 已经领取的 用户 的key值序列：%s" %(weixins.keys(),))
@@ -542,10 +537,13 @@ class WeixinShareDetailView(TemplateView):
                                   "time": user_info[key].get_time,
                                   "name": weixins[key].nick_name,
                                   "img": weixins[key].img,
-                                  "message": self.get_react_text(index)})
+                                  "message": self.get_react_text(index),
+                                  "sort_by": int(time.mktime(time.strptime(str(user_info[key].get_time), '%Y-%m-%d %H:%M:%S+00:00')))})
                 index += 1
+
+            tmp_dict = {item["sort_by"]: item for item in ret_value}
+            ret_value = [tmp_dict[key] for key in sorted(tmp_dict.keys())]
             self.debug_msg('所有获奖信息返回前端:%s' % (ret_value,))
-            sorted(ret_value, key=lambda item: item["time"])
             return ret_value
 
     def update_weixin_wanglibao_relative(self, openid, phone_num):
@@ -633,8 +631,6 @@ class WeixinShareDetailView(TemplateView):
         }
 
     def dispatch(self, request, *args, **kwargs):
-        openid = kwargs["openid"]
-        order_id = kwargs['order_id']
         key = 'share_redpack'
         is_open = False
         shareconfig = Misc.objects.filter(key=key).first()
@@ -650,22 +646,6 @@ class WeixinShareDetailView(TemplateView):
             }
             return HttpResponse(json.dumps(data), content_type='application/json')
 
-        try:
-            wx_user = WanglibaoWeixinRelative.objects.filter(openid=openid)
-            if wx_user.exists():
-                phone = wx_user.first().phone
-                QSet = WanglibaoActivityGift.objects.filter(gift_id=order_id)
-                counts = QSet.count()
-                left_counts = QSet.filter(valid=True).count()
-                if left_counts == 0 and counts > 0:
-                    return redirect("/weixin_activity/share/end/?url_id=%s" % (order_id,))
-                else:
-                    return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, order_id))
-            else:
-                logger.debug("relative表中没有用户的信息")
-        except Exception, e:
-            logger.exception("share-detail-view dispatch 跳转的时候报异常")
-
         return super(WeixinShareDetailView, self).dispatch(request, *args, **kwargs)
 
 class WeixinShareEndView(TemplateView):
@@ -673,10 +653,10 @@ class WeixinShareEndView(TemplateView):
 
     def get_context_data(self, **kwargs):
         order_id = self.request.GET.get('url_id')
-        shareTitle, shareContent, url = get_share_infos(order_id)
+        share_title, share_content, url = get_share_infos(order_id)
         logger.debug("抵达End页面，order_id:%s, URL:%s" %(order_id, url))
         return {
-         "share":{'content':shareContent,'title':shareTitle, 'url':url}
+         "share": {'content': share_content, 'title': share_title, 'url': url}
         }
 
 
@@ -688,14 +668,14 @@ class WeixinShareStartView(TemplateView):
             p2p_record = P2PRecord.objects.filter(order_id=order_id, amount__gte=amount)
             return p2p_record
         except Exception, reason:
-            logger.exception(u"判断用户投资额度抛异常 %s" %(reason,) )
+            logger.exception(u"判断用户投资额度抛异常 %s, order_id:%s, amount:%s " %(reason, order_id, amount) )
 
     def get_context_data(self, **kwargs):
         openid = self.request.GET.get('openid')
         order_id = self.request.GET.get('url_id')
 
         record = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
-
+        logger.debug("start页面，openid 是:%s" % (openid,))
         share_title, share_content, url = get_share_infos(order_id)
         return {
             'ret_code': 9001,
@@ -779,9 +759,17 @@ class WeixinShareStartView(TemplateView):
                  phone = wx_user.first().phone
                  user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=order_id, identity=openid,).first()
                  logger.debug("用户抽奖信息是：%s" % (user_gift,))
+
                  if user_gift:
                      logger.debug("openid:%s, phone:%s, product_id:%s,用户已经存在了，直接跳转页面" %(openid, phone, order_id,))
                      return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, order_id))
+
+                 QSet = WanglibaoActivityGift.objects.filter(gift_id=order_id)
+                 counts = QSet.count()
+                 left_counts = QSet.filter(valid=True).count()
+                 if left_counts == 0 and counts > 0:
+                     return redirect("/weixin_activity/share/end/?url_id=%s" % (order_id,))
+
              else:
                 WanglibaoWeixinRelative.objects.create(
                     openid=openid,

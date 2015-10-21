@@ -42,12 +42,17 @@ urlpatterns = patterns(
     url(r'^pc_caipiao/$', TemplateView.as_view(template_name="pc_caipiao.jade")),
     #url(r'^september_activity/$', TemplateView.as_view(template_name="september_activity.jade")),
     url(r'^web-view/$', TemplateView.as_view(template_name="webView.html")),
+    url(r'^web-center/$', TemplateView.as_view(template_name="fetchtoken.jade")),
+
     url(r'^android-view/$', TemplateView.as_view(template_name="android_view.html")),
     url(r'^new_user/$', TemplateView.as_view(template_name="new_user.jade")),
     url(r'^recommended/$', TemplateView.as_view(template_name="recommended.jade")),
     url(r'^national/$', TemplateView.as_view(template_name="national.jade")),
     url(r'^gold_two/$', TemplateView.as_view(template_name="gold_two.jade")),
+
+    url(r'^pc_Newgive/$', TemplateView.as_view(template_name="pc_Newgive.jade")),
     url(r'^seckill/$', TemplateView.as_view(template_name="seckill.jade")),
+
 
 )
 
@@ -103,6 +108,11 @@ urlpatterns += patterns(
     url(r'^wx_gold_two/$', TemplateView.as_view(template_name="h5_gold_two.jade")),
     url(r'^app_gold_two/$', TemplateView.as_view(template_name="app_gold_two.jade")),
     url(r'^app_seckill/$', TemplateView.as_view(template_name="app_seckill.jade")),
+
+    url(r'^maimai_index/$', TemplateView.as_view(template_name="app_maimaiIndex.jade")),
+    url(r'^maimai_rules/$', TemplateView.as_view(template_name="app_maimaiRule.jade")),
+    url(r'^maimai_success/$', TemplateView.as_view(template_name="app_maimaiSuccess.jade")),
+
 )
 
 urlpatterns += patterns(
