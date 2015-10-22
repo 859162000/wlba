@@ -514,7 +514,10 @@ class AmortizationKeeper(KeeperBaseMixin):
                 amo_amount = sub_amo.principal + sub_amo.interest + sub_amo.penal_interest + sub_amo.coupon_interest
 
                 phone_list.append(sub_amo.user.wanglibaouserprofile.phone)
-                message_list.append(messages.product_amortize(amortization.product, sub_amo.settlement_time, amo_amount))
+                message_list.append(messages.product_amortize(sub_amo.user.wanglibaouserprofile.name,
+                                                              amortization.product,
+                                                              # sub_amo.settlement_time,
+                                                              amo_amount))
 
                 title, content = messages.msg_bid_amortize(pname, timezone.now(), amo_amount)
                 inside_message.send_one.apply_async(kwargs={
@@ -528,8 +531,13 @@ class AmortizationKeeper(KeeperBaseMixin):
                               amortization, description, sub_amo.coupon_interest)
 
                 # 标的每一期还款完成后,检测该用户还款的本金是否有符合活动的规则,有的话触发活动规则
-                if sub_amo.principal > 0:
-                    activity_backends.check_activity(sub_amo.user, 'repaid', 'pc', sub_amo.principal, product.id)
+                try:
+                    if sub_amo.principal > 0:
+                        activity_backends.check_activity(sub_amo.user, 'repaid', 'pc', sub_amo.principal, product.id)
+                except Exception:
+                    logger.debug("check activity on repaid, user: {}, principal: {}, product_id: {}".format(
+                        sub_amo.user, sub_amo.principal, product.id
+                    ))
 
             amortization.settled = True
             amortization.save()
@@ -554,4 +562,3 @@ class AmortizationKeeper(KeeperBaseMixin):
 
 def check_amount(amount):
     pass
-

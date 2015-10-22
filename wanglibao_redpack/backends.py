@@ -291,18 +291,11 @@ def _send_message(user, event, end_time):
         unavailable_at = event.unavailable_at
     give_time = timezone.localtime(unavailable_at).strftime(fmt_str)
     mtype = 'activity'
-    if event.rtype == 'percent':
-        pass
-        #send_messages.apply_async(kwargs={
-        #    'phones': [user.wanglibaouserprofile.phone],
-        #    'messages': [messages.redpack_give_percent(event.amount, event.highest_amount, event.name, give_time)]
-        #})
-    else:
-        pass
-        #send_messages.apply_async(kwargs={
-        #    'phones': [user.wanglibaouserprofile.phone],
-        #    'messages': [messages.redpack_give(event.amount, event.name, give_time)]
-        #})
+    send_messages.apply_async(kwargs={
+        'phones': [user.wanglibaouserprofile.phone],
+        'messages': [messages.red_packet_get_alert(event.name)],
+        'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
+    })
     if event.rtype == 'percent':
         title, content = messages.msg_redpack_give_percent(event.amount, event.highest_amount, event.name, give_time)
     elif event.rtype == 'interest_coupon':

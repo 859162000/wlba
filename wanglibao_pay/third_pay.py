@@ -373,15 +373,24 @@ def bind_pay_deposit(request):
 
     card_no = request.DATA.get("card_no", "").strip()
     gate_id = request.DATA.get("gate_id", "").strip()
+    input_phone = request.DATA.get("phone", "").strip()
+    device = split_ua(request)
+    ip = util.get_client_ip(request)
+
+    user = request.user
+    if not user.wanglibaouserprofile.id_is_valid:
+        return {"ret_code":20111, "message":"请先进行实名认证"}
 
     if not card_no and not gate_id:
         return {"ret_code": 20001, 'message': '信息输入不完整'}
+
+    if len(card_no) > 10 and (not input_phone or not gate_id):
+        return {"ret_code":20112, 'message':'信息输入不完整'}
 
     if gate_id:
         bank = Bank.objects.filter(gate_id=gate_id).first()
 
     else:
-        user = request.user
         if len(card_no) == 10:
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
         else:
@@ -397,6 +406,7 @@ def bind_pay_deposit(request):
     amount = request.DATA.get('amount', '').strip()
     try:
         amount = float(amount)
+        amount = util.fmt_two_amount(amount)
         if amount < 0:
             raise ValueError()
     except:
@@ -409,7 +419,7 @@ def bind_pay_deposit(request):
         return YeeShortPay().pre_pay(request)
 
     elif bank.channel == 'kuaipay':
-        return KuaiShortPay().pre_pay(request)
+        return KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, device, ip)
 
     else:
         return {"ret_code": 20004, "message": "请选择支付渠道"}
@@ -423,7 +433,13 @@ def bind_pay_dynnum(request):
     user = request.user
     order_id = request.DATA.get("order_id", "").strip()
     token = request.DATA.get("token", "").strip()
+    vcode = request.DATA.get("vcode", "").strip()
+    input_phone = request.DATA.get("phone", "").strip()
+    device = split_ua(request)
+    ip = util.get_client_ip(request)
 
+    if not order_id.isdigit():
+        return {"ret_code":20125, "message":"订单号错误"}
     if not order_id or not token:
         return {"ret_code": 20120, "message": "请重新获取验证码"}
 
@@ -448,7 +464,7 @@ def bind_pay_dynnum(request):
         return YeeShortPay().dynnum_bind_pay(request)
 
     elif card.bank.channel == 'kuaipay':
-        return KuaiShortPay().dynnum_bind_pay(request)
+        return KuaiShortPay().dynnum_bind_pay(user, vcode, order_id, token, input_phone, device, ip)
     else:
         return {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
 

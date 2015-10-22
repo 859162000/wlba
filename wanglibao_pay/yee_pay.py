@@ -296,7 +296,10 @@ class YeePay:
         pay_info.save()
         if rs['ret_code'] == 0:
             device = split_ua(request)
-            tools.despoit_ok(pay_info, device)
+            try:
+                tools.deposit_ok.apply_async(kwargs={"user_id":pay_info.user.id, "amount":pay_info.amount, "device":device})
+            except:
+                pass
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs
 
@@ -669,7 +672,6 @@ class YeeShortPay:
                 return {"ret_code": 22000, "message": u"充值申请已提交，请稍候查询余额。", "amount": amount, "margin": margin.margin}
 
             else:
-
                 return {"ret_code": 0, "message": "ok", "order_id": order.id, "token": request_id}
 
         except Exception, e:
@@ -737,6 +739,7 @@ class YeeShortPay:
         except Exception:
             logger.error("orderId:%s, order not exist, handle margin, try error" % order_id)
             return {"ret_code": 20085, "message": "order not exist, handle margin, try error"}
+
         if not pay_info:
             return {"ret_code": 20131, "message": "order not exist"}
         if pay_info.status == PayInfo.SUCCESS:
@@ -767,7 +770,10 @@ class YeeShortPay:
 
         pay_info.save()
         if rs['ret_code'] == 0:
-            tools.despoit_ok(pay_info, device)
+            try:
+                tools.deposit_ok.apply_async(kwargs={"user_id":pay_info.user.id, "amount":pay_info.amount, "device":device})
+            except:
+                pass
 
             # 充值成功后，更新本次银行使用的时间
             if len(pay_info.card_no) == 10:
@@ -857,7 +863,13 @@ class YeeShortPay:
         pay_info.save()
         if rs['ret_code'] == 0:
             device = split_ua(request)
-            tools.despoit_ok(pay_info, device)
+            try:
+                try:
+                    tools.deposit_ok.apply_async(kwargs={"user_id":pay_info.user.id, "amount":pay_info.amount, "device":device})
+                except:
+                    pass
+            except:
+                pass
 
             # 充值成功后，更新本次银行使用的时间
             if len(pay_info.card_no) == 10:

@@ -3,6 +3,7 @@ from django.views.generic import TemplateView, RedirectView
 from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
+from wanglibao.views import BaiduFinanceView
 
 urlpatterns = patterns(
     '',
@@ -42,13 +43,18 @@ urlpatterns = patterns(
     url(r'^pc_caipiao/$', TemplateView.as_view(template_name="pc_caipiao.jade")),
     #url(r'^september_activity/$', TemplateView.as_view(template_name="september_activity.jade")),
     url(r'^web-view/$', TemplateView.as_view(template_name="webView.html")),
+    url(r'^web-center/$', TemplateView.as_view(template_name="fetchtoken.jade")),
+
     url(r'^android-view/$', TemplateView.as_view(template_name="android_view.html")),
     url(r'^new_user/$', TemplateView.as_view(template_name="new_user.jade")),
     url(r'^recommended/$', TemplateView.as_view(template_name="recommended.jade")),
     url(r'^national/$', TemplateView.as_view(template_name="national.jade")),
     url(r'^gold_two/$', TemplateView.as_view(template_name="gold_two.jade")),
+
+    url(r'^baidu_finance/$', BaiduFinanceView.as_view(), name="baidu_finance"),
     url(r'^seckill/$', TemplateView.as_view(template_name="seckill.jade")),
 
+    #url(r'^youku/$', TemplateView.as_view(template_name="youku_test.jade")),
 )
 
 # app URL
@@ -103,6 +109,12 @@ urlpatterns += patterns(
     url(r'^wx_gold_two/$', TemplateView.as_view(template_name="h5_gold_two.jade")),
     url(r'^app_gold_two/$', TemplateView.as_view(template_name="app_gold_two.jade")),
     url(r'^app_seckill/$', TemplateView.as_view(template_name="app_seckill.jade")),
+    url(r'^app_halloween/$', TemplateView.as_view(template_name="app_halloween.jade")),
+
+    url(r'^maimai_index/$', TemplateView.as_view(template_name="app_maimaiIndex.jade")),
+    url(r'^maimai_rules/$', TemplateView.as_view(template_name="app_maimaiRule.jade")),
+    url(r'^maimai_success/$', TemplateView.as_view(template_name="app_maimaiSuccess.jade")),
+
 )
 
 urlpatterns += patterns(
