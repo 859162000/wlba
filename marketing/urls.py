@@ -79,9 +79,9 @@ urlpatterns += patterns(
     url(r'^app_gold_day/$', TemplateView.as_view(template_name="app_gold_day.jade")),
     url(r'^app_pc_download/$', TemplateView.as_view(template_name="app_pc_download.jade")),
     url(r'^app_lottery/$', TemplateView.as_view(template_name="app_lottery.jade")),
-    url(r'^app_scratch/$', TemplateView.as_view(template_name="app_scratch.jade")),
-    #url(r'^app_scratch/$', login_required(TemplateView.as_view(template_name="app_scratch.jade"), login_url='/accounts/token_login/')),
-    #url(r'^app_scratch/nologin/$', TemplateView.as_view(template_name="app_scratch.jade")),
+    #url(r'^app_scratch/$', TemplateView.as_view(template_name="app_scratch.jade")),
+    url(r'^app_scratch/$', login_required(TemplateView.as_view(template_name="app_scratch.jade"), login_url='/accounts/token_login/')),
+    url(r'^app_scratch/nologin/$', TemplateView.as_view(template_name="app_scratch.jade")),
     url(r'^app_national/$', TemplateView.as_view(template_name="app_national.jade")),
 
 

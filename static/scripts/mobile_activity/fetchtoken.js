@@ -320,26 +320,29 @@ org.scratch = (function(org){
 
             //登陆
               $('#login').on('click',function(){
-                 bridge.callHandler('loginApp',{refresh: 1}, function (response) {
+                 bridge.callHandler('loginApp',{refresh: 0}, function (response) {
                    $('.test-log').html(JSON.stringify(response))
                  });
               });
+
             //注册
               $('#regist').on('click',function(){
                 bridge.callHandler('registerApp', {refresh: 1}, function (response) {
-                   $('.test-log').html(JSON.stringify(response))
+                   $('.test-log').html(JSON.stringify(response));
                  });
               });
+
             //投资
               $('#p2p').on('click',function(){
                 bridge.callHandler('jumpToManageMoney', function (response) {
-                    log('jumpToManageMoney', response)
+                    log('jumpToManageMoney', response);
                 });
               });
+
             //分享
               bridge.registerHandler('shareData', function(data, responseCallback) {
                   var responseData = { title:'呱呱卡test', content: '呱呱卡test' };
-                  responseCallback(responseData)
+                  responseCallback(responseData);
               });
 
               //判断client 是否登录，  并且在该方法传递数据埋点
@@ -348,7 +351,7 @@ org.scratch = (function(org){
                 var activity = {name: 'guaguaka'}
                 responseCallback(activity)
 
-              })
+              });
           })
         }
 
