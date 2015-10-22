@@ -107,11 +107,6 @@ class UserAuthForm(forms.Form):
             user = User.objects.get(id=data.get('p_user_id'),
                                     wanglibaouserprofile__phone=data.get('usn'),
                                     )
-            from django.contrib.auth import authenticate
-            print '>>>>>>>>>>>>>>aaa'
-            print data.get('usn')
-            if authenticate(identifier=data.get('usn'), password='123.com'):
-                print '>>>>>>>>>>>>>>.bbb'
         except User.DoesNotExist:
             raise forms.ValidationError(_("p_user_id could not be validated."))
 
