@@ -6,7 +6,7 @@ from django.conf.urls import patterns, url, include
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, RedirectView
 from registration.backends.default.views import ActivationView
-from forms import EmailOrPhoneAuthenticationForm
+from forms import EmailOrPhoneAuthenticationForm, TokenSecretSignAuthenticationForm
 from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView, AccountHome,
                    AccountTransaction, AccountBankCard, AccountTransactionP2P, IdVerificationView,
                    AccountTransactionDeposit, AccountRedPacket, AccountCoupon,
@@ -61,7 +61,12 @@ urlpatterns = patterns(
             "template_name": "login_test.jade",
             "authentication_form": EmailOrPhoneAuthenticationForm,
         }, name="auth_login"),
-
+    url(r'^token/login/ajax/$', 'wanglibao_account.views.ajax_token_login'),
+    url(r'^token_login/$', 'django.contrib.auth.views.login',
+        {
+            "template_name": "fetchtoken.jade",
+            "authentication_form": TokenSecretSignAuthenticationForm,
+        }, name="token_login"),
 
     url(r'^login/callback/$', login_required(Third_login_back.as_view())),
     url(r'^login/(?P<login_type>\w+)/$', login_required(Third_login.as_view())),

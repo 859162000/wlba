@@ -47,5 +47,34 @@
     };
     var time = setInterval(timersFn, Millisecond);
 
+
+    var $num = $('.gv_tzh')
+    $num.each(function( ) {
+      var amount = parseInt($(this).attr('data-number')).toString(),
+          type = $(this).attr('data-type');
+      $(this).append(amountGe(amount, type));
+    })
+    function amountGe(value, type){
+      var len = value.length, str = '';
+     // reType = type == 'man' ? '人' : '元';
+      if(type == "amount"){
+        if(len > 8){
+          str = isNode(value.substr(0,len-8), '亿') + isNode(value.substr(len-8,4), '万') + isNode(value.substr(len-4,len), '元') ;
+        }else{
+          str = isNode(value.substr(0,len-4), '万') + isNode(value.substr(len-4,len), '元');
+        }
+      }else{
+        str = isNode(value.substr(0,len), '位小伙伴');
+      }
+
+      function isNode(substr, text){
+        if(parseInt(substr) > 0){
+          return " <span class='num-animate'>" + parseInt(substr) + "</span> <span class='num-text'>" + text + '</span>';
+        }
+        return '';
+      }
+    return str
+  }
+
   });
 }).call(this);

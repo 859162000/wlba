@@ -3,7 +3,7 @@ import cPickle
 from django.db import models
 from django.utils import timezone
 from django.db.models.signals import post_save
-from redisco import models as rmodels
+# from redisco import models as rmodels
 from wanglibao_redis.backend import redis_backend
 
 
@@ -109,6 +109,10 @@ class MessageTemplate(models.Model):
         verbose_name_plural = u'短信模板'
         ordering = ['id']
 
+    @property
+    def get_args_num(self):
+        return self.args_num
+
     def save(self, *args, **kwargs):
         """
         author: Zhoudong
@@ -120,22 +124,28 @@ class MessageTemplate(models.Model):
         value = dict()
         value['title'] = self.title
         value['content'] = self.content
+        value['args_num'] = self.args_num
+        value['args_tips'] = self.args_tips
+
+        if value['content'].count('{}') != self.args_num:
+            # 怎么把错误信息返回给前端展示
+            return
 
         redis._set(self.message_for, cPickle.dumps(value))
         return super(MessageTemplate, self).save(*args, **kwargs)
 
 
-class MessageInRedis(rmodels.Model):
-
-    message_for = rmodels.CharField(required=True, unique=True)
-    title = rmodels.CharField()
-    content = rmodels.Attribute()
-
-    class Meta:
-        verbose_name = u'短信模板'
-        verbose_name_plural = u'短信模板'
-        ordering = ['message_for']
-
+# class MessageInRedis(rmodels.Model):
+#
+#     message_for = rmodels.CharField(required=True, unique=True)
+#     title = rmodels.CharField()
+#     content = rmodels.Attribute()
+#
+#     class Meta:
+#         verbose_name = u'短信模板'
+#         verbose_name_plural = u'短信模板'
+#         ordering = ['message_for']
+#
 
 def send_manual_message(sender, instance, **kwargs):
     if instance.type == u'手动' and instance.status == u'发送中':

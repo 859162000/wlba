@@ -210,6 +210,7 @@ LOCALE_PATHS = (
 AUTHENTICATION_BACKENDS = (
     'wanglibao_account.auth_backends.EmailPhoneUsernameAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
 )
 
 # Template loader
@@ -395,7 +396,7 @@ LOGGING = {
             'level': 'DEBUG'
         },
         'wanglibao_pay': {
-            'handlers': ['file'],
+            'handlers': ['file', 'console'],
             'level': 'DEBUG',
         },
         'wanglibao_activity': {
@@ -513,7 +514,7 @@ from datetime import timedelta, datetime
 CELERYBEAT_SCHEDULE = {
     'p2p-watchdog-1-minutes': {
         'task': 'wanglibao_p2p.tasks.p2p_watchdog',
-        'schedule': timedelta(minutes=1),
+        'schedule': timedelta(minutes=5),
     },
     'report-generate': {
         'task': 'report.tasks.generate_report',
@@ -602,10 +603,20 @@ CELERYBEAT_SCHEDULE = {
         'task': 'wanglibao_sms.tasks.message_arrived_rate_task',
         'schedule': timedelta(minutes=10),
     },
-    # by Zhoudong 发送短信时间统计
+    # by Zhoudong 短信到达率统计
     'message_arrived_rate_check': {
         'task': 'wanglibao_sms.tasks.check_arrived_rate_task',
         'schedule': crontab(minute=0, hour=0),
+    },
+    # by Zhoudong 定期检查没有投资的新用户, 提醒投资
+    'invested_status_task_check': {
+        'task': 'marketing.tools.check_invested_status',
+        'schedule': crontab(minute=0, hour=10),
+    },
+    # by Zhoudong 定期检查用户优惠券没使用,发送提醒
+    'redpack_status_task_check': {
+        'task': 'marketing.tools.check_redpack_status',
+        'schedule': crontab(minute=0, hour=11),
     },
 }
 
@@ -765,6 +776,7 @@ YEE_PAY_BACK_RETURN_URL = CALLBACK_HOST + '/api/pay/yee/app/deposit/callback/'
 #快钱回调地址
 KUAI_PAY_RETURN_URL = CALLBACK_HOST + '/api/pay/deposit/complete/'
 KUAI_PAY_BACK_RETURN_URL = CALLBACK_HOST + '/api/pay/deposit/callback/'
+KUAI_PAY_TR3_SIGNATURE = ''
 
 #语音验证码参数
 YTX_SID = "aaf98f89495b3f3801497488ebbe0f3f"
@@ -1064,3 +1076,4 @@ else:
 
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)
+WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'

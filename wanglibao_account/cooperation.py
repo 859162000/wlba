@@ -1638,16 +1638,13 @@ class CsaiUserQuery(APIView):
 
             if not start_date:
                 start_date = '1970-01-01'
-            start = str_to_float(start_date)
-            if end_date:
-                end = str_to_float(end_date)
-            else:
-                end = time.time()
+            if not end_date:
+                end_date = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(time.time()+8*60*60))
+            channel = Channels.objects.get(name='xicai')
+            channels = IntroducedBy.objects.filter(
+                Q(channel=channel) & Q(created_at__gte=start_date) & Q(created_at__lte=end_date))
 
-            binds = Binding.objects.filter(
-                (Q(btype=u'csai') | Q(btype=u'xicai')) & Q(created_at__gte=start) & Q(created_at__lte=end))
-
-            users = [b.user for b in binds]
+            users = [c.user for c in channels]
             ret['total'] = len(users)
 
             # 获取总页数, 和页数不对处理
@@ -1671,7 +1668,8 @@ class CsaiUserQuery(APIView):
                 user_dict['regtime'] = user.date_joined
 
                 # 去用户详情表查
-                user_profile = WanglibaoUserProfile.objects.get(user=user)
+                # user_profile = WanglibaoUserProfile.objects.get(user=user)
+                user_profile = user.wanglibaouserprofile
                 user_dict['realname'] = user_profile.name
                 user_dict['phone'] = user_profile.phone
 
@@ -2186,8 +2184,12 @@ def zhongjin_get_products():
 
         # 从redis 读对应他们的id
         if not prod['method'] == 'add':
-            redis = redis_backend()
-            prod['productId'] = int(redis._get('wangli_id_'+str(product.pk)))
+            try:
+                redis = redis_backend()
+                prod['productId'] = int(redis._get('wangli_id_'+str(product.pk)))
+            except Exception, e:
+                print e
+                prod['productId'] = -1
 
         prod['productName'] = product.name
         prod['borrowMoney'] = product.total_amount

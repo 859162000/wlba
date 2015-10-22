@@ -27,7 +27,6 @@ from Crypto.Signature import PKCS1_v1_5 as pk
 from Crypto.Cipher import PKCS1_v1_5, AES
 import base64
 from wanglibao_rest.utils import split_ua
-from wanglibao_account.cooperation import CoopRegister
 
 logger = logging.getLogger(__name__)
 
@@ -297,7 +296,10 @@ class YeePay:
         pay_info.save()
         if rs['ret_code'] == 0:
             device = split_ua(request)
-            tools.despoit_ok(pay_info, device)
+            try:
+                tools.deposit_ok.apply_async(kwargs={"user_id":pay_info.user.id, "amount":pay_info.amount, "device":device})
+            except:
+                pass
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return rs
 
@@ -607,9 +609,6 @@ class YeeShortPay:
         if not card:
             card = self.add_card_unbind(user, card_no, bank)
 
-            # 处理第三方渠道用户绑卡回调
-            CoopRegister(request).binding_card_call_back(user)
-
         if not card and not bank:
             return {'ret_code': 200117, 'message': '卡号不存在或银行不存在'}
 
@@ -669,17 +668,10 @@ class YeeShortPay:
                     pay_info.save()
                     return res
 
-                # 处理第三方渠道的用户充值回调
-                CoopRegister(request).process_for_recharge(request.user)
-
                 margin = Margin.objects.filter(user=user).first()
                 return {"ret_code": 22000, "message": u"充值申请已提交，请稍候查询余额。", "amount": amount, "margin": margin.margin}
 
             else:
-
-                # 处理第三方渠道的用户充值回调
-                CoopRegister(request).process_for_recharge(request.user)
-
                 return {"ret_code": 0, "message": "ok", "order_id": order.id, "token": request_id}
 
         except Exception, e:
@@ -737,14 +729,11 @@ class YeeShortPay:
             pay_info.save()
             return res
 
-        # 处理第三方渠道的用户充值回调
-        CoopRegister(request).process_for_recharge(request.user)
-
         margin = Margin.objects.filter(user=user).first()
         return {"ret_code": 22000, "message": u"充值申请已提交，请稍候查询余额。", "amount": pay_info.amount, "margin": margin.margin}
 
     @method_decorator(transaction.atomic)
-    def handle_margin(self, request, amount, order_id, user_id, ip, response_content, device):
+    def handle_margin(self, amount, order_id, user_id, ip, response_content, device):
         try:
             pay_info = PayInfo.objects.select_for_update().filter(order_id=order_id).first()
         except Exception:
@@ -781,7 +770,10 @@ class YeeShortPay:
 
         pay_info.save()
         if rs['ret_code'] == 0:
-            tools.despoit_ok(pay_info, device)
+            try:
+                tools.deposit_ok.apply_async(kwargs={"user_id":pay_info.user.id, "amount":pay_info.amount, "device":device})
+            except:
+                pass
 
             # 充值成功后，更新本次银行使用的时间
             if len(pay_info.card_no) == 10:
@@ -871,7 +863,13 @@ class YeeShortPay:
         pay_info.save()
         if rs['ret_code'] == 0:
             device = split_ua(request)
-            tools.despoit_ok(pay_info, device)
+            try:
+                try:
+                    tools.deposit_ok.apply_async(kwargs={"user_id":pay_info.user.id, "amount":pay_info.amount, "device":device})
+                except:
+                    pass
+            except:
+                pass
 
             # 充值成功后，更新本次银行使用的时间
             if len(pay_info.card_no) == 10:

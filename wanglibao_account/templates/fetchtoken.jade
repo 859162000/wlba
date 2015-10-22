@@ -10,5 +10,7 @@ html
   body
     section.weChat-conent 中间页获取数据
     div#log(style='color:#000')
+    {{next}}
+    input(name='next',type='hidden',value='{{next}}')
     script(data-init='test', src='/static/scripts/mobile_activity/fetchtoken.js')
 

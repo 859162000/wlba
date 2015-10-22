@@ -2,6 +2,7 @@
 from datetime import date, timedelta
 from hashlib import  md5
 from urlparse import urlparse
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -12,8 +13,7 @@ from marketing.models import IntroducedBy, Channels
 from utils import detect_identifier_type, verify_id, create_user
 from wanglibao_account.backends import parse_id_verify_response
 from wanglibao_account.cooperation import CoopRegister, CoopQuery
-from wanglibao_account.models import Binding
-from wanglibao_account.test_util import prepare_user, has_user, delete_user, get_user, clear_db
+from wanglibao.test_util import prepare_user, has_user, delete_user, get_user, clear_db
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao_sms.utils import send_validation_code
 
