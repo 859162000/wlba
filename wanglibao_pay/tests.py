@@ -66,6 +66,19 @@ def mock_request_switch(pay_inst, status='succeed'):
         return res
     pay_inst._request = new.instancemethod(_request_side_effect, pay_inst, None)
 
+class KuaiPaySignatureTests(TestCase):
+    def setUp(self):
+        self.kuai_pay = KuaiShortPay()
+        self.signature = 'Zcm+Px/tP9F/YqS40S64r2/eXMKtqzmgJdoFY0NPyCgzNKKw5OT0WXVTyP6Tw0twc42iO3zee33t6qGhim/Saq0LOB2Y9P/fCkGDEci6gsi9Sp7BRUFukNnOsZ8zS4fK2VtiVt8dQ5qK/qWLNdTdXo90zSZhy1jMefoZiVYgZYM='
+        self.content = '<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><MasMessage xmlns=\"http://www.99bill.com/mas_cnp_merchant_interface\"><version>1.0</version><TxnMsgContent><txnType>PUR</txnType><interactiveStatus>TR3</interactiveStatus><amount>10</amount><merchantId>104110045112012</merchantId><terminalId>00002012</terminalId><entryTime>20151022062806</entryTime><externalRefNumber>1905449</externalRefNumber><transTime>20151022142927</transTime><refNumber>000012576108</refNumber><responseCode>00</responseCode><cardOrg>CU</cardOrg><storableCardNo>6225880549</storableCardNo><authorizationCode>369646</authorizationCode></TxnMsgContent></MasMessage>'
+
+    def test_signature(self):
+        print self.kuai_pay.pem, self.signature, self.content
+        # succeed
+        self.assertEqual(True, self.kuai_pay._check_signature(self.content, self.signature))
+        # fail
+        self.assertEqual(False, self.kuai_pay._check_signature(self.content, ''))
+
 class KuaiPayTests(TestCase):
     def setUp(self):
         # generate user
@@ -359,6 +372,8 @@ class KuaiPayTests(TestCase):
         self.assertEqual('成功', pay_info.status)
         self.assertEqual(self.amount_2, margin.margin)
         self.assertEqual(1, margin_record.count())
+
+
 
 
 
