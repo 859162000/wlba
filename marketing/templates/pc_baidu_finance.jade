@@ -66,7 +66,12 @@ html
               span.gv_yers {{p2p.period}}
               span {{p2p.pay_method|period_unit}}
             .gv_tzbtn
-              a.tz_btn(href="/p2p/detail/{{p2p.id}}/") 立即投资
+              if p2p.display_status == '抢购中'
+                a.tz_btn(href="/p2p/detail/{{p2p.id}}/") 立即投资
+              elif p2p.display_status == '满标审核'
+                a.tz_btn(href="javascript:void(0);") 满标审核
+              else
+                a.tz_btn(href="javascript:void(0);") 还款中
     .gv_felfare
       .gv_felbox.clear
         +gv_title("新手福利")
@@ -89,7 +94,7 @@ html
             span 新手投资最高送<b>400</b>元红包<br>
             span 首次单笔投资≥10000元 送<b>200</b>元<br>
             span 首次单笔投资≥20000元 送<b>400</b>元<br>
-        a.gv_touzbtn.clear(href="/p2p/list/") 立即投资
+        a.gv_touzbtn.clear(href="/p2p/list/", style="color:white") 立即投资
 
     +gv_title("关于网利宝")
     .gv_about.clear
