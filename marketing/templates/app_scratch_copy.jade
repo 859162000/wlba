@@ -7,9 +7,11 @@ html
     .scratch_continer
       img.img_banner(src="/static/imgs/mobile_activity/app_scratch/gg_banner.png")
       span.search_logo
+
     .scratch_box
       .scratch_envelope
         img.img_envelope(src="/static/imgs/mobile_activity/app_scratch/gg_hongbao.png")
+      .test-log(style="color:#fff") -------------test--------------
       if user.is_authenticated
         #untub.unAuthenticated 您已注册
         .sceatch_opportunity#opportunity 您有3次刮奖机会
@@ -18,8 +20,15 @@ html
           .sceatch_text
             span.tub
             input.txt#zctext(type="text",placeholder="请输入你的手机号码")
+           //wlb
           a.scratch_btn#scratch_btn(href="/weixin/regist/?next=/activity/app_scratch/&phone=") 立即注册
         .sceatch_opportunity#opportunity 注册用户有3次刮奖机会
+
+        .sceatch_opportunity#p2p 去投资
+        if not user.is_authenticated
+          //native clien
+          .sceatch_opportunity#login 去登陆
+          .sceatch_opportunity#regist 去注册
 
       .sceatch_mouth
         img(src="/static/imgs/mobile_activity/app_scratch/gg_kuajq.png")
@@ -60,3 +69,4 @@ html
         a#ok(href="javascript:;") 好的
         span.close#close
       script(data-init="canvas", src='/static/scripts/mobile_activity/mobile_scratch.js?')
+      script(data-init='scratch', src='/static/scripts/mobile_activity/fetchtoken.js')
