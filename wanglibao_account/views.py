@@ -46,7 +46,7 @@ from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account import third_login, backends as account_backends, message as inside_message
-from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
+from wanglibao_account.forms import EmailOrPhoneAuthenticationForm, TokenSecretSignAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning, \
@@ -1163,6 +1163,35 @@ def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
             return HttpResponseForbidden('not valid ajax request')
     else:
         return HttpResponseNotAllowed(["GET"])
+
+from django import forms
+from django.shortcuts import redirect
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def ajax_token_login(request, authentication_form=TokenSecretSignAuthenticationForm):
+    def messenger(message, user=None):
+        res = dict()
+        if user:
+            res['nick_name'] = user.wanglibaouserprofile.nick_name
+        res['message'] = message
+        return json.dumps(res)
+
+    if request.method == "POST":
+
+        if request.is_ajax():
+            form = authentication_form(request, data=request.POST)
+            if form.is_valid():
+                auth_login(request, form.get_user())
+                request.session.set_expiry(1800)
+                return HttpResponse(messenger('done', user=request.user))
+            else:
+                return HttpResponseForbidden(messenger(form.errors))
+        else:
+            return HttpResponseForbidden('not valid ajax request')
+    else:
+        return HttpResponseNotAllowed(["GET"])
+
 
 
 @sensitive_post_parameters()

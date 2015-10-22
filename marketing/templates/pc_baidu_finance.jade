@@ -15,13 +15,13 @@ html
     ul.gv_info
       li
         p.gv_touz1 <span></span> 选择加入网利宝的已有
-        h5 <b>{{site_data.p2p_register_number}}</b>位小伙伴
+        h5.gv_tzh(data-number='{{site_data.p2p_register_number}}',data-type='man')
       li
         p.gv_touz2 <span></span> 小伙伴们总共投资额
-        h5 <b>81</b>亿<b>2480</b>万<b>2480</b>{{site_data.p2p_amount}}元
+        h5.gv_tzh(data-number='{{site_data.p2p_amount}}',data-type='amount')
       li.bornone
         p.gv_touz3 <span></span> 小伙伴们总共赚取了
-        h5 <b>4464</b>万<b>9000</b>{{site_data.user_income}}元
+        h5.gv_tzh(data-number='{{site_data.user_income}}',data-type='amount')
     mixin gv_title(content)
       h2.gv_tstls
         span=content
@@ -48,8 +48,8 @@ html
               | 还款方式: {{p2p.display_payback_method}}
             .gv_schedule
               percent = float(p2p.ordered_amount) / p2p.total_amount * 100
-              .sch_jd(style="width:{{percent | percentage}}")
-                span
+              .sch_jd
+                span(style="width:{{percent | percentage}}")
               p.sch_zhi {{percent | percentage}}
             p.gv_entext
               total_amount = p2p.total_amount / 10000
@@ -66,7 +66,12 @@ html
               span.gv_yers {{p2p.period}}
               span {{p2p.pay_method|period_unit}}
             .gv_tzbtn
-              a.tz_btn(href="/p2p/detail/{{p2p.id}}/") 立即投资
+              if p2p.display_status == '抢购中'
+                a.tz_btn(href="/p2p/detail/{{p2p.id}}/") 立即投资
+              elif p2p.display_status == '满标审核'
+                a.tz_btn(href="javascript:void(0);") 满标审核
+              else
+                a.tz_btn(href="javascript:void(0);") 还款中
     .gv_felfare
       .gv_felbox.clear
         +gv_title("新手福利")
@@ -89,7 +94,7 @@ html
             span 新手投资最高送<b>400</b>元红包<br>
             span 首次单笔投资≥10000元 送<b>200</b>元<br>
             span 首次单笔投资≥20000元 送<b>400</b>元<br>
-        a.gv_touzbtn.clear(href="/p2p/list/") 立即投资
+        a.gv_touzbtn.clear(href="/p2p/list/", style="color:white") 立即投资
 
     +gv_title("关于网利宝")
     .gv_about.clear

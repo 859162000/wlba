@@ -531,8 +531,13 @@ class AmortizationKeeper(KeeperBaseMixin):
                               amortization, description, sub_amo.coupon_interest)
 
                 # 标的每一期还款完成后,检测该用户还款的本金是否有符合活动的规则,有的话触发活动规则
-                if sub_amo.principal > 0:
-                    activity_backends.check_activity(sub_amo.user, 'repaid', 'pc', sub_amo.principal, product.id)
+                try:
+                    if sub_amo.principal > 0:
+                        activity_backends.check_activity(sub_amo.user, 'repaid', 'pc', sub_amo.principal, product.id)
+                except Exception:
+                    logger.debug("check activity on repaid, user: {}, principal: {}, product_id: {}".format(
+                        sub_amo.user, sub_amo.principal, product.id
+                    ))
 
             amortization.settled = True
             amortization.save()

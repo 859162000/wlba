@@ -210,6 +210,7 @@ LOCALE_PATHS = (
 AUTHENTICATION_BACKENDS = (
     'wanglibao_account.auth_backends.EmailPhoneUsernameAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
 )
 
 # Template loader
@@ -1075,3 +1076,4 @@ else:
 
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)
+WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'
