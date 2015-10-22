@@ -291,9 +291,9 @@ def _send_message(user, event, end_time):
         unavailable_at = event.unavailable_at
     give_time = timezone.localtime(unavailable_at).strftime(fmt_str)
     mtype = 'activity'
-    rtype = u'红包'
+    rtype = u'元红包'
     if event.rtype == 'interest_coupon':
-        rtype = u'加息券'
+        rtype = u'%加息券'
     send_messages.apply_async(kwargs={
         'phones': [user.wanglibaouserprofile.phone],
         'messages': [messages.red_packet_get_alert(event.amount, rtype)],
