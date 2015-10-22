@@ -7,7 +7,7 @@ from django.db.models.fields import (DateTimeField, DateField,
                                      EmailField, TimeField,
                                      FieldDoesNotExist)
 from django.core.serializers.json import DjangoJSONEncoder
-from .constants import EXPIRE_DELTA, EXPIRE_DELTA_PUBLIC, EXPIRE_CODE_DELTA
+from .constants import EXPIRE_DELTA
 
 try:
     import json
@@ -45,26 +45,13 @@ def long_token():
     return hash.hexdigest()
 
 
-def get_token_expiry(public=True):
+def get_token_expiry():
     """
     Return a datetime object indicating when an access token should expire.
     Can be customized by setting :attr:`settings.OAUTH_EXPIRE_DELTA` to a
     :attr:`datetime.timedelta` object.
     """
-    if public:
-        return now() + EXPIRE_DELTA_PUBLIC
-    else:
-        return now() + EXPIRE_DELTA
-
-
-def get_code_expiry():
-    """
-    Return a datetime object indicating when an authorization code should
-    expire.
-    Can be customized by setting :attr:`settings.OAUTH_EXPIRE_CODE_DELTA` to a
-    :attr:`datetime.timedelta` object.
-    """
-    return now() + EXPIRE_CODE_DELTA
+    return now() + EXPIRE_DELTA
 
 
 def serialize_instance(instance):

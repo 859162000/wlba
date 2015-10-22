@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Default model implementations. Custom database or OAuth backends need to
 implement these models with fields and and methods to be compatible with the
@@ -6,11 +8,10 @@ views in :attr:`provider.views`.
 
 from django.db import models
 from django.conf import settings
-from . import constants
-from .constants import CLIENT_TYPES
-from .utils import now, short_token, long_token, get_code_expiry
-from .utils import get_token_expiry, serialize_instance, deserialize_instance
+from .utils import now, short_token, long_token
+from .utils import get_token_expiry, deserialize_instance
 from .managers import AccessTokenManager
+from marketing.models import Channels
 
 try:
     from django.utils import timezone
@@ -26,39 +27,28 @@ class Client(models.Model):
 
     Expected fields:
 
-    * :attr:`user`
-    * :attr:`name`
-    * :attr:`url`
-    * :attr:`redirect_url`
     * :attr:`client_id`
     * :attr:`client_secret`
-    * :attr:`client_type`
+    * :attr:`channel_code`
+    * :attr:`channel`
 
     Clients are outlined in the :rfc:`2` and its subsections.
     """
-    user = models.ForeignKey(AUTH_USER_MODEL, related_name='oauth2_client', blank=True, null=True)
-    name = models.CharField(max_length=255, blank=True)
-    url = models.URLField(blank=True, help_text="Your application's URL.")
-    redirect_uri = models.URLField(blank=True, help_text="Your application's callback URL")
-    client_id = models.CharField(max_length=255, default=short_token)
+
+    client_id = models.CharField(unique=True, max_length=255, default=short_token)
     client_secret = models.CharField(max_length=255, default=long_token)
-    client_type = models.IntegerField(choices=CLIENT_TYPES)
+    channel = models.ForeignKey(Channels, help_text=u'渠道', blank=True, null=True)
 
     def __unicode__(self):
         return self.client_id
 
     def get_default_token_expiry(self):
-        public = (self.client_type == 1)
-        return get_token_expiry(public)
+        return get_token_expiry()
 
     def serialize(self):
-        return dict(user=serialize_instance(self.user),
-                    name=self.name,
-                    url=self.url,
-                    redirect_uri=self.redirect_uri,
-                    client_id=self.client_id,
+        return dict(client_id=self.client_id,
                     client_secret=self.client_secret,
-                    client_type=self.client_type)
+                    channel=self.channel)
 
     @classmethod
     def deserialize(cls, data):
@@ -81,33 +71,6 @@ class Client(models.Model):
         return cls(**kwargs)
 
 
-class Grant(models.Model):
-    """
-    Default grant implementation. A grant is a code that can be swapped for an
-    access token. Grants have a limited lifetime as defined by
-    :attr:`provider.constants.EXPIRE_CODE_DELTA` and outlined in
-    :rfc:`4.1.2`
-
-    Expected fields:
-
-    * :attr:`user`
-    * :attr:`client` - :class:`Client`
-    * :attr:`code`
-    * :attr:`expires` - :attr:`datetime.datetime`
-    * :attr:`redirect_uri`
-    * :attr:`scope`
-    """
-    user = models.ForeignKey(AUTH_USER_MODEL)
-    client = models.ForeignKey(Client)
-    code = models.CharField(max_length=255, default=long_token)
-    expires = models.DateTimeField(default=get_code_expiry)
-    redirect_uri = models.CharField(max_length=255, blank=True)
-    scope = models.IntegerField(default=0)
-
-    def __unicode__(self):
-        return self.code
-
-
 class AccessToken(models.Model):
     """
     Default access token implementation. An access token is a time limited
@@ -121,7 +84,6 @@ class AccessToken(models.Model):
     * :attr:`token`
     * :attr:`client` - :class:`Client`
     * :attr:`expires` - :attr:`datetime.datetime`
-    * :attr:`scope`
 
     Expected methods:
 
@@ -132,7 +94,6 @@ class AccessToken(models.Model):
     token = models.CharField(max_length=255, default=long_token, db_index=True)
     client = models.ForeignKey(Client)
     expires = models.DateTimeField()
-    scope = models.IntegerField(default=constants.SCOPES[0][0], choices=constants.SCOPES)
 
     objects = AccessTokenManager()
 
@@ -167,7 +128,8 @@ class AccessToken(models.Model):
 class RefreshToken(models.Model):
     """
     Default refresh token implementation. A refresh token can be swapped for a
-    new access token when said token expires.
+    new access token when said token expi
+    res.
 
     Expected fields:
 

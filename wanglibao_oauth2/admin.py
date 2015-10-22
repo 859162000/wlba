@@ -1,22 +1,21 @@
 from django.contrib import admin
-from .models import AccessToken, Grant, Client, RefreshToken
+from .models import AccessToken, Client, RefreshToken
 
 
 class AccessTokenAdmin(admin.ModelAdmin):
-    list_display = ('user', 'client', 'token', 'expires', 'scope',)
+    list_display = ('user', 'client', 'token', 'expires',)
     raw_id_fields = ('user',)
 
 
-class GrantAdmin(admin.ModelAdmin):
-    list_display = ('user', 'client', 'code', 'expires',)
+class RefreshTokenAdmin(admin.ModelAdmin):
+    list_display = ('token', 'access_token', 'expired',)
     raw_id_fields = ('user',)
 
 
 class ClientAdmin(admin.ModelAdmin):
-    list_display = ('client_id', 'url', 'user', 'redirect_uri', 'client_type')
-    raw_id_fields = ('user',)
+    list_display = ('client_id', 'channel',)
+    raw_id_fields = ('channel',)
 
 admin.site.register(AccessToken, AccessTokenAdmin)
-admin.site.register(Grant, GrantAdmin)
+admin.site.register(RefreshToken, RefreshTokenAdmin)
 admin.site.register(Client, ClientAdmin)
-admin.site.register(RefreshToken)

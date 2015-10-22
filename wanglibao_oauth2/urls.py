@@ -37,25 +37,12 @@ that are meant for client (as defined in :rfc:`1`) interaction.
 
 
 from django.conf.urls import patterns, url
-from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-from .views import Authorize, Redirect, Capture, AccessTokenView, BajinsheAccessTokenView
+from .views import AccessTokenView
 
 
 urlpatterns = patterns('',
-    url('^authorize/?$',
-        login_required(Capture.as_view()),
-        name='capture'),
-    url('^authorize/confirm/?$',
-        login_required(Authorize.as_view()),
-        name='authorize'),
-    url('^redirect/?$',
-        login_required(Redirect.as_view()),
-        name='redirect'),
-    url('^access_token/?$',
+    url('^bajinshe/(?P<grant_type>(access_token|refresh_token))/?$',
         csrf_exempt(AccessTokenView.as_view()),
-        name='access_token'),
-    url('^bajinshe/access_token/?$',
-        csrf_exempt(BajinsheAccessTokenView.as_view()),
         name='access_token'),
 )
