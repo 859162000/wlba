@@ -290,13 +290,13 @@ def red_packet_get_alert(amount, rtype):
             return content.format(amount, rtype)
         except Exception, e:
             print e
-            return u'{}的{}已经存入您的账户，登录网利宝账户进行查看。'.format(amount, rtype)
+            return u'{}{}已经存入您的账户，登录网利宝账户进行查看。'.format(amount, rtype)
     else:
-        return u'{}的{}已经存入您的账户，登录网利宝账户进行查看。'.format(amount, rtype)
+        return u'{}{}已经存入您的账户，登录网利宝账户进行查看。'.format(amount, rtype)
 
 
 @suffix_td
-def red_packet_invalid_alert(event_name):
+def red_packet_invalid_alert(amount):
     """
     红包、加息券快过期前3天提醒
     """
@@ -305,12 +305,12 @@ def red_packet_invalid_alert(event_name):
             redis = redis_backend()
             obj = redis._get('red_packet_invalid_alert')
             content = cPickle.loads(obj)['content']
-            return content.format(event_name)
+            return content.format(amount)
         except Exception, e:
             print e
-            return u'{}的加息券/红包还有3天就要过期了，请尽快登录网利宝官网或者app使用！'.format(event_name)
+            return u'您有{}张理财券再过3天就要过期了，请尽快登录网利宝官网或者app使用！'.format(amount)
     else:
-        return u'{}的加息券/红包还有3天就要过期了，请尽快登录网利宝官网或者app使用！'.format(event_name)
+        return u'您有{}张理财券再过3天就要过期了，请尽快登录网利宝官网或者app使用！'.format(amount)
 
 
 @suffix_td
