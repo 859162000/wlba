@@ -234,7 +234,6 @@ org.test = (function(org){
                 },
                 success: function(data){
                   console.log(data)
-                  window.location.href = $("input[name='next']").val();
                 }
             })
         },
@@ -282,12 +281,6 @@ org.test = (function(org){
                 },
                 success: function(data){
                   log('success')
-                  var next = org.getQueryStringByName('next');
-                if (next) {
-                    window.location.href = decodeURIComponent(decodeURIComponent(next));;
-                }else{
-                    window.location.href = '/weixin/account/';
-                }
                 }
               })
             });

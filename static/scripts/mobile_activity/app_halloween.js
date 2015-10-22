@@ -295,12 +295,13 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
       var boy_num = 2;
       step0();
       function step0(){
-          var i=3;
+          var i=9;
           var timer1 = setInterval(function(){
               i--;
               if(i===0){
                   clearInterval(timer1);
-                  boy_animate();
+                  //boy_animate();
+                  $('.boy').removeClass('boy_animate');
               }
           },1000);
       }
@@ -328,20 +329,20 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 
 
-          $('.boy').find('img').parent().children().each(function(i){
-
-              $('.boy img').eq(i).delay(500).show(1).siblings().delay(500).hide(1);
-              if(i==8){
-                  i=9;
-              }
-              if(i==9){
-                  $('.boy img').eq(0).show(1).siblings().hide(1);
-              }
-              if(boy_num!=0){
-                  boy_num--;
-                  boy_animate();
-              }
-          })
+          //$('.boy').find('img').parent().children().each(function(i){
+          //
+          //    $('.boy img').eq(i).delay(500).show(1).siblings().delay(500).hide(1);
+          //    if(i==8){
+          //        i=9;
+          //    }
+          //    if(i==9){
+          //        $('.boy img').eq(0).show(1).siblings().hide(1);
+          //    }
+          //    if(boy_num!=0){
+          //        boy_num--;
+          //        boy_animate();
+          //    }
+          //})
       }
 
       var j=10;
@@ -368,9 +369,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
       function choice1(){
           $('.choice').fadeIn(500);
           $('.choice1').click(function(){
-              boy_num = 2;
+              //boy_num = 2;
               $('.choice').fadeOut(500);
-              boy_animate();
+              //boy_animate();
+              $('.boy').addClass('boy_animate');
           });
       }
   })
