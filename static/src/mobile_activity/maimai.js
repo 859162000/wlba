@@ -34,6 +34,7 @@ org.mmIndex = (function(org){
                         lib.$phone.removeAttr('data-existing');
                         lib.$phone.removeClass('maimai-load'); //隐藏加载
                     }
+
                     lib._canSubmit() ? lib.$submit.removeAttr('disabled'): lib.$submit.attr('disabled', 'true');
                 };
             //检查图形验证码是否填写的回调
@@ -62,7 +63,7 @@ org.mmIndex = (function(org){
 
             //侦听三个input
             $.each($domlist, function(i, dom){
-                //当空间时间大于300毫秒才执行回调，防止无限触发
+                //当空间时间大于300毫秒才执行回调，防止触发频繁
                 $(dom).on('input', _self._debounce(callbackList[i],400));
             });
 
@@ -85,7 +86,9 @@ org.mmIndex = (function(org){
         _debounce :function(fn, delay){
             var timer = null;
             return function () {
-                var context = this, args = arguments;
+                var
+                  context = this,
+                  args = arguments;
                 clearTimeout(timer);
                 timer = setTimeout(function () {
                     fn.apply(context, args);

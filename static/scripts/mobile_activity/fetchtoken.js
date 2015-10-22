@@ -223,19 +223,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 org.test = (function(org){
     var lib = {
         init:function(){
-          /*var test = {"secretToken":"cd0d8da1be93f30e213a347886af3e73","ts":"1445409483.325864","ph":"15110253648","tk":"8331f0f403f0e82dd6695a90dc046885df92fc3f"}
-            org.ajax({
-                url: '/accounts/token/login/ajax/',
-                type: 'post',
-                data:{
-                  token: test.tk,
-                  secret_key: test.secretToken,
-                  ts: test.ts
-                },
-                success: function(data){
-                  console.log(data)
-                }
-            })*/
           lib.webview();
         },
         webview: function(){
@@ -266,9 +253,7 @@ org.test = (function(org){
               var data = { 'Javascript Responds':'收到' }
               log('JS responding with', data)
               responseCallback(data)
-            })
-
-            log('user-Agent', navigator.userAgent);
+            });
 
             bridge.callHandler('sendUserInfo', {'1': '1'}, function (response) {
               log('JS', response)
@@ -335,14 +320,14 @@ org.scratch = (function(org){
 
             //登陆
               $('#login').on('click',function(){
-                 bridge.callHandler('loginApp', function (response) {
-                    log('loginApp', response)
+                 bridge.callHandler('loginApp',{refresh: 1}, function (response) {
+                   $('.test-log').html(JSON.stringify(response))
                  });
               });
             //注册
               $('#regist').on('click',function(){
-                bridge.callHandler('registerApp', function (response) {
-                    log('registerApp', response)
+                bridge.callHandler('registerApp', {refresh: 1}, function (response) {
+                   $('.test-log').html(JSON.stringify(response))
                  });
               });
             //投资
@@ -353,10 +338,17 @@ org.scratch = (function(org){
               });
             //分享
               bridge.registerHandler('shareData', function(data, responseCallback) {
-                var responseData = { title:'呱呱卡test', content: '呱呱卡test' };
-                responseCallback(responseData)
-              })
+                  var responseData = { title:'呱呱卡test', content: '呱呱卡test' };
+                  responseCallback(responseData)
+              });
 
+              //判断client 是否登录，  并且在该方法传递数据埋点
+              bridge.registerHandler('authenticated', function(data, responseCallback) {
+                $('.test-log').html(JSON.stringify(data))
+                var activity = {name: 'guaguaka'}
+                responseCallback(activity)
+
+              })
           })
         }
 
