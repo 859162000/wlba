@@ -727,11 +727,7 @@ class KuaiShortPayCallbackView(APIView):
                                   pm['ref_number'],
                                   pm['res_content'],
                                   pm['signature'])
-        user_profile = WanglibaoUserProfile.objects.get(user=User.objects.get(id=int(pm['user_id'])))
-        send_messages.apply_async(kwargs={
-            'phones': [user_profile.phone],
-            'messages': [messages.deposit_succeed(user_profile.name, pm['amount'])]
-        })
+
         return Response(result)
 
 
