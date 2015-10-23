@@ -53,6 +53,7 @@ urlpatterns = patterns(
 
     url(r'^baidu_finance/$', BaiduFinanceView.as_view(), name="baidu_finance"),
     url(r'^seckill/$', TemplateView.as_view(template_name="seckill.jade")),
+    #url(r'^november_new/$', TemplateView.as_view(template_name="november_new.jade")),
 
     #url(r'^youku/$', TemplateView.as_view(template_name="youku_test.jade")),
 )
@@ -64,9 +65,9 @@ urlpatterns += patterns(
     url(r'^app_movie/$', TemplateView.as_view(template_name="app_movie.jade")),
     url(r'^app_level/$', TemplateView.as_view(template_name="app_level.jade")),
     url(r'^app_invite/$', TemplateView.as_view(template_name="app_invite.jade")),
-    url(r'^app_shareReward/$', TemplateView.as_view(template_name="app_shareReward.jade")),
+    url(r'^app_shareReward/$', TemplateView.as_view(template_name="app_gold_season.jade")),
     url(r'^app_request/$', TemplateView.as_view(template_name="app_request.jade")),
-    url(r'^app_gold/$', TemplateView.as_view(template_name="app_gold.jade")),
+    url(r'^app_gold/$', TemplateView.as_view(template_name="app_gold_season.jade")),
     url(r'^app_july_act/$', TemplateView.as_view(template_name="app_july_act.jade")),
     url(r'^app_extension/$', TemplateView.as_view(template_name="app_extension.jade")),
 #    url(r'^app_ele/$', TemplateView.as_view(template_name="app_ele.jade")),
@@ -79,7 +80,9 @@ urlpatterns += patterns(
     url(r'^app_gold_day/$', TemplateView.as_view(template_name="app_gold_day.jade")),
     url(r'^app_pc_download/$', TemplateView.as_view(template_name="app_pc_download.jade")),
     url(r'^app_lottery/$', TemplateView.as_view(template_name="app_lottery.jade")),
-    #url(r'^app_scratch/$', TemplateView.as_view(template_name="app_scratch.jade")),
+    url(r'^app_scratch/$', TemplateView.as_view(template_name="app_scratch.jade")),
+    url(r'^app_scratch_copy/$', login_required(TemplateView.as_view(template_name="app_scratch_copy.jade"), login_url='/accounts/token_login/')),
+    url(r'^app_scratch_copy/nologin/$', TemplateView.as_view(template_name="app_scratch_copy.jade")),
     url(r'^app_national/$', TemplateView.as_view(template_name="app_national.jade")),
 
 

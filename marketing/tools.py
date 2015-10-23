@@ -135,10 +135,9 @@ def send_income_message_sms():
     messages_list = []
     if incomes:
         for income in incomes:
-            user_info = User.objects.filter(id=income.get('user'))\
-                .select_related('user__wanglibaouserprofile').values('wanglibaouserprofile__phone')
-            phones_list.append(user_info[0].get('wanglibaouserprofile__phone'))
-            messages_list.append(messages.sms_income(user_info[0].get('wanglibaouserprofile__name'),
+            user_profile = User.objects.get(id=income.get('user')).wanglibaouserprofile
+            phones_list.append(user_profile.phone)
+            messages_list.append(messages.sms_income(user_profile.name,
                                                      income.get('invite__count'),
                                                      income.get('earning__sum')))
 
@@ -191,13 +190,13 @@ def check_invested_status(delta=timezone.timedelta(days=3)):
 
 
 @app.task
-def check_redpack_status(delta=timezone.timedelta(days=50)):
+def check_redpack_status(delta=timezone.timedelta(days=3)):
     """
     每天一次检查3天后到期的红包优惠券.发短息提醒投资.
     """
     check_date = timezone.now() - delta
     start = timezone.datetime(year=check_date.year, month=check_date.month, day=check_date.day).replace(tzinfo=pytz.UTC)
-    end = start + timezone.timedelta(days=50)
+    end = start + timezone.timedelta(days=1)
 
     # 有效期为3天的优惠券
     redpacks = RedPackEvent.objects.filter(give_end_at__gte=start, give_end_at__lt=end)
@@ -215,8 +214,9 @@ def check_redpack_status(delta=timezone.timedelta(days=50)):
     messages_list = []
     for user in users:
         try:
+            count = RedPackRecord.objects.filter(user=user).count()
             phones_list.append(user.wanglibaouserprofile.phone)
-            messages_list.append(messages.red_packet_invalid_alert())
+            messages_list.append(messages.red_packet_invalid_alert(count))
         except Exception, e:
             print e
             pass
