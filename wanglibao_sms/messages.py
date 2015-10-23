@@ -9,8 +9,9 @@ from wanglibao_redis.backend import redis_backend
 # zhoudong 重写该模块 2015/10/
 
 # 在后台配置 Misc, key='message_switch', value='True' 使读取配置短信内容
-message_switch, status = Misc.objects.get_or_create(key='message_switch')
-MESSAGE_SWITCH = True if message_switch.value == 'True' else False
+def get_stitch():
+    message_switch, status = Misc.objects.get_or_create(key='message_switch')
+    return True if message_switch.value == 'True' else False
 
 
 def format_datetime(time, fmt):
@@ -35,7 +36,7 @@ def deposit_succeed(name, amount):
     充值成功
     """
 
-    if MESSAGE_SWITCH:
+    if get_stitch():
         try:
             redis = redis_backend()
             obj = redis._get('sms_income')
@@ -53,7 +54,7 @@ def withdraw_failed(name, error_message=None):
     """
     提现失败
     """
-    if MESSAGE_SWITCH:
+    if get_stitch():
         try:
             redis = redis_backend()
             if len(error_message) < 1:
@@ -79,7 +80,7 @@ def withdraw_submitted(name):
     """
     提现申请成功
     """
-    if MESSAGE_SWITCH:
+    if get_stitch():
         try:
             redis = redis_backend()
             obj = redis._get('withdraw_submitted')
@@ -97,7 +98,7 @@ def withdraw_confirmed(name, amount):
     """
     提现成功
     """
-    if MESSAGE_SWITCH:
+    if get_stitch():
         try:
             redis = redis_backend()
             obj = redis._get('withdraw_confirmed')
@@ -119,7 +120,7 @@ def product_settled(name, equity, product, settled_time):
         stand = u'天'
     else:
         stand = u'个月'
-    if MESSAGE_SWITCH:
+    if get_stitch():
         try:
             redis = redis_backend()
             obj = redis._get('product_settled')
@@ -129,14 +130,14 @@ def product_settled(name, equity, product, settled_time):
                 format_datetime(settled_time, u'%Y年%m月%d日'), product.period, stand)
         except Exception, e:
             print e
-            return u'off 亲爱的{}，您已成功投资{}项目 {}元，并于{}开始计息，期限{}{}，感谢您的支持！'.format(
+            return u'亲爱的{}，您已成功投资{}项目 {}元，并于{}开始计息，期限{}{}，感谢您的支持！'.format(
                 name, product.serial_number, equity.equity,
                 format_datetime(settled_time, u'%Y年%m月%d日'), product.period, stand
             )
     else:
         # return u'%s[%s]已投资成功，并于%s开始计息。' \
         #        % (product.short_name, product.serial_number, format_datetime(settled_time, u'%Y年%m月%d日'))
-        return u'off 亲爱的{}，您已成功投资{}项目 {}元，并于{}开始计息，期限{}{}，感谢您的支持！'.format(
+        return u'亲爱的{}，您已成功投资{}项目 {}元，并于{}开始计息，期限{}{}，感谢您的支持！'.format(
             name, product.serial_number, equity.equity,
             format_datetime(settled_time, u'%Y年%m月%d日'), product.period, stand
         )
@@ -147,7 +148,7 @@ def product_failed(name, product):
     """
     投资失败
     """
-    if MESSAGE_SWITCH:
+    if get_stitch():
         try:
             redis = redis_backend()
             obj = redis._get('product_failed')
@@ -175,7 +176,7 @@ def product_amortize(name, product, amount):
     """
     投资到账
     """
-    if MESSAGE_SWITCH:
+    if get_stitch():
         try:
             redis = redis_backend()
             obj = redis._get('product_amortize')
@@ -198,7 +199,7 @@ def product_prepayment(name, product, amount):
     """
     提前还款到账
     """
-    if MESSAGE_SWITCH:
+    if get_stitch():
         try:
             redis = redis_backend()
             obj = redis._get('product_prepayment')
@@ -222,7 +223,7 @@ def validate_code(code):
     """
     手机验证码
     """
-    if MESSAGE_SWITCH:
+    if get_stitch():
         try:
             redis = redis_backend()
             obj = redis._get('product_settled')
@@ -241,7 +242,7 @@ def rand_pass(password):
     """
     发送随机密码
     """
-    if MESSAGE_SWITCH:
+    if get_stitch():
         try:
             redis = redis_backend()
             obj = redis._get('rand_pass')
@@ -261,7 +262,7 @@ def earning_message(name, amount):
     :param amount:
     :return:
     """
-    if MESSAGE_SWITCH:
+    if get_stitch():
         try:
             redis = redis_backend()
             obj = redis._get('earning_message')
@@ -277,39 +278,39 @@ def earning_message(name, amount):
 
 
 @suffix_td
-def red_packet_get_alert(event_name):
+def red_packet_get_alert(amount, rtype):
     """
     红包、加息券获得 提醒
     """
-    if MESSAGE_SWITCH:
+    if get_stitch():
         try:
             redis = redis_backend()
             obj = redis._get('red_packet_get_alert')
             content = cPickle.loads(obj)['content']
-            return content.format(event_name)
+            return content.format(amount, rtype)
         except Exception, e:
             print e
-            return u'{}的加息券/红包已经存入您的账户，登录网利宝账户进行查看。退订回TD'.format(event_name)
+            return u'{}{}已经存入您的账户，登录网利宝账户进行查看。'.format(amount, rtype)
     else:
-        return u'{}的加息券/红包已经存入您的账户，登录网利宝账户进行查看。退订回TD'.format(event_name)
+        return u'{}{}已经存入您的账户，登录网利宝账户进行查看。'.format(amount, rtype)
 
 
 @suffix_td
-def red_packet_invalid_alert(event_name):
+def red_packet_invalid_alert(amount):
     """
     红包、加息券快过期前3天提醒
     """
-    if MESSAGE_SWITCH:
+    if get_stitch():
         try:
             redis = redis_backend()
             obj = redis._get('red_packet_invalid_alert')
             content = cPickle.loads(obj)['content']
-            return content.format(event_name)
+            return content.format(amount)
         except Exception, e:
             print e
-            return u'{}的加息券/红包还有3天就要过期了，请尽快登录网利宝官网或者app使用！退订回TD'.format(event_name)
+            return u'您有{}张理财券再过3天就要过期了，请尽快登录网利宝官网或者app使用！'.format(amount)
     else:
-        return u'{}的加息券/红包还有3天就要过期了，请尽快登录网利宝官网或者app使用！退订回TD'.format(event_name)
+        return u'您有{}张理财券再过3天就要过期了，请尽快登录网利宝官网或者app使用！'.format(amount)
 
 
 @suffix_td
@@ -317,7 +318,7 @@ def user_invest_alert():
     """
     注册3天后未投资用户的提醒短信
     """
-    if MESSAGE_SWITCH:
+    if get_stitch():
         try:
             redis = redis_backend()
             obj = redis._get('user_invest_alert')
@@ -338,7 +339,7 @@ def product_full_message(name):
 # 站内信模板
 def msg_bid_purchase(order_id, product_name, amount):
 
-    if MESSAGE_SWITCH:
+    if get_stitch():
         try:
             redis = redis_backend()
             obj = redis._get('msg_bid_purchase')

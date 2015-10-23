@@ -715,6 +715,7 @@ class KuaiShortPayCallbackView(APIView):
 
     def post(self, request):
         pay = third_pay.KuaiShortPay()
+        logger.debug('kuai_pay_tr3 request body: %s' % request.body)
         pm = pay.handle_pay_result(request.body)
         result = pay.pay_callback(pm['user_id'],
                                   pm['amount'],

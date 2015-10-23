@@ -215,8 +215,9 @@ def check_redpack_status(delta=timezone.timedelta(days=50)):
     messages_list = []
     for user in users:
         try:
+            amount = RedPackRecord.objects.filter(user=user).aggregate(Sum('redpack'))['redpack__sum'] or 0
             phones_list.append(user.wanglibaouserprofile.phone)
-            messages_list.append(messages.red_packet_invalid_alert())
+            messages_list.append(messages.red_packet_invalid_alert(amount))
         except Exception, e:
             print e
             pass

@@ -922,8 +922,11 @@ class KuaiShortPay:
     def handle_pay_result(self, res_content):
         dic = self._result2dict(res_content)
         mer_id = None
+        message = ''
         ref_number = ''
         signature = ''
+        user_id = 0
+        bank_name = ''
         for k in dic['MasMessage']:
             if "TxnMsgContent" in k:
                 tmc = k['TxnMsgContent']['value']
@@ -940,6 +943,14 @@ class KuaiShortPay:
                     if 'signature' in x: signature = x['signature']['value'];continue
         if mer_id != self.MER_ID:
             return False
+
+        # 必定返回order_id
+        pay_info = PayInfo.objects.get(order_id=order_id)
+        if not user_id:
+            user_id = pay_info.user.id
+
+        if not bank_name:
+            bank_name = pay_info.bank.name
 
         result = {"ret_code": 0, "order_id":int(order_id), "user_id":int(user_id),
                     "bank_name":bank_name, "amount":amount, 'message': '成功',
