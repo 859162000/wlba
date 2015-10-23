@@ -306,7 +306,7 @@ class TokenSecretSignAuthenticationForm(forms.Form):
         token_key = self.request.POST.get('token')
         secret_sign = self.request.POST.get('secret_key')
         ts = self.request.POST.get('ts')
-
+        token = None
         if token_key and secret_sign and ts:
             token = Token.objects.get(pk=token_key)
 
