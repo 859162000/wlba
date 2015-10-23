@@ -7,7 +7,6 @@ org.test = (function(org){
           lib.webview();
         },
         webview: function(){
-
           function connectWebViewJavascriptBridge(callback) {
             if (window.WebViewJavascriptBridge) {
               callback(WebViewJavascriptBridge)
@@ -37,7 +36,6 @@ org.test = (function(org){
             });
 
             bridge.callHandler('sendUserInfo', {'1': '1'}, function (response) {
-              log('JS', response)
               $.ajax({
                 url: '/accounts/token/login/ajax/',
                 type: 'post',
