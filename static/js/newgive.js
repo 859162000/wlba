@@ -75,6 +75,10 @@
       }
     return str
   }
+  var login=$("#xun_login");
+  login.on("click",function(){
+    $(this).attr("href","/accounts/login/?next=/activity/baidu_finance/")
+  })
 
   });
 }).call(this);
