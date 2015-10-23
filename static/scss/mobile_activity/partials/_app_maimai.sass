@@ -46,15 +46,11 @@
 
 .maimai-form
   padding: 4rem 2rem
-  .maimai-form-btn
-    +btn(#2380c4, #fff)
 
-  input[name='submit']
-    &:disabled
-      +btn(#b4d2e7, #fff)
 .maimai-check-body
   height: 0
   overflow: hidden
+  -webkit-transition: height 1s
 .maimai-phone
   border: none
   -webkit-appearance: none
@@ -69,25 +65,48 @@
   text-align: center
   border-radius: .3rem
   padding: 0 .25rem 0 1.8rem
+
+
+.maimai-form-btn
+  +btn(#2380c4, #fff)
+
+input[name='submit']
+  &:disabled
+    +btn(#b4d2e7, #fff)
+
+
+.btn-activity
+  width: 2.1rem
+  color: #2380c4
+  margin: 0 auto
+  -webkit-animation: rotateplane 1.5s infinite
+  animation: rotateplane 1.5s infinite
+  -webkit-animation-delay: 1.0s
+  animation-delay: 1.0s
+
 .maimai-load
   @extend .maimai-phone
   background: url("/static/imgs/mobile_activity/app_maimai/load.gif") no-repeat
   background-size: .9rem
   background-position: .4rem center
   background-color: #fff
+
 .maimai-form-sign
-  margin: .5rem 0
   text-align: center
   color: #758794
   font-size: .6rem
-  display: none
-
+  height: 0
+  line-height: 1.275rem
+  -webkit-transition: height 1s
+  overflow: hidden
 
 
 
 .maimai-form-margin
   height: .7rem
   width: 100%
+  -webkit-transition: height 1s
+  overflow: hidden
 
 
 .phone-check
@@ -112,8 +131,11 @@
     border-radius: .3rem
     border: 0
     margin-left: .25rem
-
-
+  .check-img
+    display: block
+    @extend .check-submit
+    background: url("/static/imgs/mobile_activity/app_maimai/load.gif") no-repeat center
+    background-size: .9rem
 .maimai-itme
   background: #f2d434
   margin-bottom: 1.5rem
@@ -199,16 +221,6 @@
 .maimai-use-btn
   +btn(#f2d434, #2679b7)
 
-
-
-.btn-activity
-  width: 2.1rem
-  color: #2380c4
-  margin: 0 auto
-  -webkit-animation: rotateplane 1.5s infinite
-  animation: rotateplane 1.5s infinite
-  -webkit-animation-delay: -1.0s
-  animation-delay: -1.0s
 
 @-webkit-keyframes rotateplane
   0%
