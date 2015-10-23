@@ -97,8 +97,13 @@ def deposit_ok(user_id, amount, device):
             "mtype": "activityintro"
         })
         user = User.objects.get(id=user_id)
+        user_profile = user.wanglibaouserprofile
         activity_backends.check_activity(user, 'recharge', device_type, amount)
         utils.log_clientinfo(device, "deposit", user_id, amount)
+        send_messages.apply_async(kwargs={
+            'phones': [user_profile.phone],
+            'messages': [messages.deposit_succeed(user_profile.name, amount)]
+        })
     except:
         pass
 
