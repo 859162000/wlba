@@ -4,6 +4,7 @@
 import logging
 import re
 import socket
+from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.contrib.auth.decorators import permission_required
 from django.core.paginator import Paginator
@@ -707,6 +708,7 @@ class BindPayView(APIView):
         result = pay.pre_pay(request)
         return Response(result)
 
+
 class KuaiShortPayCallbackView(APIView):
     """
     快付TR3应答API
@@ -725,6 +727,11 @@ class KuaiShortPayCallbackView(APIView):
                                   pm['ref_number'],
                                   pm['res_content'],
                                   pm['signature'])
+        user_profile = WanglibaoUserProfile.objects.get(user=User.objects.get(id=int(pm['user_id'])))
+        send_messages.apply_async(kwargs={
+            'phones': [user_profile.phone],
+            'messages': [messages.deposit_succeed(user_profile.name, pm['amount'])]
+        })
         return Response(result)
 
 

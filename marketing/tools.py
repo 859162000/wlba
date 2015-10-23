@@ -191,13 +191,13 @@ def check_invested_status(delta=timezone.timedelta(days=3)):
 
 
 @app.task
-def check_redpack_status(delta=timezone.timedelta(days=50)):
+def check_redpack_status(delta=timezone.timedelta(days=3)):
     """
     每天一次检查3天后到期的红包优惠券.发短息提醒投资.
     """
     check_date = timezone.now() - delta
     start = timezone.datetime(year=check_date.year, month=check_date.month, day=check_date.day).replace(tzinfo=pytz.UTC)
-    end = start + timezone.timedelta(days=50)
+    end = start + timezone.timedelta(days=1)
 
     # 有效期为3天的优惠券
     redpacks = RedPackEvent.objects.filter(give_end_at__gte=start, give_end_at__lt=end)
