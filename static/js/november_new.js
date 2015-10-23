@@ -13,8 +13,8 @@
         }
     });
     require(['jquery', 'jqueryRotate', "tools"], function ($, jqueryRotate, tool) {
-        var activityId = 37; //activity id l:37 s:65&69 w:72
-        var payId = 37;
+        var activityId = 38; //activity id l:37 s:65&69 w:72
+        var payId = 38;
         function ajaxFun(url,data,fn){
             $.ajax({
                 type: "get",
@@ -56,6 +56,15 @@
             $("#alert-page").show();
         }
         var funs = {
+            "register": function(data){
+                var ret_code = data.ret_code;
+                //console.log(data,"register");
+                if(ret_code === "10001" || ret_code === "00001"){
+                    showAlert($(".running"));
+                }else{
+                    showAlert($(".no-new-user"),"Sorry~您不符合参加规则");
+                }
+            },
             "validation": function(data){
                 var ret_code = data.ret_code;
                 //console.log(data,"register");
@@ -92,7 +101,8 @@
         };
         //注册领红包
         $(".receive-red").on('click',function(){
-            ajaxFun("/api/activity/joinInfo/",{"activity_id":activityId,"trigger_node":"validation"},funs.validation);
+            //ajaxFun("/api/activity/joinInfo/",{"activity_id":activityId,"trigger_node":"validation"},funs.validation);
+            ajaxFun("/api/activity/joinInfo/",{"activity_id":activityId,"trigger_node":"register"},funs.register);
         });
         //充值
         $(".recharge").on("click",function(){
