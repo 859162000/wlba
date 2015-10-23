@@ -135,10 +135,9 @@ def send_income_message_sms():
     messages_list = []
     if incomes:
         for income in incomes:
-            user_info = User.objects.filter(id=income.get('user'))\
-                .select_related('user__wanglibaouserprofile').values('wanglibaouserprofile__phone')
-            phones_list.append(user_info[0].get('wanglibaouserprofile__phone'))
-            messages_list.append(messages.sms_income(user_info[0].get('wanglibaouserprofile__name'),
+            user_profile = User.objects.get(id=income.get('user')).wanglibaouserprofile
+            phones_list.append(user_profile.phone)
+            messages_list.append(messages.sms_income(user_profile.name,
                                                      income.get('invite__count'),
                                                      income.get('earning__sum')))
 
@@ -215,9 +214,9 @@ def check_redpack_status(delta=timezone.timedelta(days=3)):
     messages_list = []
     for user in users:
         try:
-            amount = RedPackRecord.objects.filter(user=user).aggregate(Sum('redpack'))['redpack__sum'] or 0
+            count = RedPackRecord.objects.filter(user=user).count()
             phones_list.append(user.wanglibaouserprofile.phone)
-            messages_list.append(messages.red_packet_invalid_alert(amount))
+            messages_list.append(messages.red_packet_invalid_alert(count))
         except Exception, e:
             print e
             pass
