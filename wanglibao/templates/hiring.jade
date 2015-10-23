@@ -42,10 +42,11 @@ body
               a.icon-cancel.pull-right(rel="modal:close")
 
             .hiring-container
-              .hiring-position 岗位职责：
-              .hiring-content {{hiring.duties|safe}}
-              .hiring-requirement 任职要求：
-              .hiring-content {{hiring.requirements|safe}}
+              .hiring-main
+                .hiring-position 岗位职责：
+                .hiring-content {{hiring.duties|safe}}
+                .hiring-requirement 任职要求：
+                .hiring-content {{hiring.requirements|safe}}
 
               .margin-top-m.align-center
                 a.button-middle.button-red.padding-l-r-2em(href="mailto:hr@wanglibank.com") 发送简历
