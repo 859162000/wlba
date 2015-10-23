@@ -69,7 +69,9 @@ class PayInfoTypeFilter(admin.SimpleListFilter):
 class PayInfoAdmin(admin.ModelAdmin):
     actions = None
     list_display = ('id', 'get_phone', 'get_name', 'type', 'total_amount', 'fee', 'bank', 'card_no', 'status', 'create_time', 'update_time', 'error_message', 'channel')
-    search_fields = ['=user__wanglibaouserprofile__phone', '=id']
+    # Modify by hb on 2015-10-23
+    #search_fields = ['=user__wanglibaouserprofile__phone', '=id']
+    search_fields = ['=user__wanglibaouserprofile__phone']
     raw_id_fields = ('order', 'margin_record', "user")
     list_filter = (
         PayInfoStatusFilter, PayInfoChannelFilter, PayInfoTypeFilter
