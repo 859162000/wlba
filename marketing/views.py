@@ -1902,7 +1902,7 @@ class ThunderTenAcvitityTemplate(TemplateView):
                 response_data = {
                     'ret_code': '10000',
                     'message': 'success',
-                    'nickname': nickname,
+                    'nickname': nickname[:3]+'...',
                 }
             else:
                 response_data = {
