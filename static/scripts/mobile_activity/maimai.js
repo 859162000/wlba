@@ -229,71 +229,60 @@ org.mmIndex = (function(org){
         $codenum : $('input[name=codenum]'),
         $sign: $('.maimai-form-sign'),
         $nbsp : $('.maimai-sign-margin'),
-
-        init:function(){
-            lib._fetchPack();
+        checkState: null,
+        checkPart: [
+            { type: $('input[name=phone]').attr('data-type'), dom: $('input[name=phone]'), message: $('input[name=phone]').attr('data-message')}
+        ],
+        checkAll: [
+            { type: $('input[name=phone]').attr('data-type'), dom: $('input[name=phone]'), message: $('input[name=phone]').attr('data-message')},
+            { type: $('input[name=codeimg]').attr('data-type'), dom: $('input[name=codeimg]'), message: $('input[name=codeimg]').attr('data-message')},
+            { type: $('input[name=codenum]').attr('data-type'), dom: $('input[name=codenum]'), message: $('input[name=codenum]').attr('data-message')}
+        ],
+        init: function(){
+            lib._submit();
+            lib.listen();
+            $(document.body).trigger('from:captcha');
         },
-        _fetchPack: function(){
-            var
-                _self = this,
-                $domlist = [ _self.$phone, _self.$codeimg, _self.$codenum ];
-            //检查手机号的回调
-            var phoneback = function(){
-                    var val = lib.$phone.val();
-                    //手机号是否正确
-                    if(lib._checkPhone(val)){
-                        _self.$sign.css('height','0');  //隐藏提示
-                        _self.$nbsp.css('height','.7rem');
-                        lib.$phone.addClass('maimai-load'); //显示加载
-                        lib.user_exists(val); //判断手机号是否已经注册
-                    }else{
-                        _self.$sign.css('height','1.275rem'); //显示提示
-                        _self.$nbsp.css('height','0');
-                        lib.$body_h.css({'height': '0'});  //隐藏验证区域
-                        lib.$phone.removeAttr('data-existing');
-                        lib.$phone.removeClass('maimai-load'); //隐藏加载
-                    }
+        listen: function(){
+            var _self = this;
 
-                    lib._canSubmit() ? lib.$submit.removeAttr('disabled'): lib.$submit.attr('disabled', 'true');
-                };
-            //检查图形验证码是否填写的回调
-            var codeimgback = function(){
-                    var val = lib.$codeimg.val();
-                    if(val == ''){
-                        lib.$codeimg.attr('data-post','false');
-                    }else{
-                        lib.$codeimg.attr('data-post','true');
-                    }
-                    lib._canSubmit() ? lib.$submit.removeAttr('disabled'): lib.$submit.attr('disabled', 'true');
-                };
-            //检查短信验证码是否填写的回调
-            var codenumback = function(){
-                    var val = lib.$codenum.val();
-                    if(val == ''){
-                        lib.$codenum.attr('data-post','false');
-                    }else{
-                        lib.$codenum.attr('data-post','true');
-                    }
-
-                    lib._canSubmit() ? lib.$submit.removeAttr('disabled'): lib.$submit.attr('disabled', 'true');
-                };
-            //三个回调的数组集合
-            var callbackList = [phoneback, codeimgback, codenumback];
-
-            //侦听三个input
-            $.each($domlist, function(i, dom){
-                //当空间时间大于300毫秒才执行回调，防止触发频繁
-                $(dom).on('input', _self._debounce(callbackList[i],400));
+            $(document).on('from:captcha', function(){
+                _self._fetchcode();
             });
+
+            $(document).on('from:check', function(e, checklist){
+                _self._check(checklist)
+            });
+
+            $(document).on('from:success', function(){
+                _self._success();
+            });
+
+            $(document).on('from:error', function(e, message){
+                _self._error(message)
+            });
+
+            //当空间时间大于300毫秒才执行回调，防止触发频繁
+            _self.$phone.on('input', _self._debounce(function(){
+                $(document.body).trigger('from:check', [_self.checkPart])
+            },400));
+        },
+        _submit: function(){
+            var _self = this;
 
             //提交按钮
             _self.$submit.on('click', function(){
-                phone = _self.$phone.val();
-
-                if(_self._checkPhone(phone)){
+                if(_self.$phone.attr('data-existing') === 'true'){
+                    $(document.body).trigger('from:check', [_self.checkPart]);
                 }else{
-                  return
+                    $(document.body).trigger('from:check', [_self.checkAll]);
                 }
+
+                if(lib.checkState) return
+
+                org.ajax({
+                    url: ''
+                })
               //$(this).addClass('btn-activity')
             });
 
@@ -309,64 +298,54 @@ org.mmIndex = (function(org){
                   context = this,
                   args = arguments;
                 clearTimeout(timer);
+
                 timer = setTimeout(function () {
                     fn.apply(context, args);
                 }, delay);
             };
         },
-        /*
-         * 判断账号接口
-         */
-        user_exists :function(identifier){
-            var _self = this;
-            //判断是否注册过
-            org.ajax({
-                url:'/api/user_exists/' + identifier + '/',
-                success: function(data){
-                    if(data.existing){
-                        _self.$phone.removeClass('maimai-load').attr('data-existing','true');
-                        _self.$body_h.css({'height': '0'});
-                    }else{
-                        _self._fetchcode();
-                        _self.$phone.removeClass('maimai-load').attr('data-existing','false');
-                        _self.$body_h.css({'height': '5.6rem'});
-                    }
-                },
-                error: function (data) {
-                    console.log(data)
-                }
-            })
-        },
-        /*
-         * 是否可点击提交按钮
-         * 当三个input全部正确可点击，
-         * 当手机号是已存在用户可点击，
-         */
-        _canSubmit : function(){
-            var
-              _self = this,
-              isPost = true,
-              domlist=[ _self.$codeimg, _self.$codenum];
+        _check: function(checklist){
 
-           //手机号如果存在，跳出判断 显示可点击
-           if(_self.$phone.attr('data-existing') == 'true' && _self.$phone.attr('data-existing')){
-                return isPost
-            }
+            var check = {};
 
-            //判断验证是否填写
-            $.each(domlist, function(i, dom){
-                if(dom.attr('data-post') !== 'true'){
-                    return  isPost =  false
-                }
+            $.each(checklist, function(i,hash){
+
+                check.checkback = lib['_check' + hash.type]($(hash.dom).val());
+                check.message = hash.message;
+                if(!check.checkback) return false
             });
 
-            //判断在验证都填写的情况下，手机号是否正确
-            if(isPost){
-                if(lib._checkPhone(_self.$phone.val())){
-                    isPost = true
+            if(check.checkback){
+                lib.checkState = true;
+                $(document).trigger('from:success');
+            }else{
+                lib.checkState = false;
+                $(document).trigger('from:error', check.message)
+            }
+        },
+
+        _error: function(message){
+            lib.$sign.css('height','1.275rem').html(message); //显示提示
+            lib.$nbsp.css('height','0');
+        },
+
+        _success: function(){
+            var _self = this;
+
+            _self.$sign.css('height','0');  //隐藏提示
+            _self.$nbsp.css('height','.7rem');
+
+            lib.user_exists(callback);
+
+            function callback (data){
+                if(data.existing){
+                    _self.$body_h.css({'height': '0'});
+                    _self.$phone.attr('data-existing', true);
+                }else{
+                    _self.$body_h.css({'height': '5.6rem'});
+                    _self.$phone.attr('data-existing', false);
                 }
             }
-            return isPost
         },
         _checkPhone : function(val){
             var isRight = false,
@@ -375,14 +354,41 @@ org.mmIndex = (function(org){
             re.test($.trim(val)) ? ($sign.hide(), isRight = true) : ($sign.show(),isRight = false);
             return isRight;
         },
+        _checkVal : function(val){
+
+            if(val == '') return false
+            return true
+        },
         _fetchcode: function(){
             var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
-
             $.get(captcha_refresh_url, function(res) {
                 $('.check-img').attr('src', res['image_url']);
-                //lib.$captcha_key.val(res['key']);
+                $('input[name=captcha_key]').val(res['key']);
             });
-        }
+        },
+        /*
+         * 判断账号接口
+         */
+        user_exists :function(callback){
+            var _self = this;
+                 phone = _self.$phone.val();
+            //判断是否注册过
+            org.ajax({
+                url:'/api/user_exists/' + phone + '/',
+                beforeSend: function(){
+                    lib.$phone.addClass('maimai-load'); //显示加载动画
+                },
+                success: function(data){
+                    callback && callback(data);
+                },
+                error: function (data) {
+                    console.log(data)
+                },
+                complete: function(){
+                    _self.$phone.removeClass('maimai-load');
+                }
+            })
+        },
 
     }
     return {

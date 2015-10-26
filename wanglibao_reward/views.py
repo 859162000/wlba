@@ -630,20 +630,40 @@ class WeixinShareDetailView(TemplateView):
              "share":{'content':shareContent,'title':shareTitle, 'url':url}
         }
 
+    def is_valid_user_auth(self, order_id, amount):
+        try:
+            p2p_record = P2PRecord.objects.filter(order_id=order_id, amount__gte=amount)
+            return p2p_record
+        except Exception, reason:
+            logger.exception(u"判断用户投资额度抛异常 %s, order_id:%s, amount:%s " %(reason, order_id, amount) )
+
     def dispatch(self, request, *args, **kwargs):
         key = 'share_redpack'
+        order_id = kwargs['order_id']
         is_open = False
         shareconfig = Misc.objects.filter(key=key).first()
+        amount = 1000
+
         if shareconfig:
             shareconfig = json.loads(shareconfig.value)
-            if type(shareconfig) == dict and shareconfig['is_open'] == 'true':
-                is_open = True
+            if type(shareconfig) == dict:
+                amount = int(shareconfig['amount'])
+                if shareconfig['is_open'] == 'true':
+                    is_open = True
 
         if not is_open:
             data = {
                 'ret_code': 9010,
                 'message': u'配置开关关闭，分享无效;',
             }
+            return HttpResponse(json.dumps(data), content_type='application/json')
+
+        if not self.is_valid_user_auth(order_id, amount):
+            data = {
+                'ret_code': 9000,
+                'message': u'用户投资没有达到%s元;' % (amount, ),
+            }
+            #TODO: 界面显示不友好
             return HttpResponse(json.dumps(data), content_type='application/json')
 
         return super(WeixinShareDetailView, self).dispatch(request, *args, **kwargs)
@@ -682,7 +702,7 @@ class WeixinShareStartView(TemplateView):
             'openid': openid,
             'order_id': order_id,
             'phone': record.phone if record else '',
-            "share": {'content': share_title, 'title': share_title, 'url': url}
+            "share": {'content': share_content, 'title': share_title, 'url': url}
         }
 
     def dispatch(self, request, *args, **kwargs):

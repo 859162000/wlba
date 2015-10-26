@@ -19,6 +19,7 @@ import new
 #
 #
 from wanglibao_margin.models import Margin, MarginRecord
+from wanglibao_pay.exceptions import VerifyError
 from wanglibao_pay.kuai_pay import KuaiShortPay
 from wanglibao_pay.mock_generator import PayMockGenerator
 from wanglibao_pay.models import PayInfo
@@ -79,7 +80,7 @@ class KuaiPaySignatureTests(TestCase):
         # succeed
         self.assertEqual(True, self.kuai_pay._check_signature(self.content, self.signature))
         # fail
-        self.assertEqual(False, self.kuai_pay._check_signature(self.content, ''))
+        self.assertRaises(VerifyError, self.kuai_pay._check_signature, self.content, '')
 
 class KuaiPayTests(TestCase):
     def setUp(self):
@@ -271,6 +272,7 @@ class KuaiPayTests(TestCase):
         mock_request_switch(self.kuai_pay)
         request_body = PAY_RES.substitute(amount=self.amount_2, order_id=order.id,
                                              user_id=self.user.id, res_code='00')
+
         pm = self.kuai_pay.handle_pay_result(request_body)
         print pm
         result = self.kuai_pay.pay_callback(pm['user_id'],
