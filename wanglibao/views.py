@@ -47,7 +47,7 @@ class IndexView(TemplateView):
 
         return p2p
 
-    def _full_product_payment(self, period, num, product_id=None):
+    def _full_product_payment(self, period, num, product_id=None, order_by='index'):
         """ 查询满表且已经还款中的标 """
         p2p = P2PProduct.objects.select_related(
             'warrant_company', 'activity'
@@ -58,9 +58,13 @@ class IndexView(TemplateView):
         )
         if product_id:
             p2p = p2p.exclude(id__in=product_id)
-        return self._filter_product_period(p2p, period).order_by('-soldout_time', '-priority')[:num]
 
-    def _full_product_nonpayment(self, period, num, product_id=None):
+        if order_by == 'index':
+            return self._filter_product_period(p2p, period).order_by('-soldout_time', '-priority')[:num]
+        else:
+            return self._filter_product_period(p2p, period).order_by('-expected_earning_rate', 'period')[:num]
+
+    def _full_product_nonpayment(self, period, num, product_id=None, order_by='index'):
         """ 查询满表但是非还款中的标 """
         p2p = P2PProduct.objects.select_related(
             'warrant_company', 'activity'
@@ -71,9 +75,12 @@ class IndexView(TemplateView):
         )
         if product_id:
             p2p = p2p.exclude(id__in=product_id)
-        return self._filter_product_period(p2p, period).order_by('-soldout_time', '-priority')[:num]
+        if order_by == 'index':
+            return self._filter_product_period(p2p, period).order_by('-soldout_time', '-priority')[:num]
+        else:
+            return self._filter_product_period(p2p, period).order_by('-expected_earning_rate', 'period')[:num]
 
-    def get_products(self, period, product_id=None):
+    def get_products(self, period, product_id=None, order_by='index'):
         """ 查询符合条件的标列表
         3:1-3个月（包含3月）
         6:4-6个月（包含6个月）
@@ -91,14 +98,22 @@ class IndexView(TemplateView):
         if product_id:
             p2p = p2p.exclude(id__in=product_id)
 
-        p2p = self._filter_product_period(p2p, period).order_by('-priority', '-total_amount')[:self.PRODUCT_LENGTH]
+        if order_by == 'index':
+            p2p = self._filter_product_period(p2p, period).order_by('-priority', '-total_amount')[:self.PRODUCT_LENGTH]
+        else:
+            p2p = self._filter_product_period(p2p, period).order_by('-expected_earning_rate', 'period')[:self.PRODUCT_LENGTH]
+
         p2p_list.extend(p2p)
         # 使用满标但是未还款的扩充
         if len(p2p_list) < self.PRODUCT_LENGTH:
-            p2p_list.extend(self._full_product_nonpayment(period=period, num=self.PRODUCT_LENGTH-len(p2p_list), product_id=product_id))
+            p2p_list.extend(self._full_product_nonpayment(period=period,
+                                                          num=self.PRODUCT_LENGTH-len(p2p_list),
+                                                          product_id=product_id, order_by=order_by))
         # 使用慢标且还款中的扩充
         if len(p2p_list) < self.PRODUCT_LENGTH:
-            p2p_list.extend(self._full_product_payment(period=period, num=self.PRODUCT_LENGTH-len(p2p_list), product_id=product_id))
+            p2p_list.extend(self._full_product_payment(period=period,
+                                                       num=self.PRODUCT_LENGTH-len(p2p_list),
+                                                       product_id=product_id, order_by=order_by))
         return p2p_list
 
     def get_context_data(self, **kwargs):
@@ -322,9 +337,9 @@ class BaiduFinanceView(TemplateView):
                 .order_by('-soldout_time', '-priority')[:3]
             p2p_list.extend(p2p_other)
 
-        p2p_one = IndexView().get_products(period=3, product_id=None)[:1]
-        p2p_two = IndexView().get_products(period=6, product_id=None)[:1]
-        p2p_three = IndexView().get_products(period=9, product_id=None)[:1]
+        p2p_one = IndexView().get_products(period=3, product_id=None, order_by='expected_earning_rate')[:1]
+        p2p_two = IndexView().get_products(period=6, product_id=None, order_by='expected_earning_rate')[:1]
+        p2p_three = IndexView().get_products(period=9, product_id=None, order_by='expected_earning_rate')[:1]
 
         return {
             'site_data': site_data,
