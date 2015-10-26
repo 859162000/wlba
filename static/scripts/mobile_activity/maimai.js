@@ -229,6 +229,7 @@ org.mmIndex = (function(org){
         $codenum : $('input[name=codenum]'),
         $sign: $('.maimai-form-sign'),
         $nbsp : $('.maimai-sign-margin'),
+        checkState: null,
         checkPart: [
             { type: $('input[name=phone]').attr('data-type'), dom: $('input[name=phone]'), message: $('input[name=phone]').attr('data-message')}
         ],
@@ -277,7 +278,11 @@ org.mmIndex = (function(org){
                     $(document.body).trigger('from:check', [_self.checkAll]);
                 }
 
+                if(lib.checkState) return
 
+                org.ajax({
+                    url: ''
+                })
               //$(this).addClass('btn-activity')
             });
 
@@ -311,8 +316,10 @@ org.mmIndex = (function(org){
             });
 
             if(check.checkback){
+                lib.checkState = true;
                 $(document).trigger('from:success');
             }else{
+                lib.checkState = false;
                 $(document).trigger('from:error', check.message)
             }
         },

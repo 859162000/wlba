@@ -265,10 +265,12 @@ org.test = (function(org){
                   ts: responsejson.ts
                 },
                 success: function(data){
-                  window.location.href = $("input[name='next']").val();
+                  $('#log').html(JSON.stringify(response));
+                  //window.location.href = $("input[name='next']").val();
                 },
                 error: function(){
-                  window.location.href = $("input[name='next']").val() + "nologin/";
+                  $('#log').html(JSON.stringify(response));
+                 // window.location.href = $("input[name='next']").val() + "nologin/";
                 }
               })
             });
