@@ -322,9 +322,13 @@ class BaiduFinanceView(TemplateView):
                 .order_by('-soldout_time', '-priority')[:3]
             p2p_list.extend(p2p_other)
 
+        p2p_one = IndexView().get_products(period=3, product_id=None)[:1]
+        p2p_two = IndexView().get_products(period=6, product_id=None)[:1]
+        p2p_three = IndexView().get_products(period=9, product_id=None)[:1]
+
         return {
             'site_data': site_data,
-            'p2p_one': p2p_list[:1],
-            'p2p_two': p2p_list[1:2],
-            'p2p_three': p2p_list[2:3]
+            'p2p_one': p2p_one,
+            'p2p_two': p2p_two,
+            'p2p_three': p2p_three
         }
