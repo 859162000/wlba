@@ -63,6 +63,7 @@ include include/activityTop2
                     input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree",style="position: relative;top: 3px;margin-right: 10px;width: 16px;")
                   | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
                   .form-row-error
+                    //p {{ret_code}}
                 if ret_code == '10000'
                   button#register_submit.button-account.span10.xun-zhuce(type='button')
                 else
@@ -72,7 +73,7 @@ include include/activityTop2
               p.xun-p 注册后直接与您的迅雷账号{{nickname}}绑定
             else
               p.xun-p
-                a(href="/accounts/login/") 未获取到您的迅雷账号,请返回登录迅雷账号
+                a(href="http://vip.xunlei.com/vip_service/alliance/") 未获取到您的迅雷账号,请返回登录迅雷账号
             p.xun-p 已有账号,
               a(href="/accounts/login/") 立即登录
         .denelu-form.dengruhou.denruxunlei(style="display:none")
@@ -81,4 +82,4 @@ include include/activityTop2
           p.xunshang(style="margin-top: 36px;color: #000000") 请先返回迅雷会员-理财特权页面
           p.xunshang(style="color: #000000") 登录您的迅雷账号
           .banner-form--row.align-center(style="margin-bottom: 62px")
-            a.banner-form--button(href="#",style="color:#fff;border-radius: 5px;margin-top: 62px") 返回登录迅雷
+            a.banner-form--button(href="http://vip.xunlei.com/vip_service/alliance/",style="color:#fff;border-radius: 5px;margin-top: 62px") 返回登录迅雷
