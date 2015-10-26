@@ -258,7 +258,6 @@ class WeixinShareDetailView(TemplateView):
 
     def __init__(self):
         self.activity = None
-        self.global_cfg = None
 
     @property
     def current_function_name(self):
@@ -334,9 +333,6 @@ class WeixinShareDetailView(TemplateView):
         "direct": 0,
         "interest_coupon": 1,
         "percent": 2}
-        if not self.global_cfg:
-            if not self.get_global_cfg(activity):
-                self.throw_exception(u'对应的全局红包活动配置没有配，请先配置')
 
         ids = self.get_redpack_id(activity)
         if ids:
@@ -348,7 +344,6 @@ class WeixinShareDetailView(TemplateView):
         for redpack in redpacks:
             try:
                 activity_gift = WanglibaoActivityGift.objects.create(
-                cfg=self.global_cfg,
                 gift_id=product_id,
                 activity=self.activity,
                 redpack=redpack,
@@ -468,34 +463,6 @@ class WeixinShareDetailView(TemplateView):
                 self.exception_msg(reason, u'获取已领奖用户信息失败')
                 return None
 
-    def get_global_cfg(self, activity):
-        """
-            获得活动红包的全局配置信息
-        """
-        if not self.activity:
-            self.get_activity_by_id(activity)
-
-        try:
-            self.global_cfg = WanglibaoActivityGiftGlobalCfg.objects.filter(activity=self.activity).get()
-            return self.global_cfg
-        except Exception, reason:
-            self.exception_msg(reason, u'配置全局配置抛出异常, activity:%s' % (activity,))
-            return None
-
-    def is_valid_user_auth(self, order_id, activity):
-        if not self.activity:
-            self.get_activity_by_id(activity)
-
-        if not self.global_cfg:
-            self.get_global_cfg(activity)
-
-        try:
-            p2p_record = P2PRecord.objects.filter(order_id=order_id, amount__gte=self.global_cfg.amount)
-            return p2p_record
-        except Exception, reason:
-            self.exception_msg(reason, u"判断用户投资额度抛异常")
-            return None
-
     def get_react_text(self, index):
         text = [u'感谢土豪，加息券已到手！',
                 u'这次，终于让我抢到啦！',
@@ -597,7 +564,6 @@ class WeixinShareDetailView(TemplateView):
             activity = record.activity.code if record else activitys[index]
             logger.debug("misc配置的activity有:%s, 本次使用的activity是：%s" % (activitys, activity))
 
-        #更新用户的手机号
         old_phone = self.update_weixin_wanglibao_relative(openid, phone_num)
 
         if not self.has_combine_redpack(order_id, activity):
@@ -607,27 +573,24 @@ class WeixinShareDetailView(TemplateView):
 
         if not user_gift:
             self.debug_msg('phone:%s 没有领取过奖品' %(phone_num,) )
-            #with transaction.atomic():
             user_gift = self.distribute_redpack(phone_num, openid, activity, order_id)
 
             if "No Reward" == user_gift:
                 self.debug_msg('奖品已经发完了，用户:%s 没有领到奖品' %(phone_num,))
                 self.template_name = 'app_weChatEnd.jade'
-                shareTitle, shareContent, url = get_share_infos(order_id)
+                share_title, share_content, url = get_share_infos(order_id)
                 return {
-                    "share":{'content':shareContent,'title':shareTitle, 'url':url}
+                    "share": {'content': share_title, 'title': share_content, 'url': url}
                 }
-                #redirect_url = reverse('weixin_share_end')+'?url_id=%s'%order_id
-                #return redirect(redirect_url)
         else:
             self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s' %(openid, user_gift.identity, user_gift, ))
         gifts = self.get_distribute_status(order_id, activity)
-        shareTitle, shareContent, url = get_share_infos(order_id)
+        share_title, share_content, url = get_share_infos(order_id)
         return {
             "ret_code": 0,
             "self_gift": self.format_response_data(user_gift, openid, 'alone'),
             "all_gift": self.format_response_data(gifts, openid, 'gifts'),
-             "share":{'content':shareContent,'title':shareTitle, 'url':url}
+            "share": {'content': share_title, 'title': share_content, 'url': url}
         }
 
     def is_valid_user_auth(self, order_id, amount):
