@@ -143,7 +143,7 @@ body {
 	left: 3%;
 	top: 20%;
 	z-index: 2;
-	width: 91.2%;
+	width: 28.2%;
 	display: block;
 }
 
@@ -224,26 +224,87 @@ body {
 
 .bg_after {
 	background: url("/static/imgs/mobile_activity/app_halloween/bg_after.jpg");
-	background-size: cover;
-	width: 100%;
-	height: 100%
+	background-size: 100% 100%;
+	width: 300%;
+	height: 100%;
+	-webkit-transform: translateX(0);
+	transform: translateX(0);
+}
+.bg_after_animate1{
+	-webkit-animation-name: bg_after_animate1;
+	animation-name: bg_after_animate1;
+	-webkit-animation-duration: 4.5s;
+	animation-duration: 4.5s;
+	-webkit-animation-timing-function: linear;
+	animation-timing-function: linear;
+	-webkit-animation-delay: 2s;
+	animation-delay: 2s;
+	-webkit-animation-fill-mode: forwards;
+	animation-fill-mode: forwards;
+}
+@-webkit-keyframes bg_after_animate1 {
+	0% {
+		-webkit-transform: translateX(0);
+	}
+
+	100% {
+		-webkit-transform: translateX(-15%);
+	}
 }
 
+@keyframes bg_after_animate1 {
+	0% {
+		transform: translateX(0);
+	}
 
+	100% {
+		transform: translateX(-15%);
+	}
+}
 .bg_front_wrap {
 	position: absolute;
 	left: 0;
 	top: 0;
 	z-index: 4;
 	background: url("/static/imgs/mobile_activity/app_halloween/bg_front.png") no-repeat;
-	background-size: cover;
+	background-size: 100% 100%;
 	background-position: 0% 0%;
 	height: 100%;
-	width: 100%;
+	width: 300%;
 	overflow: hidden;
 	box-shadow: 0 0 120px #000 inset;
 }
+.bg_front_wrap_animate1{
+	-webkit-animation-name: bg_front_wrap_animate1;
+	animation-name: bg_front_wrap_animate1;
+	-webkit-animation-duration: 4.5s;
+	animation-duration: 4.5s;
+	-webkit-animation-timing-function: linear;
+	animation-timing-function: linear;
+	-webkit-animation-delay: 2s;
+	animation-delay: 2s;
+	-webkit-animation-fill-mode: forwards;
+	animation-fill-mode: forwards;
+}
+@-webkit-keyframes bg_front_wrap_animate1 {
+	0% {
+		-webkit-transform: translateX(0);
+	}
 
+	100% {
+		-webkit-transform: translateX(-15%);
+	}
+}
+
+@keyframes bg_front_wrap_animate1 {
+	0% {
+		transform: translateX(0);
+	}
+
+	100% {
+		transform: translateX(-15%);
+	}
+}
 .bg_front_wrap .main {
 	width: 100%;
 	height: 100%;
@@ -825,8 +886,8 @@ body {
 	animation-duration: 1s;
 	-webkit-animation-timing-function: linear;
 	animation-timing-function: linear;
-	-webkit-animation-delay: 1s;
-	animation-delay: 1s;
+	-webkit-animation-delay: 0s;
+	animation-delay: 0s;
 	-webkit-animation-fill-mode: forwards;
 	animation-fill-mode: forwards;
 }
@@ -999,48 +1060,25 @@ body {
 	opacity: 0;
 }
 .car_animate{
-	/*-webkit-animation-name: car_animate;
+	-webkit-animation-name: car_animate;
 	animation-name: car_animate;
-	-webkit-animation-duration: 3s;
-	animation-duration: 3s;
+	-webkit-animation-duration: 5s;
+	animation-duration: 5s;
 	-webkit-animation-timing-function: ease;
 	animation-timing-function: ease;
-	-webkit-animation-delay: 0.2s;
-	animation-delay: 0.2s;
+	-webkit-animation-delay: 1s;
+	animation-delay: 1s;
 	-webkit-animation-fill-mode: forwards;
-	animation-fill-mode: forwards;*/
+	animation-fill-mode: forwards;
 }
 @-webkit-keyframes car_animate {
 	0% {
 		-webkit-transform: translateX(165%);
 	}
-	100%{
+	60%{
 		-webkit-transform: translateX(0);
 	}
-}
-
-@keyframes car_animate {
-	0% {
-		transform: translateX(165%);
-	}
-	100%{
-		transform: translateX(0);
-	}
-}
-#wrap .car_gone{
-	/*-webkit-animation-name: car_gone;
-	animation-name: car_gone;
-	-webkit-animation-duration: 3s;
-	animation-duration: 3s;
-	-webkit-animation-timing-function: eas;
-	animation-timing-function: ease;
-	-webkit-animation-delay: 0s;
-	animation-delay: 0s;
-	-webkit-animation-fill-mode: forwards;
-	animation-fill-mode: forwards;*/
-}
-@-webkit-keyframes car_gone {
-	0% {
+	80%{
 		-webkit-transform: translateX(0);
 	}
 	100%{
@@ -1048,8 +1086,14 @@ body {
 	}
 }
 
-@keyframes car_gone {
+@keyframes car_animate {
 	0% {
+		transform: translateX(165%);
+	}
+	60%{
+		transform: translateX(0);
+	}
+	80%{
 		transform: translateX(0);
 	}
 	100%{
@@ -1118,12 +1162,12 @@ body {
 .gold_animate{
 	-webkit-animation-name: gold_animate;
 	animation-name: gold_animate;
-	-webkit-animation-duration: 4.5s;
-	animation-duration: 4.5s;
+	-webkit-animation-duration: 3s;
+	animation-duration: 3s;
 	-webkit-animation-timing-function: ease;
 	animation-timing-function: ease;
-	-webkit-animation-delay: 2s;
-	animation-delay: 2s;
+	-webkit-animation-delay: 4s;
+	animation-delay: 4s;
 	-webkit-animation-fill-mode: forwards;
 	animation-fill-mode: forwards;
 }
@@ -1156,24 +1200,36 @@ body {
 	-webkit-animation-fill-mode: forwards;
 	animation-fill-mode: forwards;
 }
+.gold_hide2{
+	-webkit-animation-name: gold_hide;
+	animation-name: gold_hide;
+	-webkit-animation-duration: 1s;
+	animation-duration: 1s;
+	-webkit-animation-timing-function: ease;
+	animation-timing-function: ease;
+	-webkit-animation-delay: 3s;
+	animation-delay: 3s;
+	-webkit-animation-fill-mode: forwards;
+	animation-fill-mode: forwards;
+}
 @-webkit-keyframes gold_hide {
 	0% {
-		-webkit-transform: translateY(0);
+		-webkit-transform: translate(-30%,0);
 		opacity: 1;
 	}
 	100%{
-		-webkit-transform: translateY(-20%);
+		-webkit-transform: translate(-30%,-20%);
 		opacity: 0;
 	}
 }
 
 @keyframes gold_hide {
 	0% {
-		transform: translateY(0);
+		transform: translate(-30%,0);
 		opacity: 1;
 	}
 	100%{
-		transform: translateY(-20%);
+		transform: translate(-30%,-20%);
 		opacity: 0;
 	}
 }
