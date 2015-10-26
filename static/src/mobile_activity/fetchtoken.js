@@ -37,7 +37,7 @@ org.test = (function(org){
 
             bridge.callHandler('sendUserInfo', {'1': '1'}, function (response) {
               var responsejson = typeof response == 'string' ? JSON.parse(response): response;
-              $.ajax({
+              org.ajax({
                 url: '/accounts/token/login/ajax/',
                 type: 'post',
                 data:{
@@ -46,12 +46,11 @@ org.test = (function(org){
                   ts: responsejson.ts
                 },
                 success: function(data){
-                  $('#log').html(JSON.stringify(response));
-                  //window.location.href = $("input[name='next']").val();
+                  window.location.href = $("input[name='next']").val();
                 },
-                error: function(){
-                  $('#log').html(JSON.stringify(response));
-                 // window.location.href = $("input[name='next']").val() + "nologin/";
+                error: function(data){
+                  //$('#log').html(JSON.stringify(data))
+                  window.location.href = $("input[name='next']").val() + "nologin/";
                 }
               })
             });
