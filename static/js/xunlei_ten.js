@@ -13,7 +13,7 @@
     require(['jquery', 'activityRegister'], function ($, re) {
         //注册
         re.activityRegister.activityRegisterInit({
-            registerTitle: '注册送100元现金红包',    //注册框标语
+            registerTitle: '领取迅雷会员+现金红包',    //注册框标语
             isNOShow: '1',
             buttonFont: '立即注册'
         });
@@ -75,7 +75,7 @@
             $(".xianshi").slideToggle();
 
         });
-        //
+        //未登录时点击登入是状态
         $('.xunlei11dengru').on('click', function () {
              $('.denruxunlei').show();
              $('.dengxun11').hide();
