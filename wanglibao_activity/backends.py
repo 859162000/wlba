@@ -183,7 +183,7 @@ def _send_gift(user, rule, device_type, is_full, amount=0):
 
     #送优惠券，红包
     if rule.gift_type == 'redpack':
-        redpack_id = int(rule.redpack)
+        redpack_id = rule.redpack
         #此处后期要加上检测红包数量的逻辑，数量不够就记录下没有发送的用户，并通知市场相关人员
         _send_gift_redpack(user, rule, rtype, redpack_id, device_type, amount, is_full)
 
@@ -418,31 +418,68 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
         this_user = user
     user_channel = helper.which_channel(this_user)
     device_type = _decide_device(device_type)
-    rps = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, id=redpack_id,
-                                      give_start_at__lt=now, give_end_at__gt=now).first()
-    if rps:
-        if rps.target_channel != "":
-            chs = rps.target_channel.split(",")
-            chs = [m for m in chs if m.strip() != ""]
-            if user_channel not in chs:
-                return
-        redpack = RedPack.objects.filter(event=rps, status="unused").first()
-        if redpack:
-            # event = redpack.event
-            give_pf = rps.give_platform
-            if give_pf == "all" or give_pf == device_type:
-                if redpack.token != "":
-                    redpack.status = "used"
-                    redpack.save()
-                record = RedPackRecord()
-                record.user = this_user
-                record.redpack = redpack
-                record.change_platform = device_type
-                record.save()
-                if user_ib:
-                    _send_message_sms(user, rule, user_ib, None, amount, rps, record.created_at)
-                else:
-                    _send_message_sms(user, rule, None, None, amount, rps, record.created_at)
+
+    # 新增允许一次填写多个优惠券ID号
+    if redpack_id:
+        redpack_id_list = redpack_id.split(',')
+        redpack_id_list = [int(rid) for rid in redpack_id_list if rid.strip() != '']
+    else:
+        return
+
+    print redpack_id_list
+    if len(redpack_id_list) == 1:
+        print(redpack_id_list[0])
+        red_pack_event = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, id=redpack_id_list[0],
+                                                     give_start_at__lt=now, give_end_at__gt=now).first()
+        if red_pack_event:
+            if red_pack_event.target_channel != "":
+                chs = red_pack_event.target_channel.split(",")
+                chs = [m for m in chs if m.strip() != ""]
+                if user_channel not in chs:
+                    return
+            redpack = RedPack.objects.filter(event=red_pack_event, status="unused").first()
+            if redpack:
+                # event = redpack.event
+                give_pf = red_pack_event.give_platform
+                if give_pf == "all" or give_pf == device_type:
+                    if redpack.token != "":
+                        redpack.status = "used"
+                        redpack.save()
+                    record = RedPackRecord()
+                    record.user = this_user
+                    record.redpack = redpack
+                    record.change_platform = device_type
+                    record.save()
+                    if user_ib:
+                        _send_message_sms(user, rule, user_ib, None, amount, red_pack_event, record.created_at)
+                    else:
+                        _send_message_sms(user, rule, None, None, amount, red_pack_event, record.created_at)
+    else:
+        for red_pack_id in redpack_id_list:
+            red_pack_event = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, id=red_pack_id,
+                                                         give_start_at__lt=now, give_end_at__gt=now).first()
+            if red_pack_event:
+                if red_pack_event.target_channel != "":
+                    chs = red_pack_event.target_channel.split(",")
+                    chs = [m for m in chs if m.strip() != ""]
+                    if user_channel not in chs:
+                        return
+                redpack = RedPack.objects.filter(event=red_pack_event, status="unused").first()
+                if redpack:
+                    give_pf = red_pack_event.give_platform
+                    if give_pf == "all" or give_pf == device_type:
+                        if redpack.token != "":
+                            redpack.status = "used"
+                            redpack.save()
+                        record = RedPackRecord()
+                        record.user = this_user
+                        record.redpack = redpack
+                        record.change_platform = device_type
+                        record.save()
+        if user_ib:
+            _send_message_sms(user, rule, user_ib, None, amount, None, None)
+        else:
+            _send_message_sms(user, rule, None, None, amount, None, None)
 
 
 def _save_activity_record(rule, user, msg_type, msg_content='', introduced_by=False, is_full=False):

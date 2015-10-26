@@ -73,9 +73,9 @@ html
               if p2p.display_status == '抢购中'
                 a.tz_btn(href="/p2p/detail/{{p2p.id}}/") 立即投资
               elif p2p.display_status == '满标审核'
-                a.tz_btn(href="javascript:void(0);") 满标审核
+                a.tz_btn(href="javascript:void(0);", style="background-color:#aaaaaa") 满标审核
               else
-                a.tz_btn(href="javascript:void(0);") 还款中
+                a.tz_btn(href="javascript:void(0);", style="background-color:#aaaaaa") 还款中
     .gv_felfare
       .gv_felbox.clear
         +gv_title("新手福利")
