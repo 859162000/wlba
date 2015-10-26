@@ -702,7 +702,7 @@ class WeixinShareStartView(TemplateView):
             'openid': openid,
             'order_id': order_id,
             'phone': record.phone if record else '',
-            "share": {'content': share_title, 'title': share_title, 'url': url}
+            "share": {'content': share_content, 'title': share_title, 'url': url}
         }
 
     def dispatch(self, request, *args, **kwargs):
