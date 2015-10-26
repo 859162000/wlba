@@ -12,7 +12,7 @@ class ThirdPayError(Exception):
 
 class VerifyError(Exception):
     def __init__(self, pem_path, content, signature):
-        super(ValueError, self).__init()
+        super(VerifyError, self).__init__()
         self.pem_path = pem_path
         self.content = content
         self.signature = signature
