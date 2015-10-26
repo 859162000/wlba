@@ -884,9 +884,7 @@ class GetUserInfo(APIView):
         if not account:
             return Response({'errcode':-6, 'errmsg':u'公众号信息错误或者不存在'})
         try:
-            access_token = account.access_token
-            oauth = WeChatOAuth(account.app_id, account.app_secret, )
-            user_info = oauth.get_user_info(w_user.openid, access_token)
+            user_info = account.get_user_info(w_user.openid)
             w_user.nickname = user_info.get('nickname', "")
             w_user.sex = user_info.get('sex')
             w_user.city = user_info.get('city', "")
@@ -894,6 +892,8 @@ class GetUserInfo(APIView):
             w_user.headimgurl = user_info.get('headimgurl', "")
             w_user.unionid =  user_info.get('unionid', '')
             w_user.province = user_info.get('province', '')
+            w_user.subscribe = user_info.get('subscribe', '')
+            w_user.subscribe_time = user_info.get('subscribe_time', '')
             w_user.save()
             return Response(user_info)
         except WeChatException, e:
