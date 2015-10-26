@@ -1027,6 +1027,7 @@ class XunleiVipRegister(CoopRegister):
         self.register_call_back_url = XUNLEIVIP_REGISTER_CALL_BACK_URL
         self.coop_key = XUNLEIVIP_KEY
         self.coop_register_key = XUNLEIVIP_REGISTER_KEY
+        self.external_channel_user_key = 'xluserid'
 
     def generate_sign(self, data, key):
         sorted_data = sorted(data.iteritems(), key=lambda asd:asd[0], reverse=False)
