@@ -268,7 +268,6 @@ org.test = (function(org){
                   window.location.href = $("input[name='next']").val();
                 },
                 error: function(data){
-                  //$('#log').html(JSON.stringify(data))
                   window.location.href = $("input[name='next']").val() + "nologin/";
                 }
               })
@@ -339,7 +338,10 @@ org.scratch = (function(org){
                     log('jumpToManageMoney', response);
                 });
               });
-
+            //埋点
+              bridge.callHandler('firstLoadWebView', {name: 'test firstLoadWebView'},function (response) {
+                    log('firstLoadWebView', response);
+              });
             //分享
               bridge.registerHandler('shareData', function(data, responseCallback) {
                   var responseData = { title:'呱呱卡test', content: '呱呱卡test' };
