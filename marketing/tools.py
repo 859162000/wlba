@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from wanglibao_margin.models import Margin
 from wanglibao_reward.models import WanglibaoUserGift
-from wanglibao_p2p.models import P2PRecord, P2PProduct
+from wanglibao_p2p.models import P2PProduct
 from wanglibao_account import message as inside_message
 from wanglibao_sms import messages
 from marketing.models import IntroducedBy
@@ -19,10 +19,9 @@ from wanglibao_activity import backends as activity_backends
 from wanglibao_redpack.models import Income, RedPackEvent, RedPack, RedPackRecord
 import datetime
 from django.db.models import Sum, Count
-from wanglibao_profile.models import WanglibaoUserProfile
-import time
 import logging
 logger = logging.getLogger('wanglibao_reward')
+
 
 @app.task
 def decide_first(user_id, amount, device, product_id=0, is_full=False):
@@ -36,12 +35,13 @@ def decide_first(user_id, amount, device, product_id=0, is_full=False):
         introduced_by.bought_at = timezone.now()
         introduced_by.save()
 
-    #活动检测
+    # 活动检测
     activity_backends.check_activity(user, 'invest', device_type, amount, product_id, is_full)
     utils.log_clientinfo(device, "buy", user_id, amount)
 
-    #发送红包
+    # 发送红包
     # send_lottery.apply_async((user_id,))
+
 
 def weixin_redpack_distribute(user):
     phone = user.wanglibaouserprofile.phone
@@ -57,6 +57,7 @@ def weixin_redpack_distribute(user):
         record.valid = 1
         record.save()
 
+
 @app.task
 def register_ok(user_id, device):
     user = User.objects.filter(id=user_id).first()
@@ -64,6 +65,7 @@ def register_ok(user_id, device):
     try:
         weixin_redpack_distribute(user)
     except Exception, reason:
+        print reason
         pass
     title, content = messages.msg_register()
     inside_message.send_one.apply_async(kwargs={
@@ -72,18 +74,20 @@ def register_ok(user_id, device):
         "content": content,
         "mtype": "activityintro"
     })
-    #活动检测
+    # 活动检测
     activity_backends.check_activity(user, 'register', device_type)
     utils.log_clientinfo(device, "register", user_id)
+
 
 @app.task
 def idvalidate_ok(user_id, device):
     user = User.objects.filter(id=user_id).first()
     device_type = device['device_type']
 
-    #活动检测
+    # 活动检测
     activity_backends.check_activity(user, 'validation', device_type)
     utils.log_clientinfo(device, "validation", user_id)
+
 
 @app.task
 def deposit_ok(user_id, amount, device):
@@ -97,9 +101,16 @@ def deposit_ok(user_id, amount, device):
             "mtype": "activityintro"
         })
         user = User.objects.get(id=user_id)
+        user_profile = user.wanglibaouserprofile
         activity_backends.check_activity(user, 'recharge', device_type, amount)
         utils.log_clientinfo(device, "deposit", user_id, amount)
-    except:
+        send_messages.apply_async(kwargs={
+            'phones': [user_profile.phone],
+            'messages': [messages.deposit_succeed(user_profile.name, amount)]
+        })
+        logger.debug('send messages 充值金额啊啊啊: %s' % amount)
+    except Exception, e:
+        logger.debug('send messages 充值异常啊啊啊: %s' % str(e))
         pass
 
 

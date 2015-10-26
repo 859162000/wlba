@@ -99,7 +99,7 @@ org.scratch = (function(org){
 
             //登陆
               $('#login').on('click',function(){
-                 bridge.callHandler('loginApp',{refresh: 1}, function (response) {
+                 bridge.callHandler('loginApp',{refresh: 1, url: ''}, function (response) {
                    $('.test-log').html(JSON.stringify(response))
                  });
               });
@@ -107,7 +107,7 @@ org.scratch = (function(org){
             $('#url').html(window.location.href)
             //注册
               $('#regist').on('click',function(){
-                bridge.callHandler('registerApp', {refresh: 1}, function (response) {
+                bridge.callHandler('registerApp', {refresh: 1, url: ''}, function (response) {
                    $('.test-log').html(JSON.stringify(response));
                  });
               });

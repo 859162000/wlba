@@ -126,19 +126,17 @@ def product_settled(name, equity, product, settled_time):
             obj = redis._get('product_settled')
             content = cPickle.loads(obj)['content']
             return content.format(
-                name, product.pk, product.name,
+                name, product.serial_number, equity.equity,
                 format_datetime(settled_time, u'%Y年%m月%d日'), product.period, stand)
         except Exception, e:
             print e
             return u'亲爱的{}，您已成功投资{}项目 {}元，并于{}开始计息，期限{}{}，感谢您的支持！'.format(
-                name, product.name, equity.equity,
+                name, product.serial_number, equity.equity,
                 format_datetime(settled_time, u'%Y年%m月%d日'), product.period, stand
             )
     else:
-        # return u'%s[%s]已投资成功，并于%s开始计息。' \
-        #        % (product.short_name, product.serial_number, format_datetime(settled_time, u'%Y年%m月%d日'))
         return u'亲爱的{}，您已成功投资{}项目 {}元，并于{}开始计息，期限{}{}，感谢您的支持！'.format(
-            name, product.name, equity.equity,
+            name, product.serial_number, equity.equity,
             format_datetime(settled_time, u'%Y年%m月%d日'), product.period, stand
         )
 
@@ -153,7 +151,7 @@ def product_failed(name, product):
             redis = redis_backend()
             obj = redis._get('product_failed')
             content = cPickle.loads(obj)['content']
-            return content.format(product.short_name,
+            return content.format(name,
                                   product.serial_number,
                                   format_datetime(product.end_time, u'%Y年%m月%d日'))
         except Exception, e:
