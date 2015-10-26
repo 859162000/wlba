@@ -793,18 +793,19 @@ class KuaiShortPay:
         :param ref_number:
         :return:
         """
-        xml = etree.XML("""\
-<MasMessage xmlns="http://www.99bill.com/mas_cnp_merchant_interface">\
-<version>1.0</version>\
-<TxnMsgContent>\
-<txnType>PUR</txnType>\
-<interactiveStatus>TR4</interactiveStatus>\
-<merchantId>%s</merchantId>\
-<terminalId>%s</terminalId>\
-<refNumber>%s</refNumber>\
-</TxnMsgContent>\
-</MasMessage>""" % (self.MER_ID, self.TERM_ID, ref_number))
-        return self.xmlheader[:-1] + etree.tostring(xml, encoding="utf-8")
+        xml = etree.XML("""
+            <MasMessage xmlns="http://www.99bill.com/mas_cnp_merchant_interface">
+                <version>1.0</version>
+                <TxnMsgContent>
+                    <txnType>PUR</txnType>
+                    <interactiveStatus>TR4</interactiveStatus>
+                    <merchantId>%s</merchantId>
+                    <terminalId>%s</terminalId>
+                    <refNumber>%s</refNumber>
+                </TxnMsgContent>
+            </MasMessage>
+        """ % (self.MER_ID, self.TERM_ID, ref_number))
+        return self.xmlheader + etree.tostring(xml, encoding="utf-8")
 
 
     def _request(self, data, url):
@@ -1377,12 +1378,10 @@ class KuaiShortPay:
             except Exception, e:
                 self._handle_third_pay_error(e, user_id, pay_info.id, pay_info.order.id)
 
-        # 发送TR4
+        # TR4应答
         self._request_dict = dict(user_id=user_id, order_id=order_id, amount=amount)
-        data = self._sp_pay_tr4_xml(ref_number)
-        logger.critical('kuai_pay TR4 for pay_info %s: %s' % (pay_info.id, data))
-        result = self._request(data, self.PAY_URL)
-        logger.critical('kuai_pay TR4 result for pay_info %s %s' % (result.status_code, result.text))
+        # return self._sp_pay_tr4_xml(ref_number)
+        return '<?xml version="1.0" encoding="UTF-8"?><MasMessage xmlns="http://www.99bill.com/mas_cnp_merchant_interface"><version>1.0</version><TxnMsgContent><txnType>PUR</txnType><interactiveStatus>TR4</interactiveStatus><merchantId>%s</merchantId><terminalId>%s</terminalId><refNumber>%s</refNumber></TxnMsgContent></MasMessage>'%(self.MER_ID, self.TERM_ID, ref_number)
 
     def add_card_unbind(self, user, card_no, bank):
         """ 保存卡信息到个人名下，不绑定任何渠道 """
