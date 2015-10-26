@@ -73,10 +73,10 @@ org.mmIndex = (function(org){
                     $(document.body).trigger('from:check', [_self.checkAll, false]);
                 }
 
-                if(lib.checkState) return
+                if(!lib.checkState) return
 
                 org.ajax({
-                    url: '/accounts/register/ajax/',
+                    url: '/api/register/',
                     type: 'POST',
                     data: {
                         'identifier': _self.$phone.val(),
@@ -132,12 +132,10 @@ org.mmIndex = (function(org){
                 $(document).trigger('from:error', check.message)
             }
         },
-
         _error: function(message){
             lib.$sign.css('height','1.275rem').html(message); //显示提示
             lib.$nbsp.css('height','0');
         },
-
         _success: function(post){
             var _self = this;
 
@@ -204,21 +202,26 @@ org.mmIndex = (function(org){
                     $('.check-submit').text('数字验证码').removeAttr('disabled').removeClass('postValidation');
                     $(document.body).trigger('from:captcha');
                     $(document.body).trigger('from:error',[result.message]);
+                },
+                success: function(){
+                    times();
                 }
             });
+
             //倒计时
-            var timerFunction = function() {
-                if (count >= 1) {
-                    count--;
-                    return $('.check-submit').text( count + '秒后可重发');
-                } else {
-                    clearInterval(intervalId);
-                     $('.check-submit').text('重新获取').removeAttr('disabled').removeClass('postValidation');
-                    return $(document.body).trigger('from:captcha');
+            function times(){
+                count --;
+                $('.check-submit').text(count + '秒后可重发');
+                intervalId = setTimeout(times, 1000);
+                if ( count <= 0 ){
+                    count = 60;
+                    $('.check-submit').text('重新获取').removeAttr('disabled').removeClass('postValidation');
+                    clearTimeout(intervalId);
                 }
-            };
-            timerFunction();
-            return intervalId = setInterval(timerFunction, 1000);
+            }
+
+
+
         },
         /*
          * 判断账号接口
