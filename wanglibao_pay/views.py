@@ -691,12 +691,11 @@ class BindPayView(APIView):
         result = pay.pre_pay(request)
         return Response(result)
 
-class KuaiShortPayCallbackView(APIView):
+
+class KuaiShortPayCallbackView(View):
     """
     快付TR3应答API
     """
-    permission_classes = ()
-
     def post(self, request):
         pay = third_pay.KuaiShortPay()
         logger.debug('kuai_pay_tr3 request body: %s' % request.body)
@@ -710,7 +709,7 @@ class KuaiShortPayCallbackView(APIView):
                                   pm['res_content'],
                                   pm['signature'])
 
-        return Response(result, content_type='text/xml')
+        return HttpResponse(result, content_type='text/xml')
 
 class BindPayDynNumView(APIView):
     permission_classes = (IsAuthenticated, )
