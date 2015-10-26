@@ -136,9 +136,10 @@ class ActivityRule(models.Model):
     share_type = models.CharField(u'选择参与赠送的人员', max_length=20, choices=SHARE_TYPE, blank=True, default='')
     is_invite_in_date = models.BooleanField(u'判断是否在活动区间内邀请好友', default=False,
                                             help_text=u'勾选此项则，则会先判断邀请关系的成立时间是否在活动期间，是就触发该规则，不是则不做处理')
-    redpack = models.CharField(u'优惠券活动ID', max_length=60, blank=True,
-                               help_text=u'优惠券活动ID一定要和优惠券活动中的ID保持一致，否则会导致无法发放')
-    reward = models.CharField(u'奖品类型名称', max_length=60, blank=True,
+    redpack = models.CharField(u'优惠券活动ID', max_length=200, blank=True,
+                               help_text=u'优惠券活动ID一定要和优惠券活动中的ID保持一致，否则会导致无法发放<br/>\
+                               如需要多个ID则用英文逗号隔开,如:1,2,3')
+    reward = models.CharField(u'奖品类型名称', max_length=200, blank=True,
                               help_text=u'奖品类型名称一定要和奖品中的类型保持一致，否则会导致无法发放奖品')
     income = models.FloatField(u'金额或比率', default=0, blank=True,
                                help_text=u'选择收益或话费时填写，固定金额时填写大于1的数字，收益率时填写0-1之间的小数')
