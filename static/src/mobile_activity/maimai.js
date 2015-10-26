@@ -10,6 +10,7 @@ org.mmIndex = (function(org){
         $codenum : $('input[name=codenum]'),
         $sign: $('.maimai-form-sign'),
         $nbsp : $('.maimai-sign-margin'),
+        $validation: $('.check-submit'),
         checkState: null,
         checkPart: [
             { type: $('input[name=phone]').attr('data-type'), dom: $('input[name=phone]'), message: $('input[name=phone]').attr('data-message')}
@@ -31,12 +32,16 @@ org.mmIndex = (function(org){
                 _self._fetchcode();
             });
 
-            $(document).on('from:check', function(e, checklist){
-                _self._check(checklist)
+            $(document).on('from:validation', function(){
+                _self._fetchValidation();
             });
 
-            $(document).on('from:success', function(){
-                _self._success();
+            $(document).on('from:check', function(e, checklist, post){
+                _self._check(checklist, post)
+            });
+
+            $(document).on('from:success', function(e, post){
+                _self._success(post);
             });
 
             $(document).on('from:error', function(e, message){
@@ -45,8 +50,17 @@ org.mmIndex = (function(org){
 
             //当空间时间大于300毫秒才执行回调，防止触发频繁
             _self.$phone.on('input', _self._debounce(function(){
-                $(document.body).trigger('from:check', [_self.checkPart])
+                $(document.body).trigger('from:check', [_self.checkPart, true])
             },400));
+
+            //刷新验证码
+            $('.check-img').on('click', function() {
+                $(document.body).trigger('from:captcha')
+            });
+
+            $('.check-submit').on('click',function(){
+                $(document.body).trigger('from:validation');
+            });
         },
         _submit: function(){
             var _self = this;
@@ -54,15 +68,29 @@ org.mmIndex = (function(org){
             //提交按钮
             _self.$submit.on('click', function(){
                 if(_self.$phone.attr('data-existing') === 'true'){
-                    $(document.body).trigger('from:check', [_self.checkPart]);
+                    $(document.body).trigger('from:check', [_self.checkPart, false]);
                 }else{
-                    $(document.body).trigger('from:check', [_self.checkAll]);
+                    $(document.body).trigger('from:check', [_self.checkAll, false]);
                 }
 
                 if(lib.checkState) return
 
                 org.ajax({
-                    url: ''
+                    url: '/accounts/register/ajax/',
+                    type: 'POST',
+                    data: {
+                        'identifier': _self.$phone.val(),
+                        'validate_code': _self.$codenum.val(),
+                        'IGNORE_PWD': 'true',
+                        'captcha_0' :  $('input[name=codeimg_key]').val(),
+                        'captcha_1' :  $('input[name=codeimg]').val(),
+                    },
+                    success: function(data){
+                        console.log(data)
+                    },
+                    error: function(data){
+
+                    }
                 })
               //$(this).addClass('btn-activity')
             });
@@ -85,7 +113,7 @@ org.mmIndex = (function(org){
                 }, delay);
             };
         },
-        _check: function(checklist){
+        _check: function(checklist, post){
 
             var check = {};
 
@@ -98,7 +126,7 @@ org.mmIndex = (function(org){
 
             if(check.checkback){
                 lib.checkState = true;
-                $(document).trigger('from:success');
+                $(document).trigger('from:success', post);
             }else{
                 lib.checkState = false;
                 $(document).trigger('from:error', check.message)
@@ -110,13 +138,13 @@ org.mmIndex = (function(org){
             lib.$nbsp.css('height','0');
         },
 
-        _success: function(){
+        _success: function(post){
             var _self = this;
 
             _self.$sign.css('height','0');  //隐藏提示
             _self.$nbsp.css('height','.7rem');
 
-            lib.user_exists(callback);
+            if(post) lib.user_exists(callback);
 
             function callback (data){
                 if(data.existing){
@@ -144,8 +172,53 @@ org.mmIndex = (function(org){
             var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
             $.get(captcha_refresh_url, function(res) {
                 $('.check-img').attr('src', res['image_url']);
-                $('input[name=captcha_key]').val(res['key']);
+                $('input[name=codeimg_key]').val(res['key']);
             });
+        },
+        _fetchValidation:function(){
+            var
+                _self = this,
+                count = 60,  //60秒倒计时
+                intervalId ; //定时器
+
+            var check = [
+                { type: _self.$phone.attr('data-type'), dom: _self.$phone, message: _self.$phone.attr('data-message')},
+                { type: _self.$codeimg.attr('data-type'), dom: _self.$codeimg, message: _self.$codeimg.attr('data-message')},
+            ];
+
+            $(document.body).trigger('from:check', [check, false]);
+
+            if(!_self.checkState) return;
+
+            $('.check-submit').attr('disabled', 'disabled').addClass('postValidation');
+            org.ajax({
+                url : '/api/phone_validation_code/' + _self.$phone.val() + '/',
+                data: {
+                    captcha_0 : $('input[name=codeimg_key]').val(),
+                    captcha_1 : _self.$codeimg.val(),
+                },
+                type : 'POST',
+                error :function(xhr){
+                    clearInterval(intervalId);
+                    var result = JSON.parse(xhr.responseText);
+                    $('.check-submit').text('数字验证码').removeAttr('disabled').removeClass('postValidation');
+                    $(document.body).trigger('from:captcha');
+                    $(document.body).trigger('from:error',[result.message]);
+                }
+            });
+            //倒计时
+            var timerFunction = function() {
+                if (count >= 1) {
+                    count--;
+                    return $('.check-submit').text( count + '秒后可重发');
+                } else {
+                    clearInterval(intervalId);
+                     $('.check-submit').text('重新获取').removeAttr('disabled').removeClass('postValidation');
+                    return $(document.body).trigger('from:captcha');
+                }
+            };
+            timerFunction();
+            return intervalId = setInterval(timerFunction, 1000);
         },
         /*
          * 判断账号接口

@@ -1896,8 +1896,12 @@ class ThunderTenAcvitityTemplate(TemplateView):
 
         if not response_data:
             sign = params.get('sign')
-            nickname = params.get('nickname')
             del params['sign']
+
+            nickname = params.get('nickname')
+            if len(nickname) > 3:
+                nickname = nickname[:3]+'...'
+
             if self.generate_sign(params, XUNLEIVIP_KEY) == sign:
                 response_data = {
                     'ret_code': '10000',

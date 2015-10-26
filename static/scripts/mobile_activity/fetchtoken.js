@@ -256,7 +256,7 @@ org.test = (function(org){
 
             bridge.callHandler('sendUserInfo', {'1': '1'}, function (response) {
               var responsejson = typeof response == 'string' ? JSON.parse(response): response;
-              $.ajax({
+              org.ajax({
                 url: '/accounts/token/login/ajax/',
                 type: 'post',
                 data:{
@@ -265,12 +265,10 @@ org.test = (function(org){
                   ts: responsejson.ts
                 },
                 success: function(data){
-                  $('#log').html(JSON.stringify(response));
-                  //window.location.href = $("input[name='next']").val();
+                  window.location.href = $("input[name='next']").val();
                 },
-                error: function(){
-                  $('#log').html(JSON.stringify(response));
-                 // window.location.href = $("input[name='next']").val() + "nologin/";
+                error: function(data){
+                  window.location.href = $("input[name='next']").val() + "nologin/";
                 }
               })
             });
@@ -340,7 +338,10 @@ org.scratch = (function(org){
                     log('jumpToManageMoney', response);
                 });
               });
-
+            //埋点
+              bridge.callHandler('firstLoadWebView', {name: 'test firstLoadWebView'},function (response) {
+                    log('firstLoadWebView', response);
+              });
             //分享
               bridge.registerHandler('shareData', function(data, responseCallback) {
                   var responseData = { title:'呱呱卡test', content: '呱呱卡test' };
