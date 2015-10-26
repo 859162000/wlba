@@ -1383,7 +1383,7 @@ class KuaiShortPay:
         data = self._sp_pay_tr4_xml(ref_number)
         logger.critical('kuai_pay TR4 for pay_info %s: %s' % (pay_info.id, data))
         result = self._request(data, self.PAY_URL)
-        logger.critical('kuai_pay TR4 result for pay_info %s' % result)
+        logger.critical('kuai_pay TR4 result for pay_info %s %s' % (result.status_code, result.text))
 
     def add_card_unbind(self, user, card_no, bank):
         """ 保存卡信息到个人名下，不绑定任何渠道 """
