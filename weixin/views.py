@@ -878,6 +878,8 @@ class GetUserInfo(APIView):
                        "country": w_user.country,
                         "headimgurl": w_user.headimgurl,
                         "unionid": w_user.unionid,
+                        'subscribe': w_user.subscribe,
+                        'subscribe_time': w_user.subscribe_time
                     })
         # print w_user.account_original_id
         account = Account.objects.get(original_id=w_user.account_original_id)
