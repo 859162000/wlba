@@ -9,19 +9,18 @@ html(style="background: #f6f6f6")
       img(src='/static/imgs/mobile_activity/app_maimai/banner.png')
       a(href='/activity/maimai_rules/').maimai-rule 活动规则
     .maimai-form
-      input(type='tel', name='phone', placeholder='输入手机号',autocomplete = 'off').maimai-phone
+      input(type='tel', name='phone', placeholder='输入手机号',data-type='Phone',data-message='请输入正确的手机号', autocomplete = 'off').maimai-phone
       .maimai-check-body
         .maimai-form-margin
         .phone-check
-          input(type='tel', name='codeimg', placeholder='输入验证码').check-input
-
+          input(type='tel', name='codeimg',data-type='Val',data-message='请输入图形验证码',  placeholder='输入验证码').check-input
+          input(type='hidden', name='captcha_key',value='')
           img(src='').check-img
-
         .maimai-form-margin
         .phone-check
-          input(type='tel', name='codenum', placeholder='输入验证码').check-input
+          input(type='tel', name='codenum',data-type='Val',data-message='请输入短信码', placeholder='输入验证码').check-input
           button.check-submit 数字验证码
       .maimai-form-sign 请输入正确的手机号
       .maimai-form-margin.maimai-sign-margin
-      input(type='button',name='submit',disabled='true',value="领 取").maimai-form-btn
+      input(type='button',name='submit' ,value="领 取").maimai-form-btn
     script(data-init='mmIndex', src="/static/scripts/mobile_activity/maimai.js?v=20150707")

@@ -255,13 +255,14 @@ org.test = (function(org){
             });
 
             bridge.callHandler('sendUserInfo', {'1': '1'}, function (response) {
+              var responsejson = typeof response == 'string' ? JSON.parse(response): response;
               $.ajax({
                 url: '/accounts/token/login/ajax/',
                 type: 'post',
                 data:{
-                  token: response.tk,
-                  secret_key: response.secretToken,
-                  ts: response.ts
+                  token: responsejson.tk,
+                  secret_key: responsejson.secretToken,
+                  ts: responsejson.ts
                 },
                 success: function(data){
                   window.location.href = $("input[name='next']").val();
