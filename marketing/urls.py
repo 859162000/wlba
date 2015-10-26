@@ -1,6 +1,7 @@
 from django.conf.urls import patterns, url
 from django.views.generic import TemplateView, RedirectView
-from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate
+from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate, \
+                            ThunderTenAcvitityTemplate
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 from wanglibao.views import BaiduFinanceView
@@ -33,6 +34,7 @@ urlpatterns = patterns(
     url(r'^gold/$', TemplateView.as_view(template_name="gold.jade"), name='marketing_gold'),
     url(r'^qixi/$', TemplateView.as_view(template_name="qixi.jade")),
     url(r'^xunlei_setp/$', TemplateView.as_view(template_name="xunlei_setp.jade"), name='marketing_xunlei_setp'),
+    url(r'^xunlei_ten/$', ThunderTenAcvitityTemplate.as_view(template_name="xunlei_ten.jade")),
     url(r'^mid_autumn/$', TemplateView.as_view(template_name="mid-autumn.jade")),
     url(r'^xunlei_ten/$', TemplateView.as_view(template_name="xunlei_ten.jade")),
 
@@ -53,6 +55,7 @@ urlpatterns = patterns(
 
     url(r'^baidu_finance/$', BaiduFinanceView.as_view(), name="baidu_finance"),
     url(r'^seckill/$', TemplateView.as_view(template_name="seckill.jade")),
+    #url(r'^november_new/$', TemplateView.as_view(template_name="november_new.jade")),
 
     #url(r'^youku/$', TemplateView.as_view(template_name="youku_test.jade")),
 )
