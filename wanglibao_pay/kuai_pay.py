@@ -804,7 +804,7 @@ class KuaiShortPay:
 <refNumber>%s</refNumber>\
 </TxnMsgContent>\
 </MasMessage>""" % (self.MER_ID, self.TERM_ID, ref_number))
-        return self.xmlheader + etree.tostring(xml, encoding="utf-8")
+        return self.xmlheader[:-1] + etree.tostring(xml, encoding="utf-8")
 
 
     def _request(self, data, url):
