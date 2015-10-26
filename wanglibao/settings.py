@@ -1073,7 +1073,7 @@ THREE_DEFAULT_CHANNEL_CODE = 'wanglibao-three'
 if ENV == ENV_PRODUCTION:
     WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
 else:
-    WEIXIN_CALLBACK_URL = 'https://84befab3.ngrok.io'#'https://staging.wanglibao.com'
+    WEIXIN_CALLBACK_URL = 'https://7fd03dee.ngrok.io'#'https://staging.wanglibao.com'
 
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)

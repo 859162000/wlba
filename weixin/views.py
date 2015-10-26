@@ -55,7 +55,7 @@ class WeixinJoinView(View):
     account = None
 
     def check_signature(self, request, account_key):
-        account = WeixinAccounts.get(account_key)
+        account = Account.objects.get(pk=account_key)#WeixinAccounts.get(account_key)
         try:
             check_signature(
                 account.token,
@@ -69,8 +69,8 @@ class WeixinJoinView(View):
         return True
 
     def get(self, request, account_key):
-        if not self.check_signature(request, account_key):
-            return HttpResponseForbidden()
+        # if not self.check_signature(request, account_key):
+        #     return HttpResponseForbidden()
 
         return HttpResponse(request.GET.get('echostr'))
 
@@ -853,12 +853,6 @@ class GetAuthUserInfo(APIView):
             return Response(user_info)
         except WeChatException, e:
             return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
-
-
-def bindingAccount(request):
-    print request
-    return HttpResponse(json.dumps({'rs':0}))
-
 
 
 
