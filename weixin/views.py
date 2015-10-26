@@ -1,56 +1,52 @@
 # encoding:utf-8
 from django.views.generic import View, TemplateView, RedirectView
-from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseRedirect, HttpResponseBadRequest
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseRedirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
 from django.contrib.auth import login as auth_login
 from django.template import Template, Context
 from django.template.loader import get_template
-from django.db.models import Q
 from django.conf import settings
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import redirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_buy.models import FundHoldInfo
 from wanglibao_banner.models import Banner
-from wanglibao_p2p.models import P2PProduct, P2PEquity, Attachment
+from wanglibao_p2p.models import P2PEquity
 from wanglibao_p2p.amortization_plan import get_amortization_plan
-from wanglibao_margin.models import Margin
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
+
+
+
+
 # from wanglibao_pay import third_pay, trade_record
 from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
 from wanglibao_pay.models import Bank
-from weixin.wechatpy import WeChatClient, parse_message, create_reply
-from weixin.wechatpy.replies import TransferCustomerServiceReply
-from weixin.wechatpy.utils import check_signature
-from weixin.wechatpy.exceptions import InvalidSignatureException, WeChatException,WeChatOAuthException
-from wanglibao_reward.models import WanglibaoUserGift, WanglibaoWeixinRelative, WanglibaoActivityGift
-from weixin.wechatpy.oauth import WeChatOAuth
+from wechatpy import parse_message, create_reply
+from wechatpy.utils import check_signature
+from wechatpy.exceptions import InvalidSignatureException, WeChatException
+from wechatpy.oauth import WeChatOAuth
 from weixin.common.decorators import weixin_api_error
 from weixin.common.wx import generate_js_wxpay
 from .models import Account, WeixinUser, WeixinAccounts, AuthorizeInfo
 from .common.wechat import tuling
 from decimal import Decimal
 from wanglibao_pay.models import Card
-from marketing.models import Channels
 from marketing.utils import get_channel_record
 import datetime
-import base64
 import json
-import time
 import uuid
 import urllib
-import math
 import logging
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from wanglibao_p2p.views import get_p2p_list
 from wanglibao_redis.backend import redis_backend
-import pickle
 
 logger = logging.getLogger('wanglibao_reward')
 
@@ -857,6 +853,11 @@ class GetAuthUserInfo(APIView):
             return Response(user_info)
         except WeChatException, e:
             return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
+
+
+def bindingAccount(request):
+    print request
+    return HttpResponse(json.dumps({'rs':0}))
 
 
 

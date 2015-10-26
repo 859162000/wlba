@@ -1,11 +1,13 @@
 # encoding:utf-8
 from __future__ import unicode_literals
-from django.db import models
-from .common.wechat import gen_token
-from wechatpy.client import WeChatClient
-from django.contrib.auth.models import User
 from collections import OrderedDict
 import datetime
+
+from django.db import models
+from django.contrib.auth.models import User
+
+from .common.wechat import gen_token
+from wechatpy.client import WeChatClient
 
 
 class Account(models.Model):
