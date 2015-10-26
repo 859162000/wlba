@@ -793,18 +793,17 @@ class KuaiShortPay:
         :param ref_number:
         :return:
         """
-        xml = etree.XML("""
-            <MasMessage xmlns="http://www.99bill.com/mas_cnp_merchant_interface">
-                <version>1.0</version>
-                <TxnMsgContent>
-                    <interactiveStatus>TR4</interactiveStatus>
-                    <txnType>PUR</txnType>
-                    <merchantId>%s</merchantId>
-                    <terminalId>%s</terminalId>
-                    <refNumber>%s</refNumber>
-                </TxnMsgContent>
-            </MasMessage>
-        """ % (self.MER_ID, self.TERM_ID, ref_number))
+        xml = etree.XML("""\
+<MasMessage xmlns="http://www.99bill.com/mas_cnp_merchant_interface">\
+<version>1.0</version>\
+<TxnMsgContent>\
+<txnType>PUR</txnType>\
+<interactiveStatus>TR4</interactiveStatus>\
+<merchantId>%s</merchantId>\
+<terminalId>%s</terminalId>\
+<refNumber>%s</refNumber>\
+</TxnMsgContent>\
+</MasMessage>""" % (self.MER_ID, self.TERM_ID, ref_number))
         return self.xmlheader + etree.tostring(xml, encoding="utf-8")
 
 
