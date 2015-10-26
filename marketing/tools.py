@@ -54,6 +54,7 @@ def weixin_redpack_distribute(user):
             logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
         else:
             logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (user, record.rules.redpack,))
+        record.user = user
         record.valid = 1
         record.save()
 

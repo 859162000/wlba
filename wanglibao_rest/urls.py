@@ -54,7 +54,7 @@ from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView
 from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrdeApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
-
+from wanglibao_reward.views import WeixinRedPackView
 
 router = DefaultRouter()
 
@@ -214,6 +214,8 @@ urlpatterns = patterns(
     url(r'^gesture/isenabled/$', GestureIsEnabledView.as_view()),
     url(r'^xunlei/8/check/$', GuestCheckView.as_view()),
     url(r'^trade_pwd/$', TradePasswordView.as_view()),
+    url(r'^wechat/attention/(?P<phone>\d+)/$', WeixinRedPackView.as_view()),
+
 )
 
 urlpatterns += patterns('',

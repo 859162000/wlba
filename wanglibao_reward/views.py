@@ -16,7 +16,7 @@ import json
 import logging
 import random
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_protect
+from rest_framework.views import APIView
 from django.shortcuts import redirect
 from wanglibao.settings import CALLBACK_HOST
 from wanglibao_account import message as inside_message
@@ -816,3 +816,69 @@ def get_share_infos(order_id):
             shareContent=shareconfig.get('share_content', "")
             url = CALLBACK_HOST + reverse('weixin_share_order_gift')+"?url_id=%s"%order_id
     return shareTitle, shareContent, url
+
+
+class WeixinRedPackView(APIView):
+    permission_classes = ()
+
+    def post(self, request, phone):
+        key = 'share_redpack'
+        shareconfig = Misc.objects.filter(key=key).first()
+        if type(shareconfig) == dict:
+            is_attention = shareconfig.get('is_attention', 'false')
+            attention_code = shareconfig.get('attention_code', 'false')
+
+        if not is_attention:
+            data = {
+                'ret_code': 9000,
+                'message': u'配置开关关闭，无法关注;',
+            }
+            return HttpResponse(json.dumps(data), content_type='application/json')
+
+        phone_number = phone.strip()
+        redpack = WanglibaoUserGift.objects.filter(identity=phone, activity__code=attention_code).first()
+        if redpack:
+            data = {
+                'ret_code': 0,
+                'message': u'用户已经领取了加息券',
+                'amount': redpack.amount,
+                'phone': phone_number
+            }
+            return HttpResponse(json.dumps(data), content_type='application/json')
+
+        else:
+            activity = Activity.objects.filter(code=attention_code).first()
+            redpack = WanglibaoUserGift.objects.create(
+                identity=phone_number,
+                activity = activity,
+                type = 1,
+                valid = 0
+            )
+
+            user = WanglibaoUserProfile.objects.filter(phone=phone_number).first()
+            if user:
+                try:
+                    redpack_id = ActivityRule.objects.filter(activity=activity).first().redpack
+                except Exception, reason:
+                    logger("从ActivityRule中获得redpack_id抛异常, reason:%s" % (reason, ))
+
+                try:
+                    redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
+                except Exception, reason:
+                    logger("从RedPackEvent中获得配置红包报错, reason:%s" % (reason, ))
+
+                try:
+                    redpack_backends.give_activity_redpack(self.request.user, redpack_event, 'pc')
+                except Exception, reason:
+                    logger("给用户发红包抛异常, reason:%s" % (reason, ))
+                else:
+                    redpack.user = user
+                    redpack.valid = 1
+                    redpack.save()
+                    data = {
+                        'ret_code': 1000,
+                        'message': u'下发加息券成功',
+                        'amount': redpack.amount,
+                        'phone': phone_number
+                    }
+                    return HttpResponse(json.dumps(data), content_type='application/json')
