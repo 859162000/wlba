@@ -1857,7 +1857,7 @@ class CommonAward(object):
 
 
 class ThunderTenAcvitityTemplate(TemplateView):
-    template_name = 'xunlei_ten.jade'
+    template_name = 'xunlei_setp.jade'
 
     def generate_sign(self, data, key):
         sorted_data = sorted(data.iteritems(), key=lambda asd:asd[0], reverse=False)
@@ -1902,7 +1902,7 @@ class ThunderTenAcvitityTemplate(TemplateView):
                 response_data = {
                     'ret_code': '10000',
                     'message': 'success',
-                    'nickname': nickname,
+                    'nickname': nickname[:3]+'...',
                 }
             else:
                 response_data = {
