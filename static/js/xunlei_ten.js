@@ -75,6 +75,11 @@
             $(".xianshi").slideToggle();
 
         });
+        //
+        $('.xunlei11dengru').on('click', function () {
+             $('.denruxunlei').show();
+             $('.dengxun11').hide();
+        })
 
         //关闭弹出框
         var change = [];
