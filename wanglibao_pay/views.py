@@ -709,8 +709,8 @@ class KuaiShortPayCallbackView(APIView):
                                   pm['ref_number'],
                                   pm['res_content'],
                                   pm['signature'])
-        return Response(result)
 
+        return Response(result, content_type='text/xml')
 
 class BindPayDynNumView(APIView):
     permission_classes = (IsAuthenticated, )
