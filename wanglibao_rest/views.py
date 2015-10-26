@@ -221,7 +221,7 @@ class RegisterAPIView(APIView):
         while index < length:
             password.append(random_list[randint(0,len(random_list))])
             index += 1
-        return str(random_list)
+        return str(password)
 
     def post(self, request, *args, **kwargs):
         """ 
