@@ -669,7 +669,7 @@ class KuaiShortPay:
         pubkey.verify_update(str_content)
         result = pubkey.verify_final(b64decode(signature))
         if result != 1:
-            return False
+            raise VerifyError(self.signature_pem ,str_content, signature)
         else:
             return True
 
@@ -1332,9 +1332,7 @@ class KuaiShortPay:
         # if signature != self.PAY_TR3_SIGNATURE:
         #     return False
         str_to_sign = re.sub(r'<signature>.*</signature>', '', res_content)
-        if not self._check_signature(str_to_sign, signature):
-            logger.debug('kuai pay signature error with content %s and signature %s' % (str_to_sign, signature))
-            return False
+        self._check_signature(str_to_sign, signature)
 
         if not ref_number:
             return False
@@ -1377,8 +1375,6 @@ class KuaiShortPay:
                                            pay_info.request_ip, res_content, pay_info.device)
                     else:
                         raise ThirdPayError(res_code, res_message)
-                else:
-                    raise ThirdPayError(201401, "快钱TR3回调校验失败")
             except Exception, e:
                 self._handle_third_pay_error(e, user_id, pay_info.id, pay_info.order.id)
 
@@ -1386,7 +1382,8 @@ class KuaiShortPay:
         self._request_dict = dict(user_id=user_id, order_id=order_id, amount=amount)
         data = self._sp_pay_tr4_xml(ref_number)
         logger.critical('kuai_pay TR4 for pay_info %s: %s' % (pay_info.id, data))
-        self._request(data, self.PAY_URL)
+        result = self._request(data, self.PAY_URL)
+        logger.critical('kuai_pay TR4 result for pay_info %s' % result)
 
     def add_card_unbind(self, user, card_no, bank):
         """ 保存卡信息到个人名下，不绑定任何渠道 """
