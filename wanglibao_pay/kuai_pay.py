@@ -652,6 +652,7 @@ class KuaiShortPay:
                         "Content-Type":"application/x-www-form-urlencoded"}
         self.xmlheader = '<?xml version="1.0" encoding="UTF-8"?>\n'
         self.pem = settings.KUAI_PEM_PATH
+        self.signature_pem = settings.KUAI_SIGNATURE_PEM_PATH
         self.auth = (self.MER_ID, self.MER_PASS)
         self.ERR_CODE_WAITING = '222222'
 
@@ -661,7 +662,7 @@ class KuaiShortPay:
         :param str_content:
         :return:
         """
-        cert = X509.load_cert(self.pem)
+        cert = X509.load_cert(self.signature_pem)
         pubkey = cert.get_pubkey()
         pubkey.reset_context(md='sha1')
         pubkey.verify_init()
