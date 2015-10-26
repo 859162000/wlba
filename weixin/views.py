@@ -858,6 +858,47 @@ class GetAuthUserInfo(APIView):
         except WeChatException, e:
             return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
 
+class GetUserInfo(APIView):
+    permission_classes = ()
+    def get(self, request):
+        openid = request.GET.get('openid')
+        if not openid:
+            return Response({'errcode':-3, 'errmsg':'openid is null'})
+        w_user = WeixinUser.objects.filter(openid=openid).first()
+        if not w_user:
+            return {'errcode':-4, 'errmsg':'openid is not exist'}
+        if w_user.nickname:
+
+            return Response({
+                       "openid":openid,
+                       " nickname": w_user.nickname,
+                       "sex": w_user.sex,
+                       "province": w_user.province,
+                       "city": w_user.city,
+                       "country": w_user.country,
+                        "headimgurl": w_user.headimgurl,
+                        "unionid": w_user.unionid,
+                    })
+        # print w_user.account_original_id
+        account = Account.objects.get(original_id=w_user.account_original_id)
+        if not account:
+            return Response({'errcode':-6, 'errmsg':u'公众号信息错误或者不存在'})
+        try:
+            access_token = account.access_token
+            oauth = WeChatOAuth(account.app_id, account.app_secret, )
+            user_info = oauth.get_user_info(w_user.openid, access_token)
+            w_user.nickname = user_info.get('nickname', "")
+            w_user.sex = user_info.get('sex')
+            w_user.city = user_info.get('city', "")
+            w_user.country = user_info.get('country', "")
+            w_user.headimgurl = user_info.get('headimgurl', "")
+            w_user.unionid =  user_info.get('unionid', '')
+            w_user.province = user_info.get('province', '')
+            w_user.save()
+            return Response(user_info)
+        except WeChatException, e:
+            return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
+
 
 
 
