@@ -243,7 +243,6 @@
 
         }
 
-
         //请求宝箱接口
         function redpack(sum, callback) {
             $.ajax({
@@ -255,9 +254,12 @@
                 change = data;
                 callback && callback(data);
 
+
             });
         }
-
+        //添加奖品份数
+        $('#jianli').html(change['award']);
+        console.log(change['award']);
 
     });
 }).call(this);

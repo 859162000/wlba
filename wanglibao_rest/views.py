@@ -24,6 +24,7 @@ from marketing.models import PromotionToken, Channels, IntroducedBy
 from marketing.utils import set_promo_user, get_channel_record
 from wanglibao_account.cooperation import CoopRegister
 # from wanglibao_account.cooperation import save_to_binding
+from wanglibao_redpack.models import RedPackEvent
 from random import randint
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account.utils import create_user
@@ -34,6 +35,7 @@ from wanglibao_rest.serializers import AuthTokenSerializer
 from wanglibao_sms.utils import send_validation_code, validate_validation_code, send_rand_pass, generate_validate_code
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao.const import ErrorNumber
+from wanglibao_redpack import backends as redpack_backends
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import VerifyCounter, UserPushId
 from wanglibao_p2p.models import P2PRecord, ProductAmortization, P2PProduct
@@ -55,7 +57,7 @@ from wanglibao_account.models import Binding
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_redpack.models import Income
 from decimal import Decimal
-
+from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 logger = logging.getLogger(__name__)
 
 
@@ -219,7 +221,7 @@ class RegisterAPIView(APIView):
         password = list()
         index = 0
         while index < length:
-            password.append(random_list[randint(0,len(random_list))])
+            password.append(random_list[randint(0,len(random_list)-1)])
             index += 1
         return str(password)
 
@@ -308,11 +310,42 @@ class RegisterAPIView(APIView):
             tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
         #add by Yihen@20151020, 用户填写手机号不写密码即可完成注册, 给用户发短信,不要放到register_ok中去，保持原功能向前兼容
-        if request.DATA.get('IGNORE_PWD') and not password:
+        if request.DATA.get('IGNORE_PWD'):
             send_messages.apply_async(kwargs={
                 "phones": [identifier,],
-                "messages": [password,]
+                "messages": [u'登录账户是：'+identifier+u'登录密码:'+password,]
             })
+
+            if channel == 'maimai':
+                dt = timezone.datetime.now()
+                redpack_event = RedPackEvent.objects.filter(invalid=False, name='maimai_redpack', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                if redpack_event:
+                    redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+
+            if channel == 'weixin_attention':
+                key = 'share_redpack'
+                shareconfig = Misc.objects.filter(key=key).first()
+                if shareconfig:
+                    shareconfig = json.loads(shareconfig.value)
+                    if type(shareconfig) == dict:
+                        is_attention = shareconfig.get('is_attention', '')
+                        attention_code = shareconfig.get('attention_code', '')
+
+                if is_attention:
+                    activity = Activity.objects.filter(code=attention_code).first()
+                    redpack = WanglibaoUserGift.objects.create(
+                        identity=identifier,
+                        activity=activity,
+                        rules=WanglibaoActivityGift.objects.first(),#随机初始化一个值
+                        type=1,
+                        valid=0
+                    )
+                    dt = timezone.datetime.now()
+                    redpack_event = RedPackEvent.objects.filter(invalid=False, name='weixin_atten_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                    if redpack_event:
+                        redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+                        redpack.valid = 1
+                        redpack.save()
 
         return Response({"ret_code": 0, "message": u"注册成功"})
 
@@ -1159,3 +1192,19 @@ class GuestCheckView(APIView):
         # 渠道不符合标准
         else:
             return Response({"ret_code": 2, "message": u"抱歉，不符合活动标准！"})
+
+class DistributeRedpackView(APIView):
+    permission_classes = ()
+    def post(self, request, phone):
+        user = WanglibaoUserProfile.objects.filter(phone=phone).first()
+        channel = self.request.DATA.get('promo_token', '')
+
+        if channel == 'maimai':
+            dt = timezone.datetime.now()
+            redpack_event = RedPackEvent.objects.filter(invalid=False, name='maimai_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
+            if redpack_event:
+                redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+                return Response({"ret_code": 0, "message": u"老用户发送加息券成功"})
+            else:
+                return Response({"ret_code": 1000, "message": u"待发送的加息券没有配置"})
+

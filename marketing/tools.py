@@ -18,7 +18,7 @@ from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity import backends as activity_backends
 from wanglibao_redpack.models import Income, RedPackEvent, RedPack, RedPackRecord
 import datetime
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Q
 import logging
 logger = logging.getLogger('wanglibao_reward')
 
@@ -206,16 +206,16 @@ def check_redpack_status(delta=timezone.timedelta(days=3)):
     """
     每天一次检查3天后到期的红包优惠券.发短息提醒投资.
     """
-    check_date = timezone.now() - delta
+    check_date = timezone.now() + delta
     start = timezone.datetime(year=check_date.year, month=check_date.month, day=check_date.day).replace(tzinfo=pytz.UTC)
     end = start + timezone.timedelta(days=1)
 
     # 有效期为3天的优惠券
-    redpacks = RedPackEvent.objects.filter(give_end_at__gte=start, give_end_at__lt=end)
+    redpacks = RedPackEvent.objects.filter(unavailable_at__gte=start, unavailable_at__lt=end)
     # 未使用过的
-    available = RedPack.objects.filter(event__in=redpacks, status='unused')
+    available = RedPack.objects.filter(event__in=redpacks, status='used')
     # 三天未使用优惠券对应的红包记录
-    records = RedPackRecord.objects.filter(redpack__in=available)
+    records = RedPackRecord.objects.filter(redpack__in=available, order_id__gt=0)
 
     ids = [record.user.id for record in records]
 
@@ -226,7 +226,8 @@ def check_redpack_status(delta=timezone.timedelta(days=3)):
     messages_list = []
     for user in users:
         try:
-            count = RedPackRecord.objects.filter(user=user).count()
+            count = RedPackRecord.objects.filter(user=user, redpack__event__unavailable_at__gte=start,
+                                                 redpack__event__unavailable_at__lt=end, order_id__gt=0).count()
             phones_list.append(user.wanglibaouserprofile.phone)
             messages_list.append(messages.red_packet_invalid_alert(count))
         except Exception, e:

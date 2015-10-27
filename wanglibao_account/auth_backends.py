@@ -72,7 +72,10 @@ class TokenSecretSignAuthBackend(object):
     def authenticate(self, **kwargs):
         token_key = kwargs.get('token')
 
-        token = Token.objects.get(pk=token_key)
+        try:
+            token = Token.objects.get(pk=token_key)
+        except:
+            return None
 
         users = [token.user]
 
