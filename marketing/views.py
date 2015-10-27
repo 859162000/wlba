@@ -664,6 +664,8 @@ def ajax_get_activity_record(action='get_award', *gifts):
     }
     return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
+def get_left_awards(init=108000):
+    return init-ActivityJoinLog.objects.filter(action_name='oct_get_award', join_times=0).count()
 
 def ajax_xunlei(request):
     """
@@ -674,6 +676,7 @@ def ajax_xunlei(request):
         to_json_response = {
             'ret_code': 3000,
             'message': u'用户没有登陆，请先登陆',
+            'award': get_left_awards()
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
