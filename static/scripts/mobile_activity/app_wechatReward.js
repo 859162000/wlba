@@ -317,7 +317,9 @@ org.reward = (function(org){
 
                 if(!lib.checkState) return
 
-                var ops = {
+                var ops = {};
+                if(_self.$phone.attr('data-existing') === 'true'){
+                    ops = {
                         url: '/api/wechat/attention/' + _self.$phone.val()+'/',
                         type: 'post',
                         success: function(data){
@@ -327,8 +329,26 @@ org.reward = (function(org){
 
                         }
                     }
+                }else{
+                    ops = {
+                        url: '/api/register/?promo_token=weixin_atten',
+                        type: 'POST',
+                        data: {
+                            'identifier': _self.$phone.val(),
+                            'validate_code': _self.$codenum.val(),
+                            'IGNORE_PWD': 'true',
+                            'captcha_0' :  $('input[name=codeimg_key]').val(),
+                            'captcha_1' :  _self.$codeimg.val(),
+                        },
+                        success: function(data){
+                            console.log(data)
+                        },
+                        error: function(data){
 
-                org.ajax(ops)
+                        }
+                    }
+                }
+                org.ajax(ops);
             });
         },
         /*
@@ -496,10 +516,10 @@ org.reward = (function(org){
     }
 })(org);
 
-org.mmSuccess = (function(org){
+org.result = (function(org){
     var lib = {
         init:function(){
-            console.log('end')
+            $('#phone-target').html(org.getQueryStringByName('phone'));
         },
     }
     return {
