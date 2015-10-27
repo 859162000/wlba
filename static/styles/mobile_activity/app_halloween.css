@@ -83,20 +83,12 @@ body {
 		background-position: 0 0
 	}
 
-	20% {
+	33% {
 		background-position: -320px 0
 	}
 
-	40% {
+	66% {
 		background-position: -640px 0
-	}
-
-	60% {
-		background-position: -960px 0
-	}
-
-	80% {
-		background-position: -1280px 0
 	}
 
 	100% {
@@ -109,20 +101,12 @@ body {
 		background-position: 0 0
 	}
 
-	20% {
+	33% {
 		background-position: -320px 0
 	}
 
-	40% {
+	66% {
 		background-position: -640px 0
-	}
-
-	60% {
-		background-position: -960px 0
-	}
-
-	80% {
-		background-position: -1280px 0
 	}
 
 	100% {
@@ -135,7 +119,7 @@ body {
 	height:100%;
 	overflow: hidden;
 	box-shadow: 0 0 #000 inset;
-	display: none;
+	z-index: 999;
 }
 
 .title {
@@ -221,7 +205,130 @@ body {
 	z-index: 3;
 	display: block;
 }
+.cloud_animate1{
+	-webkit-animation-name: cloud_animate1;
+	animation-name: cloud_animate1;
+	-webkit-animation-duration: 4.5s;
+	animation-duration: 4.5s;
+	-webkit-animation-timing-function: linear;
+	animation-timing-function: linear;
+	-webkit-animation-delay: 0s;
+	animation-delay: 0s;
+	-webkit-animation-fill-mode: forwards;
+	animation-fill-mode: forwards
+}
+@-webkit-keyframes cloud_animate1 {
+	0% {
+		transform: translateX(0px)
+	}
 
+	100% {
+		transform: translateX(-30px)
+	}
+}
+
+@keyframes cloud_animate1 {
+	0% {
+		transform: translateX(0px)
+	}
+
+	100% {
+		transform: translateX(-30px)
+	}
+}
+.cloud_animate2{
+	-webkit-animation-name: cloud_animate2;
+	animation-name: cloud_animate2;
+	-webkit-animation-duration: 4.5s;
+	animation-duration: 4.5s;
+	-webkit-animation-timing-function: linear;
+	animation-timing-function: linear;
+	-webkit-animation-delay: 0s;
+	animation-delay: 0s;
+	-webkit-animation-fill-mode: forwards;
+	animation-fill-mode: forwards
+}
+@-webkit-keyframes cloud_animate2 {
+	0% {
+		transform: translateX(-30px)
+	}
+
+	100% {
+		transform: translateX(-60px)
+	}
+}
+
+@keyframes cloud_animate2 {
+	0% {
+		transform: translateX(-30px)
+	}
+
+	100% {
+		transform: translateX(-60px)
+	}
+}
+.cloud_animate3{
+	-webkit-animation-name: cloud_animate3;
+	animation-name: cloud_animate3;
+	-webkit-animation-duration: 4.5s;
+	animation-duration: 4.5s;
+	-webkit-animation-timing-function: linear;
+	animation-timing-function: linear;
+	-webkit-animation-delay: 0s;
+	animation-delay: 0s;
+	-webkit-animation-fill-mode: forwards;
+	animation-fill-mode: forwards
+}
+@-webkit-keyframes cloud_animate3 {
+	0% {
+		transform: translateX(-60px)
+	}
+
+	100% {
+		transform: translateX(-90px)
+	}
+}
+
+@keyframes cloud_animate3 {
+	0% {
+		transform: translateX(-60px)
+	}
+
+	100% {
+		transform: translateX(-90px)
+	}
+}
+.cloud_animate4{
+	-webkit-animation-name: cloud_animate4;
+	animation-name: cloud_animate4;
+	-webkit-animation-duration: 6s;
+	animation-duration: 6s;
+	-webkit-animation-timing-function: linear;
+	animation-timing-function: linear;
+	-webkit-animation-delay: 0s;
+	animation-delay: 0s;
+	-webkit-animation-fill-mode: forwards;
+	animation-fill-mode: forwards
+}
+@-webkit-keyframes cloud_animate4 {
+	0% {
+		transform: translateX(-60px)
+	}
+
+	100% {
+		transform: translateX(-120px)
+	}
+}
+
+@keyframes cloud_animate4 {
+	0% {
+		transform: translateX(-60px)
+	}
+
+	100% {
+		transform: translateX(-120px)
+	}
+}
 .bg_after {
 	background: url("/static/imgs/mobile_activity/app_halloween/bg_after.jpg");
 	background-size: 100% 100%;
@@ -237,8 +344,8 @@ body {
 	animation-duration: 4.5s;
 	-webkit-animation-timing-function: linear;
 	animation-timing-function: linear;
-	-webkit-animation-delay: 2s;
-	animation-delay: 2s;
+	-webkit-animation-delay: 0s;
+	animation-delay: 0s;
 	-webkit-animation-fill-mode: forwards;
 	animation-fill-mode: forwards;
 }
@@ -356,8 +463,8 @@ body {
 	animation-duration: 4.5s;
 	-webkit-animation-timing-function: linear;
 	animation-timing-function: linear;
-	-webkit-animation-delay: 2s;
-	animation-delay: 2s;
+	-webkit-animation-delay: 0s;
+	animation-delay: 0s;
 	-webkit-animation-fill-mode: forwards;
 	animation-fill-mode: forwards;
 }
@@ -742,12 +849,12 @@ body {
 .boy_animate1 {
 	-webkit-animation-name: boy_animate1;
 	animation-name: boy_animate1;
-	-webkit-animation-duration: 4s;
-	animation-duration: 4s;
+	-webkit-animation-duration: 4.5s;
+	animation-duration: 4.5s;
 	-webkit-animation-timing-function: steps(1, start);
 	animation-timing-function: steps(1, start);
-	-webkit-animation-delay: 2s;
-	animation-delay: 2s;
+	-webkit-animation-delay: 0s;
+	animation-delay: 0s;
 	-webkit-animation-fill-mode: forwards;
 	animation-fill-mode: forwards;
 }
@@ -1147,36 +1254,46 @@ body {
 @-webkit-keyframes gold_num_main_animate {
 	0% {
 		-webkit-transform: scale(1);
+		opacity:1;
 	}
 	25%{
 		-webkit-transform: scale(1.1);
+		opacity:0.7;
 	}
 	50%{
 		-webkit-transform: scale(1);
+		opacity:1;
 	}
 	75%{
 		-webkit-transform: scale(1.1);
+		opacity:0.7;
 	}
 	100%{
 		-webkit-transform: scale(1);
+		opacity:1;
 	}
 }
 
 @keyframes gold_num_main_animate {
 	0% {
 		transform: scale(1);
+		opacity:1;
 	}
 	25%{
 		transform: scale(1.1);
+		opacity:0.7;
 	}
 	50%{
 		transform: scale(1);
+		opacity:1;
 	}
 	75%{
 		transform: scale(1.1);
+		opacity:0.7;
 	}
 	100%{
 		transform: scale(1);
+		opacity:1;
 	}
 }
 .gold_num_wrap .main {
@@ -1247,7 +1364,7 @@ body {
 .gold_text{
 	position:absolute;
 	left:34%;
-	top:27%;
+	top:26.5%;
 	color: #fff;
 	font-size:20px;
 	width:55%;
@@ -1257,6 +1374,11 @@ body {
 @media screen and (min-width:700px) and (min-height:700px){
 	.gold_text{
 		font-size:40px;
+	}
+}
+@media screen and (min-width:410px) and (min-height:700px){
+	.gold_text{
+		top:29%;
 	}
 }
 .car{
@@ -1290,8 +1412,8 @@ body {
 	animation-duration: 5s;
 	-webkit-animation-timing-function: ease;
 	animation-timing-function: ease;
-	-webkit-animation-delay: 1s;
-	animation-delay: 1s;
+	-webkit-animation-delay: 0.5s;
+	animation-delay: 0.5s;
 	-webkit-animation-fill-mode: forwards;
 	animation-fill-mode: forwards;
 }
@@ -1386,12 +1508,12 @@ body {
 .gold_animate{
 	-webkit-animation-name: gold_animate;
 	animation-name: gold_animate;
-	-webkit-animation-duration: 3s;
-	animation-duration: 3s;
-	-webkit-animation-timing-function: ease;
-	animation-timing-function: ease;
-	-webkit-animation-delay: 4s;
-	animation-delay: 4s;
+	-webkit-animation-duration: 4.5s;
+	animation-duration: 4.5s;
+	-webkit-animation-timing-function: linear;
+	animation-timing-function: linear;
+	-webkit-animation-delay: 0s;
+	animation-delay: 0s;
 	-webkit-animation-fill-mode: forwards;
 	animation-fill-mode: forwards;
 }
@@ -1468,16 +1590,22 @@ body {
 .money_50{
 	width:16.5%;
 	position: absolute;
-	left:13%;
+	left:14%;
 	bottom:40%;
 	z-index: 5;
-	-webkit-transform: translateY(40%);
-	transform: translateY(40%);
+	-webkit-transform: translateY(-60%);
+	transform: translateY(-60%);
 	opacity: 0;
 	display: none;
 }
 @media screen and (min-width:700px) and (min-height:700px){
 	.money_50{
+		left:11%;
+	}
+}
+@media screen and (max-width:420px) and (min-height:700px){
+	.money_50{
+		bottom:32%;
 		left:11%;
 	}
 }
@@ -1495,38 +1623,38 @@ body {
 }
 @-webkit-keyframes money_50_animate {
 	0% {
-		-webkit-transform: translateY(40%);
+		-webkit-transform: translateY(-60%);
 		opacity: 0;
 	}
 	20% {
-		-webkit-transform: translateY(20%);
+		-webkit-transform: translateY(0);
 		opacity: 1;
 	}
 	70%{
-		-webkit-transform: translateY(0);
+		-webkit-transform: translateY(20%);
 		opacity: 1;	
 	}
 	100%{
-		-webkit-transform: translateY(-60%);
+		-webkit-transform: translateY(40%);
 		opacity: 0;
 	}
 }
 
 @keyframes money_50_animate {
 	0% {
-		-webkit-transform: translateY(40%);
+		-webkit-transform: translateY(-60%);
 		opacity: 0;
 	}
 	20% {
-		-webkit-transform: translateY(20%);
+		-webkit-transform: translateY(0);
 		opacity: 1;
 	}
 	70%{
-		transform: translateY(0);
+		transform: translateY(20%);
 		opacity: 1;	
 	}
 	100%{
-		transform: translateY(-60%);
+		transform: translateY(40%);
 		opacity: 0;
 	}
 }
@@ -1536,8 +1664,8 @@ body {
 	right: 18.6%;
 	bottom: 12.2%;
 	z-index: 3;
-	-webkit-transform: translateX(142%);
-	transform: translateX(142%);
+	-webkit-transform: translateX(150%);
+	transform: translateX(150%);
 	display: none;
 }
 .girl_wrap .main{
@@ -1563,7 +1691,7 @@ body {
 }
 @-webkit-keyframes girl_come_animate {
 	0% {
-		-webkit-transform: translateX(142%);
+		-webkit-transform: translateX(150%);
 	}
 	100% {
 		-webkit-transform: translateX(0%);
@@ -1572,7 +1700,7 @@ body {
 
 @keyframes girl_come_animate {
 	0% {
-		transform: translateX(142%);
+		transform: translateX(150%);
 	}
 	100% {
 		transform: translateX(0%);
@@ -1796,7 +1924,7 @@ body {
 
 @keyframes ghost_gone {
 	0% {
-		opacity:0;
+		opacity:1;
 		transform: translateY(0px);
 	}
 	20% {
@@ -1804,8 +1932,8 @@ body {
 		transform: translateY(0px);
 	}
 	100% {
-		opacity:1;
-		transform: translateY(0px);
+		opacity:0;
+		transform: translateY(-40px);
 	}
 }
 .ghost .main{
@@ -1821,5 +1949,183 @@ body {
 	left:0%;
 	top:40%;
 	width:90%;
+	display: none;
+}
+.poor_wrap,.rich_wrap{
+	position:fixed;
+	width: 100%;
+	height:100%;
+	overflow: hidden;
+	box-shadow: 0 0 #000 inset;
+	z-index: 99;
+	left:0;
+	top:0;
+}
+.poor_wrap{
+	/*display: none;*/
+}
+.poor_wrap .bg{
+	background: url("/static/imgs/mobile_activity/app_halloween/poor_bg.jpg") no-repeat center top;
+	background-size: 100% 100%;
+	width:100%;
+	height:100%;
+}
+.poor_wrap .poor_boy{
+	background: url("/static/imgs/mobile_activity/app_halloween/poor_boy.png") no-repeat center top;
+	background-size: auto 100%;
+	width:100%;
+	height:100%;	
+	position: absolute;
+	left:0;
+	top:0;
+	z-index:3;
+}
+.poor_wrap .light{
+	background: url("/static/imgs/mobile_activity/app_halloween/poor_light.png") no-repeat center top;
+	background-size: 100% 100%;
+	width:100%;
+	height:100%;	
+	position: absolute;
+	left:0;
+	top:0;
+	z-index:4;
+	-webkit-transform: translateY(-50px);
+	transform: translateY(-50px);
+	opacity: 0;
+}
+.poor_light_animate{
+	-webkit-animation-name: poor_light_animate;
+	animation-name: poor_light_animate;
+	-webkit-animation-duration: 2s;
+	animation-duration: 2s;
+	-webkit-animation-timing-function: ease;
+	animation-timing-function: ease;
+	-webkit-animation-delay: 0.5s;
+	animation-delay: 0.5s;
+	-webkit-animation-fill-mode: forwards;
+	animation-fill-mode: forwards;
+}
+@-webkit-keyframes poor_light_animate {
+	0% {
+		opacity:0;
+		-webkit-transform: translateY(-50px);
+	}
+	100% {
+		opacity:1;
+		-webkit-transform: translateY(0px);
+	}
+}
+
+@keyframes poor_light_animate {
+	0% {
+		opacity:0;
+		transform: translateY(-50px);
+	}
+	100% {
+		opacity:1;
+		transform: translateY(0px);
+	}
+}
+.poor_wrap .button,.rich_wrap .button{
+	position: absolute;
+	left:30%;
+	bottom:5.2%;
+	z-index: 5;
+	width:40%;
 	display: block;
+}
+.poor_wrap .button img,.rich_wrap .button img{
+	width:100%;
+	display: block;
+}
+.rich_wrap{
+	/*display: none;*/
+}
+.rich_wrap .bg_front{
+	background: url("/static/imgs/mobile_activity/app_halloween/rich_bg_front.png") no-repeat center top;
+	background-size: 100% 100%;
+	width:100%;
+	height:100%;	
+	position: absolute;
+	left:0;
+	top:0;
+	z-index:4;
+}
+.rich_wrap .rich_bg_after{
+	background: url("/static/imgs/mobile_activity/app_halloween/rich_bg_after.jpg") no-repeat center top;
+	background-size: 100% 100%;
+	width:100%;
+	height:100%;	
+	position: absolute;
+	left:0;
+	top:0;
+	z-index:2;
+}
+.rich_wrap .light{
+	background: url("/static/imgs/mobile_activity/app_halloween/rich_light.png") no-repeat;
+	background-position: 0 0;
+	background-size:cover;
+	width:100%;	
+	position: absolute;
+	bottom:21.5%;
+	z-index:3;
+}
+.rich_wrap .light img{
+	width:100%;
+	display: block;
+	opacity: 0;
+}
+.rich_wrap .rich_light_animate{
+	-webkit-animation-name: rich_light_animate1;
+	animation-name: rich_light_animate1;
+	-webkit-animation-duration: 1s;
+	animation-duration: 1s;
+	-webkit-animation-timing-function: steps(1, start);
+	animation-timing-function: steps(1, start);
+	-webkit-animation-delay: 0s;
+	animation-delay: 0s;
+	-webkit-animation-fill-mode: forwards;
+	animation-fill-mode: forwards;
+
+	-webkit-animation-iteration-count:infinite;
+	animation-iteration-count:infinite;
+}
+@-webkit-keyframes rich_light_animate1 {
+	0% {
+		background-position: 0 0;	
+		background-size:cover;
+	}
+	50%{
+		background-position: right 0;
+		background-size:cover;	
+	}
+	100% {
+		background-position: 0 0;	
+		background-size:cover;
+	}
+}
+
+@keyframes rich_light_animate1 {
+	0% {
+		background-position: 0 0;
+		background-size:cover;	
+	}
+	50%{
+		background-position: right 0;
+		background-size:cover;	
+	}
+	100% {
+		background-position: 0 0;	
+		background-size:cover;
+	}
+}
+.rich_wrap .boy_img{
+	background: url("/static/imgs/mobile_activity/app_halloween/rich_boy.png") no-repeat center top;
+	background-size: auto 100%;
+	width:100%;
+	height:100%;	
+	position: absolute;
+	left:0;
+	top:0;
+	z-index:5;
 }
