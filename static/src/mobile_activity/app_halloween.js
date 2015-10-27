@@ -1,11 +1,11 @@
 
 
 $(function() {
-
     window.onload = function() {
+        $('#wrap').css('opacity','1');
         $('.no_signal_wrap').addClass('no_signal_wrap_animate');
         step1();
-    }    
+    }
     var money = 0;
     var this_money;
     /*数字变换*/
@@ -68,7 +68,7 @@ $(function() {
             i--;
             if (i === 0) {
                 clearInterval(timer1);
-                $('.boy_stay').show();
+                //$('.boy_stay').show();
             }
         },
         1000);
@@ -250,4 +250,5 @@ $(function() {
             $('.rich_wrap').css('z-index','9999');
         }
     }
+
 })
