@@ -13,7 +13,7 @@
     require(['jquery', 'activityRegister'], function ($, re) {
         //注册
         re.activityRegister.activityRegisterInit({
-            registerTitle: '注册送100元现金红包',    //注册框标语
+            registerTitle: '领取迅雷会员+现金红包 ',    //注册框标语
             isNOShow: '1',
             buttonFont: '立即注册'
         });
@@ -75,6 +75,11 @@
             $(".xianshi").slideToggle();
 
         });
+        //未登录时点击登入是状态
+        $('.xunlei11dengru').on('click', function () {
+             $('.denruxunlei').show();
+             $('.dengxun11').hide();
+        })
 
         //关闭弹出框
         var change = [];
@@ -230,7 +235,7 @@
 
             } else if (change['ret_code'] == 3001) {
                 $('#xl-aug-prize').hide();
-                var xii = ['人世间最美好的事情莫过于如此，1%加息券', '人品大爆发，1%加息券', '终于等到你，还好我没放弃，1%加息券'];
+                var xii = ['人世间最美好的事情莫过于如此，0.5%加息券', '人品大爆发，0.5%加息券', '终于等到你，还好我没放弃，0.5%加息券'];
                 var shu = parseInt(Math.random() * 3);
                 $('#xl-aug-success11 p .xl-aug').text(xii[shu]);
                 $('#xl-aug-success11').show();
