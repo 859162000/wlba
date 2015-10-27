@@ -220,15 +220,15 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 ;
 
 
-org.mmIndex = (function(org){
+org.reward = (function(org){
     var lib = {
-        $body_h : $('.maimai-check-body'),
-        $submit : $('.maimai-form-btn'),
+        $body_h : $('.wechat-check-body'),
+        $submit : $('.wechat-form-btn'),
         $phone : $('input[name=phone]'),
         $codeimg : $('input[name=codeimg]'),
         $codenum : $('input[name=codenum]'),
-        $sign: $('.maimai-form-sign'),
-        $nbsp : $('.maimai-sign-margin'),
+        $sign: $('.wechat-form-sign'),
+        $nbsp : $('.wechat-sign-margin'),
         $validation: $('.check-submit'),
         $validationTime: false,  //验证码有效期控制
         checkState: null,
@@ -302,18 +302,9 @@ org.mmIndex = (function(org){
 
                 if(!lib.checkState) return
 
-                var ops = {};
-                if(_self.$phone.attr('data-existing') === 'true'){
-                    ops = {
-                        url: '/api/register/',
-                        type: 'POST',
-                        data: {
-                            'identifier': _self.$phone.val(),
-                            'validate_code': _self.$codenum.val(),
-                            'IGNORE_PWD': 'true',
-                            'captcha_0' :  $('input[name=codeimg_key]').val(),
-                            'captcha_1' :  $('input[name=codeimg]').val(),
-                        },
+                var ops = {
+                        url: '/api/wechat/attention/' + _self.$phone.val(),
+                        type: 'post',
                         success: function(data){
                             console.log(data)
                         },
@@ -321,23 +312,9 @@ org.mmIndex = (function(org){
 
                         }
                     }
-                }else{
-                    ops = {
-                        url: '/api/distribute/redpack/'+phone+'/?promo_token=momo',
-                        type: 'GET',
-                        success: function(data){
-                            console.log(data)
-                        },
-                        error: function(data){
-
-                        }
-                    }
-                }
 
                 org.ajax(ops)
-
             });
-
         },
         /*
          * fn 回调函数
@@ -392,7 +369,7 @@ org.mmIndex = (function(org){
                     _self.$body_h.css({'height': '0'});
                     _self.$phone.attr('data-existing', true);
                 }else{
-                    _self.$body_h.css({'height': '5.6rem'});
+                    _self.$body_h.css({'height': '6.6rem'});
                     _self.$phone.attr('data-existing', false);
                 }
             }
@@ -474,7 +451,7 @@ org.mmIndex = (function(org){
             org.ajax({
                 url:'/api/user_exists/' + phone + '/',
                 beforeSend: function(){
-                    lib.$phone.addClass('maimai-load'); //显示加载动画
+                    lib.$phone.addClass('wechat-load'); //显示加载动画
                 },
                 success: function(data){
                     callback && callback(data);
@@ -483,7 +460,7 @@ org.mmIndex = (function(org){
                     console.log(data)
                 },
                 complete: function(){
-                    _self.$phone.removeClass('maimai-load');
+                    _self.$phone.removeClass('wechat-load');
                 }
             })
         },

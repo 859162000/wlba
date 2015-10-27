@@ -119,6 +119,7 @@ urlpatterns += patterns(
     url(r'^maimai_index/$', TemplateView.as_view(template_name="app_maimaiIndex.jade")),
     url(r'^maimai_rules/$', TemplateView.as_view(template_name="app_maimaiRule.jade")),
     url(r'^maimai_success/$', TemplateView.as_view(template_name="app_maimaiSuccess.jade")),
+    url(r'^wechat_reward/$', TemplateView.as_view(template_name="app_wechatReward.jade")),
 
 )
 
