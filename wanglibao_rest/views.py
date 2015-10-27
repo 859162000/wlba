@@ -316,7 +316,7 @@ class RegisterAPIView(APIView):
                 "messages": [u'登录账户是：'+identifier+u'登录密码:'+password,]
             })
 
-            if channel == 'momo':
+            if channel == 'maimai':
                 dt = timezone.datetime.now()
                 redpack_event = RedPackEvent.objects.filter(invalid=False, name='momo_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
                 if redpack_event:
@@ -1174,7 +1174,7 @@ class DistributeRedpackView(APIView):
         user = WanglibaoUserProfile.objects.filter(phone=phone).first()
         channel = self.request.DATA.get('promo_token', '')
 
-        if channel == 'momo':
+        if channel == 'maimai':
             dt = timezone.datetime.now()
             redpack_event = RedPackEvent.objects.filter(invalid=False, name='momo_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
             if redpack_event:
