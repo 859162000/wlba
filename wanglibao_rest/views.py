@@ -1159,3 +1159,38 @@ class GuestCheckView(APIView):
         # 渠道不符合标准
         else:
             return Response({"ret_code": 2, "message": u"抱歉，不符合活动标准！"})
+
+
+from django.contrib.auth import authenticate
+from django.contrib.auth.tokens import default_token_generator
+
+
+# class ThirdRegisterOpenApiView(APIView):
+#     permission_classes = ()
+#
+#     def post(self, request):
+#         if request.method == 'POST':
+#             if 'username' in request.POST and 'password' in request.POST:
+#                 username =
+#                 user = authenticate(username = localusername, password = '')
+#             if user:
+#                 data = {
+#                     'success': True,
+#                     'token': default_token_generator.make_token(user),
+#                     'user': user.pk,
+#                 }
+#                 return data
+#             else:
+#                 return HttpResponse("Error token!")
+#         elif request.method == 'GET':
+#             if 'username' in request.GET and 'password' in request.GET:
+#                 user = authenticate(username = localusername, password = '')
+#             if user:
+#                 data = {
+#                     'success': True,
+#                     'token': default_token_generator.make_token(user),
+#                     'user': user.pk,
+#                 }
+#                 return data
+#             else:
+#                 return HttpResponse("Error token!")
