@@ -221,7 +221,7 @@ class RegisterAPIView(APIView):
         password = list()
         index = 0
         while index < length:
-            password.append(random_list[randint(0,len(random_list))])
+            password.append(random_list[randint(0,len(random_list)-1)])
             index += 1
         return str(password)
 
@@ -310,15 +310,21 @@ class RegisterAPIView(APIView):
             tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
         #add by Yihen@20151020, 用户填写手机号不写密码即可完成注册, 给用户发短信,不要放到register_ok中去，保持原功能向前兼容
-        if request.DATA.get('IGNORE_PWD') and not password:
+        if request.DATA.get('IGNORE_PWD'):
             send_messages.apply_async(kwargs={
                 "phones": [identifier,],
                 "messages": [u'登录账户是：'+identifier+u'登录密码:'+password,]
             })
 
-            if channel == 'momo':
+            if channel == 'maimai':
                 dt = timezone.datetime.now()
-                redpack_event = RedPackEvent.objects.filter(invalid=False, name='momo_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                redpack_event = RedPackEvent.objects.filter(invalid=False, name='maimai_redpack', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                if redpack_event:
+                    redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+
+            if channel == 'weixin_attention':
+                dt = timezone.datetime.now()
+                redpack_event = RedPackEvent.objects.filter(invalid=False, name='weixin_atten_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
                 if redpack_event:
                     redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
 
@@ -1172,11 +1178,14 @@ class DistributeRedpackView(APIView):
     permission_classes = ()
     def post(self, request, phone):
         user = WanglibaoUserProfile.objects.filter(phone=phone).first()
-        channel = self.request.GET.get('promo_token', '')
+        channel = self.request.DATA.get('promo_token', '')
 
-        if channel == 'momo':
+        if channel == 'maimai':
             dt = timezone.datetime.now()
-            redpack_event = RedPackEvent.objects.filter(invalid=False, name='momo_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
+            redpack_event = RedPackEvent.objects.filter(invalid=False, name='maimai_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
             if redpack_event:
                 redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+                return Response({"ret_code": 0, "message": u"老用户发送加息券成功"})
+            else:
+                return Response({"ret_code": 1000, "message": u"待发送的加息券没有配置"})
 
