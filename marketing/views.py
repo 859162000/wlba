@@ -51,7 +51,7 @@ from wanglibao_activity.models import TRIGGER_NODE
 from marketing.utils import get_user_channel_record
 from wanglibao_p2p.models import EquityRecord
 from wanglibao_profile.models import WanglibaoUserProfile
-from wanglibao.settings import XUNLEIVIP_KEY
+from wanglibao.settings import XUNLEIVIP_REGISTER_KEY
 import urllib
 import hashlib
 import logging
@@ -1902,7 +1902,7 @@ class ThunderTenAcvitityTemplate(TemplateView):
             if len(nickname) > 3:
                 nickname = nickname[:3]+'...'
 
-            if self.generate_sign(params, XUNLEIVIP_KEY) == sign:
+            if self.generate_sign(params, XUNLEIVIP_REGISTER_KEY) == sign:
                 response_data = {
                     'ret_code': '10000',
                     'message': 'success',
