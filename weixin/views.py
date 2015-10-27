@@ -765,14 +765,14 @@ class AuthorizeUser(APIView):
         if redirect_uri:
             redirect_url = urllib.unquote(redirect_uri)
         if not redirect_url:
-            return Response({'errcode':-1,  'errmsg':'need a redirect_uri'}, content_type='application/json')
+            return Response({'errcode':-1,  'errmsg':'need a redirect_uri'})
         code = request.GET.get('code')
         oauth = WeChatOAuth(account.app_id, account.app_secret, )
         if code:
             try:
                 res = oauth.fetch_access_token(code)
             except WeChatException, e:
-                return Response({'errcode':e.errcode, 'errmsg':e.errmsg}, content_type='application/json')
+                return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
             openid = res.get('openid')
             w_user = WeixinUser.objects.filter(openid=openid).first()
             save_user = False
@@ -807,7 +807,7 @@ class AuthorizeUser(APIView):
             else:
                 redirect_url += '&openid=%s'%openid
             return redirect(redirect_url)
-        return Response({'errcode':-2, 'errmsg':'code is null'}, content_type='application/json')
+        return Response({'errcode':-2, 'errmsg':'code is null'})
 
 
 class GetAuthUserInfo(APIView):
@@ -815,10 +815,10 @@ class GetAuthUserInfo(APIView):
     def get(self, request):
         openid = request.GET.get('openid')
         if not openid:
-            return Response({'errcode':-3, 'errmsg':'openid is null'}, content_type='application/json')
+            return Response({'errcode':-3, 'errmsg':'openid is null'})
         w_user = WeixinUser.objects.filter(openid=openid).first()
         if not w_user:
-            return Response({'errcode':-4, 'errmsg':'openid is not exist'}, content_type='application/json')
+            return Response({'errcode':-4, 'errmsg':'openid is not exist'})
         if w_user.nickname:
 
             return Response({
@@ -830,13 +830,13 @@ class GetAuthUserInfo(APIView):
                        "country": w_user.country,
                         "headimgurl": w_user.headimgurl,
                         "unionid": w_user.unionid,
-                    }, content_type='application/json')
+                    })
         if not w_user.auth_info:
-            return Response({'errcode':-5, 'errmsg':'openid auth info is null'}, content_type='application/json')
+            return Response({'errcode':-5, 'errmsg':'openid auth info is null'})
         # print w_user.account_original_id
         account = Account.objects.get(original_id=w_user.account_original_id)
         if not account:
-            return Response({'errcode':-6, 'errmsg':u'公众号信息错误或者不存在'}, content_type='application/json')
+            return Response({'errcode':-6, 'errmsg':u'公众号信息错误或者不存在'})
         try:
             oauth = WeChatOAuth(account.app_id, account.app_secret, )
             if not w_user.auth_info.check_access_token():
@@ -854,9 +854,9 @@ class GetAuthUserInfo(APIView):
             w_user.unionid =  user_info.get('unionid', '')
             w_user.province = user_info.get('province', '')
             w_user.save()
-            return Response(user_info, content_type='application/json')
+            return Response(user_info)
         except WeChatException, e:
-            return Response({'errcode':e.errcode, 'errmsg':e.errmsg}, content_type='application/json')
+            return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
 
 class GetUserInfo(APIView):
     permission_classes = ()
@@ -880,11 +880,11 @@ class GetUserInfo(APIView):
                         "unionid": w_user.unionid,
                         'subscribe': w_user.subscribe,
                         'subscribe_time': w_user.subscribe_time
-                    },content_type='application/json')
+                    })
         # print w_user.account_original_id
         account = Account.objects.get(original_id=w_user.account_original_id)
         if not account:
-            return Response({'errcode':-6, 'errmsg':u'公众号信息错误或者不存在'}, content_type='application/json')
+            return Response({'errcode':-6, 'errmsg':u'公众号信息错误或者不存在'})
         try:
             user_info = account.get_user_info(w_user.openid)
             w_user.nickname = user_info.get('nickname', "")
@@ -897,9 +897,9 @@ class GetUserInfo(APIView):
             w_user.subscribe = user_info.get('subscribe', '')
             w_user.subscribe_time = user_info.get('subscribe_time', '')
             w_user.save()
-            return Response(user_info,content_type='application/json')
+            return Response(user_info)
         except WeChatException, e:
-            return Response({'errcode':e.errcode, 'errmsg':e.errmsg},content_type='application/json')
+            return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
 
 
 
