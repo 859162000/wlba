@@ -127,7 +127,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 type: options.type,
                 data: options.data,
                 dataType : options.dataType,
-                async : options.async=="undefined" ? true : false,
+                async : options.async || true,
                 beforeSend: function(xhr, settings) {
                     options.beforeSend && options.beforeSend(xhr);
                     //django配置post请求
@@ -230,7 +230,6 @@ org.reward = (function(org){
         $sign: $('.wechat-form-sign'),
         $nbsp : $('.wechat-sign-margin'),
         $validation: $('.check-submit'),
-        $validationTime: false,  //验证码有效期控制
         checkState: null,
         init: function(){
             lib._submit();
@@ -300,7 +299,6 @@ org.reward = (function(org){
             });
             //短信验证码
             $('.check-submit').on('click',function(){
-                if(!_self.$validationTime) $(document.body).trigger('from:captcha');
                 $(document.body).trigger('from:validation');
             });
         },
@@ -437,13 +435,12 @@ org.reward = (function(org){
             $.get(captcha_refresh_url, function(res) {
                 $('.check-img').attr('src', res['image_url']);
                 $('input[name=codeimg_key]').val(res['key']);
-                lib.$validationTime = true;
             });
         },
         _fetchValidation:function(){
             var
                 _self = this,
-                count = 10,  //60秒倒计时
+                count = 60,  //60秒倒计时
                 intervalId ; //定时器
 
             $(document.body).trigger('from:check', [lib.checkfilter(2), false, true, true]);
@@ -463,27 +460,22 @@ org.reward = (function(org){
                     var result = JSON.parse(xhr.responseText);
                     $('.check-submit').text('数字验证码').removeAttr('disabled').removeClass('postValidation');
                     $(document.body).trigger('from:error',[result.message, true]);
-                    if(xhr.status == 429) _self.$validationTime = false;
-                },
-                success: function(){
-                    times();
-                    _self.$validationTime = false;
+                    $(document.body).trigger('from:captcha')
                 }
             });
-
             //倒计时
-            function times(){
-                count --;
-                $('.check-submit').text(count + '秒后可重发');
-                intervalId = setTimeout(times, 1000);
-                if ( count <= 0 ){
-                    count = 10;
-                    $('.check-submit').text('重新获取').removeAttr('disabled').removeClass('postValidation');
-                    clearTimeout(intervalId);
+            var timerFunction = function() {
+                if (count >= 1) {
+                    count--;
+                    return $('.check-submit').text(count + '秒后可重发');
+                } else {
+                    clearInterval(intervalId);
+                    $('.check-submit').text('重新获取').removeAttr('disabled').removeClass('postValidation')
+                    return $(document.body).trigger('from:captcha');
                 }
-            }
-
-
+            };
+            timerFunction();
+            return intervalId = setInterval(timerFunction, 1000);
 
         },
         /*

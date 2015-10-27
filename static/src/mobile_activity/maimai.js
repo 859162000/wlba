@@ -1,7 +1,7 @@
 
 
 
-org.reward = (function(org){
+org.mmIndex = (function(org){
     var lib = {
         $body_h : $('.maimai-check-body'),
         $submit : $('.maimai-form-btn'),
@@ -101,7 +101,7 @@ org.reward = (function(org){
                 var ops = {};
                 if(_self.$phone.attr('data-existing') === 'true'){
                     ops = {
-                        url: '/api/wechat/attention/' + _self.$phone.val()+'/',
+                        url: '/api/distribute/redpack/'+_self.$phone.val()+'/?promo_token=maimai' ,
                         type: 'post',
                         success: function(data){
                             console.log(data)
@@ -195,7 +195,7 @@ org.reward = (function(org){
                     _self.$phone.attr('data-existing', true);
                 }else{
                     lib.$submit.attr('disabled',true);
-                    _self.$body_h.css({'height': '6.6rem'});
+                    _self.$body_h.css({'height': '5.6rem'});
                     _self.$phone.attr('data-existing', false);
                     $(document.body).trigger('from:check', [_self.checkfilter(3), false, false]);
                 }
