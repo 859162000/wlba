@@ -11,6 +11,9 @@ body {
 	font-family: "微软雅黑";
 	margin: 0 auto
 }
+.weixin{
+    display: none;
+}
 .no_signal_wrap{
 	height: 100%;
 	width: 100%;
@@ -120,7 +123,7 @@ body {
 	overflow: hidden;
 	box-shadow: 0 0 #000 inset;
 	z-index: 999;
-    opacity:0;
+    display: none;
 }
 
 .title {
@@ -852,8 +855,8 @@ body {
 	animation-name: boy_animate1;
 	-webkit-animation-duration: 4.5s;
 	animation-duration: 4.5s;
-	-webkit-animation-timing-function: steps(1, start);
-	animation-timing-function: steps(1, start);
+	-webkit-animation-timing-function: steps(1, end);
+	animation-timing-function: steps(1, end);
 	-webkit-animation-delay: 0s;
 	animation-delay: 0s;
 	-webkit-animation-fill-mode: forwards;
@@ -932,17 +935,14 @@ body {
 		background-position: -1015px 0
 	}
 
-	80% {
+	90% {
 		background-position: -1160px 0
 	}
 
-	90% {
+	95% {
 		background-position: -1305px 0
 	}
 
-	95% {
-		background-position: -145px 0
-	}
 	100% {
 		background-position: 0 0
 	}
@@ -1020,17 +1020,14 @@ body {
 		background-position: -1015px 0
 	}
 
-	80% {
+	90% {
 		background-position: -1160px 0
 	}
 
-	90% {
+	95% {
 		background-position: -1305px 0
 	}
 
-	95% {
-		background-position: -145px 0
-	}
 	100% {
 		background-position: 0 0
 	}
@@ -1060,7 +1057,18 @@ body {
 	-webkit-animation-fill-mode: forwards;
 	animation-fill-mode: forwards;
 }
-
+.boy_animate0 {
+	-webkit-animation-name: boy_animate1;
+	animation-name: boy_animate1;
+	-webkit-animation-duration: 4.5s;
+	animation-duration: 4.5s;
+	-webkit-animation-timing-function: steps(1, start);
+	animation-timing-function: steps(1, start);
+	-webkit-animation-delay: 0s;
+	animation-delay: 0s;
+	-webkit-animation-fill-mode: forwards;
+	animation-fill-mode: forwards;
+}
 .boy_run{
 	position:absolute;
 	left:-35%;
@@ -1958,9 +1966,10 @@ body {
 	height:100%;
 	overflow: hidden;
 	box-shadow: 0 0 #000 inset;
-	z-index: 99;
+	z-index: 9999;
 	left:0;
 	top:0;
+    display: none;
 }
 .poor_wrap{
 	/*display: none;*/

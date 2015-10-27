@@ -2,7 +2,8 @@
 
 $(function() {
     window.onload = function() {
-        $('#wrap').css('opacity','1');
+        //$('.boy').removeClass('boy_animate0');
+        $('#wrap').show();
         $('.no_signal_wrap').addClass('no_signal_wrap_animate');
         step1();
     }
@@ -245,9 +246,12 @@ $(function() {
 
     function step6(){
         if(money<50){
-            $('.poor_wrap').css('z-index','9999');
+        //    $('.poor_wrap').css('z-index','9999');
+        //}else{
+        //    $('.rich_wrap').css()('z-index','9999');
+            $('.poor_wrap').show();
         }else{
-            $('.rich_wrap').css('z-index','9999');
+            $('.rich_wrap').hide();
         }
     }
 
