@@ -3,13 +3,13 @@
 
 org.reward = (function(org){
     var lib = {
-        $body_h : $('.maimai-check-body'),
-        $submit : $('.maimai-form-btn'),
+        $body_h : $('.wechat-check-body'),
+        $submit : $('.wechat-form-btn'),
         $phone : $('input[name=phone]'),
         $codeimg : $('input[name=codeimg]'),
         $codenum : $('input[name=codenum]'),
-        $sign: $('.maimai-form-sign'),
-        $nbsp : $('.maimai-sign-margin'),
+        $sign: $('.wechat-form-sign'),
+        $nbsp : $('.wechat-sign-margin'),
         $validation: $('.check-submit'),
         $validationTime: false,  //验证码有效期控制
         checkState: null,
@@ -112,7 +112,7 @@ org.reward = (function(org){
                     }
                 }else{
                     ops = {
-                        url: '/api/register/?promo_token=maimai',
+                        url: '/api/register/?promo_token=weixin_atten',
                         type: 'POST',
                         data: {
                             'identifier': _self.$phone.val(),
@@ -277,7 +277,7 @@ org.reward = (function(org){
             org.ajax({
                 url:'/api/user_exists/' + phone + '/',
                 beforeSend: function(){
-                    lib.$phone.addClass('maimai-load'); //显示加载动画
+                    lib.$phone.addClass('wechat-load'); //显示加载动画
                 },
                 success: function(data){
                     callback && callback(data);
@@ -286,7 +286,7 @@ org.reward = (function(org){
                     console.log(data)
                 },
                 complete: function(){
-                    _self.$phone.removeClass('maimai-load');
+                    _self.$phone.removeClass('wechat-load');
                 }
             })
         },

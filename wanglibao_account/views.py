@@ -1,5 +1,7 @@
 # encoding: utf-8
 import datetime
+from wanglibao_redpack.models import RedPackEvent
+from wanglibao_redpack import backends as redpack_backends
 import logging
 import json
 import math
@@ -1222,9 +1224,9 @@ def ajax_register(request):
         password = list()
         index = 0
         while index < length:
-            password.append(random_list[randint(0,len(random_list))])
+            password.append(random_list[randint(0,len(random_list))-1])
             index += 1
-        return str(random_list)
+        return str(password)
 
     if request.method == "POST":
         channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")    #add by Yihen@20150818; reason:第三方渠道处理的时候，会更改request中的信息
@@ -1259,12 +1261,23 @@ def ajax_register(request):
                     tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
                 #  add by Yihen@20151020, 用户填写手机号不写密码即可完成注册, 给用户发短信,不要放到register_ok中去，保持原功能向前兼容
-                if request.POST.get('IGNORE_PWD', '') and not password:
+                if request.POST.get('IGNORE_PWD', ''):
                     send_messages.apply_async(kwargs={
                         "phones": [identifier, ],
-                        "messages": [password, ]
+                        "messages": [u'登录账户是：'+identifier+u'登录密码:'+password, ]
                     })
 
+                    if channel == 'maimai':
+                        dt = timezone.datetime.now()
+                        redpack_event = RedPackEvent.objects.filter(invalid=False, name='maimai_redpack', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                        if redpack_event:
+                            redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+
+                    if channel == 'weixin_attention':
+                        dt = timezone.datetime.now()
+                        redpack_event = RedPackEvent.objects.filter(invalid=False, name='weixin_atten_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                        if redpack_event:
+                            redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
                 account_backends.set_source(request, auth_user)
 
                 return HttpResponse(messenger('done', user=request.user))
