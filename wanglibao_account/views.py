@@ -1,5 +1,7 @@
 # encoding: utf-8
 import datetime
+from wanglibao_redpack.models import RedPackEvent
+from wanglibao_redpack import backends as redpack_backends
 import logging
 import json
 import math
@@ -1224,7 +1226,7 @@ def ajax_register(request):
         while index < length:
             password.append(random_list[randint(0,len(random_list))])
             index += 1
-        return str(random_list)
+        return str(password)
 
     if request.method == "POST":
         channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")    #add by Yihen@20150818; reason:第三方渠道处理的时候，会更改request中的信息
@@ -1262,8 +1264,14 @@ def ajax_register(request):
                 if request.POST.get('IGNORE_PWD', '') and not password:
                     send_messages.apply_async(kwargs={
                         "phones": [identifier, ],
-                        "messages": [password, ]
+                        "messages": [u'登录账户是：'+identifier+u'登录密码:'+password, ]
                     })
+
+                    if channel == 'maimai':
+                        dt = timezone.datetime.now()
+                        redpack_event = RedPackEvent.objects.filter(invalid=False, name='momo_redpack', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                        if redpack_event:
+                            redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
 
                 account_backends.set_source(request, auth_user)
 
