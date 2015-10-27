@@ -1224,7 +1224,7 @@ def ajax_register(request):
         password = list()
         index = 0
         while index < length:
-            password.append(random_list[randint(0,len(random_list))])
+            password.append(random_list[randint(0,len(random_list))-1])
             index += 1
         return str(password)
 
@@ -1261,7 +1261,7 @@ def ajax_register(request):
                     tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
                 #  add by Yihen@20151020, 用户填写手机号不写密码即可完成注册, 给用户发短信,不要放到register_ok中去，保持原功能向前兼容
-                if request.POST.get('IGNORE_PWD', '') and not password:
+                if request.POST.get('IGNORE_PWD', ''):
                     send_messages.apply_async(kwargs={
                         "phones": [identifier, ],
                         "messages": [u'登录账户是：'+identifier+u'登录密码:'+password, ]
@@ -1269,10 +1269,15 @@ def ajax_register(request):
 
                     if channel == 'maimai':
                         dt = timezone.datetime.now()
-                        redpack_event = RedPackEvent.objects.filter(invalid=False, name='momo_redpack', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                        redpack_event = RedPackEvent.objects.filter(invalid=False, name='maimai_redpack', give_start_at__lte=dt, give_end_at__gte=dt).first()
                         if redpack_event:
                             redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
 
+                    if channel == 'weixin_attention':
+                        dt = timezone.datetime.now()
+                        redpack_event = RedPackEvent.objects.filter(invalid=False, name='weixin_atten_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                        if redpack_event:
+                            redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
                 account_backends.set_source(request, auth_user)
 
                 return HttpResponse(messenger('done', user=request.user))
