@@ -3,7 +3,6 @@
 $(function() {
 
     window.onload = function() {
-        $('#wrap').css('opacity','1');
         $('.no_signal_wrap').addClass('no_signal_wrap_animate');
         step1();
     }    
@@ -59,17 +58,14 @@ $(function() {
     function step3(){
         $('.bg_after').addClass('bg_after_animate1');
         $('.bg_front_wrap').addClass('bg_front_wrap_animate1');
-        
         $('.boy_stay').hide();
-        $('.gold').show().addClass('gold_animate');
+        $('.boy').addClass('boy_animate1');
         $('.choice_step1').show().addClass('choice_step_show');
-        var i = 6;
+        $('.gold').show().addClass('gold_animate');
+        $('.cloud').addClass('cloud_animate1');
+        var i = 5;
         var timer1 = setInterval(function() {
             i--;
-            if(i===4){
-                $('.boy').addClass('boy_animate1');
-                $('.cloud').addClass('cloud_animate1');
-            }
             if (i === 0) {
                 clearInterval(timer1);
                 $('.boy_stay').show();
@@ -248,10 +244,10 @@ $(function() {
     })
 
     function step6(){
-        if(money<=50){
-            $('.poor_wrap').show();
+        if(money<50){
+            $('.poor_wrap').css('z-index','9999');
         }else{
-            $('.rich_wrap').show();
+            $('.rich_wrap').css('z-index','9999');
         }
     }
 })
