@@ -880,7 +880,7 @@ class GetUserInfo(APIView):
                         "unionid": w_user.unionid,
                         'subscribe': w_user.subscribe,
                         'subscribe_time': w_user.subscribe_time
-                    })
+                    },content_type='application/json')
         # print w_user.account_original_id
         account = Account.objects.get(original_id=w_user.account_original_id)
         if not account:
@@ -897,7 +897,7 @@ class GetUserInfo(APIView):
             w_user.subscribe = user_info.get('subscribe', '')
             w_user.subscribe_time = user_info.get('subscribe_time', '')
             w_user.save()
-            return Response(user_info)
+            return Response(user_info,content_type='application/json')
         except WeChatException, e:
             return Response({'errcode':e.errcode, 'errmsg':e.errmsg},content_type='application/json')
 
