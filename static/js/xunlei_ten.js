@@ -86,7 +86,7 @@
                     n = new Date().getTime(),//取得当前毫秒数
                     c = t - n;//得到时间差
             if (c <= 0) {//如果差小于等于0  也就是过期或者正好过期，则推出程序
-              //document.getElementById('timer').innerHTML = '活动已经结束';
+              $('#jianli').html(0);
               clearInterval(window['ttt']);//清除计时器
               return;//结束执行
             }
@@ -94,7 +94,7 @@
                     d = parseInt(c / ds);//毫秒除以一天的毫秒 得到相差的天数
             var jiang=d*3600
             if(d>=30){
-                $('#jianli').html(10800);
+                $('#jianli').html(108000);
             }else{
                $('#jianli').html(jiang);
             };
