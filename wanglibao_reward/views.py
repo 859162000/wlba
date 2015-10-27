@@ -398,7 +398,7 @@ class WeixinShareDetailView(TemplateView):
             if gift_order.valid_amount > 0:
                 gifts = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity, valid=True)
                 counts = gifts.count()
-                index = random.randint(0, counts-1)
+                index = 0 if counts == 1 else random.randint(0,counts-1)
                 gift = gifts[index]
                 gift_order.valid_amount -= 1
             else:
