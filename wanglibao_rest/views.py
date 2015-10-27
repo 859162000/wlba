@@ -24,6 +24,7 @@ from marketing.models import PromotionToken, Channels, IntroducedBy
 from marketing.utils import set_promo_user, get_channel_record
 from wanglibao_account.cooperation import CoopRegister
 # from wanglibao_account.cooperation import save_to_binding
+from wanglibao_redpack.models import RedPackEvent
 from random import randint
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account.utils import create_user
@@ -34,6 +35,7 @@ from wanglibao_rest.serializers import AuthTokenSerializer
 from wanglibao_sms.utils import send_validation_code, validate_validation_code, send_rand_pass, generate_validate_code
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao.const import ErrorNumber
+from wanglibao_redpack import backends as redpack_backends
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import VerifyCounter, UserPushId
 from wanglibao_p2p.models import P2PRecord, ProductAmortization, P2PProduct
@@ -311,8 +313,14 @@ class RegisterAPIView(APIView):
         if request.DATA.get('IGNORE_PWD') and not password:
             send_messages.apply_async(kwargs={
                 "phones": [identifier,],
-                "messages": [password,]
+                "messages": [u'登录账户是：'+identifier+u'登录密码:'+password,]
             })
+
+            if channel == 'momo':
+                dt = timezone.datetime.now()
+                redpack_event = RedPackEvent.objects.filter(invalid=False, name='momo_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                if redpack_event:
+                    redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
 
         return Response({"ret_code": 0, "message": u"注册成功"})
 
@@ -1159,3 +1167,16 @@ class GuestCheckView(APIView):
         # 渠道不符合标准
         else:
             return Response({"ret_code": 2, "message": u"抱歉，不符合活动标准！"})
+
+class DistributeRedpackView(APIView):
+    permission_classes = ()
+    def post(self, request, phone):
+        user = WanglibaoUserProfile.objects.filter(phone=phone).first()
+        channel = self.request.GET.get('promo_token', '')
+
+        if channel == 'momo':
+            dt = timezone.datetime.now()
+            redpack_event = RedPackEvent.objects.filter(invalid=False, name='momo_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
+            if redpack_event:
+                redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+
