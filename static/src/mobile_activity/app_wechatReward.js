@@ -11,7 +11,6 @@ org.reward = (function(org){
         $sign: $('.wechat-form-sign'),
         $nbsp : $('.wechat-sign-margin'),
         $validation: $('.check-submit'),
-        $validationTime: false,  //验证码有效期控制
         checkState: null,
         init: function(){
             lib._submit();
@@ -81,7 +80,6 @@ org.reward = (function(org){
             });
             //短信验证码
             $('.check-submit').on('click',function(){
-                if(!_self.$validationTime) $(document.body).trigger('from:captcha');
                 $(document.body).trigger('from:validation');
             });
         },
@@ -99,15 +97,20 @@ org.reward = (function(org){
                 if(!lib.checkState) return
 
                 var ops = {};
+                _self.$submit.attr('disabled',true).html('领取中，请稍后...');
                 if(_self.$phone.attr('data-existing') === 'true'){
                     ops = {
                         url: '/api/wechat/attention/' + _self.$phone.val()+'/',
                         type: 'post',
                         success: function(data){
-                            console.log(data)
+                            if(data.ret_code == 0){
+                                window.location.href= '/activity/wechat_result/?phone='+ _self.$phone.val() + '&state=1'
+                            }else if(data.ret_code == 1000){
+                                window.location.href= '/activity/wechat_result/?phone='+ _self.$phone.val() + '&state=0'
+                            }
                         },
-                        error: function(data){
-
+                        complete:function(){
+                            lib.$submit.removeAttr('disabled').html('立即领取');
                         }
                     }
                 }else{
@@ -122,10 +125,15 @@ org.reward = (function(org){
                             'captcha_1' :  _self.$codeimg.val(),
                         },
                         success: function(data){
-                            console.log(data)
+                            if(data.ret_code == 0){
+                                window.location.href= '/activity/wechat_result/?phone='+ _self.$phone.val() + '&state=0'
+                            }
                         },
                         error: function(data){
 
+                        },
+                        complete:function(){
+                            lib.$submit.removeAttr('disabled').html('立即领取');
                         }
                     }
                 }
@@ -218,13 +226,12 @@ org.reward = (function(org){
             $.get(captcha_refresh_url, function(res) {
                 $('.check-img').attr('src', res['image_url']);
                 $('input[name=codeimg_key]').val(res['key']);
-                lib.$validationTime = true;
             });
         },
         _fetchValidation:function(){
             var
                 _self = this,
-                count = 10,  //60秒倒计时
+                count = 60,  //60秒倒计时
                 intervalId ; //定时器
 
             $(document.body).trigger('from:check', [lib.checkfilter(2), false, true, true]);
@@ -244,27 +251,22 @@ org.reward = (function(org){
                     var result = JSON.parse(xhr.responseText);
                     $('.check-submit').text('数字验证码').removeAttr('disabled').removeClass('postValidation');
                     $(document.body).trigger('from:error',[result.message, true]);
-                    if(xhr.status == 429) _self.$validationTime = false;
-                },
-                success: function(){
-                    times();
-                    _self.$validationTime = false;
+                    $(document.body).trigger('from:captcha')
                 }
             });
-
             //倒计时
-            function times(){
-                count --;
-                $('.check-submit').text(count + '秒后可重发');
-                intervalId = setTimeout(times, 1000);
-                if ( count <= 0 ){
-                    count = 10;
-                    $('.check-submit').text('重新获取').removeAttr('disabled').removeClass('postValidation');
-                    clearTimeout(intervalId);
+            var timerFunction = function() {
+                if (count >= 1) {
+                    count--;
+                    return $('.check-submit').text(count + '秒后可重发');
+                } else {
+                    clearInterval(intervalId);
+                    $('.check-submit').text('重新获取').removeAttr('disabled').removeClass('postValidation')
+                    return $(document.body).trigger('from:captcha');
                 }
-            }
-
-
+            };
+            timerFunction();
+            return intervalId = setInterval(timerFunction, 1000);
 
         },
         /*
@@ -300,7 +302,11 @@ org.reward = (function(org){
 org.result = (function(org){
     var lib = {
         init:function(){
-            $('#phone-target').html(org.getQueryStringByName('phone'));
+            var
+                phone = org.getQueryStringByName('phone'),
+                state = org.getQueryStringByName('state')*1,
+                str = state == 0 ? '加息券已放入帐户' : '您已领取过';
+                $('.wechat-form-text').html(str + '&nbsp' + phone)
         },
     }
     return {

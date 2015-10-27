@@ -219,327 +219,259 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 })();
 ;
 
+$(function() {
+    window.onload = function() {
+        //$('.boy').removeClass('boy_animate0');
+        $('#wrap').show();
+        $('.no_signal_wrap').addClass('no_signal_wrap_animate');
+        step1();
+    }
+    var money = 0;
+    var this_money;
+    /*数字变换*/
+    function gold_scroll(gold_num_change) {
+        $('.num-animate').each(function() {
+            var comma_separator_number_step = $.animateNumber.numberStepFactories.separator(',');
+            var key = parseInt($(this).attr('data-num'));
+            $(this).prop('number',gold_num_change).animateNumber({
+                number: key,
+                numberStep: comma_separator_number_step
+            },
+            1000);
+        })
+    }
+    /*数字变换*/
 
-org.reward = (function(org){
-    var lib = {
-        $body_h : $('.wechat-check-body'),
-        $submit : $('.wechat-form-btn'),
-        $phone : $('input[name=phone]'),
-        $codeimg : $('input[name=codeimg]'),
-        $codenum : $('input[name=codenum]'),
-        $sign: $('.wechat-form-sign'),
-        $nbsp : $('.wechat-sign-margin'),
-        $validation: $('.check-submit'),
-        checkState: null,
-        init: function(){
-            lib._submit();
-            lib.listen();
-            $(document.body).trigger('from:captcha');
+    function step1() {
+        var i = 4;
+        var timer1 = setInterval(function() {
+            i--;
+            if (i === 0) {
+                clearInterval(timer1);
+                $('.no_signal_wrap').hide();
+                $('.bat1').show().addClass('bat1_animate');
+                step2();
+            }
         },
-        checkfilter:function(num){
-            var
-                _self = this,
-                checkAll =  [
-                    { type: _self.$phone.attr('data-type'), dom: _self.$phone, message: _self.$phone.attr('data-message')},
-                    { type: _self.$codeimg.attr('data-type'), dom: _self.$codeimg, message: _self.$codeimg.attr('data-message')},
-                    { type: _self.$codenum.attr('data-type'), dom: _self.$codenum, message: _self.$codenum.attr('data-message')}
-                ];
-                checkAll.splice(num, 10)
-            return checkAll
+        1000);
+    }  
 
+    function step2(){
+        $('.title').addClass('title_animate');
+        $('.money_50').show().addClass('money_50_animate');
+        $('.gold_num_wrap').show().addClass('gold_num_wrap_animate');
+        var i = 12;
+        var timer1 = setInterval(function() {
+            i--;
+            if (i === 0) {
+                clearInterval(timer1);
+                $('.bat1,.title,.money_50').hide();
+                gold_scroll(money);
+                $('.gold_num_wrap .main').addClass('gold_num_main_animate');
+                step3();
+            }
         },
-        listen: function(){
-            var _self = this;
+        1000);
+        
+    }   
 
-            $(document).on('from:captcha', function(){
-                _self._fetchcode();
-            });
-
-            $(document).on('from:validation', function(){
-                _self._fetchValidation();
-            });
-
-            // arrry {checklist} 验证列表
-            // bool {post} 是否验证手机号已存在
-            // bool {state} 错误提醒是否显示
-            // bool {other} 其他验证不参与disabled逻辑
-            $(document).on('from:check', function(e, checklist, post, state, other){
-                _self._check(checklist, post, state, other)
-            });
-
-            /*
-             * bool {post} 是否验证手机号已存在
-             * bool {other} 其他验证不参与disabled逻辑
-             */
-            $(document).on('from:success', function(e, post, other){
-                _self._success(post, other);
-            });
-            /*
-             * string {message} 错误提醒
-             * bool {state} 错误提醒是否显示
-             */
-            $(document).on('from:error', function(e, message, state, other){
-                _self._error(message, state, other)
-            });
-
-            var
-                list = [_self.$phone, _self.$codeimg, _self.$codenum],
-                checkOps = {};
-            $.each(list, function(i,dom){
-                dom.on('input', _self._debounce(function(){
-                    checkOps = i === 0 ? { filter : 1, post: true, state: true } : { filter : 3, post: false, state: false };
-
-                    $(document.body).trigger('from:check', [_self.checkfilter(checkOps.filter), checkOps.post, checkOps.state]);
-                },400));
-            });
-
-            //刷新验证码
-            $('.check-img').on('click', function() {
-                $(document.body).trigger('from:captcha')
-            });
-            //短信验证码
-            $('.check-submit').on('click',function(){
-                $(document.body).trigger('from:validation');
-            });
+    function step3(){
+        $('.bg_after').addClass('bg_after_animate1');
+        $('.bg_front_wrap').addClass('bg_front_wrap_animate1');
+        $('.boy_stay').hide();
+        $('.boy').addClass('boy_animate1');
+        $('.choice_step1').show().addClass('choice_step_show');
+        $('.gold').show().addClass('gold_animate');
+        $('.cloud').addClass('cloud_animate1');
+        var i = 5;
+        var timer1 = setInterval(function() {
+            i--;
+            if (i === 0) {
+                clearInterval(timer1);
+                //$('.boy_stay').show();
+            }
         },
-        _submit: function(){
-            var _self = this;
+        1000);
+    }
 
-            //提交按钮
-            _self.$submit.on('click', function(){
-                if(_self.$phone.attr('data-existing') === 'true'){
-                    $(document.body).trigger('from:check', [_self.checkfilter(1), false]);
-                }else{
-                    $(document.body).trigger('from:check', [_self.checkfilter(3), false]);
-                }
-
-                if(!lib.checkState) return
-
-                var ops = {};
-                _self.$submit.attr('disabled',true).html('领取中，请稍后...');
-                if(_self.$phone.attr('data-existing') === 'true'){
-                    ops = {
-                        url: '/api/wechat/attention/' + _self.$phone.val()+'/',
-                        type: 'post',
-                        success: function(data){
-                            if(data.ret_code == 0){
-                                window.location.href= '/activity/wechat_result/?phone='+ _self.$phone.val() + '&state=1'
-                            }else if(data.ret_code == 1000){
-                                window.location.href= '/activity/wechat_result/?phone='+ _self.$phone.val() + '&state=0'
-                            }
-                        },
-                        complete:function(){
-                            lib.$submit.removeAttr('disabled').html('立即领取');
-                        }
-                    }
-                }else{
-                    ops = {
-                        url: '/api/register/?promo_token=weixin_atten',
-                        type: 'POST',
-                        data: {
-                            'identifier': _self.$phone.val(),
-                            'validate_code': _self.$codenum.val(),
-                            'IGNORE_PWD': 'true',
-                            'captcha_0' :  $('input[name=codeimg_key]').val(),
-                            'captcha_1' :  _self.$codeimg.val(),
-                        },
-                        success: function(data){
-                            if(data.ret_code == 0){
-                                window.location.href= '/activity/wechat_result/?phone='+ _self.$phone.val() + '&state=0'
-                            }
-                        },
-                        error: function(data){
-
-                        },
-                        complete:function(){
-                            lib.$submit.removeAttr('disabled').html('立即领取');
-                        }
-                    }
-                }
-                org.ajax(ops);
-            });
-        },
-        /*
-         * fn 回调函数
-         * delay 空闲时间
-         */
-        _debounce :function(fn, delay){
-            var timer = null;
-            return function () {
-                var
-                  context = this,
-                  args = arguments;
-                clearTimeout(timer);
-
-                timer = setTimeout(function () {
-                    fn.apply(context, args);
-                }, delay);
+    $('.choice_step1 .choice1').click(function(){
+        $('.choice_step1').addClass('choice_step_hide');
+        $('.gold_text').attr('data-num','70');
+        $('.gold').addClass('gold_hide');
+        $('.boy').removeClass('boy_animate1');
+        $('.gold_num_wrap .main').removeClass('gold_num_main_animate');
+        money = 50;
+        var i = 3;
+        var timer1 = setInterval(function() {
+            i--;
+            if (i === 2) {
+                gold_scroll(money);
+                $('.gold_num_wrap .main').addClass('gold_num_main_animate');
             };
-        },
-        _check: function(checklist, post, state, other){
-
-            var check = {};
-
-            $.each(checklist, function(i,hash){
-                check.checkback = lib['_check' + hash.type]($(hash.dom).val());
-                check.message = hash.message;
-                if(!check.checkback) return false
-            });
-
-            if(check.checkback){
-                lib.checkState = true;
-                $(document).trigger('from:success', [post, other]);
-            }else{
-                lib.checkState = false;
-                $(document).trigger('from:error', [check.message, state, other] )
+            if (i === 0) {
+                clearInterval(timer1);
+                setp4();
             }
         },
-        _error: function(message, state, other){
-            if(state){
-                lib.$sign.css('height','1.275rem').html(message);
-                lib.$nbsp.css('height','0');
-            }
-            if(!other) lib.$submit.attr('disabled',true);
-        },
-        _success: function(post, other){
-            var _self = this;
+        1000);
+        
+    });
 
-            _self.$sign.css('height','0');  //隐藏提示
-            _self.$nbsp.css('height','.7rem');
-
-            // post 为ture 进行用户验证
-            //post 为false 说明为展开场景,check三个按钮，按钮可点击
-            if(post){
-                lib.user_exists(callback);
-            }else{
-                if(!other) lib.$submit.removeAttr('disabled');
-            }
-
-            function callback (data){
-                if(data.existing){
-                    lib.$submit.removeAttr('disabled');
-                    _self.$body_h.css({'height': '0'});
-                    _self.$phone.attr('data-existing', true);
-                }else{
-                    lib.$submit.attr('disabled',true);
-                    _self.$body_h.css({'height': '6.6rem'});
-                    _self.$phone.attr('data-existing', false);
-                    $(document.body).trigger('from:check', [_self.checkfilter(3), false, false]);
-                }
+    $('.choice_step1 .choice2').click(function(){
+        $('.choice_step1').addClass('choice_step_hide');
+        $('.gold').addClass('gold_hide2');
+        $('.car').addClass('car_animate');
+        $('.boy').removeClass('boy_animate1');
+        var i = 6;
+        var timer1 = setInterval(function() {
+            i--;
+            if (i === 0){
+                clearInterval(timer1);
+                setp4();
             }
         },
-        _checkPhone : function(val){
-            var isRight = false,
-                $sign = $('.phone-sign'),
-                re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
-            re.test($.trim(val)) ? ($sign.hide(), isRight = true) : ($sign.show(),isRight = false);
-            return isRight;
+        1000); 
+        
+    });
+
+    function setp4(){
+        $('.boy_stay').hide(); 
+        $('.boy').addClass('boy_animate2');
+        $('.cloud').addClass('cloud_animate2');
+        $('.bg_after').addClass('bg_after_animate2');
+        $('.bg_front_wrap').addClass('bg_front_wrap_animate2');
+        $('.tree1_wrap').show().addClass('tree1_wrap_animate');
+        $('.choice_step2').show().addClass('choice_step_show');
+        var i = 6;
+        var timer1 = setInterval(function() {
+            i--;
+            if (i === 0){
+                clearInterval(timer1);
+                $('.gold,.car,.choice_step1').hide();
+                $('.boy_stay').show();     
+                $('.ghost').show().addClass('ghost_animate');
+                $('.boy').removeClass('boy_animate2');
+            }
         },
-        _checkVal : function(val){
+        1000); 
+    }
 
-            if(val == '') return false
-            return true
+    $('.choice_step2 .choice1').click(function(){
+        $('.boy_stay').css('opacity','0');
+        $('.boy_run').show();
+        $('.choice_step2').addClass('choice_step_hide');
+        $('.boy').addClass('boy_animate2');
+        $('.cloud').addClass('cloud_animate4');
+        $('.bg_after').addClass('bg_after_animate3');
+        $('.bg_front_wrap').addClass('bg_front_wrap_animate3');
+        $('.tree1_wrap').show().addClass('tree1_wrap_animate2');
+        $('.gold_text').attr('data-num','20');
+        $('.tree2_wrap').show().addClass('tree2_wrap_animate');
+        gold_scroll(money);
+        $('.gold_num_wrap .main').addClass('gold_num_main_animate');
+        var i = 6;
+        var timer1 = setInterval(function() {
+            i--;
+            if (i === 0){
+                clearInterval(timer1);
+                setp5();
+                $('.gold_num_wrap .main').removeClass('gold_num_main_animate');
+            }
         },
-        _fetchcode: function(){
-            var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
-            $.get(captcha_refresh_url, function(res) {
-                $('.check-img').attr('src', res['image_url']);
-                $('input[name=codeimg_key]').val(res['key']);
-            });
-        },
-        _fetchValidation:function(){
-            var
-                _self = this,
-                count = 60,  //60秒倒计时
-                intervalId ; //定时器
+        1000); 
+        setp5();
+    });
 
-            $(document.body).trigger('from:check', [lib.checkfilter(2), false, true, true]);
-
-            if(!_self.checkState) return;
-
-            $('.check-submit').attr('disabled', 'disabled').addClass('postValidation');
-            org.ajax({
-                url : '/api/phone_validation_code/' + _self.$phone.val() + '/',
-                data: {
-                    captcha_0 : $('input[name=codeimg_key]').val(),
-                    captcha_1 : _self.$codeimg.val(),
-                },
-                type : 'POST',
-                error :function(xhr){
-                    clearInterval(intervalId);
-                    var result = JSON.parse(xhr.responseText);
-                    $('.check-submit').text('数字验证码').removeAttr('disabled').removeClass('postValidation');
-                    $(document.body).trigger('from:error',[result.message, true]);
-                    $(document.body).trigger('from:captcha')
-                }
-            });
-            //倒计时
-            var timerFunction = function() {
-                if (count >= 1) {
-                    count--;
-                    return $('.check-submit').text(count + '秒后可重发');
-                } else {
-                    clearInterval(intervalId);
-                    $('.check-submit').text('重新获取').removeAttr('disabled').removeClass('postValidation')
-                    return $(document.body).trigger('from:captcha');
-                }
+    $('.choice_step2 .choice2').click(function(){
+        $('.ghost_hit').show();
+        $('.ghost').addClass('ghost_gone');
+        $('.choice_step2').addClass('choice_step_hide');
+        var i = 6;
+        var timer1 = setInterval(function() {
+            i--;
+            if (i === 3){
+                $('.boy_stay').hide(); 
+                $('.boy').addClass('boy_animate3');
+                $('.cloud').addClass('cloud_animate3');
+                $('.bg_after').addClass('bg_after_animate4');
+                $('.bg_front_wrap').addClass('bg_front_wrap_animate4');
+                $('.tree1_wrap').show().addClass('tree1_wrap_animate2');
+                $('.tree2_wrap').show().addClass('tree2_wrap_animate2');
+                setp5();
             };
-            timerFunction();
-            return intervalId = setInterval(timerFunction, 1000);
-
-        },
-        /*
-         * 判断账号接口
-         */
-        user_exists :function(callback){
-            var _self = this;
-                 phone = _self.$phone.val();
-            //判断是否注册过
-            org.ajax({
-                url:'/api/user_exists/' + phone + '/',
-                beforeSend: function(){
-                    lib.$phone.addClass('wechat-load'); //显示加载动画
-                },
-                success: function(data){
-                    callback && callback(data);
-                },
-                error: function (data) {
-                    console.log(data)
-                },
-                complete: function(){
-                    _self.$phone.removeClass('wechat-load');
-                }
-            })
-        },
-
-    }
-    return {
-        init : lib.init
-    }
-})(org);
-
-org.result = (function(org){
-    var lib = {
-        init:function(){
-            var
-                phone = org.getQueryStringByName('phone'),
-                state = org.getQueryStringByName('state')*1,
-                str = state == 0 ? '加息券已放入帐户' : '您已领取过';
-                $('.wechat-form-text').html(str + '&nbsp' + phone)
-        },
-    }
-    return {
-        init : lib.init
-    }
-})(org);
-
-;(function(org){
-    $.each($('script'), function(){
-        var src = $(this).attr('src');
-        if(src){
-            if($(this).attr('data-init') && org[$(this).attr('data-init')]){
-                org[$(this).attr('data-init')].init();
+            if (i === 0){
+                clearInterval(timer1);
+                setp5();
             }
-        }
+        },
+        1000); 
+    });
+
+    function setp5(){
+        var i = 6;
+        var timer1 = setInterval(function() {
+            i--;
+            if (i === 2){
+                $('.choice_step3').show().addClass('choice_step_show');    
+            }
+            if (i === 0){
+                clearInterval(timer1);
+                $('.boy_stay').show().css('opacity','1');
+                $('.girl_wrap').show().addClass('girl_come_animate');
+                
+            }
+        },
+        1000);
+        $('.sugar_want').addClass('sugar_want_animate');
+    }
+
+    $('.choice_step3 .choice1').click(function(){
+        $('.sugar').show().addClass('sugar_animate');
+        $('.choice_step3').addClass('choice_step_hide');
+        $('.sugar_want').addClass('sugar_want_hide');
+        this_money = $('.gold_text').attr('data-num') - 5;
+        $('.gold_text').attr('data-num',this_money);
+        money = $('.gold_text').text();
+        var i = 6;
+        var timer1 = setInterval(function() {
+            i--;
+            if (i === 4){
+                gold_scroll(money);
+                $('.gold_num_wrap .main').addClass('gold_num_main_animate');   
+            }
+            if (i === 0){
+                clearInterval(timer1);
+                step6();
+            }
+        },
+        1000);
+    });
+
+    $('.choice_step3 .choice2').click(function(){
+        $('.choice_step3').addClass('choice_step_hide');
+        $('.girl_cry').show();
+        $('.girl_come').css('opacity','0');
+        money = $('.gold_text').text();
+        var i = 4;
+        var timer1 = setInterval(function() {
+            i--;
+            if (i === 0){
+                clearInterval(timer1);
+                step6();
+            }
+        },
+        1000);
     })
-})(org);
+
+    function step6(){
+        if(money<50){
+        //    $('.poor_wrap').css('z-index','9999');
+        //}else{
+        //    $('.rich_wrap').css()('z-index','9999');
+            $('.poor_wrap').show();
+        }else{
+            $('.rich_wrap').hide();
+        }
+    }
+
+})
