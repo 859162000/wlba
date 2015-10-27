@@ -860,16 +860,18 @@ class GetAuthUserInfo(APIView):
             return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
 
 class GetUserInfo(APIView):
+    renderer_classes = (renderers.UnicodeJSONRenderer,)
     permission_classes = ()
+
     def get(self, request):
         openid = request.GET.get('openid')
         if not openid:
-            return HttpResponse(renderers.JSONRenderer().render({'errcode':-3, 'errmsg':'openid is null'}, 'application/json'))
+            return Response({'errcode':-3, 'errmsg':'openid is null'})
         w_user = WeixinUser.objects.filter(openid=openid).first()
         if not w_user:
-            return HttpResponse(renderers.JSONRenderer().render({'errcode':-4, 'errmsg':'openid is not exist'}, 'application/json'))
+            return Response({'errcode':-4, 'errmsg':'openid is not exist'})
         if w_user.nickname:
-            return HttpResponse(renderers.JSONRenderer().render({
+            return Response({
                        "openid":openid,
                        " nickname": w_user.nickname,
                        "sex": w_user.sex,
@@ -880,11 +882,10 @@ class GetUserInfo(APIView):
                         "unionid": w_user.unionid,
                         'subscribe': w_user.subscribe,
                         'subscribe_time': w_user.subscribe_time
-                    }, 'application/json'))
-        # print w_user.account_original_id
+                    })
         account = Account.objects.get(original_id=w_user.account_original_id)
         if not account:
-            return HttpResponse(renderers.JSONRenderer().render({'errcode':-6, 'errmsg':u'公众号信息错误或者不存在'}, 'application/json'))
+            return Response({'errcode':-6, 'errmsg':u'公众号信息错误或者不存在'})
         try:
             user_info = account.get_user_info(w_user.openid)
             w_user.nickname = user_info.get('nickname', "")
@@ -897,9 +898,9 @@ class GetUserInfo(APIView):
             w_user.subscribe = user_info.get('subscribe', '')
             w_user.subscribe_time = user_info.get('subscribe_time', '')
             w_user.save()
-            return HttpResponse(renderers.JSONRenderer().render(user_info, 'application/json'))
+            return Response(user_info)
         except WeChatException, e:
-            return HttpResponse(renderers.JSONRenderer().render({'errcode':e.errcode, 'errmsg':e.errmsg}, 'application/json'))
+            return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
 
 
 
