@@ -2,6 +2,7 @@
 # encoding:utf-8
 
 from decimal import Decimal
+import datetime
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
@@ -66,6 +67,21 @@ class RedPackEvent(models.Model):
     class Meta:
         verbose_name = u"优惠券活动"
         verbose_name_plural = u"优惠券活动"
+
+    def save(self, *args, **kwargs):
+
+        value = dict()
+        value['available_at'] = self.available_at
+        value['auto_extension'] = self.auto_extension
+        value['auto_extension_days'] = self.auto_extension_days
+        value['unavailable_at'] = self.unavailable_at
+
+        if value['auto_extension'] and \
+            value['available_at'] + timezone.timedelta(days=value['auto_extension_days']) > value['unavailable_at']:
+            value['unavailable_at'] = datetime.datetime.utcnow().replace(tzinfo=timezone.utc) + \
+                                      timezone.timedelta(days=value['auto_extension_days'])
+            self.unavailable_at = value['unavailable_at']
+        return super(RedPackEvent, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return u'%s <%s>' % (self.id, self.name)
