@@ -51,6 +51,9 @@ from wanglibao_activity.models import TRIGGER_NODE
 from marketing.utils import get_user_channel_record
 from wanglibao_p2p.models import EquityRecord
 from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao.settings import XUNLEIVIP_KEY
+import urllib
+import hashlib
 import logging
 logger = logging.getLogger('marketing')
 TRIGGER_NODE = [i for i, j in TRIGGER_NODE]
@@ -1851,3 +1854,63 @@ class CommonAward(object):
             'message': u'获得用户抽奖信息',
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+
+class ThunderTenAcvitityTemplate(TemplateView):
+    template_name = 'xunlei_ten.jade'
+
+    def generate_sign(self, data, key):
+        sorted_data = sorted(data.iteritems(), key=lambda asd:asd[0], reverse=False)
+        encode_data = urllib.urlencode(sorted_data)
+        sign = hashlib.md5(encode_data+str(key)).hexdigest()
+        return sign
+
+    def check_params(self, params):
+        sign = params.get('sign')
+        nickname = params.get('nickname')
+        response_data = {}
+        if not sign:
+            response_data = {
+                'ret_code': '10001',
+                'message': u'签名参数不存在',
+            }
+        elif not nickname:
+            response_data = {
+                'ret_code': '10003',
+                'message': u'用户昵称参数不存在',
+            }
+
+        return response_data
+
+    def request_to_dict(self, request_data):
+        data = dict(request_data)
+        request_params = {}
+        for key, value in data.iteritems():
+            request_params[key] = value[0]
+
+        return request_params
+
+    def get_context_data(self, **kwargs):
+        params = self.request_to_dict(self.request.GET)
+        response_data = self.check_params(params)
+
+        if not response_data:
+            sign = params.get('sign')
+            del params['sign']
+
+            nickname = params.get('nickname')
+            if len(nickname) > 3:
+                nickname = nickname[:3]+'...'
+
+            if self.generate_sign(params, XUNLEIVIP_KEY) == sign:
+                response_data = {
+                    'ret_code': '10000',
+                    'message': 'success',
+                    'nickname': nickname,
+                }
+            else:
+                response_data = {
+                    'ret_code': '10002',
+                    'message': u'签名错误',
+                }
+        return response_data

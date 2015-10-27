@@ -28,7 +28,7 @@ from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSe
 from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView, BankCardDelView, 
                             BankListAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
                             YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView,
-                            BindPayView, BindPayCallbackView, BindPayQueryView,
+                            BindPayView, KuaiShortPayCallbackView, BindPayQueryView,
                             BindPayDelView, BindPayDynNumView, TradeRecordAPIView,
                             BindCardQueryView, UnbindCardView, BindPayDepositView, BindPayDynnumNewView,
                             BankCardDelNewView, BankListNewAPIView, YeeShortPayCallbackView)
@@ -54,7 +54,7 @@ from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView
 from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrdeApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
-
+from wanglibao_reward.views import WeixinRedPackView
 
 router = DefaultRouter()
 
@@ -175,7 +175,7 @@ urlpatterns = patterns(
     url(r'^pay/cnp/yee/callback/$', YeeShortPayCallbackView.as_view(), name="yee-deposit-callback"),
 
     #url(r'^pay/deposit/callback/$', KuaiPayCallbackView.as_view(), name="kuai-deposit-callback"),
-    url(r'^pay/deposit/callback/$', BindPayCallbackView.as_view(), name="kuai-deposit-callback"),
+    url(r'^pay/deposit/callback/$', csrf_exempt(KuaiShortPayCallbackView.as_view()), name="kuai-deposit-callback"),
 
 
     url(r'^client_update/$', ClientUpdateAPIView.as_view()),
@@ -214,6 +214,8 @@ urlpatterns = patterns(
     url(r'^gesture/isenabled/$', GestureIsEnabledView.as_view()),
     url(r'^xunlei/8/check/$', GuestCheckView.as_view()),
     url(r'^trade_pwd/$', TradePasswordView.as_view()),
+    url(r'^wechat/attention/(?P<phone>\d+)/$', WeixinRedPackView.as_view()),
+
 )
 
 urlpatterns += patterns('',

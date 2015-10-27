@@ -282,7 +282,10 @@ class HuifuPay(Pay):
 
         if flag:
             device = split_ua(request)
-            tools.despoit_ok(pay_info, device)
+            try:
+                tools.deposit_ok.apply_async(kwargs={"user_id":pay_info.user.id, "amount":pay_info.amount, "device":device})
+            except:
+                pass
 
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
         return result
@@ -613,7 +616,10 @@ class HuifuShortPay:
 
             if rs['ret_code'] == 0:
                 device = split_ua(request)
-                tools.despoit_ok(pay_info, device)
+                try:
+                    tools.deposit_ok.apply_async(kwargs={"user_id":pay_info.user.id, "amount":pay_info.amount, "device":device})
+                except:
+                    pass
 
                 # 充值成功后，更新本次银行使用的时间
                 Card.objects.filter(user=pay_info.user, no=pay_info.card_no).update(last_update=timezone.now())

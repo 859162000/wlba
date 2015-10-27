@@ -1,8 +1,10 @@
 from django.conf.urls import patterns, url
 from django.views.generic import TemplateView, RedirectView
-from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate
+from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate, \
+                            ThunderTenAcvitityTemplate
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
+from wanglibao.views import BaiduFinanceView
 
 urlpatterns = patterns(
     '',
@@ -32,6 +34,7 @@ urlpatterns = patterns(
     url(r'^gold/$', TemplateView.as_view(template_name="gold.jade"), name='marketing_gold'),
     url(r'^qixi/$', TemplateView.as_view(template_name="qixi.jade")),
     url(r'^xunlei_setp/$', TemplateView.as_view(template_name="xunlei_setp.jade"), name='marketing_xunlei_setp'),
+    url(r'^xunlei_ten/$', ThunderTenAcvitityTemplate.as_view(template_name="xunlei_ten.jade")),
     url(r'^mid_autumn/$', TemplateView.as_view(template_name="mid-autumn.jade")),
     url(r'^xunlei_ten/$', TemplateView.as_view(template_name="xunlei_ten.jade")),
 
@@ -42,13 +45,19 @@ urlpatterns = patterns(
     url(r'^pc_caipiao/$', TemplateView.as_view(template_name="pc_caipiao.jade")),
     #url(r'^september_activity/$', TemplateView.as_view(template_name="september_activity.jade")),
     url(r'^web-view/$', TemplateView.as_view(template_name="webView.html")),
+    url(r'^web-center/$', TemplateView.as_view(template_name="fetchtoken.jade")),
+
     url(r'^android-view/$', TemplateView.as_view(template_name="android_view.html")),
     url(r'^new_user/$', TemplateView.as_view(template_name="new_user.jade")),
     url(r'^recommended/$', TemplateView.as_view(template_name="recommended.jade")),
     url(r'^national/$', TemplateView.as_view(template_name="national.jade")),
     url(r'^gold_two/$', TemplateView.as_view(template_name="gold_two.jade")),
-    url(r'^seckill/$', TemplateView.as_view(template_name="seckill.jade")),
 
+    url(r'^baidu_finance/$', BaiduFinanceView.as_view(), name="baidu_finance"),
+    url(r'^seckill/$', TemplateView.as_view(template_name="seckill.jade")),
+    #url(r'^november_new/$', TemplateView.as_view(template_name="november_new.jade")),
+
+    #url(r'^youku/$', TemplateView.as_view(template_name="youku_test.jade")),
 )
 
 # app URL
@@ -58,9 +67,9 @@ urlpatterns += patterns(
     url(r'^app_movie/$', TemplateView.as_view(template_name="app_movie.jade")),
     url(r'^app_level/$', TemplateView.as_view(template_name="app_level.jade")),
     url(r'^app_invite/$', TemplateView.as_view(template_name="app_invite.jade")),
-    url(r'^app_shareReward/$', TemplateView.as_view(template_name="app_shareReward.jade")),
+    url(r'^app_shareReward/$', TemplateView.as_view(template_name="app_gold_season.jade")),
     url(r'^app_request/$', TemplateView.as_view(template_name="app_request.jade")),
-    url(r'^app_gold/$', TemplateView.as_view(template_name="app_gold.jade")),
+    url(r'^app_gold/$', TemplateView.as_view(template_name="app_gold_season.jade")),
     url(r'^app_july_act/$', TemplateView.as_view(template_name="app_july_act.jade")),
     url(r'^app_extension/$', TemplateView.as_view(template_name="app_extension.jade")),
 #    url(r'^app_ele/$', TemplateView.as_view(template_name="app_ele.jade")),
@@ -73,7 +82,9 @@ urlpatterns += patterns(
     url(r'^app_gold_day/$', TemplateView.as_view(template_name="app_gold_day.jade")),
     url(r'^app_pc_download/$', TemplateView.as_view(template_name="app_pc_download.jade")),
     url(r'^app_lottery/$', TemplateView.as_view(template_name="app_lottery.jade")),
-    #url(r'^app_scratch/$', TemplateView.as_view(template_name="app_scratch.jade")),
+    url(r'^app_scratch/$', TemplateView.as_view(template_name="app_scratch.jade")),
+    url(r'^app_scratch_copy/$', login_required(TemplateView.as_view(template_name="app_scratch_copy.jade"), login_url='/accounts/token_login/')),
+    url(r'^app_scratch_copy/nologin/$', TemplateView.as_view(template_name="app_scratch_copy.jade")),
     url(r'^app_national/$', TemplateView.as_view(template_name="app_national.jade")),
 
 
@@ -103,6 +114,12 @@ urlpatterns += patterns(
     url(r'^wx_gold_two/$', TemplateView.as_view(template_name="h5_gold_two.jade")),
     url(r'^app_gold_two/$', TemplateView.as_view(template_name="app_gold_two.jade")),
     url(r'^app_seckill/$', TemplateView.as_view(template_name="app_seckill.jade")),
+    url(r'^app_halloween/$', TemplateView.as_view(template_name="app_halloween.jade")),
+
+    url(r'^maimai_index/$', TemplateView.as_view(template_name="app_maimaiIndex.jade")),
+    url(r'^maimai_rules/$', TemplateView.as_view(template_name="app_maimaiRule.jade")),
+    url(r'^maimai_success/$', TemplateView.as_view(template_name="app_maimaiSuccess.jade")),
+
 )
 
 urlpatterns += patterns(

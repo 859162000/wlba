@@ -25,6 +25,13 @@ def get_a_uuid():
 TWO_PLACES = decimal.Decimal(10) ** -2
 #format amount two places
 def fmt_two_amount(value):
+    """
+    将字符串转换为一个两位小数，如果为非精确转换会抛出一个Inexact的异常
+    :param value: value 为一个字符串
+    :return:
+    """
+    #以防传入float或是其他导致错误
+    value = str(value)
     amount = decimal.Decimal(value).quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
     return amount
 

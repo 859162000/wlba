@@ -211,6 +211,7 @@ LOCALE_PATHS = (
 AUTHENTICATION_BACKENDS = (
     'wanglibao_account.auth_backends.EmailPhoneUsernameAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
 )
 
 # Template loader
@@ -396,7 +397,7 @@ LOGGING = {
             'level': 'DEBUG'
         },
         'wanglibao_pay': {
-            'handlers': ['file'],
+            'handlers': ['file', 'console'],
             'level': 'DEBUG',
         },
         'wanglibao_activity': {
@@ -514,7 +515,7 @@ from datetime import timedelta, datetime
 CELERYBEAT_SCHEDULE = {
     'p2p-watchdog-1-minutes': {
         'task': 'wanglibao_p2p.tasks.p2p_watchdog',
-        'schedule': timedelta(minutes=1),
+        'schedule': timedelta(minutes=5),
     },
     'report-generate': {
         'task': 'report.tasks.generate_report',
@@ -603,10 +604,20 @@ CELERYBEAT_SCHEDULE = {
         'task': 'wanglibao_sms.tasks.message_arrived_rate_task',
         'schedule': timedelta(minutes=10),
     },
-    # by Zhoudong 发送短信时间统计
+    # by Zhoudong 短信到达率统计
     'message_arrived_rate_check': {
         'task': 'wanglibao_sms.tasks.check_arrived_rate_task',
         'schedule': crontab(minute=0, hour=0),
+    },
+    # by Zhoudong 定期检查没有投资的新用户, 提醒投资
+    'invested_status_task_check': {
+        'task': 'marketing.tools.check_invested_status',
+        'schedule': crontab(minute=0, hour=10),
+    },
+    # by Zhoudong 定期检查用户优惠券没使用,发送提醒
+    'redpack_status_task_check': {
+        'task': 'marketing.tools.check_redpack_status',
+        'schedule': crontab(minute=0, hour=11),
     },
 }
 
@@ -656,6 +667,7 @@ if ENV == ENV_PRODUCTION:
     #KUAI_DYNNUM_URL = "https://mas.99bill.com:443/cnp/getDynNum"
 
     KUAI_PEM_PATH = os.path.join(CERT_DIR, "81231006011001390.pem")
+    KUAI_SIGNATURE_PEM_PATH = os.path.join(CERT_DIR, "81231006011001390_signature.pem")
     KUAI_MER_ID = "812310060110013"
     KUAI_MER_PASS = "vpos123"
     KUAI_TERM_ID = "00004559"
@@ -703,6 +715,7 @@ elif ENV == ENV_PREPRODUCTION:
     #KUAI_DYNNUM_URL = "https://mas.99bill.com:443/cnp/getDynNum"
 
     KUAI_PEM_PATH = os.path.join(CERT_DIR, "81231006011001390.pem")
+    KUAI_SIGNATURE_PEM_PATH = os.path.join(CERT_DIR, "81231006011001390_signature.pem")
     KUAI_MER_ID = "812310060110013"
     KUAI_MER_PASS = "vpos123"
     KUAI_TERM_ID = "00004559"
@@ -747,6 +760,7 @@ else:
     #KUAI_DYNNUM_URL = "https://sandbox.99bill.com:9445/cnp/getDynNum"
 
     KUAI_PEM_PATH = os.path.join(CERT_DIR, "10411004511201290.pem")
+    KUAI_SIGNATURE_PEM_PATH = os.path.join(CERT_DIR, "10411004511201290_signature.pem")
     KUAI_MER_ID = "104110045112012"
     KUAI_MER_PASS = "vpos123"
     KUAI_TERM_ID = "00002012"
@@ -766,6 +780,7 @@ YEE_PAY_BACK_RETURN_URL = CALLBACK_HOST + '/api/pay/yee/app/deposit/callback/'
 #快钱回调地址
 KUAI_PAY_RETURN_URL = CALLBACK_HOST + '/api/pay/deposit/complete/'
 KUAI_PAY_BACK_RETURN_URL = CALLBACK_HOST + '/api/pay/deposit/callback/'
+KUAI_PAY_TR3_SIGNATURE = ''
 
 #语音验证码参数
 YTX_SID = "aaf98f89495b3f3801497488ebbe0f3f"
@@ -1065,3 +1080,4 @@ else:
 
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)
+WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'
