@@ -26,7 +26,7 @@
 
         var host = 'https://www.wanglibao.com',
             shareName = '万圣节恐怖夜...',
-            shareImg = host + '/static/imgs/mobile_activity/app_ten_year/weixin_img_300.jpg',
+            shareImg = host + '/static/imgs/mobile_activity/app_halloween/weixin.jpg',
             shareLink = host + '/activity/app_halloween/',
             shareMainTit = '万圣节恐怖夜...',
             shareBody = '我刚遇到十年前的自己，你也来试试把...'

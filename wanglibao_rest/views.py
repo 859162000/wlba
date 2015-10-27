@@ -57,7 +57,7 @@ from wanglibao_account.models import Binding
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_redpack.models import Income
 from decimal import Decimal
-
+from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 logger = logging.getLogger(__name__)
 
 
@@ -323,10 +323,29 @@ class RegisterAPIView(APIView):
                     redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
 
             if channel == 'weixin_attention':
-                dt = timezone.datetime.now()
-                redpack_event = RedPackEvent.objects.filter(invalid=False, name='weixin_atten_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
-                if redpack_event:
-                    redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+                key = 'share_redpack'
+                shareconfig = Misc.objects.filter(key=key).first()
+                if shareconfig:
+                    shareconfig = json.loads(shareconfig.value)
+                    if type(shareconfig) == dict:
+                        is_attention = shareconfig.get('is_attention', '')
+                        attention_code = shareconfig.get('attention_code', '')
+
+                if is_attention:
+                    activity = Activity.objects.filter(code=attention_code).first()
+                    redpack = WanglibaoUserGift.objects.create(
+                        identity=identifier,
+                        activity=activity,
+                        rules=WanglibaoActivityGift.objects.first(),#随机初始化一个值
+                        type=1,
+                        valid=0
+                    )
+                    dt = timezone.datetime.now()
+                    redpack_event = RedPackEvent.objects.filter(invalid=False, name='weixin_atten_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                    if redpack_event:
+                        redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+                        redpack.valid = 1
+                        redpack.save()
 
         return Response({"ret_code": 0, "message": u"注册成功"})
 
