@@ -28,6 +28,7 @@ urlpatterns = patterns(
     url(r'^more/contactus/$', TemplateView.as_view(template_name="weixin_contactus.jade")),
     url(r'^more/aboutus/$', TemplateView.as_view(template_name="weixin_aboutus.jade")),
 
+
     # js api
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
     url(r'^api/login/$', views.WeixinLoginAPI.as_view(), name='weixin_login_api'),
@@ -35,7 +36,7 @@ urlpatterns = patterns(
     url(r'api/wx_code/$', views.AuthorizeCode.as_view(), name='weixin_authorize_code'),
     url(r'api/wx_userinfo/$', views.AuthorizeUser.as_view(), name='weixin_authorize_user_info'),
     url(r'api/wx_getinfo/$', views.GetAuthUserInfo.as_view(), name='weixin_get_user_info'),
-    # url(r'api/bind_account/$',views.BindingAccount.as_view()),
+    url(r'api/generate/ticket/$', views.GenerateTicket.as_view(), name='generate_ticket'),
 )
 
 # 微信管理后台

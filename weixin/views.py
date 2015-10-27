@@ -27,13 +27,14 @@ from wanglibao_rest import utils
 from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
 from wanglibao_pay.models import Bank
-from wechatpy import parse_message, create_reply
+from wechatpy import parse_message, create_reply, WeChatClient
 from wechatpy.utils import check_signature
 from wechatpy.exceptions import InvalidSignatureException, WeChatException
 from wechatpy.oauth import WeChatOAuth
+from wechatpy.client.api.qrcode import WeChatQRCode
 from weixin.common.decorators import weixin_api_error
 from weixin.common.wx import generate_js_wxpay
-from .models import Account, WeixinUser, WeixinAccounts, AuthorizeInfo
+from .models import Account, WeixinUser, WeixinAccounts, AuthorizeInfo, QrCode
 from .common.wechat import tuling
 from decimal import Decimal
 from wanglibao_pay.models import Card
@@ -47,6 +48,9 @@ from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from wanglibao_p2p.views import get_p2p_list
 from wanglibao_redis.backend import redis_backend
+from wechatpy.parser import parse_message
+from wechatpy.messages import *
+from wechatpy.events import *
 
 logger = logging.getLogger('wanglibao_reward')
 
@@ -77,17 +81,70 @@ class WeixinJoinView(View):
     def post(self, request, account_key):
         if not self.check_signature(request, account_key):
             return HttpResponseForbidden()
-
+        account = Account.objects.get(pk=account_key)#WeixinAccounts.get(account_key)
         msg = parse_message(request.body)
-
-        if msg.type == 'text':
-            # 自动回复  5000次／天
-            reply = tuling(msg)
-            # 多客服转接
-            # reply = TransferCustomerServiceReply(message=msg)
-        else:
-            reply = create_reply(u'更多功能，敬请期待！', msg)
-
+        if isinstance(msg, BaseEvent):
+            if isinstance(msg, SubscribeEvent):
+                print msg.event
+                print msg._data
+                toUserName = msg._data['ToUserName']
+                fromUserName = msg._data['FromUserName']
+                createTime = msg._data['CreateTime']
+                eventKey = msg._data['EventKey']
+                w_user = WeixinUser.objects.filter(openid=fromUserName).first()
+                if not w_user:
+                    w_user = WeixinUser()
+                    w_user.openid = fromUserName
+                    w_user.account_original_id = account.original_id
+                    w_user.subscribe = 1
+                    w_user.subscribe_time = createTime
+                    w_user.scene_id = eventKey
+                    w_user.save()
+                elif w_user.subscribe == 0:
+                    w_user.subscribe = 1
+                    w_user.subscribe_time = createTime
+                    w_user.scene_id = eventKey
+                    w_user.save()
+                reply = create_reply(u'欢迎关注我们！', msg)
+            elif isinstance(msg, UnsubscribeEvent):
+                print msg.event
+                print msg._data
+                toUserName = msg._data['ToUserName']
+                fromUserName = msg._data['FromUserName']
+                createTime = msg._data['CreateTime']
+                eventKey = msg._data['EventKey']
+                w_user = WeixinUser.objects.filter(openid=fromUserName).first()
+                w_user.subscribe = 0
+                w_user.save()
+                reply = create_reply(u'欢迎下次关注我们！', msg)
+            elif isinstance(msg, SubscribeScanEvent):
+                print msg.event
+                print msg._data
+                print msg.scene_id
+                print msg.ticket
+                toUserName = msg._data['ToUserName']
+                fromUserName = msg._data['FromUserName']
+                createTime = msg._data['CreateTime']
+                eventKey = msg._data['EventKey']
+                w_user = WeixinUser.objects.filter(openid=fromUserName).first()
+                w_user.subscribe = 1
+                w_user.scene_id = eventKey
+                w_user.save()
+                reply = create_reply(u'欢迎关注我们！', msg)
+            elif isinstance(msg, ScanEvent):
+                print msg.event
+                print msg._data
+                print msg.scene_id
+                print msg.ticket
+                reply = create_reply(u'https://7fd03dee.ngrok.io/activity/new_user/', msg)
+        elif isinstance(msg, BaseMessage):
+            if isinstance(msg, TextMessage):
+                # 自动回复  5000次／天
+                reply = tuling(msg)
+                # 多客服转接
+                # reply = TransferCustomerServiceReply(message=msg)
+            else:
+                reply = create_reply(u'更多功能，敬请期待！', msg)
         return HttpResponse(reply.render())
 
     @method_decorator(csrf_exempt)
@@ -854,5 +911,29 @@ class GetAuthUserInfo(APIView):
         except WeChatException, e:
             return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
 
+class GenerateTicket(APIView):
+    permission_classes = ()
+    def get(self, request):
+        qrcode_id = request.GET.get('id')
+        if not qrcode_id:
+            return Response({'errcode':-1, 'errmsg':"-1"})
+        qrcode = QrCode.objects.filter(id=qrcode_id).first()
+        if not qrcode:
+            return Response({'errcode':-2, 'errmsg':"-2"})
+        if qrcode.ticket:
+            return Response({'errcode':-3, 'errmsg':"-3"})
+        account = Account.objects.get(original_id=qrcode.account_original_id)
+        client = WeChatClient(account.app_id, account.app_secret, account.access_token)
+        qrcode_data = {"action_name":"QR_LIMIT_STR_SCENE", "action_info":{"scene": {"scene_str": qrcode.scene_str}}}
+        try:
+            rs = client.qrcode.create(qrcode_data)
+
+            qrcode.ticket = rs.get('ticket')
+            qrcode.url = rs.get('url')
+            qrcode.save()
+        except Exception,e:
+            print e
+            pass
+        return Response(rs)
 
 

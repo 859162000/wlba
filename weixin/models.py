@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 
 from .common.wechat import gen_token
 from wechatpy.client import WeChatClient
+from wechatpy.client.api.qrcode import WeChatQRCode
 
 
 class Account(models.Model):
@@ -118,6 +119,26 @@ class Account(models.Model):
         self.oauth_access_token_expires_at = now
         self.oauth_refresh_token = ''
         self.save()
+
+class QrCode(models.Model):
+    account_original_id = models.CharField('所属公众号原始ID', max_length=32, blank=True, db_index=True)
+    ticket = models.CharField('ticket', max_length=512, null=False)
+    expire_at = models.DateTimeField('ticket过期时间', auto_now_add=True, blank=True, null=True)
+    url = models.CharField('url', max_length=512, null=False)
+    qrcode_url = models.CharField('qrcode_url', max_length=512, null=False)
+    scene_str = models.CharField('scene_str', max_length=128, null=False)
+    create_at = models.DateTimeField('生成时间', auto_now_add=True, blank=True, null=True)
+    def ticket_generate(self):
+        return u'<a href="/weixin/api/generate/ticket/?id=%s" target="_self">生成ticket</a>' % (self.id,)
+    ticket_generate.short_description = u'生成ticket'
+    ticket_generate.allow_tags = True
+    def qrcode_link(self):
+        return u'<a href="%s" target="_blank">查看二维码</a>' % (WeChatQRCode.get_url(self.ticket))
+    qrcode_link.short_description = u'查看二维码'
+    qrcode_link.allow_tags = True
+    class Meta:
+        verbose_name_plural = '微信二维码'
+        ordering = ['-account_original_id', '-create_at']
 
 # 公众号类型
 class WeixinAccounts(object):
@@ -285,7 +306,10 @@ class WeixinUser(models.Model):
     account_original_id = models.CharField('所属公众号原始ID', max_length=32, blank=True, db_index=True)
     user = models.ForeignKey(User, null=True)
     unionid = models.CharField('用户唯一标识', max_length=128, blank=True)
+    scene_id = models.CharField('渠道', max_length=64, blank=True, null=True)
     auth_info = models.ForeignKey(AuthorizeInfo, null=True)
+
+
 
 
 class Material(models.Model):
@@ -396,3 +420,4 @@ class ReplyKeyword(models.Model):
     pattern = models.IntegerField('匹配模式', choices=PATTERN_CHOICES)
     rule_reply = models.ForeignKey(ReplyRule)
     created_at = models.DateTimeField('创建时间', auto_now_add=True)
+
