@@ -674,6 +674,7 @@ def ajax_xunlei(request):
         to_json_response = {
             'ret_code': 3000,
             'message': u'用户没有登陆，请先登陆',
+            'award': 108000-ActivityJoinLog.objects.filter(action_name='oct_get_award', join_times=0).count()
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 

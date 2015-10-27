@@ -80,33 +80,6 @@
              $('.denruxunlei').show();
              $('.dengxun11').hide();
         })
-        //倒计时
-        function TimeTo(dd) {
-            var t = new Date(dd),//取得指定时间的总毫秒数
-                    n = new Date().getTime(),//取得当前毫秒数
-                    c = t - n;//得到时间差
-            if (c <= 0) {//如果差小于等于0  也就是过期或者正好过期，则推出程序
-              $('#jianli').html(0);
-              clearInterval(window['ttt']);//清除计时器
-              return;//结束执行
-            }
-            var ds = 60 * 60 * 24 * 1000,//一天共多少毫秒
-                    d = parseInt(c / ds);//毫秒除以一天的毫秒 得到相差的天数
-            var jiang=d*3600
-            if(d>=30){
-                $('#jianli').html(108000);
-            }else{
-               $('#jianli').html(jiang);
-            };
-
-          }
-          (function () {
-            window['ttt'] = setInterval(function () {
-
-              TimeTo('2015/12/2');//定义倒计时的结束时间，注意格式
-
-            }, 1000);//定义计时器，每隔1000毫秒 也就是1秒 计算并更新 div的显示
-          })();
 
         //关闭弹出框
         var change = [];
@@ -270,7 +243,6 @@
 
         }
 
-
         //请求宝箱接口
         function redpack(sum, callback) {
             $.ajax({
@@ -282,9 +254,11 @@
                 change = data;
                 callback && callback(data);
 
+
             });
         }
-
+        //添加奖品份数
+        $('#jianli').html(change['award']);
 
     });
 }).call(this);
