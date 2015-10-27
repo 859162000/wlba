@@ -316,15 +316,20 @@ org.reward = (function(org){
                 if(!lib.checkState) return
 
                 var ops = {};
+                _self.$submit.attr('disabled',true).html('领取中，请稍后...');
                 if(_self.$phone.attr('data-existing') === 'true'){
                     ops = {
                         url: '/api/wechat/attention/' + _self.$phone.val()+'/',
                         type: 'post',
                         success: function(data){
-                            console.log(data)
+                            if(data.ret_code == 0){
+                                window.location.href= '/activity/wechat_result/?phone='+ _self.$phone.val() + '&state=1'
+                            }else if(data.ret_code == 1000){
+                                window.location.href= '/activity/wechat_result/?phone='+ _self.$phone.val() + '&state=0'
+                            }
                         },
-                        error: function(data){
-
+                        complete:function(){
+                            lib.$submit.removeAttr('disabled').html('立即领取');
                         }
                     }
                 }else{
@@ -339,10 +344,15 @@ org.reward = (function(org){
                             'captcha_1' :  _self.$codeimg.val(),
                         },
                         success: function(data){
-                            console.log(data)
+                            if(data.ret_code == 0){
+                                window.location.href= '/activity/wechat_result/?phone='+ _self.$phone.val() + '&state=0'
+                            }
                         },
                         error: function(data){
 
+                        },
+                        complete:function(){
+                            lib.$submit.removeAttr('disabled').html('立即领取');
                         }
                     }
                 }
@@ -511,7 +521,11 @@ org.reward = (function(org){
 org.result = (function(org){
     var lib = {
         init:function(){
-            $('#phone-target').html(org.getQueryStringByName('phone'));
+            var
+                phone = org.getQueryStringByName('phone'),
+                state = org.getQueryStringByName('state')*1,
+                str = state == 0 ? '加息券已放入帐户' : '您已领取过';
+                $('.wechat-form-text').html(str + '&nbsp' + phone)
         },
     }
     return {
