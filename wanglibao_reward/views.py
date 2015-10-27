@@ -838,7 +838,7 @@ class WeixinRedPackView(APIView):
                 except Exception, reason:
                     logger("给用户发红包抛异常, reason:%s" % (reason, ))
                 else:
-                    redpack.user = user
+                    #redpack.user = user
                     redpack.valid = 1
                     redpack.save()
                     data = {
