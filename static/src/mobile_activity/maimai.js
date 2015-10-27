@@ -17,7 +17,6 @@ org.mmIndex = (function(org){
             lib._submit();
             lib.listen();
             $(document.body).trigger('from:captcha');
-            console.log(lib.checkfilter(3))
         },
         checkfilter:function(num){
             var
@@ -34,23 +33,27 @@ org.mmIndex = (function(org){
         listen: function(){
             var _self = this;
 
+            //图形验证码
             $(document).on('from:captcha', function(){
                 _self.$validationTime = true;
                 _self._fetchcode();
             });
 
+            //短信验证码
             $(document).on('from:validation', function(){
                 _self._fetchValidation();
             });
-
+            //check 表单
             $(document).on('from:check', function(e, checklist, post){
                 _self._check(checklist, post)
             });
 
+            //表单chek 成功
             $(document).on('from:success', function(e, post){
                 _self._success(post);
             });
 
+            //表单chek 失败
             $(document).on('from:error', function(e, message){
                 _self._error(message)
             });
@@ -65,6 +68,7 @@ org.mmIndex = (function(org){
                 $(document.body).trigger('from:captcha')
             });
 
+            //获取短信验证码
             $('.check-submit').on('click',function(){
                 if(!_self.$validationTime) $(document.body).trigger('from:captcha');
                 $(document.body).trigger('from:validation');
@@ -86,15 +90,8 @@ org.mmIndex = (function(org){
                 var ops = {};
                 if(_self.$phone.attr('data-existing') === 'true'){
                     ops = {
-                        url: '/api/register/',
-                        type: 'POST',
-                        data: {
-                            'identifier': _self.$phone.val(),
-                            'validate_code': _self.$codenum.val(),
-                            'IGNORE_PWD': 'true',
-                            'captcha_0' :  $('input[name=codeimg_key]').val(),
-                            'captcha_1' :  $('input[name=codeimg]').val(),
-                        },
+                        url: '/api/distribute/redpack/'+phone+'/?promo_token=momo',
+                        type: 'post',
                         success: function(data){
                             console.log(data)
                         },
@@ -104,8 +101,15 @@ org.mmIndex = (function(org){
                     }
                 }else{
                     ops = {
-                        url: '/api/distribute/redpack/'+phone+'/?promo_token=momo',
-                        type: 'GET',
+                        url: '/api/register/',
+                        type: 'POST',
+                        data: {
+                            'identifier': _self.$phone.val(),
+                            'validate_code': _self.$codenum.val(),
+                            'IGNORE_PWD': 'true',
+                            'captcha_0' :  $('input[name=codeimg_key]').val(),
+                            'captcha_1' :  $('input[name=codeimg]').val(),
+                        },
                         success: function(data){
                             console.log(data)
                         },
