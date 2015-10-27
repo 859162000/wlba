@@ -1,9 +1,6 @@
 from .forms import ClientAuthForm
 from .models import AccessToken
 from .utils import now
-from django.contrib.auth.models import User
-from django.contrib.auth.backends import ModelBackend
-from django.contrib.auth.tokens import default_token_generator
 
 
 class BasicClientBackend(object):
@@ -36,17 +33,7 @@ class AccessTokenBackend(object):
     def authenticate(self, access_token=None, client=None):
         try:
             return AccessToken.objects.get(token=access_token,
-                expires__gt=now(), client=client)
+                                           expires__gt=now(),
+                                           client=client)
         except AccessToken.DoesNotExist:
             return None
-
-
-class TokenBackend(ModelBackend):
-    def authenticate(self, pk, token=None):
-        try:
-            user = User.objects.get(pk=pk)
-        except User.DoesNotExist:
-            return None
-        if default_token_generator.check_token(user, token):
-            return user
-        return None
