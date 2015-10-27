@@ -722,6 +722,9 @@ class ThunderInterestAwardAPIView(APIView):
                     中奖后提示中奖金额及中奖提示语，非中奖用户提示非中奖提示语。
     """
 
+    def get_left_awards(self, init=108000):
+       return init-ActivityJoinLog.objects.filter(action_name='oct_get_award', join_times=0).count()
+
     def get_award(self, request, reward):
         """
             TO-WRITE
@@ -734,6 +737,7 @@ class ThunderInterestAwardAPIView(APIView):
                 'left': join_log.join_times,  # 还剩几次
                 'amount': str(join_log.amount),  # 加息额度
                 'message': u'抽奖机会已经用完了',
+                'award': self.get_left_awards()
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
         join_log.join_times -= 1
@@ -757,6 +761,7 @@ class ThunderInterestAwardAPIView(APIView):
             'left': join_log.join_times,  # 还剩几次
             'amount': str(join_log.amount),  # 加息额度
             'message': u'终于等到你，还好我没放弃',
+            'award': self.get_left_awards()
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -794,6 +799,7 @@ class ThunderInterestAwardAPIView(APIView):
             'left': join_log.join_times,  # 还剩几次
             'amount': str(join_log.amount),  # 加息额度
             'message': u'你和大奖只是一根头发的距离',
+            'award': self.get_left_awards()
         }
 
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -825,9 +831,8 @@ class ThunderInterestAwardAPIView(APIView):
                 create_time=timezone.now(),
             )
 
-            join_log = ActivityJoinLog.objects.filter(user=request.user, action_name='get_award').first()
-            join_log.amount = self.get_award_mount(activity.id)
-            join_log.save(update_fields=['amount'])
+            activity.amount = self.get_award_mount(activity.id)
+            activity.save(update_fields=['amount'])
 
         to_json_response = {
             'ret_code': 3003,
@@ -835,6 +840,7 @@ class ThunderInterestAwardAPIView(APIView):
             'left': join_log.join_times,  # 还剩几次
             'amount': str(join_log.amount),  # 加息额度
             'message': u'欢迎刮奖',
+            'award': self.get_left_awards()
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
