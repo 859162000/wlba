@@ -1172,11 +1172,14 @@ class DistributeRedpackView(APIView):
     permission_classes = ()
     def post(self, request, phone):
         user = WanglibaoUserProfile.objects.filter(phone=phone).first()
-        channel = self.request.GET.get('promo_token', '')
+        channel = self.request.DATA.get('promo_token', '')
 
         if channel == 'momo':
             dt = timezone.datetime.now()
             redpack_event = RedPackEvent.objects.filter(invalid=False, name='momo_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
             if redpack_event:
                 redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+                return Response({"ret_code": 0, "message": u"老用户发送加息券成功"})
+            else:
+                return Response({"ret_code": 1000, "message": u"待发送的加息券没有配置"})
 

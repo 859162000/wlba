@@ -787,9 +787,11 @@ class WeixinRedPackView(APIView):
     def post(self, request, phone):
         key = 'share_redpack'
         shareconfig = Misc.objects.filter(key=key).first()
-        if type(shareconfig) == dict:
-            is_attention = shareconfig.get('is_attention', 'false')
-            attention_code = shareconfig.get('attention_code', 'false')
+        if shareconfig:
+            shareconfig = json.loads(shareconfig.value)
+            if type(shareconfig) == dict:
+                is_attention = shareconfig.get('is_attention', '')
+                attention_code = shareconfig.get('attention_code', '')
 
         if not is_attention:
             data = {
@@ -814,6 +816,7 @@ class WeixinRedPackView(APIView):
             redpack = WanglibaoUserGift.objects.create(
                 identity=phone_number,
                 activity=activity,
+                rules=WanglibaoActivityGift.objects.first(),#随机初始化一个值
                 type=1,
                 valid=0
             )
