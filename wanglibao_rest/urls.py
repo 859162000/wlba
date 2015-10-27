@@ -175,7 +175,7 @@ urlpatterns = patterns(
     url(r'^pay/cnp/yee/callback/$', YeeShortPayCallbackView.as_view(), name="yee-deposit-callback"),
 
     #url(r'^pay/deposit/callback/$', KuaiPayCallbackView.as_view(), name="kuai-deposit-callback"),
-    url(r'^pay/deposit/callback/$', KuaiShortPayCallbackView.as_view(), name="kuai-deposit-callback"),
+    url(r'^pay/deposit/callback/$', csrf_exempt(KuaiShortPayCallbackView.as_view()), name="kuai-deposit-callback"),
 
 
     url(r'^client_update/$', ClientUpdateAPIView.as_view()),
