@@ -221,7 +221,7 @@ class RegisterAPIView(APIView):
         while index < length:
             password.append(random_list[randint(0,len(random_list))])
             index += 1
-        return str(random_list)
+        return str(password)
 
     def post(self, request, *args, **kwargs):
         """ 
@@ -236,14 +236,14 @@ class RegisterAPIView(APIView):
         identifier = identifier.strip()
         password = password.strip()
         validate_code = validate_code.strip()
+        if request.DATA.get('IGNORE_PWD', '') and not password:
+            password = self.generate_random_password(6)
+
         if not identifier or not password or not validate_code:
             return Response({"ret_code": 30011, "message": "信息输入不完整"})
 
         if not 6 <= len(password) <= 20:
             return Response({"ret_code": 30012, "message": u"密码需要在6-20位之间"})
-
-        if request.DATA.get('IGNORE_PWD', '') and not password:
-            password = self.generate_random_password(6)
 
         identifier_type = detect_identifier_type(identifier)
         if identifier_type != 'phone':
