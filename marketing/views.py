@@ -1874,44 +1874,49 @@ class ThunderTenAcvitityTemplate(TemplateView):
         sign = hashlib.md5(encode_data+str(key)).hexdigest()
         return sign
 
-    def check_params(self, params):
-        sign = params.get('sign')
-        nickname = params.get('nickname')
+    def check_params(self, sign, _time, nickname, user_id):
         response_data = {}
-        if not sign:
+        if sign is None:
             response_data = {
                 'ret_code': '10001',
-                'message': u'签名参数不存在',
+                'message': u'签名不存在',
             }
-        elif not nickname:
+        elif nickname is None:
             response_data = {
                 'ret_code': '10003',
-                'message': u'用户昵称参数不存在',
+                'message': u'用户昵称不存在',
+            }
+        elif _time is None:
+            response_data = {
+                'ret_code': '10005',
+                'message': u'时间戳不存在',
+            }
+        elif user_id is None:
+            response_data = {
+                'ret_code': '10007',
+                'message': u'用户ID不存在',
             }
 
         return response_data
 
-    def request_to_dict(self, request_data):
-        data = dict(request_data)
-        request_params = {}
-        for key, value in data.iteritems():
-            request_params[key] = value[0]
-
-        return request_params
-
     def get_context_data(self, **kwargs):
-        params = self.request_to_dict(self.request.GET)
-        response_data = self.check_params(params)
+        params = self.request.GET
+        sign = params.get('sign')
+        _time = params.get('time')
+        nickname = params.get('nickname')
+        user_id = params.get('xluserid')
+        response_data = self.check_params(sign, _time, nickname, user_id)
 
         if not response_data:
-            sign = params.get('sign')
-            del params['sign']
+            check_data = {
+                'nickname': nickname,
+                'xluserid': user_id,
+            }
 
-            nickname = params.get('nickname')
             if len(nickname) > 3:
                 nickname = nickname[:3]+'...'
 
-            if self.generate_sign(params, XUNLEIVIP_REGISTER_KEY) == sign:
+            if self.generate_sign(check_data, XUNLEIVIP_REGISTER_KEY) == sign:
                 response_data = {
                     'ret_code': '10000',
                     'message': 'success',
@@ -1922,4 +1927,5 @@ class ThunderTenAcvitityTemplate(TemplateView):
                     'ret_code': '10002',
                     'message': u'签名错误',
                 }
+
         return response_data
