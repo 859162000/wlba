@@ -826,7 +826,7 @@ class WeixinRedPackView(APIView):
                 valid=0
             )
 
-            user = WanglibaoUserProfile.objects.filter(phone=phone_number).first()
+            user = WanglibaoUserProfile.objects.filter(phone=phone_number).first().user
             if user:
                 try:
                     redpack_id = ActivityRule.objects.filter(activity=activity).first().redpack
@@ -846,7 +846,7 @@ class WeixinRedPackView(APIView):
                 except Exception, reason:
                     logger("给用户发红包抛异常, reason:%s, msg: %s" % (reason, msg))
                 else:
-                    #redpack.user = user
+                    redpack.user = user
                     redpack.valid = 1
                     redpack.save()
                     data = {
