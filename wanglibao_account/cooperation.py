@@ -739,11 +739,11 @@ class FUBARegister(CoopRegister):
             if p2p_record_set.count() == 1:
                 p2p_record = p2p_record_set.first()
                 goodmark = '1'
-                action = u'首单'
+                order_act = u'首单'
             else:
                 p2p_record = p2p_record_set.last()
                 goodmark = '2'
-                action = u'复投'
+                order_act = u'复投'
 
             p2p_amount = int(p2p_record.amount)
             if p2p_amount >= 1000:
@@ -761,7 +761,7 @@ class FUBARegister(CoopRegister):
                 # goodsname 提供固定值，固定值自定义，但不能为空
                 goodsname = u"名称:网利宝,类型:产品标,周期:1月"
                 sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
-                status = u"%s【%s元：已付款】" % (action, p2p_amount)
+                status = u"%s【%s元：已付款】" % (order_act, p2p_amount)
                 params = {
                     'action': 'create',
                     'planid': self.coop_id,
