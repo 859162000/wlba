@@ -6,13 +6,16 @@ html
     meta(content='telephone=no,email=no', name='format-detection')
     meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
     meta(content='yes', name='apple-mobile-web-app-capable')
-    link(href='/static/styles/mobile_activity/app_halloween.css?v=2015102808', rel='stylesheet')
+    link(href='/static/styles/mobile_activity/app_halloween.css?v=2015102809', rel='stylesheet')
   body
     img.weixin(src='/static/imgs/mobile_activity/app_halloween/weixin.jpg')
     .loading
       img(src='/static/imgs/mobile_activity/app_halloween/loading.gif')
     .no_signal_wrap(style='display:none')
       .no_signal
+    #play.play_music
+        audio#music(loop='loop',style='width:0;height:0;',autoplay='autoplay')
+            source(type="audio/mpeg", src="/static/imgs/mobile_activity/app_halloween/music.mp3")
     #wrap(style='opacity:0')
       .bg_after
       .bg_front_wrap
@@ -84,6 +87,6 @@ html
         img(src='/static/imgs/mobile_activity/app_halloween/rich_button.png')
     script(src='/static/src/pc/lib/jquery.min.js')
     script(src='/static/src/pc/lib/jquery.animateNumber.min.js')
-    script(src='/static/src/mobile_activity/app_halloween.js?v=2015102807')
+    script(src='/static/src/mobile_activity/app_halloween.js?v=2015102809')
     script(src='/static/src/mobile/lib/weixin/wx.js')
     script(src='/static/scripts/mobile_activity/app_halloween_share.js')
