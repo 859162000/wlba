@@ -824,7 +824,7 @@ class GetAuthUserInfo(APIView):
 
             return Response({
                        "openid":openid,
-                       " nickname": w_user.nickname,
+                       "nickname": w_user.nickname,
                        "sex": w_user.sex,
                        "province": w_user.province,
                        "city": w_user.city,
@@ -873,7 +873,7 @@ class GetUserInfo(APIView):
         if w_user.nickname:
             return Response({
                        "openid":openid,
-                       " nickname": w_user.nickname,
+                       "nickname": w_user.nickname,
                        "sex": w_user.sex,
                        "province": w_user.province,
                        "city": w_user.city,

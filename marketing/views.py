@@ -185,15 +185,16 @@ class AppShareViewShort(TemplateView):
 
     def get_context_data(self, **kwargs):
         try:
-            identifier = self.request.GET.get('p') + '='
-            identifier = base64.b64decode(identifier)
+            identifier = self.request.GET.get('p')
+            phone = base64.b64decode(identifier + '=')
         except:
             identifier = self.request.GET.get('phone')
         reg = self.request.GET.get('reg')
 
         return {
             'identifier': identifier.strip(),
-            'reg': reg
+            'reg': reg,
+            'phone': phone,
         }
 
 
@@ -203,6 +204,36 @@ class AppShareRegView(TemplateView):
     def get_context_data(self, **kwargs):
         identifier = self.request.GET.get('identifier').strip()
         friend_identifier = self.request.GET.get('friend_identifier').strip()
+
+        if friend_identifier:
+            try:
+                user = User.objects.get(wanglibaouserprofile__phone=friend_identifier)
+                promo_token = PromotionToken.objects.get(user=user)
+                invitecode = promo_token.token
+            except:
+                invitecode = ''
+        else:
+            invitecode = ''
+
+        send_validation_code(identifier)
+        return {
+            'identifier': identifier,
+            'invitecode': invitecode
+        }
+
+
+class ShortAppShareRegView(TemplateView):
+    template_name = 'app_share_reg.jade'
+
+    def get_context_data(self, **kwargs):
+        try:
+            identifier = self.request.GET.get('i')
+            # identifier = base64.b64decode(identifier)
+            friend_identifier = self.request.GET.get('fi')
+            # friend_identifier = base64.b64decode(friend_identifier)
+        except Exception, e:
+            identifier = self.request.GET.get('identifier').strip()
+            friend_identifier = self.request.GET.get('friend_identifier').strip()
 
         if friend_identifier:
             try:

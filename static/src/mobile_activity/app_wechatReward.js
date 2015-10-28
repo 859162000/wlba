@@ -115,7 +115,7 @@ org.reward = (function(org){
                     }
                 }else{
                     ops = {
-                        url: '/api/register/?promo_token=weixin_attention',
+                        url: '/api/register/?promo_token=h5chuanbo',
                         type: 'POST',
                         data: {
                             'identifier': _self.$phone.val(),

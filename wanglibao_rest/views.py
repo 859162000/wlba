@@ -335,7 +335,7 @@ class RegisterAPIView(APIView):
                     redpack.valid = 1
                     redpack.save()
 
-            if channel == 'weixin_attention':
+            if channel == 'h5chuanbo':
                 key = 'share_redpack'
                 shareconfig = Misc.objects.filter(key=key).first()
                 if shareconfig:
@@ -1238,7 +1238,7 @@ class DistributeRedpackView(APIView):
                     valid=0
                 )
                 logger.debug("usergift表中为用户生成了获奖记录：%s" % (redpack,))
-                user = WanglibaoUserProfile.objects.filter(phone=phone_number).first()
+                user = WanglibaoUserProfile.objects.filter(phone=phone_number).first().user
                 if user:
                     logger.debug("用户已经存在，开始给该用户发送加息券")
                     try:
@@ -1258,7 +1258,7 @@ class DistributeRedpackView(APIView):
                     except Exception, reason:
                         logger.debug("给用户发红包抛异常, reason:%s" % (reason, ))
                     else:
-                        #redpack.user = user
+                        redpack.user = user
                         redpack.valid = 1
                         redpack.save()
                         data = {

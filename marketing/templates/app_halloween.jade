@@ -6,11 +6,16 @@ html
     meta(content='telephone=no,email=no', name='format-detection')
     meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
     meta(content='yes', name='apple-mobile-web-app-capable')
-    link(href='/static/styles/mobile_activity/app_halloween.css?v=2015102806', rel='stylesheet')
+    link(href='/static/styles/mobile_activity/app_halloween.css?v=2015102809', rel='stylesheet')
   body
     img.weixin(src='/static/imgs/mobile_activity/app_halloween/weixin.jpg')
-    .no_signal_wrap
+    .loading
+      img(src='/static/imgs/mobile_activity/app_halloween/loading.gif')
+    .no_signal_wrap(style='display:none')
       .no_signal
+    #play.play_music
+        audio#music(loop='loop',style='width:0;height:0;',autoplay='autoplay')
+            source(type="audio/mpeg", src="/static/imgs/mobile_activity/app_halloween/music.mp3")
     #wrap(style='opacity:0')
       .bg_after
       .bg_front_wrap
@@ -64,23 +69,24 @@ html
         .choice_step.choice_step3
           img.button.choice1(src='/static/imgs/mobile_activity/app_halloween/button3_1.png')
           img.button.choice2(src='/static/imgs/mobile_activity/app_halloween/button3_2.png')
-    .poor_wrap
+    .poor_wrap(style='display:none')
       .bg
-      .poor_boy
+      img.poor_boy(src='/static/imgs/mobile_activity/app_halloween/poor_boy.gif')
+      img.poor_text(src='/static/imgs/mobile_activity/app_halloween/poor_text.png')
       .light.poor_light_animate
       a.button(href='https://www.wanglibao.com/weixin/regist/?next=/weixin/authentication/?promo_token=h5chuanbo')
         img(src='/static/imgs/mobile_activity/app_halloween/poor_button.png')
-    .rich_wrap
+    .rich_wrap(style='display:none')
       .bg_front
       .rich_bg_after
       .boy_img
+      img.rich_text(src='/static/imgs/mobile_activity/app_halloween/rich_text.png')
       .light.rich_light_animate
         img(src='/static/imgs/mobile_activity/app_halloween/rich_light_one.png')
       a.button(href='https://www.wanglibao.com/weixin/regist/?next=/weixin/authentication/?promo_token=h5chuanbo')
-        img(src='/static/imgs/mobile_activity/app_halloween/poor_button.png')
-
+        img(src='/static/imgs/mobile_activity/app_halloween/rich_button.png')
     script(src='/static/src/pc/lib/jquery.min.js')
     script(src='/static/src/pc/lib/jquery.animateNumber.min.js')
-    script(src='/static/src/mobile_activity/app_halloween.js?v=2015102806')
+    script(src='/static/src/mobile_activity/app_halloween.js?v=2015102809')
     script(src='/static/src/mobile/lib/weixin/wx.js')
     script(src='/static/scripts/mobile_activity/app_halloween_share.js')
