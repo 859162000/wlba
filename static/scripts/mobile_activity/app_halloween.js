@@ -463,6 +463,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 clearInterval(timer1);
                 $('.boy_stay').show().css('opacity','1');
                 $('.girl_wrap').show().addClass('girl_come_animate');
+                $('.girl_come').show();
                 choice_step3 = true;
             }
         },

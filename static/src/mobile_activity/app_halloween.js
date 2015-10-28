@@ -244,6 +244,7 @@ $(function() {
                 clearInterval(timer1);
                 $('.boy_stay').show().css('opacity','1');
                 $('.girl_wrap').show().addClass('girl_come_animate');
+                $('.girl_come').show();
                 choice_step3 = true;
             }
         },
