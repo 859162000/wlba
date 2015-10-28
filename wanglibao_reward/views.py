@@ -839,7 +839,8 @@ class WeixinRedPackView(APIView):
                     logger("从RedPackEvent中获得配置红包报错, reason:%s" % (reason, ))
 
                 try:
-                    redpack_backends.give_activity_redpack(self.request.user, redpack_event, 'pc')
+                    logger.debug("给用户 %s 发送红包 %s" % (user, redpack_event))
+                    redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
                 except Exception, reason:
                     logger("给用户发红包抛异常, reason:%s" % (reason, ))
                 else:
