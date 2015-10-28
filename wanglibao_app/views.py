@@ -576,7 +576,7 @@ class AppInviteAllGoldAPIView(APIView):
 
 
 class AppLogoutAPIView(APIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = ()
 
     def post(self, request, **kwargs):
         auth.logout(request)
