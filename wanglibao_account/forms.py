@@ -364,3 +364,66 @@ class TokenSecretSignAuthenticationForm(forms.Form):
     def get_user(self):
         return self.user_cache
 
+from random import randint
+
+
+def generate_random_password():
+    return ''.join([randint(0, 9) for i in range(6)])
+
+
+class EmailOrPhoneRegisterForm2(forms.ModelForm):
+    """
+    A form that creates a user, with no privileges
+    From a email address or phone number
+
+    phone number will be checked against the validate code, and if passed
+    the user will be created and be activated.
+
+    If email address provided, then an activation mail will be sent to the mail
+    account is not activated. When the user clicked the activation link, the account
+    will be activated.
+    """
+
+    identifier = forms.CharField()
+    signature = forms.CharField()
+    client_id = forms.CharField()
+
+    class Meta:
+        model = get_user_model()
+        fields = ("email",)
+
+    def _generate_sign(self):
+        pass
+
+    def clean_identifier(self):
+        """
+        since identifier may be a phone number or an email address
+        So checking the format here is important
+        """
+
+        identifier = self.cleaned_data["identifier"].strip()
+        identifier_type = detect_identifier_type(identifier)
+
+        if identifier_type == 'email':
+            users = User.objects.filter(email=identifier, is_active=True)
+        elif identifier_type == 'phone':
+            users = User.objects.filter(wanglibaouserprofile__phone=identifier)
+        else:
+            raise forms.ValidationError({
+                'code': '40001',
+                'message': u'无效手机号或邮箱格式'
+            })
+
+        if len(users) != 0:
+            raise forms.ValidationError({
+                'code': '40002',
+                'message': u'重复的用户名'
+            })
+
+        return identifier
+
+    def clean_signature(self):
+        identifier = self.cleaned_data["signature"].strip()
+
+    def clean_client_id(self):
+        pass

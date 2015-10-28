@@ -1163,43 +1163,53 @@ class GuestCheckView(APIView):
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.tokens import default_token_generator
+from wanglibao_account.forms import EmailOrPhoneRegisterForm2
 
 
 class ThirdRegisterOpenApiView(APIView):
     permission_classes = ()
 
-    # def post(self, request):
-    #     if request.method == 'POST':
-    #         params = request.POST
-    #         usn = params.get('usn')
-    #         appid = params.get('appid')
-    #         client_ip = params.get('client_ip')
-    #         signature = params.get('signature')
-    #
-    #         if 'username' in request.POST and 'password' in request.POST:
-    #             username =
-    #             user = authenticate(username = localusername, password = '')
-    #         if user:
-    #             data = {
-    #                 'success': True,
-    #                 'token': default_token_generator.make_token(user),
-    #                 'user': user.pk,
-    #             }
-    #             return data
-    #         else:
-    #             return HttpResponse("Error token!")
-    #     elif request.method == 'GET':
-    #         if 'username' in request.GET and 'password' in request.GET:
-    #             user = authenticate(username = localusername, password = '')
-    #         if user:
-    #             data = {
-    #                 'success': True,
-    #                 'token': default_token_generator.make_token(user),
-    #                 'user': user.pk,
-    #             }
-    #             return data
-    #         else:
-    #             return HttpResponse("Error token!")
+    def post(self, request):
+        form = EmailOrPhoneRegisterForm2(request.POST)
+
+        if form.is_valid():
+            response_data = {}
+        else:
+            response_data = form.errors
+
+        return HttpResponse(renderers.JSONRenderer().render(response_data,
+                                                            'application/json'))
+        # if request.method == 'POST':
+        #     params = request.POST
+        #     usn = params.get('usn')
+        #     appid = params.get('appid')
+        #     client_ip = params.get('client_ip')
+        #     signature = params.get('signature')
+        #
+        #     if 'username' in request.POST and 'password' in request.POST:
+        #         username =
+        #         user = authenticate(username = localusername, password = '')
+        #     if user:
+        #         data = {
+        #             'success': True,
+        #             'token': default_token_generator.make_token(user),
+        #             'user': user.pk,
+        #         }
+        #         return data
+        #     else:
+        #         return HttpResponse("Error token!")
+        # elif request.method == 'GET':
+        #     if 'username' in request.GET and 'password' in request.GET:
+        #         user = authenticate(username = localusername, password = '')
+        #     if user:
+        #         data = {
+        #             'success': True,
+        #             'token': default_token_generator.make_token(user),
+        #             'user': user.pk,
+        #         }
+        #         return data
+        #     else:
+        #         return HttpResponse("Error token!")
 
 
 class LoginAPIView(APIView):
