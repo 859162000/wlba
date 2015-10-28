@@ -81,7 +81,7 @@ class Channels(models.Model):
     """
         渠道信息
     """
-    code = models.CharField(u'渠道代码', max_length=12, db_index=True, unique=True)
+    code = models.CharField(u'渠道代码', max_length=50, db_index=True, unique=True)
     name = models.CharField(u'渠道名字(xunlei)', max_length=20, default="")
     description = models.CharField(u'渠道描述', max_length=50, default="", blank=True)
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
@@ -443,3 +443,14 @@ class WanglibaoActivityReward(models.Model):
         verbose_name = u'网利宝发奖活动表'
         verbose_name_plural = u'网利宝发奖活动表'
 
+
+class LoginAccessToken(models.Model):
+    """
+     by huo meimei
+    """
+    token = models.OneToOneField(Token, primary_key=True)
+    secret_sign = models.CharField(max_length=40, verbose_name='登录令牌', unique=True)
+    # client_ts = models.CharField(max_length=40, verbose_name='客户端时间')
+    expire_at = models.BigIntegerField(default=None, verbose_name=u"时间戳", blank=True)
+    class Meta:
+        verbose_name_plural = u'h5用户令牌登录表'
