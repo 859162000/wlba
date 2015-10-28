@@ -214,7 +214,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         getCookie              : lib._getCookie,
         onMenuShareAppMessage  : lib._onMenuShareAppMessage,
         onMenuShareTimeline    : lib._onMenuShareTimeline,
-        onMenuShareQQ          : lib._onMenuShareQQ
+        onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
 ;/**

@@ -221,7 +221,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 $(function() {
     window.onload = function() {
-        //$('.boy').removeClass('boy_animate0');
         $('#wrap').show();
         $('.no_signal_wrap').addClass('no_signal_wrap_animate');
         step1();
@@ -243,6 +242,7 @@ $(function() {
     /*数字变换*/
 
     function step1() {
+        $('.boy').removeClass('boy_animate1');
         var i = 4;
         var timer1 = setInterval(function() {
             i--;
@@ -465,12 +465,11 @@ $(function() {
 
     function step6(){
         if(money<50){
-        //    $('.poor_wrap').css('z-index','9999');
-        //}else{
-        //    $('.rich_wrap').css()('z-index','9999');
             $('.poor_wrap').show();
+            $('.poor_wrap .button').show().addClass('href_button');
         }else{
-            $('.rich_wrap').hide();
+            $('.rich_wrap').show();
+            $('.rich_wrap .button').show().addClass('href_button');
         }
     }
 
