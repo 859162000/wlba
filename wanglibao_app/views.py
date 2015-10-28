@@ -578,6 +578,6 @@ class AppInviteAllGoldAPIView(APIView):
 class AppLogoutAPIView(APIView):
     permission_classes = ()
 
-    def post(self, request, **kwargs):
+    def get(self, request, **kwargs):
         auth.logout(request)
         return Response({'ret_code': 0, 'message': 'success'})
