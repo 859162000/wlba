@@ -15,7 +15,7 @@ org.test = (function(org){
                 callback(WebViewJavascriptBridge)
               }, false)
               var u = navigator.userAgent;
-              if(u.indexOf('wlb') <= -1){
+              if(u.indexOf('wlbAPP') <= -1){
                   window.location.href =' /weixin/login/?next=' + $("input[name='next']").val()
               }
             }
