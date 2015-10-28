@@ -1909,7 +1909,7 @@ class ThunderTenAcvitityTemplate(TemplateView):
 
         if not response_data:
             check_data = {
-                'nickname': nickname,
+                'time': _time,
                 'xluserid': user_id,
             }
 
