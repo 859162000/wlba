@@ -28,6 +28,8 @@ body {
     position:absolute;
     top:30%;
     left:0;
+    width:100%;
+    display: block;
 }
 .loading img{
 	width:50%;
