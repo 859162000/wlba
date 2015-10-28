@@ -11,10 +11,10 @@ html(style="background: #FFF29A")
       .card-text 1.5
         em %
     .wechat-form
-      .wechat-form-text 加息券已放入帐户&nbsp
-        em#phone-target 13021160575
+      .wechat-form-text
+
       .wechat-form-margin.wechat-sign-margin
-      input(type='button',name='submit' ,value="立即领取").wechat-form-btn
-    .wechat-rules 加息券使用规则>>
+      a(href='/weixin/list/').wechat-form-btn 立即使用
+    a(href='/activity/wechat_rule/').wechat-rules 加息券使用规则>>
     .wechat-logo
     script(data-init='result', src="/static/scripts/mobile_activity/app_wechatReward.js?v=20150707")

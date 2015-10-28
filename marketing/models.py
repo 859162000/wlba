@@ -82,7 +82,7 @@ class Channels(models.Model):
     """
         渠道信息
     """
-    code = models.CharField(u'渠道代码', max_length=12, db_index=True, unique=True)
+    code = models.CharField(u'渠道代码', max_length=50, db_index=True, unique=True)
     name = models.CharField(u'渠道名字(xunlei)', max_length=20, default="")
     description = models.CharField(u'渠道描述', max_length=50, default="", blank=True)
     created_at = models.DateTimeField(u'创建时间', auto_now_add=True)
