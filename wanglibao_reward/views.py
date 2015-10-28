@@ -831,12 +831,12 @@ class WeixinRedPackView(APIView):
                 try:
                     redpack_id = ActivityRule.objects.filter(activity=activity).first().redpack
                 except Exception, reason:
-                    logger("从ActivityRule中获得redpack_id抛异常, reason:%s" % (reason, ))
+                    logger.debug("从ActivityRule中获得redpack_id抛异常, reason:%s" % (reason, ))
 
                 try:
                     redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
                 except Exception, reason:
-                    logger("从RedPackEvent中获得配置红包报错, reason:%s" % (reason, ))
+                    logger.debug("从RedPackEvent中获得配置红包报错, reason:%s" % (reason, ))
 
                 msg = ""
                 try:
@@ -844,7 +844,7 @@ class WeixinRedPackView(APIView):
                     msg = redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
                     logger.debug("发送红包返回值：%s" %(msg,))
                 except Exception, reason:
-                    logger("给用户发红包抛异常, reason:%s, msg: %s" % (reason, msg))
+                    logger.debug("给用户发红包抛异常, reason:%s, msg: %s" % (reason, msg))
                 else:
                     redpack.user = user
                     redpack.valid = 1
