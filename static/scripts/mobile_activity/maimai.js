@@ -316,20 +316,25 @@ org.mmIndex = (function(org){
                 if(!lib.checkState) return
 
                 var ops = {};
+                _self.$submit.attr('disabled',true).html('领取中，请稍后...');
                 if(_self.$phone.attr('data-existing') === 'true'){
                     ops = {
-                        url: '/api/wechat/attention/' + _self.$phone.val()+'/',
-                        type: 'post',
+                        url: '/api/distribute/redpack/' + _self.$phone.val()+'/?promo_token=maimaitest',
+                        type: 'POST',
                         success: function(data){
-                            console.log(data)
+                            if(data.ret_code == 0){
+                                window.location.href = '/activity/maimai_success/?state=1'
+                            }else if(data.ret_code === 1000){
+                                window.location.href = '/activity/maimai_success/?state=0'
+                            }
                         },
-                        error: function(data){
-
+                        complete:function(){
+                            lib.$submit.removeAttr('disabled').html('领 取');
                         }
                     }
                 }else{
                     ops = {
-                        url: '/api/register/?promo_token=weixin_atten',
+                        url: '/api/register/?promo_token=maimaitest',
                         type: 'POST',
                         data: {
                             'identifier': _self.$phone.val(),
@@ -339,10 +344,15 @@ org.mmIndex = (function(org){
                             'captcha_1' :  _self.$codeimg.val(),
                         },
                         success: function(data){
-                            console.log(data)
+                            if(data.ret_code == 0){
+                                window.location.href = '/activity/maimai_success/?state=0'
+                            }
                         },
                         error: function(data){
 
+                        },
+                        complete:function(){
+                            lib.$submit.removeAttr('disabled').html('领 取');
                         }
                     }
                 }
@@ -508,10 +518,28 @@ org.mmIndex = (function(org){
     }
 })(org);
 
-org.result = (function(org){
+org.success = (function(org){
     var lib = {
         init:function(){
-            $('#phone-target').html(org.getQueryStringByName('phone'));
+            var
+                state = org.getQueryStringByName('state')*1,
+                str = '',
+                val = '';
+
+                if(state === 0){
+                    str = '成功领取';
+                    val = '价值120元红包';
+                }else if(state === 1){
+                    str = '您已领取过';
+                    val = '***加息券';
+                }
+                $('.maimai-title').html(str);
+                $('.maimai-money').html(val);
+
+
+            var mySwiper = new Swiper('.swiper-container', {
+                pagination: '.swiper-pagination-maimai',
+            })
         },
     }
     return {

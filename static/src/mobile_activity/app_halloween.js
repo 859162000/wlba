@@ -2,7 +2,6 @@
 
 $(function() {
     window.onload = function() {
-        $('#wrap').show();
         $('.no_signal_wrap').addClass('no_signal_wrap_animate');
         step1();
     }
@@ -23,6 +22,7 @@ $(function() {
     /*数字变换*/
 
     function step1() {
+        $('#wrap').css('opacity','1');
         $('.boy').removeClass('boy_animate1');
         var i = 4;
         var timer1 = setInterval(function() {
@@ -57,19 +57,19 @@ $(function() {
     }   
 
     function step3(){
-        $('.bg_after').addClass('bg_after_animate1');
-        $('.bg_front_wrap').addClass('bg_front_wrap_animate1');
-        $('.boy_stay').hide();
-        $('.boy').addClass('boy_animate1');
-        $('.choice_step1').show().addClass('choice_step_show');
-        $('.gold').show().addClass('gold_animate');
-        $('.cloud').addClass('cloud_animate1');
-        var i = 5;
+        var i = 4;
         var timer1 = setInterval(function() {
             i--;
             if (i === 0) {
                 clearInterval(timer1);
                 //$('.boy_stay').show();
+                $('.boy').addClass('boy_animate1');
+                $('.choice_step1').show().addClass('choice_step_show');
+                $('.bg_after').addClass('bg_after_animate1');
+                $('.bg_front_wrap').addClass('bg_front_wrap_animate1');
+                $('.boy_stay').hide();
+                $('.gold').show().addClass('gold_animate');
+                $('.cloud').addClass('cloud_animate1');
             }
         },
         1000);

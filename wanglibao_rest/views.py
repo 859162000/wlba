@@ -1236,17 +1236,17 @@ class DistributeRedpackView(APIView):
                     try:
                         redpack_id = ActivityRule.objects.filter(activity=activity).first().redpack
                     except Exception, reason:
-                        logger("从ActivityRule中获得redpack_id抛异常, reason:%s" % (reason, ))
+                        logger.debug("从ActivityRule中获得redpack_id抛异常, reason:%s" % (reason, ))
 
                     try:
                         redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
                     except Exception, reason:
-                        logger("从RedPackEvent中获得配置红包报错, reason:%s" % (reason, ))
+                        logger.debug("从RedPackEvent中获得配置红包报错, reason:%s" % (reason, ))
 
                     try:
                         redpack_backends.give_activity_redpack(self.request.user, redpack_event, 'pc')
                     except Exception, reason:
-                        logger("给用户发红包抛异常, reason:%s" % (reason, ))
+                        logger.debug("给用户发红包抛异常, reason:%s" % (reason, ))
                     else:
                         #redpack.user = user
                         redpack.valid = 1
