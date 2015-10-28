@@ -688,9 +688,17 @@ class FUBARegister(CoopRegister):
         """
         # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
         binding = Binding.objects.filter(user_id=user.id).first()
-        p2p_record_set = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
-        if binding and p2p_record_set.count() == 1:
-            p2p_record = p2p_record_set.first()
+        p2p_record_set = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time')
+        if binding and p2p_record_set.exists():
+            if p2p_record_set.count() == 1:
+                p2p_record = p2p_record_set.first()
+                goodmark = '1'
+                action = u'首单'
+            else:
+                p2p_record = p2p_record_set.last()
+                goodmark = '2'
+                action = u'复投'
+
             p2p_amount = int(p2p_record.amount)
             if p2p_amount >= 1000:
                 # 如果结算时间过期了则不执行回调
@@ -703,16 +711,16 @@ class FUBARegister(CoopRegister):
                         return
 
                 order_id = p2p_record.id
-                goodsprice = 80
+                goodsprice = p2p_amount
                 # goodsname 提供固定值，固定值自定义，但不能为空
                 goodsname = u"名称:网利宝,类型:产品标,周期:1月"
                 sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
-                status = u"首单【%s元：已付款】" % p2p_amount
+                status = u"%s【%s元：已付款】" % (action, p2p_amount)
                 params = {
                     'action': 'create',
                     'planid': self.coop_id,
                     'order': order_id,
-                    'goodsmark': '1',
+                    'goodsmark': goodmark,
                     'goodsprice': goodsprice,
                     'goodsname': goodsname,
                     'sig': sig,
