@@ -21,9 +21,9 @@ html(style="background: #FFF29A")
           img(src='').check-img
         .wechat-form-margin
         .phone-check
-          input(type='tel', name='codenum',data-type='Val',data-message='请输入短信码', placeholder='输入验证码').check-input
-          button(type="button").check-submit 数字验证码
+          input(type='tel', name='codenum',data-type='Val',data-message='请输入短信码', placeholder='输入短信码').check-input
+          button(type="button").check-submit 短信验证码
       .wechat-form-sign 请输入正确的手机号
       .wechat-form-margin.wechat-sign-margin
-      input(type='button',name='submit' ,value="立即领取",disabled=true).wechat-form-btn
+      input(type='button',name='submit' ,value="立即领取",disabled=).wechat-form-btn
     script(data-init='reward', src="/static/scripts/mobile_activity/app_wechatReward.js?v=20150707")

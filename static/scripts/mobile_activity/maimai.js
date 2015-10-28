@@ -422,7 +422,7 @@ org.mmIndex = (function(org){
                     _self.$phone.attr('data-existing', true);
                 }else{
                     lib.$submit.attr('disabled',true);
-                    _self.$body_h.css({'height': '6.6rem'});
+                    _self.$body_h.css({'height': '5.6rem'});
                     _self.$phone.attr('data-existing', false);
                     $(document.body).trigger('from:check', [_self.checkfilter(3), false, false]);
                 }
@@ -468,7 +468,7 @@ org.mmIndex = (function(org){
                 error :function(xhr){
                     clearInterval(intervalId);
                     var result = JSON.parse(xhr.responseText);
-                    $('.check-submit').text('数字验证码').removeAttr('disabled').removeClass('postValidation');
+                    $('.check-submit').text('短信验证码').removeAttr('disabled').removeClass('postValidation');
                     $(document.body).trigger('from:error',[result.message, true]);
                     $(document.body).trigger('from:captcha')
                 }

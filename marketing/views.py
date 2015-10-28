@@ -697,6 +697,7 @@ def ajax_xunlei(request):
         to_json_response = {
             'ret_code': 4000,
             'message': u'非迅雷渠道过来的用户',
+            'award': get_left_awards()
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -775,6 +776,7 @@ class ThunderInterestAwardAPIView(APIView):
             'ret_code': 3005,
             'data': data,
             'message': u'获得抽奖成功用户',
+            'award': self.get_left_awards()
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -792,6 +794,7 @@ class ThunderInterestAwardAPIView(APIView):
                 'left': join_log.join_times,  # 还剩几次
                 'amount': str(join_log.amount),  # 加息额度
                 'message': u'抽奖机会已经用完了',
+                'award': self.get_left_awards()
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
