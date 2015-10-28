@@ -8,6 +8,7 @@ from django.db import transaction
 from decimal import *
 from ckeditor.fields import RichTextField
 from django.core.exceptions import ValidationError
+from rest_framework.authtoken.models import Token
 
 
 class NewsAndReport(models.Model):
