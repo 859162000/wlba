@@ -36,15 +36,7 @@ body {
 	margin:0 auto;
 	display: block;
 }
-.loading .loading_text{
-    width:100%;
-    text-align: center;
-    color: #fff;
-    font-size:22px;
-    font-style: italic;
-    height:30px;
-    line-height: 30px;
-}
+
 .no_signal_wrap{
 	height: 100%;
 	width: 100%;
@@ -155,6 +147,7 @@ body {
 	overflow: hidden;
 	box-shadow: 0 0 #000 inset;
 	opacity:0;
+    z-index: 9996;
 }
 
 .title {
@@ -220,24 +213,24 @@ body {
 @-webkit-keyframes title_animate {
 	0% {
 		transform: scale(1);
-		opacity: 1
+		opacity: 1;
 	}
 
 	100% {
-		transform: scale(1.3);
-		opacity: 0
+		transform: scale(1);
+		opacity: 0;
 	}
 }
 
 @keyframes title_animate {
 	0% {
 		transform: scale(1);
-		opacity: 1
+		opacity: 1;
 	}
 
 	100% {
-		transform: scale(1.3);
-		opacity: 0
+		transform: scale(1);
+		opacity: 0;
 	}
 }
 
@@ -281,8 +274,8 @@ body {
 .cloud_animate1{
 	-webkit-animation-name: cloud_animate1;
 	animation-name: cloud_animate1;
-	-webkit-animation-duration: 4.5s;
-	animation-duration: 4.5s;
+	-webkit-animation-duration: 5s;
+	animation-duration: 5s;
 	-webkit-animation-timing-function: linear;
 	animation-timing-function: linear;
 	-webkit-animation-delay: 0s;
@@ -413,8 +406,8 @@ body {
 .bg_after_animate1{
 	-webkit-animation-name: bg_after_animate1;
 	animation-name: bg_after_animate1;
-	-webkit-animation-duration: 4.5s;
-	animation-duration: 4.5s;
+	-webkit-animation-duration: 5s;
+	animation-duration: 5s;
 	-webkit-animation-timing-function: linear;
 	animation-timing-function: linear;
 	-webkit-animation-delay: 0s;
@@ -532,8 +525,8 @@ body {
 .bg_front_wrap_animate1{
 	-webkit-animation-name: bg_front_wrap_animate1;
 	animation-name: bg_front_wrap_animate1;
-	-webkit-animation-duration: 4.5s;
-	animation-duration: 4.5s;
+	-webkit-animation-duration: 5s;
+	animation-duration: 5s;
 	-webkit-animation-timing-function: linear;
 	animation-timing-function: linear;
 	-webkit-animation-delay: 0s;
@@ -946,7 +939,46 @@ body {
 	display: block;
 	width: 100%
 }
+.boy .boy_go_one {
+	display: none;
+	width: 100%;
+    opacity: 1;
+}
+.boy_go_one_hide{
+    -webkit-animation-name: boy_go_one_hide;
+	animation-name: boy_go_one_hide;
+	-webkit-animation-duration: 5s;
+	animation-duration: 5s;
+	-webkit-animation-timing-function: linear;
+	animation-timing-function: linear;
+	-webkit-animation-delay: 0s;
+	animation-delay: 0s;
+	-webkit-animation-fill-mode: forwards;
+	animation-fill-mode: forwards;
+}
+@-webkit-keyframes boy_go_one_hide {
+	0% {
+		opacity: 1;
+	}
+    99%{
+        opacity: 1;
+    }
+	100%{
+		opacity: 0;
+	}
+}
 
+@keyframes boy_go_one_hide {
+	0% {
+		opacity: 1;
+	}
+    99%{
+        opacity: 1;
+    }
+	100%{
+		opacity: 0;
+	}
+}
 .boy_animate1 {
 	-webkit-animation-name: boy_animate1;
 	animation-name: boy_animate1;
@@ -1133,8 +1165,8 @@ body {
 .boy_animate2 {
 	-webkit-animation-name: boy_animate1;
 	animation-name: boy_animate1;
-	-webkit-animation-duration: 3s;
-	animation-duration: 3s;
+	-webkit-animation-duration: 4.5s;
+	animation-duration: 4.5s;
 	-webkit-animation-timing-function: steps(1, start);
 	animation-timing-function: steps(1, start);
 	-webkit-animation-delay: 0s;
@@ -1147,6 +1179,18 @@ body {
 	animation-name: boy_animate1;
 	-webkit-animation-duration: 6s;
 	animation-duration: 6s;
+	-webkit-animation-timing-function: steps(1, start);
+	animation-timing-function: steps(1, start);
+	-webkit-animation-delay: 0s;
+	animation-delay: 0s;
+	-webkit-animation-fill-mode: forwards;
+	animation-fill-mode: forwards;
+}
+.boy_animate4 {
+	-webkit-animation-name: boy_animate1;
+	animation-name: boy_animate1;
+	-webkit-animation-duration: 3s;
+	animation-duration: 3s;
 	-webkit-animation-timing-function: steps(1, start);
 	animation-timing-function: steps(1, start);
 	-webkit-animation-delay: 0s;
@@ -1209,7 +1253,6 @@ body {
 		opacity: 1;
 	}
 }
-
 @keyframes choice_step_show {
 	0% {
 		opacity: 0;
@@ -1318,8 +1361,8 @@ body {
 	animation-duration: 1s;
 	-webkit-animation-timing-function: ease;
 	animation-timing-function: ease;
-	-webkit-animation-delay: 7s;
-	animation-delay: 7s;
+	-webkit-animation-delay: 8s;
+	animation-delay: 8s;
 	-webkit-animation-fill-mode: forwards;
 	animation-fill-mode: forwards;	
 }
@@ -1498,8 +1541,6 @@ body {
     width: 65%;
     display: block;
     z-index: 3;
-    background: url("/static/imgs/mobile_activity/app_halloween/car.png") no-repeat 0 0;
-	background-size: 100% auto;
 }
 .car .img{
 	background: url("/static/imgs/mobile_activity/app_halloween/car.png") no-repeat 0 0;
@@ -1615,8 +1656,8 @@ body {
 .gold_animate{
 	-webkit-animation-name: gold_animate;
 	animation-name: gold_animate;
-	-webkit-animation-duration: 4.5s;
-	animation-duration: 4.5s;
+	-webkit-animation-duration: 5s;
+	animation-duration: 5s;
 	-webkit-animation-timing-function: linear;
 	animation-timing-function: linear;
 	-webkit-animation-delay: 0s;
@@ -1782,7 +1823,7 @@ body {
 }
 .girl_wrap img{
 	width:100%;
-	display: block;
+	display: none;
 }
 .girl_come_animate{
 	-webkit-animation-name: girl_come_animate;
@@ -2064,16 +2105,15 @@ body {
 	height:100%;
 	overflow: hidden;
 	box-shadow: 0 0 #000 inset;
-	z-index: 9997;
+	z-index: 99;
 	left:0;
 	top:0;
-    display: none;
 }
 .poor_wrap{
 	/*display: none;*/
 }
 .poor_wrap .bg{
-	background: url("/static/imgs/mobile_activity/app_halloween/poor_bg.jpg") no-repeat center top;
+	background: url("/static/imgs/mobile_activity/app_halloween/rich_bg.jpg") no-repeat center top;
 	background-size: 100% 100%;
 	width:100%;
 	height:100%;
@@ -2082,7 +2122,7 @@ body {
 	width: 70%;
     position: absolute;
     left: 15%;
-    top: 30%;
+    top: 36%;
 	z-index:3;
 	display: none;
 }
@@ -2307,13 +2347,10 @@ body {
 	}
 }
 .rich_wrap .boy_img{
-	background: url("/static/imgs/mobile_activity/app_halloween/rich_boy.png") no-repeat center top;
-	background-size: auto 100%;
-	width:100%;
-	height:100%;	
+	width:56.5%;
 	position: absolute;
-	left:0;
-	top:0;
+	left:21.75%;
+	top:30%;
 	z-index:5;
 }
 #play {
