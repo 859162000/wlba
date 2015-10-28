@@ -1233,12 +1233,14 @@ class DistributeRedpackView(APIView):
 
                 user = WanglibaoUserProfile.objects.filter(phone=phone_number).first()
                 if user:
+                    logger.debug("用户已经存在，开始给该用户发送加息券")
                     try:
                         redpack_id = ActivityRule.objects.filter(activity=activity).first().redpack
                     except Exception, reason:
                         logger.debug("从ActivityRule中获得redpack_id抛异常, reason:%s" % (reason, ))
 
                     try:
+                        logger.debug("用户：%s 使用的加息券id:%s" %(phone_number, redpack_id))
                         redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
                     except Exception, reason:
                         logger.debug("从RedPackEvent中获得配置红包报错, reason:%s" % (reason, ))
