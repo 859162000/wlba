@@ -1373,21 +1373,22 @@ body {
 .gold_text{
 	position:absolute;
 	left:34%;
-	top:26.5%;
+	top:50%;
 	color: #fff;
+	height:22px;
+	margin-top:-11px;
 	font-size:20px;
 	width:55%;
 	text-align: center;
 	font-weight: bold;
+	line-height: 22px;
 }
 @media screen and (min-width:700px) and (min-height:700px){
 	.gold_text{
 		font-size:40px;
-	}
-}
-@media screen and (min-width:410px) and (min-height:700px){
-	.gold_text{
-		top:29%;
+		height:42px;
+		margin-top:-21px;
+		line-height: 42px;
 	}
 }
 .car{
@@ -2042,7 +2043,37 @@ body {
 	bottom:5.2%;
 	z-index: 5;
 	width:40%;
-	display: block;
+	display: none;
+	opacity: 0;
+}
+.href_button{
+	-webkit-animation-name: href_button;
+	animation-name: href_button;
+	-webkit-animation-duration: 1s;
+	animation-duration: 1s;
+	-webkit-animation-timing-function: linear;
+	animation-timing-function: linear;
+	-webkit-animation-delay: 2s;
+	animation-delay: 2s;
+	-webkit-animation-fill-mode: forwards;
+	animation-fill-mode: forwards;
+}
+@-webkit-keyframes href_button {
+	0% {
+		opacity:0;
+	}
+	100% {
+		opacity:1;
+	}
+}
+
+@keyframes href_button {
+	0% {
+		opacity:0;
+	}
+	100% {
+		opacity:1;
+	}
 }
 .poor_wrap .button img,.rich_wrap .button img{
 	width:100%;

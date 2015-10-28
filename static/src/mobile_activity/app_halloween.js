@@ -23,6 +23,7 @@ $(function() {
     /*数字变换*/
 
     function step1() {
+        $('.boy').removeClass('boy_animate1');
         var i = 4;
         var timer1 = setInterval(function() {
             i--;
@@ -246,8 +247,10 @@ $(function() {
     function step6(){
         if(money<50){
             $('.poor_wrap').show();
+            $('.poor_wrap .button').show().addClass('href_button');
         }else{
             $('.rich_wrap').show();
+            $('.rich_wrap .button').show().addClass('href_button');
         }
     }
 
