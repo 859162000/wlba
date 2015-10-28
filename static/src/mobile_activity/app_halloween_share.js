@@ -3,7 +3,7 @@
  */
 (function(){
     //微信分享
-    var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ',];
+    var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
     org.ajax({
         type : 'GET',
         url : '/weixin/api/jsapi_config/',
@@ -25,11 +25,11 @@
     wx.ready(function(){
 
         var host = 'https://www.wanglibao.com',
-            shareName = '万圣节恐怖夜...',
+            shareName = '万圣夜出门的结果就是......',
             shareImg = host + '/static/imgs/mobile_activity/app_halloween/weixin.jpg',
             shareLink = host + '/activity/app_halloween/',
-            shareMainTit = '万圣节恐怖夜...',
-            shareBody = '我刚遇到十年前的自己，你也来试试把...'
+            shareMainTit = '万圣夜出门的结果就是......',
+            shareBody = '没事别瞎溜达，除非......'
         //分享给微信好友
         org.onMenuShareAppMessage({
             title: shareMainTit,
@@ -39,7 +39,7 @@
         });
         //分享给微信朋友圈
         org.onMenuShareTimeline({
-            title: '我刚遇到十年前的自己，你也来试试把...',
+            title: '万圣夜出门的结果就是......',
             link : shareLink,
             imgUrl: shareImg
         })
