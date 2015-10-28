@@ -403,7 +403,7 @@ class WeixinShareDetailView(TemplateView):
                 if counts==1:
                     index=0
                 else:
-                    index = random.randint(counts-1)
+                    index = random.randint(0, counts-1)
                 gift = gifts[index]
                 gift_order.valid_amount -= 1
             else:
