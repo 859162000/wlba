@@ -400,12 +400,15 @@ class WeixinShareDetailView(TemplateView):
 
                 counts = gifts.count()
                 logger.debug("测试数据counts:%s" % (counts,))
-                if counts==1:
-                    index=0
+                if counts>0:
+                    if counts<=1:
+                        index=0
+                    else:
+                        index = random.randint(0, counts-1)
+                    gift = gifts[index]
+                    gift_order.valid_amount -= 1
                 else:
-                    index = random.randint(0, counts-1)
-                gift = gifts[index]
-                gift_order.valid_amount -= 1
+                    gift = None
             else:
                 gift = None
 
