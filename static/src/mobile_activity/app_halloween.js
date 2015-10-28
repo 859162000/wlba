@@ -5,9 +5,9 @@ $(function() {
         $('.no_signal_wrap').addClass('no_signal_wrap_animate');
         step1();
     }
-    var choice_step1 = true;
-    var choice_step2 = true;
-    var choice_step3 = true;
+    var choice_step1 = false;
+    var choice_step2 = false;
+    var choice_step3 = false;
     var money = 0;
     var this_money;
     /*数字变换*/
@@ -73,6 +73,7 @@ $(function() {
                 $('.boy_stay').hide();
                 $('.gold').show().addClass('gold_animate');
                 $('.cloud').addClass('cloud_animate1');
+                choice_step1 = true;
             }
         },
         1000);
@@ -143,6 +144,7 @@ $(function() {
                 $('.boy_stay').show();     
                 $('.ghost').show().addClass('ghost_animate');
                 $('.boy').removeClass('boy_animate2');
+                choice_step2 = true;
             }
         },
         1000); 
@@ -221,7 +223,7 @@ $(function() {
                 clearInterval(timer1);
                 $('.boy_stay').show().css('opacity','1');
                 $('.girl_wrap').show().addClass('girl_come_animate');
-                
+                choice_step3 = true;
             }
         },
         1000);
