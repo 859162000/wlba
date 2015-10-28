@@ -185,15 +185,16 @@ class AppShareViewShort(TemplateView):
 
     def get_context_data(self, **kwargs):
         try:
-            identifier = self.request.GET.get('p') + '='
-            identifier = base64.b64decode(identifier)
+            identifier = self.request.GET.get('p')
+            phone = base64.b64decode(identifier + '=')
         except:
             identifier = self.request.GET.get('phone')
         reg = self.request.GET.get('reg')
 
         return {
             'identifier': identifier.strip(),
-            'reg': reg
+            'reg': reg,
+            'phone': phone,
         }
 
 
@@ -203,6 +204,36 @@ class AppShareRegView(TemplateView):
     def get_context_data(self, **kwargs):
         identifier = self.request.GET.get('identifier').strip()
         friend_identifier = self.request.GET.get('friend_identifier').strip()
+
+        if friend_identifier:
+            try:
+                user = User.objects.get(wanglibaouserprofile__phone=friend_identifier)
+                promo_token = PromotionToken.objects.get(user=user)
+                invitecode = promo_token.token
+            except:
+                invitecode = ''
+        else:
+            invitecode = ''
+
+        send_validation_code(identifier)
+        return {
+            'identifier': identifier,
+            'invitecode': invitecode
+        }
+
+
+class ShortAppShareRegView(TemplateView):
+    template_name = 'app_share_reg.jade'
+
+    def get_context_data(self, **kwargs):
+        try:
+            identifier = self.request.GET.get('i')
+            # identifier = base64.b64decode(identifier)
+            friend_identifier = self.request.GET.get('fi')
+            # friend_identifier = base64.b64decode(friend_identifier)
+        except Exception, e:
+            identifier = self.request.GET.get('identifier').strip()
+            friend_identifier = self.request.GET.get('friend_identifier').strip()
 
         if friend_identifier:
             try:
@@ -697,6 +728,7 @@ def ajax_xunlei(request):
         to_json_response = {
             'ret_code': 4000,
             'message': u'非迅雷渠道过来的用户',
+            'award': get_left_awards()
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -775,6 +807,7 @@ class ThunderInterestAwardAPIView(APIView):
             'ret_code': 3005,
             'data': data,
             'message': u'获得抽奖成功用户',
+            'award': self.get_left_awards()
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -792,6 +825,7 @@ class ThunderInterestAwardAPIView(APIView):
                 'left': join_log.join_times,  # 还剩几次
                 'amount': str(join_log.amount),  # 加息额度
                 'message': u'抽奖机会已经用完了',
+                'award': self.get_left_awards()
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -810,11 +844,11 @@ class ThunderInterestAwardAPIView(APIView):
     def get_award_mount(self, index):
         index %= 10
         if index in (0,):
-            return 1
+            return 0.5
         if index in(3, 6, 9):
-            return 1
+            return 0.5
         if index in(1, 2, 4, 5, 7, 8):
-            return 1
+            return 0.5
 
     def enter_webpage(self, request):
         """
@@ -822,7 +856,7 @@ class ThunderInterestAwardAPIView(APIView):
         """
         join_log = ActivityJoinLog.objects.filter(user=request.user).first()
         if not join_log:
-            activity = ActivityJoinLog.objects.create(
+            join_log = ActivityJoinLog.objects.create(
                 user=request.user,
                 action_name=u'oct_get_award',
                 action_type=u'login',
@@ -834,8 +868,8 @@ class ThunderInterestAwardAPIView(APIView):
                 create_time=timezone.now(),
             )
 
-            activity.amount = self.get_award_mount(activity.id)
-            activity.save(update_fields=['amount'])
+            join_log.amount = self.get_award_mount(join_log.id)
+            join_log.save(update_fields=['amount'])
 
         to_json_response = {
             'ret_code': 3003,

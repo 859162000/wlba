@@ -334,7 +334,7 @@ org.reward = (function(org){
                     }
                 }else{
                     ops = {
-                        url: '/api/register/?promo_token=weixin_atten',
+                        url: '/api/register/?promo_token=h5chuanbo',
                         type: 'POST',
                         data: {
                             'identifier': _self.$phone.val(),
@@ -468,7 +468,7 @@ org.reward = (function(org){
                 error :function(xhr){
                     clearInterval(intervalId);
                     var result = JSON.parse(xhr.responseText);
-                    $('.check-submit').text('数字验证码').removeAttr('disabled').removeClass('postValidation');
+                    $('.check-submit').text('短信验证码').removeAttr('disabled').removeClass('postValidation');
                     $(document.body).trigger('from:error',[result.message, true]);
                     $(document.body).trigger('from:captcha')
                 }

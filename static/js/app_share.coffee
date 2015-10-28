@@ -38,11 +38,11 @@ require ['jquery', 'lib/backend'], ($, backend)->
         .done (exist) ->
           if exist.existing
             alert "您输入的手机号已注册过网利宝！"
-            window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=n"
+            window.location.href = "/aws/?p=" + identifier + "&reg=n"
             return true
           else
             alert "验证码已发送至您手机，请注意查收。"
-            window.location.href = "/activity/wap/share_reg/?friend_identifier=" + friend_identifier + "&identifier=" + identifier + "&userDevice=h5"
+            window.location.href = "/ws/?fi=" + friend_identifier + "&i=" + identifier + "&userDevice=h5"
             return true
     else
       $(".error-message").text("手机号输入错误")
