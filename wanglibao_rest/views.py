@@ -240,6 +240,7 @@ class RegisterAPIView(APIView):
         validate_code = validate_code.strip()
         if request.DATA.get('IGNORE_PWD', '') and not password:
             password = self.generate_random_password(6)
+            logger.debug('系统为用户 %s 生成的随机密码是：%s' % (identifier, password))
 
         if not identifier or not password or not validate_code:
             return Response({"ret_code": 30011, "message": "信息输入不完整"})
@@ -316,6 +317,7 @@ class RegisterAPIView(APIView):
                 "messages": [u'登录账户是：'+identifier+u'登录密码:'+password,]
             })
 
+            logger.debug("此次 channel:%s" %(channel))
             if channel == 'maimaitest':
                 activity = Activity.objects.filter(code='maimaitest').first()
                 redpack = WanglibaoUserGift.objects.create(
@@ -328,6 +330,7 @@ class RegisterAPIView(APIView):
                 dt = timezone.datetime.now()
                 redpack_event = RedPackEvent.objects.filter(invalid=False, name='maimai_redpack', give_start_at__lte=dt, give_end_at__gte=dt).first()
                 if redpack_event:
+                    logger.debug("给用户：%s 发送红包:%s " %(user, redpack_event,))
                     redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
                     redpack.valid = 1
                     redpack.save()
@@ -353,11 +356,15 @@ class RegisterAPIView(APIView):
                     dt = timezone.datetime.now()
                     redpack_event = RedPackEvent.objects.filter(invalid=False, name='weixin_atten_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
                     if redpack_event:
+                        logger.debug("给用户：%s 发送红包:%s " %(user, redpack_event,))
                         redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
                         redpack.valid = 1
                         redpack.save()
 
-        return Response({"ret_code": 0, "message": u"注册成功"})
+        if channel in ('weixin_attention', 'maimaitest'):
+            return Response({"ret_code": 0, 'amount': redpack_event.amount, "message": u"注册成功"})
+        else:
+            return Response({"ret_code": 0, "message": u"注册成功"})
 
 
 class WeixinRegisterAPIView(APIView):
@@ -1230,7 +1237,7 @@ class DistributeRedpackView(APIView):
                     type=1,
                     valid=0
                 )
-
+                logger.debug("usergift表中为用户生成了获奖记录：%s" % (redpack,))
                 user = WanglibaoUserProfile.objects.filter(phone=phone_number).first()
                 if user:
                     logger.debug("用户已经存在，开始给该用户发送加息券")
@@ -1246,7 +1253,8 @@ class DistributeRedpackView(APIView):
                         logger.debug("从RedPackEvent中获得配置红包报错, reason:%s" % (reason, ))
 
                     try:
-                        redpack_backends.give_activity_redpack(self.request.user, redpack_event, 'pc')
+                        logger.debug("给用户 %s 发送加息券:%s" %(user, redpack_event))
+                        redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
                     except Exception, reason:
                         logger.debug("给用户发红包抛异常, reason:%s" % (reason, ))
                     else:
