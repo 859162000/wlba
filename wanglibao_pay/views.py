@@ -4,6 +4,7 @@
 import logging
 import re
 import socket
+from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.contrib.auth.decorators import permission_required
 from django.core.paginator import Paginator
@@ -707,16 +708,15 @@ class BindPayView(APIView):
         result = pay.pre_pay(request)
         return Response(result)
 
-class KuaiShortPayCallbackView(APIView):
+
+class KuaiShortPayCallbackView(View):
     """
     快付TR3应答API
     """
-    permission_classes = ()
-
     def post(self, request):
         pay = third_pay.KuaiShortPay()
         logger.debug('kuai_pay_tr3 request body: %s' % request.body)
-        pm = pay.handle_pay_result(request.body)
+        pm = pay.handle_pay_result(request.body.strip())
         result = pay.pay_callback(pm['user_id'],
                                   pm['amount'],
                                   pm['ret_code'],
@@ -725,7 +725,8 @@ class KuaiShortPayCallbackView(APIView):
                                   pm['ref_number'],
                                   pm['res_content'],
                                   pm['signature'])
-        return Response(result)
+
+        return HttpResponse(result, content_type='text/xml')
 
 
 class BindPayDynNumView(APIView):

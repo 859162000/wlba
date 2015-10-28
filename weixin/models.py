@@ -109,6 +109,24 @@ class Account(models.Model):
             self.original_id = value
             self.save()
 
+    def get_user_info(self, openid=None, lang='zh_CN'):
+        """Get user infomation
+        :param openid: WeChat openid, optional
+        :param access_token: WeChat OAuth2 access token, optional
+        :param lang: Preferred language code, optional
+        :return: JSON data
+        """
+        access_token = self.access_token
+        client = WeChatClient(self.app_id, self.app_secret)
+        return client._get(
+            'user/info',
+            params={
+                'access_token': access_token,
+                'openid': openid,
+                'lang': lang
+            }
+        )
+
     def empty_data(self):
         now = self._now()
         self.access_token_content = ''

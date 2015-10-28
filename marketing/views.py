@@ -51,6 +51,9 @@ from wanglibao_activity.models import TRIGGER_NODE
 from marketing.utils import get_user_channel_record
 from wanglibao_p2p.models import EquityRecord
 from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao.settings import XUNLEIVIP_REGISTER_KEY
+import urllib
+import hashlib
 import logging
 logger = logging.getLogger('marketing')
 TRIGGER_NODE = [i for i, j in TRIGGER_NODE]
@@ -661,6 +664,8 @@ def ajax_get_activity_record(action='get_award', *gifts):
     }
     return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
+def get_left_awards(init=108000):
+    return init-ActivityJoinLog.objects.filter(action_name='oct_get_award', join_times=0).count()
 
 def ajax_xunlei(request):
     """
@@ -671,6 +676,7 @@ def ajax_xunlei(request):
         to_json_response = {
             'ret_code': 3000,
             'message': u'用户没有登陆，请先登陆',
+            'award': get_left_awards()
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -719,6 +725,9 @@ class ThunderInterestAwardAPIView(APIView):
                     中奖后提示中奖金额及中奖提示语，非中奖用户提示非中奖提示语。
     """
 
+    def get_left_awards(self, init=108000):
+       return init-ActivityJoinLog.objects.filter(action_name='oct_get_award', join_times=0).count()
+
     def get_award(self, request, reward):
         """
             TO-WRITE
@@ -731,6 +740,7 @@ class ThunderInterestAwardAPIView(APIView):
                 'left': join_log.join_times,  # 还剩几次
                 'amount': str(join_log.amount),  # 加息额度
                 'message': u'抽奖机会已经用完了',
+                'award': self.get_left_awards()
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
         join_log.join_times -= 1
@@ -754,6 +764,7 @@ class ThunderInterestAwardAPIView(APIView):
             'left': join_log.join_times,  # 还剩几次
             'amount': str(join_log.amount),  # 加息额度
             'message': u'终于等到你，还好我没放弃',
+            'award': self.get_left_awards()
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -791,6 +802,7 @@ class ThunderInterestAwardAPIView(APIView):
             'left': join_log.join_times,  # 还剩几次
             'amount': str(join_log.amount),  # 加息额度
             'message': u'你和大奖只是一根头发的距离',
+            'award': self.get_left_awards()
         }
 
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -822,9 +834,8 @@ class ThunderInterestAwardAPIView(APIView):
                 create_time=timezone.now(),
             )
 
-            join_log = ActivityJoinLog.objects.filter(user=request.user, action_name='get_award').first()
-            join_log.amount = self.get_award_mount(activity.id)
-            join_log.save(update_fields=['amount'])
+            activity.amount = self.get_award_mount(activity.id)
+            activity.save(update_fields=['amount'])
 
         to_json_response = {
             'ret_code': 3003,
@@ -832,6 +843,7 @@ class ThunderInterestAwardAPIView(APIView):
             'left': join_log.join_times,  # 还剩几次
             'amount': str(join_log.amount),  # 加息额度
             'message': u'欢迎刮奖',
+            'award': self.get_left_awards()
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -1851,3 +1863,69 @@ class CommonAward(object):
             'message': u'获得用户抽奖信息',
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+
+class ThunderTenAcvitityTemplate(TemplateView):
+    template_name = 'xunlei_ten.jade'
+
+    def generate_sign(self, data, key):
+        sorted_data = sorted(data.iteritems(), key=lambda asd:asd[0], reverse=False)
+        encode_data = urllib.urlencode(sorted_data)
+        sign = hashlib.md5(encode_data+str(key)).hexdigest()
+        return sign
+
+    def check_params(self, sign, _time, nickname, user_id):
+        response_data = {}
+        if sign is None:
+            response_data = {
+                'ret_code': '10001',
+                'message': u'签名不存在',
+            }
+        elif nickname is None:
+            response_data = {
+                'ret_code': '10003',
+                'message': u'用户昵称不存在',
+            }
+        elif _time is None:
+            response_data = {
+                'ret_code': '10005',
+                'message': u'时间戳不存在',
+            }
+        elif user_id is None:
+            response_data = {
+                'ret_code': '10007',
+                'message': u'用户ID不存在',
+            }
+
+        return response_data
+
+    def get_context_data(self, **kwargs):
+        params = self.request.GET
+        sign = params.get('sign')
+        _time = params.get('time')
+        nickname = params.get('nickname')
+        user_id = params.get('xluserid')
+        response_data = self.check_params(sign, _time, nickname, user_id)
+
+        if not response_data:
+            check_data = {
+                'time': _time,
+                'xluserid': user_id,
+            }
+
+            if len(nickname) > 3:
+                nickname = nickname[:3]+'...'
+
+            if self.generate_sign(check_data, XUNLEIVIP_REGISTER_KEY) == sign:
+                response_data = {
+                    'ret_code': '10000',
+                    'message': 'success',
+                    'nickname': nickname,
+                }
+            else:
+                response_data = {
+                    'ret_code': '10002',
+                    'message': u'签名错误',
+                }
+
+        return response_data

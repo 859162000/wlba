@@ -16,7 +16,7 @@ import json
 import logging
 import random
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_protect
+from rest_framework.views import APIView
 from django.shortcuts import redirect
 from wanglibao.settings import CALLBACK_HOST
 from wanglibao_account import message as inside_message
@@ -258,7 +258,6 @@ class WeixinShareDetailView(TemplateView):
 
     def __init__(self):
         self.activity = None
-        self.global_cfg = None
 
     @property
     def current_function_name(self):
@@ -334,9 +333,6 @@ class WeixinShareDetailView(TemplateView):
         "direct": 0,
         "interest_coupon": 1,
         "percent": 2}
-        if not self.global_cfg:
-            if not self.get_global_cfg(activity):
-                self.throw_exception(u'对应的全局红包活动配置没有配，请先配置')
 
         ids = self.get_redpack_id(activity)
         if ids:
@@ -348,7 +344,6 @@ class WeixinShareDetailView(TemplateView):
         for redpack in redpacks:
             try:
                 activity_gift = WanglibaoActivityGift.objects.create(
-                cfg=self.global_cfg,
                 gift_id=product_id,
                 activity=self.activity,
                 redpack=redpack,
@@ -402,8 +397,13 @@ class WeixinShareDetailView(TemplateView):
             gift_order = WanglibaoActivityGiftOrder.objects.select_for_update().filter(order_id=product_id).first()
             if gift_order.valid_amount > 0:
                 gifts = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity, valid=True)
+
                 counts = gifts.count()
-                index = random.randint(0, counts-1)
+                logger.debug("测试数据counts:%s" % (counts,))
+                if counts==1:
+                    index=0
+                else:
+                    index = random.randint(counts-1)
                 gift = gifts[index]
                 gift_order.valid_amount -= 1
             else:
@@ -467,34 +467,6 @@ class WeixinShareDetailView(TemplateView):
             except Exception, reason:
                 self.exception_msg(reason, u'获取已领奖用户信息失败')
                 return None
-
-    def get_global_cfg(self, activity):
-        """
-            获得活动红包的全局配置信息
-        """
-        if not self.activity:
-            self.get_activity_by_id(activity)
-
-        try:
-            self.global_cfg = WanglibaoActivityGiftGlobalCfg.objects.filter(activity=self.activity).get()
-            return self.global_cfg
-        except Exception, reason:
-            self.exception_msg(reason, u'配置全局配置抛出异常, activity:%s' % (activity,))
-            return None
-
-    def is_valid_user_auth(self, order_id, activity):
-        if not self.activity:
-            self.get_activity_by_id(activity)
-
-        if not self.global_cfg:
-            self.get_global_cfg(activity)
-
-        try:
-            p2p_record = P2PRecord.objects.filter(order_id=order_id, amount__gte=self.global_cfg.amount)
-            return p2p_record
-        except Exception, reason:
-            self.exception_msg(reason, u"判断用户投资额度抛异常")
-            return None
 
     def get_react_text(self, index):
         text = [u'感谢土豪，加息券已到手！',
@@ -597,7 +569,6 @@ class WeixinShareDetailView(TemplateView):
             activity = record.activity.code if record else activitys[index]
             logger.debug("misc配置的activity有:%s, 本次使用的activity是：%s" % (activitys, activity))
 
-        #更新用户的手机号
         old_phone = self.update_weixin_wanglibao_relative(openid, phone_num)
 
         if not self.has_combine_redpack(order_id, activity):
@@ -607,43 +578,60 @@ class WeixinShareDetailView(TemplateView):
 
         if not user_gift:
             self.debug_msg('phone:%s 没有领取过奖品' %(phone_num,) )
-            #with transaction.atomic():
             user_gift = self.distribute_redpack(phone_num, openid, activity, order_id)
 
             if "No Reward" == user_gift:
                 self.debug_msg('奖品已经发完了，用户:%s 没有领到奖品' %(phone_num,))
                 self.template_name = 'app_weChatEnd.jade'
-                shareTitle, shareContent, url = get_share_infos(order_id)
+                share_title, share_content, url = get_share_infos(order_id)
                 return {
-                    "share":{'content':shareContent,'title':shareTitle, 'url':url}
+                    "share": {'content': share_title, 'title': share_content, 'url': url}
                 }
-                #redirect_url = reverse('weixin_share_end')+'?url_id=%s'%order_id
-                #return redirect(redirect_url)
         else:
             self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s' %(openid, user_gift.identity, user_gift, ))
         gifts = self.get_distribute_status(order_id, activity)
-        shareTitle, shareContent, url = get_share_infos(order_id)
+        share_title, share_content, url = get_share_infos(order_id)
         return {
             "ret_code": 0,
             "self_gift": self.format_response_data(user_gift, openid, 'alone'),
             "all_gift": self.format_response_data(gifts, openid, 'gifts'),
-             "share":{'content':shareContent,'title':shareTitle, 'url':url}
+            "share": {'content': share_title, 'title': share_content, 'url': url}
         }
+
+    def is_valid_user_auth(self, order_id, amount):
+        try:
+            p2p_record = P2PRecord.objects.filter(order_id=order_id, amount__gte=amount)
+            return p2p_record
+        except Exception, reason:
+            logger.exception(u"判断用户投资额度抛异常 %s, order_id:%s, amount:%s " %(reason, order_id, amount) )
 
     def dispatch(self, request, *args, **kwargs):
         key = 'share_redpack'
+        order_id = kwargs['order_id']
         is_open = False
         shareconfig = Misc.objects.filter(key=key).first()
+        amount = 1000
+
         if shareconfig:
             shareconfig = json.loads(shareconfig.value)
-            if type(shareconfig) == dict and shareconfig['is_open'] == 'true':
-                is_open = True
+            if type(shareconfig) == dict:
+                amount = int(shareconfig['amount'])
+                if shareconfig['is_open'] == 'true':
+                    is_open = True
 
         if not is_open:
             data = {
                 'ret_code': 9010,
                 'message': u'配置开关关闭，分享无效;',
             }
+            return HttpResponse(json.dumps(data), content_type='application/json')
+
+        if not self.is_valid_user_auth(order_id, amount):
+            data = {
+                'ret_code': 9000,
+                'message': u'用户投资没有达到%s元;' % (amount, ),
+            }
+            #TODO: 界面显示不友好
             return HttpResponse(json.dumps(data), content_type='application/json')
 
         return super(WeixinShareDetailView, self).dispatch(request, *args, **kwargs)
@@ -682,7 +670,7 @@ class WeixinShareStartView(TemplateView):
             'openid': openid,
             'order_id': order_id,
             'phone': record.phone if record else '',
-            "share": {'content': share_title, 'title': share_title, 'url': url}
+            "share": {'content': share_content, 'title': share_title, 'url': url}
         }
 
     def dispatch(self, request, *args, **kwargs):
@@ -796,3 +784,72 @@ def get_share_infos(order_id):
             shareContent=shareconfig.get('share_content', "")
             url = CALLBACK_HOST + reverse('weixin_share_order_gift')+"?url_id=%s"%order_id
     return shareTitle, shareContent, url
+
+
+class WeixinRedPackView(APIView):
+    permission_classes = ()
+
+    def post(self, request, phone):
+        key = 'share_redpack'
+        shareconfig = Misc.objects.filter(key=key).first()
+        if shareconfig:
+            shareconfig = json.loads(shareconfig.value)
+            if type(shareconfig) == dict:
+                is_attention = shareconfig.get('is_attention', '')
+                attention_code = shareconfig.get('attention_code', '')
+
+        if not is_attention:
+            data = {
+                'ret_code': 9000,
+                'message': u'配置开关关闭，无法关注;',
+            }
+            return HttpResponse(json.dumps(data), content_type='application/json')
+
+        phone_number = phone.strip()
+        redpack = WanglibaoUserGift.objects.filter(identity=phone, activity__code=attention_code).first()
+        if redpack:
+            data = {
+                'ret_code': 0,
+                'message': u'用户已经领取了加息券',
+                'amount': redpack.amount,
+                'phone': phone_number
+            }
+            return HttpResponse(json.dumps(data), content_type='application/json')
+
+        else:
+            activity = Activity.objects.filter(code=attention_code).first()
+            redpack = WanglibaoUserGift.objects.create(
+                identity=phone_number,
+                activity=activity,
+                rules=WanglibaoActivityGift.objects.first(),#随机初始化一个值
+                type=1,
+                valid=0
+            )
+
+            user = WanglibaoUserProfile.objects.filter(phone=phone_number).first()
+            if user:
+                try:
+                    redpack_id = ActivityRule.objects.filter(activity=activity).first().redpack
+                except Exception, reason:
+                    logger("从ActivityRule中获得redpack_id抛异常, reason:%s" % (reason, ))
+
+                try:
+                    redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
+                except Exception, reason:
+                    logger("从RedPackEvent中获得配置红包报错, reason:%s" % (reason, ))
+
+                try:
+                    redpack_backends.give_activity_redpack(self.request.user, redpack_event, 'pc')
+                except Exception, reason:
+                    logger("给用户发红包抛异常, reason:%s" % (reason, ))
+                else:
+                    #redpack.user = user
+                    redpack.valid = 1
+                    redpack.save()
+                    data = {
+                        'ret_code': 1000,
+                        'message': u'下发加息券成功',
+                        'amount': redpack.amount,
+                        'phone': phone_number
+                    }
+                    return HttpResponse(json.dumps(data), content_type='application/json')

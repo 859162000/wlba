@@ -127,7 +127,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 type: options.type,
                 data: options.data,
                 dataType : options.dataType,
-                async : options.async=="undefined" ? true : false,
+                async : options.async || true,
                 beforeSend: function(xhr, settings) {
                     options.beforeSend && options.beforeSend(xhr);
                     //django配置post请求
@@ -255,18 +255,19 @@ org.test = (function(org){
             });
 
             bridge.callHandler('sendUserInfo', {'1': '1'}, function (response) {
-              $.ajax({
+              var responsejson = typeof response == 'string' ? JSON.parse(response): response;
+              org.ajax({
                 url: '/accounts/token/login/ajax/',
                 type: 'post',
                 data:{
-                  token: response.tk,
-                  secret_key: response.secretToken,
-                  ts: response.ts
+                  token: responsejson.tk,
+                  secret_key: responsejson.secretToken,
+                  ts: responsejson.ts
                 },
                 success: function(data){
                   window.location.href = $("input[name='next']").val();
                 },
-                error: function(){
+                error: function(data){
                   window.location.href = $("input[name='next']").val() + "nologin/";
                 }
               })
@@ -318,14 +319,15 @@ org.scratch = (function(org){
 
             //登陆
               $('#login').on('click',function(){
-                 bridge.callHandler('loginApp',{refresh: 0}, function (response) {
+                 bridge.callHandler('loginApp',{refresh: 1, url: ''}, function (response) {
                    $('.test-log').html(JSON.stringify(response))
                  });
               });
-
+             //url
+            $('#url').html(window.location.href)
             //注册
               $('#regist').on('click',function(){
-                bridge.callHandler('registerApp', {refresh: 1}, function (response) {
+                bridge.callHandler('registerApp', {refresh: 1, url: ''}, function (response) {
                    $('.test-log').html(JSON.stringify(response));
                  });
               });
@@ -336,7 +338,10 @@ org.scratch = (function(org){
                     log('jumpToManageMoney', response);
                 });
               });
-
+            //埋点
+              bridge.callHandler('firstLoadWebView', {name: 'test firstLoadWebView'},function (response) {
+                    log('firstLoadWebView', response);
+              });
             //分享
               bridge.registerHandler('shareData', function(data, responseCallback) {
                   var responseData = { title:'呱呱卡test', content: '呱呱卡test' };

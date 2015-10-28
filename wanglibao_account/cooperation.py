@@ -392,6 +392,7 @@ class CoopRegister(object):
                 logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
             else:
                 logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (self.request.user, record.rules.redpack,))
+            record.user = user
             record.valid = 1
             record.save()
 
@@ -1067,6 +1068,7 @@ class XunleiVipRegister(CoopRegister):
         self.register_call_back_url = XUNLEIVIP_REGISTER_CALL_BACK_URL
         self.coop_key = XUNLEIVIP_KEY
         self.coop_register_key = XUNLEIVIP_REGISTER_KEY
+        self.external_channel_user_key = 'xluserid'
 
     def generate_sign(self, data, key):
         sorted_data = sorted(data.iteritems(), key=lambda asd:asd[0], reverse=False)

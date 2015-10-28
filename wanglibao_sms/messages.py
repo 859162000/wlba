@@ -35,11 +35,10 @@ def deposit_succeed(name, amount):
     """
     充值成功
     """
-
     if get_stitch():
         try:
             redis = redis_backend()
-            obj = redis._get('sms_income')
+            obj = redis._get('deposit_succeed')
             content = cPickle.loads(obj)['content']
             return content.format(name, amount)
         except Exception, e:
@@ -126,7 +125,7 @@ def product_settled(name, equity, product, settled_time):
             obj = redis._get('product_settled')
             content = cPickle.loads(obj)['content']
             return content.format(
-                name, product.pk, product.serial_number,
+                name, product.serial_number, equity.equity,
                 format_datetime(settled_time, u'%Y年%m月%d日'), product.period, stand)
         except Exception, e:
             print e
@@ -135,8 +134,6 @@ def product_settled(name, equity, product, settled_time):
                 format_datetime(settled_time, u'%Y年%m月%d日'), product.period, stand
             )
     else:
-        # return u'%s[%s]已投资成功，并于%s开始计息。' \
-        #        % (product.short_name, product.serial_number, format_datetime(settled_time, u'%Y年%m月%d日'))
         return u'亲爱的{}，您已成功投资{}项目 {}元，并于{}开始计息，期限{}{}，感谢您的支持！'.format(
             name, product.serial_number, equity.equity,
             format_datetime(settled_time, u'%Y年%m月%d日'), product.period, stand
@@ -153,7 +150,7 @@ def product_failed(name, product):
             redis = redis_backend()
             obj = redis._get('product_failed')
             content = cPickle.loads(obj)['content']
-            return content.format(product.short_name,
+            return content.format(name,
                                   product.serial_number,
                                   format_datetime(product.end_time, u'%Y年%m月%d日'))
         except Exception, e:
@@ -204,7 +201,7 @@ def product_prepayment(name, product, amount):
             redis = redis_backend()
             obj = redis._get('product_prepayment')
             content = cPickle.loads(obj)['content']
-            return content.format(name, product.short_name, product.serial_number)
+            return content.format(name, product.name, amount)
         except Exception, e:
             print e
             return u'亲爱的{}，您投资的{}项目收到还款{}元，已到账，请登录您的网利宝账户进行查看。'.format(
@@ -296,7 +293,7 @@ def red_packet_get_alert(amount, rtype):
 
 
 @suffix_td
-def red_packet_invalid_alert(amount):
+def red_packet_invalid_alert(count):
     """
     红包、加息券快过期前3天提醒
     """
@@ -305,12 +302,12 @@ def red_packet_invalid_alert(amount):
             redis = redis_backend()
             obj = redis._get('red_packet_invalid_alert')
             content = cPickle.loads(obj)['content']
-            return content.format(amount)
+            return content.format(count)
         except Exception, e:
             print e
-            return u'您有{}张理财券再过3天就要过期了，请尽快登录网利宝官网或者app使用！'.format(amount)
+            return u'您有{}张理财券再过3天就要过期了，请尽快登录网利宝官网或者app使用！'.format(count)
     else:
-        return u'您有{}张理财券再过3天就要过期了，请尽快登录网利宝官网或者app使用！'.format(amount)
+        return u'您有{}张理财券再过3天就要过期了，请尽快登录网利宝官网或者app使用！'.format(count)
 
 
 @suffix_td
