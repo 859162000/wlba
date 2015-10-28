@@ -28,7 +28,7 @@ from wanglibao_redpack.models import RedPackEvent
 from random import randint
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account.utils import create_user
-from wanglibao_activity.models import ActivityRecord, Activity
+from wanglibao_activity.models import ActivityRecord, Activity, ActivityRule
 from wanglibao_portfolio.models import UserPortfolio
 from wanglibao_portfolio.serializers import UserPortfolioSerializer
 from wanglibao_rest.serializers import AuthTokenSerializer
@@ -316,11 +316,21 @@ class RegisterAPIView(APIView):
                 "messages": [u'登录账户是：'+identifier+u'登录密码:'+password,]
             })
 
-            if channel == 'maimai':
+            if channel == 'maimaitest':
+                activity = Activity.objects.filter(code='maimaitest').first()
+                redpack = WanglibaoUserGift.objects.create(
+                    identity=identifier,
+                    activity=activity,
+                    rules=WanglibaoActivityGift.objects.first(),#随机初始化一个值
+                    type=1,
+                    valid=0
+                )
                 dt = timezone.datetime.now()
                 redpack_event = RedPackEvent.objects.filter(invalid=False, name='maimai_redpack', give_start_at__lte=dt, give_end_at__gte=dt).first()
                 if redpack_event:
                     redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+                    redpack.valid = 1
+                    redpack.save()
 
             if channel == 'weixin_attention':
                 key = 'share_redpack'
@@ -1197,14 +1207,55 @@ class DistributeRedpackView(APIView):
     permission_classes = ()
     def post(self, request, phone):
         user = WanglibaoUserProfile.objects.filter(phone=phone).first()
-        channel = self.request.DATA.get('promo_token', '')
+        channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
 
-        if channel == 'maimai':
-            dt = timezone.datetime.now()
-            redpack_event = RedPackEvent.objects.filter(invalid=False, name='maimai_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
-            if redpack_event:
-                redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
-                return Response({"ret_code": 0, "message": u"老用户发送加息券成功"})
+        if channel == 'maimaitest':
+            phone_number = phone.strip()
+            redpack = WanglibaoUserGift.objects.filter(identity=phone, activity__code='maimaitest').first()
+            if redpack:
+                data = {
+                    'ret_code': 0,
+                    'message': u'用户已经领取了加息券',
+                    'amount': redpack.amount,
+                    'phone': phone_number
+                }
+                return HttpResponse(json.dumps(data), content_type='application/json')
+
             else:
-                return Response({"ret_code": 1000, "message": u"待发送的加息券没有配置"})
+                activity = Activity.objects.filter(code='maimaitest').first()
+                redpack = WanglibaoUserGift.objects.create(
+                    identity=phone_number,
+                    activity=activity,
+                    rules=WanglibaoActivityGift.objects.first(),#随机初始化一个值
+                    type=1,
+                    valid=0
+                )
+
+                user = WanglibaoUserProfile.objects.filter(phone=phone_number).first()
+                if user:
+                    try:
+                        redpack_id = ActivityRule.objects.filter(activity=activity).first().redpack
+                    except Exception, reason:
+                        logger("从ActivityRule中获得redpack_id抛异常, reason:%s" % (reason, ))
+
+                    try:
+                        redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
+                    except Exception, reason:
+                        logger("从RedPackEvent中获得配置红包报错, reason:%s" % (reason, ))
+
+                    try:
+                        redpack_backends.give_activity_redpack(self.request.user, redpack_event, 'pc')
+                    except Exception, reason:
+                        logger("给用户发红包抛异常, reason:%s" % (reason, ))
+                    else:
+                        #redpack.user = user
+                        redpack.valid = 1
+                        redpack.save()
+                        data = {
+                            'ret_code': 1000,
+                            'message': u'下发加息券成功',
+                            'amount': redpack.amount,
+                            'phone': phone_number
+                        }
+                        return HttpResponse(json.dumps(data), content_type='application/json')
 
