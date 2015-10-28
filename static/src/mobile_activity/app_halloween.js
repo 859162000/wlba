@@ -36,11 +36,6 @@ $(function() {
     /*数字变换*/
 
     function step1(){
-        $('#play').show();
-        mp3.play();
-        $(document).one('touchstart', function () {
-            mp3.play();
-        });
         $('.boy').removeClass('boy_animate1');
         $('.title').addClass('title_in');
         var i = 6;
@@ -48,6 +43,13 @@ $(function() {
             i--;
             if (i === 5){
                 $('#wrap').css('opacity','1');   
+            }
+            if (i === 3){
+                $('#play').show();
+                mp3.play();
+                $(document).one('touchstart', function () {
+                    mp3.play();
+                });
             }
             if (i === 0) {
                 clearInterval(timer1);
