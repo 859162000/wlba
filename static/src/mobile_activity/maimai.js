@@ -249,7 +249,7 @@ org.mmIndex = (function(org){
                 error :function(xhr){
                     clearInterval(intervalId);
                     var result = JSON.parse(xhr.responseText);
-                    $('.check-submit').text('数字验证码').removeAttr('disabled').removeClass('postValidation');
+                    $('.check-submit').text('短信验证码').removeAttr('disabled').removeClass('postValidation');
                     $(document.body).trigger('from:error',[result.message, true]);
                     $(document.body).trigger('from:captcha')
                 }
