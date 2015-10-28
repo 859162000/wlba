@@ -40,7 +40,7 @@ require ['jquery', 'lib/backend', 'jquery.base64'], ($, backend)->
         backend.userExists identifier
         .done (exist) ->
 
-          encrypt = $.base64.encode( "this is a test" );
+          encrypt = $.base64.encode(identifier);
           if exist.existing
             alert "您输入的手机号已注册过网利宝！"
             window.location.href = "/aws/?p=" + encrypt + "&reg=n"

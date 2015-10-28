@@ -49,7 +49,7 @@
         } else {
           return backend.userExists(identifier).done(function(exist) {
             var encrypt;
-            encrypt = $.base64.encode("this is a test");
+            encrypt = $.base64.encode(identifier);
             if (exist.existing) {
               alert("您输入的手机号已注册过网利宝！");
               window.location.href = "/aws/?p=" + encrypt + "&reg=n";
