@@ -6,11 +6,13 @@ html
     meta(content='telephone=no,email=no', name='format-detection')
     meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
     meta(content='yes', name='apple-mobile-web-app-capable')
-    link(href='/static/styles/mobile_activity/app_halloween.css?v=2015102809', rel='stylesheet')
+    link(href='/static/styles/mobile_activity/app_halloween.css?v=2015102815', rel='stylesheet')
   body
     img.weixin(src='/static/imgs/mobile_activity/app_halloween/weixin.jpg')
-    .loading
-      img(src='/static/imgs/mobile_activity/app_halloween/loading.gif')
+    .loading(style='width:100%; height:100%; background: #293966; position: fixed; z-index: 9999; left:0; top:0;')
+      .main(style='position:absolute; top:30%; left:0; width:100%; display:block;')
+          img(src='/static/imgs/mobile_activity/app_halloween/loading.gif' sytle='width:50%; margin:0 auto; display: block;')
+
     .no_signal_wrap(style='display:none')
       .no_signal
     #play.play_music
@@ -69,14 +71,14 @@ html
         .choice_step.choice_step3
           img.button.choice1(src='/static/imgs/mobile_activity/app_halloween/button3_1.png')
           img.button.choice2(src='/static/imgs/mobile_activity/app_halloween/button3_2.png')
-    .poor_wrap(style='display:none')
+    .poor_wrap(style='z-index:99')
       .bg
       img.poor_boy(src='/static/imgs/mobile_activity/app_halloween/poor_boy.gif')
       img.poor_text(src='/static/imgs/mobile_activity/app_halloween/poor_text.png')
       .light.poor_light_animate
       a.button(href='https://www.wanglibao.com/weixin/regist/?next=/weixin/authentication/?promo_token=h5chuanbo')
         img(src='/static/imgs/mobile_activity/app_halloween/poor_button.png')
-    .rich_wrap(style='display:none')
+    .rich_wrap(style='z-index:99')
       .bg_front
       .rich_bg_after
       .boy_img
@@ -87,6 +89,6 @@ html
         img(src='/static/imgs/mobile_activity/app_halloween/rich_button.png')
     script(src='/static/src/pc/lib/jquery.min.js')
     script(src='/static/src/pc/lib/jquery.animateNumber.min.js')
-    script(src='/static/src/mobile_activity/app_halloween.js?v=2015102809')
+    script(src='/static/src/mobile_activity/app_halloween.js?v=2015102815')
     script(src='/static/src/mobile/lib/weixin/wx.js')
     script(src='/static/scripts/mobile_activity/app_halloween_share.js')

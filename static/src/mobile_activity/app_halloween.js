@@ -36,18 +36,20 @@ $(function() {
     /*数字变换*/
 
     function step1(){
-        $('#play').show();
-        mp3.play();
-        $(document).one('touchstart', function () {
-            mp3.play();
-        });
         $('.boy').removeClass('boy_animate1');
-        $('.title').addClass('title_in');
         var i = 6;
         var timer1 = setInterval(function() {
             i--;
             if (i === 5){
-                $('#wrap').css('opacity','1');   
+                $('#wrap').css('opacity','1');
+                $('.title').addClass('title_in');
+            }
+            if (i === 3){
+                $('#play').show();
+                mp3.play();
+                $(document).one('touchstart', function () {
+                    mp3.play();
+                });
             }
             if (i === 0) {
                 clearInterval(timer1);
@@ -301,12 +303,12 @@ $(function() {
 
     function step6(){
         if(money<50){
-            $('.poor_wrap').show();
+            $('.poor_wrap').css('z-index','9997');
             $('.poor_wrap .button').show().addClass('href_button');
             $('.poor_boy').show();
             $('.poor_text').addClass('text_animate');
         }else{
-            $('.rich_wrap').show();
+            $('.rich_wrap').css('z-index','9997');
             $('.rich_wrap .button').show().addClass('href_button');
         }   $('.rich_text').addClass('text_animate');
     }
