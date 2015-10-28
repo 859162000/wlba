@@ -256,12 +256,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
     function step1(){
         $('.boy').removeClass('boy_animate1');
-        $('.title').addClass('title_in');
         var i = 6;
         var timer1 = setInterval(function() {
             i--;
             if (i === 5){
-                $('#wrap').css('opacity','1');   
+                $('#wrap').css('opacity','1');
+                $('.title').addClass('title_in');
             }
             if (i === 3){
                 $('#play').show();

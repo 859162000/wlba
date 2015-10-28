@@ -101,8 +101,8 @@ body {
 	width: 100%;
 	-webkit-animation-name: no_signal;
 	animation-name: no_signal;
-	-webkit-animation-duration: 3s;
-	animation-duration: 3s;
+	-webkit-animation-duration: 2s;
+	animation-duration: 2s;
 	-webkit-animation-timing-function: steps(1, start);
 	animation-timing-function: steps(1, start);
 	-webkit-animation-delay: 0s;
@@ -176,8 +176,8 @@ body {
 	animation-duration: 2s;
 	-webkit-animation-timing-function: linear;
 	animation-timing-function: linear;
-	-webkit-animation-delay: 2s;
-	animation-delay: 2s;
+	-webkit-animation-delay: 0s;
+	animation-delay: 0s;
 	-webkit-animation-fill-mode: forwards;
 	animation-fill-mode: forwards;
 }
@@ -224,7 +224,7 @@ body {
 	}
 
 	100% {
-		transform: scale(1.5);
+		transform: scale(1.3);
 		opacity: 0
 	}
 }
@@ -236,7 +236,7 @@ body {
 	}
 
 	100% {
-		transform: scale(1.5);
+		transform: scale(1.3);
 		opacity: 0
 	}
 }
