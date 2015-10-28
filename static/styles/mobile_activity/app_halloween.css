@@ -274,8 +274,8 @@ body {
 .cloud_animate1{
 	-webkit-animation-name: cloud_animate1;
 	animation-name: cloud_animate1;
-	-webkit-animation-duration: 4.5s;
-	animation-duration: 4.5s;
+	-webkit-animation-duration: 5s;
+	animation-duration: 5s;
 	-webkit-animation-timing-function: linear;
 	animation-timing-function: linear;
 	-webkit-animation-delay: 0s;
@@ -406,8 +406,8 @@ body {
 .bg_after_animate1{
 	-webkit-animation-name: bg_after_animate1;
 	animation-name: bg_after_animate1;
-	-webkit-animation-duration: 4.5s;
-	animation-duration: 4.5s;
+	-webkit-animation-duration: 5s;
+	animation-duration: 5s;
 	-webkit-animation-timing-function: linear;
 	animation-timing-function: linear;
 	-webkit-animation-delay: 0s;
@@ -525,8 +525,8 @@ body {
 .bg_front_wrap_animate1{
 	-webkit-animation-name: bg_front_wrap_animate1;
 	animation-name: bg_front_wrap_animate1;
-	-webkit-animation-duration: 4.5s;
-	animation-duration: 4.5s;
+	-webkit-animation-duration: 5s;
+	animation-duration: 5s;
 	-webkit-animation-timing-function: linear;
 	animation-timing-function: linear;
 	-webkit-animation-delay: 0s;
@@ -939,7 +939,46 @@ body {
 	display: block;
 	width: 100%
 }
+.boy .boy_go_one {
+	display: none;
+	width: 100%;
+    opacity: 1;
+}
+.boy_go_one_hide{
+    -webkit-animation-name: boy_go_one_hide;
+	animation-name: boy_go_one_hide;
+	-webkit-animation-duration: 5s;
+	animation-duration: 5s;
+	-webkit-animation-timing-function: linear;
+	animation-timing-function: linear;
+	-webkit-animation-delay: 0s;
+	animation-delay: 0s;
+	-webkit-animation-fill-mode: forwards;
+	animation-fill-mode: forwards;
+}
+@-webkit-keyframes boy_go_one_hide {
+	0% {
+		opacity: 1;
+	}
+    99%{
+        opacity: 1;
+    }
+	100%{
+		opacity: 0;
+	}
+}
 
+@keyframes boy_go_one_hide {
+	0% {
+		opacity: 1;
+	}
+    99%{
+        opacity: 1;
+    }
+	100%{
+		opacity: 0;
+	}
+}
 .boy_animate1 {
 	-webkit-animation-name: boy_animate1;
 	animation-name: boy_animate1;
@@ -1126,8 +1165,8 @@ body {
 .boy_animate2 {
 	-webkit-animation-name: boy_animate1;
 	animation-name: boy_animate1;
-	-webkit-animation-duration: 3s;
-	animation-duration: 3s;
+	-webkit-animation-duration: 4.5s;
+	animation-duration: 4.5s;
 	-webkit-animation-timing-function: steps(1, start);
 	animation-timing-function: steps(1, start);
 	-webkit-animation-delay: 0s;
@@ -1140,6 +1179,18 @@ body {
 	animation-name: boy_animate1;
 	-webkit-animation-duration: 6s;
 	animation-duration: 6s;
+	-webkit-animation-timing-function: steps(1, start);
+	animation-timing-function: steps(1, start);
+	-webkit-animation-delay: 0s;
+	animation-delay: 0s;
+	-webkit-animation-fill-mode: forwards;
+	animation-fill-mode: forwards;
+}
+.boy_animate4 {
+	-webkit-animation-name: boy_animate1;
+	animation-name: boy_animate1;
+	-webkit-animation-duration: 3s;
+	animation-duration: 3s;
 	-webkit-animation-timing-function: steps(1, start);
 	animation-timing-function: steps(1, start);
 	-webkit-animation-delay: 0s;
@@ -1202,7 +1253,6 @@ body {
 		opacity: 1;
 	}
 }
-
 @keyframes choice_step_show {
 	0% {
 		opacity: 0;
@@ -1311,8 +1361,8 @@ body {
 	animation-duration: 1s;
 	-webkit-animation-timing-function: ease;
 	animation-timing-function: ease;
-	-webkit-animation-delay: 7s;
-	animation-delay: 7s;
+	-webkit-animation-delay: 8s;
+	animation-delay: 8s;
 	-webkit-animation-fill-mode: forwards;
 	animation-fill-mode: forwards;	
 }
@@ -1608,8 +1658,8 @@ body {
 .gold_animate{
 	-webkit-animation-name: gold_animate;
 	animation-name: gold_animate;
-	-webkit-animation-duration: 4.5s;
-	animation-duration: 4.5s;
+	-webkit-animation-duration: 5s;
+	animation-duration: 5s;
 	-webkit-animation-timing-function: linear;
 	animation-timing-function: linear;
 	-webkit-animation-delay: 0s;

@@ -261,7 +261,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             i--;
             if (i === 5){
                 $('#wrap').css('opacity','1');
-                $('.title').addClass('title_in');
             }
             if (i === 3){
                 $('#play').show();
@@ -269,6 +268,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 $(document).one('touchstart', function () {
                     mp3.play();
                 });
+                $('.title').addClass('title_in');
             }
             if (i === 0) {
                 clearInterval(timer1);
@@ -305,7 +305,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             if (i === 0) {
                 clearInterval(timer1);
                 //$('.boy_stay').show();
-                $('.boy').addClass('boy_animate1');
+                //$('.boy').addClass('boy_animate1');
+                $('.boy_go_one').show().addClass('boy_go_one_hide');
                 $('.choice_step1').show().addClass('choice_step_show');
                 $('.bg_after').addClass('bg_after_animate1');
                 $('.bg_front_wrap').addClass('bg_front_wrap_animate1');
@@ -342,8 +343,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             },
             1000);
         }
-
-        
     });
 
     $('.choice_step1 .choice2').click(function(){
@@ -396,7 +395,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             $('.boy_stay').css('opacity', '0');
             $('.boy_run').show();
             $('.choice_step2').addClass('choice_step_hide');
-            $('.boy').addClass('boy_animate2');
+            $('.boy').addClass('boy_animate4');
             $('.cloud').addClass('cloud_animate4');
             $('.bg_after').addClass('bg_after_animate3');
             $('.bg_front_wrap').addClass('bg_front_wrap_animate3');
@@ -522,12 +521,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
     function step6(){
         if(money<50){
-            $('.poor_wrap').css('z-index','9997');
+            $('.poor_wrap').css({'z-index':'9997','opacity':'1'});
             $('.poor_wrap .button').show().addClass('href_button');
             $('.poor_boy').show();
             $('.poor_text').addClass('text_animate');
         }else{
-            $('.rich_wrap').css('z-index','9997');
+            $('.rich_wrap').css({'z-index':'9997','opacity':'1'});
             $('.rich_wrap .button').show().addClass('href_button');
         }   $('.rich_text').addClass('text_animate');
     }
