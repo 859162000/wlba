@@ -231,7 +231,7 @@ class ShortAppShareRegView(TemplateView):
             identifier = self.request.GET.get('i')
             identifier = base64.b64decode(identifier + '=')
             friend_identifier = self.request.GET.get('fi')
-            # friend_identifier = base64.b64decode(friend_identifier)
+            friend_identifier = base64.b64decode(friend_identifier)
         except Exception, e:
             print e
             identifier = self.request.GET.get('identifier').strip()
