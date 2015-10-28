@@ -221,7 +221,7 @@ class RegisterAPIView(APIView):
         password = ""
         index = 0
         while index < length:
-                password += random_list[randint(0,len(random_list)-1)]
+                password += str(random_list[randint(0,len(random_list)-1)])
                 index += 1
         return password
 
