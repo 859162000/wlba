@@ -108,6 +108,7 @@ class WeixinJoinView(View):
                     w_user.scene_id = eventKey
                     w_user.save()
                 reply = create_reply(u'欢迎关注我们！', msg)
+
             elif isinstance(msg, UnsubscribeEvent):
                 print msg.event
                 print msg._data
@@ -132,13 +133,17 @@ class WeixinJoinView(View):
                 w_user.subscribe = 1
                 w_user.scene_id = eventKey
                 w_user.save()
-                reply = create_reply(u'欢迎关注我们！', msg)
+                articles = self.getSubscribeArticle()
+                reply = create_reply(articles, msg)
+                # reply = create_reply(u'欢迎关注我们！', msg)
             elif isinstance(msg, ScanEvent):
                 print msg.event
                 print msg._data
                 print msg.scene_id
                 print msg.ticket
-                reply = create_reply(u'https://7fd03dee.ngrok.io/activity/new_user/', msg)
+                articles = self.getSubscribeArticle()
+                reply = create_reply(articles, msg)
+                # reply = create_reply(u'https://7fd03dee.ngrok.io/activity/new_user/', msg)
         elif isinstance(msg, BaseMessage):
             if isinstance(msg, TextMessage):
                 # 自动回复  5000次／天
@@ -148,6 +153,13 @@ class WeixinJoinView(View):
             else:
                 reply = create_reply(u'更多功能，敬请期待！', msg)
         return HttpResponse(reply.render())
+
+    def getSubscribeArticle(self):
+        image = "http://e.hiphotos.baidu.com/baike/c0%3Dbaike80%2C5%2C5%2C80%2C26/sign=410619fb3d01213fdb3e468e358e5db4/9f510fb30f2442a71525d087d543ad4bd11302ec.jpg"
+        url = 'https://www.wanglibao.com/activity/new_user/'
+        description = '大数据下的网利宝'
+        title = 'title'
+        return [{'image':image, 'url':url, 'description':description, 'title':title}]
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
