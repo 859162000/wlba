@@ -334,7 +334,7 @@ org.reward = (function(org){
                     }
                 }else{
                     ops = {
-                        url: '/api/register/?promo_token=weixin_atten',
+                        url: '/api/register/?promo_token=weixin_attention',
                         type: 'POST',
                         data: {
                             'identifier': _self.$phone.val(),
