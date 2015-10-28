@@ -19,7 +19,7 @@ from wanglibao_p2p.models import P2PEquity
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
-
+from django.contrib.auth.models import User
 
 
 
@@ -100,7 +100,7 @@ class WeixinJoinView(View):
                 w_user.save()
                 reply = create_reply(u'欢迎下次关注我们！', msg)
             elif isinstance(msg, SubscribeScanEvent):
-                reply = self.process_subscribe(msg)
+                reply = self.process_subscribe(msg, account_key)
             elif isinstance(msg, ScanEvent):
                 print msg.event
                 print msg._data
@@ -126,6 +126,11 @@ class WeixinJoinView(View):
         fromUserName = msg._data['FromUserName']
         createTime = msg._data['CreateTime']
         eventKey = msg._data['EventKey']
+
+        user = None
+        if eventKey.isdigit():
+            user = User.objects.filter(pk=eventKey).first()
+
         w_user = WeixinUser.objects.filter(openid=fromUserName).first()
         if not w_user:
             w_user = WeixinUser()
@@ -149,6 +154,9 @@ class WeixinJoinView(View):
                     reply = create_reply(articles, msg)
         else:
             reply = create_reply(u'欢迎关注我们！', msg)
+        if user:
+            w_user.user = user
+            # reply =
         return reply
 
     def getSubscribeArticle(self):
