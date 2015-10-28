@@ -221,7 +221,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 $(function() {
     window.onload = function() {
-        $('#wrap').css('z-index','999');
         $('.no_signal_wrap').addClass('no_signal_wrap_animate');
         step1();
     }
@@ -242,6 +241,7 @@ $(function() {
     /*数字变换*/
 
     function step1() {
+        $('#wrap').css('opacity','1');
         $('.boy').removeClass('boy_animate1');
         var i = 4;
         var timer1 = setInterval(function() {

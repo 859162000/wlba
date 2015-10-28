@@ -810,11 +810,11 @@ class ThunderInterestAwardAPIView(APIView):
     def get_award_mount(self, index):
         index %= 10
         if index in (0,):
-            return 1
+            return 0.5
         if index in(3, 6, 9):
-            return 1
+            return 0.5
         if index in(1, 2, 4, 5, 7, 8):
-            return 1
+            return 0.5
 
     def enter_webpage(self, request):
         """
@@ -822,7 +822,7 @@ class ThunderInterestAwardAPIView(APIView):
         """
         join_log = ActivityJoinLog.objects.filter(user=request.user).first()
         if not join_log:
-            activity = ActivityJoinLog.objects.create(
+            join_log = ActivityJoinLog.objects.create(
                 user=request.user,
                 action_name=u'oct_get_award',
                 action_type=u'login',
@@ -834,8 +834,8 @@ class ThunderInterestAwardAPIView(APIView):
                 create_time=timezone.now(),
             )
 
-            activity.amount = self.get_award_mount(activity.id)
-            activity.save(update_fields=['amount'])
+            join_log.amount = self.get_award_mount(join_log.id)
+            join_log.save(update_fields=['amount'])
 
         to_json_response = {
             'ret_code': 3003,
