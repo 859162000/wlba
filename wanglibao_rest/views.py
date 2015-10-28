@@ -335,7 +335,7 @@ class RegisterAPIView(APIView):
                     redpack.valid = 1
                     redpack.save()
 
-            if channel == 'weixin_attention':
+            if channel == 'h5chuanbo':
                 key = 'share_redpack'
                 shareconfig = Misc.objects.filter(key=key).first()
                 if shareconfig:
