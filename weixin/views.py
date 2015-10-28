@@ -87,7 +87,7 @@ class WeixinJoinView(View):
         msg = parse_message(request.body)
         if isinstance(msg, BaseEvent):
             if isinstance(msg, SubscribeEvent):
-                reply = self.process_subscribe(msg)
+                reply = self.process_subscribe(msg, account.id)
             elif isinstance(msg, UnsubscribeEvent):
                 print msg.event
                 print msg._data
@@ -119,7 +119,7 @@ class WeixinJoinView(View):
             reply = create_reply(u'...', msg)
         return HttpResponse(reply.render())
 
-    def process_subscribe(self, msg):
+    def process_subscribe(self, msg, accountid):
         event = msg.event
         print '-----------------------',event
         toUserName = msg._data['ToUserName']
@@ -141,8 +141,9 @@ class WeixinJoinView(View):
                 reply = create_reply(u'欢迎关注我们！', msg)
             else:
                 if event == 'subscribe':
-                    bind_url = settings.WEIXIN_CALLBACK_URL+reverse('')
-                    reply = create_reply(u"终于等到你，还好我没放弃。绑定网利宝帐号，轻松投资、随时随地查看收益！<a href='%s'>【立即绑定】</a>", msg)
+                    bind_url = settings.WEIXIN_CALLBACK_URL + reverse('weixin_bind_user') + "?openid=%s&state=%s"%(fromUserName, accountid)
+                    txt = u"终于等到你，还好我没放弃。绑定网利宝帐号，轻松投资、随时随地查看收益！<a href='%s'>【立即绑定】</a>"%(bind_url)
+                    reply = create_reply(txt, msg)
                 else:
                     articles = self.getSubscribeArticle()
                     reply = create_reply(articles, msg)
@@ -166,14 +167,14 @@ class WeixinJoinView(View):
     def dispatch(self, request, *args, **kwargs):
         return super(WeixinJoinView, self).dispatch(request, *args, **kwargs)
 
-class BindUser(APIView):
+class BindUser(TemplateView):
     permission_classes = ()
     def get(self, request):
         openid = request.GET.get('openid', '')
         if not openid:
             return Response({'errcode':-1, 'errmsg':"openid is null"})
-        original_id = request.GET.get('original_id')
-        account = Account.objects.filter(original_id=original_id).first()
+        account_id = request.GET.get('state')
+        account = Account.objects.filter(id=account_id).first()
         if not account:
             return Response({'errcode':-2, 'errmsg':"-2"})
         w_user = WeixinUser.objects.filter(openid=openid).first()
@@ -192,28 +193,12 @@ class BindUser(APIView):
             w_user.subscribe = user_info.get('subscribe', '')
             w_user.subscribe_time = user_info.get('subscribe_time', '')
             w_user.save()
+        if w_user.user:
+            return Response({'errcode':'-3', 'errmsg':"has been bind wanglibao"})
 
-        qrcode_id = request.GET.get('id')
-        if not qrcode_id:
-            return Response({'errcode':-1, 'errmsg':"-1"})
-        qrcode = QrCode.objects.filter(id=qrcode_id).first()
-        if not qrcode:
-            return Response({'errcode':-2, 'errmsg':"-2"})
-        if qrcode.ticket:
-            return Response({'errcode':-3, 'errmsg':"-3"})
-        account = Account.objects.get(original_id=qrcode.account_original_id)
-        client = WeChatClient(account.app_id, account.app_secret, account.access_token)
-        qrcode_data = {"action_name":"QR_LIMIT_STR_SCENE", "action_info":{"scene": {"scene_str": qrcode.scene_str}}}
-        try:
-            rs = client.qrcode.create(qrcode_data)
 
-            qrcode.ticket = rs.get('ticket')
-            qrcode.url = rs.get('url')
-            qrcode.save()
-        except Exception,e:
-            print e
-            return Response({'code':-1, 'message':'error'})
-        return Response(rs)
+
+        return Response("ok")
 
 
 class WeixinJsapiConfig(APIView):

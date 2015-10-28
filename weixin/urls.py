@@ -38,7 +38,7 @@ urlpatterns = patterns(
     url(r'api/wx_getinfo/$', views.GetAuthUserInfo.as_view(), name='weixin_get_user_info'),
     url(r'api/account/wx_getinfo/$', views.GetUserInfo.as_view(), name='weixin_get_account_user_info'),
     url(r'api/generate/ticket/$', views.GenerateTicket.as_view(), name='generate_ticket'),
-    url(r'api/bind/wuser/$', views.BindUser.as_view(), name='generate_ticket'),
+    url(r'api/bind/wuser/$', views.BindUser.as_view(), name='weixin_bind_user'),
 )
 
 # 微信管理后台
