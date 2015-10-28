@@ -71,7 +71,7 @@ require ['jquery', 'lib/backend'], ($, backend)->
         $(".error-message").text(data.message)
         return
       else
-        window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=y"
+        window.location.href = "/aws/?p=" + identifier + "&reg=y"
     .fail (xhr)->
       alert("注册失败。\n您可以去网利宝网站（www.wanglibao.com）试试。")
       window.location.href = "/"
