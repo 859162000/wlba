@@ -256,6 +256,8 @@ org.test = (function(org){
 
             bridge.callHandler('sendUserInfo', {'1': '1'}, function (response) {
               var responsejson = typeof response == 'string' ? JSON.parse(response): response;
+
+              $('#log1').html(JSON.stringify(responsejson));
               org.ajax({
                 url: '/accounts/token/login/ajax/',
                 type: 'post',
@@ -265,9 +267,11 @@ org.test = (function(org){
                   ts: responsejson.ts
                 },
                 success: function(data){
+                  $('#log2').html(JSON.stringify(data));
                   window.location.href = $("input[name='next']").val();
                 },
                 error: function(data){
+                  $('#log3').html(JSON.stringify(data));
                   window.location.href = $("input[name='next']").val() + "nologin/";
                 }
               })
