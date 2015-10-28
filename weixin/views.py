@@ -141,7 +141,8 @@ class WeixinJoinView(View):
                 reply = create_reply(u'欢迎关注我们！', msg)
             else:
                 if event == 'subscribe':
-                    reply = create_reply(u"终于等到你，还好我没放弃。绑定网利宝帐号，轻松投资、随时随地查看收益！<a href=''>【立即绑定】</a>", msg)
+                    bind_url = settings.WEIXIN_CALLBACK_URL+reverse('')
+                    reply = create_reply(u"终于等到你，还好我没放弃。绑定网利宝帐号，轻松投资、随时随地查看收益！<a href='%s'>【立即绑定】</a>", msg)
                 else:
                     articles = self.getSubscribeArticle()
                     reply = create_reply(articles, msg)
@@ -164,6 +165,55 @@ class WeixinJoinView(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super(WeixinJoinView, self).dispatch(request, *args, **kwargs)
+
+class BindUser(APIView):
+    permission_classes = ()
+    def get(self, request):
+        openid = request.GET.get('openid', '')
+        if not openid:
+            return Response({'errcode':-1, 'errmsg':"openid is null"})
+        original_id = request.GET.get('original_id')
+        account = Account.objects.filter(original_id=original_id).first()
+        if not account:
+            return Response({'errcode':-2, 'errmsg':"-2"})
+        w_user = WeixinUser.objects.filter(openid=openid).first()
+        if not w_user:
+            try:
+                user_info = account.get_user_info(openid)
+            except WeChatException, e:
+                return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
+            w_user.nickname = user_info.get('nickname', "")
+            w_user.sex = user_info.get('sex')
+            w_user.city = user_info.get('city', "")
+            w_user.country = user_info.get('country', "")
+            w_user.headimgurl = user_info.get('headimgurl', "")
+            w_user.unionid =  user_info.get('unionid', '')
+            w_user.province = user_info.get('province', '')
+            w_user.subscribe = user_info.get('subscribe', '')
+            w_user.subscribe_time = user_info.get('subscribe_time', '')
+            w_user.save()
+
+        qrcode_id = request.GET.get('id')
+        if not qrcode_id:
+            return Response({'errcode':-1, 'errmsg':"-1"})
+        qrcode = QrCode.objects.filter(id=qrcode_id).first()
+        if not qrcode:
+            return Response({'errcode':-2, 'errmsg':"-2"})
+        if qrcode.ticket:
+            return Response({'errcode':-3, 'errmsg':"-3"})
+        account = Account.objects.get(original_id=qrcode.account_original_id)
+        client = WeChatClient(account.app_id, account.app_secret, account.access_token)
+        qrcode_data = {"action_name":"QR_LIMIT_STR_SCENE", "action_info":{"scene": {"scene_str": qrcode.scene_str}}}
+        try:
+            rs = client.qrcode.create(qrcode_data)
+
+            qrcode.ticket = rs.get('ticket')
+            qrcode.url = rs.get('url')
+            qrcode.save()
+        except Exception,e:
+            print e
+            return Response({'code':-1, 'message':'error'})
+        return Response(rs)
 
 
 class WeixinJsapiConfig(APIView):
@@ -991,6 +1041,4 @@ class GenerateTicket(APIView):
             print e
             return Response({'code':-1, 'message':'error'})
         return Response(rs)
-
-
 

@@ -213,7 +213,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
 )
-
+import  django.contrib.auth
 # Template loader
 TEMPLATE_LOADERS = (
     ('pyjade.ext.django.Loader', (
