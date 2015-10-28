@@ -106,6 +106,24 @@ class Account(models.Model):
             self.original_id = value
             self.save()
 
+    def get_user_info(self, openid=None, lang='zh_CN'):
+        """Get user infomation
+        :param openid: WeChat openid, optional
+        :param access_token: WeChat OAuth2 access token, optional
+        :param lang: Preferred language code, optional
+        :return: JSON data
+        """
+        access_token = self.access_token
+        client = WeChatClient(self.app_id, self.app_secret)
+        return client._get(
+            'user/info',
+            params={
+                'access_token': access_token,
+                'openid': openid,
+                'lang': lang
+            }
+        )
+
     def empty_data(self):
         now = self._now()
         self.access_token_content = ''
@@ -249,6 +267,20 @@ class WeixinAccounts(object):
         return 20
 
 
+class AuthorizeInfo(models.Model):
+    access_token = models.CharField('access token', max_length=512)
+    access_token_expires_at = models.DateTimeField('access token过期时间', auto_now_add=True, blank=True)
+    refresh_token = models.CharField('refresh token', max_length=512, blank=True)
+
+
+    def check_access_token(self):
+        now = Account._now()
+        if now > self.access_token_expires_at:
+            return False
+        return True
+
+
+
 class WeixinUser(models.Model):
     SEX_DATA = (
         (1, '男'),
@@ -268,6 +300,8 @@ class WeixinUser(models.Model):
     subscribe_time = models.IntegerField('用户关注时间', default=0)
     account_original_id = models.CharField('所属公众号原始ID', max_length=32, blank=True, db_index=True)
     user = models.ForeignKey(User, null=True)
+    unionid = models.CharField('用户唯一标识', max_length=128, blank=True)
+    auth_info = models.ForeignKey(AuthorizeInfo, null=True)
 
 
 class Material(models.Model):
@@ -378,5 +412,3 @@ class ReplyKeyword(models.Model):
     pattern = models.IntegerField('匹配模式', choices=PATTERN_CHOICES)
     rule_reply = models.ForeignKey(ReplyRule)
     created_at = models.DateTimeField('创建时间', auto_now_add=True)
-
-
