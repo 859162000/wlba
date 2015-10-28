@@ -123,6 +123,8 @@ urlpatterns += patterns(
     url(r'^wechat_result/$', TemplateView.as_view(template_name="app_wechatReward_result.jade")),
     url(r'^wechat_rule/$', TemplateView.as_view(template_name="app_wechatReward_rule.jade")),
 
+    url(r'^wx_november_new/$', TemplateView.as_view(template_name="h5_november_new.jade")),
+
 )
 
 urlpatterns += patterns(

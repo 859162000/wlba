@@ -233,6 +233,10 @@ org.test = (function(org){
               document.addEventListener('WebViewJavascriptBridgeReady', function() {
                 callback(WebViewJavascriptBridge)
               }, false)
+              var u = navigator.userAgent;
+              if(u.indexOf('wlbAPP') <= -1){
+                  window.location.href =' /weixin/login/?next=' + $("input[name='next']").val()
+              }
             }
           }
 
@@ -251,11 +255,13 @@ org.test = (function(org){
               log('JS got a message', message)
               var data = { 'Javascript Responds':'收到' }
               log('JS responding with', data)
-              responseCallback(data)
+              responseCallback(data);
             });
 
             bridge.callHandler('sendUserInfo', {'1': '1'}, function (response) {
               var responsejson = typeof response == 'string' ? JSON.parse(response): response;
+
+              $('#log1').html(JSON.stringify(responsejson));
               org.ajax({
                 url: '/accounts/token/login/ajax/',
                 type: 'post',
@@ -265,9 +271,11 @@ org.test = (function(org){
                   ts: responsejson.ts
                 },
                 success: function(data){
+                  $('#log2').html(JSON.stringify(data));
                   window.location.href = $("input[name='next']").val();
                 },
                 error: function(data){
+                  $('#log3').html(JSON.stringify(data));
                   window.location.href = $("input[name='next']").val() + "nologin/";
                 }
               })
