@@ -322,7 +322,11 @@ org.mmIndex = (function(org){
                         url: '/api/distribute/redpack/' + _self.$phone.val()+'/?promo_token=maimaitest',
                         type: 'POST',
                         success: function(data){
-                            console.log(data)
+                            if(data.ret_code == 0){
+                                window.location.href = '/activity/maimai_success/?state=1'
+                            }else if(data.ret_code === 1000){
+                                window.location.href = '/activity/maimai_success/?state=0'
+                            }
                         },
                         complete:function(){
                             lib.$submit.removeAttr('disabled').html('领 取');
@@ -341,7 +345,7 @@ org.mmIndex = (function(org){
                         },
                         success: function(data){
                             if(data.ret_code == 0){
-                                //window.location.href= '/activity/wechat_result/?phone='+ _self.$phone.val() + '&state=0'
+                                window.location.href = '/activity/maimai_success/?state=0'
                             }
                         },
                         error: function(data){
@@ -514,14 +518,28 @@ org.mmIndex = (function(org){
     }
 })(org);
 
-org.result = (function(org){
+org.success = (function(org){
     var lib = {
         init:function(){
             var
-                phone = org.getQueryStringByName('phone'),
                 state = org.getQueryStringByName('state')*1,
-                str = state == 0 ? '加息券已放入帐户' : '您已领取过';
-                $('.maimai-form-text').html(str + '&nbsp' + phone)
+                str = '',
+                val = '';
+
+                if(state === 0){
+                    str = '成功领取';
+                    val = '价值120元红包';
+                }else if(state === 1){
+                    str = '您已领取过';
+                    val = '***加息券';
+                }
+                $('.maimai-title').html(str);
+                $('.maimai-money').html(val);
+
+
+            var mySwiper = new Swiper('.swiper-container', {
+                pagination: '.swiper-pagination-maimai',
+            })
         },
     }
     return {
