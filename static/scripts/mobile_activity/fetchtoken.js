@@ -251,8 +251,10 @@ org.test = (function(org){
               log('JS got a message', message)
               var data = { 'Javascript Responds':'收到' }
               log('JS responding with', data)
-              responseCallback(data)
+              $('#log1').html('初始化了');
+              responseCallback(data);
             });
+            $('#log2').html('进到webview了');
 
             bridge.callHandler('sendUserInfo', {'1': '1'}, function (response) {
               var responsejson = typeof response == 'string' ? JSON.parse(response): response;
