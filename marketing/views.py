@@ -189,6 +189,7 @@ class AppShareViewShort(TemplateView):
             phone = base64.b64decode(identifier + '=')
         except:
             identifier = self.request.GET.get('phone')
+            phone = identifier
         reg = self.request.GET.get('reg')
 
         return {
