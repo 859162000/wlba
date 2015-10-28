@@ -87,28 +87,7 @@ class WeixinJoinView(View):
         msg = parse_message(request.body)
         if isinstance(msg, BaseEvent):
             if isinstance(msg, SubscribeEvent):
-                print msg.event
-                print msg._data
-                toUserName = msg._data['ToUserName']
-                fromUserName = msg._data['FromUserName']
-                createTime = msg._data['CreateTime']
-                eventKey = msg._data['EventKey']
-                w_user = WeixinUser.objects.filter(openid=fromUserName).first()
-                if not w_user:
-                    w_user = WeixinUser()
-                    w_user.openid = fromUserName
-                    w_user.account_original_id = account.original_id
-                    w_user.subscribe = 1
-                    w_user.subscribe_time = createTime
-                    w_user.scene_id = eventKey
-                    w_user.save()
-                elif w_user.subscribe == 0:
-                    w_user.subscribe = 1
-                    w_user.subscribe_time = createTime
-                    w_user.scene_id = eventKey
-                    w_user.save()
-                reply = create_reply(u'欢迎关注我们！', msg)
-
+                reply = self.process_subscribe(msg)
             elif isinstance(msg, UnsubscribeEvent):
                 print msg.event
                 print msg._data
@@ -121,28 +100,12 @@ class WeixinJoinView(View):
                 w_user.save()
                 reply = create_reply(u'欢迎下次关注我们！', msg)
             elif isinstance(msg, SubscribeScanEvent):
-                print msg.event
-                print msg._data
-                print msg.scene_id
-                print msg.ticket
-                toUserName = msg._data['ToUserName']
-                fromUserName = msg._data['FromUserName']
-                createTime = msg._data['CreateTime']
-                eventKey = msg._data['EventKey']
-                w_user = WeixinUser.objects.filter(openid=fromUserName).first()
-                w_user.subscribe = 1
-                w_user.scene_id = eventKey
-                w_user.save()
-                articles = self.getSubscribeArticle()
-                reply = create_reply(articles, msg)
-                # reply = create_reply(u'欢迎关注我们！', msg)
+                reply = self.process_subscribe(msg)
             elif isinstance(msg, ScanEvent):
                 print msg.event
                 print msg._data
                 print msg.scene_id
                 print msg.ticket
-                articles = self.getSubscribeArticle()
-                reply = create_reply(articles, msg)
                 # reply = create_reply(u'https://7fd03dee.ngrok.io/activity/new_user/', msg)
         elif isinstance(msg, BaseMessage):
             if isinstance(msg, TextMessage):
@@ -152,14 +115,51 @@ class WeixinJoinView(View):
                 # reply = TransferCustomerServiceReply(message=msg)
             else:
                 reply = create_reply(u'更多功能，敬请期待！', msg)
+        if not reply:
+            reply = create_reply(u'...', msg)
         return HttpResponse(reply.render())
+
+    def process_subscribe(self, msg):
+        event = msg.event
+        print '-----------------------',event
+        toUserName = msg._data['ToUserName']
+        fromUserName = msg._data['FromUserName']
+        createTime = msg._data['CreateTime']
+        eventKey = msg._data['EventKey']
+        w_user = WeixinUser.objects.filter(openid=fromUserName).first()
+        if not w_user:
+            w_user = WeixinUser()
+        if w_user.subscribe != 1:
+            w_user.subscribe = 1
+            w_user.scene_id = eventKey
+            if not w_user.subscribe_time:
+                w_user.subscribe_time = createTime
+            w_user.scene_id = eventKey
+            w_user.save()
+            if False and w_user.subscribe_time < createTime:
+                #用户曾经关注过
+                reply = create_reply(u'欢迎关注我们！', msg)
+            else:
+                if event == 'subscribe':
+                    reply = create_reply(u"终于等到你，还好我没放弃。绑定网利宝帐号，轻松投资、随时随地查看收益！<a href=''>【立即绑定】</a>", msg)
+                else:
+                    articles = self.getSubscribeArticle()
+                    reply = create_reply(articles, msg)
+        else:
+            reply = create_reply(u'欢迎关注我们！', msg)
+        return reply
 
     def getSubscribeArticle(self):
         image = "http://e.hiphotos.baidu.com/baike/c0%3Dbaike80%2C5%2C5%2C80%2C26/sign=410619fb3d01213fdb3e468e358e5db4/9f510fb30f2442a71525d087d543ad4bd11302ec.jpg"
         url = 'https://www.wanglibao.com/activity/new_user/'
         description = '大数据下的网利宝'
-        title = 'title'
-        return [{'image':image, 'url':url, 'description':description, 'title':title}]
+        title = '大数据下的网利宝'
+        image1 = "http://e.hiphotos.baidu.com/baike/c0%3Dbaike80%2C5%2C5%2C80%2C26/sign=410619fb3d01213fdb3e468e358e5db4/9f510fb30f2442a71525d087d543ad4bd11302ec.jpg"
+        url1 = 'https://www.wanglibao.com/milestone/'
+        description1 = '网利宝大事记'
+        title1 = '网利宝大事记'
+        return [{'image':image, 'url':url, 'description':description, 'title':title},
+                {'image':image1, 'url':url1, 'description':description1, 'title':title1}]
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
