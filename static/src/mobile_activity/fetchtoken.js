@@ -42,7 +42,7 @@ org.test = (function(org){
             bridge.callHandler('sendUserInfo', {'1': '1'}, function (response) {
               var responsejson = typeof response == 'string' ? JSON.parse(response): response;
 
-              $('#log1').html(JSON.stringify(responsejson));
+              $('#log1').html('=============');
               org.ajax({
                 url: '/accounts/token/login/ajax/',
                 type: 'post',
@@ -52,11 +52,11 @@ org.test = (function(org){
                   ts: responsejson.ts
                 },
                 success: function(data){
-                  $('#log2').html(JSON.stringify(data));
+                  $('#log2').html('ajax success');
                   window.location.href = $("input[name='next']").val();
                 },
                 error: function(data){
-                  $('#log3').html(JSON.stringify(data));
+                  $('#log3').html('ajax error');
                   window.location.href = $("input[name='next']").val() + "nologin/";
                 }
               })
@@ -116,7 +116,7 @@ org.scratch = (function(org){
             $('#url').html(window.location.href)
             //注册
               $('#regist').on('click',function(){
-                bridge.callHandler('registerApp', {refresh: 1, url: ''}, function (response) {
+                bridge.callHandler('registerApp', {refresh: 1, url: '/activity/app_scratch_copy/'}, function (response) {
                    $('.test-log').html(JSON.stringify(response));
                  });
               });
