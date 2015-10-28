@@ -699,42 +699,40 @@ class FUBARegister(CoopRegister):
                 goodmark = '2'
                 order_act = u'复投'
 
-            p2p_amount = int(p2p_record.amount)
-            if p2p_amount >= 1000:
-                # 如果结算时间过期了则不执行回调
-                earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
-                if earliest_settlement_time:
-                    earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
-                    current_time = datetime.datetime.now()
-                    # 如果上次访问的时间是在30天前则不更新访问时间
-                    if earliest_settlement_time + datetime.timedelta(days=int(FUBA_PERIOD)) <= current_time:
-                        return
+            # 如果结算时间过期了则不执行回调
+            earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
+            if earliest_settlement_time:
+                earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
+                current_time = datetime.datetime.now()
+                # 如果上次访问的时间是在30天前则不更新访问时间
+                if earliest_settlement_time + datetime.timedelta(days=int(FUBA_PERIOD)) <= current_time:
+                    return
 
-                order_id = p2p_record.id
-                goodsprice = p2p_amount
-                # goodsname 提供固定值，固定值自定义，但不能为空
-                goodsname = u"名称:网利宝,类型:产品标,周期:1月"
-                sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
-                status = u"%s【%s元：已付款】" % (order_act, p2p_amount)
-                params = {
-                    'action': 'create',
-                    'planid': self.coop_id,
-                    'order': order_id,
-                    'goodsmark': goodmark,
-                    'goodsprice': goodsprice,
-                    'goodsname': goodsname,
-                    'sig': sig,
-                    'status': status,
-                    'uid': binding.bid,
-                }
-                common_callback.apply_async(
-                    kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
-                # 记录开始结算时间
-                if not binding.extra:
-                    # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
-                    if earliest_settlement_time:
-                        binding.extra = earliest_settlement_time
-                        binding.save()
+            order_id = p2p_record.id
+            goodsprice = int(p2p_record.amount)
+            # goodsname 提供固定值，固定值自定义，但不能为空
+            goodsname = u"名称:网利宝,类型:产品标,周期:1月"
+            sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
+            status = u"%s【%s元：已付款】" % (order_act, goodsprice)
+            params = {
+                'action': 'create',
+                'planid': self.coop_id,
+                'order': order_id,
+                'goodsmark': goodmark,
+                'goodsprice': goodsprice,
+                'goodsname': goodsname,
+                'sig': sig,
+                'status': status,
+                'uid': binding.bid,
+            }
+            common_callback.apply_async(
+                kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+            # 记录开始结算时间
+            if not binding.extra:
+                # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
+                if earliest_settlement_time:
+                    binding.extra = earliest_settlement_time
+                    binding.save()
 
 
 class YunDuanRegister(CoopRegister):
