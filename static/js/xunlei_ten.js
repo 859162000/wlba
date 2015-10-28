@@ -259,7 +259,6 @@
         }
         //添加奖品份数
         $('#jianli').html(change['award']);
-        console.log(change['award']);
 
     });
 }).call(this);

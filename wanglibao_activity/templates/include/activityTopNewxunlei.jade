@@ -5,12 +5,21 @@ include include/activityTop2
     if user.is_authenticated
       //#ganjiwang-model
       .denelu-form.dengruhou
-        p.xunshang(style="margin-top: 12px") 恭喜已完成网利宝注册
-        p.xunshang 并与您的迅雷账号绑定成功
+        if ret_code == '10000'
+          p.xunshang(style="margin-top: 12px") 恭喜已完成网利宝注册
+          p.xunshang 并与您的迅雷账号绑定成功
+        else
+          p.xunshang(style="margin-top: 12px") 您并没有与的迅雷账号绑定
+          p.xunshang 将无法正常获取迅雷会员奖励
         .xunleierwei
-          p.xunleiten &nbsp;&nbsp;&nbsp;迅雷账号：{{nickname}}
-          p.xunleiten 网利宝账号：
-            span {{user|display_name}}
+          if ret_code == '10000'
+            p.xunleiten &nbsp;&nbsp;&nbsp;迅雷账号：{{nickname}}
+            p.xunleiten 网利宝账号：
+              span {{user|display_name}}
+          else
+            p.xunleiten 网利宝账号：
+              span {{user|display_name}}
+
           .erweimaxunlei11
           p.xunleitenma 扫码关注微信
         .banner-form--row.align-center
