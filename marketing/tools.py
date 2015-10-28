@@ -181,7 +181,7 @@ def check_invested_status(delta=timezone.timedelta(days=3)):
     # 三天前注册的用户
     registered_users = User.objects.filter(date_joined__gte=start, date_joined__lt=end)
     # 获取投资过的uid
-    margins = Margin.objects.filter(user__in=registered_users).annotate(Count('user', distinct=True))
+    margins = Margin.objects.filter(user__in=registered_users, margin__gt=0).annotate(Count('user', distinct=True))
     ids = [margin.user.id for margin in margins]
 
     # 获取没有投资的用户
