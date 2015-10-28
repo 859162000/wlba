@@ -9,6 +9,18 @@ $(function() {
     var choice_step3 = false;
     var money = 0;
     var this_money;
+
+    var mp3 = document.getElementById("music"),play = $('#play');
+    play.on('click', function (e) {
+        if (mp3.paused) {
+            mp3.play();
+            $('#play').addClass('play_music').removeClass('close_music');
+        } else {
+            mp3.pause();
+            $('#play').addClass('close_music').removeClass('play_music');
+        }
+    });
+
     /*数字变换*/
     function gold_scroll(gold_num_change) {
         $('.num-animate').each(function() {
@@ -24,6 +36,11 @@ $(function() {
     /*数字变换*/
 
     function step1(){
+        $('#play').show();
+        mp3.play();
+        $(document).one('touchstart', function () {
+            mp3.play();
+        });
         $('.boy').removeClass('boy_animate1');
         $('.title').addClass('title_in');
         var i = 6;
