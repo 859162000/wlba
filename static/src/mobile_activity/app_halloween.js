@@ -86,8 +86,8 @@ $(function() {
             if (i === 0) {
                 clearInterval(timer1);
                 //$('.boy_stay').show();
-                //$('.boy').addClass('boy_animate1');
-                $('.boy_go_one').show().addClass('boy_go_one_hide');
+                $('.boy').addClass('boy_animate1');
+                //$('.boy_go_one').show().addClass('boy_go_one_hide');
                 $('.choice_step1').show().addClass('choice_step_show');
                 $('.bg_after').addClass('bg_after_animate1');
                 $('.bg_front_wrap').addClass('bg_front_wrap_animate1');
