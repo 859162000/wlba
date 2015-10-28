@@ -1165,32 +1165,80 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.tokens import default_token_generator
 
 
-# class ThirdRegisterOpenApiView(APIView):
-#     permission_classes = ()
-#
-#     def post(self, request):
-#         if request.method == 'POST':
-#             if 'username' in request.POST and 'password' in request.POST:
-#                 username =
-#                 user = authenticate(username = localusername, password = '')
-#             if user:
-#                 data = {
-#                     'success': True,
-#                     'token': default_token_generator.make_token(user),
-#                     'user': user.pk,
-#                 }
-#                 return data
-#             else:
-#                 return HttpResponse("Error token!")
-#         elif request.method == 'GET':
-#             if 'username' in request.GET and 'password' in request.GET:
-#                 user = authenticate(username = localusername, password = '')
-#             if user:
-#                 data = {
-#                     'success': True,
-#                     'token': default_token_generator.make_token(user),
-#                     'user': user.pk,
-#                 }
-#                 return data
-#             else:
-#                 return HttpResponse("Error token!")
+class ThirdRegisterOpenApiView(APIView):
+    permission_classes = ()
+
+    # def post(self, request):
+    #     if request.method == 'POST':
+    #         params = request.POST
+    #         usn = params.get('usn')
+    #         appid = params.get('appid')
+    #         client_ip = params.get('client_ip')
+    #         signature = params.get('signature')
+    #
+    #         if 'username' in request.POST and 'password' in request.POST:
+    #             username =
+    #             user = authenticate(username = localusername, password = '')
+    #         if user:
+    #             data = {
+    #                 'success': True,
+    #                 'token': default_token_generator.make_token(user),
+    #                 'user': user.pk,
+    #             }
+    #             return data
+    #         else:
+    #             return HttpResponse("Error token!")
+    #     elif request.method == 'GET':
+    #         if 'username' in request.GET and 'password' in request.GET:
+    #             user = authenticate(username = localusername, password = '')
+    #         if user:
+    #             data = {
+    #                 'success': True,
+    #                 'token': default_token_generator.make_token(user),
+    #                 'user': user.pk,
+    #             }
+    #             return data
+    #         else:
+    #             return HttpResponse("Error token!")
+
+
+class LoginAPIView(APIView):
+    permission_classes = ()
+
+    def post(self, request, *args, **kwargs):
+        identifier = request.DATA.get("identifier", "")
+        password = request.DATA.get("password", "")
+
+        if not identifier or not password:
+            return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
+
+        user = authenticate(identifier=identifier, password=password)
+
+        if not user:
+            return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
+        if not user.is_active:
+            return Response({"token":"false", "message":u"用户已被关闭"}, status=400)
+        if user.wanglibaouserprofile.frozen:
+            return Response({"token":"false", "message":u"用户已被冻结"}, status=400)
+
+        push_user_id = request.DATA.get("user_id", "")
+        push_channel_id = request.DATA.get("channel_id", "")
+        # 设备类型，默认为IOS
+        device_type = request.DATA.get("device_type", "ios")
+        if device_type not in ("ios", "android"):
+            return Response({'message': "device_type error"}, status=status.HTTP_200_OK)
+
+        if push_user_id and push_channel_id:
+            pu = UserPushId.objects.filter(push_user_id=push_user_id).first()
+            exist = False
+            if not pu:
+                pu = UserPushId()
+                pu.device_type = device_type
+                exist = True
+            if exist or pu.user != user or pu.push_channel_id != push_channel_id:
+                pu.user = user
+                pu.push_user_id = push_user_id
+                pu.push_channel_id = push_channel_id
+                pu.save()
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({'token': token.key, "user_id":user.id}, status=status.HTTP_200_OK)
