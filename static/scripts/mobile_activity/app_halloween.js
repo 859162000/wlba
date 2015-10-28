@@ -522,12 +522,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
     function step6(){
         if(money<50){
-            $('.poor_wrap').show();
+            $('.poor_wrap').css('z-index','9997');
             $('.poor_wrap .button').show().addClass('href_button');
             $('.poor_boy').show();
             $('.poor_text').addClass('text_animate');
         }else{
-            $('.rich_wrap').show();
+            $('.rich_wrap').css('z-index','9997');
             $('.rich_wrap .button').show().addClass('href_button');
         }   $('.rich_text').addClass('text_animate');
     }
