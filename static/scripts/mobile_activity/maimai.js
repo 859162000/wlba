@@ -422,7 +422,7 @@ org.mmIndex = (function(org){
                     _self.$phone.attr('data-existing', true);
                 }else{
                     lib.$submit.attr('disabled',true);
-                    _self.$body_h.css({'height': '6.6rem'});
+                    _self.$body_h.css({'height': '5.6rem'});
                     _self.$phone.attr('data-existing', false);
                     $(document.body).trigger('from:check', [_self.checkfilter(3), false, false]);
                 }
