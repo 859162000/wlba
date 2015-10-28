@@ -1224,10 +1224,10 @@ def ajax_register(request):
             raise Exception("生成随机密码的长度有误")
 
         random_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        password = list()
+        password = ""
         index = 0
         while index < length:
-            password.append(random_list[randint(0,len(random_list))-1])
+            password += random_list[randint(0,len(random_list)-1)]
             index += 1
         return str(password)
 

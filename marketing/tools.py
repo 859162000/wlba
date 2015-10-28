@@ -215,7 +215,7 @@ def check_redpack_status(delta=timezone.timedelta(days=3)):
     # 未使用过的
     available = RedPack.objects.filter(event__in=redpacks, status='used')
     # 三天未使用优惠券对应的红包记录
-    records = RedPackRecord.objects.filter(redpack__in=available, order_id__gt=0)
+    records = RedPackRecord.objects.filter(redpack__in=available)
 
     ids = [record.user.id for record in records]
 
@@ -227,12 +227,12 @@ def check_redpack_status(delta=timezone.timedelta(days=3)):
     for user in users:
         try:
             count = RedPackRecord.objects.filter(user=user, redpack__event__unavailable_at__gte=start,
-                                                 redpack__event__unavailable_at__lt=end, order_id__gt=0).count()
+                                                 redpack__event__unavailable_at__lt=end).exclude(order_id__gt=0).count()
             phones_list.append(user.wanglibaouserprofile.phone)
             messages_list.append(messages.red_packet_invalid_alert(count))
         except Exception, e:
             print e
-            pass
+
     send_messages.apply_async(kwargs={
         'phones': phones_list,
         'messages': messages_list,

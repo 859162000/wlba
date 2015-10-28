@@ -218,12 +218,12 @@ class RegisterAPIView(APIView):
             raise Exception("生成随机密码的长度有误")
 
         random_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        password = list()
+        password = ""
         index = 0
         while index < length:
-            password.append(random_list[randint(0,len(random_list)-1)])
-            index += 1
-        return str(password)
+                password += random_list[randint(0,len(random_list)-1)]
+                index += 1
+        return password
 
     def post(self, request, *args, **kwargs):
         """ 
@@ -354,7 +354,7 @@ class RegisterAPIView(APIView):
                         valid=0
                     )
                     dt = timezone.datetime.now()
-                    redpack_event = RedPackEvent.objects.filter(invalid=False, name='weixin_atten_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                    redpack_event = RedPackEvent.objects.filter(invalid=False, name='weixin_attention_inverest', give_start_at__lte=dt, give_end_at__gte=dt).first()
                     if redpack_event:
                         logger.debug("给用户：%s 发送红包:%s " %(user, redpack_event,))
                         redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
