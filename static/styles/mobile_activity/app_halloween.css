@@ -69,8 +69,8 @@ body {
 	width: 100%;
 	-webkit-animation-name: no_signal;
 	animation-name: no_signal;
-	-webkit-animation-duration: 1s;
-	animation-duration: 1s;
+	-webkit-animation-duration: 3s;
+	animation-duration: 3s;
 	-webkit-animation-timing-function: steps(1, start);
 	animation-timing-function: steps(1, start);
 	-webkit-animation-delay: 0s;
@@ -122,8 +122,7 @@ body {
 	height:100%;
 	overflow: hidden;
 	box-shadow: 0 0 #000 inset;
-	z-index: 999;
-    display: none;
+	z-index: -1;
 }
 
 .title {
