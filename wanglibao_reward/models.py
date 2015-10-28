@@ -82,6 +82,15 @@ class WanglibaoUserGift(models.Model):
         verbose_name_plural = u'用户活动获奖记录'
 
 
+class WanglibaoActivityGiftOrder(models.Model):
+    valid_amount = models.IntegerField(default=0, verbose_name=u'此次分享剩余的抽奖机会')
+    order_id = models.IntegerField(default=0, verbose_name=u'订单号')
+
+    class Meta:
+        verbose_name = u'订单分享表'
+        verbose_name_plural = u'订单分享表'
+
+
 class WanglibaoWeixinRelative(models.Model):
     """
         手机号-网利宝用户-微信openid关系表
