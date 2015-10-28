@@ -14,6 +14,10 @@ org.test = (function(org){
               document.addEventListener('WebViewJavascriptBridgeReady', function() {
                 callback(WebViewJavascriptBridge)
               }, false)
+              var u = navigator.userAgent;
+              if(u.indexOf('wlbAPP') <= -1){
+                  window.location.href =' /weixin/login/?next=' + $("input[name='next']").val()
+              }
             }
           }
 
@@ -32,10 +36,8 @@ org.test = (function(org){
               log('JS got a message', message)
               var data = { 'Javascript Responds':'收到' }
               log('JS responding with', data)
-              $('#log1').html('初始化了');
               responseCallback(data);
             });
-            $('#log2').html('进到webview了');
 
             bridge.callHandler('sendUserInfo', {'1': '1'}, function (response) {
               var responsejson = typeof response == 'string' ? JSON.parse(response): response;
