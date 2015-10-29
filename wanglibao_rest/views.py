@@ -320,18 +320,28 @@ class RegisterAPIView(APIView):
             logger.debug("此次 channel:%s" %(channel))
             if channel == 'maimaitest':
                 activity = Activity.objects.filter(code='maimaitest').first()
-                redpack = WanglibaoUserGift.objects.create(
-                    identity=identifier,
-                    activity=activity,
-                    rules=WanglibaoActivityGift.objects.first(),#随机初始化一个值
-                    type=1,
-                    valid=0
-                )
+                logger.debug("脉脉渠道的使用Activity是：%s" % (activity,))
+                try:
+                    redpack = WanglibaoUserGift.objects.create(
+                        identity=identifier,
+                        activity=activity,
+                        rules=WanglibaoActivityGift.objects.first(),#随机初始化一个值
+                        type=1,
+                        valid=0
+                    )
+                except Exception, reason:
+                    logger.debug("创建用户的领奖记录抛异常，reason：%s" % (reason,))
                 dt = timezone.datetime.now()
-                redpack_event = RedPackEvent.objects.filter(invalid=False, id=755, give_start_at__lte=dt, give_end_at__gte=dt).first()
+                try:
+                    redpack_event = RedPackEvent.objects.filter(invalid=False, name='maimai_redpack', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                except Exception, reason:
+                    logger.debug("查询脉脉直投红包(name:maimai_redpack)的时候，抛异常，reason:%s" % (reason,))
                 if redpack_event:
                     logger.debug("给用户：%s 发送红包:%s " %(user, redpack_event,))
-                    redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+                    try:
+                        redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+                    except Exception, reason:
+                        logger.debug("给用户：%s 发送红包抛出异常来, %s" % (user, reason,))
                     redpack.valid = 1
                     redpack.save()
 
@@ -354,7 +364,7 @@ class RegisterAPIView(APIView):
                         valid=0
                     )
                     dt = timezone.datetime.now()
-                    redpack_event = RedPackEvent.objects.filter(invalid=False, name='weixin_attention_inverest', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                    redpack_event = RedPackEvent.objects.filter(invalid=False, id=755, give_start_at__lte=dt, give_end_at__gte=dt).first()
                     if redpack_event:
                         logger.debug("给用户：%s 发送红包:%s " %(user, redpack_event,))
                         redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
