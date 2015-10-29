@@ -19,7 +19,7 @@ html
         .welfare-box
           p.welfare-tit 福利一：
           p.welfare-cont
-            | 新手注册送10元红包
+            | 新手注册送10元红包<br />单笔投资满<span class="brown">1000</span>元可用
           p.btn-box
             if user.is_authenticated
               a(href="javascript:void(0);").red-btn.receive-red 立即注册
@@ -31,8 +31,7 @@ html
         .welfare-box
           p.welfare-tit 福利二：
           p.welfare-cont
-            | 新手完成实名认证<br />
-            | 送20元红包
+            | 新手完成实名认证送20元红包<br />单笔投资满<span class="brown">2000</span>元可用
           p.btn-box
             a(href="javascript:void(0);").red-btn.for-name 立即实名认证
         span.welfare-icon
@@ -42,8 +41,7 @@ html
         .welfare-box
           p.welfare-tit 福利三：
           p.welfare-cont
-            | 新手首次完成充值<br />
-            | 送50元红包
+            | 新手首次完成充值送50元红包<br />单笔投资满<span class="brown">3000</span>元可用
           p.btn-box
             a(href="javascript:void(0);").red-btn.recharge 立即充值
         img(src="/static/imgs/pc_activity/november_user/welfare-img3.png").welfare-img
@@ -61,25 +59,27 @@ html
               a(href="/p2p/list/").red-btn 立即投资
         span.welfare-icon
     .rule-box
-      .rule-tit 5000元≤首次投资＜20000元，送150元组合红包，包含：
+      .rule-tit （1）5000元≤首次投资＜20000元，送150元组合红包，包含：
       .packet-cont.clearfix
         .packet-item
           p.packet-img.clearfix
             i.money-num.money-num1
             span.money-tit 限投3月标
           p.packet-tit 单笔投资满15000元可用
+        .plus-icon +
         .packet-item
           p.packet-img.clearfix
             i.money-num.money-num2
             span.money-tit 限投6月标
           p.packet-tit 单笔投资满20000元可用
-      .rule-tit 20000元≤首次投资，送500元组合红包，包含：
+      .rule-tit （2）20000元≤首次投资，送500元组合红包，包含：
       .packet-cont.clearfix
         .packet-item
           p.packet-img.clearfix
             i.money-num.money-num3
             span.money-tit 限投3月标
           p.packet-tit 单笔投资满40000元可用
+        .plus-icon +
         .packet-item
           p.packet-img.clearfix
             i.money-num.money-num4
