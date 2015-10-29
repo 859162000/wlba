@@ -58,7 +58,7 @@ from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_redpack.models import Income
 from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('wanglibao_rest')
 
 
 class UserPortfolioView(generics.ListCreateAPIView):

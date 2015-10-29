@@ -335,7 +335,7 @@ org.scratch = (function(org){
             $('#url').html(window.location.href)
             //注册
               $('#regist').on('click',function(){
-                bridge.callHandler('registerApp', {refresh: 1, url: '/activity/app_scratch_copy/'}, function (response) {
+                bridge.callHandler('registerApp', {refresh: 1, url: ''}, function (response) {
                    $('.test-log').html(JSON.stringify(response));
                  });
               });
