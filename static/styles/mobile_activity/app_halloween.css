@@ -950,7 +950,8 @@ body {
 }
 .boy .boy_go_one {
 	display: none;
-	width: 100%;
+	width: 145px;
+	height: 240px;
     opacity: 1;
 }
 .boy_go_one_hide{
@@ -2138,10 +2139,10 @@ body {
 }
 .poor_text{
 	position:absolute;
-	left:3.86%;
-	top:29.16%;
+	left:0%;
+	top:27.96%;
 	z-index: 5;
-	width:48.53%;
+	width:56.26%;
 	display:block;
 	opacity:0;
 	-webkit-transform: translateY(20px);
@@ -2294,9 +2295,9 @@ body {
 .rich_text{
 	position:absolute;
 	right:2.26%;
-	top:10.56%;
+	top:10.04%;
 	z-index: 5;
-	width:50.26%;
+	width:51.6%;
 	display:block;
 }
 .rich_wrap .light{
