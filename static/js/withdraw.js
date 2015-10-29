@@ -219,8 +219,195 @@
         }
       });
     });
+<<<<<<< HEAD
     $('.poundageF').click(function() {
+=======
+<<<<<<< HEAD
+    return $('.poundageF').click(function() {
+>>>>>>> feature: cherry_pick交易密码 by qijinjin
       return $('#poundageExplain').modal();
+=======
+
+    /*显示设置密码弹框 */
+    $('.forget-pwd').click(function() {
+      var dr, tag;
+      tag = $(this).attr('tag');
+      dr = $('.setTradingPwd1');
+      if (tag === '1') {
+        dr.find('.tag1').show();
+        dr.find('.tag2').hide();
+        dr.find('.nextBtn').attr('tag', '1');
+      } else {
+        dr.find('.tag2').show();
+        dr.find('.tag1').hide();
+        dr.find('.nextBtn').attr('tag', '2');
+      }
+      return $('#setTradingPwd').modal();
+    });
+
+    /*判断提交表单 */
+    $('.withdraw-button').click(function() {
+      if (!$(this).hasClass('no-click')) {
+        return $('#withdraw-form').submit();
+      }
+    });
+
+    /*设置密码提交表单 */
+    $('#nextBtn').click(function() {
+      var id, parent, phone, reg, res, select, sfzError, tag, yhkError, yhkh, yhkhError;
+      parent = $('.setTradingPwd1');
+      phone = $(this).attr('data-phone');
+      id = $.trim(parent.find('.sfz').val());
+      select = $('#card-select1').val();
+      yhkh = $.trim($('.yhkh').val());
+      reg = new RegExp(/^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/);
+      tag = $(this).attr('tag');
+      $('.errorS').html('').hide();
+      sfzError = parent.find('#sfzError');
+      yhkError = parent.find('#yhkError');
+      yhkhError = parent.find('#yhkhError');
+      res = /^\d{10,20}$/;
+      if (id === '') {
+        sfzError.show().addClass('errorS').html('<i></i>请输入身份证号码');
+        return;
+      } else {
+        if (!reg.test(id)) {
+          sfzError.show().addClass('errorS').html('<i></i>身份证信息有误');
+          return;
+        } else {
+          sfzError.show().removeClass('errorS').html('<i></i>');
+        }
+      }
+      if (select === '') {
+        yhkError.show().addClass('errorS').html('<i></i>请输选择银行卡');
+        return;
+      } else {
+        yhkError.show().removeClass('errorS').html('<i></i>');
+      }
+      if (yhkh === '') {
+        yhkhError.show().addClass('errorS').html('<i></i>请输入银行卡号');
+        return;
+      } else {
+        if (!res.test(yhkh)) {
+          yhkhError.show().addClass('errorS').html('<i></i>卡号无效');
+          return;
+        } else {
+          yhkhError.show().removeClass('errorS').html('<i></i>');
+        }
+      }
+      return $.ajax({
+        url: "/api/trade_pwd/",
+        type: "POST",
+        data: {
+          action_type: 3,
+          card_id: yhkh,
+          citizen_id: id,
+          requirement_check: 1
+        }
+      }).success(function(date) {
+        var dr;
+        if (date.ret_code === 5) {
+          $.modal.close();
+          dr = $('.setTradingPwd2');
+          if (tag === '1') {
+            dr.find('.tag1').show();
+            dr.find('.tag2').hide();
+          } else {
+            dr.find('.tag2').show();
+            dr.find('.tag1').hide();
+          }
+          $('#backTradingPwd').modal();
+          return $('#confirmBtn').attr({
+            'tag': tag
+          });
+        } else {
+          return tool.modalAlert({
+            title: '温馨提示',
+            msg: date.message
+          });
+        }
+      });
+    });
+
+    /*确认密码 */
+    $('#confirmBtn').click(function() {
+      var action_type, card_id, citizen_id, erro1, erro2, par, pwd1, pwd2, re, tag;
+      par = $('.setTradingPwd2');
+      pwd1 = $.trim(par.find('#pwd1').val());
+      pwd2 = $.trim(par.find('#pwd2').val());
+      erro1 = par.find('#sfzError');
+      erro2 = par.find('#yzmError');
+      card_id = $.trim($('.yhkh').val());
+      citizen_id = $.trim($('#citizen_id').val());
+      re = /^\d{6}$/;
+      tag = $(this).attr('tag');
+      $('.errorS').html('').hide();
+      if (pwd1 === '') {
+        erro1.show().addClass('errorS').html('<i></i>请输入密码');
+        return;
+      } else {
+        if (!re.test(pwd1)) {
+          erro1.show().addClass('errorS').html('<i></i>格式不正确');
+          return;
+        } else {
+          erro1.show().removeClass('errorS').html('<i></i>');
+        }
+      }
+      if (pwd2 === '') {
+        erro2.show().addClass('errorS').html('<i></i>请输入密码');
+        return;
+      } else {
+        if (!re.test(pwd2)) {
+          erro2.show().addClass('errorS').html('<i></i>格式不正确');
+          return;
+        } else {
+          erro2.show().removeClass('errorS').html('<i></i>');
+        }
+      }
+      if (pwd1 !== pwd2) {
+        erro2.show().addClass('errorS').html('<i></i>交易密码不一致');
+        return;
+      } else {
+        erro2.show().removeClass('errorS').html('<i></i>');
+      }
+      if (tag === '1') {
+        action_type = '3';
+      } else {
+        action_type = '1';
+      }
+      alert(action_type);
+      return $.ajax({
+        url: "/api/trade_pwd/",
+        type: "POST",
+        data: {
+          action_type: action_type,
+          card_id: card_id,
+          citizen_id: citizen_id,
+          new_trade_pwd: pwd1,
+          requirement_check: 0
+        }
+      }).success(function() {
+        return location.reload();
+      });
+    });
+
+    /*判断是否设置了交易密码 */
+    return $.ajax({
+      url: "/api/profile/",
+      type: "GET",
+      data: {}
+    }).success(function(date) {
+      if (date.trade_pwd_is_set) {
+        return $('.trade_pwd_is_set').show();
+      } else {
+        $('.trade_pwd_is_set_no').show();
+        if (date.cards_number > 0) {
+          return $('.bank-counts').show();
+        } else {
+          return $('.bank-count').show();
+        }
+      }
+>>>>>>> 9dbbdad... 交易密码
     });
 
     /*显示设置密码弹框 */

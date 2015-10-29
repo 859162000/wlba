@@ -16,13 +16,13 @@ mixin sidebar-item(name, link, target, mark, sty, last)
                 a(href=link, target=target)
                     em(class=sty)
                     if last == 'last'
-                        span(class='last')=name
+                        label(class='last')=name
                     else
                         if last == 'msg'
-                            span=name
-                            i 18
+                            label=name
+                            span 18
                         else
-                            span=name
+                            label=name
     else
         if mark == '1'
             li.sidebar-item-title
@@ -32,13 +32,13 @@ mixin sidebar-item(name, link, target, mark, sty, last)
                 a(href=link, target=target)
                     em(class=sty)
                     if last == 'last'
-                        span(class='last')=name
+                        label(class='last')=name
                     else
                         if last == 'msg'
-                            span=name
-                            i 18
+                            label=name
+                            span 18
                         else
-                            span=name
+                            label=name
 ul
     +sidebar-item('账户总览', '/accounts/home/', '_self', '1', '0')
 .box
@@ -55,12 +55,12 @@ ul
             classes = ['sidebar-item', 'active']
         li(class=classes)#sidebar-second
             +sidebar-item('交易记录', '/accounts/transaction/p2p/', '_self', '0', 'icon4')
-        //- var didplay = 'display:none'
-        //if activeItem == '交易记录' or activeItem == '货基交易记录'
-        //    display = 'display:block'
-        //    ul.sidebar-secondary(style=display)
-        //        +sidebar-item('理财交易记录', '/accounts/transaction/p2p/')
-        //        +sidebar-item('货基交易记录', '/accounts/transaction/fund/')
+        - var didplay = 'display:none'
+        if activeItem == '交易记录' or activeItem == '货基交易记录'
+            display = 'display:block'
+            ul.sidebar-secondary(style=display)
+                +sidebar-item('理财交易记录', '/accounts/transaction/p2p/')
+                +sidebar-item('货基交易记录', '/accounts/transaction/fund/')
         +sidebar-item('自动投标', '/accounts/auto_tender/', '_self', '0', 'icon5', 'last')
 .box
     .box-title 活动奖励

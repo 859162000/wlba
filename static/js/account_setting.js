@@ -74,7 +74,11 @@
     });
 
     /*判断是否设置了交易密码 */
+<<<<<<< HEAD
     $.ajax({
+=======
+    return $.ajax({
+>>>>>>> feature: cherry_pick交易密码 by qijinjin
       url: "/api/profile/",
       type: "GET",
       data: {}
@@ -85,6 +89,7 @@
         return $('.new').show();
       }
     });
+<<<<<<< HEAD
     $.ajax({
       url: "/api/pay/the_one_card/",
       type: "GET",
@@ -106,6 +111,8 @@
     return $('#temporaryNot').click(function() {
       return $.modal.close();
     });
+=======
+>>>>>>> feature: cherry_pick交易密码 by qijinjin
   });
 
 }).call(this);

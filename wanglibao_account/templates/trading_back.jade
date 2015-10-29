@@ -20,7 +20,11 @@ block main
         .panel-title-bar__no-border
             .panel-title 密码管理 > 找回交易密码
     .setTradingPwd.back-div
+<<<<<<< HEAD
         ul#backOne(style="display:none")
+=======
+        ul
+>>>>>>> feature: cherry_pick交易密码 by qijinjin
             li
                 label.label1 第1/2步:
                 span 身份认证
@@ -29,12 +33,17 @@ block main
                 span {{user_profile.name}}
             li
                 label 身份证号码
+<<<<<<< HEAD
                 input(type='text',placeholder="请输入身份证号码",name='id').sfz#citizen_id
+=======
+                input(type='text',placeholder="请输入身份证号码",name='id').sfz
+>>>>>>> feature: cherry_pick交易密码 by qijinjin
                 em(style='display:none')#sfzError
                     i
                     |
             li
                 label 绑定银行卡
+<<<<<<< HEAD
                 span#bindingEdInfo
                 input(type='hidden' id='bankIsNoBind')
             li.mt28
@@ -60,6 +69,23 @@ block main
             li.mt28
                 label
                 a(href='javascript:void(0)',tag='1').nextBtn.confirmBtn 确认
+=======
+                select#card-select1.withdraw-select(name='card_id1')
+                  option(value='') 请选择银行卡
+                  for card in cards
+                    option(value='{{card.id}}') {{card | card_info}}
+                em(style='display:none')#yhkError
+                        i
+            li
+                .aa.clearfix
+                    label 银行卡号
+                    input(type='text',placeholder="请输入银行卡号").yhkh
+                    em(style='display:none')#yhkhError
+                        i
+            li.mt28
+                label
+                a(href='javascript:void(0)').nextBtn 下一步
+>>>>>>> feature: cherry_pick交易密码 by qijinjin
   script.
     require(['/static/js/back.js?v=20151023'])
 
