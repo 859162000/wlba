@@ -26,9 +26,10 @@ class MarginKeeper(KeeperBaseMixin):
             margin.margin -= amount
             margin.freeze += amount
             # 交易时从充值未投资中扣除投资金额, 同时将投资金额放入冻结金额中, 当充值未投资金额小于零时为置为 0
-            uninvested = margin.uninvested - amount
-            margin.uninvested = uninvested if uninvested > 0 else Decimal('0')
-            margin.uninvested_freeze += amount
+            margin_uninvested = margin.uninvested  # 初始未投资余额
+            uninvested = margin.uninvested - amount  # 未投资金额 - 投资金额 = 未投资余额计算结果
+            margin.uninvested = uninvested if uninvested >= 0 else Decimal('0.00')  # 未投资余额计算结果<0时,结果置0
+            margin.uninvested_freeze += amount if uninvested >= 0 else margin_uninvested  # 未投资余额计算结果<0时,未投资冻结金额等于+初始未投资余额
             margin.save()
             catalog = u'交易冻结'
             record = self.__tracer(catalog, amount, margin.margin, description)
@@ -43,6 +44,12 @@ class MarginKeeper(KeeperBaseMixin):
                 raise MarginLack(u'202')
             margin.freeze -= amount
             margin.margin += amount
+            # 金额解冻时需要同时处理未投资冻结中的金额
+            margin_uninvested_freeze = margin.uninvested_freeze
+            uninvested_freeze = margin.uninvested_freeze - amount
+            margin.uninvested_freeze = uninvested_freeze if uninvested_freeze >= 0 else Decimal('0.00')
+            margin.uninvested += amount if uninvested_freeze >= 0 else margin_uninvested_freeze
+
             margin.save()
             catalog = u'交易解冻'
             record = self.__tracer(catalog, amount, margin.margin, description)
