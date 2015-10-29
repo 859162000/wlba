@@ -1,0 +1,30 @@
+- load formatters
+
+doctype html
+- with '支付' as title
+include include/head
+- endwith
+body
+  if message
+    include global/g_nav
+
+    .callback-container
+      .callback-content
+        if message
+          .error-icon
+          .callback-description
+            h1 抱歉，充值失败。
+            p {{message}}
+
+    include global/g_footer
+    include include/tracking
+
+  if form
+    url = form['url']
+    form#huifu-pay(action='{{url}}', method='post')
+      post = form['post']
+      for name in post
+        value = post[name]
+        input(type='hidden', name='{{name}}', value='{{value}}')
+
+    script(src='/static/js/pay_jump.js', data-main='/static/js/pay_jump')
