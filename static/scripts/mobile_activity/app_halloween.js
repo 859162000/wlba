@@ -303,8 +303,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             i--;
             if (i === 0) {
                 clearInterval(timer1);
-                //$('.boy_go').show().addClass('boy_animate1');
-                $('.boy_go_one').show();
+                $('.boy_go').show().addClass('boy_animate1');
+                //$('.boy_go_one').show();
                 $('.choice_step1').show().addClass('choice_step_show');
                 $('.bg_after').addClass('bg_after_animate1');
                 $('.bg_front_wrap').addClass('bg_front_wrap_animate1');
@@ -323,7 +323,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             $('.choice_step1').addClass('choice_step_hide');
             $('.gold_text').attr('data-num','70');
             $('.gold').addClass('gold_hide');
-            $('.boy_go_one').hide();
+            //$('.boy_go_one').hide();
             $('.boy_stay').show();
             $('.boy_go').removeClass('boy_animate1');
             $('.gold_num_wrap .main').removeClass('gold_num_main_animate');
@@ -345,13 +345,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         }
     });
 
+
     $('.choice_step1 .choice2').click(function(){
         if(choice_step1){
             choice_step1 = false;
             $('.choice_step1').addClass('choice_step_hide');
             $('.gold').addClass('gold_hide2');
             $('.car').addClass('car_animate');
-            $('.boy_go_one').hide();
+            //$('.boy_go_one').hide();
             $('.boy_stay').show();
             $('.boy_go').removeClass('boy_animate1');
             var i = 6;
@@ -537,7 +538,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }
 
 })
-$(function(){
+(function(){
     //微信分享
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
     org.ajax({
@@ -587,4 +588,5 @@ $(function(){
             imgUrl: shareImg
         })
     })
-});
+})();
+
