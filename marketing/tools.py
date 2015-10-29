@@ -129,7 +129,7 @@ def send_income_message_sms():
     start = timezone.datetime(yestoday.year, yestoday.month, yestoday.day, 20, 0, 0)
     end = timezone.datetime(today.year, today.month, today.day, 20, 0, 0)
     incomes = Income.objects.filter(created_at__gte=start, created_at__lt=end).values('user')\
-                            .annotate(Count('invite', DISTINCT=True)).annotate(Sum('earning'))
+                            .annotate(Count('invite', distinct=True)).annotate(Sum('earning'))
     phones_list = []
     messages_list = []
     if incomes:
