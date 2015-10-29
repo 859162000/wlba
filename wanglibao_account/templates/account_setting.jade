@@ -1,39 +1,36 @@
 extends account_home_base
 
 block head
-  - with '修改密码' as title
+  - with '密码管理' as title
     include include/head
 
 block sidebar
-  - with '修改密码' as activeItem
+  - with '密码管理' as activeItem
     include include/user_center_sidebar
 
 block main
   .panel
     .well
       .panel-title-bar__no-border
-        .panel-title 修改密码
-
-      .panel-inner.font-s
-        form#passwordChangeForm.well-s(method="POST")
-          table
-            tr
-              td 原始密码
-              td
-                input#old-password(type="password", name="old-password", autocomplete="off")
-            tr
-              td 新密码
-              td
-                input#new-password1(type="password", name="new-password1", autocomplete="off")
-            tr
-              td 再次输入
-              td
-                input#new-password2(type="password", name="new-password2", autocomplete="off")
-            tr
-              td
-              td
-                button#passwordChangeButton.button-primary(type="submit") 提交
-
+        .panel-title 密码管理
+    .pwd-management
+        .pwd-div.clearfix
+            span.span1
+            .info-fonts
+                p.p1 登录密码
+                p.p2 账户登录使用，定期修改可提升账户安全性
+            a(href='/accounts/update/') 修改
+        .pwd-div.pwd-div2.clearfix
+            span.span2
+            .info-fonts
+                p.p1 交易密码
+                p.p2 6位数字，投资、提现时使用，保证账户资金安全
+            .btns
+                p.old(style='display:none')
+                    a(href='/accounts/trading/back/') 找回
+                    a(href='/accounts/trading') 修改
+                p.new(style='display:none')
+                    a(href='/accounts/trading/setting/').bg 设置
 block script
   script.
     require(['/static/js/account_setting.js'])
