@@ -169,8 +169,8 @@ body {
 	animation-duration: 2s;
 	-webkit-animation-timing-function: linear;
 	animation-timing-function: linear;
-	-webkit-animation-delay: 0s;
-	animation-delay: 0s;
+	-webkit-animation-delay: 3s;
+	animation-delay: 3s;
 	-webkit-animation-fill-mode: forwards;
 	animation-fill-mode: forwards;
 }
