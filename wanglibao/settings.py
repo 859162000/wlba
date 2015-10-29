@@ -143,6 +143,7 @@ MIDDLEWARE_CLASSES = (
     'reversion.middleware.RevisionMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'wanglibao_app.middlewares.DisableAppCsrfCheck',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -213,7 +214,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
 )
-import  django.contrib.auth
+
 # Template loader
 TEMPLATE_LOADERS = (
     ('pyjade.ext.django.Loader', (
@@ -381,6 +382,12 @@ LOGGING = {
             'filename': '/var/log/wanglibao/wanglibao_reward.log',
             'formatter': 'verbose'
         },
+        'wanglibao_rest':{  #add by yihen@20151028
+                              'level': 'DEBUG',
+                              'class': 'logging.FileHandler',
+                              'filename': '/var/log/wanglibao/wanglibao_rest.log',
+                              'formatter': 'verbose'
+                              },
     },
     'loggers': {
         'django': {
@@ -444,6 +451,10 @@ LOGGING = {
             'handlers': ['wanglibao_reward', 'console'],
             'level': 'DEBUG'
         },
+        'wanglibao_rest': { #add by yihen@20151028
+              'handlers': ['wanglibao_rest', 'console'],
+              'level': 'DEBUG'
+          },
     }
 }
 
@@ -603,12 +614,12 @@ CELERYBEAT_SCHEDULE = {
     # by Zhoudong 定期检查没有投资的新用户, 提醒投资
     'invested_status_task_check': {
         'task': 'marketing.tools.check_invested_status',
-        'schedule': crontab(minute=30, hour=14),
+        'schedule': crontab(minute=0, hour=10),
     },
     # by Zhoudong 定期检查用户优惠券没使用,发送提醒
     'redpack_status_task_check': {
         'task': 'marketing.tools.check_redpack_status',
-        'schedule': crontab(minute=30, hour=14),
+        'schedule': crontab(minute=0, hour=11),
     },
 }
 

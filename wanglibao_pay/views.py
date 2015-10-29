@@ -484,8 +484,7 @@ class WithdrawRollback(TemplateView):
         payinfo.save()
 
         # 短信通知添加用户名
-        user = request.user
-        name = user.wanglibaouserprofile.name or u'用户'
+        name = payinfo.user.wanglibaouserprofile.name or u'用户'
 
         send_messages.apply_async(kwargs={
             "phones": [payinfo.user.wanglibaouserprofile.phone],

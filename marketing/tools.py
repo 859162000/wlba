@@ -142,7 +142,7 @@ def send_income_message_sms():
     start = timezone.datetime(yestoday.year, yestoday.month, yestoday.day, 20, 0, 0)
     end = timezone.datetime(today.year, today.month, today.day, 20, 0, 0)
     incomes = Income.objects.filter(created_at__gte=start, created_at__lt=end).values('user')\
-                            .annotate(Count('invite')).annotate(Sum('earning'))
+                            .annotate(Count('invite', distinct=True)).annotate(Sum('earning'))
     phones_list = []
     messages_list = []
     if incomes:
@@ -181,7 +181,7 @@ def check_invested_status(delta=timezone.timedelta(days=3)):
     # 三天前注册的用户
     registered_users = User.objects.filter(date_joined__gte=start, date_joined__lt=end)
     # 获取投资过的uid
-    margins = Margin.objects.filter(user__in=registered_users).annotate(Count('user', distinct=True))
+    margins = Margin.objects.filter(user__in=registered_users, margin__gt=0).annotate(Count('user', distinct=True))
     ids = [margin.user.id for margin in margins]
 
     # 获取没有投资的用户

@@ -394,18 +394,21 @@ class WeixinShareDetailView(TemplateView):
 
         try:
             #TODO: 增加分享记录表，用于计数和加锁
+            #1: 此处有数据不一致性的问题, GiftOrder表和ActivityGift表的不一致性
             gift_order = WanglibaoActivityGiftOrder.objects.select_for_update().filter(order_id=product_id).first()
             if gift_order.valid_amount > 0:
                 gifts = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity, valid=True)
 
                 counts = gifts.count()
-                logger.debug("测试数据counts:%s" % (counts,))
-                if counts==1:
-                    index=0
+                if counts > 0:
+                    if counts == 1:
+                        index = 0
+                    else:
+                        index = random.randint(0, counts-1)
+                    gift = gifts[index]
+                    gift_order.valid_amount -= 1
                 else:
-                    index = random.randint(counts-1)
-                gift = gifts[index]
-                gift_order.valid_amount -= 1
+                    gift = None
             else:
                 gift = None
 
@@ -831,20 +834,18 @@ class WeixinRedPackView(APIView):
                 try:
                     redpack_id = ActivityRule.objects.filter(activity=activity).first().redpack
                 except Exception, reason:
-                    logger("从ActivityRule中获得redpack_id抛异常, reason:%s" % (reason, ))
+                    logger.debug("从ActivityRule中获得redpack_id抛异常, reason:%s" % (reason, ))
 
                 try:
                     redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
                 except Exception, reason:
-                    logger("从RedPackEvent中获得配置红包报错, reason:%s" % (reason, ))
+                    logger.debug("从RedPackEvent中获得配置红包报错, reason:%s" % (reason, ))
 
-                msg = ""
                 try:
                     logger.debug("给用户 %s 发送红包 %s" % (user, redpack_event))
-                    msg = redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
-                    logger.debug("发送红包返回值：%s" %(msg,))
+                    redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
                 except Exception, reason:
-                    logger("给用户发红包抛异常, reason:%s, msg: %s" % (reason, msg))
+                    logger.debug("给用户发红包抛异常, reason:%s, msg: %s" % (reason,))
                 else:
                     redpack.user = user
                     redpack.valid = 1

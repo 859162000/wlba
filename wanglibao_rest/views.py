@@ -58,7 +58,7 @@ from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_redpack.models import Income
 from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('wanglibao_rest')
 
 
 class UserPortfolioView(generics.ListCreateAPIView):
@@ -328,7 +328,7 @@ class RegisterAPIView(APIView):
                     valid=0
                 )
                 dt = timezone.datetime.now()
-                redpack_event = RedPackEvent.objects.filter(invalid=False, name='maimai_redpack', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                redpack_event = RedPackEvent.objects.filter(invalid=False, id=755, give_start_at__lte=dt, give_end_at__gte=dt).first()
                 if redpack_event:
                     logger.debug("给用户：%s 发送红包:%s " %(user, redpack_event,))
                     redpack_backends.give_activity_redpack(user, redpack_event, 'pc')

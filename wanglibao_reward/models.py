@@ -83,7 +83,7 @@ class WanglibaoUserGift(models.Model):
 
 class WanglibaoActivityGiftOrder(models.Model):
     valid_amount = models.IntegerField(default=0, verbose_name=u'此次分享剩余的抽奖机会')
-    order_id = models.IntegerField(default=0, verbose_name=u'订单号')
+    order_id = models.IntegerField(default=0, unique=True, verbose_name=u'订单号')
 
     class Meta:
         verbose_name = u'订单分享表'
