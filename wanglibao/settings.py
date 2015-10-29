@@ -655,7 +655,7 @@ if ENV == ENV_PRODUCTION:
     #KUAI_DYNNUM_URL = "https://mas.99bill.com:443/cnp/getDynNum"
 
     KUAI_PEM_PATH = os.path.join(CERT_DIR, "81231006011001390.pem")
-    KUAI_SIGNATURE_PEM_PATH = os.path.join(CERT_DIR, "81231006011001390_signature.pem")
+    KUAI_SIGNATURE_PEM_PATH = os.path.join(CERT_DIR, "kuai_pay_signature.pem")
     KUAI_MER_ID = "812310060110013"
     KUAI_MER_PASS = "vpos123"
     KUAI_TERM_ID = "00004559"
@@ -703,7 +703,7 @@ elif ENV == ENV_PREPRODUCTION:
     #KUAI_DYNNUM_URL = "https://mas.99bill.com:443/cnp/getDynNum"
 
     KUAI_PEM_PATH = os.path.join(CERT_DIR, "81231006011001390.pem")
-    KUAI_SIGNATURE_PEM_PATH = os.path.join(CERT_DIR, "81231006011001390_signature.pem")
+    KUAI_SIGNATURE_PEM_PATH = os.path.join(CERT_DIR, "kuai_pay_signature.pem")
     KUAI_MER_ID = "812310060110013"
     KUAI_MER_PASS = "vpos123"
     KUAI_TERM_ID = "00004559"
@@ -748,7 +748,7 @@ else:
     #KUAI_DYNNUM_URL = "https://sandbox.99bill.com:9445/cnp/getDynNum"
 
     KUAI_PEM_PATH = os.path.join(CERT_DIR, "10411004511201290.pem")
-    KUAI_SIGNATURE_PEM_PATH = os.path.join(CERT_DIR, "10411004511201290_signature.pem")
+    KUAI_SIGNATURE_PEM_PATH = os.path.join(CERT_DIR, "kuai_pay_signature.pem")
     KUAI_MER_ID = "104110045112012"
     KUAI_MER_PASS = "vpos123"
     KUAI_TERM_ID = "00002012"
