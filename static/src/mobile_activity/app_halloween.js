@@ -36,12 +36,14 @@ $(function() {
     /*数字变换*/
 
     function step1(){
-        $('.boy').removeClass('boy_animate1');
+        $('.boy_go').removeClass('boy_animate1');
+
         var i = 6;
         var timer1 = setInterval(function() {
             i--;
             if (i === 5){
                 $('#wrap').css('opacity','1');
+                $('.title').addClass('title_in');
             }
             if (i === 3){
                 $('#play').show();
@@ -49,7 +51,6 @@ $(function() {
                 $(document).one('touchstart', function () {
                     mp3.play();
                 });
-                $('.title').addClass('title_in');
             }
             if (i === 0) {
                 clearInterval(timer1);
@@ -62,7 +63,6 @@ $(function() {
     }  
 
     function step2(){
-        $('.title').addClass('title_animate');
         $('.money_50').show().addClass('money_50_animate');
         $('.gold_num_wrap').show().addClass('gold_num_wrap_animate');
         var i = 8;
@@ -70,7 +70,6 @@ $(function() {
             i--;
             if (i === 0) {
                 clearInterval(timer1);
-                $('.bat1,.title,.money_50').hide();
                 gold_scroll(money);
                 $('.gold_num_wrap .main').addClass('gold_num_main_animate');
                 step3();
@@ -85,9 +84,8 @@ $(function() {
             i--;
             if (i === 0) {
                 clearInterval(timer1);
-                //$('.boy_stay').show();
-                $('.boy').addClass('boy_animate1');
-                //$('.boy_go_one').show().addClass('boy_go_one_hide');
+                //$('.boy_go').show().addClass('boy_animate1');
+                $('.boy_go_one').show();
                 $('.choice_step1').show().addClass('choice_step_show');
                 $('.bg_after').addClass('bg_after_animate1');
                 $('.bg_front_wrap').addClass('bg_front_wrap_animate1');
@@ -106,7 +104,9 @@ $(function() {
             $('.choice_step1').addClass('choice_step_hide');
             $('.gold_text').attr('data-num','70');
             $('.gold').addClass('gold_hide');
-            $('.boy').removeClass('boy_animate1');
+            $('.boy_go_one').hide();
+            $('.boy_stay').show();
+            $('.boy_go').removeClass('boy_animate1');
             $('.gold_num_wrap .main').removeClass('gold_num_main_animate');
             money = 50;
             var i = 3;
@@ -132,7 +132,9 @@ $(function() {
             $('.choice_step1').addClass('choice_step_hide');
             $('.gold').addClass('gold_hide2');
             $('.car').addClass('car_animate');
-            $('.boy').removeClass('boy_animate1');
+            $('.boy_go_one').hide();
+            $('.boy_stay').show();
+            $('.boy_go').removeClass('boy_animate1');
             var i = 6;
             var timer1 = setInterval(function () {
                     i--;
@@ -147,8 +149,9 @@ $(function() {
     });
 
     function setp4(){
-        $('.boy_stay').hide(); 
-        $('.boy').addClass('boy_animate2');
+        $('.boy_stay').hide();
+        $('.boy_go_one').hide();
+        $('.boy_go').show().addClass('boy_animate2');
         $('.cloud').addClass('cloud_animate2');
         $('.bg_after').addClass('bg_after_animate2');
         $('.bg_front_wrap').addClass('bg_front_wrap_animate2');
@@ -163,7 +166,7 @@ $(function() {
                 $('.gold,.car,.choice_step1').hide();
                 $('.boy_stay').show();     
                 $('.ghost').show().addClass('ghost_animate');
-                $('.boy').removeClass('boy_animate2');
+                $('.boy_go').hide().removeClass('boy_animate2');
                 choice_step2 = true;
             }
         },
@@ -173,10 +176,10 @@ $(function() {
     $('.choice_step2 .choice1').click(function(){
         if(choice_step2) {
             choice_step2 = false;
-            $('.boy_stay').css('opacity', '0');
+            $('.boy_stay').hide();
+            $('.boy_go').show().addClass('boy_animate4');
             $('.boy_run').show();
             $('.choice_step2').addClass('choice_step_hide');
-            $('.boy').addClass('boy_animate4');
             $('.cloud').addClass('cloud_animate4');
             $('.bg_after').addClass('bg_after_animate3');
             $('.bg_front_wrap').addClass('bg_front_wrap_animate3');
@@ -215,7 +218,7 @@ $(function() {
                     if (i === 3) {
                         $('.choice_step2').hide();
                         $('.boy_stay').hide();
-                        $('.boy').addClass('boy_animate3');
+                        $('.boy_go').show().addClass('boy_animate3');
                         $('.cloud').addClass('cloud_animate3');
                         $('.bg_after').addClass('bg_after_animate4');
                         $('.bg_front_wrap').addClass('bg_front_wrap_animate4');
@@ -243,6 +246,7 @@ $(function() {
             if (i === 0){
                 clearInterval(timer1);
                 $('.boy_stay').show().css('opacity','1');
+                $('.boy_go').hide();
                 $('.girl_wrap').show().addClass('girl_come_animate');
                 $('.girl_come').show();
                 choice_step3 = true;
@@ -303,12 +307,12 @@ $(function() {
 
     function step6(){
         if(money<50){
-            $('.poor_wrap').css({'z-index':'9997','opacity':'1'});
+            $('.poor_wrap').show();
             $('.poor_wrap .button').show().addClass('href_button');
             $('.poor_boy').show();
             $('.poor_text').addClass('text_animate');
         }else{
-            $('.rich_wrap').css({'z-index':'9997','opacity':'1'});
+            $('.rich_wrap').show();
             $('.rich_wrap .button').show().addClass('href_button');
         }   $('.rich_text').addClass('text_animate');
     }
