@@ -101,6 +101,11 @@ class AppActivate(models.Model):
 
     DEVICE_TYPE = ('app_iso', 'app_android', 'act_iso', 'act_android')
     DEVICES = ((x, x) for x in DEVICE_TYPE)
+    LINK_CHOICES = (
+        (u'1', u'理财专区'),
+        (u'2', u'发现页'),
+        (u'3', u'全民淘金'),
+    )
 
     name = models.CharField(u'名称', max_length=30, help_text=u'名称')
     device = models.CharField(u'设备', max_length=15, choices=DEVICES, help_text=u'活动图片应用的设备，启动页选择类型app_*，弹出页选择类型act_*')
@@ -113,5 +118,6 @@ class AppActivate(models.Model):
     start_at = models.DateTimeField(u"banner生效时间", null=True, blank=True)
     end_at = models.DateTimeField(u"banner失效时间", null=True, blank=True)
     is_used = models.BooleanField(u'是否启用', default=False, help_text=u'默认不启用')
-
+    jump_state = models.BooleanField(u'是否开启跳转', default=False, help_text=u'默认不开启跳转')
+    link_dest = models.CharField(u'跳转链接', default=u'3', max_length=32, choices=LINK_CHOICES)
 

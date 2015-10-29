@@ -6,10 +6,7 @@ include include/head
 - endwith
 body
   if message
-    include include/header
-    - with '首页' as activeItem
-    include include/navigation
-    - endwith
+    include global/g_nav
 
     .callback-container
       .callback-content
@@ -19,9 +16,7 @@ body
             h1 抱歉，充值失败。
             p {{message}}
 
-    - with 1 as no_margin
-    include include/footer
-    - endwith
+    include global/g_footer
     include include/tracking
 
   if form
