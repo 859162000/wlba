@@ -918,8 +918,6 @@ body {
 	z-index: 3;
 	left: 1.75%;
 	bottom: 14%;
-	background: url("/static/imgs/mobile_activity/app_halloween/renzou.png") no-repeat 0 0;
-	background-size: auto 100%;
 	-webkit-transform: scale(0.5) translateY(115px);
 	transform: scale(0.5) translateY(140px);
 }
@@ -935,9 +933,20 @@ body {
 	position: relative;
 	width:100%;
 }
+.boy_go{
+    background: url("/static/imgs/mobile_activity/app_halloween/renzou.png") no-repeat 0 0;
+	background-size: auto 100%;
+    width: 145px;
+	height: 240px;
+    display: none;
+}
 .boy .boy_stay {
 	display: block;
-	width: 100%
+	width: 100%;
+    position: absolute;
+    left:0;
+    top:0;
+    z-index: 4;
 }
 .boy .boy_go_one {
 	display: none;
@@ -2105,9 +2114,10 @@ body {
 	height:100%;
 	overflow: hidden;
 	box-shadow: 0 0 #000 inset;
-	z-index: 99;
+	z-index: 9997;
 	left:0;
 	top:0;
+    display: none;
 }
 .poor_wrap{
 	/*display: none;*/
