@@ -272,6 +272,7 @@ class WeixinBindRegister(TemplateView):
     template_name = 'weixin_regist_bind.jade'
 
     def get_context_data(self, **kwargs):
+        openid = self.request.GET.get('openid')
         token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
         token_session = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
         if token:
@@ -291,9 +292,9 @@ class WeixinBindRegister(TemplateView):
             'token': token,
             'channel': channel,
             'phone': phone,
-            'next' : next
+            'next' : next,
+            'openid':openid,
         }
-
 
 
 class WeixinJsapiConfig(APIView):

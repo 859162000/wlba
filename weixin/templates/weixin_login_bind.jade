@@ -38,9 +38,9 @@ html(style="background: #f5f5f5")
           button(type="submit", disabled=true) 登录网利宝
     section.login-for-regist
       if next == ''
-        a(href="/weixin/regist/") 免费注册
+        a(href="/weixin/bind/register/?openid={{context.openid}}") 免费注册
       else
-        a(href="/weixin/regist/?next={{next}}") 免费注册
+        a(href="/weixin/bind/register/?openid={{context.openid}}&next={{next}}") 免费注册
     section.bank-safe
       span 账户资金安全由阳光保险承保
     include include/tracking

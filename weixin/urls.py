@@ -27,7 +27,8 @@ urlpatterns = patterns(
     url(r'^more/$', TemplateView.as_view(template_name="weixin_more.jade")),
     url(r'^more/contactus/$', TemplateView.as_view(template_name="weixin_contactus.jade")),
     url(r'^more/aboutus/$', TemplateView.as_view(template_name="weixin_aboutus.jade")),
-
+    url(r'bind/login/$', views.WeixinBindLogin.as_view(), name='weixin_bind_login'),
+    url(r'bind/register/$', views.WeixinBindRegister.as_view(), name='weixin_bind_register'),
 
     # js api
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
@@ -40,7 +41,7 @@ urlpatterns = patterns(
     url(r'api/account/wx_getinfo/$', views.GetUserInfo.as_view(), name='weixin_get_account_user_info'),
     url(r'api/generate/qr_limit_scene_ticket/$', views.GenerateQRLimitSceneTicket.as_view(), name='generate_qr_limit_scene_ticket'),
     url(r'api/generate/qr_scene_ticket/$', views.GenerateQRSceneTicket.as_view(), name='generate_qr_scene_ticket'),
-    url(r'api/bind/login/$', views.WeixinBindLogin.as_view(), name='weixin_bind_login'),
+
 )
 
 # 微信管理后台
