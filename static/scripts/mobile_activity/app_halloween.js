@@ -256,12 +256,13 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
     function step1(){
         $('.boy_go').removeClass('boy_animate1');
-        $('.title').addClass('title_in');
+
         var i = 6;
         var timer1 = setInterval(function() {
             i--;
             if (i === 5){
                 $('#wrap').css('opacity','1');
+                $('.title').addClass('title_in');
             }
             if (i === 3){
                 $('#play').show();
@@ -281,7 +282,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }  
 
     function step2(){
-        $('.title').addClass('title_animate');
         $('.money_50').show().addClass('money_50_animate');
         $('.gold_num_wrap').show().addClass('gold_num_wrap_animate');
         var i = 8;
@@ -289,7 +289,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             i--;
             if (i === 0) {
                 clearInterval(timer1);
-                $('.bat1,.title,.money_50').hide();
                 gold_scroll(money);
                 $('.gold_num_wrap .main').addClass('gold_num_main_animate');
                 step3();
