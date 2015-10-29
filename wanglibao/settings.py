@@ -382,6 +382,12 @@ LOGGING = {
             'filename': '/var/log/wanglibao/wanglibao_reward.log',
             'formatter': 'verbose'
         },
+        'wanglibao_rest':{  #add by yihen@20151028
+                              'level': 'DEBUG',
+                              'class': 'logging.FileHandler',
+                              'filename': '/var/log/wanglibao/wanglibao_rest.log',
+                              'formatter': 'verbose'
+                              },
     },
     'loggers': {
         'django': {
@@ -445,6 +451,10 @@ LOGGING = {
             'handlers': ['wanglibao_reward', 'console'],
             'level': 'DEBUG'
         },
+        'wanglibao_rest': { #add by yihen@20151028
+              'handlers': ['wanglibao_rest', 'console'],
+              'level': 'DEBUG'
+          },
     }
 }
 
