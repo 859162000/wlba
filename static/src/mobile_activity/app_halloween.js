@@ -37,6 +37,7 @@ $(function() {
 
     function step1(){
         $('.boy_go').removeClass('boy_animate1');
+        $('.title').addClass('title_in');
         var i = 6;
         var timer1 = setInterval(function() {
             i--;
@@ -49,7 +50,6 @@ $(function() {
                 $(document).one('touchstart', function () {
                     mp3.play();
                 });
-                $('.title').addClass('title_in');
             }
             if (i === 0) {
                 clearInterval(timer1);
