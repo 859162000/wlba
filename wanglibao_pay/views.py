@@ -61,7 +61,7 @@ class BankListView(TemplateView):
 
         context.update({
             'default_bank': default_bank,
-            'banks': Bank.get_deposit_banks()[:12],
+            'banks': Bank.get_deposit_banks()[:10],
             'announcements': AnnouncementAccounts
         })
         return context
