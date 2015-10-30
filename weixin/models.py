@@ -328,8 +328,15 @@ class WeixinUser(models.Model):
     auth_info = models.ForeignKey(AuthorizeInfo, null=True)
 
 
-# class SubscribeServiceInfo(models.Model):
-    
+class SubscribeServices(models.Model):
+    key = models.CharField(u'服务快捷键', max_length=128, db_index=True)
+    term = models.IntegerField(u'标的期数', default=0)
+    describe = models.CharField(u'服务描述', max_length=256)
+    # type =
+    # is_open =
+
+# class Subscribe
+
 
 
 
