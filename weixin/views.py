@@ -234,7 +234,7 @@ def bindUser(w_user, user):
 
 
 class WeixinBindLogin(TemplateView):
-    template_name = 'weixin_login_bind.jade'
+    template_name = 'sub_login.jade'
 
     def get_context_data(self, **kwargs):
         context = super(WeixinBindLogin, self).get_context_data(**kwargs)
@@ -294,7 +294,7 @@ class WeixinLoginBindAPI(APIView):
         return Response(form.errors, status=400)
 
 class WeixinBindRegister(TemplateView):
-    template_name = 'weixin_regist_bind.jade'
+    template_name = 'sub_regist.jade'
 
     def get_context_data(self, **kwargs):
         openid = self.request.GET.get('openid')
