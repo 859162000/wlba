@@ -328,7 +328,7 @@ class WeixinUser(models.Model):
     auth_info = models.ForeignKey(AuthorizeInfo, null=True)
 
 
-class SubscribeServiceInfo(models.Model):
+# class SubscribeServiceInfo(models.Model):
     
 
 

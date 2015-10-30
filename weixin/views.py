@@ -85,8 +85,21 @@ class WeixinJoinView(View):
             return HttpResponseForbidden()
         account = Account.objects.get(pk=account_key)#WeixinAccounts.get(account_key)
         msg = parse_message(request.body)
+        print '-----------------------------%s'%msg.event
+        print '-----------------------------%s'%msg._data
+        reply = None
         if isinstance(msg, BaseEvent):
-            if isinstance(msg, SubscribeEvent):
+            if isinstance(msg, ClickEvent):
+                if msg.key == 'test_hmm':
+                    txt = u'客官，请回复相关数字订阅最新项目通知，系统会在第一时间发送给您相关信息。\n'+'【1】1月标上线通知\n'\
+                    +'【2】2月标上线通知\n'\
+                    +'【3】3月标上线通知\n'\
+                    +'【4】6月标上线通知\n'\
+                    +'如需退订请回复TD'
+
+                    reply = create_reply(txt, msg)
+                pass
+            elif isinstance(msg, SubscribeEvent):
                 reply = self.process_subscribe(msg, account.id)
             elif isinstance(msg, UnsubscribeEvent):
                 print msg.event
@@ -132,7 +145,7 @@ class WeixinJoinView(View):
         eventKey = msg._data['EventKey']
         account = Account.objects.get(pk=accountid)
         w_user = getOrCreateWeixinUser(fromUserName, account)
-
+        reply = None
         if w_user.subscribe != 1:
             w_user.subscribe = 1
             w_user.save()
