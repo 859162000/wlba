@@ -9,12 +9,12 @@ html
         span 返回
     nav.tab-nav
       ul
-        li.active
-          a(href="/weixin/transaction/repaying/") 未使用
         li
+          a(href="/weixin/transaction/repaying/") 未使用
+        li.active
           a(href="/weixin/transaction/buying/") 已使用
         li
           a(href="/weixin/transaction/finished/") 已过期
-    section#reward-unused.reward-main
+    section#reward-used.reward-main
       include include/ajax/ajax_transaction
     include include/tracking
