@@ -145,6 +145,9 @@ def list_bank_new(request):
             obj.update(util.handle_kuai_bank_limit(bank.huifu_bind_limit))
         elif bank.channel == 'yeepay' and bank.yee_bind_limit:
             obj.update(util.handle_kuai_bank_limit(bank.yee_bind_limit))
+        else:
+            # 只返回已经有渠道的银行
+            continue
 
         rs.append(obj)
 
