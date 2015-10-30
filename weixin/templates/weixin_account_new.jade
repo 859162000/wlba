@@ -1,0 +1,21 @@
+-load formatters
+doctype html
+html
+  head
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 我的账户
+    .account-assets
+      .account-assets-list
+        p.assets-one-monery 总资产(元)
+        p.assets-one-yuan ￥{{total_asset|money_format}}
+      .account-assets-list
+        p.assets-one-earnings(style="width:100%;")
+          strong 累计收益：
+            span ￥{{p2p_total_paid_interest|money_format}}
+          strong(style="position: absolute;right:0.705rem;") 待收收益：
+            span ￥{{p2p_total_unpaid_interest|money_format}}
+
+  include include/weixin_footer
+  script( src="/static/scripts/mobile/dist/mobile.js")

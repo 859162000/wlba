@@ -6,10 +6,10 @@ html
     include include/weixin_head.jade
   body
     .logo
-      img(src='/static/imgs/mobile/list/logo.jpg')
+      img(src='/static/imgs/mobile/list/logo.png')
       if user.is_authenticated
         .head-right
-          a(href="/accounts/logout?next=/weixin/list/") 退出登录
+          a(href="/weixin/account/") 我的账户
       else
         .head-right
           a(href="/weixin/regist/") 免费注册
