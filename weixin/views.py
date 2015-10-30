@@ -82,8 +82,8 @@ class WeixinJoinView(View):
         return HttpResponse(request.GET.get('echostr'))
 
     def post(self, request, account_key):
-        if not self.check_signature(request, account_key):
-            return HttpResponseForbidden()
+        # if not self.check_signature(request, account_key):
+        #     return HttpResponseForbidden()
         account = Account.objects.get(pk=account_key)#WeixinAccounts.get(account_key)
         msg = parse_message(request.body)
         print '-----------------------------%s'%msg._data
