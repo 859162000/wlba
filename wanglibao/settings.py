@@ -112,6 +112,7 @@ INSTALLED_APPS = (
     'wanglibao_activity',
     'wanglibao_mobile',
     'weixin',
+    'wechatpy',
     'wanglibao_app',
     'wanglibao_anti', #add by yihen@20150813, anti module added
     'wanglibao_reward', #add by yihen@20150910
@@ -213,7 +214,6 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
 )
-import django.contrib.auth.backends
 
 # Template loader
 TEMPLATE_LOADERS = (
@@ -1078,7 +1078,7 @@ THREE_DEFAULT_CHANNEL_CODE = 'wanglibao-three'
 if ENV == ENV_PRODUCTION:
     WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
 else:
-    WEIXIN_CALLBACK_URL = 'https://staging.wanglibao.com'
+    WEIXIN_CALLBACK_URL = 'http://a03a1aad.ngrok.io'#'https://staging.wanglibao.com'
 
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)

@@ -13,7 +13,7 @@ html(style="background: #f5f5f5")
       .login-logo-icon
           img(src="/static/imgs/mobile/logo.png", alt="")
     section.form-box
-      from(action="{% url 'weixin_login_api' %}")#login-form.login-farom
+      from(action="{% url 'weixin_login_bind_api' %}")#login-form.login-farom
         - csrf_token
         input(name="openid", type="hidden", value="{{ context.openid }}")
         input(name="captcha_0", type="hidden", value="")
@@ -38,9 +38,9 @@ html(style="background: #f5f5f5")
           button(type="submit", disabled=true) 登录网利宝
     section.login-for-regist
       if next == ''
-        a(href="/weixin/regist/") 免费注册
+        a(href="/weixin/bind/register/?openid={{context.openid}}") 免费注册
       else
-        a(href="/weixin/regist/?next={{next}}") 免费注册
+        a(href="/weixin/bind/register/?openid={{context.openid}}&next={{next}}") 免费注册
     section.bank-safe
       span 账户资金安全由阳光保险承保
     include include/tracking

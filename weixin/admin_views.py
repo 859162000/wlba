@@ -1,5 +1,6 @@
 # encoding:utf-8
 from __future__ import unicode_literals
+
 from django.views.generic import View, TemplateView
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.decorators import method_decorator
@@ -9,9 +10,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from rest_framework.authentication import SessionAuthentication
+
 from .models import Account, Material, MaterialImage, MaterialNews
 from wechatpy.client import WeChatClient
-from weixin.wechatpy.exceptions import WeChatException
+from wechatpy.exceptions import WeChatException
 from weixin.common.decorators import weixin_api_error
 
 
