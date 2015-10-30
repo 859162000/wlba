@@ -100,7 +100,7 @@ org.mmIndex = (function(org){
                 _self.$submit.attr('disabled',true).html('领取中，请稍后...');
                 if(_self.$phone.attr('data-existing') === 'true'){
                     ops = {
-                        url: '/api/distribute/redpack/' + _self.$phone.val()+'/?promo_token=maimaitest',
+                        url: '/api/distribute/redpack/' + _self.$phone.val()+'/?promo_token=maimai1',
                         type: 'POST',
                         success: function(data){
                             if(data.ret_code == 0){
