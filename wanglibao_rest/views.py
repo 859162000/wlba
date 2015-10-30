@@ -318,8 +318,8 @@ class RegisterAPIView(APIView):
             })
 
             logger.debug("此次 channel:%s" %(channel))
-            if channel == 'maimaitest':
-                activity = Activity.objects.filter(code='maimaitest').first()
+            if channel == 'maimai1':
+                activity = Activity.objects.filter(code='maimai1').first()
                 logger.debug("脉脉渠道的使用Activity是：%s" % (activity,))
                 try:
                     redpack = WanglibaoUserGift.objects.create(
@@ -358,8 +358,8 @@ class RegisterAPIView(APIView):
                         redpack.valid = 1
                         redpack.save()
 
-        if channel in ('weixin_attention', 'maimaitest'):
-            return Response({"ret_code": 0, 'amount': redpack_event.amount, "message": u"注册成功"})
+        if channel in ('weixin_attention', 'maimai1'):
+            return Response({"ret_code": 0, 'amount': 120, "message": u"注册成功"})
         else:
             return Response({"ret_code": 0, "message": u"注册成功"})
 
@@ -1213,9 +1213,9 @@ class DistributeRedpackView(APIView):
         user = WanglibaoUserProfile.objects.filter(phone=phone).first()
         channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
 
-        if channel == 'maimaitest':
+        if channel == 'maimai1':
             phone_number = phone.strip()
-            redpack = WanglibaoUserGift.objects.filter(identity=phone, activity__code='maimaitest').first()
+            redpack = WanglibaoUserGift.objects.filter(identity=phone, activity__code='maimai1').first()
             if redpack:
                 data = {
                     'ret_code': 0,
@@ -1226,7 +1226,7 @@ class DistributeRedpackView(APIView):
                 return HttpResponse(json.dumps(data), content_type='application/json')
 
             else:
-                activity = Activity.objects.filter(code='maimaitest').first()
+                activity = Activity.objects.filter(code='maimai1').first()
                 redpack = WanglibaoUserGift.objects.create(
                     identity=phone_number,
                     activity=activity,
@@ -1245,13 +1245,14 @@ class DistributeRedpackView(APIView):
 
                     try:
                         logger.debug("用户：%s 使用的加息券id:%s" %(phone_number, redpack_id))
-                        redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
+                        redpack_event = RedPackEvent.objects.filter(id=747).first()
                     except Exception, reason:
                         logger.debug("从RedPackEvent中获得配置红包报错, reason:%s" % (reason, ))
 
                     try:
                         logger.debug("给用户 %s 发送加息券:%s" %(user, redpack_event))
-                        redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+                        msg = redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+                        logger.debug("给用户 %s 发送加息券:%s, 返回状态值,:%s" %(user, redpack_event, msg))
                     except Exception, reason:
                         logger.debug("给用户发红包抛异常, reason:%s" % (reason, ))
                     else:
