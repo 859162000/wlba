@@ -359,7 +359,7 @@ class RegisterAPIView(APIView):
                         redpack.save()
 
         if channel in ('weixin_attention', 'maimaitest'):
-            return Response({"ret_code": 0, 'amount': redpack_event.amount, "message": u"注册成功"})
+            return Response({"ret_code": 0, 'amount': 120, "message": u"注册成功"})
         else:
             return Response({"ret_code": 0, "message": u"注册成功"})
 
@@ -1245,7 +1245,7 @@ class DistributeRedpackView(APIView):
 
                     try:
                         logger.debug("用户：%s 使用的加息券id:%s" %(phone_number, redpack_id))
-                        redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
+                        redpack_event = RedPackEvent.objects.filter(id=747).first()
                     except Exception, reason:
                         logger.debug("从RedPackEvent中获得配置红包报错, reason:%s" % (reason, ))
 
