@@ -20,6 +20,7 @@ from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from django.contrib.auth.models import User
+from misc.models import Misc
 
 
 
@@ -85,29 +86,18 @@ class WeixinJoinView(View):
             return HttpResponseForbidden()
         account = Account.objects.get(pk=account_key)#WeixinAccounts.get(account_key)
         msg = parse_message(request.body)
-        print '-----------------------------%s'%msg.event
         print '-----------------------------%s'%msg._data
         reply = None
+        toUserName = msg._data['ToUserName']
+        fromUserName = msg._data['FromUserName']
+        createTime = msg._data['CreateTime']
         if isinstance(msg, BaseEvent):
+            eventKey = msg._data['EventKey']
             if isinstance(msg, ClickEvent):
-                if msg.key == 'test_hmm':
-                    txt = u'客官，请回复相关数字订阅最新项目通知，系统会在第一时间发送给您相关信息。\n'+'【1】1月标上线通知\n'\
-                    +'【2】2月标上线通知\n'\
-                    +'【3】3月标上线通知\n'\
-                    +'【4】6月标上线通知\n'\
-                    +'如需退订请回复TD'
-
-                    reply = create_reply(txt, msg)
-                pass
+                reply = self.process_click_event(msg)
             elif isinstance(msg, SubscribeEvent):
                 reply = self.process_subscribe(msg, account.id)
             elif isinstance(msg, UnsubscribeEvent):
-                print msg.event
-                print msg._data
-                toUserName = msg._data['ToUserName']
-                fromUserName = msg._data['FromUserName']
-                createTime = msg._data['CreateTime']
-                eventKey = msg._data['EventKey']
                 w_user = WeixinUser.objects.filter(openid=fromUserName).first()
                 w_user.subscribe = 0
                 w_user.save()
@@ -115,14 +105,12 @@ class WeixinJoinView(View):
             elif isinstance(msg, SubscribeScanEvent):
                 reply = self.process_subscribe(msg, account_key)
             elif isinstance(msg, ScanEvent):
-                eventKey = msg._data['EventKey']
-                fromUserName = msg._data['FromUserName']
-                w_user = self.getOrCreateWeixinUser(fromUserName, account)
+                w_user = getOrCreateWeixinUser(fromUserName, account)
                 #如果eventkey为用户id则进行绑定
                 if eventKey and eventKey.isdigit():
                     user = User.objects.filter(pk=eventKey).first()
                     if user:
-                        rc, txt = self.bindUser(w_user, user)
+                        rc, txt = bindUser(w_user, user)
                         reply = create_reply(txt, msg)
         elif isinstance(msg, BaseMessage):
             if isinstance(msg, TextMessage):
@@ -136,9 +124,27 @@ class WeixinJoinView(View):
             reply = create_reply(u'...', msg)
         return HttpResponse(reply.render())
 
+    def process_click_event(self, msg):
+        reply = None
+        key = "subscribe_service_info"
+        misc = Misc.objects.filter(key=key).first()
+        service_info = {}
+        print misc.value
+        service_info = json.loads(misc.value)
+        print service_info.get(msg.key)
+        if msg.key == 'test_hmm':
+            txt = u'客官，请回复相关数字订阅最新项目通知，系统会在第一时间发送给您相关信息。\n'\
+            +'【1】1月标上线通知\n'\
+            +'【2】2月标上线通知\n'\
+            +'【3】3月标上线通知\n'\
+            +'【4】6月标上线通知\n'\
+            +'如需退订请回复TD'
+            reply = create_reply(txt, msg)
+        return reply
+
+
     def process_subscribe(self, msg, accountid):
         event = msg.event
-        print '-----------------------', event
         toUserName = msg._data['ToUserName']
         fromUserName = msg._data['FromUserName']
         createTime = msg._data['CreateTime']
