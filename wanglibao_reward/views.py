@@ -349,7 +349,8 @@ class WeixinShareDetailView(TemplateView):
                 redpack=redpack,
                 name=redpack.rtype,
                 total_count=redpack.value,  #这个地方很关键,优惠券个数
-                valid=True
+                valid=True,
+                cfg_id=1
                 )
                 activity_gift.type = redpack_type[redpack.rtype]
                 activity_gift.save()
