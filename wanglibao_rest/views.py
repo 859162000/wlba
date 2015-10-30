@@ -327,23 +327,10 @@ class RegisterAPIView(APIView):
                         activity=activity,
                         rules=WanglibaoActivityGift.objects.first(),#随机初始化一个值
                         type=1,
-                        valid=0
+                        valid=1
                     )
                 except Exception, reason:
                     logger.debug("创建用户的领奖记录抛异常，reason：%s" % (reason,))
-                dt = timezone.datetime.now()
-                try:
-                    redpack_event = RedPackEvent.objects.filter(invalid=False, name='maimai_redpack', give_start_at__lte=dt, give_end_at__gte=dt).first()
-                except Exception, reason:
-                    logger.debug("查询脉脉直投红包(name:maimai_redpack)的时候，抛异常，reason:%s" % (reason,))
-                if redpack_event:
-                    logger.debug("给用户：%s 发送红包:%s " %(user, redpack_event,))
-                    try:
-                        redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
-                    except Exception, reason:
-                        logger.debug("给用户：%s 发送红包抛出异常来, %s" % (user, reason,))
-                    redpack.valid = 1
-                    redpack.save()
 
             if channel == 'h5chuanbo':
                 key = 'share_redpack'
@@ -372,7 +359,7 @@ class RegisterAPIView(APIView):
                         redpack.save()
 
         if channel in ('weixin_attention', 'maimaitest'):
-            return Response({"ret_code": 0, 'amount': redpack_event.amount, "message": u"注册成功"})
+            return Response({"ret_code": 0, 'amount': 120, "message": u"注册成功"})
         else:
             return Response({"ret_code": 0, "message": u"注册成功"})
 
@@ -1258,7 +1245,7 @@ class DistributeRedpackView(APIView):
 
                     try:
                         logger.debug("用户：%s 使用的加息券id:%s" %(phone_number, redpack_id))
-                        redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
+                        redpack_event = RedPackEvent.objects.filter(id=747).first()
                     except Exception, reason:
                         logger.debug("从RedPackEvent中获得配置红包报错, reason:%s" % (reason, ))
 

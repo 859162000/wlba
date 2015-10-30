@@ -66,7 +66,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
         if records_count == 0:
             # 红包
             records = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
-                .exclude(redpack__event__rtype='interest_coupon')
+                .exclude(redpack__event__rtype='interest_coupon').order_by('-redpack__event__amount')
             for x in records:
                 if x.order_id:
                     continue
@@ -115,7 +115,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
             records_count_p2p = RedPackRecord.objects.filter(user=user, product_id=product_id).count()
             if records_count_p2p == 0:
                 coupons = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
-                    .filter(redpack__event__rtype='interest_coupon')
+                    .filter(redpack__event__rtype='interest_coupon').order_by('-redpack__event__amount')
                 for coupon in coupons:
                     if coupon.order_id:
                         continue
@@ -157,7 +157,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                                 obj['amount'] = obj['amount']/100.0
                             packages['available'].append(obj)
 
-        packages['available'].sort(key=lambda x: x['unavailable_at'])
+        # packages['available'].sort(key=lambda x: x['unavailable_at'])
         packages['available'].sort(key=lambda x: x['order_by'])
     else:
         packages = {"used": [], "unused": [], "expires": [], "invalid": []}
@@ -659,8 +659,8 @@ def get_start_end_time(auto, auto_days, created_at, available_at, unavailable_at
         start_time = created_at
         end_time = created_at + timezone.timedelta(days=int(auto_days))
         # 如果加上延期天数后还小于截止时间,则还以截止时间为准
-        if end_time < unavailable_at:
-            end_time = unavailable_at
+        # if end_time < unavailable_at:
+        #     end_time = unavailable_at
     else:
         start_time = available_at
         end_time = unavailable_at
