@@ -127,11 +127,14 @@ class WeixinJoinView(View):
     def process_click_event(self, msg):
         reply = None
         key = "subscribe_service_info"
-        misc = Misc.objects.filter(key=key).first()
+        ms = Misc.objects.filter(key=key).first()
+        info = {"1":{"desc":"【1】1月标上线通知", }, "2":{"desc":"【2】2月标上线通知", }, "3":{"desc":"【3】3月标上线通知",}, "4":{"desc":"【4】6月标上线通知"}}
+        if ms and not ms.value:
+            ms.value = json.dumps(info)
         service_info = {}
-        print misc.value
-        service_info = json.loads(misc.value)
-        print service_info.get(msg.key)
+        print json.loads(ms.value)
+        # service_info = json.loads(misc.value)
+        print service_info.get(ms.key)
         if msg.key == 'test_hmm':
             txt = u'客官，请回复相关数字订阅最新项目通知，系统会在第一时间发送给您相关信息。\n'\
             +'【1】1月标上线通知\n'\
@@ -257,6 +260,9 @@ class WeixinBindLogin(TemplateView):
         account = Account.objects.filter(id=account_id).first()
         if not account:
             return Response({'errcode':-2, 'errmsg':"-2"})
+        w_user = getOrCreateWeixinUser(openid, account)
+        if w_user.user:
+            return Response({"errcode":1, 'errmsg':u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone})
         return super(WeixinBindLogin, self).dispatch(request, *args, **kwargs)
 
 
