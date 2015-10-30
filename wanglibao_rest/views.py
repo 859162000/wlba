@@ -327,23 +327,10 @@ class RegisterAPIView(APIView):
                         activity=activity,
                         rules=WanglibaoActivityGift.objects.first(),#随机初始化一个值
                         type=1,
-                        valid=0
+                        valid=1
                     )
                 except Exception, reason:
                     logger.debug("创建用户的领奖记录抛异常，reason：%s" % (reason,))
-                dt = timezone.datetime.now()
-                try:
-                    redpack_event = RedPackEvent.objects.filter(invalid=False, name='maimai_redpack', give_start_at__lte=dt, give_end_at__gte=dt).first()
-                except Exception, reason:
-                    logger.debug("查询脉脉直投红包(name:maimai_redpack)的时候，抛异常，reason:%s" % (reason,))
-                if redpack_event:
-                    logger.debug("给用户：%s 发送红包:%s " %(user, redpack_event,))
-                    try:
-                        redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
-                    except Exception, reason:
-                        logger.debug("给用户：%s 发送红包抛出异常来, %s" % (user, reason,))
-                    redpack.valid = 1
-                    redpack.save()
 
             if channel == 'h5chuanbo':
                 key = 'share_redpack'
