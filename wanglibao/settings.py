@@ -612,10 +612,10 @@ CELERYBEAT_SCHEDULE = {
     },
 
     # by Zhoudong 定期检查没有投资的新用户, 提醒投资
-    'invested_status_task_check': {
-        'task': 'marketing.tools.check_invested_status',
-        'schedule': crontab(minute=0, hour=10),
-    },
+    # 'invested_status_task_check': {
+    #     'task': 'marketing.tools.check_invested_status',
+    #     'schedule': crontab(minute=0, hour=10),
+    # },
     # by Zhoudong 定期检查用户优惠券没使用,发送提醒
     'redpack_status_task_check': {
         'task': 'marketing.tools.check_redpack_status',
