@@ -359,7 +359,7 @@ class RegisterAPIView(APIView):
                         redpack.save()
 
         if channel in ('weixin_attention', 'maimaitest'):
-            return Response({"ret_code": 0, 'amount': redpack_event.amount, "message": u"注册成功"})
+            return Response({"ret_code": 0, 'amount': 120, "message": u"注册成功"})
         else:
             return Response({"ret_code": 0, "message": u"注册成功"})
 
