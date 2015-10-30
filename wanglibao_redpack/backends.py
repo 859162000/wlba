@@ -158,7 +158,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                             packages['available'].append(obj)
 
         # packages['available'].sort(key=lambda x: x['unavailable_at'])
-        packages['available'].sort(key=lambda x: x['order_by'])
+        packages['available'].sort(key=lambda x: x['order_by'], reverse=True)
     else:
         packages = {"used": [], "unused": [], "expires": [], "invalid": []}
         if rtype == 'redpack':
