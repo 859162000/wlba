@@ -177,10 +177,35 @@
       .info-tit
         font-size: 0.8rem
         color: #ffce37
+  @mixin project-icon
+    display: inline-block
+    width: 3.25rem
+    height: 3.25rem
+    background-repeat: no-repeat
+    background-size: contain
   .now-project
     background: #1359aa
-    width: 90%
-    margin: 0.5rem auto 0
-    padding: 1.5rem 0.5rem 2rem
-
+    width: 100%
+    padding: 1.5rem 0 2rem
+    .project-item
+      width: 90%
+      margin: 1rem auto 0
+      padding: 0 0.5rem
+      line-height: 1rem
+      font-size: 0.7rem
+      .project-info
+        float: left
+        margin-left: 0.5rem
+        padding-top: 0.15rem
+        .p-tit
+          font-size: 0.95rem
+          color: #ffce37
+      .project-icon1
+        +project-icon
+        background-image: url("/static/imgs/mobile/financing/news-icon1.png")
+        float: left
+      .project-icon2
+        +project-icon
+        background-image: url("/static/imgs/mobile/financing/news-icon2.png")
+        float: left
 

@@ -1251,7 +1251,8 @@ class DistributeRedpackView(APIView):
 
                     try:
                         logger.debug("给用户 %s 发送加息券:%s" %(user, redpack_event))
-                        redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+                        msg = redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+                        logger.debug("给用户 %s 发送加息券:%s, 返回状态值" %(user, redpack_event))
                     except Exception, reason:
                         logger.debug("给用户发红包抛异常, reason:%s" % (reason, ))
                     else:
