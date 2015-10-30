@@ -1160,95 +1160,163 @@ class GuestCheckView(APIView):
         else:
             return Response({"ret_code": 2, "message": u"抱歉，不符合活动标准！"})
 
+import hashlib
+from random import randint
 
 from django.contrib.auth import authenticate
-from django.contrib.auth.tokens import default_token_generator
-from wanglibao_account.forms import EmailOrPhoneRegisterForm2
+
+from wanglibao_account.utils import create_user
+from wanglibao_oauth2.models import Client
 
 
-class ThirdRegisterOpenApiView(APIView):
+def generate_random_password(length=6):
+    length = int(length)
+
+    if length <= 0:
+        raise Exception(u'密码长度不能小于或等于0')
+
+    return ''.join([str(randint(0, 9)) for i in range(length)])
+
+
+class RegisterOpenApiView(APIView):
     permission_classes = ()
 
-    def post(self, request):
-        form = EmailOrPhoneRegisterForm2(request.POST)
+    def _generate_sign(self, client_id, identifier, key):
+        return hashlib.md5(client_id+identifier+key).hexdigest()
 
-        if form.is_valid():
-            response_data = {}
+    def _cleaned_sign(self, client_id, identifier, key, sign):
+        response_data = {}
+        _sign = self._generate_sign(client_id, identifier, key)
+
+        if _sign != sign:
+            response_data = {
+                'code': '40008',
+                'message': u'签名错误'
+            }
+
+        return response_data
+
+    def _cleaned_identifier(self, identifier):
+        """
+        since identifier must be a phone number
+        So checking the format here is important
+        """
+
+        response_data = {}
+        users = None
+
+        identifier_type = detect_identifier_type(identifier)
+
+        if identifier_type == 'phone':
+            users = User.objects.filter(wanglibaouserprofile__phone=identifier)
         else:
-            response_data = form.errors
+            response_data = {
+                'code': '40002',
+                'message': u'不是有效的手机号'
+            }
+
+        if users and len(users) != 0:
+            response_data = {
+                'code': '40003',
+                'message': u'该手机号已被注册'
+            }
+
+        return response_data
+
+    def _clean_validate_code(self, identifier, v_code):
+        identifier_type = detect_identifier_type(identifier)
+        response_data = {}
+
+        if identifier_type == 'phone':
+            phone = identifier
+            _status, message = validate_validation_code(phone, v_code)
+
+            if _status != 200:
+                response_data = {
+                    'code': '40000',
+                    'message': u'验证码错误'
+                }
+
+        return response_data
+
+    def cleaned_data(self, client_id, sign, identifier, v_code):
+        if not client_id:
+            response_data = {
+                'code': '40005',
+                'message': u'平台标识不能为空'
+            }
+        elif not sign:
+            response_data = {
+                'code': '40007',
+                'message': u'签名不能为空'
+            }
+        elif not identifier:
+            response_data = {
+                'code': '40001',
+                'message': u'用户名不能为空'
+            }
+        elif not v_code:
+            response_data = {
+                'code': '40009',
+                'message': u'验证码不能为空'
+            }
+        else:
+            response_data = self._cleaned_identifier(identifier)
+            if not response_data:
+                response_data = self._clean_validate_code(identifier, v_code)
+
+                if not response_data:
+                    try:
+                        client = Client.objects.get(client_id=client_id)
+                    except Client.DoesNotExist:
+                        return {
+                            'code': '40006',
+                            'message': u'无效平台标识'
+                        }
+
+                    client_id = client.client_id
+                    client_secret = client.client_secret
+                    response_data = self._cleaned_sign(client_id, identifier, client_secret, sign)
+
+        return response_data
+
+    def post(self, request):
+        data = request.POST
+        client_id = data.get('client_id', '').strip()
+        sign = data.get('signature', '').strip()
+        identifier = data.get('identifier', '').strip()
+        v_code = data.get('validate_code', '').strip()
+
+        response_data = self.cleaned_data(client_id, sign, identifier, v_code)
+        if not response_data:
+            password = generate_random_password()
+            user = create_user(identifier, password, '')
+
+            if user:
+                # 处理第三方渠道的用户信息
+                # CoopRegister(request).all_processors_for_user_register(user, invite_code)
+
+                # 防作弊处理
+                # if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
+                #     tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+                response_data = {
+                    'code': '10000',
+                    'message': u'success',
+                    'usn': identifier,
+                    'user_id': user.id
+                }
+
+                # 向用户发送随机生成的注册密码的短信消息
+                send_messages.apply_async(kwargs={
+                    "phones": [identifier, ],
+                    "messages": [password, ]
+                })
+            else:
+                response_data = {
+                    'code': '40010',
+                    'message': u'用户创建失败'
+                }
 
         return HttpResponse(renderers.JSONRenderer().render(response_data,
                                                             'application/json'))
-        # if request.method == 'POST':
-        #     params = request.POST
-        #     usn = params.get('usn')
-        #     appid = params.get('appid')
-        #     client_ip = params.get('client_ip')
-        #     signature = params.get('signature')
-        #
-        #     if 'username' in request.POST and 'password' in request.POST:
-        #         username =
-        #         user = authenticate(username = localusername, password = '')
-        #     if user:
-        #         data = {
-        #             'success': True,
-        #             'token': default_token_generator.make_token(user),
-        #             'user': user.pk,
-        #         }
-        #         return data
-        #     else:
-        #         return HttpResponse("Error token!")
-        # elif request.method == 'GET':
-        #     if 'username' in request.GET and 'password' in request.GET:
-        #         user = authenticate(username = localusername, password = '')
-        #     if user:
-        #         data = {
-        #             'success': True,
-        #             'token': default_token_generator.make_token(user),
-        #             'user': user.pk,
-        #         }
-        #         return data
-        #     else:
-        #         return HttpResponse("Error token!")
-
-
-class LoginAPIView(APIView):
-    permission_classes = ()
-
-    def post(self, request, *args, **kwargs):
-        identifier = request.DATA.get("identifier", "")
-        password = request.DATA.get("password", "")
-
-        if not identifier or not password:
-            return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
-
-        user = authenticate(identifier=identifier, password=password)
-
-        if not user:
-            return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
-        if not user.is_active:
-            return Response({"token":"false", "message":u"用户已被关闭"}, status=400)
-        if user.wanglibaouserprofile.frozen:
-            return Response({"token":"false", "message":u"用户已被冻结"}, status=400)
-
-        push_user_id = request.DATA.get("user_id", "")
-        push_channel_id = request.DATA.get("channel_id", "")
-        # 设备类型，默认为IOS
-        device_type = request.DATA.get("device_type", "ios")
-        if device_type not in ("ios", "android"):
-            return Response({'message': "device_type error"}, status=status.HTTP_200_OK)
-
-        if push_user_id and push_channel_id:
-            pu = UserPushId.objects.filter(push_user_id=push_user_id).first()
-            exist = False
-            if not pu:
-                pu = UserPushId()
-                pu.device_type = device_type
-                exist = True
-            if exist or pu.user != user or pu.push_channel_id != push_channel_id:
-                pu.user = user
-                pu.push_user_id = push_user_id
-                pu.push_channel_id = push_channel_id
-                pu.save()
-        token, created = Token.objects.get_or_create(user=user)
-        return Response({'token': token.key, "user_id":user.id}, status=status.HTTP_200_OK)

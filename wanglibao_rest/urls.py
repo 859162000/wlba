@@ -265,3 +265,12 @@ urlpatterns += patterns(
     '',
     url(r'^activity/joinInfo/$', UserActivityStatusAPIView.as_view()),
 )
+
+
+from .views import RegisterOpenApiView
+
+
+urlpatterns += patterns(
+    '',
+    url(r'^access_user/$', RegisterOpenApiView.as_view()),
+)
