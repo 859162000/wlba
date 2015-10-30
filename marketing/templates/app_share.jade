@@ -12,7 +12,7 @@ html
       header
       div.content
         p 您的朋友
-          span.red {{ identifier|safe_phone_new }}
+          span.red {{ phone|safe_phone_new }}
           | 邀请您来网利宝赚钱，立即去领
           span.red 520元
           | 红包。
@@ -73,6 +73,5 @@ html
         p.padding-l-r-s.gray 感谢您对网利宝的信任和支持！
 
     script.
-      var v = new Date().getTime()
-      require(["/static/js/app_share.js?v="+v])
+      require(["/static/js/app_share.js?v=201510281"])
     include include/tracking
