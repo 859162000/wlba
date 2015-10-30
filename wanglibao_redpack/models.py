@@ -56,10 +56,10 @@ class RedPackEvent(models.Model):
     give_end_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"发放/兑换结束时间")
     available_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"生效时间")
     unavailable_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"失效时间")
-    auto_extension = models.BooleanField(default=False, verbose_name=u"自动延长生效时间",
-                                         help_text=u"选择此项后系统会将失效时间设置为具体发放日期加上延长天数")
-    auto_extension_days = models.IntegerField(verbose_name=u"生效延长天数", default=0, null=False,
-                                              help_text=u"请填写活动持续的天数")
+    auto_extension = models.BooleanField(default=False, verbose_name=u"自动设定失效时间",
+                                         help_text=u"选择此项后系统会将失效时间设置为具体发放日期加上失效延长天数")
+    auto_extension_days = models.IntegerField(verbose_name=u"失效延长天数", default=0, null=False,
+                                              help_text=u"如果填写了失效延长天数,系统会动态计算失效截止时间")
     invalid = models.BooleanField(default=False, verbose_name=u"是否作废")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
 
