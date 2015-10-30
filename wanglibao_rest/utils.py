@@ -90,6 +90,9 @@ def split_ua(request):
         device_type = "pc"
 
     if is_mobile:
+        if device_type == 'pc':
+            device_type = 'mobile'
+
         return {"device_type":device_type, "app_version":'wlb_h5',
                 "channel_id":'', "model":'',
                 "os_version":'', "network":''}
