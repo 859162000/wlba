@@ -430,6 +430,9 @@ class AccountHomeAPIView(APIView):
         ]).select_related('product')
 
         start_utc = local_to_utc(datetime.datetime.now(), 'min')
+        yesterday = start_utc - datetime.timedelta(days=1)
+        yesterday_start = timezone.datetime(yesterday.year, yesterday.month, yesterday.day)
+        yesterday_end = timezone.datetime(yesterday.year, yesterday.month, yesterday.day, 23, 59, 59)
         unpayed_principle = 0
         p2p_total_paid_interest = 0
         p2p_total_unpaid_interest = 0
@@ -439,6 +442,7 @@ class AccountHomeAPIView(APIView):
         p2p_total_paid_coupon_interest = 0
         p2p_total_unpaid_coupon_interest = 0
         p2p_income_today = 0
+        p2p_income_yesterday = 0
         for equity in p2p_equities:
             if equity.confirm:
                 unpayed_principle += equity.unpaid_principal  # 待收本金
@@ -454,6 +458,11 @@ class AccountHomeAPIView(APIView):
                     p2p_income_today += equity.pre_paid_interest
                     p2p_income_today += equity.pre_paid_coupon_interest
                     p2p_income_today += equity.activity_interest
+
+                if yesterday_start <= equity.confirm_at <= yesterday_end:
+                    p2p_income_yesterday += equity.pre_paid_interest
+                    p2p_income_yesterday += equity.pre_paid_coupon_interest
+                    p2p_income_yesterday += equity.activity_interest
 
         p2p_margin = user.margin.margin  # P2P余额
         p2p_freeze = user.margin.freeze  # P2P投资中冻结金额
@@ -492,6 +501,7 @@ class AccountHomeAPIView(APIView):
             'fund_income_month': float(fund_income_month),  # 基金近一月收益(元)
 
             'p2p_income_today': float(p2p_income_today),  # 今日收益
+            'p2p_income_yesterday': float(p2p_income_yesterday),  # 昨日收益
 
         }
 
