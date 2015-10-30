@@ -1051,7 +1051,7 @@ class KuaiShortPay:
             else:
                 error_code = 20119
                 is_inner_error = True
-            error_message = str(error)
+            error_message = error.message
             pay_info.save_error(error_code=error_code, error_message=error_message, is_inner_error=is_inner_error)
             OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
             return {"ret_code": error_code, "message": error_message, 'order_id':order_id, 'pay_info_id':payinfo_id}
