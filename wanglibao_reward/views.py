@@ -813,9 +813,9 @@ class WeixinRedPackView(APIView):
             activity = Activity.objects.filter(code=attention_code).first()
             redpack = WanglibaoUserGift.objects.create(
                 identity=phone_number,
-                activity = activity,
-                type = 1,
-                valid = 0
+                activity=activity,
+                type=1,
+                valid=0
             )
 
             user = WanglibaoUserProfile.objects.filter(phone=phone_number).first()
