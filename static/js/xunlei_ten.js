@@ -94,7 +94,7 @@
                     d = parseInt(c / ds);//毫秒除以一天的毫秒 得到相差的天数
             var jiang=d*3600
             if(d>=30){
-                $('#jianli').html(10800);
+                $('#jianli').html(108000);
             }else{
                $('#jianli').html(jiang);
             };
