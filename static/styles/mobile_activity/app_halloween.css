@@ -120,6 +120,7 @@ body {
 	overflow: hidden;
 	box-shadow: 0 0 #000 inset;
 	z-index: 999;
+    opacity:0;
 }
 
 .title {
@@ -705,7 +706,7 @@ body {
 	-webkit-animation-delay: 0s;
 	animation-delay: 0s;
 	-webkit-animation-fill-mode: forwards;
-	animation-fill-mode: forwards
+	animation-fill-mode: forwards;
 }
 .tree1_wrap .tree1 {
 	width: 100%;
