@@ -147,9 +147,9 @@ class MarginKeeper(KeeperBaseMixin):
         with transaction.atomic(savepoint=savepoint):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
             margin.margin += amount
-            margin.uninvested += amount  # 充值未投资金融
+            if catalog == u'现金存入':
+                margin.uninvested += amount  # 充值未投资金融
             margin.save()
-            #catalog = u'现金存入'
             catalog = catalog
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
