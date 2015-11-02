@@ -1,12 +1,11 @@
 -load formatters
-
 doctype html
 html
   head
     include include/weixin_head.jade
   body
     header
-      hgroup 已投项目
+      hgroup 理财券
       a(href="/weixin/account/")
         span 返回
     nav.tab-nav
@@ -17,18 +16,33 @@ html
         else
           li
             a(href="/weixin/reward/unused/") 未使用
+
         if status == 'used'
           li.active
             a(href="/weixin/reward/used/") 已使用
         else
           li
             a(href="/weixin/reward/used/") 已使用
+
         if status == 'expires'
           li.active
-            a(href="/weixin/reward/expired/") 已过期
+            a(href="/weixin/reward/expires/") 已过期
         else
           li
-            a(href="/weixin/reward/expired/") 已过期
+            a(href="/weixin/reward/expires/") 已过期
     section#reward-used.reward-main
-      include include/ajax/ajax_reward
-    include include/tracking
+      .reward-card-warp
+        .reward-card-list
+          each pack in packages
+            .reward-card-parent(class='{{status}}')
+              .reward-explain
+                .reward-name {{pack.name}}
+                .reward-scope {{pack.invest_amount}}元起用
+                .reward-period {{pack.available_at | milldate_format}} 至 {{pack.unavailable_at | milldate_format}}
+              .reward-amount {{pack.amount | percentage_number_two}}
+                if pack.method == '-'
+                  em 元
+                else
+                  em %
+
+    //include include/tracking
