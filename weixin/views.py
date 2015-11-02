@@ -154,13 +154,22 @@ class WeixinJoinView(View):
     def check_service_subscribe(self, msg, account):
         fromUserName = msg._data['FromUserName']
         w_user = getOrCreateWeixinUser(fromUserName, account)
+        content = msg.content.lower()
         reply = None
-        sub_service = SubscribeService.objects.filter(channel='weixin', is_open=True, key=msg.content).first()
         txt = None
+        if content == 'td':
+            sub_records = SubscribeRecord.objects.filter(user=w_user.user, status=True)
+            if sub_records.exists():
+                sub_records.update(status=False)
+                txt = u'订阅项目已退订成功，如需订阅相关项目，请再次点击【个性化项目】进行订阅'
+            else:
+                txt = u'您没有可退订项目，如需订阅相关项目，请再次点击【个性化项目】进行订阅'
+            reply = create_reply(txt, msg)
+            return reply
+        sub_service = SubscribeService.objects.filter(channel='weixin', is_open=True, key=content).first()
         if sub_service:
-            sub_service = sub_service[0]
             if w_user.user:
-                sub_service_record = SubscribeRecord.objects.filter(user=w_user.user, service = sub_service)
+                sub_service_record = SubscribeRecord.objects.filter(user=w_user.user, service = sub_service).first()
                 if sub_service_record and sub_service_record.status==1:
                     txt = u'客官真健忘，您已经订阅此项目通知，订阅其他上线通知项目吧～'
                 if not sub_service_record:
@@ -173,8 +182,8 @@ class WeixinJoinView(View):
                     txt = u'恭喜您，%s订阅成功，系统会在第一时间发送给您相关信息'%(sub_service.describe)
             else:
                 txt = self.getBindTxt(fromUserName, account.id)
-        if txt:
-            reply = create_reply(txt, msg)
+            if txt:
+                reply = create_reply(txt, msg)
         return reply
 
 
@@ -311,6 +320,38 @@ class WeixinBindLogin(TemplateView):
             return Response({"errcode":-3, 'errmsg':u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone})
         return super(WeixinBindLogin, self).dispatch(request, *args, **kwargs)
 
+
+class UnBindWeiUser(TemplateView):
+    template_name = ''
+
+    def get_context_data(self, **kwargs):
+        context = super(UnBindWeiUser, self).get_context_data(**kwargs)
+        openid = self.request.GET.get('openid', '')
+        account_id = self.request.GET.get('state')
+        account = Account.objects.filter(id=account_id).first()
+        try:
+            w_user = getOrCreateWeixinUser(openid, account)
+            context['openid'] = openid
+        except WeChatException, e:
+            pass
+        next = self.request.GET.get('next', '')
+        return {
+            'context': context,
+            'next': next
+            }
+
+    def dispatch(self, request, *args, **kwargs):
+        openid = self.request.GET.get('openid', '')
+        if not openid:
+            return Response({'errcode':-1, 'errmsg':"openid is null"})
+        account_id = self.request.GET.get('state')
+        account = Account.objects.filter(id=account_id).first()
+        if not account:
+            return Response({'errcode':-2, 'errmsg':"-2"})
+        w_user = getOrCreateWeixinUser(openid, account)
+        if w_user.user:
+            pass
+        return super(UnBindWeiUser, self).dispatch(request, *args, **kwargs)
 
 class WeixinLoginBindAPI(APIView):
     permission_classes = ()
