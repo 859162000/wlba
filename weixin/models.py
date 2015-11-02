@@ -328,16 +328,25 @@ class WeixinUser(models.Model):
     auth_info = models.ForeignKey(AuthorizeInfo, null=True)
 
 
-class SubscribeServices(models.Model):
-    key = models.CharField(u'服务快捷键', max_length=128, db_index=True)
-    term = models.IntegerField(u'标的期数', default=0)
+class SubscribeService(models.Model):
+    CHANNELS = (
+        ('wanglibao', u'网利宝平台'),
+        ('weixin', '微信平台'),
+    )
+    SERVICE_TYPES = (
+        (u'月标上线通知', u'月标上线通知'),
+    )
+    key = models.CharField(u'服务快捷键', max_length=128, unique=True, db_index=True)
     describe = models.CharField(u'服务描述', max_length=256)
-    # type =
-    # is_open =
+    type = models.IntegerField(u'', default=0)
+    num_limit = models.IntegerField(u'数值限制', default=0)
+    channel = models.CharField(u'从哪里订阅的服务', choices=CHANNELS, max_length=32)
+    is_open = models.BooleanField(u'是否开启服务', default=False)
 
-# class Subscribe
-
-
+class SubscribeRecord(models.Model):
+    user = models.ForeignKey(User, null=False)
+    status = models.BooleanField(u'订阅状态, 0:退订,1:订阅', default=False)
+    service = models.ForeignKey(SubscribeService, null=False)
 
 
 class Material(models.Model):
