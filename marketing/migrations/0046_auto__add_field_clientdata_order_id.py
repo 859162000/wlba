@@ -96,12 +96,19 @@ class Migration(SchemaMigration):
         },
         u'marketing.channels': {
             'Meta': {'object_name': 'Channels'},
+            'classification': ('django.db.models.fields.CharField', [], {'default': "'----'", 'max_length': '20'}),
             'code': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '12', 'db_index': 'True'}),
+            'coop_status': ('django.db.models.fields.IntegerField', [], {'default': '0', 'max_length': '2'}),
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '50', 'blank': 'True'}),
+            'end_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'image': ('django.db.models.fields.files.ImageField', [], {'default': "''", 'max_length': '100', 'blank': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '20'})
+            'is_abandoned': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'merge_code': ('django.db.models.fields.CharField', [], {'max_length': '12', 'null': 'True', 'blank': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '20'}),
+            'platform': ('django.db.models.fields.CharField', [], {'default': "'full'", 'max_length': '20'}),
+            'start_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'})
         },
         u'marketing.channelsnew': {
             'Meta': {'object_name': 'ChannelsNew'},
@@ -210,8 +217,20 @@ class Migration(SchemaMigration):
         },
         u'marketing.promotiontoken': {
             'Meta': {'object_name': 'PromotionToken'},
-            'token': ('django.db.models.fields.CharField', [], {'default': "'n1y6kbmHS26Tshg2riPO-w'", 'max_length': '64', 'db_index': 'True'}),
+            'token': ('django.db.models.fields.CharField', [], {'default': "'m4LGYR5SRcis3Jdss2xk-g'", 'max_length': '64', 'db_index': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
+        },
+        u'marketing.quickapplyinfo': {
+            'Meta': {'object_name': 'QuickApplyInfo'},
+            'address': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '256'}),
+            'apply_amount': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
+            'apply_way': ('django.db.models.fields.IntegerField', [], {'default': '2', 'max_length': '2'}),
+            'create_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '128'}),
+            'phone': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '32'}),
+            'status': ('django.db.models.fields.IntegerField', [], {'default': '0', 'max_length': '32'}),
+            'update_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True'})
         },
         u'marketing.reward': {
             'Meta': {'ordering': "['-create_time']", 'object_name': 'Reward'},
