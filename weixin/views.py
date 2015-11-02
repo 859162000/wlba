@@ -907,5 +907,22 @@ class GetUserInfo(APIView):
             return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
 
 
+class WeixinCouponList(TemplateView):
+    template_name = 'weixin_reward.jade'
 
+    def get_context_data(self, **kwargs):
+
+        status = kwargs['status']
+        if status not in ('used', 'unused', 'expires'):
+            status = 'unused'
+
+        user = self.request.user
+        device = utils.split_ua(self.request)
+        result = backends.list_redpack(user, 'all', device['device_type'], 0, 'all')
+        packages = result['packages'].get(status, [])
+
+        return {
+            "packages": packages,
+            "status": status
+        }
 

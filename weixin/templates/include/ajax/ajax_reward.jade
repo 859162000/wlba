@@ -1,9 +1,12 @@
+-load formatters
+
 .reward-card-warp
   .reward-card-list
-    .reward-card
-      .reward-explain
-        .reward-name 逢8必发赠送加息券
-        .reward-scope 100元起用
-        .reward-period 2015.09.25至2015.10.31
-      .reward-amount 0.8
-        em %
+    each pack in packages
+      .reward-card
+        .reward-explain
+          .reward-name {{pack.name}}
+          .reward-scope {{pack.invest_amount}}元元起用
+          .reward-period {{pack.available_at | milldate_format}} 至 {{pack.unavailable_at | milldate_format}}
+        .reward-amount {{pack.amount | percentage_number_two}}%
+          em %

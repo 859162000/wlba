@@ -1,0 +1,34 @@
+-load formatters
+
+doctype html
+html
+  head
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 已投项目
+      a(href="/weixin/account/")
+        span 返回
+    nav.tab-nav
+      ul
+        if status == 'unused'
+          li.active
+            a(href="/weixin/reward/unused/") 未使用
+        else
+          li
+            a(href="/weixin/reward/unused/") 未使用
+        if status == 'used'
+          li.active
+            a(href="/weixin/reward/used/") 已使用
+        else
+          li
+            a(href="/weixin/reward/used/") 已使用
+        if status == 'expires'
+          li.active
+            a(href="/weixin/reward/expired/") 已过期
+        else
+          li
+            a(href="/weixin/reward/expired/") 已过期
+    section#reward-used.reward-main
+      include include/ajax/ajax_reward
+    include include/tracking
