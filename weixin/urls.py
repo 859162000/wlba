@@ -28,9 +28,10 @@ urlpatterns = patterns(
     url(r'^more/$', TemplateView.as_view(template_name="weixin_more.jade")),
     url(r'^more/contactus/$', TemplateView.as_view(template_name="weixin_contactus.jade")),
     url(r'^more/aboutus/$', TemplateView.as_view(template_name="weixin_aboutus.jade")),
-    url(r'^reward/unused/$', TemplateView.as_view(template_name="weixin_reward_unused.jade")),
-    url(r'^reward/used/$', TemplateView.as_view(template_name="weixin_reward_used.jade")),
-    url(r'^reward/expired/$', TemplateView.as_view(template_name="weixin_reward_expired.jade")),
+    # url(r'^reward/unused/$', TemplateView.as_view(template_name="weixin_reward_unused.jade")),
+    # url(r'^reward/used/$', TemplateView.as_view(template_name="weixin_reward_used.jade")),
+    # url(r'^reward/expired/$', TemplateView.as_view(template_name="weixin_reward_expired.jade")),
+    url(r'^reward/(?P<status>\w+)/$', login_required(views.WeixinCouponList.as_view(), login_url='/weixin/login/')),
 
     # js api
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
