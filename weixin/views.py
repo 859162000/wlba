@@ -349,9 +349,21 @@ class UnBindWeiUser(TemplateView):
         if not account:
             return Response({'errcode':-2, 'errmsg':"-2"})
         w_user = getOrCreateWeixinUser(openid, account)
-        if w_user.user:
-            pass
+        if not w_user.user:
+            return ({'errcode':-3, 'errmsg':"has not bind a user"})
         return super(UnBindWeiUser, self).dispatch(request, *args, **kwargs)
+
+class UnBindWeiUserAPI(APIView):
+    permission_classes = ()
+    http_method_names = ['post']
+
+    def post(self, request):
+        openid = request.POST.get('openid')
+        weixin_user = WeixinUser.objects.get(openid=openid)
+        weixin_user.user = ""
+        weixin_user.save()
+        return ({'message':'ok'})
+
 
 class WeixinLoginBindAPI(APIView):
     permission_classes = ()
