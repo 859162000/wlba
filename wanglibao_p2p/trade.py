@@ -91,9 +91,10 @@ class P2PTrader(object):
             if product_record.product_balance_after <= 0:
                 is_full = True
 
+        # fix@chenweibi, add order_id
         tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount,
-                                               "device": self.device, "product_id": self.product.id,
-                                               "is_full": is_full})
+                                               "device": self.device, "order_id": self.order_id,
+                                               "product_id": self.product.id, "is_full": is_full})
 
         # 投标成功发站内信
         matches = re.search(u'日计息', self.product.pay_method)
