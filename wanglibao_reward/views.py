@@ -349,7 +349,8 @@ class WeixinShareDetailView(TemplateView):
                 redpack=redpack,
                 name=redpack.rtype,
                 total_count=redpack.value,  #这个地方很关键,优惠券个数
-                valid=True
+                valid=True,
+                cfg_id=1
                 )
                 activity_gift.type = redpack_type[redpack.rtype]
                 activity_gift.save()
@@ -394,13 +395,21 @@ class WeixinShareDetailView(TemplateView):
 
         try:
             #TODO: 增加分享记录表，用于计数和加锁
+            #1: 此处有数据不一致性的问题, GiftOrder表和ActivityGift表的不一致性
             gift_order = WanglibaoActivityGiftOrder.objects.select_for_update().filter(order_id=product_id).first()
             if gift_order.valid_amount > 0:
                 gifts = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity, valid=True)
+
                 counts = gifts.count()
-                index = random.randint(0, counts-1)
-                gift = gifts[index]
-                gift_order.valid_amount -= 1
+                if counts > 0:
+                    if counts == 1:
+                        index = 0
+                    else:
+                        index = random.randint(0, counts-1)
+                    gift = gifts[index]
+                    gift_order.valid_amount -= 1
+                else:
+                    gift = None
             else:
                 gift = None
 
@@ -634,11 +643,48 @@ class WeixinShareDetailView(TemplateView):
 class WeixinShareEndView(TemplateView):
     template_name = 'app_weChatEnd.jade'
 
+    def get_distribute_status(self, order_id):
+        """
+            获得用户领奖信息
+        """
+        try:
+            gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, valid=2).all()
+            return gifts
+        except Exception, reason:
+            self.exception_msg(reason, u'获取已领奖用户信息失败')
+            return None
+    def format_response_data(self, gifts):
+        if gifts == None:
+            return None
+
+        user_info = {gift.identity: gift for gift in gifts}
+        self.debug_msg("format_response_data, 已经领取的 奖品 的key值序列：%s" %(user_info.keys(),))
+        QSet = WanglibaoWeixinRelative.objects.filter(openid__in=user_info.keys())
+        weixins = {item.openid: item for item in QSet}
+        self.debug_msg("format_response_data, 已经领取的 用户 的key值序列：%s" %(weixins.keys(),))
+        ret_value = list()
+        index = 0
+        for key in weixins.keys():
+            ret_value.append({"amount": user_info[key].amount,
+                              "time": user_info[key].get_time,
+                              "name": weixins[key].nick_name,
+                              "img": weixins[key].img,
+                              "message": self.get_react_text(index),
+                              "sort_by": int(time.mktime(time.strptime(str(user_info[key].get_time), '%Y-%m-%d %H:%M:%S+00:00')))})
+            index += 1
+
+        tmp_dict = {item["sort_by"]: item for item in ret_value}
+        ret_value = [tmp_dict[key] for key in sorted(tmp_dict.keys())]
+        self.debug_msg('所有获奖信息返回前端:%s' % (ret_value,))
+        return ret_value
+
     def get_context_data(self, **kwargs):
         order_id = self.request.GET.get('url_id')
         share_title, share_content, url = get_share_infos(order_id)
+        gifts = self.get_distribute_status(order_id)
         logger.debug("抵达End页面，order_id:%s, URL:%s" %(order_id, url))
         return {
+         "all_gift": self.format_response_data(gifts),
          "share": {'content': share_content, 'title': share_title, 'url': url}
         }
 
@@ -787,9 +833,11 @@ class WeixinRedPackView(APIView):
     def post(self, request, phone):
         key = 'share_redpack'
         shareconfig = Misc.objects.filter(key=key).first()
-        if type(shareconfig) == dict:
-            is_attention = shareconfig.get('is_attention', 'false')
-            attention_code = shareconfig.get('attention_code', 'false')
+        if shareconfig:
+            shareconfig = json.loads(shareconfig.value)
+            if type(shareconfig) == dict:
+                is_attention = shareconfig.get('is_attention', '')
+                attention_code = shareconfig.get('attention_code', '')
 
         if not is_attention:
             data = {
@@ -813,27 +861,29 @@ class WeixinRedPackView(APIView):
             activity = Activity.objects.filter(code=attention_code).first()
             redpack = WanglibaoUserGift.objects.create(
                 identity=phone_number,
-                activity = activity,
-                type = 1,
-                valid = 0
+                activity=activity,
+                rules=WanglibaoActivityGift.objects.first(),#随机初始化一个值
+                type=1,
+                valid=0
             )
 
-            user = WanglibaoUserProfile.objects.filter(phone=phone_number).first()
+            user = WanglibaoUserProfile.objects.filter(phone=phone_number).first().user
             if user:
                 try:
                     redpack_id = ActivityRule.objects.filter(activity=activity).first().redpack
                 except Exception, reason:
-                    logger("从ActivityRule中获得redpack_id抛异常, reason:%s" % (reason, ))
+                    logger.debug("从ActivityRule中获得redpack_id抛异常, reason:%s" % (reason, ))
 
                 try:
                     redpack_event = RedPackEvent.objects.filter(id=redpack_id).first()
                 except Exception, reason:
-                    logger("从RedPackEvent中获得配置红包报错, reason:%s" % (reason, ))
+                    logger.debug("从RedPackEvent中获得配置红包报错, reason:%s" % (reason, ))
 
                 try:
-                    redpack_backends.give_activity_redpack(self.request.user, redpack_event, 'pc')
+                    logger.debug("给用户 %s 发送红包 %s" % (user, redpack_event))
+                    redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
                 except Exception, reason:
-                    logger("给用户发红包抛异常, reason:%s" % (reason, ))
+                    logger.debug("给用户发红包抛异常, reason:%s, msg: %s" % (reason,))
                 else:
                     redpack.user = user
                     redpack.valid = 1

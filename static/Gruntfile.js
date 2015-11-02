@@ -18,6 +18,7 @@ module.exports = function( grunt ) {
             basic:{
                 files: {
                     'scripts/mobile/mobile.js': ['src/mobile/lib/zepto/zepto.js', 'src/mobile/mobile.js'],
+                    'scripts/mobile_test/mobile.js': ['src/mobile_test/lib/a.js', 'src/mobile_test/b.js']
                 }
             }
         },
@@ -54,6 +55,7 @@ module.exports = function( grunt ) {
               files: [
                   'src/mobile/mobile.js',
                   'src/mobile_activity/*.js',
+                  'src/mobile_test/*.js',
               ],
               tasks: ['concat']
           }

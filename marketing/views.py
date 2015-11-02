@@ -24,7 +24,7 @@ from django.db.models.base import ModelState
 from wanglibao_sms.utils import send_validation_code
 from misc.models import Misc
 from wanglibao_sms.models import *
-from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, IntroducedBy, IntroducedByReward, Reward, ActivityJoinLog
+from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, IntroducedBy, IntroducedByReward, Reward, ActivityJoinLog, QuickApplyInfo
 from marketing.tops import Top
 from utils import local_to_utc
 
@@ -57,6 +57,16 @@ import hashlib
 import logging
 logger = logging.getLogger('marketing')
 TRIGGER_NODE = [i for i, j in TRIGGER_NODE]
+
+import sys
+import time
+from smtplib import SMTP
+from email.header import Header
+#from email import MIMEText
+#from email.MIMEMultipart import MIMEMultipart
+from email.MIMEText import MIMEText
+from email.MIMEMultipart import MIMEMultipart
+reload(sys)
 
 class YaoView(TemplateView):
     template_name = 'yaoqing.jade'
@@ -185,15 +195,17 @@ class AppShareViewShort(TemplateView):
 
     def get_context_data(self, **kwargs):
         try:
-            identifier = self.request.GET.get('p') + '='
-            identifier = base64.b64decode(identifier)
+            identifier = self.request.GET.get('p')
+            phone = base64.b64decode(identifier + '=')
         except:
             identifier = self.request.GET.get('phone')
+            phone = identifier
         reg = self.request.GET.get('reg')
 
         return {
             'identifier': identifier.strip(),
-            'reg': reg
+            'reg': reg,
+            'phone': phone,
         }
 
 
@@ -203,6 +215,40 @@ class AppShareRegView(TemplateView):
     def get_context_data(self, **kwargs):
         identifier = self.request.GET.get('identifier').strip()
         friend_identifier = self.request.GET.get('friend_identifier').strip()
+
+        if friend_identifier:
+            try:
+                user = User.objects.get(wanglibaouserprofile__phone=friend_identifier)
+                promo_token = PromotionToken.objects.get(user=user)
+                invitecode = promo_token.token
+            except:
+                invitecode = ''
+        else:
+            invitecode = ''
+
+        send_validation_code(identifier)
+        return {
+            'identifier': identifier,
+            'invitecode': invitecode
+        }
+
+
+class ShortAppShareRegView(TemplateView):
+    template_name = 'app_share_reg.jade'
+
+    def get_context_data(self, **kwargs):
+        try:
+            identifier = self.request.GET.get('i')
+            identifier = base64.b64decode(identifier + '=')
+            friend_identifier = self.request.GET.get('fi')
+            try:
+                friend_identifier = str(int(friend_identifier))
+            except:
+                friend_identifier = base64.b64decode(friend_identifier + '=')
+        except Exception, e:
+            print e
+            identifier = self.request.GET.get('identifier').strip()
+            friend_identifier = self.request.GET.get('friend_identifier').strip()
 
         if friend_identifier:
             try:
@@ -664,6 +710,8 @@ def ajax_get_activity_record(action='get_award', *gifts):
     }
     return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
+def get_left_awards(init=108000):
+    return init-ActivityJoinLog.objects.filter(action_name='oct_get_award', join_times=0).count()
 
 def ajax_xunlei(request):
     """
@@ -674,6 +722,7 @@ def ajax_xunlei(request):
         to_json_response = {
             'ret_code': 3000,
             'message': u'用户没有登陆，请先登陆',
+            'award': get_left_awards()
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -694,6 +743,7 @@ def ajax_xunlei(request):
         to_json_response = {
             'ret_code': 4000,
             'message': u'非迅雷渠道过来的用户',
+            'award': get_left_awards()
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -722,6 +772,9 @@ class ThunderInterestAwardAPIView(APIView):
                     中奖后提示中奖金额及中奖提示语，非中奖用户提示非中奖提示语。
     """
 
+    def get_left_awards(self, init=108000):
+       return init-ActivityJoinLog.objects.filter(action_name='oct_get_award', join_times=0).count()
+
     def get_award(self, request, reward):
         """
             TO-WRITE
@@ -734,6 +787,7 @@ class ThunderInterestAwardAPIView(APIView):
                 'left': join_log.join_times,  # 还剩几次
                 'amount': str(join_log.amount),  # 加息额度
                 'message': u'抽奖机会已经用完了',
+                'award': self.get_left_awards()
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
         join_log.join_times -= 1
@@ -757,6 +811,7 @@ class ThunderInterestAwardAPIView(APIView):
             'left': join_log.join_times,  # 还剩几次
             'amount': str(join_log.amount),  # 加息额度
             'message': u'终于等到你，还好我没放弃',
+            'award': self.get_left_awards()
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -767,6 +822,7 @@ class ThunderInterestAwardAPIView(APIView):
             'ret_code': 3005,
             'data': data,
             'message': u'获得抽奖成功用户',
+            'award': self.get_left_awards()
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -784,6 +840,7 @@ class ThunderInterestAwardAPIView(APIView):
                 'left': join_log.join_times,  # 还剩几次
                 'amount': str(join_log.amount),  # 加息额度
                 'message': u'抽奖机会已经用完了',
+                'award': self.get_left_awards()
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -794,6 +851,7 @@ class ThunderInterestAwardAPIView(APIView):
             'left': join_log.join_times,  # 还剩几次
             'amount': str(join_log.amount),  # 加息额度
             'message': u'你和大奖只是一根头发的距离',
+            'award': self.get_left_awards()
         }
 
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -801,11 +859,11 @@ class ThunderInterestAwardAPIView(APIView):
     def get_award_mount(self, index):
         index %= 10
         if index in (0,):
-            return 1
+            return 0.5
         if index in(3, 6, 9):
-            return 1
+            return 0.5
         if index in(1, 2, 4, 5, 7, 8):
-            return 1
+            return 0.5
 
     def enter_webpage(self, request):
         """
@@ -813,7 +871,7 @@ class ThunderInterestAwardAPIView(APIView):
         """
         join_log = ActivityJoinLog.objects.filter(user=request.user).first()
         if not join_log:
-            activity = ActivityJoinLog.objects.create(
+            join_log = ActivityJoinLog.objects.create(
                 user=request.user,
                 action_name=u'oct_get_award',
                 action_type=u'login',
@@ -825,8 +883,7 @@ class ThunderInterestAwardAPIView(APIView):
                 create_time=timezone.now(),
             )
 
-            join_log = ActivityJoinLog.objects.filter(user=request.user, action_name='get_award').first()
-            join_log.amount = self.get_award_mount(activity.id)
+            join_log.amount = self.get_award_mount(join_log.id)
             join_log.save(update_fields=['amount'])
 
         to_json_response = {
@@ -835,6 +892,7 @@ class ThunderInterestAwardAPIView(APIView):
             'left': join_log.join_times,  # 还剩几次
             'amount': str(join_log.amount),  # 加息额度
             'message': u'欢迎刮奖',
+            'award': self.get_left_awards()
         }
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -1920,3 +1978,107 @@ class ThunderTenAcvitityTemplate(TemplateView):
                 }
 
         return response_data
+
+class QuickApplyer(APIView):
+    permission_classes = ()
+
+    def send_mail(self, sender, reciver, title, body):
+        SMTPSVR = 'smtp.exmail.qq.com'
+        user = 'develop@wanglibank.com'
+        pw = 'abc&321'
+        msg = MIMEMultipart()
+        msg['From'] = '%s <%s>' % (Header('网利技术服务', 'utf-8'), sender)
+        if isinstance(reciver, list):
+            msg['To'] = ';'.join(reciver)
+        else:
+            msg['To'] = reciver
+        msg['Subject'] = Header(title, 'utf-8')
+        msg['Accept-Language'] = 'zh-CN'
+        msg['Accept-Charset'] = 'ISO-8859-1,utf-8'
+        body = MIMEText(body, 'html', 'utf-8')
+        body.set_charset('utf-8')
+        msg.attach(body)
+        sendSvr = SMTP(SMTPSVR, 25)
+        sendSvr.login(user, pw)
+        sendSvr.sendmail(sender, reciver, msg.as_string())
+        sendSvr.quit()
+
+    def post(self, request):
+        email ={
+        u"北京": 'beijingoffice@wanglibank.com',
+        u"上海": 'shanghaioffice@wanglibank.com',
+        u"中山": 'zhongshanoffice@wanglibank.com',
+        u"深圳": 'shenzhenoffice@wanglibank.com',
+
+        u"天津": 'tianjinoffice@wanglibank.com',
+        u"长沙": 'changshaoffice@wanglibank.com',
+        u"武汉": 'wuhanoffice@wanglibank.com',
+        u"贵阳": 'guiyangoffice@wanglibank.com',
+
+        u"西安": 'xianoffice@wanglibank.com',
+        u"青岛": 'qingdaooffice@wanglibank.com',
+        u"石家庄": 'shijiazhuangoffice@wanglibank.com',
+        u"海口": 'haikouoffice@wanglibank.com',
+
+        u"郑州": 'zhengzhouoffice@wanglibank.com',
+        u"重庆": 'chongqingoffice@wanglibank.com',
+        u"其他": 'qitachengshioffice@wanglibank.com',
+        }
+
+        apply = {
+            0: u'我有房',
+            1: u'我有车',
+            2: u'其他',
+        }
+
+        name = request.POST.get('name', '')
+        phone = request.POST.get('phone', '')
+        address = request.POST.get('address', '')
+        apply_way = request.POST.get('apply_way', '')
+        amount = request.POST.get('amount', '')
+
+        if not(name and phone and address and apply_way and amount):
+            to_json_response = {
+                'ret_code': 1000,
+                'message': u'您的输入信息有遗漏'
+            }
+
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+        mytime = datetime.strptime(now, '%Y-%m-%d %H:%M:%S')+timedelta(days=-7)
+        last_register = datetime.strftime(mytime, '%Y-%m-%d %H:%M:%S')
+        applyer = QuickApplyInfo.objects.filter(phone=phone, create_time__gte=last_register)
+        if applyer.count() >= 2:
+            to_json_response = {
+                'ret_code': '1001',
+                'message': u"您已提交过申请，请等待业务人员联系"
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        try:
+            applyer = QuickApplyInfo.objects.create(
+                name=name,
+                phone=phone,
+                address=address,
+                apply_way=apply_way,
+                apply_amount=amount
+            )
+        except Exception, reason:
+            logger.debug("贷款专区，申请人数据入库报异常, reason:%s" % (reason,))
+            to_json_response = {
+                'ret_code': '1002',
+                'message': u"申请人信息入库异常"
+            }
+
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        title = "[%s - %s]贷款申请" % (address, apply[int(apply_way)])
+        body = "姓名:%s <br/> 手机号:%s<br/> 城市:%s<br/> 资产状况:%s<br/> 贷款金额:%s万<br/>" % (name, phone, address,apply[int(apply_way)], amount)
+        self.send_mail('develop@wanglibank.com', email[address], title, body)
+        to_json_response = {
+            'ret_code': '0',
+            'message': u"提交成功,请您耐心等待"
+        }
+
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')

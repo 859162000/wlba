@@ -1,5 +1,7 @@
 # encoding: utf-8
 import datetime
+from wanglibao_redpack.models import RedPackEvent
+from wanglibao_redpack import backends as redpack_backends
 import logging
 import json
 import math
@@ -67,12 +69,16 @@ from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityRecord
 from aes import Crypt_Aes
+from misc.models import Misc
+from wanglibao_activity.models import Activity
+from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from wanglibao.settings import AMORIZATION_AES_KEY
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.utils import get_client_ip
 from wanglibao_account.models import UserThreeOrder
 from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes, hex2bin
 import requests
+from wanglibao_margin.models import MarginRecord
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
@@ -425,6 +431,9 @@ class AccountHomeAPIView(APIView):
         ]).select_related('product')
 
         start_utc = local_to_utc(datetime.datetime.now(), 'min')
+        yesterday_start = start_utc - datetime.timedelta(days=1)
+        yesterday_end = yesterday_start + datetime.timedelta(hours=23, minutes=59, seconds=59)
+
         unpayed_principle = 0
         p2p_total_paid_interest = 0
         p2p_total_unpaid_interest = 0
@@ -434,6 +443,7 @@ class AccountHomeAPIView(APIView):
         p2p_total_paid_coupon_interest = 0
         p2p_total_unpaid_coupon_interest = 0
         p2p_income_today = 0
+        p2p_income_yesterday = 0
         for equity in p2p_equities:
             if equity.confirm:
                 unpayed_principle += equity.unpaid_principal  # 待收本金
@@ -449,6 +459,20 @@ class AccountHomeAPIView(APIView):
                     p2p_income_today += equity.pre_paid_interest
                     p2p_income_today += equity.pre_paid_coupon_interest
                     p2p_income_today += equity.activity_interest
+
+                if yesterday_start < equity.confirm_at <= yesterday_end:
+                    p2p_income_yesterday += equity.pre_paid_interest
+                    p2p_income_yesterday += equity.pre_paid_coupon_interest
+                    p2p_income_yesterday += equity.activity_interest
+
+        # 其他昨日收益
+        # 佣金存入, 全民淘金
+        p2p_income_yesterday_other = MarginRecord.objects.filter(user=user)\
+            .filter(create_time__gt=yesterday_start, create_time__lte=yesterday_end)\
+            .filter(catalog__in=[u'佣金存入', u'全民淘金']).aggregate(Sum('amount'))
+
+        if p2p_income_yesterday_other.get('amount__sum'):
+            p2p_income_yesterday += int(p2p_income_yesterday_other.get('amount__sum'))
 
         p2p_margin = user.margin.margin  # P2P余额
         p2p_freeze = user.margin.freeze  # P2P投资中冻结金额
@@ -487,6 +511,7 @@ class AccountHomeAPIView(APIView):
             'fund_income_month': float(fund_income_month),  # 基金近一月收益(元)
 
             'p2p_income_today': float(p2p_income_today),  # 今日收益
+            'p2p_income_yesterday': float(p2p_income_yesterday),  # 昨日到账收益
 
         }
 
@@ -1219,12 +1244,12 @@ def ajax_register(request):
             raise Exception("生成随机密码的长度有误")
 
         random_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        password = list()
+        password = ""
         index = 0
         while index < length:
-            password.append(random_list[randint(0,len(random_list))])
+            password += str(random_list[randint(0,len(random_list)-1)])
             index += 1
-        return str(random_list)
+        return str(password)
 
     if request.method == "POST":
         channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")    #add by Yihen@20150818; reason:第三方渠道处理的时候，会更改request中的信息
@@ -1259,11 +1284,42 @@ def ajax_register(request):
                     tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
                 #  add by Yihen@20151020, 用户填写手机号不写密码即可完成注册, 给用户发短信,不要放到register_ok中去，保持原功能向前兼容
-                if request.POST.get('IGNORE_PWD', '') and not password:
+                if request.POST.get('IGNORE_PWD', ''):
                     send_messages.apply_async(kwargs={
                         "phones": [identifier, ],
-                        "messages": [password, ]
+                        "messages": [u'登录账户是：'+identifier+u'登录密码:'+password, ]
                     })
+
+                    if channel == 'maimai':
+                        dt = timezone.datetime.now()
+                        redpack_event = RedPackEvent.objects.filter(invalid=False, name='maimai_redpack', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                        if redpack_event:
+                            redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+
+                    if channel == 'weixin_attention':
+                        key = 'share_redpack'
+                        shareconfig = Misc.objects.filter(key=key).first()
+                        if shareconfig:
+                            shareconfig = json.loads(shareconfig.value)
+                            if type(shareconfig) == dict:
+                                is_attention = shareconfig.get('is_attention', '')
+                                attention_code = shareconfig.get('attention_code', '')
+
+                        if is_attention:
+                            activity = Activity.objects.filter(code=attention_code).first()
+                            redpack = WanglibaoUserGift.objects.create(
+                                identity=identifier,
+                                activity=activity,
+                                rules=WanglibaoActivityGift.objects.first(),#随机初始化一个值
+                                type=1,
+                                valid=0
+                            )
+                            dt = timezone.datetime.now()
+                            redpack_event = RedPackEvent.objects.filter(invalid=False, name='weixin_atten_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                            if redpack_event:
+                                redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+                                redpack.valid = 1
+                                redpack.save()
 
                 account_backends.set_source(request, auth_user)
 

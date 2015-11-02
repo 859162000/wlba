@@ -14,6 +14,7 @@ from misc.views import MiscRecommendProduction
 
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.contrib import auth
 from django.db.models import Q
 from django.shortcuts import redirect, render_to_response
 from django.template import RequestContext
@@ -44,7 +45,6 @@ logger = logging.getLogger(__name__)
 
 class AppActivateImageAPIView(APIView):
     """ app端查询启动活动图片 """
-
     permission_classes = ()
 
     SIZE_MAP = {'1': 'img_one', '2': 'img_two', '3': 'img_three', '4': 'img_four'}
@@ -573,3 +573,11 @@ class AppInviteAllGoldAPIView(APIView):
             return False
         except Exception, e:
             return False
+
+
+class AppLogoutAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, **kwargs):
+        auth.logout(request)
+        return Response({'ret_code': 0, 'message': 'success'})

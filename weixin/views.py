@@ -51,6 +51,7 @@ from django.core.paginator import PageNotAnInteger
 from wanglibao_p2p.views import get_p2p_list
 from wanglibao_redis.backend import redis_backend
 import pickle
+from rest_framework import renderers
 
 logger = logging.getLogger('wanglibao_reward')
 
@@ -818,12 +819,12 @@ class GetAuthUserInfo(APIView):
             return Response({'errcode':-3, 'errmsg':'openid is null'})
         w_user = WeixinUser.objects.filter(openid=openid).first()
         if not w_user:
-            return {'errcode':-4, 'errmsg':'openid is not exist'}
+            return Response({'errcode':-4, 'errmsg':'openid is not exist'})
         if w_user.nickname:
 
             return Response({
                        "openid":openid,
-                       " nickname": w_user.nickname,
+                       "nickname": w_user.nickname,
                        "sex": w_user.sex,
                        "province": w_user.province,
                        "city": w_user.city,
@@ -859,19 +860,20 @@ class GetAuthUserInfo(APIView):
             return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
 
 class GetUserInfo(APIView):
+    renderer_classes = (renderers.UnicodeJSONRenderer,)
     permission_classes = ()
+
     def get(self, request):
         openid = request.GET.get('openid')
         if not openid:
             return Response({'errcode':-3, 'errmsg':'openid is null'})
         w_user = WeixinUser.objects.filter(openid=openid).first()
         if not w_user:
-            return {'errcode':-4, 'errmsg':'openid is not exist'}
+            return Response({'errcode':-4, 'errmsg':'openid is not exist'})
         if w_user.nickname:
-
             return Response({
                        "openid":openid,
-                       " nickname": w_user.nickname,
+                       "nickname": w_user.nickname,
                        "sex": w_user.sex,
                        "province": w_user.province,
                        "city": w_user.city,
@@ -881,7 +883,6 @@ class GetUserInfo(APIView):
                         'subscribe': w_user.subscribe,
                         'subscribe_time': w_user.subscribe_time
                     })
-        # print w_user.account_original_id
         account = Account.objects.get(original_id=w_user.account_original_id)
         if not account:
             return Response({'errcode':-6, 'errmsg':u'公众号信息错误或者不存在'})

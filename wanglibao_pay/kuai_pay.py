@@ -1053,7 +1053,7 @@ class KuaiShortPay:
             else:
                 error_code = 20119
                 is_inner_error = True
-            error_message = str(error)
+            error_message = error.message
             pay_info.save_error(error_code=error_code, error_message=error_message, is_inner_error=is_inner_error)
             OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
             return {"ret_code": error_code, "message": error_message, 'order_id':order_id, 'pay_info_id':payinfo_id}
@@ -1384,8 +1384,8 @@ class KuaiShortPay:
 
         # TR4应答
         self._request_dict = dict(user_id=user_id, order_id=order_id, amount=amount)
-        # return self._sp_pay_tr4_xml(ref_number)
-        return '<?xml version="1.0" encoding="UTF-8"?><MasMessage xmlns="http://www.99bill.com/mas_cnp_merchant_interface"><version>1.0</version><TxnMsgContent><txnType>PUR</txnType><interactiveStatus>TR4</interactiveStatus><merchantId>%s</merchantId><terminalId>%s</terminalId><refNumber>%s</refNumber></TxnMsgContent></MasMessage>'%(self.MER_ID, self.TERM_ID, ref_number)
+        return self._sp_pay_tr4_xml(ref_number)
+        # return '<?xml version="1.0" encoding="UTF-8"?><MasMessage xmlns="http://www.99bill.com/mas_cnp_merchant_interface"><version>1.0</version><TxnMsgContent><txnType>PUR</txnType><interactiveStatus>TR4</interactiveStatus><merchantId>%s</merchantId><terminalId>%s</terminalId><refNumber>%s</refNumber></TxnMsgContent></MasMessage>'%(self.MER_ID, self.TERM_ID, ref_number)
 
     def add_card_unbind(self, user, card_no, bank):
         """ 保存卡信息到个人名下，不绑定任何渠道 """

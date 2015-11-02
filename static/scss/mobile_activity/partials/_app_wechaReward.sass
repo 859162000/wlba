@@ -1,0 +1,151 @@
+@mixin btn($bg, $color)
+  display: block
+  width: 100%
+  height: 2.5rem
+  line-height: 2.5rem
+  text-align: center
+  font-size: .8rem
+  border-radius: .3rem
+  background: $bg
+  color: $color
+  margin: 0 auto
+  border: 0
+  -webkit-appearance: none
+
+.wechat-banner
+  img
+    display: block
+    width: 100%
+    height: auto
+
+.wechat-card
+  width: 100%
+  height: 4.75rem
+  background: url("/static/imgs/mobile_activity/app_reward/card.png") no-repeat center
+  background-size: 14.5rem
+  text-align: center
+  line-height: 4.75rem
+  margin: 1.5rem 0
+  .card-text
+    color: #DB493F
+    font-size: 2.5rem
+    height: 100%
+    display: inline-block
+    margin-left: 4rem
+    em
+      font-style: normal
+      font-size: 1rem
+
+.wechat-form
+  padding: 1rem 2rem
+  font-size: .8rem
+  .wechat-check-body
+    height: 0
+    overflow: hidden
+    -webkit-transition: height 500ms
+  .wechat-phone
+    border: none
+    -webkit-appearance: none
+    background-color: #fff
+    font-size: .8rem
+    width: 100%
+    border-radius: .3rem
+    padding: .775rem .25rem .775rem 1.5rem
+
+
+  .wechat-form-btn
+    +btn(#DB493F, #fff)
+    &:disabled
+      +btn(#EC8D87, #fff)
+
+  .wechat-load
+    @extend .wechat-phone
+    background: url("/static/imgs/mobile_activity/app_maimai/load.gif") no-repeat
+    background-size: .9rem
+    background-position: .4rem center
+    background-color: #fff
+
+  .wechat-form-sign
+    text-align: center
+    color: #758794
+    font-size: .6rem
+    height: 0
+    line-height: 1.275rem
+    -webkit-transition: height 1s
+    overflow: hidden
+
+  .wechat-form-margin
+    height: .7rem
+    width: 100%
+    -webkit-transition: height 1s
+    overflow: hidden
+
+
+  .phone-check
+    display: -webkit-box
+    .check-input
+      -webkit-box-flex: 1
+      text-align: center
+      border: none
+      -webkit-appearance: none
+      background-color: #fff
+      font-size: .8rem
+      border-radius: .3rem
+      padding: .775rem .25rem .775rem .25rem
+      display: block
+    .check-submit
+      width: 5.4rem
+      height: 2.5rem
+      color: #2380c4
+      background: #f2d434
+      border-radius: .3rem
+      border: 0
+      margin-left: .25rem
+      font-size: .8rem
+    .postValidation
+      background: #ECE8D2
+    .check-img
+      display: block
+      @extend .check-submit
+      background: url("/static/imgs/mobile_activity/app_maimai/load.gif") no-repeat center
+      background-size: .9rem
+
+.wechat-form-text
+  color: #F5A623
+  font-size: .8rem
+  text-align: center
+  margin-bottom: 1rem
+  em
+    font-style: normal
+
+.wechat-rules
+  font-size: .6rem
+  color: #5DB5F2
+  text-align: center
+  display: block
+  &:visited,&:link
+    color: #5DB5F2
+
+.wechat-logo
+  width: 3.275rem
+  height: 1rem 
+  background: url("/static/imgs/mobile_activity/app_reward/footer_logo.png") no-repeat center
+  background-size: 100%
+  margin: 1.875rem auto 1.1rem auto
+
+.wechat-rule-warp
+  padding: 1rem .5rem 0 .5rem
+
+  .wechat-rule-item
+    text-align: left
+    margin-bottom: .6rem
+  .rule-im-title
+    color: #5DB5F2
+    font-size: .8rem
+    margin-bottom: .9rem
+  p
+    color: #F5A623
+    font-size: .6rem
+    text-align: justify
+    line-height: 1.5
+    max-height: 999999px

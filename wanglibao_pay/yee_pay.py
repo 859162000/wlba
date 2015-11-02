@@ -442,6 +442,7 @@ class YeeShortPay:
         return {"data": data, "encryptkey": encryptkey, "merchantaccount": self.MER_ID}
 
     def _request_yee(self, url, data):
+        logger.error("request yee_pay: %s" % data)
         post = self._format_post(data)
         res = requests.post(url, post)
         return self._response_data_change(res=json.loads(res.text))
@@ -471,6 +472,7 @@ class YeeShortPay:
             logger.error(data)
             return {'ret_code': 20011, 'message': '签名验证失败', 'data': data}
 
+        logger.error("yee_pay response: %s" % data)
         return {'ret_code': 0, 'message': 'ok', 'data': data}
 
     def _response_decode(self, res):

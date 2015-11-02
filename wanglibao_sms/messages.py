@@ -35,11 +35,10 @@ def deposit_succeed(name, amount):
     """
     充值成功
     """
-
     if get_stitch():
         try:
             redis = redis_backend()
-            obj = redis._get('sms_income')
+            obj = redis._get('deposit_succeed')
             content = cPickle.loads(obj)['content']
             return content.format(name, amount)
         except Exception, e:
@@ -202,7 +201,7 @@ def product_prepayment(name, product, amount):
             redis = redis_backend()
             obj = redis._get('product_prepayment')
             content = cPickle.loads(obj)['content']
-            return content.format(name, product.short_name, product.serial_number)
+            return content.format(name, product.name, amount)
         except Exception, e:
             print e
             return u'亲爱的{}，您投资的{}项目收到还款{}元，已到账，请登录您的网利宝账户进行查看。'.format(

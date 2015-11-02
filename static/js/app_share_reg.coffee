@@ -1,8 +1,10 @@
 require.config
   paths:
     jquery: 'lib/jquery.min'
-
-require ['jquery', 'lib/backend'], ($, backend)->
+    'jquery.base64': 'lib/jquery.base64.min'
+  shim:
+    'jquery.base64': ['jquery']
+require ['jquery', 'lib/backend','jquery.base64'], ($, backend)->
   _countDown = ()->
     element = $('#sendValidateCodeButton')
 
@@ -71,7 +73,8 @@ require ['jquery', 'lib/backend'], ($, backend)->
         $(".error-message").text(data.message)
         return
       else
-        window.location.href = "/activity/wap/share?phone=" + identifier + "&reg=y"
+        encrypt = $.base64.encode(identifier);
+        window.location.href = "/aws/?p=" + encrypt + "&reg=y"
     .fail (xhr)->
       alert("注册失败。\n您可以去网利宝网站（www.wanglibao.com）试试。")
       window.location.href = "/"

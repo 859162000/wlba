@@ -44,13 +44,13 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
                             DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView,
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
-                            CaptchaValidationCodeView, TopsOfEaringView)
+                            CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, )
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
 
 from marketing.play_list import InvestmentHistory
 from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView,
-                             ThousandRedPackCountAPIView, ThunderActivityRewardCounter, ThunderAwardAPIView,)
+                             ThousandRedPackCountAPIView, ThunderActivityRewardCounter, QuickApplyer,)
 from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrdeApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
@@ -215,7 +215,7 @@ urlpatterns = patterns(
     url(r'^xunlei/8/check/$', GuestCheckView.as_view()),
     url(r'^trade_pwd/$', TradePasswordView.as_view()),
     url(r'^wechat/attention/(?P<phone>\d+)/$', WeixinRedPackView.as_view()),
-
+    url(r'^distribute/redpack/(?P<phone>\d+)/$', DistributeRedpackView.as_view()),
 )
 
 urlpatterns += patterns('',
@@ -244,6 +244,7 @@ urlpatterns += patterns(
     url(r'^xunlei/award/records/$', 'marketing.views.ajax_get_activity_record'), #add by Yihen@20150825, 迅雷-网利宝 抽奖活动记录
     url(r'^celebrate/awards/$', 'marketing.views.celebrate_ajax'), #add by Yihen@20150828, 网利宝一周年大转盘活动
     url(r'^award/common_september/$', 'marketing.views.september_award_ajax'), #add by Yihen@20150907,9月PC常规
+    url(r'^quick/applyer/$', QuickApplyer.as_view()), #add by yihen@20151102 ,快速贷款人申请填写
 )
 
 

@@ -127,7 +127,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 type: options.type,
                 data: options.data,
                 dataType : options.dataType,
-                async : options.async=="undefined" ? true : false,
+                async : options.async || true,
                 beforeSend: function(xhr, settings) {
                     options.beforeSend && options.beforeSend(xhr);
                     //django配置post请求
@@ -231,18 +231,22 @@ org.mmIndex = (function(org){
         $nbsp : $('.maimai-sign-margin'),
         $validation: $('.check-submit'),
         checkState: null,
-        checkPart: [
-            { type: $('input[name=phone]').attr('data-type'), dom: $('input[name=phone]'), message: $('input[name=phone]').attr('data-message')}
-        ],
-        checkAll: [
-            { type: $('input[name=phone]').attr('data-type'), dom: $('input[name=phone]'), message: $('input[name=phone]').attr('data-message')},
-            { type: $('input[name=codeimg]').attr('data-type'), dom: $('input[name=codeimg]'), message: $('input[name=codeimg]').attr('data-message')},
-            { type: $('input[name=codenum]').attr('data-type'), dom: $('input[name=codenum]'), message: $('input[name=codenum]').attr('data-message')}
-        ],
         init: function(){
             lib._submit();
             lib.listen();
             $(document.body).trigger('from:captcha');
+        },
+        checkfilter:function(num){
+            var
+                _self = this,
+                checkAll =  [
+                    { type: _self.$phone.attr('data-type'), dom: _self.$phone, message: _self.$phone.attr('data-message')},
+                    { type: _self.$codeimg.attr('data-type'), dom: _self.$codeimg, message: _self.$codeimg.attr('data-message')},
+                    { type: _self.$codenum.attr('data-type'), dom: _self.$codenum, message: _self.$codenum.attr('data-message')}
+                ];
+                checkAll.splice(num, 10)
+            return checkAll
+
         },
         listen: function(){
             var _self = this;
@@ -255,28 +259,45 @@ org.mmIndex = (function(org){
                 _self._fetchValidation();
             });
 
-            $(document).on('from:check', function(e, checklist, post){
-                _self._check(checklist, post)
+            // arrry {checklist} 验证列表
+            // bool {post} 是否验证手机号已存在
+            // bool {state} 错误提醒是否显示
+            // bool {other} 其他验证不参与disabled逻辑
+            $(document).on('from:check', function(e, checklist, post, state, other){
+                _self._check(checklist, post, state, other)
             });
 
-            $(document).on('from:success', function(e, post){
-                _self._success(post);
+            /*
+             * bool {post} 是否验证手机号已存在
+             * bool {other} 其他验证不参与disabled逻辑
+             */
+            $(document).on('from:success', function(e, post, other){
+                _self._success(post, other);
+            });
+            /*
+             * string {message} 错误提醒
+             * bool {state} 错误提醒是否显示
+             */
+            $(document).on('from:error', function(e, message, state, other){
+                _self._error(message, state, other)
             });
 
-            $(document).on('from:error', function(e, message){
-                _self._error(message)
-            });
+            var
+                list = [_self.$phone, _self.$codeimg, _self.$codenum],
+                checkOps = {};
+            $.each(list, function(i,dom){
+                dom.on('input', _self._debounce(function(){
+                    checkOps = i === 0 ? { filter : 1, post: true, state: true } : { filter : 3, post: false, state: false };
 
-            //当空间时间大于300毫秒才执行回调，防止触发频繁
-            _self.$phone.on('input', _self._debounce(function(){
-                $(document.body).trigger('from:check', [_self.checkPart, true])
-            },400));
+                    $(document.body).trigger('from:check', [_self.checkfilter(checkOps.filter), checkOps.post, checkOps.state]);
+                },400));
+            });
 
             //刷新验证码
             $('.check-img').on('click', function() {
                 $(document.body).trigger('from:captcha')
             });
-
+            //短信验证码
             $('.check-submit').on('click',function(){
                 $(document.body).trigger('from:validation');
             });
@@ -287,33 +308,56 @@ org.mmIndex = (function(org){
             //提交按钮
             _self.$submit.on('click', function(){
                 if(_self.$phone.attr('data-existing') === 'true'){
-                    $(document.body).trigger('from:check', [_self.checkPart, false]);
+                    $(document.body).trigger('from:check', [_self.checkfilter(1), false]);
                 }else{
-                    $(document.body).trigger('from:check', [_self.checkAll, false]);
+                    $(document.body).trigger('from:check', [_self.checkfilter(3), false]);
                 }
 
                 if(!lib.checkState) return
 
-                org.ajax({
-                    url: '/api/register/',
-                    type: 'POST',
-                    data: {
-                        'identifier': _self.$phone.val(),
-                        'validate_code': _self.$codenum.val(),
-                        'IGNORE_PWD': 'true',
-                        'captcha_0' :  $('input[name=codeimg_key]').val(),
-                        'captcha_1' :  $('input[name=codeimg]').val(),
-                    },
-                    success: function(data){
-                        console.log(data)
-                    },
-                    error: function(data){
-
+                var ops = {};
+                _self.$submit.attr('disabled',true).html('领取中，请稍后...');
+                if(_self.$phone.attr('data-existing') === 'true'){
+                    ops = {
+                        url: '/api/distribute/redpack/' + _self.$phone.val()+'/?promo_token=maimai1',
+                        type: 'POST',
+                        success: function(data){
+                            if(data.ret_code == 0){
+                                window.location.href = '/activity/maimai_success/?state=1'
+                            }else if(data.ret_code === 1000){
+                                window.location.href = '/activity/maimai_success/?state=0'
+                            }
+                        },
+                        complete:function(){
+                            lib.$submit.removeAttr('disabled').html('领 取');
+                        }
                     }
-                })
-              //$(this).addClass('btn-activity')
+                }else{
+                    ops = {
+                        url: '/api/register/?promo_token=maimai1',
+                        type: 'POST',
+                        data: {
+                            'identifier': _self.$phone.val(),
+                            'validate_code': _self.$codenum.val(),
+                            'IGNORE_PWD': 'true',
+                            'captcha_0' :  $('input[name=codeimg_key]').val(),
+                            'captcha_1' :  _self.$codeimg.val(),
+                        },
+                        success: function(data){
+                            if(data.ret_code == 0){
+                                window.location.href = '/activity/maimai_success/?state=2'
+                            }
+                        },
+                        error: function(data){
+                            alert(data)
+                        },
+                        complete:function(){
+                            lib.$submit.removeAttr('disabled').html('领 取');
+                        }
+                    }
+                }
+                org.ajax(ops);
             });
-
         },
         /*
          * fn 回调函数
@@ -332,12 +376,11 @@ org.mmIndex = (function(org){
                 }, delay);
             };
         },
-        _check: function(checklist, post){
+        _check: function(checklist, post, state, other){
 
             var check = {};
 
             $.each(checklist, function(i,hash){
-
                 check.checkback = lib['_check' + hash.type]($(hash.dom).val());
                 check.message = hash.message;
                 if(!check.checkback) return false
@@ -345,31 +388,43 @@ org.mmIndex = (function(org){
 
             if(check.checkback){
                 lib.checkState = true;
-                $(document).trigger('from:success', post);
+                $(document).trigger('from:success', [post, other]);
             }else{
                 lib.checkState = false;
-                $(document).trigger('from:error', check.message)
+                $(document).trigger('from:error', [check.message, state, other] )
             }
         },
-        _error: function(message){
-            lib.$sign.css('height','1.275rem').html(message); //显示提示
-            lib.$nbsp.css('height','0');
+        _error: function(message, state, other){
+            if(state){
+                lib.$sign.css('height','1.275rem').html(message);
+                lib.$nbsp.css('height','0');
+            }
+            if(!other) lib.$submit.attr('disabled',true);
         },
-        _success: function(post){
+        _success: function(post, other){
             var _self = this;
 
             _self.$sign.css('height','0');  //隐藏提示
             _self.$nbsp.css('height','.7rem');
 
-            if(post) lib.user_exists(callback);
+            // post 为ture 进行用户验证
+            //post 为false 说明为展开场景,check三个按钮，按钮可点击
+            if(post){
+                lib.user_exists(callback);
+            }else{
+                if(!other) lib.$submit.removeAttr('disabled');
+            }
 
             function callback (data){
                 if(data.existing){
+                    lib.$submit.removeAttr('disabled');
                     _self.$body_h.css({'height': '0'});
                     _self.$phone.attr('data-existing', true);
                 }else{
+                    lib.$submit.attr('disabled',true);
                     _self.$body_h.css({'height': '5.6rem'});
                     _self.$phone.attr('data-existing', false);
+                    $(document.body).trigger('from:check', [_self.checkfilter(3), false, false]);
                 }
             }
         },
@@ -398,12 +453,7 @@ org.mmIndex = (function(org){
                 count = 60,  //60秒倒计时
                 intervalId ; //定时器
 
-            var check = [
-                { type: _self.$phone.attr('data-type'), dom: _self.$phone, message: _self.$phone.attr('data-message')},
-                { type: _self.$codeimg.attr('data-type'), dom: _self.$codeimg, message: _self.$codeimg.attr('data-message')},
-            ];
-
-            $(document.body).trigger('from:check', [check, false]);
+            $(document.body).trigger('from:check', [lib.checkfilter(2), false, true, true]);
 
             if(!_self.checkState) return;
 
@@ -418,28 +468,24 @@ org.mmIndex = (function(org){
                 error :function(xhr){
                     clearInterval(intervalId);
                     var result = JSON.parse(xhr.responseText);
-                    $('.check-submit').text('数字验证码').removeAttr('disabled').removeClass('postValidation');
-                    $(document.body).trigger('from:captcha');
-                    $(document.body).trigger('from:error',[result.message]);
-                },
-                success: function(){
-                    times();
+                    $('.check-submit').text('短信验证码').removeAttr('disabled').removeClass('postValidation');
+                    $(document.body).trigger('from:error',[result.message, true]);
+                    $(document.body).trigger('from:captcha')
                 }
             });
-
             //倒计时
-            function times(){
-                count --;
-                $('.check-submit').text(count + '秒后可重发');
-                intervalId = setTimeout(times, 1000);
-                if ( count <= 0 ){
-                    count = 60;
-                    $('.check-submit').text('重新获取').removeAttr('disabled').removeClass('postValidation');
-                    clearTimeout(intervalId);
+            var timerFunction = function() {
+                if (count >= 1) {
+                    count--;
+                    return $('.check-submit').text(count + '秒后可重发');
+                } else {
+                    clearInterval(intervalId);
+                    $('.check-submit').text('重新获取').removeAttr('disabled').removeClass('postValidation')
+                    return $(document.body).trigger('from:captcha');
                 }
-            }
-
-
+            };
+            timerFunction();
+            return intervalId = setInterval(timerFunction, 1000);
 
         },
         /*
@@ -472,10 +518,33 @@ org.mmIndex = (function(org){
     }
 })(org);
 
-org.mmSuccess = (function(org){
+org.success = (function(org){
     var lib = {
         init:function(){
-            console.log('end')
+            var
+                state = org.getQueryStringByName('state')*1,
+                str = '',
+                val = null;
+
+                if(state === 0){
+                    str = '成功领取';
+                    val = '1.5%加息券';
+                }else if(state === 1){
+                    str = '您已领取过奖品!';
+                    val = null;
+                }else if(state === 2){
+                    str = '成功领取';
+                    val = '120元红包';
+                }
+                $('.maimai-title').html(str);
+                if(val){
+                    $('.maimai-money').html(val);
+                }
+
+
+            var mySwiper = new Swiper('.swiper-container', {
+                pagination: '.swiper-pagination-maimai',
+            })
         },
     }
     return {

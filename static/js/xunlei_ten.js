@@ -13,7 +13,7 @@
     require(['jquery', 'activityRegister'], function ($, re) {
         //注册
         re.activityRegister.activityRegisterInit({
-            registerTitle: '领取迅雷会员+现金红包cd ',    //注册框标语
+            registerTitle: '领取迅雷会员+现金红包 ',    //注册框标语
             isNOShow: '1',
             buttonFont: '立即注册'
         });
@@ -243,7 +243,6 @@
 
         }
 
-
         //请求宝箱接口
         function redpack(sum, callback) {
             $.ajax({
@@ -255,9 +254,11 @@
                 change = data;
                 callback && callback(data);
 
+
             });
         }
-
+        //添加奖品份数
+        $('#jianli').html(change['award']);
 
     });
 }).call(this);

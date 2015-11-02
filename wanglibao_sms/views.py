@@ -47,6 +47,7 @@ def count_messages_arrived_rate():
     try:
         f = open('/var/log/wanglibao/report_messages/' + file_name, 'r')
         lines = f.readlines()
+        f.close()
 
         for line in lines:
             s = line.split(',')[-1]
@@ -69,6 +70,7 @@ def count_messages_arrived_rate():
 def check_arrived_rate_tasks(period=2):
     """
     检查是不是有任务跳过了没有执行.
+    TODO: 每天的改进为只打开一次文件
     :param period: 检查的天数
     :return:
     """
@@ -106,6 +108,7 @@ def check_arrived_rate_tasks(period=2):
             try:
                 f = open('/var/log/wanglibao/report_messages/' + file_name, 'r')
                 lines = f.readlines()
+                f.close()
 
                 for line in lines:
                     s = line.split(',')[-1]

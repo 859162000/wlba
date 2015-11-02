@@ -127,7 +127,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 type: options.type,
                 data: options.data,
                 dataType : options.dataType,
-                async : options.async=="undefined" ? true : false,
+                async : options.async || true,
                 beforeSend: function(xhr, settings) {
                     options.beforeSend && options.beforeSend(xhr);
                     //django配置post请求
@@ -280,7 +280,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             shareImg = host + '/static/imgs/mobile/share_logo.png',
             shareLink = host + '/activity/share/index/?parentPhone='+phoneNum,
             shareMainTit = '有个红包一直拽在手里，今天我想要送给你',
-            shareBody = '领取网利宝520元现金红包,同时可为好友赢得30元红包奖励'
+            shareBody = '领取网利宝580元现金红包,同时可为好友赢得最高80元红包奖励'
         //分享给微信好友
         org.onMenuShareAppMessage({
             title: shareMainTit,
@@ -290,7 +290,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         });
         //分享给微信朋友圈
         org.onMenuShareTimeline({
-            title: '[有人@我]给我们的友情添点真金白银，一人￥520',
+            title: '[有人@我]给我们的友情添点真金白银，一人￥580',
             link : shareLink,
             imgUrl: shareImg
         })
