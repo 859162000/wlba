@@ -82,8 +82,8 @@ class WeixinJoinView(View):
         return HttpResponse(request.GET.get('echostr'))
 
     def post(self, request, account_key):
-        if not self.check_signature(request, account_key):
-            return HttpResponseForbidden()
+        # if not self.check_signature(request, account_key):
+        #     return HttpResponseForbidden()
         account = Account.objects.get(pk=account_key)#WeixinAccounts.get(account_key)
         msg = parse_message(request.body)
         print '-----------------------------%s'%msg._data
@@ -381,7 +381,7 @@ class WeixinLoginBindAPI(APIView):
         return Response(form.errors, status=400)
 
 class WeixinBindRegister(TemplateView):
-    template_name = 'weixin_regist_bind.jade'
+    template_name = 'sub_regist.jade'
 
     def get_context_data(self, **kwargs):
         openid = self.request.GET.get('openid')
