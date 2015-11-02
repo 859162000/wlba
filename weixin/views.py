@@ -32,10 +32,9 @@ from wechatpy import parse_message, create_reply, WeChatClient
 from wechatpy.utils import check_signature
 from wechatpy.exceptions import InvalidSignatureException, WeChatException
 from wechatpy.oauth import WeChatOAuth
-from wechatpy.client.api.qrcode import WeChatQRCode
 from weixin.common.decorators import weixin_api_error
 from weixin.common.wx import generate_js_wxpay
-from .models import Account, WeixinUser, WeixinAccounts, AuthorizeInfo, QrCode
+from .models import Account, WeixinUser, WeixinAccounts, AuthorizeInfo, QrCode, SubscribeService, SubscribeRecord
 from .common.wechat import tuling
 from decimal import Decimal
 from wanglibao_pay.models import Card
@@ -52,6 +51,7 @@ from wanglibao_redis.backend import redis_backend
 from wechatpy.parser import parse_message
 from wechatpy.messages import *
 from wechatpy.events import *
+
 import pickle
 from rest_framework import renderers
 
@@ -112,10 +112,14 @@ class WeixinJoinView(View):
                     if user:
                         rc, txt = bindUser(w_user, user)
                         reply = create_reply(txt, msg)
+                txt = self.getBindTxt(fromUserName, account_key)
+                reply = create_reply(txt, msg)
         elif isinstance(msg, BaseMessage):
             if isinstance(msg, TextMessage):
+                reply = self.check_service_subscribe(msg, account)
                 # 自动回复  5000次／天
-                reply = tuling(msg)
+                if not reply:
+                    reply = tuling(msg)
                 # 多客服转接
                 # reply = TransferCustomerServiceReply(message=msg)
             else:
@@ -126,20 +130,60 @@ class WeixinJoinView(View):
 
     def process_click_event(self, msg):
         reply = None
-        key = "subscribe_service_info"
-        misc = Misc.objects.filter(key=key).first()
-        service_info = {}
-        print misc.value
-        service_info = json.loads(misc.value)
-        print service_info.get(msg.key)
+        sub_services = SubscribeService.objects.filter(channel='weixin', is_open=True).all()
+        # info = {"1":{"desc":"【1】1月标上线通知", }, "2":{"desc":"【2】2月标上线通知", }, "3":{"desc":"【3】3月标上线通知",}, "4":{"desc":"【4】6月标上线通知"}}
+
         if msg.key == 'test_hmm':
-            txt = u'客官，请回复相关数字订阅最新项目通知，系统会在第一时间发送给您相关信息。\n'\
-            +'【1】1月标上线通知\n'\
-            +'【2】2月标上线通知\n'\
-            +'【3】3月标上线通知\n'\
-            +'【4】6月标上线通知\n'\
-            +'如需退订请回复TD'
+            txt = u'客官，请回复相关数字订阅最新项目通知，系统会在第一时间发送给您相关信息。\n'
+            for sub_service in sub_services:
+                txt += (sub_service.describe+'\n')
+            txt += u'如需退订请回复TD'
             reply = create_reply(txt, msg)
+        if msg.key == 'bind_weixin':
+            toUserName = msg._data['ToUserName']
+            fromUserName = msg._data['FromUserName']
+            account = Account.objects.get(original_id=toUserName)
+            w_user = getOrCreateWeixinUser(fromUserName, account)
+            if not w_user.user:
+                txt = self.getBindTxt(fromUserName, account.id)
+            else:
+                txt = self.getUnBindTxt(fromUserName, account.id, w_user.user.wanglibaouserprofile.phone)
+            reply = create_reply(txt, msg)
+        return reply
+
+    def check_service_subscribe(self, msg, account):
+        fromUserName = msg._data['FromUserName']
+        w_user = getOrCreateWeixinUser(fromUserName, account)
+        content = msg.content.lower()
+        reply = None
+        txt = None
+        if content == 'td':
+            sub_records = SubscribeRecord.objects.filter(user=w_user.user, status=True)
+            if sub_records.exists():
+                sub_records.update(status=False)
+                txt = u'订阅项目已退订成功，如需订阅相关项目，请再次点击【个性化项目】进行订阅'
+            else:
+                txt = u'您没有可退订项目，如需订阅相关项目，请再次点击【个性化项目】进行订阅'
+            reply = create_reply(txt, msg)
+            return reply
+        sub_service = SubscribeService.objects.filter(channel='weixin', is_open=True, key=content).first()
+        if sub_service:
+            if w_user.user:
+                sub_service_record = SubscribeRecord.objects.filter(user=w_user.user, service = sub_service).first()
+                if sub_service_record and sub_service_record.status==1:
+                    txt = u'客官真健忘，您已经订阅此项目通知，订阅其他上线通知项目吧～'
+                if not sub_service_record:
+                    sub_service_record = SubscribeRecord()
+                    sub_service_record.service = sub_service
+                    sub_service_record.user = w_user.user
+                if not sub_service_record.status:
+                    sub_service_record.status = True
+                    sub_service_record.save()
+                    txt = u'恭喜您，%s订阅成功，系统会在第一时间发送给您相关信息'%(sub_service.describe)
+            else:
+                txt = self.getBindTxt(fromUserName, account.id)
+            if txt:
+                reply = create_reply(txt, msg)
         return reply
 
 
@@ -157,8 +201,7 @@ class WeixinJoinView(View):
             w_user.save()
 
         if not w_user.user:
-            bind_url = settings.WEIXIN_CALLBACK_URL + reverse('weixin_bind_login') + "?openid=%s&state=%s"%(fromUserName, accountid)
-            txt = u"终于等到你，还好我没放弃。绑定网利宝帐号，轻松投资、随时随地查看收益！<a href='%s'>【立即绑定】</a>"%(bind_url)
+            txt = self.getBindTxt(fromUserName, accountid)
             reply = create_reply(txt, msg)
 
         #如果eventkey为用户id则进行绑定
@@ -186,6 +229,17 @@ class WeixinJoinView(View):
         title1 = '网利宝大事记'
         return [{'image':image, 'url':url, 'description':description, 'title':title},
                 {'image':image1, 'url':url1, 'description':description1, 'title':title1}]
+
+    def getBindTxt(self, fromUserName, accountid):
+        bind_url = settings.WEIXIN_CALLBACK_URL + reverse('weixin_bind_login') + "?openid=%s&state=%s"%(fromUserName, accountid)
+        txt = u"终于等到你，还好我没放弃。绑定网利宝帐号，轻松投资、随时随地查看收益！<a href='%s'>【立即绑定】</a>"%(bind_url)
+        return txt
+
+    def getUnBindTxt(self, fromUserName, accountid, userPhone):
+        unbind_url = settings.WEIXIN_CALLBACK_URL + reverse('weixin_unbind') + "?openid=%s&state=%s"%(fromUserName, accountid)
+        txt = u"您的微信绑定帐号为：%s\n"%userPhone\
+            +u"如需解绑当前帐号，请点击<a href='%s'>【立即解绑】</a>"%unbind_url
+        return txt
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -257,8 +311,47 @@ class WeixinBindLogin(TemplateView):
         account = Account.objects.filter(id=account_id).first()
         if not account:
             return Response({'errcode':-2, 'errmsg':"-2"})
+        w_user = getOrCreateWeixinUser(openid, account)
+        if w_user.user:
+            txt = "您的微信绑定帐号为：13241926426\n"\
+                +"如需解绑当前帐号，请点击【立即解绑】"
+            client = WeChatClient(account.app_id, account.app_secret)
+            client.message.send_text(openid, txt)
+            return Response({"errcode":-3, 'errmsg':u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone})
         return super(WeixinBindLogin, self).dispatch(request, *args, **kwargs)
 
+
+class UnBindWeiUser(TemplateView):
+    template_name = ''
+
+    def get_context_data(self, **kwargs):
+        context = super(UnBindWeiUser, self).get_context_data(**kwargs)
+        openid = self.request.GET.get('openid', '')
+        account_id = self.request.GET.get('state')
+        account = Account.objects.filter(id=account_id).first()
+        try:
+            w_user = getOrCreateWeixinUser(openid, account)
+            context['openid'] = openid
+        except WeChatException, e:
+            pass
+        next = self.request.GET.get('next', '')
+        return {
+            'context': context,
+            'next': next
+            }
+
+    def dispatch(self, request, *args, **kwargs):
+        openid = self.request.GET.get('openid', '')
+        if not openid:
+            return Response({'errcode':-1, 'errmsg':"openid is null"})
+        account_id = self.request.GET.get('state')
+        account = Account.objects.filter(id=account_id).first()
+        if not account:
+            return Response({'errcode':-2, 'errmsg':"-2"})
+        w_user = getOrCreateWeixinUser(openid, account)
+        if w_user.user:
+            pass
+        return super(UnBindWeiUser, self).dispatch(request, *args, **kwargs)
 
 class WeixinLoginBindAPI(APIView):
     permission_classes = ()
