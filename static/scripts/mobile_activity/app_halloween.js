@@ -537,7 +537,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         }   $('.rich_text').addClass('text_animate');
     }
 
-});
+})
 (function(){
     //微信分享
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
