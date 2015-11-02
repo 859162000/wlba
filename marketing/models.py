@@ -531,3 +531,28 @@ class LoginAccessToken(models.Model):
     expire_at = models.BigIntegerField(default=None, verbose_name=u"时间戳", blank=True)
     class Meta:
         verbose_name_plural = u'h5用户令牌登录表'
+
+class QuickApplyInfo(models.Model):
+    """
+        Author:Yihen@20151102
+        Description: 快速申请人填写自己的基本信息，包括姓名、电话、住址、房车、贷款金额
+    """
+    APPLY_WAY = (
+        (0, u'我有房'),
+        (1, u'我有车'),
+        (2, u'其他'),
+    )
+    STATUS = (
+        (0, u'提交申请'),
+        (1, u'申请中'),
+        (2, u'申请成功'),
+        (3, u'申请失败')
+    )
+    name = models.CharField(max_length=128, default='', null=False, verbose_name=u'姓名')
+    phone = models.CharField(max_length=32, default='', null=False, verbose_name=u'电话')
+    address = models.CharField(max_length=256, default='', null=False, verbose_name=u'住址')
+    apply_way = models.IntegerField(max_length=2, choices=APPLY_WAY, default=2, verbose_name=u'贷款抵押')
+    apply_amount = models.CharField(max_length=32, null=False, verbose_name=u'贷款金额')
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
+    update_time = models.DateTimeField(null=True, verbose_name=u'更新时间')
+    status = models.IntegerField(max_length=32, null=False, default=0, choices=STATUS, verbose_name=u'流程状态')
