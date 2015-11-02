@@ -917,10 +917,8 @@ class WeixinCouponList(TemplateView):
             status = 'unused'
 
         user = self.request.user
-        device = utils.split_ua(self.request)
-        result = backends.list_redpack(user, 'all', device['device_type'], 0, 'all')
+        result = backends.list_redpack(user, 'all', 'all', 0, 'all')
         packages = result['packages'].get(status, [])
-
         return {
             "packages": packages,
             "status": status
