@@ -38,6 +38,7 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False)
 
     # 活动检测
     activity_backends.check_activity(user, 'invest', device_type, amount, product_id, is_full)
+    # fix@chenweibi, add order_id
     utils.log_clientinfo(device, "buy", order_id, user_id, amount)
 
     # 发送红包
