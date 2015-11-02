@@ -10,11 +10,11 @@ html
     nav.tab-nav
       ul
         li.active
-          a(href="/weixin/transaction/repaying/") 未使用
+          a(href="/weixin/reward/unused/") 未使用
         li
-          a(href="/weixin/transaction/buying/") 已使用
+          a(href="/weixin/reward/used/") 已使用
         li
-          a(href="/weixin/transaction/finished/") 已过期
+          a(href="/weixin/reward/expired/") 已过期
     section#reward-unused.reward-main
-      include include/ajax/ajax_transaction
+      include include/ajax/ajax_reward
     include include/tracking

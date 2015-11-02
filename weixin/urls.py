@@ -13,6 +13,7 @@ urlpatterns = patterns(
     url(r'^view/(?P<template>\w+)/(?P<id>\w+)/$', views.P2PDetailView.as_view(), name='weixin_p2p_detail'),
     url(r'^account/bankcard/$', login_required(views.WeixinAccountBankCard.as_view(), login_url='/weixin/login/'), name='weixin_bankcard'),
     url(r'^account/bankcard/add/$', login_required(views.WeixinAccountBankCardAdd.as_view(), login_url='/weixin/login/'), name='weixin_bankcard_add'),
+
     url(r'^login/$', views.WeixinLogin.as_view(), name='weixin_login'),
     url(r'^oauth/login/$', views.WeixinOauthLoginRedirect.as_view(), name='weixin_oauth_login_redirect'),
     url(r'^regist/$', views.WeixinRegister.as_view(), name="weixin_register"),
@@ -27,6 +28,9 @@ urlpatterns = patterns(
     url(r'^more/$', TemplateView.as_view(template_name="weixin_more.jade")),
     url(r'^more/contactus/$', TemplateView.as_view(template_name="weixin_contactus.jade")),
     url(r'^more/aboutus/$', TemplateView.as_view(template_name="weixin_aboutus.jade")),
+    url(r'^reward/unused/$', TemplateView.as_view(template_name="weixin_reward_unused.jade")),
+    url(r'^reward/used/$', TemplateView.as_view(template_name="weixin_reward_used.jade")),
+    url(r'^reward/expired/$', TemplateView.as_view(template_name="weixin_reward_expired.jade")),
 
     # js api
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
