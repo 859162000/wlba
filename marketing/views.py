@@ -189,6 +189,7 @@ class AppShareViewShort(TemplateView):
             phone = base64.b64decode(identifier + '=')
         except:
             identifier = self.request.GET.get('phone')
+            phone = identifier
         reg = self.request.GET.get('reg')
 
         return {
@@ -230,7 +231,10 @@ class ShortAppShareRegView(TemplateView):
             identifier = self.request.GET.get('i')
             identifier = base64.b64decode(identifier + '=')
             friend_identifier = self.request.GET.get('fi')
-            # friend_identifier = base64.b64decode(friend_identifier)
+            try:
+                friend_identifier = str(int(friend_identifier))
+            except:
+                friend_identifier = base64.b64decode(friend_identifier + '=')
         except Exception, e:
             print e
             identifier = self.request.GET.get('identifier').strip()

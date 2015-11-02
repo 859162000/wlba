@@ -529,8 +529,8 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
         name = redpack_event.name
         if redpack_event.auto_extension and redpack_event.auto_extension_days > 0 and created_at:
             unavailable_at = created_at + datetime.timedelta(days=int(redpack_event.auto_extension_days))
-            if unavailable_at < redpack_event.unavailable_at:
-                unavailable_at = redpack_event.unavailable_at
+            # if unavailable_at < redpack_event.unavailable_at:
+            #     unavailable_at = redpack_event.unavailable_at
         else:
             unavailable_at = redpack_event.unavailable_at
         end_date = timezone.localtime(unavailable_at).strftime(fmt_str)

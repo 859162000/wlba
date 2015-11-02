@@ -199,9 +199,11 @@ class RewardRecordAdmin(admin.ModelAdmin):
 
 class ChannelsAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ("id", "code", "name", "description")
+##    list_display = ("id", "code", "name", "description")
+    list_display = ("id", "code", "name", "description", "platform", "coop_status", "is_abandoned")
     search_fields = ("name",)
-    list_filter = ("name",)
+##    list_filter = ("name",)
+    list_filter = ("coop_status", "is_abandoned", "classification")
 
     # def __init__(self, *args, **kwargs):
     #     super(ChannelsAdmin, self).__init__(*args, **kwargs)
@@ -280,7 +282,7 @@ admin.site.register(Reward, RewardAdmin)
 admin.site.register(RewardRecord, RewardRecordAdmin)
 #admin.site.register(ClientData, ClientDataAdmin)
 admin.site.register(Channels, ChannelsAdmin)
-admin.site.register(ChannelsNew, ChannelsNewAdmin)
+##admin.site.register(ChannelsNew, ChannelsNewAdmin)
 admin.site.register(IntroducedByReward, IntroducedByRewardAdmin)
 admin.site.register(ActivityJoinLog, ActivityJoinLogAdmin)
 admin.site.register(PlayList, PlayListAdmin)

@@ -125,6 +125,7 @@ urlpatterns += patterns(
 
     url(r'^wx_november_new/$', TemplateView.as_view(template_name="h5_november_new.jade")),
 
+    #url(r'^wx_financing/$', TemplateView.as_view(template_name="h5_financing.jade")),
 )
 
 urlpatterns += patterns(
