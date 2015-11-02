@@ -33,10 +33,10 @@ urlpatterns = patterns(
     url(r'^advance/$', TemplateView.as_view(template_name="advance.jade")),
     url(r'^gold/$', TemplateView.as_view(template_name="gold.jade"), name='marketing_gold'),
     url(r'^qixi/$', TemplateView.as_view(template_name="qixi.jade")),
-    url(r'^xunlei_setp/$', TemplateView.as_view(template_name="xunlei_setp.jade"), name='marketing_xunlei_setp'),
-    url(r'^xunlei_ten/$', ThunderTenAcvitityTemplate.as_view(template_name="xunlei_ten.jade")),
+    # url(r'^xunlei_setp/$', TemplateView.as_view(template_name="xunlei_setp.jade"), name='marketing_xunlei_setp'),
+    url(r'^xunlei_setp/$', ThunderTenAcvitityTemplate.as_view(template_name="xunlei_ten.jade")),
     url(r'^mid_autumn/$', TemplateView.as_view(template_name="mid-autumn.jade")),
-    url(r'^xunlei_ten/$', TemplateView.as_view(template_name="xunlei_ten.jade")),
+    # url(r'^xunlei_ten/$', TemplateView.as_view(template_name="xunlei_ten.jade")),
 
     url(r'^anniversary/$', TemplateView.as_view(template_name="anniversary.jade")),
     url(r'^app_anniversary/$', TemplateView.as_view(template_name="app_anniversary.jade")),

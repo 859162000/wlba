@@ -142,6 +142,7 @@ MIDDLEWARE_CLASSES = (
     'reversion.middleware.RevisionMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'wanglibao_app.middlewares.DisableAppCsrfCheck',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -210,7 +211,9 @@ LOCALE_PATHS = (
 AUTHENTICATION_BACKENDS = (
     'wanglibao_account.auth_backends.EmailPhoneUsernameAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
 )
+import django.contrib.auth.backends
 
 # Template loader
 TEMPLATE_LOADERS = (
@@ -379,6 +382,12 @@ LOGGING = {
             'filename': '/var/log/wanglibao/wanglibao_reward.log',
             'formatter': 'verbose'
         },
+        'wanglibao_rest':{  #add by yihen@20151028
+                              'level': 'DEBUG',
+                              'class': 'logging.FileHandler',
+                              'filename': '/var/log/wanglibao/wanglibao_rest.log',
+                              'formatter': 'verbose'
+                              },
     },
     'loggers': {
         'django': {
@@ -442,6 +451,10 @@ LOGGING = {
             'handlers': ['wanglibao_reward', 'console'],
             'level': 'DEBUG'
         },
+        'wanglibao_rest': { #add by yihen@20151028
+              'handlers': ['wanglibao_rest', 'console'],
+              'level': 'DEBUG'
+          },
     }
 }
 
@@ -597,15 +610,16 @@ CELERYBEAT_SCHEDULE = {
         'task': 'marketing.tools.check_and_generate_codes',
         'schedule': crontab(minute=0, hour=3)
     },
-    # by Zhoudong 发送短信时间统计
-    'message_arrived_rate_statistics': {
-        'task': 'wanglibao_sms.tasks.message_arrived_rate_task',
-        'schedule': timedelta(minutes=10),
-    },
-    # by Zhoudong 发送短信时间统计
-    'message_arrived_rate_check': {
-        'task': 'wanglibao_sms.tasks.check_arrived_rate_task',
-        'schedule': crontab(minute=0, hour=0),
+
+    # by Zhoudong 定期检查没有投资的新用户, 提醒投资
+    # 'invested_status_task_check': {
+    #     'task': 'marketing.tools.check_invested_status',
+    #     'schedule': crontab(minute=0, hour=10),
+    # },
+    # by Zhoudong 定期检查用户优惠券没使用,发送提醒
+    'redpack_status_task_check': {
+        'task': 'marketing.tools.check_redpack_status',
+        'schedule': crontab(minute=0, hour=11),
     },
 }
 
@@ -1068,3 +1082,4 @@ else:
 
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)
+WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'
