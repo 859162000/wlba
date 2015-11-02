@@ -2025,6 +2025,12 @@ class QuickApplyer(APIView):
         u"其他": 'qitachengshioffice@wanglibank.com',
         }
 
+        apply = {
+            0: u'我有房',
+            1: u'我有车',
+            2: u'其他',
+        }
+
         name = request.POST.get('name', '')
         phone = request.POST.get('phone', '')
         address = request.POST.get('address', '')
@@ -2050,22 +2056,26 @@ class QuickApplyer(APIView):
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-        applyer = QuickApplyInfo.objects.create(
-            name=name,
-            phone=phone,
-            address=address,
-            apply_way=apply_way,
-            apply_amount=amount
-        )
+        try:
+            applyer = QuickApplyInfo.objects.create(
+                name=name,
+                phone=phone,
+                address=address,
+                apply_way=apply_way,
+                apply_amount=amount
+            )
+        except Exception, reason:
+            logger.debug("贷款专区，申请人数据入库报异常, reason:%s" % (reason,))
+            to_json_response = {
+                'ret_code': '1002',
+                'message': u"申请人信息入库异常"
+            }
 
-        apply = {
-            0: u'我有房',
-            1: u'我有车',
-            2: u'其他',
-        }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
         title = "[%s - %s]贷款申请" % (address, apply[int(apply_way)])
         body = "姓名:%s <br/> 手机号:%s<br/> 城市:%s<br/> 资产状况:%s<br/> 贷款金额:%s万<br/>" % (name, phone, address,apply[int(apply_way)], amount)
-        self.send_mail('develop@wanglibank.com', 'chenfeifan@wanglibank.com', title, body)
+        self.send_mail('develop@wanglibank.com', email[address], title, body)
         to_json_response = {
             'ret_code': '0',
             'message': u"提交成功,请您耐心等待"
