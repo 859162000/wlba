@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # encoding:utf-8
+from celery.utils.log import get_task_logger
 import pytz
 
 from wanglibao.celery import app
@@ -20,8 +21,10 @@ from wanglibao_redpack.models import Income, RedPackEvent, RedPack, RedPackRecor
 import datetime
 from django.db.models import Sum, Count, Q
 import logging
-logger = logging.getLogger('wanglibao_reward')
 
+# logger = logging.getLogger('wanglibao_reward')
+
+logger = get_task_logger(__name__)
 
 @app.task
 def decide_first(user_id, amount, device, product_id=0, is_full=False):

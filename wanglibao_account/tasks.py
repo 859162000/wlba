@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from celery.utils.log import get_task_logger
 from wanglibao import settings
 import wanglibao_account
 
@@ -13,6 +14,8 @@ from wanglibao.celery import app
 
 from wanglibao_account.models import Binding
 
+logger = get_task_logger(__name__)
+
 # from wanglibao_p2p.models import P2PProduct
 # from wanglibao_account.utils import CjdaoUtils
 # from wanglibao.settings import CJDAOKEY, POST_PRODUCT_URL
@@ -21,7 +24,7 @@ from wanglibao_account.models import Binding
 # import logging
 #
 #
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 #
 #
 # @app.task
