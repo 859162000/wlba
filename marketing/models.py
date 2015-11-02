@@ -339,6 +339,8 @@ class ClientData(models.Model):
     user_id = models.IntegerField(u"用户ID", blank=False, null=False, default=0)
     amount = models.DecimalField(u'金额', max_digits=20, decimal_places=2, default=0)
     action = models.CharField(max_length=10, blank=False, null=False, choices=ACTION)
+    # fix@chenweibi, add order_id
+    order_id = models.IntegerField(u'关联订单编号', null=True, db_index=True)
     create_time = models.DateTimeField(u'创建时间', blank=False, null=False, default=timezone.now)
 
 
