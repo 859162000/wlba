@@ -24,7 +24,7 @@ from django.db.models.base import ModelState
 from wanglibao_sms.utils import send_validation_code
 from misc.models import Misc
 from wanglibao_sms.models import *
-from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, IntroducedBy, IntroducedByReward, Reward, ActivityJoinLog, QuickApplyInfo
+from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, IntroducedBy, IntroducedByReward, Reward, ActivityJoinLog
 from marketing.tops import Top
 from utils import local_to_utc
 
@@ -57,16 +57,6 @@ import hashlib
 import logging
 logger = logging.getLogger('marketing')
 TRIGGER_NODE = [i for i, j in TRIGGER_NODE]
-
-import sys
-import time
-from smtplib import SMTP
-from email.header import Header
-#from email import MIMEText
-#from email.MIMEMultipart import MIMEMultipart
-from email.MIMEText import MIMEText
-from email.MIMEMultipart import MIMEMultipart
-reload(sys)
 
 class YaoView(TemplateView):
     template_name = 'yaoqing.jade'
@@ -1979,106 +1969,3 @@ class ThunderTenAcvitityTemplate(TemplateView):
 
         return response_data
 
-class QuickApplyer(APIView):
-    permission_classes = ()
-
-    def send_mail(self, sender, reciver, title, body):
-        SMTPSVR = 'smtp.exmail.qq.com'
-        user = 'develop@wanglibank.com'
-        pw = 'abc&321'
-        msg = MIMEMultipart()
-        msg['From'] = '%s <%s>' % (Header('网利技术服务', 'utf-8'), sender)
-        if isinstance(reciver, list):
-            msg['To'] = ';'.join(reciver)
-        else:
-            msg['To'] = reciver
-        msg['Subject'] = Header(title, 'utf-8')
-        msg['Accept-Language'] = 'zh-CN'
-        msg['Accept-Charset'] = 'ISO-8859-1,utf-8'
-        body = MIMEText(body, 'html', 'utf-8')
-        body.set_charset('utf-8')
-        msg.attach(body)
-        sendSvr = SMTP(SMTPSVR, 25)
-        sendSvr.login(user, pw)
-        sendSvr.sendmail(sender, reciver, msg.as_string())
-        sendSvr.quit()
-
-    def post(self, request):
-        email ={
-        u"北京": 'beijingoffice@wanglibank.com',
-        u"上海": 'shanghaioffice@wanglibank.com',
-        u"中山": 'zhongshanoffice@wanglibank.com',
-        u"深圳": 'shenzhenoffice@wanglibank.com',
-
-        u"天津": 'tianjinoffice@wanglibank.com',
-        u"长沙": 'changshaoffice@wanglibank.com',
-        u"武汉": 'wuhanoffice@wanglibank.com',
-        u"贵阳": 'guiyangoffice@wanglibank.com',
-
-        u"西安": 'xianoffice@wanglibank.com',
-        u"青岛": 'qingdaooffice@wanglibank.com',
-        u"石家庄": 'shijiazhuangoffice@wanglibank.com',
-        u"海口": 'haikouoffice@wanglibank.com',
-
-        u"郑州": 'zhengzhouoffice@wanglibank.com',
-        u"重庆": 'chongqingoffice@wanglibank.com',
-        u"其他": 'qitachengshioffice@wanglibank.com',
-        }
-
-        apply = {
-            0: u'我有房',
-            1: u'我有车',
-            2: u'其他',
-        }
-
-        name = request.POST.get('name', '')
-        phone = request.POST.get('phone', '')
-        address = request.POST.get('address', '')
-        apply_way = request.POST.get('apply_way', '')
-        amount = request.POST.get('amount', '')
-
-        if not(name and phone and address and apply_way and amount):
-            to_json_response = {
-                'ret_code': 1000,
-                'message': u'您的输入信息有遗漏'
-            }
-
-            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-
-        now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-        mytime = datetime.strptime(now, '%Y-%m-%d %H:%M:%S')+timedelta(days=-7)
-        last_register = datetime.strftime(mytime, '%Y-%m-%d %H:%M:%S')
-        applyer = QuickApplyInfo.objects.filter(phone=phone, create_time__gte=last_register)
-        if applyer.count() >= 2:
-            to_json_response = {
-                'ret_code': '1001',
-                'message': u"您已提交过申请，请等待业务人员联系"
-            }
-            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-
-        try:
-            applyer = QuickApplyInfo.objects.create(
-                name=name,
-                phone=phone,
-                address=address,
-                apply_way=apply_way,
-                apply_amount=amount
-            )
-        except Exception, reason:
-            logger.debug("贷款专区，申请人数据入库报异常, reason:%s" % (reason,))
-            to_json_response = {
-                'ret_code': '1002',
-                'message': u"申请人信息入库异常"
-            }
-
-            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-
-        title = "[%s - %s]贷款申请" % (address, apply[int(apply_way)])
-        body = "姓名:%s <br/> 手机号:%s<br/> 城市:%s<br/> 资产状况:%s<br/> 贷款金额:%s万<br/>" % (name, phone, address,apply[int(apply_way)], amount)
-        self.send_mail('develop@wanglibank.com', email[address], title, body)
-        to_json_response = {
-            'ret_code': '0',
-            'message': u"提交成功,请您耐心等待"
-        }
-
-        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
