@@ -12,7 +12,7 @@ from django.conf import settings
 from django.shortcuts import render_to_response, redirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
+from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
 from wanglibao_buy.models import FundHoldInfo
 from wanglibao_banner.models import Banner
 from wanglibao_p2p.models import P2PProduct, P2PEquity, Attachment
@@ -198,7 +198,7 @@ class WeixinLoginAPI(APIView):
     http_method_names = ['post']
 
     def _form(self, request):
-        return EmailOrPhoneAuthenticationForm(request, data=request.POST)
+        return LoginAuthenticationNoCaptchaForm(request, data=request.POST)
 
     def post(self, request):
         form = self._form(request)

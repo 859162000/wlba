@@ -16,7 +16,6 @@ html(style="background: #f5f5f5")
       from(action="{% url 'weixin_login_api' %}")#login-form.login-farom
         - csrf_token
         input(name="openid", type="hidden", value="{{ openid }}")
-        input(name="captcha_0", type="hidden", value="")
         .form-list
           .form-icon.user-phone.identifier-icon
           .form-input
@@ -27,13 +26,6 @@ html(style="background: #f5f5f5")
           .form-input
             input(type="password", name="password", placeholder="请输入密码",data-target2='password-icon', data-icon='user-password')
             .form-edit-icon.password-handle.hide-password
-        //.form-code
-          .form-list.form-validation
-            .form-icon.user-validation.captcha_1-icon
-            .form-input
-              input(type="text", name="captcha_1", placeholder="请输入计算结果", data-target2='captcha_1-icon', data-icon='user-validation')
-          .login-validation
-            img(src="", alt="", width="100%", height="100%")#captcha
         section.login-submit
           button(type="submit", disabled=true) 登录网利宝
     section.login-for-regist
