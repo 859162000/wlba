@@ -46,6 +46,7 @@ from wanglibao_sms.utils import validate_validation_code
 from django.conf import settings
 from wanglibao_announcement.utility import AnnouncementAccounts
 # from wanglibao_account.forms import verify_captcha
+from util import WithdrawFee
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -182,12 +183,21 @@ class WithdrawView(TemplateView):
     def get_context_data(self, **kwargs):
         cards = Card.objects.filter(user=self.request.user).order_by("-is_default").select_related()
         banks = Bank.get_withdraw_banks()
+        # 查询用户本月提现次数,查询成功/处理中状态的记录
+        withdraw_count = PayInfo.objects.filter(user=self.request.user, type='W')\
+            .filter(status__in=[u'成功', u'已受理']).count()
+
+        # 提现管理费费率
+        fee_config = WithdrawFee(switch='on')
+        fee = fee_config.get_withdraw_fee()
         return {
             'cards': cards,
             'banks': banks,
             'user_profile': self.request.user.wanglibaouserprofile,
             'margin': self.request.user.margin.margin,
-            'fee': HuifuPay.FEE,
+            'uninvested': self.request.user.margin.uninvested,
+            'withdraw_count': withdraw_count,
+            'fee': fee,
             'announcements': AnnouncementAccounts
         }
 
