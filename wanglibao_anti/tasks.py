@@ -9,14 +9,15 @@
 
 import logging
 import time
+from celery.utils.log import get_task_logger
 from marketing import tools
 from wanglibao_anti.models import AntiDelayCallback
 from wanglibao_anti.anti.anti import GlobalParamsSpace
 from wanglibao.celery import app
 from json import JSONDecoder
 
-logger = logging.getLogger('wanglibao_anti')
-
+# logger = logging.getLogger('wanglibao_anti')
+logger = get_task_logger(__name__)
 
 def kill_register_user_by_admin(*ips):
     '''针对某些特殊的ip，手工封杀；不管其IP注册数有多少

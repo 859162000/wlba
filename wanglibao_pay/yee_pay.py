@@ -297,7 +297,9 @@ class YeePay:
         if rs['ret_code'] == 0:
             device = split_ua(request)
             try:
-                tools.deposit_ok.apply_async(kwargs={"user_id":pay_info.user.id, "amount":pay_info.amount, "device":device})
+                # fix@chenweibi, add order_id
+                tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
+                                                     "device": device, "order_id": orderId})
             except:
                 pass
         OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
@@ -440,6 +442,7 @@ class YeeShortPay:
         return {"data": data, "encryptkey": encryptkey, "merchantaccount": self.MER_ID}
 
     def _request_yee(self, url, data):
+        logger.error("request yee_pay: %s" % data)
         post = self._format_post(data)
         res = requests.post(url, post)
         return self._response_data_change(res=json.loads(res.text))
@@ -469,6 +472,7 @@ class YeeShortPay:
             logger.error(data)
             return {'ret_code': 20011, 'message': '签名验证失败', 'data': data}
 
+        logger.error("yee_pay response: %s" % data)
         return {'ret_code': 0, 'message': 'ok', 'data': data}
 
     def _response_decode(self, res):
@@ -771,7 +775,9 @@ class YeeShortPay:
         pay_info.save()
         if rs['ret_code'] == 0:
             try:
-                tools.deposit_ok.apply_async(kwargs={"user_id":pay_info.user.id, "amount":pay_info.amount, "device":device})
+                # fix@chenweibi, add order_id
+                tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
+                                                     "device": device, "order_id": order_id})
             except:
                 pass
 
@@ -865,7 +871,9 @@ class YeeShortPay:
             device = split_ua(request)
             try:
                 try:
-                    tools.deposit_ok.apply_async(kwargs={"user_id":pay_info.user.id, "amount":pay_info.amount, "device":device})
+                    # fix@chenweibi, add order_id
+                    tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
+                                                         "device": device, "order_id": orderId})
                 except:
                     pass
             except:

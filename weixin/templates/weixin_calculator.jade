@@ -14,7 +14,7 @@ html
       .head-profit
         earning_rate = float(p2p['expected_earning_rate'])
         if p2p.activity
-          earning_rate = earning_rate + float(p2p.activity.rule.percent_text)
+          earning_rate = earning_rate + float(p2p['activity']['activity_rule_percent_text'])
         p.profit-numbe {{earning_rate}}
           em %
         p.profit-txt 年化收益
