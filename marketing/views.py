@@ -1978,7 +1978,7 @@ class ThunderTenAcvitityTemplate(TemplateView):
 
         return response_data
 
-class QuickApplyer(APIView):
+class QuickApplyerAPIView(APIView):
     permission_classes = ()
 
     def send_mail(self, sender, reciver, title, body):
@@ -2083,7 +2083,7 @@ class QuickApplyer(APIView):
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
 
-class GiftOwnerInfo(APIView):
+class GiftOwnerInfoAPIView(APIView):
     permission_classes = ()
 
     def get_left_awards(self):
@@ -2114,10 +2114,31 @@ class GiftOwnerInfo(APIView):
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
+        if self.request.user.is_authenticated():
+            to_json_response = {
+                'ret_code': 1030,
+                'message': u'请先登录，再领取奖品',
+                'award80': award80,
+                'award100': award188
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
         if 'jcw' != channel:
             to_json_response = {
                 'ret_code': 1000,
-                'message': u'渠道不是聚橙网'
+                'message': u'渠道不是聚橙网',
+                'award80': award80,
+                'award100': award188
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        item = GiftOwnerInfo.objects.filter(config__description__in=('jcw_ticket_80', 'jcw_ticket_188'), user=self.request.user)
+        if item.exists():
+            to_json_response = {
+                'ret_code': 1010,
+                'message': u'您已经领取过门票，不可重复领取',
+                'award80': award80,
+                'award100': award188
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -2154,7 +2175,9 @@ class GiftOwnerInfo(APIView):
                         logger.info(u"获奖用户 (%s) 信息入库成功" % (self.request.user,))
                         to_json_response = {
                             'ret_code': 0,
-                            'message': u'获得80元没票一张'
+                            'message': u'获得80元没票一张',
+                            'award80': award80-1,
+                            'award100': award188
                         }
                         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -2184,20 +2207,26 @@ class GiftOwnerInfo(APIView):
                         logger.info(u"获奖用户 (%s) 信息入库成功" % (self.request.user,))
                         to_json_response={
                             'ret_code': 0,
-                            'message': u'获得188元没票一张'
+                            'message': u'获得188元没票一张',
+                            'award80': award80,
+                            'award100': award188-1
                         }
                         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
             else:
                 to_json_response = {
                     'ret_code': 200,
-                    'message': u'用户的投资额度不符合领奖规则'
+                    'message': u'用户的投资额度不符合领奖规则',
+                    'award80': award80,
+                    'award100': award188
                 }
                 return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
         else:
             to_json_response = {
                 'ret_code': 100,
-                'message': u'首投用户才有可以领取门票'
+                'message': u'首投用户才有可以领取门票',
+                'award80': award80,
+                'award100': award188
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 

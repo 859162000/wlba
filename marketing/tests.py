@@ -17,7 +17,7 @@ class TestMarketingAPI(TestCase):
                          {
                             'phone':13521522034,
                              'name':'hello',
-                             'address': u'北京市',
+                             'address': u'北京',
                              'apply_way': 0,
                              'amount': '10-30'
                          }
