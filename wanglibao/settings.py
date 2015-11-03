@@ -411,7 +411,7 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG',
         },
-        'p2p': {
+        'wanglibao_p2p': {
             'handlers': ['file'],
             'level': 'DEBUG',
         },
@@ -455,6 +455,10 @@ LOGGING = {
               'handlers': ['wanglibao_rest', 'console'],
               'level': 'DEBUG'
           },
+        'wanglibao_p2p': {
+            'handlers': [ 'console'],
+            'level': 'DEBUG'
+        }
     }
 }
 
@@ -526,7 +530,7 @@ from datetime import timedelta, datetime
 CELERYBEAT_SCHEDULE = {
     'p2p-watchdog-1-minutes': {
         'task': 'wanglibao_p2p.tasks.p2p_watchdog',
-        'schedule': timedelta(minutes=5),
+        'schedule': timedelta(minutes=1),
     },
     'report-generate': {
         'task': 'report.tasks.generate_report',
@@ -623,7 +627,9 @@ CELERYBEAT_SCHEDULE = {
     },
 }
 
-CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
+# CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
+CELERYBEAT_SCHEDULE_FILENAME = "/tmp/celerybeat-schedule"
+
 
 ID_VERIFY_USERNAME = 'wljr_admin'
 ID_VERIFY_PASSWORD = 'wljr888'

@@ -10,17 +10,17 @@ html
       img(src="/static/imgs/mobile/financing/banner.png")
     .f-form#financeForm
       p.form-item
-        input.txt-input.placeholderInput(placeholder="请输入您的姓名",title="请输入您的姓名")
+        input.txt-input.placeholderInput.name-inp(placeholder="请输入您的姓名",title="请输入您的姓名",maxlength="128")
       p.form-item
-        input.txt-input.placeholderInput.checkMobile(placeholder="请输入您的手机号",title="请输入您的手机号")
+        input.txt-input.placeholderInput.checkMobile(placeholder="请输入您的手机号",title="请输入您的手机号",maxlength="20")
       .relative1.select-box
         p.form-item.relative.js-select
-          input.txt-input(placeholder="选择您的所在城市",title="选择您的所在城市",readonly="true")
+          input.txt-input.city-inp(placeholder="选择您的所在城市",title="选择您的所在城市",readonly="true")
           span.arr-box
             i.arr-top
         .select-cont.js-select-skin(style="display:none;")
           p.form-item.relative.js-select-top
-            input.txt-input(placeholder="选择您的所在城市",title="选择您的所在城市",readonly="true")
+            input.txt-input.city-inp(placeholder="选择您的所在城市",title="选择您的所在城市",readonly="true")
             span.arr-box
               i.arr-bottom
           .form-cont
@@ -43,27 +43,27 @@ html
             .form-promot *如上若无您所在城市，请选择就近城市或其它城市
       .relative2.select-box
         p.form-item.relative.js-select
-          input.txt-input(placeholder="我有车/我有房",title="我有车/我有房",readonly="true")
+          input.txt-input.home-inp(placeholder="我有车/我有房",title="我有车/我有房",readonly="true")
           span.arr-box
             i.arr-top
         .select-cont.js-select-skin(style="display:none;")
           p.form-item.relative.js-select-top
-            input.txt-input(placeholder="我有车/我有房",title="我有车/我有房",readonly="true")
+            input.txt-input.home-inp(placeholder="我有车/我有房",title="我有车/我有房",readonly="true")
             span.arr-box
               i.arr-bottom
           .form-cont
             .form-list.clearfix.three-item
-              a(href="javascript:;") 我有车
-              a(href="javascript:;") 我有房
-              a(href="javascript:;") 其它
+              a(href="javascript:;",data-val="0") 我有车
+              a(href="javascript:;",data-val="1") 我有房
+              a(href="javascript:;",data-val="2") 其它
       .relative3.select-box
         p.form-item.relative.js-select
-          input.txt-input(placeholder="选择您要贷款的金额",title="选择您要贷款的金额",readonly="true")
+          input.txt-input.money-inp(placeholder="选择您要贷款的金额",title="选择您要贷款的金额",readonly="true")
           span.arr-box
             i.arr-top
         .select-cont.js-select-skin(style="display:none;")
           p.form-item.relative.js-select-top
-            input.txt-input(placeholder="选择您要申请的金额",title="选择您要申请的金额",readonly="true")
+            input.txt-input.money-inp(placeholder="选择您要申请的金额",title="选择您要申请的金额",readonly="true")
             span.arr-box
               i.arr-bottom
           .form-cont
@@ -123,6 +123,10 @@ html
         .project-info
           p.p-tit 房贷
           p 个人或企业名下有房产；信用记录良好<br />贷款额度：3—600万
+    .alt-pages#alt-pages
+    .alt-box#alt-box
+      p 您已提交成功,请您耐心等待
+      p.promote <span id="times-box">3秒</span>后将关闭
     script(src="/static/js/require.js", data-main="/static/js/header")
     script.
       require(["/static/src/pc/financing.js"])
