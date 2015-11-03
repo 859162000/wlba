@@ -1,0 +1,12 @@
+-load formatters
+doctype html
+html
+  head
+    include include/app_header.jade
+  body
+    .question-warp
+      for val in list
+        a(href='/api/m/questions/{{val.id}}/').question-list
+          .question-name {{val.id}}、{{val.question}}
+          .question-arrow
+
