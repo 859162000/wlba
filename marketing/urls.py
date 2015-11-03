@@ -124,6 +124,7 @@ urlpatterns += patterns(
     url(r'^wechat_rule/$', TemplateView.as_view(template_name="app_wechatReward_rule.jade")),
 
     url(r'^wx_november_new/$', TemplateView.as_view(template_name="h5_november_new.jade")),
+    url(r'^app_xiaomei/$', TemplateView.as_view(template_name="app_xiaomei.jade")),
 
     url(r'^wx_financing/$', TemplateView.as_view(template_name="h5_financing.jade")),
 )
