@@ -364,7 +364,7 @@ LOGGING = {
             'filename': '/var/log/wanglibao/mysite.log',
             'formatter': 'verbose'
         },
-        'anti': {
+        'wanglibao_anti': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': '/var/log/wanglibao/anti.log',
@@ -440,7 +440,7 @@ LOGGING = {
             'level': 'DEBUG'
         },
         'wanglibao_anti': {
-            'handlers': ['anti', 'console'],
+            'handlers': ['wanglibao_anti', 'console'],
             'level': 'DEBUG'
         },
         'marketing': {

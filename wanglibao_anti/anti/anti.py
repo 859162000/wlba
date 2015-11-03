@@ -16,7 +16,7 @@ logger = logging.getLogger('wanglibao_anti')
 
 
 class GlobalParamsSpace(object):
-    DELAY_CHANNELS = ['xingmei']
+    DELAY_CHANNELS = []
     ANTI_DEBUG = True
 
 class AntiBase(object):
