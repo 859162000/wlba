@@ -621,7 +621,7 @@ class AppQuestionsView(TemplateView):
 
         list = []
 
-        for val in  question_list:
+        for val in sorted(question_list):
             list.append({
                 'id': val,
                 'question': question_list[val]['question']
