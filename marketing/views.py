@@ -2114,7 +2114,7 @@ class GiftOwnerInfoAPIView(APIView):
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-        if self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated():
             to_json_response = {
                 'ret_code': 1030,
                 'message': u'请先登录，再领取奖品',
@@ -2132,7 +2132,7 @@ class GiftOwnerInfoAPIView(APIView):
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-        item = GiftOwnerInfo.objects.filter(config__description__in=('jcw_ticket_80', 'jcw_ticket_188'), user=self.request.user)
+        item = GiftOwnerInfo.objects.filter(config__description__in=('jcw_ticket_80', 'jcw_ticket_188'), sender=request.user)
         if item.exists():
             to_json_response = {
                 'ret_code': 1010,
