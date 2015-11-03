@@ -644,3 +644,8 @@ class AppQuestionsResultView(TemplateView):
             'title': result_title,
             "list": result_list,
         }
+
+class AppCostView(TemplateView):
+
+    """ 费用说明 """
+    template_name = 'client_cost_description.jade'

@@ -8,7 +8,7 @@ from wanglibao_app.views import (AppActivateImageAPIView, AppRepaymentAPIView, A
                                  SendValidationCodeView, AppIncomeRateAPIView, AppPhoneBookUploadAPIView,
                                  AppPhoneBookQueryAPIView, AppPhoneBookAlertApiView, AppInviteAllGoldAPIView,
                                  AppAboutView, AppManagementView, AppLogoutAPIView, AppQuestionsView,
-                                 AppQuestionsResultView)
+                                 AppQuestionsResultView, AppCostView)
 
 router = DefaultRouter()
 
@@ -37,4 +37,5 @@ urlpatterns = patterns(
     url(r'^logout/$', AppLogoutAPIView.as_view()),
     url(r'^questions/$', AppQuestionsView.as_view()),
     url(r'^questions/(?P<index>\w+)/$', AppQuestionsResultView.as_view()),
+    url(r'^cost/$', AppCostView.as_view()),
 )
