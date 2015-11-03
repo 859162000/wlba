@@ -803,11 +803,21 @@ class AuthorizeUser(APIView):
                 w_user.auth_info.save()
             if save_user:
                 w_user.save()
+
+            appendkeys = []
+            for key in request.GET.keys():
+                if key == u'state' or key == u'code':
+                    continue
+                appendkeys.append(key)
+
             if redirect_url.find('?') == -1:
                 redirect_url += '?openid=%s'%openid
             else:
                 redirect_url += '&openid=%s'%openid
+            for key in appendkeys:
+                redirect_url += '&%s=%s'%(key, request.GET.get(key))
             return redirect(redirect_url)
+
         return Response({'errcode':-2, 'errmsg':'code is null'})
 
 
