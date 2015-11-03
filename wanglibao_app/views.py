@@ -40,6 +40,7 @@ from wanglibao_sms.utils import send_validation_code
 from wanglibao_sms.tasks import send_messages
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.forms import verify_captcha
+from wanglibao_app.questions import question_list
 
 logger = logging.getLogger(__name__)
 
@@ -581,3 +582,43 @@ class AppLogoutAPIView(APIView):
     def get(self, request, **kwargs):
         auth.logout(request)
         return Response({'ret_code': 0, 'message': 'success'})
+
+
+class AppQuestionsView(TemplateView):
+
+    """ app常见问题 """
+    template_name = 'client_questions.jade'
+
+    def get_context_data(self, **kwargs):
+
+        list = []
+
+        for val in  question_list:
+            list.append({
+                'id': val,
+                'question': question_list[val]['question']
+            })
+
+        return {
+            "list": list,
+        }
+
+
+class AppQuestionsResultView(TemplateView):
+
+    """ app常见问题 """
+    template_name = 'client_questions_result.jade'
+
+    def get_context_data(self, **kwargs):
+
+        index = kwargs['index']
+
+        que_list = question_list[index]
+
+        result_title = que_list['question']
+        result_list = que_list['answer']
+        print result_title
+        return {
+            'title': result_title,
+            "list": result_list,
+        }
