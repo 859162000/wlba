@@ -6,7 +6,7 @@ __author__ = 'zhanghe'
 import logging
 import json
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from marketing.models import IntroducedBy
 from marketing.tops import Top
 from marketing.utils import local_to_utc
@@ -105,8 +105,8 @@ class AppRepaymentAPIView(APIView):
                 # 登陆用户 查询当天收益和累计收益
                 user = request.user
                 start_utc = local_to_utc(now, 'min')
-                yesterday_start = start_utc - datetime.timedelta(days=1)
-                yesterday_end = yesterday_start + datetime.timedelta(hours=23, minutes=59, seconds=59)
+                yesterday_start = start_utc - timedelta(days=1)
+                yesterday_end = yesterday_start + timedelta(hours=23, minutes=59, seconds=59)
 
                 p2p_equities = P2PEquity.objects.filter(user=user, confirm=True, product__status__in=[
                     u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
