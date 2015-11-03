@@ -66,6 +66,9 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
             dom3.find("div.form-list").html(moneyStr);
             dom3.find("input.txt-input").val("");
         }
+        if(!errorDom.is(":hidden")){
+            errorDom.html("").hide();
+        }
     });
     $(document).click(function(e){
         var tag = $(e.target);
