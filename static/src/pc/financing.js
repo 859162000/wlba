@@ -142,6 +142,14 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
             }else{
                 errorDom.hide();
             }
+        },
+        altShow: function(txt){
+            var box = $("#alt-box");
+            var altTxt = box.find("#alt-promote");
+            $("#alt-pages").show();
+            altTxt.text(txt);
+            box.show();
+            timeFun();
         }
     }
     var isSub = false;
@@ -160,6 +168,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         var way = parseInt($.trim(wayDom.data("val")));
         var moneyDom = tp.find("input.money-inp");
         var money = $.trim(moneyDom.val());
+
         for(var i=0; i<doms.length; i++){
             if(formVal.isNull(doms.eq(i)) === "null"){
                 errorDom.text("* "+doms.eq(i).attr("placeholder")).show();
@@ -192,11 +201,9 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                         wayDom.val("");
                         moneyDom.val("");
                         tp.find(".form-list a").removeClass("active");
-                        $("#alt-pages").show();
-                        $("#alt-box").show();
-                        timeFun();
+                        formVal.altShow("申请已提交，请等待业务人员联系");
                     }else if(data.ret_code === '1001'){
-                        errorDom.text("* 您已提交过申请，请等待业务人员联系").show();
+                        formVal.altShow("您已提交过申请，请等待业务人员联系");
                     }else if(data.ret_code === '1000'){
                         errorDom.text("* 您完整填写您的信息").show();
                     }else{
