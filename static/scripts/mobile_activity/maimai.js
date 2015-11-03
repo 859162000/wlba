@@ -319,7 +319,7 @@ org.mmIndex = (function(org){
                 _self.$submit.attr('disabled',true).html('领取中，请稍后...');
                 if(_self.$phone.attr('data-existing') === 'true'){
                     ops = {
-                        url: '/api/distribute/redpack/' + _self.$phone.val()+'/?promo_token=maimaitest',
+                        url: '/api/distribute/redpack/' + _self.$phone.val()+'/?promo_token=maimai1',
                         type: 'POST',
                         success: function(data){
                             if(data.ret_code == 0){
@@ -334,7 +334,7 @@ org.mmIndex = (function(org){
                     }
                 }else{
                     ops = {
-                        url: '/api/register/?promo_token=maimaitest',
+                        url: '/api/register/?promo_token=maimai1',
                         type: 'POST',
                         data: {
                             'identifier': _self.$phone.val(),
@@ -345,11 +345,11 @@ org.mmIndex = (function(org){
                         },
                         success: function(data){
                             if(data.ret_code == 0){
-                                window.location.href = '/activity/maimai_success/?state=0'
+                                window.location.href = '/activity/maimai_success/?state=2'
                             }
                         },
                         error: function(data){
-
+                            alert(data)
                         },
                         complete:function(){
                             lib.$submit.removeAttr('disabled').html('领 取');
@@ -524,17 +524,22 @@ org.success = (function(org){
             var
                 state = org.getQueryStringByName('state')*1,
                 str = '',
-                val = '';
+                val = null;
 
                 if(state === 0){
                     str = '成功领取';
-                    val = '价值120元红包';
+                    val = '1.5%加息券';
                 }else if(state === 1){
-                    str = '您已领取过';
-                    val = '***加息券';
+                    str = '您已领取过奖品!';
+                    val = null;
+                }else if(state === 2){
+                    str = '成功领取';
+                    val = '120元红包';
                 }
                 $('.maimai-title').html(str);
-                $('.maimai-money').html(val);
+                if(val){
+                    $('.maimai-money').html(val);
+                }
 
 
             var mySwiper = new Swiper('.swiper-container', {
