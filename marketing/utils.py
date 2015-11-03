@@ -58,13 +58,15 @@ def save_introducedBy(user, introduced_by_user, product_id=0):
     record.product_id=product_id
     record.save()
 
+
 def save_introducedBy_channel(user, channel):
     record = IntroducedBy()
     record.channel = channel
     record.user = user
     record.save()
 
-def log_clientinfo(device, atype, order_id='', user_id=0, amount=0):
+
+def log_clientinfo(device, atype, user_id=0, order_id=0, amount=0):
     # fix@chenweibi, add order_id
     if type(device) != dict:
         return
