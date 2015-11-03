@@ -283,7 +283,9 @@ class HuifuPay(Pay):
         if flag:
             device = split_ua(request)
             try:
-                tools.deposit_ok.apply_async(kwargs={"user_id":pay_info.user.id, "amount":pay_info.amount, "device":device})
+                # fix@chenweibi, add order_id
+                tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
+                                                     "device": device, "order_id": order_id})
             except:
                 pass
 
@@ -617,7 +619,9 @@ class HuifuShortPay:
             if rs['ret_code'] == 0:
                 device = split_ua(request)
                 try:
-                    tools.deposit_ok.apply_async(kwargs={"user_id":pay_info.user.id, "amount":pay_info.amount, "device":device})
+                    # fix@chenweibi, add order_id
+                    tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
+                                                         "device": device, "order_id": order.id})
                 except:
                     pass
 

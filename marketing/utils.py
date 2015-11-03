@@ -58,13 +58,16 @@ def save_introducedBy(user, introduced_by_user, product_id=0):
     record.product_id=product_id
     record.save()
 
+
 def save_introducedBy_channel(user, channel):
     record = IntroducedBy()
     record.channel = channel
     record.user = user
     record.save()
 
-def log_clientinfo(device, atype, user_id=0, amount=0):
+
+def log_clientinfo(device, atype, user_id=0, order_id=0, amount=0):
+    # fix@chenweibi, add order_id
     if type(device) != dict:
         return
     if "device_type" not in device or device['device_type'] == "pc":
@@ -79,6 +82,7 @@ def log_clientinfo(device, atype, user_id=0, amount=0):
 
     if device['device_type'] == "android":
         device['model'] = device['model'][:-8]
+
     ci.version = device['app_version']
     ci.userdevice = device['model']
     ci.os = device['device_type']
@@ -88,6 +92,7 @@ def log_clientinfo(device, atype, user_id=0, amount=0):
     ci.user_id = user_id
     ci.amount = amount
     ci.action = action
+    ci.order_id = order_id
     ci.save()
 
 

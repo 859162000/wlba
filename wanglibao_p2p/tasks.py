@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # encoding:utf-8
+from celery.utils.log import get_task_logger
 
 from django.forms import model_to_dict
 from django.utils import timezone
@@ -20,6 +21,7 @@ from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import period_unit
 import time, datetime
 
+logger = get_task_logger(__name__)
 
 @app.task
 def p2p_watchdog():

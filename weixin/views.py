@@ -12,7 +12,7 @@ from django.conf import settings
 from django.shortcuts import render_to_response, redirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
+from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
 from wanglibao_buy.models import FundHoldInfo
 from wanglibao_banner.models import Banner
 from wanglibao_p2p.models import P2PProduct, P2PEquity, Attachment
@@ -198,7 +198,7 @@ class WeixinLoginAPI(APIView):
     http_method_names = ['post']
 
     def _form(self, request):
-        return EmailOrPhoneAuthenticationForm(request, data=request.POST)
+        return LoginAuthenticationNoCaptchaForm(request, data=request.POST)
 
     def post(self, request):
         form = self._form(request)
@@ -494,7 +494,7 @@ class P2PDetailView(TemplateView):
 
 
 class WeixinAccountHome(TemplateView):
-    template_name = 'weixin_account.jade'
+    template_name = 'weixin_account_new.jade'
 
     def get_context_data(self, **kwargs):
         user = self.request.user
@@ -616,7 +616,7 @@ class WeixinTransaction(TemplateView):
                 .select_related('product')[:10]
 
         p2p_records = [{
-            'equity_created_at': timezone.localtime(equity.created_at).strftime("%Y-%m-%d %H:%M:%S"),  # 投标时间
+            'equity_created_at': timezone.localtime(equity.created_at).strftime("%Y.%m.%d %H:%M:%S"),  # 投标时间
             'equity_product_short_name': equity.product.short_name,  # 产品名称
             'equity_product_expected_earning_rate': equity.product.expected_earning_rate,  # 年化收益(%)
             'equity_product_period': equity.product.period,  # 产品期限(月)*
@@ -634,6 +634,10 @@ class WeixinTransaction(TemplateView):
         } for equity in p2p_equities]
 
         return {
+            'status': {
+                'chinese': p2p_status,
+                'english': status
+            },
             'results': p2p_records
         }
 
@@ -903,5 +907,20 @@ class GetUserInfo(APIView):
             return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
 
 
+class WeixinCouponList(TemplateView):
+    template_name = 'weixin_reward.jade'
 
+    def get_context_data(self, **kwargs):
+
+        status = kwargs['status']
+        if status not in ('used', 'unused', 'expires'):
+            status = 'unused'
+
+        user = self.request.user
+        result = backends.list_redpack(user, 'all', 'all', 0, 'all')
+        packages = result['packages'].get(status, [])
+        return {
+            "packages": packages,
+            "status": status
+        }
 

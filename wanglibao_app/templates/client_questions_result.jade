@@ -1,0 +1,15 @@
+-load formatters
+doctype html
+html
+  head
+    title=title
+    include include/app_header.jade
+  body
+    .question-warp
+      for val in list
+        .question-box
+          .question-list#list
+            .question-name {{val.question}}
+            .question-arrow
+          .question-answer {{val.answer}}
+    script(src='/static/scripts/app/dist/question.js', data-init='result')
