@@ -150,7 +150,13 @@ class AppRepaymentAPIView(APIView):
                 ams = ProductAmortization.objects.filter(settlement_time__range=(start_utc, timezone.now()), settled=True)
                 for x in ams:
                     amount += x.principal + x.interest + x.penal_interest
-                return Response({'ret_code': 0, 'message': 'ok', 'amount': float(amount), 'income_num': len(ams),})
+                return Response({
+                    'ret_code': 0,
+                    'message': 'ok',
+                    'amount': float(amount),
+                    'income_num': len(ams),
+                    'income_yesterday': float(income_yesterday)
+                })
         except Exception, e:
             logger.error(e.message)
             return Response({'ret_code': 20001, 'message': 'fail'})
