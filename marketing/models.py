@@ -532,6 +532,7 @@ class LoginAccessToken(models.Model):
     class Meta:
         verbose_name_plural = u'h5用户令牌登录表'
 
+
 class QuickApplyInfo(models.Model):
     """
         Author:Yihen@20151102
@@ -549,10 +550,43 @@ class QuickApplyInfo(models.Model):
         (3, u'申请失败')
     )
     name = models.CharField(max_length=128, default='', null=False, verbose_name=u'姓名')
-    phone = models.CharField(max_length=32, default='', null=False, verbose_name=u'电话')
+    phone = models.CharField(max_length=32, default='', null=False, verbose_name=u'电话', db_index=True)
     address = models.CharField(max_length=256, default='', null=False, verbose_name=u'住址')
     apply_way = models.IntegerField(max_length=2, choices=APPLY_WAY, default=2, verbose_name=u'贷款抵押')
     apply_amount = models.CharField(max_length=32, null=False, verbose_name=u'贷款金额')
     create_time = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
     update_time = models.DateTimeField(null=True, verbose_name=u'更新时间')
     status = models.IntegerField(max_length=32, null=False, default=0, choices=STATUS, verbose_name=u'流程状态')
+    class Meta:
+        verbose_name = u'贷款申请人信息'
+        verbose_name_plural = u'贷款申请人信息'
+
+
+class GiftOwnerGlobalInfo(models.Model):
+    description = models.CharField(max_length=64, verbose_name=u'奖品描述')
+    amount = models.IntegerField(default=0, verbose_name=u'奖品个数', unique=True)
+    valid = models.BooleanField(default=True, verbose_name=u'是否生效')
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
+    update_time = models.DateTimeField(default=None, null=True, verbose_name=u'修改时间')
+    class Meta:
+        verbose_name = u'发奖全局表'
+        verbose_name_plural = u'发奖全局表'
+
+
+class GiftOwnerInfo(models.Model):
+    """
+        Author:Yihen@20151102
+        Description: 抽奖人的基本信息表
+    """
+    sender =models.ForeignKey(User,verbose_name=u'奖品派送人', help_text=u'领奖人和奖品派送人可以不是同一个人')
+    config = models.ForeignKey(GiftOwnerGlobalInfo, verbose_name=u'外键关联')
+    name = models.CharField(max_length=128, default='', null=False, verbose_name=u'姓名')
+    phone = models.CharField(max_length=32, default='', null=False, verbose_name=u'电话', db_index=True)
+    address = models.CharField(max_length=256, default='', null=False, verbose_name=u'住址')
+    award = models.CharField(max_length=64, default='', null=False, verbose_name=u'奖品名称', db_index=True)
+    type = models.IntegerField(default=0, null=False, verbose_name=u'奖品类别')
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name=u'领奖时间')
+    update_time = models.DateTimeField(null=True, verbose_name=u'更新时间')
+    class Meta:
+        verbose_name = u'抽奖人信息表'
+        verbose_name_plural = u'抽奖人信息表'

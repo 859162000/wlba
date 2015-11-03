@@ -1,3 +1,4 @@
+# encoding:utf-8
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -7,30 +8,29 @@ from marketing.models import IntroducedBy
 from wanglibao_sms.utils import send_validation_code
 
 
-class TestPromoCodeCreation(TestCase):
-    def test_promo_code_creation(self):
-        u = User(username='test', password='hehehehe')
-        u.save()
+class TestMarketingAPI(TestCase):
+    def setUp(self):
+        pass
 
-        self.assertIsNotNone(u.promotiontoken)
+    def test_quick_applyer(self):
+        response = self.client.post("/api/quick/applyer/",
+                         {
+                            'phone':13521522034,
+                             'name':'hello',
+                             'address': u'北京市',
+                             'apply_way': 0,
+                             'amount': '10-30'
+                         }
+                         )
+        print response.content
 
-
-    def test_promo_code_connection(self):
-        u = User(username='test', password='hehehe')
-        u.save()
-
-        phone = '12345678901'
-        # The real user not registered, but holds the true phone
-        validate_code = '123456'
-        send_validation_code(phone, validate_code)
-
-        self.client.post("/accounts/register/?promo_token=%s" % u.promotiontoken.token, {
-            'nickname': 'nickname',
-            'identifier': phone,
-            'validate_code': validate_code,
-            'password': 'testpassword'
-        })
-
-        connection = IntroducedBy.objects.all()[0]
-        self.assertEqual(connection.user.wanglibaouserprofile.phone, phone)
-        self.assertEqual(connection.introduced_by.username, 'test')
+    def test_gift_owner(self):
+        response = self.client.post("/api/gift/owner/?promo_token=jcw",
+                        {
+                            'phone': 13423444354,
+                            'name': 'Yihen',
+                            'address': u"北京市朝阳区"
+                        })
+        print "Hello world"
+        print response.content
+        print "Hello world"
