@@ -57,8 +57,8 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         //我有车/我有房
         if(top.find("input").attr("placeholder") === "我有车/我有房"){
             preInp.data("val",$t.data("val"));
-            if(txt === "我有房"){
-                moneyStr = '<a href="javascript:;">3-50万</a><a href="javascript:;">50-100万</a><a href="javascript:;">100-300万</a><a href="javascript:;">300-500万</a>';
+            if(txt === "我有房" || txt === "其它"){
+                moneyStr = '<a href="javascript:;">3-50万</a><a href="javascript:;">50-100万</a><a href="javascript:;">100-300万</a><a href="javascript:;">300-600万</a>';
             }else{
                 moneyStr = '<a href="javascript:;">3-10万</a><a href="javascript:;">10-30万</a><a href="javascript:;">30万以上</a>';
             }
