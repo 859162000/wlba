@@ -70,8 +70,13 @@ def log_clientinfo(device, atype, user_id=0, order_id=0, amount=0):
     # fix@chenweibi, add order_id
     if type(device) != dict:
         return
-    if "device_type" not in device or device['device_type'] == "pc":
+
+    if "device_type" not in device:
         return
+
+    if device['device_type'] == "pc" and device['app_version'] != 'wlb_h5':
+        return
+
     ci = ClientData()
     if atype=="register": action='R'
     elif atype=="login": action='L'
