@@ -74,7 +74,8 @@ def log_clientinfo(device, atype, user_id=0, order_id=0, amount=0):
     if "device_type" not in device:
         return
 
-    if device['device_type'] == "pc" and device['app_version'] != 'wlb_h5':
+    app_version = device.get('app_version', '')
+    if device['device_type'] == "pc" and app_version != 'wlb_h5':
         return
 
     ci = ClientData()
