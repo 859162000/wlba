@@ -224,7 +224,6 @@ class P2POperator(object):
             product.status = u'还款中'
             product.save()
 
-        phones = {}.fromkeys(phones).keys()
         send_messages.apply_async(kwargs={
             "phones": phones,
             "messages": messages_list,
@@ -272,7 +271,6 @@ class P2POperator(object):
                 messages_list.append(messages.product_failed(equity.user.wanglibaouserprofile.name, product))
             ProductKeeper(product).fail()
 
-        phones = {}.fromkeys(phones).keys()
         user_ids = {}.fromkeys(user_ids).keys()
         if phones:
             send_messages.apply_async(kwargs={
