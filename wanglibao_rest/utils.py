@@ -65,21 +65,22 @@ def check_mobile(request):
 
 def split_ua(request):
     if not request or "HTTP_USER_AGENT" not in request.META:
-        return {"device_type":"pc"}
+        return {"device_type": "pc"}
 
     ua = request.META['HTTP_USER_AGENT']
     tmp_ua = ua.lower()
-    is_mobile = False
 
     if "mozilla" in tmp_ua or "safari" in tmp_ua:
         if check_mobile(request):
-            is_mobile = True
+            return {"device_type": 'pc', "app_version": 'wlb_h5',
+                    "channel_id": '', "model": '',
+                    "os_version": '', "network": ''}
         else:
-            return {"device_type":"pc"}
+            return {"device_type": "pc"}
 
     arr = ua.split("/")
     if len(arr) < 5:
-        return {"device_type":"pc"}
+        return {"device_type": "pc"}
 
     dt = arr[1].lower()
     if "android" in dt:
@@ -89,17 +90,9 @@ def split_ua(request):
     else:
         device_type = "pc"
 
-    if is_mobile:
-        if device_type == 'pc':
-            device_type = 'mobile'
-
-        return {"device_type":device_type, "app_version":'wlb_h5',
-                "channel_id":'', "model":'',
-                "os_version":'', "network":''}
-
-    return {"device_type":device_type, "app_version":arr[0],
-            "channel_id":arr[2], "model":arr[1],
-            "os_version":arr[3], "network":arr[4]}
+    return {"device_type": device_type, "app_version": arr[0],
+            "channel_id": arr[2], "model": arr[1],
+            "os_version": arr[3], "network": arr[4]}
 
 
 def get_client_ip(request):

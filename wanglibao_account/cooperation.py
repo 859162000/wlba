@@ -23,7 +23,7 @@ from django.utils import timezone
 import requests
 from rest_framework import renderers
 from rest_framework.views import APIView
-from marketing.models import Channels, IntroducedBy, PromotionToken
+from marketing.models import Channels, IntroducedBy, PromotionToken, GiftOwnerInfo, GiftOwnerGlobalInfo
 from marketing.utils import set_promo_user, get_channel_record, get_user_channel_record
 from wanglibao import settings
 from wanglibao_redpack import backends as redpack_backends
@@ -978,6 +978,69 @@ class ZGDXRegister(CoopRegister):
                 else:
                     plat_offer_id = '103050'
                 self.zgdx_call_back(user, plat_offer_id)
+
+
+class JuChengRegister(CoopRegister):
+    def __init__(self, request):
+        super(JuChengRegister, self).__init__(request)
+        self.c_code = 'jcw'
+        self.invite_code = 'jcw'
+
+    def purchase_call_back(self, user):
+        name = self.request.DATA.get('name', '')
+        phone = self.request.DATA.get('phone', '')
+        address = self.request.DATA.get('address', '')
+        binding = Binding.objects.filter(user_id=user.id).first()
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
+        if binding and p2p_record.count() == 1:
+            p2p_amount = int(p2p_record.first().amount)
+            if p2p_amount>=1000 and p2p_amount<2000:
+                try:
+                    config = GiftOwnerGlobalInfo.objects.select_for_update(description=u'jcw_ticket_80').first()
+                except Exception, reason:
+                    logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
+                    raise
+                if config and config.amount>0:
+                    try:
+                        GiftOwnerInfo.objects.create(
+                            config=config,
+                            name=name,
+                            phone=phone,
+                            address=address,
+                            award=u'张昊辰门票',
+                            type='80'
+                        )
+                    except Exception, reason:
+                        logger.exception(u'获奖用户(%s)信息入库失败, reason:%s' % (user,reason))
+                    else:
+                        config.amount -= 1
+                        logger.info(u"获奖用户 (%s) 信息入库成功" % (user,))
+                    finally:
+                        config.save()
+
+            if p2p_amount>=2000:
+                try:
+                    config = GiftOwnerGlobalInfo.objects.select_for_update(description=u'jcw_ticket_188').first()
+                except Exception, reason:
+                    logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
+                    raise
+                if config and config.amount>0:
+                    try:
+                        GiftOwnerInfo.objects.create(
+                            config=config,
+                            name=name,
+                            phone=phone,
+                            address=address,
+                            award=u'张昊辰门票',
+                            type='188'
+                        )
+                    except Exception, reason:
+                        logger.exception(u'获奖用户(%s)信息入库失败, reason:%s' % (user,reason))
+                    else:
+                        config.amount -= 1
+                        logger.info(u"获奖用户 (%s) 信息入库成功" % (user,))
+                    finally:
+                        config.save()
 
 
 class WeixinRedpackRegister(CoopRegister):

@@ -16,8 +16,7 @@ from wanglibao_anti.anti.anti import GlobalParamsSpace
 from wanglibao.celery import app
 from json import JSONDecoder
 
-# logger = logging.getLogger('wanglibao_anti')
-logger = get_task_logger(__name__)
+logger = logging.getLogger('wanglibao_anti')
 
 def kill_register_user_by_admin(*ips):
     '''针对某些特殊的ip，手工封杀；不管其IP注册数有多少
@@ -49,7 +48,7 @@ def handle_delay_time_data():
     recover_anti_user_data()
 
     channels = GlobalParamsSpace.DELAY_CHANNELS
-    max_record_for_one_ip = 5
+    max_record_for_one_ip = 20
 
     records = AntiDelayCallback.objects.filter(channel__in=channels, status=0)
     valid_records = dict()

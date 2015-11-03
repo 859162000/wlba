@@ -50,7 +50,7 @@ from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIVie
 
 from marketing.play_list import InvestmentHistory
 from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView,
-                             ThousandRedPackCountAPIView, ThunderActivityRewardCounter, QuickApplyer,)
+                             ThousandRedPackCountAPIView, ThunderActivityRewardCounter, QuickApplyerAPIView, GiftOwnerInfoAPIView)
 from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrdeApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
@@ -244,7 +244,8 @@ urlpatterns += patterns(
     url(r'^xunlei/award/records/$', 'marketing.views.ajax_get_activity_record'), #add by Yihen@20150825, 迅雷-网利宝 抽奖活动记录
     url(r'^celebrate/awards/$', 'marketing.views.celebrate_ajax'), #add by Yihen@20150828, 网利宝一周年大转盘活动
     url(r'^award/common_september/$', 'marketing.views.september_award_ajax'), #add by Yihen@20150907,9月PC常规
-    url(r'^quick/applyer/$', QuickApplyer.as_view()), #add by yihen@20151102 ,快速贷款人申请填写
+    url(r'^quick/applyer/$', QuickApplyerAPIView.as_view()), #add by yihen@20151102 ,快速贷款人申请填写
+    url(r'^gift/owner/$', GiftOwnerInfoAPIView.as_view()), #add by yihen@20151102 ,聚橙网领取门票接口
 )
 
 
