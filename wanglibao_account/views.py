@@ -471,8 +471,8 @@ class AccountHomeAPIView(APIView):
             .filter(create_time__gt=yesterday_start, create_time__lte=yesterday_end)\
             .filter(catalog__in=[u'佣金存入', u'全民淘金']).aggregate(Sum('amount'))
 
-        if p2p_income_yesterday_other:
-            p2p_income_yesterday += p2p_income_yesterday_other['amount__sum']
+        if p2p_income_yesterday_other.get('amount__sum'):
+            p2p_income_yesterday += p2p_income_yesterday_other.get('amount__sum')
 
         p2p_margin = user.margin.margin  # P2P余额
         p2p_freeze = user.margin.freeze  # P2P投资中冻结金额
