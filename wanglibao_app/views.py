@@ -6,7 +6,7 @@ __author__ = 'zhanghe'
 import logging
 import json
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from marketing.models import IntroducedBy
 from marketing.tops import Top
 from marketing.utils import local_to_utc
@@ -15,7 +15,7 @@ from misc.views import MiscRecommendProduction
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib import auth
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.shortcuts import redirect, render_to_response
 from django.template import RequestContext
 from django.views.generic import TemplateView
@@ -40,6 +40,8 @@ from wanglibao_sms.utils import send_validation_code
 from wanglibao_sms.tasks import send_messages
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.forms import verify_captcha
+from wanglibao_app.questions import question_list
+from wanglibao_margin.models import MarginRecord
 
 logger = logging.getLogger(__name__)
 
@@ -98,12 +100,14 @@ class AppRepaymentAPIView(APIView):
 
     def post(self, request):
         now = datetime.now()
-        amount, income_num = 0, 0
+        amount, income_num, income_yesterday = 0, 0, 0
         try:
             if request.user and request.user.is_authenticated():
                 # 登陆用户 查询当天收益和累计收益
                 user = request.user
                 start_utc = local_to_utc(now, 'min')
+                yesterday_start = start_utc - timedelta(days=1)
+                yesterday_end = yesterday_start + timedelta(hours=23, minutes=59, seconds=59)
 
                 p2p_equities = P2PEquity.objects.filter(user=user, confirm=True, product__status__in=[
                     u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
@@ -116,8 +120,27 @@ class AppRepaymentAPIView(APIView):
                         income_num += equity.pre_paid_interest
                         income_num += equity.pre_paid_coupon_interest
                         income_num += equity.activity_interest
+                    # 昨日收益
+                    if yesterday_start < equity.confirm_at <= yesterday_end:
+                        income_yesterday += equity.pre_paid_interest
+                        income_yesterday += equity.pre_paid_coupon_interest
+                        income_yesterday += equity.activity_interest
+                # 其他昨日收益
+                # 佣金存入, 全民淘金
+                income_yesterday_other = MarginRecord.objects.filter(user=user)\
+                    .filter(create_time__gt=yesterday_start, create_time__lte=yesterday_end)\
+                    .filter(catalog__in=[u'佣金存入', u'全民淘金']).aggregate(Sum('amount'))
 
-                return Response({'ret_code': 0, 'message': 'ok', 'amount': float(amount), 'income_num': float(income_num)})
+                if income_yesterday_other.get('amount__sum'):
+                    income_yesterday += income_yesterday_other.get('amount__sum')
+
+                return Response({
+                    'ret_code': 0,
+                    'message': 'ok',
+                    'amount': float(amount),
+                    'income_num': float(income_num),
+                    'income_yesterday': float(income_yesterday)
+                })
 
             else:
                 # 未登陆用户 查询当月还款金额和当月还款项目
@@ -127,7 +150,13 @@ class AppRepaymentAPIView(APIView):
                 ams = ProductAmortization.objects.filter(settlement_time__range=(start_utc, timezone.now()), settled=True)
                 for x in ams:
                     amount += x.principal + x.interest + x.penal_interest
-                return Response({'ret_code': 0, 'message': 'ok', 'amount': float(amount), 'income_num': len(ams)})
+                return Response({
+                    'ret_code': 0,
+                    'message': 'ok',
+                    'amount': float(amount),
+                    'income_num': len(ams),
+                    'income_yesterday': float(income_yesterday)
+                })
         except Exception, e:
             logger.error(e.message)
             return Response({'ret_code': 20001, 'message': 'fail'})
@@ -581,3 +610,48 @@ class AppLogoutAPIView(APIView):
     def get(self, request, **kwargs):
         auth.logout(request)
         return Response({'ret_code': 0, 'message': 'success'})
+
+
+class AppQuestionsView(TemplateView):
+
+    """ app常见问题 """
+    template_name = 'client_questions.jade'
+
+    def get_context_data(self, **kwargs):
+
+        list = []
+
+        for val in sorted(question_list):
+            list.append({
+                'id': val,
+                'question': question_list[val]['question']
+            })
+
+        return {
+            "list": list,
+        }
+
+
+class AppQuestionsResultView(TemplateView):
+
+    """ app常见问题 """
+    template_name = 'client_questions_result.jade'
+
+    def get_context_data(self, **kwargs):
+
+        index = kwargs['index']
+
+        que_list = question_list[index]
+
+        result_title = que_list['question']
+        result_list = que_list['answer']
+        print result_title
+        return {
+            'title': result_title,
+            "list": result_list,
+        }
+
+class AppCostView(TemplateView):
+
+    """ 费用说明 """
+    template_name = 'client_cost_description.jade'

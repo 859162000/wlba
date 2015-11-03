@@ -24,7 +24,8 @@ from django.db.models.base import ModelState
 from wanglibao_sms.utils import send_validation_code
 from misc.models import Misc
 from wanglibao_sms.models import *
-from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, IntroducedBy, IntroducedByReward, Reward, ActivityJoinLog
+from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, IntroducedBy, IntroducedByReward, \
+    Reward, ActivityJoinLog, QuickApplyInfo, GiftOwnerGlobalInfo, GiftOwnerInfo
 from marketing.tops import Top
 from utils import local_to_utc
 
@@ -35,7 +36,6 @@ from marketing.models import RewardRecord, NewsAndReport
 from wanglibao_p2p.models import Earning
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao.templatetags.formatters import safe_phone_str
-from wanglibao_account import message as inside_message
 from order.models import Order
 from order.utils import OrderHelper
 from rest_framework.response import Response
@@ -46,6 +46,7 @@ from wanglibao_redpack.models import RedPackEvent
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity.models import ActivityRecord, Activity, ActivityRule
 from wanglibao_account import message as inside_message
+from wanglibao_account.models import Binding
 from wanglibao_pay.models import PayInfo
 from wanglibao_activity.models import TRIGGER_NODE
 from marketing.utils import get_user_channel_record
@@ -57,6 +58,14 @@ import hashlib
 import logging
 logger = logging.getLogger('marketing')
 TRIGGER_NODE = [i for i, j in TRIGGER_NODE]
+
+import sys
+import time
+from smtplib import SMTP
+from email.header import Header
+from email.MIMEText import MIMEText
+from email.MIMEMultipart import MIMEMultipart
+reload(sys)
 
 class YaoView(TemplateView):
     template_name = 'yaoqing.jade'
@@ -189,6 +198,7 @@ class AppShareViewShort(TemplateView):
             phone = base64.b64decode(identifier + '=')
         except:
             identifier = self.request.GET.get('phone')
+            phone = identifier
         reg = self.request.GET.get('reg')
 
         return {
@@ -230,7 +240,10 @@ class ShortAppShareRegView(TemplateView):
             identifier = self.request.GET.get('i')
             identifier = base64.b64decode(identifier + '=')
             friend_identifier = self.request.GET.get('fi')
-            # friend_identifier = base64.b64decode(friend_identifier)
+            try:
+                friend_identifier = str(int(friend_identifier))
+            except:
+                friend_identifier = base64.b64decode(friend_identifier + '=')
         except Exception, e:
             print e
             identifier = self.request.GET.get('identifier').strip()
@@ -1964,3 +1977,256 @@ class ThunderTenAcvitityTemplate(TemplateView):
                 }
 
         return response_data
+
+class QuickApplyerAPIView(APIView):
+    permission_classes = ()
+
+    def send_mail(self, sender, reciver, title, body):
+        SMTPSVR = 'smtp.exmail.qq.com'
+        user = 'develop@wanglibank.com'
+        pw = 'abc&321'
+        msg = MIMEMultipart()
+        msg['From'] = '%s <%s>' % (Header('网利技术服务', 'utf-8'), sender)
+        if isinstance(reciver, list):
+            msg['To'] = ';'.join(reciver)
+        else:
+            msg['To'] = reciver
+        msg['Subject'] = Header(title, 'utf-8')
+        msg['Accept-Language'] = 'zh-CN'
+        msg['Accept-Charset'] = 'ISO-8859-1,utf-8'
+        body = MIMEText(body, 'html', 'utf-8')
+        body.set_charset('utf-8')
+        msg.attach(body)
+        sendSvr = SMTP(SMTPSVR, 25)
+        sendSvr.login(user, pw)
+        sendSvr.sendmail(sender, reciver, msg.as_string())
+        sendSvr.quit()
+
+    def post(self, request):
+        email ={
+        u"北京": 'beijingoffice@wanglibank.com',
+        u"上海": 'shanghaioffice@wanglibank.com',
+        u"中山": 'zhongshanoffice@wanglibank.com',
+        u"深圳": 'shenzhenoffice@wanglibank.com',
+
+        u"天津": 'tianjinoffice@wanglibank.com',
+        u"长沙": 'changshaoffice@wanglibank.com',
+        u"武汉": 'wuhanoffice@wanglibank.com',
+        u"贵阳": 'guiyangoffice@wanglibank.com',
+
+        u"西安": 'xianoffice@wanglibank.com',
+        u"青岛": 'qingdaooffice@wanglibank.com',
+        u"石家庄": 'shijiazhuangoffice@wanglibank.com',
+        u"海口": 'haikouoffice@wanglibank.com',
+
+        u"郑州": 'zhengzhouoffice@wanglibank.com',
+        u"重庆": 'chongqingoffice@wanglibank.com',
+        u"其他": 'qitachengshioffice@wanglibank.com',
+        }
+
+        apply = {
+            0: u'我有房',
+            1: u'我有车',
+            2: u'其他',
+        }
+
+        name = request.POST.get('name', '')
+        phone = request.POST.get('phone', '')
+        address = request.POST.get('address', '')
+        apply_way = request.POST.get('apply_way', '')
+        amount = request.POST.get('amount', '')
+
+        if not(name and phone and address and apply_way and amount):
+            to_json_response = {
+                'ret_code': 1000,
+                'message': u'您的输入信息有遗漏'
+            }
+
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+        mytime = datetime.strptime(now, '%Y-%m-%d %H:%M:%S')+timedelta(days=-7)
+        last_register = datetime.strftime(mytime, '%Y-%m-%d %H:%M:%S')
+        applyer = QuickApplyInfo.objects.filter(phone=phone, create_time__gte=last_register)
+        if applyer.count() >= 2:
+            to_json_response = {
+                'ret_code': '1001',
+                'message': u"您已提交过申请，请等待业务人员联系"
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        try:
+            applyer = QuickApplyInfo.objects.create(
+                name=name,
+                phone=phone,
+                address=address,
+                apply_way=apply_way,
+                apply_amount=amount
+            )
+        except Exception, reason:
+            logger.debug("贷款专区，申请人数据入库报异常, reason:%s" % (reason,))
+            to_json_response = {
+                'ret_code': '1002',
+                'message': u"申请人信息入库异常"
+            }
+
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        title = "[%s - %s]贷款申请" % (address, apply[int(apply_way)])
+        body = "姓名:%s <br/> 手机号:%s<br/> 城市:%s<br/> 资产状况:%s<br/> 贷款金额:%s<br/>" % (name, phone, address,apply[int(apply_way)], amount)
+        self.send_mail('develop@wanglibank.com', email[address], title, body)
+        to_json_response = {
+            'ret_code': '0',
+            'message': u"提交成功,请您耐心等待"
+        }
+
+        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+
+class GiftOwnerInfoAPIView(APIView):
+    permission_classes = ()
+
+    def get_left_awards(self):
+        items = GiftOwnerGlobalInfo.objects.filter(description__in=('jcw_ticket_80', 'jcw_ticket_188')).values("amount")
+        return items[0]["amount"], items[1]["amount"]
+
+    def post(self, request):
+        channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
+        try:
+            (award80, award188) = self.get_left_awards()
+        except Exception, reason:
+            logger.exception(u'获取门票global配置报异常, reason:%s' % (reason,))
+            to_json_response = {
+                'ret_code': 1002,
+                'message': u'门票配置报异常',
+                'award80': -1,
+                'award100': -1
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        action = request.DATA.get('action', 'OTHERS')
+        if action == "ENTER_WEB_PAGE":
+            to_json_response = {
+                'ret_code': 1,
+                'message': u'首次进入页面',
+                'award80': award80,
+                'award100': award188
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        if self.request.user.is_authenticated():
+            to_json_response = {
+                'ret_code': 1030,
+                'message': u'请先登录，再领取奖品',
+                'award80': award80,
+                'award100': award188
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        if 'jcw' != channel:
+            to_json_response = {
+                'ret_code': 1000,
+                'message': u'渠道不是聚橙网',
+                'award80': award80,
+                'award100': award188
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        item = GiftOwnerInfo.objects.filter(config__description__in=('jcw_ticket_80', 'jcw_ticket_188'), user=self.request.user)
+        if item.exists():
+            to_json_response = {
+                'ret_code': 1010,
+                'message': u'您已经领取过门票，不可重复领取',
+                'award80': award80,
+                'award100': award188
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        name = request.DATA.get('name', '')
+        phone = request.DATA.get('phone', '')
+        address = request.DATA.get('address', '')
+        binding = Binding.objects.filter(user_id=request.user.id).first()
+        p2p_record = P2PRecord.objects.filter(user_id=request.user.id, catalog=u'申购')
+        if binding and p2p_record.count() == 1:
+            p2p_amount = int(p2p_record.first().amount)
+            if p2p_amount >= 1000 and p2p_amount < 2000:
+                try:
+                    config = GiftOwnerGlobalInfo.objects.select_for_update(description=u'jcw_ticket_80', valid=True).first()
+                except Exception, reason:
+                    logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
+                    raise
+                if config and config.amount>0:
+                    try:
+                        GiftOwnerInfo.objects.create(
+                            sender=self.request.user,
+                            config=config,
+                            name=name,
+                            phone=phone,
+                            address=address,
+                            award=u'张昊辰门票',
+                            type='80'
+                        )
+                    except Exception, reason:
+                        logger.exception(u'获奖用户(%s)信息入库失败, reason:%s' % (self.request.user,reason))
+                        config.save()
+                    else:
+                        config.amount -= 1
+                        config.save()
+                        logger.info(u"获奖用户 (%s) 信息入库成功" % (self.request.user,))
+                        to_json_response = {
+                            'ret_code': 0,
+                            'message': u'获得80元没票一张',
+                            'award80': award80-1,
+                            'award100': award188
+                        }
+                        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+            elif p2p_amount >= 2000:
+                try:
+                    config = GiftOwnerGlobalInfo.objects.select_for_update(description=u'jcw_ticket_188', valid=True).first()
+                except Exception, reason:
+                    logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
+                    raise
+                if config and config.amount > 0:
+                    try:
+                        GiftOwnerInfo.objects.create(
+                            sender=self.request.user,
+                            config=config,
+                            name=name,
+                            phone=phone,
+                            address=address,
+                            award=u'张昊辰门票',
+                            type='188'
+                        )
+                    except Exception, reason:
+                        logger.exception(u'获奖用户(%s)信息入库失败, reason:%s' % (self.request.user,reason))
+                        config.save()
+                    else:
+                        config.amount -= 1
+                        config.save()
+                        logger.info(u"获奖用户 (%s) 信息入库成功" % (self.request.user,))
+                        to_json_response={
+                            'ret_code': 0,
+                            'message': u'获得188元没票一张',
+                            'award80': award80,
+                            'award100': award188-1
+                        }
+                        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+            else:
+                to_json_response = {
+                    'ret_code': 200,
+                    'message': u'用户的投资额度不符合领奖规则',
+                    'award80': award80,
+                    'award100': award188
+                }
+                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        else:
+            to_json_response = {
+                'ret_code': 100,
+                'message': u'首投用户才有可以领取门票',
+                'award80': award80,
+                'award100': award188
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+

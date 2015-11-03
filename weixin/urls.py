@@ -13,6 +13,7 @@ urlpatterns = patterns(
     url(r'^view/(?P<template>\w+)/(?P<id>\w+)/$', views.P2PDetailView.as_view(), name='weixin_p2p_detail'),
     url(r'^account/bankcard/$', login_required(views.WeixinAccountBankCard.as_view(), login_url='/weixin/login/'), name='weixin_bankcard'),
     url(r'^account/bankcard/add/$', login_required(views.WeixinAccountBankCardAdd.as_view(), login_url='/weixin/login/'), name='weixin_bankcard_add'),
+
     url(r'^login/$', views.WeixinLogin.as_view(), name='weixin_login'),
     url(r'^oauth/login/$', views.WeixinOauthLoginRedirect.as_view(), name='weixin_oauth_login_redirect'),
     url(r'^regist/$', views.WeixinRegister.as_view(), name="weixin_register"),
@@ -30,6 +31,8 @@ urlpatterns = patterns(
     url(r'bind/login/$', views.WeixinBindLogin.as_view(), name='weixin_bind_login'),
     url(r'bind/register/$', views.WeixinBindRegister.as_view(), name='weixin_bind_register'),
     url(r'weixin_unbind/$', TemplateView.as_view(), name='weixin_unbind'),
+    url(r'^reward/(?P<status>\w+)/$', login_required(views.WeixinCouponList.as_view(), login_url='/weixin/login/')),
+
     # js api
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
     url(r'^api/login/$', views.WeixinLoginAPI.as_view(), name='weixin_login_api'),
