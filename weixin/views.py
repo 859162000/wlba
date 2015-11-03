@@ -49,11 +49,12 @@ from django.core.paginator import PageNotAnInteger
 from wanglibao_p2p.views import get_p2p_list
 from wanglibao_redis.backend import redis_backend
 from wechatpy.parser import parse_message
-from wechatpy.messages import *
-from wechatpy.events import *
+from wechatpy.messages import BaseMessage, TextMessage
+import datetime
+from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEvent, UnsubscribeEvent, SubscribeEvent,\
+                             TemplateSendJobFinishEvent)
 from rest_framework import renderers
 import functools
-
 
 def checkBindDeco(func):
     @functools.wraps(func)
@@ -76,7 +77,6 @@ def checkBindDeco(func):
         if check_bind and not w_user.user:
             txt = self.getBindTxt(fromUserName, account.id)
             reply = create_reply(txt, self.msg)
-            print '----------------------------check bind in decorator----'
             return reply
         else:
             return func(self, *args, **kwargs)
@@ -111,12 +111,13 @@ class WeixinJoinView(View):
         account = Account.objects.get(pk=account_key) #WeixinAccounts.get(account_key)
         self.msg = parse_message(request.body)
         msg = self.msg
+        print msg
         reply = None
         toUserName = msg._data['ToUserName']
         fromUserName = msg._data['FromUserName']
         createTime = msg._data['CreateTime']
         if isinstance(msg, BaseEvent):
-            eventKey = msg._data['EventKey']
+
             if isinstance(msg, ClickEvent):
                 reply = self.process_click_event(msg)
             elif isinstance(msg, SubscribeEvent):
@@ -130,6 +131,7 @@ class WeixinJoinView(View):
                 reply = self.process_subscribe(msg, account_key)
             elif isinstance(msg, ScanEvent):
                 w_user = getOrCreateWeixinUser(fromUserName, account)
+                eventKey = msg._data['EventKey']
                 #如果eventkey为用户id则进行绑定
                 if eventKey and eventKey.isdigit():
                     user = User.objects.filter(pk=eventKey).first()
@@ -138,6 +140,8 @@ class WeixinJoinView(View):
                         reply = create_reply(txt, msg)
                 txt = self.getBindTxt(fromUserName, account_key)
                 reply = create_reply(txt, msg)
+            elif isinstance(msg, TemplateSendJobFinishEvent):
+                pass
         elif isinstance(msg, BaseMessage):
             if isinstance(msg, TextMessage):
                 reply = self.check_service_subscribe(msg, account)
@@ -149,7 +153,7 @@ class WeixinJoinView(View):
             else:
                 reply = create_reply(u'更多功能，敬请期待！', msg)
         if not reply:
-            reply = create_reply(u'...', msg)
+            reply = create_reply(u'这个是不是不需要回复什么的?', msg)
         return HttpResponse(reply.render())
 
     @checkBindDeco
@@ -265,6 +269,7 @@ class WeixinJoinView(View):
 
 
 
+
 def getOrCreateWeixinUser(openid, account):
     w_user = WeixinUser.objects.filter(openid=openid).first()
     if not w_user:
@@ -303,6 +308,37 @@ def bindUser(w_user, user):
     w_user.save()
     return 0, u'绑定成功'
 
+
+class SendTemplateMessage(APIView):
+    permission_classes = ()
+    http_method_names = ['post']
+
+    @classmethod
+    def sendTemplate(cls, openid):
+        weixin_user = WeixinUser.objects.get(openid=openid)
+        account = Account.objects.get(original_id=weixin_user.account_original_id)
+        client = WeChatClient(account.app_id, account.app_secret)
+        client.message.send_template(weixin_user.openid, '_8E2B4QZQC3yyvkubjpR6NYXtUXRB9Ya79MYmpVvQ1o',
+                                     top_color='#88ffdd', data={
+                "first":{
+                    "value":"您好，恭喜您账户绑定成功！\n  \n您的账户已经与微信账户绑定在一起。",
+                   "color":"#173177"
+                },
+                "keyword1":{
+                    "value":"2015年09月22日",
+                   "color":"#173177"
+                },
+            }, url='')
+
+    def post(self, request):
+        openid = request.POST.get('openid')
+        if not openid:
+            return Response({'error':-1})
+        try:
+            SendTemplateMessage.sendTemplate(openid)
+        except:
+            return Response({'error':-2})
+        return Response({'message':'ok'})
 
 
 class WeixinBindLogin(TemplateView):
@@ -391,7 +427,7 @@ class WeixinLoginBindAPI(APIView):
     http_method_names = ['post']
 
     def _form(self, request):
-        return EmailOrPhoneAuthenticationForm(request, data=request.POST)
+        return LoginAuthenticationNoCaptchaForm(request, data=request.POST)
 
     def post(self, request):
         form = self._form(request)
@@ -403,6 +439,8 @@ class WeixinLoginBindAPI(APIView):
                 openid = request.POST.get('openid')
                 weixin_user = WeixinUser.objects.get(openid=openid)
                 rs, txt = bindUser(weixin_user, user)
+                if rs==0:
+                    SendTemplateMessage.sendTemplate(openid)
             except WeixinUser.DoesNotExist:
                 pass
 
