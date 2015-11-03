@@ -41,7 +41,8 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         var $t = $(this);
         var tp = $t.parents("div.js-select-skin");
         var top = tp.find("p.js-select-top");
-        var preInp = tp.prev("p.js-select");
+        var preBox = tp.prev("p.js-select");
+        var preInp = preBox.find("input");
         var txt = $t.text();
         var moneyStr = "";
         var dom3;
@@ -51,9 +52,11 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         }
         $t.addClass("active").siblings("a").removeClass("active");
         top.find("input").val(txt);
-        preInp.show().find("input").val(txt);
+        preBox.show();
+        preInp.val(txt);
         //我有车/我有房
         if(top.find("input").attr("placeholder") === "我有车/我有房"){
+            preInp.data("val",$t.data("val"));
             if(txt === "我有房"){
                 moneyStr = '<a href="javascript:;">3-50万</a><a href="javascript:;">50-100万</a><a href="javascript:;">100-300万</a><a href="javascript:;">300-500万</a>';
             }else{
@@ -119,7 +122,6 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
     var checkMobileFun = function(t){
         var checkStatus = false,self = $.trim(t.val());
         if(! checkMobile(self)){
-            console.log(t.val());
             errorDom.text('* 请输入正确手机号').show();
             checkStatus = false;
         }else{
@@ -139,11 +141,22 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
             }
         }
     }
-
-    $("#financeSub").on("click",function (){
-        var tp = $(this).parents("#financeForm");
+    var isSub = false;
+    function fSub(self){
+        isSub = true;
+        var tp = self.parents("#financeForm");
         var doms = tp.find("input.txt-input");
         var isNext = true;
+        var nameDom = tp.find("input.name-inp");
+        var name = $.trim(nameDom.val());
+        var phoneDom = tp.find("input.checkMobile");
+        var phone = parseInt($.trim(phoneDom.val()));
+        var cityDom = tp.find("input.city-inp");
+        var city = $.trim(cityDom.val());
+        var wayDom = tp.find("input.home-inp");
+        var way = parseInt($.trim(wayDom.data("val")));
+        var moneyDom = tp.find("input.money-inp");
+        var money = $.trim(moneyDom.val());
         for(var i=0; i<doms.length; i++){
             if(formVal.isNull(doms.eq(i)) === "null"){
                 errorDom.text("* "+doms.eq(i).attr("placeholder")).show();
@@ -158,11 +171,64 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                errorDom.hide();
             }
         }
-
         if(errorDom.is(":hidden")){
-            console.log("submit!");
+            self.text("正在提交……");
+            $.ajax({
+                type: "post",
+                url: "/api/quick/applyer/",
+                dataType: "json",
+                data: {'phone': phone,'name': name,'address':city,'apply_way':way,'amount':money},
+                async: true,
+                success: function(data){
+                    isSub = false;
+                    self.text("提交");
+                    if(data.ret_code === '0'){
+                        nameDom.val("");
+                        phoneDom.val("");
+                        cityDom.val("");
+                        wayDom.val("");
+                        moneyDom.val("");
+                        tp.find(".form-list a").removeClass("active");
+                        $("#alt-pages").show();
+                        $("#alt-box").show();
+                        timeFun();
+                    }else if(data.ret_code === '1001'){
+                        errorDom.text("* 您已提交过申请，请等待业务人员联系").show();
+                    }else if(data.ret_code === '1000'){
+                        errorDom.text("* 您完整填写您的信息").show();
+                    }else{
+                        errorDom.text("* 系统异常，请重新提交").show();
+                    }
+                }
+            });
         }else{
-            console.log("con't submit!");
+            isSub = false;
+        }
+    }
+
+    $("#financeSub").on("click",function (){
+        var self = $(this);
+        //fSub(self);
+        if(isSub){
+            self.off("click");
+        }else{
+            self.on("click",fSub(self));
         }
     });
+
+    function timeFun(){//倒计时
+		var numDom = $("#times-box");
+		var num = parseInt(numDom.text());
+		var timeSet = setInterval(function(){
+			if(num <= 0){
+				clearInterval(timeSet);
+				$("#alt-pages").hide();
+                $("#alt-box").hide();
+                numDom.text("3秒");
+				return;
+			}
+			num --;
+			numDom.text(num+"秒");
+		},1000);
+	}
 });
