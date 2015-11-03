@@ -36,5 +36,7 @@ html
 
     .account-logou
       a(href="/accounts/logout?next=/weixin/list/").account-exit 安全退出
+  - with 'account' as state
   include include/weixin_footer
+  - endwith
   script( src="/static/scripts/mobile/dist/mobile.js")

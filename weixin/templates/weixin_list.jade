@@ -34,7 +34,10 @@ html
         p.load-text 点击查看更多项目
         p.load
 
+
+    - with 'list' as state
     include include/weixin_footer
+    - endwith
     include include/app_down
     script(src="/static/scripts/mobile/swiper/swiper.min.js")
     script(data-init='list', src="/static/scripts/mobile/mobile.js?v=20150707")
