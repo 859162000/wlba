@@ -1,6 +1,6 @@
 # encoding:utf-8
 from django.contrib import admin
-from .models import Account, QrCode
+from .models import Account, QrCode, SubscribeService
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
@@ -54,5 +54,10 @@ class QrCodeAdmin(admin.ModelAdmin):
     search_fields = ('account_original_id',)
     fields = ('account_original_id', 'scene_str')
 
+
+class SubscribeServiceAdmin(admin.ModelAdmin):
+    list_display = ('id', 'key', 'describe', 'type', 'num_limit', 'channel', 'is_open')
+
 admin.site.register(Account, AccountAdmin)
 admin.site.register(QrCode, QrCodeAdmin)
+admin.site.register(SubscribeService, SubscribeServiceAdmin)

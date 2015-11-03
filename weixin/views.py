@@ -39,7 +39,6 @@ from .common.wechat import tuling
 from decimal import Decimal
 from wanglibao_pay.models import Card
 from marketing.utils import get_channel_record
-import datetime
 import json
 import uuid
 import urllib
@@ -51,12 +50,36 @@ from wanglibao_redis.backend import redis_backend
 from wechatpy.parser import parse_message
 from wechatpy.messages import *
 from wechatpy.events import *
-
-import pickle
 from rest_framework import renderers
+import functools
 
-logger = logging.getLogger('wanglibao_reward')
 
+def checkBindDeco(func):
+    @functools.wraps(func)
+    def wrapper(self, *args, **kwargs):
+        toUserName = self.msg._data['ToUserName']
+        fromUserName = self.msg._data['FromUserName']
+        account = Account.objects.get(original_id=toUserName)
+        w_user = getOrCreateWeixinUser(fromUserName, account)
+        check_bind = False
+        if isinstance(self.msg, BaseEvent):
+            if isinstance(self.msg,(ClickEvent,)):
+                if self.msg.key == 'test_hmm':
+                    check_bind = True
+        elif isinstance(self.msg, BaseMessage):
+            content = self.msg.content.lower()
+            sub_service = SubscribeService.objects.filter(channel='weixin', is_open=True, key=content).first()
+            if content == 'td' or sub_service:
+                check_bind = True
+
+        if check_bind and not w_user.user:
+            txt = self.getBindTxt(fromUserName, account.id)
+            reply = create_reply(txt, self.msg)
+            print '----------------------------check bind in decorator----'
+            return reply
+        else:
+            return func(self, *args, **kwargs)
+    return wrapper
 
 class WeixinJoinView(View):
     account = None
@@ -76,17 +99,17 @@ class WeixinJoinView(View):
         return True
 
     def get(self, request, account_key):
-        # if not self.check_signature(request, account_key):
-        #     return HttpResponseForbidden()
+        if not self.check_signature(request, account_key):
+            return HttpResponseForbidden()
 
         return HttpResponse(request.GET.get('echostr'))
 
     def post(self, request, account_key):
         if not self.check_signature(request, account_key):
             return HttpResponseForbidden()
-        account = Account.objects.get(pk=account_key)#WeixinAccounts.get(account_key)
-        msg = parse_message(request.body)
-        print '-----------------------------%s'%msg._data
+        account = Account.objects.get(pk=account_key) #WeixinAccounts.get(account_key)
+        self.msg = parse_message(request.body)
+        msg = self.msg
         reply = None
         toUserName = msg._data['ToUserName']
         fromUserName = msg._data['FromUserName']
@@ -128,21 +151,20 @@ class WeixinJoinView(View):
             reply = create_reply(u'...', msg)
         return HttpResponse(reply.render())
 
+    @checkBindDeco
     def process_click_event(self, msg):
         reply = None
         sub_services = SubscribeService.objects.filter(channel='weixin', is_open=True).all()
-        # info = {"1":{"desc":"【1】1月标上线通知", }, "2":{"desc":"【2】2月标上线通知", }, "3":{"desc":"【3】3月标上线通知",}, "4":{"desc":"【4】6月标上线通知"}}
-
+        toUserName = msg._data['ToUserName']
+        fromUserName = msg._data['FromUserName']
+        account = Account.objects.get(original_id=toUserName)
         if msg.key == 'test_hmm':
             txt = u'客官，请回复相关数字订阅最新项目通知，系统会在第一时间发送给您相关信息。\n'
             for sub_service in sub_services:
-                txt += (sub_service.describe+'\n')
+                txt += (sub_service.describe + '\n')
             txt += u'如需退订请回复TD'
             reply = create_reply(txt, msg)
         if msg.key == 'bind_weixin':
-            toUserName = msg._data['ToUserName']
-            fromUserName = msg._data['FromUserName']
-            account = Account.objects.get(original_id=toUserName)
             w_user = getOrCreateWeixinUser(fromUserName, account)
             if not w_user.user:
                 txt = self.getBindTxt(fromUserName, account.id)
@@ -151,6 +173,7 @@ class WeixinJoinView(View):
             reply = create_reply(txt, msg)
         return reply
 
+    @checkBindDeco
     def check_service_subscribe(self, msg, account):
         fromUserName = msg._data['FromUserName']
         w_user = getOrCreateWeixinUser(fromUserName, account)
@@ -168,30 +191,24 @@ class WeixinJoinView(View):
             return reply
         sub_service = SubscribeService.objects.filter(channel='weixin', is_open=True, key=content).first()
         if sub_service:
-            if w_user.user:
-                sub_service_record = SubscribeRecord.objects.filter(user=w_user.user, service = sub_service).first()
-                if sub_service_record and sub_service_record.status==1:
-                    txt = u'客官真健忘，您已经订阅此项目通知，订阅其他上线通知项目吧～'
-                if not sub_service_record:
-                    sub_service_record = SubscribeRecord()
-                    sub_service_record.service = sub_service
-                    sub_service_record.user = w_user.user
-                if not sub_service_record.status:
-                    sub_service_record.status = True
-                    sub_service_record.save()
-                    txt = u'恭喜您，%s订阅成功，系统会在第一时间发送给您相关信息'%(sub_service.describe)
-            else:
-                txt = self.getBindTxt(fromUserName, account.id)
+            sub_service_record = SubscribeRecord.objects.filter(user=w_user.user, service = sub_service).first()
+            if sub_service_record and sub_service_record.status==1:
+                txt = u'客官真健忘，您已经订阅此项目通知，订阅其他上线通知项目吧～'
+            if not sub_service_record:
+                sub_service_record = SubscribeRecord()
+                sub_service_record.service = sub_service
+                sub_service_record.user = w_user.user
+            if not sub_service_record.status:
+                sub_service_record.status = True
+                sub_service_record.save()
+                txt = u'恭喜您，%s订阅成功，系统会在第一时间发送给您相关信息'%(sub_service.describe)
             if txt:
                 reply = create_reply(txt, msg)
         return reply
 
 
     def process_subscribe(self, msg, accountid):
-        event = msg.event
-        toUserName = msg._data['ToUserName']
         fromUserName = msg._data['FromUserName']
-        createTime = msg._data['CreateTime']
         eventKey = msg._data['EventKey']
         account = Account.objects.get(pk=accountid)
         w_user = getOrCreateWeixinUser(fromUserName, account)
@@ -245,6 +262,8 @@ class WeixinJoinView(View):
     def dispatch(self, request, *args, **kwargs):
         return super(WeixinJoinView, self).dispatch(request, *args, **kwargs)
 
+
+
 def getOrCreateWeixinUser(openid, account):
     w_user = WeixinUser.objects.filter(openid=openid).first()
     if not w_user:
@@ -282,6 +301,7 @@ def bindUser(w_user, user):
     w_user.user = user
     w_user.save()
     return 0, u'绑定成功'
+
 
 
 class WeixinBindLogin(TemplateView):
@@ -1063,13 +1083,13 @@ class AuthorizeCode(APIView):
             else:
                 redirect_uri += "&%s=%s"%(key, request.GET.get(key))
             count += 1
-
+        print redirect_uri
         # print redirect_uri
         if auth and auth=='1':
             oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, scope='snsapi_userinfo', state=account_id)
         else:
             oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, state=account_id)
-        # print oauth.authorize_url
+        print oauth.authorize_url
         return redirect(oauth.authorize_url)
 
 
@@ -1085,6 +1105,7 @@ class AuthorizeUser(APIView):
         redirect_url = ''
         if redirect_uri:
             redirect_url = urllib.unquote(redirect_uri)
+        print '3------', redirect_url
         if not redirect_url:
             return Response({'errcode':-1,  'errmsg':'need a redirect_uri'})
         code = request.GET.get('code')

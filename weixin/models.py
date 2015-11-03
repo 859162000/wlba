@@ -334,19 +334,24 @@ class SubscribeService(models.Model):
         ('weixin', '微信平台'),
     )
     SERVICE_TYPES = (
-        (u'月标上线通知', u'月标上线通知'),
+        (0, u'月标上线通知'),
     )
     key = models.CharField(u'服务快捷键', max_length=128, unique=True, db_index=True)
     describe = models.CharField(u'服务描述', max_length=256)
-    type = models.IntegerField(u'', default=0)
+    type = models.IntegerField(u'类型', default=0, choices=SERVICE_TYPES)
     num_limit = models.IntegerField(u'数值限制', default=0)
     channel = models.CharField(u'从哪里订阅的服务', choices=CHANNELS, max_length=32)
     is_open = models.BooleanField(u'是否开启服务', default=False)
+
+    class Meta:
+        verbose_name_plural = '订阅服务'
+        ordering = ['key']
 
 class SubscribeRecord(models.Model):
     user = models.ForeignKey(User, null=False)
     status = models.BooleanField(u'订阅状态, 0:退订,1:订阅', default=False)
     service = models.ForeignKey(SubscribeService, null=False)
+    # update_at = models.DateTimeField('更新时间', auto_now_add=True)
 
 
 class Material(models.Model):
