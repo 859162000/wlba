@@ -50,7 +50,7 @@ from wanglibao_p2p.views import get_p2p_list
 from wanglibao_redis.backend import redis_backend
 from wechatpy.parser import parse_message
 from wechatpy.messages import BaseMessage, TextMessage
-import datetime
+import datetime, time
 from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEvent, UnsubscribeEvent, SubscribeEvent,\
                              TemplateSendJobFinishEvent)
 from rest_framework import renderers
@@ -1104,7 +1104,7 @@ class WeixinAccountBankCardAdd(TemplateView):
             'banks': banks,
         }
 
-import time
+
 class AuthorizeCode(APIView):
     permission_classes = ()
 
@@ -1147,7 +1147,6 @@ class AuthorizeUser(APIView):
         redirect_url = ''
         if redirect_uri:
             redirect_url = urllib.unquote(redirect_uri)
-        print '3------', redirect_url
         if not redirect_url:
             return Response({'errcode':-1,  'errmsg':'need a redirect_uri'})
         code = request.GET.get('code')
@@ -1250,6 +1249,7 @@ class GetAuthUserInfo(APIView):
             return Response(user_info)
         except WeChatException, e:
             return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
+
 class GetUserInfo(APIView):
     renderer_classes = (renderers.UnicodeJSONRenderer,)
     permission_classes = ()
