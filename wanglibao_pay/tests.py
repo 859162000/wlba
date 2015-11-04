@@ -116,6 +116,17 @@ class KuaiPayTests(TestCase):
         margin.amount = 0
         margin.save()
 
+    def test_result2dict(self):
+        # transtime 的值为空
+        c = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?><MasMessage xmlns="http://www.99bill.com/\
+mas_cnp_merchant_interface"><version>1.0</version><TxnMsgContent><txnType>PUR</txnType><interactiveStatus>TR2\
+</interactiveStatus><amount>200.00</amount><merchantId>812310060110013</merchantId><terminalId>00004559</terminalId>\
+<entryTime>20151101022840</entryTime><externalRefNumber>36825386</externalRefNumber><customerId>759891</customerId>\
+<transTime></transTime><responseCode>68</responseCode><responseTextMessage>deal time out</responseTextMessage>\
+</TxnMsgContent></MasMessage>"""
+        r = self.kuai_pay._result2dict(c)
+        print r
+
     def test_dynnum_pay(self):
         """
         验证码支付
