@@ -379,7 +379,7 @@ class WeixinBindLogin(TemplateView):
 
 
 class UnBindWeiUser(TemplateView):
-    template_name = ''
+    template_name = 'sub_is_bind.jade'
 
     def get_context_data(self, **kwargs):
         context = super(UnBindWeiUser, self).get_context_data(**kwargs)

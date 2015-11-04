@@ -30,13 +30,14 @@ urlpatterns = patterns(
     url(r'^more/aboutus/$', TemplateView.as_view(template_name="weixin_aboutus.jade")),
     url(r'bind/login/$', views.WeixinBindLogin.as_view(), name='weixin_bind_login'),
     url(r'bind/register/$', views.WeixinBindRegister.as_view(), name='weixin_bind_register'),
-    url(r'weixin_unbind/$', TemplateView.as_view(), name='weixin_unbind'),
+    url(r'weixin_unbind/$', views.UnBindWeiUser.as_view(), name='weixin_unbind'),
     url(r'^reward/(?P<status>\w+)/$', login_required(views.WeixinCouponList.as_view(), login_url='/weixin/login/')),
 
     # js api
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
     url(r'^api/login/$', views.WeixinLoginAPI.as_view(), name='weixin_login_api'),
     url(r'^api/login/bind/$', views.WeixinLoginBindAPI.as_view(), name='weixin_login_bind_api'),
+    url(r'^api/unbind/$', views.UnBindWeiUserAPI.as_view(), name='weixin_unbind_api'),
     url(r'^api/pay/order/$', views.WeixinPayOrder.as_view(), name='weixin_pay_order_api'),
     url(r'api/wx_code/$', views.AuthorizeCode.as_view(), name='weixin_authorize_code'),
     url(r'api/wx_userinfo/$', views.AuthorizeUser.as_view(), name='weixin_authorize_user_info'),
