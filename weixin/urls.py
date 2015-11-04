@@ -47,7 +47,7 @@ urlpatterns = patterns(
     url(r'api/generate/qr_scene_ticket/$', views.GenerateQRSceneTicket.as_view(), name='generate_qr_scene_ticket'),
 
     #test
-    url(r'^has_bind/$', TemplateView.as_view(template_name="sub_has_bind.jade")),
+    url(r'^jump_page/$', views.JumpPageTemplate.as_view(template_name="sub_times.jade"), name='jump_page'),
     url(r'^is_bind/$', TemplateView.as_view(template_name="sub_is_bind.jade")),
 )
 

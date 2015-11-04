@@ -363,20 +363,32 @@ class WeixinBindLogin(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         openid = self.request.GET.get('openid', '')
         if not openid:
-            return Response({'errcode':-1, 'errmsg':"openid is null"})
+            return HttpResponse({'errcode':-1, 'errmsg':"openid is null"})
         account_id = self.request.GET.get('state')
         account = Account.objects.filter(id=account_id).first()
         if not account:
-            return Response({'errcode':-2, 'errmsg':"-2"})
+            return HttpResponse({'errcode':-2, 'errmsg':"-2"})
         w_user = getOrCreateWeixinUser(openid, account)
         if w_user.user:
-            txt = "您的微信绑定帐号为：13241926426\n"\
-                +"如需解绑当前帐号，请点击【立即解绑】"
-            client = WeChatClient(account.app_id, account.app_secret)
-            client.message.send_text(openid, txt)
-            return Response({"errcode":-3, 'errmsg':u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone})
+            message = u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone
+            return redirectToJumpPage(message)
         return super(WeixinBindLogin, self).dispatch(request, *args, **kwargs)
 
+class JumpPageTemplate(TemplateView):
+    template_name = 'sub_times.jade'
+
+    def get_context_data(self, **kwargs):
+        context = super(JumpPageTemplate, self).get_context_data(**kwargs)
+        message = self.request.GET.get('message', 'ERROR')
+        context['message'] = message
+        return {
+            'context': context,
+            'next': next
+            }
+
+def redirectToJumpPage(message):
+    url = reverse('jump_page')+'?message=%s'%message
+    return HttpResponseRedirect(url)
 
 class UnBindWeiUser(TemplateView):
     template_name = 'sub_is_bind.jade'
