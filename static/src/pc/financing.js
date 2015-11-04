@@ -47,7 +47,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
 
 
 
-    
+
     var errorDom = $("#errorBox");
     //select
     $("p.js-select").click(function(){
