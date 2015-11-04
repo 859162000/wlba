@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # encoding:utf-8
+from celery.utils.log import get_task_logger
 import pytz
 
 from wanglibao.celery import app
@@ -20,11 +21,14 @@ from wanglibao_redpack.models import Income, RedPackEvent, RedPack, RedPackRecor
 import datetime
 from django.db.models import Sum, Count, Q
 import logging
-logger = logging.getLogger('wanglibao_reward')
 
+# logger = logging.getLogger('wanglibao_reward')
+
+logger = get_task_logger(__name__)
 
 @app.task
-def decide_first(user_id, amount, device, product_id=0, is_full=False):
+def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False):
+    # fix@chenweibi, add order_id
     user = User.objects.filter(id=user_id).first()
     amount = long(amount)
     device_type = device['device_type']
@@ -37,8 +41,8 @@ def decide_first(user_id, amount, device, product_id=0, is_full=False):
 
     # 活动检测
     activity_backends.check_activity(user, 'invest', device_type, amount, product_id, is_full)
-
-    utils.log_clientinfo(device, "buy", user_id, amount)
+    # fix@chenweibi, add order_id
+    utils.log_clientinfo(device, "buy", user_id, order_id, amount)
 
     # 发送红包
     # send_lottery.apply_async((user_id,))
@@ -92,7 +96,8 @@ def idvalidate_ok(user_id, device):
 
 
 @app.task
-def deposit_ok(user_id, amount, device):
+def deposit_ok(user_id, amount, device, order_id):
+    # fix@chenweibi, add order_id
     try:
         device_type = device['device_type']
         title, content = messages.msg_pay_ok(amount)
@@ -105,7 +110,7 @@ def deposit_ok(user_id, amount, device):
         user = User.objects.get(id=user_id)
         user_profile = user.wanglibaouserprofile
         activity_backends.check_activity(user, 'recharge', device_type, amount)
-        utils.log_clientinfo(device, "deposit", user_id, amount)
+        utils.log_clientinfo(device, "deposit", user_id, order_id, amount)
         send_messages.apply_async(kwargs={
             'phones': [user_profile.phone],
             'messages': [messages.deposit_succeed(user_profile.name, amount)]
@@ -134,6 +139,42 @@ def calc_broker_commission(product_id):
     with transaction.atomic():
         for equity in product.equities.all():
             redpack_backends.commission(equity.user, product, equity.equity, start, end)
+
+
+@app.task
+def send_income_message_sms():
+    today = datetime.datetime.now()
+    yestoday = today - datetime.timedelta(days=1)
+    start = timezone.datetime(yestoday.year, yestoday.month, yestoday.day, 20, 0, 0)
+    end = timezone.datetime(today.year, today.month, today.day, 20, 0, 0)
+    incomes = Income.objects.filter(created_at__gte=start, created_at__lt=end).values('user')\
+                            .annotate(Count('invite', distinct=True)).annotate(Sum('earning'))
+    phones_list = []
+    messages_list = []
+    if incomes:
+        for income in incomes:
+            user_info = User.objects.filter(id=income.get('user'))\
+                .select_related('user__wanglibaouserprofile').values('wanglibaouserprofile__phone')
+            phones_list.append(user_info[0].get('wanglibaouserprofile__phone'))
+            user = User.objects.get(id=income.get('user'))
+            messages_list.append(messages.sms_income(user.wanglibaouserprofile.name,
+                                                     income.get('invite__count'),
+                                                     income.get('earning__sum')))
+
+            # 发送站内信
+            title, content = messages.msg_give_income(income.get('invite__count'), income.get('earning__sum'))
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": income.get('user'),
+                "title": title,
+                "content": content,
+                "mtype": "invite"
+            })
+
+        # 批量发送短信
+        send_messages.apply_async(kwargs={
+            "phones": phones_list,
+            "messages": messages_list
+        })
 
 
 @app.task
@@ -205,45 +246,6 @@ def check_invested_status(delta=timezone.timedelta(days=3)):
     send_messages.apply_async(kwargs={
         'phones': phones_list,
         'messages': [messages.user_invest_alert()],
-        'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
-    })
-
-
-@app.task
-def check_redpack_status(delta=timezone.timedelta(days=3)):
-    """
-    每天一次检查3天后到期的红包优惠券.发短息提醒投资.
-    """
-    check_date = timezone.now() + delta
-    start = timezone.datetime(year=check_date.year, month=check_date.month, day=check_date.day).replace(tzinfo=pytz.UTC)
-    end = start + timezone.timedelta(days=1)
-
-    # 有效期为3天的优惠券
-    redpacks = RedPackEvent.objects.filter(unavailable_at__gte=start, unavailable_at__lt=end)
-    # 未使用过的
-    available = RedPack.objects.filter(event__in=redpacks, status='used')
-    # 三天未使用优惠券对应的红包记录
-    records = RedPackRecord.objects.filter(redpack__in=available)
-
-    ids = [record.user.id for record in records]
-
-    # 获取需要发送提醒的用户
-    users = User.objects.filter(id__in=ids)
-
-    phones_list = []
-    messages_list = []
-    for user in users:
-        try:
-            count = RedPackRecord.objects.filter(user=user, redpack__event__unavailable_at__gte=start,
-                                                 redpack__event__unavailable_at__lt=end).exclude(order_id__gt=0).count()
-            phones_list.append(user.wanglibaouserprofile.phone)
-            messages_list.append(messages.red_packet_invalid_alert(count))
-        except Exception, e:
-            print e
-
-    send_messages.apply_async(kwargs={
-        'phones': phones_list,
-        'messages': messages_list,
         'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
     })
 
