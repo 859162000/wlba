@@ -8,7 +8,7 @@ from views import AggregateView, MarketingView, TvView, TopsView, IntroducedAwar
 from play_list import InvestmentRewardView
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, \
     Activity, ActivityRule, Reward, RewardRecord, Channels, ChannelsNew, IntroducedByReward, PlayList, \
-    ActivityJoinLog, WanglibaoActivityReward
+    ActivityJoinLog, WanglibaoActivityReward, GiftOwnerGlobalInfo, GiftOwnerInfo, QuickApplyInfo
 from marketing.views import GennaeratorCode
 
 from import_export import resources
@@ -269,7 +269,31 @@ class ChannelsNewAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+class GiftOwnerGlobalInfoAdmin(admin.ModelAdmin):
+    actions = None
+    list_display = ("description", "amount", "valid")
 
+
+class GiftOwnerInfoAdmin(admin.ModelAdmin):
+    actions = None
+    list_display = ("sender", "name", "phone", "address", "award", "type", "create_time", "update_time")
+    readonly_fields = list_display
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+class QuickApplyInfoAdmin(admin.ModelAdmin):
+    actions = None
+    list_display = ("name", "phone", "address", "apply_way", "apply_amount", "status", "create_time", "update_time")
+    readonly_fields = list_display
+
+    def has_delete_permission(self, request, obj=None):
+        return None
+
+admin.site.register(QuickApplyInfo, QuickApplyInfoAdmin) #add by Yihen@20151103
+admin.site.register(GiftOwnerGlobalInfo, GiftOwnerGlobalInfoAdmin) #add by Yihen@20151103
+admin.site.register(GiftOwnerInfo, GiftOwnerInfoAdmin) #add by Yihen@20151103
 admin.site.register(WanglibaoActivityReward, WanglibaoActivityRewardAdmin)  # add by Yihen@20150901
 admin.site.register(NewsAndReport, NewsAndReportAdmin)
 admin.site.register(SiteData, SiteDataAdmin)

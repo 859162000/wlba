@@ -38,12 +38,19 @@ html
                 .reward-card-parent(class='{{status}}')
                   .reward-explain
                     .reward-name {{pack.name}}
-                    .reward-scope {{pack.invest_amount}}元起用
-                    .reward-period {{pack.available_at | milldate_format}} 至 {{pack.unavailable_at | milldate_format}}
-                  .reward-amount {{pack.amount | percentage_number_two}}
-                    if pack.method == '-'
-                      em 元
+
+                    if pack.invest_amount == 0
+                      .reward-scope 无门槛
                     else
+                      .reward-scope {{pack.invest_amount}}元起用
+
+                    .reward-period {{pack.available_at | milldate_format}} 至 {{pack.unavailable_at | milldate_format}}
+
+                  if pack.method == '-'
+                    .reward-amount {{pack.amount }}
+                      em 元
+                  else
+                    .reward-amount {{pack.amount | percentage_number_two}}
                       em %
           else
             .reward-default

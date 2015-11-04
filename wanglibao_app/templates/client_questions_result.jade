@@ -1,4 +1,6 @@
 -load formatters
+-load mathfilters
+-load widget_tweaks
 doctype html
 html
   head
@@ -11,5 +13,5 @@ html
           .question-list#list
             .question-name {{val.question}}
             .question-arrow
-          .question-answer {{val.answer}}
+          .question-answer {{val.answer|linebreaksbr}}
     script(src='/static/scripts/app/dist/question.js', data-init='result')
