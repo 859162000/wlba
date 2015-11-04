@@ -149,7 +149,7 @@ urlpatterns += patterns(
     # url(r'^api/bengbeng/getInfoList/(?P<startday>.*)/(?P<endday>.*)/(?P<sign>.*)/$', BengbengQuery.as_view())
     url(r'^api/coopinfo/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<user_type>[a-z0-9A-Z_]*)/(?P<start_day>[0-9]*)/(?P<end_day>[0-9]*)/(?P<sign>[a-z0-9A-Z_]*)/$', CoopQuery.as_view()),
     url(r'^api/coopinfo/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<user_type>[a-z0-9A-Z_]*)/(?P<start_day>[0-9]*)/(?P<end_day>[0-9]*)/(?P<sign>[a-z0-9A-Z_]*)/(?P<page>[0-9]*)/$', CoopQuery.as_view()),
-    url(r'^api/coopinvestinfo/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<start_day>[0-9]*)/(?P<end_day>[0-9]*)/(?P<sign>[a-z0-9A-Z_]*)/$', CoopInvestmentQuery.as_view()),
+    url(r'^api/coopinvestinfo/(?P<channel_code>[a-z0-9A-Z_]*)/(?P<p_id>[0-9]*)/(?P<sign>[a-z0-9A-Z_]*)/$', CoopInvestmentQuery.as_view()),
 
     url(r'^api/csai/users/', CsaiUserQuery.as_view()),
     url(r'^api/csai/investment/', CsaiInvestmentQuery.as_view()),
