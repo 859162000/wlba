@@ -400,14 +400,14 @@ class UnBindWeiUser(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         openid = self.request.GET.get('openid', '')
         if not openid:
-            return Response({'errcode':-1, 'errmsg':"openid is null"})
+            return HttpResponse({'errcode':-1, 'errmsg':"openid is null"})
         account_id = self.request.GET.get('state')
         account = Account.objects.filter(id=account_id).first()
         if not account:
-            return Response({'errcode':-2, 'errmsg':"-2"})
+            return HttpResponse({'errcode':-2, 'errmsg':"-2"})
         w_user = getOrCreateWeixinUser(openid, account)
         if not w_user.user:
-            return ({'errcode':-3, 'errmsg':"has not bind a user"})
+            return HttpResponse({'errcode':-3, 'errmsg':"has not bind a user"})
         return super(UnBindWeiUser, self).dispatch(request, *args, **kwargs)
 
 class UnBindWeiUserAPI(APIView):
@@ -417,9 +417,9 @@ class UnBindWeiUserAPI(APIView):
     def post(self, request):
         openid = request.POST.get('openid')
         weixin_user = WeixinUser.objects.get(openid=openid)
-        weixin_user.user = ""
+        weixin_user.user = None
         weixin_user.save()
-        return ({'message':'ok'})
+        return Response({'message':'ok'})
 
 
 class WeixinLoginBindAPI(APIView):
