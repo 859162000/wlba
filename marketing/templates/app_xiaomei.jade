@@ -7,9 +7,29 @@ html.html1
   body.body1
     .container
       .xunleipage.page1
-        img(src='/static/imgs/mobile_activity/app_xiaomei/jiantou.png')
+        img(src='/static/imgs/mobile_activity/app_xiaomei/jiantou.png').jiantou
+        img(src='/static/imgs/mobile_activity/app_xiaomei/feiqi.png').feiqi
+        img(src='/static/imgs/mobile_activity/app_xiaomei/xingxing-1.png').xingxing-1
+        img(src='/static/imgs/mobile_activity/app_xiaomei/xingxing-2.png').xingxing-2
+        img(src='/static/imgs/mobile_activity/app_xiaomei/qiandai.png').qiandai
+
       .xunleipage.page2
-        img(src='/static/imgs/mobile_activity/app_xiaomei/jiantou.png')
+        img(src='/static/imgs/mobile_activity/app_xiaomei/jiantou.png').jiantou
+        .xuxian
+          .xuxian2
+            .zhe
+            .zhe2
+          .xuxian3
+            .zhe
+          .xuxian4
+            .zhe
+            .zhe2
+          .xuxian5
+            .zhe
+          .xuxian6
+            .zhe
+            .zhe2
+
       .xunleipage.page0
         .mei-instructions
           p 活动说明
@@ -55,6 +75,9 @@ html.html1
       $('.cheng-button').on('click',function(){
         $('.xiaomei-mengcheng').hide();
       })
+      if($('.container').offset().top == '-100%'){
+        alert(123)
+      }
       $(document).ready(
               function () {
                 var nowpage = 0;
@@ -76,6 +99,11 @@ html.html1
                             if (nowpage < 0)//道理同上
                             {
                               nowpage = 0;
+                            }
+                            if(nowpage == 1){
+                              $('.xuxian').addClass('xuxian1');
+                            }else{
+                              $('.xuxian').removeClass('xuxian1');
                             }
                             $(".container").animate({"top": nowpage * -100 + "%"}, 400);//根据当前记数器滚动到相应的高度
                           }
