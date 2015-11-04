@@ -233,7 +233,11 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                 async: true,
                 success: function(data){
                     isSub = false;
-                    self.text("提交");
+                    if(self.hasClass("wx-btn")){
+                        self.text("快速申请");
+                    }else{
+                        self.text("提交");
+                    }
                     if(data.ret_code === '0'){
                         nameDom.val("");
                         phoneDom.val("");
