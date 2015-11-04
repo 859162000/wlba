@@ -253,9 +253,9 @@ def card_bind_list(request):
                 card = Card.objects.filter(user=user, no__startswith=car['card_top'], no__endswith=car['card_last']).first()
                 if card:
                     yee_card_no_list.append(card.no)
-            if yee_card_no_list:
-                Card.objects.filter(user=user, no__in=yee_card_no_list).update(is_bind_yee=True)
-                Card.objects.filter(user=user).exclude(no__in=yee_card_no_list).update(is_bind_yee=False)
+            # if yee_card_no_list:
+            #     Card.objects.filter(user=user, no__in=yee_card_no_list).update(is_bind_yee=True)
+            #     Card.objects.filter(user=user).exclude(no__in=yee_card_no_list).update(is_bind_yee=False)
 
         # 查询块钱已经绑定卡
         res = KuaiShortPay().query_bind_new(user.id)
