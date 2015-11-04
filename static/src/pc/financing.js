@@ -7,6 +7,7 @@ require.config({
     }
 });
 require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
+    //表单提交  - csrf_token  start
      var  csrfSafeMethod, getCookie,sameOrigin,
     getCookie = function(name) {
         var cookie, cookieValue, cookies, i;
@@ -43,11 +44,9 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
             }
         }
     });
+    //表单提交   - csrf_token  end
 
 
-
-
-    
     var errorDom = $("#errorBox");
     //select
     $("p.js-select").click(function(){
