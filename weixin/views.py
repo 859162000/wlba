@@ -21,7 +21,7 @@ from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from django.contrib.auth.models import User
-from misc.models import Misc
+import constant
 
 
 
@@ -314,11 +314,16 @@ class SendTemplateMessage(APIView):
     http_method_names = ['post']
 
     @classmethod
-    def sendTemplate(cls, openid):
+    def sendTemplate(cls, openid, template_id):
         weixin_user = WeixinUser.objects.get(openid=openid)
         account = Account.objects.get(original_id=weixin_user.account_original_id)
         client = WeChatClient(account.app_id, account.app_secret)
-        client.message.send_template(weixin_user.openid, '_8E2B4QZQC3yyvkubjpR6NYXtUXRB9Ya79MYmpVvQ1o',
+        if template_id not in constant.Message_template.keys():
+            return -1
+        template = constant.Message_template.get(template_id, {})
+        # template['top_color']
+
+        client.message.send_template(weixin_user.openid, constant.BIND_SUCCESS_TEMPLATE_ID,
                                      top_color='#88ffdd', data={
                 "first":{
                     "value":"您好，恭喜您账户绑定成功！\n  \n您的账户已经与微信账户绑定在一起。",
