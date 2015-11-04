@@ -304,7 +304,7 @@ org.login = (function(org){
         $captcha_img : $('#captcha'),
         $captcha_key : $('input[name=captcha_0]'),
         init:function(){
-            lib._captcha_refresh();
+            //lib._captcha_refresh();
             lib._checkFrom();
         },
         _captcha_refresh :function(){
@@ -322,20 +322,17 @@ org.login = (function(org){
                 inputList: [
                     {target : $('input[name=identifier]'),  required:true},
                     {target : $('input[name=password]'), required : true},
-                    {target: $('input[name=captcha_1]'), required : true},
                 ],
             });
 
             //刷新验证码
-            lib.$captcha_img.on('click', function() {
-                lib._captcha_refresh();
-            });
+            //lib.$captcha_img.on('click', function() {
+              //  lib._captcha_refresh();
+            //});
             $submit.on('click', function() {
                 var data = {
                     'identifier': $.trim($form.find('input[name=identifier]').val()),
                     'password': $.trim($form.find('input[name=password]').val()),
-                    'captcha_0': $.trim($form.find('input[name=captcha_0]').val()),
-                    'captcha_1': $.trim($form.find('input[name=captcha_1]').val()),
                     'openid': $.trim($form.find('input[name=openid]').val())
                 }
                 org.ajax({
@@ -608,11 +605,9 @@ org.list = (function(org){
             });
         },
         _scrollListen:function(){
-            $(document).scroll(function(){
-                if(document.body.scrollTop / (document.body.clientHeight -lib.windowHeight ) >= lib.scale){
-                    lib.canGetPage && lib._getNextPage();
-                }
-            });
+            $('.load-body').on('click', function(){
+                lib.canGetPage && lib._getNextPage();
+            })
         },
         _getNextPage :function(){
             org.ajax({
@@ -621,14 +616,19 @@ org.list = (function(org){
                 data: {page: lib.page, 'pagesize': lib.pageSize},
                 beforeSend:function(){
                     lib.canGetPage =false
+                    $('.load-text').html('加载中...');
                 },
                 success: function(data){
                    $('#list-body').append(data.html_data);
                     lib.page++;
                     lib.canGetPage = true;
+
                 },
                 error: function(){
                     org.ui.alert('Ajax error!')
+                },
+                complete: function(){
+                     $('.load-text').html('点击查看更多项目');
                 }
             })
         }

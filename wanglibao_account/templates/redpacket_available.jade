@@ -64,15 +64,18 @@ block main
                 td {{red_packet.amount}}元
               else
                 td {{red_packet.highest_amount}}元
-              td 仅限一次
+              td 仅限一次2
+
               if red_packet.method == '-'
                 td {{red_packet.amount}}元
               else
                 td 投资额{{red_packet.amount | percentage_number_two}}%
+
               if red_packet.invest_amount == 0
                 td 无
               else
                 td {{red_packet.invest_amount}}元
+
               td
                 if red_packet.p2p_types_name
                   | {{red_packet.p2p_types_name}}
@@ -82,6 +85,7 @@ block main
                   | 无
                 if red_packet.period
                   | {{red_packet.period}}
+
               td {{red_packet.available_at | milldate_format}} 至 {{red_packet.unavailable_at | milldate_format}}
               if status == 'used'
                 td {{red_packet.product}} <br/> {{red_packet.apply_at | milltime_format }}
