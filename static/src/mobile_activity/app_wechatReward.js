@@ -131,7 +131,7 @@ org.reward = (function(org){
                             }else{
                                 $(document.body).trigger('from:error',[data.message, true]);
                                 clearInterval(_self.intervalId);
-                                $('.check-submit').text('重新获取').removeAttr('disabled').removeClass('postValidation')
+                                $('.check-submit').text('短信验证码').removeAttr('disabled').removeClass('postValidation')
                                 return $(document.body).trigger('from:captcha');
                             }
                         },
