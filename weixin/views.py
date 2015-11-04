@@ -363,16 +363,47 @@ class WeixinBindLogin(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         openid = self.request.GET.get('openid', '')
         if not openid:
-            return HttpResponse({'errcode':-1, 'errmsg':"openid is null"})
+            return redirectToJumpPage("error:-1")
         account_id = self.request.GET.get('state')
         account = Account.objects.filter(id=account_id).first()
         if not account:
-            return HttpResponse({'errcode':-2, 'errmsg':"-2"})
+            return redirectToJumpPage("error:-2")
         w_user = getOrCreateWeixinUser(openid, account)
         if w_user.user:
             message = u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone
             return redirectToJumpPage(message)
         return super(WeixinBindLogin, self).dispatch(request, *args, **kwargs)
+
+
+class WeixinLoginBindAPI(APIView):
+    permission_classes = ()
+    http_method_names = ['post']
+
+    def _form(self, request):
+        return LoginAuthenticationNoCaptchaForm(request, data=request.POST)
+
+    def post(self, request):
+        form = self._form(request)
+
+        if form.is_valid():
+            user = form.get_user()
+
+            try:
+                openid = request.POST.get('openid')
+                weixin_user = WeixinUser.objects.get(openid=openid)
+                rs, txt = bindUser(weixin_user, user)
+                if rs==0:
+                    SendTemplateMessage.sendTemplate(openid)
+            except WeixinUser.DoesNotExist:
+                pass
+
+            auth_login(request, user)
+            request.session.set_expiry(1800)
+            data = {'nickname': user.wanglibaouserprofile.nick_name}
+            return Response(data)
+
+        return Response(form.errors, status=400)
+
 
 class JumpPageTemplate(TemplateView):
     template_name = 'sub_times.jade'
@@ -412,14 +443,15 @@ class UnBindWeiUser(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         openid = self.request.GET.get('openid', '')
         if not openid:
-            return HttpResponse({'errcode':-1, 'errmsg':"openid is null"})
+            return redirectToJumpPage("error:-1")
         account_id = self.request.GET.get('state')
         account = Account.objects.filter(id=account_id).first()
         if not account:
-            return HttpResponse({'errcode':-2, 'errmsg':"-2"})
+            return redirectToJumpPage("error:-2")
         w_user = getOrCreateWeixinUser(openid, account)
         if not w_user.user:
-            return HttpResponse({'errcode':-3, 'errmsg':"has not bind a user"})
+            message = u"您没有绑定的网利宝帐号"
+            return redirectToJumpPage(message)
         return super(UnBindWeiUser, self).dispatch(request, *args, **kwargs)
 
 class UnBindWeiUserAPI(APIView):
@@ -433,35 +465,6 @@ class UnBindWeiUserAPI(APIView):
         weixin_user.save()
         return Response({'message':'ok'})
 
-
-class WeixinLoginBindAPI(APIView):
-    permission_classes = ()
-    http_method_names = ['post']
-
-    def _form(self, request):
-        return LoginAuthenticationNoCaptchaForm(request, data=request.POST)
-
-    def post(self, request):
-        form = self._form(request)
-
-        if form.is_valid():
-            user = form.get_user()
-
-            try:
-                openid = request.POST.get('openid')
-                weixin_user = WeixinUser.objects.get(openid=openid)
-                rs, txt = bindUser(weixin_user, user)
-                if rs==0:
-                    SendTemplateMessage.sendTemplate(openid)
-            except WeixinUser.DoesNotExist:
-                pass
-
-            auth_login(request, user)
-            request.session.set_expiry(1800)
-            data = {'nickname': user.wanglibaouserprofile.nick_name}
-            return Response(data)
-
-        return Response(form.errors, status=400)
 
 class WeixinBindRegister(TemplateView):
     template_name = 'sub_regist.jade'
