@@ -156,7 +156,7 @@ def send_income_message_sms():
             user_info = User.objects.filter(id=income.get('user'))\
                 .select_related('user__wanglibaouserprofile').values('wanglibaouserprofile__phone')
             phones_list.append(user_info[0].get('wanglibaouserprofile__phone'))
-            messages_list.append(messages.sms_income(user_info[0].get('wanglibaouserprofile__phone'),
+            messages_list.append(messages.sms_income(user_info[0].get('wanglibaouserprofile__name'),
                                                      income.get('invite__count'),
                                                      income.get('earning__sum')))
 
