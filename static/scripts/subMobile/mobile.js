@@ -381,8 +381,8 @@ org.detail = (function(org){
         init : lib.init
     }
 })(org);
-(function(){
-    function timeFun(){
+(function(org){
+    function timeFun(){//倒计时跳转
       var numDom = $("#times-box");
       var num = parseInt(numDom.text());
       var timeSet = setInterval(function(){
@@ -398,4 +398,18 @@ org.detail = (function(org){
       },1000);
     }
     timeFun();
-})();
+
+    //解除绑定
+    $("#unbind").click(function(){
+        var openid = $("#openid").val();
+        org.ajax({
+            type: "post",
+            url: "/weixin/api/unbind/",
+            data: {"openid":openid},
+            dataType: "json",
+            success: function (data) {
+                console.log(data);
+            }
+        });
+    });
+})(org);
