@@ -38,19 +38,62 @@ define ['jquery'], ($)->
     amount = target.val()
     fee_element = target.attr 'data-target-fee'
     actual_element = target.attr 'data-target-actual'
-    fee = (rate * amount).toFixed(2)
-    actual = (amount - fee).toFixed(2)
-    if fee and $.isNumeric(fee)
-      $(fee_element).text fee
-    else
-      $(fee_element).text "0.00"
+    fee_switch = target.attr 'data-switch'
+    fee_interval = target.attr 'data-interval'
+    fee_count = target.attr 'data-count'
+    fee_poundage = target.attr 'data-poundage'
+    uninvested = $('input[name=uninvested]').val()
+    arrays = eval(fee_interval)
+    if fee_switch == 'on'
+      if amount != ''
+        if fee_count > 2
+          for array , i in arrays
+            if amount > arrays[i][0] && amount <= arrays[i][1]
+              sxf = arrays[i][2]
+          if sxf == undefined
+            sxf = 5
+        else
+          sxf = 0
+      else
+         sxf = 0
 
-    if actual and $.isNumeric(actual)
-      $(actual_element).text actual
-    else
-      $(actual_element).text "0.00"
+      m = amount - uninvested
+      if m <= 0
+        zjglf = 0
+      else
+        zjglf = m*rate
 
+      fee = (sxf+zjglf).toFixed(2)
+      actual = (amount - fee).toFixed(2)
+      if actual < 0
+        actual=0
+      if fee and $.isNumeric(fee)
+        $(fee_element).text fee
+      else
+        $(fee_element).text "0.00"
 
+      if actual and $.isNumeric(actual)
+        $(actual_element).text actual
+      else
+        $(actual_element).text "0.00"
+
+      if sxf == 0 &&  zjglf == 0
+        str = '0 元'
+      else
+        if sxf == 0
+          sxf_str = '0元'
+        else
+          sxf_str = sxf+'元'
+
+        if zjglf == 0
+          zjglf_str = ''
+        else
+          zjglf_str = zjglf.toFixed(2)+'元'
+        if zjglf_str == ''
+          str = sxf_str
+        else
+          str = sxf_str + '+' +zjglf_str
+      $(fee_poundage).text str
 
   $('input[data-role=fee-calculator]').keyup()
 

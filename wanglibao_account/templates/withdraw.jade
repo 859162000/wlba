@@ -47,12 +47,12 @@ block main
             th 提现金额(元)
             td
               .span5
-                input.withdraw-input(type='text', name='amount', placeholder='金额', data-balance='{{margin}}', data-role='fee-calculator', data-rate='{{fee.management_fee.fee_rate}}', data-target-fee='#fee', data-target-actual='#actual-amount')
+                input.withdraw-input(type='text', name='amount', placeholder='金额', data-balance='{{margin}}', data-role='fee-calculator', data-rate='{{fee.management_fee.fee_rate}}', data-target-fee='#fee', data-target-actual='#actual-amount',data-count='{{fee.fee.free_times_per_month}}',data-interval='{{fee.fee.amount_interval}}',data-switch='{{fee.switch}}',data-poundage='#poundage',)
               .span6(style="line-height:40px") 50元起，如果账户余额少于50元，可一次性取完
           tr
             th 手续费(元)
             td
-              span.orange-text 优惠期内，暂时不收取手续费
+              span.orange-text#poundage 0.00
           tr
             th 实际到账金额(元)
             td
