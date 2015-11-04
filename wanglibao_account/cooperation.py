@@ -51,7 +51,7 @@ from dateutil.relativedelta import relativedelta
 from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes, hex2bin
 from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift
-from wanglibao_rest.utils import check_mobile
+from user_agents import parse
 import uuid
 import urllib
 
@@ -883,7 +883,9 @@ class ZhiTuiRegister(CoopRegister):
             if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
                 period = (invest_time + relativedelta(months=period) - invest_time).days
 
-            if check_mobile(self.request):
+            ua_string = self.request.META.get('HTTP_USER_AGENT', '')
+            user_agent = parse(ua_string)
+            if user_agent.is_mobile:
                 note = 'wap'
             else:
                 note = 'pc'
