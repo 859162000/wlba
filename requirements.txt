@@ -79,3 +79,4 @@ optionaldict>=0.1.0
 #cryptography>=0.8.2
 # 或者安装 PyCrypto
 #pycrypto>=2.6.1
+user_agents==1.0.0
