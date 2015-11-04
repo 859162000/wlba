@@ -623,7 +623,7 @@ def xml2dict(node, res, xmlns):
                 res.append(rep[tag][0])
     else:
         value = {}
-        value = {"value":node.text.strip(), "attr":node.attrib}
+        value = {"value":node.text.strip() if node.text else '', "attr":node.attrib}
         res.append({tag:value})
     return
 
