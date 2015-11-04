@@ -42,6 +42,9 @@ urlpatterns = patterns(
     url(r'api/generate/qr_limit_scene_ticket/$', views.GenerateQRLimitSceneTicket.as_view(), name='generate_qr_limit_scene_ticket'),
     url(r'api/generate/qr_scene_ticket/$', views.GenerateQRSceneTicket.as_view(), name='generate_qr_scene_ticket'),
 
+    #test
+    url(r'^has_bind/$', TemplateView.as_view(template_name="sub_has_bind.jade")),
+    url(r'^is_bind/$', TemplateView.as_view(template_name="sub_is_bind.jade")),
 )
 
 # 微信管理后台

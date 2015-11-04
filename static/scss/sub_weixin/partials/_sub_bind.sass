@@ -1,0 +1,86 @@
+@mixin border-radius($r:0.5rem)
+  border-radius: $r
+@mixin box-shadow($c:#bbb)
+  border: 0.05rem solid $c
+  box-shadow: 0 0 1.5rem rgba(0,0,0,0.5)
+@mixin red-btn($pt:0.2rem)
+  background: #db493f
+  +border-radius(0.15rem)
+  color: #fff
+  text-align: center
+  display: inline-block
+  font-size: 0.8rem
+  padding: $pt 0
+  cursor: pointer
+
+.text-center,.txt-center
+  text-align: center
+
+.sub-body-h
+  position: relative
+  height: 100%
+  body
+    height: 100%
+.left
+  float: left
+.right
+  float: right
+
+//底部
+.sub-footer
+  display: -webkit-box
+  -webkit-box-align: center
+  width: 100%
+  background: rgba(0,0,0,.6)
+  padding: .375rem 1.25rem .375rem .75rem
+  position: fixed
+  bottom: 0
+  left: 0
+  .down-logo
+    -webkit-box-flex: 1
+    img
+      vertical-align: middle
+      width: 2.25rem
+  .down-btn
+    width: 3.75rem
+    a
+      +red-btn
+      width: 3.75rem
+      font-size: 0.6rem
+      display: table-cell
+  .down-close
+    position: absolute
+    right: 0
+    top: 0
+    width: .8rem
+    height: .8rem
+    background: url("/static/imgs/sub_weixin/close.png") left top no-repeat
+    background-size: 100%
+
+//已经绑定
+.sub-has-bind
+  width: 90%
+  position: absolute
+  top: 50%
+  margin-top: -4rem
+  margin-left: 5%
+  height: 6rem
+  line-height: 1.5rem
+  padding-top: 1.5rem
+  +border-radius
+  +box-shadow
+  font-size: 0.8rem
+  #time-promte
+    font-size: 0.7rem
+    #times-box
+      color: #db493f
+
+//是否解除绑定
+.sub-is-bind
+  width: 90%
+  margin: 3rem auto 0
+  .btn-box
+    margin-bottom: 1rem
+  .red-btn
+    +red-btn(0.5rem)
+    width: 100%
