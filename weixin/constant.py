@@ -1,6 +1,26 @@
 # encoding:utf-8
 
 BIND_SUCCESS_TEMPLATE_ID = '_8E2B4QZQC3yyvkubjpR6NYXtUXRB9Ya79MYmpVvQ1o'
+from copy import deepcopy
+
+class MessageTemplate404(Exception):
+    def __init__(self):
+        pass
+
+class MessageTemplate(object):
+    def __init__(self, template_id, **kwargs):
+        template = Message_template.get(template_id, {})
+        if not template:
+            raise MessageTemplate404
+        self.template_id = template_id
+        self.top_color = template.get('top_color')
+        template_data = template.get("data", {})
+        self.data = deepcopy(template_data)
+        for key, value in kwargs.iteritems():
+            if key in template_data:
+                self.data[key]['value'] = kwargs.get(key)
+
+
 
 
 Message_template = {
@@ -15,6 +35,7 @@ Message_template = {
                     "value": "{value}",
                    "color": "#173177"
                 },
-        }
+        },
+        "url": '',
     }
 }

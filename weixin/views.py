@@ -21,7 +21,7 @@ from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from django.contrib.auth.models import User
-import constant
+from constant import MessageTemplate
 
 
 
@@ -117,7 +117,6 @@ class WeixinJoinView(View):
         fromUserName = msg._data['FromUserName']
         createTime = msg._data['CreateTime']
         if isinstance(msg, BaseEvent):
-
             if isinstance(msg, ClickEvent):
                 reply = self.process_click_event(msg)
             elif isinstance(msg, SubscribeEvent):
@@ -133,13 +132,7 @@ class WeixinJoinView(View):
                 w_user = getOrCreateWeixinUser(fromUserName, account)
                 eventKey = msg._data['EventKey']
                 #如果eventkey为用户id则进行绑定
-                if eventKey and eventKey.isdigit():
-                    user = User.objects.filter(pk=eventKey).first()
-                    if user:
-                        rc, txt = bindUser(w_user, user)
-                        reply = create_reply(txt, msg)
-                txt = self.getBindTxt(fromUserName, account_key)
-                reply = create_reply(txt, msg)
+                reply = self.process_subscribe(msg, account.id)
             elif isinstance(msg, TemplateSendJobFinishEvent):
                 pass
         elif isinstance(msg, BaseMessage):
@@ -222,10 +215,6 @@ class WeixinJoinView(View):
             w_user.subscribe = 1
             w_user.save()
 
-        if not w_user.user:
-            txt = self.getBindTxt(fromUserName, accountid)
-            reply = create_reply(txt, msg)
-
         #如果eventkey为用户id则进行绑定
         if eventKey and eventKey.isdigit():
             user = User.objects.filter(pk=eventKey).first()
@@ -233,8 +222,12 @@ class WeixinJoinView(View):
                 rs, txt = bindUser(w_user, user)
                 reply = create_reply(txt, msg)
         else:
-            w_user.scene_id = eventKey
-            w_user.save()
+            if not w_user.scene_id:
+                w_user.scene_id = eventKey
+                w_user.save()
+        if not reply and not w_user.user:
+            txt = self.getBindTxt(fromUserName, accountid)
+            reply = create_reply(txt, msg)
         if not reply:
             articles = self.getSubscribeArticle()
             reply = create_reply(articles, msg)
@@ -314,26 +307,12 @@ class SendTemplateMessage(APIView):
     http_method_names = ['post']
 
     @classmethod
-    def sendTemplate(cls, openid, template_id):
-        weixin_user = WeixinUser.objects.get(openid=openid)
+    def sendTemplate(cls, weixin_user, message_template):
         account = Account.objects.get(original_id=weixin_user.account_original_id)
         client = WeChatClient(account.app_id, account.app_secret)
-        if template_id not in constant.Message_template.keys():
-            return -1
-        template = constant.Message_template.get(template_id, {})
-        # template['top_color']
-
-        client.message.send_template(weixin_user.openid, constant.BIND_SUCCESS_TEMPLATE_ID,
-                                     top_color='#88ffdd', data={
-                "first":{
-                    "value":"您好，恭喜您账户绑定成功！\n  \n您的账户已经与微信账户绑定在一起。",
-                   "color":"#173177"
-                },
-                "keyword1":{
-                    "value":"2015年09月22日",
-                   "color":"#173177"
-                },
-            }, url='')
+        client.message.send_template(weixin_user.openid, template_id=message_template.template_id,
+                                     top_color=message_template.top_color, data=message_template.data,
+                                     url=message_template.url)
 
     def post(self, request):
         openid = request.POST.get('openid')
@@ -1362,3 +1341,7 @@ class WeixinCouponList(TemplateView):
         }
 
 
+def testTemplate():
+    a = MessageTemplate('_8E2B4QZQC3yyvkubjpR6NYXtUXRB9Ya79MYmpVvQ1o',
+                        first=u"您好，恭喜您账户绑定成功！\n  \n您的账户已经与微信账户绑定在一起。",
+                        keyword1=u"2015年09月22日")
