@@ -13,7 +13,7 @@
   require(['jquery','activityRegister'], function($,re) {
     //注册
     re.activityRegister.activityRegisterInit({
-        registerTitle :'领取520新用户红包',    //注册框标语
+        registerTitle :'领取580新用户红包',    //注册框标语
         isNOShow : '1',
         buttonFont: '立即注册'
     });
