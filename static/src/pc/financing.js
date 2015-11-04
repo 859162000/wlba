@@ -7,6 +7,46 @@ require.config({
     }
 });
 require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
+    //表单提交  - csrf_token  start
+     var  csrfSafeMethod, getCookie,sameOrigin,
+    getCookie = function(name) {
+        var cookie, cookieValue, cookies, i;
+        cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            cookies = document.cookie.split(";");
+            i = 0;
+            while (i < cookies.length) {
+              cookie = $.trim(cookies[i]);
+              if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+              }
+              i++;
+            }
+        }
+        return cookieValue;
+    };
+    csrfSafeMethod = function(method) {
+        return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+    };
+    sameOrigin = function(url) {
+        var host, origin, protocol, sr_origin;
+        host = document.location.host;
+        protocol = document.location.protocol;
+        sr_origin = "//" + host;
+        origin = protocol + sr_origin;
+        return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
+    };
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+              xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+            }
+        }
+    });
+    //表单提交   - csrf_token  end
+
+
     var errorDom = $("#errorBox");
     //select
     $("p.js-select").click(function(){
@@ -193,7 +233,11 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                 async: true,
                 success: function(data){
                     isSub = false;
-                    self.text("提交");
+                    if(self.hasClass("wx-btn")){
+                        self.text("快速申请");
+                    }else{
+                        self.text("提交");
+                    }
                     if(data.ret_code === '0'){
                         nameDom.val("");
                         phoneDom.val("");

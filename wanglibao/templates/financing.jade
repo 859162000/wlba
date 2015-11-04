@@ -9,6 +9,7 @@ html
     .financing-banner
       .mod.g-banner-login-warp
         .form-box.g-banner-login#financeForm
+          - csrf_token
           h3.form-tit 快速申请
           p.form-item
             input.txt-input.placeholderInput.name-inp(placeholder="请输入您的姓名",title="请输入您的姓名",maxlength="128")
@@ -54,8 +55,8 @@ html
                   i.arr-bottom
               .form-cont
                 .form-list.clearfix.three-item
-                  a(href="javascript:;",data-val="0") 我有车
-                  a(href="javascript:;",data-val="1") 我有房
+                  a(href="javascript:;",data-val="1") 我有车
+                  a(href="javascript:;",data-val="0") 我有房
                   a(href="javascript:;",data-val="2") 其它
           .relative3.select-box
             p.form-item.relative.js-select
