@@ -364,7 +364,7 @@ LOGGING = {
             'filename': '/var/log/wanglibao/mysite.log',
             'formatter': 'verbose'
         },
-        'anti': {
+        'wanglibao_anti': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': '/var/log/wanglibao/anti.log',
@@ -411,7 +411,7 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG',
         },
-        'p2p': {
+        'wanglibao_p2p': {
             'handlers': ['file'],
             'level': 'DEBUG',
         },
@@ -440,7 +440,7 @@ LOGGING = {
             'level': 'DEBUG'
         },
         'wanglibao_anti': {
-            'handlers': ['anti', 'console'],
+            'handlers': ['wanglibao_anti', 'console'],
             'level': 'DEBUG'
         },
         'marketing': {
@@ -455,6 +455,10 @@ LOGGING = {
               'handlers': ['wanglibao_rest', 'console'],
               'level': 'DEBUG'
           },
+        'wanglibao_p2p': {
+            'handlers': [ 'console'],
+            'level': 'DEBUG'
+        }
     }
 }
 
@@ -526,7 +530,7 @@ from datetime import timedelta, datetime
 CELERYBEAT_SCHEDULE = {
     'p2p-watchdog-1-minutes': {
         'task': 'wanglibao_p2p.tasks.p2p_watchdog',
-        'schedule': timedelta(minutes=5),
+        'schedule': timedelta(minutes=1),
     },
     'report-generate': {
         'task': 'report.tasks.generate_report',
@@ -612,10 +616,10 @@ CELERYBEAT_SCHEDULE = {
     },
 
     # by Zhoudong 定期检查没有投资的新用户, 提醒投资
-    'invested_status_task_check': {
-        'task': 'marketing.tools.check_invested_status',
-        'schedule': crontab(minute=0, hour=10),
-    },
+    # 'invested_status_task_check': {
+    #     'task': 'marketing.tools.check_invested_status',
+    #     'schedule': crontab(minute=0, hour=10),
+    # },
     # by Zhoudong 定期检查用户优惠券没使用,发送提醒
     'redpack_status_task_check': {
         'task': 'marketing.tools.check_redpack_status',
@@ -623,7 +627,9 @@ CELERYBEAT_SCHEDULE = {
     },
 }
 
-CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
+# CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
+CELERYBEAT_SCHEDULE_FILENAME = "/tmp/celerybeat-schedule"
+
 
 ID_VERIFY_USERNAME = 'wljr_admin'
 ID_VERIFY_PASSWORD = 'wljr888'
@@ -1078,8 +1084,8 @@ THREE_DEFAULT_CHANNEL_CODE = 'wanglibao-three'
 if ENV == ENV_PRODUCTION:
     WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
 else:
-    WEIXIN_CALLBACK_URL = 'http://3301e5c2.ngrok.io'#'https://staging.wanglibao.com'
-
+    WEIXIN_CALLBACK_URL = 'http://492f8c43.ngrok.io'#'https://staging.wanglibao.com'
+    CALLBACK_HOST='http://492f8c43.ngrok.io'
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)
 WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'

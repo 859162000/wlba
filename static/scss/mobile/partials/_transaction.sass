@@ -1,56 +1,16 @@
 .transaction-main
   //display: none
 
-.transaction-nav
-  position: relative
-  margin-bottom: $margin-bottom
-  ul
-    display: -webkit-box
-    display: -ms-flexbox
-    li
-      -webkit-box-flex: 1
-      -ms-flex: 1
-      font-size: $font-size14
-      color: $color-grey-3e3e3e
-      text-align: center
-      background: #fff
-      border-right: 1px solid $color-grey-e8e8e8
-
-      &:last-child
-        border-right: 0
-    a
-      display: block
-      height: 2.2rem
-      line-height: 2.2rem
-      text-align: center
-      border-bottom: 1px solid $color-grey-e8e8e8
-    li.active
-      color: $color-db493f
-      background: $color-grey-fbfbfb
-      a
-        border-bottom: 2px solid $color-db493f
-
-  .tab-line
-    position: absolute
-    left: 0
-    bottom: 0
-    width: 33.33%
-    height: .05rem
-    background: $color-db493f
-    -webkit-transition: -webkit-transform 300ms ease-out
-    -webkit-transform: translate3d(0,0,0)
 
 .transaction-list
   background: #fff
   font-size: $font-size12
   margin-bottom: $margin-bottom
-  border-top: 1px solid $color-grey-e8e8e8
-  border-bottom: 1px solid $color-grey-e8e8e8
   .transaction-tit
-    border-bottom: 1px solid $color-grey-e8e8e8
-    padding: .3rem .75rem
+    padding: .5rem
     display: -webkit-box
     display: -ms-flexbox
+    -webkit-box-align: center
     .tit-name
       text-align: left
       color: $color-grey-6b6b6b
@@ -59,30 +19,40 @@
       white-space: nowrap
       text-overflow: ellipsis
       overflow: hidden
+      font-size: $font-size14
+      .tit-name-div
+        display: inline-block
+        font-size: $font-size14
+        background: #5DB5F2
+        margin-right: .2rem
     .tit-time
       text-align: right
-      color: $color-grey-b6b6b6
-      width: 6rem
+      color: #ccc
+      font-size: $font-size10
   .transaction-cont
     display: -webkit-box
     display: -ms-flexbox
-    padding: .7rem 0
+    padding: .3rem 0 .7rem 0
     .cont-money-left
       -webkit-box-flex: 1
       -ms-flex: 1
+      text-align: left
+      padding-left: 1rem
       p:first-child
-        text-align: center
         font-size: $font-size14
-        color: $color-grey-6b6b6b
+        color: #666
+        margin-bottom: .35rem
       p:last-child
-        text-align: center
-        color: $color-grey-b6b6b6
+        font-size: $font-size12
+        color: #CCC
     .cont-money-center
       @extend  .cont-money-left
+      p:first-child
+        color: #FF4C2E
     .cont-money-right
       @extend  .cont-money-left
   .transaction-footer
-    color: $color-4e7cda
+    color: #5DB5F2
     display: -webkit-box
     display: -ms-flexbox
     a
@@ -91,9 +61,7 @@
       -ms-flex: 1
       text-align: center
       border-top: 1px solid $color-grey-e8e8e8
-      padding: .4rem 0
-      &:first-child
-        border-right: 1px solid $color-grey-e8e8e8
+      padding: .5rem 0
 
 
 .none-data
@@ -103,6 +71,6 @@
   margin-top: 2rem
   img
     display: inline-block
-    width: 3.8rem
-    height: 1.2rem
-    margin-top: 1rem
+    width: 7rem
+    height: 7rem
+    margin: 1rem 0 .5rem 0
