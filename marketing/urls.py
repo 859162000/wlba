@@ -56,7 +56,7 @@ urlpatterns = patterns(
     url(r'^baidu_finance/$', BaiduFinanceView.as_view(), name="baidu_finance"),
     url(r'^seckill/$', TemplateView.as_view(template_name="seckill.jade")),
     url(r'^november_new/$', TemplateView.as_view(template_name="november_new.jade")),
-
+    url(r'^jucheng/$', TemplateView.as_view(template_name="jucheng.jade")),
     #url(r'^youku/$', TemplateView.as_view(template_name="youku_test.jade")),
 )
 
@@ -127,6 +127,8 @@ urlpatterns += patterns(
     url(r'^app_xiaomei/$', TemplateView.as_view(template_name="app_xiaomei.jade")),
 
     url(r'^wx_financing/$', TemplateView.as_view(template_name="h5_financing.jade")),
+
+    url(r'^app_jucheng/$', TemplateView.as_view(template_name="app_jucheng.jade")),
 )
 
 urlpatterns += patterns(
