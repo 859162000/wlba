@@ -18,9 +18,22 @@
         isNOShow : '1',
         hasCallBack : true,
         callBack : function(){
-            alert('1')
+            $('.get_ticket').show();
+            $('.register_wrap').hide();
+            $.ajax({
+                url: '/api/gift/owner/?promo_token=jcw',
+                type: "POST",
+                data: {
+                    phone : '',
+                    address : '',
+                    name : '',
+                    action : 'ENTER_WEB_PAGE'
+                }
+            }).done(function (json) {
+                $('span.shi').text(json.award80);
+                $('span.bai').text(json.award100);
+            });
         }
-
     });
 
     var has_ticket;
@@ -42,11 +55,6 @@
         });
     }
 
-
-    function registered_success(){
-        alert('1');
-    }
-
     $('#button').click(function(){
         if(has_ticket){
             $('.register_wrap').show();
@@ -63,7 +71,6 @@
         $('.get_ticket').hide();
         $('.write_info').show();
     });
-
 
 	$('.write_info').click(function(){
 		var name = $('input.name').val();
