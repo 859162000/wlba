@@ -2351,6 +2351,8 @@ class JrjiaCPSView(APIView):
                 data.append(data_dic)
 
             ret['data'] = data
+            ret['result'] = 'ok'
+            ret['errMsg'] = None
             return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
         else:

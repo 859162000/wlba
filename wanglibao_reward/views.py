@@ -466,7 +466,7 @@ class WeixinShareStartView(TemplateView):
         order_id = self.request.GET.get('url_id')
 
         user_gift = WanglibaoUserGift.objects.filter(identity=openid,).last()
-        record = WanglibaoUserGift.objects.filter(rules=user_gift.rules).exclude(identity=(str(openid))).first()
+        record = WanglibaoUserGift.objects.filter(rules=user_gift.rules).exclude(identity=(str(openid))).first() if user_gift else None
         logger.debug("start页面，openid 是:%s" % (openid,))
         share_title, share_content, url = get_share_infos(order_id)
         return {
