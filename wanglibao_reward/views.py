@@ -473,7 +473,7 @@ class WeixinShareStartView(TemplateView):
             'ret_code': 9001,
             'openid': openid,
             'order_id': order_id,
-            'phone': record.phone if record else '',
+            'phone': record.identity if record else '',
             "share": {'content': share_content, 'title': share_title, 'url': url}
         }
 
