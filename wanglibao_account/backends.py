@@ -126,16 +126,23 @@ class ProductionIDVerifyBackEnd(object):
             logger.error("Failed to send request: status: %d, ", response.status_code)
             return None, "Failed to send request"
 
-        parsed_response = parse_id_verify_response(response.text)
-        result = bool(parsed_response['response_code'] == 100)
-
-        if not result:
-            logger.error("Failed to validate: %s" % response.text)
-
-        verify_result = True
-        if parsed_response['result'] != u'一致':
+        try:
             verify_result = False
-            logger.info("Identity not consistent %s" % response.text)
+            parsed_response = parse_id_verify_response(response.text)
+            if parsed_response['result'] == u'一致':
+                verify_result = True
+        except StopIteration:
+            pass
+
+        # result = bool(parsed_response['response_code'] == 100)
+        #
+        # if not result:
+        #     logger.error("Failed to validate: %s" % response.text)
+        #
+        # verify_result = True
+        # if parsed_response['result'] != u'一致':
+        #     verify_result = False
+        #     logger.info("Identity not consistent %s" % response.text)
 
         record = IdVerification(id_number=id_number, name=name, is_valid=verify_result)
         record.save()
