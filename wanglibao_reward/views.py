@@ -492,7 +492,7 @@ class WeixinShareDetailView(TemplateView):
 
         if types == 'alone':
             logger.debug("整理用户的数据返回前端，phone:%s" %(gifts.identity,))
-            QSet = WanglibaoWeixinRelative.objects.filter(openid=openid).values("phone", "nick_name", "img", "openid").first()
+            QSet = WeixinUser.objects.filter(openid=openid).values("nickname", "headimgurl", "openid").first()
             if QSet:
                 ret_val = {"amount": gifts.amount, "name": QSet["nick_name"], "img": QSet["img"], "phone": gifts.identity}
             else:
@@ -503,7 +503,7 @@ class WeixinShareDetailView(TemplateView):
         if types == 'gifts':
             user_info = {gift.identity: gift for gift in gifts}
             self.debug_msg("format_response_data, 已经领取的 奖品 的key值序列：%s" %(user_info.keys(),))
-            QSet = WanglibaoWeixinRelative.objects.filter(openid__in=user_info.keys())
+            QSet = WeixinUser.objects.filter(openid__in=user_info.keys())
             weixins = {item.openid: item for item in QSet}
             self.debug_msg("format_response_data, 已经领取的 用户 的key值序列：%s" %(weixins.keys(),))
             ret_value = list()
@@ -511,8 +511,8 @@ class WeixinShareDetailView(TemplateView):
             for key in weixins.keys():
                 ret_value.append({"amount": user_info[key].amount,
                                   "time": user_info[key].get_time,
-                                  "name": weixins[key].nick_name,
-                                  "img": weixins[key].img,
+                                  "name": weixins[key].nickname,
+                                  "img": weixins[key].headimgurl,
                                   "message": self.get_react_text(index),
                                   "sort_by": int(time.mktime(time.strptime(str(user_info[key].get_time), '%Y-%m-%d %H:%M:%S+00:00')))})
                 index += 1
@@ -573,12 +573,12 @@ class WeixinShareDetailView(TemplateView):
             activity = record.activity.code if record else activitys[index]
             logger.debug("misc配置的activity有:%s, 本次使用的activity是：%s" % (activitys, activity))
 
-        old_phone = self.update_weixin_wanglibao_relative(openid, phone_num)
+        #old_phone = self.update_weixin_wanglibao_relative(openid, phone_num)
 
         if not self.has_combine_redpack(order_id, activity):
             self.generate_combine_redpack(order_id, activity)
 
-        user_gift = self.has_got_redpack(old_phone, activity, order_id, openid)
+        user_gift = self.has_got_redpack(phone_num, activity, order_id, openid)
 
         if not user_gift:
             self.debug_msg('phone:%s 没有领取过奖品' %(phone_num,) )
@@ -659,7 +659,7 @@ class WeixinShareEndView(TemplateView):
 
         user_info = {gift.identity: gift for gift in gifts}
         self.debug_msg("format_response_data, 已经领取的 奖品 的key值序列：%s" %(user_info.keys(),))
-        QSet = WanglibaoWeixinRelative.objects.filter(openid__in=user_info.keys())
+        QSet = WeixinUser.objects.filter(openid__in=user_info.keys())
         weixins = {item.openid: item for item in QSet}
         self.debug_msg("format_response_data, 已经领取的 用户 的key值序列：%s" %(weixins.keys(),))
         ret_value = list()
@@ -667,8 +667,8 @@ class WeixinShareEndView(TemplateView):
         for key in weixins.keys():
             ret_value.append({"amount": user_info[key].amount,
                               "time": user_info[key].get_time,
-                              "name": weixins[key].nick_name,
-                              "img": weixins[key].img,
+                              "name": weixins[key].nickname,
+                              "img": weixins[key].headimgurl,
                               "message": self.get_react_text(index),
                               "sort_by": int(time.mktime(time.strptime(str(user_info[key].get_time), '%Y-%m-%d %H:%M:%S+00:00')))})
             index += 1
