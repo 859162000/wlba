@@ -304,6 +304,8 @@ def card_bind_list(request):
                     if card.bank.kuai_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.kuai_limit))
 
+                tmp.update(util.handle_withdraw_limit(card.bank.withdraw_limit))  # 银行提现最大最小限额
+
                 if tmp:
                     card_list.append(tmp)
 

@@ -82,6 +82,7 @@ from wanglibao_account.models import UserThreeOrder
 from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes, hex2bin
 import requests
 from wanglibao_margin.models import MarginRecord
+from wanglibao_pay.fee import WithdrawFee
 
 
 logger = logging.getLogger(__name__)
@@ -588,6 +589,10 @@ class AccountHomeAPIView(APIView):
         fund_income_month = DailyIncome.objects.filter(user=user, 
                             date__gt=today + datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
 
+        # 获取提现费率配置
+        fee_misc = WithdrawFee(switch='on')
+        fee_config = fee_misc.get_withdraw_fee_config()
+
         res = {
             'total_asset': float(p2p_total_asset + fund_total_asset),  # 总资产
             'p2p_total_asset': float(p2p_total_asset),  # p2p总资产
@@ -606,6 +611,9 @@ class AccountHomeAPIView(APIView):
 
             'p2p_income_today': float(p2p_income_today),  # 今日收益
             'p2p_income_yesterday': float(p2p_income_yesterday),  # 昨日到账收益
+
+            'max_amount': fee_config.get('max_amount'),  # 提现最大限额
+            'min_amount': fee_config.get('min_amount'),  # 提现最小限额
 
         }
 
