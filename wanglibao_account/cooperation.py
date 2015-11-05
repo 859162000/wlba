@@ -2351,6 +2351,8 @@ class JrjiaCPSView(APIView):
                 data.append(data_dic)
 
             ret['data'] = data
+            ret['result'] = 'ok'
+            ret['errMsg'] = None
             return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
         else:
@@ -2489,7 +2491,7 @@ class JrjiaReportView(APIView):
 
         if source == u'jrjia':
             try:
-                data = []
+                data = dict()
                 start_date = datetime.datetime.strptime(time_str, "%Y%m%d")
 
                 time_zone = settings.TIME_ZONE

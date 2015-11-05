@@ -144,8 +144,17 @@
 	height:100%;
 	background: #f6f6f6;
 	overflow: auto;
-	padding-top:1.4rem;
 	display:none;
+}
+.write_info .text{
+	height: 42px;
+  	width: 100%;
+  	text-align: center;
+  	color: #ee7700;
+  	line-height: 22px;
+  	font-size: 0.7rem;
+  	display: inline-block;
+  	margin-bottom: 0.43rem;
 }
 .write_info .title{
 	font-size:0.8rem;
@@ -157,12 +166,12 @@
 	line-height: 1.5rem;
 }
 .write_info ul{
-	padding: 18px 2rem 12px;
+	padding: 0px 2rem 1rem;
     width: 100%;
 }
 .write_info li{
     width: 100%;
-    margin-bottom:0.875rem;
+    margin: 0.43rem 0;
 	display:inline-block;
 }
 .write_info input{

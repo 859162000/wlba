@@ -29,6 +29,7 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllo
 from django.shortcuts import resolve_url, render_to_response
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.utils.http import urlencode
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
@@ -156,6 +157,23 @@ class RegisterView(RegistrationView):
         return context
 
 
+# AES 加解密
+# from Crypto.Cipher import AES
+# import base64
+#
+# BS = AES.block_size
+# pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
+# unpad = lambda s: s[0:-ord(s[-1])]
+#
+# result = 'bAqCOs5Ox10kmcKKn7n47lDqljwBmKbHAtuWf0pkLqu7XbNaJOCXVEVJ9PRqIC5LiiB0MsbvjOEU+eIFWRSmaw=='
+# all_the_text1 = base64.b64decode(result)
+#
+# cipher2 = AES.new(b'https://jrjia.cn')
+# decrypted2 = unpad(cipher2.decrypt(all_the_text1))
+# ecrypted = cipher2.encrypt(pad('{"src":"jrjia","reqId":"31646132","prodId":"1","mobile":"11811849324"}'))
+# sign = base64.b64encode(ecrypted)
+
+
 class JrjiaAutoRegisterView(APIView):
     """
     author： Zhoudong
@@ -168,26 +186,20 @@ class JrjiaAutoRegisterView(APIView):
 
         # key = 'jrjia.cn'
         key = 'https://jrjia.cn'
-        iv = '0000000000000000'
         src = self.request.GET.get('src', None)
-        sign = self.request.GET.get('sign', None)
+        sign = self.request.GET.get('sign', None).replace(' ', '+')
 
         if src == 'jrjia':
             # 解密
             import base64
             from Crypto.Cipher import AES
 
-            d = base64.b64decode(sign)
-            decryptor = AES.new(key, AES.MODE_CBC, iv)
-            # ret = '{"reqId":"req15910961200","src":"jrjia","prodId":"5381","mobile":"15910961200"}'
-            sign_args = eval(decryptor.decrypt(d))
-
-            # sign_args = {
-            #         "mobile": '123' + str(randint(10000000, 99999999)),
-            #         "reqId": "A3566D98AFA988934",
-            #         "prodId": "1234",
-            #         "src": "jrjia"
-            #         }
+            decryptor = AES.new(key, AES.MODE_ECB)
+            try:
+                base_str = base64.b64decode(sign)
+                sign_args = eval(decryptor.decrypt(base_str).split('}')[0] + '}')
+            except Exception, e:
+                print 'exception error: {}'.format(e)
 
             context = {}
             context.update(sign_args)
@@ -206,7 +218,6 @@ class JrjiaAutoRegisterView(APIView):
         :return:
         """
         args = self.get_context_data()
-        # {'mobile': '13859974466', 'src': 'jrjia', 'reqId': 'A3566D98AFA988934', 'prodId': '123', 'next': '/'}
         source = args['src']
         password = str(random.randint(100000, 999999))
         identifier = args['mobile']
@@ -214,10 +225,6 @@ class JrjiaAutoRegisterView(APIView):
         nickname = identifier
 
         redirect_url = args['next']
-        # if redirect_url.split('.')[0] == '127':
-        #     redirect_url = 'http://' + redirect_url
-        # else:
-        #     redirect_url = 'https://' + redirect_url
 
         # 用户已存在， 返回
         if User.objects.filter(wanglibaouserprofile__phone=identifier).first():
@@ -227,8 +234,9 @@ class JrjiaAutoRegisterView(APIView):
         channel = Channels.objects.get(code=source)
 
         # 当用户不存在， 添加到binding 表（自带reqId）
-        # IntroducedBy.objects.get_or_create(user=user, channel=channel)
-        Binding.objects.get_or_create(user=user, btype=channel, bid=req_id)
+        Binding.objects.get_or_create(user=user, btype=source, bid=req_id)
+        # 邀请关系表
+        IntroducedBy.objects.get_or_create(user=user, channel=channel)
 
         auth_user = authenticate(identifier=identifier, password=password)
         auth.login(request, auth_user)
@@ -589,10 +597,6 @@ class AccountHomeAPIView(APIView):
         fund_income_month = DailyIncome.objects.filter(user=user, 
                             date__gt=today + datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
 
-        # 获取提现费率配置
-        fee_misc = WithdrawFee(switch='on')
-        fee_config = fee_misc.get_withdraw_fee_config()
-
         res = {
             'total_asset': float(p2p_total_asset + fund_total_asset),  # 总资产
             'p2p_total_asset': float(p2p_total_asset),  # p2p总资产
@@ -611,9 +615,6 @@ class AccountHomeAPIView(APIView):
 
             'p2p_income_today': float(p2p_income_today),  # 今日收益
             'p2p_income_yesterday': float(p2p_income_yesterday),  # 昨日到账收益
-
-            'max_amount': fee_config.get('max_amount'),  # 提现最大限额
-            'min_amount': fee_config.get('min_amount'),  # 提现最小限额
 
         }
 
