@@ -733,7 +733,7 @@ class AuthorizeCode(APIView):
     def get(self, request):
         account_id = self.request.GET.get('state')
         try:
-            account = Account.objects.get(pk=account_id)
+            account = Account.objects.get(original_id=account_id)
         except Account.DoesNotExist:
             return HttpResponseNotFound()
         auth = request.GET.get('auth')
@@ -762,7 +762,7 @@ class AuthorizeUser(APIView):
     def get(self, request):
         account_id = self.request.GET.get('state')
         try:
-            account = Account.objects.get(pk=account_id)
+            account = Account.objects.get(original_id=account_id)
         except Account.DoesNotExist:
             return HttpResponseNotFound()
         redirect_uri = self.request.GET.get('redirect_uri')
@@ -848,9 +848,8 @@ class GetAuthUserInfo(APIView):
         if not w_user.auth_info:
             return Response({'errcode':-5, 'errmsg':'openid auth info is null'})
         # print w_user.account_original_id
-        account = Account.objects.get(original_id=w_user.account_original_id)
-        if not account:
-            return Response({'errcode':-6, 'errmsg':u'公众号信息错误或者不存在'})
+        weixin_account = WeixinAccounts.getByOriginalId(w_user.account_original_id)
+        account = weixin_account.db_account
         try:
             oauth = WeChatOAuth(account.app_id, account.app_secret, )
             if not w_user.auth_info.check_access_token():
@@ -885,14 +884,8 @@ class GetUserInfo(APIView):
         w_user = WeixinUser.objects.filter(openid=openid).first()
         if not w_user:
             return Response({'errcode':-4, 'errmsg':'openid is not exist'})
-        account = Account.objects.get(original_id=w_user.account_original_id)
-        if not account:
-            return Response({'errcode':-6, 'errmsg':u'公众号信息错误或者不存在'})
-
-        if settings.ENV == settings.ENV_PRODUCTION:
-            request.session['account_key'] = 'account_main'
-        else:
-            request.session['account_key'] = 'test'
+        weixin_account = WeixinAccounts.getByOriginalId(w_user.account_original_id)
+        account = weixin_account.db_account
 
         user_info = account.get_user_info(w_user.openid)
         if not w_user.nickname:

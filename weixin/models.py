@@ -168,6 +168,15 @@ class WeixinAccounts(object):
         'token': '6ad01528',
         'qrcode_url': '/static/imgs/admin/qrcode_for_gh_d852bc2cead2_258.jpg'
     }
+    account_test_hmm = {
+        'id': 'gh_3b82a2651647 ',
+        'name': '测试号',
+        'app_id': 'wx18689c393281241e',
+        'app_secret': '7b30aec7477fb8eaed0673fca8f41044',
+        'classify': '微信公众平台测试号',
+        'token': '6ad01528',
+        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_d852bc2cead2_258.jpg'
+    }
 
     id = None
     name = None
@@ -184,7 +193,10 @@ class WeixinAccounts(object):
     host_url = None
 
     def __init__(self, account_key=None):
-        self.append_account()
+        print '----------------------------1'
+        if not self.data:
+            print '-------------------------2'
+            self.append_account()
         if account_key:
             data = self.data.get(account_key)
             self.account_key = account_key
@@ -196,6 +208,7 @@ class WeixinAccounts(object):
         cls.data['main'] = cls.account_main
         cls.data['sub_1'] = cls.account_sub_1
         cls.data['test'] = cls.account_test
+        cls.data['account_test_hmm']=cls.account_test_hmm
 
     @classmethod
     def account_classify(cls):
@@ -221,6 +234,14 @@ class WeixinAccounts(object):
     @classmethod
     def get(cls, key):
         return cls(key)
+
+    @classmethod
+    def getByOriginalId(cls, original_id):
+        if not cls.data:
+            cls.append_account()
+        for key, account_info in cls.data.items():
+            if account_info['id'] == original_id:
+                return cls(key)
 
     @classmethod
     def all(cls):
