@@ -155,7 +155,7 @@
       timerFunction();
       return intervalId = setInterval(timerFunction, 1000);
     });
-    return $(".voice").on('click', '.voice-validate', function(e) {
+    $(".voice").on('click', '.voice-validate', function(e) {
       var element, url;
       e.preventDefault();
       if ($(this).attr('disabled') && $(this).attr('disabled') === 'disabled') {
@@ -205,6 +205,9 @@
           });
         }
       });
+    });
+    return $('.poundageF').click(function() {
+      return $('#poundageExplain').modal();
     });
   });
 
