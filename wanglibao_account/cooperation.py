@@ -2491,7 +2491,7 @@ class JrjiaReportView(APIView):
 
         if source == u'jrjia':
             try:
-                data = []
+                data = dict()
                 start_date = datetime.datetime.strptime(time_str, "%Y%m%d")
 
                 time_zone = settings.TIME_ZONE
