@@ -14,6 +14,8 @@ org.mmIndex = (function(org){
         checkState: null,
         intervalId: null,
         $write_info_button : $('.write_info_button'),
+        $act_explain_button : $('#explain_button'),
+        $explain_wrap : $('.explain_wrap'),
         init: function(){
             lib._submit();
             lib.listen();
@@ -98,8 +100,8 @@ org.mmIndex = (function(org){
 
                 if(!lib.checkState) return
 
-                var ops = {};
-                ops = {
+                var get_ticket_ajax = {};
+                get_ticket_ajax = {
                     url: '/api/gift/owner/?promo_token=jcw',
                     type: 'POST',
                     data: {
@@ -116,54 +118,43 @@ org.mmIndex = (function(org){
                         $('.get_ticket_wrap').show();
                     }
                 }
-                org.ajax(ops);
 
-                //_self.$submit.attr('disabled',true).html('领取中，请稍后...');
-                //if(_self.$phone.attr('data-existing') === 'true'){
-                //    ops = {
-                //        url: '/api/distribute/redpack/' + _self.$phone.val()+'/?promo_token=maimai1',
-                //        type: 'POST',
-                //        success: function(data){
-                //            if(data.ret_code == 0){
-                //                window.location.href = '/activity/maimai_success/?state=1'
-                //            }else if(data.ret_code === 1000){
-                //                window.location.href = '/activity/maimai_success/?state=0'
-                //            }
-                //        },
-                //        complete:function(){
-                //            lib.$submit.removeAttr('disabled').html('领 取');
-                //        }
-                //    }
-                //}else{
-                //    ops = {
-                //        url: '/api/register/?promo_token=maimai1',
-                //        type: 'POST',
-                //        data: {
-                //            'identifier': _self.$phone.val(),
-                //            'validate_code': _self.$codenum.val(),
-                //            'IGNORE_PWD': 'true',
-                //            'captcha_0' :  $('input[name=codeimg_key]').val(),
-                //            'captcha_1' :  _self.$codeimg.val(),
-                //        },
-                //        success: function(data){
-                //            if(data.ret_code == 0){
-                //                window.location.href = '/activity/maimai_success/?state=2'
-                //            }else{
-                //                $(document.body).trigger('from:error',[data.message, true]);
-                //                clearInterval(_self.intervalId);
-                //                $('.check-submit').text('短信验证码').removeAttr('disabled').removeClass('postValidation')
-                //                return $(document.body).trigger('from:captcha');
-                //            }
-                //        },
-                //        error: function(data){
-                //            alert(data)
-                //        },
-                //        complete:function(){
-                //            lib.$submit.removeAttr('disabled').html('领 取');
-                //        }
-                //    }
-                //}
-                //org.ajax(ops);
+
+                _self.$submit.attr('disabled',true).html('领取中，请稍后...');
+
+                    ops = {
+                        url: '/api/gift/owner/?promo_token=jcw',
+                        type: 'POST',
+                        data: {
+                            'phone': _self.$phone.val(),
+                            'validition': _self.$codenum.val(),
+                            'action': 'VALIDATION'
+                            //'validate_code': _self.$codenum.val(),
+                            //'IGNORE_PWD': 'true',
+                            //'captcha_0' :  $('input[name=codeimg_key]').val(),
+                            //'captcha_1' :  _self.$codeimg.val(),
+                        },
+                        success: function(data){
+                            if(data.ret_code == 0){
+                                //window.location.href = '/activity/maimai_success/?state=2'
+                                alert('1');
+                                org.ajax(ajax);
+                            }else{
+                                $(document.body).trigger('from:error',[data.message, true]);
+                                clearInterval(_self.intervalId);
+                                $('.check-submit').text('短信验证码').removeAttr('disabled').removeClass('postValidation')
+                                return $(document.body).trigger('from:captcha');
+                            }
+                        },
+                        error: function(data){
+                            alert(data)
+                        },
+                        complete:function(){
+                            lib.$submit.removeAttr('disabled').html('领 取');
+                        }
+                    }
+
+                org.ajax(ops);
             });
         },
         _write_info_button: function(){
@@ -197,6 +188,18 @@ org.mmIndex = (function(org){
                     org.ajax(ops);
                 }
             });
+        },
+        _act_explain_button: function(){
+            $('#explain_button').click(function(){
+                $('.explain_wrap').show();
+            })
+
+        },
+        _explain_wrap : function(){
+            $().click(function(){
+                $('.explain_wrap').hide();
+            })
+
         },
         /*
          * fn 回调函数

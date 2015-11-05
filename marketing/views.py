@@ -2091,8 +2091,11 @@ class GiftOwnerInfoAPIView(APIView):
         return items[0]["amount"], items[1]["amount"]
 
     def post(self, request):
-        channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
-        item = GiftOwnerInfo.objects.filter(config__description__in=('jcw_ticket_80', 'jcw_ticket_188'), sender=request.user)
+        action = request.DATA.get('action', 'OTHERS')
+        name = request.DATA.get('name', '')
+        phone = request.DATA.get('phone', '')
+        address = request.DATA.get('address', '')
+
         try:
             (award80, award188) = self.get_left_awards()
         except Exception, reason:
@@ -2105,18 +2108,6 @@ class GiftOwnerInfoAPIView(APIView):
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-        action = request.DATA.get('action', 'OTHERS')
-
-        if action == "HAS_TICKET":
-            to_json_response = {
-                'ret_code': 2,
-                'message': u'判断是否领过票',
-                'award80': award80,
-                'award100': award188,
-                'has_ticket': "True" if item.exists() else "False"
-            }
-            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-
         if action == 'VALIDATION':
             status, message = validate_validation_code(request.DATA.get("phone", ""), request.DATA.get("validation", ""))
             to_json_response = {
@@ -2126,13 +2117,24 @@ class GiftOwnerInfoAPIView(APIView):
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-
         if action == "ENTER_WEB_PAGE":
             to_json_response = {
                 'ret_code': 1,
                 'message': u'首次进入页面',
                 'award80': award80,
                 'award100': award188
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
+        item = GiftOwnerInfo.objects.filter(config__description__in=('jcw_ticket_80', 'jcw_ticket_188'), sender=request.user)
+        if action == "HAS_TICKET":
+            to_json_response = {
+                'ret_code': 2,
+                'message': u'判断是否领过票',
+                'award80': award80,
+                'award100': award188,
+                'has_ticket': "True" if item.exists() else "False"
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -2163,9 +2165,6 @@ class GiftOwnerInfoAPIView(APIView):
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-        name = request.DATA.get('name', '')
-        phone = request.DATA.get('phone', '')
-        address = request.DATA.get('address', '')
         binding = Binding.objects.filter(user_id=request.user.id).first()
         p2p_record = P2PRecord.objects.filter(user_id=request.user.id, catalog=u'申购')
         if binding and p2p_record.count() == 1:
