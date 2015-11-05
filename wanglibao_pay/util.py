@@ -6,9 +6,6 @@ import decimal
 import time
 import random
 from django.utils import timezone
-from decimal import Decimal
-from misc.models import Misc
-import json
 
 
 def get_client_ip(request):
@@ -85,43 +82,12 @@ def handle_kuai_bank_limit(limitstr):
     return obj
 
 
-class WithdrawFee(object):
-    """ 提现费用配置
-      @:param management_fee 资金管理费
-      @:param fee_rate: 0.003
-
-      @:param fee 提现费用
-      @:param free_times_per_month :2 每月前2次免费
-      @:param amount_interval  [[0, 10000, 2], [10000, 50000, 3], [50000, 100000, 5]]
-      :return config data
-
-    """
-
-    def __init__(self, switch='on', key='withdraw_fee'):
-        self.KEY = key
-        self.SWITCH = switch
-        self.MANAGEMENT_FEE = {
-            "fee_rate": Decimal('0.003')
-        }
-        self.FEE = {
-            "free_times_per_month": 2,
-            "amount_interval": [[0, 10000, 2], [10000, 50000, 3], [50000, 100000, 5]]
-        }
-
-    def get_withdraw_fee(self):
-        fee_config = Misc.objects.filter(key=self.KEY).first()
-        if fee_config:
-            data = json.loads(fee_config.value)
-            if not data.get('switch'):
-                data['switch'] = self.SWITCH
-            if not data.get('fee'):
-                data['fee'] = self.FEE
-            if not data.get('management_fee'):
-                data['management_fee'] = self.MANAGEMENT_FEE
-        else:
-            data = {
-                "switch": self.SWITCH,
-                "fee": self.FEE,
-                "management_fee": self.MANAGEMENT_FEE
-            }
-        return data
+def handle_withdraw_limit(limitstr):
+    obj = {}
+    try:
+        first, second = limitstr.split(",")
+        obj['bank_min_amount'] = first.split("=")[1]
+        obj['bank_max_amount'] = second.split("=")[1]
+    except:
+        pass
+    return obj

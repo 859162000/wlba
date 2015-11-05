@@ -64,6 +64,8 @@ class MarginKeeper(KeeperBaseMixin):
                 logger.debug('user id: {}, amount:{}, freeze:{} ========'.format(self.user.id, amount, margin.freeze))
                 raise MarginLack(u'202')
             margin.freeze -= amount
+            uninvested_freeze = margin.uninvested_freeze - amount
+            margin.uninvested_freeze = uninvested_freeze if uninvested_freeze >= 0 else Decimal('0.00')
             margin.save()
             catalog = u'交易成功扣款'
             record = self.__tracer(catalog, amount, margin.margin, description)
@@ -98,7 +100,7 @@ class MarginKeeper(KeeperBaseMixin):
                                          status=u'成功', amount=coupon_interest)
             margin.save()
 
-    def withdraw_pre_freeze(self, amount, description=u'', savepoint=True):
+    def withdraw_pre_freeze(self, amount, description=u'', savepoint=True, uninvested=0):
         amount = Decimal(amount)
         check_amount(amount)
         with transaction.atomic(savepoint=savepoint):
@@ -107,12 +109,18 @@ class MarginKeeper(KeeperBaseMixin):
                 raise MarginLack(u'201')
             margin.margin -= amount
             margin.withdrawing += amount
+
+            # 取现时从充值未投资中扣除取现金额中已扣费的金额, 当未投资金额小于0时,置为0
+            margin_uninvested = margin.uninvested - uninvested
+            margin.uninvested = margin_uninvested if margin_uninvested <= 0 else Decimal('0.00')
+            margin.uninvested_freeze += uninvested
+
             margin.save()
             catalog = u'取款预冻结'
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
-    def withdraw_rollback(self, amount, description=u'', is_already_successful=False, savepoint=True):
+    def withdraw_rollback(self, amount, description=u'', is_already_successful=False, savepoint=True, uninvested=0):
         amount = Decimal(amount)
         check_amount(amount)
         with transaction.atomic(savepoint=savepoint):
@@ -122,13 +130,15 @@ class MarginKeeper(KeeperBaseMixin):
                 if amount > margin.withdrawing:
                     raise MarginLack(u'203')
                 margin.withdrawing -= amount
+                margin.uninvested_freeze -= uninvested
                 catalog = u'取款失败解冻'
             margin.margin += amount
+            margin.uninvested += uninvested
             margin.save()
             record = self.__tracer(catalog, amount, margin.margin, description)
             return record
 
-    def withdraw_ack(self, amount, description=u'', savepoint=True):
+    def withdraw_ack(self, amount, description=u'', savepoint=True, uninvested=0):
         amount = Decimal(amount)
         check_amount(amount)
         with transaction.atomic(savepoint=savepoint):
@@ -136,6 +146,7 @@ class MarginKeeper(KeeperBaseMixin):
             if amount > margin.withdrawing:
                 raise MarginLack(u'203')
             margin.withdrawing -= amount
+            margin.uninvested_freeze -= uninvested
             margin.save()
             catalog = u'取款确认'
             record = self.__tracer(catalog, amount, margin.margin, description)
