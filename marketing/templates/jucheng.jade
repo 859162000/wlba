@@ -6,7 +6,7 @@ html
     - with '网利宝' as title
     include include/common_head
     - endwith
-    link(rel="stylesheet",href="/static/stylesheets/jucheng.css")
+    link(rel="stylesheet",href="/static/stylesheets/jucheng.css?v=2015110501")
   body(style="background:#d9e6de")
     include global/g_nav
     .banner
@@ -123,9 +123,9 @@ html
                     button#register_submit.button-account.span10.xun-zhuce(type='button')
                   .space-vertical-s
                 //p.xun-p 已有账号,
-                //  a(href="/accounts/login/") 立即登录
+                //a(href="/accounts/login/") 立即登录
     .write_info.popup
-      .title 您已成功获得门票，请您认真填写相关信息，以便奖励顺利发放，谢谢！
+      .title 请您认真填写相关信息，以便奖励顺利发放，谢谢！
       ul
         li
           input.name(type="text", name="user_name", placeholder="姓名")
@@ -133,14 +133,15 @@ html
           input.phone(type="text", name="user_phone", placeholder="联系电话")
         li
           input.address(type="text", name="user_address", placeholder="邮寄地址")
+      .text
       .button 保存
     .get_ticket.popup
       .title 恭喜！您已成功注册网利宝，20元现金红包已发放到您的个人账户中，立即<br>投资，领取限量门票吧！
       ul
         li!='80元门票剩余 <span></span> 张'
         li!='188元门票剩余 <span></span> 张'
-      .button 立即抢门票
+      .button#get_ticket_button 立即抢门票
     include global/g_footer
     script.
-      require(['/static/js/jucheng.js?v=20151103'])
+      require(['/static/js/jucheng.js?v=2015110501'])
 
