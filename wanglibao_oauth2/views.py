@@ -3,6 +3,12 @@
 import hashlib
 from datetime import timedelta
 
+from django.http import HttpResponse
+from django.utils.translation import ugettext as _
+from django.contrib.auth.tokens import default_token_generator
+from rest_framework.views import APIView
+from rest_framework import renderers
+
 from . import OAuthError
 from . import BasicClientBackend
 from . import AccessTokenBaseView
@@ -10,9 +16,8 @@ from .models import AccessToken
 from .models import RefreshToken
 from .forms import RefreshTokenGrantForm, UserAuthForm
 from .utils import now
+from .backends import AccessTokenBackend
 import constants
-
-from django.utils.translation import ugettext as _
 
 
 class AccessTokenView(AccessTokenBaseView):
@@ -41,7 +46,8 @@ class AccessTokenView(AccessTokenBaseView):
         return at
 
     def create_access_token(self, request, user, client):
-        return AccessToken.objects.create(user=user, client=client)
+        token = default_token_generator.make_token(user)
+        return AccessToken.objects.create(user=user, client=client, token=token)
 
     def create_refresh_token(self, request, user, access_token, client):
         return RefreshToken.objects.create(
@@ -106,8 +112,31 @@ class AccessTokenView(AccessTokenBaseView):
             return handler(request, request.POST, client, user)
         except OAuthError, e:
             return self.error_response(e.args[0])
-        except Exception:
+        except Exception, e:
             return self.error_response({
                 'code': '10400',
                 'message': 'api error.'
             })
+
+
+class TokenLoginOpenApiView(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        data = request.POST
+        token = data.get('token', '').strip()
+        client_id = data.get('client_id', '').strip()
+        user_id = data.get('user_id', '').strip()
+
+        user = AccessTokenBackend().authenticate(token, client_id, user_id)
+
+        if user and user.is_authenticated():
+            response_data = {'code': '10000',
+                             'message': 'ok'}
+
+        else:
+            response_data = {'code': '10210',
+                             'message': 'Token error.'}
+
+        return HttpResponse(renderers.JSONRenderer().render(response_data,
+                                                            'application/json'))

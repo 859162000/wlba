@@ -1,3 +1,6 @@
+from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth.tokens import default_token_generator
+
 from .forms import ClientAuthForm
 from .models import AccessToken
 from .utils import now
@@ -18,15 +21,21 @@ class BasicClientBackend(object):
                 return None
 
 
-class AccessTokenBackend(object):
+class AccessTokenBackend(ModelBackend):
     """
     Authenticate a user via access token and client object.
     """
 
-    def authenticate(self, access_token=None, client=None):
+    def authenticate(self, token, client_id, user_id):
         try:
-            return AccessToken.objects.get(token=access_token,
+            user = AccessToken.objects.get(token=token,
                                            expires__gt=now(),
-                                           client=client)
+                                           client__client_id=client_id,
+                                           user_id=user_id).user
         except AccessToken.DoesNotExist:
             return None
+
+        if default_token_generator.check_token(user, token):
+            return user
+
+        return None

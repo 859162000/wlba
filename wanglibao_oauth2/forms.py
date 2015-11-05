@@ -103,15 +103,15 @@ class UserAuthForm(OAuthForm):
     the user.
     """
 
-    p_user_id = forms.CharField(required=False)
+    user_id = forms.CharField(required=False)
     usn = forms.CharField(required=False)
 
     def clean(self):
-        user_id = self.cleaned_data.get('p_user_id').strip()
+        user_id = self.cleaned_data.get('user_id').strip()
         if not user_id:
             raise OAuthValidationError({
                 'code': '10104',
-                'message': _("invalid p_user_id.")
+                'message': _("invalid user_id.")
             })
 
         usn = self.cleaned_data.get('usn', '').strip()
@@ -126,7 +126,7 @@ class UserAuthForm(OAuthForm):
         except User.DoesNotExist:
             raise OAuthValidationError({
                 'code': '10104',
-                'message': _("invalid p_user_id or usn.")
+                'message': _("invalid user_id or usn.")
             })
 
         self.cleaned_data['usn'] = usn
