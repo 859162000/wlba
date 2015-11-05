@@ -1,3 +1,6 @@
+
+
+
 org.mmIndex = (function(org){
     var lib = {
         $body_h : $('.maimai-check-body'),
@@ -9,11 +12,11 @@ org.mmIndex = (function(org){
         $nbsp : $('.maimai-sign-margin'),
         $validation: $('.check-submit'),
         checkState: null,
-		$write_info_button : $('.write_info_button'),
+        intervalId: null,
+        $write_info_button : $('.write_info_button'),
         init: function(){
             lib._submit();
             lib.listen();
-            lib._write_info_button();
             $(document.body).trigger('from:captcha');
         },
         checkfilter:function(num){
@@ -88,9 +91,9 @@ org.mmIndex = (function(org){
             //提交按钮
             _self.$submit.on('click', function(){
                 if(_self.$phone.attr('data-existing') === 'true'){
-                    $(document.body).trigger('from:check', [_self.checkfilter(1), true]);
+                    $(document.body).trigger('from:check', [_self.checkfilter(1), false]);
                 }else{
-                    $(document.body).trigger('from:check', [_self.checkfilter(3), true]);
+                    $(document.body).trigger('from:check', [_self.checkfilter(3), false]);
                 }
 
                 if(!lib.checkState) return
@@ -115,9 +118,7 @@ org.mmIndex = (function(org){
                 }
                 org.ajax(ops);
 
-                //var ops = {};
                 //_self.$submit.attr('disabled',true).html('领取中，请稍后...');
-				/*判断用户已注册*/
                 //if(_self.$phone.attr('data-existing') === 'true'){
                 //    ops = {
                 //        url: '/api/distribute/redpack/' + _self.$phone.val()+'/?promo_token=maimai1',
@@ -147,6 +148,11 @@ org.mmIndex = (function(org){
                 //        success: function(data){
                 //            if(data.ret_code == 0){
                 //                window.location.href = '/activity/maimai_success/?state=2'
+                //            }else{
+                //                $(document.body).trigger('from:error',[data.message, true]);
+                //                clearInterval(_self.intervalId);
+                //                $('.check-submit').text('短信验证码').removeAttr('disabled').removeClass('postValidation')
+                //                return $(document.body).trigger('from:captcha');
                 //            }
                 //        },
                 //        error: function(data){
@@ -157,7 +163,6 @@ org.mmIndex = (function(org){
                 //        }
                 //    }
                 //}
-				/*判断用户已注册结束*/
                 //org.ajax(ops);
             });
         },
@@ -229,16 +234,13 @@ org.mmIndex = (function(org){
             }
         },
         _error: function(message, state, other){
-        //如果输入错误
             if(state){
                 lib.$sign.css('height','1.275rem').html(message);
                 lib.$nbsp.css('height','0');
-
             }
             if(!other) lib.$submit.attr('disabled',true);
         },
         _success: function(post, other){
-        //如果输入正确
             var _self = this;
 
             _self.$sign.css('height','0');  //隐藏提示
@@ -287,8 +289,7 @@ org.mmIndex = (function(org){
         _fetchValidation:function(){
             var
                 _self = this,
-                count = 60,  //60秒倒计时
-                intervalId ; //定时器
+                count = 60;  //60秒倒计时
 
             $(document.body).trigger('from:check', [lib.checkfilter(2), false, true, true]);
 
@@ -303,7 +304,7 @@ org.mmIndex = (function(org){
                 },
                 type : 'POST',
                 error :function(xhr){
-                    clearInterval(intervalId);
+                    clearInterval(_self.intervalId);
                     var result = JSON.parse(xhr.responseText);
                     $('.check-submit').text('短信验证码').removeAttr('disabled').removeClass('postValidation');
                     $(document.body).trigger('from:error',[result.message, true]);
@@ -316,13 +317,13 @@ org.mmIndex = (function(org){
                     count--;
                     return $('.check-submit').text(count + '秒后可重发');
                 } else {
-                    clearInterval(intervalId);
+                    clearInterval(_self.intervalId);
                     $('.check-submit').text('重新获取').removeAttr('disabled').removeClass('postValidation')
                     return $(document.body).trigger('from:captcha');
                 }
             };
             timerFunction();
-            return intervalId = setInterval(timerFunction, 1000);
+            return _self.intervalId = setInterval(timerFunction, 1000);
 
         },
         /*
@@ -377,6 +378,7 @@ org.success = (function(org){
                 if(val){
                     $('.maimai-money').html(val);
                 }
+
 
             var mySwiper = new Swiper('.swiper-container', {
                 pagination: '.swiper-pagination-maimai',

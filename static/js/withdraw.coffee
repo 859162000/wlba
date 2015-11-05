@@ -178,3 +178,6 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
     .fail (xhr)->
       if xhr.status > 400
         tool.modalAlert({title: '温馨提示', msg: result.message})
+
+  $('.poundageF').click ()->
+    $('#poundageExplain').modal()
