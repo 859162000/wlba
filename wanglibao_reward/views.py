@@ -760,7 +760,7 @@ class WeixinShareStartView(TemplateView):
                 self.request.session['nick_name'] = nick_name
 
         try:
-             phone = w_user.first().phone
+             phone = w_user.phone
              user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=order_id, identity=openid,).first()
              logger.debug("用户抽奖信息是：%s" % (user_gift,))
 
