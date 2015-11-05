@@ -11,7 +11,7 @@ html(style="background: #f6f6f6")
         img.banner(src="/static/imgs/mobile_activity/app_jucheng/banner.jpg")
         .main
             .explain_main
-              .explain_button 活动说明
+              .explain_button#explain_button 活动说明
             .title_big 限时限量 满额直送
             .maimai-form
               input(type='tel', name='phone', placeholder='请输入手机号',data-type='Phone',data-message='请输入正确的手机号', autocomplete = 'off').maimai-phone
@@ -69,5 +69,6 @@ html(style="background: #f6f6f6")
                   input.phone(type="text", name="user_phone", placeholder="联系电话")
                 li
                   input.address(type="text", name="user_address", placeholder="邮寄地址")
-              .button.write_info_button 保存
+            .text!='*<span class="write_info_text">测试</span>'
+            .button.write_info_button 保存
         script(data-init='mmIndex', src="/static/scripts/mobile_activity/app_jucheng.js?v=20151030")
