@@ -50,10 +50,12 @@ html
                     .reward-period {{pack.available_at | milldate_format}} 至 {{pack.unavailable_at | milldate_format}}
 
                   if pack.method == '-'
-                    .reward-amount {{pack.amount }}
+                    amount = int(pack['amount'])
+                    .reward-amount {{amount }}
                       em 元
                   elif pack.method == '*'
-                    .reward-amount {{pack.highest_amount }}
+                    highest = int(pack['highest_amount'])
+                    .reward-amount {{highest }}
                       em 元
                   else
                     .reward-amount {{pack.amount | percentage_number_two}}
