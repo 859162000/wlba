@@ -22,10 +22,10 @@ from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from django.contrib.auth.models import User
 from constant import MessageTemplate
+from constant import (ACCOUNT_INFO_TEMPLATE_ID, BIND_SUCCESS_TEMPLATE_ID)
+from weixin.util import getAccountInfo
 
 
-
-# from wanglibao_pay import third_pay, trade_record
 from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
 from wanglibao_pay.models import Bank
@@ -66,7 +66,7 @@ def checkBindDeco(func):
         check_bind = False
         if isinstance(self.msg, BaseEvent):
             if isinstance(self.msg,(ClickEvent,)):
-                if self.msg.key == 'test_hmm':
+                if self.msg.key == 'test_hmm' or self.msg.key == 'my_account':
                     check_bind = True
         elif isinstance(self.msg, BaseMessage):
             content = self.msg.content.lower()
@@ -145,9 +145,12 @@ class WeixinJoinView(View):
                 # reply = TransferCustomerServiceReply(message=msg)
             else:
                 reply = create_reply(u'更多功能，敬请期待！', msg)
+        if reply == -1:
+            return HttpResponse("")
         if not reply:
             reply = create_reply(u'这个是不是不需要回复什么的?', msg)
         return HttpResponse(reply.render())
+
 
     @checkBindDeco
     def process_click_event(self, msg):
@@ -156,6 +159,7 @@ class WeixinJoinView(View):
         toUserName = msg._data['ToUserName']
         fromUserName = msg._data['FromUserName']
         account = Account.objects.get(original_id=toUserName)
+        w_user = getOrCreateWeixinUser(fromUserName, account)
         if msg.key == 'test_hmm':
             txt = u'客官，请回复相关数字订阅最新项目通知，系统会在第一时间发送给您相关信息。\n'
             for sub_service in sub_services:
@@ -163,12 +167,24 @@ class WeixinJoinView(View):
             txt += u'如需退订请回复TD'
             reply = create_reply(txt, msg)
         if msg.key == 'bind_weixin':
-            w_user = getOrCreateWeixinUser(fromUserName, account)
             if not w_user.user:
                 txt = self.getBindTxt(fromUserName, account.id)
             else:
                 txt = self.getUnBindTxt(fromUserName, account.id, w_user.user.wanglibaouserprofile.phone)
             reply = create_reply(txt, msg)
+        if msg.key == 'my_account':
+            account_info = getAccountInfo(w_user.user)
+            # 【账户概况】
+            # 总资产       (元）： 12000.00
+            # 可用余额（元）： 108.00
+            # 累计收益（元）：  79.00
+            # 待收收益（元）：  24.00
+            a = MessageTemplate(ACCOUNT_INFO_TEMPLATE_ID,
+                    first="", keyword1=account_info['total_asset'],
+                    keyword2=account_info['p2p_margin'], keyword3=account_info['p2p_total_paid_interest'],
+                    keyword4=account_info['p2p_total_unpaid_interest'], remark=u'账户详情')
+            SendTemplateMessage.sendTemplate(w_user, a)
+            reply = -1
         return reply
 
     @checkBindDeco
@@ -256,10 +272,10 @@ class WeixinJoinView(View):
             +u"如需解绑当前帐号，请点击<a href='%s'>【立即解绑】</a>"%unbind_url
         return txt
 
+
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super(WeixinJoinView, self).dispatch(request, *args, **kwargs)
-
 
 
 
@@ -302,10 +318,11 @@ def bindUser(w_user, user):
     return 0, u'绑定成功'
 
 
+
 class SendTemplateMessage(APIView):
     permission_classes = ()
     http_method_names = ['post']
-
+    BIND_SUCCESS = "bind_success"
     @classmethod
     def sendTemplate(cls, weixin_user, message_template):
         account = Account.objects.get(original_id=weixin_user.account_original_id)
@@ -318,6 +335,10 @@ class SendTemplateMessage(APIView):
         openid = request.POST.get('openid')
         if not openid:
             return Response({'error':-1})
+        template_type = request.POST.get('template_type','')
+        if template_type.lower() == SendTemplateMessage.BIND_SUCCESS:
+            template = MessageTemplate(BIND_SUCCESS_TEMPLATE_ID, )
+
         try:
             SendTemplateMessage.sendTemplate(openid)
         except:
@@ -376,8 +397,6 @@ class WeixinLoginBindAPI(APIView):
                 openid = request.POST.get('openid')
                 weixin_user = WeixinUser.objects.get(openid=openid)
                 rs, txt = bindUser(weixin_user, user)
-                if rs==0:
-                    SendTemplateMessage.sendTemplate(openid)
             except WeixinUser.DoesNotExist:
                 pass
 
