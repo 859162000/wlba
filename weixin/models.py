@@ -246,6 +246,12 @@ class WeixinAccounts(object):
         return cls(key)
 
     @classmethod
+    def getByOriginalId(cls, original_id):
+        for key, account_info in cls.data.iteritems():
+            if account_info['id'] == original_id:
+                return cls(key)
+
+    @classmethod
     def all(cls):
         _all = []
         cls.append_account()
