@@ -323,9 +323,9 @@ org.lottery = (function(){
               },
               success: function(xhr){
                 if(xhr.existing){
-                  window.location.href = 'http://mo.lingcaibao.com/act/wlb/start?mcode=ACTwlberwet&mobile='+ phoneVal +'&serverId=39'; //对方
+                  window.location.href = 'http://just.lingcaibao.com/activity/act/wlb/start?mcode=ACTwlberwet&mobile='+ phoneVal +'&serverId=39'; //对方
                 }else{
-                  window.location.href = '/weixin/regist/?next=http://mo.lingcaibao.com/act/wlb/start?mcode=ACTwlberwet&mobile='+ phoneVal +'&serverId=39&phone='+$phone.val();
+                  window.location.href = '/weixin/regist/?next=http://just.lingcaibao.com/activity/act/wlb/start?mcode=ACTwlberwet&mobile='+ phoneVal +'&serverId=39&phone='+$phone.val();
                 }
               },
               error: function(xhr){
