@@ -231,6 +231,7 @@ org.mmIndex = (function(org){
         $nbsp : $('.maimai-sign-margin'),
         $validation: $('.check-submit'),
         checkState: null,
+        intervalId: null,
         init: function(){
             lib._submit();
             lib.listen();
@@ -346,6 +347,11 @@ org.mmIndex = (function(org){
                         success: function(data){
                             if(data.ret_code == 0){
                                 window.location.href = '/activity/maimai_success/?state=2'
+                            }else{
+                                $(document.body).trigger('from:error',[data.message, true]);
+                                clearInterval(_self.intervalId);
+                                $('.check-submit').text('短信验证码').removeAttr('disabled').removeClass('postValidation')
+                                return $(document.body).trigger('from:captcha');
                             }
                         },
                         error: function(data){
@@ -450,8 +456,7 @@ org.mmIndex = (function(org){
         _fetchValidation:function(){
             var
                 _self = this,
-                count = 60,  //60秒倒计时
-                intervalId ; //定时器
+                count = 60;  //60秒倒计时
 
             $(document.body).trigger('from:check', [lib.checkfilter(2), false, true, true]);
 
@@ -466,7 +471,7 @@ org.mmIndex = (function(org){
                 },
                 type : 'POST',
                 error :function(xhr){
-                    clearInterval(intervalId);
+                    clearInterval(_self.intervalId);
                     var result = JSON.parse(xhr.responseText);
                     $('.check-submit').text('短信验证码').removeAttr('disabled').removeClass('postValidation');
                     $(document.body).trigger('from:error',[result.message, true]);
@@ -479,13 +484,13 @@ org.mmIndex = (function(org){
                     count--;
                     return $('.check-submit').text(count + '秒后可重发');
                 } else {
-                    clearInterval(intervalId);
+                    clearInterval(_self.intervalId);
                     $('.check-submit').text('重新获取').removeAttr('disabled').removeClass('postValidation')
                     return $(document.body).trigger('from:captcha');
                 }
             };
             timerFunction();
-            return intervalId = setInterval(timerFunction, 1000);
+            return _self.intervalId = setInterval(timerFunction, 1000);
 
         },
         /*
