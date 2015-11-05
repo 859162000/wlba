@@ -96,17 +96,17 @@
           $(actual_element).text("0.00");
         }
         if (sxf === 0 && zjglf === 0) {
-          str = '0 元';
+          str = '0';
         } else {
           if (sxf === 0) {
-            sxf_str = '0元';
+            sxf_str = '0';
           } else {
-            sxf_str = sxf + '元';
+            sxf_str = sxf;
           }
           if (zjglf === 0) {
             zjglf_str = '';
           } else {
-            zjglf_str = zjglf.toFixed(2) + '元';
+            zjglf_str = zjglf.toFixed(2);
           }
           if (zjglf_str === '') {
             str = sxf_str;
