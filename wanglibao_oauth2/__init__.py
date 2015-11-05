@@ -208,16 +208,12 @@ class AccessTokenBaseView(OAuthView, Mixin):
             json.dumps(response_data), mimetype='application/json'
         )
 
-    def access_token(self, request, data, client):
+    def access_token(self, request, data, client, user):
         """
         Handle ``grant_type=authorization_code`` requests as defined in
         :rfc:`4.1.3`.
         """
-        form = UserAuthForm(data)
-        if not form.is_valid():
-            raise OAuthError(form.errors)
 
-        user = form.cleaned_data.get('user')
         if constants.SINGLE_ACCESS_TOKEN:
             at = self.get_access_token(request, user, client)
         else:
@@ -226,7 +222,7 @@ class AccessTokenBaseView(OAuthView, Mixin):
 
         return self.access_token_response(at, user.id)
 
-    def refresh_token(self, request, data, client):
+    def refresh_token(self, request, data, client, user):
         """
         Handle ``grant_type=refresh_token`` requests as defined in :rfc:`6`.
         """
@@ -252,7 +248,7 @@ class AccessTokenBaseView(OAuthView, Mixin):
             return self.refresh_token
         return None
 
-    def get(self, request):
+    def get(self, request, grant_type):
         """
         As per :rfc:`3.2` the token endpoint *only* supports POST requests.
         Returns an error response.

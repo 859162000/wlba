@@ -2,7 +2,6 @@ from django import forms
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from .models import Client, RefreshToken
-import hashlib
 
 
 class OAuthValidationError(Exception):
@@ -68,67 +67,96 @@ class OAuthForm(forms.Form):
             self._errors.update(e.args[0])
 
 
-class ClientAuthForm(forms.Form):
+class ClientAuthForm(OAuthForm):
     """
     Client authentication form. Required to make sure that we're dealing with a
     real client. Form is used in :attr:`provider.oauth2.backends` to validate
     the client.
     """
-    client_id = forms.CharField()
-    signature = forms.CharField()
-    usn = forms.IntegerField()
 
-    def clean(self):
-        data = self.cleaned_data
-        client = Client.objects.filter(client_id=data.get('client_id')).first()
-        if client:
-            client_secret = client.client_secret
-            sign = hashlib.md5(data.get('client_id')+str(data.get('usn'))+client_secret).hexdigest()
-            if sign == data.get('signature'):
-                data['client'] = client
-                return data
+    client_id = forms.CharField(required=False)
 
-        raise forms.ValidationError(_("Client could not be validated with "
-                                    "key pair."))
+    def clean_client_id(self):
+        client_id = self.cleaned_data.get('client_id', '').strip()
+        if not client_id:
+            raise OAuthValidationError({
+                'code': '10105',
+                'message': _("invalid client_id.")
+            })
+
+        try:
+            client = Client.objects.get(client_id=client_id)
+        except Client.DoesNotExist:
+            raise OAuthValidationError({
+                'code': '10105',
+                'message': _("invalid client_id.")
+            })
+
+        self.cleaned_data['client'] = client
+        return self.cleaned_data
 
 
-class UserAuthForm(forms.Form):
+class UserAuthForm(OAuthForm):
     """
     User authentication form. Required to make sure that we're dealing with a
     real client. Form is used in :attr:`provider.oauth2.backends` to validate
     the user.
     """
-    p_user_id = forms.IntegerField()
-    usn = forms.IntegerField()
+
+    p_user_id = forms.CharField(required=False)
+    usn = forms.CharField(required=False)
 
     def clean(self):
-        data = self.cleaned_data
-        try:
-            user = User.objects.get(id=data.get('p_user_id'),
-                                    wanglibaouserprofile__phone=data.get('usn'),
-                                    )
-        except User.DoesNotExist:
-            raise forms.ValidationError(_("p_user_id could not be validated."))
+        user_id = self.cleaned_data.get('p_user_id').strip()
+        if not user_id:
+            raise OAuthValidationError({
+                'code': '10104',
+                'message': _("invalid p_user_id.")
+            })
 
-        data['user'] = user
-        return data
+        usn = self.cleaned_data.get('usn', '').strip()
+        if not usn:
+            raise OAuthValidationError({
+                'code': '10107',
+                'message': 'invalid_usn'
+            })
+
+        try:
+            user = User.objects.get(id=user_id, wanglibaouserprofile__phone=usn)
+        except User.DoesNotExist:
+            raise OAuthValidationError({
+                'code': '10104',
+                'message': _("invalid p_user_id or usn.")
+            })
+
+        self.cleaned_data['usn'] = usn
+        self.cleaned_data['user'] = user
+        return self.cleaned_data
 
 
 class RefreshTokenGrantForm(OAuthForm):
     """
     Checks and returns a refresh token.
     """
+
     refresh_token = forms.CharField(required=False)
 
     def clean_refresh_token(self):
-        token = self.cleaned_data.get('refresh_token')
+        token = self.cleaned_data.get('refresh_token', '').strip()
 
         if not token:
-            raise OAuthValidationError({'error': 'invalid_request'})
+            raise OAuthValidationError({
+                'code': '10110',
+                'message': 'invalid refresh_token.'
+            })
 
         try:
             token = RefreshToken.objects.get(token=token, expired=False, client=self.client)
         except RefreshToken.DoesNotExist:
-            raise OAuthValidationError({'error': 'invalid_grant'})
+            raise OAuthValidationError({
+                'code': '10110',
+                'message': 'invalid refresh_token.'
+            })
 
-        return token
+        self.cleaned_data['refresh_token'] = token
+        return self.cleaned_data

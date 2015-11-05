@@ -35,7 +35,7 @@ class Client(models.Model):
     Clients are outlined in the :rfc:`2` and its subsections.
     """
 
-    client_id = models.CharField(unique=True, max_length=255, default=short_token)
+    client_id = models.CharField(unique=True, db_index=True, max_length=255, default=short_token)
     client_secret = models.CharField(max_length=255, default=long_token)
     channel = models.ForeignKey(Channels, help_text=u'渠道', blank=True, null=True)
 

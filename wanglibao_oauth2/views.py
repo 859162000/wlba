@@ -1,5 +1,6 @@
 # -×- coding: utf-8 -*-
 
+import hashlib
 from datetime import timedelta
 
 from . import OAuthError
@@ -7,7 +8,7 @@ from . import BasicClientBackend
 from . import AccessTokenBaseView
 from .models import AccessToken
 from .models import RefreshToken
-from .forms import RefreshTokenGrantForm
+from .forms import RefreshTokenGrantForm, UserAuthForm
 from .utils import now
 import constants
 
@@ -33,10 +34,10 @@ class AccessTokenView(AccessTokenBaseView):
             at = AccessToken.objects.get(user=user, client=client, expires__gt=now())
         except AccessToken.DoesNotExist:
             # None found... make a new one!
-            # at = self.create_access_token(request, user, client)
-            # self.create_refresh_token(request, user, at, client)
+            at = self.create_access_token(request, user, client)
+            self.create_refresh_token(request, user, at, client)
 
-            raise OAuthError({'error': 'invalid_grant'})
+            # raise OAuthError({'error': 'invalid_grant'})
         return at
 
     def create_access_token(self, request, user, client):
@@ -63,23 +64,50 @@ class AccessTokenView(AccessTokenBaseView):
             at.expires = now() - timedelta(days=1)
             at.save()
 
+    def _cleaned_sign(self, client, usn, sign):
+        client_id = client.client_id
+        client_secret = client.client_secret
+
+        local_sign = hashlib.md5(str(client_id)+str(usn)+str(client_secret)).hexdigest()
+        if sign == local_sign:
+            return True
+
     def post(self, request, grant_type):
         """
         As per :rfc:`3.2` the token endpoint *only* supports POST requests.
         """
         if constants.ENFORCE_SECURE and not request.is_secure():
             return self.error_response({
-                'error': 'invalid_request',
-                'error_description': _("A secure connection is required.")
+                'code': '10100',
+                'message': _("A secure connection is required.")
             })
 
         client = self.authenticate(request)
         if client is None:
-            return self.error_response({'error': 'invalid_client'})
+            return self.error_response({
+                'code': '10101',
+                'message': 'invalid_client'})
+
+        form = UserAuthForm(request.POST)
+        if not form.is_valid():
+            return self.error_response(form.errors)
+
+        user = form.cleaned_data['user']
+        usn = form.cleaned_data['usn']
+        sign = request.POST.get('signature', '').strip()
+        if not self._cleaned_sign(client, usn, sign):
+            return self.error_response({
+                'code': '10108',
+                'message': 'invalid signature'})
 
         handler = self.get_handler(grant_type)
 
         try:
-            return handler(request, request.POST, client)
+            return handler(request, request.POST, client, user)
         except OAuthError, e:
             return self.error_response(e.args[0])
+        except Exception:
+            return self.error_response({
+                'code': '10400',
+                'message': 'api error.'
+            })

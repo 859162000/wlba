@@ -5,19 +5,12 @@ from .utils import now
 
 class BasicClientBackend(object):
     def authenticate(self, request=None):
-        client_id = request.POST.get('appid').strip()
-        signature = request.POST.get('signature').strip()
-        usn = request.POST.get('usn').strip()
-
+        client_id = request.POST.get('client_id', '').strip()
         if client_id:
             try:
-                form = ClientAuthForm({
-                    'client_id': client_id,
-                    'signature': signature,
-                    'usn': usn,
-                    })
+                form = ClientAuthForm(request.POST)
                 if form.is_valid():
-                    return form.cleaned_data.get('client')
+                    return form.cleaned_data['client']
                 return None
 
             except ValueError:
