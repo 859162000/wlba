@@ -96,8 +96,7 @@ def idvalidate_ok(user_id, device):
 
 
 @app.task
-def deposit_ok(user_id, amount, device, order_id):
-    # fix@chenweibi, add order_id
+def deposit_ok(user_id, amount, device):
     try:
         device_type = device['device_type']
         title, content = messages.msg_pay_ok(amount)
@@ -110,7 +109,7 @@ def deposit_ok(user_id, amount, device, order_id):
         user = User.objects.get(id=user_id)
         user_profile = user.wanglibaouserprofile
         activity_backends.check_activity(user, 'recharge', device_type, amount)
-        utils.log_clientinfo(device, "deposit", user_id, order_id, amount)
+        utils.log_clientinfo(device, "deposit", user_id, amount)
         send_messages.apply_async(kwargs={
             'phones': [user_profile.phone],
             'messages': [messages.deposit_succeed(user_profile.name, amount)]
