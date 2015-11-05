@@ -522,26 +522,6 @@ class WeixinShareDetailView(TemplateView):
             self.debug_msg('所有获奖信息返回前端:%s' % (ret_value,))
             return ret_value
 
-    def update_weixin_wanglibao_relative(self, openid, phone_num):
-        try:
-            relative = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
-            old = None
-            if relative:
-                old = relative.phone
-                relative.phone = phone_num
-                relative.save()
-                self.debug_msg("用户更新自己的手机号为:%s, openid:%s" %(phone_num, openid))
-                return old
-            else:
-                self.debug_msg("待更新的微信网利宝用户关系记录为空")
-                return None
-        except Exception, reason:
-            self.exception_msg(reason, "weixin-wanglibao-realitive table 更新用户的手机号报异常")
-            return None
-
-    def throw_exception(self, msg):
-        raise Exception(msg)
-
     def get_context_data(self, **kwargs):
         openid = kwargs["openid"]
         phone_num = kwargs['phone_num']
@@ -562,7 +542,7 @@ class WeixinShareDetailView(TemplateView):
         else:
             activitys = activitys.split(",")
             if len(activitys) == 0:
-                self.throw_exception("Misc中, activity没有配置")
+                raise Exception("Misc中, activity没有配置")
 
             index = int(time.time()) % len(activitys)
             try:
@@ -572,8 +552,6 @@ class WeixinShareDetailView(TemplateView):
                 self.exception_msg("获得activity报异常， order_id:%s" %(order_id,), reason)
             activity = record.activity.code if record else activitys[index]
             logger.debug("misc配置的activity有:%s, 本次使用的activity是：%s" % (activitys, activity))
-
-        #old_phone = self.update_weixin_wanglibao_relative(openid, phone_num)
 
         if not self.has_combine_redpack(order_id, activity):
             self.generate_combine_redpack(order_id, activity)
@@ -703,7 +681,7 @@ class WeixinShareStartView(TemplateView):
         openid = self.request.GET.get('openid')
         order_id = self.request.GET.get('url_id')
 
-        record = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
+        record = WanglibaoUserGift.objects.filter(openid=openid, rules__gift_id=order_id).first()
         logger.debug("start页面，openid 是:%s" % (openid,))
         share_title, share_content, url = get_share_infos(order_id)
         return {
@@ -779,32 +757,22 @@ class WeixinShareStartView(TemplateView):
                 return HttpResponseRedirect(redirect_url)#redirect(redirect_url)
             else:
                 nick_name = result.get('nickname')
-                head_img_url = result.get('headimgurl')
                 self.request.session['nick_name'] = nick_name
 
         try:
-             wx_user = WanglibaoWeixinRelative.objects.filter(openid=openid)
-             if wx_user.exists():
-                 phone = wx_user.first().phone
-                 user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=order_id, identity=openid,).first()
-                 logger.debug("用户抽奖信息是：%s" % (user_gift,))
+             phone = w_user.first().phone
+             user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=order_id, identity=openid,).first()
+             logger.debug("用户抽奖信息是：%s" % (user_gift,))
 
-                 if user_gift:
-                     logger.debug("openid:%s, phone:%s, product_id:%s,用户已经存在了，直接跳转页面" %(openid, phone, order_id,))
-                     return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, order_id))
+             if user_gift:
+                 logger.debug("openid:%s, phone:%s, product_id:%s,用户已经存在了，直接跳转页面" %(openid, phone, order_id,))
+                 return redirect("/weixin_activity/share/%s/%s/%s/share/" %(phone, openid, order_id))
 
-                 QSet = WanglibaoActivityGift.objects.filter(gift_id=order_id)
-                 counts = QSet.count()
-                 left_counts = QSet.filter(valid=True).count()
-                 if left_counts == 0 and counts > 0:
-                     return redirect("/weixin_activity/share/end/?url_id=%s" % (order_id,))
-
-             else:
-                WanglibaoWeixinRelative.objects.create(
-                    openid=openid,
-                    nick_name=nick_name,
-                    img=head_img_url
-                )
+             QSet = WanglibaoActivityGift.objects.filter(gift_id=order_id)
+             counts = QSet.count()
+             left_counts = QSet.filter(valid=True).count()
+             if left_counts == 0 and counts > 0:
+                 return redirect("/weixin_activity/share/end/?url_id=%s" % (order_id,))
 
         except Exception, e:
             logger.exception("share-start-view dispatch 跳转的时候报异常")
@@ -814,17 +782,16 @@ class WeixinShareStartView(TemplateView):
 def get_share_infos(order_id):
     key = 'share_redpack'
     url = ""
-    shareTitle=""
-    shareContent=""
+    share_title = ""
+    share_content = ""
     shareconfig = Misc.objects.filter(key=key).first()
     if shareconfig:
         shareconfig = json.loads(shareconfig.value)
         if type(shareconfig) == dict:
-            is_open = shareconfig.get('is_open', 'false')
-            shareTitle=shareconfig.get('share_title', "")
-            shareContent=shareconfig.get('share_content', "")
+            share_title = shareconfig.get('share_title', "")
+            share_content = shareconfig.get('share_content', "")
             url = CALLBACK_HOST + reverse('weixin_share_order_gift')+"?url_id=%s"%order_id
-    return shareTitle, shareContent, url
+    return share_title, share_content, url
 
 
 class WeixinRedPackView(APIView):
