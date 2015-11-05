@@ -4,7 +4,7 @@ from models import Margin, MarginRecord
 
 class UserMarginAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ('user', 'margin', 'freeze', 'withdrawing', )
+    list_display = ('user', 'margin', 'freeze', 'withdrawing', 'uninvested', 'uninvested_freeze')
     search_fields = ('user__wanglibaouserprofile__phone',)
     raw_id_fields = ('user', )
     readonly_fields = ('margin', 'freeze', 'withdrawing')
@@ -16,7 +16,7 @@ class UserMarginAdmin(admin.ModelAdmin):
         return False
 
     def get_readonly_fields(self, request, obj=None):
-        return ('user', 'margin', 'freeze', 'withdrawing', 'invest')
+        return ('user', 'margin', 'freeze', 'withdrawing', 'invest', 'uninvested', 'uninvested_freeze')
 
 
 class MarginRecordAdmin(admin.ModelAdmin):
