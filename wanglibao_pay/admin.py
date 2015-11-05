@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.utils import timezone
 # Register your models here.
-from wanglibao_pay.models import Bank, PayInfo, Card
+from wanglibao_pay.models import Bank, PayInfo, Card, WithdrawCard, WithdrawCardRecord
 from wanglibao_pay.views import WithdrawTransactions, WithdrawRollback, \
     AdminTransaction
 # , 'channel', 'type'
@@ -68,7 +68,7 @@ class PayInfoTypeFilter(admin.SimpleListFilter):
 
 class PayInfoAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ('id', 'get_phone', 'get_name', 'type', 'total_amount', 'fee', 'bank', 'card_no', 'status', 'create_time', 'update_time', 'error_message', 'channel')
+    list_display = ('id', 'get_phone', 'get_name', 'type', 'total_amount', 'fee', 'management_fee', 'bank', 'card_no', 'status', 'create_time', 'update_time', 'error_message', 'channel')
     # Modify by hb on 2015-10-23
     #search_fields = ['=user__wanglibaouserprofile__phone', '=id']
     search_fields = ['=user__wanglibaouserprofile__phone']
@@ -124,9 +124,37 @@ class CardAdmin(admin.ModelAdmin):
 
     get_phone.short_description = u'手机'
 
+
+class WithdrawCardAdmin(admin.ModelAdmin):
+    list_display = ('bank', 'bank_name', 'card_name', 'card_no', 'amount', 'freeze', 'is_default')
+
+    def get_readonly_fields(self, request, obj=None):
+        return ('amount', 'freeze')
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+class WithdrawCardRecordAdmin(admin.ModelAdmin):
+    actions = None
+    list_display = ('type', 'amount', 'withdrawcard', 'user', 'create_time', 'update_time', 'confirm_time', 'status', 'message')
+    raw_id_fields = ('user', 'payinfo', 'order')
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
+        return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return [f.name for f in self.model._meta.fields]
+
+
 admin.site.register(Bank, BankAdmin)
 admin.site.register(Card, CardAdmin)
 admin.site.register(PayInfo, PayInfoAdmin)
+admin.site.register(WithdrawCard, WithdrawCardAdmin)
+admin.site.register(WithdrawCardRecord, WithdrawCardRecordAdmin)
 
 
 admin.site.register_view('pay/withdraw/audit', view=WithdrawTransactions.as_view(), name=u'提现申请审核页面')
