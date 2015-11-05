@@ -545,10 +545,10 @@ class WeixinShareStartView(TemplateView):
 
         try:
              user_gift = WanglibaoUserGift.objects.filter(rules__gift_id=order_id, identity=openid,).first()
-             ano_gift = WanglibaoUserGift.objects.filter(rules=user_gift.rules).exclude(identity=(str(openid))).first()
              logger.debug("用户抽奖信息是：%s" % (user_gift,))
 
              if user_gift:
+                 ano_gift = WanglibaoUserGift.objects.filter(rules=user_gift.rules).exclude(identity=(str(openid))).first()
                  logger.debug("openid:%s, phone:%s, product_id:%s,用户已经存在了，直接跳转页面" %(openid, ano_gift.identity, order_id,))
                  return redirect("/weixin_activity/share/%s/%s/%s/share/" %(ano_gift.identity, openid, order_id))
 
