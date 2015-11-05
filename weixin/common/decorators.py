@@ -21,7 +21,8 @@ def weixin_api_error(f):
             # 42003: 'oauth_code超时',
             errcode = res.get('errcode')
             current_account = WeixinAccounts.get(request.session.get('account_key'))
-            if errcode == 40014 or errcode == 43001:
+
+            if errcode == 40014 or errcode == 43001 or errcode == 40001:
                 current_account.db_account.update_access_token()
             elif errcode == 42002:
                 pass

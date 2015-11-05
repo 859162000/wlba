@@ -1269,10 +1269,12 @@ class GetAuthUserInfo(APIView):
         except WeChatException, e:
             return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
 
+
 class GetUserInfo(APIView):
     renderer_classes = (renderers.UnicodeJSONRenderer,)
     permission_classes = ()
 
+    @weixin_api_error
     def get(self, request):
         openid = request.GET.get('openid')
         if not openid:
@@ -1283,22 +1285,25 @@ class GetUserInfo(APIView):
         account = Account.objects.get(original_id=w_user.account_original_id)
         if not account:
             return Response({'errcode':-6, 'errmsg':u'公众号信息错误或者不存在'})
-        try:
-            user_info = account.get_user_info(w_user.openid)
-            if not w_user.nickname:
-                w_user.nickname = user_info.get('nickname', "")
-                w_user.sex = user_info.get('sex')
-                w_user.city = user_info.get('city', "")
-                w_user.country = user_info.get('country', "")
-                w_user.headimgurl = user_info.get('headimgurl', "")
-                w_user.unionid =  user_info.get('unionid', '')
-                w_user.province = user_info.get('province', '')
-                w_user.subscribe = user_info.get('subscribe', '')
-                w_user.subscribe_time = user_info.get('subscribe_time', '')
-                w_user.save()
-            return Response(user_info)
-        except WeChatException, e:
-            return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
+
+        if settings.ENV == settings.ENV_DEV:
+            request.session['account_key'] = 'test'
+        else:
+            request.session['account_key'] = 'account_main'
+
+        user_info = account.get_user_info(w_user.openid)
+        if not w_user.nickname:
+            w_user.nickname = user_info.get('nickname', "")
+            w_user.sex = user_info.get('sex')
+            w_user.city = user_info.get('city', "")
+            w_user.country = user_info.get('country', "")
+            w_user.headimgurl = user_info.get('headimgurl', "")
+            w_user.unionid = user_info.get('unionid', '')
+            w_user.province = user_info.get('province', '')
+            w_user.subscribe = user_info.get('subscribe', '')
+            w_user.subscribe_time = user_info.get('subscribe_time', '')
+            w_user.save()
+        return Response(user_info)
 
 class GenerateQRSceneTicket(APIView):
     permission_classes = ()

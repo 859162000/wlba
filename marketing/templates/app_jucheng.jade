@@ -1,0 +1,73 @@
+- load formatters
+doctype html
+html(style="background: #f6f6f6")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile_activity/app_jucheng.css?v=201511041", rel="stylesheet")
+        script(src="/static/js/require.js")
+        - csrf_token
+       body
+        img.banner(src="/static/imgs/mobile_activity/app_jucheng/banner.jpg")
+        .main
+            .explain_main
+              .explain_button 活动说明
+            .title_big 限时限量 满额直送
+            .maimai-form
+              input(type='tel', name='phone', placeholder='请输入手机号',data-type='Phone',data-message='请输入正确的手机号', autocomplete = 'off').maimai-phone
+              .maimai-check-body
+                .maimai-form-margin
+                .phone-check
+                  input(type='tel', name='codeimg',data-type='Val',data-message='请输入图形验证码',  placeholder='输入验证码').check-input
+                  input(type='hidden', name='codeimg_key',value='')
+                  img(src='').check-img
+                .maimai-form-margin
+                .phone-check
+                  input(type='tel', name='codenum',data-type='Val',data-message='请输入短信码', placeholder='输入短信码').check-input
+                  button(type="button").check-submit 短信验证码
+              .maimai-form-sign 请输入正确的手机号
+              .maimai-form-margin.maimai-sign-margin
+              input(type='button',name='submit' ,value="我要抢票",disabled=true).maimai-form-btn
+        .explain_wrap
+            .explain_main
+              .explain_button 活动说明
+            .main
+                dl
+                    dt 1.
+                    dd 活动时间：待定；
+                dl
+                    dt 2.
+                    dd 注册为网利宝用户并且完成实名认证即得20元现金红包（投资2000元可抵扣使用）；
+                dl
+                    dt 3.
+                    dd 用户通过网利宝投资1000元即可获得80元独奏会门票（限量30张），送完为止；
+                dl
+                    dt 4.
+                    dd 用户通过网利宝投资2000元即有机会抢188元独奏会门票（限量80张），送完为止；
+                dl
+                    dt 5.
+                    dd 本次活动仅限于张昊辰北京独奏会抢票活动；
+                dl
+                    dt 6.
+                    dd 抢票成功用户将弹出填写地址框，请准确填写邮寄地址并保持手机畅通，我们将尽快为您邮寄门票。
+                dl
+                    dt 7.
+                    dd 网利宝对此次活动有最终解释权。
+        .get_ticket_wrap
+            .title 您已成功领取20元现金红包
+            .title 立即投资抢门票
+            ul
+                li!='80元门票剩余 <span class="shi"></span> 张'
+                li!='188元门票剩余 <span class="bai"></span> 张'
+            .button 立即抢门票
+        .write_info
+            .title 您已成功获得门票，请您认真填写相关信息，以便奖励顺利发放，谢谢！
+            ul
+                li
+                  input.name(type="text", name="user_name", placeholder="姓名")
+                li
+                  input.phone(type="text", name="user_phone", placeholder="联系电话")
+                li
+                  input.address(type="text", name="user_address", placeholder="邮寄地址")
+              .button.write_info_button 保存
+        script(data-init='mmIndex', src="/static/scripts/mobile_activity/app_jucheng.js?v=20151030")
