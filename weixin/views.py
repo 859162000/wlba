@@ -1286,10 +1286,10 @@ class GetUserInfo(APIView):
         if not account:
             return Response({'errcode':-6, 'errmsg':u'公众号信息错误或者不存在'})
 
-        if settings.ENV == settings.ENV_DEV:
-            request.session['account_key'] = 'test'
-        else:
+        if settings.ENV == settings.ENV_PRODUCTION:
             request.session['account_key'] = 'account_main'
+        else:
+            request.session['account_key'] = 'test'
 
         user_info = account.get_user_info(w_user.openid)
         if not w_user.nickname:
