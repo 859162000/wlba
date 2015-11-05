@@ -1130,7 +1130,7 @@ class AuthorizeCode(APIView):
     def get(self, request):
         account_id = self.request.GET.get('state')
         try:
-            account = Account.objects.get(pk=account_id)
+            account = Account.objects.get(original_id=account_id)
         except Account.DoesNotExist:
             return HttpResponseNotFound()
         auth = request.GET.get('auth')
@@ -1159,7 +1159,7 @@ class AuthorizeUser(APIView):
     def get(self, request):
         account_id = self.request.GET.get('state')
         try:
-            account = Account.objects.get(pk=account_id)
+            account = Account.objects.get(original_id=account_id)
         except Account.DoesNotExist:
             return HttpResponseNotFound()
         redirect_uri = self.request.GET.get('redirect_uri')
