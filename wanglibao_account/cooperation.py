@@ -2324,7 +2324,7 @@ class JrjiaCPSView(APIView):
             for equity in equities:
                 data_dic = dict()
                 data_dic['reqId'] = Binding.objects.get(user=equity.user).bid
-                data_dic['prodIdAct'] = equity.product.pk
+                data_dic['prodIdAct'] = str(equity.product.pk)
                 data_dic['purchaseTime'] = int(time.mktime(equity.created_at.timetuple()))
                 data_dic['investAmount'] = equity.equity
                 data_dic['investDuration'] = equity.product.period
@@ -2334,7 +2334,7 @@ class JrjiaCPSView(APIView):
                     data_dic['startDate'] = int(time.mktime(equity.product.make_loans_time.timetuple()))
                 except Exception, e:
                     print 'get startDate error: {}'.format(e)
-                    data_dic['startDate'] = None
+                    data_dic['startDate'] = ''
 
                 data.append(data_dic)
 
@@ -2383,7 +2383,7 @@ class JrjiaP2PStatusView(APIView):
                 data['prodId'] = str(product.pk)
                 data['totalAmount'] = product.total_amount
                 data['soldAmount'] = product.ordered_amount
-                data['userCount'] = "%.2f" % product.completion_rate
+                data['userCount'] = len(product.equities.all().values('user').annotate(Count('user')))
 
                 ret['data'] = data
         elif int(pid) <= 0:
@@ -2555,13 +2555,23 @@ class JrjiaUsStatusView(APIView):
                     dic['reqId'] = Binding.objects.get(user=user).bid
                     if user in deposited_users:
                         status = 4
+                        action_datetime = PayInfo.objects.filter(user=user).first().create_time
                     elif user in binding_users:
                         status = 3
+                        action_datetime = Card.objects.filter(user=user).last().add_at
                     elif user in identify_users:
                         status = 2
+                        action_datetime = WanglibaoUserProfile.objects.get(user=user).id_valid_time
+
                     else:
                         status = 1
-                    dic['actionTime'] = status
+                        action_datetime = user.date_joined
+
+                    action_time = (action_datetime - datetime.datetime(1970, 1, 1).
+                                   replace(tzinfo=timezone.utc)).total_seconds()
+
+                    dic['userStatus '] = status
+                    dic['actionTime'] = action_time
                     dic['payAmount'] = Binding.objects.get(user=user).bid
                     try:
                         dic['userAccount'] = user.wanglibaouserprofile.phone
