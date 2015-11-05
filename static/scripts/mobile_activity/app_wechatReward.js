@@ -231,6 +231,7 @@ org.reward = (function(org){
         $nbsp : $('.wechat-sign-margin'),
         $validation: $('.check-submit'),
         checkState: null,
+        intervalId: null,
         init: function(){
             lib._submit();
             lib.listen();
@@ -346,10 +347,12 @@ org.reward = (function(org){
                         success: function(data){
                             if(data.ret_code == 0){
                                 window.location.href= '/activity/wechat_result/?phone='+ _self.$phone.val() + '&state=0'
+                            }else{
+                                $(document.body).trigger('from:error',[data.message, true]);
+                                clearInterval(_self.intervalId);
+                                $('.check-submit').text('短信验证码').removeAttr('disabled').removeClass('postValidation')
+                                return $(document.body).trigger('from:captcha');
                             }
-                        },
-                        error: function(data){
-
                         },
                         complete:function(){
                             lib.$submit.removeAttr('disabled').html('立即领取');
@@ -450,9 +453,7 @@ org.reward = (function(org){
         _fetchValidation:function(){
             var
                 _self = this,
-                count = 60,  //60秒倒计时
-                intervalId ; //定时器
-
+                count = 60;  //60秒倒计时
             $(document.body).trigger('from:check', [lib.checkfilter(2), false, true, true]);
 
             if(!_self.checkState) return;
@@ -466,7 +467,7 @@ org.reward = (function(org){
                 },
                 type : 'POST',
                 error :function(xhr){
-                    clearInterval(intervalId);
+                    clearInterval(_self.intervalId);
                     var result = JSON.parse(xhr.responseText);
                     $('.check-submit').text('短信验证码').removeAttr('disabled').removeClass('postValidation');
                     $(document.body).trigger('from:error',[result.message, true]);
@@ -479,13 +480,13 @@ org.reward = (function(org){
                     count--;
                     return $('.check-submit').text(count + '秒后可重发');
                 } else {
-                    clearInterval(intervalId);
+                    clearInterval(_self.intervalId);
                     $('.check-submit').text('重新获取').removeAttr('disabled').removeClass('postValidation')
                     return $(document.body).trigger('from:captcha');
                 }
             };
             timerFunction();
-            return intervalId = setInterval(timerFunction, 1000);
+            return _self.intervalId = setInterval(timerFunction, 1000);
 
         },
         /*
