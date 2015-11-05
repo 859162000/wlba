@@ -43,7 +43,7 @@
       return _results;
     });
     $('input[data-role=fee-calculator]').keyup(function(e) {
-      var actual, actual_element, amount, array, arrays, fee, fee_count, fee_element, fee_interval, fee_poundage, fee_switch, i, m, rate, str, sxf, sxf_str, target, uninvested, zjglf, zjglf_str, _i, _len;
+      var actual, actual_element, amount, array, arrays, data_balance, fee, fee_count, fee_element, fee_interval, fee_poundage, fee_switch, i, m, rate, str, sxf, sxf_str, target, uninvested, zjglf, zjglf_str, _i, _len;
       target = $(e.target);
       rate = target.attr('data-rate');
       amount = target.val();
@@ -53,6 +53,7 @@
       fee_interval = target.attr('data-interval');
       fee_count = target.attr('data-count');
       fee_poundage = target.attr('data-poundage');
+      data_balance = target.attr('data-balance');
       uninvested = $('input[name=uninvested]').val();
       arrays = eval(fee_interval);
       if (fee_switch === 'on') {
@@ -73,11 +74,11 @@
         } else {
           sxf = 0;
         }
-        m = amount - uninvested;
-        if (m <= 0) {
+        m = data_balance - amount;
+        if (m >= uninvested) {
           zjglf = 0;
         } else {
-          zjglf = m * rate;
+          zjglf = Math.abs(uninvested - m) * rate;
         }
         fee = (sxf + zjglf).toFixed(2);
         actual = (amount - fee).toFixed(2);

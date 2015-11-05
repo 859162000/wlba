@@ -42,6 +42,7 @@ define ['jquery'], ($)->
     fee_interval = target.attr 'data-interval'
     fee_count = target.attr 'data-count'
     fee_poundage = target.attr 'data-poundage'
+    data_balance = target.attr 'data-balance'
     uninvested = $('input[name=uninvested]').val()
     arrays = eval(fee_interval)
     if fee_switch == 'on'
@@ -57,11 +58,11 @@ define ['jquery'], ($)->
       else
          sxf = 0
 
-      m = amount - uninvested
-      if m <= 0
+      m = data_balance - amount
+      if m >= uninvested
         zjglf = 0
       else
-        zjglf = m*rate
+        zjglf = Math.abs(uninvested - m)*rate
 
       fee = (sxf+zjglf).toFixed(2)
       actual = (amount - fee).toFixed(2)
