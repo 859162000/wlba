@@ -1,5 +1,7 @@
 # encoding: utf-8
 import datetime
+from wanglibao_redpack.models import RedPackEvent
+from wanglibao_redpack import backends as redpack_backends
 import logging
 import json
 import math
@@ -8,6 +10,7 @@ import hashlib
 import urllib
 import urlparse
 
+from random import randint
 from decimal import Decimal
 from django.contrib import auth
 from django.contrib.auth import login as auth_login
@@ -37,6 +40,7 @@ from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm, IdVe
 from marketing.models import IntroducedBy, Reward, RewardRecord
 from marketing.utils import set_promo_user, local_to_utc, get_channel_record
 from marketing import tools
+from wanglibao_sms.tasks import send_messages
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from wanglibao import settings
@@ -44,7 +48,7 @@ from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account import third_login, backends as account_backends, message as inside_message
-from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
+from wanglibao_account.forms import EmailOrPhoneAuthenticationForm, TokenSecretSignAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning, \
@@ -65,6 +69,9 @@ from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityRecord
 from aes import Crypt_Aes
+from misc.models import Misc
+from wanglibao_activity.models import Activity
+from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from wanglibao.settings import AMORIZATION_AES_KEY
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.utils import get_client_ip
@@ -1162,6 +1169,35 @@ def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
     else:
         return HttpResponseNotAllowed(["GET"])
 
+from django import forms
+from django.shortcuts import redirect
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def ajax_token_login(request, authentication_form=TokenSecretSignAuthenticationForm):
+    def messenger(message, user=None):
+        res = dict()
+        if user:
+            res['nick_name'] = user.wanglibaouserprofile.nick_name
+        res['message'] = message
+        return json.dumps(res)
+
+    if request.method == "POST":
+
+        if request.is_ajax():
+            form = authentication_form(request, data=request.POST)
+            if form.is_valid():
+                auth_login(request, form.get_user())
+                request.session.set_expiry(1800)
+                return HttpResponse(messenger('done', user=request.user))
+            else:
+                return HttpResponseForbidden(messenger(form.errors))
+        else:
+            return HttpResponseForbidden('not valid ajax request')
+    else:
+        return HttpResponseNotAllowed(["GET"])
+
+
 
 @sensitive_post_parameters()
 @csrf_protect
@@ -1170,9 +1206,7 @@ def ajax_register(request):
     """
         modified-1 by: Yihen@20150812
         descrpition: if(line1150~line1151)的修改，针对特定的渠道延迟返积分、发红包等行为，防止被刷单
-
         //////////////////////////
-
         modified-2 by: Yihen@20150818
         descrpition: if(line1154~line1156)的修改，web端在注册的时候，不需要再次验证图片验证码, code暂留，后期会加上这方面的逻辑
     """
@@ -1183,13 +1217,21 @@ def ajax_register(request):
         res['message'] = message
         return json.dumps(res)
 
+    def generate_random_password(length):
+        if length < 0:
+            raise Exception("生成随机密码的长度有误")
+
+        random_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        password = ""
+        index = 0
+        while index < length:
+            password += str(random_list[randint(0,len(random_list)-1)])
+            index += 1
+        return str(password)
+
     if request.method == "POST":
         channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")    #add by Yihen@20150818; reason:第三方渠道处理的时候，会更改request中的信息
         if request.is_ajax():
-
-            #res, message = verify_captcha(dic=request.POST, keep=False)
-            #if not res:
-            #    return HttpResponseForbidden(messenger(message={'captcha_1': u'图片验证码错误'}))
 
             form = EmailOrPhoneRegisterForm(request.POST)
             if form.is_valid():
@@ -1198,6 +1240,9 @@ def ajax_register(request):
                 identifier = form.cleaned_data['identifier']
                 invitecode = form.cleaned_data['invitecode']
 
+                if request.POST.get('IGNORE_PWD', '') and not password:
+                    password = generate_random_password(6)
+
                 if User.objects.filter(wanglibaouserprofile__phone=identifier).values("id"):
                     return HttpResponse(messenger('error'))
 
@@ -1205,7 +1250,7 @@ def ajax_register(request):
                 if not user:
                     return HttpResponse(messenger('error'))
 
-                #处理第三方渠道的用户信息
+                # 处理第三方渠道的用户信息
                 CoopRegister(request).all_processors_for_user_register(user, invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
 
@@ -1215,6 +1260,44 @@ def ajax_register(request):
 
                 if not AntiForAllClient(request).anti_delay_callback_time(user.id, device, channel):
                     tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+                #  add by Yihen@20151020, 用户填写手机号不写密码即可完成注册, 给用户发短信,不要放到register_ok中去，保持原功能向前兼容
+                if request.POST.get('IGNORE_PWD', ''):
+                    send_messages.apply_async(kwargs={
+                        "phones": [identifier, ],
+                        "messages": [u'登录账户是：'+identifier+u'登录密码:'+password, ]
+                    })
+
+                    if channel == 'maimai':
+                        dt = timezone.datetime.now()
+                        redpack_event = RedPackEvent.objects.filter(invalid=False, name='maimai_redpack', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                        if redpack_event:
+                            redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+
+                    if channel == 'weixin_attention':
+                        key = 'share_redpack'
+                        shareconfig = Misc.objects.filter(key=key).first()
+                        if shareconfig:
+                            shareconfig = json.loads(shareconfig.value)
+                            if type(shareconfig) == dict:
+                                is_attention = shareconfig.get('is_attention', '')
+                                attention_code = shareconfig.get('attention_code', '')
+
+                        if is_attention:
+                            activity = Activity.objects.filter(code=attention_code).first()
+                            redpack = WanglibaoUserGift.objects.create(
+                                identity=identifier,
+                                activity=activity,
+                                rules=WanglibaoActivityGift.objects.first(),#随机初始化一个值
+                                type=1,
+                                valid=0
+                            )
+                            dt = timezone.datetime.now()
+                            redpack_event = RedPackEvent.objects.filter(invalid=False, name='weixin_atten_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                            if redpack_event:
+                                redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+                                redpack.valid = 1
+                                redpack.save()
 
                 account_backends.set_source(request, auth_user)
 
