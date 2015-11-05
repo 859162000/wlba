@@ -27,8 +27,7 @@ import logging
 logger = get_task_logger(__name__)
 
 @app.task
-def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False):
-    # fix@chenweibi, add order_id
+def decide_first(user_id, amount, device, product_id=0, is_full=False):
     user = User.objects.filter(id=user_id).first()
     amount = long(amount)
     device_type = device['device_type']
@@ -41,8 +40,7 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False)
 
     # 活动检测
     activity_backends.check_activity(user, 'invest', device_type, amount, product_id, is_full)
-    # fix@chenweibi, add order_id
-    utils.log_clientinfo(device, "buy", user_id, order_id, amount)
+    utils.log_clientinfo(device, "buy", user_id, amount)
 
     # 发送红包
     # send_lottery.apply_async((user_id,))
