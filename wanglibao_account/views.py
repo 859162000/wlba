@@ -589,10 +589,6 @@ class AccountHomeAPIView(APIView):
         fund_income_month = DailyIncome.objects.filter(user=user, 
                             date__gt=today + datetime.timedelta(days=-31)).aggregate(Sum('income'))['income__sum'] or 0
 
-        # 获取提现费率配置
-        fee_misc = WithdrawFee(switch='on')
-        fee_config = fee_misc.get_withdraw_fee_config()
-
         res = {
             'total_asset': float(p2p_total_asset + fund_total_asset),  # 总资产
             'p2p_total_asset': float(p2p_total_asset),  # p2p总资产
