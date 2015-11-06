@@ -154,18 +154,12 @@ class WeixinShareDetailView(TemplateView):
         if not self.activity:
             self.activity = self.get_activity_by_id(activity)
         try:
-            # modify by hb on 2015-10-15
-            #user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity=(str(phone_num)), activity=self.activity).first()
-            user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity=(str(openid)), activity=self.activity).first()
-            award_user_gift = None
+            user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity=str(openid), activity=self.activity).first()
             if not user_gift:
-                logger.debug("没有从数据库里查到用户(%s)的领奖记录, openid:%s, order_id:%s" %(phone_num, openid, order_id))
+                logger.debug("判断用户是否用此手机号在别的微信上领取过phone: %s, openid:%s, order_id:%s" %(phone_num, openid, order_id))
+                award_user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity=str(phone_num), activity=self.activity).first()
             else:
-                # add by hb on 2015-10-15
                 award_user_gift = WanglibaoUserGift.objects.filter(rules=user_gift.rules).exclude(identity=(str(openid))).first()
-                if not award_user_gift:  #判断用户是否用同一个手机号在别的微信上领取过同一个order
-                    award_user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity=(str(phone_num)), activity=self.activity).first()
-
                 logger.debug("已经从数据库里查到用户(%s)的领奖记录, openid:%s, order_id:%s" %(award_user_gift.identity, openid, order_id))
             return award_user_gift
         except Exception, reason:
