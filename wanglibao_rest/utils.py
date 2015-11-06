@@ -5,6 +5,7 @@ import re
 from user_agents import parse
 
 
+
 def search(client, string):
     pattern = re.compile(client)
     return re.search(pattern, string)
@@ -61,3 +62,15 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
+
+
+def decide_device(device_type):
+    device_type = device_type.lower()
+    if device_type == 'pc':
+        return 'pc'
+    elif device_type == 'ios':
+        return 'ios'
+    elif device_type == 'android':
+        return 'android'
+    else:
+        return 'all'
