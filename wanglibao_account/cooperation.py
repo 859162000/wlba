@@ -21,6 +21,8 @@ from django.contrib.auth.models import User
 from django.db.models import Sum, Q, Count
 from django.http import HttpResponse
 from django.utils import timezone
+from wanglibao_account import message as inside_message
+from wanglibao_sms.tasks import send_messages
 import requests
 from rest_framework import renderers
 from rest_framework.views import APIView
@@ -990,11 +992,9 @@ class JuChengRegister(CoopRegister):
         self.invite_code = 'jcw'
 
     def purchase_call_back(self, user):
-        name = self.request.DATA.get('name', '')
-        phone = self.request.DATA.get('phone', '')
-        address = self.request.DATA.get('address', '')
         binding = Binding.objects.filter(user_id=user.id).first()
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
+        SEND_SUCCESS = None
         if binding and p2p_record.count() == 1:
             p2p_amount = int(p2p_record.first().amount)
             if p2p_amount>=1000 and p2p_amount<2000:
@@ -1003,23 +1003,11 @@ class JuChengRegister(CoopRegister):
                 except Exception, reason:
                     logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
                     raise
-                if config and config.amount>0:
-                    try:
-                        GiftOwnerInfo.objects.create(
-                            config=config,
-                            name=name,
-                            phone=phone,
-                            address=address,
-                            award=u'张昊辰门票',
-                            type='80'
-                        )
-                    except Exception, reason:
-                        logger.exception(u'获奖用户(%s)信息入库失败, reason:%s' % (user,reason))
-                    else:
-                        config.amount -= 1
-                        logger.info(u"获奖用户 (%s) 信息入库成功" % (user,))
-                    finally:
-                        config.save()
+                if config and config.amount > 0:
+                    config.amount -= 1
+                    config.save()
+                    logger.debug(u"用户 %s 获得80门票一张" % (user))
+                    SEND_SUCCESS = True
 
             if p2p_amount>=2000:
                 try:
@@ -1028,22 +1016,22 @@ class JuChengRegister(CoopRegister):
                     logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
                     raise
                 if config and config.amount>0:
-                    try:
-                        GiftOwnerInfo.objects.create(
-                            config=config,
-                            name=name,
-                            phone=phone,
-                            address=address,
-                            award=u'张昊辰门票',
-                            type='188'
-                        )
-                    except Exception, reason:
-                        logger.exception(u'获奖用户(%s)信息入库失败, reason:%s' % (user,reason))
-                    else:
                         config.amount -= 1
-                        logger.info(u"获奖用户 (%s) 信息入库成功" % (user,))
-                    finally:
+                        logger.debug(u"获奖用户(%s)得到188门票一张 " % (user,))
                         config.save()
+                        SEND_SUCCESS = True
+
+            if SEND_SUCCESS:
+                send_messages.apply_async(kwargs={
+                    "phones": [user.wanglibaouserprofile.phone, ],
+                    "messages": [u'[网利科技]您已成功获得门票，请于演出当天到北京音乐铁一楼大厅票务兑换处领取，咨询电话:13581710219', ]
+                })
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id": user.id,
+                    "title": u"演出门票赠送",
+                    "content": u'[网利科技]您已成功获得门票，请于演出当天到北京音乐铁一楼大厅票务兑换处领取，咨询电话:13581710219',
+                    "mtype": "activity"
+                })
 
 
 class WeixinRedpackRegister(CoopRegister):
@@ -1151,7 +1139,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
                           ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
-                          XunleiVipRegister]
+                          XunleiVipRegister, JuChengRegister, ]
 
 
 #######################第三方用户查询#####################

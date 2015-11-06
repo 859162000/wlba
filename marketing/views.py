@@ -2126,7 +2126,6 @@ class GiftOwnerInfoAPIView(APIView):
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-        channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
         item = GiftOwnerInfo.objects.filter(config__description__in=('jcw_ticket_80', 'jcw_ticket_188'), sender=request.user)
         if action == "HAS_TICKET":
             to_json_response = {
@@ -2147,10 +2146,11 @@ class GiftOwnerInfoAPIView(APIView):
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-        if 'jcw' != channel:
+        record = get_user_channel_record(request.user.id)
+        if not record or (record and record.name != 'jcw'):
             to_json_response = {
                 'ret_code': 1000,
-                'message': u'渠道不是聚橙网',
+                'message': u'用户不是聚橙网渠道',
                 'award80': award80,
                 'award100': award188
             }
