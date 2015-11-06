@@ -12,6 +12,7 @@ html(style="background: #f5f5f5")
             else
                 img(src='/static/imgs/mobile/regist/regist_weixin_banner.jpg')
         //表单
+        input(name="openid", type="hidden", value="{{ context.openid }}")
         section.form-box
             if phone
                 phoneValue = phone

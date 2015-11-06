@@ -1,0 +1,46 @@
+-load formatters
+doctype html
+html(style="background: #f5f5f5").sub-body
+  head
+    include include/weixin_head.jade
+    link(href="/static/styles/sub_weixin/sub_weixin.css?v=20150910", rel="stylesheet")
+  body(style="background:#fff495;")
+    header
+      hgroup 赚钱哪里好 就在网利宝
+      a(href="/weixin/list/")
+        span 返回
+
+    .sub-award-banner
+      img(src="/static/imgs/sub_weixin/award_banner.png")
+
+    .sub-award-main
+      .award-btn-box
+        button.award-item.award1 继续<br />攒人品
+        button.award-item.award2 0.1%<br />加息券
+        button.award-item.award3 0.6%<br />加息券
+        button.award-item.award4 1%<br />加息券
+        button.award-item.award5 1.5%<br />加息券
+        button.award-item.award6 25元<br />红包
+        button.award-item.award7 25元<br />红包
+        button.award-item.award8 2元<br />红包
+        button.award-item.award9 6元<br />红包
+        button.award-item.award10 10元<br />红包
+      .award-handle-box
+        .red-btns#award-btn 立即抽奖
+        .award-promot 您还有<span id="sub-award-num">3</span>次抽奖机会
+    p.activity-title.text-center
+      a(href="/weixin/award_rule/") 活动规则
+    p.text-center.grey-footer
+      img(src="/static/imgs/sub_weixin/grey_logo.png")
+
+    .page-box#page-bg
+    .alt-box#alt-box
+      .alt-tit
+        span 提示
+        span.close-box
+          i.close-icon
+      .alt-cont
+        p#alt-promot 终于等到你，还好我没放弃
+        p <span id="alt-award" class="alt-award">2%加息券</span>已在您的账户中
+
+    script(src='/static/scripts/subMobile/mobile.js')

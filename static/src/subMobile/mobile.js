@@ -323,16 +323,11 @@ org.detail = (function(org){
                 }
             });
             wx.ready(function(){
-                var $productName = $('.product-name'),
-                    $earningRate = $('.profit-txt'),
-                    $period = $('.time-txt');
-
                 var host = 'https://www.wanglibao.com',
-                    shareName = $productName.attr('data-name'),
-                    shareImg = host + '/static/imgs/mobile/share_logo.png',
-                    shareLink = host + '/weixin/detail/'+$productName.attr('data-productID'),
-                    shareMainTit = '我在网利宝发现一个不错的投资标的，快来看看吧',
-                    shareBody = shareName + ',年收益' + $earningRate.attr('data-earn') + '%,期限' + $period.attr('data-period');
+                    shareImg = host + '/static/imgs/sub_mobile/logo.png',//图片
+                    shareLink = host + '/weixin/award_index/',//连接地址
+                    shareMainTit = '幸运大转盘，日日有惊喜',//分享标题
+                    shareBody = '转盘一动，大奖即送。还不快快领取！';//分享描述
                 //分享给微信好友
                 org.onMenuShareAppMessage({
                     title: shareMainTit,
@@ -345,14 +340,14 @@ org.detail = (function(org){
                     title: shareMainTit,
                     link : shareLink,
                     imgUrl: shareImg
-                })
+                });
                 //分享给QQ
                 org.onMenuShareQQ({
                     title: shareMainTit,
                     desc: shareBody,
                     link : shareLink,
                     imgUrl: shareImg
-                })
+                });
             })
         },
         _downPage:function(){
@@ -362,6 +357,7 @@ org.detail = (function(org){
               isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1,
               isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
           $('#down-btn').on('click',function(){
+
             if (ua.match(/MicroMessenger/i) == "micromessenger") {
                 window.location.href = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao&g_f=991653';
             }else{
@@ -380,26 +376,323 @@ org.detail = (function(org){
         init : lib.init
     }
 })(org);
-(function(org){
+org.login = (function(org){
+    var lib = {
+        $captcha_img : $('#captcha'),
+        $captcha_key : $('input[name=captcha_0]'),
+        init:function(){
+            //lib._captcha_refresh();
+            lib._checkFrom();
+        },
+        _captcha_refresh :function(){
+            var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
+            $.get(captcha_refresh_url, function(res) {
+                lib.$captcha_img.attr('src', res['image_url']);
+                lib.$captcha_key.val(res['key']);
+            });
+        },
+        _checkFrom:function(){
+            var $form = $('#login-form'),
+                $submit = $form.find('button[type=submit]');
+            org.ui.focusInput({
+                submit : $('button[type=submit]'),
+                inputList: [
+                    {target : $('input[name=identifier]'),  required:true},
+                    {target : $('input[name=password]'), required : true},
+                ],
+            });
+
+            //刷新验证码
+            //lib.$captcha_img.on('click', function() {
+              //  lib._captcha_refresh();
+            //});
+            $submit.on('click', function() {
+                var data = {
+                    'identifier': $.trim($form.find('input[name=identifier]').val()),
+                    'password': $.trim($form.find('input[name=password]').val()),
+                    'openid': $.trim($form.find('input[name=openid]').val())
+                }
+                org.ajax({
+                    'type': 'post',
+                    'url': $form.attr('action'),
+                    'data': data,
+                    beforeSend: function (xhr) {
+                        $submit.attr('disabled', true).text('登录中..');
+                    },
+                    success: function(res) {
+                        window.location.href = "/weixin/login_success/";
+                        //var next = org.getQueryStringByName('next');
+                        //if (next) {
+                        //    window.location.href = decodeURIComponent(decodeURIComponent(next));;
+                        //}else{
+                        //    window.location.href = '/weixin/account/';
+                        //}
+                    },
+                    error: function(res) {
+                        if (res['status'] == 403) {
+                            org.ui.showSign('请勿重复提交')
+                            return false;
+                        }
+                        var data = JSON.parse(res.responseText);
+                        for (var key in data) {
+                            data['__all__'] ?  org.ui.showSign(data['__all__']) : org.ui.showSign(data[key]);
+                        }
+                        lib._captcha_refresh()
+                    },
+                    complete: function() {
+                        $submit.removeAttr('disabled').text('登录网利宝');
+                    }
+                });
+                return false;
+            });
+        }
+    }
+    return {
+        init : lib.init
+    }
+
+
+})(org);
+
+org.regist = (function(org){
+    var lib ={
+        $captcha_img : $('#captcha'),
+        $captcha_key : $('input[name=captcha_0]'),
+        init:function(){
+            lib._captcha_refresh();
+            lib._checkFrom();
+            lib._animateXieyi();
+        },
+        _animateXieyi:function(){
+            var $submitBody = $('.submit-body'),
+                $protocolDiv = $('.regist-protocol-div'),
+                $cancelXiyi = $('.cancel-xiyie'),
+                $showXiyi = $('.xieyi-btn'),
+                $agreement = $('#agreement');
+            //是否同意协议
+            $agreement.change(function() {
+              if ($(this).attr('checked') == 'checked') {
+                $submitBody.addClass('disabled').attr('disabled', 'disabled');
+                return $(this).removeAttr('checked');
+              } else {
+                $submitBody.removeClass('disabled').removeAttr('disabled');
+                return $(this).attr('checked', 'checked');
+              }
+            });
+            //显示协议
+            $showXiyi.on('click',function(event){
+                event.preventDefault();
+                $protocolDiv.css('display','block');
+                setTimeout(function(){
+                    $protocolDiv.css('top','0%');
+                },0)
+            });
+            //关闭协议
+            $cancelXiyi.on('click',function(){
+                $protocolDiv.css('top','100%');
+                setTimeout(function(){
+                    $protocolDiv.css('display','none');
+                },200)
+            })
+        },
+        _captcha_refresh :function(){
+            var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
+            $.get(captcha_refresh_url, function(res) {
+                lib.$captcha_img.attr('src', res['image_url']);
+                lib.$captcha_key.val(res['key']);
+            });
+        },
+        _checkFrom:function(){
+            var $submit = $('button[type=submit]'),
+                $identifier = $('input[name=identifier]'),
+                $password = $('input[name=password]'),
+                $validation =  $('input[name=validation]'),
+                $invitation = $('input[name=invitation]'),
+                $agreement = $('input[name=agreement]'),
+                $captcha_0 =  $('input[name=captcha_0]'),
+                $captcha_1 =  $('input[name=captcha_1]');
+
+
+            org.ui.focusInput({
+                submit : $submit,
+                inputList: [
+                    {target : $identifier,  required:true},
+                    {target :$password,required : true},
+                    {target: $validation,required : true},
+                    {target: $invitation, required: false},
+                    {target: $captcha_1, required: true}
+                ],
+                otherTarget : [{target: $agreement,required: true}]
+            });
+            $("#agreement").on('click',function(){
+                $(this).toggleClass('agreement');
+                $(this).hasClass('agreement') ?  $(this).find('input').attr('checked','checked') : $(this).find('input').removeAttr('checked');
+                $identifier.trigger('input')
+            })
+            //刷新验证码
+            lib.$captcha_img.on('click', function() {
+                lib._captcha_refresh();
+            });
+
+
+            //手机验证码
+            $('.request-check').on('click',function(){
+                var phoneNumber = $identifier.val(),
+                    $that = $(this), //保存指针
+                    count = 60,  //60秒倒计时
+                    intervalId ; //定时器
+
+                if(!check['identifier'](phoneNumber, 'phone')) return  //号码不符合退出
+                $that.attr('disabled', 'disabled').addClass('regist-alreay-request');
+                org.ajax({
+                    url : '/api/phone_validation_code/register/' + phoneNumber + '/',
+                    data: {
+                        captcha_0 : $captcha_0.val(),
+                        captcha_1 : $captcha_1.val(),
+                    },
+                    type : 'POST',
+                    error :function(xhr){
+                        clearInterval(intervalId);
+                        var result = JSON.parse(xhr.responseText);
+                        org.ui.showSign(result.message);
+                        $that.text('获取验证码').removeAttr('disabled').removeClass('regist-alreay-request');
+                        lib._captcha_refresh();
+                    }
+                });
+                //倒计时
+                var timerFunction = function() {
+                    if (count >= 1) {
+                        count--;
+                        return $that.text( count + '秒后可重发');
+                    } else {
+                        clearInterval(intervalId);
+                        $that.text('重新获取').removeAttr('disabled').removeClass('regist-alreay-request');
+                        return lib._captcha_refresh();
+                    }
+                };
+                timerFunction();
+                return intervalId = setInterval(timerFunction, 1000);
+            });
+            //校验方法
+            var check ={
+                identifier:function(val){
+                    var isRight = false,
+                        re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
+                    re.test($.trim(val)) ? isRight = true : (org.ui.showSign('请输入正确的手机号'),isRight = false);
+                    return isRight;
+                },
+                password:function(val){
+                   if(6 > $.trim(val).length || $.trim(val).length > 20 ){
+                       org.ui.showSign('密码为6-20位数字/字母/符号/区分大小写')
+                       return false
+                   }
+                   return true
+                }
+            }
+            var checkList = [$identifier, $password],
+                isSubmit = true;
+
+            var invite_phone = org.getQueryStringByName('parentPhone') == '' ? '' : org.getQueryStringByName('parentPhone');
+            $submit.on('click',function(){
+                isSubmit =  true;
+                //校验主函数
+                $.each(checkList, function(){
+                    var value = $(this).val(), checkTarget = $(this).attr('name');
+                    if(!check[checkTarget](value)){
+                        return isSubmit = false
+                    }
+                });
+
+                if(!isSubmit) return false;
+                var tid = org.getQueryStringByName('tid');
+                var token = $invitation.val() === '' ?  $('input[name=token]').val() : $invitation.val();
+                org.ajax({
+                    url: '/api/register/',
+                    type: 'POST',
+                    data: {
+                            'identifier':       $identifier.val(),
+                            'password':         $password.val(),
+                            'captcha_0':        $captcha_0.val(),
+                            'captcha_1':        $captcha_1.val(),
+                            'validate_code':    $validation.val(),
+                            'invite_code':      token,
+                            'tid' : tid,
+                            'invite_phone' : invite_phone
+                    },
+                    beforeSend: function() {
+                        $submit.text('注册中,请稍等...');
+                    },
+                    success:function(data){
+                        if(data.ret_code === 0){
+                            var next = org.getQueryStringByName('next') == '' ? '/weixin/regist/succees/?phone='+$identifier.val() : org.getQueryStringByName('next');
+                            next = org.getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ org.getQueryStringByName('mobile');
+                            next = org.getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ org.getQueryStringByName('serverId');
+                            window.location.href = next;
+                        }else if(data.ret_code > 0){
+                            org.ui.showSign(data.message)
+                            $submit.text('立即注册 ｜ 领取奖励');
+                        }
+                    },
+                    error: function (xhr) {
+                        var result = JSON.parse(xhr.responseText);
+                        if(xhr.status === 429){
+                            org.ui.alert('系统繁忙，请稍候重试')
+                        }else{
+                            org.ui.alert(result.message);
+                        }
+                    },
+                    complete:function(){
+                        $submit.text('立即注册 ｜ 领取奖励');
+                    }
+                });
+            })
+        }
+    }
+    return {
+        init : lib.init
+    }
+})(org);
+
+;(function(org){
+    $.each($('script'), function(){//登录、注册
+        var src = $(this).attr('src');
+        if(src && src.indexOf(org.scriptName) > 0){
+            if($(this).attr('data-init') && org[$(this).attr('data-init')]){
+                org[$(this).attr('data-init')].init();
+            }
+        }
+    });
+    org.detail.init();//下载、微信分享
+
+    //关闭页面，返回微信
+    function closePage(){
+        if(typeof (WeixinJSBridge) != 'undefined'){
+            WeixinJSBridge.call('closeWindow');
+        }else{
+            window.close();
+        }
+    }
+
     function timeFun(){//倒计时跳转
       var numDom = $("#times-box");
       var num = parseInt(numDom.text());
       var timeSet = setInterval(function(){
         if(num <= 0){
           clearInterval(timeSet);
-          if(typeof (WeixinJSBridge) != 'undefined'){
-            WeixinJSBridge.call('closeWindow');
-          }
+          closePage();
           return;
         }
         num --;
         numDom.text(num+"秒");
       },1000);
     }
-    timeFun();
+    window.onload = function(){
+        timeFun();
+    }
 
-    //解除绑定
-    $("#unbind").click(function(){
+    var unbindf = false;
+    function unbingFun(){
+        unbindf = true;
         var openid = $("#openid").val();
         org.ajax({
             type: "post",
@@ -407,8 +700,47 @@ org.detail = (function(org){
             data: {"openid":openid},
             dataType: "json",
             success: function (data) {
-                console.log(data);
+                //console.log(data);
+                unbindf = false;
+                window.location.href="/weixin/sub_unbind_success/";
             }
         });
+    }
+    //解除绑定
+    $("#unbind").click(function(){
+        var self = $(this);
+        if(unbindf){
+            self.off("click");
+            self.addClass("unbings")
+        }else{
+            self.on("click",unbingFun());
+            self.removeClass("unbings")
+        }
     });
+
+    $("#no-unbind").click(function(){
+        closePage();
+    });
+    //关闭底部
+    $("#footer-down").on("click",".down-close",function(){
+        $("#footer-down").hide();
+    });
+
+    //立即抽奖
+    $("#award-btn").click(function(){
+        var arrStr = ["RP爆表，恭喜您获得","终于等到你还好我没放弃","人品大爆棚且抽且珍惜","大奖明天见，网利宝天天见。您今天已经抽奖，明天再来碰运气吧"];
+        $("#page-bg").show();
+        $("#alt-box").show();
+    });
+
+    //规则 html添加class
+    (function(){
+        var html = $("html");
+        alert(html.height() + "," + $(window).height());
+        if(html.height() <= $(window).height()){
+            html.addClass("sub-height");
+        }else{
+            html.removeClass("sub-height");
+        }
+    })();
 })(org);
