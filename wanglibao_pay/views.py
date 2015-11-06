@@ -457,6 +457,8 @@ class WithdrawTransactions(TemplateView):
                     payinfo.confirm_time = timezone.now()
                     payinfo.save()
 
+                    # 取款确认时要检测该次提现是否是真正的在每个月的免费次数之内,如果是还需要将已扣除的费用返还给用户
+
                     # 给提现记录表中的信息同步进行确认,同时将提现的费用充值到网利宝的公司提现账户
                     fee_amount = payinfo.fee + payinfo.management_fee
                     withdraw_card = WithdrawCard.objects.filter(is_default=True).first()
@@ -526,13 +528,13 @@ class WithdrawRollback(TemplateView):
             return HttpResponse({u"该%s 请求已经处理过,请勿重复处理" % uuid})
 
         marginKeeper = MarginKeeper(payinfo.user)
-        marginKeeper.withdraw_rollback(payinfo.amount, error_message, uninvested=payinfo.management_amount)
+        # 提现审核失败回滚时需要将扣除的各手续费返还
+        total_amount = payinfo.amount + payinfo.fee + payinfo.management_fee
+        marginKeeper.withdraw_rollback(total_amount, error_message, uninvested=payinfo.management_amount)
         payinfo.status = PayInfo.FAIL
         payinfo.error_message = error_message
         payinfo.confirm_time = None
         payinfo.save()
-
-        # TODO 取款失败回滚时要检测提现费用记录表中的记录, 同时将费用重新增加到账户余额中
 
         # 短信通知添加用户名
         user = request.user
@@ -856,8 +858,6 @@ class FEEAPIView(APIView):
                 return {"ret_code": 30134, 'message': u'金额格式错误'}
 
         # 检测银行的单笔最大提现限额,如民生银行
-
-        print bank_id
         bank = Bank.objects.filter(code=bank_id.upper()).first()
         if bank and bank.withdraw_limit:
             bank_limit = util.handle_withdraw_limit(bank.withdraw_limit)
@@ -872,7 +872,7 @@ class FEEAPIView(APIView):
 
         actual_amount = amount - fee - management_fee  # 实际到账金额
         if actual_amount <= 0:
-            return {"ret_code": 30136, "message": u'实际到账金额为0,提现失败'}
+            return {"ret_code": 30136, "message": u'实际到账金额为0,无法提现'}
 
         return Response({
             "ret_code": 0,
@@ -881,6 +881,7 @@ class FEEAPIView(APIView):
             "management_fee": management_fee,  # 管理费
             "management_amount": management_amount,  # 计算管理费的金额
         })
+
 
 class TradeRecordAPIView(APIView):
     permission_classes = (IsAuthenticated, )
