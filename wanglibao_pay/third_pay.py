@@ -422,7 +422,7 @@ def bind_pay_deposit(request):
         return YeeShortPay().pre_pay(request)
 
     elif bank.channel == 'kuaipay':
-        return KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, device, ip)
+        return KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, device, ip, request)
 
     else:
         return {"ret_code": 20004, "message": "请选择支付渠道"}
