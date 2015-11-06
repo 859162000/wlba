@@ -28,8 +28,8 @@ urlpatterns = patterns(
     url(r'^more/$', TemplateView.as_view(template_name="weixin_more.jade")),
     url(r'^more/contactus/$', TemplateView.as_view(template_name="weixin_contactus.jade")),
     url(r'^more/aboutus/$', TemplateView.as_view(template_name="weixin_aboutus.jade")),
-    url(r'bind/login/$', views.WeixinBindLogin.as_view(), name='weixin_bind_login'),
-    url(r'bind/register/$', views.WeixinBindRegister.as_view(), name='weixin_bind_register'),
+    url(r'bind/login/$', views.WeixinBindLogin.as_view(), name='sub_login'),
+    url(r'bind/register/$', views.WeixinBindRegister.as_view(), name='sub_register'),
     url(r'weixin_unbind/$', views.UnBindWeiUser.as_view(), name='weixin_unbind'),
     url(r'^reward/(?P<status>\w+)/$', login_required(views.WeixinCouponList.as_view(), login_url='/weixin/login/')),
 
@@ -53,6 +53,7 @@ urlpatterns = patterns(
     url(r'^unbind_success/$', TemplateView.as_view(template_name="sub_unbind_success.jade")),
     url(r'^award_index/$', TemplateView.as_view(template_name="sub_award.jade")),
     url(r'^award_rule/$', TemplateView.as_view(template_name="sub_award_rule.jade")),
+    url(r'^sub_code/$', TemplateView.as_view(template_name="sub_code.jade")),
 
 )
 
