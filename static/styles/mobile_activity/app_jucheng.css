@@ -218,3 +218,10 @@
 	border: 0;
 	-webkit-appearance: none;
 }
+.xun-p{
+  	font-size: 0.6rem;
+  	text-align: right;
+  	margin-right: 0px;
+  	padding-top:0.5rem;
+	color:#ff5252;
+}
