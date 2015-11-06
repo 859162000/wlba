@@ -15,6 +15,7 @@ from wanglibao_pay.models import PayInfo, Bank, Card
 from order.utils import OrderHelper
 from order.models import Order
 from wanglibao_margin.marginkeeper import MarginKeeper
+from wanglibao_account.cooperation import CoopRegister
 from wanglibao_sms.utils import validate_validation_code
 from marketing import tools
 from fee import WithdrawFee
@@ -433,10 +434,28 @@ def bind_pay_deposit(request):
         return HuifuShortPay().pre_pay(request)
 
     elif bank.channel == 'yeepay':
-        return YeeShortPay().pre_pay(request)
+        result = YeeShortPay().pre_pay(request)
+
+        if result['ret_code'] == 0:
+            try:
+                # 处理第三方用户充值回调
+                CoopRegister(request).process_for_recharge(request.user)
+            except Exception, e:
+                logger.error(e)
+
+        return result
 
     elif bank.channel == 'kuaipay':
-        return KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, device, ip)
+        result = KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, device, ip)
+
+        if result['ret_code'] == 0:
+            try:
+                # 处理第三方用户充值回调
+                CoopRegister(request).process_for_recharge(request.user)
+            except Exception, e:
+                logger.error(e)
+
+        return result
 
     else:
         return {"ret_code": 20004, "message": "请选择支付渠道"}
