@@ -2434,7 +2434,7 @@ class JrjiaP2PInvestView(APIView):
                     dic = dict()
                     dic['prodId'] = str(product.id)
                     dic['username'] = equity.user.wanglibaouserprofile.name
-                    dic['investTime'] = equity.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                    dic['investTime'] = equity.created_at.strftime('%Y-%m-%d %H:%M:%S')
                     dic['investAmount'] = equity.equity
                     dic['reqId'] = Binding.objects.get(user=equity.user).bid
                     data.append(dic)
