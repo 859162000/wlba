@@ -299,7 +299,7 @@ class WeixinShareDetailView(TemplateView):
                 index += 1
 
             tmp_dict = {item["sort_by"]: item for item in ret_value}
-            ret_value = [tmp_dict[key] for key in sorted(tmp_dict.keys())]
+            ret_value = [tmp_dict[key] for key in sorted(tmp_dict.keys(), reverse=True)]
             self.debug_msg('所有获奖信息返回前端:%s' % (ret_value,))
             return ret_value
 
@@ -352,7 +352,10 @@ class WeixinShareDetailView(TemplateView):
                     "share": {'content': share_title, 'title': share_content, 'url': url}
                 }
         else:
-            has_gift = 'true'
+            if phone_num == user_gift.identity:
+                has_gift = 'false'
+            else:
+                has_gift = 'true'
             self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s' %(openid, user_gift.identity, user_gift, ))
         gifts = self.get_distribute_status(order_id, activity)
         share_title, share_content, url = get_share_infos(order_id)
@@ -450,7 +453,7 @@ class WeixinShareEndView(TemplateView):
             index += 1
 
         tmp_dict = {item["sort_by"]: item for item in ret_value}
-        ret_value = [tmp_dict[key] for key in sorted(tmp_dict.keys())]
+        ret_value = [tmp_dict[key] for key in sorted(tmp_dict.keys(), reverse=True)]
         logger.debug('所有获奖信息返回前端:%s' % (ret_value,))
         return ret_value
 
