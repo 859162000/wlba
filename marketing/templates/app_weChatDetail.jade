@@ -7,12 +7,12 @@ block content
     img(src='/static/imgs/mobile_activity/app_wechat/default_user.png').default-img
     .default-message
       .message-icon
-      .message-body 哎呦你的手气还不错哦，快去使用吧，和我一起变身土豪。{{has_gift}}
+      .message-body 哎呦你的手气还不错哦，快去使用吧，和我一起变身土豪。
 
   .webchat-redpack-detail
     img(src='/static/imgs/mobile_activity/app_wechat/redpack.png').detail-redpack
     .redpack-message
-      em#amount {{self_gift.amount}}
+      em#amount(data-hasgift='{{{{has_gift}}}}') {{self_gift.amount}}
       em.baifen %
       .amount-name 加息券
 
@@ -47,5 +47,5 @@ block content
   .webchar-deatil-footer
     img(src='/static/imgs/mobile_activity/app_wechat/detail_footer.png')
   script(src="/static/src/mobile/lib/weixin/wx.js")
-  script(data-init='weChatDetail', src='/static/scripts/mobile_activity/weChart_share.js')
+  script(data-init='weChatDetail', src='/static/scripts/mobile_activity/weChart_share.js?v=212')
 

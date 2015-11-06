@@ -87,7 +87,9 @@ org.weChatStart = (function(org){
 org.weChatDetail = (function(org){
     var lib = {
         init:function(){
-            console.log('detail')
+           if($('#amount').attr('data-hasgift') == 'true'){
+               alert('您已经领取过礼物了！')
+           }
         },
     }
     return {
