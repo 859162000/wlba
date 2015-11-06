@@ -42,6 +42,7 @@ from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.forms import verify_captcha
 from wanglibao_app.questions import question_list
 from wanglibao_margin.models import MarginRecord
+from wanglibao_rest import utils
 
 logger = logging.getLogger(__name__)
 
@@ -368,12 +369,16 @@ class SendValidationCodeView(APIView):
             descrpition: if(line299~line304)的修改，app端增加图片校验码验证
         """
         phone_number = phone.strip()
-        if not AntiForAllClient(request).anti_special_channel():
-            res, message = False, u"请输入验证码"
-        else:
-            res, message = verify_captcha(request.POST)
-        if not res:
-            return Response({"ret_code": 40044, "message": message})
+        device = utils.split_ua(request)
+        device_type = utils.decide_device(device['device_type'])
+        if device_type == 'ios' or device_type == 'android':
+            if device('app_version') < "2.6.3":
+                if not AntiForAllClient(request).anti_special_channel():
+                    res, message = False, u"请输入验证码"
+                else:
+                    res, message = verify_captcha(request.POST)
+                if not res:
+                    return Response({"ret_code": 40044, "message": message})
 
         status, message = send_validation_code(phone_number, ip=get_client_ip(request))
         if status != 200:
