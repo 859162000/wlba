@@ -99,7 +99,7 @@ urlpatterns = patterns(
     url(r'^lottery/', include('wanglibao_lottery.urls')),
     url(r'^landpage/', landpage_view),
 
-    #url(r'^finance', TemplateView.as_view(template_name="financing.jade")),
+    url(r'^finance', TemplateView.as_view(template_name="financing.jade")),
 )
 
 urlpatterns += patterns(

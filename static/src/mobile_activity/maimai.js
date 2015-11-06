@@ -1,6 +1,4 @@
 
-
-
 org.mmIndex = (function(org){
     var lib = {
         $body_h : $('.maimai-check-body'),
@@ -12,6 +10,7 @@ org.mmIndex = (function(org){
         $nbsp : $('.maimai-sign-margin'),
         $validation: $('.check-submit'),
         checkState: null,
+        intervalId: null,
         init: function(){
             lib._submit();
             lib.listen();
@@ -86,7 +85,7 @@ org.mmIndex = (function(org){
         _submit: function(){
             var _self = this;
 
-            //提交按钮
+            //提交按钮22
             _self.$submit.on('click', function(){
                 if(_self.$phone.attr('data-existing') === 'true'){
                     $(document.body).trigger('from:check', [_self.checkfilter(1), false]);
@@ -127,6 +126,11 @@ org.mmIndex = (function(org){
                         success: function(data){
                             if(data.ret_code == 0){
                                 window.location.href = '/activity/maimai_success/?state=2'
+                            }else{
+                                $(document.body).trigger('from:error',[data.message, true]);
+                                clearInterval(_self.intervalId);
+                                $('.check-submit').text('短信验证码').removeAttr('disabled').removeClass('postValidation')
+                                return $(document.body).trigger('from:captcha');
                             }
                         },
                         error: function(data){
@@ -231,8 +235,7 @@ org.mmIndex = (function(org){
         _fetchValidation:function(){
             var
                 _self = this,
-                count = 60,  //60秒倒计时
-                intervalId ; //定时器
+                count = 60;  //60秒倒计时
 
             $(document.body).trigger('from:check', [lib.checkfilter(2), false, true, true]);
 
@@ -247,7 +250,7 @@ org.mmIndex = (function(org){
                 },
                 type : 'POST',
                 error :function(xhr){
-                    clearInterval(intervalId);
+                    clearInterval(_self.intervalId);
                     var result = JSON.parse(xhr.responseText);
                     $('.check-submit').text('短信验证码').removeAttr('disabled').removeClass('postValidation');
                     $(document.body).trigger('from:error',[result.message, true]);
@@ -260,13 +263,13 @@ org.mmIndex = (function(org){
                     count--;
                     return $('.check-submit').text(count + '秒后可重发');
                 } else {
-                    clearInterval(intervalId);
+                    clearInterval(_self.intervalId);
                     $('.check-submit').text('重新获取').removeAttr('disabled').removeClass('postValidation')
                     return $(document.body).trigger('from:captcha');
                 }
             };
             timerFunction();
-            return intervalId = setInterval(timerFunction, 1000);
+            return _self.intervalId = setInterval(timerFunction, 1000);
 
         },
         /*
@@ -304,24 +307,30 @@ org.success = (function(org){
         init:function(){
             var
                 state = org.getQueryStringByName('state')*1,
-                str = '',
-                val = null;
+                str = null,
+                val = null,
+                url = null;
 
                 if(state === 0){
                     str = '成功领取';
-                    val = '1.5%加息券';
+                    val = '1.1%加息券';
+                    url = '/weixin/login/';
                 }else if(state === 1){
                     str = '您已领取过奖品!';
                     val = null;
+                    url = '/weixin/login/';
                 }else if(state === 2){
                     str = '成功领取';
                     val = '120元红包';
+                    url = '/weixin/list/';
                 }
                 $('.maimai-title').html(str);
                 if(val){
                     $('.maimai-money').html(val);
                 }
-
+            $('.maimai-use-btn').on('click', function(){
+                window.location.href = url;
+            });
 
             var mySwiper = new Swiper('.swiper-container', {
                 pagination: '.swiper-pagination-maimai',

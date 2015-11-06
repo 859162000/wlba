@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 import logging
+from django.contrib.auth.models import User
 
 from django.db import transaction
 from django.utils import timezone
@@ -31,7 +32,7 @@ class P2PTrader(object):
     def __init__(self, product, user, order_id=None, request=None):
         self.user = user
         self.product = product
-
+        
         if self.product.status != u"正在招标":
             raise P2PException(u'购买的标不在招标状态')
 
@@ -78,7 +79,7 @@ class P2PTrader(object):
                 if result['rtype'] != 'interest_coupon':
                     red_record = self.margin_keeper.redpack_deposit(result['deduct'], u"购买P2P抵扣%s元" % result['deduct'],
                                                                     order_id=redpack_order_id, savepoint=False)
-                OrderHelper.update_order(Order.objects.get(pk=redpack_order_id), user=self.user, status=u'成功',
+                OrderHelper.update_order(Order.objects.get(pk=redpack_order_id), user=self.user, status=u'成功', 
                                         amount=amount, deduct=result['deduct'], redpack=redpack)
 
             product_record = self.product_keeper.reserve(amount, self.user, savepoint=False, platform=platform)
@@ -90,9 +91,10 @@ class P2PTrader(object):
             if product_record.product_balance_after <= 0:
                 is_full = True
 
+        # fix@chenweibi, add order_id
         tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount,
-                                               "device": self.device, "product_id": self.product.id,
-                                               "is_full": is_full})
+                                               "device": self.device, "order_id": self.order_id,
+                                               "product_id": self.product.id, "is_full": is_full})
 
         # 投标成功发站内信
         matches = re.search(u'日计息', self.product.pay_method)

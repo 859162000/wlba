@@ -4,6 +4,7 @@ import decimal
 import json
 import urllib2
 from django.utils.http import urlencode
+import pytz
 from wanglibao_account.utils import str_to_float
 
 if __name__ == '__main__':
@@ -20,10 +21,12 @@ from django.contrib.auth.models import User
 from django.db.models import Sum, Q, Count
 from django.http import HttpResponse
 from django.utils import timezone
+from wanglibao_account import message as inside_message
+from wanglibao_sms.tasks import send_messages
 import requests
 from rest_framework import renderers
 from rest_framework.views import APIView
-from marketing.models import Channels, IntroducedBy, PromotionToken
+from marketing.models import Channels, IntroducedBy, PromotionToken, GiftOwnerInfo, GiftOwnerGlobalInfo
 from marketing.utils import set_promo_user, get_channel_record, get_user_channel_record
 from wanglibao import settings
 from wanglibao_redpack import backends as redpack_backends
@@ -50,7 +53,7 @@ from dateutil.relativedelta import relativedelta
 from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes, hex2bin
 from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift
-from wanglibao_rest.utils import check_mobile
+from user_agents import parse
 import uuid
 import urllib
 
@@ -882,7 +885,9 @@ class ZhiTuiRegister(CoopRegister):
             if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
                 period = (invest_time + relativedelta(months=period) - invest_time).days
 
-            if check_mobile(self.request):
+            ua_string = self.request.META.get('HTTP_USER_AGENT', '')
+            user_agent = parse(ua_string)
+            if user_agent.is_mobile:
                 note = 'wap'
             else:
                 note = 'pc'
@@ -978,6 +983,55 @@ class ZGDXRegister(CoopRegister):
                 else:
                     plat_offer_id = '103050'
                 self.zgdx_call_back(user, plat_offer_id)
+
+
+class JuChengRegister(CoopRegister):
+    def __init__(self, request):
+        super(JuChengRegister, self).__init__(request)
+        self.c_code = 'jcw'
+        self.invite_code = 'jcw'
+
+    def purchase_call_back(self, user):
+        binding = Binding.objects.filter(user_id=user.id).first()
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
+        SEND_SUCCESS = None
+        if binding and p2p_record.count() == 1:
+            p2p_amount = int(p2p_record.first().amount)
+            if p2p_amount>=1000 and p2p_amount<2000:
+                try:
+                    config = GiftOwnerGlobalInfo.objects.select_for_update(description=u'jcw_ticket_80').first()
+                except Exception, reason:
+                    logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
+                    raise
+                if config and config.amount > 0:
+                    config.amount -= 1
+                    config.save()
+                    logger.debug(u"用户 %s 获得80门票一张" % (user))
+                    SEND_SUCCESS = True
+
+            if p2p_amount>=2000:
+                try:
+                    config = GiftOwnerGlobalInfo.objects.select_for_update(description=u'jcw_ticket_188').first()
+                except Exception, reason:
+                    logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
+                    raise
+                if config and config.amount>0:
+                        config.amount -= 1
+                        logger.debug(u"获奖用户(%s)得到188门票一张 " % (user,))
+                        config.save()
+                        SEND_SUCCESS = True
+
+            if SEND_SUCCESS:
+                send_messages.apply_async(kwargs={
+                    "phones": [user.wanglibaouserprofile.phone, ],
+                    "messages": [u'[网利科技]您已成功获得门票，请于演出当天到北京音乐铁一楼大厅票务兑换处领取，咨询电话:13581710219', ]
+                })
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id": user.id,
+                    "title": u"演出门票赠送",
+                    "content": u'[网利科技]您已成功获得门票，请于演出当天到北京音乐铁一楼大厅票务兑换处领取，咨询电话:13581710219',
+                    "mtype": "activity"
+                })
 
 
 class WeixinRedpackRegister(CoopRegister):
@@ -1085,7 +1139,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
                           ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
-                          XunleiVipRegister]
+                          XunleiVipRegister, JuChengRegister, ]
 
 
 #######################第三方用户查询#####################
@@ -2236,3 +2290,298 @@ def zhongjin_list_p2p():
     url = zhongjin_get_sign(args_dict)
 
     return url
+
+
+# 金融加渠道
+# 自动注册登录在 wanglibao_account/views.py JrjiaAutoRegisterView
+class JrjiaCPSView(APIView):
+    """
+    接口示例：http://api.xxx.com/cps?src=jsrjia&time=14233469890
+    """
+
+    permission_classes = ()
+
+    def get(self, request):
+        """
+        """
+        source = self.request.GET.get('src', None)
+        start = self.request.GET.get('time', None)
+        ret = dict()
+        data = []
+
+        if source == 'jrjia' and int(start) > 0:
+            timeArray = time.localtime(int(start))
+            check_time = timezone.datetime(year=timeArray.tm_year,
+                                           month=timeArray.tm_mon,
+                                           day=timeArray.tm_mday,
+                                           hour=timeArray.tm_hour,
+                                           minute=timeArray.tm_min,
+                                           second=timeArray.tm_sec).replace(tzinfo=pytz.UTC)
+            jrjia_bindings = Binding.objects.filter(btype='jrjia')
+            jrjia_users = [binding.user for binding in jrjia_bindings]
+            equities = P2PEquity.objects.filter(user__in=jrjia_users, created_at__gte=check_time)
+
+            for equity in equities:
+                data_dic = dict()
+                data_dic['reqId'] = Binding.objects.get(user=equity.user).bid
+                data_dic['prodIdAct'] = equity.product.pk
+                data_dic['purchaseTime'] = int(time.mktime(equity.created_at.timetuple()))
+                data_dic['investAmount'] = equity.equity
+                data_dic['investDuration'] = equity.product.period
+                data_dic['investDurationUnit'] = 1 if equity.product.pay_method.startswith(u"日计息") else 2
+                data_dic['returnRate'] = equity.product.expected_earning_rate
+                try:
+                    data_dic['startDate'] = int(time.mktime(equity.product.make_loans_time.timetuple()))
+                except Exception, e:
+                    print 'get startDate error: {}'.format(e)
+                    data_dic['startDate'] = None
+
+                data.append(data_dic)
+
+            ret['data'] = data
+            ret['result'] = 'ok'
+            ret['errMsg'] = None
+            return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+        else:
+            ret['result'] = 'error'
+            ret['errMsg'] = u'参数错误'
+            ret['data'] = data
+
+            return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class JrjiaP2PStatusView(APIView):
+    """
+    author: Zhoudong
+    http请求方式: GET  P2P标的的售卖进度
+    http://api.xxx.com/pstatus?src=jrjia&prodId=123
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    def get(self, request):
+
+        source = self.request.GET.get('src', None)
+        pid = self.request.GET.get('prodId', None)
+        ret = dict()
+
+        if source == u'jrjia' and int(pid) > 0:
+            try:
+                product = P2PProduct.objects.get(pk=pid)
+            except Exception, e:
+                ret['result'] = 'err'
+                ret['errMsg'] = u'未找到该标： {}'.format(e)
+                return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+            if product:
+                ret['result'] = 'ok'
+                ret['errMsg'] = None
+                data = dict()
+
+                data['prodId'] = str(product.pk)
+                data['totalAmount'] = product.total_amount
+                data['soldAmount'] = product.ordered_amount
+                data['userCount'] = "%.2f" % product.completion_rate
+
+                ret['data'] = data
+        elif int(pid) <= 0:
+            ret = {
+                'result': 'err',
+                'errMsg': u"标id错误"
+            }
+        else:
+            ret = {
+                'result': 'err',
+                'errMsg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class JrjiaP2PInvestView(APIView):
+    """
+    author: Zhoudong
+    http请求方式: GET  P2P标的的售卖进度
+    http://api.xxx.com/pinvest?src=jrjia&prodId=123&time=1423469890
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    def get(self, request):
+        ret = dict()
+
+        source = self.request.GET.get('src', None)
+        pid = self.request.GET.get('prodId', None)
+        start = self.request.GET.get('time', None)
+
+        if source == u'jrjia' and int(pid) > 0 and int(start) > 0:
+            timeArray = time.localtime(int(start))
+            check_time = timezone.datetime(year=timeArray.tm_year,
+                                           month=timeArray.tm_mon,
+                                           day=timeArray.tm_mday,
+                                           hour=timeArray.tm_hour,
+                                           minute=timeArray.tm_min,
+                                           second=timeArray.tm_sec).replace(tzinfo=pytz.UTC)
+            try:
+                data = []
+                jrjia_bindings = Binding.objects.filter(btype='jrjia')
+                jrjia_users = [binding.user for binding in jrjia_bindings]
+                product = P2PProduct.objects.get(pk=pid)
+                equities = P2PEquity.objects.filter(created_at__gte=check_time, user__in=jrjia_users)
+                for equity in equities:
+                    dic = dict()
+                    dic['prodId'] = str(product.id)
+                    dic['username'] = equity.user.wanglibaouserprofile.name
+                    dic['investTime'] = equity.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                    dic['investAmount'] = equity.equity
+                    dic['reqId'] = Binding.objects.get(user=equity.user).bid
+                    data.append(dic)
+
+                ret['data'] = data
+                ret['result'] = 'ok'
+                ret['errMsg'] = None
+
+            except Exception, e:
+                ret['result'] = 'err'
+                ret['errMsg'] = u'未找到该标： {}'.format(e)
+                return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+        elif int(pid) <= 0:
+            ret = {
+                'result': 'err',
+                'errMsg': u"标id错误"
+            }
+        else:
+            ret = {
+                'result': 'err',
+                'errMsg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class JrjiaReportView(APIView):
+    """
+    author: Zhoudong
+    http请求方式: GET  该接口返回指定日期的数据日报，包括成交金额、成交笔数、参与人数和年化收益率等指标
+    http://api.xxx.com/report?src=jrjia&date=20150825
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    def get(self, request):
+        ret = dict()
+
+        source = self.request.GET.get('src', None)
+        time_str = self.request.GET.get('date', None)
+
+        if source == u'jrjia':
+            try:
+                data = dict()
+                start_date = datetime.datetime.strptime(time_str, "%Y%m%d")
+
+                time_zone = settings.TIME_ZONE
+                local = pytz.timezone(time_zone)
+                local_dt = local.localize(start_date, is_dst=None)
+                start = local_dt.astimezone(pytz.utc)
+
+                equities = P2PEquity.objects.filter(created_at__gt=start,
+                                                    created_at__lte=(start + timezone.timedelta(days=1)))
+
+                data['statDate'] = start_date.strftime("%Y-%m-%d")
+                data['investAmount'] = equities.aggregate(Sum('equity'))['equity__sum']
+                data['investCount'] = equities.count()
+                data['investUser'] = equities.values_list('user', flat=True).distinct().count()
+                products = P2PProduct.objects.filter(publish_time__gt=start,
+                                                     publish_time__lte=(start + timezone.timedelta(days=1)))
+                data['returnRate'] = round(products.aggregate(Sum('expected_earning_rate'))
+                                           ['expected_earning_rate__sum'] / products.count(), 2)
+
+                ret['data'] = data
+                ret['result'] = 'ok'
+                ret['errMsg'] = None
+
+            except Exception, e:
+                ret['result'] = 'err'
+                ret['errMsg'] = u'数据错误： {}'.format(e)
+                return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+        else:
+            ret = {
+                'result': 'err',
+                'errMsg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class JrjiaUsStatusView(APIView):
+    """
+    http请求方式: GET  返回指定时间以后的所有从”金融加”带来的用户的最终状态（状态包括：注册、实名认证、绑卡、充值）
+                        按照注册、实名认证、绑卡、充值的顺序
+    http://api.xxx.com/ustatus?src=jrjia&time=14233469890
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    def get(self, request):
+        ret = dict()
+
+        source = self.request.GET.get('src', None)
+        start = self.request.GET.get('time', None)
+
+        if source == u'jrjia' and int(start) > 0:
+            try:
+                data = []
+
+                # bindings = Binding.objects.filter(btype='jrjia', created_at__gt=int(start))
+                bindings = Binding.objects.all()
+                jrjia_users = set([b.user for b in bindings])
+
+                # equities = P2PEquity.objects.filter(user__in=jrjia_users, equity__gt=100)
+                deposits = PayInfo.objects.filter(user__in=jrjia_users, type=u'D')
+                cards = Card.objects.filter(user__in=jrjia_users)
+                identifies = WanglibaoUserProfile.objects.filter(user__in=jrjia_users, id_is_valid=True)
+
+                # invested_users = set([equity.user for equity in equities])
+                deposited_users = set([deposit.user for deposit in deposits])
+                binding_users = set([card.user for card in cards])
+                identify_users = set([identify.user for identify in identifies])
+
+                for user in jrjia_users:
+                    dic = dict()
+                    dic['reqId'] = Binding.objects.get(user=user).bid
+                    if user in deposited_users:
+                        status = 4
+                    elif user in binding_users:
+                        status = 3
+                    elif user in identify_users:
+                        status = 2
+                    else:
+                        status = 1
+                    dic['actionTime'] = status
+                    dic['payAmount'] = Binding.objects.get(user=user).bid
+                    try:
+                        dic['userAccount'] = user.wanglibaouserprofile.phone
+                    except Exception, e:
+                        print 'user {} profile error: {}'.format(user.id, e)
+
+                    data.append(dic)
+
+                ret['data'] = data
+                ret['result'] = 'ok'
+                ret['errMsg'] = None
+
+            except Exception, e:
+                ret['result'] = 'err'
+                ret['errMsg'] = u'数据错误： {}'.format(e)
+                return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+        else:
+            ret = {
+                'result': 'err',
+                'errMsg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
