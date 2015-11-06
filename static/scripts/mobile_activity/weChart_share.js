@@ -340,7 +340,11 @@ org.weChatStart = (function(org){
 org.weChatDetail = (function(org){
     var lib = {
         init:function(){
-
+            window.onload = function(){
+              if($('#amount').attr('data-hasgift') == 'true'){
+                 org.ui.alert('您已经领取过礼物了！');
+              }
+            }
         },
     }
     return {
@@ -351,11 +355,7 @@ org.weChatDetail = (function(org){
 org.weChatEnd = (function(org){
     var lib = {
         init:function(){
-            window.onload = function(){
-              if($('#amount').attr('data-hasgift') == 'true'){
-                 org.ui.alert('您已经领取过礼物了！');
-              }
-            }
+
         },
     }
     return {
