@@ -411,6 +411,20 @@ class WeixinShareDetailView(TemplateView):
 class WeixinShareEndView(TemplateView):
     template_name = 'app_weChatEnd.jade'
 
+    def get_react_text(self, index):
+        text = [u'感谢土豪，加息券已到手！',
+                u'这次，终于让我抢到啦！',
+                u'哈哈，轻松一点，加息到手！',
+                u'下次一定抢到2%加息券！',
+                u'我去使用加息券喽，拜拜~',
+                u'大家手气如何啊？！',
+                u'太险了，差一点没抢到。',
+                u'感谢土豪，带我飞。',
+                u'投资就能发加息福袋啦？',
+                u'土豪，传授下投资经验吧'
+                ]
+        return text[index]
+
     def get_distribute_status(self, order_id):
         """
             获得用户领奖信息
@@ -419,17 +433,17 @@ class WeixinShareEndView(TemplateView):
             gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, valid=2).all()
             return gifts
         except Exception, reason:
-            self.exception_msg(reason, u'获取已领奖用户信息失败')
+            logger.debug(reason, u'获取已领奖用户信息失败')
             return None
     def format_response_data(self, gifts):
         if gifts == None:
             return None
 
         user_info = {gift.identity: gift for gift in gifts}
-        self.debug_msg("format_response_data, 已经领取的 奖品 的key值序列：%s" %(user_info.keys(),))
+        logger.debug("format_response_data, 已经领取的 奖品 的key值序列：%s" %(user_info.keys(),))
         QSet = WeixinUser.objects.filter(openid__in=user_info.keys())
         weixins = {item.openid: item for item in QSet}
-        self.debug_msg("format_response_data, 已经领取的 用户 的key值序列：%s" %(weixins.keys(),))
+        logger.debug("format_response_data, 已经领取的 用户 的key值序列：%s" %(weixins.keys(),))
         ret_value = list()
         index = 0
         for key in weixins.keys():
@@ -443,7 +457,7 @@ class WeixinShareEndView(TemplateView):
 
         tmp_dict = {item["sort_by"]: item for item in ret_value}
         ret_value = [tmp_dict[key] for key in sorted(tmp_dict.keys())]
-        self.debug_msg('所有获奖信息返回前端:%s' % (ret_value,))
+        logger.debug('所有获奖信息返回前端:%s' % (ret_value,))
         return ret_value
 
     def get_context_data(self, **kwargs):
