@@ -122,8 +122,12 @@ class PayView(TemplateView):
             pay_info.save()
             OrderHelper.update_order(order, request.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
 
-            # 处理第三方渠道的用户充值回调
-            CoopRegister(request).process_for_recharge(request.user)
+            try:
+                # 处理第三方用户充值回调
+                CoopRegister(request).process_for_recharge(request.user)
+            except Exception, e:
+                logger.error(e)
+
         except decimal.DecimalException:
             message = u'金额格式错误'
         except Bank.DoesNotExist:
@@ -369,8 +373,11 @@ class CardViewSet(ModelViewSet):
 
         card.save()
 
-        #处理第三方渠道回调
-        CoopRegister(request).process_for_binding_card(request.user)
+        try:
+            # 处理第三方用户绑卡回调
+            CoopRegister(request).process_for_binding_card(request.user)
+        except Exception, e:
+            logger.error(e)
 
         return Response({
             'id': card.pk,
@@ -652,6 +659,14 @@ class YeePayAppPayView(APIView):
     def post(self, request):
         yeepay = third_pay.YeePay()
         result = yeepay.app_pay(request)
+
+        if result['ret_code'] == 0:
+            try:
+                # 处理第三方用户充值回调
+                CoopRegister(request).process_for_recharge(request.user)
+            except Exception, e:
+                logger.error(e)
+
         return Response(result)
 
 #易宝支付回调
@@ -705,6 +720,14 @@ class BindPayView(APIView):
     def post(self, request):
         pay = third_pay.KuaiPay()
         result = pay.pre_pay(request)
+
+        if result['ret_code'] == 0:
+            try:
+                # 处理第三方用户充值回调
+                CoopRegister(request).process_for_recharge(request.user)
+            except Exception, e:
+                logger.error(e)
+
         return Response(result)
 
 

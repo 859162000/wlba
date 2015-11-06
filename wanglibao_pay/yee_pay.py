@@ -27,6 +27,7 @@ from Crypto.Signature import PKCS1_v1_5 as pk
 from Crypto.Cipher import PKCS1_v1_5, AES
 import base64
 from wanglibao_rest.utils import split_ua
+from wanglibao_account.cooperation import CoopRegister
 
 logger = logging.getLogger(__name__)
 
@@ -550,21 +551,31 @@ class YeeShortPay:
         post['userip'] = util.get_client_ip(request)
         return self._request_yee(url=self.BIND_PAY_REQUEST, data=post)
 
-    def add_card_unbind(self, user, card_no, bank):
+    def add_card_unbind(self, user, card_no, bank, request):
         """ 保存卡信息到个人名下，不绑定任何渠道 """
         if len(card_no) == 10:
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
         else:
             card = Card.objects.filter(no=card_no, user=user).first()
 
+        add_card = False
         if not card:
             card = Card()
             card.user = user
             card.no = card_no
             card.is_default = False
 
+            add_card = True
+
         card.bank = bank
         card.save()
+        if add_card:
+            try:
+                # 处理第三方用户绑卡回调
+                CoopRegister(request).process_for_binding_card(request.user)
+            except Exception, e:
+                logger.error(e)
+
         return card
 
     def pre_pay(self, request):
@@ -611,7 +622,7 @@ class YeeShortPay:
             card = Card.objects.filter(no=card_no, user=user).first()
 
         if not card:
-            card = self.add_card_unbind(user, card_no, bank)
+            card = self.add_card_unbind(user, card_no, bank, request)
 
         if not card and not bank:
             return {'ret_code': 200117, 'message': '卡号不存在或银行不存在'}
