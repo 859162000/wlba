@@ -1,6 +1,4 @@
 
-
-
 org.mmIndex = (function(org){
     var lib = {
         $body_h : $('.maimai-check-body'),

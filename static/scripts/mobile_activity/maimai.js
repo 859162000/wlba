@@ -218,8 +218,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }
 })();
 ;
-
-
 org.mmIndex = (function(org){
     var lib = {
         $body_h : $('.maimai-check-body'),
