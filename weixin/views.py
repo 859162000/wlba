@@ -1341,9 +1341,10 @@ class GenerateQRLimitSceneTicket(APIView):
         qrcode_data = {"action_name":"QR_LIMIT_SCENE", "action_info":{"scene": {"scene_id": uid}}}
         try:
             rs = client.qrcode.create(qrcode_data)
+            qrcode_url = client.qrcode.get_url(rs.get('ticket'))
         except WeChatException,e:
             return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
-        return Response(rs)
+        return Response({'qrcode_url':qrcode_url})
 
 class WeixinCouponList(TemplateView):
     template_name = 'weixin_reward.jade'
