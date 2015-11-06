@@ -299,7 +299,7 @@ class WeixinShareDetailView(TemplateView):
                 index += 1
 
             tmp_dict = {item["sort_by"]: item for item in ret_value}
-            ret_value = [tmp_dict[key] for key in sorted(tmp_dict.keys())]
+            ret_value = [tmp_dict[key] for key in sorted(tmp_dict.keys(), reverse=True)]
             self.debug_msg('所有获奖信息返回前端:%s' % (ret_value,))
             return ret_value
 
@@ -450,7 +450,7 @@ class WeixinShareEndView(TemplateView):
             index += 1
 
         tmp_dict = {item["sort_by"]: item for item in ret_value}
-        ret_value = [tmp_dict[key] for key in sorted(tmp_dict.keys())]
+        ret_value = [tmp_dict[key] for key in sorted(tmp_dict.keys(), reverse=True)]
         logger.debug('所有获奖信息返回前端:%s' % (ret_value,))
         return ret_value
 
