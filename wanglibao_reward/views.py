@@ -159,7 +159,7 @@ class WeixinShareDetailView(TemplateView):
                 logger.debug("判断用户是否用此手机号在别的微信上领取过phone: %s, openid:%s, order_id:%s" %(phone_num, openid, order_id))
                 award_user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity=str(phone_num), activity=self.activity).first()
             else:
-                award_user_gift = WanglibaoUserGift.objects.filter(rules=user_gift.rules).exclude(identity=(str(openid))).first()
+                award_user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity).exclude(identity=(str(openid))).first()
                 logger.debug("已经从数据库里查到用户(%s)的领奖记录, openid:%s, order_id:%s" %(award_user_gift.identity, openid, order_id))
             return award_user_gift
         except Exception, reason:
@@ -238,7 +238,7 @@ class WeixinShareDetailView(TemplateView):
         else:
             return 'No Reward'
 
-    def get_distribute_status(self, order_id, activity, openid):
+    def get_distribute_status(self, order_id, activity):
             """
                 获得用户领奖信息
             """
@@ -247,7 +247,7 @@ class WeixinShareDetailView(TemplateView):
 
             try:
                 # modify by hb on 2015-10-15 : 只查询微信号关联记录
-                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity, identity=openid, valid=2).all()
+                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity, valid=2).all()
                 return gifts
             except Exception, reason:
                 self.exception_msg(reason, u'获取已领奖用户信息失败')
@@ -299,7 +299,7 @@ class WeixinShareDetailView(TemplateView):
                 index += 1
 
             tmp_dict = {item["sort_by"]: item for item in ret_value}
-            ret_value = [tmp_dict[key] for key in sorted(tmp_dict.keys())]
+            ret_value = [tmp_dict[key] for key in sorted(tmp_dict.keys(), reverse=True)]
             self.debug_msg('所有获奖信息返回前端:%s' % (ret_value,))
             return ret_value
 
@@ -352,9 +352,12 @@ class WeixinShareDetailView(TemplateView):
                     "share": {'content': share_title, 'title': share_content, 'url': url}
                 }
         else:
-            has_gift = 'true'
+            if phone_num == user_gift.identity:
+                has_gift = 'false'
+            else:
+                has_gift = 'true'
             self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s' %(openid, user_gift.identity, user_gift, ))
-        gifts = self.get_distribute_status(order_id, activity, openid)
+        gifts = self.get_distribute_status(order_id, activity)
         share_title, share_content, url = get_share_infos(order_id)
         return {
             "ret_code": 0,
@@ -419,12 +422,12 @@ class WeixinShareEndView(TemplateView):
                 ]
         return text[index]
 
-    def get_distribute_status(self, order_id, openid):
+    def get_distribute_status(self, order_id):
         """
             获得用户领奖信息
         """
         try:
-            gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, openid=openid, valid=2).all()
+            gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, valid=2).all()
             return gifts
         except Exception, reason:
             logger.debug(reason, u'获取已领奖用户信息失败')
@@ -450,15 +453,14 @@ class WeixinShareEndView(TemplateView):
             index += 1
 
         tmp_dict = {item["sort_by"]: item for item in ret_value}
-        ret_value = [tmp_dict[key] for key in sorted(tmp_dict.keys())]
+        ret_value = [tmp_dict[key] for key in sorted(tmp_dict.keys(), reverse=True)]
         logger.debug('所有获奖信息返回前端:%s' % (ret_value,))
         return ret_value
 
     def get_context_data(self, **kwargs):
         order_id = self.request.GET.get('url_id')
-        openid = self.request.GET.get('openid')
         share_title, share_content, url = get_share_infos(order_id)
-        gifts = self.get_distribute_status(order_id, openid)
+        gifts = self.get_distribute_status(order_id)
         logger.debug("抵达End页面，order_id:%s, URL:%s" %(order_id, url))
         return {
          "all_gift": self.format_response_data(gifts),
@@ -572,7 +574,7 @@ class WeixinShareStartView(TemplateView):
              counts = QSet.count()
              left_counts = QSet.filter(valid=True).count()
              if left_counts == 0 and counts > 0:
-                 return redirect("/weixin_activity/share/end/?url_id=%s&openid=%s" % (order_id, openid))
+                 return redirect("/weixin_activity/share/end/?url_id=%s" % (order_id,))
 
         except Exception, e:
             logger.exception("share-start-view dispatch 跳转的时候报异常")

@@ -42,6 +42,7 @@ from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.forms import verify_captcha
 from wanglibao_app.questions import question_list
 from wanglibao_margin.models import MarginRecord
+from wanglibao_rest import utils
 
 logger = logging.getLogger(__name__)
 
@@ -374,6 +375,20 @@ class SendValidationCodeView(APIView):
             res, message = verify_captcha(request.POST)
         if not res:
             return Response({"ret_code": 40044, "message": message})
+
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
+        if status != 200:
+            return Response({"ret_code": 30044, "message": message})
+
+        return Response({"ret_code": 0, "message": u'验证码发送成功'})
+
+
+class SendValidationCodeNoCaptchaView(APIView):
+    """ app端获取验证码，不在设置状态码， """
+    permission_classes = ()
+
+    def post(self, request, phone):
+        phone_number = phone.strip()
 
         status, message = send_validation_code(phone_number, ip=get_client_ip(request))
         if status != 200:
