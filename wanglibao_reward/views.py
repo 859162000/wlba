@@ -352,7 +352,10 @@ class WeixinShareDetailView(TemplateView):
                     "share": {'content': share_title, 'title': share_content, 'url': url}
                 }
         else:
-            has_gift = 'true'
+            if phone_num == user_gift.identity:
+                has_gift = 'false'
+            else:
+                has_gift = 'true'
             self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s' %(openid, user_gift.identity, user_gift, ))
         gifts = self.get_distribute_status(order_id, activity)
         share_title, share_content, url = get_share_infos(order_id)
