@@ -254,7 +254,7 @@ class RegisterAPIView(APIView):
 
         status, message = validate_validation_code(identifier, validate_code)
         if status != 200:
-            return Response({"ret_code": 30014, "message": u"短信验证码输入错误,status:%s, msg:%s" % (status, message)})
+            return Response({"ret_code": 30014, "message": message, "status":status })
 
         if User.objects.filter(wanglibaouserprofile__phone=identifier).first():
             return Response({"ret_code": 30015, "message": u"该手机号已经注册"})
