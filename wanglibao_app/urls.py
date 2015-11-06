@@ -7,7 +7,7 @@ from wanglibao_app.views import (AppActivateImageAPIView, AppRepaymentAPIView, A
                                  AppGuideView, AppSecureView, AppExploreView, AppP2PProductViewSet, AppRecommendViewSet,
                                  SendValidationCodeView, AppIncomeRateAPIView, AppPhoneBookUploadAPIView,
                                  AppPhoneBookQueryAPIView, AppPhoneBookAlertApiView, AppInviteAllGoldAPIView,
-                                 AppAboutView, AppManagementView)
+                                 AppAboutView, AppManagementView, SendValidationCodeNoCaptchaView)
 
 router = DefaultRouter()
 
@@ -28,6 +28,7 @@ urlpatterns = patterns(
     url(r'^about/$', AppAboutView.as_view()),
     url(r'^team/$', AppManagementView.as_view()),
     url(r'^phone_validation_code/(?P<phone>\d{11})/$', SendValidationCodeView.as_view()),
+    url(r'^phone_validation_code_no_captcha/(?P<phone>\d{11})/$', SendValidationCodeNoCaptchaView.as_view()),
     url(r'^rate/$', AppIncomeRateAPIView.as_view()),
     url(r'^phone/upload/$', AppPhoneBookUploadAPIView.as_view()),
     url(r'^phone/query/$', AppPhoneBookQueryAPIView.as_view()),

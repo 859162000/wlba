@@ -368,16 +368,26 @@ class SendValidationCodeView(APIView):
             descrpition: if(line299~line304)的修改，app端增加图片校验码验证
         """
         phone_number = phone.strip()
-        device = utils.split_ua(request)
-        device_type = utils.decide_device(device['device_type'])
-        if device_type == 'ios' or device_type == 'android':
-            if device('app_version') < "2.6.3":
-                if not AntiForAllClient(request).anti_special_channel():
-                    res, message = False, u"请输入验证码"
-                else:
-                    res, message = verify_captcha(request.POST)
-                if not res:
-                    return Response({"ret_code": 40044, "message": message})
+        if not AntiForAllClient(request).anti_special_channel():
+            res, message = False, u"请输入验证码"
+        else:
+            res, message = verify_captcha(request.POST)
+        if not res:
+            return Response({"ret_code": 40044, "message": message})
+
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
+        if status != 200:
+            return Response({"ret_code": 30044, "message": message})
+
+        return Response({"ret_code": 0, "message": u'验证码发送成功'})
+
+
+class SendValidationCodeNoCaptchaView(APIView):
+    """ app端获取验证码，不在设置状态码， """
+    permission_classes = ()
+
+    def post(self, request, phone):
+        phone_number = phone.strip()
 
         status, message = send_validation_code(phone_number, ip=get_client_ip(request))
         if status != 200:
