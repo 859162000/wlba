@@ -2092,6 +2092,10 @@ class GiftOwnerInfoAPIView(APIView):
 
     def post(self, request):
         action = request.DATA.get('action', 'OTHERS')
+        name = request.DATA.get('name', '')
+        phone = request.DATA.get('phone', '')
+        address = request.DATA.get('address', '')
+
         try:
             (award80, award188) = self.get_left_awards()
         except Exception, reason:
@@ -2161,9 +2165,6 @@ class GiftOwnerInfoAPIView(APIView):
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-        name = request.DATA.get('name', '')
-        phone = request.DATA.get('phone', '')
-        address = request.DATA.get('address', '')
         binding = Binding.objects.filter(user_id=request.user.id).first()
         p2p_record = P2PRecord.objects.filter(user_id=request.user.id, catalog=u'申购')
         if binding and p2p_record.count() == 1:

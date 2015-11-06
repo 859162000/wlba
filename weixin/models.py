@@ -160,10 +160,10 @@ class WeixinAccounts(object):
         'qrcode_url': '/static/imgs/admin/qrcode_for_gh_77c09ff2f3a3_258.jpg'
     }
     account_test = {
-        'id': 'gh_d852bc2cead2',
+        'id': 'gh_32e9dc3fab8e',
         'name': '测试号',
-        'app_id': 'wx22c7a048569d3e7e',
-        'app_secret': '1340e746fb4c3719d405fdc27752bc6f',
+        'app_id': 'wx83535d60d4476686',
+        'app_secret': 'cc9f1b27fc4aea966cbada7f7dfec655',
         'classify': '微信公众平台测试号',
         'token': '6ad01528',
         'qrcode_url': '/static/imgs/admin/qrcode_for_gh_d852bc2cead2_258.jpg'

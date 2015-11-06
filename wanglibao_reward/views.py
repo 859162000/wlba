@@ -163,6 +163,9 @@ class WeixinShareDetailView(TemplateView):
             else:
                 # add by hb on 2015-10-15
                 award_user_gift = WanglibaoUserGift.objects.filter(rules=user_gift.rules).exclude(identity=(str(openid))).first()
+                if not award_user_gift:  #判断用户是否用同一个手机号在别的微信上领取过同一个order
+                    award_user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity=(str(phone_num)), activity=self.activity).first()
+
                 logger.debug("已经从数据库里查到用户(%s)的领奖记录, openid:%s, order_id:%s" %(award_user_gift.identity, openid, order_id))
             return award_user_gift
         except Exception, reason:
@@ -344,6 +347,7 @@ class WeixinShareDetailView(TemplateView):
 
         if not user_gift:
             self.debug_msg('phone:%s 没有领取过奖品' %(phone_num,) )
+            has_gift = 'false'
             user_gift = self.distribute_redpack(phone_num, openid, activity, order_id)
 
             if "No Reward" == user_gift:
@@ -354,11 +358,13 @@ class WeixinShareDetailView(TemplateView):
                     "share": {'content': share_title, 'title': share_content, 'url': url}
                 }
         else:
+            has_gift = 'true'
             self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s' %(openid, user_gift.identity, user_gift, ))
         gifts = self.get_distribute_status(order_id, activity)
         share_title, share_content, url = get_share_infos(order_id)
         return {
             "ret_code": 0,
+            "has_gift": has_gift,
             "self_gift": self.format_response_data(user_gift, openid, 'alone'),
             "all_gift": self.format_response_data(gifts, openid, 'gifts'),
             "share": {'content': share_title, 'title': share_content, 'url': url}

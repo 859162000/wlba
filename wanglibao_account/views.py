@@ -187,7 +187,10 @@ class JrjiaAutoRegisterView(APIView):
         # key = 'jrjia.cn'
         key = 'https://jrjia.cn'
         src = self.request.GET.get('src', None)
-        sign = self.request.GET.get('sign', None).replace(' ', '+')
+        sign = self.request.GET.get('sign', None)
+
+        if ' ' in sign:
+            sign = sign.replace(' ', '+')
 
         if src == 'jrjia':
             # 解密
@@ -199,13 +202,19 @@ class JrjiaAutoRegisterView(APIView):
                 base_str = base64.b64decode(sign)
                 sign_args = eval(decryptor.decrypt(base_str).split('}')[0] + '}')
             except Exception, e:
-                print 'exception error: {}'.format(e)
+                sign = urllib.unquote(sign)
+                base_str = base64.b64decode(sign)
+                sign_args = eval(decryptor.decrypt(base_str).split('}')[0] + '}')
 
             context = {}
             context.update(sign_args)
 
             host = self.request.get_host()
-            next_url = 'http://' + '{}/p2p/detail/{}/'.format(host, sign_args['prodId'])
+            try:
+                next_url = 'http://' + '{}/p2p/detail/{}/'.format(host, sign_args['prodId'])
+            except Exception, e:
+                print 'args error: {}'.format(e)
+                next_url = '/'
             context.update({
                 'next': next_url
             })
@@ -218,13 +227,17 @@ class JrjiaAutoRegisterView(APIView):
         :return:
         """
         args = self.get_context_data()
-        source = args['src']
-        password = str(random.randint(100000, 999999))
-        identifier = args['mobile']
-        req_id = args['reqId']
-        nickname = identifier
-
         redirect_url = args['next']
+
+        try:
+            source = args['src']
+            password = str(random.randint(100000, 999999))
+            identifier = args['mobile']
+            req_id = args['reqId']
+            nickname = identifier
+        except Exception, e:
+            print 'args get error: {}'.format(e)
+            return HttpResponseRedirect(redirect_url)
 
         # 用户已存在， 返回
         if User.objects.filter(wanglibaouserprofile__phone=identifier).first():

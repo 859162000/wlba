@@ -306,7 +306,11 @@ org.weChatStart = (function(org){
 org.weChatDetail = (function(org){
     var lib = {
         init:function(){
-            console.log('detail')
+             window.onload = function(){
+                if($('#amount').attr('data-hasgift') == 'true'){
+                   alert('您已经领取过礼物了！')
+                }
+             }
         },
     }
     return {
