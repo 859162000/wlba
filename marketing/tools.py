@@ -42,8 +42,10 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False)
     # 活动检测
     activity_backends.check_activity(user, 'invest', device_type, amount, product_id, is_full)
     # fix@chenweibi, add order_id
-    utils.log_clientinfo(device, "buy", user_id, order_id, amount)
-
+    try:
+        utils.log_clientinfo(device, "buy", user_id, order_id, amount)
+    except Exception:
+        pass
     # 发送红包
     # send_lottery.apply_async((user_id,))
 
@@ -82,8 +84,10 @@ def register_ok(user_id, device):
     })
     # 活动检测
     activity_backends.check_activity(user, 'register', device_type)
-    utils.log_clientinfo(device, "register", user_id)
-
+    try:
+        utils.log_clientinfo(device, "register", user_id)
+    except Exception:
+        pass
 
 @app.task
 def idvalidate_ok(user_id, device):
@@ -92,11 +96,13 @@ def idvalidate_ok(user_id, device):
 
     # 活动检测
     activity_backends.check_activity(user, 'validation', device_type)
-    utils.log_clientinfo(device, "validation", user_id)
-
+    try:
+        utils.log_clientinfo(device, "validation", user_id)
+    except Exception:
+        pass
 
 @app.task
-def deposit_ok(user_id, amount, device, order_id):
+def deposit_ok(user_id, amount, device, order_id=0):
     # fix@chenweibi, add order_id
     try:
         device_type = device['device_type']
@@ -110,7 +116,10 @@ def deposit_ok(user_id, amount, device, order_id):
         user = User.objects.get(id=user_id)
         user_profile = user.wanglibaouserprofile
         activity_backends.check_activity(user, 'recharge', device_type, amount)
-        utils.log_clientinfo(device, "deposit", user_id, order_id, amount)
+        try:
+            utils.log_clientinfo(device, "deposit", user_id, order_id, amount)
+        except Exception:
+            pass
         send_messages.apply_async(kwargs={
             'phones': [user_profile.phone],
             'messages': [messages.deposit_succeed(user_profile.name, amount)]
