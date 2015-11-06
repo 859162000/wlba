@@ -1072,7 +1072,7 @@ class KuaiShortPay:
             return {"ret_code": pay_info.error_code, "message": pay_info.error_message,
                     'order_id':order_id, 'pay_info_id':payinfo_id}
 
-    def pre_pay(self, user, amount, card_no, input_phone, gate_id, device, ip, exit_for_test=False):
+    def pre_pay(self, user, amount, card_no, input_phone, gate_id, device, ip, request, exit_for_test=False):
         # if not user.wanglibaouserprofile.id_is_valid:
         #     return {"ret_code":20111, "message":"请先进行实名认证"}
 
@@ -1116,7 +1116,7 @@ class KuaiShortPay:
                 return {"ret_code":201153, "message":"银行卡与银行不匹配"}
 
         if not card:
-            card = self.add_card_unbind(user, card_no, bank)
+            card = self.add_card_unbind(user, card_no, bank, request)
 
         if not card and not bank:
             return {"ret_code":201152, "message":"卡号不存在或银行不存在"}

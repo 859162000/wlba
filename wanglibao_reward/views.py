@@ -238,7 +238,7 @@ class WeixinShareDetailView(TemplateView):
         else:
             return 'No Reward'
 
-    def get_distribute_status(self, order_id, activity):
+    def get_distribute_status(self, order_id, activity, openid):
             """
                 获得用户领奖信息
             """
@@ -247,7 +247,7 @@ class WeixinShareDetailView(TemplateView):
 
             try:
                 # modify by hb on 2015-10-15 : 只查询微信号关联记录
-                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity, valid=2).all()
+                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity, identity=openid, valid=2).all()
                 return gifts
             except Exception, reason:
                 self.exception_msg(reason, u'获取已领奖用户信息失败')
@@ -354,7 +354,7 @@ class WeixinShareDetailView(TemplateView):
         else:
             has_gift = 'true'
             self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s' %(openid, user_gift.identity, user_gift, ))
-        gifts = self.get_distribute_status(order_id, activity)
+        gifts = self.get_distribute_status(order_id, activity, openid)
         share_title, share_content, url = get_share_infos(order_id)
         return {
             "ret_code": 0,
@@ -419,12 +419,12 @@ class WeixinShareEndView(TemplateView):
                 ]
         return text[index]
 
-    def get_distribute_status(self, order_id):
+    def get_distribute_status(self, order_id, openid):
         """
             获得用户领奖信息
         """
         try:
-            gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, valid=2).all()
+            gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, openid=openid, valid=2).all()
             return gifts
         except Exception, reason:
             logger.debug(reason, u'获取已领奖用户信息失败')
@@ -456,8 +456,9 @@ class WeixinShareEndView(TemplateView):
 
     def get_context_data(self, **kwargs):
         order_id = self.request.GET.get('url_id')
+        openid = self.request.GET.get('openid')
         share_title, share_content, url = get_share_infos(order_id)
-        gifts = self.get_distribute_status(order_id)
+        gifts = self.get_distribute_status(order_id, openid)
         logger.debug("抵达End页面，order_id:%s, URL:%s" %(order_id, url))
         return {
          "all_gift": self.format_response_data(gifts),
@@ -571,7 +572,7 @@ class WeixinShareStartView(TemplateView):
              counts = QSet.count()
              left_counts = QSet.filter(valid=True).count()
              if left_counts == 0 and counts > 0:
-                 return redirect("/weixin_activity/share/end/?url_id=%s" % (order_id,))
+                 return redirect("/weixin_activity/share/end/?url_id=%s&openid=%s" % (order_id, openid))
 
         except Exception, e:
             logger.exception("share-start-view dispatch 跳转的时候报异常")

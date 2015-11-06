@@ -446,7 +446,7 @@ def bind_pay_deposit(request):
         return result
 
     elif bank.channel == 'kuaipay':
-        result = KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, device, ip)
+        result = KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, device, ip, request)
 
         if result['ret_code'] == 0:
             try:
