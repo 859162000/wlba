@@ -154,15 +154,12 @@ class WeixinShareDetailView(TemplateView):
         if not self.activity:
             self.activity = self.get_activity_by_id(activity)
         try:
-            # modify by hb on 2015-10-15
-            #user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity=(str(phone_num)), activity=self.activity).first()
-            user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity=(str(openid)), activity=self.activity).first()
-            award_user_gift = None
+            user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity=str(openid), activity=self.activity).first()
             if not user_gift:
-                logger.debug("没有从数据库里查到用户(%s)的领奖记录, openid:%s, order_id:%s" %(phone_num, openid, order_id))
+                logger.debug("判断用户是否用此手机号在别的微信上领取过phone: %s, openid:%s, order_id:%s" %(phone_num, openid, order_id))
+                award_user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity=str(phone_num), activity=self.activity).first()
             else:
-                # add by hb on 2015-10-15
-                award_user_gift = WanglibaoUserGift.objects.filter(rules=user_gift.rules).exclude(identity=(str(openid))).first()
+                award_user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity).exclude(identity=(str(openid))).first()
                 logger.debug("已经从数据库里查到用户(%s)的领奖记录, openid:%s, order_id:%s" %(award_user_gift.identity, openid, order_id))
             return award_user_gift
         except Exception, reason:
@@ -302,7 +299,7 @@ class WeixinShareDetailView(TemplateView):
                 index += 1
 
             tmp_dict = {item["sort_by"]: item for item in ret_value}
-            ret_value = [tmp_dict[key] for key in sorted(tmp_dict.keys())]
+            ret_value = [tmp_dict[key] for key in sorted(tmp_dict.keys(), reverse=True)]
             self.debug_msg('所有获奖信息返回前端:%s' % (ret_value,))
             return ret_value
 
@@ -344,6 +341,7 @@ class WeixinShareDetailView(TemplateView):
 
         if not user_gift:
             self.debug_msg('phone:%s 没有领取过奖品' %(phone_num,) )
+            has_gift = 'false'
             user_gift = self.distribute_redpack(phone_num, openid, activity, order_id)
 
             if "No Reward" == user_gift:
@@ -354,11 +352,13 @@ class WeixinShareDetailView(TemplateView):
                     "share": {'content': share_title, 'title': share_content, 'url': url}
                 }
         else:
+            has_gift = 'true'
             self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s' %(openid, user_gift.identity, user_gift, ))
         gifts = self.get_distribute_status(order_id, activity)
         share_title, share_content, url = get_share_infos(order_id)
         return {
             "ret_code": 0,
+            "has_gift": has_gift,
             "self_gift": self.format_response_data(user_gift, openid, 'alone'),
             "all_gift": self.format_response_data(gifts, openid, 'gifts'),
             "share": {'content': share_title, 'title': share_content, 'url': url}
@@ -405,6 +405,20 @@ class WeixinShareDetailView(TemplateView):
 class WeixinShareEndView(TemplateView):
     template_name = 'app_weChatEnd.jade'
 
+    def get_react_text(self, index):
+        text = [u'感谢土豪，加息券已到手！',
+                u'这次，终于让我抢到啦！',
+                u'哈哈，轻松一点，加息到手！',
+                u'下次一定抢到2%加息券！',
+                u'我去使用加息券喽，拜拜~',
+                u'大家手气如何啊？！',
+                u'太险了，差一点没抢到。',
+                u'感谢土豪，带我飞。',
+                u'投资就能发加息福袋啦？',
+                u'土豪，传授下投资经验吧'
+                ]
+        return text[index]
+
     def get_distribute_status(self, order_id):
         """
             获得用户领奖信息
@@ -413,17 +427,17 @@ class WeixinShareEndView(TemplateView):
             gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, valid=2).all()
             return gifts
         except Exception, reason:
-            self.exception_msg(reason, u'获取已领奖用户信息失败')
+            logger.debug(reason, u'获取已领奖用户信息失败')
             return None
     def format_response_data(self, gifts):
         if gifts == None:
             return None
 
         user_info = {gift.identity: gift for gift in gifts}
-        self.debug_msg("format_response_data, 已经领取的 奖品 的key值序列：%s" %(user_info.keys(),))
+        logger.debug("format_response_data, 已经领取的 奖品 的key值序列：%s" %(user_info.keys(),))
         QSet = WeixinUser.objects.filter(openid__in=user_info.keys())
         weixins = {item.openid: item for item in QSet}
-        self.debug_msg("format_response_data, 已经领取的 用户 的key值序列：%s" %(weixins.keys(),))
+        logger.debug("format_response_data, 已经领取的 用户 的key值序列：%s" %(weixins.keys(),))
         ret_value = list()
         index = 0
         for key in weixins.keys():
@@ -436,8 +450,8 @@ class WeixinShareEndView(TemplateView):
             index += 1
 
         tmp_dict = {item["sort_by"]: item for item in ret_value}
-        ret_value = [tmp_dict[key] for key in sorted(tmp_dict.keys())]
-        self.debug_msg('所有获奖信息返回前端:%s' % (ret_value,))
+        ret_value = [tmp_dict[key] for key in sorted(tmp_dict.keys(), reverse=True)]
+        logger.debug('所有获奖信息返回前端:%s' % (ret_value,))
         return ret_value
 
     def get_context_data(self, **kwargs):
@@ -466,7 +480,7 @@ class WeixinShareStartView(TemplateView):
         order_id = self.request.GET.get('url_id')
 
         user_gift = WanglibaoUserGift.objects.filter(identity=openid,).last()
-        record = WanglibaoUserGift.objects.filter(rules=user_gift.rules).exclude(identity=(str(openid))).first()
+        record = WanglibaoUserGift.objects.filter(rules=user_gift.rules).exclude(identity=(str(openid))).first() if user_gift else None
         logger.debug("start页面，openid 是:%s" % (openid,))
         share_title, share_content, url = get_share_infos(order_id)
         return {

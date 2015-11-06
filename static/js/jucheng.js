@@ -68,28 +68,27 @@
     });
 
     $('#get_ticket_button').click(function(){
-        $('.get_ticket').hide();
-        $('.write_info').show();
+        window.location.href = '/accounts/home/'
     });
 
-	$('.write_info').click(function(){
-		var name = $('input.name').val();
-		var phone = $('input.phone').val();
-		var address = $('input.address').val();
-		if(name&&phone&&address){
-			$.ajax({
-				url: '/api/gift/owner/?promo_token=jcw',
-				type: "POST",
-				data: {
-					phone : name,
-					address : phone,
-					name : name
-				}
-			}).done(function (json) {
-                $('.write_info .text').text(json.message);
-			})
-		}
-	})
+	//$('.write_info').click(function(){
+	//	var name = $('input.name').val();
+	//	var phone = $('input.phone').val();
+	//	var address = $('input.address').val();
+	//	if(name&&phone&&address){
+	//		$.ajax({
+	//			url: '/api/gift/owner/?promo_token=jcw',
+	//			type: "POST",
+	//			data: {
+	//				phone : name,
+	//				address : phone,
+	//				name : name
+	//			}
+	//		}).done(function (json) {
+     //           $('.write_info .text').text(json.message);
+	//		})
+	//	}
+	//})
 
   });
 }).call(this);
