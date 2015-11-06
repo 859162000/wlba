@@ -24,6 +24,7 @@ from django.contrib.auth.models import User
 from constant import MessageTemplate
 from constant import (ACCOUNT_INFO_TEMPLATE_ID, BIND_SUCCESS_TEMPLATE_ID)
 from weixin.util import getAccountInfo
+from wanglibao_profile.models import WanglibaoUserProfile
 
 
 from django.utils import timezone
@@ -233,9 +234,9 @@ class WeixinJoinView(View):
 
         #如果eventkey为用户id则进行绑定
         if eventKey and eventKey.isdigit():
-            user = User.objects.filter(pk=eventKey).first()
-            if user:
-                rs, txt = bindUser(w_user, user)
+            userProfile = WanglibaoUserProfile.objects.filter(phone=eventKey).first()
+            if userProfile:
+                rs, txt = bindUser(w_user, userProfile.user)
                 reply = create_reply(txt, msg)
         else:
             if not w_user.scene_id:
@@ -1330,15 +1331,15 @@ class GenerateQRSceneTicket(APIView):
 class GenerateQRLimitSceneTicket(APIView):
     permission_classes = ()
     def post(self, request):
-        uid = request.POST.get('id')
-        if not uid:
+        phone = request.POST.get('phone')
+        if not phone:
             return Response({'errcode':-1, 'errmsg':"-1"})
         original_id = request.POST.get('original_id')
         if not original_id:
             return Response({'errcode':-2, 'errmsg':"-2"})
         account = Account.objects.get(original_id=original_id)
         client = WeChatClient(account.app_id, account.app_secret, account.access_token)
-        qrcode_data = {"action_name":"QR_LIMIT_SCENE", "action_info":{"scene": {"scene_id": uid}}}
+        qrcode_data = {"action_name":"QR_LIMIT_SCENE", "action_info":{"scene": {"scene_id": phone}}}
         try:
             rs = client.qrcode.create(qrcode_data)
             qrcode_url = client.qrcode.get_url(rs.get('ticket'))

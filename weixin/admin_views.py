@@ -134,6 +134,7 @@ class WeixinCustomerServiceView(AdminWeixinTemplateView):
     def get_context_data(self, **kwargs):
         context = super(WeixinCustomerServiceView, self).get_context_data(**kwargs)
         context['account'] = self.account
+
         return context
 
 
@@ -227,7 +228,13 @@ class WeixinMaterialListJsonApi(AdminAPIView):
 
 class WeixinCustomerServiceApi(AdminAPIView):
 
-    http_method_names = ['post']
+    http_method_names = ['get', 'post', 'delete']
+
+    @weixin_api_error
+    def get(self, request):
+        res = self.client.customservice.get_accounts()
+        self.client.customservice.upload_headimg()
+        return Response(res.json())
 
     @weixin_api_error
     def post(self, request):
@@ -236,6 +243,12 @@ class WeixinCustomerServiceApi(AdminAPIView):
         password = request.POST.get('password')
         res = self.client.customservice.add_account(kf_account, nickname, password)
         return Response(res.json())
+
+    @weixin_api_error
+    def delete(self, request):
+        kf_account = request.DATA.get('kf_account')
+        res = self.client.customservice.delete_account(kf_account)
+        return Response(res, status=204)
 
 
 class WeixinMenuApi(AdminAPIView):
