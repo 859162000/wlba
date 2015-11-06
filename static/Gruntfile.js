@@ -5,7 +5,7 @@ module.exports = function( grunt ) {
         compass: {
             dist: {
                 options: {
-                    config: 'config_weixin.rb'
+                    config: 'config.rb'
                 }
             }
         },
@@ -17,8 +17,7 @@ module.exports = function( grunt ) {
             },
             basic:{
                 files: {
-                    'scripts/mobile/mobile.js': ['src/mobile/lib/zepto/zepto.js', 'src/mobile/mobile.js'],
-                    'scripts/mobile_test/mobile.js': ['src/mobile_test/lib/a.js', 'src/mobile_test/b.js']
+                    'scripts/mobile/mobile.js': ['src/mobile/lib/zepto/zepto.js', 'src/mobile/mobile.js']
                 }
             }
         },
@@ -38,6 +37,12 @@ module.exports = function( grunt ) {
                         src: '*.js',
                         dest: 'scripts/mobile/dist/'
                     },
+                    {
+                        expand: true,
+                        cwd: 'scripts/app/',
+                        src: '*.js',
+                        dest: 'scripts/app/dist/'
+                    },
                 ]
 
             }
@@ -55,7 +60,7 @@ module.exports = function( grunt ) {
               files: [
                   'src/mobile/mobile.js',
                   'src/mobile_activity/*.js',
-                  'src/mobile_test/*.js',
+                  'src/app/*.js',
               ],
               tasks: ['concat']
           }
@@ -67,6 +72,14 @@ module.exports = function( grunt ) {
     grunt.file.recurse('src/mobile_activity/', function(abspath, rootdir, subdir, filename){
         if(abspath.indexOf(subdir) < 0){
             var key  = 'scripts/mobile_activity/'+filename
+            config.concat.basic.files[key] = ['<%= activityMod %>', abspath]
+        }
+        return
+    })
+
+    grunt.file.recurse('src/app/', function(abspath, rootdir, subdir, filename){
+        if(abspath.indexOf(subdir) < 0){
+            var key  = 'scripts/app/'+filename
             config.concat.basic.files[key] = ['<%= activityMod %>', abspath]
         }
         return

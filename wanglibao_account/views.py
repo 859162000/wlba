@@ -1,5 +1,6 @@
 # encoding: utf-8
 import datetime
+import pytz
 from wanglibao_redpack.models import RedPackEvent
 from wanglibao_redpack import backends as redpack_backends
 import logging
@@ -7,6 +8,7 @@ import json
 import math
 import copy
 import hashlib
+import random
 import urllib
 import urlparse
 
@@ -27,17 +29,19 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllo
 from django.shortcuts import resolve_url, render_to_response
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.utils.http import urlencode
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView, View
 from registration.views import RegistrationView
 from rest_framework import status
+from rest_framework import renderers
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm, IdVerificationForm, verify_captcha
-from marketing.models import IntroducedBy, Reward, RewardRecord
+from marketing.models import IntroducedBy, Channels, Reward, RewardRecord
 from marketing.utils import set_promo_user, local_to_utc, get_channel_record
 from marketing import tools
 from wanglibao_sms.tasks import send_messages
@@ -55,7 +59,7 @@ from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, User
     AmortizationRecord, P2PProductContract, P2PProduct, P2PEquityJiuxian, AutomaticPlan, AutomaticManager
 from wanglibao_p2p.tasks import automatic_trade
 from wanglibao_pay.models import Card, Bank, PayInfo
-from wanglibao_sms.utils import validate_validation_code, send_validation_code
+from wanglibao_sms.utils import validate_validation_code, send_validation_code, send_rand_pass
 from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
@@ -79,9 +83,12 @@ from wanglibao_account.models import UserThreeOrder
 from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes, hex2bin
 import requests
 from wanglibao_margin.models import MarginRecord
+from wanglibao_pay.fee import WithdrawFee
+
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
+
 
 class RegisterView(RegistrationView):
     template_name = "register_test.jade"
@@ -148,6 +155,115 @@ class RegisterView(RegistrationView):
                 })
 
         return context
+
+
+# AES 加解密
+# from Crypto.Cipher import AES
+# import base64
+#
+# BS = AES.block_size
+# pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
+# unpad = lambda s: s[0:-ord(s[-1])]
+#
+# result = 'bAqCOs5Ox10kmcKKn7n47lDqljwBmKbHAtuWf0pkLqu7XbNaJOCXVEVJ9PRqIC5LiiB0MsbvjOEU+eIFWRSmaw=='
+# all_the_text1 = base64.b64decode(result)
+#
+# cipher2 = AES.new(b'https://jrjia.cn')
+# decrypted2 = unpad(cipher2.decrypt(all_the_text1))
+# ecrypted = cipher2.encrypt(pad('{"src":"jrjia","reqId":"31646132","prodId":"1","mobile":"11811849324"}'))
+# sign = base64.b64encode(ecrypted)
+
+
+class JrjiaAutoRegisterView(APIView):
+    """
+    author： Zhoudong
+    金融加 自动注册， 保存到 introduceby 表里。 之前需要添加金融加渠道。
+    """
+
+    permission_classes = ()
+
+    def get_context_data(self):
+
+        # key = 'jrjia.cn'
+        key = 'https://jrjia.cn'
+        src = self.request.GET.get('src', None)
+        sign = self.request.GET.get('sign', None)
+
+        if ' ' in sign:
+            sign = sign.replace(' ', '+')
+
+        if src == 'jrjia':
+            # 解密
+            import base64
+            from Crypto.Cipher import AES
+
+            decryptor = AES.new(key, AES.MODE_ECB)
+            try:
+                base_str = base64.b64decode(sign)
+                sign_args = eval(decryptor.decrypt(base_str).split('}')[0] + '}')
+            except Exception, e:
+                sign = urllib.unquote(sign)
+                base_str = base64.b64decode(sign)
+                sign_args = eval(decryptor.decrypt(base_str).split('}')[0] + '}')
+
+            context = {}
+            context.update(sign_args)
+
+            host = self.request.get_host()
+            try:
+                next_url = 'http://' + '{}/p2p/detail/{}/'.format(host, sign_args['prodId'])
+            except Exception, e:
+                print 'args error: {}'.format(e)
+                next_url = '/'
+            context.update({
+                'next': next_url
+            })
+
+            return context
+
+    def get(self, request):
+        """
+        :param request:
+        :return:
+        """
+        args = self.get_context_data()
+        redirect_url = args['next']
+
+        try:
+            source = args['src']
+            password = str(random.randint(100000, 999999))
+            identifier = args['mobile']
+            req_id = args['reqId']
+            nickname = identifier
+        except Exception, e:
+            print 'args get error: {}'.format(e)
+            return HttpResponseRedirect(redirect_url)
+
+        # 用户已存在， 返回
+        if User.objects.filter(wanglibaouserprofile__phone=identifier).first():
+            return HttpResponseRedirect(redirect_url)
+
+        user = create_user(identifier, password, nickname)
+        channel = Channels.objects.get(code=source)
+
+        # 当用户不存在， 添加到binding 表（自带reqId）
+        Binding.objects.get_or_create(user=user, btype=source, bid=req_id)
+        # 邀请关系表
+        IntroducedBy.objects.get_or_create(user=user, channel=channel)
+
+        auth_user = authenticate(identifier=identifier, password=password)
+        auth.login(request, auth_user)
+
+        device = utils.split_ua(request)
+        if not AntiForAllClient(request).anti_delay_callback_time(user.id, device):
+            tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+        # send message for the user.
+        send_rand_pass(identifier, password)
+
+        account_backends.set_source(request, auth_user)
+
+        return HttpResponseRedirect(redirect_url)
 
 
 class EmailSentView(TemplateView):
@@ -472,7 +588,7 @@ class AccountHomeAPIView(APIView):
             .filter(catalog__in=[u'佣金存入', u'全民淘金']).aggregate(Sum('amount'))
 
         if p2p_income_yesterday_other.get('amount__sum'):
-            p2p_income_yesterday += int(p2p_income_yesterday_other.get('amount__sum'))
+            p2p_income_yesterday += p2p_income_yesterday_other.get('amount__sum')
 
         p2p_margin = user.margin.margin  # P2P余额
         p2p_freeze = user.margin.freeze  # P2P投资中冻结金额

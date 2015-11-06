@@ -12,9 +12,12 @@ from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, 
                    AccountTransactionDeposit, AccountRedPacket, AccountCoupon,
                    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract,
                    Third_login, Third_login_back, MessageView, MessageDetailAPIView, MessageCountAPIView,
-                   MessageListAPIView, AccountRepayment, AddressView, AccountInviteView, user_product_contract_kf)#, CjdaoApiView)
+                   MessageListAPIView, AccountRepayment, AddressView, AccountInviteView, user_product_contract_kf,
+                   JrjiaAutoRegisterView)#, CjdaoApiView)
 from django.contrib.auth import views as auth_views
 from views import AutomaticView
+from wanglibao_account.cooperation import JrjiaCPSView, JrjiaP2PStatusView, JrjiaP2PInvestView, JrjiaReportView, \
+    JrjiaUsStatusView
 from wanglibao_lottery.views import LotteryListTemplateView
 
 urlpatterns = patterns(
@@ -72,6 +75,12 @@ urlpatterns = patterns(
     url(r'^login/(?P<login_type>\w+)/$', login_required(Third_login.as_view())),
 
     url(r'^register/$', RegisterView.as_view(), name='auth_register'),
+    url(r'^api/register/jrjia/$', JrjiaAutoRegisterView.as_view(), name='auth_register_auto'),
+    url(r'^api/cps/$', JrjiaCPSView.as_view(), name='auth_register_auto'),
+    url(r'^api/pstatus/$', JrjiaP2PStatusView.as_view(), name='auth_register_auto'),
+    url(r'^api/pinvest/$', JrjiaP2PInvestView.as_view(), name='auth_register_auto'),
+    url(r'^api/report/$', JrjiaReportView.as_view(), name='auth_register_auto'),
+    url(r'^api/usstatus/$', JrjiaUsStatusView.as_view(), name='auth_register_auto'),
     url(r'^register/wap/$', RedirectView.as_view(url='/weixin/regist/', permanent=True), name='wap_register'),
     url(r'^register/ajax/$', 'wanglibao_account.views.ajax_register'),
 

@@ -554,7 +554,8 @@ class YeeShortPay:
     def add_card_unbind(self, user, card_no, bank, request):
         """ 保存卡信息到个人名下，不绑定任何渠道 """
         if len(card_no) == 10:
-            card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
+            card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:],
+                                       is_bind_yee=True).first()
         else:
             card = Card.objects.filter(no=card_no, user=user).first()
 
@@ -617,7 +618,8 @@ class YeeShortPay:
                 return {"ret_code": 201116, "message": "不支持该银行"}
 
         if len(card_no) == 10:
-            card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
+            card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:],
+                                       is_bind_yee=True).first()
         else:
             card = Card.objects.filter(no=card_no, user=user).first()
 
@@ -717,7 +719,8 @@ class YeeShortPay:
         user = request.user
         card_no = pay_info.card_no
         if len(card_no) == 10:
-            card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
+            card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:],
+                                       is_bind_yee=True).first()
         else:
             card = Card.objects.filter(no=card_no, user=user).first()
 

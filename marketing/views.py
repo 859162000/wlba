@@ -21,10 +21,11 @@ from django.http.response import HttpResponse, Http404
 from mock_generator import MockGenerator
 from django.conf import settings
 from django.db.models.base import ModelState
-from wanglibao_sms.utils import send_validation_code
+from wanglibao_sms.utils import send_validation_code, validate_validation_code
 from misc.models import Misc
 from wanglibao_sms.models import *
-from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, IntroducedBy, IntroducedByReward, Reward, ActivityJoinLog, QuickApplyInfo
+from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, IntroducedBy, IntroducedByReward, \
+    Reward, ActivityJoinLog, QuickApplyInfo, GiftOwnerGlobalInfo, GiftOwnerInfo
 from marketing.tops import Top
 from utils import local_to_utc
 
@@ -35,7 +36,6 @@ from marketing.models import RewardRecord, NewsAndReport
 from wanglibao_p2p.models import Earning
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao.templatetags.formatters import safe_phone_str
-from wanglibao_account import message as inside_message
 from order.models import Order
 from order.utils import OrderHelper
 from rest_framework.response import Response
@@ -46,6 +46,7 @@ from wanglibao_redpack.models import RedPackEvent
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity.models import ActivityRecord, Activity, ActivityRule
 from wanglibao_account import message as inside_message
+from wanglibao_account.models import Binding
 from wanglibao_pay.models import PayInfo
 from wanglibao_activity.models import TRIGGER_NODE
 from marketing.utils import get_user_channel_record
@@ -62,8 +63,6 @@ import sys
 import time
 from smtplib import SMTP
 from email.header import Header
-#from email import MIMEText
-#from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
 reload(sys)
@@ -1979,7 +1978,7 @@ class ThunderTenAcvitityTemplate(TemplateView):
 
         return response_data
 
-class QuickApplyer(APIView):
+class QuickApplyerAPIView(APIView):
     permission_classes = ()
 
     def send_mail(self, sender, reciver, title, body):
@@ -2074,7 +2073,7 @@ class QuickApplyer(APIView):
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
         title = "[%s - %s]贷款申请" % (address, apply[int(apply_way)])
-        body = "姓名:%s <br/> 手机号:%s<br/> 城市:%s<br/> 资产状况:%s<br/> 贷款金额:%s万<br/>" % (name, phone, address,apply[int(apply_way)], amount)
+        body = "姓名:%s <br/> 手机号:%s<br/> 城市:%s<br/> 资产状况:%s<br/> 贷款金额:%s<br/>" % (name, phone, address,apply[int(apply_way)], amount)
         self.send_mail('develop@wanglibank.com', email[address], title, body)
         to_json_response = {
             'ret_code': '0',
@@ -2082,3 +2081,172 @@ class QuickApplyer(APIView):
         }
 
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+
+class GiftOwnerInfoAPIView(APIView):
+    permission_classes = ()
+
+    def get_left_awards(self):
+        items = GiftOwnerGlobalInfo.objects.filter(description__in=('jcw_ticket_80', 'jcw_ticket_188')).values("amount")
+        return items[0]["amount"], items[1]["amount"]
+
+    def post(self, request):
+        action = request.DATA.get('action', 'OTHERS')
+        name = request.DATA.get('name', '')
+        phone = request.DATA.get('phone', '')
+        address = request.DATA.get('address', '')
+
+        try:
+            (award80, award188) = self.get_left_awards()
+        except Exception, reason:
+            logger.exception(u'获取门票global配置报异常, reason:%s' % (reason,))
+            to_json_response = {
+                'ret_code': 1002,
+                'message': u'门票配置报异常',
+                'award80': -1,
+                'award100': -1
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        if action == 'VALIDATION':
+            status, message = validate_validation_code(request.DATA.get("phone", ""), request.DATA.get("validation", ""))
+            to_json_response = {
+                'ret_code': 1,
+                'message': message,
+                'status': status
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        if action == "ENTER_WEB_PAGE":
+            to_json_response = {
+                'ret_code': 1,
+                'message': u'首次进入页面',
+                'award80': award80,
+                'award100': award188
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        item = GiftOwnerInfo.objects.filter(config__description__in=('jcw_ticket_80', 'jcw_ticket_188'), sender=request.user)
+        if action == "HAS_TICKET":
+            to_json_response = {
+                'ret_code': 2,
+                'message': u'判断是否领过票',
+                'award80': award80,
+                'award100': award188,
+                'has_ticket': "True" if item.exists() else "False"
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        if not self.request.user.is_authenticated():
+            to_json_response = {
+                'ret_code': 1030,
+                'message': u'请先登录，再领取奖品',
+                'award80': award80,
+                'award100': award188
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        record = get_user_channel_record(request.user.id)
+        if not record or (record and record.name != 'jcw'):
+            to_json_response = {
+                'ret_code': 1000,
+                'message': u'用户不是聚橙网渠道',
+                'award80': award80,
+                'award100': award188
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        if item.exists():
+            to_json_response = {
+                'ret_code': 1010,
+                'message': u'您已经领取过门票，不可重复领取',
+                'award80': award80,
+                'award100': award188
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        binding = Binding.objects.filter(user_id=request.user.id).first()
+        p2p_record = P2PRecord.objects.filter(user_id=request.user.id, catalog=u'申购')
+        if binding and p2p_record.count() == 1:
+            p2p_amount = int(p2p_record.first().amount)
+            if p2p_amount >= 1000 and p2p_amount < 2000:
+                try:
+                    config = GiftOwnerGlobalInfo.objects.select_for_update(description=u'jcw_ticket_80', valid=True).first()
+                except Exception, reason:
+                    logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
+                    raise
+                if config and config.amount>0:
+                    try:
+                        GiftOwnerInfo.objects.create(
+                            sender=self.request.user,
+                            config=config,
+                            name=name,
+                            phone=phone,
+                            address=address,
+                            award=u'张昊辰门票',
+                            type='80'
+                        )
+                    except Exception, reason:
+                        logger.exception(u'获奖用户(%s)信息入库失败, reason:%s' % (self.request.user,reason))
+                        config.save()
+                    else:
+                        config.amount -= 1
+                        config.save()
+                        logger.info(u"获奖用户 (%s) 信息入库成功" % (self.request.user,))
+                        to_json_response = {
+                            'ret_code': 0,
+                            'message': u'获得80元没票一张',
+                            'award80': award80-1,
+                            'award100': award188
+                        }
+                        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+            elif p2p_amount >= 2000:
+                try:
+                    config = GiftOwnerGlobalInfo.objects.select_for_update(description=u'jcw_ticket_188', valid=True).first()
+                except Exception, reason:
+                    logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
+                    raise
+                if config and config.amount > 0:
+                    try:
+                        GiftOwnerInfo.objects.create(
+                            sender=self.request.user,
+                            config=config,
+                            name=name,
+                            phone=phone,
+                            address=address,
+                            award=u'张昊辰门票',
+                            type='188'
+                        )
+                    except Exception, reason:
+                        logger.exception(u'获奖用户(%s)信息入库失败, reason:%s' % (self.request.user,reason))
+                        config.save()
+                    else:
+                        config.amount -= 1
+                        config.save()
+                        logger.info(u"获奖用户 (%s) 信息入库成功" % (self.request.user,))
+                        to_json_response={
+                            'ret_code': 0,
+                            'message': u'获得188元没票一张',
+                            'award80': award80,
+                            'award100': award188-1
+                        }
+                        return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+            else:
+                to_json_response = {
+                    'ret_code': 200,
+                    'message': u'用户的投资额度不符合领奖规则',
+                    'award80': award80,
+                    'award100': award188
+                }
+                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        else:
+            to_json_response = {
+                'ret_code': 100,
+                'message': u'首投用户才有可以领取门票',
+                'award80': award80,
+                'award100': award188
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+

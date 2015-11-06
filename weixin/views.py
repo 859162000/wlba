@@ -12,7 +12,7 @@ from django.conf import settings
 from django.shortcuts import render_to_response, redirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
+from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
 from wanglibao_buy.models import FundHoldInfo
 from wanglibao_banner.models import Banner
 from wanglibao_p2p.models import P2PProduct, P2PEquity, Attachment
@@ -198,7 +198,7 @@ class WeixinLoginAPI(APIView):
     http_method_names = ['post']
 
     def _form(self, request):
-        return EmailOrPhoneAuthenticationForm(request, data=request.POST)
+        return LoginAuthenticationNoCaptchaForm(request, data=request.POST)
 
     def post(self, request):
         form = self._form(request)
@@ -494,7 +494,7 @@ class P2PDetailView(TemplateView):
 
 
 class WeixinAccountHome(TemplateView):
-    template_name = 'weixin_account.jade'
+    template_name = 'weixin_account_new.jade'
 
     def get_context_data(self, **kwargs):
         user = self.request.user
@@ -616,7 +616,7 @@ class WeixinTransaction(TemplateView):
                 .select_related('product')[:10]
 
         p2p_records = [{
-            'equity_created_at': timezone.localtime(equity.created_at).strftime("%Y-%m-%d %H:%M:%S"),  # 投标时间
+            'equity_created_at': timezone.localtime(equity.created_at).strftime("%Y.%m.%d %H:%M:%S"),  # 投标时间
             'equity_product_short_name': equity.product.short_name,  # 产品名称
             'equity_product_expected_earning_rate': equity.product.expected_earning_rate,  # 年化收益(%)
             'equity_product_period': equity.product.period,  # 产品期限(月)*
@@ -634,6 +634,10 @@ class WeixinTransaction(TemplateView):
         } for equity in p2p_equities]
 
         return {
+            'status': {
+                'chinese': p2p_status,
+                'english': status
+            },
             'results': p2p_records
         }
 
@@ -803,10 +807,19 @@ class AuthorizeUser(APIView):
                 w_user.auth_info.save()
             if save_user:
                 w_user.save()
+
+            appendkeys = []
+            for key in request.GET.keys():
+                if key == u'state' or key == u'code':
+                    continue
+                appendkeys.append(key)
+
             if redirect_url.find('?') == -1:
                 redirect_url += '?openid=%s'%openid
             else:
                 redirect_url += '&openid=%s'%openid
+            for key in appendkeys:
+                redirect_url += '&%s=%s'%(key, request.GET.get(key))
             return redirect(redirect_url)
         return Response({'errcode':-2, 'errmsg':'code is null'})
 
@@ -859,10 +872,12 @@ class GetAuthUserInfo(APIView):
         except WeChatException, e:
             return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
 
+
 class GetUserInfo(APIView):
     renderer_classes = (renderers.UnicodeJSONRenderer,)
     permission_classes = ()
 
+    @weixin_api_error
     def get(self, request):
         openid = request.GET.get('openid')
         if not openid:
@@ -870,38 +885,44 @@ class GetUserInfo(APIView):
         w_user = WeixinUser.objects.filter(openid=openid).first()
         if not w_user:
             return Response({'errcode':-4, 'errmsg':'openid is not exist'})
-        if w_user.nickname:
-            return Response({
-                       "openid":openid,
-                       "nickname": w_user.nickname,
-                       "sex": w_user.sex,
-                       "province": w_user.province,
-                       "city": w_user.city,
-                       "country": w_user.country,
-                        "headimgurl": w_user.headimgurl,
-                        "unionid": w_user.unionid,
-                        'subscribe': w_user.subscribe,
-                        'subscribe_time': w_user.subscribe_time
-                    })
         account = Account.objects.get(original_id=w_user.account_original_id)
         if not account:
             return Response({'errcode':-6, 'errmsg':u'公众号信息错误或者不存在'})
-        try:
-            user_info = account.get_user_info(w_user.openid)
+
+        if settings.ENV == settings.ENV_PRODUCTION:
+            request.session['account_key'] = 'account_main'
+        else:
+            request.session['account_key'] = 'test'
+
+        user_info = account.get_user_info(w_user.openid)
+        if not w_user.nickname:
             w_user.nickname = user_info.get('nickname', "")
             w_user.sex = user_info.get('sex')
             w_user.city = user_info.get('city', "")
             w_user.country = user_info.get('country', "")
             w_user.headimgurl = user_info.get('headimgurl', "")
-            w_user.unionid =  user_info.get('unionid', '')
+            w_user.unionid = user_info.get('unionid', '')
             w_user.province = user_info.get('province', '')
             w_user.subscribe = user_info.get('subscribe', '')
             w_user.subscribe_time = user_info.get('subscribe_time', '')
             w_user.save()
-            return Response(user_info)
-        except WeChatException, e:
-            return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
+        return Response(user_info)
 
 
+class WeixinCouponList(TemplateView):
+    template_name = 'weixin_reward.jade'
 
+    def get_context_data(self, **kwargs):
+
+        status = kwargs['status']
+        if status not in ('used', 'unused', 'expires'):
+            status = 'unused'
+
+        user = self.request.user
+        result = backends.list_redpack(user, 'all', 'all', 0, 'all')
+        packages = result['packages'].get(status, [])
+        return {
+            "packages": packages,
+            "status": status
+        }
 

@@ -18,7 +18,7 @@ from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_sms.utils import validate_validation_code
 from marketing import tools
-
+from fee import WithdrawFee
 from wanglibao_rest.utils import split_ua
 
 from wanglibao_pay.kuai_pay import KuaiPay, KuaiShortPay
@@ -254,9 +254,9 @@ def card_bind_list(request):
                 card = Card.objects.filter(user=user, no__startswith=car['card_top'], no__endswith=car['card_last']).first()
                 if card:
                     yee_card_no_list.append(card.no)
-            if yee_card_no_list:
-                Card.objects.filter(user=user, no__in=yee_card_no_list).update(is_bind_yee=True)
-                Card.objects.filter(user=user).exclude(no__in=yee_card_no_list).update(is_bind_yee=False)
+            # if yee_card_no_list:
+            #     Card.objects.filter(user=user, no__in=yee_card_no_list).update(is_bind_yee=True)
+            #     Card.objects.filter(user=user).exclude(no__in=yee_card_no_list).update(is_bind_yee=False)
 
         # 查询块钱已经绑定卡
         res = KuaiShortPay().query_bind_new(user.id)
@@ -277,6 +277,12 @@ def card_bind_list(request):
             # 排序
             bank_list = [card.bank.gate_id for card in cards]
             cards = sorted(cards, key=lambda x: bank_list.index(x.bank.gate_id))
+
+            # 获取提现费率配置
+            fee_misc = WithdrawFee(switch='on')
+            fee_config = fee_misc.get_withdraw_fee_config()
+            min_amount = fee_config.get('min_amount')
+            max_amount = fee_config.get('max_amount')
 
             for card in cards:
                 base_dict = {
@@ -305,6 +311,14 @@ def card_bind_list(request):
                     if card.bank.kuai_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.kuai_limit))
 
+                bank_limit = util.handle_withdraw_limit(card.bank.withdraw_limit)  # 银行提现最大最小限额
+                bank_min_amount = bank_limit.get('bank_min_amount')
+                bank_max_amount = bank_limit.get('bank_max_amount')
+                bank_limit_amount = {
+                    "bank_min_amount": bank_min_amount if bank_min_amount and bank_min_amount < min_amount else min_amount,
+                    "bank_max_amount": bank_max_amount if bank_max_amount and bank_max_amount < max_amount else max_amount
+                }
+                tmp.update(bank_limit_amount)
                 if tmp:
                     card_list.append(tmp)
 
