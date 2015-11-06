@@ -1,6 +1,3 @@
-
-
-
 org.mmIndex = (function(org){
     $('#explain_button').click(function(){
         $('.explain_wrap').show();
@@ -27,12 +24,8 @@ org.mmIndex = (function(org){
         $explain_wrap : $('.explain_wrap'),
         init: function(){
             lib._submit();
-            //lib._write_info_button();
             lib.listen();
             $(document.body).trigger('from:captcha');
-
-
-
         },
         checkfilter:function(num){
             var
@@ -361,28 +354,34 @@ org.success = (function(org){
         init:function(){
             var
                 state = org.getQueryStringByName('state')*1,
-                str = '',
-                val = null;
+                str = null,
+                val = null,
+                url = null;
 
-                //if(state === 0){
-                //    str = '成功领取';
-                //    val = '1.5%加息券';
-                //}else if(state === 1){
-                //    str = '您已领取过奖品!';
-                //    val = null;
-                //}else if(state === 2){
-                //    str = '成功领取';
-                //    val = '120元红包';
-                //}
-                //$('.maimai-title').html(str);
-                //if(val){
-                //    $('.maimai-money').html(val);
-                //}
-
+                if(state === 0){
+                    str = '成功领取';
+                    val = '1.5%加息券';
+                    url = '/weixin/login/';
+                }else if(state === 1){
+                    str = '您已领取过奖品!';
+                    val = null;
+                    url = '/weixin/login/';
+                }else if(state === 2){
+                    str = '成功领取';
+                    val = '120元红包';
+                    url = '/weixin/list/';
+                }
+                $('.maimai-title').html(str);
+                if(val){
+                    $('.maimai-money').html(val);
+                }
+            $('.maimai-use-btn').on('click', function(){
+                window.location.href = url;
+            });
 
             var mySwiper = new Swiper('.swiper-container', {
                 pagination: '.swiper-pagination-maimai',
-            })
+            }) 
         },
     }
     return {
