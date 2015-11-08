@@ -461,26 +461,27 @@ class WithdrawTransactions(TemplateView):
                     fee = payinfo.fee
                     management_fee = payinfo.management_fee
 
-                    fee_total_amount = fee + management_fee
-                    withdraw_card = WithdrawCard.objects.filter(is_default=True).first()
-                    withdraw_card.amount += fee_total_amount
-                    withdraw_card.save()
+                    if fee > 0 or management_fee > 0:
+                        fee_total_amount = fee + management_fee
+                        withdraw_card = WithdrawCard.objects.filter(is_default=True).first()
+                        withdraw_card.amount += fee_total_amount
+                        withdraw_card.save()
 
-                    # 将提现信息单独记录到提现费用记录表中
-                    withdraw_card = WithdrawCard.objects.filter(is_default=True).first()
-                    if withdraw_card:
-                        withdraw_card_record = WithdrawCardRecord()
-                        withdraw_card_record.type = PayInfo.WITHDRAW
-                        withdraw_card_record.amount = payinfo.fee + payinfo.management_fee
-                        withdraw_card_record.fee = payinfo.fee
-                        withdraw_card_record.management_fee = payinfo.management_fee
-                        withdraw_card_record.management_amount = payinfo.management_amount
-                        withdraw_card_record.withdrawcard = withdraw_card
-                        withdraw_card_record.payinfo = payinfo
-                        withdraw_card_record.user = payinfo.user
-                        withdraw_card_record.status = PayInfo.SUCCESS
-                        withdraw_card_record.message = u'用户提现费用存入'
-                        withdraw_card_record.save()
+                        # 将提现信息单独记录到提现费用记录表中
+                        withdraw_card = WithdrawCard.objects.filter(is_default=True).first()
+                        if withdraw_card:
+                            withdraw_card_record = WithdrawCardRecord()
+                            withdraw_card_record.type = PayInfo.WITHDRAW
+                            withdraw_card_record.amount = payinfo.fee + payinfo.management_fee
+                            withdraw_card_record.fee = payinfo.fee
+                            withdraw_card_record.management_fee = payinfo.management_fee
+                            withdraw_card_record.management_amount = payinfo.management_amount
+                            withdraw_card_record.withdrawcard = withdraw_card
+                            withdraw_card_record.payinfo = payinfo
+                            withdraw_card_record.user = payinfo.user
+                            withdraw_card_record.status = PayInfo.SUCCESS
+                            withdraw_card_record.message = u'用户提现费用存入'
+                            withdraw_card_record.save()
 
                     # 取款确认时要检测该次提现是否是真正的在每个月的免费次数之内,如果是还需要将已扣除的费用返还给用户(仅限手续费)
                     give_back = False
