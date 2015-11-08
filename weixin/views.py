@@ -286,6 +286,9 @@ class WeixinJoinView(View):
 
 def getOrCreateWeixinUser(openid, account):
     w_user = WeixinUser.objects.filter(openid=openid).first()
+    if w_user.account_original_id != account.original_id:
+        w_user.account_original_id = account.original_id
+        w_user.save()
     if not w_user:
         w_user = WeixinUser()
         w_user.openid = openid

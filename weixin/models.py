@@ -192,7 +192,7 @@ class WeixinAccounts(object):
         'qrcode_url': '/static/imgs/admin/qrcode_for_gh_d852bc2cead2_258.jpg'
     }
     account_test_hmm = {
-        'id': 'gh_3b82a2651647 ',
+        'id': 'gh_3b82a2651647',
         'name': '测试号',
         'app_id': 'wx18689c393281241e',
         'app_secret': '7b30aec7477fb8eaed0673fca8f41044',
