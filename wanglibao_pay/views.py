@@ -470,7 +470,7 @@ class WithdrawTransactions(TemplateView):
 
                     fee_total_amount = fee + management_fee
                     withdraw_card = WithdrawCard.objects.filter(is_default=True).first()
-                    withdraw_card.margin += fee_total_amount
+                    withdraw_card.amount += fee_total_amount
                     withdraw_card.save()
 
                     # 将提现信息单独记录到提现费用记录表中
@@ -505,7 +505,7 @@ class WithdrawTransactions(TemplateView):
 
                         # 2.从网利宝提现账户中减去手续费
                         withdraw_card = WithdrawCard.objects.filter(is_default=True).first()
-                        withdraw_card.margin -= fee
+                        withdraw_card.amount -= fee
                         withdraw_card.save()
                         
                         # 将提现信息单独记录到提现费用记录表中
