@@ -457,12 +457,13 @@ class WithdrawTransactions(TemplateView):
                     payinfo.confirm_time = timezone.now()
                     payinfo.save()
 
-                    # 取款确认时要检测该次提现是否是真正的在每个月的免费次数之内,如果是还需要将已扣除的费用返还给用户
-
                     # 给提现记录表中的信息同步进行确认,同时将提现的费用充值到网利宝的公司提现账户
-                    fee_amount = payinfo.fee + payinfo.management_fee
+                    fee = payinfo.fee
+                    management_fee = payinfo.management_fee
+
+                    fee_total_amount = fee + management_fee
                     withdraw_card = WithdrawCard.objects.filter(is_default=True).first()
-                    withdraw_card.margin += fee_amount
+                    withdraw_card.margin += fee_total_amount
                     withdraw_card.save()
 
                     # 将提现信息单独记录到提现费用记录表中
@@ -479,6 +480,39 @@ class WithdrawTransactions(TemplateView):
                         withdraw_card_record.user = payinfo.user
                         withdraw_card_record.status = PayInfo.SUCCESS
                         withdraw_card_record.message = u'用户提现费用存入'
+                        withdraw_card_record.save()
+
+                    # 取款确认时要检测该次提现是否是真正的在每个月的免费次数之内,如果是还需要将已扣除的费用返还给用户(仅限手续费)
+                    give_back = False
+                    if fee > 0:
+                        fee_misc = WithdrawFee(switch='on')
+                        fee_config = fee_misc.get_withdraw_fee_config()
+                        withdraw_count = fee_misc.get_withdraw_success_count(payinfo.user)
+                        free_times = fee_config['fee']['amount_interval']
+                        if withdraw_count <= free_times:
+                            give_back = True
+
+                    if give_back:
+                        # 1.给用户返还手续费
+                        marginKeeper.deposit(fee, description=u'返还提现免费次数之内的手续费:{}元'.format(fee), catalog=u"返还手续费")
+
+                        # 2.从网利宝提现账户中减去手续费
+                        withdraw_card = WithdrawCard.objects.filter(is_default=True).first()
+                        withdraw_card.margin -= fee
+                        withdraw_card.save()
+                        
+                        # 将提现信息单独记录到提现费用记录表中
+                        withdraw_card_record = WithdrawCardRecord()
+                        withdraw_card_record.type = PayInfo.WITHDRAW
+                        withdraw_card_record.amount = payinfo.fee
+                        withdraw_card_record.fee = payinfo.fee
+                        withdraw_card_record.management_fee = 0
+                        withdraw_card_record.management_amount = 0
+                        withdraw_card_record.withdrawcard = withdraw_card
+                        withdraw_card_record.payinfo = payinfo
+                        withdraw_card_record.user = payinfo.user
+                        withdraw_card_record.status = PayInfo.SUCCESS
+                        withdraw_card_record.message = u'用户提现费用返还'
                         withdraw_card_record.save()
 
                     # 发站内信
