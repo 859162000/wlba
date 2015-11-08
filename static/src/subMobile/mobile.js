@@ -298,13 +298,13 @@ org.detail = (function(org){
     var lib ={
         weiURL: '/weixin/api/jsapi_config/',
         init :function(){
-            lib._share();
+            //lib._share(obj);
             lib._downPage();
         },
         /*
         * 微信分享
          */
-        _share: function(){
+        _share: function(obj){
             var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ',];
             org.ajax({
                 type : 'GET',
@@ -323,23 +323,44 @@ org.detail = (function(org){
                 }
             });
             wx.ready(function(){
-                var host = 'https://www.wanglibao.com',
-                    shareImg = host + '/static/imgs/sub_mobile/logo.png',//图片
-                    shareLink = host + '/weixin/award_index/',//连接地址
-                    shareMainTit = '幸运大转盘，日日有惊喜',//分享标题
-                    shareBody = '转盘一动，大奖即送。还不快快领取！';//分享描述
+                var host = 'https://staging.wanglibao.com',
+                    shareImg,//图片
+                    shareLink,//连接地址
+                    shareMainTit,//分享标题
+                    shareBody,//分享描述
+                    success;
+                var conf = $.extend({
+                    shareImg: host + '/static/imgs/sub_mobile/logo.png',//图片
+                    shareLink: host + '/weixin/award_index/',//连接地址
+                    shareMainTit: '幸运大转盘，日日有惊喜',//分享标题
+                    shareBody: '转盘一动，大奖即送。还不快快领取！',//分享描述
+                    success: function(){//成功事件
+                    }
+                }, obj || {});
+                shareImg = conf.shareImg;
+                shareLink = conf.shareLink;//连接地址
+                shareMainTit = conf.shareMainTit;//分享标题
+                shareBody = conf.shareBody;//分享描述
+                success = conf.success;
+                alert(shareMainTit);
                 //分享给微信好友
                 org.onMenuShareAppMessage({
                     title: shareMainTit,
                     desc: shareBody,
                     link: shareLink,
-                    imgUrl: shareImg
+                    imgUrl: shareImg,
+                    success: function(){
+                        alert(shareMainTit);
+                    }
                 });
                 //分享给微信朋友圈
                 org.onMenuShareTimeline({
                     title: shareMainTit,
                     link : shareLink,
-                    imgUrl: shareImg
+                    imgUrl: shareImg,
+                    success: function(){
+                        alert(shareMainTit);
+                    }
                 });
                 //分享给QQ
                 org.onMenuShareQQ({
@@ -373,7 +394,8 @@ org.detail = (function(org){
         }
     }
     return {
-        init : lib.init
+        init : lib.init,
+        share: lib._share
     }
 })(org);
 org.login = (function(org){
@@ -624,12 +646,13 @@ org.regist = (function(org){
                     },
                     success:function(data){
                         if(data.ret_code === 0){
-                            var next = org.getQueryStringByName('next') == '' ? '/weixin/regist/succees/?phone='+$identifier.val() : org.getQueryStringByName('next');
-                            next = org.getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ org.getQueryStringByName('mobile');
-                            next = org.getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ org.getQueryStringByName('serverId');
+                            //var next = org.getQueryStringByName('next') == '' ? '/weixin/regist/succees/?phone='+$identifier.val() : org.getQueryStringByName('next');
+                            //next = org.getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ org.getQueryStringByName('mobile');
+                            //next = org.getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ org.getQueryStringByName('serverId');
+                            var next = '/weixin/sub_code/?phone='+$identifier.val();
                             window.location.href = next;
                         }else if(data.ret_code > 0){
-                            org.ui.showSign(data.message)
+                            org.ui.showSign(data.message);
                             $submit.text('立即注册 ｜ 领取奖励');
                         }
                     },
@@ -734,9 +757,9 @@ org.regist = (function(org){
     });
 
     //规则 html添加class
-    (function(){
+    ;(function(){
         var html = $("html");
-        alert(html.height() + "," + $(window).height());
+        //alert(html.height() + "," + $(window).height());
         if(html.height() <= $(window).height()){
             html.addClass("sub-height");
         }else{
@@ -744,3 +767,14 @@ org.regist = (function(org){
         }
     })();
 })(org);
+function getCode(){//得到用户信息的二维码
+    var phone = org.getQueryStringByName('phone');
+    org.ajax({
+        type: "POST",
+        url: "/weixin/api/generate/qr_limit_scene_ticket/",
+        data: {"phone": phone, "original_id":"gh_9e8ff84237cd"},
+        success: function (data) {
+            console.log(data);
+        }
+    });
+}

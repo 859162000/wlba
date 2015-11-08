@@ -18,7 +18,7 @@ module.exports = function( grunt ) {
             basic:{
                 files: {
                     'scripts/mobile/mobile.js': ['src/mobile/lib/zepto/zepto.js', 'src/mobile/mobile.js'],
-                    'scripts/subMobile/mobile.js': ['src/subMobile/lib/weixin/wx.js','src/subMobile/lib/zepto/zepto.js', 'src/subMobile/mobile.js'],
+                    'scripts/subMobile/mobile.js': ['src/subMobile/lib/zepto/zepto.js', 'src/subMobile/mobile.js'],
                 }
             }
         },
