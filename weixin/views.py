@@ -109,31 +109,35 @@ class WeixinJoinView(View):
     def post(self, request, account_key):
         if not self.check_signature(request, account_key):
             return HttpResponseForbidden()
-        account = Account.objects.get(pk=account_key) #WeixinAccounts.get(account_key)
+        # account = Account.objects.get(pk=account_key) #WeixinAccounts.get(account_key)
         self.msg = parse_message(request.body)
         msg = self.msg
         print msg
         reply = None
         toUserName = msg._data['ToUserName']
+        print "toUserName:::",toUserName
         fromUserName = msg._data['FromUserName']
         createTime = msg._data['CreateTime']
+        weixin_account = WeixinAccounts.getByOriginalId(toUserName)
+        account = weixin_account.db_account
         if isinstance(msg, BaseEvent):
             if isinstance(msg, ClickEvent):
                 reply = self.process_click_event(msg)
             elif isinstance(msg, SubscribeEvent):
-                reply = self.process_subscribe(msg, account.id)
+                reply = self.process_subscribe(msg, toUserName)
             elif isinstance(msg, UnsubscribeEvent):
-                w_user = WeixinUser.objects.filter(openid=fromUserName).first()
-                w_user.subscribe = 0
-                w_user.save()
+                w_user = getOrCreateWeixinUser(fromUserName, account)
+                if w_user.subscribe != 0:
+                    w_user.subscribe = 0
+                    w_user.save()
                 reply = create_reply(u'欢迎下次关注我们！', msg)
             elif isinstance(msg, SubscribeScanEvent):
-                reply = self.process_subscribe(msg, account_key)
+                reply = self.process_subscribe(msg, toUserName)
             elif isinstance(msg, ScanEvent):
                 w_user = getOrCreateWeixinUser(fromUserName, account)
                 eventKey = msg._data['EventKey']
                 #如果eventkey为用户id则进行绑定
-                reply = self.process_subscribe(msg, account.id)
+                reply = self.process_subscribe(msg, toUserName)
             elif isinstance(msg, TemplateSendJobFinishEvent):
                 pass
         elif isinstance(msg, BaseMessage):
@@ -159,8 +163,8 @@ class WeixinJoinView(View):
         sub_services = SubscribeService.objects.filter(channel='weixin', is_open=True).all()
         toUserName = msg._data['ToUserName']
         fromUserName = msg._data['FromUserName']
-        account = Account.objects.get(original_id=toUserName)
-        w_user = getOrCreateWeixinUser(fromUserName, account)
+        account = WeixinAccounts.getByOriginalId(toUserName)
+        w_user = getOrCreateWeixinUser(fromUserName, account.db_account)
         if msg.key == 'test_hmm':
             txt = u'客官，请回复相关数字订阅最新项目通知，系统会在第一时间发送给您相关信息。\n'
             for sub_service in sub_services:
@@ -169,9 +173,9 @@ class WeixinJoinView(View):
             reply = create_reply(txt, msg)
         if msg.key == 'bind_weixin':
             if not w_user.user:
-                txt = self.getBindTxt(fromUserName, account.id)
+                txt = self.getBindTxt(fromUserName)
             else:
-                txt = self.getUnBindTxt(fromUserName, account.id, w_user.user.wanglibaouserprofile.phone)
+                txt = self.getUnBindTxt(fromUserName, w_user.user.wanglibaouserprofile.phone)
             reply = create_reply(txt, msg)
         if msg.key == 'my_account':
             account_info = getAccountInfo(w_user.user)
@@ -222,11 +226,11 @@ class WeixinJoinView(View):
         return reply
 
 
-    def process_subscribe(self, msg, accountid):
+    def process_subscribe(self, msg, original_id):
         fromUserName = msg._data['FromUserName']
         eventKey = msg._data['EventKey']
-        account = Account.objects.get(pk=accountid)
-        w_user = getOrCreateWeixinUser(fromUserName, account)
+        account = WeixinAccounts.getByOriginalId(original_id)
+        w_user = getOrCreateWeixinUser(fromUserName, account.db_account)
         reply = None
         if w_user.subscribe != 1:
             w_user.subscribe = 1
@@ -243,7 +247,7 @@ class WeixinJoinView(View):
                 w_user.scene_id = eventKey
                 w_user.save()
         if not reply and not w_user.user:
-            txt = self.getBindTxt(fromUserName, accountid)
+            txt = self.getBindTxt(fromUserName)
             reply = create_reply(txt, msg)
         if not reply:
             articles = self.getSubscribeArticle()
@@ -262,13 +266,13 @@ class WeixinJoinView(View):
         return [{'image':image, 'url':url, 'description':description, 'title':title},
                 {'image':image1, 'url':url1, 'description':description1, 'title':title1}]
 
-    def getBindTxt(self, fromUserName, accountid):
-        bind_url = settings.WEIXIN_CALLBACK_URL + reverse('weixin_bind_login') + "?openid=%s&state=%s"%(fromUserName, accountid)
+    def getBindTxt(self, fromUserName):
+        bind_url = settings.WEIXIN_CALLBACK_URL + reverse('weixin_bind_login') + "?openid=%s"%(fromUserName)
         txt = u"终于等到你，还好我没放弃。绑定网利宝帐号，轻松投资、随时随地查看收益！<a href='%s'>【立即绑定】</a>"%(bind_url)
         return txt
 
-    def getUnBindTxt(self, fromUserName, accountid, userPhone):
-        unbind_url = settings.WEIXIN_CALLBACK_URL + reverse('weixin_unbind') + "?openid=%s&state=%s"%(fromUserName, accountid)
+    def getUnBindTxt(self, fromUserName, userPhone):
+        unbind_url = settings.WEIXIN_CALLBACK_URL + reverse('weixin_unbind') + "?openid=%s"%(fromUserName)
         txt = u"您的微信绑定帐号为：%s\n"%userPhone\
             +u"如需解绑当前帐号，请点击<a href='%s'>【立即解绑】</a>"%unbind_url
         return txt
@@ -298,8 +302,8 @@ def getOrCreateWeixinUser(openid, account):
             w_user.unionid =  user_info.get('unionid', '')
             w_user.province = user_info.get('province', '')
             w_user.subscribe = user_info.get('subscribe', '')
-            if not w_user.subscribe_time:
-                w_user.subscribe_time = user_info.get('subscribe_time', '')
+            # if not w_user.subscribe_time:
+            w_user.subscribe_time = user_info.get('subscribe_time', '')
             w_user.save()
         except WeChatException, e:
             pass
@@ -317,221 +321,6 @@ def bindUser(w_user, user):
     w_user.user = user
     w_user.save()
     return 0, u'绑定成功'
-
-
-
-class SendTemplateMessage(APIView):
-    permission_classes = ()
-    http_method_names = ['post']
-    BIND_SUCCESS = "bind_success"
-    @classmethod
-    def sendTemplate(cls, weixin_user, message_template):
-        account = Account.objects.get(original_id=weixin_user.account_original_id)
-        client = WeChatClient(account.app_id, account.app_secret)
-        client.message.send_template(weixin_user.openid, template_id=message_template.template_id,
-                                     top_color=message_template.top_color, data=message_template.data,
-                                     url=message_template.url)
-
-    def post(self, request):
-        openid = request.POST.get('openid')
-        if not openid:
-            return Response({'error':-1})
-        template_type = request.POST.get('template_type','')
-        if template_type.lower() == SendTemplateMessage.BIND_SUCCESS:
-            template = MessageTemplate(BIND_SUCCESS_TEMPLATE_ID, )
-
-        try:
-            SendTemplateMessage.sendTemplate(openid)
-        except:
-            return Response({'error':-2})
-        return Response({'message':'ok'})
-
-
-class WeixinBindLogin(TemplateView):
-    template_name = 'sub_login.jade'
-
-    def get_context_data(self, **kwargs):
-        context = super(WeixinBindLogin, self).get_context_data(**kwargs)
-        openid = self.request.GET.get('openid', '')
-        account_id = self.request.GET.get('state')
-        account = Account.objects.filter(id=account_id).first()
-        try:
-            w_user = getOrCreateWeixinUser(openid, account)
-            context['openid'] = openid
-        except WeChatException, e:
-            pass
-        next = self.request.GET.get('next', '')
-        return {
-            'context': context,
-            'next': next
-            }
-
-    def dispatch(self, request, *args, **kwargs):
-        openid = self.request.GET.get('openid', '')
-        if not openid:
-            return redirectToJumpPage("error:-1")
-        account_id = self.request.GET.get('state')
-        account = Account.objects.filter(id=account_id).first()
-        if not account:
-            return redirectToJumpPage("error:-2")
-        w_user = getOrCreateWeixinUser(openid, account)
-        if w_user.user:
-            message = u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone
-            return redirectToJumpPage(message)
-        return super(WeixinBindLogin, self).dispatch(request, *args, **kwargs)
-
-
-class WeixinLoginBindAPI(APIView):
-    permission_classes = ()
-    http_method_names = ['post']
-
-    def _form(self, request):
-        return LoginAuthenticationNoCaptchaForm(request, data=request.POST)
-
-    def post(self, request):
-        form = self._form(request)
-
-        if form.is_valid():
-            user = form.get_user()
-
-            try:
-                openid = request.POST.get('openid')
-                weixin_user = WeixinUser.objects.get(openid=openid)
-                rs, txt = bindUser(weixin_user, user)
-            except WeixinUser.DoesNotExist:
-                pass
-
-            auth_login(request, user)
-            request.session.set_expiry(1800)
-            data = {'nickname': user.wanglibaouserprofile.nick_name}
-            return Response(data)
-
-        return Response(form.errors, status=400)
-
-
-class JumpPageTemplate(TemplateView):
-    template_name = 'sub_times.jade'
-
-    def get_context_data(self, **kwargs):
-        context = super(JumpPageTemplate, self).get_context_data(**kwargs)
-        message = self.request.GET.get('message', 'ERROR')
-        context['message'] = message
-        return {
-            'context': context,
-            'next': next
-            }
-
-def redirectToJumpPage(message):
-    url = reverse('jump_page')+'?message=%s'%message
-    return HttpResponseRedirect(url)
-
-class UnBindWeiUser(TemplateView):
-    template_name = 'sub_is_bind.jade'
-
-    def get_context_data(self, **kwargs):
-        context = super(UnBindWeiUser, self).get_context_data(**kwargs)
-        openid = self.request.GET.get('openid', '')
-        account_id = self.request.GET.get('state')
-        account = Account.objects.filter(id=account_id).first()
-        try:
-            w_user = getOrCreateWeixinUser(openid, account)
-            context['openid'] = openid
-        except WeChatException, e:
-            pass
-        next = self.request.GET.get('next', '')
-        return {
-            'context': context,
-            'next': next
-            }
-
-    def dispatch(self, request, *args, **kwargs):
-        openid = self.request.GET.get('openid', '')
-        if not openid:
-            return redirectToJumpPage("error:-1")
-        account_id = self.request.GET.get('state')
-        account = Account.objects.filter(id=account_id).first()
-        if not account:
-            return redirectToJumpPage("error:-2")
-        w_user = getOrCreateWeixinUser(openid, account)
-        if not w_user.user:
-            message = u"您没有绑定的网利宝帐号"
-            return redirectToJumpPage(message)
-        return super(UnBindWeiUser, self).dispatch(request, *args, **kwargs)
-
-class UnBindWeiUserAPI(APIView):
-    permission_classes = ()
-    http_method_names = ['post']
-
-    def post(self, request):
-        openid = request.POST.get('openid')
-        weixin_user = WeixinUser.objects.get(openid=openid)
-        weixin_user.user = None
-        weixin_user.save()
-        return Response({'message':'ok'})
-
-
-class WeixinBindRegister(TemplateView):
-    template_name = 'sub_regist.jade'
-
-    def get_context_data(self, **kwargs):
-        openid = self.request.GET.get('openid')
-        token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
-        token_session = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
-        if token:
-            token = token
-        elif token_session:
-            token = token_session
-        else:
-            token = 'weixin'
-
-        if token:
-            channel = get_channel_record(token)
-        else:
-            channel = None
-        phone = self.request.GET.get('phone', 0)
-        next = self.request.GET.get('next', '')
-        return {
-            'token': token,
-            'channel': channel,
-            'phone': phone,
-            'next' : next,
-            'openid':openid,
-        }
-
-
-class WeixinJsapiConfig(APIView):
-    permission_classes = ()
-    http_method_names = ['get']
-
-    @weixin_api_error
-    def get(self, request):
-        if settings.ENV == settings.ENV_DEV:
-            request.session['account_key'] = 'test'
-            account = WeixinAccounts.get('test')
-        else:
-            request.session['account_key'] = 'sub_1'
-            account = WeixinAccounts.get('sub_1')
-
-        noncestr = uuid.uuid1().hex
-        timestamp = str(int(time.time()))
-        url = (request.META.get('HTTP_REFERER') or '').split('#')[0]
-
-        app_id = account.app_id
-        signature = account.weixin_client.jsapi.get_jsapi_signature(
-            noncestr,
-            account.jsapi_ticket,
-            timestamp,
-            url
-        )
-
-        data = {
-            'appId': app_id,
-            'timestamp': timestamp,
-            'nonceStr': noncestr,
-            'signature': signature
-        }
-        return Response(data)
-
 
 class WeixinLogin(TemplateView):
     template_name = 'weixin_login_new.jade'
@@ -592,6 +381,214 @@ class WeixinRegister(TemplateView):
         }
 
 
+class WeixinBindLogin(TemplateView):
+    template_name = 'sub_login.jade'
+
+    def get_context_data(self, **kwargs):
+        context = super(WeixinBindLogin, self).get_context_data(**kwargs)
+        openid = self.request.GET.get('openid', '')
+        context['openid'] = openid
+        next = self.request.GET.get('next', '')
+        return {
+            'context': context,
+            'next': next
+            }
+
+    def dispatch(self, request, *args, **kwargs):
+        openid = self.request.GET.get('openid', '')
+        if not openid:
+            return redirectToJumpPage("error:-1")
+        w_user = WeixinUser.objects.filter(openid=openid).first()
+        if not w_user:
+            message = u"请从[服务中心]点击[绑定微信]进行绑定"
+            return redirectToJumpPage(message)
+        if w_user.user:
+            message = u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone
+            return redirectToJumpPage(message)
+        return super(WeixinBindLogin, self).dispatch(request, *args, **kwargs)
+
+class WeixinBindRegister(WeixinRegister):
+    template_name = 'sub_regist.jade'
+
+    def get_context_data(self, **kwargs):
+        context = super(WeixinBindRegister, self).get_context_data(**kwargs)
+        openid = self.request.GET.get('openid', '')
+        context['openid'] = openid
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        openid = self.request.GET.get('openid', '')
+        if not openid:
+            return redirectToJumpPage("error:-1")
+        w_user = WeixinUser.objects.filter(openid=openid).first()
+        if not w_user:
+            message = u"请从[服务中心]点击[绑定微信]进行绑定"
+            return redirectToJumpPage(message)
+        if w_user.user:
+            message = u'你微信已经绑定网利宝账户%s'%w_user.user.wanglibaouserprofile.phone
+            return redirectToJumpPage(message)
+        return super(WeixinBindRegister, self).dispatch(request, *args, **kwargs)
+
+class WeixinBindAPI(APIView):
+    permission_classes = (IsAuthenticated,)
+    http_method_names = ['post']
+
+    def post(self, request):
+        user = request.user
+        rs = -1
+        txt = 'error'
+        try:
+            openid = request.POST.get('openid')
+            weixin_user = WeixinUser.objects.get(openid=openid)
+            rs, txt = bindUser(weixin_user, user)
+        except WeixinUser.DoesNotExist:
+            pass
+        return Response({'message': txt, 'code': rs})
+
+class SendTemplateMessage(APIView):
+    permission_classes = (IsAuthenticated,)
+    http_method_names = ['post']
+    BIND_SUCCESS = "bind_success"
+
+    @classmethod
+    def sendTemplate(cls, weixin_user, message_template):
+        weixin_account = WeixinAccounts.getByOriginalId(weixin_user.account_original_id)
+        account = weixin_account.db_account
+        # account = Account.objects.get(original_id=weixin_user.account_original_id)
+        client = WeChatClient(account.app_id, account.app_secret)
+        client.message.send_template(weixin_user.openid, template_id=message_template.template_id,
+                                     top_color=message_template.top_color, data=message_template.data,
+                                     url=message_template.url)
+    def post(self, request):
+        openid = request.POST.get('openid')
+        if not openid:
+            return Response({'error':-1})
+        w_user = WeixinUser.objects.filter(openid=openid).first()
+        template_type = request.POST.get('template_type', '')
+        template = None
+        if template_type.lower() == SendTemplateMessage.BIND_SUCCESS and w_user.user == request.user:
+            now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
+            template = MessageTemplate(BIND_SUCCESS_TEMPLATE_ID, first=u"您好，恭喜您账户绑定成功！\n  \n您的账户已经与微信账户绑定在一起。",
+                        keyword1=now_str)
+        if template:
+            SendTemplateMessage.sendTemplate(w_user, template)
+        return Response({'message':'ok'})
+
+
+# class WeixinLoginBindAPI(APIView):
+#     permission_classes = ()
+#     http_method_names = ['post']
+#
+#     def _form(self, request):
+#         return LoginAuthenticationNoCaptchaForm(request, data=request.POST)
+#
+#     def post(self, request):
+#         form = self._form(request)
+#
+#         if form.is_valid():
+#             user = form.get_user()
+#
+#             try:
+#                 openid = request.POST.get('openid')
+#                 weixin_user = WeixinUser.objects.filter(openid=openid).first()
+#                 rs, txt = bindUser(weixin_user, user)
+#             except WeixinUser.DoesNotExist:
+#                 pass
+#             auth_login(request, user)
+#             request.session.set_expiry(1800)
+#             data = {'nickname': user.wanglibaouserprofile.nick_name}
+#             return Response(data)
+#         return Response(form.errors, status=400)
+
+class JumpPageTemplate(TemplateView):
+    template_name = 'sub_times.jade'
+
+    def get_context_data(self, **kwargs):
+        context = super(JumpPageTemplate, self).get_context_data(**kwargs)
+        message = self.request.GET.get('message', 'ERROR')
+        context['message'] = message
+        return {
+            'context': context,
+            'next': next
+            }
+
+def redirectToJumpPage(message):
+    url = reverse('jump_page')+'?message=%s'%message
+    return HttpResponseRedirect(url)
+
+class UnBindWeiUser(TemplateView):
+    template_name = 'sub_is_bind.jade'
+
+    def get_context_data(self, **kwargs):
+        context = super(UnBindWeiUser, self).get_context_data(**kwargs)
+        openid = self.request.GET.get('openid', '')
+        context['openid'] = openid
+        next = self.request.GET.get('next', '')
+        return {
+            'context': context,
+            'next': next
+            }
+
+    def dispatch(self, request, *args, **kwargs):
+        openid = self.request.GET.get('openid', '')
+        if not openid:
+            return redirectToJumpPage("error:-1")
+        w_user = WeixinUser.objects.filter(openid=openid).first()
+        if not w_user:
+            message = u"请从[服务中心]点击[绑定微信]进行绑定"
+            return redirectToJumpPage(message)
+        if not w_user.user:
+            message = u"您没有绑定的网利宝帐号"
+            return redirectToJumpPage(message)
+        return super(UnBindWeiUser, self).dispatch(request, *args, **kwargs)
+
+class UnBindWeiUserAPI(APIView):
+    permission_classes = ()
+    http_method_names = ['post']
+
+    def post(self, request):
+        openid = request.POST.get('openid')
+        weixin_user = WeixinUser.objects.get(openid=openid)
+        weixin_user.user = None
+        weixin_user.save()
+        return Response({'message':'ok'})
+
+
+class WeixinJsapiConfig(APIView):
+    permission_classes = ()
+    http_method_names = ['get']
+
+    @weixin_api_error
+    def get(self, request):
+        if settings.ENV == settings.ENV_DEV:
+            request.session['account_key'] = 'test'
+            account = WeixinAccounts.get('test')
+        else:
+            request.session['account_key'] = 'sub_1'
+            account = WeixinAccounts.get('sub_1')
+
+        noncestr = uuid.uuid1().hex
+        timestamp = str(int(time.time()))
+        url = (request.META.get('HTTP_REFERER') or '').split('#')[0]
+
+        app_id = account.app_id
+        signature = account.weixin_client.jsapi.get_jsapi_signature(
+            noncestr,
+            account.jsapi_ticket,
+            timestamp,
+            url
+        )
+
+        data = {
+            'appId': app_id,
+            'timestamp': timestamp,
+            'nonceStr': noncestr,
+            'signature': signature
+        }
+        return Response(data)
+
+
+
 class WeixinLoginAPI(APIView):
     permission_classes = ()
     http_method_names = ['post']
@@ -604,11 +601,11 @@ class WeixinLoginAPI(APIView):
 
         if form.is_valid():
             user = form.get_user()
-
             try:
                 openid = request.POST.get('openid')
-                weixin_user = WeixinUser.objects.get(openid=openid)
-                rs, txt = bindUser(weixin_user, user)
+                if openid:
+                    weixin_user = WeixinUser.objects.get(openid=openid)
+                    # rs, txt = bindUser(weixin_user, user)
             except WeixinUser.DoesNotExist:
                 pass
 
@@ -1339,7 +1336,8 @@ class GenerateQRLimitSceneTicket(APIView):
             return Response({'errcode':-2, 'errmsg':"-2"})
         account = Account.objects.get(original_id=original_id)
         client = WeChatClient(account.app_id, account.app_secret, account.access_token)
-        qrcode_data = {"action_name":"QR_LIMIT_SCENE", "action_info":{"scene": {"scene_id": phone}}}
+        qrcode_data = {"action_name": "QR_LIMIT_STR_SCENE", "action_info": {"scene": {"scene_str": str(phone)}}}
+        # qrcode_data = {"action_name":"QR_LIMIT_SCENE", "action_info":{"scene": {"scene_id": phone}}}
         try:
             rs = client.qrcode.create(qrcode_data)
             qrcode_url = client.qrcode.get_url(rs.get('ticket'))

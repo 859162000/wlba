@@ -36,8 +36,10 @@ urlpatterns = patterns(
     # js api
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
     url(r'^api/login/$', views.WeixinLoginAPI.as_view(), name='weixin_login_api'),
-    url(r'^api/login/bind/$', views.WeixinLoginBindAPI.as_view(), name='weixin_login_bind_api'),
+    # url(r'^api/login/bind/$', views.WeixinLoginBindAPI.as_view(), name='weixin_login_bind_api'),
+    url(r'^api/bind/$', views.WeixinBindAPI.as_view(), name='weixin_bind_api'),
     url(r'^api/unbind/$', views.UnBindWeiUserAPI.as_view(), name='weixin_unbind_api'),
+    url(r'^api/send_template_msg/$', views.SendTemplateMessage.as_view(), name='send_template_message'),
     url(r'^api/pay/order/$', views.WeixinPayOrder.as_view(), name='weixin_pay_order_api'),
     url(r'api/wx_code/$', views.AuthorizeCode.as_view(), name='weixin_authorize_code'),
     url(r'api/wx_userinfo/$', views.AuthorizeUser.as_view(), name='weixin_authorize_user_info'),
