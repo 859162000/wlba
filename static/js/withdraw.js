@@ -16,6 +16,9 @@
   });
 
   require(['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator', 'jquery.validate'], function($, modal, backend, tool, placeholder, validate) {
+    var max_amount, min_amount;
+    max_amount = parseInt($('input[name=fee]').attr('data-max_amount'));
+    min_amount = parseInt($('input[name=fee]').attr('data-min_amount'));
     $.validator.addMethod("balance", function(value, element) {
       return backend.checkBalance(value, element);
     });
@@ -23,7 +26,7 @@
       return backend.checkMoney(value, element);
     });
     $.validator.addMethod("huge", function(value, element) {
-      return value <= 100000;
+      return value <= max_amount;
     });
     $.validator.addMethod("small", function(value, element) {
       var balance;
@@ -33,7 +36,7 @@
       }
       if (balance - value === 0) {
         return true;
-      } else if (value >= 50) {
+      } else if (value >= min_amount) {
         return true;
       }
       return false;
@@ -43,9 +46,9 @@
         amount: {
           required: true,
           money: true,
-          balance: true,
-          huge: true,
-          small: true
+          balance: false,
+          huge: false,
+          small: false
         },
         card_id: {
           required: true
