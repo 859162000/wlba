@@ -111,6 +111,9 @@ class WithdrawFee(object):
             management_amount = decimal.Decimal(0)
         management_fee = (management_amount * management_fee_rate).quantize(TWO_PLACES)
 
+        fee = fee / decimal.Decimal('1.00')
+        management_fee = management_fee / decimal.Decimal('1.00')
+
         return fee, management_fee, management_amount
 
     @staticmethod
