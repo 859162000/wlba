@@ -459,7 +459,16 @@ def bind_pay_deposit(request):
         return {"ret_code": 20114, 'message': '金额格式错误'}
 
     if bank.channel == 'huifu':
-        return HuifuShortPay().pre_pay(request)
+        result = HuifuShortPay().pre_pay(request)
+
+        if result['ret_code'] == 0:
+            try:
+                # 处理第三方用户充值回调
+                CoopRegister(request).process_for_recharge(request.user)
+            except Exception, e:
+                logger.error(e)
+
+        return result
 
     elif bank.channel == 'yeepay':
         result = YeeShortPay().pre_pay(request)
