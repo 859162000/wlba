@@ -48,6 +48,7 @@ define ['jquery'], ($)->
       }
     .success (xhr)->
       target.next().text('')
+      $('#card-select').next().text('')
       if xhr.ret_code > 0
         if xhr.ret_code = 30137
           $('#card-select').next().text(xhr.message)

@@ -61,6 +61,7 @@
         }
       }).success(function(xhr) {
         target.next().text('');
+        $('#card-select').next().text('');
         if (xhr.ret_code > 0) {
           if (xhr.ret_code = 30137) {
             return $('#card-select').next().text(xhr.message);
