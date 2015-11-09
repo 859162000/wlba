@@ -2021,13 +2021,13 @@ class QuickApplyerAPIView(APIView):
 
         u"郑州": 'zhengzhouoffice@wanglibank.com',
         u"重庆": 'chongqingoffice@wanglibank.com',
-        u"其他": 'qitachengshioffice@wanglibank.com',
+        u"其它": 'qitachengshioffice@wanglibank.com',
         }
 
         apply = {
             0: u'我有房',
             1: u'我有车',
-            2: u'其他',
+            2: u'其它',
         }
 
         name = request.POST.get('name', '')
