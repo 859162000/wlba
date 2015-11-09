@@ -890,7 +890,7 @@ class FEEAPIView(APIView):
             return {"ret_code": 30133, 'message': u'提现金额超出最大提现限额'}
         if amount < fee_config.get('min_amount'):
             if amount != margin:
-                return {"ret_code": 30134, 'message': u'金额格式错误'}
+                return {"ret_code": 30134, 'message': u'提现金额小于{}元时须一次性提完'.format(fee_config.get('min_amount'))}
 
         # 检测银行的单笔最大提现限额,如民生银行
         bank = Bank.objects.filter(code=bank_id.upper()).first()
@@ -949,7 +949,7 @@ class FEEPCAPIView(APIView):
             return {"ret_code": 30133, 'message': u'提现金额超出最大提现限额'}
         if amount < fee_config.get('min_amount'):
             if amount != margin:
-                return {"ret_code": 30134, 'message': u'金额格式错误'}
+                return {"ret_code": 30134, 'message': u'提现金额小于{}元时须一次性提完'.format(fee_config.get('min_amount'))}
 
         # 检测银行的单笔最大提现限额,如民生银行
         card = Card.objects.get(pk=card_id)
