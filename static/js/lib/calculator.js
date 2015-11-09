@@ -62,9 +62,13 @@
       }).success(function(xhr) {
         target.next().text('');
         if (xhr.ret_code > 0) {
-          return target.next().text(xhr.message);
+          if (xhr.ret_code = 30137) {
+            return $('#card-select').next().text(xhr.message);
+          } else {
+            return target.next().text(xhr.message);
+          }
         } else {
-          $('#poundage').text(xhr.fee + '+' + management_fee);
+          $('#poundage').text(xhr.fee + '+' + xhr.management_fee);
           return $('#actual-amount').text(xhr.actual_amount);
         }
       });
