@@ -36,6 +36,7 @@ block main
                   option(value='') 请选择银行卡
                   for card in cards
                     option(value='{{card.id}}') {{card | card_info}}
+                label.error
                 .space-vertical-s
                 a#add-card-button.blue.margin-top-m(href='#add-card-form')
                  .add-icon
