@@ -873,7 +873,7 @@ class FEEAPIView(APIView):
         try:
             float(amount)
         except:
-            return {"ret_code": 30132, 'message': u'金额格式错误'}
+            return Response({"ret_code": 30132, 'message': u'金额格式错误'})
 
         amount = util.fmt_two_amount(amount)
         # 计算提现费用 手续费 + 资金管理费
@@ -886,11 +886,16 @@ class FEEAPIView(APIView):
         fee_config = fee_misc.get_withdraw_fee_config()
 
         # 检测提现最大最小金额
-        if amount > fee_config.get('max_amount') or amount <= 0:
-            return {"ret_code": 30133, 'message': u'提现金额超出最大提现限额'}
-        if amount < fee_config.get('min_amount'):
-            if amount != margin:
-                return {"ret_code": 30134, 'message': u'提现金额小于{}元时须一次性提完'.format(fee_config.get('min_amount'))}
+        max_amount = fee_config.get('max_amount')
+        min_amount = fee_config.get('min_amount')
+        if amount > max_amount or amount <= 0:
+            return Response({"ret_code": 30133, 'message': u'提现金额超出最大提现限额'})
+        if amount < min_amount:
+            if margin > min_amount:
+                return Response({"ret_code": 30134, 'message': u'提现金额必须大于{}元'.format(min_amount)})
+            else:
+                if amount != margin:
+                    return Response({"ret_code": 30138, 'message': u'账户余额小于{}元时须一次性提完'.format(min_amount)})
 
         # 检测银行的单笔最大提现限额,如民生银行
         bank = Bank.objects.filter(code=bank_id.upper()).first()
@@ -900,14 +905,14 @@ class FEEAPIView(APIView):
 
             if bank_max_amount:
                 if amount > bank_max_amount:
-                    return {"ret_code": 30135, 'message': u'提现金额超出银行最大提现限额'}
+                    return Response({"ret_code": 30135, 'message': u'提现金额超出银行最大提现限额'})
 
         # 获取计算后的费率
         fee, management_fee, management_amount = fee_misc.get_withdraw_fee(user, amount, margin, uninvested)
 
         actual_amount = amount - fee - management_fee  # 实际到账金额
         if actual_amount <= 0:
-            return {"ret_code": 30136, "message": u'实际到账金额为0,无法提现'}
+            return Response({"ret_code": 30136, "message": u'实际到账金额为0,无法提现'})
 
         return Response({
             "ret_code": 0,
@@ -932,7 +937,7 @@ class FEEPCAPIView(APIView):
         try:
             float(amount)
         except ValueError:
-            return {"ret_code": 30132, 'message': u'金额格式错误'}
+            return Response({"ret_code": 30132, 'message': u'金额格式错误'})
 
         amount = util.fmt_two_amount(amount)
         # 计算提现费用 手续费 + 资金管理费
@@ -945,11 +950,16 @@ class FEEPCAPIView(APIView):
         fee_config = fee_misc.get_withdraw_fee_config()
 
         # 检测提现最大最小金额
-        if amount > fee_config.get('max_amount') or amount <= 0:
-            return {"ret_code": 30133, 'message': u'提现金额超出最大提现限额'}
-        if amount < fee_config.get('min_amount'):
-            if amount != margin:
-                return {"ret_code": 30134, 'message': u'提现金额小于{}元时须一次性提完'.format(fee_config.get('min_amount'))}
+        max_amount = fee_config.get('max_amount')
+        min_amount = fee_config.get('min_amount')
+        if amount > max_amount or amount <= 0:
+            return Response({"ret_code": 30133, 'message': u'提现金额超出最大提现限额'})
+        if amount < min_amount:
+            if margin > min_amount:
+                return Response({"ret_code": 30134, 'message': u'提现金额必须大于{}元'.format(min_amount)})
+            else:
+                if amount != margin:
+                    return Response({"ret_code": 30138, 'message': u'账户余额小于{}元时须一次性提完'.format(min_amount)})
 
         # 检测银行的单笔最大提现限额,如民生银行
         card = Card.objects.get(pk=card_id)
@@ -957,14 +967,14 @@ class FEEPCAPIView(APIView):
         bank_max_amount = bank_limit.get('bank_max_amount', 0)
         if bank_max_amount:
             if amount > bank_max_amount:
-                return {"ret_code": 30135, 'message': u'提现金额超出银行最大提现限额'}
+                return Response({"ret_code": 30135, 'message': u'提现金额超出银行最大提现限额'})
 
         # 获取计算后的费率
         fee, management_fee, management_amount = fee_misc.get_withdraw_fee(user, amount, margin, uninvested)
 
         actual_amount = amount - fee - management_fee  # 实际到账金额
         if actual_amount <= 0:
-            return {"ret_code": 30136, "message": u'实际到账金额为0,无法提现'}
+            return Response({"ret_code": 30136, "message": u'实际到账金额为0,无法提现'})
 
         return Response({
             "ret_code": 0,
