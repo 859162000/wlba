@@ -13,20 +13,21 @@ require.config(
 )
 
 require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator', 'jquery.validate'], ($, modal, backend, tool, placeholder, validate)->
-
+  max_amount = parseInt($('input[name=fee]').attr('data-max_amount'))
+  min_amount = parseInt($('input[name=fee]').attr('data-min_amount'))
   $.validator.addMethod "balance", (value, element)->
     return backend.checkBalance(value, element)
   $.validator.addMethod "money", (value, element)->
     return backend.checkMoney(value, element)
   $.validator.addMethod "huge", (value, element)->
-    return value <= 100000
+    return value <= max_amount
   $.validator.addMethod "small", (value, element)->
     balance = $(element).attr('data-balance')
     if value <= 0
       return false
     if balance - value == 0
       return true
-    else if value >= 50
+    else if value >= min_amount
       return true
     return false
 
@@ -35,9 +36,9 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       amount:
         required: true
         money: true
-        balance: true
-        huge: true
-        small: true
+        balance: false
+        huge: false
+        small: false
       card_id:
         required: true
       validate_code:

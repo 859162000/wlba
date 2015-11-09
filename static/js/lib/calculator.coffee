@@ -32,11 +32,33 @@ define ['jquery'], ($)->
         $(earning_element).text "0.0"
 
 
-  $('input[data-role=fee-calculator]').keyup (e)->
-    target = $(e.target)
-    rate = target.attr 'data-rate'
+  $('input[data-role=fee-calculator]').blur ()->
+    checkInput()
+  $('#card-select').change ()->
+    checkInput()
+  checkInput = () ->
+    target = $('input[name=amount]')
     amount = target.val()
-    fee_element = target.attr 'data-target-fee'
+    $.ajax
+      url: "/api/fee/pc/"
+      type: "POST"
+      data: {
+        card_id : $('select[name=card_id]').val()
+        amount : amount
+      }
+    .success (xhr)->
+      target.next().text('')
+      $('#card-select').next().text('')
+      if xhr.ret_code > 0
+        if xhr.ret_code == 30137
+          $('#card-select').next().text(xhr.message)
+        else
+          target.next().text(xhr.message)
+      else
+        $('#poundage').text(xhr.fee+'+'+xhr.management_fee)
+        $('#actual-amount').text(xhr.actual_amount)
+
+    ###fee_element = target.attr 'data-target-fee'
     actual_element = target.attr 'data-target-actual'
     fee_switch = target.attr 'data-switch'
     fee_interval = target.attr 'data-interval'
@@ -94,9 +116,9 @@ define ['jquery'], ($)->
           str = sxf_str
         else
           str = sxf_str + '+' +zjglf_str
-      $(fee_poundage).text str
+      $(fee_poundage).text str###
 
-  $('input[data-role=fee-calculator]').keyup()
+  ######$('input[data-role=fee-calculator]').keyup()
 
   p2pCalculate = () ->
     target = $('input[data-role=p2p-calculator]')

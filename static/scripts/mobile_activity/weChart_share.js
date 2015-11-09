@@ -308,9 +308,13 @@ org.weChatStart = (function(org){
         _fetchPack: function(){
             var
                 $submit  = $('.webpack-btn-red'),
-                phoneVal = $('input[name=phone]');
+                phoneVal = $('input[name=phone]'),
+                postDo = false;
 
             $submit.on('click', function(){
+                if(postDo) return
+
+                $submit.html('领取中...');
                 var ops = {
                     phone : phoneVal.val() * 1,
                     activity : $(this).attr('data-activity'),
@@ -319,8 +323,32 @@ org.weChatStart = (function(org){
                 }
 
                 if(!lib._checkPhone(ops.phone)) return ;
+                org.ajax({
+                    url: '/api/weixin/share/has_gift/',
+                    type: 'POST',
 
-                window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
+                    data: {
+                        'openid': ops.openid,
+                        'phone_num': ops.phone,
+                        'order_id': ops.orderid
+                    },
+                    dataType : 'json',
+                    success: function(data){
+                        if(data.has_gift == 'true'){
+                            org.ui.alert(data.message);
+                        }else if(data.has_gift == 'false'){
+                            window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
+                        }
+                    },
+                    error: function(data){
+                        org.ui.alert(data)
+                    },
+                    complete: function(){
+                        postDo = false;
+                        $submit.html('立即开奖');
+                    }
+                })
+
             });
 
         },
@@ -340,11 +368,11 @@ org.weChatStart = (function(org){
 org.weChatDetail = (function(org){
     var lib = {
         init:function(){
-            window.onload = function(){
+            /*window.onload = function(){
               if($('#amount').attr('data-hasgift') == 'true'){
                  org.ui.alert('您已经领取过礼物了！');
               }
-            }
+            }*/
         },
     }
     return {
