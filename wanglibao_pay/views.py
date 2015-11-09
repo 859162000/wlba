@@ -881,6 +881,9 @@ class FEEAPIView(APIView):
         margin = user.margin.margin  # 账户余额
         uninvested = user.margin.uninvested  # 充值未投资金额
 
+        if amount > margin:
+            return Response({"ret_code": 30139, "message": u"提现金额超出账户可用余额"})
+
         # 获取费率配置
         fee_misc = WithdrawFee(switch='on')
         fee_config = fee_misc.get_withdraw_fee_config()
@@ -944,6 +947,9 @@ class FEEPCAPIView(APIView):
         user = request.user
         margin = user.margin.margin  # 账户余额
         uninvested = user.margin.uninvested  # 充值未投资金额
+
+        if amount > margin:
+            return Response({"ret_code": 30139, "message": u"提现金额超出账户可用余额"})
 
         # 获取费率配置
         fee_misc = WithdrawFee(switch='on')
