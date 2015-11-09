@@ -105,8 +105,8 @@ class WithdrawFee(object):
 
         # 比较提现金额与充值未投资金额
         margin_left = margin - uninvested
-        if margin_left < uninvested:
-            management_amount = uninvested - margin_left
+        if amount > margin_left:
+            management_amount = amount - margin_left
         else:
             management_amount = decimal.Decimal(0)
         management_fee = (management_amount * management_fee_rate).quantize(TWO_PLACES)
