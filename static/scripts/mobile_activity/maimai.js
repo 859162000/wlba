@@ -532,7 +532,7 @@ org.success = (function(org){
 
                 if(state === 0){
                     str = '成功领取';
-                    val = '1.1%加息券';
+                    val = '1.0%加息券';
                     url = '/weixin/login/';
                 }else if(state === 1){
                     str = '您已领取过奖品!';

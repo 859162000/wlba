@@ -4,9 +4,10 @@ html(style="background: #f6f6f6")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_jucheng.css?v=201511061", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_jucheng.css?v=201511062", rel="stylesheet")
         - csrf_token
        body
+        img.weixin_share(src="/static/imgs/mobile_activity/app_jucheng/300x300.jpg" style="display:none")
         img.banner(src="/static/imgs/mobile_activity/app_jucheng/banner.jpg")
         .main
             .explain_main
@@ -27,8 +28,8 @@ html(style="background: #f6f6f6")
               .maimai-form-sign 请输入正确的手机号
               .maimai-form-margin.maimai-sign-margin
               input(type='button',name='submit' ,value="我要抢票",disabled=true).maimai-form-btn
-              p.xun-p 已有账号,
-                  a(href="/weixin/login/") 立即登录
+              p.xun-p
+                  a(href="/weixin/login/") 已有账号,立即登录
         .explain_wrap
             .explain_main
               .explain_button 活动说明
@@ -50,10 +51,10 @@ html(style="background: #f6f6f6")
                     dd 本次活动仅限于张昊辰北京独奏会抢票活动；
                 dl
                     dt 6.
-                    dd 获得独奏会门票用户请留意网利宝站内信及短信，并凭领票短信及手机号码到现场取票；
+                    dd 获得独奏会门票用户请留意网利宝站内信及短信，并凭领票短信及手机号码取票；
                 dl
                     dt 7.
-                    dd 现场取票地址：北京市东城区东四北大街107号科林大厦A座710，咨询电话：13581710219 ；
+                    dd 现场取票地址：演出当天到北京音乐厅一楼大厅票务兑换处，咨询电话：13581710219 ；<br>上门取票地址：北京市东城区东四北大街107号科林大厦A座710，咨询电话：13581710219 ；
                 dl
                     dt 8.
                     dd 本活动最终解释权在法律允许范围内归网利宝所有。
@@ -76,4 +77,4 @@ html(style="background: #f6f6f6")
             .text!='*<span class="write_info_text">测试</span>'
             .button.write_info_button 保存
         script(src='/static/src/mobile/lib/weixin/wx.js')
-        script(data-init='mmIndex',src="/static/scripts/mobile_activity/app_jucheng.js?v=201511061")
+        script(data-init='mmIndex',src="/static/scripts/mobile_activity/dist/app_jucheng.js?v=201511062")
