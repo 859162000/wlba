@@ -8,7 +8,7 @@ require.config({
 });
 
 require(['jquery', 'jquery.fullPage'], function( $ ) {
-  var page_h = $(window).height()
+  /*var page_h = $(window).height()
   $('.section').height(page_h);
 
   $(document).ready(function() {
@@ -17,5 +17,5 @@ require(['jquery', 'jquery.fullPage'], function( $ ) {
 			menu: '#menu',
       scrollingSpeed: 500
     });
-  });
+  });*/
 });
