@@ -8,6 +8,11 @@ import datetime
 from misc.models import Misc
 from models import PayInfo
 from marketing.utils import local_to_utc
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import ModelViewSet
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 
 logger = logging.getLogger(__name__)
@@ -100,8 +105,8 @@ class WithdrawFee(object):
 
         # 比较提现金额与充值未投资金额
         margin_left = margin - uninvested
-        if margin_left < uninvested:
-            management_amount = uninvested - margin_left
+        if amount > margin_left:
+            management_amount = amount - margin_left
         else:
             management_amount = decimal.Decimal(0)
         management_fee = (management_amount * management_fee_rate).quantize(TWO_PLACES)
