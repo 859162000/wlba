@@ -8,6 +8,11 @@ import datetime
 from misc.models import Misc
 from models import PayInfo
 from marketing.utils import local_to_utc
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import ModelViewSet
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 
 logger = logging.getLogger(__name__)
@@ -27,8 +32,8 @@ class WithdrawFee(object):
             "free_times_per_month": 2,
             "amount_interval": [[0, 10000, 2], [10000, 50000, 3], [50000, 10000000, 5]]
         }
-        self.MAX_AMOUNT = decimal.Decimal('500000.00')
-        self.MIN_AMOUNT = decimal.Decimal('50.00')
+        self.MAX_AMOUNT = decimal.Decimal('500000')
+        self.MIN_AMOUNT = decimal.Decimal('50')
 
     def get_withdraw_fee_config(self):
         """
@@ -100,11 +105,14 @@ class WithdrawFee(object):
 
         # 比较提现金额与充值未投资金额
         margin_left = margin - uninvested
-        if margin_left < uninvested:
-            management_amount = uninvested - margin_left
+        if amount > margin_left:
+            management_amount = amount - margin_left
         else:
             management_amount = decimal.Decimal(0)
         management_fee = (management_amount * management_fee_rate).quantize(TWO_PLACES)
+
+        fee = fee / decimal.Decimal('1.00')
+        management_fee = management_fee / decimal.Decimal('1.00')
 
         return fee, management_fee, management_amount
 
@@ -114,5 +122,14 @@ class WithdrawFee(object):
         today = local_to_utc(datetime.datetime.now(), 'min')
         month_start = today - datetime.timedelta(days=today.day)
         withdraw_count = PayInfo.objects.filter(user=user, type='W').filter(status__in=[u'成功', u'已受理'])\
+            .filter(create_time__gt=month_start).count()
+        return withdraw_count
+
+    @staticmethod
+    def get_withdraw_success_count(user):
+        """ 获取当月成功提现次数 """
+        today = local_to_utc(datetime.datetime.now(), 'min')
+        month_start = today - datetime.timedelta(days=today.day)
+        withdraw_count = PayInfo.objects.filter(user=user, type='W').filter(status=u'成功')\
             .filter(create_time__gt=month_start).count()
         return withdraw_count

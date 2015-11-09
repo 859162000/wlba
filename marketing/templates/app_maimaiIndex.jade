@@ -23,4 +23,20 @@ html(style="background: #f6f6f6")
       .maimai-form-sign 请输入正确的手机号
       .maimai-form-margin.maimai-sign-margin
       input(type='button',name='submit' ,value="领 取",disabled=true).maimai-form-btn
-    script(data-init='mmIndex', src="/static/scripts/mobile_activity/dist/maimai.js?v=20151105")
+    //宣传文案
+    section.regist-propagate
+      ul
+        mixin li(imgName, title, bodyTxt1, bodyTxt2)
+          li
+            span(class=imgName)
+            h4=title
+            p=bodyTxt1
+            p=bodyTxt2
+
+
+        +li('trust', '信赖', 'IDG资本投资A轮融资', '鸿利光电投资B轮融资')
+        +li('safe', '安全', '第三方资金托管', '阳光保险承保资金安全')
+        +li('authority', '权威', '华尔街精英金融团队', 'IT数据风控系统')
+        +li('profit', '高收益', '30余倍银行活期收益', '100元起投')
+
+    script(data-init='mmIndex', src="/static/scripts/mobile_activity/dist/maimai.js?v=201511061")

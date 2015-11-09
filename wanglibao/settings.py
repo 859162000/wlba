@@ -1024,7 +1024,7 @@ else:
 WLB_FOR_FANLITOU_KEY = '2002'
 
 # 迅雷VIP
-WLB_FOR_XUNLEIVIP_KEY = '2003'
+WLB_FOR_XUNLEI9_KEY = '2003'
 XUNLEIVIP_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/xljinku/sendvip/'
 XUNLEIVIP_REGISTER_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_report.php'
 XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'

@@ -23,7 +23,7 @@ block main
         - csrf_token
         input(type="hidden", name="withdraw_count", value="{{withdraw_count}}")
         input(type="hidden", name="uninvested", value="{{uninvested}}")
-        input(type="hidden", name="fee", value="{{fee}}")
+        input(type="hidden", name="fee", data-max_amount="{{fee.max_amount}}", data-min_amount="{{fee.min_amount}}")
         table.withdraw-table
           tr
             th 持卡人
@@ -36,6 +36,7 @@ block main
                   option(value='') 请选择银行卡
                   for card in cards
                     option(value='{{card.id}}') {{card | card_info}}
+                label.error
                 .space-vertical-s
                 a#add-card-button.blue.margin-top-m(href='#add-card-form')
                  .add-icon
@@ -47,7 +48,8 @@ block main
             th 提现金额(元)
             td
               .span5
-                input.withdraw-input(type='text', name='amount', placeholder='金额', data-balance='{{margin}}', data-role='fee-calculator', data-rate='{{fee.management_fee.fee_rate}}', data-target-fee='#fee', data-target-actual='#actual-amount',data-count='{{fee.fee.free_times_per_month}}',data-interval='{{fee.fee.amount_interval}}',data-switch='{{fee.switch}}',data-poundage='#poundage',)
+                input.withdraw-input(type='text', name='amount', placeholder='金额', data-balance='{{margin}}', data-role='fee-calculator', data-rate='{{fee.management_fee.fee_rate}}', data-target-fee='#fee', data-target-actual='#actual-amount',data-count='{{fee.fee.free_times_per_month}}',data-interval='{{fee.fee.amount_interval}}',data-switch='{{fee.switch}}',data-poundage='#poundage')
+                label.error
               .span6(style="line-height:40px") 50元起，如果账户余额少于50元，可一次性取完
           tr
             th 提现费用(元)

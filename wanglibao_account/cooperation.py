@@ -21,6 +21,8 @@ from django.contrib.auth.models import User
 from django.db.models import Sum, Q, Count
 from django.http import HttpResponse
 from django.utils import timezone
+from wanglibao_account import message as inside_message
+from wanglibao_sms.tasks import send_messages
 import requests
 from rest_framework import renderers
 from rest_framework.views import APIView
@@ -38,7 +40,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      YICHE_KEY, YICHE_CALL_BACK_URL, WLB_FOR_ZHITUI1_KEY, ZHITUI_COOP_ID, ZHITUI_CALL_BACK_URL, \
      WLB_FOR_ZGDX_KEY, ZGDX_CALL_BACK_URL, ZGDX_PARTNER_NO, ZGDX_SERVICE_CODE, ZGDX_CONTRACT_ID, \
      ZGDX_ACTIVITY_ID, ZGDX_KEY, ZGDX_IV, WLB_FOR_NJWH_KEY, ENV, ENV_PRODUCTION, WLB_FOR_FANLITOU_KEY, \
-     WLB_FOR_XUNLEIVIP_KEY, XUNLEIVIP_CALL_BACK_URL, XUNLEIVIP_KEY, XUNLEIVIP_REGISTER_CALL_BACK_URL, \
+     WLB_FOR_XUNLEI9_KEY, XUNLEIVIP_CALL_BACK_URL, XUNLEIVIP_KEY, XUNLEIVIP_REGISTER_CALL_BACK_URL, \
      XUNLEIVIP_REGISTER_KEY
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback
@@ -990,11 +992,9 @@ class JuChengRegister(CoopRegister):
         self.invite_code = 'jcw'
 
     def purchase_call_back(self, user):
-        name = self.request.DATA.get('name', '')
-        phone = self.request.DATA.get('phone', '')
-        address = self.request.DATA.get('address', '')
         binding = Binding.objects.filter(user_id=user.id).first()
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
+        SEND_SUCCESS = None
         if binding and p2p_record.count() == 1:
             p2p_amount = int(p2p_record.first().amount)
             if p2p_amount>=1000 and p2p_amount<2000:
@@ -1003,23 +1003,11 @@ class JuChengRegister(CoopRegister):
                 except Exception, reason:
                     logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
                     raise
-                if config and config.amount>0:
-                    try:
-                        GiftOwnerInfo.objects.create(
-                            config=config,
-                            name=name,
-                            phone=phone,
-                            address=address,
-                            award=u'张昊辰门票',
-                            type='80'
-                        )
-                    except Exception, reason:
-                        logger.exception(u'获奖用户(%s)信息入库失败, reason:%s' % (user,reason))
-                    else:
-                        config.amount -= 1
-                        logger.info(u"获奖用户 (%s) 信息入库成功" % (user,))
-                    finally:
-                        config.save()
+                if config and config.amount > 0:
+                    config.amount -= 1
+                    config.save()
+                    logger.debug(u"用户 %s 获得80门票一张" % (user))
+                    SEND_SUCCESS = True
 
             if p2p_amount>=2000:
                 try:
@@ -1028,22 +1016,22 @@ class JuChengRegister(CoopRegister):
                     logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
                     raise
                 if config and config.amount>0:
-                    try:
-                        GiftOwnerInfo.objects.create(
-                            config=config,
-                            name=name,
-                            phone=phone,
-                            address=address,
-                            award=u'张昊辰门票',
-                            type='188'
-                        )
-                    except Exception, reason:
-                        logger.exception(u'获奖用户(%s)信息入库失败, reason:%s' % (user,reason))
-                    else:
                         config.amount -= 1
-                        logger.info(u"获奖用户 (%s) 信息入库成功" % (user,))
-                    finally:
+                        logger.debug(u"获奖用户(%s)得到188门票一张 " % (user,))
                         config.save()
+                        SEND_SUCCESS = True
+
+            if SEND_SUCCESS:
+                send_messages.apply_async(kwargs={
+                    "phones": [user.wanglibaouserprofile.phone, ],
+                    "messages": [u'[网利科技]您已成功获得门票，请于演出当天到北京音乐铁一楼大厅票务兑换处领取，咨询电话:13581710219', ]
+                })
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id": user.id,
+                    "title": u"演出门票赠送",
+                    "content": u'[网利科技]您已成功获得门票，请于演出当天到北京音乐铁一楼大厅票务兑换处领取，咨询电话:13581710219',
+                    "mtype": "activity"
+                })
 
 
 class WeixinRedpackRegister(CoopRegister):
@@ -1151,7 +1139,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
                           ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
-                          XunleiVipRegister]
+                          XunleiVipRegister, JuChengRegister, ]
 
 
 #######################第三方用户查询#####################
@@ -2336,7 +2324,7 @@ class JrjiaCPSView(APIView):
             for equity in equities:
                 data_dic = dict()
                 data_dic['reqId'] = Binding.objects.get(user=equity.user).bid
-                data_dic['prodIdAct'] = equity.product.pk
+                data_dic['prodIdAct'] = str(equity.product.pk)
                 data_dic['purchaseTime'] = int(time.mktime(equity.created_at.timetuple()))
                 data_dic['investAmount'] = equity.equity
                 data_dic['investDuration'] = equity.product.period
@@ -2346,7 +2334,7 @@ class JrjiaCPSView(APIView):
                     data_dic['startDate'] = int(time.mktime(equity.product.make_loans_time.timetuple()))
                 except Exception, e:
                     print 'get startDate error: {}'.format(e)
-                    data_dic['startDate'] = None
+                    data_dic['startDate'] = ''
 
                 data.append(data_dic)
 
@@ -2395,7 +2383,7 @@ class JrjiaP2PStatusView(APIView):
                 data['prodId'] = str(product.pk)
                 data['totalAmount'] = product.total_amount
                 data['soldAmount'] = product.ordered_amount
-                data['userCount'] = "%.2f" % product.completion_rate
+                data['userCount'] = len(product.equities.all().values('user').annotate(Count('user')))
 
                 ret['data'] = data
         elif int(pid) <= 0:
@@ -2446,7 +2434,8 @@ class JrjiaP2PInvestView(APIView):
                     dic = dict()
                     dic['prodId'] = str(product.id)
                     dic['username'] = equity.user.wanglibaouserprofile.name
-                    dic['investTime'] = equity.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                    dic['investTime'] = (equity.created_at - datetime.datetime(1970, 1, 1).
+                                         replace(tzinfo=timezone.utc)).total_seconds()
                     dic['investAmount'] = equity.equity
                     dic['reqId'] = Binding.objects.get(user=equity.user).bid
                     data.append(dic)
@@ -2567,13 +2556,23 @@ class JrjiaUsStatusView(APIView):
                     dic['reqId'] = Binding.objects.get(user=user).bid
                     if user in deposited_users:
                         status = 4
+                        action_datetime = PayInfo.objects.filter(user=user).first().create_time
                     elif user in binding_users:
                         status = 3
+                        action_datetime = Card.objects.filter(user=user).last().add_at
                     elif user in identify_users:
                         status = 2
+                        action_datetime = WanglibaoUserProfile.objects.get(user=user).id_valid_time
+
                     else:
                         status = 1
-                    dic['actionTime'] = status
+                        action_datetime = user.date_joined
+
+                    action_time = (action_datetime - datetime.datetime(1970, 1, 1).
+                                   replace(tzinfo=timezone.utc)).total_seconds()
+
+                    dic['userStatus '] = status
+                    dic['actionTime'] = action_time
                     dic['payAmount'] = Binding.objects.get(user=user).bid
                     try:
                         dic['userAccount'] = user.wanglibaouserprofile.phone

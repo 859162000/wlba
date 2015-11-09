@@ -27,7 +27,7 @@ from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSe
     P2PProductDetailView, RepaymentAPIView
 from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView, BankCardDelView, 
                             BankListAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
-                            YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView,
+                            YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView, FEEPCAPIView,
                             BindPayView, KuaiShortPayCallbackView, BindPayQueryView,
                             BindPayDelView, BindPayDynNumView, TradeRecordAPIView,
                             BindCardQueryView, UnbindCardView, BindPayDepositView, BindPayDynnumNewView,
@@ -54,7 +54,7 @@ from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView
 from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrdeApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
-from wanglibao_reward.views import WeixinRedPackView
+from wanglibao_reward.views import WeixinRedPackView, WeixinShareTools
 
 router = DefaultRouter()
 
@@ -156,6 +156,7 @@ urlpatterns = patterns(
     url(r'^p2p/contract/(?P<product_id>\d+)', UserProductContract.as_view()),
     url(r'^withdraw/$', WithdrawAPIView.as_view(), name="withdraw-api-view"),
     url(r'^fee/$', FEEAPIView.as_view(), name="withdraw-api-view"),
+    url(r'^fee/pc/$', FEEPCAPIView.as_view(), name="withdraw-pc-api-view"),
 
     url(r'^pay/gate/$', DepositGateAPIView.as_view(), name="pay-gate-api-view"),
     url(r'^pay/yee/app/deposit/$', YeePayAppPayView.as_view(), name="yee-deposit-view"),
@@ -246,6 +247,8 @@ urlpatterns += patterns(
     url(r'^award/common_september/$', 'marketing.views.september_award_ajax'), #add by Yihen@20150907,9月PC常规
     url(r'^quick/applyer/$', QuickApplyerAPIView.as_view()), #add by yihen@20151102 ,快速贷款人申请填写
     url(r'^gift/owner/$', GiftOwnerInfoAPIView.as_view()), #add by yihen@20151102 ,聚橙网领取门票接口
+    url(r'^weixin/share/has_gift/$', WeixinShareTools.as_view()), #add by yihen@20151102 ,聚橙网领取门票接口
+
 )
 
 
