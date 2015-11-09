@@ -50,7 +50,7 @@ define ['jquery'], ($)->
       target.next().text('')
       $('#card-select').next().text('')
       if xhr.ret_code > 0
-        if xhr.ret_code = 30137
+        if xhr.ret_code == 30137
           $('#card-select').next().text(xhr.message)
         else
           target.next().text(xhr.message)
