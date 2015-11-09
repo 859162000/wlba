@@ -58,6 +58,8 @@ urlpatterns = patterns(
     url(r'^november_new/$', TemplateView.as_view(template_name="november_new.jade")),
     url(r'^jucheng/$', TemplateView.as_view(template_name="jucheng.jade")),
     #url(r'^youku/$', TemplateView.as_view(template_name="youku_test.jade")),
+    url(r'^two-eleven/$', TemplateView.as_view(template_name="two-eleven.jade")),
+    url(r'^bid/$', TemplateView.as_view(template_name="bid.jade")),
 )
 
 # app URL
@@ -129,6 +131,8 @@ urlpatterns += patterns(
     url(r'^wx_financing/$', TemplateView.as_view(template_name="h5_financing.jade")),
 
     url(r'^app_jucheng/$', TemplateView.as_view(template_name="app_jucheng.jade")),
+    url(r'^app_two-eleven/$', TemplateView.as_view(template_name="app_two-eleven.jade")),
+    url(r'^app_bid/$', TemplateView.as_view(template_name="app_bid.jade")),
 )
 
 urlpatterns += patterns(
