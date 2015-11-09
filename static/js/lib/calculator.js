@@ -64,7 +64,7 @@
         if (xhr.ret_code > 0) {
           return target.next().text(xhr.message);
         } else {
-          $('#poundage').text(xhr.management_fee);
+          $('#poundage').text(xhr.fee + '+' + management_fee);
           return $('#actual-amount').text(xhr.actual_amount);
         }
       });
