@@ -238,6 +238,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     $("#jiaxi0 ").on("click", function () {
         Down($(".footer-guizhe"));
     });
+    $(".app-bidjiaxi").on("click", function () {
+        Down($(".app-bid-guizhe1"));
+    });
 
      $('#page1').on('click',function(){
         var top = $('#page1Pos').offset().top;
