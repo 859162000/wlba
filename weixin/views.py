@@ -267,7 +267,7 @@ class WeixinJoinView(View):
                 {'image':image1, 'url':url1, 'description':description1, 'title':title1}]
 
     def getBindTxt(self, fromUserName):
-        bind_url = settings.WEIXIN_CALLBACK_URL + reverse('weixin_bind_login') + "?openid=%s"%(fromUserName)
+        bind_url = settings.WEIXIN_CALLBACK_URL + reverse('sub_login') + "?openid=%s"%(fromUserName)
         txt = u"终于等到你，还好我没放弃。绑定网利宝帐号，轻松投资、随时随地查看收益！<a href='%s'>【立即绑定】</a>"%(bind_url)
         return txt
 

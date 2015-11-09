@@ -263,7 +263,7 @@ class WeixinAccounts(object):
         if not cls.data:
             cls.append_account()
         for key, account_info in cls.data.items():
-            if account_info['id'] == original_id:
+            if account_info['id'].strip() == original_id.strip():
                 return cls(key)
 
     @classmethod
