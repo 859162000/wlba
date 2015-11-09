@@ -132,6 +132,7 @@ urlpatterns += patterns(
 
     url(r'^app_jucheng/$', TemplateView.as_view(template_name="app_jucheng.jade")),
     url(r'^app_two-eleven/$', TemplateView.as_view(template_name="app_two-eleven.jade")),
+    url(r'^app_bid/$', TemplateView.as_view(template_name="app_bid.jade")),
 )
 
 urlpatterns += patterns(

@@ -32,8 +32,8 @@ class WithdrawFee(object):
             "free_times_per_month": 2,
             "amount_interval": [[0, 10000, 2], [10000, 50000, 3], [50000, 10000000, 5]]
         }
-        self.MAX_AMOUNT = decimal.Decimal('500000.00')
-        self.MIN_AMOUNT = decimal.Decimal('50.00')
+        self.MAX_AMOUNT = decimal.Decimal('500000')
+        self.MIN_AMOUNT = decimal.Decimal('50')
 
     def get_withdraw_fee_config(self):
         """
