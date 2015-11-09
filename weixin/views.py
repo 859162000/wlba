@@ -267,7 +267,7 @@ class WeixinJoinView(View):
                 {'image':image1, 'url':url1, 'description':description1, 'title':title1}]
 
     def getBindTxt(self, fromUserName):
-        bind_url = settings.WEIXIN_CALLBACK_URL + reverse('sub_login') + "?openid=%s"%(fromUserName)
+        bind_url = settings.WEIXIN_CALLBACK_URL + reverse('weixin_bind') + "?openid=%s"%(fromUserName)
         txt = u"终于等到你，还好我没放弃。绑定网利宝帐号，轻松投资、随时随地查看收益！<a href='%s'>【立即绑定】</a>"%(bind_url)
         return txt
 
@@ -383,71 +383,6 @@ class WeixinRegister(TemplateView):
             'next' : next
         }
 
-
-class WeixinBindLogin(TemplateView):
-    template_name = 'sub_login.jade'
-
-    def get_context_data(self, **kwargs):
-        context = super(WeixinBindLogin, self).get_context_data(**kwargs)
-        openid = self.request.GET.get('openid', '')
-        context['openid'] = openid
-        next = self.request.GET.get('next', '')
-        return {
-            'context': context,
-            'next': next
-            }
-
-    def dispatch(self, request, *args, **kwargs):
-        openid = self.request.GET.get('openid', '')
-        if not openid:
-            return redirectToJumpPage("error:-1")
-        w_user = WeixinUser.objects.filter(openid=openid).first()
-        if not w_user:
-            message = u"请从[服务中心]点击[绑定微信]进行绑定"
-            return redirectToJumpPage(message)
-        if w_user.user:
-            message = u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone
-            return redirectToJumpPage(message)
-        return super(WeixinBindLogin, self).dispatch(request, *args, **kwargs)
-
-class WeixinBindRegister(WeixinRegister):
-    template_name = 'sub_regist.jade'
-
-    def get_context_data(self, **kwargs):
-        context = super(WeixinBindRegister, self).get_context_data(**kwargs)
-        openid = self.request.GET.get('openid', '')
-        context['openid'] = openid
-        return context
-
-    def dispatch(self, request, *args, **kwargs):
-        openid = self.request.GET.get('openid', '')
-        if not openid:
-            return redirectToJumpPage("error:-1")
-        w_user = WeixinUser.objects.filter(openid=openid).first()
-        if not w_user:
-            message = u"请从[服务中心]点击[绑定微信]进行绑定"
-            return redirectToJumpPage(message)
-        if w_user.user:
-            message = u'你微信已经绑定网利宝账户%s'%w_user.user.wanglibaouserprofile.phone
-            return redirectToJumpPage(message)
-        return super(WeixinBindRegister, self).dispatch(request, *args, **kwargs)
-
-class WeixinBindAPI(APIView):
-    permission_classes = (IsAuthenticated,)
-    http_method_names = ['post']
-
-    def post(self, request):
-        user = request.user
-        rs = -1
-        txt = 'error'
-        try:
-            openid = request.POST.get('openid')
-            weixin_user = WeixinUser.objects.get(openid=openid)
-            rs, txt = bindUser(weixin_user, user)
-        except WeixinUser.DoesNotExist:
-            pass
-        return Response({'message': txt, 'code': rs})
-
 class SendTemplateMessage(APIView):
     permission_classes = (IsAuthenticated,)
     http_method_names = ['post']
@@ -478,31 +413,6 @@ class SendTemplateMessage(APIView):
         return Response({'message':'ok'})
 
 
-# class WeixinLoginBindAPI(APIView):
-#     permission_classes = ()
-#     http_method_names = ['post']
-#
-#     def _form(self, request):
-#         return LoginAuthenticationNoCaptchaForm(request, data=request.POST)
-#
-#     def post(self, request):
-#         form = self._form(request)
-#
-#         if form.is_valid():
-#             user = form.get_user()
-#
-#             try:
-#                 openid = request.POST.get('openid')
-#                 weixin_user = WeixinUser.objects.filter(openid=openid).first()
-#                 rs, txt = bindUser(weixin_user, user)
-#             except WeixinUser.DoesNotExist:
-#                 pass
-#             auth_login(request, user)
-#             request.session.set_expiry(1800)
-#             data = {'nickname': user.wanglibaouserprofile.nick_name}
-#             return Response(data)
-#         return Response(form.errors, status=400)
-
 class JumpPageTemplate(TemplateView):
     template_name = 'sub_times.jade'
 
@@ -510,6 +420,26 @@ class JumpPageTemplate(TemplateView):
         context = super(JumpPageTemplate, self).get_context_data(**kwargs)
         message = self.request.GET.get('message', 'ERROR')
         context['message'] = message
+        return {
+            'context': context,
+            'next': next
+            }
+
+class WeixinBind(TemplateView):
+    template_name = 'sub_times.jade'
+
+    def get_context_data(self, **kwargs):
+        context = super(WeixinBind, self).get_context_data(**kwargs)
+        user = self.request.user
+        rs = -1
+        txt = 'error'
+        try:
+            openid = self.request.GET.get('openid')
+            weixin_user = WeixinUser.objects.get(openid=openid)
+            rs, txt = bindUser(weixin_user, user)
+        except WeixinUser.DoesNotExist:
+            pass
+        context['message'] = txt
         return {
             'context': context,
             'next': next
@@ -1370,3 +1300,51 @@ def testTemplate():
     a = MessageTemplate('_8E2B4QZQC3yyvkubjpR6NYXtUXRB9Ya79MYmpVvQ1o',
                         first=u"您好，恭喜您账户绑定成功！\n  \n您的账户已经与微信账户绑定在一起。",
                         keyword1=u"2015年09月22日")
+
+# class WeixinBindLogin(TemplateView):
+#     template_name = 'sub_login.jade'
+#
+#     def get_context_data(self, **kwargs):
+#         context = super(WeixinBindLogin, self).get_context_data(**kwargs)
+#         openid = self.request.GET.get('openid', '')
+#         context['openid'] = openid
+#         next = self.request.GET.get('next', '')
+#         return {
+#             'context': context,
+#             'next': next
+#             }
+#
+#     def dispatch(self, request, *args, **kwargs):
+#         openid = self.request.GET.get('openid', '')
+#         if not openid:
+#             return redirectToJumpPage("error:-1")
+#         w_user = WeixinUser.objects.filter(openid=openid).first()
+#         if not w_user:
+#             message = u"请从[服务中心]点击[绑定微信]进行绑定"
+#             return redirectToJumpPage(message)
+#         if w_user.user:
+#             message = u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone
+#             return redirectToJumpPage(message)
+#         return super(WeixinBindLogin, self).dispatch(request, *args, **kwargs)
+#
+# class WeixinBindRegister(WeixinRegister):
+#     template_name = 'sub_regist.jade'
+#
+#     def get_context_data(self, **kwargs):
+#         context = super(WeixinBindRegister, self).get_context_data(**kwargs)
+#         openid = self.request.GET.get('openid', '')
+#         context['openid'] = openid
+#         return context
+#
+#     def dispatch(self, request, *args, **kwargs):
+#         openid = self.request.GET.get('openid', '')
+#         if not openid:
+#             return redirectToJumpPage("error:-1")
+#         w_user = WeixinUser.objects.filter(openid=openid).first()
+#         if not w_user:
+#             message = u"请从[服务中心]点击[绑定微信]进行绑定"
+#             return redirectToJumpPage(message)
+#         if w_user.user:
+#             message = u'你微信已经绑定网利宝账户%s'%w_user.user.wanglibaouserprofile.phone
+#             return redirectToJumpPage(message)
+#         return super(WeixinBindRegister, self).dispatch(request, *args, **kwargs)

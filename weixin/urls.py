@@ -28,16 +28,16 @@ urlpatterns = patterns(
     url(r'^more/$', TemplateView.as_view(template_name="weixin_more.jade")),
     url(r'^more/contactus/$', TemplateView.as_view(template_name="weixin_contactus.jade")),
     url(r'^more/aboutus/$', TemplateView.as_view(template_name="weixin_aboutus.jade")),
-    url(r'bind/login/$', views.WeixinBindLogin.as_view(), name='sub_login'),
-    url(r'bind/register/$', views.WeixinBindRegister.as_view(), name='sub_register'),
+    url(r'bind/$', login_required(views.WeixinBind.as_view(), login_url='/weixin/login/'), name='weixin_bind'),
+    # url(r'bind/login/$', views.WeixinBindLogin.as_view(), name='sub_login'),
+    # url(r'bind/register/$', views.WeixinBindRegister.as_view(), name='sub_register'),
     url(r'weixin_unbind/$', views.UnBindWeiUser.as_view(), name='weixin_unbind'),
     url(r'^reward/(?P<status>\w+)/$', login_required(views.WeixinCouponList.as_view(), login_url='/weixin/login/')),
 
     # js api
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
     url(r'^api/login/$', views.WeixinLoginAPI.as_view(), name='weixin_login_api'),
-    # url(r'^api/login/bind/$', views.WeixinLoginBindAPI.as_view(), name='weixin_login_bind_api'),
-    url(r'^api/bind/$', views.WeixinBindAPI.as_view(), name='weixin_bind_api'),
+
     url(r'^api/unbind/$', views.UnBindWeiUserAPI.as_view(), name='weixin_unbind_api'),
     url(r'^api/send_template_msg/$', views.SendTemplateMessage.as_view(), name='send_template_message'),
     url(r'^api/pay/order/$', views.WeixinPayOrder.as_view(), name='weixin_pay_order_api'),
