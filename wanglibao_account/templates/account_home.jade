@@ -63,7 +63,8 @@ block main
           li.title-bar--tab.active
             a.title-bar--tab--anchor(href="javascript:void(0)") 理财专区
           li.title-bar--tab
-            a.title-bar--tab--anchor(href="/accounts/home/fund/") 货币基金
+            a.title-bar--tab--anchor(href="/accounts/home/fund/") 体验金专区
+            i
         a.pull-right.align-right.detail-view(href='/accounts/transaction/p2p/') 查看交易记录
       .clamp-xl
         .account-home-panel--action-bar
@@ -168,53 +169,76 @@ block main
           li.title-bar--tab
             a.title-bar--tab--anchor(href="/accounts/home/") 理财专区
           li.title-bar--tab.active
-            a.title-bar--tab--anchor(href="javascript:void(0)") 货币基金
-        a.pull-right.align-right.detail-view(href='/accounts/transaction/fund/') 查看交易记录
-      .clamp-xl
-        .space-vertical-s
-        .row.total-money
-          .gray-card4
-            p
-              span#fund_total_asset.big_number
-            p 总资产(元)
-          .gray-card4
-            p
-              span#total_income.big_number
-            p 累积收益(元)
-          .gray-card4
-            p
-              span#fund_income_week.big_number
-            p 近一周收益(元)
-          .gray-card4
-            p
-              span#fund_income_month.big_number
-            p 近一月收益(元)
-        .space-vertical-s
-
-        table.table
-          thead
-            tr
-              th 产品名称
-              th 金额(元)
-              th 收益(元)
-              th 操作
-          tbody#fund_detail_body
-            if fund_hold_info
-              each fund in fund_hold_info
-                tr
-                  td
-                    a(href="/fund/detail/{{fund.id}}/") {{fund.fund_name}}
-                  td {{fund.current_remain_share}}
-                  td {{fund.unpaid_income}}
-                  td
-                    a.button.button-small.button-pink(href="/shumi/oauth/check_oauth_status/?fund_code={{fund.fund_code}}&action=purchase" target="_blank") 继续购买
-                    &nbsp;
-                    a.button.button-small.button-pink(href="/shumi/oauth/check_oauth_status/?fund_code={{fund.fund_code}}&action=redeem" target="_blank") 赎回
-            else
-              tr
-                td(colspan='4') 无持仓记录
-
-        .space-vertical-m
+            a.title-bar--tab--anchor(href="javascript:void(0)") 体验金专区
+            i
+        a.pull-right.align-right.detail-view(href='/accounts/transaction/fund/')
+            i
+            | 查看体验金活动
+      .account-home-panel__no-padding
+          .clamp-xl
+              .row.tyjRow
+                  .total-asset-money-card
+                      p.align-center
+                          span.big_number 8,888.00
+                      p.align-center.desc 体验金总资产（元）
+                  .total-asset-money-card
+                      p.align-center
+                          span.big_number 00.00
+                      p.align-center.desc 体验金余额（元）
+                  .total-asset-money-card
+                      p.align-center
+                          span.big_number 00.00
+                      p.align-center.desc 到账收益余额（元）
+                  .total-asset-money-card
+                      p.align-center
+                          span.big_number 00.00
+                      p.align-center.desc 待收收益（元）
+              p.tyjMark 注：体验金投资获取收益可以提现，提现操作会优先从体验金到账收益余额里扣除。
+              table.table.tableNew
+                  thead
+                      tr
+                          th 投标时间
+                          th 产品名称
+                          th 投资金额
+                          th 年化收益
+                          th 项目期限
+                          th 已收益／预期收益
+                  tbody
+                      tr
+                          td 2015-10-10 19:53
+                          td 专享福利体验标
+                          td 8,888.00
+                          td 00.00
+                          td 0.00
+                          td 0.00/9.89（元）
+                      tr
+                          td 2015-10-10 19:53
+                          td 专享福利体验标
+                          td 8,888.00
+                          td 00.00
+                          td 0.00
+                          td 0.00/9.89（元）
+                      tr
+                          td 2015-10-10 19:53
+                          td 专享福利体验标
+                          td 8,888.00
+                          td 00.00
+                          td 0.00
+                          td 0.00/9.89（元）
+                      tr
+                          td 2015-10-10 19:53
+                          td 专享福利体验标
+                          td 8,888.00
+                          td 00.00
+                          td 0.00
+                          td 0.00/9.89（元）
+                      tr
+                          td 2015-10-10 19:53
+                          td 专享福利体验标
+                          td 8,888.00
+                          td 00.00
+                          td 0.00
+                          td 0.00/9.89（元）
 
 block script
   script.
