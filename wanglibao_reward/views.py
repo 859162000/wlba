@@ -435,9 +435,9 @@ class WeixinShareTools(APIView):
             return None
 
     def post(self, request):
-        openid = self.DATA.get("openid")
-        phone_num = self.DATA.get('phone_num')
-        order_id = self.DATA.get('order_id')
+        openid = request.DATA.get("openid")
+        phone_num = request.DATA.get('phone_num')
+        order_id = request.DATA.get('order_id')
         try:
             key = 'share_redpack'
             shareconfig = Misc.objects.filter(key=key).first()
