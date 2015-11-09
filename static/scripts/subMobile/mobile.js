@@ -434,7 +434,7 @@ org.login = (function(org){
                     'identifier': $.trim($form.find('input[name=identifier]').val()),
                     'password': $.trim($form.find('input[name=password]').val()),
                     'openid': $.trim($form.find('input[name=openid]').val())
-                }
+                };
                 org.ajax({
                     'type': 'post',
                     'url': $form.attr('action'),
@@ -443,17 +443,21 @@ org.login = (function(org){
                         $submit.attr('disabled', true).text('登录中..');
                     },
                     success: function(res) {
-                        window.location.href = "/weixin/login_success/";
-                        //var next = org.getQueryStringByName('next');
-                        //if (next) {
-                        //    window.location.href = decodeURIComponent(decodeURIComponent(next));;
-                        //}else{
-                        //    window.location.href = '/weixin/account/';
-                        //}
+                        org.ajax({
+                           'type': 'post',
+                            'url': '/weixin/api/bind/',
+                            'data': {'openid': data.openid},
+                            success: function(data){
+                                window.location.href = "/weixin/jump_page/?message=" + data.message;
+                            },
+                            error: function(data){
+                                window.location.href = "/weixin/jump_page/?message=" + data.message;
+                            }
+                        });
                     },
                     error: function(res) {
                         if (res['status'] == 403) {
-                            org.ui.showSign('请勿重复提交')
+                            org.ui.showSign('请勿重复提交');
                             return false;
                         }
                         var data = JSON.parse(res.responseText);
@@ -726,7 +730,7 @@ org.regist = (function(org){
             success: function (data) {
                 //console.log(data);
                 unbindf = false;
-                window.location.href="/weixin/sub_unbind_success/";
+                window.location.href="/weixin/jump_page/?message=您已经解除绑定";
             }
         });
     }
@@ -750,11 +754,41 @@ org.regist = (function(org){
         $("#footer-down").hide();
     });
 
+    function btnAnimate(tp,k){
+        var btns = tp.find(".award-item");
+        var i = 0;
+        function setAn(){
+            console.log(i,k,btns.length,i >= btns.length);
+            btns.eq(i).addClass("awards-now").siblings(".award-item").removeClass("awards-now");
+            if(i == k){
+                clearInterval(setAnimate);
+            }
+            if(i >= btns.length){
+                console.log('hrer');
+                clearInterval(setAnimate);
+                i = 0;
+                setAnimate = setInterval(setAn,1000);
+            }else{
+              i ++;
+            }
+        }
+        var setAnimate = setInterval(function(){
+            setAn();
+        },1000);
+    }
     //立即抽奖
     $("#award-btn").click(function(){
+        var awards = $(this).parents("div.award-handle-box").siblings("div.award-btn-box");
         var arrStr = ["RP爆表，恭喜您获得","终于等到你还好我没放弃","人品大爆棚且抽且珍惜","大奖明天见，网利宝天天见。您今天已经抽奖，明天再来碰运气吧"];
-        $("#page-bg").show();
-        $("#alt-box").show();
+        //awards.addClass("awards-now");
+        btnAnimate(awards,5);
+        //$("#page-bg").show();
+        //$("#alt-box").show();
+    });
+    //关闭弹层
+    $("#alt-box .close-box").click(function(){
+        $(this).parents("#alt-box").hide();
+        $("#page-bg").hide();
     });
 
     //规则 html添加class
