@@ -22,7 +22,7 @@ from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from django.contrib.auth.models import User
 from constant import MessageTemplate
-from constant import (ACCOUNT_INFO_TEMPLATE_ID, BIND_SUCCESS_TEMPLATE_ID)
+from constant import (ACCOUNT_INFO_TEMPLATE_ID, BIND_SUCCESS_TEMPLATE_ID, UNBIND_SUCCESS_TEMPLATE_ID)
 from weixin.util import getAccountInfo
 from wanglibao_profile.models import WanglibaoUserProfile
 
@@ -31,6 +31,7 @@ from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
 from wanglibao_pay.models import Bank
 from wechatpy import parse_message, create_reply, WeChatClient
+from wechatpy.replies import TransferCustomerServiceReply
 from wechatpy.utils import check_signature
 from wechatpy.exceptions import InvalidSignatureException, WeChatException
 from wechatpy.oauth import WeChatOAuth
@@ -146,10 +147,11 @@ class WeixinJoinView(View):
                 # 自动回复  5000次／天
                 if not reply:
                     reply = tuling(msg)
-                # 多客服转接
-                # reply = TransferCustomerServiceReply(message=msg)
-            else:
-                reply = create_reply(u'更多功能，敬请期待！', msg)
+                if not reply:
+                    # 多客服转接
+                    reply = TransferCustomerServiceReply(message=msg)
+            # else:
+            #     reply = create_reply(u'更多功能，敬请期待！', msg)
         if reply == -1:
             return HttpResponse("")
         if not reply:
@@ -165,7 +167,7 @@ class WeixinJoinView(View):
         fromUserName = msg._data['FromUserName']
         account = WeixinAccounts.getByOriginalId(toUserName)
         w_user = getOrCreateWeixinUser(fromUserName, account.db_account)
-        if msg.key == 'test_hmm':
+        if msg.key == 'subscribe_service':
             txt = u'客官，请回复相关数字订阅最新项目通知，系统会在第一时间发送给您相关信息。\n'
             for sub_service in sub_services:
                 txt += (sub_service.describe + '\n')
@@ -185,9 +187,9 @@ class WeixinJoinView(View):
             # 累计收益（元）：  79.00
             # 待收收益（元）：  24.00
             a = MessageTemplate(ACCOUNT_INFO_TEMPLATE_ID,
-                    first="", keyword1=account_info['total_asset'],
+                    keyword1=account_info['total_asset'],
                     keyword2=account_info['p2p_margin'], keyword3=account_info['p2p_total_paid_interest'],
-                    keyword4=account_info['p2p_total_unpaid_interest'], remark=u'账户详情')
+                    keyword4=account_info['p2p_total_unpaid_interest'])
             SendTemplateMessage.sendTemplate(w_user, a)
             reply = -1
         return reply
@@ -406,8 +408,8 @@ class SendTemplateMessage(APIView):
         template = None
         if template_type.lower() == SendTemplateMessage.BIND_SUCCESS and w_user.user == request.user:
             now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
-            template = MessageTemplate(BIND_SUCCESS_TEMPLATE_ID, first=u"您好，恭喜您账户绑定成功！\n  \n您的账户已经与微信账户绑定在一起。",
-                        keyword1=now_str)
+            template = MessageTemplate(BIND_SUCCESS_TEMPLATE_ID, first=u"账户绑定通知", name1="",
+                    name2=now_str)
         if template:
             SendTemplateMessage.sendTemplate(w_user, template)
         return Response({'message':'ok'})
@@ -437,6 +439,11 @@ class WeixinBind(TemplateView):
             openid = self.request.GET.get('openid')
             weixin_user = WeixinUser.objects.get(openid=openid)
             rs, txt = bindUser(weixin_user, user)
+            if rs == 0:
+                now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
+                template = MessageTemplate(BIND_SUCCESS_TEMPLATE_ID,
+                     name2=user.wanglibaouserprofile.phone, time=now_str)
+                SendTemplateMessage.sendTemplate(weixin_user, template)
         except WeixinUser.DoesNotExist:
             pass
         context['message'] = txt
@@ -482,8 +489,14 @@ class UnBindWeiUserAPI(APIView):
     def post(self, request):
         openid = request.POST.get('openid')
         weixin_user = WeixinUser.objects.get(openid=openid)
-        weixin_user.user = None
-        weixin_user.save()
+        if weixin_user.user:
+            user_phone = weixin_user.user.wanglibaouserprofile.phone
+            weixin_user.user = None
+            weixin_user.save()
+            now_str = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M')
+            template = MessageTemplate(UNBIND_SUCCESS_TEMPLATE_ID, keyword1=user_phone, keyword2=now_str)
+            SendTemplateMessage.sendTemplate(weixin_user, template)
+
         return Response({'message':'ok'})
 
 
@@ -1259,17 +1272,16 @@ class GenerateQRSceneTicket(APIView):
         return Response(rs)
 
 class GenerateQRLimitSceneTicket(APIView):
-    permission_classes = ()
+    permission_classes = (IsAuthenticated,)
     def post(self, request):
-        phone = request.POST.get('phone')
-        if not phone:
-            return Response({'errcode':-1, 'errmsg':"-1"})
         original_id = request.POST.get('original_id')
         if not original_id:
-            return Response({'errcode':-2, 'errmsg':"-2"})
-        account = Account.objects.get(original_id=original_id)
+            return Response({'errcode':-1, 'errmsg':"-1"})
+        # account = Account.objects.get(original_id=original_id)
+        weixin_account = WeixinAccounts.getByOriginalId(original_id)
+        account = weixin_account.db_account
         client = WeChatClient(account.app_id, account.app_secret, account.access_token)
-        qrcode_data = {"action_name": "QR_LIMIT_STR_SCENE", "action_info": {"scene": {"scene_str": str(phone)}}}
+        qrcode_data = {"action_name": "QR_LIMIT_STR_SCENE", "action_info": {"scene": {"scene_str": str(request.user.wanglibaouserprofile.phone)}}}
         # qrcode_data = {"action_name":"QR_LIMIT_SCENE", "action_info":{"scene": {"scene_id": phone}}}
         try:
             rs = client.qrcode.create(qrcode_data)
