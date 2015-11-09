@@ -408,6 +408,8 @@ class WeixinShareDetailView(TemplateView):
 
 class WeixinShareTools(APIView):
     permission_classes = ()
+    def __init__(self):
+        self.activity = None
 
     def get_activity_by_id(self, activity_id):
         try:
