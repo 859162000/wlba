@@ -458,7 +458,8 @@ class WithdrawTransactions(TemplateView):
                         continue
 
                     marginKeeper = MarginKeeper(payinfo.user)
-                    marginKeeper.withdraw_ack(payinfo.amount, uninvested=payinfo.management_amount)
+                    total_amount = payinfo.amount + payinfo.fee + payinfo.management_fee
+                    marginKeeper.withdraw_ack(total_amount, uninvested=payinfo.management_amount)
 
                     payinfo.status = PayInfo.SUCCESS
                     payinfo.confirm_time = timezone.now()
@@ -479,7 +480,7 @@ class WithdrawTransactions(TemplateView):
                         if withdraw_card:
                             withdraw_card_record = WithdrawCardRecord()
                             withdraw_card_record.type = PayInfo.WITHDRAW
-                            withdraw_card_record.amount = payinfo.fee + payinfo.management_fee
+                            withdraw_card_record.amount = payinfo.amount
                             withdraw_card_record.fee = payinfo.fee
                             withdraw_card_record.management_fee = payinfo.management_fee
                             withdraw_card_record.management_amount = payinfo.management_amount
