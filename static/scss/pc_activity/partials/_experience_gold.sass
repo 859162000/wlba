@@ -198,6 +198,52 @@
     text-align: center
     a
       @extend .btn
+.oldUser
+  width: 350px
+  font-size: 22px
+  color: #3f3f41
+  p
+    text-indent: 63px
+    span
+      @include experience_gold-sprite(logo)
+      width: 124px
+      height: 124px
+      display: inline-block
+      margin: 10px 0 30px
+  p.tc
+    text-align: center
+    text-indent: 0
+    a
+      @extend .btn
+      background: #d1d1d1
+      color: #ffffff
+  p.newTc
+    text-align: center
+    text-indent: 0
+    span
+      @include experience_gold-sprite(receive)
+      width: 124px
+      height: 124px
+      display: inline-block
+      margin: 40px 0 30px
+    a
+      @extend .btn
+.successBox
+  width: 350px
+  text-align: center
+  p
+    font-size: 22px
+    color: #3f3f41
+    span
+      @include experience_gold-sprite(right)
+      width: 162px
+      height: 162px
+      display: inline-block
+      margin: 50px 0 20px
+  p.succeesFonts
+    color: #fb7c00
+    font-size: 30px
+    padding-bottom: 5px
 
 
 
