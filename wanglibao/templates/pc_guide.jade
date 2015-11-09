@@ -1,9 +1,11 @@
 doctype html
 html
   head
-    - with '新手指引－网利宝' as title
+    - with 'p2p网贷基础知识_p2p网贷理财_网利宝' as title
     include global/g_head
     - endwith
+    meta(name="keywords", content="p2p网贷基础知识,保本型收益理财,p2p网贷理财,网利宝")
+    meta(name="description", content="网利宝是国内低门槛，高收益，期限灵活，专业权威的p2p理财网贷公司 。IDG资本+A股公司千万美元入股网利宝金融，网利宝您的私人银行，保障投资人资金安全，P2P投资理财网贷客户首选的互联网金融平台。")
   body
     ul#menu
       li(data-menuanchor="Page1")
@@ -24,7 +26,7 @@ html
           - with '新手指引' as activeItem
           include global/g_nav
           - endwith
-        img(src="/static/imgs/pc/guide/guide_banner.jpg").i-mod-warp.i-guide-banner
+        img(src="/static/imgs/pc/guide/guide_banner.jpg", alt='banner').i-mod-warp.i-guide-banner
 
       .section.i-mod-warp.i-guide-company
         .i-guide-item
@@ -32,7 +34,7 @@ html
             .guide-title
               span.guide-tit-1.font-xxl 什么是网利宝？
             .guide-item-1-txt.t-d11.jy.padding-l-r-sm 网利宝（www.wanglibao.com）是网利金融旗下的在线理财平台，中国第一家互联网私人银行。网利宝在业内独创产融结合的业务模式，凭借丰富的金融行业经验、互联网优势，联合中国领先的金融机构、产业龙头企业进行战略合作，为投资用户提供高收益、安全透明、期限灵活的理财产品。网利宝的金融产品研发团队目前已覆盖全国20多个省市，执行360度全方位风险控制，确保我们的理财产品安全可靠，为投资者的财富增值保驾护航。
-            img(src="/static/imgs/pc/security/security_grid.jpg").guide-item-company
+            img(src="/static/imgs/pc/security/security_grid.jpg", alt='grid').guide-item-company
 
       .section.i-mod-warp.i-guide-advantage
         .i-guide-item
