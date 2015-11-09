@@ -138,5 +138,8 @@
            }
 
         }
+      $('.draw_btn_ed').on('click',function(){
+          $('#receiveSuccess').modal()
+      })
   });
 }).call(this);
