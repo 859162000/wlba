@@ -23,7 +23,7 @@ block main
         - csrf_token
         input(type="hidden", name="withdraw_count", value="{{withdraw_count}}")
         input(type="hidden", name="uninvested", value="{{uninvested}}")
-        input(type="hidden", name="fee", value="{{fee}}")
+        input(type="hidden", name="fee", data-max_amount="{{fee.max_amount}}", data-min_amount="{{fee.min_amount}}")
         table.withdraw-table
           tr
             th 持卡人

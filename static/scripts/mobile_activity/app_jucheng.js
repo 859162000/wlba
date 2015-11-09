@@ -217,10 +217,16 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;
-
-
-org.mmIndex = (function(org){
+;org.mmIndex = (function(org){
+    $('#explain_button').click(function(){
+        $('.explain_wrap').show();
+    });
+    $('.explain_wrap').click(function(){
+        $(this).hide();
+    });
+    $('.get_ticket_wrap .button').click(function(){
+        window.location.href = '/weixin/account/'
+    });
     var lib = {
         $body_h : $('.maimai-check-body'),
         $submit : $('.maimai-form-btn'),
@@ -232,7 +238,7 @@ org.mmIndex = (function(org){
         $validation: $('.check-submit'),
         checkState: null,
         intervalId: null,
-        $write_info_button : $('.write_info_button'),
+        //$write_info_button : $('.write_info_button'),
         $act_explain_button : $('#explain_button'),
         $explain_wrap : $('.explain_wrap'),
         init: function(){
@@ -338,26 +344,21 @@ org.mmIndex = (function(org){
                     }
                 }
 
-
-                _self.$submit.attr('disabled',true).html('领取中，请稍后...');
+                //_self.$submit.attr('disabled',true).html('领取中，请稍后...');
 
                     ops = {
-                        url: '/api/gift/owner/?promo_token=jcw',
+                        url: '/api/register/?promo_token=jcw',
                         type: 'POST',
                         data: {
-                            'phone': _self.$phone.val(),
-                            'validition': _self.$codenum.val(),
-                            'action': 'VALIDATION'
-                            //'validate_code': _self.$codenum.val(),
-                            //'IGNORE_PWD': 'true',
-                            //'captcha_0' :  $('input[name=codeimg_key]').val(),
-                            //'captcha_1' :  _self.$codeimg.val(),
+                            'identifier': _self.$phone.val(),
+                            'validate_code': _self.$codenum.val(),
+                            'IGNORE_PWD': 'true',
+                            'captcha_0' :  $('input[name=codeimg_key]').val(),
+                            'captcha_1' :  _self.$codeimg.val(),
                         },
                         success: function(data){
                             if(data.ret_code == 0){
-                                //window.location.href = '/activity/maimai_success/?state=2'
-                                alert('1');
-                                org.ajax(ajax);
+                                org.ajax(get_ticket_ajax);
                             }else{
                                 $(document.body).trigger('from:error',[data.message, true]);
                                 clearInterval(_self.intervalId);
@@ -369,57 +370,46 @@ org.mmIndex = (function(org){
                             alert(data)
                         },
                         complete:function(){
-                            lib.$submit.removeAttr('disabled').html('领 取');
+                            //lib.$submit.removeAttr('disabled').html('领 取');
                         }
                     }
 
                 org.ajax(ops);
             });
         },
-        _write_info_button: function(){
-            var _self = this;
-            //保存按钮
-            _self.$write_info_button.on('click', function(){
-            alert('1');
-                var name = $('.write_info .name').val();
-                var phone = $('.write_info .phone').val();
-                var address = $('.write_info .address').val();
-                if(name&&phone&&address){
-                    ops = {
-                        url: '/api/gift/owner/?promo_token=jcw',
-                        type: 'POST',
-                        data: {
-                            phone : phone,
-                            address : address,
-                            name : name
-                        },
-                        success: function(data){
-                            //if(data.ret_code == 0){
-                            //    window.location.href = '/activity/maimai_success/?state=1'
-                            //}else if(data.ret_code === 1000){
-                            //    window.location.href = '/activity/maimai_success/?state=0'
-                            //}
-                        },
-                        complete:function(){
-                            //lib.$submit.removeAttr('disabled').html('领 取');
-                        }
-                    }
-                    org.ajax(ops);
-                }
-            });
-        },
-        _act_explain_button: function(){
-            $('#explain_button').click(function(){
-                $('.explain_wrap').show();
-            })
-
-        },
-        _explain_wrap : function(){
-            $().click(function(){
-                $('.explain_wrap').hide();
-            })
-
-        },
+        //_write_info_button: function(){
+        //    var _self = this;
+        //    //保存按钮
+        //    _self.$write_info_button.on('click', function(){
+        //    alert('1');
+        //        var name = $('.write_info .name').val();
+        //        var phone = $('.write_info .phone').val();
+        //        var address = $('.write_info .address').val();
+        //        if(name&&phone&&address){
+        //            ops = {
+        //                url: '/api/gift/owner/?promo_token=jcw',
+        //                type: 'POST',
+        //                data: {
+        //                    phone : phone,
+        //                    address : address,
+        //                    name : name
+        //                },
+        //                success: function(data){
+        //                    //if(data.ret_code == 0){
+        //                    //    window.location.href = '/activity/maimai_success/?state=1'
+        //                    //}else if(data.ret_code === 1000){
+        //                    //    window.location.href = '/activity/maimai_success/?state=0'
+        //                    //}
+        //                    $('.write_info .text').text(data.message);
+        //                },
+        //                complete:function(){
+        //                    //lib.$submit.removeAttr('disabled').html('领 取');
+        //                }
+        //            }
+        //            org.ajax(ops);
+        //        }
+        //    });
+        //},
         /*
          * fn 回调函数
          * delay 空闲时间
@@ -583,28 +573,34 @@ org.success = (function(org){
         init:function(){
             var
                 state = org.getQueryStringByName('state')*1,
-                str = '',
-                val = null;
+                str = null,
+                val = null,
+                url = null;
 
                 if(state === 0){
                     str = '成功领取';
                     val = '1.5%加息券';
+                    url = '/weixin/login/';
                 }else if(state === 1){
                     str = '您已领取过奖品!';
                     val = null;
+                    url = '/weixin/login/';
                 }else if(state === 2){
                     str = '成功领取';
                     val = '120元红包';
+                    url = '/weixin/list/';
                 }
                 $('.maimai-title').html(str);
                 if(val){
                     $('.maimai-money').html(val);
                 }
-
+            $('.maimai-use-btn').on('click', function(){
+                window.location.href = url;
+            });
 
             var mySwiper = new Swiper('.swiper-container', {
                 pagination: '.swiper-pagination-maimai',
-            })
+            }) 
         },
     }
     return {
@@ -622,3 +618,52 @@ org.success = (function(org){
         }
     })
 })(org);
+var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
+            org.ajax({
+                type : 'GET',
+                url : '/weixin/api/jsapi_config/',
+                dataType : 'json',
+                success : function(data) {
+                    //请求成功，通过config注入配置信息,
+                    wx.config({
+                        debug: false,
+                        appId: data.appId,
+                        timestamp: data.timestamp,
+                        nonceStr: data.nonceStr,
+                        signature: data.signature,
+                        jsApiList: jsApiList
+                    });
+                }
+            });
+
+
+            wx.ready(function(){
+
+                var host = 'https://staging.wanglibao.com/',
+                    shareName = '网利宝用户专享福利',
+                    shareImg = host + '/static/imgs/mobile_activity/app_jucheng/300x300.jpg',
+                    shareLink = host + '/activity/app_jucheng/',
+                    shareMainTit = '网利宝用户专享福利',
+                    shareBody = '张昊辰钢琴独奏会门票限量抢'
+                //分享给微信好友
+                org.onMenuShareAppMessage({
+                    title: shareMainTit,
+                    desc: shareBody,
+                    link: shareLink,
+                    imgUrl: shareImg
+                });
+                //分享给微信朋友圈
+                org.onMenuShareTimeline({
+                    title: '网利宝用户专享福利',
+                    link : shareLink,
+                    imgUrl: shareImg
+                })
+                //分享给QQ
+                org.onMenuShareQQ({
+                    title: shareMainTit,
+                    desc: shareBody,
+                    link : shareLink,
+                    imgUrl: shareImg
+                })
+            })
+

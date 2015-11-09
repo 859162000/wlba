@@ -8,6 +8,11 @@ import datetime
 from misc.models import Misc
 from models import PayInfo
 from marketing.utils import local_to_utc
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import ModelViewSet
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 
 logger = logging.getLogger(__name__)
@@ -114,5 +119,14 @@ class WithdrawFee(object):
         today = local_to_utc(datetime.datetime.now(), 'min')
         month_start = today - datetime.timedelta(days=today.day)
         withdraw_count = PayInfo.objects.filter(user=user, type='W').filter(status__in=[u'成功', u'已受理'])\
+            .filter(create_time__gt=month_start).count()
+        return withdraw_count
+
+    @staticmethod
+    def get_withdraw_success_count(user):
+        """ 获取当月成功提现次数 """
+        today = local_to_utc(datetime.datetime.now(), 'min')
+        month_start = today - datetime.timedelta(days=today.day)
+        withdraw_count = PayInfo.objects.filter(user=user, type='W').filter(status=u'成功')\
             .filter(create_time__gt=month_start).count()
         return withdraw_count

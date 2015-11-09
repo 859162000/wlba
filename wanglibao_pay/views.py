@@ -124,8 +124,12 @@ class PayView(TemplateView):
             pay_info.save()
             OrderHelper.update_order(order, request.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
 
-            # 处理第三方渠道的用户充值回调
-            CoopRegister(request).process_for_recharge(request.user)
+            try:
+                # 处理第三方用户充值回调
+                CoopRegister(request).process_for_recharge(request.user)
+            except Exception, e:
+                logger.error(e)
+
         except decimal.DecimalException:
             message = u'金额格式错误'
         except Bank.DoesNotExist:
@@ -396,8 +400,11 @@ class CardViewSet(ModelViewSet):
 
         card.save()
 
-        # 处理第三方渠道回调
-        CoopRegister(request).process_for_binding_card(request.user)
+        try:
+            # 处理第三方用户绑卡回调
+            CoopRegister(request).process_for_binding_card(request.user)
+        except Exception, e:
+            logger.error(e)
 
         return Response({
             'id': card.pk,
@@ -458,25 +465,62 @@ class WithdrawTransactions(TemplateView):
                     payinfo.save()
 
                     # 给提现记录表中的信息同步进行确认,同时将提现的费用充值到网利宝的公司提现账户
-                    fee_amount = payinfo.fee + payinfo.management_fee
-                    withdraw_card = WithdrawCard.objects.filter(is_default=True).first()
-                    withdraw_card.margin += fee_amount
-                    withdraw_card.save()
+                    fee = payinfo.fee
+                    management_fee = payinfo.management_fee
 
-                    # 将提现信息单独记录到提现费用记录表中
-                    withdraw_card = WithdrawCard.objects.filter(is_default=True).first()
-                    if withdraw_card:
+                    if fee > 0 or management_fee > 0:
+                        fee_total_amount = fee + management_fee
+                        withdraw_card = WithdrawCard.objects.filter(is_default=True).first()
+                        withdraw_card.amount += fee_total_amount
+                        withdraw_card.save()
+
+                        # 将提现信息单独记录到提现费用记录表中
+                        withdraw_card = WithdrawCard.objects.filter(is_default=True).first()
+                        if withdraw_card:
+                            withdraw_card_record = WithdrawCardRecord()
+                            withdraw_card_record.type = PayInfo.WITHDRAW
+                            withdraw_card_record.amount = payinfo.fee + payinfo.management_fee
+                            withdraw_card_record.fee = payinfo.fee
+                            withdraw_card_record.management_fee = payinfo.management_fee
+                            withdraw_card_record.management_amount = payinfo.management_amount
+                            withdraw_card_record.withdrawcard = withdraw_card
+                            withdraw_card_record.payinfo = payinfo
+                            withdraw_card_record.user = payinfo.user
+                            withdraw_card_record.status = PayInfo.SUCCESS
+                            withdraw_card_record.message = u'用户提现费用存入'
+                            withdraw_card_record.save()
+
+                    # 取款确认时要检测该次提现是否是真正的在每个月的免费次数之内,如果是还需要将已扣除的费用返还给用户(仅限手续费)
+                    give_back = False
+                    if fee > 0:
+                        fee_misc = WithdrawFee(switch='on')
+                        fee_config = fee_misc.get_withdraw_fee_config()
+                        withdraw_count = fee_misc.get_withdraw_success_count(payinfo.user)
+                        free_times = fee_config['fee']['amount_interval']
+                        if withdraw_count <= free_times:
+                            give_back = True
+
+                    if give_back:
+                        # 1.给用户返还手续费
+                        marginKeeper.deposit(fee, description=u'返还提现免费次数之内的手续费:{}元'.format(fee), catalog=u"返还手续费")
+
+                        # 2.从网利宝提现账户中减去手续费
+                        withdraw_card = WithdrawCard.objects.filter(is_default=True).first()
+                        withdraw_card.amount -= fee
+                        withdraw_card.save()
+                        
+                        # 将提现信息单独记录到提现费用记录表中
                         withdraw_card_record = WithdrawCardRecord()
                         withdraw_card_record.type = PayInfo.WITHDRAW
-                        withdraw_card_record.amount = payinfo.fee + payinfo.management_fee
+                        withdraw_card_record.amount = payinfo.fee
                         withdraw_card_record.fee = payinfo.fee
-                        withdraw_card_record.management_fee = payinfo.management_fee
-                        withdraw_card_record.management_amount = payinfo.management_amount
+                        withdraw_card_record.management_fee = 0
+                        withdraw_card_record.management_amount = 0
                         withdraw_card_record.withdrawcard = withdraw_card
                         withdraw_card_record.payinfo = payinfo
                         withdraw_card_record.user = payinfo.user
                         withdraw_card_record.status = PayInfo.SUCCESS
-                        withdraw_card_record.message = u'用户提现费用存入'
+                        withdraw_card_record.message = u'用户提现费用返还'
                         withdraw_card_record.save()
 
                     # 发站内信
@@ -526,13 +570,13 @@ class WithdrawRollback(TemplateView):
             return HttpResponse({u"该%s 请求已经处理过,请勿重复处理" % uuid})
 
         marginKeeper = MarginKeeper(payinfo.user)
-        marginKeeper.withdraw_rollback(payinfo.amount, error_message, uninvested=payinfo.management_amount)
+        # 提现审核失败回滚时需要将扣除的各手续费返还
+        total_amount = payinfo.amount + payinfo.fee + payinfo.management_fee
+        marginKeeper.withdraw_rollback(total_amount, error_message, uninvested=payinfo.management_amount)
         payinfo.status = PayInfo.FAIL
         payinfo.error_message = error_message
         payinfo.confirm_time = None
         payinfo.save()
-
-        # TODO 取款失败回滚时要检测提现费用记录表中的记录, 同时将费用重新增加到账户余额中
 
         # 短信通知添加用户名
         name = payinfo.user.wanglibaouserprofile.name or u'用户'
@@ -703,6 +747,14 @@ class YeePayAppPayView(APIView):
     def post(self, request):
         yeepay = third_pay.YeePay()
         result = yeepay.app_pay(request)
+
+        if result['ret_code'] == 0:
+            try:
+                # 处理第三方用户充值回调
+                CoopRegister(request).process_for_recharge(request.user)
+            except Exception, e:
+                logger.error(e)
+
         return Response(result)
 
 #易宝支付回调
@@ -756,6 +808,14 @@ class BindPayView(APIView):
     def post(self, request):
         pay = third_pay.KuaiPay()
         result = pay.pre_pay(request)
+
+        if result['ret_code'] == 0:
+            try:
+                # 处理第三方用户充值回调
+                CoopRegister(request).process_for_recharge(request.user)
+            except Exception, e:
+                logger.error(e)
+
         return Response(result)
 
 
@@ -855,8 +915,6 @@ class FEEAPIView(APIView):
                 return {"ret_code": 30134, 'message': u'金额格式错误'}
 
         # 检测银行的单笔最大提现限额,如民生银行
-
-        print bank_id
         bank = Bank.objects.filter(code=bank_id.upper()).first()
         if bank and bank.withdraw_limit:
             bank_limit = util.handle_withdraw_limit(bank.withdraw_limit)
@@ -871,7 +929,7 @@ class FEEAPIView(APIView):
 
         actual_amount = amount - fee - management_fee  # 实际到账金额
         if actual_amount <= 0:
-            return {"ret_code": 30136, "message": u'实际到账金额为0,提现失败'}
+            return {"ret_code": 30136, "message": u'实际到账金额为0,无法提现'}
 
         return Response({
             "ret_code": 0,
@@ -880,6 +938,7 @@ class FEEAPIView(APIView):
             "management_fee": management_fee,  # 管理费
             "management_amount": management_amount,  # 计算管理费的金额
         })
+
 
 class TradeRecordAPIView(APIView):
     permission_classes = (IsAuthenticated, )
