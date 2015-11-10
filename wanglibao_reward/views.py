@@ -433,8 +433,10 @@ class WeixinShareTools(APIView):
             award_user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity=str(phone_num), activity=self.activity).first()
 
             if not award_user_gift:  #用户这个手机号没有领取过，再判断这个微信号是否已经领取过
+                logger.debug(u'用户没有用手机号(%s)领取过' % (phone_num,))
                 user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity=str(openid), activity=self.activity).first()
                 if not user_gift:
+                    logger.debug(u'用户没有用此微信号(%s)领取过' % (openid,))
                     award_user_gift = None
                 else:
                     award_user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity).exclude(identity=(str(openid))).first()
