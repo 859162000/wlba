@@ -8,11 +8,6 @@ import datetime
 from misc.models import Misc
 from models import PayInfo
 from marketing.utils import local_to_utc
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.viewsets import ModelViewSet
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
 
 
 logger = logging.getLogger(__name__)
@@ -89,11 +84,11 @@ class WithdrawFee(object):
 
         withdraw_count = self.get_withdraw_count(user)
 
-        fee = decimal.Decimal(0)
+        fee = 0
         if withdraw_count > free_times_per_month:
             for interval in amount_interval:
                 if interval[0] < amount <= interval[1]:
-                    fee = decimal.Decimal(str(interval[2]))
+                    fee = interval[2]
                     break
                 else:
                     continue
@@ -111,7 +106,6 @@ class WithdrawFee(object):
             management_amount = decimal.Decimal(0)
         management_fee = (management_amount * management_fee_rate).quantize(TWO_PLACES)
 
-        fee = fee / decimal.Decimal('1.00')
         management_fee = management_fee / decimal.Decimal('1.00')
 
         return fee, management_fee, management_amount
