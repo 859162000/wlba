@@ -48,7 +48,7 @@ block main
             th 提现金额(元)
             td
               .span5
-                input.withdraw-input(type='text', name='amount', placeholder='金额', data-balance='{{margin}}', data-role='fee-calculator', data-rate='{{fee.management_fee.fee_rate}}', data-target-fee='#fee', data-target-actual='#actual-amount',data-count='{{fee.fee.free_times_per_month}}',data-interval='{{fee.fee.amount_interval}}',data-switch='{{fee.switch}}',data-poundage='#poundage')
+                input.withdraw-input#withdraw-input(type='text', name='amount', placeholder='金额', data-balance='{{margin}}', data-role='fee-calculator', data-rate='{{fee.management_fee.fee_rate}}', data-target-fee='#fee', data-target-actual='#actual-amount',data-count='{{fee.fee.free_times_per_month}}',data-interval='{{fee.fee.amount_interval}}',data-switch='{{fee.switch}}',data-poundage='#poundage')
                 label.error
               .span6(style="line-height:40px") 50元起，如果账户余额少于50元，可一次性取完
           tr
@@ -108,8 +108,8 @@ block main
         p.clearfix.pl 提现金额大于5万，5元/笔
         p.clearfix
             span 2、
-            label 额外手续费。充值未投资的资金如需要提现，将额外收取提现金额的0.3%，此部分手续费不包含免费范围内。
+            label 额外手续费。充值未投资的资金如需要提现，将额外收取提现金额的0.3‰，此部分手续费不包含免费范围内。
     block script
   include include/add_card
   script.
-    require(['/static/js/withdraw.js?v=20150923', '/static/js/add_card.js'])
+    require(['/static/js/withdraw.js?v=20151110', '/static/js/add_card.js'])
