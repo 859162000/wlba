@@ -299,12 +299,12 @@ class WeixinJoinView(View):
 
 def getOrCreateWeixinUser(openid, account):
     w_user = WeixinUser.objects.filter(openid=openid).first()
-    if w_user.account_original_id != account.original_id:
-        w_user.account_original_id = account.original_id
-        w_user.save()
     if not w_user:
         w_user = WeixinUser()
         w_user.openid = openid
+        w_user.account_original_id = account.original_id
+        w_user.save()
+    if w_user.account_original_id != account.original_id:
         w_user.account_original_id = account.original_id
         w_user.save()
     if not w_user.nickname:
@@ -1345,6 +1345,7 @@ def checkAndSendProductTemplate(product):
     if matches and matches.group():
         period = period/30.0   # 天
         period_desc = '%s天'%product.period
+    rate_desc = "%s%%"%product.expected_earning_rate
 
     services = SubscribeService.objects.filter(channel='weixin', is_open=True, type=0).all()
     for service in services:
@@ -1354,7 +1355,7 @@ def checkAndSendProductTemplate(product):
                 w_user = WeixinUser.objects.filter(user=sub_record.user).first()
                 if w_user:
                     template = MessageTemplate(PRODUCT_ONLINE_TEMPLATE_ID,
-                        first=service.describe, keyword1=product.name, keyword2=product.expected_earning_rate,
+                        first=service.describe, keyword1=product.name, keyword2=rate_desc,
                         keyword3=period_desc, keyword4=product.pay_method)
                     SendTemplateMessage.sendTemplate(w_user, template)
 
