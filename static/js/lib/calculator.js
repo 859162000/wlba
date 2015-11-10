@@ -42,6 +42,9 @@
       }
       return _results;
     });
+    $('input[data-role=fee-calculator]').keyup(function() {
+      return $('#withdraw-input').next().text('');
+    });
     $('input[data-role=fee-calculator]').blur(function() {
       return checkInput();
     });
@@ -50,7 +53,7 @@
     });
     checkInput = function() {
       var amount, target;
-      target = $('input[name=amount]');
+      target = $('#withdraw-input');
       amount = target.val();
       return $.ajax({
         url: "/api/fee/pc/",
@@ -66,7 +69,8 @@
           if (xhr.ret_code === 30137) {
             return $('#card-select').next().text(xhr.message);
           } else {
-            return target.next().text(xhr.message);
+            target.next().text(xhr.message);
+            return target.next().show();
           }
         } else {
           $('#poundage').text(xhr.fee + '+' + xhr.management_fee);
