@@ -74,26 +74,28 @@ class WeixinJoinView(View):
         return True
 
     def get(self, request, account_key):
-        if not self.check_signature(request, account_key):
-            return HttpResponseForbidden()
+        # if not self.check_signature(request, account_key):
+        #     return HttpResponseForbidden()
 
-        return HttpResponse(request.GET.get('echostr'))
+        # return HttpResponse(request.GET.get('echostr'))
+        return HttpResponse("ok")
 
     def post(self, request, account_key):
-        if not self.check_signature(request, account_key):
-            return HttpResponseForbidden()
-
-        msg = parse_message(request.body)
-
-        if msg.type == 'text':
-            # 自动回复  5000次／天
-            reply = tuling(msg)
-            # 多客服转接
-            # reply = TransferCustomerServiceReply(message=msg)
-        else:
-            reply = create_reply(u'更多功能，敬请期待！', msg)
-
-        return HttpResponse(reply.render())
+        # if not self.check_signature(request, account_key):
+        #     return HttpResponseForbidden()
+        #
+        # msg = parse_message(request.body)
+        #
+        # if msg.type == 'text':
+        #     # 自动回复  5000次／天
+        #     reply = tuling(msg)
+        #     # 多客服转接
+        #     # reply = TransferCustomerServiceReply(message=msg)
+        # else:
+        #     reply = create_reply(u'更多功能，敬请期待！', msg)
+        #
+        # return HttpResponse(reply.render())
+        return HttpResponse({'message':'ok'})
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -860,13 +862,15 @@ class GetAuthUserInfo(APIView):
                 w_user.auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
                 w_user.auth_info.save()
             user_info = oauth.get_user_info(w_user.openid, w_user.auth_info.access_token)
-            w_user.nickname = user_info.get('nickname', "")
-            w_user.sex = user_info.get('sex')
-            w_user.city = user_info.get('city', "")
-            w_user.country = user_info.get('country', "")
-            w_user.headimgurl = user_info.get('headimgurl', "")
-            w_user.unionid =  user_info.get('unionid', '')
-            w_user.province = user_info.get('province', '')
+            w_user.nickname = None if not user_info.get('nickname') else user_info.get('nickname')
+            w_user.sex = None if not user_info.get('sex') else user_info.get('sex')
+            w_user.city = None if not user_info.get('city') else user_info.get('city')
+            w_user.country = None if not user_info.get('country') else user_info.get('country')
+            w_user.headimgurl = None if not user_info.get('headimgurl') else user_info.get('headimgurl')
+            w_user.unionid = None if not user_info.get('unionid') else user_info.get('unionid')
+            w_user.province = None if not user_info.get('province') else user_info.get('province')
+            w_user.subscribe = None if not user_info.get('subscribe') else user_info.get('subscribe')
+            w_user.subscribe_time = None if not user_info.get('subscribe_time') else user_info.get('subscribe_time')
             w_user.save()
             return Response(user_info)
         except WeChatException, e:
@@ -896,15 +900,15 @@ class GetUserInfo(APIView):
 
         user_info = account.get_user_info(w_user.openid)
         if not w_user.nickname:
-            w_user.nickname = user_info.get('nickname', "")
-            w_user.sex = user_info.get('sex')
-            w_user.city = user_info.get('city', "")
-            w_user.country = user_info.get('country', "")
-            w_user.headimgurl = user_info.get('headimgurl', "")
-            w_user.unionid = user_info.get('unionid', '')
-            w_user.province = user_info.get('province', '')
-            w_user.subscribe = user_info.get('subscribe', '')
-            w_user.subscribe_time = user_info.get('subscribe_time', '')
+            w_user.nickname = None if not user_info.get('nickname') else user_info.get('nickname')
+            w_user.sex = None if not user_info.get('sex') else user_info.get('sex')
+            w_user.city = None if not user_info.get('city') else user_info.get('city')
+            w_user.country = None if not user_info.get('country') else user_info.get('country')
+            w_user.headimgurl = None if not user_info.get('headimgurl') else user_info.get('headimgurl')
+            w_user.unionid = None if not user_info.get('unionid') else user_info.get('unionid')
+            w_user.province = None if not user_info.get('province') else user_info.get('province')
+            w_user.subscribe = None if not user_info.get('subscribe') else user_info.get('subscribe')
+            w_user.subscribe_time = None if not user_info.get('subscribe_time') else user_info.get('subscribe_time')
             w_user.save()
         return Response(user_info)
 
@@ -925,3 +929,4 @@ class WeixinCouponList(TemplateView):
             "packages": packages,
             "status": status
         }
+
