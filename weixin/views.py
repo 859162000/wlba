@@ -53,7 +53,7 @@ from wanglibao_redis.backend import redis_backend
 import pickle
 from rest_framework import renderers
 
-logger = logging.getLogger('wanglibao_reward')
+logger = logging.getLogger(__name__)
 
 
 class WeixinJoinView(View):
@@ -876,7 +876,7 @@ class GetAuthUserInfo(APIView):
             w_user.unionid = user_info.get('unionid', "")
             w_user.province = user_info.get('province', "")
             w_user.subscribe = user_info.get('subscribe')
-            w_user.subscribe_time = user_info.get('subscribe_time', "")
+            w_user.subscribe_time = user_info.get('subscribe_time', 0)
             w_user.save()
             return Response(user_info)
         except WeChatException, e:
@@ -915,10 +915,11 @@ class GetUserInfo(APIView):
                 w_user.unionid = user_info.get('unionid', "")
                 w_user.province = user_info.get('province', "")
                 w_user.subscribe = user_info.get('subscribe')
-                w_user.subscribe_time = user_info.get('subscribe_time', "")
+                w_user.subscribe_time = user_info.get('subscribe_time', 0)
                 w_user.save()
         except Exception, e:
-            pass
+            logger.debug(e.message)
+
         return Response(user_info)
 
 
