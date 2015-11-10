@@ -162,7 +162,7 @@ class WeixinShareDetailView(TemplateView):
                 if not user_gift:
                     award_user_gift = None
                 else:
-                    award_user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity).exclude(identity=(str(openid))).first()
+                    award_user_gift = WanglibaoUserGift.objects.filter(rules=user_gift.rules, activity=self.activity).exclude(identity=(str(openid))).first()
                     logger.debug("已经从数据库里查到用户(%s)的领奖记录, openid:%s, order_id:%s" %(award_user_gift.identity, openid, order_id))
             return award_user_gift
         except Exception, reason:
@@ -439,7 +439,7 @@ class WeixinShareTools(APIView):
                     logger.debug(u'用户没有用此微信号(%s)领取过' % (openid,))
                     award_user_gift = None
                 else:
-                    award_user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity).exclude(identity=(str(openid))).first()
+                    award_user_gift = WanglibaoUserGift.objects.filter(rules=user_gift.rules, activity=self.activity).exclude(identity=(str(openid))).first()
                     logger.debug("开奖页面，已经从数据库里查到用户(%s)的领奖记录, openid:%s, order_id:%s" %(award_user_gift.identity, openid, order_id))
             return award_user_gift
         except Exception, reason:
