@@ -74,26 +74,28 @@ class WeixinJoinView(View):
         return True
 
     def get(self, request, account_key):
-        if not self.check_signature(request, account_key):
-            return HttpResponseForbidden()
+        # if not self.check_signature(request, account_key):
+        #     return HttpResponseForbidden()
 
-        return HttpResponse(request.GET.get('echostr'))
+        # return HttpResponse(request.GET.get('echostr'))
+        return HttpResponse("ok")
 
     def post(self, request, account_key):
-        if not self.check_signature(request, account_key):
-            return HttpResponseForbidden()
-
-        msg = parse_message(request.body)
-
-        if msg.type == 'text':
-            # 自动回复  5000次／天
-            reply = tuling(msg)
-            # 多客服转接
-            # reply = TransferCustomerServiceReply(message=msg)
-        else:
-            reply = create_reply(u'更多功能，敬请期待！', msg)
-
-        return HttpResponse(reply.render())
+        # if not self.check_signature(request, account_key):
+        #     return HttpResponseForbidden()
+        #
+        # msg = parse_message(request.body)
+        #
+        # if msg.type == 'text':
+        #     # 自动回复  5000次／天
+        #     reply = tuling(msg)
+        #     # 多客服转接
+        #     # reply = TransferCustomerServiceReply(message=msg)
+        # else:
+        #     reply = create_reply(u'更多功能，敬请期待！', msg)
+        #
+        # return HttpResponse(reply.render())
+        return HttpResponse({'message':'ok'})
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):

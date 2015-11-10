@@ -31,13 +31,14 @@ define ['jquery'], ($)->
       else
         $(earning_element).text "0.0"
 
-
+  $('input[data-role=fee-calculator]').keyup ()->
+    $('#withdraw-input').next().text('')
   $('input[data-role=fee-calculator]').blur ()->
     checkInput()
   $('#card-select').change ()->
     checkInput()
   checkInput = () ->
-    target = $('input[name=amount]')
+    target = $('#withdraw-input')
     amount = target.val()
     $.ajax
       url: "/api/fee/pc/"
@@ -54,6 +55,7 @@ define ['jquery'], ($)->
           $('#card-select').next().text(xhr.message)
         else
           target.next().text(xhr.message)
+          target.next().show()
       else
         $('#poundage').text(xhr.fee+'+'+xhr.management_fee)
         $('#actual-amount').text(xhr.actual_amount)
