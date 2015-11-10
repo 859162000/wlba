@@ -6,7 +6,7 @@ html
     - with '网利宝' as title
     include include/common_head
     - endwith
-    link(rel="stylesheet",href="/static/stylesheets/jucheng.css?v=201511064")
+    link(rel="stylesheet",href="/static/stylesheets/jucheng.css?v=201511065")
   body(style="background:#d9e6de")
     //include global/g_nav
     .g-nav-warp
@@ -32,7 +32,7 @@ html
               +liItem('/accounts/transaction/p2p/', '交易记录')
               if user.is_authenticated
                 li
-                  a(href='/accounts/logout?next=/activity/jucheng/') 退出
+                  a(href='/accounts/logout?next=/activity/jucheng/?promo_token=jcw') 退出
         .g-nav-box
           mixin nav-item(name, link)
             if activeItem == name
@@ -66,14 +66,14 @@ html
       .rule
         p.title 活动规则
         ul
-          li 1. 活动时间：11月12日－12月5日.
-          li 2. 注册为网利宝用户并且完成实名认证即得20元现金红包（投资2000元可抵扣使用）.
-          li 3. 用户通过网利宝单笔首次投资满1000元即可获得80元独奏会门票（限量30张），送完为止.
-          li 4. 用户通过网利宝单笔首次投资满2000元即可获得188元独奏会门票（限量100张），送完为止.
-          li 5. 本次活动仅限于张昊辰北京独奏会抢票活动.
-          li 6. 获得独奏会门票用户请留意网利宝站内信及短信，并凭领票短信及手机号码取票.
-          li 7. 现场取票地址：演出当天到北京音乐厅一楼大厅票务兑换处，咨询电话：13581710219 ，<br>&nbsp;&nbsp;&nbsp;&nbsp;上门取票地址：北京市东城区东四北大街107号科林大厦A座710，咨询电话：13581710219.
-          li 8. 本活动最终解释权在法律允许范围内归网利宝所有.
+          li!='<span class="space">1.</span> 活动时间：11月12日－12月5日；'
+          li!='<span class="space">2.</span> 注册为网利宝用户并且完成实名认证即得20元现金红包（投资2000元可抵扣使用）；'
+          li!='<span class="space">3.</span>用户通过网利宝单笔首次投资满1000元即可获得80元独奏会门票（限量30张），送完为止；'
+          li!='<span class="space">4.</span>用户通过网利宝单笔首次投资满2000元即可获得188元独奏会门票（限量100张），送完为止；'
+          li!='<span class="space">5.</span>本次活动仅限于张昊辰北京独奏会抢票活动；'
+          li!='<span class="space">6.</span>获得独奏会门票用户请留意网利宝站内信及短信，并凭领票短信及手机号码取票；'
+          li!='<span class="space">7.</span>现场取票地址：演出当天到北京音乐厅一楼大厅票务兑换处，咨询电话：13581710219 ，<br><span class="space"></span>上门取票地址：北京市东城区东四北大街107号科林大厦A座710，咨询电话：13581710219；'
+          li!='<span class="space">8.</span>本活动最终解释权在法律允许范围内归网利宝所有；'
       .advantage
         .box.one
           .img
@@ -181,5 +181,5 @@ html
       a.button#get_ticket_button(href="/accounts/home/?promo_token=jcw") 立即抢门票
     include global/g_footer
     script.
-      require(['/static/js/jucheng.js?v=201511064'])
+      require(['/static/js/jucheng.js?v=201511065'])
 
