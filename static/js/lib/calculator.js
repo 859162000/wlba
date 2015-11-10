@@ -56,7 +56,7 @@
       target = $('#withdraw-input');
       amount = target.val();
       return $.ajax({
-        url: "/api/fee/pc/",
+        url: "/api/fee/",
         type: "POST",
         data: {
           card_id: $('select[name=card_id]').val(),
