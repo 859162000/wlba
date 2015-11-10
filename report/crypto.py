@@ -1,7 +1,7 @@
 import base64
 import os
 from Crypto.Cipher import AES
-from M2Crypto import RSA,BIO,EVP
+#from M2Crypto import RSA,BIO,EVP
 import binascii
 from wanglibao import settings
 
