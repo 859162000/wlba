@@ -41,7 +41,7 @@ define ['jquery'], ($)->
     target = $('#withdraw-input')
     amount = target.val()
     $.ajax
-      url: "/api/fee/pc/"
+      url: "/api/fee/"
       type: "POST"
       data: {
         card_id : $('select[name=card_id]').val()

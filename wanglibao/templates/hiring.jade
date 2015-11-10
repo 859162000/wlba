@@ -18,7 +18,7 @@ body
         p.para “网利宝，中国第一家互联网私人银行”招募核心创始团队成员，我们期待“热情阳光、充满激情、热爱奋斗、有能力、有自信的你”与我们并肩奋斗！
 
         br
-        img(src="/static/images/hiring.jpg", alt='hiring')
+        img(src="/static/images/hiring.jpg", alt='p2p理财')
         br
 
         p.para 工作地点：北京
@@ -33,7 +33,7 @@ body
               a(href="#job-{{ forloop.counter }}", data-role="modal") {{ hiring.name }}
               if hiring.is_urgent
                 span.hot-gif
-                  img(src="/static/images/hot.gif", alt="hot")
+                  img(src="/static/images/hot.gif", alt="p2p理财")
 
         for hiring in hirings
           .job-modal(id="job-{{forloop.counter}}", style="display:none")
@@ -41,7 +41,7 @@ body
               span.modal-title {{hiring.name}}
                 if hiring.is_urgent
                   span.hot-gif
-                    img(src="/static/images/hot.gif", alt="hot")
+                    img(src="/static/images/hot.gif", alt="网利宝")
               a.icon-cancel.pull-right(rel="modal:close")
 
             .hiring-container
