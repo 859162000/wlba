@@ -6,13 +6,22 @@ html
     - endwith
     meta(name="keywords", content="p2p网贷基础知识,保本型收益理财,p2p网贷理财,网利宝")
     meta(name="description", content="网利宝是国内低门槛，高收益，期限灵活，专业权威的p2p理财网贷公司 。IDG资本+A股公司千万美元入股网利宝金融，网利宝您的私人银行，保障投资人资金安全，P2P投资理财网贷客户首选的互联网金融平台。")
+    link(href="/static/styles/pc/video-js.min.css", rel="stylesheet", type="text/css")
+    style.
+      .video-js .vjs-big-play-button {line-height: 3em; height: 3em; border-radius: 1.5em;}
+      .video-js .vjs-big-play-button { margin-top: -1.5em; }
+      .vjs-big-play-button:before{font-size: 2em;}
   body
     - with '新手指引' as activeItem
     include global/g_nav
     - endwith
-    .section
-      img(src="/static/imgs/pc/guide/guide_banner.jpg", alt='banner').i-mod-warp.i-guide-banner
-
+    .section.i-guide-banner
+      .i-guide-banner-body
+      .i-guide-video-warp
+        video( id="really-cool-video", class="video-js vjs-default-skin vjs-big-play-centered", controls, preload="auto", width="562", height="341", poster="/static/imgs/pc/guide/video_poster.jpg", data-setup='{"language":"zh"}' )
+          source( src="http://video-js.zencoder.com/oceans-clip.mp4", type='video/mp4')
+          source( src="http://video-js.zencoder.com/oceans-clip.webm", type='video/webm')
+          p.vjs-no-js 你的浏览器不支持该播放器，请用高级浏览器打开(chrome,firefox,ie9以上等)！
     .section.i-mod-warp.i-guide-company
       .i-guide-item
         .i-item-cont-warp
@@ -136,4 +145,4 @@ html
     include global/g_footer
     include include/tracking
     script.
-      require(["/static/src/pc/guide.js?v=2"])
+      require(["/static/src/pc/guide.js?v=22"])
