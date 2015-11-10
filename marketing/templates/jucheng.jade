@@ -138,11 +138,11 @@ html
       .text
       .button 保存
     .get_ticket.popup
-      .title 恭喜！您已成功注册网利宝，实名认证领取20元现金红包；立即投资，疯抢限量门票。
+      .title 恭喜！您已成功注册网利宝，<br>实名认证领取20元现金红包；<br>立即投资，疯抢限量门票。
       ul
         li!='80元门票剩余 <span class="shi"></span> 张'
         li!='188元门票剩余 <span class="bai"></span> 张'
-      .button#get_ticket_button 立即抢门票
+      a.button#get_ticket_button(href="/accounts/home/?promo_token=jcw") 立即抢门票
     include global/g_footer
     script.
       require(['/static/js/jucheng.js?v=201511064'])
