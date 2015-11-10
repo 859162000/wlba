@@ -509,6 +509,9 @@ class WeixinAccountHome(TemplateView):
         p2p_total_paid_interest = 0
         p2p_total_unpaid_interest = 0
         p2p_total_interest = 0
+        p2p_total_coupon_interest = 0
+        p2p_total_paid_coupon_interest = 0
+        p2p_total_unpaid_coupon_interest = 0
         p2p_activity_interest = 0
         for equity in p2p_equities:
             if equity.confirm:
@@ -517,6 +520,9 @@ class WeixinAccountHome(TemplateView):
                 p2p_total_unpaid_interest += equity.unpaid_interest  # 待收益
                 p2p_total_interest += equity.pre_total_interest  # 总收益
                 p2p_activity_interest += equity.activity_interest  # 活动收益
+                p2p_total_coupon_interest += equity.pre_total_coupon_interest  # 加息券总收益
+                p2p_total_paid_coupon_interest += equity.pre_paid_coupon_interest  # 加息券已收总收益
+                p2p_total_unpaid_coupon_interest += equity.unpaid_coupon_interest  # 加息券待收总收益
 
         p2p_margin = user.margin.margin  # P2P余额
         p2p_freeze = user.margin.freeze  # P2P投资中冻结金额
@@ -540,9 +546,9 @@ class WeixinAccountHome(TemplateView):
             'p2p_freeze': p2p_freeze,  # P2P投资中冻结金额
             'p2p_withdrawing': p2p_withdrawing,  # P2P提现中冻结金额
             'p2p_unpayed_principle': p2p_unpayed_principle,  # P2P待收本金
-            'p2p_total_unpaid_interest': p2p_total_unpaid_interest,  # p2p总待收益
-            'p2p_total_paid_interest': p2p_total_paid_interest + p2p_activity_interest,  # P2P总累积收益
-            'p2p_total_interest': p2p_total_interest,  # P2P总收益
+            'p2p_total_unpaid_interest': p2p_total_unpaid_interest + p2p_total_unpaid_coupon_interest,  # p2p总待收益
+            'p2p_total_paid_interest': p2p_total_paid_interest + p2p_activity_interest + p2p_total_paid_coupon_interest,  # P2P总累积收益
+            'p2p_total_interest': p2p_total_interest + p2p_total_coupon_interest,  # P2P总收益
             'banner': banner,
         }
 
