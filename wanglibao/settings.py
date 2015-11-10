@@ -944,6 +944,9 @@ ZHONGJIN_SECRET = '2CF7AC2A27CC9B48C4EFCD7E356CD95F'
 ZHONGJIN_TEST_SECRET = '348BB1C9A2032B2DA855D082151E8B8E'
 ZHONGJIN_UPDATE_TIMEDELTA = timedelta(hours=1)
 
+# 01财经
+OZ_SECRET = '3r2o3j3m3g3q3l2o7o'
+
 # 金山
 WLB_FOR_JINSHAN_KEY = '1994'
 JINSHAN_CALL_BACK_URL = 'https://vip.wps.cn/task/api/reward'
@@ -1024,7 +1027,7 @@ else:
 WLB_FOR_FANLITOU_KEY = '2002'
 
 # 迅雷VIP
-WLB_FOR_XUNLEIVIP_KEY = '2003'
+WLB_FOR_XUNLEI9_KEY = '2003'
 XUNLEIVIP_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/xljinku/sendvip/'
 XUNLEIVIP_REGISTER_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_report.php'
 XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
@@ -1084,8 +1087,8 @@ THREE_DEFAULT_CHANNEL_CODE = 'wanglibao-three'
 if ENV == ENV_PRODUCTION:
     WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
 else:
-    WEIXIN_CALLBACK_URL = 'http://492f8c43.ngrok.io'#'https://staging.wanglibao.com'
-    CALLBACK_HOST='http://492f8c43.ngrok.io'
+    WEIXIN_CALLBACK_URL = 'https://staging.wanglibao.com'
+    CALLBACK_HOST='https://staging.wanglibao.com'
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)
 WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'

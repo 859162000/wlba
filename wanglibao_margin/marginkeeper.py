@@ -112,7 +112,7 @@ class MarginKeeper(KeeperBaseMixin):
 
             # 取现时从充值未投资中扣除取现金额中已扣费的金额, 当未投资金额小于0时,置为0
             margin_uninvested = margin.uninvested - uninvested
-            margin.uninvested = margin_uninvested if margin_uninvested <= 0 else Decimal('0.00')
+            margin.uninvested = margin_uninvested if margin_uninvested > 0 else Decimal('0.00')
             margin.uninvested_freeze += uninvested
 
             margin.save()
