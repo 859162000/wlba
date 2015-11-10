@@ -430,16 +430,16 @@ class WeixinShareTools(APIView):
             self.activity = self.get_activity_by_id(activity)
         try:
             logger.debug("开奖页面，判断用户是否用此手机号在别的微信上领取过phone: %s, openid:%s, order_id:%s" %(phone_num, openid, order_id))
-            award_user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity=str(phone_num), activity=self.activity).first()
+            award_user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity=str(phone_num)).first()
 
             if not award_user_gift:  #用户这个手机号没有领取过，再判断这个微信号是否已经领取过
                 logger.debug(u'用户没有用手机号(%s)领取过' % (phone_num,))
-                user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity=str(openid), activity=self.activity).first()
+                user_gift = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, identity=str(openid)).first()
                 if not user_gift:
                     logger.debug(u'用户没有用此微信号(%s)领取过, order:%s' % (openid,order_id,))
                     award_user_gift = None
                 else:
-                    award_user_gift = WanglibaoUserGift.objects.filter(rules=user_gift.rules, activity=self.activity).exclude(identity=(str(openid))).first()
+                    award_user_gift = WanglibaoUserGift.objects.filter(rules=user_gift.rules).exclude(identity=(str(openid))).first()
                     logger.debug("开奖页面，已经从数据库里查到用户(%s)的领奖记录, openid:%s, order_id:%s" %(award_user_gift.identity, openid, order_id))
             return award_user_gift
         except Exception, reason:
