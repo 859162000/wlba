@@ -2639,23 +2639,17 @@ class ZOP2PListView(APIView):
                 if status == 2:
                     p2p_status = [u'流标']
 
-                print '####'*100
-                print time_from
-                print time_to
-                # time_from = time_from.replace(tzinfo=pytz.utc)
-                # time_to = time_to.replace(tzinfo=pytz.utc)
-                # print time_to
-                # time_zone = settings.TIME_ZONE
-                # local = pytz.timezone(time_zone)
-                # local_dt = local.localize(time_from, is_dst=None)
-                # local_dt2 = local.localize(time_to, is_dst=None)
-                # time_from2 = time_from.astimezone(pytz.utc)
-                # time_to2 = time_to.astimezone(pytz.utc)
-                # print time_from2
-                # print time_to2
+                time_zone = settings.TIME_ZONE
+                local = pytz.timezone(time_zone)
+                time_from2 = datetime.datetime.strptime(time_from, "%Y-%m-%d %H:%M:%S")
+                time_to2 = datetime.datetime.strptime(time_to, "%Y-%m-%d %H:%M:%S")
+                time_from3 = local.localize(time_from2, is_dst=None)
+                time_to3 = local.localize(time_to2, is_dst=None)
+                time_from4 = time_from3.astimezone(pytz.utc)
+                time_to4 = time_to3.astimezone(pytz.utc)
                 p2ps = P2PProduct.objects.filter(status__in=p2p_status,
-                                                 publish_time__gt=time_from,
-                                                 publish_time__lte=time_to)
+                                                 publish_time__gt=time_from4,
+                                                 publish_time__lte=time_to4)
 
                 ret['total'] = p2ps.count()
 
@@ -2687,15 +2681,16 @@ class ZOP2PListView(APIView):
                     p2p_dict['borrow_type'] = product.category
                     p2p_dict['product_type'] = u'散标'
                     p2p_dict['amount'] = product.total_amount
-                    p2p_dict['interest'] = product.expected_earning_rate
-                    p2p_dict['borrow_period'] = u'个月'
+                    p2p_dict['interest'] = (product.expected_earning_rate/100)
+                    p2p_dict['borrow_period'] = (str(product.period) + u'天') \
+                        if product.pay_method.startswith(u'日计息') else (str(product.period) + u'个月')
                     p2p_dict['repay_type'] = product.pay_method
                     p2p_dict['percentage'] = product.completion_rate
                     p2p_dict['reward'] = 0
                     p2p_dict['guarantee'] = 0
                     p2p_dict['credit'] = ''
-                    p2p_dict['verify_time'] = product.publish_time
-                    p2p_dict['reverify_time'] = product.soldout_time
+                    p2p_dict['verify_time'] = timezone.localtime(product.publish_time).strftime('%Y-%m-%d %H:%M:%S')
+                    p2p_dict['reverify_time'] = timezone.localtime(product.soldout_time).strftime('%Y-%m-%d %H:%M:%S')
                     p2p_dict['invest_count'] = P2PEquity.objects.filter(product=product).count()
                     p2p_dict['borrow_detail'] = product.usage
                     p2p_dict['attribute1'] = ''
@@ -2779,7 +2774,7 @@ class ZORecordView(APIView):
                     p2p_dict['id'] = product.id
                     p2p_dict['invest_id'] = equity.id
                     p2p_dict['link'] = '/p2p/detail/{}'.format(product.id)
-                    p2p_dict['title'] = product.name
+                    # p2p_dict['title'] = product.name
                     p2p_dict['username'] = equity.user.wanglibaouserprofile.name
                     p2p_dict['userid'] = equity.user.pk
                     try:
