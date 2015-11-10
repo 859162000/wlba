@@ -148,6 +148,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'marketing.middlewares.PromotionTokenMiddleWare',
+    'marketing.middlewares.StatsKeyWordMiddleWare',
 )
 
 CONCURRENCY_POLICY = 2
@@ -388,6 +389,12 @@ LOGGING = {
                               'filename': '/var/log/wanglibao/wanglibao_rest.log',
                               'formatter': 'verbose'
                               },
+        'wanglibao_cooperation':{  #add by yihen@20150915
+                              'level': 'DEBUG',
+                              'class': 'logging.FileHandler',
+                              'filename': '/var/log/wanglibao/wanglibao_cooperation.log',
+                              'formatter': 'verbose'
+                              },
     },
     'loggers': {
         'django': {
@@ -455,6 +462,10 @@ LOGGING = {
               'handlers': ['wanglibao_rest', 'console'],
               'level': 'DEBUG'
           },
+        'wanglibao_cooperation': { #add by yihen@20150915
+                              'handlers': ['wanglibao_cooperation', 'console'],
+                              'level': 'DEBUG'
+                              },
         'wanglibao_p2p': {
             'handlers': [ 'console'],
             'level': 'DEBUG'
@@ -530,15 +541,15 @@ from datetime import timedelta, datetime
 CELERYBEAT_SCHEDULE = {
     'p2p-watchdog-1-minutes': {
         'task': 'wanglibao_p2p.tasks.p2p_watchdog',
-        'schedule': timedelta(minutes=1),
+        'schedule': timedelta(minutes=5),
     },
-    'report-generate': {
-        'task': 'report.tasks.generate_report',
-        'schedule': crontab(minute=0, hour=16),
-    },
+    # 'report-generate': {
+    #     'task': 'report.tasks.generate_report',
+    #     'schedule': crontab(minute=0, hour=16),
+    # },
     'generate_site_data': {
         'task': 'marketing.tasks.generate_site_data',
-        'schedule': crontab(minute=15, hour=16)
+        'schedule': crontab(minute=15, hour=4)
     },
     # 'post_product_cjdao': {
     #     'task': 'wanglibao_account.tasks.post_product_half_hour',
