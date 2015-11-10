@@ -2712,34 +2712,38 @@ class ZOP2PListView(APIView):
                     p2ps = p2ps[(page - 1) * page_size:]
 
                 for product in p2ps:
-                    p2p_dict = dict()
 
-                    p2p_dict['id'] = product.id
-                    p2p_dict['link'] = '/p2p/detail/{}'.format(product.id)
-                    p2p_dict['title'] = product.name
-                    p2p_dict['username'] = product.borrower_name
-                    p2p_dict['userd'] = -1
-                    p2p_dict['asset_type'] = u'抵押标'
-                    p2p_dict['borrow_type'] = product.category
-                    p2p_dict['product_type'] = u'散标'
-                    p2p_dict['amount'] = product.total_amount
-                    p2p_dict['interest'] = (product.expected_earning_rate/100)
-                    p2p_dict['borrow_period'] = (str(product.period) + u'天') \
-                        if product.pay_method.startswith(u'日计息') else (str(product.period) + u'个月')
-                    p2p_dict['repay_type'] = product.pay_method
-                    p2p_dict['percentage'] = product.completion_rate
-                    p2p_dict['reward'] = 0
-                    p2p_dict['guarantee'] = 0
-                    p2p_dict['credit'] = ''
-                    p2p_dict['verify_time'] = timezone.localtime(product.publish_time).strftime('%Y-%m-%d %H:%M:%S')
-                    p2p_dict['reverify_time'] = timezone.localtime(product.soldout_time).strftime('%Y-%m-%d %H:%M:%S')
-                    p2p_dict['invest_count'] = P2PEquity.objects.filter(product=product).count()
-                    p2p_dict['borrow_detail'] = product.usage
-                    p2p_dict['attribute1'] = ''
-                    p2p_dict['attribute2'] = ''
-                    p2p_dict['attribute3'] = ''
+                    try:
+                        p2p_dict = dict()
+                        p2p_dict['id'] = product.id
+                        p2p_dict['link'] = '/p2p/detail/{}'.format(product.id)
+                        p2p_dict['title'] = product.name
+                        p2p_dict['username'] = product.borrower_name
+                        p2p_dict['userd'] = -1
+                        p2p_dict['asset_type'] = u'抵押标'
+                        p2p_dict['borrow_type'] = product.category
+                        p2p_dict['product_type'] = u'散标'
+                        p2p_dict['amount'] = product.total_amount
+                        p2p_dict['interest'] = (product.expected_earning_rate/100)
+                        p2p_dict['borrow_period'] = (str(product.period) + u'天') \
+                            if product.pay_method.startswith(u'日计息') else (str(product.period) + u'个月')
+                        p2p_dict['repay_type'] = product.pay_method
+                        p2p_dict['percentage'] = product.completion_rate
+                        p2p_dict['reward'] = 0
+                        p2p_dict['guarantee'] = 0
+                        p2p_dict['credit'] = ''
+                        p2p_dict['verify_time'] = timezone.localtime(product.publish_time).strftime('%Y-%m-%d %H:%M:%S')
+                        p2p_dict['reverify_time'] = timezone.localtime(product.soldout_time).strftime('%Y-%m-%d %H:%M:%S')
+                        p2p_dict['invest_count'] = P2PEquity.objects.filter(product=product).count()
+                        p2p_dict['borrow_detail'] = product.usage
+                        p2p_dict['attribute1'] = ''
+                        p2p_dict['attribute2'] = ''
+                        p2p_dict['attribute3'] = ''
 
-                    p2p_list.append(p2p_dict)
+                        p2p_list.append(p2p_dict)
+
+                    except Exception, e:
+                        print 'product{} error: {}'.format(product.pk, e)
 
                 ret['data'] = p2p_list
                 ret['page_count'] = com_page
