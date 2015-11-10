@@ -863,14 +863,14 @@ class GetAuthUserInfo(APIView):
                 w_user.auth_info.save()
             user_info = oauth.get_user_info(w_user.openid, w_user.auth_info.access_token)
             w_user.nickname = None if not user_info.get('nickname') else user_info.get('nickname')
-            w_user.sex = None if not user_info.get('sex') else user_info.get('sex')
+            w_user.sex = user_info.get('sex')
             w_user.city = None if not user_info.get('city') else user_info.get('city')
             w_user.country = None if not user_info.get('country') else user_info.get('country')
             w_user.headimgurl = None if not user_info.get('headimgurl') else user_info.get('headimgurl')
             w_user.unionid = None if not user_info.get('unionid') else user_info.get('unionid')
             w_user.province = None if not user_info.get('province') else user_info.get('province')
-            w_user.subscribe = None if not user_info.get('subscribe') else user_info.get('subscribe')
-            w_user.subscribe_time = None if not user_info.get('subscribe_time') else user_info.get('subscribe_time')
+            w_user.subscribe = user_info.get('subscribe')
+            w_user.subscribe_time = user_info.get('subscribe_time')
             w_user.save()
             return Response(user_info)
         except WeChatException, e:
@@ -902,14 +902,14 @@ class GetUserInfo(APIView):
         try:
             if not w_user.nickname:
                 w_user.nickname = None if not user_info.get('nickname') else user_info.get('nickname')
-                w_user.sex = None if not user_info.get('sex') else user_info.get('sex')
+                w_user.sex = user_info.get('sex')
                 w_user.city = None if not user_info.get('city') else user_info.get('city')
                 w_user.country = None if not user_info.get('country') else user_info.get('country')
                 w_user.headimgurl = None if not user_info.get('headimgurl') else user_info.get('headimgurl')
                 w_user.unionid = None if not user_info.get('unionid') else user_info.get('unionid')
                 w_user.province = None if not user_info.get('province') else user_info.get('province')
-                w_user.subscribe = None if not user_info.get('subscribe') else user_info.get('subscribe')
-                w_user.subscribe_time = None if not user_info.get('subscribe_time') else user_info.get('subscribe_time')
+                w_user.subscribe = user_info.get('subscribe')
+                w_user.subscribe_time = user_info.get('subscribe_time')
                 w_user.save()
         except Exception, e:
             pass
