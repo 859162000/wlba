@@ -700,6 +700,7 @@ org.regist = (function(org){
         }
     }
 
+
     function timeFun(){//倒计时跳转
       var numDom = $("#times-box");
       var num = parseInt(numDom.text());
@@ -715,6 +716,10 @@ org.regist = (function(org){
     }
     window.onload = function(){
         timeFun();
+        $("#unbind").addClass("clickOk");
+        $("#no-unbind,.back-weixin").addClass("clickOk").click(function(){
+            closePage();
+        });
     }
 
     var unbindf = false;
@@ -737,17 +742,17 @@ org.regist = (function(org){
     $("#unbind").click(function(){
         var self = $(this);
         if(unbindf){
+            self.text("正在解除……");
             self.off("click");
             self.addClass("unbings")
         }else{
+            self.text("解除绑定");
             self.on("click",unbingFun());
             self.removeClass("unbings")
         }
     });
 
-    $("#no-unbind,.back-weixin").click(function(){
-        closePage();
-    });
+
     //关闭底部
     $("#footer-down").on("click",".down-close",function(){
         $("#footer-down").hide();
