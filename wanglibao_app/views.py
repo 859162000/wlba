@@ -121,10 +121,12 @@ class AppRepaymentAPIView(APIView):
                         income_num += equity.pre_paid_coupon_interest
                         income_num += equity.activity_interest
                     # 昨日收益
-                    if yesterday_start < equity.confirm_at <= yesterday_end:
-                        income_yesterday += equity.pre_paid_interest
-                        income_yesterday += equity.pre_paid_coupon_interest
-                        income_yesterday += equity.activity_interest
+                    if equity.lasted_settlement_time:
+                        if yesterday_start < equity.lasted_settlement_time <= yesterday_end:
+                            if yesterday_start < equity.confirm_at <= yesterday_end:
+                                income_yesterday += equity.pre_paid_interest
+                                income_yesterday += equity.pre_paid_coupon_interest
+                                income_yesterday += equity.activity_interest
                 # 其他昨日收益
                 # 佣金存入, 全民淘金
                 income_yesterday_other = MarginRecord.objects.filter(user=user)\
