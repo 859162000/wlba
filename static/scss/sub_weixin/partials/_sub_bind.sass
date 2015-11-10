@@ -84,8 +84,11 @@
   .red-btn
     +red-btn(0.5rem)
     width: 100%
+    opacity: 0.5
     &.unbings
       opacity: 0.5
+    &.clickOk
+      opacity: 1
 
 //抽奖
 .sub-award-banner
@@ -120,7 +123,9 @@
     +border-radius(1.5rem)
     position: absolute
     margin-left: -1.3rem
-    opacity: 0.8
+    opacity: 0.7
+    &.awards-now
+      opacity: 1
     &.award1
       background: #f5a623
       left: 50%
@@ -253,6 +258,20 @@
       width: 100%
       left: 0
       bottom: 0
+//二维码
+.sub-code
+  text-align: center
+  width: 100%
+  height: 12rem
+  line-height: 12rem
+  position: absolute
+  top: 50%
+  left: 0
+  margin-top: -6rem
+  img
+    max-height: 12rem
+    vertical-align: middle
+
 
 
 

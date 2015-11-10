@@ -701,6 +701,7 @@ org.regist = (function(org){
         }
     }
 
+
     function timeFun(){//倒计时跳转
       var numDom = $("#times-box");
       var num = parseInt(numDom.text());
@@ -716,6 +717,10 @@ org.regist = (function(org){
     }
     window.onload = function(){
         timeFun();
+        $("#unbind").addClass("clickOk");
+        $("#no-unbind,.back-weixin").addClass("clickOk").click(function(){
+            closePage();
+        });
     }
 
     var unbindf = false;
@@ -738,57 +743,79 @@ org.regist = (function(org){
     $("#unbind").click(function(){
         var self = $(this);
         if(unbindf){
+            self.text("正在解除……");
             self.off("click");
             self.addClass("unbings")
         }else{
+            self.text("解除绑定");
             self.on("click",unbingFun());
             self.removeClass("unbings")
         }
     });
 
-    $("#no-unbind").click(function(){
-        closePage();
-    });
+
     //关闭底部
     $("#footer-down").on("click",".down-close",function(){
         $("#footer-down").hide();
     });
 
     function btnAnimate(tp,k){
+        var arrStr = ["终于等到你还好我没放弃","人品大爆发！"];
+        var errorStr = ['太可惜了，你竟然与大奖擦肩而过','天苍苍，野茫茫，中奖的希望太渺茫','你和大奖只是一根头发的距离','奖品何时有，把酒问青天？','据说心灵纯洁的人中奖几率更高'];
         var btns = tp.find(".award-item");
         var i = 0;
+        var num = 0;
+        var alt = $("#alt-box");
+        var altAwardP = alt.find("#alt-award-p");
+        var altAward = altAwardP.find("#alt-award");
+        var altPro = alt.find("#alt-promot");
         function setAn(){
-            console.log(i,k,btns.length,i >= btns.length);
             btns.eq(i).addClass("awards-now").siblings(".award-item").removeClass("awards-now");
-            if(i == k){
+            if(i == k && num > 2){
                 clearInterval(setAnimate);
+                setTimeout(function(){
+                    $("#page-bg").show();
+                    if(k === 0){
+                        altPro.text(errorStr[Math.floor(Math.random()*5)]);
+                        altAwardP.html('<span id="alt-award" class="alt-award">继续攒人品</span>');
+                    }else{
+                        altPro.text(arrStr[Math.floor(Math.random()*2)]);
+                        altAward.text(btns.eq(i).text());
+                    }
+                    alt.show();
+                },100);
             }
             if(i >= btns.length){
-                console.log('hrer');
+                num ++;
                 clearInterval(setAnimate);
                 i = 0;
-                setAnimate = setInterval(setAn,1000);
+                setAnimate = setInterval(setAn,100);
             }else{
               i ++;
             }
         }
         var setAnimate = setInterval(function(){
             setAn();
-        },1000);
+        },100);
     }
+    var awardBtn = true;
     //立即抽奖
     $("#award-btn").click(function(){
+        if(awardBtn){
+            awardBtn = false;
+        }else{
+            return;
+        }
         var awards = $(this).parents("div.award-handle-box").siblings("div.award-btn-box");
-        var arrStr = ["RP爆表，恭喜您获得","终于等到你还好我没放弃","人品大爆棚且抽且珍惜","大奖明天见，网利宝天天见。您今天已经抽奖，明天再来碰运气吧"];
+        var noChance = '大奖明天见，网利宝天天见。您今天已经抽奖，明天再来碰运气吧';
         //awards.addClass("awards-now");
-        btnAnimate(awards,5);
-        //$("#page-bg").show();
-        //$("#alt-box").show();
+        btnAnimate(awards,3);
     });
     //关闭弹层
     $("#alt-box .close-box").click(function(){
         $(this).parents("#alt-box").hide();
         $("#page-bg").hide();
+        awardBtn = true;
     });
 
     //规则 html添加class
@@ -807,9 +834,12 @@ function getCode(){//得到用户信息的二维码
     org.ajax({
         type: "POST",
         url: "/weixin/api/generate/qr_limit_scene_ticket/",
-        data: {"phone": phone, "original_id":"gh_9e8ff84237cd"},
+        data: {"original_id":"gh_9e8ff84237cd"},
         success: function (data) {
-            console.log(data);
+            $("#sub-code").html("<img src='"+ data.qrcode_url + "' />");
+        },
+        error: function(){
+            window.location.href="/weixin/jump_page/?message=请进行登录并绑定您的微信";
         }
     });
 }
