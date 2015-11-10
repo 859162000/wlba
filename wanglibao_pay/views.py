@@ -876,6 +876,8 @@ class FEEAPIView(APIView):
             float(amount)
         except:
             return Response({"ret_code": 30132, 'message': u'金额格式错误'})
+        if amount <= 0:
+            return Response({"ret_code": 30131, "message": u"请输入金额"})
 
         amount = util.fmt_two_amount(amount)
         # 计算提现费用 手续费 + 资金管理费
@@ -893,7 +895,7 @@ class FEEAPIView(APIView):
         # 检测提现最大最小金额
         max_amount = fee_config.get('max_amount')
         min_amount = fee_config.get('min_amount')
-        if amount > max_amount or amount <= 0:
+        if amount > max_amount:
             return Response({"ret_code": 30133, 'message': u'提现金额超出最大提现限额'})
         if amount < min_amount:
             if margin > min_amount:

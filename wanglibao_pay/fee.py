@@ -103,7 +103,7 @@ class WithdrawFee(object):
         if amount > margin_left:
             management_amount = amount - margin_left
         else:
-            management_amount = decimal.Decimal(0)
+            management_amount = decimal.Decimal('0.00')
         management_fee = (management_amount * management_fee_rate).quantize(TWO_PLACES)
 
         management_fee = management_fee / decimal.Decimal('1.00')
