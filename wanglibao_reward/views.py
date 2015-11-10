@@ -363,7 +363,7 @@ class WeixinShareDetailView(TemplateView):
             "ret_code": 0,
             "self_gift": self.format_response_data(user_gift, openid, 'alone'),
             "all_gift": self.format_response_data(gifts, openid, 'gifts'),
-            "share": {'content': share_title, 'title': share_content, 'url': url}
+            "share": {'content': share_content, 'title': share_title, 'url': url}
         }
 
     def is_valid_user_auth(self, order_id, amount):
