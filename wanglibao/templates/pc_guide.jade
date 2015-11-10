@@ -6,20 +6,29 @@ html
     - endwith
     meta(name="keywords", content="p2p网贷基础知识,保本型收益理财,p2p网贷理财,网利宝")
     meta(name="description", content="网利宝是国内低门槛，高收益，期限灵活，专业权威的p2p理财网贷公司 。IDG资本+A股公司千万美元入股网利宝金融，网利宝您的私人银行，保障投资人资金安全，P2P投资理财网贷客户首选的互联网金融平台。")
+    link(href="/static/styles/pc/video-js.min.css", rel="stylesheet", type="text/css")
+    style.
+      .video-js .vjs-big-play-button {line-height: 3em; height: 3em; border-radius: 1.5em;}
+      .video-js .vjs-big-play-button { margin-top: -1.5em; }
+      .vjs-big-play-button:before{font-size: 2em;}
   body
     - with '新手指引' as activeItem
     include global/g_nav
     - endwith
-    .section
-      img(src="/static/imgs/pc/guide/guide_banner.jpg", alt='banner').i-mod-warp.i-guide-banner
-
+    .section.i-guide-banner
+      .i-guide-banner-body
+      .i-guide-video-warp
+        video( id="really-cool-video", class="video-js vjs-default-skin vjs-big-play-centered", controls, preload="auto", width="562", height="341", poster="/static/imgs/pc/guide/video_poster.jpg", data-setup='{"language":"zh"}' )
+          source( src="https://wanglibao1.oss-cn-beijing.aliyuncs.com/media/wlb_video.mp4", type='video/mp4')
+          source(src='https://wanglibao1.oss-cn-beijing.aliyuncs.com/media/wlb_video_ogg.ogg', type='video/ogg')
+          p.vjs-no-js 你的浏览器不支持该播放器，请用高级浏览器打开(chrome,firefox,safari,ie9以上等)！
     .section.i-mod-warp.i-guide-company
       .i-guide-item
         .i-item-cont-warp
           .guide-title
             span.guide-tit-1.font-xxl 什么是网利宝？
           .guide-item-1-txt.t-d11.jy.padding-l-r-sm 网利宝（www.wanglibao.com）是网利金融旗下的在线理财平台，中国第一家互联网私人银行。网利宝在业内独创产融结合的业务模式，凭借丰富的金融行业经验、互联网优势，联合中国领先的金融机构、产业龙头企业进行战略合作，为投资用户提供高收益、安全透明、期限灵活的理财产品。网利宝的金融产品研发团队目前已覆盖全国20多个省市，执行360度全方位风险控制，确保我们的理财产品安全可靠，为投资者的财富增值保驾护航。
-          img(src="/static/imgs/pc/security/security_grid.jpg", alt='grid').guide-item-company
+          img(src="/static/imgs/pc/security/security_grid.jpg", alt='p2p理财').guide-item-company
 
     .section.i-mod-warp.i-guide-advantage
       .i-guide-item
@@ -136,4 +145,4 @@ html
     include global/g_footer
     include include/tracking
     script.
-      require(["/static/src/pc/guide.js?v=2"])
+      require(["/static/src/pc/guide.js?v=22"])
