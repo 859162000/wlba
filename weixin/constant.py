@@ -4,10 +4,13 @@ if settings.ENV == settings.ENV_PRODUCTION:
     BIND_SUCCESS_TEMPLATE_ID = 'mxNfcoJ8lfpbL1gFdazCk1OFGBhm9wIGL21Q6ZeB5FI'
     UNBIND_SUCCESS_TEMPLATE_ID = "lGr-ClUgsv-ruam0ZvN_O-xy_7EzB__1tbCInUs_tOE"
     ACCOUNT_INFO_TEMPLATE_ID = 'EUnDdpMNocmYynxiw939HGwv0_uG1wDrvg-xJ-Lhdz8'
+    PRODUCT_ONLINE_TEMPLATE_ID = "itviF9BIU8BBjEXwPOEMiElLzFByxMZ6-FjvYapk8pY"
 else:
     BIND_SUCCESS_TEMPLATE_ID = "8a21nArPQS0XWct6AGCASDqoaaaE_Ir5SaqarSqkNws"
     UNBIND_SUCCESS_TEMPLATE_ID = "BR08JlAXbQ_JUCnKWmhrSNe4pNL2PF9PQxV1QLcxrNo"
     ACCOUNT_INFO_TEMPLATE_ID = "EUnDdpMNocmYynxiw939HGwv0_uG1wDrvg-xJ-Lhdz8"
+    PRODUCT_ONLINE_TEMPLATE_ID = "LQADSfNMmbZdTrz2UsRic93aPb_7cS1TUjUSx7tbxHE"
+
 from copy import deepcopy
 
 class MessageTemplate404(Exception):
@@ -32,7 +35,7 @@ class MessageTemplate(object):
 
 
 Message_template = {
-    "mxNfcoJ8lfpbL1gFdazCk1OFGBhm9wIGL21Q6ZeB5FI":{
+    BIND_SUCCESS_TEMPLATE_ID:{
         "top_color":'#88ffdd',
         "data": {
                 "first": {
@@ -59,7 +62,7 @@ Message_template = {
         "url": '',
     },
 
-    "EUnDdpMNocmYynxiw939HGwv0_uG1wDrvg-xJ-Lhdz8":{
+    ACCOUNT_INFO_TEMPLATE_ID:{
         "top_color":'#88ffdd',
         "data":{
                 "first": {
@@ -89,7 +92,7 @@ Message_template = {
         },
         "url": settings.CALLBACK_HOST + '/weixin/account/',
     },
-    "BR08JlAXbQ_JUCnKWmhrSNe4pNL2PF9PQxV1QLcxrNo":{
+    UNBIND_SUCCESS_TEMPLATE_ID:{
         "first":{
             "value":u"尊敬的客户您好，您的账户已经解绑！",
             "color":"#173177"
@@ -107,5 +110,36 @@ Message_template = {
            "color":"#173177"
        },
        "url":""
+    },
+    PRODUCT_ONLINE_TEMPLATE_ID:{
+        # {{first.DATA}} 项目名称：{{keyword1.DATA}} 年化收益率：{{keyword2.DATA}} 项目期限：{{keyword3.DATA}} 还款方式：{{keyword4.DATA}} {{remark.DATA}}
+        "top_color":'#88ffdd',
+        "data":{
+                "first": {
+                    "value": "{value}",#
+                   "color": "#173177"
+                },
+                "keyword1": {
+                    "value": "{value}",#项目名称
+                   "color": "#173177"
+                },
+                "keyword2": {
+                    "value": "{value}",#年化收益率
+                   "color": "#173177"
+                },
+                "keyword3": {
+                    "value": "{value}",#项目期限
+                   "color": "#173177"
+                },
+                "keyword4": {
+                    "value": "{value}",#还款方式
+                   "color": "#173177"
+                },
+               "remark":{
+                   "value":u'如有疑问，请拨打客服热线或直接输入您的问题，我们会尽快给你回复',
+                   "color":"#173177"
+               }
+        },
+        "url": "",
     }
 }

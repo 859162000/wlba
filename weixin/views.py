@@ -11,24 +11,28 @@ from django.conf import settings
 from django.shortcuts import redirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import renderers
+from django.utils import timezone
+from rest_framework.permissions import IsAuthenticated
+import functools
+import re
 
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
 from wanglibao_buy.models import FundHoldInfo
 from wanglibao_banner.models import Banner
-from wanglibao_p2p.models import P2PEquity
+from wanglibao_p2p.models import P2PEquity, P2PProduct
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from django.contrib.auth.models import User
 from constant import MessageTemplate
-from constant import (ACCOUNT_INFO_TEMPLATE_ID, BIND_SUCCESS_TEMPLATE_ID, UNBIND_SUCCESS_TEMPLATE_ID)
+from constant import (ACCOUNT_INFO_TEMPLATE_ID, BIND_SUCCESS_TEMPLATE_ID, UNBIND_SUCCESS_TEMPLATE_ID,
+                      PRODUCT_ONLINE_TEMPLATE_ID)
 from weixin.util import getAccountInfo
 from wanglibao_profile.models import WanglibaoUserProfile
 
 
-from django.utils import timezone
-from rest_framework.permissions import IsAuthenticated
 from wanglibao_pay.models import Bank
 from wechatpy import parse_message, create_reply, WeChatClient
 from wechatpy.replies import TransferCustomerServiceReply
@@ -55,8 +59,6 @@ from wechatpy.messages import BaseMessage, TextMessage
 import datetime, time
 from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEvent, UnsubscribeEvent, SubscribeEvent,\
                              TemplateSendJobFinishEvent)
-from rest_framework import renderers
-import functools
 
 def checkBindDeco(func):
     @functools.wraps(func)
@@ -77,7 +79,7 @@ def checkBindDeco(func):
                 check_bind = True
 
         if check_bind and not w_user.user:
-            txt = self.getBindTxt(fromUserName, account.id)
+            txt = self.getBindTxt(fromUserName)
             reply = create_reply(txt, self.msg)
             return reply
         else:
@@ -146,10 +148,16 @@ class WeixinJoinView(View):
                 reply = self.check_service_subscribe(msg, account)
                 # 自动回复  5000次／天
                 if not reply:
-                    reply = tuling(msg)
+                    if msg.content=='test':
+                        reply = -1
+                        product = P2PProduct.objects.get(id=1745)
+                        checkAndSendProductTemplate(product)
+                # if not reply:
+                #     reply = tuling(msg)
                 if not reply:
                     # 多客服转接
                     reply = TransferCustomerServiceReply(message=msg)
+
             # else:
             #     reply = create_reply(u'更多功能，敬请期待！', msg)
         if reply == -1:
@@ -1312,6 +1320,32 @@ def testTemplate():
     a = MessageTemplate('_8E2B4QZQC3yyvkubjpR6NYXtUXRB9Ya79MYmpVvQ1o',
                         first=u"您好，恭喜您账户绑定成功！\n  \n您的账户已经与微信账户绑定在一起。",
                         keyword1=u"2015年09月22日")
+
+
+
+def checkAndSendProductTemplate(product):
+    matches = re.search(u'日计息', product.pay_method)
+    period = product.period
+    period_desc = "%s个月"%product.period
+    if matches and matches.group():
+        period = period/30.0   # 天
+        period_desc = '%s天'%product.period
+
+    services = SubscribeService.objects.filter(channel='weixin', is_open=True, type=0).all()
+    for service in services:
+        if period == service.num_limit:
+            sub_records = SubscribeRecord.objects.filter(service=service).all()
+            for sub_record in sub_records:
+                w_user = WeixinUser.objects.filter(user=sub_record.user).first()
+                if w_user:
+                    template = MessageTemplate(PRODUCT_ONLINE_TEMPLATE_ID,
+                        first=service.describe, keyword1=product.name, keyword2=product.expected_earning_rate,
+                        keyword3=period_desc, keyword4=product.pay_method)
+                    SendTemplateMessage.sendTemplate(w_user, template)
+
+
+
+
 
 # class WeixinBindLogin(TemplateView):
 #     template_name = 'sub_login.jade'
