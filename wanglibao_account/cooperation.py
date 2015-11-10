@@ -57,7 +57,7 @@ from user_agents import parse
 import uuid
 import urllib
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('wanglibao_cooperation')
 
 
 def get_uid_for_coop(user_id):
