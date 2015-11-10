@@ -27,8 +27,10 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     """
     A form that creates a user, with no privileges
     From a email address or phone number
+
     phone number will be checked against the validate code, and if passed
     the user will be created and be activated.
+
     If email address provided, then an activation mail will be sent to the mail
     account is not activated. When the user clicked the activation link, the account
     will be activated.
@@ -201,6 +203,7 @@ def verify_captcha(dic, keep=False):
     else:
         return False, u"图片验证码错误"
 
+
 class EmailOrPhoneAuthenticationForm(forms.Form):
     """
     Base class for authenticating users. Extend this to get a form that accepts
@@ -256,6 +259,59 @@ class EmailOrPhoneAuthenticationForm(forms.Form):
         return self.user_cache
 
 
+class LoginAuthenticationNoCaptchaForm(forms.Form):
+    """
+    Base class for authenticating users. Extend this to get a form that accepts
+    username/password logins.
+    """
+    identifier = forms.CharField(max_length=254, error_messages={'required': u'请输入手机号'})
+    password = forms.CharField(label="Password", widget=forms.PasswordInput, error_messages={'required': u'请输入密码'})
+
+    error_messages = {
+        'invalid_login': u"用户名或者密码不正确",
+        'frozen': u"用户账户已被冻结",
+    }
+
+    def __init__(self, request=None, *args, **kwargs):
+        """
+        The 'request' parameter is set for custom auth use by subclasses.
+        The form data comes in via the standard 'data' kwarg.
+        """
+        self.request = request
+        self.user_cache = None
+        super(LoginAuthenticationNoCaptchaForm, self).__init__(*args, **kwargs)
+
+        self._errors = None
+
+    def clean(self):
+        identifier = self.cleaned_data.get('identifier')
+        password = self.cleaned_data.get('password')
+
+        if identifier and password:
+            self.user_cache = authenticate(identifier=identifier, password=password)
+            if self.user_cache is None:
+                raise forms.ValidationError(
+                    self.error_messages['invalid_login'],
+                    code='invalid_login',
+                    params={'identifier': identifier},
+                )
+            else:
+                if self.user_cache.wanglibaouserprofile.frozen:
+                    raise forms.ValidationError(
+                        self.error_messages['frozen'],
+                        code='frozen',
+                        params={'identifier': identifier},
+                    )
+        return self.cleaned_data
+
+    def get_user_id(self):
+        if self.user_cache:
+            return self.user_cache.id
+        return None
+
+    def get_user(self):
+        return self.user_cache
+
 
 class ResetPasswordGetIdentifierForm(forms.Form):
     identifier = forms.CharField(max_length=254)
@@ -270,8 +326,11 @@ class IdVerificationForm(forms.Form):
         super(IdVerificationForm, self).__init__(*args, **kwargs)
         self._user = user
 
+
 def timestamp():
     return long(time.time())
+
+
 class TokenSecretSignAuthenticationForm(forms.Form):
     """
     Base class for authenticating users. Extend this to get a form that accepts
@@ -361,3 +420,4 @@ class TokenSecretSignAuthenticationForm(forms.Form):
 
     def get_user(self):
         return self.user_cache
+

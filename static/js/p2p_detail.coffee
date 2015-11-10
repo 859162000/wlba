@@ -272,6 +272,8 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
   #$('#id_amount').keyup hideEmptyLabel
 
   #build the table for invest history
+  toThousands = (num) ->
+    return  (num || 0).toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
   buildTable = (list) ->
     html = []
     i = 0
@@ -287,7 +289,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
         list[i].user
         "</em></td>"
         "<td><span class='money-highlight'>"
-        list[i].amount
+        toThousands(parseInt(list[i].amount))
         "</span><span>元</span></td>"
         "</tr>"
       ].join("")
