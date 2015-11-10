@@ -4,7 +4,7 @@ from base64 import b64decode
 
 import logging
 import traceback
-#from M2Crypto import X509
+from M2Crypto import X509
 from django.contrib.auth.models import User
 from lxml import etree
 import requests
