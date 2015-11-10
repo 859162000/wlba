@@ -53,7 +53,7 @@ from wanglibao_redis.backend import redis_backend
 import pickle
 from rest_framework import renderers
 
-logger = logging.getLogger('wanglibao_reward')
+logger = logging.getLogger(__name__)
 
 
 class WeixinJoinView(View):
@@ -509,6 +509,9 @@ class WeixinAccountHome(TemplateView):
         p2p_total_paid_interest = 0
         p2p_total_unpaid_interest = 0
         p2p_total_interest = 0
+        p2p_total_coupon_interest = 0
+        p2p_total_paid_coupon_interest = 0
+        p2p_total_unpaid_coupon_interest = 0
         p2p_activity_interest = 0
         for equity in p2p_equities:
             if equity.confirm:
@@ -517,6 +520,9 @@ class WeixinAccountHome(TemplateView):
                 p2p_total_unpaid_interest += equity.unpaid_interest  # 待收益
                 p2p_total_interest += equity.pre_total_interest  # 总收益
                 p2p_activity_interest += equity.activity_interest  # 活动收益
+                p2p_total_coupon_interest += equity.pre_total_coupon_interest  # 加息券总收益
+                p2p_total_paid_coupon_interest += equity.pre_paid_coupon_interest  # 加息券已收总收益
+                p2p_total_unpaid_coupon_interest += equity.unpaid_coupon_interest  # 加息券待收总收益
 
         p2p_margin = user.margin.margin  # P2P余额
         p2p_freeze = user.margin.freeze  # P2P投资中冻结金额
@@ -540,9 +546,9 @@ class WeixinAccountHome(TemplateView):
             'p2p_freeze': p2p_freeze,  # P2P投资中冻结金额
             'p2p_withdrawing': p2p_withdrawing,  # P2P提现中冻结金额
             'p2p_unpayed_principle': p2p_unpayed_principle,  # P2P待收本金
-            'p2p_total_unpaid_interest': p2p_total_unpaid_interest,  # p2p总待收益
-            'p2p_total_paid_interest': p2p_total_paid_interest + p2p_activity_interest,  # P2P总累积收益
-            'p2p_total_interest': p2p_total_interest,  # P2P总收益
+            'p2p_total_unpaid_interest': p2p_total_unpaid_interest + p2p_total_unpaid_coupon_interest,  # p2p总待收益
+            'p2p_total_paid_interest': p2p_total_paid_interest + p2p_activity_interest + p2p_total_paid_coupon_interest,  # P2P总累积收益
+            'p2p_total_interest': p2p_total_interest + p2p_total_coupon_interest,  # P2P总收益
             'banner': banner,
         }
 
@@ -862,15 +868,15 @@ class GetAuthUserInfo(APIView):
                 w_user.auth_info.access_token_expires_at = Account._now() + datetime.timedelta(seconds=res.get('expires_in') - 60)
                 w_user.auth_info.save()
             user_info = oauth.get_user_info(w_user.openid, w_user.auth_info.access_token)
-            w_user.nickname = None if not user_info.get('nickname') else user_info.get('nickname')
-            w_user.sex = None if not user_info.get('sex') else user_info.get('sex')
-            w_user.city = None if not user_info.get('city') else user_info.get('city')
-            w_user.country = None if not user_info.get('country') else user_info.get('country')
-            w_user.headimgurl = None if not user_info.get('headimgurl') else user_info.get('headimgurl')
-            w_user.unionid = None if not user_info.get('unionid') else user_info.get('unionid')
-            w_user.province = None if not user_info.get('province') else user_info.get('province')
-            w_user.subscribe = None if not user_info.get('subscribe') else user_info.get('subscribe')
-            w_user.subscribe_time = None if not user_info.get('subscribe_time') else user_info.get('subscribe_time')
+            w_user.nickname = user_info.get('nickname', "")
+            w_user.sex = user_info.get('sex')
+            w_user.city = user_info.get('city', "")
+            w_user.country = user_info.get('country', "")
+            w_user.headimgurl = user_info.get('headimgurl', "")
+            w_user.unionid = user_info.get('unionid', "")
+            w_user.province = user_info.get('province', "")
+            w_user.subscribe = user_info.get('subscribe')
+            w_user.subscribe_time = user_info.get('subscribe_time', 0)
             w_user.save()
             return Response(user_info)
         except WeChatException, e:
@@ -901,18 +907,19 @@ class GetUserInfo(APIView):
         user_info = account.get_user_info(w_user.openid)
         try:
             if not w_user.nickname:
-                w_user.nickname = None if not user_info.get('nickname') else user_info.get('nickname')
-                w_user.sex = None if not user_info.get('sex') else user_info.get('sex')
-                w_user.city = None if not user_info.get('city') else user_info.get('city')
-                w_user.country = None if not user_info.get('country') else user_info.get('country')
-                w_user.headimgurl = None if not user_info.get('headimgurl') else user_info.get('headimgurl')
-                w_user.unionid = None if not user_info.get('unionid') else user_info.get('unionid')
-                w_user.province = None if not user_info.get('province') else user_info.get('province')
-                w_user.subscribe = None if not user_info.get('subscribe') else user_info.get('subscribe')
-                w_user.subscribe_time = None if not user_info.get('subscribe_time') else user_info.get('subscribe_time')
+                w_user.nickname = user_info.get('nickname', "")
+                w_user.sex = user_info.get('sex')
+                w_user.city = user_info.get('city', "")
+                w_user.country = user_info.get('country', "")
+                w_user.headimgurl = user_info.get('headimgurl', "")
+                w_user.unionid = user_info.get('unionid', "")
+                w_user.province = user_info.get('province', "")
+                w_user.subscribe = user_info.get('subscribe')
+                w_user.subscribe_time = user_info.get('subscribe_time', 0)
                 w_user.save()
         except Exception, e:
-            pass
+            logger.debug(e.message)
+
         return Response(user_info)
 
 
