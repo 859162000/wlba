@@ -352,7 +352,7 @@ class WeixinShareDetailView(TemplateView):
                 gifts = self.get_distribute_status(order_id, activity)
                 share_title, share_content, url = get_share_infos(order_id)
                 return {
-                    "share": {'content': share_title, 'title': share_content, 'url': url},
+                    "share": {'content': share_content, 'title': share_title, 'url': url},
                     "all_gift": self.format_response_data(gifts, openid, 'gifts'),
                 }
         else:
