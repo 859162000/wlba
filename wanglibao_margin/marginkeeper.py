@@ -83,12 +83,12 @@ class MarginKeeper(KeeperBaseMixin):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
             catalog = u'还款入账'
             margin.margin += principal
-            self.__tracer(catalog, principal, margin.margin, u'本金入账')
+            self.__tracer(u'本金入账', principal, margin.margin, u'本金入账')
             margin.margin += interest
-            self.__tracer(catalog, interest, margin.margin, u'利息入账')
+            self.__tracer(u'利息入账', interest, margin.margin, u'利息入账')
             if penal_interest > 0:
                 margin.margin += penal_interest
-                self.__tracer(catalog, penal_interest, margin.margin, u'罚息入账')
+                self.__tracer(u'罚息入账', penal_interest, margin.margin, u'罚息入账')
             if coupon_interest > 0:
                 margin.margin += coupon_interest
                 description = u"加息存入{}元".format(coupon_interest)
