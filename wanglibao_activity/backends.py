@@ -20,25 +20,14 @@ from wanglibao_p2p.models import P2PRecord, P2PEquity
 from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_sms.tasks import send_messages
+from wanglibao_rest.utils import decide_device
 
 logger = logging.getLogger(__name__)
 
 
-def _decide_device(device_type):
-    device_type = device_type.lower()
-    if device_type == 'pc':
-        return 'pc'
-    elif device_type == 'ios':
-        return 'ios'
-    elif device_type == 'android':
-        return 'android'
-    else:
-        return 'all'
-
-
 def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_full=False):
     now = timezone.now()
-    device_type = _decide_device(device_type)
+    device_type = decide_device(device_type)
     if not trigger_node:
         return
     channel = helper.which_channel(user)
@@ -417,7 +406,7 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
     else:
         this_user = user
     user_channel = helper.which_channel(this_user)
-    device_type = _decide_device(device_type)
+    device_type = decide_device(device_type)
 
     # 新增允许一次填写多个优惠券ID号
     if redpack_id:

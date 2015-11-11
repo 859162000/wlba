@@ -30,7 +30,7 @@ html
             img(src=img)
           .card-title=title
           .arrow-right
-      +item('/static/imgs/mobile/account/project.png', '已投项目', '/weixin/transaction/buying/')
+      +item('/static/imgs/mobile/account/project.png', '已投项目', '/weixin/transaction/repaying/')
       +item('/static/imgs/mobile/account/reward.png', '理财券', '/weixin/reward/unused/')
       +item('/static/imgs/mobile/account/safe.png', '账户安全', '/weixin/security/')
 
@@ -39,4 +39,3 @@ html
   - with 'account' as state
   include include/weixin_footer
   - endwith
-  script( src="/static/scripts/mobile/dist/mobile.js")

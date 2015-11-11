@@ -4,10 +4,11 @@
 doctype html
 html
   head
-    - with '网利宝官网--p2p理财--p2p网贷--值得信赖的互联网金融服务平台' as title
+    - with '网利宝官网_p2p理财_p2p网贷_值得信赖的互联网金融服务平台_网利宝' as title
     include global/g_head
     - endwith
-
+    meta(name="keywords", content="网利宝,网利宝官网,p2p金融,p2p理财,p2p网贷,P2p贷款,p2p平台,P2P网贷平台,互联网金融")
+    meta(name="description", content="网利宝（www.wanglibao.com）是中国领先的互联网金融p2p理财、p2p网贷平台，网利宝官网提供安全、精准的网贷平台投资及互联网金融服务，大型机构100%本息担保，保障投资人资金安全，P2P投资理财网贷客户首选的互联网金融平台。")
   body
     - with '首页' as activeItem
     include global/g_nav
@@ -112,7 +113,7 @@ html
                   | 小伙伴们昨日共投资
                   span.num-space(data-number='{{site_data.p2p_amount_yesterday}}',data-type='amount')
           .ex-download-app.mg-t-sm.padding-sm
-            img(src='/static/imgs/pc/home/www_erweima.jpg').dol-app.mg-r-sm.fl
+            img(src='/static/imgs/pc/home/www_erweima.jpg', alt='p2p金融').dol-app.mg-r-sm.fl
             .dol-btn.fl
               .t-d4 网利宝APP-随时随地 让钱生钱
               a(href='https://www.wanglibao.com/static/wanglibao1.apk').dol-btn-warp
@@ -199,7 +200,7 @@ html
               i.icon.iconfont.icon-about
               span.font-l.mg-l-s 关于网利宝
             a(href="/pc_guide/").ns-cont
-              img(src='/static/imgs/pc/home/about.gif').ns-about
+              img(src='/static/imgs/pc/home/video.jpg', alt='互联网金融').ns-about
           li.mg-r-xxl
             a(href="/announcement/").ns-head
               i.icon.iconfont.icon-notice
@@ -218,7 +219,7 @@ html
             .ns-cont.ns-media.t-d4
               for news in news_and_reports
                 a(href="/news/detail/{{news.id}}", title="{{news.name}}", target='_blank').t-d4.font-ss.clearfix.media-list
-                  img(src="/media/{{news.image}}", alt="{{news.name}}")
+                  img(src="/media/{{news.image}}", alt="p2p理财")
                   .media-txt {{news.name}}
                   .media-time.t-d9 {{news.created_at | date:"Y-m-d"}}
     .i-mod-wrap.mg-t-sm.mg-b-xl
@@ -242,7 +243,7 @@ html
                   parts = enumerate(partners)
                   for index, partner in parts
                     if startItem <= index and index < endItem
-                        a(href="{{partner.link}}",  style="background: url('/media/{{partner.image}}') no-repeat", target="_blank", title="{{partner.name}}",)
+                        a(href="{{partner.link}}",  style="background: url('/media/{{partner.image}}') no-repeat", target="_blank", title="{{partner.name}}", rel="nofollow")
     a.bonus-icon
     .bonus-img(style='display:none')
         .close

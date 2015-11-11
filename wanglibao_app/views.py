@@ -42,6 +42,7 @@ from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.forms import verify_captcha
 from wanglibao_app.questions import question_list
 from wanglibao_margin.models import MarginRecord
+from wanglibao_rest import utils
 
 logger = logging.getLogger(__name__)
 
@@ -121,10 +122,12 @@ class AppRepaymentAPIView(APIView):
                         income_num += equity.pre_paid_coupon_interest
                         income_num += equity.activity_interest
                     # 昨日收益
-                    if yesterday_start < equity.confirm_at <= yesterday_end:
-                        income_yesterday += equity.pre_paid_interest
-                        income_yesterday += equity.pre_paid_coupon_interest
-                        income_yesterday += equity.activity_interest
+                    if equity.lasted_settlement_time:
+                        if yesterday_start < equity.lasted_settlement_time <= yesterday_end:
+                            if yesterday_start < equity.confirm_at <= yesterday_end:
+                                income_yesterday += equity.pre_paid_interest
+                                income_yesterday += equity.pre_paid_coupon_interest
+                                income_yesterday += equity.activity_interest
                 # 其他昨日收益
                 # 佣金存入, 全民淘金
                 income_yesterday_other = MarginRecord.objects.filter(user=user)\
@@ -374,6 +377,20 @@ class SendValidationCodeView(APIView):
             res, message = verify_captcha(request.POST)
         if not res:
             return Response({"ret_code": 40044, "message": message})
+
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
+        if status != 200:
+            return Response({"ret_code": 30044, "message": message})
+
+        return Response({"ret_code": 0, "message": u'验证码发送成功'})
+
+
+class SendValidationCodeNoCaptchaView(APIView):
+    """ app端获取验证码，不在设置状态码， """
+    permission_classes = ()
+
+    def post(self, request, phone):
+        phone_number = phone.strip()
 
         status, message = send_validation_code(phone_number, ip=get_client_ip(request))
         if status != 200:
