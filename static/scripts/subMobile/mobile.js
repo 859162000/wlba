@@ -759,9 +759,10 @@ org.regist = (function(org){
         $("#footer-down").hide();
     });
 
-    function btnAnimate(tp,k){
+    function btnAnimate(self,tp,k){
         var arrStr = ["终于等到你还好我没放弃","人品大爆发！"];
         var errorStr = ['太可惜了，你竟然与大奖擦肩而过','天苍苍，野茫茫，中奖的希望太渺茫','你和大奖只是一根头发的距离','奖品何时有，把酒问青天？','据说心灵纯洁的人中奖几率更高'];
+        var noChance = '大奖明天见，网利宝天天见。您今天已经抽奖，明天再来碰运气吧';
         var btns = tp.find(".award-item");
         var i = 0;
         var num = 0;
@@ -771,7 +772,7 @@ org.regist = (function(org){
         var altPro = alt.find("#alt-promot");
         function setAn(){
             btns.eq(i).addClass("awards-now").siblings(".award-item").removeClass("awards-now");
-            if(i == k && num > 2){
+            if(i === k && num > 1){
                 clearInterval(setAnimate);
                 setTimeout(function(){
                     $("#page-bg").show();
@@ -780,8 +781,9 @@ org.regist = (function(org){
                         altAwardP.html('<span id="alt-award" class="alt-award">继续攒人品</span>');
                     }else{
                         altPro.text(arrStr[Math.floor(Math.random()*2)]);
-                        altAward.text(btns.eq(i).text());
+                        altAward.text(btns.eq(i-1).text());
                     }
+                    self.removeClass("had-click");
                     alt.show();
                 },100);
             }
@@ -801,15 +803,17 @@ org.regist = (function(org){
     var awardBtn = true;
     //立即抽奖
     $("#award-btn").click(function(){
+        var self = $(this);
         if(awardBtn){
             awardBtn = false;
+            self.addClass("had-click");
         }else{
             return;
         }
-        var awards = $(this).parents("div.award-handle-box").siblings("div.award-btn-box");
-        var noChance = '大奖明天见，网利宝天天见。您今天已经抽奖，明天再来碰运气吧';
+        var awards = self.parents("div.award-handle-box").siblings("div.award-btn-box");
+
         //awards.addClass("awards-now");
-        btnAnimate(awards,3);
+        btnAnimate(self,awards,3);
     });
     //关闭弹层
     $("#alt-box .close-box").click(function(){
