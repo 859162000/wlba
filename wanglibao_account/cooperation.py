@@ -1017,12 +1017,14 @@ class JuChengRegister(CoopRegister):
             p2p_amount = int(p2p_record.first().amount)
             if p2p_amount>=1000 and p2p_amount<2000:
                 try:
+                    logger.debug(u"80门票，我要申请锁")
                     config = GiftOwnerGlobalInfo.objects.select_for_update().filter(description=u'jcw_ticket_80').first()
                 except Exception, reason:
                     logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
                     raise
                 if config and config.amount > 0:
-                    time.sleep(60)
+                    logger.debug(u'80门票，我已经得到了锁，开始睡觉5s')
+                    time.sleep(5)
                     logger.debug(u'80 ticket left：%s' % (config.amount,))
                     config.amount -= 1
                     ticket = 80
@@ -1032,12 +1034,14 @@ class JuChengRegister(CoopRegister):
 
             if p2p_amount>=2000:
                 try:
+                    logger.debug(u"188门票，我要申请锁")
                     config = GiftOwnerGlobalInfo.objects.select_for_update().filter(description=u'jcw_ticket_188').first()
                 except Exception, reason:
                     logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
                     raise
                 if config and config.amount > 0:
-                        time.sleep(60)
+                        logger.debug(u'188门票，我已经得到了锁，开始睡觉5s')
+                        time.sleep(5)
                         config.amount -= 1
                         logger.debug(u"用户 %s 获得188门票一张, 剩余：%s" % (user, config.amount))
                         config.save()
