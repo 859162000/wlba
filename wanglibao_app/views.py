@@ -117,22 +117,16 @@ class AppRepaymentAPIView(APIView):
                     amount += equity.pre_paid_interest  # 累积收益
                     amount += equity.pre_paid_coupon_interest  # 加息券加息收益
                     amount += equity.activity_interest  # 活动收益
-                    if equity.confirm_at >= start_utc:
-                        income_num += equity.pre_paid_interest
-                        income_num += equity.pre_paid_coupon_interest
-                        income_num += equity.activity_interest
-                    # 昨日收益
-                    if equity.lasted_settlement_time:
-                        if yesterday_start < equity.lasted_settlement_time <= yesterday_end:
-                            if yesterday_start < equity.confirm_at <= yesterday_end:
-                                income_yesterday += equity.pre_paid_interest
-                                income_yesterday += equity.pre_paid_coupon_interest
-                                income_yesterday += equity.activity_interest
-                # 其他昨日收益
-                # 佣金存入, 全民淘金
+                    # if equity.confirm_at >= start_utc:
+                    #     income_num += equity.pre_paid_interest
+                    #     income_num += equity.pre_paid_coupon_interest
+                    #     income_num += equity.activity_interest
+
+                # 昨日收益
+                # 利息入账, 罚息入账, 活动赠送, 邀请赠送, 加息存入, 佣佣金存入, 全民淘金
                 income_yesterday_other = MarginRecord.objects.filter(user=user)\
                     .filter(create_time__gt=yesterday_start, create_time__lte=yesterday_end)\
-                    .filter(catalog__in=[u'佣金存入', u'全民淘金']).aggregate(Sum('amount'))
+                    .filter(catalog__in=[u'利息入账', u'罚息入账', u'加息存入', u'佣金存入', u'全民淘金']).aggregate(Sum('amount'))
 
                 if income_yesterday_other.get('amount__sum'):
                     income_yesterday += income_yesterday_other.get('amount__sum')
