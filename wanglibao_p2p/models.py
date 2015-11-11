@@ -600,6 +600,16 @@ class P2PEquity(models.Model):
     def amortizations(self):
         return self.__get_amortizations()
 
+    @property
+    def lasted_settlement_time(self):
+        amortizations = UserAmortization.objects.filter(user=self.user, settled=True,
+                                                        product_amortization__product=self.product)\
+            .order_by('-settlement_time').first()
+        if amortizations and amortizations.settlement_time:
+            return amortizations.settlement_time
+        else:
+            return None
+
     def __get_amortizations(self, settled_only=False):
         if settled_only:
             amortizations = UserAmortization.objects.filter(user=self.user, product_amortization__product=self.product,

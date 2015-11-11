@@ -335,7 +335,9 @@ org.weChatStart = (function(org){
                     dataType : 'json',
                     success: function(data){
                         if(data.has_gift == 'true'){
-                            org.ui.alert(data.message);
+                            org.ui.alert(data.message, function(){
+                                window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
+                            });
                         }else if(data.has_gift == 'false'){
                             window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
                         }
