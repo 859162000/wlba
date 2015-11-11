@@ -2259,7 +2259,7 @@ class OpenidPhoneForFencai(APIView):
     def post(self, request):
         openid = request.POST.get("openid")
         phone = request.POST.get("phone")
-        if not openid or not phone:
+        if not openid or not phone or not phone.isdigit():
             return Response({'error': -1})
         relative, created = WanglibaoWeixinRelative.objects.get_or_create(openid=openid)
         if not relative.phone_for_fencai or relative.phone_for_fencai != phone:
