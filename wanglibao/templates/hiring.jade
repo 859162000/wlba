@@ -1,7 +1,10 @@
 doctype html
-- with '招贤纳士' as title
+- with '网利宝是中国领先的互联网金融_p2p理财_p2p网贷平台_网利宝' as title
 include include/common_head
 - endwith
+meta(name="keywords", content="网利宝")
+meta(name="description", content="网利宝（www.wanglibao.com）是中国领先的互联网金融p2p理财、p2p网贷平台，网利宝官网提供安全、精准的网贷平台投资及互联网金融服务，大型机构100%本息担保，保障投资人资金安全，P2P投资理财网贷客户首选的互联网金融平台。")
+
 body
   include global/g_nav
   .container.margin-bottom-xxl
@@ -15,7 +18,7 @@ body
         p.para “网利宝，中国第一家互联网私人银行”招募核心创始团队成员，我们期待“热情阳光、充满激情、热爱奋斗、有能力、有自信的你”与我们并肩奋斗！
 
         br
-        img(src="/static/images/hiring.jpg")
+        img(src="/static/images/hiring.jpg", alt='p2p理财')
         br
 
         p.para 工作地点：北京
@@ -30,7 +33,7 @@ body
               a(href="#job-{{ forloop.counter }}", data-role="modal") {{ hiring.name }}
               if hiring.is_urgent
                 span.hot-gif
-                  img(src="/static/images/hot.gif", alt="hot")
+                  img(src="/static/images/hot.gif", alt="p2p理财")
 
         for hiring in hirings
           .job-modal(id="job-{{forloop.counter}}", style="display:none")
@@ -38,7 +41,7 @@ body
               span.modal-title {{hiring.name}}
                 if hiring.is_urgent
                   span.hot-gif
-                    img(src="/static/images/hot.gif", alt="hot")
+                    img(src="/static/images/hot.gif", alt="网利宝")
               a.icon-cancel.pull-right(rel="modal:close")
 
             .hiring-container
