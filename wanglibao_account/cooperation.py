@@ -997,6 +997,7 @@ class JuChengRegister(CoopRegister):
     def purchase_call_back(self, user):
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
         SEND_SUCCESS = None
+        ticket = 0
         if p2p_record.count() == 1:
             p2p_amount = int(p2p_record.first().amount)
             if p2p_amount>=1000 and p2p_amount<2000:
@@ -1007,6 +1008,7 @@ class JuChengRegister(CoopRegister):
                     raise
                 if config and config.amount > 0:
                     config.amount -= 1
+                    ticket = 80
                     config.save()
                     logger.debug(u"用户 %s 获得80门票一张" % (user))
                     SEND_SUCCESS = True
@@ -1017,21 +1019,22 @@ class JuChengRegister(CoopRegister):
                 except Exception, reason:
                     logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
                     raise
-                if config and config.amount>0:
+                if config and config.amount > 0:
                         config.amount -= 1
                         logger.debug(u"获奖用户(%s)得到188门票一张 " % (user,))
                         config.save()
+                        ticket = 188
                         SEND_SUCCESS = True
 
             if SEND_SUCCESS:
                 send_messages.apply_async(kwargs={
                     "phones": [user.wanglibaouserprofile.phone, ],
-                    "messages": [u'[网利科技]您已成功获得门票，请于演出当天到北京音乐铁一楼大厅票务兑换处领取，咨询电话:13581710219', ]
+                    "messages": [u'[网利科技]您已成功获得%s元门票，请于演出当天到北京音乐铁一楼大厅票务兑换处领取，咨询电话:13581710219' % (ticket,), ]
                 })
                 inside_message.send_one.apply_async(kwargs={
                     "user_id": user.id,
                     "title": u"演出门票赠送",
-                    "content": u'[网利科技]您已成功获得门票，请于演出当天到北京音乐铁一楼大厅票务兑换处领取，咨询电话:13581710219',
+                    "content": u'[网利科技]您已成功获得%s元门票，请于演出当天到北京音乐铁一楼大厅票务兑换处领取，咨询电话:13581710219' % (ticket,),
                     "mtype": "activity"
                 })
 
