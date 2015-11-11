@@ -1016,7 +1016,7 @@ class JuChengRegister(CoopRegister):
             p2p_amount = int(p2p_record.first().amount)
             if p2p_amount>=1000 and p2p_amount<2000:
                 try:
-                    config = GiftOwnerGlobalInfo.objects.filter(description=u'jcw_ticket_80').first()
+                    config = GiftOwnerGlobalInfo.objects.select_for_update().filter(description=u'jcw_ticket_80').first()
                 except Exception, reason:
                     logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
                     raise
@@ -1030,7 +1030,7 @@ class JuChengRegister(CoopRegister):
 
             if p2p_amount>=2000:
                 try:
-                    config = GiftOwnerGlobalInfo.objects.filter(description=u'jcw_ticket_188').first()
+                    config = GiftOwnerGlobalInfo.objects.select_for_update().filter(description=u'jcw_ticket_188').first()
                 except Exception, reason:
                     logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
                     raise
