@@ -1058,7 +1058,7 @@ class XunleiVipRegister(CoopRegister):
             pay_amount = int(pay_info.first().amount)
             if pay_amount >= 100:
                 data = {
-                    'send_type': 1,
+                    'sendtype': '1',
                     'num1': 7,
                     'act': 5171
                 }
@@ -1073,7 +1073,7 @@ class XunleiVipRegister(CoopRegister):
             pay_amount = int(p2p_record.first().amount)
             if pay_amount >= 100:
                 data = {
-                    'send_type': '0',
+                    'sendtype': '0',
                     'num1': 12,
                     'act': 5170
                 }
