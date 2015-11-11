@@ -85,7 +85,7 @@ class WithdrawFee(object):
         withdraw_count = self.get_withdraw_count(user)
 
         fee = 0
-        if withdraw_count > free_times_per_month:
+        if withdraw_count >= free_times_per_month:
             for interval in amount_interval:
                 if interval[0] < amount <= interval[1]:
                     fee = interval[2]
