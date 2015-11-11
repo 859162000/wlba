@@ -173,9 +173,26 @@ class UserSource(models.Model):
     """
         user baidu source keyword
     """
+    ACTION = (
+        ('default', u'浏览'),
+        ('register', u'注册'),
+        ('login', u'登录'),
+        ('verified', u'实名'),
+        ('binding', u'绑卡'),
+        ('pay', u'充值'),
+        ('buy', u'投资'),
+        ('withdraw', u'提现')
+    )
     user = models.ForeignKey(User)
-    keyword = models.CharField(max_length=50, verbose_name=u"收件人姓名", blank=False, null=False, default="")
+    keyword = models.CharField(max_length=50, verbose_name=u"收件人姓名", blank=False, null=False,  default='')
+    website = models.CharField(max_length=256, verbose_name=u'网站地址', blank=False, null=False,  default='')
+    site_name = models.CharField(max_length=64, verbose_name=u'站点名称', blank=True, null=False, default='')
+    action = models.CharField(max_length=128, verbose_name=u'此次访问的最终行为', choices=ACTION, null=False, default='default')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=u"入库时间", default='2015-01-01 00:00:00')
 
+    class Meta:
+        verbose_name_plural = u'关键词统计'
+        verbose_name = u'关键词统计'
 
 class UserPhoneBook(models.Model):
     user = models.ForeignKey(User)
