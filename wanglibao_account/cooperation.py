@@ -993,7 +993,6 @@ class JuChengRegister(CoopRegister):
         self.c_code = 'jcw'
         self.invite_code = 'jcw'
 
-    @method_decorator(transaction.atomic)
     def purchase_call_back(self, user):
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
         SEND_SUCCESS = None
@@ -1002,26 +1001,27 @@ class JuChengRegister(CoopRegister):
             p2p_amount = int(p2p_record.first().amount)
             if p2p_amount>=1000 and p2p_amount<2000:
                 try:
-                    config = GiftOwnerGlobalInfo.objects.select_for_update(description=u'jcw_ticket_80').first()
+                    config = GiftOwnerGlobalInfo.objects.filter(description=u'jcw_ticket_80').first()
                 except Exception, reason:
                     logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
                     raise
                 if config and config.amount > 0:
+                    logger.debug(u'80 ticket left：%s' % (config.amount,))
                     config.amount -= 1
                     ticket = 80
                     config.save()
-                    logger.debug(u"用户 %s 获得80门票一张" % (user))
+                    logger.debug(u"用户 %s 获得80门票一张, 剩余：%s" % (user, config.amount))
                     SEND_SUCCESS = True
 
             if p2p_amount>=2000:
                 try:
-                    config = GiftOwnerGlobalInfo.objects.select_for_update(description=u'jcw_ticket_188').first()
+                    config = GiftOwnerGlobalInfo.objects.filter(description=u'jcw_ticket_188').first()
                 except Exception, reason:
                     logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
                     raise
                 if config and config.amount > 0:
                         config.amount -= 1
-                        logger.debug(u"获奖用户(%s)得到188门票一张 " % (user,))
+                        logger.debug(u"用户 %s 获得188门票一张, 剩余：%s" % (user, config.amount))
                         config.save()
                         ticket = 188
                         SEND_SUCCESS = True
