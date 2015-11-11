@@ -10,7 +10,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'UserSource.website'
         db.add_column(u'wanglibao_account_usersource', 'website',
-                      self.gf('django.db.models.fields.CharField')(default='', max_length=256, db_index=True, blank=True),
+                      self.gf('django.db.models.fields.CharField')(default='', max_length=256),
                       keep_default=False)
 
         # Adding field 'UserSource.site_name'
@@ -25,17 +25,11 @@ class Migration(SchemaMigration):
 
         # Adding field 'UserSource.created_at'
         db.add_column(u'wanglibao_account_usersource', 'created_at',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default='2015-01-01 00:00:00', blank=True),
+                      self.gf('django.db.models.fields.DateTimeField')(default='2015-01-01 00:00:00', auto_now_add=True, blank=True),
                       keep_default=False)
-
-        # Adding index on 'UserSource', fields ['keyword']
-        db.create_index(u'wanglibao_account_usersource', ['keyword'])
 
 
     def backwards(self, orm):
-        # Removing index on 'UserSource', fields ['keyword']
-        db.delete_index(u'wanglibao_account_usersource', ['keyword'])
-
         # Deleting field 'UserSource.website'
         db.delete_column(u'wanglibao_account_usersource', 'website')
 
@@ -143,7 +137,7 @@ class Migration(SchemaMigration):
         u'wanglibao_account.messagetext': {
             'Meta': {'ordering': "['-created_at']", 'object_name': 'MessageText'},
             'content': ('django.db.models.fields.TextField', [], {}),
-            'created_at': ('django.db.models.fields.BigIntegerField', [], {'default': '1447222673L', 'blank': 'True'}),
+            'created_at': ('django.db.models.fields.BigIntegerField', [], {'default': '1447226219L', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'mtype': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_index': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'})
@@ -184,13 +178,13 @@ class Migration(SchemaMigration):
         },
         u'wanglibao_account.usersource': {
             'Meta': {'object_name': 'UserSource'},
-            'action': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'action': ('django.db.models.fields.CharField', [], {'default': "'default'", 'max_length': '128'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': "'2015-01-01 00:00:00'", 'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'keyword': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '50', 'db_index': 'True'}),
-            'site_name': ('django.db.models.fields.CharField', [], {'max_length': '64', 'blank': 'True'}),
+            'keyword': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '50'}),
+            'site_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '64', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
-            'website': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '256', 'db_index': 'True', 'blank': 'True'})
+            'website': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '256'})
         },
         u'wanglibao_account.userthreeorder': {
             'Meta': {'object_name': 'UserThreeOrder'},
