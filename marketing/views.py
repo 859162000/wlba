@@ -17,7 +17,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
 from wanglibao_p2p.models import P2PRecord
 from django.views.generic import TemplateView
-from django.http.response import HttpResponse, Http404
+from django.http.response import HttpResponse, Http404, HttpResponseRedirect
 from mock_generator import MockGenerator
 from django.conf import settings
 from django.db.models.base import ModelState
@@ -28,7 +28,7 @@ from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, 
     Reward, ActivityJoinLog, QuickApplyInfo, GiftOwnerGlobalInfo, GiftOwnerInfo
 from marketing.tops import Top
 from utils import local_to_utc
-
+from wanglibao_reward.models import WanglibaoWeixinRelative
 # used for reward
 from django.forms import model_to_dict
 from django.db.models import Q
@@ -65,6 +65,8 @@ from smtplib import SMTP
 from email.header import Header
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
+from rest_framework import renderers
+from django.core.urlresolvers import reverse
 reload(sys)
 
 class YaoView(TemplateView):
@@ -2250,3 +2252,51 @@ class GiftOwnerInfoAPIView(APIView):
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
+
+class OpenidPhoneForFencai(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        openid = request.POST.get("openid")
+        phone = request.POST.get("phone")
+        if not openid or not phone:
+            return Response({'error': -1})
+        relative, created = WanglibaoWeixinRelative.objects.get_or_create(openid=openid)
+        if not relative.phone_for_fencai or relative.phone_for_fencai != phone:
+            relative.phone_for_fencai = phone
+            relative.save()
+        return Response({"code": 0, "message": "ok"})
+
+class AppLotteryTemplate(TemplateView):
+    template_name = 'app_lottery.jade'
+
+    def get_context_data(self, request, *args, **kwargs):
+        openid = self.request.GET.get('openid')
+        phone = ""
+        if not openid:
+            redirect_uri = settings.CALLBACK_HOST + reverse("weixin_share_order_gift")
+            count = 0
+            for key in self.request.GET.keys():
+                if count == 0:
+                    redirect_uri += '?%s=%s'%(key, request.GET.get(key))
+                else:
+                    redirect_uri += "&%s=%s"%(key, request.GET.get(key))
+                count += 1
+            redirect_uri = urllib.quote(redirect_uri)
+            account_id = 3
+            key = 'share_redpack'
+            shareconfig = Misc.objects.filter(key=key).first()
+            if shareconfig:
+                shareconfig = json.loads(shareconfig.value)
+                if type(shareconfig) == dict:
+                    account_id = shareconfig['account_id']
+            redirect_url = reverse('weixin_authorize_code')+'?state=%s&redirect_uri=%s' % (account_id, redirect_uri)
+            # print redirect_url
+            return HttpResponseRedirect(redirect_url)
+        relative = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
+        if relative:
+            phone = relative.phone_for_fencai
+        return {
+            'openid': openid,
+            'phone': phone,
+        }
