@@ -17,6 +17,7 @@ import hashlib
 import datetime
 import time
 import logging
+from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
 from django.db.models import Sum, Q, Count
 from django.http import HttpResponse
@@ -991,6 +992,7 @@ class JuChengRegister(CoopRegister):
         self.c_code = 'jcw'
         self.invite_code = 'jcw'
 
+    @method_decorator(transaction.atomic)
     def purchase_call_back(self, user):
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
         SEND_SUCCESS = None
