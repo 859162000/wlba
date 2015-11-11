@@ -992,10 +992,9 @@ class JuChengRegister(CoopRegister):
         self.invite_code = 'jcw'
 
     def purchase_call_back(self, user):
-        binding = Binding.objects.filter(user_id=user.id).first()
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
         SEND_SUCCESS = None
-        if binding and p2p_record.count() == 1:
+        if p2p_record.count() == 1:
             p2p_amount = int(p2p_record.first().amount)
             if p2p_amount>=1000 and p2p_amount<2000:
                 try:
