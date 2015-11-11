@@ -2655,7 +2655,7 @@ class ZOP2PListView(APIView):
             full_path = urllib.unquote(full_path)
             # TODO 进行校验
             from hashlib import md5
-            check_sign = md5(settings.OZ_SECRET + '&' + full_path.split('?')[1].split('&sign')[0]).hexdigest()
+            check_sign = md5(settings.ZO_SECRET + '&' + full_path.split('?')[1].split('&sign')[0]).hexdigest()
             if sign == check_sign.upper():
                 return True
 
@@ -2838,7 +2838,7 @@ class ZORecordView(APIView):
                     p2p_dict['money'] = equity.equity
                     p2p_dict['account'] = equity.equity
                     p2p_dict['status'] = u'成功' if equity.equity else u'失败'
-                    p2p_dict['add_time'] = equity.created_at
+                    p2p_dict['add_time'] = timezone.localtime(equity.created_at).strftime('%Y-%m-%d %H:%M:%S')
 
                     p2p_list.append(p2p_dict)
 
