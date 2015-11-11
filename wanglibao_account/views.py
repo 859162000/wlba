@@ -576,13 +576,14 @@ class AccountHomeAPIView(APIView):
                     p2p_income_today += equity.pre_paid_coupon_interest
                     p2p_income_today += equity.activity_interest
 
-                if yesterday_start < equity.confirm_at <= yesterday_end:
-                    p2p_income_yesterday += equity.pre_paid_interest
-                    p2p_income_yesterday += equity.pre_paid_coupon_interest
-                    p2p_income_yesterday += equity.activity_interest
+                if equity.lasted_settlement_time:
+                    if yesterday_start < equity.lasted_settlement_time <= yesterday_end:
+                        p2p_income_yesterday += equity.pre_paid_interest
+                        p2p_income_yesterday += equity.pre_paid_coupon_interest
+                        p2p_income_yesterday += equity.activity_interest
 
         # 其他昨日收益
-        # 佣金存入, 全民淘金
+        # 还款账, 活动赠送, 邀请赠送, 加息存入, 佣佣金存入, 全民淘金
         p2p_income_yesterday_other = MarginRecord.objects.filter(user=user)\
             .filter(create_time__gt=yesterday_start, create_time__lte=yesterday_end)\
             .filter(catalog__in=[u'佣金存入', u'全民淘金']).aggregate(Sum('amount'))
