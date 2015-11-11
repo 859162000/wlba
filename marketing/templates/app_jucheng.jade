@@ -6,33 +6,33 @@ html(style="background: #f6f6f6")
         include include/app_head
         link(href="/static/styles/mobile_activity/app_jucheng.css?v=201511063", rel="stylesheet")
         - csrf_token
-       body
+    body
         img.weixin_share(src="/static/imgs/mobile_activity/app_jucheng/300x300.jpg" style="display:none")
         img.banner(src="/static/imgs/mobile_activity/app_jucheng/banner.jpg")
         .main
             .explain_main
-              .explain_button#explain_button 活动说明
-            .title_big 限时限量 满额直送
+                .explain_button#explain_button 活动说明
+            .title_big 限时限量 满额直送
             .maimai-form
-              input(type='tel', name='phone', placeholder='请输入手机号',data-type='Phone',data-message='请输入正确的手机号', autocomplete = 'off').maimai-phone
-              .maimai-check-body
-                .maimai-form-margin
-                .phone-check
-                  input(type='tel', name='codeimg',data-type='Val',data-message='请输入图形验证码',  placeholder='输入验证码').check-input
-                  input(type='hidden', name='codeimg_key',value='')
-                  img(src='').check-img
-                .maimai-form-margin
-                .phone-check
-                  input(type='tel', name='codenum',data-type='Val',data-message='请输入短信码', placeholder='输入短信码').check-input
-                  button(type="button").check-submit 短信验证码
-              .maimai-form-sign 请输入正确的手机号
-              .maimai-form-margin.maimai-sign-margin
-              input(type='button',name='submit' ,value="我要抢票",disabled=true).maimai-form-btn
-              p.xun-p
-                  a(href="/weixin/login/") 已有账号,立即登录
+                input(type='tel', name='phone', placeholder='请输入手机号',data-type='Phone',data-message='请输入正确的手机号', autocomplete = 'off').maimai-phone
+                .maimai-check-body
+                    .maimai-form-margin
+                    .phone-check
+                        input(type='tel', name='codeimg',data-type='Val',data-message='请输入图形验证码',  placeholder='输入验证码').check-input
+                        input(type='hidden', name='codeimg_key',value='')
+                        img(src='').check-img
+                    .maimai-form-margin
+                    .phone-check
+                        input(type='tel', name='codenum',data-type='Val',data-message='请输入短信码', placeholder='输入短信码').check-input
+                        button(type="button").check-submit 短信验证码
+                .maimai-form-sign 请输入正确的手机号
+                .maimai-form-margin.maimai-sign-margin
+                input(type='button',name='submit' ,value="我要抢票",disabled=true).maimai-form-btn
+                p.xun-p
+                    a(href="/weixin/login/") 已有账号,立即登录
         .explain_wrap
             .explain_main
-              .explain_button 活动说明
+                .explain_button 活动说明
             .main
                 dl
                     dt 1.
@@ -68,11 +68,11 @@ html(style="background: #f6f6f6")
             .title 您已成功获得门票，请您认真填写相关信息，以便奖励顺利发放，谢谢！
             ul
                 li
-                  input.name(type="text", name="user_name", placeholder="姓名")
+                    input.name(type="text", name="user_name", placeholder="姓名")
                 li
-                  input.phone(type="text", name="user_phone", placeholder="联系电话")
+                    input.phone(type="text", name="user_phone", placeholder="联系电话")
                 li
-                  input.address(type="text", name="user_address", placeholder="邮寄地址")
+                    input.address(type="text", name="user_address", placeholder="邮寄地址")
             .text!='*<span class="write_info_text">测试</span>'
             .button.write_info_button 保存
         script(src='/static/src/mobile/lib/weixin/wx.js')
