@@ -22,7 +22,6 @@ import pickle
 import datetime
 import hashlib
 from wanglibao import settings
-from wanglibao_account.cooperation import CoopRegister
 
 
 class IndexView(TemplateView):
@@ -285,9 +284,6 @@ def landpage_view(request):
     if channel_code:
         activity_page = getattr(settings, '%s_ACTIVITY_PAGE' % channel_code.upper(), 'index')
         if channel_code == getattr(settings, '%s_CHANNEL_CODE' % channel_code.upper(), None):
-            # 处理第三方用户cpc回调
-            CoopRegister(request).process_for_click()
-
             if channel_code == 'fuba':
                 # period 为结算周期，必须以天为单位
                 period = getattr(settings, '%s_PERIOD' % channel_code.upper())
