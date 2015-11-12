@@ -223,13 +223,15 @@ def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
                     this_record = records[ranking_num-1]
                     # print "this_record  ", this_record
                     if this_record.user.id == user.id:
-                        _send_gift(user, rule, device_type, is_full)
+                        _check_trade_amount(user, rule, device_type, amount, is_full)
+                        # _send_gift(user, rule, device_type, is_full)
                 except Exception:
                     pass
         elif ranking_num == -1 and is_full is True:
             # print "-1-1-1-1-1-1"
             # 查询是否满标，满标时不再考虑最小/最大金额，直接发送
-            _send_gift(user, rule, device_type, is_full)
+            _check_trade_amount(user, rule, device_type, amount, is_full)
+            # _send_gift(user, rule, device_type, is_full)
         elif ranking_num == 0 and not is_full:
             # print "0000000000000000==id:%s==" % rule.id
             _check_trade_amount(user, rule, device_type, amount, is_full)
