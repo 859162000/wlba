@@ -616,7 +616,7 @@ class JinShanRegister(CoopRegister):
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
         if p2p_record.count() == 1:
             p2p_amount = int(p2p_record.first().amount)
-            if p2p_amount >= 100:
+            if p2p_amount >= 500:
                 if p2p_amount <= 999:
                     self.jinshan_call_back(user, 'wangli_invest_reward', 'pA71ZhBf4DDeet7SLiLlGsT1qTYu')
                 elif p2p_amount <= 1999:
