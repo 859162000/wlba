@@ -149,6 +149,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'marketing.middlewares.PromotionTokenMiddleWare',
+    'marketing.middlewares.StatsKeyWordMiddleWare',
 )
 
 CONCURRENCY_POLICY = 2
@@ -388,6 +389,12 @@ LOGGING = {
                               'filename': '/var/log/wanglibao/wanglibao_rest.log',
                               'formatter': 'verbose'
                               },
+        'wanglibao_cooperation':{  #add by yihen@20150915
+                              'level': 'DEBUG',
+                              'class': 'logging.FileHandler',
+                              'filename': '/var/log/wanglibao/wanglibao_cooperation.log',
+                              'formatter': 'verbose'
+                              },
     },
     'loggers': {
         'django': {
@@ -455,6 +462,10 @@ LOGGING = {
               'handlers': ['wanglibao_rest', 'console'],
               'level': 'DEBUG'
           },
+        'wanglibao_cooperation': { #add by yihen@20150915
+                              'handlers': ['wanglibao_cooperation', 'console'],
+                              'level': 'DEBUG'
+                              },
         'wanglibao_p2p': {
             'handlers': [ 'console'],
             'level': 'DEBUG'
@@ -530,15 +541,15 @@ from datetime import timedelta, datetime
 CELERYBEAT_SCHEDULE = {
     'p2p-watchdog-1-minutes': {
         'task': 'wanglibao_p2p.tasks.p2p_watchdog',
-        'schedule': timedelta(minutes=1),
+        'schedule': timedelta(minutes=5),
     },
-    'report-generate': {
-        'task': 'report.tasks.generate_report',
-        'schedule': crontab(minute=0, hour=16),
-    },
+    # 'report-generate': {
+    #     'task': 'report.tasks.generate_report',
+    #     'schedule': crontab(minute=0, hour=16),
+    # },
     'generate_site_data': {
         'task': 'marketing.tasks.generate_site_data',
-        'schedule': crontab(minute=15, hour=16)
+        'schedule': crontab(minute=15, hour=4)
     },
     # 'post_product_cjdao': {
     #     'task': 'wanglibao_account.tasks.post_product_half_hour',
@@ -945,7 +956,11 @@ ZHONGJIN_TEST_SECRET = '348BB1C9A2032B2DA855D082151E8B8E'
 ZHONGJIN_UPDATE_TIMEDELTA = timedelta(hours=1)
 
 # 01财经
-OZ_SECRET = '3r2o3j3m3g3q3l2o7o'
+ZO_SECRET = '3r2o3j3m3g3q3l2o7o'
+
+# 米贷网
+MIDAI_USERNAME = 'medai360'
+MIDAI_PASSWORD = '12345678'
 
 # 金山
 WLB_FOR_JINSHAN_KEY = '1994'
@@ -1034,6 +1049,12 @@ XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
 XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
 XUNLEI9_ACTIVITY_PAGE = 'marketing_xunlei_setp'
 
+# 脉脉
+WLB_FOR_MAIMAI1_KEY = '2004'
+MAIMAI_COOP_KEY = 'iV1RagPbOQ19oejhm9GZlQ'
+MAIMAI_CALL_BACK_URL = 'https://maimai.cn/hb_pingback'
+MAIMAI1_CHANNEL_CODE = 'maimai1'
+MAIMAI1_ACTIVITY_PAGE = 'maimai_index'
 
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
