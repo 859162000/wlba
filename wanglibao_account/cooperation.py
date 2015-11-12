@@ -1024,7 +1024,6 @@ class JuChengRegister(CoopRegister):
                     raise
                 if config and config.amount > 0:
                     logger.debug(u'80门票，我已经得到了锁，开始睡觉5s')
-                    time.sleep(5)
                     logger.debug(u'80 ticket left：%s' % (config.amount,))
                     config.amount -= 1
                     ticket = 80
@@ -1041,7 +1040,6 @@ class JuChengRegister(CoopRegister):
                     raise
                 if config and config.amount > 0:
                         logger.debug(u'188门票，我已经得到了锁，开始睡觉5s')
-                        time.sleep(5)
                         config.amount -= 1
                         logger.debug(u"用户 %s 获得188门票一张, 剩余：%s" % (user, config.amount))
                         config.save()
