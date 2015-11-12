@@ -902,7 +902,7 @@ class FEEAPIView(APIView):
 
         if device_type == 'pc':
             if not card_id:
-                return Response({"ret_code": 30137, "message": u"银行卡选择错误"})
+                return Response({"ret_code": 30141, "message": u"银行卡选择错误"})
         else:
             if not bank_id:
                 return Response({"ret_code": 30137, "message": u"银行卡选择错误"})
@@ -948,7 +948,7 @@ class FEEAPIView(APIView):
             except Card.DoesNotExist:
                 card = None
             if bank.id != card.bank.id:
-                return Response({"ret_code": 30139, 'message': u'银行选择错误'})
+                return Response({"ret_code": 30140, 'message': u'银行选择错误'})
             else:
                 if card:
                     withdraw_limit = card.bank.withdraw_limit
