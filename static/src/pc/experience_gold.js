@@ -11,8 +11,9 @@
   });
 
   require(['jquery',"tools"], function($,tool) {
-      $('.draw_btn_ed').on('click',function(){
-          $('#newUser').modal()
+      $('.draw_btn_ing').on('click',function(){
+          $('#receiveSuccess').modal()
+          $('#receiveSuccess').find('.close-modal').hide()
       })
       $('.investBtn').on('click',function(){
           $('#success').modal()
@@ -25,6 +26,13 @@
       })
       $('.more_btn').on('click',function(){
         $('.project_list').slideToggle()
+      })
+      $('#closeBtn').on('click',function(){
+        $.modal.close()
+      })
+      $('#goBtn').on('click',function(){
+        $.modal.close()
+        $('body,html').animate({scrollTop: $('.experience_project').offset().top}, 600);
       })
   });
 }).call(this);

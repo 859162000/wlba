@@ -15,7 +15,7 @@ html
                     if user.is_authenticated
                         a(href='javascript:void(0)').draw_btn_ed
                     else
-                        a(href='/accounts/register/?next=/activity/experience_gold/')
+                        a(href='/accounts/login/?next=/activity/experience_gold/')
             .content.clearfix
                 .experience_title
                     span 我的体验金
@@ -151,7 +151,7 @@ html
                 p 恭喜您获得
                 p 8,888元体验金
                 p
-                    a(href='/p2p/list/') 领完可以在这里投资呦！
+                    a(href='javascript:void(0)')#goBtn 领完可以在这里投资呦！
         #oldUser(style='display:none')
             .oldUser
                 p 您是老用户，
@@ -160,15 +160,7 @@ html
                 p.tc
                     span
                 p.tc
-                    a(href='javascript:void(0)') 领完可以在这里投资呦！
-        #newUser(style='display:none')
-            .oldUser
-                p 您已经领取过体验金啦，
-                p 赶紧去投资吧！
-                p.newTc
-                    span
-                p.newTc
-                    a(href='/p2p/list/') 领完可以在这里投资呦！
+                    a(href='javascript:void(0)')#closeBtn 我知道了！
         #success(style='display:none')
             .successBox
                 p
