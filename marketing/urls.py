@@ -60,6 +60,7 @@ urlpatterns = patterns(
     #url(r'^youku/$', TemplateView.as_view(template_name="youku_test.jade")),
     url(r'^two-eleven/$', TemplateView.as_view(template_name="two-eleven.jade")),
     url(r'^bid/$', TemplateView.as_view(template_name="bid.jade")),
+    url(r'^365_gu/$', TemplateView.as_view(template_name="365_gu.jade")),
 )
 
 # app URL
