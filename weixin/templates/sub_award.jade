@@ -5,29 +5,29 @@ html(style="background: #f5f5f5").sub-body
     include include/weixin_head.jade
     link(href="/static/styles/sub_weixin/sub_weixin.css?v=20150910", rel="stylesheet")
   body(style="background:#fff495;")
+    - csrf_token
     header
       hgroup 赚钱哪里好 就在网利宝
       a(href="javascript:;").back-weixin
         span 返回
-
     .sub-award-banner
       img(src="/static/imgs/sub_weixin/award_banner.png")
 
     .sub-award-main
       .award-btn-box
         button.award-item.award1 继续<br />攒人品
-        button.award-item.award2 0.1%<br />加息券
-        button.award-item.award3 0.6%<br />加息券
-        button.award-item.award4 1%<br />加息券
-        button.award-item.award5 1.5%<br />加息券
-        button.award-item.award6 25元<br />红包
+        button.award-item.award2 0.2%<br />加息券
+        button.award-item.award3 0.3%<br />加息券
+        button.award-item.award4 0.4%<br />加息券
+        button.award-item.award5 1.0%<br />加息券
+        button.award-item.award6 1.5%<br />加息券
         button.award-item.award7 25元<br />红包
         button.award-item.award8 2元<br />红包
         button.award-item.award9 6元<br />红包
         button.award-item.award10 10元<br />红包
       .award-handle-box
-        .red-btns#award-btn 立即抽奖
-        .award-promot 您还有<span id="sub-award-num">3</span>次抽奖机会
+        .red-btns.had-click#award-btn 立即抽奖
+        .award-promot 您还有<span id="sub-award-num">0</span>次抽奖机会
     p.activity-title.text-center
       a(href="/weixin/award_rule/") 活动规则
     p.text-center.grey-footer
@@ -48,4 +48,10 @@ html(style="background: #f5f5f5").sub-body
     script.
       ;(function(){
         org.detail.share();
+        org.awardEvent("ENTER_WEB_PAGE",function(d){
+          $("#sub-award-num").text(d.left);
+          if(d.left > 0){
+            $("#award-btn").removeClass("had-click");
+          }
+        });
       })();

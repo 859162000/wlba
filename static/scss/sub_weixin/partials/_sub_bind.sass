@@ -102,10 +102,13 @@
   padding: 0.5rem 0
   width: 50%
   margin: 0 auto
+a.red-btns
+  &:visited
+    color: #fff
 .sub-award-main
   margin: 2rem auto 1.5rem
   position: relative
-  width: 80%
+  width: 13.5rem
   height: 14rem
   .award-btn-box
     position: relative
@@ -174,7 +177,8 @@
     width: 100%
     position: absolute
     top: 5.5rem
-
+    .had-click
+      opacity: 0.6
   .award-promot
     font-size: 0.6rem
     color: #f5a623
@@ -251,6 +255,7 @@
     .rule-cont
       color: #f7a700
       font-size: 0.75rem
+.sub-body-rule,.sub-body
   //100% body\html
   &.sub-height
     .grey-footer
@@ -259,18 +264,31 @@
       left: 0
       bottom: 0
 //二维码
-.sub-code
-  text-align: center
-  width: 100%
-  height: 12rem
-  line-height: 12rem
+.sub-code-mian
   position: absolute
   top: 50%
   left: 0
-  margin-top: -6rem
-  img
-    max-height: 12rem
-    vertical-align: middle
+  text-align: center
+  width: 100%
+  height: 13.8rem
+  margin-top: -7.2rem
+  .sub-code-tit
+    font-size: 0.8rem
+    height: 1rem
+    line-height: 1rem
+    color: #00c
+  .sub-code-pro
+    font-size: 0.7rem
+    height: 1.8rem
+    line-height: 0.9rem
+  .sub-code
+    width: 100%
+    height: 10rem
+    line-height: 10rem
+    margin: 0.5rem 0
+    img
+      max-height: 10rem
+      vertical-align: middle
 
 
 
