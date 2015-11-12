@@ -123,7 +123,7 @@ class WeixinJoinView(View):
         print msg
         reply = None
         toUserName = msg._data['ToUserName']
-        print "toUserName:::",toUserName
+        print "toUserName:::", toUserName
         fromUserName = msg._data['FromUserName']
         createTime = msg._data['CreateTime']
         weixin_account = WeixinAccounts.getByOriginalId(toUserName)
@@ -142,8 +142,6 @@ class WeixinJoinView(View):
             elif isinstance(msg, SubscribeScanEvent):
                 reply = self.process_subscribe(msg, toUserName)
             elif isinstance(msg, ScanEvent):
-                w_user = getOrCreateWeixinUser(fromUserName, account)
-                eventKey = msg._data['EventKey']
                 #如果eventkey为用户id则进行绑定
                 reply = self.process_subscribe(msg, toUserName)
             elif isinstance(msg, TemplateSendJobFinishEvent):
@@ -182,10 +180,13 @@ class WeixinJoinView(View):
         w_user = getOrCreateWeixinUser(fromUserName, account.db_account)
         if msg.key == 'subscribe_service':
             txt = u'客官，请回复相关数字订阅最新项目通知，系统会在第一时间发送给您相关信息。\n'
-            for sub_service in sub_services:
-                txt += (sub_service.describe + '\n')
-            txt += u'如需退订请回复TD'
-            reply = create_reply(txt, msg)
+            if len(sub_services)>0:
+                for sub_service in sub_services:
+                    txt += ("【" + sub_service.key + "】" + sub_service.describe + '\n')
+                txt += u'如需退订请回复TD'
+                reply = create_reply(txt, msg)
+            else:
+                reply = -1
         if msg.key == 'bind_weixin':
             if not w_user.user:
                 txt = self.getBindTxt(fromUserName)
@@ -205,6 +206,9 @@ class WeixinJoinView(View):
                     keyword4=account_info['p2p_total_unpaid_interest'])
             SendTemplateMessage.sendTemplate(w_user, a)
             reply = -1
+        if msg.key == 'customer_service':
+            txt = self.getCSReply()
+            reply = create_reply(txt, msg)
         return reply
 
     @checkBindDeco
@@ -252,15 +256,16 @@ class WeixinJoinView(View):
             w_user.save()
 
         #如果eventkey为用户id则进行绑定
-        if eventKey and eventKey.isdigit():
-            userProfile = WanglibaoUserProfile.objects.filter(phone=eventKey).first()
-            if userProfile:
-                rs, txt = bindUser(w_user, userProfile.user)
-                reply = create_reply(txt, msg)
-        else:
-            if not w_user.scene_id:
-                w_user.scene_id = eventKey
-                w_user.save()
+        if eventKey:
+            if eventKey.isdigit():
+                userProfile = WanglibaoUserProfile.objects.filter(phone=eventKey).first()
+                if userProfile:
+                    rs, txt = bindUser(w_user, userProfile.user)
+                    reply = create_reply(txt, msg)
+            else:
+                if not w_user.scene_id:
+                    w_user.scene_id = eventKey
+                    w_user.save()
         if not reply and not w_user.user:
             txt = self.getBindTxt(fromUserName)
             reply = create_reply(txt, msg)
@@ -292,6 +297,18 @@ class WeixinJoinView(View):
             +u"如需解绑当前帐号，请点击<a href='%s'>【立即解绑】</a>"%unbind_url
         return txt
 
+    def getCSReply(self):
+        now = datetime.datetime.now()
+        weekday = now.weekday() + 1
+        if now.hour<=20 and now.hour>=9 and weekday>=1 and weekday<=5:
+            txt = "客官，骚安勿躁！网利菌不是在回答问题，就是在回答问题的路上。\n"\
+                    + "请留下您的问题，网利菌会在第一时间给予解答。"
+        else:
+            txt = "客官，网利菌在线时间为\n"\
+                    + "【周一至周五9：00~20：00】，请在工作与我们联系哦~"
+        return txt
+
+
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super(WeixinJoinView, self).dispatch(request, *args, **kwargs)
@@ -318,9 +335,9 @@ def getOrCreateWeixinUser(openid, account):
             w_user.headimgurl = user_info.get('headimgurl', "")
             w_user.unionid =  user_info.get('unionid', '')
             w_user.province = user_info.get('province', '')
-            w_user.subscribe = user_info.get('subscribe', '')
+            w_user.subscribe = user_info.get('subscribe', 0)
             # if not w_user.subscribe_time:
-            w_user.subscribe_time = user_info.get('subscribe_time', '')
+            w_user.subscribe_time = user_info.get('subscribe_time', 0)
             w_user.save()
         except WeChatException, e:
             pass
@@ -1371,24 +1388,21 @@ def checkAndSendProductTemplate(sender, **kw):
 import weixin.tasks
 
 def checkProduct(sender, **kw):
-    print kw
     product = kw["instance"]
-    # print '=============================1', product.status
-    # db_product = P2PProduct.objects.get(pk=product.id)
-    # print '=============================2', db_product.status
-
-    if getattr(product, "old_status"):
-        print '===============================3', product.old_status
+    if getattr(product, "old_status", ""):
         if product.old_status == u'待审核' and product.status==u'正在招标':
             weixin.tasks.detect_product_biding.apply_async(kwargs={
                "product_id":product.id
             })
 
 def recordProduct(sender, **kw):
-    product = kw["instance"]
-    if product.status == u'正在招标':
-        db_product = P2PProduct.objects.get(pk=product.id)
-        setattr(product, 'old_status', db_product.status)
+    try:
+        product = kw["instance"]
+        if product.status == u'正在招标':
+            db_product = P2PProduct.objects.get(pk=product.id)
+            setattr(product, 'old_status', db_product.status)
+    except:
+        pass
 
 pre_save.connect(recordProduct, sender=P2PProduct, dispatch_uid="product-pre-save-signal")
 post_save.connect(checkProduct, sender=P2PProduct, dispatch_uid="product-post-save-signal")
