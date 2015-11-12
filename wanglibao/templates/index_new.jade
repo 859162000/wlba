@@ -162,7 +162,7 @@ html
                         percent = float(p2p.ordered_amount) / p2p.total_amount * 100
                         .pro-container(style="width:{{percent | percentage}}")
                       .pdt-progress-percent.t-d7.fl {{percent | percentage}}
-                    total_amount = p2p.total_amount / 10000
+                    total_amount = p2p.total_amount / 10000.0
                     amount = p2p.total_amount - p2p.ordered_amount
                     .t-d7.mg-b-s {{total_amount}}万元/￥{{amount | money_format_int}}元 可投
                   .product-footer.clearfix
