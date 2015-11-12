@@ -855,6 +855,14 @@ org.regist = (function(org){
             html.removeClass("sub-height");
         }
     })();
+
+    //抽奖活动 显示规则
+    $("#show-alt-rule").click(function(){
+        $("#sub-body-rule").show();
+    });
+    $("#close-this").click(function(){
+        $(this).parents("#sub-body-rule").hide();
+    });
 })(org);
 function getCode(){//得到用户信息的二维码
     var phone = org.getQueryStringByName('phone');
@@ -919,6 +927,7 @@ org.awardEvent = (function(org){ //微信抽奖
             success: function(data){
                 fn(data);
                 awardsNum = data.left;
+                //alert(awardsNum+", "+$("#openid").val());
                 goods = parseFloat(data.amount);
             },
             error: function(){}
