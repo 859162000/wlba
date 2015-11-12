@@ -381,9 +381,16 @@ org.regist = (function(org){
         $captcha_img : $('#captcha'),
         $captcha_key : $('input[name=captcha_0]'),
         init:function(){
+            lib._onlytrue();
             lib._captcha_refresh();
             lib._checkFrom();
             lib._animateXieyi();
+        },
+        _onlytrue: function(){
+            var onlyture = org.getQueryStringByName('onlyphone');
+            if(onlyture && onlyture == 'true'){
+                $('input[name=identifier]').attr('readOnly', true);
+            }
         },
         _animateXieyi:function(){
             var $submitBody = $('.submit-body'),

@@ -43,7 +43,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_ZGDX_KEY, ZGDX_CALL_BACK_URL, ZGDX_PARTNER_NO, ZGDX_SERVICE_CODE, ZGDX_CONTRACT_ID, \
      ZGDX_ACTIVITY_ID, ZGDX_KEY, ZGDX_IV, WLB_FOR_NJWH_KEY, ENV, ENV_PRODUCTION, WLB_FOR_FANLITOU_KEY, \
      WLB_FOR_XUNLEI9_KEY, XUNLEIVIP_CALL_BACK_URL, XUNLEIVIP_KEY, XUNLEIVIP_REGISTER_CALL_BACK_URL, \
-     XUNLEIVIP_REGISTER_KEY, WLB_FOR_MAIMAI1_KEY, MAIMAI_CALL_BACK_URL, MAIMAI_COOP_KEY, MAIMAI1_CHANNEL_CODE
+     XUNLEIVIP_REGISTER_KEY
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization, AutomaticPlan
@@ -300,13 +300,6 @@ class CoopRegister(object):
         """
         pass
 
-    def click_call_back(self):
-        """
-        用户点击投放链接后回调
-        :return:
-        """
-        pass
-
     def process_for_register(self, user, invite_code):
         """
         用户可以在从渠道跳转后的注册页使用邀请码，优先考虑邀请码
@@ -408,14 +401,6 @@ class CoopRegister(object):
                 channel_processor.recharge_call_back(user)
         except:
             logger.exception('channel recharge process error for user %s'%(user.id))
-
-    def process_for_click(self):
-        try:
-            for processor in self.processors:
-                if processor.c_code == processor.channel_code:
-                    processor.click_call_back()
-        except:
-            logger.exception('channel cpc process error.')
 
 
 class TianMangRegister(CoopRegister):
@@ -593,7 +578,7 @@ class JinShanRegister(CoopRegister):
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
         if p2p_record.count() == 1:
             p2p_amount = int(p2p_record.first().amount)
-            if p2p_amount >= 100:
+            if p2p_amount >= 500:
                 if p2p_amount <= 999:
                     self.jinshan_call_back(user, 'wangli_invest_reward', 'pA71ZhBf4DDeet7SLiLlGsT1qTYu')
                 elif p2p_amount <= 1999:
@@ -1023,8 +1008,7 @@ class JuChengRegister(CoopRegister):
                     logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
                     raise
                 if config and config.amount > 0:
-                    logger.debug(u'80门票，我已经得到了锁，开始睡觉5s')
-                    time.sleep(5)
+                    logger.debug(u'80门票，我已经得到了锁')
                     logger.debug(u'80 ticket left：%s' % (config.amount,))
                     config.amount -= 1
                     ticket = 80
@@ -1034,18 +1018,17 @@ class JuChengRegister(CoopRegister):
 
             if p2p_amount>=2000:
                 try:
-                    logger.debug(u"188门票，我要申请锁")
+                    logger.debug(u"180门票，我要申请锁")
                     config = GiftOwnerGlobalInfo.objects.select_for_update().filter(description=u'jcw_ticket_188').first()
                 except Exception, reason:
                     logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
                     raise
                 if config and config.amount > 0:
-                        logger.debug(u'188门票，我已经得到了锁，开始睡觉5s')
-                        time.sleep(5)
+                        logger.debug(u'180门票，我已经得到了锁')
                         config.amount -= 1
-                        logger.debug(u"用户 %s 获得188门票一张, 剩余：%s" % (user, config.amount))
+                        logger.debug(u"用户 %s 获得180门票一张, 剩余：%s" % (user, config.amount))
                         config.save()
-                        ticket = 188
+                        ticket = 180
                         SEND_SUCCESS = True
 
             if SEND_SUCCESS:
@@ -1152,7 +1135,7 @@ class XunleiVipRegister(CoopRegister):
         if binding and p2p_record.count() == 1:
             # 判断投资金额是否大于100
             pay_amount = int(p2p_record.first().amount)
-            if pay_amount >= 100:
+            if pay_amount >= 1000:
                 data = {
                     'sendtype': '0',
                     'num1': 12,
@@ -1161,34 +1144,13 @@ class XunleiVipRegister(CoopRegister):
                 self.xunlei_call_back(user, binding.bid, data, self.call_back_url)
 
 
-class MaimaiRegister(CoopRegister):
-    """
-    脉脉渠道--用户回调
-    回调方式: click
-    """
-    def __init__(self, request):
-        super(MaimaiRegister, self).__init__(request)
-        self.c_code = MAIMAI1_CHANNEL_CODE
-        self.call_back_url = MAIMAI_CALL_BACK_URL
-        self.coop_key = MAIMAI_COOP_KEY
-
-    def click_call_back(self):
-        params = {
-            'mmtoken': self.coop_key,
-        }
-
-        # 异步回调
-        common_callback.apply_async(
-            kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
-
-
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
                           ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
-                          XunleiVipRegister, JuChengRegister, MaimaiRegister, ]
+                          XunleiVipRegister, JuChengRegister, ]
 
 
 #######################第三方用户查询#####################
