@@ -43,7 +43,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_ZGDX_KEY, ZGDX_CALL_BACK_URL, ZGDX_PARTNER_NO, ZGDX_SERVICE_CODE, ZGDX_CONTRACT_ID, \
      ZGDX_ACTIVITY_ID, ZGDX_KEY, ZGDX_IV, WLB_FOR_NJWH_KEY, ENV, ENV_PRODUCTION, WLB_FOR_FANLITOU_KEY, \
      WLB_FOR_XUNLEI9_KEY, XUNLEIVIP_CALL_BACK_URL, XUNLEIVIP_KEY, XUNLEIVIP_REGISTER_CALL_BACK_URL, \
-     XUNLEIVIP_REGISTER_KEY, WLB_FOR_MAIMAI1_KEY, MAIMAI_CALL_BACK_URL, MAIMAI_COOP_KEY, MAIMAI1_CHANNEL_CODE
+     XUNLEIVIP_REGISTER_KEY
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization, AutomaticPlan
@@ -300,13 +300,6 @@ class CoopRegister(object):
         """
         pass
 
-    def click_call_back(self):
-        """
-        用户点击投放链接后回调
-        :return:
-        """
-        pass
-
     def process_for_register(self, user, invite_code):
         """
         用户可以在从渠道跳转后的注册页使用邀请码，优先考虑邀请码
@@ -408,14 +401,6 @@ class CoopRegister(object):
                 channel_processor.recharge_call_back(user)
         except:
             logger.exception('channel recharge process error for user %s'%(user.id))
-
-    def process_for_click(self):
-        try:
-            for processor in self.processors:
-                if processor.c_code == processor.channel_code:
-                    processor.click_call_back()
-        except:
-            logger.exception('channel cpc process error.')
 
 
 class TianMangRegister(CoopRegister):
@@ -1161,34 +1146,13 @@ class XunleiVipRegister(CoopRegister):
                 self.xunlei_call_back(user, binding.bid, data, self.call_back_url)
 
 
-class MaimaiRegister(CoopRegister):
-    """
-    脉脉渠道--用户回调
-    回调方式: click
-    """
-    def __init__(self, request):
-        super(MaimaiRegister, self).__init__(request)
-        self.c_code = MAIMAI1_CHANNEL_CODE
-        self.call_back_url = MAIMAI_CALL_BACK_URL
-        self.coop_key = MAIMAI_COOP_KEY
-
-    def click_call_back(self):
-        params = {
-            'mmtoken': self.coop_key,
-        }
-
-        # 异步回调
-        common_callback.apply_async(
-            kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
-
-
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           JuxiangyouRegister, DouwanRegister, JinShanRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
                           ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
-                          XunleiVipRegister, JuChengRegister, MaimaiRegister, ]
+                          XunleiVipRegister, JuChengRegister, ]
 
 
 #######################第三方用户查询#####################
