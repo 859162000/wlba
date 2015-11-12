@@ -50,7 +50,7 @@ urlpatterns = patterns(
     #test
     url(r'^jump_page/$', views.JumpPageTemplate.as_view(template_name="sub_times.jade"), name='jump_page'),
     url(r'^is_bind/$', TemplateView.as_view(template_name="sub_is_bind.jade")),
-    url(r'^award_index/$', views.AwardIndexTemplate.as_view(template_name="sub_award.jade")),
+    url(r'^award_index/$', views.AwardIndexTemplate.as_view(template_name="sub_award.jade"), name='award_index'),
     url(r'^award_rule/$', TemplateView.as_view(template_name="sub_award_rule.jade")),
     url(r'^sub_code/$', TemplateView.as_view(template_name="sub_code.jade")),
 

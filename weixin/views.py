@@ -1361,7 +1361,7 @@ class AwardIndexTemplate(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         openid = self.request.GET.get('openid')
         if not openid:
-            redirect_uri = settings.CALLBACK_HOST + reverse("weixin_share_order_gift")
+            redirect_uri = settings.CALLBACK_HOST + reverse("award_index")
             count = 0
             for key in self.request.GET.keys():
                 if count == 0:
