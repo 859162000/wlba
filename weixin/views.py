@@ -56,7 +56,7 @@ from django.core.paginator import PageNotAnInteger
 from wanglibao_p2p.views import get_p2p_list
 from wanglibao_redis.backend import redis_backend
 from rest_framework import renderers
-
+from misc.models import Misc
 from wechatpy.parser import parse_message
 from wechatpy.messages import BaseMessage, TextMessage
 import datetime, time
@@ -1348,6 +1348,45 @@ class WeixinCouponList(TemplateView):
             "packages": packages,
             "status": status
         }
+
+class AwardIndexTemplate(TemplateView):
+    template_name = "sub_award.jade"
+
+    def get_context_data(self, **kwargs):
+        openid = self.request.GET.get('openid')
+        return {
+            "openid": openid,
+        }
+
+    def dispatch(self, request, *args, **kwargs):
+        openid = self.request.GET.get('openid')
+        if not openid:
+            redirect_uri = settings.CALLBACK_HOST + reverse("weixin_share_order_gift")
+            count = 0
+            for key in self.request.GET.keys():
+                if count == 0:
+                    redirect_uri += '?%s=%s'%(key, self.request.GET.get(key))
+                else:
+                    redirect_uri += "&%s=%s"%(key, self.request.GET.get(key))
+                count += 1
+            redirect_uri = urllib.quote(redirect_uri)
+            account_id = 3
+            key = 'share_redpack'
+            shareconfig = Misc.objects.filter(key=key).first()
+            if shareconfig:
+                shareconfig = json.loads(shareconfig.value)
+                if type(shareconfig) == dict:
+                    account_id = shareconfig['account_id']
+            redirect_url = reverse('weixin_authorize_code')+'?state=%s&redirect_uri=%s' % (account_id, redirect_uri)
+            # print redirect_url
+            return HttpResponseRedirect(redirect_url)
+        w_user = WeixinUser.objects.filter(openid=openid).first()
+        if not w_user:
+            return redirectToJumpPage("error")
+        if not w_user.user:
+            return redirectToJumpPage("一定要绑定网利宝账号才可以抽奖哦")
+
+        return super(AwardIndexTemplate, self).dispatch(request, *args, **kwargs)
 
 
 def testTemplate():
