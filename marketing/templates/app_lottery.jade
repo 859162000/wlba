@@ -5,6 +5,8 @@ html(style="background:#FFF29A")
     title 彩票领取
     include include/app_head
   body
+    input(type='hidden', name='openid')
+    input(type='hidden', name='userphone')
     .lottery-banner
       img(src='/static/imgs/mobile_activity/app_lottery/lottery_banner.jpg')
     .lottery-content
@@ -47,4 +49,4 @@ html(style="background:#FFF29A")
         p 网利宝对此活动享有最终解释权。
       .lottery-rulse-close 关闭
 
-    script(data-init="lottery", src="/static/scripts/mobile_activity/dist/app_lottery.js?v=12")
+    script(data-init="lottery", src="/static/scripts/mobile_activity/app_lottery.js?v=12")
