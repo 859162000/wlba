@@ -963,65 +963,6 @@ var org = (function () {
                 }
             });
         },
-        _calculate: function (dom, callback) {
-            var calculate = function (amount, rate, period, pay_method) {
-                var divisor, rate_pow, result, term_amount;
-                if (/等额本息/ig.test(pay_method)) {
-                    rate_pow = Math.pow(1 + rate, period);
-                    divisor = rate_pow - 1;
-                    term_amount = amount * (rate * rate_pow) / divisor;
-                    result = term_amount * period - amount;
-                } else if (/日计息/ig.test(pay_method)) {
-                    result = amount * rate * period / 360;
-                } else {
-                    result = amount * rate * period / 12;
-                }
-                return Math.floor(result * 100) / 100;
-            };
-            dom.on('input', function (e) {
-                var earning, earning_element, earning_elements, fee_earning, fee_element, fee_elements;
-                var target = $(e.target),
-                    existing = parseFloat(target.attr('data-existing')),
-                    period = target.attr('data-period'),
-                    rate = target.attr('data-rate') / 100,
-                    pay_method = target.attr('data-paymethod');
-                activity_rate = target.attr('activity-rate') / 100;
-                amount = parseFloat(target.val()) || 0;
-
-                if (amount > target.attr('data-max')) {
-                    amount = target.attr('data-max');
-                    target.val(amount);
-                }
-                amount = parseFloat(existing) + parseFloat(amount);
-                earning = calculate(amount, rate, period, pay_method);
-                fee_earning = calculate(amount, activity_rate, period, pay_method);
-
-                if (earning < 0) {
-                    earning = 0;
-                }
-                earning_elements = (target.attr('data-target')).split(',');
-                fee_elements = (target.attr('fee-target')).split(',');
-
-                for (var i = 0; i < earning_elements.length; i++) {
-                    earning_element = earning_elements[i];
-                    if (earning) {
-                        earning += fee_earning;
-                        $(earning_element).text(earning.toFixed(2));
-                    } else {
-                        $(earning_element).text("0.00");
-                    }
-                }
-                for (var j = 0; j < fee_elements.length; j++) {
-                    fee_element = fee_elements[j];
-                    if (fee_earning) {
-                        $(fee_element).text(fee_earning);
-                    } else {
-                        $(fee_element).text("0.00");
-                    }
-                }
-                callback && callback(target);
-            });
-        },
         _getQueryStringByName: function (name) {
             var result = location.search.match(new RegExp('[\?\&]' + name + '=([^\&]+)', 'i'));
             if (result == null || result.length < 1) {
@@ -1127,122 +1068,7 @@ org.ui = (function () {
             document.body.onselectstart = function () {
                 return false;
             };
-        },
-        _showSign: function (signTxt, callback) {
-            var $sign = $('.error-sign');
-            if ($sign.length == 0) {
-                $('body').append("<section class='error-sign'>" + signTxt + "</section>");
-                $sign = $('.error-sign');
-            } else {
-                $sign.text(signTxt)
-            }
-            ~function animate() {
-                $sign.css('display', 'block');
-                setTimeout(function () {
-                    $sign.css('opacity', 1);
-                    setTimeout(function () {
-                        $sign.css('opacity', 0);
-                        setTimeout(function () {
-                            $sign.hide();
-                            return callback && callback();
-                        }, 300)
-                    }, 1000)
-                }, 0)
-            }()
-        },
-        /*
-         .form-list
-         .form-icon.user-phone(ui targer).identifier-icon（事件target）
-         .form-input
-         input(type="tel", name="identifier", placeholder="请输入手机号",data-target2='identifier-icon'（事件target）, data-icon='user-phone'(ui事件), data-target="identifier-edit"(右侧操作), data-empty=''（input val空的时候的classname）, data-val='input-clear'（input val不为空的时候的classname）).foreach-input
-         .form-edit-icon.identifier-edit（右边操作如：清空密码）
-         */
-        _inputStyle: function (options) {
-            var $submit = options.submit,
-                inputArrList = options.inputList;
-
-            $.each(inputArrList, function (i) {
-                inputArrList[i]['target'].on('input', function () {
-                    var $self = $(this);
-                    if ($self.val() == '') {
-                        inputForClass([
-                            {
-                                target: $self.attr('data-target'),
-                                addName: $self.attr('data-empty'),
-                                reMove: $self.attr('data-val')
-                            },
-                            {
-                                target: $self.attr('data-target2'),
-                                addName: $self.attr('data-icon'),
-                                reMove: ($self.attr('data-icon') + "-active")
-                            },
-                        ])
-                        $submit.attr('disabled', true);
-                    } else {
-                        inputForClass([
-                            {
-                                target: $self.attr('data-target'),
-                                addName: $self.attr('data-val'),
-                                reMove: $self.attr('data-empty')
-                            },
-                            {
-                                target: $self.attr('data-target2'),
-                                addName: ($self.attr('data-icon') + "-active"),
-                                reMove: $self.attr('data-icon')
-                            }
-                        ])
-                    }
-                    canSubmit() ? $submit.css('background', 'rgba(219,73,63,1)').removeAttr('disabled') : $submit.css('background', 'rgba(219,73,63,.5)').attr('disabled')
-                })
-            })
-
-            //用户名一键清空
-            $('.identifier-edit').on('click', function (e) {
-                $(this).siblings().val('').trigger('input');
-            })
-            //密码隐藏显示
-            $('.password-handle').on('click', function () {
-                if ($(this).hasClass('hide-password')) {
-                    $(this).addClass('show-password').removeClass('hide-password');
-                    $(this).siblings().attr('type', 'text');
-                } else if ($(this).hasClass('show-password')) {
-                    $(this).addClass('hide-password').removeClass('show-password');
-                    $(this).siblings().attr('type', 'password');
-                }
-            })
-
-            var inputForClass = function (ops) {
-                if (!typeof(ops) === 'object') return;
-                $.each(ops, function (i) {
-                    $('.' + ops[i].target).addClass(ops[i].addName).removeClass(ops[i].reMove);
-                })
-            }
-            var returnCheckArr = function () {
-                var returnArr = [];
-                for (var i = 0; i < arguments.length; i++) {
-                    for (var arr in arguments[i]) {
-                        if (arguments[i][arr]['required'])
-                            returnArr.push(arguments[i][arr]['target'])
-                    }
-                }
-                return returnArr
-            }
-            var canSubmit = function () {
-                var isPost = true, newArr = [];
-
-                newArr = returnCheckArr(options.inputList, options.otherTarget);
-
-                $.each(newArr, function (i, dom) {
-                    if (dom.attr('type') == 'checkbox') {
-                        if (!dom.attr('checked'))
-                            return isPost = false
-                    } else if (dom.val() == '')
-                        return isPost = false
-                })
-
-                return isPost
-            }
-        },
+        }
     }
 
     return {
@@ -1261,26 +1087,36 @@ org.lottery = (function () {
                 phoneVal = null,
                 $submit = $('.lottery-submit'),
                 phoneRe = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/),
-                userphone = $('input[name=userphone]'),
-                openid = $('input[name=openid]');
+                userphone = $('input[name=userphone]').val(),
+                openid = $('input[name=openid]').val();
+
+            function callback(data) {
+                if (data !== '') {
+                    $phone.val(data).attr('disabled');
+                }
+            }
 
             if (userphone == '') {
+
+
+                function pandoraCall(data) {
+                    console.log(data);
+                }
+
                 $.ajax({
-                    url: 'http://just.lingcaibao.com/activity/act/wlb/findByOpenId?mcode=ACTwlberwet&serverId=39&openId=' + openid,
                     type: 'GET',
+                    url: 'http://just.lingcaibao.com/activity/act/wlb/findByOpenId?mcode=ACTwlberwet&serverId=39&openId=opz3Mjl_egXymDv0mK3f9ltS47tk',
                     dataType: 'jsonp',
+                    jsonpCallback: 'callback',
                     success: function (data) {
-                        if (data !== '') {
-                            $phone.val(data).attr('disabled');
-                        }
-                    },
-                    error: function (data) {
-                        alert(data)
+                        alert('success');
                     }
-                })
+                });
+
             } else {
                 $phone.val(userphone).attr('disabled');
             }
+
 
             $submit.on('click', function () {
                 phoneVal = $phone.val();
