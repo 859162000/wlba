@@ -436,7 +436,7 @@ class WithdrawTransactions(TemplateView):
         action = request.POST.get('action')
         uuids_param = request.POST.get('transaction_uuids', '')
         uuids = re.findall(r'[\w\-_]+', uuids_param)
-        payinfos = PayInfo.objects.filter(uuid__in=uuids, type='W')
+        payinfos = PayInfo.objects.filter(uuid__in=uuids, type='W').order_by('create_time')
 
         # These are the uuids exists in db for real
         uuids_param = ",".join([payinfo.uuid for payinfo in payinfos])
