@@ -2300,3 +2300,198 @@ class AppLotteryTemplate(TemplateView):
             'openid': openid,
             'phone': phone,
         }
+
+class RewardDistributeAPIView(APIView):
+    permission_classes = ()
+    def __init__(self):
+        super(RewardDistributeAPIView, self).__init__()
+        self.activity_key = 'wechat_activity'  #Misc配置
+        self.index = 0         #使用activity的index,对应MISC中的配置
+        self.activitys = None
+        self.activity = None
+        self.redpacks = dict() #红包amount: 红包object
+        self.redpack_amount = list()
+        self.rates = (50, 12, 11, 2.1, 0.6, 13, 9, 1.9, 0.4)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
+        self.action_name = u'weixin_distribute_redpack'
+
+    def get_activitys_from_wechat_misc(self):
+        """从misc中获得活动的值
+        """
+        try:
+            wechat_conf = Misc.objects.filter(key=self.activity_key).first()
+        except Exception, reason:
+            logger.debug("MISC 中wechat_activity配置异常, reason:%s" % (reason, ))
+            raise
+
+        if wechat_conf:
+            conf_value = json.loads(wechat_conf.value)
+            if type(conf_value) == dict:
+                self.activitys = conf_value['activity'].split(",")
+                logger.debug("MISC中activity的配置是%s" % (self.activitys,))
+        else:
+            raise("MISC 中没有配置wechat_activity")
+
+    def get_activity(self):
+        try:
+            self.activity = self.activitys[self.index]
+        except KeyError, reason:
+            logger.debug("MISC中没有配置activity, reason:%s" % (reason, ))
+            raise
+
+    def get_redpacks(self):
+        try:
+            rules = ActivityRule.objects.filter(activity=self.activity)
+        except Exception, reason:
+            logger.debug("rules获取失败, reason:%s" % (reason,))
+            raise
+        try:
+            redpacks = [rule.redpack for rule in rules]
+            QSet = RedPackEvent.objects.filter(id__in=redpacks)
+        except Exception, reason:
+            logger.debug("获得配置红包报异常, reason:%s" % (reason,))
+            raise
+        for item in QSet:
+            self.redpacks[item.amount] = item
+
+        self.redpack_amount = sorted(self.redpacks.keys())
+        logger.debug("红包的大小依次为：%s" % (self.redpack_amount, ))
+        logger.debug("对应红包的获奖概率是：%s" % (self.rates, ))
+
+    def decide_which_to_distribute(self, request):
+        """ 决定发送哪一个奖品
+        """
+        sent_count = ActivityJoinLog.objects.filter(action_name=self.action_name).count() + 1
+        today = time.strftime("%Y-%m-%d", time.localtime())
+        join_log = ActivityJoinLog.objects.filter(user=request.user, create_time__gt=today).first()
+        if not join_log:
+            rate = 50
+            for rate in self.rates:
+                if sent_count%(100/rate)==0:
+                    break
+
+            #根据rate找到对应的红包
+            index = self.rates.index(rate)
+            logger.debug("rate:%s,index:%d, redpack_amount:%s" % (rate,index, self.redpack_amount))
+            join_log = ActivityJoinLog.objects.create(
+                action_name=self.action_name,
+                join_time=3,
+                amount=self.redpacks.get(self.redpack_amount[index], None),
+                create_time=timezone.now(),
+            )
+        return join_log
+
+    @method_decorator(transaction.atomic)
+    def distribute_redpack(self, user):
+        """给用户发送出去一个奖品
+        """
+        try:
+            today = time.strftime("%Y-%m-%d", time.localtime())
+            join_log = ActivityJoinLog.objects.select_for_update().filter(user=user, create_time__gte=today).first()
+            if join_log.join_times == 0:
+                join_log.save()
+                return "No Reward"
+            else:
+                redpack_event = self.redpacks.get(join_log.amount)
+        except Exception, reason:
+            logger.debug("获得用户的预配置红包抛异常, reason:%s" % (reason, ))
+
+        try:
+            redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+        except Exception, reason:
+            logger.debug(u'给用户 %s 发送红包报错, redpack_event:%s, reason:%s' % (user, redpack_event,reason,))
+            raise
+        else:
+            join_log.join_times -= 1
+            join_log.save()
+            return "Send Success"
+
+    @method_decorator(transaction.atomic)
+    def ignore_post_action(self, user):
+        """处理用户的没有抽到奖品的动作流程
+        """
+        today = time.strftime("%Y-%m-%d", time.localtime())
+        join_log = ActivityJoinLog.objects.select_for_update().filter(user=user, create_time__gte=today).first()
+        if join_log.join_times == 0:
+            join_log.save()
+            return "No Chance"
+        else:
+            join_log.join_times -= 1
+            join_log.save()
+            return "Handle Success"
+
+    def prepare_for_distribute(self):
+        self.get_activitys_from_wechat_misc()
+        self.get_activity()
+        self.get_redpacks()
+
+    def post(self, request):
+        if not request.user.is_authenticated():
+            logger.debug(u'用户没有登录')
+            to_json_response = {
+                'ret_code': 3000,
+                'message': u'用户没有登陆，请先登陆',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        today = time.strftime("%Y-%m-%d", time.localtime())
+        join_log = ActivityJoinLog.objects.filter(user=request.user, create_time__gte=today).first()
+        self.prepare_for_distribute()
+        if not join_log:
+            logger.debug(u'用户(%s) 第一次进入页面，给用户生成抽奖记录' % (request.user,))
+            join_log = self.decide_which_to_distribute(request)
+
+        if join_log.join_times == 0:
+            logger.debug(u'用户(%s)的抽奖次数已经用完了' % (request.user))
+            to_json_response = {
+                'ret_code': 3001,
+                'message': u'用户的抽奖次数已经用完了',
+                'left': 0
+            }
+
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        action = request.DATA.get("action", "")
+        logger.debug("用户(%s)前端传入的行为是：%s" % (request.user, action,))
+
+        if action not in ("ENTER_WEB_PAGE", "GET_REWARD", "IGNORE"):
+            logger.debug("参数不正确，action:%s" % (action,))
+            to_json_response = {
+                'ret_code': 3002,
+                'message': u'传入的参数不正确',
+            }
+
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        join_log = ActivityJoinLog.objects.filter(user=request.user, create_time__gte=today).first()
+        logger.debug("剩余的抽奖次数：%s" % (join_log.join_times,))
+        if action == "ENTER_WEB_PAGE":
+            to_json_response = {
+                'ret_code': 4000,
+                'message': u'进入页面',
+                'amount': join_log.amount,
+                'left': join_log.join_times
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        if action == "GET_REWARD":
+            to_json_response = {
+                'ret_code': 0,
+                'message': u'发奖成功',
+                'amount': join_log.amount,
+                'left': join_log.join_times
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+            self.distribute_redpack(request.user)
+
+        if action == "IGNORE":
+            self.ignore_post_action(request.user)
+            to_json_response = {
+                'ret_code': 4002,
+                'message': u'忽略本次操作',
+                'amount': join_log.amount,
+                'left': join_log.join_times
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+
+
