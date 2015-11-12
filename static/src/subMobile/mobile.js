@@ -860,7 +860,7 @@ function getCode(){//得到用户信息的二维码
     org.ajax({
         type: "POST",
         url: "/weixin/api/generate/qr_limit_scene_ticket/",
-        data: {"original_id":"gh_9e8ff84237cd"},
+        data: {"original_id":"gh_32e9dc3fab8e"},
         success: function (data) {
             $("#sub-code").html("<img src='"+ data.qrcode_url + "' />");
         },
@@ -914,7 +914,7 @@ org.awardEvent = (function(org){ //微信抽奖
             type: "post",
             url: '/api/weixin/distribute/redpack/',
             dataType: 'json',
-            data: {"action": obj},
+            data: {"action": obj,"openid": $("#openid").val()},
             success: function(data){
                 fn(data);
                 awardsNum = data.left;
