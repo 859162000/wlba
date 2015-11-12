@@ -22,6 +22,24 @@ html(style="background:#fff")
         .ivt-message-body 网利宝送您<br>580元新人特权红包
 
       .invite-from
-      .invite-agreement
+        .mod-form
+          input(type='tel', name='phone', placeholder='输入手机号',data-type='Phone',data-message='请输入正确的手机号', autocomplete = 'off').mod-phone
+          .mod-check-body
+            .mod-form-margin
+            .phone-check
+              input(type='tel', name='codeimg',data-type='Val',data-message='请输入图形验证码',  placeholder='输入验证码').check-input
+              input(type='hidden', name='codeimg_key',value='')
+              img(src='').check-img
+            .mod-form-margin
+            .phone-check
+              input(type='tel', name='codenum',data-type='Val',data-message='请输入短信码', placeholder='输入短信码').check-input
+              button(type="button").check-submit 短信验证码
+          .mod-form-sign 请输入正确的手机号
+          .mod-form-margin.mod-sign-margin
+          input(type='button',name='submit' ,value="领 取",disabled=true).mod-form-submit
+      .invite-protocol
+          span.checkbox.agreement
+            input(type='checkbox', name='agreement', checked=true)
+          span.xieyi-btn 同意网利宝注册协议
       .invite-propagate
       .invite-company
