@@ -24,7 +24,7 @@ class MessageTemplate(object):
             raise MessageTemplate404
         self.template_id = template_id
         self.top_color = template.get('top_color')
-        self.url = template.get('url', '')
+        self.url = kwargs.get('url', template.get('url', ''))
         template_data = template.get("data", {})
         self.data = deepcopy(template_data)
         for key, value in kwargs.iteritems():

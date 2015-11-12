@@ -9,6 +9,7 @@ from django.template import Template, Context
 from django.template.loader import get_template
 from django.conf import settings
 from django.shortcuts import redirect
+from django.db.models.signals import post_save, pre_save
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import renderers
@@ -281,12 +282,12 @@ class WeixinJoinView(View):
                 {'image':image1, 'url':url1, 'description':description1, 'title':title1}]
 
     def getBindTxt(self, fromUserName):
-        bind_url = settings.WEIXIN_CALLBACK_URL + reverse('weixin_bind') + "?openid=%s"%(fromUserName)
+        bind_url = settings.CALLBACK_HOST + reverse('weixin_bind') + "?openid=%s"%(fromUserName)
         txt = u"终于等到你，还好我没放弃。绑定网利宝帐号，轻松投资、随时随地查看收益！<a href='%s'>【立即绑定】</a>"%(bind_url)
         return txt
 
     def getUnBindTxt(self, fromUserName, userPhone):
-        unbind_url = settings.WEIXIN_CALLBACK_URL + reverse('weixin_unbind') + "?openid=%s"%(fromUserName)
+        unbind_url = settings.CALLBACK_HOST + reverse('weixin_unbind') + "?openid=%s"%(fromUserName)
         txt = u"您的微信绑定帐号为：%s\n"%userPhone\
             +u"如需解绑当前帐号，请点击<a href='%s'>【立即解绑】</a>"%unbind_url
         return txt
@@ -407,6 +408,7 @@ class SendTemplateMessage(APIView):
         account = weixin_account.db_account
         # account = Account.objects.get(original_id=weixin_user.account_original_id)
         client = WeChatClient(account.app_id, account.app_secret)
+        print message_template.url
         client.message.send_template(weixin_user.openid, template_id=message_template.template_id,
                                      top_color=message_template.top_color, data=message_template.data,
                                      url=message_template.url)
@@ -1338,7 +1340,11 @@ def testTemplate():
 
 
 
-def checkAndSendProductTemplate(product):
+def checkAndSendProductTemplate(sender, **kw):
+    print kw
+    product = kw["instance"]
+
+    print product.__dict__
     matches = re.search(u'日计息', product.pay_method)
     period = product.period
     period_desc = "%s个月"%product.period
@@ -1354,12 +1360,13 @@ def checkAndSendProductTemplate(product):
             for sub_record in sub_records:
                 w_user = WeixinUser.objects.filter(user=sub_record.user).first()
                 if w_user:
+                    url = settings.CALLBACK_HOST + '/weixin/view/detail/%s/'%product.id
                     template = MessageTemplate(PRODUCT_ONLINE_TEMPLATE_ID,
                         first=service.describe, keyword1=product.name, keyword2=rate_desc,
-                        keyword3=period_desc, keyword4=product.pay_method)
+                        keyword3=period_desc, keyword4=product.pay_method, url=url)
                     SendTemplateMessage.sendTemplate(w_user, template)
 
 
 
-
-
+# post_save.connect(checkAndSendProductTemplate, sender=P2PProduct, dispatch_uid="product-profile-creation-signal")
+pre_save.connect(checkAndSendProductTemplate, sender=P2PProduct, dispatch_uid="product-profile-creation-signal")

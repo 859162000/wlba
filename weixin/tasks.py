@@ -23,5 +23,7 @@ import time, datetime
 
 @app.task
 def detect_product_biding():
+    now = datetime.datetime.now()
+    start = now - datetime.timedelta(minutes=30)
 
     pass
