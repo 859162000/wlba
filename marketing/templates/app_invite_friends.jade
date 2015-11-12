@@ -40,4 +40,24 @@ html(style="background:#fff")
 
     .tly-title
       span 选择网利宝的优势
-    //.tly-title 谁投资了我们
+    //宣传文案
+    section.regist-propagate.invite-friend-propagate
+      ul
+        mixin li(imgName, title, bodyTxt1, bodyTxt2)
+          li
+            span(class=imgName)
+            h4=title
+            p=bodyTxt1
+            p=bodyTxt2
+        +li('trust', '信赖', 'IDG资本A轮投资', '100%本息保障')
+        +li('authority', '权威', 'A股百亿上市公司', '鸿利光电投资入股')
+        +li('safe', '安全', '账户资金安全', '由阳光保险承保')
+        +li('profit', '高收益', '37倍银行活期收益', '100元起投0手续')
+    .tly-title
+      span 谁投资了我们
+
+    section.invite-us
+      img(src='').invite-us-logo-idg
+      .invite-us-dec 2014年2月，网利宝获得国际知名风投IDG资本的千万美元A轮投资。自1992年开始，作为最早进入中国市场的国际投资机构之一，IDG资本已投资包括百度、腾讯、携程等200家优秀企业，并已有超过60家企业在美国、中国香港、中国A股证券市场上市，或通过M&A成功退出。
+      img(src='').invite-us-logo-hgdl
+      .invite-us-dec 2015年5月，网利宝获市值百亿上市公司鸿利光电战略投资。鸿利光电是中国白光LED器件领军者，国家高新技术企业，致力于打造中国领先的LED+互联网金融+车联网的生态平台。
