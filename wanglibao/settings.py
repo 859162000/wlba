@@ -148,7 +148,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'marketing.middlewares.PromotionTokenMiddleWare',
-    'marketing.middlewares.StatsKeyWordMiddleWare',
 )
 
 CONCURRENCY_POLICY = 2
@@ -558,7 +557,7 @@ CELERYBEAT_SCHEDULE = {
 
     'p2p_auto_ready_for_settle': {
         'task': 'wanglibao_p2p.tasks.p2p_auto_ready_for_settle',
-        'schedule': crontab(hour=16),
+        'schedule': crontab(minute=0, hour=16),
     },
 
     #add by guoya: 希财网渠道数据定时推送
