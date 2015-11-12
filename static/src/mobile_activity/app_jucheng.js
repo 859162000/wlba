@@ -418,7 +418,7 @@ var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','on
 
             wx.ready(function(){
 
-                var host = 'https://staging.wanglibao.com/',
+                var host = 'https://www.wanglibao.com/',
                     shareName = '网利宝用户专享福利',
                     shareImg = host + '/static/imgs/mobile_activity/app_jucheng/300x300.jpg',
                     shareLink = host + '/activity/app_jucheng/',

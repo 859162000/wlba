@@ -436,7 +436,7 @@ class WithdrawTransactions(TemplateView):
         action = request.POST.get('action')
         uuids_param = request.POST.get('transaction_uuids', '')
         uuids = re.findall(r'[\w\-_]+', uuids_param)
-        payinfos = PayInfo.objects.filter(uuid__in=uuids, type='W')
+        payinfos = PayInfo.objects.filter(uuid__in=uuids, type='W').order_by('create_time')
 
         # These are the uuids exists in db for real
         uuids_param = ",".join([payinfo.uuid for payinfo in payinfos])
@@ -498,7 +498,7 @@ class WithdrawTransactions(TemplateView):
                         fee_config = fee_misc.get_withdraw_fee_config()
                         withdraw_count = fee_misc.get_withdraw_success_count(payinfo.user)
                         free_times = fee_config['fee']['amount_interval']
-                        if withdraw_count <= free_times:
+                        if withdraw_count < free_times:
                             give_back = True
 
                     if give_back:
