@@ -2260,7 +2260,7 @@ class OpenidPhoneForFencai(APIView):
         openid = request.POST.get("openid")
         phone = request.POST.get("phone")
         if not openid or not phone or not phone.isdigit():
-            return Response({'error': -1})
+            return Response({'code': -1, "message": "error"})
         relative, created = WanglibaoWeixinRelative.objects.get_or_create(openid=openid)
         if not relative.phone_for_fencai or relative.phone_for_fencai != phone:
             relative.phone_for_fencai = phone
