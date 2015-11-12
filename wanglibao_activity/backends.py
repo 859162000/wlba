@@ -219,12 +219,29 @@ def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
                                        .order_by('create_time')
             print records.query
             if records and records.count() <= ranking_num:
+                # print "records.count: %s ====, ranking_num: %s ====" % (records.count(), ranking_num)
                 try:
                     this_record = records[ranking_num-1]
                     # print "this_record  ", this_record
                     if this_record.user.id == user.id:
+                        # print "this_record.user.id--:%s == user.id-- %s:" % (this_record.user.id, user.id)
                         _check_trade_amount(user, rule, device_type, amount, is_full)
                         # _send_gift(user, rule, device_type, is_full)
+                except Exception:
+                    pass
+        if ranking_num > 0 and is_full is True:
+            # 符合抢标顺序且满标
+            records = P2PRecord.objects.filter(product=product_id, catalog=u'申购') \
+                                       .order_by('create_time')
+            # print records.query
+            if records and records.count() <= ranking_num:
+                # print "records.count: %s ====, ranking_num: %s ====" % (records.count(), ranking_num)
+                try:
+                    this_record = records[ranking_num-1]
+                    # print "=========this_record==:%s=====" % this_record
+                    if this_record.user.id == user.id:
+                        # print "this_record.user.id--:%s == user.id-- %s:" % (this_record.user.id, user.id)
+                        _check_trade_amount(user, rule, device_type, amount, is_full)
                 except Exception:
                     pass
         elif ranking_num == -1 and is_full is True:
