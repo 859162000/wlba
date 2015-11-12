@@ -57,7 +57,14 @@ define ['jquery'], ($)->
           target.next().text(xhr.message)
           target.next().show()
       else
-        $('#poundage').text(xhr.fee+'+'+xhr.management_fee)
+        if (xhr.fee == 0) && (xhr.management_fee == '0')
+          strs = 0
+        else if(xhr.fee != 0 && xhr.management_fee == '0')
+          strs = xhr.fee
+        else
+          strs = xhr.fee+'+'+xhr.management_fee
+
+        $('#poundage').text(strs)
         $('#actual-amount').text(xhr.actual_amount)
 
     ###fee_element = target.attr 'data-target-fee'

@@ -1090,31 +1090,19 @@ org.lottery = (function () {
                 userphone = $('input[name=userphone]').val(),
                 openid = $('input[name=openid]').val();
 
-            function callback(data) {
-                if (data !== '') {
-                    $phone.val(data).attr('disabled');
-                }
-            }
-
-            if (userphone == '') {
-
-
-                function pandoraCall(data) {
-                    console.log(data);
-                }
-
+            if ($phone.val() == '') {
                 $.ajax({
                     type: 'GET',
-                    url: 'http://just.lingcaibao.com/activity/act/wlb/findByOpenId?mcode=ACTwlberwet&serverId=39&openId=opz3Mjl_egXymDv0mK3f9ltS47tk',
+                    url: 'http://just.lingcaibao.com/activity/act/wlb/findByOpenId?mcode=ACTwlberwet&serverId=39&openId='+ openid,
                     dataType: 'jsonp',
-                    jsonpCallback: 'callback',
                     success: function (data) {
-                        alert('success');
+                        console.log(data)
+                        if(data.success){
+                            $phone.val(data.msg).attr('readOnly',true);
+                        }
                     }
                 });
 
-            } else {
-                $phone.val(userphone).attr('disabled');
             }
 
 
@@ -1125,42 +1113,41 @@ org.lottery = (function () {
                     return org.ui.alert('请输入正确的手机号');
                 }
 
-                function saveUser() {
+                $submit.attr('disabled', true).text('校验中..');
+                if(userphone != '' && openid != ''){
+                    user_exists();
+                }else{
                     org.ajax({
                         url: '/activity/lingcai/phone/',
                         type: 'post',
                         async: false,
                         data: {openid: openid, phone: phoneVal},
-                        success: function (data) {
-                            console.log(data)
-                        },
-                        error: function () {
-
+                        complete: function(){
+                            user_exists();
                         }
                     })
                 }
 
-                org.ajax({
-                    url: '/api/user_exists/' + phoneVal + '/',
-                    type: 'get',
-                    beforeSend: function () {
-                        $submit.attr('disabled', true).text('校验中..');
-                        saveUser();
-                    },
-                    success: function (xhr) {
-                        if (xhr.existing) {
-                            window.location.href = 'http://just.lingcaibao.com/activity/act/wlb/start?mcode=ACTwlberwet&mobile=' + phoneVal + '&serverId=39'; //对方
-                        } else {
-                            window.location.href = '/weixin/regist/?next=http://just.lingcaibao.com/activity/act/wlb/start?mcode=ACTwlberwet&mobile=' + phoneVal + '&serverId=39&phone=' + $phone.val();
+
+                function user_exists(){
+                    org.ajax({
+                        url: '/api/user_exists/' + phoneVal + '/',
+                        type: 'get',
+                        success: function (xhr) {
+                            if (xhr.existing) {
+                                window.location.href = 'http://just.lingcaibao.com/activity/act/wlb/start?mcode=ACTwlberwet&mobile=' + phoneVal + '&serverId=39'; //对方
+                            } else {
+                                window.location.href = '/weixin/regist/?onlyphone=true&next=http://just.lingcaibao.com/activity/act/wlb/start?mcode=ACTwlberwet&mobile=' + phoneVal + '&serverId=39&phone=' + $phone.val();
+                            }
+                        },
+                        error: function (xhr) {
+                            org.ui.alert('系统繁忙，请稍候重试')
+                        },
+                        complete: function () {
+                            $submit.removeAttr('disabled').text('我要领彩票');
                         }
-                    },
-                    error: function (xhr) {
-                        org.ui.alert('系统繁忙，请稍候重试')
-                    },
-                    complete: function () {
-                        $submit.removeAttr('disabled').text('我要领彩票');
-                    }
-                })
+                    })
+                }
             })
 
             var $warp = $('.lottery-rules-warp');

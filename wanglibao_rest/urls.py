@@ -50,7 +50,7 @@ from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIVie
 
 from marketing.play_list import InvestmentHistory
 from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView,
-                             ThousandRedPackCountAPIView, ThunderActivityRewardCounter, QuickApplyerAPIView, GiftOwnerInfoAPIView)
+                             ThousandRedPackCountAPIView, ThunderActivityRewardCounter, QuickApplyerAPIView, GiftOwnerInfoAPIView, RewardDistributeAPIView)
 from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrdeApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
@@ -247,6 +247,7 @@ urlpatterns += patterns(
     url(r'^quick/applyer/$', QuickApplyerAPIView.as_view()), #add by yihen@20151102 ,快速贷款人申请填写
     url(r'^gift/owner/$', GiftOwnerInfoAPIView.as_view()), #add by yihen@20151102 ,聚橙网领取门票接口
     url(r'^weixin/share/has_gift/$', WeixinShareTools.as_view()), #add by yihen@20151102 ,聚橙网领取门票接口
+    url(r'^weixin/distribute/redpack/$', RewardDistributeAPIView.as_view()), #add by yihen@20151102 ,聚橙网领取门票接口
 
 )
 
