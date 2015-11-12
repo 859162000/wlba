@@ -2270,7 +2270,7 @@ class OpenidPhoneForFencai(APIView):
 class AppLotteryTemplate(TemplateView):
     template_name = 'app_lottery.jade'
 
-    def get_context_data(self, request, *args, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         openid = self.request.GET.get('openid')
         phone = ""
         if not openid:
@@ -2278,9 +2278,9 @@ class AppLotteryTemplate(TemplateView):
             count = 0
             for key in self.request.GET.keys():
                 if count == 0:
-                    redirect_uri += '?%s=%s'%(key, request.GET.get(key))
+                    redirect_uri += '?%s=%s'%(key, self.request.GET.get(key))
                 else:
-                    redirect_uri += "&%s=%s"%(key, request.GET.get(key))
+                    redirect_uri += "&%s=%s"%(key, self.request.GET.get(key))
                 count += 1
             redirect_uri = urllib.quote(redirect_uri)
             account_id = 3
