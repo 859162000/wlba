@@ -1017,11 +1017,14 @@ class JuChengRegister(CoopRegister):
             p2p_amount = int(p2p_record.first().amount)
             if p2p_amount>=1000 and p2p_amount<2000:
                 try:
+                    logger.debug(u"80门票，我要申请锁")
                     config = GiftOwnerGlobalInfo.objects.select_for_update().filter(description=u'jcw_ticket_80').first()
                 except Exception, reason:
                     logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
                     raise
                 if config and config.amount > 0:
+                    logger.debug(u'80门票，我已经得到了锁，开始睡觉5s')
+                    time.sleep(5)
                     logger.debug(u'80 ticket left：%s' % (config.amount,))
                     config.amount -= 1
                     ticket = 80
@@ -1031,11 +1034,14 @@ class JuChengRegister(CoopRegister):
 
             if p2p_amount>=2000:
                 try:
+                    logger.debug(u"188门票，我要申请锁")
                     config = GiftOwnerGlobalInfo.objects.select_for_update().filter(description=u'jcw_ticket_188').first()
                 except Exception, reason:
                     logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
                     raise
                 if config and config.amount > 0:
+                        logger.debug(u'188门票，我已经得到了锁，开始睡觉5s')
+                        time.sleep(5)
                         config.amount -= 1
                         logger.debug(u"用户 %s 获得188门票一张, 剩余：%s" % (user, config.amount))
                         config.save()
@@ -1133,7 +1139,7 @@ class XunleiVipRegister(CoopRegister):
             pay_amount = int(pay_info.first().amount)
             if pay_amount >= 100:
                 data = {
-                    'send_type': 1,
+                    'sendtype': '1',
                     'num1': 7,
                     'act': 5171
                 }
@@ -1148,7 +1154,7 @@ class XunleiVipRegister(CoopRegister):
             pay_amount = int(p2p_record.first().amount)
             if pay_amount >= 100:
                 data = {
-                    'send_type': '0',
+                    'sendtype': '0',
                     'num1': 12,
                     'act': 5170
                 }
@@ -2937,5 +2943,186 @@ class ZOCountView(APIView):
             ret = {
                 'result_code': 0,
                 'result_msg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class MidaiSuccessView(APIView):
+    """
+    每日成交标的列表 或者 每日新增标的列表
+    """
+    permission_classes = ()
+
+    def check_sign(self):
+        username = str(self.request.GET.get('username', None))
+        password = str(self.request.GET.get('password', None))
+
+        if username == settings.MIDAI_USERNAME and password == settings.MIDAI_PASSWORD:
+            return True
+
+        return False
+
+    def get(self, request):
+
+        time_str = str(self.request.GET.get('date', None))
+        time_zone = settings.TIME_ZONE
+        local = pytz.timezone(time_zone)
+        naive = datetime.datetime.strptime(time_str, "%Y%m%d")
+
+        date = str(naive.year) + '-' + str(naive.month) + '-' + str(naive.day)
+
+        if self.check_sign():
+            try:
+                local_dt = local.localize(naive, is_dst=None)
+                start = local_dt.astimezone(pytz.utc)
+                end = start + timezone.timedelta(days=1)
+
+                ret = dict()
+                loans = []
+                data_dic = dict()
+
+                products = P2PProduct.objects.filter(make_loans_time__gt=start,
+                                                     make_loans_time__lte=end)
+
+                for product in products:
+
+                    data_dic['id'] = product.pk
+                    data_dic['title'] = product.name
+                    data_dic['desc'] = product.usage
+                    data_dic['borrower'] = product.borrower_name
+                    data_dic['amount'] = product.total_amount
+                    data_dic['interest'] = product.expected_earning_rate
+                    data_dic['bidnum'] = P2PEquity.objects.filter(product=product).count()
+                    data_dic['time_0'] = product.publish_time
+                    data_dic['time_1'] = product.soldout_time
+                    data_dic['time_2'] = product.make_loans_time
+                    data_dic['url'] = "http://{}/p2p/detail/{}".format(request.get_host(), product.id),
+                    data_dic['months'] = product.period if not product.pay_method.startswith(u"日计息") else 0
+                    data_dic['days'] = product.period if product.pay_method.startswith(u"日计息") else 0
+                    if product.pay_method == u'等额本息':
+                        pay_method = u'等额本息'
+                    if product.pay_method == u'按月付息':
+                        pay_method = u'先息后本'
+                    if product.pay_method == u'到期还本付息':
+                        pay_method = u'一次性还款'
+                    if product.pay_method == u'日计息一次性还本付息':
+                        pay_method = u'一次性还款'
+                    if product.pay_method == u'日计息月付息到期还本':
+                        pay_method = u'先息后本'
+                    data_dic['repaytype'] = pay_method
+                    data_dic['progress'] = product.completion_rate
+                    data_dic['reward'] = ''
+                    data_dic['type'] = u'diya'
+
+                    loans.append(data_dic)
+
+                ret['date'] = date
+                ret['total'] = products.count()
+                ret['loans'] = loans
+
+            except Exception, e:
+                print 'MidaiSuccessView exception: {}'.format(e)
+                ret = {
+                    'date': date,
+                    'total': 0,
+                    'loans': []
+                }
+
+        else:
+            ret = {
+                'date': date,
+                'total': 0,
+                'loans': []
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class MidaiNewView(APIView):
+    """
+    每日成交标的列表 或者 每日新增标的列表
+    """
+    permission_classes = ()
+
+    def check_sign(self):
+        username = str(self.request.GET.get('username', None))
+        password = str(self.request.GET.get('password', None))
+
+        if username == settings.MIDAI_USERNAME and password == settings.MIDAI_PASSWORD:
+            return True
+
+        return False
+
+    def get(self, request):
+
+        time_str = str(self.request.GET.get('date', None))
+        time_zone = settings.TIME_ZONE
+        local = pytz.timezone(time_zone)
+        naive = datetime.datetime.strptime(time_str, "%Y%m%d")
+
+        date = str(naive.year) + '-' + str(naive.month) + '-' + str(naive.day)
+
+        if self.check_sign():
+            try:
+                local_dt = local.localize(naive, is_dst=None)
+                start = local_dt.astimezone(pytz.utc)
+                end = start + timezone.timedelta(days=1)
+
+                ret = dict()
+                loans = []
+                data_dic = dict()
+
+                products = P2PProduct.objects.filter(status=u'正在招标',
+                                                     publish_time__gt=start,
+                                                     publish_time__lte=end)
+
+                for product in products:
+
+                    data_dic['id'] = product.pk
+                    data_dic['title'] = product.name
+                    data_dic['desc'] = product.usage
+                    data_dic['borrower'] = product.borrower_name
+                    data_dic['amount'] = product.total_amount
+                    data_dic['interest'] = product.expected_earning_rate
+                    data_dic['bidnum'] = P2PEquity.objects.filter(product=product).count()
+                    data_dic['time_0'] = product.publish_time
+                    data_dic['time_1'] = product.soldout_time
+                    data_dic['time_2'] = product.make_loans_time
+                    data_dic['url'] = "http://{}/p2p/detail/{}".format(request.get_host(), product.id),
+                    data_dic['months'] = product.period if not product.pay_method.startswith(u"日计息") else 0
+                    data_dic['days'] = product.period if product.pay_method.startswith(u"日计息") else 0
+                    if product.pay_method == u'等额本息':
+                        pay_method = u'等额本息'
+                    if product.pay_method == u'按月付息':
+                        pay_method = u'先息后本'
+                    if product.pay_method == u'到期还本付息':
+                        pay_method = u'一次性还款'
+                    if product.pay_method == u'日计息一次性还本付息':
+                        pay_method = u'一次性还款'
+                    if product.pay_method == u'日计息月付息到期还本':
+                        pay_method = u'先息后本'
+                    data_dic['repaytype'] = pay_method
+                    data_dic['progress'] = product.completion_rate
+                    data_dic['reward'] = ''
+                    data_dic['type'] = u'diya'
+
+                    loans.append(data_dic)
+
+                ret['date'] = date
+                ret['total'] = products.count()
+                ret['loans'] = loans
+
+            except Exception, e:
+                print 'MidaiSuccessView exception: {}'.format(e)
+                ret = {
+                    'date': date,
+                    'total': 0,
+                    'loans': []
+                }
+
+        else:
+            ret = {
+                'date': date,
+                'total': 0,
+                'loans': []
             }
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))

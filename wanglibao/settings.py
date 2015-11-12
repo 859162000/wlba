@@ -958,6 +958,10 @@ ZHONGJIN_UPDATE_TIMEDELTA = timedelta(hours=1)
 # 01财经
 ZO_SECRET = '3r2o3j3m3g3q3l2o7o'
 
+# 米贷网
+MIDAI_USERNAME = 'medai360'
+MIDAI_PASSWORD = '12345678'
+
 # 金山
 WLB_FOR_JINSHAN_KEY = '1994'
 JINSHAN_CALL_BACK_URL = 'https://vip.wps.cn/task/api/reward'
