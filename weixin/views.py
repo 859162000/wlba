@@ -1340,8 +1340,10 @@ def testTemplate():
 
 
 
+
+
 def checkAndSendProductTemplate(sender, **kw):
-    print kw
+    # print kw
     product = kw["instance"]
 
     print product.__dict__
@@ -1366,7 +1368,28 @@ def checkAndSendProductTemplate(sender, **kw):
                         keyword3=period_desc, keyword4=product.pay_method, url=url)
                     SendTemplateMessage.sendTemplate(w_user, template)
 
+import weixin.tasks
 
+def checkProduct(sender, **kw):
+    print kw
+    product = kw["instance"]
+    # print '=============================1', product.status
+    # db_product = P2PProduct.objects.get(pk=product.id)
+    # print '=============================2', db_product.status
 
-# post_save.connect(checkAndSendProductTemplate, sender=P2PProduct, dispatch_uid="product-profile-creation-signal")
-pre_save.connect(checkAndSendProductTemplate, sender=P2PProduct, dispatch_uid="product-profile-creation-signal")
+    if getattr(product, "old_status"):
+        print '===============================3', product.old_status
+        if product.old_status == u'待审核' and product.status==u'正在招标':
+            weixin.tasks.detect_product_biding.apply_async(kwargs={
+               "product_id":product.id
+            })
+
+def recordProduct(sender, **kw):
+    product = kw["instance"]
+    if product.status == u'正在招标':
+        db_product = P2PProduct.objects.get(pk=product.id)
+        setattr(product, 'old_status', db_product.status)
+
+pre_save.connect(recordProduct, sender=P2PProduct, dispatch_uid="product-pre-save-signal")
+post_save.connect(checkProduct, sender=P2PProduct, dispatch_uid="product-post-save-signal")
+

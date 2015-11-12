@@ -139,7 +139,7 @@ Message_template = {
                    "color": "#173177"
                 },
                "remark":{
-                   "value":u'如有疑问，请拨打客服热线或直接输入您的问题，我们会尽快给你回复',
+                   "value":u'',
                    "color":"#173177"
                }
         },
