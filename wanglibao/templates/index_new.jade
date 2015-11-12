@@ -59,7 +59,7 @@ html
                   .pdt-progress-percent.t-d7.fl {{percent | percentage}}
                 .ac-tg-row.clearfix
                   .tg-list.profit-amount
-                    total_amount = product.total_amount / 10000
+                    total_amount = product.total_amount / 10000.0
                     span.t-d5.font-xll {{total_amount}}
                       span.font-m 万
                     .t-d7.tg-bt-text 融资金额
@@ -162,7 +162,7 @@ html
                         percent = float(p2p.ordered_amount) / p2p.total_amount * 100
                         .pro-container(style="width:{{percent | percentage}}")
                       .pdt-progress-percent.t-d7.fl {{percent | percentage}}
-                    total_amount = p2p.total_amount / 10000
+                    total_amount = p2p.total_amount / 10000.0
                     amount = p2p.total_amount - p2p.ordered_amount
                     .t-d7.mg-b-s {{total_amount}}万元/￥{{amount | money_format_int}}元 可投
                   .product-footer.clearfix
