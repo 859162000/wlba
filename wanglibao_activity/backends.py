@@ -209,48 +209,52 @@ def _check_introduced_by_product(user):
 
 
 def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
-    #检查单标投资顺序是否设置数字
+    # 检查单标投资顺序是否设置数字
     ranking_num = int(rule.ranking)
-    if ranking_num > 0:
-        #查询单标投资顺序
-        records = P2PRecord.objects.filter(product__id=product_id, catalog=u'申购') \
-                                   .order_by('create_time')
-        if records:
-            this_record = records[ranking_num-1]
-            if this_record.user.id == user.id:
-                _send_gift(user, rule, device_type, is_full)
-    elif ranking_num == -1 and is_full is True:
-        #查询是否满标，满标时不再考虑最小/最大金额，直接发送
-        _send_gift(user, rule, device_type, is_full)
-    elif ranking_num == 0:
-        _check_trade_amount(user, rule, device_type, amount, is_full)
+    # print "====111:::%s:::%s===id:%s=:" % (rule.ranking, ranking_num, rule.id)
+    if not rule.is_total_invest:
+        if ranking_num > 0 and not is_full:
+            # 查询单标投资顺序
+            records = P2PRecord.objects.filter(product=product_id, catalog=u'申购') \
+                                       .order_by('create_time')
+            print records.query
+            if records and records.count() <= ranking_num:
+                try:
+                    this_record = records[ranking_num-1]
+                    # print "this_record  ", this_record
+                    if this_record.user.id == user.id:
+                        _check_trade_amount(user, rule, device_type, amount, is_full)
+                        # _send_gift(user, rule, device_type, is_full)
+                except Exception:
+                    pass
+        elif ranking_num == -1 and is_full is True:
+            # print "-1-1-1-1-1-1"
+            # 查询是否满标，满标时不再考虑最小/最大金额，直接发送
+            _check_trade_amount(user, rule, device_type, amount, is_full)
+            # _send_gift(user, rule, device_type, is_full)
+        elif ranking_num == 0 and not is_full:
+            # print "0000000000000000==id:%s==" % rule.id
+            _check_trade_amount(user, rule, device_type, amount, is_full)
 
-    #判断单标累计投资名次
+    # 判断单标累计投资名次
     if rule.is_total_invest and is_full is True:
+        # print "=====is full: ::%s====" % is_full
         total_invest_order = int(rule.total_invest_order)
+        # print "=====total_invest_order:::%s=====" % total_invest_order
         if total_invest_order > 0:
-            #按用户查询单标投资的总金额
-            records = P2PRecord.objects.filter(product__id=product_id, catalog=u'申购').values('user') \
-                                       .annotate(amount_sum=Sum('amount')) \
-                                       .extra({'amount_sum': Sum('amount')}).order_by('-amount_sum')
+            # 按用户查询单标投资的总金额
+            records = P2PEquity.objects.filter(product=product_id, product__status=u'满标待打款').order_by('-equity')
             if records:
-                record = records[total_invest_order-1]
-                #给符合名次的用户发放奖励
-                total_user = User.objects.filter(id=record['user']).first()
-                #如果设置了最小金额，则判断用户的投资总额是否在最大最小金额区间
-                amount_sum = record['amount_sum']
-                is_amount = _check_amount(rule.min_amount, rule.max_amount, amount_sum)
-                if is_amount and total_user:
-                    _send_gift(total_user, rule, device_type, is_full)
-        # else:
-        #     #直接取当前用户的投资总额
-        #     record = P2PRecord.objects.filter(product__id=product_id, user=user, catalog=u'申购')\
-        #                               .extra({'amount_sum': Sum('amount')}).first()
-        #     if record:
-        #         amount_sum = record.amount_sum
-        #         is_amount = _check_amount(rule.min_amount, rule.max_amount, amount_sum)
-        #         if is_amount:
-        #             _send_gift(user, rule, device_type)
+                try:
+                    record = records[total_invest_order-1]
+                    # print "----====----:::: %s" % (total_invest_order - 1)
+                    # print "=======equity:======", record
+                    # 如果设置了最小金额，则判断用户的投资总额是否在最大最小金额区间
+                    is_amount = _check_amount(rule.min_amount, rule.max_amount, record.equity)
+                    if is_amount:
+                        _send_gift(record.user, rule, device_type, is_full)
+                except Exception:
+                    pass
 
 
 def _check_trade_amount(user, rule, device_type, amount, is_full):

@@ -137,7 +137,8 @@ class WithdrawCardAdmin(admin.ModelAdmin):
 
 class WithdrawCardRecordAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ('type', 'amount', 'withdrawcard', 'user', 'create_time', 'update_time', 'confirm_time', 'status', 'message')
+    list_display = ('id', 'type', 'withdrawcard', 'amount', 'fee', 'management_fee', 'management_amount',
+                    'user', 'create_time', 'status', 'message')
     raw_id_fields = ('user', 'payinfo', 'order')
 
     def has_delete_permission(self, request, obj=None):

@@ -5,6 +5,8 @@ html(style="background:#FFF29A")
     title 彩票领取
     include include/app_head
   body
+    input(type='hidden', name='openid', value='{{openid}}')
+    input(type='hidden', name='userphone', value='{{phone}}')
     .lottery-banner
       img(src='/static/imgs/mobile_activity/app_lottery/lottery_banner.jpg')
     .lottery-content
@@ -15,7 +17,10 @@ html(style="background:#FFF29A")
           .lottery-from-sign
             span 彩票已备好！输入手机号马上<br>领取，百万大奖在等着你！
           .lotter-from-btn
-            input(type='tel', placeholder='请输入手机号', name='phone')
+            if phone
+              input(type='tel', placeholder='请输入手机号', name='phone', value='{{phone}}', readOnly='true')
+            else
+              input(type='tel', placeholder='请输入手机号', name='phone')
             button.lottery-submit 我要领彩票
           .lotter-from-rules 活动规则 >>
       .lottery-cont-bg
@@ -47,4 +52,4 @@ html(style="background:#FFF29A")
         p 网利宝对此活动享有最终解释权。
       .lottery-rulse-close 关闭
 
-    script(data-init="lottery", src="/static/scripts/mobile_activity/dist/app_lottery.js?v=12")
+    script(data-init="lottery", src="/static/scripts/mobile_activity/app_lottery.js?v=12")
