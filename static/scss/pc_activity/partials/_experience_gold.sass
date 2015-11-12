@@ -99,6 +99,13 @@
             text-align: center
             font-size: 30px
             margin: 50px 28px 0 0
+          a.invest_ed
+            background: #fa8162
+          .income_fonts
+            font-size: 18px
+            color: #fc8f02
+            width: 234px
+            text-align: center
     .look_more_detail
       text-align: center
       padding: 42px 0
@@ -125,6 +132,8 @@
     .project_box
       margin: -6px 10px 10px
       background: #ffeed3
+      border-bottom-left-radius: 10px
+      border-bottom-right-radius: 10px
       .project_ul_pre
         padding: 24px 24px 38px
         background: url(/static/imgs/pc_activity/experience_gold/border.jpg) repeat-x top center
@@ -144,7 +153,7 @@
           tr:nth-child(even)
             background: #fffaf1
     .explain_box
-      margin: 165px 0 130px
+      margin: 65px 0 130px
       .explain_box_img
         background: url(/static/imgs/pc_activity/experience_gold/explain.jpg) center center no-repeat
         width: 1021px
@@ -177,6 +186,29 @@
                 .name
                   color: #624838
                 .mt40
+@mixin close-modal
+  top: -5px
+  right: 10px
+  @include experience_gold-sprite(close)
+  width: 22px
+  height: 22px
+  position: absolute
+  text-indent: -9999px
+#receiveSuccess
+  width: 515px
+  height: 428px
+  text-align: center
+  a.close-modal
+    +close-modal
+#oldUser,#newUser,#success
+  background: #ffffff
+  width: 352px
+  border-radius: 20px
+  padding: 50px 0 30px
+  a.close-modal
+    +close-modal
+    top: 10px
+    right: 10px
 .btn
   width: 280px
   height: 48px
@@ -198,6 +230,7 @@
     text-align: center
     a
       @extend .btn
+      margin-top: 40px
 .oldUser
   width: 350px
   font-size: 22px
@@ -239,11 +272,12 @@
       width: 162px
       height: 162px
       display: inline-block
-      margin: 50px 0 20px
+      margin: 0 0 20px
   p.succeesFonts
     color: #fb7c00
     font-size: 30px
     padding-bottom: 5px
+
 
 
 

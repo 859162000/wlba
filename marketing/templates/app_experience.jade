@@ -1,0 +1,158 @@
+- load formatters
+doctype html
+html(style="background:#fc9300")
+    head
+        meta(name="format-detection" content="telephone=no,email=no")
+        title 体验金
+        meta(charset="utf-8")
+        meta(content="telephone=no,email=no" ,name="format-detection")
+        meta(content="yes" ,name="apple-mobile-web-app-capable")
+        script.
+            (function(){var b=navigator.userAgent;ipad=b.match(/(iPad).*OS\s([\d_]+)/)?true:false;iphone=!ipad&&b.match(/(iPhone\sOS)\s([\d_]+)/)?true:false;uc=navigator.userAgent.indexOf("UCBrowser")>-1?true:false;ios=ipad||iphone;var d=1,a=1,c;if(ios){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}else{if(uc){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}}c='<meta name="viewport" content="initial-scale='+d+", maximum-scale="+d+", minimum-scale="+d+', width=device-width, user-scalable=no" />';document.write(c);document.documentElement.style.fontSize=20*a+"px"})();
+        link(href="/static/styles/mobile_activity/app_experience.css?v=20151110", rel="stylesheet")
+        body
+            .experience
+                .banner
+                    img(src='/static/imgs/mobile_activity/app_experience/banner.jpg')
+                    .receive_box
+                        img(src='/static/imgs/mobile_activity/app_experience/btn.png').banner
+                .my_experience_gold
+                    .title
+                        .title_img 我的体验金
+                .assets_list
+                    .assets_box
+                        .box
+                            p.pt 总资产（元）
+                            p.pb 10000.00
+                        .box
+                            p.pt 到账收益余额（元）
+                            p.pb 10000.00
+                    .assets_box
+                        .box
+                            p.pt 总资产（元）
+                            p.pb 10000.00
+                        .box
+                            p.pt 待收收益（元）
+                            p.pb 10000.00
+                .project
+                    .project_detail
+                        h5 专属福利体验标
+                        .detail_font_box
+                            .detail_font
+                                p.pt 10,000元
+                                p.pb 融资金额
+                            .detail_font.p2
+                                p.pt 10%
+                                p.pb 年化收益
+                            .detail_font
+                                p.pt 7天
+                                p.pb 投资期限
+                        .project_btn
+                            a(href='') 立即投资
+                .look_more
+                    span#lookMore
+                        p
+                            label 查看历史投资项目
+                        p
+                            i
+                .history-list
+                    .border-top
+                    .table_box.clearfix
+                        table
+                            thead
+                                tr
+                                    th 投标时间
+                                    th 产品名称
+                                    th 投资金额(元)
+                                    th 年化收益
+                                    th 项目天数
+                                    th.last 已收益／预期收益（元）
+                            tbody
+                                tr
+                                    td 2015-10-10 19:53
+                                    td 专享福利体验标
+                                    td 8,888.00
+                                    td 00.00
+                                    td 2
+                                    td 0.00/9.89
+                                tr
+                                    td 2015-10-10 19:53
+                                    td 专享福利体验标
+                                    td 8,888.00
+                                    td 00.00
+                                    td 2
+                                    td 0.00/9.89
+                                tr
+                                    td 2015-10-10 19:53
+                                    td 专享福利体验标
+                                    td 8,888.00
+                                    td 00.00
+                                    td 2
+                                    td 0.00/9.89
+                                tr
+                                    td 2015-10-10 19:53
+                                    td 专享福利体验标
+                                    td 8,888.00
+                                    td 00.00
+                                    td 2
+                                    td 0.00/9.89
+                                tr
+                                    td 2015-10-10 19:53
+                                    td 专享福利体验标
+                                    td 8,888.00
+                                    td 00.00
+                                    td 2
+                                    td 0.00/9.89
+                                tr
+                                    td 2015-10-10 19:53
+                                    td 专享福利体验标
+                                    td 8,888.00
+                                    td 00.00
+                                    td 2
+                                    td 0.00/9.89
+                                tr
+                                    td 2015-10-10 19:53
+                                    td 专享福利体验标
+                                    td 8,888.00
+                                    td 00.00
+                                    td 2
+                                    td 0.00/9.89
+                                tr
+                                    td 2015-10-10 19:53
+                                    td 专享福利体验标
+                                    td 8,888.00
+                                    td 00.00
+                                    td 2
+                                    td 0.00/9.89
+                                tr
+                                    td 2015-10-10 19:53
+                                    td 专享福利体验标
+                                    td 8,888.00
+                                    td 00.00
+                                    td 2
+                                    td 0.00/9.89
+                .re_box
+                    .rule_list.clearfix
+                        img(src='/static/imgs/mobile_activity/app_experience/bg.jpg')
+                        ul
+                            li.title 体验金领取及使用说明
+                            li
+                                span
+                                .rule_content
+                                    p.rule_content_top 如何领取？
+                                    p.rule_content_bt 1、新用户通过注册（老用户通过邀请等活动奖励）获得体验金后，体验金自动放入相应账户并发送站内信通知。
+                            li
+                                span
+                                .rule_content
+                                    p.rule_content_top 如何使用？
+                                    p.rule_content_bt 1、体验金只能在相关活动页投资体验标，投资时不能使用其它理财券。体验金有效期自发放日起15天内有效。
+                                    p.rule_content_bt 2、体验金需要用户手动投资，投资时系统将自动按体验金总额一次性投资完毕。例如用户A注册获得10000元体验金，未使用，之后该用户通过参与活动获得5000元体验金，此时用户选择投资体验标时（两笔体验金均在有效期内），系统默认将15000元体验金全部投资。
+                            li
+                                span
+                                .rule_content
+                                    p.rule_content_top 体验金是否可提现？
+                                    p.rule_content_bt 1、体验金投资完毕后，当日立即开始计息，到期日16点回款。还款本金系统自动收回，利息收益自动发放至投资人的个人账户 。例如 ，新手10000元体验金，可计息日为3天（含节假日），今天投资（周四），周四、周五、周六计息3天，周六16点您的收益会发放到个人帐户。
+                                    p.rule_content_bt 2、体验金利息收益与正常账户余额一样，可用来投资和提现。
+                                    p.p_last 部分合作渠道来源用户无法享受此活动奖励，网利宝对此活动享有最终解释权。
+
+    script(src="/static/scripts/mobile_activity/app_experience.js")
