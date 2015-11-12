@@ -759,17 +759,16 @@ org.regist = (function(org){
         $("#footer-down").hide();
     });
 
-    function btnAnimate(self,tp,k){
+    function btnAnimate(self,tp,k){//抽奖动画
         var arrStr = ["终于等到你还好我没放弃","人品大爆发！"];
         var errorStr = ['太可惜了，你竟然与大奖擦肩而过','天苍苍，野茫茫，中奖的希望太渺茫','你和大奖只是一根头发的距离','奖品何时有，把酒问青天？','据说心灵纯洁的人中奖几率更高'];
-        var noChance = '大奖明天见，网利宝天天见。您今天已经抽奖，明天再来碰运气吧';
         var btns = tp.find(".award-item");
         var i = 0;
         var num = 0;
         var alt = $("#alt-box");
         var altAwardP = alt.find("#alt-award-p");
-        var altAward = altAwardP.find("#alt-award");
         var altPro = alt.find("#alt-promot");
+        var sleep = 60;
         function setAn(){
             btns.eq(i).addClass("awards-now").siblings(".award-item").removeClass("awards-now");
             if(i === k && num > 1){
@@ -781,39 +780,64 @@ org.regist = (function(org){
                         altAwardP.html('<span id="alt-award" class="alt-award">继续攒人品</span>');
                     }else{
                         altPro.text(arrStr[Math.floor(Math.random()*2)]);
-                        altAward.text(btns.eq(i-1).text());
+                        altAwardP.html('<span id="alt-award" class="alt-award">'+btns.eq(i-1).text()+'</span>已在您的账户中');
                     }
                     self.removeClass("had-click");
                     alt.show();
-                },100);
+                },sleep);
             }
             if(i >= btns.length){
                 num ++;
                 clearInterval(setAnimate);
                 i = 0;
-                setAnimate = setInterval(setAn,100);
+                setAnimate = setInterval(setAn,sleep);
             }else{
               i ++;
             }
         }
         var setAnimate = setInterval(function(){
             setAn();
-        },100);
+        },sleep);
     }
     var awardBtn = true;
     //立即抽奖
     $("#award-btn").click(function(){
         var self = $(this);
+        var isNum = goods;
+        var nowNum = 0;
+        var awardAction = "ENTER_WEB_PAGE";
+        if(self.hasClass("had-click")){
+            return;
+        }
+        if(awardsNum === 0){
+            $("#page-bg").show();
+            $("#alt-promot").text("大奖明天见，网利宝天天见。");
+            $("#alt-award-p").text("您今天已经抽奖，明天再来碰运气吧").parents("#alt-box").show();
+            self.addClass("had-click");
+            return;
+        }
         if(awardBtn){
             awardBtn = false;
             self.addClass("had-click");
+            if(awardsNum === 2){
+                awardAction = 'GET_REWARD';
+                nowNum = isAwards(isNum);
+            }else{
+                awardAction = 'IGNORE';
+                nowNum = 0;
+            }
         }else{
             return;
         }
+
+        org.awardEvent(awardAction,function(d){ //ajax
+            //console.log(d);
+            $("#sub-award-num").text(d.left);
+            isNum = parseFloat(d.amount);
+        });
         var awards = self.parents("div.award-handle-box").siblings("div.award-btn-box");
 
-        //awards.addClass("awards-now");
-        btnAnimate(self,awards,3);
+        btnAnimate(self,awards,nowNum);//执行动画
     });
     //关闭弹层
     $("#alt-box .close-box").click(function(){
@@ -825,7 +849,6 @@ org.regist = (function(org){
     //规则 html添加class
     ;(function(){
         var html = $("html");
-        //alert(html.height() + "," + $(window).height());
         if(html.height() <= $(window).height()){
             html.addClass("sub-height");
         }else{
@@ -847,3 +870,59 @@ function getCode(){//得到用户信息的二维码
         }
     });
 }
+
+function isAwards(k){//判断抽奖是第几项
+    var is = 0;
+    switch(k){
+        case 0.2:
+            is = 1;
+            break;
+        case 0.3:
+            is = 2;
+            break;
+        case 0.4:
+            is = 3;
+            break;
+        case 1:
+            is = 4;
+            break;
+        case 1.5:
+            is = 5;
+            break;
+        case 25:
+            is = 6;
+            break;
+        case 2:
+            is = 7;
+            break;
+        case 6:
+            is = 8;
+            break;
+        case 10:
+            is = 9;
+            break;
+        default :
+            is = 0;
+            break;
+    }
+    return is;
+}
+var awardsNum = 0,
+    goods = '';
+org.awardEvent = (function(org){ //微信抽奖
+    var awardFun = function(obj, fn){
+        org.ajax({
+            type: "post",
+            url: '/api/weixin/distribute/redpack/',
+            dataType: 'json',
+            data: {"action": obj},
+            success: function(data){
+                fn(data);
+                awardsNum = data.left;
+                goods = parseFloat(data.amount);
+            },
+            error: function(){}
+        });
+    };
+    return awardFun;
+})(org);
