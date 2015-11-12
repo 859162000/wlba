@@ -224,7 +224,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     $('.explain_wrap').click(function(){
         $(this).hide();
     });
-    
+
     var lib = {
         $body_h : $('.maimai-check-body'),
         $submit : $('.maimai-form-btn'),
