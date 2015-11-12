@@ -137,6 +137,7 @@ urlpatterns += patterns(
     url(r'^app_bid/$', TemplateView.as_view(template_name="app_bid.jade")),
 
     url(r'^app-invite/$', TemplateView.as_view(template_name="app_invite_friends.jade")),
+    url(r'^app-invite-result/$', TemplateView.as_view(template_name="app_invite_result.jade")),
 )
 
 urlpatterns += patterns(
