@@ -58,6 +58,9 @@ html(style="background: #f6f6f6")
                 dl
                     dt 8.
                     dd 本活动最终解释权在法律允许范围内归网利宝所有。
+                dl(style="display:none")#ios-show
+                    dt 9.
+                    dd 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关。
         .get_ticket_wrap
             .title 恭喜！您已成功注册网利宝，<br>实名认证领取20元现金红包；<br>立即投资，疯抢限量门票。
             ul
@@ -77,3 +80,10 @@ html(style="background: #f6f6f6")
             .button.write_info_button 保存
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(data-init='mmIndex',src="/static/scripts/mobile_activity/dist/app_jucheng.js?v=201511063")
+        script.
+          var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+              iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+              ios = ipad || iphone;
+          if (ios) {
+              document.getElementById('ios-show').style.display = 'block';
+          }
