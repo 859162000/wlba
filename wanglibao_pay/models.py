@@ -163,6 +163,9 @@ class WithdrawCard(models.Model):
     class Meta:
         verbose_name_plural = u'公司提现账户'
 
+    def __unicode__(self):
+        return u'%s' % self.card_no
+
 
 class WithdrawCardRecord(models.Model):
     type = models.CharField(u'类型', help_text=u'充值：D 取款：W', max_length=5)
