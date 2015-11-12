@@ -1130,7 +1130,7 @@ class XunleiVipRegister(CoopRegister):
         if binding and p2p_record.count() == 1:
             # 判断投资金额是否大于100
             pay_amount = int(p2p_record.first().amount)
-            if pay_amount >= 100:
+            if pay_amount >= 1000:
                 data = {
                     'sendtype': '0',
                     'num1': 12,
