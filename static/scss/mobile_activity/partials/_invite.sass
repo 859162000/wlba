@@ -1,3 +1,4 @@
+@import "./from"
 
 @mixin inviteButton($background, $color, $height)
   display: block
@@ -34,5 +35,59 @@
     text-align: center
 
 .invite-message
+  display: -webkit-box
+  -webkit-box-align: center
+  .ivt-use
+    width: 1.75rem
+    height: 1.75rem
+    margin-right: .5rem
+    img
+      display: block
+
+  .ivt-message-body
+    display: -webkit-box
+    -webkit-box-align: center
+    height: 2.625rem
+    width: 13rem
+    background: url("/static/imgs/mobile_activity/app_invite/message.png") no-repeat center
+    background-size: 100%
+    color: #fff
+    font-size: .7rem
+    padding-left: 1.7rem
+    padding-top: .4rem
 
 
+.tly-title
+  position: relative
+  text-align: center
+  color: #F5A623
+  font-size: .7rem
+  margin: 0 2.15rem
+  span
+    position: relative
+    background: #fff
+    padding: 0 .5rem
+    z-index: 999
+  &:after
+    content: ''
+    position: absolute
+    top: 50%
+    left: 0
+    width: 100%
+    height: 1px
+    margin-top: 1px
+    background: #979797
+
+.invite-friend-propagate
+  h4
+    color: #666
+  p
+    color: #9b9b9b
+
+.invite-us
+  .invite-us-logo-idg
+    width: 4.7rem
+
+  .invite-us-logo-hgdl
+
+    width: 7.175

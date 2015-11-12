@@ -2274,6 +2274,19 @@ class AppLotteryTemplate(TemplateView):
     def get_context_data(self, *args, **kwargs):
         openid = self.request.GET.get('openid')
         phone = ""
+        relative = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
+        if relative:
+            phone = relative.phone_for_fencai
+        return {
+            'openid': openid,
+            'phone': phone,
+        }
+
+
+
+    def dispatch(self, request, *args, **kwargs):
+        openid = self.request.GET.get('openid')
+
         if not openid:
             redirect_uri = settings.CALLBACK_HOST + reverse("weixin_share_order_gift")
             count = 0
@@ -2294,13 +2307,8 @@ class AppLotteryTemplate(TemplateView):
             redirect_url = reverse('weixin_authorize_code')+'?state=%s&redirect_uri=%s' % (account_id, redirect_uri)
             # print redirect_url
             return HttpResponseRedirect(redirect_url)
-        relative = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
-        if relative:
-            phone = relative.phone_for_fencai
-        return {
-            'openid': openid,
-            'phone': phone,
-        }
+        return super(AppLotteryTemplate, self).dispatch(request, *args, **kwargs)
+
 
 
 class NoConfigException(Exception):
@@ -2525,6 +2533,4 @@ class RewardDistributeAPIView(APIView):
                 'left': join_log.join_times
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-
-
 
