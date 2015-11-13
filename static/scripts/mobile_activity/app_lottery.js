@@ -1093,7 +1093,7 @@ org.lottery = (function () {
             if ($phone.val() == '') {
                 $.ajax({
                     type: 'GET',
-                    url: 'http://just.lingcaibao.com/activity/act/wlb/findByOpenId?mcode=ACTwlberwet&serverId=39&openId='+ openid,
+                    url: 'http://mo.lingcaibao.com/act/wlb/findByOpenId?mcode=ACTwlberwet&serverId=39&openId='+ openid,
                     dataType: 'jsonp',
                     success: function (data) {
                         console.log(data)
@@ -1135,9 +1135,9 @@ org.lottery = (function () {
                         type: 'get',
                         success: function (xhr) {
                             if (xhr.existing) {
-                                window.location.href = 'http://just.lingcaibao.com/activity/act/wlb/start?mcode=ACTwlberwet&mobile=' + phoneVal + '&serverId=39'; //对方
+                                window.location.href = 'http://mo.lingcaibao.com/act/wlb/start?mcode=ACTwlberwet&mobile=' + phoneVal + '&serverId=39'; //对方
                             } else {
-                                window.location.href = '/weixin/regist/?onlyphone=true&next=http://just.lingcaibao.com/activity/act/wlb/start?mcode=ACTwlberwet&mobile=' + phoneVal + '&serverId=39&phone=' + $phone.val();
+                                window.location.href = '/weixin/regist/?onlyphone=true&next=http://mo.lingcaibao.com/act/wlb/start?mcode=ACTwlberwet&mobile=' + phoneVal + '&serverId=39&phone=' + $phone.val();
                             }
                         },
                         error: function (xhr) {
