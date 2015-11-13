@@ -148,7 +148,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'marketing.middlewares.PromotionTokenMiddleWare',
-    'marketing.middlewares.StatsKeyWordMiddleWare',
 )
 
 CONCURRENCY_POLICY = 2
@@ -558,7 +557,7 @@ CELERYBEAT_SCHEDULE = {
 
     'p2p_auto_ready_for_settle': {
         'task': 'wanglibao_p2p.tasks.p2p_auto_ready_for_settle',
-        'schedule': crontab(hour=16),
+        'schedule': crontab(minute=0, hour=16),
     },
 
     #add by guoya: 希财网渠道数据定时推送
@@ -1049,12 +1048,6 @@ XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
 XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
 XUNLEI9_ACTIVITY_PAGE = 'marketing_xunlei_setp'
 
-# 脉脉
-WLB_FOR_MAIMAI1_KEY = '2004'
-MAIMAI_COOP_KEY = 'iV1RagPbOQ19oejhm9GZlQ'
-MAIMAI_CALL_BACK_URL = 'https://maimai.cn/hb_pingback'
-MAIMAI1_CHANNEL_CODE = 'maimai1'
-MAIMAI1_ACTIVITY_PAGE = 'maimai_index'
 
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:

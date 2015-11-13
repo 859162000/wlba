@@ -48,6 +48,7 @@ from wanglibao_announcement.utility import AnnouncementAccounts
 # from wanglibao_account.forms import verify_captcha
 from fee import WithdrawFee
 import datetime
+from wanglibao_rest import utils as rest_utils
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -436,7 +437,7 @@ class WithdrawTransactions(TemplateView):
         action = request.POST.get('action')
         uuids_param = request.POST.get('transaction_uuids', '')
         uuids = re.findall(r'[\w\-_]+', uuids_param)
-        payinfos = PayInfo.objects.filter(uuid__in=uuids, type='W')
+        payinfos = PayInfo.objects.filter(uuid__in=uuids, type='W').order_by('create_time')
 
         # These are the uuids exists in db for real
         uuids_param = ",".join([payinfo.uuid for payinfo in payinfos])
@@ -889,10 +890,22 @@ class FEEAPIView(APIView):
         amount = request.DATA.get("amount", "")
         bank_id = request.DATA.get("bank_id", "")
         card_id = request.DATA.get("card_id", "")
+        device = rest_utils.split_ua(request)
+        device_type = rest_utils.decide_device(device['device_type'])
+        try:
+            app_version = device['app_version']
+        except KeyError:
+            app_version = ''
+
         if not amount:
             return Response({"ret_code": 30131, "message": u"请输入金额"})
-        if not bank_id and not card_id:
-            return Response({"ret_code": 30137, "message": u"银行卡选择错误"})
+
+        if device_type == 'pc':
+            if not card_id:
+                return Response({"ret_code": 30141, "message": u"银行卡选择错误"})
+        else:
+            if not bank_id:
+                return Response({"ret_code": 30137, "message": u"银行卡选择错误"})
 
         try:
             float(amount)
@@ -935,7 +948,7 @@ class FEEAPIView(APIView):
             except Card.DoesNotExist:
                 card = None
             if bank.id != card.bank.id:
-                return Response({"ret_code": 30139, 'message': u'银行选择错误'})
+                return Response({"ret_code": 30140, 'message': u'银行选择错误'})
             else:
                 if card:
                     withdraw_limit = card.bank.withdraw_limit
@@ -965,6 +978,10 @@ class FEEAPIView(APIView):
         actual_amount = amount - fee - management_fee  # 实际到账金额
         if actual_amount <= 0:
             return Response({"ret_code": 30136, "message": u'实际到账金额为0,无法提现'})
+
+        if device_type == 'ios' or device_type == 'android':
+            if app_version and app_version < "2.6.3":
+                fee = fee + management_fee
 
         return Response({
             "ret_code": 0,
