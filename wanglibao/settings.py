@@ -149,6 +149,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'marketing.middlewares.PromotionTokenMiddleWare',
+    'marketing.middlewares.StatsKeyWordMiddleWare',
 )
 
 CONCURRENCY_POLICY = 2
@@ -382,6 +383,12 @@ LOGGING = {
             'filename': '/var/log/wanglibao/wanglibao_reward.log',
             'formatter': 'verbose'
         },
+        'wanglibao_account':{  #add by yihen@20151113
+                              'level': 'INFO',
+                              'class': 'logging.FileHandler',
+                              'filename': '/var/log/wanglibao/wanglibao_account.log',
+                              'formatter': 'verbose'
+                              },
         'wanglibao_rest':{  #add by yihen@20151028
                               'level': 'DEBUG',
                               'class': 'logging.FileHandler',
@@ -430,8 +437,8 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'wanglibao_account': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
+            'handlers': ['wanglibao_account', 'console'],
+            'level': 'INFO',
         },
         'wanglibao_app': {
             'handlers': ['file'],
