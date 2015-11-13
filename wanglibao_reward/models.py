@@ -81,15 +81,13 @@ class WanglibaoUserGift(models.Model):
         verbose_name = u'用户活动获奖记录'
         verbose_name_plural = u'用户活动获奖记录'
 
-
 class WanglibaoActivityGiftOrder(models.Model):
     valid_amount = models.IntegerField(default=0, verbose_name=u'此次分享剩余的抽奖机会')
-    order_id = models.IntegerField(default=0, verbose_name=u'订单号')
+    order_id = models.IntegerField(default=0, unique=True, verbose_name=u'订单号')
 
     class Meta:
         verbose_name = u'订单分享表'
         verbose_name_plural = u'订单分享表'
-
 
 class WanglibaoWeixinRelative(models.Model):
     """
@@ -100,6 +98,7 @@ class WanglibaoWeixinRelative(models.Model):
     nick_name = models.CharField(max_length=128, default=u'', verbose_name=u'微信昵称')
     openid = models.CharField(max_length=128, default=u'', verbose_name=u'')
     img = models.CharField(max_length=255, default=u'', verbose_name=u'微信头像')
+    phone_for_fencai = models.CharField(max_length=32, default="", verbose_name=u'电话号码')
 
     class Meta:
         verbose_name = u'微信网利宝关系表'
