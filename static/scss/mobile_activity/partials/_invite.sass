@@ -1,12 +1,12 @@
 @import "./from"
 
-@mixin inviteButton($background, $color, $height)
+@mixin inviteButton($background, $color, $height, $font: .7rem)
   display: block
   width: 100%
   height: $height
   line-height: $height
   background: $background
-  font-size: .7rem
+  font-size: $font
   text-align: center
   color: $color
   border-radius: .2rem
@@ -243,7 +243,7 @@
 /* share mask  */
 
 .invite-mask-share
-  position: absolute
+  position: fixed
   top: 0
   bottom: 0
   width: 100%
@@ -281,8 +281,24 @@
     width: 15.45rem
     height: auto
     margin: 0 auto
+    padding: 1.5rem 0
 
 .invite-server-message
   display: block
-  width: rem(100)
-  margin: 0 auto
+  background: url("/static/imgs/mobile_activity/app_invite/message_server.png") no-repeat center
+  background-size: 100%
+  width: rem(590)
+  height: rem(208)
+  margin: 0 auto rem(77) auto
+  color: #fff
+  .messahe-head
+    font-size: .6rem
+    padding: .5rem 0 .8rem 1.2rem
+  .messahe-cont
+    text-align: center
+    font-size: rem(64)
+.invite-server-mb
+  margin-bottom: rem(77)
+
+.invite-server-btn
+  +inviteButton(#DB493F, #fff, 2.5rem, rem(42))
