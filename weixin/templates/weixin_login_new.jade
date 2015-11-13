@@ -15,7 +15,8 @@ html(style="background: #f5f5f5")
     section.form-box
       from(action="{% url 'weixin_login_api' %}")#login-form.login-farom
         - csrf_token
-        input(name="openid", type="hidden", value="{{ openid }}")
+        input(name="openid", type="hidden", value="{{ context.openid }}")
+        input(name="captcha_0", type="hidden", value="")
         .form-list
           .form-icon.user-phone.identifier-icon
           .form-input

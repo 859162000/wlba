@@ -2370,7 +2370,7 @@ class RewardDistributeAPIView(APIView):
 
     def get_redpacks(self):
         try:
-            rules = ActivityRule.objects.filter(activity__code=self.activity).first()
+            rules = ActivityRule.objects.filter(activity=self.activity).first()
         except Exception, reason:
             logger.debug(u"rules获取抛异常, reason:%s" % (reason,))
             raise
@@ -2476,14 +2476,14 @@ class RewardDistributeAPIView(APIView):
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
         w_user = WeixinUser.objects.filter(openid=openid)
-        if not w_user.exists() or not w_user.user:
+        if not w_user.exists() or not w_user.first().user:
             to_json_response = {
                 'ret_code': 3011,
                 'message': u'weixin info No saved',
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
         else:
-            user = w_user.user
+            user = w_user.first().user
 
         today = time.strftime("%Y-%m-%d", time.localtime())
         join_log = ActivityJoinLog.objects.filter(user=user, create_time__gte=today).first()
@@ -2505,7 +2505,9 @@ class RewardDistributeAPIView(APIView):
         action = request.DATA.get("action", "")
         logger.debug(u"用户{0}前端传入的行为是：{1}".format(user, action,))
 
-        if action not in ("ENTER_WEB_PAGE", "GET_REWARD", "IGNORE"):
+        try:
+            assert action in ("ENTER_WEB_PAGE", "GET_REWARD", "IGNORE")
+        except AssertionError:
             logger.debug(u"参数不正确，action:{0}".format(action))
             to_json_response = {
                 'ret_code': 3002,

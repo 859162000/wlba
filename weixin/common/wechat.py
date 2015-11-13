@@ -1,8 +1,10 @@
 # encoding:utf-8
 from __future__ import unicode_literals
-from weixin.wechatpy import create_reply
 import urllib
+
 import requests
+
+from wechatpy import create_reply
 
 
 class Permission(object):
