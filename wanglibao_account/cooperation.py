@@ -1135,7 +1135,7 @@ class XunleiVipRegister(CoopRegister):
         if binding and p2p_record.count() == 1:
             # 判断投资金额是否大于100
             pay_amount = int(p2p_record.first().amount)
-            if pay_amount >= 100:
+            if pay_amount >= 1000:
                 data = {
                     'sendtype': '0',
                     'num1': 12,
@@ -2752,7 +2752,7 @@ class ZORecordView(APIView):
             full_path = urllib.unquote(full_path)
             # TODO 进行校验
             from hashlib import md5
-            check_sign = md5(settings.OZ_SECRET + '&' + full_path.split('?')[1].split('&sign')[0]).hexdigest()
+            check_sign = md5(settings.ZO_SECRET + '&' + full_path.split('?')[1].split('&sign')[0]).hexdigest()
             if sign == check_sign.upper():
                 return True
 
@@ -2849,7 +2849,7 @@ class ZOCountView(APIView):
             full_path = urllib.unquote(full_path)
             # TODO 进行校验
             from hashlib import md5
-            check_sign = md5(settings.OZ_SECRET + '&' + full_path.split('?')[1].split('&sign')[0]).hexdigest()
+            check_sign = md5(settings.ZO_SECRET + '&' + full_path.split('?')[1].split('&sign')[0]).hexdigest()
             if sign == check_sign.upper():
                 return True
 

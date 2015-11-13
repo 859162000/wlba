@@ -155,7 +155,6 @@ class ActivityRule(models.Model):
                                                        如果设置最大/最小金额，则会判断用户投资总额是否符合最大/最小金额区间')
     ranking = models.IntegerField(u'单标投资顺序', blank=True, default=0,
                                   help_text=u'设置单个标的投资顺序，只能填写-1或者大于1的数字，默认0不做判断<br/>\
-                                            最大/最小金额和投资顺序不同时计算，即设置单标投资顺序时不考虑最大/最小金额<br/>\
                                             注：满标（即最后一名）填写-1')
     msg_template = models.TextField(u'站内信模板（不填则不发）', blank=True,
                                     help_text=u'站内信模板不填写则触发该规则时不发站内信，变量写在2个大括号之间，<br/>\

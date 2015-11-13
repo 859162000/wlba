@@ -112,6 +112,7 @@ INSTALLED_APPS = (
     'wanglibao_activity',
     'wanglibao_mobile',
     'weixin',
+    'wechatpy',
     'wanglibao_app',
     'wanglibao_anti', #add by yihen@20150813, anti module added
     'wanglibao_reward', #add by yihen@20150910
@@ -148,7 +149,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'marketing.middlewares.PromotionTokenMiddleWare',
-    'marketing.middlewares.StatsKeyWordMiddleWare',
 )
 
 CONCURRENCY_POLICY = 2
@@ -214,7 +214,6 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
 )
-import django.contrib.auth.backends
 
 # Template loader
 TEMPLATE_LOADERS = (
@@ -558,7 +557,7 @@ CELERYBEAT_SCHEDULE = {
 
     'p2p_auto_ready_for_settle': {
         'task': 'wanglibao_p2p.tasks.p2p_auto_ready_for_settle',
-        'schedule': crontab(hour=16),
+        'schedule': crontab(minute=0, hour=16),
     },
 
     #add by guoya: 希财网渠道数据定时推送
@@ -1103,7 +1102,7 @@ if ENV == ENV_PRODUCTION:
     WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
 else:
     WEIXIN_CALLBACK_URL = 'https://staging.wanglibao.com'
-
+    CALLBACK_HOST='https://staging.wanglibao.com'
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)
 WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'

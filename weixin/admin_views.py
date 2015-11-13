@@ -1,5 +1,6 @@
 # encoding:utf-8
 from __future__ import unicode_literals
+
 from django.views.generic import View, TemplateView
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.decorators import method_decorator
@@ -9,9 +10,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from rest_framework.authentication import SessionAuthentication
+
 from .models import Account, Material, MaterialImage, MaterialNews
 from wechatpy.client import WeChatClient
-from weixin.wechatpy.exceptions import WeChatException
+from wechatpy.exceptions import WeChatException
 from weixin.common.decorators import weixin_api_error
 
 
@@ -132,6 +134,7 @@ class WeixinCustomerServiceView(AdminWeixinTemplateView):
     def get_context_data(self, **kwargs):
         context = super(WeixinCustomerServiceView, self).get_context_data(**kwargs)
         context['account'] = self.account
+
         return context
 
 
@@ -225,7 +228,13 @@ class WeixinMaterialListJsonApi(AdminAPIView):
 
 class WeixinCustomerServiceApi(AdminAPIView):
 
-    http_method_names = ['post']
+    http_method_names = ['get', 'post', 'delete']
+
+    @weixin_api_error
+    def get(self, request):
+        res = self.client.customservice.get_accounts()
+        self.client.customservice.upload_headimg()
+        return Response(res.json())
 
     @weixin_api_error
     def post(self, request):
@@ -234,6 +243,12 @@ class WeixinCustomerServiceApi(AdminAPIView):
         password = request.POST.get('password')
         res = self.client.customservice.add_account(kf_account, nickname, password)
         return Response(res.json())
+
+    @weixin_api_error
+    def delete(self, request):
+        kf_account = request.DATA.get('kf_account')
+        res = self.client.customservice.delete_account(kf_account)
+        return Response(res, status=204)
 
 
 class WeixinMenuApi(AdminAPIView):
