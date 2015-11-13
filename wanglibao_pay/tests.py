@@ -390,13 +390,13 @@ mas_cnp_merchant_interface"><version>1.0</version><TxnMsgContent><txnType>PUR</t
         self.assertEqual(1, margin_record.count())
 
 
-class WithdrawFeeTests(TestCase):
-             # (2)提现手续费新接口，后台处理跨月提现手续费有问题        ----待解决
-             # (3)处理每月多笔提现 2+ n笔 ，如果前两笔提现失败，后边n笔提现手续费都会回退给用户。    ----待解决
-    def setUp(self):
-        self.withdraw_fee = WithdrawFee()
-
-    def
+# class WithdrawFeeTests(TestCase):
+#              # (2)提现手续费新接口，后台处理跨月提现手续费有问题        ----待解决
+#              # (3)处理每月多笔提现 2+ n笔 ，如果前两笔提现失败，后边n笔提现手续费都会回退给用户。    ----待解决
+#     def setUp(self):
+#         self.withdraw_fee = WithdrawFee()
+#
+#     def
 
 
 

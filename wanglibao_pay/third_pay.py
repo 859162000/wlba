@@ -536,7 +536,7 @@ def bind_pay_dynnum(request):
         return YeeShortPay().dynnum_bind_pay(request)
 
     elif card.bank.channel == 'kuaipay':
-        return KuaiShortPay().dynnum_bind_pay(user, vcode, order_id, token, input_phone, device, ip)
+        return KuaiShortPay().dynnum_bind_pay(user, vcode, order_id, token, input_phone, device, ip, request)
     else:
         return {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
 

@@ -12,6 +12,7 @@ from django.forms import model_to_dict
 from django.db import transaction
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from wanglibao_account.cooperation import CoopRegister
 from wanglibao_pay import util
 from wanglibao_pay.models import PayInfo, PayResult, Bank, Card
 from order.utils import OrderHelper
@@ -789,7 +790,7 @@ class YeeShortPay:
         pay_info.save()
         if rs['ret_code'] == 0:
             try:
-                # fix@chenweibi, add order_id
+                # fix@chenweibi, add order_id, handle_margin已经废弃未被使用
                 tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
                                                      "device": device, "order_id": order_id})
             except:
@@ -888,6 +889,7 @@ class YeeShortPay:
                     # fix@chenweibi, add order_id
                     tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
                                                          "device": device, "order_id": orderId})
+                    CoopRegister(request).process_for_recharge(pay_info.user, orderId)
                 except:
                     pass
             except:

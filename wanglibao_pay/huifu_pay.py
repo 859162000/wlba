@@ -11,6 +11,7 @@ import traceback
 #from marketing.helper import RewardStrategy
 import requests
 from order.utils import OrderHelper
+from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_pay.models import PayInfo, Bank, Card
 from wanglibao_pay.pay import Pay
@@ -286,6 +287,7 @@ class HuifuPay(Pay):
                 # fix@chenweibi, add order_id
                 tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
                                                      "device": device, "order_id": order_id})
+                CoopRegister(request).process_for_recharge(pay_info.user, order_id)
             except:
                 pass
 
