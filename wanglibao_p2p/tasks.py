@@ -41,6 +41,7 @@ def process_paid_product(product_id):
         p2p = P2PProduct.objects.select_related('user').get(pk=product_id)
         P2POperator.preprocess_for_settle(p2p)
     except:
+        print('p2p process_for_settle error: ' + str(p2p))
         logger.error('p2p process_for_settle error: ' + str(p2p))
 
 @app.task
