@@ -20,6 +20,7 @@ import new
 #
 from wanglibao_margin.models import Margin, MarginRecord
 from wanglibao_pay.exceptions import VerifyError
+from wanglibao_pay.fee import WithdrawFee
 from wanglibao_pay.kuai_pay import KuaiShortPay
 from wanglibao_pay.mock_generator import PayMockGenerator
 from wanglibao_pay.models import PayInfo
@@ -387,6 +388,16 @@ mas_cnp_merchant_interface"><version>1.0</version><TxnMsgContent><txnType>PUR</t
         self.assertEqual('成功', pay_info.status)
         self.assertEqual(self.amount_2, margin.margin)
         self.assertEqual(1, margin_record.count())
+
+
+class WithdrawFeeTests(TestCase):
+             # (2)提现手续费新接口，后台处理跨月提现手续费有问题        ----待解决
+             # (3)处理每月多笔提现 2+ n笔 ，如果前两笔提现失败，后边n笔提现手续费都会回退给用户。    ----待解决
+    def setUp(self):
+        self.withdraw_fee = WithdrawFee()
+
+    def
+
 
 
 
