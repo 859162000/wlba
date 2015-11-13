@@ -884,14 +884,12 @@ class YeeShortPay:
         pay_info.save()
         if rs['ret_code'] == 0:
             device = split_ua(request)
+
             try:
-                try:
-                    # fix@chenweibi, add order_id
-                    tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
-                                                         "device": device, "order_id": orderId})
-                    CoopRegister(request).process_for_recharge(pay_info.user, orderId)
-                except:
-                    pass
+                # fix@chenweibi, add order_id
+                tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
+                                                     "device": device, "order_id": orderId})
+                CoopRegister(request).process_for_recharge(pay_info.user, orderId)
             except:
                 pass
 
