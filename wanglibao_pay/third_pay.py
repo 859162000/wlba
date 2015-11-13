@@ -15,7 +15,6 @@ from wanglibao_pay.models import PayInfo, Bank, Card
 from order.utils import OrderHelper
 from order.models import Order
 from wanglibao_margin.marginkeeper import MarginKeeper
-from wanglibao_account.cooperation import CoopRegister
 from wanglibao_sms.utils import validate_validation_code
 from marketing import tools
 from fee import WithdrawFee
@@ -461,36 +460,36 @@ def bind_pay_deposit(request):
     if bank.channel == 'huifu':
         result = HuifuShortPay().pre_pay(request)
 
-        if result['ret_code'] == 0:
-            try:
-                # 处理第三方用户充值回调
-                CoopRegister(request).process_for_recharge(request.user)
-            except Exception, e:
-                logger.error(e)
+        # if result['ret_code'] == 0:
+        #     try:
+        #         # 处理第三方用户充值回调
+        #         CoopRegister(request).process_for_recharge(request.user)
+        #     except Exception, e:
+        #         logger.error(e)
 
         return result
 
     elif bank.channel == 'yeepay':
         result = YeeShortPay().pre_pay(request)
 
-        if result['ret_code'] == 0:
-            try:
-                # 处理第三方用户充值回调
-                CoopRegister(request).process_for_recharge(request.user)
-            except Exception, e:
-                logger.error(e)
+        # if result['ret_code'] == 0:
+            # try:
+            #     # 处理第三方用户充值回调
+            #     CoopRegister(request).process_for_recharge(request.user)
+            # except Exception, e:
+            #     logger.error(e)
 
         return result
 
     elif bank.channel == 'kuaipay':
         result = KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, device, ip, request)
 
-        if result['ret_code'] == 0:
-            try:
-                # 处理第三方用户充值回调
-                CoopRegister(request).process_for_recharge(request.user)
-            except Exception, e:
-                logger.error(e)
+        # if result['ret_code'] == 0:
+        #     try:
+        #         # 处理第三方用户充值回调
+        #         CoopRegister(request).process_for_recharge(request.user)
+        #     except Exception, e:
+        #         logger.error(e)
 
         return result
 

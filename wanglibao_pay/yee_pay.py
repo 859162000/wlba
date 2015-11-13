@@ -27,7 +27,7 @@ from Crypto.Signature import PKCS1_v1_5 as pk
 from Crypto.Cipher import PKCS1_v1_5, AES
 import base64
 from wanglibao_rest.utils import split_ua
-from wanglibao_account.cooperation import CoopRegister
+# from wanglibao_account.cooperation import CoopRegister
 
 logger = logging.getLogger(__name__)
 
@@ -570,12 +570,12 @@ class YeeShortPay:
 
         card.bank = bank
         card.save()
-        if add_card:
-            try:
-                # 处理第三方用户绑卡回调
-                CoopRegister(request).process_for_binding_card(request.user)
-            except Exception, e:
-                logger.error(e)
+        # if add_card:
+        #     try:
+        #         # 处理第三方用户绑卡回调
+        #         CoopRegister(request).process_for_binding_card(request.user)
+        #     except Exception, e:
+        #         logger.error(e)
 
         return card
 
