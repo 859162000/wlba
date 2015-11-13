@@ -95,7 +95,9 @@ class WeixinJoinView(View):
     account = None
 
     def check_signature(self, request, account_key):
-        account = Account.objects.get(pk=account_key)#WeixinAccounts.get(account_key)
+        # account = Account.objects.get(pk=account_key)#WeixinAccounts.get(account_key)
+        weixin_account = WeixinAccounts.getByOriginalId(account_key)
+        account = weixin_account.db_account
         try:
             check_signature(
                 account.token,
