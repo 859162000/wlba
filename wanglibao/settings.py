@@ -394,6 +394,12 @@ LOGGING = {
                               'filename': '/var/log/wanglibao/wanglibao_cooperation.log',
                               'formatter': 'verbose'
                               },
+        'weixin':{  #add by huomeimei
+              'level': 'DEBUG',
+              'class': 'logging.FileHandler',
+              'filename': '/var/log/wanglibao/weixin.log',
+              'formatter': 'verbose'
+                },
     },
     'loggers': {
         'django': {
@@ -465,6 +471,10 @@ LOGGING = {
                               'handlers': ['wanglibao_cooperation', 'console'],
                               'level': 'DEBUG'
                               },
+        'weixin':{#add by huomeimei
+              'handlers': ['weixin', 'console'],
+              'level': 'DEBUG'
+        },
         'wanglibao_p2p': {
             'handlers': [ 'console'],
             'level': 'DEBUG'
