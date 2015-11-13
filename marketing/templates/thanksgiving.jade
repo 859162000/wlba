@@ -1,0 +1,51 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include global/g_head
+    - endwith
+    link(rel="stylesheet",href="/static/styles/pc_activity/thanksgiving.css?v=20151103")
+  body
+    include global/g_nav
+    .thanksgiving
+      .banner
+        .bannerdong
+      .thanksgiving-prize
+        .prize
+          p.prize-title 单笔投资满5000元可参与抽奖一次，100%中奖，投资越多奖品越丰厚。百万豪礼抽疯了，多投多抽不要停！
+          .prize-rotary
+          p.prize-title1 说明：新老用户均可参与，虚拟奖品抽完立即发放。立即查看活动规则>>
+      .thanksgiving-investment
+        .investment
+
+        .bid-guizhe.bid-yangshi
+          h2 【加息券规则】
+          ul
+            li 1、加息券使用不限平台均可使用，自领取日起10天内有效，请在有效期内使用；
+            li 2、购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+            li 3、投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+            li 4、使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+            li 5、使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+        .bid-guizhe
+          h2 【活动规则】
+          ul
+            li 1、投标有奖活动不限标期均可投资赢取，所得加息券自满足获奖条件后自动发放，统一以站内信的形式通知；
+            li 2、一马当先排头兵，第一名成功投标用户但未满足5000元的条件，按投标时间顺序予以顺延；
+            li 3、压轴大戏终结者，最后一名成功投标用户但未满足5000元的条件，按投标时间顺序追溯评定；
+            li 4、当仁不让称霸赛，如出现数位相同最高累计投资金额用户，按投标顺序，先投先得；
+            li 5、加息券有效期自领取日起10天内有效，请在有效期内使用；
+            li 6、网利宝对此活动享有最终解释权。
+      .bid-footer
+      include global/g_footer
+      include include/tracking
+      .xl-backtop(style="z-index:99")
+          span.seven-com.seven-ten
+          .backtop.sev-backtop 回到顶部
+          img(src="/static/imgs/pc_activity/xunlei/seven/sev_weixin.png")#xl-weixin
+          a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank")
+            img(src="/static/imgs/pc_activity/xunlei/seven/sev_qq.png",style="margin-top:10px")#xl-qq
+          .erweima
+  script.
+      require(['/static/js/thanksgiving.js?v=20151112'])

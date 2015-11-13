@@ -1,10 +1,4 @@
-org.mmIndex = (function(org){
-    $('#explain_button').click(function(){
-        $('.explain_wrap').show();
-    });
-    $('.explain_wrap').click(function(){
-        $(this).hide();
-    });
+org.jucheng = (function(org){
 
     var lib = {
         $body_h : $('.maimai-check-body'),
@@ -17,13 +11,21 @@ org.mmIndex = (function(org){
         $validation: $('.check-submit'),
         checkState: null,
         intervalId: null,
-        //$write_info_button : $('.write_info_button'),
         $act_explain_button : $('#explain_button'),
         $explain_wrap : $('.explain_wrap'),
         init: function(){
             lib._submit();
             lib.listen();
+            lib._addEvent();
             $(document.body).trigger('from:captcha');
+        },
+        _addEvent:function(){
+            $('#explain_button').click(function(){
+                $('.explain_wrap').show();
+            });
+            $('.explain_wrap').click(function(){
+                $(this).hide();
+            });
         },
         checkfilter:function(num){
             var
@@ -142,9 +144,6 @@ org.mmIndex = (function(org){
                                 $(document.body).trigger('from:error',[data.message, true]);
                                 clearInterval(_self.intervalId);
                                 $('.check-submit').text('短信验证码').removeAttr('disabled').removeClass('postValidation');
-                                if(data.ret_code == 30011){
-                                    lib.$sign.html('该用户已注册');
-                                }
                                 return $(document.body).trigger('from:captcha');
                             }
                         },
@@ -214,9 +213,10 @@ org.mmIndex = (function(org){
 
             function callback (data){
                 if(data.existing){
-                    lib.$submit.removeAttr('disabled');
+                    //lib.$submit.removeAttr('disabled');
                     _self.$body_h.css({'height': '0'});
                     _self.$phone.attr('data-existing', true);
+                    lib.$sign.css('height','1.275rem').html('该用户已注册');
                 }else{
                     lib.$submit.attr('disabled',true);
                     _self.$body_h.css({'height': '5.6rem'});
@@ -291,68 +291,29 @@ org.mmIndex = (function(org){
             var _self = this;
                  phone = _self.$phone.val();
             //判断是否注册过
-            //org.ajax({
-            //    url:'/api/user_exists/' + phone + '/',
-            //    beforeSend: function(){
-            //        lib.$phone.addClass('maimai-load'); //显示加载动画
-            //    },
-            //    success: function(data){
-            //        callback && callback(data);
-            //    },
-            //    error: function (data) {
-            //        console.log(data)
-            //    },
-            //    complete: function(){
-            //        _self.$phone.removeClass('maimai-load');
-            //    }
-            //})
-        },
-
-    }
-    return {
-        init : lib.init
-    }
-})(org);
-
-org.success = (function(org){
-    var lib = {
-        init:function(){
-            var
-                state = org.getQueryStringByName('state')*1,
-                str = null,
-                val = null,
-                url = null;
-
-                if(state === 0){
-                    str = '成功领取';
-                    val = '1.5%加息券';
-                    url = '/weixin/login/';
-                }else if(state === 1){
-                    str = '您已领取过奖品!';
-                    val = null;
-                    url = '/weixin/login/';
-                }else if(state === 2){
-                    str = '成功领取';
-                    val = '120元红包';
-                    url = '/weixin/list/';
+            org.ajax({
+                url:'/api/user_exists/' + phone + '/',
+                beforeSend: function(){
+                    //lib.$phone.addClass('maimai-load'); //显示加载动画
+                },
+                success: function(data){
+                    callback && callback(data);
+                },
+                error: function (data) {
+                    //console.log(data)
+                },
+                complete: function(){
+                    //_self.$phone.removeClass('maimai-load');
                 }
-                $('.maimai-title').html(str);
-                if(val){
-                    $('.maimai-money').html(val);
-                }
-            $('.maimai-use-btn').on('click', function(){
-                window.location.href = url;
-            });
-
-            var mySwiper = new Swiper('.swiper-container', {
-                pagination: '.swiper-pagination-maimai',
-            }) 
+            })
         },
     }
     return {
         init : lib.init
     }
 })(org);
+
+
 
 ;(function(org){
     $.each($('script'), function(){
