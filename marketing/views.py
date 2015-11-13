@@ -9,6 +9,7 @@ from datetime import date, timedelta, datetime
 from collections import defaultdict
 from decimal import Decimal
 import time
+from weixin.models import WeixinUser
 from wanglibao_p2p.models import P2PEquity
 from django.db import transaction
 from django.db.models import Count, Sum, connection
@@ -2414,10 +2415,10 @@ class RewardDistributeAPIView(APIView):
                     amount=self.redpack_amount[index],
                 )
             except IndexError, reason:
-                logger.exception("redpack_amount 索引超范围了,reason:{0}".format(reason))
+                logger.exception(u"redpack_amount 索引超范围了,reason:{0}".format(reason))
                 raise
             except Exception, reason:
-                logger.exception("创建用户获奖记录异常了， reason:{0}".format(reason))
+                logger.exception(u"创建用户获奖记录异常了， reason:{0}".format(reason))
 
         return join_log
 
@@ -2434,12 +2435,12 @@ class RewardDistributeAPIView(APIView):
             else:
                 redpack_event = self.redpacks.get(join_log.amount)
         except Exception, reason:
-            logger.debug(u"获得用户的预配置红包抛异常, reason:%s" % (reason, ))
+            logger.debug(u"获得用户的预配置红包抛异常, reason:{0}".format(reason))
 
         try:
             redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
         except Exception, reason:
-            logger.debug(u'给用户 %s 发送红包报错, redpack_event:%s, reason:%s' % (user, redpack_event,reason,))
+            logger.debug(u'给用户 {0}发送红包报错, redpack_event:{1}, reason:{2}'.format(user, redpack_event,reason))
             raise
         else:
             join_log.join_times -= 1
@@ -2466,23 +2467,33 @@ class RewardDistributeAPIView(APIView):
         self.get_redpacks()
 
     def post(self, request):
-        if not request.user.is_authenticated():
-            logger.debug(u'用户没有登录')
+        openid = request.DATA.get("openid", "")
+        if None == openid:
             to_json_response = {
-                'ret_code': 3000,
-                'message': u'用户没有登陆，请先登陆',
+                'ret_code': 3010,
+                'message': u'openid 没有传入',
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
+        w_user = WeixinUser.objects.filter(openid=openid)
+        if not w_user.exists() or not w_user.user:
+            to_json_response = {
+                'ret_code': 3011,
+                'message': u'weixin info No saved',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+        else:
+            user = w_user.user
+
         today = time.strftime("%Y-%m-%d", time.localtime())
-        join_log = ActivityJoinLog.objects.filter(user=request.user, create_time__gte=today).first()
+        join_log = ActivityJoinLog.objects.filter(user=user, create_time__gte=today).first()
         self.prepare_for_distribute()
         if not join_log:
-            logger.debug(u'用户(%s) 第一次进入页面，给用户生成抽奖记录' % (request.user,))
+            logger.debug(u'用户{0}第一次进入页面，给用户生成抽奖记录'.format(user))
             join_log = self.decide_which_to_distribute(request)
 
         if join_log.join_times == 0:
-            logger.debug(u'用户(%s)的抽奖次数已经用完了' % (request.user))
+            logger.debug(u'用户{0}的抽奖次数已经用完了'.format(user))
             to_json_response = {
                 'ret_code': 3001,
                 'message': u'用户的抽奖次数已经用完了',
@@ -2492,10 +2503,10 @@ class RewardDistributeAPIView(APIView):
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
         action = request.DATA.get("action", "")
-        logger.debug(u"用户(%s)前端传入的行为是：%s" % (request.user, action,))
+        logger.debug(u"用户{0}前端传入的行为是：{1}".format(user, action,))
 
         if action not in ("ENTER_WEB_PAGE", "GET_REWARD", "IGNORE"):
-            logger.debug(u"参数不正确，action:%s" % (action,))
+            logger.debug(u"参数不正确，action:{0}".format(action))
             to_json_response = {
                 'ret_code': 3002,
                 'message': u'传入的参数不正确',
@@ -2503,8 +2514,8 @@ class RewardDistributeAPIView(APIView):
 
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-        join_log = ActivityJoinLog.objects.filter(user=request.user, create_time__gte=today).first()
-        logger.debug(u"剩余的抽奖次数：%s" % (join_log.join_times,))
+        join_log = ActivityJoinLog.objects.filter(user=user, create_time__gte=today).first()
+        logger.debug(u"剩余的抽奖次数：{0}".format(join_log.join_times,))
         if action == "ENTER_WEB_PAGE":
             to_json_response = {
                 'ret_code': 4000,
@@ -2515,7 +2526,7 @@ class RewardDistributeAPIView(APIView):
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
         if action == "GET_REWARD":
-            join_log = self.distribute_redpack(request.user)
+            join_log = self.distribute_redpack(user)
             to_json_response = {
                 'ret_code': 0,
                 'message': u'发奖成功',
@@ -2525,7 +2536,7 @@ class RewardDistributeAPIView(APIView):
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
         if action == "IGNORE":
-            join_log = self.ignore_post_action(request.user)
+            join_log = self.ignore_post_action(user)
             to_json_response = {
                 'ret_code': 4002,
                 'message': u'忽略本次操作',
