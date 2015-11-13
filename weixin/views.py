@@ -63,7 +63,7 @@ import datetime, time
 from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEvent, UnsubscribeEvent, SubscribeEvent,\
                              TemplateSendJobFinishEvent)
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("weixin")
 
 def checkBindDeco(func):
     @functools.wraps(func)

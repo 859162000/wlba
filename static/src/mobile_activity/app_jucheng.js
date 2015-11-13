@@ -216,11 +216,13 @@ org.jucheng = (function(org){
                     //lib.$submit.removeAttr('disabled');
                     _self.$body_h.css({'height': '0'});
                     _self.$phone.attr('data-existing', true);
+                    _self.$nbsp.css('height','0rem');
                     lib.$sign.css('height','1.275rem').html('该用户已注册');
                 }else{
                     lib.$submit.attr('disabled',true);
                     _self.$body_h.css({'height': '5.6rem'});
                     _self.$phone.attr('data-existing', false);
+                    _self.$nbsp.css('height','.7rem');
                     $(document.body).trigger('from:check', [_self.checkfilter(3), false, false]);
                 }
             }
