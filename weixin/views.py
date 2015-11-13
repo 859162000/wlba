@@ -75,7 +75,7 @@ def checkBindDeco(func):
         check_bind = False
         if isinstance(self.msg, BaseEvent):
             if isinstance(self.msg,(ClickEvent,)):
-                if self.msg.key == 'test_hmm' or self.msg.key == 'my_account':
+                if self.msg.key == 'subscribe_service' or self.msg.key == 'my_account':
                     check_bind = True
         elif isinstance(self.msg, BaseMessage):
             content = self.msg.content.lower()
