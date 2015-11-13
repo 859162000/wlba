@@ -333,7 +333,7 @@ org.mmIndex = (function(org){
                     callback && callback(data);
                 },
                 error: function (data) {
-                    console.log(data)
+                    //console.log(data)
                 },
                 complete: function(){
                     _self.$phone.removeClass('maimai-load');
