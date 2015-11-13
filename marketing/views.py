@@ -2289,7 +2289,7 @@ class AppLotteryTemplate(TemplateView):
         openid = self.request.GET.get('openid')
 
         if not openid:
-            redirect_uri = settings.CALLBACK_HOST + reverse("weixin_share_order_gift")
+            redirect_uri = settings.CALLBACK_HOST + reverse("app_lottery")
             count = 0
             for key in self.request.GET.keys():
                 if count == 0:
@@ -2487,6 +2487,8 @@ class RewardDistributeAPIView(APIView):
 
         today = time.strftime("%Y-%m-%d", time.localtime())
         join_log = ActivityJoinLog.objects.filter(user=user, create_time__gte=today).first()
+        redpack_event = self.redpacks.get(join_log.amount)
+
         self.prepare_for_distribute()
         if not join_log:
             logger.debug(u'用户{0}第一次进入页面，给用户生成抽奖记录'.format(user))
@@ -2497,7 +2499,8 @@ class RewardDistributeAPIView(APIView):
             to_json_response = {
                 'ret_code': 3001,
                 'message': u'用户的抽奖次数已经用完了',
-                'left': 0
+                'left': 0,
+                'redpack': redpack_event.id
             }
 
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -2523,7 +2526,8 @@ class RewardDistributeAPIView(APIView):
                 'ret_code': 4000,
                 'message': u'进入页面',
                 'amount': str(join_log.amount),
-                'left': join_log.join_times
+                'left': join_log.join_times,
+                'redpack': redpack_event.id
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -2533,7 +2537,8 @@ class RewardDistributeAPIView(APIView):
                 'ret_code': 0,
                 'message': u'发奖成功',
                 'amount': str(join_log.amount),
-                'left': join_log.join_times
+                'left': join_log.join_times,
+                'redpack': redpack_event.id
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -2543,7 +2548,8 @@ class RewardDistributeAPIView(APIView):
                 'ret_code': 4002,
                 'message': u'忽略本次操作',
                 'amount': str(join_log.amount),
-                'left': join_log.join_times
+                'left': join_log.join_times,
+                'redpack': redpack_event.id
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 

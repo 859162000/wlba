@@ -5,11 +5,13 @@ if settings.ENV == settings.ENV_PRODUCTION:
     UNBIND_SUCCESS_TEMPLATE_ID = "lGr-ClUgsv-ruam0ZvN_O-xy_7EzB__1tbCInUs_tOE"
     ACCOUNT_INFO_TEMPLATE_ID = 'EUnDdpMNocmYynxiw939HGwv0_uG1wDrvg-xJ-Lhdz8'
     PRODUCT_ONLINE_TEMPLATE_ID = "itviF9BIU8BBjEXwPOEMiElLzFByxMZ6-FjvYapk8pY"
+    AWARD_COUPON_TEMPLATE_ID  = "_-Xlr2icPtM5sXj0VKuF3fleKYR-Rl4a_h2gpcd_95M"
 else:
     BIND_SUCCESS_TEMPLATE_ID = "ze8Mgao5wi5SJpfkQB_OQUTiX9NqnB0V6oLsm_GaTFI"
     UNBIND_SUCCESS_TEMPLATE_ID = "TtmpZytSck7cULmFw2Oo-LK2N2VZ5A4wQ1JpXmaoo2s"
     ACCOUNT_INFO_TEMPLATE_ID = "WWpxe28g8z9YWADrCUGFfznzcxL-6Pg6i5zgToPCCqw"
     PRODUCT_ONLINE_TEMPLATE_ID = "CBIMqm2GrhDTlilYE_jLJkFxkzzOsDItSsRTDoKtO-Q"
+    AWARD_COUPON_TEMPLATE_ID  = "_-Xlr2icPtM5sXj0VKuF3fleKYR-Rl4a_h2gpcd_95M"
 
 from copy import deepcopy
 
@@ -144,5 +146,23 @@ Message_template = {
                }
         },
         "url": "",
+    },
+    AWARD_COUPON_TEMPLATE_ID:{
+        "top_color":'#88ffdd',
+        "data":{
+            "first":{
+                "value":'{value}',
+                "color":"#173177"
+            },
+            "present_income":{
+                "value":"{value}",#获赠金额
+                "color":"#173177"
+            },
+           "remark":{
+               "value":u"如有疑问，请拨打6546544654",
+               "color":"#173177"
+           },
+        },
+       "url":""
     }
 }
