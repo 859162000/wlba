@@ -61,7 +61,8 @@ urlpatterns = patterns(
     url(r'^two-eleven/$', TemplateView.as_view(template_name="two-eleven.jade")),
     url(r'^bid/$', TemplateView.as_view(template_name="bid.jade")),
     url(r'^365_gu/$', TemplateView.as_view(template_name="365_gu.jade")),
-     url(r'thanksgiving/$', TemplateView.as_view(template_name="thanksgiving.jade")),
+    url(r'thanksgiving/$', TemplateView.as_view(template_name="thanksgiving.jade")),
+    url(r'winter_brid/$', TemplateView.as_view(template_name="winter_bird.jade")),
 )
 
 # app URL
@@ -85,7 +86,7 @@ urlpatterns += patterns(
     url(r'^app_qixi/$', TemplateView.as_view(template_name="app_qixi.jade")),
     url(r'^app_gold_day/$', TemplateView.as_view(template_name="app_gold_day.jade")),
     url(r'^app_pc_download/$', TemplateView.as_view(template_name="app_pc_download.jade")),
-    url(r'^app_lottery/$', AppLotteryTemplate.as_view(template_name="app_lottery.jade")),
+    url(r'^app_lottery/$', AppLotteryTemplate.as_view(template_name="app_lottery.jade"), name="app_lottery"),
     url(r'^lingcai/phone/$', OpenidPhoneForFencai.as_view()),
     url(r'^app_scratch/$', TemplateView.as_view(template_name="app_scratch.jade")),
     url(r'^app_scratch_copy/$', login_required(TemplateView.as_view(template_name="app_scratch_copy.jade"), login_url='/accounts/token_login/')),

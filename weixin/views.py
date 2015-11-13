@@ -29,7 +29,7 @@ from wanglibao_rest import utils
 from django.contrib.auth.models import User
 from constant import MessageTemplate
 from constant import (ACCOUNT_INFO_TEMPLATE_ID, BIND_SUCCESS_TEMPLATE_ID, UNBIND_SUCCESS_TEMPLATE_ID,
-                      PRODUCT_ONLINE_TEMPLATE_ID)
+                      PRODUCT_ONLINE_TEMPLATE_ID, AWARD_COUPON_TEMPLATE_ID)
 from weixin.util import getAccountInfo
 from wanglibao_profile.models import WanglibaoUserProfile
 
@@ -70,8 +70,8 @@ def checkBindDeco(func):
     def wrapper(self, *args, **kwargs):
         toUserName = self.msg._data['ToUserName']
         fromUserName = self.msg._data['FromUserName']
-        account = Account.objects.get(original_id=toUserName)
-        w_user = getOrCreateWeixinUser(fromUserName, account)
+        weixin_account = WeixinAccounts.getByOriginalId(toUserName)
+        w_user = getOrCreateWeixinUser(fromUserName, weixin_account)
         check_bind = False
         if isinstance(self.msg, BaseEvent):
             if isinstance(self.msg,(ClickEvent,)):
@@ -130,14 +130,13 @@ class WeixinJoinView(View):
         fromUserName = msg._data['FromUserName']
         createTime = msg._data['CreateTime']
         weixin_account = WeixinAccounts.getByOriginalId(toUserName)
-        account = weixin_account.db_account
         if isinstance(msg, BaseEvent):
             if isinstance(msg, ClickEvent):
                 reply = self.process_click_event(msg)
             elif isinstance(msg, SubscribeEvent):
                 reply = self.process_subscribe(msg, toUserName)
             elif isinstance(msg, UnsubscribeEvent):
-                w_user = getOrCreateWeixinUser(fromUserName, account)
+                w_user = getOrCreateWeixinUser(fromUserName, weixin_account)
                 if w_user.subscribe != 0:
                     w_user.subscribe = 0
                     w_user.save()
@@ -151,7 +150,7 @@ class WeixinJoinView(View):
                 reply = -1
         elif isinstance(msg, BaseMessage):
             if isinstance(msg, TextMessage):
-                reply = self.check_service_subscribe(msg, account)
+                reply = self.check_service_subscribe(msg, weixin_account)
                 # 自动回复  5000次／天
                 # if not reply:
                 #     reply = tuling(msg)
@@ -174,8 +173,8 @@ class WeixinJoinView(View):
         sub_services = SubscribeService.objects.filter(channel='weixin', is_open=True).all()
         toUserName = msg._data['ToUserName']
         fromUserName = msg._data['FromUserName']
-        account = WeixinAccounts.getByOriginalId(toUserName)
-        w_user = getOrCreateWeixinUser(fromUserName, account.db_account)
+        weixin_account = WeixinAccounts.getByOriginalId(toUserName)
+        w_user = getOrCreateWeixinUser(fromUserName, weixin_account)
         if msg.key == 'subscribe_service':
             txt = u'客官，请回复相关数字订阅最新项目通知，系统会在第一时间发送给您相关信息。\n'
             if len(sub_services)>0:
@@ -210,9 +209,9 @@ class WeixinJoinView(View):
         return reply
 
     @checkBindDeco
-    def check_service_subscribe(self, msg, account):
+    def check_service_subscribe(self, msg, weixin_account):
         fromUserName = msg._data['FromUserName']
-        w_user = getOrCreateWeixinUser(fromUserName, account)
+        w_user = getOrCreateWeixinUser(fromUserName, weixin_account)
         content = msg.content.lower()
         reply = None
         txt = None
@@ -246,8 +245,8 @@ class WeixinJoinView(View):
     def process_subscribe(self, msg, original_id):
         fromUserName = msg._data['FromUserName']
         eventKey = msg._data['EventKey']
-        account = WeixinAccounts.getByOriginalId(original_id)
-        w_user = getOrCreateWeixinUser(fromUserName, account.db_account)
+        weixin_account = WeixinAccounts.getByOriginalId(original_id)
+        w_user = getOrCreateWeixinUser(fromUserName, weixin_account)
         reply = None
         if w_user.subscribe != 1:
             w_user.subscribe = 1
@@ -313,19 +312,19 @@ class WeixinJoinView(View):
 
 
 
-def getOrCreateWeixinUser(openid, account):
+def getOrCreateWeixinUser(openid, weixin_account):
     w_user = WeixinUser.objects.filter(openid=openid).first()
     if not w_user:
         w_user = WeixinUser()
         w_user.openid = openid
-        w_user.account_original_id = account.original_id
+        w_user.account_original_id = weixin_account.db_account.original_id
         w_user.save()
-    if w_user.account_original_id != account.original_id:
-        w_user.account_original_id = account.original_id
+    if w_user.account_original_id != weixin_account.db_account.original_id:
+        w_user.account_original_id = weixin_account.db_account.original_id
         w_user.save()
     if not w_user.nickname:
         try:
-            user_info = account.get_user_info(openid)
+            user_info = weixin_account.get_user_info(openid)
             w_user.nickname = user_info.get('nickname', "")
             w_user.sex = user_info.get('sex')
             w_user.city = user_info.get('city', "")
@@ -420,9 +419,8 @@ class SendTemplateMessage(APIView):
     @classmethod
     def sendTemplate(cls, weixin_user, message_template):
         weixin_account = WeixinAccounts.getByOriginalId(weixin_user.account_original_id)
-        account = weixin_account.db_account
         # account = Account.objects.get(original_id=weixin_user.account_original_id)
-        client = WeChatClient(account.app_id, account.app_secret)
+        client = WeChatClient(weixin_account.app_id, weixin_account.app_secret)
         print message_template.url
         client.message.send_template(weixin_user.openid, template_id=message_template.template_id,
                                      top_color=message_template.top_color, data=message_template.data,
@@ -1109,12 +1107,14 @@ class AuthorizeCode(APIView):
     def get(self, request):
         account_id = self.request.GET.get('state')
         try:
-            account = Account.objects.get(original_id=account_id)
-        except Account.DoesNotExist:
-            try:
+            account = None
+            weixin_account = WeixinAccounts.getByOriginalId(account_id)
+            if weixin_account:
+                account = weixin_account.db_account
+            if not account:
                 account = Account.objects.get(id=account_id)
-            except Account.DoesNotExist:
-                return HttpResponseNotFound()
+        except Account.DoesNotExist:
+            return HttpResponseNotFound()
         auth = request.GET.get('auth')
         redirect_uri = settings.WEIXIN_CALLBACK_URL + reverse("weixin_authorize_user_info")
         count = 0
@@ -1141,12 +1141,14 @@ class AuthorizeUser(APIView):
     def get(self, request):
         account_id = self.request.GET.get('state')
         try:
-            account = Account.objects.get(original_id=account_id)
-        except Account.DoesNotExist:
-            try:
+            account = None
+            weixin_account = WeixinAccounts.getByOriginalId(account_id)
+            if weixin_account:
+                account = weixin_account.db_account
+            if not account:
                 account = Account.objects.get(id=account_id)
-            except Account.DoesNotExist:
-                return HttpResponseNotFound()
+        except Account.DoesNotExist:
+            return HttpResponseNotFound()
         redirect_uri = self.request.GET.get('redirect_uri')
         redirect_url = ''
         if redirect_uri:
@@ -1231,9 +1233,8 @@ class GetAuthUserInfo(APIView):
             return Response({'errcode':-5, 'errmsg':'openid auth info is null'})
         # print w_user.account_original_id
         weixin_account = WeixinAccounts.getByOriginalId(w_user.account_original_id)
-        account = weixin_account.db_account
         try:
-            oauth = WeChatOAuth(account.app_id, account.app_secret, )
+            oauth = WeChatOAuth(weixin_account.app_id, weixin_account.app_secret, )
             if not w_user.auth_info.check_access_token():
                 res = oauth.refresh_access_token(w_user.auth_info.refresh_token)
                 w_user.auth_info.access_token = res['access_token']
@@ -1269,8 +1270,7 @@ class GetUserInfo(APIView):
         if not w_user:
             return Response({'errcode':-4, 'errmsg':'openid is not exist'})
         weixin_account = WeixinAccounts.getByOriginalId(w_user.account_original_id)
-        account = weixin_account.db_account
-        user_info = account.get_user_info(w_user.openid)
+        user_info = weixin_account.get_user_info(w_user.openid)
         try:
             if not w_user.nickname:
                 w_user.nickname = user_info.get('nickname', "")
@@ -1299,8 +1299,8 @@ class GenerateQRSceneTicket(APIView):
             return Response({'errcode':-2, 'errmsg':"-2"})
         if qrcode.ticket:
             return Response({'errcode':-3, 'errmsg':"-3"})
-        account = Account.objects.get(original_id=qrcode.account_original_id)
-        client = WeChatClient(account.app_id, account.app_secret, account.access_token)
+        weixin_account = WeixinAccounts.getByOriginalId(qrcode.account_original_id)
+        client = WeChatClient(weixin_account.app_id, weixin_account.app_secret, weixin_account.access_token)
         qrcode_data = {"action_name":"QR_LIMIT_STR_SCENE", "action_info":{"scene": {"scene_str": qrcode.scene_str}}}
         try:
             rs = client.qrcode.create(qrcode_data)
@@ -1318,10 +1318,10 @@ class GenerateQRLimitSceneTicket(APIView):
         original_id = request.POST.get('original_id')
         if not original_id:
             return Response({'errcode':-1, 'errmsg':"-1"})
-        # account = Account.objects.get(original_id=original_id)
+
         weixin_account = WeixinAccounts.getByOriginalId(original_id)
-        account = weixin_account.db_account
-        client = WeChatClient(account.app_id, account.app_secret, account.access_token)
+
+        client = WeChatClient(weixin_account.app_id, weixin_account.app_secret, weixin_account.access_token)
         qrcode_data = {"action_name": "QR_LIMIT_STR_SCENE", "action_info": {"scene": {"scene_str": str(request.user.wanglibaouserprofile.phone)}}}
         # qrcode_data = {"action_name":"QR_LIMIT_SCENE", "action_info":{"scene": {"scene_id": phone}}}
         try:
@@ -1395,7 +1395,20 @@ def testTemplate():
 
 
 
-
+def sendAwardRedpackTempalte(openid, amount_str, type, rule_desc=""):
+    first = u'您获得了%s'
+    if type == 0:
+        first = first%(u'红包')
+    if type ==1:
+        first = first%(u'加息券')
+    template = MessageTemplate(AWARD_COUPON_TEMPLATE_ID,
+        first=first, present_income=amount_str, remark=rule_desc)
+    try:
+        w_user = WeixinUser.objects.get(openid=openid)
+        if w_user:
+            SendTemplateMessage.sendTemplate(w_user, template)
+    except:
+        pass
 
 def checkAndSendProductTemplate(sender, **kw):
     # print kw
