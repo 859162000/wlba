@@ -2289,7 +2289,7 @@ class AppLotteryTemplate(TemplateView):
         openid = self.request.GET.get('openid')
 
         if not openid:
-            redirect_uri = settings.CALLBACK_HOST + reverse("weixin_share_order_gift")
+            redirect_uri = settings.CALLBACK_HOST + reverse("app_lottery")
             count = 0
             for key in self.request.GET.keys():
                 if count == 0:
