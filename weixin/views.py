@@ -29,7 +29,7 @@ from wanglibao_rest import utils
 from django.contrib.auth.models import User
 from constant import MessageTemplate
 from constant import (ACCOUNT_INFO_TEMPLATE_ID, BIND_SUCCESS_TEMPLATE_ID, UNBIND_SUCCESS_TEMPLATE_ID,
-                      PRODUCT_ONLINE_TEMPLATE_ID)
+                      PRODUCT_ONLINE_TEMPLATE_ID, AWARD_COUPON_TEMPLATE_ID)
 from weixin.util import getAccountInfo
 from wanglibao_profile.models import WanglibaoUserProfile
 
@@ -1395,7 +1395,20 @@ def testTemplate():
 
 
 
-
+def sendAwardRedpackTempalte(openid, amount_str, type, rule_desc=""):
+    first = u'您获得了%s'
+    if type == 0:
+        first = first%(u'红包')
+    if type ==1:
+        first = first%(u'加息券')
+    template = MessageTemplate(AWARD_COUPON_TEMPLATE_ID,
+        first=first, present_income=amount_str, remark=rule_desc)
+    try:
+        w_user = WeixinUser.objects.get(openid=openid)
+        if w_user:
+            SendTemplateMessage.sendTemplate(w_user, template)
+    except:
+        pass
 
 def checkAndSendProductTemplate(sender, **kw):
     # print kw
