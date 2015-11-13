@@ -52,7 +52,7 @@ html
             dt 110元
             dd 365谷代金券礼包
           img.logo_img(src="/static/imgs/pc_activity/365_gu/registered_img.png")
-          img.button#button(src="/static/imgs/pc_activity/365_gu/registered_button.png")
+          .button#button
     .wrap_main
       img.modular_title.modular_title_1(src="/static/imgs/pc_activity/365_gu/module_1.png")
       .act_wrap
@@ -85,10 +85,51 @@ html
           .main
             .title 新用户最高可享有
             .goods_wrap
-              img(src="/static/imgs/pc_activity/365_gu/goods_3.jpg")
-              p 4.5千克<br>五常长粒香米
-
-
+              img(src="/static/imgs/pc_activity/365_gu/goods_5.jpg")
+              p 580元网利宝现金红包
+      #button_get
+      img.modular_title.modular_title_2(src="/static/imgs/pc_activity/365_gu/module_2.png")
+      .act_rule
+        p!='<span class="number_1">1.</span> 活动时间：待定；'
+        p!='<span class="number_1">2.</span> 用户注册网利宝可获赠0.5千克五常大米+ 110元365谷代金券礼包，<br><span class="number_1"></span> 礼包包含80元代金券1张（满359元可用）、20元代金券1张（满119元可用）、5元代金券2张（全场通用）；'
+        p!='<span class="number_1">3.</span> 单笔首次投资大于等于1000元送4.5千克五常长粒香米+210元365谷代金券礼包，<br><span class="number_1"></span> 礼包包含80元代金券1张（满359可用）、20元代金券1张（满119元可用）、100元代金券1张（满529元可用）、5元代金券2张（全场通用）；'
+        p!='<span class="number_1">4.</span> 网利宝新用户享580元现金红包：'
+        p!='<span class="number_2"></span><span class="number_3">（1）</span>新手注册送10元红包（单笔投资1000元可抵扣使用）；'
+        p!='<span class="number_2"></span><span class="number_3">（2）</span>新手完成实名认证送20元红包（单笔投资2000元可抵扣使用）；'
+        p!='<span class="number_2"></span><span class="number_3">（3）</span>新手首次充值送50元红包（单笔投资3000元可抵扣使用）；'
+        p!='<span class="number_2"></span><span class="number_3">（4）</span>新手完成首次投资最高送500元红包'
+        .demo
+          .left
+            p 5000元≤首次投资＜20000元，送150元组合红包，包含：
+            p a. 50元，限投3月标，单笔投资满15000元可用；
+            p b. 100元，限投6月标，单笔投资满20000元可用；
+          .right
+            p 20000元≤首次投资，送500元组合红包，包含：
+            p a. 150元，限投3月标，单笔投资满40000元可用；
+            p b. 350元，限投6月标，单笔投资满50000元可用；
+        p!='<span class="number_1">5.</span> 获得五常大米用户请留意网利宝站内信，凭站内信兑换码兑换领取。365谷代金券请查看365谷账户并抵扣使用。'
+        img.modular_title.modular_title_3(src="/static/imgs/pc_activity/365_gu/module_3.png")
+        .introduction_wrap
+          .box
+            img(src="/static/imgs/pc_activity/365_gu/advantage_1.png")
+            dl
+              dt 信赖
+              dd IDG资本投资A轮融资<br>鸿利光电投资B轮融资
+          .box
+            img(src="/static/imgs/pc_activity/365_gu/advantage_2.png")
+            dl
+              dt 安全
+              dd 第三方资金托管<br>阳光保险承保资金安全
+          .box
+            img(src="/static/imgs/pc_activity/365_gu/advantage_3.png")
+            dl
+              dt 权威
+              dd 华尔街精英金融团队<br>IT数据风控系统
+          .box
+            img(src="/static/imgs/pc_activity/365_gu/advantage_4.png")
+            dl
+              dt 高收益
+              dd 30余倍银行活期收益<br>100元起投
     .popup_bg
     .register_wrap.popup(style="display:none")
         .close_ico
@@ -151,12 +192,13 @@ html
                   .space-vertical-s
                 p.xun-p 已有账号,
                   a(href="/accounts/login/?next=/accounts/home/") 立即登录
-    .get_ticket.popup(style="display:none")
-      .title 恭喜！您已成功注册网利宝，<br>实名认证领取20元现金红包；<br>立即投资，疯抢限量门票。
-      ul
-        li!='80元门票剩余 <span class="shi"></span> 张'
-        li!='188元门票剩余 <span class="bai"></span> 张'
-      a.button#get_ticket_button(href="/accounts/home/?promo_token=jcw") 立即抢门票
+    .popup_bg
+    .get_red.popup
+      img.logo_img(src="/static/imgs/pc_activity/365_gu/logo.jpg")
+      .title_text 恭喜您<br>已成功领取奖励
+      img.code(src="/static/imgs/pc_activity/365_gu/code.jpg")
+      .text 扫码关注微信
+      a.href(href="/accounts/home/?promo_token=jcw") 立即抢门票
     include global/g_footer
     script.
       require(['/static/js/jucheng.js?v=201511065'])
