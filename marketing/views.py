@@ -2391,12 +2391,12 @@ class RewardDistributeAPIView(APIView):
         logger.debug(u"红包的大小依次为：%s" % (self.redpack_amount, ))
         logger.debug(u"对应红包的获奖概率是：%s" % (self.rates, ))
 
-    def decide_which_to_distribute(self, request):
+    def decide_which_to_distribute(self, user):
         """ 决定发送哪一个奖品
         """
         sent_count = ActivityJoinLog.objects.filter(action_name=self.action_name).count() + 1
         today = time.strftime("%Y-%m-%d", time.localtime())
-        join_log = ActivityJoinLog.objects.filter(user=request.user, create_time__gt=today).first()
+        join_log = ActivityJoinLog.objects.filter(user=user, create_time__gt=today).first()
         if not join_log:
             rate = None
             for rate in self.rates:
@@ -2409,7 +2409,7 @@ class RewardDistributeAPIView(APIView):
             logger.debug(u"rate:{0},index:{1}, redpack_amount:{2}".format(rate,index, self.redpack_amount))
             try:
                 join_log = ActivityJoinLog.objects.create(
-                    user=request.user,
+                    user=user,
                     action_name=self.action_name,
                     join_times=3,
                     amount=self.redpack_amount[index],
@@ -2490,7 +2490,7 @@ class RewardDistributeAPIView(APIView):
         self.prepare_for_distribute()
         if not join_log:
             logger.debug(u'用户{0}第一次进入页面，给用户生成抽奖记录'.format(user))
-            join_log = self.decide_which_to_distribute(request)
+            join_log = self.decide_which_to_distribute(user)
 
         if join_log.join_times == 0:
             logger.debug(u'用户{0}的抽奖次数已经用完了'.format(user))
