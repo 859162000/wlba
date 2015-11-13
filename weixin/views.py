@@ -1107,12 +1107,14 @@ class AuthorizeCode(APIView):
     def get(self, request):
         account_id = self.request.GET.get('state')
         try:
-            account = Account.objects.get(original_id=account_id)
-        except Account.DoesNotExist:
-            try:
+            account = None
+            weixin_account = WeixinAccounts.getByOriginalId(account_id)
+            if weixin_account:
+                account = weixin_account.db_account
+            if not account:
                 account = Account.objects.get(id=account_id)
-            except Account.DoesNotExist:
-                return HttpResponseNotFound()
+        except Account.DoesNotExist:
+            return HttpResponseNotFound()
         auth = request.GET.get('auth')
         redirect_uri = settings.WEIXIN_CALLBACK_URL + reverse("weixin_authorize_user_info")
         count = 0
@@ -1139,12 +1141,14 @@ class AuthorizeUser(APIView):
     def get(self, request):
         account_id = self.request.GET.get('state')
         try:
-            account = Account.objects.get(original_id=account_id)
-        except Account.DoesNotExist:
-            try:
+            account = None
+            weixin_account = WeixinAccounts.getByOriginalId(account_id)
+            if weixin_account:
+                account = weixin_account.db_account
+            if not account:
                 account = Account.objects.get(id=account_id)
-            except Account.DoesNotExist:
-                return HttpResponseNotFound()
+        except Account.DoesNotExist:
+            return HttpResponseNotFound()
         redirect_uri = self.request.GET.get('redirect_uri')
         redirect_url = ''
         if redirect_uri:
