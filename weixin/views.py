@@ -63,7 +63,7 @@ import datetime, time
 from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEvent, UnsubscribeEvent, SubscribeEvent,\
                              TemplateSendJobFinishEvent)
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("weixin")
 
 def checkBindDeco(func):
     @functools.wraps(func)
@@ -75,7 +75,7 @@ def checkBindDeco(func):
         check_bind = False
         if isinstance(self.msg, BaseEvent):
             if isinstance(self.msg,(ClickEvent,)):
-                if self.msg.key == 'test_hmm' or self.msg.key == 'my_account':
+                if self.msg.key == 'subscribe_service' or self.msg.key == 'my_account':
                     check_bind = True
         elif isinstance(self.msg, BaseMessage):
             content = self.msg.content.lower()
@@ -111,16 +111,19 @@ class WeixinJoinView(View):
         return True
 
     def get(self, request, account_key):
+        logger.debug("entering get =============================/weixin/join/%s"%account_key)
         if not self.check_signature(request, account_key):
             return HttpResponseForbidden()
 
         return HttpResponse(request.GET.get('echostr'))
 
     def post(self, request, account_key):
+        logger.debug("entering post=============================/weixin/join/%s"%account_key)
         if not self.check_signature(request, account_key):
             return HttpResponseForbidden()
         # account = Account.objects.get(pk=account_key) #WeixinAccounts.get(account_key)
         self.msg = parse_message(request.body)
+        logger.debug(self.msg)
         msg = self.msg
         print msg
         reply = None
@@ -453,6 +456,7 @@ class JumpPageTemplate(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(JumpPageTemplate, self).get_context_data(**kwargs)
         message = self.request.GET.get('message', 'ERROR')
+        logger.debug(message)
         context['message'] = message
         return {
             'context': context,
@@ -1386,7 +1390,7 @@ class AwardIndexTemplate(TemplateView):
         if not w_user:
             return redirectToJumpPage("error")
         if not w_user.user:
-            return redirectToJumpPage("一定要绑定网利宝账号才可以抽奖哦")
+            return redirectToJumpPage(u"一定要绑定网利宝账号才可以抽奖哦")
 
         return super(AwardIndexTemplate, self).dispatch(request, *args, **kwargs)
 
