@@ -1,11 +1,14 @@
 # encoding:utf-8
 from __future__ import unicode_literals
-from django.db import models
-from .common.wechat import gen_token
-from wechatpy.client import WeChatClient
-from django.contrib.auth.models import User
 from collections import OrderedDict
 import datetime
+
+from django.db import models
+from django.contrib.auth.models import User
+
+from .common.wechat import gen_token
+from wechatpy.client import WeChatClient
+from wechatpy.client.api.qrcode import WeChatQRCode
 
 
 class Account(models.Model):
@@ -135,6 +138,26 @@ class Account(models.Model):
         self.oauth_refresh_token = ''
         self.save()
 
+class QrCode(models.Model):
+    account_original_id = models.CharField('所属公众号原始ID', max_length=32, blank=True, db_index=True)
+    ticket = models.CharField('ticket', max_length=512, null=False)
+    expire_at = models.DateTimeField('ticket过期时间', auto_now_add=True, blank=True, null=True)
+    url = models.CharField('url', max_length=512, null=False)
+    qrcode_url = models.CharField('qrcode_url', max_length=512, null=False)
+    scene_str = models.CharField('scene_str', max_length=128, null=False)
+    create_at = models.DateTimeField('生成时间', auto_now_add=True, blank=True, null=True)
+    def ticket_generate(self):
+        return u'<a href="/weixin/api/generate/qr_limit_scene_ticket/?id=%s" target="_self">生成ticket</a>' % (self.id,)
+    ticket_generate.short_description = u'生成ticket'
+    ticket_generate.allow_tags = True
+    def qrcode_link(self):
+        return u'<a href="%s" target="_blank">查看二维码</a>' % (WeChatQRCode.get_url(self.ticket))
+    qrcode_link.short_description = u'查看二维码'
+    qrcode_link.allow_tags = True
+    class Meta:
+        verbose_name_plural = '微信二维码'
+        ordering = ['-account_original_id', '-create_at']
+
 # 公众号类型
 class WeixinAccounts(object):
     data = OrderedDict()
@@ -168,6 +191,15 @@ class WeixinAccounts(object):
         'token': '6ad01528',
         'qrcode_url': '/static/imgs/admin/qrcode_for_gh_d852bc2cead2_258.jpg'
     }
+    account_test_hmm = {
+        'id': 'gh_3b82a2651647',
+        'name': '测试号',
+        'app_id': 'wx18689c393281241e',
+        'app_secret': '7b30aec7477fb8eaed0673fca8f41044',
+        'classify': '微信公众平台测试号',
+        'token': '6ad01528',
+        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_d852bc2cead2_258.jpg'
+    }
 
     id = None
     name = None
@@ -184,7 +216,10 @@ class WeixinAccounts(object):
     host_url = None
 
     def __init__(self, account_key=None):
-        self.append_account()
+        print '----------------------------1'
+        if not self.data:
+            print '-------------------------2'
+            self.append_account()
         if account_key:
             data = self.data.get(account_key)
             self.account_key = account_key
@@ -196,6 +231,7 @@ class WeixinAccounts(object):
         cls.data['main'] = cls.account_main
         cls.data['sub_1'] = cls.account_sub_1
         cls.data['test'] = cls.account_test
+        cls.data['account_test_hmm']=cls.account_test_hmm
 
     @classmethod
     def account_classify(cls):
@@ -221,6 +257,14 @@ class WeixinAccounts(object):
     @classmethod
     def get(cls, key):
         return cls(key)
+
+    @classmethod
+    def getByOriginalId(cls, original_id):
+        if not cls.data:
+            cls.append_account()
+        for key, account_info in cls.data.items():
+            if account_info['id'].strip() == original_id.strip():
+                return cls(key)
 
     @classmethod
     def all(cls):
@@ -301,7 +345,34 @@ class WeixinUser(models.Model):
     account_original_id = models.CharField('所属公众号原始ID', max_length=32, blank=True, db_index=True)
     user = models.ForeignKey(User, null=True)
     unionid = models.CharField('用户唯一标识', max_length=128, blank=True)
+    scene_id = models.CharField('渠道', max_length=64, blank=True, null=True)
     auth_info = models.ForeignKey(AuthorizeInfo, null=True)
+
+
+class SubscribeService(models.Model):
+    CHANNELS = (
+        ('wanglibao', u'网利宝平台'),
+        ('weixin', '微信平台'),
+    )
+    SERVICE_TYPES = (
+        (0, u'月标上线通知'),
+    )
+    key = models.CharField(u'服务快捷键', max_length=128, unique=True, db_index=True)
+    describe = models.CharField(u'服务描述', max_length=256)
+    type = models.IntegerField(u'类型', default=0, choices=SERVICE_TYPES)
+    num_limit = models.IntegerField(u'数值限制', default=0)
+    channel = models.CharField(u'从哪里订阅的服务', choices=CHANNELS, max_length=32)
+    is_open = models.BooleanField(u'是否开启服务', default=False)
+
+    class Meta:
+        verbose_name_plural = '订阅服务'
+        ordering = ['key']
+
+class SubscribeRecord(models.Model):
+    user = models.ForeignKey(User, null=False)
+    status = models.BooleanField(u'订阅状态, 0:退订,1:订阅', default=False)
+    service = models.ForeignKey(SubscribeService, null=False)
+    # update_at = models.DateTimeField('更新时间', auto_now_add=True)
 
 
 class Material(models.Model):
@@ -412,3 +483,4 @@ class ReplyKeyword(models.Model):
     pattern = models.IntegerField('匹配模式', choices=PATTERN_CHOICES)
     rule_reply = models.ForeignKey(ReplyRule)
     created_at = models.DateTimeField('创建时间', auto_now_add=True)
+

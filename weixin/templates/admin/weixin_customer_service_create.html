@@ -21,7 +21,7 @@
                 <p>最长6个汉字或12个英文字符</p>
             </div>
             <div>登录密码：<input type="text" name="password" /></div>
-            <div><button type="submit" disabled="disabled">添加客服账号</button></div>
+            <div><button type="submit" disabled="disabled" data-url="{% url 'admin_weixin_customer_service_api' %}">添加客服账号</button></div>
         </form>
     </div>
 </div>
@@ -74,7 +74,8 @@
 
             $submit.attr('disabled', false);
             $submit.on('click', function() {
-                var url = '{% url 'admin_weixin_customer_service_create_api' account.id %}';
+                var url = $(this).attr('data-url');
+                alert(url);
                 var data = {
                     'kf_account': $.trim($form.find('input[name=kf_account]').val()),
                     'nickname': $.trim($form.find('input[name=nickname]').val()),

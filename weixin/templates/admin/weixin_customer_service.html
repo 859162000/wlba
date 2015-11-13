@@ -3,7 +3,7 @@
 {% load url from future %}
 
 {% block content %}
-<div id="content-main">
+<div id="content-main" data-url="{% url 'admin_weixin_customer_service_api' %}">
     <div>
         <p>当前公众账号：{{ account.name }}</p>
         <p>多客服</p>
@@ -11,8 +11,24 @@
 
     <div>
         <ul>
-            <li><a href="{% url 'admin_weixin_customer_service_create' account.id %}">添加客服账号</a></li>
+            <li><a href="{% url 'admin_weixin_customer_service_create'  %}">添加客服账号</a></li>
         </ul>
     </div>
 </div>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    $(function(){
+        var url = $("#content-main").data("url");
+        $.ajax({
+            'type': "get",
+            'url': url,
+            'dataType': 'json',
+            'success': function(data){
+                console.log(data);
+            }
+        });
+    })
+</script>
 {% endblock %}
