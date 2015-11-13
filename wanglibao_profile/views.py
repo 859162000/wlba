@@ -98,10 +98,6 @@ class ProfileView(APIView):
                             }, status=400)
 
         profile_serializer.save()
-
-        # 处理第三方用户实名回调
-        CoopRegister(self.request).process_for_validate(user)
-
         return Response(profile_serializer.data, status=status.HTTP_200_OK)
 
 class TradePasswordView(APIView):
