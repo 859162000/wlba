@@ -123,7 +123,7 @@
 
 .invite-result-head
   text-align: center
-
+  color: #50B143
   .ive-sign-icon
     display: block
     width: 5rem
@@ -131,7 +131,6 @@
     margin: 1.15rem auto 0 auto
 
   .ive-sign-text
-    color: #50B143
     font-size: .9rem
     line-height: 1.5
 
@@ -187,8 +186,82 @@
 
 
 .invite-result-mask
-  position: absolute
+  display: -webkit-box
+  -webkit-box-pack: center
+  -webkit-box-align: center
+  position: fixed
   top: 0
   bottom: 0
   width: 100%
   background: rgba(0,0,0, .5)
+  padding: 0 1rem
+.invite-mask-cont
+  position: relative
+  width: 100%
+  color: #666
+  background: #fff
+  text-align: center
+  padding: 2rem 0
+  border-radius: .3rem
+  .invite-mask-dec
+    text-align: center
+    font-size: .7rem
+    line-height: 1.4
+  .invite-mask-erweima
+    width: 6rem
+    height: 6rem
+    display: block
+    margin: 1.5rem auto .75rem auto
+  .invite-mask-dec-bot
+    font-size: .6rem
+
+  .mask-close
+    display: -webkit-box
+    -webkit-box-pack: center
+    -webkit-box-align: center
+    position: absolute
+    top: -.85rem
+    right: -.75rem
+    width: 1.75rem
+    height: 1.75rem
+    border: 1px solid #CCCCCC
+    background: url("/static/imgs/mobile_activity/app_invite/close.png") no-repeat center #fff
+    background-size: .7rem
+    border-radius: 50%
+
+/* error  */
+
+.invite-error-head
+  color: #F5A623
+
+.invite-error-erweima
+  margin: 2rem 1rem 1rem 1rem
+  border: 1px dashed #5DB5F2
+
+  .invite-mask-cont
+    padding: 1.5rem 0
+
+/* share mask  */
+
+.invite-mask-share
+  position: absolute
+  top: 0
+  bottom: 0
+  width: 100%
+  background: rgba(0,0,0,.5)
+  .invite-icon-warp
+    text-align: right
+    margin-bottom: .5rem
+    .invite-mask-icon
+      display: inline-block
+      width: 5.375rem
+      height: auto
+      margin-right: 1rem
+  .invite-mask-dec
+    color: #fff
+    background: url("/static/imgs/mobile_activity/app_invite/share_sign_content.png") no-repeat center
+    background-size: 15rem
+    text-align: center
+    font-size: .7rem
+    line-height: 1.6
+    padding: 2rem 0
