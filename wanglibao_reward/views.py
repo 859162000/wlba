@@ -348,7 +348,7 @@ class WeixinShareDetailView(TemplateView):
             activity = record.activity.code if record else activitys[index]
             logger.debug("misc配置的activity有:%s, 本次使用的activity是：%s" % (activitys, activity))
 
-        if not self.has_combine_redpack(order_id, activity):
+        if not self.has_combine_redpack(order_id):
             self.generate_combine_redpack(order_id, activity)
 
         user_gift = self.has_got_redpack(phone_num, activity, order_id, openid)
