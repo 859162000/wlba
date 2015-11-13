@@ -2,8 +2,9 @@
 from django.conf import settings
 import urlparse
 from wanglibao_account.cooperation import CoopRegister
-from wanglibao_account.models import UserSource
+import logging
 
+logger = logging.getLogger("marketing")
 
 class PromotionTokenMiddleWare(object):
     def process_request(self, request):
@@ -31,12 +32,12 @@ class StatsKeyWordMiddleWare(object):
                 'keyword': 'q'
             },
             'www.sogou.com': {
-                'webiste': 'www.sogou.com',
+                'website': 'www.sogou.com',
                 'name': u'搜狗页面搜索',
                 'keyword': 'query'
             },
-            'm.sogou.com': {
-                'website': 'm.sogou.com',
+            'wap.sogou.com': {
+                'website': 'wap.sogou.com',
                 'name': u'搜狗移动站',
                 'keyword': 'keyword'
             },
@@ -67,9 +68,11 @@ class StatsKeyWordMiddleWare(object):
                 website = website[0]
                 qs = urlparse.parse_qs(res.query)
                 if self.statics[website]['keyword'] in qs:
-                    UserSource.objects.create(
-                        user=request.user,
-                        website=self.statics[website]['website'],
-                        site_name=self.statics[website]['name'],
-                        keyword="|".join(qs[self.statics[website]['keyword']])
-                    )
+                    request.session["promo_source_keyword"] = "|".join(qs[self.statics[website]['keyword']])
+                    request.session["promo_source_site_name"] = self.statics[website]['name']
+                    request.session['promo_source_website'] = self.statics[website]['website']
+                    if settings.DEBUG:
+                        logger.debug("keyword:%s, site_name:%s, website:%s" % (request.session.get("promo_source_keyword"),
+                                                                           request.session.get("promo_source_site_name"),
+                                                                           request.session.get("promo_source_website")
+                                                                           ))
