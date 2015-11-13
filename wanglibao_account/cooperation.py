@@ -2752,7 +2752,7 @@ class ZORecordView(APIView):
             full_path = urllib.unquote(full_path)
             # TODO 进行校验
             from hashlib import md5
-            check_sign = md5(settings.OZ_SECRET + '&' + full_path.split('?')[1].split('&sign')[0]).hexdigest()
+            check_sign = md5(settings.ZO_SECRET + '&' + full_path.split('?')[1].split('&sign')[0]).hexdigest()
             if sign == check_sign.upper():
                 return True
 
@@ -2849,7 +2849,7 @@ class ZOCountView(APIView):
             full_path = urllib.unquote(full_path)
             # TODO 进行校验
             from hashlib import md5
-            check_sign = md5(settings.OZ_SECRET + '&' + full_path.split('?')[1].split('&sign')[0]).hexdigest()
+            check_sign = md5(settings.ZO_SECRET + '&' + full_path.split('?')[1].split('&sign')[0]).hexdigest()
             if sign == check_sign.upper():
                 return True
 
