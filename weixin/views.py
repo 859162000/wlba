@@ -111,13 +111,14 @@ class WeixinJoinView(View):
         return True
 
     def get(self, request, account_key):
+        logger.debug("entering get =============================/weixin/join/%s"%account_key)
         if not self.check_signature(request, account_key):
             return HttpResponseForbidden()
 
         return HttpResponse(request.GET.get('echostr'))
 
     def post(self, request, account_key):
-        logger.debug("entering =============================/weixin/join/%s"%account_key)
+        logger.debug("entering post=============================/weixin/join/%s"%account_key)
         if not self.check_signature(request, account_key):
             return HttpResponseForbidden()
         # account = Account.objects.get(pk=account_key) #WeixinAccounts.get(account_key)
@@ -455,6 +456,7 @@ class JumpPageTemplate(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(JumpPageTemplate, self).get_context_data(**kwargs)
         message = self.request.GET.get('message', 'ERROR')
+        logger.debug(message)
         context['message'] = message
         return {
             'context': context,
