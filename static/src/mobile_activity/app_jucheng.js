@@ -141,7 +141,10 @@ org.mmIndex = (function(org){
                             }else{
                                 $(document.body).trigger('from:error',[data.message, true]);
                                 clearInterval(_self.intervalId);
-                                $('.check-submit').text('短信验证码').removeAttr('disabled').removeClass('postValidation')
+                                $('.check-submit').text('短信验证码').removeAttr('disabled').removeClass('postValidation');
+                                if(data.ret_code == 30011){
+                                    lib.$sign.html('该用户已注册');
+                                }
                                 return $(document.body).trigger('from:captcha');
                             }
                         },
@@ -156,43 +159,7 @@ org.mmIndex = (function(org){
                 org.ajax(ops);
             });
         },
-        //_write_info_button: function(){
-        //    var _self = this;
-        //    //保存按钮
-        //    _self.$write_info_button.on('click', function(){
-        //    alert('1');
-        //        var name = $('.write_info .name').val();
-        //        var phone = $('.write_info .phone').val();
-        //        var address = $('.write_info .address').val();
-        //        if(name&&phone&&address){
-        //            ops = {
-        //                url: '/api/gift/owner/?promo_token=jcw',
-        //                type: 'POST',
-        //                data: {
-        //                    phone : phone,
-        //                    address : address,
-        //                    name : name
-        //                },
-        //                success: function(data){
-        //                    //if(data.ret_code == 0){
-        //                    //    window.location.href = '/activity/maimai_success/?state=1'
-        //                    //}else if(data.ret_code === 1000){
-        //                    //    window.location.href = '/activity/maimai_success/?state=0'
-        //                    //}
-        //                    $('.write_info .text').text(data.message);
-        //                },
-        //                complete:function(){
-        //                    //lib.$submit.removeAttr('disabled').html('领 取');
-        //                }
-        //            }
-        //            org.ajax(ops);
-        //        }
-        //    });
-        //},
-        /*
-         * fn 回调函数
-         * delay 空闲时间
-         */
+
         _debounce :function(fn, delay){
             var timer = null;
             return function () {
@@ -324,21 +291,21 @@ org.mmIndex = (function(org){
             var _self = this;
                  phone = _self.$phone.val();
             //判断是否注册过
-            org.ajax({
-                url:'/api/user_exists/' + phone + '/',
-                beforeSend: function(){
-                    lib.$phone.addClass('maimai-load'); //显示加载动画
-                },
-                success: function(data){
-                    callback && callback(data);
-                },
-                error: function (data) {
-                    //console.log(data)
-                },
-                complete: function(){
-                    _self.$phone.removeClass('maimai-load');
-                }
-            })
+            //org.ajax({
+            //    url:'/api/user_exists/' + phone + '/',
+            //    beforeSend: function(){
+            //        lib.$phone.addClass('maimai-load'); //显示加载动画
+            //    },
+            //    success: function(data){
+            //        callback && callback(data);
+            //    },
+            //    error: function (data) {
+            //        console.log(data)
+            //    },
+            //    complete: function(){
+            //        _self.$phone.removeClass('maimai-load');
+            //    }
+            //})
         },
 
     }
