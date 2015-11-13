@@ -14,7 +14,6 @@ from wanglibao_pay.models import Card
 from wanglibao_account.utils import str_add_md5
 from django.db.models import F
 from wanglibao_redpack.backends import local_transform_str
-from wanglibao_account.cooperation import CoopRegister
 from django.contrib.auth.models import User
 from django.utils import timezone
 
@@ -98,10 +97,6 @@ class ProfileView(APIView):
                             }, status=400)
 
         profile_serializer.save()
-
-        # 处理第三方用户实名回调
-        CoopRegister(self.request).process_for_validate(user)
-
         return Response(profile_serializer.data, status=status.HTTP_200_OK)
 
 class TradePasswordView(APIView):
