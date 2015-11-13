@@ -343,7 +343,7 @@ org.detail = (function(org){
                 shareMainTit = conf.shareMainTit;//分享标题
                 shareBody = conf.shareBody;//分享描述
                 success = conf.success;
-                alert(shareMainTit);
+                //alert(shareMainTit);
                 //分享给微信好友
                 org.onMenuShareAppMessage({
                     title: shareMainTit,
@@ -351,7 +351,7 @@ org.detail = (function(org){
                     link: shareLink,
                     imgUrl: shareImg,
                     success: function(){
-                        alert(shareMainTit);
+                        //alert(shareMainTit);
                     }
                 });
                 //分享给微信朋友圈
@@ -360,7 +360,7 @@ org.detail = (function(org){
                     link : shareLink,
                     imgUrl: shareImg,
                     success: function(){
-                        alert(shareMainTit);
+                        //alert(shareMainTit);
                     }
                 });
                 //分享给QQ
@@ -869,7 +869,7 @@ function getCode(){//得到用户信息的二维码
     org.ajax({
         type: "POST",
         url: "/weixin/api/generate/qr_limit_scene_ticket/",
-        data: {"original_id":"gh_32e9dc3fab8e"},
+        data: {"original_id":"gh_32e9dc3fab8e"},//c:gh_32e9dc3fab8e
         success: function (data) {
             $("#sub-code").html("<img src='"+ data.qrcode_url + "' />");
         },
