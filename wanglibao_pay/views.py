@@ -125,11 +125,11 @@ class PayView(TemplateView):
             pay_info.save()
             OrderHelper.update_order(order, request.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
 
-            try:
-                # 处理第三方用户充值回调
-                CoopRegister(request).process_for_recharge(request.user)
-            except Exception, e:
-                logger.error(e)
+            # try:
+            #     # 处理PC第三方用户充值回调
+            #     CoopRegister(request).process_for_recharge(request.user, order.id)
+            # except Exception, e:
+            #     logger.error(e)
 
         except decimal.DecimalException:
             message = u'金额格式错误'
@@ -402,7 +402,7 @@ class CardViewSet(ModelViewSet):
         card.save()
 
         try:
-            # 处理第三方用户绑卡回调
+            # 处理第PC三方用户绑卡回调
             CoopRegister(request).process_for_binding_card(request.user)
         except Exception, e:
             logger.error(e)
@@ -750,12 +750,12 @@ class YeePayAppPayView(APIView):
         yeepay = third_pay.YeePay()
         result = yeepay.app_pay(request)
 
-        if result['ret_code'] == 0:
-            try:
-                # 处理第三方用户充值回调
-                CoopRegister(request).process_for_recharge(request.user)
-            except Exception, e:
-                logger.error(e)
+        # if result['ret_code'] == 0:
+        #     try:
+        #         # 处理第三方用户充值回调
+        #         CoopRegister(request).process_for_recharge(request.user)
+        #     except Exception, e:
+        #         logger.error(e)
 
         return Response(result)
 
@@ -811,13 +811,6 @@ class BindPayView(APIView):
         pay = third_pay.KuaiPay()
         result = pay.pre_pay(request)
 
-        if result['ret_code'] == 0:
-            try:
-                # 处理第三方用户充值回调
-                CoopRegister(request).process_for_recharge(request.user)
-            except Exception, e:
-                logger.error(e)
-
         return Response(result)
 
 
@@ -836,7 +829,8 @@ class KuaiShortPayCallbackView(View):
                                   pm['order_id'],
                                   pm['ref_number'],
                                   pm['res_content'],
-                                  pm['signature'])
+                                  pm['signature'],
+                                  request)
 
         return HttpResponse(result, content_type='text/xml')
 
@@ -1044,7 +1038,6 @@ class UnbindCardView(APIView):
         result = third_pay.card_unbind(request)
         return Response(result)
 
-
 class BindPayDepositView(APIView):
     """ 获取验证码或快捷支付 """
     permission_classes = (IsAuthenticated, )
@@ -1052,6 +1045,7 @@ class BindPayDepositView(APIView):
     @require_trade_pwd
     def post(self, request):
         result = third_pay.bind_pay_deposit(request)
+
         return Response(result)
 
 class BindPayDynnumNewView(APIView):
@@ -1061,6 +1055,7 @@ class BindPayDynnumNewView(APIView):
     @require_trade_pwd
     def post(self, request):
         result = third_pay.bind_pay_dynnum(request)
+
         return Response(result)
 
 class BankCardDelNewView(APIView):

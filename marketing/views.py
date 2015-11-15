@@ -2289,7 +2289,7 @@ class AppLotteryTemplate(TemplateView):
         openid = self.request.GET.get('openid')
 
         if not openid:
-            redirect_uri = settings.CALLBACK_HOST + reverse("weixin_share_order_gift")
+            redirect_uri = settings.CALLBACK_HOST + reverse("app_lottery")
             count = 0
             for key in self.request.GET.keys():
                 if count == 0:
@@ -2370,7 +2370,7 @@ class RewardDistributeAPIView(APIView):
 
     def get_redpacks(self):
         try:
-            rules = ActivityRule.objects.filter(activity__code=self.activity).first()
+            rules = ActivityRule.objects.filter(activity=self.activity).first()
         except Exception, reason:
             logger.debug(u"rules获取抛异常, reason:%s" % (reason,))
             raise
@@ -2391,12 +2391,12 @@ class RewardDistributeAPIView(APIView):
         logger.debug(u"红包的大小依次为：%s" % (self.redpack_amount, ))
         logger.debug(u"对应红包的获奖概率是：%s" % (self.rates, ))
 
-    def decide_which_to_distribute(self, request):
+    def decide_which_to_distribute(self, user):
         """ 决定发送哪一个奖品
         """
         sent_count = ActivityJoinLog.objects.filter(action_name=self.action_name).count() + 1
         today = time.strftime("%Y-%m-%d", time.localtime())
-        join_log = ActivityJoinLog.objects.filter(user=request.user, create_time__gt=today).first()
+        join_log = ActivityJoinLog.objects.filter(user=user, create_time__gt=today).first()
         if not join_log:
             rate = None
             for rate in self.rates:
@@ -2409,7 +2409,7 @@ class RewardDistributeAPIView(APIView):
             logger.debug(u"rate:{0},index:{1}, redpack_amount:{2}".format(rate,index, self.redpack_amount))
             try:
                 join_log = ActivityJoinLog.objects.create(
-                    user=request.user,
+                    user=user,
                     action_name=self.action_name,
                     join_times=3,
                     amount=self.redpack_amount[index],
@@ -2476,28 +2476,31 @@ class RewardDistributeAPIView(APIView):
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
         w_user = WeixinUser.objects.filter(openid=openid)
-        if not w_user.exists() or not w_user.user:
+        if not w_user.exists() or not w_user.first().user:
             to_json_response = {
                 'ret_code': 3011,
                 'message': u'weixin info No saved',
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
         else:
-            user = w_user.user
+            user = w_user.first().user
 
         today = time.strftime("%Y-%m-%d", time.localtime())
         join_log = ActivityJoinLog.objects.filter(user=user, create_time__gte=today).first()
+        redpack_event = self.redpacks.get(join_log.amount)
+
         self.prepare_for_distribute()
         if not join_log:
             logger.debug(u'用户{0}第一次进入页面，给用户生成抽奖记录'.format(user))
-            join_log = self.decide_which_to_distribute(request)
+            join_log = self.decide_which_to_distribute(user)
 
         if join_log.join_times == 0:
             logger.debug(u'用户{0}的抽奖次数已经用完了'.format(user))
             to_json_response = {
                 'ret_code': 3001,
                 'message': u'用户的抽奖次数已经用完了',
-                'left': 0
+                'left': 0,
+                'redpack': redpack_event.id
             }
 
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -2505,7 +2508,9 @@ class RewardDistributeAPIView(APIView):
         action = request.DATA.get("action", "")
         logger.debug(u"用户{0}前端传入的行为是：{1}".format(user, action,))
 
-        if action not in ("ENTER_WEB_PAGE", "GET_REWARD", "IGNORE"):
+        try:
+            assert action in ("ENTER_WEB_PAGE", "GET_REWARD", "IGNORE")
+        except AssertionError:
             logger.debug(u"参数不正确，action:{0}".format(action))
             to_json_response = {
                 'ret_code': 3002,
@@ -2521,7 +2526,8 @@ class RewardDistributeAPIView(APIView):
                 'ret_code': 4000,
                 'message': u'进入页面',
                 'amount': str(join_log.amount),
-                'left': join_log.join_times
+                'left': join_log.join_times,
+                'redpack': redpack_event.id
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -2531,7 +2537,8 @@ class RewardDistributeAPIView(APIView):
                 'ret_code': 0,
                 'message': u'发奖成功',
                 'amount': str(join_log.amount),
-                'left': join_log.join_times
+                'left': join_log.join_times,
+                'redpack': redpack_event.id
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -2541,7 +2548,8 @@ class RewardDistributeAPIView(APIView):
                 'ret_code': 4002,
                 'message': u'忽略本次操作',
                 'amount': str(join_log.amount),
-                'left': join_log.join_times
+                'left': join_log.join_times,
+                'redpack': redpack_event.id
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
