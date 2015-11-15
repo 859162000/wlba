@@ -155,8 +155,8 @@ class WeixinJoinView(View):
                         reply = -1
                         product = P2PProduct.objects.get(id=1745)
                         checkAndSendProductTemplate(product)
-                # if not reply:
-                #     reply = tuling(msg)
+                if not reply:
+                    reply = tuling(msg)
                 if not reply:
                     # 多客服转接
                     reply = TransferCustomerServiceReply(message=msg)
