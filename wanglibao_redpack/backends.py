@@ -193,7 +193,8 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                     "available_at": stamp(start_time), "unavailable_at": stamp(end_time),
                     "id": x.id, "invest_amount": event.invest_amount, "amount": event.amount, "event_id": event.id,
                     "highest_amount": event.highest_amount,
-                    "period": event.period, "p2p_types_id": p2p_types_id, "p2p_types_name": p2p_types_name,
+                    "period": event.period, "period_type": "月",
+                    "p2p_types_id": p2p_types_id, "p2p_types_name": p2p_types_name,
                     "method": REDPACK_RULE[event.rtype], "order_by": order_by}
 
             if obj['method'] == REDPACK_RULE['percent'] or obj['method'] == REDPACK_RULE['interest_coupon']:
