@@ -19,7 +19,7 @@ class IdVerification(models.Model):
 
     id_number = models.CharField(u"身份证号", max_length=128, db_index=True)
     name = models.CharField(u"姓名", max_length=32)
-    id_photo = models.ImageField(upload_to='id_photos', blank=True, default='',
+    id_photo = models.ImageField(upload_to='id_photos', blank=True, null=True,
                                  verbose_name=u'身份证头像')
     is_valid = models.BooleanField(u"验证结果", default=False)
     created_at = models.DateTimeField(auto_now_add=True)
