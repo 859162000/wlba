@@ -34,7 +34,11 @@
         });
 
         $('#button,#button_get').click(function() {
-            $('.register_wrap,.popup_bg').show();
+            if(popup_bg_static){
+                $('.get_red,.popup_bg').show();
+            }else{
+                $('.register_wrap,.popup_bg').show();
+            }
         });
         $('.popup_bg').click(function() {
             if (popup_bg_static == true) {
