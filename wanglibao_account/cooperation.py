@@ -3241,7 +3241,7 @@ def get_rongtu_list():
 
 def rongtu_post_data():
 
-    url = settings.RONGTU_URL_TEST
+    url = settings.RONGTU_URL
 
     dangan_id = settings.RONGTU_ID
     borrow = get_rongtu_borrow()
