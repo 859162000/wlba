@@ -99,7 +99,7 @@
     position: relative;
     right: -10px;
     top: 3px;
-    height: 28px; }
+    height: 0.75rem; }
   .act_rule_button .rotate {
     -webkit-transform: rotate(90deg);
     transform: rotate(90deg); }
