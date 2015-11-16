@@ -498,7 +498,7 @@ class WithdrawTransactions(TemplateView):
                         fee_misc = WithdrawFee(switch='on')
                         fee_config = fee_misc.get_withdraw_fee_config()
                         withdraw_count = fee_misc.get_withdraw_success_count(payinfo.user)
-                        free_times = fee_config['fee']['amount_interval']
+                        free_times = fee_config['fee']['free_times_per_month']
                         if withdraw_count < free_times:
                             give_back = True
 
