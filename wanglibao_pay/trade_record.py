@@ -16,6 +16,10 @@ def detect(request):
     product_id = request.DATA.get("product_id", "").strip()
     device = rest_utils.split_ua(request)
     device_type = rest_utils.decide_device(device['device_type'])
+    try:
+        app_version = device['app_version']
+    except KeyError:
+        app_version = ''
 
     if not stype or stype not in ("deposit", "withdraw", "amortization"):
         return {"ret_code": 30191, "message": u"错误的类型"}
@@ -35,7 +39,7 @@ def detect(request):
     if stype == "deposit":
         res = _deposit_record(user, pagesize, pagenum)
     elif stype == "withdraw":
-        res = _withdraw_record(user, pagesize, pagenum, device_type['app_version'])
+        res = _withdraw_record(user, pagesize, pagenum, app_version)
     else:
         res = _amo_record(user, pagesize, pagenum, product_id)
     return {"ret_code": 0, "data": res, "pagenum": pagenum}
