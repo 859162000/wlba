@@ -123,7 +123,7 @@ class WithdrawFee(object):
     def get_withdraw_success_count(user):
         """ 获取当月成功提现次数 """
         today = local_to_utc(datetime.datetime.now(), 'max')
-        month_start = today - datetime.timedelta(days=today.day)
+        month_start = today - datetime.timedelta(days=today.day, seconds=-1)
         withdraw_count = PayInfo.objects.filter(user=user, type='W').filter(status=u'成功')\
             .filter(create_time__gt=month_start).count()
         return withdraw_count
