@@ -9,7 +9,9 @@ from datetime import date, timedelta, datetime
 from collections import defaultdict
 from decimal import Decimal
 import time
+from weixin.models import WeixinUser
 from wanglibao_p2p.models import P2PEquity
+from django.db import transaction
 from django.db.models import Count, Sum, connection
 from django.contrib.auth.decorators import permission_required
 from django.core.paginator import Paginator, PageNotAnInteger
@@ -17,7 +19,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
 from wanglibao_p2p.models import P2PRecord
 from django.views.generic import TemplateView
-from django.http.response import HttpResponse, Http404
+from django.http.response import HttpResponse, Http404, HttpResponseRedirect
 from mock_generator import MockGenerator
 from django.conf import settings
 from django.db.models.base import ModelState
@@ -28,7 +30,7 @@ from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, 
     Reward, ActivityJoinLog, QuickApplyInfo, GiftOwnerGlobalInfo, GiftOwnerInfo
 from marketing.tops import Top
 from utils import local_to_utc
-
+from wanglibao_reward.models import WanglibaoWeixinRelative
 # used for reward
 from django.forms import model_to_dict
 from django.db.models import Q
@@ -65,6 +67,8 @@ from smtplib import SMTP
 from email.header import Header
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
+from rest_framework import renderers
+from django.core.urlresolvers import reverse
 reload(sys)
 
 class YaoView(TemplateView):
@@ -2021,13 +2025,13 @@ class QuickApplyerAPIView(APIView):
 
         u"郑州": 'zhengzhouoffice@wanglibank.com',
         u"重庆": 'chongqingoffice@wanglibank.com',
-        u"其他": 'qitachengshioffice@wanglibank.com',
+        u"其它": 'qitachengshioffice@wanglibank.com',
         }
 
         apply = {
             0: u'我有房',
             1: u'我有车',
-            2: u'其他',
+            2: u'其它',
         }
 
         name = request.POST.get('name', '')
@@ -2091,8 +2095,11 @@ class GiftOwnerInfoAPIView(APIView):
         return items[0]["amount"], items[1]["amount"]
 
     def post(self, request):
-        channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
-        item = GiftOwnerInfo.objects.filter(config__description__in=('jcw_ticket_80', 'jcw_ticket_188'), sender=request.user)
+        action = request.DATA.get('action', 'OTHERS')
+        name = request.DATA.get('name', '')
+        phone = request.DATA.get('phone', '')
+        address = request.DATA.get('address', '')
+
         try:
             (award80, award188) = self.get_left_awards()
         except Exception, reason:
@@ -2105,18 +2112,6 @@ class GiftOwnerInfoAPIView(APIView):
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-        action = request.DATA.get('action', 'OTHERS')
-
-        if action == "HAS_TICKET":
-            to_json_response = {
-                'ret_code': 2,
-                'message': u'判断是否领过票',
-                'award80': award80,
-                'award100': award188,
-                'has_ticket': "True" if item.exists() else "False"
-            }
-            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-
         if action == 'VALIDATION':
             status, message = validate_validation_code(request.DATA.get("phone", ""), request.DATA.get("validation", ""))
             to_json_response = {
@@ -2126,13 +2121,23 @@ class GiftOwnerInfoAPIView(APIView):
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-
         if action == "ENTER_WEB_PAGE":
             to_json_response = {
                 'ret_code': 1,
                 'message': u'首次进入页面',
                 'award80': award80,
                 'award100': award188
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        item = GiftOwnerInfo.objects.filter(config__description__in=('jcw_ticket_80', 'jcw_ticket_188'), sender=request.user)
+        if action == "HAS_TICKET":
+            to_json_response = {
+                'ret_code': 2,
+                'message': u'判断是否领过票',
+                'award80': award80,
+                'award100': award188,
+                'has_ticket': "True" if item.exists() else "False"
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -2145,10 +2150,11 @@ class GiftOwnerInfoAPIView(APIView):
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-        if 'jcw' != channel:
+        record = get_user_channel_record(request.user.id)
+        if not record or (record and record.name != 'jcw'):
             to_json_response = {
                 'ret_code': 1000,
-                'message': u'渠道不是聚橙网',
+                'message': u'用户不是聚橙网渠道',
                 'award80': award80,
                 'award100': award188
             }
@@ -2163,9 +2169,6 @@ class GiftOwnerInfoAPIView(APIView):
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-        name = request.DATA.get('name', '')
-        phone = request.DATA.get('phone', '')
-        address = request.DATA.get('address', '')
         binding = Binding.objects.filter(user_id=request.user.id).first()
         p2p_record = P2PRecord.objects.filter(user_id=request.user.id, catalog=u'申购')
         if binding and p2p_record.count() == 1:
@@ -2248,6 +2251,305 @@ class GiftOwnerInfoAPIView(APIView):
                 'message': u'首投用户才有可以领取门票',
                 'award80': award80,
                 'award100': award188
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+
+class OpenidPhoneForFencai(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        openid = request.POST.get("openid")
+        phone = request.POST.get("phone")
+        if not openid or not phone or not phone.isdigit():
+            return Response({'code': -1, "message": "error"})
+        relative, created = WanglibaoWeixinRelative.objects.get_or_create(openid=openid)
+        if not relative.phone_for_fencai or relative.phone_for_fencai != phone:
+            relative.phone_for_fencai = phone
+            relative.save()
+        return Response({"code": 0, "message": "ok"})
+
+class AppLotteryTemplate(TemplateView):
+    template_name = 'app_lottery.jade'
+
+    def get_context_data(self, *args, **kwargs):
+        openid = self.request.GET.get('openid')
+        phone = ""
+        relative = WanglibaoWeixinRelative.objects.filter(openid=openid).first()
+        if relative:
+            phone = relative.phone_for_fencai
+        return {
+            'openid': openid,
+            'phone': phone,
+        }
+
+
+
+    def dispatch(self, request, *args, **kwargs):
+        openid = self.request.GET.get('openid')
+
+        if not openid:
+            redirect_uri = settings.CALLBACK_HOST + reverse("app_lottery")
+            count = 0
+            for key in self.request.GET.keys():
+                if count == 0:
+                    redirect_uri += '?%s=%s'%(key, self.request.GET.get(key))
+                else:
+                    redirect_uri += "&%s=%s"%(key, self.request.GET.get(key))
+                count += 1
+            redirect_uri = urllib.quote(redirect_uri)
+            account_id = 3
+            key = 'share_redpack'
+            shareconfig = Misc.objects.filter(key=key).first()
+            if shareconfig:
+                shareconfig = json.loads(shareconfig.value)
+                if type(shareconfig) == dict:
+                    account_id = shareconfig['account_id']
+            redirect_url = reverse('weixin_authorize_code')+'?state=%s&redirect_uri=%s' % (account_id, redirect_uri)
+            # print redirect_url
+            return HttpResponseRedirect(redirect_url)
+        return super(AppLotteryTemplate, self).dispatch(request, *args, **kwargs)
+
+
+
+class NoConfigException(Exception):
+    def __init__(self, conf):
+        self.conf = conf
+
+    def __str__(self):
+        return u'后台没有配置:  {0},'.format(self.conf)
+
+
+class RewardDistributeAPIView(APIView):
+    permission_classes = ()
+    def __init__(self):
+        super(RewardDistributeAPIView, self).__init__()
+        self.activity_key = 'wechat_activity'  #Misc配置
+        self.index = 0         #使用activity的index,对应MISC中的配置
+        self.activitys = None
+        self.activity = None
+        self.redpacks = dict() #红包amount: 红包object
+        self.redpack_amount = list()
+        self.rates = (50, 12, 11, 2.1, 0.6, 13, 9, 1.9, 0.4)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
+        self.action_name = u'weixin_distribute_redpack'
+
+    def get_activitys_from_wechat_misc(self):
+        """从misc中获得活动的值
+        """
+        try:
+            wechat_conf = Misc.objects.filter(key=self.activity_key).first()
+            if None == wechat_conf:
+                raise NoConfigException("misc {0}".format(self.activity_key))
+
+        except NoConfigException as no_conf:
+            logger.exception(no_conf)
+            raise
+        except Exception, reason:
+            logger.exception(u"获取MISC 中wechat_activity配置异常, reason:%s" % (reason, ))
+            raise
+
+        conf_value = json.loads(wechat_conf.value)
+        if type(conf_value) == dict:
+            try:
+                self.activitys = conf_value['activity'].split(",")
+            except KeyError, reason:
+                logger.exception(u"misc-wechat_activity-activity key ERROR异常，reason:{0}".format(reason))
+            else:
+                logger.debug(u"MISC中activity的配置是%s" % (self.activitys,))
+
+
+    def get_activity(self):
+        try:
+            self.activity = Activity.objects.filter(code=self.activitys[self.index]).first()
+        except KeyError, reason:
+            logger.debug(u"活动管理中没有配置activity, reason:%s" % (reason, ))
+            raise
+
+        if None == self.activity:
+            raise NoConfigException(u"活动管理没有配置")
+
+    def get_redpacks(self):
+        try:
+            rules = ActivityRule.objects.filter(activity=self.activity).first()
+        except Exception, reason:
+            logger.debug(u"rules获取抛异常, reason:%s" % (reason,))
+            raise
+
+        if None == rules:
+            raise NoConfigException(u"Rule没有配置")
+        try:
+            redpacks = list(rules.redpack.split(","))
+            logger.debug(u"后台配置的红包id是：{0}".format(redpacks))
+            QSet = RedPackEvent.objects.filter(id__in=redpacks)
+        except Exception, reason:
+            logger.debug(u"获得配置红包报异常, reason:%s" % (reason,))
+            raise
+        for item in QSet:
+            self.redpacks[item.amount] = item
+
+        self.redpack_amount = sorted(self.redpacks.keys())
+        logger.debug(u"红包的大小依次为：%s" % (self.redpack_amount, ))
+        logger.debug(u"对应红包的获奖概率是：%s" % (self.rates, ))
+
+    def decide_which_to_distribute(self, user):
+        """ 决定发送哪一个奖品
+        """
+        sent_count = ActivityJoinLog.objects.filter(action_name=self.action_name).count() + 1
+        today = time.strftime("%Y-%m-%d", time.localtime())
+        join_log = ActivityJoinLog.objects.filter(user=user, create_time__gt=today).first()
+        if not join_log:
+            rate = None
+            for rate in self.rates:
+                if sent_count%(100/rate)==0:
+                    break
+
+            rate = 50 if rate==None else rate
+            #根据rate找到对应的红包
+            index = self.rates.index(rate)
+            logger.debug(u"rate:{0},index:{1}, redpack_amount:{2}".format(rate,index, self.redpack_amount))
+            try:
+                join_log = ActivityJoinLog.objects.create(
+                    user=user,
+                    action_name=self.action_name,
+                    join_times=3,
+                    amount=self.redpack_amount[index],
+                )
+            except IndexError, reason:
+                logger.exception(u"redpack_amount 索引超范围了,reason:{0}".format(reason))
+                raise
+            except Exception, reason:
+                logger.exception(u"创建用户获奖记录异常了， reason:{0}".format(reason))
+
+        return join_log
+
+    @method_decorator(transaction.atomic)
+    def distribute_redpack(self, user):
+        """给用户发送出去一个奖品
+        """
+        try:
+            today = time.strftime("%Y-%m-%d", time.localtime())
+            join_log = ActivityJoinLog.objects.select_for_update().filter(user=user, create_time__gte=today).first()
+            if join_log.join_times == 0:
+                join_log.save()
+                return "No Reward"
+            else:
+                redpack_event = self.redpacks.get(join_log.amount)
+        except Exception, reason:
+            logger.debug(u"获得用户的预配置红包抛异常, reason:{0}".format(reason))
+
+        try:
+            redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+        except Exception, reason:
+            logger.debug(u'给用户 {0}发送红包报错, redpack_event:{1}, reason:{2}'.format(user, redpack_event,reason))
+            raise
+        else:
+            join_log.join_times -= 1
+            join_log.save()
+            return join_log
+
+    @method_decorator(transaction.atomic)
+    def ignore_post_action(self, user):
+        """处理用户的没有抽到奖品的动作流程
+        """
+        today = time.strftime("%Y-%m-%d", time.localtime())
+        join_log = ActivityJoinLog.objects.select_for_update().filter(user=user, create_time__gte=today).first()
+        if join_log.join_times == 0:
+            join_log.save()
+            return "No Chance"
+        else:
+            join_log.join_times -= 1
+            join_log.save()
+            return join_log
+
+    def prepare_for_distribute(self):
+        self.get_activitys_from_wechat_misc()
+        self.get_activity()
+        self.get_redpacks()
+
+    def post(self, request):
+        openid = request.DATA.get("openid", "")
+        if None == openid:
+            to_json_response = {
+                'ret_code': 3010,
+                'message': u'openid 没有传入',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        w_user = WeixinUser.objects.filter(openid=openid)
+        if not w_user.exists() or not w_user.first().user:
+            to_json_response = {
+                'ret_code': 3011,
+                'message': u'weixin info No saved',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+        else:
+            user = w_user.first().user
+
+        today = time.strftime("%Y-%m-%d", time.localtime())
+        join_log = ActivityJoinLog.objects.filter(user=user, create_time__gte=today).first()
+        redpack_event = self.redpacks.get(join_log.amount)
+
+        self.prepare_for_distribute()
+        if not join_log:
+            logger.debug(u'用户{0}第一次进入页面，给用户生成抽奖记录'.format(user))
+            join_log = self.decide_which_to_distribute(user)
+
+        if join_log.join_times == 0:
+            logger.debug(u'用户{0}的抽奖次数已经用完了'.format(user))
+            to_json_response = {
+                'ret_code': 3001,
+                'message': u'用户的抽奖次数已经用完了',
+                'left': 0,
+                'redpack': redpack_event.id
+            }
+
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        action = request.DATA.get("action", "")
+        logger.debug(u"用户{0}前端传入的行为是：{1}".format(user, action,))
+
+        try:
+            assert action in ("ENTER_WEB_PAGE", "GET_REWARD", "IGNORE")
+        except AssertionError:
+            logger.debug(u"参数不正确，action:{0}".format(action))
+            to_json_response = {
+                'ret_code': 3002,
+                'message': u'传入的参数不正确',
+            }
+
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        join_log = ActivityJoinLog.objects.filter(user=user, create_time__gte=today).first()
+        logger.debug(u"剩余的抽奖次数：{0}".format(join_log.join_times,))
+        if action == "ENTER_WEB_PAGE":
+            to_json_response = {
+                'ret_code': 4000,
+                'message': u'进入页面',
+                'amount': str(join_log.amount),
+                'left': join_log.join_times,
+                'redpack': redpack_event.id
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        if action == "GET_REWARD":
+            join_log = self.distribute_redpack(user)
+            to_json_response = {
+                'ret_code': 0,
+                'message': u'发奖成功',
+                'amount': str(join_log.amount),
+                'left': join_log.join_times,
+                'redpack': redpack_event.id
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        if action == "IGNORE":
+            join_log = self.ignore_post_action(user)
+            to_json_response = {
+                'ret_code': 4002,
+                'message': u'忽略本次操作',
+                'amount': str(join_log.amount),
+                'left': join_log.join_times,
+                'redpack': redpack_event.id
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 

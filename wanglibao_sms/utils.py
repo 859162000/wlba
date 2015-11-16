@@ -147,16 +147,16 @@ def validate_validation_code(phone, code):
         return status_code, message
 
     if item.vcount >= 3:
-        return 410, "The maximum number of verify"
+        return 410, "短信验证码最多不超过2次"
     if item.validate_code != code:
         item.vcount += 1
         item.save()
-        return 410, "code error"
+        return 410, "短信验证码错误"
     now = timezone.now()
     if (now - item.last_send_time) >= datetime.timedelta(minutes=600):
-        return 410, "code is expired"
+        return 410, "短信验证码已经过期"
     if item.is_validated:
-        return 410, "code is validated"
+        return 410, "短信验证码已经被使用"
 
     item.is_validated = True
     item.code_send_count = 0

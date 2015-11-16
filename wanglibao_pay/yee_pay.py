@@ -12,6 +12,7 @@ from django.forms import model_to_dict
 from django.db import transaction
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from wanglibao_account.cooperation import CoopRegister
 from wanglibao_pay import util
 from wanglibao_pay.models import PayInfo, PayResult, Bank, Card
 from order.utils import OrderHelper
@@ -27,6 +28,7 @@ from Crypto.Signature import PKCS1_v1_5 as pk
 from Crypto.Cipher import PKCS1_v1_5, AES
 import base64
 from wanglibao_rest.utils import split_ua
+# from wanglibao_account.cooperation import CoopRegister
 
 logger = logging.getLogger(__name__)
 
@@ -550,7 +552,7 @@ class YeeShortPay:
         post['userip'] = util.get_client_ip(request)
         return self._request_yee(url=self.BIND_PAY_REQUEST, data=post)
 
-    def add_card_unbind(self, user, card_no, bank):
+    def add_card_unbind(self, user, card_no, bank, request):
         """ 保存卡信息到个人名下，不绑定任何渠道 """
         if len(card_no) == 10:
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:],
@@ -558,14 +560,24 @@ class YeeShortPay:
         else:
             card = Card.objects.filter(no=card_no, user=user).first()
 
+        add_card = False
         if not card:
             card = Card()
             card.user = user
             card.no = card_no
             card.is_default = False
 
+            add_card = True
+
         card.bank = bank
         card.save()
+        # if add_card:
+        #     try:
+        #         # 处理第三方用户绑卡回调
+        #         CoopRegister(request).process_for_binding_card(request.user)
+        #     except Exception, e:
+        #         logger.error(e)
+
         return card
 
     def pre_pay(self, request):
@@ -613,7 +625,7 @@ class YeeShortPay:
             card = Card.objects.filter(no=card_no, user=user).first()
 
         if not card:
-            card = self.add_card_unbind(user, card_no, bank)
+            card = self.add_card_unbind(user, card_no, bank, request)
 
         if not card and not bank:
             return {'ret_code': 200117, 'message': '卡号不存在或银行不存在'}
@@ -778,7 +790,7 @@ class YeeShortPay:
         pay_info.save()
         if rs['ret_code'] == 0:
             try:
-                # fix@chenweibi, add order_id
+                # fix@chenweibi, add order_id, handle_margin已经废弃未被使用
                 tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
                                                      "device": device, "order_id": order_id})
             except:
@@ -872,13 +884,12 @@ class YeeShortPay:
         pay_info.save()
         if rs['ret_code'] == 0:
             device = split_ua(request)
+
             try:
-                try:
-                    # fix@chenweibi, add order_id
-                    tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
-                                                         "device": device, "order_id": orderId})
-                except:
-                    pass
+                # fix@chenweibi, add order_id
+                tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
+                                                     "device": device, "order_id": orderId})
+                CoopRegister(request).process_for_recharge(pay_info.user, orderId)
             except:
                 pass
 

@@ -1,0 +1,144 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include global/g_head
+    - endwith
+    link(rel="stylesheet",href="/static/styles/pc_activity/two-eleven.css?v=20151103")
+  body(style="background:#ffc50e")
+    include global/g_nav
+    .two-eleven
+      .banner
+        .banner-title
+          p 单标加息1.11%
+      .eleven-main
+        p.main-title.main-title1  任意投资后领1.11%加息券，领券后追加投资可整标永久加息！ 玩命加息，全面爆发！
+        p.main-title  理财也疯狂，仅限双十一活动三天！！
+        img(src='/static/imgs/pc_activity/two-eleven/elevenbao.png').main-img
+        .line
+          .line-xian
+            p 攻略详解
+        .main-img1
+          img(src='/static/imgs/pc_activity/two-eleven/elevenxiaoqing.png')
+          .xiaoqing1
+            h3 1.单标先投100
+            p 先在任意标投资100元起，
+            p 获得2张1.11%加息券；
+          .xiaoqing2
+            h3 2.获得补贴加息券
+            p 1.11%加息券限投3、6月标；
+          .xiaoqing3
+            h3 3.单标用券追加投资
+            p 若在3月标上追加投资时使用加息券，使所投3月标
+            p 单标加息达到11.11%。若在6月标上追加投资时使
+            p 用加息券，使所投6月标单标加息达到13.11%；
+            p &nbsp;&nbsp;&nbsp;(可与平台加息共享)
+          .xiaoqing4
+            h3 4.整标额外永久加息1.11%高收益
+            p
+              |一劵一标永久加息，立即查看
+              a(href='javascript:void(0);')#jiaxi 加息券规则
+        .eleven-guizhe
+          h2 【加息券规则】
+          ul
+            li  1. 加息券在电脑端、手机端均可使用，有效期限11月10日-12日；
+            li 2. 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+            li 3. 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+            li 4. 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+            li 5. 使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+        .eleven-button
+          img(src='/static/imgs/pc_activity/two-eleven/elevenbutton.png').button
+
+      .eleven-main2
+        .main2-eleven
+          h1 【加息券正确使用姿势】
+          p 投资获得加息券——投标选择使用——投标成功加息生效——获得双11专享收益
+          h4 【活动规则】
+          ul
+            li 1. 活动日期：仅限11月10日-12日0:00-23:59全天参与抢投赢取，活动期间每位用户限领一次；
+            li 2. 双11专享单标加息福利详见攻略详解。投资所得加息券在电脑端、手机端均可使用，有效期限11月10日-12日，过期不补；
+            li
+              |3. 加息券统一会以站内信通知，收到后可立即使用。详情请看
+              a(href='javascript:void(0);')#jiaxi1 加息券使用规则
+              |；
+            li 4. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+
+          ul.footer-guizhe
+            li  1. 加息券在电脑端、手机端均可使用，有效期限11月10日-12日；
+            li 2. 购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+            li 3. 投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+            li 4. 使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+            li 5. 使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+          p.mark * 网利宝对此活动享有最终解释权
+
+
+      .eleven-footer
+
+      .xl-backtop(style="z-index:99")
+        span.seven-com.seven-ten
+        .backtop.sev-backtop 回到顶部
+        img(src="/static/imgs/pc_activity/xunlei/seven/sev_weixin.png")#xl-weixin
+        a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank")
+          img(src="/static/imgs/pc_activity/xunlei/seven/sev_qq.png",style="margin-top:10px")#xl-qq
+        .erweima
+    script.
+      require.config({
+        paths: {
+          jquery: "lib/jquery.min"
+        }
+      });
+      require(["jquery"], function ($) {
+        function toggles(obj) {
+          obj.slideToggle()
+        }
+
+        $(".button").on("click", function () {
+
+          window.open("/p2p/list/");
+        })
+        $("#jiaxi").on("click", function () {
+          toggles($(".eleven-guizhe"));
+        })
+        $("#jiaxi1").on("click", function () {
+          toggles($(".footer-guizhe"));
+        })
+        $('#page1').on('click', function () {
+          var top = $('#page1Pos').offset().top;
+          $('body,html').animate({scrollTop: top}, 600);
+        })
+        //固定回到顶部
+        function backtop() {
+          var k = document.body.clientWidth,
+                  a = k - 100
+          return a;
+        }
+
+        var left2 = backtop();
+        //浏览器大小改变触发的事件
+        window.onresize = function () {
+          left2 = backtop();
+        };
+        //赋值
+        $('.xl-backtop').css({'left': left2});
+        //显示微信二维码
+        $('#xl-weixin').on('mouseover', function () {
+          $('.erweima').show();
+        });
+        $('#xl-weixin').on('mouseout', function () {
+          $('.erweima').hide();
+        })
+        //返回顶部
+        $(window).scroll(function () {
+          if ($(document).scrollTop() > 0) {
+            $(".xl-backtop").fadeIn();
+          } else {
+            $('.xl-backtop').stop().fadeOut();
+          }
+        });
+        $('.backtop').on('click', function () {
+          $('body,html').animate({scrollTop: 0}, 600);
+          return false
+        })
+      })

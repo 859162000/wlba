@@ -254,7 +254,7 @@ class RegisterAPIView(APIView):
 
         status, message = validate_validation_code(identifier, validate_code)
         if status != 200:
-            return Response({"ret_code": 30014, "message": u"验证码输入错误"})
+            return Response({"ret_code": 30014, "message": message, "status":status })
 
         if User.objects.filter(wanglibaouserprofile__phone=identifier).first():
             return Response({"ret_code": 30015, "message": u"该手机号已经注册"})
@@ -507,6 +507,10 @@ class IdValidateAPIView(APIView):
 
         device = split_ua(request)
         tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+        # 处理第三方用户实名回调
+        CoopRegister(self.request).process_for_validate(user)
+
         return Response({"ret_code": 0, "message": u"验证成功"})
 
 
@@ -840,7 +844,7 @@ class IdValidate(APIView):
             device = split_ua(request)
             tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
-            #处理渠道回调
+            # 处理第三方用户实名回调
             CoopRegister(self.request).process_for_validate(user)
 
             return Response({ "validate": True }, status=200)
@@ -1245,7 +1249,7 @@ class DistributeRedpackView(APIView):
 
                     try:
                         logger.debug("用户：%s 使用的加息券id:%s" %(phone_number, redpack_id))
-                        redpack_event = RedPackEvent.objects.filter(id=747).first()
+                        redpack_event = RedPackEvent.objects.filter(id=780).first()
                     except Exception, reason:
                         logger.debug("从RedPackEvent中获得配置红包报错, reason:%s" % (reason, ))
 

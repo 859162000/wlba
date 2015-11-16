@@ -11,6 +11,7 @@ import traceback
 #from marketing.helper import RewardStrategy
 import requests
 from order.utils import OrderHelper
+from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_pay.models import PayInfo, Bank, Card
 from wanglibao_pay.pay import Pay
@@ -286,6 +287,7 @@ class HuifuPay(Pay):
                 # fix@chenweibi, add order_id
                 tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
                                                      "device": device, "order_id": order_id})
+                CoopRegister(request).process_for_recharge(pay_info.user, order_id)
             except:
                 pass
 
@@ -486,7 +488,7 @@ class HuifuShortPay:
 
         return {"ret_code": 0, "message": "解除绑定成功"}
 
-    def bind_card_wlbk(self, user, card_no, bank):
+    def bind_card_wlbk(self, user, card_no, bank, request):
         """ 保存卡信息到个人名下 """
         if len(card_no) == 10:
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
@@ -499,8 +501,17 @@ class HuifuShortPay:
             card.no = card_no
             card.is_default = False
 
+            add_card = True
+
         card.bank = bank
         card.save()
+        # if add_card:
+        #     try:
+        #         # 处理第三方用户绑卡回调
+        #         CoopRegister(request).process_for_binding_card(request.user)
+        #     except Exception, e:
+        #         logger.error(e)
+
         return card
 
     def open_bind_card(self, user, bank, card):
@@ -555,7 +566,7 @@ class HuifuShortPay:
             card = Card.objects.filter(no=card_no, user=user).first()
 
         if not card:
-            card = self.bind_card_wlbk(user, card_no, bank)
+            card = self.bind_card_wlbk(user, card_no, bank, request)
 
         if not card:
             return {"ret_code": -1, "message": '银行卡不存在'}

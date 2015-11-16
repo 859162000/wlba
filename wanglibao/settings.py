@@ -112,6 +112,7 @@ INSTALLED_APPS = (
     'wanglibao_activity',
     'wanglibao_mobile',
     'weixin',
+    'wechatpy',
     'wanglibao_app',
     'wanglibao_anti', #add by yihen@20150813, anti module added
     'wanglibao_reward', #add by yihen@20150910
@@ -148,6 +149,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'marketing.middlewares.PromotionTokenMiddleWare',
+    'marketing.middlewares.StatsKeyWordMiddleWare',
 )
 
 CONCURRENCY_POLICY = 2
@@ -213,7 +215,6 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
 )
-import django.contrib.auth.backends
 
 # Template loader
 TEMPLATE_LOADERS = (
@@ -382,12 +383,30 @@ LOGGING = {
             'filename': '/var/log/wanglibao/wanglibao_reward.log',
             'formatter': 'verbose'
         },
+        'wanglibao_account':{  #add by yihen@20151113
+                              'level': 'INFO',
+                              'class': 'logging.FileHandler',
+                              'filename': '/var/log/wanglibao/wanglibao_account.log',
+                              'formatter': 'verbose'
+                              },
         'wanglibao_rest':{  #add by yihen@20151028
                               'level': 'DEBUG',
                               'class': 'logging.FileHandler',
                               'filename': '/var/log/wanglibao/wanglibao_rest.log',
                               'formatter': 'verbose'
                               },
+        'wanglibao_cooperation':{  #add by yihen@20150915
+                              'level': 'DEBUG',
+                              'class': 'logging.FileHandler',
+                              'filename': '/var/log/wanglibao/wanglibao_cooperation.log',
+                              'formatter': 'verbose'
+                              },
+        'weixin':{  #add by huomeimei
+              'level': 'DEBUG',
+              'class': 'logging.FileHandler',
+              'filename': '/var/log/wanglibao/weixin.log',
+              'formatter': 'verbose'
+                },
     },
     'loggers': {
         'django': {
@@ -424,8 +443,8 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'wanglibao_account': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
+            'handlers': ['wanglibao_account', 'console'],
+            'level': 'INFO',
         },
         'wanglibao_app': {
             'handlers': ['file'],
@@ -455,6 +474,14 @@ LOGGING = {
               'handlers': ['wanglibao_rest', 'console'],
               'level': 'DEBUG'
           },
+        'wanglibao_cooperation': { #add by yihen@20150915
+                              'handlers': ['wanglibao_cooperation', 'console'],
+                              'level': 'DEBUG'
+                              },
+        'weixin':{#add by huomeimei
+              'handlers': ['weixin', 'console'],
+              'level': 'DEBUG'
+        },
         'wanglibao_p2p': {
             'handlers': [ 'console'],
             'level': 'DEBUG'
@@ -530,15 +557,15 @@ from datetime import timedelta, datetime
 CELERYBEAT_SCHEDULE = {
     'p2p-watchdog-1-minutes': {
         'task': 'wanglibao_p2p.tasks.p2p_watchdog',
-        'schedule': timedelta(minutes=1),
+        'schedule': timedelta(minutes=5),
     },
-    'report-generate': {
-        'task': 'report.tasks.generate_report',
-        'schedule': crontab(minute=0, hour=16),
-    },
+    # 'report-generate': {
+    #     'task': 'report.tasks.generate_report',
+    #     'schedule': crontab(minute=0, hour=16),
+    # },
     'generate_site_data': {
         'task': 'marketing.tasks.generate_site_data',
-        'schedule': crontab(minute=15, hour=16)
+        'schedule': crontab(minute=15, hour=4)
     },
     # 'post_product_cjdao': {
     #     'task': 'wanglibao_account.tasks.post_product_half_hour',
@@ -547,7 +574,7 @@ CELERYBEAT_SCHEDULE = {
 
     'p2p_auto_ready_for_settle': {
         'task': 'wanglibao_p2p.tasks.p2p_auto_ready_for_settle',
-        'schedule': crontab(hour=16),
+        'schedule': crontab(minute=0, hour=16),
     },
 
     #add by guoya: 希财网渠道数据定时推送
@@ -607,6 +634,11 @@ CELERYBEAT_SCHEDULE = {
     # by Zhoudong 中金标的推送(包含新标, 更新, 下架)
     'zhongjin_send_data': {
         'task': 'wanglibao_account.tasks.zhongjin_post_task',
+        'schedule': timedelta(hours=1),
+    },
+    # by Zhoudong 融途网标的推送(包含新标, 更新, 下架)
+    'rongtu_send_data': {
+        'task': 'wanglibao_account.tasks.rongtu_post_task',
         'schedule': timedelta(hours=1),
     },
     # 每天定时检测和生成原始邀请码
@@ -944,6 +976,18 @@ ZHONGJIN_SECRET = '2CF7AC2A27CC9B48C4EFCD7E356CD95F'
 ZHONGJIN_TEST_SECRET = '348BB1C9A2032B2DA855D082151E8B8E'
 ZHONGJIN_UPDATE_TIMEDELTA = timedelta(hours=1)
 
+# 01财经
+ZO_SECRET = '3r2o3j3m3g3q3l2o7o'
+
+# 米贷网
+MIDAI_USERNAME = 'medai360'
+MIDAI_PASSWORD = '12345678'
+
+# 融途网
+RONGTU_URL = 'http://shuju.erongtu.com/api/borrow'
+RONGTU_URL_TEST = 'http://shuju.erongtu.com/api/test'
+RONGTU_ID = 1638
+
 # 金山
 WLB_FOR_JINSHAN_KEY = '1994'
 JINSHAN_CALL_BACK_URL = 'https://vip.wps.cn/task/api/reward'
@@ -1024,7 +1068,7 @@ else:
 WLB_FOR_FANLITOU_KEY = '2002'
 
 # 迅雷VIP
-WLB_FOR_XUNLEIVIP_KEY = '2003'
+WLB_FOR_XUNLEI9_KEY = '2003'
 XUNLEIVIP_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/xljinku/sendvip/'
 XUNLEIVIP_REGISTER_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_report.php'
 XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
@@ -1085,7 +1129,7 @@ if ENV == ENV_PRODUCTION:
     WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
 else:
     WEIXIN_CALLBACK_URL = 'https://staging.wanglibao.com'
-
+    CALLBACK_HOST='https://staging.wanglibao.com'
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)
 WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'

@@ -6,7 +6,7 @@ from django.db.models import Sum
 from wanglibao_account.models import IdVerification, UserSource
 from wanglibao_redpack.models import Income
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("wanglibao_account")
 
 
 def broker_invite_list(user):
@@ -52,12 +52,17 @@ def invite_earning(user):
 
 
 def set_source(request, user):
-    keyword = request.session.get("promo_source_word", "")
+    keyword = request.session.get("promo_source_keyword", "")
     if keyword:
-        us = UserSource()
-        us.user = user
-        us.keyword = keyword
-        us.save()
+        source = UserSource.objects.create(
+            user=user,
+            action='register',
+            keyword=keyword,
+            site_name=request.session.get("promo_source_site_name", ""),
+            website=request.session.get("website", "")
+        )
+        logger.debug("注册行为已经完成，SEM统计参量入库,object value:{0}".format(source))
+
 
 class TestIDVerifyBackEnd(object):
 
@@ -126,16 +131,23 @@ class ProductionIDVerifyBackEnd(object):
             logger.error("Failed to send request: status: %d, ", response.status_code)
             return None, "Failed to send request"
 
-        parsed_response = parse_id_verify_response(response.text)
-        result = bool(parsed_response['response_code'] == 100)
-
-        if not result:
-            logger.error("Failed to validate: %s" % response.text)
-
-        verify_result = True
-        if parsed_response['result'] != u'一致':
+        try:
             verify_result = False
-            logger.info("Identity not consistent %s" % response.text)
+            parsed_response = parse_id_verify_response(response.text)
+            if parsed_response['result'] == u'一致':
+                verify_result = True
+        except StopIteration:
+            pass
+
+        # result = bool(parsed_response['response_code'] == 100)
+        #
+        # if not result:
+        #     logger.error("Failed to validate: %s" % response.text)
+        #
+        # verify_result = True
+        # if parsed_response['result'] != u'一致':
+        #     verify_result = False
+        #     logger.info("Identity not consistent %s" % response.text)
 
         record = IdVerification(id_number=id_number, name=name, is_valid=verify_result)
         record.save()
