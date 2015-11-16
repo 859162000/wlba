@@ -248,20 +248,10 @@ def parse_id_verify_response(text):
     }
 
 
-def base64_to_image(base64_str):
-    import base64
-    import StringIO
-
-    img_str = base64.b64decode(base64_str)
-    io_handle = StringIO.StringIO()
-    img_data = io_handle.write(img_str)
-
-    return img_data
-
-
 def parse_id_verify_response_v2(text):
     import HTMLParser
     import lxml.html.soupparser as soupparser
+    from .utils import base64_to_image
 
     html_parser = HTMLParser.HTMLParser()
     text = html_parser.unescape(text)
