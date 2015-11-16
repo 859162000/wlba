@@ -6,6 +6,7 @@ from wanglibao_pay.models import PayInfo
 from wanglibao_pay import util
 from wanglibao_p2p.models import UserAmortization, AmortizationRecord
 # from wanglibao_margin.models import MarginRecord
+from wanglibao_rest import utils as rest_utils
 
 
 def detect(request):
@@ -13,6 +14,8 @@ def detect(request):
     pagesize = request.DATA.get("pagesize", "10").strip()
     pagenum = request.DATA.get("pagenum", "1").strip()
     product_id = request.DATA.get("product_id", "").strip()
+    device = rest_utils.split_ua(request)
+    device_type = rest_utils.decide_device(device['device_type'])
 
     if not stype or stype not in ("deposit", "withdraw", "amortization"):
         return {"ret_code": 30191, "message": u"错误的类型"}
@@ -32,7 +35,7 @@ def detect(request):
     if stype == "deposit":
         res = _deposit_record(user, pagesize, pagenum)
     elif stype == "withdraw":
-        res = _withdraw_record(user, pagesize, pagenum)
+        res = _withdraw_record(user, pagesize, pagenum, device_type['app_version'])
     else:
         res = _amo_record(user, pagesize, pagenum, product_id)
     return {"ret_code": 0, "data": res, "pagenum": pagenum}
@@ -57,10 +60,14 @@ def _deposit_record(user, pagesize, pagenum):
     return res
 
 
-def _withdraw_record(user, pagesize, pagenum):
+def _withdraw_record(user, pagesize, pagenum, app_version):
     res = []
     records = PayInfo.objects.filter(user=user, type="W")[(pagenum-1)*pagesize:pagenum*pagesize]
     for x in records:
+        if app_version and app_version < "2.6.3":
+            fee = x.fee + x.management_fee
+        else:
+            fee = x.fee
         obj = {
             "id": x.id,
             "amount": x.total_amount,
@@ -68,7 +75,7 @@ def _withdraw_record(user, pagesize, pagenum):
             "status": x.status,
             "confirm_time": util.fmt_dt_normal(x.confirm_time),
             "card_no": x.card_no,
-            "fee": x.fee,
+            "fee": fee,
             "management_fee": x.management_fee,
             "management_amount": x.management_amount,
             "channel": "APP"
