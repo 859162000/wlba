@@ -546,6 +546,7 @@ def bind_pay_dynnum(request):
         try:
             CoopRegister(request).process_for_binding_card(user)
         except:
+            logger.exception('bind_card_callback_failed for %s' % str(user))
 
 
     return res
