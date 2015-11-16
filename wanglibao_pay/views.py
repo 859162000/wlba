@@ -883,7 +883,11 @@ class FEEAPIView(APIView):
                 return Response({"ret_code": 30141, "message": u"银行卡选择错误"})
         else:
             if not bank_id:
-                return Response({"ret_code": 30137, "message": u"银行卡选择错误"})
+                if device_type == 'ios' or device_type == 'android':
+                    if app_version and app_version < "2.6.3":
+                        pass
+                    else:
+                        return Response({"ret_code": 30137, "message": u"银行卡选择错误"})
 
         try:
             float(amount)
@@ -955,7 +959,7 @@ class FEEAPIView(APIView):
 
         actual_amount = amount - fee - management_fee  # 实际到账金额
         if actual_amount <= 0:
-            return Response({"ret_code": 30136, "message": u'实际到账金额为0,无法提现'})
+            return Response({"ret_code": 30136, "message": u'余额不足，提现失败'})
 
         if device_type == 'ios' or device_type == 'android':
             if app_version and app_version < "2.6.3":
