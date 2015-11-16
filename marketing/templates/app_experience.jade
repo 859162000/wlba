@@ -48,7 +48,8 @@ html(style="background:#fc9300")
                                 p.pt 7天
                                 p.pb 投资期限
                         .project_btn
-                            a(href='') 立即投资
+                            a(href='javascript:void(0)').investBtn 立即投资
+                            p.time_style(style='display:none') 将于2015-10-31收益13元
                 .look_more
                     span#lookMore
                         p
@@ -133,8 +134,7 @@ html(style="background:#fc9300")
                                     td 0.00/9.89
                 .re_box
                     .rule_list.clearfix
-                        img(src='/static/imgs/mobile_activity/app_experience/bg.jpg')
-                        ul
+                        ul.clearfix
                             li.title 体验金领取及使用说明
                             li
                                 span
@@ -154,5 +154,4 @@ html(style="background:#fc9300")
                                     p.rule_content_bt 1、体验金投资完毕后，当日立即开始计息，到期日16点回款。还款本金系统自动收回，利息收益自动发放至投资人的个人账户 。例如 ，新手10000元体验金，可计息日为3天（含节假日），今天投资（周四），周四、周五、周六计息3天，周六16点您的收益会发放到个人帐户。
                                     p.rule_content_bt 2、体验金利息收益与正常账户余额一样，可用来投资和提现。
                                     p.p_last 部分合作渠道来源用户无法享受此活动奖励，网利宝对此活动享有最终解释权。
-            .d
-    script(src="/static/scripts/mobile_activity/app_experience.js")
+    script(data-init="experience",src="/static/scripts/mobile_activity/app_experience.js")

@@ -131,6 +131,7 @@ urlpatterns += patterns(
 
     url(r'^app_jucheng/$', TemplateView.as_view(template_name="app_jucheng.jade")),
     url(r'^app_experience/$', TemplateView.as_view(template_name="app_experience.jade")),
+    url(r'^experience_account/$', TemplateView.as_view(template_name="account.jade")),
 )
 
 urlpatterns += patterns(

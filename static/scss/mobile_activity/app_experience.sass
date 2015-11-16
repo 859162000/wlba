@@ -105,7 +105,7 @@ body
     .project_btn
       text-align: center
       padding-bottom: 1.3rem
-      a
+      a.investBtn
         background: #f45e37
         color: #ffffff
         font-size: .75rem
@@ -115,6 +115,12 @@ body
         line-height: 1.95rem
         text-decoration: none
         border-radius: .25rem
+      a.investBtnEd
+        background: #fa8162
+      .time_style
+        font-size: .5rem
+        color: #fc8f02
+        margin-top: .2rem
 .look_more
   text-align: center
   color: #c66032
@@ -164,24 +170,21 @@ body
         padding: .35rem 0
 .re_box
   padding: 1.825rem 0 2.55rem
+  font-size: 0
   .rule_list
-    position: relative
-    img
-      width: 100%
-      position: absolute
-      margin-bottom: 2rem
+    background: url(/static/imgs/mobile_activity/app_experience/bg.jpg) center center no-repeat
+    background-size: 100% 100%
+    display: inline-block
+    margin: 0 auto
     ul
       width: 100%
-      position: absolute
-      left: 0
-      top: 0
       font-size: .4rem
-      max-height: 99999999999rem
       padding: 2rem 1.5rem
       li
         list-style-type: inherit
         display: -webkit-box
         margin-bottom: 1rem
+        max-height: 99999rem
         span
           display: block
           width: .675rem
@@ -205,6 +208,74 @@ body
         font-size: .5rem
         display: block
         padding: 0
+.successWin
+  position: relative
+  img
+    width: 100%
+  .btns
+    position: absolute
+    text-align: center
+    width: 100%
+    bottom: 1.5rem
+    z-index: 10000
+    a
+      width: 45%
+      height: 1.5rem
+      line-height: 1.5rem
+      font-size: .6rem
+      background: #fb7c00
+      color: #ffffff
+      display: inline-block
+      border-radius: .5rem
+      z-index: 100000
+.investWin
+  position: fixed
+  top: 35%
+  left: 50%
+  width: 14rem
+  margin: -2.75rem 0 0 -7rem
+  background: #fafafa
+  border-radius: .5rem
+  z-index: 1000001
+  padding: 1.9rem 0 1.45rem
+  p
+    text-align: center
+    font-size: .775rem
+    color: #3f3f41
+  .successFonts
+    color: #fb7c00
+    font-size: 1.055rem
+    padding: .75rem 0
+.oldUserWin
+  position: fixed
+  top: 35%
+  left: 50%
+  width: 14rem
+  margin: -2.75rem 0 0 -7rem
+  background: #fafafa
+  border-radius: .5rem
+  z-index: 1000001
+  padding: 1.9rem 0 1.45rem
+  text-align: center
+  .p_left
+    text-align: left
+    padding-left: 2.175rem
+    color: #3f3f41
+    font-size: .77rem
+  img
+    width: 4.35rem
+    height: 4.35rem
+    margin: .5rem 0 1rem
+  .close_btn
+    width: 80%
+    height: 1.5rem
+    line-height: 1.5rem
+    font-size: .6rem
+    background: #d1d1d1
+    color: #ffffff
+    display: inline-block
+    border-radius: .5rem
+
 
 
 
