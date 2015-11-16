@@ -11,13 +11,14 @@ import traceback
 #from marketing.helper import RewardStrategy
 import requests
 from order.utils import OrderHelper
+from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_pay.models import PayInfo, Bank, Card
 from wanglibao_pay.pay import Pay
 import socket
 from django.conf import settings
 from django.db import transaction
-from wanglibao_pay.util import get_client_ip, fmt_two_amount, handle_kuai_bank_limit
+from wanglibao_pay.util import get_client_ip, fmt_two_amount, handle_kuai_bank_limit, TWO_PLACES
 from wanglibao_pay.views import PayResult
 from marketing import tools
 import xml.etree.ElementTree as ET
@@ -127,6 +128,84 @@ class HuifuPay(Pay):
             'url': HuifuPay.PAY_URL + '/gar/RecvMerchant.do',
             'post': post
         }
+
+    def pre_pay(self, request):
+        """
+        返回跳转信息{'message': message,'form': form}供跳转js使用，message包含报错信息
+            form包含跳转信息
+        :param request:
+        :return:
+        """
+        if not request.user.wanglibaouserprofile.id_is_valid:
+            return self.render_to_response({
+                'message': u'请先进行实名认证'
+            })
+        form = dict()
+        message = ''
+        try:
+            amount_str = request.POST.get('amount', '')
+            amount = decimal.Decimal(amount_str). \
+                quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
+            amount_str = str(amount)
+            if amount <= 0:
+                # todo handler the raise
+                raise decimal.DecimalException()
+
+            gate_id = request.POST.get('gate_id', '')
+            bank = Bank.objects.get(gate_id=gate_id)
+
+            # Store this as the default bank
+            request.user.wanglibaouserprofile.deposit_default_bank_name = bank.name
+            request.user.wanglibaouserprofile.save()
+
+            pay_info = PayInfo()
+            pay_info.amount = amount
+            pay_info.total_amount = amount
+            pay_info.type = PayInfo.DEPOSIT
+            pay_info.status = PayInfo.INITIAL
+            pay_info.user = request.user
+            pay_info.bank = bank
+            pay_info.channel = "huifu"
+            pay_info.request_ip = get_client_ip(request)
+
+            order = OrderHelper.place_order(request.user, Order.PAY_ORDER, pay_info.status,
+                                            pay_info=model_to_dict(pay_info))
+            pay_info.order = order
+            pay_info.save()
+
+            post = {
+                'OrdId': pay_info.pk,
+                'GateId': gate_id,
+                'OrdAmt': amount_str
+            }
+
+            form = self.pay(post)
+            pay_info.request = str(form)
+            pay_info.status = PayInfo.PROCESSING
+            pay_info.save()
+            OrderHelper.update_order(order, request.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
+
+            # 处理第三方渠道的用户充值回调
+            CoopRegister(request).process_for_recharge(request.user)
+        except decimal.DecimalException:
+            message = u'金额格式错误'
+        except Bank.DoesNotExist:
+            message = u'请选择有效的银行'
+        except (socket.error, SignException) as e:
+            message = PayResult.RETRY
+            pay_info.status = PayInfo.FAIL
+            pay_info.error_message = str(e)
+            pay_info.save()
+            OrderHelper.update_order(order, request.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
+            logger.fatal('sign error! order id: ' + str(pay_info.pk) + ' ' + str(e))
+
+        result = {
+            'message': message,
+            'form': form
+        }
+
+        return result
+
 
     def withdraw(self, post):
         post['Version'] = HuifuPay.VERSION

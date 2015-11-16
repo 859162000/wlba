@@ -27,8 +27,6 @@ from wanglibao_pay.yee_pay import YeePay, YeeShortPay
 logger = logging.getLogger(__name__)
 
 
-
-
 def add_bank_card(request):
     card_no = request.DATA.get("card_number", "")
     gate_id = request.DATA.get("gate_id", "")

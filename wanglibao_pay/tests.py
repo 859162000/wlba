@@ -1,23 +1,10 @@
 # encoding:utf-8
 from string import Template
-
 from django.test import TestCase
 from mock import MagicMock
-
 from order.models import Order
 from wanglibao import test_util
 import new
-
-
-
-# class BackEndTestCase(TestCase):
-
-# def test_sign(self):
-#         pay = HuifuPay()
-#         post = pay.pay({})
-#         self.assertEqual('9EA036EF66D9B0F5B9DFB9E79BC48D69E7A1EAD47CAC6F3B49D94335D6222DABE81FDF5C52606FBF20422293CF52B74075C8A5DEBE4B2600A40877A2CA0D9C8A0A74086C08483E121499BE5A71AFB74BB87C9E80EA2E4DA20BA7EC180AD16316D6C8ECDAD8ACEFCA3AA5C5459031E2A2B7B4DBAD8438964C015B11D31159FA56', post['ChkValue'])
-#
-#
 from wanglibao_margin.models import Margin, MarginRecord
 from wanglibao_pay.exceptions import VerifyError
 from wanglibao_pay.kuai_pay import KuaiShortPay
@@ -82,18 +69,12 @@ class KuaiPaySignatureTests(TestCase):
         # fail
         self.assertRaises(VerifyError, self.kuai_pay._check_signature, self.content, '')
 
-class KuaiPayTests(TestCase):
+class PayTests(TestCase):
     def setUp(self):
         # generate user
         test_util.prepare_user_with_profile()
         #generate bank
         PayMockGenerator.generate_bank()
-
-        self.kuai_pay = KuaiShortPay()
-        # todo 暂时无法构造签名，只能到服务器上测试该方法
-        self.kuai_pay._check_signature = MagicMock(ret_value=True)
-        self.kuai_pay._request = MagicMock()
-        mock_request_switch(self.kuai_pay)
 
         self.user = test_util.get_user()
         self.amount_1 = 100
@@ -109,7 +90,15 @@ class KuaiPayTests(TestCase):
         self.VCODE = 'abc'
         self.TOKEN = '323881987'
 
+class KuaiPayTests(PayTests):
+    def setUp(self):
+        super(KuaiPayTests)
 
+        self.kuai_pay = KuaiShortPay()
+        # todo 暂时无法构造签名，只能到服务器上测试该方法
+        self.kuai_pay._check_signature = MagicMock(ret_value=True)
+        self.kuai_pay._request = MagicMock()
+        mock_request_switch(self.kuai_pay)
 
     def _clear_margin(self):
         margin = Margin.objects.get(user_id=self.user.id)
