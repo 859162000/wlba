@@ -23,7 +23,7 @@ html(style="background: #ffeec3")
                         .goods.goods_right
                             img(src="/static/imgs/mobile_activity/app_365_gu/goods_2.jpg")
                             p 110元365谷<br>代金券礼包
-            a.button(href="/weixin/regist/")
+            a.button(href="/weixin/regist/?promo_token=365gu'")
                 img(src="/static/imgs/mobile_activity/app_365_gu/button_1.png")
             .box
                 .main
@@ -37,7 +37,7 @@ html(style="background: #ffeec3")
                         .goods.goods_right
                             img(src="/static/imgs/mobile_activity/app_365_gu/goods_4.jpg")
                             p 210元365谷<br>代金券礼包
-            a.button(href="/weixin/regist/")
+            a.button(href="/weixin/regist/?promo_token=365gu'")
                 img(src="/static/imgs/mobile_activity/app_365_gu/button_2.png")
             .box.box_3
                 .main
@@ -46,9 +46,9 @@ html(style="background: #ffeec3")
                     .goods_wrap
                         img.goods_img(src="/static/imgs/mobile_activity/app_365_gu/goods_5.jpg")
                         p 580元网利宝现金红包
-            a.button(href="/weixin/regist/")
+            a.button(href="/weixin/regist/?promo_token=365gu'")
                 img(src="/static/imgs/mobile_activity/app_365_gu/button_3.png")
-        .act_rule_button 活动规则 》
+        .act_rule_button!=' 活动规则 <span>》</span>'
         .act_rule_wrap
             dl
                 dt 1.
@@ -107,6 +107,7 @@ html(style="background: #ffeec3")
                     dd 30余倍银行活期收益<br>100元起投
         img.code(src="/static/imgs/mobile_activity/app_365_gu/code.png")
         p.code_text 扫码关注微信
+    script(src="/static/js/lib/jquery.min.js")
     script(src='/static/src/mobile/lib/weixin/wx.js')
     script(src="/static/scripts/mobile_activity/app_365_gu.js?v=201511131")
     script.
