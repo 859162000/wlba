@@ -3,11 +3,11 @@
     $('.act_rule_button').click(function(){
         if(act_rule_static){
             $('.act_rule_wrap').slideUp('1000');
-            $('.act_rule_button span').removeClass('hover');
+            $('.act_rule_button img').removeClass('rotate');
             act_rule_static = false;
         }else{
             $('.act_rule_wrap').slideDown('1000');
-            $('.act_rule_button span').addClass('hover');
+            $('.act_rule_button img').addClass('rotate');
             act_rule_static = true;
 
         }
@@ -36,7 +36,7 @@ var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','on
 
                 var host = 'https://staging.wanglibao.com/',
                     shareName = '网利宝用户专享福利',
-                    shareImg = host + '/static/imgs/mobile_activity/app_365_gu/300x300.jpg',
+                    shareImg = host + '/static/imgs/mobile_activity/app_365_gu/300X300.jpg',
                     shareLink = host + '/activity/app_365_gu/',
                     shareMainTit = '网利宝用户专享福利',
                     shareBody = '网利宝理财券&365谷礼包任性送'
