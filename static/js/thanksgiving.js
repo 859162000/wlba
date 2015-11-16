@@ -42,6 +42,13 @@
                 $('body,html').animate({scrollTop: 0}, 600);
                 return false
             })
+      //规则显示隐藏
+      $('.prize-title1 .title1-a').on('click',function(){
+           $('.title1-guizhe').slideToggle();
+      })
+      $('.investment-title1 .title1-a').on('click',function(){
+           $('.title1-guizhe1').slideToggle();
+      })
 
   });
 
