@@ -255,7 +255,7 @@ var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','on
 
                 var host = 'https://staging.wanglibao.com/',
                     shareName = '网利宝用户专享福利',
-                    shareImg = host + '/static/imgs/mobile_activity/app_365_gu/300x300.jpg',
+                    shareImg = host + '/static/imgs/mobile_activity/app_365_gu/300X300.jpg',
                     shareLink = host + '/activity/app_365_gu/',
                     shareMainTit = '网利宝用户专享福利',
                     shareBody = '网利宝理财券&365谷礼包任性送'
