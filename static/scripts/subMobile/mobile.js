@@ -935,8 +935,7 @@ org.awardEvent = (function(org){ //微信抽奖
             success: function(data){
                 fn(data);
                 awardsNum = data.left;
-                redPack_id = data.redpack;
-                //alert(awardsNum+", "+$("#openid").val());
+                //redPack_id = data.redpack;
                 goods = parseFloat(data.amount);
             },
             error: function(){}
