@@ -6,7 +6,7 @@ html
     - with '网利宝' as title
     include include/common_head
     - endwith
-    link(rel="stylesheet",href="/static/styles/pc_activity/365_gu.css?v=201511121")
+    link(rel="stylesheet",href="/static/stylesheets/365_gu.css?v=201511121")
   body(style="background:#ffeec3")
     //include global/g_nav
     .g-nav-warp
@@ -131,8 +131,9 @@ html
               dt 高收益
               dd 30余倍银行活期收益<br>100元起投
     .popup_bg
-    .register_wrap.popup(style="display:none")
+    .register_wrap.popup
         .close_ico
+        img.logo_img(src="/static/imgs/pc_activity/365_gu/logo.jpg")
         if user.is_authenticated
           #ganjiwang-model
           .banner-form#ganjiwang-welcome
@@ -147,7 +148,7 @@ html
         else
             .denelu-form#denglu
                 #aug-center
-                    .off-form#off-form ×
+                    .off-form#off-form
                     form#img-code-form.img-code-form.aut-form(method='post', action='')
                         .form-row
                             input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
@@ -201,5 +202,6 @@ html
       a.href(href="/accounts/home/?promo_token=jcw") 立即抢门票
     include global/g_footer
     script.
-      require(['/static/js/jucheng.js?v=201511065'])
+      require(['/static/src/pc/365_gu.js?v=201511131'])
+
 

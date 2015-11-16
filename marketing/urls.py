@@ -136,10 +136,12 @@ urlpatterns += patterns(
     url(r'^app_jucheng/$', TemplateView.as_view(template_name="app_jucheng.jade")),
     url(r'^app_two-eleven/$', TemplateView.as_view(template_name="app_two-eleven.jade")),
     url(r'^app_bid/$', TemplateView.as_view(template_name="app_bid.jade")),
+    url(r'^app_365_gu/$', TemplateView.as_view(template_name="app_365_gu.jade")),
 
     url(r'^app-invite/$', TemplateView.as_view(template_name="app_invite_friends.jade")),
     url(r'^app-invite-success/$', TemplateView.as_view(template_name="app_invite_success.jade")),
     url(r'^app-invite-error/$', TemplateView.as_view(template_name="app_invite_error.jade")),
+
 )
 
 urlpatterns += patterns(
