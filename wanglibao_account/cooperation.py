@@ -3088,3 +3088,168 @@ class MidaiNewView(APIView):
                 'loans': []
             }
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+def get_rongtu_borrow():
+    """
+    author: Zhoudong
+    http请求方式: GET  返回正在招标但是没有投满的标
+    :return:
+    """
+    ret = dict()
+    ret['borrow'] = []
+    try:
+        products = P2PProduct.objects.filter(status=u'正在招标')
+    except Exception, e:
+        print 'Exception : {}'.format(e)
+        return
+
+    for product in products:
+        data = dict()
+        data['borrowid'] = product.pk
+        data['name'] = product.name
+        data['url'] = "https://www.wanglibao.com/p2p/detail/{}".format(product.id)
+        data['isday'] = 1 if product.pay_method.startswith(u"日计息") else 0
+        data['timelimit'] = 0 if product.pay_method.startswith(u"日计息") else product.period
+        data['timelimitday'] = product.period if product.pay_method.startswith(u"日计息") else 0
+        data['account'] = product.total_amount
+        data['owner'] = product.borrower_name
+        data['apr'] = product.expected_earning_rate
+        data['award'] = 1 if product.activity else 0
+        data['partaccount'] = str(round(product.activity.rule.rule_amount, 2)) if product.activity else ''
+        data['funds'] = 0
+
+        if product.pay_method in [u'等额本息']:
+            pay_method = 0
+        elif product.pay_method in [u'日计息一次性还本付息', u'到期还本付息']:
+            pay_method = 1
+        else:
+            pay_method = 3
+        data['repaymentType'] = pay_method
+        data['type'] = 1
+        data['addtime'] = time.mktime(time.strptime(
+            product.publish_time.strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S'))
+        data['sumTender'] = product.completion_rate
+        data['startmoney'] = float(100)
+        data['tenderTimes'] = P2PEquity.objects.filter(product=product).count()
+
+        ret['borrow'].append(data)
+
+    return json.dumps(ret['borrow'])
+
+
+def get_rongtu_list():
+    """
+    author: Zhoudong
+    http请求方式: GET  30天内每天的平均年利率
+    :return:
+    """
+    ret = dict()
+    today = timezone.now()
+    today_start = today.replace(hour=0, minute=0, second=0, microsecond=0)
+    ret['apr_data'] = {}
+    ret['count_data'] = {}
+    ret['dcount_data'] = {}
+    try:
+        for i in range(29, -1, -1):
+            check_date = today_start - timezone.timedelta(days=i)
+
+            products = P2PProduct.objects.filter(publish_time__gte=check_date,
+                                                 publish_time__lt=(check_date + timezone.timedelta(days=1)))
+
+            try:
+                avg_rate = round(products.aggregate(Sum('expected_earning_rate'))
+                                 ['expected_earning_rate__sum'] / products.count(), 2) or 0
+                if avg_rate <= 0:
+                    avg_rate = round(P2PProduct.objects.all().aggregate(Sum('expected_earning_rate'))
+                                     ['expected_earning_rate__sum'] / products.count(), 2) or 15
+            except Exception, e:
+                avg_rate = round(P2PProduct.objects.all().aggregate(Sum('expected_earning_rate'))
+                                 ['expected_earning_rate__sum'] / P2PProduct.objects.count(), 2) or 15
+                print 'avg_rate error: {}'.format(e)
+                print avg_rate
+
+            try:
+                avg_amount = products.aggregate(Sum('total_amount'))['total_amount__sum'] / 10000 or 0
+            except Exception, e:
+                print 'avg_amount error: {}'.format(e)
+                avg_amount = 0
+
+            p2p_equities = P2PEquity.objects.filter(created_at__gte=check_date,
+                                                    created_at__lt=(check_date + timezone.timedelta(days=1)))
+            try:
+                day_amount = (p2p_equities.aggregate(Sum('equity'))['equity__sum'] / 10000) or 0
+            except Exception, e:
+                print 'day_amount error: {}'.format(e)
+                day_amount = 0
+            # 需要返回的数据进行字符串处理
+            # date_str += "'" + str(check_date).split()[0][5:] + "'" + ','
+            date_str = str(check_date).split()[0][5:]
+
+            ret['apr_data'].update({date_str: avg_rate})
+            ret['count_data'].update({date_str: avg_amount})
+            ret['dcount_data'].update({date_str: day_amount})
+
+    except Exception, e:
+        print 'apr_data error: {}'.format(e)
+
+    try:
+        time_delta = timezone.timedelta(days=365)
+        products = P2PProduct.objects.filter(publish_time__gte=today-time_delta)
+
+        day_count = products.filter(pay_method__contains=u'日计息')
+        month_count = products.filter().exclude(pay_method__contains=u'日计息')
+
+        p2p_1to3 = month_count.filter(period__gte=1, period__lte=3)
+        p2p_4to6 = month_count.filter(period__gte=4, period__lte=6)
+        p2p_7to12 = month_count.filter(period__gte=7, period__lte=12)
+        p2p_gt_12 = month_count.filter(period__gt=12)
+
+        amount_p2p_1to3 = (day_count.aggregate(Sum('total_amount'))['total_amount__sum'] +
+                           p2p_1to3.aggregate(Sum('total_amount'))['total_amount__sum']) / 10000 or 0
+        amount_p2p_4to6 = p2p_4to6.aggregate(Sum('total_amount'))['total_amount__sum'] / 10000 or 0
+        amount_p2p_7to12 = p2p_7to12.aggregate(Sum('total_amount'))['total_amount__sum'] / 10000 or 0
+        amount_p2p_gt_12 = p2p_gt_12.aggregate(Sum('total_amount'))['total_amount__sum'] / 10000 or 0
+
+        ret['time_data'] = u"[u'1-3个月',{}],[u'4-6个月',{}],[u'7-12个月',{}],[u'12个月以上',{}]".format(
+            amount_p2p_1to3, amount_p2p_4to6, amount_p2p_7to12, amount_p2p_gt_12)
+    except Exception, e:
+        print 'time_data error: {}'.format(e)
+        ret['time_data'] = u"[u'1-3个月',?],[u'4-6个月',?],[u'7-12个月',?],[u'12个月以上',?]"
+
+    try:
+        # 平台交易总量
+        ret['cj_data'] = P2PEquity.objects.all().aggregate(Sum('equity'))['equity__sum'] / 10000 or 0
+        # 平台待还金额
+        ret['dh_data'] = P2PProduct.objects.filter(status__in=[u'还款中']).aggregate(
+            Sum('total_amount'))['total_amount__sum'] / 10000 or 0
+        # 当天平均年利率
+        today_products = P2PProduct.objects.filter(publish_time__gte=today_start,
+                                                   publish_time__lt=today_start + timezone.timedelta(days=1))
+        try:
+            ret['avg_apr'] = round(today_products.aggregate(Sum('expected_earning_rate'))
+                                   ['expected_earning_rate__sum'] / today_products.count(), 2) or 0
+        except Exception, e:
+            print 'avg_apr error: {}'.format(e)
+            ret['avg_apr'] = round(P2PProduct.objects.all().aggregate(Sum('expected_earning_rate'))
+                                   ['expected_earning_rate__sum'] / P2PProduct.objects.count(), 2) or 0
+    except Exception, e:
+        print 'error: {}'.format(e)
+
+    return json.dumps(ret)
+
+
+def rongtu_post_data():
+
+    url = settings.RONGTU_URL_TEST
+
+    dangan_id = settings.RONGTU_ID
+    borrow = get_rongtu_borrow()
+    arg_list = get_rongtu_list()
+
+    args = dict()
+    args.update(dangan_id=dangan_id, borrow=borrow, list=arg_list)
+
+    ret = requests.post(url, data=args)
+    print ret.text
+    return ret.text
