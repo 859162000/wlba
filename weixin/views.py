@@ -324,7 +324,7 @@ def getOrCreateWeixinUser(openid, weixin_account):
         w_user.save()
     if not w_user.nickname:
         try:
-            user_info = weixin_account.get_user_info(openid)
+            user_info = weixin_account.db_account.get_user_info(openid)
             w_user.nickname = user_info.get('nickname', "")
             w_user.sex = user_info.get('sex')
             w_user.city = user_info.get('city', "")
@@ -337,6 +337,7 @@ def getOrCreateWeixinUser(openid, weixin_account):
             w_user.subscribe_time = user_info.get('subscribe_time', 0)
             w_user.save()
         except WeChatException, e:
+            logger.debug(e.message)
             pass
     return w_user
 
@@ -1270,7 +1271,7 @@ class GetUserInfo(APIView):
         if not w_user:
             return Response({'errcode':-4, 'errmsg':'openid is not exist'})
         weixin_account = WeixinAccounts.getByOriginalId(w_user.account_original_id)
-        user_info = weixin_account.get_user_info(w_user.openid)
+        user_info = weixin_account.db_account.get_user_info(w_user.openid)
         try:
             if not w_user.nickname:
                 w_user.nickname = user_info.get('nickname', "")

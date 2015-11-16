@@ -636,6 +636,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'wanglibao_account.tasks.zhongjin_post_task',
         'schedule': timedelta(hours=1),
     },
+    # by Zhoudong 融途网标的推送(包含新标, 更新, 下架)
+    'rongtu_send_data': {
+        'task': 'wanglibao_account.tasks.rongtu_post_task',
+        'schedule': timedelta(hours=1),
+    },
     # 每天定时检测和生成原始邀请码
     'check_and_generate_codes': {
         'task': 'marketing.tools.check_and_generate_codes',
@@ -977,6 +982,11 @@ ZO_SECRET = '3r2o3j3m3g3q3l2o7o'
 # 米贷网
 MIDAI_USERNAME = 'medai360'
 MIDAI_PASSWORD = '12345678'
+
+# 融途网
+RONGTU_URL = 'http://shuju.erongtu.com/api/borrow'
+RONGTU_URL_TEST = 'http://shuju.erongtu.com/api/test'
+RONGTU_ID = 1638
 
 # 金山
 WLB_FOR_JINSHAN_KEY = '1994'
