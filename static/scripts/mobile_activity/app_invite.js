@@ -437,7 +437,7 @@ org.invite_index = (function (org) {
                     if(data.ret_code === 0 ){
                         var base64Native = Base64.encode(_self.$phone.val());
                         var styleBase = base64Native.substring(0,base64Native.length-1);
-                        window.location.href='/app_invite_success/'+ styleBase+'/';
+                        window.location.href='/wst/'+ styleBase+'/';
                     }else if (data.ret_code){
                         return _self.spread.trigger('from:showSign',[data.message])
                     }
@@ -467,7 +467,7 @@ org.invite_index = (function (org) {
                     if(data.existing){
                         var base64Native = Base64.encode(_self.$phone.val());
                         var styleBase = base64Native.substring(0,base64Native.length-1);
-                        window.location.href = '/app_invite_error/'+ styleBase+'/';
+                        window.location.href = '/wsf/'+ styleBase+'/';
                     }else{
                         _self.$phone.attr({'data-existing': 'false'});
                         _self.$body_h.css({'height': '6.6rem'});
