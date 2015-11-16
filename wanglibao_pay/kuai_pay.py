@@ -600,11 +600,11 @@ class KuaiPay:
             card.is_default = False
             card.save()
 
-            try:
-                # 处理第三方用户绑卡回调
-                CoopRegister(request).process_for_binding_card(request.user)
-            except Exception, e:
-                logger.error(e)
+            # try:
+            #     # 处理第三方用户绑卡回调
+            #     CoopRegister(request).process_for_binding_card(request.user)
+            # except Exception, e:
+            #     logger.error(e)
 
             return True
 
@@ -1416,11 +1416,11 @@ class KuaiShortPay:
         card.bank = bank
         card.save()
 
-        if add_card:
-            try:
-                # 处理第三方用户绑卡回调
-                CoopRegister(request).process_for_binding_card(request.user)
-            except Exception, e:
-                logger.error(e)
+        # if add_card:
+        #     try:
+        #         # 处理第三方用户绑卡回调
+        #         CoopRegister(request).process_for_binding_card(request.user)
+        #     except Exception, e:
+        #         logger.error(e)
 
         return card

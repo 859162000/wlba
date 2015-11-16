@@ -2,6 +2,8 @@
 # encoding:utf-8
 
 import sys
+from wanglibao_account.cooperation import CoopRegister
+
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
@@ -456,18 +458,22 @@ def bind_pay_dynnum(request):
         card = Card.objects.filter(no=card_no, user=user).first()
 
     if not card:
-        return {"ret_code": 20002, "message": "银行卡未绑定"}
+        res = {"ret_code": 20002, "message": "银行卡未绑定"}
 
     if card.bank.channel == 'huifu':
-        return {'ret_code': 20003, 'message': '汇付天下请选择快捷支付渠道'}
+        res = {'ret_code': 20003, 'message': '汇付天下请选择快捷支付渠道'}
 
     elif card.bank.channel == 'yeepay':
-        return YeeShortPay().dynnum_bind_pay(request)
+        res = YeeShortPay().dynnum_bind_pay(request)
 
     elif card.bank.channel == 'kuaipay':
-        return KuaiShortPay().dynnum_bind_pay(user, vcode, order_id, token, input_phone, device, ip)
+        res = KuaiShortPay().dynnum_bind_pay(user, vcode, order_id, token, input_phone, device, ip)
     else:
-        return {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
+        res = {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
+
+    if res.get('ret_code') == 0:
+        CoopRegister(request).process_for_binding_card(user)
+    return res
 
 
 def yee_callback(request):
