@@ -222,13 +222,13 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     $('.act_rule_button').click(function(){
         if(act_rule_static){
             $('.act_rule_wrap').slideUp('1000');
-            $('.act_rule_button span').removeClass('hover');
+            $('.act_rule_button img').removeClass('rotate');
             act_rule_static = false;
         }else{
             $('.act_rule_wrap').slideDown('1000');
-            $('.act_rule_button span').addClass('hover');
+            $('.act_rule_button img').addClass('rotate');
             act_rule_static = true;
-            
+
         }
     });
 })();

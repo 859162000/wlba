@@ -90,13 +90,16 @@
   font-weight: bold;
   margin: 0 auto;
   line-height: 1.4rem; }
-  .act_rule_button span {
+  .act_rule_button img {
     -webkit-transform: rotate(0deg);
     transform: rotate(0deg);
     display: inline-block;
-    transform-origin: 35% 55%;
-    transition: all 0.4s linear; }
-  .act_rule_button .hover {
+    transform-origin: 50% 60%;
+    transition: all 0.4s linear;
+    position: relative;
+    right: -10px;
+    top: 3px; }
+  .act_rule_button .rotate {
     -webkit-transform: rotate(90deg);
     transform: rotate(90deg); }
 
