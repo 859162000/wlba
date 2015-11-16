@@ -1306,7 +1306,7 @@ class KuaiShortPay:
                                                      "device": device, "order_id": order_id})
                 CoopRegister(request).process_for_recharge(pay_info.user, order_id)
             except:
-                pass
+                logger.exception('kuai_pay_deposit_call_back_failed')
 
             # 充值成功后，更新本次银行使用的时间
             if len(pay_info.card_no) == 10:
