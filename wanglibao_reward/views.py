@@ -7,6 +7,7 @@
 #########################################################################
 from django.utils import timezone
 from django.db import transaction
+from django.db import IntegrityError
 from django.db.models import Count, Q
 from datetime import datetime
 from wanglibao_redpack import backends as redpack_backends
@@ -56,17 +57,15 @@ class WeixinShareDetailView(TemplateView):
     def debug_msg(self, msg=u'None'):
         logger.debug("class:%s, function:%s,  msg:%s" %(self.__class__.__name__, self.current_function_name, msg))
 
-    def has_combine_redpack(self, product_id, activity):
+    def has_combine_redpack(self, product_id):
         """
             判断是否已经生成了此次活动的组合红包
         """
-        if not self.activity:
-           self.get_activity_by_id(activity)
         try:
-            combine_redpack = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity)
+            gift_order = WanglibaoActivityGiftOrder.objects.filter(order_id=product_id)
         except Exception, reason:
-            self.exception_msg(reason, u'判断组合红包生成报异常, gift_id:%s, activity:%s' %(product_id, self.activity))
-        return True if combine_redpack else False
+            self.exception_msg(reason, u'判断组合红包生成报异常, gift_id:%s, activity:%s' %(product_id,))
+        return True if gift_order else False
 
     def get_activity_by_id(self, activity_id):
         try:
@@ -125,6 +124,22 @@ class WeixinShareDetailView(TemplateView):
             self.debug_msg(u"获得配置红包id失败")
             return None
         self.debug_msg("红包编号为：%s" % (ids, ))
+        try:
+            WanglibaoActivityGiftOrder.objects.create(
+                valid_amount=len(redpacks),
+                order_id=product_id
+            )
+        except IntegrityError, reason:
+            if -1 != reason.find("Duplicate entry"):
+                logger.debug("此条记录已经存在，由unique key保证")
+                return
+            else:
+                raise IntegrityError(reason)
+
+        except Exception, reason:
+            logger.debug("ordergift表入库报了未知异常")
+            raise
+
         for redpack in redpacks:
             try:
                 activity_gift = WanglibaoActivityGift.objects.create(
@@ -142,10 +157,6 @@ class WeixinShareDetailView(TemplateView):
             except Exception, reason:
                 self.exception_msg(reason, '组合红包入库报错')
 
-        WanglibaoActivityGiftOrder.objects.create(
-            valid_amount=len(redpacks),
-            order_id=product_id
-        )
 
     def has_got_redpack(self, phone_num, activity, order_id, openid):
         """
@@ -337,7 +348,7 @@ class WeixinShareDetailView(TemplateView):
             activity = record.activity.code if record else activitys[index]
             logger.debug("misc配置的activity有:%s, 本次使用的activity是：%s" % (activitys, activity))
 
-        if not self.has_combine_redpack(order_id, activity):
+        if not self.has_combine_redpack(order_id):
             self.generate_combine_redpack(order_id, activity)
 
         user_gift = self.has_got_redpack(phone_num, activity, order_id, openid)

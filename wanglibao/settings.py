@@ -149,6 +149,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'marketing.middlewares.PromotionTokenMiddleWare',
+    'marketing.middlewares.StatsKeyWordMiddleWare',
 )
 
 CONCURRENCY_POLICY = 2
@@ -382,6 +383,12 @@ LOGGING = {
             'filename': '/var/log/wanglibao/wanglibao_reward.log',
             'formatter': 'verbose'
         },
+        'wanglibao_account':{  #add by yihen@20151113
+                              'level': 'INFO',
+                              'class': 'logging.FileHandler',
+                              'filename': '/var/log/wanglibao/wanglibao_account.log',
+                              'formatter': 'verbose'
+                              },
         'wanglibao_rest':{  #add by yihen@20151028
                               'level': 'DEBUG',
                               'class': 'logging.FileHandler',
@@ -394,6 +401,12 @@ LOGGING = {
                               'filename': '/var/log/wanglibao/wanglibao_cooperation.log',
                               'formatter': 'verbose'
                               },
+        'weixin':{  #add by huomeimei
+              'level': 'DEBUG',
+              'class': 'logging.FileHandler',
+              'filename': '/var/log/wanglibao/weixin.log',
+              'formatter': 'verbose'
+                },
     },
     'loggers': {
         'django': {
@@ -430,8 +443,8 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'wanglibao_account': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
+            'handlers': ['wanglibao_account', 'console'],
+            'level': 'INFO',
         },
         'wanglibao_app': {
             'handlers': ['file'],
@@ -465,6 +478,10 @@ LOGGING = {
                               'handlers': ['wanglibao_cooperation', 'console'],
                               'level': 'DEBUG'
                               },
+        'weixin':{#add by huomeimei
+              'handlers': ['weixin', 'console'],
+              'level': 'DEBUG'
+        },
         'wanglibao_p2p': {
             'handlers': [ 'console'],
             'level': 'DEBUG'
