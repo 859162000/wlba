@@ -125,11 +125,11 @@ class PayView(TemplateView):
             pay_info.save()
             OrderHelper.update_order(order, request.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
 
-            try:
-                # 处理PC第三方用户充值回调
-                CoopRegister(request).process_for_recharge(request.user)
-            except Exception, e:
-                logger.error(e)
+            # try:
+            #     # 处理PC第三方用户充值回调
+            #     CoopRegister(request).process_for_recharge(request.user, order.id)
+            # except Exception, e:
+            #     logger.error(e)
 
         except decimal.DecimalException:
             message = u'金额格式错误'
@@ -498,7 +498,7 @@ class WithdrawTransactions(TemplateView):
                         fee_misc = WithdrawFee(switch='on')
                         fee_config = fee_misc.get_withdraw_fee_config()
                         withdraw_count = fee_misc.get_withdraw_success_count(payinfo.user)
-                        free_times = fee_config['fee']['amount_interval']
+                        free_times = fee_config['fee']['free_times_per_month']
                         if withdraw_count < free_times:
                             give_back = True
 
@@ -811,14 +811,6 @@ class BindPayView(APIView):
         pay = third_pay.KuaiPay()
         result = pay.pre_pay(request)
 
-        #旧版手机充值回调
-        if result['ret_code'] == 0:
-            try:
-                # 处理第三方用户充值回调
-                CoopRegister(request).process_for_recharge(request.user)
-            except Exception, e:
-                logger.error(e)
-
         return Response(result)
 
 
@@ -837,7 +829,8 @@ class KuaiShortPayCallbackView(View):
                                   pm['order_id'],
                                   pm['ref_number'],
                                   pm['res_content'],
-                                  pm['signature'])
+                                  pm['signature'],
+                                  request)
 
         return HttpResponse(result, content_type='text/xml')
 
@@ -1045,13 +1038,6 @@ class UnbindCardView(APIView):
         result = third_pay.card_unbind(request)
         return Response(result)
 
-def _is_short_card_num(request):
-    card_no = request.DATA.get("card_no", "").strip()
-    if card_no and len(card_no) == 10:
-        return True
-    else:
-        return False
-
 class BindPayDepositView(APIView):
     """ 获取验证码或快捷支付 """
     permission_classes = (IsAuthenticated, )
@@ -1059,12 +1045,6 @@ class BindPayDepositView(APIView):
     @require_trade_pwd
     def post(self, request):
         result = third_pay.bind_pay_deposit(request)
-        if _is_short_card_num(request) and result.get('ret_code') == 0:
-            # 手机首次充值
-            try:
-                CoopRegister(request).process_for_purchase(request.user)
-            except:
-                pass
 
         return Response(result)
 
@@ -1075,13 +1055,6 @@ class BindPayDynnumNewView(APIView):
     @require_trade_pwd
     def post(self, request):
         result = third_pay.bind_pay_dynnum(request)
-        # 手机首次充值，绑卡
-        if result.get('ret_code') == 0:
-            try:
-                CoopRegister(request).process_for_purchase(request.user)
-                CoopRegister(request).process_for_binding_card(request.user)
-            except:
-                pass
 
         return Response(result)
 

@@ -97,7 +97,7 @@ class P2PTrader(object):
                                                "device": self.device, "order_id": self.order_id,
                                                "product_id": self.product.id, "is_full": is_full})
         try:
-            CoopRegister(self.request).process_for_purchase(self.user)
+            CoopRegister(self.request).process_for_purchase(self.user, self.order_id)
         except:
             pass
 
