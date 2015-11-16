@@ -98,7 +98,8 @@
     transition: all 0.4s linear;
     position: relative;
     right: -10px;
-    top: 3px; }
+    top: 3px;
+    height: 28px; }
   .act_rule_button .rotate {
     -webkit-transform: rotate(90deg);
     transform: rotate(90deg); }
