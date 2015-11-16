@@ -416,3 +416,14 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
+
+
+def base64_to_image(base64_str):
+    import base64
+    import StringIO
+
+    img_str = base64.b64decode(base64_str)
+    io_handle = StringIO.StringIO()
+    img_data = io_handle.write(img_str)
+
+    return img_data
