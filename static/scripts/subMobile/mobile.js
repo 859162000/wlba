@@ -878,6 +878,14 @@ function getCode(){//得到用户信息的二维码
         }
     });
 }
+function isIphone(id){
+    var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+        iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+        ios = ipad || iphone;
+    if (ios) {
+      document.getElementById(id).style.display = 'block';
+    }
+}
 
 function isAwards(k){//判断抽奖是第几项
     var is = 0;
@@ -927,7 +935,7 @@ org.awardEvent = (function(org){ //微信抽奖
             success: function(data){
                 fn(data);
                 awardsNum = data.left;
-                //alert(awardsNum+", "+$("#openid").val());
+                //redPack_id = data.redpack;
                 goods = parseFloat(data.amount);
             },
             error: function(){}

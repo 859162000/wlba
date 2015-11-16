@@ -4,10 +4,9 @@ html(style="background: #ffeec3")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_365_gu.css?v=201511063", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_365_gu.css?v=201511161", rel="stylesheet")
         - csrf_token
     body
-        img.weixin_share(src="/static/imgs/mobile_activity/app_jucheng/300x300.jpg" style="display:none")
         img.banner(src="/static/imgs/mobile_activity/app_365_gu/banner.jpg")
         img.module_title(src="/static/imgs/mobile_activity/app_365_gu/module_1.png")
         .act_wrap
@@ -23,12 +22,12 @@ html(style="background: #ffeec3")
                         .goods.goods_right
                             img(src="/static/imgs/mobile_activity/app_365_gu/goods_2.jpg")
                             p 110元365谷<br>代金券礼包
-            a.button(href="/weixin/regist/")
+            a.button(href="/weixin/regist/?promo_token=365gu'")
                 img(src="/static/imgs/mobile_activity/app_365_gu/button_1.png")
             .box
                 .main
                     img.title_img(src="/static/imgs/mobile_activity/app_365_gu/goods_title_2.png")
-                    .title_text 用户投资 ≥1000元送
+                    .title_text 用户投资 ≥500元送
                     .goods_wrap
                         .goods.goods_left
                             img(src="/static/imgs/mobile_activity/app_365_gu/goods_3.jpg")
@@ -37,7 +36,7 @@ html(style="background: #ffeec3")
                         .goods.goods_right
                             img(src="/static/imgs/mobile_activity/app_365_gu/goods_4.jpg")
                             p 210元365谷<br>代金券礼包
-            a.button(href="/weixin/regist/")
+            a.button(href="/weixin/regist/?promo_token=365gu'")
                 img(src="/static/imgs/mobile_activity/app_365_gu/button_2.png")
             .box.box_3
                 .main
@@ -46,9 +45,10 @@ html(style="background: #ffeec3")
                     .goods_wrap
                         img.goods_img(src="/static/imgs/mobile_activity/app_365_gu/goods_5.jpg")
                         p 580元网利宝现金红包
-            a.button(href="/weixin/regist/")
+            a.button(href="/weixin/regist/?promo_token=365gu'")
                 img(src="/static/imgs/mobile_activity/app_365_gu/button_3.png")
-        .act_rule_button 活动规则 》
+        .act_rule_button 活动规则
+            img(src="/static/imgs/mobile_activity/app_365_gu/ico.png")
         .act_rule_wrap
             dl
                 dt 1.
@@ -58,7 +58,7 @@ html(style="background: #ffeec3")
                 dd 用户注册网利宝可获赠0.5千克五常大米 + 110元365谷代金券礼包，礼包包含80元代金券1张（满359元可用）、20元代金券1张（满119元可用）、5元代金券2张（全场通用）；
             dl
                 dt 3.
-                dd 单笔首次投资大于等于1000元送4.5千克五常长粒香米 + 210元365谷代金券礼包，礼包包含80元代金券1张（满359可用）、20元代金券1张（满119元可用）、100元代金券1张（满529元可用）、5元代金券2张（全场通用）；
+                dd 单笔首次投资大于等于500元送4.5千克五常长粒香米 + 210元365谷代金券礼包，礼包包含80元代金券1张（满359可用）、20元代金券1张（满119元可用）、100元代金券1张（满529元可用）、5元代金券2张（全场通用）；
             dl
                 dt 4.
                 dd 网利宝新用户享580元现金红包：<br>
@@ -107,6 +107,7 @@ html(style="background: #ffeec3")
                     dd 30余倍银行活期收益<br>100元起投
         img.code(src="/static/imgs/mobile_activity/app_365_gu/code.png")
         p.code_text 扫码关注微信
+    script(src="/static/js/lib/jquery.min.js")
     script(src='/static/src/mobile/lib/weixin/wx.js')
     script(src="/static/scripts/mobile_activity/app_365_gu.js?v=201511131")
     script.

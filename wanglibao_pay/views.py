@@ -458,17 +458,20 @@ class WithdrawTransactions(TemplateView):
                         payinfo.status, PayInfo.ACCEPTED, PayInfo.PROCESSING))
                         continue
 
+                    amount = payinfo.amount
+                    fee = payinfo.fee
+                    management_fee = payinfo.management_fee
+                    management_amount = payinfo.management_amount
+
                     marginKeeper = MarginKeeper(payinfo.user)
-                    total_amount = payinfo.amount + payinfo.fee + payinfo.management_fee
-                    marginKeeper.withdraw_ack(total_amount, uninvested=payinfo.management_amount)
+                    total_amount = amount + fee + management_fee
+                    marginKeeper.withdraw_ack(total_amount, uninvested=management_amount)
 
                     payinfo.status = PayInfo.SUCCESS
                     payinfo.confirm_time = timezone.now()
                     payinfo.save()
 
                     # 给提现记录表中的信息同步进行确认,同时将提现的费用充值到网利宝的公司提现账户
-                    fee = payinfo.fee
-                    management_fee = payinfo.management_fee
 
                     if fee > 0 or management_fee > 0:
                         fee_total_amount = fee + management_fee
@@ -481,10 +484,10 @@ class WithdrawTransactions(TemplateView):
                         if withdraw_card:
                             withdraw_card_record = WithdrawCardRecord()
                             withdraw_card_record.type = PayInfo.WITHDRAW
-                            withdraw_card_record.amount = payinfo.amount
-                            withdraw_card_record.fee = payinfo.fee
-                            withdraw_card_record.management_fee = payinfo.management_fee
-                            withdraw_card_record.management_amount = payinfo.management_amount
+                            withdraw_card_record.amount = amount
+                            withdraw_card_record.fee = fee
+                            withdraw_card_record.management_fee = management_fee
+                            withdraw_card_record.management_amount = management_amount
                             withdraw_card_record.withdrawcard = withdraw_card
                             withdraw_card_record.payinfo = payinfo
                             withdraw_card_record.user = payinfo.user
@@ -499,7 +502,8 @@ class WithdrawTransactions(TemplateView):
                         fee_config = fee_misc.get_withdraw_fee_config()
                         withdraw_count = fee_misc.get_withdraw_success_count(payinfo.user)
                         free_times = fee_config['fee']['free_times_per_month']
-                        if withdraw_count < free_times:
+                        # 已成功次数 + 本次成功的次数
+                        if (withdraw_count + 1) <= free_times:
                             give_back = True
 
                     if give_back:
@@ -514,8 +518,8 @@ class WithdrawTransactions(TemplateView):
                         # 将提现信息单独记录到提现费用记录表中
                         withdraw_card_record = WithdrawCardRecord()
                         withdraw_card_record.type = PayInfo.WITHDRAW
-                        withdraw_card_record.amount = payinfo.fee
-                        withdraw_card_record.fee = payinfo.fee
+                        withdraw_card_record.amount = fee
+                        withdraw_card_record.fee = fee
                         withdraw_card_record.management_fee = 0
                         withdraw_card_record.management_amount = 0
                         withdraw_card_record.withdrawcard = withdraw_card
@@ -535,8 +539,7 @@ class WithdrawTransactions(TemplateView):
                     })
                     send_messages.apply_async(kwargs={
                         "phones": [payinfo.user.wanglibaouserprofile.phone],
-                        "messages": [messages.withdraw_confirmed(payinfo.user.wanglibaouserprofile.name,
-                                                                 payinfo.amount)]
+                        "messages": [messages.withdraw_confirmed(payinfo.user.wanglibaouserprofile.name, amount)]
                     })
             return HttpResponse({
                 u"所有的取款请求已经处理完毕 %s" % uuids_param
@@ -899,7 +902,11 @@ class FEEAPIView(APIView):
                 return Response({"ret_code": 30141, "message": u"银行卡选择错误"})
         else:
             if not bank_id:
-                return Response({"ret_code": 30137, "message": u"银行卡选择错误"})
+                if device_type == 'ios' or device_type == 'android':
+                    if app_version and app_version < "2.6.3":
+                        pass
+                    else:
+                        return Response({"ret_code": 30137, "message": u"银行卡选择错误"})
 
         try:
             float(amount)
@@ -971,7 +978,7 @@ class FEEAPIView(APIView):
 
         actual_amount = amount - fee - management_fee  # 实际到账金额
         if actual_amount <= 0:
-            return Response({"ret_code": 30136, "message": u'实际到账金额为0,无法提现'})
+            return Response({"ret_code": 30136, "message": u'余额不足，提现失败'})
 
         if device_type == 'ios' or device_type == 'android':
             if app_version and app_version < "2.6.3":

@@ -2541,12 +2541,14 @@ class RewardDistributeAPIView(APIView):
 
         today = time.strftime("%Y-%m-%d", time.localtime())
         join_log = ActivityJoinLog.objects.filter(user=user, create_time__gte=today).first()
-        redpack_event = self.redpacks.get(join_log.amount)
 
         self.prepare_for_distribute()
         if not join_log:
             logger.debug(u'用户{0}第一次进入页面，给用户生成抽奖记录'.format(user))
             join_log = self.decide_which_to_distribute(user)
+
+        key = float("{0:.1f}".format(join_log.amount))
+        redpack_event = self.redpacks.get(key)
 
         if join_log.join_times == 0:
             logger.debug(u'用户{0}的抽奖次数已经用完了'.format(user))
