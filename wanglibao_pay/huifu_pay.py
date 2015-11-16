@@ -11,6 +11,7 @@ import traceback
 #from marketing.helper import RewardStrategy
 import requests
 from order.utils import OrderHelper
+from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_pay.models import PayInfo, Bank, Card
 from wanglibao_pay.pay import Pay
@@ -26,7 +27,6 @@ import xml.etree.ElementTree as ET
 #from wanglibao_account import message as inside_message
 from wanglibao_rest.utils import split_ua
 from order.models import Order
-from wanglibao_account.cooperation import CoopRegister
 
 logger = logging.getLogger(__name__)
 
@@ -287,6 +287,7 @@ class HuifuPay(Pay):
                 # fix@chenweibi, add order_id
                 tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
                                                      "device": device, "order_id": order_id})
+                CoopRegister(request).process_for_recharge(pay_info.user, order_id)
             except:
                 pass
 
@@ -504,12 +505,12 @@ class HuifuShortPay:
 
         card.bank = bank
         card.save()
-        if add_card:
-            try:
-                # 处理第三方用户绑卡回调
-                CoopRegister(request).process_for_binding_card(request.user)
-            except Exception, e:
-                logger.error(e)
+        # if add_card:
+        #     try:
+        #         # 处理第三方用户绑卡回调
+        #         CoopRegister(request).process_for_binding_card(request.user)
+        #     except Exception, e:
+        #         logger.error(e)
 
         return card
 
