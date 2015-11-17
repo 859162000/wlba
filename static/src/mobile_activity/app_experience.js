@@ -50,6 +50,7 @@ org.experience = (function(org){
             lib._lookMore()
             lib._goExperienceBtn()
             lib._goInvest()
+            lib._bannerEffect()
         },
         _lookMore:function(){
             $lookMore = $('#lookMore')
@@ -94,6 +95,36 @@ org.experience = (function(org){
                     }, 2000)
                 }
             })
+        },
+        _bannerEffect:function(){
+            function snow(left,height,src){
+                var elem = $("<div />", {
+                    css: {
+                        left: left+"px",
+                        height:height+"px"
+                    }
+                }).addClass('div').append($('<img />',{
+                    src : src
+                }).addClass('roll'));
+                $('#showMoney').append(elem);
+                setTimeout(function(){
+                    $(elem).remove();
+                },4000);
+             }
+            xg=setInterval(function(){
+                var left = Math.random()*window.innerWidth;
+                var height = Math.random()*window.innerHeight;
+                var src = "/static/imgs/mobile_activity/app_experience/xg"+Math.floor(Math.random()*7+1)+".png";
+                snow(left,height,src);
+            },300);
+
+            $(window).scroll(function () {
+                if ($('body').scrollTop() > 0) {
+                    $('#showMoney').animate({opacity:0},500);
+                }else{
+                    $('#showMoney').animate({opacity:1},500);
+                }
+            });
         }
     }
     return {
