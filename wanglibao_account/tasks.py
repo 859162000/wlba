@@ -8,7 +8,6 @@ import wanglibao_account
 __author__ = 'rsj217'
 import requests
 import urllib
-import logging
 import json
 from wanglibao.celery import app
 
