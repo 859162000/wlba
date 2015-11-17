@@ -114,7 +114,7 @@ class Migration(SchemaMigration):
         u'wanglibao_account.messagetext': {
             'Meta': {'ordering': "['-created_at']", 'object_name': 'MessageText'},
             'content': ('django.db.models.fields.TextField', [], {}),
-            'created_at': ('django.db.models.fields.BigIntegerField', [], {'default': '1447670813L', 'blank': 'True'}),
+            'created_at': ('django.db.models.fields.BigIntegerField', [], {'default': '1447726990L', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'mtype': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_index': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '100'})
@@ -135,7 +135,7 @@ class Migration(SchemaMigration):
         u'wanglibao_account.userphonebook': {
             'Meta': {'object_name': 'UserPhoneBook'},
             'alert_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 11, 16, 0, 0)', 'auto_now_add': 'True', 'blank': 'True'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 11, 17, 0, 0)', 'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'invite_at': ('django.db.models.fields.DateTimeField', [], {'db_index': 'True', 'null': 'True', 'blank': 'True'}),
             'is_invite': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
@@ -155,9 +155,13 @@ class Migration(SchemaMigration):
         },
         u'wanglibao_account.usersource': {
             'Meta': {'object_name': 'UserSource'},
+            'action': ('django.db.models.fields.CharField', [], {'default': "'default'", 'max_length': '128'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': "'2015-01-01 00:00:00'", 'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'keyword': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '50'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
+            'site_name': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '64', 'blank': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
+            'website': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '256'})
         },
         u'wanglibao_account.userthreeorder': {
             'Meta': {'object_name': 'UserThreeOrder'},
