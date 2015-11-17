@@ -284,17 +284,19 @@ class CoopRegister(object):
         """
         pass
 
-    def purchase_call_back(self, user):
+    def purchase_call_back(self, user, order_id):
         """
         用户购买后回调，一般用于用于用户首次投资之后回调第三方接口
+        :param order_id:
         :param user:
         :return:
         """
         pass
 
-    def recharge_call_back(self, user):
+    def recharge_call_back(self, user, order_id):
         """
         用户充值后回调，一般用于用户首次充值之后回调第三方接口
+        :param order_id:
         :param user:
         :return:
         """
@@ -386,19 +388,19 @@ class CoopRegister(object):
         except:
             logger.exception('channel bind card process error for user %s'%(user.id))
 
-    def process_for_purchase(self, user):
+    def process_for_purchase(self, user, order_id):
         try:
             channel_processor = self.get_user_channel_processor(user)
             if channel_processor:
-                channel_processor.purchase_call_back(user)
+                channel_processor.purchase_call_back(user, order_id)
         except:
             logger.exception('channel bind purchase process error for user %s'%(user.id))
 
-    def process_for_recharge(self, user):
+    def process_for_recharge(self, user, order_id):
         try:
             channel_processor = self.get_user_channel_processor(user)
             if channel_processor:
-                channel_processor.recharge_call_back(user)
+                channel_processor.recharge_call_back(user, order_id)
         except:
             logger.exception('channel recharge process error for user %s'%(user.id))
 
@@ -574,7 +576,7 @@ class JinShanRegister(CoopRegister):
     def validate_call_back(self, user):
         self.jinshan_call_back(user, 'wangli_regist_reward', 'Cp9AhO2o9BQTDhbUBnHxmY0X4Kbg')
 
-    def purchase_call_back(self, user):
+    def purchase_call_back(self, user, order_id):
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
         if p2p_record.count() == 1:
             p2p_amount = int(p2p_record.first().amount)
@@ -647,7 +649,7 @@ class ShiTouCunRegister(CoopRegister):
             common_callback.apply_async(
                 kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
-    def purchase_call_back(self, user):
+    def purchase_call_back(self, user, order_id):
         # 判断是否是首次投资
         if P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').count() == 1:
             self.shitoucun_call_back(user)
@@ -669,9 +671,10 @@ class FUBARegister(CoopRegister):
             channel_user = FUBA_DEFAULT_TID
         return channel_user
 
-    def purchase_call_back(self, user):
+    def purchase_call_back(self, user, order_id):
         """
         投资回调
+        :param order_id:
         """
         # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
         binding = Binding.objects.filter(user_id=user.id).first()
@@ -748,7 +751,7 @@ class YunDuanRegister(CoopRegister):
         if binding:
             self.yunduan_call_back()
 
-    def purchase_call_back(self, user):
+    def purchase_call_back(self, user, order_id):
         # 判断是否是首次投资
         binding = Binding.objects.filter(user_id=user.id).first()
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
@@ -801,7 +804,7 @@ class YiCheRegister(CoopRegister):
             }
             self.yiche_call_back(url, params)
 
-    def purchase_call_back(self, user):
+    def purchase_call_back(self, user, order_id):
         introduced_by = IntroducedBy.objects.filter(user_id=user.id).first()
         p2p_record = get_last_investment_for_coop(user.id)
         if introduced_by and p2p_record:
@@ -875,7 +878,7 @@ class ZhiTuiRegister(CoopRegister):
             binding.save()
             # logger.debug('save user %s to binding'%user)
 
-    def purchase_call_back(self, user):
+    def purchase_call_back(self, user, order_id):
         binding = Binding.objects.filter(user_id=user.id).first()
         p2p_record = get_last_investment_for_coop(user.id)
         if binding and p2p_record:
@@ -970,7 +973,7 @@ class ZGDXRegister(CoopRegister):
             binding.extra = '1'
             binding.save()
 
-    def purchase_call_back(self, user):
+    def purchase_call_back(self, user, order_id):
         # 判断是否是首次投资
         binding = Binding.objects.filter(user_id=user.id).first()
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
@@ -994,7 +997,7 @@ class JuChengRegister(CoopRegister):
         self.invite_code = 'jcw'
 
     @method_decorator(transaction.atomic)
-    def purchase_call_back(self, user):
+    def purchase_call_back(self, user, order_id):
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
         SEND_SUCCESS = None
         ticket = 0
@@ -1113,7 +1116,7 @@ class XunleiVipRegister(CoopRegister):
             common_callback.apply_async(
                 kwargs={'url': self.register_call_back_url, 'params': params, 'channel': self.c_code})
 
-    def recharge_call_back(self, user):
+    def recharge_call_back(self, user, order_id):
         # 判断用户是否绑定和首次充值
         binding = Binding.objects.filter(user_id=user.id).first()
         pay_info = PayInfo.objects.filter(user_id=user.id).order_by('create_time')
@@ -1128,7 +1131,7 @@ class XunleiVipRegister(CoopRegister):
                 }
                 self.xunlei_call_back(user, binding.bid, data, self.call_back_url)
 
-    def purchase_call_back(self, user):
+    def purchase_call_back(self, user, order_id):
         # 判断用户是否绑定和首次投资
         binding = Binding.objects.filter(user_id=user.id).first()
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')

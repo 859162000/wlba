@@ -22,7 +22,8 @@ from wanglibao_banner.views import HiringView, AboutView, CompanyView, TeamView,
 
 from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
-from marketing.views import NewsListView, NewsDetailView, AppShareViewShort, ShortAppShareRegView
+from marketing.views import NewsListView, NewsDetailView, AppShareViewShort, ShortAppShareRegView,\
+    AppShareViewSuccess, AppShareViewError
 from wanglibao_activity.decorators import decorator_include
 from wanglibao_activity.decorators import wap_activity_manage
 from wanglibao.views import landpage_view
@@ -166,8 +167,10 @@ urlpatterns += patterns(
 
     url(r'^AK7WtEQ4Q9KPs8Io_zOncw/wanglibao_sms/arrive_rate/$', ArriveRate.as_view(), name='arrive_rate'),
 
-    url(r'^aws/$', AppShareViewShort.as_view(), name="app_share"),
-    url(r'^ws/$', ShortAppShareRegView.as_view(), name="app_share_reg_short"),
+    #url(r'^ws/$', ShortAppShareRegView.as_view(), name="app_share_reg_short"),
+    url(r'^aws/$', AppShareViewShort.as_view(), name="app_invite"),
+    url(r'^wst/(?P<phone>\w+)', AppShareViewSuccess.as_view(), name="app_invite_success"),
+    url(r'^wsf/(?P<phone>\w+)', AppShareViewError.as_view(), name="app_invite_error"),
 )
 
 # 短信
