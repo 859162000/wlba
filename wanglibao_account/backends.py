@@ -222,7 +222,7 @@ class ProductionIDVerifyV2BackEnd(object):
         record.name = name
         record.is_valid = verify_result
 
-        if id_photo:
+        if verify_result and id_photo:
             record.id_photo.save('%s.jpg' % id_number, id_photo, save=True)
 
         record.save()
@@ -259,7 +259,7 @@ def parse_id_verify_response_v2(text):
         # xp's value type is base64
         xp = next(root.iter('xp')).text
         id_photo = base64_to_image(xp)
-    except:
+    except Exception:
         id_photo = None
 
     return {
