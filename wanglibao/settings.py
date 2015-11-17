@@ -388,7 +388,7 @@ LOGGING = {
             'formatter': 'verbose'
         },
         'wanglibao_account':{  #add by yihen@20151113
-                              'level': 'INFO',
+                              'level': 'DEBUG',
                               'class': 'logging.FileHandler',
                               'filename': '/var/log/wanglibao/wanglibao_account.log',
                               'formatter': 'verbose'
