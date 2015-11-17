@@ -59,7 +59,7 @@
             //点击抽奖
             lottery.init('lottery');
             $("#lottery .jiang-button2").click(function () {
-                redpack('ENTER_WEB_PAGE', function (data) {
+                redpack('GET_REWARD_INFO', function (data) {
                     if (click) {
                         return false;
                     } else {
@@ -196,7 +196,7 @@
             $('.title1-guizhe1').slideToggle();
         })
         var change = [];
-        redpack();
+        redpack('POINT_AT');
         //抽奖
         var lottery = {
             index: -1,	//当前转动到哪个位置，起点位置
@@ -279,11 +279,11 @@
 
         var click = false;
 
-        function redpack(callback) {
+        function redpack(sum,callback) {
             $.ajax({
                 url: '/api/activity/reward/',
                 type: "POST",
-                data: {"action": "GET_REWARD_INFO", "activity": "thanks_given"},
+                data: {"action": sum, "activity": "thanks_given"},
                 async: false
             }).done(function (data) {
                 change = data;
