@@ -89,13 +89,17 @@
   font-weight: bold
   margin: 0 auto
   line-height: 1.4rem
-  span
+  img
     -webkit-transform: rotate(0deg)
     transform: rotate(0deg)
     display: inline-block
-    transform-origin: 35% 55%
+    transform-origin: 50% 60%
     transition: all 0.4s linear
-  .hover
+    position: relative
+    right: -6px
+    top: 2px
+    height: 0.75rem
+  .rotate
     -webkit-transform: rotate(90deg)
     transform: rotate(90deg)
 .act_rule_wrap
@@ -103,7 +107,8 @@
   padding: 0.5rem 0.5rem 0
   color: #a15825
   max-height: 99999rem
-  display: none
+  height: 0
+  overflow: hidden
   dl
     width: 100%
     display: inline-block
@@ -180,7 +185,8 @@
   text-align: center
   font-size: 0.9rem
   line-height: 2.2rem
-
+.modular_title_2
+  padding: 0.5rem 0.5rem 0.85rem
 
 
 

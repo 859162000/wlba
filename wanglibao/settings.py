@@ -310,8 +310,12 @@ DEFAULT_FROM_EMAIL = 'noreply@wanglibao.com'
 # 新的漫道请求设置
 SMS_MANDAO_URL = 'http://sdk.entinfo.cn:8061/webservice.asmx/mdsmssend'
 SMS_MANDAO_MULTICAST_URL = 'http://sdk2.entinfo.cn:8061/webservice.asmx/mdgxsend'
-SMS_MANDAO_SN = 'SDK-SKY-010-02839'
-SMS_MANDAO_MD5_PWD = '1FE15236BBEB705A8F5D221F47164693'
+
+SMS_MANDAO_SN_MARKETING = 'SDK-SKY-010-02839'  # 营销类短信SDK
+SMS_MANDAO_MD5_PWD_MARKETING = '1FE15236BBEB705A8F5D221F47164693'  # 营销类短信pwd
+
+SMS_MANDAO_SN = 'SDK-SKY-010-02932'  # 应用类短信SDK
+SMS_MANDAO_MD5_PWD = '35A6A58E6538586E76BA097A0F26E86A'  # 应用类短信pwd
 
 SMS_BACKEND = 'wanglibao_sms.backends.ManDaoSMSBackEnd'
 
@@ -384,7 +388,7 @@ LOGGING = {
             'formatter': 'verbose'
         },
         'wanglibao_account':{  #add by yihen@20151113
-                              'level': 'INFO',
+                              'level': 'DEBUG',
                               'class': 'logging.FileHandler',
                               'filename': '/var/log/wanglibao/wanglibao_account.log',
                               'formatter': 'verbose'
@@ -665,6 +669,7 @@ CELERYBEAT_SCHEDULE_FILENAME = "/tmp/celerybeat-schedule"
 
 ID_VERIFY_USERNAME = 'wljr_admin'
 ID_VERIFY_PASSWORD = 'wljr888'
+ID_LICENSE = '6a?zT-`f>_&lt;iDCC5V3[73#V?7$$t(a/p8w+u?o?[1(cf+T9&amp;7)3#I64)8n&amp;bJf`1Aa?o?z?x9V)qYq^eMgPqXw[.Tk.j?vLtNoa3KtGgYeb3Mc?x?v`0a8A.Fc-;&lt;a:c?/:a?/?v?j^qSuSyJg?x6abLLbFhM/3f:c?.2x?h?h?v.xOwMnGgSe?x.laLQtSyc6$y[:0#TH6QV\H3dh@9-u4b?.&lt;f?/+e?jS/JcRuAn)e?vY/Cc@;[.aMImHyFc$yKn+y?g?g&lt;f?g>c%a[sCcbX_ddVMcZ.a4?x?vRuKu0[=v=x?jEjJtZ[QvDfXw]uYw2d?v`V`4YscNJvTeUjBsBdKfCd?x-kXpcBHx]t?x?g4b)j>d&lt;z?jN.YgSyUk?x3h6t]gRe^dXgFhTeWlYjXwHgCd?x*w?jd7^eMgV;Ty]gc5?x'
 
 if ENV == ENV_PRODUCTION:
     CALLBACK_HOST = 'https://www.wanglibao.com'
@@ -827,9 +832,10 @@ YTX_SID = "aaf98f89495b3f3801497488ebbe0f3f"
 YTX_TOKEN = "dbf6b3bf0d514c6fa21cd12d29930c18"
 YTX_BACK_RETURN_URL = CALLBACK_HOST + "/api/ytx/voice_back/"
 
-ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
+ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
 if ENV == ENV_DEV:
-    ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
+    # ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
+    ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
     STATIC_FILE_HOST = 'http://localhost:8000'
 
 PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
