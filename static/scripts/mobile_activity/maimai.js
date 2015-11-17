@@ -218,8 +218,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }
 })();
 ;
-
-
 org.mmIndex = (function(org){
     var lib = {
         $body_h : $('.maimai-check-body'),
@@ -306,7 +304,7 @@ org.mmIndex = (function(org){
         _submit: function(){
             var _self = this;
 
-            //提交按钮
+            //提交按钮22
             _self.$submit.on('click', function(){
                 if(_self.$phone.attr('data-existing') === 'true'){
                     $(document.body).trigger('from:check', [_self.checkfilter(1), false]);
@@ -528,13 +526,13 @@ org.success = (function(org){
         init:function(){
             var
                 state = org.getQueryStringByName('state')*1,
-                str = '',
+                str = null,
                 val = null,
                 url = null;
 
                 if(state === 0){
                     str = '成功领取';
-                    val = '1.5%加息券';
+                    val = '1.0%加息券';
                     url = '/weixin/login/';
                 }else if(state === 1){
                     str = '您已领取过奖品!';

@@ -1,0 +1,307 @@
+@import "./from"
+
+@mixin inviteButton($background, $color, $height, $font: .7rem)
+  display: block
+  width: 100%
+  height: $height
+  line-height: $height
+  background: $background
+  font-size: $font
+  text-align: center
+  color: $color
+  border-radius: .2rem
+
+.tly-mod
+  padding: 0 .5rem
+
+.invite-banner-tly
+  position: relative
+  display: -webkit-box
+  -webkit-box-pack: center
+  -webkit-box-align: center
+  height: 7rem
+  background: url('/static/imgs/mobile_activity/app_invite/banner.png') no-repeat center
+  background-size: cover
+  .logo
+    position: absolute
+    top: -.25rem
+    left: .7rem
+    width: 2.1rem
+
+  .data-item
+    position: relative
+    color: #fff
+    font-size: .6rem
+    text-align: center
+    .data-num
+      margin: .4rem 0 .6rem 0
+    .animate-num
+      font-size: .7rem
+      padding: .1rem .2rem .1rem .4rem
+      background: rgba(0,0,0,.5)
+      letter-spacing: .25rem
+      border-radius: .1rem
+    .animate-text
+      color: #DB493F
+      padding: 0 .2rem
+.invite-message
+  display: -webkit-box
+  -webkit-box-align: center
+  margin: .6rem 1rem
+  .ivt-use
+    width: 1.75rem
+    height: 1.75rem
+    margin-right: .5rem
+    img
+      display: block
+
+  .ivt-message-body
+    display: -webkit-box
+    -webkit-box-align: center
+    height: 2.625rem
+    width: 13rem
+    background: url("/static/imgs/mobile_activity/app_invite/message.png") no-repeat center
+    background-size: 100%
+    color: #fff
+    font-size: .7rem
+    padding-left: 1rem
+    padding-top: .4rem
+
+
+.tly-title
+  position: relative
+  text-align: center
+  color: #F5A623
+  font-size: .7rem
+  margin: 1.5rem 2.15rem 1.325rem 2.15rem
+  span
+    position: relative
+    background: #fff
+    padding: 0 .5rem
+    z-index: 999
+  &:after
+    content: ''
+    position: absolute
+    top: 50%
+    left: 0
+    width: 100%
+    height: 1px
+    margin-top: 1px
+    background: #979797
+
+.invite-friend-propagate
+  h4
+    color: #666
+  p
+    color: #9b9b9b
+
+.invite-us
+  padding: 0 1rem
+  font-size: .6rem
+  color: #666
+  img
+    margin-bottom: .7rem
+  .invite-us-logo-idg
+    width: 4.7rem
+
+  .invite-us-logo-hgdl
+    width: 7.175rem
+  .invite-us-dec
+    max-height: 99999rem
+    margin-bottom: 1.5rem
+
+.invite-download
+  +inviteButton(#5DB5F2, #fff, 2.25rem)
+  margin-bottom: 1.25rem
+.invite-bottom-logo 
+  display: block
+  margin: 0 auto .5rem auto
+  width: 3.3rem
+
+/* invite-result */
+
+.invite-result-head
+  text-align: center
+  color: #50B143
+  .ive-sign-icon
+    display: block
+    width: 5rem
+    height: auto
+    margin: 1.15rem auto 0 auto
+
+  .ive-sign-text
+    font-size: .9rem
+    line-height: 1.5
+
+  .ive-sign-phone
+    font-size: .6rem
+    color: #F5A623
+    padding-bottom: .7rem
+
+.invite-result-redpack
+
+  li
+    display: -webkit-box
+    -webkit-box-align: center
+    background: url("/static/imgs/mobile_activity/app_invite/repack_bg.png") repeat-x top
+    background-size: .7rem
+    padding: .5rem
+    font-size: .6rem
+    border: 2px solid #DB493F
+    border-radius: .2rem
+    margin-bottom: .7rem
+  .redpack-dec
+    -webkit-box-flex: 1
+    text-align: left
+    .redpack-dec-name
+      font-size: .7rem
+      color: #FF4C2E
+      padding: .8rem 0 .5rem 0
+    .redpack-dec-hight, .redpack-dec-date
+      color: #FF8672
+
+
+  .repack-amout
+    text-align: center
+    .redpack-amout-num
+      color: #FF4C2E
+      font-size: 1.2rem
+    .redpack-amout-aound
+      color: #FF8672
+
+.invite-result-mg
+  margin-bottom: .75rem
+
+.invite-result-touch
+  color: #fff
+.invite-result-btn
+  +inviteButton(#DB493F, #fff, 2.25rem)
+
+.invite-result-erweima
+  text-align: right
+  margin: .8rem 1.5rem .5rem 0
+  img
+    display: inline-block
+    width: 1.5rem
+    height: auto
+
+
+.invite-result-mask
+  display: none
+  -webkit-box-pack: center
+  -webkit-box-align: center
+  position: fixed
+  top: 0
+  bottom: 0
+  width: 100%
+  background: rgba(0,0,0, .5)
+  padding: 0 1rem
+.invite-mask-cont
+  position: relative
+  width: 100%
+  color: #666
+  background: #fff
+  text-align: center
+  padding: 2rem 0
+  border-radius: .3rem
+  .invite-mask-dec
+    text-align: center
+    font-size: .7rem
+    line-height: 1.4
+  .invite-mask-erweima
+    width: 6rem
+    height: 6rem
+    display: block
+    margin: 1.5rem auto .75rem auto
+  .invite-mask-dec-bot
+    font-size: .6rem
+
+  .mask-close
+    display: -webkit-box
+    -webkit-box-pack: center
+    -webkit-box-align: center
+    position: absolute
+    top: -.85rem
+    right: -.75rem
+    width: 1.75rem
+    height: 1.75rem
+    border: 1px solid #CCCCCC
+    background: url("/static/imgs/mobile_activity/app_invite/close.png") no-repeat center #fff
+    background-size: .7rem
+    border-radius: 50%
+
+/* error  */
+
+.invite-error-head
+  color: #F5A623
+
+.invite-error-erweima
+  margin: 2rem 1rem 1rem 1rem
+  border: 1px dashed #5DB5F2
+
+  .invite-mask-cont
+    padding: 1.5rem 0
+
+/* share mask  */
+
+.invite-mask-share
+  position: fixed
+  top: 0
+  bottom: 0
+  width: 100%
+  background: rgba(0,0,0,.5)
+  display: none
+  .invite-icon-warp
+    text-align: right
+    margin-bottom: .5rem
+    .invite-mask-icon
+      display: inline-block
+      width: 5.375rem
+      height: auto
+      margin-right: 1rem
+  .invite-mask-dec
+    color: #fff
+    background: url("/static/imgs/mobile_activity/app_invite/share_sign_content.png") no-repeat center
+    background-size: 15rem
+    text-align: center
+    font-size: .7rem
+    line-height: 1.6
+    padding: 2rem 0
+
+/*server style*/
+
+.invite-banner-server
+  position: relative
+
+  .logo
+    position: absolute
+    top: -.25rem
+    left: .7rem
+    width: 2.1rem
+
+  .server-banner
+    display: block
+    width: 15.45rem
+    height: auto
+    margin: 0 auto
+    padding: 1.5rem 0
+
+.invite-server-message
+  display: block
+  background: url("/static/imgs/mobile_activity/app_invite/message_server.png") no-repeat center
+  background-size: 100%
+  width: rem(590)
+  height: rem(208)
+  margin: 0 auto rem(77) auto
+  color: #fff
+  .messahe-head
+    font-size: .6rem
+    padding: .5rem 0 .8rem 1.2rem
+  .messahe-cont
+    text-align: center
+    font-size: rem(64)
+.invite-server-mb
+  margin-bottom: rem(77)
+
+.invite-server-btn
+  +inviteButton(#DB493F, #fff, 2.5rem, rem(42))

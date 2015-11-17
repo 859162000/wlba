@@ -13,6 +13,7 @@ from django.forms import model_to_dict
 from django.db import transaction
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from wanglibao_account.cooperation import CoopRegister
 from wanglibao_pay import util
 from wanglibao_pay.exceptions import ThirdPayError, VerifyError
 from wanglibao_pay.models import PayInfo, PayResult, Bank, Card
@@ -21,7 +22,6 @@ from order.models import Order
 from wanglibao_margin.marginkeeper import MarginKeeper
 from marketing import tools
 from wanglibao_rest.utils import split_ua
-from wanglibao_account.cooperation import CoopRegister
 import re
 
 logger = logging.getLogger(__name__)
@@ -554,7 +554,8 @@ class KuaiPay:
             pay_info.margin_record = margin_record
             pay_info.status = PayInfo.SUCCESS
             logger.critical("orderId:%s success" % order_id)
-            rs = {"ret_code":0, "message":"success", "amount":amount, "margin":margin_record.margin_current}
+            rs = {"ret_code": 0, "message":"success", "amount":amount, "margin":margin_record.margin_current,
+                  'order_id': order_id}
 
         pay_info.save()
         if rs['ret_code'] == 0:
@@ -600,11 +601,11 @@ class KuaiPay:
             card.is_default = False
             card.save()
 
-            try:
-                # 处理第三方用户绑卡回调
-                CoopRegister(request).process_for_binding_card(request.user)
-            except Exception, e:
-                logger.error(e)
+            # try:
+            #     # 处理第三方用户绑卡回调
+            #     CoopRegister(request).process_for_binding_card(request.user)
+            # except Exception, e:
+            #     logger.error(e)
 
             return True
 
@@ -1188,7 +1189,8 @@ class KuaiShortPay:
                     else:
                         raise ThirdPayError(201181, result['message'])
                 # device = split_ua(request)
-                ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], ip, res.content, device)
+                ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], ip, res.content,
+                                        device, request)
 
                 return ms
             else:
@@ -1205,7 +1207,7 @@ class KuaiShortPay:
         except Exception, e:
             return self._handle_third_pay_error(e, user.id, pay_info.id, order.id)
 
-    def dynnum_bind_pay(self, user, vcode, order_id, token, input_phone, device, ip):
+    def dynnum_bind_pay(self, user, vcode, order_id, token, input_phone, device, ip, request):
         # vcode = request.DATA.get("vcode", "").strip()
         # order_id = request.DATA.get("order_id", "").strip()
         # token = request.DATA.get("token", "").strip()
@@ -1255,13 +1257,14 @@ class KuaiShortPay:
                                     result['user_id'],
                                     ip,
                                     res.content,
-                                    device)
+                                    device,
+                                    request)
             return ms
         except Exception, e:
             return self._handle_third_pay_error(e, user.id, pay_info.id, order_id)
 
     @method_decorator(transaction.atomic)
-    def handle_margin(self, amount, order_id, user_id, ip, response_content, device):
+    def handle_margin(self, amount, order_id, user_id, ip, response_content, device, request):
         # todo add test
         pay_info = PayInfo.objects.select_for_update().filter(order_id=order_id).first()
         if not pay_info:
@@ -1301,8 +1304,9 @@ class KuaiShortPay:
                 # fix@chenweibi, add order_id
                 tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
                                                      "device": device, "order_id": order_id})
+                CoopRegister(request).process_for_recharge(pay_info.user, order_id)
             except:
-                pass
+                logger.exception('kuai_pay_deposit_call_back_failed')
 
             # 充值成功后，更新本次银行使用的时间
             if len(pay_info.card_no) == 10:
@@ -1366,7 +1370,7 @@ class KuaiShortPay:
 
 
     def pay_callback(self, user_id, amount, res_code, res_message, order_id, ref_number, res_content,
-                     signature):
+                     signature, request):
         """
         快钱快捷支付TR3应答API。
         TR1中会将该api的地址传给快钱，快钱在TR3阶段回调该API。
@@ -1386,7 +1390,7 @@ class KuaiShortPay:
                     if res_code == 0:
                         # 第三方不管我方处理的结果，只在乎是否发送TR4，所以不用处理返回
                         self.handle_margin(amount, pay_info.order.id, user_id,
-                                           pay_info.request_ip, res_content, pay_info.device)
+                                           pay_info.request_ip, res_content, pay_info.device, request)
                     else:
                         raise ThirdPayError(res_code, res_message)
             except Exception, e:
@@ -1416,11 +1420,11 @@ class KuaiShortPay:
         card.bank = bank
         card.save()
 
-        if add_card:
-            try:
-                # 处理第三方用户绑卡回调
-                CoopRegister(request).process_for_binding_card(request.user)
-            except Exception, e:
-                logger.error(e)
+        # if add_card:
+        #     try:
+        #         # 处理第三方用户绑卡回调
+        #         CoopRegister(request).process_for_binding_card(request.user)
+        #     except Exception, e:
+        #         logger.error(e)
 
         return card

@@ -1,8 +1,10 @@
 # encoding:utf-8
 from __future__ import unicode_literals
-from weixin.wechatpy import create_reply
 import urllib
+
 import requests
+
+from wechatpy import create_reply
 
 
 class Permission(object):
@@ -95,7 +97,7 @@ def gen_token(length=8):
 
 def tuling(msg):
     query_params = {
-        'key': '9d6abfaecc7102d7d9b22b51ed0efe80',
+        'key': 'e8beb9af8f52b438bb8a917b40255f7d',
         'info': msg.content,
         'userid': msg.source
     }

@@ -1,4 +1,5 @@
 @import ./swipe
+@import "./propagate"
 
 @mixin rule-item($bg, $color, $type)
   position: absolute
@@ -29,8 +30,6 @@
   margin: 0 auto
   border: 0
   -webkit-appearance: none
-  //&:hover
-    box-shadow: 0 0 100rem rgba(0,0,0,.2) inset
 
 .maimai-banner
   position: relative
@@ -45,8 +44,7 @@
     height: auto
 
 .maimai-form
-  padding: 4rem 2rem
-
+  padding: 2rem 2rem 1rem 2rem
 .maimai-check-body
   height: 0
   overflow: hidden

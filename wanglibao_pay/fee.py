@@ -27,8 +27,8 @@ class WithdrawFee(object):
             "free_times_per_month": 2,
             "amount_interval": [[0, 10000, 2], [10000, 50000, 3], [50000, 10000000, 5]]
         }
-        self.MAX_AMOUNT = decimal.Decimal('500000.00')
-        self.MIN_AMOUNT = decimal.Decimal('50.00')
+        self.MAX_AMOUNT = decimal.Decimal('500000')
+        self.MIN_AMOUNT = decimal.Decimal('50')
 
     def get_withdraw_fee_config(self):
         """
@@ -84,11 +84,11 @@ class WithdrawFee(object):
 
         withdraw_count = self.get_withdraw_count(user)
 
-        fee = decimal.Decimal(0)
-        if withdraw_count > free_times_per_month:
+        fee = 0
+        if withdraw_count >= free_times_per_month:
             for interval in amount_interval:
                 if interval[0] < amount <= interval[1]:
-                    fee = decimal.Decimal(str(interval[2]))
+                    fee = interval[2]
                     break
                 else:
                     continue
@@ -100,19 +100,30 @@ class WithdrawFee(object):
 
         # 比较提现金额与充值未投资金额
         margin_left = margin - uninvested
-        if margin_left < uninvested:
-            management_amount = uninvested - margin_left
+        if amount > margin_left:
+            management_amount = amount - margin_left
         else:
-            management_amount = decimal.Decimal(0)
+            management_amount = decimal.Decimal('0.00')
         management_fee = (management_amount * management_fee_rate).quantize(TWO_PLACES)
+
+        management_fee = management_fee / decimal.Decimal('1.00')
 
         return fee, management_fee, management_amount
 
     @staticmethod
     def get_withdraw_count(user):
         """ 获取当月提现次数 """
-        today = local_to_utc(datetime.datetime.now(), 'min')
+        today = local_to_utc(datetime.datetime.now(), 'max')
         month_start = today - datetime.timedelta(days=today.day)
         withdraw_count = PayInfo.objects.filter(user=user, type='W').filter(status__in=[u'成功', u'已受理'])\
+            .filter(create_time__gt=month_start).count()
+        return withdraw_count
+
+    @staticmethod
+    def get_withdraw_success_count(user):
+        """ 获取当月成功提现次数 """
+        today = local_to_utc(datetime.datetime.now(), 'max')
+        month_start = today - datetime.timedelta(days=today.day, seconds=-1)
+        withdraw_count = PayInfo.objects.filter(user=user, type='W').filter(status=u'成功')\
             .filter(create_time__gt=month_start).count()
         return withdraw_count

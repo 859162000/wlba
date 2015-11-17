@@ -1,21 +1,19 @@
 require.config({
   paths: {
     'jquery.fullPage': 'lib/jquery.fullPage.min',
+    'videojs': 'lib/video.min',
+
   },
   shim: {
     'jquery.fullPage': ['jquery'],
   }
 });
 
-require(['jquery', 'jquery.fullPage'], function( $ ) {
-  var page_h = $(window).height()
-  $('.section').height(page_h);
+require(['jquery', 'videojs'], function( $ ,videojs) {
+  var player = videojs('really-cool-video', { /* Options */ }, function() {
+    console.log('Good to go!');
+    //this.play();
 
-  $(document).ready(function() {
-    $('#fullpage').fullpage({
-      anchors: ['Page1', 'Page2', 'Page3', 'Page4', 'Page5', 'Page6'],
-			menu: '#menu',
-      scrollingSpeed: 500
-    });
   });
+
 });

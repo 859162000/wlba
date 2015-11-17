@@ -28,16 +28,32 @@ urlpatterns = patterns(
     url(r'^more/$', TemplateView.as_view(template_name="weixin_more.jade")),
     url(r'^more/contactus/$', TemplateView.as_view(template_name="weixin_contactus.jade")),
     url(r'^more/aboutus/$', TemplateView.as_view(template_name="weixin_aboutus.jade")),
+    url(r'^bind/$', login_required(views.WeixinBind.as_view(), login_url='/weixin/login/'), name='weixin_bind'),
+
+    url(r'^unbind/$', views.UnBindWeiUser.as_view(), name='weixin_unbind'),
     url(r'^reward/(?P<status>\w+)/$', login_required(views.WeixinCouponList.as_view(), login_url='/weixin/login/')),
 
     # js api
     url(r'^api/jsapi_config/$', views.WeixinJsapiConfig.as_view(), name='weixin_jsapi_config_api'),
     url(r'^api/login/$', views.WeixinLoginAPI.as_view(), name='weixin_login_api'),
+
+    url(r'^api/unbind/$', views.UnBindWeiUserAPI.as_view(), name='weixin_unbind_api'),
+    url(r'^api/send_template_msg/$', views.SendTemplateMessage.as_view(), name='send_template_message'),
     url(r'^api/pay/order/$', views.WeixinPayOrder.as_view(), name='weixin_pay_order_api'),
     url(r'api/wx_code/$', views.AuthorizeCode.as_view(), name='weixin_authorize_code'),
     url(r'api/wx_userinfo/$', views.AuthorizeUser.as_view(), name='weixin_authorize_user_info'),
     url(r'api/wx_getinfo/$', views.GetAuthUserInfo.as_view(), name='weixin_get_user_info'),
     url(r'api/account/wx_getinfo/$', views.GetUserInfo.as_view(), name='weixin_get_account_user_info'),
+    url(r'api/generate/qr_limit_scene_ticket/$', views.GenerateQRLimitSceneTicket.as_view(), name='generate_qr_limit_scene_ticket'),
+    url(r'api/generate/qr_scene_ticket/$', views.GenerateQRSceneTicket.as_view(), name='generate_qr_scene_ticket'),
+
+    #test
+    url(r'^jump_page/$', views.JumpPageTemplate.as_view(template_name="sub_times.jade"), name='jump_page'),
+    url(r'^is_bind/$', TemplateView.as_view(template_name="sub_is_bind.jade")),
+    url(r'^award_index/$', views.AwardIndexTemplate.as_view(template_name="sub_award.jade"), name='award_index'),
+    url(r'^award_rule/$', TemplateView.as_view(template_name="sub_award_rule.jade")),
+    url(r'^sub_code/$', TemplateView.as_view(template_name="sub_code.jade")),
+
 )
 
 # 微信管理后台

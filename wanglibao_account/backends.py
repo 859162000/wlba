@@ -8,7 +8,7 @@ from django.db.models import Sum
 from wanglibao_account.models import IdVerification, UserSource
 from wanglibao_redpack.models import Income
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("wanglibao_account")
 
 
 def broker_invite_list(user):
@@ -54,12 +54,17 @@ def invite_earning(user):
 
 
 def set_source(request, user):
-    keyword = request.session.get("promo_source_word", "")
+    keyword = request.session.get("promo_source_keyword", "")
     if keyword:
-        us = UserSource()
-        us.user = user
-        us.keyword = keyword
-        us.save()
+        source = UserSource.objects.create(
+            user=user,
+            action='register',
+            keyword=keyword,
+            site_name=request.session.get("promo_source_site_name", ""),
+            website=request.session.get("website", "")
+        )
+        logger.debug("注册行为已经完成，SEM统计参量入库,object value:{0}".format(source))
+
 
 class TestIDVerifyBackEnd(object):
 
