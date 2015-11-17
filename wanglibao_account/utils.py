@@ -418,12 +418,20 @@ def get_client_ip(request):
     return ip
 
 
+class FileObject(object):
+    def __init__(self, content, size):
+        self.file = content
+        self.size = size
+
+
 def base64_to_image(base64_str):
     import base64
-    import StringIO
+    import cStringIO
 
     img_str = base64.b64decode(base64_str)
-    io_handle = StringIO.StringIO()
-    img_data = io_handle.write(img_str)
+    img_handle = cStringIO.StringIO()
+    img_handle.write(img_str)
+    img_handle.seek(0)
+    img_file = FileObject(img_handle, len(img_str))
 
-    return img_data
+    return img_file
