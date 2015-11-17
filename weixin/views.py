@@ -484,6 +484,7 @@ class WeixinBind(TemplateView):
             }
 
 def redirectToJumpPage(message):
+    logger.debug('-----------------message beforejump::%s'%message)
     url = reverse('jump_page')+'?message=%s'%message
     return HttpResponseRedirect(url)
 
