@@ -2691,7 +2691,8 @@ class ZOP2PListView(APIView):
                         p2p_dict['link'] = '/p2p/detail/{}'.format(product.id)
                         p2p_dict['title'] = product.name
                         p2p_dict['username'] = product.borrower_name
-                        p2p_dict['userd'] = -1
+                        # 借款用户没有uid, 渠道说用用户名
+                        p2p_dict['userd'] = product.borrower_name
                         p2p_dict['asset_type'] = u'抵押标'
                         p2p_dict['borrow_type'] = product.category
                         p2p_dict['product_type'] = u'散标'
@@ -2699,8 +2700,21 @@ class ZOP2PListView(APIView):
                         p2p_dict['interest'] = (product.expected_earning_rate/100)
                         p2p_dict['borrow_period'] = (str(product.period) + u'天') \
                             if product.pay_method.startswith(u'日计息') else (str(product.period) + u'个月')
-                        p2p_dict['repay_type'] = product.pay_method
-                        p2p_dict['percentage'] = product.completion_rate
+
+                        if product.pay_method == u'等额本息':
+                            pay_method = u'等额本息'
+                        elif product.pay_method == u'按月付息':
+                            pay_method = u'月付息到期还本'
+                        elif product.pay_method == u'到期还本付息':
+                            pay_method = product.pay_method
+                        elif product.pay_method == u'日计息一次性还本付息':
+                            pay_method = product.pay_method
+                        elif product.pay_method == u'日计息月付息到期还本':
+                            pay_method = u'月付息到期还本'
+                        else:
+                            pay_method = product.pay_method
+                        p2p_dict['repay_type'] = pay_method
+                        p2p_dict['percentage'] = product.completion_rate/100
                         p2p_dict['reward'] = 0
                         p2p_dict['guarantee'] = 0
                         p2p_dict['credit'] = ''
