@@ -187,7 +187,7 @@ class WithdrawView(TemplateView):
         banks = Bank.get_withdraw_banks()
 
         # 提现管理费费率
-        fee_misc = WithdrawFee(switch='on')
+        fee_misc = WithdrawFee()
         fee_config = fee_misc.get_withdraw_fee_config()
         withdraw_count = fee_misc.get_withdraw_count(user=self.request.user)
         return {
@@ -229,7 +229,7 @@ class WithdrawCompleteView(TemplateView):
         result = PayResult.WITHDRAW_SUCCESS
 
         # 获取费率配置
-        fee_misc = WithdrawFee(switch='on')
+        fee_misc = WithdrawFee()
         fee_config = fee_misc.get_withdraw_fee_config()
 
         try:
@@ -491,7 +491,7 @@ class WithdrawTransactions(TemplateView):
                     # 取款确认时要检测该次提现是否是真正的在每个月的免费次数之内,如果是还需要将已扣除的费用返还给用户(仅限手续费)
                     give_back = False
                     if fee > 0:
-                        fee_misc = WithdrawFee(switch='on')
+                        fee_misc = WithdrawFee()
                         fee_config = fee_misc.get_withdraw_fee_config()
                         withdraw_count = fee_misc.get_withdraw_success_count(payinfo.user)
                         free_times = fee_config['fee']['free_times_per_month']
@@ -908,7 +908,7 @@ class FEEAPIView(APIView):
             return Response({"ret_code": 30139, "message": u"提现金额超出账户可用余额"})
 
         # 获取费率配置
-        fee_misc = WithdrawFee(switch='on')
+        fee_misc = WithdrawFee()
         fee_config = fee_misc.get_withdraw_fee_config()
 
         # 检测提现最大最小金额

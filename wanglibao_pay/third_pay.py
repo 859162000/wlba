@@ -203,7 +203,7 @@ def withdraw(request):
     uninvested = user.margin.uninvested  # 充值未投资金额
 
     # 获取费率配置
-    fee_misc = WithdrawFee(switch='on')
+    fee_misc = WithdrawFee()
     fee_config = fee_misc.get_withdraw_fee_config()
 
     # 检测提现最大最小金额
@@ -303,7 +303,7 @@ def card_bind_list(request):
             cards = sorted(cards, key=lambda x: bank_list.index(x.bank.gate_id))
 
             # 获取提现费率配置
-            fee_misc = WithdrawFee(switch='on')
+            fee_misc = WithdrawFee()
             fee_config = fee_misc.get_withdraw_fee_config()
             min_amount = fee_config.get('min_amount')
             max_amount = fee_config.get('max_amount')
