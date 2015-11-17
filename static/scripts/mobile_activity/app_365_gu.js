@@ -218,19 +218,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }
 })();
 ;(function(){
-    var act_rule_static = false;
-    $('.act_rule_button').click(function(){
-        if(act_rule_static){
-            $('.act_rule_wrap').slideUp('1000');
-            $('.act_rule_button img').removeClass('rotate');
-            act_rule_static = false;
-        }else{
-            $('.act_rule_wrap').slideDown('1000');
-            $('.act_rule_button img').addClass('rotate');
-            act_rule_static = true;
-
-        }
-    });
+    
 })();
 var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
             org.ajax({
