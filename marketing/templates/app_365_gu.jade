@@ -109,8 +109,7 @@ html(style="background: #ffeec3")
         p.code_text 扫码关注微信
 
     script(src='/static/src/mobile/lib/weixin/wx.js')
-    script(src="/static/scripts/mobile_activity/app_365_gu.js?v=201511171")
-    script(src='/static/js/lib/jquery.min.js')
+    script(src="/static/scripts/mobile_activity/app_365_gu.js?v=201511172")
     script.
         var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
             iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
@@ -118,16 +117,6 @@ html(style="background: #ffeec3")
         if (ios) {
             document.getElementById('ios-show').style.display = 'block';
         }
-        var act_rule_static = false;
-        $('.act_rule_button').click(function(){
-            if(act_rule_static){
-                $('.act_rule_wrap').slideUp('1000');
-                $('.act_rule_button img').removeClass('rotate');
-                act_rule_static = false;
-            }else{
-                $('.act_rule_wrap').slideDown('1000');
-                $('.act_rule_button img').addClass('rotate');
-                act_rule_static = true;
 
-            }
-        });
+
+
