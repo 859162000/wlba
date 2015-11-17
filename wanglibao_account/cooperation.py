@@ -3349,7 +3349,7 @@ class Rong360P2PListView(APIView):
                 ret = dict()
 
                 p2ps = P2PProduct.objects.filter(publish_time__gte=start,
-                                                 publish_time__lt=end)
+                                                 publish_time__lt=end).exclude(status=u'流标')
 
                 # 获取总页数, 和页数不对处理
                 com_page = len(p2ps) / page_size + 1
