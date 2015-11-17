@@ -231,10 +231,13 @@ class AppShareViewShort(TemplateView):
             m.update_value(value={MiscRecommendProduction.KEY_PC_DATA: site_data})
 
         identifier_result = identifier and identifier.strip() or identifier
+
+        url = self.request.get_host() + self.request.get_full_path()
         return {
             'site_data': site_data,
             'identifier': identifier_result,
             'friend_phone': friend_phone,
+            'url': url
         }
 
 class AppShareViewError(TemplateView):
@@ -245,10 +248,11 @@ class AppShareViewError(TemplateView):
             identifier = kwargs['phone']
             phone = base64.b64decode(identifier + '=')
         except:
-            phone = None
-
+            phone = ''
+        url = self.request.get_host() + '/aws/?p=' + identifier
         return {
-            'phone': phone
+            'phone': phone,
+            'url': url
         }
 
 class AppShareViewSuccess(TemplateView):
@@ -259,10 +263,11 @@ class AppShareViewSuccess(TemplateView):
             identifier = kwargs['phone']
             phone = base64.b64decode(identifier + '=')
         except:
-            phone = None
-
+            phone = ''
+        url = self.request.get_host() + '/aws/?p=' + identifier
         return {
-            'phone': phone
+            'phone': phone,
+            'url': url
         }
 
 
