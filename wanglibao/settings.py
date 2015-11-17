@@ -310,8 +310,12 @@ DEFAULT_FROM_EMAIL = 'noreply@wanglibao.com'
 # 新的漫道请求设置
 SMS_MANDAO_URL = 'http://sdk.entinfo.cn:8061/webservice.asmx/mdsmssend'
 SMS_MANDAO_MULTICAST_URL = 'http://sdk2.entinfo.cn:8061/webservice.asmx/mdgxsend'
-SMS_MANDAO_SN = 'SDK-SKY-010-02839'
-SMS_MANDAO_MD5_PWD = '1FE15236BBEB705A8F5D221F47164693'
+
+SMS_MANDAO_SN_MARKETING = 'SDK-SKY-010-02839'  # 营销类短信SDK
+SMS_MANDAO_MD5_PWD_MARKETING = '1FE15236BBEB705A8F5D221F47164693'  # 营销类短信pwd
+
+SMS_MANDAO_SN = 'SDK-SKY-010-02932'  # 应用类短信SDK
+SMS_MANDAO_MD5_PWD = '35A6A58E6538586E76BA097A0F26E86A'  # 应用类短信pwd
 
 SMS_BACKEND = 'wanglibao_sms.backends.ManDaoSMSBackEnd'
 
