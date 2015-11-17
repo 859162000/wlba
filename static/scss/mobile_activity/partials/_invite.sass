@@ -119,3 +119,79 @@
   margin: 0 auto .5rem auto
   width: 3.3rem
 
+$checkbox-width: .8rem
+.invite-protocol-n
+  color: #5DB5F2
+  font-size: $font-size14
+  margin-top: .5rem
+  .xieyi-btn
+    padding-left: .5rem
+  .checkbox
+    display: inline-block
+    position: relative
+    width: $checkbox-width
+    height: $checkbox-width
+    background: #fff
+    input
+      visibility: hidden
+    &:before
+      content: ''
+      position: absolute
+      top: 0
+      left: 0
+      width: $checkbox-width
+      height: $checkbox-width
+      background: #fff
+      border: 1px solid #5DB5F2
+  .agreement
+    &:after
+      content: ''
+      position: absolute
+      top: 0.05rem
+      left: .25rem
+      border: 3px solid #5DB5F2
+      border-left: 0
+      border-top: 0
+      width: .25rem
+      height: .5rem
+      -webkit-transform: rotateZ(45deg)
+  .regist-for-login
+    float: right
+    text-decoration: underline
+    padding-right: .25rem
+
+
+.regist-protocol-div
+  position: fixed
+  width: 100%
+  top: 0
+  bottom: 0
+  background: #fff
+  font-size: $font-size14
+  -webkit-transition: -webkit-transform 200ms ease-out
+  z-index: 11111
+  -webkit-transform: translate3d(0, 100%, 0)
+  transform: translate3d(0, 100%, 0)
+  .xieyi-head
+    position: fixed
+    width: 100%
+  .xieyi-cont
+    position: absolute
+    top: 2.2rem
+    bottom: 0
+    padding: 0 .75rem
+    overflow-y: auto
+    -webkit-overflow-scrolling : touch
+  .agreement-number
+    width: 20%
+    float: left
+  .agreement-line
+    width: 80%
+    float: right
+  li
+    overflow: auto
+    margin-bottom: $margin-bottom
+  h1,h2
+    font-size: $font-size16
+    font-weight: bold
+    line-height: 1.5rem
