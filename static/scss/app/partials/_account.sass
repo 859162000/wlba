@@ -1,3 +1,26 @@
+@-webkit-keyframes rightS
+  0%
+    right: -100%
+  100%
+    right: 0
+
+@keyframes rightS
+  0%
+    right: -100%
+  100%
+    right: 0
+@-webkit-keyframes leftS
+  0%
+    left: -100%
+  100%
+    left: 0
+
+@keyframes leftS
+  0%
+    left: -100%
+  100%
+    left: 0
+
 .account_top
   background: #4a90e2
   .asset_content,.income_content
@@ -28,6 +51,7 @@
 .transaction_list
   margin-top: .3rem
   background: #ffffff
+  position: relative
   .transaction_tit
     padding: .75rem .5rem .625rem
     border-bottom: 1px solid #E5E5E5
@@ -83,6 +107,14 @@
     .cont_money_center
       p:first-child
         color: #FF4C2E
+.transaction_list:nth-child(odd)
+  -webkit-animation: rightS 1s 1
+  animation: rightS 1s 1
+.transaction_list:nth-child(even)
+  -webkit-animation: leftS 1s 1
+  animation: leftS 1s 1
+
+
 
 
 
