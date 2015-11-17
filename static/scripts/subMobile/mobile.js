@@ -777,7 +777,7 @@ org.regist = (function(org){
                     $("#page-bg").show();
                     if(k === 0){
                         altPro.text(errorStr[Math.floor(Math.random()*5)]);
-                        altAwardP.html('<span id="alt-award" class="alt-award">继续攒人品</span>');
+                        altAwardP.html('<span id="alt-award" class="alt-award red-btns close-box">继续攒人品</span>');
                     }else{
                         altPro.text(arrStr[Math.floor(Math.random()*2)]);
                         altAwardP.html('<span id="alt-award" class="alt-award">'+btns.eq(i-1).text()+'</span>已在您的账户中');
@@ -840,7 +840,7 @@ org.regist = (function(org){
         btnAnimate(self,awards,nowNum);//执行动画
     });
     //关闭弹层
-    $("#alt-box .close-box").click(function(){
+    $("#alt-box").on("click",".close-box",function(){
         $(this).parents("#alt-box").hide();
         $("#page-bg").hide();
         awardBtn = true;
