@@ -286,7 +286,8 @@ class WeixinJoinView(View):
 
     def getBindTxt(self, fromUserName):
         bind_url = settings.CALLBACK_HOST + reverse('weixin_bind') + "?openid=%s"%(fromUserName)
-        txt = u"终于等到你，还好我没放弃。绑定网利宝帐号，轻松投资、随时随地查看收益！<a href='%s'>【立即绑定】</a>"%(bind_url)
+        txt = u"终于等到你，还好我没放弃。绑定网利宝帐号，轻松投资、随时随地查看收益！\n" \
+              u"<a href='%s'>【立即绑定】</a>"%(bind_url)
         return txt
 
     def getUnBindTxt(self, fromUserName, userPhone):
@@ -299,8 +300,7 @@ class WeixinJoinView(View):
         now = datetime.datetime.now()
         weekday = now.weekday() + 1
         if now.hour<=20 and now.hour>=9 and weekday>=1 and weekday<=5:
-            txt = u"客官，想和网利菌天南海北的聊天还是正经的咨询？不要羞涩，放马过来吧！聊什么听你的，\n" \
-                  u"但是网利菌在线时间为\n" \
+            txt = u"客官，想和网利菌天南海北的聊天还是正经的咨询？不要羞涩，放马过来吧！聊什么听你的，但是网利菌在线时间为\n" \
                   u"【周一至周五9：00~20：00】"
         else:
             txt = u"客官，网利菌在线时间为\n"\
@@ -543,12 +543,12 @@ class WeixinJsapiConfig(APIView):
 
     @weixin_api_error
     def get(self, request):
-        if settings.ENV == settings.ENV_DEV:
-            request.session['account_key'] = 'test'
-            account = WeixinAccounts.get('test')
-        else:
+        if settings.ENV == settings.ENV_PRODUCTION:
             request.session['account_key'] = 'sub_1'
             account = WeixinAccounts.get('sub_1')
+        else:
+            request.session['account_key'] = 'test'
+            account = WeixinAccounts.get('test')
 
         noncestr = uuid.uuid1().hex
         timestamp = str(int(time.time()))
