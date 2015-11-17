@@ -78,6 +78,8 @@ from wanglibao_account.utils import get_client_ip
 from wanglibao_account.models import UserThreeOrder
 from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes, hex2bin
 import requests
+from wanglibao_margin.models import MarginRecord
+from wanglibao_pay.fee import WithdrawFee
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
@@ -430,6 +432,9 @@ class AccountHomeAPIView(APIView):
         ]).select_related('product')
 
         start_utc = local_to_utc(datetime.datetime.now(), 'min')
+        yesterday_start = start_utc - datetime.timedelta(days=1)
+        yesterday_end = yesterday_start + datetime.timedelta(hours=23, minutes=59, seconds=59)
+
         unpayed_principle = 0
         p2p_total_paid_interest = 0
         p2p_total_unpaid_interest = 0
@@ -439,6 +444,7 @@ class AccountHomeAPIView(APIView):
         p2p_total_paid_coupon_interest = 0
         p2p_total_unpaid_coupon_interest = 0
         p2p_income_today = 0
+        p2p_income_yesterday = 0
         for equity in p2p_equities:
             if equity.confirm:
                 unpayed_principle += equity.unpaid_principal  # 待收本金
@@ -450,10 +456,18 @@ class AccountHomeAPIView(APIView):
                 p2p_total_unpaid_coupon_interest += equity.unpaid_coupon_interest  # 加息券待收总收益
                 p2p_activity_interest += equity.activity_interest  # 活动收益
 
-                if equity.confirm_at >= start_utc:
-                    p2p_income_today += equity.pre_paid_interest
-                    p2p_income_today += equity.pre_paid_coupon_interest
-                    p2p_income_today += equity.activity_interest
+                # if equity.confirm_at >= start_utc:
+                #     p2p_income_today += equity.pre_paid_interest
+                #     p2p_income_today += equity.pre_paid_coupon_interest
+                #     p2p_income_today += equity.activity_interest
+
+        # 利息入账, 罚息入账, 活动赠送, 邀请赠送, 加息存入, 佣佣金存入, 全民淘金
+        p2p_income_yesterday_other = MarginRecord.objects.filter(user=user)\
+            .filter(create_time__gt=yesterday_start, create_time__lte=yesterday_end)\
+            .filter(catalog__in=[u'利息入账', u'罚息入账', u'加息存入', u'佣金存入', u'全民淘金']).aggregate(Sum('amount'))
+
+        if p2p_income_yesterday_other.get('amount__sum'):
+            p2p_income_yesterday += p2p_income_yesterday_other.get('amount__sum')
 
         p2p_margin = user.margin.margin  # P2P余额
         p2p_freeze = user.margin.freeze  # P2P投资中冻结金额
@@ -492,6 +506,7 @@ class AccountHomeAPIView(APIView):
             'fund_income_month': float(fund_income_month),  # 基金近一月收益(元)
 
             'p2p_income_today': float(p2p_income_today),  # 今日收益
+            'p2p_income_yesterday': float(p2p_income_yesterday),  # 昨日到账收益
 
         }
 

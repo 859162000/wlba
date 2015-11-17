@@ -217,144 +217,160 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;(function() {
-  require.config({
-    paths: {
-        jquery: '/static/src/pc/lib/jquery.min',
-        'jquery.animateNumber': '/static/src/pc/lib/jquery.animateNumber.min'
-    },
-    shim: {
-        'jquery.animateNumber': ['jquery']
-    }
-  });
+;
 
-  require(['jquery','jquery.animateNumber'], function($) {
-      var csrfSafeMethod, getCookie, sameOrigin,
-          getCookie = function (name) {
-              var cookie, cookieValue, cookies, i;
-              cookieValue = null;
-              if (document.cookie && document.cookie !== "") {
-                  cookies = document.cookie.split(";");
-                  i = 0;
-                  while (i < cookies.length) {
-                      cookie = $.trim(cookies[i]);
-                      if (cookie.substring(0, name.length + 1) === (name + "=")) {
-                          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                          break;
-                      }
-                      i++;
-                  }
-              }
-              return cookieValue;
-          };
-      csrfSafeMethod = function (method) {
-          return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
-      };
-      sameOrigin = function (url) {
-          var host, origin, protocol, sr_origin;
-          host = document.location.host;
-          protocol = document.location.protocol;
-          sr_origin = "//" + host;
-          origin = protocol + sr_origin;
-          return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
-      };
-      $.ajaxSetup({
-          beforeSend: function (xhr, settings) {
-              if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
-                  xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
-              }
+
+org.test = (function(org){
+    var lib = {
+        init:function(){
+          lib.webview();
+        },
+        webview: function(){
+          function connectWebViewJavascriptBridge(callback) {
+            if (window.WebViewJavascriptBridge) {
+              callback(WebViewJavascriptBridge)
+            } else {
+              document.addEventListener('WebViewJavascriptBridgeReady', function() {
+                callback(WebViewJavascriptBridge)
+              }, false)
+            }
           }
-      });
-      var is_animate = true;
 
-      function fmoney(s, type) {
-          if (/[^0-9\.]/.test(s))
-              return "0";
-          if (s == null || s == "")
-              return "0";
-          s = s.toString().replace(/^(\d*)$/, "$1.");
-          s = (s + "00").replace(/(\d*\.\d\d)\d*/, "$1");
-          s = s.replace(".", ",");
-          var re = /(\d)(\d{3},)/;
-          while (re.test(s))
-              s = s.replace(re, "$1,$2");
-          s = s.replace(/,(\d\d)$/, ".$1");
-          if (type == 0) {// 不带小数位(默认是有小数位)
-              var a = s.split(".");
-              if (a[1] == "00") {
-                  s = a[0];
-              }
-          }
-          return s;
-      }
+          connectWebViewJavascriptBridge(function(bridge) {
+            var uniqueId = 1
+            function log(message, data) {
+              var log = document.getElementById('log')
+              var el = document.createElement('div')
+              el.className = 'logLine'
+              el.innerHTML = uniqueId++ + '. ' + message + ':<br/>' + JSON.stringify(data)
+              if (log.children.length) { log.insertBefore(el, log.children[0]) }
+              else { log.appendChild(el) }
+            }
 
-      function page_scroll() {
-          $('.num-animate').each(function () {
-              var comma_separator_number_step = $.animateNumber.numberStepFactories.separator(',')
-              var key = parseInt($(this).attr('data-num'));
-              $(this).prop('number', 0).animateNumber({
-                  number: key,
-                  numberStep: comma_separator_number_step
-              }, 1000);
-              is_animate = false;
+            bridge.init(function(message, responseCallback) {
+              log('JS got a message', message)
+              var data = { 'Javascript Responds':'收到' }
+              log('JS responding with', data)
+              responseCallback(data)
+            });
+
+            bridge.callHandler('sendUserInfo', {'1': '1'}, function (response) {
+              var responsejson = typeof response == 'string' ? JSON.parse(response): response;
+              org.ajax({
+                url: '/accounts/token/login/ajax/',
+                type: 'post',
+                data:{
+                  token: responsejson.tk,
+                  secret_key: responsejson.secretToken,
+                  ts: responsejson.ts
+                },
+                success: function(data){
+                  window.location.href = $("input[name='next']").val();
+                },
+                error: function(data){
+                  window.location.href = $("input[name='next']").val() + "nologin/";
+                }
+              })
+            });
           })
-      }
+        }
 
-      var windowHeight = $("body").height();
-      var cheatseight = $(".cheats").height();
-      var footerHeight = $(".cheats").height();
-      var juli = windowHeight - cheatseight - footerHeight / 2 - 76;
+    }
+    return {
+        init : lib.init
+    }
+})(org);
 
-      function button_fix() {
-          if ($(window).scrollTop() >= juli) {
-              $('.fixBox').css({'position': 'relative', 'background': 'none'});
-          } else {
-              $('.fixBox').css({'position': 'fixed', 'background': 'rgba(255,255,255,0.8)'});
+
+org.scratch = (function(org){
+    var lib = {
+        init:function(){
+          lib.webview();
+        },
+        webview: function(){
+
+          function connectWebViewJavascriptBridge(callback) {
+            if (window.WebViewJavascriptBridge) {
+              callback(WebViewJavascriptBridge)
+            } else {
+              document.addEventListener('WebViewJavascriptBridgeReady', function() {
+                callback(WebViewJavascriptBridge)
+              }, false)
+            }
           }
-      }
 
-      button_fix();
-      $(window).scroll(function () {
-          button_fix();
-      });
-      $.ajax({
-          url: '/api/gettopofearings/',
-          type: "POST"
-      }).done(function (json) {
-          var rankingList_phone = [];
-          var rankingList_amount = [];
-          var json_one;
-          for (var i = 0; i < json.records.length; i++) {
-              json_one = json.records[i];
-              if (json_one != '') {
-                  var number = fmoney(json_one.amount, 0);
-                  if (i <= 2) {
-                      rankingList_phone.push(['<li class="front">' + json_one.phone + '</li>'].join(''));
-                      rankingList_amount.push(['<li class="front"><span class="num-animate" data-num="' + json_one.amount + '">0</span> 元</li>'].join(''));
-                  } else {
-                      rankingList_phone.push(['<li>' + json_one.phone + '</li>'].join(''));
-                      rankingList_amount.push(['<li><span class="num-animate" data-num="' + json_one.amount + '">0</span> 元</li>'].join(''));
-                  }
+          connectWebViewJavascriptBridge(function(bridge) {
+            var uniqueId = 1
+            function log(message, data) {
+              var log = document.getElementById('log')
+              var el = document.createElement('div')
+              el.className = 'logLine'
+              el.innerHTML = uniqueId++ + '. ' + message + ':<br/>' + JSON.stringify(data)
+              if (log.children.length) { log.insertBefore(el, log.children[0]) }
+              else { log.appendChild(el) }
+            }
 
-              } else {
-                  rankingList_phone.push(['<li>虚位以待</li>'].join(''));
-                  rankingList_amount.push(['<li>虚位以待</li>'].join(''));
-              }
+            bridge.init(function(message, responseCallback) {
+              log('JS got a message', message)
+              var data = { 'Javascript Responds':'收到' }
+              log('JS responding with', data)
+              responseCallback(data)
+            });
 
-          }
-          $('.rankingList ul.two').html(rankingList_phone.join(''));
-          $('.rankingList ul.three').html(rankingList_amount.join(''));
-          page_scroll();
-      })
-      var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
-          iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
-          ios = ipad || iphone;
-      if (ios) {
-          document.getElementById('ios-show').style.display = 'block';
-      }
-  })
+            //登陆
+              $('#login').on('click',function(){
+                 bridge.callHandler('loginApp',{refresh: 1, url: ''}, function (response) {
+                   $('.test-log').html(JSON.stringify(response))
+                 });
+              });
+             //url
+            $('#url').html(window.location.href)
+            //注册
+              $('#regist').on('click',function(){
+                bridge.callHandler('registerApp', {refresh: 1, url: ''}, function (response) {
+                   $('.test-log').html(JSON.stringify(response));
+                 });
+              });
 
-}).call(this);
+            //投资
+              $('#p2p').on('click',function(){
+                bridge.callHandler('jumpToManageMoney', function (response) {
+                    log('jumpToManageMoney', response);
+                });
+              });
+            //埋点
+              bridge.callHandler('firstLoadWebView', {name: 'test firstLoadWebView'},function (response) {
+                    log('firstLoadWebView', response);
+              });
+            //分享
+              bridge.registerHandler('shareData', function(data, responseCallback) {
+                  var responseData = { title:'呱呱卡test', content: '呱呱卡test' };
+                  responseCallback(responseData);
+              });
 
+              //判断client 是否登录，  并且在该方法传递数据埋点
+              bridge.registerHandler('authenticated', function(data, responseCallback) {
+                $('.test-log').html(JSON.stringify(data))
+                var activity = {name: 'guaguaka'}
+                responseCallback(activity)
 
+              });
+          })
+        }
 
+    }
+    return {
+        init : lib.init
+    }
+})(org);
+
+;(function(org){
+    $.each($('script'), function(){
+        var src = $(this).attr('src');
+        if(src){
+            if($(this).attr('data-init') && org[$(this).attr('data-init')]){
+                org[$(this).attr('data-init')].init();
+            }
+        }
+    })
+})(org);

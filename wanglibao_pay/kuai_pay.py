@@ -1364,7 +1364,6 @@ class KuaiShortPay:
 
         return False
 
-
     def pay_callback(self, user_id, amount, res_code, res_message, order_id, ref_number, res_content,
                      signature):
         """

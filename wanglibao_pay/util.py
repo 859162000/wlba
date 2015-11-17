@@ -23,7 +23,9 @@ def get_a_uuid():
     return r_uuid.replace('=', '')
 
 TWO_PLACES = decimal.Decimal(10) ** -2
-#format amount two places
+
+
+# format amount two places
 def fmt_two_amount(value):
     """
     将字符串转换为一个两位小数，如果为非精确转换会抛出一个Inexact的异常
@@ -35,28 +37,35 @@ def fmt_two_amount(value):
     amount = decimal.Decimal(value).quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
     return amount
 
+
 def fmt_dt_14(dt):
     return dt.strftime("%Y%m%d%H%M%S")
 
+
 def fmt_time_14(t):
     return time.strftime("%Y%m%d%H%M%S", time.localtime(t))
+
 
 def randstr(length=16):
     sampleStr = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ123456789'
     return ''.join(random.sample(sampleStr, length))
 
+
 def local_datetime(dt):
     return timezone.get_current_timezone().normalize(dt)
+
 
 def fmt_dt_normal(dt):
     if dt:
         return dt.strftime("%Y-%m-%d %H:%M:%S")
     return ""
 
+
 def fmt_date_normal(dt):
     if dt:
         return dt.strftime("%Y-%m-%d")
     return ""
+
 
 def handle_kuai_bank_limit(limitstr):
     obj = {}
@@ -68,6 +77,17 @@ def handle_kuai_bank_limit(limitstr):
         arr1 = second.split(",")
         obj['second_one'] = arr1[0].split("=")[1]
         obj['second_day'] = arr1[1].split("=")[1]
+    except:
+        pass
+    return obj
+
+
+def handle_withdraw_limit(limitstr):
+    obj = {}
+    try:
+        first, second = limitstr.split(",")
+        obj['bank_min_amount'] = int(first.split("=")[1])
+        obj['bank_max_amount'] = int(second.split("=")[1])
     except:
         pass
     return obj

@@ -26,6 +26,7 @@ import logging
 
 logger = get_task_logger(__name__)
 
+
 @app.task
 def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False):
     # fix@chenweibi, add order_id
@@ -88,6 +89,7 @@ def register_ok(user_id, device):
         utils.log_clientinfo(device, "register", user_id)
     except Exception:
         pass
+
 
 @app.task
 def idvalidate_ok(user_id, device):

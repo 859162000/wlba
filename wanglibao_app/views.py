@@ -6,7 +6,7 @@ __author__ = 'zhanghe'
 import logging
 import json
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from marketing.models import IntroducedBy
 from marketing.tops import Top
 from marketing.utils import local_to_utc
@@ -15,7 +15,7 @@ from misc.views import MiscRecommendProduction
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib import auth
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.shortcuts import redirect, render_to_response
 from django.template import RequestContext
 from django.views.generic import TemplateView
@@ -40,6 +40,8 @@ from wanglibao_sms.utils import send_validation_code
 from wanglibao_sms.tasks import send_messages
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.forms import verify_captcha
+from wanglibao_margin.models import MarginRecord
+from wanglibao_rest import utils
 
 logger = logging.getLogger(__name__)
 
@@ -98,12 +100,14 @@ class AppRepaymentAPIView(APIView):
 
     def post(self, request):
         now = datetime.now()
-        amount, income_num = 0, 0
+        amount, income_num, income_yesterday = 0, 0, 0
         try:
             if request.user and request.user.is_authenticated():
                 # 登陆用户 查询当天收益和累计收益
                 user = request.user
                 start_utc = local_to_utc(now, 'min')
+                yesterday_start = start_utc - timedelta(days=1)
+                yesterday_end = yesterday_start + timedelta(hours=23, minutes=59, seconds=59)
 
                 p2p_equities = P2PEquity.objects.filter(user=user, confirm=True, product__status__in=[
                     u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
@@ -112,12 +116,27 @@ class AppRepaymentAPIView(APIView):
                     amount += equity.pre_paid_interest  # 累积收益
                     amount += equity.pre_paid_coupon_interest  # 加息券加息收益
                     amount += equity.activity_interest  # 活动收益
-                    if equity.confirm_at >= start_utc:
-                        income_num += equity.pre_paid_interest
-                        income_num += equity.pre_paid_coupon_interest
-                        income_num += equity.activity_interest
+                    # if equity.confirm_at >= start_utc:
+                    #     income_num += equity.pre_paid_interest
+                    #     income_num += equity.pre_paid_coupon_interest
+                    #     income_num += equity.activity_interest
 
-                return Response({'ret_code': 0, 'message': 'ok', 'amount': float(amount), 'income_num': float(income_num)})
+                # 昨日收益
+                # 利息入账, 罚息入账, 活动赠送, 邀请赠送, 加息存入, 佣佣金存入, 全民淘金
+                income_yesterday_other = MarginRecord.objects.filter(user=user)\
+                    .filter(create_time__gt=yesterday_start, create_time__lte=yesterday_end)\
+                    .filter(catalog__in=[u'利息入账', u'罚息入账', u'加息存入', u'佣金存入', u'全民淘金']).aggregate(Sum('amount'))
+
+                if income_yesterday_other.get('amount__sum'):
+                    income_yesterday += income_yesterday_other.get('amount__sum')
+
+                return Response({
+                    'ret_code': 0,
+                    'message': 'ok',
+                    'amount': float(amount),
+                    'income_num': float(income_num),
+                    'income_yesterday': float(income_yesterday)
+                })
 
             else:
                 # 未登陆用户 查询当月还款金额和当月还款项目
@@ -127,7 +146,13 @@ class AppRepaymentAPIView(APIView):
                 ams = ProductAmortization.objects.filter(settlement_time__range=(start_utc, timezone.now()), settled=True)
                 for x in ams:
                     amount += x.principal + x.interest + x.penal_interest
-                return Response({'ret_code': 0, 'message': 'ok', 'amount': float(amount), 'income_num': len(ams)})
+                return Response({
+                    'ret_code': 0,
+                    'message': 'ok',
+                    'amount': float(amount),
+                    'income_num': len(ams),
+                    'income_yesterday': float(income_yesterday)
+                })
         except Exception, e:
             logger.error(e.message)
             return Response({'ret_code': 20001, 'message': 'fail'})
@@ -345,6 +370,20 @@ class SendValidationCodeView(APIView):
             res, message = verify_captcha(request.POST)
         if not res:
             return Response({"ret_code": 40044, "message": message})
+
+        status, message = send_validation_code(phone_number, ip=get_client_ip(request))
+        if status != 200:
+            return Response({"ret_code": 30044, "message": message})
+
+        return Response({"ret_code": 0, "message": u'验证码发送成功'})
+
+
+class SendValidationCodeNoCaptchaView(APIView):
+    """ app端获取验证码，不在设置状态码， """
+    permission_classes = ()
+
+    def post(self, request, phone):
+        phone_number = phone.strip()
 
         status, message = send_validation_code(phone_number, ip=get_client_ip(request))
         if status != 200:

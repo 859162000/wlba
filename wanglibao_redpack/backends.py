@@ -66,7 +66,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
         if records_count == 0:
             # 红包
             records = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
-                .exclude(redpack__event__rtype='interest_coupon')
+                .exclude(redpack__event__rtype='interest_coupon').order_by('-redpack__event__amount')
             for x in records:
                 if x.order_id:
                     continue
@@ -96,7 +96,8 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                 obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
                         "id": x.id, "invest_amount": event.invest_amount,
                         "unavailable_at": stamp(end_time), "event_id": event.id,
-                        "period": event.period, "p2p_types_id": p2p_types_id, "p2p_types_name": p2p_types_name,
+                        "period": event.period, "period_type": "月",
+                        "p2p_types_id": p2p_types_id, "p2p_types_name": p2p_types_name,
                         "highest_amount": event.highest_amount, "order_by": 2}
                 if start_time < timezone.now() < end_time:
                     if event.apply_platform == "all" or event.apply_platform == device_type or \
@@ -115,7 +116,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
             records_count_p2p = RedPackRecord.objects.filter(user=user, product_id=product_id).count()
             if records_count_p2p == 0:
                 coupons = RedPackRecord.objects.filter(user=user, order_id=None, product_id=None)\
-                    .filter(redpack__event__rtype='interest_coupon')
+                    .filter(redpack__event__rtype='interest_coupon').order_by('-redpack__event__amount')
                 for coupon in coupons:
                     if coupon.order_id:
                         continue
@@ -147,7 +148,8 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                     obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
                            "id": coupon.id, "invest_amount": event.invest_amount,
                            "unavailable_at": stamp(end_time), "event_id": event.id,
-                           "period": event.period, "p2p_types": p2p_types_id, "p2p_types_name": p2p_types_name,
+                           "period": event.period, "period_type": "月",
+                           "p2p_types": p2p_types_id, "p2p_types_name": p2p_types_name,
                            "highest_amount": event.highest_amount, "order_by": 1}
 
                     if start_time < timezone.now() < end_time:
@@ -157,8 +159,8 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                                 obj['amount'] = obj['amount']/100.0
                             packages['available'].append(obj)
 
-        packages['available'].sort(key=lambda x: x['unavailable_at'])
-        packages['available'].sort(key=lambda x: x['order_by'])
+        # packages['available'].sort(key=lambda x: x['unavailable_at'])
+        packages['available'].sort(key=lambda x: x['order_by'], reverse=True)
     else:
         packages = {"used": [], "unused": [], "expires": [], "invalid": []}
         if rtype == 'redpack':
