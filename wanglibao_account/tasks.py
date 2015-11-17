@@ -3,6 +3,7 @@
 from celery.utils.log import get_task_logger
 from wanglibao import settings
 import wanglibao_account
+import logging
 
 
 __author__ = 'rsj217'
@@ -13,7 +14,8 @@ from wanglibao.celery import app
 
 from wanglibao_account.models import Binding
 
-logger = get_task_logger(__name__)
+# logger = get_task_logger(__name__)
+logger = logging.getLogger(__name__)
 
 # from wanglibao_p2p.models import P2PProduct
 # from wanglibao_account.utils import CjdaoUtils
@@ -23,7 +25,7 @@ logger = get_task_logger(__name__)
 # import logging
 #
 #
-# logger = logging.getLogger(__name__)
+#
 #
 #
 # @app.task
