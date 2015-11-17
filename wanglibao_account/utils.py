@@ -14,7 +14,7 @@ from django.template import Context, Template, add_to_builtins
 from django.template.loader import render_to_string, get_template
 from django.utils import timezone
 from registration.models import RegistrationProfile
-from wanglibao_account.backends import TestIDVerifyBackEnd, ProductionIDVerifyV2BackEnd
+from wanglibao_account.backends import TestIDVerifyBackEnd, ProductionIDVerifyBackEnd, ProductionIDVerifyV2BackEnd
 import logging
 import hashlib
 import pytz
@@ -119,6 +119,8 @@ def verify_id(name, id_number):
 
     if class_name == 'TestIDVerifyBackEnd':
         return TestIDVerifyBackEnd.verify(name, id_number)
+    elif class_name == 'ProductionIDVerifyBackEnd':
+        return ProductionIDVerifyBackEnd.verify(name, id_number)
     elif class_name == 'ProductionIDVerifyV2BackEnd':
         return ProductionIDVerifyV2BackEnd.verify(name, id_number)
     else:
