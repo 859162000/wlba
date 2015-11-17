@@ -7,7 +7,3 @@ header
         if user.is_authenticated
             span.sub-name {{user | display_name}}, 您好!
             a(href="/accounts/logout?next=/").sub-logout 退出
-        else
-            a(href="/weixin/regist/").sub-logout 注册
-            span.sub-top-line &nbsp;|&nbsp;
-            a(href="/weixin/login/").sub-logout 登录
