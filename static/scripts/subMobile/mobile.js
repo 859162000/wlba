@@ -846,16 +846,6 @@ org.regist = (function(org){
         awardBtn = true;
     });
 
-    //规则 html添加class
-    ;(function(){
-        var html = $("html");
-        if(html.height() <= $(window).height()){
-            html.addClass("sub-height");
-        }else{
-            html.removeClass("sub-height");
-        }
-    })();
-
     //抽奖活动 显示规则
     $("#show-alt-rule").click(function(){
         $("#sub-body-rule").show();
@@ -864,6 +854,16 @@ org.regist = (function(org){
         $(this).parents("#sub-body-rule").hide();
     });
 })(org);
+
+//页面加载完成 添加class
+function onLoadClass(){
+    var html = $("html");
+    if(html.height() <= $(window).height()){
+        html.addClass("sub-height");
+    }else{
+        html.removeClass("sub-height");
+    }
+}
 function getCode(){//得到用户信息的二维码
     var phone = org.getQueryStringByName('phone');
     org.ajax({
