@@ -135,6 +135,7 @@ INSTALLED_APPS = (
     'file_storage',
     'wanglibao_lottery',
     'daterange_filter',
+    'experience_gold',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -381,36 +382,42 @@ LOGGING = {
             'filename': '/var/log/wanglibao/marketing.log',
             'formatter': 'verbose'
         },
-        'wanglibao_reward':{  #add by yihen@20150915
+        'wanglibao_reward': {  #add by yihen@20150915
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': '/var/log/wanglibao/wanglibao_reward.log',
             'formatter': 'verbose'
         },
-        'wanglibao_account':{  #add by yihen@20151113
-                              'level': 'INFO',
-                              'class': 'logging.FileHandler',
-                              'filename': '/var/log/wanglibao/wanglibao_account.log',
-                              'formatter': 'verbose'
-                              },
-        'wanglibao_rest':{  #add by yihen@20151028
-                              'level': 'DEBUG',
-                              'class': 'logging.FileHandler',
-                              'filename': '/var/log/wanglibao/wanglibao_rest.log',
-                              'formatter': 'verbose'
-                              },
-        'wanglibao_cooperation':{  #add by yihen@20150915
-                              'level': 'DEBUG',
-                              'class': 'logging.FileHandler',
-                              'filename': '/var/log/wanglibao/wanglibao_cooperation.log',
-                              'formatter': 'verbose'
-                              },
-        'weixin':{  #add by huomeimei
-              'level': 'DEBUG',
-              'class': 'logging.FileHandler',
-              'filename': '/var/log/wanglibao/weixin.log',
-              'formatter': 'verbose'
-                },
+        'wanglibao_account': {  #add by yihen@20151113
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/wanglibao_account.log',
+            'formatter': 'verbose'
+        },
+        'wanglibao_rest': {  #add by yihen@20151028
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/wanglibao_rest.log',
+            'formatter': 'verbose'
+        },
+        'wanglibao_cooperation': {  #add by yihen@20150915
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/wanglibao_cooperation.log',
+            'formatter': 'verbose'
+        },
+        'weixin': {  #add by huomeimei
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/weixin.log',
+            'formatter': 'verbose'
+        },
+        'experience_gold': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/experience_gold.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
@@ -435,7 +442,7 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'wanglibao_p2p': {
-            'handlers': ['file'],
+            'handlers': ['file', 'console'],
             'level': 'DEBUG',
         },
         'wanglibao_redpack': {
@@ -470,24 +477,24 @@ LOGGING = {
             'handlers': ['marketing', 'console'],
             'level': 'DEBUG'
         },
-        'wanglibao_reward': { #add by yihen@20150915
+        'wanglibao_reward': {  # add by yihen@20150915
             'handlers': ['wanglibao_reward', 'console'],
             'level': 'DEBUG'
         },
-        'wanglibao_rest': { #add by yihen@20151028
+        'wanglibao_rest': {  # add by yihen@20151028
               'handlers': ['wanglibao_rest', 'console'],
               'level': 'DEBUG'
           },
-        'wanglibao_cooperation': { #add by yihen@20150915
-                              'handlers': ['wanglibao_cooperation', 'console'],
-                              'level': 'DEBUG'
-                              },
-        'weixin':{#add by huomeimei
+        'wanglibao_cooperation': {  # add by yihen@20150915
+            'handlers': ['wanglibao_cooperation', 'console'],
+            'level': 'DEBUG'
+        },
+        'weixin': {  # add by huomeimei
               'handlers': ['weixin', 'console'],
               'level': 'DEBUG'
         },
-        'wanglibao_p2p': {
-            'handlers': [ 'console'],
+        'experience_gold': {
+            'handlers': ['file', 'console'],
             'level': 'DEBUG'
         }
     }
