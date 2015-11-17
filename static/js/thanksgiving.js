@@ -14,7 +14,7 @@
         window.onload = function () {
             //点击抽奖
              lottery.init('lottery');
-             $("#lottery .jiang-button").click(function () {
+             $("#lottery .jiang-button2").click(function () {
                 if (click) {
                     return false;
                 } else {
@@ -222,11 +222,11 @@
     }
 
     var click = false;
-    function redpack(sum, callback) {
+    function redpack(callback) {
             $.ajax({
                 url:'/api/activity/reward/',
                 type: "POST",
-                data: {activity: "thanks_given"},
+                data: {"action": "GET_REWARD_INFO","activity":"thanks_given" },
                 async: false
             }).done(function (data) {
                 change = data;

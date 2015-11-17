@@ -75,7 +75,10 @@ html
                        |你还有
                        span 1
                        |次抽奖机会
-                      a(href='javascript:void(0);').jiang-button 立即抽奖
+                      if user.is_authenticated
+                        a(href='javascript:void(0);').jiang-button.jiang-button2 立即抽奖
+                      else
+                        a(href='/accounts/login/?next=/activity/thanksgiving/').jiang-button.jiang-button1 立即抽奖
                       a(href='/p2p/list/', target="_blank").jiang-a 投资赢抽奖机会>>
                   td.lottery-unit.lottery-unit-5
                     .active1

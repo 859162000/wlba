@@ -63,6 +63,7 @@ urlpatterns = patterns(
     url(r'^365_gu/$', TemplateView.as_view(template_name="365_gu.jade")),
     url(r'thanksgiving/$', TemplateView.as_view(template_name="thanksgiving.jade")),
     url(r'winter_brid/$', TemplateView.as_view(template_name="winter_bird.jade")),
+    url(r'^experience_gold/$', TemplateView.as_view(template_name="experience_gold.jade")),
 )
 
 # app URL
@@ -144,6 +145,10 @@ urlpatterns += patterns(
     url(r'^app-invite-error/$', TemplateView.as_view(template_name="app_invite_error.jade")),
     url(r'^app-invite-server/$', TemplateView.as_view(template_name="app_invite_server.jade")),
     url(r'^app_thanksgiv/$', TemplateView.as_view(template_name="app_thanksgiv.jade")),
+
+
+    url(r'^app_experience/$', TemplateView.as_view(template_name="app_experience.jade")),
+    url(r'^experience_account/$', TemplateView.as_view(template_name="account.jade")),
 )
 
 urlpatterns += patterns(

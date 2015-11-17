@@ -1198,10 +1198,10 @@ class KuaiShortPay:
                 if not token:
                     raise ThirdPayError(201172, '信息不匹配')
                 elif token['ret_code'] != 0:
-                    if token['ret_code'] == 2:
-                        raise ThirdPayError(self.ERR_CODE_WAITING, token['message'])
-                    else:
-                        raise ThirdPayError(201182, token['message'])
+                    # if token['ret_code'] == 2:
+                    #     raise ThirdPayError(self.ERR_CODE_WAITING, token['message'])
+                    # else:
+                    raise ThirdPayError(201182, token['message'])
 
                 return {"ret_code":0, "message":"ok", "order_id":order.id, "token":token['token']}
         except Exception, e:
@@ -1306,7 +1306,7 @@ class KuaiShortPay:
                                                      "device": device, "order_id": order_id})
                 CoopRegister(request).process_for_recharge(pay_info.user, order_id)
             except:
-                pass
+                logger.exception('kuai_pay_deposit_call_back_failed')
 
             # 充值成功后，更新本次银行使用的时间
             if len(pay_info.card_no) == 10:

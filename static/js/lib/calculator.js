@@ -74,9 +74,9 @@
             return target.next().show();
           }
         } else {
-          if ((xhr.fee === 0) && (xhr.management_fee === '0')) {
+          if ((xhr.fee === 0) && (xhr.management_fee === 0 || xhr.management_fee === '0')) {
             strs = 0;
-          } else if (xhr.fee !== 0 && xhr.management_fee === '0') {
+          } else if (xhr.fee !== 0 && (xhr.management_fee === 0 || xhr.management_fee === '0')) {
             strs = xhr.fee;
           } else {
             strs = xhr.fee + '+' + xhr.management_fee;

@@ -846,16 +846,6 @@ org.regist = (function(org){
         awardBtn = true;
     });
 
-    //规则 html添加class
-    ;(function(){
-        var html = $("html");
-        if(html.height() <= $(window).height()){
-            html.addClass("sub-height");
-        }else{
-            html.removeClass("sub-height");
-        }
-    })();
-
     //抽奖活动 显示规则
     $("#show-alt-rule").click(function(){
         $("#sub-body-rule").show();
@@ -864,6 +854,16 @@ org.regist = (function(org){
         $(this).parents("#sub-body-rule").hide();
     });
 })(org);
+
+//页面加载完成 添加class
+function onLoadClass(){
+    var html = $("html");
+    if(html.height() <= $(window).height()){
+        html.addClass("sub-height");
+    }else{
+        html.removeClass("sub-height");
+    }
+}
 function getCode(){//得到用户信息的二维码
     var phone = org.getQueryStringByName('phone');
     org.ajax({
@@ -877,6 +877,14 @@ function getCode(){//得到用户信息的二维码
             window.location.href="/weixin/jump_page/?message=请进行登录并绑定您的微信";
         }
     });
+}
+function isIphone(id){
+    var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+        iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+        ios = ipad || iphone;
+    if (ios) {
+      document.getElementById(id).style.display = 'block';
+    }
 }
 
 function isAwards(k){//判断抽奖是第几项
@@ -927,7 +935,7 @@ org.awardEvent = (function(org){ //微信抽奖
             success: function(data){
                 fn(data);
                 awardsNum = data.left;
-                //alert(awardsNum+", "+$("#openid").val());
+                //redPack_id = data.redpack;
                 goods = parseFloat(data.amount);
             },
             error: function(){}
