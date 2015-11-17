@@ -48,3 +48,19 @@ def sendUserProductOnLine(uid, service_desc, product_id, product_name, rate_desc
             first=service_desc, keyword1=product_name, keyword2=rate_desc,
             keyword3=period_desc, keyword4=pay_method, url=url)
         SendTemplateMessage.sendTemplate(w_user, template)
+
+@app.task
+def sendBindTemplateMsg(openid, template_id,name1,name2,time):
+    print '-----------------', template_id
+    w_user = WeixinUser.objects.filter(openid=openid).first()
+    template = MessageTemplate(template_id, name1=name1, name2=name2, time=time)
+    if w_user and template:
+        SendTemplateMessage.sendTemplate(w_user, template)
+
+@app.task
+def sendUnbindTemplateMsg(openid, template_id, keyword1, keyword2):
+    print '-----------------', template_id
+    w_user = WeixinUser.objects.filter(openid=openid).first()
+    template = MessageTemplate(template_id, keyword1=keyword1, keyword2=keyword2)
+    if w_user and template:
+        SendTemplateMessage.sendTemplate(w_user, template)

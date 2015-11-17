@@ -267,8 +267,9 @@ class WeixinJoinView(View):
             txt = self.getBindTxt(fromUserName)
             reply = create_reply(txt, msg)
         if not reply:
-            articles = self.getSubscribeArticle()
-            reply = create_reply(articles, msg)
+            # articles = self.getSubscribeArticle()
+            # reply = create_reply(articles, msg)
+            reply = -1
         return reply
 
     def getSubscribeArticle(self):
@@ -298,11 +299,12 @@ class WeixinJoinView(View):
         now = datetime.datetime.now()
         weekday = now.weekday() + 1
         if now.hour<=20 and now.hour>=9 and weekday>=1 and weekday<=5:
-            txt = "客官，骚安勿躁！网利菌不是在回答问题，就是在回答问题的路上。\n"\
-                    + "请留下您的问题，网利菌会在第一时间给予解答。"
+            txt = u"客官，想和网利菌天南海北的聊天还是正经的咨询？不要羞涩，放马过来吧！聊什么听你的，\n" \
+                  u"但是网利菌在线时间为\n" \
+                  u"【周一至周五9：00~20：00】"
         else:
-            txt = "客官，网利菌在线时间为\n"\
-                    + "【周一至周五9：00~20：00】，请在工作与我们联系哦~"
+            txt = u"客官，网利菌在线时间为\n"\
+                    + u"【周一至周五9：00~20：00】，请在工作与我们联系哦~"
         return txt
 
 
@@ -349,7 +351,8 @@ def bindUser(w_user, user):
         return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone
     other_w_user = WeixinUser.objects.filter(user=user).first()
     if other_w_user:
-        return 3, u'你的手机号%s已经绑定微信%s,请绑定其他网利宝帐号'%(user.wanglibaouserprofile.phone, other_w_user.nickname)
+        msg = u"你的手机号%s已经绑定微信<span style='color:#173177;'>%s</span>"%(user.wanglibaouserprofile.phone, other_w_user.nickname)
+        return 3, msg
     w_user.user = user
     w_user.save()
     return 0, u'绑定成功'
@@ -433,12 +436,7 @@ class SendTemplateMessage(APIView):
         w_user = WeixinUser.objects.filter(openid=openid).first()
         template_type = request.POST.get('template_type', '')
         template = None
-        if template_type.lower() == SendTemplateMessage.BIND_SUCCESS and w_user.user == request.user:
-            now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
-            template = MessageTemplate(BIND_SUCCESS_TEMPLATE_ID, first=u"账户绑定通知", name1="",
-                    name2=now_str)
-        if template:
-            SendTemplateMessage.sendTemplate(w_user, template)
+
         return Response({'message':'ok'})
 
 
@@ -469,9 +467,14 @@ class WeixinBind(TemplateView):
             rs, txt = bindUser(weixin_user, user)
             if rs == 0:
                 now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
-                template = MessageTemplate(BIND_SUCCESS_TEMPLATE_ID,
-                     name2=user.wanglibaouserprofile.phone, time=now_str)
-                SendTemplateMessage.sendTemplate(weixin_user, template)
+                weixin.tasks.sendBindTemplateMsg.apply_async(kwargs={
+                        "openid":weixin_user.openid,
+                        "template_id":BIND_SUCCESS_TEMPLATE_ID,
+                        "name1":"",
+                        "name2":user.wanglibaouserprofile.phone,
+                        "time":now_str
+                    })
+                # SendTemplateMessage.sendTemplate(weixin_user, template)
         except WeixinUser.DoesNotExist:
             pass
         context['message'] = txt
@@ -522,8 +525,14 @@ class UnBindWeiUserAPI(APIView):
             weixin_user.user = None
             weixin_user.save()
             now_str = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M')
-            template = MessageTemplate(UNBIND_SUCCESS_TEMPLATE_ID, keyword1=user_phone, keyword2=now_str)
-            SendTemplateMessage.sendTemplate(weixin_user, template)
+            # template = MessageTemplate(UNBIND_SUCCESS_TEMPLATE_ID, keyword1=user_phone, keyword2=now_str)
+            weixin.tasks.sendUnbindTemplateMsg.apply_async(kwargs={
+                    "openid":weixin_user.openid,
+                    "template_id":UNBIND_SUCCESS_TEMPLATE_ID,
+                    "keyword1":user_phone,
+                    "keyword2":now_str
+                })
+            # SendTemplateMessage.sendTemplate(weixin_user, template)
 
         return Response({'message':'ok'})
 
