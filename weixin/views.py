@@ -446,6 +446,7 @@ class JumpPageTemplate(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(JumpPageTemplate, self).get_context_data(**kwargs)
         message = self.request.GET.get('message', 'ERROR')
+        message = urllib.unquote(message)
         logger.debug(message)
         context['message'] = message
         return {
