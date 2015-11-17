@@ -502,8 +502,7 @@ class WithdrawTransactions(TemplateView):
                         fee_config = fee_misc.get_withdraw_fee_config()
                         withdraw_count = fee_misc.get_withdraw_success_count(payinfo.user)
                         free_times = fee_config['fee']['free_times_per_month']
-                        # 已成功次数 + 本次成功的次数
-                        if (withdraw_count + 1) <= free_times:
+                        if withdraw_count <= free_times:
                             give_back = True
 
                     if give_back:
