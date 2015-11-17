@@ -1384,7 +1384,7 @@ class AwardIndexTemplate(TemplateView):
         if not w_user:
             return redirectToJumpPage("error")
         if not w_user.user:
-            return redirectToJumpPage(urllib.unquote(u"一定要绑定网利宝账号才可以抽奖"))
+            return redirectToJumpPage(urllib.unquote(urllib.quote(u"一定要绑定网利宝账号才可以抽奖")))
 
         return super(AwardIndexTemplate, self).dispatch(request, *args, **kwargs)
 
