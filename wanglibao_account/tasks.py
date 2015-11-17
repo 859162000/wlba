@@ -220,8 +220,9 @@ def zhongjin_post_task():
     向中金发送p2p 数据
     :return:
     """
-    from wanglibao_account.cooperation import zhongjin_post_p2p_info
-    zhongjin_post_p2p_info()
+    if settings.ENV == settings.ENV_PRODUCTION:
+        from wanglibao_account.cooperation import zhongjin_post_p2p_info
+        zhongjin_post_p2p_info()
 
 
 @app.task
@@ -229,5 +230,6 @@ def rongtu_post_task():
     """
     融途把所有参数打包, 参数太长, 用post. 返回1 正确.
     """
-    from wanglibao_account.cooperation import rongtu_post_data
-    rongtu_post_data()
+    if settings.ENV == settings.ENV_PRODUCTION:
+        from wanglibao_account.cooperation import rongtu_post_data
+        rongtu_post_data()
