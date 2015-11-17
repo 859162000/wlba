@@ -22,6 +22,7 @@ html
           p.prize-title 单笔投资满5000元可参与抽奖一次，100%中奖，投资越多奖品越丰厚。百万豪礼抽疯了，多投多抽不要停！
           .prize-rotary#lottery
             table(border="0", cellpadding="0", cellspacing="0")
+              - csrf_token
               tbody
                 tr
                   td.lottery-unit.lottery-unit-0

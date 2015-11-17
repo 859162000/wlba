@@ -9,22 +9,77 @@
     });
 
     require(['jquery'], function ($) {
+        var csrfSafeMethod, getCookie, sameOrigin,
+            getCookie = function (name) {
+                var cookie, cookieValue, cookies, i;
+                cookieValue = null;
+                if (document.cookie && document.cookie !== "") {
+                    cookies = document.cookie.split(";");
+                    i = 0;
+                    while (i < cookies.length) {
+                        cookie = $.trim(cookies[i]);
+                        if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                        i++;
+                    }
+                }
+                return cookieValue;
+            };
+        csrfSafeMethod = function (method) {
+            return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+        };
+        sameOrigin = function (url) {
+            var host, origin, protocol, sr_origin;
+            host = document.location.host;
+            protocol = document.location.protocol;
+            sr_origin = "//" + host;
+            origin = protocol + sr_origin;
+            return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
+        };
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+                    xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+                }
+            }
+        });
+
+        _getQueryStringByName = function (name) {
+            var result = location.search.match(new RegExp('[\?\&]' + name + '=([^\&]+)', 'i'));
+            if (result == null || result.length < 1) {
+                return '';
+            }
+            return result[1];
+        }
 
         var arrPos = new Array();
         window.onload = function () {
             //点击抽奖
-             lottery.init('lottery');
-             $("#lottery .jiang-button2").click(function () {
-                if (click) {
-                    return false;
-                } else {
-                    lottery.speed = 100;
-                    roll();
-                    click = true;
-                    //alert(4);
-                    return false;
-                }
-             });
+            lottery.init('lottery');
+            $("#lottery .jiang-button2").click(function () {
+                redpack('GET_REWARD_INFO', function (data) {
+                    if (click) {
+                        return false;
+                    } else {
+                        lottery.speed = 100;
+                        roll();
+                        click = true;
+                        //alert(4);
+                        return false;
+                    }
+                })
+                //if (click) {
+                //    return false;
+                //} else {
+                //    lottery.speed = 100;
+                //    roll();
+                //    click = true;
+                //    //alert(4);
+                //    return false;
+                //}
+            });
             //banner动画
             document.getElementsByTagName('body')[0].onmousemove = function (e) {
                 var x = e.clientX, y = e.clientY;
@@ -80,25 +135,26 @@
             }
         }
         //弹层
-        var h=$('.thanksgiving').height();
-            $('.thanksgiving-kuang').css("height",h);
+        var h = $('.thanksgiving').height();
+        $('.thanksgiving-kuang').css("height", h);
         //无线滚动
-        var timer,i= 1,j=2;
-        timer = setInterval(function(){
-          scroll();
-        },30)
+        var timer, i = 1, j = 2;
+        timer = setInterval(function () {
+            scroll();
+        }, 30)
 
-        function scroll(){
-          if (-parseInt($('.long-p').css('top'))>=$('.long-p p').height()){
-            $('.long-p p').eq(0).appendTo($('.long-p'));
-            $('.long-p').css({'top':'0px'})
-            i=0
-          }else{
-            i++
-            $('.long-p').css({'top':-i+'px'})
-          }
+        function scroll() {
+            if (-parseInt($('.long-p').css('top')) >= $('.long-p p').height()) {
+                $('.long-p p').eq(0).appendTo($('.long-p'));
+                $('.long-p').css({'top': '0px'})
+                i = 0
+            } else {
+                i++
+                $('.long-p').css({'top': -i + 'px'})
+            }
 
         }
+
         //固定回到顶部
         function backtop() {
             var k = document.body.clientWidth,
@@ -140,7 +196,7 @@
             $('.title1-guizhe1').slideToggle();
         })
         var change = [];
-        redpack();
+        redpack('POINT_AT');
         //抽奖
         var lottery = {
             index: -1,	//当前转动到哪个位置，起点位置
@@ -189,11 +245,11 @@
                 lottery.prize = -1;
                 lottery.times = 0;
                 //奖品弹出位子
-                $('.thanksgiving-kuang').css('display','block');
-                $('.kuang-tidhi').css('display','block');
-                $('.imgx').on('click',function(){
-                    $('.thanksgiving-kuang').css('display','none');
-                    $('.kuang-tidhi').css('display','none');
+                $('.thanksgiving-kuang').css('display', 'block');
+                $('.kuang-tidhi').css('display', 'block');
+                $('.imgx').on('click', function () {
+                    $('.thanksgiving-kuang').css('display', 'none');
+                    $('.kuang-tidhi').css('display', 'none');
                 });
                 click = false;
             } else {
@@ -212,21 +268,22 @@
                     }
                 }
                 if (lottery.speed < 40) {
-                lottery.speed = 40;
+                    lottery.speed = 40;
+                }
+                ;
+                //console.log(lottery.times + '^^^^^^' + lottery.speed + '^^^^^^^' + lottery.prize);
+                lottery.timer = setTimeout(roll, lottery.speed);
             }
-            ;
-            //console.log(lottery.times + '^^^^^^' + lottery.speed + '^^^^^^^' + lottery.prize);
-            lottery.timer = setTimeout(roll, lottery.speed);
+            return false;
         }
-        return false;
-    }
 
-    var click = false;
-    function redpack(callback) {
+        var click = false;
+
+        function redpack(sum,callback) {
             $.ajax({
-                url:'/api/activity/reward/',
+                url: '/api/activity/reward/',
                 type: "POST",
-                data: {"action": "GET_REWARD_INFO","activity":"thanks_given" },
+                data: {"action": sum, "activity": "thanks_given"},
                 async: false
             }).done(function (data) {
                 change = data;
@@ -237,7 +294,7 @@
             });
         }
 
-   // window.onload = function () {
+        // window.onload = function () {
         //lottery.init('lottery');
         //$("#lottery a").click(function () {
         //    if (click) {
@@ -250,7 +307,7 @@
         //        return false;
         //    }
         //});
-    //};
+        //};
 
     });
 
