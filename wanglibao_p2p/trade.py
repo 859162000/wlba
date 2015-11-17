@@ -9,6 +9,7 @@ from marketing import tools
 #from marketing.models import IntroducedBy, Reward, RewardRecord
 from order.models import Order
 #from wanglibao.templatetags.formatters import safe_phone_str
+from wanglibao_reward.views import RewardDistributer
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.marginkeeper import MarginKeeper
 from order.utils import OrderHelper
@@ -20,6 +21,7 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_redpack.models import RedPackRecord
+import logging
 # from wanglibao_account.utils import CjdaoUtils
 # from wanglibao_account.tasks import cjdao_callback
 # from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
@@ -28,6 +30,7 @@ from wanglibao_redis.backend import redis_backend
 
 from wanglibao_rest.utils import split_ua
 
+logger = logging.getLogger('wanglibao_account')
 
 class P2PTrader(object):
     def __init__(self, product, user, order_id=None, request=None):
@@ -92,7 +95,7 @@ class P2PTrader(object):
             if product_record.product_balance_after <= 0:
                 is_full = True
 
-        # fix@chenweibi, add order_id
+        # fix@chenweibin, add order_id
         tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount,
                                                "device": self.device, "order_id": self.order_id,
                                                "product_id": self.product.id, "is_full": is_full})
@@ -100,7 +103,16 @@ class P2PTrader(object):
             CoopRegister(self.request).process_for_purchase(self.user, self.order_id)
         except:
             pass
+        try:
+            kwargs = {
+                'amount': amount}
 
+            RewardDistributer(self.request, kwargs).processor_for_distribute()
+        except Exception, reason:
+            logger.debug("购标异常 reason:{0}".format(reason))
+            pass
+        else:
+            logger.debug("{0}购标成功".format(self.user))
         # 投标成功发站内信
         matches = re.search(u'日计息', self.product.pay_method)
         if matches and matches.group():

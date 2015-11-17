@@ -1198,10 +1198,10 @@ class KuaiShortPay:
                 if not token:
                     raise ThirdPayError(201172, '信息不匹配')
                 elif token['ret_code'] != 0:
-                    if token['ret_code'] == 2:
-                        raise ThirdPayError(self.ERR_CODE_WAITING, token['message'])
-                    else:
-                        raise ThirdPayError(201182, token['message'])
+                    # if token['ret_code'] == 2:
+                    #     raise ThirdPayError(self.ERR_CODE_WAITING, token['message'])
+                    # else:
+                    raise ThirdPayError(201182, token['message'])
 
                 return {"ret_code":0, "message":"ok", "order_id":order.id, "token":token['token']}
         except Exception, e:
