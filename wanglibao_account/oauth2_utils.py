@@ -40,11 +40,10 @@ def create_token(request):
     if token:
         try:
             access_token = AccessToken.objects.get(token=token)
-            print access_token
             user = access_token.user
             expires = access_token.expires
         except Exception, e:
-            return {'state': False, 'data': 'token err: %s' % e}
+            user_token = None
 
     # 用户名密码登录, 先确认是不是渠道用户.
     elif settings.TOKEN_CLIENTS.get(username) == password:
@@ -72,23 +71,27 @@ def create_token(request):
         return {'state': False, 'data': 'user authenticated error!'}
 
     if user:
-        user_token = AccessToken.objects.filter(user=user).last()
-        token = user_token.token
+        token = AccessToken.objects.filter(user=user).last()
+
+        try:
+            user_token = token.token
+        except:
+            user_token = None
 
         # 如果token失效, 则重新生成token
-        if not token or user_token.get_expire_delta() <= 0:
-            token = generate_token()
+        if not user_token or token.get_expire_delta() <= 0:
+            user_token = generate_token()
 
             # client_type = 0 默认是365 有效期, 1 默认是30天有效期.
             client_type = 1
             client, status = Client.objects.get_or_create(user=user, client_type=client_type)
 
             AccessToken.objects.create(user=user,
-                                       token=token,
+                                       token=user_token,
                                        client=client,
                                        expires=expires)
 
-        return {'state': True, 'data': token}
+        return {'state': True, 'data': user_token}
 
 
 def get_token(key):
