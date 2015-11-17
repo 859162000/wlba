@@ -153,57 +153,6 @@ class Income(models.Model):
     created_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"创建时间")
 
 
-class ExperienceGold(models.Model):
-    """ 体验金活动 """
-    name = models.CharField(max_length=30, verbose_name=u'体验金名称')
-    amount = models.FloatField(null=False, default=0, verbose_name=u'体验金金额')
-    description = models.CharField(max_length=20, verbose_name=u"描述", default="")
-    give_mode = models.CharField(max_length=20, verbose_name=u"发放方式", db_index=True, choices=(
-        # ("nil", u"零门槛(兑换码)"),
-        ("activity", u"活动奖励"),
-        ("register", u"注册"),
-        ("validation", u"实名认证"),
-        ("first_buy", u"首次投资"),
-        ("first_pay", u"首次充值"),
-        ('buy', u'投资'),
-        ('pay', u'充值'),
-        ('p2p_audit', u'满标审核'),
-        ('repaid', u'还款')), default=u"注册")
-    give_platform = models.CharField(max_length=10, verbose_name=u"发放平台", default="全平台", choices=PLATFORM)
-    target_channel = models.CharField(max_length=1000, verbose_name=u"渠道", blank=True, default="",
-                                      help_text=u'不限渠道则留空即可,多个渠道用英文逗号间隔')
-    available_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"生效时间")
-    unavailable_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"失效时间")
-    auto_extension = models.BooleanField(default=False, verbose_name=u"自动设定失效时间",
-                                         help_text=u"选择此项后系统会将失效时间设置为具体发放日期加上失效延长天数")
-    auto_extension_days = models.IntegerField(verbose_name=u"失效延长天数", default=0, null=False,
-                                              help_text=u"如果填写了失效延长天数,系统会动态计算失效截止时间")
-    invalid = models.BooleanField(default=False, verbose_name=u"是否作废")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
-
-    class Meta:
-        verbose_name = u"体验金活动"
-        verbose_name_plural = u"体验金活动"
-
-    def __unicode__(self):
-        return u'%s <%s>' % (self.id, self.name)
-
-
-class ExperienceGoldRecord(models.Model):
-    experience_gold = models.ForeignKey(ExperienceGold, verbose_name=u"体验金")
-    user = models.ForeignKey(User, verbose_name=u"用户")
-    apply_platform = models.CharField(max_length=20, null=False, default="", choices=PLATFORM, verbose_name=u"使用平台")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
-    apply_at = models.DateTimeField(verbose_name=u'使用时间', null=True)
-    apply_amount = models.FloatField(null=True, default=0.0, verbose_name=u'使用金额')
-    order_id = models.IntegerField(verbose_name=u'关联订单', null=True, db_index=True)
-    product_id = models.IntegerField(verbose_name=u'关联产品', null=True, db_index=True)
-
-    class Meta:
-        verbose_name = u"体验金流水"
-        verbose_name_plural = u"体验金流水"
-
-
 # 创建红包列表
 def create_redpack(sender, instance, **kwargs):
     from wanglibao_redpack import tasks

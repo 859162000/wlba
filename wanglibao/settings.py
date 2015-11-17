@@ -134,6 +134,7 @@ INSTALLED_APPS = (
     'file_storage',
     'wanglibao_lottery',
     'daterange_filter',
+    'experience_gold',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -411,6 +412,12 @@ LOGGING = {
             'filename': '/var/log/wanglibao/weixin.log',
             'formatter': 'verbose'
         },
+        'experience_gold': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/experience_gold.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
@@ -486,6 +493,10 @@ LOGGING = {
               'handlers': ['weixin', 'console'],
               'level': 'DEBUG'
         },
+        'experience_gold': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG'
+        }
     }
 }
 
