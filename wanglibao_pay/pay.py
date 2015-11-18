@@ -341,14 +341,14 @@ class YeeProxyPayCallbackMessage(PayMessage):
         request_para_order = ['p0_Cmd', 'p1_MerId', 'p2_Order', 'p3_Amt', 'p4_Cur', 'p5_Pid', 'p8_Url']
         response_para_order = ['p1_MerId', 'r0_Cmd', 'r1_Code', 'r2_TrxId', 'r3_Amt', 'r4_Cur', 'r5_Pid', 'r6_Order',
                                'r7_Uid', 'r8_MP', 'r9_BType']
-        secret_key = settings.YEE_MER_PRIV_KEY
+        secret_key = settings.YEE_PROXY_PAY_KEY
 
         if para_type == 'request':
             para_order = request_para_order
         else:
             para_order = response_para_order
 
-        str_to_sign = ''.join([para_dict.get(k, '') for k in para_order])
+        str_to_sign = ''.join([str(para_dict.get(k, '')) for k in para_order])
         hmac_str = hmac.new(secret_key, str_to_sign).hexdigest()
         return hmac_str
 
@@ -387,25 +387,25 @@ class YeeProxyPay(object):
     1.后台回调地址要通过管理页面设置，页面重定向通过p8_Url设置
     2.生成hmac的参数是有顺序的
     """
-    def __int__(self):
+    def __init__(self):
         self.pay_order = PayOrder()
         # TODO ADD TO SETTINGS
-        self.proxy_pay_url = settings.YEE_PROXY_PAY_URL
+        self.proxy_pay_url = settings.YEE_PROXY_PAY_WEB_CALLBACK_URL
 
     def _post(self, order_id, amount):
         post_para = {
             'p0_Cmd': 'Buy',
-            'p1_MerId': settings.YEE_MER_ID,
+            'p1_MerId': settings.YEE_PROXY_PAY_MER_ID,
             'p2_Order': order_id,
             'p3_Amt': amount,
             'p4_Cur': 'CNY',
             # 商品名称， Max（20）,p6, p7为商品分类，描述，我们暂时就不传了
             'p5_Pid': '网利宝最专业的选择',
-            # 回调地址， Max（200）
+            # 回调地址， Max（200）,页面回调地址
             'p8_Url': settings.YEE_PROXY_PAY_WEB_CALLBACK_URL,
             'hmac': ''
         }
-        post_para.update(hmac=self.get_hmac(post_para))
+        post_para.update(hmac=YeeProxyPayCallbackMessage.get_hmac(post_para, 'request'))
         return post_para
 
     def _request(self, url, post_data):

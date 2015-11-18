@@ -35,7 +35,7 @@ from wanglibao_p2p.models import P2PRecord
 import decimal
 from wanglibao_pay.pay import YeeProxyPay, PayOrder, YeeProxyPayCallbackMessage
 from wanglibao_pay.serializers import CardSerializer
-from wanglibao_pay.util import get_client_ip
+from wanglibao_pay.util import get_client_ip, fmt_two_amount
 from wanglibao_pay import util
 from wanglibao_profile.backends import require_trade_pwd
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -156,7 +156,7 @@ class PayView(TemplateView):
 
         # todo 参数校验
         user = request.user
-        amount = int(request.POST.get('amount'))
+        amount = fmt_two_amount(request.POST.get('amount'))
         gate_id = request.POST.get('gate_id')
         request_ip = get_client_ip(request)
         device = split_ua(request)
@@ -165,8 +165,8 @@ class PayView(TemplateView):
         if channel == 'yeepay':
             result = YeeProxyPay().proxy_pay(user, amount,  gate_id,  request_ip, device)
         else:
-            result = HuifuPay.pre_pay(request)
-        return self.render_to_response()
+            result = HuifuPay().pre_pay(request)
+        return self.render_to_response(result)
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
