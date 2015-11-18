@@ -13,7 +13,9 @@ html
     .kuang-tidhi
       img(src='/static/imgs/pc_activity/thanksgiving/guanbibutton.png').imgx
       .huodejiang
-        p 恭喜您！获得iPhone6s plus
+        p
+          |恭喜您！获得
+          span#app-jiangli iPhone6s plus
     .thanksgiving
       .banner#banner
         .bannerdong
@@ -74,7 +76,7 @@ html
                     .prize-ri
                       p
                        |你还有
-                       span 1
+                       span.app-jihui 1
                        |次抽奖机会
                       if user.is_authenticated
                         a(href='javascript:void(0);').jiang-button.jiang-button2 立即抽奖

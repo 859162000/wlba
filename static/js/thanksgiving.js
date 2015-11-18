@@ -59,7 +59,7 @@
             //点击抽奖
             lottery.init('lottery');
             $("#lottery .jiang-button2").click(function () {
-                redpack('GET_REWARD_INFO', function (data) {
+                redpack('POINT_AT', function (data) {
                     if (click) {
                         return false;
                     } else {
@@ -196,8 +196,19 @@
             $('.title1-guizhe1').slideToggle();
         })
         var change = [];
-        redpack('POINT_AT');
+        redpack('GET_REWARD_INFO');
         //抽奖
+        var arr = [null, '200元现金红包', '1.8%加息券', '10元现金红包', 'iPhone6s plus', '2.2%加息券', 'beats头戴式耳机', '80元现金红包', '1%加息券', '400元现金红包', '霍尼韦尔空气净化器', '1.5%加息券', '600元现金红包', '1年迅雷会员'];
+        arr.indexof = function (value) {
+            var a = this;
+            for (var i = 0; i < a.length; i++) {
+                if (a[i] == value)
+                    return i;
+            }
+        }
+        //alert(arr.indexof('200元现金红包'));
+
+
         var lottery = {
             index: -1,	//当前转动到哪个位置，起点位置
             count: 0,	//总共有多少个位置
@@ -240,6 +251,13 @@
         function roll() {
             lottery.times += 1;
             lottery.roll();
+/*            if(change['reward']==null){
+                clearTimeout(lottery.timer);
+                lottery.prize = -1;
+                lottery.times = 0;
+                $('.thanksgiving-kuang').css('display', 'block');
+                $('.kuang-tidhi').css('display', 'block');
+            }*/
             if (lottery.times > lottery.cycle + 10 && lottery.prize == lottery.index) {
                 clearTimeout(lottery.timer);
                 lottery.prize = -1;
@@ -251,6 +269,8 @@
                     $('.thanksgiving-kuang').css('display', 'none');
                     $('.kuang-tidhi').css('display', 'none');
                 });
+
+
                 click = false;
             } else {
                 if (lottery.times < lottery.cycle) {
@@ -258,8 +278,10 @@
                 } else if (lottery.times == lottery.cycle) {
                     //奖品位置
                     //var index = Math.random() * (lottery.count) | 0;
-                    var index = 6
+                    var index = arr.indexof(change['reward'])
+
                     lottery.prize = index;
+                    console.log(change['reward']);
                 } else {
                     if (lottery.times > lottery.cycle + 10 && ((lottery.prize == 0 && lottery.index == 7) || lottery.prize == lottery.index + 1)) {
                         lottery.speed += 110;
@@ -279,7 +301,7 @@
 
         var click = false;
 
-        function redpack(sum,callback) {
+        function redpack(sum, callback) {
             $.ajax({
                 url: '/api/activity/reward/',
                 type: "POST",
@@ -290,6 +312,12 @@
                 callback && callback(data);
                 console.log(change);
 
+                $('.app-jihui').text(change['left']);
+                if(change['reward']==null){
+                     $(lottery).find(".lottery-unit-0").children().removeClass("active");
+                } else{
+                    $('#app-jiangli').text(change['reward']);
+                }
 
             });
         }

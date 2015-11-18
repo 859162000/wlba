@@ -264,12 +264,13 @@ org.invite_index = (function (org) {
         _regist_wlb: function(){
             var _self = this;
             org.ajax({
-                url: '/api/register/?invite_code='+ $('input[name=friend_identifier]').val()+'/',
+                url: '/api/register/',
                 type: 'POST',
                 data: {
                     "identifier":  _self.$phone.val(),
                     "validate_code": _self.$codenum.val(),
-                    "IGNORE_PWD": 'true'
+                    "IGNORE_PWD": 'true',
+                    'invite_code': $('#invite_code').val()
                 },
                 beforeSend: function(){
                     $('input[name=submit]').attr('disabled',true)

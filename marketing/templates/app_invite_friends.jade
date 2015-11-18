@@ -27,6 +27,7 @@ html(style="background:#fff")
       .invite-from
         .mod-form
           input#friend_identifier(type="hidden", name="friend_identifier", value="{{ friend_phone }}")
+          input#invite_code(type="hidden", name="invite_code", value="{{ invite_code }}")
           input(type='tel', name='phone',data-existing='true', placeholder='输入手机号',data-type='Phone',data-message='请输入正确的手机号', autocomplete = 'off').mod-phone
           .mod-check-body
             .mod-form-margin
