@@ -831,20 +831,22 @@ class ThanksGivenRewardDistributer(RewardDistributer):
             redpack_event = RedPackEvent.objects.filter(name=self.reward).first()
         else:
             reward = Reward.objects.filter(description=self.reward).first()
-        logger.debug("用户的投资额度是：%s, 获得的红包是：%s" % (self.amount, self.reward,))
-        WanglibaoActivityReward.objects.create(
-            activity=u'ThanksGiven',
-            user=self.request.user,
-            redpack_event_id=2,
-            reward_id=1,
-            join_times=1,
-            left_times=1,
-            when_dist=1,
-            has_sent=False,
-            p2p_amount=self.amount,
-            channel=self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, 'all'),
-        )
-
+        logger.debug("用户的投资额度是：%s, 获得的红包是：%s, redpack_event:%s, reward:%s" % (self.amount, self.reward, redpack_event, reward,))
+        try:
+            WanglibaoActivityReward.objects.create(
+                activity=u'ThanksGiven',
+                user=self.request.user,
+                redpack_event=redpack_event if redpack_event else None,
+                reward=reward if reward else None,
+                join_times=1,
+                left_times=1,
+                when_dist=1,
+                has_sent=False,
+                p2p_amount=self.amount,
+                channel=self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, 'all'),
+            )
+        except Exception, reason:
+            logger.debug("中奖信息入库报错:%s" % reason)
 
 class DistributeRewardAPIView(APIView):
     permission_classes = ()
@@ -908,37 +910,39 @@ class ThanksGivingDistribute(object):
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         if 'POINT_AT' == action:
+
             reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', left_times__gt=0, has_sent=False).first()
 
             if reward:
+                with transaction.atomic():
+                    reward = WanglibaoActivityReward.objects.select_for_update().filter(pk=reward.id).first()
+                    if reward.left_times == reward.when_dist:
+                        """发站内信"""
+                        if reward.reward:
+                            inside_message.send_one.apply_async(kwargs={
+                                "user_id": request.user.id,
+                                "title": reward.reward.description,
+                                "content": reward.reward.content,
+                                "mtype": "activity"
+                            })
+                            reward.reward.is_used = True
+                            reward.reward.save()
 
-                if reward.left_times == reward.when_dist:
-                    """发站内信"""
-                    if reward.reward:
-                        inside_message.send_one.apply_async(kwargs={
-                            "user_id": request.user.id,
-                            "title": reward.reward.description,
-                            "content": reward.reward.content,
-                            "mtype": "activity"
-                        })
-                        reward.reward.is_used = True
-                        reward.reward.save()
+                        """发红包"""
+                        if reward.redpack_event:
+                            redpack_backends.give_activity_redpack(request.user, reward.redpack_event, 'pc')
 
-                    """发红包"""
-                    if reward.redpack_event:
-                        redpack_backends.give_activity_redpack(request.user, reward.redpack_event, 'pc')
+                    json_to_response = {
+                        'ret_code': 2000,
+                        'message': u'用户抽奖信息描述',
+                        'reward': reward.redpack_event.name if reward.left_times == reward.when_dist else None,
+                        'left': reward.left_times - 1,
+                        'is_first': self.is_first(request)
+                    }
 
-                json_to_response = {
-                    'ret_code': 2000,
-                    'message': u'用户抽奖信息描述',
-                    'reward': reward.redpack_event.name if reward.left_times == reward.when_dist else None,
-                    'left': reward.left_times - 1,
-                    'is_first': self.is_first(request)
-                }
-
-                reward.left_times -= 1
-                reward.has_sent = True
-                reward.save()
+                    reward.left_times -= 1
+                    reward.has_sent = True
+                    reward.save()
             else:
                 json_to_response = {
                     'ret_code': 2001,

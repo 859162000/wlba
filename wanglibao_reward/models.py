@@ -106,8 +106,8 @@ class WanglibaoWeixinRelative(models.Model):
 
 class WanglibaoActivityReward(models.Model):
     user = models.ForeignKey(User, related_name='reward_owner', default=None, blank=True, null=True, on_delete=models.SET_NULL)
-    redpack_event = models.ForeignKey(RedPackEvent, default=None, verbose_name=u'用户获得的红包')
-    reward = models.ForeignKey(Reward, default=None, verbose_name=u'用户获得的奖品')
+    redpack_event = models.ForeignKey(RedPackEvent, default=None, blank=True, null=True, verbose_name=u'用户获得的红包')
+    reward = models.ForeignKey(Reward, default=None, blank=True, null=True, verbose_name=u'用户获得的奖品')
     activity = models.CharField(default='', max_length=256, verbose_name=u'活动名称')
     when_dist = models.IntegerField(default=0, verbose_name=u'什么时候发奖')
     left_times = models.IntegerField(default=0, verbose_name=u'还剩几次抽奖机会')
