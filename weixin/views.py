@@ -485,8 +485,8 @@ class WeixinBind(TemplateView):
             }
 
 def redirectToJumpPage(message):
-    logger.debug('-----------------message beforejump::%s'%message)
-    url = reverse('jump_page')+'?message=%s'%urllib.quote(message)
+    logger.debug('-----------------message beforejump::%s'% message)
+    url = reverse('jump_page')+'?message=%s'% message
     logger.debug(url)
     return HttpResponseRedirect(url)
 
@@ -513,7 +513,7 @@ class UnBindWeiUser(TemplateView):
             return redirectToJumpPage(message)
         if not w_user.user:
             message = u"您没有绑定的网利宝帐号"
-            return redirectToJumpPage(message)
+            return redirectToJumpPage(urllib.quote("您没有绑定的网利宝帐号"))
         return super(UnBindWeiUser, self).dispatch(request, *args, **kwargs)
 
 class UnBindWeiUserAPI(APIView):
@@ -1394,7 +1394,7 @@ class AwardIndexTemplate(TemplateView):
         if not w_user:
             return redirectToJumpPage("error")
         if not w_user.user:
-            return redirectToJumpPage(u"一定要绑定网利宝账号才可以抽奖")
+            return redirectToJumpPage(urllib.quote("一定要绑定网利宝账号才可以抽奖"))
 
         return super(AwardIndexTemplate, self).dispatch(request, *args, **kwargs)
 
