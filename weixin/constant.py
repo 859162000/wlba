@@ -1,15 +1,15 @@
 # encoding:utf-8
 from django.conf import settings
 if settings.ENV == settings.ENV_PRODUCTION:
-    BIND_SUCCESS_TEMPLATE_ID = 'mxNfcoJ8lfpbL1gFdazCk1OFGBhm9wIGL21Q6ZeB5FI'
-    UNBIND_SUCCESS_TEMPLATE_ID = "lGr-ClUgsv-ruam0ZvN_O-xy_7EzB__1tbCInUs_tOE"
-    ACCOUNT_INFO_TEMPLATE_ID = 'EUnDdpMNocmYynxiw939HGwv0_uG1wDrvg-xJ-Lhdz8'
+    BIND_SUCCESS_TEMPLATE_ID = '8a21nArPQS0XWct6AGCASDqoaaaE_Ir5SaqarSqkNws'
+    UNBIND_SUCCESS_TEMPLATE_ID = "BR08JlAXbQ_JUCnKWmhrSNe4pNL2PF9PQxV1QLcxrNo"
+    ACCOUNT_INFO_TEMPLATE_ID = 'OTxLYQNDhxMmi51lCTw3EY954jGH0_b7YgcsE66QnVY'
     PRODUCT_ONLINE_TEMPLATE_ID = "itviF9BIU8BBjEXwPOEMiElLzFByxMZ6-FjvYapk8pY"
     AWARD_COUPON_TEMPLATE_ID  = "_-Xlr2icPtM5sXj0VKuF3fleKYR-Rl4a_h2gpcd_95M"
 else:
     BIND_SUCCESS_TEMPLATE_ID = "ze8Mgao5wi5SJpfkQB_OQUTiX9NqnB0V6oLsm_GaTFI"
     UNBIND_SUCCESS_TEMPLATE_ID = "TtmpZytSck7cULmFw2Oo-LK2N2VZ5A4wQ1JpXmaoo2s"
-    ACCOUNT_INFO_TEMPLATE_ID = "WWpxe28g8z9YWADrCUGFfznzcxL-6Pg6i5zgToPCCqw"
+    ACCOUNT_INFO_TEMPLATE_ID = "fSasXs2oJIKPUkuLHU-aKvkqO-mIE6oGPg_FxiAxtd0"
     PRODUCT_ONLINE_TEMPLATE_ID = "CBIMqm2GrhDTlilYE_jLJkFxkzzOsDItSsRTDoKtO-Q"
     AWARD_COUPON_TEMPLATE_ID  = "_-Xlr2icPtM5sXj0VKuF3fleKYR-Rl4a_h2gpcd_95M"
 
@@ -72,19 +72,23 @@ Message_template = {
                    "color": "#173177"
                 },
                 "keyword1": {
-                    "value": "{value}",
+                    "value": "{value}",#账户总额
                    "color": "#173177"
                 },
                 "keyword2": {
-                    "value": "{value}",
+                    "value": "{value}",# 可用余额
                    "color": "#173177"
                 },
                 "keyword3": {
-                    "value": "{value}",
+                    "value": "{value}",# 投资金额
                    "color": "#173177"
                 },
                 "keyword4": {
-                    "value": "{value}",
+                    "value": "{value}",# 待收本金
+                   "color": "#173177"
+                },
+                "keyword5": {
+                    "value": "{value}",# 待收利息
                    "color": "#173177"
                 },
                "remark":{
