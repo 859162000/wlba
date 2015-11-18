@@ -30,8 +30,6 @@ class Migration(SchemaMigration):
             ('target_channel', self.gf('django.db.models.fields.CharField')(default='', max_length=500, blank=True)),
             ('available_at', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
             ('unavailable_at', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
-            ('auto_extension', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('auto_extension_days', self.gf('django.db.models.fields.IntegerField')(default=0)),
             ('invalid', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
         ))
@@ -42,12 +40,11 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('event', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['experience_gold.ExperienceEvent'])),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('apply_platform', self.gf('django.db.models.fields.CharField')(default='', max_length=20)),
             ('created_at', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('apply', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('apply_platform', self.gf('django.db.models.fields.CharField')(default='', max_length=20)),
             ('apply_at', self.gf('django.db.models.fields.DateTimeField')(null=True)),
             ('apply_amount', self.gf('django.db.models.fields.FloatField')(default=0.0, null=True)),
-            ('order_id', self.gf('django.db.models.fields.IntegerField')(null=True, db_index=True)),
-            ('product_id', self.gf('django.db.models.fields.IntegerField')(null=True, db_index=True)),
         ))
         db.send_create_signal(u'experience_gold', ['ExperienceEventRecord'])
 
@@ -61,7 +58,7 @@ class Migration(SchemaMigration):
             ('principal', self.gf('django.db.models.fields.DecimalField')(max_digits=20, decimal_places=2)),
             ('interest', self.gf('django.db.models.fields.DecimalField')(max_digits=20, decimal_places=2)),
             ('settled', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('settlement_time', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+            ('settlement_time', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
             ('created_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('description', self.gf('django.db.models.fields.CharField')(max_length=500, blank=True)),
         ))
@@ -128,7 +125,7 @@ class Migration(SchemaMigration):
             'principal': ('django.db.models.fields.DecimalField', [], {'max_digits': '20', 'decimal_places': '2'}),
             'product': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'experience_product_subs'", 'to': u"orm['experience_gold.ExperienceProduct']"}),
             'settled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'settlement_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'settlement_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'term': ('django.db.models.fields.IntegerField', [], {}),
             'term_date': ('django.db.models.fields.DateTimeField', [], {}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
@@ -136,8 +133,6 @@ class Migration(SchemaMigration):
         u'experience_gold.experienceevent': {
             'Meta': {'object_name': 'ExperienceEvent'},
             'amount': ('django.db.models.fields.FloatField', [], {'default': '0'}),
-            'auto_extension': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'auto_extension_days': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'available_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '20', 'blank': 'True'}),
@@ -151,14 +146,13 @@ class Migration(SchemaMigration):
         },
         u'experience_gold.experienceeventrecord': {
             'Meta': {'object_name': 'ExperienceEventRecord'},
+            'apply': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'apply_amount': ('django.db.models.fields.FloatField', [], {'default': '0.0', 'null': 'True'}),
             'apply_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'apply_platform': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '20'}),
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'event': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['experience_gold.ExperienceEvent']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'order_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'db_index': 'True'}),
-            'product_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'db_index': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         },
         u'experience_gold.experienceproduct': {

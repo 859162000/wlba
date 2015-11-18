@@ -53,10 +53,6 @@ class ExperienceEvent(models.Model):
                                       help_text=u'不限渠道则留空即可,多个渠道用英文逗号间隔')
     available_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"生效时间")
     unavailable_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"失效时间")
-    auto_extension = models.BooleanField(default=False, verbose_name=u"设定失效时间",
-                                         help_text=u"选择此项后系统会将失效时间设置为具体发放日期加上失效延长天数")
-    auto_extension_days = models.IntegerField(verbose_name=u"失效延长天数", default=0, null=False,
-                                              help_text=u"如果填写了失效延长天数,系统会动态计算失效截止时间")
     invalid = models.BooleanField(default=False, verbose_name=u"是否作废")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
 
@@ -71,12 +67,11 @@ class ExperienceEvent(models.Model):
 class ExperienceEventRecord(models.Model):
     event = models.ForeignKey(ExperienceEvent, verbose_name=u"体验金")
     user = models.ForeignKey(User, verbose_name=u"用户")
-    apply_platform = models.CharField(max_length=20, null=False, default="", choices=PLATFORM, verbose_name=u"使用平台")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
+    apply = models.BooleanField(default=False, verbose_name=u"是否使用")
+    apply_platform = models.CharField(max_length=20, null=False, default="", choices=PLATFORM, verbose_name=u"使用平台")
     apply_at = models.DateTimeField(verbose_name=u'使用时间', null=True)
     apply_amount = models.FloatField(null=True, default=0.0, verbose_name=u'使用金额')
-    order_id = models.IntegerField(verbose_name=u'关联订单', null=True, db_index=True)
-    product_id = models.IntegerField(verbose_name=u'关联产品', null=True, db_index=True)
 
     class Meta:
         verbose_name = u"体验金流水"
@@ -93,7 +88,7 @@ class ExperienceAmortization(models.Model):
     interest = models.DecimalField(u'利息', max_digits=20, decimal_places=2)
 
     settled = models.BooleanField(u'已结算', default=False)
-    settlement_time = models.DateTimeField(u'结算时间', auto_now=True)
+    settlement_time = models.DateTimeField(u'结算时间', auto_now=False, null=True, blank=True)
 
     created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
     description = models.CharField(u'摘要', max_length=500, blank=True)

@@ -22,107 +22,67 @@ html
                 ul.account_detail.clearfix
                     li
                         p.experience_name 总资产（元）
-                        p.experience_money 10,000.00
+                        p.experience_money {{total_experience_amount}}
                     li
                         p.experience_name 体验金余额（元）
-                        p.experience_money 8,888.00
+                        p.experience_money {{experience_amount}}
                     li
-                        p.experience_name 到账收益余额（元）
-                        p.experience_money 10,000.00
+                        p.experience_name 到账收益（元）
+                        p.experience_money {{paid_interest}}
                     li.last
                         p.experience_name 待收收益（元）
-                        p.experience_money 10,000.00
+                        p.experience_money {{unpaid_interest}}
                 .experience_project.clearfix
                     .project_div.clearfix
                         .project_left
-                            h5 专属福利体验标R
+                            h5 {{product.name}}
                             ul.project_detail.clearfix
                                 li.li_one
-                                    label 10,000元
+                                    label {{experience_amount}}元
                                     span 融资金额
                                 li.li_two
-                                    label 10%
+                                    label {{product.expected_earning_rate}}%
                                     span 年化收益
                                 li.li_three
-                                    label 7天
+                                    label {{product.period}}天
                                     span 投资期限
                         .project_right
+                          if experience_amount > 0
                             a(href='javascript:void(0)').investBtn 立即投资
                             p.income_fonts(style='display:none') 将于2015-10-31收益13元
-                .look_more_detail
+                          else
+                            a.invest_ed 立即投资
+                if user.is_authenticated
+                  .look_more_detail
                     .more_btn
                         label 查看历史投资项目
                         span
-                .project_list.clearfix(style='display:none')
+                  .project_list.clearfix(style='display:none')
                     .project_top
                     .project_box.clearfix
                         .project_ul_pre.clearfix
-                            table
-                                thead
-                                    tr
-                                        th 投标时间
-                                        th 产品名称
-                                        th 投资金额（元）
-                                        th 年化收益
-                                        th 项目天数
-                                        th.th_w 已收益／预期收益（元）
-                                tbody
-                                    tr
-                                        td 2015-10-10 19:53
-                                        td 专享福利体验标
-                                        td 8,888.00
-                                        td 00.00
-                                        td 2
-                                        td 0.00/9.89
-                                    tr
-                                        td 2015-10-10 19:53
-                                        td 专享福利体验标
-                                        td 8,888.00
-                                        td 00.00
-                                        td 2
-                                        td 0.00/9.89
-                                    tr
-                                        td 2015-10-10 19:53
-                                        td 专享福利体验标
-                                        td 8,888.00
-                                        td 00.00
-                                        td 2
-                                        td 0.00/9.89
-                                    tr
-                                        td 2015-10-10 19:53
-                                        td 专享福利体验标
-                                        td 8,888.00
-                                        td 00.00
-                                        td 2
-                                        td 0.00/9.89
-                                    tr
-                                        td 2015-10-10 19:53
-                                        td 专享福利体验标
-                                        td 8,888.00
-                                        td 00.00
-                                        td 2
-                                        td 0.00/9.89
-                                    tr
-                                        td 2015-10-10 19:53
-                                        td 专享福利体验标
-                                        td 8,888.00
-                                        td 00.00
-                                        td 2
-                                        td 0.00/9.89
-                                    tr
-                                        td 2015-10-10 19:53
-                                        td 专享福利体验标
-                                        td 8,888.00
-                                        td 00.00
-                                        td 2
-                                        td 0.00/9.89
-                                    tr
-                                        td 2015-10-10 19:53
-                                        td 专享福利体验标
-                                        td 8,888.00
-                                        td 00.00
-                                        td 2
-                                        td 0.00/9.89
+                          table
+                            thead
+                              tr
+                                th 投标时间
+                                th 产品名称
+                                th 投资金额（元）
+                                th 年化收益
+                                th 项目天数
+                                th.th_w 已收益／预期收益（元）
+                            tbody
+                              if experience_amoritization
+                                for amo in experience_amoritization
+                                  tr
+                                    td {{amo.created_time}}
+                                    td {{amo.product.name}}
+                                    td {{amo.principal}}
+                                    td {{amo.product.expected_earning_rate}}%
+                                    td {{amo.product.period}}
+                                    if amo.settled
+                                      td {{amo.interest}}/0.00（元）
+                                    else
+                                      td 0.00/{{amo.interest}}（元）
                 .explain_box
                     .explain_box_img
                         .explain_content_box
