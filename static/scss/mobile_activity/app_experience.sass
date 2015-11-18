@@ -1,4 +1,48 @@
 @charset "utf-8"
+@keyframes mysnow
+  0%
+    bottom: 100%
+    opacity: 0
+  50%
+    opacity: 1
+    transform: rotate(1080deg)
+  100%
+    transform: rotate(0deg)
+    opacity: 0
+    bottom: 0
+@-webkit-keyframes mysnow
+  0%
+    bottom: 100%
+    opacity: 0
+  50%
+    opacity: 1
+    -webkit-transform: rotate(1080deg)
+  100%
+    -webkit-transform: rotate(0deg)
+    opacity: 0
+    bottom: 0
+@-moz-keyframes mysnow
+  0%
+    bottom: 100%
+    opacity: 0
+  50%
+    opacity: 1
+    -webkit-transform: rotate(1080deg)
+  100%
+    -webkit-transform: rotate(0deg)
+    opacity: 0
+    bottom: 0
+@-o-keyframes mysnow
+  0%
+    bottom: 100%
+    opacity: 0
+  50%
+    opacity: 1
+    -webkit-transform: rotate(1080deg)
+  100%
+    -webkit-transform: rotate(0deg)
+    opacity: 0
+    bottom: 0
 html
   font-size: 20px
   background: #efeff4
@@ -9,7 +53,7 @@ html *
   -webkit-box-sizing: border-box
 html,body
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif
-body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,form,input,textarea,p,th,td,hr,button,article,aside,footer,header,hgroup,menu,nav,section
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,form,input,textarea,p,th,td,hr,button,article,aside,footer,header,menu,nav,section
   margin: 0
   padding: 0
 input,select,textarea
@@ -276,7 +320,24 @@ body
     display: inline-block
     border-radius: .5rem
 
-
+#showMoney
+  width: 100%
+  top: 0px
+  position: fixed
+  z-index: 999999999999
+.roll
+  position: absolute
+  opacity: 0
+  animation: mysnow 5s
+  -webkit-animation: mysnow 5s
+  -moz-animation: mysnow 5s
+  ms-animation: mysnow 5s
+  -o-animation: mysnow 5s
+  width: .825rem
+  height: .8rem
+.div
+  position: fixed
+  z-index: 999
 
 
 
