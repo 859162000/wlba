@@ -204,13 +204,26 @@ class WeixinJoinView(View):
             # 待收收益（元）：  24.00
             a = MessageTemplate(ACCOUNT_INFO_TEMPLATE_ID,
                     keyword1=account_info['total_asset'],
-                    keyword2=account_info['p2p_margin'], keyword3=account_info['p2p_total_paid_interest'],
-                    keyword4=account_info['p2p_total_unpaid_interest'])
+                    keyword2=account_info['p2p_margin'], keyword3=account_info['equity_total'],
+                    keyword4=account_info['p2p_total_paid_interest'],
+                    keyword5=account_info['p2p_total_unpaid_interest'])
             SendTemplateMessage.sendTemplate(w_user, a)
             reply = -1
         if msg.key == 'customer_service':
             txt = self.getCSReply()
-            reply = create_reply(txt, msg)
+            try:
+                client = WeChatClient(weixin_account.app_id, weixin_account.app_secret)
+                client.message._send_custom_message({
+                                            "touser":fromUserName,
+                                            "msgtype":"text",
+                                            "text":
+                                            {
+                                                 "content":txt
+                                            }
+                                        }, account="007@wanglibao400")
+            except:
+                pass
+            reply = -1#create_reply(txt, msg)
         return reply
 
     @checkBindDeco
