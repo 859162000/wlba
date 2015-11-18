@@ -197,8 +197,9 @@
         })
         var change = [];
         redpack('GET_REWARD_INFO');
+        redpack('GET_REWARD');
         //抽奖
-        var arr = [null, '200元现金红包', '1.8%加息券', '10元现金红包', 'iPhone6s plus', '2.2%加息券', 'beats头戴式耳机', '80元现金红包', '1%加息券', '400元现金红包', '霍尼韦尔空气净化器', '1.5%加息券', '600元现金红包', '1年迅雷会员'];
+        var arr = ['扫地机器人', '200元现金红包', '1.8%加息券', '10元现金红包', 'iPhone6s plus', '2.2%加息券', 'beats头戴式耳机', '80元现金红包', '1%加息券', '400元现金红包', '霍尼韦尔空气净化器', '1.5%加息券', '600元现金红包', '1年迅雷会员'];
         arr.indexof = function (value) {
             var a = this;
             for (var i = 0; i < a.length; i++) {
@@ -251,13 +252,6 @@
         function roll() {
             lottery.times += 1;
             lottery.roll();
-/*            if(change['reward']==null){
-                clearTimeout(lottery.timer);
-                lottery.prize = -1;
-                lottery.times = 0;
-                $('.thanksgiving-kuang').css('display', 'block');
-                $('.kuang-tidhi').css('display', 'block');
-            }*/
             if (lottery.times > lottery.cycle + 10 && lottery.prize == lottery.index) {
                 clearTimeout(lottery.timer);
                 lottery.prize = -1;
@@ -279,7 +273,6 @@
                     //奖品位置
                     //var index = Math.random() * (lottery.count) | 0;
                     var index = arr.indexof(change['reward'])
-
                     lottery.prize = index;
                     console.log(change['reward']);
                 } else {
@@ -311,31 +304,23 @@
                 change = data;
                 callback && callback(data);
                 console.log(change);
-
-                $('.app-jihui').text(change['left']);
-                if(change['reward']==null){
-                     $(lottery).find(".lottery-unit-0").children().removeClass("active");
-                } else{
-                    $('#app-jiangli').text(change['reward']);
+                if(change['left']==0){
+                    $('.jiang-button').removeClass("jiang-button2");
+                    $('.jiang-button').addClass("jiang-button1");
+                    $('.prize-ri p').html('您没有抽奖机会');
+                }else{
+                    $('.app-jihui').text(change['left']);
+                }
+                if(change['is_first']==false){
+                    $('.kuang-tidhi').addClass("kuang-tidhi12");
+                }else if(change['is_first']==true){
+                     $('.kuang-tidhi').removeClass("kuang-tidhi12");
                 }
 
+                $('#app-jiangli').text(change['reward']);
             });
         }
 
-        // window.onload = function () {
-        //lottery.init('lottery');
-        //$("#lottery a").click(function () {
-        //    if (click) {
-        //        return false;
-        //    } else {
-        //        lottery.speed = 100;
-        //        roll();
-        //        click = true;
-        //        //alert(4);
-        //        return false;
-        //    }
-        //});
-        //};
 
     });
 
