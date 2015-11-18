@@ -5,6 +5,7 @@ from marketing.views import AppShareView, AppShareRegView, NewYearView, Aggregat
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 from wanglibao.views import BaiduFinanceView
+from experience_gold.views import ExperienceGoldView
 
 urlpatterns = patterns(
     '',
@@ -65,6 +66,7 @@ urlpatterns = patterns(
     url(r'winter_brid/$', TemplateView.as_view(template_name="winter_bird.jade")),
 #    url(r'^xiaoher/$', TemplateView.as_view(template_name="xiaoher.jade")),
     url(r'fun_tuan/$', TemplateView.as_view(template_name="fun_tuan.jade")),
+    url(r'^experience_gold/$', ExperienceGoldView.as_view(), name="experience_gold"),
 )
 
 # app URL

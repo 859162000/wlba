@@ -13,7 +13,7 @@ from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, 
                    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract,
                    Third_login, Third_login_back, MessageView, MessageDetailAPIView, MessageCountAPIView,
                    MessageListAPIView, AccountRepayment, AddressView, AccountInviteView, user_product_contract_kf,
-                   JrjiaAutoRegisterView)#, CjdaoApiView)
+                   JrjiaAutoRegisterView)
 from django.contrib.auth import views as auth_views
 from views import AutomaticView
 from wanglibao_account.cooperation import JrjiaCPSView, JrjiaP2PStatusView, JrjiaP2PInvestView, JrjiaReportView, \
@@ -25,7 +25,7 @@ urlpatterns = patterns(
     url(r'^home/$', login_required(AccountHome.as_view(),
                                    login_url='/accounts/login/')),
     url(r'^home/experience/$', login_required(AccountHome.as_view(),
-                                        login_url='/accounts/login/')),
+                                              login_url='/accounts/login/')),
     url(r'^home/jiuxian/$', login_required(AccountHome.as_view(),
                                            login_url='/accounts/login/'), name='accounts_jiuxian'),
     url(r'^p2p/amortization/(?P<product_id>\d+)', login_required(P2PAmortizationView.as_view(),

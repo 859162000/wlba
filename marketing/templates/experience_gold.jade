@@ -1,0 +1,134 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+    head
+        - with '网利宝' as title
+        include global/g_head
+        - endwith
+        link(rel="stylesheet",href="/static/styles/pc_activity/experience_gold.css?v=20151106")
+    body(style="background:#fc9300")
+        include global/g_nav
+        .experience_gold
+            .banner
+                .draw_btn
+                    if user.is_authenticated
+                        a(href='javascript:void(0)').draw_btn_ed
+                    else
+                        a(href='/accounts/login/?next=/activity/experience_gold/')
+            .content.clearfix
+                .experience_title
+                    span 我的体验金
+                ul.account_detail.clearfix
+                    li
+                        p.experience_name 总资产（元）
+                        p.experience_money {{total_experience_amount}}
+                    li
+                        p.experience_name 体验金余额（元）
+                        p.experience_money {{experience_amount}}
+                    li
+                        p.experience_name 到账收益（元）
+                        p.experience_money {{paid_interest}}
+                    li.last
+                        p.experience_name 待收收益（元）
+                        p.experience_money {{unpaid_interest}}
+                .experience_project.clearfix
+                    .project_div.clearfix
+                        .project_left
+                            h5 {{product.name}}
+                            ul.project_detail.clearfix
+                                li.li_one
+                                    label {{experience_amount}}元
+                                    span 融资金额
+                                li.li_two
+                                    label {{product.expected_earning_rate}}%
+                                    span 年化收益
+                                li.li_three
+                                    label {{product.period}}天
+                                    span 投资期限
+                        .project_right
+                          if experience_amount > 0
+                            a(href='javascript:void(0)').investBtn 立即投资
+                            p.income_fonts(style='display:none') 将于2015-10-31收益13元
+                          else
+                            a.invest_ed 立即投资
+                if user.is_authenticated
+                  .look_more_detail
+                    .more_btn
+                        label 查看历史投资项目
+                        span
+                  .project_list.clearfix(style='display:none')
+                    .project_top
+                    .project_box.clearfix
+                        .project_ul_pre.clearfix
+                          table
+                            thead
+                              tr
+                                th 投标时间
+                                th 产品名称
+                                th 投资金额（元）
+                                th 年化收益
+                                th 项目天数
+                                th.th_w 已收益／预期收益（元）
+                            tbody
+                              if experience_amoritization
+                                for amo in experience_amoritization
+                                  tr
+                                    td {{amo.created_time}}
+                                    td {{amo.product.name}}
+                                    td {{amo.principal}}
+                                    td {{amo.product.expected_earning_rate}}%
+                                    td {{amo.product.period}}
+                                    if amo.settled
+                                      td {{amo.interest}}/0.00（元）
+                                    else
+                                      td 0.00/{{amo.interest}}（元）
+                .explain_box
+                    .explain_box_img
+                        .explain_content_box
+                            p.title_ex 体验金领取及使用说明
+                            ul
+                                li.clearfix
+                                    span
+                                    .explain_content
+                                        p.name 如何领取？
+                                        p 1、新用户通过注册（老用户通过邀请等活动奖励）获得体验金后，体验金自动放入相应账户并发送站内信通知。
+                                li.clearfix
+                                    span
+                                    .explain_content
+                                        p.name 如何使用？
+                                        p 1、体验金只能在相关活动页投资体验标，投资时不能使用其它理财券。体验金有效期自发放日起15天内有效。
+                                        p 2、体验金需要用户手动投资，投资时系统将自动按体验金总额一次性投资完毕。例如，用户A注册获得10000元体验金，未使用，之后该用户通过参与活动获得5000元体验金，此时用户选择投资体验标时（两笔体验金均在有效期内），系统默认将15000元体验金全部投资。
+                                li.clearfix
+                                    span
+                                    .explain_content
+                                        p.name 体验金是否可提现？
+                                        p 1、体验金投资完毕后，当日立即开始计息，到期日16点回款。还款本金系统自动收回，利息收益自动发放至投资人的个人账户。例如，新手10000元体验金，可计息日为3天（含节假日），今天投资（周四），周四、周五、周六计息3天，周六16点您的收益会发放到个人帐户。
+                                        p 2、体验金利息收益与正常账户余额一样，可用来投资和提现。
+                                        p.mt40 部分合作渠道来源用户无法享受此活动奖励，网利宝对此活动享有最终解释权。
+        #receiveSuccess(style='display:none')
+            .receiveSuccess
+                p 恭喜您获得
+                p 8,888元体验金
+                p
+                    a(href='javascript:void(0)')#goBtn 领完可以在这里投资呦！
+        #oldUser(style='display:none')
+            .oldUser
+                p 您是老用户，
+                p 关注网利宝最新活动，
+                p 赢取老用户专享体验金。
+                p.tc
+                    span
+                p.tc
+                    a(href='javascript:void(0)')#closeBtn 我知道了！
+        #success(style='display:none')
+            .successBox
+                p
+                    span
+                p.succeesFonts 恭喜您投资成功！
+                p 到期后体验金自动收回
+                p 收益自动发放
+        include global/g_footer
+        script.
+            require(['/static/src/pc/experience_gold.js'])
+

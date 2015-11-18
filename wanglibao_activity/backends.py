@@ -537,9 +537,9 @@ def _give_activity_experience_new(user, rtype, experience_id, device_type, rule,
                 record.user = this_user
                 record.save()
                 if user_ib:
-                    _send_message_sms(user, rule, user_ib, None, amount, experience_event, record.created_at)
+                    _send_message_sms(user, rule, user_ib, None, amount)
                 else:
-                    _send_message_sms(user, rule, None, None, amount, experience_event, record.created_at)
+                    _send_message_sms(user, rule, None, None, amount)
     else:
         for e_id in experience_id_list:
             experience_event = ExperienceEvent.objects.filter(give_mode=rtype, invalid=False, id=e_id,
@@ -558,9 +558,9 @@ def _give_activity_experience_new(user, rtype, experience_id, device_type, rule,
                     record.user = this_user
                     record.save()
         if user_ib:
-            _send_message_sms(user, rule, user_ib, None, amount, None, None)
+            _send_message_sms(user, rule, user_ib, None, amount)
         else:
-            _send_message_sms(user, rule, None, None, amount, None, None)
+            _send_message_sms(user, rule, None, None, amount)
 
 
 def _save_activity_record(rule, user, msg_type, msg_content='', introduced_by=False, is_full=False):

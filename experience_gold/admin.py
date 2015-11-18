@@ -15,7 +15,7 @@ class ExperienceProductAdmin(admin.ModelAdmin):
 
 class ExperienceEventAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'amount', 'give_mode', 'give_platform', 'target_channel',
-                    'available_at', 'unavailable_at', 'auto_extension', 'auto_extension_days', 'invalid')
+                    'available_at', 'unavailable_at', 'invalid')
     search_fields = ('name', )
 
     def has_delete_permission(self, request, obj=None):
@@ -24,8 +24,7 @@ class ExperienceEventAdmin(admin.ModelAdmin):
 
 class ExperienceEventRecordAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ('id', 'event', 'user', 'apply_platform', 'apply_at', 'apply_amount',
-                    'created_at', 'order_id', 'product_id')
+    list_display = ('id', 'event', 'user', 'apply_platform', 'apply_at', 'apply_amount', 'created_at')
     search_fields = ('=user__wanglibaouserprofile__phone', '=event')
     raw_id_fields = ('user', )
 
