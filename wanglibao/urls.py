@@ -10,7 +10,8 @@ from wanglibao.views import IndexView, SecurityView, PartnerView
 # from wanglibao_account.cooperation import YiruiteQuery, TianmangRegisterQuery, TianmangIDVerificationQuery, \
     # TianmangInvestQuery, TianmangInvestNotConfirmQuery, TianmangCardBindQuery, BengbengQuery, CoopQuery
 from wanglibao_account.cooperation import CoopQuery, CsaiUserQuery, CsaiInvestmentQuery, ZhongniuP2PQuery, \
-    ZhongniuP2PDataQuery, CoopInvestmentQuery, ZOP2PListView, ZORecordView, ZOCountView, MidaiSuccessView, MidaiNewView
+    ZhongniuP2PDataQuery, CoopInvestmentQuery, ZOP2PListView, ZORecordView, ZOCountView, MidaiSuccessView, MidaiNewView, \
+    Rong360P2PListView, Rong360TokenView
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
@@ -22,7 +23,8 @@ from wanglibao_banner.views import HiringView, AboutView, CompanyView, TeamView,
 
 from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
-from marketing.views import NewsListView, NewsDetailView, AppShareViewShort, ShortAppShareRegView
+from marketing.views import NewsListView, NewsDetailView, AppShareViewShort, ShortAppShareRegView,\
+    AppShareViewSuccess, AppShareViewError
 from wanglibao_activity.decorators import decorator_include
 from wanglibao_activity.decorators import wap_activity_manage
 from wanglibao.views import landpage_view
@@ -161,13 +163,19 @@ urlpatterns += patterns(
     url(r'^api/01/record/$', ZORecordView.as_view()),
     url(r'^api/01/count/$', ZOCountView.as_view()),
 
+    url(r'^api/rong360/token/$', Rong360TokenView.as_view()),
+    url(r'^api/rong360/list/$', Rong360P2PListView.as_view()),
+
     url(r'^api/loans/success/$', MidaiSuccessView.as_view()),
     url(r'^api/loans/new/$', MidaiNewView.as_view()),
 
     url(r'^AK7WtEQ4Q9KPs8Io_zOncw/wanglibao_sms/arrive_rate/$', ArriveRate.as_view(), name='arrive_rate'),
 
-    url(r'^aws/$', AppShareViewShort.as_view(), name="app_share"),
-    url(r'^ws/$', ShortAppShareRegView.as_view(), name="app_share_reg_short"),
+    #url(r'^ws/$', ShortAppShareRegView.as_view(), name="app_share_reg_short"),
+    url(r'^aws/$', AppShareViewShort.as_view(), name="app_invite"),
+    url(r'^wst/(?P<phone>\w+)', AppShareViewSuccess.as_view(), name="app_invite_success"),
+    url(r'^wsf/(?P<phone>\w+)', AppShareViewError.as_view(), name="app_invite_error"),
+    url(r'^app-invite-server/$', TemplateView.as_view(template_name="app_invite_server.jade")),
 )
 
 # 短信

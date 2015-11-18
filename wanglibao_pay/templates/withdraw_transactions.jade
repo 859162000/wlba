@@ -20,6 +20,8 @@ body
               th 用户姓名
               th 用户身份证
               th 金额
+              th 手续费
+              th 资金管理费
               th 类型
           tbody
           each payinfo, index in payinfos
@@ -31,13 +33,15 @@ body
               td {{payinfo.user.wanglibaouserprofile.name | safe_name}}
               td {{payinfo.user.wanglibaouserprofile.id_number | safe_id}}
               td {{payinfo.amount}}
+              td {{payinfo.fee}}
+              td {{payinfo.management_fee}}
               if payinfo.type == 'D'
                 td 充值
               else
                 td 提现
           tfoot
             tr
-              td(align="right", colspan=5) 金额总计：
+              td(align="right", colspan=7) 金额总计：
               td {{ total_amount }}
               td &nbsp;
 

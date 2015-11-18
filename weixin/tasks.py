@@ -6,6 +6,7 @@ from wanglibao.celery import app
 from wanglibao_p2p.models import P2PProduct
 from django.contrib.auth.models import User
 import re
+import json
 from django.conf import settings
 
 from weixin.models import SubscribeRecord, SubscribeService, WeixinUser
@@ -47,4 +48,19 @@ def sendUserProductOnLine(uid, service_desc, product_id, product_name, rate_desc
         template = MessageTemplate(PRODUCT_ONLINE_TEMPLATE_ID,
             first=service_desc, keyword1=product_name, keyword2=rate_desc,
             keyword3=period_desc, keyword4=pay_method, url=url)
+        SendTemplateMessage.sendTemplate(w_user, template)
+
+@app.task
+def sentTemplate(kwargs):
+    json_kwargs = json.loads(kwargs)
+    openid = json_kwargs.get('openid', "")
+    template_id = json_kwargs.get('template_id', "")
+    template_args = {}
+    for k, v in json_kwargs.iteritems():
+        if k == 'openid' or k == 'template_id':
+            continue
+        template_args[k]=v
+    template = MessageTemplate(template_id, **template_args)
+    w_user = WeixinUser.objects.filter(openid=openid).first()
+    if w_user and template:
         SendTemplateMessage.sendTemplate(w_user, template)

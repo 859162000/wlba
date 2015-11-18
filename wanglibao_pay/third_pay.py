@@ -2,6 +2,8 @@
 # encoding:utf-8
 
 import sys
+from wanglibao_account.cooperation import CoopRegister
+
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
@@ -206,7 +208,7 @@ def withdraw(request):
     uninvested = user.margin.uninvested  # 充值未投资金额
 
     # 获取费率配置
-    fee_misc = WithdrawFee(switch='on')
+    fee_misc = WithdrawFee()
     fee_config = fee_misc.get_withdraw_fee_config()
 
     # 检测提现最大最小金额
@@ -306,7 +308,7 @@ def card_bind_list(request):
             cards = sorted(cards, key=lambda x: bank_list.index(x.bank.gate_id))
 
             # 获取提现费率配置
-            fee_misc = WithdrawFee(switch='on')
+            fee_misc = WithdrawFee()
             fee_config = fee_misc.get_withdraw_fee_config()
             min_amount = fee_config.get('min_amount')
             max_amount = fee_config.get('max_amount')
@@ -527,18 +529,27 @@ def bind_pay_dynnum(request):
         card = Card.objects.filter(no=card_no, user=user).first()
 
     if not card:
-        return {"ret_code": 20002, "message": "银行卡未绑定"}
+        res = {"ret_code": 20002, "message": "银行卡未绑定"}
 
     if card.bank.channel == 'huifu':
-        return {'ret_code': 20003, 'message': '汇付天下请选择快捷支付渠道'}
+        res = {'ret_code': 20003, 'message': '汇付天下请选择快捷支付渠道'}
 
     elif card.bank.channel == 'yeepay':
-        return YeeShortPay().dynnum_bind_pay(request)
+        res = YeeShortPay().dynnum_bind_pay(request)
 
     elif card.bank.channel == 'kuaipay':
-        return KuaiShortPay().dynnum_bind_pay(user, vcode, order_id, token, input_phone, device, ip, request)
+        res = KuaiShortPay().dynnum_bind_pay(user, vcode, order_id, token, input_phone, device, ip, request)
     else:
-        return {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
+        res = {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
+
+    if res.get('ret_code') == 0:
+        try:
+            CoopRegister(request).process_for_binding_card(user)
+        except:
+            logger.exception('bind_card_callback_failed for %s' % str(user))
+
+
+    return res
 
 
 def yee_callback(request):

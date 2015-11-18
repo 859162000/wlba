@@ -1,10 +1,12 @@
 # coding=utf-8
+
 import logging
 from django.conf import settings
 import requests
 from django.db.models import Sum
 from wanglibao_account.models import IdVerification, UserSource
 from wanglibao_redpack.models import Income
+from . import get_verify_result
 
 logger = logging.getLogger("wanglibao_account")
 
@@ -150,6 +152,30 @@ class ProductionIDVerifyBackEnd(object):
         #     logger.info("Identity not consistent %s" % response.text)
 
         record = IdVerification(id_number=id_number, name=name, is_valid=verify_result)
+        record.save()
+
+        return record, None
+
+
+class ProductionIDVerifyV2BackEnd(object):
+
+    @classmethod
+    def verify(cls, name, id_number):
+        records = IdVerification.objects.filter(id_number=id_number, name=name)
+        if records.exists():
+            record = records.first()
+            return record, None
+
+        verify_result, id_photo = get_verify_result(id_number, name)
+
+        record = IdVerification()
+        record.id_number = id_number
+        record.name = name
+        record.is_valid = verify_result
+
+        if verify_result and id_photo:
+            record.id_photo.save('%s.jpg' % id_number, id_photo, save=True)
+
         record.save()
 
         return record, None
