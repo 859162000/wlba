@@ -24,7 +24,7 @@ urlpatterns = patterns(
     '',
     url(r'^home/$', login_required(AccountHome.as_view(),
                                    login_url='/accounts/login/')),
-    url(r'^home/fund/$', login_required(AccountHome.as_view(),
+    url(r'^home/experience/$', login_required(AccountHome.as_view(),
                                         login_url='/accounts/login/')),
     url(r'^home/jiuxian/$', login_required(AccountHome.as_view(),
                                            login_url='/accounts/login/'), name='accounts_jiuxian'),
