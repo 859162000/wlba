@@ -8,8 +8,9 @@
 from django.utils import timezone
 from django.db import transaction
 from django.db import IntegrityError
-from django.db.models import Count, Q
+from django.db.models import Sum
 from datetime import datetime
+from wanglibao_account import message as inside_message
 from wanglibao_redpack import backends as redpack_backends
 import inspect
 import time
@@ -22,7 +23,8 @@ from django.shortcuts import redirect
 from wanglibao.settings import CALLBACK_HOST
 from wanglibao_account import message as inside_message
 from marketing.models import IntroducedBy, Reward
-from wanglibao_reward.models import WanglibaoActivityGift, WanglibaoUserGift, WanglibaoActivityGiftGlobalCfg, WanglibaoWeixinRelative, WanglibaoActivityGiftOrder
+from wanglibao import settings
+from wanglibao_reward.models import WanglibaoActivityGift, WanglibaoUserGift, WanglibaoActivityReward, WanglibaoActivityGiftOrder
 from wanglibao_redpack.models import RedPackEvent
 from wanglibao_activity.models import Activity, ActivityRule
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -761,3 +763,207 @@ class WeixinRedPackView(APIView):
                         'phone': phone_number
                     }
                     return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+class RewardDistributer(object):
+    def __init__(self, request, kwargs):
+        logger.debug("request:%s, kwargs:%s" % (request, kwargs))
+        self.request = request
+        self.kwargs = kwargs
+
+    @property
+    def activity(self):
+         return self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, 'all')
+
+    @property
+    def processors(self):
+        processor = []
+        for key, value in Processor.items():
+            if self.activity in value:
+                processor.append(key)
+        return processor
+
+    def processor_for_distribute(self):
+        for processor in self.processors:
+            processor(self.request, self.kwargs).distribute()
+
+
+class ThanksGivenRewardDistributer(RewardDistributer):
+    def __init__(self, request, kwargs):
+        super(ThanksGivenRewardDistributer, self).__init__(request, kwargs)
+        self.amount = kwargs['amount']
+        self.token = 'thanks_given'
+
+    @property
+    def is_valid(self):
+        """用来标示次活动是否继续启用, 配合MISC使用
+        """
+        key = 'activities'
+        activities = Misc.objects.filter(key=key).first()
+        if activities:
+            activities = json.loads(activities.value)
+            if type(activities) == dict:
+                activities = activities.get('valid_activity', '')
+        logger.debug("activitys:%s, token:%s" % (activities, self.token))
+        return True if activities.find(self.token)>=0 else False
+
+    @property
+    def reward(self):
+        rewards = {
+            u"感恩节3%加息券":(500000,100000000),
+            u"感恩节600元现金红包":(300000,500000),
+            u"感恩节400元现金红包":(200000,300000),
+            u"感恩节200元现金红包":(100000,200000),
+            u"感恩节2.2%加息券":(80000,100000),
+            u"感恩节1.8%加息券":(60000,80000),
+            u"感恩节80元现金红包":(40000,60000),
+            u'一年迅雷会员':(30000,40000), #共计1000个,送完了送1.5%加息券
+            u"感恩节1.5%加息券":(8000,30000),
+            u"感恩节10元现金红包":(5000,8000),
+            u'蛋糕叔叔40元代金券':(4500,5000),
+            u'河狸家30元代金券':(4000,4500),
+            u'点到全身理疗30元代金券':(3500,4000),
+            u'小狗电器30元代金券':(3000,3500),
+            u'一个月爱奇艺会员':(2000,3000),
+            u'7天爱奇艺会员':(1000,2000),
+            u'七天迅雷会员':(0,1000),
+            u"感恩节1%加息券":(0,0),
+        }
+        for key, values in rewards.items():
+            if self.amount>=values[0] and self.amount<values[1]:
+                if key == u'1年迅雷会员':
+                    xunlei_reward = WanglibaoActivityReward.objects.filter(redpack_event__name=key, activity=u'ThanksGiven').count()
+                    if xunlei_reward>=1000:
+                        return u'感恩节1.5%加息券'
+                return key
+
+    def distribute(self):
+        if not self.is_valid:
+            return
+
+        redpack_event = None
+        reward = None
+        if self.reward.find(u"红包") >=0 or self.reward.find(u'加息券')>=0:
+            redpack_event = RedPackEvent.objects.filter(name=self.reward).first()
+        else:
+            reward = Reward.objects.filter(description=self.reward).first()
+        logger.debug("用户的投资额度是：%s, 获得的红包是：%s" % (self.amount, self.reward,))
+        WanglibaoActivityReward.objects.create(
+            activity=u'ThanksGiven',
+            user=self.request.user,
+            redpack_event=redpack_event,
+            reward=reward,
+            join_times=3,
+            left_times=3,
+            when_dist=int(time.time())%3+1,
+            has_sent=False,
+            p2p_amount=self.amount,
+            channel=self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, 'all'),
+        )
+
+
+class DistributeRewardAPIView(APIView):
+    permission_classes = ()
+
+    def __init__(self):
+        super(DistributeRewardAPIView, self).__init__()
+        self.processors = [ThanksGivingDistribute, ]
+
+    def post(self, request):
+        self.activity = request.DATA.get('activity', '')
+        run = None
+        for processor in self.processors:
+            if processor().token == self.activity:
+                run = True
+                break
+
+        if run:
+            return processor().distribute(request)
+        else:
+            json_to_response = {
+                'ret_code': 3000,
+                'message': u'接口还没有实现，请联系相应后端同学'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type="application/json")
+
+
+class ThanksGivingDistribute(object):
+
+    def __init__(self):
+        self.token = 'thanks_given'
+
+
+    def is_first(self, request):
+        reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven').first()
+        if reward and reward.left_times == reward.join_times:
+            return True
+        else:
+            return False
+
+    def distribute(self, request):
+        if not request.user.is_authenticated():
+            json_to_response = {
+               'ret_code': 1000,
+                'message': u'用户没有登录'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+
+        action = request.DATA.get('action', 'GET_REWARD_INFO')
+
+        reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven').aggregate(left_sum=Sum('left_times'))
+
+        if 'GET_REWARD_INFO' == action:
+            json_to_response = {
+                'ret_code': 1001,
+                'message': u'获得用户的抽奖汇总信息',
+                'left': reward["left_sum"] if reward else 0  #用户可能从没有投过资
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        if 'POINT_AT' == action:
+            reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', left_times__gt=0).first()
+
+            if reward:
+
+                if reward.left_times == reward.when_dist:
+                    """发站内信"""
+                    if reward.reward:
+                        inside_message.send_one.apply_async(kwargs={
+                            "user_id": request.user.id,
+                            "title": reward.reward.description,
+                            "content": reward.reward.content,
+                            "mtype": "activity"
+                        })
+                        reward.reward.is_used = True
+                        reward.reward.save()
+
+                    """发红包"""
+                    if reward.redpack_event:
+                        redpack_backends.give_activity_redpack(request.user, reward.redpack_event, 'pc')
+
+                json_to_response = {
+                    'ret_code': 2000,
+                    'message': u'用户抽奖信息描述',
+                    'reward': reward.redpack_event.name if reward.left_times == reward.when_dist else None,
+                    'left': reward.left_times - 1,
+                    'is_first': self.is_first(request)
+                }
+
+                reward.left_times -= 1
+                reward.save()
+            else:
+                json_to_response = {
+                    'ret_code': 2001,
+                    'message': u'用户抽奖机会已经用完了',
+                    'reward': None,
+                    'left': 0
+                }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+Processor = {
+    ThanksGivenRewardDistributer: ('all',),
+}

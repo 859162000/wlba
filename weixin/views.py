@@ -447,6 +447,8 @@ class JumpPageTemplate(TemplateView):
         context = super(JumpPageTemplate, self).get_context_data(**kwargs)
         message = self.request.GET.get('message', 'ERROR')
         logger.debug(message)
+        message = urllib.unquote(message).decode('utf-8')
+        logger.debug(message)
         context['message'] = message
         return {
             'context': context,
@@ -484,7 +486,9 @@ class WeixinBind(TemplateView):
             }
 
 def redirectToJumpPage(message):
-    url = reverse('jump_page')+'?message=%s'%message
+    logger.debug('-----------------message beforejump::%s'%message)
+    url = reverse('jump_page')+'?message=%s'%message.encode('utf-8')
+    logger.debug(url)
     return HttpResponseRedirect(url)
 
 class UnBindWeiUser(TemplateView):
