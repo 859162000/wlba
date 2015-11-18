@@ -446,9 +446,8 @@ class JumpPageTemplate(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(JumpPageTemplate, self).get_context_data(**kwargs)
         message = self.request.GET.get('message', 'ERROR')
-        logger.debug(message)
-        message = urllib.unquote(message).decode('utf-8')
-        logger.debug(message)
+        message=message.encode('utf-8')
+        message = urllib.unquote(message)
         context['message'] = message
         return {
             'context': context,
@@ -485,9 +484,7 @@ class WeixinBind(TemplateView):
             }
 
 def redirectToJumpPage(message):
-    logger.debug('-----------------message beforejump::%s'%message)
-    url = reverse('jump_page')+'?message=%s'%urllib.unquote(message).decode('utf-8')
-    logger.debug(url)
+    url = reverse('jump_page')+'?message=%s'% message
     return HttpResponseRedirect(url)
 
 class UnBindWeiUser(TemplateView):
@@ -512,8 +509,7 @@ class UnBindWeiUser(TemplateView):
             message = u"请从[服务中心]点击[绑定微信]进行绑定"
             return redirectToJumpPage(message)
         if not w_user.user:
-            message = u"您没有绑定的网利宝帐号"
-            return redirectToJumpPage(urllib.quote("您没有绑定的网利宝帐号"))
+            return redirectToJumpPage(u"您没有绑定的网利宝帐号")
         return super(UnBindWeiUser, self).dispatch(request, *args, **kwargs)
 
 class UnBindWeiUserAPI(APIView):
@@ -1394,7 +1390,7 @@ class AwardIndexTemplate(TemplateView):
         if not w_user:
             return redirectToJumpPage("error")
         if not w_user.user:
-            return redirectToJumpPage(urllib.quote("一定要绑定网利宝账号才可以抽奖"))
+            return redirectToJumpPage(u"一定要绑定网利宝账号才可以抽奖")
 
         return super(AwardIndexTemplate, self).dispatch(request, *args, **kwargs)
 
@@ -1468,4 +1464,3 @@ def recordProduct(sender, **kw):
 
 pre_save.connect(recordProduct, sender=P2PProduct, dispatch_uid="product-pre-save-signal")
 post_save.connect(checkProduct, sender=P2PProduct, dispatch_uid="product-post-save-signal")
-

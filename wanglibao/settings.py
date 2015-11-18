@@ -1139,3 +1139,8 @@ else:
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)
 WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'
+
+# 第三方来我们这的用户名密码去获取 token
+TOKEN_CLIENTS = {
+    'rong360': 'wanglibao_1116',
+}
