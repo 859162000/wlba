@@ -33,11 +33,13 @@ from wanglibao_pay.huifu_pay import HuifuPay, SignException
 from wanglibao_pay import third_pay, trade_record
 from wanglibao_p2p.models import P2PRecord
 import decimal
+from wanglibao_pay.pay import YeeProxyPay, PayOrder, YeeProxyPayCallbackMessage
 from wanglibao_pay.serializers import CardSerializer
 from wanglibao_pay.util import get_client_ip, get_pc_channel_class
 from wanglibao_pay import util
 from wanglibao_profile.backends import require_trade_pwd
 from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_rest.utils import split_ua
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
@@ -141,13 +143,27 @@ class PayView(TemplateView):
         #     'form': form
         # }
 
-        gate_id = request.POST.get('gate_id', '')
-        bank = Bank.objects.get(gate_id=gate_id)
-        pay_channel_class = get_pc_channel_class(bank.pc_channel)
+        # gate_id = request.POST.get('gate_id', '')
+        # bank = Bank.objects.get(gate_id=gate_id)
+        # pay_channel_class = get_pc_channel_class(bank.pc_channel)
+        #
+        # pay_channel = pay_channel_class()
+        # result = pay_channel.pre_pay(request)
+        # return self.render_to_response(result)
 
-        pay_channel = pay_channel_class()
-        result = pay_channel.pre_pay(request)
-        return self.render_to_response(result)
+        # todo 参数校验
+        user = request.user
+        amount = int(request.POST.get('amount'))
+        gate_id = request.POST.get('gate_id')
+        request_ip = get_client_ip(request)
+        device = split_ua(request)
+        channel = PayOrder.get_bank_and_channel(gate_id, device)[1]
+
+        if channel == 'yeepay':
+            result = YeeProxyPay().proxy_pay(user, amount,  gate_id,  request_ip, device)
+        else:
+            result = HuifuPay.pre_pay(request)
+        return self.render_to_response()
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -181,6 +197,28 @@ class PayCallback(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super(PayCallback, self).dispatch(request, *args, **kwargs)
+
+class YeeProxyPayCompleteView(TemplateView):
+    def post(self, request, *args, **kwargs):
+        # result = HuifuPay.handle_pay_result(request)
+        # amount = request.POST.get('OrdAmt', '')
+        #
+        # return self.render_to_response({
+        #     'result': result,
+        #     'amount': amount
+        # })
+        pay_message = YeeProxyPayCallbackMessage().parse_message(request.POST)
+        YeeProxyPay().proxy_pay_callback(pay_message)
+        # todo 增强错误处理
+        return self.render_to_response({
+            'result': '支付成功',
+            'amount': pay_message.amount
+            })
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(PayCompleteView, self).dispatch(request, *args, **kwargs)
+
 
 
 class WithdrawView(TemplateView):

@@ -1,6 +1,10 @@
+# encoding:utf-8
+
 import hmac
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
+from django.db.models.query_utils import Q
 from django.forms.models import model_to_dict
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -8,79 +12,141 @@ import requests
 from order.models import Order
 from order.utils import OrderHelper
 from wanglibao_account.auth_backends import User
-from wanglibao_bank_financing.models import Bank
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_pay import util
 from wanglibao_pay.exceptions import ThirdPayError
-from wanglibao_pay.models import PayInfo, Card, PayResult
+from wanglibao_pay.models import PayInfo, Card, PayResult, Bank
 import logging
 
 logger = logging.getLogger(__name__)
 
+class Pay(object):
+    def pay(self, post):
+        raise  NotImplementedError
+
 class PayOrder(object):
     """
-    用于绑卡，支付请求和订单系统的交互
+    支付时，用于绑卡，支付请求和订单系统的交互
     未绑卡时根据card_no 和gate_id可以知道银行卡，银行，支付渠道信息
     绑卡后根据card_no 就可以知道银行卡，银行，支付渠道信息
+    不再维护Card的last_update字段
     """
-    @method_decorator(transaction.atomic)
-    def order_before_pay(self, user, amount, card_no, gate_id, phone_for_card, request_ip, device):
-        """
+    FEE = 0
+    channel_mapping = {
+            # 数据库的对应字段 bank_bind_code, card_bind_code
+            'huifu': ['huifu_bind_code', 'is_bind_huifu'],
+            'yeepay': ['yee_bind_code', 'is_bind_yee'],
+            'kuaipay': ['kuai_code', 'is_bind_kuai'],
+        }
 
-        :param user:
-        :param amount:
+    @staticmethod
+    def get_bank_and_channel(gate_id, device):
+        """
+        device: 'ios', 'android', 'pc'
+        channel: 'huifu', 'yeepay', 'kuaipay'
+        :param gate_id:
+        :param device:
+        :return: bank(Type Bank), channel(str), bind_code(str)
+        """
+        try:
+            bank = Bank.objects.get(gate_id=gate_id)
+            if device == 'pc':
+                channel = bank.pc_channel
+            else:
+                channel = bank.channel
+            bind_code = getattr(bank, PayOrder.channel_mapping.get(channel)[0])
+            assert len(bind_code) > 0
+            return bank, channel, bind_code
+        except:
+            raise ThirdPayError(40011, '银行代码错误')
+
+    @staticmethod
+    def get_card_no(card_no, user, gate_id, device):
+        """
+        对于长卡直接返回card_no
+        对于短卡(10位)会校验绑卡信息，若绑卡正确，则返回完整的长卡号
         :param card_no:
         :param gate_id:
-        :param request_ip:
-        :param channel: kuaipay, yeepay, huifupay
+        :param device:
         :return:
         """
+        try:
+            if len(card_no) != 10:
+                return card_no
 
-        # todo 参数校验
-        if len(card_no) == 10:
-            card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
-        else:
-            card = Card.objects.filter(no=card_no, user=user).first()
-        bank = Bank.objects.filter(gate_id=gate_id).first()
-        channel = ''
-        # if not bank or not bank.kuai_code.strip():
-        #         # return {"ret_code":201151, "message":"不支持该银行"}
-        # if bank and card and bank != card.bank:
-        #     # return {"ret_code":201153, "message":"银行卡与银行不匹配"}
-        #
-        # if not card and not bank:
-        #     # return {"ret_code":201152, "message":"卡号不存在或银行不存在"}
+            bank, channel, bind_code = PayOrder.get_bank_and_channel(gate_id, device)
+            card = Card.objects.get(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:])
+            is_bind_channel = getattr(card, PayOrder.channel_mapping.get(channel)[1])
+            assert is_bind_channel is True
+            return card.no
+        except:
+            raise ThirdPayError(40012, '卡号错误')
 
+
+    # todo gate_id 可能会重复，不应该使用gate_id代表银行，现阶段假定gate_id不重复,若重复会在get_bank_and_channel中报错
+    def order_before_pay(self, user, amount, gate_id, request_ip, device,
+                         card_no=None, phone_for_card=None):
+        """
+        支付前的订单处理
+        card_no和phone_for_card为可选参数，其他为必填参数
+        网银支付（页面支付）：无card_no和phone_for_card
+        快捷支付第一次支付：会带上card_no和phone_for_card,这时的卡号是完整的，用于绑卡
+        快捷支付后续支付：只有card_no,无phone_for_card，这时的卡号是10位的短号
+        无论长号还是短号，填入pay_info的都是长号
+        :param user:
+        :param amount:
+        :param gate_id:
+        :param request_ip:
+        :param device:
+        :param request_para_str: 发往第三方的请求信息
+        :return:
+        """
+        # 处理必填信息
+        bank, channel, bind_code = self.get_bank_and_channel(gate_id, device)
 
         pay_info = PayInfo()
+        pay_info.type = PayInfo.DEPOSIT
+        pay_info.user = user
+        pay_info.account_name = user.wanglibaouserprofile.name
         pay_info.amount = amount
         pay_info.total_amount = amount
-        pay_info.type = PayInfo.DEPOSIT
-        pay_info.status = PayInfo.INITIAL
-        pay_info.user = user
+        # pay_info.status = PayInfo.INITIAL
+        pay_info.bank = bank
         pay_info.channel = channel
-        pay_info.phone_for_card = phone_for_card
-        pay_info.device = device
+        # pay_info.phone_for_card = phone_for_card
         # todo 是否记录更全面的客户端信息
         pay_info.request_ip = request_ip
-        order = OrderHelper.place_order(user, Order.PAY_ORDER, pay_info.status,
-                                        pay_info = model_to_dict(pay_info))
+        pay_info.device = device
 
-        # todo 不同状态（已绑卡，未绑卡）事bank和card_no的处理
-        pay_info.order = order
-        if card:
-            pay_info.bank = card.bank
-            pay_info.card_no = card.no
-        else:
-            pay_info.bank = bank
-            pay_info.card_no = card_no
+        # 处理可选的银行卡信息
+        if card_no:
+            pay_info.card_no = self.get_card_no(card_no, user, gate_id, device)
+
+        if phone_for_card:
+            pay_info.phone_for_card = phone_for_card
+
+        # order = OrderHelper.place_order(user, Order.PAY_ORDER, pay_info.status,
+        #                                 pay_info = model_to_dict(pay_info))
+
+        # 不同状态（已绑卡，未绑卡）事bank和card_no的处理
+        # pay_info.order = order
+        # if card:
+        #     pay_info.bank = card.bank
+        #     pay_info.card_no = card.no
+        # else:
+        #     pay_info.bank = bank
+        #     pay_info.card_no = card_no
 
         # todo 时间处理
-        pay_info.request = ""
         pay_info.status = PayInfo.PROCESSING
-        pay_info.account_name = user.wanglibaouserprofile.name
         pay_info.save()
-        OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
+        # OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
+
+        order = OrderHelper.place_order(user, Order.PAY_ORDER, pay_info.status,
+                                        pay_info=model_to_dict(pay_info))
+        pay_info.order = order
+        pay_info.save()
+
         return order.id
 
     def order_restart_fail(self, order_id):
@@ -98,9 +164,29 @@ class PayOrder(object):
         else:
             raise ThirdPayError(77777, 'illegal condition within pay')
 
+    def add_card(self, card_no, bank, user, channel):
+        """
+
+        :param card_no:
+        :param bank: instance
+        :param user: instance
+        :return:
+        """
+        card = Card.objects.filter(no=card_no, user=user).first()
+        if not card:
+            card = Card()
+            card.no = card_no
+            card.bank = bank
+            card.user = user
+            card.is_default = False
+            is_bind_channel = getattr(card, PayOrder.channel_mapping.get(channel)[1])
+            is_bind_channel = True
+            card.save()
+            return True
+        return False
 
     @method_decorator(transaction.atomic)
-    def order_after_pay_succcess(self, amount, order_id, res_ip, res_content):
+    def order_after_pay_succcess(self, amount, order_id, res_ip, res_content, need_bind_card=False):
         """
         处理订单和用户的账户
         :param amount:
@@ -136,18 +222,23 @@ class PayOrder(object):
         pay_info.status = PayInfo.SUCCESS
         pay_info.save()
 
-        # 更新card和order信息
-        if len(pay_info.card_no) == 10:
-            Card.objects.filter(user=pay_info.user, no__startswith=pay_info.card_no[:6], no__endswith=pay_info.card_no[-4:]).update(last_update=timezone.now(), is_bind_kuai=True)
-        else:
-            Card.objects.filter(user=pay_info.user, no=pay_info.card_no).update(last_update=timezone.now(), is_bind_kuai=True)
-        OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
+        # 更新order信息
+        # if len(pay_info.card_no) == 10:
+        #     Card.objects.filter(user=pay_info.user, no__startswith=pay_info.card_no[:6], no__endswith=pay_info.card_no[-4:]).update(last_update=timezone.now(), is_bind_kuai=True)
+        # else:
+        #     Card.objects.filter(user=pay_info.user, no=pay_info.card_no).update(last_update=timezone.now(), is_bind_kuai=True)
+        OrderHelper.update_order(pay_info.order, pay_info.user, pay_info=model_to_dict(pay_info),
+                                 status=pay_info.status)
+        # 绑卡
+        if need_bind_card:
+            self.add_card(pay_info.card_no, pay_info.bank, pay_info.user, pay_info.channel)
 
         # todo 加入存款成功的回调
         logger.critical("orderId:%s success" % order_id)
         rs = {"ret_code": 0, "message": "success", "amount": amount, "margin": margin_record.margin_current,
               "order_id": order_id}
         return rs
+
 
     @method_decorator(transaction.atomic)
     def order_after_pay_error(self, error, order_id):
@@ -199,13 +290,13 @@ class PayMessage(object):
         return '%s: order %s amount %s raw_message %s' % (self.__class__.__name__, self.order_id, self.amount,
                                                           self.res_content)
 
-    def _convert_message(self, res_content, res_ip):
+    def _convert_message(self, res_content):
         """
         将第三方信息转换为dict以便后续处理
         :param res_content:
         :return:
         """
-        self.res_ip = res_ip
+        raise NotImplementedError()
 
     def _check_signature(self, message_dict):
         """
@@ -226,9 +317,16 @@ class PayMessage(object):
         if self.amount != amount:
             raise ThirdPayError(40019, '第三方返回参数与数据库不一致' + str(self))
 
-    def parse_message(self, res_content):
+    def parse_message(self, res_content, res_ip):
+        """
+
+        :param res_content: 可能是request.post或者其他
+        :param res_ip:
+        :return:
+        """
         self._check_signature(self._convert_message(res_content))
         self._check_result()
+        self.res_ip = res_ip
         return self
 
 class YeeProxyPayCallbackMessage(PayMessage):
@@ -254,13 +352,12 @@ class YeeProxyPayCallbackMessage(PayMessage):
         hmac_str = hmac.new(secret_key, str_to_sign).hexdigest()
         return hmac_str
 
-    def _convert_message(self, res_in_post, res_ip):
+    def _convert_message(self, res_in_post):
         """
         第三方返回的参数直接放到了 request.POST中，不用转换
         :param res_in_post:
         :return:
         """
-        super(YeeProxyPayCallbackMessage, self)._convert_message(res_in_post, res_ip)
         return res_in_post
 
     def _check_signature(self, message_dict):
@@ -314,10 +411,15 @@ class YeeProxyPay(object):
     def _request(self, url, post_data):
         return requests.post(url, post_data)
 
-    def proxy_pay(self, user, amount, card_no, gate_id, phone_for_card, request_ip, device, exit_for_test=False):
-        order_id = self.pay_order.order_before_pay(user, amount, card_no, gate_id, phone_for_card, request_ip, device)
+    def proxy_pay(self, user, amount,  gate_id,  request_ip, device):
+        order_id = self.pay_order.order_before_pay(user, amount, gate_id, request_ip, device)
         post_data = self._post(order_id, amount)
+        PayInfo.filter(order_id).update(request=str(post_data))
         self._request(self.proxy_pay_url, post_data)
+        # todo 完善报错message， url移到settings
+        return {'message': '',
+                'form': {'url': 'https://www.yeepay.com/app-merchant-proxy/node',
+                        'post': post_data}}
 
     def proxy_pay_callback(self, pay_message):
         """

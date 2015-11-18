@@ -35,7 +35,7 @@ class MarginRecord(models.Model):
     description = models.CharField(verbose_name=u'摘要', max_length=1000, default=u'')
 
     def __unicode__(self):
-        return u'%s , %s' % (self.catalog, self.user)
+        return u'%s , %s, 交易金额%s, 余额%s' % (self.catalog, self.user, self.amount, self.margin_current)
 
     class Meta:
         ordering = ['-create_time']

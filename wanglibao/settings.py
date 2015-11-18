@@ -760,7 +760,7 @@ else:
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'http://test.chinapnr.com/buser'
 
-    YEE_PROXY_PAY_WEB_CALLBACK_URL = ''
+    YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete'
     YEE_PAY_URL = "http://mobiletest.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10000419568"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'staging_yee_mer_priv_key.pem'), 'r').read())
