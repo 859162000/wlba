@@ -835,8 +835,8 @@ class ThanksGivenRewardDistributer(RewardDistributer):
         WanglibaoActivityReward.objects.create(
             activity=u'ThanksGiven',
             user=self.request.user,
-            redpack_event=redpack_event,
-            reward=reward,
+            redpack_event_id=2,
+            reward_id=1,
             join_times=3,
             left_times=3,
             when_dist=int(time.time())%3+1,
