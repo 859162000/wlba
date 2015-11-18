@@ -561,7 +561,7 @@ from datetime import timedelta, datetime
 CELERYBEAT_SCHEDULE = {
     'p2p-watchdog-1-minutes': {
         'task': 'wanglibao_p2p.tasks.p2p_watchdog',
-        'schedule': timedelta(minutes=5),
+        'schedule': timedelta(minute=5),
     },
     # 'report-generate': {
     #     'task': 'report.tasks.generate_report',
