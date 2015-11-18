@@ -3343,11 +3343,8 @@ class Rong360P2PListView(APIView):
                 p2p_list = []
                 ret = dict()
 
-                p2p_status = [u'正在招标']
-
-                p2ps = P2PProduct.objects.filter(status__in=p2p_status,
-                                                 publish_time__gt=start,
-                                                 )
+                p2ps = P2PProduct.objects.filter(publish_time__gte=start,
+                                                 publish_time__lt=end)
 
                 # 获取总页数, 和页数不对处理
                 com_page = len(p2ps) / page_size + 1
@@ -3381,6 +3378,7 @@ class Rong360P2PListView(APIView):
                         p2p_dict['reward'] = 0
                         p2p_dict['type'] = product.category
 
+                        pay_method = 6
                         if product.pay_method == u'等额本息':
                             pay_method = 6
                         if product.pay_method == u'按月付息':
