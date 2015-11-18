@@ -150,6 +150,12 @@ urlpatterns += patterns(
     url(r'^app_experience/$', TemplateView.as_view(template_name="app_experience.jade")),
     url(r'^experience_account/$', TemplateView.as_view(template_name="account.jade")),
 )
+# app with webview
+urlpatterns += patterns(
+    '',
+    url(r'^thanks/$', login_required(TemplateView.as_view(template_name="app_thanksgiv.jade"), login_url='/accounts/token_login/')),
+)
+
 
 urlpatterns += patterns(
     '',
