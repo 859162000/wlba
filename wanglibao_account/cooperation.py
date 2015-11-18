@@ -5,6 +5,8 @@ import json
 import urllib2
 from django.utils.http import urlencode
 import pytz
+
+from wanglibao_account.oauth2_utils import check_token, create_token
 from wanglibao_account.utils import str_to_float
 
 if __name__ == '__main__':
@@ -3298,3 +3300,162 @@ def rongtu_post_data():
     ret = requests.post(url, data=args)
     print ret.text
     return ret.text
+
+
+class Rong360TokenView(APIView):
+    """
+    get token from us.
+    """
+    permission_classes = ()
+
+    def get(self, request):
+
+        ret = create_token(request)
+        # {'state': True, 'data': token}
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class Rong360P2PListView(APIView):
+    """
+    """
+    permission_classes = ()
+
+    def check_token(self):
+        token = str(self.request.GET.get('token', None))
+        return check_token(token)
+
+    def get(self, request):
+
+        if self.check_token():
+            try:
+                time_str = self.request.GET.get('date', None)
+                page_size = int(self.request.GET.get('page_size', 20))
+                page_index = int(self.request.GET.get('page', 1))
+
+                time_zone = settings.TIME_ZONE
+                local = pytz.timezone(time_zone)
+                naive = datetime.datetime.strptime(time_str, "%Y-%m-%d")
+
+                local_dt = local.localize(naive, is_dst=None)
+                start = local_dt.astimezone(pytz.utc)
+                end = start + timezone.timedelta(days=1)
+
+                p2p_list = []
+                ret = dict()
+
+                p2p_status = [u'正在招标']
+
+                p2ps = P2PProduct.objects.filter(status__in=p2p_status,
+                                                 publish_time__gt=start,
+                                                 )
+
+                # 获取总页数, 和页数不对处理
+                com_page = len(p2ps) / page_size + 1
+
+                if page_index > com_page:
+                    page = com_page
+                elif page_index < 1:
+                    page = 1
+                else:
+                    page = page_index
+
+                # 获取到对应的页数的所有用户
+                total = p2ps.count()
+                total_amount = p2ps.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+                if total / page_size >= page:
+                    p2ps = p2ps[(page - 1) * page_size: page * page_size]
+                else:
+                    p2ps = p2ps[(page - 1) * page_size:]
+
+                for product in p2ps:
+
+                    try:
+                        p2p_dict = dict()
+                        p2p_dict['projectId'] = product.id
+                        p2p_dict['title'] = product.name
+                        p2p_dict['amount'] = product.total_amount
+                        p2p_dict['schedule'] = str(product.completion_rate)
+                        p2p_dict['interestRate'] = str(product.expected_earning_rate) + '%'
+                        p2p_dict['deadline'] = product.period
+                        p2p_dict['deadlineUnit'] = u'天' if product.pay_method.startswith(u'日计息') else u'月'
+                        p2p_dict['reward'] = 0
+                        p2p_dict['type'] = product.category
+
+                        if product.pay_method == u'等额本息':
+                            pay_method = 6
+                        if product.pay_method == u'按月付息':
+                            pay_method = 5
+                        if product.pay_method == u'到期还本付息':
+                            pay_method = 1
+                        if product.pay_method == u'日计息一次性还本付息':
+                            pay_method = 1
+                        if product.pay_method == u'日计息月付息到期还本':
+                            pay_method = 5
+                        p2p_dict['repaymentType'] = pay_method
+
+                        p2p_dict['province'] = None
+                        p2p_dict['city'] = None
+                        p2p_dict['userName'] = product.borrower_name
+                        p2p_dict['userAvatarUrl'] = None
+                        p2p_dict['amountUsedDesc'] = product.usage
+                        p2p_dict['revenue'] = None
+                        p2p_dict['loanUrl'] = '/p2p/detail/{}'.format(product.id)
+
+                        p2p_dict['successTime'] = timezone.localtime(product.soldout_time).\
+                            strftime('%Y-%m-%d %H:%M:%S') if product.soldout_time else ''
+                        p2p_dict['publishTime'] = timezone.localtime(product.publish_time).\
+                            strftime('%Y-%m-%d %H:%M:%S') if product.publish_time else ''
+
+                        subscribes = []
+                        equities = P2PEquity.objects.filter(product=product)
+                        for equity in equities:
+                            data_dic = dict()
+                            data_dic['subscribeUserName'] = equity.user.pk
+                            data_dic['amount'] = equity.equity
+                            data_dic['validAmount'] = equity.equity
+                            data_dic['addDate'] = equity.confirm_at
+                            data_dic['status'] = 1 if equity.confirm else 0
+
+                            # 标识手动或自动投标 0:手动 1:自动
+                            try:
+                                may_auto = AutomaticPlan.objects.get(user=equity.user)
+                                if may_auto.amounts_auto == equity.equity \
+                                        and may_auto.rate_min > product.expected_earning_rate \
+                                        and may_auto.is_used:
+                                    data_dic['type'] = 1
+                                else:
+                                    data_dic['type'] = 0
+                            except Exception, e:
+                                print 'Except: {}'.format(e)
+                                data_dic['type'] = 0
+
+                            subscribes.append(data_dic)
+
+                        p2p_dict['subscribes'] = subscribes
+
+                        p2p_list.append(p2p_dict)
+
+                    except Exception, e:
+                        print 'product{} error: {}'.format(product.pk, e)
+
+                ret['borrowList'] = p2p_list
+                ret['totalPage'] = com_page
+                ret['currentPage'] = page_index
+                ret['totalCount'] = total
+                ret['totalAmount'] = total_amount
+
+                return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+            except Exception, e:
+                ret = {
+                    'page_count': 1,
+                    'page_index': 1,
+                    'result_msg': e
+                }
+        else:
+            ret = {
+                'page_count': 1,
+                'page_index': 1,
+                'result_code': 0,
+                'result_msg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
