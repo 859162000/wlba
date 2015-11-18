@@ -469,14 +469,13 @@ class WeixinBind(TemplateView):
             rs, txt = bindUser(weixin_user, user)
             if rs == 0:
                 now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
-                weixin.tasks.sendBindTemplateMsg.apply_async(kwargs={
+                weixin.tasks.sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
                         "openid":weixin_user.openid,
                         "template_id":BIND_SUCCESS_TEMPLATE_ID,
                         "name1":"",
                         "name2":user.wanglibaouserprofile.phone,
-                        "time":now_str
-                    })
-                # SendTemplateMessage.sendTemplate(weixin_user, template)
+                        "time":now_str,
+                    })})
         except WeixinUser.DoesNotExist:
             pass
         context['message'] = txt
@@ -529,15 +528,13 @@ class UnBindWeiUserAPI(APIView):
             weixin_user.user = None
             weixin_user.save()
             now_str = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M')
-            # template = MessageTemplate(UNBIND_SUCCESS_TEMPLATE_ID, keyword1=user_phone, keyword2=now_str)
-            weixin.tasks.sendUnbindTemplateMsg.apply_async(kwargs={
+
+            weixin.tasks.sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
                     "openid":weixin_user.openid,
                     "template_id":UNBIND_SUCCESS_TEMPLATE_ID,
                     "keyword1":user_phone,
                     "keyword2":now_str
-                })
-            # SendTemplateMessage.sendTemplate(weixin_user, template)
-
+                })})
         return Response({'message':'ok'})
 
 
