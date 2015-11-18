@@ -197,6 +197,7 @@
         })
         var change = [];
         redpack('GET_REWARD_INFO');
+        redpack('GET_REWARD');
         //抽奖
         var arr = ['扫地机器人', '200元现金红包', '1.8%加息券', '10元现金红包', 'iPhone6s plus', '2.2%加息券', 'beats头戴式耳机', '80元现金红包', '1%加息券', '400元现金红包', '霍尼韦尔空气净化器', '1.5%加息券', '600元现金红包', '1年迅雷会员'];
         arr.indexof = function (value) {
@@ -304,9 +305,18 @@
                 callback && callback(data);
                 console.log(change);
                 if(change['left']==0){
-
+                    $('.jiang-button').removeClass("jiang-button2");
+                    $('.jiang-button').addClass("jiang-button1");
+                    $('.prize-ri p').html('您没有抽奖机会');
+                }else{
+                    $('.app-jihui').text(change['left']);
                 }
-                $('.app-jihui').text(change['left']);
+                if(change['is_first']==false){
+                    $('.kuang-tidhi').addClass("kuang-tidhi12");
+                }else if(change['is_first']==true){
+                     $('.kuang-tidhi').removeClass("kuang-tidhi12");
+                }
+
                 $('#app-jiangli').text(change['reward']);
             });
         }
