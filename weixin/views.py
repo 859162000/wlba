@@ -202,11 +202,11 @@ class WeixinJoinView(View):
             # 可用余额（元）： 108.00
             # 累计收益（元）：  79.00
             # 待收收益（元）：  24.00
+            now_str = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M')
+            infos = "%s\n总资产　：%s \n可用余额：%s"%(account_info['p2p_total_paid_interest'], account_info['equity_total'], account_info['p2p_margin'])
             a = MessageTemplate(ACCOUNT_INFO_TEMPLATE_ID,
-                    keyword1=account_info['total_asset'],
-                    keyword2=account_info['p2p_margin'], keyword3=account_info['equity_total'],
-                    keyword4=account_info['p2p_total_paid_interest'],
-                    keyword5=account_info['p2p_total_unpaid_interest'])
+                    keyword1=now_str,
+                    keyword2=infos)
             SendTemplateMessage.sendTemplate(w_user, a)
             reply = -1
         if msg.key == 'customer_service':
@@ -493,7 +493,8 @@ class WeixinBind(TemplateView):
                         "name2":user.wanglibaouserprofile.phone,
                         "time":now_str,
                     })})
-        except WeixinUser.DoesNotExist:
+        except WeixinUser.DoesNotExist, e:
+            logger.debug(e.message)
             pass
         context['message'] = txt
         return {
