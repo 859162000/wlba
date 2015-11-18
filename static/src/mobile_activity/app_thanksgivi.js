@@ -13,7 +13,7 @@ var lottery = {
             $units = $lottery.find(".lottery-unit");
             this.obj = $lottery;
             this.count = $units.length;
-            $lottery.find(".lottery-unit-" + this.index).children().addClass("active");
+            $lottery.find(".lottery-unit-" + this.index).first().addClass("active");
         }
         ;
     },
@@ -21,13 +21,13 @@ var lottery = {
         var index = this.index;
         var count = this.count;
         var lottery = this.obj;
-        $(lottery).find(".lottery-unit-" + index).children().removeClass("active");
+        $(lottery).find(".lottery-unit-" + index).first().removeClass("active");
         index += 1;
         if (index > count - 1) {
             index = 0;
         }
         ;
-        $(lottery).find(".lottery-unit-" + index).children().addClass("active");
+        $(lottery).find(".lottery-unit-" + index).first().addClass("active");
         this.index = index;
         return false;
     },
