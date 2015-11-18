@@ -28,7 +28,10 @@ def which_channel(user, intro=None):
     else:
         ib = intro
 
-    if not ib or not ib.channel:
+    try:
+        if not ib or not ib.channel:
+            return Channel.WANGLIBAO
+    except Exception:
         return Channel.WANGLIBAO
 
     name = ib.channel.name
