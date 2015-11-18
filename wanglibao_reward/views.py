@@ -899,13 +899,16 @@ class ThanksGivingDistribute(object):
 
         action = request.DATA.get('action', 'GET_REWARD_INFO')
 
-        reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven').aggregate(left_sum=Sum('left_times'))
-
+        level = request.DATA.get('level', "5000+")
+        if level == "5000+":
+            sum_reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', p2p_amount__gte=5000).aggregate(left_sum=Sum('left_times'))
+        elif level == "5000-":
+            sum_reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', p2p_amount__lt=5000).aggregate(left_sum=Sum('left_times'))
         if 'GET_REWARD_INFO' == action:
             json_to_response = {
                 'ret_code': 1001,
                 'message': u'获得用户的抽奖汇总信息',
-                'left': reward["left_sum"] if reward else 0  #用户可能从没有投过资
+                'left': sum_reward["left_sum"] if sum_reward['left_sum'] else 0  #用户可能从没有投过资
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
@@ -936,7 +939,7 @@ class ThanksGivingDistribute(object):
                         'ret_code': 2000,
                         'message': u'用户抽奖信息描述',
                         'reward': reward.redpack_event.name if reward.left_times == reward.when_dist else None,
-                        'left': reward.left_times - 1,
+                        'left': sum_reward["left_sum"]-1 if sum_reward['left_sum'] else 1,  #用户可能从没有投过资
                         'is_first': self.is_first(request)
                     }
 

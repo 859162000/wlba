@@ -22,6 +22,7 @@ DESCRIPTION = u'提前还款'
 
 logger = logging.getLogger(__name__)
 
+
 class PrepaymentHistory(object):
     def __init__(self, product, payment_date):
         if product.status != u'还款中':
