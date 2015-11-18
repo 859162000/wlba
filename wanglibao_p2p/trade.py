@@ -9,6 +9,7 @@ from marketing import tools
 #from marketing.models import IntroducedBy, Reward, RewardRecord
 from order.models import Order
 #from wanglibao.templatetags.formatters import safe_phone_str
+from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.marginkeeper import MarginKeeper
 from order.utils import OrderHelper
 from keeper import ProductKeeper, EquityKeeper, AmortizationKeeper, EquityKeeperDecorator
@@ -91,10 +92,14 @@ class P2PTrader(object):
             if product_record.product_balance_after <= 0:
                 is_full = True
 
-        # fix@chenweibi, add order_id
+        # fix@chenweibin, add order_id
         tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount,
                                                "device": self.device, "order_id": self.order_id,
                                                "product_id": self.product.id, "is_full": is_full})
+        try:
+            CoopRegister(self.request).process_for_purchase(self.user, self.order_id)
+        except:
+            pass
 
         # 投标成功发站内信
         matches = re.search(u'日计息', self.product.pay_method)
