@@ -469,14 +469,13 @@ class WeixinBind(TemplateView):
             rs, txt = bindUser(weixin_user, user)
             if rs == 0:
                 now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
-                weixin.tasks.sendBindTemplateMsg.apply_async(kwargs={
+                weixin.tasks.sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
                         "openid":weixin_user.openid,
                         "template_id":BIND_SUCCESS_TEMPLATE_ID,
                         "name1":"",
                         "name2":user.wanglibaouserprofile.phone,
-                        "time":now_str
-                    })
-                # SendTemplateMessage.sendTemplate(weixin_user, template)
+                        "time":now_str,
+                    })})
         except WeixinUser.DoesNotExist:
             pass
         context['message'] = txt
@@ -487,7 +486,7 @@ class WeixinBind(TemplateView):
 
 def redirectToJumpPage(message):
     logger.debug('-----------------message beforejump::%s'%message)
-    url = reverse('jump_page')+'?message=%s'%message.encode('utf-8')
+    url = reverse('jump_page')+'?message=%s'%urllib.unquote(message).decode('utf-8')
     logger.debug(url)
     return HttpResponseRedirect(url)
 
@@ -514,7 +513,7 @@ class UnBindWeiUser(TemplateView):
             return redirectToJumpPage(message)
         if not w_user.user:
             message = u"您没有绑定的网利宝帐号"
-            return redirectToJumpPage(message)
+            return redirectToJumpPage(urllib.quote("您没有绑定的网利宝帐号"))
         return super(UnBindWeiUser, self).dispatch(request, *args, **kwargs)
 
 class UnBindWeiUserAPI(APIView):
@@ -529,15 +528,13 @@ class UnBindWeiUserAPI(APIView):
             weixin_user.user = None
             weixin_user.save()
             now_str = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M')
-            # template = MessageTemplate(UNBIND_SUCCESS_TEMPLATE_ID, keyword1=user_phone, keyword2=now_str)
-            weixin.tasks.sendUnbindTemplateMsg.apply_async(kwargs={
+
+            weixin.tasks.sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
                     "openid":weixin_user.openid,
                     "template_id":UNBIND_SUCCESS_TEMPLATE_ID,
                     "keyword1":user_phone,
                     "keyword2":now_str
-                })
-            # SendTemplateMessage.sendTemplate(weixin_user, template)
-
+                })})
         return Response({'message':'ok'})
 
 
@@ -1397,7 +1394,7 @@ class AwardIndexTemplate(TemplateView):
         if not w_user:
             return redirectToJumpPage("error")
         if not w_user.user:
-            return redirectToJumpPage(u"一定要绑定网利宝账号才可以抽奖")
+            return redirectToJumpPage(urllib.quote("一定要绑定网利宝账号才可以抽奖"))
 
         return super(AwardIndexTemplate, self).dispatch(request, *args, **kwargs)
 

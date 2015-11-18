@@ -534,6 +534,10 @@ class JinShanRegister(CoopRegister):
             self.request.session[self.extra_key] = channel_extra
             # logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
 
+    def clear_session(self):
+        super(JinShanRegister, self).clear_session()
+        self.request.session.pop(self.extra_key, None)
+
     def save_to_binding(self, user):
         """
         处理从url获得的渠道参数
@@ -577,9 +581,11 @@ class JinShanRegister(CoopRegister):
         self.jinshan_call_back(user, 'wangli_regist_reward', 'Cp9AhO2o9BQTDhbUBnHxmY0X4Kbg')
 
     def purchase_call_back(self, user, order_id):
-        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
-        if p2p_record.count() == 1:
-            p2p_amount = int(p2p_record.first().amount)
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+
+        # 判断是否首次投资
+        if p2p_record and p2p_record.order_id == order_id:
+            p2p_amount = int(p2p_record.amount)
             if p2p_amount >= 500:
                 if p2p_amount <= 999:
                     self.jinshan_call_back(user, 'wangli_invest_reward', 'pA71ZhBf4DDeet7SLiLlGsT1qTYu')
@@ -599,6 +605,7 @@ class NanjingWaihuRegister(CoopRegister):
         super(NanjingWaihuRegister, self).__init__(request)
         self.c_code = 'njwh'
 
+
 class ShiTouCunRegister(CoopRegister):
     def __init__(self, request):
         super(ShiTouCunRegister, self).__init__(request)
@@ -612,6 +619,10 @@ class ShiTouCunRegister(CoopRegister):
         if channel_extra:
             self.request.session[self.extra_key] = channel_extra
             # logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
+
+    def clear_session(self):
+        super(ShiTouCunRegister, self).clear_session()
+        self.request.session.pop(self.extra_key, None)
 
     def save_to_binding(self, user):
         """
@@ -650,8 +661,10 @@ class ShiTouCunRegister(CoopRegister):
                 kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
     def purchase_call_back(self, user, order_id):
-        # 判断是否是首次投资
-        if P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').count() == 1:
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+
+        # 判断是否首次投资
+        if p2p_record and p2p_record.order_id == order_id:
             self.shitoucun_call_back(user)
 
 
@@ -680,7 +693,8 @@ class FUBARegister(CoopRegister):
         binding = Binding.objects.filter(user_id=user.id).first()
         p2p_record_set = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time')
         if binding and p2p_record_set.exists():
-            if p2p_record_set.count() == 1:
+            # 判断是否首次投资
+            if p2p_record_set.first().order_id == order_id:
                 p2p_record = p2p_record_set.first()
                 goodmark = '1'
                 order_act = u'首单'
@@ -754,8 +768,10 @@ class YunDuanRegister(CoopRegister):
     def purchase_call_back(self, user, order_id):
         # 判断是否是首次投资
         binding = Binding.objects.filter(user_id=user.id).first()
-        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
-        if binding and p2p_record.count() == 1:
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+
+        # 判断是否首次投资
+        if binding and p2p_record and p2p_record.order_id == order_id:
             self.yunduan_call_back()
 
 
@@ -857,6 +873,10 @@ class ZhiTuiRegister(CoopRegister):
         if channel_extra:
             self.request.session[self.extra_key] = channel_extra
             # logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
+
+    def clear_session(self):
+        super(ZhiTuiRegister, self).clear_session()
+        self.request.session.pop(self.extra_key, None)
 
     def save_to_binding(self, user):
         """
@@ -976,9 +996,11 @@ class ZGDXRegister(CoopRegister):
     def purchase_call_back(self, user, order_id):
         # 判断是否是首次投资
         binding = Binding.objects.filter(user_id=user.id).first()
-        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
-        if binding and p2p_record.count() == 1:
-            p2p_amount = int(p2p_record.first().amount)
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+
+        # 判断是否首次投资
+        if binding and p2p_record and p2p_record.order_id == order_id:
+            p2p_amount = int(p2p_record.amount)
             if p2p_amount >= 1000:
                 if ENV == ENV_PRODUCTION:
                     if 1000 <= p2p_amount < 2000:
@@ -998,11 +1020,13 @@ class JuChengRegister(CoopRegister):
 
     @method_decorator(transaction.atomic)
     def purchase_call_back(self, user, order_id):
-        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
         SEND_SUCCESS = None
         ticket = 0
-        if p2p_record.count() == 1:
-            p2p_amount = int(p2p_record.first().amount)
+
+        # 判断是否首次投资
+        if p2p_record and p2p_record.order_id == order_id:
+            p2p_amount = int(p2p_record.amount)
             if p2p_amount>=1000 and p2p_amount<2000:
                 try:
                     logger.debug(u"80门票，我要申请锁")
@@ -1119,10 +1143,10 @@ class XunleiVipRegister(CoopRegister):
     def recharge_call_back(self, user, order_id):
         # 判断用户是否绑定和首次充值
         binding = Binding.objects.filter(user_id=user.id).first()
-        pay_info = PayInfo.objects.filter(user_id=user.id).order_by('create_time')
-        if binding and pay_info.count() == 1:
+        pay_info = PayInfo.objects.filter(user_id=user.id).order_by('create_time').first()
+        if binding and pay_info and pay_info.order_id == order_id:
             # 判断充值金额是否大于100
-            pay_amount = int(pay_info.first().amount)
+            pay_amount = int(pay_info.amount)
             if pay_amount >= 100:
                 data = {
                     'sendtype': '1',
@@ -1134,10 +1158,12 @@ class XunleiVipRegister(CoopRegister):
     def purchase_call_back(self, user, order_id):
         # 判断用户是否绑定和首次投资
         binding = Binding.objects.filter(user_id=user.id).first()
-        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购')
-        if binding and p2p_record.count() == 1:
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+
+        # 判断是否首次投资
+        if binding and p2p_record and p2p_record.order_id == order_id:
             # 判断投资金额是否大于100
-            pay_amount = int(p2p_record.first().amount)
+            pay_amount = int(p2p_record.amount)
             if pay_amount >= 1000:
                 data = {
                     'sendtype': '0',
