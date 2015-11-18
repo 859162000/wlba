@@ -213,7 +213,6 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
 )
-import django.contrib.auth.backends
 
 # Template loader
 TEMPLATE_LOADERS = (
@@ -382,6 +381,12 @@ LOGGING = {
             'filename': '/var/log/wanglibao/wanglibao_reward.log',
             'formatter': 'verbose'
         },
+        'wanglibao_account':{  #add by yihen@20151113
+                              'level': 'DEBUG',
+                              'class': 'logging.FileHandler',
+                              'filename': '/var/log/wanglibao/wanglibao_account.log',
+                              'formatter': 'verbose'
+                              },
         'wanglibao_rest':{  #add by yihen@20151028
                               'level': 'DEBUG',
                               'class': 'logging.FileHandler',
@@ -394,6 +399,12 @@ LOGGING = {
                               'filename': '/var/log/wanglibao/wanglibao_cooperation.log',
                               'formatter': 'verbose'
                               },
+        'weixin':{  #add by huomeimei
+              'level': 'DEBUG',
+              'class': 'logging.FileHandler',
+              'filename': '/var/log/wanglibao/weixin.log',
+              'formatter': 'verbose'
+                },
     },
     'loggers': {
         'django': {
@@ -430,7 +441,7 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'wanglibao_account': {
-            'handlers': ['file'],
+            'handlers': ['wanglibao_account', 'console'],
             'level': 'DEBUG',
         },
         'wanglibao_app': {
@@ -465,6 +476,10 @@ LOGGING = {
                               'handlers': ['wanglibao_cooperation', 'console'],
                               'level': 'DEBUG'
                               },
+        'weixin':{#add by huomeimei
+              'handlers': ['weixin', 'console'],
+              'level': 'DEBUG'
+        },
         'wanglibao_p2p': {
             'handlers': [ 'console'],
             'level': 'DEBUG'
@@ -619,6 +634,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'wanglibao_account.tasks.zhongjin_post_task',
         'schedule': timedelta(hours=1),
     },
+    # by Zhoudong 融途网标的推送(包含新标, 更新, 下架)
+    'rongtu_send_data': {
+        'task': 'wanglibao_account.tasks.rongtu_post_task',
+        'schedule': timedelta(hours=1),
+    },
     # 每天定时检测和生成原始邀请码
     'check_and_generate_codes': {
         'task': 'marketing.tools.check_and_generate_codes',
@@ -643,6 +663,7 @@ CELERYBEAT_SCHEDULE_FILENAME = "/tmp/celerybeat-schedule"
 
 ID_VERIFY_USERNAME = 'wljr_admin'
 ID_VERIFY_PASSWORD = 'wljr888'
+ID_LICENSE = '6a?zT-`f>_&lt;iDCC5V3[73#V?7$$t(a/p8w+u?o?[1(cf+T9&amp;7)3#I64)8n&amp;bJf`1Aa?o?z?x9V)qYq^eMgPqXw[.Tk.j?vLtNoa3KtGgYeb3Mc?x?v`0a8A.Fc-;&lt;a:c?/:a?/?v?j^qSuSyJg?x6abLLbFhM/3f:c?.2x?h?h?v.xOwMnGgSe?x.laLQtSyc6$y[:0#TH6QV\H3dh@9-u4b?.&lt;f?/+e?jS/JcRuAn)e?vY/Cc@;[.aMImHyFc$yKn+y?g?g&lt;f?g>c%a[sCcbX_ddVMcZ.a4?x?vRuKu0[=v=x?jEjJtZ[QvDfXw]uYw2d?v`V`4YscNJvTeUjBsBdKfCd?x-kXpcBHx]t?x?g4b)j>d&lt;z?jN.YgSyUk?x3h6t]gRe^dXgFhTeWlYjXwHgCd?x*w?jd7^eMgV;Ty]gc5?x'
 
 if ENV == ENV_PRODUCTION:
     CALLBACK_HOST = 'https://www.wanglibao.com'
@@ -807,7 +828,8 @@ YTX_BACK_RETURN_URL = CALLBACK_HOST + "/api/ytx/voice_back/"
 
 ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
 if ENV == ENV_DEV:
-    ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
+    # ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
+    ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
     STATIC_FILE_HOST = 'http://localhost:8000'
 
 PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
@@ -961,6 +983,11 @@ ZO_SECRET = '3r2o3j3m3g3q3l2o7o'
 MIDAI_USERNAME = 'medai360'
 MIDAI_PASSWORD = '12345678'
 
+# 融途网
+RONGTU_URL = 'http://shuju.erongtu.com/api/borrow'
+RONGTU_URL_TEST = 'http://shuju.erongtu.com/api/test'
+RONGTU_ID = 1638
+
 # 金山
 WLB_FOR_JINSHAN_KEY = '1994'
 JINSHAN_CALL_BACK_URL = 'https://vip.wps.cn/task/api/reward'
@@ -1102,7 +1129,7 @@ if ENV == ENV_PRODUCTION:
     WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
 else:
     WEIXIN_CALLBACK_URL = 'https://staging.wanglibao.com'
-
+    CALLBACK_HOST='https://staging.wanglibao.com'
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)
 WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'

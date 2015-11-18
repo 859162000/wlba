@@ -2,6 +2,8 @@
 # encoding:utf-8
 
 import sys
+from wanglibao_account.cooperation import CoopRegister
+
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
@@ -458,13 +460,40 @@ def bind_pay_deposit(request):
         return {"ret_code": 20114, 'message': '金额格式错误'}
 
     if bank.channel == 'huifu':
-        return HuifuShortPay().pre_pay(request)
+        result = HuifuShortPay().pre_pay(request)
+
+        # if result['ret_code'] == 0:
+        #     try:
+        #         # 处理第三方用户充值回调
+        #         CoopRegister(request).process_for_recharge(request.user)
+        #     except Exception, e:
+        #         logger.error(e)
+
+        return result
 
     elif bank.channel == 'yeepay':
-        return YeeShortPay().pre_pay(request)
+        result = YeeShortPay().pre_pay(request)
+
+        # if result['ret_code'] == 0:
+            # try:
+            #     # 处理第三方用户充值回调
+            #     CoopRegister(request).process_for_recharge(request.user)
+            # except Exception, e:
+            #     logger.error(e)
+
+        return result
 
     elif bank.channel == 'kuaipay':
-        return KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, device, ip, request)
+        result = KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, device, ip, request)
+
+        # if result['ret_code'] == 0:
+        #     try:
+        #         # 处理第三方用户充值回调
+        #         CoopRegister(request).process_for_recharge(request.user)
+        #     except Exception, e:
+        #         logger.error(e)
+
+        return result
 
     else:
         return {"ret_code": 20004, "message": "请选择支付渠道"}
@@ -500,18 +529,27 @@ def bind_pay_dynnum(request):
         card = Card.objects.filter(no=card_no, user=user).first()
 
     if not card:
-        return {"ret_code": 20002, "message": "银行卡未绑定"}
+        res = {"ret_code": 20002, "message": "银行卡未绑定"}
 
     if card.bank.channel == 'huifu':
-        return {'ret_code': 20003, 'message': '汇付天下请选择快捷支付渠道'}
+        res = {'ret_code': 20003, 'message': '汇付天下请选择快捷支付渠道'}
 
     elif card.bank.channel == 'yeepay':
-        return YeeShortPay().dynnum_bind_pay(request)
+        res = YeeShortPay().dynnum_bind_pay(request)
 
     elif card.bank.channel == 'kuaipay':
-        return KuaiShortPay().dynnum_bind_pay(user, vcode, order_id, token, input_phone, device, ip)
+        res = KuaiShortPay().dynnum_bind_pay(user, vcode, order_id, token, input_phone, device, ip, request)
     else:
-        return {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
+        res = {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
+
+    if res.get('ret_code') == 0:
+        try:
+            CoopRegister(request).process_for_binding_card(user)
+        except:
+            logger.exception('bind_card_callback_failed for %s' % str(user))
+
+
+    return res
 
 
 def yee_callback(request):

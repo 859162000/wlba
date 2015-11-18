@@ -314,7 +314,7 @@ class RegisterAPIView(APIView):
         if request.DATA.get('IGNORE_PWD'):
             send_messages.apply_async(kwargs={
                 "phones": [identifier,],
-                "messages": [u'登录账户是：'+identifier+u'登录密码:'+password,]
+                "messages": [u'[网利科技]用户名： '+identifier+u'; 登录密码:'+password,]
             })
 
             logger.debug("此次 channel:%s" %(channel))
@@ -507,6 +507,10 @@ class IdValidateAPIView(APIView):
 
         device = split_ua(request)
         tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+        # 处理第三方用户实名回调
+        CoopRegister(self.request).process_for_validate(user)
+
         return Response({"ret_code": 0, "message": u"验证成功"})
 
 
@@ -840,7 +844,7 @@ class IdValidate(APIView):
             device = split_ua(request)
             tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
-            #处理渠道回调
+            # 处理第三方用户实名回调
             CoopRegister(self.request).process_for_validate(user)
 
             return Response({ "validate": True }, status=200)
