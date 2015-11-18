@@ -83,8 +83,7 @@ from wanglibao_account.models import UserThreeOrder
 from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes, hex2bin
 import requests
 from wanglibao_margin.models import MarginRecord
-from wanglibao_pay.fee import WithdrawFee
-
+from experience_gold.models import ExperienceAmortization
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
@@ -470,10 +469,8 @@ class AccountHome(TemplateView):
         user = self.request.user
 
         mode = 'p2p'
-        fund_hold_info = []
-        if self.request.path.rstrip('/').split('/')[-1] == 'fund':
-            mode = 'fund'
-            fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
+        if self.request.path.rstrip('/').split('/')[-1] == 'experience':
+            mode = 'experience'
 
         p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
             u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
@@ -483,16 +480,6 @@ class AccountHome(TemplateView):
         earnings = Earning.objects.select_related('product__activity').filter(user=user)
 
         earning_map = {earning.product_id: earning for earning in earnings}
-        result = []
-        for equity in p2p_equities:
-            obj = {"equity": equity}
-            if earning_map.get(equity.product_id):
-                obj["earning"] = earning_map.get(equity.product_id)
-
-            result.append(obj)
-
-        amortizations = ProductAmortization.objects.filter(product__in=[e.product for e in p2p_equities],
-                                                           settled=False).prefetch_related("subs")
 
         unpayed_principle = 0
         for equity in p2p_equities:
@@ -501,39 +488,36 @@ class AccountHome(TemplateView):
 
         p2p_total_asset = user.margin.margin + user.margin.freeze + user.margin.withdrawing + unpayed_principle
 
-        p2p_product_amortization = {}
-        for amortization in amortizations:
-            if not amortization.product_id in p2p_product_amortization:
-                p2p_product_amortization[amortization.product_id] = amortization
-
         total_asset = p2p_total_asset
 
-        #xunlei_vip = Binding.objects.filter(user=user).filter(btype='xunlei').first()
+        if mode == 'p2p':
+            result = []
+            for equity in p2p_equities:
+                obj = {"equity": equity}
+                if earning_map.get(equity.product_id):
+                    obj["earning"] = earning_map.get(equity.product_id)
+
+                result.append(obj)
+        else:
+            result = []
+
+        if mode == 'experience':
+            experience_amortization = ExperienceAmortization.objects.filter(user=user).select_related('product')
+        else:
+            experience_amortization = []
 
         return {
             'message': message,
             'result': result,
-            'amortizations': amortizations,
-            'p2p_product_amortization': p2p_product_amortization,
             'p2p_unpay_principle': unpayed_principle,
             'margin_withdrawing': user.margin.withdrawing,
             'margin_freeze': user.margin.freeze,
-            'fund_hold_info': fund_hold_info,
             'p2p_total_asset': p2p_total_asset,
             'total_asset': total_asset,
             'mode': mode,
+            'experience_amortization': experience_amortization,
             'announcements': AnnouncementAccounts,
         }
-
-    # def post(self, request):
-    #     select_type = request.POST.get('select_type')
-    #     equity_jiuxian = P2PEquityJiuxian.objects.filter(user=self.request.user)\
-    #         .filter(product__category=u'酒仙众筹标').first()
-    #     if equity_jiuxian:
-    #         equity_jiuxian.selected_type = select_type
-    #         equity_jiuxian.selected_at = timezone.now()
-    #         equity_jiuxian.save()
-    #     return HttpResponseRedirect(reverse('accounts_address'))
 
 
 class AccountHomeAPIView(APIView):

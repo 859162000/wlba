@@ -46,16 +46,16 @@ block main
           +
       if mode == 'p2p'
         .brief--fund-total-asset
-          a(href="/accounts/home/fund/")
+          a(href="/accounts/home/experience/")
             p.align-center
               span#fund_total_asset_title.big_number
-            p.align-center 货币基金(元)
+            p.align-center 体验金(元)
       else
         .brief--fund-total-asset.active
-          a(href="/accounts/home/fund/")
+          a(href="/accounts/home/experience/")
             p.align-center
               span#fund_total_asset_title.big_number
-            p.align-center 货币基金(元)
+            p.align-center 体验金(元)
   if mode == 'p2p'
     .account-home-panel__no-padding
       .account-home-panel--title-bar__product
@@ -63,7 +63,7 @@ block main
           li.title-bar--tab.active
             a.title-bar--tab--anchor(href="javascript:void(0)") 理财专区
           li.title-bar--tab
-            a.title-bar--tab--anchor(href="/accounts/home/fund/") 体验金专区
+            a.title-bar--tab--anchor(href="/accounts/home/experience/") 体验金专区
             i
         a.pull-right.align-right.detail-view(href='/accounts/transaction/p2p/') 查看交易记录
       .clamp-xl
@@ -171,7 +171,7 @@ block main
           li.title-bar--tab.active
             a.title-bar--tab--anchor(href="javascript:void(0)") 体验金专区
             i
-        a.pull-right.align-right.detail-view(href='/accounts/transaction/fund/')
+        a.pull-right.align-right.detail-view(href='/activity/experience_gold/', target="_blank")
             i
             | 查看体验金活动
       .account-home-panel__no-padding
@@ -188,12 +188,12 @@ block main
                   .total-asset-money-card
                       p.align-center
                           span.big_number 00.00
-                      p.align-center.desc 到账收益余额（元）
+                      p.align-center.desc 到账收益（元）
                   .total-asset-money-card
                       p.align-center
                           span.big_number 00.00
                       p.align-center.desc 待收收益（元）
-              p.tyjMark 注：体验金投资获取收益可以提现，提现操作会优先从体验金到账收益余额里扣除。
+              p.tyjMark 注：体验金收益可以正常使用，每一笔到账收益会自动转至理财专区余额。
               table.table.tableNew
                   thead
                       tr
@@ -204,41 +204,18 @@ block main
                           th 项目期限
                           th 已收益／预期收益
                   tbody
-                      tr
-                          td 2015-10-10 19:53
-                          td 专享福利体验标
-                          td 8,888.00
-                          td 00.00
-                          td 0.00
-                          td 0.00/9.89（元）
-                      tr
-                          td 2015-10-10 19:53
-                          td 专享福利体验标
-                          td 8,888.00
-                          td 00.00
-                          td 0.00
-                          td 0.00/9.89（元）
-                      tr
-                          td 2015-10-10 19:53
-                          td 专享福利体验标
-                          td 8,888.00
-                          td 00.00
-                          td 0.00
-                          td 0.00/9.89（元）
-                      tr
-                          td 2015-10-10 19:53
-                          td 专享福利体验标
-                          td 8,888.00
-                          td 00.00
-                          td 0.00
-                          td 0.00/9.89（元）
-                      tr
-                          td 2015-10-10 19:53
-                          td 专享福利体验标
-                          td 8,888.00
-                          td 00.00
-                          td 0.00
-                          td 0.00/9.89（元）
+                    if experience_amoritization
+                      for amo in experience_amoritization
+                        tr
+                          td {{amo.created_time}}
+                          td {{amo.product.name}}
+                          td {{amo.principal}}
+                          td {{amo.product.expected_earning_rate}}%
+                          td {{amo.product.period}}
+                          if amo.settled
+                            td {{amo.interest}}/0.00（元）
+                          else
+                            td 0.00/{{amo.interest}}（元）
 
 block script
   script.

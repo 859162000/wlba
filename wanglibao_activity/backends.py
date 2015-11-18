@@ -21,6 +21,7 @@ from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_sms.tasks import send_messages
 from wanglibao_rest.utils import decide_device
+from experience_gold.models import ExperienceEvent, ExperienceEventRecord
 
 logger = logging.getLogger(__name__)
 
@@ -165,26 +166,31 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
 def _send_gift(user, rule, device_type, is_full, amount=0):
     # rule_id = rule.id
     rtype = rule.trigger_node
-    #送奖品
+    # 送奖品
     if rule.gift_type == 'reward':
         reward_name = rule.reward
         _send_gift_reward(user, rule, rtype, reward_name, device_type, amount, is_full)
 
-    #送优惠券，红包
+    # 送优惠券，红包
     if rule.gift_type == 'redpack':
         redpack_id = rule.redpack
-        #此处后期要加上检测红包数量的逻辑，数量不够就记录下没有发送的用户，并通知市场相关人员
+        # 此处后期要加上检测红包数量的逻辑，数量不够就记录下没有发送的用户，并通知市场相关人员
         _send_gift_redpack(user, rule, rtype, redpack_id, device_type, amount, is_full)
 
-    #送现金或收益
-    if rule.gift_type == 'income':
-        #send to
-        _send_gift_income(user, rule, amount, is_full)
+    # 送体验金
+    if rule.gift_type == 'experience_gold':
+        experience_id = rule.redpack
+        _send_gift_experience(user, rule, rtype, experience_id, device_type, amount, is_full)
 
-    #送话费
-    if rule.gift_type == 'phonefare':
-        #send to
-        _send_gift_phonefare(user, rule, amount, is_full)
+    # 送现金或收益
+    # if rule.gift_type == 'income':
+    #     send to
+    #     _send_gift_income(user, rule, amount, is_full)
+
+    # 送话费
+    # if rule.gift_type == 'phonefare':
+    #     send to
+    #     _send_gift_phonefare(user, rule, amount, is_full)
 
 
 def _check_introduced_by(user, start_dt, is_invite_in_date):
@@ -211,7 +217,6 @@ def _check_introduced_by_product(user):
 def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
     # 检查单标投资顺序是否设置数字
     ranking_num = int(rule.ranking)
-    # print "====111:::%s:::%s===id:%s=:" % (rule.ranking, ranking_num, rule.id)
     if not rule.is_total_invest:
         if ranking_num > 0 and not is_full:
             # 查询单标投资顺序
@@ -219,12 +224,9 @@ def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
                                        .order_by('create_time')
             print records.query
             if records and records.count() <= ranking_num:
-                # print "records.count: %s ====, ranking_num: %s ====" % (records.count(), ranking_num)
                 try:
                     this_record = records[ranking_num-1]
-                    # print "this_record  ", this_record
                     if this_record.user.id == user.id:
-                        # print "this_record.user.id--:%s == user.id-- %s:" % (this_record.user.id, user.id)
                         _check_trade_amount(user, rule, device_type, amount, is_full)
                         # _send_gift(user, rule, device_type, is_full)
                 except Exception:
@@ -235,37 +237,28 @@ def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
                                        .order_by('create_time')
             # print records.query
             if records and records.count() <= ranking_num:
-                # print "records.count: %s ====, ranking_num: %s ====" % (records.count(), ranking_num)
                 try:
                     this_record = records[ranking_num-1]
-                    # print "=========this_record==:%s=====" % this_record
                     if this_record.user.id == user.id:
-                        # print "this_record.user.id--:%s == user.id-- %s:" % (this_record.user.id, user.id)
                         _check_trade_amount(user, rule, device_type, amount, is_full)
                 except Exception:
                     pass
         elif ranking_num == -1 and is_full is True:
-            # print "-1-1-1-1-1-1"
             # 查询是否满标，满标时不再考虑最小/最大金额，直接发送
             _check_trade_amount(user, rule, device_type, amount, is_full)
             # _send_gift(user, rule, device_type, is_full)
         elif ranking_num == 0 and not is_full:
-            # print "0000000000000000==id:%s==" % rule.id
             _check_trade_amount(user, rule, device_type, amount, is_full)
 
     # 判断单标累计投资名次
     if rule.is_total_invest and is_full is True:
-        # print "=====is full: ::%s====" % is_full
         total_invest_order = int(rule.total_invest_order)
-        # print "=====total_invest_order:::%s=====" % total_invest_order
         if total_invest_order > 0:
             # 按用户查询单标投资的总金额
             records = P2PEquity.objects.filter(product=product_id, product__status=u'满标待打款').order_by('-equity')
             if records:
                 try:
                     record = records[total_invest_order-1]
-                    # print "----====----:::: %s" % (total_invest_order - 1)
-                    # print "=======equity:======", record
                     # 如果设置了最小金额，则判断用户的投资总额是否在最大最小金额区间
                     is_amount = _check_amount(rule.min_amount, rule.max_amount, record.equity)
                     if is_amount:
@@ -319,7 +312,7 @@ def _check_product_id(product_id, product_ids):
 def _send_gift_reward(user, rule, rtype, reward_name, device_type, amount, is_full):
     now = timezone.now()
     if rule.send_type == 'sys_auto':
-        #do send
+        # do send
         if rule.share_type != 'inviter':
             _send_reward(user, rule, rtype, reward_name, None, amount)
         if rule.share_type == 'both' or rule.share_type == 'inviter':
@@ -327,7 +320,7 @@ def _send_gift_reward(user, rule, rtype, reward_name, device_type, amount, is_fu
             if user_introduced_by:
                 _send_reward(user, rule, rtype, reward_name, user_introduced_by, amount)
     else:
-        #只记录不发信息
+        # 只记录不发信息
         if rule.share_type != 'inviter':
             _save_activity_record(rule, user, 'only_record', reward_name, False, is_full)
         if rule.share_type == 'both' or rule.share_type == 'inviter':
@@ -345,10 +338,10 @@ def _send_reward(user, rule, rtype, reward_name, user_introduced_by=None, amount
         reward.is_used = True
         reward.save()
         description = '=>'.join([rtype, reward.type])
-        #记录奖品发放流水
+        # 记录奖品发放流水
         has_reward_record = _keep_reward_record(user, reward, description)
         if has_reward_record:
-            #发放站内信或短信
+            # 发放站内信或短信
             if user_introduced_by:
                 _send_message_sms(user, rule, user_introduced_by, reward, amount)
             else:
@@ -473,7 +466,7 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
                     chs = red_pack_event.target_channel.split(",")
                     chs = [m for m in chs if m.strip() != ""]
                     if user_channel not in chs:
-                        return
+                        continue
                 redpack = RedPack.objects.filter(event=red_pack_event, status="unused").first()
                 if redpack:
                     give_pf = red_pack_event.give_platform
@@ -486,6 +479,84 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
                         record.redpack = redpack
                         record.change_platform = device_type
                         record.save()
+        if user_ib:
+            _send_message_sms(user, rule, user_ib, None, amount, None, None)
+        else:
+            _send_message_sms(user, rule, None, None, amount, None, None)
+
+
+def _send_gift_experience(user, rule, rtype, experience_id, device_type, amount, is_full):
+    """ 活动中发送的理财金使用规则里边配置的模板，其他的使用系统原有的模板。 """
+    if rule.send_type == 'sys_auto':
+        if rule.share_type != 'inviter':
+            _give_activity_experience_new(user, rtype, experience_id, device_type, rule, None, amount)
+        if rule.share_type == 'both' or rule.share_type == 'inviter':
+            user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
+            if user_introduced_by:
+                _give_activity_experience_new(user, rtype, experience_id, device_type, rule, user_introduced_by, amount)
+    else:
+        if rule.share_type != 'inviter':
+            _save_activity_record(rule, user, 'only_record', rule.rule_name, False, is_full)
+        if rule.share_type == 'both' or rule.share_type == 'inviter':
+            user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
+            if user_introduced_by:
+                _save_activity_record(rule, user_introduced_by, 'only_record', rule.rule_name, True, is_full)
+
+
+def _give_activity_experience_new(user, rtype, experience_id, device_type, rule, user_ib=None, amount=0):
+    """ rule: get message template """
+    now = timezone.now()
+    if user_ib:
+        this_user = user_ib
+    else:
+        this_user = user
+    user_channel = helper.which_channel(this_user)
+    device_type = decide_device(device_type)
+
+    # 新增允许一次填写多个体验金ID号
+    if experience_id:
+        experience_id_list = experience_id.split(',')
+        experience_id_list = [int(rid) for rid in experience_id_list if rid.strip() != '']
+    else:
+        return
+
+    if len(experience_id_list) == 1:
+        experience_event = ExperienceEvent.objects.filter(give_mode=rtype, invalid=False, id=experience_id_list[0],
+                                                          available_at__lt=now, unavailable_at__gt=now).first()
+        if experience_event:
+            if experience_event.target_channel != "":
+                chs = experience_event.target_channel.split(",")
+                chs = [m for m in chs if m.strip() != ""]
+                if user_channel not in chs:
+                    return
+
+            give_pf = experience_event.give_platform
+            if give_pf == "all" or give_pf == device_type:
+                record = ExperienceEventRecord()
+                record.event = experience_event
+                record.user = this_user
+                record.save()
+                if user_ib:
+                    _send_message_sms(user, rule, user_ib, None, amount, experience_event, record.created_at)
+                else:
+                    _send_message_sms(user, rule, None, None, amount, experience_event, record.created_at)
+    else:
+        for e_id in experience_id_list:
+            experience_event = ExperienceEvent.objects.filter(give_mode=rtype, invalid=False, id=e_id,
+                                                              available_at__lt=now, unavailable_at__gt=now).first()
+            if experience_event:
+                if experience_event.target_channel != "":
+                    chs = experience_event.target_channel.split(",")
+                    chs = [m for m in chs if m.strip() != ""]
+                    if user_channel not in chs:
+                        continue
+
+                give_pf = experience_event.give_platform
+                if give_pf == "all" or give_pf == device_type:
+                    record = ExperienceEventRecord()
+                    record.event = experience_event
+                    record.user = this_user
+                    record.save()
         if user_ib:
             _send_message_sms(user, rule, user_ib, None, amount, None, None)
         else:
@@ -533,9 +604,18 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
         end_date = timezone.localtime(reward.end_time).strftime(fmt_str)
         name = reward.type
     if redpack_event:
-        redpack_amount = redpack_event.amount
-        invest_amount = redpack_event.invest_amount
-        highest_amount = redpack_event.highest_amount
+        try:
+            redpack_amount = redpack_event.amount
+        except AttributeError:
+            redpack_amount = 0
+        try:
+            invest_amount = redpack_event.invest_amount
+        except AttributeError:
+            invest_amount = 0
+        try:
+            highest_amount = redpack_event.highest_amount
+        except AttributeError:
+            highest_amount = 0
         name = redpack_event.name
         if redpack_event.auto_extension and redpack_event.auto_extension_days > 0 and created_at:
             unavailable_at = created_at + datetime.timedelta(days=int(redpack_event.auto_extension_days))
