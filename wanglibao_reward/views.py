@@ -770,6 +770,9 @@ class RewardDistributer(object):
         logger.debug("request:%s, kwargs:%s" % (request, kwargs))
         self.request = request
         self.kwargs = kwargs
+        self.Processor = {
+            ThanksGivenRewardDistributer: ('all',),
+        }
 
     @property
     def activity(self):
@@ -778,7 +781,7 @@ class RewardDistributer(object):
     @property
     def processors(self):
         processor = []
-        for key, value in Processor.items():
+        for key, value in self.Processor.items():
             if self.activity in value:
                 processor.append(key)
         return processor
@@ -809,26 +812,7 @@ class ThanksGivenRewardDistributer(RewardDistributer):
 
     @property
     def reward(self):
-        rewards = {
-            u"感恩节3%加息券":(500000,100000000),
-            u"感恩节600元现金红包":(300000,500000),
-            u"感恩节400元现金红包":(200000,300000),
-            u"感恩节200元现金红包":(100000,200000),
-            u"感恩节2.2%加息券":(80000,100000),
-            u"感恩节1.8%加息券":(60000,80000),
-            u"感恩节80元现金红包":(40000,60000),
-            u'一年迅雷会员':(30000,40000), #共计1000个,送完了送1.5%加息券
-            u"感恩节1.5%加息券":(8000,30000),
-            u"感恩节10元现金红包":(5000,8000),
-            u'蛋糕叔叔40元代金券':(4500,5000),
-            u'河狸家30元代金券':(4000,4500),
-            u'点到全身理疗30元代金券':(3500,4000),
-            u'小狗电器30元代金券':(3000,3500),
-            u'一个月爱奇艺会员':(2000,3000),
-            u'7天爱奇艺会员':(1000,2000),
-            u'七天迅雷会员':(0,1000),
-            u"感恩节1%加息券":(0,0),
-        }
+        from wanglibao_reward.settings import thanks_given_rewards as rewards
         for key, values in rewards.items():
             if self.amount>=values[0] and self.amount<values[1]:
                 if key == u'1年迅雷会员':
@@ -924,7 +908,7 @@ class ThanksGivingDistribute(object):
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         if 'POINT_AT' == action:
-            reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', left_times__gt=0).first()
+            reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', left_times__gt=0, has_sent=False).first()
 
             if reward:
 
@@ -953,6 +937,7 @@ class ThanksGivingDistribute(object):
                 }
 
                 reward.left_times -= 1
+                reward.has_sent = True
                 reward.save()
             else:
                 json_to_response = {
@@ -964,6 +949,15 @@ class ThanksGivingDistribute(object):
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-Processor = {
-    ThanksGivenRewardDistributer: ('all',),
-}
+        if action == "GET_REWARD":
+            rewards = WanglibaoActivityReward.objects.filter(p2p_amount__gte=5000, activity="ThanksGiven", has_sent=True).all()
+            phone = [reward.user.wanglibaouserprofile.phone for reward in rewards]
+            reward = [reward.redpack_event.name for reward in rewards if reward.redpack_event] + [reward.reward.description for reward in rewards if reward.reward]
+            json_to_response = {
+                "phone": phone,
+                "rewards": reward,
+                "message": u'中奖名单',
+                "ret_code": 4000
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
