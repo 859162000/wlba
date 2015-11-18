@@ -144,6 +144,9 @@ urlpatterns += patterns(
     url(r'^app-invite-success/$', TemplateView.as_view(template_name="app_invite_success.jade")),
     url(r'^app-invite-error/$', TemplateView.as_view(template_name="app_invite_error.jade")),
     url(r'^app-invite-server/$', TemplateView.as_view(template_name="app_invite_server.jade")),
+    url(r'^app_thanksgiv/$', TemplateView.as_view(template_name="app_thanksgiv.jade")),
+
+
     url(r'^app_experience/$', TemplateView.as_view(template_name="app_experience.jade")),
     url(r'^experience_account/$', TemplateView.as_view(template_name="account.jade")),
 )

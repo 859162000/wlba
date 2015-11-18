@@ -221,6 +221,16 @@ class AppShareViewShort(TemplateView):
             identifier = self.request.GET.get('phone')
             friend_phone = identifier
 
+        if friend_phone:
+            try:
+                user = User.objects.get(wanglibaouserprofile__phone=friend_phone)
+                promo_token = PromotionToken.objects.get(user=user)
+                invite_code = promo_token.token
+            except:
+                invite_code = ''
+        else:
+            invite_code = ''
+
         # 网站数据
         m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
         site_data = m.get_recommend_products()
@@ -230,11 +240,12 @@ class AppShareViewShort(TemplateView):
             site_data = pc_data_generator()
             m.update_value(value={MiscRecommendProduction.KEY_PC_DATA: site_data})
 
-        identifier_result = identifier and identifier.strip() or identifier
+        url = self.request.get_host() + self.request.get_full_path()
         return {
             'site_data': site_data,
-            'identifier': identifier_result,
+            'invite_code': invite_code,
             'friend_phone': friend_phone,
+            'url': url
         }
 
 class AppShareViewError(TemplateView):
@@ -245,10 +256,11 @@ class AppShareViewError(TemplateView):
             identifier = kwargs['phone']
             phone = base64.b64decode(identifier + '=')
         except:
-            phone = None
-
+            phone = ''
+        url = self.request.get_host() + '/aws/?p=' + identifier
         return {
-            'phone': phone
+            'phone': phone,
+            'url': url
         }
 
 class AppShareViewSuccess(TemplateView):
@@ -259,10 +271,11 @@ class AppShareViewSuccess(TemplateView):
             identifier = kwargs['phone']
             phone = base64.b64decode(identifier + '=')
         except:
-            phone = None
-
+            phone = ''
+        url = self.request.get_host() + '/aws/?p=' + identifier
         return {
-            'phone': phone
+            'phone': phone,
+            'url': url
         }
 
 

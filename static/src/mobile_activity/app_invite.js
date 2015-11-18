@@ -87,6 +87,53 @@ org.ui = (function () {
     }
 })();
 
+var weChatShare = (function(org){
+    var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ',];
+        org.ajax({
+            type : 'GET',
+            url : '/weixin/api/jsapi_config/',
+            dataType : 'json',
+            success : function(data) {
+                //请求成功，通过config注入配置信息,
+                wx.config({
+                    debug: false,
+                    appId: data.appId,
+                    timestamp: data.timestamp,
+                    nonceStr: data.nonceStr,
+                    signature: data.signature,
+                    jsApiList: jsApiList
+                });
+            }
+        });
+        wx.ready(function(){
+            var host = 'https://www.wanglibao.com',
+                shareImg = host + '/static/imgs/mobile/weChat_logo.png',
+                shareLink = $('input[name=url]').val(),
+                shareMainTit = '送你580元现金豪礼，就是这么任性！专享16%超高收益',
+                shareBody = '新人立领580元现金红包，专享16%超高收益，史无前例！100元起投立即去看看～戳这里>>';
+            //分享给微信好友
+            org.onMenuShareAppMessage({
+                title: shareMainTit,
+                desc: shareBody,
+                link: shareLink,
+                imgUrl: shareImg
+            });
+            //分享给微信朋友圈
+            org.onMenuShareTimeline({
+                title: shareMainTit,
+                link : shareLink,
+                imgUrl: shareImg
+            })
+            //分享给QQ
+            org.onMenuShareQQ({
+                title: shareMainTit,
+                desc: shareBody,
+                link : shareLink,
+                imgUrl: shareImg
+            })
+        })
+})(org);
+
 org.invite_index = (function (org) {
     var lib = {
         $phone: $('input[name=phone]'),
@@ -96,6 +143,7 @@ org.invite_index = (function (org) {
         $nbsp : $('.mod-sign-margin'),
         spread: $(document),
         $body_h : $('.mod-check-body'),
+        $agreement: $("#agreement"),
         checkState: null,
         init: function () {
             lib._initNum(lib._animate);
@@ -176,11 +224,23 @@ org.invite_index = (function (org) {
                 _self.spread.trigger('from:validation');
             });
 
+
+            $("#agreement").on('click',function(){
+                $(this).toggleClass('agreement');
+                $(this).hasClass('agreement') ?  $(this).find('input').attr('checked','checked') : $(this).find('input').removeAttr('checked');
+            })
+            $('.xieyi-btn').on('click', function(){
+                $('.regist-protocol-div').css('-webkit-transform','translate3d(0, 0, 0)')
+            })
+            $('.cancel-xiyie').on('click', function(){
+                $('.regist-protocol-div').css('-webkit-transform','translate3d(0, 100%, 0)')
+            })
+
             $('input[name=submit]').on('click', function(){
                 if(_self.$phone.attr('data-existing') == 'true'){
-                    _self.spread.trigger('from:check', [_self.checkfilter(1), existingTrueClllback]);
+                    _self.spread.trigger('from:check', [_self.checkfilter(2), existingTrueClllback]);
                 }else{
-                    _self.spread.trigger('from:check', [_self.checkfilter(3), existingFalseClllback]);
+                    _self.spread.trigger('from:check', [_self.checkfilter(4), existingFalseClllback]);
                 }
             });
 
@@ -204,12 +264,13 @@ org.invite_index = (function (org) {
         _regist_wlb: function(){
             var _self = this;
             org.ajax({
-                url: '/api/register/?invite_code='+ $('input[name=friend_identifier]').val()+'/',
+                url: '/api/register/',
                 type: 'POST',
                 data: {
                     "identifier":  _self.$phone.val(),
                     "validate_code": _self.$codenum.val(),
-                    "IGNORE_PWD": 'true'
+                    "IGNORE_PWD": 'true',
+                    'invite_code': $('#invite_code').val()
                 },
                 beforeSend: function(){
                     $('input[name=submit]').attr('disabled',true)
@@ -251,7 +312,7 @@ org.invite_index = (function (org) {
                         window.location.href = '/wsf/'+ styleBase+'/';
                     }else{
                         _self.$phone.attr({'data-existing': 'false'});
-                        _self.$body_h.css({'height': '6.6rem'});
+                        _self.$body_h.css({'height': '6rem'});
                         _self.spread.trigger('from:captcha');
                     }
                 },
@@ -269,7 +330,7 @@ org.invite_index = (function (org) {
                 _self = this,
                 count = 60;  //60秒倒计时
 
-           _self.spread.trigger('from:check', [_self.checkfilter(2)]);
+           _self.spread.trigger('from:check', [_self.checkfilter(3)]);
 
             if(!_self.checkState) return;
 
@@ -308,6 +369,7 @@ org.invite_index = (function (org) {
                 _self = this,
                 checkAll =  [
                     { type: _self.$phone.attr('data-type'), dom: _self.$phone, message: _self.$phone.attr('data-message')},
+                    { type: _self.$agreement.attr('data-type'), dom: _self.$agreement, message: _self.$agreement.attr('data-message')},
                     { type: _self.$codeimg.attr('data-type'), dom: _self.$codeimg, message: _self.$codeimg.attr('data-message')},
                     { type: _self.$codenum.attr('data-type'), dom: _self.$codenum, message: _self.$codenum.attr('data-message')}
                 ];
@@ -320,7 +382,8 @@ org.invite_index = (function (org) {
             var check = {}, _self = this;
 
             $.each(checklist, function(i,hash){
-                check.checkback = lib['_check' + hash.type]($(hash.dom).val());
+
+                check.checkback = (hash.dom)[0].tagName == 'INPUT' ? lib['_check' + hash.type]($(hash.dom).val()) : lib['_check' + hash.type]($(hash.dom));
                 check.message = hash.message;
                 if(!check.checkback) return false
             });
@@ -343,6 +406,12 @@ org.invite_index = (function (org) {
 
             if(val == '') return false
             return true
+        },
+        _checkAgree: function(obj){
+            if(obj.hasClass('agreement')){
+                return true
+            }
+            return false
         },
         _fetchcode: function(){
             var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
@@ -370,13 +439,13 @@ org.invite_success = (function (org) {
     var lib = {
         init: function () {
             $('.invite-result-btn-dom').on('click', function(){
-                $('.invite-result-mask').css('display','-webkit-box');
+                $('.invite-mask-share').show()
             })
             $('.mask-close').on('click', function(){
                 $('.invite-result-mask').css('display','none');
             })
             $('.erweima-dom').on('click', function(){
-                $('.invite-mask-share').show()
+                $('.invite-result-mask').css('display','-webkit-box');
             })
             $('.invite-mask-share').on('click', function(){
                 $(this).hide()

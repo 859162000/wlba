@@ -110,7 +110,7 @@ Message_template = {
                 "color":"#173177"
             },
            "remark":{
-               "value":u"如有疑问，请拨打6546544654",
+               "value":u"",
                "color":"#173177"
            },
         },

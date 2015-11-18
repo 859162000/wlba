@@ -66,16 +66,29 @@ class ManDaoSMSBackEnd(SMSBackEnd):
                 ext = ''
         except ValueError:
             ext = ''
-        params = {
-            'sn': settings.SMS_MANDAO_SN,
-            'pwd': settings.SMS_MANDAO_MD5_PWD,
-            'mobile': phone,
-            'content': text,
-            'ext': ext,
-            'stime': '',
-            'rrid': '',
-            'msgfmt': ''
-        }
+
+        if ext:
+            params = {
+                'sn': settings.SMS_MANDAO_SN_MARKETING,
+                'pwd': settings.SMS_MANDAO_MD5_PWD_MARKETING,
+                'mobile': phone,
+                'content': text,
+                'ext': ext,
+                'stime': '',
+                'rrid': '',
+                'msgfmt': ''
+            }
+        else:
+            params = {
+                'sn': settings.SMS_MANDAO_SN,
+                'pwd': settings.SMS_MANDAO_MD5_PWD,
+                'mobile': phone,
+                'content': text,
+                'ext': '',
+                'stime': '',
+                'rrid': '',
+                'msgfmt': ''
+            }
 
         response = requests.post(url, params)
 

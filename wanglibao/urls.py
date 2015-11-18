@@ -171,6 +171,7 @@ urlpatterns += patterns(
     url(r'^aws/$', AppShareViewShort.as_view(), name="app_invite"),
     url(r'^wst/(?P<phone>\w+)', AppShareViewSuccess.as_view(), name="app_invite_success"),
     url(r'^wsf/(?P<phone>\w+)', AppShareViewError.as_view(), name="app_invite_error"),
+    url(r'^app-invite-server/$', TemplateView.as_view(template_name="app_invite_server.jade")),
 )
 
 # 短信

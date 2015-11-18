@@ -3,7 +3,12 @@ doctype html
 html(style="background:#f8f1d1")
   head
     title 全民淘金
-    include include/app_head
+    meta(charset="utf-8")
+    meta(name="format-detection" content="telephone=no,email=no")
+    meta(content="telephone=no,email=no" ,name="format-detection")
+    meta(content="yes" ,name="apple-mobile-web-app-capable")
+    meta(name="viewport", content="initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, user-scalable=no")
+    link(href="/static/styles/mobile_activity/app_invite_result.css", rel="stylesheet")
   body
     .invite-banner-server
       img(src='/static/imgs/mobile_activity/app_invite/logo.png').logo

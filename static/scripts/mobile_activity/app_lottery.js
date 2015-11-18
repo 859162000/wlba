@@ -1137,7 +1137,7 @@ org.lottery = (function () {
                             if (xhr.existing) {
                                 window.location.href = 'http://mo.lingcaibao.com/act/wlb/start?mcode=ACTwlberwet&mobile=' + phoneVal + '&serverId=39'; //对方
                             } else {
-                                window.location.href = '/weixin/regist/?onlyphone=true&next=http://mo.lingcaibao.com/act/wlb/start?mcode=ACTwlberwet&mobile=' + phoneVal + '&serverId=39&phone=' + $phone.val();
+                                window.location.href = '/weixin/regist/?promo_token=caipiao&onlyphone=true&next=http://mo.lingcaibao.com/act/wlb/start?mcode=ACTwlberwet&mobile=' + phoneVal + '&serverId=39&phone=' + $phone.val();
                             }
                         },
                         error: function (xhr) {
