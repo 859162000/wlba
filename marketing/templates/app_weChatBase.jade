@@ -10,6 +10,9 @@ html(style="background:#FFF6B7")
 		input(type='hidden',name="url", value='{{share.url}}')
 		input(type='hidden',name="title", value='{{share.title}}')
 		input(type='hidden',name="content", value='{{share.content}}')
+		section {{share.content}}
+		section {{share.url}}
+		section {{share.title}}
 		section.weChat-head
 			img(src='/static/imgs/mobile_activity/app_wechat/super.png').super
 			img(src='/static/imgs/mobile_activity/app_wechat/secure.png').secure
