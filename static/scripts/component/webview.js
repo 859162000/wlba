@@ -48,11 +48,12 @@ var wlb = (function () {
 
 
         function run(target){
+            var mixins ;
             if(target.callback && target.callback == 'app'){
-                var mixins = new Mixin(target.data).init();
+                mixins = new Mixin(target.data);
+                mixins.init();
             }
-
-            dics[target.callback](mixins);
+            dics[target.callback]();
         }
     }
 
@@ -64,6 +65,7 @@ var wlb = (function () {
 
 wlb.ready({
     app: function(mixins){
+        document.getElementById('log').innerHTML = JSON.stringify(mixins)
         document.getElementById('buttons').onclick = function(){
             mixins.loginApp();
         }
@@ -75,3 +77,22 @@ wlb.ready({
         }
     },
 })
+
+
+function Mixin (bridge) {
+        this.bridge = bridge;
+    }
+
+
+Mixin.prototype = {
+    init: function(){
+        console.log(123)
+    },
+    loginApp: function(data, callback){
+
+        console.log(this)
+    }
+}
+
+var est = new Mixin('1')
+console.log(est)
