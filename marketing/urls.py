@@ -1,11 +1,10 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, url, include
 from django.views.generic import TemplateView, RedirectView
 from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate, \
                             ThunderTenAcvitityTemplate, AppLotteryTemplate, OpenidPhoneForFencai
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 from wanglibao.views import BaiduFinanceView
-from experience_gold.views import ExperienceGoldView
 
 urlpatterns = patterns(
     '',
@@ -64,7 +63,6 @@ urlpatterns = patterns(
     url(r'^365_gu/$', TemplateView.as_view(template_name="365_gu.jade")),
     url(r'thanksgiving/$', TemplateView.as_view(template_name="thanksgiving.jade")),
     url(r'winter_brid/$', TemplateView.as_view(template_name="winter_bird.jade")),
-    url(r'^experience_gold/$', ExperienceGoldView.as_view(), name="experience_gold"),
 )
 
 # app URL
@@ -145,8 +143,6 @@ urlpatterns += patterns(
     url(r'^app-invite-success/$', TemplateView.as_view(template_name="app_invite_success.jade")),
     url(r'^app-invite-error/$', TemplateView.as_view(template_name="app_invite_error.jade")),
     url(r'^app-invite-server/$', TemplateView.as_view(template_name="app_invite_server.jade")),
-    url(r'^app_experience/$', TemplateView.as_view(template_name="app_experience.jade")),
-    url(r'^experience_account/$', TemplateView.as_view(template_name="account.jade")),
 )
 
 urlpatterns += patterns(
@@ -161,6 +157,7 @@ urlpatterns += patterns(
     url(r'^investment/$', Investment.as_view(), name='day'),
 )
 
-#urlpatterns += patterns('',
-#    url(r'^xunlei/july/$', TemplateView.as_view(template_name="xunlei_july.jade"), name='xunlei_july_activity')
-#)
+urlpatterns += patterns(
+    '',
+    url(r'', include('experience_gold.urls'))
+)

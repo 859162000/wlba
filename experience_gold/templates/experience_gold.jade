@@ -12,23 +12,26 @@ html
         .experience_gold
             .banner
                 .draw_btn
-                    if user.is_authenticated
-                        a(href='javascript:void(0)').draw_btn_ed
+                  if user.is_authenticated
+                    if experience_count == 0
+                      a(href='javascript:void(0)').no_invest
                     else
-                      if p2p_record_count == 0 and experience_count == 0
-                        a(href='javascript:void(0)').draw_btn_ed
+                      if p2p_record_count == 0
+                        a(href='javascript:void(0)').invested
                       else
-                        a(href='/accounts/login/?next=/activity/experience_gold/')
+                        a(href='javascript:void(0)').draw_btn_ed  已领取体验金{{experience_all | money_format_int}}元
+                  else
+                    a(href='/accounts/login/?next=/activity/experience_gold/')
             .content.clearfix
                 .experience_title
                     span 我的体验金
                 ul.account_detail.clearfix
                     li
                         p.experience_name 总资产（元）
-                        p.experience_money {{total_experience_amount}}
+                        p.experience_money {{total_experience_amount | money_format}}
                     li
                         p.experience_name 体验金余额（元）
-                        p.experience_money {{experience_amount}}
+                        p.experience_money {{experience_amount | money_format_int}}
                     li
                         p.experience_name 到账收益（元）
                         p.experience_money {{paid_interest}}
@@ -42,7 +45,7 @@ html
                             ul.project_detail.clearfix
                                 li.li_one
                                   if experience_amount == 0
-                                    label 8888元
+                                    label 8,888元
                                   else
                                     label {{experience_amount}}元
                                   span 融资金额
@@ -55,7 +58,7 @@ html
                         .project_right
                           if experience_amount > 0
                             a(href='javascript:void(0)').investBtn 立即投资
-                            p.income_fonts(style='display:none') 将于2015-10-31收益13元
+                            p.income_fonts(style='display:none')
                           else
                             a.invest_ed 立即投资
                 if user.is_authenticated and experience_amortization
@@ -81,7 +84,7 @@ html
                                 tr
                                   td {{amo.created_time}}
                                   td {{amo.product.name}}
-                                  td {{amo.principal}}
+                                  td {{amo.principal | money_format_int}}
                                   td {{amo.product.expected_earning_rate}}%
                                   td {{amo.product.period}}
                                   if amo.settled
@@ -113,6 +116,8 @@ html
                                         p.mt40 部分合作渠道来源用户无法享受此活动奖励，网利宝对此活动享有最终解释权。
         #receiveSuccess(style='display:none')
             .receiveSuccess
+                p.money_count 8888
+                  span 元
                 p 恭喜您获得
                 p 8,888元体验金
                 p

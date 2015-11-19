@@ -11,18 +11,28 @@
   });
 
   require(['jquery',"tools"], function($,tool) {
-      $('.draw_btn_ing').on('click',function(){
+      $('.no_invest').on('click',function(){
           $('#receiveSuccess').modal()
           $('#receiveSuccess').find('.close-modal').hide()
       })
+      $('.invested').on('click',function(){
+          $('#oldUser').modal()
+          $('#oldUser').find('.close-modal').hide()
+      })
       $('.investBtn').on('click',function(){
-          $('#success').modal()
-          $('#success').find('.close-modal').hide()
-          setInterval(function(){
-            $.modal.close()
-            $('.investBtn').text('已投资8888元').addClass('invest_ed').removeClass('investBtn')
-            $('.income_fonts').show()
-          },2000)
+         $.ajax({
+            url: '/api/experience/buy/',
+            type: "POST",
+            data: {}
+         }).done(function (xhr) {
+            $('#success').modal()
+            $('#success').find('.close-modal').hide()
+            setInterval(function(){
+                $.modal.close()
+                $('.investBtn').text('已投资'+ xhr.amount +'元').addClass('invest_ed').removeClass('investBtn')
+                $('.income_fonts').show().text('将于'+ term_date +'收益'+ interest +'元')
+            },2000)
+         })
       })
       $('.more_btn').on('click',function(){
         $('.project_list').slideToggle()
