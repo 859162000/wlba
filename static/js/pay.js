@@ -29,7 +29,7 @@
       }
     });
     $.validator.addMethod('morethan100', function(value, element) {
-      return Number(value) >= 100;
+      return Number(value) >= 0.01;
     }, '充值金额100元起');
     $("#payform").validate({
       ignore: "",

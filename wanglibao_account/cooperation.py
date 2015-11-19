@@ -1029,7 +1029,7 @@ class JuChengRegister(CoopRegister):
         # 判断是否首次投资
         if p2p_record and p2p_record.order_id == order_id:
             p2p_amount = int(p2p_record.amount)
-            if p2p_amount>=1000 and p2p_amount<2000:
+            if p2p_amount>=500 and p2p_amount<1000:
                 try:
                     logger.debug(u"80门票，我要申请锁")
                     config = GiftOwnerGlobalInfo.objects.select_for_update().filter(description=u'jcw_ticket_80').first()
@@ -1045,7 +1045,7 @@ class JuChengRegister(CoopRegister):
                     logger.debug(u"用户 %s 获得80门票一张, 剩余：%s" % (user, config.amount))
                     SEND_SUCCESS = True
 
-            if p2p_amount>=2000:
+            if p2p_amount>=1000:
                 try:
                     logger.debug(u"180门票，我要申请锁")
                     config = GiftOwnerGlobalInfo.objects.select_for_update().filter(description=u'jcw_ticket_188').first()
@@ -3312,7 +3312,9 @@ class Rong360TokenView(APIView):
 
         ret = create_token(request)
         # {'state': True, 'data': token}
-        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+        if ret['state']:
+            rong_ret = {'data': {'token': ret['data']}}
+        return HttpResponse(renderers.JSONRenderer().render(rong_ret, 'application/json'))
 
 
 class Rong360P2PListView(APIView):
@@ -3368,9 +3370,9 @@ class Rong360P2PListView(APIView):
 
                     try:
                         p2p_dict = dict()
-                        p2p_dict['projectId'] = product.id
+                        p2p_dict['projectId'] = str(product.id)
                         p2p_dict['title'] = product.name
-                        p2p_dict['amount'] = product.total_amount
+                        p2p_dict['amount'] = decimal.Decimal(product.total_amount)
                         p2p_dict['schedule'] = str(product.completion_rate)
                         p2p_dict['interestRate'] = str(product.expected_earning_rate) + '%'
                         p2p_dict['deadline'] = product.period
@@ -3408,10 +3410,10 @@ class Rong360P2PListView(APIView):
                         equities = P2PEquity.objects.filter(product=product)
                         for equity in equities:
                             data_dic = dict()
-                            data_dic['subscribeUserName'] = equity.user.pk
-                            data_dic['amount'] = equity.equity
-                            data_dic['validAmount'] = equity.equity
-                            data_dic['addDate'] = equity.confirm_at
+                            data_dic['subscribeUserName'] = str(equity.user.pk)
+                            data_dic['amount'] = decimal.Decimal(equity.equity)
+                            data_dic['validAmount'] = decimal.Decimal(equity.equity)
+                            data_dic['addDate'] = equity.confirm_at or equity.created_at
                             data_dic['status'] = 1 if equity.confirm else 0
 
                             # 标识手动或自动投标 0:手动 1:自动
@@ -3440,7 +3442,7 @@ class Rong360P2PListView(APIView):
                 ret['totalPage'] = com_page
                 ret['currentPage'] = page_index
                 ret['totalCount'] = total
-                ret['totalAmount'] = total_amount
+                ret['totalAmount'] = decimal.Decimal(total_amount)
 
                 return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
             except Exception, e:

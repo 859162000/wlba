@@ -153,17 +153,17 @@ class WeixinJoinView(View):
                 reply = self.check_service_subscribe(msg, weixin_account)
                 # 自动回复  5000次／天
                 # if not reply:
+                #     if msg.content=='test':
+                #         reply = -1
+                #         product = P2PProduct.objects.get(id=1745)
+                #         checkAndSendProductTemplate(product)
+                # if not reply:
                 #     reply = tuling(msg)
                 if not reply:
                     # 多客服转接
                     reply = TransferCustomerServiceReply(message=msg)
-
-            # else:
-            #     reply = create_reply(u'更多功能，敬请期待！', msg)
-        if reply == -1:
+        if reply == -1 or not reply:
             return HttpResponse("")
-        if not reply:
-            reply = create_reply(u'这个是不是不需要回复什么的?', msg)
         return HttpResponse(reply.render())
 
 
@@ -197,15 +197,28 @@ class WeixinJoinView(View):
             # 可用余额（元）： 108.00
             # 累计收益（元）：  79.00
             # 待收收益（元）：  24.00
+            now_str = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M')
+            infos = "%s\n总资产　：%s \n可用余额：%s"%(account_info['p2p_total_paid_interest'], account_info['total_asset'], account_info['p2p_margin'])
             a = MessageTemplate(ACCOUNT_INFO_TEMPLATE_ID,
-                    keyword1=account_info['total_asset'],
-                    keyword2=account_info['p2p_margin'], keyword3=account_info['p2p_total_paid_interest'],
-                    keyword4=account_info['p2p_total_unpaid_interest'])
+                    keyword1=now_str,
+                    keyword2=infos)
             SendTemplateMessage.sendTemplate(w_user, a)
             reply = -1
         if msg.key == 'customer_service':
             txt = self.getCSReply()
-            reply = create_reply(txt, msg)
+            try:
+                client = WeChatClient(weixin_account.app_id, weixin_account.app_secret)
+                client.message._send_custom_message({
+                                            "touser":fromUserName,
+                                            "msgtype":"text",
+                                            "text":
+                                            {
+                                                 "content":txt
+                                            }
+                                        }, account="007@wanglibao400")
+            except:
+                pass
+            reply = -1#create_reply(txt, msg)
         return reply
 
     @checkBindDeco
@@ -475,7 +488,8 @@ class WeixinBind(TemplateView):
                         "name2":user.wanglibaouserprofile.phone,
                         "time":now_str,
                     })})
-        except WeixinUser.DoesNotExist:
+        except WeixinUser.DoesNotExist, e:
+            logger.debug(e.message)
             pass
         context['message'] = txt
         return {
