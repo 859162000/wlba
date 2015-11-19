@@ -1,22 +1,22 @@
-function Down(ele){
-        var curHeight = ele.height();
-        var autoHeight = ele.css('height', 'auto').height();
-        if (!ele.hasClass('down')){
-          ele.height(curHeight).animate({height: autoHeight},500,function(){
+function Down(ele) {
+    var curHeight = ele.height();
+    var autoHeight = ele.css('height', 'auto').height();
+    if (!ele.hasClass('down')) {
+        ele.height(curHeight).animate({height: autoHeight}, 500, function () {
             ele.addClass('down')
-          });
-        }else{
-          ele.height(curHeight).animate({height: 0},500,function(){
+        });
+    } else {
+        ele.height(curHeight).animate({height: 0}, 500, function () {
             ele.removeClass('down')
-          });
-        }
+        });
     }
-    $(".thanks-main p .title1-a").on("click", function () {
-        Down($(".app-thanks-giv"));
-    });
-    $(".thanks-main1 p .title1-a").on("click", function () {
-        Down($(".app-thanks-giv1"));
-    });
+}
+$(".thanks-main p .title1-a").on("click", function () {
+    Down($(".app-thanks-giv"));
+});
+$(".thanks-main1 p .title1-a").on("click", function () {
+    Down($(".app-thanks-giv1"));
+});
 
 //抽奖
 var lottery = {
@@ -111,19 +111,56 @@ window.onload = function () {
 };
 
 //无线滚动
-var timer,i= 1,j=2;
-timer = setInterval(function(){
-  scroll();
-},30)
+var timer, i = 1, j = 2;
+timer = setInterval(function () {
+    scroll();
+}, 30)
 
-function scroll(){
-  if (-parseInt($('.long-p').css('top'))>=$('.long-p p').height()){
-    $('.long-p p').eq(0).appendTo($('.long-p'));
-    $('.long-p').css({'top':'0px'})
-    i=0
-  }else{
-    i++
-    $('.long-p').css({'top':-i+'px'})
-  }
+function scroll() {
+    if (-parseInt($('.long-p').css('top')) >= $('.long-p p').height()) {
+        $('.long-p p').eq(0).appendTo($('.long-p'));
+        $('.long-p').css({'top': '0px'})
+        i = 0
+    } else {
+        i++
+        $('.long-p').css({'top': -i + 'px'})
+    }
 
+}
+var change = [];
+redpack({
+    'action': "GET_REWARD_INFO",
+    'activity': "thanks_given"
+    //'level': "5000+"
+}, function () {
+    //if (change['left'] == 0) {
+    //    $('.jiang-button').removeClass("jiang-button2");
+    //    $('.jiang-button').addClass("jiang-button1");
+    //    $('.prize-ri p').html('您没有抽奖机会');
+    //} else {
+    //    $('.app-jihui').text(change['left']);
+    //}
+});
+function redpack(data, callback) {
+    org.ajax({
+        url: '/api/activity/reward/',
+        type: "POST",
+        data: data,
+        async: false,
+        success: function (data) {
+            change = data;
+            callback && callback(data);
+            console.log(change);
+
+            // $('.app-jihui1').text(change['left']);
+
+            //if (change['is_first'] == false) {
+            //    $('.kuang-tidhi').addClass("kuang-tidhi12");
+            //} else if (change['is_first'] == true) {
+            //    $('.kuang-tidhi').removeClass("kuang-tidhi12");
+            //}
+            //
+            //$('#app-jiangli').text(change['reward']);
+        }
+    })
 }

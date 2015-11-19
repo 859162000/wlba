@@ -97,13 +97,6 @@
                     } else {
                         $('.prize-ri1 p span').text(change['left']);
                     }
-                    //alert(change['reward']);
-                    //$('.thanks').html('领取成功');
-                    //setTimeout(function () {
-                    //
-                    //     $('.thanks').html('领取奖品');
-                    //}, 1000);
-
                     $('.hongxi').show();
                     $('#thankgi-thanks2 ').text(change['reward']);
 

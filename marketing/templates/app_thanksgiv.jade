@@ -34,7 +34,10 @@ html(style="background:#7c37e8")
               .active1
               img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang14.png')
             td(colspan="3", rowspan="2").appprize-mingdan
-              a(href='javascript:void(0);').appjiang-button 立即抽奖
+              if user.is_authenticated
+                a(href='javascript:void(0);').appjiang-button.appjiang-button2 立即抽奖
+              else
+                a(href='javascript:void(0);').appjiang-button.appjiang-button1 立即抽奖
               .appjiang-ri
                 p
                   |你还有
