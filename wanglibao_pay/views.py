@@ -217,7 +217,7 @@ class YeeProxyPayCompleteView(TemplateView):
         result = YeeProxyPay().proxy_pay_callback(pay_message)
         # todo 增强错误处理
         return self.render_to_response({
-            'result': '支付成功' if result['ret_code'] == 0 else '支付失败',
+            'result': '充值成功' if result['ret_code'] == 0 else '充值失败',
             'amount': pay_message.amount
             })
 
