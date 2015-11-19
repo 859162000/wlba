@@ -1143,6 +1143,7 @@ class XunleiVipRegister(CoopRegister):
                 kwargs={'url': self.register_call_back_url, 'params': params, 'channel': self.c_code})
 
     def recharge_call_back(self, user, order_id):
+        logger.info("AAA-Enter recharge_call_back for xunlei9: [%s], [%s]" % (user.id, order_id))
         # 判断用户是否绑定和首次充值
         binding = Binding.objects.filter(user_id=user.id).first()
         penny = Decimal(0.01).quantize(Decimal('.01'))
@@ -1150,6 +1151,7 @@ class XunleiVipRegister(CoopRegister):
                                           status=PayInfo.SUCCESS).order_by('create_time').first()
 
         if binding and pay_info and pay_info.order_id == order_id:
+            logger.info("AAA-If amount for xunlei9: [%s], [%s], [%s]" % (order_id, binding.bid, pay_info.amount))
             # 判断充值金额是否大于100
             pay_amount = int(pay_info.amount)
             if pay_amount >= 100:
@@ -1161,6 +1163,7 @@ class XunleiVipRegister(CoopRegister):
                 self.xunlei_call_back(user, binding.bid, data, self.call_back_url)
 
     def purchase_call_back(self, user, order_id):
+        logger.info("AAA-Enter purchase_call_back for xunlei9: [%s], [%s]" % (user.id, order_id))
         # 判断用户是否绑定和首次投资
         binding = Binding.objects.filter(user_id=user.id).first()
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()

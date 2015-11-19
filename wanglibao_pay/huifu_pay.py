@@ -287,7 +287,7 @@ class HuifuPay(Pay):
                 # fix@chenweibi, add order_id
                 tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
                                                      "device": device, "order_id": order_id})
-                CoopRegister(request).process_for_recharge(pay_info.user, order_id)
+                CoopRegister(request).process_for_recharge(pay_info.user, pay_info.order_id)
             except:
                 pass
 
