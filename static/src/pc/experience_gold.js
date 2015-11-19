@@ -15,6 +15,10 @@
           $('#receiveSuccess').modal()
           $('#receiveSuccess').find('.close-modal').hide()
       })
+      $('.invested').on('click',function(){
+          $('#oldUser').modal()
+          $('#oldUser').find('.close-modal').hide()
+      })
       $('.investBtn').on('click',function(){
          $.ajax({
             url: '/api/experience/buy/',
@@ -26,7 +30,7 @@
             setInterval(function(){
                 $.modal.close()
                 $('.investBtn').text('已投资'+ xhr.amount +'元').addClass('invest_ed').removeClass('investBtn')
-                $('.income_fonts').show().text('将于'+ xhr.term_date +'收益'+ xhr.interest +'元')
+                $('.income_fonts').show().text('将于'+ term_date +'收益'+ interest +'元')
             },2000)
          })
       })

@@ -12,23 +12,26 @@ html
         .experience_gold
             .banner
                 .draw_btn
-                    if user.is_authenticated
-                        a(href='javascript:void(0)').draw_btn_ed  已领取体验金8,888元
+                  if user.is_authenticated
+                    if experience_count == 0
+                      a(href='javascript:void(0)').no_invest
                     else
-                      if p2p_record_count == 0 and experience_count == 0
-                        a(href='javascript:void(0)').draw_btn_ed
+                      if p2p_record_count == 0
+                        a(href='javascript:void(0)').invested
                       else
-                        a(href='/accounts/login/?next=/activity/experience_gold/')
+                        a(href='javascript:void(0)').draw_btn_ed  已领取体验金{{experience_all | money_format_int}}元
+                  else
+                    a(href='/accounts/login/?next=/activity/experience_gold/')
             .content.clearfix
                 .experience_title
                     span 我的体验金
                 ul.account_detail.clearfix
                     li
                         p.experience_name 总资产（元）
-                        p.experience_money {{total_experience_amount}}
+                        p.experience_money {{total_experience_amount | money_format}}
                     li
                         p.experience_name 体验金余额（元）
-                        p.experience_money {{experience_amount}}
+                        p.experience_money {{experience_amount | money_format_int}}
                     li
                         p.experience_name 到账收益（元）
                         p.experience_money {{paid_interest}}
@@ -42,7 +45,7 @@ html
                             ul.project_detail.clearfix
                                 li.li_one
                                   if experience_amount == 0
-                                    label 8888元
+                                    label 8,888元
                                   else
                                     label {{experience_amount}}元
                                   span 融资金额
@@ -81,7 +84,7 @@ html
                                 tr
                                   td {{amo.created_time}}
                                   td {{amo.product.name}}
-                                  td {{amo.principal}}
+                                  td {{amo.principal | money_format_int}}
                                   td {{amo.product.expected_earning_rate}}%
                                   td {{amo.product.period}}
                                   if amo.settled
