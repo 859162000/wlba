@@ -22,13 +22,13 @@ html(style="background:#fc9300")
                                 if p2p_record_count == 0
                                     img(src='/static/imgs/mobile_activity/app_experience/btn.png').no_invest
                                 else
-                                    img(src='/static/imgs/mobile_activity/app_experience/btn.png').invested
+                                    img(src='/static/imgs/mobile_activity/app_experience/btn.png').investeds
                             else
                                 .invested 已领取体验金{{experience_all | money_format_int}}元
                         else
                             a(href='/weixin/regist/?next=/activity/experience/mobile/')
                                 img(src='/static/imgs/mobile_activity/app_experience/btn.png')
-                        .invested#edT(style='display:none')
+                        .investedH#edT(style='display:none')
                 .my_experience_gold
                     .title
                         .title_img 我的体验金
