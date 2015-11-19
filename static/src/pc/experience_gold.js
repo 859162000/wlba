@@ -58,11 +58,11 @@
                 var par = $('#receiveSuccess');
                 $('#receiveSuccess').modal()
                 par.find('.close-modal').hide()
-                par.find('.money_count').text(xhr.money_count)
-                par.find('.money_counts').text(xhr.money_count+'元体验金')
-                $('.tyjye').text(Number($('.tyjye').text)+xhr.money_count)
-                $('.zzc').text(Number($('.zzc').text)+xhr.money_count)
-                $('.rzje').text(xhr.money_count+'元')
+                par.find('.money_count').text(xhr.data.amount)
+                par.find('.money_counts').text(xhr.data.amount+'元体验金')
+                $('.tyjye').text(parseFloat($('.tyjye').text())+xhr.data.amount)
+                $('.zzc').text(parseFloat($('.zzc').text())+xhr.data.amount)
+                $('.rzje').text(xhr.data.amount+'元')
                 $('.invest_ed').removeClass('invest_ed').addClass('investBtn');
             }
          })
@@ -70,7 +70,7 @@
       $('.invested').on('click',function(){
           $('#oldUser').modal()
       })
-      $('.investBtn').on('click',function(){
+      $('.project_right').delegate('.investBtn','click',function() {
          $.ajax({
             url: '/api/experience/buy/',
             type: "POST",
@@ -80,8 +80,8 @@
             $('#success').find('.close-modal').hide()
             setInterval(function(){
                 $.modal.close()
-                $('.investBtn').text('已投资'+ xhr.amount +'元').addClass('invest_ed').removeClass('investBtn')
-                $('.income_fonts').show().text('将于'+ xhr.term_date +'收益'+ xhr.interest +'元')
+                $('.investBtn').text('已投资'+ xhr.data.amount +'元').addClass('invest_ed').removeClass('investBtn')
+                $('.income_fonts').show().text('将于'+ xhr.data.term_date +'收益'+ xhr.data.interest +'元')
             },2000)
          })
       })
