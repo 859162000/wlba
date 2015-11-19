@@ -15,7 +15,7 @@ html(style="background:#7c37e8")
         tbody
           tr
             td.lottery-unit.lottery-unit-0
-              .active1.active
+              .active1
               img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang1.png')
             td.lottery-unit.lottery-unit-1
               .active1
@@ -31,6 +31,7 @@ html(style="background:#7c37e8")
               img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang5.png')
           tr
             td.lottery-unit.lottery-unit-13
+              .active1
               img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang14.png')
             td(colspan="3", rowspan="2").appprize-mingdan
               a(href='javascript:void(0);').appjiang-button 立即抽奖
@@ -41,22 +42,30 @@ html(style="background:#7c37e8")
                   |次抽奖机会
                 a(href='javascript:void(0);').jiang-a 投资赢抽奖机会>>
             td.lottery-unit.lottery-unit-5
+              .active1
               img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang6.png')
           tr
             td.lottery-unit.lottery-unit-12
+              .active1
               img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang13.png')
             td.lottery-unit.lottery-unit-6
+              .active1
               img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang7.png')
           tr
             td.lottery-unit.lottery-unit-11
+              .active1
               img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang12.png')
             td.lottery-unit.lottery-unit-10
+              .active1
               img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang11.png')
             td.lottery-unit.lottery-unit-9
+              .active1
               img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang10.png')
             td.lottery-unit.lottery-unit-8
+              .active1
               img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang9.png')
             td.lottery-unit.lottery-unit-7
+              .active1
               img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang8.png')
     .appprize-le
       h2 中奖用户名单
@@ -157,7 +166,7 @@ html(style="background:#7c37e8")
         p
           |立即
           a(href='javascript:void(0);').title1-a 查看活动规则>>
-      .app-thanks-giv
+      .app-thanks-giv1
         h6 【加息券和红包规则】
         ul
           li 1、红包和加息券有效期：自领取日起10天内有效；
@@ -170,10 +179,13 @@ html(style="background:#7c37e8")
         p 单笔投资100元~4999元用户不用愁，100%获得阳光普照大奖，所有奖品随机发送。全民大福利，根本停不下来！
       img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiangduo.png')
       .appjiang-ri
-        p
-          |你还有
-          span 1
-          |次抽奖机会
+        if user.is_authenticated
+          p
+            |你还有
+            span
+            |次抽奖机会
+        else
+          p
         if user.is_authenticated
           a(href='javascript:void(0);').app-thanks 领取奖品
         else
