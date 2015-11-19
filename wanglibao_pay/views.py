@@ -202,7 +202,7 @@ class PayCallback(View):
         return super(PayCallback, self).dispatch(request, *args, **kwargs)
 
 class YeeProxyPayCompleteView(TemplateView):
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         # result = HuifuPay.handle_pay_result(request)
         # amount = request.POST.get('OrdAmt', '')
         #
@@ -210,7 +210,7 @@ class YeeProxyPayCompleteView(TemplateView):
         #     'result': result,
         #     'amount': amount
         # })
-        pay_message = YeeProxyPayCallbackMessage().parse_message(request.POST)
+        pay_message = YeeProxyPayCallbackMessage().parse_message(request.GET)
         YeeProxyPay().proxy_pay_callback(pay_message)
         # todo 增强错误处理
         return self.render_to_response({
