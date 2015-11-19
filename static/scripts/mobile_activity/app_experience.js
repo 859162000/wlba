@@ -290,11 +290,29 @@ org.experience = (function(org){
         },
         _goExperienceBtn:function(){
             //goExperienceBtn 新用户领取成功
-            $goExperienceBtn = $('#goExperienceBtn');
+            $goExperienceBtn = $('.no_invest');
             $goExperienceBtn.on('click',function(){
-                org.ui.alert('',function(){
-                    $('body,html').scrollTo($('.project').offset().top);
-                },'1')
+            org.ajax({
+                url: '/api/experience/get_experience/',
+                type: 'POST',
+                data: {},
+                success:function(data){
+                    if(data.ret_code == 0) {
+                        org.ui.alert('', function () {
+                            $('body,html').scrollTo($('.project').offset().top);
+                        }, '1')
+
+                        $('.qianshu').html(data.data.amount+'<span>元</span>')
+                        $('.icon2').text(data.data.amount+'元体验金')
+                        $('.tyjye').text(parseFloat($('.tyjye').text())+data.data.amount)
+                        $('.zzc').text(parseFloat($('.zzc').text())+data.data.amount)
+                        $('.rzje').text(data.data.amount+'元')
+                        $('.investBtn').removeClass('investBtnEd');
+                    }
+                },
+                error: function () {
+                }
+              });
             })
             //老用户
             $oldUser = $('#oldUser');
@@ -303,8 +321,8 @@ org.experience = (function(org){
             })
         },
         _goInvest:function(){
-            $('.project_right').delegate('.investBtn','click',function() {
-                if (!$investBtn.hasClass('investBtnEd')) {
+            $('.project_btn').delegate('.investBtn','click',function() {
+                if (!$('investBtn').hasClass('investBtnEd')) {
                   org.ajax({
                     url: '/api/experience/buy/',
                     type: 'POST',
@@ -313,8 +331,8 @@ org.experience = (function(org){
                         org.ui.alert('', '', '2')
                         setTimeout(function () {
                             $('#alert-cont,#popubMask').hide();
-                            $('.investBtn').text('已投资'+ data.amount +'元').addClass('investBtnEd').removeClass('investBtn')
-                            $('.time_style').show().text('将于'+ data.term_date +'收益'+ data.interest +'元')
+                            $('.investBtn').text('已投资'+ data.data.amount +'元').addClass('investBtnEd').removeClass('investBtn')
+                            $('.time_style').show().text('将于'+ data.data.term_date +'收益'+ data.data.interest +'元')
                         }, 2000)
                     },
                     error: function (xhr) {
