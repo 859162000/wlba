@@ -167,7 +167,7 @@ class WeixinAccounts(object):
         'id': 'gh_f758af6347b6',
         'name': '网利宝',
         'app_id': 'wx896485cecdb4111d',
-        'app_secret': 'b1e152144e4a4974cd06b8716faa98e1',
+        'app_secret': '64c4a31828b47cbff0575a52df235ff3',
         'classify': '微信认证服务号',
         'mch_id': '1237430102',
         'key': 'mmeBOdBjuovQOgPPSp1qZFONbHS9pkZn',
