@@ -218,22 +218,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }
 })();
 ;(function(org){
-    $('.act_rule_button').on('click',function(){
-        var ele = $('.act_rule_wrap');
-        var curHeight = ele.height();
-        var autoHeight = ele.css('height', 'auto').height();
-        if (!ele.hasClass('down')){
-            $('.act_rule_button img').addClass('rotate');
-            ele.height(curHeight).animate({height: autoHeight},500,function(){
-                ele.addClass('down');
-            });
-        }else{
-            $('.act_rule_button img').removeClass('rotate');
-            ele.height(curHeight).animate({height: 0},500,function(){
-            	ele.removeClass('down');
-            });
-        }
-    })
 
 	var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({
