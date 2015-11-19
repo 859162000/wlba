@@ -87,18 +87,21 @@ org.experience = (function(org){
             $investBtn = $('.investBtn');
             $investBtn.on('click',function() {
                 if (!$investBtn.hasClass('investBtnEd')) {
-                org.ajax({
+                  org.ajax({
                     url: '/api/experience/buy/',
-                    type: "POST",
-                    data: {}
-                 }).done(function (xhr) { 
-                    org.ui.alert('', '', '2')
-                    setTimeout(function () {
-                        $('#alert-cont,#popubMask').hide();
-                        $('.investBtn').text('已投资'+ xhr.amount +'元').addClass('investBtnEd')
-                        $('.time_style').show().text('将于'+ xhr.term_date +'收益'+ xhr.interest +'元')
-                    }, 2000)
-                 })
+                    type: 'POST',
+                    data: {},
+                    success:function(data){
+                        org.ui.alert('', '', '2')
+                        setTimeout(function () {
+                            $('#alert-cont,#popubMask').hide();
+                            $('.investBtn').text('已投资'+ data.amount +'元').addClass('investBtnEd')
+                            $('.time_style').show().text('将于'+ data.term_date +'收益'+ data.interest +'元')
+                        }, 2000)
+                    },
+                    error: function (xhr) {
+                    }
+                  });
                 }
             })
         },
