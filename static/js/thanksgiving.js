@@ -59,12 +59,16 @@
             //点击抽奖
             lottery.init('lottery');
             $(".jiang-button2").click(function () {
+                if (change['left'] == 0) {
+                    return;
+                }
                 redpack({
                     'action': "POINT_AT",
                     'activity': "thanks_given",
                     'level': "5000+"
                 }, function () {
                     if (change['left'] == 0) {
+                        //e.stopPropagation();
                         $('.jiang-button').removeClass("jiang-button2");
                         $('.jiang-button').addClass("jiang-button1");
                         $('.prize-ri p').html('您没有抽奖机会');
@@ -222,7 +226,7 @@
         var change = [];
         redpack({
             'action': "GET_REWARD_INFO",
-            'activity': "thanks_given",
+            'activity': "thanks_given"
             //'level': "5000+"
         }, function () {
             if (change['left'] == 0) {

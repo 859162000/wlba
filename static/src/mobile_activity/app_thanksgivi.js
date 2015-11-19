@@ -17,8 +17,17 @@ $(".thanks-main p .title1-a").on("click", function () {
 $(".thanks-main1 p .title1-a").on("click", function () {
     Down($(".app-thanks-giv1"));
 });
+var change = [];
 
 //抽奖
+var arr = ['扫地机器人', '感恩节200元现金红包', '感恩节1.8%加息券', '感恩节10元现金红包', 'iPhone6s plus', '感恩节2.2%加息券', 'beats头戴式耳机', '感恩节80元现金红包', '感恩节1%加息券', '感恩节400元现金红包', '霍尼韦尔空气净化器', '感恩节1.5%加息券', '感恩节600元现金红包', '感恩节1年迅雷会员'];
+arr.indexof = function (value) {
+    var a = this;
+    for (var i = 0; i < a.length; i++) {
+        if (a[i] == value)
+            return i;
+    }
+}
 var lottery = {
     index: -1,	//当前转动到哪个位置，起点位置
     count: 0,	//总共有多少个位置
@@ -66,7 +75,11 @@ function roll() {
         lottery.prize = -1;
         lottery.times = 0;
         //奖品弹出位子
-        alert(123);
+        $('.app-jiangshow').css('display', 'block');
+        $('#app-jiangli0').text(change['reward']);
+        setTimeout(function(){
+          $('.app-jiangshow').css('display', 'none');
+        },3000);
         click = false;
     } else {
         if (lottery.times < lottery.cycle) {
@@ -74,7 +87,7 @@ function roll() {
         } else if (lottery.times == lottery.cycle) {
             //奖品位置
             //var index = Math.random() * (lottery.count) | 0;
-            var index = 6
+            var index = arr.indexof(change['reward'])
             lottery.prize = index;
         } else {
             if (lottery.times > lottery.cycle + 10 && ((lottery.prize == 0 && lottery.index == 7) || lottery.prize == lottery.index + 1)) {
@@ -97,19 +110,66 @@ var click = false;
 
 window.onload = function () {
     lottery.init('lottery');
-    $("#lottery .appjiang-button").click(function () {
-        if (click) {
-            return false;
-        } else {
-            lottery.speed = 100;
-            roll();
-            click = true;
-            //alert(4);
-            return false;
+    $("#lottery .appjiang-button2").click(function () {
+        if (change['left'] == 0) {
+            return;
         }
+        redpack({
+            'action': "POINT_AT",
+            'activity': "thanks_given",
+            'level': "5000+"
+        }, function () {
+            if (change['left'] == 0) {
+                $('.appjiang-button').removeClass("appjiang-button2");
+                $('.appjiang-button').addClass("appjiang-button1");
+                $('.appjiang-ri p').html('您没有抽奖机会');
+            } else {
+                $('.appjiang-ri p span').text(change['left']);
+            }
+            if (click) {
+                return false;
+            } else {
+                lottery.speed = 100;
+                roll();
+                click = true;
+                //alert(4);
+                return false;
+            }
+
+        })
     });
 };
+redpack({
+    'action': "GET_REWARD_INFO",
+    'activity': "thanks_given"
+    //'level': "5000+"
+}, function () {
+    if (change['left'] == 0) {
+        $('.appjiang-button').removeClass("appjiang-button2");
+        $('.appjiang-button').addClass("appjiang-button1");
+        $('.appjiang-ri p').html('您没有抽奖机会');
+    } else {
+        $('.appjiang-ri p span').text(change['left']);
+    }
+});
+//名单
+var str = '';
+if (change['ret_code'] != 1000) {
+    redpack({
+        'action': 'GET_REWARD',
+        'activity': "thanks_given",
+        'level': "5000+"
+    },function () {
+        for (var k = 0, len2 = change['phone'].length; k < len2; k++) {
+            var tel = change['phone'][k].substring(0, 3) + "******" + change['phone'][k].substring(9, 11);
 
+            str += '<p>恭喜' + tel + '获得<span>' + change['rewards'][k] + '</span></p>';
+            //console.log(str);
+        }
+
+        $('.long-p').append(str);
+    });
+}
 //无线滚动
 var timer, i = 1, j = 2;
 timer = setInterval(function () {
@@ -127,19 +187,19 @@ function scroll() {
     }
 
 }
-var change = [];
+
 redpack({
     'action': "GET_REWARD_INFO",
     'activity': "thanks_given"
     //'level': "5000+"
 }, function () {
-    //if (change['left'] == 0) {
-    //    $('.jiang-button').removeClass("jiang-button2");
-    //    $('.jiang-button').addClass("jiang-button1");
-    //    $('.prize-ri p').html('您没有抽奖机会');
-    //} else {
-    //    $('.app-jihui').text(change['left']);
-    //}
+    if (change['left'] == 0) {
+        $('.jiang-button').removeClass("jiang-button2");
+        $('.jiang-button').addClass("jiang-button1");
+        $('.prize-ri p').html('您没有抽奖机会');
+    } else {
+        $('.app-jihui').text(change['left']);
+    }
 });
 function redpack(data, callback) {
     org.ajax({
@@ -160,7 +220,7 @@ function redpack(data, callback) {
             //    $('.kuang-tidhi').removeClass("kuang-tidhi12");
             //}
             //
-            //$('#app-jiangli').text(change['reward']);
+           // $('#app-jiangli0').text(change['reward']);
         }
     })
 }
