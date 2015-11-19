@@ -152,23 +152,18 @@ class WeixinJoinView(View):
             if isinstance(msg, TextMessage):
                 reply = self.check_service_subscribe(msg, weixin_account)
                 # 自动回复  5000次／天
-                if not reply:
-                    if msg.content=='test':
-                        reply = -1
-                        product = P2PProduct.objects.get(id=1745)
-                        checkAndSendProductTemplate(product)
-                if not reply:
-                    reply = tuling(msg)
+                # if not reply:
+                #     if msg.content=='test':
+                #         reply = -1
+                #         product = P2PProduct.objects.get(id=1745)
+                #         checkAndSendProductTemplate(product)
+                # if not reply:
+                #     reply = tuling(msg)
                 if not reply:
                     # 多客服转接
                     reply = TransferCustomerServiceReply(message=msg)
-
-            # else:
-            #     reply = create_reply(u'更多功能，敬请期待！', msg)
-        if reply == -1:
+        if reply == -1 or not reply:
             return HttpResponse("")
-        if not reply:
-            reply = create_reply(u'这个是不是不需要回复什么的?', msg)
         return HttpResponse(reply.render())
 
 
