@@ -874,8 +874,18 @@ class DistributeRewardAPIView(APIView):
             return HttpResponse(json.dumps(json_to_response), content_type="application/json")
 
 
-class ThanksGivingDistribute(object):
+class ActivityRewardDistribute(object):
+    def __init__(self):
+        self.token = ''  #用户从前端传入的activity(POST/GET)
+        pass
 
+    def distribute(self):
+        """发奖接口，必须被实现
+        """
+        raise NotImplementedError(u"抽象类中的方法，子类中需要被实现")
+
+
+class ThanksGivingDistribute(ActivityRewardDistribute):
     def __init__(self):
         self.token = 'thanks_given'
 
