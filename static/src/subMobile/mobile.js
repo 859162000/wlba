@@ -805,9 +805,6 @@ org.regist = (function(org){
         var isNum = goods;
         var nowNum = 0;
         var awardAction = "ENTER_WEB_PAGE";
-        if(self.hasClass("had-click")){
-            return;
-        }
         if(awardsNum === 0){
             $("#page-bg").show();
             $("#alt-promot").text("大奖明天见，网利宝天天见。");
