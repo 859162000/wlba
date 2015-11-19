@@ -1143,6 +1143,8 @@ class XunleiVipRegister(CoopRegister):
                 kwargs={'url': self.register_call_back_url, 'params': params, 'channel': self.c_code})
 
     def recharge_call_back(self, user, order_id):
+        logger.info("Enter recharge_call_back for xunlei9.")
+
         # 判断用户是否绑定和首次充值
         binding = Binding.objects.filter(user_id=user.id).first()
         penny = Decimal(0.01).quantize(Decimal('.01'))
