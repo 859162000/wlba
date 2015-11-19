@@ -229,7 +229,7 @@ class WeixinJoinView(View):
         reply = None
         txt = None
         if content == 'td':
-            sub_records = SubscribeRecord.objects.filter(user=w_user.user, status=True)
+            sub_records = SubscribeRecord.objects.filter(w_user=w_user, status=True)
             if sub_records.exists():
                 sub_records.update(status=False)
                 txt = u'订阅项目已退订成功，如需订阅相关项目，请再次点击【个性化项目】进行订阅'
@@ -239,13 +239,13 @@ class WeixinJoinView(View):
             return reply
         sub_service = SubscribeService.objects.filter(channel='weixin', is_open=True, key=content).first()
         if sub_service:
-            sub_service_record = SubscribeRecord.objects.filter(user=w_user.user, service = sub_service).first()
+            sub_service_record = SubscribeRecord.objects.filter(w_user=w_user, service = sub_service).first()
             if sub_service_record and sub_service_record.status==1:
                 txt = u'客官真健忘，您已经订阅此项目通知，订阅其他上线通知项目吧～'
             if not sub_service_record:
                 sub_service_record = SubscribeRecord()
                 sub_service_record.service = sub_service
-                sub_service_record.user = w_user.user
+                sub_service_record.w_user = w_user
             if not sub_service_record.status:
                 sub_service_record.status = True
                 sub_service_record.save()

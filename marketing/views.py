@@ -2499,7 +2499,7 @@ class RewardDistributeAPIView(APIView):
                 join_log.save()
                 return "No Reward"
             else:
-                redpack_event = self.redpacks.get(join_log.amount)
+                redpack_event = self.redpacks.get(float(join_log.amount))
         except Exception, reason:
             logger.debug(u"获得用户的预配置红包抛异常, reason:{0}".format(reason))
         else:

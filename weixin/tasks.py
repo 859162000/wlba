@@ -29,21 +29,21 @@ def detect_product_biding(product_id):
         if period == service.num_limit:
             sub_records = SubscribeRecord.objects.filter(service=service).all()
             for sub_record in sub_records:
-                sendUserProductOnLine.apply_async(kwargs={
-                        "uid": sub_record.user.id,
-                        "service_desc": service.describe,
-                        "product_id": product.id,
-                        "product_name": product.name,
-                        "rate_desc": rate_desc,
-                        "period_desc": period_desc,
-                        "pay_method": product.pay_method,
-                    })
+                if sub_record.w_user and sub_record.w_user.subscribe==1 and sub_record.w_user.user:
+                    sendUserProductOnLine.apply_async(kwargs={
+                            "openid": sub_record.w_user.openid,
+                            "service_desc": service.describe,
+                            "product_id": product.id,
+                            "product_name": product.name,
+                            "rate_desc": rate_desc,
+                            "period_desc": period_desc,
+                            "pay_method": product.pay_method,
+                        })
 
 @app.task
-def sendUserProductOnLine(uid, service_desc, product_id, product_name, rate_desc, period_desc, pay_method):
-    user = User.objects.get(pk=uid)
-    w_user = WeixinUser.objects.filter(user=user).first()
-    if w_user and w_user.subscribe==1:
+def sendUserProductOnLine(openid, service_desc, product_id, product_name, rate_desc, period_desc, pay_method):
+    w_user = WeixinUser.objects.filter(openid=openid).first()
+    if w_user and w_user.subscribe==1 and w_user.user:
         url = settings.CALLBACK_HOST + '/weixin/view/detail/%s/'%product_id
         template = MessageTemplate(PRODUCT_ONLINE_TEMPLATE_ID,
             first=service_desc, keyword1=product_name, keyword2=rate_desc,

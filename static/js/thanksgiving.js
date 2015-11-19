@@ -58,8 +58,19 @@
         window.onload = function () {
             //点击抽奖
             lottery.init('lottery');
-            $("#lottery .jiang-button2").click(function () {
-                redpack('POINT_AT', function (data) {
+            $(".jiang-button2").click(function () {
+                redpack({
+                    'action': "POINT_AT",
+                    'activity': "thanks_given",
+                    'level': "5000+"
+                }, function () {
+                    if (change['left'] == 0) {
+                        $('.jiang-button').removeClass("jiang-button2");
+                        $('.jiang-button').addClass("jiang-button1");
+                        $('.prize-ri p').html('您没有抽奖机会');
+                    } else {
+                        $('.app-jihui').text(change['left']);
+                    }
                     if (click) {
                         return false;
                     } else {
@@ -69,17 +80,37 @@
                         //alert(4);
                         return false;
                     }
+
                 })
-                //if (click) {
-                //    return false;
-                //} else {
-                //    lottery.speed = 100;
-                //    roll();
-                //    click = true;
-                //    //alert(4);
-                //    return false;
-                //}
             });
+            //抽奖2
+            $('.thanks2 ').on('click', function () {
+                redpack({
+                    'action': "POINT_AT",
+                    'activity': "thanks_given",
+                    'level': "5000-"
+                }, function () {
+                    if (change['left'] == 0) {
+                        $('.thanks').removeClass("thanks2");
+                        $('.thanks').addClass("thanks1");
+                        $('.prize-ri1 p').html('您没有抽奖机会');
+                    } else {
+                        $('.prize-ri1 p span').text(change['left']);
+                    }
+                    //alert(change['reward']);
+                    //$('.thanks').html('领取成功');
+                    //setTimeout(function () {
+                    //
+                    //     $('.thanks').html('领取奖品');
+                    //}, 1000);
+
+                    $('.hongxi').show();
+                    $('#thankgi-thanks2 ').text(change['reward']);
+
+
+                    return false;
+                })
+            })
             //banner动画
             document.getElementsByTagName('body')[0].onmousemove = function (e) {
                 var x = e.clientX, y = e.clientY;
@@ -196,10 +227,59 @@
             $('.title1-guizhe1').slideToggle();
         })
         var change = [];
-        redpack('GET_REWARD_INFO');
-        redpack('GET_REWARD');
+        redpack({
+            'action': "GET_REWARD_INFO",
+            'activity': "thanks_given",
+            //'level': "5000+"
+        }, function () {
+            if (change['left'] == 0) {
+                $('.jiang-button').removeClass("jiang-button2");
+                $('.jiang-button').addClass("jiang-button1");
+                $('.prize-ri p').html('您没有抽奖机会');
+            } else {
+                $('.app-jihui').text(change['left']);
+            }
+        });
+        redpack({
+            'action': 'GET_REWARD_INFO',
+            'activity': "thanks_given",
+            'level': "5000-"
+        }, function () {
+            if (change['left'] == 0) {
+                $('.thanks').removeClass("thanks2");
+                $('.thanks').addClass("thanks1");
+                $('.prize-ri1 p').html('您没有抽奖机会');
+            } else {
+                $('.prize-ri1 p span').text(change['left']);
+            }
+
+
+        });
+        //名单
+        var str = '';
+        if (change['ret_code'] != 1000) {
+            redpack({
+                    'action': 'GET_REWARD',
+                    'activity': "thanks_given",
+                    'level': "5000+"
+                },
+                function () {
+                    //console.log(change['phone'])
+                    //console.log(change['rewards'])
+
+                    for (var k = 0, len2 = change['phone'].length; k < len2; k++) {
+                        var tel = change['phone'][k].substring(0, 3) + "******" + change['phone'][k].substring(9, 11);
+
+                        str += '<p>恭喜' + tel + '获得<span>' + change['rewards'][k] + '</span></p>';
+                        //console.log(str);
+                    }
+
+                    $('.long-p').append(str);
+                });
+        }
+
         //抽奖
-        var arr = ['扫地机器人', '200元现金红包', '1.8%加息券', '10元现金红包', 'iPhone6s plus', '2.2%加息券', 'beats头戴式耳机', '80元现金红包', '1%加息券', '400元现金红包', '霍尼韦尔空气净化器', '1.5%加息券', '600元现金红包', '1年迅雷会员'];
+        var arr = ['扫地机器人', '感恩节200元现金红包', '感恩节1.8%加息券', '感恩节10元现金红包', 'iPhone6s plus', '感恩节2.2%加息券', 'beats头戴式耳机', '感恩节80元现金红包', '感恩节1%加息券', '感恩节400元现金红包', '霍尼韦尔空气净化器', '感恩节1.5%加息券', '感恩节600元现金红包', '感恩节1年迅雷会员'];
         arr.indexof = function (value) {
             var a = this;
             for (var i = 0; i < a.length; i++) {
@@ -294,27 +374,23 @@
 
         var click = false;
 
-        function redpack(sum, callback) {
+        function redpack(data, callback) {
             $.ajax({
                 url: '/api/activity/reward/',
                 type: "POST",
-                data: {"action": sum, "activity": "thanks_given"},
+                data: data,
                 async: false
             }).done(function (data) {
                 change = data;
                 callback && callback(data);
                 console.log(change);
-                if(change['left']==0){
-                    $('.jiang-button').removeClass("jiang-button2");
-                    $('.jiang-button').addClass("jiang-button1");
-                    $('.prize-ri p').html('您没有抽奖机会');
-                }else{
-                    $('.app-jihui').text(change['left']);
-                }
-                if(change['is_first']==false){
+
+                // $('.app-jihui1').text(change['left']);
+
+                if (change['is_first'] == false) {
                     $('.kuang-tidhi').addClass("kuang-tidhi12");
-                }else if(change['is_first']==true){
-                     $('.kuang-tidhi').removeClass("kuang-tidhi12");
+                } else if (change['is_first'] == true) {
+                    $('.kuang-tidhi').removeClass("kuang-tidhi12");
                 }
 
                 $('#app-jiangli').text(change['reward']);
