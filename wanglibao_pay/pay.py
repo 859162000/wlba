@@ -348,7 +348,6 @@ class YeeProxyPayCallbackMessage(PayMessage):
         else:
             para_order = response_para_order
         str_to_sign = ''.join([str(para_dict.get(k, '')) for k in para_order])
-        logger.debug(str(para_dict) + secret_key + str_to_sign)
         hmac_str = hmac.new(secret_key, str_to_sign).hexdigest()
         return hmac_str
 
@@ -400,7 +399,9 @@ class YeeProxyPay(object):
             'p3_Amt': amount,
             'p4_Cur': 'CNY',
             # 商品名称， Max（20）,p6, p7为商品分类，描述，我们暂时就不传了
-            'p5_Pid': '网利宝最专业的选择',
+            # 'p5_Pid': '网利宝最专业的P2P之选',
+            # todo 中文商品名称
+            'p5_Pid': 'Wanglibao',
             # 回调地址， Max（200）,页面回调地址
             'p8_Url': settings.YEE_PROXY_PAY_WEB_CALLBACK_URL,
             'hmac': ''
