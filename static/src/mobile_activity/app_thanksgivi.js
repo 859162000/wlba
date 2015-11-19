@@ -14,6 +14,9 @@ function Down(ele){
     $(".thanks-main p .title1-a").on("click", function () {
         Down($(".app-thanks-giv"));
     });
+    $(".thanks-main1 p .title1-a").on("click", function () {
+        Down($(".app-thanks-giv1"));
+    });
 
 //抽奖
 var lottery = {

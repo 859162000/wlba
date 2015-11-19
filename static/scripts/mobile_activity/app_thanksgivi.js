@@ -233,6 +233,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     $(".thanks-main p .title1-a").on("click", function () {
         Down($(".app-thanks-giv"));
     });
+    $(".thanks-main1 p .title1-a").on("click", function () {
+        Down($(".app-thanks-giv1"));
+    });
 
 //抽奖
 var lottery = {
