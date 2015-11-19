@@ -89,6 +89,9 @@
             });
             //抽奖2
             $('.thanks2 ').on('click', function () {
+                if (change['left'] == 0) {
+                    return;
+                }
                 redpack({
                     'action': "POINT_AT",
                     'activity': "thanks_given",

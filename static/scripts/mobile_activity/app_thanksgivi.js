@@ -237,7 +237,6 @@ $(".thanks-main1 p .title1-a").on("click", function () {
     Down($(".app-thanks-giv1"));
 });
 var change = [];
-
 //抽奖
 var arr = ['扫地机器人', '感恩节200元现金红包', '感恩节1.8%加息券', '感恩节10元现金红包', 'iPhone6s plus', '感恩节2.2%加息券', 'beats头戴式耳机', '感恩节80元现金红包', '感恩节1%加息券', '感恩节400元现金红包', '霍尼韦尔空气净化器', '感恩节1.5%加息券', '感恩节600元现金红包', '感恩节1年迅雷会员'];
 arr.indexof = function (value) {
@@ -341,9 +340,9 @@ window.onload = function () {
             if (change['left'] == 0) {
                 $('.appjiang-button').removeClass("appjiang-button2");
                 $('.appjiang-button').addClass("appjiang-button1");
-                $('.appjiang-ri p').html('您没有抽奖机会');
+                $('.appprize-mingdan .appjiang-ri p').html('您没有抽奖机会');
             } else {
-                $('.appjiang-ri p span').text(change['left']);
+                $('.appprize-mingdan .appjiang-ri p span').text(change['left']);
             }
             if (click) {
                 return false;
@@ -357,28 +356,68 @@ window.onload = function () {
 
         })
     });
+    //抽奖2
+    $('.app-thanksbu2').on('click', function () {
+        if (change['left'] == 0) {
+            return;
+        }
+        redpack({
+            'action': "POINT_AT",
+            'activity': "thanks_given",
+            'level': "5000-"
+        }, function () {
+            if (change['left'] == 0) {
+                $('.app-thanksbu').removeClass("app-thanksbu2");
+                $('.app-thanksbu').addClass("app-thanksbu1");
+                $('.yellow1-main .appjiang-ri p').html('您没有抽奖机会');
+            } else {
+                $('.yellow1-main .appjiang-ri p span').text(change['left']);
+            }
+            $('.apphongxi').show();
+            $('#thankgi-thanks2 ').text(change['reward']);
+
+
+            return false;
+        })
+    })
 };
 redpack({
     'action': "GET_REWARD_INFO",
-    'activity': "thanks_given"
-    //'level': "5000+"
-}, function () {
-    if (change['left'] == 0) {
+    'activity': "thanks_given",
+    'level': "5000+"
+}, function (da) {
+    console.log(da['left']);
+    if (da['left'] == 0) {
         $('.appjiang-button').removeClass("appjiang-button2");
         $('.appjiang-button').addClass("appjiang-button1");
-        $('.appjiang-ri p').html('您没有抽奖机会');
+        $('.appprize-mingdan .appjiang-ri p').html('您没有抽奖机会');
     } else {
-        $('.appjiang-ri p span').text(change['left']);
+        $('.appprize-mingdan .appjiang-ri p span').text(da['left']);
     }
 });
+function redpack2(d){
+    if (d['left'] == 0) {
+        $('.app-thanksbu').removeClass("app-thanksbu2");
+        $('.app-thanksbu').addClass("app-thanksbu1");
+        $('.yellow1-main .appjiang-ri p').html('您没有抽奖机会');
+    } else {
+        $('.yellow1-main .appjiang-ri p span').html(d['left']);
+    }
+}
+redpack({
+    'action': 'GET_REWARD_INFO',
+    'activity': "thanks_given",
+    'level': "5000-"
+}, redpack2);
 //名单
 var str = '';
-if (change['ret_code'] != 1000) {
+//if (change['ret_code'] != 1000) {
     redpack({
         'action': 'GET_REWARD',
         'activity': "thanks_given",
         'level': "5000+"
     },function () {
+        if (change['ret_code'] != 1000) {
         for (var k = 0, len2 = change['phone'].length; k < len2; k++) {
             var tel = change['phone'][k].substring(0, 3) + "******" + change['phone'][k].substring(9, 11);
 
@@ -386,9 +425,11 @@ if (change['ret_code'] != 1000) {
             //console.log(str);
         }
 
+
         $('.long-p').append(str);
+        }
     });
-}
+//}
 //无线滚动
 var timer, i = 1, j = 2;
 timer = setInterval(function () {
@@ -407,19 +448,7 @@ function scroll() {
 
 }
 
-redpack({
-    'action': "GET_REWARD_INFO",
-    'activity': "thanks_given"
-    //'level': "5000+"
-}, function () {
-    if (change['left'] == 0) {
-        $('.jiang-button').removeClass("jiang-button2");
-        $('.jiang-button').addClass("jiang-button1");
-        $('.prize-ri p').html('您没有抽奖机会');
-    } else {
-        $('.app-jihui').text(change['left']);
-    }
-});
+
 function redpack(data, callback) {
     org.ajax({
         url: '/api/activity/reward/',
@@ -431,15 +460,6 @@ function redpack(data, callback) {
             callback && callback(data);
             console.log(change);
 
-            // $('.app-jihui1').text(change['left']);
-
-            //if (change['is_first'] == false) {
-            //    $('.kuang-tidhi').addClass("kuang-tidhi12");
-            //} else if (change['is_first'] == true) {
-            //    $('.kuang-tidhi').removeClass("kuang-tidhi12");
-            //}
-            //
-           // $('#app-jiangli0').text(change['reward']);
         }
     })
 }

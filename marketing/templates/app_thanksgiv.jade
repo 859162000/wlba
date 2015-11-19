@@ -198,10 +198,14 @@ html(style="background:#7c37e8")
         else
           p
         if user.is_authenticated
-          a(href='javascript:void(0);').app-thanks 领取奖品
+          a(href='javascript:void(0);').app-thanksbu.app-thanksbu2 领取奖品
+          .apphongxi
+            h5
+              |恭喜您！获得
+              span#thankgi-thanks2
         else
-          a(href='javascript:void(0);').app-thanks.app-thanks1 领取奖品
-        a(href='javascript:void(0);').jiang-a 投资赢抽奖机会>>
+          a(href='/weixin/login/?next=/activity/app_thanksgiv/').app-thanksbu.app-thanksbu1 领取奖品
+        a(href='/weixin/list/', target="_blank").jiang-a 投资赢抽奖机会>>
       .app-thanks-guizhe
         h6 【加息券和红包规则】
           ul
