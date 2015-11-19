@@ -1153,7 +1153,7 @@ class AuthorizeCode(APIView):
             oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, scope='snsapi_userinfo', state=account_id)
         else:
             oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, state=account_id)
-        print oauth.authorize_url
+        logger.debug("---------------------------AuthorizeCode::oauth.authorize_url==%s"%oauth.authorize_url)
         return redirect(oauth.authorize_url)
 
 
