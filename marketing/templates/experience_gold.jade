@@ -15,6 +15,9 @@ html
                     if user.is_authenticated
                         a(href='javascript:void(0)').draw_btn_ed
                     else
+                      if p2p_record_count == 0 and experience_count == 0
+                        a(href='javascript:void(0)').draw_btn_ed
+                      else
                         a(href='/accounts/login/?next=/activity/experience_gold/')
             .content.clearfix
                 .experience_title
@@ -38,8 +41,11 @@ html
                             h5 {{product.name}}
                             ul.project_detail.clearfix
                                 li.li_one
+                                  if experience_amount == 0
+                                    label 8888元
+                                  else
                                     label {{experience_amount}}元
-                                    span 融资金额
+                                  span 融资金额
                                 li.li_two
                                     label {{product.expected_earning_rate}}%
                                     span 年化收益
@@ -52,7 +58,7 @@ html
                             p.income_fonts(style='display:none') 将于2015-10-31收益13元
                           else
                             a.invest_ed 立即投资
-                if user.is_authenticated
+                if user.is_authenticated and experience_amortization
                   .look_more_detail
                     .more_btn
                         label 查看历史投资项目
@@ -71,18 +77,17 @@ html
                                 th 项目天数
                                 th.th_w 已收益／预期收益（元）
                             tbody
-                              if experience_amortization
-                                for amo in experience_amortization
-                                  tr
-                                    td {{amo.created_time}}
-                                    td {{amo.product.name}}
-                                    td {{amo.principal}}
-                                    td {{amo.product.expected_earning_rate}}%
-                                    td {{amo.product.period}}
-                                    if amo.settled
-                                      td {{amo.interest}}/{{amo.interest}}（（元）
-                                    else
-                                      td 0.00/{{amo.interest}}（元）
+                              for amo in experience_amortization
+                                tr
+                                  td {{amo.created_time}}
+                                  td {{amo.product.name}}
+                                  td {{amo.principal}}
+                                  td {{amo.product.expected_earning_rate}}%
+                                  td {{amo.product.period}}
+                                  if amo.settled
+                                    td {{amo.interest}}/{{amo.interest}}（（元）
+                                  else
+                                    td 0.00/{{amo.interest}}（元）
                 .explain_box
                     .explain_box_img
                         .explain_content_box
