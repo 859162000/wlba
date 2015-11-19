@@ -33,11 +33,13 @@ from wanglibao_pay.huifu_pay import HuifuPay, SignException
 from wanglibao_pay import third_pay, trade_record
 from wanglibao_p2p.models import P2PRecord
 import decimal
+from wanglibao_pay.pay import YeeProxyPay, PayOrder, YeeProxyPayCallbackMessage
 from wanglibao_pay.serializers import CardSerializer
-from wanglibao_pay.util import get_client_ip
+from wanglibao_pay.util import get_client_ip, fmt_two_amount
 from wanglibao_pay import util
 from wanglibao_profile.backends import require_trade_pwd
 from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_rest.utils import split_ua
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
@@ -75,79 +77,96 @@ class PayView(TemplateView):
     template_name = 'pay_jump.jade'
 
     def post(self, request):
-        if not request.user.wanglibaouserprofile.id_is_valid:
-            return self.render_to_response({
-                'message': u'请先进行实名认证'
-            })
-        form = dict()
-        message = ''
-        try:
-            amount_str = request.POST.get('amount', '')
-            amount = decimal.Decimal(amount_str). \
-                quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
-            amount_str = str(amount)
-            if amount <= 0:
-                # todo handler the raise
-                raise decimal.DecimalException()
+        # if not request.user.wanglibaouserprofile.id_is_valid:
+        #     return self.render_to_response({
+        #         'message': u'请先进行实名认证'
+        #     })
+        # form = dict()
+        # message = ''
+        # try:
+        #     amount_str = request.POST.get('amount', '')
+        #     amount = decimal.Decimal(amount_str). \
+        #         quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
+        #     amount_str = str(amount)
+        #     if amount <= 0:
+        #         # todo handler the raise
+        #         raise decimal.DecimalException()
+        #
+        #     gate_id = request.POST.get('gate_id', '')
+        #     bank = Bank.objects.get(gate_id=gate_id)
+        #
+        #     # Store this as the default bank
+        #     request.user.wanglibaouserprofile.deposit_default_bank_name = bank.name
+        #     request.user.wanglibaouserprofile.save()
+        #
+        #     pay_info = PayInfo()
+        #     pay_info.amount = amount
+        #     pay_info.total_amount = amount
+        #     pay_info.type = PayInfo.DEPOSIT
+        #     pay_info.status = PayInfo.INITIAL
+        #     pay_info.user = request.user
+        #     pay_info.bank = bank
+        #     pay_info.channel = "huifu"
+        #     pay_info.request_ip = get_client_ip(request)
+        #
+        #     order = OrderHelper.place_order(request.user, Order.PAY_ORDER, pay_info.status,
+        #                                     pay_info=model_to_dict(pay_info))
+        #     pay_info.order = order
+        #     pay_info.save()
+        #
+        #     post = {
+        #         'OrdId': pay_info.pk,
+        #         'GateId': gate_id,
+        #         'OrdAmt': amount_str
+        #     }
+        #
+        #     pay = HuifuPay()
+        #     form = pay.pay(post)
+        #     pay_info.request = str(form)
+        #     pay_info.status = PayInfo.PROCESSING
+        #     pay_info.save()
+        #     OrderHelper.update_order(order, request.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
+        #
+        #     # 处理第三方渠道的用户充值回调
+        #     CoopRegister(request).process_for_recharge(request.user)
+        # except decimal.DecimalException:
+        #     message = u'金额格式错误'
+        # except Bank.DoesNotExist:
+        #     message = u'请选择有效的银行'
+        # except (socket.error, SignException) as e:
+        #     message = PayResult.RETRY
+        #     pay_info.status = PayInfo.FAIL
+        #     pay_info.error_message = str(e)
+        #     pay_info.save()
+        #     OrderHelper.update_order(order, request.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
+        #     logger.fatal('sign error! order id: ' + str(pay_info.pk) + ' ' + str(e))
+        #
+        # context = {
+        #     'message': message,
+        #     'form': form
+        # }
 
-            gate_id = request.POST.get('gate_id', '')
-            bank = Bank.objects.get(gate_id=gate_id)
+        # gate_id = request.POST.get('gate_id', '')
+        # bank = Bank.objects.get(gate_id=gate_id)
+        # pay_channel_class = get_pc_channel_class(bank.pc_channel)
+        #
+        # pay_channel = pay_channel_class()
+        # result = pay_channel.pre_pay(request)
+        # return self.render_to_response(result)
 
-            # Store this as the default bank
-            request.user.wanglibaouserprofile.deposit_default_bank_name = bank.name
-            request.user.wanglibaouserprofile.save()
+        # todo 参数校验
+        user = request.user
+        amount = fmt_two_amount(request.POST.get('amount'))
+        gate_id = request.POST.get('gate_id')
+        request_ip = get_client_ip(request)
+        device = split_ua(request)
+        channel = PayOrder.get_bank_and_channel(gate_id, device)[1]
 
-            pay_info = PayInfo()
-            pay_info.amount = amount
-            pay_info.total_amount = amount
-            pay_info.type = PayInfo.DEPOSIT
-            pay_info.status = PayInfo.INITIAL
-            pay_info.user = request.user
-            pay_info.bank = bank
-            pay_info.channel = "huifu"
-            pay_info.request_ip = get_client_ip(request)
-
-            order = OrderHelper.place_order(request.user, Order.PAY_ORDER, pay_info.status,
-                                            pay_info=model_to_dict(pay_info))
-            pay_info.order = order
-            pay_info.save()
-
-            post = {
-                'OrdId': pay_info.pk,
-                'GateId': gate_id,
-                'OrdAmt': amount_str
-            }
-
-            pay = HuifuPay()
-            form = pay.pay(post)
-            pay_info.request = str(form)
-            pay_info.status = PayInfo.PROCESSING
-            pay_info.save()
-            OrderHelper.update_order(order, request.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
-
-            # try:
-            #     # 处理PC第三方用户充值回调
-            #     CoopRegister(request).process_for_recharge(request.user, order.id)
-            # except Exception, e:
-            #     logger.error(e)
-
-        except decimal.DecimalException:
-            message = u'金额格式错误'
-        except Bank.DoesNotExist:
-            message = u'请选择有效的银行'
-        except (socket.error, SignException) as e:
-            message = PayResult.RETRY
-            pay_info.status = PayInfo.FAIL
-            pay_info.error_message = str(e)
-            pay_info.save()
-            OrderHelper.update_order(order, request.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
-            logger.fatal('sign error! order id: ' + str(pay_info.pk) + ' ' + str(e))
-
-        context = {
-            'message': message,
-            'form': form
-        }
-        return self.render_to_response(context)
+        if channel == 'yeepay':
+            result = YeeProxyPay().proxy_pay(user, amount,  gate_id,  request_ip, device)
+        else:
+            result = HuifuPay().pre_pay(request)
+        return self.render_to_response(result)
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -181,6 +200,28 @@ class PayCallback(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super(PayCallback, self).dispatch(request, *args, **kwargs)
+
+class YeeProxyPayCompleteView(TemplateView):
+    def post(self, request, *args, **kwargs):
+        # result = HuifuPay.handle_pay_result(request)
+        # amount = request.POST.get('OrdAmt', '')
+        #
+        # return self.render_to_response({
+        #     'result': result,
+        #     'amount': amount
+        # })
+        pay_message = YeeProxyPayCallbackMessage().parse_message(request.POST)
+        YeeProxyPay().proxy_pay_callback(pay_message)
+        # todo 增强错误处理
+        return self.render_to_response({
+            'result': '支付成功',
+            'amount': pay_message.amount
+            })
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(PayCompleteView, self).dispatch(request, *args, **kwargs)
+
 
 
 class WithdrawView(TemplateView):
@@ -293,8 +334,9 @@ class WithdrawCompleteView(TemplateView):
 
             # 短信通知添加用户名
             name = user.wanglibaouserprofile.name or u'用户'
+
             send_messages.apply_async(kwargs={
-                'phones': [user.wanglibaouserprofile.phone],
+                'phones': [request.user.wanglibaouserprofile.phone],
                 # 'messages': [messages.withdraw_submitted(amount, timezone.now())]
                 'messages': [messages.withdraw_submitted(name)]
             })

@@ -217,7 +217,24 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;//抽奖
+;function Down(ele){
+        var curHeight = ele.height();
+        var autoHeight = ele.css('height', 'auto').height();
+        if (!ele.hasClass('down')){
+          ele.height(curHeight).animate({height: autoHeight},500,function(){
+            ele.addClass('down')
+          });
+        }else{
+          ele.height(curHeight).animate({height: 0},500,function(){
+            ele.removeClass('down')
+          });
+        }
+    }
+    $(".thanks-main p .title1-a").on("click", function () {
+        Down($(".app-thanks-giv"));
+    });
+
+//抽奖
 var lottery = {
     index: -1,	//当前转动到哪个位置，起点位置
     count: 0,	//总共有多少个位置
@@ -232,7 +249,7 @@ var lottery = {
             $units = $lottery.find(".lottery-unit");
             this.obj = $lottery;
             this.count = $units.length;
-            $lottery.find(".lottery-unit-" + this.index).children().addClass("active");
+            $lottery.find(".lottery-unit-" + this.index).children().first().addClass("active");
         }
         ;
     },
@@ -240,13 +257,13 @@ var lottery = {
         var index = this.index;
         var count = this.count;
         var lottery = this.obj;
-        $(lottery).find(".lottery-unit-" + index).children().removeClass("active");
+        $(lottery).find(".lottery-unit-" + index).children().first().removeClass("active");
         index += 1;
         if (index > count - 1) {
             index = 0;
         }
         ;
-        $(lottery).find(".lottery-unit-" + index).children().addClass("active");
+        $(lottery).find(".lottery-unit-" + index).children().first().addClass("active");
         this.index = index;
         return false;
     },
