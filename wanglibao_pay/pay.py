@@ -50,7 +50,6 @@ class PayOrder(object):
         :return: bank(Type Bank), channel(str), bind_code(str)
         """
         try:
-            logger.critical()
             bank = Bank.objects.get(gate_id=gate_id)
             if device_type == 'pc':
                 channel = bank.pc_channel
