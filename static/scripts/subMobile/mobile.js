@@ -701,6 +701,9 @@ org.regist = (function(org){
         }
     }
 
+    $("#no-unbind,.back-weixin").addClass("clickOk").click(function(){
+        closePage();
+    });
 
     function timeFun(){//倒计时跳转
       var numDom = $("#times-box");
@@ -718,9 +721,6 @@ org.regist = (function(org){
     window.onload = function(){
         timeFun();
         $("#unbind").addClass("clickOk");
-        $("#no-unbind,.back-weixin").addClass("clickOk").click(function(){
-            closePage();
-        });
     }
 
     var unbindf = false;
@@ -767,6 +767,7 @@ org.regist = (function(org){
         var num = 0;
         var alt = $("#alt-box");
         var altAwardP = alt.find("#alt-award-p");
+        var altCont = alt.find(".alt-cont");
         var altPro = alt.find("#alt-promot");
         var sleep = 60;
         function setAn(){
@@ -777,11 +778,14 @@ org.regist = (function(org){
                     $("#page-bg").show();
                     if(k === 0){
                         altPro.text(errorStr[Math.floor(Math.random()*5)]);
-                        altAwardP.html('<span id="alt-award" class="alt-award red-btns close-box">继续攒人品</span>');
+                        altAwardP.html('');
+                        altCont.removeClass("mt");
                     }else{
                         altPro.text(arrStr[Math.floor(Math.random()*2)]);
                         altAwardP.html('<span id="alt-award" class="alt-award">'+btns.eq(i-1).text()+'</span>已在您的账户中');
+                        altCont.addClass("mt");
                     }
+                    //altCont.find(".alt-btn").html('<span class="alt-award red-btns close-box">继续攒人品</span>');
                     self.removeClass("had-click");
                     alt.show();
                 },sleep);
@@ -806,13 +810,14 @@ org.regist = (function(org){
         var isNum = goods;
         var nowNum = 0;
         var awardAction = "ENTER_WEB_PAGE";
-        if(self.hasClass("had-click")){
-            return;
-        }
+        var altDom = $("#alt-box");
         if(awardsNum === 0){
             $("#page-bg").show();
-            $("#alt-promot").text("大奖明天见，网利宝天天见。");
-            $("#alt-award-p").text("您今天已经抽奖，明天再来碰运气吧").parents("#alt-box").show();
+            altDom.find("#alt-promot").text("大奖明天见，网利宝天天见。");
+            altDom.find("#alt-award-p").text("您今天已经抽奖，明天再来碰运气吧");
+            altDom.find(".alt-cont").addClass("mt");
+            altDom.find(".alt-btn").html('<span class="alt-award red-btns close-box">知道了</span>');
+            altDom.show();
             self.addClass("had-click");
             return;
         }
@@ -869,7 +874,7 @@ function getCode(){//得到用户信息的二维码
     org.ajax({
         type: "POST",
         url: "/weixin/api/generate/qr_limit_scene_ticket/",
-        data: {"original_id":"gh_32e9dc3fab8e"},//c:gh_32e9dc3fab8e
+        data: {"original_id":"gh_f758af6347b6"},//c:gh_32e9dc3fab8e
         success: function (data) {
             $("#sub-code").html("<img src='"+ data.qrcode_url + "' />");
         },
