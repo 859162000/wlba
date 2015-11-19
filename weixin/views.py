@@ -203,7 +203,7 @@ class WeixinJoinView(View):
             # 累计收益（元）：  79.00
             # 待收收益（元）：  24.00
             now_str = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M')
-            infos = "%s\n总资产　：%s \n可用余额：%s"%(account_info['p2p_total_paid_interest'], account_info['equity_total'], account_info['p2p_margin'])
+            infos = "%s\n总资产　：%s \n可用余额：%s"%(account_info['p2p_total_paid_interest'], account_info['total_asset'], account_info['p2p_margin'])
             a = MessageTemplate(ACCOUNT_INFO_TEMPLATE_ID,
                     keyword1=now_str,
                     keyword2=infos)
