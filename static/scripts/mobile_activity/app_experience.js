@@ -317,7 +317,7 @@ org.experience = (function(org){
               });
             })
             //老用户
-            $oldUser = $('#oldUser');
+            $oldUser = $('.invested');
             $oldUser.on('click',function(){
                  org.ui.alert('','','3')
             })
