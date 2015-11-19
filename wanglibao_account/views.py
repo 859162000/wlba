@@ -48,8 +48,8 @@ from wanglibao_sms.tasks import send_messages
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from wanglibao import settings
-from wanglibao_account.cooperation import CoopRegister, update_coop_order
-from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract
+from wanglibao_account.cooperation import CoopRegister
+from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract, update_coop_order
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account import third_login, backends as account_backends, message as inside_message
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm, TokenSecretSignAuthenticationForm
@@ -83,7 +83,7 @@ from wanglibao_account.models import UserThreeOrder
 import requests
 from wanglibao_margin.models import MarginRecord
 from wanglibao_pay.fee import WithdrawFee
-from wanglibao_account import cooperation
+from wanglibao_account import utils
 
 
 logger = logging.getLogger(__name__)
@@ -2023,7 +2023,7 @@ class AutomaticApiView(APIView):
             return Response({'ret_code': 3009, 'message': u'用户设置自动投标计划失败'})
 
 
-class ThirdOrdeApiView(APIView):
+class ThirdOrderApiView(APIView):
     """
     记录来自第三方回调的订单状态
     """
@@ -2108,7 +2108,7 @@ class ThirdOrderQueryApiView(APIView):
         params = getattr(request, request.method)
         channel_code = params.get('promo_token', None)
         if channel_code:
-            order_query_fun = getattr(cooperation, '%s_order_query' % channel_code.lower(), None)
+            order_query_fun = getattr(utils, '%s_order_query' % channel_code.lower(), None)
             if order_query_fun:
                 json_response = order_query_fun(params)
             else:

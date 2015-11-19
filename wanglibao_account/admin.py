@@ -9,13 +9,21 @@ from import_export.admin import ImportExportModelAdmin
 from import_export.widgets import DecimalWidget
 from marketing.models import PromotionToken, IntroducedBy
 from wanglibao.admin import ReadPermissionModelAdmin
-from wanglibao_account.models import VerifyCounter, IdVerification, Binding, Message, MessageText, UserPushId, UserAddress
+from wanglibao_account.models import VerifyCounter, IdVerification, Binding, Message, MessageText, UserPushId, \
+                                     UserAddress, UserThreeOrder
 from wanglibao_margin.models import Margin
 from wanglibao_p2p.models import P2PEquity
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.views import AdminIdVerificationView, AdminSendMessageView
 from wanglibao.templatetags.formatters import safe_phone_str, safe_name
 from django.forms.models import BaseInlineFormSet
+from wanglibao_p2p.models import P2PRecord
+from wanglibao_pay.models import PayInfo
+from .utils import xunleivip_generate_sign
+from marketing.utils import get_user_channel_record
+from .tasks import xunleivip_callback
+from decimal import Decimal
+from django.conf import settings
 
 
 class ProfileInline(admin.StackedInline):
@@ -172,6 +180,71 @@ class BindingAdmin(admin.ModelAdmin):
     list_display = ("user", "bid", "btype", "isvip")
     search_fields = ('user__wanglibaouserprofile__phone',)
     raw_id_fields = ('user', )
+    model = Binding
+
+    def xunlei_call_back(self, user, tid, data, url, order_id):
+        order_id = '%s_%s' % (order_id, data['act'])
+        data['uid'] = tid
+        data['orderid'] = order_id
+        data['type'] = 'baijin'
+        sign = xunleivip_generate_sign(data, self.coop_key)
+        params = dict({'sign': sign}, **data)
+
+        # 创建渠道订单记录
+        channel_recode = get_user_channel_record(user.id)
+        order = UserThreeOrder(user=user, order_on=channel_recode, request_no=order_id)
+        order.save()
+
+        # 异步回调
+        xunleivip_callback.apply_async(
+            kwargs={'url': url, 'params': params,
+                    'channel': self.c_code, 'order_id': order_id})
+
+    def recharge_call_back(self, obj):
+        # 判断用户是否绑定和首次充值
+        penny = Decimal(0.01).quantize(Decimal('.01'))
+        pay_info = PayInfo.objects.filter(user=obj.user, type='D', amount__gt=penny,
+                                          status=PayInfo.SUCCESS).order_by('create_time').first()
+
+        if pay_info and int(pay_info.amount) >= 100:
+            data = {
+                'sendtype': '1',
+                'num1': 7,
+                'act': 5171
+            }
+            self.xunlei_call_back(obj.user, obj.bid, data,
+                                  settings.XUNLEIVIP_CALL_BACK_URL,
+                                  pay_info.order_id)
+
+    def purchase_call_back(self, obj):
+        p2p_record = P2PRecord.objects.filter(user=obj.user, catalog=u'申购').order_by('create_time').first()
+
+        # 判断是否首次投资
+        if p2p_record and int(p2p_record.amount) >= 1000:
+            data = {
+                'sendtype': '0',
+                'num1': 12,
+                'act': 5170
+            }
+            self.xunlei_call_back(obj.user, obj.bid, data,
+                                  settings.XUNLEIVIP_CALL_BACK_URL,
+                                  p2p_record.order_id)
+
+    def save_model(self, request, obj, form, change):
+        if obj.detect_callback is True and obj.btype == 'xunlei9':
+            print ">>>>>>>>>>>>>>>>aaa"
+            obj.detect_callback = False
+            order = UserThreeOrder.objects.filter(user=obj.user, order_on__code=obj.btype)
+            if order.exists():
+                if order.count() < 2:
+                    if order.first().request_no.split('_')[1] == 5171:
+                        self.purchase_call_back(obj)
+                    else:
+                        self.recharge_call_back(obj)
+            else:
+                self.recharge_call_back(obj)
+                self.purchase_call_back(obj)
+        obj.save()
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -226,6 +299,16 @@ class UserAddressAdmin(admin.ModelAdmin):
         return False
 
 
+class UserThreeOrderAdmin(admin.ModelAdmin):
+    actions = None
+    list_display = ("user", "order_on", "request_no", "result_code", "created_at")
+    search_fields = ('user__wanglibaouserprofile__phone', "request_no")
+    raw_id_fields = ('user', )
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 admin.site.unregister(User)
 admin.site.register(User, UserProfileAdmin)
 admin.site.register(IdVerification, IdVerificationAdmin)
@@ -237,5 +320,6 @@ admin.site.register(Message, MessageAdmin)
 admin.site.register(MessageText, MessageTextAdmin)
 admin.site.register(UserPushId, UserPushIdAdmin)
 admin.site.register(UserAddress, UserAddressAdmin)
+admin.site.register(UserThreeOrder, UserThreeOrderAdmin, name=u'渠道订单记录')
 
 admin.site.register_view('accounts/message/', view=AdminSendMessageView.as_view(), name=u'网利宝-发送站内信')

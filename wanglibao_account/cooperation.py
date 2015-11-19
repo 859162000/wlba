@@ -47,7 +47,8 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_XUNLEI9_KEY, XUNLEIVIP_CALL_BACK_URL, XUNLEIVIP_KEY, XUNLEIVIP_REGISTER_CALL_BACK_URL, \
      XUNLEIVIP_REGISTER_KEY
 from wanglibao_account.models import Binding, IdVerification
-from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback
+from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback, \
+                                    xunleivip_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization, AutomaticPlan
 from wanglibao_pay.models import Card, PayInfo
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -1105,8 +1106,8 @@ class XunleiVipRegister(CoopRegister):
         self.coop_register_key = XUNLEIVIP_REGISTER_KEY
         self.external_channel_user_key = 'xluserid'
 
-    def xunlei_call_back(self, user, tid, data, url):
-        order_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')+'_'+str(data['act'])
+    def xunlei_call_back(self, user, tid, data, url, order_id):
+        order_id = '%s_%s' % (order_id, data['act'])
         data['uid'] = tid
         data['orderid'] = order_id
         data['type'] = 'baijin'
@@ -1119,7 +1120,7 @@ class XunleiVipRegister(CoopRegister):
         order.save()
 
         # 异步回调
-        common_callback.apply_async(
+        xunleivip_callback.apply_async(
             kwargs={'url': url, 'params': params,
                     'channel': self.c_code, 'order_id': order_id})
 
@@ -1132,8 +1133,10 @@ class XunleiVipRegister(CoopRegister):
                 'xluserid': binding.bid,
                 'regtime': int(time.mktime(user.date_joined.date().timetuple()))
             }
+
             sign = xunleivip_generate_sign(data, self.coop_register_key)
             params = dict({'sign': sign}, **data)
+
             # 异步回调
             common_callback.apply_async(
                 kwargs={'url': self.register_call_back_url, 'params': params, 'channel': self.c_code})
@@ -1151,7 +1154,8 @@ class XunleiVipRegister(CoopRegister):
                     'num1': 7,
                     'act': 5171
                 }
-                self.xunlei_call_back(user, binding.bid, data, self.call_back_url)
+                self.xunlei_call_back(user, binding.bid, data,
+                                      self.call_back_url, pay_info.order_id)
 
     def purchase_call_back(self, user, order_id):
         # 判断用户是否绑定和首次投资
@@ -1168,7 +1172,8 @@ class XunleiVipRegister(CoopRegister):
                     'num1': 12,
                     'act': 5170
                 }
-                self.xunlei_call_back(user, binding.bid, data, self.call_back_url)
+                self.xunlei_call_back(user, binding.bid, data,
+                                      self.call_back_url, p2p_record.order_id)
 
 
 # 注册第三方通道
@@ -3455,126 +3460,3 @@ class Rong360P2PListView(APIView):
                 'result_msg': u"没有权限访问"
             }
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
-
-
-def update_coop_order(request_no, channel_code, result_code, msg):
-    order = UserThreeOrder.objects.filter(request_no=request_no, order_on__code=channel_code).first()
-
-    if order:
-        logger.info("Enter %s order update===>>>" % channel_code)
-        logger.info("%s update params:{request_no=%s, result_code=%s, "
-                    "msg=%s}===>>>" % (channel_code, request_no, result_code, msg))
-        try:
-            order.result_code = result_code
-            order.msg = msg
-            order.answer_at = datetime.datetime.now()
-            order.save()
-            response = {
-                'ret_code': 1,
-                'message': 'success'
-            }
-        except Exception, e:
-            logger.info('%s request_no %s save to UserThreeOrder faild.' % (channel_code, request_no))
-            logger.info(e)
-            response = {
-                'ret_code': 50000,
-                'message': 'api error.'
-            }
-    else:
-        response = {
-            'ret_code': 20002,
-            'message': u'订单流水号不存在'
-        }
-
-    return response
-
-
-def zgdx_order_query(params):
-    """
-    中国电信业务查询
-    """
-
-    coop_key = getattr(settings, 'ZGDX_KEY', None)
-    iv = getattr(settings, 'ZGDX_IV', None)
-    url = getattr(settings, 'ZGDX_QUERY_URL', None)
-    if coop_key and iv and url:
-        data = {
-            'phone_id': params.get('phone_id', ''),
-            'service_code': params.get('service_code', ''),
-            'request_no': params.get('request_no', ''),
-            'start_time': params.get('start_time', ''),
-            'end_time': params.get('end_time', ''),
-        }
-
-        encrypt_data = encrypt_mode_cbc(json.dumps(data), coop_key, iv)
-        params = {
-            'code': encodeBytes(hex2bin(encrypt_data)),
-            'partner_no': params.get('partner_no', None),
-        }
-
-        try:
-            res = requests.post(url, data=json.dumps(params)).json()
-            res_code = res.get('result_code', '')
-            result = res.get('result', '')
-            if res_code == '00000':
-                json_response = {
-                    'ret_code': 0,
-                    'message': 'success',
-                    'data': result
-                }
-            else:
-                json_response = {
-                    'ret_code': res_code,
-                    'message': result
-                }
-        except Exception, e:
-            json_response = {
-                'ret_code': 50001,
-                'message': 'api error'
-            }
-    else:
-        json_response = {
-            'ret_code': 50001,
-            'message': 'api error'
-        }
-
-    return json_response
-
-
-def xunlei9_order_query(params):
-    """
-    迅雷VIP业务查询
-    """
-
-    from .utils import xunleivip_generate_sign
-
-    url = getattr(settings, 'XUNLEIVIP_QUERY_URL', None)
-    coop_key = getattr(settings, 'XUNLEIVIP_KEY', None)
-    if coop_key and url:
-        data = {
-            'uid': params.get('uid', ''),
-            'act': params.get('act', ''),
-            'orderid': params.get('orderid', ''),
-        }
-
-        data['sign'] = xunleivip_generate_sign(data, coop_key)
-
-        try:
-            res = requests.get(url, params=data).json()
-            json_response = {
-                'ret_code': 0,
-                'message': 'success',
-                'data': res
-            }
-        except Exception, e:
-            json_response = {
-                'ret_code': 50001,
-                'message': 'api error'
-            }
-    else:
-        json_response = {
-            'ret_code': 50001,
-            'message': 'api error'
-        }
-
-    return json_response
