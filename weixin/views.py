@@ -1160,9 +1160,10 @@ class AuthorizeCode(APIView):
 class AuthorizeUser(APIView):
     permission_classes = ()
     def get(self, request):
-        account_id = self.request.GET.get('state')
+        account_id = self.request.GET.get('state', "")
         try:
             account = None
+            logger.debug("AuthorizeUser---------------------------%s"%account_id)
             weixin_account = WeixinAccounts.getByOriginalId(account_id)
             if weixin_account:
                 account = weixin_account.db_account
