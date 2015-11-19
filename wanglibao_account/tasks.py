@@ -11,6 +11,7 @@ import requests
 import urllib
 import json
 from wanglibao.celery import app
+from .cooperation import update_coop_order
 
 from wanglibao_account.models import Binding
 
@@ -134,6 +135,27 @@ def jinshan_callback(url, params):
     
     if ret:
         logger.info(ret.text)
+
+
+def xunleivip_callback(url, params, channel_name, order_id):
+    logger.info("Enter %s_callback task===>>>" % channel_name)
+    try:
+        params = urllib.urlencode(params)
+        logger.info(params)
+        ret = requests.get(url, params=params)
+        ret.status_code
+        ret_text = ret.text
+        result, error, code = ret_text.encode('utf-8').split('&')
+
+        # 更新第三方订单处理状态
+        update_coop_order(order_id, channel_name, result, error)
+
+        logger.info('%s callback url: %s' % (channel_name, ret.url))
+        logger.info('%s callback return: %s' % (channel_name, ret_text))
+        return ret
+    except Exception, e:
+        logger.info(" {'%s callback':'failed to connect'} " % channel_name)
+        logger.info(e)
 
 
 @app.task

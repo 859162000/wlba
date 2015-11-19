@@ -60,6 +60,7 @@ from wanglibao_reward.models import WanglibaoUserGift
 from user_agents import parse
 import uuid
 import urllib
+from .utils import xunleivip_generate_sign
 
 logger = logging.getLogger('wanglibao_cooperation')
 
@@ -1104,18 +1105,12 @@ class XunleiVipRegister(CoopRegister):
         self.coop_register_key = XUNLEIVIP_REGISTER_KEY
         self.external_channel_user_key = 'xluserid'
 
-    def generate_sign(self, data, key):
-        sorted_data = sorted(data.iteritems(), key=lambda asd:asd[0], reverse=False)
-        encode_data = urllib.urlencode(sorted_data)
-        sign = hashlib.md5(encode_data+str(key)).hexdigest()
-        return sign
-
     def xunlei_call_back(self, user, tid, data, url):
         order_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')+'_'+str(data['act'])
         data['uid'] = tid
         data['orderid'] = order_id
         data['type'] = 'baijin'
-        sign = self.generate_sign(data, self.coop_key)
+        sign = xunleivip_generate_sign(data, self.coop_key)
         params = dict({'sign': sign}, **data)
 
         # 创建渠道订单记录
@@ -1125,7 +1120,8 @@ class XunleiVipRegister(CoopRegister):
 
         # 异步回调
         common_callback.apply_async(
-            kwargs={'url': url, 'params': params, 'channel': self.c_code})
+            kwargs={'url': url, 'params': params,
+                    'channel': self.c_code, 'order_id': order_id})
 
     def register_call_back(self, user):
         # 判断用户是否绑定
@@ -1136,7 +1132,7 @@ class XunleiVipRegister(CoopRegister):
                 'xluserid': binding.bid,
                 'regtime': int(time.mktime(user.date_joined.date().timetuple()))
             }
-            sign = self.generate_sign(data, self.coop_register_key)
+            sign = xunleivip_generate_sign(data, self.coop_register_key)
             params = dict({'sign': sign}, **data)
             # 异步回调
             common_callback.apply_async(
@@ -3459,3 +3455,126 @@ class Rong360P2PListView(APIView):
                 'result_msg': u"没有权限访问"
             }
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+def update_coop_order(request_no, channel_code, result_code, msg):
+    order = UserThreeOrder.objects.filter(request_no=request_no, order_on__code=channel_code).first()
+
+    if order:
+        logger.info("Enter %s order update===>>>" % channel_code)
+        logger.info("%s update params:{request_no=%s, result_code=%s, "
+                    "msg=%s}===>>>" % (channel_code, request_no, result_code, msg))
+        try:
+            order.result_code = result_code
+            order.msg = msg
+            order.answer_at = datetime.datetime.now()
+            order.save()
+            response = {
+                'ret_code': 1,
+                'message': 'success'
+            }
+        except Exception, e:
+            logger.info('%s request_no %s save to UserThreeOrder faild.' % (channel_code, request_no))
+            logger.info(e)
+            response = {
+                'ret_code': 50000,
+                'message': 'api error.'
+            }
+    else:
+        response = {
+            'ret_code': 20002,
+            'message': u'订单流水号不存在'
+        }
+
+    return response
+
+
+def zgdx_order_query(params):
+    """
+    中国电信业务查询
+    """
+
+    coop_key = getattr(settings, 'ZGDX_KEY', None)
+    iv = getattr(settings, 'ZGDX_IV', None)
+    url = getattr(settings, 'ZGDX_QUERY_URL', None)
+    if coop_key and iv and url:
+        data = {
+            'phone_id': params.get('phone_id', ''),
+            'service_code': params.get('service_code', ''),
+            'request_no': params.get('request_no', ''),
+            'start_time': params.get('start_time', ''),
+            'end_time': params.get('end_time', ''),
+        }
+
+        encrypt_data = encrypt_mode_cbc(json.dumps(data), coop_key, iv)
+        params = {
+            'code': encodeBytes(hex2bin(encrypt_data)),
+            'partner_no': params.get('partner_no', None),
+        }
+
+        try:
+            res = requests.post(url, data=json.dumps(params)).json()
+            res_code = res.get('result_code', '')
+            result = res.get('result', '')
+            if res_code == '00000':
+                json_response = {
+                    'ret_code': 0,
+                    'message': 'success',
+                    'data': result
+                }
+            else:
+                json_response = {
+                    'ret_code': res_code,
+                    'message': result
+                }
+        except Exception, e:
+            json_response = {
+                'ret_code': 50001,
+                'message': 'api error'
+            }
+    else:
+        json_response = {
+            'ret_code': 50001,
+            'message': 'api error'
+        }
+
+    return json_response
+
+
+def xunlei9_order_query(params):
+    """
+    迅雷VIP业务查询
+    """
+
+    from .utils import xunleivip_generate_sign
+
+    url = getattr(settings, 'XUNLEIVIP_QUERY_URL', None)
+    coop_key = getattr(settings, 'XUNLEIVIP_KEY', None)
+    if coop_key and url:
+        data = {
+            'uid': params.get('uid', ''),
+            'act': params.get('act', ''),
+            'orderid': params.get('orderid', ''),
+        }
+
+        data['sign'] = xunleivip_generate_sign(data, coop_key)
+
+        try:
+            res = requests.get(url, params=data).json()
+            json_response = {
+                'ret_code': 0,
+                'message': 'success',
+                'data': res
+            }
+        except Exception, e:
+            json_response = {
+                'ret_code': 50001,
+                'message': 'api error'
+            }
+    else:
+        json_response = {
+            'ret_code': 50001,
+            'message': 'api error'
+        }
+
+    return json_response

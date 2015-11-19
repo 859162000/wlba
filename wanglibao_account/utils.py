@@ -19,6 +19,7 @@ import logging
 import hashlib
 import pytz
 from Crypto.Cipher import AES
+import urllib
 
 from decimal import Decimal
 from wanglibao_p2p.amortization_plan import get_amortization_plan
@@ -437,3 +438,10 @@ def base64_to_image(base64_str):
     img_file = FileObject(img_handle, len(img_str))
 
     return img_file
+
+
+def xunleivip_generate_sign(data, key):
+    sorted_data = sorted(data.iteritems(), key=lambda asd:asd[0], reverse=False)
+    encode_data = urllib.urlencode(sorted_data)
+    sign = hashlib.md5(encode_data+str(key)).hexdigest()
+    return sign
