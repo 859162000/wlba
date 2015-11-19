@@ -2462,31 +2462,30 @@ class RewardDistributeAPIView(APIView):
         """ 决定发送哪一个奖品
         """
         sent_count = ActivityJoinLog.objects.filter(action_name=self.action_name).count() + 1
-        today = time.strftime("%Y-%m-%d", time.localtime())
-        join_log = ActivityJoinLog.objects.filter(user=user, create_time__gt=today, action_name=self.action_name).first()
-        if not join_log:
-            rate = None
-            for rate in self.rates:
-                if sent_count%(100/rate)==0:
-                    break
+        rate = None
 
-            rate = 50 if rate==None else rate
-            #根据rate找到对应的红包
-            index = self.rates.index(rate)
-            logger.debug(u"rate:{0},index:{1}, redpack_amount:{2}".format(rate,index, self.redpack_amount))
-            try:
-                join_log = ActivityJoinLog.objects.create(
-                    user=user,
-                    action_name=self.action_name,
-                    join_times=3,
-                    amount=self.redpack_amount[index],
-                )
-            except IndexError, reason:
-                logger.exception(u"redpack_amount 索引超范围了,reason:{0}".format(reason))
-                raise
-            except Exception, reason:
-                logger.exception(u"创建用户获奖记录异常了， reason:{0}".format(reason))
+        for rate in self.rates:
+            if sent_count%(100/rate)==0:
+                break
 
+        rate = 50 if rate==None else rate
+        #根据rate找到对应的红包
+        index = self.rates.index(rate)
+        logger.debug(u"rate:{0},index:{1}, redpack_amount:{2}".format(rate,index, self.redpack_amount))
+        try:
+            join_log = ActivityJoinLog.objects.create(
+                user=user,
+                action_name=self.action_name,
+                join_times=3,
+                amount=self.redpack_amount[index],
+            )
+        except IndexError, reason:
+            logger.exception(u"redpack_amount 索引超范围了,reason:{0}".format(reason))
+            raise
+        except Exception, reason:
+            logger.exception(u"创建用户获奖记录异常了， reason:{0}".format(reason))
+        else:
+            logger.debug("生成用户的抽奖记录:{0}".format(join_log))
         return join_log
 
     @method_decorator(transaction.atomic)
@@ -2495,7 +2494,7 @@ class RewardDistributeAPIView(APIView):
         """
         try:
             today = time.strftime("%Y-%m-%d", time.localtime())
-            join_log = ActivityJoinLog.objects.select_for_update().filter(user=user, create_time__gte=today).first()
+            join_log = ActivityJoinLog.objects.select_for_update().filter(action_name=self.action_name, user=user, create_time__gte=today).first()
             if join_log.join_times == 0:
                 join_log.save()
                 return "No Reward"
@@ -2503,6 +2502,8 @@ class RewardDistributeAPIView(APIView):
                 redpack_event = self.redpacks.get(join_log.amount)
         except Exception, reason:
             logger.debug(u"获得用户的预配置红包抛异常, reason:{0}".format(reason))
+        else:
+            logger.debug("join_log.amount的值为:{0}, redpack_event的值为:{1}, redpacks的值为:{2}".format(join_log.amount, redpack_event, self.redpacks))
 
         try:
             redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
@@ -2555,7 +2556,7 @@ class RewardDistributeAPIView(APIView):
             user = w_user.first().user
 
         today = time.strftime("%Y-%m-%d", time.localtime())
-        join_log = ActivityJoinLog.objects.filter(user=user, create_time__gte=today).first()
+        join_log = ActivityJoinLog.objects.filter(user=user, create_time__gte=today, action_name=self.action_name).first()
 
         self.prepare_for_distribute()
         if not join_log:
