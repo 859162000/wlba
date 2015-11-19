@@ -15,7 +15,9 @@ class ExperienceGoldView(TemplateView):
 
     def get_template_names(self):
         template = self.kwargs['template']
-        if template == 'mobile':
+        if template not in ('mobile', 'gold'):
+            template_name = "experience_gold.jade"
+        elif template == 'mobile':
             template_name = 'app_experience.jade'
         else:
             template_name = "experience_gold.jade"
