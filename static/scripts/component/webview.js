@@ -3,9 +3,6 @@ var wlb = (function () {
     function Mixin (bridge) {
         this.bridge = bridge;
     }
-    Mixin.checkArguments = function(target){
-        return toString.call(target)
-    }
 
     Mixin.prototype = {
         init: function(){
@@ -15,19 +12,25 @@ var wlb = (function () {
             });
         },
         loginApp: function(data, callback){
+            this.bridge.callHandler('registerApp', {'12':12}, function (response) {
 
+            });
             var ops = {
                 refresh: data.refresh || 1,
                 url: data.url || ''
             };
 
-            this.bridge.callHandler('loginApp', ops, function (response) {
-                if(Mixin.checkArguments(data) == '[object function]'){
+            this.bridge.callHandler('registerApp', {'1': 12}, function (response) {
+
+               /* if(toString.call(data) == '[object function]'){
                     data.callback(response)
                 }else{
                     callback && callback(response);
-                }
+                }*/
             });
+        },
+        test: function(){
+            document.getElementById('log').innerHTML ='test'
         }
     }
 
@@ -46,14 +49,14 @@ var wlb = (function () {
             run({callback: 'other', data: null })
         }
 
-
         function run(target){
             var mixins ;
             if(target.callback && target.callback == 'app'){
                 mixins = new Mixin(target.data);
                 mixins.init();
+
             }
-            dics[target.callback]();
+            dics[target.callback](mixins);
         }
     }
 
@@ -65,34 +68,20 @@ var wlb = (function () {
 
 wlb.ready({
     app: function(mixins){
-        document.getElementById('log').innerHTML = JSON.stringify(mixins)
+
         document.getElementById('buttons').onclick = function(){
             mixins.loginApp();
         }
 
     },
     other: function(mixins){
+        var ops = {
+                refresh: data.refresh || 1,
+                url: data.url || ''
+            };
          document.getElementById('buttons').onclick = function(){
             window.location.href= '/weixin/login/'
         }
     },
 })
 
-
-function Mixin (bridge) {
-        this.bridge = bridge;
-    }
-
-
-Mixin.prototype = {
-    init: function(){
-        console.log(123)
-    },
-    loginApp: function(data, callback){
-
-        console.log(this)
-    }
-}
-
-var est = new Mixin('1')
-console.log(est)
