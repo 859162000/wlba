@@ -83,7 +83,7 @@ from wanglibao_account.models import UserThreeOrder
 from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes, hex2bin
 import requests
 from wanglibao_margin.models import MarginRecord
-from experience_gold.models import ExperienceAmortization
+from experience_gold.models import ExperienceAmortization, ExperienceEventRecord, ExperienceProduct
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
@@ -490,21 +490,39 @@ class AccountHome(TemplateView):
 
         total_asset = p2p_total_asset
 
+        result = []
+
         if mode == 'p2p':
-            result = []
             for equity in p2p_equities:
                 obj = {"equity": equity}
                 if earning_map.get(equity.product_id):
                     obj["earning"] = earning_map.get(equity.product_id)
 
                 result.append(obj)
-        else:
-            result = []
 
-        if mode == 'experience':
-            experience_amortization = ExperienceAmortization.objects.filter(user=user).select_related('product')
-        else:
-            experience_amortization = []
+        now = timezone.now()
+        experience_amount = 0
+        paid_interest = unpaid_interest = 0
+
+        experience_record = ExperienceEventRecord.objects.filter(user=user, apply=False, event__invalid=False)\
+            .filter(event__available_at__lt=now, event__unavailable_at__gt=now).aggregate(Sum('event__amount'))
+        if experience_record.get('event__amount__sum'):
+            experience_amount = experience_record.get('event__amount__sum')
+
+        experience_amortization = ExperienceAmortization.objects.filter(user=user).select_related('product')
+        if experience_amortization:
+            paid_interest = reduce(lambda x, y: x + y,
+                                   [e.interest for e in experience_amortization if e.settled is True], 0)
+            unpaid_interest = reduce(lambda x, y: x + y,
+                                     [e.interest for e in experience_amortization if e.settled is False], 0)
+
+        total_experience_amount = float(experience_amount) + float(paid_interest) + float(unpaid_interest)
+        experience_account = {
+            'total_experience_amount': total_experience_amount,
+            'experience_amount': float(experience_amount),
+            'paid_interest': paid_interest,
+            'unpaid_interest': unpaid_interest
+        }
 
         return {
             'message': message,
@@ -516,6 +534,7 @@ class AccountHome(TemplateView):
             'total_asset': total_asset,
             'mode': mode,
             'experience_amortization': experience_amortization,
+            'experience_account': experience_account,
             'announcements': AnnouncementAccounts,
         }
 

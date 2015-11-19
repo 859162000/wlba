@@ -48,13 +48,13 @@ block main
         .brief--fund-total-asset
           a(href="/accounts/home/experience/")
             p.align-center
-              span#fund_total_asset_title.big_number
+              span.big_number {{experience_account.unpaid_interest}}
             p.align-center 体验金(元)
       else
         .brief--fund-total-asset.active
           a(href="/accounts/home/experience/")
             p.align-center
-              span#fund_total_asset_title.big_number
+              span.big_number {{experience_account.unpaid_interest}}
             p.align-center 体验金(元)
   if mode == 'p2p'
     .account-home-panel__no-padding
@@ -179,19 +179,19 @@ block main
               .row.tyjRow
                   .total-asset-money-card
                       p.align-center
-                          span.big_number 8,888.00
+                          span.big_number {{experience_account.total_experience_amount}}
                       p.align-center.desc 体验金总资产（元）
                   .total-asset-money-card
                       p.align-center
-                          span.big_number 00.00
+                          span.big_number {{experience_account.experience_amount}}
                       p.align-center.desc 体验金余额（元）
                   .total-asset-money-card
                       p.align-center
-                          span.big_number 00.00
+                          span.big_number {{experience_account.paid_interest}}
                       p.align-center.desc 到账收益（元）
                   .total-asset-money-card
                       p.align-center
-                          span.big_number 00.00
+                          span.big_number {{experience_account.unpaid_interest}}
                       p.align-center.desc 待收收益（元）
               p.tyjMark 注：体验金收益可以正常使用，每一笔到账收益会自动转至理财专区余额。
               table.table.tableNew
@@ -204,8 +204,8 @@ block main
                           th 项目期限
                           th 已收益／预期收益
                   tbody
-                    if experience_amoritization
-                      for amo in experience_amoritization
+                    if experience_amortization
+                      for amo in experience_amortization
                         tr
                           td {{amo.created_time}}
                           td {{amo.product.name}}
@@ -213,7 +213,7 @@ block main
                           td {{amo.product.expected_earning_rate}}%
                           td {{amo.product.period}}
                           if amo.settled
-                            td {{amo.interest}}/0.00（元）
+                            td {{amo.interest}}/{{amo.interest}}（（元）
                           else
                             td 0.00/{{amo.interest}}（元）
 
