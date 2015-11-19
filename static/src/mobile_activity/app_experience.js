@@ -87,11 +87,11 @@ org.experience = (function(org){
             $investBtn = $('.investBtn');
             $investBtn.on('click',function() {
                 if (!$investBtn.hasClass('investBtnEd')) {
-                $.ajax({
+                org.ajax({
                     url: '/api/experience/buy/',
                     type: "POST",
                     data: {}
-                 }).done(function (xhr) {
+                 }).done(function (xhr) { 
                     org.ui.alert('', '', '2')
                     setTimeout(function () {
                         $('#alert-cont,#popubMask').hide();
