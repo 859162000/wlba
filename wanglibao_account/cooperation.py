@@ -3312,7 +3312,9 @@ class Rong360TokenView(APIView):
 
         ret = create_token(request)
         # {'state': True, 'data': token}
-        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+        if ret['state']:
+            rong_ret = {'data': {'token': ret['data']}}
+        return HttpResponse(renderers.JSONRenderer().render(rong_ret, 'application/json'))
 
 
 class Rong360P2PListView(APIView):
