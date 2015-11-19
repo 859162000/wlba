@@ -1445,7 +1445,7 @@ def get_rate(product_id_or_instance):
     if isinstance(product_id_or_instance, P2PProduct):
         if product_id_or_instance.activity and product_id_or_instance.activity.rule:
             return product_id_or_instance.activity.rule.rule_amount + \
-                   decimal.Decimal(product_id_or_instance.expected_earning_rate)
+                   Decimal(product_id_or_instance.expected_earning_rate)
         else:
             return product_id_or_instance.expected_earning_rate
 
@@ -3372,8 +3372,8 @@ class Rong360P2PListView(APIView):
                         p2p_dict = dict()
                         p2p_dict['projectId'] = str(product.id)
                         p2p_dict['title'] = product.name
-                        p2p_dict['amount'] = decimal.Decimal(product.total_amount)
-                        p2p_dict['schedule'] = str(product.completion_rate)
+                        p2p_dict['amount'] = Decimal(product.total_amount)
+                        p2p_dict['schedule'] = str(Decimal(product.completion_rate).quantize(Decimal('0.00')))
                         p2p_dict['interestRate'] = str(product.expected_earning_rate) + '%'
                         p2p_dict['deadline'] = product.period
                         p2p_dict['deadlineUnit'] = u'天' if product.pay_method.startswith(u'日计息') else u'月'
@@ -3411,10 +3411,10 @@ class Rong360P2PListView(APIView):
                         for equity in equities:
                             data_dic = dict()
                             data_dic['subscribeUserName'] = str(equity.user.pk)
-                            data_dic['amount'] = decimal.Decimal(equity.equity)
-                            data_dic['validAmount'] = decimal.Decimal(equity.equity)
+                            data_dic['amount'] = Decimal(equity.equity)
+                            data_dic['validAmount'] = Decimal(equity.equity)
                             data_dic['addDate'] = equity.confirm_at or equity.created_at
-                            data_dic['status'] = 1 if equity.confirm else 0
+                            data_dic['status'] = 1 if equity.confirm else 2
 
                             # 标识手动或自动投标 0:手动 1:自动
                             try:
@@ -3442,7 +3442,7 @@ class Rong360P2PListView(APIView):
                 ret['totalPage'] = com_page
                 ret['currentPage'] = page_index
                 ret['totalCount'] = total
-                ret['totalAmount'] = decimal.Decimal(total_amount)
+                ret['totalAmount'] = Decimal(total_amount)
 
                 return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
             except Exception, e:
