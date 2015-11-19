@@ -714,8 +714,16 @@ class WeixinRedPackView(APIView):
             }
             return HttpResponse(json.dumps(data), content_type='application/json')
 
+        day = time.strftime("%Y-%m-%d", time.localtime())
+        if day < "2015-11-23" or day > "2015-11-29":
+            data = {
+                'ret_code': 9100,
+                'message': u'感恩节活动期已过，不发了',
+            }
+            return HttpResponse(json.dumps(data), content_type='application/json')
+
         phone_number = phone.strip()
-        redpack = WanglibaoUserGift.objects.filter(identity=phone, activity__code=attention_code).first()
+        redpack = WanglibaoUserGift.objects.filter(get_time__gte="2015-11-23", get_time__lte="2015-11-29", identity=phone, activity__code=attention_code).first()
         if redpack:
             data = {
                 'ret_code': 0,
@@ -874,8 +882,18 @@ class DistributeRewardAPIView(APIView):
             return HttpResponse(json.dumps(json_to_response), content_type="application/json")
 
 
-class ThanksGivingDistribute(object):
+class ActivityRewardDistribute(object):
+    def __init__(self):
+        self.token = ''  #用户从前端传入的activity(POST/GET)
+        pass
 
+    def distribute(self):
+        """发奖接口，必须被实现
+        """
+        raise NotImplementedError(u"抽象类中的方法，子类中需要被实现")
+
+
+class ThanksGivingDistribute(ActivityRewardDistribute):
     def __init__(self):
         self.token = 'thanks_given'
 

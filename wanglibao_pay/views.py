@@ -159,11 +159,11 @@ class PayView(TemplateView):
         amount = fmt_two_amount(request.POST.get('amount'))
         gate_id = request.POST.get('gate_id')
         request_ip = get_client_ip(request)
-        device = split_ua(request)
-        channel = PayOrder.get_bank_and_channel(gate_id, device)[1]
+        device_type = split_ua(request)['device_type']
+        channel = PayOrder.get_bank_and_channel(gate_id, device_type)[1]
 
         if channel == 'yeepay':
-            result = YeeProxyPay().proxy_pay(user, amount,  gate_id,  request_ip, device)
+            result = YeeProxyPay().proxy_pay(user, amount,  gate_id,  request_ip, device_type)
         else:
             result = HuifuPay().pre_pay(request)
         return self.render_to_response(result)
