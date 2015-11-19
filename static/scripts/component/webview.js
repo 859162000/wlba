@@ -115,6 +115,6 @@ wlb.ready({
     },
     other: function(){
 
-    },
+    }
 })
 
