@@ -306,12 +306,18 @@ org.experience = (function(org){
             $investBtn = $('.investBtn');
             $investBtn.on('click',function() {
                 if (!$investBtn.hasClass('investBtnEd')) {
+                $.ajax({
+                    url: '/api/experience/buy/',
+                    type: "POST",
+                    data: {}
+                 }).done(function (xhr) {
                     org.ui.alert('', '', '2')
                     setTimeout(function () {
                         $('#alert-cont,#popubMask').hide();
-                        $('.investBtn').text('已投资8888元').addClass('investBtnEd')
-                        $('.time_style').show()
+                        $('.investBtn').text('已投资'+ xhr.amount +'元').addClass('investBtnEd')
+                        $('.time_style').show().text('将于'+ xhr.term_date +'收益'+ xhr.interest +'元')
                     }, 2000)
+                 })
                 }
             })
         },
