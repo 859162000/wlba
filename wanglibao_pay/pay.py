@@ -21,6 +21,7 @@ from wanglibao_pay.util import fmt_two_amount
 
 logger = logging.getLogger(__name__)
 
+# todo better logger
 class Pay(object):
     def pay(self, post):
         raise  NotImplementedError
@@ -150,20 +151,20 @@ class PayOrder(object):
 
         return order.id
 
-    def order_restart_fail(self, order_id):
-        """
-        将pay_info 设置为processing状态，重新开始处理失败或是异常的订单
-        :param pay_info_id:
-        :return:
-        """
-        pay_info = PayInfo.objects.select_for_update().filter(order_id=order_id).get()
-        if pay_info.status == PayInfo.EXCEPTION or pay_info.status == PayInfo.FAIL:
-            pay_info.status = PayInfo.PROCESSING
-            return 0
-        elif pay_info.status == PayInfo.SUCCESS:
-            return 1
-        else:
-            raise ThirdPayError(77777, 'illegal condition within pay')
+    # def order_restart_fail(self, order_id):
+    #     """
+    #     将pay_info 设置为processing状态，重新开始处理失败或是异常的订单
+    #     :param pay_info_id:
+    #     :return:
+    #     """
+    #     pay_info = PayInfo.objects.select_for_update().filter(order_id=order_id).get()
+    #     if pay_info.status == PayInfo.EXCEPTION or pay_info.status == PayInfo.FAIL:
+    #         pay_info.status = PayInfo.PROCESSING
+    #         return 0
+    #     elif pay_info.status == PayInfo.SUCCESS:
+    #         return 1
+    #     else:
+    #         raise ThirdPayError(77777, 'illegal condition within pay')
 
     def add_card(self, card_no, bank, user, channel):
         """
@@ -243,27 +244,27 @@ class PayOrder(object):
 
     @method_decorator(transaction.atomic)
     def order_after_pay_error(self, error, order_id):
+        # todo error when error
         logger.exception(error)
         pay_info = PayInfo.objects.select_for_update().get(order_id=order_id)
 
-        if pay_info.status == PayInfo.PROCESSING:
-            order = Order.objects.get(id=order_id)
-            user = User.objects.get(id=pay_info.user_id)
+        if pay_info.status == PayInfo.SUCCESS:
+            return {"ret_code":0, "message":PayResult.DEPOSIT_SUCCESS, "amount": pay_info.amount}
 
-            if isinstance(error, ThirdPayError):
-                error_code = error.code
-                is_inner_error = False
-            else:
-                error_code = 20119
-                is_inner_error = True
-            error_message = error.message
-            pay_info.save_error(error_code=error_code, error_message=error_message, is_inner_error=is_inner_error)
-            OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
-            return {"ret_code": error_code, "message": error_message, 'order_id':order_id, 'pay_info_id':pay_info.id}
+        order = Order.objects.get(id=order_id)
+        user = User.objects.get(id=pay_info.user_id)
+
+        if isinstance(error, ThirdPayError):
+            error_code = error.code
+            is_inner_error = False
         else:
-            # 若TR3或者前期已经完成该交易，直接返回结果
-            return {"ret_code": pay_info.error_code, "message": pay_info.error_message,
-                    'order_id':order_id, 'pay_info_id':pay_info.id}
+            # todo better exception than just using code
+            error_code = 20119
+            is_inner_error = True
+        error_message = error.message
+        pay_info.save_error(error_code=error_code, error_message=error_message, is_inner_error=is_inner_error)
+        OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
+        return {"ret_code": error_code, "message": error_message, 'order_id':order_id, 'pay_info_id':pay_info.id}
 
 class PayMessage(object):
     """
@@ -431,10 +432,10 @@ class YeeProxyPay(object):
         """
         try:
             # use PayMessage to CHECK PARA, RAISE ERROR before proxy_pay_callback
-            self.pay_order.order_after_pay_succcess(pay_message.amount, pay_message.order_id, pay_message.res_ip,
+            return self.pay_order.order_after_pay_succcess(pay_message.amount, pay_message.order_id, pay_message.res_ip,
                                                     pay_message.res_content)
         except ThirdPayError, error:
-            self.pay_order.order_after_pay_error(error, pay_message.order_id)
+            return self.pay_order.order_after_pay_error(error, pay_message.order_id)
 
 
 

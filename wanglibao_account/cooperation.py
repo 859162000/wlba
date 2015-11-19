@@ -3381,7 +3381,7 @@ class Rong360P2PListView(APIView):
                         p2p_dict['deadline'] = product.period
                         p2p_dict['deadlineUnit'] = u'天' if product.pay_method.startswith(u'日计息') else u'月'
                         p2p_dict['reward'] = 0
-                        p2p_dict['type'] = product.category
+                        p2p_dict['type'] = u'抵押标'
 
                         pay_method = 6
                         if product.pay_method == u'等额本息':
