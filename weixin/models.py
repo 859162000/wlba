@@ -369,7 +369,7 @@ class SubscribeService(models.Model):
         ordering = ['key']
 
 class SubscribeRecord(models.Model):
-    user = models.ForeignKey(User, null=False)
+    w_user = models.ForeignKey(WeixinUser, null=True)
     status = models.BooleanField(u'订阅状态, 0:退订,1:订阅', default=False)
     service = models.ForeignKey(SubscribeService, null=False)
     # update_at = models.DateTimeField('更新时间', auto_now_add=True)
