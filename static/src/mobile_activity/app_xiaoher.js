@@ -19,11 +19,11 @@
 	});
 	wx.ready(function(){
 		var host = 'https://staging.wanglibao.com/',
-			shareName = '网利宝用户专享福利',
-			shareImg = host + '/static/imgs/mobile_activity/app_365_gu/300X300.jpg',
-			shareLink = host + '/activity/app_365_gu/',
-			shareMainTit = '网利宝用户专享福利',
-			shareBody = '网利宝理财券&365谷礼包任性送'
+			shareName = '网利宝送百元红包',
+			shareImg = host + '/static/imgs/mobile_activity/app_xiaoher/300x300.jpg',
+			shareLink = host + '/activity/app_xiaoher/',
+			shareMainTit = '网利宝送百元红包',
+			shareBody = '你购物我买单'
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -33,7 +33,7 @@
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '网利宝用户专享福利',
+			title: '网利宝送百元红包',
 			link : shareLink,
 			imgUrl: shareImg
 		})
