@@ -15,10 +15,12 @@ class ExperienceGoldView(TemplateView):
 
     def get_template_names(self):
         template = self.kwargs['template']
-        if template not in ('mobile', 'gold'):
+        if template not in ('mobile', 'gold', 'account'):
             template_name = "experience_gold.jade"
         elif template == 'mobile':
             template_name = 'app_experience.jade'
+        elif template == 'account':
+            template_name = 'experience_account.jade'
         else:
             template_name = "experience_gold.jade"
 
@@ -75,3 +77,10 @@ class ExperienceGoldView(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         return super(ExperienceGoldView, self).dispatch(request, *args, **kwargs)
+
+
+# class ExperienceAccountsView(TemplateView):
+#     template_name = 'experience_account.jade'
+#
+#     def get_context_data(self, **kwargs):
+#         return {}
