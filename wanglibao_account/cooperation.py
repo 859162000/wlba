@@ -1029,7 +1029,7 @@ class JuChengRegister(CoopRegister):
         # 判断是否首次投资
         if p2p_record and p2p_record.order_id == order_id:
             p2p_amount = int(p2p_record.amount)
-            if p2p_amount>=1000 and p2p_amount<2000:
+            if p2p_amount>=500 and p2p_amount<1000:
                 try:
                     logger.debug(u"80门票，我要申请锁")
                     config = GiftOwnerGlobalInfo.objects.select_for_update().filter(description=u'jcw_ticket_80').first()
@@ -1045,7 +1045,7 @@ class JuChengRegister(CoopRegister):
                     logger.debug(u"用户 %s 获得80门票一张, 剩余：%s" % (user, config.amount))
                     SEND_SUCCESS = True
 
-            if p2p_amount>=2000:
+            if p2p_amount>=1000:
                 try:
                     logger.debug(u"180门票，我要申请锁")
                     config = GiftOwnerGlobalInfo.objects.select_for_update().filter(description=u'jcw_ticket_188').first()
