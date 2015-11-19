@@ -9,7 +9,9 @@ from django.contrib.auth.models import User
 from .common.wechat import gen_token
 from wechatpy.client import WeChatClient
 from wechatpy.client.api.qrcode import WeChatQRCode
+import logging
 
+logger = logging.getLogger("weixin")
 
 class Account(models.Model):
     """
@@ -262,6 +264,8 @@ class WeixinAccounts(object):
     def getByOriginalId(cls, original_id):
         if not cls.data:
             cls.append_account()
+        logger.debug("original_id::%s"%original_id)
+        logger.debug("cls.data::%s"%cls.data)
         for key, account_info in cls.data.items():
             if account_info['id'].strip() == original_id.strip():
                 return cls(key)

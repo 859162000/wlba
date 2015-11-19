@@ -6,8 +6,8 @@ from rest_framework.response import Response
 
 from wechatpy.exceptions import WeChatException
 from weixin.models import WeixinAccounts
-
-
+import logging
+logger = logging.getLogger("weixin")
 def weixin_api_error(f):
     @wraps(f)
     def decoration(obj, request, *args, **kwargs):
@@ -24,6 +24,7 @@ def weixin_api_error(f):
 
             if errcode == 40014 or errcode == 43001 or errcode == 40001:
                 current_account.db_account.update_access_token()
+                logger.debug("------------------------refreshed access_token in weixin_api_error")
             elif errcode == 42002:
                 pass
             elif errcode == 42003:
