@@ -153,17 +153,17 @@ class WeixinJoinView(View):
                 reply = self.check_service_subscribe(msg, weixin_account)
                 # 自动回复  5000次／天
                 # if not reply:
+                #     if msg.content=='test':
+                #         reply = -1
+                #         product = P2PProduct.objects.get(id=1745)
+                #         checkAndSendProductTemplate(product)
+                # if not reply:
                 #     reply = tuling(msg)
                 if not reply:
                     # 多客服转接
                     reply = TransferCustomerServiceReply(message=msg)
-
-            # else:
-            #     reply = create_reply(u'更多功能，敬请期待！', msg)
-        if reply == -1:
+        if reply == -1 or not reply:
             return HttpResponse("")
-        if not reply:
-            reply = create_reply(u'这个是不是不需要回复什么的?', msg)
         return HttpResponse(reply.render())
 
 
@@ -197,15 +197,28 @@ class WeixinJoinView(View):
             # 可用余额（元）： 108.00
             # 累计收益（元）：  79.00
             # 待收收益（元）：  24.00
+            now_str = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M')
+            infos = "%s\n总资产　：%s \n可用余额：%s"%(account_info['p2p_total_paid_interest'], account_info['total_asset'], account_info['p2p_margin'])
             a = MessageTemplate(ACCOUNT_INFO_TEMPLATE_ID,
-                    keyword1=account_info['total_asset'],
-                    keyword2=account_info['p2p_margin'], keyword3=account_info['p2p_total_paid_interest'],
-                    keyword4=account_info['p2p_total_unpaid_interest'])
+                    keyword1=now_str,
+                    keyword2=infos)
             SendTemplateMessage.sendTemplate(w_user, a)
             reply = -1
         if msg.key == 'customer_service':
             txt = self.getCSReply()
-            reply = create_reply(txt, msg)
+            try:
+                client = WeChatClient(weixin_account.app_id, weixin_account.app_secret)
+                client.message._send_custom_message({
+                                            "touser":fromUserName,
+                                            "msgtype":"text",
+                                            "text":
+                                            {
+                                                 "content":txt
+                                            }
+                                        }, account="007@wanglibao400")
+            except:
+                pass
+            reply = -1#create_reply(txt, msg)
         return reply
 
     @checkBindDeco
@@ -216,7 +229,7 @@ class WeixinJoinView(View):
         reply = None
         txt = None
         if content == 'td':
-            sub_records = SubscribeRecord.objects.filter(user=w_user.user, status=True)
+            sub_records = SubscribeRecord.objects.filter(w_user=w_user, status=True)
             if sub_records.exists():
                 sub_records.update(status=False)
                 txt = u'订阅项目已退订成功，如需订阅相关项目，请再次点击【个性化项目】进行订阅'
@@ -226,13 +239,13 @@ class WeixinJoinView(View):
             return reply
         sub_service = SubscribeService.objects.filter(channel='weixin', is_open=True, key=content).first()
         if sub_service:
-            sub_service_record = SubscribeRecord.objects.filter(user=w_user.user, service = sub_service).first()
+            sub_service_record = SubscribeRecord.objects.filter(w_user=w_user, service = sub_service).first()
             if sub_service_record and sub_service_record.status==1:
                 txt = u'客官真健忘，您已经订阅此项目通知，订阅其他上线通知项目吧～'
             if not sub_service_record:
                 sub_service_record = SubscribeRecord()
                 sub_service_record.service = sub_service
-                sub_service_record.user = w_user.user
+                sub_service_record.w_user = w_user
             if not sub_service_record.status:
                 sub_service_record.status = True
                 sub_service_record.save()
@@ -445,11 +458,9 @@ class JumpPageTemplate(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(JumpPageTemplate, self).get_context_data(**kwargs)
-        logger.debug(self.request.__dict__)
         message = self.request.GET.get('message', 'ERROR')
-        logger.debug(message)
-        message = urllib.unquote(message).decode('utf-8')
-        logger.debug(message)
+        message=message.encode('utf-8')
+        message = urllib.unquote(message)
         context['message'] = message
         return {
             'context': context,
@@ -477,7 +488,8 @@ class WeixinBind(TemplateView):
                         "name2":user.wanglibaouserprofile.phone,
                         "time":now_str,
                     })})
-        except WeixinUser.DoesNotExist:
+        except WeixinUser.DoesNotExist, e:
+            logger.debug(e.message)
             pass
         context['message'] = txt
         return {
@@ -486,9 +498,7 @@ class WeixinBind(TemplateView):
             }
 
 def redirectToJumpPage(message):
-    logger.debug('-----------------message beforejump::%s'% message)
     url = reverse('jump_page')+'?message=%s'% message
-    logger.debug(url)
     return HttpResponseRedirect(url)
 
 class UnBindWeiUser(TemplateView):
@@ -513,8 +523,7 @@ class UnBindWeiUser(TemplateView):
             message = u"请从[服务中心]点击[绑定微信]进行绑定"
             return redirectToJumpPage(message)
         if not w_user.user:
-            message = u"您没有绑定的网利宝帐号"
-            return redirectToJumpPage(urllib.quote("您没有绑定的网利宝帐号"))
+            return redirectToJumpPage(u"您没有绑定的网利宝帐号")
         return super(UnBindWeiUser, self).dispatch(request, *args, **kwargs)
 
 class UnBindWeiUserAPI(APIView):
@@ -1395,7 +1404,7 @@ class AwardIndexTemplate(TemplateView):
         if not w_user:
             return redirectToJumpPage("error")
         if not w_user.user:
-            return redirectToJumpPage(urllib.quote("一定要绑定网利宝账号才可以抽奖"))
+            return redirectToJumpPage(u"一定要绑定网利宝账号才可以抽奖")
 
         return super(AwardIndexTemplate, self).dispatch(request, *args, **kwargs)
 
@@ -1469,4 +1478,3 @@ def recordProduct(sender, **kw):
 
 pre_save.connect(recordProduct, sender=P2PProduct, dispatch_uid="product-pre-save-signal")
 post_save.connect(checkProduct, sender=P2PProduct, dispatch_uid="product-post-save-signal")
-

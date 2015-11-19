@@ -89,6 +89,7 @@ org.scratch = (function(org){
           }
 
           connectWebViewJavascriptBridge(function(bridge) {
+
             var uniqueId = 1
             function log(message, data) {
               var log = document.getElementById('log')
@@ -99,12 +100,12 @@ org.scratch = (function(org){
               else { log.appendChild(el) }
             }
 
-            bridge.init(function(message, responseCallback) {
+           /* bridge.init(function(message, responseCallback) {
               log('JS got a message', message)
               var data = { 'Javascript Responds':'收到' }
               log('JS responding with', data)
               responseCallback(data)
-            });
+            });*/
 
             //登陆
               $('#login').on('click',function(){

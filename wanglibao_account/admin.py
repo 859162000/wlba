@@ -129,7 +129,7 @@ User.__unicode__ = user_unicode
 
 class IdVerificationAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ('id', 'name', 'id_number', 'is_valid', 'created_at', ) # 'update_verify'
+    list_display = ('id', 'name', 'id_number', 'is_valid', 'created_at')
     search_fields = ('name', 'id_number')
     list_filter = ('is_valid', )
 

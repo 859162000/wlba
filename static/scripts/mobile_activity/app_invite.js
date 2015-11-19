@@ -448,11 +448,19 @@ org.invite_index = (function (org) {
                 $(this).toggleClass('agreement');
                 $(this).hasClass('agreement') ?  $(this).find('input').attr('checked','checked') : $(this).find('input').removeAttr('checked');
             })
+
+            var $registXieyi = $('.regist-protocol-div');
             $('.xieyi-btn').on('click', function(){
-                $('.regist-protocol-div').css('-webkit-transform','translate3d(0, 0, 0)')
+                 $registXieyi.css('display','block')
+                setTimeout(function(){
+                    $registXieyi.css('-webkit-transform','translate3d(0, 0%, 0)')
+                },30)
             })
             $('.cancel-xiyie').on('click', function(){
-                $('.regist-protocol-div').css('-webkit-transform','translate3d(0, 100%, 0)')
+                $registXieyi.css('-webkit-transform','translate3d(0, 100%, 0)')
+                setTimeout(function(){
+                    $registXieyi.css('display','none')
+                },200)
             })
 
             $('input[name=submit]').on('click', function(){
@@ -495,11 +503,13 @@ org.invite_index = (function (org) {
                     $('input[name=submit]').attr('disabled',true)
                 },
                 success:function(data){
+                    var base64Native = Base64.encode(_self.$phone.val());
+                    var styleBase = base64Native.substring(0,base64Native.length-1);
                     if(data.ret_code === 0 ){
-                        var base64Native = Base64.encode(_self.$phone.val());
-                        var styleBase = base64Native.substring(0,base64Native.length-1);
                         window.location.href='/wst/'+ styleBase+'/';
-                    }else if (data.ret_code){
+                    }else if (data.ret_code === 30015){
+                        window.location.href = '/wsf/'+ styleBase+'/';
+                    }else{
                         return _self.spread.trigger('from:showSign',[data.message])
                     }
                 },

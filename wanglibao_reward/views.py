@@ -714,8 +714,16 @@ class WeixinRedPackView(APIView):
             }
             return HttpResponse(json.dumps(data), content_type='application/json')
 
+        day = time.strftime("%Y-%m-%d", time.localtime())
+        if day < "2015-11-23" or day > "2015-11-29":
+            data = {
+                'ret_code': 9100,
+                'message': u'感恩节活动期已过，不发了',
+            }
+            return HttpResponse(json.dumps(data), content_type='application/json')
+
         phone_number = phone.strip()
-        redpack = WanglibaoUserGift.objects.filter(identity=phone, activity__code=attention_code).first()
+        redpack = WanglibaoUserGift.objects.filter(get_time__gte="2015-11-23", get_time__lte="2015-11-29", identity=phone, activity__code=attention_code).first()
         if redpack:
             data = {
                 'ret_code': 0,
@@ -831,20 +839,22 @@ class ThanksGivenRewardDistributer(RewardDistributer):
             redpack_event = RedPackEvent.objects.filter(name=self.reward).first()
         else:
             reward = Reward.objects.filter(description=self.reward).first()
-        logger.debug("用户的投资额度是：%s, 获得的红包是：%s" % (self.amount, self.reward,))
-        WanglibaoActivityReward.objects.create(
-            activity=u'ThanksGiven',
-            user=self.request.user,
-            redpack_event_id=2,
-            reward_id=1,
-            join_times=1,
-            left_times=1,
-            when_dist=1,
-            has_sent=False,
-            p2p_amount=self.amount,
-            channel=self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, 'all'),
-        )
-
+        logger.debug("用户的投资额度是：%s, 获得的红包是：%s, redpack_event:%s, reward:%s" % (self.amount, self.reward, redpack_event, reward,))
+        try:
+            WanglibaoActivityReward.objects.create(
+                activity=u'ThanksGiven',
+                user=self.request.user,
+                redpack_event=redpack_event if redpack_event else None,
+                reward=reward if reward else None,
+                join_times=1,
+                left_times=1,
+                when_dist=1,
+                has_sent=False,
+                p2p_amount=self.amount,
+                channel=self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, 'all'),
+            )
+        except Exception, reason:
+            logger.debug("中奖信息入库报错:%s" % reason)
 
 class DistributeRewardAPIView(APIView):
     permission_classes = ()
@@ -872,8 +882,18 @@ class DistributeRewardAPIView(APIView):
             return HttpResponse(json.dumps(json_to_response), content_type="application/json")
 
 
-class ThanksGivingDistribute(object):
+class ActivityRewardDistribute(object):
+    def __init__(self):
+        self.token = ''  #用户从前端传入的activity(POST/GET)
+        pass
 
+    def distribute(self):
+        """发奖接口，必须被实现
+        """
+        raise NotImplementedError(u"抽象类中的方法，子类中需要被实现")
+
+
+class ThanksGivingDistribute(ActivityRewardDistribute):
     def __init__(self):
         self.token = 'thanks_given'
 
@@ -897,48 +917,58 @@ class ThanksGivingDistribute(object):
 
         action = request.DATA.get('action', 'GET_REWARD_INFO')
 
-        reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven').aggregate(left_sum=Sum('left_times'))
-
+        level = request.DATA.get('level', "5000+")
+        if level == "5000+":
+            sum_reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', p2p_amount__gte=5000).exclude(redpack_event=None).aggregate(left_sum=Sum('left_times'))
+        elif level == "5000-":
+            sum_reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', p2p_amount__lt=5000).exclude(reward=None).aggregate(left_sum=Sum('left_times'))
         if 'GET_REWARD_INFO' == action:
             json_to_response = {
                 'ret_code': 1001,
                 'message': u'获得用户的抽奖汇总信息',
-                'left': reward["left_sum"] if reward else 0  #用户可能从没有投过资
+                'left': sum_reward["left_sum"] if sum_reward['left_sum'] else 0  #用户可能从没有投过资
             }
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
         if 'POINT_AT' == action:
-            reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', left_times__gt=0, has_sent=False).first()
 
+            if level == "5000+":
+                reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', left_times__gt=0, has_sent=False, p2p_amount__gte=5000).exclude(redpack_event=None).first()
+            elif level == "5000-":
+                reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', left_times__gt=0, has_sent=False, p2p_amount__lt=5000).exclude(reward=None).first()
+
+            reward_name = None
             if reward:
+                with transaction.atomic():
+                    reward = WanglibaoActivityReward.objects.select_for_update().filter(pk=reward.id).first()
+                    if reward.left_times == reward.when_dist:
+                        """发站内信"""
+                        if reward.reward:
+                            inside_message.send_one.apply_async(kwargs={
+                                "user_id": request.user.id,
+                                "title": reward.reward.description,
+                                "content": reward.reward.content,
+                                "mtype": "activity"
+                            })
+                            reward.reward.is_used = True
+                            reward.reward.save()
+                            reward_name = reward.reward.description
 
-                if reward.left_times == reward.when_dist:
-                    """发站内信"""
-                    if reward.reward:
-                        inside_message.send_one.apply_async(kwargs={
-                            "user_id": request.user.id,
-                            "title": reward.reward.description,
-                            "content": reward.reward.content,
-                            "mtype": "activity"
-                        })
-                        reward.reward.is_used = True
-                        reward.reward.save()
+                        """发红包"""
+                        if reward.redpack_event:
+                            redpack_backends.give_activity_redpack(request.user, reward.redpack_event, 'pc')
+                            reward_name = reward.redpack_event.name
+                    json_to_response = {
+                        'ret_code': 2000,
+                        'message': u'用户抽奖信息描述',
+                        'reward': reward_name,
+                        'left': sum_reward["left_sum"]-1 if sum_reward['left_sum'] else 1,  #用户可能从没有投过资
+                        'is_first': self.is_first(request)
+                    }
 
-                    """发红包"""
-                    if reward.redpack_event:
-                        redpack_backends.give_activity_redpack(request.user, reward.redpack_event, 'pc')
-
-                json_to_response = {
-                    'ret_code': 2000,
-                    'message': u'用户抽奖信息描述',
-                    'reward': reward.redpack_event.name if reward.left_times == reward.when_dist else None,
-                    'left': reward.left_times - 1,
-                    'is_first': self.is_first(request)
-                }
-
-                reward.left_times -= 1
-                reward.has_sent = True
-                reward.save()
+                    reward.left_times -= 1
+                    reward.has_sent = True
+                    reward.save()
             else:
                 json_to_response = {
                     'ret_code': 2001,

@@ -13,7 +13,6 @@ from django.forms import model_to_dict
 from django.db import transaction
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from wanglibao_account.cooperation import CoopRegister
 from wanglibao_pay import util
 from wanglibao_pay.exceptions import ThirdPayError, VerifyError
 from wanglibao_pay.models import PayInfo, PayResult, Bank, Card
@@ -22,6 +21,7 @@ from order.models import Order
 from wanglibao_margin.marginkeeper import MarginKeeper
 from marketing import tools
 from wanglibao_rest.utils import split_ua
+from wanglibao_account.cooperation import CoopRegister
 import re
 
 logger = logging.getLogger(__name__)
@@ -556,6 +556,7 @@ class KuaiPay:
             logger.critical("orderId:%s success" % order_id)
             rs = {"ret_code": 0, "message":"success", "amount":amount, "margin":margin_record.margin_current,
                   'order_id': order_id}
+
 
         pay_info.save()
         if rs['ret_code'] == 0:

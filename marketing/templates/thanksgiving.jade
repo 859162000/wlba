@@ -6,16 +6,16 @@ html
     - with '网利宝' as title
     include global/g_head
     - endwith
-    link(rel="stylesheet",href="/static/styles/pc_activity/thanksgiving.css?v=20151103")
+    link(rel="stylesheet",href="/static/styles/pc_activity/thanksgiving.css?v=20151118")
   body
     include global/g_nav
     .thanksgiving-kuang
     .kuang-tidhi
       img(src='/static/imgs/pc_activity/thanksgiving/guanbibutton.png').imgx
       .huodejiang
-        p
+        p(style='font-size: 16px')
           |恭喜您！获得
-          span#app-jiangli iPhone6s plus
+          span#app-jiangli
     .thanksgiving
       .banner#banner
         .bannerdong
@@ -74,10 +74,13 @@ html
                           p 恭喜130******71获得
                             span 霍尼韦尔空气净化器
                     .prize-ri
-                      p
-                       |你还有
-                       span.app-jihui 1
-                       |次抽奖机会
+                      if user.is_authenticated
+                        p
+                         |你还有
+                         span.app-jihui 1
+                         |次抽奖机会
+                      else
+                        p
                       if user.is_authenticated
                         a(href='javascript:void(0);').jiang-button.jiang-button2 立即抽奖
                       else
@@ -178,16 +181,22 @@ html
               h3 1月会员
             .thank1.thank8
               h3 7天会员
-          .prize-ri
-            p
-             |你还有
-             span 1
-             |次抽奖机会
+          .prize-ri1
+            if user.is_authenticated
+              p
+                |你还有
+                span
+                |次抽奖机会
+            else
+              p
           if user.is_authenticated
-            a(href='javascript:void(0);').thanks 领取奖品
+            a(href='javascript:void(0);').thanks.thanks2 领取奖品
+              .hongxi
+                h5
+                  |恭喜您！获得
+                  span#thankgi-thanks2
           else
-            //a(href='/accounts/login/?next=/activity/thanksgiving/').thanks.thanks1 领取奖品
-            a(href='javascript:void(0);').thanks.thanks1 领取奖品
+            a(href='/accounts/login/?next=/activity/thanksgiving/').thanks.thanks1 领取奖品
           a(href='/p2p/list/', target="_blank").jiang-a 投资赢抽奖机会>>
           p.thank-title1 说明：当前奖品统一以站内信形式发放，敬请留意。
           h6 【加息券和红包规则】
