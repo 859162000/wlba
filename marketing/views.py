@@ -2463,7 +2463,7 @@ class RewardDistributeAPIView(APIView):
         """
         sent_count = ActivityJoinLog.objects.filter(action_name=self.action_name).count() + 1
         today = time.strftime("%Y-%m-%d", time.localtime())
-        join_log = ActivityJoinLog.objects.filter(user=user, create_time__gt=today).first()
+        join_log = ActivityJoinLog.objects.filter(user=user, create_time__gt=today, action_name=self.action_name).first()
         if not join_log:
             rate = None
             for rate in self.rates:
@@ -2508,8 +2508,10 @@ class RewardDistributeAPIView(APIView):
             redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
         except Exception, reason:
             logger.debug(u'给用户 {0}发送红包报错, redpack_event:{1}, reason:{2}'.format(user, redpack_event,reason))
+            join_log.save()
             raise
         else:
+            logger.debug(u'给用户发送出去的红包大小是: {0}'.format(redpack_event.amount))
             join_log.join_times -= 1
             join_log.save()
             return join_log
