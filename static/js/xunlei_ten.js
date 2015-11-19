@@ -11,24 +11,7 @@
     });
 
     require(['jquery', 'activityRegister'], function ($, re) {
-        function getCode(){//得到用户信息的二维码
-            $.ajax({
-                type: "POST",
-                url: "/weixin/api/generate/qr_limit_scene_ticket/",
-                data: {"original_id":"gh_9e8ff84237cd"}, //gh_32e9dc3fab8e
-                success: function (data) {
-                    $("#erweimaxunlei11").html("<img src='"+ data.qrcode_url + "' style='width:100%;' />");
-                },
-                error: function(){
-                    //window.location.href="/weixin/jump_page/?message=请进行登录并绑定您的微信";
-                }
-            });
-        }
-        var codeBox = $(".dengruhou");
-        if(codeBox.length > 0 && !codeBox.is(":hidden")){
-            getCode();
-        }
-
+        
         //注册
         re.activityRegister.activityRegisterInit({
             registerTitle: '领取迅雷会员+现金红包 ',    //注册框标语

@@ -59,15 +59,19 @@
             //点击抽奖
             lottery.init('lottery');
             $(".jiang-button2").click(function () {
+                if (change['left'] == 0) {
+                    return;
+                }
                 redpack({
                     'action': "POINT_AT",
                     'activity': "thanks_given",
                     'level': "5000+"
                 }, function () {
                     if (change['left'] == 0) {
+                        //e.stopPropagation();
                         $('.jiang-button').removeClass("jiang-button2");
                         $('.jiang-button').addClass("jiang-button1");
-                        $('.prize-ri p').html('您没有抽奖机会');
+                        $('.prize-mingdan .prize-ri p').html('您没有抽奖机会');
                     } else {
                         $('.app-jihui').text(change['left']);
                     }
@@ -85,6 +89,9 @@
             });
             //抽奖2
             $('.thanks2 ').on('click', function () {
+                if (change['left'] == 0) {
+                    return;
+                }
                 redpack({
                     'action': "POINT_AT",
                     'activity': "thanks_given",
@@ -93,17 +100,10 @@
                     if (change['left'] == 0) {
                         $('.thanks').removeClass("thanks2");
                         $('.thanks').addClass("thanks1");
-                        $('.prize-ri1 p').html('您没有抽奖机会');
+                        $('.main-thank .prize-ri1 p').html('您没有抽奖机会');
                     } else {
-                        $('.prize-ri1 p span').text(change['left']);
+                        $('.main-thank .prize-ri1 p span').text(change['left']);
                     }
-                    //alert(change['reward']);
-                    //$('.thanks').html('领取成功');
-                    //setTimeout(function () {
-                    //
-                    //     $('.thanks').html('领取奖品');
-                    //}, 1000);
-
                     $('.hongxi').show();
                     $('#thankgi-thanks2 ').text(change['reward']);
 
@@ -229,13 +229,13 @@
         var change = [];
         redpack({
             'action': "GET_REWARD_INFO",
-            'activity': "thanks_given",
+            'activity': "thanks_given"
             //'level': "5000+"
         }, function () {
             if (change['left'] == 0) {
                 $('.jiang-button').removeClass("jiang-button2");
                 $('.jiang-button').addClass("jiang-button1");
-                $('.prize-ri p').html('您没有抽奖机会');
+                $('.prize-mingdan .prize-ri p').html('您没有抽奖机会');
             } else {
                 $('.app-jihui').text(change['left']);
             }
@@ -248,9 +248,9 @@
             if (change['left'] == 0) {
                 $('.thanks').removeClass("thanks2");
                 $('.thanks').addClass("thanks1");
-                $('.prize-ri1 p').html('您没有抽奖机会');
+                $('.main-thank .prize-ri1 p').html('您没有抽奖机会');
             } else {
-                $('.prize-ri1 p span').text(change['left']);
+                $('.main-thank .prize-ri1 p span').text(change['left']);
             }
 
 
