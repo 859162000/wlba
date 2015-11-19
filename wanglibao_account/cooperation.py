@@ -1145,7 +1145,10 @@ class XunleiVipRegister(CoopRegister):
     def recharge_call_back(self, user, order_id):
         # 判断用户是否绑定和首次充值
         binding = Binding.objects.filter(user_id=user.id).first()
-        pay_info = PayInfo.objects.filter(user_id=user.id).order_by('create_time').first()
+        penny = Decimal(0.01).quantize(Decimal('.01'))
+        pay_info = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
+                                          status=PayInfo.SUCCESS).order_by('create_time').first()
+
         if binding and pay_info and pay_info.order_id == order_id:
             # 判断充值金额是否大于100
             pay_amount = int(pay_info.amount)
@@ -3378,7 +3381,7 @@ class Rong360P2PListView(APIView):
                         p2p_dict['deadline'] = product.period
                         p2p_dict['deadlineUnit'] = u'天' if product.pay_method.startswith(u'日计息') else u'月'
                         p2p_dict['reward'] = 0
-                        p2p_dict['type'] = product.category
+                        p2p_dict['type'] = u'抵押标'
 
                         pay_method = 6
                         if product.pay_method == u'等额本息':

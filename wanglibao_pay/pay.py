@@ -17,6 +17,7 @@ from wanglibao_pay import util
 from wanglibao_pay.exceptions import ThirdPayError
 from wanglibao_pay.models import PayInfo, Card, PayResult, Bank
 import logging
+from wanglibao_pay.util import fmt_two_amount
 
 logger = logging.getLogger(__name__)
 
@@ -305,17 +306,17 @@ class PayMessage(object):
         """
         raise NotImplementedError()
 
-    def _check_result(self):
-        """
-        校验第三方信息转换之后的PayMessage是否符合业务逻辑
-        :return: self
-        """
-        if self.ret_code != 0:
-            # todo error如何返回给前段？
-            raise ThirdPayError(40017, '第三方支付失败' + str(self))
-        amount = PayInfo.objects.get(order_id=self.order_id).amount
-        if self.amount != amount:
-            raise ThirdPayError(40019, '第三方返回参数与数据库不一致' + str(self))
+    # def _check_result(self):
+    #     """
+    #     校验第三方信息转换之后的PayMessage是否符合业务逻辑
+    #     :return: self
+    #     """
+    #     if self.ret_code != 0:
+    #         # todo error如何返回给前段？
+    #         raise ThirdPayError(40017, '第三方支付失败' + str(self))
+    #     amount = PayInfo.objects.get(order_id=self.order_id).amount
+    #     if self.amount != amount:
+    #         raise ThirdPayError(40019, '第三方返回参数与数据库不一致' + str(self))
 
     def parse_message(self, res_content, res_ip):
         """
@@ -325,7 +326,7 @@ class PayMessage(object):
         :return:
         """
         self._check_signature(self._convert_message(res_content))
-        self._check_result()
+        # self._check_result()
         self.res_ip = res_ip
         return self
 
@@ -362,13 +363,13 @@ class YeeProxyPayCallbackMessage(PayMessage):
     def _check_signature(self, message_dict):
         # check
         hmac = self.get_hmac(message_dict, 'response')
-        if message_dict.get('r8_MP') != '2' or hmac != message_dict.get('hmac'):
+        if hmac != message_dict.get('hmac'):
             raise ThirdPayError(40015, '不合法的第三方支付信息' + str(message_dict))
 
         try:
             # convert data
             self.order_id = int(message_dict.get('r6_Order'))
-            self.amount = int(message_dict.get('r3_Amt'))
+            self.amount = fmt_two_amount(message_dict.get('r3_Amt'))
             # 1代表成功，因为只有成功才会回调，所以只会是1
             ret_code = int(message_dict.get('r1_Code'))
             if ret_code == 1:
@@ -430,10 +431,10 @@ class YeeProxyPay(object):
         """
         try:
             # use PayMessage to CHECK PARA, RAISE ERROR before proxy_pay_callback
-            self.pay_order.order_after_pay_succcess(pay_message.amount, pay_message.order_id, pay_message.res_ip,
+            return self.pay_order.order_after_pay_succcess(pay_message.amount, pay_message.order_id, pay_message.res_ip,
                                                     pay_message.res_content)
         except ThirdPayError, error:
-            self.pay_order.order_after_pay_error(error, pay_message.order_id)
+            return self.pay_order.order_after_pay_error(error, pay_message.order_id)
 
 
 
