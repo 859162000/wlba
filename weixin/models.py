@@ -118,6 +118,7 @@ class Account(models.Model):
         :param lang: Preferred language code, optional
         :return: JSON data
         """
+        logger.debug("-get_user_info**********************app_id:%s,app_secret:%s"%(self.app_id, self.app_secret))
         access_token = self.access_token
         client = WeChatClient(self.app_id, self.app_secret)
         return client._get(

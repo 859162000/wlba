@@ -33,6 +33,6 @@ def weixin_api_error(f):
                 logger.debug("------------------------wexinerror---%s--%s"%(errcode, request.get_full_path()))
             except:
                 pass
-            return Response(res, status=400)
+            return Response({'errcode':e.errcode, 'errmsg':e.errmsg}, status=400)
         return res
     return decoration
