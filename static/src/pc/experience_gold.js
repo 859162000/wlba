@@ -58,12 +58,13 @@
                 var par = $('#receiveSuccess');
                 $('#receiveSuccess').modal()
                 par.find('.close-modal').hide()
-                par.find('.money_count').text(xhr.data.amount)
+                par.find('.money_count').html(xhr.data.amount+'<span>元</span>')
                 par.find('.money_counts').text(xhr.data.amount+'元体验金')
                 $('.tyjye').text(parseFloat($('.tyjye').text())+xhr.data.amount)
                 $('.zzc').text(parseFloat($('.zzc').text())+xhr.data.amount)
                 $('.rzje').text(xhr.data.amount+'元')
                 $('.invest_ed').removeClass('invest_ed').addClass('investBtn');
+                $('.no_invest').removeClass('no_invest').addClass('draw_btn_ed').text('已领取体验金'+ xhr.data.amount  +'元');
             }
          })
       })

@@ -22,12 +22,13 @@ html(style="background:#fc9300")
                                 if p2p_record_count == 0
                                     img(src='/static/imgs/mobile_activity/app_experience/btn.png').no_invest
                                 else
-                                    img(src='/static/imgs/mobile_activity/app_experience/btn.png').invested
+                                    img(src='/static/imgs/mobile_activity/app_experience/btn.png').investeds
                             else
                                 .invested 已领取体验金{{experience_all | money_format_int}}元
                         else
                             a(href='/weixin/regist/?next=/activity/experience/mobile/')
                                 img(src='/static/imgs/mobile_activity/app_experience/btn.png')
+                        .investedH#edT(style='display:none')
                 .my_experience_gold
                     .title
                         .title_img 我的体验金
@@ -63,7 +64,10 @@ html(style="background:#fc9300")
                                 p.pt {{product.period}}天
                                 p.pb 投资期限
                         .project_btn
-                            a(href='javascript:void(0)').investBtn.investBtnEd 立即投资
+                            if experience_amount > 0
+                                a(href='javascript:void(0)').investBtn 立即投资
+                            else
+                               a(href='javascript:void(0)').investBtnEd 立即投资
                             p.time_style(style='display:none')
                 if user.is_authenticated and experience_amortization
                   .look_more

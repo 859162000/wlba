@@ -88,7 +88,9 @@ org.experience = (function(org){
                         $('.tyjye').text(parseFloat($('.tyjye').text())+data.data.amount)
                         $('.zzc').text(parseFloat($('.zzc').text())+data.data.amount)
                         $('.rzje').text(data.data.amount+'元')
-                        $('.investBtn').removeClass('investBtnEd');
+                        $('.investBtnEd').removeClass('investBtnEd').addClass('investBtn');
+                        $('.receive_box').find('img').hide()
+                        $('.receive_box').find('#edT').show().text('已领取体验金'+ data.data.amount +'元')
                     }
                 },
                 error: function () {
@@ -96,30 +98,28 @@ org.experience = (function(org){
               });
             })
             //老用户
-            $oldUser = $('#oldUser');
+            $oldUser = $('.investeds');
             $oldUser.on('click',function(){
                  org.ui.alert('','','3')
             })
         },
         _goInvest:function(){
             $('.project_btn').delegate('.investBtn','click',function() {
-                if (!$('investBtn').hasClass('investBtnEd')) {
-                  org.ajax({
-                    url: '/api/experience/buy/',
-                    type: 'POST',
-                    data: {},
-                    success:function(data){
-                        org.ui.alert('', '', '2')
-                        setTimeout(function () {
-                            $('#alert-cont,#popubMask').hide();
-                            $('.investBtn').text('已投资'+ data.data.amount +'元').addClass('investBtnEd').removeClass('investBtn')
-                            $('.time_style').show().text('将于'+ data.data.term_date +'收益'+ data.data.interest +'元')
-                        }, 2000)
-                    },
-                    error: function (xhr) {
-                    }
-                  });
+              org.ajax({
+                url: '/api/experience/buy/',
+                type: 'POST',
+                data: {},
+                success:function(data){
+                    org.ui.alert('', '', '2')
+                    setTimeout(function () {
+                        $('#alert-cont,#popubMask').hide();
+                        $('.investBtn').text('已投资'+ data.data.amount +'元').addClass('investBtnEd').removeClass('investBtn')
+                        $('.time_style').show().text('将于'+ data.data.term_date +'收益'+ data.data.interest +'元')
+                    }, 2000)
+                },
+                error: function (xhr) {
                 }
+              });
             })
         },
         _bannerEffect:function(){
