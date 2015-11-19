@@ -445,8 +445,8 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'wanglibao_account': {
-            'handlers': ['wanglibao_account', 'console'],
-            'level': 'INFO',
+            'handlers': ['file'],
+            'level': 'DEBUG',
         },
         'wanglibao_app': {
             'handlers': ['file'],
