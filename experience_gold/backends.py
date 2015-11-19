@@ -73,7 +73,14 @@ class ExperienceBuyView(APIView):
                 amortization.term_date = term[6]
 
                 amortization.save()
+
+            term_date = amortization.term_date
+            interest = amortization.interest
+
+            return Response({
+                'ret_code': 0,
+                'data': {'amount': total_amount, 'term_date': term_date.strftime("Y-m-d"), 'interest': interest}
+            })
+
         else:
             return Response({'ret_code': 30002, 'message': u'没有体验金记录,无法购买体验标'})
-
-        return Response({'ret_code': 0, 'message': 'ok'})
