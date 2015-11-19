@@ -53,10 +53,10 @@ var wlb = (function () {
                 callback && callback(response)
             });
         },
-        authenticated : function(callback){
-
-            this.bridge.callHandler('authenticated',{'a':1}, function(data) {
-                callback && callback(data);
+        authenticated : function(data, callback){
+            var options = this._setData(data, callback);
+            this.bridge.callHandler('authenticated', options.post, function(response) {
+                options.callback && options.callback(response);
             });
         },
         shareData: function(data){
@@ -94,7 +94,6 @@ var wlb = (function () {
                 mixins = new Mixin(target.data);
                 mixins._init();
             }
-
             dics[target.callback](mixins);
         }
     }
@@ -105,16 +104,14 @@ var wlb = (function () {
 
 })();
 
+
+
 wlb.ready({
     app: function(mixins){
-        document.getElementById('buttons').onclick= function(){
-            mixins.authenticated(function(data){
-               document.getElementById('log').innerHTML = JSON.stringify(data)
-            })
-        }
+        
     },
     other: function(){
 
-    },
+    }
 })
 
