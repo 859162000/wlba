@@ -914,8 +914,12 @@ class ThanksGivingDistribute(object):
 
         if 'POINT_AT' == action:
 
-            reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', left_times__gt=0, has_sent=False).first()
+            if level == "5000+":
+                reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', left_times__gt=0, has_sent=False, p2p_amount__gte=5000).exclude(redpack_event=None).first()
+            elif level == "5000-":
+                reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', left_times__gt=0, has_sent=False, p2p_amount__lt=5000).exclude(redpack_event=None).first()
 
+            reward_name = None
             if reward:
                 with transaction.atomic():
                     reward = WanglibaoActivityReward.objects.select_for_update().filter(pk=reward.id).first()
@@ -930,15 +934,16 @@ class ThanksGivingDistribute(object):
                             })
                             reward.reward.is_used = True
                             reward.reward.save()
+                            reward_name = reward.reward.description
 
                         """发红包"""
                         if reward.redpack_event:
                             redpack_backends.give_activity_redpack(request.user, reward.redpack_event, 'pc')
-
+                            reward_name = reward.redpack_event.name
                     json_to_response = {
                         'ret_code': 2000,
                         'message': u'用户抽奖信息描述',
-                        'reward': reward.redpack_event.name if reward.left_times == reward.when_dist else None,
+                        'reward': reward_name,
                         'left': sum_reward["left_sum"]-1 if sum_reward['left_sum'] else 1,  #用户可能从没有投过资
                         'is_first': self.is_first(request)
                     }
