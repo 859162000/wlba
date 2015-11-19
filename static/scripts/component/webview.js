@@ -5,32 +5,71 @@ var wlb = (function () {
     }
 
     Mixin.prototype = {
-        init: function(){
+        _init: function(){
             this.bridge.init(function (message, responseCallback) {
                 var data = {'init': 'true'}
                 responseCallback(data);
             });
         },
+        _setData:function(ops,callback){
+            var data = {'post': {}, 'callback': null};
+            if(toString.call(ops) == '[object Object]'){
+                for(var p in ops){
+                    data.post[p] = ops[p];
+                }
+            }else if(toString.call(ops) == '[object Function]'){
+                 data.callback = ops;
+                return data
+            }
+
+            data.callback = toString.call(callback) == '[object Function]' ? callback : null;
+            return data
+        },
         loginApp: function(data, callback){
-            this.bridge.callHandler('registerApp', {'12':12}, function (response) {
 
-            });
-            var ops = {
-                refresh: data.refresh || 1,
-                url: data.url || ''
-            };
+            var options = this._setData(data, callback);
 
-            this.bridge.callHandler('registerApp', {'1': 12}, function (response) {
-
-               /* if(toString.call(data) == '[object function]'){
-                    data.callback(response)
-                }else{
-                    callback && callback(response);
-                }*/
+            this.bridge.callHandler('loginApp', options.post, function (response) {
+                options.callback && options.callback(response);
             });
         },
-        test: function(){
-            document.getElementById('log').innerHTML ='test'
+        registerApp: function(data, callback){
+
+            var options = this._setData(data, callback);
+
+            this.bridge.callHandler('registerApp', options.post, function (response) {
+                options.callback && options.callback(response);
+            });
+        },
+        firstLoadWebView: function(data, callback){
+
+            var options = this._setData(data, callback);
+            this.bridge.callHandler('firstLoadWebView', options.post,function (response) {
+                options.callback && options.callback(response);
+            });
+        },
+        jumpToManageMoney: function(callback){
+            this.bridge.callHandler('jumpToManageMoney', function (response) {
+                callback && callback(response)
+            });
+        },
+        authenticated : function(callback){
+
+            this.bridge.callHandler('authenticated',{'a':1}, function(data) {
+                callback && callback(data);
+            });
+        },
+        shareData: function(data){
+            this.bridge.registerHandler('shareData', function(data, responseCallback) {
+                responseCallback(data);
+            });
+        },
+        sendUserInfo: function(data, callback){
+            var options = this._setData(data, callback);
+
+            this.bridge.callHandler('sendUserInfo', options.post, function (response) {
+                options.callback && options.callback(response);
+            });
         }
     }
 
@@ -53,9 +92,9 @@ var wlb = (function () {
             var mixins ;
             if(target.callback && target.callback == 'app'){
                 mixins = new Mixin(target.data);
-                mixins.init();
-
+                mixins._init();
             }
+
             dics[target.callback](mixins);
         }
     }
@@ -68,20 +107,14 @@ var wlb = (function () {
 
 wlb.ready({
     app: function(mixins){
-
-        document.getElementById('buttons').onclick = function(){
-            mixins.loginApp();
+        document.getElementById('buttons').onclick= function(){
+            mixins.authenticated(function(data){
+               document.getElementById('log').innerHTML = JSON.stringify(data)
+            })
         }
-
     },
-    other: function(mixins){
-        var ops = {
-                refresh: data.refresh || 1,
-                url: data.url || ''
-            };
-         document.getElementById('buttons').onclick = function(){
-            window.location.href= '/weixin/login/'
-        }
+    other: function(){
+
     },
 })
 
