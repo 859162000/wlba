@@ -458,14 +458,14 @@ class PayOrderTest(PayTests):
         self.assertRaises(ObjectDoesNotExist, MarginRecord.objects.get, order_id=order_id)
         # todo 异常：order_id, transaction
 
-    def test_order_restart_fail(self):
-        order_id = self.pay_order.order_before_pay(self.user, self.amount_1, self.gate_id,
-                                                self.ip, self.device, self.card_no, self.input_phone)
-        rs = self.pay_order.order_after_pay_error(ThirdPayError(77777, 'illegal condition within pay'), order_id)
-        self.pay_order.order_after_pay_succcess
-        self.pay_order.order_restart_fail(order_id)
+    # def test_order_restart_fail(self):
+    #     order_id = self.pay_order.order_before_pay(self.user, self.amount_1, self.gate_id,
+    #                                             self.ip, self.device, self.card_no, self.input_phone)
+    #     rs = self.pay_order.order_after_pay_error(ThirdPayError(77777, 'illegal condition within pay'), order_id)
+    #     self.pay_order.order_after_pay_succcess
+    #     self.pay_order.order_restart_fail(order_id)
 
-#     todo 覆盖：短卡号，PayMessage
+#     todo 覆盖：短卡号
 
 
 
