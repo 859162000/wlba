@@ -187,7 +187,7 @@ class BindingAdmin(admin.ModelAdmin):
         data['uid'] = tid
         data['orderid'] = order_id
         data['type'] = 'baijin'
-        sign = xunleivip_generate_sign(data, self.coop_key)
+        sign = xunleivip_generate_sign(data, settings.XUNLEIVIP_KEY)
         params = dict({'sign': sign}, **data)
 
         # 创建渠道订单记录
@@ -198,7 +198,7 @@ class BindingAdmin(admin.ModelAdmin):
         # 异步回调
         xunleivip_callback.apply_async(
             kwargs={'url': url, 'params': params,
-                    'channel': self.c_code, 'order_id': order_id})
+                    'channel': channel_recode.code, 'order_id': order_id})
 
     def recharge_call_back(self, obj):
         # 判断用户是否绑定和首次充值
@@ -232,7 +232,6 @@ class BindingAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         if obj.detect_callback is True and obj.btype == 'xunlei9':
-            print ">>>>>>>>>>>>>>>>aaa"
             obj.detect_callback = False
             order = UserThreeOrder.objects.filter(user=obj.user, order_on__code=obj.btype)
             if order.exists():

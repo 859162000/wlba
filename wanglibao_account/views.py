@@ -83,7 +83,7 @@ from wanglibao_account.models import UserThreeOrder
 import requests
 from wanglibao_margin.models import MarginRecord
 from wanglibao_pay.fee import WithdrawFee
-from wanglibao_account import utils
+from wanglibao_account import utils as account_utils
 
 
 logger = logging.getLogger(__name__)
@@ -2108,7 +2108,7 @@ class ThirdOrderQueryApiView(APIView):
         params = getattr(request, request.method)
         channel_code = params.get('promo_token', None)
         if channel_code:
-            order_query_fun = getattr(utils, '%s_order_query' % channel_code.lower(), None)
+            order_query_fun = getattr(account_utils, '%s_order_query' % channel_code.lower(), None)
             if order_query_fun:
                 json_response = order_query_fun(params)
             else:

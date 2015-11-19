@@ -569,3 +569,19 @@ def update_coop_order(request_no, channel_code, result_code, msg):
         }
 
     return response
+
+
+def str_to_dict(s):
+    """
+    将字符串转换成字典
+    ret=0&error=test' ==> {u'ret': u'0', u'error': u'test'}
+    :param s:
+    :return: result
+    """
+
+    result = {}
+    for item in s.split('&'):
+        key, value = item.split('=')
+        result[urllib.unquote_plus(key)] = urllib.unquote_plus(value)
+
+    return result
