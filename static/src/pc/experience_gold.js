@@ -11,13 +11,64 @@
   });
 
   require(['jquery',"tools"], function($,tool) {
+    var  csrfSafeMethod, getCookie,sameOrigin,
+    getCookie = function(name) {
+        var cookie, cookieValue, cookies, i;
+        cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            cookies = document.cookie.split(";");
+            i = 0;
+            while (i < cookies.length) {
+              cookie = $.trim(cookies[i]);
+              if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+              }
+              i++;
+            }
+        }
+        return cookieValue;
+    };
+    csrfSafeMethod = function(method) {
+        return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+    };
+    sameOrigin = function(url) {
+        var host, origin, protocol, sr_origin;
+        host = document.location.host;
+        protocol = document.location.protocol;
+        sr_origin = "//" + host;
+        origin = protocol + sr_origin;
+        return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
+    };
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+              xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+            }
+        }
+    });
+
       $('.no_invest').on('click',function(){
-          $('#receiveSuccess').modal()
-          $('#receiveSuccess').find('.close-modal').hide()
+          $.ajax({
+            url: '/api/experience/get_experience/',
+            type: "POST",
+            data: {}
+         }).done(function (xhr) {
+            if(xhr.ret_code == 0){
+                var par = $('#receiveSuccess');
+                $('#receiveSuccess').modal()
+                par.find('.close-modal').hide()
+                par.find('.money_count').text(xhr.money_count)
+                par.find('.money_counts').text(xhr.money_count+'元体验金')
+                $('.tyjye').text(Number($('.tyjye').text)+xhr.money_count)
+                $('.zzc').text(Number($('.zzc').text)+xhr.money_count)
+                $('.rzje').text(xhr.money_count+'元')
+                $('.invest_ed').removeClass('invest_ed').addClass('investBtn');
+            }
+         })
       })
       $('.invested').on('click',function(){
           $('#oldUser').modal()
-          $('#oldUser').find('.close-modal').hide()
       })
       $('.investBtn').on('click',function(){
          $.ajax({
