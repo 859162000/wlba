@@ -38,7 +38,8 @@ def detect_product_biding(product_id):
                             "rate_desc": rate_desc,
                             "period_desc": period_desc,
                             "pay_method": product.pay_method,
-                        })
+                        },
+                        queue='celery02')
 
 @app.task
 def sendUserProductOnLine(openid, service_desc, product_id, product_name, rate_desc, period_desc, pay_method):

@@ -482,12 +482,14 @@ class WeixinBind(TemplateView):
             if rs == 0:
                 now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
                 weixin.tasks.sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
-                        "openid":weixin_user.openid,
-                        "template_id":BIND_SUCCESS_TEMPLATE_ID,
-                        "name1":"",
-                        "name2":user.wanglibaouserprofile.phone,
-                        "time":now_str,
-                    })})
+                                            "openid":weixin_user.openid,
+                                            "template_id":BIND_SUCCESS_TEMPLATE_ID,
+                                            "name1":"",
+                                            "name2":user.wanglibaouserprofile.phone,
+                                            "time":now_str,
+                                                })},
+                                            queue='celery02'
+                                            )
         except WeixinUser.DoesNotExist, e:
             logger.debug(e.message)
             pass
@@ -544,7 +546,8 @@ class UnBindWeiUserAPI(APIView):
                     "template_id":UNBIND_SUCCESS_TEMPLATE_ID,
                     "keyword1":user_phone,
                     "keyword2":now_str
-                })})
+                })},
+                                                queue='celery02')
         return Response({'message':'ok'})
 
 
@@ -1465,7 +1468,8 @@ def checkProduct(sender, **kw):
         if product.old_status == u'待审核' and product.status==u'正在招标':
             weixin.tasks.detect_product_biding.apply_async(kwargs={
                "product_id":product.id
-            })
+            },
+                                                           queue='celery01')
 
 def recordProduct(sender, **kw):
     try:
