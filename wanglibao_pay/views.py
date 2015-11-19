@@ -214,10 +214,10 @@ class YeeProxyPayCompleteView(TemplateView):
         # })
         request_ip = get_client_ip(request)
         pay_message = YeeProxyPayCallbackMessage().parse_message(request.GET, request_ip)
-        YeeProxyPay().proxy_pay_callback(pay_message)
+        result = YeeProxyPay().proxy_pay_callback(pay_message)
         # todo 增强错误处理
         return self.render_to_response({
-            'result': '支付成功',
+            'result': '支付成功' if result['ret_code'] == 0 else '支付失败',
             'amount': pay_message.amount
             })
 

@@ -431,10 +431,10 @@ class YeeProxyPay(object):
         """
         try:
             # use PayMessage to CHECK PARA, RAISE ERROR before proxy_pay_callback
-            self.pay_order.order_after_pay_succcess(pay_message.amount, pay_message.order_id, pay_message.res_ip,
+            return self.pay_order.order_after_pay_succcess(pay_message.amount, pay_message.order_id, pay_message.res_ip,
                                                     pay_message.res_content)
         except ThirdPayError, error:
-            self.pay_order.order_after_pay_error(error, pay_message.order_id)
+            return self.pay_order.order_after_pay_error(error, pay_message.order_id)
 
 
 
