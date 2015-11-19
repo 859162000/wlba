@@ -3411,7 +3411,7 @@ class Rong360P2PListView(APIView):
                         for equity in equities:
                             data_dic = dict()
                             data_dic['subscribeUserName'] = str(equity.user.pk)
-                            data_dic['amount'] = equity.equity
+                            data_dic['amount'] = decimal.Decimal(equity.equity)
                             data_dic['validAmount'] = decimal.Decimal(equity.equity)
                             data_dic['addDate'] = equity.confirm_at or equity.created_at
                             data_dic['status'] = 1 if equity.confirm else 0
