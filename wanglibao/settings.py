@@ -112,7 +112,6 @@ INSTALLED_APPS = (
     'wanglibao_activity',
     'wanglibao_mobile',
     'weixin',
-    'wechatpy',
     'wanglibao_app',
     'wanglibao_anti', #add by yihen@20150813, anti module added
     'wanglibao_reward', #add by yihen@20150910
@@ -215,6 +214,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
 )
+import django.contrib.auth.backends
 
 # Template loader
 TEMPLATE_LOADERS = (
@@ -691,6 +691,7 @@ if ENV == ENV_PRODUCTION:
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
+    YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete'
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
@@ -739,6 +740,7 @@ elif ENV == ENV_PREPRODUCTION:
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
+    YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete'
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
@@ -785,6 +787,9 @@ else:
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'http://test.chinapnr.com/buser'
 
+    YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete'
+    YEE_PROXY_PAY_MER_ID = '10001126856'
+    YEE_PROXY_PAY_KEY = '69cl522AV6q613Ii4W6u8K6XuW8vM1N6bFgyv769220IuYe9u37N4y7rI4Pl'
     YEE_PAY_URL = "http://mobiletest.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10000419568"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'staging_yee_mer_priv_key.pem'), 'r').read())
@@ -832,10 +837,9 @@ YTX_SID = "aaf98f89495b3f3801497488ebbe0f3f"
 YTX_TOKEN = "dbf6b3bf0d514c6fa21cd12d29930c18"
 YTX_BACK_RETURN_URL = CALLBACK_HOST + "/api/ytx/voice_back/"
 
-ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
+ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
 if ENV == ENV_DEV:
-    # ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
-    ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
+    ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
     STATIC_FILE_HOST = 'http://localhost:8000'
 
 PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
@@ -1139,3 +1143,8 @@ else:
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)
 WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'
+
+# 第三方来我们这的用户名密码去获取 token
+TOKEN_CLIENTS = {
+    'rong360': 'wanglibao_1116',
+}

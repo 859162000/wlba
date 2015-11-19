@@ -314,7 +314,7 @@ class RegisterAPIView(APIView):
         if request.DATA.get('IGNORE_PWD'):
             send_messages.apply_async(kwargs={
                 "phones": [identifier,],
-                "messages": [u'登录账户是：'+identifier+u'登录密码:'+password,]
+                "messages": [u'【网利科技】用户名： '+identifier+u'; 登录密码:'+password,]
             })
 
             logger.debug("此次 channel:%s" %(channel))

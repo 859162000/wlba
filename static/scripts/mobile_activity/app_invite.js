@@ -448,11 +448,19 @@ org.invite_index = (function (org) {
                 $(this).toggleClass('agreement');
                 $(this).hasClass('agreement') ?  $(this).find('input').attr('checked','checked') : $(this).find('input').removeAttr('checked');
             })
+
+            var $registXieyi = $('.regist-protocol-div');
             $('.xieyi-btn').on('click', function(){
-                $('.regist-protocol-div').css('-webkit-transform','translate3d(0, 0, 0)')
+                 $registXieyi.css('display','block')
+                setTimeout(function(){
+                    $registXieyi.css('-webkit-transform','translate3d(0, 0%, 0)')
+                },30)
             })
             $('.cancel-xiyie').on('click', function(){
-                $('.regist-protocol-div').css('-webkit-transform','translate3d(0, 100%, 0)')
+                $registXieyi.css('-webkit-transform','translate3d(0, 100%, 0)')
+                setTimeout(function(){
+                    $registXieyi.css('display','none')
+                },200)
             })
 
             $('input[name=submit]').on('click', function(){
@@ -483,12 +491,13 @@ org.invite_index = (function (org) {
         _regist_wlb: function(){
             var _self = this;
             org.ajax({
-                url: '/api/register/?invite_code='+ $('input[name=friend_identifier]').val()+'/',
+                url: '/api/register/',
                 type: 'POST',
                 data: {
                     "identifier":  _self.$phone.val(),
                     "validate_code": _self.$codenum.val(),
-                    "IGNORE_PWD": 'true'
+                    "IGNORE_PWD": 'true',
+                    'invite_code': $('#invite_code').val()
                 },
                 beforeSend: function(){
                     $('input[name=submit]').attr('disabled',true)

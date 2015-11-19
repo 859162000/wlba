@@ -55,7 +55,10 @@ block main
             th 提现费用(元)
             td
               span.orange-text#poundage 0.00
-              a(href='javascript:void(0)').poundageF 收费说明
+              if fee.switch == 'on'
+                a(href='javascript:void(0)').poundageF 收费说明
+              else
+                | &nbsp;&nbsp;优惠期内，暂时不收取手续费
           tr
             th 实际到账金额(元)
             td
@@ -112,4 +115,4 @@ block main
     block script
   include include/add_card
   script.
-    require(['/static/js/withdraw.js?v=20151110', '/static/js/add_card.js'])
+    require(['/static/js/withdraw.js?v=20151118', '/static/js/add_card.js'])

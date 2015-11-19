@@ -152,8 +152,13 @@ class WeixinJoinView(View):
             if isinstance(msg, TextMessage):
                 reply = self.check_service_subscribe(msg, weixin_account)
                 # 自动回复  5000次／天
-                # if not reply:
-                #     reply = tuling(msg)
+                if not reply:
+                    if msg.content=='test':
+                        reply = -1
+                        product = P2PProduct.objects.get(id=1745)
+                        checkAndSendProductTemplate(product)
+                if not reply:
+                    reply = tuling(msg)
                 if not reply:
                     # 多客服转接
                     reply = TransferCustomerServiceReply(message=msg)
@@ -197,15 +202,28 @@ class WeixinJoinView(View):
             # 可用余额（元）： 108.00
             # 累计收益（元）：  79.00
             # 待收收益（元）：  24.00
+            now_str = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M')
+            infos = "%s\n总资产　：%s \n可用余额：%s"%(account_info['p2p_total_paid_interest'], account_info['total_asset'], account_info['p2p_margin'])
             a = MessageTemplate(ACCOUNT_INFO_TEMPLATE_ID,
-                    keyword1=account_info['total_asset'],
-                    keyword2=account_info['p2p_margin'], keyword3=account_info['p2p_total_paid_interest'],
-                    keyword4=account_info['p2p_total_unpaid_interest'])
+                    keyword1=now_str,
+                    keyword2=infos)
             SendTemplateMessage.sendTemplate(w_user, a)
             reply = -1
         if msg.key == 'customer_service':
             txt = self.getCSReply()
-            reply = create_reply(txt, msg)
+            try:
+                client = WeChatClient(weixin_account.app_id, weixin_account.app_secret)
+                client.message._send_custom_message({
+                                            "touser":fromUserName,
+                                            "msgtype":"text",
+                                            "text":
+                                            {
+                                                 "content":txt
+                                            }
+                                        }, account="007@wanglibao400")
+            except:
+                pass
+            reply = -1#create_reply(txt, msg)
         return reply
 
     @checkBindDeco
@@ -446,7 +464,8 @@ class JumpPageTemplate(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(JumpPageTemplate, self).get_context_data(**kwargs)
         message = self.request.GET.get('message', 'ERROR')
-        logger.debug(message)
+        message=message.encode('utf-8')
+        message = urllib.unquote(message)
         context['message'] = message
         return {
             'context': context,
@@ -467,15 +486,15 @@ class WeixinBind(TemplateView):
             rs, txt = bindUser(weixin_user, user)
             if rs == 0:
                 now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
-                weixin.tasks.sendBindTemplateMsg.apply_async(kwargs={
+                weixin.tasks.sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
                         "openid":weixin_user.openid,
                         "template_id":BIND_SUCCESS_TEMPLATE_ID,
                         "name1":"",
                         "name2":user.wanglibaouserprofile.phone,
-                        "time":now_str
-                    })
-                # SendTemplateMessage.sendTemplate(weixin_user, template)
-        except WeixinUser.DoesNotExist:
+                        "time":now_str,
+                    })})
+        except WeixinUser.DoesNotExist, e:
+            logger.debug(e.message)
             pass
         context['message'] = txt
         return {
@@ -484,8 +503,7 @@ class WeixinBind(TemplateView):
             }
 
 def redirectToJumpPage(message):
-    logger.debug('-----------------message beforejump::%s'%message)
-    url = reverse('jump_page')+'?message=%s'%message
+    url = reverse('jump_page')+'?message=%s'% message
     return HttpResponseRedirect(url)
 
 class UnBindWeiUser(TemplateView):
@@ -510,8 +528,7 @@ class UnBindWeiUser(TemplateView):
             message = u"请从[服务中心]点击[绑定微信]进行绑定"
             return redirectToJumpPage(message)
         if not w_user.user:
-            message = u"您没有绑定的网利宝帐号"
-            return redirectToJumpPage(message)
+            return redirectToJumpPage(u"您没有绑定的网利宝帐号")
         return super(UnBindWeiUser, self).dispatch(request, *args, **kwargs)
 
 class UnBindWeiUserAPI(APIView):
@@ -526,15 +543,13 @@ class UnBindWeiUserAPI(APIView):
             weixin_user.user = None
             weixin_user.save()
             now_str = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M')
-            # template = MessageTemplate(UNBIND_SUCCESS_TEMPLATE_ID, keyword1=user_phone, keyword2=now_str)
-            weixin.tasks.sendUnbindTemplateMsg.apply_async(kwargs={
+
+            weixin.tasks.sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
                     "openid":weixin_user.openid,
                     "template_id":UNBIND_SUCCESS_TEMPLATE_ID,
                     "keyword1":user_phone,
                     "keyword2":now_str
-                })
-            # SendTemplateMessage.sendTemplate(weixin_user, template)
-
+                })})
         return Response({'message':'ok'})
 
 
@@ -1468,4 +1483,3 @@ def recordProduct(sender, **kw):
 
 pre_save.connect(recordProduct, sender=P2PProduct, dispatch_uid="product-pre-save-signal")
 post_save.connect(checkProduct, sender=P2PProduct, dispatch_uid="product-post-save-signal")
-
