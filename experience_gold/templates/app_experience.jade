@@ -11,13 +11,23 @@ html(style="background:#fc9300")
             (function(){var b=navigator.userAgent;ipad=b.match(/(iPad).*OS\s([\d_]+)/)?true:false;iphone=!ipad&&b.match(/(iPhone\sOS)\s([\d_]+)/)?true:false;uc=navigator.userAgent.indexOf("UCBrowser")>-1?true:false;ios=ipad||iphone;var d=1,a=1,c;if(ios){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}else{if(uc){if(window.devicePixelRatio>=2){d*=0.5;a*=2}}}c='<meta name="viewport" content="initial-scale='+d+", maximum-scale="+d+", minimum-scale="+d+', width=device-width, user-scalable=no" />';document.write(c);document.documentElement.style.fontSize=20*a+"px"})();
         link(href="/static/styles/mobile_activity/app_experience.css?v=20151110", rel="stylesheet")
         body
+            - csrf_token
             .experience
                 #showMoney
                 .banner
                     img(src='/static/imgs/mobile_activity/app_experience/banner.jpg')
                     .receive_box
-                        img(src='/static/imgs/mobile_activity/app_experience/btn.png')#goExperienceBtn
-                        .invested 已领取体验金8888元
+                        if user.is_authenticated
+                            if experience_count == 0
+                                if p2p_record_count == 0
+                                    img(src='/static/imgs/mobile_activity/app_experience/btn.png').no_invest
+                                else
+                                    img(src='/static/imgs/mobile_activity/app_experience/btn.png').invested
+                            else
+                                .invested 已领取体验金{{experience_all | money_format_int}}元
+                        else
+                            a(href='/weixin/regist/?next=/activity/experience/mobile/')
+                                img(src='/static/imgs/mobile_activity/app_experience/btn.png')
                 .my_experience_gold
                     .title
                         .title_img 我的体验金
@@ -25,14 +35,14 @@ html(style="background:#fc9300")
                     .assets_box
                         .box
                             p.pt 总资产（元）
-                            p.pb {{total_experience_amount | money_format}}
+                            p.pb.zzc {{total_experience_amount | money_format}}
                         .box
                             p.pt 到账收益（元）
                             p.pb {{paid_interest}}
                     .assets_box
                         .box
                             p.pt 体验金余额（元）
-                            p.pb {{experience_amount | money_format}}
+                            p.pb.tyjye  {{experience_amount | money_format}}
                         .box
                             p.pt 待收收益（元）
                             p.pb {{unpaid_interest}}
@@ -42,7 +52,7 @@ html(style="background:#fc9300")
                         .detail_font_box
                             .detail_font
                               if experience_amount == 0
-                                p.pt 8,888元
+                                p.pt.rzje 8,888元
                               else
                                 p.pt {{experience_amount}}元
                               p.pb 融资金额
@@ -53,7 +63,7 @@ html(style="background:#fc9300")
                                 p.pt {{product.period}}天
                                 p.pb 投资期限
                         .project_btn
-                            a(href='javascript:void(0)').investBtn 立即投资
+                            a(href='javascript:void(0)').investBtn.investBtnEd 立即投资
                             p.time_style(style='display:none')
                 if user.is_authenticated and experience_amortization
                   .look_more
