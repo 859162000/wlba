@@ -347,8 +347,8 @@ class YeeProxyPayCallbackMessage(PayMessage):
             para_order = request_para_order
         else:
             para_order = response_para_order
-
         str_to_sign = ''.join([str(para_dict.get(k, '')) for k in para_order])
+        logger.debug(str(para_dict) + secret_key + str_to_sign)
         hmac_str = hmac.new(secret_key, str_to_sign).hexdigest()
         return hmac_str
 
@@ -414,7 +414,7 @@ class YeeProxyPay(object):
     def proxy_pay(self, user, amount,  gate_id,  request_ip, device):
         order_id = self.pay_order.order_before_pay(user, amount, gate_id, request_ip, device)
         post_data = self._post(order_id, amount)
-        PayInfo.filter(order_id).update(request=str(post_data))
+        PayInfo.objects.filter(order_id=order_id).update(request=str(post_data))
         self._request(self.proxy_pay_url, post_data)
         # todo 完善报错message， url移到settings
         return {'message': '',

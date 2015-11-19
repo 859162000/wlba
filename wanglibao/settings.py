@@ -498,6 +498,7 @@ if ENV != ENV_DEV:
     LOGGING['loggers']['django']['level'] = 'INFO'
     LOGGING['loggers']['wanglibao_sms']['level'] = 'INFO'
     LOGGING['loggers']['wanglibao_lottery']['level'] = 'INFO'
+    LOGGING['loggers']['wanglibao_pay']['level'] = 'INFO'
 
     # secure proxy SSL header and secure cookies
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
