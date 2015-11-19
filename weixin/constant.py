@@ -41,7 +41,7 @@ Message_template = {
         "top_color":'#88ffdd',
         "data": {
                 "first": {
-                    "value": u"账户绑定通知",
+                    "value": "",
                    "color": "#173177"
                 },
                 "name1": {
