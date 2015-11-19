@@ -42,17 +42,17 @@ class PayOrder(object):
         }
 
     @staticmethod
-    def get_bank_and_channel(gate_id, device):
+    def get_bank_and_channel(gate_id, device_type):
         """
-        device: 'ios', 'android', 'pc'
         channel: 'huifu', 'yeepay', 'kuaipay'
         :param gate_id:
-        :param device:
+        :param device_type: 'ios', 'android', 'pc'
         :return: bank(Type Bank), channel(str), bind_code(str)
         """
         try:
+            logger.critical()
             bank = Bank.objects.get(gate_id=gate_id)
-            if device == 'pc':
+            if device_type == 'pc':
                 channel = bank.pc_channel
             else:
                 channel = bank.channel
@@ -63,20 +63,20 @@ class PayOrder(object):
             raise ThirdPayError(40011, '银行代码错误')
 
     @staticmethod
-    def get_card_no(card_no, user, gate_id, device):
+    def get_card_no(card_no, user, gate_id, device_type):
         """
         对于长卡直接返回card_no
         对于短卡(10位)会校验绑卡信息，若绑卡正确，则返回完整的长卡号
         :param card_no:
         :param gate_id:
-        :param device:
+        :param device_type:
         :return:
         """
         try:
             if len(card_no) != 10:
                 return card_no
 
-            bank, channel, bind_code = PayOrder.get_bank_and_channel(gate_id, device)
+            bank, channel, bind_code = PayOrder.get_bank_and_channel(gate_id, device_type)
             card = Card.objects.get(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:])
             is_bind_channel = getattr(card, PayOrder.channel_mapping.get(channel)[1])
             assert is_bind_channel is True
@@ -86,7 +86,7 @@ class PayOrder(object):
 
 
     # todo gate_id 可能会重复，不应该使用gate_id代表银行，现阶段假定gate_id不重复,若重复会在get_bank_and_channel中报错
-    def order_before_pay(self, user, amount, gate_id, request_ip, device,
+    def order_before_pay(self, user, amount, gate_id, request_ip, device_type,
                          card_no=None, phone_for_card=None):
         """
         支付前的订单处理
@@ -99,12 +99,12 @@ class PayOrder(object):
         :param amount:
         :param gate_id:
         :param request_ip:
-        :param device:
+        :param device_type:
         :param request_para_str: 发往第三方的请求信息
         :return:
         """
         # 处理必填信息
-        bank, channel, bind_code = self.get_bank_and_channel(gate_id, device)
+        bank, channel, bind_code = self.get_bank_and_channel(gate_id, device_type)
 
         pay_info = PayInfo()
         pay_info.type = PayInfo.DEPOSIT
@@ -118,11 +118,11 @@ class PayOrder(object):
         # pay_info.phone_for_card = phone_for_card
         # todo 是否记录更全面的客户端信息
         pay_info.request_ip = request_ip
-        pay_info.device = device
+        pay_info.device = device_type
 
         # 处理可选的银行卡信息
         if card_no:
-            pay_info.card_no = self.get_card_no(card_no, user, gate_id, device)
+            pay_info.card_no = self.get_card_no(card_no, user, gate_id, device_type)
 
         if phone_for_card:
             pay_info.phone_for_card = phone_for_card
@@ -196,7 +196,6 @@ class PayOrder(object):
         :param user_id:
         :param ip:
         :param res_content:
-        :param device:
         :return:
         """
         # 参数校验
@@ -414,8 +413,8 @@ class YeeProxyPay(object):
     def _request(self, url, post_data):
         return requests.post(url, post_data)
 
-    def proxy_pay(self, user, amount,  gate_id,  request_ip, device):
-        order_id = self.pay_order.order_before_pay(user, amount, gate_id, request_ip, device)
+    def proxy_pay(self, user, amount,  gate_id,  request_ip, device_type):
+        order_id = self.pay_order.order_before_pay(user, amount, gate_id, request_ip, device_type)
         post_data = self._post(order_id, amount)
         PayInfo.objects.filter(order_id=order_id).update(request=str(post_data))
         self._request(self.proxy_pay_url, post_data)
