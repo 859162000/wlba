@@ -33,7 +33,7 @@
             }
         });
 
-        $('#button,#button_get').click(function() {
+        $('#button,#button_get,.act_wrap .box').click(function() {
             if(popup_bg_static){
                 $('.get_red,.popup_bg').show();
             }else{

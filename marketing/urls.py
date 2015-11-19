@@ -64,6 +64,7 @@ urlpatterns = patterns(
     url(r'thanksgiving/$', TemplateView.as_view(template_name="thanksgiving.jade")),
     url(r'winter_brid/$', TemplateView.as_view(template_name="winter_bird.jade")),
     url(r'^experience_gold/$', TemplateView.as_view(template_name="experience_gold.jade")),
+    url(r'^xiaoher/$', TemplateView.as_view(template_name="xiaoher.jade")),
 )
 
 # app URL
@@ -139,6 +140,7 @@ urlpatterns += patterns(
     url(r'^app_two-eleven/$', TemplateView.as_view(template_name="app_two-eleven.jade")),
     url(r'^app_bid/$', TemplateView.as_view(template_name="app_bid.jade")),
     url(r'^app_365_gu/$', TemplateView.as_view(template_name="app_365_gu.jade")),
+    url(r'^app_xiaoher/$', TemplateView.as_view(template_name="app_xiaoher.jade")),
 
     url(r'^app-invite/$', TemplateView.as_view(template_name="app_invite_friends.jade")),
     url(r'^app-invite-success/$', TemplateView.as_view(template_name="app_invite_success.jade")),
