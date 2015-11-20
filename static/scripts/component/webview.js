@@ -144,17 +144,16 @@ var wlb = (function () {
 })();
 
 
+/*
+调用方法
 
 wlb.ready({
     app: function(mixins){
-        document.getElementById('buttons').onclick = function(){
-            mixins.authenticated(function(data){
-                document.getElementById('log').innerHTML = JSON.stringify(data)
-            })
-        }
+        console.log(直接调用mixins对象就可调用接口如： mixins.loginApp())
+        cosnole.log('webview里的业务逻辑)
     },
     other: function(){
-
+        cosnole.log('其他场景的业务逻辑)
     }
 })
-
+*/
