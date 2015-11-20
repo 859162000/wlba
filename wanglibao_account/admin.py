@@ -24,6 +24,7 @@ from marketing.utils import get_user_channel_record
 from .tasks import xunleivip_callback
 from decimal import Decimal
 from django.conf import settings
+from django.db.models import Q
 
 
 class ProfileInline(admin.StackedInline):
@@ -192,7 +193,7 @@ class BindingAdmin(admin.ModelAdmin):
 
         # 创建渠道订单记录
         channel_recode = get_user_channel_record(user.id)
-        order = UserThreeOrder(user=user, order_on=channel_recode, request_no=order_id)
+        order = UserThreeOrder.objects.get_or_create(user=user, order_on=channel_recode, request_no=order_id)[0]
         order.save()
 
         # 异步回调
@@ -233,7 +234,7 @@ class BindingAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         if obj.detect_callback is True and obj.btype == 'xunlei9':
             obj.detect_callback = False
-            order = UserThreeOrder.objects.filter(user=obj.user, order_on__code=obj.btype)
+            order = UserThreeOrder.objects.filter(Q(user=obj.user) & Q(order_on__code=obj.btype) & ~Q(result_code=''))
             if order.exists():
                 if order.count() < 2:
                     if order.first().request_no.split('_')[1] == 5171:
