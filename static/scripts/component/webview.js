@@ -1,7 +1,7 @@
 var wlb = (function () {
 
     function Mixin (bridge) {
-        this.bridge = bridge;
+        this.bridge = bridge;  //WebViewJavascriptBridge对象
     }
 
     Mixin.prototype = {
