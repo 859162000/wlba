@@ -54,18 +54,20 @@ def create_token(request):
                 return {'state': False, 'data': 'get user error!'}
             # 根据用户名密码来获取token
         except Exception, e:
+            # 波波说不要自己建用户. 手动建.#########
             # 注册新用户做认证.
-            try:
-                user = User(username=username)
-                user.set_password(password)
-                user.save()
-                # 如果是指定字符串的认证.
-                user = authenticate(username=username, password=password)
-                if not user:
-                    return {'state': False, 'data': 'get user error!'}
-            except Exception, e:
-                print 'except: {}'.format(e)
-                return {'state': False, 'data': 'user authentic err: %s' % e}
+            # try:
+            #     user = User(username=username)
+            #     user.set_password(password)
+            #     user.save()
+            #     TODO: wanglibaouserprofile 表增加用户.
+            #     # 如果是指定字符串的认证.
+            #     user = authenticate(username=username, password=password)
+            #     if not user:
+            #         return {'state': False, 'data': 'get user error!'}
+            # except Exception, e:
+            print 'except: {}'.format(e)
+            return {'state': False, 'data': 'user authentic err: %s' % e}
 
     else:
         return {'state': False, 'data': 'user authenticated error!'}

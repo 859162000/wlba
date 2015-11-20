@@ -352,6 +352,8 @@ class YeeProxyPayCallbackMessage(PayMessage):
             para_order = request_para_order
         else:
             para_order = response_para_order
+        if 'p5_Pid'in para_dict:
+            para_dict['p5_Pid'] = para_dict['p5_Pid'].decode('GBK').encode('UTF8')
         str_to_sign = ''.join([str(para_dict.get(k, '')) for k in para_order])
         hmac_str = hmac.new(secret_key, str_to_sign).hexdigest()
         return hmac_str
@@ -390,6 +392,7 @@ class YeeProxyPay(object):
     易宝网银支付，跳转到易宝的支付页面
     1.后台回调地址要通过管理页面设置，页面重定向通过p8_Url设置
     2.生成hmac的参数是有顺序的
+    易宝支付有个坑：post用gbk编码，算hmac用utf8编码
     """
     def __init__(self):
         self.pay_order = PayOrder()
@@ -405,7 +408,7 @@ class YeeProxyPay(object):
             'p3_Amt': amount,
             'p4_Cur': 'CNY',
             # 商品名称， Max（20）,p6, p7为商品分类，描述，我们暂时就不传了
-            # 'p5_Pid': '网利宝最专业的P2P之选',
+            #'p5_Pid': u'网利宝最专业的P2P之选'.encode('GBK'),
             # todo urgent 中文商品名称
             'p5_Pid': 'Wanglibao',
             # 回调地址， Max（200）,页面回调地址
