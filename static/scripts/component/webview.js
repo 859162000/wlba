@@ -25,6 +25,11 @@ var wlb = (function () {
             data.callback = toString.call(callback) == '[object Function]' ? callback : null;
             return data
         },
+        /**
+         * 登陆
+         * @param data  {refresh: 1||0, url: url||''}
+         * @param callback
+         */
         loginApp: function(data, callback){
 
             var options = this._setData(data, callback);
@@ -33,6 +38,11 @@ var wlb = (function () {
                 options.callback && options.callback(response);
             });
         },
+        /**
+         * 注册
+         * @param data {refresh: 1||0, url: url||''}
+         * @param callback
+         */
         registerApp: function(data, callback){
 
             var options = this._setData(data, callback);
@@ -41,6 +51,11 @@ var wlb = (function () {
                 options.callback && options.callback(response);
             });
         },
+        /**
+         * 数据埋点
+         * @param data {name: 活动名称||''}
+         * @param callback
+         */
         firstLoadWebView: function(data, callback){
 
             var options = this._setData(data, callback);
@@ -48,22 +63,40 @@ var wlb = (function () {
                 options.callback && options.callback(response);
             });
         },
+        /**
+         * 跳到理财专区
+         * @param callback
+         */
         jumpToManageMoney: function(callback){
             this.bridge.callHandler('jumpToManageMoney', function (response) {
                 callback && callback(response)
             });
         },
+        /**
+         * 判断是否登陆
+         * @param data  可不传
+         * @param callback 返回 [login, ph, tk]
+         */
         authenticated : function(data, callback){
             var options = this._setData(data, callback);
             this.bridge.callHandler('authenticated', options.post, function(response) {
                 options.callback && options.callback(response);
             });
         },
+        /**
+         * 获取分享信息
+         * @param data {title: 活动标题, content: 活动描述}
+         */
         shareData: function(data){
             this.bridge.registerHandler('shareData', function(data, responseCallback) {
                 responseCallback(data);
             });
         },
+        /**
+         * 获取用户信息
+         * @param data 可不传
+         * @param callback 返回[secretToken, ts, ph, tk]
+         */
         sendUserInfo: function(data, callback){
             var options = this._setData(data, callback);
 
@@ -94,7 +127,12 @@ var wlb = (function () {
                 mixins = new Mixin(target.data);
                 mixins._init();
             }
-            dics[target.callback](mixins);
+            try{
+                dics[target.callback](mixins);
+            }catch(e){
+                console.log('请传入正确的参数格式如{app: function(){}, other: function(){}}, 目前却少 '+ target.callback);
+            }
+
         }
     }
 
@@ -108,7 +146,11 @@ var wlb = (function () {
 
 wlb.ready({
     app: function(mixins){
-        
+        document.getElementById('buttons').onclick = function(){
+            mixins.authenticated(function(data){
+                document.getElementById('log').innerHTML = JSON.stringify(data)
+            })
+        }
     },
     other: function(){
 
