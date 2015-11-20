@@ -3406,8 +3406,7 @@ class Rong360P2PListView(APIView):
                         p2p_dict['userAvatarUrl'] = None
                         p2p_dict['amountUsedDesc'] = product.usage
                         p2p_dict['revenue'] = None
-                        p2p_dict['loanUrl'] = '/p2p/detail/{}'.format(product.id)
-
+                        p2p_dict['loanUrl'] = 'https://{}/p2p/detail/{}'.format(request.get_host(), product.id)
                         p2p_dict['successTime'] = timezone.localtime(product.soldout_time).\
                             strftime('%Y-%m-%d %H:%M:%S') if product.soldout_time else ''
                         p2p_dict['publishTime'] = timezone.localtime(product.publish_time).\
