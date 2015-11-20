@@ -715,7 +715,7 @@ class WeixinRedPackView(APIView):
             return HttpResponse(json.dumps(data), content_type='application/json')
 
         day = time.strftime("%Y-%m-%d", time.localtime())
-        if day < "2015-11-23" and day > "2015-11-29":
+        if day < "2015-11-23" or day > "2015-11-29":
             data = {
                 'ret_code': 9100,
                 'message': u'感恩节活动期已过，不发了',
