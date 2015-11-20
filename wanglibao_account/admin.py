@@ -240,12 +240,20 @@ class BindingAdmin(admin.ModelAdmin):
             obj.detect_callback = False
             order_list = UserThreeOrder.objects.filter(user=obj.user, order_on__code=obj.btype)
             if order_list.exists():
-                if order_list.count() == 1 and order_list.first().result_code:
+                if order_list.count() == 1:
                     order_prefix, order_suffix = order_list.first().request_no.split('_')
-                    if int(order_suffix) == 5170:
-                        self.recharge_call_back(obj)
+                    if order_list.first().result_code:
+                        if int(order_suffix) == 5170:
+                            self.recharge_call_back(obj)
+                        elif int(order_suffix) == 5171:
+                            self.purchase_call_back(obj)
                     else:
-                        self.purchase_call_back(obj)
+                        if int(order_suffix) == 5170:
+                            self.recharge_call_back(obj)
+                            self.purchase_call_back(obj, order_prefix)
+                        elif int(order_suffix) == 5171:
+                            self.recharge_call_back(obj, order_prefix)
+                            self.purchase_call_back(obj)
                 else:
                     for order in order_list:
                         if order.result_code == '':
@@ -254,7 +262,6 @@ class BindingAdmin(admin.ModelAdmin):
                                 self.purchase_call_back(obj, order_prefix)
                             elif int(order_suffix) == 5171:
                                 self.recharge_call_back(obj, order_prefix)
-
             else:
                 self.recharge_call_back(obj)
                 self.purchase_call_back(obj)
