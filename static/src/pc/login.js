@@ -116,37 +116,37 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         return checkStatus;
     }
     //验证码
-    //checkCodedFun = function(form,re){
-    //    var checkStatus = false,str = ''
-    //    if(re == 're'){
-    //        var self = $.trim($('#'+form).find('#registerSMSCode').val());
-    //        str = '短信';
-    //    }else{
-    //        var self = $.trim($('#'+form).find('.checkCode').val());
-    //        str = '图片';
-    //    }
-    //    if(self == '') {
-    //        $('#'+form).find('.loginError').text('请输入'+ str +'验证码');
-    //        checkStatus = false;
-    //    }else{
-    //        $('#'+form).find('.loginError').text('');
-    //        checkStatus = true;
-    //    }
-    //    return checkStatus;
-    //}
+    checkCodedFun = function(form,re){
+        var checkStatus = false,str = ''
+        if(re == 're'){
+            var self = $.trim($('#'+form).find('#registerSMSCode').val());
+            str = '短信';
+        }else{
+            var self = $.trim($('#'+form).find('.checkCode').val());
+            str = '图片';
+        }
+        if(self == '') {
+            $('#'+form).find('.loginError').text('请输入'+ str +'验证码');
+            checkStatus = false;
+        }else{
+            $('#'+form).find('.loginError').text('');
+            checkStatus = true;
+        }
+        return checkStatus;
+    }
     //手机和正则
     checkMobile = function(identifier) {  //验证手机号
       var re = /^1\d{10}$/;
       return re.test(identifier);
     }
     //刷新验证码
-    //imgCodeRe = function(form){
-    //    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
-    //    $.getJSON(url, {}, function(json) {
-    //      $('#'+form).find('input[name="captcha_0"]').val(json.key);
-    //      $('#'+form).find('img.captchaImg').attr('src', json.image_url);
-    //    });
-    //}
+    imgCodeRe = function(form){
+        url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
+        $.getJSON(url, {}, function(json) {
+          $('#'+form).find('input[name="captcha_0"]').val(json.key);
+          $('#'+form).find('img.captchaImg').attr('src', json.image_url);
+        });
+    }
 
     //登录模块初始化
     loginInitFun = function(){
@@ -156,13 +156,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         $('#loginPwd').on('blur',function() {
             checkPwdFun('loginForm');
         })
-        //$('#loginCode').on('blur',function() {
-        //    checkCodedFun('loginForm');
-        //})
-        //imgCodeRe('loginForm');
-        //$('#loginRefresh').on('click',function(){
-        //    imgCodeRe('loginForm');
-        //})
+
         //提交登录表单
         $('#loginSubmit').on('click',function(){
             if(checkMobileFun('loginForm') && checkPwdFun('loginForm')){
@@ -175,17 +169,9 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                   data: {
                       identifier : $('#loginMobile').val(),
                       password : $('#loginPwd').val(),
-                      //captcha_0 : $('#id_captcha_0').val(),
-                      //captcha_1 : $('#loginCode').val(),
                       remember_me : remember_me
                   }
                 }).done(function() {
-                  /*var arr = location.search;
-                  if (arr != '') {
-                      window.location = arr.split('=')[1];
-                  } else {
-                      window.location = '/';
-                  }*/
                   var next = _getQueryStringByName('next') == '' ? '/' : _getQueryStringByName('next');
                   window.location.href = next;
                 }).fail(function(xhr) {
