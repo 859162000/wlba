@@ -28,6 +28,7 @@ from order.utils import OrderHelper
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper
+from wanglibao_pay.exceptions import ThirdPayError
 from wanglibao_pay.models import Bank, Card, PayResult, PayInfo, WithdrawCard, WithdrawCardRecord
 from wanglibao_pay.huifu_pay import HuifuPay, SignException
 from wanglibao_pay import third_pay, trade_record
@@ -89,7 +90,6 @@ class PayView(TemplateView):
         #         quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
         #     amount_str = str(amount)
         #     if amount <= 0:
-        #         # todo handler the raise
         #         raise decimal.DecimalException()
         #
         #     gate_id = request.POST.get('gate_id', '')
@@ -153,14 +153,19 @@ class PayView(TemplateView):
         # pay_channel = pay_channel_class()
         # result = pay_channel.pre_pay(request)
         # return self.render_to_response(result)
+        logger.info('web_pay_request_para:' + str(request.POST))
 
-        # todo 参数校验
-        user = request.user
-        amount = fmt_two_amount(request.POST.get('amount'))
-        gate_id = request.POST.get('gate_id')
-        request_ip = get_client_ip(request)
-        device_type = split_ua(request)['device_type']
-        channel = PayOrder.get_bank_and_channel(gate_id, device_type)[1]
+        try:
+            user = request.user
+            amount = fmt_two_amount(request.POST.get('amount'))
+            gate_id = request.POST.get('gate_id')
+            request_ip = get_client_ip(request)
+            device_type = split_ua(request)['device_type']
+            channel = PayOrder.get_bank_and_channel(gate_id, device_type)[1]
+        except:
+            logger.exception('third_pay_error')
+            result = {'message': '参数错误'}
+            return self.render_to_response(result)
 
         if channel == 'yeepay':
             result = YeeProxyPay().proxy_pay(user, amount,  gate_id,  request_ip, device_type)
@@ -212,10 +217,15 @@ class YeeProxyPayCompleteView(TemplateView):
         #     'result': result,
         #     'amount': amount
         # })
-        request_ip = get_client_ip(request)
-        pay_message = YeeProxyPayCallbackMessage().parse_message(request.GET, request_ip)
-        result = YeeProxyPay().proxy_pay_callback(pay_message)
-        # todo 增强错误处理
+        logger.info('web_pay_thirdpay_request_para'+str(request.GET))
+        try:
+            request_ip = get_client_ip(request)
+            pay_message = YeeProxyPayCallbackMessage().parse_message(request.GET, request_ip)
+            result = YeeProxyPay().proxy_pay_callback(pay_message, request)
+        except ThirdPayError, e:
+            logger.exception('third_pay_error')
+            result = {'ret_code': e.code}
+
         return self.render_to_response({
             'result': '充值成功' if result['ret_code'] == 0 else '充值失败',
             'amount': pay_message.amount

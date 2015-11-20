@@ -41,7 +41,7 @@ from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from wanglibao import settings
 from wanglibao_account.cooperation import CoopRegister
-from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract
+from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract, update_coop_order
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account import third_login, backends as account_backends, message as inside_message
 from wanglibao_account.serializers import UserSerializer
@@ -70,10 +70,11 @@ from wanglibao.settings import AMORIZATION_AES_KEY
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.utils import get_client_ip
 from wanglibao_account.models import UserThreeOrder
-from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes, hex2bin
 import requests
 from wanglibao_margin.models import MarginRecord
 from experience_gold.models import ExperienceAmortization, ExperienceEventRecord, ExperienceProduct
+from wanglibao_pay.fee import WithdrawFee
+from wanglibao_account import utils as account_utils
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
@@ -2016,7 +2017,7 @@ class AutomaticApiView(APIView):
             return Response({'ret_code': 3009, 'message': u'用户设置自动投标计划失败'})
 
 
-class ThirdOrdeApiView(APIView):
+class ThirdOrderApiView(APIView):
     """
     记录来自第三方回调的订单状态
     """
@@ -2072,27 +2073,7 @@ class ThirdOrdeApiView(APIView):
                 msg = params.get('message', '')
                 json_response = self.check_params(request_no, result_code, msg)
                 if not json_response:
-                    order = UserThreeOrder.objects.filter(request_no=request_no, order_on__code=channel_code).first()
-                    if order:
-                        if not order.answer_at:
-                            order.request_no = request_no
-                            order.result_code = result_code
-                            order.msg = msg
-                            order.answer_at = datetime.datetime.now()
-                            if channel_code == 'zgdx':
-                                msg_id = params.get('msg_id', '')
-                                if len(msg_id) <= UserThreeOrder._meta.get_field_by_name('extra')[0].max_length:
-                                    order.extra = msg_id
-                            order.save()
-                        json_response = {
-                            'ret_code': 1,
-                            'message': 'sucess'
-                        }
-                    else:
-                        json_response = {
-                            'ret_code': 20002,
-                            'message': u'订单流水号不存在'
-                        }
+                    json_response = update_coop_order(request_no, channel_code, result_code, msg)
             else:
                 json_response = {
                     'ret_code': 10001,
@@ -2121,20 +2102,13 @@ class ThirdOrderQueryApiView(APIView):
         params = getattr(request, request.method)
         channel_code = params.get('promo_token', None)
         if channel_code:
-            url = getattr(settings, '%s_QUERY_URL' % channel_code.upper(), None)
-            if url:
-                order_query_fun = getattr(self, '%s_order_query' % channel_code.lower(), None)
-                if order_query_fun:
-                    json_response = order_query_fun(url, params)
-                else:
-                    json_response = {
-                        'ret_code': 50001,
-                        'message': 'api error'
-                    }
+            order_query_fun = getattr(account_utils, '%s_order_query' % channel_code.lower(), None)
+            if order_query_fun:
+                json_response = order_query_fun(params)
             else:
                 json_response = {
-                    'ret_code': 10001,
-                    'message': u'无效渠道码'
+                    'ret_code': 50001,
+                    'message': 'api error'
                 }
         else:
             json_response = {
@@ -2144,49 +2118,4 @@ class ThirdOrderQueryApiView(APIView):
 
         return HttpResponse(json.dumps(json_response), content_type='application/json')
 
-    def zgdx_order_query(self, url, params):
-        """
-        中国电信业务查询
-        """
-        coop_key = getattr(settings, 'ZGDX_KEY', None)
-        iv = getattr(settings, 'ZGDX_IV', None)
-        if coop_key or iv:
-            code = {
-                'phone_id': params.get('phone_id', ''),
-                'service_code': params.get('service_code', ''),
-                'request_no': params.get('request_no', ''),
-                'start_time': params.get('start_time', ''),
-                'end_time': params.get('end_time', ''),
-            }
-            encrypt_str = encrypt_mode_cbc(json.dumps(code), coop_key, iv)
-            params = {
-                'code': encodeBytes(hex2bin(encrypt_str)),
-                'partner_no': params.get('partner_no', None),
-            }
-            try:
-                res = requests.post(url, data=json.dumps(params)).json()
-                res_code = res.get('result_code', '')
-                result = res.get('result', '')
-                if res_code == '00000':
-                    json_response = {
-                        'ret_code': 0,
-                        'message': 'sucess',
-                        'data': result
-                    }
-                else:
-                    json_response = {
-                        'ret_code': res_code,
-                        'message': result
-                    }
-            except Exception, e:
-                json_response = {
-                    'ret_code': 50001,
-                    'message': 'api error'
-                }
-        else:
-            json_response = {
-                'ret_code': 50001,
-                'message': 'api error'
-            }
 
-        return json_response

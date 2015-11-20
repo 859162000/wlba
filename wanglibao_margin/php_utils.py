@@ -5,25 +5,45 @@ import random
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from provider.oauth2.models import AccessToken, Client
+from user_agents import parse
+
 from wanglibao import settings
 
-UNICODE_ASCII_CHARACTER_SET = ('abcdefghijklmnopqrstuvwxyz'
-                               'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-                               '0123456789')
 
-
-def generate_token(length=30, chars=UNICODE_ASCII_CHARACTER_SET):
+def get_user_info(request, session_id):
     """
-    默认有 token 字符串生成方法.
-    Generates a non-guessable OAuth token
-
-    OAuth (1 and 2) does not specify the format of tokens except that they
-    should be strings of random characters. Tokens should not be guessable
-    and entropy when generating the random characters is important. Which is
-    why SystemRandom is used instead of the default random.choice method.
+    get user's base info to php server.
+    :param request:
+    :param session_id:
+    :return:
+    userid, 用户 id.
+    username, 用户手机号 .
+    is_disable, 是否禁用了账户 .
+    is_realname, 是否已实名
+    总资产
+    可用余额
+    from_channel, 登录渠道 . 如 :P
     """
-    rand = random.SystemRandom()
-    return ''.join(rand.choice(chars) for x in range(length))
+    user_info = dict()
+
+    ua_string = request.META.get('HTTP_USER_AGENT', '')
+    user_agent = parse(ua_string)
+
+    print '######'*100
+    print session_id
+    print request.session.session_key
+
+    if session_id == request.session.session_key:
+        user = request.user
+        user_info.update(user_id=user.pk,
+                         username=user.wanglibaouserprofile.name,
+                         is_disable=user.wanglibaouserprofile.frozen,
+                         is_realname=0,
+                         total_amount=user.margin.margin,
+                         avaliable_amount=user.margin.margin,
+                         from_channel=ua_string)
+
+    return user_info
 
 
 def create_token(request):
@@ -54,20 +74,18 @@ def create_token(request):
                 return {'state': False, 'data': 'get user error!'}
             # 根据用户名密码来获取token
         except Exception, e:
-            # 波波说不要自己建用户. 手动建.#########
             # 注册新用户做认证.
-            # try:
-            #     user = User(username=username)
-            #     user.set_password(password)
-            #     user.save()
-            #     TODO: wanglibaouserprofile 表增加用户.
-            #     # 如果是指定字符串的认证.
-            #     user = authenticate(username=username, password=password)
-            #     if not user:
-            #         return {'state': False, 'data': 'get user error!'}
-            # except Exception, e:
-            print 'except: {}'.format(e)
-            return {'state': False, 'data': 'user authentic err: %s' % e}
+            try:
+                user = User(username=username)
+                user.set_password(password)
+                user.save()
+                # 如果是指定字符串的认证.
+                user = authenticate(username=username, password=password)
+                if not user:
+                    return {'state': False, 'data': 'get user error!'}
+            except Exception, e:
+                print 'except: {}'.format(e)
+                return {'state': False, 'data': 'user authentic err: %s' % e}
 
     else:
         return {'state': False, 'data': 'user authenticated error!'}

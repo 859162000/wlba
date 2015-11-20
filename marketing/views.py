@@ -2240,7 +2240,7 @@ class GiftOwnerInfoAPIView(APIView):
         p2p_record = P2PRecord.objects.filter(user_id=request.user.id, catalog=u'申购')
         if binding and p2p_record.count() == 1:
             p2p_amount = int(p2p_record.first().amount)
-            if p2p_amount >= 1000 and p2p_amount < 2000:
+            if p2p_amount >= 500 and p2p_amount < 1000:
                 try:
                     config = GiftOwnerGlobalInfo.objects.select_for_update(description=u'jcw_ticket_80', valid=True).first()
                 except Exception, reason:
@@ -2272,7 +2272,7 @@ class GiftOwnerInfoAPIView(APIView):
                         }
                         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-            elif p2p_amount >= 2000:
+            elif p2p_amount >= 1000:
                 try:
                     config = GiftOwnerGlobalInfo.objects.select_for_update(description=u'jcw_ticket_188', valid=True).first()
                 except Exception, reason:
