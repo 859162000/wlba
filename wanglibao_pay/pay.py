@@ -8,10 +8,13 @@ from django.db.models.query_utils import Q
 from django.forms.models import model_to_dict
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from nose import tools
 import requests
+from marketing import tools
 from order.models import Order
 from order.utils import OrderHelper
 from wanglibao_account.auth_backends import User
+from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_pay import util
 from wanglibao_pay.exceptions import ThirdPayError
@@ -21,10 +24,9 @@ from wanglibao_pay.util import fmt_two_amount
 
 logger = logging.getLogger(__name__)
 
-# todo better logger
 class Pay(object):
     def pay(self, post):
-        raise  NotImplementedError
+        raise NotImplementedError
 
 class PayOrder(object):
     """
@@ -84,7 +86,7 @@ class PayOrder(object):
             raise ThirdPayError(40012, '卡号错误')
 
 
-    # todo gate_id 可能会重复，不应该使用gate_id代表银行，现阶段假定gate_id不重复,若重复会在get_bank_and_channel中报错
+    # todo better gate_id 可能会重复，不应该使用gate_id代表银行，现阶段假定gate_id不重复,若重复会在get_bank_and_channel中报错
     def order_before_pay(self, user, amount, gate_id, request_ip, device_type,
                          card_no=None, phone_for_card=None):
         """
@@ -115,7 +117,7 @@ class PayOrder(object):
         pay_info.bank = bank
         pay_info.channel = channel
         # pay_info.phone_for_card = phone_for_card
-        # todo 是否记录更全面的客户端信息
+        # todo better 是否记录更全面的客户端信息
         pay_info.request_ip = request_ip
         pay_info.device = device_type
 
@@ -138,7 +140,7 @@ class PayOrder(object):
         #     pay_info.bank = bank
         #     pay_info.card_no = card_no
 
-        # todo 时间处理
+        # todo better 时间处理
         pay_info.status = PayInfo.PROCESSING
         pay_info.save()
         # OrderHelper.update_order(order, user, pay_info=model_to_dict(pay_info), status=pay_info.status)
@@ -187,7 +189,7 @@ class PayOrder(object):
         return False
 
     @method_decorator(transaction.atomic)
-    def order_after_pay_succcess(self, amount, order_id, res_ip, res_content, need_bind_card=False):
+    def order_after_pay_succcess(self, amount, order_id, res_ip, res_content, request, need_bind_card=False):
         """
         处理订单和用户的账户
         :param amount:
@@ -202,7 +204,6 @@ class PayOrder(object):
         if not pay_info:
             # return {"ret_code":20131, "message":"order not exist", "amount": amount}
             raise ThirdPayError(20131, 'order not exist')
-        # todo 只允许processing状态的
         if pay_info.status == PayInfo.SUCCESS:
             return {"ret_code":0, "message":PayResult.DEPOSIT_SUCCESS, "amount": amount}
         if pay_info.amount != amount:
@@ -233,7 +234,12 @@ class PayOrder(object):
         if need_bind_card:
             self.add_card(pay_info.card_no, pay_info.bank, pay_info.user, pay_info.channel)
 
-        # todo 加入存款成功的回调
+        try:
+            CoopRegister(request).process_for_recharge(request.user, order_id)
+            tools.deposit_ok(request.user.id, amount, pay_info.device, order_id)
+        except:
+            logger.exception('recharge_call_back faile for ' + str(request.user) + str(order_id))
+
         logger.critical("orderId:%s success" % order_id)
         rs = {"ret_code": 0, "message": "success", "amount": amount, "margin": margin_record.margin_current,
               "order_id": order_id}
@@ -242,7 +248,7 @@ class PayOrder(object):
 
     @method_decorator(transaction.atomic)
     def order_after_pay_error(self, error, order_id):
-        # todo error when error
+        # todo better error when error
         logger.exception(error)
         pay_info = PayInfo.objects.select_for_update().get(order_id=order_id)
 
@@ -311,7 +317,6 @@ class PayMessage(object):
     #     :return: self
     #     """
     #     if self.ret_code != 0:
-    #         # todo error如何返回给前段？
     #         raise ThirdPayError(40017, '第三方支付失败' + str(self))
     #     amount = PayInfo.objects.get(order_id=self.order_id).amount
     #     if self.amount != amount:
@@ -389,7 +394,6 @@ class YeeProxyPay(object):
     """
     def __init__(self):
         self.pay_order = PayOrder()
-        # TODO ADD TO SETTINGS
         self.proxy_pay_url = settings.YEE_PROXY_PAY_WEB_CALLBACK_URL
 
     def _post(self, order_id, amount, gate_id):
@@ -403,7 +407,7 @@ class YeeProxyPay(object):
             'p4_Cur': 'CNY',
             # 商品名称， Max（20）,p6, p7为商品分类，描述，我们暂时就不传了
             # 'p5_Pid': '网利宝最专业的P2P之选',
-            # todo 中文商品名称
+            # todo urgent 中文商品名称
             'p5_Pid': 'Wanglibao',
             # 回调地址， Max（200）,页面回调地址
             'p8_Url': settings.YEE_PROXY_PAY_WEB_CALLBACK_URL,
@@ -417,16 +421,22 @@ class YeeProxyPay(object):
         return requests.post(url, post_data)
 
     def proxy_pay(self, user, amount,  gate_id,  request_ip, device_type):
-        order_id = self.pay_order.order_before_pay(user, amount, gate_id, request_ip, device_type)
-        post_data = self._post(order_id, amount, gate_id)
-        PayInfo.objects.filter(order_id=order_id).update(request=str(post_data))
-        self._request(self.proxy_pay_url, post_data)
-        # todo 完善报错message， url移到settings
-        return {'message': '',
+        try:
+            order_id = self.pay_order.order_before_pay(user, amount, gate_id, request_ip, device_type)
+            post_data = self._post(order_id, amount, gate_id)
+            PayInfo.objects.filter(order_id=order_id).update(request=str(post_data))
+            self._request(self.proxy_pay_url, post_data)
+            # message为空前段页面会判定为支付成功
+            message = ''
+        except ThirdPayError, e:
+            logger.exception('thirdpay_error')
+            message = e.message
+            post_data = dict()
+        return {'message': message,
                 'form': {'url': 'https://www.yeepay.com/app-merchant-proxy/node',
                         'post': post_data}}
 
-    def proxy_pay_callback(self, pay_message):
+    def proxy_pay_callback(self, pay_message, request):
         """
 
         :type pay_message: PayMessage
@@ -435,9 +445,10 @@ class YeeProxyPay(object):
         try:
             # use PayMessage to CHECK PARA, RAISE ERROR before proxy_pay_callback
             return self.pay_order.order_after_pay_succcess(pay_message.amount, pay_message.order_id, pay_message.res_ip,
-                                                    pay_message.res_content)
+                                                    pay_message.res_content, request)
         except ThirdPayError, error:
-            return self.pay_order.order_after_pay_error(error, pay_message.order_id)
+            self.pay_order.order_after_pay_error(error, pay_message.order_id)
+            raise
 
 
 
