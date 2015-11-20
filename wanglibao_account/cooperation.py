@@ -47,7 +47,8 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_XUNLEI9_KEY, XUNLEIVIP_CALL_BACK_URL, XUNLEIVIP_KEY, XUNLEIVIP_REGISTER_CALL_BACK_URL, \
      XUNLEIVIP_REGISTER_KEY
 from wanglibao_account.models import Binding, IdVerification
-from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback
+from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback, \
+                                    xunleivip_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization, AutomaticPlan
 from wanglibao_pay.models import Card, PayInfo
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -60,6 +61,7 @@ from wanglibao_reward.models import WanglibaoUserGift
 from user_agents import parse
 import uuid
 import urllib
+from .utils import xunleivip_generate_sign
 
 logger = logging.getLogger('wanglibao_cooperation')
 
@@ -1104,18 +1106,12 @@ class XunleiVipRegister(CoopRegister):
         self.coop_register_key = XUNLEIVIP_REGISTER_KEY
         self.external_channel_user_key = 'xluserid'
 
-    def generate_sign(self, data, key):
-        sorted_data = sorted(data.iteritems(), key=lambda asd:asd[0], reverse=False)
-        encode_data = urllib.urlencode(sorted_data)
-        sign = hashlib.md5(encode_data+str(key)).hexdigest()
-        return sign
-
-    def xunlei_call_back(self, user, tid, data, url):
-        order_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')+'_'+str(data['act'])
+    def xunlei_call_back(self, user, tid, data, url, order_id):
+        order_id = '%s_%s' % (order_id, data['act'])
         data['uid'] = tid
         data['orderid'] = order_id
         data['type'] = 'baijin'
-        sign = self.generate_sign(data, self.coop_key)
+        sign = xunleivip_generate_sign(data, self.coop_key)
         params = dict({'sign': sign}, **data)
 
         # 创建渠道订单记录
@@ -1124,8 +1120,9 @@ class XunleiVipRegister(CoopRegister):
         order.save()
 
         # 异步回调
-        common_callback.apply_async(
-            kwargs={'url': url, 'params': params, 'channel': self.c_code})
+        xunleivip_callback.apply_async(
+            kwargs={'url': url, 'params': params,
+                    'channel': self.c_code, 'order_id': order_id})
 
     def register_call_back(self, user):
         # 判断用户是否绑定
@@ -1136,8 +1133,10 @@ class XunleiVipRegister(CoopRegister):
                 'xluserid': binding.bid,
                 'regtime': int(time.mktime(user.date_joined.date().timetuple()))
             }
-            sign = self.generate_sign(data, self.coop_register_key)
+
+            sign = xunleivip_generate_sign(data, self.coop_register_key)
             params = dict({'sign': sign}, **data)
+
             # 异步回调
             common_callback.apply_async(
                 kwargs={'url': self.register_call_back_url, 'params': params, 'channel': self.c_code})
@@ -1160,7 +1159,8 @@ class XunleiVipRegister(CoopRegister):
                     'num1': 7,
                     'act': 5171
                 }
-                self.xunlei_call_back(user, binding.bid, data, self.call_back_url)
+                self.xunlei_call_back(user, binding.bid, data,
+                                      self.call_back_url, pay_info.order_id)
 
     def purchase_call_back(self, user, order_id):
         # 判断用户是否绑定和首次投资
@@ -1177,7 +1177,8 @@ class XunleiVipRegister(CoopRegister):
                     'num1': 12,
                     'act': 5170
                 }
-                self.xunlei_call_back(user, binding.bid, data, self.call_back_url)
+                self.xunlei_call_back(user, binding.bid, data,
+                                      self.call_back_url, p2p_record.order_id)
 
 
 # 注册第三方通道
