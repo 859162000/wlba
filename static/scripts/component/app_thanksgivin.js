@@ -107,9 +107,15 @@ var wlb = (function () {
 
 wlb.ready({
     app: function(mixins){
-        document.getElementById('buttons').onclick= function(){
-            mixins.authenticated(function(data){
+        document.getElementById('.appjiang-button').onclick= function(){
+            mixins.sendUserInfo(function(data){
                document.getElementById('log').innerHTML = JSON.stringify(data)
+                if(data){
+                 $('.appjiang-button').html('123');
+                }else{
+                 $('.appjiang-button').html('321');
+                }
+
             })
         }
     },
