@@ -220,13 +220,6 @@ class IndexView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         device_list = ['android', 'iphone']
-        referer = request.META.get("HTTP_REFERER", "")
-        if referer:
-            res = urlparse.urlparse(referer)
-            if "baidu.com" in res.netloc:
-                qs = urlparse.parse_qs(res.query)
-                if "wd" in qs:
-                    request.session["promo_source_word"] = "|".join(qs['wd'])
         user_agent = request.META.get('HTTP_USER_AGENT', "").lower()
         for device in device_list:
             match = re.search(device, user_agent)

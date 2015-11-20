@@ -68,7 +68,7 @@ Message_template = {
         "top_color":'#88ffdd',
         "data":{
                 "first": {
-                    "value": "账户概况",
+                    "value": "",
                    "color": "#173177"
                 },
                 "keyword1": {

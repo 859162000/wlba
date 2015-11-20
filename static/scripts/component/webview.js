@@ -104,7 +104,8 @@ var wlb = (function () {
         sendUserInfo: function (data, callback) {
             var options = this._setData(data, callback);
 
-            this.bridge.callHandler('sendUserInfo', options.post, function (response) {
+            this.bridge.callHandler('sendUserInfo', {}, function (response) {
+
                 options.callback && options.callback(response);
             });
         }
@@ -130,6 +131,7 @@ var wlb = (function () {
                 mixins = new Mixin(target.data);
                 mixins._init();
             }
+
             try {
                 dics[target.callback](mixins);
             } catch (e) {
@@ -147,7 +149,6 @@ var wlb = (function () {
 
 
 /*
- 调用方法
 
  wlb.ready({
      app: function(mixins){
