@@ -217,18 +217,30 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;wlb.ready({
+;var login=false;
+wlb.ready({
     app: function(mixins){
-        $('.appjiang-button2').on('click',function(){
-            mixins.sendUserInfo(function(data){
-                if(data.ph==''){
-                    $('.appjiang-button2').html(1111);
-                } else{
-                     $('.appjiang-button2').html(1122);
-                }
-                //$('.appjiang-button2').html('123');
-            })
+        mixins.sendUserInfo(function(data){
+            if(data.ph==''){
+                 login=false;
+                $('.appjiang-button').addClass("appjiang-button1").click(
+                    function(){
+                        mixins.loginApp({refresh:1},function(){
+                            $('.appjiang-button').addClass("appjiang-button2").removeClass('appjiang-button1');
+                        });
+                    }
+                );
+
+            } else{
+                 login=true;
+
+            }
+
         })
+        //$('.appjiang-button').on('click',function(){
+        //    if()
+        //
+        //})
         //document.getElementById('appjiang-button').onclick= function(){
         //    mixins.sendUserInfo(function(data){
         //         document.getElementById('appjiang-button').innerHTML= JSON.stringify(data);
@@ -353,6 +365,10 @@ var click = false;
 window.onload = function () {
     lottery.init('lottery');
     $("#lottery .appjiang-button2").click(function () {
+        //if(!login){
+        //    $(this).html(12);
+        //    return;
+        //}
         if (change['left'] == 0) {
             return;
         }
@@ -411,6 +427,7 @@ redpack({
     'level': "5000+"
 }, function (da) {
     console.log(da['left']);
+    $('.appjiang-button').html(da['left']);
     if (da['left'] == 0) {
         $('.appjiang-button').removeClass("appjiang-button2");
         $('.appjiang-button').addClass("appjiang-button1");

@@ -57,8 +57,10 @@
         var arrPos = new Array();
         window.onload = function () {
             //点击抽奖
+            alert(21)
             lottery.init('lottery');
-            $(".jiang-button2").click(function () {
+            $(".prize-mingdan").on('click','.jiang-button2',function () {
+                alert(12);
                 if (change['left'] == 0) {
                     return;
                 }
@@ -67,11 +69,14 @@
                     'activity': "thanks_given",
                     'level': "5000+"
                 }, function () {
-                    if (change['left'] == 0) {
-                        //e.stopPropagation();
+                    if (change['left'] == 0 ) {
                         $('.jiang-button').removeClass("jiang-button2");
                         $('.jiang-button').addClass("jiang-button1");
                         $('.prize-mingdan .prize-ri p').html('您没有抽奖机会');
+                        if(change['reward'] == null){
+                            return;
+                        }
+                        //return;
                     } else {
                         $('.app-jihui').text(change['left']);
                     }
@@ -101,6 +106,9 @@
                         $('.thanks').removeClass("thanks2");
                         $('.thanks').addClass("thanks1");
                         $('.main-thank .prize-ri1 p').html('您没有抽奖机会');
+                        if(change['reward'] == null){
+                            return;
+                        }
                     } else {
                         $('.main-thank .prize-ri1 p span').text(change['left']);
                     }
@@ -113,14 +121,13 @@
             })
             //banner动画
             document.getElementsByTagName('body')[0].onmousemove = function (e) {
-                var x = e.clientX, y = e.clientY;
+                var x = e.clientX || window.event.clientX, y = e.clientY || window.event.clientY;
                 //判断鼠标运行方向
                 var direction = '';
                 if (arrPos.length > 0) {
                     if (x > arrPos[0][0]) {
                         if (y == arrPos[0][1]) {
-                            //direction = '右';
-                            direction = $('.bannerdong').css("left", "260px");
+                            //direction = '右';direction = $('.bannerdong').css("left", "260px");
                         }
                         else {
                             if (y > arrPos[0][1]) {
@@ -133,7 +140,7 @@
                         if (x == arrPos[0][0]) {
                             if (y < arrPos[0][1]) {
                                 direction = '上';
-                                direction = $('.bannerdong').css("top", "-30px");
+                                direction = $('.bannerdong').css("top", "-15px");
                             }
                             else {
                                 if (y > arrPos[0][1]) {
@@ -145,7 +152,7 @@
                         else {
                             if (y == arrPos[0][1]) {
                                 //direction = '左';
-                                direction = $('.bannerdong').css("left", "100px");
+                                // direction = $('.bannerdong').css("left", "100px");
                             }
                             else {
                                 if (y > arrPos[0][1]) direction = '左上';
@@ -264,14 +271,13 @@
                     'level': "5000+"
                 },
                 function () {
-                    //console.log(change['phone'])
-                    //console.log(change['rewards'])
+
 
                     for (var k = 0, len2 = change['phone'].length; k < len2; k++) {
                         var tel = change['phone'][k].substring(0, 3) + "******" + change['phone'][k].substring(9, 11);
 
                         str += '<p>恭喜' + tel + '获得<span>' + change['rewards'][k] + '</span></p>';
-                        //console.log(str);
+
                     }
 
                     $('.long-p').append(str);
@@ -354,7 +360,7 @@
                     //var index = Math.random() * (lottery.count) | 0;
                     var index = arr.indexof(change['reward'])
                     lottery.prize = index;
-                    console.log(change['reward']);
+
                 } else {
                     if (lottery.times > lottery.cycle + 10 && ((lottery.prize == 0 && lottery.index == 7) || lottery.prize == lottery.index + 1)) {
                         lottery.speed += 110;
@@ -366,7 +372,7 @@
                     lottery.speed = 40;
                 }
                 ;
-                //console.log(lottery.times + '^^^^^^' + lottery.speed + '^^^^^^^' + lottery.prize);
+
                 lottery.timer = setTimeout(roll, lottery.speed);
             }
             return false;
@@ -383,15 +389,15 @@
             }).done(function (data) {
                 change = data;
                 callback && callback(data);
-                console.log(change);
+
 
                 // $('.app-jihui1').text(change['left']);
 
-                if (change['is_first'] == false) {
-                    $('.kuang-tidhi').addClass("kuang-tidhi12");
-                } else if (change['is_first'] == true) {
-                    $('.kuang-tidhi').removeClass("kuang-tidhi12");
-                }
+                //if (change['is_first'] == false) {
+                //    $('.kuang-tidhi').addClass("kuang-tidhi12");
+                //} else if (change['is_first'] == true) {
+                //    $('.kuang-tidhi').removeClass("kuang-tidhi12");
+                //}
 
                 $('#app-jiangli').text(change['reward']);
             });
@@ -400,4 +406,4 @@
 
     });
 
-}).call(this);
+})();

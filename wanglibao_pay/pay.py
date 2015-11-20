@@ -338,7 +338,8 @@ class YeeProxyPayCallbackMessage(PayMessage):
         @:param type: request or response
         """
         # 参与hmac计算的参数以及其顺序
-        request_para_order = ['p0_Cmd', 'p1_MerId', 'p2_Order', 'p3_Amt', 'p4_Cur', 'p5_Pid', 'p8_Url']
+        request_para_order = ['p0_Cmd', 'p1_MerId', 'p2_Order', 'p3_Amt', 'p4_Cur', 'p5_Pid', 'p6_Pcat',
+                              'p7_Pdesc', 'p8_Url', 'p9_SAF', 'pa_MP', 'pd_FrpId', 'pm_Period', 'pn_Unit']
         response_para_order = ['p1_MerId', 'r0_Cmd', 'r1_Code', 'r2_TrxId', 'r3_Amt', 'r4_Cur', 'r5_Pid', 'r6_Order',
                                'r7_Uid', 'r8_MP', 'r9_BType']
         secret_key = settings.YEE_PROXY_PAY_KEY
@@ -391,7 +392,9 @@ class YeeProxyPay(object):
         # TODO ADD TO SETTINGS
         self.proxy_pay_url = settings.YEE_PROXY_PAY_WEB_CALLBACK_URL
 
-    def _post(self, order_id, amount):
+    def _post(self, order_id, amount, gate_id):
+        yee_proxy_bank_code = Bank.objects.get(gate_id=gate_id).yee_bind_code + '-NET-B2C'
+        yee_proxy_bank_code = yee_proxy_bank_code.upper()
         post_para = {
             'p0_Cmd': 'Buy',
             'p1_MerId': settings.YEE_PROXY_PAY_MER_ID,
@@ -404,6 +407,7 @@ class YeeProxyPay(object):
             'p5_Pid': 'Wanglibao',
             # 回调地址， Max（200）,页面回调地址
             'p8_Url': settings.YEE_PROXY_PAY_WEB_CALLBACK_URL,
+            'pd_FrpId': yee_proxy_bank_code,
             'hmac': ''
         }
         post_para.update(hmac=YeeProxyPayCallbackMessage.get_hmac(post_para, 'request'))
@@ -414,7 +418,7 @@ class YeeProxyPay(object):
 
     def proxy_pay(self, user, amount,  gate_id,  request_ip, device_type):
         order_id = self.pay_order.order_before_pay(user, amount, gate_id, request_ip, device_type)
-        post_data = self._post(order_id, amount)
+        post_data = self._post(order_id, amount, gate_id)
         PayInfo.objects.filter(order_id=order_id).update(request=str(post_data))
         self._request(self.proxy_pay_url, post_data)
         # todo 完善报错message， url移到settings
