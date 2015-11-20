@@ -406,10 +406,6 @@ class PayOrderTest(PayTests):
         self.assertEqual(self.amount_1, pay_info.amount)
         self.assertEqual(self.user, pay_info.user)
 
-        # todo urgent card_no, gate_id exception
-        # todo urgent transaction
-
-
     def test_order_after_pay_success(self):
         # def order_after_pay_succcess(self, amount, order_id, res_ip, res_content):
         #    rs = {"ret_code": 0, "message": "success", "amount": amount, "margin": margin_record.margin_current,
@@ -425,7 +421,6 @@ class PayOrderTest(PayTests):
         margin_record_amount = MarginRecord.objects.get(order_id=order_id).amount
         self.assertEqual(margin_record_amount, self.amount_1)
 
-        # todo urgent 异常：amount, order_id, transaction
 
     def test_order_after_pay_success_add_card(self):
         # def order_after_pay_succcess(self, amount, order_id, res_ip, res_content):
@@ -458,7 +453,7 @@ class PayOrderTest(PayTests):
         margin_after = Margin.objects.get(user_id=self.user.id).margin
         self.assertEqual(margin_after-margin_before, self.amount_0)
         self.assertRaises(ObjectDoesNotExist, MarginRecord.objects.get, order_id=order_id)
-        # todo urgent 异常：order_id, transaction
+        # todo urgent 异常 transaction
 
     # def test_order_restart_fail(self):
     #     order_id = self.pay_order.order_before_pay(self.user, self.amount_1, self.gate_id,
@@ -467,7 +462,7 @@ class PayOrderTest(PayTests):
     #     self.pay_order.order_after_pay_succcess
     #     self.pay_order.order_restart_fail(order_id)
 
-#     todo urgent 覆盖：短卡号
+#     todo better 覆盖：短卡号
 
 
 

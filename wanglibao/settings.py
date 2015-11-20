@@ -780,8 +780,10 @@ elif ENV == ENV_PREPRODUCTION:
 else:
     CALLBACK_HOST = 'https://staging.wanglibao.com'
     STATIC_FILE_HOST = 'https://staging.wanglibao.com'
-    MER_ID = '510743'
-    CUSTOM_ID = '000010124821'
+    # MER_ID = '510743'
+    # CUSTOM_ID = '000010124821'
+    MER_ID = '872724'
+    CUSTOM_ID = '000007522683'
     SIGN_HOST = '127.0.0.1'
     SIGN_PORT = 8733
     HUI_SHORT_MER_ID = "510793"
