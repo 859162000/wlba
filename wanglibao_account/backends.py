@@ -54,16 +54,20 @@ def invite_earning(user):
 
 
 def set_source(request, user):
-    keyword = request.session.get("promo_source_keyword", "")
-    if keyword:
-        source = UserSource.objects.create(
-            user=user,
-            action='register',
-            keyword=keyword,
-            site_name=request.session.get("promo_source_site_name", ""),
-            website=request.session.get("website", "")
-        )
-        logger.debug("注册行为已经完成，SEM统计参量入库,object value:{0}".format(source))
+    # Add try-except by hb on 2015-11-20
+    try:
+        keyword = request.session.get("promo_source_keyword", "")
+        if keyword:
+            source = UserSource.objects.create(
+                user=user,
+                action='register',
+                keyword=keyword,
+                site_name=request.session.get("promo_source_site_name", ""),
+                website=request.session.get("website", "")
+            )
+            logger.debug("注册行为已经完成，SEM统计参量入库,object value:{0}".format(source))
+    except Exception:
+        pass
 
 
 class TestIDVerifyBackEnd(object):
