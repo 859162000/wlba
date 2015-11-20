@@ -78,15 +78,25 @@ class UserPushId(models.Model):
         verbose_name_plural = u"推送信息"
 
 
+class UserThreeOrder(models.Model):
+    user = models.ForeignKey(User)
+    order_on = models.ForeignKey(Channels, verbose_name=u'订单渠道')
+    request_no = models.CharField(unique=True, max_length=30, verbose_name=u'请求流水号')
+    result_code = models.CharField(max_length=30, blank=True, verbose_name=u'受理结果编码')
+    msg = models.CharField(max_length=255, blank=True, verbose_name=u'受理结果消息')
+    created_at = models.DateTimeField(u'下单时间', auto_now_add=True)
+    answer_at = models.DateTimeField(u'订单反馈时间', blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = u'渠道订单记录'
+
+
 class Binding(models.Model):
     """
         third app bind table, store bind related
     """
     user = models.ForeignKey(User)
-    btype = models.CharField(max_length=20, choices=(
-        ('xunlei', 'xunlei'),
-        ('yiruite', 'yiruite')
-    ), verbose_name=u"类型")
+    btype = models.CharField(max_length=20, verbose_name=u"类型")
     bid = models.CharField(max_length=50, db_index=True, verbose_name=u"第三方用户id")
     bname = models.CharField(max_length=50, blank=True, verbose_name=u"第三方用户昵称")
     gender = models.CharField(max_length=5, choices=(
@@ -99,6 +109,7 @@ class Binding(models.Model):
     access_token = models.CharField(max_length=100, blank=True)
     refresh_token = models.CharField(max_length=100, blank=True)
     created_at = models.BigIntegerField(default=0, verbose_name=u'创建时间', blank=True)
+    detect_callback = models.BooleanField(u"回调检测", default=False)
 
     class Meta:
         verbose_name_plural = u'用户绑定'
@@ -222,15 +233,6 @@ class UserPhoneBook(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, default=timezone.now())
     is_used = models.BooleanField(default=True, verbose_name=u"是否使用", help_text=u'默认使用')
 
-
-class UserThreeOrder(models.Model):
-    user = models.ForeignKey(User)
-    order_on = models.ForeignKey(Channels, verbose_name=u'订单渠道')
-    request_no = models.CharField(unique=True, max_length=30, verbose_name=u'请求流水号')
-    result_code = models.CharField(max_length=30, blank=True, verbose_name=u'受理结果编码')
-    msg = models.CharField(max_length=255, blank=True, verbose_name=u'受理结果消息')
-    created_at = models.DateTimeField(u'下单时间', auto_now_add=True)
-    answer_at = models.DateTimeField(u'订单反馈时间', blank=True, null=True)
 
 #发给所有人
 def send_public_message(sender, instance, **kwargs):
