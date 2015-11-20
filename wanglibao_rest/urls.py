@@ -52,9 +52,9 @@ from marketing.play_list import InvestmentHistory
 from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView,
                              ThousandRedPackCountAPIView, ThunderActivityRewardCounter, QuickApplyerAPIView, GiftOwnerInfoAPIView, RewardDistributeAPIView)
 from weixin.views import P2PListWeixin
-from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
+from wanglibao_account.views import ThirdOrdeApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
-from wanglibao_reward.views import WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView
+from wanglibao_reward.views import WeixinRedPackView, WeixinShareTools
 
 router = DefaultRouter()
 
@@ -248,8 +248,6 @@ urlpatterns += patterns(
     url(r'^gift/owner/$', GiftOwnerInfoAPIView.as_view()), #add by yihen@20151102 ,聚橙网领取门票接口
     url(r'^weixin/share/has_gift/$', WeixinShareTools.as_view()), #add by yihen@20151102 ,聚橙网领取门票接口
     url(r'^weixin/distribute/redpack/$', RewardDistributeAPIView.as_view()), #add by yihen@20151102 ,聚橙网领取门票接口
-    url(r'^activity/reward/$', DistributeRewardAPIView.as_view()),
-
 )
 
 
@@ -262,7 +260,7 @@ urlpatterns += patterns(
 # 第三方渠道业务接口
 urlpatterns += patterns(
     '',
-    url(r'^coop/order/receive/(?P<channel_code>[a-z0-9A-Z_]*)/$', ThirdOrderApiView.as_view()),
+    url(r'^coop/order/receive/(?P<channel_code>[a-z0-9A-Z_]*)/$', ThirdOrdeApiView.as_view()),
     url(r'^coop/order/query/$', ThirdOrderQueryApiView.as_view()),
 )
 
