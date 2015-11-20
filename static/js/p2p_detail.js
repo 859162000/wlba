@@ -231,9 +231,9 @@
               redpack: redpack_id
             }).done(function(data) {
               return tool.modalAlert({
-                //height:'500px',
+                height:'334px',
                 title: '温馨提示',
-                msg: '份额认购成功',
+                msg: '<a href="/activity/thanksgiving/" style="display: block;"><img src="/static/imgs/pc_activity/thanksgiving/ganen.jpg"  style="width: 314px;"></img></a>份额认购成功',
                 callback_ok: function() {
                   if (data.category === '酒仙众筹标') {
                     return window.location.href = "/accounts/home/jiuxian/";

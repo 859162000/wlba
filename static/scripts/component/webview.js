@@ -130,6 +130,7 @@ var wlb = (function () {
                 mixins = new Mixin(target.data);
                 mixins._init();
             }
+
             try {
                 dics[target.callback](mixins);
             } catch (e) {
@@ -147,7 +148,6 @@ var wlb = (function () {
 
 
 /*
- 调用方法
 
  wlb.ready({
      app: function(mixins){
