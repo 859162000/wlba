@@ -346,6 +346,7 @@
                 $('.thanksgiving-kuang').css('display', 'block');
                 $('.kuang-tidhi').css('display', 'block');
                 $('.imgx').on('click', function () {
+                    $('.active1').removeClass("active");
                     $('.thanksgiving-kuang').css('display', 'none');
                     $('.kuang-tidhi').css('display', 'none');
                 });
