@@ -1,16 +1,12 @@
 # encoding: utf-8
 import datetime
-import pytz
 from wanglibao_redpack.models import RedPackEvent
 from wanglibao_redpack import backends as redpack_backends
 import logging
 import json
 import math
-import copy
-import hashlib
 import random
 import urllib
-import urlparse
 
 from random import randint
 from decimal import Decimal
@@ -24,23 +20,19 @@ from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from django.core.urlresolvers import reverse
-from django.core import serializers
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, Http404, HttpResponseRedirect
 from django.shortcuts import resolve_url, render_to_response
 from django.utils import timezone
-from django.utils.decorators import method_decorator
-from django.utils.http import urlencode
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView, View
 from registration.views import RegistrationView
-from rest_framework import status
-from rest_framework import renderers
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm, IdVerificationForm, verify_captcha
+from forms import EmailOrPhoneRegisterForm, LoginAuthenticationNoCaptchaForm,\
+    ResetPasswordGetIdentifierForm, IdVerificationForm, TokenSecretSignAuthenticationForm
 from marketing.models import IntroducedBy, Channels, Reward, RewardRecord
 from marketing.utils import set_promo_user, local_to_utc, get_channel_record
 from marketing import tools
@@ -52,12 +44,10 @@ from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account import third_login, backends as account_backends, message as inside_message
-from wanglibao_account.forms import EmailOrPhoneAuthenticationForm, TokenSecretSignAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning, \
     AmortizationRecord, P2PProductContract, P2PProduct, P2PEquityJiuxian, AutomaticPlan, AutomaticManager
-from wanglibao_p2p.tasks import automatic_trade
 from wanglibao_pay.models import Card, Bank, PayInfo
 from wanglibao_sms.utils import validate_validation_code, send_validation_code, send_rand_pass
 from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress
@@ -1275,7 +1265,7 @@ class MessageDetailAPIView(APIView):
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
-def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
+def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
     def messenger(message, user=None):
         res = dict()
         if user:
