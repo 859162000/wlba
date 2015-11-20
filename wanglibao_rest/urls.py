@@ -91,7 +91,7 @@ router.register(r'pre_orders', PreOrderViewSet)
 router.register(r'feedbacks', FeedbackViewSet)
 router.register(r'trade_info', TradeInfoViewSet)
 #router.register(r'banners', BannerViewSet)
-router.register(r'users', UserViewSet)
+# router.register(r'users', UserViewSet)
 
 router.register(r'daily_income', DailyIncomeViewSet)
 
@@ -207,7 +207,7 @@ urlpatterns = patterns(
     url(r'^address/(?P<address_id>\d+)/$', AddressGetAPIView.as_view()),
     url(r'^address/delete/$', AddressDeleteAPIView.as_view()),
 
-    url(r'^repayment/$', RepaymentAPIView.as_view()),
+    url(r'^repayment/$', RepaymentAPIView.as_view()),  # 后台还款中标的接口
 
     url(r'^gesture/add/$', GestureAddView.as_view()),
     url(r'^gesture/update/$', GestureUpdateView.as_view()),
