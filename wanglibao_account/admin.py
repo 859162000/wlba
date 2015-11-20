@@ -244,7 +244,7 @@ class BindingAdmin(admin.ModelAdmin):
                         order_prefix, order_suffix = order.request_no.split('_')
                         if int(order_suffix) == 5170:
                             self.purchase_call_back(obj, order_prefix)
-                        else:
+                        elif int(order_suffix) == 5171:
                             self.recharge_call_back(obj, order_prefix)
             else:
                 self.recharge_call_back(obj)
