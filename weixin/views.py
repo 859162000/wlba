@@ -139,7 +139,8 @@ class WeixinJoinView(View):
                 w_user = getOrCreateWeixinUser(fromUserName, weixin_account)
                 if w_user.subscribe != 0:
                     w_user.subscribe = 0
-                    w_user.save()
+                w_user.user = None
+                w_user.save()
                 reply = create_reply(u'欢迎下次关注我们！', msg)
             elif isinstance(msg, SubscribeScanEvent):
                 reply = self.process_subscribe(msg, toUserName)
