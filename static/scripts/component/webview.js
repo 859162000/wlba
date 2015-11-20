@@ -94,7 +94,12 @@ var wlb = (function () {
                 mixins = new Mixin(target.data);
                 mixins._init();
             }
-            dics[target.callback](mixins);
+            try{
+                dics[target.callback](mixins);
+            }catch(e){
+                console.log('传参类型{app: function(){}, other: function(){}}')
+            }
+
         }
     }
 
@@ -106,12 +111,12 @@ var wlb = (function () {
 
 
 
-wlb.ready({
+/*wlb.ready({
     app: function(mixins){
         
     },
     other: function(){
 
     }
-})
+})*/
 
