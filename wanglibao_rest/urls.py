@@ -269,9 +269,3 @@ urlpatterns += patterns(
     '',
     url(r'^activity/joinInfo/$', UserActivityStatusAPIView.as_view()),
 )
-
-# 理财金接口
-urlpatterns += patterns(
-    '',
-    url(r'^experience/', include('experience_gold.urls')),
-)
