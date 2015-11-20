@@ -1,0 +1,14 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+    head
+        - with '网利宝' as title
+        include include/common_head
+        - endwith
+        link(rel="stylesheet",href="/static/stylesheets/fun_tuan.css?v=201511121")
+    body(style="background:#fff")
+        include global/g_nav
+        #wrap_box
+           img.banner(src="/static/imgs/pc_activity/fun_tuan/banner.jpg")
+        include global/g_footer
