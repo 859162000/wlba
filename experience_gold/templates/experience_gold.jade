@@ -8,121 +8,90 @@ html
         - endwith
         link(rel="stylesheet",href="/static/styles/pc_activity/experience_gold.css?v=20151106")
     body(style="background:#fc9300")
+        - csrf_token
         include global/g_nav
         .experience_gold
             .banner
                 .draw_btn
-                    if user.is_authenticated
-                        a(href='javascript:void(0)').draw_btn_ed
+                  if user.is_authenticated
+                    if experience_count == 0
+                      if p2p_record_count == 0
+                        a(href='javascript:void(0)').no_invest
+                      else
+                        a(href='javascript:void(0)').invested
                     else
-                        a(href='/accounts/login/?next=/activity/experience_gold/')
+                      a(href='javascript:void(0)').draw_btn_ed  已领取体验金{{experience_all | money_format_int}}元
+                  else
+                    a(href='/accounts/register/?next=/activity/experience/gold/')
             .content.clearfix
                 .experience_title
                     span 我的体验金
                 ul.account_detail.clearfix
                     li
                         p.experience_name 总资产（元）
-                        p.experience_money 10,000.00
+                        p.experience_money.zzc {{total_experience_amount | money_format}}
                     li
                         p.experience_name 体验金余额（元）
-                        p.experience_money 8,888.00
+                        p.experience_money.tyjye {{experience_amount | money_format_int}}
                     li
-                        p.experience_name 到账收益余额（元）
-                        p.experience_money 10,000.00
+                        p.experience_name 到账收益（元）
+                        p.experience_money {{paid_interest}}
                     li.last
                         p.experience_name 待收收益（元）
-                        p.experience_money 10,000.00
+                        p.experience_money {{unpaid_interest}}
                 .experience_project.clearfix
                     .project_div.clearfix
                         .project_left
-                            h5 专属福利体验标R
+                            h5 {{product.name}}
                             ul.project_detail.clearfix
                                 li.li_one
-                                    label 10,000元
-                                    span 融资金额
+                                  if experience_amount == 0
+                                    label.rzje 8,888元
+                                  else
+                                    label {{experience_amount}}元
+                                  span 融资金额
                                 li.li_two
-                                    label 10%
+                                    label {{product.expected_earning_rate}}%
                                     span 年化收益
                                 li.li_three
-                                    label 7天
+                                    label {{product.period}}天
                                     span 投资期限
                         .project_right
+                          if experience_amount > 0
                             a(href='javascript:void(0)').investBtn 立即投资
-                            p.income_fonts(style='display:none') 将于2015-10-31收益13元
-                .look_more_detail
+                          else
+                            a.invest_ed 立即投资
+                          p.income_fonts(style='display:none')
+                if user.is_authenticated and experience_amortization
+                  .look_more_detail
                     .more_btn
                         label 查看历史投资项目
                         span
-                .project_list.clearfix(style='display:none')
+                  .project_list.clearfix(style='display:none')
                     .project_top
                     .project_box.clearfix
                         .project_ul_pre.clearfix
-                            table
-                                thead
-                                    tr
-                                        th 投标时间
-                                        th 产品名称
-                                        th 投资金额（元）
-                                        th 年化收益
-                                        th 项目天数
-                                        th.th_w 已收益／预期收益（元）
-                                tbody
-                                    tr
-                                        td 2015-10-10 19:53
-                                        td 专享福利体验标
-                                        td 8,888.00
-                                        td 00.00
-                                        td 2
-                                        td 0.00/9.89
-                                    tr
-                                        td 2015-10-10 19:53
-                                        td 专享福利体验标
-                                        td 8,888.00
-                                        td 00.00
-                                        td 2
-                                        td 0.00/9.89
-                                    tr
-                                        td 2015-10-10 19:53
-                                        td 专享福利体验标
-                                        td 8,888.00
-                                        td 00.00
-                                        td 2
-                                        td 0.00/9.89
-                                    tr
-                                        td 2015-10-10 19:53
-                                        td 专享福利体验标
-                                        td 8,888.00
-                                        td 00.00
-                                        td 2
-                                        td 0.00/9.89
-                                    tr
-                                        td 2015-10-10 19:53
-                                        td 专享福利体验标
-                                        td 8,888.00
-                                        td 00.00
-                                        td 2
-                                        td 0.00/9.89
-                                    tr
-                                        td 2015-10-10 19:53
-                                        td 专享福利体验标
-                                        td 8,888.00
-                                        td 00.00
-                                        td 2
-                                        td 0.00/9.89
-                                    tr
-                                        td 2015-10-10 19:53
-                                        td 专享福利体验标
-                                        td 8,888.00
-                                        td 00.00
-                                        td 2
-                                        td 0.00/9.89
-                                    tr
-                                        td 2015-10-10 19:53
-                                        td 专享福利体验标
-                                        td 8,888.00
-                                        td 00.00
-                                        td 2
-                                        td 0.00/9.89
+                          table
+                            thead
+                              tr
+                                th 投标时间
+                                th 产品名称
+                                th 投资金额（元）
+                                th 年化收益
+                                th 项目天数
+                                th.th_w 已收益／预期收益（元）
+                            tbody
+                              for amo in experience_amortization
+                                tr
+                                  td {{amo.created_time}}
+                                  td {{amo.product.name}}
+                                  td {{amo.principal | money_format_int}}
+                                  td {{amo.product.expected_earning_rate}}%
+                                  td {{amo.product.period}}
+                                  if amo.settled
+                                    td {{amo.interest}}/{{amo.interest}}（（元）
+                                  else
+                                    td 0.00/{{amo.interest}}（元）
                 .explain_box
                     .explain_box_img
                         .explain_content_box
@@ -148,8 +117,9 @@ html
                                         p.mt40 部分合作渠道来源用户无法享受此活动奖励，网利宝对此活动享有最终解释权。
         #receiveSuccess(style='display:none')
             .receiveSuccess
+                p.money_count 8888
                 p 恭喜您获得
-                p 8,888元体验金
+                p.money_counts 8,888元体验金
                 p
                     a(href='javascript:void(0)')#goBtn 领完可以在这里投资呦！
         #oldUser(style='display:none')

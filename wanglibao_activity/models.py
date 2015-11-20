@@ -44,12 +44,12 @@ TRIGGER_NODE = (
 GIFT_TYPE = (
     ('reward', u'奖品'),
     ('redpack', u'优惠券'),
-    # ('income', u'收益'),
-    ('phonefare', u'手机话费')
+    ('experience_gold', u'体验金'),
+    # ('phonefare', u'手机话费')
 )
 SEND_TYPE = (
     ('sys_auto', u'系统实时发放'),
-    ('manual_operation', u'人工手动发放')
+    # ('manual_operation', u'人工手动发放')
 )
 SEND_TYPE_ABBR = (
     ('sys_auto', u'系统'),
@@ -75,7 +75,7 @@ class Activity(models.Model):
     product_ids = models.CharField(u'指定产品ID', max_length=200, blank=True, default='',
                                    help_text=u"如果有多个产品，则产品ID之间用英文逗号分割")
     description = models.TextField(u'描述', null=True, blank=True)
-    channel = models.CharField(u'渠道名称', max_length=200, blank=True,
+    channel = models.CharField(u'渠道名称', max_length=800, blank=True,
                                help_text=u'如果是对应渠道的活动，则填入对应渠道的渠道名称代码，默认为wanglibao-other，多个渠道用英文逗号间隔')
     is_all_channel = models.BooleanField(u'所有渠道', default=False, help_text=u'如果勾选“所有渠道”，则系统不再限定渠道')
     start_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"活动开始时间*")
@@ -136,8 +136,8 @@ class ActivityRule(models.Model):
     share_type = models.CharField(u'选择参与赠送的人员', max_length=20, choices=SHARE_TYPE, blank=True, default='')
     is_invite_in_date = models.BooleanField(u'判断是否在活动区间内邀请好友', default=False,
                                             help_text=u'勾选此项则，则会先判断邀请关系的成立时间是否在活动期间，是就触发该规则，不是则不做处理')
-    redpack = models.CharField(u'优惠券活动ID', max_length=200, blank=True,
-                               help_text=u'优惠券活动ID一定要和优惠券活动中的ID保持一致，否则会导致无法发放<br/>\
+    redpack = models.CharField(u'对应活动ID', max_length=200, blank=True,
+                               help_text=u'优惠券活动ID/体验金活动ID一定要和对应活动中的ID保持一致，否则会导致无法发放<br/>\
                                如需要多个ID则用英文逗号隔开,如:1,2,3')
     reward = models.CharField(u'奖品类型名称', max_length=200, blank=True,
                               help_text=u'奖品类型名称一定要和奖品中的类型保持一致，否则会导致无法发放奖品')
@@ -182,8 +182,8 @@ class ActivityRule(models.Model):
     def clean(self):
         if self.gift_type == 'reward' and not self.reward:
             raise ValidationError(u'赠送类型为“奖品”时，必须填写“奖品类型名称”')
-        if self.gift_type == 'redpack' and not self.redpack:
-            raise ValidationError(u'赠送类型为“优惠券”时，必须填写“优惠券活动ID”')
+        if (self.gift_type == 'redpack' or self.gift_type == 'experience_gold') and not self.redpack:
+            raise ValidationError(u'赠送类型为“优惠券/体验金”时，必须填写“对应活动ID”')
         if self.gift_type == 'income' or self.gift_type == 'phonefare':
             if self.income <= 0:
                 raise ValidationError(u'选择送收益或手机话费时要填写“金额或比率”')

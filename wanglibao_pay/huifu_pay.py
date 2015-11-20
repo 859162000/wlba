@@ -186,7 +186,7 @@ class HuifuPay(Pay):
             OrderHelper.update_order(order, request.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
 
             # 处理第三方渠道的用户充值回调
-            CoopRegister(request).process_for_recharge(request.user)
+            CoopRegister(request).process_for_recharge(request.user, order.id)
         except decimal.DecimalException:
             message = u'金额格式错误'
         except Bank.DoesNotExist:
@@ -365,7 +365,7 @@ class HuifuPay(Pay):
                 # fix@chenweibi, add order_id
                 tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
                                                      "device": device, "order_id": order_id})
-                CoopRegister(request).process_for_recharge(pay_info.user, order_id)
+                CoopRegister(request).process_for_recharge(pay_info.user, pay_info.order_id)
             except:
                 pass
 

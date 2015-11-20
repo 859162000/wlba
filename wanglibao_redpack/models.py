@@ -34,7 +34,12 @@ class RedPackEvent(models.Model):
     amount = models.FloatField(null=False, default=0.0, verbose_name=u'优惠券金额(百分比也为0-100)')
     invest_amount = models.IntegerField(null=False, default=0, verbose_name=u"投资门槛")
     p2p_types = models.ForeignKey(ProductType, verbose_name=u"限定P2P分类", blank=True, null=True, on_delete=models.SET_NULL)
-    period = models.CharField(default='',max_length=200, verbose_name=u'限定产品期限(月/天)', blank=True, help_text=u"如果期限有多个,则用英文逗号 , 隔开")
+    period = models.CharField(default='', max_length=200, verbose_name=u'限定产品期限', blank=True,
+                              help_text=u"如果期限有多个,则用英文逗号 , 隔开")
+    period_type = models.CharField(default=u'月', max_length=20, verbose_name=u'产品期限类型', choices=(
+        (u'月', u'月'),
+        (u'日', u'日')
+    ), blank=True)
     highest_amount = models.IntegerField(null=False, default=0, verbose_name=u"最高抵扣金额(百分比使用0无限制)")
     value = models.IntegerField(null=False, default=0, verbose_name=u"优惠券个数(不生成兑换码无需修改)")
     describe = models.CharField(max_length=20, verbose_name=u"标注渠道批次等信息", default="")
@@ -123,8 +128,9 @@ class InterestHike(models.Model):
         verbose_name = u"加息券"
         verbose_name_plural = u"加息券"
 
-#佣金,加息等
-#todo: move p2p earning to here
+
+# 佣金,加息等
+# todo: move p2p earning to here
 class Income(models.Model):
     user = models.ForeignKey(User, verbose_name=u"用户", related_name="user")
     invite = models.ForeignKey(User, verbose_name=u"被邀请用户", related_name="invite")
@@ -137,7 +143,7 @@ class Income(models.Model):
     created_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"创建时间")
 
 
-#创建红包列表
+# 创建红包列表
 def create_redpack(sender, instance, **kwargs):
     from wanglibao_redpack import tasks
     tasks.create_update_redpack.apply_async(kwargs={
