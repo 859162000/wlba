@@ -57,10 +57,8 @@
         var arrPos = new Array();
         window.onload = function () {
             //点击抽奖
-            alert(21)
             lottery.init('lottery');
             $(".prize-mingdan").on('click','.jiang-button2',function () {
-                alert(12);
                 if (change['left'] == 0) {
                     return;
                 }
