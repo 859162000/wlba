@@ -11,6 +11,7 @@ import requests
 import urllib
 import json
 from wanglibao.celery import app
+from .utils import update_coop_order, xunlei9_order_query, str_to_dict
 
 from wanglibao_account.models import Binding
 
@@ -134,6 +135,68 @@ def jinshan_callback(url, params):
     
     if ret:
         logger.info(ret.text)
+
+
+@app.task
+def xunleivip_recallback(url, params, channel, order_id):
+    result = xunlei9_order_query(params)
+    data = result.get('data', None)
+
+    if not data:
+        logger.info("Enter %s_callback task===>>>" % channel)
+        try:
+            params = urllib.urlencode(params)
+            logger.info(params)
+            ret = requests.get(url, params=params)
+            if ret.status_code != 200:
+                raise Exception("Failed to send request: status: %d, ", ret.status_code)
+
+            ret_data = str_to_dict(ret.text)
+            result = ret_data['ret']
+            error = ret_data['error'].encode('utf-8')
+            code = ret_data['code']
+
+            # 更新第三方订单处理状态
+            update_coop_order(order_id, channel, result, error)
+
+            logger.info('%s callback url: %s' % (channel, ret.url))
+            logger.info('%s callback return: %s' % (channel, ret_data))
+            return ret
+        except Exception, e:
+            logger.info("%s callback':'failed to connect" % channel)
+            logger.info(e)
+
+
+@app.task
+def xunleivip_callback(url, params, channel, order_id):
+    logger.info("Enter %s_callback task===>>>" % channel)
+    try:
+        _params = urllib.urlencode(params)
+        logger.info(_params)
+        ret = requests.get(url, params=_params)
+        if ret.status_code != 200:
+            raise Exception("Failed to send request: status: %d, ", ret.status_code)
+
+        ret_data = str_to_dict(ret.text)
+        result = ret_data['ret']
+        error = ret_data['error'].encode('utf-8')
+        code = ret_data['code']
+
+        # 更新第三方订单处理状态
+        update_coop_order(order_id, channel, result, error)
+
+        logger.info('%s callback url: %s' % (channel, ret.url))
+        logger.info('%s callback return: %s' % (channel, ret_data))
+        return ret
+    except Exception, e:
+        # 回调补发
+        xunleivip_recallback.apply_async(
+            # FixMe, 修改延迟时间
+            countdown=600,
+            kwargs={'url': url, 'params': params, 'channel': channel, 'order_id': order_id})
+
+        logger.info("%s callback':'failed to connect" % channel)
+        logger.info(e)
 
 
 @app.task

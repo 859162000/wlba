@@ -148,6 +148,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'marketing.middlewares.PromotionTokenMiddleWare',
+    'marketing.middlewares.StatsKeyWordMiddleWare',
 )
 
 CONCURRENCY_POLICY = 2
@@ -379,36 +380,42 @@ LOGGING = {
             'filename': '/var/log/wanglibao/marketing.log',
             'formatter': 'verbose'
         },
-        'wanglibao_reward':{  #add by yihen@20150915
+        'wanglibao_reward': {  #add by yihen@20150915
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': '/var/log/wanglibao/wanglibao_reward.log',
             'formatter': 'verbose'
         },
-        'wanglibao_account':{  #add by yihen@20151113
-                              'level': 'DEBUG',
-                              'class': 'logging.FileHandler',
-                              'filename': '/var/log/wanglibao/wanglibao_account.log',
-                              'formatter': 'verbose'
-                              },
-        'wanglibao_rest':{  #add by yihen@20151028
-                              'level': 'DEBUG',
-                              'class': 'logging.FileHandler',
-                              'filename': '/var/log/wanglibao/wanglibao_rest.log',
-                              'formatter': 'verbose'
-                              },
-        'wanglibao_cooperation':{  #add by yihen@20150915
-                              'level': 'DEBUG',
-                              'class': 'logging.FileHandler',
-                              'filename': '/var/log/wanglibao/wanglibao_cooperation.log',
-                              'formatter': 'verbose'
-                              },
-        'weixin':{  #add by huomeimei
-              'level': 'DEBUG',
-              'class': 'logging.FileHandler',
-              'filename': '/var/log/wanglibao/weixin.log',
-              'formatter': 'verbose'
-                },
+        'wanglibao_account': {  #add by yihen@20151113
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/wanglibao_account.log',
+            'formatter': 'verbose'
+        },
+        'wanglibao_rest': {  #add by yihen@20151028
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/wanglibao_rest.log',
+            'formatter': 'verbose'
+        },
+        'wanglibao_cooperation': {  #add by yihen@20150915
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/wanglibao_cooperation.log',
+            'formatter': 'verbose'
+        },
+        'weixin': {  #add by huomeimei
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/weixin.log',
+            'formatter': 'verbose'
+        },
+        'experience_gold': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/experience_gold.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
@@ -433,7 +440,7 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'wanglibao_p2p': {
-            'handlers': ['file'],
+            'handlers': ['file', 'console'],
             'level': 'DEBUG',
         },
         'wanglibao_redpack': {
@@ -468,24 +475,24 @@ LOGGING = {
             'handlers': ['marketing', 'console'],
             'level': 'DEBUG'
         },
-        'wanglibao_reward': { #add by yihen@20150915
+        'wanglibao_reward': {  # add by yihen@20150915
             'handlers': ['wanglibao_reward', 'console'],
             'level': 'DEBUG'
         },
-        'wanglibao_rest': { #add by yihen@20151028
+        'wanglibao_rest': {  # add by yihen@20151028
               'handlers': ['wanglibao_rest', 'console'],
               'level': 'DEBUG'
           },
-        'wanglibao_cooperation': { #add by yihen@20150915
-                              'handlers': ['wanglibao_cooperation', 'console'],
-                              'level': 'DEBUG'
-                              },
-        'weixin':{#add by huomeimei
+        'wanglibao_cooperation': {  # add by yihen@20150915
+            'handlers': ['wanglibao_cooperation', 'console'],
+            'level': 'DEBUG'
+        },
+        'weixin': {  # add by huomeimei
               'handlers': ['weixin', 'console'],
               'level': 'DEBUG'
         },
-        'wanglibao_p2p': {
-            'handlers': [ 'console'],
+        'experience_gold': {
+            'handlers': ['file', 'console'],
             'level': 'DEBUG'
         }
     }
@@ -1078,6 +1085,7 @@ WLB_FOR_FANLITOU_KEY = '2002'
 
 # 迅雷VIP
 WLB_FOR_XUNLEI9_KEY = '2003'
+XUNLEIVIP_QUERY_URL = 'http://dynamic.vip.xunlei.com/xljinku/checkOrder'
 XUNLEIVIP_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/xljinku/sendvip/'
 XUNLEIVIP_REGISTER_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_report.php'
 XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
