@@ -48,3 +48,15 @@ class Announcement(models.Model):
 
     def get_absolute_url(self):
         return '/announcement/detail/%s' % self.id
+#
+#
+# class AppMemorabilia(models.Model):
+#     name = models.CharField(max_length=100, blank=False, null=False, verbose_name=u'名称')
+#     banner = models.ImageField(upload_to='announcement', blank=False, null=False, verbose_name=u'Banner')
+#     detail_link = models.CharField(max_length=255, blank=False, null=False, verbose_name=u'详情页链接')
+#     done_date = models.DateField(auto_now=True, blank=False, null=False, verbose_name=u'完成日期')
+#     start_time = models.DateTimeField(auto_now=False, blank=True, null=True, verbose_name=u'展示开始时间')
+#     end_time = models.DateTimeField(auto_now=False, blank=True, null=True, verbose_name=u'展示结束时间')
+#
+#     class Meta:
+#         verbose_name_plural = u'APP-大事记'
