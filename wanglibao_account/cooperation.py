@@ -3316,7 +3316,7 @@ class Rong360TokenView(APIView):
     permission_classes = ()
 
     def get(self, request):
-
+        rong_ret = dict()
         ret = create_token(request)
         # {'state': True, 'data': token}
         if ret['state']:
