@@ -104,7 +104,8 @@ var wlb = (function () {
         sendUserInfo: function (data, callback) {
             var options = this._setData(data, callback);
 
-            this.bridge.callHandler('sendUserInfo', options.post, function (response) {
+            this.bridge.callHandler('sendUserInfo', {}, function (response) {
+
                 options.callback && options.callback(response);
             });
         }
