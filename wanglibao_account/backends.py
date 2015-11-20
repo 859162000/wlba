@@ -66,8 +66,8 @@ def set_source(request, user):
                 website=request.session.get("promo_source_website", "")
             )
             logger.debug("注册行为已经完成，SEM统计参量入库,object value:{0}".format(source))
-    except Exception:
-        pass
+    except Exception, reason:
+        logger.debug("SEM关键词统计，入库报异常；reason:%s" % reason)
 
 
 class TestIDVerifyBackEnd(object):
