@@ -74,6 +74,7 @@ var wlb = (function () {
         },
         /**
          * 判断是否登陆
+         * 目前该接口有问题，暂不使用，用senduserinfo先替代
          * @param data  可不传
          * @param callback 返回 [login, ph, tk]
          */
