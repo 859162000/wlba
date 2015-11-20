@@ -503,11 +503,13 @@ org.invite_index = (function (org) {
                     $('input[name=submit]').attr('disabled',true)
                 },
                 success:function(data){
+                    var base64Native = Base64.encode(_self.$phone.val());
+                    var styleBase = base64Native.substring(0,base64Native.length-1);
                     if(data.ret_code === 0 ){
-                        var base64Native = Base64.encode(_self.$phone.val());
-                        var styleBase = base64Native.substring(0,base64Native.length-1);
                         window.location.href='/wst/'+ styleBase+'/';
-                    }else if (data.ret_code){
+                    }else if (data.ret_code === 30015){
+                        window.location.href = '/wsf/'+ styleBase+'/';
+                    }else{
                         return _self.spread.trigger('from:showSign',[data.message])
                     }
                 },

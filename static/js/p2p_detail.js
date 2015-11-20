@@ -4,7 +4,8 @@
     paths: {
       jquery: 'lib/jquery.min',
       underscore: 'lib/underscore-min',
-      tools: 'lib/modal.tools',
+      tools: 'lib/modal.t' +
+      'ools',
       "jquery.validate": 'lib/jquery.validate.min',
       'jquery.modal': 'lib/jquery.modal.min',
       ddslick: 'lib/jquery.ddslick'
@@ -230,6 +231,7 @@
               redpack: redpack_id
             }).done(function(data) {
               return tool.modalAlert({
+                //height:'500px',
                 title: '温馨提示',
                 msg: '份额认购成功',
                 callback_ok: function() {

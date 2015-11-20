@@ -1,4 +1,5 @@
 # encoding:utf-8
+from decimal import Decimal
 from string import Template
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
@@ -11,7 +12,7 @@ from wanglibao_pay.exceptions import VerifyError, ThirdPayError
 from wanglibao_pay.kuai_pay import KuaiShortPay
 from wanglibao_pay.mock_generator import PayMockGenerator
 from wanglibao_pay.models import PayInfo, Card
-from wanglibao_pay.pay import PayOrder
+from wanglibao_pay.pay import PayOrder, YeeProxyPayCallbackMessage
 
 PAY_RES = Template("""\
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>\
@@ -98,7 +99,7 @@ class PayTests(TestCase):
 #         super(KuaiPayTests)
 #
 #         self.kuai_pay = KuaiShortPay()
-#         # todo 暂时无法构造签名，只能到服务器上测试该方法
+#         # todo better 暂时无法构造签名，只能到服务器上测试该方法
 #         self.kuai_pay._check_signature = MagicMock(ret_value=True)
 #         self.kuai_pay._request = MagicMock()
 #         mock_request_switch(self.kuai_pay)
@@ -386,15 +387,25 @@ class PayOrderTest(PayTests):
         super(PayOrderTest, self).setUp()
         self.pay_order = PayOrder()
 
+    def test_order_before_pay_success_without_card(self):
+        order_id = self.pay_order.order_before_pay(self.user, self.amount_1, self.gate_id,
+                                                self.ip, self.device)
+        pay_info = PayInfo.objects.get(order_id=order_id)
+        self.assertEqual(self.amount_1, pay_info.amount)
+        self.assertEqual(self.user, pay_info.user)
+
+
     def test_order_before_pay(self):
         # def order_before_pay(self, user, amount, card_no, gate_id, phone_for_card, request_ip, device):
         #     return order.id
         order_id = self.pay_order.order_before_pay(self.user, self.amount_1, self.gate_id,
                                                 self.ip, self.device, self.card_no, self.input_phone)
-        print order_id
+        pay_info = PayInfo.objects.get(order_id=order_id)
+        self.assertEqual(self.amount_1, pay_info.amount)
+        self.assertEqual(self.user, pay_info.user)
 
-        # todo card_no, gate_id exception
-        # todo transaction
+        # todo urgent card_no, gate_id exception
+        # todo urgent transaction
 
 
     def test_order_after_pay_success(self):
@@ -412,7 +423,7 @@ class PayOrderTest(PayTests):
         margin_record_amount = MarginRecord.objects.get(order_id=order_id).amount
         self.assertEqual(margin_record_amount, self.amount_1)
 
-        # todo 异常：amount, order_id, transaction
+        # todo urgent 异常：amount, order_id, transaction
 
     def test_order_after_pay_success_add_card(self):
         # def order_after_pay_succcess(self, amount, order_id, res_ip, res_content):
@@ -445,25 +456,47 @@ class PayOrderTest(PayTests):
         margin_after = Margin.objects.get(user_id=self.user.id).margin
         self.assertEqual(margin_after-margin_before, self.amount_0)
         self.assertRaises(ObjectDoesNotExist, MarginRecord.objects.get, order_id=order_id)
-        # todo 异常：order_id, transaction
+        # todo urgent 异常：order_id, transaction
 
-    def test_order_restart_fail(self):
-        order_id = self.pay_order.order_before_pay(self.user, self.amount_1, self.gate_id,
-                                                self.ip, self.device, self.card_no, self.input_phone)
-        rs = self.pay_order.order_after_pay_error(ThirdPayError(77777, 'illegal condition within pay'), order_id)
-        self.pay_order.order_after_pay_succcess
-        self.pay_order.order_restart_fail(order_id)
+    # def test_order_restart_fail(self):
+    #     order_id = self.pay_order.order_before_pay(self.user, self.amount_1, self.gate_id,
+    #                                             self.ip, self.device, self.card_no, self.input_phone)
+    #     rs = self.pay_order.order_after_pay_error(ThirdPayError(77777, 'illegal condition within pay'), order_id)
+    #     self.pay_order.order_after_pay_succcess
+    #     self.pay_order.order_restart_fail(order_id)
 
-#     todo 覆盖：短卡号，PayMessage
-
-
+#     todo urgent 覆盖：短卡号
 
 
-class YeeProxyPayCallbackMessage(TestCase):
-    def parse_message_test(self):
-        pass
 
 
+class YeeProxyPayCallbackMessageTest(TestCase):
+    def test_parse_message_test(self):
+        request_get_para = dict(p1_MerId='10001126856',
+                           r0_Cmd='Buy',
+                           r1_Code='1',
+                           r2_TrxId='418329545762402G',
+                           r3_Amt='0.01',
+                           r4_Cur='RMB',
+                           r5_Pid='Wanglibao',
+                           r6_Order='1925745',
+                           r7_Uid='',
+                           r8_MP='',
+                           r9_BType='1',
+                           ru_Trxtime='20151119130908',
+                           ro_BankOrderId='1490128225',
+                           rb_BankId='YJZF-NET',
+                           rp_PayDate='20151119130907',
+                           rq_CardNo='',
+                           rq_SourceFee='0.0',
+                           rq_TargetFee='0.0',
+                           hmac='4d433af4e4eea2a6d054e8f1864810a4')
+        pay_message = YeeProxyPayCallbackMessage().parse_message(request_get_para, 'response')
+        self.assertEqual(0.01, float(pay_message.amount))
+        self.assertEqual(1925745, pay_message.order_id)
+
+['p1_MerId', 'r0_Cmd', 'r1_Code', 'r2_TrxId', 'r3_Amt', 'r4_Cur', 'r5_Pid', 'r6_Order',
+                               'r7_Uid', 'r8_MP', 'r9_BType']
 
 
 

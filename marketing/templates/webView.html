@@ -9,49 +9,8 @@
 	</style>
 </head><body>
 	<h1>WebViewJavascriptBridge Demo </h1>
-    <div id='buttons'>testObjcCallback</div> <div id='log'></div>
-	<script>
-	window.onerror = function(err) {
-		log('window.onerror: ' + err)
-	}
-	function connectWebViewJavascriptBridge(callback) {
-		if (window.WebViewJavascriptBridge) {
-			callback(WebViewJavascriptBridge)
-		} else {
-			document.addEventListener('WebViewJavascriptBridgeReady', function() {
-				callback(WebViewJavascriptBridge)
-			}, false)
-		}
-	}
-
-	connectWebViewJavascriptBridge(function(bridge) {
-		var uniqueId = 1
-		function log(message, data) {
-			var log = document.getElementById('log')
-			var el = document.createElement('div')
-			el.className = 'logLine'
-			el.innerHTML = uniqueId++ + '. ' + message + ':<br/>' + JSON.stringify(data)
-			if (log.children.length) { log.insertBefore(el, log.children[0]) }
-			else { log.appendChild(el) }
-		}
-
-		bridge.init(function(message, responseCallback) {
-			log('JS got a message', message)
-			var data = { 'Javascript Responds':'收到' }
-			log('JS responding with', data)
-			responseCallback(data)
-		})
-
-        var callbackButton = document.getElementById('buttons');
-		callbackButton.onclick = function(e) {
-			e.preventDefault();
-            log('testObjcCallback','123')
-            bridge.callHandler('testObjcCallback', {'1': '1'}, function(response) {
-				log('JS', response)
-			})
-		}
-
-	})
-	</script>
+    <div id='buttons'>testObjcCallback</div>
+    <div id='log'></div>
+	<script src="/static/scripts/component/webview.js"></script>
 
 </body></html>

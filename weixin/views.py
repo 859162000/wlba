@@ -1130,6 +1130,8 @@ class AuthorizeCode(APIView):
 
     def get(self, request):
         account_id = self.request.GET.get('state')
+        if not account_id:
+            return Response({'errcode':-1, 'errmsg':'state is null'})
         try:
             account = None
             weixin_account = WeixinAccounts.getByOriginalId(account_id)
@@ -1156,16 +1158,17 @@ class AuthorizeCode(APIView):
             oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, scope='snsapi_userinfo', state=account_id)
         else:
             oauth = WeChatOAuth(account.app_id, account.app_secret, redirect_uri=redirect_uri, state=account_id)
-        print oauth.authorize_url
+        logger.debug("---------------------------AuthorizeCode::oauth.authorize_url==%s"%oauth.authorize_url)
         return redirect(oauth.authorize_url)
 
 
 class AuthorizeUser(APIView):
     permission_classes = ()
     def get(self, request):
-        account_id = self.request.GET.get('state')
+        account_id = self.request.GET.get('state', "0")
         try:
             account = None
+            logger.debug("AuthorizeUser---------------------------%s, path:::%s"%(account_id, request.get_full_path()))
             weixin_account = WeixinAccounts.getByOriginalId(account_id)
             if weixin_account:
                 account = weixin_account.db_account

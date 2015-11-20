@@ -47,7 +47,8 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_XUNLEI9_KEY, XUNLEIVIP_CALL_BACK_URL, XUNLEIVIP_KEY, XUNLEIVIP_REGISTER_CALL_BACK_URL, \
      XUNLEIVIP_REGISTER_KEY
 from wanglibao_account.models import Binding, IdVerification
-from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback
+from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback, \
+                                    xunleivip_callback
 from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization, AutomaticPlan
 from wanglibao_pay.models import Card, PayInfo
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -60,6 +61,7 @@ from wanglibao_reward.models import WanglibaoUserGift
 from user_agents import parse
 import uuid
 import urllib
+from .utils import xunleivip_generate_sign
 
 logger = logging.getLogger('wanglibao_cooperation')
 
@@ -1029,7 +1031,7 @@ class JuChengRegister(CoopRegister):
         # 判断是否首次投资
         if p2p_record and p2p_record.order_id == order_id:
             p2p_amount = int(p2p_record.amount)
-            if p2p_amount>=1000 and p2p_amount<2000:
+            if p2p_amount>=500 and p2p_amount<1000:
                 try:
                     logger.debug(u"80门票，我要申请锁")
                     config = GiftOwnerGlobalInfo.objects.select_for_update().filter(description=u'jcw_ticket_80').first()
@@ -1045,7 +1047,7 @@ class JuChengRegister(CoopRegister):
                     logger.debug(u"用户 %s 获得80门票一张, 剩余：%s" % (user, config.amount))
                     SEND_SUCCESS = True
 
-            if p2p_amount>=2000:
+            if p2p_amount>=1000:
                 try:
                     logger.debug(u"180门票，我要申请锁")
                     config = GiftOwnerGlobalInfo.objects.select_for_update().filter(description=u'jcw_ticket_188').first()
@@ -1104,18 +1106,12 @@ class XunleiVipRegister(CoopRegister):
         self.coop_register_key = XUNLEIVIP_REGISTER_KEY
         self.external_channel_user_key = 'xluserid'
 
-    def generate_sign(self, data, key):
-        sorted_data = sorted(data.iteritems(), key=lambda asd:asd[0], reverse=False)
-        encode_data = urllib.urlencode(sorted_data)
-        sign = hashlib.md5(encode_data+str(key)).hexdigest()
-        return sign
-
-    def xunlei_call_back(self, user, tid, data, url):
-        order_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')+'_'+str(data['act'])
+    def xunlei_call_back(self, user, tid, data, url, order_id):
+        order_id = '%s_%s' % (order_id, data['act'])
         data['uid'] = tid
         data['orderid'] = order_id
         data['type'] = 'baijin'
-        sign = self.generate_sign(data, self.coop_key)
+        sign = xunleivip_generate_sign(data, self.coop_key)
         params = dict({'sign': sign}, **data)
 
         # 创建渠道订单记录
@@ -1124,8 +1120,9 @@ class XunleiVipRegister(CoopRegister):
         order.save()
 
         # 异步回调
-        common_callback.apply_async(
-            kwargs={'url': url, 'params': params, 'channel': self.c_code})
+        xunleivip_callback.apply_async(
+            kwargs={'url': url, 'params': params,
+                    'channel': self.c_code, 'order_id': order_id})
 
     def register_call_back(self, user):
         # 判断用户是否绑定
@@ -1136,16 +1133,23 @@ class XunleiVipRegister(CoopRegister):
                 'xluserid': binding.bid,
                 'regtime': int(time.mktime(user.date_joined.date().timetuple()))
             }
-            sign = self.generate_sign(data, self.coop_register_key)
+
+            sign = xunleivip_generate_sign(data, self.coop_register_key)
             params = dict({'sign': sign}, **data)
+
             # 异步回调
             common_callback.apply_async(
                 kwargs={'url': self.register_call_back_url, 'params': params, 'channel': self.c_code})
 
     def recharge_call_back(self, user, order_id):
+        logger.info("Enter recharge_call_back for xunlei9.")
+
         # 判断用户是否绑定和首次充值
         binding = Binding.objects.filter(user_id=user.id).first()
-        pay_info = PayInfo.objects.filter(user_id=user.id).order_by('create_time').first()
+        penny = Decimal(0.01).quantize(Decimal('.01'))
+        pay_info = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
+                                          status=PayInfo.SUCCESS).order_by('create_time').first()
+
         if binding and pay_info and pay_info.order_id == order_id:
             # 判断充值金额是否大于100
             pay_amount = int(pay_info.amount)
@@ -1155,7 +1159,8 @@ class XunleiVipRegister(CoopRegister):
                     'num1': 7,
                     'act': 5171
                 }
-                self.xunlei_call_back(user, binding.bid, data, self.call_back_url)
+                self.xunlei_call_back(user, binding.bid, data,
+                                      self.call_back_url, pay_info.order_id)
 
     def purchase_call_back(self, user, order_id):
         # 判断用户是否绑定和首次投资
@@ -1172,7 +1177,8 @@ class XunleiVipRegister(CoopRegister):
                     'num1': 12,
                     'act': 5170
                 }
-                self.xunlei_call_back(user, binding.bid, data, self.call_back_url)
+                self.xunlei_call_back(user, binding.bid, data,
+                                      self.call_back_url, p2p_record.order_id)
 
 
 # 注册第三方通道
@@ -1445,7 +1451,7 @@ def get_rate(product_id_or_instance):
     if isinstance(product_id_or_instance, P2PProduct):
         if product_id_or_instance.activity and product_id_or_instance.activity.rule:
             return product_id_or_instance.activity.rule.rule_amount + \
-                   decimal.Decimal(product_id_or_instance.expected_earning_rate)
+                   Decimal(product_id_or_instance.expected_earning_rate)
         else:
             return product_id_or_instance.expected_earning_rate
 
@@ -3346,7 +3352,7 @@ class Rong360P2PListView(APIView):
                 ret = dict()
 
                 p2ps = P2PProduct.objects.filter(publish_time__gte=start,
-                                                 publish_time__lt=end)
+                                                 publish_time__lt=end).exclude(status=u'流标')
 
                 # 获取总页数, 和页数不对处理
                 com_page = len(p2ps) / page_size + 1
@@ -3372,13 +3378,13 @@ class Rong360P2PListView(APIView):
                         p2p_dict = dict()
                         p2p_dict['projectId'] = str(product.id)
                         p2p_dict['title'] = product.name
-                        p2p_dict['amount'] = decimal.Decimal(product.total_amount)
-                        p2p_dict['schedule'] = str(product.completion_rate)
+                        p2p_dict['amount'] = Decimal(product.total_amount)
+                        p2p_dict['schedule'] = str(Decimal(product.completion_rate).quantize(Decimal('0.00')))
                         p2p_dict['interestRate'] = str(product.expected_earning_rate) + '%'
                         p2p_dict['deadline'] = product.period
                         p2p_dict['deadlineUnit'] = u'天' if product.pay_method.startswith(u'日计息') else u'月'
                         p2p_dict['reward'] = 0
-                        p2p_dict['type'] = product.category
+                        p2p_dict['type'] = u'抵押标'
 
                         pay_method = 6
                         if product.pay_method == u'等额本息':
@@ -3411,10 +3417,10 @@ class Rong360P2PListView(APIView):
                         for equity in equities:
                             data_dic = dict()
                             data_dic['subscribeUserName'] = str(equity.user.pk)
-                            data_dic['amount'] = decimal.Decimal(equity.equity)
-                            data_dic['validAmount'] = decimal.Decimal(equity.equity)
+                            data_dic['amount'] = Decimal(equity.equity)
+                            data_dic['validAmount'] = Decimal(equity.equity)
                             data_dic['addDate'] = equity.confirm_at or equity.created_at
-                            data_dic['status'] = 1 if equity.confirm else 0
+                            data_dic['status'] = 1 if equity.confirm else 2
 
                             # 标识手动或自动投标 0:手动 1:自动
                             try:
@@ -3442,7 +3448,7 @@ class Rong360P2PListView(APIView):
                 ret['totalPage'] = com_page
                 ret['currentPage'] = page_index
                 ret['totalCount'] = total
-                ret['totalAmount'] = decimal.Decimal(total_amount)
+                ret['totalAmount'] = Decimal(total_amount)
 
                 return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
             except Exception, e:
