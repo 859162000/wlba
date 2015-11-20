@@ -408,9 +408,9 @@ class YeeProxyPay(object):
             'p3_Amt': amount,
             'p4_Cur': 'CNY',
             # 商品名称， Max（20）,p6, p7为商品分类，描述，我们暂时就不传了
-            'p5_Pid': u'网利宝最专业的P2P之选'.encode('GBK'),
+            #'p5_Pid': u'网利宝最专业的P2P之选'.encode('GBK'),
             # todo urgent 中文商品名称
-            #'p5_Pid': 'Wanglibao',
+            'p5_Pid': 'Wanglibao',
             # 回调地址， Max（200）,页面回调地址
             'p8_Url': settings.YEE_PROXY_PAY_WEB_CALLBACK_URL,
             'pd_FrpId': yee_proxy_bank_code,
