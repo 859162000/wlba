@@ -44,6 +44,7 @@ from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract, update_coop_order
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account import third_login, backends as account_backends, message as inside_message
+from wanglibao_account.forms import EmailOrPhoneAuthenticationForm, TokenSecretSignAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning, \
