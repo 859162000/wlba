@@ -123,8 +123,9 @@ class InterestHike(models.Model):
         verbose_name = u"加息券"
         verbose_name_plural = u"加息券"
 
-#佣金,加息等
-#todo: move p2p earning to here
+
+# 佣金,加息等
+# todo: move p2p earning to here
 class Income(models.Model):
     user = models.ForeignKey(User, verbose_name=u"用户", related_name="user")
     invite = models.ForeignKey(User, verbose_name=u"被邀请用户", related_name="invite")
@@ -137,7 +138,7 @@ class Income(models.Model):
     created_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"创建时间")
 
 
-#创建红包列表
+# 创建红包列表
 def create_redpack(sender, instance, **kwargs):
     from wanglibao_redpack import tasks
     tasks.create_update_redpack.apply_async(kwargs={

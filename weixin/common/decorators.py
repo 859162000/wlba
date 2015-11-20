@@ -29,7 +29,10 @@ def weixin_api_error(f):
                 pass
             elif errcode == 42003:
                 pass
-
-            return Response(res, status=400)
+            try:
+                logger.debug("------------------------wexinerror---%s--%s"%(errcode, request.get_full_path()))
+            except:
+                pass
+            return Response({'errcode':e.errcode, 'errmsg':e.errmsg}, status=400)
         return res
     return decoration
