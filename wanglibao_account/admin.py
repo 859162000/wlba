@@ -25,6 +25,7 @@ from .tasks import xunleivip_callback
 from decimal import Decimal
 from django.conf import settings
 from django.db.models import Q
+from wanglibao_account.models import UserSource
 
 
 class ProfileInline(admin.StackedInline):
@@ -308,6 +309,20 @@ class UserThreeOrderAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+class UserSourceAdmin(admin.ModelAdmin):
+    list_display = ['keyword', 'website', 'created_at']
+    readonly_fields = ['keyword', 'website', 'created_at']
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return  False
+
+admin.site.register(UserSource, UserSourceAdmin)
 
 admin.site.unregister(User)
 admin.site.register(User, UserProfileAdmin)
