@@ -93,13 +93,15 @@ class PayTests(TestCase):
         #手机验证码
         self.VCODE = 'abc'
         self.TOKEN = '323881987'
+        self.request = MagicMock()
+        self.request.user = ''
 
 # class KuaiPayTests(PayTests):
 #     def setUp(self):
 #         super(KuaiPayTests)
 #
 #         self.kuai_pay = KuaiShortPay()
-#         # todo 暂时无法构造签名，只能到服务器上测试该方法
+#         # todo better 暂时无法构造签名，只能到服务器上测试该方法
 #         self.kuai_pay._check_signature = MagicMock(ret_value=True)
 #         self.kuai_pay._request = MagicMock()
 #         mock_request_switch(self.kuai_pay)
@@ -404,8 +406,8 @@ class PayOrderTest(PayTests):
         self.assertEqual(self.amount_1, pay_info.amount)
         self.assertEqual(self.user, pay_info.user)
 
-        # todo card_no, gate_id exception
-        # todo transaction
+        # todo urgent card_no, gate_id exception
+        # todo urgent transaction
 
 
     def test_order_after_pay_success(self):
@@ -416,14 +418,14 @@ class PayOrderTest(PayTests):
         margin_before = Margin.objects.get(user_id=self.user.id).margin
         order_id = self.pay_order.order_before_pay(self.user, self.amount_1, self.gate_id,
                                                 self.ip, self.device, self.card_no, self.input_phone)
-        rs = self.pay_order.order_after_pay_succcess(self.amount_1, order_id, 'res_ip', 'res_content')
+        rs = self.pay_order.order_after_pay_succcess(self.amount_1, order_id, 'res_ip', 'res_content', self.request)
         self.assertEqual(PayInfo.objects.get(order_id=order_id).status, PayInfo.SUCCESS)
         margin_after = Margin.objects.get(user_id=self.user.id).margin
         self.assertEqual(margin_after-margin_before, self.amount_1)
         margin_record_amount = MarginRecord.objects.get(order_id=order_id).amount
         self.assertEqual(margin_record_amount, self.amount_1)
 
-        # todo 异常：amount, order_id, transaction
+        # todo urgent 异常：amount, order_id, transaction
 
     def test_order_after_pay_success_add_card(self):
         # def order_after_pay_succcess(self, amount, order_id, res_ip, res_content):
@@ -433,7 +435,7 @@ class PayOrderTest(PayTests):
         margin_before = Margin.objects.get(user_id=self.user.id).margin
         order_id = self.pay_order.order_before_pay(self.user, self.amount_1, self.gate_id,
                                                 self.ip, self.device, self.card_no, self.input_phone)
-        rs = self.pay_order.order_after_pay_succcess(self.amount_1, order_id, 'res_ip', 'res_content',
+        rs = self.pay_order.order_after_pay_succcess(self.amount_1, order_id, 'res_ip', 'res_content', self.request,
                                                      need_bind_card=True)
         self.assertEqual(PayInfo.objects.get(order_id=order_id).status, PayInfo.SUCCESS)
         margin_after = Margin.objects.get(user_id=self.user.id).margin
@@ -456,7 +458,7 @@ class PayOrderTest(PayTests):
         margin_after = Margin.objects.get(user_id=self.user.id).margin
         self.assertEqual(margin_after-margin_before, self.amount_0)
         self.assertRaises(ObjectDoesNotExist, MarginRecord.objects.get, order_id=order_id)
-        # todo 异常：order_id, transaction
+        # todo urgent 异常：order_id, transaction
 
     # def test_order_restart_fail(self):
     #     order_id = self.pay_order.order_before_pay(self.user, self.amount_1, self.gate_id,
@@ -465,7 +467,7 @@ class PayOrderTest(PayTests):
     #     self.pay_order.order_after_pay_succcess
     #     self.pay_order.order_restart_fail(order_id)
 
-#     todo 覆盖：短卡号
+#     todo urgent 覆盖：短卡号
 
 
 
