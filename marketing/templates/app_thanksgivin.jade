@@ -35,10 +35,9 @@ html(style="background:#7c37e8")
               .active1
               img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang14.png')
             td(colspan="3", rowspan="2").appprize-mingdan
-              if user.is_authenticated
-                a(href='javascript:void(0);').appjiang-button.appjiang-button2 立即抽奖
-              else
-                a(href='/weixin/login/?next=/activity/app_thanksgiv/').appjiang-button.appjiang-button1 立即抽奖
+              a(href='javascript:void(0);').appjiang-button.appjiang-button2 立即抽奖
+
+                //a(href='/weixin/login/?next=/activity/app_thanksgiv/').appjiang-button.appjiang-button1 立即抽奖
               .appjiang-ri
                 if user.is_authenticated
                   p
@@ -224,5 +223,5 @@ html(style="background:#7c37e8")
             li 4、所有奖品不兑换现金，不可替换。中得优惠券得用户，使用方法请登录品牌官网联系查询本；
             li 5、活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
             li 6、网利宝对此活动享有最终解释权。
-    script(src="/static/scripts/mobile_activity/app_thanksgivi.js")
+    //script(src="/static/scripts/mobile_activity/app_thanksgivi.js")
     script(src="/static/scripts/component/app_thanksgivin.js")
