@@ -715,7 +715,7 @@ class WeixinRedPackView(APIView):
             return HttpResponse(json.dumps(data), content_type='application/json')
 
         day = time.strftime("%Y-%m-%d", time.localtime())
-        if day < "2015-11-23" or day > "2015-11-29":
+        if day < "2015-11-23" and day > "2015-11-29":
             data = {
                 'ret_code': 9100,
                 'message': u'感恩节活动期已过，不发了',
@@ -807,7 +807,9 @@ class ThanksGivenRewardDistributer(RewardDistributer):
 
     @property
     def is_valid(self):
-        """用来标示次活动是否继续启用, 配合MISC使用
+        """
+           用来标示次活动是否继续启用, 配合MISC使用, 如果不使用，
+           只要将self.token对应的值从misc.activities中去掉即可
         """
         key = 'activities'
         activities = Misc.objects.filter(key=key).first()
@@ -895,6 +897,7 @@ class ActivityRewardDistribute(object):
 
 class ThanksGivingDistribute(ActivityRewardDistribute):
     def __init__(self):
+        super(ThanksGivingDistribute, self).__init__()
         self.token = 'thanks_given'
 
 
