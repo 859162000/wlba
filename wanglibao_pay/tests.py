@@ -93,6 +93,8 @@ class PayTests(TestCase):
         #手机验证码
         self.VCODE = 'abc'
         self.TOKEN = '323881987'
+        self.request = MagicMock()
+        self.request.user = ''
 
 # class KuaiPayTests(PayTests):
 #     def setUp(self):
@@ -416,7 +418,7 @@ class PayOrderTest(PayTests):
         margin_before = Margin.objects.get(user_id=self.user.id).margin
         order_id = self.pay_order.order_before_pay(self.user, self.amount_1, self.gate_id,
                                                 self.ip, self.device, self.card_no, self.input_phone)
-        rs = self.pay_order.order_after_pay_succcess(self.amount_1, order_id, 'res_ip', 'res_content')
+        rs = self.pay_order.order_after_pay_succcess(self.amount_1, order_id, 'res_ip', 'res_content', self.request)
         self.assertEqual(PayInfo.objects.get(order_id=order_id).status, PayInfo.SUCCESS)
         margin_after = Margin.objects.get(user_id=self.user.id).margin
         self.assertEqual(margin_after-margin_before, self.amount_1)
@@ -433,7 +435,7 @@ class PayOrderTest(PayTests):
         margin_before = Margin.objects.get(user_id=self.user.id).margin
         order_id = self.pay_order.order_before_pay(self.user, self.amount_1, self.gate_id,
                                                 self.ip, self.device, self.card_no, self.input_phone)
-        rs = self.pay_order.order_after_pay_succcess(self.amount_1, order_id, 'res_ip', 'res_content',
+        rs = self.pay_order.order_after_pay_succcess(self.amount_1, order_id, 'res_ip', 'res_content', self.request,
                                                      need_bind_card=True)
         self.assertEqual(PayInfo.objects.get(order_id=order_id).status, PayInfo.SUCCESS)
         margin_after = Margin.objects.get(user_id=self.user.id).margin
