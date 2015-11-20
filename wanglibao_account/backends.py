@@ -63,7 +63,7 @@ def set_source(request, user):
                 action='register',
                 keyword=keyword,
                 site_name=request.session.get("promo_source_site_name", ""),
-                website=request.session.get("website", "")
+                website=request.session.get("promo_source_website", "")
             )
             logger.debug("注册行为已经完成，SEM统计参量入库,object value:{0}".format(source))
     except Exception:
