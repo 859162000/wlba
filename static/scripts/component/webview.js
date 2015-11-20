@@ -1,3 +1,6 @@
+// author wangxiaoqing
+// last update 2015-11-20
+
 var wlb = (function () {
 
     function Mixin (bridge) {
