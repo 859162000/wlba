@@ -338,7 +338,8 @@ class YeeProxyPayCallbackMessage(PayMessage):
         @:param type: request or response
         """
         # 参与hmac计算的参数以及其顺序
-        request_para_order = ['p0_Cmd', 'p1_MerId', 'p2_Order', 'p3_Amt', 'p4_Cur', 'p5_Pid', 'p8_Url']
+        request_para_order = ['p0_Cmd', 'p1_MerId', 'p2_Order', 'p3_Amt', 'p4_Cur', 'p5_Pid', 'p6_Pcat',
+                              'p7_Pdesc', 'p8_Url', 'p9_SAF', 'pa_MP', 'pd_FrpId', 'pm_Period', 'pn_Unit']
         response_para_order = ['p1_MerId', 'r0_Cmd', 'r1_Code', 'r2_TrxId', 'r3_Amt', 'r4_Cur', 'r5_Pid', 'r6_Order',
                                'r7_Uid', 'r8_MP', 'r9_BType']
         secret_key = settings.YEE_PROXY_PAY_KEY
