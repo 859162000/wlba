@@ -323,14 +323,14 @@ org.detail = (function(org){
                 }
             });
             wx.ready(function(){
-                var host = 'https://staging.wanglibao.com',
+                var host = 'https://www.wanglibao.com',
                     shareImg,//图片
                     shareLink,//连接地址
                     shareMainTit,//分享标题
                     shareBody,//分享描述
                     success;
                 var conf = $.extend({
-                    shareImg: host + '/static/imgs/sub_mobile/logo.png',//图片
+                    shareImg: host + '/static/imgs/sub_weixin/logo.png',//图片
                     shareLink: host + '/weixin/award_index/',//连接地址
                     shareMainTit: '幸运大转盘，日日有惊喜',//分享标题
                     shareBody: '转盘一动，大奖即送。还不快快领取！',//分享描述
