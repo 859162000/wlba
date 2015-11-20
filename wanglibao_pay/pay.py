@@ -8,7 +8,6 @@ from django.db.models.query_utils import Q
 from django.forms.models import model_to_dict
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from nose import tools
 import requests
 from marketing import tools
 from order.models import Order
