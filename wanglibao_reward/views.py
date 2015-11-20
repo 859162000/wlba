@@ -723,7 +723,8 @@ class WeixinRedPackView(APIView):
             return HttpResponse(json.dumps(data), content_type='application/json')
 
         phone_number = phone.strip()
-        redpack = WanglibaoUserGift.objects.filter(get_time__gte="2015-11-23", get_time__lte="2015-11-29", identity=phone, activity__code=attention_code).first()
+        #redpack = WanglibaoUserGift.objects.filter(get_time__gte="2015-11-23", get_time__lte="2015-11-29", identity=phone, activity__code=attention_code).first()
+        redpack = WanglibaoUserGift.objects.filter(identity=phone, activity__code=attention_code).first()
         if redpack:
             data = {
                 'ret_code': 0,
