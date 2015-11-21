@@ -2,24 +2,24 @@
 
 footer
   if state == 'list'
-    a(href="/weixin/list/").active
+    a(href="/weixin/list/").active.list-a
       span.index 首页
   else
-    a(href="/weixin/list/")
+    a(href="/weixin/list/").list-a
       span.index 首页
 
   if state == 'account'
-    a(href="/weixin/account/").active
+    a(href="/weixin/account/").active.account-a
       span.account 我的账户
   else
-    a(href="/weixin/account/")
+    a(href="/weixin/account/").account-a
       span.account 我的账户
 
   if state == 'more'
-    a(href="/weixin/more/").active
+    a(href="/weixin/more/").active.more-a
       span.more 更多
   else
-    a(href="/weixin/more/")
+    a(href="/weixin/more/").more-a
       span.more 更多
 
   include include/tracking

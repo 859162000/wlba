@@ -780,8 +780,10 @@ elif ENV == ENV_PREPRODUCTION:
 else:
     CALLBACK_HOST = 'https://staging.wanglibao.com'
     STATIC_FILE_HOST = 'https://staging.wanglibao.com'
-    MER_ID = '510743'
-    CUSTOM_ID = '000010124821'
+    # MER_ID = '510743'
+    # CUSTOM_ID = '000010124821'
+    MER_ID = '872724'
+    CUSTOM_ID = '000007522683'
     SIGN_HOST = '127.0.0.1'
     SIGN_PORT = 8733
     HUI_SHORT_MER_ID = "510793"
@@ -789,7 +791,8 @@ else:
     HUI_SHORT_SIGN_PORT = 8734
     HUI_SHORT_OPER_ID = "bjwl"
     HUI_SHORT_LOGIN_PWD = "cathy123"
-    PAY_URL = 'http://test.chinapnr.com'
+    # PAY_URL = 'http://test.chinapnr.com'
+    PAY_URL = 'https://mas.chinapnr.com'
     HUI_SHORT_BIND_URL = "%s/gar/entry.do" % PAY_URL
     HUI_SHORT_DEBIND_URL = "%s/gar/entry.do" % PAY_URL
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL

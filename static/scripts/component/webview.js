@@ -104,7 +104,8 @@ var wlb = (function () {
         sendUserInfo: function (data, callback) {
             var options = this._setData(data, callback);
 
-            this.bridge.callHandler('sendUserInfo', options.post, function (response) {
+            this.bridge.callHandler('sendUserInfo', {}, function (response) {
+
                 options.callback && options.callback(response);
             });
         }
@@ -130,6 +131,8 @@ var wlb = (function () {
                 mixins = new Mixin(target.data);
                 mixins._init();
             }
+
+
             try {
                 dics[target.callback](mixins);
             } catch (e) {
@@ -146,16 +149,14 @@ var wlb = (function () {
 })();
 
 
-/*
- 调用方法
+
 
  wlb.ready({
      app: function(mixins){
-        console.log(直接调用mixins对象就可调用接口如： mixins.loginApp())
-        cosnole.log('webview里的业务逻辑)
+        mixins.loginApp()
      },
      other: function(){
-        cosnole.log('其他场景的业务逻辑)
+        console.log('其他场景的业务逻辑')
      }
  })
- */
+
