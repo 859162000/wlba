@@ -24,7 +24,7 @@ from marketing.utils import get_user_channel_record
 from .tasks import xunleivip_callback
 from decimal import Decimal
 from django.conf import settings
-from django.db.models import Q
+from wanglibao_account.models import UserSource
 
 
 class ProfileInline(admin.StackedInline):
@@ -201,23 +201,25 @@ class BindingAdmin(admin.ModelAdmin):
             kwargs={'url': url, 'params': params,
                     'channel': channel_recode.code, 'order_id': order_id})
 
-    def recharge_call_back(self, obj):
-        # 判断用户是否绑定和首次充值
+    def recharge_call_back(self, obj, order_prefix=''):
         penny = Decimal(0.01).quantize(Decimal('.01'))
         pay_info = PayInfo.objects.filter(user=obj.user, type='D', amount__gt=penny,
                                           status=PayInfo.SUCCESS).order_by('create_time').first()
 
+        # 判断用户是否绑定和首次充值
         if pay_info and int(pay_info.amount) >= 100:
             data = {
                 'sendtype': '1',
                 'num1': 7,
                 'act': 5171
             }
+
+            order_prefix = order_prefix or pay_info.order_id
             self.xunlei_call_back(obj.user, obj.bid, data,
                                   settings.XUNLEIVIP_CALL_BACK_URL,
-                                  pay_info.order_id)
+                                  order_prefix)
 
-    def purchase_call_back(self, obj):
+    def purchase_call_back(self, obj, order_prefix=''):
         p2p_record = P2PRecord.objects.filter(user=obj.user, catalog=u'申购').order_by('create_time').first()
 
         # 判断是否首次投资
@@ -227,23 +229,36 @@ class BindingAdmin(admin.ModelAdmin):
                 'num1': 12,
                 'act': 5170
             }
+
+            order_prefix = order_prefix or p2p_record.order_id
             self.xunlei_call_back(obj.user, obj.bid, data,
                                   settings.XUNLEIVIP_CALL_BACK_URL,
-                                  p2p_record.order_id)
+                                  order_prefix)
 
     def save_model(self, request, obj, form, change):
         if obj.detect_callback is True and obj.btype == 'xunlei9':
             obj.detect_callback = False
-            order = UserThreeOrder.objects.filter(Q(user=obj.user) & Q(order_on__code=obj.btype) & ~Q(result_code=''))
-            if order.exists():
-                if order.count() < 2:
-                    if order.first().request_no.split('_')[1] == 5171:
-                        self.purchase_call_back(obj)
-                    else:
+            order_list = UserThreeOrder.objects.filter(user=obj.user, order_on__code=obj.btype)
+            if order_list.exists():
+                if order_list.count() == 1 and order_list.first().result_code:
+                    order_prefix, order_suffix = order_list.first().request_no.split('_')
+                    if int(order_suffix) == 5170:
                         self.recharge_call_back(obj)
+                    else:
+                        self.purchase_call_back(obj)
+                else:
+                    for order in order_list:
+                        if order.result_code == '':
+                            order_prefix, order_suffix = order.request_no.split('_')
+                            if int(order_suffix) == 5170:
+                                self.purchase_call_back(obj, order_prefix)
+                            elif int(order_suffix) == 5171:
+                                self.recharge_call_back(obj, order_prefix)
+
             else:
                 self.recharge_call_back(obj)
                 self.purchase_call_back(obj)
+
         obj.save()
 
     def has_delete_permission(self, request, obj=None):
@@ -308,6 +323,20 @@ class UserThreeOrderAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+class UserSourceAdmin(admin.ModelAdmin):
+    list_display = ['keyword', 'website', 'created_at']
+    readonly_fields = ['keyword', 'website', 'created_at']
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return  False
+
+admin.site.register(UserSource, UserSourceAdmin)
 
 admin.site.unregister(User)
 admin.site.register(User, UserProfileAdmin)
