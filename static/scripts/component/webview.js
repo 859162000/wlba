@@ -131,6 +131,7 @@ var wlb = (function () {
                 mixins._init();
             }
 
+
             try {
                 dics[target.callback](mixins);
             } catch (e) {
@@ -147,15 +148,14 @@ var wlb = (function () {
 })();
 
 
-/*
+
 
  wlb.ready({
      app: function(mixins){
-        console.log(直接调用mixins对象就可调用接口如： mixins.loginApp())
-        cosnole.log('webview里的业务逻辑)
+        mixins.loginApp()
      },
      other: function(){
-        cosnole.log('其他场景的业务逻辑)
+        console.log('其他场景的业务逻辑')
      }
  })
- */
+
