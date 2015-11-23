@@ -848,6 +848,8 @@ class ThanksGivenRewardDistributer(RewardDistributer):
                 p2p_amount=self.amount,
                 channel="all",
             )
+
+
         except Exception, reason:
             logger.debug("中奖信息入库报错:%s" % reason)
 
@@ -937,6 +939,10 @@ class ThanksGivingDistribute(ActivityRewardDistribute):
             if reward:
                 with transaction.atomic():
                     reward = WanglibaoActivityReward.objects.select_for_update().filter(pk=reward.id).first()
+                    old_reward = Reward.objects.filter(id=reward.reward.id).first()
+                    if old_reward and old_reward.is_used:
+                        new_reward = Reward.objects.filter(type=old_reward.type, is_used=False).order_by('-id').first()
+                        reward.reward = new_reward
                     if reward.left_times == reward.when_dist:
                         """发站内信"""
                         if reward.reward:
