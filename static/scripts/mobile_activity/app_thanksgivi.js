@@ -361,7 +361,7 @@ window.onload = function () {
     });
     //抽奖2
     $('.app-thanksbu2').on('click', function () {
-        alert(11);
+        //alert(11);
         redpack({
             'action': "POINT_AT",
             'activity': "thanks_given",
@@ -377,7 +377,7 @@ window.onload = function () {
             }
             $('.apphongxi').show();
             $('#thankgi-thanks2 ').text(data['reward']);
-            alert(data['reward']);
+            //alert(change['reward']);
 
             return false;
         })
