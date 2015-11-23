@@ -16,7 +16,7 @@ from wanglibao_account.cooperation import CoopQuery, CsaiUserQuery, CsaiInvestme
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
-from wanglibao_margin.php_api import GetUserInfo, GetMarginInfo, SendInsideMessage
+from wanglibao_margin.php_api import GetUserInfo, GetMarginInfo, SendInsideMessage, CheckTradePassword
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
@@ -183,7 +183,7 @@ urlpatterns += patterns(
     url(r'^php/margin/$', login_required(GetMarginInfo.as_view(), login_url='/accounts/login/'), name='user_info'),
     url(r'^php/send_message/$', login_required(SendInsideMessage.as_view(), login_url='/accounts/login/'),
         name='user_info'),
-    url(r'^php/margin/$', login_required(GetMarginInfo.as_view(), login_url='/accounts/login/'), name='user_info'),
+    url(r'^php/trade_password/$', login_required(CheckTradePassword.as_view(), login_url='/accounts/login/'), name='user_info'),
 )
 
 # 短信
