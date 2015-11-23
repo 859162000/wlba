@@ -1,13 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import random
-
-from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from provider.oauth2.models import AccessToken, Client
 from user_agents import parse
 
-from wanglibao import settings
 from weixin.util import getAccountInfo
 
 
@@ -66,21 +61,3 @@ def get_margin_info(user_id):
         print e
 
     return {'state': False, 'info': 'user authenticated error!'}
-
-
-def get_request_token(request):
-    """
-    :rtype `根据渠道传的token`
-    """
-    request_token = request.REQUEST.get('token', '')
-    token = AccessToken.objects.filter(token=request_token).first()
-
-    return token
-
-
-def check_token(token):
-    """
-    check token is valid or not
-    :param token:
-    """
-    return True if AccessToken.objects.filter(token=token).exists() else False
