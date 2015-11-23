@@ -59,15 +59,17 @@ class WeixinShareDetailView(TemplateView):
     def debug_msg(self, msg=u'None'):
         logger.debug("class:%s, function:%s,  msg:%s" %(self.__class__.__name__, self.current_function_name, msg))
 
-    def has_combine_redpack(self, product_id):
+    def has_combine_redpack(self, product_id, activity):
         """
             判断是否已经生成了此次活动的组合红包
         """
+        if not self.activity:
+           self.get_activity_by_id(activity)
         try:
-            gift_order = WanglibaoActivityGiftOrder.objects.filter(order_id=product_id)
+            combine_redpack = WanglibaoActivityGift.objects.filter(gift_id=product_id, activity=self.activity)
         except Exception, reason:
-            self.exception_msg(reason, u'判断组合红包生成报异常, gift_id:%s, activity:%s' %(product_id,))
-        return True if gift_order else False
+            self.exception_msg(reason, u'判断组合红包生成报异常, gift_id:%s, activity:%s' %(product_id, self.activity))
+        return True if combine_redpack else False
 
     def get_activity_by_id(self, activity_id):
         try:
@@ -126,22 +128,6 @@ class WeixinShareDetailView(TemplateView):
             self.debug_msg(u"获得配置红包id失败")
             return None
         self.debug_msg("红包编号为：%s" % (ids, ))
-        try:
-            WanglibaoActivityGiftOrder.objects.create(
-                valid_amount=len(redpacks),
-                order_id=product_id
-            )
-        except IntegrityError, reason:
-            if -1 != reason.find("Duplicate entry"):
-                logger.debug("此条记录已经存在，由unique key保证")
-                return
-            else:
-                raise IntegrityError(reason)
-
-        except Exception, reason:
-            logger.debug("ordergift表入库报了未知异常")
-            raise
-
         for redpack in redpacks:
             try:
                 activity_gift = WanglibaoActivityGift.objects.create(
@@ -159,6 +145,10 @@ class WeixinShareDetailView(TemplateView):
             except Exception, reason:
                 self.exception_msg(reason, '组合红包入库报错')
 
+        WanglibaoActivityGiftOrder.objects.create(
+            valid_amount=len(redpacks),
+            order_id=product_id
+        )
 
     def has_got_redpack(self, phone_num, activity, order_id, openid):
         """
@@ -350,7 +340,7 @@ class WeixinShareDetailView(TemplateView):
             activity = record.activity.code if record else activitys[index]
             logger.debug("misc配置的activity有:%s, 本次使用的activity是：%s" % (activitys, activity))
 
-        if not self.has_combine_redpack(order_id):
+        if not self.has_combine_redpack(order_id, activity):
             self.generate_combine_redpack(order_id, activity)
 
         user_gift = self.has_got_redpack(phone_num, activity, order_id, openid)
@@ -784,7 +774,8 @@ class RewardDistributer(object):
 
     @property
     def activity(self):
-         return self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, 'all')
+        return 'all'
+        #return self.request.DATA.get('activity', 'all')
 
     @property
     def processors(self):
@@ -803,6 +794,7 @@ class ThanksGivenRewardDistributer(RewardDistributer):
     def __init__(self, request, kwargs):
         super(ThanksGivenRewardDistributer, self).__init__(request, kwargs)
         self.amount = kwargs['amount']
+        self.order_id = kwargs['order_id']
         self.token = 'thanks_given'
 
     @property
@@ -840,12 +832,13 @@ class ThanksGivenRewardDistributer(RewardDistributer):
         if self.reward.find(u"红包") >=0 or self.reward.find(u'加息券')>=0:
             redpack_event = RedPackEvent.objects.filter(name=self.reward).first()
         else:
-            reward = Reward.objects.filter(description=self.reward).first()
-        logger.debug("用户的投资额度是：%s, 获得的红包是：%s, redpack_event:%s, reward:%s" % (self.amount, self.reward, redpack_event, reward,))
+            reward = Reward.objects.filter(description=self.reward, is_used=False).first()
+        logger.debug("用户(%s)的投资额度是：%s, 订单号：%s, 获得的红包是：%s, redpack_event:%s, reward:%s" % (self.request.user, self.amount, self.order_id, self.reward, redpack_event, reward,))
         try:
             WanglibaoActivityReward.objects.create(
                 activity=u'ThanksGiven',
                 user=self.request.user,
+                order_id=self.order_id,
                 redpack_event=redpack_event if redpack_event else None,
                 reward=reward if reward else None,
                 join_times=1,
@@ -853,7 +846,7 @@ class ThanksGivenRewardDistributer(RewardDistributer):
                 when_dist=1,
                 has_sent=False,
                 p2p_amount=self.amount,
-                channel=self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, 'all'),
+                channel="all",
             )
         except Exception, reason:
             logger.debug("中奖信息入库报错:%s" % reason)
