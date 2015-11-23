@@ -784,7 +784,8 @@ class RewardDistributer(object):
 
     @property
     def activity(self):
-         return self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, 'all')
+        return 'all'
+        #return self.request.DATA.get('activity', 'all')
 
     @property
     def processors(self):
@@ -803,6 +804,7 @@ class ThanksGivenRewardDistributer(RewardDistributer):
     def __init__(self, request, kwargs):
         super(ThanksGivenRewardDistributer, self).__init__(request, kwargs)
         self.amount = kwargs['amount']
+        self.order_id = kwargs['order_id']
         self.token = 'thanks_given'
 
     @property
@@ -841,11 +843,12 @@ class ThanksGivenRewardDistributer(RewardDistributer):
             redpack_event = RedPackEvent.objects.filter(name=self.reward).first()
         else:
             reward = Reward.objects.filter(description=self.reward).first()
-        logger.debug("用户的投资额度是：%s, 获得的红包是：%s, redpack_event:%s, reward:%s" % (self.amount, self.reward, redpack_event, reward,))
+        logger.debug("用户(%s)的投资额度是：%s, 订单号：%s, 获得的红包是：%s, redpack_event:%s, reward:%s" % (self.request.user, self.amount, self.order_id, self.reward, redpack_event, reward,))
         try:
             WanglibaoActivityReward.objects.create(
                 activity=u'ThanksGiven',
                 user=self.request.user,
+                order_id=self.order_id,
                 redpack_event=redpack_event if redpack_event else None,
                 reward=reward if reward else None,
                 join_times=1,
@@ -853,7 +856,7 @@ class ThanksGivenRewardDistributer(RewardDistributer):
                 when_dist=1,
                 has_sent=False,
                 p2p_amount=self.amount,
-                channel=self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, 'all'),
+                channel="all",
             )
         except Exception, reason:
             logger.debug("中奖信息入库报错:%s" % reason)
