@@ -31,7 +31,8 @@ from wanglibao_account import backends as account_backends
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_banner.models import AppActivate
-from wanglibao_p2p.models import ProductAmortization, P2PEquity, P2PProduct, P2PRecord
+from wanglibao_p2p.models import ProductAmortization, P2PEquity, P2PProduct, P2PRecord, \
+    UserAmortization, AmortizationRecord
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_rest.utils import split_ua, get_client_ip
 from wanglibao_banner.models import Banner
@@ -157,6 +158,59 @@ class AppRepaymentAPIView(APIView):
         except Exception, e:
             logger.error(e.message)
             return Response({'ret_code': 20001, 'message': 'fail'})
+
+
+class AppRepaymentPlanAllAPIView(APIView):
+    """ app 用户所有还款计划接口 """
+
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+        user_amortizations = UserAmortization.objects.filter(user=user).order_by('-term_date').all()
+        if user_amortizations:
+            amo_list = []
+            for amo in user_amortizations:
+                if amo.settled:
+                    if amo.last_settlement_status == u'提前还款':
+                        status = u'提前回款'
+                    else:
+                        status = u'已回款'
+                else:
+                    status = u'待回款'
+                product = amo.product_amortization.product
+                amo_list.append({
+                    'product_name': product.name,
+                    'term': amo.term,
+                    'term_total': product.terms,
+                    'term_date': amo.term_date,
+                    'principal': amo.principal,
+                    'interest': amo.interest,
+                    'penal_interest': amo.penal_interest,
+                    'coupon_interest': amo.coupon_interest,
+                    'settled': amo.settled,
+                    'settlement_time': amo.settlement_time,
+                    'settlement_status': status
+                })
+        else:
+            amo_list = []
+        return Response({'ret_code': 0, 'data': amo_list})
+
+
+class AppRepaymentPlanMonthAllAPIView(APIView):
+    """
+     app 用户月份还款计划接口
+     返回当月的还款计划
+     返回所有月份及月份的回款总额/笔数
+    """
+
+    permission_classes = (IsAuthenticated, )
+
+
+class AppRepaymentPlanMonthAPIView(APIView):
+    """ app 用户月份还款计划接口 """
+
+    permission_classes = (IsAuthenticated, )
 
 
 class AppDayListView(TemplateView):
