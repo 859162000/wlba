@@ -832,7 +832,7 @@ class ThanksGivenRewardDistributer(RewardDistributer):
         if self.reward.find(u"红包") >=0 or self.reward.find(u'加息券')>=0:
             redpack_event = RedPackEvent.objects.filter(name=self.reward).first()
         else:
-            reward = Reward.objects.filter(description=self.reward).first()
+            reward = Reward.objects.filter(description=self.reward, is_used=False).first()
         logger.debug("用户(%s)的投资额度是：%s, 订单号：%s, 获得的红包是：%s, redpack_event:%s, reward:%s" % (self.request.user, self.amount, self.order_id, self.reward, redpack_event, reward,))
         try:
             WanglibaoActivityReward.objects.create(
@@ -848,6 +848,8 @@ class ThanksGivenRewardDistributer(RewardDistributer):
                 p2p_amount=self.amount,
                 channel="all",
             )
+
+
         except Exception, reason:
             logger.debug("中奖信息入库报错:%s" % reason)
 
@@ -937,6 +939,10 @@ class ThanksGivingDistribute(ActivityRewardDistribute):
             if reward:
                 with transaction.atomic():
                     reward = WanglibaoActivityReward.objects.select_for_update().filter(pk=reward.id).first()
+                    old_reward = Reward.objects.filter(id=reward.reward.id).first()
+                    if old_reward and old_reward.is_used:
+                        new_reward = Reward.objects.filter(type=old_reward.type, is_used=False).order_by('-id').first()
+                        reward.reward = new_reward
                     if reward.left_times == reward.when_dist:
                         """发站内信"""
                         if reward.reward:
