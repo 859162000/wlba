@@ -4,7 +4,6 @@ from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 from django.utils.html import escape
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.contrib.auth.models import User
-from wanglibao_account.models import UserSource
 
 class ReadPermissionModelAdmin(admin.ModelAdmin):
     def has_change_permission(self, request, obj=None):
@@ -139,18 +138,4 @@ class LogEntryAdmin(admin.ModelAdmin):
     action_description.short_description = 'Action'
 
 
-class UserSourceAdmin(admin.ModelAdmin):
-    list_display = ['keyword', 'website', 'created_at']
-    readonly_fields = ['keyword', 'website', 'created_at']
-
-    def has_add_permission(self, request):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        return  False
-
-admin.site.register(UserSource, UserSourceAdmin)
 admin.site.register(LogEntry, LogEntryAdmin)
