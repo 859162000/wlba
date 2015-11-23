@@ -500,6 +500,7 @@ LOGGING = {
     }
 }
 
+
 if ENV != ENV_DEV:
     LOGGING['loggers']['django']['level'] = 'INFO'
     LOGGING['loggers']['wanglibao_sms']['level'] = 'INFO'
@@ -513,6 +514,9 @@ if ENV != ENV_DEV:
 
     # session expire at browser close
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+    # set session for cross domain.
+    SESSION_COOKIE_DOMAIN = '.wanglibao.com'
 
     # wsgi scheme
     os.environ['wsgi.url_scheme'] = 'https'
