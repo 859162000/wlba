@@ -666,3 +666,12 @@ class AppCostView(TemplateView):
 
     """ 费用说明 """
     template_name = 'client_cost_description.jade'
+
+
+class AppAreaView(TemplateView):
+
+    """ 最新活动 """
+    template_name = 'client_area.jade'
+
+
+
