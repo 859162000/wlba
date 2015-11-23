@@ -664,6 +664,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'marketing.tools.check_invested_status',
         'schedule': crontab(minute=0, hour=10),
     },
+    # 每天下午4点半开始处理体验金的还款
+    'experience_repayment_plan': {
+        'task': 'experience_gold.backends.experience_repayment_plan',
+        'schedule': crontab(minute=40, hour=16),
+    },
     # # by Zhoudong 定期检查用户优惠券没使用,发送提醒
     # 'redpack_status_task_check': {
     #     'task': 'marketing.tools.check_redpack_status',
@@ -780,8 +785,10 @@ elif ENV == ENV_PREPRODUCTION:
 else:
     CALLBACK_HOST = 'https://staging.wanglibao.com'
     STATIC_FILE_HOST = 'https://staging.wanglibao.com'
-    MER_ID = '510743'
-    CUSTOM_ID = '000010124821'
+    # MER_ID = '510743'
+    # CUSTOM_ID = '000010124821'
+    MER_ID = '872724'
+    CUSTOM_ID = '000007522683'
     SIGN_HOST = '127.0.0.1'
     SIGN_PORT = 8733
     HUI_SHORT_MER_ID = "510793"
@@ -789,7 +796,8 @@ else:
     HUI_SHORT_SIGN_PORT = 8734
     HUI_SHORT_OPER_ID = "bjwl"
     HUI_SHORT_LOGIN_PWD = "cathy123"
-    PAY_URL = 'http://test.chinapnr.com'
+    # PAY_URL = 'http://test.chinapnr.com'
+    PAY_URL = 'https://mas.chinapnr.com'
     HUI_SHORT_BIND_URL = "%s/gar/entry.do" % PAY_URL
     HUI_SHORT_DEBIND_URL = "%s/gar/entry.do" % PAY_URL
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL

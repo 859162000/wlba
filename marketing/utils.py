@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pytz
+import time
 from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -15,6 +16,7 @@ import logging
 
 logger = logging.getLogger('p2p')
 
+
 def get_channel_record(channel_code):
     record = Channels.objects.filter(code=channel_code).first()
     # if record:
@@ -24,9 +26,11 @@ def get_channel_record(channel_code):
     #         record = None
     return record
 
+
 def get_user_channel_record(user_id):
     channel = Channels.objects.filter(introducedby__user_id=user_id).first()
     return channel
+
 
 def set_promo_user(request, user, invitecode=''):
     if not user:
@@ -46,6 +50,7 @@ def set_promo_user(request, user, invitecode=''):
                 save_introducedBy(user, introduced_by_user)
 
         request.session[settings.PROMO_TOKEN_QUERY_STRING] = None
+
 
 def save_introducedBy(user, introduced_by_user, product_id=0):
     record = IntroducedBy()
@@ -122,6 +127,8 @@ def local_to_utc(source_date, source_time='min'):
         source_time = source_date.min.time()
     elif source_time == 'max':
         source_time = source_date.max.time()
+    else:
+        source_time = source_date.time()
 
     # convert to utc time
     new = time_zone.localize(datetime.combine(source_date, source_time))

@@ -57,9 +57,9 @@ class PayOrder(object):
             else:
                 channel = bank.channel
             bind_code = getattr(bank, PayOrder.channel_mapping.get(channel)[0])
-            assert len(bind_code) > 0
             return bank, channel, bind_code
         except:
+            logger.exception('third_pay_error')
             raise ThirdPayError(40011, '银行代码错误')
 
     @staticmethod
