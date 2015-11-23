@@ -20,5 +20,66 @@ html
                   .ico
             img.logo_img(src="/static/imgs/pc_activity/fun_tuan/logo_img.png")
             p.text 懂得理财的人，一定热爱生活。<br>我们负责创造有意思的活动，<br>让每一个爱理财、爱生活、爱网利宝的你，<br>“团”在一起！<br>在这里，认识新自己；<br>在这里，结交新朋友；<br>在这里，让好收益，<br>开启我们的多彩生活！
-
+            .man_info
+                .man_left
+                .man_right
+                .down_ico_2
+                .title
+                .text_wrap
+                    .text.text_left 青年钢琴家<br>李云迪、郎朗的同门师弟<br>毕业于柯蒂斯音乐学院<br>师从加里格拉夫曼大师<br>是音乐界一颗冉冉升起<br>的钢琴新星
+                    .text.text_right 网利宝CEO<br>曾在美国摩根斯坦利<br>美银美林等世界投行工作<br>随之创办网利宝互联网金融公司<br>是85后“福布斯30岁以下”<br>领袖榜商界新秀
+                    .line
+            .man_text
+          .place_wrap.place_1
+            .main
+                .title
+                    .img.img_1
+                    p.text_1 海顿室内乐厅
+                .img_wrap
+                    img(src="/static/imgs/pc_activity/fun_tuan/place_img_1.jpg")
+                    img(src="/static/imgs/pc_activity/fun_tuan/place_img_2.jpg")
+                    img(src="/static/imgs/pc_activity/fun_tuan/place_img_3.jpg")
+                    img(src="/static/imgs/pc_activity/fun_tuan/place_img_4.jpg")
+                    img(src="/static/imgs/pc_activity/fun_tuan/place_img_5.jpg")
+                    img(src="/static/imgs/pc_activity/fun_tuan/place_img_6.jpg")
+          .space_wrap
+            .down_ico_2
+          .place_wrap.place_2
+            .main
+                .title
+                    .img.img_2
+                    p.text_2 万般艺博馆
+                .img_wrap
+                    img(src="/static/imgs/pc_activity/fun_tuan/place_img_7.jpg")
+                    img(src="/static/imgs/pc_activity/fun_tuan/place_img_8.jpg")
+                    img(src="/static/imgs/pc_activity/fun_tuan/place_img_9.jpg")
+                    img(src="/static/imgs/pc_activity/fun_tuan/place_img_10.jpg")
+                    img(src="/static/imgs/pc_activity/fun_tuan/place_img_11.jpg")
+                    img(src="/static/imgs/pc_activity/fun_tuan/place_img_12.jpg")
+          .map_wrap
+            .down_ico_2
+            p.text_1 时间：12月5日 下午15：30<br>地点：北京万般艺博馆－－东土城路乙14号(原沐蕾拉帝思公馆)
+            img.map(src="/static/imgs/pc_activity/fun_tuan/map.jpg")
+            p.text_2 扫描网利宝微信二维码，回复“钢琴”，报名参加<br>仅限30人，错过一定会后悔。<br>（微信订阅号二维码）
+            img.code(src="/static/imgs/pc_activity/fun_tuan/code.png")
         include global/g_footer
+    script(src="/static/js/lib/jquery.min.js")
+    script.
+        $(function(){
+
+            window.onscroll = function(e) {
+                var scrolltop=document.documentElement.scrollTop||document.body.scrollTop;
+                if(scrolltop>=400){
+                    $('#bg').css({'position':'fixed','top':'0px'})
+                }else{
+                    $('#bg').css({'position':'absolute','top':'400px'})
+                }
+            }
+            var body_scroll = $(window).scrollTop();
+            if(body_scroll>=400){
+                $('#bg').css({'position':'fixed','top':'0px'})
+            }else{
+                $('#bg').css({'position':'absolute','top':'400px'})
+            }
+        })
+
