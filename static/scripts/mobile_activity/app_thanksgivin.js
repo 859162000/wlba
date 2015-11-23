@@ -412,14 +412,18 @@ wlb.ready({
                     }, function () {
                         if (change['left'] == 0) {
                             $('.app-thanksbu').removeClass("app-thanksbu2");
-                            $('.apphongxi').hide();
+
                             $('.app-thanksbu').addClass("app-thanksbu1");
                             $('.yellow1-main .appjiang-ri p').html('您没有抽奖机会');
                         } else {
                             $('.yellow1-main .appjiang-ri p span').text(change['left']);
-                            $('.apphongxi').show();
-                        }
 
+                        }
+                        if(change['reward']==''){
+                            $('.apphongxi').html('');
+                        }
+                        $('.apphongxi').show();
+                        $('.apphongxi').show();
                         $('#thankgi-thanks2 ').text(change['reward']);
 
 
