@@ -41,7 +41,8 @@ def get_user_info(request, session_id):
         user = request.user
         account_info = getAccountInfo(user)
         user_info.update(userId=user.pk,
-                         username=user.wanglibaouserprofile.name,
+                         username=user.wanglibaouserprofile.phone,
+                         realname=user.wanglibaouserprofile.name,
                          isDisable=user.wanglibaouserprofile.frozen,
                          isRealname=0,
                          total_amount=account_info['total_asset'],
