@@ -9,8 +9,7 @@ from wanglibao_app.views import (AppActivateImageAPIView, AppRepaymentAPIView, A
                                  AppPhoneBookQueryAPIView, AppPhoneBookAlertApiView, AppInviteAllGoldAPIView,
                                  AppAboutView, AppManagementView, AppLogoutAPIView, AppQuestionsView,
                                  AppQuestionsResultView, AppCostView, SendValidationCodeNoCaptchaView,
-                                 AppRepaymentPlanAllAPIView, AppRepaymentPlanMonthAPIView,
-                                 AppRepaymentPlanMonthAllAPIView)
+                                 AppRepaymentPlanAllAPIView, AppRepaymentPlanMonthAPIView)
 
 router = DefaultRouter()
 
@@ -25,7 +24,6 @@ urlpatterns = patterns(
     url(r'^preload/$', AppActivateImageAPIView.as_view()),
     url(r'^repayment/$', AppRepaymentAPIView.as_view()),
     url(r'^repayment_plan/all/$', AppRepaymentPlanAllAPIView.as_view()),
-    url(r'^repayment_plan/month_all/$', AppRepaymentPlanMonthAllAPIView.as_view()),
     url(r'^repayment_plan/month/$', AppRepaymentPlanMonthAPIView.as_view()),
     url(r'^guard/$', AppGuardView.as_view()),
     url(r'^guide/$', AppGuideView.as_view()),
