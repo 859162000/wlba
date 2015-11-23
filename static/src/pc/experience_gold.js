@@ -81,8 +81,9 @@
             $('#success').find('.close-modal').hide()
             setInterval(function(){
                 $.modal.close()
-                $('.investBtn').text('已投资'+ xhr.data.amount +'元').addClass('invest_ed').removeClass('investBtn')
-                $('.income_fonts').show().text('将于'+ xhr.data.term_date +'收益'+ xhr.data.interest +'元')
+                /*$('.investBtn').text('已投资'+ xhr.data.amount +'元').addClass('invest_ed').removeClass('investBtn')
+                $('.income_fonts').show().text('将于'+ xhr.data.term_date +'收益'+ xhr.data.interest +'元')*/
+                location.reload();
             },2000)
          })
       })
