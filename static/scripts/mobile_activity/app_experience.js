@@ -301,14 +301,16 @@ org.experience = (function(org){
                         org.ui.alert('', function () {
                             $('body,html').scrollTo($('.project').offset().top);
                         }, '1')
-
+                        var tyjye = lib._fmoney((parseFloat($('.tyjye').text())+data.data.amount),2);
+                        var zzc = lib._fmoney((parseFloat($('.zzc').text())+data.data.amount),2);
+                        var rzje = lib._fmoney(data.data.amount,2,1);
                         $('.qianshu').html(data.data.amount+'<span>元</span>')
-                        $('.icon2').text(data.data.amount+'元体验金')
-                        $('.tyjye').text(parseFloat($('.tyjye').text())+data.data.amount)
-                        $('.zzc').text(parseFloat($('.zzc').text())+data.data.amount)
-                        $('.rzje').text(data.data.amount+'元')
+                        $('.icon2').text(rzje+'元体验金')
+                        $('.tyjye').text(tyjye);
+                        $('.zzc').text(zzc);
+                        $('.rzje').text(rzje+'元');
                         $('.investBtnEd').removeClass('investBtnEd').addClass('investBtn');
-                        $('.receive_box').find('img').hide()
+                        $('.receive_box').find('img').hide();
                         $('.receive_box').find('#edT').show().text('已领取体验金'+ data.data.amount +'元')
                     }
                 },
@@ -323,6 +325,7 @@ org.experience = (function(org){
             })
         },
         _goInvest:function(){
+            /*投资*/
             $('.project_btn').delegate('.investBtn','click',function() {
               org.ajax({
                 url: '/api/experience/buy/',
@@ -342,7 +345,26 @@ org.experience = (function(org){
               });
             })
         },
+              /*格式化金额*/
+        _fmoney:function(s, n, m){
+           n = n > 0 && n <= 20 ? n : 2;
+           s = parseFloat((s + "").replace(/[^\d\.-]/g, "")).toFixed(n) + "";
+           var l = s.split(".")[0].split("").reverse(),
+           r = s.split(".")[1];
+           t = "";
+           for(i = 0; i < l.length; i ++ )
+           {
+              t += l[i] + ((i + 1) % 3 == 0 && (i + 1) != l.length ? "," : "");
+           }
+           if(m == 1 && r == '00')
+           {
+               return t.split("").reverse().join("");
+           }else{
+               return t.split("").reverse().join("") + "." + r;
+           }
+        },
         _bannerEffect:function(){
+            /*效果*/
             function snow(left,height,src){
                 var elem = $("<div />", {
                     css: {

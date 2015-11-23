@@ -47,7 +47,7 @@
             }
         }
     });
-
+    /*领取体验金*/
       $('.no_invest').on('click',function(){
           $.ajax({
             url: '/api/experience/get_experience/',
@@ -55,22 +55,27 @@
             data: {}
          }).done(function (xhr) {
             if(xhr.ret_code == 0){
+                $('#receiveSuccess').modal();
                 var par = $('#receiveSuccess');
-                $('#receiveSuccess').modal()
-                par.find('.close-modal').hide()
-                par.find('.money_count').html(xhr.data.amount+'<span>元</span>')
-                par.find('.money_counts').text(xhr.data.amount+'元体验金')
-                $('.tyjye').text(parseFloat($('.tyjye').text())+xhr.data.amount)
-                $('.zzc').text(parseFloat($('.zzc').text())+xhr.data.amount)
-                $('.rzje').text(xhr.data.amount+'元')
+                var tyjye = fmoney((parseFloat($('.tyjye').text())+xhr.data.amount),2);
+                var zzc = fmoney((parseFloat($('.zzc').text())+xhr.data.amount),2);
+                var rzje = fmoney(xhr.data.amount,2,1);
+                par.find('.close-modal').hide();
+                par.find('.money_count').html(xhr.data.amount+'<span>元</span>');
+                par.find('.money_counts').text(rzje+'元体验金')
+                $('.tyjye').text(tyjye);
+                $('.zzc').text(zzc);
+                $('.rzje').text(rzje+'元');
                 $('.invest_ed').removeClass('invest_ed').addClass('investBtn');
                 $('.no_invest').removeClass('no_invest').addClass('draw_btn_ed').text('已领取体验金'+ xhr.data.amount  +'元');
             }
          })
       })
+      /*老用户*/
       $('.invested').on('click',function(){
           $('#oldUser').modal()
       })
+      /*投标*/
       $('.project_right').delegate('.investBtn','click',function() {
          $.ajax({
             url: '/api/experience/buy/',
@@ -87,15 +92,39 @@
             },2000)
          })
       })
+      /*展开更多*/
       $('.more_btn').on('click',function(){
         $('.project_list').slideToggle()
       })
+      /*关闭弹框*/
       $('#closeBtn').on('click',function(){
         $.modal.close()
       })
+      /*去投资按钮下滑*/
       $('#goBtn').on('click',function(){
         $.modal.close()
         $('body,html').animate({scrollTop: $('.experience_project').offset().top}, 600);
       })
+      /*格式化金额*/
+        function fmoney(s, n, m)
+        {
+           n = n > 0 && n <= 20 ? n : 2;
+           s = parseFloat((s + "").replace(/[^\d\.-]/g, "")).toFixed(n) + "";
+           var l = s.split(".")[0].split("").reverse(),
+           r = s.split(".")[1];
+           console.dir(m +'dddddddd' + r)
+           t = "";
+           for(i = 0; i < l.length; i ++ )
+           {
+              t += l[i] + ((i + 1) % 3 == 0 && (i + 1) != l.length ? "," : "");
+           }
+           if(m == 1 && r == '00')
+           {
+               return t.split("").reverse().join("");
+           }else{
+               return t.split("").reverse().join("") + "." + r;
+           }
+
+        }
   });
 }).call(this);
