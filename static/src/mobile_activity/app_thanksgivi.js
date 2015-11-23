@@ -153,6 +153,10 @@ window.onload = function () {
                 $('.app-thanksbu').addClass("app-thanksbu1");
                 $('.yellow1-main .appjiang-ri p').html('您没有抽奖机会');
                 $('.apphongxi').hide();
+                if (data['reward'] == null) {
+                    return;
+                }
+               // return;
             } else {
                 $('.yellow1-main .appjiang-ri p span').text(data['left']);
             }
