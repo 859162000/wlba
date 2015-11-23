@@ -832,7 +832,7 @@ class ThanksGivenRewardDistributer(RewardDistributer):
         if self.reward.find(u"红包") >=0 or self.reward.find(u'加息券')>=0:
             redpack_event = RedPackEvent.objects.filter(name=self.reward).first()
         else:
-            reward = Reward.objects.filter(description=self.reward).first()
+            reward = Reward.objects.filter(description=self.reward, is_used=False).first()
         logger.debug("用户(%s)的投资额度是：%s, 订单号：%s, 获得的红包是：%s, redpack_event:%s, reward:%s" % (self.request.user, self.amount, self.order_id, self.reward, redpack_event, reward,))
         try:
             WanglibaoActivityReward.objects.create(
