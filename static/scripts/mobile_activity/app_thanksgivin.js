@@ -228,11 +228,14 @@ wlb.ready({
             $('.app-thanks').click(function () {
                 mixins.jumpToManageMoney();
             })
+            $('.yellow1-main .appjiang-ri .jiang-a').click(function () {
+                mixins.jumpToManageMoney();
+            })
 
             if (data.ph == '') {
-                //$('.appjiang-button').html(12)
                 login = false;
                 $('.appprize-mingdan .appjiang-ri p').html('');
+                $('.appjiang-button').removeClass('appjiang-button2')
                 $('.appjiang-button').addClass("appjiang-button1").click(
                     function () {
                         mixins.loginApp({refresh: 1}, function () {
@@ -395,6 +398,7 @@ wlb.ready({
                         }
 
                     })
+                    return;
                 });
                 //抽奖2
                 $('.app-thanksbu2').on('click', function () {
@@ -413,8 +417,9 @@ wlb.ready({
                             $('.yellow1-main .appjiang-ri p').html('您没有抽奖机会');
                         } else {
                             $('.yellow1-main .appjiang-ri p span').text(change['left']);
+                            $('.apphongxi').show();
                         }
-                        $('.apphongxi').show();
+
                         $('#thankgi-thanks2 ').text(change['reward']);
 
 
