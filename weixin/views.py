@@ -32,7 +32,7 @@ from constant import (ACCOUNT_INFO_TEMPLATE_ID, BIND_SUCCESS_TEMPLATE_ID, UNBIND
                       PRODUCT_ONLINE_TEMPLATE_ID, AWARD_COUPON_TEMPLATE_ID)
 from weixin.util import getAccountInfo
 from wanglibao_profile.models import WanglibaoUserProfile
-
+import weixin.tasks
 
 from wanglibao_pay.models import Bank
 from wechatpy import parse_message, create_reply, WeChatClient
@@ -139,7 +139,8 @@ class WeixinJoinView(View):
                 w_user = getOrCreateWeixinUser(fromUserName, weixin_account)
                 if w_user.subscribe != 0:
                     w_user.subscribe = 0
-                    w_user.save()
+                w_user.user = None
+                w_user.save()
                 reply = create_reply(u'欢迎下次关注我们！', msg)
             elif isinstance(msg, SubscribeScanEvent):
                 reply = self.process_subscribe(msg, toUserName)
@@ -337,7 +338,7 @@ def getOrCreateWeixinUser(openid, weixin_account):
     if w_user.account_original_id != weixin_account.db_account.original_id:
         w_user.account_original_id = weixin_account.db_account.original_id
         w_user.save()
-    if not w_user.nickname:
+    if not w_user.nickname or not w_user.subscribe:
         try:
             user_info = weixin_account.db_account.get_user_info(openid)
             w_user.nickname = user_info.get('nickname', "")
@@ -1438,29 +1439,32 @@ def checkAndSendProductTemplate(sender, **kw):
     # print kw
     product = kw["instance"]
 
-    print product.__dict__
+
     matches = re.search(u'日计息', product.pay_method)
     period = product.period
     period_desc = "%s个月"%product.period
     if matches and matches.group():
         period = period/30.0   # 天
         period_desc = '%s天'%product.period
-    rate_desc = "%s%%"%product.expected_earning_rate
+    if product.activity:
+        rate_desc = "%s%% + %s%%"%(product.expected_earning_rate, float(Decimal(str(product.activity.rule.rule_amount)).quantize(Decimal('0.000'), 'ROUND_DOWN')) * 100)
+    else:
+        rate_desc = "%s%%"%product.expected_earning_rate
 
     services = SubscribeService.objects.filter(channel='weixin', is_open=True, type=0).all()
     for service in services:
         if period == service.num_limit:
             sub_records = SubscribeRecord.objects.filter(service=service).all()
             for sub_record in sub_records:
-                w_user = WeixinUser.objects.filter(user=sub_record.user).first()
-                if w_user:
-                    url = settings.CALLBACK_HOST + '/weixin/view/detail/%s/'%product.id
-                    template = MessageTemplate(PRODUCT_ONLINE_TEMPLATE_ID,
-                        first=service.describe, keyword1=product.name, keyword2=rate_desc,
-                        keyword3=period_desc, keyword4=product.pay_method, url=url)
-                    SendTemplateMessage.sendTemplate(w_user, template)
+                if sub_record.w_user and sub_record.w_user.subscribe==1 and sub_record.w_user.user:
+                        url = settings.CALLBACK_HOST + '/weixin/view/detail/%s/'%product.id
+                        template = MessageTemplate(PRODUCT_ONLINE_TEMPLATE_ID,
+                            first=service.describe, keyword1=product.name, keyword2=rate_desc,
+                            keyword3=period_desc, keyword4=product.pay_method, url=url)
+                        SendTemplateMessage.sendTemplate(sub_record.w_user, template)
 
-import weixin.tasks
+
+
 
 def checkProduct(sender, **kw):
     product = kw["instance"]
