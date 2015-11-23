@@ -91,8 +91,8 @@ urlpatterns += patterns(
     url(r'^app_lottery/$', AppLotteryTemplate.as_view(template_name="app_lottery.jade"), name="app_lottery"),
     url(r'^lingcai/phone/$', OpenidPhoneForFencai.as_view()),
     url(r'^app_scratch/$', TemplateView.as_view(template_name="app_scratch.jade")),
-    url(r'^app_scratch_copy/$', login_required(TemplateView.as_view(template_name="app_scratch_copy.jade"), login_url='/accounts/token_login/')),
-    url(r'^app_scratch_copy/nologin/$', TemplateView.as_view(template_name="app_scratch_copy.jade")),
+    #url(r'^app_scratch_copy/$', login_required(TemplateView.as_view(template_name="app_scratch_copy.jade"), login_url='/accounts/token_login/')),
+    url(r'^app_scratch_copy/$', TemplateView.as_view(template_name="app_scratch_copy.jade")),
     url(r'^app_national/$', TemplateView.as_view(template_name="app_national.jade")),
 
 
