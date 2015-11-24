@@ -64,7 +64,7 @@ urlpatterns = patterns(
     url(r'thanksgiving/$', TemplateView.as_view(template_name="thanksgiving.jade")),
     url(r'winter_brid/$', TemplateView.as_view(template_name="winter_bird.jade")),
 #    url(r'^xiaoher/$', TemplateView.as_view(template_name="xiaoher.jade")),
-#    url(r'fun_tuan/$', TemplateView.as_view(template_name="fun_tuan.jade")),
+    url(r'fun_tuan/$', TemplateView.as_view(template_name="fun_tuan.jade")),
 )
 
 # app URL
@@ -148,6 +148,8 @@ urlpatterns += patterns(
     url(r'^app-invite-server/$', TemplateView.as_view(template_name="app_invite_server.jade")),
     url(r'^app_thanksgiv/$', TemplateView.as_view(template_name="app_thanksgiv.jade")),
     url(r'^app_thanksgivin/$', TemplateView.as_view(template_name="app_thanksgivin.jade")),
+
+    # url(r'^app_thanksgivin/$', login_required(TemplateView.as_view(template_name="app_thanksgivin.jade"), login_url='/accounts/token_login/')),
 
 )
 # app with webview
