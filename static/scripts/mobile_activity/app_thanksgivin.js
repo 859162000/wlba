@@ -406,67 +406,79 @@ wlb.ready({
             var click = false;
 
             lottery.init('lottery');
-            if (logein) {
-                $("#lottery .appjiang-button2").click(function () {
-                    if (click) {
-                        return false;
+            //if (logein) {
+            $("#lottery .appjiang-button2").click(function () {
+                if (click) {
+                    return false;
+                } else {
+                    click = true;
+                }
+                redpack({
+                    'action': "POINT_AT",
+                    'activity': "thanks_given",
+                    'level': "5000+"
+                }, function () {
+
+                    if (change['left'] == 0) {
+                        $('.appjiang-button').removeClass("appjiang-button2");
+                        $('.appjiang-button').addClass("appjiang-button1");
+                        $('.appprize-mingdan .appjiang-ri p').html('您没有抽奖机会');
+                        if (change['reward'] == null) {
+                            return;
+                        }
                     } else {
-                        click = true;
+                        $('.appprize-mingdan .appjiang-ri p span').text(change['left']);
                     }
-                    redpack({
-                        'action': "POINT_AT",
-                        'activity': "thanks_given",
-                        'level': "5000+"
-                    }, function () {
 
-                        if (change['left'] == 0) {
-                            $('.appjiang-button').removeClass("appjiang-button2");
-                            $('.appjiang-button').addClass("appjiang-button1");
-                            $('.appprize-mingdan .appjiang-ri p').html('您没有抽奖机会');
-                            if (change['reward'] == null) {
-                                return;
-                            }
-                        } else {
-                            $('.appprize-mingdan .appjiang-ri p span').text(change['left']);
+                    lottery.speed = 100;
+
+                    roll();
+
+
+                })
+                //return;
+            });
+            //抽奖2
+            //if (logein) {
+            $('.app-thanksbu2').on('click', function () {
+                if (click) {
+                    return false;
+                } else {
+                    click = true;
+                }
+                redpack({
+                    'action': "POINT_AT",
+                    'activity': "thanks_given",
+                    'level': "5000-"
+                }, function (data) {
+                    if (data['left'] == 0) {
+                        //$('.apphongxi').show().html(JSON.stringify(data));
+                        $('.app-thanksbu').removeClass("app-thanksbu2");
+
+                        $('.app-thanksbu').addClass("app-thanksbu1");
+                        $('.yellow1-main .appjiang-ri p').html('您没有抽奖机会');
+                        if (data['reward'] == null) {
+                            return;
                         }
+                    } else {
+                        $('.yellow1-main .appjiang-ri p span').text(data['left']);
 
-                        lottery.speed = 100;
-
-                        roll();
-
-
-                    })
-                    //return;
-                });
-                //抽奖2
-                $('.app-thanksbu2').on('click', function () {
-                    redpack({
-                        'action': "POINT_AT",
-                        'activity': "thanks_given",
-                        'level': "5000-"
-                    }, function (data) {
-                        if (data['left'] == 0) {
-                            //$('.apphongxi').show().html(JSON.stringify(data));
-                            $('.app-thanksbu').removeClass("app-thanksbu2");
-
-                            $('.app-thanksbu').addClass("app-thanksbu1");
-                            $('.yellow1-main .appjiang-ri p').html('您没有抽奖机会');
-                            if (data['reward'] == null) {
-                                return;
-                            }
-                        } else {
-                            $('.yellow1-main .appjiang-ri p span').text(data['left']);
-
-                        }
+                    }
+                    if (login) {
                         $('.apphongxi').show();
                         $('#thankgi-thanks2 ').text(data['reward']);
 
+                    }
 
-                        return false;
-                    })
+                    click = false;
+
+
+                    //return false;
                 })
+            })
+            //}
 
-            }
+            //}
 
             redpack({
                 'action': "GET_REWARD_INFO",
@@ -499,7 +511,7 @@ wlb.ready({
             }, redpack2);
 //名单
             var str = '';
-//if (change['ret_code'] != 1000) {
+
             redpack({
                 'action': 'GET_REWARD',
                 'activity': "thanks_given",
@@ -517,7 +529,7 @@ wlb.ready({
                     $('.long-p').append(str);
                 }
             });
-//}
+
 //无线滚动
             var timer, i = 1, j = 2;
             timer = setInterval(function () {
