@@ -7,13 +7,17 @@ if settings.ENV == settings.ENV_PRODUCTION:
     PRODUCT_ONLINE_TEMPLATE_ID = "itviF9BIU8BBjEXwPOEMiElLzFByxMZ6-FjvYapk8pY"
     AWARD_COUPON_TEMPLATE_ID  = "_-Xlr2icPtM5sXj0VKuF3fleKYR-Rl4a_h2gpcd_95M"
     WITH_DRAW_SUBMITTED_TEMPLATE_ID = "KUG_9_VDPdX78g8T2kshvZcE6GAZjxhK5nW2bvjmpJQ"
+    WITH_DRAW_SUCCESS_TEMPLATE_ID = ""
+    DEPOSIT_SUCCESS_TEMPLATE_ID = "EVvBX8AIlhih9E2YYdZYzMljF__JA-SrMSDTyUeNdcE"
 else:
     BIND_SUCCESS_TEMPLATE_ID = "mxNfcoJ8lfpbL1gFdazCk1OFGBhm9wIGL21Q6ZeB5FI"
     UNBIND_SUCCESS_TEMPLATE_ID = "lGr-ClUgsv-ruam0ZvN_O-xy_7EzB__1tbCInUs_tOE"
     ACCOUNT_INFO_TEMPLATE_ID = "RVeDKzQxeuxBXuWeZAjIyuv0olTh0HOWttFfqLhwDlU"
     PRODUCT_ONLINE_TEMPLATE_ID = "LQADSfNMmbZdTrz2UsRic93aPb_7cS1TUjUSx7tbxHE"
     AWARD_COUPON_TEMPLATE_ID  = "_-Xlr2icPtM5sXj0VKuF3fleKYR-Rl4a_h2gpcd_95M"
-    WITH_DRAW_SUBMITTED_TEMPLATE_ID = ""
+    WITH_DRAW_SUBMITTED_TEMPLATE_ID = "Paf_qr_WiojI3BddoDvqNKMI1C7KRzayEA_XGrmgQac"
+    WITH_DRAW_SUCCESS_TEMPLATE_ID = ""
+    DEPOSIT_SUCCESS_TEMPLATE_ID = "LuwpMH6CdEP2IeEsB7h6uewLhZdrnQPb0vmjDlqWh70"
 
 from copy import deepcopy
 
@@ -39,6 +43,79 @@ class MessageTemplate(object):
 
 
 Message_template = {
+    DEPOSIT_SUCCESS_TEMPLATE_ID:{
+        "top_color":'#88ffdd',
+        "data": {
+            # {{first.DATA}} 充值时间：{{keyword1.DATA}} 充值金额：{{keyword2.DATA}} 可用余额：{{keyword3.DATA}} {{remark.DATA}}
+                "first": {
+                    "value": "",
+                   "color": "#173177"
+                },
+                "keyword1": {
+                    "value": "",
+                    "color": "#173177"
+                },
+                "keyword2": {
+                    "value": "",
+                    "color": "#173177"
+                },
+                "keyword3": {
+                    "value": "",
+                    "color": "#173177"
+                },
+               "remark":{
+                   "value":u'您可以使用下方微信菜单进行更多体验。',
+                   "color":"#173177"
+               }
+        },
+        "url": '',
+    },
+
+    WITH_DRAW_SUCCESS_TEMPLATE_ID:{
+        "top_color":'#88ffdd',
+        "data": {
+                "first": {
+                    "value": "",
+                   "color": "#173177"
+                },
+
+               "remark":{
+                   "value":u'您可以使用下方微信菜单进行更多体验。',
+                   "color":"#173177"
+               }
+        },
+        "url": '',
+    },
+
+    WITH_DRAW_SUBMITTED_TEMPLATE_ID:{
+        "top_color":'#88ffdd',
+        "data": {
+            # 亲爱的{}，您的提现申请已受理，1-3个工作日内将处理完毕，请耐心等待。
+            # {{first.DATA}} 取现金额：{{keyword1.DATA}} 到账银行：{{keyword2.DATA}} 预计到账时间：{{keyword3.DATA}} {{remark.DATA}}
+                "first": {
+                    "value": "",
+                   "color": "#173177"
+                },
+                "keyword1": {
+                    "value": "",
+                    "color": "#173177"
+                },
+                "keyword2": {
+                    "value": "",
+                    "color": "#173177"
+                },
+                "keyword3": {
+                    "value": "",
+                    "color": "#173177"
+                },
+               "remark":{
+                   "value":u'您可以使用下方微信菜单进行更多体验。',
+                   "color":"#173177"
+               }
+        },
+        "url": '',
+    },
+
     BIND_SUCCESS_TEMPLATE_ID:{
         "top_color":'#88ffdd',
         "data": {
