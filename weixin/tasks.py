@@ -12,6 +12,7 @@ from django.conf import settings
 from weixin.models import SubscribeRecord, SubscribeService, WeixinUser
 from weixin.constant import MessageTemplate, PRODUCT_ONLINE_TEMPLATE_ID
 from weixin.views import SendTemplateMessage
+from decimal import Decimal
 
 
 @app.task
@@ -23,11 +24,14 @@ def detect_product_biding(product_id):
     if matches and matches.group():
         period = period/30.0   # 天
         period_desc = '%s天'%product.period
-    rate_desc = "%s%%"%product.expected_earning_rate
+    if product.activity:
+        rate_desc = "%s%% + %s%%"%(product.expected_earning_rate, float(Decimal(str(product.activity.rule.rule_amount)).quantize(Decimal('0.000'), 'ROUND_DOWN')) * 100)
+    else:
+        rate_desc = "%s%%"%product.expected_earning_rate
     services = SubscribeService.objects.filter(channel='weixin', is_open=True, type=0).all()
     for service in services:
         if period == service.num_limit:
-            sub_records = SubscribeRecord.objects.filter(service=service).all()
+            sub_records = SubscribeRecord.objects.filter(service=service, status=True).all()
             for sub_record in sub_records:
                 if sub_record.w_user and sub_record.w_user.subscribe==1 and sub_record.w_user.user:
                     sendUserProductOnLine.apply_async(kwargs={
