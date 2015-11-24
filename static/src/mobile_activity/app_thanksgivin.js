@@ -157,7 +157,7 @@ wlb.ready({
                     $('#app-jiangli0').text(change['reward']);
                     setTimeout(function () {
                         $('.app-jiangshow').css('display', 'none');
-                    }, 3000);
+                    }, 30000);
                     click = false;
                 } else {
                     if (lottery.times < lottery.cycle) {
