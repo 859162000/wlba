@@ -16,11 +16,20 @@ wlb.ready({
             if (data.ph == '') {
                 login = false;
                 $('.appprize-mingdan .appjiang-ri p').html('');
-                $('.appjiang-button').removeClass('appjiang-button2')
+                $('.appjiang-button').removeClass('appjiang-button2');
                 $('.appjiang-button').addClass("appjiang-button1").click(
                     function () {
                         mixins.loginApp({refresh: 1}, function () {
                             $('.appjiang-button').removeClass('appjiang-button1').addClass("appjiang-button2");
+                        });
+                    }
+                );
+                $('.yellow1-main .appjiang-ri p').html('');
+                $('.app-thanksbu').removeClass('.app-thanksbu2');
+                $('.app-thanksbu').addClass(".app-thanksbu1").click(
+                    function () {
+                        mixins.loginApp({refresh: 1}, function () {
+                            $('.app-thanksbu').removeClass('.app-thanksbu1').addClass(".app-thanksbu2");
                         });
                     }
                 );
