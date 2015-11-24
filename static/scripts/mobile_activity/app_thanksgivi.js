@@ -340,7 +340,7 @@ window.onload = function () {
             'activity': "thanks_given",
             'level': "5000+"
         }, function (dd) {
-             $('#ff').html(JSON.stringify(dd))
+            $('#ff').html(JSON.stringify(dd))
             if (change['left'] == 0) {
                 $('.appjiang-button').removeClass("appjiang-button2");
                 $('.appjiang-button').addClass("appjiang-button1");
@@ -360,8 +360,13 @@ window.onload = function () {
         })
     });
     //抽奖2
+    var onclick = false;
     $('.app-thanksbu2').on('click', function () {
-        //alert(11);
+        if (onclick) {
+            return false;
+        } else {
+            onclick = true;
+        }
         redpack({
             'action': "POINT_AT",
             'activity': "thanks_given",
@@ -375,15 +380,14 @@ window.onload = function () {
                 if (data['reward'] == null) {
                     return;
                 }
-               // return;
+                // return;
             } else {
                 $('.yellow1-main .appjiang-ri p span').text(data['left']);
             }
             $('.apphongxi').show();
             $('#thankgi-thanks2 ').text(data['reward']);
-            //alert(change['reward']);
 
-            return false;
+            onclick = false;
         })
     })
 };
@@ -421,20 +425,17 @@ var str = '';
 //if (change['ret_code'] != 1000) {
 redpack({
     'action': 'GET_REWARD',
-    'activity': "thanks_given",
-    'level': "5000+"
+    'activity': "thanks_given"
 }, function () {
-    if (change['ret_code'] != 1000) {
-        for (var k = 0, len2 = change['phone'].length; k < len2; k++) {
-            var tel = change['phone'][k].substring(0, 3) + "******" + change['phone'][k].substring(9, 11);
+    for (var k = 0, len2 = change['phone'].length; k < len2; k++) {
+        var tel = change['phone'][k].substring(0, 3) + "******" + change['phone'][k].substring(9, 11);
 
-            str += '<p>恭喜' + tel + '获得<span>' + change['rewards'][k] + '</span></p>';
-            //console.log(str);
-        }
-
-
-        $('.long-p').append(str);
+        str += '<p>恭喜' + tel + '获得<span>' + change['rewards'][k] + '</span></p>';
+        //console.log(str);
     }
+
+
+    $('.long-p').append(str);
 });
 //}
 //无线滚动
