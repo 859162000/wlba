@@ -6,6 +6,7 @@ from django.views.generic import TemplateView
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from wanglibao_announcement.models import Announcement, AppMemorabilia
+from django.utils import timezone
 
 
 class AnnouncementHomeView(TemplateView):
@@ -77,7 +78,8 @@ class AppMemorabiliaHomeView(TemplateView):
     template_name = 'app_memorabilia_home.jade'
 
     def get_context_data(self, **kwargs):
-        memorabilia = AppMemorabilia.objects.filter(status=1, hide_link=False).order_by('-done_date', '-priority')
+        memorabilia = AppMemorabilia.objects.filter(hide_link=False,
+                                                    start_time__lte=timezone.now()).order_by('-priority')
 
         memorabilia_list = []
         memorabilia_list.extend(memorabilia)
@@ -105,7 +107,9 @@ class AppMemorabiliaDetailView(TemplateView):
         context = super(AppMemorabiliaDetailView, self).get_context_data(**kwargs)
 
         try:
-            memorabilia = (AppMemorabilia.objects.get(pk=id, status=1))
+            memorabilia = (AppMemorabilia.objects.get(pk=id,
+                                                      hide_link=False,
+                                                      start_time__lte=timezone.now()))
 
         except AppMemorabilia.DoesNotExist:
             raise Http404(u'您查找的大事记不存在')
@@ -132,26 +136,6 @@ class AppMemorabiliaPreviewView(TemplateView):
 
         context.update({
             'memorabilia': memorabilia,
-
-        })
-
-        return context
-
-
-class AnnouncementDetailView(TemplateView):
-    template_name = 'announcement_detail.jade'
-
-    def get_context_data(self, id, **kwargs):
-        context = super(AnnouncementDetailView, self).get_context_data(**kwargs)
-
-        try:
-            announce = Announcement.objects.get(pk=id, status=1, device='pc')
-
-        except Announcement.DoesNotExist:
-            raise Http404(u'您查找的公告不存在')
-
-        context.update({
-            'announce': announce,
 
         })
 

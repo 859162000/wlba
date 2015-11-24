@@ -446,6 +446,6 @@ class ActivityShow(models.Model):
         return self.activity.name
 
     class Meta:
-        verbose_name = u'活动展示'
-        verbose_name_plural = u'活动展示'
+        verbose_name = u'活动页管理'
+        verbose_name_plural = u'活动页管理'
 

@@ -6,6 +6,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from wanglibao_activity.models import ActivityTemplates, ActivityImages, ActivityShow
+from django.utils import timezone
 
 
 class TemplatesFormatTemplate(TemplateView):
@@ -115,7 +116,9 @@ class ActivityShowHomeView(TemplateView):
         except Exception:
             raise Http404(u'您查找的活动列表页面不存在')
 
-        activity_shows = ActivityShow.objects.filter(link_is_hide=False).order_by('-activity__priority', '-created_at')
+        activity_shows = ActivityShow.objects.filter(link_is_hide=False,
+                                                     start_at_lte=timezone.now(),
+                                                     end_at_gt=timezone.now()).order_by('-activity__priority')
 
         activity_show_list = []
         activity_show_list.extend(activity_shows)
@@ -142,10 +145,14 @@ class ActivityDetailView(TemplateView):
 
         try:
             if platform == 'pc':
-                activity_show = ActivityShow.objects.get(pk=id, is_pc=True, link_is_hide=False)
+                activity_show = ActivityShow.objects.get(pk=id, is_pc=True, link_is_hide=False,
+                                                         start_at_lte=timezone.now(),
+                                                         end_at_gt=timezone.now())
                 self.template_name = activity_show.pc_template
             elif platform == 'app':
-                activity_show = ActivityShow.objects.get(pk=id, is_app=True, link_is_hide=False)
+                activity_show = ActivityShow.objects.get(pk=id, is_app=True, link_is_hide=False,
+                                                         start_at_lte=timezone.now(),
+                                                         end_at_gt=timezone.now())
                 self.template_name = activity_show.app_template
         except Exception:
             raise Http404(u'您查找的活动页面不存在')
