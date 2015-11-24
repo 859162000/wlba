@@ -187,6 +187,7 @@ class AppRepaymentPlanMonthAPIView(APIView):
         request_month = request.DATA.get('month', '')
         year = request_year if request_year else now.year
         month = request_month if request_month else now.month
+        current_month = '{}-{}'.format(now.year, now.month)
 
         start = local_to_utc(datetime(int(year), int(month), 1), 'min')
         end = local_to_utc(datetime(int(year), int(month) + 1, 1) - timedelta(days=1), 'max')
@@ -216,7 +217,7 @@ class AppRepaymentPlanMonthAPIView(APIView):
         else:
             amo_list = []
 
-        return Response({'ret_code': 0, 'data': amo_list, 'month_group': month_group})
+        return Response({'ret_code': 0, 'data': amo_list, 'month_group': month_group, 'current_month': current_month})
 
 
 def _user_amortization_list(user_amortizations):
