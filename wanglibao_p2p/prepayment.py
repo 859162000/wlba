@@ -75,6 +75,7 @@ class PrepaymentHistory(object):
                 user_record = self.get_user_repayment(user_amortization, penal_interest, repayment_type, payment_date)
 
                 user_margin_keeper = MarginKeeper(user_record.user)
+                # TODO: 提前还款是否要将标的加息金融还给用户?
                 user_margin_keeper.amortize(user_record.principal, user_record.interest, user_record.penal_interest,
                                             user_record.coupon_interest, savepoint=False, description=self.description)
 
