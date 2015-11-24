@@ -16,7 +16,7 @@ urlpatterns = patterns('',
     url(r'^deposit/callback/$', PayCallback.as_view(), name='deposit-callback'),
     url(r'^deposit/complete/$', login_required(PayCompleteView.as_view(), login_url='/accounts/login/'), name='deposit-callback'),
     # todo 在setting中使用名字来引用
-    url(r'^deposit/yee_proxy_pay_complete', login_required(YeeProxyPayCompleteView.as_view(), login_url='/accounts/login/')),
+    url(r'^deposit/yee_proxy_pay_complete', YeeProxyPayCompleteView.as_view()),
     url(r'^withdraw/audit/$', login_required(WithdrawTransactions.as_view(), login_url='/accounts/login/'), name='withdraw-transactions'),
     url(r'^withdraw/rollback/$', login_required(WithdrawTransactions.as_view(), login_url='/accounts/login/'), name='withdraw-rollback'),
 )

@@ -6,7 +6,7 @@ import re
 import socket
 from django.contrib.auth.models import User
 from django.db.models import Sum
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import permission_required, login_required
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.forms import model_to_dict
@@ -221,6 +221,7 @@ class YeeProxyPayCompleteView(TemplateView):
             amount = 0
         return result, amount
 
+    @login_required(login_url='/accounts/login')
     def get(self, request, *args, **kwargs):
         # result = HuifuPay.handle_pay_result(request)
         # amount = request.POST.get('OrdAmt', '')
