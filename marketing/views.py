@@ -2397,7 +2397,7 @@ class RewardDistributeAPIView(APIView):
         self.activity = None
         self.redpacks = dict() #红包amount: 红包object
         self.redpack_amount = list()
-        self.rates = (50, 12, 11, 2.1, 0.6, 13, 9, 1.9, 0.4)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
+        self.rates = (0.4, 1.9, 9, 13, 0.6, 2.1, 11, 12, 50)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
         self.action_name = u'weixin_distribute_redpack'
 
     def get_activitys_from_wechat_misc(self):
@@ -2454,7 +2454,7 @@ class RewardDistributeAPIView(APIView):
         for item in QSet:
             self.redpacks[item.amount] = item
 
-        self.redpack_amount = sorted(self.redpacks.keys())
+        self.redpack_amount = sorted(self.redpacks.keys(), reverse=True)
         logger.debug(u"红包的大小依次为：%s" % (self.redpack_amount, ))
         logger.debug(u"对应红包的获奖概率是：%s" % (self.rates, ))
 
@@ -2462,13 +2462,13 @@ class RewardDistributeAPIView(APIView):
         """ 决定发送哪一个奖品
         """
         sent_count = ActivityJoinLog.objects.filter(action_name=self.action_name).count() + 1
-        rate = None
+        rate = 50
 
-        for rate in self.rates:
-            if sent_count%(100/rate)==0:
+        for item in self.rates:
+            if sent_count%(100/item)==0:
+                rate = item
                 break
 
-        rate = 50 if rate==None else rate
         #根据rate找到对应的红包
         index = self.rates.index(rate)
         logger.debug(u"rate:{0},index:{1}, redpack_amount:{2}".format(rate,index, self.redpack_amount))
