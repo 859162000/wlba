@@ -190,7 +190,10 @@ class AppRepaymentPlanMonthAPIView(APIView):
         current_month = '{}-{}'.format(now.year, now.month)
 
         start = local_to_utc(datetime(int(year), int(month), 1), 'min')
-        end = local_to_utc(datetime(int(year), int(month) + 1, 1) - timedelta(days=1), 'max')
+        if int(month) == 12:
+            end = local_to_utc(datetime(int(year) + 1, 1, 1) - timedelta(days=1), 'max')
+        else:
+            end = local_to_utc(datetime(int(year), int(month) + 1, 1) - timedelta(days=1), 'max')
 
         # 月份/月还款金额/月还款期数
         if request_year and request_month:
