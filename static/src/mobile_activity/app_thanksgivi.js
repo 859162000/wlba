@@ -99,7 +99,6 @@ function roll() {
             lottery.speed = 40;
         }
         ;
-        //console.log(lottery.times + '^^^^^^' + lottery.speed + '^^^^^^^' + lottery.prize);
         lottery.timer = setTimeout(roll, lottery.speed);
     }
     return false;
@@ -177,7 +176,6 @@ redpack({
     'activity': "thanks_given",
     'level': "5000+"
 }, function (da) {
-    console.log(da['left']);
     if (da['left'] == 0) {
         $('.appjiang-button').removeClass("appjiang-button2");
         $('.appjiang-button').addClass("appjiang-button1");
@@ -212,7 +210,6 @@ redpack({
         var tel = change['phone'][k].substring(0, 3) + "******" + change['phone'][k].substring(9, 11);
 
         str += '<p>恭喜' + tel + '获得<span>' + change['rewards'][k] + '</span></p>';
-        //console.log(str);
     }
 
 
@@ -247,7 +244,6 @@ function redpack(data, callback) {
         success: function (data) {
             change = data;
             callback && callback(data);
-            console.log(change);
 
         }
     })

@@ -1,5 +1,5 @@
 doctype html
-html
+html(style='background:#f5f5f5;')
   head
     - with '安全p2p网贷_p2p理财的风险_投资理财资金安全_网利宝' as title
     include global/g_head
@@ -19,20 +19,48 @@ html
           img(src='/static/imgs/pc/area/main_push.png')
         .area-main-push.fl
           img(src='/static/imgs/pc/area/main_push.png')
-    .i-mod-warp.mg-t-xxxlll.mg-b-xll
+    .i-mod-warp.i-mod-line.mg-t-m.mg-b-xll
+
+    .i-mod-warp.mg-b-xll
       .area-ac-name
 
-    .i-mod-warp
-      .area-filter-nav
-        ul
-          li 全部
+    .i-mod-warp.area-nav-warp.mg-b-xxl
+      .area-filter-nav.font-m
+        ul.clearfix#area-nav
+          li.active 全部
           li 投资有奖
           li 节日热点
           li 新手福利
-        .active
+        .active_slide
+
     .i-mod-warp
-      .i-mod.area-active-item
-        .area-active-list
-          .area-ac-exhibition
-          .area-ac-mask
+      .i-mod.area-active-item.clearfix
+        mixin list()
+          .area-active-list.font-m
+            .area-ac-ehn
+              .area-ehn-name.es 新手专享580红包
+              .area-ehn-banner
+                img(src='/static/imgs/pc/area/list_banner.jpg')
+                .area-ac-time.font-xs
+                  .area-tiem-body 已结束
+                  .area-tiem-bg
+              .area-ac-date.font-xs.es 活动日期：2015年6月23-2016年9月22
+
+            .area-ac-mask
+              .area-mask-name.es.font-l 新手专享580红包
+              .area-mask-date.font-xs.es 活动日期：2015年6月23-2016年9月22
+              .area-mask-line
+              .area-mask-dec 邀请好友注册网利宝，若好友注册后 ，投资3个月（含3个月）项目，则享有好友投资额3‰作为邀请佣金 ； 若好友再邀请其他人注册并投资3个月以上（含3个月）项目，可与好友一起享有投资额3‰作为邀请佣金；
+              .area-mask-link.font-s
+                a(href='#') 立即查看
+        +list()
+        +list()
+        +list()
+        +list()
+        +list()
+        +list()
+      .area-more-wap.font-s
+        .area-list-more 更多
     include global/g_footer
+    script.
+      require(["/static/src/pc/area.js?v=22"])
