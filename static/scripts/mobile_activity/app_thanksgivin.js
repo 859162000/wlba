@@ -464,8 +464,12 @@ wlb.ready({
                         $('.yellow1-main .appjiang-ri p span').text(data['left']);
 
                     }
-                    $('.apphongxi').show();
-                    $('#thankgi-thanks2 ').text(data['reward']);
+                    if (login) {
+                        $('.apphongxi').show();
+                        $('#thankgi-thanks2 ').text(data['reward']);
+
+                    }
+
                     click = false;
 
 
@@ -507,7 +511,7 @@ wlb.ready({
             }, redpack2);
 //名单
             var str = '';
-//if (change['ret_code'] != 1000) {
+
             redpack({
                 'action': 'GET_REWARD',
                 'activity': "thanks_given",
@@ -525,7 +529,7 @@ wlb.ready({
                     $('.long-p').append(str);
                 }
             });
-//}
+
 //无线滚动
             var timer, i = 1, j = 2;
             timer = setInterval(function () {
