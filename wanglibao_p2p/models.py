@@ -424,7 +424,7 @@ class UserAmortization(models.Model):
 
     @property
     def terms(self):
-        return ProductAmortization.objects.filter(product=self.product_amortization).count()
+        return ProductAmortization.objects.filter(product=self.product_amortization.product).count()
 
 
 class P2PEquity(models.Model):
