@@ -109,24 +109,24 @@ var click = false;
 
 window.onload = function () {
     lottery.init('lottery');
-    $("#lottery .appjiang-button2").click(function () {
-        if (change['left'] == 0) {
-            return;
-        }
+    $("#lottery .appjiang-button2").click(function (fa) {
+        //if (change['left'] == 0) {
+        //    return;
+        //}
         redpack({
             'action': "POINT_AT",
             'activity': "thanks_given",
             'level': "5000+"
-        }, function () {
-            if (change['left'] == 0) {
+        }, function (data) {
+            if (data['left'] == 0) {
                 $('.appjiang-button').removeClass("appjiang-button2");
                 $('.appjiang-button').addClass("appjiang-button1");
                 $('.appprize-mingdan .appjiang-ri p').html('您没有抽奖机会');
-                if (change['reward'] == null) {
+                if (data['reward'] == null) {
                     return;
                 }
             } else {
-                $('.appprize-mingdan .appjiang-ri p span').text(change['left']);
+                $('.appprize-mingdan .appjiang-ri p span').text(data['left']);
             }
             if (click) {
                 return false;
@@ -142,25 +142,27 @@ window.onload = function () {
     });
     //抽奖2
     $('.app-thanksbu2').on('click', function () {
-        if (change['left'] == 0) {
-            return;
-        }
+        //alert(11);
         redpack({
             'action': "POINT_AT",
             'activity': "thanks_given",
             'level': "5000-"
-        }, function () {
-            if (change['left'] == 0) {
+        }, function (data) {
+            if (data['left'] == 0) {
                 $('.app-thanksbu').removeClass("app-thanksbu2");
                 $('.app-thanksbu').addClass("app-thanksbu1");
                 $('.yellow1-main .appjiang-ri p').html('您没有抽奖机会');
                 $('.apphongxi').hide();
+                if (data['reward'] == null) {
+                    return;
+                }
+               // return;
             } else {
-                $('.yellow1-main .appjiang-ri p span').text(change['left']);
+                $('.yellow1-main .appjiang-ri p span').text(data['left']);
             }
             $('.apphongxi').show();
-            $('#thankgi-thanks2 ').text(change['reward']);
-
+            $('#thankgi-thanks2 ').text(data['reward']);
+            //alert(change['reward']);
 
             return false;
         })
@@ -240,7 +242,7 @@ function redpack(data, callback) {
         url: '/api/activity/reward/',
         type: "POST",
         data: data,
-        async: false,
+        //async: false,
         success: function (data) {
             change = data;
             callback && callback(data);

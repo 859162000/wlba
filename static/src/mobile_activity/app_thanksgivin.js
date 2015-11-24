@@ -2,21 +2,22 @@ var login = false;
 //$('.appjiang-button').html(123)
 wlb.ready({
     app: function (mixins) {
-        mixins.sendUserInfo(function (data) {
-            $('.appprize-mingdan .appjiang-ri .jiang-a').click(function () {
-                mixins.jumpToManageMoney();
-            })
-            $('.app-thanks').click(function () {
-                mixins.jumpToManageMoney();
-            })
-            $('.yellow1-main .appjiang-ri .jiang-a').click(function () {
-                mixins.jumpToManageMoney();
-            })
+        $('.appprize-mingdan .appjiang-ri .jiang-a').click(function () {
+            mixins.jumpToManageMoney();
+        })
+        $('.app-thanks').click(function () {
+            mixins.jumpToManageMoney();
+        })
+        $('.yellow1-main .appjiang-ri .jiang-a').click(function () {
+            mixins.jumpToManageMoney();
+        })
 
+
+        mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 login = false;
                 $('.appprize-mingdan .appjiang-ri p').html('');
-                $('.appjiang-button').removeClass('appjiang-button2')
+                $('.appjiang-button').removeClass('appjiang-button2');
                 $('.appjiang-button').addClass("appjiang-button1").click(
                     function () {
                         mixins.loginApp({refresh: 1}, function () {
@@ -24,14 +25,64 @@ wlb.ready({
                         });
                     }
                 );
+                $('.yellow1-main .appjiang-ri p').html('');
+                $('.app-thanksbu').removeClass('.app-thanksbu2').addClass("app-thanksbu1").click(
+                    function () {
+                        mixins.loginApp({refresh: 1}, function () {
+                            $('.app-thanksbu').removeClass('app-thanksbu1').addClass("app-thanksbu2");
+                        });
+                    }
+                );
 
             } else {
                 login = true;
+                org.ajax({
+                    url: '/accounts/token/login/ajax/',
+                    type: 'post',
+                    data: {
+                        token: data.tk,
+                        secret_key: data.secretToken,
+                        ts: data.ts
+                    },
+                    success: function (data1) {
+                        redpack({
+                            'action': "GET_REWARD_INFO",
+                            'activity': "thanks_given",
+                            'level': "5000+"
+                        }, function (da) {
+                            //$('.appprize-mingdan .appjiang-ri p span').text(da['left']);
+                            if (da['left'] == 0) {
+                                $('.appjiang-button').removeClass("appjiang-button2").addClass("appjiang-button1");
+                                $('.appprize-mingdan .appjiang-ri p').html('您没有抽奖机会');
+                            } else {
+                                $('.appprize-mingdan .appjiang-ri p span').text(da['left']);
+                            }
+                        });
+                        function redpack2(d) {
+                            if (d['left'] == 0) {
+                                $('.app-thanksbu').removeClass("app-thanksbu2").addClass("app-thanksbu1");
+                                $('.yellow1-main .appjiang-ri p').html('您没有抽奖机会');
+                            } else {
+                                $('.yellow1-main .appjiang-ri p span').html(d['left']);
+                            }
+                        }
+
+                        redpack({
+                            'action': 'GET_REWARD_INFO',
+                            'activity': "thanks_given",
+                            'level': "5000-"
+                        }, redpack2);
+                    }
+                    //error: function(data){
+                    //  $('#log3').html('ajax error');
+                    //  window.location.href = $("input[name='next']").val() + "nologin/";
+                    //}
+                })
 
 
             }
-            $('.appjiang-button')
-            if (login) {
+            //$('.appjiang-button')
+            //if (login) {
                 function Down(ele) {
                     var curHeight = ele.height();
                     var autoHeight = ele.css('height', 'auto').height();
@@ -146,13 +197,6 @@ wlb.ready({
 
                 lottery.init('lottery');
                 $("#lottery .appjiang-button2").click(function () {
-                    //if(!login){
-                    //    $(this).html(12);
-                    //    return;
-                    //}
-                    if (change['left'] == 0) {
-                        return;
-                    }
                     redpack({
                         'action': "POINT_AT",
                         'activity': "thanks_given",
@@ -183,25 +227,26 @@ wlb.ready({
                 });
                 //抽奖2
                 $('.app-thanksbu2').on('click', function () {
-                    if (change['left'] == 0) {
-                        return;
-                    }
                     redpack({
                         'action': "POINT_AT",
                         'activity': "thanks_given",
                         'level': "5000-"
-                    }, function () {
-                        if (change['left'] == 0) {
+                    }, function (data) {
+                        if (data['left'] == 0) {
+                            //$('.apphongxi').show().html(JSON.stringify(data));
                             $('.app-thanksbu').removeClass("app-thanksbu2");
-                            $('.apphongxi').hide();
+
                             $('.app-thanksbu').addClass("app-thanksbu1");
                             $('.yellow1-main .appjiang-ri p').html('您没有抽奖机会');
+                            if (data['reward'] == null) {
+                                return;
+                            }
                         } else {
-                            $('.yellow1-main .appjiang-ri p span').text(change['left']);
-                            $('.apphongxi').show();
-                        }
+                            $('.yellow1-main .appjiang-ri p span').text(data['left']);
 
-                        $('#thankgi-thanks2 ').text(change['reward']);
+                        }
+                        $('.apphongxi').show();
+                        $('#thankgi-thanks2 ').text(data['reward']);
 
 
                         return false;
@@ -287,14 +332,14 @@ wlb.ready({
                             callback && callback(data);
                             //console.log(change['rewards'] , "asd");
                             //$('.shuju').text((change['rewards'] ? change['rewards'].join("") : "" )+"1111");
-                            $('.shuju').html(JSON.stringify(change))
+                            //$('.shuju').html(JSON.stringify(change))
 
 
                         }
                     })
                 }
 
-            }
+           // }
 
 
         })
