@@ -7,7 +7,6 @@ import datetime
 from user_agents import parse
 from wanglibao import settings
 from wanglibao_redis.backend import redis_backend
-from wanglibao_account.cooperation import CoopRegister
 
 
 def search(client, string):
@@ -108,7 +107,3 @@ def process_for_fuba_landpage(request, channel_code):
                 return
         else:
             redis._set(redis_channel_key, current_time.strftime("%Y-%m-%d %H:%M:%S"))
-
-
-def process_for_maimai1_landpage(request, channel_code):
-    CoopRegister(request).process_for_click(channel_code)
