@@ -124,7 +124,7 @@ class GetExperienceAPIView(APIView):
             content = u"网利宝赠送的【{}】体验金已发放，体验金额度:{}，请进入投资页面尽快投资赚收益吧！有效期至{}。" \
                       u"<br/>感谢您对我们的支持与关注!" \
                       u"<br>网利宝".format(experience_event.name, experience_event.amount,
-                                          experience_event.unavailable_at.strftime("Y-m-d"))
+                                          experience_event.unavailable_at.strftime("%Y-%m-%d"))
 
             inside_message.send_one.apply_async(kwargs={
                 "user_id": user.id,
