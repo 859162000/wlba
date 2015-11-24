@@ -1204,23 +1204,12 @@ class MaimaiRegister(CoopRegister):
         super(MaimaiRegister, self).__init__(request)
         self.c_code = MAIMAI1_CHANNEL_CODE
         self.call_back_url = MAIMAI_CALL_BACK_URL
-        self.extra_key = 'mmtoken'
+        self.external_channel_user_key = 'mmtoken'
 
-    def save_to_session(self):
-        super(MaimaiRegister, self).save_to_session()
-        channel_extra = self.request.GET.get(self.extra_key, None)
-        if channel_extra:
-            self.request.session[self.extra_key] = channel_extra
-            # logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
-
-    def clear_session(self):
-        super(MaimaiRegister, self).clear_session()
-        self.request.session.pop(self.extra_key, None)
-
-    def click_call_back(self):
-        mm_token = self.channel_extra
-        if mm_token:
-            params = {'mmtoken': mm_token}
+    def register_call_back(self, user):
+        binding = Binding.objects.filter(user_id=user.id).first()
+        if binding:
+            params = {'mmtoken': binding.bid}
             # 异步回调
             common_callback.apply_async(
                 kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
