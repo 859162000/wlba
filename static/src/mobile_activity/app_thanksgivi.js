@@ -78,7 +78,7 @@ function roll() {
         $('#app-jiangli0').text(change['reward']);
         setTimeout(function () {
             $('.app-jiangshow').css('display', 'none');
-        }, 3000);
+        }, 30000);
         click = false;
     } else {
         if (lottery.times < lottery.cycle) {
@@ -99,7 +99,6 @@ function roll() {
             lottery.speed = 40;
         }
         ;
-        //console.log(lottery.times + '^^^^^^' + lottery.speed + '^^^^^^^' + lottery.prize);
         lottery.timer = setTimeout(roll, lottery.speed);
     }
     return false;
@@ -109,40 +108,45 @@ var click = false;
 
 window.onload = function () {
     lottery.init('lottery');
-    $("#lottery .appjiang-button2").click(function (fa) {
-        //if (change['left'] == 0) {
-        //    return;
-        //}
+
+    $("#lottery .appjiang-button2").click(function () {
+        if (click) {
+            return false;
+        } else {
+            click = true;
+        }
         redpack({
             'action': "POINT_AT",
             'activity': "thanks_given",
             'level': "5000+"
-        }, function (data) {
-            if (data['left'] == 0) {
+        }, function (dd) {
+            $('#ff').html(JSON.stringify(dd))
+            if (change['left'] == 0) {
                 $('.appjiang-button').removeClass("appjiang-button2");
                 $('.appjiang-button').addClass("appjiang-button1");
                 $('.appprize-mingdan .appjiang-ri p').html('您没有抽奖机会');
-                if (data['reward'] == null) {
+                if (change['reward'] == null) {
                     return;
                 }
             } else {
-                $('.appprize-mingdan .appjiang-ri p span').text(data['left']);
+                $('.appprize-mingdan .appjiang-ri p span').text(change['left']);
             }
-            if (click) {
-                return false;
-            } else {
-                lottery.speed = 100;
-                roll();
-                click = true;
-                //alert(4);
-                return false;
-            }
+
+            lottery.speed = 100;
+
+            roll();
+
 
         })
     });
     //抽奖2
+    var onclick = false;
     $('.app-thanksbu2').on('click', function () {
-        //alert(11);
+        if (onclick) {
+            return false;
+        } else {
+            onclick = true;
+        }
         redpack({
             'action': "POINT_AT",
             'activity': "thanks_given",
@@ -156,15 +160,14 @@ window.onload = function () {
                 if (data['reward'] == null) {
                     return;
                 }
-               // return;
+                // return;
             } else {
                 $('.yellow1-main .appjiang-ri p span').text(data['left']);
             }
             $('.apphongxi').show();
             $('#thankgi-thanks2 ').text(data['reward']);
-            //alert(change['reward']);
 
-            return false;
+            onclick = false;
         })
     })
 };
@@ -173,7 +176,6 @@ redpack({
     'activity': "thanks_given",
     'level': "5000+"
 }, function (da) {
-    console.log(da['left']);
     if (da['left'] == 0) {
         $('.appjiang-button').removeClass("appjiang-button2");
         $('.appjiang-button').addClass("appjiang-button1");
@@ -202,20 +204,16 @@ var str = '';
 //if (change['ret_code'] != 1000) {
 redpack({
     'action': 'GET_REWARD',
-    'activity': "thanks_given",
-    'level': "5000+"
+    'activity': "thanks_given"
 }, function () {
-    if (change['ret_code'] != 1000) {
-        for (var k = 0, len2 = change['phone'].length; k < len2; k++) {
-            var tel = change['phone'][k].substring(0, 3) + "******" + change['phone'][k].substring(9, 11);
+    for (var k = 0, len2 = change['phone'].length; k < len2; k++) {
+        var tel = change['phone'][k].substring(0, 3) + "******" + change['phone'][k].substring(9, 11);
 
-            str += '<p>恭喜' + tel + '获得<span>' + change['rewards'][k] + '</span></p>';
-            //console.log(str);
-        }
-
-
-        $('.long-p').append(str);
+        str += '<p>恭喜' + tel + '获得<span>' + change['rewards'][k] + '</span></p>';
     }
+
+
+    $('.long-p').append(str);
 });
 //}
 //无线滚动
@@ -246,7 +244,6 @@ function redpack(data, callback) {
         success: function (data) {
             change = data;
             callback && callback(data);
-            console.log(change);
 
         }
     })

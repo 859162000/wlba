@@ -157,7 +157,7 @@ wlb.ready({
                     $('#app-jiangli0').text(change['reward']);
                     setTimeout(function () {
                         $('.app-jiangshow').css('display', 'none');
-                    }, 3000);
+                    }, 30000);
                     click = false;
                 } else {
                     if (lottery.times < lottery.cycle) {
@@ -178,7 +178,6 @@ wlb.ready({
                         lottery.speed = 40;
                     }
                     ;
-                    //console.log(lottery.times + '^^^^^^' + lottery.speed + '^^^^^^^' + lottery.prize);
                     lottery.timer = setTimeout(roll, lottery.speed);
                 }
                 return false;
@@ -198,17 +197,16 @@ wlb.ready({
                     'action': "POINT_AT",
                     'activity': "thanks_given",
                     'level': "5000+"
-                }, function () {
-
-                    if (change['left'] == 0) {
+                }, function (dd) {
+                    if (dd['left'] == 0) {
                         $('.appjiang-button').removeClass("appjiang-button2");
                         $('.appjiang-button').addClass("appjiang-button1");
                         $('.appprize-mingdan .appjiang-ri p').html('您没有抽奖机会');
-                        if (change['reward'] == null) {
+                        if (dd['reward'] == null) {
                             return;
                         }
                     } else {
-                        $('.appprize-mingdan .appjiang-ri p span').text(change['left']);
+                        $('.appprize-mingdan .appjiang-ri p span').text(dd['left']);
                     }
 
                     lottery.speed = 100;
@@ -220,12 +218,12 @@ wlb.ready({
                 //return;
             });
             //抽奖2
-            //if (logein) {
+            var onclick = false;
             $('.app-thanksbu2').on('click', function () {
-                if (click) {
+                if (onclick) {
                     return false;
                 } else {
-                    click = true;
+                    onclick = true;
                 }
                 redpack({
                     'action': "POINT_AT",
@@ -233,11 +231,11 @@ wlb.ready({
                     'level': "5000-"
                 }, function (data) {
                     if (data['left'] == 0) {
-                        //$('.apphongxi').show().html(JSON.stringify(data));
                         $('.app-thanksbu').removeClass("app-thanksbu2");
 
                         $('.app-thanksbu').addClass("app-thanksbu1");
                         $('.yellow1-main .appjiang-ri p').html('您没有抽奖机会');
+                        $('.apphongxi').hide();
                         if (data['reward'] == null) {
                             return;
                         }
@@ -251,22 +249,18 @@ wlb.ready({
 
                     }
 
-                    click = false;
+                    onclick = false;
 
 
                     //return false;
                 })
             })
-            //}
-
-            //}
 
             redpack({
                 'action': "GET_REWARD_INFO",
                 'activity': "thanks_given",
                 'level': "5000+"
             }, function (da) {
-                //$('.appprize-mingdan .appjiang-ri p span').text(da['left']);
                 if (da['left'] == 0) {
                     $('.appjiang-button').removeClass("appjiang-button2");
                     $('.appjiang-button').addClass("appjiang-button1");
@@ -276,6 +270,7 @@ wlb.ready({
                 }
             });
             function redpack2(d) {
+
                 if (d['left'] == 0) {
                     $('.app-thanksbu').removeClass("app-thanksbu2");
                     $('.app-thanksbu').addClass("app-thanksbu1");
@@ -297,18 +292,15 @@ wlb.ready({
                 'action': 'GET_REWARD',
                 'activity': "thanks_given",
                 'level': "5000+"
-            }, function () {
-                if (change['ret_code'] != 1000) {
-                    for (var k = 0, len2 = change['phone'].length; k < len2; k++) {
-                        var tel = change['phone'][k].substring(0, 3) + "******" + change['phone'][k].substring(9, 11);
+            }, function (date) {
+                for (var k = 0, len2 = date['phone'].length; k < len2; k++) {
+                    var tel = date['phone'][k].substring(0, 3) + "******" + date['phone'][k].substring(9, 11);
 
-                        str += '<p>恭喜' + tel + '获得<span>' + change['rewards'][k] + '</span></p>';
-                        //console.log(str);
-                    }
-
-
-                    $('.long-p').append(str);
+                    str += '<p>恭喜' + tel + '获得<span>' + date['rewards'][k] + '</span></p>';
                 }
+
+
+                $('.long-p').append(str);
             });
 
 //无线滚动
@@ -339,22 +331,16 @@ wlb.ready({
                     success: function (data) {
                         change = data;
                         callback && callback(data);
-                        //console.log(change['rewards'] , "asd");
-                        //$('.shuju').text((change['rewards'] ? change['rewards'].join("") : "" )+"1111");
-                        //$('.shuju').html(JSON.stringify(change))
 
 
                     }
                 })
             }
 
-            // }
-
-
         })
 
     },
     other: function () {
-        console.log(2)
+
     }
 })
