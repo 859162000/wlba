@@ -221,17 +221,18 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 //$('.appjiang-button').html(123)
 wlb.ready({
     app: function (mixins) {
-        mixins.sendUserInfo(function (data) {
-            $('.appprize-mingdan .appjiang-ri .jiang-a').click(function () {
-                mixins.jumpToManageMoney();
-            })
-            $('.app-thanks').click(function () {
-                mixins.jumpToManageMoney();
-            })
-            $('.yellow1-main .appjiang-ri .jiang-a').click(function () {
-                mixins.jumpToManageMoney();
-            })
+        $('.appprize-mingdan .appjiang-ri .jiang-a').click(function () {
+            mixins.jumpToManageMoney();
+        })
+        $('.app-thanks').click(function () {
+            mixins.jumpToManageMoney();
+        })
+        $('.yellow1-main .appjiang-ri .jiang-a').click(function () {
+            mixins.jumpToManageMoney();
+        })
 
+
+        mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 login = false;
                 $('.appprize-mingdan .appjiang-ri p').html('');
@@ -244,8 +245,7 @@ wlb.ready({
                     }
                 );
                 $('.yellow1-main .appjiang-ri p').html('');
-                $('.app-thanksbu').removeClass('app-thanksbu2');
-                $('.app-thanksbu').addClass("app-thanksbu1").click(
+                $('.app-thanksbu').removeClass('.app-thanksbu2').addClass("app-thanksbu1").click(
                     function () {
                         mixins.loginApp({refresh: 1}, function () {
                             $('.app-thanksbu').removeClass('app-thanksbu1').addClass("app-thanksbu2");
@@ -271,8 +271,7 @@ wlb.ready({
                         }, function (da) {
                             //$('.appprize-mingdan .appjiang-ri p span').text(da['left']);
                             if (da['left'] == 0) {
-                                $('.appjiang-button').removeClass("appjiang-button2");
-                                $('.appjiang-button').addClass("appjiang-button1");
+                                $('.appjiang-button').removeClass("appjiang-button2").addClass("appjiang-button1");
                                 $('.appprize-mingdan .appjiang-ri p').html('您没有抽奖机会');
                             } else {
                                 $('.appprize-mingdan .appjiang-ri p span').text(da['left']);
@@ -280,8 +279,7 @@ wlb.ready({
                         });
                         function redpack2(d) {
                             if (d['left'] == 0) {
-                                $('.app-thanksbu').removeClass("app-thanksbu2");
-                                $('.app-thanksbu').addClass("app-thanksbu1");
+                                $('.app-thanksbu').removeClass("app-thanksbu2").addClass("app-thanksbu1");
                                 $('.yellow1-main .appjiang-ri p').html('您没有抽奖机会');
                             } else {
                                 $('.yellow1-main .appjiang-ri p span').html(d['left']);
@@ -302,8 +300,8 @@ wlb.ready({
 
 
             }
-            $('.appjiang-button')
-            if (login) {
+            //$('.appjiang-button')
+            //if (login) {
                 function Down(ele) {
                     var curHeight = ele.height();
                     var autoHeight = ele.css('height', 'auto').height();
@@ -560,7 +558,7 @@ wlb.ready({
                     })
                 }
 
-            }
+           // }
 
 
         })
