@@ -338,7 +338,7 @@ def getOrCreateWeixinUser(openid, weixin_account):
     if w_user.account_original_id != weixin_account.db_account.original_id:
         w_user.account_original_id = weixin_account.db_account.original_id
         w_user.save()
-    if not w_user.nickname:
+    if not w_user.nickname or not w_user.subscribe:
         try:
             user_info = weixin_account.db_account.get_user_info(openid)
             w_user.nickname = user_info.get('nickname', "")

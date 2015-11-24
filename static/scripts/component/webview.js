@@ -7,6 +7,16 @@ var wlb = (function () {
         this.bridge = bridge;  //WebViewJavascriptBridge对象
     }
 
+    Mixin.filterJSON = function(target){
+        var
+            u = navigator.userAgent,
+            newJSON = target;
+
+        if(u.indexOf('Android')) newJSON = eval("(" + target + ")");
+
+        return newJSON;
+    }
+
     Mixin.prototype = {
         _init: function () {
             this.bridge.init(function (message, responseCallback) {
@@ -16,11 +26,15 @@ var wlb = (function () {
         },
         _setData: function (ops, callback) {
             var data = {'post': {}, 'callback': null};
+            var toString = Object.prototype.toString;
+
             if (toString.call(ops) == '[object Object]') {
                 for (var p in ops) {
                     data.post[p] = ops[p];
                 }
-            } else if (toString.call(ops) == '[object Function]') {
+            }
+
+            if (toString.call(ops) == '[object Function]') {
                 data.callback = ops;
                 return data
             }
@@ -84,7 +98,9 @@ var wlb = (function () {
         authenticated: function (data, callback) {
             var options = this._setData(data, callback);
             this.bridge.callHandler('authenticated', options.post, function (response) {
-                options.callback && options.callback(response);
+
+                var responseData  = Mixin.filterJSON(response);
+                options.callback && options.callback(responseData);
             });
         },
         /**
@@ -106,7 +122,8 @@ var wlb = (function () {
 
             this.bridge.callHandler('sendUserInfo', {}, function (response) {
 
-                options.callback && options.callback(response);
+                var responseData  = Mixin.filterJSON(response);
+                options.callback && options.callback(responseData);
             });
         }
     }
@@ -132,7 +149,6 @@ var wlb = (function () {
                 mixins._init();
             }
 
-
             try {
                 dics[target.callback](mixins);
             } catch (e) {
@@ -150,13 +166,19 @@ var wlb = (function () {
 
 
 
-
+/*
  wlb.ready({
      app: function(mixins){
-        mixins.loginApp()
+
+         document.getElementById('refresh').onclick= function(){
+             window.location.href=window.location.href;
+         }
+        mixins.sendUserInfo(function(data){
+            document.getElementById('log').innerHTML = JSON.stringify(data)
+        })
      },
      other: function(){
         console.log('其他场景的业务逻辑')
      }
  })
-
+*/

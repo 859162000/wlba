@@ -261,7 +261,6 @@ org.test = (function(org){
             bridge.callHandler('sendUserInfo', {'1': '1'}, function (response) {
               var responsejson = typeof response == 'string' ? JSON.parse(response): response;
 
-              $('#log1').html('=============');
               org.ajax({
                 url: '/accounts/token/login/ajax/',
                 type: 'post',

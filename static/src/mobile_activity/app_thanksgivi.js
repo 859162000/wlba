@@ -76,9 +76,9 @@ function roll() {
         //奖品弹出位子
         $('.app-jiangshow').css('display', 'block');
         $('#app-jiangli0').text(change['reward']);
-        setTimeout(function(){
-          $('.app-jiangshow').css('display', 'none');
-        },3000);
+        setTimeout(function () {
+            $('.app-jiangshow').css('display', 'none');
+        }, 3000);
         click = false;
     } else {
         if (lottery.times < lottery.cycle) {
@@ -109,21 +109,24 @@ var click = false;
 
 window.onload = function () {
     lottery.init('lottery');
-    $("#lottery .appjiang-button2").click(function () {
-        if (change['left'] == 0) {
-            return;
-        }
+    $("#lottery .appjiang-button2").click(function (fa) {
+        //if (change['left'] == 0) {
+        //    return;
+        //}
         redpack({
             'action': "POINT_AT",
             'activity': "thanks_given",
             'level': "5000+"
-        }, function () {
-            if (change['left'] == 0) {
+        }, function (data) {
+            if (data['left'] == 0) {
                 $('.appjiang-button').removeClass("appjiang-button2");
                 $('.appjiang-button').addClass("appjiang-button1");
                 $('.appprize-mingdan .appjiang-ri p').html('您没有抽奖机会');
+                if (data['reward'] == null) {
+                    return;
+                }
             } else {
-                $('.appprize-mingdan .appjiang-ri p span').text(change['left']);
+                $('.appprize-mingdan .appjiang-ri p span').text(data['left']);
             }
             if (click) {
                 return false;
@@ -139,24 +142,27 @@ window.onload = function () {
     });
     //抽奖2
     $('.app-thanksbu2').on('click', function () {
-        if (change['left'] == 0) {
-            return;
-        }
+        //alert(11);
         redpack({
             'action': "POINT_AT",
             'activity': "thanks_given",
             'level': "5000-"
-        }, function () {
-            if (change['left'] == 0) {
+        }, function (data) {
+            if (data['left'] == 0) {
                 $('.app-thanksbu').removeClass("app-thanksbu2");
                 $('.app-thanksbu').addClass("app-thanksbu1");
                 $('.yellow1-main .appjiang-ri p').html('您没有抽奖机会');
+                $('.apphongxi').hide();
+                if (data['reward'] == null) {
+                    return;
+                }
+               // return;
             } else {
-                $('.yellow1-main .appjiang-ri p span').text(change['left']);
+                $('.yellow1-main .appjiang-ri p span').text(data['left']);
             }
             $('.apphongxi').show();
-            $('#thankgi-thanks2 ').text(change['reward']);
-
+            $('#thankgi-thanks2 ').text(data['reward']);
+            //alert(change['reward']);
 
             return false;
         })
@@ -172,11 +178,12 @@ redpack({
         $('.appjiang-button').removeClass("appjiang-button2");
         $('.appjiang-button').addClass("appjiang-button1");
         $('.appprize-mingdan .appjiang-ri p').html('您没有抽奖机会');
+
     } else {
         $('.appprize-mingdan .appjiang-ri p span').text(da['left']);
     }
 });
-function redpack2(d){
+function redpack2(d) {
     if (d['left'] == 0) {
         $('.app-thanksbu').removeClass("app-thanksbu2");
         $('.app-thanksbu').addClass("app-thanksbu1");
@@ -193,12 +200,12 @@ redpack({
 //名单
 var str = '';
 //if (change['ret_code'] != 1000) {
-    redpack({
-        'action': 'GET_REWARD',
-        'activity': "thanks_given",
-        'level': "5000+"
-    },function () {
-        if (change['ret_code'] != 1000) {
+redpack({
+    'action': 'GET_REWARD',
+    'activity': "thanks_given",
+    'level': "5000+"
+}, function () {
+    if (change['ret_code'] != 1000) {
         for (var k = 0, len2 = change['phone'].length; k < len2; k++) {
             var tel = change['phone'][k].substring(0, 3) + "******" + change['phone'][k].substring(9, 11);
 
@@ -208,8 +215,8 @@ var str = '';
 
 
         $('.long-p').append(str);
-        }
-    });
+    }
+});
 //}
 //无线滚动
 var timer, i = 1, j = 2;
@@ -235,7 +242,7 @@ function redpack(data, callback) {
         url: '/api/activity/reward/',
         type: "POST",
         data: data,
-        async: false,
+        //async: false,
         success: function (data) {
             change = data;
             callback && callback(data);
