@@ -500,6 +500,7 @@ LOGGING = {
     }
 }
 
+
 if ENV != ENV_DEV:
     LOGGING['loggers']['django']['level'] = 'INFO'
     LOGGING['loggers']['wanglibao_sms']['level'] = 'INFO'
@@ -513,6 +514,9 @@ if ENV != ENV_DEV:
 
     # session expire at browser close
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+    # set session for cross domain.
+    SESSION_COOKIE_DOMAIN = '.wanglibao.com'
 
     # wsgi scheme
     os.environ['wsgi.url_scheme'] = 'https'
@@ -664,6 +668,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'marketing.tools.check_invested_status',
         'schedule': crontab(minute=0, hour=10),
     },
+    # 每天下午4点半开始处理体验金的还款
+    'experience_repayment_plan': {
+        'task': 'experience_gold.backends.experience_repayment_plan',
+        'schedule': crontab(minute=40, hour=16),
+    },
     # # by Zhoudong 定期检查用户优惠券没使用,发送提醒
     # 'redpack_status_task_check': {
     #     'task': 'marketing.tools.check_redpack_status',
@@ -699,7 +708,7 @@ if ENV == ENV_PRODUCTION:
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
-    YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete'
+    YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete/'
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
@@ -748,7 +757,7 @@ elif ENV == ENV_PREPRODUCTION:
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
-    YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete'
+    YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete/'
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
@@ -798,7 +807,7 @@ else:
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'http://test.chinapnr.com/buser'
 
-    YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete'
+    YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete/'
     YEE_PROXY_PAY_MER_ID = '10001126856'
     YEE_PROXY_PAY_KEY = '69cl522AV6q613Ii4W6u8K6XuW8vM1N6bFgyv769220IuYe9u37N4y7rI4Pl'
     YEE_PAY_URL = "http://mobiletest.yeepay.com/paymobile/api/pay/request"

@@ -2,9 +2,10 @@
 # encoding:utf-8
 
 import time
-import datetime
 import logging
 import decimal
+from datetime import datetime, timedelta
+from django.db import transaction
 from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -15,6 +16,9 @@ from models import ExperienceProduct, ExperienceEventRecord, ExperienceAmortizat
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.models import P2PRecord
 from wanglibao_account import message as inside_message
+from marketing.utils import local_to_utc
+from wanglibao.celery import app
+from wanglibao_margin.marginkeeper import MarginKeeper
 
 logger = logging.getLogger(__name__)
 
@@ -120,7 +124,7 @@ class GetExperienceAPIView(APIView):
             content = u"网利宝赠送的【{}】体验金已发放，体验金额度:{}，请进入投资页面尽快投资赚收益吧！有效期至{}。" \
                       u"<br/>感谢您对我们的支持与关注!" \
                       u"<br>网利宝".format(experience_event.name, experience_event.amount,
-                                          experience_event.unavailable_at.strftime("Y-m-d"))
+                                          experience_event.unavailable_at.strftime("%Y-%m-%d"))
 
             inside_message.send_one.apply_async(kwargs={
                 "user_id": user.id,
@@ -135,4 +139,37 @@ class GetExperienceAPIView(APIView):
             })
 
         return Response({'ret_code': 30003, 'message': u'领取失败,请联系网利宝,客服电话:4008-588-066.'})
+
+
+@app.task
+def experience_repayment_plan():
+    """
+    体验标还款计划结算任务
+    每天下午16:40分开始执行
+    自动将前一天16:40到当天16:40之间所有该结算的计划进行统一结算
+    结算的利息自动计入用户的资金账户余额
+    """
+    print(u"Getting experience gold repayment plan to start!")
+    now = datetime.now()
+    start = local_to_utc(datetime(now.year, now.month, now.day - 1, 17, 0, 0), 'normal')
+    end = local_to_utc(datetime(now.year, now.month, now.day, 17, 0, 0), 'normal')
+    amortizations = ExperienceAmortization.objects.filter(settled=False)\
+        .filter(term_date__gt=start, term_date__lte=end)
+    for amo in amortizations:
+        if amo.interest <= 0:
+            continue
+
+        try:
+            amo.settled = True
+            amo.settlement_time = timezone.now()
+            amo.save()
+
+            # 体验金利息计入用户账户余额
+            with transaction.atomic():
+                description = u"体验金利息入账:%s元" % amo.interest
+                user_margin_keeper = MarginKeeper(amo.user)
+                user_margin_keeper.deposit(amo.interest, description=description, catalog=u"体验金利息入账")
+
+        except Exception, e:
+            logger.error(u"experience repayment error, amortization id : %s , message: %s" % (amo.id, e.message))
 

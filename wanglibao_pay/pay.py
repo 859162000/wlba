@@ -6,6 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.models.query_utils import Q
 from django.forms.models import model_to_dict
+from django.http.request import QueryDict
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 import requests
@@ -352,6 +353,9 @@ class YeeProxyPayCallbackMessage(PayMessage):
             para_order = request_para_order
         else:
             para_order = response_para_order
+        # querydict is immutable
+        if isinstance(para_dict, QueryDict):
+            para_dict = para_dict.copy()
         if 'p5_Pid'in para_dict:
             para_dict['p5_Pid'] = para_dict['p5_Pid'].decode('GBK').encode('UTF8')
         str_to_sign = ''.join([str(para_dict.get(k, '')) for k in para_order])

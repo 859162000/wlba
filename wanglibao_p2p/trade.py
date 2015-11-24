@@ -105,7 +105,8 @@ class P2PTrader(object):
             pass
         try:
             kwargs = {
-                'amount': amount}
+                'amount': amount,
+                'order_id': self.order_id,}
 
             RewardDistributer(self.request, kwargs).processor_for_distribute()
         except Exception, reason:

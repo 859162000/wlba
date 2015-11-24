@@ -15,7 +15,7 @@ from misc.views import MiscRecommendProduction
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib import auth
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, Count
 from django.shortcuts import redirect, render_to_response
 from django.template import RequestContext
 from django.views.generic import TemplateView
@@ -31,7 +31,8 @@ from wanglibao_account import backends as account_backends
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_banner.models import AppActivate
-from wanglibao_p2p.models import ProductAmortization, P2PEquity, P2PProduct, P2PRecord
+from wanglibao_p2p.models import ProductAmortization, P2PEquity, P2PProduct, P2PRecord, \
+    UserAmortization, AmortizationRecord
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_rest.utils import split_ua, get_client_ip
 from wanglibao_banner.models import Banner
@@ -157,6 +158,95 @@ class AppRepaymentAPIView(APIView):
         except Exception, e:
             logger.error(e.message)
             return Response({'ret_code': 20001, 'message': 'fail'})
+
+
+class AppRepaymentPlanAllAPIView(APIView):
+    """ app 用户所有还款计划接口 """
+
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+        user_amortizations = UserAmortization.objects.filter(user=user).order_by('-term_date')
+        if user_amortizations:
+            amo_list = _user_amortization_list(user_amortizations)
+        else:
+            amo_list = []
+        return Response({'ret_code': 0, 'data': amo_list})
+
+
+class AppRepaymentPlanMonthAPIView(APIView):
+    """ app 用户月份还款计划接口 """
+
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+        now = datetime.now()
+        request_year = request.DATA.get('year', '')
+        request_month = request.DATA.get('month', '')
+        year = request_year if request_year else now.year
+        month = request_month if request_month else now.month
+        current_month = '{}-{}'.format(now.year, now.month)
+
+        start = local_to_utc(datetime(int(year), int(month), 1), 'min')
+        end = local_to_utc(datetime(int(year), int(month) + 1, 1) - timedelta(days=1), 'max')
+
+        # 月份/月还款金额/月还款期数
+        if request_year and request_month:
+            amos_group = UserAmortization.objects.filter(user=user)\
+                .filter(term_date__gt=start, term_date__lte=end).order_by('term_date')\
+                .extra({'term_date': "DATE_FORMAT(term_date,'%%Y-%%m')"}).values('term_date')\
+                .annotate(Count('term_date')).annotate(Sum('principal')).order_by('term_date')
+        else:
+            amos_group = UserAmortization.objects.filter(user=user)\
+                .extra({'term_date': "DATE_FORMAT(term_date,'%%Y-%%m')"}).values('term_date')\
+                .annotate(Count('term_date')).annotate(Sum('principal')).order_by('term_date')
+
+        month_group = [{
+            'term_date': amo.get('term_date'),
+            'term_date_count': amo.get('term_date__count'),
+            'principal_sum': amo.get('principal__sum')
+        } for amo in amos_group]
+
+        # 当月的还款计划
+        user_amortizations = UserAmortization.objects.filter(user=user)\
+            .filter(term_date__gt=start, term_date__lte=end).order_by('term_date')
+        if user_amortizations:
+            amo_list = _user_amortization_list(user_amortizations)
+        else:
+            amo_list = []
+
+        return Response({'ret_code': 0, 'data': amo_list, 'month_group': month_group, 'current_month': current_month})
+
+
+def _user_amortization_list(user_amortizations):
+    amo_list = []
+    for amo in user_amortizations:
+        if amo.settled:
+            if amo.last_settlement_status == u'提前还款':
+                status = u'提前回款'
+            else:
+                status = u'已回款'
+        else:
+            status = u'待回款'
+        product = P2PProduct.objects.filter(id=amo.product_amortization.product.id).values('name').first()
+        amo_list.append({
+            'user_amortization_id': amo.id,
+            'product_amortization_id': amo.product_amortization.id,
+            'product_name': product.get('name'),
+            'term': amo.term,
+            'term_total': amo.terms,
+            'term_date': amo.term_date,
+            'principal': amo.principal,
+            'interest': amo.interest,
+            'penal_interest': amo.penal_interest,
+            'coupon_interest': amo.coupon_interest,
+            'settled': amo.settled,
+            'settlement_time': amo.settlement_time,
+            'settlement_status': status
+        })
+    return amo_list
 
 
 class AppDayListView(TemplateView):
@@ -666,3 +756,12 @@ class AppCostView(TemplateView):
 
     """ 费用说明 """
     template_name = 'client_cost_description.jade'
+
+
+class AppAreaView(TemplateView):
+
+    """ 最新活动 """
+    template_name = 'client_area.jade'
+
+
+
