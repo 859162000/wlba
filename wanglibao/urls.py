@@ -23,7 +23,8 @@ from wanglibao_banner.views import HiringView, AboutView, CompanyView, TeamView,
 
 from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDateAPI, WangdaiEyeListAPIView, \
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
-from marketing.views import NewsListView, NewsDetailView, AppShareViewShort, ShortAppShareRegView
+from marketing.views import NewsListView, NewsDetailView, AppShareViewShort, ShortAppShareRegView,\
+    AppShareViewSuccess, AppShareViewError
 from wanglibao_activity.decorators import decorator_include
 from wanglibao_activity.decorators import wap_activity_manage
 from wanglibao.views import landpage_view
@@ -89,7 +90,7 @@ urlpatterns = patterns(
     url(r'^ckeditor/', include('ckeditor.urls')),
 
     url(r'^preorder/', include('wanglibao_preorder.urls')),
-    url(r'^activity/', decorator_include(include('marketing.urls'), wap_activity_manage)),
+    url(r'^activity/', include('marketing.urls')),
     # url(r'^activity/', include('marketing.urls')),
     url(r'^announcement/', include('wanglibao_announcement.urls')),
     url(r'^redpacket/', include('wanglibao_redpack.urls')),
@@ -168,8 +169,10 @@ urlpatterns += patterns(
     url(r'^api/loans/success/$', MidaiSuccessView.as_view()),
     url(r'^api/loans/new/$', MidaiNewView.as_view()),
 
-    url(r'^aws/$', AppShareViewShort.as_view(), name="app_share"),
-    url(r'^ws/$', ShortAppShareRegView.as_view(), name="app_share_reg_short"),
+    #url(r'^ws/$', ShortAppShareRegView.as_view(), name="app_share_reg_short"),
+    url(r'^aws/$', AppShareViewShort.as_view(), name="app_invite"),
+    url(r'^wst/(?P<phone>\w+)', AppShareViewSuccess.as_view(), name="app_invite_success"),
+    url(r'^wsf/(?P<phone>\w+)', AppShareViewError.as_view(), name="app_invite_error"),
 )
 
 # 短信

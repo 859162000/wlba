@@ -183,34 +183,99 @@ class TvView(TemplateView):
 
 
 class AppShareView(TemplateView):
-    template_name = 'app_share.jade'
-
-    def get_context_data(self, **kwargs):
-        identifier = self.request.GET.get('phone')
-        reg = self.request.GET.get('reg')
-
-        return {
-            'identifier': identifier.strip(),
-            'reg': reg
-        }
-
-
-class AppShareViewShort(TemplateView):
-    template_name = 'app_share.jade'
+    template_name = 'app_invite_friends.jade'
 
     def get_context_data(self, **kwargs):
         try:
             identifier = self.request.GET.get('p')
-            phone = base64.b64decode(identifier + '=')
+            friend_phone = base64.b64decode(identifier + '=')
         except:
             identifier = self.request.GET.get('phone')
-            phone = identifier
-        reg = self.request.GET.get('reg')
+            friend_phone = identifier
 
+        # 网站数据
+        m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
+        site_data = m.get_recommend_products()
+        if site_data:
+            site_data = site_data[MiscRecommendProduction.KEY_PC_DATA]
+        else:
+            site_data = pc_data_generator()
+            m.update_value(value={MiscRecommendProduction.KEY_PC_DATA: site_data})
+
+        identifier_result = identifier and identifier.strip() or identifier
         return {
-            'identifier': identifier.strip(),
-            'reg': reg,
+            'site_data': site_data,
+            'identifier': identifier_result,
+            'friend_phone': friend_phone,
+        }
+
+
+class AppShareViewShort(TemplateView):
+    template_name = 'app_invite_friends.jade'
+
+    def get_context_data(self, **kwargs):
+        try:
+            identifier = self.request.GET.get('p')
+            friend_phone = base64.b64decode(identifier + '=')
+        except:
+            identifier = self.request.GET.get('phone')
+            friend_phone = identifier
+
+        if friend_phone:
+            try:
+                user = User.objects.get(wanglibaouserprofile__phone=friend_phone)
+                promo_token = PromotionToken.objects.get(user=user)
+                invite_code = promo_token.token
+            except:
+                invite_code = ''
+        else:
+            invite_code = ''
+
+        # 网站数据
+        m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
+        site_data = m.get_recommend_products()
+        if site_data:
+            site_data = site_data[MiscRecommendProduction.KEY_PC_DATA]
+        else:
+            site_data = pc_data_generator()
+            m.update_value(value={MiscRecommendProduction.KEY_PC_DATA: site_data})
+
+        url = self.request.get_host() + self.request.get_full_path()
+        return {
+            'site_data': site_data,
+            'invite_code': invite_code,
+            'friend_phone': friend_phone,
+            'url': url
+        }
+
+class AppShareViewError(TemplateView):
+    template_name = 'app_invite_error.jade'
+
+    def get_context_data(self, **kwargs):
+        try:
+            identifier = kwargs['phone']
+            phone = base64.b64decode(identifier + '=')
+        except:
+            phone = ''
+        url = self.request.get_host() + '/aws/?p=' + identifier
+        return {
             'phone': phone,
+            'url': url
+        }
+
+class AppShareViewSuccess(TemplateView):
+    template_name = 'app_invite_success.jade'
+
+    def get_context_data(self, **kwargs):
+        try:
+            identifier = kwargs['phone']
+            phone = base64.b64decode(identifier + '=')
+        except:
+            phone = ''
+        url = self.request.get_host() + '/aws/?p=' + identifier
+        return {
+            'phone': phone,
+            'url': url
         }
 
 
