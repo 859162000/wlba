@@ -12,7 +12,14 @@ var wlb = (function () {
             u = navigator.userAgent,
             newJSON = target;
 
-        if(u.indexOf('Android')) newJSON = eval("(" + target + ")");
+        if(u.indexOf('Android')){
+            try{
+                newJSON = eval("(" + target + ")");
+            }catch(e){
+
+            }
+
+        }
 
         return newJSON;
     }
@@ -166,19 +173,22 @@ var wlb = (function () {
 
 
 
-/*
- wlb.ready({
-     app: function(mixins){
+ //wlb.ready({
+ //    app: function(mixins){
+ //        //mixins.loginApp()
+ //        ///document.getElementById('refresh').onclick= function(){
+ //        //    window.location.href=window.location.href;
+ //        //}
+ //       mixins.sendUserInfo(function(data){
+ //           document.getElementById('log').innerHTML = JSON.stringify(data)
+ //       })
+ //    },
+ //    other: function(){
+ //       console.log('其他场景的业务逻辑')
+ //    }
+ //})
 
-         document.getElementById('refresh').onclick= function(){
-             window.location.href=window.location.href;
-         }
-        mixins.sendUserInfo(function(data){
-            document.getElementById('log').innerHTML = JSON.stringify(data)
-        })
-     },
-     other: function(){
-        console.log('其他场景的业务逻辑')
-     }
- })
-*/
+
+
+
+

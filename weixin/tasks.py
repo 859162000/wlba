@@ -31,7 +31,7 @@ def detect_product_biding(product_id):
     services = SubscribeService.objects.filter(channel='weixin', is_open=True, type=0).all()
     for service in services:
         if period == service.num_limit:
-            sub_records = SubscribeRecord.objects.filter(service=service).all()
+            sub_records = SubscribeRecord.objects.filter(service=service, status=True).all()
             for sub_record in sub_records:
                 if sub_record.w_user and sub_record.w_user.subscribe==1 and sub_record.w_user.user:
                     sendUserProductOnLine.apply_async(kwargs={

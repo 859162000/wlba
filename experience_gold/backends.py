@@ -124,7 +124,7 @@ class GetExperienceAPIView(APIView):
             content = u"网利宝赠送的【{}】体验金已发放，体验金额度:{}，请进入投资页面尽快投资赚收益吧！有效期至{}。" \
                       u"<br/>感谢您对我们的支持与关注!" \
                       u"<br>网利宝".format(experience_event.name, experience_event.amount,
-                                          experience_event.unavailable_at.strftime("Y-m-d"))
+                                          experience_event.unavailable_at.strftime("%Y-%m-%d"))
 
             inside_message.send_one.apply_async(kwargs={
                 "user_id": user.id,
@@ -151,8 +151,8 @@ def experience_repayment_plan():
     """
     print(u"Getting experience gold repayment plan to start!")
     now = datetime.now()
-    start = local_to_utc(datetime(now.year, now.month, now.day - 1, 16, 40, 00), 'normal')
-    end = local_to_utc(datetime(now.year, now.month, now.day, 16, 40, 00), 'normal')
+    start = local_to_utc(datetime(now.year, now.month, now.day - 1, 17, 0, 0), 'normal')
+    end = local_to_utc(datetime(now.year, now.month, now.day, 17, 0, 0), 'normal')
     amortizations = ExperienceAmortization.objects.filter(settled=False)\
         .filter(term_date__gt=start, term_date__lte=end)
     for amo in amortizations:
@@ -165,9 +165,6 @@ def experience_repayment_plan():
             amo.save()
 
             # 体验金利息计入用户账户余额
-            if amo.settled is True:
-                raise Exception(u"ID : %s was repayment")
-
             with transaction.atomic():
                 description = u"体验金利息入账:%s元" % amo.interest
                 user_margin_keeper = MarginKeeper(amo.user)

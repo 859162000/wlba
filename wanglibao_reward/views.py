@@ -904,6 +904,21 @@ class ThanksGivingDistribute(ActivityRewardDistribute):
             return False
 
     def distribute(self, request):
+        action = request.DATA.get('action', 'GET_REWARD_INFO')
+
+        if action == "GET_REWARD":
+            rewards = WanglibaoActivityReward.objects.filter(p2p_amount__gte=5000, activity="ThanksGiven", has_sent=True).all()
+            phone = [reward.user.wanglibaouserprofile.phone for reward in rewards]
+            reward = [reward.redpack_event.name for reward in rewards if reward.redpack_event] + [reward.reward.description for reward in rewards if reward.reward]
+            json_to_response = {
+                "phone": phone,
+                "rewards": reward,
+                "message": u'中奖名单',
+                "ret_code": 4000
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
         if not request.user.is_authenticated():
             json_to_response = {
                'ret_code': 1000,
@@ -912,8 +927,6 @@ class ThanksGivingDistribute(ActivityRewardDistribute):
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-
-        action = request.DATA.get('action', 'GET_REWARD_INFO')
 
         level = request.DATA.get('level', "5000+")
         if level == "5000+":
@@ -984,15 +997,3 @@ class ThanksGivingDistribute(ActivityRewardDistribute):
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        if action == "GET_REWARD":
-            rewards = WanglibaoActivityReward.objects.filter(p2p_amount__gte=5000, activity="ThanksGiven", has_sent=True).all()
-            phone = [reward.user.wanglibaouserprofile.phone for reward in rewards]
-            reward = [reward.redpack_event.name for reward in rewards if reward.redpack_event] + [reward.reward.description for reward in rewards if reward.reward]
-            json_to_response = {
-                "phone": phone,
-                "rewards": reward,
-                "message": u'中奖名单',
-                "ret_code": 4000
-            }
-
-            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
