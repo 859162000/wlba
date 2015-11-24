@@ -2,7 +2,10 @@
 
 
 from django.views.generic import TemplateView
-from wanglibao_activity.models import ActivityTemplates, ActivityImages
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.core.paginator import Paginator
+from django.core.paginator import PageNotAnInteger
+from wanglibao_activity.models import ActivityTemplates, ActivityImages, ActivityShow
 
 
 class TemplatesFormatTemplate(TemplateView):
@@ -98,3 +101,57 @@ class TemplatesFormatTemplate(TemplateView):
             'sequence_one': sequence_one,
             'sequence_two': sequence_two,
         }
+
+
+class ActivityShowHomeView(TemplateView):
+    def get_context_data(self, platform, limit=10, **kwargs):
+        try:
+            if platform == 'pc':
+                self.template_name = ''
+            elif platform == 'app':
+                self.template_name = ''
+            else:
+                raise Exception
+        except Exception:
+            raise Http404(u'您查找的活动列表页面不存在')
+
+        activity_shows = ActivityShow.objects.filter(link_is_hide=False).order_by('-activity__priority', '-created_at')
+
+        activity_show_list = []
+        activity_show_list.extend(activity_shows)
+
+        paginator = Paginator(activity_show_list, limit)
+        page = self.request.GET.get('page')
+
+        try:
+            activity_show_list = paginator.page(page)
+        except PageNotAnInteger:
+            activity_show_list = paginator.page(1)
+        except Exception:
+            activity_show_list = paginator.page(paginator.num_pages)
+
+        return {
+            'activitys': activity_show_list
+        }
+
+
+class ActivityDetailView(TemplateView):
+    def get_context_data(self, platform, id, **kwargs):
+        context = super(ActivityDetailView, self).get_context_data(**kwargs)
+        activity_show = None
+
+        try:
+            if platform == 'pc':
+                activity_show = ActivityShow.objects.get(pk=id, is_pc=True, link_is_hide=False)
+                self.template_name = activity_show.pc_template
+            elif platform == 'app':
+                activity_show = ActivityShow.objects.get(pk=id, is_app=True, link_is_hide=False)
+                self.template_name = activity_show.app_template
+        except Exception:
+            raise Http404(u'您查找的活动页面不存在')
+
+        context.update({
+            'activity': activity_show.activity,
+        })
+
+        return context

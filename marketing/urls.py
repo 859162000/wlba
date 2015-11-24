@@ -5,6 +5,7 @@ from marketing.views import AppShareView, AppShareRegView, NewYearView, Aggregat
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 from wanglibao.views import BaiduFinanceView
+from wanglibao_activity.views import ActivityShowHomeView, ActivityDetailView
 
 urlpatterns = patterns(
     '',
@@ -172,4 +173,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'', include('experience_gold.urls'))
+)
+
+urlpatterns += patterns(
+    '',
+    url(r'^list/(?P<platform>app|pc)/(?P<limit>\d{1,2})/$', ActivityShowHomeView.as_view()),
+    url(r'^detail/(?P<platform>app|pc)/(?P<id>\d+)/$', ActivityDetailView.as_view()),
 )

@@ -64,6 +64,7 @@ class AppMemorabilia(models.Model):
     end_time = models.DateTimeField(auto_now=False, blank=True, null=True, verbose_name=u'展示结束时间')
     priority = models.IntegerField(blank=True, default=0, verbose_name=u'优先级', help_text=u'越大越优先')
     status = models.SmallIntegerField(verbose_name=u'当前状态', max_length=2, choices=STATUS, default=0)
+    hide_link = models.BooleanField(verbose_name=u'是否隐藏（大事记页面）', default=False)
 
     class Meta:
         verbose_name = u"APP-大事记"
@@ -72,3 +73,6 @@ class AppMemorabilia(models.Model):
 
     def __unicode__(self):
         return "%s" % self.title
+
+    def get_absolute_url(self):
+        return '/memorabilia/detail/%s' % self.id

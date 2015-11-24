@@ -1,10 +1,11 @@
 # encoding: utf8
+
 from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.views.generic import TemplateView
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
-from wanglibao_announcement.models import Announcement
+from wanglibao_announcement.models import Announcement, AppMemorabilia
 
 
 class AnnouncementHomeView(TemplateView):
@@ -60,6 +61,91 @@ class AnnouncementPreviewView(TemplateView):
 
         try:
             announce = Announcement.objects.get(pk=id)
+
+        except Announcement.DoesNotExist:
+            raise Http404(u'您查找的公告不存在')
+
+        context.update({
+            'announce': announce,
+
+        })
+
+        return context
+
+
+class AppMemorabiliaHomeView(TemplateView):
+    template_name = 'app_memorabilia_home.jade'
+
+    def get_context_data(self, **kwargs):
+        memorabilia = AppMemorabilia.objects.filter(status=1, hide_link=False).order_by('-done_date', '-priority')
+
+        memorabilia_list = []
+        memorabilia_list.extend(memorabilia)
+
+        limit = 10
+        paginator = Paginator(memorabilia_list, limit)
+        page = self.request.GET.get('page')
+
+        try:
+            memorabilia_list = paginator.page(page)
+        except PageNotAnInteger:
+            memorabilia_list = paginator.page(1)
+        except Exception:
+            memorabilia_list = paginator.page(paginator.num_pages)
+
+        return {
+            'announcements': memorabilia_list
+        }
+
+
+class AppMemorabiliaDetailView(TemplateView):
+    template_name = 'memorabilia_detail.jade'
+
+    def get_context_data(self, id, **kwargs):
+        context = super(AppMemorabiliaDetailView, self).get_context_data(**kwargs)
+
+        try:
+            memorabilia = (AppMemorabilia.objects.get(pk=id, status=1))
+
+        except AppMemorabilia.DoesNotExist:
+            raise Http404(u'您查找的大事记不存在')
+
+        context.update({
+            'memorabilia': memorabilia,
+
+        })
+
+        return context
+
+
+class AppMemorabiliaPreviewView(TemplateView):
+    template_name = 'app_memorabilia_preview.jade'
+
+    def get_context_data(self, id, **kwargs):
+        context = super(AppMemorabiliaPreviewView, self).get_context_data(**kwargs)
+
+        try:
+            memorabilia = AppMemorabilia.objects.get(pk=id)
+
+        except AppMemorabilia.DoesNotExist:
+            raise Http404(u'您查找的大事记不存在')
+
+        context.update({
+            'memorabilia': memorabilia,
+
+        })
+
+        return context
+
+
+class AnnouncementDetailView(TemplateView):
+    template_name = 'announcement_detail.jade'
+
+    def get_context_data(self, id, **kwargs):
+        context = super(AnnouncementDetailView, self).get_context_data(**kwargs)
+
+        try:
+            announce = Announcement.objects.get(pk=id, status=1, device='pc')
 
         except Announcement.DoesNotExist:
             raise Http404(u'您查找的公告不存在')

@@ -10,8 +10,19 @@ class AnnouncementAdmin(admin.ModelAdmin):
 
 class AppMemorabiliaAdmin(admin.ModelAdmin):
     list_display = ('title', 'status', 'detail_link', 'done_date', 'priority')
-    # list_editable = ('type', 'priority', 'status')
-    # list_filter = ('device', 'type', 'status')
+    search_fields = ('title',)
+    fields = ('title', 'banner', 'detail_link', 'done_date', 'priority', 'hide_link',
+              'start_time', 'end_time')
+
+    def save_model(self, request, obj, form, change):
+        if obj.hide_link is True:
+            obj.status = 0
+
+        if obj.hide_link is False:
+            obj.status = 1
+
+        obj.save()
+
 
 admin.site.register(Announcement, AnnouncementAdmin)
 admin.site.register(AppMemorabilia, AppMemorabiliaAdmin)
