@@ -417,8 +417,8 @@ wlb.ready({
                     'action': "POINT_AT",
                     'activity': "thanks_given",
                     'level': "5000+"
-                }, function () {
-
+                }, function (dd) {
+                     $('#ff').html(JSON.stringify(dd))
                     if (change['left'] == 0) {
                         $('.appjiang-button').removeClass("appjiang-button2");
                         $('.appjiang-button').addClass("appjiang-button1");
@@ -495,6 +495,7 @@ wlb.ready({
                 }
             });
             function redpack2(d) {
+
                 if (d['left'] == 0) {
                     $('.app-thanksbu').removeClass("app-thanksbu2");
                     $('.app-thanksbu').addClass("app-thanksbu1");
@@ -516,12 +517,13 @@ wlb.ready({
                 'action': 'GET_REWARD',
                 'activity': "thanks_given",
                 'level': "5000+"
-            }, function () {
-                if (change['ret_code'] != 1000) {
-                    for (var k = 0, len2 = change['phone'].length; k < len2; k++) {
-                        var tel = change['phone'][k].substring(0, 3) + "******" + change['phone'][k].substring(9, 11);
+            }, function (date) {
+                $('#log1').html(JSON.stringify(date))
+                if (date['ret_code'] != 1000) {
+                    for (var k = 0, len2 = date['phone'].length; k < len2; k++) {
+                        var tel = date['phone'][k].substring(0, 3) + "******" + date['phone'][k].substring(9, 11);
 
-                        str += '<p>恭喜' + tel + '获得<span>' + change['rewards'][k] + '</span></p>';
+                        str += '<p>恭喜' + tel + '获得<span>' + date['rewards'][k] + '</span></p>';
                         //console.log(str);
                     }
 

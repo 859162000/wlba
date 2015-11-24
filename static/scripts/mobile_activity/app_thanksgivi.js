@@ -328,34 +328,34 @@ var click = false;
 
 window.onload = function () {
     lottery.init('lottery');
-    $("#lottery .appjiang-button2").click(function (fa) {
-        //if (change['left'] == 0) {
-        //    return;
-        //}
+
+    $("#lottery .appjiang-button2").click(function () {
+        if (click) {
+            return false;
+        } else {
+            click = true;
+        }
         redpack({
             'action': "POINT_AT",
             'activity': "thanks_given",
             'level': "5000+"
-        }, function (data) {
-            if (data['left'] == 0) {
+        }, function (dd) {
+             $('#ff').html(JSON.stringify(dd))
+            if (change['left'] == 0) {
                 $('.appjiang-button').removeClass("appjiang-button2");
                 $('.appjiang-button').addClass("appjiang-button1");
                 $('.appprize-mingdan .appjiang-ri p').html('您没有抽奖机会');
-                if (data['reward'] == null) {
+                if (change['reward'] == null) {
                     return;
                 }
             } else {
-                $('.appprize-mingdan .appjiang-ri p span').text(data['left']);
+                $('.appprize-mingdan .appjiang-ri p span').text(change['left']);
             }
-            if (click) {
-                return false;
-            } else {
-                lottery.speed = 100;
-                roll();
-                click = true;
-                //alert(4);
-                return false;
-            }
+
+            lottery.speed = 100;
+
+            roll();
+
 
         })
     });
