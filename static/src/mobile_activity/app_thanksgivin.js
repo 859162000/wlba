@@ -178,7 +178,6 @@ wlb.ready({
                         lottery.speed = 40;
                     }
                     ;
-                    //console.log(lottery.times + '^^^^^^' + lottery.speed + '^^^^^^^' + lottery.prize);
                     lottery.timer = setTimeout(roll, lottery.speed);
                 }
                 return false;
@@ -236,6 +235,7 @@ wlb.ready({
 
                         $('.app-thanksbu').addClass("app-thanksbu1");
                         $('.yellow1-main .appjiang-ri p').html('您没有抽奖机会');
+                        $('.apphongxi').hide();
                         if (data['reward'] == null) {
                             return;
                         }
@@ -297,7 +297,6 @@ wlb.ready({
                     var tel = date['phone'][k].substring(0, 3) + "******" + date['phone'][k].substring(9, 11);
 
                     str += '<p>恭喜' + tel + '获得<span>' + date['rewards'][k] + '</span></p>';
-                    //console.log(str);
                 }
 
 
@@ -332,22 +331,16 @@ wlb.ready({
                     success: function (data) {
                         change = data;
                         callback && callback(data);
-                        //console.log(change['rewards'] , "asd");
-                        //$('.shuju').text((change['rewards'] ? change['rewards'].join("") : "" )+"1111");
-                        //$('.shuju').html(JSON.stringify(change))
 
 
                     }
                 })
             }
 
-            // }
-
-
         })
 
     },
     other: function () {
-        console.log(2)
+
     }
 })
