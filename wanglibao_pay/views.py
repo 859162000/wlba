@@ -212,7 +212,11 @@ class YeeProxyPayCompleteView(TemplateView):
     def _process(self, request):
         try:
             request_ip = get_client_ip(request)
-            pay_message = YeeProxyPayCallbackMessage().parse_message(request.GET, request_ip)
+            if request.method == 'GET':
+                message_dict = request.GET
+            elif request.method == 'POST':
+                message_dict = request.POST
+            pay_message = YeeProxyPayCallbackMessage().parse_message(message_dict, request_ip)
             result = YeeProxyPay().proxy_pay_callback(pay_message, request)
             amount = pay_message.amount
         except ThirdPayError, e:
