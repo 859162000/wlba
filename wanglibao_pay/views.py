@@ -225,7 +225,7 @@ class YeeProxyPayCompleteView(TemplateView):
             amount = 0
         return result, amount
 
-    @login_required(login_url='/accounts/login')
+    @method_decorator(login_required(login_url='/accounts/login'))
     def get(self, request, *args, **kwargs):
         # result = HuifuPay.handle_pay_result(request)
         # amount = request.POST.get('OrdAmt', '')
