@@ -219,8 +219,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 })();
 ;var version = navigator.userAgent
 var index1 = version.indexOf("wlbAPP/");
-$('#fff').html(index1)
-
 if (index1 === -1) {
     $('.appjiang-button').addClass("appjiang-button1")
     $('.appprize-mingdan .appjiang-ri p,.yellow1-main .appjiang-ri p').html('升级APP即可抽奖，或前往网利宝官方网站');
