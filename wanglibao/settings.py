@@ -708,6 +708,9 @@ if ENV == ENV_PRODUCTION:
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
+    YEE_PROXY_PAY_MER_ID = '10012413099'
+    YEE_PROXY_PAY_KEY = '418oFDp0384T5p236690c27Qp0893s8RZSG09VLy06A218ZCIi674V0h77M8'
+
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
@@ -756,6 +759,9 @@ elif ENV == ENV_PREPRODUCTION:
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
+    YEE_PROXY_PAY_MER_ID = '10012413099'
+    YEE_PROXY_PAY_KEY = '418oFDp0384T5p236690c27Qp0893s8RZSG09VLy06A218ZCIi674V0h77M8'
+
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
@@ -789,6 +795,7 @@ else:
     STATIC_FILE_HOST = 'https://staging.wanglibao.com'
     # MER_ID = '510743'
     # CUSTOM_ID = '000010124821'
+    # huifu id 改为和生产相同
     MER_ID = '872724'
     CUSTOM_ID = '000007522683'
     SIGN_HOST = '127.0.0.1'
@@ -799,6 +806,7 @@ else:
     HUI_SHORT_OPER_ID = "bjwl"
     HUI_SHORT_LOGIN_PWD = "cathy123"
     # PAY_URL = 'http://test.chinapnr.com'
+    # huifu pay url改为和生产相同
     PAY_URL = 'https://mas.chinapnr.com'
     HUI_SHORT_BIND_URL = "%s/gar/entry.do" % PAY_URL
     HUI_SHORT_DEBIND_URL = "%s/gar/entry.do" % PAY_URL
