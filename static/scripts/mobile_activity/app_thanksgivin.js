@@ -217,13 +217,23 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;var login = false;
+;var version = navigator.userAgent
+var index1 = version.indexOf("wlbAPP/");
+$('#fff').html(index1)
+
+if (index1 === -1) {
+    $('.appjiang-button').addClass("appjiang-button1")
+    $('.appprize-mingdan .appjiang-ri p,.yellow1-main .appjiang-ri p').html('升级APP即可抽奖，或前往网利宝官方网站');
+    $('.appprize-mingdan .appjiang-ri .jiang-a,.yellow1-main .appjiang-ri .jiang-a').hide();
+    $('.app-thanks').hide();
+    $('.app-thanksbu').addClass("app-thanksbu1")
+    $('.app-thanks01').show().html('理财专区即可投资');
+}
+
+var login = false;
 //$('.appjiang-button').html(123)
 wlb.ready({
     app: function (mixins) {
-        if(navigator.userAgent){
-
-        }
         $('.appprize-mingdan .appjiang-ri .jiang-a,.app-thanks,.yellow1-main .appjiang-ri .jiang-a').click(function () {
             mixins.jumpToManageMoney();
         })
