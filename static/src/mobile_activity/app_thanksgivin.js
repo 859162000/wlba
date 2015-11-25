@@ -2,6 +2,9 @@ var login = false;
 //$('.appjiang-button').html(123)
 wlb.ready({
     app: function (mixins) {
+        if(navigator.userAgent){
+
+        }
         $('.appprize-mingdan .appjiang-ri .jiang-a,.app-thanks,.yellow1-main .appjiang-ri .jiang-a').click(function () {
             mixins.jumpToManageMoney();
         })
