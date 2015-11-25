@@ -233,11 +233,11 @@ def _user_amortization_list(user_amortizations):
                 status = u'已回款'
         else:
             status = u'待回款'
-        product = P2PProduct.objects.filter(id=amo.product_amortization.product.id).values('name').first()
         amo_list.append({
             'user_amortization_id': amo.id,
             'product_amortization_id': amo.product_amortization.id,
-            'product_name': product.get('name'),
+            'product_id': amo.product_amortization.product.id,
+            'product_name': amo.product_amortization.product.name,
             'term': amo.term,
             'term_total': amo.terms,
             'term_date': amo.term_date,
