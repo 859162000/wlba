@@ -119,7 +119,7 @@ class PcActivityShowHomeView(TemplateView):
         activity_show_list.extend(activity_shows)
 
         pagesize = self.request.GET.get('pagesize', 10)
-        page = self.request.GET.get('page')
+        page = self.request.GET.get('page', 1)
         page = int(page)
         pagesize = int(pagesize)
         paginator = Paginator(activity_show_list, pagesize)
