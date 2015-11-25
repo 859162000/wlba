@@ -47,22 +47,24 @@ class GetMarginInfo(APIView):
 class SendInsideMessage(APIView):
     """
     author: Zhoudong
-    http请求方式: GET  根据用户ID 得到用户可用余额。
-    http://xxxxxx.com/php/margin/?user_id=11111
+    http请求方式: POST  发送站内信。
+    http://xxxxxx.com/php/send_message/
     返回数据格式：json
     :return:
     """
     permission_classes = ()
 
-    def get(self, request):
+    def post(self, request):
         user_id = self.request.POST.get('userId')
-        msg_type = self.request.POST.get('msgType')
+        # useless argument.
+        # msg_type = self.request.POST.get('msgType')
+        title = self.request.POST.get('title')
         content = self.request.POST.get('content')
 
         try:
             inside_message.send_one.apply_async(kwargs={
                 "user_id": user_id,
-                "title": msg_type,
+                "title": title,
                 "content": content,
                 "mtype": "activity"
             })
@@ -76,24 +78,24 @@ class SendInsideMessage(APIView):
 class CheckTradePassword(APIView):
     """
     author: Zhoudong
-    http请求方式: GET  根据用户ID 得到用户可用余额。
-    http://xxxxxx.com/php/margin/?user_id=11111
+    http请求方式: POST  检查交易密码。
+    http://xxxxxx.com/php/trade_password/
     返回数据格式：json
     :return:
     """
     permission_classes = ()
 
-    def get(self, request):
+    def post(self, request):
         user_id = self.request.POST.get('userId')
         trade_password = self.request.POST.get('password')
 
         try:
-            user = User.objects.get(pk=user_id)
+            user = User.objects.get(id=user_id)
             if trade_password == user.wanglibaouserprofile.trade_pwd:
                 ret = {'status': 1, 'message': 'Succeed'}
             else:
                 ret = {'status': 0, 'message': 'password error!'}
         except Exception, e:
-            ret = {'status': 0, 'message': e}
+            ret = {'status': 0, 'message': str(e)}
 
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
