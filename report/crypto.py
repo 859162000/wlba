@@ -4,6 +4,7 @@ from Crypto.Cipher import AES
 from M2Crypto import RSA,BIO,EVP
 import binascii
 from wanglibao import settings
+import hashlib
 
 class Rsa(object):
 
@@ -58,6 +59,33 @@ class Aes(object):
         plain_text = cryptor.decrypt(text)
         return plain_text.rstrip("\0")
 
+class AesForApp(object):
+    # the block size for the cipher object; must be 16, 24, or 32 for AES
+    def __init__(self, key, padding):
+        self.cipher = AES.new(key)
+        self.padding = padding
+
+    def pad(self, content):
+        bs = AES.block_size
+        # one-liner to sufficiently pad the text to be encrypted
+        pad = lambda s: s + (bs - len(s) % bs) * chr(self.padding)
+        return pad(content)
+
+    # one-liners to encrypt/encode and decrypt/decode a string
+    # encrypt with AES, encode with base64
+    def encrypt(self, content):
+        EncodeAES = lambda c, s: base64.b64encode(c.encrypt(self.pad(s)))
+        return EncodeAES(self.cipher, content)
+
+    def decrypt(self, content_encoded):
+        DecodeAES = lambda c, e: c.decrypt(base64.b64decode(e)).rstrip(chr(self.padding))
+        return DecodeAES(self.cipher, content_encoded)
+
+
+
+def getAppSecretKey(token):
+    return (hashlib.md5(token[:5]).hexdigest()[:16]).lower()
+
 
 class ReportCrypto(object):
     @classmethod
@@ -82,3 +110,5 @@ class ReportCrypto(object):
         print(decrypt_key)
         decrypt_text = ase.decrypt(decrypt_key, all_text)
         print(decrypt_text)
+
+
