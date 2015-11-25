@@ -14,7 +14,7 @@ html
       img(src='/static/imgs/pc_activity/thanksgiving/guanbibutton.png').imgx
       .huodejiang
         p(style='font-size: 16px')
-          |恭喜您！获得
+          | 恭喜您！获得
           span#app-jiangli
     .thanksgiving
       .banner#banner
@@ -76,9 +76,9 @@ html
                     .prize-ri
                       if user.is_authenticated
                         p
-                         |你还有
-                         span.app-jihui 1
-                         |次抽奖机会
+                          | 你还有
+                          span.app-jihui
+                          | 次抽奖机会
                       else
                         p
                       if user.is_authenticated
@@ -106,7 +106,7 @@ html
                     .active1
 
           p.prize-title1
-            |说明：新老用户均可参与，虚拟奖品抽完立即发放。立即
+            | 说明：新老用户均可参与，虚拟奖品抽完立即发放。立即
             a(href='javascript:void(0);').title1-a 查看加息券和红包规则>>
           .title1-guizhe
             h6 【加息券和红包规则】
@@ -145,7 +145,7 @@ html
               p 365谷五常大米
           a(href='/p2p/list/', target="_blank").thanks.thanks1 立即投资
           p.investment-title1
-            |说明：在活动结束后7个工作日内会有客服人员与您联系，奖品展示图片仅作参考，实际款式以通知为准。所有实物奖品均会在12月15日前发放完毕。立即
+            | 说明：在活动结束后7个工作日内会有客服人员与您联系，奖品展示图片仅作参考，实际款式以通知为准。所有实物奖品均会在12月15日前发放完毕。立即
             a(href='javascript:void(0);').title1-a 查看加息券和红包规则>>
           .title1-guizhe1
             h6 【加息券和红包规则】
@@ -187,16 +187,16 @@ html
           .prize-ri1
             if user.is_authenticated
               p
-                |你还有
+                | 你还有
                 span
-                |次抽奖机会
+                | 次抽奖机会
             else
               p
           if user.is_authenticated
             a(href='javascript:void(0);').thanks.thanks2 领取奖品
               .hongxi
                 h5
-                  |恭喜您！获得
+                  | 恭喜您！获得
                   span#thankgi-thanks2
           else
             a(href='/accounts/login/?next=/activity/thanksgiving/').thanks.thanks1 领取奖品
@@ -215,7 +215,7 @@ html
             li 2、感恩节活动期间，新老用户不限渠道均可参与活动，单笔投资5000元即可获得大富翁转盘抽奖一次，多抽多送上不封顶；
             li 3、用户需在用户中心里完善收货信息，中得实物奖品的用户，在活动结束后7个工作日内会有客服MM与您联系，
               br
-              |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15个工作日内完成奖品发放，请保持手机畅通；
+              | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15个工作日内完成奖品发放，请保持手机畅通；
             li 4、所有奖品不兑换现金，不可替换。中得优惠券得用户，使用方法请登录品牌官网联系查询；
             li 5、活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
             li 6、网利宝对此活动享有最终解释权。
@@ -223,11 +223,11 @@ html
       include global/g_footer
       include include/tracking
       .xl-backtop(style="z-index:99")
-          span.seven-com.seven-ten
-          .backtop.sev-backtop 回到顶部
-          img(src="/static/imgs/pc_activity/xunlei/seven/sev_weixin.png")#xl-weixin
-          a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank")
-            img(src="/static/imgs/pc_activity/xunlei/seven/sev_qq.png",style="margin-top:10px")#xl-qq
-          .erweima
+        span.seven-com.seven-ten
+        .backtop.sev-backtop 回到顶部
+        img(src="/static/imgs/pc_activity/xunlei/seven/sev_weixin.png")#xl-weixin
+        a(href="http://wpa.b.qq.com/cgi/wpa.php?ln=1&key=XzkzODAxODg4N18yMDU1NjlfNDAwODU4ODA2Nl8yXw" target="_blank")
+          img(src="/static/imgs/pc_activity/xunlei/seven/sev_qq.png",style="margin-top:10px")#xl-qq
+        .erweima
   script.
-      require(['/static/js/thanksgiving.js?v=201577523'])
+    require(['/static/js/thanksgiving.js?v=201577523'])

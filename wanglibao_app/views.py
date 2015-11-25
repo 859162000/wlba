@@ -187,9 +187,13 @@ class AppRepaymentPlanMonthAPIView(APIView):
         request_month = request.DATA.get('month', '')
         year = request_year if request_year else now.year
         month = request_month if request_month else now.month
+        current_month = '{}-{}'.format(now.year, now.month)
 
         start = local_to_utc(datetime(int(year), int(month), 1), 'min')
-        end = local_to_utc(datetime(int(year), int(month) + 1, 1) - timedelta(days=1), 'max')
+        if int(month) == 12:
+            end = local_to_utc(datetime(int(year) + 1, 1, 1) - timedelta(days=1), 'max')
+        else:
+            end = local_to_utc(datetime(int(year), int(month) + 1, 1) - timedelta(days=1), 'max')
 
         # 月份/月还款金额/月还款期数
         if request_year and request_month:
@@ -216,7 +220,7 @@ class AppRepaymentPlanMonthAPIView(APIView):
         else:
             amo_list = []
 
-        return Response({'ret_code': 0, 'data': amo_list, 'month_group': month_group})
+        return Response({'ret_code': 0, 'data': amo_list, 'month_group': month_group, 'current_month': current_month})
 
 
 def _user_amortization_list(user_amortizations):
@@ -229,11 +233,11 @@ def _user_amortization_list(user_amortizations):
                 status = u'已回款'
         else:
             status = u'待回款'
-        product = P2PProduct.objects.filter(id=amo.product_amortization.product.id).values('name').first()
         amo_list.append({
             'user_amortization_id': amo.id,
             'product_amortization_id': amo.product_amortization.id,
-            'product_name': product.get('name'),
+            'product_id': amo.product_amortization.product.id,
+            'product_name': amo.product_amortization.product.name,
             'term': amo.term,
             'term_total': amo.terms,
             'term_date': amo.term_date,

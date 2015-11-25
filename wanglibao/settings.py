@@ -708,7 +708,7 @@ if ENV == ENV_PRODUCTION:
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
-    YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete'
+    YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete/'
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
@@ -757,7 +757,7 @@ elif ENV == ENV_PREPRODUCTION:
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
-    YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete'
+    YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete/'
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
@@ -807,7 +807,7 @@ else:
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'http://test.chinapnr.com/buser'
 
-    YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete'
+    YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete/'
     YEE_PROXY_PAY_MER_ID = '10001126856'
     YEE_PROXY_PAY_KEY = '69cl522AV6q613Ii4W6u8K6XuW8vM1N6bFgyv769220IuYe9u37N4y7rI4Pl'
     YEE_PAY_URL = "http://mobiletest.yeepay.com/paymobile/api/pay/request"
@@ -1105,6 +1105,11 @@ XUNLEIVIP_REGISTER_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coo
 XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
 XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
 XUNLEI9_ACTIVITY_PAGE = 'marketing_xunlei_setp'
+
+# 脉脉
+MAIMAI1_CHANNEL_CODE = 'maimai1'
+MAIMAI1_ACTIVITY_PAGE = 'maimai_index'
+MAIMAI_CALL_BACK_URL = 'https://maimai.cn/hb_pingback'
 
 
 # 对第三方回调做IP鉴权所信任的IP列表

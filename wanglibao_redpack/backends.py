@@ -100,7 +100,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                                     if event_period > product_period:
                                         continue
                                 else:
-                                    if event_period < pay_method * 30:
+                                    if event_period > pay_method * 30:
                                         continue
                     if event.p2p_types:
                         p2p_types_id = int(event.p2p_types.id)
@@ -166,7 +166,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                                         if event_period > product_period:
                                             continue
                                     else:
-                                        if event_period < pay_method * 30:
+                                        if event_period > pay_method * 30:
                                             continue
 
                     if event.p2p_types:
