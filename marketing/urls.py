@@ -179,5 +179,5 @@ urlpatterns += patterns(
 
 urlpatterns += patterns(
     '',
-    url(r'^list/$', ActivityListPC.as_view()),
+    url(r'^list/$', PcActivityShowHomeView.as_view()),
 )
