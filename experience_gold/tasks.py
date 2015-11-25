@@ -17,16 +17,15 @@ logger = logging.getLogger(__name__)
 def experience_repayment_plan():
     """
     体验标还款计划结算任务
-    每天下午16:40分开始执行
-    自动将前一天16:40到当天16:40之间所有该结算的计划进行统一结算
+    每天下午17:00分开始执行
+    自动将当天17:00之间所有未结算的计划进行统一结算
     结算的利息自动计入用户的资金账户余额
     """
     print(u"Getting experience gold repayment plan to start!")
     now = datetime.now()
-    start = local_to_utc(datetime(now.year, now.month, now.day - 1, 17, 0, 0), 'normal')
+    # start = local_to_utc(datetime(now.year, now.month, now.day - 1, 17, 0, 0), 'normal')
     end = local_to_utc(datetime(now.year, now.month, now.day, 17, 0, 0), 'normal')
-    amortizations = ExperienceAmortization.objects.filter(settled=False)\
-        .filter(term_date__gt=start, term_date__lte=end)
+    amortizations = ExperienceAmortization.objects.filter(settled=False).filter(term_date__lt=end)
     for amo in amortizations:
         if amo.interest <= 0:
             continue
