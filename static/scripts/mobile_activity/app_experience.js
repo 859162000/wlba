@@ -312,6 +312,8 @@ org.experience = (function(org){
                         $('.investBtnEd').removeClass('investBtnEd').addClass('investBtn');
                         $('.receive_box').find('img').hide();
                         $('.receive_box').find('#edT').show().text('已领取体验金'+ data.data.amount +'元')
+                    }else{
+                      org.ui.alert('', '', '4')
                     }
                 },
                 error: function () {
