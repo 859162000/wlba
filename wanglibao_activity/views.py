@@ -145,7 +145,7 @@ class ActivityListPC(APIView):
         return ['GET']
 
     def get(self, request):
-        template_name = ''
+        template_name = 'include/ajax/area_ajax.jade'
 
         activity_shows = ActivityShow.objects.filter(link_is_hide=False,
                                                      is_pc=True,
