@@ -409,7 +409,6 @@ class ActivityShow(models.Model):
 
     def activity_status(self):
         now = timezone.now()
-
         if self.activity.start_at > now:
             return u'未开始'
         elif now > self.activity.end_at:
