@@ -134,7 +134,6 @@ INSTALLED_APPS = (
     'file_storage',
     'wanglibao_lottery',
     'daterange_filter',
-    'experience_gold',
 )
 
 MIDDLEWARE_CLASSES = (
