@@ -670,7 +670,7 @@ CELERYBEAT_SCHEDULE = {
     },
     # 每天下午17点半开始处理体验金的还款
     'experience_repayment_plan': {
-        'task': 'experience_gold.backends.experience_repayment_plan',
+        'task': 'experience_gold.tasks.experience_repayment_plan',
         'schedule': timedelta(minutes=5),
     },
     # # by Zhoudong 定期检查用户优惠券没使用,发送提醒
