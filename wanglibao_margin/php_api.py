@@ -87,7 +87,7 @@ class CheckTradePassword(APIView):
 
     def post(self, request):
         user_id = self.request.POST.get('userId')
-        trade_password = self.request.POST.get('password')
+        trade_password = self.request.POST.get('pwd')
 
         try:
             user = User.objects.get(id=user_id)
