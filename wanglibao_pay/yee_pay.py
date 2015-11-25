@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # encoding:utf-8
-
+import hmac
 import urllib
 import logging
 import time
@@ -14,6 +14,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_pay import util
+from wanglibao_pay.exceptions import ThirdPayError
 from wanglibao_pay.models import PayInfo, PayResult, Bank, Card
 from order.utils import OrderHelper
 from order.models import Order
@@ -27,13 +28,16 @@ from Crypto.Hash import SHA
 from Crypto.Signature import PKCS1_v1_5 as pk
 from Crypto.Cipher import PKCS1_v1_5, AES
 import base64
+from wanglibao_pay.pay import PayOrder, PayMessage
 from wanglibao_rest.utils import split_ua
 # from wanglibao_account.cooperation import CoopRegister
 
 logger = logging.getLogger(__name__)
 
-
 class YeePay:
+    """
+    旧的手机支付接口，wap支付，跳转到yeepay的wap页面
+    """
     FEE = 0
 
     def __init__(self):
