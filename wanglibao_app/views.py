@@ -45,7 +45,7 @@ from wanglibao_app.questions import question_list
 from wanglibao_margin.models import MarginRecord
 from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityShow
-from django.core.paginator import Paginator, PageNotAnInteger
+from wanglibao_activity.utils import get_queryset_paginator
 
 logger = logging.getLogger(__name__)
 
@@ -775,26 +775,31 @@ class AppActivityShowHomeView(TemplateView):
     def get_context_data(self, **kwargs):
 
         activity_shows = ActivityShow.objects.filter(link_is_hide=False,
+                                                     is_app=True,
                                                      start_at__lte=timezone.now(),
-                                                     end_at__gt=timezone.now()).order_by('-activity__priority')
+                                                     end_at__gt=timezone.now()
+                                                     ).select_related('activity').\
+                                                     order_by('-activity__priority')
 
         activity_show_list = []
         activity_show_list.extend(activity_shows)
 
-        page = self.request.GET.get('page')
+        page = self.request.GET.get('page', 1)
         pagesize = self.request.GET.get('pagesize', 5)
         page = int(page)
         pagesize = int(pagesize)
-        paginator = Paginator(activity_show_list, pagesize)
 
-        try:
-            activity_show_list = paginator.page(page)
-        except PageNotAnInteger:
-            activity_show_list = paginator.page(1)
-        except Exception:
-            activity_show_list = paginator.page(paginator.num_pages)
+        activity_main = get_queryset_paginator(activity_shows.filter(banner_pos='main'),
+                                               page, pagesize)
+
+        activity_left = get_queryset_paginator(activity_shows.filter(banner_pos='second_left'),
+                                               page, pagesize)
+
+        activity_right = get_queryset_paginator(activity_shows.filter(banner_pos='second_right'),
+                                                page, pagesize)
 
         return {
-            'activitys': activity_show_list
+            'activity_main': activity_main,
+            'activity_left': activity_left,
+            'activity_right': activity_right,
         }
-
