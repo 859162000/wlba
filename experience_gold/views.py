@@ -24,13 +24,14 @@ class ExperienceGoldView(TemplateView):
         else:
             template_name = "experience_gold.jade"
 
-        device_list = ['android', 'iphone']
-        user_agent = self.request.META['HTTP_USER_AGENT']
-        for device in device_list:
-            match = re.search(device, user_agent.lower())
-            if match and match.group():
-                template_name = 'app_experience.jade'
-                break
+        if template_name == 'experience_gold.jade':
+            device_list = ['android', 'iphone']
+            user_agent = self.request.META['HTTP_USER_AGENT']
+            for device in device_list:
+                match = re.search(device, user_agent.lower())
+                if match and match.group():
+                    template_name = 'app_experience.jade'
+                    break
 
         return template_name
 

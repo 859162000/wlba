@@ -68,7 +68,7 @@ class BankListView(TemplateView):
 
         context.update({
             'default_bank': default_bank,
-            'banks': Bank.get_deposit_banks()[:10],
+            'banks': Bank.get_deposit_banks()[:14],
             'announcements': AnnouncementAccounts
         })
         return context
@@ -225,7 +225,7 @@ class YeeProxyPayCompleteView(TemplateView):
             amount = 0
         return result, amount
 
-    @login_required(login_url='/accounts/login')
+    @method_decorator(login_required(login_url='/accounts/login'))
     def get(self, request, *args, **kwargs):
         # result = HuifuPay.handle_pay_result(request)
         # amount = request.POST.get('OrdAmt', '')

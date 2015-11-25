@@ -44,6 +44,8 @@ from wanglibao_account.forms import verify_captcha
 from wanglibao_app.questions import question_list
 from wanglibao_margin.models import MarginRecord
 from wanglibao_rest import utils
+from wanglibao_activity.models import ActivityShow
+from django.core.paginator import Paginator, PageNotAnInteger
 
 logger = logging.getLogger(__name__)
 
@@ -767,4 +769,32 @@ class AppAreaView(TemplateView):
     template_name = 'client_area.jade'
 
 
+class AppActivityShowHomeView(TemplateView):
+    template_name = 'client_area.jade'
+
+    def get_context_data(self, **kwargs):
+
+        activity_shows = ActivityShow.objects.filter(link_is_hide=False,
+                                                     start_at__lte=timezone.now(),
+                                                     end_at__gt=timezone.now()).order_by('-activity__priority')
+
+        activity_show_list = []
+        activity_show_list.extend(activity_shows)
+
+        page = self.request.GET.get('page')
+        pagesize = self.request.GET.get('pagesize', 5)
+        page = int(page)
+        pagesize = int(pagesize)
+        paginator = Paginator(activity_show_list, pagesize)
+
+        try:
+            activity_show_list = paginator.page(page)
+        except PageNotAnInteger:
+            activity_show_list = paginator.page(1)
+        except Exception:
+            activity_show_list = paginator.page(paginator.num_pages)
+
+        return {
+            'activitys': activity_show_list
+        }
 
