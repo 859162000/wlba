@@ -1,10 +1,10 @@
 # encoding: utf-8
 
 from django.views.generic import TemplateView
-from django.template import Template, Context
 from django.utils import timezone
 from django.db.models import Sum
-from decimal import Decimal
+from django.http import HttpResponseRedirect
+import re
 
 from wanglibao_p2p.models import P2PRecord
 
@@ -23,6 +23,14 @@ class ExperienceGoldView(TemplateView):
             template_name = 'experience_account.jade'
         else:
             template_name = "experience_gold.jade"
+
+        device_list = ['android', 'iphone']
+        user_agent = self.request.META['HTTP_USER_AGENT']
+        for device in device_list:
+            match = re.search(device, user_agent.lower())
+            if match and match.group():
+                template_name = 'app_experience.jade'
+                break
 
         return template_name
 
