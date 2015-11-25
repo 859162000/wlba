@@ -420,7 +420,6 @@ class ActivityShow(models.Model):
         elif self.activity.end_at - now > timedelta(days=7):
             return u'进行中'
 
-
     activity_status.short_description = u'活动状态'
     activity_status.allow_tags = True
 
