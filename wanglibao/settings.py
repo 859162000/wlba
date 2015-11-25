@@ -867,7 +867,9 @@ DEBUG_TOOLBAR_CONFIG = {
 
 USE_L10N = False
 DATETIME_FORMAT = 'Y-m-d H:i:s'
-ADMIN_ADDRESS = 'AK7WtEQ4Q9KPs8Io_zOncw'
+# Modify by hb on 2015-11-25
+#ADMIN_ADDRESS = 'AK7WtEQ4Q9KPs8Io_zOncw'
+ADMIN_ADDRESS = 'PK7wlbQ4Q9KPs9Io_zOpac'
 # DATE_FORMAT='Y-m-d'
 
 # AUTH_PROFILE_MODULE = 'wanglibao_profile.WanglibaoUserProfile'
