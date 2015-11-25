@@ -56,13 +56,15 @@ class SendInsideMessage(APIView):
 
     def get(self, request):
         user_id = self.request.POST.get('userId')
-        msg_type = self.request.POST.get('msgType')
+        # useless argument.
+        # msg_type = self.request.POST.get('msgType')
+        title = self.request.POST.get('title')
         content = self.request.POST.get('content')
 
         try:
             inside_message.send_one.apply_async(kwargs={
                 "user_id": user_id,
-                "title": msg_type,
+                "title": title,
                 "content": content,
                 "mtype": "activity"
             })

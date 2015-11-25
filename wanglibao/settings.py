@@ -1108,6 +1108,11 @@ XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
 XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
 XUNLEI9_ACTIVITY_PAGE = 'marketing_xunlei_setp'
 
+# 脉脉
+MAIMAI1_CHANNEL_CODE = 'maimai1'
+MAIMAI1_ACTIVITY_PAGE = 'maimai_index'
+MAIMAI_CALL_BACK_URL = 'https://maimai.cn/hb_pingback'
+
 
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
