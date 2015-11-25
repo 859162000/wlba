@@ -30,11 +30,18 @@ class Bank(models.Model):
 
     #last_update = models.DateTimeField(u'更新时间', auto_now=True, null=True)
 
-    channel = models.CharField(u'支付通道', max_length=20, blank=True, null=True, choices=(
+    channel = models.CharField(u'手机支付通道', max_length=20, blank=True, null=True, choices=(
         ("huifu", "Huifu"),
         ("yeepay", "Yeepay"),
         ("kuaipay", "Kuaipay")
     ))
+
+    pc_channel = models.CharField(u'pc支付通道', max_length=20, default='huifu', blank=False, null=False, choices=(
+        ("huifu", "Huifu"),
+        ("yeepay", "Yeepay"),
+        ("kuaipay", "Kuaipay")
+    ))
+
 
     class Meta:
         ordering = '-sort_order',
@@ -116,6 +123,7 @@ class PayInfo(models.Model):
     bank = models.ForeignKey(Bank, blank=True, null=True, on_delete=models.PROTECT, verbose_name=u'银行')
     account_name = models.CharField(u'姓名', max_length=12, blank=True, null=True)
     card_no = models.CharField(u'卡号', max_length=25, blank=True, null=True)
+    phone_for_card = models.CharField(u'预留手机号', max_length=25, blank=True, null=False, default='')
     channel = models.CharField(u'支付通道', max_length=20, blank=True, null=True, choices=(
         ("huifu", "Huifu"), #汇付网银
         ("huifu_bind", "Huifu_bind"), #汇付快捷

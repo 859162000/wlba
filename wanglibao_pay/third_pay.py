@@ -548,7 +548,6 @@ def bind_pay_dynnum(request):
         except:
             logger.exception('bind_card_callback_failed for %s' % str(user))
 
-
     return res
 
 
