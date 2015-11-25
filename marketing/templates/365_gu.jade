@@ -1,0 +1,207 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    link(rel="stylesheet",href="/static/stylesheets/365_gu.css?v=201511121")
+  body(style="background:#ffeec3")
+    //include global/g_nav
+    .g-nav-warp
+      .g-nav
+        a(href="/").g-logo-box
+          img(src="/static/imgs/pc/logo/logo_80.jpg", alt='logo', class='logo_l')
+          img(src="/static/imgs/pc/logo/logo_60.jpg", alt='logo', class='logo_s')
+        .g-user-warp
+          .g-user
+            if activeItem == "我的账户"
+              myacount = 'highlight'
+            a(href="/accounts/home", class='{{myacount}}').user-nav
+              i.icon.iconfont.icon-user
+              span.user-text 我的账户
+              i.icon.iconfont.icon-down
+            ul.g-nav-user-nav
+              mixin liItem(url, text)
+                li
+                  a(href=url)=text
+              +liItem('/pay/banks/', '我要充值')
+              +liItem('/pay/withdraw/', '我要提现')
+              +liItem('/accounts/auto_tender/', '自动投标')
+              +liItem('/accounts/transaction/p2p/', '交易记录')
+              if user.is_authenticated
+                li
+                  a(href='/accounts/logout?next=/activity/365_gu/?promo_token=365gu') 退出
+        .g-nav-box
+          mixin nav-item(name, link)
+            if activeItem == name
+                a.highlight(href=link)= name
+            else
+                a(href=link)= name
+          +nav-item('首页', '/')
+          +nav-item('理财专区', '/p2p/list/')
+          +nav-item('贷款专区', '/finance/')
+          +nav-item('安全保障', '/security')
+          +nav-item('帮助中心', '/help')
+
+    .banner
+      .main
+        .box
+          dl
+            dt 110元
+            dd 365谷代金券礼包
+          img.logo_img(src="/static/imgs/pc_activity/365_gu/registered_img.png")
+          .button#button
+    .wrap_main
+      img.modular_title.modular_title_1(src="/static/imgs/pc_activity/365_gu/module_1.png")
+      .act_wrap
+        .box.box_1
+          .title_top.title_top_1 惊喜一：注册送
+          .main
+            .title 用户注册网利宝送
+            .goods_wrap
+              .goods.goods_left
+                img(src="/static/imgs/pc_activity/365_gu/goods_1.jpg")
+                p 0.5千克<br>五常大米
+              img.add_ico(src="/static/imgs/pc_activity/365_gu/add_ico.png")
+              .goods.goods_right
+                img(src="/static/imgs/pc_activity/365_gu/goods_2.jpg")
+                p 110元365谷<br>代金券礼包
+        .box.box_2
+          .title_top.title_top_2 惊喜二：首投送
+          .main
+            .title 用户投资 ≥500元送
+            .goods_wrap
+              .goods.goods_left
+                img(src="/static/imgs/pc_activity/365_gu/goods_3.jpg")
+                p 4.5千克<br>五常长粒香米
+              img.add_ico(src="/static/imgs/pc_activity/365_gu/add_ico.png")
+              .goods.goods_right
+                img(src="/static/imgs/pc_activity/365_gu/goods_4.jpg")
+                p 210元365谷<br>代金券礼包
+        .box.box_3
+          .title_top.title_top_3 惊喜三：新用户专享
+          .main
+            .title 新用户最高可享有
+            .goods_wrap
+              img(src="/static/imgs/pc_activity/365_gu/goods_5.jpg")
+              p 580元网利宝现金红包
+      #button_get
+      img.modular_title.modular_title_2(src="/static/imgs/pc_activity/365_gu/module_2.png")
+      .act_rule
+        p!='<span class="number_1">1.</span> 用户注册网利宝可获赠0.5千克五常大米+ 110元365谷代金券礼包，<br><span class="number_1"></span> 礼包包含80元代金券1张（满359元可用）、20元代金券1张（满119元可用）、5元代金券2张（全场通用）；'
+        p!='<span class="number_1">2.</span> 单笔首次投资大于等于500元送4.5千克五常长粒香米+210元365谷代金券礼包，<br><span class="number_1"></span> 礼包包含80元代金券1张（满359可用）、20元代金券1张（满119元可用）、100元代金券1张（满529元可用）、5元代金券2张（全场通用）；'
+        p!='<span class="number_1">3.</span> 网利宝新用户享580元现金红包：'
+        p!='<span class="number_2"></span><span class="number_3">（1）</span>新手注册送10元红包（单笔投资1000元可抵扣使用）；'
+        p!='<span class="number_2"></span><span class="number_3">（2）</span>新手完成实名认证送20元红包（单笔投资2000元可抵扣使用）；'
+        p!='<span class="number_2"></span><span class="number_3">（3）</span>新手首次充值送50元红包（单笔投资3000元可抵扣使用）；'
+        p!='<span class="number_2"></span><span class="number_3">（4）</span>新手完成首次投资最高送500元红包'
+        .demo
+          .left
+            p 5000元≤首次投资＜20000元，送150元组合红包，包含：
+            p a. 50元，限投3月标，单笔投资满15000元可用；
+            p b. 100元，限投6月标，单笔投资满20000元可用；
+          .right
+            p 20000元≤首次投资，送500元组合红包，包含：
+            p a. 150元，限投3月标，单笔投资满40000元可用；
+            p b. 350元，限投6月标，单笔投资满50000元可用；
+        p!='<span class="number_1">4.</span> 获得五常大米用户请留意网利宝站内信，凭站内信兑换码兑换领取。365谷代金券请查看365谷账户并抵扣使用。'
+        p!='<span class="number_1">5.</span> 网利宝对此活动享有最终解释权'
+        img.modular_title.modular_title_3(src="/static/imgs/pc_activity/365_gu/module_3.png")
+        .introduction_wrap
+          .box
+            img(src="/static/imgs/pc_activity/365_gu/advantage_1.png")
+            dl
+              dt 信赖
+              dd IDG资本投资A轮融资<br>鸿利光电投资B轮融资
+          .box
+            img(src="/static/imgs/pc_activity/365_gu/advantage_2.png")
+            dl
+              dt 安全
+              dd 第三方资金托管<br>阳光保险承保资金安全
+          .box
+            img(src="/static/imgs/pc_activity/365_gu/advantage_3.png")
+            dl
+              dt 权威
+              dd 华尔街精英金融团队<br>IT数据风控系统
+          .box
+            img(src="/static/imgs/pc_activity/365_gu/advantage_4.png")
+            dl
+              dt 高收益
+              dd 30余倍银行活期收益<br>100元起投
+    .popup_bg
+    .register_wrap.popup
+        .close_ico
+        img.logo_img(src="/static/imgs/pc_activity/365_gu/logo.jpg")
+        if user.is_authenticated
+          #ganjiwang-model
+          .banner-form#ganjiwang-welcome
+            .space-vertical-m
+              h1.banner-form--title 欢迎来网利宝投资理财
+              .space-vertical-s
+              p.banner-form--row.font-s 您的登录账户:
+                span {{user|display_name}}
+              .space-vertical-m
+              .banner-form--row.align-center
+                a.banner-form--button(href="/accounts/home",style="color:#fff") 进入我的账户
+        else
+            .denelu-form#denglu
+                #aug-center
+                    .off-form#off-form
+                    form#img-code-form.img-code-form.aut-form(method='post', action='')
+                        .form-row
+                            input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
+                            input#id_captcha_1.captcha.aut-captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
+                            img.captcha.captcha-img(alt="captcha", src="")
+                            button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
+                        .code-img-error.aut-error
+                        .clearfix.tc
+                            span.submit-code-img#submit-code-img1 确定
+                #aug-code
+                h1.biaoyu
+                form#register-modal-form.login-form.dale(method='post', action='')
+                  - csrf_token
+                  .form-row
+                    .form-control-group
+                      .span12
+                        input#reg_identifier.com-tu.tu1(type="text", name="identifier", placeholder="请输入手机号")
+                    .form-row-error
+                  .form-row.voice
+                    .span12-omega.hidden.show
+                      没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
+                    .form-control-group
+                      .span6(style="width:49%")
+                        input#id_validate_code.com-tu.tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+                      .span6-omega
+                        button#button-get-validate-code-modal.button-orange.button-large.huoqu-ma.new-btn(type='button',style="display:none") 获取验证码
+                        button#img-code.button-orange.button-large.huoqu-ma.new-btn(type='button',style="top:-2px;margin-left:5px") 获取验证码
+                    .form-row-error
+                  .form-row
+                    input#reg_password.full-width.com-tu.tu3(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")
+                    .form-row-error
+                  .form-row
+                    input#reg_password2.com-tu.tu3(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
+                    .form-row-error#aug-form-row-eroor
+                  .form-row.form-bottom-bar
+                    .agreement(style="padding:0 0 10px 10px;text-align:left")
+                      label(for="agreement")
+                        input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree",style="position: relative;top: 2px;margin-right: 0px;width: 16px;")
+                      | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
+                      .form-row-error
+                    button#register_submit.button-account.span10.xun-zhuce(type='button')
+                  .space-vertical-s
+                p.xun-p 已有账号,
+                  a(href="/accounts/login/?next=/accounts/home/") 立即登录
+    .popup_bg
+    .get_red.popup
+      img.logo_img(src="/static/imgs/pc_activity/365_gu/logo.jpg")
+      .title_text 恭喜您<br>已成功领取奖励
+      img.code(src="/static/imgs/pc_activity/365_gu/code.jpg")
+      .text 扫码关注微信
+      a.href(href="/accounts/home/?promo_token=365gu") 进入我的账户
+    include global/g_footer
+    script.
+      require(['/static/js/365_gu.js?v=201511131'])
+
+
