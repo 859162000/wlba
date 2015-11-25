@@ -221,7 +221,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 var index1 = version.indexOf("wlbAPP/");
 if (index1 === -1) {
     $('.appjiang-button').addClass("appjiang-button1")
-    $('.appprize-mingdan .appjiang-ri p,.yellow1-main .appjiang-ri p').html('升级APP即可抽奖，或前往网利宝官方网站');
+    $('.appprize-mingdan .appjiang-ri p').html('升级为最新版APP即可抽奖，或前往网利宝官方网站').css('color','#f6d564');
+    $('.yellow1-main .appjiang-ri p').html('升级为最新版APP即可抽奖，或前往网利宝官方网站');
     $('.appprize-mingdan .appjiang-ri .jiang-a,.yellow1-main .appjiang-ri .jiang-a').hide();
     $('.app-thanks').hide();
     $('.app-thanksbu').addClass("app-thanksbu1")
