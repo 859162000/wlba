@@ -35,7 +35,7 @@ block main
               span.big_number {{p2p_total_asset|money_format}}
             p.align-center 理财专区(元)
         .sign-money-card
-          +
+          //+
       else
         .brief--p2p-total-asset
           a(href="/accounts/home/")
@@ -43,18 +43,18 @@ block main
               span.big_number {{p2p_total_asset|money_format}}
             p.align-center 理财专区(元)
         .sign-money-card
-          +
-      if mode == 'p2p'
-        .brief--fund-total-asset
-          a(href="/accounts/home/experience/")
-            p.align-center
-              span.big_number {{experience_account.unpaid_interest}}
-            p.align-center 体验金(元)
-      else
-        .brief--fund-total-asset.active
-          a(href="/accounts/home/experience/")
-            p.align-center
-              span.big_number {{experience_account.unpaid_interest}}
+      //    +
+      //if mode == 'p2p'
+      //  .brief--fund-total-asset
+      //    a(href="/accounts/home/experience/")
+      //      p.align-center
+      //        span.big_number {{experience_account.unpaid_interest}}
+      //      p.align-center 体验金(元)
+      //else
+      //  .brief--fund-total-asset.active
+      //    a(href="/accounts/home/experience/")
+      //      p.align-center
+      //        span.big_number {{experience_account.unpaid_interest}}
             p.align-center 体验金(元)
   if mode == 'p2p'
     .account-home-panel__no-padding
