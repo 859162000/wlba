@@ -24,6 +24,9 @@ from wanglibao_pay.util import fmt_two_amount
 
 logger = logging.getLogger(__name__)
 
+# todo urgent 1.传入中文商户名称
+# 2.错误的编码，退出登陆后无法正常调回来/pay/deposit/yee_proxy_pay_complete/%253Fp1_MerId%253D10001126856%2526r0_Cmd%253DBuy
+
 class Pay(object):
     def pay(self, post):
         raise NotImplementedError
