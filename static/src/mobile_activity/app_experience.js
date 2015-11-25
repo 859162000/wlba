@@ -26,6 +26,9 @@ org.ui = (function(){
                 strHtml = "<div id='alertTxt' class='popub-txt oldUserWin'><p class='p_left'>您是老用户，</p>";
                 strHtml+="<p class='p_left'>关注网利宝最新活动，</p><p class='p_left'>赢取老用户专享体验金。</p>";
                 strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo.png'/></p><p class='popub-footer'><div class='close_btn'>知道了！</div></p></div>";
+            }else if(difference == 4){
+                strHtml+="<p class='p_left'>"+ txt +"</p>";
+                strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo.png'/></p><p class='popub-footer'><div class='close_btn'>知道了！</div></p></div>";
             }
             alertFram.innerHTML = strHtml;
             document.body.appendChild(alertFram);
@@ -93,9 +96,12 @@ org.experience = (function(org){
                         $('.investBtnEd').removeClass('investBtnEd').addClass('investBtn');
                         $('.receive_box').find('img').hide();
                         $('.receive_box').find('#edT').show().text('已领取体验金'+ data.data.amount +'元')
+                    }else{
+                      org.ui.alert(data.data.message, '', '4')
                     }
                 },
-                error: function () {
+                error: function (data) {
+                    org.ui.alert(data.data.message, '', '4')
                 }
               });
             })
@@ -113,15 +119,20 @@ org.experience = (function(org){
                 type: 'POST',
                 data: {},
                 success:function(data){
-                    org.ui.alert('', '', '2')
-                    setTimeout(function () {
-                        $('#alert-cont,#popubMask').hide();
-                        /*$('.investBtn').text('已投资'+ data.data.amount +'元').addClass('investBtnEd').removeClass('investBtn')
-                        $('.time_style').show().text('将于'+ data.data.term_date +'收益'+ data.data.interest +'元')*/
-                        location.reload();
-                    }, 2000)
+                    if(data.ret_code > 0) {
+                        org.ui.alert(data.data.message, '', '4')
+                    }else{
+                        org.ui.alert('', '', '2')
+                        setTimeout(function () {
+                            $('#alert-cont,#popubMask').hide();
+                            /*$('.investBtn').text('已投资'+ data.data.amount +'元').addClass('investBtnEd').removeClass('investBtn')
+                            $('.time_style').show().text('将于'+ data.data.term_date +'收益'+ data.data.interest +'元')*/
+                            location.reload();
+                        }, 2000)
+                    }
                 },
-                error: function (xhr) {
+                error: function (data) {
+                    org.ui.alert(data.data.message, '', '4')
                 }
               });
             })
