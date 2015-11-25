@@ -93,7 +93,7 @@
             });
             //抽奖2
             var onclick = false;
-            $('.thanks2 ').on('click', function () {
+            $('.thanks2').on('click', function () {
                 if (onclick) {
                     return false;
                 } else {
