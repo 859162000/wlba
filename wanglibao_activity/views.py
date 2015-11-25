@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 
-
 from django.views.generic import TemplateView
-from wanglibao_activity.models import ActivityTemplates, ActivityImages
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from wanglibao_activity.models import ActivityTemplates, ActivityImages, ActivityShow
+from django.utils import timezone
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from weixin.views import _generate_ajax_template
+from .utils import get_queryset_paginator
 
 
 class TemplatesFormatTemplate(TemplateView):
@@ -98,3 +103,111 @@ class TemplatesFormatTemplate(TemplateView):
             'sequence_one': sequence_one,
             'sequence_two': sequence_two,
         }
+
+
+class PcActivityShowHomeView(TemplateView):
+    template_name = 'area.jade'
+
+    def get_context_data(self, **kwargs):
+        activity_shows = ActivityShow.objects.filter(link_is_hide=False,
+                                                     is_pc=True,
+                                                     start_at__lte=timezone.now(),
+                                                     end_at__gt=timezone.now()
+                                                     ).select_related('activity').\
+                                                     order_by('-activity__priority')
+
+        pagesize = self.request.GET.get('pagesize', 10)
+        page = self.request.GET.get('page', 1)
+        page = int(page)
+        pagesize = int(pagesize)
+
+        activity_main = get_queryset_paginator(activity_shows.filter(banner_pos='main'),
+                                               page, pagesize)
+
+        activity_left = get_queryset_paginator(activity_shows.filter(banner_pos='second_left'),
+                                               page, pagesize)
+
+        activity_right = get_queryset_paginator(activity_shows.filter(banner_pos='second_right'),
+                                                page, pagesize)
+
+        return {
+            'activity_main': activity_main,
+            'activity_left': activity_left,
+            'activity_right': activity_right,
+        }
+
+
+class ActivityListPC(APIView):
+    permission_classes = ()
+
+    @property
+    def allowed_methods(self):
+        return ['GET']
+
+    def get(self, request):
+        template_name = 'include/ajax/area_ajax.jade'
+
+        activity_shows = ActivityShow.objects.filter(link_is_hide=False,
+                                                     is_pc=True,
+                                                     start_at__lte=timezone.now(),
+                                                     end_at__gt=timezone.now(),
+                                                     ).select_related('activity').\
+                                                     order_by('-activity__priority')
+
+        category = request.GET.get('category')
+        if category:
+            activity_shows = activity_shows.filter(category=category)
+
+        page = request.GET.get('page', 1)
+        pagesize = request.GET.get('pagesize', 10)
+        page = int(page)
+        pagesize = int(pagesize)
+
+        activity_main = get_queryset_paginator(activity_shows.filter(banner_pos='main'),
+                                               page, pagesize)
+
+        activity_left = get_queryset_paginator(activity_shows.filter(banner_pos='second_left'),
+                                               page, pagesize)
+
+        activity_right = get_queryset_paginator(activity_shows.filter(banner_pos='second_right'),
+                                                page, pagesize)
+
+        activity_list = {
+            'activity_main': activity_main,
+            'activity_left': activity_left,
+            'activity_right': activity_right,
+        }
+
+        html_data = _generate_ajax_template(activity_list, template_name)
+
+        return Response({
+            'html_data': html_data,
+            'page': page,
+            'pagesize': pagesize,
+        })
+
+
+# class ActivityDetailView(TemplateView):
+#     def get_context_data(self, platform, id, **kwargs):
+#         context = super(ActivityDetailView, self).get_context_data(**kwargs)
+#         activity_show = None
+#
+#         try:
+#             if platform == 'pc':
+#                 activity_show = ActivityShow.objects.get(pk=id, is_pc=True, link_is_hide=False,
+#                                                          start_at_lte=timezone.now(),
+#                                                          end_at_gt=timezone.now())
+#                 self.template_name = activity_show.pc_template
+#             elif platform == 'app':
+#                 activity_show = ActivityShow.objects.get(pk=id, is_app=True, link_is_hide=False,
+#                                                          start_at_lte=timezone.now(),
+#                                                          end_at_gt=timezone.now())
+#                 self.template_name = activity_show.app_template
+#         except Exception:
+#             raise Http404(u'您查找的活动页面不存在')
+#
+#         context.update({
+#             'activity': activity_show.activity,
+#         })
+#
+#         return context

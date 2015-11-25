@@ -24,6 +24,9 @@ from wanglibao_pay.util import fmt_two_amount
 
 logger = logging.getLogger(__name__)
 
+# todo urgent 1.传入中文商户名称
+# 2.错误的编码，退出登陆后无法正常调回来/pay/deposit/yee_proxy_pay_complete/%253Fp1_MerId%253D10001126856%2526r0_Cmd%253DBuy
+
 class Pay(object):
     def pay(self, post):
         raise NotImplementedError
@@ -400,7 +403,7 @@ class YeeProxyPay(object):
     """
     def __init__(self):
         self.pay_order = PayOrder()
-        self.proxy_pay_url = settings.YEE_PROXY_PAY_WEB_CALLBACK_URL
+        self.proxy_pay_url = settings.YEE_PROXY_PAY_URL
 
     def _post(self, order_id, amount, gate_id):
         yee_proxy_bank_code = Bank.objects.get(gate_id=gate_id).yee_bind_code + '-NET-B2C'
@@ -423,15 +426,11 @@ class YeeProxyPay(object):
         post_para.update(hmac=YeeProxyPayCallbackMessage.get_hmac(post_para, 'request'))
         return post_para
 
-    def _request(self, url, post_data):
-        return requests.post(url, post_data)
-
     def proxy_pay(self, user, amount,  gate_id,  request_ip, device_type):
         try:
             order_id = self.pay_order.order_before_pay(user, amount, gate_id, request_ip, device_type)
             post_data = self._post(order_id, amount, gate_id)
             PayInfo.objects.filter(order_id=order_id).update(request=str(post_data))
-            self._request(self.proxy_pay_url, post_data)
             # message为空前段页面会判定为支付成功
             message = ''
         except ThirdPayError, e:
@@ -439,7 +438,7 @@ class YeeProxyPay(object):
             message = e.message
             post_data = dict()
         return {'message': message,
-                'form': {'url': 'https://www.yeepay.com/app-merchant-proxy/node',
+                'form': {'url': self.proxy_pay_url,
                         'post': post_data}}
 
     def proxy_pay_callback(self, pay_message, request):

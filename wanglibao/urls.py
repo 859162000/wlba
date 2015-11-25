@@ -179,11 +179,10 @@ urlpatterns += patterns(
     url(r'^wsf/(?P<phone>\w+)', AppShareViewError.as_view(), name="app_invite_error"),
     url(r'^app-invite-server/$', TemplateView.as_view(template_name="app_invite_server.jade")),
 
-    url(r'^php/get_user/$', login_required(GetUserInfo.as_view(), login_url='/accounts/login/'), name='user_info'),
-    url(r'^php/margin/$', login_required(GetMarginInfo.as_view(), login_url='/accounts/login/'), name='user_info'),
-    url(r'^php/send_message/$', login_required(SendInsideMessage.as_view(), login_url='/accounts/login/'),
-        name='user_info'),
-    url(r'^php/trade_password/$', login_required(CheckTradePassword.as_view(), login_url='/accounts/login/'), name='user_info'),
+    url(r'^php/get_user/$', GetUserInfo.as_view(), name='user_info'),
+    url(r'^php/margin/$', GetMarginInfo.as_view(), name='user_info'),
+    url(r'^php/send_message/$', SendInsideMessage.as_view(), name='user_info'),
+    url(r'^php/trade_password/$', CheckTradePassword.as_view(), name='user_info'),
 )
 
 # 短信
