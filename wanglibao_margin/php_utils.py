@@ -51,14 +51,14 @@ def get_user_info(request, session_id):
     return user_info
 
 
-def get_margin_info(user_id):
+def get_margin_info(request, user_id):
     """
     :param user_id:
     :return: 用户可用余额
     """
     try:
         user = User.objects.get(pk=user_id)
-        if user:
+        if user and request.user == user:
             margin = user.margin.margin
             return {'state': True, 'margin': margin}
     except Exception, e:
