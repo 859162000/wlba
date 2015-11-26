@@ -17,4 +17,4 @@ def get_queryset_paginator(queryset, page, pagesize):
     except Exception:
         data_list = paginator.page(paginator.num_pages)
 
-    return data_list
+    return data_list, paginator.num_pages, paginator.count

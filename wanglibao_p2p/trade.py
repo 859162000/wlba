@@ -96,24 +96,37 @@ class P2PTrader(object):
                 is_full = True
 
         # fix@chenweibin, add order_id
-        tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount,
-                                               "device": self.device, "order_id": self.order_id,
-                                               "product_id": self.product.id, "is_full": is_full})
+        # Modify by hb on 2015-11-25 : add "try-except"
         try:
-            CoopRegister(self.request).process_for_purchase(self.user, self.order_id)
-        except:
+            logger.debug("=20151125= decide_first.apply_async : [%s], [%s], [%s], [%s], [%s], [%s]" % \
+                         (self.user.id, amount, self.device['device_type'], self.order_id, self.product.id, is_full) )
+            tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount,
+                                                   "device": self.device, "order_id": self.order_id,
+                                                   "product_id": self.product.id, "is_full": is_full})
+        except Exception, reason:
+            logger.debug("=20151125= decide_first.apply_async Except:{0}".format(reason))
             pass
+
         try:
+            logger.debug("=20151125= CoopRegister.process_for_purchase : [%s], [%s]" % (self.user.id, self.order_id) )
+            CoopRegister(self.request).process_for_purchase(self.user, self.order_id)
+        except Exception, reason:
+            logger.debug("=20151125= CoopRegister.process_for_purchase Except:{0}".format(reason) )
+            pass
+
+        try:
+            logger.debug("=20151125= RewardDistributer.processor_for_distribute : [%s], [%s]" % (self.user.id, self.order_id) )
             kwargs = {
                 'amount': amount,
                 'order_id': self.order_id,}
 
             RewardDistributer(self.request, kwargs).processor_for_distribute()
         except Exception, reason:
-            logger.debug("购标异常 reason:{0}".format(reason))
+            logger.debug("=20151125= RewardDistributer.processor_for_distribute Except:{0}".format(reason) )
             pass
         else:
-            logger.debug("{0}购标成功".format(self.user))
+            logger.debug("=20151125= RewardDistributer.processor_for_distribute : {0}购标成功".format(self.user) )
+
         # 投标成功发站内信
         matches = re.search(u'日计息', self.product.pay_method)
         if matches and matches.group():
@@ -129,6 +142,8 @@ class P2PTrader(object):
             "mtype": "purchase"
 
         })
+        logger.debug("=20151125= inside_message.send_one : {0}购标站内信发成功".format(self.user) )
+
 
         # 满标给管理员发短信
         if is_full:
