@@ -391,7 +391,7 @@ class ActivityShow(models.Model):
     activity = models.ForeignKey(Activity, verbose_name=u'活动名称')
     category = models.CharField(u'活动类型', max_length=20, choices=ACTIVITY_CATEGORY, default=u'全部')
     is_pc = models.BooleanField(u'是否主站活动', default=False)
-    banner_pos = models.CharField(u'主站位置', max_length=20, choices=ACTIVITY_CATEGORY, default=u'主推')
+    banner_pos = models.CharField(u'主站位置', max_length=20, choices=BANNER_POSITION, default=u'主推')
     pc_banner = models.ImageField(u'PC-活动Banner', null=True, blank=True, upload_to='activity')
     thumbnail = models.ImageField(u'卡片区域缩略图', null=True, blank=True, upload_to='activity')
     pc_detail_link = models.CharField(u'PC-活动详情页链接', max_length=255)
