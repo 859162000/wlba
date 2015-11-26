@@ -4,7 +4,7 @@ from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpRespon
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
-from django.contrib.auth import login as auth_login
+from django.contrib.auth import login as auth_login, logout
 from django.template import Template, Context
 from django.template.loader import get_template
 from django.conf import settings
@@ -539,7 +539,7 @@ class UnBindWeiUserAPI(APIView):
             weixin_user.user = None
             weixin_user.save()
             now_str = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M')
-
+            logout(request)
             weixin.tasks.sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
                     "openid":weixin_user.openid,
                     "template_id":UNBIND_SUCCESS_TEMPLATE_ID,
