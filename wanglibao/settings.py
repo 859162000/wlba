@@ -455,7 +455,7 @@ LOGGING = {
         },
         'wanglibao_account': {
             'handlers': ['wanglibao_account', 'console'],
-            'level': 'INFO',
+            'level': 'DEBUG',
         },
         'wanglibao_app': {
             'handlers': ['file'],
@@ -515,7 +515,7 @@ if ENV != ENV_DEV:
     # session expire at browser close
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-    # set session for cross domain.
+    # set session for PHP cross domain.
     SESSION_COOKIE_DOMAIN = '.wanglibao.com'
 
     # wsgi scheme
@@ -891,7 +891,9 @@ DEBUG_TOOLBAR_CONFIG = {
 
 USE_L10N = False
 DATETIME_FORMAT = 'Y-m-d H:i:s'
-ADMIN_ADDRESS = 'AK7WtEQ4Q9KPs8Io_zOncw'
+# Modify by hb on 2015-11-25
+#ADMIN_ADDRESS = 'AK7WtEQ4Q9KPs8Io_zOncw'
+ADMIN_ADDRESS = 'PK7wlbQ4Q9KPs9Io_zOpac'
 DATE_FORMAT = 'Y-m-d'
 
 # AUTH_PROFILE_MODULE = 'wanglibao_profile.WanglibaoUserProfile'

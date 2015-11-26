@@ -4,9 +4,7 @@ from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpRespon
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
-from django.contrib.auth import login as auth_login
-from django.template import Template, Context
-from django.template.loader import get_template
+from django.contrib.auth import login as auth_login, logout
 from django.conf import settings
 from django.shortcuts import redirect
 from django.db.models.signals import post_save, pre_save
@@ -60,6 +58,7 @@ from misc.models import Misc
 from wechatpy.parser import parse_message
 from wechatpy.messages import BaseMessage, TextMessage
 import datetime, time
+from .util import _generate_ajax_template
 from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEvent, UnsubscribeEvent, SubscribeEvent,\
                              TemplateSendJobFinishEvent)
 
@@ -539,7 +538,7 @@ class UnBindWeiUserAPI(APIView):
             weixin_user.user = None
             weixin_user.save()
             now_str = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M')
-
+            logout(request)
             weixin.tasks.sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
                     "openid":weixin_user.openid,
                     "template_id":UNBIND_SUCCESS_TEMPLATE_ID,
@@ -729,20 +728,6 @@ class P2PListView(TemplateView):
             'results': p2p_products[:10],
             'banner': banner,
         }
-
-
-def _generate_ajax_template(content, template_name=None):
-
-    context = Context({
-        'results': content,
-    })
-
-    if template_name:
-        template = get_template(template_name)
-    else:
-        template = Template('<div></div>')
-
-    return template.render(context)
 
 
 class P2PListWeixin(APIView):
