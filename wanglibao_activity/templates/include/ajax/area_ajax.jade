@@ -1,0 +1,22 @@
+-load formatters
+-load mathfilters
+if results
+  for activity in results
+    .area-active-list.font-m
+      .area-ac-ehn
+        .area-ehn-name.es {{activity.activity}}
+        .area-ehn-banner
+          img(src='/media/{{activity.pc_banner}}')
+          .area-ac-time.font-xs
+            .area-tiem-body {{activity.activity_status}}
+            .area-tiem-bg
+
+        .area-ac-date.font-xs.es 活动日期：{{activity.activity.start_at | date:"Y年m月d日"}} - {{activity.activity.end_at | date:"Y年m月d日"}}
+
+      .area-ac-mask
+        .area-mask-name.es.font-l {{activity.activity}}
+        .area-mask-date.font-xs.es 活动日期：{{activity.activity.start_at | date:"Y年m月d日"}} - {{activity.activity.end_at | date:"Y年m月d日"}}
+        .area-mask-line
+        .area-mask-dec {{activity.pc_description}}
+        .area-mask-link.font-s
+          a(href='{{activity.pc_detail_link}}') 立即查看

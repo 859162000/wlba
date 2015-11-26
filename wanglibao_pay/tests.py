@@ -96,9 +96,10 @@ class PayTests(TestCase):
         self.request = MagicMock()
         self.request.user = ''
 
+# todo better 等去掉requests 之后开启测试
 # class KuaiPayTests(PayTests):
 #     def setUp(self):
-#         super(KuaiPayTests)
+#         super(KuaiPayTests, self).setUp()
 #
 #         self.kuai_pay = KuaiShortPay()
 #         # todo better 暂时无法构造签名，只能到服务器上测试该方法

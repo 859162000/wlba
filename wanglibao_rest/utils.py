@@ -2,8 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import re
+import hashlib
+import datetime
 from user_agents import parse
-
+from wanglibao import settings
+from wanglibao_redis.backend import redis_backend
 
 
 def search(client, string):
@@ -74,3 +77,33 @@ def decide_device(device_type):
         return 'android'
     else:
         return 'all'
+
+
+def process_for_fuba_landpage(request, channel_code):
+    response = {}
+    request_data = request.GET
+
+    # period 为结算周期，必须以天为单位
+    period = getattr(settings, '%s_PERIOD' % channel_code.upper())
+
+    # 设置tid默认值
+    default_tid = getattr(settings, '%s_DEFAULT_TID' % channel_code.upper(), '')
+    tid = request_data.get('tid', default_tid)
+    if not tid and default_tid:
+        tid = default_tid
+
+    sign = request_data.get('sign', None)
+    wlb_for_channel_key = getattr(settings, 'WLB_FOR_%s_KEY' % channel_code.upper())
+    # 确定渠道来源
+    if tid and sign == hashlib.md5(channel_code+str(wlb_for_channel_key)).hexdigest():
+        redis = redis_backend()
+        redis_channel_key = '%s_%s' % (channel_code, tid)
+        land_time_lately = redis._get(redis_channel_key)
+        current_time = datetime.datetime.now()
+        # 如果上次访问的时间是在30天前则不更新访问时间
+        if land_time_lately and tid != default_tid:
+            land_time_lately = datetime.datetime.strptime(land_time_lately, '%Y-%m-%d %H:%M:%S')
+            if land_time_lately + datetime.timedelta(days=int(period)) <= current_time:
+                return
+        else:
+            redis._set(redis_channel_key, current_time.strftime("%Y-%m-%d %H:%M:%S"))

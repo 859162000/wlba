@@ -26,7 +26,7 @@ from experience_gold.models import ExperienceEvent, ExperienceEventRecord
 logger = logging.getLogger(__name__)
 
 
-def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_full=False):
+def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_full=False, order_id=0):
     now = timezone.now()
     device_type = decide_device(device_type)
     if not trigger_node:
@@ -60,16 +60,18 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_f
                     if rule.is_introduced:
                         user_ib = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                         if user_ib:
-                            _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id, is_full, user_ib)
+                            _check_rules_trigger(user, rule, rule.trigger_node, device_type,
+                                                 amount, product_id, is_full, user_ib, order_id)
                     else:
-                        _check_rules_trigger(user, rule, rule.trigger_node, device_type, amount, product_id, is_full)
+                        _check_rules_trigger(user, rule, rule.trigger_node, device_type,
+                                             amount, product_id, is_full, order_id)
             else:
                 continue
     else:
         return
 
 
-def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, user_ib=None):
+def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, user_ib=None, order_id=0):
     """ check the trigger node """
     product_id = int(product_id)
     # 注册 或 实名认证
@@ -80,13 +82,16 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
         # check first pay
         penny = Decimal(0.01).quantize(Decimal('.01'))
         if rule.is_in_date:
-            first_pay_num = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
-                                                   update_time__gt=rule.activity.start_at,
-                                                   status=PayInfo.SUCCESS).count()
+            first_pay = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
+                                               update_time__gt=rule.activity.start_at,
+                                               status=PayInfo.SUCCESS
+                                               ).order_by('create_time').first()
         else:
-            first_pay_num = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
-                                                   status=PayInfo.SUCCESS).count()
-        if first_pay_num == 1:
+            first_pay = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
+                                               status=PayInfo.SUCCESS
+                                               ).order_by('create_time').first()
+
+        if first_pay and first_pay.order_id == order_id:
             _check_trade_amount(user, rule, device_type, amount, is_full)
     # 充值
     elif trigger_node == 'pay':
@@ -95,12 +100,14 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
     elif trigger_node == 'first_buy':
         # check first pay
         if rule.is_in_date:
-            first_buy_num = P2PRecord.objects.filter(user=user,
-                                                     create_time__gt=rule.activity.start_at).count()
+            first_buy = P2PRecord.objects.filter(user=user,
+                                                 create_time__gt=rule.activity.start_at
+                                                 ).order_by('create_time').first()
         else:
-            first_buy_num = P2PRecord.objects.filter(user=user).count()
+            first_buy = P2PRecord.objects.filter(user=user
+                                                 ).order_by('create_time').first()
 
-        if first_buy_num == 1:
+        if first_buy and first_buy.order_id == order_id:
             # 判断当前购买产品id是否在活动设置的id中
             if product_id > 0 and rule.activity.product_ids:
                 is_product = _check_product_id(product_id, rule.activity.product_ids)
@@ -444,7 +451,7 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
             if redpack:
                 # event = redpack.event
                 give_pf = red_pack_event.give_platform
-                if give_pf == "all" or give_pf == device_type:
+                if give_pf == "all" or give_pf == device_type or (give_pf == 'app' and device_type in ('ios', 'android')):
                     if redpack.token != "":
                         redpack.status = "used"
                         redpack.save()
@@ -470,7 +477,7 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
                 redpack = RedPack.objects.filter(event=red_pack_event, status="unused").first()
                 if redpack:
                     give_pf = red_pack_event.give_platform
-                    if give_pf == "all" or give_pf == device_type:
+                    if give_pf == "all" or give_pf == device_type or (give_pf == 'app' and device_type in ('ios', 'android')):
                         if redpack.token != "":
                             redpack.status = "used"
                             redpack.save()
@@ -531,7 +538,7 @@ def _give_activity_experience_new(user, rtype, experience_id, device_type, rule,
                     return
 
             give_pf = experience_event.give_platform
-            if give_pf == "all" or give_pf == device_type:
+            if give_pf == "all" or give_pf == device_type or (give_pf == 'app' and device_type in ('ios', 'android')):
                 record = ExperienceEventRecord()
                 record.event = experience_event
                 record.user = this_user
@@ -552,7 +559,7 @@ def _give_activity_experience_new(user, rtype, experience_id, device_type, rule,
                         continue
 
                 give_pf = experience_event.give_platform
-                if give_pf == "all" or give_pf == device_type:
+                if give_pf == "all" or give_pf == device_type or (give_pf == 'app' and device_type in ('ios', 'android')):
                     record = ExperienceEventRecord()
                     record.event = experience_event
                     record.user = this_user

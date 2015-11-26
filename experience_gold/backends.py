@@ -2,9 +2,10 @@
 # encoding:utf-8
 
 import time
-import datetime
 import logging
 import decimal
+from datetime import datetime, timedelta
+from django.db import transaction
 from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -15,6 +16,9 @@ from models import ExperienceProduct, ExperienceEventRecord, ExperienceAmortizat
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.models import P2PRecord
 from wanglibao_account import message as inside_message
+from marketing.utils import local_to_utc
+from wanglibao.celery import app
+from wanglibao_margin.marginkeeper import MarginKeeper
 
 logger = logging.getLogger(__name__)
 
@@ -120,7 +124,7 @@ class GetExperienceAPIView(APIView):
             content = u"网利宝赠送的【{}】体验金已发放，体验金额度:{}，请进入投资页面尽快投资赚收益吧！有效期至{}。" \
                       u"<br/>感谢您对我们的支持与关注!" \
                       u"<br>网利宝".format(experience_event.name, experience_event.amount,
-                                          experience_event.unavailable_at.strftime("Y-m-d"))
+                                          experience_event.unavailable_at.strftime("%Y-%m-%d"))
 
             inside_message.send_one.apply_async(kwargs={
                 "user_id": user.id,
@@ -135,4 +139,5 @@ class GetExperienceAPIView(APIView):
             })
 
         return Response({'ret_code': 30003, 'message': u'领取失败,请联系网利宝,客服电话:4008-588-066.'})
+
 

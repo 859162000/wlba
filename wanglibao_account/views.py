@@ -1878,7 +1878,7 @@ class AddressGetAPIView(APIView):
             return Response({'ret_code': 3002, 'message': u'ID错误'})
 
         try:
-            address = UserAddress.objects.get(id=address_id)
+            address = UserAddress.objects.get(id=address_id, user=request.user)
             if address:
                 address = {
                     'address_id': address.id,

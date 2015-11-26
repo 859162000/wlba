@@ -105,6 +105,7 @@ class WanglibaoWeixinRelative(models.Model):
         verbose_name_plural = u'微信网利宝关系表'
 
 class WanglibaoActivityReward(models.Model):
+    order_id =models.IntegerField(default=0, verbose_name=u'订单ID')
     user = models.ForeignKey(User, related_name='reward_owner', default=None, blank=True, null=True, on_delete=models.SET_NULL)
     redpack_event = models.ForeignKey(RedPackEvent, default=None, blank=True, null=True, verbose_name=u'用户获得的红包')
     reward = models.ForeignKey(Reward, default=None, blank=True, null=True, verbose_name=u'用户获得的奖品')

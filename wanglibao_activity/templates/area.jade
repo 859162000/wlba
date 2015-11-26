@@ -1,0 +1,47 @@
+-load formatters
+-load mathfilters
+doctype html
+html(style='background:#f5f5f5;')
+  head
+    - with '安全p2p网贷_p2p理财的风险_投资理财资金安全_网利宝' as title
+    include global/g_head
+    - endwith
+    meta(name="keywords", content="安全p2p网贷, p2p理财的风险 ,投资理财资金安全,网利宝")
+    meta(name="description", content="网利宝在p2p理财的风险，投资理财资金安全问题上做出业内独创“产融结合”的业务模式。为投资用户提供高收益、安全透明、期限灵活的理财产品，为了降低p2p理财的风险和投资理财资金安全问题，网利宝的业务模式执行360度全方位风险控制，强调把风险控制在贷前、打造风险闭环，确保理财产品安全可靠，为投资者财富增值保驾护航。")
+  body
+    - with '活动专区' as activeItem
+    include global/g_nav
+    - endwith
+    .i-mod-warp
+      .i-area-banner
+        if banner.main
+          img(src='/media/{{banner.main}}')
+    .i-mod-warp.mg-t-l
+      .i-mod.clearfix
+        .area-main-push.fl.mg-r-sm
+          if banner.left
+            img(src='/media/{{banner.left}}')
+        .area-main-push.fl
+          if banner.right
+            img(src='/media/{{banner.right}}')
+    .i-mod-warp.i-mod-line.mg-t-m.mg-b-xll
+
+    .i-mod-warp.mg-b-xll
+      .area-ac-name
+
+    .i-mod-warp.area-nav-warp.mg-b-xxl
+      .area-filter-nav.font-m
+        ul.clearfix#area-nav
+          li.active 全部
+          li 投资有奖
+          li 节日热点
+          li 新手福利
+        .active_slide
+    .i-mod-warp
+      .i-mod.area-active-item.clearfix
+        include include/ajax/area_ajax.jade
+      .area-more-wap.font-s
+        .area-list-more 更多
+    include global/g_footer
+    script.
+      require(["/static/src/pc/area.js?v=22"])
