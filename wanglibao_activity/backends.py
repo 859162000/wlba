@@ -26,7 +26,7 @@ from experience_gold.models import ExperienceEvent, ExperienceEventRecord
 logger = logging.getLogger(__name__)
 
 
-def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_full=False, order_id=0):
+def check_activity(user, trigger_node, device_type, amount=0, product_id=0, order_id=0, is_full=False):
     now = timezone.now()
     device_type = decide_device(device_type)
     if not trigger_node:
@@ -90,9 +90,8 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
             first_pay = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
                                                status=PayInfo.SUCCESS
                                                ).order_by('create_time').first()
-        logger.info(">>>>into start %s, %s" % (first_pay.order_id, order_id))
+
         if first_pay and first_pay.order_id == order_id:
-            logger.info(">>>>into start2 %s, %s" % (first_pay.order_id, order_id))
             _check_trade_amount(user, rule, device_type, amount, is_full)
     # 充值
     elif trigger_node == 'pay':
@@ -172,7 +171,6 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
 
 
 def _send_gift(user, rule, device_type, is_full, amount=0):
-    logger.info(">>>>into _send_gift %s, %s " % (rule.trigger_node, rule.gift_type))
     # rule_id = rule.id
     rtype = rule.trigger_node
     # 送奖品
@@ -277,7 +275,6 @@ def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
 
 
 def _check_trade_amount(user, rule, device_type, amount, is_full):
-    logger.info(">>>>into _check_trade_amounts")
     is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
     if amount and amount > 0:
         if is_amount:
@@ -405,7 +402,6 @@ def _send_gift_phonefare(user, rule, amount, is_full):
 
 
 def _send_gift_redpack(user, rule, rtype, redpack_id, device_type, amount, is_full):
-    logger.info(">>>>into _send_gift_redpack %s, %s " % (rule.send_type, rule.share_type))
     """ 活动中发送的红包使用规则里边配置的模板，其他的使用系统原有的模板。 """
     if rule.send_type == 'sys_auto':
         if rule.share_type != 'inviter':
@@ -425,7 +421,6 @@ def _send_gift_redpack(user, rule, rtype, redpack_id, device_type, amount, is_fu
 
 
 def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_ib=None, amount=0):
-    logger.info(">>>>into _give_activity_redpack_new")
     """ rule: get message template """
     now = timezone.now()
     if user_ib:
@@ -443,14 +438,11 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
         return
 
     print redpack_id_list
-    logger.info(">>>>into _give_activity_redpack_new %s" % redpack_id_list)
     if len(redpack_id_list) == 1:
-        logger.info(">>>>into _give_activity_redpack_new ——2")
         print(redpack_id_list[0])
         red_pack_event = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, id=redpack_id_list[0],
                                                      give_start_at__lt=now, give_end_at__gt=now).first()
         if red_pack_event:
-            logger.info(">>>>into _give_activity_redpack_new ——3")
             if red_pack_event.target_channel != "":
                 chs = red_pack_event.target_channel.split(",")
                 chs = [m for m in chs if m.strip() != ""]
@@ -458,7 +450,6 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
                     return
             redpack = RedPack.objects.filter(event=red_pack_event, status="unused").first()
             if redpack:
-                logger.info(">>>>into _give_activity_redpack_new ——4")
                 # event = redpack.event
                 give_pf = red_pack_event.give_platform
                 if give_pf == "all" or give_pf == device_type or (give_pf == 'app' and device_type in ('ios', 'android')):
@@ -475,12 +466,10 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
                     else:
                         _send_message_sms(user, rule, None, None, amount, red_pack_event, record.created_at)
     else:
-        logger.info(">>>>into _give_activity_redpack_new ——4")
         for red_pack_id in redpack_id_list:
             red_pack_event = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, id=red_pack_id,
                                                          give_start_at__lt=now, give_end_at__gt=now).first()
             if red_pack_event:
-                logger.info(">>>>into _give_activity_redpack_new ——5")
                 if red_pack_event.target_channel != "":
                     chs = red_pack_event.target_channel.split(",")
                     chs = [m for m in chs if m.strip() != ""]
