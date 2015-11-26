@@ -106,7 +106,7 @@ class TemplatesFormatTemplate(TemplateView):
         }
 
 
-class PcActivityShowHomeView(TemplateView):
+class PcActivityAreaView(TemplateView):
     template_name = 'area.jade'
 
     def get_context_data(self, **kwargs):
@@ -131,10 +131,10 @@ class PcActivityShowHomeView(TemplateView):
         try:
             banner['right'] = activity_list.filter(banner_pos='second_right')[0].pc_banner
         except Exception:
-            banner['right'] = ''
+            banner['right'] = '' # FixME
 
         limit = 6
-        activity_list = get_queryset_paginator(activity_list, 1, limit)
+        activity_list, all_page, data_count = get_queryset_paginator(activity_list, 1, limit)
 
         return {
             'banner': banner,
@@ -142,7 +142,7 @@ class PcActivityShowHomeView(TemplateView):
         }
 
 
-class ActivityListPC(APIView):
+class ActivityAreaApi(APIView):
     permission_classes = ()
 
     @property
@@ -168,17 +168,9 @@ class ActivityListPC(APIView):
         page = int(page)
         pagesize = int(pagesize)
 
-        paginator = Paginator(activity_list, pagesize)
+        activity_list, all_page, data_count = get_queryset_paginator(activity_list,
+                                                                     page, pagesize)
 
-        try:
-            activity_list = paginator.page(page)
-        except PageNotAnInteger:
-            activity_list = paginator.page(1)
-        except Exception:
-            activity_list = paginator.page(paginator.num_pages)
-
-        all_page = paginator.num_pages
-        data_count = paginator.count
         html_data = _generate_ajax_template(activity_list, template_name)
 
         return Response({

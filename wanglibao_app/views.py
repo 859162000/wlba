@@ -47,6 +47,7 @@ from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityShow
 from wanglibao_activity.utils import get_queryset_paginator
 from wanglibao_announcement.models import AppMemorabilia
+from weixin.views import _generate_ajax_template
 
 logger = logging.getLogger(__name__)
 
@@ -790,19 +791,11 @@ class AppActivityShowHomeView(TemplateView):
         page = int(page)
         pagesize = int(pagesize)
 
-        activity_main = get_queryset_paginator(activity_shows.filter(banner_pos='main'),
+        activity_list, all_page, data_count = get_queryset_paginator(activity_shows,
                                                page, pagesize)
-
-        activity_left = get_queryset_paginator(activity_shows.filter(banner_pos='second_left'),
-                                               page, pagesize)
-
-        activity_right = get_queryset_paginator(activity_shows.filter(banner_pos='second_right'),
-                                                page, pagesize)
 
         return {
-            'activity_main': activity_main,
-            'activity_left': activity_left,
-            'activity_right': activity_right,
+            'activity_main': activity_list,
         }
 
 
@@ -825,8 +818,13 @@ class AppMemorabiliaHomeView(APIView):
         page = int(page)
         pagesize = int(pagesize)
 
+        memorabilias, all_page, data_count = get_queryset_paginator(memorabilias,
+                                                                    page, pagesize)
+
+        html_data = _generate_ajax_template(memorabilias, template_name)
+
         return {
-            'memorabilias': memorabilias
+            'html_data': html_data,
         }
 
 
