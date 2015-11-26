@@ -433,6 +433,10 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG'
         },
+        'wanglibao': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+        },
         'wanglibao_pay': {
             'handlers': ['file', 'console'],
             'level': 'DEBUG',
