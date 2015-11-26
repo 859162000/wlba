@@ -90,9 +90,9 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
             first_pay = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
                                                status=PayInfo.SUCCESS
                                                ).order_by('create_time').first()
-
+        logger.info(">>>>into start %s, %s" % (first_pay.order_id, order_id))
         if first_pay and first_pay.order_id == order_id:
-            logger.info(">>>>into start %s, %s" % (first_pay.order_id, order_id))
+            logger.info(">>>>into start2 %s, %s" % (first_pay.order_id, order_id))
             _check_trade_amount(user, rule, device_type, amount, is_full)
     # 充值
     elif trigger_node == 'pay':
