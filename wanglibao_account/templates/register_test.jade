@@ -5,9 +5,9 @@ extends loginAndRegister
 
 block registerFormPage
     .minNax
-        a(href='/accounts/login/').font-l.padding-l-r-s.fl.minNavLeft 快速登录
+        a(href='/accounts/login/?next={{next}}').font-l.padding-l-r-s.fl.minNavLeft 快速登录
         .borderStyle.fl.mg-t-s
-        a(href='/accounts/register/').font-l.padding-l-r-s.fl.minNavRight.curr 十秒注册
+        a(href='/accounts/register/?next={{next}}').font-l.padding-l-r-s.fl.minNavRight.curr 十秒注册
     #registerForm.login-form
         - csrf_token
         .registerFormDiv

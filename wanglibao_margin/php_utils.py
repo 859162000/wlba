@@ -44,6 +44,9 @@ def get_user_info(request, session_id):
                          avaliable_amount=account_info['p2p_margin'],
                          from_channel=ua_string,
                          isAdmin=user.is_superuser)
+    else:
+        user_info.update(status=False,
+                         message=u'session error.')
 
     return user_info
 
