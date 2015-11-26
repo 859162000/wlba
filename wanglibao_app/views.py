@@ -211,11 +211,6 @@ class AppRepaymentPlanMonthAPIView(APIView):
         month = request_month if request_month else now.month
         current_month = '{}-{}'.format(now.year, now.month)
 
-        page = request.GET.get('page', 1)
-        pagesize = request.GET.get('num', 10)
-        page = int(page)
-        pagesize = int(pagesize)
-
         start = local_to_utc(datetime(int(year), int(month), 1), 'min')
         end = local_to_utc(datetime(int(year), int(month) + 1, 1) - timedelta(days=1), 'max')
 
@@ -247,14 +242,6 @@ class AppRepaymentPlanMonthAPIView(APIView):
         user_amortizations = UserAmortization.objects.filter(user=user)\
             .filter(term_date__gt=start, term_date__lte=end).order_by('term_date')
         if user_amortizations:
-            paginator = Paginator(user_amortizations, pagesize)
-
-            try:
-                user_amortizations = paginator.page(page)
-            except PageNotAnInteger:
-                user_amortizations = paginator.page(1)
-            except Exception:
-                user_amortizations = paginator.page(paginator.num_pages)
             amo_list = _user_amortization_list(user_amortizations)
         else:
             amo_list = []
@@ -263,8 +250,6 @@ class AppRepaymentPlanMonthAPIView(APIView):
                          'data': amo_list, 
                          'month_group': month_group,
                          'current_month': current_month,
-                         'page': page,
-                         'num': pagesize
                          })
 
 
