@@ -133,11 +133,26 @@ class PcActivityShowHomeView(TemplateView):
         except Exception:
             banner['right'] = ''
         limit = 6
-        activity_list = get_queryset_paginator(activity_list, 1, limit)
+        page = 1
+        #activity_list = get_queryset_paginator(activity_list, 1, limit)
 
+        paginator = Paginator(activity_list, limit)
+        try:
+            activity_list = paginator.page(page)
+        except PageNotAnInteger:
+            activity_list = paginator.page(1)
+        except Exception:
+            activity_list = paginator.page(paginator.num_pages)
+
+        all_page = paginator.num_pages
+        list_count = paginator.count
+        print all_page
         return {
             'banner': banner,
-            'results': activity_list[:limit]
+            'results': activity_list[:limit],
+            'all_page': all_page,
+            'page': page,
+            'list_count': list_count
         }
 
 
@@ -146,7 +161,7 @@ class ActivityListPC(APIView):
 
     @property
     def allowed_methods(self):
-        return ['GET', 'POST']
+        return ['GET']
 
     def get(self, request):
         template_name = 'include/ajax/area_ajax.jade'
@@ -159,8 +174,12 @@ class ActivityListPC(APIView):
                                                      order_by('-activity__priority')
 
         category = request.GET.get('category', 'all')
+
         if category:
-            activity_list = activity_list.filter(category=category)
+            if category == 'all':
+                activity_list = activity_list
+            else:
+                activity_list = activity_list.filter(category=category)
 
         page = request.GET.get('page', 1)
         pagesize = request.GET.get('pagesize', 6)
@@ -177,14 +196,14 @@ class ActivityListPC(APIView):
             activity_list = paginator.page(paginator.num_pages)
 
         all_page = paginator.num_pages
-        data_count = paginator.count
         html_data = _generate_ajax_template(activity_list, template_name)
+        list_count = paginator.count
 
         return Response({
             'html_data': html_data,
             'page': page,
             'all_page': all_page,
-            'data_count': data_count
+            'list_count': list_count
         })
 
 
