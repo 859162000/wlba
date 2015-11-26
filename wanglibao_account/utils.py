@@ -499,7 +499,7 @@ def zgdx_order_query(params):
             'ret_code': 50001,
             'message': 'api error'
         }
-        logger.info(e)
+        logger.info("zgdx_order_query coop_key, iv or url None")
 
     return json_response
 
