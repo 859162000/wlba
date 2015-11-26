@@ -16,7 +16,7 @@ class DecryptParmsAPIView(APIView):
         """
         super(DecryptParmsAPIView, self).initial(request, args, kwargs)
         try:
-            logger.debug("===decrypt in wanglibao_rest.common====request_params:%s"%request.__dict__)
+            # logger.debug("===decrypt in wanglibao_rest.common====request_params:%s"%request.__dict__)
             method = request.method.lower()
             self.params = {}
             request_params = {}
@@ -35,12 +35,12 @@ class DecryptParmsAPIView(APIView):
                             for pk, pv in ps.iteritems():
                                 token_key += pk
                                 self.params[k][pk]=pv
-                    if type(v) is unicode:
-                        v = json.loads(v)
-                        for vk, vv in v.iteritems():
+                    elif type(v) is unicode:
+                        p_v = json.loads(v)
+                        for vk, vv in p_v.iteritems():
                             token_key += vk
                             self.params[k][vk] = vv
-                    if type(v) is dict:
+                    elif type(v) is dict:
                         for vk, vv in v.iteritems():
                             token_key += vk
                             self.params[k][vk] = vv
@@ -52,9 +52,10 @@ class DecryptParmsAPIView(APIView):
             if self.params.get("param", {}):
                 for key, length in self.params.get("param", {}).iteritems():
                     content = self.params.get(key, "")
-                    # print length
-                    # print key
-                    # print content
+                    print length
+                    print token_key
+                    print content
+                    print getDecryptedContent(token_key, content, int(length))
                     self.params[key]=getDecryptedContent(token_key, content, int(length))
                 logger.debug("===decrypt in wanglibao_rest.common====self.params:%s"%self.params)
         except Exception, e:
