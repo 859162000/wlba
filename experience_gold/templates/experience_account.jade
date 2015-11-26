@@ -19,14 +19,14 @@ html(style="background:#efeff4")
                             p.asset_count {{total_experience_amount | money_format}}
                         .asset
                             p.asset_title 体验金余额(元)
-                            p.asset_count {{experience_amount | money_format_int}}
+                            p.asset_count {{experience_amount | money_format}}
                     .income_content
                         .asset.border_right
                             p.asset_title 到账收益(元)
-                            p.asset_count {{paid_interest}}
+                            p.asset_count {{paid_interest | money_format}}
                         .asset
                             p.asset_title 待收收益(元)
-                            p.asset_count {{unpaid_interest}}
+                            p.asset_count {{unpaid_interest | money_format}}
             if user.is_authenticated and experience_amortization
               .account_list
                 section.project_box
