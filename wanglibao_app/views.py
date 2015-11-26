@@ -173,8 +173,8 @@ class AppRepaymentPlanAllAPIView(APIView):
 
     def post(self, request):
         user = request.user
-        page = request.GET.get('page', 1)
-        pagesize = request.GET.get('num', 10)
+        page = request.DATA.get('page', 1)
+        pagesize = request.DATA.get('num', 10)
         page = int(page)
         pagesize = int(pagesize)
 
