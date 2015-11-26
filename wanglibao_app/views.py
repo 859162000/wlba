@@ -806,10 +806,16 @@ class AppActivityShowHomeView(TemplateView):
         }
 
 
-class AppMemorabiliaHomeView(TemplateView):
-    template_name = 'include/ajax/ajax_area_milepost.jade'
+class AppMemorabiliaHomeView(APIView):
+    permission_classes = ()
 
-    def get_context_data(self, **kwargs):
+    @property
+    def allowed_methods(self):
+        return ['GET', 'POST']
+
+    def get(self):
+        template_name = 'include/ajax/ajax_area_milepost.jade'
+
         memorabilias = AppMemorabilia.objects.filter(hide_link=False,
                                                      start_time__lte=timezone.now()
                                                      ).order_by('-priority')
