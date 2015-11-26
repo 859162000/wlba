@@ -5,8 +5,6 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.core.urlresolvers import reverse
 from django.contrib.auth import login as auth_login, logout
-from django.template import Template, Context
-from django.template.loader import get_template
 from django.conf import settings
 from django.shortcuts import redirect
 from django.db.models.signals import post_save, pre_save
@@ -60,6 +58,7 @@ from misc.models import Misc
 from wechatpy.parser import parse_message
 from wechatpy.messages import BaseMessage, TextMessage
 import datetime, time
+from .util import _generate_ajax_template
 from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEvent, UnsubscribeEvent, SubscribeEvent,\
                              TemplateSendJobFinishEvent)
 
@@ -734,20 +733,6 @@ class P2PListView(TemplateView):
             'results': p2p_products[:10],
             'banner': banner,
         }
-
-
-def _generate_ajax_template(content, template_name=None):
-
-    context = Context({
-        'results': content,
-    })
-
-    if template_name:
-        template = get_template(template_name)
-    else:
-        template = Template('<div></div>')
-
-    return template.render(context)
 
 
 class P2PListWeixin(APIView):

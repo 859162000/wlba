@@ -6,10 +6,8 @@ from wanglibao_activity.models import ActivityTemplates, ActivityImages, Activit
 from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from weixin.views import _generate_ajax_template
+from weixin.util import _generate_ajax_template
 from .utils import get_queryset_paginator
-from django.core.paginator import Paginator
-from django.core.paginator import PageNotAnInteger
 
 class TemplatesFormatTemplate(TemplateView):
     def get_context_data(self, **kwargs):
@@ -106,16 +104,16 @@ class TemplatesFormatTemplate(TemplateView):
         }
 
 
-class PcActivityShowHomeView(TemplateView):
+class PcActivityAreaView(TemplateView):
     template_name = 'area.jade'
 
     def get_context_data(self, **kwargs):
         activity_list = ActivityShow.objects.filter(link_is_hide=False,
-                                                     is_pc=True,
-                                                     start_at__lte=timezone.now(),
-                                                     end_at__gt=timezone.now()
-                                                     ).select_related('activity').\
-                                                     order_by('-activity__priority')
+                                                    is_pc=True,
+                                                    start_at__lte=timezone.now(),
+                                                    end_at__gt=timezone.now()
+                                                    ).select_related('activity').\
+                                                    order_by('-activity__priority')
 
         banner = {}
         try:
@@ -131,34 +129,41 @@ class PcActivityShowHomeView(TemplateView):
         try:
             banner['right'] = activity_list.filter(banner_pos='second_right')[0].pc_banner
         except Exception:
-            banner['right'] = ''
+            banner['right'] = '' # FixME
+
         limit = 6
-        activity_list = get_queryset_paginator(activity_list, 1, limit)
+        page = 1
+
+        activity_list, all_page, data_count = get_queryset_paginator(activity_list, 1, limit)
 
         return {
             'banner': banner,
-            'results': activity_list[:limit]
+            'results': activity_list[:limit],
+            'all_page': all_page,
+            'page': page,
+            'list_count': data_count
         }
 
 
-class ActivityListPC(APIView):
+class ActivityAreaApi(APIView):
     permission_classes = ()
 
     @property
     def allowed_methods(self):
-        return ['GET', 'POST']
+        return ['GET']
 
     def get(self, request):
         template_name = 'include/ajax/area_ajax.jade'
 
         activity_list = ActivityShow.objects.filter(link_is_hide=False,
-                                                     is_pc=True,
-                                                     start_at__lte=timezone.now(),
-                                                     end_at__gt=timezone.now(),
-                                                     ).select_related('activity').\
-                                                     order_by('-activity__priority')
+                                                    is_pc=True,
+                                                    start_at__lte=timezone.now(),
+                                                    end_at__gt=timezone.now(),
+                                                    ).select_related('activity').\
+                                                    order_by('-activity__priority')
 
         category = request.GET.get('category', 'all')
+
         if category:
             activity_list = activity_list.filter(category=category)
 
@@ -167,24 +172,16 @@ class ActivityListPC(APIView):
         page = int(page)
         pagesize = int(pagesize)
 
-        paginator = Paginator(activity_list, pagesize)
+        activity_list, all_page, data_count = get_queryset_paginator(activity_list,
+                                                                     page, pagesize)
 
-        try:
-            activity_list = paginator.page(page)
-        except PageNotAnInteger:
-            activity_list = paginator.page(1)
-        except Exception:
-            activity_list = paginator.page(paginator.num_pages)
-
-        all_page = paginator.num_pages
-        data_count = paginator.count
         html_data = _generate_ajax_template(activity_list, template_name)
 
         return Response({
             'html_data': html_data,
             'page': page,
             'all_page': all_page,
-            'data_count': data_count
+            'list_count': data_count
         })
 
 
