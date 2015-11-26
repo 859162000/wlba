@@ -16,7 +16,7 @@ class DecryptParmsAPIView(APIView):
         """
         super(DecryptParmsAPIView, self).initial(request, args, kwargs)
         try:
-            # logger.debug("===decrypt in wanglibao_rest.common====request_params:%s"%request.__dict__)
+            logger.debug("===decrypt in wanglibao_rest.common====request_params:%s"%request.__dict__)
             method = request.method.lower()
             self.params = {}
             request_params = {}
@@ -29,13 +29,7 @@ class DecryptParmsAPIView(APIView):
             for k, v in request_params.iteritems():
                 if k == 'param':
                     self.params[k] = {}
-                    if type(v) is list:
-                        for ps in v:
-                            ps = json.loads(ps)
-                            for pk, pv in ps.iteritems():
-                                token_key += pk
-                                self.params[k][pk]=pv
-                    elif type(v) is unicode:
+                    if type(v) is unicode:
                         p_v = json.loads(v)
                         for vk, vv in p_v.iteritems():
                             token_key += vk
@@ -45,6 +39,7 @@ class DecryptParmsAPIView(APIView):
                             token_key += vk
                             self.params[k][vk] = vv
                     if token_key:
+                        token_key = "".join(sorted(list(token_key)))
                         token_key += settings.APP_DECRYPT_KEY
                 else:
                     self.params[k] = v
@@ -56,7 +51,7 @@ class DecryptParmsAPIView(APIView):
                     print token_key
                     print content
                     print getDecryptedContent(token_key, content, int(length))
-                    self.params[key]=getDecryptedContent(token_key, content, int(length))
+                    self.params[key] = getDecryptedContent(token_key, content, int(length))
                 logger.debug("===decrypt in wanglibao_rest.common====self.params:%s"%self.params)
         except Exception, e:
             print e
