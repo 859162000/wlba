@@ -35,7 +35,7 @@ block main
               span.big_number {{p2p_total_asset|money_format}}
             p.align-center 理财专区(元)
         .sign-money-card
-          +
+          //+
       else
         .brief--p2p-total-asset
           a(href="/accounts/home/")
@@ -43,18 +43,18 @@ block main
               span.big_number {{p2p_total_asset|money_format}}
             p.align-center 理财专区(元)
         .sign-money-card
-          +
-      if mode == 'p2p'
-        .brief--fund-total-asset
-          a(href="/accounts/home/experience/")
-            p.align-center
-              span.big_number {{experience_account.unpaid_interest}}
-            p.align-center 体验金(元)
-      else
-        .brief--fund-total-asset.active
-          a(href="/accounts/home/experience/")
-            p.align-center
-              span.big_number {{experience_account.unpaid_interest}}
+      //    +
+      //if mode == 'p2p'
+      //  .brief--fund-total-asset
+      //    a(href="/accounts/home/experience/")
+      //      p.align-center
+      //        span.big_number {{experience_account.unpaid_interest}}
+      //      p.align-center 体验金(元)
+      //else
+      //  .brief--fund-total-asset.active
+      //    a(href="/accounts/home/experience/")
+      //      p.align-center
+      //        span.big_number {{experience_account.unpaid_interest}}
             p.align-center 体验金(元)
   if mode == 'p2p'
     .account-home-panel__no-padding
@@ -179,19 +179,19 @@ block main
               .row.tyjRow
                   .total-asset-money-card
                       p.align-center
-                          span.big_number {{experience_account.total_experience_amount}}
+                          span.big_number {{experience_account.total_experience_amount | money_format}}
                       p.align-center.desc 体验金总资产（元）
                   .total-asset-money-card
                       p.align-center
-                          span.big_number {{experience_account.experience_amount}}
+                          span.big_number {{experience_account.experience_amount | money_format}}
                       p.align-center.desc 体验金余额（元）
                   .total-asset-money-card
                       p.align-center
-                          span.big_number {{experience_account.paid_interest}}
+                          span.big_number {{experience_account.paid_interest | money_format}}
                       p.align-center.desc 到账收益（元）
                   .total-asset-money-card
                       p.align-center
-                          span.big_number {{experience_account.unpaid_interest}}
+                          span.big_number {{experience_account.unpaid_interest | money_format}}
                       p.align-center.desc 待收收益（元）
               p.tyjMark 注：体验金收益可以正常使用，每一笔到账收益会自动转至理财专区余额。
               table.table.tableNew
@@ -213,9 +213,9 @@ block main
                           td {{amo.product.expected_earning_rate}}%
                           td {{amo.product.period}}
                           if amo.settled
-                            td {{amo.interest}}/{{amo.interest}}（（元）
+                            td {{amo.interest | money_format}}/{{amo.interest | money_format}}（（元）
                           else
-                            td 0.00/{{amo.interest}}（元）
+                            td 0.00/{{amo.interest | money_format}}（元）
                     else
                         tr
                             td 暂无记录

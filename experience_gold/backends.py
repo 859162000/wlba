@@ -121,10 +121,11 @@ class GetExperienceAPIView(APIView):
 
             # 发放站内信
             title = u'参加活动送体验金'
-            content = u"网利宝赠送的【{}】体验金已发放，体验金额度:{}，请进入投资页面尽快投资赚收益吧！有效期至{}。" \
+            content = u"网利宝赠送的【{}】体验金已发放，体验金额度:{}元，请进入投资页面尽快投资赚收益吧！有效期至{}。" \
                       u"<br/>感谢您对我们的支持与关注!" \
-                      u"<br>网利宝".format(experience_event.name, experience_event.amount,
-                                          experience_event.unavailable_at.strftime("Y-m-d"))
+                      u"<br>网利宝".format(experience_event.name,
+                                          decimal.Decimal(str(experience_event.amount)).quantize(decimal.Decimal('.01')),
+                                          experience_event.unavailable_at.strftime("%Y-%m-%d"))
 
             inside_message.send_one.apply_async(kwargs={
                 "user_id": user.id,
@@ -140,39 +141,4 @@ class GetExperienceAPIView(APIView):
 
         return Response({'ret_code': 30003, 'message': u'领取失败,请联系网利宝,客服电话:4008-588-066.'})
 
-
-@app.task
-def experience_repayment_plan():
-    """
-    体验标还款计划结算任务
-    每天下午16:40分开始执行
-    自动将前一天16:40到当天16:40之间所有该结算的计划进行统一结算
-    结算的利息自动计入用户的资金账户余额
-    """
-    print(u"Getting experience gold repayment plan to start!")
-    now = datetime.now()
-    start = local_to_utc(datetime(now.year, now.month, now.day - 1, 16, 40, 00), 'normal')
-    end = local_to_utc(datetime(now.year, now.month, now.day, 16, 40, 00), 'normal')
-    amortizations = ExperienceAmortization.objects.filter(settled=False)\
-        .filter(term_date__gt=start, term_date__lte=end)
-    for amo in amortizations:
-        if amo.interest <= 0:
-            continue
-
-        try:
-            amo.settled = True
-            amo.settlement_time = timezone.now()
-            amo.save()
-
-            # 体验金利息计入用户账户余额
-            if amo.settled is True:
-                raise Exception(u"ID : %s was repayment")
-
-            with transaction.atomic():
-                description = u"体验金利息入账:%s元" % amo.interest
-                user_margin_keeper = MarginKeeper(amo.user)
-                user_margin_keeper.deposit(amo.interest, description=description, catalog=u"体验金利息入账")
-
-        except Exception, e:
-            logger.error(u"experience repayment error, amortization id : %s , message: %s" % (amo.id, e.message))
 

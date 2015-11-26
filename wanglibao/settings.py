@@ -433,6 +433,10 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG'
         },
+        'wanglibao': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+        },
         'wanglibao_pay': {
             'handlers': ['file', 'console'],
             'level': 'DEBUG',
@@ -455,7 +459,7 @@ LOGGING = {
         },
         'wanglibao_account': {
             'handlers': ['wanglibao_account', 'console'],
-            'level': 'INFO',
+            'level': 'DEBUG',
         },
         'wanglibao_app': {
             'handlers': ['file'],
@@ -500,6 +504,7 @@ LOGGING = {
     }
 }
 
+
 if ENV != ENV_DEV:
     LOGGING['loggers']['django']['level'] = 'INFO'
     LOGGING['loggers']['wanglibao_sms']['level'] = 'INFO'
@@ -513,6 +518,9 @@ if ENV != ENV_DEV:
 
     # session expire at browser close
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+    # set session for PHP cross domain.
+    SESSION_COOKIE_DOMAIN = '.wanglibao.com'
 
     # wsgi scheme
     os.environ['wsgi.url_scheme'] = 'https'
@@ -673,10 +681,10 @@ CELERYBEAT_SCHEDULE = {
         'task': 'marketing.tools.check_invested_status',
         'schedule': crontab(minute=0, hour=10),
     },
-    # 每天下午4点半开始处理体验金的还款
+    # 每天下午17点半开始处理体验金的还款
     'experience_repayment_plan': {
-        'task': 'experience_gold.backends.experience_repayment_plan',
-        'schedule': crontab(minute=40, hour=16),
+        'task': 'experience_gold.tasks.experience_repayment_plan',
+        'schedule': timedelta(minutes=5),
     },
     # # by Zhoudong 定期检查用户优惠券没使用,发送提醒
     # 'redpack_status_task_check': {
@@ -713,7 +721,9 @@ if ENV == ENV_PRODUCTION:
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
-    YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete'
+    YEE_PROXY_PAY_MER_ID = '10012413099'
+    YEE_PROXY_PAY_KEY = '418oFDp0384T5p236690c27Qp0893s8RZSG09VLy06A218ZCIi674V0h77M8'
+
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
@@ -762,7 +772,9 @@ elif ENV == ENV_PREPRODUCTION:
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
-    YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete'
+    YEE_PROXY_PAY_MER_ID = '10012413099'
+    YEE_PROXY_PAY_KEY = '418oFDp0384T5p236690c27Qp0893s8RZSG09VLy06A218ZCIi674V0h77M8'
+
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
@@ -796,6 +808,7 @@ else:
     STATIC_FILE_HOST = 'https://staging.wanglibao.com'
     # MER_ID = '510743'
     # CUSTOM_ID = '000010124821'
+    # huifu id 改为和生产相同
     MER_ID = '872724'
     CUSTOM_ID = '000007522683'
     SIGN_HOST = '127.0.0.1'
@@ -806,13 +819,13 @@ else:
     HUI_SHORT_OPER_ID = "bjwl"
     HUI_SHORT_LOGIN_PWD = "cathy123"
     # PAY_URL = 'http://test.chinapnr.com'
+    # huifu pay url改为和生产相同
     PAY_URL = 'https://mas.chinapnr.com'
     HUI_SHORT_BIND_URL = "%s/gar/entry.do" % PAY_URL
     HUI_SHORT_DEBIND_URL = "%s/gar/entry.do" % PAY_URL
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'http://test.chinapnr.com/buser'
 
-    YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete'
     YEE_PROXY_PAY_MER_ID = '10001126856'
     YEE_PROXY_PAY_KEY = '69cl522AV6q613Ii4W6u8K6XuW8vM1N6bFgyv769220IuYe9u37N4y7rI4Pl'
     YEE_PAY_URL = "http://mobiletest.yeepay.com/paymobile/api/pay/request"
@@ -847,6 +860,11 @@ PAY_BACK_RETURN_URL = CALLBACK_HOST + '/pay/deposit/callback/'
 PAY_RET_URL = CALLBACK_HOST + '/pay/deposit/complete/'
 WITHDRAW_BACK_RETURN_URL = CALLBACK_HOST + '/pay/withdraw/callback/'
 
+#易宝网银支付
+YEE_PROXY_PAY_URL = 'https://www.yeepay.com/app-merchant-proxy/node'
+YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete/'
+
+
 #易宝支付回调地址
 YEE_PAY_RETURN_URL = CALLBACK_HOST + '/api/pay/yee/app/deposit/complete/'
 YEE_PAY_BACK_RETURN_URL = CALLBACK_HOST + '/api/pay/yee/app/deposit/callback/'
@@ -862,7 +880,9 @@ YTX_SID = "aaf98f89495b3f3801497488ebbe0f3f"
 YTX_TOKEN = "dbf6b3bf0d514c6fa21cd12d29930c18"
 YTX_BACK_RETURN_URL = CALLBACK_HOST + "/api/ytx/voice_back/"
 
-ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
+# Modify by hb on 2015-11-25 for new id-verify-channel
+#ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
+ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
 if ENV == ENV_DEV:
     ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
     STATIC_FILE_HOST = 'http://localhost:8000'
@@ -884,8 +904,10 @@ DEBUG_TOOLBAR_CONFIG = {
 
 USE_L10N = False
 DATETIME_FORMAT = 'Y-m-d H:i:s'
-ADMIN_ADDRESS = 'AK7WtEQ4Q9KPs8Io_zOncw'
-# DATE_FORMAT='Y-m-d'
+# Modify by hb on 2015-11-25
+#ADMIN_ADDRESS = 'AK7WtEQ4Q9KPs8Io_zOncw'
+ADMIN_ADDRESS = 'PK7wlbQ4Q9KPs9Io_zOpac'
+DATE_FORMAT = 'Y-m-d'
 
 # AUTH_PROFILE_MODULE = 'wanglibao_profile.WanglibaoUserProfile'
 CKEDITOR_CONFIGS = {
@@ -1111,6 +1133,11 @@ XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
 XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
 XUNLEI9_ACTIVITY_PAGE = 'marketing_xunlei_setp'
 
+# 脉脉
+MAIMAI1_CHANNEL_CODE = 'maimai1'
+MAIMAI1_ACTIVITY_PAGE = 'maimai_index'
+MAIMAI_CALL_BACK_URL = 'https://maimai.cn/hb_pingback'
+
 
 # 对第三方回调做IP鉴权所信任的IP列表
 if ENV == ENV_PRODUCTION:
@@ -1133,6 +1160,7 @@ SUIT_CONFIG = {
 REDIS_HOST = '127.0.0.1'
 REDIS_PORT = 6379
 REDIS_DB = 0
+REDIS_PASSWORD = 'wanglibank_redis'
 
 # CACHES = {
 #     'default': {

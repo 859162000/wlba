@@ -15,13 +15,11 @@ from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2P
 from wanglibao_p2p.models import P2PEquity
 from django.core.urlresolvers import reverse
 import re
-import urlparse
-from wanglibao_redis.backend import redis_backend
-import json
-import pickle
-import datetime
-import hashlib
 from wanglibao import settings
+from wanglibao_rest import utils as rest_utils
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class IndexView(TemplateView):
@@ -272,33 +270,19 @@ def landpage_view(request):
     :param request:
     :return:
     """
-    channel_code = getattr(request, request.method).get('promo_token', None)
+    request_data = request.GET
+    channel_code = request_data.get('promo_token', None)
     url = reverse('index')
     if channel_code:
         activity_page = getattr(settings, '%s_ACTIVITY_PAGE' % channel_code.upper(), 'index')
         if channel_code == getattr(settings, '%s_CHANNEL_CODE' % channel_code.upper(), None):
-            if channel_code == 'fuba':
-                # period 为结算周期，必须以天为单位
-                period = getattr(settings, '%s_PERIOD' % channel_code.upper())
-                # 设置tid默认值
-                default_tid = getattr(settings, '%s_DEFAULT_TID' % channel_code.upper(), '')
-                tid = getattr(request, request.method).get('tid', default_tid)
-                if not tid and default_tid:
-                    tid = default_tid
-                sign = getattr(request, request.method).get('sign', None)
-                wlb_for_channel_key = getattr(settings, 'WLB_FOR_%s_KEY' % channel_code.upper())
-                # 确定渠道来源
-                if tid and sign == hashlib.md5(channel_code+str(wlb_for_channel_key)).hexdigest():
-                    redis = redis_backend()
-                    redis_channel_key = '%s_%s' % (channel_code, tid)
-                    land_time_lately = redis._get(redis_channel_key)
-                    current_time = datetime.datetime.now()
-                    # 如果上次访问的时间是在30天前则不更新访问时间
-                    if land_time_lately and tid != default_tid:
-                        land_time_lately = datetime.datetime.strptime(land_time_lately, '%Y-%m-%d %H:%M:%S')
-                        if land_time_lately + datetime.timedelta(days=int(period)) <= current_time:
-                            return HttpResponseRedirect(reverse(activity_page))
-                    redis._set(redis_channel_key, current_time.strftime("%Y-%m-%d %H:%M:%S"))
+            coop_landpage_fun = getattr(rest_utils, 'process_for_%s_landpage' % channel_code.lower(), None)
+            if coop_landpage_fun:
+                try:
+                    coop_landpage_fun(request, channel_code)
+                except Exception, e:
+                    logger.exception('process for %s landpage error' % channel_code)
+                    logger.info(e)
 
         url = reverse(activity_page) + "?promo_token=" + channel_code
     return HttpResponseRedirect(url)

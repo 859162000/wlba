@@ -8,7 +8,7 @@ import json
 
 from django.contrib.auth.models import User
 from django.db.models import Sum
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import permission_required, login_required
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.forms import model_to_dict
@@ -73,7 +73,7 @@ class BankListView(TemplateView):
 
         context.update({
             'default_bank': default_bank,
-            'banks': Bank.get_deposit_banks()[:10],
+            'banks': Bank.get_deposit_banks()[:13],
             'announcements': AnnouncementAccounts
         })
         return context
@@ -214,6 +214,23 @@ class PayCallback(View):
 class YeeProxyPayCompleteView(TemplateView):
     template_name = 'pay_complete.jade'
 
+    def _process(self, request):
+        try:
+            request_ip = get_client_ip(request)
+            if request.method == 'GET':
+                message_dict = request.GET
+            elif request.method == 'POST':
+                message_dict = request.POST
+            pay_message = YeeProxyPayCallbackMessage().parse_message(message_dict, request_ip)
+            result = YeeProxyPay().proxy_pay_callback(pay_message, request)
+            amount = pay_message.amount
+        except ThirdPayError, e:
+            logger.exception('third_pay_error')
+            result = {'ret_code': e.code}
+            amount = 0
+        return result, amount
+
+    @method_decorator(login_required(login_url='/accounts/login'))
     def get(self, request, *args, **kwargs):
         # result = HuifuPay.handle_pay_result(request)
         # amount = request.POST.get('OrdAmt', '')
@@ -222,19 +239,18 @@ class YeeProxyPayCompleteView(TemplateView):
         #     'result': result,
         #     'amount': amount
         # })
-        logger.info('web_pay_thirdpay_request_para'+str(request.GET))
-        try:
-            request_ip = get_client_ip(request)
-            pay_message = YeeProxyPayCallbackMessage().parse_message(request.GET, request_ip)
-            result = YeeProxyPay().proxy_pay_callback(pay_message, request)
-        except ThirdPayError, e:
-            logger.exception('third_pay_error')
-            result = {'ret_code': e.code}
+        logger.info('web_pay_thirdpay_get_request_para'+str(request.GET))
+        result, amount = self._process(request)
 
         return self.render_to_response({
             'result': '充值成功' if result['ret_code'] == 0 else '充值失败',
-            'amount': pay_message.amount
+            'amount': amount
             })
+
+    def post(self, request, *args, **kwargs):
+        logger.info('web_pay_thirdpay_post_request_para'+str(request.POST))
+        self._process(request)
+        return HttpResponse('success')
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):

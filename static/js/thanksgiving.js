@@ -57,8 +57,14 @@
         var arrPos = new Array();
         window.onload = function () {
             //点击抽奖
+
             lottery.init('lottery');
-            $(".prize-mingdan").on('click','.jiang-button2',function () {
+            $(".prize-mingdan").on('click', '.jiang-button2', function () {
+                if (click) {
+                    return false;
+                } else {
+                    click = true;
+                }
                 if (change['left'] == 0) {
                     return;
                 }
@@ -67,31 +73,32 @@
                     'activity': "thanks_given",
                     'level': "5000+"
                 }, function () {
-                    if (change['left'] == 0 ) {
+                    if (change['left'] == 0) {
                         $('.jiang-button').removeClass("jiang-button2");
                         $('.jiang-button').addClass("jiang-button1");
                         $('.prize-mingdan .prize-ri p').html('您没有抽奖机会');
-                        if(change['reward'] == null){
+                        if (change['reward'] == null) {
                             return;
                         }
                         //return;
                     } else {
                         $('.app-jihui').text(change['left']);
                     }
-                    if (click) {
-                        return false;
-                    } else {
-                        lottery.speed = 100;
-                        roll();
-                        click = true;
-                        //alert(4);
-                        return false;
-                    }
+
+                    lottery.speed = 100;
+                    roll();
+
 
                 })
             });
             //抽奖2
-            $('.thanks2 ').on('click', function () {
+            var onclick = false;
+            $('.thanks2').on('click', function () {
+                if (onclick) {
+                    return false;
+                } else {
+                    onclick = true;
+                }
                 if (change['left'] == 0) {
                     return;
                 }
@@ -104,7 +111,7 @@
                         $('.thanks').removeClass("thanks2");
                         $('.thanks').addClass("thanks1");
                         $('.main-thank .prize-ri1 p').html('您没有抽奖机会');
-                        if(change['reward'] == null){
+                        if (change['reward'] == null) {
                             return;
                         }
                     } else {
@@ -113,8 +120,7 @@
                     $('.hongxi').show();
                     $('#thankgi-thanks2 ').text(change['reward']);
 
-
-                    return false;
+                    onclick = false;
                 })
             })
             //banner动画

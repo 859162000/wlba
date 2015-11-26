@@ -5,6 +5,7 @@ from marketing.views import AppShareView, AppShareRegView, NewYearView, Aggregat
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 from wanglibao.views import BaiduFinanceView
+from wanglibao_activity.views import PcActivityAreaView, ActivityAreaApi
 
 urlpatterns = patterns(
     '',
@@ -124,7 +125,7 @@ urlpatterns += patterns(
     url(r'^app_seckill/$', TemplateView.as_view(template_name="app_seckill.jade")),
     url(r'^app_halloween/$', TemplateView.as_view(template_name="app_halloween.jade")),
 
-    url(r'^maimai_index/$', TemplateView.as_view(template_name="app_maimaiIndex.jade")),
+    url(r'^maimai_index/$', TemplateView.as_view(template_name="app_maimaiIndex.jade"), name='maimai_index'),
     url(r'^maimai_rules/$', TemplateView.as_view(template_name="app_maimaiRule.jade")),
     url(r'^maimai_success/$', TemplateView.as_view(template_name="app_maimaiSuccess.jade")),
     url(r'^wechat_reward/$', TemplateView.as_view(template_name="app_wechatReward.jade")),
@@ -149,6 +150,8 @@ urlpatterns += patterns(
     url(r'^app_thanksgiv/$', TemplateView.as_view(template_name="app_thanksgiv.jade")),
     url(r'^app_thanksgivin/$', TemplateView.as_view(template_name="app_thanksgivin.jade")),
 
+    # url(r'^app_thanksgivin/$', login_required(TemplateView.as_view(template_name="app_thanksgivin.jade"), login_url='/accounts/token_login/')),
+
 )
 # app with webview
 urlpatterns += patterns(
@@ -172,4 +175,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'', include('experience_gold.urls'))
+)
+
+urlpatterns += patterns(
+    '',
+    url(r'^area/$', PcActivityAreaView.as_view()),
+    url(r'^area/filter/$', ActivityAreaApi.as_view()),
 )
