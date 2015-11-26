@@ -47,6 +47,11 @@ from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityShow
 from wanglibao_activity.utils import get_queryset_paginator
 
+
+from django.core.paginator import Paginator
+from django.core.paginator import PageNotAnInteger
+
+
 logger = logging.getLogger(__name__)
 
 class AppActivateImageAPIView(APIView):
@@ -763,43 +768,33 @@ class AppCostView(TemplateView):
     template_name = 'client_cost_description.jade'
 
 
-class AppAreaView(TemplateView):
-
-    """ 最新活动 """
-    template_name = 'client_area.jade'
-
-
 class AppActivityShowHomeView(TemplateView):
     template_name = 'client_area.jade'
 
     def get_context_data(self, **kwargs):
 
-        activity_shows = ActivityShow.objects.filter(link_is_hide=False,
+        activity_list = ActivityShow.objects.filter(link_is_hide=False,
                                                      is_app=True,
                                                      start_at__lte=timezone.now(),
                                                      end_at__gt=timezone.now()
                                                      ).select_related('activity').\
                                                      order_by('-activity__priority')
 
-        activity_show_list = []
-        activity_show_list.extend(activity_shows)
+        limit = 6
+        page = 1
 
-        page = self.request.GET.get('page', 1)
-        pagesize = self.request.GET.get('pagesize', 5)
-        page = int(page)
-        pagesize = int(pagesize)
+        paginator = Paginator(activity_list, limit)
+        try:
+            activity_list = paginator.page(page)
+        except PageNotAnInteger:
+            activity_list = paginator.page(1)
+        except Exception:
+            activity_list = paginator.page(paginator.num_pages)
 
-        activity_main = get_queryset_paginator(activity_shows.filter(banner_pos='main'),
-                                               page, pagesize)
-
-        activity_left = get_queryset_paginator(activity_shows.filter(banner_pos='second_left'),
-                                               page, pagesize)
-
-        activity_right = get_queryset_paginator(activity_shows.filter(banner_pos='second_right'),
-                                                page, pagesize)
-
+        all_page = paginator.num_pages
+        print all_page
         return {
-            'activity_main': activity_main,
-            'activity_left': activity_left,
-            'activity_right': activity_right,
+            'results': activity_list[:limit],
+            'all_page': all_page,
+            'page': page
         }
