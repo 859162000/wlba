@@ -111,11 +111,11 @@ class PcActivityShowHomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         activity_list = ActivityShow.objects.filter(link_is_hide=False,
-                                                     is_pc=True,
-                                                     start_at__lte=timezone.now(),
-                                                     end_at__gt=timezone.now()
-                                                     ).select_related('activity').\
-                                                     order_by('-activity__priority')
+                                                    is_pc=True,
+                                                    start_at__lte=timezone.now(),
+                                                    end_at__gt=timezone.now()
+                                                    ).select_related('activity').\
+                                                    order_by('-activity__priority')
 
         banner = {}
         try:
@@ -132,6 +132,7 @@ class PcActivityShowHomeView(TemplateView):
             banner['right'] = activity_list.filter(banner_pos='second_right')[0].pc_banner
         except Exception:
             banner['right'] = ''
+
         limit = 6
         activity_list = get_queryset_paginator(activity_list, 1, limit)
 
@@ -152,11 +153,11 @@ class ActivityListPC(APIView):
         template_name = 'include/ajax/area_ajax.jade'
 
         activity_list = ActivityShow.objects.filter(link_is_hide=False,
-                                                     is_pc=True,
-                                                     start_at__lte=timezone.now(),
-                                                     end_at__gt=timezone.now(),
-                                                     ).select_related('activity').\
-                                                     order_by('-activity__priority')
+                                                    is_pc=True,
+                                                    start_at__lte=timezone.now(),
+                                                    end_at__gt=timezone.now(),
+                                                    ).select_related('activity').\
+                                                    order_by('-activity__priority')
 
         category = request.GET.get('category', 'all')
         if category:
