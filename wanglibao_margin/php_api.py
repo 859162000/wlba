@@ -39,7 +39,7 @@ class GetMarginInfo(APIView):
     def get(self, request):
         user_id = self.request.REQUEST.get('userId')
 
-        margin = get_margin_info(user_id)
+        margin = get_margin_info(request, user_id)
 
         return HttpResponse(renderers.JSONRenderer().render(margin, 'application/json'))
 
@@ -87,7 +87,7 @@ class CheckTradePassword(APIView):
 
     def post(self, request):
         user_id = self.request.POST.get('userId')
-        trade_password = self.request.POST.get('password')
+        trade_password = self.request.POST.get('pwd')
 
         try:
             user = User.objects.get(id=user_id)

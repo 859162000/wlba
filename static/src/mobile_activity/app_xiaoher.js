@@ -18,7 +18,7 @@
 		}
 	});
 	wx.ready(function(){
-		var host = 'https://staging.wanglibao.com/',
+		var host = 'https://www.wanglibao.com/',
 			shareName = '网利宝送百元红包',
 			shareImg = host + '/static/imgs/mobile_activity/app_xiaoher/300x300.jpg',
 			shareLink = host + '/activity/app_xiaoher/',
@@ -45,6 +45,5 @@
 			imgUrl: shareImg
 		})
 	})
-
 })(org);
 
