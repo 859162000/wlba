@@ -48,6 +48,8 @@ from wanglibao_activity.models import ActivityShow
 from wanglibao_activity.utils import get_queryset_paginator
 from wanglibao_announcement.models import AppMemorabilia
 from weixin.util import _generate_ajax_template
+from django.core.paginator import Paginator
+from django.core.paginator import PageNotAnInteger
 
 logger = logging.getLogger(__name__)
 
@@ -171,12 +173,26 @@ class AppRepaymentPlanAllAPIView(APIView):
 
     def post(self, request):
         user = request.user
+        page = request.GET.get('page', 1)
+        pagesize = request.GET.get('num', 10)
+        page = int(page)
+        pagesize = int(pagesize)
+
         user_amortizations = UserAmortization.objects.filter(user=user).order_by('-term_date')
         if user_amortizations:
+            paginator = Paginator(user_amortizations, pagesize)
+
+            try:
+                user_amortizations = paginator.page(page)
+            except PageNotAnInteger:
+                user_amortizations = paginator.page(1)
+            except Exception:
+                user_amortizations = paginator.page(paginator.num_pages)
+
             amo_list = _user_amortization_list(user_amortizations)
         else:
             amo_list = []
-        return Response({'ret_code': 0, 'data': amo_list})
+        return Response({'ret_code': 0, 'data': amo_list, 'page': page, 'num': pagesize})
 
 
 class AppRepaymentPlanMonthAPIView(APIView):
@@ -192,6 +208,11 @@ class AppRepaymentPlanMonthAPIView(APIView):
         year = request_year if request_year else now.year
         month = request_month if request_month else now.month
         current_month = '{}-{}'.format(now.year, now.month)
+
+        page = request.GET.get('page', 1)
+        pagesize = request.GET.get('num', 10)
+        page = int(page)
+        pagesize = int(pagesize)
 
         start = local_to_utc(datetime(int(year), int(month), 1), 'min')
         if int(month) == 12:
@@ -220,11 +241,25 @@ class AppRepaymentPlanMonthAPIView(APIView):
         user_amortizations = UserAmortization.objects.filter(user=user)\
             .filter(term_date__gt=start, term_date__lte=end).order_by('term_date')
         if user_amortizations:
+            paginator = Paginator(user_amortizations, pagesize)
+
+            try:
+                user_amortizations = paginator.page(page)
+            except PageNotAnInteger:
+                user_amortizations = paginator.page(1)
+            except Exception:
+                user_amortizations = paginator.page(paginator.num_pages)
             amo_list = _user_amortization_list(user_amortizations)
         else:
             amo_list = []
 
-        return Response({'ret_code': 0, 'data': amo_list, 'month_group': month_group, 'current_month': current_month})
+        return Response({'ret_code': 0,
+                         'data': amo_list, 
+                         'month_group': month_group,
+                         'current_month': current_month,
+                         'page': page,
+                         'num': pagesize
+                         })
 
 
 def _user_amortization_list(user_amortizations):
