@@ -6,10 +6,8 @@ from wanglibao_activity.models import ActivityTemplates, ActivityImages, Activit
 from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from weixin.views import _generate_ajax_template
+from weixin.util import _generate_ajax_template
 from .utils import get_queryset_paginator
-from django.core.paginator import Paginator
-from django.core.paginator import PageNotAnInteger
 
 class TemplatesFormatTemplate(TemplateView):
     def get_context_data(self, **kwargs):
@@ -134,11 +132,16 @@ class PcActivityAreaView(TemplateView):
             banner['right'] = '' # FixME
 
         limit = 6
+        page = 1
+
         activity_list, all_page, data_count = get_queryset_paginator(activity_list, 1, limit)
 
         return {
             'banner': banner,
-            'results': activity_list[:limit]
+            'results': activity_list[:limit],
+            'all_page': all_page,
+            'page': page,
+            'list_count': data_count
         }
 
 
@@ -147,7 +150,7 @@ class ActivityAreaApi(APIView):
 
     @property
     def allowed_methods(self):
-        return ['GET', 'POST']
+        return ['GET']
 
     def get(self, request):
         template_name = 'include/ajax/area_ajax.jade'
@@ -160,6 +163,7 @@ class ActivityAreaApi(APIView):
                                                     order_by('-activity__priority')
 
         category = request.GET.get('category', 'all')
+
         if category:
             activity_list = activity_list.filter(category=category)
 
@@ -177,7 +181,7 @@ class ActivityAreaApi(APIView):
             'html_data': html_data,
             'page': page,
             'all_page': all_page,
-            'data_count': data_count
+            'list_count': data_count
         })
 
 

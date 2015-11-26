@@ -179,6 +179,6 @@ urlpatterns += patterns(
 
 urlpatterns += patterns(
     '',
-    url(r'^Area/$', PcActivityAreaView.as_view()),
-    url(r'^Area/filter/$', ActivityAreaApi.as_view()),
+    url(r'^area/$', PcActivityAreaView.as_view()),
+    url(r'^area/filter/$', ActivityAreaApi.as_view()),
 )

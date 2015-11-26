@@ -47,7 +47,7 @@ from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityShow
 from wanglibao_activity.utils import get_queryset_paginator
 from wanglibao_announcement.models import AppMemorabilia
-from weixin.views import _generate_ajax_template
+from weixin.util import _generate_ajax_template
 
 logger = logging.getLogger(__name__)
 
@@ -759,6 +759,7 @@ class AppQuestionsResultView(TemplateView):
             "list": result_list,
         }
 
+
 class AppCostView(TemplateView):
 
     """ 费用说明 """
@@ -766,55 +767,79 @@ class AppCostView(TemplateView):
 
 
 class AppAreaView(TemplateView):
-
-    """ 最新活动 """
-    template_name = 'client_area.jade'
-
-
-class AppActivityShowHomeView(TemplateView):
     template_name = 'client_area.jade'
 
     def get_context_data(self, **kwargs):
+        activity_list = ActivityShow.objects.filter(link_is_hide=False,
+                                                    is_app=True,
+                                                    start_at__lte=timezone.now(),
+                                                    end_at__gt=timezone.now()
+                                                    ).select_related('activity').\
+                                                    order_by('-activity__priority')
 
-        activity_shows = ActivityShow.objects.filter(link_is_hide=False,
-                                                     is_app=True,
-                                                     start_at__lte=timezone.now(),
-                                                     end_at__gt=timezone.now()
-                                                     ).select_related('activity').\
-                                                     order_by('-activity__priority')
+        limit = 2
+        page = 1
 
-        activity_show_list = []
-        activity_show_list.extend(activity_shows)
-
-        page = self.request.GET.get('page', 1)
-        pagesize = self.request.GET.get('pagesize', 5)
-        page = int(page)
-        pagesize = int(pagesize)
-
-        activity_list, all_page, data_count = get_queryset_paginator(activity_shows,
-                                               page, pagesize)
+        activity_list, all_page, data_count = get_queryset_paginator(activity_list, 1, limit)
 
         return {
-            'activity_main': activity_list,
+            'results': activity_list[:limit],
+            'all_page': all_page,
+            'page': page
         }
 
 
-class AppMemorabiliaHomeView(APIView):
+class AppAreaApiView(APIView):
     permission_classes = ()
 
     @property
     def allowed_methods(self):
-        return ['GET', 'POST']
+        return ['GET']
 
-    def get(self):
+    def get(self, request):
+
+        template_name = 'include/ajax/ajax_area_latest.jade'
+
+        activity_list = ActivityShow.objects.filter(link_is_hide=False,
+                                                    is_app=True,
+                                                    start_at__lte=timezone.now(),
+                                                    end_at__gt=timezone.now(),
+                                                    ).select_related('activity').\
+                                                    order_by('-activity__priority')
+
+        page = request.GET.get('page', 1)
+        pagesize = request.GET.get('pagesize', 6)
+        page = int(page)
+        pagesize = int(pagesize)
+
+        activity_list, all_page, data_count = get_queryset_paginator(activity_list,
+                                                                     page, pagesize)
+
+        html_data = _generate_ajax_template(activity_list, template_name)
+
+        return Response({
+            'html_data': html_data,
+            'page': page,
+            'all_page': all_page,
+        })
+
+
+class AppMemorabiliaView(APIView):
+    permission_classes = ()
+
+    @property
+    def allowed_methods(self):
+        return ['GET']
+
+    def get(self, request):
         template_name = 'include/ajax/ajax_area_milepost.jade'
 
         memorabilias = AppMemorabilia.objects.filter(hide_link=False,
                                                      start_time__lte=timezone.now()
                                                      ).order_by('-priority')
 
-        page = self.request.GET.get('page', 1)
-        pagesize = self.request.GET.get('pagesize', 5)
+        page = request.GET.get('page', 1)
+        pagesize = request.GET.get('pagesize', 5)
         page = int(page)
         pagesize = int(pagesize)
 
@@ -823,49 +848,50 @@ class AppMemorabiliaHomeView(APIView):
 
         html_data = _generate_ajax_template(memorabilias, template_name)
 
-        return {
+        return Response({
             'html_data': html_data,
-        }
-
-
-class AppMemorabiliaDetailView(TemplateView):
-    template_name = 'memorabilia_detail.jade'
-
-    def get_context_data(self, id, **kwargs):
-        context = super(AppMemorabiliaDetailView, self).get_context_data(**kwargs)
-
-        try:
-            memorabilia = (AppMemorabilia.objects.get(pk=id,
-                                                      hide_link=False,
-                                                      start_time__lte=timezone.now()))
-
-        except AppMemorabilia.DoesNotExist:
-            raise Http404(u'您查找的大事记不存在')
-
-        context.update({
-            'memorabilia': memorabilia,
-
+            'page': page,
+            'all_page': all_page,
         })
 
-        return context
+
+# class AppMemorabiliaDetailView(TemplateView):
+#     template_name = 'memorabilia_detail.jade'
+#
+#     def get_context_data(self, id, **kwargs):
+#         context = super(AppMemorabiliaDetailView, self).get_context_data(**kwargs)
+#
+#         try:
+#             memorabilia = (AppMemorabilia.objects.get(pk=id,
+#                                                       hide_link=False,
+#                                                       start_time__lte=timezone.now()))
+#
+#         except AppMemorabilia.DoesNotExist:
+#             raise Http404(u'您查找的大事记不存在')
+#
+#         context.update({
+#             'memorabilia': memorabilia,
+#
+#         })
+#
+#         return context
 
 
-class AppMemorabiliaPreviewView(TemplateView):
-    template_name = 'app_memorabilia_preview.jade'
-
-    def get_context_data(self, id, **kwargs):
-        context = super(AppMemorabiliaPreviewView, self).get_context_data(**kwargs)
-
-        try:
-            memorabilia = AppMemorabilia.objects.get(pk=id)
-
-        except AppMemorabilia.DoesNotExist:
-            raise Http404(u'您查找的大事记不存在')
-
-        context.update({
-            'memorabilia': memorabilia,
-
-        })
-
-        return context
-
+# class AppMemorabiliaPreviewView(TemplateView):
+#     template_name = 'app_memorabilia_preview.jade'
+#
+#     def get_context_data(self, id, **kwargs):
+#         context = super(AppMemorabiliaPreviewView, self).get_context_data(**kwargs)
+#
+#         try:
+#             memorabilia = AppMemorabilia.objects.get(pk=id)
+#
+#         except AppMemorabilia.DoesNotExist:
+#             raise Http404(u'您查找的大事记不存在')
+#
+#         context.update({
+#             'memorabilia': memorabilia,
+#
+#         })
+#
+#         return context
