@@ -1,0 +1,50 @@
+doctype html
+html(style='background:#f5f5f5;')
+  head
+    title 发现活动
+    include include/app_header.jade
+  body(style='overflow:hidden')
+    .area-warp
+      .area-nav
+        nav.tab-nav
+          ul
+            li.active
+              a(href="javascript:void()") 最新活动
+            li
+              a(href="javascript:void()") 里程碑
+          .slide-bottom
+
+      .swiper-container.area-container
+        .swiper-wrapper
+          .area-latest.swiper-slide.area-scroll
+            .area-item.area-latest
+              include include/ajax/ajax_area_latest
+          .area-milepost.swiper-slide.area-scroll
+            .area-item.area-milepost
+              include include/ajax/ajax_area_milepost
+
+    // banner javascript
+    script(src="/static/scripts/mobile/swiper/swiper.min.js")
+    script(src="/static/src/mobile/lib/zepto/zepto.js")
+    script.
+      var myswiper = new Swiper('.swiper-container', {
+          loop: false,
+          lazyLoading: false,
+          onSliderMove: function (swiper) {
+            var translateX = -(swiper.getWrapperTranslate()/2)
+            $('.slide-bottom').css('-webkit-transform', 'translate3d('+translateX+'px, 0, 0)')
+          },
+          onTouchEnd: function(swiper){
+            var translateX = 100 * swiper.activeIndex + '%';
+            $('.slide-bottom').css('-webkit-transform', 'translate3d('+translateX+', 0, 0)')
+          },
+          onSlideChangeStart: function(swiper){
+            var translateX = 100 * swiper.activeIndex + '%';
+            $('.slide-bottom').css('-webkit-transform', 'translate3d('+translateX+', 0, 0)')
+          }
+      });
+      $('.tab-nav li').on('touchend click', function(){
+        var index = $(this).index();
+        $(this).addClass('active').siblings().removeClass('active')
+        myswiper.slideTo(index, 400);
+      });

@@ -1881,7 +1881,7 @@ class AddressGetAPIView(APIView):
             return Response({'ret_code': 3002, 'message': u'ID错误'})
 
         try:
-            address = UserAddress.objects.get(id=address_id)
+            address = UserAddress.objects.get(id=address_id, user=request.user)
             if address:
                 address = {
                     'address_id': address.id,
@@ -2113,6 +2113,7 @@ class ThirdOrderQueryApiView(APIView):
                     'ret_code': 50001,
                     'message': 'api error'
                 }
+                logger.error('%s_order_query not found' % channel_code.lower())
         else:
             json_response = {
                 'ret_code': 10002,

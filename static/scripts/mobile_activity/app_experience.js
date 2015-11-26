@@ -237,13 +237,16 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             if(difference == 1){
                 alertFram.style.cssText = "position:fixed; top:35%;left:0; width:100%;z-index:1000001;";
                 strHtml = "<div id='alertTxt' class='popub-txt successWin'>";
-                strHtml+="<div class='winContent'><p class='qianshu'>8888<span>元</span></p><p class='con1'>恭喜您获得</p><p class='con2'>8,888元体验金</p><div class='btns popub-footer'><a href='javascript:void(0)' class='close_btn'>领完可以在这里投资呦！</a></div></div></div>";
+                strHtml+="<div class='winContent'><p class='qianshu'>28888<span>元</span></p><p class='con1'>恭喜您获得</p><p class='con2'>28,888元体验金</p><div class='btns popub-footer'><a href='javascript:void(0)' class='close_btn'>领完可以在这里投资呦！</a></div></div></div>";
             }else if(difference == 2){
                 strHtml = "<div id='alertTxt' class='popub-txt investWin'><p><img src='/static/imgs/mobile_activity/app_experience/right.png'/></p>";
                 strHtml+="<p class='successFonts'>恭喜您投资成功！</p><p>到期后体验金自动收回</p><p>收益自动发放</p></div>";
             }else if(difference == 3){
                 strHtml = "<div id='alertTxt' class='popub-txt oldUserWin'><p class='p_left'>您是老用户，</p>";
                 strHtml+="<p class='p_left'>关注网利宝最新活动，</p><p class='p_left'>赢取老用户专享体验金。</p>";
+                strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo.png'/></p><p class='popub-footer'><div class='close_btn'>知道了！</div></p></div>";
+            }else if(difference == 4){
+                strHtml+="<p class='p_left'>"+ txt +"</p>";
                 strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo.png'/></p><p class='popub-footer'><div class='close_btn'>知道了！</div></p></div>";
             }
             alertFram.innerHTML = strHtml;
@@ -301,18 +304,23 @@ org.experience = (function(org){
                         org.ui.alert('', function () {
                             $('body,html').scrollTo($('.project').offset().top);
                         }, '1')
-
+                        var tyjye = lib._fmoney((parseFloat($('.tyjye').text())+data.data.amount),2);
+                        var zzc = lib._fmoney((parseFloat($('.zzc').text())+data.data.amount),2);
+                        var rzje = lib._fmoney(data.data.amount,2,1);
                         $('.qianshu').html(data.data.amount+'<span>元</span>')
-                        $('.icon2').text(data.data.amount+'元体验金')
-                        $('.tyjye').text(parseFloat($('.tyjye').text())+data.data.amount)
-                        $('.zzc').text(parseFloat($('.zzc').text())+data.data.amount)
-                        $('.rzje').text(data.data.amount+'元')
+                        $('.icon2').text(rzje+'元体验金')
+                        $('.tyjye').text(tyjye);
+                        $('.zzc').text(zzc);
+                        $('.rzje').text(rzje+'元');
                         $('.investBtnEd').removeClass('investBtnEd').addClass('investBtn');
-                        $('.receive_box').find('img').hide()
+                        $('.receive_box').find('img').hide();
                         $('.receive_box').find('#edT').show().text('已领取体验金'+ data.data.amount +'元')
+                    }else{
+                      org.ui.alert(data.data.message, '', '4')
                     }
                 },
-                error: function () {
+                error: function (data) {
+                    org.ui.alert(data.data.message, '', '4')
                 }
               });
             })
@@ -323,25 +331,51 @@ org.experience = (function(org){
             })
         },
         _goInvest:function(){
+            /*投资*/
             $('.project_btn').delegate('.investBtn','click',function() {
               org.ajax({
                 url: '/api/experience/buy/',
                 type: 'POST',
                 data: {},
                 success:function(data){
-                    org.ui.alert('', '', '2')
-                    setTimeout(function () {
-                        $('#alert-cont,#popubMask').hide();
-                        $('.investBtn').text('已投资'+ data.data.amount +'元').addClass('investBtnEd').removeClass('investBtn')
-                        $('.time_style').show().text('将于'+ data.data.term_date +'收益'+ data.data.interest +'元')
-                    }, 2000)
+                    if(data.ret_code > 0) {
+                        org.ui.alert(data.data.message, '', '4')
+                    }else{
+                        org.ui.alert('', '', '2')
+                        setTimeout(function () {
+                            $('#alert-cont,#popubMask').hide();
+                            /*$('.investBtn').text('已投资'+ data.data.amount +'元').addClass('investBtnEd').removeClass('investBtn')
+                            $('.time_style').show().text('将于'+ data.data.term_date +'收益'+ data.data.interest +'元')*/
+                            location.reload();
+                        }, 2000)
+                    }
                 },
-                error: function (xhr) {
+                error: function (data) {
+                    org.ui.alert(data.data.message, '', '4')
                 }
               });
             })
         },
+              /*格式化金额*/
+        _fmoney:function(s, n, m){
+           n = n > 0 && n <= 20 ? n : 2;
+           s = parseFloat((s + "").replace(/[^\d\.-]/g, "")).toFixed(n) + "";
+           var l = s.split(".")[0].split("").reverse(),
+           r = s.split(".")[1];
+           t = "";
+           for(i = 0; i < l.length; i ++ )
+           {
+              t += l[i] + ((i + 1) % 3 == 0 && (i + 1) != l.length ? "," : "");
+           }
+           if(m == 1 && r == '00')
+           {
+               return t.split("").reverse().join("");
+           }else{
+               return t.split("").reverse().join("") + "." + r;
+           }
+        },
         _bannerEffect:function(){
+            /*效果*/
             function snow(left,height,src){
                 var elem = $("<div />", {
                     css: {

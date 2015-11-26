@@ -150,7 +150,7 @@ class QrCode(models.Model):
     scene_str = models.CharField('scene_str', max_length=128, null=False)
     create_at = models.DateTimeField('生成时间', auto_now_add=True, blank=True, null=True)
     def ticket_generate(self):
-        return u'<a href="/weixin/api/generate/qr_limit_scene_ticket/?id=%s" target="_self">生成ticket</a>' % (self.id,)
+        return u'<a href="/weixin/api/generate/qr_scene_ticket/?id=%s" target="_self">生成ticket</a>' % (self.id,)
     ticket_generate.short_description = u'生成ticket'
     ticket_generate.allow_tags = True
     def qrcode_link(self):
