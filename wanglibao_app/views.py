@@ -46,6 +46,7 @@ from wanglibao_margin.models import MarginRecord
 from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityShow
 from wanglibao_activity.utils import get_queryset_paginator
+from wanglibao_announcement.models import AppMemorabilia
 
 logger = logging.getLogger(__name__)
 
@@ -803,3 +804,64 @@ class AppActivityShowHomeView(TemplateView):
             'activity_left': activity_left,
             'activity_right': activity_right,
         }
+
+
+class AppMemorabiliaHomeView(TemplateView):
+    template_name = 'include/ajax/ajax_area_milepost.jade'
+
+    def get_context_data(self, **kwargs):
+        memorabilias = AppMemorabilia.objects.filter(hide_link=False,
+                                                     start_time__lte=timezone.now()
+                                                     ).order_by('-priority')
+
+        page = self.request.GET.get('page', 1)
+        pagesize = self.request.GET.get('pagesize', 5)
+        page = int(page)
+        pagesize = int(pagesize)
+
+        return {
+            'memorabilias': memorabilias
+        }
+
+
+class AppMemorabiliaDetailView(TemplateView):
+    template_name = 'memorabilia_detail.jade'
+
+    def get_context_data(self, id, **kwargs):
+        context = super(AppMemorabiliaDetailView, self).get_context_data(**kwargs)
+
+        try:
+            memorabilia = (AppMemorabilia.objects.get(pk=id,
+                                                      hide_link=False,
+                                                      start_time__lte=timezone.now()))
+
+        except AppMemorabilia.DoesNotExist:
+            raise Http404(u'您查找的大事记不存在')
+
+        context.update({
+            'memorabilia': memorabilia,
+
+        })
+
+        return context
+
+
+class AppMemorabiliaPreviewView(TemplateView):
+    template_name = 'app_memorabilia_preview.jade'
+
+    def get_context_data(self, id, **kwargs):
+        context = super(AppMemorabiliaPreviewView, self).get_context_data(**kwargs)
+
+        try:
+            memorabilia = AppMemorabilia.objects.get(pk=id)
+
+        except AppMemorabilia.DoesNotExist:
+            raise Http404(u'您查找的大事记不存在')
+
+        context.update({
+            'memorabilia': memorabilia,
+
+        })
+
+        return context
+
