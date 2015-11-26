@@ -69,7 +69,12 @@ class StatsKeyWordMiddleWare(object):
                     website = website[0]
                     qs = urlparse.parse_qs(res.query)
                     if self.statics[website]['keyword'] in qs:
-                        request.session["promo_source_keyword"] = "|".join(qs[self.statics[website]['keyword']])
+                        res = "|".join(qs[self.statics[website]['keyword']])
+                        try:
+                            gb2312 = res.decode('gb2312')
+                        except:
+                            gb2312 = res
+                        request.session["promo_source_keyword"] = gb2312
                         request.session["promo_source_site_name"] = self.statics[website]['name']
                         request.session['promo_source_website'] = self.statics[website]['website']
             except Exception, reason:
