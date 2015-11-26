@@ -873,7 +873,7 @@ function getCode(){//得到用户信息的二维码
     var phone = org.getQueryStringByName('phone');
     org.ajax({
         type: "POST",
-        url: "/weixin/api/generate/qr_limit_scene_ticket/",
+        url: "/weixin/api/generate/qr_scene_ticket/",
         data: {"original_id":"gh_f758af6347b6"},//c:gh_32e9dc3fab8e
         success: function (data) {
             $("#sub-code").html("<img src='"+ data.qrcode_url + "' />");
