@@ -4,6 +4,10 @@ from rest_framework.views import APIView
 from report.crypto import getDecryptedContent
 from rest_framework.authentication import get_authorization_header, TokenAuthentication
 from django.conf import settings
+import json
+import logging
+
+logger = logging.getLogger("wanglibao_rest")
 
 class DecryptParmsAPIView(APIView):
     def initial(self, request, *args, **kwargs):
@@ -12,22 +16,48 @@ class DecryptParmsAPIView(APIView):
         """
         super(DecryptParmsAPIView, self).initial(request, args, kwargs)
         try:
-
+            logger.debug("===decrypt in wanglibao_rest.common====request_params:%s"%request.__dict__)
             method = request.method.lower()
-            params = {}
+            self.params = {}
+            request_params = {}
             if method == "get":
-                params = request.GET
+                request_params = request.GET
             if method == "post":
-                params = request.DATA
-            decrypt_params = params.get("params", None)
+                request_params = request.DATA
+
             token_key = ""
-            if decrypt_params:
-                for decrypt_param, length in decrypt_params.iteritems():
-                    token_key += decrypt_param
-                token_key+=settings.APP_DECRYPT_KEY
-                for decrypt_param, length in decrypt_params.iteritems():
-                    decrypted = getDecryptedContent(token_key, decrypt_param, length)
-                    params[decrypt_param] = decrypted
-            print params
-        except:
-            pass
+            for k, v in request_params.iteritems():
+                if k == 'param':
+                    self.params[k] = {}
+                    if type(v) is list:
+                        for ps in v:
+                            ps = json.loads(ps)
+                            for pk, pv in ps.iteritems():
+                                token_key += pk
+                                self.params[k][pk]=pv
+                    if type(v) is unicode:
+                        v = json.loads(v)
+                        for vk, vv in v.iteritems():
+                            token_key += vk
+                            self.params[k][vk] = vv
+                    if type(v) is dict:
+                        for vk, vv in v.iteritems():
+                            token_key += vk
+                            self.params[k][vk] = vv
+                    if token_key:
+                        token_key += settings.APP_DECRYPT_KEY
+                else:
+                    self.params[k] = v
+            logger.debug("===decrypt in wanglibao_rest.common====request_params:%s"%request_params)
+            if self.params.get("param", {}):
+                for key, length in self.params.get("param", {}).iteritems():
+                    content = self.params.get(key, "")
+                    # print length
+                    # print key
+                    # print content
+                    self.params[key]=getDecryptedContent(token_key, content, int(length))
+                logger.debug("===decrypt in wanglibao_rest.common====self.params:%s"%self.params)
+        except Exception, e:
+            print e
+            # logger.debug("===decrypt in wanglibao_rest.common====error:%s"%e.message)
+

@@ -890,8 +890,8 @@ class LoginAPIView(DecryptParmsAPIView):
     permission_classes = ()
 
     def post(self, request, *args, **kwargs):
-        identifier = request.DATA.get("identifier", "")
-        password = request.DATA.get("password", "")
+        identifier = self.params.get("identifier", "")
+        password = self.params.get("password", "")
 
         if not identifier or not password:
             return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
