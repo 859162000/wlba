@@ -44,9 +44,11 @@ require(['jquery', 'csrf'], function ($) {
             data: data,
             beforeSend: function(){
                 dopost = true
+                $('.area-mask-warp').show();
             },
             complete: function(){
                 dopost = false
+                $('.area-mask-warp').hide();
             }
         }).done(function (result) {
             if(result.page >= result.all_page){
