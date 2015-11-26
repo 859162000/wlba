@@ -71,7 +71,7 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_f
         return
 
 
-def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, user_ib=None, order_id=0):
+def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, order_id, user_ib=None):
     """ check the trigger node """
     product_id = int(product_id)
     # 注册 或 实名认证
