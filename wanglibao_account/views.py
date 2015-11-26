@@ -1173,15 +1173,18 @@ class Third_login_back(APIView):
         result = third_login.login_back(request)
         return Response(result)
 
+from wanglibao_rest.common import DecryptParmsAPIView
 
-class ChangePasswordAPIView(APIView):
+class ChangePasswordAPIView(DecryptParmsAPIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        new_password = request.DATA.get('new_password', "").strip()
-        old_password = request.DATA.get('old_password', "").strip()
-        validate_code = request.DATA.get('validate_code', "").strip()
-
+        # new_password = request.DATA.get('new_password', "").strip()
+        # old_password = request.DATA.get('old_password', "").strip()
+        # validate_code = request.DATA.get('validate_code', "").strip()
+        new_password = self.params.get('new_password', "").strip()
+        old_password = self.params.get('old_password', "").strip()
+        validate_code = self.params.get('validate_code', "").strip()
         if not old_password or not new_password or not validate_code:
             return Response({'ret_code': 30041, 'message': u'信息输入不完整'})
 
