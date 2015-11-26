@@ -84,7 +84,14 @@ class AesForApp(object):
 
 
 def getAppSecretKey(token):
-    return (hashlib.md5(token[:5]).hexdigest()[:16]).lower()
+    return (hashlib.md5(token).hexdigest()[:16]).lower()
+
+def getDecryptedContent(token, content_encrypted, original_length):
+    key = getAppSecretKey(token)
+    padding = AES.block_size-original_length%16
+    aes = AesForApp(key, padding)
+    return aes.decrypt(content_encrypted)
+
 
 
 class ReportCrypto(object):

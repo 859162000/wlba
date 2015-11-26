@@ -58,6 +58,8 @@ from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_redpack.models import Income
 from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
+from common import DecryptParmsAPIView
+
 logger = logging.getLogger('wanglibao_rest')
 
 
@@ -884,7 +886,7 @@ class AdminIdValidate(APIView):
                             "validate": True
                         }, status=200)
 
-class LoginAPIView(APIView):
+class LoginAPIView(DecryptParmsAPIView):
     permission_classes = ()
 
     def post(self, request, *args, **kwargs):
