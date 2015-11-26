@@ -768,7 +768,7 @@ class AppCostView(TemplateView):
     template_name = 'client_cost_description.jade'
 
 
-class AppActivityShowHomeView(TemplateView):
+class AppAreaView(TemplateView):
     template_name = 'client_area.jade'
 
     def get_context_data(self, **kwargs):
@@ -780,7 +780,7 @@ class AppActivityShowHomeView(TemplateView):
                                                      ).select_related('activity').\
                                                      order_by('-activity__priority')
 
-        limit = 6
+        limit = 2
         page = 1
 
         paginator = Paginator(activity_list, limit)
@@ -798,3 +798,46 @@ class AppActivityShowHomeView(TemplateView):
             'all_page': all_page,
             'page': page
         }
+
+class AppAreaApiView(APIView):
+    permission_classes = ()
+
+    @property
+    def allowed_methods(self):
+        return ['GET']
+
+    def get(self, request):
+        from weixin.views import _generate_ajax_template
+
+        template_name = 'include/ajax/ajax_area_latest.jade'
+
+        activity_list = ActivityShow.objects.filter(link_is_hide=False,
+                                                     is_app=True,
+                                                     start_at__lte=timezone.now(),
+                                                     end_at__gt=timezone.now(),
+                                                     ).select_related('activity').\
+                                                     order_by('-activity__priority')
+
+        page = request.GET.get('page', 1)
+        pagesize = request.GET.get('pagesize', 6)
+        page = int(page)
+        pagesize = int(pagesize)
+
+        paginator = Paginator(activity_list, pagesize)
+
+        try:
+            activity_list = paginator.page(page)
+        except PageNotAnInteger:
+            activity_list = paginator.page(1)
+        except Exception:
+            activity_list = paginator.page(paginator.num_pages)
+
+        all_page = paginator.num_pages
+
+        html_data = _generate_ajax_template(activity_list, template_name)
+
+        return Response({
+            'html_data': html_data,
+            'page': page,
+            'all_page': all_page
+        })
