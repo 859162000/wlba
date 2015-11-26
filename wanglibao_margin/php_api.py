@@ -8,6 +8,7 @@ from wanglibao_account.auth_backends import User
 from wanglibao_margin.php_utils import get_user_info, get_margin_info
 from wanglibao_account import message as inside_message
 
+
 class GetUserInfo(APIView):
     """
     author: Zhoudong
