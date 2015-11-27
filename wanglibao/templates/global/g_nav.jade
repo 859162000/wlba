@@ -27,6 +27,7 @@
         a(href='/accounts/home/').samll-nav-user {{user | display_name}}
         a(href='/accounts/logout?next=/').samll-nav-logout 退出
       else
+        a(href='/accounts/login/').samll-nav-user 登录
         a(href='/accounts/register/').samll-nav-logout 免费注册
 
 .g-nav-warp
@@ -50,9 +51,7 @@
           +liItem('/pay/withdraw/', '我要提现')
           +liItem('/accounts/auto_tender/', '自动投标')
           +liItem('/accounts/transaction/p2p/', '交易记录')
-          if user.is_authenticated
-            li
-              a(href='/accounts/logout?next=/') 退出
+          
     .g-nav-box
       mixin nav-item(name, link)
         if activeItem == name
