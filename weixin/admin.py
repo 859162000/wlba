@@ -1,6 +1,6 @@
 # encoding:utf-8
 from django.contrib import admin
-from .models import Account, QrCode, SubscribeService
+from .models import Account, QrCode, SubscribeService,WeiXinChannel
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
@@ -48,6 +48,8 @@ class AccountAdmin(admin.ModelAdmin):
         self.oauth_login_url.short_description = u'微信登录链接'
         return super(AccountAdmin, self).get_list_display(request)
 
+class WeiXinChannelAdmin(admin.ModelAdmin):
+    pass
 
 class QrCodeAdmin(admin.ModelAdmin):
     list_display = ('id', 'account_original_id', 'ticket', 'expire_at', 'url', 'scene_str', 'ticket_generate', 'qrcode_link')
@@ -61,3 +63,4 @@ class SubscribeServiceAdmin(admin.ModelAdmin):
 admin.site.register(Account, AccountAdmin)
 admin.site.register(QrCode, QrCodeAdmin)
 admin.site.register(SubscribeService, SubscribeServiceAdmin)
+admin.site.register(WeiXinChannel, WeiXinChannelAdmin)
