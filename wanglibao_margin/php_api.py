@@ -8,6 +8,7 @@ from wanglibao_account.auth_backends import User
 from wanglibao_margin.php_utils import get_user_info, get_margin_info
 from wanglibao_account import message as inside_message
 
+
 class GetUserInfo(APIView):
     """
     author: Zhoudong
@@ -39,7 +40,7 @@ class GetMarginInfo(APIView):
     def get(self, request):
         user_id = self.request.REQUEST.get('userId')
 
-        margin = get_margin_info(user_id)
+        margin = get_margin_info(request, user_id)
 
         return HttpResponse(renderers.JSONRenderer().render(margin, 'application/json'))
 

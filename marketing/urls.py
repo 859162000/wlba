@@ -5,7 +5,7 @@ from marketing.views import AppShareView, AppShareRegView, NewYearView, Aggregat
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 from wanglibao.views import BaiduFinanceView
-from wanglibao_activity.views import PcActivityShowHomeView, ActivityListPC
+from wanglibao_activity.views import PcActivityAreaView, ActivityAreaApi
 
 urlpatterns = patterns(
     '',
@@ -66,6 +66,7 @@ urlpatterns = patterns(
     url(r'winter_brid/$', TemplateView.as_view(template_name="winter_bird.jade")),
     url(r'^xiaoher/$', TemplateView.as_view(template_name="xiaoher.jade")),
     url(r'fun_tuan/$', TemplateView.as_view(template_name="fun_tuan.jade")),
+    url(r'noviceDecember/$', TemplateView.as_view(template_name="noviceDecember.jade")),
 )
 
 # app URL
@@ -179,6 +180,6 @@ urlpatterns += patterns(
 
 urlpatterns += patterns(
     '',
-    url(r'^home/$', PcActivityShowHomeView.as_view()),
-    url(r'^list/$', ActivityListPC.as_view()),
+    url(r'^area/$', PcActivityAreaView.as_view()),
+    url(r'^area/filter/$', ActivityAreaApi.as_view()),
 )

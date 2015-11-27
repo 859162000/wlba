@@ -26,7 +26,7 @@ from experience_gold.models import ExperienceEvent, ExperienceEventRecord
 logger = logging.getLogger(__name__)
 
 
-def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_full=False, order_id=0):
+def check_activity(user, trigger_node, device_type, amount=0, product_id=0, order_id=0, is_full=False):
     now = timezone.now()
     device_type = decide_device(device_type)
     if not trigger_node:
@@ -71,7 +71,7 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, is_f
         return
 
 
-def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, user_ib=None, order_id=0):
+def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, order_id, user_ib=None):
     """ check the trigger node """
     product_id = int(product_id)
     # 注册 或 实名认证
@@ -408,6 +408,7 @@ def _send_gift_redpack(user, rule, rtype, redpack_id, device_type, amount, is_fu
             _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, None, amount)
         if rule.share_type == 'both' or rule.share_type == 'inviter':
             user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
+            logger.info("user_introduced_by %s" % user_introduced_by)
             if user_introduced_by:
                 _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_introduced_by, amount)
     else:

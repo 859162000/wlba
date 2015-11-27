@@ -32,16 +32,23 @@ html(style='background:#f5f5f5;')
     .i-mod-warp.area-nav-warp.mg-b-xxl
       .area-filter-nav.font-m
         ul.clearfix#area-nav
-          li.active 全部
-          li 投资有奖
-          li 节日热点
-          li 新手福利
+          li.active(data-category='all', data-page='1') 全部
+          li(data-category='purchase', data-page='0') 投资有奖
+          li(data-category='holiday', data-page='0') 节日热点
+          li(data-category='novice', data-page='0') 新手福利
         .active_slide
     .i-mod-warp
       .i-mod.area-active-item.clearfix
         include include/ajax/area_ajax.jade
       .area-more-wap.font-s
-        .area-list-more 更多
+        if all_page > page
+          .area-list-more 更多
+          .area-list-unmore(style='display:none;') 呵呵，没有更多了！
+        else
+          .area-list-unmore 呵呵，没有更多了！
+    .i-mod-warp.area-mask-warp
+        .area-mask
+        .loading-icon
     include global/g_footer
     script.
       require(["/static/src/pc/area.js?v=22"])

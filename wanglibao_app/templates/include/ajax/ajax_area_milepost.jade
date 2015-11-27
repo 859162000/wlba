@@ -1,15 +1,12 @@
 
-mixin list()
-  .area-list
-    .area-ac-head 网利宝B轮融资携手IDG
-    .area-ac-banner
-      img(src='/static/imgs/app/area/default_banner.png')
-    .area-ac-milepost-footer
-      .area-milepost-time 2015-10-08
-      .area-milepost-link 立即查看
-+list()
-+list()
-+list()
-+list()
-+list()
+if results
+  for activity in results
+    .area-list
+      .area-ac-head {{activity.title}}
+      .area-ac-banner
+        img(src='/media/{{activity.banner}}')
+      .area-ac-milepost-footer
+        .area-milepost-time {{activity.done_date}}
+        a(href="{{activity.detail_link}}").area-milepost-link 立即查看
+
 
