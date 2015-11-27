@@ -114,7 +114,8 @@ class PcActivityAreaView(TemplateView):
                                                     start_at__lte=timezone.now(),
                                                     end_at__gt=timezone.now()
                                                     ).select_related('activity').\
-                                                    order_by('-activity__priority')
+                                                    order_by('-priority',
+                                                             '-created_at',)
 
         banner = ActivityBannerPosition.objects.all().select_related().order_by('-priority',
                                                                                 '-created_at',
@@ -149,7 +150,8 @@ class ActivityAreaApi(APIView):
                                                     start_at__lte=timezone.now(),
                                                     end_at__gt=timezone.now(),
                                                     ).select_related('activity').\
-                                                    order_by('-activity__priority')
+                                                    order_by('-priority',
+                                                             '-created_at',)
 
         category = request.GET.get('category', 'all')
 

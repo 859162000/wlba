@@ -227,24 +227,49 @@ class WapActivityTemplatesAdmin(admin.ModelAdmin):
 class ActivityShowAdmin(admin.ModelAdmin):
     actions = None
     search_fields = ('activity', 'channel')
-    ordering = ('-created_at',)
-    # raw_id_fields = ('activity',)
+    ordering = ('-priority', '-created_at')
+    raw_id_fields = ('activity',)
     list_display = ('activity', 'activity_status', 'platform', 'priority')
 
 
 class ActivityBannerPosForm(forms.ModelForm):
-    main = forms.CharField(required=True)
-    second_left = forms.CharField(required=True)
-    second_right = forms.CharField(required=True)
+    queryset = ActivityShow.objects.filter(is_pc=True, link_is_hide=False)
+    main = forms.ModelChoiceField(queryset=queryset, label=u'主推', required=True)
+    second_left = forms.ModelChoiceField(queryset=queryset, label=u'副推左', required=True)
+    second_right = forms.ModelChoiceField(queryset=queryset, label=u'副推右', required=True)
 
-    def clean(self):
+    def clean_main(self):
         main = self.cleaned_data.get('main')
         second_left = self.cleaned_data.get('second_left')
         second_right = self.cleaned_data.get('second_right')
 
-        act_list = [main, second_left, second_right]
-        if len(act_list) != len(set(act_list)):
-            raise forms.ValidationError(u'Banner主、副推活动不能重复')
+        act_list = [second_left, second_right]
+        if main in act_list:
+            raise forms.ValidationError(u'活动不能重复')
+
+        return main
+
+    def clean_second_left(self):
+        main = self.cleaned_data.get('main')
+        second_left = self.cleaned_data.get('second_left')
+        second_right = self.cleaned_data.get('second_right')
+
+        act_list = [main, second_right]
+        if second_left in act_list:
+            raise forms.ValidationError(u'活动不能重复')
+
+        return second_left
+
+    def clean_second_right(self):
+        main = self.cleaned_data.get('main')
+        second_left = self.cleaned_data.get('second_left')
+        second_right = self.cleaned_data.get('second_right')
+
+        act_list = [main, second_left]
+        if second_right in act_list:
+            raise forms.ValidationError(u'活动不能重复')
+
+        return second_right
 
     class Meta:
         forms.model = ActivityBannerPosition
@@ -252,13 +277,9 @@ class ActivityBannerPosForm(forms.ModelForm):
 
 class ActivityBannerPosAdmin(admin.ModelAdmin):
     actions = None
-    # search_fields = ('main', 'second_left', 'second_right')
-    raw_id_fields = ('main', 'second_left', 'second_right')
+    search_fields = ('main', 'second_left', 'second_right')
     ordering = ('-priority', '-created_at',)
-    # form = ActivityBannerPosForm
-    #
-    # def save_model(self, request, obj, form, change):
-    #     form.
+    form = ActivityBannerPosForm
 
 
 admin.site.register(WapActivityTemplates, WapActivityTemplatesAdmin)
