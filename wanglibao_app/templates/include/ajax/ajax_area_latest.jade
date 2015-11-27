@@ -1,16 +1,11 @@
 
-
-mixin list()
-  .area-list
-    .area-ac-head 网利宝B轮融资携手IDG
-    .area-ac-banner
-      .area-ac-time 剩1天
-      img(src='/static/imgs/app/area/default_banner.png')
-    .area-ac-dec 邀请好友获得3%奖金，好友再邀请其他人，依旧获得3%奖金。邀请好友获得3%奖金，好友再邀请其他人，依旧获得3%奖金。
-    .area-ac-line
-    .area-ac-footer 立即查看
-+list()
-+list()
-+list()
-+list()
-+list()
+if results
+  for activity in results
+    .area-list
+      .area-ac-head {{activity.activity}}
+      .area-ac-banner
+        .area-ac-time {{activity.activity_status}}
+        img(src='/media/{{activity.app_banner}}')
+      .area-ac-dec 邀请好友获得3%奖金，好友再邀请其他人，依旧获得3%奖金。邀请好友获得3%奖金，好友再邀请其他人，依旧获得3%奖金。
+      .area-ac-line
+      a(href='{{activity.pc_detail_link}}').area-ac-footer 立即查看
