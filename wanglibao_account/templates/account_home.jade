@@ -171,7 +171,7 @@ block main
           li.title-bar--tab.active
             a.title-bar--tab--anchor(href="javascript:void(0)") 体验金专区
             i
-        a.pull-right.align-right.detail-view(href='/activity/experience/gold/', target="_blank")
+        //a.pull-right.align-right.detail-view(href='/activity/experience/gold/', target="_blank")
             i
             | 查看体验金活动
       .account-home-panel__no-padding
@@ -193,7 +193,7 @@ block main
                       p.align-center
                           span.big_number {{experience_account.unpaid_interest | money_format}}
                       p.align-center.desc 待收收益（元）
-              p.tyjMark 注：体验金收益可以正常使用，每一笔到账收益会自动转至理财专区余额。
+              p.tyjMark 注：体验金收益可以正常使用，每一笔到账收益会自动以余额形式发放至投资人的理财专区账户。
               table.table.tableNew
                   thead
                       tr
