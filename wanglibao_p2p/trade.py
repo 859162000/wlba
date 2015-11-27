@@ -118,7 +118,8 @@ class P2PTrader(object):
             logger.debug("=20151125= RewardDistributer.processor_for_distribute : [%s], [%s]" % (self.user.id, self.order_id) )
             kwargs = {
                 'amount': amount,
-                'order_id': self.order_id,}
+                'order_id': self.order_id,
+                'user': self.user,}
 
             RewardDistributer(self.request, kwargs).processor_for_distribute()
         except Exception, reason:
