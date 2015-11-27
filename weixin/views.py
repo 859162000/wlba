@@ -259,11 +259,12 @@ class WeixinJoinView(View):
         fromUserName = msg._data['FromUserName']
         eventKey = msg._data['EventKey']
         weixin_account = WeixinAccounts.getByOriginalId(original_id)
+        w_user = WeixinUser.objects.filter(openid=fromUserName).first()
+        old_subscribe = 0
+        if w_user and w_user.subscribe:
+            old_subscribe = 1
         w_user = getOrCreateWeixinUser(fromUserName, weixin_account)
         reply = None
-        if w_user.subscribe != 1:
-            w_user.subscribe = 1
-            w_user.save()
 
         #如果eventkey为用户id则进行绑定
         if eventKey:
@@ -273,9 +274,13 @@ class WeixinJoinView(View):
                     rs, txt = bindUser(w_user, userProfile.user)
                     reply = create_reply(txt, msg)
             else:
-                if not w_user.scene_id:
+                if not old_subscribe and w_user.subscribe:
                     w_user.scene_id = eventKey
                     w_user.save()
+        else:
+            if not old_subscribe and w_user.subscribe and w_user.scene_id:
+                w_user.scene_id = None
+                w_user.save()
         if not reply and not w_user.user:
             txt = self.getBindTxt(fromUserName)
             reply = create_reply(txt, msg)
@@ -413,7 +418,7 @@ class WeixinRegister(TemplateView):
         elif token_session:
             token = token_session
         else:
-            token = 'weixin'
+            token = 'fwh'
 
         if token:
             channel = get_channel_record(token)
@@ -1299,6 +1304,26 @@ class GetUserInfo(APIView):
         return Response(user_info)
 
 class GenerateQRSceneTicket(APIView):
+    permission_classes = (IsAuthenticated,)
+    def post(self, request):
+        original_id = request.POST.get('original_id')
+        if not original_id:
+            return Response({'errcode':-1, 'errmsg':"-1"})
+
+        weixin_account = WeixinAccounts.getByOriginalId(original_id)
+
+        client = WeChatClient(weixin_account.app_id, weixin_account.app_secret, weixin_account.access_token)
+        qrcode_data = {"action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": int(request.user.wanglibaouserprofile.phone)}}}
+        # qrcode_data = {"action_name":"QR_LIMIT_SCENE", "action_info":{"scene": {"scene_id": phone}}}
+        try:
+            rs = client.qrcode.create(qrcode_data)
+            qrcode_url = client.qrcode.get_url(rs.get('ticket'))
+        except WeChatException,e:
+            return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
+        return Response({'qrcode_url':qrcode_url})
+
+
+class GenerateQRLimitSceneTicket(APIView):
     permission_classes = ()
     def get(self, request):
         qrcode_id = request.GET.get('id')
@@ -1321,25 +1346,6 @@ class GenerateQRSceneTicket(APIView):
             print e
             return Response({'code':-1, 'message':'error'})
         return Response(rs)
-
-class GenerateQRLimitSceneTicket(APIView):
-    permission_classes = (IsAuthenticated,)
-    def post(self, request):
-        original_id = request.POST.get('original_id')
-        if not original_id:
-            return Response({'errcode':-1, 'errmsg':"-1"})
-
-        weixin_account = WeixinAccounts.getByOriginalId(original_id)
-
-        client = WeChatClient(weixin_account.app_id, weixin_account.app_secret, weixin_account.access_token)
-        qrcode_data = {"action_name": "QR_LIMIT_STR_SCENE", "action_info": {"scene": {"scene_str": str(request.user.wanglibaouserprofile.phone)}}}
-        # qrcode_data = {"action_name":"QR_LIMIT_SCENE", "action_info":{"scene": {"scene_id": phone}}}
-        try:
-            rs = client.qrcode.create(qrcode_data)
-            qrcode_url = client.qrcode.get_url(rs.get('ticket'))
-        except WeChatException,e:
-            return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
-        return Response({'qrcode_url':qrcode_url})
 
 class WeixinCouponList(TemplateView):
     template_name = 'weixin_reward.jade'

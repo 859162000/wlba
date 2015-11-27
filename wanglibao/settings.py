@@ -433,6 +433,10 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG'
         },
+        'wanglibao': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+        },
         'wanglibao_pay': {
             'handlers': ['file', 'console'],
             'level': 'DEBUG',
@@ -511,8 +515,6 @@ if ENV != ENV_DEV:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    # 把csrf 加到根域, 给PHP方面调用API.
-    CSRF_COOKIE_DOMAIN = '.wanglibao.com'
 
     # session expire at browser close
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
