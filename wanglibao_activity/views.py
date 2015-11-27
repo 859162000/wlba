@@ -116,8 +116,9 @@ class PcActivityAreaView(TemplateView):
                                                     ).select_related('activity').\
                                                     order_by('-activity__priority')
 
-        banner = ActivityBannerPosition.objects.all().order_by('-priority',
-                                                               '-created_at',).first()
+        banner = ActivityBannerPosition.objects.all().select_related().order_by('-priority',
+                                                                                '-created_at',
+                                                                                ).first()
 
         limit = 6
         page = 1
