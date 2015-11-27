@@ -7,6 +7,9 @@ require.config({
 require(['jquery', 'csrf'], function ($) {
 
     var dopost= false;
+
+    var pagesize = 6;
+
     $('#area-nav li').on('click', function () {
         if (dopost) return
         var index = $(this).index();
@@ -22,7 +25,6 @@ require(['jquery', 'csrf'], function ($) {
         }, $(this), true)
     });
 
-    var pagesize = 6;
     $('.area-list-more').on('click', function(){
         if (dopost) return
         $.each($('#area-nav li'), function(i,dom){
@@ -39,7 +41,7 @@ require(['jquery', 'csrf'], function ($) {
 
     function postDate(data, target, cover, callback){
         $.ajax({
-            url: '/activity/list/',
+            url: '/activity/area/filter/',
             type: "GET",
             data: data,
             beforeSend: function(){
