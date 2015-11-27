@@ -53,7 +53,7 @@ urlpatterns = patterns(
     url(r'^award_index/$', views_activity.AwardIndexTemplate.as_view(template_name="sub_award.jade"), name='award_index'),
     url(r'^award_rule/$', TemplateView.as_view(template_name="sub_award_rule.jade")),
     url(r'^sub_code/$', TemplateView.as_view(template_name="sub_code.jade")),
-    url(r'^sub_invite/$', TemplateView.as_view(template_name="sub_invite_server.jade"), name='sub_invite'),
+    url(r'^sub_invite/$', views_activity.InviteWeixinFriendTemplate.as_view(template_name="sub_invite_server.jade"), name='sub_invite'),
 
 )
 
