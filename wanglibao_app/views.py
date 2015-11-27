@@ -881,6 +881,7 @@ class AppMemorabiliaView(APIView):
             'html_data': html_data,
             'page': page,
             'all_page': all_page,
+            'list_count': data_count
         })
 
 
