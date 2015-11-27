@@ -406,6 +406,7 @@ class ActivityShow(models.Model):
     end_at = models.DateTimeField(u"页面展示结束时间*", auto_now=False, default=timezone.now, null=False)
     created_at = models.DateTimeField(u'添加时间', auto_now=False, default=timezone.now, auto_now_add=True)
     link_is_hide = models.BooleanField(verbose_name=u'是否隐藏活动页面', default=False)
+    priority = models.IntegerField(u'优先级', help_text=u'越大越优先', default=0, blank=False)
 
     def activity_status(self):
         now = timezone.now()
@@ -428,12 +429,6 @@ class ActivityShow(models.Model):
 
     platform.short_description = u'活动平台'
     platform.allow_tags = True
-
-    def priority(self):
-        return self.activity.priority
-
-    priority.short_description = u'优先级'
-    priority.allow_tags = True
 
     def channel(self):
         return self.activity.channel
