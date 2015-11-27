@@ -51,7 +51,8 @@ def detect_product_biding(product_id):
                                 "period_desc": period_desc,
                                 "pay_method": product.pay_method,
                                 },
-                                                          eta= exec_time
+                                                          eta= exec_time,
+                                                          queue='celery02'
                                                           )
                     else:
                         sendUserProductOnLine.apply_async(kwargs={
@@ -62,7 +63,8 @@ def detect_product_biding(product_id):
                                 "rate_desc": rate_desc,
                                 "period_desc": period_desc,
                                 "pay_method": product.pay_method,
-                            })
+                            },
+                                                          queue='celery02')
 
 @app.task
 def sendUserProductOnLine(openid, service_desc, product_id, product_name, rate_desc, period_desc, pay_method):
