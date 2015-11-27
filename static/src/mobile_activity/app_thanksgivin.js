@@ -4,18 +4,18 @@ if (index1 === -1) {
     $('.appjiang-button').addClass("appjiang-button1")
     //$('.appprize-mingdan .appjiang-ri p').html('升级为最新版APP即可抽奖，或前往网利宝官方网站').css('color', '#f6d564');
     $('.appprize-mingdan .appjiang-ri p').html('升级为最新版APP即可抽奖，或前往网利宝官方网站').css({
-        'text-align': 'left',
-        'color': '#f6d564',
-        'margin-left':'18px'
-    }
-)
-;
+            'text-align': 'left',
+            'color': '#f6d564',
+            'margin-left': '18px'
+        }
+    )
+    ;
 
-$('.yellow1-main .appjiang-ri p').html('升级为最新版APP即可抽奖，或前往网利宝官方网站').css('color', '#12d0f1');
-$('.appprize-mingdan .appjiang-ri .jiang-a,.yellow1-main .appjiang-ri .jiang-a').hide();
-$('.app-thanks').hide();
-$('.app-thanksbu').addClass("app-thanksbu1")
-$('.app-thanks01').show().html('理财专区即可投资');
+    $('.yellow1-main .appjiang-ri p').html('升级为最新版APP即可抽奖，或前往网利宝官方网站').css('color', '#12d0f1');
+    $('.appprize-mingdan .appjiang-ri .jiang-a,.yellow1-main .appjiang-ri .jiang-a').hide();
+    $('.app-thanks').hide();
+    $('.app-thanksbu').addClass("app-thanksbu1")
+    $('.app-thanks01').show().html('理财专区即可投资');
 }
 function Down(ele) {
     var curHeight = ele.height();
@@ -119,7 +119,7 @@ wlb.ready({
 
             var change = [];
 //抽奖
-            var arr = ['扫地机器人', '感恩节200元现金红包', '感恩节1.8%加息券', '感恩节10元现金红包', 'iPhone6s plus', '感恩节2.2%加息券', 'beats头戴式耳机', '感恩节80元现金红包', '感恩节1%加息券', '感恩节400元现金红包', '霍尼韦尔空气净化器', '感恩节1.5%加息券', '感恩节600元现金红包', '感恩节1年迅雷会员'];
+            var arr = ['扫地机器人', '感恩节200元现金红包', '感恩节1.8%加息券', '感恩节10元现金红包', 'iPhone6s plus', '感恩节2.2%加息券', 'beats头戴式耳机', '感恩节80元现金红包', '感恩节1%加息券', '感恩节400元现金红包', '霍尼韦尔空气净化器', '感恩节1.5%加息券', '感恩节600元现金红包', '一年迅雷会员'];
             arr.indexof = function (value) {
                 var a = this;
                 for (var i = 0; i < a.length; i++) {

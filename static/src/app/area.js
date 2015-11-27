@@ -3,8 +3,13 @@ org.area = (function (org) {
         init: function () {
             lib.slide();
 
-            var page = 2, pagesize = 2, latestPost = false;
-            $('.area-latest-btn').on('click', function () {
+            var page = 2, pagesize = 6, latestPost = false;
+
+            var $latest =$('.area-latest-btn'),
+                $latestPush = $('.area-latest-push'),
+                $latestMore = $('.area-latest-more');
+
+            $latest.on('click', function () {
                 if (latestPost) return;
 
                 org.ajax({
@@ -14,14 +19,14 @@ org.area = (function (org) {
                         pagesize: pagesize
                     },
                     beforeSend: function(){
-                        latestPost = true
-                        $('.area-latest-btn').text('加载中别急...')
+                        latestPost = true;
+                        $latest.text('加载中...')
                     },
                     success: function (data) {
                         page++;
-                        $('.area-latest-push').append(data.html_data);
+                        $latestPush.append(data.html_data);
                         if (data.page >= data.all_page) {
-                            $('.area-latest-more').html('没有更多了');
+                            $latestMore.html('没有更多了!');
                         }
                     },
                     error: function (xhr) {
@@ -29,45 +34,56 @@ org.area = (function (org) {
                     },
                     complete: function(){
                         latestPost = false;
-                        $('.area-latest-btn').text('查看更多');
+                        $latest.text('查看更多');
                     }
 
                 })
             })
         },
-        slide: function () {
-            var myswiper = new Swiper('.swiper-container', {
-                loop: false,
-                lazyLoading: false,
-                onSliderMove: function (swiper) {
-                    var translateX = -(swiper.getWrapperTranslate() / 2)
-                    $('.slide-bottom').css('-webkit-transform', 'translate3d(' + translateX + 'px, 0, 0)')
-                },
-                onTouchEnd: function (swiper) {
-                    var translateX = 100 * swiper.activeIndex + '%';
-                    $('.slide-bottom').css('-webkit-transform', 'translate3d(' + translateX + ', 0, 0)')
-                },
-                onSlideChangeStart: function (swiper) {
-                    var translateX = 100 * swiper.activeIndex + '%';
-                    $('.slide-bottom').css('-webkit-transform', 'translate3d(' + translateX + ', 0, 0)')
 
-                    if(swiper.activeIndex === 1 && $('.area-milepost').attr('data-active') != 'true'){
-                        doing(1, function(){
-                            $('.area-milepost-loading').hide()
-                        })
+        slide: function () {
+
+            var $slideLine = $('.slide-bottom'),
+                $milepostLoad = $('.area-milepost-loading'),
+                $milepost = $('.area-milepost'),
+                myswiper = new Swiper('.swiper-container', {
+                    loop: false,
+                    lazyLoading: false,
+                    onSliderMove: function (swiper) {
+                        var translateX = -(swiper.getWrapperTranslate() / 2)
+                        $slideLine.css('-webkit-transform', 'translate3d(' + translateX + 'px, 0, 0)')
+                    },
+                    onTouchEnd: function (swiper) {
+                        var translateX = 100 * swiper.activeIndex + '%';
+                        $slideLine.css('-webkit-transform', 'translate3d(' + translateX + ', 0, 0)')
+                    },
+                    onSlideChangeStart: function (swiper) {
+                        var translateX = 100 * swiper.activeIndex + '%';
+                        $slideLine.css('-webkit-transform', 'translate3d(' + translateX + ', 0, 0)')
+
+                        if(swiper.activeIndex === 1 && $milepost.attr('data-active') != 'true'){
+                            doing(1, function(){
+                                $milepostLoad.hide()
+                            })
+                        }
                     }
-                }
-            });
+                });
+
             $('.tab-nav li').on('touchend click', function () {
                 var index = $(this).index();
                 $(this).addClass('active').siblings().removeClass('active')
                 myswiper.slideTo(index, 400, true);
             });
 
-            var milepost = false
-            $('.area-milepost-btn').on('click', function(){
+            var milepost = false,
+                $milepostBtn = $('.area-milepost-btn'),
+                $milepostMore = $('.area-milepost-more'),
+                $milepostPush =$('.area-milepost-push');
+
+
+            $milepostBtn.on('click', function(){
                 if (milepost) return;
-                var page = parseInt($('.area-milepost').attr('data-page')) + 1;
+                var page = parseInt($milepost.attr('data-page')) + 1;
                 doing(page)
             });
 
@@ -77,25 +93,25 @@ org.area = (function (org) {
                     url: '/api/m/app_memorabilia/',
                     data: {
                         page: page,
-                        pagesize: 2
+                        pagesize: 6
                     },
                     beforeSend: function(){
                         milepost = true
-                        $('.area-milepost-btn').text('加载中别急...')
+                        $milepostBtn.text('加载中...')
                     },
                     success: function(result){
                         if(result.all_page > result.page){
-                            $('.area-milepost-more').show()
+                            $milepostMore.show()
                         }else{
-                            $('.area-milepost-more').html('没有更多了，呵呵')
+                            $milepostMore.html('没有更多了!')
                         }
-                        $('.area-milepost').attr({'data-active': true, 'data-page': result.page});
-                        $('.area-milepost-push').append(result.html_data)
-                        callback && callback(result)
+                        $milepost.attr({'data-active': true, 'data-page': result.page});
+                        $milepostPush.append(result.html_data);
+                        callback && callback(result);
                     },
                     complete: function(){
                         milepost = false;
-                        $('.area-milepost-btn').text('查看更多');
+                        $milepostBtn.text('查看更多');
                     }
                 })
             }
