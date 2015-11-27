@@ -444,7 +444,7 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
             if redpack:
                 # event = redpack.event
                 give_pf = red_pack_event.give_platform
-                if give_pf == "all" or give_pf == device_type:
+                if give_pf == "all" or give_pf == device_type or (give_pf == 'app' and device_type in ('ios', 'android')):
                     if redpack.token != "":
                         redpack.status = "used"
                         redpack.save()
@@ -470,7 +470,7 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
                 redpack = RedPack.objects.filter(event=red_pack_event, status="unused").first()
                 if redpack:
                     give_pf = red_pack_event.give_platform
-                    if give_pf == "all" or give_pf == device_type:
+                    if give_pf == "all" or give_pf == device_type or (give_pf == 'app' and device_type in ('ios', 'android')):
                         if redpack.token != "":
                             redpack.status = "used"
                             redpack.save()
@@ -531,7 +531,7 @@ def _give_activity_experience_new(user, rtype, experience_id, device_type, rule,
                     return
 
             give_pf = experience_event.give_platform
-            if give_pf == "all" or give_pf == device_type:
+            if give_pf == "all" or give_pf == device_type or (give_pf == 'app' and device_type in ('ios', 'android')):
                 record = ExperienceEventRecord()
                 record.event = experience_event
                 record.user = this_user
@@ -552,7 +552,7 @@ def _give_activity_experience_new(user, rtype, experience_id, device_type, rule,
                         continue
 
                 give_pf = experience_event.give_platform
-                if give_pf == "all" or give_pf == device_type:
+                if give_pf == "all" or give_pf == device_type or (give_pf == 'app' and device_type in ('ios', 'android')):
                     record = ExperienceEventRecord()
                     record.event = experience_event
                     record.user = this_user

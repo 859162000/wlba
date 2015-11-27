@@ -151,8 +151,8 @@ def experience_repayment_plan():
     """
     print(u"Getting experience gold repayment plan to start!")
     now = datetime.now()
-    start = local_to_utc(datetime(now.year, now.month, now.day - 1, 16, 40, 00), 'normal')
-    end = local_to_utc(datetime(now.year, now.month, now.day, 16, 40, 00), 'normal')
+    start = local_to_utc(datetime(now.year, now.month, now.day - 1, 17, 0, 0), 'normal')
+    end = local_to_utc(datetime(now.year, now.month, now.day, 17, 0, 0), 'normal')
     amortizations = ExperienceAmortization.objects.filter(settled=False)\
         .filter(term_date__gt=start, term_date__lte=end)
     for amo in amortizations:
@@ -165,9 +165,6 @@ def experience_repayment_plan():
             amo.save()
 
             # 体验金利息计入用户账户余额
-            if amo.settled is True:
-                raise Exception(u"ID : %s was repayment")
-
             with transaction.atomic():
                 description = u"体验金利息入账:%s元" % amo.interest
                 user_margin_keeper = MarginKeeper(amo.user)
