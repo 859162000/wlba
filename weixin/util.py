@@ -2,6 +2,8 @@
 
 from wanglibao_p2p.models import P2PEquity
 from wanglibao_buy.models import FundHoldInfo
+from django.template import Template, Context
+from django.template.loader import get_template
 
 
 def getAccountInfo(user):
@@ -15,7 +17,9 @@ def getAccountInfo(user):
     p2p_activity_interest = 0
     p2p_total_paid_coupon_interest = 0
     p2p_total_unpaid_coupon_interest = 0
+    equity_total = 0
     for equity in p2p_equities:
+        equity_total += equity.equity
         if equity.confirm:
             unpayed_principle += equity.unpaid_principal  # 待收本金
             p2p_total_paid_interest += equity.pre_paid_interest  # 累积收益
@@ -40,5 +44,20 @@ def getAccountInfo(user):
         'p2p_margin': float(p2p_margin),  # P2P余额
         'p2p_total_unpaid_interest': float(p2p_total_unpaid_interest + p2p_total_unpaid_coupon_interest),  # p2p总待收益
         'p2p_total_paid_interest': float(p2p_total_paid_interest + p2p_activity_interest + p2p_total_paid_coupon_interest),  # P2P总累积收益
+        'equity_total':equity_total #投资金额
     }
     return res
+
+
+def _generate_ajax_template(content, template_name=None):
+
+    context = Context({
+        'results': content,
+    })
+
+    if template_name:
+        template = get_template(template_name)
+    else:
+        template = Template('<div></div>')
+
+    return template.render(context)

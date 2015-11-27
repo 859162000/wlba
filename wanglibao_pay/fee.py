@@ -17,7 +17,7 @@ TWO_PLACES = decimal.Decimal(10) ** -2
 class WithdrawFee(object):
     """ 提现费用 """
 
-    def __init__(self, switch='on', key='withdraw_fee'):
+    def __init__(self, switch='off', key='withdraw_fee'):
         self.KEY = key
         self.SWITCH = switch
         self.MANAGEMENT_FEE = {
@@ -70,51 +70,54 @@ class WithdrawFee(object):
         """
         fee_config = self.get_withdraw_fee_config()
 
-        # 每月免费次数
-        if fee_config['fee']['free_times_per_month']:
-            free_times_per_month = int(fee_config['fee']['free_times_per_month'])
+        if fee_config['switch'] == 'on':
+            # 每月免费次数
+            if fee_config['fee']['free_times_per_month']:
+                free_times_per_month = int(fee_config['fee']['free_times_per_month'])
+            else:
+                free_times_per_month = int(self.FEE.get('free_times_per_month'))
+
+            # 手续费区间
+            if fee_config['fee']['amount_interval']:
+                amount_interval = fee_config['fee']['amount_interval']
+            else:
+                amount_interval = self.FEE.get('amount_interval')
+
+            withdraw_count = self.get_withdraw_count(user)
+
+            fee = 0
+            if withdraw_count >= free_times_per_month:
+                for interval in amount_interval:
+                    if interval[0] < amount <= interval[1]:
+                        fee = interval[2]
+                        break
+                    else:
+                        continue
+            # 管理费费率
+            if fee_config['management_fee']['fee_rate']:
+                management_fee_rate = decimal.Decimal(str(fee_config['management_fee']['fee_rate']))
+            else:
+                management_fee_rate = self.MANAGEMENT_FEE.get('fee_rate')
+
+            # 比较提现金额与充值未投资金额
+            margin_left = margin - uninvested
+            if amount > margin_left:
+                management_amount = amount - margin_left
+            else:
+                management_amount = decimal.Decimal('0.00')
+            management_fee = (management_amount * management_fee_rate).quantize(TWO_PLACES)
+
+            management_fee = management_fee / decimal.Decimal('1.00')
         else:
-            free_times_per_month = int(self.FEE.get('free_times_per_month'))
-
-        # 手续费区间
-        if fee_config['fee']['amount_interval']:
-            amount_interval = fee_config['fee']['amount_interval']
-        else:
-            amount_interval = self.FEE.get('amount_interval')
-
-        withdraw_count = self.get_withdraw_count(user)
-
-        fee = 0
-        if withdraw_count >= free_times_per_month:
-            for interval in amount_interval:
-                if interval[0] < amount <= interval[1]:
-                    fee = interval[2]
-                    break
-                else:
-                    continue
-        # 管理费费率
-        if fee_config['management_fee']['fee_rate']:
-            management_fee_rate = decimal.Decimal(str(fee_config['management_fee']['fee_rate']))
-        else:
-            management_fee_rate = self.MANAGEMENT_FEE.get('fee_rate')
-
-        # 比较提现金额与充值未投资金额
-        margin_left = margin - uninvested
-        if amount > margin_left:
-            management_amount = amount - margin_left
-        else:
-            management_amount = decimal.Decimal('0.00')
-        management_fee = (management_amount * management_fee_rate).quantize(TWO_PLACES)
-
-        management_fee = management_fee / decimal.Decimal('1.00')
+            fee = management_fee = management_amount = 0
 
         return fee, management_fee, management_amount
 
     @staticmethod
     def get_withdraw_count(user):
         """ 获取当月提现次数 """
-        today = local_to_utc(datetime.datetime.now(), 'max')
-        month_start = today - datetime.timedelta(days=today.day)
+        now = datetime.datetime.now()
+        month_start = local_to_utc(datetime.datetime(now.year, now.month, 1), 'min')
         withdraw_count = PayInfo.objects.filter(user=user, type='W').filter(status__in=[u'成功', u'已受理'])\
             .filter(create_time__gt=month_start).count()
         return withdraw_count
@@ -122,8 +125,8 @@ class WithdrawFee(object):
     @staticmethod
     def get_withdraw_success_count(user):
         """ 获取当月成功提现次数 """
-        today = local_to_utc(datetime.datetime.now(), 'max')
-        month_start = today - datetime.timedelta(days=today.day)
+        now = datetime.datetime.now()
+        month_start = local_to_utc(datetime.datetime(now.year, now.month, 1), 'min')
         withdraw_count = PayInfo.objects.filter(user=user, type='W').filter(status=u'成功')\
             .filter(create_time__gt=month_start).count()
         return withdraw_count

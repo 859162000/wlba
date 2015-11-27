@@ -9,6 +9,7 @@ var org = (function(){
                 type: options.type,
                 data: options.data,
                 dataType : options.dataType,
+                async: options.async,
                 beforeSend: function(xhr, settings) {
                     options.beforeSend && options.beforeSend(xhr);
                     //django配置post请求
@@ -189,6 +190,24 @@ org.ui = (function(){
             }
             document.body.onselectstart = function(){return false;};
         },
+        _confirm: function(title, certainName, callback, callbackData){
+            if($('.confirm-warp').length> 0 ){
+                $('.confirm-text').text(title);
+                $('.confirm-certain').text(certainName);
+                $('.confirm-warp').show();
+
+                $('.confirm-cancel').on('click', function(e){
+                    $('.confirm-warp').hide();
+                })
+                $('.confirm-certain').on('click', function(e){
+                    $('.confirm-warp').hide();
+
+                    if(callback){
+                        callbackData ? callback(callbackData): callback();
+                    }
+                })
+            }
+        },
         _showSign:function(signTxt, callback){
             var $sign = $('.error-sign');
             if($sign.length == 0){
@@ -294,6 +313,7 @@ org.ui = (function(){
         focusInput: lib._inputStyle,
         showSign : lib._showSign,
         alert : lib._alert,
+        confirm: lib._confirm
     }
 })();
 
@@ -924,8 +944,11 @@ org.buy=(function(org){
                 }
 
                 if(lib.isBuy){
-                   if(confirm("购买金额为" + amount)){
-                        org.ajax({
+
+                   org.ui.confirm("购买金额为" + amount, '确认投资', gobuy);
+
+                   function gobuy(){
+                       org.ajax({
                             type: 'POST',
                             url: '/api/p2p/purchase/',
                             data: {product: productID, amount: amount, redpack: redpackValue},
@@ -1154,7 +1177,11 @@ org.recharge=(function(org){
                      return org.ui.alert('最高充值'+ maxamount +'元！')
                 }
                 if(lib.canRecharge){
-                    confirm("充值金额为"+amount) && lib._rechargeSingleStep(card_no,amount);
+                    var postdata = {
+                        card_no: card_no,
+                        amount: amount
+                    }
+                    org.ui.confirm("充值金额为"+amount, '确认充值', lib._rechargeSingleStep, postdata)
                 }else{
                     return org.ui.alert('充值中，请稍后');
                 }
@@ -1164,11 +1191,11 @@ org.recharge=(function(org){
         /*
         * 快捷充值接口业务
          */
-        _rechargeSingleStep: function(card_no, amount) {
+        _rechargeSingleStep: function(getdata) {
             org.ajax({
                 type: 'POST',
                 url: '/api/pay/deposit/',
-                data: {card_no: card_no, amount: amount},
+                data: {card_no: getdata.card_no, amount: getdata.amount},
                 beforeSend:function(){
                     lib.canRecharge = false;
                     $('#secondBtn').text("充值中..");
@@ -1285,7 +1312,8 @@ org.recharge_second=(function(org){
                 }
 
                 if(canPost){
-                    if(confirm("充值金额为" + amount)){
+                    org.ui.confirm("充值金额为" + amount, '确认充值', recharge);
+                    function  recharge(){
                         org.ajax({
                             type: 'POST',
                             url: '/api/pay/cnp/dynnum/',
@@ -1362,7 +1390,7 @@ org.authentication = (function(org){
                     },
                     success:function(){
                         org.ui.alert("实名认证成功!",function(){
-                           return window.location.href = '/weixin/security/';
+                           return window.location.href = '/weixin/account/';
                         });
                     },
                     error:function(xhr){

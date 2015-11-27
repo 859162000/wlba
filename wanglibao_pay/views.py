@@ -4,9 +4,11 @@
 import logging
 import re
 import socket
+import json
+
 from django.contrib.auth.models import User
 from django.db.models import Sum
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import permission_required, login_required
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.forms import model_to_dict
@@ -28,16 +30,19 @@ from order.utils import OrderHelper
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper
+from wanglibao_pay.exceptions import ThirdPayError
 from wanglibao_pay.models import Bank, Card, PayResult, PayInfo, WithdrawCard, WithdrawCardRecord
 from wanglibao_pay.huifu_pay import HuifuPay, SignException
 from wanglibao_pay import third_pay, trade_record
 from wanglibao_p2p.models import P2PRecord
 import decimal
+from wanglibao_pay.pay import YeeProxyPay, PayOrder, YeeProxyPayCallbackMessage
 from wanglibao_pay.serializers import CardSerializer
-from wanglibao_pay.util import get_client_ip
+from wanglibao_pay.util import get_client_ip, fmt_two_amount
 from wanglibao_pay import util
 from wanglibao_profile.backends import require_trade_pwd
 from wanglibao_profile.models import WanglibaoUserProfile
+from wanglibao_rest.utils import split_ua
 from wanglibao_sms import messages
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
@@ -49,6 +54,10 @@ from wanglibao_announcement.utility import AnnouncementAccounts
 from fee import WithdrawFee
 import datetime
 from wanglibao_rest import utils as rest_utils
+from weixin.tasks import sentTemplate
+from weixin.models import WeixinUser
+from weixin.constant import WITH_DRAW_SUBMITTED_TEMPLATE_ID, WITH_DRAW_SUCCESS_TEMPLATE_ID
+from wanglibao_rest.common import DecryptParmsAPIView
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -65,7 +74,7 @@ class BankListView(TemplateView):
 
         context.update({
             'default_bank': default_bank,
-            'banks': Bank.get_deposit_banks()[:10],
+            'banks': Bank.get_deposit_banks()[:13],
             'announcements': AnnouncementAccounts
         })
         return context
@@ -75,79 +84,100 @@ class PayView(TemplateView):
     template_name = 'pay_jump.jade'
 
     def post(self, request):
-        if not request.user.wanglibaouserprofile.id_is_valid:
-            return self.render_to_response({
-                'message': u'请先进行实名认证'
-            })
-        form = dict()
-        message = ''
+        # if not request.user.wanglibaouserprofile.id_is_valid:
+        #     return self.render_to_response({
+        #         'message': u'请先进行实名认证'
+        #     })
+        # form = dict()
+        # message = ''
+        # try:
+        #     amount_str = request.POST.get('amount', '')
+        #     amount = decimal.Decimal(amount_str). \
+        #         quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
+        #     amount_str = str(amount)
+        #     if amount <= 0:
+        #         raise decimal.DecimalException()
+        #
+        #     gate_id = request.POST.get('gate_id', '')
+        #     bank = Bank.objects.get(gate_id=gate_id)
+        #
+        #     # Store this as the default bank
+        #     request.user.wanglibaouserprofile.deposit_default_bank_name = bank.name
+        #     request.user.wanglibaouserprofile.save()
+        #
+        #     pay_info = PayInfo()
+        #     pay_info.amount = amount
+        #     pay_info.total_amount = amount
+        #     pay_info.type = PayInfo.DEPOSIT
+        #     pay_info.status = PayInfo.INITIAL
+        #     pay_info.user = request.user
+        #     pay_info.bank = bank
+        #     pay_info.channel = "huifu"
+        #     pay_info.request_ip = get_client_ip(request)
+        #
+        #     order = OrderHelper.place_order(request.user, Order.PAY_ORDER, pay_info.status,
+        #                                     pay_info=model_to_dict(pay_info))
+        #     pay_info.order = order
+        #     pay_info.save()
+        #
+        #     post = {
+        #         'OrdId': pay_info.pk,
+        #         'GateId': gate_id,
+        #         'OrdAmt': amount_str
+        #     }
+        #
+        #     pay = HuifuPay()
+        #     form = pay.pay(post)
+        #     pay_info.request = str(form)
+        #     pay_info.status = PayInfo.PROCESSING
+        #     pay_info.save()
+        #     OrderHelper.update_order(order, request.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
+        #
+        #     # 处理第三方渠道的用户充值回调
+        #     CoopRegister(request).process_for_recharge(request.user)
+        # except decimal.DecimalException:
+        #     message = u'金额格式错误'
+        # except Bank.DoesNotExist:
+        #     message = u'请选择有效的银行'
+        # except (socket.error, SignException) as e:
+        #     message = PayResult.RETRY
+        #     pay_info.status = PayInfo.FAIL
+        #     pay_info.error_message = str(e)
+        #     pay_info.save()
+        #     OrderHelper.update_order(order, request.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
+        #     logger.fatal('sign error! order id: ' + str(pay_info.pk) + ' ' + str(e))
+        #
+        # context = {
+        #     'message': message,
+        #     'form': form
+        # }
+
+        # gate_id = request.POST.get('gate_id', '')
+        # bank = Bank.objects.get(gate_id=gate_id)
+        # pay_channel_class = get_pc_channel_class(bank.pc_channel)
+        #
+        # pay_channel = pay_channel_class()
+        # result = pay_channel.pre_pay(request)
+        # return self.render_to_response(result)
+        logger.info('web_pay_request_para:' + str(request.POST))
+
         try:
-            amount_str = request.POST.get('amount', '')
-            amount = decimal.Decimal(amount_str). \
-                quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
-            amount_str = str(amount)
-            if amount <= 0:
-                # todo handler the raise
-                raise decimal.DecimalException()
+            user = request.user
+            amount = fmt_two_amount(request.POST.get('amount'))
+            gate_id = request.POST.get('gate_id')
+            request_ip = get_client_ip(request)
+            device_type = split_ua(request)['device_type']
+            channel = PayOrder.get_bank_and_channel(gate_id, device_type)[1]
+        except:
+            logger.exception('third_pay_error')
+            result = {'message': '参数错误'}
+            return self.render_to_response(result)
 
-            gate_id = request.POST.get('gate_id', '')
-            bank = Bank.objects.get(gate_id=gate_id)
-
-            # Store this as the default bank
-            request.user.wanglibaouserprofile.deposit_default_bank_name = bank.name
-            request.user.wanglibaouserprofile.save()
-
-            pay_info = PayInfo()
-            pay_info.amount = amount
-            pay_info.total_amount = amount
-            pay_info.type = PayInfo.DEPOSIT
-            pay_info.status = PayInfo.INITIAL
-            pay_info.user = request.user
-            pay_info.bank = bank
-            pay_info.channel = "huifu"
-            pay_info.request_ip = get_client_ip(request)
-
-            order = OrderHelper.place_order(request.user, Order.PAY_ORDER, pay_info.status,
-                                            pay_info=model_to_dict(pay_info))
-            pay_info.order = order
-            pay_info.save()
-
-            post = {
-                'OrdId': pay_info.pk,
-                'GateId': gate_id,
-                'OrdAmt': amount_str
-            }
-
-            pay = HuifuPay()
-            form = pay.pay(post)
-            pay_info.request = str(form)
-            pay_info.status = PayInfo.PROCESSING
-            pay_info.save()
-            OrderHelper.update_order(order, request.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
-
-            try:
-                # 处理第三方用户充值回调
-                CoopRegister(request).process_for_recharge(request.user)
-            except Exception, e:
-                logger.error(e)
-
-        except decimal.DecimalException:
-            message = u'金额格式错误'
-        except Bank.DoesNotExist:
-            message = u'请选择有效的银行'
-        except (socket.error, SignException) as e:
-            message = PayResult.RETRY
-            pay_info.status = PayInfo.FAIL
-            pay_info.error_message = str(e)
-            pay_info.save()
-            OrderHelper.update_order(order, request.user, pay_info=model_to_dict(pay_info), status=pay_info.status)
-            logger.fatal('sign error! order id: ' + str(pay_info.pk) + ' ' + str(e))
-
-        context = {
-            'message': message,
-            'form': form
-        }
-        return self.render_to_response(context)
+        if channel == 'yeepay':
+            result = YeeProxyPay().proxy_pay(user, amount,  gate_id,  request_ip, device_type)
+        else:
+            result = HuifuPay().pre_pay(request)
+        return self.render_to_response(result)
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -182,6 +212,52 @@ class PayCallback(View):
     def dispatch(self, request, *args, **kwargs):
         return super(PayCallback, self).dispatch(request, *args, **kwargs)
 
+class YeeProxyPayCompleteView(TemplateView):
+    template_name = 'pay_complete.jade'
+
+    def _process(self, request):
+        try:
+            request_ip = get_client_ip(request)
+            if request.method == 'GET':
+                message_dict = request.GET
+            elif request.method == 'POST':
+                message_dict = request.POST
+            pay_message = YeeProxyPayCallbackMessage().parse_message(message_dict, request_ip)
+            result = YeeProxyPay().proxy_pay_callback(pay_message, request)
+            amount = pay_message.amount
+        except ThirdPayError, e:
+            logger.exception('third_pay_error')
+            result = {'ret_code': e.code}
+            amount = 0
+        return result, amount
+
+    @method_decorator(login_required(login_url='/accounts/login'))
+    def get(self, request, *args, **kwargs):
+        # result = HuifuPay.handle_pay_result(request)
+        # amount = request.POST.get('OrdAmt', '')
+        #
+        # return self.render_to_response({
+        #     'result': result,
+        #     'amount': amount
+        # })
+        logger.info('web_pay_thirdpay_get_request_para'+str(request.GET))
+        result, amount = self._process(request)
+
+        return self.render_to_response({
+            'result': '充值成功' if result['ret_code'] == 0 else '充值失败',
+            'amount': amount
+            })
+
+    def post(self, request, *args, **kwargs):
+        logger.info('web_pay_thirdpay_post_request_para'+str(request.POST))
+        self._process(request)
+        return HttpResponse('success')
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(YeeProxyPayCompleteView, self).dispatch(request, *args, **kwargs)
+
+
 
 class WithdrawView(TemplateView):
     template_name = 'withdraw.jade'
@@ -191,7 +267,7 @@ class WithdrawView(TemplateView):
         banks = Bank.get_withdraw_banks()
 
         # 提现管理费费率
-        fee_misc = WithdrawFee(switch='on')
+        fee_misc = WithdrawFee()
         fee_config = fee_misc.get_withdraw_fee_config()
         withdraw_count = fee_misc.get_withdraw_count(user=self.request.user)
         return {
@@ -233,7 +309,7 @@ class WithdrawCompleteView(TemplateView):
         result = PayResult.WITHDRAW_SUCCESS
 
         # 获取费率配置
-        fee_misc = WithdrawFee(switch='on')
+        fee_misc = WithdrawFee()
         fee_config = fee_misc.get_withdraw_fee_config()
 
         try:
@@ -293,8 +369,9 @@ class WithdrawCompleteView(TemplateView):
 
             # 短信通知添加用户名
             name = user.wanglibaouserprofile.name or u'用户'
+
             send_messages.apply_async(kwargs={
-                'phones': [user.wanglibaouserprofile.phone],
+                'phones': [request.user.wanglibaouserprofile.phone],
                 # 'messages': [messages.withdraw_submitted(amount, timezone.now())]
                 'messages': [messages.withdraw_submitted(name)]
             })
@@ -402,7 +479,7 @@ class CardViewSet(ModelViewSet):
         card.save()
 
         try:
-            # 处理第三方用户绑卡回调
+            # 处理第PC三方用户绑卡回调
             CoopRegister(request).process_for_binding_card(request.user)
         except Exception, e:
             logger.error(e)
@@ -458,17 +535,20 @@ class WithdrawTransactions(TemplateView):
                         payinfo.status, PayInfo.ACCEPTED, PayInfo.PROCESSING))
                         continue
 
+                    amount = payinfo.amount
+                    fee = payinfo.fee
+                    management_fee = payinfo.management_fee
+                    management_amount = payinfo.management_amount
+
                     marginKeeper = MarginKeeper(payinfo.user)
-                    total_amount = payinfo.amount + payinfo.fee + payinfo.management_fee
-                    marginKeeper.withdraw_ack(total_amount, uninvested=payinfo.management_amount)
+                    total_amount = amount + fee + management_fee
+                    marginKeeper.withdraw_ack(total_amount, uninvested=management_amount)
 
                     payinfo.status = PayInfo.SUCCESS
                     payinfo.confirm_time = timezone.now()
                     payinfo.save()
 
                     # 给提现记录表中的信息同步进行确认,同时将提现的费用充值到网利宝的公司提现账户
-                    fee = payinfo.fee
-                    management_fee = payinfo.management_fee
 
                     if fee > 0 or management_fee > 0:
                         fee_total_amount = fee + management_fee
@@ -481,10 +561,10 @@ class WithdrawTransactions(TemplateView):
                         if withdraw_card:
                             withdraw_card_record = WithdrawCardRecord()
                             withdraw_card_record.type = PayInfo.WITHDRAW
-                            withdraw_card_record.amount = payinfo.amount
-                            withdraw_card_record.fee = payinfo.fee
-                            withdraw_card_record.management_fee = payinfo.management_fee
-                            withdraw_card_record.management_amount = payinfo.management_amount
+                            withdraw_card_record.amount = amount
+                            withdraw_card_record.fee = fee
+                            withdraw_card_record.management_fee = management_fee
+                            withdraw_card_record.management_amount = management_amount
                             withdraw_card_record.withdrawcard = withdraw_card
                             withdraw_card_record.payinfo = payinfo
                             withdraw_card_record.user = payinfo.user
@@ -495,11 +575,11 @@ class WithdrawTransactions(TemplateView):
                     # 取款确认时要检测该次提现是否是真正的在每个月的免费次数之内,如果是还需要将已扣除的费用返还给用户(仅限手续费)
                     give_back = False
                     if fee > 0:
-                        fee_misc = WithdrawFee(switch='on')
+                        fee_misc = WithdrawFee()
                         fee_config = fee_misc.get_withdraw_fee_config()
                         withdraw_count = fee_misc.get_withdraw_success_count(payinfo.user)
-                        free_times = fee_config['fee']['amount_interval']
-                        if withdraw_count < free_times:
+                        free_times = fee_config['fee']['free_times_per_month']
+                        if withdraw_count <= free_times:
                             give_back = True
 
                     if give_back:
@@ -514,8 +594,8 @@ class WithdrawTransactions(TemplateView):
                         # 将提现信息单独记录到提现费用记录表中
                         withdraw_card_record = WithdrawCardRecord()
                         withdraw_card_record.type = PayInfo.WITHDRAW
-                        withdraw_card_record.amount = payinfo.fee
-                        withdraw_card_record.fee = payinfo.fee
+                        withdraw_card_record.amount = fee
+                        withdraw_card_record.fee = fee
                         withdraw_card_record.management_fee = 0
                         withdraw_card_record.management_amount = 0
                         withdraw_card_record.withdrawcard = withdraw_card
@@ -535,9 +615,22 @@ class WithdrawTransactions(TemplateView):
                     })
                     send_messages.apply_async(kwargs={
                         "phones": [payinfo.user.wanglibaouserprofile.phone],
-                        "messages": [messages.withdraw_confirmed(payinfo.user.wanglibaouserprofile.name,
-                                                                 payinfo.amount)]
+                        "messages": [messages.withdraw_confirmed(payinfo.user.wanglibaouserprofile.name, amount)]
                     })
+                    weixin_user = WeixinUser.objects.filter(user=payinfo.user).first()
+                    if weixin_user:
+                        pass
+                        # bank_name = result['bank_name']
+                        # sentTemplate.apply_async(kwargs={
+                        #     "kwargs":json.dumps({
+                        #                 "openid":weixin_user.openid,
+                        #                 "template_id":WITH_DRAW_SUCCESS_TEMPLATE_ID,
+                        #                 "first":u"亲爱的%s，您的提现申请已受理"%name,
+                        #                 "keyword1":result['amount'],
+                        #                 "keyword2":bank_name,
+                        #                 "keyword3":withdraw_ok_time,
+                        #                     })},
+                        #                 queue='celery02')
             return HttpResponse({
                 u"所有的取款请求已经处理完毕 %s" % uuids_param
             })
@@ -750,12 +843,12 @@ class YeePayAppPayView(APIView):
         yeepay = third_pay.YeePay()
         result = yeepay.app_pay(request)
 
-        if result['ret_code'] == 0:
-            try:
-                # 处理第三方用户充值回调
-                CoopRegister(request).process_for_recharge(request.user)
-            except Exception, e:
-                logger.error(e)
+        # if result['ret_code'] == 0:
+        #     try:
+        #         # 处理第三方用户充值回调
+        #         CoopRegister(request).process_for_recharge(request.user)
+        #     except Exception, e:
+        #         logger.error(e)
 
         return Response(result)
 
@@ -811,13 +904,6 @@ class BindPayView(APIView):
         pay = third_pay.KuaiPay()
         result = pay.pre_pay(request)
 
-        if result['ret_code'] == 0:
-            try:
-                # 处理第三方用户充值回调
-                CoopRegister(request).process_for_recharge(request.user)
-            except Exception, e:
-                logger.error(e)
-
         return Response(result)
 
 
@@ -836,7 +922,8 @@ class KuaiShortPayCallbackView(View):
                                   pm['order_id'],
                                   pm['ref_number'],
                                   pm['res_content'],
-                                  pm['signature'])
+                                  pm['signature'],
+                                  request)
 
         return HttpResponse(result, content_type='text/xml')
 
@@ -905,7 +992,11 @@ class FEEAPIView(APIView):
                 return Response({"ret_code": 30141, "message": u"银行卡选择错误"})
         else:
             if not bank_id:
-                return Response({"ret_code": 30137, "message": u"银行卡选择错误"})
+                if device_type == 'ios' or device_type == 'android':
+                    if app_version and app_version < "2.6.3":
+                        pass
+                    else:
+                        return Response({"ret_code": 30137, "message": u"银行卡选择错误"})
 
         try:
             float(amount)
@@ -924,7 +1015,7 @@ class FEEAPIView(APIView):
             return Response({"ret_code": 30139, "message": u"提现金额超出账户可用余额"})
 
         # 获取费率配置
-        fee_misc = WithdrawFee(switch='on')
+        fee_misc = WithdrawFee()
         fee_config = fee_misc.get_withdraw_fee_config()
 
         # 检测提现最大最小金额
@@ -977,7 +1068,7 @@ class FEEAPIView(APIView):
 
         actual_amount = amount - fee - management_fee  # 实际到账金额
         if actual_amount <= 0:
-            return Response({"ret_code": 30136, "message": u'实际到账金额为0,无法提现'})
+            return Response({"ret_code": 30136, "message": u'余额不足，提现失败'})
 
         if device_type == 'ios' or device_type == 'android':
             if app_version and app_version < "2.6.3":
@@ -1000,7 +1091,7 @@ class TradeRecordAPIView(APIView):
         return Response(rs)
 
 
-class WithdrawAPIView(APIView):
+class WithdrawAPIView(DecryptParmsAPIView):
     permission_classes = (IsAuthenticated, )
 
     @require_trade_pwd
@@ -1024,6 +1115,23 @@ class WithdrawAPIView(APIView):
                 "content": content,
                 "mtype": "withdraw"
             })
+            weixin_user = WeixinUser.objects.filter(user=user).first()
+            if weixin_user:
+                bank_name = result['bank_name']
+                # 亲爱的{}，您的提现申请已受理，1-3个工作日内将处理完毕，请耐心等待。
+            # {{first.DATA}} 取现金额：{{keyword1.DATA}} 到账银行：{{keyword2.DATA}} 预计到账时间：{{keyword3.DATA}} {{remark.DATA}}
+                now = datetime.datetime.now()
+                withdraw_ok_time = "%s前处理完毕"%(now+datetime.timedelta(days=3)).strftime('%Y年%m月%d日')
+                sentTemplate.apply_async(kwargs={
+                                "kwargs":json.dumps({
+                                                "openid":weixin_user.openid,
+                                                "template_id":WITH_DRAW_SUBMITTED_TEMPLATE_ID,
+                                                "first":u"亲爱的%s，您的提现申请已受理"%name,
+                                                "keyword1":result['amount'],
+                                                "keyword2":bank_name,
+                                                "keyword3":withdraw_ok_time,
+                                                    })},
+                                                queue='celery02')
         return Response(result)
 
 
@@ -1044,14 +1152,14 @@ class UnbindCardView(APIView):
         result = third_pay.card_unbind(request)
         return Response(result)
 
-
-class BindPayDepositView(APIView):
+class BindPayDepositView(DecryptParmsAPIView):
     """ 获取验证码或快捷支付 """
     permission_classes = (IsAuthenticated, )
 
     @require_trade_pwd
     def post(self, request):
         result = third_pay.bind_pay_deposit(request)
+
         return Response(result)
 
 class BindPayDynnumNewView(APIView):
@@ -1061,6 +1169,7 @@ class BindPayDynnumNewView(APIView):
     @require_trade_pwd
     def post(self, request):
         result = third_pay.bind_pay_dynnum(request)
+
         return Response(result)
 
 class BankCardDelNewView(APIView):

@@ -62,17 +62,20 @@ class StatsKeyWordMiddleWare(object):
     def process_request(self, request):
         referer = request.META.get("HTTP_REFERER", "")
         if referer:
-            res = urlparse.urlparse(referer)
-            website = filter(lambda item: item in res.netloc, self.statics.keys())
-            if website:
-                website = website[0]
-                qs = urlparse.parse_qs(res.query)
-                if self.statics[website]['keyword'] in qs:
-                    request.session["promo_source_keyword"] = "|".join(qs[self.statics[website]['keyword']])
-                    request.session["promo_source_site_name"] = self.statics[website]['name']
-                    request.session['promo_source_website'] = self.statics[website]['website']
-                    if settings.DEBUG:
-                        logger.debug("keyword:%s, site_name:%s, website:%s" % (request.session.get("promo_source_keyword"),
-                                                                           request.session.get("promo_source_site_name"),
-                                                                           request.session.get("promo_source_website")
-                                                                           ))
+            try:
+                res = urlparse.urlparse(referer)
+                website = filter(lambda item: item in res.netloc, self.statics.keys())
+                if website:
+                    website = website[0]
+                    qs = urlparse.parse_qs(res.query)
+                    if self.statics[website]['keyword'] in qs:
+                        res = "|".join(qs[self.statics[website]['keyword']])
+                        try:
+                            gb2312 = res.decode('gb2312')
+                        except:
+                            gb2312 = res
+                        request.session["promo_source_keyword"] = gb2312
+                        request.session["promo_source_site_name"] = self.statics[website]['name']
+                        request.session['promo_source_website'] = self.statics[website]['website']
+            except Exception, reason:
+                logger.debug(u"SEM关键词统计，中间件报异常, reason:%s" % reason)

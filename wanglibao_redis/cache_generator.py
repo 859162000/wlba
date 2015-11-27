@@ -4,7 +4,6 @@ import pickle
 from django.utils import timezone
 from django.db.models import Q
 from django.forms import model_to_dict
-from decimal import Decimal
 from wanglibao_p2p.models import P2PProduct
 from wanglibao_redis.backend import redis_backend
 from wanglibao_announcement.models import Announcement
@@ -13,6 +12,7 @@ from wanglibao_banner.models import Banner
 
 
 cache_backend = redis_backend()
+
 
 def cache_generate_detail():
     p2p_products = P2PProduct.objects.select_related('activity')\
@@ -41,7 +41,8 @@ def cache_generate_list():
 
     return True
 
-#缓存公告
+
+# 缓存公告
 def cache_announcement():
     cache_backend._delete("announcement")
 
@@ -55,7 +56,8 @@ def cache_announcement():
 
     cache_backend._set("announcement", pickle.dumps(result))
 
-#缓存新闻
+
+# 缓存新闻
 def cache_news():
     cache_backend._delete("announcement_news")
     news = NewsAndReport.objects.all().order_by("-score")[:5]
@@ -65,7 +67,8 @@ def cache_news():
 
     cache_backend._set("announcement_news", pickle.dumps(result))
 
-#缓存banner
+
+# 缓存banner
 def cache_banners():
     cache_backend._delete("banners")
     banners = Banner.objects.filter(Q(device=Banner.PC_2), Q(is_used=True), Q(is_long_used=True) | Q(is_long_used=False))
@@ -77,8 +80,9 @@ def cache_banners():
     cache_backend._set("banners", pickle.dumps(result))
 
 if __name__ == "__main__":
-    cache_generate_detail()
-    cache_generate_list()
-    cache_announcement()
-    cache_news()
-    cache_banners()
+    pass
+    # cache_generate_detail()
+    # cache_generate_list()
+    # cache_announcement()
+    # cache_news()
+    # cache_banners()

@@ -324,14 +324,14 @@ org.detail = (function(org){
                 }
             });
             wx.ready(function(){
-                var host = 'https://staging.wanglibao.com',
+                var host = 'https://www.wanglibao.com',
                     shareImg,//图片
                     shareLink,//连接地址
                     shareMainTit,//分享标题
                     shareBody,//分享描述
                     success;
                 var conf = $.extend({
-                    shareImg: host + '/static/imgs/sub_mobile/logo.png',//图片
+                    shareImg: host + '/static/imgs/sub_weixin/logo.png',//图片
                     shareLink: host + '/weixin/award_index/',//连接地址
                     shareMainTit: '幸运大转盘，日日有惊喜',//分享标题
                     shareBody: '转盘一动，大奖即送。还不快快领取！',//分享描述
@@ -343,7 +343,7 @@ org.detail = (function(org){
                 shareMainTit = conf.shareMainTit;//分享标题
                 shareBody = conf.shareBody;//分享描述
                 success = conf.success;
-                alert(shareMainTit);
+                //alert(shareMainTit);
                 //分享给微信好友
                 org.onMenuShareAppMessage({
                     title: shareMainTit,
@@ -351,7 +351,7 @@ org.detail = (function(org){
                     link: shareLink,
                     imgUrl: shareImg,
                     success: function(){
-                        alert(shareMainTit);
+                        //alert(shareMainTit);
                     }
                 });
                 //分享给微信朋友圈
@@ -360,7 +360,7 @@ org.detail = (function(org){
                     link : shareLink,
                     imgUrl: shareImg,
                     success: function(){
-                        alert(shareMainTit);
+                        //alert(shareMainTit);
                     }
                 });
                 //分享给QQ
@@ -701,6 +701,9 @@ org.regist = (function(org){
         }
     }
 
+    $("#no-unbind,.back-weixin").addClass("clickOk").click(function(){
+        closePage();
+    });
 
     function timeFun(){//倒计时跳转
       var numDom = $("#times-box");
@@ -718,9 +721,6 @@ org.regist = (function(org){
     window.onload = function(){
         timeFun();
         $("#unbind").addClass("clickOk");
-        $("#no-unbind,.back-weixin").addClass("clickOk").click(function(){
-            closePage();
-        });
     }
 
     var unbindf = false;
@@ -767,6 +767,7 @@ org.regist = (function(org){
         var num = 0;
         var alt = $("#alt-box");
         var altAwardP = alt.find("#alt-award-p");
+        var altCont = alt.find(".alt-cont");
         var altPro = alt.find("#alt-promot");
         var sleep = 60;
         function setAn(){
@@ -777,11 +778,14 @@ org.regist = (function(org){
                     $("#page-bg").show();
                     if(k === 0){
                         altPro.text(errorStr[Math.floor(Math.random()*5)]);
-                        altAwardP.html('<span id="alt-award" class="alt-award">继续攒人品</span>');
+                        altAwardP.html('');
+                        altCont.removeClass("mt");
                     }else{
                         altPro.text(arrStr[Math.floor(Math.random()*2)]);
                         altAwardP.html('<span id="alt-award" class="alt-award">'+btns.eq(i-1).text()+'</span>已在您的账户中');
+                        altCont.addClass("mt");
                     }
+                    //altCont.find(".alt-btn").html('<span class="alt-award red-btns close-box">继续攒人品</span>');
                     self.removeClass("had-click");
                     alt.show();
                 },sleep);
@@ -806,13 +810,14 @@ org.regist = (function(org){
         var isNum = goods;
         var nowNum = 0;
         var awardAction = "ENTER_WEB_PAGE";
-        if(self.hasClass("had-click")){
-            return;
-        }
+        var altDom = $("#alt-box");
         if(awardsNum === 0){
             $("#page-bg").show();
-            $("#alt-promot").text("大奖明天见，网利宝天天见。");
-            $("#alt-award-p").text("您今天已经抽奖，明天再来碰运气吧").parents("#alt-box").show();
+            altDom.find("#alt-promot").text("大奖明天见，网利宝天天见。");
+            altDom.find("#alt-award-p").text("您今天已经抽奖，明天再来碰运气吧");
+            altDom.find(".alt-cont").addClass("mt");
+            altDom.find(".alt-btn").html('<span class="alt-award red-btns close-box">知道了</span>');
+            altDom.show();
             self.addClass("had-click");
             return;
         }
@@ -840,21 +845,11 @@ org.regist = (function(org){
         btnAnimate(self,awards,nowNum);//执行动画
     });
     //关闭弹层
-    $("#alt-box .close-box").click(function(){
+    $("#alt-box").on("click",".close-box",function(){
         $(this).parents("#alt-box").hide();
         $("#page-bg").hide();
         awardBtn = true;
     });
-
-    //规则 html添加class
-    ;(function(){
-        var html = $("html");
-        if(html.height() <= $(window).height()){
-            html.addClass("sub-height");
-        }else{
-            html.removeClass("sub-height");
-        }
-    })();
 
     //抽奖活动 显示规则
     $("#show-alt-rule").click(function(){
@@ -864,12 +859,22 @@ org.regist = (function(org){
         $(this).parents("#sub-body-rule").hide();
     });
 })(org);
+
+//页面加载完成 添加class
+function onLoadClass(){
+    var html = $("html");
+    if(html.height() <= $(window).height()){
+        html.addClass("sub-height");
+    }else{
+        html.removeClass("sub-height");
+    }
+}
 function getCode(){//得到用户信息的二维码
     var phone = org.getQueryStringByName('phone');
     org.ajax({
         type: "POST",
-        url: "/weixin/api/generate/qr_limit_scene_ticket/",
-        data: {"original_id":"gh_32e9dc3fab8e"},
+        url: "/weixin/api/generate/qr_scene_ticket/",
+        data: {"original_id":"gh_f758af6347b6"},//c:gh_32e9dc3fab8e
         success: function (data) {
             $("#sub-code").html("<img src='"+ data.qrcode_url + "' />");
         },
@@ -877,6 +882,14 @@ function getCode(){//得到用户信息的二维码
             window.location.href="/weixin/jump_page/?message=请进行登录并绑定您的微信";
         }
     });
+}
+function isIphone(id){
+    var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+        iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+        ios = ipad || iphone;
+    if (ios) {
+      document.getElementById(id).style.display = 'block';
+    }
 }
 
 function isAwards(k){//判断抽奖是第几项
@@ -915,6 +928,7 @@ function isAwards(k){//判断抽奖是第几项
     }
     return is;
 }
+
 var awardsNum = 0,
     goods = '';
 org.awardEvent = (function(org){ //微信抽奖
@@ -927,7 +941,6 @@ org.awardEvent = (function(org){ //微信抽奖
             success: function(data){
                 fn(data);
                 awardsNum = data.left;
-                alert(awardsNum+", "+$("#openid").val());
                 goods = parseFloat(data.amount);
             },
             error: function(){}

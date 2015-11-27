@@ -112,7 +112,6 @@ INSTALLED_APPS = (
     'wanglibao_activity',
     'wanglibao_mobile',
     'weixin',
-    'wechatpy',
     'wanglibao_app',
     'wanglibao_anti', #add by yihen@20150813, anti module added
     'wanglibao_reward', #add by yihen@20150910
@@ -135,6 +134,7 @@ INSTALLED_APPS = (
     'file_storage',
     'wanglibao_lottery',
     'daterange_filter',
+    'experience_gold',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -215,6 +215,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
 )
+import django.contrib.auth.backends
 
 # Template loader
 TEMPLATE_LOADERS = (
@@ -310,8 +311,12 @@ DEFAULT_FROM_EMAIL = 'noreply@wanglibao.com'
 # 新的漫道请求设置
 SMS_MANDAO_URL = 'http://sdk.entinfo.cn:8061/webservice.asmx/mdsmssend'
 SMS_MANDAO_MULTICAST_URL = 'http://sdk2.entinfo.cn:8061/webservice.asmx/mdgxsend'
-SMS_MANDAO_SN = 'SDK-SKY-010-02839'
-SMS_MANDAO_MD5_PWD = '1FE15236BBEB705A8F5D221F47164693'
+
+SMS_MANDAO_SN_MARKETING = 'SDK-SKY-010-02839'  # 营销类短信SDK
+SMS_MANDAO_MD5_PWD_MARKETING = '1FE15236BBEB705A8F5D221F47164693'  # 营销类短信pwd
+
+SMS_MANDAO_SN = 'SDK-SKY-010-02932'  # 应用类短信SDK
+SMS_MANDAO_MD5_PWD = 'E9E12F71CE9A9E98B459CBF4BDD13315'  # 应用类短信pwd
 
 SMS_BACKEND = 'wanglibao_sms.backends.ManDaoSMSBackEnd'
 
@@ -377,36 +382,42 @@ LOGGING = {
             'filename': '/var/log/wanglibao/marketing.log',
             'formatter': 'verbose'
         },
-        'wanglibao_reward':{  #add by yihen@20150915
+        'wanglibao_reward': {  #add by yihen@20150915
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': '/var/log/wanglibao/wanglibao_reward.log',
             'formatter': 'verbose'
         },
-        'wanglibao_account':{  #add by yihen@20151113
-                              'level': 'INFO',
-                              'class': 'logging.FileHandler',
-                              'filename': '/var/log/wanglibao/wanglibao_account.log',
-                              'formatter': 'verbose'
-                              },
-        'wanglibao_rest':{  #add by yihen@20151028
-                              'level': 'DEBUG',
-                              'class': 'logging.FileHandler',
-                              'filename': '/var/log/wanglibao/wanglibao_rest.log',
-                              'formatter': 'verbose'
-                              },
-        'wanglibao_cooperation':{  #add by yihen@20150915
-                              'level': 'DEBUG',
-                              'class': 'logging.FileHandler',
-                              'filename': '/var/log/wanglibao/wanglibao_cooperation.log',
-                              'formatter': 'verbose'
-                              },
-        'weixin':{  #add by huomeimei
-              'level': 'DEBUG',
-              'class': 'logging.FileHandler',
-              'filename': '/var/log/wanglibao/weixin.log',
-              'formatter': 'verbose'
-                },
+        'wanglibao_account': {  #add by yihen@20151113
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/wanglibao_account.log',
+            'formatter': 'verbose'
+        },
+        'wanglibao_rest': {  #add by yihen@20151028
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/wanglibao_rest.log',
+            'formatter': 'verbose'
+        },
+        'wanglibao_cooperation': {  #add by yihen@20150915
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/wanglibao_cooperation.log',
+            'formatter': 'verbose'
+        },
+        'weixin': {  #add by huomeimei
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/weixin.log',
+            'formatter': 'verbose'
+        },
+        'experience_gold': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/wanglibao/experience_gold.log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'django': {
@@ -422,6 +433,10 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG'
         },
+        'wanglibao': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+        },
         'wanglibao_pay': {
             'handlers': ['file', 'console'],
             'level': 'DEBUG',
@@ -431,7 +446,7 @@ LOGGING = {
             'level': 'DEBUG',
         },
         'wanglibao_p2p': {
-            'handlers': ['file'],
+            'handlers': ['file', 'console'],
             'level': 'DEBUG',
         },
         'wanglibao_redpack': {
@@ -444,7 +459,7 @@ LOGGING = {
         },
         'wanglibao_account': {
             'handlers': ['wanglibao_account', 'console'],
-            'level': 'INFO',
+            'level': 'DEBUG',
         },
         'wanglibao_app': {
             'handlers': ['file'],
@@ -466,33 +481,35 @@ LOGGING = {
             'handlers': ['marketing', 'console'],
             'level': 'DEBUG'
         },
-        'wanglibao_reward': { #add by yihen@20150915
+        'wanglibao_reward': {  # add by yihen@20150915
             'handlers': ['wanglibao_reward', 'console'],
             'level': 'DEBUG'
         },
-        'wanglibao_rest': { #add by yihen@20151028
+        'wanglibao_rest': {  # add by yihen@20151028
               'handlers': ['wanglibao_rest', 'console'],
               'level': 'DEBUG'
           },
-        'wanglibao_cooperation': { #add by yihen@20150915
-                              'handlers': ['wanglibao_cooperation', 'console'],
-                              'level': 'DEBUG'
-                              },
-        'weixin':{#add by huomeimei
+        'wanglibao_cooperation': {  # add by yihen@20150915
+            'handlers': ['wanglibao_cooperation', 'console'],
+            'level': 'DEBUG'
+        },
+        'weixin': {  # add by huomeimei
               'handlers': ['weixin', 'console'],
               'level': 'DEBUG'
         },
-        'wanglibao_p2p': {
-            'handlers': [ 'console'],
+        'experience_gold': {
+            'handlers': ['file', 'console'],
             'level': 'DEBUG'
         }
     }
 }
 
+
 if ENV != ENV_DEV:
     LOGGING['loggers']['django']['level'] = 'INFO'
     LOGGING['loggers']['wanglibao_sms']['level'] = 'INFO'
     LOGGING['loggers']['wanglibao_lottery']['level'] = 'INFO'
+    LOGGING['loggers']['wanglibao_pay']['level'] = 'INFO'
 
     # secure proxy SSL header and secure cookies
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -501,6 +518,9 @@ if ENV != ENV_DEV:
 
     # session expire at browser close
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+    # set session for PHP cross domain.
+    SESSION_COOKIE_DOMAIN = '.wanglibao.com'
 
     # wsgi scheme
     os.environ['wsgi.url_scheme'] = 'https'
@@ -551,6 +571,15 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+
+CELERY_QUEUES = {
+                "celery":  {"exchange": "celery",
+                              "routing_key": "celery"},
+                "celery01": {"exchange": "celery01",
+                              "routing_key": "celery01"},
+                "celery02": {"exchange": "celery02",
+                              "routing_key": "celery02"},
+                }
 
 from datetime import timedelta, datetime
 
@@ -636,6 +665,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'wanglibao_account.tasks.zhongjin_post_task',
         'schedule': timedelta(hours=1),
     },
+    # by Zhoudong 融途网标的推送(包含新标, 更新, 下架)
+    'rongtu_send_data': {
+        'task': 'wanglibao_account.tasks.rongtu_post_task',
+        'schedule': timedelta(hours=1),
+    },
     # 每天定时检测和生成原始邀请码
     'check_and_generate_codes': {
         'task': 'marketing.tools.check_and_generate_codes',
@@ -646,6 +680,11 @@ CELERYBEAT_SCHEDULE = {
     'invested_status_task_check': {
         'task': 'marketing.tools.check_invested_status',
         'schedule': crontab(minute=0, hour=10),
+    },
+    # 每天下午17点半开始处理体验金的还款
+    'experience_repayment_plan': {
+        'task': 'experience_gold.tasks.experience_repayment_plan',
+        'schedule': timedelta(minutes=5),
     },
     # # by Zhoudong 定期检查用户优惠券没使用,发送提醒
     # 'redpack_status_task_check': {
@@ -660,6 +699,7 @@ CELERYBEAT_SCHEDULE_FILENAME = "/tmp/celerybeat-schedule"
 
 ID_VERIFY_USERNAME = 'wljr_admin'
 ID_VERIFY_PASSWORD = 'wljr888'
+ID_LICENSE = '6a?zT-`f>_&lt;iDCC5V3[73#V?7$$t(a/p8w+u?o?[1(cf+T9&amp;7)3#I64)8n&amp;bJf`1Aa?o?z?x9V)qYq^eMgPqXw[.Tk.j?vLtNoa3KtGgYeb3Mc?x?v`0a8A.Fc-;&lt;a:c?/:a?/?v?j^qSuSyJg?x6abLLbFhM/3f:c?.2x?h?h?v.xOwMnGgSe?x.laLQtSyc6$y[:0#TH6QV\H3dh@9-u4b?.&lt;f?/+e?jS/JcRuAn)e?vY/Cc@;[.aMImHyFc$yKn+y?g?g&lt;f?g>c%a[sCcbX_ddVMcZ.a4?x?vRuKu0[=v=x?jEjJtZ[QvDfXw]uYw2d?v`V`4YscNJvTeUjBsBdKfCd?x-kXpcBHx]t?x?g4b)j>d&lt;z?jN.YgSyUk?x3h6t]gRe^dXgFhTeWlYjXwHgCd?x*w?jd7^eMgV;Ty]gc5?x'
 
 if ENV == ENV_PRODUCTION:
     CALLBACK_HOST = 'https://www.wanglibao.com'
@@ -680,6 +720,9 @@ if ENV == ENV_PRODUCTION:
     HUI_SHORT_DEBIND_URL = "%s/gao/entry.do" % PAY_URL
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
+
+    YEE_PROXY_PAY_MER_ID = '10012413099'
+    YEE_PROXY_PAY_KEY = '418oFDp0384T5p236690c27Qp0893s8RZSG09VLy06A218ZCIi674V0h77M8'
 
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
@@ -729,6 +772,9 @@ elif ENV == ENV_PREPRODUCTION:
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'https://lab.chinapnr.com/buser'
 
+    YEE_PROXY_PAY_MER_ID = '10012413099'
+    YEE_PROXY_PAY_KEY = '418oFDp0384T5p236690c27Qp0893s8RZSG09VLy06A218ZCIi674V0h77M8'
+
     YEE_PAY_URL = "https://ok.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10012413099"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'yeepay_mer_pri_key.pem'), 'r').read())
@@ -760,8 +806,11 @@ elif ENV == ENV_PREPRODUCTION:
 else:
     CALLBACK_HOST = 'https://staging.wanglibao.com'
     STATIC_FILE_HOST = 'https://staging.wanglibao.com'
-    MER_ID = '510743'
-    CUSTOM_ID = '000010124821'
+    # MER_ID = '510743'
+    # CUSTOM_ID = '000010124821'
+    # huifu id 改为和生产相同
+    MER_ID = '872724'
+    CUSTOM_ID = '000007522683'
     SIGN_HOST = '127.0.0.1'
     SIGN_PORT = 8733
     HUI_SHORT_MER_ID = "510793"
@@ -769,12 +818,16 @@ else:
     HUI_SHORT_SIGN_PORT = 8734
     HUI_SHORT_OPER_ID = "bjwl"
     HUI_SHORT_LOGIN_PWD = "cathy123"
-    PAY_URL = 'http://test.chinapnr.com'
+    # PAY_URL = 'http://test.chinapnr.com'
+    # huifu pay url改为和生产相同
+    PAY_URL = 'https://mas.chinapnr.com'
     HUI_SHORT_BIND_URL = "%s/gar/entry.do" % PAY_URL
     HUI_SHORT_DEBIND_URL = "%s/gar/entry.do" % PAY_URL
     HUI_SHORT_PAY_URL = "%s/gar/entry.do" % PAY_URL
     WITHDRAW_URL = 'http://test.chinapnr.com/buser'
 
+    YEE_PROXY_PAY_MER_ID = '10001126856'
+    YEE_PROXY_PAY_KEY = '69cl522AV6q613Ii4W6u8K6XuW8vM1N6bFgyv769220IuYe9u37N4y7rI4Pl'
     YEE_PAY_URL = "http://mobiletest.yeepay.com/paymobile/api/pay/request"
     YEE_MER_ID = "10000419568"
     YEE_MER_PRIV_KEY = RSA.importKey(open(os.path.join(CERT_DIR, 'staging_yee_mer_priv_key.pem'), 'r').read())
@@ -807,6 +860,11 @@ PAY_BACK_RETURN_URL = CALLBACK_HOST + '/pay/deposit/callback/'
 PAY_RET_URL = CALLBACK_HOST + '/pay/deposit/complete/'
 WITHDRAW_BACK_RETURN_URL = CALLBACK_HOST + '/pay/withdraw/callback/'
 
+#易宝网银支付
+YEE_PROXY_PAY_URL = 'https://www.yeepay.com/app-merchant-proxy/node'
+YEE_PROXY_PAY_WEB_CALLBACK_URL = CALLBACK_HOST + '/pay/deposit/yee_proxy_pay_complete/'
+
+
 #易宝支付回调地址
 YEE_PAY_RETURN_URL = CALLBACK_HOST + '/api/pay/yee/app/deposit/complete/'
 YEE_PAY_BACK_RETURN_URL = CALLBACK_HOST + '/api/pay/yee/app/deposit/callback/'
@@ -822,7 +880,9 @@ YTX_SID = "aaf98f89495b3f3801497488ebbe0f3f"
 YTX_TOKEN = "dbf6b3bf0d514c6fa21cd12d29930c18"
 YTX_BACK_RETURN_URL = CALLBACK_HOST + "/api/ytx/voice_back/"
 
-ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
+# Modify by hb on 2015-11-25 for new id-verify-channel
+#ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
+ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
 if ENV == ENV_DEV:
     ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
     STATIC_FILE_HOST = 'http://localhost:8000'
@@ -844,8 +904,10 @@ DEBUG_TOOLBAR_CONFIG = {
 
 USE_L10N = False
 DATETIME_FORMAT = 'Y-m-d H:i:s'
-ADMIN_ADDRESS = 'AK7WtEQ4Q9KPs8Io_zOncw'
-# DATE_FORMAT='Y-m-d'
+# Modify by hb on 2015-11-25
+#ADMIN_ADDRESS = 'AK7WtEQ4Q9KPs8Io_zOncw'
+ADMIN_ADDRESS = 'PK7wlbQ4Q9KPs9Io_zOpac'
+DATE_FORMAT = 'Y-m-d'
 
 # AUTH_PROFILE_MODULE = 'wanglibao_profile.WanglibaoUserProfile'
 CKEDITOR_CONFIGS = {
@@ -978,6 +1040,11 @@ ZO_SECRET = '3r2o3j3m3g3q3l2o7o'
 MIDAI_USERNAME = 'medai360'
 MIDAI_PASSWORD = '12345678'
 
+# 融途网
+RONGTU_URL = 'http://shuju.erongtu.com/api/borrow'
+RONGTU_URL_TEST = 'http://shuju.erongtu.com/api/test'
+RONGTU_ID = 1638
+
 # 金山
 WLB_FOR_JINSHAN_KEY = '1994'
 JINSHAN_CALL_BACK_URL = 'https://vip.wps.cn/task/api/reward'
@@ -1059,11 +1126,17 @@ WLB_FOR_FANLITOU_KEY = '2002'
 
 # 迅雷VIP
 WLB_FOR_XUNLEI9_KEY = '2003'
+XUNLEIVIP_QUERY_URL = 'http://dynamic.vip.xunlei.com/xljinku/checkOrder'
 XUNLEIVIP_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/xljinku/sendvip/'
 XUNLEIVIP_REGISTER_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_report.php'
 XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
 XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
 XUNLEI9_ACTIVITY_PAGE = 'marketing_xunlei_setp'
+
+# 脉脉
+MAIMAI1_CHANNEL_CODE = 'maimai1'
+MAIMAI1_ACTIVITY_PAGE = 'maimai_index'
+MAIMAI_CALL_BACK_URL = 'https://maimai.cn/hb_pingback'
 
 
 # 对第三方回调做IP鉴权所信任的IP列表
@@ -1087,6 +1160,7 @@ SUIT_CONFIG = {
 REDIS_HOST = '127.0.0.1'
 REDIS_PORT = 6379
 REDIS_DB = 0
+REDIS_PASSWORD = 'wanglibank_redis'
 
 # CACHES = {
 #     'default': {
@@ -1118,8 +1192,15 @@ THREE_DEFAULT_CHANNEL_CODE = 'wanglibao-three'
 if ENV == ENV_PRODUCTION:
     WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
 else:
-    WEIXIN_CALLBACK_URL = 'https://staging.wanglibao.com'
-    CALLBACK_HOST='https://staging.wanglibao.com'
+    WEIXIN_CALLBACK_URL = 'http://84de5958.ngrok.io'
+    CALLBACK_HOST='http://84de5958.ngrok.io'
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)
 WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'
+
+# 第三方来我们这的用户名密码去获取 token
+TOKEN_CLIENTS = {
+    'rong360': 'wanglibao_1116',
+}
+
+APP_DECRYPT_KEY = "31D21828CC9DA7CE527F08481E361A7E"

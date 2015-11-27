@@ -6,6 +6,8 @@ require.config(
     'jquery.validate': 'lib/jquery.validate.min'
     tools: 'lib/modal.tools'
 
+  urlArgs: 'v=20151118'
+
   shim:
     'jquery.modal': ['jquery']
     'jquery.placeholder': ['jquery']

@@ -8,6 +8,7 @@ import random
 from django.utils import timezone
 
 
+
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
@@ -33,6 +34,7 @@ def fmt_two_amount(value):
     :return:
     """
     # 以防传入float或是其他导致错误
+
     value = str(value)
     amount = decimal.Decimal(value).quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
     return amount
@@ -86,8 +88,9 @@ def handle_withdraw_limit(limitstr):
     obj = {}
     try:
         first, second = limitstr.split(",")
-        obj['bank_min_amount'] = first.split("=")[1]
-        obj['bank_max_amount'] = second.split("=")[1]
+        obj['bank_min_amount'] = int(first.split("=")[1])
+        obj['bank_max_amount'] = int(second.split("=")[1])
     except:
         pass
     return obj
+

@@ -52,9 +52,9 @@ from marketing.play_list import InvestmentHistory
 from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView,
                              ThousandRedPackCountAPIView, ThunderActivityRewardCounter, QuickApplyerAPIView, GiftOwnerInfoAPIView, RewardDistributeAPIView)
 from weixin.views import P2PListWeixin
-from wanglibao_account.views import ThirdOrdeApiView, ThirdOrderQueryApiView
+from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
-from wanglibao_reward.views import WeixinRedPackView, WeixinShareTools
+from wanglibao_reward.views import WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView
 
 router = DefaultRouter()
 
@@ -91,7 +91,7 @@ router.register(r'pre_orders', PreOrderViewSet)
 router.register(r'feedbacks', FeedbackViewSet)
 router.register(r'trade_info', TradeInfoViewSet)
 #router.register(r'banners', BannerViewSet)
-router.register(r'users', UserViewSet)
+# router.register(r'users', UserViewSet)
 
 router.register(r'daily_income', DailyIncomeViewSet)
 
@@ -207,7 +207,7 @@ urlpatterns = patterns(
     url(r'^address/(?P<address_id>\d+)/$', AddressGetAPIView.as_view()),
     url(r'^address/delete/$', AddressDeleteAPIView.as_view()),
 
-    url(r'^repayment/$', RepaymentAPIView.as_view()),
+    url(r'^repayment/$', RepaymentAPIView.as_view()),  # 后台还款中标的接口
 
     url(r'^gesture/add/$', GestureAddView.as_view()),
     url(r'^gesture/update/$', GestureUpdateView.as_view()),
@@ -248,6 +248,7 @@ urlpatterns += patterns(
     url(r'^gift/owner/$', GiftOwnerInfoAPIView.as_view()), #add by yihen@20151102 ,聚橙网领取门票接口
     url(r'^weixin/share/has_gift/$', WeixinShareTools.as_view()), #add by yihen@20151102 ,聚橙网领取门票接口
     url(r'^weixin/distribute/redpack/$', RewardDistributeAPIView.as_view()), #add by yihen@20151102 ,聚橙网领取门票接口
+    url(r'^activity/reward/$', DistributeRewardAPIView.as_view()),
 
 )
 
@@ -261,7 +262,7 @@ urlpatterns += patterns(
 # 第三方渠道业务接口
 urlpatterns += patterns(
     '',
-    url(r'^coop/order/receive/(?P<channel_code>[a-z0-9A-Z_]*)/$', ThirdOrdeApiView.as_view()),
+    url(r'^coop/order/receive/(?P<channel_code>[a-z0-9A-Z_]*)/$', ThirdOrderApiView.as_view()),
     url(r'^coop/order/query/$', ThirdOrderQueryApiView.as_view()),
 )
 
@@ -269,4 +270,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^activity/joinInfo/$', UserActivityStatusAPIView.as_view()),
+)
+
+# 理财金接口
+urlpatterns += patterns(
+    '',
+    url(r'^experience/', include('experience_gold.urls')),
 )

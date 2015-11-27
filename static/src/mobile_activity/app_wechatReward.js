@@ -108,6 +108,8 @@ org.reward = (function(org){
                                 window.location.href= '/activity/wechat_result/?phone='+ _self.$phone.val() + '&state=1'
                             }else if(data.ret_code == 1000){
                                 window.location.href= '/activity/wechat_result/?phone='+ _self.$phone.val() + '&state=0'
+                            }else{
+                                alert(data.message)
                             }
                         },
                         complete:function(){

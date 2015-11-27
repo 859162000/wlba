@@ -97,19 +97,21 @@ def gen_token(length=8):
 
 def tuling(msg):
     query_params = {
-        'key': 'e8beb9af8f52b438bb8a917b40255f7d',
+        'key': '8519004c8bd2dcad54b7c097b217f0e7',
         'info': msg.content,
         'userid': msg.source
     }
     url = 'http://www.tuling123.com/openapi/api?%s' % urllib.urlencode(query_params)
     res = requests.get(url)
-    reply = create_reply('呵呵', msg)
-
+    reply=None
     if res.status_code == 200:
         data = res.json()
         if data.get('code') == 100000:
-            reply = create_reply(data.get('text'), msg)
-
+            text = data.get('text', '')
+            print text
+            if text.startswith(u'[tuling]'):
+                text = text[8:-1]
+                reply = create_reply(text, msg)
     return reply
 
 

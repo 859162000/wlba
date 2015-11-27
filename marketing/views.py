@@ -69,6 +69,8 @@ from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
 from rest_framework import renderers
 from django.core.urlresolvers import reverse
+from misc.views import MiscRecommendProduction
+from marketing.utils import pc_data_generator
 reload(sys)
 
 class YaoView(TemplateView):
@@ -181,34 +183,99 @@ class TvView(TemplateView):
 
 
 class AppShareView(TemplateView):
-    template_name = 'app_share.jade'
-
-    def get_context_data(self, **kwargs):
-        identifier = self.request.GET.get('phone')
-        reg = self.request.GET.get('reg')
-
-        return {
-            'identifier': identifier.strip(),
-            'reg': reg
-        }
-
-
-class AppShareViewShort(TemplateView):
-    template_name = 'app_share.jade'
+    template_name = 'app_invite_friends.jade'
 
     def get_context_data(self, **kwargs):
         try:
             identifier = self.request.GET.get('p')
-            phone = base64.b64decode(identifier + '=')
+            friend_phone = base64.b64decode(identifier + '=')
         except:
             identifier = self.request.GET.get('phone')
-            phone = identifier
-        reg = self.request.GET.get('reg')
+            friend_phone = identifier
 
+        # 网站数据
+        m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
+        site_data = m.get_recommend_products()
+        if site_data:
+            site_data = site_data[MiscRecommendProduction.KEY_PC_DATA]
+        else:
+            site_data = pc_data_generator()
+            m.update_value(value={MiscRecommendProduction.KEY_PC_DATA: site_data})
+
+        identifier_result = identifier and identifier.strip() or identifier
         return {
-            'identifier': identifier.strip(),
-            'reg': reg,
+            'site_data': site_data,
+            'identifier': identifier_result,
+            'friend_phone': friend_phone,
+        }
+
+
+class AppShareViewShort(TemplateView):
+    template_name = 'app_invite_friends.jade'
+
+    def get_context_data(self, **kwargs):
+        try:
+            identifier = self.request.GET.get('p')
+            friend_phone = base64.b64decode(identifier + '=')
+        except:
+            identifier = self.request.GET.get('phone')
+            friend_phone = identifier
+
+        if friend_phone:
+            try:
+                user = User.objects.get(wanglibaouserprofile__phone=friend_phone)
+                promo_token = PromotionToken.objects.get(user=user)
+                invite_code = promo_token.token
+            except:
+                invite_code = ''
+        else:
+            invite_code = ''
+
+        # 网站数据
+        m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
+        site_data = m.get_recommend_products()
+        if site_data:
+            site_data = site_data[MiscRecommendProduction.KEY_PC_DATA]
+        else:
+            site_data = pc_data_generator()
+            m.update_value(value={MiscRecommendProduction.KEY_PC_DATA: site_data})
+
+        url = self.request.get_host() + self.request.get_full_path()
+        return {
+            'site_data': site_data,
+            'invite_code': invite_code,
+            'friend_phone': friend_phone,
+            'url': url
+        }
+
+class AppShareViewError(TemplateView):
+    template_name = 'app_invite_error.jade'
+
+    def get_context_data(self, **kwargs):
+        try:
+            identifier = kwargs['phone']
+            phone = base64.b64decode(identifier + '=')
+        except:
+            phone = ''
+        url = self.request.get_host() + '/aws/?p=' + identifier
+        return {
             'phone': phone,
+            'url': url
+        }
+
+class AppShareViewSuccess(TemplateView):
+    template_name = 'app_invite_success.jade'
+
+    def get_context_data(self, **kwargs):
+        try:
+            identifier = kwargs['phone']
+            phone = base64.b64decode(identifier + '=')
+        except:
+            phone = ''
+        url = self.request.get_host() + '/aws/?p=' + identifier
+        return {
+            'phone': phone,
+            'url': url
         }
 
 
@@ -2173,7 +2240,7 @@ class GiftOwnerInfoAPIView(APIView):
         p2p_record = P2PRecord.objects.filter(user_id=request.user.id, catalog=u'申购')
         if binding and p2p_record.count() == 1:
             p2p_amount = int(p2p_record.first().amount)
-            if p2p_amount >= 1000 and p2p_amount < 2000:
+            if p2p_amount >= 500 and p2p_amount < 1000:
                 try:
                     config = GiftOwnerGlobalInfo.objects.select_for_update(description=u'jcw_ticket_80', valid=True).first()
                 except Exception, reason:
@@ -2205,7 +2272,7 @@ class GiftOwnerInfoAPIView(APIView):
                         }
                         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-            elif p2p_amount >= 2000:
+            elif p2p_amount >= 1000:
                 try:
                     config = GiftOwnerGlobalInfo.objects.select_for_update(description=u'jcw_ticket_188', valid=True).first()
                 except Exception, reason:
@@ -2289,7 +2356,7 @@ class AppLotteryTemplate(TemplateView):
         openid = self.request.GET.get('openid')
 
         if not openid:
-            redirect_uri = settings.CALLBACK_HOST + reverse("weixin_share_order_gift")
+            redirect_uri = settings.CALLBACK_HOST + reverse("app_lottery")
             count = 0
             for key in self.request.GET.keys():
                 if count == 0:
@@ -2330,7 +2397,7 @@ class RewardDistributeAPIView(APIView):
         self.activity = None
         self.redpacks = dict() #红包amount: 红包object
         self.redpack_amount = list()
-        self.rates = (50, 12, 11, 2.1, 0.6, 13, 9, 1.9, 0.4)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
+        self.rates = (0.4, 1.9, 9, 13, 0.6, 2.1, 11, 12, 50)  #每一个奖品的获奖概率，按照奖品amount的大小排序对应
         self.action_name = u'weixin_distribute_redpack'
 
     def get_activitys_from_wechat_misc(self):
@@ -2387,39 +2454,38 @@ class RewardDistributeAPIView(APIView):
         for item in QSet:
             self.redpacks[item.amount] = item
 
-        self.redpack_amount = sorted(self.redpacks.keys())
+        self.redpack_amount = sorted(self.redpacks.keys(), reverse=True)
         logger.debug(u"红包的大小依次为：%s" % (self.redpack_amount, ))
         logger.debug(u"对应红包的获奖概率是：%s" % (self.rates, ))
 
-    def decide_which_to_distribute(self, request):
+    def decide_which_to_distribute(self, user):
         """ 决定发送哪一个奖品
         """
         sent_count = ActivityJoinLog.objects.filter(action_name=self.action_name).count() + 1
-        today = time.strftime("%Y-%m-%d", time.localtime())
-        join_log = ActivityJoinLog.objects.filter(user=request.user, create_time__gt=today).first()
-        if not join_log:
-            rate = None
-            for rate in self.rates:
-                if sent_count%(100/rate)==0:
-                    break
+        rate = 50
 
-            rate = 50 if rate==None else rate
-            #根据rate找到对应的红包
-            index = self.rates.index(rate)
-            logger.debug(u"rate:{0},index:{1}, redpack_amount:{2}".format(rate,index, self.redpack_amount))
-            try:
-                join_log = ActivityJoinLog.objects.create(
-                    user=request.user,
-                    action_name=self.action_name,
-                    join_times=3,
-                    amount=self.redpack_amount[index],
-                )
-            except IndexError, reason:
-                logger.exception(u"redpack_amount 索引超范围了,reason:{0}".format(reason))
-                raise
-            except Exception, reason:
-                logger.exception(u"创建用户获奖记录异常了， reason:{0}".format(reason))
+        for item in self.rates:
+            if sent_count%(100/item)==0:
+                rate = item
+                break
 
+        #根据rate找到对应的红包
+        index = self.rates.index(rate)
+        logger.debug(u"rate:{0},index:{1}, redpack_amount:{2}".format(rate,index, self.redpack_amount))
+        try:
+            join_log = ActivityJoinLog.objects.create(
+                user=user,
+                action_name=self.action_name,
+                join_times=3,
+                amount=self.redpack_amount[index],
+            )
+        except IndexError, reason:
+            logger.exception(u"redpack_amount 索引超范围了,reason:{0}".format(reason))
+            raise
+        except Exception, reason:
+            logger.exception(u"创建用户获奖记录异常了， reason:{0}".format(reason))
+        else:
+            logger.debug("生成用户的抽奖记录:{0}".format(join_log))
         return join_log
 
     @method_decorator(transaction.atomic)
@@ -2428,21 +2494,25 @@ class RewardDistributeAPIView(APIView):
         """
         try:
             today = time.strftime("%Y-%m-%d", time.localtime())
-            join_log = ActivityJoinLog.objects.select_for_update().filter(user=user, create_time__gte=today).first()
+            join_log = ActivityJoinLog.objects.select_for_update().filter(action_name=self.action_name, user=user, create_time__gte=today).first()
             if join_log.join_times == 0:
                 join_log.save()
                 return "No Reward"
             else:
-                redpack_event = self.redpacks.get(join_log.amount)
+                redpack_event = self.redpacks.get(float(join_log.amount))
         except Exception, reason:
             logger.debug(u"获得用户的预配置红包抛异常, reason:{0}".format(reason))
+        else:
+            logger.debug("join_log.amount的值为:{0}, redpack_event的值为:{1}, redpacks的值为:{2}".format(join_log.amount, redpack_event, self.redpacks))
 
         try:
             redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
         except Exception, reason:
             logger.debug(u'给用户 {0}发送红包报错, redpack_event:{1}, reason:{2}'.format(user, redpack_event,reason))
+            join_log.save()
             raise
         else:
+            logger.debug(u'给用户发送出去的红包大小是: {0}'.format(redpack_event.amount))
             join_log.join_times -= 1
             join_log.save()
             return join_log
@@ -2486,18 +2556,23 @@ class RewardDistributeAPIView(APIView):
             user = w_user.first().user
 
         today = time.strftime("%Y-%m-%d", time.localtime())
-        join_log = ActivityJoinLog.objects.filter(user=user, create_time__gte=today).first()
+        join_log = ActivityJoinLog.objects.filter(user=user, create_time__gte=today, action_name=self.action_name).first()
+
         self.prepare_for_distribute()
         if not join_log:
             logger.debug(u'用户{0}第一次进入页面，给用户生成抽奖记录'.format(user))
-            join_log = self.decide_which_to_distribute(request)
+            join_log = self.decide_which_to_distribute(user)
+
+        key = float("{0:.1f}".format(join_log.amount))
+        redpack_event = self.redpacks.get(key)
 
         if join_log.join_times == 0:
             logger.debug(u'用户{0}的抽奖次数已经用完了'.format(user))
             to_json_response = {
                 'ret_code': 3001,
                 'message': u'用户的抽奖次数已经用完了',
-                'left': 0
+                'left': 0,
+                'redpack': redpack_event.id
             }
 
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -2523,7 +2598,8 @@ class RewardDistributeAPIView(APIView):
                 'ret_code': 4000,
                 'message': u'进入页面',
                 'amount': str(join_log.amount),
-                'left': join_log.join_times
+                'left': join_log.join_times,
+                'redpack': redpack_event.id
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -2533,7 +2609,8 @@ class RewardDistributeAPIView(APIView):
                 'ret_code': 0,
                 'message': u'发奖成功',
                 'amount': str(join_log.amount),
-                'left': join_log.join_times
+                'left': join_log.join_times,
+                'redpack': redpack_event.id
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
@@ -2543,7 +2620,8 @@ class RewardDistributeAPIView(APIView):
                 'ret_code': 4002,
                 'message': u'忽略本次操作',
                 'amount': str(join_log.amount),
-                'left': join_log.join_times
+                'left': join_log.join_times,
+                'redpack': redpack_event.id
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 

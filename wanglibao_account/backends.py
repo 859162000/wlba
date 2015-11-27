@@ -1,10 +1,12 @@
 # coding=utf-8
+
 import logging
 from django.conf import settings
 import requests
 from django.db.models import Sum
 from wanglibao_account.models import IdVerification, UserSource
 from wanglibao_redpack.models import Income
+from . import get_verify_result
 
 logger = logging.getLogger("wanglibao_account")
 
@@ -52,16 +54,20 @@ def invite_earning(user):
 
 
 def set_source(request, user):
-    keyword = request.session.get("promo_source_keyword", "")
-    if keyword:
-        source = UserSource.objects.create(
-            user=user,
-            action='register',
-            keyword=keyword,
-            site_name=request.session.get("promo_source_site_name", ""),
-            website=request.session.get("website", "")
-        )
-        logger.debug("注册行为已经完成，SEM统计参量入库,object value:{0}".format(source))
+    # Add try-except by hb on 2015-11-20
+    try:
+        keyword = request.session.get("promo_source_keyword", "")
+        if keyword:
+            source = UserSource.objects.create(
+                user=user,
+                action='register',
+                keyword=keyword,
+                site_name=request.session.get("promo_source_site_name", ""),
+                website=request.session.get("promo_source_website", "")
+            )
+            logger.debug("注册行为已经完成，SEM统计参量入库,object value:{0}".format(source))
+    except Exception, reason:
+        logger.debug("SEM关键词统计，入库报异常；reason:%s" % reason)
 
 
 class TestIDVerifyBackEnd(object):
@@ -150,6 +156,30 @@ class ProductionIDVerifyBackEnd(object):
         #     logger.info("Identity not consistent %s" % response.text)
 
         record = IdVerification(id_number=id_number, name=name, is_valid=verify_result)
+        record.save()
+
+        return record, None
+
+
+class ProductionIDVerifyV2BackEnd(object):
+
+    @classmethod
+    def verify(cls, name, id_number):
+        records = IdVerification.objects.filter(id_number=id_number, name=name)
+        if records.exists():
+            record = records.first()
+            return record, None
+
+        verify_result, id_photo = get_verify_result(id_number, name)
+
+        record = IdVerification()
+        record.id_number = id_number
+        record.name = name
+        record.is_valid = verify_result
+
+        if verify_result and id_photo:
+            record.id_photo.save('%s.jpg' % id_number, id_photo, save=True)
+
         record.save()
 
         return record, None

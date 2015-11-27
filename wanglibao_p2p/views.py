@@ -55,7 +55,7 @@ import pickle
 from misc.models import Misc
 import json
 from wanglibao_activity import backends as activity_backends
-
+from wanglibao_rest.common import DecryptParmsAPIView
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -185,8 +185,8 @@ class PurchaseP2P(APIView):
                 trader = P2PTrader(product=p2p, user=request.user, request=request)
                 product_info, margin_info, equity_info = trader.purchase(amount, redpack)
 
-                # 处理第三方渠道用户投资回调
-                CoopRegister(request).process_for_purchase(request.user)
+                # # 处理第三方渠道用户投资回调
+                # CoopRegister(request).process_for_purchase(request.user)
 
                 return Response({
                     'data': product_info.amount,
@@ -204,7 +204,7 @@ class PurchaseP2P(APIView):
                             }, status=status.HTTP_400_BAD_REQUEST)
 
 
-class PurchaseP2PMobile(APIView):
+class PurchaseP2PMobile(DecryptParmsAPIView):
     permission_classes = (IsAuthenticated,)
 
     @property
@@ -248,8 +248,8 @@ class PurchaseP2PMobile(APIView):
                 trader = P2PTrader(product=p2p, user=request.user, request=request)
                 product_info, margin_info, equity_info = trader.purchase(amount, redpack)
 
-                # 处理第三方渠道用户投资回调
-                CoopRegister(request).process_for_purchase(request.user)
+                # # 处理第三方渠道用户投资回调
+                # CoopRegister(request).process_for_purchase(request.user)
 
                 order_id = margin_info.order_id
                 shareShow=0

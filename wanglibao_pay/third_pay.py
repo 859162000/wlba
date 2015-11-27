@@ -2,6 +2,8 @@
 # encoding:utf-8
 
 import sys
+from wanglibao_account.cooperation import CoopRegister
+
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
@@ -15,7 +17,6 @@ from wanglibao_pay.models import PayInfo, Bank, Card
 from order.utils import OrderHelper
 from order.models import Order
 from wanglibao_margin.marginkeeper import MarginKeeper
-from wanglibao_account.cooperation import CoopRegister
 from wanglibao_sms.utils import validate_validation_code
 from marketing import tools
 from fee import WithdrawFee
@@ -207,7 +208,7 @@ def withdraw(request):
     uninvested = user.margin.uninvested  # 充值未投资金额
 
     # 获取费率配置
-    fee_misc = WithdrawFee(switch='on')
+    fee_misc = WithdrawFee()
     fee_config = fee_misc.get_withdraw_fee_config()
 
     # 检测提现最大最小金额
@@ -258,7 +259,7 @@ def withdraw(request):
         pay_info.margin_record = margin_record
 
         pay_info.save()
-        return {"ret_code": 0, 'message': u'提现成功', "amount": amount, "phone": phone}
+        return {"ret_code": 0, 'message': u'提现成功', "amount": amount, "phone": phone, "bank_name":bank.name}
     except Exception, e:
         pay_info.error_message = str(e)
         pay_info.status = PayInfo.FAIL
@@ -307,7 +308,7 @@ def card_bind_list(request):
             cards = sorted(cards, key=lambda x: bank_list.index(x.bank.gate_id))
 
             # 获取提现费率配置
-            fee_misc = WithdrawFee(switch='on')
+            fee_misc = WithdrawFee()
             fee_config = fee_misc.get_withdraw_fee_config()
             min_amount = fee_config.get('min_amount')
             max_amount = fee_config.get('max_amount')
@@ -461,38 +462,29 @@ def bind_pay_deposit(request):
     if bank.channel == 'huifu':
         result = HuifuShortPay().pre_pay(request)
 
-        if result['ret_code'] == 0:
-            try:
-                # 处理第三方用户充值回调
-                CoopRegister(request).process_for_recharge(request.user)
-            except Exception, e:
-                logger.error(e)
+        # if result['ret_code'] == 0:
+        #     try:
+        #         # 处理第三方用户充值回调
+        #         CoopRegister(request).process_for_recharge(request.user)
+        #     except Exception, e:
+        #         logger.error(e)
 
         return result
 
     elif bank.channel == 'yeepay':
         result = YeeShortPay().pre_pay(request)
 
-        if result['ret_code'] == 0:
-            try:
-                # 处理第三方用户充值回调
-                CoopRegister(request).process_for_recharge(request.user)
-            except Exception, e:
-                logger.error(e)
+        # if result['ret_code'] == 0:
+            # try:
+            #     # 处理第三方用户充值回调
+            #     CoopRegister(request).process_for_recharge(request.user)
+            # except Exception, e:
+            #     logger.error(e)
 
         return result
 
     elif bank.channel == 'kuaipay':
-        result = KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, device, ip, request)
-
-        if result['ret_code'] == 0:
-            try:
-                # 处理第三方用户充值回调
-                CoopRegister(request).process_for_recharge(request.user)
-            except Exception, e:
-                logger.error(e)
-
-        return result
+        return KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, device, ip, request)
 
     else:
         return {"ret_code": 20004, "message": "请选择支付渠道"}
@@ -528,18 +520,27 @@ def bind_pay_dynnum(request):
         card = Card.objects.filter(no=card_no, user=user).first()
 
     if not card:
-        return {"ret_code": 20002, "message": "银行卡未绑定"}
+        res = {"ret_code": 20002, "message": "银行卡未绑定"}
 
     if card.bank.channel == 'huifu':
-        return {'ret_code': 20003, 'message': '汇付天下请选择快捷支付渠道'}
+        res = {'ret_code': 20003, 'message': '汇付天下请选择快捷支付渠道'}
 
     elif card.bank.channel == 'yeepay':
-        return YeeShortPay().dynnum_bind_pay(request)
+        res = YeeShortPay().dynnum_bind_pay(request)
 
     elif card.bank.channel == 'kuaipay':
-        return KuaiShortPay().dynnum_bind_pay(user, vcode, order_id, token, input_phone, device, ip)
+        res = KuaiShortPay().dynnum_bind_pay(user, vcode, order_id, token, input_phone, device, ip, request)
     else:
-        return {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
+        res = {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
+
+    if res.get('ret_code') == 0:
+        try:
+            CoopRegister(request).process_for_binding_card(user)
+        except:
+            logger.exception('bind_card_callback_failed for %s' % str(user))
+
+
+    return res
 
 
 def yee_callback(request):

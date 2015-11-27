@@ -1,0 +1,299 @@
+.experience_gold
+  width: 100%
+  height: 100%
+  .banner
+    background: url('/static/imgs/pc_activity/experience_gold/banner.jpg') center center no-repeat
+    height: 1041px
+    position: relative
+    .experience_gold_sum
+      width: 980px
+      margin: 0 auto
+      height: 100px
+      position: relative
+      .experience_gold_sum_s
+        position: absolute
+        left: 245px
+        top: 200px
+        font-size: 80.6px
+        color: #ffffff
+        font-weight: bold
+    .draw_btn
+      position: absolute
+      bottom: 38px
+      width: 100%
+      text-align: center
+      a
+        @include experience_gold-sprite(btn)
+        width: 600px
+        height: 100px
+        display: inline-block
+        &:hover
+          @include experience_gold-sprite(hover)
+      .draw_btn_ed
+        @include experience_gold-sprite(ed)
+        line-height: 96px
+        font-size: 36px
+        color: #f7cccc
+        font-weight: bold
+        &:hover
+          @include experience_gold-sprite(ed)
+  .content
+    width: 1097px
+    margin: 0 auto
+    .experience_title
+      text-align: center
+      margin-top: 135px
+      span
+        @include experience_gold-sprite(title)
+        width: 373px
+        height: 69px
+        display: inline-block
+        color: #ffffff
+        text-align: center
+        font-size: 30px
+        line-height: 60px
+    .account_detail
+      padding: 60px 57px
+      li
+        background: #ffeed3
+        border-radius: 10px
+        margin-right: 73px
+        float: left
+        width: 189px
+        height: 112px
+        text-align: center
+        .experience_name
+          font-size: 18px
+          color: #d0314b
+          padding: 25px 0 5px
+        .experience_money
+          color: #f45e37
+          font-size: 24px
+      li.last
+        margin-right: 0
+    .experience_project
+      padding: 0 9px
+      .project_div
+        background: #ffeed3
+        border-radius: 8px
+        padding: 25px 0 55px
+        .project_left
+          width: 815px
+          float: left
+          h5
+            color: #d0314b
+            font-size: 30px
+            text-indent: 26px
+            margin-bottom: 10px
+          li
+            float: left
+            text-align: center
+            label
+              display: block
+              font-size: 30px
+              color: #f45e37
+            span
+              display: block
+              font-size: 20px
+              color: #fc8f02
+          .li_one
+            width: 196px
+          .li_two
+            width: 418px
+          .li_three
+            width: 199px
+        .project_right
+          float: right
+          a
+            width: 234px
+            height: 78px
+            line-height: 78px
+            display: inline-block
+            background: #f45e37
+            color: #ffffff
+            border-radius: 8px
+            text-align: center
+            font-size: 30px
+            margin: 50px 28px 0 0
+          a.invest_ed
+            background: #fa8162
+          .income_fonts
+            font-size: 18px
+            color: #fc8f02
+            width: 234px
+            text-align: center
+    .look_more_detail
+      text-align: center
+      padding: 42px 0
+      .more_btn
+        text-align: center
+        color: #c66032
+        font-size: 20px
+        width: 160px
+        margin: 0 auto
+        cursor: pointer
+        label
+          cursor: pointer
+        span
+          @include experience_gold-sprite(more)
+          width: 24px
+          height: 18px
+          display: inline-block
+          cursor: pointer
+    .project_top
+      background: #86380a
+      height: 12px
+      border-radius: 20px
+      width: 100%
+    .project_box
+      margin: -6px 10px 10px
+      background: #ffeed3
+      border-bottom-left-radius: 10px
+      border-bottom-right-radius: 10px
+      .project_ul_pre
+        padding: 24px 24px 38px
+        background: url(/static/imgs/pc_activity/experience_gold/border.jpg) repeat-x top center
+        table
+          table-layout: fixed
+          border-collapse: collapse
+          width: 100%
+          thead
+            background: #f7deb6
+          .th_w
+            width: 178px
+          tr
+            height: 53px
+          th, td
+            text-align: center
+            font-size: 16px
+          tr:nth-child(even)
+            background: #fffaf1
+    .explain_box
+      margin: 65px 0 130px
+      .explain_box_img
+        background: url(/static/imgs/pc_activity/experience_gold/explain.jpg) center center no-repeat
+        width: 1021px
+        height: 872px
+        margin: 0 auto
+        .explain_content_box
+          width: 745px
+          padding-top: 86px
+          margin: 0 auto
+          .title_ex
+            text-align: center
+            font-size: 20px
+            color: #d03144
+          ul
+            li
+              margin-top: 50px
+              span
+                float: left
+                margin: 5px 30px 0 0
+                @include experience_gold-sprite(jinbi)
+                width: 25px
+                height: 24px
+                display: inline-block
+              .explain_content
+                float: left
+                width: 688px
+                color: #705848
+                font-size: 16px
+                line-height: 31px
+                .name
+                  color: #624838
+                .mt40
+@mixin close-modal
+  top: -5px
+  right: 10px
+  @include experience_gold-sprite(close)
+  width: 22px
+  height: 22px
+  position: absolute
+  text-indent: -9999px
+#receiveSuccess
+  width: 515px
+  height: 428px
+  text-align: center
+  a.close-modal
+    +close-modal
+#oldUser,#newUser,#success
+  background: #ffffff
+  width: 352px
+  border-radius: 20px
+  padding: 50px 0 30px
+  a.close-modal
+    +close-modal
+    top: 10px
+    right: 10px
+.btn
+  width: 280px
+  height: 48px
+  line-height: 48px
+  background: #fb7c00
+  font-size: 22px
+  color: #ffffff
+  border-radius: 30px
+  display: inline-block
+.receiveSuccess
+  @include experience_gold-sprite(hongbao)
+  width: 515px
+  height: 428px
+  padding-top: 80px
+  p
+    line-height: 50px
+    font-size: 30px
+    color: #ffffff
+    text-align: center
+    a
+      @extend .btn
+      margin-top: 40px
+  .money_count
+    font-size: 60px
+    font-weight: bold
+    margin-bottom: 50px
+    span
+      font-size: 36px
+.oldUser
+  width: 350px
+  font-size: 22px
+  color: #3f3f41
+  p
+    text-indent: 63px
+    span
+      @include experience_gold-sprite(logo)
+      width: 124px
+      height: 124px
+      display: inline-block
+      margin: 10px 0 30px
+  p.tc
+    text-align: center
+    text-indent: 0
+    a
+      @extend .btn
+      background: #d1d1d1
+      color: #ffffff
+.successBox
+  width: 350px
+  text-align: center
+  p
+    font-size: 22px
+    color: #3f3f41
+    span
+      @include experience_gold-sprite(right)
+      width: 162px
+      height: 162px
+      display: inline-block
+      margin: 0 0 20px
+  p.succeesFonts
+    color: #fb7c00
+    font-size: 30px
+    padding-bottom: 5px
+
+
+
+
+
+
+
+
+

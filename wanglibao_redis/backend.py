@@ -17,9 +17,10 @@ class redis_backend(object):
 
     def __init__(self, host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB):
         try:
-            self.pool = redis.ConnectionPool(host=host, port=port, db=db)
+            self.password = settings.REDIS_PASSWORD
+            self.pool = redis.ConnectionPool(host=host, port=port, db=db, password=self.password)
             self.redis = redis.Redis(connection_pool=self.pool)
-            self.redis.set("test","test")
+            self.redis.set("test", "test")
         except:
             self.pool = None
             self.redis = None

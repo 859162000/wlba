@@ -9,6 +9,8 @@ from marketing import tools
 #from marketing.models import IntroducedBy, Reward, RewardRecord
 from order.models import Order
 #from wanglibao.templatetags.formatters import safe_phone_str
+from wanglibao_reward.views import RewardDistributer
+from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.marginkeeper import MarginKeeper
 from order.utils import OrderHelper
 from keeper import ProductKeeper, EquityKeeper, AmortizationKeeper, EquityKeeperDecorator
@@ -19,6 +21,7 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_redpack.models import RedPackRecord
+import logging
 # from wanglibao_account.utils import CjdaoUtils
 # from wanglibao_account.tasks import cjdao_callback
 # from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
@@ -27,6 +30,7 @@ from wanglibao_redis.backend import redis_backend
 
 from wanglibao_rest.utils import split_ua
 
+logger = logging.getLogger('wanglibao_account')
 
 class P2PTrader(object):
     def __init__(self, product, user, order_id=None, request=None):
@@ -91,10 +95,38 @@ class P2PTrader(object):
             if product_record.product_balance_after <= 0:
                 is_full = True
 
-        # fix@chenweibi, add order_id
-        tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount,
-                                               "device": self.device, "order_id": self.order_id,
-                                               "product_id": self.product.id, "is_full": is_full})
+        # fix@chenweibin, add order_id
+        # Modify by hb on 2015-11-25 : add "try-except"
+        try:
+            logger.debug("=20151125= decide_first.apply_async : [%s], [%s], [%s], [%s], [%s], [%s]" % \
+                         (self.user.id, amount, self.device['device_type'], self.order_id, self.product.id, is_full) )
+            tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount,
+                                                   "device": self.device, "order_id": self.order_id,
+                                                   "product_id": self.product.id, "is_full": is_full})
+        except Exception, reason:
+            logger.debug("=20151125= decide_first.apply_async Except:{0}".format(reason))
+            pass
+
+        try:
+            logger.debug("=20151125= CoopRegister.process_for_purchase : [%s], [%s]" % (self.user.id, self.order_id) )
+            CoopRegister(self.request).process_for_purchase(self.user, self.order_id)
+        except Exception, reason:
+            logger.debug("=20151125= CoopRegister.process_for_purchase Except:{0}".format(reason) )
+            pass
+
+        try:
+            logger.debug("=20151125= RewardDistributer.processor_for_distribute : [%s], [%s]" % (self.user.id, self.order_id) )
+            kwargs = {
+                'amount': amount,
+                'order_id': self.order_id,
+                'user': self.user,}
+
+            RewardDistributer(self.request, kwargs).processor_for_distribute()
+        except Exception, reason:
+            logger.debug("=20151125= RewardDistributer.processor_for_distribute Except:{0}".format(reason) )
+            pass
+        else:
+            logger.debug("=20151125= RewardDistributer.processor_for_distribute : {0}购标成功".format(self.user) )
 
         # 投标成功发站内信
         matches = re.search(u'日计息', self.product.pay_method)
@@ -111,6 +143,8 @@ class P2PTrader(object):
             "mtype": "purchase"
 
         })
+        logger.debug("=20151125= inside_message.send_one : {0}购标站内信发成功".format(self.user) )
+
 
         # 满标给管理员发短信
         if is_full:
