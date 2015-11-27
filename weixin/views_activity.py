@@ -29,7 +29,7 @@ class BaseWeixinTemplate(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         openid = self.request.GET.get('openid')
         if not openid:
-            redirect_uri = settings.CALLBACK_HOST + reverse("award_index")
+            redirect_uri = settings.CALLBACK_HOST + reverse(self.url_name)
             count = 0
             for key in self.request.GET.keys():
                 if count == 0:
@@ -66,6 +66,10 @@ class AwardIndexTemplate(BaseWeixinTemplate):
         return {
             "openid": openid,
         }
+    def dispatch(self, request, *args, **kwargs):
+        self.url_name = 'award_index'
+        return super(AwardIndexTemplate, self).dispatch(request, *args, **kwargs)
+
 
 class InviteWeixinFriendTemplate(BaseWeixinTemplate):
     template_name = "sub_invite_server.jade"
@@ -75,8 +79,12 @@ class InviteWeixinFriendTemplate(BaseWeixinTemplate):
         w_user = WeixinUser.objects.filter(openid=openid).first()
 
         return {
-            "url": base64.b64decode(w_user.user.wanglibaouserprofile.phone),
+            "url": base64.b64encode(w_user.user.wanglibaouserprofile.phone),
         }
+    def dispatch(self, request, *args, **kwargs):
+        self.url_name = 'sub_invite'
+        return super(InviteWeixinFriendTemplate, self).dispatch(request, *args, **kwargs)
+
 
 
 
