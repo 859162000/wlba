@@ -2,7 +2,8 @@
 
 from django.views.generic import TemplateView
 from django.http import Http404, HttpResponse, HttpResponseRedirect
-from wanglibao_activity.models import ActivityTemplates, ActivityImages, ActivityShow
+from wanglibao_activity.models import (ActivityTemplates, ActivityImages, ActivityShow,
+                                       ActivityBannerPosition)
 from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -115,21 +116,8 @@ class PcActivityAreaView(TemplateView):
                                                     ).select_related('activity').\
                                                     order_by('-activity__priority')
 
-        banner = {}
-        try:
-            banner['main'] = activity_list.filter(banner_pos='main')[0].pc_banner
-        except Exception:
-            banner['main'] = ''
-
-        try:
-            banner['left'] = activity_list.filter(banner_pos='second_left')[0].pc_banner
-        except Exception:
-            banner['left'] = ''
-
-        try:
-            banner['right'] = activity_list.filter(banner_pos='second_right')[0].pc_banner
-        except Exception:
-            banner['right'] = '' # FixME
+        banner = ActivityBannerPosition.objects.all().order_by('-priority',
+                                                               '-created_at',).first()
 
         limit = 6
         page = 1
@@ -164,7 +152,7 @@ class ActivityAreaApi(APIView):
 
         category = request.GET.get('category', 'all')
 
-        if category:
+        if category and category != 'all':
             activity_list = activity_list.filter(category=category)
 
         page = request.GET.get('page', 1)

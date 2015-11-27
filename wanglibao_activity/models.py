@@ -447,3 +447,19 @@ class ActivityShow(models.Model):
     class Meta:
         verbose_name = u'活动页管理'
         verbose_name_plural = u'活动页管理'
+
+
+class ActivityBannerPosition(models.Model):
+    """PC-活动Banner展示位置"""
+    main = models.ForeignKey(ActivityShow, verbose_name=u'主推', related_name='act_banner_main')
+    main_banner = models.ImageField(u'主推Banner', null=True, blank=True, upload_to='activity')
+    second_left = models.ForeignKey(ActivityShow, verbose_name=u'副推左', related_name='act_banner_left')
+    left_banner = models.ImageField(u'副推左Banner', null=True, blank=True, upload_to='activity')
+    second_right = models.ForeignKey(ActivityShow, verbose_name=u'副推右', related_name='act_banner_right')
+    right_banner = models.ImageField(u'副推右Banner', null=True, blank=True, upload_to='activity')
+    priority = models.IntegerField(u'优先级', help_text=u'越大越优先', default=0, blank=False)
+    created_at = models.DateTimeField(u'创建时间', auto_now=False, default=timezone.now, auto_now_add=True)
+
+    class Meta:
+        verbose_name = u'活动Banner展示位置'
+        verbose_name_plural = u'活动Banner展示位置'
