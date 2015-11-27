@@ -173,8 +173,8 @@ class AppRepaymentPlanAllAPIView(APIView):
 
     def post(self, request):
         user = request.user
-        page = request.GET.get('page', 1)
-        pagesize = request.GET.get('num', 10)
+        page = request.DATA.get('page', 1)
+        pagesize = request.DATA.get('num', 10)
         page = int(page)
         pagesize = int(pagesize)
 
@@ -220,16 +220,23 @@ class AppRepaymentPlanMonthAPIView(APIView):
             amos_group = UserAmortization.objects.filter(user=user)\
                 .filter(term_date__gt=start, term_date__lte=end).order_by('term_date')\
                 .extra({'term_date': "DATE_FORMAT(term_date,'%%Y-%%m')"}).values('term_date')\
-                .annotate(Count('term_date')).annotate(Sum('principal')).order_by('term_date')
+                .annotate(Count('term_date')).annotate(Sum('principal')).annotate(Sum('interest'))\
+                .annotate(Sum('penal_interest')).annotate(Sum('coupon_interest')).order_by('term_date')
         else:
             amos_group = UserAmortization.objects.filter(user=user)\
                 .extra({'term_date': "DATE_FORMAT(term_date,'%%Y-%%m')"}).values('term_date')\
-                .annotate(Count('term_date')).annotate(Sum('principal')).order_by('term_date')
+                .annotate(Count('term_date')).annotate(Sum('principal')).annotate(Sum('interest'))\
+                .annotate(Sum('penal_interest')).annotate(Sum('coupon_interest')).order_by('term_date')
 
         month_group = [{
             'term_date': amo.get('term_date'),
             'term_date_count': amo.get('term_date__count'),
-            'principal_sum': amo.get('principal__sum')
+            'total_sum': amo.get('principal__sum') + amo.get('interest__sum') +
+                         amo.get('penal_interest__sum') + amo.get('coupon_interest__sum'),
+            'principal_sum': amo.get('principal__sum'),
+            'interest_sum': amo.get('interest__sum'),
+            'penal_interest_sum': amo.get('penal_interest__sum'),
+            'coupon_interest_sum': amo.get('coupon_interest__sum'),
         } for amo in amos_group]
 
         # 当月的还款计划

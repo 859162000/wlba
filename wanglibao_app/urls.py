@@ -43,15 +43,10 @@ urlpatterns = patterns(
     url(r'^questions/$', AppQuestionsView.as_view()),
     url(r'^questions/(?P<index>\w+)/$', AppQuestionsResultView.as_view()),
     url(r'^cost/$', AppCostView.as_view()),
+
     url(r'^area/$', AppAreaView.as_view()),
-
     url(r'^area/fetch/$', AppAreaApiView.as_view()),
+
+    url(r'^app_memorabilia/$', AppMemorabiliaView.as_view(), name='app_memorabilia'),
 )
 
-# APP-大事记
-urlpatterns += patterns(
-    '',
-    url(r'^app_memorabilia/$', AppMemorabiliaView.as_view(), name='app_memorabilia'),
-    # url(r'^app_memorabilia_detail/(?P<id>\w+)/$', AppMemorabiliaDetailView.as_view(), name='app_memorabilia_detail'),
-    # url(r'^app_memorabilia_preview/(?P<id>\w+)/$', AppMemorabiliaPreviewView.as_view(), name='app_memorabilia_preview'),
-)
