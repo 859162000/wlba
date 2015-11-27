@@ -269,9 +269,9 @@ class WeixinJoinView(View):
         #如果eventkey为用户id则进行绑定
         if eventKey:
             if eventKey.isdigit():
-                userProfile = WanglibaoUserProfile.objects.filter(phone=eventKey).first()
-                if userProfile:
-                    rs, txt = bindUser(w_user, userProfile.user)
+                user = User.objects.filter(pk=int(eventKey)).first()
+                if user:
+                    rs, txt = bindUser(w_user, user)
                     reply = create_reply(txt, msg)
             else:
                 if not old_subscribe and w_user.subscribe:
@@ -1309,14 +1309,15 @@ class GetUserInfo(APIView):
 class GenerateQRSceneTicket(APIView):
     permission_classes = (IsAuthenticated,)
     def post(self, request):
-        original_id = request.POST.get('original_id')
+        original_id = request.DATA.get('original_id')
         if not original_id:
             return Response({'errcode':-1, 'errmsg':"-1"})
 
         weixin_account = WeixinAccounts.getByOriginalId(original_id)
 
         client = WeChatClient(weixin_account.app_id, weixin_account.app_secret, weixin_account.access_token)
-        qrcode_data = {"action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": int(request.user.wanglibaouserprofile.phone)}}}
+        # print int(request.user.id)
+        qrcode_data = {"action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": request.user.id}}}
         # qrcode_data = {"action_name":"QR_LIMIT_SCENE", "action_info":{"scene": {"scene_id": phone}}}
         try:
             rs = client.qrcode.create(qrcode_data)

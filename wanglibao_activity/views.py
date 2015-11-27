@@ -164,13 +164,15 @@ class ActivityAreaApi(APIView):
 
         category = request.GET.get('category', 'all')
 
-        if category:
+        print len(activity_list)
+        if category and category != 'all':
             activity_list = activity_list.filter(category=category)
 
         page = request.GET.get('page', 1)
         pagesize = request.GET.get('pagesize', 6)
         page = int(page)
         pagesize = int(pagesize)
+        print len(activity_list)
 
         activity_list, all_page, data_count = get_queryset_paginator(activity_list,
                                                                      page, pagesize)
