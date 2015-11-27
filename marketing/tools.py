@@ -26,7 +26,6 @@ import logging
 
 logger = get_task_logger(__name__)
 
-
 @app.task
 def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False):
     # fix@chenweibi, add order_id
@@ -41,7 +40,7 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False)
         introduced_by.save()
 
     # 活动检测
-    activity_backends.check_activity(user, 'invest', device_type, amount, product_id, is_full)
+    activity_backends.check_activity(user, 'invest', device_type, amount, product_id, order_id, is_full)
     # fix@chenweibi, add order_id
     try:
         utils.log_clientinfo(device, "buy", user_id, order_id, amount)
@@ -104,7 +103,7 @@ def idvalidate_ok(user_id, device):
         pass
 
 @app.task
-def deposit_ok(user_id, amount, device, order_id=0):
+def deposit_ok(user_id, amount, device, order_id):
     # fix@chenweibi, add order_id
     try:
         device_type = device['device_type']
@@ -117,7 +116,8 @@ def deposit_ok(user_id, amount, device, order_id=0):
         })
         user = User.objects.get(id=user_id)
         user_profile = user.wanglibaouserprofile
-        activity_backends.check_activity(user, 'recharge', device_type, amount)
+        activity_backends.check_activity(user, 'recharge', device_type,
+                                         amount, **{'order_id': order_id})
         try:
             utils.log_clientinfo(device, "deposit", user_id, order_id, amount)
         except Exception:
