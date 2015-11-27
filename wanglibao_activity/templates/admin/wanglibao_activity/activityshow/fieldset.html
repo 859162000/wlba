@@ -7,6 +7,19 @@
             {% endif %}
         </h2>{% endif %}
   {% for line in fieldset %}
+    {% ifequal forloop.counter 4 %}
+        <div id="_pc_div" style="background: grey">
+    {% endifequal %}
+    {% ifequal forloop.counter 8 %}
+        </div>
+    {% endifequal %}
+    {% ifequal forloop.counter 9 %}
+        <div id="_app_div" style="background: grey">
+    {% endifequal %}
+    {% ifequal forloop.counter 13 %}
+        </div>
+    {% endifequal %}
+
     {% with singlefield=line.fields|length_is:'1' %}
       <div class="control-group form-row{% if line.errors %} {{ singlefield|yesno:'error,first-error' }} errors{% endif %}{% for field in line %}{% if field.field.name %} field-{{ field.field.name }}{% endif %} {{ field.field.field.widget.attrs.rowclass }}{% endfor %}{{ singlefield|yesno:',multi-field-row' }}">
         {% for field in line %}
@@ -32,19 +45,6 @@
           {% endif %}
             {{ field.label_tag }}
         {% endif %}
-{#        <h1>666666666666666666</h1>#}
-        {% ifequal forloop.counter 4 %}
-            <div id="is_pc" style="background: grey">
-        {% endifequal %}
-        {% ifequal forloop.counter 10 %}
-            </div>
-        {% endifequal %}
-        {% ifequal forloop.counter 11 %}
-            <div id="is_app" style="background: grey">
-        {% endifequal %}
-        {% ifequal forloop.counter 15 %}
-            </div>
-        {% endifequal %}
 
         {% if not field.is_readonly and field.errors %}<div class="inline error errors">{% endif %}
 
