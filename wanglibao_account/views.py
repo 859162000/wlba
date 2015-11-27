@@ -292,11 +292,13 @@ def password_change(request,
     # TODO find a proper status value and return error message
     return HttpResponse(status=400)
 
-class PasswordCheckView(APIView):
+class PasswordCheckView(DecryptParmsAPIView):
     permission_classes = ()
     def post(self, request, **kwargs):
-        identifier = request.DATA.get("identifier", "")
-        password = request.DATA.get("password", "")
+        identifier = self.params.get("identifier", "")
+        password = self.params.get("password", "")
+        # identifier = request.DATA.get("identifier", "")
+        # password = request.DATA.get("password", "")
 
         if not identifier or not password:
             return Response({"token":False, "message":u"登录密码错误，请重试"})
@@ -1125,13 +1127,16 @@ class AccountBankCard(TemplateView):
         }
 
 
-class ResetPasswordAPI(APIView):
+class ResetPasswordAPI(DecryptParmsAPIView):
     permission_classes = ()
 
     def post(self, request):
-        password = request.DATA.get('new_password', "")
-        identifier = request.DATA.get('identifier', "")
-        validate_code = request.DATA.get('validate_code', "")
+        password = self.params.get('new_password', "")
+        identifier = self.params.get('identifier', "")
+        validate_code = self.params.get('validate_code', "")
+        # password = request.DATA.get('new_password', "")
+        # identifier = request.DATA.get('identifier', "")
+        # validate_code = request.DATA.get('validate_code', "")
 
         identifier = identifier.strip()
         password = password.strip()
