@@ -938,9 +938,9 @@ class ThanksGivingDistribute(ActivityRewardDistribute):
 
         level = request.DATA.get('level', "5000+")
         if level == "5000+":
-            sum_reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', p2p_amount__gte=5000).exclude(redpack_event=None).aggregate(left_sum=Sum('left_times'))
+            sum_reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', p2p_amount__gte=5000).aggregate(left_sum=Sum('left_times'))
         elif level == "5000-":
-            sum_reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', p2p_amount__lt=5000).exclude(reward=None).aggregate(left_sum=Sum('left_times'))
+            sum_reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', p2p_amount__lt=5000).aggregate(left_sum=Sum('left_times'))
         if 'GET_REWARD_INFO' == action:
             json_to_response = {
                 'ret_code': 1001,
@@ -952,9 +952,9 @@ class ThanksGivingDistribute(ActivityRewardDistribute):
         if 'POINT_AT' == action:
 
             if level == "5000+":
-                reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', left_times__gt=0, has_sent=False, p2p_amount__gte=5000).exclude(redpack_event=None).first()
+                reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', left_times__gt=0, has_sent=False, p2p_amount__gte=5000).first()
             elif level == "5000-":
-                reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', left_times__gt=0, has_sent=False, p2p_amount__lt=5000).exclude(reward=None).first()
+                reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', left_times__gt=0, has_sent=False, p2p_amount__lt=5000).first()
 
             reward_name = None
             if reward:
@@ -965,18 +965,27 @@ class ThanksGivingDistribute(ActivityRewardDistribute):
                         if reward.reward:
                             # modify by hb on 2015-11-23
                             old_reward = Reward.objects.filter(pk=reward.reward.id).first()
-                            if old_reward and old_reward.is_used:
-                                new_reward = Reward.objects.filter(type=old_reward.type, is_used=False).order_by('-id').first()
-                                reward.reward = new_reward
-                            inside_message.send_one.apply_async(kwargs={
-                                "user_id": request.user.id,
-                                "title": reward.reward.type,
-                                "content": reward.reward.content,
-                                "mtype": "activity"
-                            })
-                            reward.reward.is_used = True
-                            reward.reward.save()
-                            reward_name = reward.reward.type
+
+                            xunlei_reward = WanglibaoActivityReward.objects.filter(reward__type=u'一年迅雷会员', activity=u'ThanksGiven').count()
+                            if old_reward and old_reward.type == '一年迅雷会员' and xunlei_reward>1000:
+                                logger.debug(u'1000个一年迅雷会员已经发完，改发1.5加息券')
+                                redpack_event = RedPackEvent.objects.filter(name='感恩节1.5%加息券').first()
+                                redpack_backends.give_activity_redpack(request.user, redpack_event, 'pc')
+                                reward_name = u'感恩节1.5%加息券'
+
+                            else:
+                                if old_reward and old_reward.is_used:
+                                    new_reward = Reward.objects.filter(type=old_reward.type, is_used=False).order_by('-id').first()
+                                    reward.reward = new_reward
+                                inside_message.send_one.apply_async(kwargs={
+                                    "user_id": request.user.id,
+                                    "title": reward.reward.type,
+                                    "content": reward.reward.content,
+                                    "mtype": "activity"
+                                })
+                                reward.reward.is_used = True
+                                reward.reward.save()
+                                reward_name = reward.reward.type
 
                         """发红包"""
                         if reward.redpack_event:
