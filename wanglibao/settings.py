@@ -433,6 +433,10 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG'
         },
+        'wanglibao': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+        },
         'wanglibao_pay': {
             'handlers': ['file', 'console'],
             'level': 'DEBUG',
@@ -455,7 +459,7 @@ LOGGING = {
         },
         'wanglibao_account': {
             'handlers': ['wanglibao_account', 'console'],
-            'level': 'INFO',
+            'level': 'DEBUG',
         },
         'wanglibao_app': {
             'handlers': ['file'],
@@ -515,7 +519,7 @@ if ENV != ENV_DEV:
     # session expire at browser close
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-    # set session for cross domain.
+    # set session for PHP cross domain.
     SESSION_COOKIE_DOMAIN = '.wanglibao.com'
 
     # wsgi scheme

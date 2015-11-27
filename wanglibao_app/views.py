@@ -48,6 +48,8 @@ from wanglibao_activity.models import ActivityShow
 from wanglibao_activity.utils import get_queryset_paginator
 from wanglibao_announcement.models import AppMemorabilia
 from weixin.util import _generate_ajax_template
+from django.core.paginator import Paginator
+from django.core.paginator import PageNotAnInteger
 
 logger = logging.getLogger(__name__)
 
@@ -171,12 +173,26 @@ class AppRepaymentPlanAllAPIView(APIView):
 
     def post(self, request):
         user = request.user
+        page = request.DATA.get('page', 1)
+        pagesize = request.DATA.get('num', 10)
+        page = int(page)
+        pagesize = int(pagesize)
+
         user_amortizations = UserAmortization.objects.filter(user=user).order_by('-term_date')
         if user_amortizations:
+            paginator = Paginator(user_amortizations, pagesize)
+
+            try:
+                user_amortizations = paginator.page(page)
+            except PageNotAnInteger:
+                user_amortizations = paginator.page(1)
+            except Exception:
+                user_amortizations = paginator.page(paginator.num_pages)
+
             amo_list = _user_amortization_list(user_amortizations)
         else:
             amo_list = []
-        return Response({'ret_code': 0, 'data': amo_list})
+        return Response({'ret_code': 0, 'data': amo_list, 'page': page, 'num': pagesize})
 
 
 class AppRepaymentPlanMonthAPIView(APIView):
@@ -204,16 +220,23 @@ class AppRepaymentPlanMonthAPIView(APIView):
             amos_group = UserAmortization.objects.filter(user=user)\
                 .filter(term_date__gt=start, term_date__lte=end).order_by('term_date')\
                 .extra({'term_date': "DATE_FORMAT(term_date,'%%Y-%%m')"}).values('term_date')\
-                .annotate(Count('term_date')).annotate(Sum('principal')).order_by('term_date')
+                .annotate(Count('term_date')).annotate(Sum('principal')).annotate(Sum('interest'))\
+                .annotate(Sum('penal_interest')).annotate(Sum('coupon_interest')).order_by('term_date')
         else:
             amos_group = UserAmortization.objects.filter(user=user)\
                 .extra({'term_date': "DATE_FORMAT(term_date,'%%Y-%%m')"}).values('term_date')\
-                .annotate(Count('term_date')).annotate(Sum('principal')).order_by('term_date')
+                .annotate(Count('term_date')).annotate(Sum('principal')).annotate(Sum('interest'))\
+                .annotate(Sum('penal_interest')).annotate(Sum('coupon_interest')).order_by('term_date')
 
         month_group = [{
             'term_date': amo.get('term_date'),
             'term_date_count': amo.get('term_date__count'),
-            'principal_sum': amo.get('principal__sum')
+            'total_sum': amo.get('principal__sum') + amo.get('interest__sum') +
+                         amo.get('penal_interest__sum') + amo.get('coupon_interest__sum'),
+            'principal_sum': amo.get('principal__sum'),
+            'interest_sum': amo.get('interest__sum'),
+            'penal_interest_sum': amo.get('penal_interest__sum'),
+            'coupon_interest_sum': amo.get('coupon_interest__sum'),
         } for amo in amos_group]
 
         # 当月的还款计划
@@ -224,7 +247,11 @@ class AppRepaymentPlanMonthAPIView(APIView):
         else:
             amo_list = []
 
-        return Response({'ret_code': 0, 'data': amo_list, 'month_group': month_group, 'current_month': current_month})
+        return Response({'ret_code': 0,
+                         'data': amo_list, 
+                         'month_group': month_group,
+                         'current_month': current_month,
+                         })
 
 
 def _user_amortization_list(user_amortizations):

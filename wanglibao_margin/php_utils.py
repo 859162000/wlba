@@ -53,6 +53,7 @@ def get_user_info(request, session_id):
 
 def get_margin_info(request, user_id):
     """
+    :param request:
     :param user_id:
     :return: 用户可用余额
     """

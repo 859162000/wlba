@@ -416,7 +416,7 @@ class ActivityShow(models.Model):
         elif self.activity.end_at - now <= timedelta(days=1):
             return u'剩%s小时' % ((self.activity.end_at - now).seconds / 3600)
         elif self.activity.end_at - now <= timedelta(days=7):
-            return u'剩X天'
+            return u'剩%s天' % (self.activity.end_at - now).days
         elif self.activity.end_at - now > timedelta(days=7):
             return u'进行中'
 
