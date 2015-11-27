@@ -802,7 +802,8 @@ class AppAreaView(TemplateView):
                                                     start_at__lte=timezone.now(),
                                                     end_at__gt=timezone.now()
                                                     ).select_related('activity').\
-                                                    order_by('-activity__priority')
+                                                    order_by('-priority',
+                                                             '-created_at',)
 
         limit = 6
         page = 1
@@ -832,7 +833,8 @@ class AppAreaApiView(APIView):
                                                     start_at__lte=timezone.now(),
                                                     end_at__gt=timezone.now(),
                                                     ).select_related('activity').\
-                                                    order_by('-activity__priority')
+                                                    order_by('-priority',
+                                                             '-created_at',)
 
         page = request.GET.get('page', 1)
         pagesize = request.GET.get('pagesize', 6)
