@@ -18,7 +18,9 @@ class WangliTask(Task):
 
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wanglibao.settings')
-app = Celery('wanglibao', task_cls=WangliTask)
+# todo urgent 会导致编码错误，解决后上线
+# app = Celery('wanglibao', task_cls=WangliTask)
+app = Celery('wanglibao')
 app.config_from_object('django.conf:settings')
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
