@@ -874,7 +874,7 @@ function getCode(){//得到用户信息的二维码
     org.ajax({
         type: "POST",
         url: "/weixin/api/generate/qr_scene_ticket/",
-        data: {"original_id":"gh_f758af6347b6"},//c:gh_32e9dc3fab8e
+        data: {"original_id":"gh_9e8ff84237cd"},//c:gh_32e9dc3fab8e, w:gh_f758af6347b6
         success: function (data) {
             $("#sub-code").html("<img src='"+ data.qrcode_url + "' />");
         },
