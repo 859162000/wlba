@@ -804,7 +804,7 @@ class AppAreaView(TemplateView):
                                                     ).select_related('activity').\
                                                     order_by('-activity__priority')
 
-        limit = 2
+        limit = 6
         page = 1
 
         activity_list, all_page, data_count = get_queryset_paginator(activity_list, 1, limit)
