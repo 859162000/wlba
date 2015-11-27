@@ -84,8 +84,7 @@ org.experience = (function(org){
             })
         },
         _goInvest:function(){
-            $investBtn = $('.investBtn');
-            $investBtn.on('click',function() {
+            $('.project_right').delegate('.investBtn','click',function() {
                 if (!$investBtn.hasClass('investBtnEd')) {
                   org.ajax({
                     url: '/api/experience/buy/',
