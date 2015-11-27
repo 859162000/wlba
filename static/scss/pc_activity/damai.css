@@ -1,0 +1,101 @@
+.damai-wrap {
+  width: 100%;
+  position: relative; }
+  .damai-wrap .damai-banner {
+    background: url("/static/imgs/pc_activity/damai/damai-banner.jpg") no-repeat center center;
+    height: 1248px; }
+  .damai-wrap .damai-line {
+    width: 100%;
+    position: absolute;
+    border-bottom: 1px dashed #c6af85;
+    top: 1499px; }
+  .damai-wrap .damai-main {
+    width: 1095px;
+    margin: 0 auto;
+    padding-top: 40px; }
+    .damai-wrap .damai-main p {
+      font-size: 18px;
+      color: #c6af85;
+      text-align: center;
+      line-height: 33px; }
+    .damai-wrap .damai-main h2 {
+      font-size: 24px;
+      color: #c6af85;
+      text-align: center;
+      line-height: 42px; }
+    .damai-wrap .damai-main .maitop {
+      margin-top: 23px; }
+    .damai-wrap .damai-main h1 {
+      font-size: 36px;
+      color: #c6af85;
+      line-height: 128px;
+      text-align: center;
+      margin-top: 40px; }
+    .damai-wrap .damai-main .damai-button {
+      display: block;
+      background: url("/static/imgs/pc_activity/damai/damai-button1.png") no-repeat center center;
+      width: 396px;
+      height: 55px;
+      position: relative;
+      left: 50%;
+      margin-left: -198px;
+      font-size: 24px;
+      line-height: 55px;
+      text-align: center;
+      color: #c6af85; }
+      .damai-wrap .damai-main .damai-button:hover {
+        background: url("/static/imgs/pc_activity/damai/damai-button2.png") no-repeat center center; }
+  .damai-wrap .damai-main1 {
+    width: 100%;
+    margin-top: 76px;
+    background: url("/static/imgs/pc_activity/damai/damai-main.jpg") no-repeat center center;
+    height: 1196px;
+    border-top: 4px solid #000000; }
+    .damai-wrap .damai-main1 .main1-song {
+      height: 1196px;
+      width: 1095px;
+      margin: 0 auto; }
+    .damai-wrap .damai-main1 .main1-song1, .damai-wrap .damai-main1 .main1-song2, .damai-wrap .damai-main1 .main1-song3 {
+      width: 365px;
+      height: 1196px;
+      float: left; }
+      .damai-wrap .damai-main1 .main1-song1 dl .song1, .damai-wrap .damai-main1 .main1-song2 dl .song1, .damai-wrap .damai-main1 .main1-song3 dl .song1 {
+        width: 100%;
+        height: 322px;
+        background: url("/static/imgs/pc_activity/damai/damai-song.png") no-repeat 11px 0px;
+        margin-top: 248px; }
+      .damai-wrap .damai-main1 .main1-song1 dl .song2, .damai-wrap .damai-main1 .main1-song2 dl .song2, .damai-wrap .damai-main1 .main1-song3 dl .song2 {
+        background: url("/static/imgs/pc_activity/damai/damai-song.png") no-repeat -358px 0px; }
+      .damai-wrap .damai-main1 .main1-song1 dl .song3, .damai-wrap .damai-main1 .main1-song2 dl .song3, .damai-wrap .damai-main1 .main1-song3 dl .song3 {
+        background: url("/static/imgs/pc_activity/damai/damai-song.png") no-repeat -743px 0px; }
+      .damai-wrap .damai-main1 .main1-song1 dl dd, .damai-wrap .damai-main1 .main1-song2 dl dd, .damai-wrap .damai-main1 .main1-song3 dl dd {
+        font-size: 24px;
+        text-align: center;
+        color: #c6af85; }
+      .damai-wrap .damai-main1 .main1-song1 .xuan1 .xuan-song1, .damai-wrap .damai-main1 .main1-song2 .xuan1 .xuan-song1, .damai-wrap .damai-main1 .main1-song3 .xuan1 .xuan-song1 {
+        margin-bottom: 4px;
+        padding-left: 25px;
+        line-height: 25px;
+        cursor: pointer;
+        font-size: 13px;
+        position: relative;
+        display: block;
+        font-weight: 400; }
+        .damai-wrap .damai-main1 .main1-song1 .xuan1 .xuan-song1 input, .damai-wrap .damai-main1 .main1-song2 .xuan1 .xuan-song1 input, .damai-wrap .damai-main1 .main1-song3 .xuan1 .xuan-song1 input {
+          position: absolute;
+          left: -9999px;
+          box-sizing: border-box; }
+        .damai-wrap .damai-main1 .main1-song1 .xuan1 .xuan-song1 i, .damai-wrap .damai-main1 .main1-song2 .xuan1 .xuan-song1 i, .damai-wrap .damai-main1 .main1-song3 .xuan1 .xuan-song1 i {
+          position: absolute;
+          top: 6px;
+          left: 0;
+          display: block;
+          width: 15px;
+          height: 15px;
+          outline: 0;
+          border-width: 1px;
+          border-style: solid;
+          background: #9cd9e8;
+          border-radius: 50%; }
+
+/*# sourceMappingURL=damai.css.map */
