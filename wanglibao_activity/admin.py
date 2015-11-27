@@ -9,7 +9,6 @@ from import_export.admin import ExportMixin
 from models import Activity, ActivityRule, ActivityRecord, ActivityTemplates, \
     ActivityImages, WapActivityTemplates, ActivityShow, ActivityBannerPosition
 import models as m
-from rest_framework.response import Response
 
 
 class ActivityAdmin(admin.ModelAdmin):
@@ -229,7 +228,7 @@ class ActivityShowAdmin(admin.ModelAdmin):
     actions = None
     search_fields = ('activity', 'channel')
     ordering = ('-priority', '-created_at')
-    # raw_id_fields = ('activity',)
+    raw_id_fields = ('activity',)
     list_display = ('activity', 'activity_status', 'platform', 'priority')
 
 
@@ -278,16 +277,9 @@ class ActivityBannerPosForm(forms.ModelForm):
 
 class ActivityBannerPosAdmin(admin.ModelAdmin):
     actions = None
-    # search_fields = ('main', 'second_left', 'second_right')
-    raw_id_fields = ('main', 'second_left', 'second_right')
+    search_fields = ('main', 'second_left', 'second_right')
     ordering = ('-priority', '-created_at',)
     form = ActivityBannerPosForm
-
-    # def save_model(self, request, obj, form, change):
-    #     if obj.main == obj.second_left:
-    #         return Response('hello world')
-    #
-    #     obj.save()
 
 
 admin.site.register(WapActivityTemplates, WapActivityTemplatesAdmin)

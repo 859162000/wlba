@@ -374,12 +374,7 @@ class ActivityShow(models.Model):
         ('holiday', u'节日热点'),
         ('novice', u'新手福利'),
     )
-    # BANNER_POSITION = (
-    #     ('main', u'主推'),
-    #     ('second_left', u'副推左'),
-    #     ('second_right', u'副推右'),
-    #     ('behind', u'加在后面'),
-    # )
+
     STATUS = (
         ('waiting', u'未开始'),
         ('active', u'进行中'),
@@ -391,8 +386,6 @@ class ActivityShow(models.Model):
     activity = models.ForeignKey(Activity, verbose_name=u'活动名称')
     category = models.CharField(u'活动类型', max_length=20, choices=ACTIVITY_CATEGORY, default=u'全部')
     is_pc = models.BooleanField(u'是否主站活动', default=False)
-    # banner_pos = models.CharField(u'主站位置', max_length=20, choices=BANNER_POSITION, default=u'主推')
-    # pc_banner = models.ImageField(u'PC-活动Banner', null=True, blank=True, upload_to='activity')
     thumbnail = models.ImageField(u'卡片区域缩略图', null=True, blank=True, upload_to='activity')
     pc_detail_link = models.CharField(u'PC-活动详情页链接', max_length=255)
     pc_template = models.CharField(u'PC-活动详情页模板名称', max_length=255)
@@ -458,3 +451,9 @@ class ActivityBannerPosition(models.Model):
     class Meta:
         verbose_name = u'活动Banner展示位置'
         verbose_name_plural = u'活动Banner展示位置'
+
+    def __unicode__(self):
+        return u'（主推）：%s——（副推左）：%s——（副推右）：%s' % (self.main.activity.name,
+                                                            self.second_left.activity.name,
+                                                            self.second_right.activity.name,
+                                                            )
