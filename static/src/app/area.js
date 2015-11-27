@@ -100,13 +100,18 @@ org.area = (function (org) {
                         $milepostBtn.text('加载中...')
                     },
                     success: function(result){
+                        var html_data = result.html_data;
                         if(result.all_page > result.page){
                             $milepostMore.show()
                         }else{
                             $milepostMore.html('没有更多了!')
                         }
                         $milepost.attr({'data-active': true, 'data-page': result.page});
-                        $milepostPush.append(result.html_data);
+
+                        if(result.list_count === 0){
+                            html_data = "<div class='unactivty'>暂无大事件！</div>";
+                        }
+                        $milepostPush.append(html_data);
                         callback && callback(result);
                     },
                     complete: function(){

@@ -101,7 +101,7 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function( $ ) {
     $balanceShowCont.hide()
   })
 
-
+  /*
   //合作伙伴
   ~function _initPart($partner, $next, $last, idx, count){
     $partner.css({'width': $partner.find('li').length * 100 + '%'})
@@ -126,7 +126,7 @@ require(['jquery', 'jquery.animateNumber', 'countdown'], function( $ ) {
     $('.cn-last'),
     0,
     $('.cn-ul-warp li').length - 1
-  );
+  );*/
 
   //扫描送红包
   var scrollTimer = null;
