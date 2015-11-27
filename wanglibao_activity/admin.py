@@ -7,7 +7,7 @@ from django.utils import timezone
 from import_export import resources, fields
 from import_export.admin import ExportMixin
 from models import Activity, ActivityRule, ActivityRecord, ActivityTemplates, \
-    ActivityImages, WapActivityTemplates, ActivityShow
+    ActivityImages, WapActivityTemplates, ActivityShow, ActivityBannerPosition
 import models as m
 
 
@@ -228,7 +228,38 @@ class ActivityShowAdmin(admin.ModelAdmin):
     actions = None
     search_fields = ('activity', 'channel')
     ordering = ('-created_at',)
+    # raw_id_fields = ('activity',)
     list_display = ('activity', 'activity_status', 'platform', 'priority')
+
+
+class ActivityBannerPosForm(forms.ModelForm):
+    main = forms.CharField(required=True)
+    second_left = forms.CharField(required=True)
+    second_right = forms.CharField(required=True)
+
+    def clean(self):
+        main = self.cleaned_data.get('main')
+        second_left = self.cleaned_data.get('second_left')
+        second_right = self.cleaned_data.get('second_right')
+
+        act_list = [main, second_left, second_right]
+        if len(act_list) != len(set(act_list)):
+            raise forms.ValidationError(u'Banner主、副推活动不能重复')
+
+    class Meta:
+        forms.model = ActivityBannerPosition
+
+
+class ActivityBannerPosAdmin(admin.ModelAdmin):
+    actions = None
+    # search_fields = ('main', 'second_left', 'second_right')
+    raw_id_fields = ('main', 'second_left', 'second_right')
+    ordering = ('-priority', '-created_at',)
+    # form = ActivityBannerPosForm
+    #
+    # def save_model(self, request, obj, form, change):
+    #     form.
+
 
 admin.site.register(WapActivityTemplates, WapActivityTemplatesAdmin)
 admin.site.register(ActivityImages, ActivityImagesAdmin)
@@ -239,3 +270,4 @@ admin.site.register(ActivityRule, ActivityRuleAdmin)
 admin.site.register(ActivityRecord, ActivityRecordAdmin)
 
 admin.site.register(ActivityShow, ActivityShowAdmin)
+admin.site.register(ActivityBannerPosition, ActivityBannerPosAdmin)

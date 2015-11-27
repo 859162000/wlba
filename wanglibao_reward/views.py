@@ -764,6 +764,9 @@ class WeixinRedPackView(APIView):
 
 
 class RewardDistributer(object):
+    """
+        Description:发奖总入口
+    """
     def __init__(self, request, kwargs):
         logger.debug("request:%s, kwargs:%s" % (request, kwargs))
         self.request = request
@@ -795,6 +798,7 @@ class ThanksGivenRewardDistributer(RewardDistributer):
         super(ThanksGivenRewardDistributer, self).__init__(request, kwargs)
         self.amount = kwargs['amount']
         self.order_id = kwargs['order_id']
+        self.user = kwargs['user']
         self.token = 'thanks_given'
 
     @property
@@ -817,7 +821,7 @@ class ThanksGivenRewardDistributer(RewardDistributer):
         from wanglibao_reward.settings import thanks_given_rewards as rewards
         for key, values in rewards.items():
             if self.amount>=values[0] and self.amount<values[1]:
-                if key == u'1年迅雷会员':
+                if key == u'一年迅雷会员':
                     xunlei_reward = WanglibaoActivityReward.objects.filter(redpack_event__name=key, activity=u'ThanksGiven').count()
                     if xunlei_reward>=1000:
                         return u'感恩节1.5%加息券'
@@ -833,11 +837,12 @@ class ThanksGivenRewardDistributer(RewardDistributer):
             redpack_event = RedPackEvent.objects.filter(name=self.reward).first()
         else:
             reward = Reward.objects.filter(type=self.reward, is_used=False).first()
-        logger.debug("用户(%s)的投资额度是：%s, 订单号：%s, 获得的红包是：%s, redpack_event:%s, reward:%s" % (self.request.user, self.amount, self.order_id, self.reward, redpack_event, reward,))
+        user = self.request.user if self.request else self.user  #对于自动投标的用户，request参量为空
+        logger.debug("用户(%s)的投资额度是：%s, 订单号：%s, 获得的红包是：%s, redpack_event:%s, reward:%s" % (user, self.amount, self.order_id, self.reward, redpack_event, reward,))
         try:
             WanglibaoActivityReward.objects.create(
                 activity=u'ThanksGiven',
-                user=self.request.user,
+                user=user,
                 order_id=self.order_id,
                 redpack_event=redpack_event if redpack_event else None,
                 reward=reward if reward else None,
@@ -854,6 +859,9 @@ class ThanksGivenRewardDistributer(RewardDistributer):
             logger.debug("中奖信息入库报错:%s" % reason)
 
 class DistributeRewardAPIView(APIView):
+    """
+        Description:抽奖总入口
+    """
     permission_classes = ()
 
     def __init__(self):
@@ -885,7 +893,7 @@ class ActivityRewardDistribute(object):
         pass
 
     def distribute(self):
-        """发奖接口，必须被实现
+        """抽奖接口，必须被实现
         """
         raise NotImplementedError(u"抽象类中的方法，子类中需要被实现")
 
