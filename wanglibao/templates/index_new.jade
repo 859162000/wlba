@@ -192,7 +192,7 @@ html
                   .product-line.mg-l-r-sm
     //product end
 
-    .i-mod-wrap.mg-t-sm
+    .i-mod-wrap.mg-t-sm.mg-b-xl
       .i-mod-news
         ul.clearfix
           li.mg-r-xxl
@@ -222,7 +222,7 @@ html
                   img(src="/media/{{news.image}}", alt="p2p理财")
                   .media-txt {{news.name}}
                   .media-time.t-d9 {{news.created_at | date:"Y-m-d"}}
-    .i-mod-wrap.mg-t-sm.mg-b-xl
+    //.i-mod-wrap.mg-t-sm.mg-b-xl
       .i-mod-cooperation
         .cn-head.br-b-d2.font-l.clearfix
           a(href="/partner/").cn-head-title.fl
@@ -250,5 +250,5 @@ html
     .page(style='display:none')
     include global/g_footer
     script.
-      require(["/static/src/pc/index.js?v=20151016"])
+      require(["/static/src/pc/index.js?v=20151127"])
     include include/tracking
