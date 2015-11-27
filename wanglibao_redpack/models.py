@@ -146,6 +146,19 @@ class Income(models.Model):
     created_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"创建时间")
 
 
+# 新平台佣金单独处理
+class PhpIncome(models.Model):
+    # user = models.ForeignKey(User, verbose_name=u"用户", related_name="user")
+    # invite = models.ForeignKey(User, verbose_name=u"被邀请用户", related_name="invite")
+    level = models.IntegerField(verbose_name=u"级别", default=0, blank=False, null=False)
+    product_id = models.IntegerField(verbose_name=u"月利宝ID", null=False)
+    amount = models.DecimalField(verbose_name=u'投资金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
+    earning = models.DecimalField(verbose_name=u'收益金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
+    order_id = models.IntegerField(verbose_name=u"订单号", default=0, blank=False, null=False)
+    paid = models.BooleanField(verbose_name=u'已打款', default=False)
+    created_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"创建时间")
+
+
 # 创建红包列表
 def create_redpack(sender, instance, **kwargs):
     from wanglibao_redpack import tasks
