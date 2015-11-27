@@ -58,6 +58,8 @@ from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_redpack.models import Income
 from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
+from common import DecryptParmsAPIView
+
 logger = logging.getLogger('wanglibao_rest')
 
 
@@ -884,12 +886,12 @@ class AdminIdValidate(APIView):
                             "validate": True
                         }, status=200)
 
-class LoginAPIView(APIView):
+class LoginAPIView(DecryptParmsAPIView):
     permission_classes = ()
 
     def post(self, request, *args, **kwargs):
-        identifier = request.DATA.get("identifier", "")
-        password = request.DATA.get("password", "")
+        identifier = self.params.get("identifier", "")
+        password = self.params.get("password", "")
 
         if not identifier or not password:
             return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
@@ -923,6 +925,9 @@ class LoginAPIView(APIView):
                 pu.push_channel_id = push_channel_id
                 pu.save()
         token, created = Token.objects.get_or_create(user=user)
+        if not created:
+            token.delete()
+            token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, "user_id":user.id}, status=status.HTTP_200_OK)
 
 class ObtainAuthTokenCustomized(ObtainAuthToken):
