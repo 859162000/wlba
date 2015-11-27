@@ -2,7 +2,7 @@
 from django.conf.urls import patterns, url
 from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth.decorators import login_required
-import views
+import views, views_activity
 import manage_views
 
 urlpatterns = patterns(
@@ -50,10 +50,10 @@ urlpatterns = patterns(
     #test
     url(r'^jump_page/$', views.JumpPageTemplate.as_view(template_name="sub_times.jade"), name='jump_page'),
     url(r'^is_bind/$', TemplateView.as_view(template_name="sub_is_bind.jade")),
-    url(r'^award_index/$', views.AwardIndexTemplate.as_view(template_name="sub_award.jade"), name='award_index'),
+    url(r'^award_index/$', views_activity.AwardIndexTemplate.as_view(template_name="sub_award.jade"), name='award_index'),
     url(r'^award_rule/$', TemplateView.as_view(template_name="sub_award_rule.jade")),
     url(r'^sub_code/$', TemplateView.as_view(template_name="sub_code.jade")),
-    url(r'^sub_invite/$', TemplateView.as_view(template_name="sub_invite_server.jade")),
+    url(r'^sub_invite/$', views_activity.InviteWeixinFriendTemplate.as_view(template_name="sub_invite_server.jade"), name='sub_invite'),
 
 )
 

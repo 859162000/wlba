@@ -75,6 +75,7 @@ from wanglibao_margin.models import MarginRecord
 from experience_gold.models import ExperienceAmortization, ExperienceEventRecord, ExperienceProduct
 from wanglibao_pay.fee import WithdrawFee
 from wanglibao_account import utils as account_utils
+from wanglibao_rest.common import DecryptParmsAPIView
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
@@ -1178,7 +1179,7 @@ class Third_login_back(APIView):
         result = third_login.login_back(request)
         return Response(result)
 
-from wanglibao_rest.common import DecryptParmsAPIView
+
 
 class ChangePasswordAPIView(DecryptParmsAPIView):
     permission_classes = (IsAuthenticated, )
