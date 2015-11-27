@@ -224,12 +224,61 @@ class WapActivityTemplatesAdmin(admin.ModelAdmin):
     search_fields = ('name', 'url', 'aim_template')
 
 
+class ActivityShowForm(forms.ModelForm):
+    is_pc = forms.BooleanField(label=u'是否主站活动', required=False)
+    is_app = forms.BooleanField(label=u'是否APP活动', required=False)
+    pc_detail_link = forms.CharField(label=u'PC-活动详情页链接*', max_length=255, required=False)
+    pc_template = forms.CharField(label=u'PC-活动详情页模板名称*', max_length=255, required=False)
+    app_detail_link = forms.CharField(label=u'APP-活动详情页链接*', max_length=255, required=False)
+    app_template = forms.CharField(label=u'APP-活动详情页模板名称*', max_length=255, required=False)
+
+    def clean_pc_detail_link(self):
+        is_pc = self.cleaned_data.get('is_pc')
+        pc_detail_link = self.cleaned_data.get('pc_detail_link')
+
+        if is_pc and not pc_detail_link:
+            raise forms.ValidationError(u'这个字段是必须的')
+
+        return pc_detail_link
+
+    def clean_pc_template(self):
+        is_pc = self.cleaned_data.get('is_pc')
+        pc_template = self.cleaned_data.get('pc_template')
+
+        if is_pc and not pc_template:
+            raise forms.ValidationError(u'这个字段是必须的')
+
+        return pc_template
+
+    def clean_app_detail_link(self):
+        is_app = self.cleaned_data.get('is_app')
+        app_detail_link = self.cleaned_data.get('app_detail_link')
+
+        if is_app and not app_detail_link:
+            raise forms.ValidationError(u'这个字段是必须的')
+
+        return app_detail_link
+
+    def clean_app_template(self):
+        is_app = self.cleaned_data.get('is_app')
+        app_template = self.cleaned_data.get('app_template')
+
+        if is_app and not app_template:
+            raise forms.ValidationError(u'这个字段是必须的')
+
+        return app_template
+
+    class Meta:
+        forms.model = ActivityShow
+
+
 class ActivityShowAdmin(admin.ModelAdmin):
     actions = None
     search_fields = ('activity', 'channel')
     ordering = ('-priority', '-created_at')
     raw_id_fields = ('activity',)
     list_display = ('activity', 'activity_status', 'platform', 'priority')
+    form = ActivityShowForm
 
 
 class ActivityBannerPosForm(forms.ModelForm):
