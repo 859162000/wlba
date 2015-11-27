@@ -1,3 +1,30 @@
+.i-mod-wrap.g-small-nav-warp
+
+  .g-small-nav
+    .g-samll-start
+      .samll-nav-hotline 客服热线 ： 400-858-8066
+
+      .samll-nav-wechat.samll-nav-animate 关注有惊喜
+        .samll-wechat-hover
+          .wechat-hover-body
+            .wechat-hover-san
+            img(src='/static/imgs/pc/nav/wechat.jpg')
+            .wechat-hover-dec 关注网利宝微信
+
+      .samll-nav-app.samll-nav-animate 网利宝APP
+        .samll-wechat-hover
+          .wechat-hover-body
+            .wechat-hover-san
+            img(src='/static/imgs/pc/nav/app_download.jpg')
+            .wechat-hover-dec 下载网利宝APP
+
+    .g-samll-end
+      a(href='/pc_guide/').samll-nav-guide 新手指引
+      if user.is_authenticated
+        a(href='/accounts/home/').samll-nav-user a15117968964
+        a(href='/accounts/logout?next=/').samll-nav-logout 退出
+      else
+        a(href='/accounts/register/').samll-nav-logout 免费注册
 
 .g-nav-warp
   .g-nav
@@ -34,5 +61,4 @@
       +nav-item('贷款专区', '/finance/')
       +nav-item('安全保障', '/security')
       +nav-item('帮助中心', '/help')
-
 
