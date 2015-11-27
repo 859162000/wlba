@@ -85,7 +85,7 @@ class ExperienceBuyAPIView(APIView):
 
             return Response({
                 'ret_code': 0,
-                'data': {'amount': total_amount, 'term_date': term_date.strftime("Y-m-d"), 'interest': interest}
+                'data': {'amount': total_amount, 'term_date': term_date.strftime("%Y-%m-%d"), 'interest': interest}
             })
 
         else:
