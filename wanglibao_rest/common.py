@@ -16,7 +16,7 @@ class DecryptParmsAPIView(APIView):
         """
         super(DecryptParmsAPIView, self).initial(request, args, kwargs)
         try:
-            logger.debug("===decrypt in wanglibao_rest.common====request_params:%s"%request.__dict__)
+            # logger.debug("===decrypt in wanglibao_rest.common====request_params:%s"%request.__dict__)
             method = request.method.lower()
             self.params = {}
             request_params = {}
@@ -52,7 +52,7 @@ class DecryptParmsAPIView(APIView):
                     print content
                     print getDecryptedContent(token_key, content, int(length))
                     self.params[key] = getDecryptedContent(token_key, content, int(length))
-                logger.debug("===decrypt in wanglibao_rest.common====self.params:%s"%self.params)
+            logger.debug("===decrypt in wanglibao_rest.common====self.params:%s"%self.params)
         except Exception, e:
             print e
             # logger.debug("===decrypt in wanglibao_rest.common====error:%s"%e.message)

@@ -57,6 +57,7 @@ from wanglibao_rest import utils as rest_utils
 from weixin.tasks import sentTemplate
 from weixin.models import WeixinUser
 from weixin.constant import WITH_DRAW_SUBMITTED_TEMPLATE_ID, WITH_DRAW_SUCCESS_TEMPLATE_ID
+from wanglibao_rest.common import DecryptParmsAPIView
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -1090,7 +1091,7 @@ class TradeRecordAPIView(APIView):
         return Response(rs)
 
 
-class WithdrawAPIView(APIView):
+class WithdrawAPIView(DecryptParmsAPIView):
     permission_classes = (IsAuthenticated, )
 
     @require_trade_pwd
@@ -1151,7 +1152,7 @@ class UnbindCardView(APIView):
         result = third_pay.card_unbind(request)
         return Response(result)
 
-class BindPayDepositView(APIView):
+class BindPayDepositView(DecryptParmsAPIView):
     """ 获取验证码或快捷支付 """
     permission_classes = (IsAuthenticated, )
 
