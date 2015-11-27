@@ -1368,45 +1368,6 @@ class WeixinCouponList(TemplateView):
             "status": status
         }
 
-class AwardIndexTemplate(TemplateView):
-    template_name = "sub_award.jade"
-
-    def get_context_data(self, **kwargs):
-        openid = self.request.GET.get('openid')
-        return {
-            "openid": openid,
-        }
-
-    def dispatch(self, request, *args, **kwargs):
-        openid = self.request.GET.get('openid')
-        if not openid:
-            redirect_uri = settings.CALLBACK_HOST + reverse("award_index")
-            count = 0
-            for key in self.request.GET.keys():
-                if count == 0:
-                    redirect_uri += '?%s=%s'%(key, self.request.GET.get(key))
-                else:
-                    redirect_uri += "&%s=%s"%(key, self.request.GET.get(key))
-                count += 1
-            redirect_uri = urllib.quote(redirect_uri)
-            account_id = 3
-            key = 'share_redpack'
-            shareconfig = Misc.objects.filter(key=key).first()
-            if shareconfig:
-                shareconfig = json.loads(shareconfig.value)
-                if type(shareconfig) == dict:
-                    account_id = shareconfig['account_id']
-            redirect_url = reverse('weixin_authorize_code')+'?state=%s&redirect_uri=%s' % (account_id, redirect_uri)
-            # print redirect_url
-            return HttpResponseRedirect(redirect_url)
-        w_user = WeixinUser.objects.filter(openid=openid).first()
-        if not w_user:
-            return redirectToJumpPage("error")
-        if not w_user.user:
-            return redirectToJumpPage(u"一定要绑定网利宝账号才可以抽奖")
-
-        return super(AwardIndexTemplate, self).dispatch(request, *args, **kwargs)
-
 
 def testTemplate():
     a = MessageTemplate('_8E2B4QZQC3yyvkubjpR6NYXtUXRB9Ya79MYmpVvQ1o',
