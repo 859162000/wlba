@@ -1,19 +1,92 @@
 # -*- coding: utf-8 -*-
 import decimal
 from decimal import Decimal
+
+import datetime
+import redis
+import requests
+import simplejson
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
 from user_agents import parse
 
 from marketing.models import IntroducedBy
+from wanglibao import settings
 from wanglibao_margin.marginkeeper import MarginKeeper, check_amount
-from wanglibao_margin.models import Margin, MarginRecord, MonthProduct
+from wanglibao_margin.models import Margin, MarginRecord, MonthProduct, PhpRefundRecord
 from wanglibao_p2p.models import P2PEquity
-from wanglibao_redpack.models import Income
-from weixin.util import getAccountInfo
+from wanglibao_redpack.models import PhpIncome
+# from weixin.util import getAccountInfo
+
+
+def set_cookie(response, key, value, hours_expire=1, domain=settings.SESSION_COOKIE_DOMAIN):
+    """
+    set cookie for PHP to judge the login statement.
+    :param response:
+    :param key:
+    :param value:
+    :param hours_expire:
+    :param domain:
+    :return:
+    """
+    expires = datetime.datetime.now() + datetime.timedelta(hours=hours_expire)
+    response.set_cookie(key, value, expires=expires, domain=domain)
+
+
+class PhpRedisBackend(object):
+
+    def __init__(self, host=settings.PHP_REDIS_HOST, port=settings.PHP_REDIS_PORT, db=settings.PHP_REDIS_DB):
+        try:
+            self.password = settings.PHP_REDIS_PASSWORD
+            self.pool = redis.ConnectionPool(host=host, port=port, db=db, password=self.password)
+            self.redis = redis.Redis(connection_pool=self.pool)
+            self.redis.set("php_test", "php_test")
+        except:
+            self.pool = None
+            self.redis = None
+
+    def _is_available(self):
+        try:
+            self.redis.ping()
+        except:
+            return False
+        return True
+
+    def _exists(self, name):
+        if self.redis:
+            return self.redis.exists(name)
+        return False
+
+    def _set(self, key, value):
+        if self.redis:
+            self.redis.set(key, value)
+
+    def _get(self, key):
+        if self.redis:
+            return self.redis.get(key)
+        return None
+
+    def _delete(self, key):
+        if self.redis:
+            self.redis.delete(key)
+
+    def _lpush(self, key, value):
+        if self.redis:
+            self.redis.lpush(key, value)
+
+    def _rpush(self, key, value):
+        if self.redis:
+            self.redis.rpush(key, value)
+
+    def _lrange(self, key, start, end):
+        if self.redis:
+            return self.redis.lrange(key, start, end)
+
+    def _lrem(self, key, value, count=0):
+        if self.redis:
+            self.redis.lrem(key, value, count)
 
 
 class PhpMarginKeeper(MarginKeeper):
@@ -67,6 +140,33 @@ class PhpMarginKeeper(MarginKeeper):
         trace.save()
         return trace
 
+    def php_amortize(self, refund_id, user, catalog, amount, description, savepoint=True):
+        """
+        月利宝到期回款, 用户只加总额, 操作后写流水日志. 详细写在description里.
+        :param refund_id:       唯一回款ID, 不可重复.
+        :param user:            对应用户
+        :param catalog:         0: 月利宝, 1: 债权转让
+        :param amount:          回款总金额
+        :param description:     回款所有细节
+        :param savepoint:       原子操作标记
+        :return:
+        """
+        check_amount(amount)
+        amount = Decimal(amount)
+
+        with transaction.atomic(savepoint=savepoint):
+            if not PhpRefundRecord.objects.filter(refund_id=refund_id).first():
+                margin = Margin.objects.select_for_update().filter(user=self.user).first()
+                margin.margin += amount
+                margin.save()
+                try:
+                    PhpRefundRecord.objects.get_or_create(
+                        refund_id=refund_id, user=user, catalog=catalog,
+                        amount=amount, margin_current=margin.margin, description=description)
+                    return 1
+                except Exception, e:
+                    print e
+
 
 def get_user_info(request, session_id):
     """
@@ -74,12 +174,6 @@ def get_user_info(request, session_id):
     :param request:
     :param session_id:
     :return:
-    userId, 用户 id.
-    username, 用户手机号 .
-    isDisable, 是否禁用了账户 .
-    isRealname, 是否已实名
-    总资产
-    可用余额
     from_channel, 登录渠道 . 如 :PC
     isAdmin
     """
@@ -88,39 +182,45 @@ def get_user_info(request, session_id):
     ua_string = request.META.get('HTTP_USER_AGENT', '')
     user_agent = parse(ua_string)
 
-    print '######'*100
-    print session_id
-    print request.session.session_key
     print 'ua_string = ', ua_string
     print 'user agent = ', user_agent
 
     if session_id == request.session.session_key:
         user = request.user
-        account_info = getAccountInfo(user)
-        user_info.update(userId=user.pk,
+
+        margin_info = get_margin_info(user.id)
+
+        # account_info = getAccountInfo(user)
+        user_info.update(user_id=user.pk,
                          username=user.wanglibaouserprofile.phone,
                          realname=user.wanglibaouserprofile.name,
-                         isDisable=user.wanglibaouserprofile.frozen,
-                         isRealname=0,
-                         total_amount=account_info['total_asset'],
-                         avaliable_amount=account_info['p2p_margin'],
+                         is_disable=user.wanglibaouserprofile.frozen,
+                         is_realname=1 if user.wanglibaouserprofile.id_is_valid else 0,
+                         total_amount=margin_info.get('total_amount'),
+                         avaliable_amount=margin_info.get('margin'),
+                         unpayed_principle=margin_info.get('unpayed_principle'),
+                         margin_freeze=margin_info.get('margin_freeze'),
+                         margin_withdrawing=margin_info.get('margin_withdrawing'),
                          from_channel=ua_string,
-                         isAdmin=user.is_superuser)
+                         is_admin=user.is_superuser,
+                         id_number=user.wanglibaouserprofile.id_number)
+
+        # save to redis if not exist else update.
+        redis_obj = PhpRedisBackend()
+        redis_obj.redis.set('python_{}_{}'.format(user.id, session_id), simplejson.dumps(user_info))
+        redis_obj.redis.expire('python_{}_{}'.format(user.id, session_id), 1440)
     else:
-        user_info.update(status=False,
+        user_info.update(status=0,
                          message=u'session error.')
 
     return user_info
 
 
-@csrf_exempt
-def get_margin_info(request, user_id):
+def get_margin_info(user_id):
     """
-    :param request:
     :param user_id:
     :return: 用户可用余额
     0.00 总资产(元) = 0.00 可用余额 + 0.00 待收本金 + 0.00 投资冻结 + 0.00 提现冻结
-
     """
 
     try:
@@ -131,18 +231,21 @@ def get_margin_info(request, user_id):
             p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
                         u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
                     ]).select_related('product')
-            unpayed_principle = 0
+            unpaid_principle = 0
             for equity in p2p_equities:
                 if equity.confirm:
-                    unpayed_principle += equity.unpaid_principal  # 待收本金
+                    unpaid_principle += equity.unpaid_principal  # 待收本金
 
-            unpayed_principle = unpayed_principle
+            # 增加从PHP项目来的月利宝待收本金
+            php_principle = get_php_redis_principle(user.pk)
+            unpaid_principle += php_principle
+
             margin = user.margin.margin
             margin_freeze = user.margin.freeze
             margin_withdrawing = user.margin.withdrawing
-            total_amount = margin + margin_freeze + margin_withdrawing + unpayed_principle
+            total_amount = margin + margin_freeze + margin_withdrawing + unpaid_principle
 
-            return {'state': True, 'margin': margin, 'total_amount': total_amount, 'unpayed_principle': unpayed_principle,
+            return {'state': True, 'margin': margin, 'total_amount': total_amount, 'unpayed_principle': unpaid_principle,
                     'margin_freeze': margin_freeze, 'margin_withdrawing': margin_withdrawing}
     except Exception, e:
         print e
@@ -150,38 +253,85 @@ def get_margin_info(request, user_id):
     return {'state': False, 'info': 'user authenticated error!'}
 
 
-# def commission(user, product_id, equity, start, end):
-#     """
-#     用户在月利宝购买东西的时候加入佣金.
-#     :param user:        购买用户
-#     :param product_id:  月利宝产品id
-#     :param equity:                      ??????月利宝交易金额
-#     :param start:
-#     :param end:
-#     :return:
-#     """
-#     _amount = MonthProduct.objects.filter(user=user, product_id=product_id, create_time__gt=start,
-#                                           create_time__lt=end).aggregate(Sum('amount'))
-#     if _amount['amount__sum'] and _amount['amount__sum'] <= equity:
-#         commission = decimal.Decimal(_amount['amount__sum']) * decimal.Decimal("0.003")
-#         commission = commission.quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_HALF_DOWN)
-#         first_intro = IntroducedBy.objects.filter(user=user).first()
-#         if first_intro and first_intro.introduced_by:
-#             first = MarginKeeper(first_intro.introduced_by)
-#             first.deposit(commission, catalog=u"全民淘金")
-#
-#             # 创建一个月利宝对应的P2P产品?????
-#             income = Income(user=first_intro.introduced_by, invite=user, level=1,
-#                             product=product, amount=_amount['amount__sum'],
-#                             earning=commission, order_id=first.order_id, paid=True, created_at=timezone.now())
-#             income.save()
-#
-#             sec_intro = IntroducedBy.objects.filter(user=first_intro.introduced_by).first()
-#             if sec_intro and sec_intro.introduced_by:
-#                 second = MarginKeeper(sec_intro.introduced_by)
-#                 second.deposit(commission, catalog=u"全民淘金")
-#
-#                 income = Income(user=sec_intro.introduced_by, invite=user, level=2,
-#                                 product=product, amount=_amount['amount__sum'],
-#                                 earning=commission, order_id=second.order_id, paid=True, created_at=timezone.now())
-#                 income.save()
+def php_commission_exist(product_id):
+    record = PhpIncome.objects.filter(product_id=product_id).first()
+    return record
+
+
+def php_commission(user, product_id, start, end):
+    """
+    月利宝的表存的是php那边的流水.直接从这获取
+    :param user:
+    :param product_id:
+    :param equity:
+    :param start:
+    :param end:
+    :return:
+    """
+    _amount = MonthProduct.objects.filter(user=user, product_id=product_id, created_at__gt=start,
+                                          created_at__lt=end).aggregate(Sum('amount'))
+    if _amount['amount__sum']:
+        commission = decimal.Decimal(_amount['amount__sum']) * decimal.Decimal("0.003")
+        commission = commission.quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_HALF_DOWN)
+        first_intro = IntroducedBy.objects.filter(user=user).first()
+        if first_intro and first_intro.introduced_by:
+            first = MarginKeeper(first_intro.introduced_by)
+            first.deposit(commission, description=u'月利宝一级淘金', catalog=u"全民淘金")
+
+            income = PhpIncome(user=first_intro.introduced_by, invite=user, level=1,
+                               product_id=product_id, amount=_amount['amount__sum'],
+                               earning=commission, order_id=first.order_id, paid=True, created_at=timezone.now())
+            income.save()
+
+            sec_intro = IntroducedBy.objects.filter(user=first_intro.introduced_by).first()
+            if sec_intro and sec_intro.introduced_by:
+                second = MarginKeeper(sec_intro.introduced_by)
+                second.deposit(commission, description=u'月利宝二级淘金', catalog=u"全民淘金")
+
+                income = PhpIncome(user=sec_intro.introduced_by, invite=user, level=2,
+                                   product_id=product_id, amount=_amount['amount__sum'],
+                                   earning=commission, order_id=second.order_id, paid=True, created_at=timezone.now())
+                income.save()
+
+
+# TODO 对月利宝进行全民淘金处理, 并加入短信发送统计.
+def calc_php_commission(product_id):
+    """
+    这里每次处理一个满标审核后的标, 只写入记录. 短信发送的时候去统计 散标和月利宝的佣金
+    参考:　/wanglibao_redpack/backends.py    function calc_broker_commission
+    :param product_id:
+    :return:
+    """
+    if not product_id:
+        return
+
+    month_products = MonthProduct.objects.filter(product_id=product_id)
+    users = set([product.user for product in month_products])
+    if php_commission_exist(product_id):
+        return
+
+    start = timezone.datetime(2015, 6, 22, 16, 0, 0, tzinfo=timezone.utc)
+    end = timezone.datetime(2016, 6, 30, 15, 59, 59, tzinfo=timezone.utc)
+    with transaction.atomic():
+        for user in users:
+            php_commission(user, product_id, start, end)
+
+
+def get_php_redis_principle(user_id):
+    """
+    从redis 或者 api接口 得到用户的待收本金
+    :param user_id:
+    :return: 1000   代收本金
+    """
+    try:
+        redis_obj = PhpRedisBackend()
+        redis_key = 'unpayed_principle_{}'.format(user_id)
+        php_unpaid_principle = redis_obj.redis.get(redis_key)
+
+        return decimal.Decimal(php_unpaid_principle) or 0
+
+    except:
+        url = settings.PHP_UNPAID_PRINCIPLE
+        response = requests.get(url, data={'user_id': user_id}).json()
+
+        return decimal.Decimal(response.get('total_amount')) or 0

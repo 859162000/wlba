@@ -1,14 +1,18 @@
 #!/usr/bin/env python
 # encoding:utf-8
-from django.http.response import HttpResponse
+import datetime
+from django.contrib import auth
+from django.db import transaction
+from django.http.response import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import renderers
 from rest_framework.views import APIView
 
 from wanglibao_account.auth_backends import User
 from wanglibao_margin.models import AssignmentOfClaims, MonthProduct
-from wanglibao_margin.php_utils import get_user_info, get_margin_info, PhpMarginKeeper
+from wanglibao_margin.php_utils import get_user_info, get_margin_info, PhpMarginKeeper, set_cookie, calc_php_commission
 from wanglibao_account import message as inside_message
+from wanglibao_profile.backends import trade_pwd_check
 from wanglibao_profile.models import WanglibaoUserProfile
 
 
@@ -29,21 +33,43 @@ class GetUserInfo(APIView):
         user_info = dict()
         if session_id and not user_ids:
             user_info = get_user_info(request, session_id)
-        if user_ids:
+        elif user_ids:
             ids = user_ids.split(',')
             ids_list = [int(uid) for uid in ids]
             users = User.objects.filter(pk__in=ids_list)
 
-            ret_str = ''
+            ret_list = list()
             for user in users:
+                user_dic = dict()
                 profile = WanglibaoUserProfile.objects.get(user=user)
-                ret_str += '{}:{},'.format(user.pk, profile.phone)
+                user_dic.update(user_id=user.pk, mobile=profile.phone, id_number=profile.id_number)
+                ret_list.append(user_dic)
+
             user_info.update(
-                status=True,
-                user_list=ret_str
+                status=1,
+                user_list=ret_list
+            )
+        else:
+            user_info.update(
+                status=0,
             )
 
         return HttpResponse(renderers.JSONRenderer().render(user_info, 'application/json'))
+
+
+def logout_with_cookie(request, next_page='/'):
+    """
+    logout for php, clear session_bak cookie.
+    :param request:
+    :param next_page:
+    :return:
+    """
+    auth.logout(request)
+    # 退出的时候设置时间就清除cookie
+    response = HttpResponseRedirect(next_page)
+    set_cookie(response, 'session_bak', None, -100)
+
+    return response
 
 
 class GetMarginInfo(APIView):
@@ -59,7 +85,7 @@ class GetMarginInfo(APIView):
     def get(self, request):
         user_id = self.request.REQUEST.get('userId')
 
-        margin = get_margin_info(request, user_id)
+        margin = get_margin_info(user_id)
 
         return HttpResponse(renderers.JSONRenderer().render(margin, 'application/json'))
 
@@ -68,7 +94,7 @@ class SendInsideMessage(APIView):
     """
     author: Zhoudong
     http请求方式: POST  发送站内信。
-    http://xxxxxx.com/php/send_message/
+    http://xxxxxx.com/php/send_message/inside/
     返回数据格式：json
     :return:
     """
@@ -78,7 +104,7 @@ class SendInsideMessage(APIView):
     def post(self, request):
         user_id = self.request.POST.get('userId')
         # useless argument.
-        # msg_type = self.request.POST.get('msgType')
+        msg_type = self.request.POST.get('msgType')
         title = self.request.POST.get('title')
         content = self.request.POST.get('content')
 
@@ -87,8 +113,47 @@ class SendInsideMessage(APIView):
                 "user_id": user_id,
                 "title": title,
                 "content": content,
-                "mtype": "activity"
+                "mtype": msg_type
             })
+            ret = {'status': 1, 'message': 'Succeed'}
+        except Exception, e:
+            ret = {'status': 0, 'message': e}
+
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class SendMessages(APIView):
+    """
+    author: Zhoudong
+    http请求方式: POST  短信。
+    http://xxxxxx.com/php/send_messages/
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    @csrf_exempt
+    def post(self, request):
+        phones = self.request.POST.get('phones')
+        messages = self.request.POST.get('messages')
+        ext = request.POST.get('ext', False)
+
+        phones = phones.split('|')
+        messages = messages.split('|')
+
+        try:
+            from wanglibao_sms.tasks import send_messages
+            if not ext:
+                send_messages.apply_async(kwargs={
+                    'phones': phones,
+                    'messages': messages,
+                })
+            else:
+                send_messages.apply_async(kwargs={
+                    'phones': phones,
+                    'messages': messages,
+                    'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
+                })
             ret = {'status': 1, 'message': 'Succeed'}
         except Exception, e:
             ret = {'status': 0, 'message': e}
@@ -111,11 +176,7 @@ class CheckTradePassword(APIView):
         trade_password = self.request.POST.get('pwd')
 
         try:
-            user = User.objects.get(id=user_id)
-            if trade_password == user.wanglibaouserprofile.trade_pwd:
-                ret = {'status': 1, 'message': 'Succeed'}
-            else:
-                ret = {'status': 0, 'message': 'password error!'}
+            ret = trade_pwd_check(user_id, trade_password)
         except Exception, e:
             ret = {'status': 0, 'message': str(e)}
 
@@ -134,9 +195,6 @@ class YueLiBaoBuy(APIView):
 
     @csrf_exempt
     def post(self, request):
-
-        # 当扣款成功时 , 请后续执行记录 " 全民淘金 "
-        # TODO
 
         ret = dict()
 
@@ -186,7 +244,7 @@ class YueLiBaoCheck(APIView):
     """
     author: Zhoudong
     http请求方式: POST  满标审核完毕, 减去冻结资金
-    http://xxxxxx.com/php/yuelibao/check/
+    http://xxxxxx.com/php/yue/check/
     返回数据格式：json
     :return:
     """
@@ -197,15 +255,26 @@ class YueLiBaoCheck(APIView):
 
         ret = dict()
 
-        tokens = request.POST.get('tokens')
+        product_id = request.POST.get('productId')
 
         try:
-            month_products = MonthProduct.objects.filter(token__in=tokens)
-            for product in month_products:
-                user = product.user
-                product_id = product.product_id
-                buyer_keeper = PhpMarginKeeper(user, product_id)
-                buyer_keeper.settle(product.amount, description='')
+            with transaction.atomic(savepoint=True):
+                month_products = MonthProduct.objects.filter(product_id=product_id)
+                print month_products
+                for product in month_products:
+                    # 已支付, 直接返回成功
+                    if not product.pay_status:
+                        user = product.user
+                        product_id = product.product_id
+                        buyer_keeper = PhpMarginKeeper(user, product_id)
+                        trace = buyer_keeper.settle(product.amount, description='')
+                        if trace:
+                            product.pay_status = True
+                            product.save()
+
+                # 进行全民淘金数据写入
+                calc_php_commission(product_id)
+
                 ret.update(status=1,
                            msg='success')
         except Exception, e:
@@ -233,15 +302,15 @@ class YueLiBaoCancel(APIView):
         tokens = eval(request.POST.get('tokens'))
 
         try:
-            month_products = MonthProduct.objects.filter(token__in=tokens)
-            for product in month_products:
-
-                user = product.user
-                product_id = product.product_id
-                buyer_keeper = PhpMarginKeeper(user, product_id)
-                record = buyer_keeper.unfreeze(product.amount, description='')
-                status = 1 if record else 0
-                msg_list.append({'token': product.token, 'status': status})
+            with transaction.atomic(savepoint=True):
+                month_products = MonthProduct.objects.filter(token__in=tokens)
+                for product in month_products:
+                    user = product.user
+                    product_id = product.product_id
+                    buyer_keeper = PhpMarginKeeper(user, product_id)
+                    record = buyer_keeper.unfreeze(product.amount, description='')
+                    status = 1 if record else 0
+                    msg_list.append({'token': product.token, 'status': status})
 
             ret.update(status=1,
                        msg=msg_list)
@@ -256,6 +325,22 @@ class YueLiBaoRefund(APIView):
     author: Zhoudong
     http请求方式: POST  投资到期回款.
     http://xxxxxx.com/php/yuelibao/refund/
+    refundId 还款记录ID 月利宝还款计划表id
+    userId 用户ID
+    productId 产品ID
+    principal 本金
+    interest 利息
+    increase 加息额
+    plusInterest 平台加息
+    amount 本次还款金额
+    tradeType 产品类型 0月利宝 1债转
+    remark 备注 [{"refundId":1,"userId":78641,"amount":15,"tradeType":0,"remark":"string"},
+                {"refundId":2,"userId":78694,"amount":15,"tradeType":0,"remark":""}]
+        # args = [{'refundId': 1, 'userId': 2, 'productId': 4, 'tradeType': 0, 'remark': 'string',
+        #          'amount': 1018, 'principal': 1000, 'interest': 10, 'increase': 5, 'plusInterest': 3},
+        #         {'refundId': 2, 'userId': 2, 'amount': 4, 'tradeType': 0, 'remark': 'string',
+        #          'amount': 1018, 'principal': 1000, 'interest': 10, 'increase': 5, 'plusInterest': 3},
+        #         ...]
     返回数据格式：json
     :return:
     """
@@ -268,28 +353,21 @@ class YueLiBaoRefund(APIView):
         ret = dict()
 
         args = request.POST.get('args')
-        # args = [{'refundId': 1, 'userId': 2, 'productId': 3, 'principal': 4, 'interest': 5,
-        #          'increase': 6, 'amount': 4+5+6, 'tradeType': 0, 'remark': 'string', 'plusInterest': '10%'}
-        #         {'refundId': 1, 'userId': 2, 'productId': 3, 'principal': 4, 'interest': 5,
-        #          'increase': 6, 'amount': 4+5+6, 'tradeType': 0, 'remark': 'string'}...]
 
         try:
-            for arg in eval(args):
-                user = User.objects.get(pk=arg['userId'])
-                # product = AssignmentOfClaims.objects.get(pk=arg['productId']) if arg['tradeType'] \
-                #     else MonthProduct.objects.get(pk=arg['productId'])
-                product_id = arg['productId']
-                trade_type = u'债转' if arg['tradeType'] else u'投资'
-                description = '{}的还款, 类型是{}, 描述是{}'.format(arg['productId'], trade_type, arg['remark'])
+            with transaction.atomic(savepoint=True):
+                for arg in eval(args):
+                    user = User.objects.get(pk=arg['userId'])
 
-                buyer_keeper = PhpMarginKeeper(user, product_id)
-                # 字段需要更新. 添加利息.
-                buyer_keeper.amortize(arg['principal'], arg['interest'], 0, arg['increase'], description)
-
-                msg_list.append({'refundId': arg['refundId'], 'plusInterest': arg['plusInterest'], 'status': 1})
-
-            ret.update(status=1,
-                       msg=msg_list)
+                    buyer_keeper = PhpMarginKeeper(user, arg['refundId'])
+                    try:
+                        buyer_keeper.amortize(arg['principal'], arg['interest'], 0,
+                                              arg['increase'], description=arg['remark'])
+                        msg_list.append({'refundId': arg['refundId'], 'status': 1})
+                    except Exception, e:
+                        print e
+                ret.update(status=1,
+                           msg=msg_list)
         except Exception, e:
             ret.update(status=0,
                        msg=str(e))
@@ -348,17 +426,18 @@ class AssignmentOfClaimsBuy(APIView):
             # 状态成功, 对买家扣款, 卖家回款.
             if status:
                 try:
-                    # status == 0 加钱, 其他减钱. 这直接对买家余额减钱, 卖家余额加钱
-                    buyer_keeper = PhpMarginKeeper(buyer, )
-                    seller_keeper = PhpMarginKeeper(seller, )
-                    buyer_keeper.margin_process(buyer, 1, buy_price, description=u'', catalog=u"买债转")
-                    seller_keeper.margin_process(seller, 0, sell_price, description=u'', catalog=u"卖债转")
+                    with transaction.atomic(savepoint=True):
+                        # status == 0 加钱, 其他减钱. 这直接对买家余额减钱, 卖家余额加钱
+                        buyer_keeper = PhpMarginKeeper(buyer, )
+                        seller_keeper = PhpMarginKeeper(seller, )
+                        buyer_keeper.margin_process(buyer, 1, buy_price, description=u'', catalog=u"买债转")
+                        seller_keeper.margin_process(seller, 0, sell_price, description=u'', catalog=u"卖债转")
 
-                    # 如果加减钱成功后, 更新债转的表的状态为成功
-                    assignment.status = True
-                    assignment.save()
-                    ret.update(status=1,
-                               msg='success')
+                        # 如果加减钱成功后, 更新债转的表的状态为成功
+                        assignment.status = True
+                        assignment.save()
+                        ret.update(status=1,
+                                   msg='success')
                 except Exception, e:
                     ret.update(status=0,
                                msg=str(e))

@@ -1204,6 +1204,12 @@ REDIS_PORT = 6379
 REDIS_DB = 0
 REDIS_PASSWORD = 'wanglibank_redis'
 
+PHP_REDIS_HOST = '192.168.20.241'
+PHP_REDIS_PORT = 6379
+PHP_REDIS_DB = 0
+PHP_REDIS_PASSWORD = ''
+
+
 # CACHES = {
 #     'default': {
 #         'BACKEND': 'redis_cache.RedisCache',

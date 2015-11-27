@@ -42,6 +42,31 @@ class MarginRecord(models.Model):
         ordering = ['-create_time']
 
 
+class PhpRefundRecord(models.Model):
+    """
+    针对月利宝产品到期回款流水记录, 有月利宝和债转两种回款
+    """
+    CATALOG = (
+        ("0", "月利宝"),
+        ("1", "债权转让"),
+    )
+    refund_id = models.IntegerField(verbose_name=u'相关订单编号', unique=True, null=False)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    catalog = models.CharField(db_index=True, verbose_name=u'购买类型',
+                               choices=CATALOG, default='0', max_length=32)
+    amount = models.DecimalField(verbose_name=u'发生金额', max_digits=20, decimal_places=2)
+    margin_current = models.DecimalField(verbose_name=u'用户后余额', max_digits=20, decimal_places=2)
+    description = models.CharField(verbose_name=u'摘要', max_length=1000, default=u'')
+
+    create_at = models.DateTimeField(verbose_name=u'流水时间', auto_now_add=True)
+
+    def __unicode__(self):
+        return u'%s , %s, 交易金额%s, 余额%s' % (self.catalog, self.user, self.amount, self.margin_current)
+
+    class Meta:
+        ordering = ['-create_at']
+
+
 class MonthProduct(models.Model):
     """
     月利宝model, 记录主要字段.
@@ -60,6 +85,10 @@ class MonthProduct(models.Model):
     red_packet = models.DecimalField(verbose_name=u'红包金额', max_digits=10, decimal_places=2)
     red_packet_type = models.CharField(db_index=True, verbose_name=u'红包类型',
                                        choices=RED_PACKET_TYPE, default='-1', max_length=32)
+
+    cancel_status = models.BooleanField(default=False, verbose_name=u'是否已取消')   # 流标, 用户冻结金额恢复状态
+    pay_status = models.BooleanField(default=False, verbose_name=u'是否已支付')      # 满标审核后用户支付状态
+
     created_at = models.DateTimeField(verbose_name=u'月利宝生效时间', auto_now_add=True)
 
     class Meta:

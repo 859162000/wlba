@@ -28,8 +28,6 @@ from marketing.cooperationapi import HeXunListAPI, WangDaiListAPI, WangDaiByDate
     WangdaiEyeEquityAPIView, XunleiP2PListAPIView, XunleiP2PbyUser
 from marketing.views import NewsListView, NewsDetailView, AppShareViewShort, ShortAppShareRegView,\
     AppShareViewSuccess, AppShareViewError, RockFinanceQRCodeView
-from wanglibao_activity.decorators import decorator_include
-from wanglibao_activity.decorators import wap_activity_manage
 from wanglibao.views import landpage_view
 from wanglibao_sms.views import ArriveRate
 
@@ -201,6 +199,8 @@ urlpatterns += patterns(
     url(r'^php/yue/refund/$', YueLiBaoRefund.as_view(), name='php_refund_yuelibao'),
 
     url(r'^php/assignment/buy/$', AssignmentOfClaimsBuy.as_view(), name='php_refund_yuelibao'),
+
+    url(r'^php/logout/$', logout_with_cookie, name='php_logout_cookie'),
 )
 
 # 短信

@@ -1,5 +1,7 @@
 # encoding: utf-8
 import datetime
+
+from wanglibao_margin.php_utils import set_cookie
 from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
 from wanglibao_redpack import backends as redpack_backends
 import logging
@@ -1325,7 +1327,12 @@ def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
                     request.session.set_expiry(604800)
                 else:
                     request.session.set_expiry(1800)
-                return HttpResponse(messenger('done', user=request.user))
+                response = HttpResponse(messenger('done', user=request.user))
+                # 这个不是实时的
+                # set_cookie(response, 'session_bak',
+                #            request.COOKIES.get('sessionid', 'session_has_not_initialized_yet'))
+                set_cookie(response, 'session_bak', request.session.session_key)
+                return response
             else:
                 return HttpResponseForbidden(messenger(form.errors))
         else:
