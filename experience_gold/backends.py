@@ -121,7 +121,7 @@ class GetExperienceAPIView(APIView):
 
             # 发放站内信
             title = u'参加活动送体验金'
-            content = u"网利宝赠送的【{}】体验金已发放，体验金额度:{}，请进入投资页面尽快投资赚收益吧！有效期至{}。" \
+            content = u"网利宝赠送的【{}】体验金已发放，体验金额度:{}元，请进入投资页面尽快投资赚收益吧！有效期至{}。" \
                       u"<br/>感谢您对我们的支持与关注!" \
                       u"<br>网利宝".format(experience_event.name,
                                           decimal.Decimal(str(experience_event.amount)).quantize(decimal.Decimal('.01')),
