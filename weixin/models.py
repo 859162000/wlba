@@ -203,6 +203,15 @@ class WeixinAccounts(object):
         'token': '6ad01528',
         'qrcode_url': '/static/imgs/admin/qrcode_for_gh_d852bc2cead2_258.jpg'
     }
+    account_test_yj = {
+        'id': 'gh_9e8ff84237cd',
+        'name': '测试号',
+        'app_id': 'wxd64b17c0ff16c2e4',
+        'app_secret': 'd4624c36b6795d1d99dcf0547af5443d',
+        'classify': '微信公众平台测试号',
+        'token': '7RvywP6u',
+        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_d852bc2cead2_258.jpg'
+    }
 
     id = None
     name = None
@@ -235,6 +244,7 @@ class WeixinAccounts(object):
         cls.data['sub_1'] = cls.account_sub_1
         cls.data['test'] = cls.account_test
         cls.data['account_test_hmm']=cls.account_test_hmm
+        cls.data['account_test_yj']=cls.account_test_yj
 
     @classmethod
     def account_classify(cls):
