@@ -52,6 +52,7 @@ from wanglibao_announcement.utility import AnnouncementAccounts
 from fee import WithdrawFee
 import datetime
 from wanglibao_rest import utils as rest_utils
+from wanglibao_rest.common import DecryptParmsAPIView
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -226,7 +227,7 @@ class YeeProxyPayCompleteView(TemplateView):
         return result, amount
 
     @method_decorator(login_required(login_url='/accounts/login'))
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         # result = HuifuPay.handle_pay_result(request)
         # amount = request.POST.get('OrdAmt', '')
         #
@@ -242,7 +243,7 @@ class YeeProxyPayCompleteView(TemplateView):
             'amount': amount
             })
 
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         logger.info('web_pay_thirdpay_post_request_para'+str(request.POST))
         self._process(request)
         return HttpResponse('success')
@@ -1071,7 +1072,7 @@ class TradeRecordAPIView(APIView):
         return Response(rs)
 
 
-class WithdrawAPIView(APIView):
+class WithdrawAPIView(DecryptParmsAPIView):
     permission_classes = (IsAuthenticated, )
 
     @require_trade_pwd
@@ -1115,7 +1116,7 @@ class UnbindCardView(APIView):
         result = third_pay.card_unbind(request)
         return Response(result)
 
-class BindPayDepositView(APIView):
+class BindPayDepositView(DecryptParmsAPIView):
     """ 获取验证码或快捷支付 """
     permission_classes = (IsAuthenticated, )
 
