@@ -19,8 +19,13 @@ from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity import backends as activity_backends
 from wanglibao_redpack.models import Income, RedPackEvent, RedPack, RedPackRecord
 import datetime
+import json
 from django.db.models import Sum, Count, Q
 import logging
+from weixin.constant import DEPOSIT_SUCCESS_TEMPLATE_ID
+from weixin.tasks import sentTemplate
+from weixin.models import WeixinUser
+
 
 # logger = logging.getLogger('wanglibao_reward')
 
@@ -116,6 +121,22 @@ def deposit_ok(user_id, amount, device, order_id):
             'phones': [user_profile.phone],
             'messages': [messages.deposit_succeed(user_profile.name, amount)]
         })
+
+        weixin_user = WeixinUser.objects.filter(user=user).first()
+        deposit_ok_time = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
+        margin = Margin.objects.filter(user=user).first()
+# 亲爱的满先生，您的充值已成功
+# {{first.DATA}} 充值时间：{{keyword1.DATA}} 充值金额：{{keyword2.DATA}} 可用余额：{{keyword3.DATA}} {{remark.DATA}}
+        sentTemplate.apply_async(kwargs={
+                        "kwargs":json.dumps({
+                                        "openid":weixin_user.openid,
+                                        "template_id":DEPOSIT_SUCCESS_TEMPLATE_ID,
+                                        "first":u"亲爱的%s，您的充值已成功"%user_profile.name,
+                                        "keyword1":deposit_ok_time,
+                                        "keyword2":amount,
+                                        "keyword3":margin.margin,
+                                            })},
+                                        queue='celery02')
         logger.debug('send messages 充值金额啊啊啊: %s' % amount)
     except Exception, e:
         logger.debug('send messages 充值异常啊啊啊: %s' % str(e))

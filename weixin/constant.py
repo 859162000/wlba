@@ -6,18 +6,22 @@ if settings.ENV == settings.ENV_PRODUCTION:
     ACCOUNT_INFO_TEMPLATE_ID = '3_BxoXsC9wnPQlYJ-Iq80-Ice5b1wIDMjKXzFzQUEeA'
     PRODUCT_ONLINE_TEMPLATE_ID = "itviF9BIU8BBjEXwPOEMiElLzFByxMZ6-FjvYapk8pY"
     AWARD_COUPON_TEMPLATE_ID  = "_-Xlr2icPtM5sXj0VKuF3fleKYR-Rl4a_h2gpcd_95M"
-    WITH_DRAW_SUBMITTED_TEMPLATE_ID = "KUG_9_VDPdX78g8T2kshvZcE6GAZjxhK5nW2bvjmpJQ"
+    WITH_DRAW_SUBMITTED_TEMPLATE_ID = "KUG_9_VDPdX78g8T2kshvZcE6GAZjxhK5nW2bvjmpJQ"#取现已受理通知
     WITH_DRAW_SUCCESS_TEMPLATE_ID = ""
-    DEPOSIT_SUCCESS_TEMPLATE_ID = "EVvBX8AIlhih9E2YYdZYzMljF__JA-SrMSDTyUeNdcE"
+    DEPOSIT_SUCCESS_TEMPLATE_ID = "EVvBX8AIlhih9E2YYdZYzMljF__JA-SrMSDTyUeNdcE"     #充值到账通知
+    PRODUCT_AMORTIZATION_TEMPLATE_ID = "JlRMqfGNiPdeSjTrCR9w1OUgDEusr0e3YWwqyU89vQM"#项目还款通知
+    PRODUCT_INVEST_SUCCESS_TEMPLATE_ID = "jcgCbkXDebiZPe0iNP4GWkH-SK4iM-gLWRdfRxzM9Ew"#投标成功通知
 else:
     BIND_SUCCESS_TEMPLATE_ID = "mxNfcoJ8lfpbL1gFdazCk1OFGBhm9wIGL21Q6ZeB5FI"
     UNBIND_SUCCESS_TEMPLATE_ID = "lGr-ClUgsv-ruam0ZvN_O-xy_7EzB__1tbCInUs_tOE"
     ACCOUNT_INFO_TEMPLATE_ID = "RVeDKzQxeuxBXuWeZAjIyuv0olTh0HOWttFfqLhwDlU"
     PRODUCT_ONLINE_TEMPLATE_ID = "LQADSfNMmbZdTrz2UsRic93aPb_7cS1TUjUSx7tbxHE"
     AWARD_COUPON_TEMPLATE_ID  = "_-Xlr2icPtM5sXj0VKuF3fleKYR-Rl4a_h2gpcd_95M"
-    WITH_DRAW_SUBMITTED_TEMPLATE_ID = "Paf_qr_WiojI3BddoDvqNKMI1C7KRzayEA_XGrmgQac"
+    WITH_DRAW_SUBMITTED_TEMPLATE_ID = "Paf_qr_WiojI3BddoDvqNKMI1C7KRzayEA_XGrmgQac"#取现已受理通知
     WITH_DRAW_SUCCESS_TEMPLATE_ID = ""
-    DEPOSIT_SUCCESS_TEMPLATE_ID = "LuwpMH6CdEP2IeEsB7h6uewLhZdrnQPb0vmjDlqWh70"
+    DEPOSIT_SUCCESS_TEMPLATE_ID = "LuwpMH6CdEP2IeEsB7h6uewLhZdrnQPb0vmjDlqWh70"     #充值到账通知
+    PRODUCT_AMORTIZATION_TEMPLATE_ID = "wDHmjettSpgHys4HMXdcndUfkloiQNu2j9LXTa_qkO4"#项目还款通知
+    PRODUCT_INVEST_SUCCESS_TEMPLATE_ID = "JgSYj3TqABs9UbmA33QfkZ2ZGjHL436oBBvOMpyWGh8"#投标成功通知
 
 from copy import deepcopy
 
@@ -43,6 +47,70 @@ class MessageTemplate(object):
 
 
 Message_template = {
+    PRODUCT_INVEST_SUCCESS_TEMPLATE_ID:{
+        "top_color":'#88ffdd',
+        "data": {
+# 您好，您已投标成功。
+# 标的编号：10023
+# 投标金额：￥3000.00
+# 投标时间：2015-09-12
+# 投标成功,可在投标记录里查看.
+# {{first.DATA}} 标的编号：{{keyword1.DATA}} 投标金额：{{keyword2.DATA}} 投标时间：{{keyword3.DATA}} {{remark.DATA}}
+                "first": {
+                    "value": "您好，您已投标成功",
+                   "color": "#173177"
+                },
+                "keyword1": {
+                    "value": "",
+                    "color": "#173177"
+                },
+                "keyword2": {
+                    "value": "",
+                    "color": "#173177"
+                },
+                "keyword3": {
+                    "value": "",
+                    "color": "#173177"
+                },
+               "remark":{
+                   "value":"",
+                   "color":"#173177"
+               }
+        },
+        "url": '',
+    },
+    PRODUCT_AMORTIZATION_TEMPLATE_ID:{
+        "top_color":'#88ffdd',
+        "data": {
+            # 您好，您投资的项目还款完成
+            # 项目名称：宝马X5-HK20151112002
+            # 还款金额：1000元
+            # 还款时间：2015-11-12
+            # 详情请登录平台会员中心查看
+            # {{first.DATA}} 项目名称：{{keyword1.DATA}} 还款金额：{{keyword2.DATA}} 还款时间：{{keyword3.DATA}} {{remark.DATA}}
+                "first": {
+                    "value": "您好，您投资的项目还款完成",
+                   "color": "#173177"
+                },
+                "keyword1": {
+                    "value": "",
+                    "color": "#173177"
+                },
+                "keyword2": {
+                    "value": "",
+                    "color": "#173177"
+                },
+                "keyword3": {
+                    "value": "",
+                    "color": "#173177"
+                },
+               "remark":{
+                   "value":"",
+                   "color":"#173177"
+               }
+        },
+        "url": '',
+    },
     DEPOSIT_SUCCESS_TEMPLATE_ID:{
         "top_color":'#88ffdd',
         "data": {
@@ -64,7 +132,7 @@ Message_template = {
                     "color": "#173177"
                 },
                "remark":{
-                   "value":u'您可以使用下方微信菜单进行更多体验。',
+                   "value":"",
                    "color":"#173177"
                }
         },
