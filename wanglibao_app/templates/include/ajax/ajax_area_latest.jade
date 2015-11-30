@@ -6,7 +6,7 @@ if results
       .area-ac-banner
         .area-ac-time {{activity.activity_status}}
         img(src='/media/{{activity.app_banner}}')
-      .area-ac-dec 邀请好友获得3%奖金，好友再邀请其他人，依旧获得3%奖金。邀请好友获得3%奖金，好友再邀请其他人，依旧获得3%奖金。
+      .area-ac-dec {{activity.app_description}}
       .area-ac-line
       a(href='{{activity.pc_detail_link}}').area-ac-footer 立即查看
 else

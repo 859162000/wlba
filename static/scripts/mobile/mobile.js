@@ -280,6 +280,7 @@ org.ui = (function(){
                 if(!typeof(ops) === 'object') return ;
                 $.each(ops, function(i){
                     $('.'+ops[i].target).addClass(ops[i].addName).removeClass(ops[i].reMove);
+                    console.log(ops[i].reMove)
                 })
             }
             var returnCheckArr = function(){
@@ -1504,7 +1505,7 @@ org.processSecond = (function(org){
         },
         form_logic: function(){
             var $submit = $('button[type=submit]'),
-                $bank = $('input[name=bank]'),
+                $bank = $('select[name=bank]'),
                 $bankcard = $('input[name=bankcard]'),
                 $bankphone = $('input[name=bankphone]'),
                 $validation = $('input[name=validation]'),
@@ -1513,13 +1514,26 @@ org.processSecond = (function(org){
             org.ui.focusInput({
                 submit : $submit,
                 inputList: [
-                    {target : $bank,  required:true},
                     {target : $bankcard,required : true},
                     {target : $bankphone,required : true},
                     {target : $validation,required : true},
                     {target : $money,required : true}
-                ]
+                ],
+                otherTarget : [{target: $bank,required: true}]
             });
+
+
+            var addClass = $bank.attr('data-icon'),
+                $target = $('.'+$bank.attr('data-target2'));
+            $bank.change(function() {
+                if($(this).val() == ''){
+                    $target.addClass(addClass).removeClass(addClass + '-active');
+                }else{
+                    $target.addClass(addClass + '-active').removeClass(addClass);
+                }
+                $bankcard.trigger('input')
+            });
+
         }
     }
     return {

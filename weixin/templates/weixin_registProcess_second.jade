@@ -18,7 +18,12 @@ html(style='background:#f5f5f5;')
       .form-list
         .form-icon.binding-bank.bank-icon
         .form-input
-          input(type="tel",name='bank',value='', placeholder="请选择银行", data-target2='binding-bank', data-icon='bank-icon')
+          //input(type="tel",name='bank',value='', placeholder="请选择银行", data-target2='binding-bank', data-icon='bank-icon')
+          select(name="bank", type='select', data-target2='binding-bank', data-icon='bank-icon')
+            option(value = '')  请选择银行
+            option(value = "2") 建设银行
+            option(value = "3") 北京银行
+            option(value = "4") 建设银行
 
       .form-list
         .form-icon.binding-bankcard.bankcard-icon
@@ -28,7 +33,7 @@ html(style='background:#f5f5f5;')
       .form-list
         .form-icon.binding-bankphone.bankphone-icon
         .form-input
-          input(type="tel",name='bankphone',value='', placeholder="请输入银行预留手机号", data-target2='binding-bankphone', data-icon='bankphone-icon')
+          input(type="tel",name='bankphone',value='', placeholder="请输入银行预留手机号", data-target2='binding-bankphone', data-icon='bankphone-icon', data-target = 'regist-validation', data-empty='regist-validation-disable', data-val='')
 
       .form-code
         .form-list.form-validation
