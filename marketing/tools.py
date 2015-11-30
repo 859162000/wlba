@@ -126,9 +126,9 @@ def deposit_ok(user_id, amount, device, order_id):
             'phones': [user_profile.phone],
             'messages': [messages.deposit_succeed(user_profile.name, amount)]
         })
-        logger.info('send messages 充值金额啊啊啊: %s' % amount)
+        logger.info('=20151130= deposit_ok success: user_id=[%s], amount=[%s], device=[%s], order_id=[%s]' % (user_id, amount, device, order_id))
     except Exception, e:
-        logger.exception('send messages 充值异常啊啊啊: %s' % str(e))
+        logger.exception('=20151130= deposit_ok exception: %s' % str(e))
 
 
 @app.task

@@ -93,6 +93,13 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
 
         if first_pay and first_pay.order_id == order_id:
             _check_trade_amount(user, rule, device_type, amount, is_full)
+        else:
+            order_pay = PayInfo.objects.filter(order_id=order_id).first()
+            if order_pay:
+                logger.error("=20151130= _check_rules_trigger: order_id=[%s], status=[%s], amount=[%s]" % (order_id, order_pay.status, order_pay.amount))
+            else:
+                logger.error("=20151130= _check_rules_trigger: order_id=[%s] not found" % (order_id))
+
     # 充值
     elif trigger_node == 'pay':
         _check_trade_amount(user, rule, device_type, amount, is_full)
