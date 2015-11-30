@@ -459,12 +459,10 @@ class ActivityBannerPosition(models.Model):
     class Meta:
         verbose_name = u'活动Banner展示位置'
         verbose_name_plural = u'活动Banner展示位置'
+        ordering = ['-priority', '-created_at']
 
     def __unicode__(self):
         return u'（主推）：%s——（副推左）：%s——（副推右）：%s' % (self.main.activity.name,
                                                             self.second_left.activity.name,
                                                             self.second_right.activity.name,
                                                             )
-
-    class Meta:
-        ordering = ['-priority', '-created_at']

@@ -9,6 +9,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from weixin.util import _generate_ajax_template
 from .utils import get_queryset_paginator, get_sorts_for_activity_show
+from django.db.models import Q
+
 
 class TemplatesFormatTemplate(TemplateView):
     def get_context_data(self, **kwargs):
@@ -149,12 +151,12 @@ class ActivityAreaApi(APIView):
                                                     end_at__gt=timezone.now(),
                                                     ).select_related('activity')
 
-        activity_list = get_sorts_for_activity_show(activity_list)
-
         category = request.GET.get('category', 'all')
 
         if category and category != 'all':
-            activity_list = activity_list.filter(category=category)
+            activity_list = activity_list.filter(Q(category='all') | Q(category=category))
+
+        activity_list = get_sorts_for_activity_show(activity_list)
 
         page = request.GET.get('page', 1)
         pagesize = request.GET.get('pagesize', 6)
