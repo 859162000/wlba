@@ -52,9 +52,9 @@ class WeiXinChannelAdmin(admin.ModelAdmin):
     pass
 
 class QrCodeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'account_original_id', 'ticket', 'expire_at', 'url', 'scene_str', 'ticket_generate', 'qrcode_link')
+    list_display = ('id', 'account_original_id', 'ticket', 'expire_at', 'url', 'weiXinChannel', 'ticket_generate', 'qrcode_link')
     search_fields = ('account_original_id',)
-    fields = ('account_original_id', 'scene_str')
+    fields = ('account_original_id', 'weiXinChannel')
 
 
 class SubscribeServiceAdmin(admin.ModelAdmin):

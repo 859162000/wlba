@@ -40,7 +40,7 @@ from wechatpy.exceptions import InvalidSignatureException, WeChatException
 from wechatpy.oauth import WeChatOAuth
 from weixin.common.decorators import weixin_api_error
 from weixin.common.wx import generate_js_wxpay
-from .models import Account, WeixinUser, WeixinAccounts, AuthorizeInfo, QrCode, SubscribeService, SubscribeRecord
+from .models import Account, WeixinUser, WeixinAccounts, AuthorizeInfo, QrCode, SubscribeService, SubscribeRecord, WeiXinChannel
 from .common.wechat import tuling
 from decimal import Decimal
 from wanglibao_pay.models import Card
@@ -273,14 +273,9 @@ class WeixinJoinView(View):
                 if user:
                     rs, txt = bindUser(w_user, user)
                     reply = create_reply(txt, msg)
-            else:
-                if not old_subscribe and w_user.subscribe:
-                    w_user.scene_id = eventKey
-                    w_user.save()
-        else:
-            if not old_subscribe and w_user.subscribe and w_user.scene_id:
-                w_user.scene_id = None
-                w_user.save()
+        if not old_subscribe and w_user.subscribe:
+            w_user.scene_id = eventKey
+            w_user.save()
         if not reply and not w_user.user:
             txt = self.getBindTxt(fromUserName)
             reply = create_reply(txt, msg)
@@ -1340,7 +1335,7 @@ class GenerateQRLimitSceneTicket(APIView):
             return Response({'errcode':-3, 'errmsg':"-3"})
         weixin_account = WeixinAccounts.getByOriginalId(qrcode.account_original_id)
         client = WeChatClient(weixin_account.app_id, weixin_account.app_secret, weixin_account.access_token)
-        qrcode_data = {"action_name":"QR_LIMIT_STR_SCENE", "action_info":{"scene": {"scene_str": qrcode.scene_str}}}
+        qrcode_data = {"action_name":"QR_LIMIT_STR_SCENE", "action_info":{"scene": {"scene_str": qrcode.weiXinChannel.code}}}
         try:
             rs = client.qrcode.create(qrcode_data)
             qrcode.ticket = rs.get('ticket')

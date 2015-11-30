@@ -167,13 +167,20 @@ class WeiXinChannel(models.Model):
 
 
 class QrCode(models.Model):
-    account_original_id = models.CharField('所属公众号原始ID', max_length=32, blank=True, db_index=True)
+    ACCOUNTS = (
+        ('gh_f758af6347b6', '网利宝服务号'),
+        ('gh_77c09ff2f3a3', '网利宝订阅号'),
+        ('gh_32e9dc3fab8e', '王小青测试号'),
+        ('gh_3b82a2651647', '霍梅梅测试号'),
+        ('gh_9e8ff84237cd', '曹玉娇测试号'),
+    )
+    account_original_id = models.CharField('所属公众号原始ID', max_length=32, blank=True, db_index=True, choices=ACCOUNTS)
     ticket = models.CharField('ticket', max_length=512, null=False)
     expire_at = models.DateTimeField('ticket过期时间', auto_now_add=True, blank=True, null=True)
     url = models.CharField('url', max_length=512, null=False)
     qrcode_url = models.CharField('qrcode_url', max_length=512, null=False)
     # scene_str = models.CharField('scene_str', max_length=128, null=False)
-    WeiXinChannel = models.ForeignKey(WeiXinChannel, null=True)
+    weiXinChannel = models.ForeignKey(WeiXinChannel, null=True)
     create_at = models.DateTimeField('生成时间', auto_now_add=True, blank=True, null=True)
     def ticket_generate(self):
         return u'<a href="/weixin/api/generate/qr_limit_scene_ticket/?id=%s" target="_blank">生成ticket</a>' % (self.id,)
