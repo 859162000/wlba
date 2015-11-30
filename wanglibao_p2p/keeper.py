@@ -26,7 +26,7 @@ import json
 
 from weixin.constant import PRODUCT_AMORTIZATION_TEMPLATE_ID
 from weixin.models import WeixinUser
-from weixin.tasks import sentTemplate
+
 
 
 logger = logging.getLogger(__name__)
@@ -536,6 +536,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                 # 还款时间：2015-11-12
                 # 详情请登录平台会员中心查看
     #             {{first.DATA}} 项目名称：{{keyword1.DATA}} 还款金额：{{keyword2.DATA}} 还款时间：{{keyword3.DATA}} {{remark.DATA}}
+                from weixin.tasks import sentTemplate
                 sentTemplate.apply_async(kwargs={
                                 "kwargs":json.dumps({
                                                 "openid": weixin_user.openid,

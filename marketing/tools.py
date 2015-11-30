@@ -23,7 +23,7 @@ import json
 from django.db.models import Sum, Count, Q
 import logging
 from weixin.constant import DEPOSIT_SUCCESS_TEMPLATE_ID
-from weixin.tasks import sentTemplate
+
 from weixin.models import WeixinUser
 
 
@@ -127,6 +127,7 @@ def deposit_ok(user_id, amount, device, order_id):
         margin = Margin.objects.filter(user=user).first()
 # 亲爱的满先生，您的充值已成功
 # {{first.DATA}} 充值时间：{{keyword1.DATA}} 充值金额：{{keyword2.DATA}} 可用余额：{{keyword3.DATA}} {{remark.DATA}}
+        from weixin.tasks import sentTemplate
         sentTemplate.apply_async(kwargs={
                         "kwargs":json.dumps({
                                         "openid":weixin_user.openid,
