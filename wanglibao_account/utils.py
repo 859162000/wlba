@@ -473,33 +473,42 @@ def zgdx_order_query(params):
             'partner_no': params.get('partner_no', None),
         }
 
-        # try:
-        res = requests.post(url, data=json.dumps(params))
-        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>%s" % res)
-        logger.info(res.text)
-        res_code = res.get('result_code', '')
-        result = res.get('result', '')
-        if res_code == '00000':
+        try:
+            res = requests.post(url, data=json.dumps(params))
+            if res.status == 200:
+                res = res.json()
+                res_code = res.get('result_code', '')
+                result = res.get('result', '')
+                if res_code == '00000':
+                    json_response = {
+                        'ret_code': 0,
+                        'message': 'success',
+                        'data': result
+                    }
+                else:
+                    json_response = {
+                        'ret_code': res_code,
+                        'message': result
+                    }
+            else:
+                json_response = {
+                    'ret_code': 50001,
+                    'message': 'api error'
+                }
+                logger.info('zgdx connect to query api faild with status %s' % res.status)
+        except Exception, e:
             json_response = {
-                'ret_code': 0,
-                'message': 'success',
-                'data': result
+                'ret_code': 50001,
+                'message': 'api error'
             }
-        else:
-            json_response = {
-                'ret_code': res_code,
-                'message': result
-            }
-        # except Exception, e:
-        #     json_response = {
-        #         'ret_code': 50001,
-        #         'message': 'api error'
-        #     }
+            logger.info('zgdx connect to query api faild')
+            logger.info(e)
     else:
         json_response = {
             'ret_code': 50001,
             'message': 'api error'
         }
+        logger.info("zgdx_order_query coop_key, iv or url None")
 
     return json_response
 
