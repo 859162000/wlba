@@ -1,8 +1,14 @@
 -load formatters
 -load mathfilters
 if results
-  for activity in results
-    .area-active-list.font-m
+  resultsEn =enumerate(results)
+  for idx, activity in resultsEn
+    values = (idx + 1) % 3
+    if values == 0
+      ismarg = "margin-right: 0"
+    else
+      ismarg = ""
+    .area-active-list.font-m(style='{{ismarg}}')
       .area-ac-ehn
         .area-ehn-name.es {{activity.activity}}
         .area-ehn-banner
