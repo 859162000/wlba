@@ -72,6 +72,7 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, orde
 
 
 def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, order_id, user_ib=None):
+    logger.error("=20151130= _check_rules_trigger: [%s], [%s], [%s], [%s], [%s], [%s], [%s], [%s], [%s]" % (user, rule, trigger_node, device_type, amount, product_id, is_full, order_id, user_ib))
     """ check the trigger node """
     product_id = int(product_id)
     # 注册 或 实名认证
@@ -94,6 +95,8 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
         if first_pay and first_pay.order_id == order_id:
             _check_trade_amount(user, rule, device_type, amount, is_full)
         else:
+            if first_pay:
+                logger.error("=20151130= _check_rules_trigger: order_id=[%s], first_pay.order_id=[%s]" % (order_id, first_pay.order_id))
             order_pay = PayInfo.objects.filter(order_id=order_id).first()
             if order_pay:
                 logger.error("=20151130= _check_rules_trigger: order_id=[%s], status=[%s], amount=[%s]" % (order_id, order_pay.status, order_pay.amount))
@@ -178,6 +181,7 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
 
 
 def _send_gift(user, rule, device_type, is_full, amount=0):
+    logger.error("=20151130= _send_gift: [%s], [%s], [%s], [%s], [%s]" % (user, rule, device_type, is_full, amount))
     # rule_id = rule.id
     rtype = rule.trigger_node
     # 送奖品
@@ -282,6 +286,7 @@ def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
 
 
 def _check_trade_amount(user, rule, device_type, amount, is_full):
+    logger.error("=20151130= _check_trade_amount: [%s], [%s], [%s], [%s], [%s]" % (user, rule, device_type, amount, is_full))
     is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
     if amount and amount > 0:
         if is_amount:
@@ -291,6 +296,7 @@ def _check_trade_amount(user, rule, device_type, amount, is_full):
 
 
 def _check_amount(min_amount, max_amount, amount):
+    logger.error("=20151130= _check_trade_amount: [%s], [%s], [%s]" % (min_amount, max_amount, amount))
     min_amount = int(min_amount)
     max_amount = int(max_amount)
     amount = int(amount)
@@ -409,13 +415,14 @@ def _send_gift_phonefare(user, rule, amount, is_full):
 
 
 def _send_gift_redpack(user, rule, rtype, redpack_id, device_type, amount, is_full):
+    logger.error("=20151130= _send_gift_redpack: [%s], [%s], [%s], [%s], [%s], [%s], [%s]" % (user, rule, rtype, redpack_id, device_type, amount, is_full))
     """ 活动中发送的红包使用规则里边配置的模板，其他的使用系统原有的模板。 """
     if rule.send_type == 'sys_auto':
         if rule.share_type != 'inviter':
             _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, None, amount)
         if rule.share_type == 'both' or rule.share_type == 'inviter':
             user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
-            logger.info("user_introduced_by %s" % user_introduced_by)
+            #logger.info("user_introduced_by %s" % user_introduced_by)
             if user_introduced_by:
                 _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_introduced_by, amount)
     else:
@@ -428,6 +435,7 @@ def _send_gift_redpack(user, rule, rtype, redpack_id, device_type, amount, is_fu
 
 
 def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_ib=None, amount=0):
+    logger.error("=20151130= _give_activity_redpack_new: [%s], [%s], [%s], [%s], [%s], [%s], [%s]" % (user, rtype, redpack_id, device_type, rule, user_ib, amount))
     """ rule: get message template """
     now = timezone.now()
     if user_ib:
