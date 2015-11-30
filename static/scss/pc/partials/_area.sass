@@ -32,7 +32,7 @@
 
 .area-filter-nav
   position: relative
-  width: 590px
+  width: 600px
   margin: 0 auto
   color: #666666
 
@@ -45,8 +45,8 @@
     text-align: center
     border: 1px solid #f0f0f0
     cursor: pointer
-    &:last-child
-      margin-right: 0
+  .no-margin
+    margin-right: 0
   li.active
     color: #4e7cda
   .active_slide
@@ -59,11 +59,7 @@
     border-left: 1px solid #4e7cda
     border-right: 1px solid #4e7cda
     border-bottom: 2px solid #4e7cda
-    z-index: 10
-    -webkit-transition: -webkit-transform 200ms
-    transition: transform 200ms
-    -webkit-transform: translate3d(0, 0, 0)
-    transform: translate3d(0, 0, 0)
+    z-index: 100
 
 .area-active-item
 
