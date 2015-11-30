@@ -475,6 +475,8 @@ def zgdx_order_query(params):
 
         # try:
         res = requests.post(url, data=json.dumps(params))
+        print res
+        print res.text, ">>>>>>>>>>>>>>>"
         # res = res.json()
         res_code = res.get('result_code', '')
         result = res.get('result', '')
