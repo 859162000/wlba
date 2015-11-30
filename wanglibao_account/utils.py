@@ -473,26 +473,26 @@ def zgdx_order_query(params):
             'partner_no': params.get('partner_no', None),
         }
 
-        try:
-            res = requests.post(url, data=json.dumps(params)).json()
-            res_code = res.get('result_code', '')
-            result = res.get('result', '')
-            if res_code == '00000':
-                json_response = {
-                    'ret_code': 0,
-                    'message': 'success',
-                    'data': result
-                }
-            else:
-                json_response = {
-                    'ret_code': res_code,
-                    'message': result
-                }
-        except Exception, e:
+        # try:
+        res = requests.post(url, data=json.dumps(params)).json()
+        res_code = res.get('result_code', '')
+        result = res.get('result', '')
+        if res_code == '00000':
             json_response = {
-                'ret_code': 50001,
-                'message': 'api error'
+                'ret_code': 0,
+                'message': 'success',
+                'data': result
             }
+        else:
+            json_response = {
+                'ret_code': res_code,
+                'message': result
+            }
+        # except Exception, e:
+        #     json_response = {
+        #         'ret_code': 50001,
+        #         'message': 'api error'
+        #     }
     else:
         json_response = {
             'ret_code': 50001,
