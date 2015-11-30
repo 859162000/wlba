@@ -375,14 +375,6 @@ class ActivityShow(models.Model):
         ('novice', u'新手福利'),
     )
 
-    STATUS = (
-        ('waiting', u'未开始'),
-        ('active', u'进行中'),
-        ('remain_7', u'剩7天'),
-        ('remain_1', u'剩1天'),
-        ('finished', u'已结束'),
-    )
-
     activity = models.ForeignKey(Activity, verbose_name=u'活动名称')
     category = models.CharField(u'活动类型', max_length=20, choices=ACTIVITY_CATEGORY, default=u'全部')
     is_pc = models.BooleanField(u'是否主站活动', default=False)
@@ -450,6 +442,7 @@ class ActivityShow(models.Model):
     class Meta:
         verbose_name = u'活动页管理'
         verbose_name_plural = u'活动页管理'
+        ordering = ['-priority', '-created_at']
 
 
 class ActivityBannerPosition(models.Model):
@@ -472,3 +465,6 @@ class ActivityBannerPosition(models.Model):
                                                             self.second_left.activity.name,
                                                             self.second_right.activity.name,
                                                             )
+
+    class Meta:
+        ordering = ['-priority', '-created_at']
