@@ -802,9 +802,10 @@ class AppAreaView(TemplateView):
                                                     start_at__lte=timezone.now(),
                                                     end_at__gt=timezone.now()
                                                     ).select_related('activity').\
-                                                    order_by('-activity__priority')
+                                                    order_by('-priority',
+                                                             '-created_at',)
 
-        limit = 2
+        limit = 6
         page = 1
 
         activity_list, all_page, data_count = get_queryset_paginator(activity_list, 1, limit)
@@ -832,7 +833,8 @@ class AppAreaApiView(APIView):
                                                     start_at__lte=timezone.now(),
                                                     end_at__gt=timezone.now(),
                                                     ).select_related('activity').\
-                                                    order_by('-activity__priority')
+                                                    order_by('-priority',
+                                                             '-created_at',)
 
         page = request.GET.get('page', 1)
         pagesize = request.GET.get('pagesize', 6)
@@ -879,6 +881,7 @@ class AppMemorabiliaView(APIView):
             'html_data': html_data,
             'page': page,
             'all_page': all_page,
+            'list_count': data_count
         })
 
 

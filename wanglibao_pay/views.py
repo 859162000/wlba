@@ -227,7 +227,7 @@ class YeeProxyPayCompleteView(TemplateView):
         return result, amount
 
     @method_decorator(login_required(login_url='/accounts/login'))
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         # result = HuifuPay.handle_pay_result(request)
         # amount = request.POST.get('OrdAmt', '')
         #
@@ -243,7 +243,7 @@ class YeeProxyPayCompleteView(TemplateView):
             'amount': amount
             })
 
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         logger.info('web_pay_thirdpay_post_request_para'+str(request.POST))
         self._process(request)
         return HttpResponse('success')
