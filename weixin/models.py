@@ -395,6 +395,9 @@ class WeixinUser(models.Model):
     unionid = models.CharField('用户唯一标识', max_length=128, blank=True)
     scene_id = models.CharField('渠道', max_length=64, blank=True, null=True)
     auth_info = models.ForeignKey(AuthorizeInfo, null=True)
+    unsubscribe_time = models.IntegerField('用户取消关注时间', default=0)
+    bind_time = models.IntegerField('用户绑定时间', default=0)
+    unbind_time = models.IntegerField('用户解除绑定时间', default=0)
 
 
 class SubscribeService(models.Model):
@@ -420,6 +423,8 @@ class SubscribeRecord(models.Model):
     w_user = models.ForeignKey(WeixinUser, null=True)
     status = models.BooleanField(u'订阅状态, 0:退订,1:订阅', default=False)
     service = models.ForeignKey(SubscribeService, null=False)
+    subscribe_time = models.IntegerField('用户订阅时间', default=0)
+    unsubscribe_time = models.IntegerField('用户取消订阅时间', default=0)
     # update_at = models.DateTimeField('更新时间', auto_now_add=True)
 
 

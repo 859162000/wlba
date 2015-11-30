@@ -231,7 +231,7 @@ class WeixinJoinView(View):
         if content == 'td':
             sub_records = SubscribeRecord.objects.filter(w_user=w_user, status=True)
             if sub_records.exists():
-                sub_records.update(status=False)
+                sub_records.update(status=False, )
                 txt = u'订阅项目已退订成功，如需订阅相关项目，请再次点击【个性化项目】进行订阅'
             else:
                 txt = u'您没有可退订项目，如需订阅相关项目，请再次点击【个性化项目】进行订阅'
