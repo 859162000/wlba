@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 def check_activity(user, trigger_node, device_type, amount=0, product_id=0, order_id=0, is_full=False):
+    logger.error("=20151130= check_activity: [%s], [%s], [%s], [%s], [%s], [%s], [%s]" % (user, trigger_node, device_type, amount, product_id, order_id, is_full))
     now = timezone.now()
     device_type = decide_device(device_type)
     if not trigger_node:
