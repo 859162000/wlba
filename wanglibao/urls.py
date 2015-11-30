@@ -16,7 +16,6 @@ from wanglibao_account.cooperation import CoopQuery, CsaiUserQuery, CsaiInvestme
 from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsView, FinancingDetailView
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
-from wanglibao_margin.php_api import GetUserInfo, GetMarginInfo, SendInsideMessage, CheckTradePassword
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
@@ -179,10 +178,6 @@ urlpatterns += patterns(
     url(r'^wsf/(?P<phone>\w+)', AppShareViewError.as_view(), name="app_invite_error"),
     url(r'^app-invite-server/$', TemplateView.as_view(template_name="app_invite_server.jade")),
 
-    url(r'^php/get_user/$', GetUserInfo.as_view(), name='user_info'),
-    url(r'^php/margin/$', GetMarginInfo.as_view(), name='user_info'),
-    url(r'^php/send_message/$', SendInsideMessage.as_view(), name='user_info'),
-    url(r'^php/trade_password/$', CheckTradePassword.as_view(), name='user_info'),
 )
 
 # 短信

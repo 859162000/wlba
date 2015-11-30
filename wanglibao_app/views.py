@@ -247,6 +247,19 @@ class AppRepaymentPlanMonthAPIView(APIView):
         else:
             amo_list = []
 
+        if not amo_list:
+            custom_month_data = {
+                'term_date': current_month,
+                'term_date_count': 0,
+                'total_sum': 0.0,
+                'principal_sum': 0.0,
+                'interest_sum': 0.0,
+                'penal_interest_sum': 0.0,
+                'coupon_interest_sum': 0.0,
+            }
+            month_group.append(custom_month_data)
+            month_group.sort(key=lambda x: x['term_date'])
+
         return Response({'ret_code': 0,
                          'data': amo_list, 
                          'month_group': month_group,
@@ -802,9 +815,10 @@ class AppAreaView(TemplateView):
                                                     start_at__lte=timezone.now(),
                                                     end_at__gt=timezone.now()
                                                     ).select_related('activity').\
-                                                    order_by('-activity__priority')
+                                                    order_by('-priority',
+                                                             '-created_at',)
 
-        limit = 2
+        limit = 6
         page = 1
 
         activity_list, all_page, data_count = get_queryset_paginator(activity_list, 1, limit)
@@ -832,7 +846,8 @@ class AppAreaApiView(APIView):
                                                     start_at__lte=timezone.now(),
                                                     end_at__gt=timezone.now(),
                                                     ).select_related('activity').\
-                                                    order_by('-activity__priority')
+                                                    order_by('-priority',
+                                                             '-created_at',)
 
         page = request.GET.get('page', 1)
         pagesize = request.GET.get('pagesize', 6)
@@ -879,6 +894,7 @@ class AppMemorabiliaView(APIView):
             'html_data': html_data,
             'page': page,
             'all_page': all_page,
+            'list_count': data_count
         })
 
 

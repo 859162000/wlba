@@ -192,7 +192,7 @@ html
                   .product-line.mg-l-r-sm
     //product end
 
-    .i-mod-wrap.mg-t-sm
+    .i-mod-wrap.mg-t-sm.mg-b-xl
       .i-mod-news
         ul.clearfix
           li.mg-r-xxl
@@ -222,28 +222,6 @@ html
                   img(src="/media/{{news.image}}", alt="p2p理财")
                   .media-txt {{news.name}}
                   .media-time.t-d9 {{news.created_at | date:"Y-m-d"}}
-    .i-mod-wrap.mg-t-sm.mg-b-xl
-      .i-mod-cooperation
-        .cn-head.br-b-d2.font-l.clearfix
-          a(href="/partner/").cn-head-title.fl
-            i.icon.iconfont.icon-cooperation.mg-r-s.t-d7.font-xxl
-            |合作伙伴
-          .cn-head-change.fr.t-d7
-            i.icon.iconfont.icon-flip-left.mg-r-sm.font-xl.cn-last
-            i.icon.iconfont.icon-flip-right.font-xl.cn-next
-        .cn-cont
-          .cn-ul-warp
-            itemLeng = 14
-            lenarr = range(int((len(partners)+ itemLeng - 1)/ itemLeng))
-            ul
-              for i in lenarr
-                li
-                  startItem = i * itemLeng
-                  endItem = (i + 1) * itemLeng
-                  parts = enumerate(partners)
-                  for index, partner in parts
-                    if startItem <= index and index < endItem
-                        a(href="{{partner.link}}",  style="background: url('/media/{{partner.image}}') no-repeat", target="_blank", title="{{partner.name}}", rel="nofollow")
     a.bonus-icon
     .bonus-img(style='display:none')
       a.weixin_btn(href="/activity/pc_caipiao/")
@@ -251,5 +229,5 @@ html
     .page(style='display:none')
     include global/g_footer
     script.
-      require(["/static/src/pc/index.js?v=20151016"])
+      require(["/static/src/pc/index.js?v=20151130"])
     include include/tracking
