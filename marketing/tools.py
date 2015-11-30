@@ -52,15 +52,15 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False)
 
 def weixin_redpack_distribute(user):
     phone = user.wanglibaouserprofile.phone
-    logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
+    logger.info('通过weixin_redpack渠道注册,phone:%s' % (phone,))
     records = WanglibaoUserGift.objects.filter(valid=0, identity=phone)
     for record in records:
         try:
             redpack_backends.give_activity_redpack(user, record.rules.redpack, 'pc')
         except Exception, reason:
-            logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
+            logger.exception('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
         else:
-            logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (user, record.rules.redpack,))
+            logger.info('Success:发送红包完毕,user:%s, redpack:%s' % (user, record.rules.redpack,))
         record.user = user
         record.valid = 1
         record.save()
@@ -126,10 +126,9 @@ def deposit_ok(user_id, amount, device, order_id):
             'phones': [user_profile.phone],
             'messages': [messages.deposit_succeed(user_profile.name, amount)]
         })
-        logger.debug('send messages 充值金额啊啊啊: %s' % amount)
+        logger.info('send messages 充值金额啊啊啊: %s' % amount)
     except Exception, e:
-        logger.debug('send messages 充值异常啊啊啊: %s' % str(e))
-        pass
+        logger.exception('send messages 充值异常啊啊啊: %s' % str(e))
 
 
 @app.task
