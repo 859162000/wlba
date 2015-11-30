@@ -233,7 +233,7 @@
               return tool.modalAlert({
                 height:'364px',
                 title: '温馨提示',
-                msg: '<a href="/activity/thanksgiving/" style="display: block;"><img src="/static/imgs/pc/buy_ok.jpg?v=20151130"  style="width: 390px;"></img></a>份额认购成功',
+                msg: '<span style="display: block;"><img src="/static/imgs/pc/buy_ok.jpg?v=20151130"  style="width: 390px;"></img></span>份额认购成功',
                 //msg: '份额认购成功',
                 callback_ok: function() {
                   if (data.category === '酒仙众筹标') {
