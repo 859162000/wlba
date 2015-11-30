@@ -938,9 +938,9 @@ class ThanksGivingDistribute(ActivityRewardDistribute):
 
         level = request.DATA.get('level', "5000+")
         if level == "5000+":
-            sum_reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', p2p_amount__gte=5000).exclude(redpack_event=None).aggregate(left_sum=Sum('left_times'))
+            sum_reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', p2p_amount__gte=5000).aggregate(left_sum=Sum('left_times'))
         elif level == "5000-":
-            sum_reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', p2p_amount__lt=5000).exclude(reward=None).aggregate(left_sum=Sum('left_times'))
+            sum_reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', p2p_amount__lt=5000).aggregate(left_sum=Sum('left_times'))
         if 'GET_REWARD_INFO' == action:
             json_to_response = {
                 'ret_code': 1001,
@@ -952,9 +952,9 @@ class ThanksGivingDistribute(ActivityRewardDistribute):
         if 'POINT_AT' == action:
 
             if level == "5000+":
-                reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', left_times__gt=0, has_sent=False, p2p_amount__gte=5000).exclude(redpack_event=None).first()
+                reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', left_times__gt=0, has_sent=False, p2p_amount__gte=5000).first()
             elif level == "5000-":
-                reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', left_times__gt=0, has_sent=False, p2p_amount__lt=5000).exclude(reward=None).first()
+                reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='ThanksGiven', left_times__gt=0, has_sent=False, p2p_amount__lt=5000).first()
 
             reward_name = None
             if reward:
