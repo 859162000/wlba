@@ -8,7 +8,7 @@ from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from weixin.util import _generate_ajax_template
-from .utils import get_queryset_paginator
+from .utils import get_queryset_paginator, get_sorts_for_activity_show
 
 class TemplatesFormatTemplate(TemplateView):
     def get_context_data(self, **kwargs):
@@ -113,13 +113,11 @@ class PcActivityAreaView(TemplateView):
                                                     is_pc=True,
                                                     start_at__lte=timezone.now(),
                                                     end_at__gt=timezone.now()
-                                                    ).select_related('activity').\
-                                                    order_by('-priority',
-                                                             '-created_at',)
+                                                    ).select_related('activity')
 
-        banner = ActivityBannerPosition.objects.all().select_related().order_by('-priority',
-                                                                                '-created_at',
-                                                                                ).first()
+        activity_list = get_sorts_for_activity_show(activity_list)
+
+        banner = ActivityBannerPosition.objects.all().select_related().first()
 
         limit = 6
         page = 1
@@ -149,9 +147,9 @@ class ActivityAreaApi(APIView):
                                                     is_pc=True,
                                                     start_at__lte=timezone.now(),
                                                     end_at__gt=timezone.now(),
-                                                    ).select_related('activity').\
-                                                    order_by('-priority',
-                                                             '-created_at',)
+                                                    ).select_related('activity')
+
+        activity_list = get_sorts_for_activity_show(activity_list)
 
         category = request.GET.get('category', 'all')
 
