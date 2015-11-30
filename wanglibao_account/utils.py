@@ -474,8 +474,9 @@ def zgdx_order_query(params):
         }
 
         # try:
-        res = requests.post(url, data=json.dumps(params)).text
-        res = json.loads(res)
+        res = requests.post(url, data=json.dumps(params))
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>%s" % res)
+        logger.info(res.text)
         res_code = res.get('result_code', '')
         result = res.get('result', '')
         if res_code == '00000':
