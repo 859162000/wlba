@@ -243,7 +243,8 @@ def require_trade_pwd(view_func):
                 return view_func(self, request, *args, **kwargs)
 
             # logging.getLogger('django').error('trade request user %s pwd %s %s'%(request.user.id, request.POST.get('trade_pwd'), len(request.POST.get('trade_pwd'))))
-            check_result = trade_pwd_check(request.user.id, request.POST.get('trade_pwd', ''))
+            # check_result = trade_pwd_check(request.user.id, request.POST.get('trade_pwd', ''))
+            check_result = trade_pwd_check(request.user.id, self.params.get('trade_pwd', ''))
             if check_result.get('ret_code') == 0 :
                 return view_func(self, request, *args, **kwargs)
             else:
