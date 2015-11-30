@@ -10,6 +10,7 @@ from .common.wechat import gen_token
 from wechatpy.client import WeChatClient
 from wechatpy.client.api.qrcode import WeChatQRCode
 import logging
+from django.core.exceptions import ValidationError
 
 logger = logging.getLogger("weixin")
 
@@ -141,13 +142,38 @@ class Account(models.Model):
         self.oauth_refresh_token = ''
         self.save()
 
+class WeiXinChannel(models.Model):
+    """
+        微信关注渠道表
+    """
+    code = models.CharField(u'渠道代码', max_length=12, db_index=True, unique=True)
+    digital_code = models.CharField(u'渠道数字代号', max_length=12, db_index=True, unique=True)
+    name = models.CharField(u'渠道名字', max_length=20, default="")
+    description = models.CharField(u'渠道描述', max_length=50, default="", blank=True)
+    is_abandoned = models.BooleanField(u'是否废弃', default=False)
+
+    class Meta:
+        verbose_name_plural = u"微信关注渠道"
+
+    def clean(self):
+        if len(self.code) == 6:
+            raise ValidationError(u'为避免和邀请码重复，渠道代码长度不能等于6位')
+        #
+        # if self.classification == '----':
+        #     raise ValidationError(u'请选择渠道分类')
+
+    def __unicode__(self):
+        return self.name
+
+
 class QrCode(models.Model):
     account_original_id = models.CharField('所属公众号原始ID', max_length=32, blank=True, db_index=True)
     ticket = models.CharField('ticket', max_length=512, null=False)
     expire_at = models.DateTimeField('ticket过期时间', auto_now_add=True, blank=True, null=True)
     url = models.CharField('url', max_length=512, null=False)
     qrcode_url = models.CharField('qrcode_url', max_length=512, null=False)
-    scene_str = models.CharField('scene_str', max_length=128, null=False)
+    # scene_str = models.CharField('scene_str', max_length=128, null=False)
+    WeiXinChannel = models.ForeignKey(WeiXinChannel, null=True)
     create_at = models.DateTimeField('生成时间', auto_now_add=True, blank=True, null=True)
     def ticket_generate(self):
         return u'<a href="/weixin/api/generate/qr_limit_scene_ticket/?id=%s" target="_blank">生成ticket</a>' % (self.id,)
