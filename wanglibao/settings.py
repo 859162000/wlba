@@ -569,6 +569,15 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
+CELERY_QUEUES = {
+                "celery":  {"exchange": "celery",
+                              "routing_key": "celery"},
+                "celery01": {"exchange": "celery01",
+                              "routing_key": "celery01"},
+                "celery02": {"exchange": "celery02",
+                              "routing_key": "celery02"},
+                }
+
 from datetime import timedelta, datetime
 
 CELERYBEAT_SCHEDULE = {
@@ -1180,8 +1189,8 @@ THREE_DEFAULT_CHANNEL_CODE = 'wanglibao-three'
 if ENV == ENV_PRODUCTION:
     WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
 else:
-    WEIXIN_CALLBACK_URL = 'https://staging.wanglibao.com'
-    CALLBACK_HOST='https://staging.wanglibao.com'
+    WEIXIN_CALLBACK_URL = 'http://84de5958.ngrok.io'
+    CALLBACK_HOST='http://84de5958.ngrok.io'
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)
 WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'
