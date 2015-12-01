@@ -94,7 +94,7 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
         if first_pay and int(first_pay.order_id) == int(order_id):
             # Add by hb only for debug
             if first_pay.order_id <> order_id:
-                logger.exception("=_check_rules_trigger= first_pay: type(%s)=[%s], type(%s)=[%s]" % first_pay.order_id, type(first_pay.order_id), order_id, type(order_id))
+                logger.exception("=_check_rules_trigger= first_pay: type(%s)=[%s], type(%s)=[%s]" % (first_pay.order_id, type(first_pay.order_id), order_id, type(order_id)))
             _check_trade_amount(user, rule, device_type, amount, is_full)
         else:
             # Add by hb only for debug
