@@ -159,7 +159,16 @@ class MarginKeeper(KeeperBaseMixin):
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
             margin.margin += amount
             if catalog == u'现金存入':
-                margin.uninvested += amount  # 充值未投资金融
+                try:
+                    # 获取费率配置
+                    from wanglibao_pay.fee import WithdrawFee
+                    fee_misc = WithdrawFee()
+                    fee_config = fee_misc.get_withdraw_fee_config()
+
+                    if fee_config.get('switch') == 'on':
+                        margin.uninvested += amount  # 充值未投资金融
+                except Exception:
+                    logger.debug(u"获取费率配置或充值未投资金额增加失败,用户:{}, 充值金额:{}".format(self.user.id, amount))
             margin.save()
             catalog = catalog
             record = self.__tracer(catalog, amount, margin.margin, description)
