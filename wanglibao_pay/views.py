@@ -1127,7 +1127,7 @@ class WithdrawAPIView(DecryptParmsAPIView):
                                                 "openid":weixin_user.openid,
                                                 "template_id":WITH_DRAW_SUBMITTED_TEMPLATE_ID,
                                                 "first":u"亲爱的%s，您的提现申请已受理"%name,
-                                                "keyword1":result['amount'],
+                                                "keyword1":str(result['amount']),
                                                 "keyword2":bank_name,
                                                 "keyword3":withdraw_ok_time,
                                                     })},

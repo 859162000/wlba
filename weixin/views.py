@@ -422,7 +422,7 @@ class WeixinRegister(TemplateView):
         elif token_session:
             token = token_session
         else:
-            token = 'fwh'
+            token = 'weixin'
 
         if token:
             channel = get_channel_record(token)
