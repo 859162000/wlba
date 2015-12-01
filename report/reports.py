@@ -147,7 +147,7 @@ class WithDrawReportGenerator(ReportGeneratorBase):
 
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow(['Id', u'用户名', u'真实姓名', u'身份证', u'手机', u'提现银行', u'支行', u'所在地', u'提现账号',
-                         u'提现总额', u'到账金额', u'手续费', u'提现时间', u'提现ip', u'状态', u'审核时间', u'编号'])
+                         u'提现总额', u'到账金额', u'手续费', u'提现时间', u'提现ip', u'状态', u'审核时间', u'编号', u'资金管理费', u'管理费计算金额'])
 
         for payinfo in payinfos:
             confirm_time = ""
@@ -173,7 +173,9 @@ class WithDrawReportGenerator(ReportGeneratorBase):
                 str(payinfo.request_ip),
                 unicode(payinfo.status),
                 confirm_time,
-                unicode(payinfo.uuid)
+                unicode(payinfo.uuid),
+                str(payinfo.management_fee),
+                str(payinfo.management_amount),
             ])
         return output.getvalue()
 
@@ -266,7 +268,7 @@ class PaybackReportGenerator(ReportGeneratorBase):
         output = cStringIO.StringIO()
         writer = UnicodeWriter(output, delimiter='\t')
         writer.writerow([u'序号', u'贷款号', u'借款人', u'借款标题', u'借款期数', u'借款类型', u'应还日期',
-                         u'应还本息', u'应还本金', u'应还利息', u'状态', u'编号', u'完成时间'])
+                         u'应还本息', u'应还本金', u'应还利息', u'状态', u'编号', u'完成时间', u'加息利息'])
 
         amortizations = UserAmortization.objects.filter(term_date__gte=start_time, term_date__lt=end_time) \
             .prefetch_related('product_amortization').prefetch_related('product_amortization__product') \
@@ -292,7 +294,8 @@ class PaybackReportGenerator(ReportGeneratorBase):
                 # u'待还',
                 amortization.product_amortization.product.status,
                 unicode("wanglibao_yhhkjl_" + str(amortization.id)),
-                settled_at
+                settled_at,
+                str(amortization.coupon_interest)
             ])
         return output.getvalue()
 
