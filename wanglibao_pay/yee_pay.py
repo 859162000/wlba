@@ -596,6 +596,7 @@ class YeeShortPay:
         card_no = request.DATA.get("card_no", "").strip()
         input_phone = request.DATA.get("phone", "").strip()
         gate_id = request.DATA.get("gate_id", "").strip()
+        device_type = split_ua(request)['device_type']
 
         if not amount or not card_no:
             return {"ret_code": 20112, 'message': '信息输入不完整'}
@@ -665,6 +666,7 @@ class YeeShortPay:
             pay_info.user = user
             pay_info.channel = "yeepay_bind"
 
+            pay_info.device = device_type
             pay_info.request_ip = util.get_client_ip(request)
             order = OrderHelper.place_order(user, Order.PAY_ORDER, pay_info.status, pay_info=model_to_dict(pay_info))
             pay_info.order = order
@@ -887,12 +889,11 @@ class YeeShortPay:
 
         pay_info.save()
         if rs['ret_code'] == 0:
-            device = split_ua(request)
-
+            device_type = pay_info.device
             try:
                 # fix@chenweibi, add order_id
                 tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
-                                                     "device": device, "order_id": orderId})
+                                                     "device": device_type, "order_id": orderId})
                 CoopRegister(request).process_for_recharge(pay_info.user, pay_info.order_id)
             except:
                 pass
