@@ -99,9 +99,11 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
         else:
             if first_pay:
                 if first_pay.order_id == order_id:
-                    logger.error("=20151130= _check_rules_trigger: order_id=[%s], first_pay.order_id=[%s], isEval" % (order_id, first_pay.order_id))
+                    logger.error("=20151130= _check_rules_trigger: order_id=[%s], first_pay.order_id=[%s], Eval" % (order_id, first_pay.order_id))
+                elif int(first_pay.order_id) == int(order_id):
+                    logger.error("=20151130= _check_rules_trigger: order_id=[%s], first_pay.order_id=[%s], int-Eval" % (order_id, first_pay.order_id))
                 else:
-                    logger.error("=20151130= _check_rules_trigger: order_id=[%s], first_pay.order_id=[%s], notEval" % (order_id, first_pay.order_id))
+                    logger.error("=20151130= _check_rules_trigger: order_id=[%s], first_pay.order_id=[%s], not-Eval" % (order_id, first_pay.order_id))
             order_pay = PayInfo.objects.filter(order_id=order_id).first()
             if order_pay:
                 logger.error("=20151130= _check_rules_trigger: order_id=[%s], status=[%s], amount=[%s]" % (order_id, order_pay.status, order_pay.amount))
