@@ -151,8 +151,8 @@ def deposit_ok(user_id, amount, device, order_id):
                                         "template_id":DEPOSIT_SUCCESS_TEMPLATE_ID,
                                         "first":u"亲爱的%s，您的充值已成功"%user_profile.name,
                                         "keyword1":deposit_ok_time,
-                                        "keyword2":amount,
-                                        "keyword3":margin.margin,
+                                        "keyword2":str(amount),
+                                        "keyword3":str(margin.margin),
                                             })},
                                         queue='celery02')
 
