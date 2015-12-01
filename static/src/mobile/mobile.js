@@ -279,7 +279,6 @@ org.ui = (function(){
                 if(!typeof(ops) === 'object') return ;
                 $.each(ops, function(i){
                     $('.'+ops[i].target).addClass(ops[i].addName).removeClass(ops[i].reMove);
-                    console.log(ops[i].reMove)
                 })
             }
             var returnCheckArr = function(){
@@ -1476,21 +1475,77 @@ org.bankcardAdd = (function(org){
 
 org.processFirst = (function(org){
     var lib = {
+        $submit : $('button[type=submit]'),
+        $name : $('input[name=name]'),
+        $idcard : $('input[name=idcard]'),
         init:function(){
             lib.form_logic()
+            lib._postData()
         },
         form_logic: function(){
-            var $submit = $('button[type=submit]'),
-                $name = $('input[name=name]'),
-                $idcard = $('input[name=idcard]');
+            var _self = this;
 
             org.ui.focusInput({
-                submit : $submit,
+                submit : _self.$submit,
                 inputList: [
-                    {target : $name,  required:true},
-                    {target :$idcard,required : true}
+                    {target : _self.$name,  required:true},
+                    {target : _self.$idcard, required : true}
                 ]
             });
+        },
+        _postData :function(){
+            var _self = this, data = {};
+            _self.$submit.on('click',function(){
+                data = {
+                    name: _self.$name.val(),
+                    id_number: _self.$idcard.val()
+                };
+                _self._check($('.check-list')) && _self._forAuthentication(data)
+            });
+
+
+        },
+        _check: function(checklist){
+            var check = true,
+                reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+
+            checklist.each(function(i){
+                if($(this).val() == ''){
+                    org.ui.showSign($(this).attr('placeholder'))
+                    return check = false;
+                }else{
+                    if(i === 1 && !reg.test($(this).val())){
+                        org.ui.showSign('请输入正确的身份证号')
+                        return check =false;
+                    }
+                }
+            })
+
+            return check
+        },
+        _forAuthentication:function(postdata){
+            org.ajax({
+                type: 'POST',
+                url : '/api/id_validate/',
+                data : postdata,
+                beforeSend:function(){
+                    //lib.isPost = false;
+                    //lib.$fromComplete.text("认证中，请等待...");
+                },
+                success:function(){
+                    org.ui.alert("实名认证成功!",function(){
+                       return window.location.href = '/weixin/account/';
+                    });
+                },
+                error:function(xhr){
+                    result = JSON.parse(xhr.responseText);
+                    return org.ui.alert(result.message);
+                },
+                complete:function(){
+                    //lib.isPost = true;
+                    //lib.$fromComplete.text("完成");
+                }
+            })
         }
     }
     return {
