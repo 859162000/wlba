@@ -2119,6 +2119,7 @@ class ThirdOrderQueryApiView(APIView):
                     'ret_code': 50001,
                     'message': 'api error'
                 }
+                logger.error('%s_order_query not found' % channel_code.lower())
         else:
             json_response = {
                 'ret_code': 10002,

@@ -19,6 +19,9 @@ urlpatterns = patterns(
     url(r'^regist/$', views.WeixinRegister.as_view(), name="weixin_register"),
     url(r'^regist/succees/$', TemplateView.as_view(template_name="weixin_regist_succees_new.jade")),
     url(r'^regist/first/$', TemplateView.as_view(template_name="weixin_registProcess_first.jade")),
+    url(r'^regist/second/$', TemplateView.as_view(template_name="weixin_registProcess_second.jade")),
+
+
     url(r'^security/$', login_required(views.WeixinAccountSecurity.as_view(), login_url='/weixin/login/'), name='weixin_security'),
     url(r'^authentication/', TemplateView.as_view(template_name="weixin_authentication.jade")),
     url(r'^recharge/$', login_required(views.WeixinRecharge.as_view(), login_url='/weixin/login/'), name='weixin_recharge_first'),
