@@ -435,6 +435,13 @@ def _send_gift_redpack(user, rule, rtype, redpack_id, device_type, amount, is_fu
 
 
 def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_ib=None, amount=0):
+    # add by hb for debug
+    try:
+        phone = user.wanglibaouserprofile.phone
+    except:
+        phone = None
+    logger.debug("=_give_activity_redpack_new= [%s], [%s], [%s], [%s], [%s], [%s], [%s]" % (phone, rtype, redpack_id, device_type, rule, user_ib, amount))
+    print("=_give_activity_redpack_new= [%s], [%s], [%s], [%s], [%s], [%s], [%s]" % (phone, rtype, redpack_id, device_type, rule, user_ib, amount))
     """ rule: get message template """
     now = timezone.now()
     if user_ib:
@@ -451,9 +458,9 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
     else:
         return
 
-    print redpack_id_list
+    #print redpack_id_list
     if len(redpack_id_list) == 1:
-        print(redpack_id_list[0])
+        #print(redpack_id_list[0])
         red_pack_event = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, id=redpack_id_list[0],
                                                      give_start_at__lt=now, give_end_at__gt=now).first()
         if red_pack_event:
