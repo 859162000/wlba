@@ -380,6 +380,47 @@ class Reward(models.Model):
         return u'<%s>' % self.type
 
 
+class P2PReward(models.Model):
+    """ P2P奖品存储
+    """
+
+    REWARD_TYPE = (
+        (u'加油卡', u'加油卡'),
+    )
+
+    type = models.CharField(u'奖品类型', max_length=40, default=u'加油卡', choices=REWARD_TYPE)
+    channel = models.ForeignKey(Channels, verbose_name=u'奖品渠道')
+    description = models.TextField(u'奖品描述', null=True)
+    content = models.CharField(u'奖品内容', max_length=128)
+    is_used = models.BooleanField(u'是否使用', default=False)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+    end_time = models.DateTimeField(u'结束时间', null=True, blank=True)
+
+    class Meta:
+        ordering = ['-create_time']
+        verbose_name_plural = u'P2P奖品'
+
+    def __unicode__(self):
+        return u'<%s>' % self.type
+
+
+class P2PRewardRecord(models.Model):
+    """ P2P奖品发放流水
+    """
+    user = models.ForeignKey(User)
+    reward = models.ForeignKey(P2PReward)
+    description = models.TextField(u'发放奖品流水说明', null=True)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+    order_id = models.IntegerField(u'关联订单编号', null=True)
+
+    class Meta:
+        ordering = ['-create_time']
+        verbose_name_plural = u'P2P奖品发放流水'
+
+    def __unicode__(self):
+        return u'<%s>' % self.user
+
+
 class RewardRecord(models.Model):
     """ 奖品发放流水
     """

@@ -85,7 +85,8 @@ class P2PProduct(ProductBase):
         (u'证大速贷', u'证大速贷'),
         (u'票据', u'票据'),
         (u'新手标', u'新手标'),
-        (u'酒仙众筹标', u'酒仙众筹标')
+        (u'酒仙众筹标', u'酒仙众筹标'),
+        (u'加油卡', u'加油卡'),
     )
 
     PAY_METHOD_CHOICES = (
@@ -190,6 +191,7 @@ class P2PProduct(ProductBase):
     make_loans_time = models.DateTimeField(u'放款时间', null=True, blank=True)
 
     limit_per_user = models.FloatField(verbose_name=u'单用户购买限额(0-1的系数)*', default=1)
+    limit_min_per_user = models.FloatField(u'单用户购买最低额度', default=0, help_text=u'加油卡')
 
     warrant_company = models.ForeignKey(WarrantCompany, verbose_name=u'担保公司', blank=False)
     usage = models.TextField(blank=False, verbose_name=u'借款用途(合同用)*')
