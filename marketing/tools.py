@@ -107,7 +107,14 @@ def deposit_ok(user_id, amount, device, order_id):
     # fix@chenweibi, add order_id
     try:
         try:
-            device_type = device['device_type']
+            # 支持通过字典传递完整的device信息或是通过str直接传device_type
+            if isinstance(device, dict):
+                device_type = device['device_type']
+            elif isinstance(device, str):
+                assert device in ['pc', 'ios', 'android']
+                device_type = device
+            else:
+                raise
         except:
             device_type = u'pc'
             logger.exception("=deposit_ok= Failed to get device_type")
