@@ -14,33 +14,33 @@ html(style='background:#f5f5f5;')
       .form-list
         .form-icon.binding-bank.bank-icon
         .form-input
-          select(name="bank", type='select', data-target2='binding-bank', data-icon='bank-icon')
+          select(name="bank", type='select', data-target2='binding-bank', data-icon='bank-icon', data-sign= '请选择银行')
             option(value = '')  请选择银行
-            option(value = "2") 建设银行
-            option(value = "3") 北京银行
-            option(value = "4") 建设银行
+
 
       .form-list
         .form-icon.binding-bankcard.bankcard-icon
         .form-input
-          input(type="tel",name='bankcard',value='', placeholder="请输入银行卡号", data-target2='binding-bankcard', data-icon='bankcard-icon')
+          input(type="tel",name='bankcard',value='', data-sign= '银行卡号错误', placeholder="请输入银行卡号", data-target2='binding-bankcard', data-icon='bankcard-icon')
 
       .form-list
         .form-icon.binding-bankphone.bankphone-icon
         .form-input
-          input(type="tel",name='bankphone',value='', placeholder="请输入银行预留手机号", data-target2='binding-bankphone', data-icon='bankphone-icon', data-target = 'regist-validation', data-empty='regist-validation-disable', data-val='')
+          input(type="tel",name='bankphone',value='', data-sign= '手机号错误', placeholder="请输入银行预留手机号", data-target2='binding-bankphone', data-icon='bankphone-icon', data-target = 'regist-validation', data-empty='regist-validation-disable', data-val='')
+
+      .form-list
+        .form-icon.binding-amount.amount-icon
+        .form-input
+          input(type="tel",name='money',value='', data-sign= '请输入正确的金额', placeholder="请输入充值金额", data-target2='binding-amount', data-icon='amount-icon')
 
       .form-code
         .form-list.form-validation
           .form-icon.binding-validation.validation-icon
           .form-input
-            input(type="tel",name="validation", placeholder="请输入短信验证码",data-target2='binding-validation', data-icon='validation-icon')
+            input(type="tel",name="validation", data-sign= '验证码错误', placeholder="请输入短信验证码",data-target2='binding-validation', data-icon='validation-icon')
         .login-validation
-          button(type="button").request-check.regist-validation.regist-validation-disable 获取验证码
-      .form-list
-        .form-icon.binding-amount.amount-icon
-        .form-input
-          input(type="tel",name='money',value='', placeholder="请输入充值金额", data-target2='binding-amount', data-icon='amount-icon')
+          button(type="button", disabled=true).request-check.regist-validation.regist-validation-disable 获取验证码
+
 
 
 
