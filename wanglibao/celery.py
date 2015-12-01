@@ -1,3 +1,4 @@
+# encoding:utf-8
 from __future__ import absolute_import
 import os
 import logging
@@ -18,7 +19,8 @@ class WangliTask(Task):
 
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wanglibao.settings')
-app = Celery('wanglibao', task_cls=WangliTask)
+# app = Celery('wanglibao', task_cls=WangliTask)
+app = Celery('wanglibao')
 app.config_from_object('django.conf:settings')
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
