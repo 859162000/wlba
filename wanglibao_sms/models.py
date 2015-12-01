@@ -29,6 +29,8 @@ class PhoneValidateCode(models.Model):
     code_send_count = models.IntegerField(default=0)
     vcount = models.IntegerField(u"验证次数", null=False, blank=False, default=0)
     data = models.TextField(default="")
+    # Add by hb on  2015-12-01
+    create_time = models.DateTimeField(db_index=True, null=True, blank=True)
 
     class Meta:
         verbose_name_plural = u'验证码'
