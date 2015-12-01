@@ -577,7 +577,7 @@ org.regist = (function(org){
                     },
                     success:function(data){
                         if(data.ret_code === 0){
-                            var next = org.getQueryStringByName('next') == '' ? '/weixin/regist/succees/?phone='+$identifier.val() : org.getQueryStringByName('next');
+                            var next = org.getQueryStringByName('next') == '' ? '/weixin/regist/first/' : org.getQueryStringByName('next');
                             next = org.getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ org.getQueryStringByName('mobile');
                             next = org.getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ org.getQueryStringByName('serverId');
                             window.location.href = next;
@@ -1541,7 +1541,7 @@ org.processFirst = (function(org){
                 success:function(data){
                     if(data.validate != true) return org.ui.alert('认证失败，请重试');
                         org.ui.alert("实名认证成功!",function(){
-                           return window.location.href = '/weixin/account/';
+                           return window.location.href = '/weixin/regist/second/';
                         });
                 },
                 error:function(xhr){
@@ -1569,8 +1569,9 @@ org.processSecond = (function(org){
         $money: $('input[name=money]'),
         init: function(){
             lib._init_select();
-            lib.form_logic()
-            lib._postData()
+            lib.form_logic();
+            lib._validation();
+            lib._submit();
         },
         _init_select: function(){
             if(localStorage.getItem('bank')){
@@ -1643,20 +1644,16 @@ org.processSecond = (function(org){
             });
 
         },
-        _postData: function(){
+        _validation: function(){
             var _self = this,
                 re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/),
                 $validationBtn = $('.regist-validation');
-
-            _self.$submit.on('click', function(){
-
-            });
 
             $validationBtn.on('click', function(){
                 var count = 60, intervalId ; //定时器
 
                 if(_self.$bankcard.val().length < 10){
-                    return org.ui.alert('银行卡号错误');
+                    return org.ui.alert('银行卡号不正确');
                 }
 
                 if(!re.test(_self.$bankphone.val())){
@@ -1675,7 +1672,6 @@ org.processSecond = (function(org){
                         return
                     }
                 };
-
                 org.ajax({
                     type: 'POST',
                     url: '/api/pay/deposit_new/',
@@ -1690,19 +1686,55 @@ org.processSecond = (function(org){
                             clearInterval(intervalId);
                             $validationBtn.text('重新获取').removeAttr('disabled').css('background','#50b143')
                             return org.ui.alert(data.message);
+                        }else {
+                            $("input[name='order_id']").val(data.order_id);
+                            $("input[name='token']").val(data.token);
                         }
                     },
                     error:function(data){
-                        console.log(data)
-                    },
-                    complete:function(){
                         clearInterval(intervalId);
                         $validationBtn.text('重新获取').removeAttr('disabled').css('background','#50b143')
+                        return org.ui.alert(data);
                     }
                 })
                 timerFunction();
                 return intervalId = setInterval(timerFunction, 1000);
             })
+        },
+        _submit: function(){
+            var _self = this;
+
+            _self.$submit.on('click',function(){
+                org.ui.confirm("充值金额为" + _self.$money.val(), '确认充值', recharge);
+
+            });
+
+            function recharge(){
+                org.ajax({
+                    type: 'POST',
+                    url: '/api/pay/cnp/dynnum_new/',
+                    data: {
+                         phone: _self.$bankphone.val(),
+                         vcode: _self.$validation.val(),
+                         order_id: $('input[name=order_id]').val(),
+                         token: $('input[name=token]').val()
+                    },
+                    beforeSend:function(){
+                        _self.$submit.attr('disabled', 'disabled').text('充值中...');
+                    },
+                    success: function(data) {
+                        if(data.ret_code > 0) {
+                            return org.ui.alert(data.message);
+                        } else {
+                           $('.sign-main').css('display','-webkit-box').find(".balance-sign").text(data.amount);
+                        }
+                    },
+                    complete:function(){
+                        _self.$submit.removeAttr('disabled').text('绑卡并充值');
+                    }
+                })
+            }
+
         }
     }
     return {
