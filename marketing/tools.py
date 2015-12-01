@@ -106,7 +106,19 @@ def idvalidate_ok(user_id, device):
 def deposit_ok(user_id, amount, device, order_id):
     # fix@chenweibi, add order_id
     try:
-        device_type = device['device_type']
+        try:
+            # 支持通过字典传递完整的device信息或是通过str直接传device_type
+            if isinstance(device, dict):
+                device_type = device['device_type']
+            elif isinstance(device, str):
+                assert device in ['pc', 'ios', 'android']
+                device_type = device
+            else:
+                raise
+        except:
+            device_type = u'pc'
+            logger.exception("=deposit_ok= Failed to get device_type")
+
         title, content = messages.msg_pay_ok(amount)
         inside_message.send_one.apply_async(kwargs={
             "user_id": user_id,
@@ -114,6 +126,7 @@ def deposit_ok(user_id, amount, device, order_id):
             "content": content,
             "mtype": "activityintro"
         })
+
         user = User.objects.get(id=user_id)
         user_profile = user.wanglibaouserprofile
         activity_backends.check_activity(user, 'recharge', device_type,
@@ -122,13 +135,14 @@ def deposit_ok(user_id, amount, device, order_id):
             utils.log_clientinfo(device, "deposit", user_id, order_id, amount)
         except Exception:
             pass
+
         send_messages.apply_async(kwargs={
             'phones': [user_profile.phone],
             'messages': [messages.deposit_succeed(user_profile.name, amount)]
         })
-        logger.info('send messages 充值金额啊啊啊: %s' % amount)
+        logger.info('=deposit_ok= Success: [%s], [%s]' % user_profile.phone, order_id, amount)
     except Exception, e:
-        logger.exception('send messages 充值异常啊啊啊: %s' % str(e))
+        logger.exception('=deposit_ok= Except: [%s]' % str(e))
 
 
 @app.task

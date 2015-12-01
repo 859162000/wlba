@@ -475,7 +475,9 @@ def zgdx_order_query(params):
 
         try:
             res = requests.post(url, data=json.dumps(params))
-            if res.status == 200:
+            if res.status_code == 200:
+                logger.info(res.content)
+                logger.info(">>>>>>>>>>>>>>>>>>>%s" % res.text)
                 res = res.json()
                 res_code = res.get('result_code', '')
                 result = res.get('result', '')
@@ -495,7 +497,7 @@ def zgdx_order_query(params):
                     'ret_code': 50001,
                     'message': 'api error'
                 }
-                logger.info('zgdx connect to query api faild with status %s' % res.status)
+                logger.info('zgdx connect to query api faild with status %s' % res.status_code)
         except Exception, e:
             json_response = {
                 'ret_code': 50001,

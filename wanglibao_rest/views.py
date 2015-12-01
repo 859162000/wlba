@@ -928,9 +928,9 @@ class LoginAPIView(DecryptParmsAPIView):
                 pu.push_channel_id = push_channel_id
                 pu.save()
         token, created = Token.objects.get_or_create(user=user)
-        if not created:
-            token.delete()
-            token, created = Token.objects.get_or_create(user=user)
+        # if not created:
+        #     token.delete()
+        #     token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, "user_id":user.id}, status=status.HTTP_200_OK)
 
 class ObtainAuthTokenCustomized(ObtainAuthToken):
