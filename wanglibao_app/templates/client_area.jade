@@ -11,7 +11,7 @@ html(style='background:#f5f5f5;')
             li.active
               a(href="javascript:void(0)") 最新活动
             li
-              a(href="javascript:void(0)") 里程碑
+              a(href="javascript:void(0)") 大事件
           .slide-bottom
 
       .swiper-container.area-container
@@ -19,35 +19,18 @@ html(style='background:#f5f5f5;')
           .area-latest.swiper-slide.area-scroll
             .area-item.area-latest-push
               include include/ajax/ajax_area_latest
-            .area-latest-more
-              .area-latest-btn 查看更多
+            if page < all_page
+              .area-latest-more
+                .area-latest-btn 查看更多
           .area-milepost.swiper-slide.area-scroll
             .area-item.area-milepost-push
-              include include/ajax/ajax_area_milepost
-              .area-milepost-more 查看更多
+              .area-milepost-loading.unactivty 加载中..
+              //include include/ajax/ajax_area_milepost
+            .area-milepost-more(style='display:none')
+              .area-milepost-btn 查看更多
 
     // banner javascript
     script(src="/static/scripts/mobile/swiper/swiper.min.js")
     script(src='/static/scripts/app/area.js', data-init='area')
     script.
-      var myswiper = new Swiper('.swiper-container', {
-          loop: false,
-          lazyLoading: false,
-          onSliderMove: function (swiper) {
-            var translateX = -(swiper.getWrapperTranslate()/2)
-            $('.slide-bottom').css('-webkit-transform', 'translate3d('+translateX+'px, 0, 0)')
-          },
-          onTouchEnd: function(swiper){
-            var translateX = 100 * swiper.activeIndex + '%';
-            $('.slide-bottom').css('-webkit-transform', 'translate3d('+translateX+', 0, 0)')
-          },
-          onSlideChangeStart: function(swiper){
-            var translateX = 100 * swiper.activeIndex + '%';
-            $('.slide-bottom').css('-webkit-transform', 'translate3d('+translateX+', 0, 0)')
-          }
-      });
-      $('.tab-nav li').on('touchend click', function(){
-        var index = $(this).index();
-        $(this).addClass('active').siblings().removeClass('active')
-        myswiper.slideTo(index, 400);
-      });
+

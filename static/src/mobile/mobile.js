@@ -1473,6 +1473,58 @@ org.bankcardAdd = (function(org){
     }
 })(org);
 
+org.processFirst = (function(org){
+    var lib = {
+        init:function(){
+            lib.form_logic()
+        },
+        form_logic: function(){
+            var $submit = $('button[type=submit]'),
+                $name = $('input[name=name]'),
+                $idcard = $('input[name=idcard]');
+
+            org.ui.focusInput({
+                submit : $submit,
+                inputList: [
+                    {target : $name,  required:true},
+                    {target :$idcard,required : true}
+                ]
+            });
+        }
+    }
+    return {
+        init : lib.init
+    }
+})(org);
+org.processSecond = (function(org){
+    var lib = {
+        init:function(){
+            lib.form_logic()
+        },
+        form_logic: function(){
+            var $submit = $('button[type=submit]'),
+                $bank = $('input[name=bank]'),
+                $bankcard = $('input[name=bankcard]'),
+                $bankphone = $('input[name=bankphone]'),
+                $validation = $('input[name=validation]'),
+                $money = $('input[name=money]');
+
+            org.ui.focusInput({
+                submit : $submit,
+                inputList: [
+                    {target : $bank,  required:true},
+                    {target : $bankcard,required : true},
+                    {target : $bankphone,required : true},
+                    {target : $validation,required : true},
+                    {target : $money,required : true}
+                ]
+            });
+        }
+    }
+    return {
+        init : lib.init
+    }
+})(org);
 ;(function(org){
     $.each($('script'), function(){
         var src = $(this).attr('src');

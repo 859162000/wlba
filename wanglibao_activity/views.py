@@ -2,12 +2,15 @@
 
 from django.views.generic import TemplateView
 from django.http import Http404, HttpResponse, HttpResponseRedirect
-from wanglibao_activity.models import ActivityTemplates, ActivityImages, ActivityShow
+from wanglibao_activity.models import (ActivityTemplates, ActivityImages, ActivityShow,
+                                       ActivityBannerPosition)
 from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from weixin.util import _generate_ajax_template
-from .utils import get_queryset_paginator
+from .utils import get_queryset_paginator, get_sorts_for_activity_show
+from django.db.models import Q
+
 
 class TemplatesFormatTemplate(TemplateView):
     def get_context_data(self, **kwargs):
@@ -112,24 +115,11 @@ class PcActivityAreaView(TemplateView):
                                                     is_pc=True,
                                                     start_at__lte=timezone.now(),
                                                     end_at__gt=timezone.now()
-                                                    ).select_related('activity').\
-                                                    order_by('-activity__priority')
+                                                    ).select_related('activity')
 
-        banner = {}
-        try:
-            banner['main'] = activity_list.filter(banner_pos='main')[0].pc_banner
-        except Exception:
-            banner['main'] = ''
+        activity_list = get_sorts_for_activity_show(activity_list)
 
-        try:
-            banner['left'] = activity_list.filter(banner_pos='second_left')[0].pc_banner
-        except Exception:
-            banner['left'] = ''
-
-        try:
-            banner['right'] = activity_list.filter(banner_pos='second_right')[0].pc_banner
-        except Exception:
-            banner['right'] = '' # FixME
+        banner = ActivityBannerPosition.objects.all().select_related().first()
 
         limit = 6
         page = 1
@@ -159,13 +149,14 @@ class ActivityAreaApi(APIView):
                                                     is_pc=True,
                                                     start_at__lte=timezone.now(),
                                                     end_at__gt=timezone.now(),
-                                                    ).select_related('activity').\
-                                                    order_by('-activity__priority')
+                                                    ).select_related('activity')
 
         category = request.GET.get('category', 'all')
 
-        if category:
-            activity_list = activity_list.filter(category=category)
+        if category and category != 'all':
+            activity_list = activity_list.filter(Q(category='all') | Q(category=category))
+
+        activity_list = get_sorts_for_activity_show(activity_list)
 
         page = request.GET.get('page', 1)
         pagesize = request.GET.get('pagesize', 6)

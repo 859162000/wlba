@@ -519,9 +519,6 @@ if ENV != ENV_DEV:
     # session expire at browser close
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-    # set session for PHP cross domain.
-    SESSION_COOKIE_DOMAIN = '.wanglibao.com'
-
     # wsgi scheme
     os.environ['wsgi.url_scheme'] = 'https'
     os.environ['HTTPS'] = 'on'
@@ -1193,3 +1190,5 @@ WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'
 TOKEN_CLIENTS = {
     'rong360': 'wanglibao_1116',
 }
+
+APP_DECRYPT_KEY = "31D21828CC9DA7CE527F08481E361A7E"

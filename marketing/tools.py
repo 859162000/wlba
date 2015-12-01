@@ -42,23 +42,25 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False)
     # 活动检测
     activity_backends.check_activity(user, 'invest', device_type, amount, product_id, order_id, is_full)
     # fix@chenweibi, add order_id
-    utils.log_clientinfo(device, "buy", user_id, order_id, amount)
-
+    try:
+        utils.log_clientinfo(device, "buy", user_id, order_id, amount)
+    except Exception:
+        pass
     # 发送红包
     # send_lottery.apply_async((user_id,))
 
 
 def weixin_redpack_distribute(user):
     phone = user.wanglibaouserprofile.phone
-    logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
+    logger.info('通过weixin_redpack渠道注册,phone:%s' % (phone,))
     records = WanglibaoUserGift.objects.filter(valid=0, identity=phone)
     for record in records:
         try:
             redpack_backends.give_activity_redpack(user, record.rules.redpack, 'pc')
         except Exception, reason:
-            logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
+            logger.exception('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
         else:
-            logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (user, record.rules.redpack,))
+            logger.info('Success:发送红包完毕,user:%s, redpack:%s' % (user, record.rules.redpack,))
         record.user = user
         record.valid = 1
         record.save()
@@ -82,7 +84,10 @@ def register_ok(user_id, device):
     })
     # 活动检测
     activity_backends.check_activity(user, 'register', device_type)
-    utils.log_clientinfo(device, "register", user_id)
+    try:
+        utils.log_clientinfo(device, "register", user_id)
+    except Exception:
+        pass
 
 
 @app.task
@@ -92,8 +97,10 @@ def idvalidate_ok(user_id, device):
 
     # 活动检测
     activity_backends.check_activity(user, 'validation', device_type)
-    utils.log_clientinfo(device, "validation", user_id)
-
+    try:
+        utils.log_clientinfo(device, "validation", user_id)
+    except Exception:
+        pass
 
 @app.task
 def deposit_ok(user_id, amount, device, order_id):
@@ -111,15 +118,17 @@ def deposit_ok(user_id, amount, device, order_id):
         user_profile = user.wanglibaouserprofile
         activity_backends.check_activity(user, 'recharge', device_type,
                                          amount, **{'order_id': order_id})
-        utils.log_clientinfo(device, "deposit", user_id, order_id, amount)
+        try:
+            utils.log_clientinfo(device, "deposit", user_id, order_id, amount)
+        except Exception:
+            pass
         send_messages.apply_async(kwargs={
             'phones': [user_profile.phone],
             'messages': [messages.deposit_succeed(user_profile.name, amount)]
         })
-        logger.debug('send messages 充值金额啊啊啊: %s' % amount)
+        logger.info('send messages 充值金额啊啊啊: %s' % amount)
     except Exception, e:
-        logger.debug('send messages 充值异常啊啊啊: %s' % str(e))
-        pass
+        logger.exception('send messages 充值异常啊啊啊: %s' % str(e))
 
 
 @app.task

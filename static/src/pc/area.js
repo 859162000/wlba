@@ -6,7 +6,8 @@ require.config({
 
 require(['jquery', 'csrf'], function ($) {
 
-    var dopost= false;
+    var dopost= false, pagesize = 6;
+
     $('#area-nav li').on('click', function () {
         if (dopost) return
         var index = $(this).index();
@@ -22,7 +23,6 @@ require(['jquery', 'csrf'], function ($) {
         }, $(this), true)
     });
 
-    var pagesize = 6;
     $('.area-list-more').on('click', function(){
         if (dopost) return
         $.each($('#area-nav li'), function(i,dom){
@@ -37,31 +37,45 @@ require(['jquery', 'csrf'], function ($) {
 
     });
 
+
+    var $areaLoding = $('.area-mask-warp'),
+        $more = $('.area-list-more'),
+        $unMore = $('.area-list-unmore'),
+        $item = $('.area-active-item');
     function postDate(data, target, cover, callback){
         $.ajax({
-            url: '/activity/list/',
+            url: '/activity/area/filter/',
             type: "GET",
             data: data,
             beforeSend: function(){
                 dopost = true
+                $areaLoding.show();
             },
             complete: function(){
                 dopost = false
+                $areaLoding.hide();
             }
         }).done(function (result) {
+            var html_data = result.html_data;
+
             if(result.page >= result.all_page){
-                $('.area-list-more').hide();
-                $('.area-list-unmore').show();
+                $more.hide();
+                cover ? $unMore.hide(): $unMore.show();;
             }else{
-                $('.area-list-more').show();
-                $('.area-list-unmore').hide()
+                $more.show();
+                $unMore.hide();
             }
 
-            cover ? $('.area-active-item').html(result.html_data): $('.area-active-item').append(result.html_data);
+            if(cover && result.list_count === 0){
+                html_data = '该分类下没有活动！';
+            }
+
+            cover ? $item.html(html_data): $item.append(html_data);
+
             target.attr('data-page', result.page).siblings().attr('data-page', 0);
             callback && callback(result)
         }).fail(function (xhr) {
-
+            alert(xhr)
         });
     }
 
