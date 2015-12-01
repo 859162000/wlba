@@ -2,8 +2,8 @@
 from django.conf.urls import patterns, url
 from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth.decorators import login_required
-import views
-import manage_views
+import views, views_activity, manage_views
+
 
 urlpatterns = patterns(
     '',
@@ -20,6 +20,7 @@ urlpatterns = patterns(
     url(r'^regist/succees/$', TemplateView.as_view(template_name="weixin_regist_succees_new.jade")),
     url(r'^regist/first/$', TemplateView.as_view(template_name="weixin_registProcess_first.jade")),
     url(r'^regist/second/$', TemplateView.as_view(template_name="weixin_registProcess_second.jade")),
+    url(r'^regist/three/$', TemplateView.as_view(template_name="weixin_registProcess_three.jade")),
 
 
     url(r'^security/$', login_required(views.WeixinAccountSecurity.as_view(), login_url='/weixin/login/'), name='weixin_security'),
@@ -57,25 +58,11 @@ urlpatterns = patterns(
     #test
     url(r'^jump_page/$', views.JumpPageTemplate.as_view(template_name="sub_times.jade"), name='jump_page'),
     url(r'^is_bind/$', TemplateView.as_view(template_name="sub_is_bind.jade")),
-    url(r'^award_index/$', views.AwardIndexTemplate.as_view(template_name="sub_award.jade"), name='award_index'),
+    url(r'^award_index/$', views_activity.AwardIndexTemplate.as_view(template_name="sub_award.jade"), name='award_index'),
     url(r'^award_rule/$', TemplateView.as_view(template_name="sub_award_rule.jade")),
     url(r'^sub_code/$', TemplateView.as_view(template_name="sub_code.jade")),
+    url(r'^sub_invite/$', views_activity.InviteWeixinFriendTemplate.as_view(template_name="sub_invite_server.jade"), name='sub_invite'),
 
 )
 
-# 微信管理后台
-urlpatterns += patterns(
-    '',
-    # view
-    url(r'^manage/$', manage_views.IndexView.as_view(), name='wx_manage_index'),
-    url(r'^manage/account/(?P<account_key>\w+)/$', manage_views.AccountView.as_view(), name='wx_manage_account'),
-    url(r'^manage/menu/$', manage_views.MenuView.as_view(), name='wx_manage_menu'),
-    url(r'^manage/material/$', manage_views.MaterialView.as_view(), name='wx_manage_material'),
-    url(r'^manage/material/img/(?P<media_id>[\w_-]+)/$', manage_views.MaterialImageView.as_view(), name='wx_manage_material_image'),
 
-    # api
-    url(r'^manage/api/menu/$', manage_views.MenuAPI.as_view(), name='wx_manage_menu_api'),
-    url(r'^manage/api/materials/$', manage_views.MaterialListAPI.as_view(), name='wx_manage_material_list_api'),
-    url(r'^manage/api/materials/count/$', manage_views.MaterialCountAPI.as_view(), name='wx_manage_material_count_api'),
-    url(r'^manage/api/materials/(?P<media_id>\w+)/$', manage_views.MaterialDetailAPI.as_view(), name='wx_manage_material_detail_api'),
-)
