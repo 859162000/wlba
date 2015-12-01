@@ -27,7 +27,6 @@ logger = logging.getLogger(__name__)
 
 
 def check_activity(user, trigger_node, device_type, amount=0, product_id=0, order_id=0, is_full=False):
-    logger.error("=20151130= check_activity: [%s], [%s], [%s], [%s], [%s], [%s], [%s]" % (user, trigger_node, device_type, amount, product_id, order_id, is_full))
     now = timezone.now()
     device_type = decide_device(device_type)
     if not trigger_node:
@@ -73,7 +72,6 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, orde
 
 
 def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, order_id, user_ib=None):
-    logger.error("=20151130= _check_rules_trigger: [%s], [%s], [%s], [%s], [%s], [%s], [%s], [%s], [%s]" % (user, rule, trigger_node, device_type, amount, product_id, is_full, order_id, user_ib))
     """ check the trigger node """
     product_id = int(product_id)
     # 注册 或 实名认证
@@ -93,22 +91,18 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
                                                status=PayInfo.SUCCESS
                                                ).order_by('create_time').first()
 
-        if first_pay and first_pay.order_id == order_id:
-            logger.error("=20151130= _check_rules_trigger: first_pay=[%s], order_id=[%s], first_pay.order_id=[%s], isEval" % (first_pay, order_id, first_pay.order_id))
+        if first_pay and int(first_pay.order_id) == int(order_id):
+            # Add by hb only for debug
+            if first_pay.order_id <> order_id:
+                logger.exception("=_check_rules_trigger= first_pay: type(%s)=[%s], type(%s)=[%s]" % first_pay.order_id, type(first_pay.order_id), order_id, type(order_id))
             _check_trade_amount(user, rule, device_type, amount, is_full)
         else:
-            if first_pay:
-                if first_pay.order_id == order_id:
-                    logger.error("=20151130= _check_rules_trigger: order_id=[%s], first_pay.order_id=[%s], Eval" % (order_id, first_pay.order_id))
-                elif int(first_pay.order_id) == int(order_id):
-                    logger.error("=20151130= _check_rules_trigger: order_id=[%s], first_pay.order_id=[%s], int-Eval" % (order_id, first_pay.order_id))
-                else:
-                    logger.error("=20151130= _check_rules_trigger: order_id=[%s], first_pay.order_id=[%s], not-Eval" % (order_id, first_pay.order_id))
-            order_pay = PayInfo.objects.filter(order_id=order_id).first()
+            # Add by hb only for debug
+            order_pay = PayInfo.objects.filter(order_id=int(order_id)).first()
             if order_pay:
-                logger.error("=20151130= _check_rules_trigger: order_id=[%s], status=[%s], amount=[%s]" % (order_id, order_pay.status, order_pay.amount))
+                logger.error("=_check_rules_trigger= first_pay: order_id=[%s], status=[%s], amount=[%s]" % (order_id, order_pay.status, order_pay.amount))
             else:
-                logger.error("=20151130= _check_rules_trigger: order_id=[%s] not found" % (order_id))
+                logger.error("=_check_rules_trigger= first_pay: order_id=[%s] not found" % (order_id))
 
     # 充值
     elif trigger_node == 'pay':
@@ -124,7 +118,10 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
             first_buy = P2PRecord.objects.filter(user=user
                                                  ).order_by('create_time').first()
 
-        if first_buy and first_buy.order_id == order_id:
+        if first_buy and int(first_buy.order_id) == int(order_id):
+            # Add by hb only for debug
+            if first_buy.order_id <> order_id:
+                logger.exception("=_check_rules_trigger= first_buy: type(%s)=[%s], type(%s)=[%s]" % first_buy.order_id, type(first_buy.order_id), order_id, type(order_id))
             # 判断当前购买产品id是否在活动设置的id中
             if product_id > 0 and rule.activity.product_ids:
                 is_product = _check_product_id(product_id, rule.activity.product_ids)
@@ -188,7 +185,6 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
 
 
 def _send_gift(user, rule, device_type, is_full, amount=0):
-    logger.error("=20151130= _send_gift: [%s], [%s], [%s], [%s], [%s]" % (user, rule, device_type, is_full, amount))
     # rule_id = rule.id
     rtype = rule.trigger_node
     # 送奖品
@@ -293,7 +289,6 @@ def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
 
 
 def _check_trade_amount(user, rule, device_type, amount, is_full):
-    logger.error("=20151130= _check_trade_amount: [%s], [%s], [%s], [%s], [%s]" % (user, rule, device_type, amount, is_full))
     is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
     if amount and amount > 0:
         if is_amount:
@@ -303,7 +298,6 @@ def _check_trade_amount(user, rule, device_type, amount, is_full):
 
 
 def _check_amount(min_amount, max_amount, amount):
-    logger.error("=20151130= _check_trade_amount: [%s], [%s], [%s]" % (min_amount, max_amount, amount))
     min_amount = int(min_amount)
     max_amount = int(max_amount)
     amount = int(amount)
@@ -422,7 +416,6 @@ def _send_gift_phonefare(user, rule, amount, is_full):
 
 
 def _send_gift_redpack(user, rule, rtype, redpack_id, device_type, amount, is_full):
-    logger.error("=20151130= _send_gift_redpack: [%s], [%s], [%s], [%s], [%s], [%s], [%s]" % (user, rule, rtype, redpack_id, device_type, amount, is_full))
     """ 活动中发送的红包使用规则里边配置的模板，其他的使用系统原有的模板。 """
     if rule.send_type == 'sys_auto':
         if rule.share_type != 'inviter':
@@ -442,7 +435,6 @@ def _send_gift_redpack(user, rule, rtype, redpack_id, device_type, amount, is_fu
 
 
 def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_ib=None, amount=0):
-    logger.error("=20151130= _give_activity_redpack_new: [%s], [%s], [%s], [%s], [%s], [%s], [%s]" % (user, rtype, redpack_id, device_type, rule, user_ib, amount))
     """ rule: get message template """
     now = timezone.now()
     if user_ib:
