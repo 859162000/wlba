@@ -421,7 +421,7 @@ def bind_pay_deposit(request):
     card_no = request.DATA.get("card_no", "").strip()
     gate_id = request.DATA.get("gate_id", "").strip()
     input_phone = request.DATA.get("phone", "").strip()
-    device = split_ua(request)
+    device_type = split_ua(request)['device_type']
     ip = util.get_client_ip(request)
 
     user = request.user
@@ -484,7 +484,16 @@ def bind_pay_deposit(request):
         return result
 
     elif bank.channel == 'kuaipay':
-        return KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, device, ip, request)
+        result = KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, device_type, ip, request)
+
+        # if result['ret_code'] == 0:
+        #     try:
+        #         # 处理第三方用户充值回调
+        #         CoopRegister(request).process_for_recharge(request.user)
+        #     except Exception, e:
+        #         logger.error(e)
+
+        return result
 
     else:
         return {"ret_code": 20004, "message": "请选择支付渠道"}
@@ -538,7 +547,6 @@ def bind_pay_dynnum(request):
             CoopRegister(request).process_for_binding_card(user)
         except:
             logger.exception('bind_card_callback_failed for %s' % str(user))
-
 
     return res
 

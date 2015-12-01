@@ -784,6 +784,18 @@ class UserExisting(APIView):
         #                    }, status=400)
 
 
+class UserHasLoginAPI(APIView):
+    """
+        判断用户是否已经登录
+    """
+    permission_classes = ()
+
+    def post(self, request):
+        if not request.user.is_authenticated():
+            return Response({"login": False})
+        else:
+            return Response({"login": True})
+
 class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)
 

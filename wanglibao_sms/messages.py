@@ -359,7 +359,8 @@ def msg_bid_purchase(order_id, product_name, amount):
 
 def msg_bid_earning(product_name, activity_name, term, time, earning_percent, earning_aoumnt, unit):
     title = u"活动收益"
-    content = u"借款项目“%s(%s），期限%s%s”于%s赠送【%s%s】活动收益【%s】元，请注意查收。 查看账户余额 感谢您对我们的支持与关注。" \
+    content = u"借款项目“%s(%s），期限%s%s”于%s赠送【%s%s】活动收益【%s】元，请注意查收。 " \
+              u"<a href='/accounts/home/' target='_blank'>查看账户余额</a><br/>感谢您对我们的支持与关注。" \
               % (product_name, activity_name, term, unit, time, earning_percent, u"%", earning_aoumnt)
     return title, content
 
