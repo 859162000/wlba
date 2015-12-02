@@ -217,22 +217,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;(function() {
-		$('.take_red').click(function(){
-			if($('#denglu').index()){
-				$('.title_wrap').show();
-			}else{
-				window.location.href = '/p2p/list/'
-			}
-		});
-
-		$('.take_first_red').click(function(){
-			if($('#denglu').index()){
-				$('.title_wrap').show();
-			}else{
-				window.location.href = '/accounts/login/?next=/p2p/list/'
-			}
-		});
+;(function(org) {
 
 		$('.click_rule').click(function(){
 			$('.strategy_wrap').addClass('strategy_wrap_show');
@@ -244,12 +229,22 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			$('.title_wrap').hide();
 		});
 
+		var h5_user_static;
+		org.ajax({
+			url: '/api/user_login/',
+			type: 'post',
+			success: function (data1) {
+				h5_user_static = data1.login;
+			}
+		})
 		var login = false;
-		//$('.appjiang-button').html(123)
 		wlb.ready({
 			app: function (mixins) {
 				$('#take').click(function () {
 					mixins.registerApp();
+				});
+				$('#take_red').click(function () {
+					mixins.jumpToManageMoney();
 				});
 				$('#take_red').click(function () {
 					mixins.jumpToManageMoney();
@@ -259,16 +254,44 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 						login = false;
 						$('#register').click(function(){
 							mixins.loginApp();
+						});
+						$('#go_user').on('click',function() {
+							mixins.loginApp();
 						})
 					} else {
 						login = true;
 						$('#register').click(function(){
 							mixins.jumpToManageMoney();
 						})
+						$('#go_user').on('click',function() {
+							mixins.jumpToManageMoney();
+						})
 					}
 				})
 			},
 			other: function(){
+
+				$('#register').on('click',function(){
+					window.location.href = '/weixin/regist/'
+				});
+				$('#take').on('click',function(){
+					if(h5_user_static){
+						$('.title_wrap').show();
+					}else{
+						window.location.href = '/activity/experience/mobile/'
+					}
+				});
+				$('#go_user').on('click',function() {
+					window.location.href = '/activity/app_gold_season/';
+				})
+				$('#take_red').on('click',function(){
+					if(h5_user_static){
+						window.location.href = '/weixin/list/'
+					}else{
+						window.location.href = '/weixin/regist/?next=/weixin/list/'
+					}
+				});
+			   	//console.log('其他场景的业务逻辑');
 
 				var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 				org.ajax({
@@ -287,8 +310,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 						});
 					}
 				});
-				wx.ready(function(){
-					var host = 'https://www.wanglibao.com/',
+				wx.ready(function(org){
+					var host = 'https://staging.wanglibao.com/',
 						shareName = '网利宝用户专享福利',
 						shareImg = host + '/static/imgs/mobile_activity/app_noviceDecember_h5/300x300.jpg',
 						shareLink = host + '/activity/app_noviceDecember_h5/',
@@ -316,18 +339,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					})
 				})
 
-				$('#register').click(function(){
-					window.location.href = '/weixin/regist/'
-				});
-				$('#take').click(function(){
-					$('#title_wrap'){
-						/api/user-login
-					}
-				});
-			   	console.log('其他场景的业务逻辑');
 			}
 		})
-	})
+	})(org);
+
 
 
 

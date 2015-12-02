@@ -4,7 +4,7 @@ html(style="background: #fff2d5")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_noviceDecember_h5.css?v=201511063", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_noviceDecember_h5.css?v=120201", rel="stylesheet")
         - csrf_token
     body
         img.banner(src="/static/imgs/mobile_activity/app_noviceDecember_h5/banner.jpg")
@@ -35,7 +35,7 @@ html(style="background: #fff2d5")
                         p 首次投资最高送再送180元红包
                     img(src="/static/imgs/mobile_activity/app_noviceDecember_h5/step_img_4.png")
                 .button#take_red 领取红包
-        .strategy_wrap.strategy_wrap_show
+        .strategy_wrap
             img.title_bg(src="/static/imgs/mobile_activity/app_noviceDecember_h5/strategy_wrap_title.png")
             .main
                 .act_rule
@@ -76,7 +76,7 @@ html(style="background: #fff2d5")
                         dt 2.
                         dd 随后相继使用100元直抵红包投3月标8000元、使用20元红包投1月标1000元。这样自己投14000即可立得220红包，赚了！
                 .small_title!='<span>投资小贴士</span>想要拿满新手300元红包，充值后务必首次投资满1万哦！'
-        .recommend_send_red.recommend_send_red_show
+        .recommend_send_red
             img.title_bg(src="/static/imgs/mobile_activity/app_noviceDecember_h5/send_red_title.png")
             .main
                 .talbe
@@ -110,7 +110,7 @@ html(style="background: #fff2d5")
         .how_recommend
             .title 【如何邀请】
             p &nbsp;&nbsp;&nbsp;&nbsp;好友使用你的邀请码或邀请链接注册，并完成首投（100元起投），即算成功邀请，你可获50元红包。<br>&nbsp;&nbsp;&nbsp;&nbsp;受邀好友首投金额越高，赠送红包金额越高，邀请每个好友最高送100元。<br>&nbsp;&nbsp;&nbsp;&nbsp;所以邀请好友多多投资吧！多邀多送，上不封顶！TA好我也好！<br>&nbsp;&nbsp;&nbsp;&nbsp;登录后，在“我的账户 > 全民淘金”可查看专属邀请码。使用手机移动端，邀请更轻松！
-            a.button(href="/accounts/invite/") 立即前往
+            .button#go_user 立即前往
             .title 【投资流程】
             img.step_img(src="/static/imgs/mobile_activity/app_noviceDecember_h5/how_use_img.png")
             .title 【红包使用规则】
@@ -140,7 +140,7 @@ html(style="background: #fff2d5")
         .title_wrap
             .title_main
                 .close
-                .text 提示 语句
+                .text 您已注册
                 .button 我知道啦
-        script(src="/static/scripts/component/webview.js?v=233632")
-        script(src="/static/scripts/mobile_activity/app_noviceDecember_h5.js")
+        script(src="/static/scripts/component/webview.js")
+        script(src="/static/scripts/mobile_activity/dist/app_noviceDecember_h5.js?v=120201")
