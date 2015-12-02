@@ -10,18 +10,33 @@ html
   body(style="background:#fff")
     include global/g_nav
     include include/activityTopNew2
-    //.ng_conban
-    h3.gv_tls <span></span>数据统计 <a>截止{{today}}</a>
-    ul.gv_info
-      li
-        p.gv_touz1 <span></span> 选择加入网利宝的已有
-        h5.gv_tzh(data-number='{{site_data.p2p_register_number}}',data-type='man')
-      li
-        p.gv_touz2 <span></span> 小伙伴们总共投资额
-        h5.gv_tzh(data-number='{{site_data.p2p_amount}}',data-type='amount')
-      li.bornone
-        p.gv_touz3 <span></span> 小伙伴们总共赚取了
-        h5.gv_tzh(data-number='{{site_data.user_income}}',data-type='amount')
+    .bd-finance-data-warp
+      .bd-finance-data.clear
+        .bd-data-title-warp
+          .bd-data-title 数据统计
+        .bd-data-body
+          .bd-data-time {{today}}
+          .bd-data-main
+            span 选择加入网利宝的已有
+            span.bd-time-marg.gv_tzh(data-number='{{site_data.p2p_register_number}}',data-type='man')
+            span 小伙伴们总共投资额
+            span.bd-time-marg.gv_tzh(data-number='{{site_data.p2p_amount}}',data-type='amount')
+            span 小伙伴们总共赚取了
+            span.gv_tzh(data-number='{{site_data.user_income}}',data-type='amount')
+
+    .gv_about.clear
+      mixin fn_about(title, test, text, icon, warpclass)
+        dl.gv_abdls(class=warpclass)
+          dt.about_dts(class=icon)
+          dd
+            h5= title
+            span= test
+            br
+            span=text
+      +fn_about('信赖', 'IDG资本投资A轮融资', '鸿利光电投资B轮融资', 'about_dts1')
+      +fn_about("安全", "第三方资金托管", "阳光保险承担资金安全", "about_dts2")
+      +fn_about("权威", "华尔街精英金融团队", "IT数据风控系统", "about_dts3")
+      +fn_about("高收益", "30余倍活期银行收益", "100元起投", "about_dts4", 'unmargin')
     mixin gv_title(content)
       h2.gv_tstls
         span=content
@@ -71,53 +86,38 @@ html
               span {{p2p.pay_method|period_unit}}
             .gv_tzbtn
               if p2p.display_status == '抢购中'
-                a.tz_btn(href="/p2p/detail/{{p2p.id}}/") 立即投资
+                a.tz_btn(href="/p2p/detail/{{p2p.id}}/", class='active-stylebtn') 立即投资
               elif p2p.display_status == '满标审核'
-                a.tz_btn(href="javascript:void(0);", style="background-color:#aaaaaa") 满标审核
+                a.tz_btn(href="javascript:void(0);",class='un-stylebtn') 满标审核
               else
-                a.tz_btn(href="javascript:void(0);", style="background-color:#aaaaaa") 还款中
+                a.tz_btn(href="javascript:void(0);",class='un-stylebtn') 还款中
     .gv_felfare
       .gv_felbox.clear
         +gv_title("新手福利")
         dl.gv_feldls.feldls1.clear
           dt
-            img(src="/static/imgs/pc_activity/newgive/fuli_1.png")
+            img(src="/static/imgs/pc_activity/newgive/list1.png")
           dd
-            span 新手注册送<b>10</b>元红包<br>
-            span 单笔投资满<b>1,000</b>使用
+            span 新手注册送<b>28888</b>元红包
         dl.gv_feldls.feldls2.clear
           dt
-            img(src="/static/imgs/pc_activity/newgive/fuli_2.png")
+            img(src="/static/imgs/pc_activity/newgive/list2.png")
           dd
-            span 新手完成实名认证送<b>20</b>元红包 <br>
-            span 单笔投资满<b>2,000</b>使用
+            span 完成实名认证送<b>20</b>元红包
         dl.gv_feldls.feldls3.clear
           dt
-            img(src="/static/imgs/pc_activity/newgive/fuli_3.png")
+            img(src="/static/imgs/pc_activity/newgive/list3.png")
           dd
-            span 新手首次完成充值送<b>50</b>元红包<br>
-            span 单笔投资满<b>3,000</b>使用
+            span 新手首次完成充值送<b>100</b>元红包
         dl.gv_feldls.feldls4.clear
           dt
-            img(src="/static/imgs/pc_activity/newgive/fuli_4.png")
+            img(src="/static/imgs/pc_activity/newgive/list4.png")
           dd
-            span 新手投资理财最高送<b>500</b>元红包
+            span 新手投资理财最高送<b>180</b>元红包
         a.gv_touzbtn.clear(href="/", style="color:white") 立即投资
 
-    +gv_title("关于网利宝")
-    .gv_about.clear
-      mixin fn_about(title, test, text, icon)
-        dl.gv_abdls
-          dt.about_dts(class=icon)
-          dd
-            h5= title
-            span= test
-            br
-            span=text
-      +fn_about('信赖', 'IDG资本投资A轮融资', '鸿利光电投资B轮融资', 'about_dts1')
-      +fn_about("安全", "第三方资金托管", "阳光保险承担资金安全", "about_dts2")
-      +fn_about("权威", "华尔街精英金融团队", "IT数据风控系统", "about_dts3")
-      +fn_about("高收益", "30余倍活期银行收益", "100元起投", "about_dts4")
+    .bd-finance-bodyimg
+      img(src='/static/imgs/pc_activity/newgive/about.jpg')
     .gv_focal
       span.btn_left#btn_left
       ul#fal_box
@@ -130,6 +130,7 @@ html
         li
           img(src="/static/imgs/pc_activity/newgive/lub4.jpg")
       span.btn_right#btn_right
+
     .gv_explain
       .explain
         +gv_title("活动说明")
