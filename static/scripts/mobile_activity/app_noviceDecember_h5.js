@@ -249,11 +249,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		var login = false;
 		wlb.ready({
 			app: function (mixins) {
+				$('.code_wrap').hide();
 				$('#take').click(function () {
 					mixins.registerApp();
-				});
-				$('#take_red').click(function () {
-					mixins.jumpToManageMoney();
 				});
 				$('#take_red').click(function () {
 					mixins.jumpToManageMoney();

@@ -30,11 +30,9 @@
 		var login = false;
 		wlb.ready({
 			app: function (mixins) {
+				$('.code_wrap').hide();
 				$('#take').click(function () {
 					mixins.registerApp();
-				});
-				$('#take_red').click(function () {
-					mixins.jumpToManageMoney();
 				});
 				$('#take_red').click(function () {
 					mixins.jumpToManageMoney();
