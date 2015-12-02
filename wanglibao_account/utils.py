@@ -455,8 +455,8 @@ def zgdx_order_query(params):
     中国电信业务查询
     """
 
-    coop_key = getattr(settings, 'ZGDX_QUERY_KEY', None)
-    iv = getattr(settings, 'ZGDX_QUERY_IV', None)
+    coop_key = getattr(settings, 'ZGDX_KEY', None)
+    iv = getattr(settings, 'ZGDX_IV', None)
     url = getattr(settings, 'ZGDX_QUERY_URL', None)
     if coop_key and iv and url:
         data = {
