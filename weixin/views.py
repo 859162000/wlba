@@ -270,6 +270,7 @@ class WeixinJoinView(View):
         reply = None
 
         #如果eventkey为用户id则进行绑定
+        scene_id = None
         if eventKey:
             scene_id = eventKey
             if eventKey.isdigit():
