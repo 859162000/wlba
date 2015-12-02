@@ -33,9 +33,10 @@
         line-height: 50px; }
         .step_wrap .main .box .text_wrap .title {
           background: url("/static/imgs/mobile_activity/app_noviceDecember_h5/step_ico.png") no-repeat;
-          padding: 0 11px 0 0;
-          width: 121px;
-          height: 50px;
+          background-size: cover;
+          padding: 0 0.275rem 0 0;
+          width: 3.3rem;
+          height: 1.25rem;
           text-align: center;
           color: #fff;
           display: inline-block;
@@ -43,9 +44,10 @@
           line-height: 1.25rem; }
         .step_wrap .main .box .text_wrap .title_long {
           background: url("/static/imgs/mobile_activity/app_noviceDecember_h5/step_ico_long.png") no-repeat;
-          padding: 0 11px 0 0;
-          width: 183px;
-          height: 50px;
+          background-size: cover;
+          padding: 0 0.275rem 0 0;
+          width: 4.85rem;
+          height: 1.25rem;
           text-align: center;
           color: #fff;
           display: inline-block;
@@ -70,6 +72,7 @@
       color: #fff;
       font-size: 0.65rem;
       border-radius: 25px;
+      box-shadow: 0 2px 2px 2px #fad6b2;
       margin: 0.375rem auto 0;
       line-height: 1.2rem; }
     .step_wrap .main .line {
@@ -107,7 +110,8 @@
         position: absolute;
         right: 6%;
         bottom: -0.5rem;
-        z-index: 2; }
+        z-index: 2;
+        width: 2.875rem; }
     .strategy_wrap .main dl {
       width: 100%;
       display: inline-block;
@@ -155,8 +159,7 @@
         line-height: 1.15rem; }
     .strategy_wrap .main .max_red {
       width: 100%;
-      padding: 0 7% 0 10%;
-      padding-bottom: 30px; }
+      padding: 0.5rem 7% 0.75rem 10%; }
       .strategy_wrap .main .max_red .title {
         width: 100%;
         text-align: center;
@@ -173,10 +176,11 @@
       line-height: 1.25rem; }
       .strategy_wrap .main .small_title span {
         display: inline-block;
-        width: 161px;
+        width: 4.3rem;
         font-size: 0.65rem;
         background: url("/static/imgs/mobile_activity/app_noviceDecember_h5/small_title_ico.png") no-repeat;
-        padding-right: 11px;
+        background-size: cover;
+        padding-right: 0.275rem;
         height: 1.25rem;
         text-align: center;
         color: #fff;
@@ -228,7 +232,8 @@
         left: 9.375%;
         top: 1.2rem;
         display: block;
-        z-index: 2; }
+        z-index: 2;
+        width: 2.3rem; }
       .recommend_send_red .main .talbe ul {
         float: left;
         width: 33.33%; }
@@ -303,7 +308,7 @@
 .how_recommend {
   width: 100%;
   color: #8a4b3d;
-  padding: 1.2rem 1rem 0; }
+  padding: 1.2rem 1rem 0.75rem; }
   .how_recommend .title {
     width: 100%;
     padding: 0;
@@ -344,6 +349,7 @@
       .how_recommend .red_rule dl dt {
         float: left;
         display: block;
+        font-weight: normal;
         font-size: 0.6rem;
         width: 0.65rem;
         line-height: 1.05rem; }
@@ -351,6 +357,7 @@
         float: left;
         display: inline-block;
         width: 90%;
+        font-weight: normal;
         max-height: 99999rem;
         font-size: 0.6rem;
         color: #8a4b3d;
@@ -373,7 +380,6 @@
 
 .code_wrap {
   width: 100%;
-  padding-top: 30px;
   clear: both;
   position: relative;
   left: 0;
@@ -383,14 +389,16 @@
     display: block; }
   .code_wrap .img {
     position: absolute;
-    top: 30.638%;
+    top: 35.638%;
     right: 5.0666%;
-    display: block; }
+    display: block;
+    width: 14.666%; }
   .code_wrap .text {
     position: absolute;
     top: 79.574%;
     right: 5.0666%;
-    display: block; }
+    display: block;
+    width: 14.666%; }
 
 .register_wrap {
   width: 100%;
@@ -457,6 +465,7 @@
       border-radius: 25px;
       display: block;
       margin: 0 auto;
+      box-shadow: 0 2px 2px 2px #fad6b2;
       line-height: 40px; }
 
 /*# sourceMappingURL=app_noviceDecember_h5.css.map */

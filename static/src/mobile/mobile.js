@@ -181,13 +181,11 @@ org.ui = (function(){
                 alertFram.innerHTML = strHtml;
                 document.body.appendChild(alertFram);
                 document.body.appendChild(shield);
-
-                $('.popub-footer').on('click',function(){
-                    alertFram.style.display = "none";
-                    shield.style.display = "none";
-                    callback && callback();
-                })
             }
+            $('.popub-footer').on('click',function(){
+                $('#alert-cont, #popubMask').hide()
+                callback && callback();
+            })
             document.body.onselectstart = function(){return false;};
         },
         _confirm: function(title, certainName, callback, callbackData){
@@ -577,7 +575,7 @@ org.regist = (function(org){
                     },
                     success:function(data){
                         if(data.ret_code === 0){
-                            var next = org.getQueryStringByName('next') == '' ? '/weixin/regist/first/' : org.getQueryStringByName('next');
+                            var next = org.getQueryStringByName('next') == '' ? '/weixin/account/' : org.getQueryStringByName('next');
                             next = org.getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ org.getQueryStringByName('mobile');
                             next = org.getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ org.getQueryStringByName('serverId');
                             window.location.href = next;
@@ -1539,10 +1537,10 @@ org.processFirst = (function(org){
                     lib.$submit.attr('disabled',true).text("认证中，请等待...");
                 },
                 success:function(data){
-                    if(data.validate != true) return org.ui.alert('认证失败，请重试');
-                        org.ui.alert("实名认证成功!",function(){
-                           return window.location.href = '/weixin/regist/second/';
-                        });
+                    if(!data.validate == 'true') return org.ui.alert('认证失败，请重试');
+                    org.ui.alert("实名认证成功!",function(){
+                       return window.location.href = '/weixin/regist/second/';
+                    });
                 },
                 error:function(xhr){
                     result = JSON.parse(xhr.responseText);
