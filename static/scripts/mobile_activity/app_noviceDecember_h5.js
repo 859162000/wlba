@@ -270,7 +270,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 				})
 			},
 			other: function(){
-
+				$('.code_wrap').show();
 				$('#register').on('click',function(){
 					window.location.href = '/weixin/regist/'
 				});
