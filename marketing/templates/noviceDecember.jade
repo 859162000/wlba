@@ -169,12 +169,12 @@ html
                     img(src="/static/imgs/pc_activity/noviceDecember/code_img.jpg")
                     p 手机扫一下也许就能赚钱
           .register_wrap
-              a.button(href="/accounts/login/") 立即注册
+              .button#zhuce 立即注册
         .title_wrap
             .title_main
                 .close
-                .text 您已注册
-                .button 我知道啦
+                .text 您已注册过，立即去投资吧！
+                .button 我知道了
         #user_static
             if user.is_authenticated
               #ganjiwang-model
@@ -237,5 +237,5 @@ html
                       a(href="/accounts/login/?next=/accounts/home/") 立即登录
         include global/g_footer
 script.
-    require(['/static/js/noviceDecember.js?v=201511131'])
+    require(['/static/js/noviceDecember.js?v=201511132'])
 
