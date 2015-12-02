@@ -271,6 +271,7 @@ class WeixinJoinView(View):
 
         #如果eventkey为用户id则进行绑定
         if eventKey:
+            scene_id = eventKey
             if eventKey.isdigit():
                 user_id = eventKey[:-2]
                 channel_digital_code = eventKey[-2:]
@@ -279,10 +280,10 @@ class WeixinJoinView(View):
                     rs, txt = bindUser(w_user, user)
                     channel = WeiXinChannel.objects.filter(digital_code=channel_digital_code).first()
                     if channel:
-                        w_user.scene_id = channel.code
+                        scene_id = channel.code
                     reply = create_reply(txt, msg)
         if not old_subscribe and w_user.subscribe:
-            w_user.scene_id = eventKey
+            w_user.scene_id = scene_id
             w_user.save()
         if not reply and not w_user.user:
             txt = self.getBindTxt(fromUserName)
