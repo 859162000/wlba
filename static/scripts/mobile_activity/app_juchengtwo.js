@@ -221,7 +221,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
     var lib = {
         $body_h : $('.maimai-check-body'),
-        $submit : $('.maimai-form-btn'),
+        $submit : $('.maimai-form-btn1'),
         $phone : $('input[name=phone]'),
         $codeimg : $('input[name=codeimg]'),
         $codenum : $('input[name=codenum]'),
@@ -336,17 +336,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         action : 'ENTER_WEB_PAGE'
                     },
                     success: function(data){
-                        //$('span.shi').text(data.award80);
-                        //$('span.bai').text(data.award100);
                         if(data.award100>=0){
                             $('.get_ticket_wrap').show();
                         }else{
                             $('.get_ticket_wrap1').show();
                         }
-                    },
-                    complete:function(){
-
-
                     }
                 }
 

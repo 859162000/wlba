@@ -19,9 +19,7 @@
                     data: {phone: '', address: '', name: '', action: 'ENTER_WEB_PAGE'}
                 }).done(function (json) {
                      award100 = json.award100
-                    //$('span.shi').text(json.award80);
-                    console.log(json.award80);
-                    //$('span.bai').text(json.award100);
+                    console.log(json.award100);
                     if(json.award100>=0){
                        $('.get_ticket').show();
                     }else{
@@ -46,7 +44,6 @@
                 data: {'action': 'HAS_TICKET'}
             }).done(function (json) {
                 has_ticket = json.has_ticket
-                conslog.log(has_ticket)
 
             })
         }

@@ -159,12 +159,11 @@ html
                 p.xun-p 已有账号,
                   a(href="/accounts/login/?next=/accounts/home/") 立即登录
     .get_ticket.popup
-      .title 恭喜！<br>您已成功获得<br>20元现金红包
-      p 立即投资抢门票吧
+      .title 恭喜！<br>您已成功注册网利宝<br>立即投资抢门票吧
       a.button#get_ticket_button(href="/accounts/home/?promo_token=jcw") 立即抢门票
     .get_ticket1.popup1
       .title 哎呀，来晚了<br>门票已经被抢光了<br>来网利宝发现更多惊喜吧
-      a.button#get_ticket_button(href="/?promo_token=jcw") 去看看
+      a.button#get_ticket_button(href="/accounts/home/?promo_token=jcw") 去看看
     include global/g_footer
     script.
       var v = new Date().getTime()
