@@ -4,10 +4,45 @@
   display: block
   clear: both
 
-body .wrap
-  height: 475px
-  background: url("/static/imgs/pc_activity/newgive/banner.jpg") no-repeat center center
-
+body
+  .wrap
+    height: 475px
+    .gold2
+      height: 0
+.g-banner-slide-baidu
+  position: absolute
+  width: 100%
+  height: 100%
+  .g-slide
+    position: relative
+    left: 0
+    top: 0
+    width: 100%
+    height: 100%
+    .slide-banner
+      position: absolute
+      left: 0
+      top: 0
+      width: 100%
+      height: 100%
+      background-position: center
+      background-repeat: no-repeat
+  .g-slide-anchor
+    position: absolute
+    left: 0
+    bottom: 10px
+    width: 100%
+    text-align: center
+    .slide-anchor
+      width: 15px
+      height: 15px
+      display: inline-block
+      border-radius: 9px
+      background: #d3d3d3
+      margin: 0 5px
+      text-indent: 9000em
+    .active
+      background: red
 .biaoyu
   font-size: 24px
   color: #ff5252
@@ -130,13 +165,13 @@ input.captcha
 .gv_financing
   width: 1100px
   height: auto
-  margin: 40px auto 0 auto
+  margin: 40px auto
 
 .gv_minbox
   width: 352px
   height: auto
   border: 1px solid #ebebeb
-  margin: 0 20px 38px 0
+  margin-right: 20px
   float: left
 
 .min11
@@ -271,7 +306,7 @@ input.captcha
   width: 1100px
   margin: 0 auto
   position: relative
-
+  overflow: hidden
 .gv_feldls
   width: 275px
   height: auto
@@ -303,18 +338,16 @@ input.captcha
   margin-top: 20px
 
 .gv_touzbtn
-  display: inline-block
+  display: block
   width: 220px
   height: 48px
   background: #f5462e
-  -webkit-border-radius: 25px
-  -moz-border-radius: 25px
   border-radius: 25px
   text-align: center
   line-height: 48px
   font-size: 22px
-  color: #ffffff
-  margin: 0 auto
+  color: #fff
+  margin: 40px auto
 
 .gv_touzbtn:link
   color: #ffffff
@@ -325,7 +358,6 @@ input.captcha
   margin: 40px auto 0 auto
 .gv_abdls
   width: 130px
-  height: 260px
   float: left
   margin-right: 190px
 
@@ -383,20 +415,19 @@ input.captcha
 
 .gv_explain
   width: 100%
-  margin-top: 55px
   background: #f5f5f5
-  padding-top: 15px
-
+  overflow: hidden
 .explain
   width: 1100px
   height: auto
   margin: 0 auto
+  color: #999999
+
   p
-    margin-top: 20px
+    line-height: 24px
+  .gv-explain-decend
     padding-bottom: 20px
-    color: #999999
-    span
-      line-height: 24px
+
 
 #ganjiwang-model
   width: 320px
@@ -415,10 +446,10 @@ input.captcha
   border-bottom: 1px solid #ccc
 .bd-finance-data
   width: 1100px
-  margin: 0 auto
+  margin: 10px auto 10px auto
   .bd-data-title-warp
     float: left
-    margin-top: 16px
+    margin-top: 6px
   .bd-data-body
     margin-left: 120px
     font-size: 14px
@@ -430,6 +461,7 @@ input.captcha
   .bd-data-main
     text-align: center
     color: #808080
+    line-height: 1
     .num-text
       color: #4d4d4d
       font-size: 16px
@@ -449,10 +481,25 @@ input.captcha
 
 .bd-finance-bodyimg
   width: 1100px
-  margin: 0 auto
+  margin: 40px auto
   img
     width: 100%
     height: auto
 
+.rules-detail
+  color: #5ab1ed
+  cursor: pointer
+.explain-detail
+  height: 0
 
+.gv-tstls-new
+  width: 1100px
+  height: 39px
+  border-bottom: 1px solid #ccc
+  margin-bottom: 22px
+  span
+    color: #666
+    font-weight: bold
+    border-bottom: 5px solid #f5462e
+    line-height: 48px
 
