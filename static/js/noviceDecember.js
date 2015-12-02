@@ -35,13 +35,13 @@
 			if($('#denglu').index()){
 				$('.title_wrap').show();
 			}else{
-				window.location.href = '/p2p/list/'
+				window.location.href = '/activity/experience/gold/'
 			}
 		});
 
 		$('.take_first_red').click(function(){
 			if($('#denglu').index()){
-				$('.title_wrap').show();
+				window.location.href = '/p2p/list/'
 			}else{
 				window.location.href = '/accounts/login/?next=/p2p/list/'
 			}
