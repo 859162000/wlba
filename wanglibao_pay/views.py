@@ -922,6 +922,12 @@ class BankCardAddView(APIView):
     def post(self, request):
         result = third_pay.add_bank_card(request)
 
+        if result.get('ret_code') == 0:
+            try:
+                CoopRegister(request).process_for_binding_card(request.user)
+            except:
+                logger.exception('bind_card_callback_failed for %s' % str(request.user))
+
         return Response(result)
 
 
