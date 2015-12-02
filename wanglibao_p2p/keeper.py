@@ -529,7 +529,6 @@ class AmortizationKeeper(KeeperBaseMixin):
                                                               amo_amount))
 
                 weixin_user = WeixinUser.objects.filter(user=sub_amo.user).first()
-                now = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
     #             您好，您投资的项目还款完成
                 # 项目名称：宝马X5-HK20151112002
                 # 还款金额：1000元
@@ -537,15 +536,17 @@ class AmortizationKeeper(KeeperBaseMixin):
                 # 详情请登录平台会员中心查看
     #             {{first.DATA}} 项目名称：{{keyword1.DATA}} 还款金额：{{keyword2.DATA}} 还款时间：{{keyword3.DATA}} {{remark.DATA}}
                 from weixin.tasks import sentTemplate
-                sentTemplate.apply_async(kwargs={
-                                "kwargs":json.dumps({
-                                                "openid": weixin_user.openid,
-                                                "template_id": PRODUCT_AMORTIZATION_TEMPLATE_ID,
-                                                "keyword1": product.name,
-                                                "keyword2": str(amo_amount),
-                                                "keyword3": now,
-                                                    })},
-                                                queue='celery02')
+                if weixin_user:
+                    now = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
+                    sentTemplate.apply_async(kwargs={
+                                    "kwargs":json.dumps({
+                                                    "openid": weixin_user.openid,
+                                                    "template_id": PRODUCT_AMORTIZATION_TEMPLATE_ID,
+                                                    "keyword1": product.name,
+                                                    "keyword2": str(amo_amount),
+                                                    "keyword3": now,
+                                                        })},
+                                                    queue='celery02')
 
                 title, content = messages.msg_bid_amortize(pname, timezone.now(), amo_amount)
                 inside_message.send_one.apply_async(kwargs={

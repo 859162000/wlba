@@ -160,15 +160,16 @@ class P2PTrader(object):
 #         投标成功,可在投标记录里查看.
 # {{first.DATA}} 标的编号：{{keyword1.DATA}} 投标金额：{{keyword2.DATA}} 投标时间：{{keyword3.DATA}} {{remark.DATA}}
         from weixin.tasks import sentTemplate
-        sentTemplate.apply_async(kwargs={
-                        "kwargs":json.dumps({
-                                        "openid": weixin_user.openid,
-                                        "template_id": PRODUCT_INVEST_SUCCESS_TEMPLATE_ID,
-                                        "keyword1": self.product.id,
-                                        "keyword2": str(amount),
-                                        "keyword3": now,
-                                            })},
-                                        queue='celery02')
+        if weixin_user:
+            sentTemplate.apply_async(kwargs={
+                            "kwargs":json.dumps({
+                                            "openid": weixin_user.openid,
+                                            "template_id": PRODUCT_INVEST_SUCCESS_TEMPLATE_ID,
+                                            "keyword1": self.product.id,
+                                            "keyword2": str(amount),
+                                            "keyword3": now,
+                                                })},
+                                            queue='celery02')
 
         # 满标给管理员发短信
         if is_full:
