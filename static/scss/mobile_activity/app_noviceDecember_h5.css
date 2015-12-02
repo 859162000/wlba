@@ -33,8 +33,9 @@
         line-height: 50px; }
         .step_wrap .main .box .text_wrap .title {
           background: url("/static/imgs/mobile_activity/app_noviceDecember_h5/step_ico.png") no-repeat;
-          padding: 0 11px 0 0;
-          width: 121px;
+          background-size: cover;
+          padding: 0 0.275rem 0 0;
+          width: 3.3rem;
           height: 50px;
           text-align: center;
           color: #fff;
@@ -43,8 +44,9 @@
           line-height: 1.25rem; }
         .step_wrap .main .box .text_wrap .title_long {
           background: url("/static/imgs/mobile_activity/app_noviceDecember_h5/step_ico_long.png") no-repeat;
-          padding: 0 11px 0 0;
-          width: 183px;
+          background-size: cover;
+          padding: 0 0.275rem 0 0;
+          width: 4.85rem;
           height: 50px;
           text-align: center;
           color: #fff;
@@ -108,7 +110,8 @@
         position: absolute;
         right: 6%;
         bottom: -0.5rem;
-        z-index: 2; }
+        z-index: 2;
+        width: 2.875rem; }
     .strategy_wrap .main dl {
       width: 100%;
       display: inline-block;
@@ -156,8 +159,7 @@
         line-height: 1.15rem; }
     .strategy_wrap .main .max_red {
       width: 100%;
-      padding: 0 7% 0 10%;
-      padding-bottom: 30px; }
+      padding: 0.5rem 7% 0.75rem 10%; }
       .strategy_wrap .main .max_red .title {
         width: 100%;
         text-align: center;
@@ -174,10 +176,11 @@
       line-height: 1.25rem; }
       .strategy_wrap .main .small_title span {
         display: inline-block;
-        width: 161px;
+        width: 4.3rem;
         font-size: 0.65rem;
         background: url("/static/imgs/mobile_activity/app_noviceDecember_h5/small_title_ico.png") no-repeat;
-        padding-right: 11px;
+        background-size: cover;
+        padding-right: 0.275rem;
         height: 1.25rem;
         text-align: center;
         color: #fff;
@@ -229,7 +232,8 @@
         left: 9.375%;
         top: 1.2rem;
         display: block;
-        z-index: 2; }
+        z-index: 2;
+        width: 2.3rem; }
       .recommend_send_red .main .talbe ul {
         float: left;
         width: 33.33%; }
@@ -386,12 +390,14 @@
     position: absolute;
     top: 30.638%;
     right: 5.0666%;
-    display: block; }
+    display: block;
+    width: 14.666%; }
   .code_wrap .text {
     position: absolute;
     top: 79.574%;
     right: 5.0666%;
-    display: block; }
+    display: block;
+    width: 14.666%; }
 
 .register_wrap {
   width: 100%;
