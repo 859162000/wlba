@@ -569,6 +569,15 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
+CELERY_QUEUES = {
+                "celery":  {"exchange": "celery",
+                              "routing_key": "celery"},
+                "celery01": {"exchange": "celery01",
+                              "routing_key": "celery01"},
+                "celery02": {"exchange": "celery02",
+                              "routing_key": "celery02"},
+                }
+
 from datetime import timedelta, datetime
 
 CELERYBEAT_SCHEDULE = {
@@ -1091,7 +1100,7 @@ ZHITUI_CALL_BACK_URL = 'http://api.zhitui.com/wanglibao/recive.php'
 
 # 中国电信
 WLB_FOR_ZGDX_KEY = '2001'
-ZGDX_QUERY_URL = 'http://182.140.241.47:8080/ESB/flowService.do'
+ZGDX_QUERY_URL = 'http://182.140.241.47:8080/fps/ESBFlowService.do'
 if ENV == ENV_PRODUCTION:
     ZGDX_CALL_BACK_URL = 'http://182.140.241.47:8080/fps/flowService.do'
     ZGDX_PARTNER_NO = '102139887'

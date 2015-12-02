@@ -4,6 +4,8 @@
 import logging
 import re
 import socket
+import json
+
 from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.contrib.auth.decorators import permission_required, login_required
@@ -52,6 +54,9 @@ from wanglibao_announcement.utility import AnnouncementAccounts
 from fee import WithdrawFee
 import datetime
 from wanglibao_rest import utils as rest_utils
+from weixin.tasks import sentTemplate
+from weixin.models import WeixinUser
+from weixin.constant import WITH_DRAW_SUBMITTED_TEMPLATE_ID, WITH_DRAW_SUCCESS_TEMPLATE_ID
 from wanglibao_rest.common import DecryptParmsAPIView
 
 logger = logging.getLogger(__name__)
@@ -298,7 +303,9 @@ class WithdrawCompleteView(TemplateView):
         status, message = validate_validation_code(phone, code)
         if status != 200:
             return self.render_to_response({
-                'result': u'短信验证码输入错误'
+                # Modify by hb on 2015-12-02
+                #'result': u'短信验证码输入错误'
+                'result': message
             })
 
         result = PayResult.WITHDRAW_SUCCESS
@@ -612,6 +619,20 @@ class WithdrawTransactions(TemplateView):
                         "phones": [payinfo.user.wanglibaouserprofile.phone],
                         "messages": [messages.withdraw_confirmed(payinfo.user.wanglibaouserprofile.name, amount)]
                     })
+                    weixin_user = WeixinUser.objects.filter(user=payinfo.user).first()
+                    if weixin_user:
+                        pass
+                        # bank_name = result['bank_name']
+                        # sentTemplate.apply_async(kwargs={
+                        #     "kwargs":json.dumps({
+                        #                 "openid":weixin_user.openid,
+                        #                 "template_id":WITH_DRAW_SUCCESS_TEMPLATE_ID,
+                        #                 "first":u"亲爱的%s，您的提现申请已受理"%name,
+                        #                 "keyword1":result['amount'],
+                        #                 "keyword2":bank_name,
+                        #                 "keyword3":withdraw_ok_time,
+                        #                     })},
+                        #                 queue='celery02')
             return HttpResponse({
                 u"所有的取款请求已经处理完毕 %s" % uuids_param
             })
@@ -924,6 +945,12 @@ class BankCardAddView(APIView):
     def post(self, request):
         result = third_pay.add_bank_card(request)
 
+        if result.get('ret_code') == 0:
+            try:
+                CoopRegister(request).process_for_binding_card(request.user)
+            except:
+                logger.exception('bind_card_callback_failed for %s' % str(request.user))
+
         return Response(result)
 
 
@@ -1096,6 +1123,23 @@ class WithdrawAPIView(DecryptParmsAPIView):
                 "content": content,
                 "mtype": "withdraw"
             })
+            weixin_user = WeixinUser.objects.filter(user=user).first()
+            if weixin_user:
+                bank_name = result['bank_name']
+                # 亲爱的{}，您的提现申请已受理，1-3个工作日内将处理完毕，请耐心等待。
+            # {{first.DATA}} 取现金额：{{keyword1.DATA}} 到账银行：{{keyword2.DATA}} 预计到账时间：{{keyword3.DATA}} {{remark.DATA}}
+                now = datetime.datetime.now()
+                withdraw_ok_time = "%s前处理完毕"%(now+datetime.timedelta(days=3)).strftime('%Y年%m月%d日')
+                sentTemplate.apply_async(kwargs={
+                                "kwargs":json.dumps({
+                                                "openid":weixin_user.openid,
+                                                "template_id":WITH_DRAW_SUBMITTED_TEMPLATE_ID,
+                                                "first":u"亲爱的%s，您的提现申请已受理"%name,
+                                                "keyword1":str(result['amount']),
+                                                "keyword2":bank_name,
+                                                "keyword3":withdraw_ok_time,
+                                                    })},
+                                                queue='celery02')
         return Response(result)
 
 

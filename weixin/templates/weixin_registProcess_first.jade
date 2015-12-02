@@ -12,22 +12,21 @@ html(style='background:#f5f5f5;')
 
     //表单
     section.form-box.regist-process-form
-
       //表单单个模版
       .form-list
         .form-icon.authentication-name.name-icon
         .form-input
-          input(type="text",name="name", placeholder="请输入您的姓名", data-target2='authentication-name', data-icon='name-icon')
+          input(type="text",name="name", placeholder="请输入您的姓名", data-target2='authentication-name', data-icon='name-icon').check-list
           .form-edit-icon
       .form-mg-first
       .form-list
         .form-icon.authentication-card.idcard-icon
         .form-input
-          input(type="tel",name='idcard',value=phoneValue, placeholder="请输您的身份证号", data-target2='authentication-card', data-icon='idcard-icon', data-target="identifier-edit", data-empty='', data-val='input-clear')
+          input(type="tel",name='idcard',value=phoneValue, placeholder="请输您的身份证号", data-target2='authentication-card', data-icon='idcard-icon', data-target="identifier-edit", data-empty='', data-val='input-clear').check-list
           .form-edit-icon.identifier-edit
 
       //账户安全
-      section.regist-safe
+      section.regist-safe.regist-process-safe
         span 账户资金安全由阳光保险承保
 
       section#shiming.login-submit

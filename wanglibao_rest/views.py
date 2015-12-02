@@ -393,7 +393,9 @@ class WeixinRegisterAPIView(APIView):
 
         status, message = validate_validation_code(identifier, validate_code)
         if status != 200:
-            return Response({"ret_code": 30023, "message": "验证码输入错误"})
+            # Modify by hb on 2015-12-02
+            #return Response({"ret_code": 30023, "message": "验证码输入错误"})
+            return Response({"ret_code": 30023, "message": message})
 
         #if User.objects.filter(wanglibaouserprofile__phone=identifier,
         #                       wanglibaouserprofile__phone_verified=True).exists():
@@ -784,6 +786,18 @@ class UserExisting(APIView):
         #                    }, status=400)
 
 
+class UserHasLoginAPI(APIView):
+    """
+        判断用户是否已经登录
+    """
+    permission_classes = ()
+
+    def post(self, request):
+        if not request.user.is_authenticated():
+            return Response({"login": False})
+        else:
+            return Response({"login": True})
+
 class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -928,9 +942,9 @@ class LoginAPIView(DecryptParmsAPIView):
                 pu.push_channel_id = push_channel_id
                 pu.save()
         token, created = Token.objects.get_or_create(user=user)
-        if not created:
-            token.delete()
-            token, created = Token.objects.get_or_create(user=user)
+        # if not created:
+        #     token.delete()
+        #     token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, "user_id":user.id}, status=status.HTTP_200_OK)
 
 class ObtainAuthTokenCustomized(ObtainAuthToken):
