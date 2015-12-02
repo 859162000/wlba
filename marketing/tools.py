@@ -110,7 +110,7 @@ def deposit_ok(user_id, amount, device, order_id):
             # 支持通过字典传递完整的device信息或是通过str直接传device_type
             if isinstance(device, dict):
                 device_type = device['device_type']
-            elif isinstance(device, str):
+            elif isinstance(device, str) or isinstance(device, unicode):
                 assert device in ['pc', 'ios', 'android']
                 device_type = device
             else:
