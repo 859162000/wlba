@@ -13,13 +13,11 @@ html
     .wrap#ganjiwang-banner
       .g-banner-slide-baidu
         .g-slide
-          .slide-banner(style="display:block; background-image:url('/static/imgs/pc_activity/newgive/banner.jpg')")
-          .slide-banner(style="display:none; background-image:url('/static/imgs/pc_activity/newgive/banner.jpg')")
-          .slide-banner(style="display:none; background-image:url('/static/imgs/pc_activity/newgive/banner.jpg')")
+          .slide-banner(style="display:block; background-image:url('/static/imgs/pc_activity/newgive/banner1.jpg')")
+          .slide-banner(style="display:none; background-image:url('/static/imgs/pc_activity/newgive/banner2.jpg')")
         .g-slide-anchor
             a.slide-anchor.active 0
             a.slide-anchor 1
-            a.slide-anchor 2
       .gold2
         if user.is_authenticated
           #ganjiwang-model
@@ -158,7 +156,7 @@ html
               span {{p2p.pay_method|period_unit}}
             .gv_tzbtn
               if p2p.display_status == '抢购中'
-                a.tz_btn(href="/p2p/detail/{{p2p.id}}/", class='active-stylebtn') 立即投资
+                a.tz_btn(href="javascript:void(0);", class='active-stylebtn') 立即投资
               elif p2p.display_status == '满标审核'
                 a.tz_btn(href="javascript:void(0);",class='un-stylebtn') 满标审核
               else
@@ -187,7 +185,7 @@ html
               img(src="/static/imgs/pc_activity/newgive/list4.png")
             dd
               span 新手投资理财最高送<b>180</b>元红包
-        a.gv_touzbtn.clear(href="/", style="color:white") 立即投资
+        a.gv_touzbtn.clear(href="javascript:void(0);", style="color:white") 立即投资
 
     .bd-finance-bodyimg
       img(src='/static/imgs/pc_activity/newgive/about.jpg')

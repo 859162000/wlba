@@ -83,7 +83,9 @@
             $(this).attr("href", "/accounts/login/?next=/activity/baidu_finance/")
         })
 
-
+        $('.tz_btn, .gv_touzbtn').on('click', function(){
+            $('body,html').animate({scrollTop: 0}, 400);
+        })
         var detail = $('.explain-detail');
         $('.rules-detail').on('click', function () {
             if (detail.hasClass('this-show')) {
