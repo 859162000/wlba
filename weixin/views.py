@@ -1314,8 +1314,8 @@ class GetUserInfo(APIView):
 class GenerateQRSceneTicket(APIView):
     permission_classes = (IsAuthenticated,)
     def get(self, request):
-        original_id = request.DATA.get('original_id')
-        channel_code = request.DATA.get('code')
+        original_id = request.GET.get('original_id')
+        channel_code = request.GET.get('code')
         if not original_id:
             return Response({'errcode':-1, 'errmsg':"-1"})
 
