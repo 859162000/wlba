@@ -198,7 +198,7 @@ def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name):
                         "kwargs":json.dumps({
                                         "openid":weixin_user.openid,
                                         "template_id":WITH_DRAW_SUBMITTED_TEMPLATE_ID,
-                                        "first":u"亲爱的%s，您的提现申请已受理"%name,
+                                        "first":u"亲爱的%s，您的提现申请已受理"%user_name,
                                         "keyword1":str(amount),
                                         "keyword2":bank_name,
                                         "keyword3":withdraw_ok_time,
