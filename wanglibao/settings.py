@@ -569,6 +569,15 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
+CELERY_QUEUES = {
+                "celery":  {"exchange": "celery",
+                              "routing_key": "celery"},
+                "celery01": {"exchange": "celery01",
+                              "routing_key": "celery01"},
+                "celery02": {"exchange": "celery02",
+                              "routing_key": "celery02"},
+                }
+
 from datetime import timedelta, datetime
 
 CELERYBEAT_SCHEDULE = {
