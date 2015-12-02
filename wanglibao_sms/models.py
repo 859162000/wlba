@@ -25,12 +25,12 @@ class PhoneValidateCode(models.Model):
     validate_type = models.CharField(max_length=64)
     is_validated = models.BooleanField(default=False)
     # Modify by hb on 2015-10-13 : add 'db_index' for last_send_time
-    last_send_time = models.DateTimeField(db_index=True)
+    last_send_time = models.DateTimeField(u"最后发送时间", db_index=True)
     code_send_count = models.IntegerField(default=0)
     vcount = models.IntegerField(u"验证次数", null=False, blank=False, default=0)
     data = models.TextField(default="")
     # Add by hb on  2015-12-01
-    create_time = models.DateTimeField(db_index=True, null=True, blank=True)
+    create_time = models.DateTimeField(u"生成时间", null=False, db_index=True, default="2015-12-01T00:00:00+08:00")
 
     class Meta:
         verbose_name_plural = u'验证码'
