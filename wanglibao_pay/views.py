@@ -54,10 +54,9 @@ from wanglibao_announcement.utility import AnnouncementAccounts
 from fee import WithdrawFee
 import datetime
 from wanglibao_rest import utils as rest_utils
-from weixin.tasks import sentTemplate
 from weixin.models import WeixinUser
-from weixin.constant import WITH_DRAW_SUBMITTED_TEMPLATE_ID, WITH_DRAW_SUCCESS_TEMPLATE_ID
 from wanglibao_rest.common import DecryptParmsAPIView
+from marketing.tools import withdraw_submit_ok
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
@@ -368,21 +367,13 @@ class WithdrawCompleteView(TemplateView):
             pay_info.margin_record = margin_record
 
             pay_info.save()
-
-            # 短信通知添加用户名
             name = user.wanglibaouserprofile.name or u'用户'
-
-            send_messages.apply_async(kwargs={
-                'phones': [request.user.wanglibaouserprofile.phone],
-                # 'messages': [messages.withdraw_submitted(amount, timezone.now())]
-                'messages': [messages.withdraw_submitted(name)]
-            })
-            title, content = messages.msg_withdraw(timezone.now(), amount)
-            inside_message.send_one.apply_async(kwargs={
+            withdraw_submit_ok.apply_async(kwargs={
                 "user_id": user.id,
-                "title": title,
-                "content": content,
-                "mtype": "withdraw"
+                "user_name": name,
+                "phone": user.wanglibaouserprofile.phone,
+                "amount": amount,
+                "bank_name": card.bank.name
             })
         except decimal.DecimalException:
             result = u'提款金额在0～{}之间'.format(fee_config.get('max_amount'))
@@ -1109,39 +1100,14 @@ class WithdrawAPIView(DecryptParmsAPIView):
         # 短信通知添加用户名
         user = request.user
         name = user.wanglibaouserprofile.name or u'用户'
-
         if not result['ret_code']:
-            send_messages.apply_async(kwargs={
-                'phones': [result['phone']],
-                'messages': [messages.withdraw_submitted(name)]
+            withdraw_submit_ok.apply_async(kwargs={
+                "user_id": user.id,
+                "user_name": name,
+                "phone": request.user.wanglibaouserprofile.phone,
+                "amount": result['amount'],
+                "bank_name": result['bank_name']
             })
-
-            title, content = messages.msg_withdraw(timezone.now(), result['amount'])
-            inside_message.send_one.apply_async(kwargs={
-                "user_id": request.user.id,
-                "title": title,
-                "content": content,
-                "mtype": "withdraw"
-            })
-            weixin_user = WeixinUser.objects.filter(user=user).first()
-            if weixin_user:
-                bank_name = result['bank_name']
-                # 亲爱的{}，您的提现申请已受理，1-3个工作日内将处理完毕，请耐心等待。
-            # {{first.DATA}} 取现金额：{{keyword1.DATA}} 到账银行：{{keyword2.DATA}} 预计到账时间：{{keyword3.DATA}} {{remark.DATA}}
-                now = datetime.datetime.now()
-                withdraw_ok_time = "%s前处理完毕"%(now+datetime.timedelta(days=3)).strftime('%Y年%m月%d日')
-                sentTemplate.apply_async(kwargs={
-                                "kwargs":json.dumps({
-                                                "openid":weixin_user.openid,
-                                                "template_id":WITH_DRAW_SUBMITTED_TEMPLATE_ID,
-                                                "first":u"亲爱的%s，您的提现申请已受理"%name,
-                                                "keyword1":str(result['amount']),
-                                                "keyword2":bank_name,
-                                                "keyword3":withdraw_ok_time,
-                                                    })},
-                                                queue='celery02')
-        return Response(result)
-
 
 class BindCardQueryView(APIView):
     """ 查询用户绑定卡号列表接口 """
