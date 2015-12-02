@@ -308,7 +308,7 @@
 .how_recommend {
   width: 100%;
   color: #8a4b3d;
-  padding: 1.2rem 1rem 0; }
+  padding: 1.2rem 1rem 0.75rem; }
   .how_recommend .title {
     width: 100%;
     padding: 0;
@@ -380,7 +380,6 @@
 
 .code_wrap {
   width: 100%;
-  padding-top: 30px;
   clear: both;
   position: relative;
   left: 0;

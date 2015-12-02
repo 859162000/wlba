@@ -51,7 +51,7 @@
 				})
 			},
 			other: function(){
-
+				$('.code_wrap').show();
 				$('#register').on('click',function(){
 					window.location.href = '/weixin/regist/'
 				});
