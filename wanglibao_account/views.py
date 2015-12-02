@@ -1158,7 +1158,9 @@ class ResetPasswordAPI(APIView):
             user.save()
             return Response({'ret_code': 0, 'message': u'修改成功'})
         else:
-            return Response({'ret_code': 30004, 'message': u'验证码验证失败'})
+            # Modify by hb on 2015-12-02
+            #return Response({'ret_code': 30004, 'message': u'验证码验证失败'})
+            return Response({'ret_code': 30004, 'message': message})
 
 
 class Third_login(View):
@@ -1195,7 +1197,9 @@ class ChangePasswordAPIView(APIView):
 
         status, message = validate_validation_code(user.wanglibaouserprofile.phone, validate_code)
         if status != 200:
-            return Response({"ret_code": 30044, "message": u"验证码输入错误"})
+            # Modify by hb 0n 2015-12-02
+            #return Response({"ret_code": 30044, "message": u"验证码输入错误"})
+            return Response({"ret_code": 30044, "message": message})
 
         user.set_password(new_password)
         user.save()
@@ -1267,7 +1271,7 @@ class MessageDetailAPIView(APIView):
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
-def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
+def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
     def messenger(message, user=None):
         res = dict()
         if user:
