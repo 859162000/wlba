@@ -22,7 +22,7 @@ import datetime
 import json
 from django.db.models import Sum, Count, Q
 import logging
-from weixin.constant import DEPOSIT_SUCCESS_TEMPLATE_ID
+from weixin.constant import DEPOSIT_SUCCESS_TEMPLATE_ID, WITH_DRAW_SUBMITTED_TEMPLATE_ID
 
 from weixin.models import WeixinUser
 
@@ -115,7 +115,7 @@ def deposit_ok(user_id, amount, device, order_id):
             # 支持通过字典传递完整的device信息或是通过str直接传device_type
             if isinstance(device, dict):
                 device_type = device['device_type']
-            elif isinstance(device, str):
+            elif isinstance(device, str) or isinstance(device, unicode):
                 assert device in ['pc', 'ios', 'android']
                 device_type = device
             else:
@@ -167,6 +167,45 @@ def deposit_ok(user_id, amount, device, order_id):
         logger.info('=deposit_ok= Success: [%s], [%s]' % user_profile.phone, order_id, amount)
     except Exception, e:
         logger.exception('=deposit_ok= Except: [%s]' % str(e))
+
+
+@app.task
+def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name):
+    user = User.objects.filter(id=user_id).first()
+    # 短信通知添加用户名
+
+
+    send_messages.apply_async(kwargs={
+        'phones': [phone],
+        # 'messages': [messages.withdraw_submitted(amount, timezone.now())]
+        'messages': [messages.withdraw_submitted(user_name)]
+    })
+    title, content = messages.msg_withdraw(timezone.now(), amount)
+    inside_message.send_one.apply_async(kwargs={
+        "user_id": user.id,
+        "title": title,
+        "content": content,
+        "mtype": "withdraw"
+    })
+    weixin_user = WeixinUser.objects.filter(user=user).first()
+    if weixin_user:
+        from weixin.tasks import sentTemplate
+        # 亲爱的{}，您的提现申请已受理，1-3个工作日内将处理完毕，请耐心等待。
+    # {{first.DATA}} 取现金额：{{keyword1.DATA}} 到账银行：{{keyword2.DATA}} 预计到账时间：{{keyword3.DATA}} {{remark.DATA}}
+        now = datetime.datetime.now()
+        withdraw_ok_time = "%s前处理完毕"%(now+datetime.timedelta(days=3)).strftime('%Y年%m月%d日')
+        sentTemplate.apply_async(kwargs={
+                        "kwargs":json.dumps({
+                                        "openid":weixin_user.openid,
+                                        "template_id":WITH_DRAW_SUBMITTED_TEMPLATE_ID,
+                                        "first":u"亲爱的%s，您的提现申请已受理"%name,
+                                        "keyword1":str(amount),
+                                        "keyword2":bank_name,
+                                        "keyword3":withdraw_ok_time,
+                                            })},
+                                        queue='celery02')
+
+
 
 
 @app.task

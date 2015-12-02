@@ -1,10 +1,19 @@
 (function(org) {
 
 		$('.click_rule').click(function(){
-			$('.strategy_wrap').addClass('strategy_wrap_show');
+			if($('.strategy_wrap').hasClass('strategy_wrap_show')){
+				$('.strategy_wrap').removeClass('strategy_wrap_show');
+			}else{
+				$('.strategy_wrap').addClass('strategy_wrap_show');
+			}
+
 		});
 		$('.see_red_rule').click(function(){
-			$('.recommend_send_red').addClass('recommend_send_red_show');
+			if($('.recommend_send_red').hasClass('recommend_send_red_show')){
+				$('.recommend_send_red').removeClass('recommend_send_red_show');
+			}else{
+				$('.recommend_send_red').addClass('recommend_send_red_show');
+			}
 		});
 		$('.title_wrap .close,.title_wrap .button').click(function(){
 			$('.title_wrap').hide();
@@ -21,11 +30,9 @@
 		var login = false;
 		wlb.ready({
 			app: function (mixins) {
+				$('.code_wrap').hide();
 				$('#take').click(function () {
 					mixins.registerApp();
-				});
-				$('#take_red').click(function () {
-					mixins.jumpToManageMoney();
 				});
 				$('#take_red').click(function () {
 					mixins.jumpToManageMoney();
@@ -34,7 +41,7 @@
 					if (data.ph == '') {
 						login = false;
 						$('#register').click(function(){
-							mixins.loginApp();
+							mixins.registerApp();
 						});
 						$('#go_user').on('click',function() {
 							mixins.loginApp();
@@ -52,10 +59,8 @@
 			},
 			other: function(){
 				$('.code_wrap').show();
-				$('#register').on('click',function(){
-					window.location.href = '/weixin/regist/'
-				});
-				$('#take').on('click',function(){
+
+				$('#take,#register').on('click',function(){
 					if(h5_user_static){
 						$('.title_wrap').show();
 					}else{
@@ -118,7 +123,6 @@
 						imgUrl: shareImg
 					})
 				})
-
 			}
 		})
 	})(org);

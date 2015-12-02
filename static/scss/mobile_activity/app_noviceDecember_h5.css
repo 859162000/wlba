@@ -10,17 +10,12 @@
   width: 100%;
   position: relative;
   padding-top: 1.5rem;
-  margin-top: 1.5rem;
   display: inline-block; }
   .step_wrap .title_bg {
     width: 100%;
-    display: block;
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    z-index: 2; }
+    display: block; }
   .step_wrap .main {
-    padding: 1.5rem 0 0.5rem;
+    padding: 0.5rem 0 0.5rem;
     background: url("/static/imgs/mobile_activity/app_noviceDecember_h5/step_wrap_bg.png") no-repeat;
     background-size: 100% 100%; }
     .step_wrap .main .box {
@@ -87,17 +82,12 @@
   width: 100%;
   position: relative;
   padding-top: 1.5rem;
-  margin-top: 1.5rem;
   font-size: 0; }
   .strategy_wrap .title_bg {
     width: 100%;
-    display: block;
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 2; }
+    display: block; }
   .strategy_wrap .main {
-    padding: 1.5rem 0 0.5rem;
+    padding: 0.5rem 0 0.5rem;
     background: url("/static/imgs/mobile_activity/app_noviceDecember_h5/strategy_wrap_bg.png") no-repeat;
     background-size: 100% 100%;
     display: inline-block; }
@@ -197,17 +187,12 @@
   width: 100%;
   position: relative;
   padding-top: 1.5rem;
-  margin-top: 1.5rem;
   font-size: 0; }
   .recommend_send_red .title_bg {
     width: 100%;
-    display: block;
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 2; }
+    display: block; }
   .recommend_send_red .main {
-    padding: 1.5rem 0 0.5rem;
+    padding: 0.5rem 0 0.5rem;
     background: url("/static/imgs/mobile_activity/app_noviceDecember_h5/send_red_bg.png") no-repeat;
     background-size: 100% 100%;
     display: inline-block;
@@ -383,7 +368,8 @@
   clear: both;
   position: relative;
   left: 0;
-  top: 0; }
+  top: 0;
+  display: none; }
   .code_wrap .bg {
     width: 100%;
     display: block; }

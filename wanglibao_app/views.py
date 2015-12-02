@@ -49,7 +49,7 @@ from wanglibao_activity.utils import get_queryset_paginator, get_sorts_for_activ
 from wanglibao_announcement.models import AppMemorabilia
 from weixin.util import _generate_ajax_template
 from django.core.paginator import Paginator
-from django.core.paginator import PageNotAnInteger
+from django.core.paginator import PageNotAnInteger, EmptyPage
 
 logger = logging.getLogger(__name__)
 
@@ -186,6 +186,8 @@ class AppRepaymentPlanAllAPIView(APIView):
                 user_amortizations = paginator.page(page)
             except PageNotAnInteger:
                 user_amortizations = paginator.page(1)
+            except EmptyPage:
+                user_amortizations = []
             except Exception:
                 user_amortizations = paginator.page(paginator.num_pages)
 
@@ -289,6 +291,7 @@ def _user_amortization_list(user_amortizations):
             'interest': amo.interest,
             'penal_interest': amo.penal_interest,
             'coupon_interest': amo.coupon_interest,
+            'total_interest': amo.interest + amo.penal_interest + amo.coupon_interest,  # 总利息
             'settled': amo.settled,
             'settlement_time': amo.settlement_time,
             'settlement_status': status
