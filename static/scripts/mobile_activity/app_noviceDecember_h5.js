@@ -270,7 +270,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 				})
 			},
 			other: function(){
-
+				$('.code_wrap').show();
 				$('#register').on('click',function(){
 					window.location.href = '/weixin/regist/'
 				});
@@ -292,7 +292,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					}
 				});
 			   	//console.log('其他场景的业务逻辑');
-
 				var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 				org.ajax({
 					type : 'GET',
