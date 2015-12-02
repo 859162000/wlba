@@ -368,18 +368,23 @@ def getOrCreateWeixinUser(openid, weixin_account):
 
 
 def bindUser(w_user, user):
+    is_first_bind = False
     if w_user.user:
         if w_user.user.id==user.id:
-            return 1, u'你已经绑定, 请勿重复绑定'
-        return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone
+            return 1, u'你已经绑定, 请勿重复绑定', is_first_bind
+        return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone, is_first_bind
     other_w_user = WeixinUser.objects.filter(user=user).first()
     if other_w_user:
         msg = u"你的手机号%s已经绑定微信<span style='color:#173177;'>%s</span>"%(user.wanglibaouserprofile.phone, other_w_user.nickname)
-        return 3, msg
+        return 3, msg, is_first_bind
     w_user.user = user
     w_user.bind_time = int(time.time())
     w_user.save()
-    return 0, u'绑定成功'
+    if user.wanglibaouserprofile.first_bind_time:
+        user.wanglibaouserprofile.first_bind_time = w_user.bind_time
+        user.wanglibaouserprofile.save()
+        is_first_bind = True
+    return 0, u'绑定成功', is_first_bind
 
 class WeixinLogin(TemplateView):
     template_name = 'weixin_login_new.jade'
