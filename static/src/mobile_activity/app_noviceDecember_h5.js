@@ -73,7 +73,6 @@
 					}
 				});
 			   	//console.log('其他场景的业务逻辑');
-
 				var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 				org.ajax({
 					type : 'GET',
