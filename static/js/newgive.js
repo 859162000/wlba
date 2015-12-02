@@ -13,7 +13,7 @@
     require(['jquery', 'activityRegister'], function ($, re) {
         //注册
         re.activityRegister.activityRegisterInit({
-            registerTitle: '领取580新用户红包',    //注册框标语
+            registerTitle: '注册即送28888体验金',    //注册框标语
             isNOShow: '1',
             buttonFont: '立即注册'
         });
@@ -60,9 +60,9 @@
             // reType = type == 'man' ? '人' : '元';
             if (type == "amount") {
                 if (len > 8) {
-                    str = isNode(value.substr(0, len - 8), '亿') + isNode(value.substr(len - 8, 4), '万') + isNode(value.substr(len - 4, len), '元');
+                    str = isNode(value.substr(0, len - 8), '亿') + isNode(value.substr(len - 8, 4), '万');
                 } else {
-                    str = isNode(value.substr(0, len - 4), '万') + isNode(value.substr(len - 4, len), '元');
+                    str = isNode(value.substr(0, len - 4), '万');
                 }
             } else {
                 str = isNode(value.substr(0, len), '位小伙伴');
