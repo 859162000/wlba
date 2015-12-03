@@ -2,7 +2,7 @@
 from django.conf.urls import patterns, url
 from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth.decorators import login_required
-import views, views_activity, manage_views
+import views, views_activity, manage_views, sub_views
 
 
 urlpatterns = patterns(
@@ -63,6 +63,12 @@ urlpatterns = patterns(
     url(r'^sub_code/$', TemplateView.as_view(template_name="sub_code.jade")),
     url(r'^sub_invite/$', views_activity.InviteWeixinFriendTemplate.as_view(template_name="sub_invite_server.jade"), name='sub_invite'),
 
+)
+
+# 微信管理后台
+urlpatterns += patterns(
+    '',
+    url(r'^sub_join/(?P<account_key>\w+)/$', sub_views.SubWeixinJoinView.as_view(), name='sub_weixin_join'),
 )
 
 
