@@ -274,8 +274,8 @@ class WeixinJoinView(View):
         if eventKey:
             scene_id = eventKey
             if eventKey.isdigit():
-                user_id = eventKey[:-2]
-                channel_digital_code = eventKey[-2:]
+                user_id = eventKey[:-3]
+                channel_digital_code = eventKey[-3:]
                 user = User.objects.filter(pk=int(user_id)).first()
                 if user:
                     rs, txt = bindUser(w_user, user)
