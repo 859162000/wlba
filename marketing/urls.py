@@ -151,7 +151,7 @@ urlpatterns += patterns(
 
     url(r'^app_thanksgiv/$', TemplateView.as_view(template_name="app_thanksgiv.jade")),
     url(r'^app_thanksgivin/$', TemplateView.as_view(template_name="app_thanksgivin.jade")),
-    #url(r'^app_noviceDecember_h5/$', TemplateView.as_view(template_name="app_noviceDecember_h5.jade")),
+    url(r'^app_noviceDecember_h5/$', TemplateView.as_view(template_name="app_noviceDecember_h5.jade")),
     #url(r'^app_juchengtwo/$', TemplateView.as_view(template_name="app_juchengtwo.jade")),
 
 
