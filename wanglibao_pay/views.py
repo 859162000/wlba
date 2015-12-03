@@ -209,6 +209,7 @@ class PayCallback(View):
     def dispatch(self, request, *args, **kwargs):
         return super(PayCallback, self).dispatch(request, *args, **kwargs)
 
+
 class YeeProxyPayCompleteView(TemplateView):
     template_name = 'pay_complete.jade'
 
@@ -255,7 +256,6 @@ class YeeProxyPayCompleteView(TemplateView):
         return super(YeeProxyPayCompleteView, self).dispatch(request, *args, **kwargs)
 
 
-
 class WithdrawView(TemplateView):
     template_name = 'withdraw.jade'
 
@@ -278,6 +278,11 @@ class WithdrawView(TemplateView):
             'announcements': AnnouncementAccounts
         }
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.wanglibaouserprofile.frozen:
+            return HttpResponseRedirect('/')
+        return super(WithdrawView, self).dispatch(request, *args, **kwargs)
+
 
 class WithdrawCompleteView(TemplateView):
     template_name = 'withdraw_complete.jade'
@@ -294,6 +299,10 @@ class WithdrawCompleteView(TemplateView):
         if not user.wanglibaouserprofile.id_is_valid:
             return self.render_to_response({
                 'result': u'请先进行实名认证'
+            })
+        if user.wanglibaouserprofile.frozen:
+            return self.render_to_response({
+                'result': u'账户已冻结!请联系网利宝客服:4008-588-066'
             })
         phone = user.wanglibaouserprofile.phone
         code = request.POST.get('validate_code', '')
