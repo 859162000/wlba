@@ -121,7 +121,7 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
         if first_buy and int(first_buy.order_id) == int(order_id):
             # Add by hb only for debug
             if first_buy.order_id <> order_id:
-                logger.exception("=_check_rules_trigger= first_buy: type(%s)=[%s], type(%s)=[%s]" % first_buy.order_id, type(first_buy.order_id), order_id, type(order_id))
+                logger.exception("=_check_rules_trigger= first_buy: type(%s)=[%s], type(%s)=[%s]" % (first_buy.order_id, type(first_buy.order_id), order_id, type(order_id)))
             # 判断当前购买产品id是否在活动设置的id中
             if product_id > 0 and rule.activity.product_ids:
                 is_product = _check_product_id(product_id, rule.activity.product_ids)
