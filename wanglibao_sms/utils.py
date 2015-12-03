@@ -111,8 +111,6 @@ def send_validation_code(phone, validate_code=None, ip=""):
         seconds = now - code.last_send_time
         seconds = seconds.total_seconds()
 
-        if seconds <= 60:
-            return 429, u'请60秒之后重试'
         if code.code_send_count >= 10:
             return 429, u'请联系客服进行验证'
         if code.code_send_count >= 6 and seconds < 86400:
@@ -121,6 +119,8 @@ def send_validation_code(phone, validate_code=None, ip=""):
         if code.code_send_count >= 3 and seconds < 3600:
             #return 429, u'4-请60分钟后重试'
             return 429, u'请{0}分钟后重试'.format(int(((3600-seconds)//60)+1))
+        if seconds <= 60:
+            return 429, u'请60秒之后重试'
 
         valid_seconds = now - code.create_time
         valid_seconds = valid_seconds.total_seconds()
