@@ -1117,6 +1117,7 @@ class WithdrawAPIView(DecryptParmsAPIView):
                 "amount": result['amount'],
                 "bank_name": result['bank_name']
             })
+        return Response(result)
 
 class BindCardQueryView(APIView):
     """ 查询用户绑定卡号列表接口 """
