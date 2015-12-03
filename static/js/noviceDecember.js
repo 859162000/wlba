@@ -1,37 +1,26 @@
 (function() {
     require.config({
         paths: {
-            jquery: 'lib/jquery.min',
-            'jquery.modal': 'lib/jquery.modal.min',
-            'activityRegister': 'activityRegister'
+            jquery: 'lib/jquery.min'
         },
         shim: {
             'jquery.modal': ['jquery']
         }
     });
-    require(['jquery', 'activityRegister'],
+    require(['jquery'],
     function($, re) {
-        re.activityRegister.activityRegisterInit({
-            registerTitle: '限时限量，满额直送',
-            isNOShow: '1',
-            hasCallBack: true,
-            callBack: function() {
-                $.ajax({
-                    url: '/api/gift/owner/?promo_token=jcw',
-                    type: "POST",
-                    data: {
-                        phone: '',
-                        address: '',
-                        name: '',
-                        action: 'ENTER_WEB_PAGE'
-                    }
-                }).done(function(json) {
-                })
-            }
-        })
+
+        var h5_user_static;
+		$.ajax({
+			url: '/api/user_login/',
+			type: 'post',
+			success: function (data1) {
+				h5_user_static = data1.login;
+			}
+		})
 
 		$('.take_red,#zhuce').click(function(){
-			if($('#denglu').index()){
+			if(h5_user_static){
 				$('.title_wrap').show();
 			}else{
 				window.location.href = '/activity/experience/gold/'
@@ -39,7 +28,7 @@
 		});
 
 		$('.take_first_red').click(function(){
-			if($('#denglu').index()){
+			if(h5_user_static){
 				window.location.href = '/p2p/list/'
 			}else{
 				window.location.href = '/accounts/login/?next=/p2p/list/'
