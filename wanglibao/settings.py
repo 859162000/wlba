@@ -914,7 +914,7 @@ if ENV == ENV_DEV:
     ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
     # Modify by hb on 2015-12-02
     #STATIC_FILE_HOST = 'http://localhost:8000'
-    STATIC_FILE_HOST = ''
+    STATIC_FILE_HOST = 'http://localhost:8000'
 
 PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
 PROMO_TOKEN_QUERY_STRING = 'promo_token'
