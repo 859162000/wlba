@@ -1318,9 +1318,12 @@ class GenerateQRSceneTicket(APIView):
     def get(self, request):
         original_id = request.GET.get('original_id')
         channel_code = request.GET.get('code')
-        if not original_id:
+        phone = request.GET.get('phone')
+        if not original_id or not channel_code or not phone:
             return Response({'errcode':-1, 'errmsg':"-1"})
-
+        user_profile = WanglibaoUserProfile.objects.filter(phone=phone).first()
+        if not user_profile or user_profile.user_id != request.user.id:
+            return Response({'errcode':-2, 'errmsg':"invalid phone"})
         weixin_account = WeixinAccounts.getByOriginalId(original_id)
 
         client = WeChatClient(weixin_account.app_id, weixin_account.app_secret, weixin_account.access_token)
