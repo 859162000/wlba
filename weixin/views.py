@@ -312,13 +312,13 @@ class WeixinJoinView(View):
                 {'image':B_img_url, 'url':B_url, 'description':'B轮4000万美元融资', 'title':'B轮4000万美元融资'},]
 
     def getBindTxt(self, fromUserName):
-        bind_url = settings.CALLBACK_HOST + reverse('weixin_bind') + "?openid=%s"%(fromUserName)
+        bind_url = settings.CALLBACK_HOST + reverse('weixin_bind') + "?openid=%s&promo_token=fwh"%(fromUserName)
         txt = u"终于等到你，还好我没放弃。绑定网利宝帐号，轻松投资、随时随地查看收益！\n" \
               u"<a href='%s'>【立即绑定】</a>"%(bind_url)
         return txt
 
     def getUnBindTxt(self, fromUserName, userPhone):
-        unbind_url = settings.CALLBACK_HOST + reverse('weixin_unbind') + "?openid=%s"%(fromUserName)
+        unbind_url = settings.CALLBACK_HOST + reverse('weixin_unbind') + "?openid=%s&promo_token=fwh"%(fromUserName)
         txt = u"您的微信绑定帐号为：%s\n"%userPhone\
             +u"如需解绑当前帐号，请点击<a href='%s'>【立即解绑】</a>"%unbind_url
         return txt
