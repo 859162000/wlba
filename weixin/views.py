@@ -278,7 +278,7 @@ class WeixinJoinView(View):
                 channel_digital_code = eventKey[-2:]
                 user = User.objects.filter(pk=int(user_id)).first()
                 if user:
-                    rs, txt = bindUser(w_user, user)
+                    rs, txt, is_first_bind = bindUser(w_user, user)
                     channel = WeiXinChannel.objects.filter(digital_code=channel_digital_code).first()
                     if channel:
                         scene_id = channel.code
@@ -494,7 +494,7 @@ class WeixinBind(TemplateView):
         try:
             openid = self.request.GET.get('openid')
             weixin_user = WeixinUser.objects.get(openid=openid)
-            rs, txt = bindUser(weixin_user, user)
+            rs, txt, is_first_bind = bindUser(weixin_user, user)
             if rs == 0:
                 now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
                 weixin.tasks.sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
