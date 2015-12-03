@@ -66,6 +66,7 @@ urlpatterns = patterns(
     url(r'^xiaoher/$', TemplateView.as_view(template_name="xiaoher.jade")),
     url(r'fun_tuan/$', TemplateView.as_view(template_name="fun_tuan.jade")),
     url(r'noviceDecember/$', TemplateView.as_view(template_name="noviceDecember.jade")),
+    #url(r'^juchengtwo/$', TemplateView.as_view(template_name="juchengtwo.jade")),
 )
 
 # app URL
@@ -141,23 +142,27 @@ urlpatterns += patterns(
     url(r'^app_two-eleven/$', TemplateView.as_view(template_name="app_two-eleven.jade")),
     url(r'^app_bid/$', TemplateView.as_view(template_name="app_bid.jade")),
     url(r'^app_365_gu/$', TemplateView.as_view(template_name="app_365_gu.jade")),
-#    url(r'^app_xiaoher/$', TemplateView.as_view(template_name="app_xiaoher.jade")),
+    #url(r'^app_xiaoher/$', TemplateView.as_view(template_name="app_xiaoher.jade")),
 
     url(r'^app-invite/$', TemplateView.as_view(template_name="app_invite_friends.jade")),
     url(r'^app-invite-success/$', TemplateView.as_view(template_name="app_invite_success.jade")),
     url(r'^app-invite-error/$', TemplateView.as_view(template_name="app_invite_error.jade")),
     url(r'^app-invite-server/$', TemplateView.as_view(template_name="app_invite_server.jade")),
-    #url(r'^app_thanksgiv/$', TemplateView.as_view(template_name="app_thanksgiv.jade")),
-    #url(r'^app_thanksgivin/$', TemplateView.as_view(template_name="app_thanksgivin.jade")),
+
+    url(r'^app_thanksgiv/$', TemplateView.as_view(template_name="app_thanksgiv.jade")),
+    url(r'^app_thanksgivin/$', TemplateView.as_view(template_name="app_thanksgivin.jade")),
+    #url(r'^app_noviceDecember_h5/$', TemplateView.as_view(template_name="app_noviceDecember_h5.jade")),
+    #url(r'^app_juchengtwo/$', TemplateView.as_view(template_name="app_juchengtwo.jade")),
+
 
     # url(r'^app_thanksgivin/$', login_required(TemplateView.as_view(template_name="app_thanksgivin.jade"), login_url='/accounts/token_login/')),
 
 )
 # app with webview
-#urlpatterns += patterns(
-#    '',
-#    url(r'^thanks/$', login_required(TemplateView.as_view(template_name="app_thanksgiv.jade"), login_url='/accounts/token_login/')),
-#)
+urlpatterns += patterns(
+    '',
+    url(r'^thanks/$', login_required(TemplateView.as_view(template_name="app_thanksgiv.jade"), login_url='/accounts/token_login/')),
+)
 
 
 urlpatterns += patterns(

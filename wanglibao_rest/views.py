@@ -314,7 +314,7 @@ class RegisterAPIView(APIView):
         if request.DATA.get('IGNORE_PWD'):
             send_messages.apply_async(kwargs={
                 "phones": [identifier,],
-                "messages": [u'[网利科技]用户名： '+identifier+u'; 登录密码:'+password,]
+                "messages": [u'【网利科技】用户名： '+identifier+u'; 登录密码:'+password,]
             })
 
             logger.debug("此次 channel:%s" %(channel))
@@ -778,6 +778,18 @@ class UserExisting(APIView):
         #                        "existing": False
         #                    }, status=400)
 
+
+class UserHasLoginAPI(APIView):
+    """
+        判断用户是否已经登录
+    """
+    permission_classes = ()
+
+    def post(self, request):
+        if not request.user.is_authenticated():
+            return Response({"login": False})
+        else:
+            return Response({"login": True})
 
 class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)
