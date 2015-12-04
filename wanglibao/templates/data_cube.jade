@@ -1,0 +1,85 @@
+doctype html
+html
+  head
+    - with '贷款专区' as title
+    include global/g_head
+    - endwith
+  body.data-cube
+    include global/g_nav
+    .data-cube-part.data-cube-part1
+      .w1100
+        p.cube-title 平台数据总览
+          span.cube-title-l （数据截止日期:2015.11.10）
+        ul.data-item-box
+          li.data-item.data-red
+            p.tit 撮合贷款额（元）
+            p.num 1,234,567,890<span class="font-l">.28</span>
+          li.data-item.data-blue
+            p.tit 已还本金（元）
+            p.num 234,567,890<span class="font-l">.28</span>
+          li.data-item.data-green
+            p.tit 累计预期收益（元）
+            p.num 34,567,890<span class="font-l">.28</span>
+          li.data-item.data-orange
+            p.tit 累计发放收益（元）
+            p.num 234,567,890<span class="font-l">.28</span>
+        .data-total#data-total
+        p.data-img-tit 网利宝月交易额
+    .data-cube-part.data-cube-part2
+      .w1100
+        p.cube-title 平台7日数据
+          span.cube-title-l （2015.11.3—11.10）
+        ul.cube-seven
+          li.cube-seven-item
+            p.txt-center
+             .cube-icon.cube-icon1
+            p.num 1,234,567,890.28
+            p.s-tit 撮合贷款额（元）
+          li.cube-seven-item
+            p.txt-center
+             .cube-icon.cube-icon2
+            p.num 1,234,567,890.28
+            p.s-tit 已还本金（元）
+          li.cube-seven-item
+            p.txt-center
+             .cube-icon.cube-icon3
+            p.num 1,234,567,890.28
+            p.s-tit 累计预期收益（元）
+          li.cube-seven-item
+            p.txt-center
+             .cube-icon.cube-icon4
+            p.num 1,234,567,890.28
+            p.s-tit 累计发放收益（元）
+    .data-cube-part.data-cube-part3
+      .w1100
+        p.cube-title 融资概览
+        .cube-survey.clearfix
+          ul
+             li.cube-survey-item
+               p.center-text 融资期限
+               .cube-survey-img#cube-survey-img1
+             li.cube-survey-item
+               p.center-text 融资金额
+               .cube-survey-img#cube-survey-img2
+             li.cube-survey-item
+               p.center-text 融资类型
+               .cube-survey-img#cube-survey-img3
+             li.cube-survey-item
+               p.center-text 还款方式
+               .cube-survey-img#cube-survey-img4
+    .data-cube-part.data-cube-part4
+      .w1100
+        p.cube-title 投资概况
+        .part4-mian
+          .age-box
+            p.part4-tit-l 投资人年龄分布
+            .cube-age#cube-age
+          .sex-box
+            p.part4-tit-l 投资人性别分布
+            .cube-sex#cube-sex
+
+    include global/g_footer
+    script.
+      require(["/static/src/pc/echarts.js","/static/src/pc/data_cube.js"])
+
+    include include/tracking
