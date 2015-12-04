@@ -41,7 +41,7 @@ from wechatpy.oauth import WeChatOAuth
 from weixin.common.decorators import weixin_api_error
 from weixin.common.wx import generate_js_wxpay
 from .models import Account, WeixinUser, WeixinAccounts, AuthorizeInfo, QrCode, SubscribeService, SubscribeRecord, WeiXinChannel
-from .common.wechat import tuling
+# from .common.wechat import tuling
 from decimal import Decimal
 from wanglibao_pay.models import Card
 from marketing.utils import get_channel_record
@@ -138,6 +138,7 @@ class WeixinJoinView(View):
                 w_user = getOrCreateWeixinUser(fromUserName, weixin_account)
                 if w_user.subscribe != 0:
                     w_user.subscribe = 0
+                w_user.unsubscribe_time = int(time.time())
                 w_user.user = None
                 w_user.save()
                 reply = create_reply(u'欢迎下次关注我们！', msg)
@@ -231,7 +232,7 @@ class WeixinJoinView(View):
         if content == 'td':
             sub_records = SubscribeRecord.objects.filter(w_user=w_user, status=True)
             if sub_records.exists():
-                sub_records.update(status=False)
+                sub_records.update(status=False, unsubscribe_time=int(time.time()))
                 txt = u'订阅项目已退订成功，如需订阅相关项目，请再次点击【个性化项目】进行订阅'
             else:
                 txt = u'您没有可退订项目，如需订阅相关项目，请再次点击【个性化项目】进行订阅'
@@ -246,8 +247,10 @@ class WeixinJoinView(View):
                 sub_service_record = SubscribeRecord()
                 sub_service_record.service = sub_service
                 sub_service_record.w_user = w_user
+                sub_service_record.subscribe_time=int(time.time())
             if not sub_service_record.status:
                 sub_service_record.status = True
+                sub_service_record.subscribe_time=int(time.time())
                 sub_service_record.save()
                 txt = u'恭喜您，%s订阅成功，系统会在第一时间发送给您相关信息'%(sub_service.describe)
             if txt:
@@ -269,9 +272,14 @@ class WeixinJoinView(View):
         #如果eventkey为用户id则进行绑定
         if eventKey:
             if eventKey.isdigit():
-                user = User.objects.filter(pk=int(eventKey)).first()
+                user_id = eventKey[:-2]
+                channel_digital_code = eventKey[-2:]
+                user = User.objects.filter(pk=int(user_id)).first()
                 if user:
                     rs, txt = bindUser(w_user, user)
+                    channel = WeiXinChannel.objects.filter(digital_code=channel_digital_code).first()
+                    if channel:
+                        w_user.scene_id = channel.code
                     reply = create_reply(txt, msg)
         if not old_subscribe and w_user.subscribe:
             w_user.scene_id = eventKey
@@ -337,7 +345,7 @@ def getOrCreateWeixinUser(openid, weixin_account):
     if w_user.account_original_id != weixin_account.db_account.original_id:
         w_user.account_original_id = weixin_account.db_account.original_id
         w_user.save()
-    if not w_user.nickname or not w_user.subscribe:
+    if not w_user.nickname or not w_user.subscribe or not w_user.subscribe_time:
         try:
             user_info = weixin_account.db_account.get_user_info(openid)
             w_user.nickname = user_info.get('nickname', "")
@@ -367,6 +375,7 @@ def bindUser(w_user, user):
         msg = u"你的手机号%s已经绑定微信<span style='color:#173177;'>%s</span>"%(user.wanglibaouserprofile.phone, other_w_user.nickname)
         return 3, msg
     w_user.user = user
+    w_user.bind_time = int(time.time())
     w_user.save()
     return 0, u'绑定成功'
 
@@ -413,7 +422,7 @@ class WeixinRegister(TemplateView):
         elif token_session:
             token = token_session
         else:
-            token = 'fwh'
+            token = 'weixin'
 
         if token:
             channel = get_channel_record(token)
@@ -538,6 +547,7 @@ class UnBindWeiUserAPI(APIView):
         if weixin_user.user:
             user_phone = weixin_user.user.wanglibaouserprofile.phone
             weixin_user.user = None
+            weixin_user.unbind_time = int(time.time())
             weixin_user.save()
             now_str = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M')
             logout(request)
@@ -1303,16 +1313,23 @@ class GetUserInfo(APIView):
 
 class GenerateQRSceneTicket(APIView):
     permission_classes = (IsAuthenticated,)
-    def post(self, request):
+    def get(self, request):
         original_id = request.DATA.get('original_id')
+        channel_code = request.DATA.get('code')
         if not original_id:
             return Response({'errcode':-1, 'errmsg':"-1"})
 
         weixin_account = WeixinAccounts.getByOriginalId(original_id)
 
         client = WeChatClient(weixin_account.app_id, weixin_account.app_secret, weixin_account.access_token)
+        scene_id = str(request.user.id)
+        if channel_code:
+            channel = WeiXinChannel.objects.filter(code=channel_code).first()
+            if channel:
+                scene_id = scene_id + str(channel.digital_code)
+        scene_id = int(scene_id)
         # print int(request.user.id)
-        qrcode_data = {"action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": request.user.id}}}
+        qrcode_data = {"action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": scene_id}}}
         # qrcode_data = {"action_name":"QR_LIMIT_SCENE", "action_info":{"scene": {"scene_id": phone}}}
         try:
             rs = client.qrcode.create(qrcode_data)
@@ -1320,6 +1337,7 @@ class GenerateQRSceneTicket(APIView):
         except WeChatException,e:
             return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
         return Response({'qrcode_url':qrcode_url})
+
 
 
 class GenerateQRLimitSceneTicket(APIView):
@@ -1369,22 +1387,6 @@ def testTemplate():
                         first=u"您好，恭喜您账户绑定成功！\n  \n您的账户已经与微信账户绑定在一起。",
                         keyword1=u"2015年09月22日")
 
-
-
-def sendAwardRedpackTempalte(openid, amount_str, type, rule_desc=""):
-    first = u'您获得了%s'
-    if type == 0:
-        first = first%(u'红包')
-    if type ==1:
-        first = first%(u'加息券')
-    template = MessageTemplate(AWARD_COUPON_TEMPLATE_ID,
-        first=first, present_income=amount_str, remark=rule_desc)
-    try:
-        w_user = WeixinUser.objects.get(openid=openid)
-        if w_user:
-            SendTemplateMessage.sendTemplate(w_user, template)
-    except:
-        pass
 
 def checkAndSendProductTemplate(sender, **kw):
     # print kw

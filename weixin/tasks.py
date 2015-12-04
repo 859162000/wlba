@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # encoding:utf-8
 
-from celery.utils.log import get_task_logger
 from wanglibao.celery import app
 from wanglibao_p2p.models import P2PProduct
 from django.contrib.auth.models import User

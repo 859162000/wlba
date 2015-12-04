@@ -91,7 +91,10 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
                                                status=PayInfo.SUCCESS
                                                ).order_by('create_time').first()
 
-        if first_pay and first_pay.order_id == order_id:
+        if first_pay and int(first_pay.order_id) == int(order_id):
+            # Add by hb only for debug
+            if first_pay.order_id <> order_id:
+                logger.exception("=_check_rules_trigger= type(%s)=[%s], type(%s)=[%s]" % first_pay.order_id, type(first_pay.order_id), order_id, type(order_id))
             _check_trade_amount(user, rule, device_type, amount, is_full)
     # 充值
     elif trigger_node == 'pay':
@@ -107,7 +110,10 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
             first_buy = P2PRecord.objects.filter(user=user
                                                  ).order_by('create_time').first()
 
-        if first_buy and first_buy.order_id == order_id:
+        if first_buy and int(first_buy.order_id) == int(order_id):
+            # Add by hb only for debug
+            if first_buy.order_id <> order_id:
+                logger.exception("=_check_rules_trigger= type(%s)=[%s], type(%s)=[%s]" % first_buy.order_id, type(first_buy.order_id), order_id, type(order_id))
             # 判断当前购买产品id是否在活动设置的id中
             if product_id > 0 and rule.activity.product_ids:
                 is_product = _check_product_id(product_id, rule.activity.product_ids)

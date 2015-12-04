@@ -45,7 +45,7 @@ from wanglibao_app.questions import question_list
 from wanglibao_margin.models import MarginRecord
 from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityShow
-from wanglibao_activity.utils import get_queryset_paginator
+from wanglibao_activity.utils import get_queryset_paginator, get_sorts_for_activity_show
 from wanglibao_announcement.models import AppMemorabilia
 from weixin.util import _generate_ajax_template
 from django.core.paginator import Paginator
@@ -246,6 +246,19 @@ class AppRepaymentPlanMonthAPIView(APIView):
             amo_list = _user_amortization_list(user_amortizations)
         else:
             amo_list = []
+
+        if not amo_list:
+            custom_month_data = {
+                'term_date': current_month,
+                'term_date_count': 0,
+                'total_sum': 0.0,
+                'principal_sum': 0.0,
+                'interest_sum': 0.0,
+                'penal_interest_sum': 0.0,
+                'coupon_interest_sum': 0.0,
+            }
+            month_group.append(custom_month_data)
+            month_group.sort(key=lambda x: x['term_date'])
 
         return Response({'ret_code': 0,
                          'data': amo_list, 
@@ -801,12 +814,12 @@ class AppAreaView(TemplateView):
                                                     is_app=True,
                                                     start_at__lte=timezone.now(),
                                                     end_at__gt=timezone.now()
-                                                    ).select_related('activity').\
-                                                    order_by('-priority',
-                                                             '-created_at',)
+                                                    ).select_related('activity')
 
         limit = 6
         page = 1
+
+        activity_list = get_sorts_for_activity_show(activity_list)
 
         activity_list, all_page, data_count = get_queryset_paginator(activity_list, 1, limit)
 
@@ -832,9 +845,9 @@ class AppAreaApiView(APIView):
                                                     is_app=True,
                                                     start_at__lte=timezone.now(),
                                                     end_at__gt=timezone.now(),
-                                                    ).select_related('activity').\
-                                                    order_by('-priority',
-                                                             '-created_at',)
+                                                    ).select_related('activity')
+
+        activity_list = get_sorts_for_activity_show(activity_list)
 
         page = request.GET.get('page', 1)
         pagesize = request.GET.get('pagesize', 6)

@@ -11,6 +11,7 @@ from wechatpy.client import WeChatClient
 from wechatpy.client.api.qrcode import WeChatQRCode
 import logging
 from django.core.exceptions import ValidationError
+from django.conf import settings
 
 logger = logging.getLogger("weixin")
 
@@ -199,46 +200,46 @@ class WeixinAccounts(object):
     data = OrderedDict()
     account_main = {
         'id': 'gh_f758af6347b6',
-        'name': '网利宝',
+        'name': '网利宝服务号',
         'app_id': 'wx896485cecdb4111d',
         'app_secret': '64c4a31828b47cbff0575a52df235ff3',
         'classify': '微信认证服务号',
         'mch_id': '1237430102',
         'key': 'mmeBOdBjuovQOgPPSp1qZFONbHS9pkZn',
-        'token': '6d0dbaca',
+        'token': 'EVf962zt',
         'qrcode_url': '/static/imgs/admin/qrcode_for_gh_f758af6347b6_258.jpg'
     }
     account_sub_1 = {
         'id': 'gh_77c09ff2f3a3',
-        'name': '网利宝',
+        'name': '网利宝订阅号',
         'app_id': 'wx110c1d06158c860b',
         'app_secret': '2523d084edca65b6633dae215967a23f',
         'classify': '微信认证订阅号',
         'EncodingAESKey': '3QXabFsqXV64Bvdc4EvRciOfvWbYw7Fud38J8ianHmx',
-        'token': '695bc700',
+        'token': 'l0HFMuON',
         'qrcode_url': '/static/imgs/admin/qrcode_for_gh_77c09ff2f3a3_258.jpg'
     }
     account_test = {
         'id': 'gh_32e9dc3fab8e',
-        'name': '测试号',
+        'name': 'wxq测试号',
         'app_id': 'wx83535d60d4476686',
         'app_secret': 'cc9f1b27fc4aea966cbada7f7dfec655',
         'classify': '微信公众平台测试号',
-        'token': '6ad01528',
+        'token': 'tgK2dBUn',
         'qrcode_url': '/static/imgs/admin/qrcode_for_gh_d852bc2cead2_258.jpg'
     }
     account_test_hmm = {
         'id': 'gh_3b82a2651647',
-        'name': '测试号',
+        'name': 'hmm测试号',
         'app_id': 'wx18689c393281241e',
         'app_secret': '7b30aec7477fb8eaed0673fca8f41044',
         'classify': '微信公众平台测试号',
-        'token': '6ad01528',
+        'token': 'CPIhRv8V',
         'qrcode_url': '/static/imgs/admin/qrcode_for_gh_d852bc2cead2_258.jpg'
     }
     account_test_yj = {
         'id': 'gh_9e8ff84237cd',
-        'name': '测试号',
+        'name': 'yj测试号',
         'app_id': 'wxd64b17c0ff16c2e4',
         'app_secret': 'd4624c36b6795d1d99dcf0547af5443d',
         'classify': '微信公众平台测试号',
@@ -273,11 +274,13 @@ class WeixinAccounts(object):
 
     @classmethod
     def append_account(cls):
-        cls.data['main'] = cls.account_main
-        cls.data['sub_1'] = cls.account_sub_1
-        cls.data['test'] = cls.account_test
-        cls.data['account_test_hmm']=cls.account_test_hmm
-        cls.data['account_test_yj']=cls.account_test_yj
+        if settings.ENV == settings.ENV_PRODUCTION:
+            cls.data['main'] = cls.account_main
+            cls.data['sub_1'] = cls.account_sub_1
+        else:
+            cls.data['test'] = cls.account_test
+            cls.data['account_test_hmm']=cls.account_test_hmm
+            cls.data['account_test_yj']=cls.account_test_yj
 
     @classmethod
     def account_classify(cls):
@@ -395,6 +398,9 @@ class WeixinUser(models.Model):
     unionid = models.CharField('用户唯一标识', max_length=128, blank=True)
     scene_id = models.CharField('渠道', max_length=64, blank=True, null=True)
     auth_info = models.ForeignKey(AuthorizeInfo, null=True)
+    unsubscribe_time = models.IntegerField('用户取消关注时间', default=0)
+    bind_time = models.IntegerField('用户绑定时间', default=0)
+    unbind_time = models.IntegerField('用户解除绑定时间', default=0)
 
 
 class SubscribeService(models.Model):
@@ -420,6 +426,8 @@ class SubscribeRecord(models.Model):
     w_user = models.ForeignKey(WeixinUser, null=True)
     status = models.BooleanField(u'订阅状态, 0:退订,1:订阅', default=False)
     service = models.ForeignKey(SubscribeService, null=False)
+    subscribe_time = models.IntegerField('用户订阅时间', default=0)
+    unsubscribe_time = models.IntegerField('用户取消订阅时间', default=0)
     # update_at = models.DateTimeField('更新时间', auto_now_add=True)
 
 

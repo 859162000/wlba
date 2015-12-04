@@ -19,8 +19,13 @@ from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity import backends as activity_backends
 from wanglibao_redpack.models import Income, RedPackEvent, RedPack, RedPackRecord
 import datetime
+import json
 from django.db.models import Sum, Count, Q
 import logging
+from weixin.constant import DEPOSIT_SUCCESS_TEMPLATE_ID
+
+from weixin.models import WeixinUser
+
 
 # logger = logging.getLogger('wanglibao_reward')
 
@@ -52,15 +57,15 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False)
 
 def weixin_redpack_distribute(user):
     phone = user.wanglibaouserprofile.phone
-    logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
+    logger.info('通过weixin_redpack渠道注册,phone:%s' % (phone,))
     records = WanglibaoUserGift.objects.filter(valid=0, identity=phone)
     for record in records:
         try:
             redpack_backends.give_activity_redpack(user, record.rules.redpack, 'pc')
         except Exception, reason:
-            logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
+            logger.exception('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
         else:
-            logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (user, record.rules.redpack,))
+            logger.info('Success:发送红包完毕,user:%s, redpack:%s' % (user, record.rules.redpack,))
         record.user = user
         record.valid = 1
         record.save()
@@ -106,7 +111,12 @@ def idvalidate_ok(user_id, device):
 def deposit_ok(user_id, amount, device, order_id):
     # fix@chenweibi, add order_id
     try:
-        device_type = device['device_type']
+        try:
+            device_type = device['device_type']
+        except:
+            device_type = u'pc'
+            logger.exception("=deposit_ok= Failed to get device_type")
+
         title, content = messages.msg_pay_ok(amount)
         inside_message.send_one.apply_async(kwargs={
             "user_id": user_id,
@@ -114,6 +124,7 @@ def deposit_ok(user_id, amount, device, order_id):
             "content": content,
             "mtype": "activityintro"
         })
+
         user = User.objects.get(id=user_id)
         user_profile = user.wanglibaouserprofile
         activity_backends.check_activity(user, 'recharge', device_type,
@@ -122,14 +133,32 @@ def deposit_ok(user_id, amount, device, order_id):
             utils.log_clientinfo(device, "deposit", user_id, order_id, amount)
         except Exception:
             pass
+
         send_messages.apply_async(kwargs={
             'phones': [user_profile.phone],
             'messages': [messages.deposit_succeed(user_profile.name, amount)]
         })
-        logger.debug('send messages 充值金额啊啊啊: %s' % amount)
+
+        weixin_user = WeixinUser.objects.filter(user=user).first()
+        deposit_ok_time = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
+        margin = Margin.objects.filter(user=user).first()
+# 亲爱的满先生，您的充值已成功
+# {{first.DATA}} 充值时间：{{keyword1.DATA}} 充值金额：{{keyword2.DATA}} 可用余额：{{keyword3.DATA}} {{remark.DATA}}
+        from weixin.tasks import sentTemplate
+        sentTemplate.apply_async(kwargs={
+                        "kwargs":json.dumps({
+                                        "openid":weixin_user.openid,
+                                        "template_id":DEPOSIT_SUCCESS_TEMPLATE_ID,
+                                        "first":u"亲爱的%s，您的充值已成功"%user_profile.name,
+                                        "keyword1":deposit_ok_time,
+                                        "keyword2":str(amount),
+                                        "keyword3":str(margin.margin),
+                                            })},
+                                        queue='celery02')
+
+        logger.info('=deposit_ok= Success: [%s], [%s]' % user_profile.phone, order_id, amount)
     except Exception, e:
-        logger.debug('send messages 充值异常啊啊啊: %s' % str(e))
-        pass
+        logger.exception('=deposit_ok= Except: [%s]' % str(e))
 
 
 @app.task

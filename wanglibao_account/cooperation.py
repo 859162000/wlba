@@ -605,7 +605,7 @@ class JinShanRegister(CoopRegister):
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
 
         # 判断是否首次投资
-        if p2p_record and p2p_record.order_id == order_id:
+        if p2p_record and p2p_record.order_id == int(order_id):
             p2p_amount = int(p2p_record.amount)
             if p2p_amount >= 500:
                 if p2p_amount <= 999:
@@ -685,7 +685,7 @@ class ShiTouCunRegister(CoopRegister):
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
 
         # 判断是否首次投资
-        if p2p_record and p2p_record.order_id == order_id:
+        if p2p_record and p2p_record.order_id == int(order_id):
             self.shitoucun_call_back(user)
 
 
@@ -792,7 +792,7 @@ class YunDuanRegister(CoopRegister):
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
 
         # 判断是否首次投资
-        if binding and p2p_record and p2p_record.order_id == order_id:
+        if binding and p2p_record and p2p_record.order_id == int(order_id):
             self.yunduan_call_back()
 
 
@@ -1020,7 +1020,7 @@ class ZGDXRegister(CoopRegister):
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
 
         # 判断是否首次投资
-        if binding and p2p_record and p2p_record.order_id == order_id:
+        if binding and p2p_record and p2p_record.order_id == int(order_id):
             p2p_amount = int(p2p_record.amount)
             if p2p_amount >= 1000:
                 if ENV == ENV_PRODUCTION:
@@ -1046,7 +1046,7 @@ class JuChengRegister(CoopRegister):
         ticket = 0
 
         # 判断是否首次投资
-        if p2p_record and p2p_record.order_id == order_id:
+        if p2p_record and p2p_record.order_id == int(order_id):
             p2p_amount = int(p2p_record.amount)
             if p2p_amount>=500 and p2p_amount<1000:
                 try:
@@ -1166,7 +1166,7 @@ class XunleiVipRegister(CoopRegister):
         pay_info = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
                                           status=PayInfo.SUCCESS).order_by('create_time').first()
 
-        if binding and pay_info and pay_info.order_id == order_id:
+        if binding and pay_info and pay_info.order_id == int(order_id):
             logger.info("XunleiVip-If amount for xunlei9: [%s], [%s], [%s]" % (order_id, binding.bid, pay_info.amount))
             # 判断充值金额是否大于100
             pay_amount = int(pay_info.amount)
@@ -1186,7 +1186,7 @@ class XunleiVipRegister(CoopRegister):
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
 
         # 判断是否首次投资
-        if binding and p2p_record and p2p_record.order_id == order_id:
+        if binding and p2p_record and p2p_record.order_id == int(order_id):
             # 判断投资金额是否大于100
             pay_amount = int(p2p_record.amount)
             if pay_amount >= 1000:
