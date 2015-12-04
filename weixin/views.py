@@ -384,10 +384,10 @@ def bindUser(w_user, user):
     w_user.user = user
     w_user.bind_time = int(time.time())
     w_user.save()
-    if user.wanglibaouserprofile.first_bind_time:
-        user.wanglibaouserprofile.first_bind_time = w_user.bind_time
-        user.wanglibaouserprofile.save()
-        is_first_bind = True
+    # if user.wanglibaouserprofile.first_bind_time:
+    #     user.wanglibaouserprofile.first_bind_time = w_user.bind_time
+    #     user.wanglibaouserprofile.save()
+    #     is_first_bind = True
     return 0, u'绑定成功', is_first_bind
 
 class WeixinLogin(TemplateView):
@@ -1338,20 +1338,21 @@ class GenerateQRSceneTicket(APIView):
 
         client = WeChatClient(weixin_account.app_id, weixin_account.app_secret, weixin_account.access_token)
         scene_id = str(request.user.id)
-        if channel_code:
-            channel = WeiXinChannel.objects.filter(code=channel_code).first()
-            if channel:
-                scene_id = scene_id + str(channel.digital_code)
-        scene_id = int(scene_id)
-        # print int(request.user.id)
-        qrcode_data = {"action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": scene_id}}}
-        # qrcode_data = {"action_name":"QR_LIMIT_SCENE", "action_info":{"scene": {"scene_id": phone}}}
-        try:
-            rs = client.qrcode.create(qrcode_data)
-            qrcode_url = client.qrcode.get_url(rs.get('ticket'))
-        except WeChatException,e:
-            return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
-        return Response({'qrcode_url':qrcode_url})
+
+        channel = WeiXinChannel.objects.filter(code=channel_code).first()
+        if channel:
+            scene_id = scene_id + str(channel.digital_code)
+            scene_id = int(scene_id)
+            # print int(request.user.id)
+            qrcode_data = {"action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": scene_id}}}
+            # qrcode_data = {"action_name":"QR_LIMIT_SCENE", "action_info":{"scene": {"scene_id": phone}}}
+            try:
+                rs = client.qrcode.create(qrcode_data)
+                qrcode_url = client.qrcode.get_url(rs.get('ticket'))
+            except WeChatException,e:
+                return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
+            return Response({'qrcode_url':qrcode_url})
+        return Response({'errcode':-2, 'errmsg':"code does not exist"})
 
 
 

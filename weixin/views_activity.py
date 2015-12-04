@@ -87,7 +87,8 @@ class InviteWeixinFriendTemplate(BaseWeixinTemplate):
 
 
 class ChannelBaseTemplate(TemplateView):
-    wx_classify = 'fwh'
+    wx_classify = ''
+    wx_code = ''
 
     def get_context_data(self, **kwargs):
         # print '---------------------------%s'%self.wx_classify
@@ -97,6 +98,7 @@ class ChannelBaseTemplate(TemplateView):
             info = json.loads(m.value)
             if info.get(self.wx_classify):
                 context['original_id'] = info.get(self.wx_classify)
+        context['code'] = self.wx_code
         return context
 
 
