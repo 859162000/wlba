@@ -224,7 +224,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         } else {
             $('.strategy_wrap').addClass('strategy_wrap_show');
         }
-
     });
     $('.see_red_rule').click(function() {
         if ($('.recommend_send_red').hasClass('recommend_send_red_show')) {
