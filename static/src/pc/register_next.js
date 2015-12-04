@@ -109,7 +109,7 @@ require(['jquery','jquery.placeholder',"tools"], function( $ ,placeholder, tool)
                         title: '温馨提示',
                         msg: '<div class="tc">认证成功</div>',
                         callback_ok: function() {
-                            window.location.href = '/accounts/register/second/';
+                            window.location.href = '/pay/banks_for_register/';
                         }
                       });
                 }
@@ -122,18 +122,33 @@ require(['jquery','jquery.placeholder',"tools"], function( $ ,placeholder, tool)
     })
     /*充值*/
     $('#recharge').on('click',function(){
-        var amount = $('#amount')
+        var amount = $('#amount');
+        var cardSelect = $('#card-select');
         if($.trim(amount.val()) == ''){
             amount.next().html('<i></i>请输入充值金额');
             return false;
         }else{
             if($.trim(amount.val()) >= 100){
-                $('#rechargeAlert').modal();
+                amount.next().html('');
             }else{
                 amount.next().html('<i></i>充值金额100元起');
                 amount.val('');
                 return false;
             }
+        }
+        if(cardSelect.val() == ''){
+            cardSelect.next().html('<i></i>请选择银行');
+            return false;
+        }
+        $('#rechargeAlert').modal();
+    })
+    /*下拉框*/
+    $('#card-select').focus(function(){
+        $('#card-select').addClass('selected');
+    })
+    $('#card-select').blur(function(){
+        if($(this).val() == ''){
+            $('#card-select').removeClass('selected');
         }
     })
 });
