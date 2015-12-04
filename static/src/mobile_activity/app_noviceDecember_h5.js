@@ -64,7 +64,7 @@
 					if(h5_user_static){
 						$('.title_wrap').show();
 					}else{
-						window.location.href = '/accounts/register/'
+						window.location.href = '/weixin/regist/'
 					}
 				});
 				$('#go_user').on('click',function() {
@@ -127,6 +127,7 @@
 					})
 				})
 	})(org);
+
 
 
 
