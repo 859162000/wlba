@@ -1,5 +1,4 @@
 (function(org) {
-
 		$('.click_rule').click(function(){
 			if($('.strategy_wrap').hasClass('strategy_wrap_show')){
 				$('.strategy_wrap').removeClass('strategy_wrap_show');
@@ -32,8 +31,9 @@
 			app: function (mixins) {
 				$('.code_wrap').hide();
 				$('#take').click(function () {
-					mixins.registerApp();
+					//mixins.registerApp();
 				});
+
 				$('#take_red').click(function () {
 					mixins.jumpToManageMoney();
 				});
@@ -60,11 +60,11 @@
 			other: function(){
 				$('.code_wrap').show();
 
-				$('#take,#register').on('click',function(){
+				$('#register').on('click',function(){
 					if(h5_user_static){
 						$('.title_wrap').show();
 					}else{
-						window.location.href = '/activity/experience/mobile/'
+						window.location.href = '/accounts/register/'
 					}
 				});
 				$('#go_user').on('click',function() {
@@ -78,7 +78,10 @@
 					}
 				});
 			   	//console.log('其他场景的业务逻辑');
-				var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
+
+			}
+		})
+		var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 				org.ajax({
 					type : 'GET',
 					url : '/weixin/api/jsapi_config/',
@@ -123,9 +126,8 @@
 						imgUrl: shareImg
 					})
 				})
-			}
-		})
 	})(org);
+
 
 
 
