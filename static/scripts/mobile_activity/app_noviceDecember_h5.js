@@ -250,8 +250,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			app: function (mixins) {
 				$('.code_wrap').hide();
 				$('#take').click(function () {
-					mixins.registerApp();
+					//mixins.registerApp();
 				});
+
 				$('#take_red').click(function () {
 					mixins.jumpToManageMoney();
 				});
@@ -278,11 +279,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			other: function(){
 				$('.code_wrap').show();
 
-				$('#take,#register').on('click',function(){
+				$('#register').on('click',function(){
 					if(h5_user_static){
 						$('.title_wrap').show();
 					}else{
-						window.location.href = '/activity/experience/mobile/'
+						window.location.href = '/accounts/register/'
 					}
 				});
 				$('#go_user').on('click',function() {
@@ -345,6 +346,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					})
 				})
 	})(org);
+
 
 
 
