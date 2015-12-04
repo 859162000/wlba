@@ -77,6 +77,13 @@
       height: 1px;
       border-bottom: 1px #8a4b3d dashed;
       margin-top: 0.65rem; }
+    .step_wrap .main .zhuyi {
+      width: 100%;
+      text-align: center;
+      color: #333;
+      font-size: 0.6rem;
+      height: 0.8rem;
+      line-height: 0.8rem; }
 
 .strategy_wrap {
   width: 100%;
