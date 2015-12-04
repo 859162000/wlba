@@ -1,0 +1,69 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+    head
+        - with '网利宝官网' as title
+        include global/g_head
+        - endwith
+    body
+        include global/g_nav
+        - csrf_token
+        .register
+            .register_nav_min
+            .register_box.clearfix
+                #registerForm.login-form
+                    .h5.register_welfare 注册即送28888元体验金
+                    .registerFormDiv
+                        ul.registerForm
+                            li.clearfix
+                                label 手机号码 ：
+                                if phone
+                                  input#registerMobile.placeholderInput.checkMobile(value='{{ phone }}', type="text",  name="identifier", title="请输入手机号")
+                                else
+                                  input#registerMobile.placeholderInput.checkMobile(type="text", name="identifier", placeholder="请输入手机号", autocomplete='off', title="请输入手机号")
+                            li.clearfix
+                                label 计算结果 ：
+                                input(type="hidden", name="captcha_0", autocomplete="off")
+                                input#registerCode.w115.placeholderInput.checkCode(type="text", name="captcha_1", placeholder="请输入计算结果", autocomplete='off', title="请输入验证码")
+                                img.captchaImg.fl(alt="captcha", src="")
+                                i#registerRefresh.icon.iconfont.icon-cycle.captchaRefresh.fl
+                            li#passWordInput.pwdLi.clearfix
+                                label 输入密码 ：
+                                input.registerPwd.placeholderInput.checkPwd(type="password", name="password", placeholder="请输入密码", autocomplete='off', title="请输入密码")
+                            li.SMELI.clearfix
+                                label 验证码 ：
+                                input#registerSMSCode.w115.placeholderInput.checkSEMCode(type="text", name="button-get-validate-code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+                                button.getCodeBtn.buttonGray(type='button') 获取验证码
+                            li.voice(style='display:none')
+                                没有收到验证码？请尝试<a href="javascript:void(0)" class="voiceValidate">语音验证</a>
+                            li.clearfix
+                                label 邀请码 ：
+                                input#invitecode.placeholderInput(type="text", name="invitecode", placeholder="邀请码（选填）", autocomplete='off', title="邀请码（选填）")
+                                .pop 如果没有邀请码请忽略
+                        .loginError
+                        .form_bottom
+                            .checkboxDiv
+                                label
+                                    input#agreement.checkboxStyle(type="checkbox", name="",checked='checked')
+                                    a(href='/agreement/',target='_blank') 我已阅读并同意《网利宝注册协议》
+                            .form_submit.clearfix
+                                .submitFormStyle#registerSubmit 注册
+                                .go_login 已有网利宝帐号，请
+                                    a(href='/accounts/login/') 登录
+                .register_info
+                    .go_next_welfare 下一步奖励：
+                    .red_packets.clearfix
+                        i
+                        label 实名认证送20元现金红包
+                    .info_middle.clearfix
+                        .welfare_ed 已获得的奖励：
+                        .nothing 奖励空空如也～
+                        .go_finish 赶紧完成操作，赢取奖励吧
+                    .info_ewm.clearfix
+                        i
+                        label 关注网利宝官方微信
+    include global/g_footer
+    script.
+      require(["/static/src/pc/login.js?v=20151202"])
+
