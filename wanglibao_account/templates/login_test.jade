@@ -11,7 +11,7 @@ block loginFormPage
     form#loginForm.login-form(method='post', action='/accounts/login/ajax/')
         - csrf_token
         .logonFormDiv
-            ul.loginForm.padding-top-xl
+            ul.loginForm.padding-top-xl.clearfix
                 li
                     i.icon.iconfont.icon-mobile.ml19
                     input#loginMobile.placeholderInput.checkMobile(type="text", name="identifier", placeholder="请输入手机号", autocomplete='off', title="请输入手机号")

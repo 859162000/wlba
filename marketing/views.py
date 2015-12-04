@@ -2158,8 +2158,13 @@ class GiftOwnerInfoAPIView(APIView):
     permission_classes = ()
 
     def get_left_awards(self):
-        items = GiftOwnerGlobalInfo.objects.filter(description__in=('jcw_ticket_80', 'jcw_ticket_188')).values("amount")
-        return items[0]["amount"], items[1]["amount"]
+        items = GiftOwnerGlobalInfo.objects.filter(description__in=('jcw_ticket_80', 'jcw_ticket_188')).values("amount", "description")
+        for item in items:
+            if item["description"] == "jcw_ticket_80":
+                jcw_ticket_80 = item["amount"]
+            elif item["description"] == "jcw_ticket_188":
+                jcw_ticket_188 = item["amount"]
+        return jcw_ticket_80, jcw_ticket_188
 
     def post(self, request):
         action = request.DATA.get('action', 'OTHERS')
