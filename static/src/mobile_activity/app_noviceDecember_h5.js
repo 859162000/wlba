@@ -125,7 +125,6 @@
 						imgUrl: shareImg
 					})
 				})
-
 	})(org);
 
 
