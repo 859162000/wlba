@@ -86,5 +86,22 @@ class InviteWeixinFriendTemplate(BaseWeixinTemplate):
         return super(InviteWeixinFriendTemplate, self).dispatch(request, *args, **kwargs)
 
 
+class ChannelBaseTemplate(TemplateView):
+    wx_classify = ''
+    wx_code = ''
+
+    def get_context_data(self, **kwargs):
+        # print '---------------------------%s'%self.wx_classify
+        context = super(ChannelBaseTemplate, self).get_context_data(**kwargs)
+        m = Misc.objects.filter(key='weixin_qrcode_info').first()
+        if m and m.value:
+            info = json.loads(m.value)
+            if info.get(self.wx_classify):
+                context['original_id'] = info.get(self.wx_classify)
+        context['code'] = self.wx_code
+        return context
+
+
+
 
 

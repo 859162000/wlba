@@ -282,7 +282,7 @@ class WeixinJoinView(View):
                 channel_digital_code = eventKey[-3:]
                 user = User.objects.filter(pk=int(user_id)).first()
                 if user:
-                    rs, txt = bindUser(w_user, user)
+                    rs, txt, is_first_bind = bindUser(w_user, user)
                     channel = WeiXinChannel.objects.filter(digital_code=channel_digital_code).first()
                     if channel:
                         scene_id = channel.code
@@ -372,18 +372,23 @@ def getOrCreateWeixinUser(openid, weixin_account):
 
 
 def bindUser(w_user, user):
+    is_first_bind = False
     if w_user.user:
         if w_user.user.id==user.id:
-            return 1, u'你已经绑定, 请勿重复绑定'
-        return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone
+            return 1, u'你已经绑定, 请勿重复绑定', is_first_bind
+        return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone, is_first_bind
     other_w_user = WeixinUser.objects.filter(user=user).first()
     if other_w_user:
         msg = u"你的手机号%s已经绑定微信<span style='color:#173177;'>%s</span>"%(user.wanglibaouserprofile.phone, other_w_user.nickname)
-        return 3, msg
+        return 3, msg, is_first_bind
     w_user.user = user
     w_user.bind_time = int(time.time())
     w_user.save()
-    return 0, u'绑定成功'
+    # if user.wanglibaouserprofile.first_bind_time:
+    #     user.wanglibaouserprofile.first_bind_time = w_user.bind_time
+    #     user.wanglibaouserprofile.save()
+    #     is_first_bind = True
+    return 0, u'绑定成功', is_first_bind
 
 class WeixinLogin(TemplateView):
     template_name = 'weixin_login_new.jade'
@@ -493,7 +498,7 @@ class WeixinBind(TemplateView):
         try:
             openid = self.request.GET.get('openid')
             weixin_user = WeixinUser.objects.get(openid=openid)
-            rs, txt = bindUser(weixin_user, user)
+            rs, txt, is_first_bind = bindUser(weixin_user, user)
             if rs == 0:
                 now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
                 weixin.tasks.sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
@@ -1333,20 +1338,21 @@ class GenerateQRSceneTicket(APIView):
 
         client = WeChatClient(weixin_account.app_id, weixin_account.app_secret, weixin_account.access_token)
         scene_id = str(request.user.id)
-        if channel_code:
-            channel = WeiXinChannel.objects.filter(code=channel_code).first()
-            if channel:
-                scene_id = scene_id + str(channel.digital_code)
-        scene_id = int(scene_id)
-        # print int(request.user.id)
-        qrcode_data = {"action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": scene_id}}}
-        # qrcode_data = {"action_name":"QR_LIMIT_SCENE", "action_info":{"scene": {"scene_id": phone}}}
-        try:
-            rs = client.qrcode.create(qrcode_data)
-            qrcode_url = client.qrcode.get_url(rs.get('ticket'))
-        except WeChatException,e:
-            return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
-        return Response({'qrcode_url':qrcode_url})
+
+        channel = WeiXinChannel.objects.filter(code=channel_code).first()
+        if channel:
+            scene_id = scene_id + str(channel.digital_code)
+            scene_id = int(scene_id)
+            # print int(request.user.id)
+            qrcode_data = {"action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": scene_id}}}
+            # qrcode_data = {"action_name":"QR_LIMIT_SCENE", "action_info":{"scene": {"scene_id": phone}}}
+            try:
+                rs = client.qrcode.create(qrcode_data)
+                qrcode_url = client.qrcode.get_url(rs.get('ticket'))
+            except WeChatException,e:
+                return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
+            return Response({'qrcode_url':qrcode_url})
+        return Response({'errcode':-2, 'errmsg':"code does not exist"})
 
 
 
