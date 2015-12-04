@@ -837,7 +837,7 @@ class AdminTransactionDeposit(TemplateView):
 
 
 # 易宝支付创建订单接口
-class YeePayAppPayView(APIView):
+class YeePayAppPayView(DecryptParmsAPIView):
     permission_classes = (IsAuthenticated, )
 
     @require_trade_pwd
@@ -1117,6 +1117,7 @@ class WithdrawAPIView(DecryptParmsAPIView):
                 "amount": result['amount'],
                 "bank_name": result['bank_name']
             })
+        return Response(result)
 
 class BindCardQueryView(APIView):
     """ 查询用户绑定卡号列表接口 """
@@ -1145,7 +1146,7 @@ class BindPayDepositView(DecryptParmsAPIView):
 
         return Response(result)
 
-class BindPayDynnumNewView(APIView):
+class BindPayDynnumNewView(DecryptParmsAPIView):
     """ 确认支付 """
     permission_classes = (IsAuthenticated, )
 
