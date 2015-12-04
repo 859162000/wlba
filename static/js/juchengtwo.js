@@ -20,7 +20,7 @@
                 }).done(function (json) {
                      award100 = json.award100
                     console.log(json.award100);
-                    if(json.award100>=0){
+                    if(json.award100>0){
                        $('.get_ticket').show();
                     }else{
                        $('.get_ticket1').show();

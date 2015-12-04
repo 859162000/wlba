@@ -336,7 +336,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         action : 'ENTER_WEB_PAGE'
                     },
                     success: function(data){
-                        if(data.award100>=0){
+                        console.log(data);
+                        console.log(data.award100);
+                        if(data.award100>0){
                             $('.get_ticket_wrap').show();
                         }else{
                             $('.get_ticket_wrap1').show();
@@ -357,7 +359,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                             'captcha_1' :  _self.$codeimg.val(),
                         },
                         success: function(data){
+                             //console.log('11111')
                             if(data.ret_code == 0){
+
                                 org.ajax(get_ticket_ajax);
                             }else{
                                 $(document.body).trigger('from:error',[data.message, true]);
@@ -367,7 +371,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                             }
                         },
                         error: function(data){
-                            alert(data)
+                            //alert(data)
                         },
                         complete:function(){
                             //lib.$submit.removeAttr('disabled').html('领 取');

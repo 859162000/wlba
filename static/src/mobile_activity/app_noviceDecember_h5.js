@@ -1,5 +1,4 @@
 (function(org) {
-
 		$('.click_rule').click(function(){
 			if($('.strategy_wrap').hasClass('strategy_wrap_show')){
 				$('.strategy_wrap').removeClass('strategy_wrap_show');
@@ -78,7 +77,10 @@
 					}
 				});
 			   	//console.log('其他场景的业务逻辑');
-				var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
+
+			}
+		})
+		var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 				org.ajax({
 					type : 'GET',
 					url : '/weixin/api/jsapi_config/',
@@ -123,8 +125,6 @@
 						imgUrl: shareImg
 					})
 				})
-			}
-		})
 	})(org);
 
 
