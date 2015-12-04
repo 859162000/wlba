@@ -384,10 +384,10 @@ def bindUser(w_user, user):
     w_user.user = user
     w_user.bind_time = int(time.time())
     w_user.save()
-    # if user.wanglibaouserprofile.first_bind_time:
-    #     user.wanglibaouserprofile.first_bind_time = w_user.bind_time
-    #     user.wanglibaouserprofile.save()
-    #     is_first_bind = True
+    if not user.wanglibaouserprofile.first_bind_time:
+        user.wanglibaouserprofile.first_bind_time = w_user.bind_time
+        user.wanglibaouserprofile.save()
+        is_first_bind = True
     return 0, u'绑定成功', is_first_bind
 
 class WeixinLogin(TemplateView):

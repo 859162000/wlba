@@ -381,6 +381,9 @@ def give_first_pay_redpack(user, device_type):
 def give_first_buy_redpack(user, device_type):
     _give_redpack(user, "first_buy", device_type)
 
+def give_first_bind_wx_redpack(user, device_type):
+    _give_redpack(user, 'first_bind_weixin', device_type)
+
 
 def give_buy_redpack(user, device_type, give_mode='buy', describe=''):
     now = timezone.now()
@@ -392,6 +395,37 @@ def give_buy_redpack(user, device_type, give_mode='buy', describe=''):
 
 
 def _give_redpack(user, give_mode, device_type):
+    now = timezone.now()
+    user_ch = helper.which_channel(user)
+    device_type = _decide_device(device_type)
+    rps = RedPackEvent.objects.filter(give_mode=give_mode, invalid=False, give_start_at__lt=now, give_end_at__gt=now)
+    for x in rps:
+        #if x.target_channel != "" and user_ch != x.target_channel:
+        if x.target_channel != "":
+            chs = x.target_channel.split(",")
+            chs = [m for m in chs if m.strip()!=""]
+            if user_ch not in chs:
+                continue
+        redpack = RedPack.objects.filter(event=x, status="unused").first()
+        if redpack:
+            event = redpack.event
+            give_pf = event.give_platform
+            if give_pf == "all" or give_pf == device_type:
+                if redpack.token != "":
+                    redpack.status = "used"
+                    redpack.save()
+                record = RedPackRecord()
+                record.user = user
+                record.redpack = redpack
+                record.change_platform = device_type
+                record.save()
+
+                start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
+                                                          record.created_at, event.available_at, event.unavailable_at)
+                _send_message(user, event, end_time)
+
+
+def _give_redpack(user, give_mode, describe, device_type):
     now = timezone.now()
     user_ch = helper.which_channel(user)
     device_type = _decide_device(device_type)
