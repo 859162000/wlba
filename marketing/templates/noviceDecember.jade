@@ -6,7 +6,8 @@ html
         - with '网利宝' as title
         include include/common_head
         - endwith
-        link(rel="stylesheet",href="/static/stylesheets/noviceDecember.css?v=201511121")
+        link(rel="stylesheet",href="/static/stylesheets/noviceDecember.css?v=201512041")
+        - csrf_token
     body(style="background:#fff2d5")
         //include global/g_nav
         .g-nav-warp
@@ -178,5 +179,5 @@ html
 
         include global/g_footer
 script.
-    require(['/static/js/noviceDecember.js?v=201511132'])
+    require(['/static/js/noviceDecember.js?v=201512041'])
 
