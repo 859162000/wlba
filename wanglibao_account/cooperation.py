@@ -1082,12 +1082,12 @@ class JuChengRegister(CoopRegister):
             if SEND_SUCCESS:
                 send_messages.apply_async(kwargs={
                     "phones": [user.wanglibaouserprofile.phone, ],
-                    "messages": [u'[网利科技]您已成功获得%s元门票，请于演出当天到北京音乐厅一楼大厅票务兑换处领取，咨询电话:13581710219' % (ticket,), ]
+                    "messages": [u'【网利科技】您已成功获得%s元门票，请于演出当天到北京音乐厅一楼大厅票务兑换处领取，咨询电话:13581710219' % (ticket,), ]
                 })
                 inside_message.send_one.apply_async(kwargs={
                     "user_id": user.id,
                     "title": u"演出门票赠送",
-                    "content": u'[网利科技]您已成功获得%s元门票，请于演出当天到北京音乐厅一楼大厅票务兑换处领取，咨询电话:13581710219' % (ticket,),
+                    "content": u'【网利科技】您已成功获得%s元门票，请于演出当天到北京音乐厅一楼大厅票务兑换处领取，咨询电话:13581710219' % (ticket,),
                     "mtype": "activity"
                 })
 
