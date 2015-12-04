@@ -218,7 +218,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }
 })();
 ;(function(org) {
-
 		$('.click_rule').click(function(){
 			if($('.strategy_wrap').hasClass('strategy_wrap_show')){
 				$('.strategy_wrap').removeClass('strategy_wrap_show');
@@ -297,7 +296,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					}
 				});
 			   	//console.log('其他场景的业务逻辑');
-				var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
+
+			}
+		})
+		var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 				org.ajax({
 					type : 'GET',
 					url : '/weixin/api/jsapi_config/',
@@ -315,12 +317,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					}
 				});
 				wx.ready(function(org){
-					var host = 'https://staging.wanglibao.com/',
+					var host = 'https://www.wanglibao.com/',
 						shareName = '网利宝用户专享福利',
 						shareImg = host + '/static/imgs/mobile_activity/app_noviceDecember_h5/300x300.jpg',
 						shareLink = host + '/activity/app_noviceDecember_h5/',
 						shareMainTit = '网利宝用户专享福利',
-						shareBody = '网利宝新人大礼包'
+						shareBody = '网利宝送你新手福利大红包，快来领哦！'
 					//分享给微信好友
 					org.onMenuShareAppMessage({
 						title: shareMainTit,
@@ -342,10 +344,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 						imgUrl: shareImg
 					})
 				})
-			}
-		})
 	})(org);
-
 
 
 
