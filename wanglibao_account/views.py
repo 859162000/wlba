@@ -82,7 +82,7 @@ logger_anti = logging.getLogger('wanglibao_anti')
 
 
 class RegisterView(RegistrationView):
-    template_name = "register_test.jade"
+    template_name = "register_new.jade"
     form_class = EmailOrPhoneRegisterForm
 
     def register(self, request, **cleaned_data):

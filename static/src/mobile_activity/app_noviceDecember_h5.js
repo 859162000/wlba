@@ -31,8 +31,9 @@
 			app: function (mixins) {
 				$('.code_wrap').hide();
 				$('#take').click(function () {
-					mixins.registerApp();
+					//mixins.registerApp();
 				});
+
 				$('#take_red').click(function () {
 					mixins.jumpToManageMoney();
 				});
@@ -59,11 +60,11 @@
 			other: function(){
 				$('.code_wrap').show();
 
-				$('#take,#register').on('click',function(){
+				$('#register').on('click',function(){
 					if(h5_user_static){
 						$('.title_wrap').show();
 					}else{
-						window.location.href = '/activity/experience/mobile/'
+						window.location.href = '/weixin/regist/'
 					}
 				});
 				$('#go_user').on('click',function() {
@@ -126,6 +127,8 @@
 					})
 				})
 	})(org);
+
+
 
 
 

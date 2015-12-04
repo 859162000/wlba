@@ -77,6 +77,9 @@ urlpatterns = patterns(
     url(r'^login/(?P<login_type>\w+)/$', login_required(Third_login.as_view())),
 
     url(r'^register/$', RegisterView.as_view(), name='auth_register'),
+    url(r'^register/first/$', TemplateView.as_view(template_name="register_first.jade")),
+    url(r'^register/second/$', TemplateView.as_view(template_name="register_second.jade")),
+    url(r'^register/three/$', TemplateView.as_view(template_name="register_three.jade")),
     url(r'^api/register/jrjia/$', JrjiaAutoRegisterView.as_view(), name='auth_register_auto'),
     url(r'^api/cps/$', JrjiaCPSView.as_view(), name='auth_register_auto'),
     url(r'^api/pstatus/$', JrjiaP2PStatusView.as_view(), name='auth_register_auto'),
