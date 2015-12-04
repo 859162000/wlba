@@ -283,7 +283,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					if(h5_user_static){
 						$('.title_wrap').show();
 					}else{
-						window.location.href = '/accounts/register/'
+						window.location.href = '/weixin/regist/'
 					}
 				});
 				$('#go_user').on('click',function() {
@@ -346,6 +346,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					})
 				})
 	})(org);
+
 
 
 
