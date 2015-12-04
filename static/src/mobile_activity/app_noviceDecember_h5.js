@@ -5,7 +5,6 @@
         } else {
             $('.strategy_wrap').addClass('strategy_wrap_show');
         }
-
     });
     $('.see_red_rule').click(function() {
         if ($('.recommend_send_red').hasClass('recommend_send_red_show')) {
