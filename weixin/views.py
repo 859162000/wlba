@@ -220,6 +220,10 @@ class WeixinJoinView(View):
             except:
                 pass
             reply = -1#create_reply(txt, msg)
+
+        if msg.key == 'month_papers':
+            articles = self.getSubscribeArticle()
+            reply = create_reply(articles, msg)
         return reply
 
     @checkBindDeco
@@ -270,49 +274,51 @@ class WeixinJoinView(View):
         reply = None
 
         #如果eventkey为用户id则进行绑定
+        scene_id = None
         if eventKey:
+            scene_id = eventKey
             if eventKey.isdigit():
-                user_id = eventKey[:-2]
-                channel_digital_code = eventKey[-2:]
+                user_id = eventKey[:-3]
+                channel_digital_code = eventKey[-3:]
                 user = User.objects.filter(pk=int(user_id)).first()
                 if user:
-                    rs, txt = bindUser(w_user, user)
+                    rs, txt, is_first_bind = bindUser(w_user, user)
                     channel = WeiXinChannel.objects.filter(digital_code=channel_digital_code).first()
                     if channel:
-                        w_user.scene_id = channel.code
+                        scene_id = channel.code
                     reply = create_reply(txt, msg)
         if not old_subscribe and w_user.subscribe:
-            w_user.scene_id = eventKey
+            w_user.scene_id = scene_id
             w_user.save()
         if not reply and not w_user.user:
             txt = self.getBindTxt(fromUserName)
             reply = create_reply(txt, msg)
         if not reply:
-            # articles = self.getSubscribeArticle()
-            # reply = create_reply(articles, msg)
             reply = -1
         return reply
 
     def getSubscribeArticle(self):
-        image = "http://e.hiphotos.baidu.com/baike/c0%3Dbaike80%2C5%2C5%2C80%2C26/sign=410619fb3d01213fdb3e468e358e5db4/9f510fb30f2442a71525d087d543ad4bd11302ec.jpg"
-        url = 'https://www.wanglibao.com/activity/new_user/'
-        description = '大数据下的网利宝'
-        title = '大数据下的网利宝'
-        image1 = "http://e.hiphotos.baidu.com/baike/c0%3Dbaike80%2C5%2C5%2C80%2C26/sign=410619fb3d01213fdb3e468e358e5db4/9f510fb30f2442a71525d087d543ad4bd11302ec.jpg"
-        url1 = 'https://www.wanglibao.com/milestone/'
-        description1 = '网利宝大事记'
-        title1 = '网利宝大事记'
-        return [{'image':image, 'url':url, 'description':description, 'title':title},
-                {'image':image1, 'url':url1, 'description':description1, 'title':title1}]
+        big_data_img_url = "https://mmbiz.qlogo.cn/mmbiz/EmgibEGAXiahvyFZtnAQJ765uicv4VkX9gI8IlfkNibDj8un11ia7y8JZIWWk9LeKDNibaf0HbCDpia9sTO7WiaHHxRcNg/0?wx_fmt=jpeg"
+        big_data_url = 'http://mp.weixin.qq.com/s?__biz=MzA5NzE4NTIzMQ==&mid=400316172&idx=2&sn=b7e13fe0e235198bc73c990f0c5d946c&scene=1&srcid=1201omjGLaXIC2xXHVnVPBWa&key=ac89cba618d2d976dc4dc26ac26775f1546acbfe1d7af45c95e9b4462e98a06d6ff9d79a97a948b7ae4be866933edcaa&ascene=1&uin=MjU0MDYyNDQzMw%3D%3D&devicetype=webwx&version=70000001&pass_ticket=5%2BegJdyHvw97jvM495sqVRvpdvtQ4vl9QykfsV21yy2tgNbUcnPTyAjchjglUkg3'
+
+        A_img_url = "https://mmbiz.qlogo.cn/mmbiz/EmgibEGAXiahvyFZtnAQJ765uicv4VkX9gIdMuibjodyEeWdavoBO0uvAdfpMzaCNjfreoT4APezdbu6hasMTibTWxw/0?wx_fmt=jpeg"
+        A_url = "http://mp.weixin.qq.com/s?__biz=MjM5NTc0OTc5OQ==&mid=206425012&idx=1&sn=8ee1a55847e4a94d8c8941a7d051e821&scene=1&srcid=1201B5VHp3R7TDdlsog0bxFT&key=ac89cba618d2d976324fb9d2339235db9d6008530c972dec224dc69f371b8a75a6be336e5e4f2da34cd417cdd2b77ca6&ascene=1&uin=MjU0MDYyNDQzMw%3D%3D&devicetype=webwx&version=70000001&pass_ticket=5%2BegJdyHvw97jvM495sqVRvpdvtQ4vl9QykfsV21yy2tgNbUcnPTyAjchjglUkg3"
+
+        B_img_url = "https://mmbiz.qlogo.cn/mmbiz/EmgibEGAXiahvyFZtnAQJ765uicv4VkX9gInibWxZlOdB2ZXn4lt1r0zEM8FgOXF9NkWo3K1hWwiaLeSH4JWics9IEvw/0?wx_fmt=jpeg"
+        B_url = "http://mp.weixin.qq.com/s?__biz=MjM5NTc0OTc5OQ==&mid=206419904&idx=1&sn=6d0cf2bee4b110635c5a178be0241e6f&scene=1&srcid=12018c9ZzjIVDpAYiUMR9AQ2&key=ac89cba618d2d9765681b6b8e02f41f539b6d711d2c0c3c34ab5b5971c62c434ebd49e11b8c9cbd9f7372231fd6c0ca5&ascene=1&uin=MjU0MDYyNDQzMw%3D%3D&devicetype=webwx&version=70000001&pass_ticket=5%2BegJdyHvw97jvM495sqVRvpdvtQ4vl9QykfsV21yy2tgNbUcnPTyAjchjglUkg3"
+
+        return [{'image':big_data_img_url, 'url':big_data_url, 'description':"网利宝10月数据公告", 'title':'大数据下的网利宝'},
+                {'image':A_img_url, 'url':A_url, 'description':'IDG资本A轮千万美元融资', 'title':'IDG资本A轮千万美元融资'},
+                {'image':B_img_url, 'url':B_url, 'description':'B轮4000万美元融资', 'title':'B轮4000万美元融资'},]
 
     def getBindTxt(self, fromUserName):
-        bind_url = settings.CALLBACK_HOST + reverse('weixin_bind') + "?openid=%s"%(fromUserName)
+        bind_url = settings.CALLBACK_HOST + reverse('weixin_bind') + "?openid=%s&promo_token=fwh"%(fromUserName)
         txt = u"终于等到你，还好我没放弃。绑定网利宝帐号，轻松投资、随时随地查看收益！\n" \
               u"<a href='%s'>【立即绑定】</a>"%(bind_url)
         return txt
 
     def getUnBindTxt(self, fromUserName, userPhone):
-        unbind_url = settings.CALLBACK_HOST + reverse('weixin_unbind') + "?openid=%s"%(fromUserName)
+        unbind_url = settings.CALLBACK_HOST + reverse('weixin_unbind') + "?openid=%s&promo_token=fwh"%(fromUserName)
         txt = u"您的微信绑定帐号为：%s\n"%userPhone\
             +u"如需解绑当前帐号，请点击<a href='%s'>【立即解绑】</a>"%unbind_url
         return txt
@@ -366,18 +372,23 @@ def getOrCreateWeixinUser(openid, weixin_account):
 
 
 def bindUser(w_user, user):
+    is_first_bind = False
     if w_user.user:
         if w_user.user.id==user.id:
-            return 1, u'你已经绑定, 请勿重复绑定'
-        return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone
+            return 1, u'你已经绑定, 请勿重复绑定', is_first_bind
+        return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone, is_first_bind
     other_w_user = WeixinUser.objects.filter(user=user).first()
     if other_w_user:
         msg = u"你的手机号%s已经绑定微信<span style='color:#173177;'>%s</span>"%(user.wanglibaouserprofile.phone, other_w_user.nickname)
-        return 3, msg
+        return 3, msg, is_first_bind
     w_user.user = user
     w_user.bind_time = int(time.time())
     w_user.save()
-    return 0, u'绑定成功'
+    if user.wanglibaouserprofile.first_bind_time:
+        user.wanglibaouserprofile.first_bind_time = w_user.bind_time
+        user.wanglibaouserprofile.save()
+        is_first_bind = True
+    return 0, u'绑定成功', is_first_bind
 
 class WeixinLogin(TemplateView):
     template_name = 'weixin_login_new.jade'
@@ -487,7 +498,7 @@ class WeixinBind(TemplateView):
         try:
             openid = self.request.GET.get('openid')
             weixin_user = WeixinUser.objects.get(openid=openid)
-            rs, txt = bindUser(weixin_user, user)
+            rs, txt, is_first_bind = bindUser(weixin_user, user)
             if rs == 0:
                 now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
                 weixin.tasks.sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
@@ -1314,11 +1325,15 @@ class GetUserInfo(APIView):
 class GenerateQRSceneTicket(APIView):
     permission_classes = (IsAuthenticated,)
     def get(self, request):
-        original_id = request.DATA.get('original_id')
-        channel_code = request.DATA.get('code')
-        if not original_id:
+        original_id = request.GET.get('original_id')
+        channel_code = request.GET.get('code')
+        # phone = request.GET.get('phone')
+        # if not original_id or not channel_code or not phone:
+        if not original_id or not channel_code:
             return Response({'errcode':-1, 'errmsg':"-1"})
-
+        # user_profile = WanglibaoUserProfile.objects.filter(phone=phone).first()
+        # if not user_profile or user_profile.user_id != request.user.id:
+        #     return Response({'errcode':-2, 'errmsg':"invalid phone"})
         weixin_account = WeixinAccounts.getByOriginalId(original_id)
 
         client = WeChatClient(weixin_account.app_id, weixin_account.app_secret, weixin_account.access_token)

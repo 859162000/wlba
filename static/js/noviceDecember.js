@@ -1,57 +1,53 @@
 (function() {
     require.config({
         paths: {
-            jquery: 'lib/jquery.min',
-            'jquery.modal': 'lib/jquery.modal.min',
-            'activityRegister': 'activityRegister'
+            jquery: 'lib/jquery.min'
         },
         shim: {
             'jquery.modal': ['jquery']
         }
     });
-    require(['jquery', 'activityRegister'],
+    require(['jquery'],
     function($, re) {
-        re.activityRegister.activityRegisterInit({
-            registerTitle: '限时限量，满额直送',
-            isNOShow: '1',
-            hasCallBack: true,
-            callBack: function() {
-                $.ajax({
-                    url: '/api/gift/owner/?promo_token=jcw',
-                    type: "POST",
-                    data: {
-                        phone: '',
-                        address: '',
-                        name: '',
-                        action: 'ENTER_WEB_PAGE'
-                    }
-                }).done(function(json) {
 
-                })
-            }
-        })
+        var h5_user_static;
+		$.ajax({
+			url: '/api/user_login/',
+			type: 'post',
+			success: function (data1) {
+				h5_user_static = data1.login;
+			}
+		})
 
-		$('.take_red').click(function(){
-			if($('#denglu').index()){
+		$('.take_red,#zhuce').click(function(){
+			if(h5_user_static){
 				$('.title_wrap').show();
 			}else{
-				window.location.href = '/p2p/list/'
+				window.location.href = '/activity/experience/gold/'
 			}
 		});
 
 		$('.take_first_red').click(function(){
-			if($('#denglu').index()){
-				$('.title_wrap').show();
+			if(h5_user_static){
+				window.location.href = '/p2p/list/'
 			}else{
 				window.location.href = '/accounts/login/?next=/p2p/list/'
 			}
 		});
 
 		$('.click_rule').click(function(){
-			$('.strategy_wrap').addClass('strategy_wrap_show');
+            if($('.strategy_wrap').hasClass('strategy_wrap_show')) {
+                $('.strategy_wrap').removeClass('strategy_wrap_show');
+            }else{
+                $('.strategy_wrap').addClass('strategy_wrap_show');
+            }
 		});
 		$('.see_red_rule').click(function(){
-			$('.recommend_send_red').addClass('recommend_send_red_show');
+            if($('.recommend_send_red').hasClass('recommend_send_red_show')) {
+                $('.recommend_send_red').removeClass('recommend_send_red_show');
+            }else{
+                $('.recommend_send_red').addClass('recommend_send_red_show');
+            }
 		});
 		$('.title_wrap .close,.title_wrap .button').click(function(){
 			$('.title_wrap').hide();

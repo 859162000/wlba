@@ -159,9 +159,11 @@ class WeiXinChannel(models.Model):
     def clean(self):
         if len(self.code) == 6:
             raise ValidationError(u'为避免和邀请码重复，渠道代码长度不能等于6位')
-        #
-        # if self.classification == '----':
-        #     raise ValidationError(u'请选择渠道分类')
+        if len(self.digital_code) != 3:
+            raise ValidationError(u'渠道数字代码长度必须等于3位')
+        if not self.digital_code.isdigit():
+            raise ValidationError(u'渠道数字代码必须为3个数字')
+
 
     def __unicode__(self):
         return self.name

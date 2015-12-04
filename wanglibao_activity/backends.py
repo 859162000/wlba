@@ -94,8 +94,16 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
         if first_pay and int(first_pay.order_id) == int(order_id):
             # Add by hb only for debug
             if first_pay.order_id <> order_id:
-                logger.exception("=_check_rules_trigger= type(%s)=[%s], type(%s)=[%s]" % first_pay.order_id, type(first_pay.order_id), order_id, type(order_id))
+                logger.exception("=_check_rules_trigger= first_pay: type(%s)=[%s], type(%s)=[%s]" % (first_pay.order_id, type(first_pay.order_id), order_id, type(order_id)))
             _check_trade_amount(user, rule, device_type, amount, is_full)
+        else:
+            # Add by hb only for debug
+            order_pay = PayInfo.objects.filter(order_id=int(order_id)).first()
+            if order_pay:
+                logger.error("=_check_rules_trigger= first_pay: order_id=[%s], status=[%s], amount=[%s]" % (order_id, order_pay.status, order_pay.amount))
+            else:
+                logger.error("=_check_rules_trigger= first_pay: order_id=[%s] not found" % (order_id))
+
     # 充值
     elif trigger_node == 'pay':
         _check_trade_amount(user, rule, device_type, amount, is_full)
@@ -113,7 +121,7 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
         if first_buy and int(first_buy.order_id) == int(order_id):
             # Add by hb only for debug
             if first_buy.order_id <> order_id:
-                logger.exception("=_check_rules_trigger= type(%s)=[%s], type(%s)=[%s]" % first_buy.order_id, type(first_buy.order_id), order_id, type(order_id))
+                logger.exception("=_check_rules_trigger= first_buy: type(%s)=[%s], type(%s)=[%s]" % (first_buy.order_id, type(first_buy.order_id), order_id, type(order_id)))
             # 判断当前购买产品id是否在活动设置的id中
             if product_id > 0 and rule.activity.product_ids:
                 is_product = _check_product_id(product_id, rule.activity.product_ids)
@@ -414,7 +422,7 @@ def _send_gift_redpack(user, rule, rtype, redpack_id, device_type, amount, is_fu
             _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, None, amount)
         if rule.share_type == 'both' or rule.share_type == 'inviter':
             user_introduced_by = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
-            logger.info("user_introduced_by %s" % user_introduced_by)
+            #logger.info("user_introduced_by %s" % user_introduced_by)
             if user_introduced_by:
                 _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_introduced_by, amount)
     else:
@@ -427,6 +435,13 @@ def _send_gift_redpack(user, rule, rtype, redpack_id, device_type, amount, is_fu
 
 
 def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_ib=None, amount=0):
+    # add by hb for debug
+    try:
+        phone = user.wanglibaouserprofile.phone
+    except:
+        phone = None
+    logger.debug("=_give_activity_redpack_new= [%s], [%s], [%s], [%s], [%s], [%s], [%s]" % (phone, rtype, redpack_id, device_type, rule, user_ib, amount))
+    print("=_give_activity_redpack_new= [%s], [%s], [%s], [%s], [%s], [%s], [%s]" % (phone, rtype, redpack_id, device_type, rule, user_ib, amount))
     """ rule: get message template """
     now = timezone.now()
     if user_ib:
@@ -443,9 +458,9 @@ def _give_activity_redpack_new(user, rtype, redpack_id, device_type, rule, user_
     else:
         return
 
-    print redpack_id_list
+    #print redpack_id_list
     if len(redpack_id_list) == 1:
-        print(redpack_id_list[0])
+        #print(redpack_id_list[0])
         red_pack_event = RedPackEvent.objects.filter(give_mode=rtype, invalid=False, id=redpack_id_list[0],
                                                      give_start_at__lt=now, give_end_at__gt=now).first()
         if red_pack_event:

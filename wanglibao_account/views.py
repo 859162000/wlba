@@ -82,7 +82,7 @@ logger_anti = logging.getLogger('wanglibao_anti')
 
 
 class RegisterView(RegistrationView):
-    template_name = "register_test.jade"
+    template_name = "register_new.jade"
     form_class = EmailOrPhoneRegisterForm
 
     def register(self, request, **cleaned_data):
@@ -1163,7 +1163,9 @@ class ResetPasswordAPI(DecryptParmsAPIView):
             user.save()
             return Response({'ret_code': 0, 'message': u'修改成功'})
         else:
-            return Response({'ret_code': 30004, 'message': u'验证码验证失败'})
+            # Modify by hb on 2015-12-02
+            #return Response({'ret_code': 30004, 'message': u'验证码验证失败'})
+            return Response({'ret_code': 30004, 'message': message})
 
 
 class Third_login(View):
@@ -1203,7 +1205,9 @@ class ChangePasswordAPIView(DecryptParmsAPIView):
 
         status, message = validate_validation_code(user.wanglibaouserprofile.phone, validate_code)
         if status != 200:
-            return Response({"ret_code": 30044, "message": u"验证码输入错误"})
+            # Modify by hb 0n 2015-12-02
+            #return Response({"ret_code": 30044, "message": u"验证码输入错误"})
+            return Response({"ret_code": 30044, "message": message})
 
         user.set_password(new_password)
         user.save()

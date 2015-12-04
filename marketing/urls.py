@@ -62,11 +62,12 @@ urlpatterns = patterns(
     url(r'^two-eleven/$', TemplateView.as_view(template_name="two-eleven.jade")),
     url(r'^bid/$', TemplateView.as_view(template_name="bid.jade")),
     url(r'^365_gu/$', TemplateView.as_view(template_name="365_gu.jade")),
-    url(r'thanksgiving/$', TemplateView.as_view(template_name="thanksgiving.jade")),
+    #url(r'thanksgiving/$', TemplateView.as_view(template_name="thanksgiving.jade")),
     url(r'winter_brid/$', TemplateView.as_view(template_name="winter_bird.jade")),
     url(r'^xiaoher/$', TemplateView.as_view(template_name="xiaoher.jade")),
     url(r'fun_tuan/$', TemplateView.as_view(template_name="fun_tuan.jade")),
     url(r'noviceDecember/$', TemplateView.as_view(template_name="noviceDecember.jade")),
+    url(r'^juchengtwo/$', TemplateView.as_view(template_name="juchengtwo.jade")),
 )
 
 # app URL
@@ -152,6 +153,7 @@ urlpatterns += patterns(
     url(r'^app_thanksgiv/$', TemplateView.as_view(template_name="app_thanksgiv.jade")),
     url(r'^app_thanksgivin/$', TemplateView.as_view(template_name="app_thanksgivin.jade")),
     url(r'^app_noviceDecember_h5/$', TemplateView.as_view(template_name="app_noviceDecember_h5.jade")),
+     url(r'^app_juchengtwo/$', TemplateView.as_view(template_name="app_juchengtwo.jade")),
 
 
     # url(r'^app_thanksgivin/$', login_required(TemplateView.as_view(template_name="app_thanksgivin.jade"), login_url='/accounts/token_login/')),

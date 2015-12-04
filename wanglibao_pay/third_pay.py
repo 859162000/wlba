@@ -197,7 +197,9 @@ def withdraw(request):
     phone = user.wanglibaouserprofile.phone
     status, message = validate_validation_code(phone, vcode)
     if status != 200:
-        return {"ret_code": 20066, "message": u"验证码输入错误"}
+        # Modify by hb on 2015-12-02
+        #return {"ret_code": 20066, "message": u"验证码输入错误"}
+        return {"ret_code": 20066, "message": message}
 
     card = Card.objects.filter(pk=card_id).first()
     if not card or card.user != user:
@@ -301,7 +303,8 @@ def card_bind_list(request):
                 Card.objects.filter(user=user).exclude(no__in=kuai_card_no_list).update(is_bind_kuai=False)
 
         card_list = []
-        cards = Card.objects.filter(Q(user=user), Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True)).select_related('bank').order_by('-last_update')
+        cards = Card.objects.exclude(bank__name__in=[u'邮政储蓄银行', u'上海银行', u'北京银行']).filter(Q(user=user),
+                    Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True)).select_related('bank').order_by('-last_update')
         if cards.exists():
             # 排序
             bank_list = [card.bank.gate_id for card in cards]
@@ -421,7 +424,7 @@ def bind_pay_deposit(request):
     card_no = request.DATA.get("card_no", "").strip()
     gate_id = request.DATA.get("gate_id", "").strip()
     input_phone = request.DATA.get("phone", "").strip()
-    device = split_ua(request)
+    device_type = split_ua(request)['device_type']
     ip = util.get_client_ip(request)
 
     user = request.user
@@ -484,7 +487,16 @@ def bind_pay_deposit(request):
         return result
 
     elif bank.channel == 'kuaipay':
-        return KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, device, ip, request)
+        result = KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, device_type, ip, request)
+
+        # if result['ret_code'] == 0:
+        #     try:
+        #         # 处理第三方用户充值回调
+        #         CoopRegister(request).process_for_recharge(request.user)
+        #     except Exception, e:
+        #         logger.error(e)
+
+        return result
 
     else:
         return {"ret_code": 20004, "message": "请选择支付渠道"}
@@ -538,7 +550,6 @@ def bind_pay_dynnum(request):
             CoopRegister(request).process_for_binding_card(user)
         except:
             logger.exception('bind_card_callback_failed for %s' % str(user))
-
 
     return res
 
