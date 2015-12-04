@@ -327,7 +327,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			shareImg = host + '/static/imgs/mobile_activity/app_noviceDecember_h5/300x300.jpg',
 			shareLink = host + '/activity/app_noviceDecember_h5/',
 			shareMainTit = '网利宝用户专享福利',
-			shareBody = '网利宝送你新手福利大红包，快来领哦！'
+			shareBody = '网利宝送你新手福利大红包，快来领哦！';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
