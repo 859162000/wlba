@@ -23,6 +23,9 @@ block loginFormPage
                         input#remember_me.checkboxStyle(type="checkbox", name="remember_me" )
                         | 一周内自动登录
             .loginError
-            .submitFormStyle.tc.font-l#loginSubmit 登录
+            if user.is_authenticated and user.wanglibaouserprofile.frozen
+                .submitFormStyle.tc.font-l.disabled(style="background-color:#999999") 账户已冻结
+            else
+                .submitFormStyle.tc.font-l#loginSubmit 登录
             .findPwd.tc
                 a(href='/accounts/password/reset/identifier/') 忘记密码？

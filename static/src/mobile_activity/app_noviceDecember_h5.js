@@ -1,10 +1,18 @@
 (function(org) {
-
 		$('.click_rule').click(function(){
-			$('.strategy_wrap').addClass('strategy_wrap_show');
+			if($('.strategy_wrap').hasClass('strategy_wrap_show')){
+				$('.strategy_wrap').removeClass('strategy_wrap_show');
+			}else{
+				$('.strategy_wrap').addClass('strategy_wrap_show');
+			}
+
 		});
 		$('.see_red_rule').click(function(){
-			$('.recommend_send_red').addClass('recommend_send_red_show');
+			if($('.recommend_send_red').hasClass('recommend_send_red_show')){
+				$('.recommend_send_red').removeClass('recommend_send_red_show');
+			}else{
+				$('.recommend_send_red').addClass('recommend_send_red_show');
+			}
 		});
 		$('.title_wrap .close,.title_wrap .button').click(function(){
 			$('.title_wrap').hide();
@@ -21,11 +29,9 @@
 		var login = false;
 		wlb.ready({
 			app: function (mixins) {
+				$('.code_wrap').hide();
 				$('#take').click(function () {
 					mixins.registerApp();
-				});
-				$('#take_red').click(function () {
-					mixins.jumpToManageMoney();
 				});
 				$('#take_red').click(function () {
 					mixins.jumpToManageMoney();
@@ -34,7 +40,7 @@
 					if (data.ph == '') {
 						login = false;
 						$('#register').click(function(){
-							mixins.loginApp();
+							mixins.registerApp();
 						});
 						$('#go_user').on('click',function() {
 							mixins.loginApp();
@@ -51,11 +57,9 @@
 				})
 			},
 			other: function(){
+				$('.code_wrap').show();
 
-				$('#register').on('click',function(){
-					window.location.href = '/weixin/regist/'
-				});
-				$('#take').on('click',function(){
+				$('#take,#register').on('click',function(){
 					if(h5_user_static){
 						$('.title_wrap').show();
 					}else{
@@ -73,7 +77,10 @@
 					}
 				});
 			   	//console.log('其他场景的业务逻辑');
-				var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
+
+			}
+		})
+		var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 				org.ajax({
 					type : 'GET',
 					url : '/weixin/api/jsapi_config/',
@@ -91,12 +98,12 @@
 					}
 				});
 				wx.ready(function(org){
-					var host = 'https://staging.wanglibao.com/',
+					var host = 'https://www.wanglibao.com/',
 						shareName = '网利宝用户专享福利',
 						shareImg = host + '/static/imgs/mobile_activity/app_noviceDecember_h5/300x300.jpg',
 						shareLink = host + '/activity/app_noviceDecember_h5/',
 						shareMainTit = '网利宝用户专享福利',
-						shareBody = '网利宝新人大礼包'
+						shareBody = '网利宝送你新手福利大红包，快来领哦！'
 					//分享给微信好友
 					org.onMenuShareAppMessage({
 						title: shareMainTit,
@@ -118,11 +125,7 @@
 						imgUrl: shareImg
 					})
 				})
-
-			}
-		})
 	})(org);
-
 
 
 

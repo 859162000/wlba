@@ -3,7 +3,7 @@
 
 from django.conf import settings
 from django.conf.urls import patterns, url, include
-from django.contrib.auth.decorators import login_required
+# from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, RedirectView
 from registration.backends.default.views import ActivationView
 from forms import EmailOrPhoneAuthenticationForm, TokenSecretSignAuthenticationForm
@@ -19,6 +19,7 @@ from views import AutomaticView
 from wanglibao_account.cooperation import JrjiaCPSView, JrjiaP2PStatusView, JrjiaP2PInvestView, JrjiaReportView, \
     JrjiaUsStatusView
 from wanglibao_lottery.views import LotteryListTemplateView
+from wanglibao_account.decorators import login_required
 
 urlpatterns = patterns(
     '',
@@ -56,6 +57,7 @@ urlpatterns = patterns(
     #url(r'^add_introduce/$', login_required(IntroduceRelation.as_view(), login_url='/accounts/login/')),
 
     url(r'^invite/$', login_required(AccountInviteView.as_view(), login_url='/accounts/login/')),
+    url(r'^frozen/$', TemplateView.as_view(template_name="frozen.jade"), name='accounts_frozen'),
 
     url(r'^login/ajax/$', 'wanglibao_account.views.ajax_login'),
 
