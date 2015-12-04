@@ -47,7 +47,7 @@ org.ui = (function(){
         alert : lib._alert
     }
 })();
-var login = false;
+/*var login = false;
 wlb.ready({
     app: function (mixins) {
         mixins.sendUserInfo(function (data) {
@@ -62,7 +62,7 @@ wlb.ready({
             }
         })
     },
-    other: function(){
+    other: function(){*/
         org.experience = (function(org){
             var lib = {
                 init:function(){
@@ -72,9 +72,9 @@ wlb.ready({
                     lib._bannerEffect()
                 },
                 _lookMore:function(){
-                     $('#nologin').on('click',function(){
+/*                     $('#nologin').on('click',function(){
                         window.location.href = '/weixin/regist/?next=/activity/experience/mobile/';
-                    })
+                    })*/
                     $lookMore = $('#lookMore')
                     $lookMore.on('click',function(){
                         var ele = $('.history-list');
@@ -210,8 +210,8 @@ wlb.ready({
                 init : lib.init
             }
         })(org);
-    }
-})
+/*    }
+})*/
 ;(function(org){
     $.extend($.fn, {
         scrollTo: function(m){
