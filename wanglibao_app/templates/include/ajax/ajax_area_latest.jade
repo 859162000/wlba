@@ -2,7 +2,7 @@
 if results
   for activity in results
     .area-list
-      .area-ac-head {{activity.activity}}
+      .area-ac-head {{activity.activity.name}}
       .area-ac-banner
         .area-ac-time {{activity.activity_status}}
         img(src='/media/{{activity.app_banner}}')
