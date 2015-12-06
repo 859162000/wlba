@@ -58,7 +58,7 @@
 
 		$('.take_red,#zhuce').click(function(){
 			if(h5_user_static){
-				$('.title_wrap').show();
+				window.location.href = '/activity/experience/gold/'
 			}else{
 				window.location.href = '/activity/experience/gold/'
 			}
