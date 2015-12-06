@@ -61,6 +61,8 @@ import datetime, time
 from .util import _generate_ajax_template
 from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEvent, UnsubscribeEvent, SubscribeEvent,\
                              TemplateSendJobFinishEvent)
+from wanglibao_redpack.backends import give_first_bind_wx_redpack
+
 
 logger = logging.getLogger("weixin")
 
@@ -74,7 +76,7 @@ def checkBindDeco(func):
         check_bind = False
         if isinstance(self.msg, BaseEvent):
             if isinstance(self.msg,(ClickEvent,)):
-                if self.msg.key == 'subscribe_service' or self.msg.key == 'my_account':
+                if self.msg.key == 'subscribe_service' or self.msg.key == 'my_account' or self.msg.key == 'sign_in':
                     check_bind = True
         elif isinstance(self.msg, BaseMessage):
             content = self.msg.content.lower()
@@ -224,6 +226,9 @@ class WeixinJoinView(View):
         if msg.key == 'month_papers':
             articles = self.getSubscribeArticle()
             reply = create_reply(articles, msg)
+
+        if msg.key == 'sign_in':
+            pass
         return reply
 
     @checkBindDeco
@@ -282,7 +287,15 @@ class WeixinJoinView(View):
                 channel_digital_code = eventKey[-3:]
                 user = User.objects.filter(pk=int(user_id)).first()
                 if user:
-                    rs, txt, is_first_bind = bindUser(w_user, user)
+                    rs, txt, is_first_bind, redpack_record_id = bindUser(w_user, user)
+                    if rs == 0:
+                        weixin.tasks.bind_ok.apply_async(kwargs={
+                            "openid": fromUserName,
+                            "is_first_bind": is_first_bind,
+                            "redpack_record_id": redpack_record_id,
+                        },
+                                            queue='celery01'
+                                            )
                     channel = WeiXinChannel.objects.filter(digital_code=channel_digital_code).first()
                     if channel:
                         scene_id = channel.code
@@ -373,22 +386,25 @@ def getOrCreateWeixinUser(openid, weixin_account):
 
 def bindUser(w_user, user):
     is_first_bind = False
+    redpack_record_id = 0
     if w_user.user:
         if w_user.user.id==user.id:
-            return 1, u'你已经绑定, 请勿重复绑定', is_first_bind
-        return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone, is_first_bind
+            return 1, u'你已经绑定, 请勿重复绑定', is_first_bind, redpack_record_id
+        return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone, is_first_bind, redpack_record_id
     other_w_user = WeixinUser.objects.filter(user=user).first()
     if other_w_user:
         msg = u"你的手机号%s已经绑定微信<span style='color:#173177;'>%s</span>"%(user.wanglibaouserprofile.phone, other_w_user.nickname)
-        return 3, msg, is_first_bind
+        return 3, msg, is_first_bind, redpack_record_id
     w_user.user = user
     w_user.bind_time = int(time.time())
     w_user.save()
     if not user.wanglibaouserprofile.first_bind_time:
         user.wanglibaouserprofile.first_bind_time = w_user.bind_time
         user.wanglibaouserprofile.save()
+        redpack_record_id = give_first_bind_wx_redpack(user, 'all')
         is_first_bind = True
-    return 0, u'绑定成功', is_first_bind
+
+    return 0, u'绑定成功', is_first_bind, redpack_record_id
 
 class WeixinLogin(TemplateView):
     template_name = 'weixin_login_new.jade'
@@ -498,18 +514,15 @@ class WeixinBind(TemplateView):
         try:
             openid = self.request.GET.get('openid')
             weixin_user = WeixinUser.objects.get(openid=openid)
-            rs, txt, is_first_bind = bindUser(weixin_user, user)
+            rs, txt, is_first_bind, redpack_record_id = bindUser(weixin_user, user)
             if rs == 0:
-                now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
-                weixin.tasks.sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
-                                            "openid":weixin_user.openid,
-                                            "template_id":BIND_SUCCESS_TEMPLATE_ID,
-                                            "name1":"",
-                                            "name2":user.wanglibaouserprofile.phone,
-                                            "time":now_str,
-                                                })},
-                                            queue='celery02'
-                                            )
+                weixin.tasks.bind_ok.apply_async(kwargs={
+                    "openid": openid,
+                    "is_first_bind": is_first_bind,
+                    "redpack_record_id": redpack_record_id,
+                },
+                                    queue='celery01'
+                                    )
         except WeixinUser.DoesNotExist, e:
             logger.debug(e.message)
             pass
