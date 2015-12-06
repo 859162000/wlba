@@ -15,6 +15,7 @@ from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
 import functools
 import re
+import random
 
 from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
@@ -62,21 +63,24 @@ from .util import _generate_ajax_template
 from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEvent, UnsubscribeEvent, SubscribeEvent,\
                              TemplateSendJobFinishEvent)
 from wanglibao_redpack.backends import give_first_bind_wx_redpack
+from experience_gold.models import ExperienceEvent, ExperienceEventRecord
+from experience_gold.backends import SendExperienceGold
+from marketing.utils import local_to_utc
 
 
 logger = logging.getLogger("weixin")
+CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
 
 def checkBindDeco(func):
     @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
         toUserName = self.msg._data['ToUserName']
         fromUserName = self.msg._data['FromUserName']
-        weixin_account = WeixinAccounts.getByOriginalId(toUserName)
-        w_user = getOrCreateWeixinUser(fromUserName, weixin_account)
+        user = kwargs.get('user')
         check_bind = False
         if isinstance(self.msg, BaseEvent):
             if isinstance(self.msg,(ClickEvent,)):
-                if self.msg.key == 'subscribe_service' or self.msg.key == 'my_account' or self.msg.key == 'sign_in':
+                if self.msg.key in CHECK_BIND_CLICK_EVENT:
                     check_bind = True
         elif isinstance(self.msg, BaseMessage):
             content = self.msg.content.lower()
@@ -84,7 +88,7 @@ def checkBindDeco(func):
             if content == 'td' or sub_service:
                 check_bind = True
 
-        if check_bind and not w_user.user:
+        if check_bind and not user:
             txt = self.getBindTxt(fromUserName)
             reply = create_reply(txt, self.msg)
             return reply
@@ -131,13 +135,14 @@ class WeixinJoinView(View):
         fromUserName = msg._data['FromUserName']
         createTime = msg._data['CreateTime']
         weixin_account = WeixinAccounts.getByOriginalId(toUserName)
+        w_user, old_subscribe = getOrCreateWeixinUser(fromUserName, weixin_account)
+        user = w_user.user
         if isinstance(msg, BaseEvent):
             if isinstance(msg, ClickEvent):
-                reply = self.process_click_event(msg)
+                reply = self.process_click_event(weixin_account, w_user=w_user, user=user)
             elif isinstance(msg, SubscribeEvent):
-                reply = self.process_subscribe(msg, toUserName)
+                reply = self.process_subscribe(old_subscribe, w_user=w_user, user=user)
             elif isinstance(msg, UnsubscribeEvent):
-                w_user = getOrCreateWeixinUser(fromUserName, weixin_account)
                 if w_user.subscribe != 0:
                     w_user.subscribe = 0
                 w_user.unsubscribe_time = int(time.time())
@@ -145,15 +150,15 @@ class WeixinJoinView(View):
                 w_user.save()
                 reply = create_reply(u'欢迎下次关注我们！', msg)
             elif isinstance(msg, SubscribeScanEvent):
-                reply = self.process_subscribe(msg, toUserName)
+                reply = self.process_subscribe(old_subscribe, w_user=w_user, user=user)
             elif isinstance(msg, ScanEvent):
                 #如果eventkey为用户id则进行绑定
-                reply = self.process_subscribe(msg, toUserName)
+                reply = self.process_subscribe(old_subscribe, w_user=w_user, user=user)
             elif isinstance(msg, TemplateSendJobFinishEvent):
                 reply = -1
         elif isinstance(msg, BaseMessage):
             if isinstance(msg, TextMessage):
-                reply = self.check_service_subscribe(msg, weixin_account)
+                reply = self.check_service_subscribe(w_user=w_user, user=user)
                 # 自动回复  5000次／天
                 # if not reply:
                 #     if msg.content=='test':
@@ -171,30 +176,38 @@ class WeixinJoinView(View):
 
 
     @checkBindDeco
-    def process_click_event(self, msg):
+    def process_click_event(self, weixin_account, w_user=None, user=None):
         reply = None
         sub_services = SubscribeService.objects.filter(channel='weixin', is_open=True).all()
-        toUserName = msg._data['ToUserName']
-        fromUserName = msg._data['FromUserName']
-        weixin_account = WeixinAccounts.getByOriginalId(toUserName)
-        w_user = getOrCreateWeixinUser(fromUserName, weixin_account)
-        if msg.key == 'subscribe_service':
+        toUserName = self.msg._data['ToUserName']
+        fromUserName = self.msg._data['FromUserName']
+        if self.msg.key == 'subscribe_service':
             txt = u'客官，请回复相关数字订阅最新项目通知，系统会在第一时间发送给您相关信息。\n'
             if len(sub_services)>0:
                 for sub_service in sub_services:
                     txt += ("【" + sub_service.key + "】" + sub_service.describe + '\n')
-                txt += u'如需退订请回复TD'
-                reply = create_reply(txt, msg)
+
+                sub_records = SubscribeRecord.objects.filter(w_user=w_user, status=True)
+                if sub_records.exists():
+                    txt += u'已经订阅的项目：\n'
+                    sub_records = sub_records.order_by('service').all()
+                    for sub_record in sub_records:
+                        txt += u"【" + sub_record.service.key + u"】"
+                    txt += u'\n如需退订请回复TD'
+                else:
+                    txt += u'当前没有订阅任何项目'
+
+                reply = create_reply(txt, self.msg)
             else:
                 reply = -1
-        if msg.key == 'bind_weixin':
-            if not w_user.user:
+        if self.msg.key == 'bind_weixin':
+            if not user:
                 txt = self.getBindTxt(fromUserName)
             else:
-                txt = self.getUnBindTxt(fromUserName, w_user.user.wanglibaouserprofile.phone)
-            reply = create_reply(txt, msg)
-        if msg.key == 'my_account':
-            account_info = getAccountInfo(w_user.user)
+                txt = self.getUnBindTxt(fromUserName, user.wanglibaouserprofile.phone)
+            reply = create_reply(txt, self.msg)
+        if self.msg.key == 'my_account':
+            account_info = getAccountInfo(user)
             # 【账户概况】
             # 总资产       (元）： 12000.00
             # 可用余额（元）： 108.00
@@ -207,7 +220,7 @@ class WeixinJoinView(View):
                     keyword2=infos)
             SendTemplateMessage.sendTemplate(w_user, a)
             reply = -1
-        if msg.key == 'customer_service':
+        if self.msg.key == 'customer_service':
             txt = self.getCSReply()
             try:
                 client = WeChatClient(weixin_account.app_id, weixin_account.app_secret)
@@ -223,19 +236,44 @@ class WeixinJoinView(View):
                 pass
             reply = -1#create_reply(txt, msg)
 
-        if msg.key == 'month_papers':
+        if self.msg.key == 'month_papers':
             articles = self.getSubscribeArticle()
-            reply = create_reply(articles, msg)
+            reply = create_reply(articles, self.msg)
 
-        if msg.key == 'sign_in':
-            pass
+        if self.msg.key == 'sign_in':
+            try:
+                if self.checkIsTodaySignIn(user):
+                    txt = u"今日已经签到，明日再来"
+                    reply = create_reply(txt, self.msg)
+                else:
+                    seg = SendExperienceGold(user)
+                    experience_event = self.getSignExperience_gold()
+                    if experience_event:
+                        seg.send(experience_event.id)
+                        txt = u"恭喜您，签到成功！\n" \
+                              u"奖励金额：%s元体验金\n" \
+                              u"体验期限：1天\n" \
+                              u"每日签到积少成多，记得明天再来哦~"%experience_event.amount
+                        reply = create_reply(txt, self.msg)
+                    else:
+                        reply = -1
+                        logger.debug(u'用户签到没有领到体验金')
+            except Exception, e:
+                reply = -1
+                logger.debug(u"用户签到领体验金抛出异常")
+        if self.msg.key == 'my_experience_gold':
+            seg = SendExperienceGold(user)
+            amount = seg.get_amount()
+            txt = u"您的帐号：%s\n" \
+                  u"体验金金额：%s元"%(user.wanglibaouserprofile.phone, amount)
+            reply = create_reply(txt, self.msg)
+
         return reply
 
     @checkBindDeco
-    def check_service_subscribe(self, msg, weixin_account):
-        fromUserName = msg._data['FromUserName']
-        w_user = getOrCreateWeixinUser(fromUserName, weixin_account)
-        content = msg.content.lower()
+    def check_service_subscribe(self, w_user=None, user=None):
+        fromUserName = self.msg._data['FromUserName']
+        content = self.msg.content.lower()
         reply = None
         txt = None
         if content == 'td':
@@ -245,7 +283,7 @@ class WeixinJoinView(View):
                 txt = u'订阅项目已退订成功，如需订阅相关项目，请再次点击【个性化项目】进行订阅'
             else:
                 txt = u'您没有可退订项目，如需订阅相关项目，请再次点击【个性化项目】进行订阅'
-            reply = create_reply(txt, msg)
+            reply = create_reply(txt, self.msg)
             return reply
         sub_service = SubscribeService.objects.filter(channel='weixin', is_open=True, key=content).first()
         if sub_service:
@@ -263,19 +301,13 @@ class WeixinJoinView(View):
                 sub_service_record.save()
                 txt = u'恭喜您，%s订阅成功，系统会在第一时间发送给您相关信息'%(sub_service.describe)
             if txt:
-                reply = create_reply(txt, msg)
+                reply = create_reply(txt, self.msg)
         return reply
 
 
-    def process_subscribe(self, msg, original_id):
-        fromUserName = msg._data['FromUserName']
-        eventKey = msg._data['EventKey']
-        weixin_account = WeixinAccounts.getByOriginalId(original_id)
-        w_user = WeixinUser.objects.filter(openid=fromUserName).first()
-        old_subscribe = 0
-        if w_user and w_user.subscribe:
-            old_subscribe = 1
-        w_user = getOrCreateWeixinUser(fromUserName, weixin_account)
+    def process_subscribe(self, old_subscribe, w_user=None, user=None):
+        fromUserName = self.msg._data['FromUserName']
+        eventKey = self.msg._data['EventKey']
         reply = None
 
         #如果eventkey为用户id则进行绑定
@@ -299,13 +331,13 @@ class WeixinJoinView(View):
                     channel = WeiXinChannel.objects.filter(digital_code=channel_digital_code).first()
                     if channel:
                         scene_id = channel.code
-                    reply = create_reply(txt, msg)
+                    reply = create_reply(txt, self.msg)
         if not old_subscribe and w_user.subscribe:
             w_user.scene_id = scene_id
             w_user.save()
-        if not reply and not w_user.user:
+        if not reply and not user:
             txt = self.getBindTxt(fromUserName)
-            reply = create_reply(txt, msg)
+            reply = create_reply(txt, self.msg)
         if not reply:
             reply = -1
         return reply
@@ -347,6 +379,31 @@ class WeixinJoinView(View):
                     + u"【周一至周五9：00~20：00】，请在工作与我们联系哦~"
         return txt
 
+    def getSignExperience_gold(self):
+        now = timezone.now()
+        query_object = ExperienceEvent.objects.filter(invalid=False, give_mode='weixin_bind',
+                                                          available_at__lt=now, unavailable_at__gt=now)
+        experience_events = query_object.all()
+        length = len(experience_events)
+        if length > 1:
+            random_int = random.randint(0, length-1)
+            return experience_events[random_int]
+        return None
+    def checkIsTodaySignIn(self, user):
+        now = datetime.datetime.now()
+
+        start = local_to_utc(now, 'min')
+        end = local_to_utc(now, 'max')
+        experience_records = ExperienceEventRecord.objects.filter(user=user, event__give_mode='weixin_sign_in',
+                                                          created_at__lt=end, created_at__gt=start).all()
+        is_today_signin = False
+        if len(experience_records)>0:
+            is_today_signin = True
+        return is_today_signin
+
+
+
+
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -355,7 +412,10 @@ class WeixinJoinView(View):
 
 
 def getOrCreateWeixinUser(openid, weixin_account):
+    old_subscribe = 0
     w_user = WeixinUser.objects.filter(openid=openid).first()
+    if w_user and w_user.subscribe:
+        old_subscribe = 1
     if not w_user:
         w_user = WeixinUser()
         w_user.openid = openid
@@ -381,7 +441,7 @@ def getOrCreateWeixinUser(openid, weixin_account):
         except WeChatException, e:
             logger.debug(e.message)
             pass
-    return w_user
+    return w_user, old_subscribe
 
 
 def bindUser(w_user, user):

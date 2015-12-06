@@ -14,9 +14,11 @@ logger = logging.getLogger(__name__)
 class WangliTask(Task):
     abstract = True
 
-    def apply_async(self, args=None, kwargs=None):
+    def apply_async(self, args=None, kwargs=None, task_id=None, producer=None,
+                    link=None, link_error=None, **options):
         try:
-            super(WangliTask, self).apply_async(args=args, kwargs=kwargs)
+            super(WangliTask, self).apply_async(args=args, kwargs=kwargs, task_id=task_id, producer=producer, link=link,
+                                                link_error=link_error, **options)
         except:
             logger.exception('send_task_failed_with_para:' + str(args) + str(kwargs))
 
