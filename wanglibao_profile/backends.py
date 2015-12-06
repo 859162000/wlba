@@ -9,7 +9,9 @@ from wanglibao_pay.models import Card, PayInfo
 from wanglibao_profile.models import WanglibaoUserProfile
 import time
 import json
-# import logging
+import logging
+
+logger = logging.getLogger(__name__)
 
 #最多重试三次
 from wanglibao_rest.utils import split_ua
@@ -250,6 +252,7 @@ def require_trade_pwd(view_func):
             else:
                 return HttpResponse(json.dumps(check_result), content_type="application/json")
         except ValueError:
+            logger.error('trade request POST %s header %s'%(request.POST, request.META))
             return HttpResponse(json.dumps({'ret_code': 40002, 'message': '交易密码错误'}), content_type="application/json")
     
     return _wrapped_view

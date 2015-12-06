@@ -44,7 +44,8 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
                             DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView,
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
-                            CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI)
+                            CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI, InnerSysSaveChannel,
+                            InnerSysSendSMS, InnerSysValidateID)
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
 
@@ -216,7 +217,10 @@ urlpatterns = patterns(
     url(r'^xunlei/8/check/$', GuestCheckView.as_view()),
     url(r'^trade_pwd/$', TradePasswordView.as_view()),
     url(r'^wechat/attention/(?P<phone>\d+)/$', WeixinRedPackView.as_view()),
-    url(r'^distribute/redpack/(?P<phone>\d+)/$', DistributeRedpackView.as_view()),
+    url(r'^distribute//(?P<phone>\d+)/$', DistributeRedpackView.as_view()),
+    url(r'^inner/send_sms/$', InnerSysSendSMS.as_view()),
+    url(r'^inner/validate_id/$', InnerSysValidateID.as_view()),
+    url(r'^inner/save_channel/$', InnerSysSaveChannel.as_view()),
 )
 
 urlpatterns += patterns('',
