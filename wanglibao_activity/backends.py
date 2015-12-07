@@ -74,6 +74,7 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, orde
 def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, order_id, user_ib=None):
     """ check the trigger node """
     product_id = int(product_id)
+    order_id = int(order_id)
     # 注册 或 实名认证
     if trigger_node in ('register', 'validation'):
         _send_gift(user, rule, device_type, is_full)
@@ -81,6 +82,9 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
     elif trigger_node == 'first_pay':
         # check first pay
         penny = Decimal(0.01).quantize(Decimal('.01'))
+        with transaction.atomic():
+            # 等待pay_info交易完成
+            pay_info_lock = PayInfo.objects.select_for_update().filter(order_id=order_id).all()
         if rule.is_in_date:
             first_pay = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
                                                update_time__gt=rule.activity.start_at,
