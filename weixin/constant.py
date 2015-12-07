@@ -44,6 +44,7 @@ class MessageTemplate404(Exception):
 
 class MessageTemplate(object):
     def __init__(self, template_id, **kwargs):
+        print kwargs
         template = Message_template.get(template_id, {})
         if not template:
             raise MessageTemplate404
@@ -201,7 +202,7 @@ Message_template = {
         "top_color":'#88ffdd',
         "data": {
                 "first": {
-                    "value": "",
+                    "value": u"绑定通知",
                    "color": "#173177"
                 },
                 "name1": {
@@ -218,7 +219,7 @@ Message_template = {
                 },
                "remark":{
                    "value":u'您可以使用下方微信菜单进行更多体验。',
-                   "color":"#173177"
+                   "color":"#000000"
                }
         },
         "url": '',
