@@ -108,7 +108,7 @@
                 window.open("/accounts/register/?next=/accounts/id_verify/");
             },
             "rechargeErr": function(){
-                window.open("/accounts/register/?next=/pay/banks/");
+                window.open("/accounts/register/?next=/pay/banks_for_register/");
             }
         };
         //注册领红包
