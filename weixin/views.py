@@ -386,9 +386,9 @@ class WeixinJoinView(View):
 
     def getSignExperience_gold(self):
         now = timezone.now()
-        query_object = ExperienceEvent.objects.filter(invalid=False, give_mode='weixin_bind',
+        query_object = ExperienceEvent.objects.filter(invalid=False, give_mode='weixin_sign_in',
                                                           available_at__lt=now, unavailable_at__gt=now)
-        experience_events = query_object.all()
+        experience_events = query_object.order_by('amount').all()
         length = len(experience_events)
         if length > 1:
             random_int = random.randint(0, length-1)
