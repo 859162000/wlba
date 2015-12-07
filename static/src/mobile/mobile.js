@@ -961,7 +961,7 @@ org.buy=(function(org){
                             },
                             success: function(data){
                                if(data.data){
-                                   $('.balance-sign').text(balance - data.data + lib.redPackAmountNew);
+                                   $('.balance-sign').text(balance - data.data + lib.redPackAmountNew + '元');
                                    $(".sign-main").css("display","-webkit-box");
                                }
                             },
