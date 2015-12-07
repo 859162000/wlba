@@ -26,9 +26,14 @@ import logging
 # from wanglibao_account.tasks import cjdao_callback
 # from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
 import re
+import json, datetime
+
 from wanglibao_redis.backend import redis_backend
 
 from wanglibao_rest.utils import split_ua
+from weixin.models import WeixinUser
+from weixin.constant import PRODUCT_INVEST_SUCCESS_TEMPLATE_ID
+
 
 logger = logging.getLogger('wanglibao_account')
 
@@ -145,7 +150,6 @@ class P2PTrader(object):
         })
         logger.debug("=20151125= inside_message.send_one : {0}购标站内信发成功".format(self.user) )
 
-
         # 满标给管理员发短信
         if is_full:
             from wanglibao_p2p.tasks import full_send_message
@@ -164,7 +168,29 @@ class P2PTrader(object):
 
                 # 将标写入redis list
                 cache_backend.push_p2p_products(self.product)
-
+        try:
+            weixin_user = WeixinUser.objects.filter(user=self.user).first()
+            now = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
+    #         投标成功通知
+    #         您好，您已投标成功。
+    #         标的编号：10023
+    #         投标金额：￥3000.00
+    #         投标时间：2015-09-12
+    #         投标成功,可在投标记录里查看.
+    # {{first.DATA}} 标的编号：{{keyword1.DATA}} 投标金额：{{keyword2.DATA}} 投标时间：{{keyword3.DATA}} {{remark.DATA}}
+            if weixin_user:
+                from weixin.tasks import sentTemplate
+                sentTemplate.apply_async(kwargs={
+                                "kwargs":json.dumps({
+                                                "openid": weixin_user.openid,
+                                                "template_id": PRODUCT_INVEST_SUCCESS_TEMPLATE_ID,
+                                                "keyword1": self.product.id,
+                                                "keyword2": str(amount),
+                                                "keyword3": now,
+                                                    })},
+                                                queue='celery02')
+        except Exception, e:
+            pass
         return product_record, margin_record, equity
 
 
