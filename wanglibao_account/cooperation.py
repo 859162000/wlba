@@ -1107,7 +1107,66 @@ class ZGDXRegister(CoopRegister):
                         plat_offer_id = '104372'
                 else:
                     plat_offer_id = '103050'
-                self.zgdx_call_back(self.user, plat_offer_id)
+                self.zgdx_call_back(user, plat_offer_id)
+
+
+class JuChengRegister(CoopRegister):
+    def __init__(self, request):
+        super(JuChengRegister, self).__init__(request)
+        self.c_code = 'jcw'
+        self.invite_code = 'jcw'
+
+    @method_decorator(transaction.atomic)
+    def purchase_call_back(self, user, order_id):
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+        SEND_SUCCESS = None
+        ticket = 0
+
+        # 判断是否首次投资
+        if p2p_record and p2p_record.order_id == int(order_id):
+            p2p_amount = int(p2p_record.amount)
+            if p2p_amount>=500 and p2p_amount<1000 and False:
+                try:
+                    logger.debug(u"80门票，我要申请锁")
+                    config = GiftOwnerGlobalInfo.objects.select_for_update().filter(description=u'jcw_ticket_80').first()
+                except Exception, reason:
+                    logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
+                    raise
+                if config and config.amount > 0:
+                    logger.debug(u'80门票，我已经得到了锁')
+                    logger.debug(u'80 ticket left：%s' % (config.amount,))
+                    config.amount -= 1
+                    ticket = 80
+                    config.save()
+                    logger.debug(u"用户 %s 获得80门票一张, 剩余：%s" % (user, config.amount))
+                    SEND_SUCCESS = True
+
+            if p2p_amount>=2000:
+                try:
+                    logger.debug(u"180门票，我要申请锁")
+                    config = GiftOwnerGlobalInfo.objects.select_for_update().filter(description=u'jcw_ticket_188').first()
+                except Exception, reason:
+                    logger.debug(u"获取奖品信息全局配置表报异常,reason:%s" % (reason,))
+                    raise
+                if config and config.amount > 0:
+                        logger.debug(u'180门票，我已经得到了锁')
+                        config.amount -= 1
+                        logger.debug(u"用户 %s 获得180门票一张, 剩余：%s" % (user, config.amount))
+                        config.save()
+                        ticket = 180
+                        SEND_SUCCESS = True
+
+            if SEND_SUCCESS:
+                send_messages.apply_async(kwargs={
+                    "phones": [user.wanglibaouserprofile.phone, ],
+                    "messages": [u'【网利科技】您已成功获得%s元门票，请于演出当天到北京音乐厅一楼大厅票务兑换处领取，咨询电话:13581710219' % (ticket,), ]
+                })
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id": user.id,
+                    "title": u"演出门票赠送",
+                    "content": u'【网利科技】您已成功获得%s元门票，请于演出当天到北京音乐厅一楼大厅票务兑换处领取，咨询电话:13581710219' % (ticket,),
+                    "mtype": "activity"
+                })
 
 
 class WeixinRedpackRegister(CoopRegister):
