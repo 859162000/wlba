@@ -189,6 +189,9 @@ def withdraw(request):
     if not user.wanglibaouserprofile.id_is_valid:
         return {"ret_code": 20062, "message": u"请先进行实名认证"}
 
+    if user.wanglibaouserprofile.frozen:
+        return {"ret_code": 20072, "message": u"用户账户已冻结,请联系客服"}
+
     try:
         float(amount)
     except:
