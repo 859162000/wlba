@@ -222,6 +222,15 @@ class WeixinAccounts(object):
         'qrcode_url': '/static/imgs/admin/qrcode_for_gh_77c09ff2f3a3_258.jpg'
     }
     account_test = {
+        'id': 'gh_d3d05c71a967',
+        'name': 'staging测试号',
+        'app_id': 'wx406c0da365002254',
+        'app_secret': 'd4624c36b6795d1d99dcf0547af5443d',
+        'classify': '微信公众平台测试号',
+        'token': 'tgE3AdMS',
+        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_d3d05c71a967_258.jpg'
+    }
+    account_test_wxq = {
         'id': 'gh_32e9dc3fab8e',
         'name': 'wxq测试号',
         'app_id': 'wx83535d60d4476686',
@@ -283,6 +292,7 @@ class WeixinAccounts(object):
             cls.data['test'] = cls.account_test
             cls.data['account_test_hmm']=cls.account_test_hmm
             cls.data['account_test_yj']=cls.account_test_yj
+            cls.data['account_test_wxq']=cls.account_test_wxq
 
     @classmethod
     def account_classify(cls):
