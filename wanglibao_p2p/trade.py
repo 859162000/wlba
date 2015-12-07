@@ -159,8 +159,8 @@ class P2PTrader(object):
 #         投标时间：2015-09-12
 #         投标成功,可在投标记录里查看.
 # {{first.DATA}} 标的编号：{{keyword1.DATA}} 投标金额：{{keyword2.DATA}} 投标时间：{{keyword3.DATA}} {{remark.DATA}}
-        from weixin.tasks import sentTemplate
         if weixin_user:
+            from weixin.tasks import sentTemplate
             sentTemplate.apply_async(kwargs={
                             "kwargs":json.dumps({
                                             "openid": weixin_user.openid,

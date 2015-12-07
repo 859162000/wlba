@@ -149,8 +149,8 @@ def deposit_ok(user_id, amount, device, order_id):
         weixin_user = WeixinUser.objects.filter(user=user).first()
 # 亲爱的满先生，您的充值已成功
 # {{first.DATA}} 充值时间：{{keyword1.DATA}} 充值金额：{{keyword2.DATA}} 可用余额：{{keyword3.DATA}} {{remark.DATA}}
-        from weixin.tasks import sentTemplate
         if weixin_user:
+            from weixin.tasks import sentTemplate
             deposit_ok_time = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
             margin = Margin.objects.filter(user=user).first()
             sentTemplate.apply_async(kwargs={
