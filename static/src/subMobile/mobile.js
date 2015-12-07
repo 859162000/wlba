@@ -871,9 +871,9 @@ function onLoadClass(){
 function getCode(){//得到用户信息的二维码
     var phone = org.getQueryStringByName('phone');
     org.ajax({
-        type: "POST",
+        type: "GET",
         url: "/weixin/api/generate/qr_scene_ticket/",
-        data: {"original_id":"gh_32e9dc3fab8e"},//c:gh_32e9dc3fab8e, w:gh_f758af6347b6
+        data: {"original_id":"gh_32e9dc3fab8e", "code": "test1"},//c:gh_32e9dc3fab8e, w:gh_f758af6347b6;code:微信关注渠道
         success: function (data) {
             $("#sub-code").html("<img src='"+ data.qrcode_url + "' />");
         },

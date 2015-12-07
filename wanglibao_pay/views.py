@@ -63,6 +63,9 @@ TWO_PLACES = decimal.Decimal(10) ** -2
 
 
 class BankListView(TemplateView):
+    """
+    pc端使用的银行列表页
+    """
     template_name = 'pay_banks.jade'
 
     def get_context_data(self, **kwargs):
@@ -77,6 +80,13 @@ class BankListView(TemplateView):
             'announcements': AnnouncementAccounts
         })
         return context
+
+
+class BankListForRegisterView(BankListView):
+    """
+    pc端使用的银行列表页，新的用户注册流程需要用户在注册之后就充值，这个页面给注册时的充值使用
+    """
+    template_name = 'register_second.jade'
 
 
 class PayView(TemplateView):
