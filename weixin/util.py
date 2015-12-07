@@ -2,6 +2,8 @@
 
 from wanglibao_p2p.models import P2PEquity
 from wanglibao_buy.models import FundHoldInfo
+from django.template import Template, Context
+from django.template.loader import get_template
 
 
 def getAccountInfo(user):
@@ -45,3 +47,17 @@ def getAccountInfo(user):
         'equity_total':equity_total #投资金额
     }
     return res
+
+
+def _generate_ajax_template(content, template_name=None):
+
+    context = Context({
+        'results': content,
+    })
+
+    if template_name:
+        template = get_template(template_name)
+    else:
+        template = Template('<div></div>')
+
+    return template.render(context)

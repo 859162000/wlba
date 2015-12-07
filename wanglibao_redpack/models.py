@@ -48,7 +48,8 @@ class RedPackEvent(models.Model):
                                 ('buy', u'投资'),
                                 ('pay', u'充值'),
                                 ('p2p_audit', u'满标审核'),
-                                ('repaid', u'还款')), default=u"注册")
+                                ('repaid', u'还款'),
+                                ('first_bind_weixin', u'首次绑定微信')), default=u"注册")
     give_platform = models.CharField(max_length=10, verbose_name=u"发放平台", default="全平台", choices=PLATFORM)
     apply_platform = models.CharField(max_length=10, verbose_name=u"使用平台", default="全平台", choices=PLATFORM)
     target_channel = models.CharField(max_length=1000, verbose_name=u"渠道(非邀请码)", blank=True, default="",
@@ -67,21 +68,6 @@ class RedPackEvent(models.Model):
     class Meta:
         verbose_name = u"优惠券活动"
         verbose_name_plural = u"优惠券活动"
-
-    def save(self, *args, **kwargs):
-
-        value = dict()
-        value['available_at'] = self.available_at
-        value['auto_extension'] = self.auto_extension
-        value['auto_extension_days'] = self.auto_extension_days
-        value['unavailable_at'] = self.unavailable_at
-
-        if value['auto_extension'] and \
-            value['available_at'] + timezone.timedelta(days=value['auto_extension_days']) > value['unavailable_at']:
-            value['unavailable_at'] = datetime.datetime.utcnow().replace(tzinfo=timezone.utc) + \
-                                      timezone.timedelta(days=value['auto_extension_days'])
-            self.unavailable_at = value['unavailable_at']
-        return super(RedPackEvent, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return u'%s <%s>' % (self.id, self.name)

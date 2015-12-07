@@ -4,6 +4,8 @@
 import logging
 import re
 import socket
+import json
+
 from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.contrib.auth.decorators import permission_required, login_required
@@ -55,12 +57,17 @@ from wanglibao_announcement.utility import AnnouncementAccounts
 from fee import WithdrawFee
 import datetime
 from wanglibao_rest import utils as rest_utils
+from weixin.models import WeixinUser
+from marketing.tools import withdraw_submit_ok
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
 
 
 class BankListView(TemplateView):
+    """
+    pc端使用的银行列表页
+    """
     template_name = 'pay_banks.jade'
 
     def get_context_data(self, **kwargs):
@@ -75,6 +82,13 @@ class BankListView(TemplateView):
             'announcements': AnnouncementAccounts
         })
         return context
+
+
+class BankListForRegisterView(BankListView):
+    """
+    pc端使用的银行列表页，新的用户注册流程需要用户在注册之后就充值，这个页面给注册时的充值使用
+    """
+    template_name = 'register_second.jade'
 
 
 class PayView(TemplateView):
@@ -372,20 +386,13 @@ class WithdrawCompleteView(TemplateView):
             pay_info.margin_record = margin_record
 
             pay_info.save()
-
-            # 短信通知添加用户名
             name = user.wanglibaouserprofile.name or u'用户'
-            send_messages.apply_async(kwargs={
-                'phones': [user.wanglibaouserprofile.phone],
-                # 'messages': [messages.withdraw_submitted(amount, timezone.now())]
-                'messages': [messages.withdraw_submitted(name)]
-            })
-            title, content = messages.msg_withdraw(timezone.now(), amount)
-            inside_message.send_one.apply_async(kwargs={
+            withdraw_submit_ok.apply_async(kwargs={
                 "user_id": user.id,
-                "title": title,
-                "content": content,
-                "mtype": "withdraw"
+                "user_name": name,
+                "phone": user.wanglibaouserprofile.phone,
+                "amount": amount,
+                "bank_name": card.bank.name
             })
         except decimal.DecimalException:
             result = u'提款金额在0～{}之间'.format(fee_config.get('max_amount'))
@@ -1098,22 +1105,15 @@ class WithdrawAPIView(APIView):
         # 短信通知添加用户名
         user = request.user
         name = user.wanglibaouserprofile.name or u'用户'
-
         if not result['ret_code']:
-            send_messages.apply_async(kwargs={
-                'phones': [result['phone']],
-                'messages': [messages.withdraw_submitted(name)]
-            })
-
-            title, content = messages.msg_withdraw(timezone.now(), result['amount'])
-            inside_message.send_one.apply_async(kwargs={
-                "user_id": request.user.id,
-                "title": title,
-                "content": content,
-                "mtype": "withdraw"
+            withdraw_submit_ok.apply_async(kwargs={
+                "user_id": user.id,
+                "user_name": name,
+                "phone": request.user.wanglibaouserprofile.phone,
+                "amount": result['amount'],
+                "bank_name": result['bank_name']
             })
         return Response(result)
-
 
 class BindCardQueryView(APIView):
     """ 查询用户绑定卡号列表接口 """

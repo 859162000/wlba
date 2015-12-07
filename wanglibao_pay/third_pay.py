@@ -269,7 +269,7 @@ def withdraw(request):
         pay_info.margin_record = margin_record
 
         pay_info.save()
-        return {"ret_code": 0, 'message': u'提现成功', "amount": amount, "phone": phone}
+        return {"ret_code": 0, 'message': u'提现成功', "amount": amount, "phone": phone, "bank_name":bank.name}
     except Exception, e:
         pay_info.error_message = str(e)
         pay_info.status = PayInfo.FAIL
