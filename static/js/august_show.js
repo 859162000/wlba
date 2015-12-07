@@ -187,7 +187,7 @@
 
     $('#fast').on('click',function(){
       if($(this).text()=='赶快去充值'){
-        window.location.href='/pay/banks/'
+        window.location.href='/pay/banks_for_register/'
       }
       if($(this).text()=='赶快去投资'){
         window.location.href='/p2p/list/'
