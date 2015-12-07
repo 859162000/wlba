@@ -6,6 +6,7 @@ import logging
 import decimal
 from django.db.models import Sum
 from django.utils import timezone
+from datetime import datetime, timedelta
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -72,7 +73,7 @@ class ExperienceBuyAPIView(APIView):
                 amortization.interest = term[2]  # 利息
                 amortization.term = index + 1  # 期数
                 amortization.description = u'第%d期' % (index + 1)
-                amortization.term_date = term[6]
+                amortization.term_date = term[6] - timedelta(days=1)
 
                 amortization.save()
 

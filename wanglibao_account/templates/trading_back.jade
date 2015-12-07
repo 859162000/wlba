@@ -1,0 +1,56 @@
+extends account_home_base
+
+- load formatters
+- load mathfilters
+- load widget_tweaks
+
+block head
+  - with '密码管理' as title
+  include include/common_head
+  - endwith
+
+block sidebar
+  - with '密码管理' as activeItem
+  include include/user_center_sidebar
+  - endwith
+
+block main
+  .panel
+    .well
+        .panel-title-bar__no-border
+            .panel-title 密码管理 > 找回交易密码
+    .setTradingPwd.back-div
+        ul
+            li
+                label.label1 第1/2步:
+                span 身份认证
+            li.mt10
+                label 真实姓名
+                span {{user_profile.name}}
+            li
+                label 身份证号码
+                input(type='text',placeholder="请输入身份证号码",name='id').sfz
+                em(style='display:none')#sfzError
+                    i
+                    |
+            li
+                label 绑定银行卡
+                select#card-select1.withdraw-select(name='card_id1')
+                  option(value='') 请选择银行卡
+                  for card in cards
+                    option(value='{{card.id}}') {{card | card_info}}
+                em(style='display:none')#yhkError
+                        i
+            li
+                .aa.clearfix
+                    label 银行卡号
+                    input(type='text',placeholder="请输入银行卡号").yhkh
+                    em(style='display:none')#yhkhError
+                        i
+            li.mt28
+                label
+                a(href='javascript:void(0)').nextBtn 下一步
+  script.
+    require(['/static/js/back.js?v=20151023'])
+
+
