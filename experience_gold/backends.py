@@ -66,7 +66,7 @@ class ExperienceBuyAPIView(APIView):
                 total_amount,
                 experience_product.expected_earning_rate / 100.0,
                 timezone.now(),
-                experience_product.period - 1
+                experience_product.period
             )
 
             for index, term in enumerate(terms['terms']):
@@ -77,7 +77,7 @@ class ExperienceBuyAPIView(APIView):
                 amortization.interest = term[2]  # 利息
                 amortization.term = index + 1  # 期数
                 amortization.description = u'第%d期' % (index + 1)
-                amortization.term_date = term[6]
+                amortization.term_date = term[6] - timedelta(days=1)
 
                 amortization.save()
 
