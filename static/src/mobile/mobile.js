@@ -1544,7 +1544,16 @@ org.processFirst = (function(org){
                 },
                 error:function(xhr){
                     result = JSON.parse(xhr.responseText);
-                    return org.ui.alert(result.message);
+
+                    if(result.error_number == 8){
+                        org.ui.alert(result.message,function(){
+                           window.location.href = '/weixin/list/';
+                        });
+                    }else{
+                        return org.ui.alert(result.message);
+                    }
+
+
                 },
                 complete:function(){
                     lib.$submit.removeAttr('disabled').text("实名认证");
