@@ -368,7 +368,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                               window.location = '/';
                           }
                          */
-                        var next = _getQueryStringByName('next') == '' ? '/' : _getQueryStringByName('next');
+                        var next = _getQueryStringByName('next') == '' ? '/accounts/register/first/' : _getQueryStringByName('next');
                         window.location.href = next;
 
                     }).fail(function (xhr) {

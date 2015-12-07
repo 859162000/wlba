@@ -63,6 +63,9 @@ TWO_PLACES = decimal.Decimal(10) ** -2
 
 
 class BankListView(TemplateView):
+    """
+    pc端使用的银行列表页
+    """
     template_name = 'pay_banks.jade'
 
     def get_context_data(self, **kwargs):
@@ -77,6 +80,13 @@ class BankListView(TemplateView):
             'announcements': AnnouncementAccounts
         })
         return context
+
+
+class BankListForRegisterView(BankListView):
+    """
+    pc端使用的银行列表页，新的用户注册流程需要用户在注册之后就充值，这个页面给注册时的充值使用
+    """
+    template_name = 'register_second.jade'
 
 
 class PayView(TemplateView):
@@ -211,6 +221,7 @@ class PayCallback(View):
     def dispatch(self, request, *args, **kwargs):
         return super(PayCallback, self).dispatch(request, *args, **kwargs)
 
+
 class YeeProxyPayCompleteView(TemplateView):
     template_name = 'pay_complete.jade'
 
@@ -257,7 +268,6 @@ class YeeProxyPayCompleteView(TemplateView):
         return super(YeeProxyPayCompleteView, self).dispatch(request, *args, **kwargs)
 
 
-
 class WithdrawView(TemplateView):
     template_name = 'withdraw.jade'
 
@@ -280,6 +290,11 @@ class WithdrawView(TemplateView):
             'announcements': AnnouncementAccounts
         }
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.wanglibaouserprofile.frozen:
+            return HttpResponseRedirect('/')
+        return super(WithdrawView, self).dispatch(request, *args, **kwargs)
+
 
 class WithdrawCompleteView(TemplateView):
     template_name = 'withdraw_complete.jade'
@@ -296,6 +311,10 @@ class WithdrawCompleteView(TemplateView):
         if not user.wanglibaouserprofile.id_is_valid:
             return self.render_to_response({
                 'result': u'请先进行实名认证'
+            })
+        if user.wanglibaouserprofile.frozen:
+            return self.render_to_response({
+                'result': u'账户已冻结!请联系网利宝客服:4008-588-066'
             })
         phone = user.wanglibaouserprofile.phone
         code = request.POST.get('validate_code', '')
@@ -828,7 +847,7 @@ class AdminTransactionDeposit(TemplateView):
 
 
 # 易宝支付创建订单接口
-class YeePayAppPayView(APIView):
+class YeePayAppPayView(DecryptParmsAPIView):
     permission_classes = (IsAuthenticated, )
 
     @require_trade_pwd
@@ -1108,6 +1127,7 @@ class WithdrawAPIView(DecryptParmsAPIView):
                 "amount": result['amount'],
                 "bank_name": result['bank_name']
             })
+        return Response(result)
 
 class BindCardQueryView(APIView):
     """ 查询用户绑定卡号列表接口 """
@@ -1136,7 +1156,7 @@ class BindPayDepositView(DecryptParmsAPIView):
 
         return Response(result)
 
-class BindPayDynnumNewView(APIView):
+class BindPayDynnumNewView(DecryptParmsAPIView):
     """ 确认支付 """
     permission_classes = (IsAuthenticated, )
 

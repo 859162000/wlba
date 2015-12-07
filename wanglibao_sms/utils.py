@@ -96,7 +96,9 @@ def send_validation_code(phone, validate_code=None, ip=""):
     if validate_code is None:
         validate_code = generate_validate_code()
     if not check_rate(ip):
-        return 403, u"已达到最大发送限制"
+        #return 403, u"已达到最大发送限制"
+        return 403, u"操作太频繁了，休息一下"
+
 
     now = timezone.now()
     code = PhoneValidateCode.objects.filter(phone=phone).first()
@@ -111,8 +113,6 @@ def send_validation_code(phone, validate_code=None, ip=""):
         seconds = now - code.last_send_time
         seconds = seconds.total_seconds()
 
-        if seconds <= 60:
-            return 429, u'请60秒之后重试'
         if code.code_send_count >= 10:
             return 429, u'请联系客服进行验证'
         if code.code_send_count >= 6 and seconds < 86400:
@@ -121,10 +121,12 @@ def send_validation_code(phone, validate_code=None, ip=""):
         if code.code_send_count >= 3 and seconds < 3600:
             #return 429, u'4-请60分钟后重试'
             return 429, u'请{0}分钟后重试'.format(int(((3600-seconds)//60)+1))
+        if seconds <= 60:
+            return 429, u'请60秒之后重试'
 
         valid_seconds = now - code.create_time
         valid_seconds = valid_seconds.total_seconds()
-        if valid_seconds<=60*10 and code.vcount>=3:
+        if valid_seconds<=60*10 and code.vcount>=5:
             #return 429, u'5-请10分钟后重新获取'
             return 429, u'请{0}分钟后重新获取'.format(int(((600-valid_seconds)//60)+1))
         if valid_seconds<=60*10 and not code.is_validated:
@@ -153,12 +155,14 @@ def validate_validation_code(phone, code):
         return status_code, message
 
     now = timezone.now()
+    if (now - item.create_time) >= datetime.timedelta(minutes=30):
+        return 410, u'短信验证码错误，请重新获取'
     if (now - item.create_time) >= datetime.timedelta(minutes=10):
         return 410, u'短信验证码已经过期，请重新获取'
     if item.is_validated:
         return 410, u'短信验证码已经被使用，请重新获取'
-    if item.vcount >= 3:
-        return 410, u'短信验证码连续输入错误达到3次，请10分钟后重新获取'
+    if item.vcount >= 5:
+        return 410, u'验证码错误频繁，请稍后再获取'
 
     if item.validate_code != code:
         item.vcount += 1

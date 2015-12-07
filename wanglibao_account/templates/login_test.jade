@@ -11,7 +11,7 @@ block loginFormPage
     form#loginForm.login-form(method='post', action='/accounts/login/ajax/')
         - csrf_token
         .logonFormDiv
-            ul.loginForm.padding-top-xl
+            ul.loginForm.padding-top-xl.clearfix
                 li
                     i.icon.iconfont.icon-mobile.ml19
                     input#loginMobile.placeholderInput.checkMobile(type="text", name="identifier", placeholder="请输入手机号", autocomplete='off', title="请输入手机号")
@@ -23,6 +23,9 @@ block loginFormPage
                         input#remember_me.checkboxStyle(type="checkbox", name="remember_me" )
                         | 一周内自动登录
             .loginError
-            .submitFormStyle.tc.font-l#loginSubmit 登录
+            if user.is_authenticated and user.wanglibaouserprofile.frozen
+                .submitFormStyle.tc.font-l.disabled(style="background-color:#999999") 账户已冻结
+            else
+                .submitFormStyle.tc.font-l#loginSubmit 登录
             .findPwd.tc
                 a(href='/accounts/password/reset/identifier/') 忘记密码？

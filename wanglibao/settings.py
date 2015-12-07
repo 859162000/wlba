@@ -500,7 +500,11 @@ LOGGING = {
         'experience_gold': {
             'handlers': ['file', 'console'],
             'level': 'DEBUG'
-        }
+        },
+        'wanglibao_profile': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG'
+        },
     }
 }
 

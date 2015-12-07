@@ -182,6 +182,9 @@ def withdraw(request):
     if not user.wanglibaouserprofile.id_is_valid:
         return {"ret_code": 20062, "message": u"请先进行实名认证"}
 
+    if user.wanglibaouserprofile.frozen:
+        return {"ret_code": 20072, "message": u"用户账户已冻结,请联系客服"}
+
     try:
         float(amount)
     except:
@@ -343,15 +346,25 @@ def card_bind_list(request):
                     if card.bank.kuai_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.kuai_limit))
 
-                bank_limit = util.handle_withdraw_limit(card.bank.withdraw_limit)  # 银行提现最大最小限额
-                bank_min_amount = bank_limit.get('bank_min_amount')
-                bank_max_amount = bank_limit.get('bank_max_amount')
-                bank_limit_amount = {
-                    "bank_min_amount": bank_min_amount if bank_min_amount and bank_min_amount < min_amount else min_amount,
-                    "bank_max_amount": bank_max_amount if bank_max_amount and bank_max_amount < max_amount else max_amount
-                }
-                tmp.update(bank_limit_amount)
+                # bank_limit = util.handle_withdraw_limit(card.bank.withdraw_limit)  # 银行提现最大最小限额
+                # bank_min_amount = bank_limit.get('bank_min_amount')
+                # bank_max_amount = bank_limit.get('bank_max_amount')
+                # bank_limit_amount = {
+                #     "bank_min_amount": bank_min_amount if bank_min_amount and bank_min_amount < min_amount else min_amount,
+                #     "bank_max_amount": bank_max_amount if bank_max_amount and bank_max_amount < max_amount else max_amount
+                # }
+                # tmp.update(bank_limit_amount)
                 if tmp:
+                    # 更新提现信息
+                    bank_limit = util.handle_withdraw_limit(card.bank.withdraw_limit)  # 银行提现最大最小限额
+                    bank_min_amount = bank_limit.get('bank_min_amount')
+                    bank_max_amount = bank_limit.get('bank_max_amount')
+                    bank_limit_amount = {
+                        "bank_min_amount": bank_min_amount if bank_min_amount and bank_min_amount < min_amount else min_amount,
+                        "bank_max_amount": bank_max_amount if bank_max_amount and bank_max_amount < max_amount else max_amount
+                    }
+                    tmp.update(bank_limit_amount)
+
                     card_list.append(tmp)
 
         return {"ret_code": 0, "message": "ok", "cards": card_list}

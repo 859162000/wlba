@@ -48,6 +48,8 @@ class WanglibaoUserProfile(models.Model):
     trade_pwd_failed_count = models.IntegerField(help_text=u'交易密码连续输入错误次数', default=0)
     trade_pwd_last_failed_time = models.IntegerField(help_text=u'交易密码最后一次输入失败的时间',default=0)
 
+    first_bind_time = models.IntegerField(u'第一次绑定微信时间', default=0)
+
     def __unicode__(self):
         return "phone: %s nickname: %s  %s" % (self.phone, self.nick_name, self.user.username)
 

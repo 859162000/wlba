@@ -2,7 +2,7 @@
 from django.conf.urls import patterns, url
 from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth.decorators import login_required
-import views, views_activity, manage_views
+import views, views_activity, manage_views, sub_views
 
 
 urlpatterns = patterns(
@@ -60,9 +60,15 @@ urlpatterns = patterns(
     url(r'^is_bind/$', TemplateView.as_view(template_name="sub_is_bind.jade")),
     url(r'^award_index/$', views_activity.AwardIndexTemplate.as_view(template_name="sub_award.jade"), name='award_index'),
     url(r'^award_rule/$', TemplateView.as_view(template_name="sub_award_rule.jade")),
-    url(r'^sub_code/$', TemplateView.as_view(template_name="sub_code.jade")),
+    url(r'^sub_code/$', views_activity.ChannelBaseTemplate.as_view(template_name="sub_code.jade", wx_classify='dyh', wx_code='')),#wx_classify='dyh' or 'fwh'
     url(r'^sub_invite/$', views_activity.InviteWeixinFriendTemplate.as_view(template_name="sub_invite_server.jade"), name='sub_invite'),
 
+)
+
+# 微信管理后台
+urlpatterns += patterns(
+    '',
+    url(r'^sub_join/(?P<account_key>\w+)/$', sub_views.SubWeixinJoinView.as_view(), name='sub_weixin_join'),
 )
 
 
