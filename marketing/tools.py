@@ -164,7 +164,7 @@ def deposit_ok(user_id, amount, device, order_id):
                                                 })},
                                             queue='celery02')
 
-        logger.info('=deposit_ok= Success: [%s], [%s]' % user_profile.phone, order_id, amount)
+        logger.info('=deposit_ok= Success: [%s], [%s], [%s]' % (user_profile.phone, order_id, amount))
     except Exception, e:
         logger.exception('=deposit_ok= Except: [%s]' % str(e))
 
