@@ -116,10 +116,6 @@ define ['jquery'], ($)->
     url = '/accounts/password/change/'
     $.post url,
       params
-  changeTradingPwd = (params)->
-    url = '/api/trade_pwd/'
-    $.post url,
-      params
 
   addToFavorite = (target, type)->
     id = $(target).data('id')
@@ -310,7 +306,6 @@ define ['jquery'], ($)->
 
     createPreOrder: createPreOrder
     changePassword: changePassword
-    changeTradingPwd : changeTradingPwd
 
     addToFavorite: addToFavorite
     loadFavorites: loadFavorites
