@@ -81,15 +81,16 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
     elif trigger_node == 'first_pay':
         # check first pay
         penny = Decimal(0.01).quantize(Decimal('.01'))
-        if rule.is_in_date:
-            first_pay = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
-                                               update_time__gt=rule.activity.start_at,
-                                               status=PayInfo.SUCCESS
-                                               ).order_by('create_time').first()
-        else:
-            first_pay = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
-                                               status=PayInfo.SUCCESS
-                                               ).order_by('create_time').first()
+        with transaction.atomic():
+            if rule.is_in_date:
+                first_pay = PayInfo.objects.select_for_update().filter(user=user, type='D', amount__gt=penny,
+                                                                       update_time__gt=rule.activity.start_at,
+                                                                       status=PayInfo.SUCCESS
+                                                                        ).order_by('create_time').first()
+            else:
+                first_pay = PayInfo.objects.select_for_update().filter(user=user, type='D', amount__gt=penny,
+                                                                       status=PayInfo.SUCCESS
+                                                                        ).order_by('create_time').first()
 
         if first_pay and int(first_pay.order_id) == int(order_id):
             # Add by hb only for debug

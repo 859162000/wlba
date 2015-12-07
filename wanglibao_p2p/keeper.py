@@ -495,6 +495,7 @@ class AmortizationKeeper(KeeperBaseMixin):
         return amos
 
     def amortize(self, amortization, savepoint=True):
+        from weixin.tasks import sentTemplate
         with transaction.atomic(savepoint=savepoint):
             if amortization.settled:
                 raise P2PException('amortization %s already settled.' % amortization)
@@ -535,7 +536,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                     # 还款时间：2015-11-12
                     # 详情请登录平台会员中心查看
         #             {{first.DATA}} 项目名称：{{keyword1.DATA}} 还款金额：{{keyword2.DATA}} 还款时间：{{keyword3.DATA}} {{remark.DATA}}
-                    from weixin.tasks import sentTemplate
+
                     if weixin_user:
                         now = datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
                         sentTemplate.apply_async(kwargs={
