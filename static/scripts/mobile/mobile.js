@@ -260,7 +260,7 @@ org.ui = (function(){
                         disabledBg = options.submitStyle.disabledBg || 'rgba(219,73,63,.5)';
                         activeBg = options.submitStyle.activeBg || 'rgba(219,73,63,1)';
                     }
-                    canSubmit() ? $submit.css('background', activeBg).removeAttr('disabled') : $submit.css('background', disabledBg).attr('disabled')
+                    canSubmit() ? $submit.css('background', activeBg).removeAttr('disabled') : $submit.css('background', disabledBg).attr('disabled',true)
                 })
             })
 
