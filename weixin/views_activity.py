@@ -79,6 +79,7 @@ class InviteWeixinFriendTemplate(BaseWeixinTemplate):
         w_user = WeixinUser.objects.filter(openid=openid).first()
 
         return {
+            "callback_host":settings.CALLBACK_HOST,
             "url": base64.b64encode(w_user.user.wanglibaouserprofile.phone),
         }
     def dispatch(self, request, *args, **kwargs):
