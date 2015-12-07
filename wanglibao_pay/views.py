@@ -1114,9 +1114,6 @@ class WithdrawAPIView(DecryptParmsAPIView):
 
     @require_trade_pwd
     def post(self, request):
-        if request.user.wanglibaouserprofile.frozen:
-            return Response({"ret_code": 20072, "message": u"用户账户已冻结,请联系客服"})
-        
         result = third_pay.withdraw(request)
 
         # 短信通知添加用户名
