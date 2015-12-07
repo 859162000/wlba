@@ -298,8 +298,13 @@ class WeixinJoinView(View):
         return reply
 
     def getSubscribeArticle(self):
+        m = Misc.objects.filter(key='weixin_yuebao_info').first()
+        big_data_url = 'http://mp.weixin.qq.com/s?__biz=MzA5NzE4NTIzMQ==&mid=400880736&idx=2&sn=8960f12d794c90492ed5cedd1561afc4&scene=1&srcid=1204pU1pDJsV4RyaK2WesNTN&key=ac89cba618d2d9768a249f64106fa7c4857db09c6013d1e43374d9c0dc4cfa7ba992e13d9b8c7826b109ee3729ef35a4&ascene=1&uin=MjU0MDYyNDQzMw%3D%3D&devicetype=webwx&version=70000001&pass_ticket=yHIDIChmoYlIXIUjkPF6XZwcg%2FcSi09vHTBNTyHS5BwL1%2B91EHyr90ZMXi3OEp4J'
+        if m and m.value:
+            info = json.loads(m.value)
+            big_data_url = info['big_data_url']
         big_data_img_url = "https://mmbiz.qlogo.cn/mmbiz/EmgibEGAXiahvyFZtnAQJ765uicv4VkX9gI8IlfkNibDj8un11ia7y8JZIWWk9LeKDNibaf0HbCDpia9sTO7WiaHHxRcNg/0?wx_fmt=jpeg"
-        big_data_url = 'http://mp.weixin.qq.com/s?__biz=MzA5NzE4NTIzMQ==&mid=400316172&idx=2&sn=b7e13fe0e235198bc73c990f0c5d946c&scene=1&srcid=1201omjGLaXIC2xXHVnVPBWa&key=ac89cba618d2d976dc4dc26ac26775f1546acbfe1d7af45c95e9b4462e98a06d6ff9d79a97a948b7ae4be866933edcaa&ascene=1&uin=MjU0MDYyNDQzMw%3D%3D&devicetype=webwx&version=70000001&pass_ticket=5%2BegJdyHvw97jvM495sqVRvpdvtQ4vl9QykfsV21yy2tgNbUcnPTyAjchjglUkg3'
+
 
         A_img_url = "https://mmbiz.qlogo.cn/mmbiz/EmgibEGAXiahvyFZtnAQJ765uicv4VkX9gIdMuibjodyEeWdavoBO0uvAdfpMzaCNjfreoT4APezdbu6hasMTibTWxw/0?wx_fmt=jpeg"
         A_url = "http://mp.weixin.qq.com/s?__biz=MjM5NTc0OTc5OQ==&mid=206425012&idx=1&sn=8ee1a55847e4a94d8c8941a7d051e821&scene=1&srcid=1201B5VHp3R7TDdlsog0bxFT&key=ac89cba618d2d976324fb9d2339235db9d6008530c972dec224dc69f371b8a75a6be336e5e4f2da34cd417cdd2b77ca6&ascene=1&uin=MjU0MDYyNDQzMw%3D%3D&devicetype=webwx&version=70000001&pass_ticket=5%2BegJdyHvw97jvM495sqVRvpdvtQ4vl9QykfsV21yy2tgNbUcnPTyAjchjglUkg3"
