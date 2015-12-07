@@ -7,6 +7,7 @@ import decimal
 from datetime import datetime, timedelta
 from django.db import transaction
 from django.utils import timezone
+from datetime import datetime, timedelta
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -65,7 +66,7 @@ class ExperienceBuyAPIView(APIView):
                 total_amount,
                 experience_product.expected_earning_rate / 100.0,
                 timezone.now(),
-                experience_product.period
+                experience_product.period - 1
             )
 
             for index, term in enumerate(terms['terms']):
