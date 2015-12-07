@@ -504,7 +504,7 @@ class CardViewSet(ModelViewSet):
 
     def destroy(self, request, pk=None):
         card_id = request.DATA.get('card_id', '')
-        card = Card.objects.filter(id=card_id)
+        card = Card.objects.filter(id=card_id, user=self.request.user)
         if card:
             card.delete()
             return Response({
