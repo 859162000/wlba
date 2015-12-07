@@ -25,7 +25,7 @@ class ExperienceEventAdmin(admin.ModelAdmin):
 class ExperienceEventRecordAdmin(admin.ModelAdmin):
     actions = None
     list_display = ('id', 'event', 'user', 'apply_platform', 'apply_at', 'apply_amount', 'created_at')
-    search_fields = ('=user__wanglibaouserprofile__phone', '=event')
+    search_fields = ('=user__wanglibaouserprofile__phone')
     raw_id_fields = ('user', )
 
     def has_delete_permission(self, request, obj=None):
