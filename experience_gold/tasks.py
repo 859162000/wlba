@@ -27,19 +27,18 @@ def experience_repayment_plan():
     end = local_to_utc(datetime(now.year, now.month, now.day, 17, 0, 0), 'normal')
     amortizations = ExperienceAmortization.objects.filter(settled=False).filter(term_date__lt=end)
     for amo in amortizations:
-        if amo.interest <= 0:
-            continue
 
         try:
             amo.settled = True
             amo.settlement_time = timezone.now()
             amo.save()
 
-            # 体验金利息计入用户账户余额
-            with transaction.atomic():
-                description = u"体验金利息入账:%s元" % amo.interest
-                user_margin_keeper = MarginKeeper(amo.user)
-                user_margin_keeper.deposit(amo.interest, description=description, catalog=u"体验金利息入账")
+            if amo.interest > 0:
+                # 体验金利息计入用户账户余额
+                with transaction.atomic():
+                    description = u"体验金利息入账:%s元" % amo.interest
+                    user_margin_keeper = MarginKeeper(amo.user)
+                    user_margin_keeper.deposit(amo.interest, description=description, catalog=u"体验金利息入账")
 
         except Exception, e:
             logger.error(u"experience repayment error, amortization id : %s , message: %s" % (amo.id, e.message))
