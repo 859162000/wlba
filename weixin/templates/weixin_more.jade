@@ -22,4 +22,6 @@ html(style="background: url('/static/imgs/mobile/login/loginback.png');")
                 .link-icon
           +link('关于网利', '/weixin/more/aboutus/')
           +link('联系我们', '/weixin/more/contactus/')
+        - with 'more' as state
         include include/weixin_footer
+        - endwith

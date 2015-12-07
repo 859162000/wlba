@@ -18,16 +18,15 @@ html
             p.invest-two 可投资金额
         .buy-balance
             .buy-balance-one
-                p.balance-left 可用余额
+                p.balance-left 可用余额 (元)
                 .balance-middle(data-value="{{margin}}")#balance {{margin|money_format}}
-                a(href="#").balance-right 元
+                a(href="/weixin/recharge/?rechargeNext=/weixin/view/buy/{{p2p.id}}/").balance-buy-sufficient 充值
             .buy-balance-two
-                p.balance-left 投资金额
+                p.balance-left 投资金额 (元)
                 amount = int(amount)
                 if amount == 0
                   amount = ''
                 input(type="tel",value="{{amount}}",placeholder="输入100的整数倍金额",p2p-type="{{p2p.category}}", activity-jiaxi='0', data-max="{{orderable_amount}}",data-role="p2p-calculator",fee-target="",data-target="#expected_income", data-existing="0", data-rate="{{p2p.expected_earning_rate}}", data-period="{{p2p.period}}", data-paymethod="{{p2p.pay_method}}", activity-rate="{{p2p.activity.rule.percent_text}}", maxlength="8").amount.balance-middle
-                p.balance-right 元
             .buy-balance-three
               p.balance-left 理财券
               .balance-middle
@@ -66,11 +65,11 @@ html
               |元
         if user.is_authenticated and p2p.category == '新手标' and user.wanglibaouserprofile.is_invested
           .buy-snap-up
-              P.invested-btn 确认抢购
+              P.invested-btn 立即投资
           .is_invested-sign 只有未进行投资的用户才可以购买
         else
           .buy-snap-up
-              a(href="#").snap-up 确认抢购
+              a(href="#").snap-up 立即投资
         .buy-sufficient
           p
            |余额不足，
@@ -84,5 +83,6 @@ html
             .callban-url
               a(href="/weixin/list/") 返回首页
               a(href="/weixin/account/") 查看账户
-    include include/tracking
-    script(data-init="buy", src="/static/scripts/mobile/dist/mobile.js?v=20150911")
+        include include/confirm
+        include include/tracking
+        script(data-init="buy", src="/static/scripts/mobile/dist/mobile.js?v=20151202")

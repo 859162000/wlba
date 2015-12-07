@@ -24,16 +24,18 @@ from marketing.models import PromotionToken, Channels, IntroducedBy
 from marketing.utils import set_promo_user, get_channel_record
 from wanglibao_account.cooperation import CoopRegister
 # from wanglibao_account.cooperation import save_to_binding
+from wanglibao_redpack.models import RedPackEvent
 from random import randint
 from wanglibao_sms.tasks import send_messages
 from wanglibao_account.utils import create_user
-from wanglibao_activity.models import ActivityRecord, Activity
+from wanglibao_activity.models import ActivityRecord, Activity, ActivityRule
 from wanglibao_portfolio.models import UserPortfolio
 from wanglibao_portfolio.serializers import UserPortfolioSerializer
 from wanglibao_rest.serializers import AuthTokenSerializer
 from wanglibao_sms.utils import send_validation_code, validate_validation_code, send_rand_pass, generate_validate_code
 from wanglibao_sms.models import PhoneValidateCode
 from wanglibao.const import ErrorNumber
+from wanglibao_redpack import backends as redpack_backends
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import VerifyCounter, UserPushId
 from wanglibao_p2p.models import P2PRecord, ProductAmortization, P2PProduct
@@ -55,8 +57,10 @@ from wanglibao_account.models import Binding
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_redpack.models import Income
 from decimal import Decimal
+from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
+from common import DecryptParmsAPIView
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('wanglibao_rest')
 
 
 class UserPortfolioView(generics.ListCreateAPIView):
@@ -208,7 +212,7 @@ class WeixinSendRegisterValidationCodeView(APIView):
 
 
 
-class RegisterAPIView(APIView):
+class RegisterAPIView(DecryptParmsAPIView):
     permission_classes = ()
 
     def generate_random_password(self, length):
@@ -216,34 +220,38 @@ class RegisterAPIView(APIView):
             raise Exception("生成随机密码的长度有误")
 
         random_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        password = list()
+        password = ""
         index = 0
         while index < length:
-            password.append(random_list[randint(0,len(random_list))])
-            index += 1
-        return str(random_list)
+                password += str(random_list[randint(0,len(random_list)-1)])
+                index += 1
+        return password
 
     def post(self, request, *args, **kwargs):
         """ 
             modified by: Yihen@20150812
             descrpition: if(line282~line283)的修改，针对特定的渠道延迟返积分、发红包等行为，防止被刷单
         """
-        identifier = request.DATA.get('identifier', "")
-        password = request.DATA.get('password', "")
-        validate_code = request.DATA.get('validate_code', "")
+        identifier = self.params.get('identifier', "")
+        password = self.params.get('password', "")
+        validate_code = self.params.get('validate_code', "")
+        # identifier = request.DATA.get('identifier', "")
+        # password = request.DATA.get('password', "")
+        # validate_code = request.DATA.get('validate_code', "")
         channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
 
         identifier = identifier.strip()
         password = password.strip()
         validate_code = validate_code.strip()
+        if request.DATA.get('IGNORE_PWD', '') and not password:
+            password = self.generate_random_password(6)
+            logger.debug('系统为用户 %s 生成的随机密码是：%s' % (identifier, password))
+
         if not identifier or not password or not validate_code:
             return Response({"ret_code": 30011, "message": "信息输入不完整"})
 
         if not 6 <= len(password) <= 20:
             return Response({"ret_code": 30012, "message": u"密码需要在6-20位之间"})
-
-        if request.DATA.get('IGNORE_PWD', '') and not password:
-            password = self.generate_random_password(6)
 
         identifier_type = detect_identifier_type(identifier)
         if identifier_type != 'phone':
@@ -251,7 +259,7 @@ class RegisterAPIView(APIView):
 
         status, message = validate_validation_code(identifier, validate_code)
         if status != 200:
-            return Response({"ret_code": 30014, "message": u"验证码输入错误"})
+            return Response({"ret_code": 30014, "message": message, "status":status })
 
         if User.objects.filter(wanglibaouserprofile__phone=identifier).first():
             return Response({"ret_code": 30015, "message": u"该手机号已经注册"})
@@ -308,13 +316,57 @@ class RegisterAPIView(APIView):
             tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
         #add by Yihen@20151020, 用户填写手机号不写密码即可完成注册, 给用户发短信,不要放到register_ok中去，保持原功能向前兼容
-        if request.DATA.get('IGNORE_PWD') and not password:
+        if request.DATA.get('IGNORE_PWD'):
             send_messages.apply_async(kwargs={
                 "phones": [identifier,],
-                "messages": [password,]
+                "messages": [u'【网利科技】用户名： '+identifier+u'; 登录密码:'+password,]
             })
 
-        return Response({"ret_code": 0, "message": u"注册成功"})
+            logger.debug("此次 channel:%s" %(channel))
+            if channel == 'maimai1':
+                activity = Activity.objects.filter(code='maimai1').first()
+                logger.debug("脉脉渠道的使用Activity是：%s" % (activity,))
+                try:
+                    redpack = WanglibaoUserGift.objects.create(
+                        identity=identifier,
+                        activity=activity,
+                        rules=WanglibaoActivityGift.objects.first(),#随机初始化一个值
+                        type=1,
+                        valid=1
+                    )
+                except Exception, reason:
+                    logger.debug("创建用户的领奖记录抛异常，reason：%s" % (reason,))
+
+            if channel == 'h5chuanbo':
+                key = 'share_redpack'
+                shareconfig = Misc.objects.filter(key=key).first()
+                if shareconfig:
+                    shareconfig = json.loads(shareconfig.value)
+                    if type(shareconfig) == dict:
+                        is_attention = shareconfig.get('is_attention', '')
+                        attention_code = shareconfig.get('attention_code', '')
+
+                if is_attention:
+                    activity = Activity.objects.filter(code=attention_code).first()
+                    redpack = WanglibaoUserGift.objects.create(
+                        identity=identifier,
+                        activity=activity,
+                        rules=WanglibaoActivityGift.objects.first(),#随机初始化一个值
+                        type=1,
+                        valid=0
+                    )
+                    dt = timezone.datetime.now()
+                    redpack_event = RedPackEvent.objects.filter(invalid=False, id=755, give_start_at__lte=dt, give_end_at__gte=dt).first()
+                    if redpack_event:
+                        logger.debug("给用户：%s 发送红包:%s " %(user, redpack_event,))
+                        redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+                        redpack.valid = 1
+                        redpack.save()
+
+        if channel in ('weixin_attention', 'maimai1'):
+            return Response({"ret_code": 0, 'amount': 120, "message": u"注册成功"})
+        else:
+            return Response({"ret_code": 0, "message": u"注册成功"})
 
 
 class WeixinRegisterAPIView(APIView):
@@ -341,7 +393,9 @@ class WeixinRegisterAPIView(APIView):
 
         status, message = validate_validation_code(identifier, validate_code)
         if status != 200:
-            return Response({"ret_code": 30023, "message": "验证码输入错误"})
+            # Modify by hb on 2015-12-02
+            #return Response({"ret_code": 30023, "message": "验证码输入错误"})
+            return Response({"ret_code": 30023, "message": message})
 
         #if User.objects.filter(wanglibaouserprofile__phone=identifier,
         #                       wanglibaouserprofile__phone_verified=True).exists():
@@ -460,6 +514,10 @@ class IdValidateAPIView(APIView):
 
         device = split_ua(request)
         tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+        # 处理第三方用户实名回调
+        CoopRegister(self.request).process_for_validate(user)
+
         return Response({"ret_code": 0, "message": u"验证成功"})
 
 
@@ -728,6 +786,18 @@ class UserExisting(APIView):
         #                    }, status=400)
 
 
+class UserHasLoginAPI(APIView):
+    """
+        判断用户是否已经登录
+    """
+    permission_classes = ()
+
+    def post(self, request):
+        if not request.user.is_authenticated():
+            return Response({"login": False})
+        else:
+            return Response({"login": True})
+
 class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -793,7 +863,7 @@ class IdValidate(APIView):
             device = split_ua(request)
             tools.idvalidate_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
-            #处理渠道回调
+            # 处理第三方用户实名回调
             CoopRegister(self.request).process_for_validate(user)
 
             return Response({ "validate": True }, status=200)
@@ -833,12 +903,12 @@ class AdminIdValidate(APIView):
                             "validate": True
                         }, status=200)
 
-class LoginAPIView(APIView):
+class LoginAPIView(DecryptParmsAPIView):
     permission_classes = ()
 
     def post(self, request, *args, **kwargs):
-        identifier = request.DATA.get("identifier", "")
-        password = request.DATA.get("password", "")
+        identifier = self.params.get("identifier", "")
+        password = self.params.get("password", "")
 
         if not identifier or not password:
             return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
@@ -872,6 +942,9 @@ class LoginAPIView(APIView):
                 pu.push_channel_id = push_channel_id
                 pu.save()
         token, created = Token.objects.get_or_create(user=user)
+        # if not created:
+        #     token.delete()
+        #     token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, "user_id":user.id}, status=status.HTTP_200_OK)
 
 class ObtainAuthTokenCustomized(ObtainAuthToken):
@@ -1159,3 +1232,163 @@ class GuestCheckView(APIView):
         # 渠道不符合标准
         else:
             return Response({"ret_code": 2, "message": u"抱歉，不符合活动标准！"})
+
+
+class InnerSysHandler(object):
+    def ip_valid(self, request):
+        client_ip = get_client_ip(request)
+
+
+    def judge_valid(self, request):
+        return True, u'通过验证'
+
+
+class InnerSysSendSMS(APIView, InnerSysHandler):
+    permission_classes = ()
+
+    def post(self, request):
+        phone = request.DATA.get("phone", None)
+        message = request.DATA.get("message", None)
+        print phone, message
+        if phone is None or message is None:
+            return Response({"code": 1000, "message": u'传入的phone或message不全'})
+
+        status, message = super(InnerSysSendSMS, self).judge_valid(request)
+        if not status:
+            return Response({"code":1001, "message": message})
+        try:
+            status, content = send_messages.apply_async(kwargs={
+                "phones": [phone, ],
+                "messages": [message, ]
+            })
+        except Exception, reason:
+            return Response({"code": 1002, "message": u"发送短信报异常,reason:{0}".format(reason)})
+        else:
+            if status == 200:
+                return Response({"code": 0, "message": u"短信发送成功"})
+            else:
+                return Response({"code": 1003, "message": u"短信发送失败"})
+
+
+class InnerSysValidateID(APIView, InnerSysHandler):
+    permission_classes = ()
+
+    def param_is_valid(self, name, id):
+        id_pattern = '\d{17}[0-9Xx]'
+        return True if id and len(id) == 18 and re.match(id_pattern, id).group() else False
+
+    def post(self, request):
+        """
+            要考虑已经做过验证的用户
+        """
+        name = request.DATA.get("name", None)
+        id = request.DATA.get("id", None)
+
+        if name is None or id is None:
+            return Response({"code": 1000, "message": u'请发送完整的姓名及身份证号'})
+
+        if not self.param_is_valid(name, id):
+            return Response({"code": 1001, "message": u'传递的参数不合法'})
+
+        status, message = self.judge_valid(request)
+        if not status:  # 此步目前跳过
+            return Response({"code": 1002, "message": message})
+
+        profile = WanglibaoUserProfile.objects.filter(name=name, id_number=id, id_is_valid=True)
+        if profile.exists():
+            return Response({"code": 0, "message": u'用户以前已经验证过且验证通过'})
+
+        try:
+            verify_record, error = verify_id(name, id)
+        except:
+            return Response({"code": 1003, "message": u"验证失败，拨打客服电话进行人工验证"})
+        else:
+            if error:
+                return Response({"code": 1003, "message": u"验证失败，拨打客服电话进行人工验证"})
+            else:
+                return Response({"code": 0, "message": u"验证通过"})
+
+
+class InnerSysSaveChannel(APIView, InnerSysHandler):
+    permission_classes = ()
+
+    def post(self, request):
+        code = request.DATA.get("code", None)
+        if not code:
+            return Response({"code": 1000, "message": u'渠道号为空值'})
+
+        status, message = super(InnerSysSaveChannel, self).judge_valid(request)
+        if not status:
+            return Response({"code": 1001, "message": message})
+
+        channel = Channels.objects.filter(code=code)
+        if channel.exists():
+            return Response({"code": 1002, "message": u'渠道号已经存在'})
+        try:
+            Channels.objects.create(code=code)
+        except Exception, reason:
+            return Response({"code": 1003, "message": u'创建渠道报异常,reason:{0}'.format(reason)})
+        else:
+            return Response({"code": 0, "message": u'创建渠道成功'})
+
+
+class DistributeRedpackView(APIView):
+    permission_classes = ()
+    def post(self, request, phone):
+        user = WanglibaoUserProfile.objects.filter(phone=phone).first()
+        channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
+
+        if channel == 'maimai1':
+            phone_number = phone.strip()
+            redpack = WanglibaoUserGift.objects.filter(identity=phone, activity__code='maimai1').first()
+            if redpack:
+                data = {
+                    'ret_code': 0,
+                    'message': u'用户已经领取了加息券',
+                    'amount': redpack.amount,
+                    'phone': phone_number
+                }
+                return HttpResponse(json.dumps(data), content_type='application/json')
+
+            else:
+                activity = Activity.objects.filter(code='maimai1').first()
+                redpack = WanglibaoUserGift.objects.create(
+                    identity=phone_number,
+                    activity=activity,
+                    rules=WanglibaoActivityGift.objects.first(),#随机初始化一个值
+                    type=1,
+                    valid=0
+                )
+                logger.debug("usergift表中为用户生成了获奖记录：%s" % (redpack,))
+                user = WanglibaoUserProfile.objects.filter(phone=phone_number).first().user
+                if user:
+                    logger.debug("用户已经存在，开始给该用户发送加息券")
+                    try:
+                        redpack_id = ActivityRule.objects.filter(activity=activity).first().redpack
+                    except Exception, reason:
+                        logger.debug("从ActivityRule中获得redpack_id抛异常, reason:%s" % (reason, ))
+
+                    try:
+                        logger.debug("用户：%s 使用的加息券id:%s" %(phone_number, redpack_id))
+                        redpack_event = RedPackEvent.objects.filter(id=780).first()
+                    except Exception, reason:
+                        logger.debug("从RedPackEvent中获得配置红包报错, reason:%s" % (reason, ))
+
+                    try:
+                        logger.debug("给用户 %s 发送加息券:%s" %(user, redpack_event))
+                        msg = redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+                        logger.debug("给用户 %s 发送加息券:%s, 返回状态值,:%s" %(user, redpack_event, msg))
+                    except Exception, reason:
+                        logger.debug("给用户发红包抛异常, reason:%s" % (reason, ))
+                    else:
+                        redpack.user = user
+                        redpack.valid = 1
+                        redpack.save()
+                        data = {
+                            'ret_code': 1000,
+                            'message': u'下发加息券成功',
+                            'amount': redpack.amount,
+                            'phone': phone_number
+                        }
+                        return HttpResponse(json.dumps(data), content_type='application/json')
+

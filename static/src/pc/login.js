@@ -156,16 +156,10 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
         $('#loginPwd').on('blur',function() {
             checkPwdFun('loginForm');
         })
-        $('#loginCode').on('blur',function() {
-            checkCodedFun('loginForm');
-        })
-        imgCodeRe('loginForm');
-        $('#loginRefresh').on('click',function(){
-            imgCodeRe('loginForm');
-        })
+
         //提交登录表单
         $('#loginSubmit').on('click',function(){
-            if(checkMobileFun('loginForm') && checkPwdFun('loginForm') && checkCodedFun('loginForm')){
+            if(checkMobileFun('loginForm') && checkPwdFun('loginForm')){
                 if($('#remember_me').is(':checked')){
                     var remember_me = 'remember_me';
                 }
@@ -175,17 +169,9 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                   data: {
                       identifier : $('#loginMobile').val(),
                       password : $('#loginPwd').val(),
-                      captcha_0 : $('#id_captcha_0').val(),
-                      captcha_1 : $('#loginCode').val(),
                       remember_me : remember_me
                   }
                 }).done(function() {
-                  /*var arr = location.search;
-                  if (arr != '') {
-                      window.location = arr.split('=')[1];
-                  } else {
-                      window.location = '/';
-                  }*/
                   var next = _getQueryStringByName('next') == '' ? '/' : _getQueryStringByName('next');
                   window.location.href = next;
                 }).fail(function(xhr) {
@@ -382,7 +368,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                               window.location = '/';
                           }
                          */
-                        var next = _getQueryStringByName('next') == '' ? '/' : _getQueryStringByName('next');
+                        var next = _getQueryStringByName('next') == '' ? '/accounts/register/first/' : _getQueryStringByName('next');
                         window.location.href = next;
 
                     }).fail(function (xhr) {

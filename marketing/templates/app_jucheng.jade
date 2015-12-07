@@ -1,0 +1,88 @@
+- load formatters
+doctype html
+html(style="background: #f6f6f6")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile_activity/app_jucheng.css?v=201511063", rel="stylesheet")
+        - csrf_token
+    body
+        img.banner(src="/static/imgs/mobile_activity/app_jucheng/banner.jpg")
+        .main
+            .explain_main
+                .explain_button#explain_button 活动说明
+            .title_big 限时限量 满额直送
+            .maimai-form
+                input(type='tel', name='phone', placeholder='请输入手机号',data-type='Phone',data-message='请输入正确的手机号', autocomplete = 'off').maimai-phone
+                .maimai-check-body
+                    .maimai-form-margin
+                    .phone-check
+                        input(type='tel', name='codeimg',data-type='Val',data-message='请输入图形验证码',  placeholder='输入验证码').check-input
+                        input(type='hidden', name='codeimg_key',value='')
+                        img(src='').check-img
+                    .maimai-form-margin
+                    .phone-check
+                        input(type='tel', name='codenum',data-type='Val',data-message='请输入短信码', placeholder='输入短信码').check-input
+                        button(type="button").check-submit 短信验证码
+                .maimai-form-sign 请输入正确的手机号
+                .maimai-form-margin.maimai-sign-margin
+                input(type='button',name='submit' ,value="我要抢票",disabled=true).maimai-form-btn
+                p.xun-p
+                    a(href="/weixin/login/") 已有账号,立即登录
+        .explain_wrap
+            .explain_main
+                .explain_button 活动说明
+            .main
+                dl
+                    dt 1.
+                    dd 活动时间：11月12日－12月5日；
+                dl
+                    dt 2.
+                    dd 注册为网利宝用户并且完成实名认证即得20元现金红包（投资2000元可抵扣使用）；
+                dl
+                    dt 3.
+                    dd 用户通过网利宝单笔首次投资满500元即可获得80元独奏会门票（限量30张），送完为止；
+                dl
+                    dt 4.
+                    dd 用户通过网利宝单笔首次投资满1000元即可获得180元独奏会门票（限量100张），送完为止；
+                dl
+                    dt 5.
+                    dd 本次活动仅限于张昊辰北京独奏会抢票活动；
+                dl
+                    dt 6.
+                    dd 获得独奏会门票用户请留意网利宝站内信及短信，并凭领票短信及手机号码取票；
+                dl
+                    dt 7.
+                    dd 现场取票地址：演出当天到北京音乐厅一楼大厅票务兑换处，咨询电话：13581710219，<br>上门取票地址：北京市东城区东四北大街107号科林大厦A座710，咨询电话：13581710219；
+                dl
+                    dt 8.
+                    dd 本活动最终解释权在法律允许范围内归网利宝所有。
+                dl(style="display:none")#ios-show
+                    dt 9.
+                    dd 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关。
+        .get_ticket_wrap
+            .title 恭喜！您已成功注册网利宝，<br>实名认证领取20元现金红包；<br>立即投资，疯抢限量门票。
+            ul
+                li!='80元门票剩余 <span class="shi"></span> 张'
+                li!='180元门票剩余 <span class="bai"></span> 张'
+            a.button(href="/weixin/account/?promo_token=jcw") 立即抢门票
+        .write_info
+            .title 您已成功获得门票，请您认真填写相关信息，以便奖励顺利发放，谢谢！
+            ul
+                li
+                    input.name(type="text", name="user_name", placeholder="姓名")
+                li
+                    input.phone(type="text", name="user_phone", placeholder="联系电话")
+                li
+                    input.address(type="text", name="user_address", placeholder="邮寄地址")
+            .text!='*<span class="write_info_text">测试</span>'
+            .button.write_info_button 保存
+        script(src='/static/src/mobile/lib/weixin/wx.js')
+        script(data-init='jucheng',src="/static/scripts/mobile_activity/dist/app_jucheng.js?v=201511131")
+        script.
+          var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+              iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+              ios = ipad || iphone;
+          if (ios) {
+              document.getElementById('ios-show').style.display = 'block';
+          }

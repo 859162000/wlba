@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 import logging
+from django.contrib.auth.models import User
 
 from django.db import transaction
 from django.utils import timezone
@@ -8,6 +9,8 @@ from marketing import tools
 #from marketing.models import IntroducedBy, Reward, RewardRecord
 from order.models import Order
 #from wanglibao.templatetags.formatters import safe_phone_str
+from wanglibao_reward.views import RewardDistributer
+from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.marginkeeper import MarginKeeper
 from order.utils import OrderHelper
 from keeper import ProductKeeper, EquityKeeper, AmortizationKeeper, EquityKeeperDecorator
@@ -18,14 +21,21 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_redpack.models import RedPackRecord
+import logging
 # from wanglibao_account.utils import CjdaoUtils
 # from wanglibao_account.tasks import cjdao_callback
 # from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
 import re
+import json, datetime
+
 from wanglibao_redis.backend import redis_backend
 
 from wanglibao_rest.utils import split_ua
+from weixin.models import WeixinUser
+from weixin.constant import PRODUCT_INVEST_SUCCESS_TEMPLATE_ID
 
+
+logger = logging.getLogger('wanglibao_account')
 
 class P2PTrader(object):
     def __init__(self, product, user, order_id=None, request=None):
@@ -90,9 +100,38 @@ class P2PTrader(object):
             if product_record.product_balance_after <= 0:
                 is_full = True
 
-        tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount,
-                                               "device": self.device, "product_id": self.product.id,
-                                               "is_full": is_full})
+        # fix@chenweibin, add order_id
+        # Modify by hb on 2015-11-25 : add "try-except"
+        try:
+            logger.debug("=20151125= decide_first.apply_async : [%s], [%s], [%s], [%s], [%s], [%s]" % \
+                         (self.user.id, amount, self.device['device_type'], self.order_id, self.product.id, is_full) )
+            tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount,
+                                                   "device": self.device, "order_id": self.order_id,
+                                                   "product_id": self.product.id, "is_full": is_full})
+        except Exception, reason:
+            logger.debug("=20151125= decide_first.apply_async Except:{0}".format(reason))
+            pass
+
+        try:
+            logger.debug("=20151125= CoopRegister.process_for_purchase : [%s], [%s]" % (self.user.id, self.order_id) )
+            CoopRegister(self.request).process_for_purchase(self.user, self.order_id)
+        except Exception, reason:
+            logger.debug("=20151125= CoopRegister.process_for_purchase Except:{0}".format(reason) )
+            pass
+
+        try:
+            logger.debug("=20151125= RewardDistributer.processor_for_distribute : [%s], [%s]" % (self.user.id, self.order_id) )
+            kwargs = {
+                'amount': amount,
+                'order_id': self.order_id,
+                'user': self.user,}
+
+            RewardDistributer(self.request, kwargs).processor_for_distribute()
+        except Exception, reason:
+            logger.debug("=20151125= RewardDistributer.processor_for_distribute Except:{0}".format(reason) )
+            pass
+        else:
+            logger.debug("=20151125= RewardDistributer.processor_for_distribute : {0}购标成功".format(self.user) )
 
         # 投标成功发站内信
         matches = re.search(u'日计息', self.product.pay_method)
@@ -109,6 +148,28 @@ class P2PTrader(object):
             "mtype": "purchase"
 
         })
+        logger.debug("=20151125= inside_message.send_one : {0}购标站内信发成功".format(self.user) )
+
+        weixin_user = WeixinUser.objects.filter(user=self.user).first()
+        now = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
+#         投标成功通知
+#         您好，您已投标成功。
+#         标的编号：10023
+#         投标金额：￥3000.00
+#         投标时间：2015-09-12
+#         投标成功,可在投标记录里查看.
+# {{first.DATA}} 标的编号：{{keyword1.DATA}} 投标金额：{{keyword2.DATA}} 投标时间：{{keyword3.DATA}} {{remark.DATA}}
+        from weixin.tasks import sentTemplate
+        if weixin_user:
+            sentTemplate.apply_async(kwargs={
+                            "kwargs":json.dumps({
+                                            "openid": weixin_user.openid,
+                                            "template_id": PRODUCT_INVEST_SUCCESS_TEMPLATE_ID,
+                                            "keyword1": self.product.id,
+                                            "keyword2": str(amount),
+                                            "keyword3": now,
+                                                })},
+                                            queue='celery02')
 
         # 满标给管理员发短信
         if is_full:
@@ -209,6 +270,7 @@ class P2POperator(object):
             raise P2PException(u'产品状态(%s)不是(满标已审核)' % product.status)
 
         phones = []
+        messages_list = []
         user_ids = []
         with transaction.atomic():
             for equity in product.equities.all():
@@ -217,13 +279,15 @@ class P2POperator(object):
 
                 user_ids.append(equity.user.id)
                 phones.append(equity.user.wanglibaouserprofile.phone)
+                name = equity.user.wanglibaouserprofile.name
+                messages_list.append(messages.product_settled(name, equity, product, timezone.now()))
+
             product.status = u'还款中'
             product.save()
 
-        phones = {}.fromkeys(phones).keys()
         send_messages.apply_async(kwargs={
             "phones": phones,
-            "messages": [messages.product_settled(product, timezone.now())]
+            "messages": messages_list,
         })
 
         user_ids = {}.fromkeys(user_ids).keys()
@@ -256,6 +320,7 @@ class P2POperator(object):
         cls.logger.info(u"Product [%d] [%s] not able to reach 100%%" % (product.id, product.name))
         user_ids = []
         phones = []
+        messages_list = []
 
         with transaction.atomic():
             for equity in product.equities.all():
@@ -264,14 +329,14 @@ class P2POperator(object):
 
                 user_ids.append(equity.user.id)
                 phones.append(equity.user.wanglibaouserprofile.phone)
+                messages_list.append(messages.product_failed(equity.user.wanglibaouserprofile.name, product))
             ProductKeeper(product).fail()
 
-        phones = {}.fromkeys(phones).keys()
         user_ids = {}.fromkeys(user_ids).keys()
         if phones:
             send_messages.apply_async(kwargs={
                 "phones": phones,
-                "messages": [messages.product_failed(product)]
+                "messages": messages_list,
             })
 
             matches = re.search(u'日计息', product.pay_method)

@@ -1,0 +1,254 @@
+.financing
+  $default-color: #b2b2b2
+  @mixin arr-item
+    border: 6px dashed transparent
+    display: inline-block
+    width: 0
+    height: 0
+    overflow: hidden
+    position: absolute
+    top: 50%
+    left: 50%
+    margin: -10px 0 0 -6px
+  @mixin redBtn
+    background: #db493f
+    color: #fff
+    text-align: center
+    width: 100%
+    height: 40px
+    line-height: 40px
+    border: 0
+    cursor: pointer
+    +border-radius(4px)
+  @mixin border-shadow
+    border: 1px solid #4e7cda
+    box-shadow: 1px 0 4px #d7e1f7,-1px 0 4px #d7e1f7
+  @mixin finance-icon
+    background: url("/static/imgs/pc/financing/f-icon.png") no-repeat
+    display: inline-block
+    width: 91px
+    height: 91px
+  .wrap918
+    width: 918px
+    margin: 0 auto
+  .font-xxl
+    font-size: 28px
+  .txt-input
+    border: 0
+    font-size: 14px
+    height: 38px
+    padding-left: 15px
+    line-height: 38px \9
+    display: inline-block
+    outline: none
+    font-family: "Helvetica Neue", "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif
+  .arr-top
+    +arr-item
+    border-top: 6px solid #b3b3b3
+    margin-top: -3px
+  .arr-bottom
+    +arr-item
+    border-bottom: 6px solid #b3b3b3
+  .relative
+    position: relative
+  .financing-banner
+    width: 100%
+    height: 450px
+    background: #08468d url("/static/imgs/pc/financing/banner.png") center center no-repeat
+    .form-box
+      width: 350px
+      height: auto
+      background: #fff
+      padding: 0 25px 20px
+      +border-radius
+      box-shadow: 2px 0 2px rgba(0,0,0,0.2),-2px 0 2px rgba(0,0,0,0.2)
+      .form-tit
+        font-size: 20px
+        line-height: 30px
+        text-align: center
+        margin: 20px 0 10px
+      .form-item
+        margin-bottom: 10px
+        border: 1px solid #dbdbdb
+        height: 40px
+        overflow: hidden
+        &.selectEdLi
+          +border-shadow
+      .txt-input
+        width: 100%
+        -webkit-appearance: none
+      .arr-box
+        position: absolute
+        width: 48px
+        height: 100%
+        display: inline-block
+        border-left: 1px solid #dbdbdb
+        background: #f7f7f7
+        right: 0
+        top: 0
+      .select-cont
+        position: absolute
+        top: 0
+        width: 300px
+        +border-shadow
+        height: auto
+        background: #fff
+        .form-item
+          border: 0
+        .arr-box
+          border-left-color: #4e7cda
+          border-bottom: 1px solid #4e7cda
+        .form-cont
+          padding: 0 10px 10px
+        .form-list
+          a
+            display: inline-block
+            width: 20%
+            float: left
+            height: 26px
+            line-height: 26px
+            text-align: center
+            font-size: 14px
+            color: #666
+            margin-bottom: 5px
+            &.active,
+            &:hover
+              color: #666
+              background: #ebedf2
+          &.three-item
+            a
+              width: 33.33%
+        .form-promot
+          color: $default-color
+          line-height: 24px
+          font-size: 12px
+    .relative1
+      position: relative
+      z-index: 4
+    .relative2
+      position: relative
+      z-index: 3
+    .relative3
+      position: relative
+      z-index: 2
+    .error-box
+      color: #db493f
+      font-size: 12px
+      margin-bottom: 10px
+    .submitFormStyle
+      +redBtn
+  .pdt-item
+    border: 0
+    background: none
+  .ex-intro
+    border: 0
+    width: 100%
+    .i-mod-product
+      padding: 70px 0
+    .finance-icon
+      +finance-icon
+      float: left
+      &.finance-icon1
+        background-position: -104px 0
+      &.finance-icon2
+        background-position: -209px 0
+    .big-tit
+      font-size: 42px
+      line-height: 56px
+      margin-top: 5px
+  .finance-detail
+    .pdt-item
+      margin-left: 100px
+      width: auto
+  .arr-left
+    +arr-item
+    border-width: 5px
+    border-left: 5px solid #a1aab2
+    top: 64px
+    &.rht-arr
+      left: auto
+      right: 298px
+    &.lft-arr
+      left: 310px
+  .finance-step
+    padding: 55px 0
+    .pdt-item
+      width: 306px
+    .finance-icon
+      +finance-icon
+      width: 125px
+      height: 125px
+    .item-text
+      font-size: 20px
+    .step-tit
+      margin-bottom: 30px
+    .step1
+      background-position: 0 -108px
+    .step2
+      background-position: -137px -108px
+    .step3
+      background-position: -274px -108px
+    .finance-info
+      margin-top: 40px
+      padding: 20px 0
+      background: #fff
+      line-height: 32px
+      +border-radius(10px)
+      .info-item
+        width: 435px
+        padding-left: 80px
+        float: left
+        color: #737480
+        .info-tit
+          color: #03b36e
+  .now-items
+    width: 50%
+    padding-left: 30px
+  .now-items-box
+    .finance-icon
+      +finance-icon
+      width: 78px
+      height: 78px
+      &.news1
+        background-position: 0 -248px
+      &.news2
+        background-position: -99px -248px
+
+    .now-item
+      width: 50%
+      padding-left: 40px
+      float: left
+      margin-top: 30px
+
+  .alt-pages
+    position: fixed
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    background: #000
+    opacity: 0.7
+    filter: alpha(opacity=70)
+    z-index: 9998
+    display: none
+  .alt-box
+    position: fixed
+    top: 50%
+    left: 50%
+    margin: -100px 0 0 -200px
+    width: 400px
+    height: 200px
+    text-align: center
+    font-size: 18px
+    background: #fff
+    z-index: 9999
+    padding-top: 60px
+    line-height: 30px
+    display: none
+    +border-radius
+    +border-shadow
+    .promote
+      font-size: 14px
+    #times-box
+      color: #db493f
+

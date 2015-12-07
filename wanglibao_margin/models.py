@@ -1,7 +1,6 @@
 # encoding: utf-8
 from decimal import Decimal
 from django.db import models
-from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 
@@ -13,6 +12,8 @@ class Margin(models.Model):
     freeze = models.DecimalField(verbose_name=u'冻结金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
     withdrawing = models.DecimalField(verbose_name=u'提款中金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
     invest = models.DecimalField(verbose_name=u'已投资金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
+    uninvested = models.DecimalField(verbose_name=u'充值未投资金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
+    uninvested_freeze = models.DecimalField(verbose_name=u'充值未投资冻结金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
 
     def __unicode__(self):
         return u'%s margin: %s, freeze: %s' % (self.user, self.margin, self.freeze)
@@ -35,7 +36,7 @@ class MarginRecord(models.Model):
     description = models.CharField(verbose_name=u'摘要', max_length=1000, default=u'')
 
     def __unicode__(self):
-        return u'%s , %s' % (self.catalog, self.user)
+        return u'%s , %s, 交易金额%s, 余额%s' % (self.catalog, self.user, self.amount, self.margin_current)
 
     class Meta:
         ordering = ['-create_time']

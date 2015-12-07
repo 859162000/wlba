@@ -1,17 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from celery.utils.log import get_task_logger
 from wanglibao import settings
 import wanglibao_account
+import logging
 
 
 __author__ = 'rsj217'
 import requests
 import urllib
-import logging
 import json
 from wanglibao.celery import app
+from .utils import update_coop_order, xunlei9_order_query, str_to_dict
 
 from wanglibao_account.models import Binding
+
+# logger = get_task_logger(__name__)
+logger = logging.getLogger(__name__)
 
 # from wanglibao_p2p.models import P2PProduct
 # from wanglibao_account.utils import CjdaoUtils
@@ -21,7 +26,7 @@ from wanglibao_account.models import Binding
 # import logging
 #
 #
-logger = logging.getLogger(__name__)
+#
 #
 #
 # @app.task
@@ -133,6 +138,68 @@ def jinshan_callback(url, params):
 
 
 @app.task
+def xunleivip_recallback(url, params, channel, order_id):
+    result = xunlei9_order_query(params)
+    data = result.get('data', None)
+
+    if not data:
+        logger.info("Enter %s_callback task===>>>" % channel)
+        try:
+            params = urllib.urlencode(params)
+            logger.info(params)
+            ret = requests.get(url, params=params)
+            if ret.status_code != 200:
+                raise Exception("Failed to send request: status: %d, ", ret.status_code)
+
+            ret_data = str_to_dict(ret.text)
+            result = ret_data['ret']
+            error = ret_data['error'].encode('utf-8')
+            code = ret_data['code']
+
+            # 更新第三方订单处理状态
+            update_coop_order(order_id, channel, result, error)
+
+            logger.info('%s callback url: %s' % (channel, ret.url))
+            logger.info('%s callback return: %s' % (channel, ret_data))
+            return ret
+        except Exception, e:
+            logger.info("%s callback':'failed to connect" % channel)
+            logger.info(e)
+
+
+@app.task
+def xunleivip_callback(url, params, channel, order_id):
+    logger.info("Enter %s_callback task===>>>" % channel)
+    try:
+        _params = urllib.urlencode(params)
+        logger.info(_params)
+        ret = requests.get(url, params=_params)
+        if ret.status_code != 200:
+            raise Exception("Failed to send request: status: %d, ", ret.status_code)
+
+        ret_data = str_to_dict(ret.text)
+        result = ret_data['ret']
+        error = ret_data['error'].encode('utf-8')
+        code = ret_data['code']
+
+        # 更新第三方订单处理状态
+        update_coop_order(order_id, channel, result, error)
+
+        logger.info('%s callback url: %s' % (channel, ret.url))
+        logger.info('%s callback return: %s' % (channel, ret_data))
+        return ret
+    except Exception, e:
+        # 回调补发
+        xunleivip_recallback.apply_async(
+            # FixMe, 修改延迟时间
+            countdown=600,
+            kwargs={'url': url, 'params': params, 'channel': channel, 'order_id': order_id})
+
+        logger.info("%s callback':'failed to connect" % channel)
+        logger.info(e)
+
+
+@app.task
 def yiche_callback(url, params, channel):
     logger.info("Enter %s_callback task===>>>" % channel)
     ret = None
@@ -217,5 +284,16 @@ def zhongjin_post_task():
     向中金发送p2p 数据
     :return:
     """
-    from wanglibao_account.cooperation import zhongjin_post_p2p_info
-    zhongjin_post_p2p_info()
+    if settings.ENV == settings.ENV_PRODUCTION:
+        from wanglibao_account.cooperation import zhongjin_post_p2p_info
+        zhongjin_post_p2p_info()
+
+
+@app.task
+def rongtu_post_task():
+    """
+    融途把所有参数打包, 参数太长, 用post. 返回1 正确.
+    """
+    if settings.ENV == settings.ENV_PRODUCTION:
+        from wanglibao_account.cooperation import rongtu_post_data
+        rongtu_post_data()

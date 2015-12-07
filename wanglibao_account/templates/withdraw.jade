@@ -21,6 +21,9 @@ block main
 
       form#withdraw-form.padding-l-r-m(action="/pay/withdraw/complete/", method='post')
         - csrf_token
+        input(type="hidden", name="withdraw_count", value="{{withdraw_count}}")
+        input(type="hidden", name="uninvested", value="{{uninvested}}")
+        input(type="hidden", name="fee", data-max_amount="{{fee.max_amount}}", data-min_amount="{{fee.min_amount}}")
         table.withdraw-table
           tr
             th 持卡人
@@ -33,6 +36,7 @@ block main
                   option(value='') 请选择银行卡
                   for card in cards
                     option(value='{{card.id}}') {{card | card_info}}
+                label.error
                 .space-vertical-s
                 a.add-card-button.blue.margin-top-m(href='#add-card-form')
                  .add-icon
@@ -44,12 +48,17 @@ block main
             th 提现金额(元)
             td
               .span5
-                input.withdraw-input(type='text', name='amount', placeholder='金额', data-balance='{{margin}}', data-role='fee-calculator', data-rate='{{fee}}', data-target-fee='#fee', data-target-actual='#actual-amount')
+                input.withdraw-input#withdraw-input(type='text', name='amount', placeholder='金额', data-balance='{{margin}}', data-role='fee-calculator', data-rate='{{fee.management_fee.fee_rate}}', data-target-fee='#fee', data-target-actual='#actual-amount',data-count='{{fee.fee.free_times_per_month}}',data-interval='{{fee.fee.amount_interval}}',data-switch='{{fee.switch}}',data-poundage='#poundage')
+                label.error
               .span6(style="line-height:40px") 50元起，如果账户余额少于50元，可一次性取完
           tr
-            th 手续费(元)
+            th 提现费用(元)
             td
-              span.orange-text 优惠期内，暂时不收取手续费
+              span.orange-text#poundage 0.00
+              if fee.switch == 'on'
+                a(href='javascript:void(0)').poundageF 收费说明
+              else
+                | &nbsp;&nbsp;优惠期内，暂时不收取手续费
           tr
             th 实际到账金额(元)
             td
@@ -93,6 +102,7 @@ block main
         p 1. 提款申请提交后，您的提现金额将从可用金额中扣除，无法再进行出借。
         p 2. 为防止信用卡套现、洗钱等违法行为，网站将针对异常提款（包括提取无消费充值资金）进行严格审核，审核时间在 15 个工作日之后。
         p 3. 提现银行账号的开户名必须与银行卡名一致， 否则提现失败。
+        p 4. 提现最高限额：单笔限额50万（民生银行单笔限额5万），单日不限次数
   #img-code-div2(style="display:none")
         form#img-code-form.img-code-form(method='post', action='',tag='')
             .form-row
@@ -172,6 +182,21 @@ block main
                 a(href='javascript:void(0)').nextBtn#confirmBtn 确认
 
 block script
+  #poundageExplain(style="display:none")
+    p.explainTitle 温馨提示
+    .poundageExplain.clearfix
+        p.p1 客户在网利宝提现，将收取一定比例的手续费，具体收取规则如下：
+        p.p2 提现手续费=基本手续费 + 额外手续费
+        p.clearfix
+            span 1、
+            label 基本手续费。每个月前2次提现免收基本手续费，超过2次后的提现基本手续费如下：
+        p.clearfix.pl 提现金额小于等于1万：2元/笔
+        p.clearfix.pl 提现金额大于1万，小于等于5万：3元/笔
+        p.clearfix.pl 提现金额大于5万，5元/笔
+        p.clearfix
+            span 2、
+            label 额外手续费。充值未投资的资金如需要提现，将额外收取提现金额的0.3%，此部分手续费不包含免费范围内。
+    block script
   include include/add_card
   script.
-    require(['/static/js/withdraw.js?v=20150923', '/static/js/add_card.js'])
+    require(['/static/js/withdraw.js?v=20151118', '/static/js/add_card.js'])

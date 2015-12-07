@@ -14,11 +14,15 @@ from django.template import Context, Template, add_to_builtins
 from django.template.loader import render_to_string, get_template
 from django.utils import timezone
 from registration.models import RegistrationProfile
-from wanglibao_account.backends import TestIDVerifyBackEnd, ProductionIDVerifyBackEnd
+from wanglibao_account.backends import TestIDVerifyBackEnd, ProductionIDVerifyBackEnd, ProductionIDVerifyV2BackEnd
 import logging
 import hashlib
 import pytz
 from Crypto.Cipher import AES
+import urllib
+from .models import UserThreeOrder
+import requests
+import json
 
 from decimal import Decimal
 from wanglibao_p2p.amortization_plan import get_amortization_plan
@@ -121,6 +125,8 @@ def verify_id(name, id_number):
         return TestIDVerifyBackEnd.verify(name, id_number)
     elif class_name == 'ProductionIDVerifyBackEnd':
         return ProductionIDVerifyBackEnd.verify(name, id_number)
+    elif class_name == 'ProductionIDVerifyV2BackEnd':
+        return ProductionIDVerifyV2BackEnd.verify(name, id_number)
     else:
         raise NameError("The specific backend not implemented")
 
@@ -416,3 +422,178 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
+
+
+class FileObject(object):
+    def __init__(self, content, size):
+        self.file = content
+        self.size = size
+
+
+def base64_to_image(base64_str):
+    import base64
+    import cStringIO
+
+    img_str = base64.b64decode(base64_str)
+    img_handle = cStringIO.StringIO()
+    img_handle.write(img_str)
+    img_handle.seek(0)
+    img_file = FileObject(img_handle, len(img_str))
+
+    return img_file
+
+
+def xunleivip_generate_sign(data, key):
+    sorted_data = sorted(data.iteritems(), key=lambda asd:asd[0], reverse=False)
+    encode_data = urllib.urlencode(sorted_data)
+    sign = hashlib.md5(encode_data+str(key)).hexdigest()
+    return sign
+
+
+def zgdx_order_query(params):
+    """
+    中国电信业务查询
+    """
+
+    coop_key = getattr(settings, 'ZGDX_KEY', None)
+    iv = getattr(settings, 'ZGDX_IV', None)
+    url = getattr(settings, 'ZGDX_QUERY_URL', None)
+    if coop_key and iv and url:
+        data = {
+            'phone_id': params.get('phone_id', ''),
+            'service_code': params.get('service_code', ''),
+            'request_no': params.get('request_no', ''),
+            'start_time': params.get('start_time', ''),
+            'end_time': params.get('end_time', ''),
+        }
+
+        encrypt_data = encrypt_mode_cbc(json.dumps(data), coop_key, iv)
+        params = {
+            'code': encodeBytes(hex2bin(encrypt_data)),
+            'partner_no': params.get('partner_no', None),
+        }
+
+        try:
+            res = requests.post(url, data=json.dumps(params))
+            if res.status_code == 200:
+                logger.info(">>>>>>>>>>>>>>>>>>>%s" % res.text)
+                res = res.json()
+                res_code = res.get('result_code', '')
+                result = res.get('result', '')
+                if res_code == '00000':
+                    json_response = {
+                        'ret_code': 0,
+                        'message': 'success',
+                        'data': result
+                    }
+                else:
+                    json_response = {
+                        'ret_code': res_code,
+                        'message': result
+                    }
+            else:
+                json_response = {
+                    'ret_code': 50001,
+                    'message': 'api error'
+                }
+                logger.info('zgdx connect to query api faild with status %s' % res.status_code)
+        except Exception, e:
+            json_response = {
+                'ret_code': 50001,
+                'message': 'api error'
+            }
+            logger.info('zgdx connect to query api faild')
+            logger.info(e)
+    else:
+        json_response = {
+            'ret_code': 50001,
+            'message': 'api error'
+        }
+        logger.info("zgdx_order_query coop_key, iv or url None")
+
+    return json_response
+
+
+def xunlei9_order_query(params):
+    """
+    迅雷VIP业务查询
+    """
+
+    url = getattr(settings, 'XUNLEIVIP_QUERY_URL', None)
+    coop_key = getattr(settings, 'XUNLEIVIP_KEY', None)
+    if coop_key and url:
+        data = {
+            'uid': params.get('uid', ''),
+            'act': params.get('act', ''),
+            'orderid': params.get('orderid', ''),
+        }
+
+        data['sign'] = xunleivip_generate_sign(data, coop_key)
+
+        try:
+            res = requests.get(url, params=data).json()
+            json_response = {
+                'ret_code': 0,
+                'message': 'success',
+                'data': res
+            }
+        except Exception, e:
+            json_response = {
+                'ret_code': 50001,
+                'message': 'api error'
+            }
+    else:
+        json_response = {
+            'ret_code': 50001,
+            'message': 'api error'
+        }
+
+    return json_response
+
+
+def update_coop_order(request_no, channel_code, result_code, msg):
+    order = UserThreeOrder.objects.filter(request_no=request_no, order_on__code=channel_code).first()
+
+    if order:
+        logger.info("Enter %s order update===>>>" % channel_code)
+        logger.info("%s update params:{request_no=%s, result_code=%s, "
+                    "msg=%s}===>>>" % (channel_code, request_no, result_code, msg))
+        try:
+            order.result_code = result_code
+            order.msg = msg
+            order.answer_at = datetime.datetime.now()
+            order.save()
+            response = {
+                'ret_code': 1,
+                'message': 'success'
+            }
+        except Exception, e:
+            logger.info('%s request_no %s save to UserThreeOrder faild.' % (channel_code, request_no))
+            logger.info(e)
+            response = {
+                'ret_code': 50000,
+                'message': 'api error.'
+            }
+    else:
+        response = {
+            'ret_code': 20002,
+            'message': u'订单流水号不存在'
+        }
+
+    return response
+
+
+def str_to_dict(s):
+    """
+    将字符串转换成字典
+    ret=0&error=test' ==> {u'ret': u'0', u'error': u'test'}
+    :param s:
+    :return: result
+    """
+
+    result = {}
+    for item in s.split('&'):
+        key, value = item.split('=')
+        result[urllib.unquote_plus(key)] = urllib.unquote_plus(value)
+
+    return result

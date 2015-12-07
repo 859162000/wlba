@@ -43,7 +43,16 @@
   margin-right: 40px
   .detail-view
     font-size: 12px
-    margin-top: 13px
+    margin-top: 6px
+    position: relative
+    text-indent: 30px
+    i
+      position: absolute
+      background: url(/static/images/tyj.png) -46px 0
+      width: 23px
+      height: 18px
+      display: inline-block
+      left: 0
 
 .p2p-record
   h1
@@ -117,7 +126,15 @@
   display: inline-block
   width: 105px
   text-align: center
-
+  position: relative
+  i
+    background: url(/static/images/tyj.png) 0 -3px
+    width: 28px
+    height: 18px
+    display: inline-block
+    position: absolute
+    top: -14px
+    right: -34px
   &.active
     background: $color-pomegranate
 
@@ -126,6 +143,7 @@
 
   .title-bar--tab--anchor
     +link-colors($color-text-d3)
+
 
 .p2p-asset--detail-container
   float: left
@@ -446,6 +464,15 @@ $add-icon-large-width: 8px
     a
       @extend .blue
 
+.tableNew
+  tr:nth-child(even)
+    background: #edf9ff
+    td
+      color: #3e3e3e
+      padding: 16px 0
+  margin-bottom: 25px
+
+
 .icon-msg-arrow-up
   @extend .icon
   width: 13px
@@ -551,3 +578,12 @@ $add-icon-large-width: 8px
         background-position: -74px -2px
         width: 24px
         height: 18px
+
+.tyjRow
+  padding: 10px 0 0 12px
+  .total-asset-money-card
+    margin-right: 20px
+.tyjMark
+  font-size: 12px
+  color: #666666
+  padding: 15px 0

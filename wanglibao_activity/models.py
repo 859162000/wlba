@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from wanglibao_redpack.models import RedPackEvent
 from ckeditor.fields import RichTextField
+from datetime import timedelta
 
 PLATFORM = (
     ("all", u"全平台"),
@@ -44,12 +45,12 @@ TRIGGER_NODE = (
 GIFT_TYPE = (
     ('reward', u'奖品'),
     ('redpack', u'优惠券'),
-    # ('income', u'收益'),
-    ('phonefare', u'手机话费')
+    ('experience_gold', u'体验金'),
+    # ('phonefare', u'手机话费')
 )
 SEND_TYPE = (
     ('sys_auto', u'系统实时发放'),
-    ('manual_operation', u'人工手动发放')
+    # ('manual_operation', u'人工手动发放')
 )
 SEND_TYPE_ABBR = (
     ('sys_auto', u'系统'),
@@ -75,7 +76,7 @@ class Activity(models.Model):
     product_ids = models.CharField(u'指定产品ID', max_length=200, blank=True, default='',
                                    help_text=u"如果有多个产品，则产品ID之间用英文逗号分割")
     description = models.TextField(u'描述', null=True, blank=True)
-    channel = models.CharField(u'渠道名称', max_length=200, blank=True,
+    channel = models.CharField(u'渠道名称', max_length=800, blank=True,
                                help_text=u'如果是对应渠道的活动，则填入对应渠道的渠道名称代码，默认为wanglibao-other，多个渠道用英文逗号间隔')
     is_all_channel = models.BooleanField(u'所有渠道', default=False, help_text=u'如果勾选“所有渠道”，则系统不再限定渠道')
     start_at = models.DateTimeField(default=timezone.now, null=False, verbose_name=u"活动开始时间*")
@@ -136,9 +137,10 @@ class ActivityRule(models.Model):
     share_type = models.CharField(u'选择参与赠送的人员', max_length=20, choices=SHARE_TYPE, blank=True, default='')
     is_invite_in_date = models.BooleanField(u'判断是否在活动区间内邀请好友', default=False,
                                             help_text=u'勾选此项则，则会先判断邀请关系的成立时间是否在活动期间，是就触发该规则，不是则不做处理')
-    redpack = models.CharField(u'优惠券活动ID', max_length=60, blank=True,
-                               help_text=u'优惠券活动ID一定要和优惠券活动中的ID保持一致，否则会导致无法发放')
-    reward = models.CharField(u'奖品类型名称', max_length=60, blank=True,
+    redpack = models.CharField(u'对应活动ID', max_length=200, blank=True,
+                               help_text=u'优惠券活动ID/体验金活动ID一定要和对应活动中的ID保持一致，否则会导致无法发放<br/>\
+                               如需要多个ID则用英文逗号隔开,如:1,2,3')
+    reward = models.CharField(u'奖品类型名称', max_length=200, blank=True,
                               help_text=u'奖品类型名称一定要和奖品中的类型保持一致，否则会导致无法发放奖品')
     income = models.FloatField(u'金额或比率', default=0, blank=True,
                                help_text=u'选择收益或话费时填写，固定金额时填写大于1的数字，收益率时填写0-1之间的小数')
@@ -154,7 +156,6 @@ class ActivityRule(models.Model):
                                                        如果设置最大/最小金额，则会判断用户投资总额是否符合最大/最小金额区间')
     ranking = models.IntegerField(u'单标投资顺序', blank=True, default=0,
                                   help_text=u'设置单个标的投资顺序，只能填写-1或者大于1的数字，默认0不做判断<br/>\
-                                            最大/最小金额和投资顺序不同时计算，即设置单标投资顺序时不考虑最大/最小金额<br/>\
                                             注：满标（即最后一名）填写-1')
     msg_template = models.TextField(u'站内信模板（不填则不发）', blank=True,
                                     help_text=u'站内信模板不填写则触发该规则时不发站内信，变量写在2个大括号之间，<br/>\
@@ -182,8 +183,8 @@ class ActivityRule(models.Model):
     def clean(self):
         if self.gift_type == 'reward' and not self.reward:
             raise ValidationError(u'赠送类型为“奖品”时，必须填写“奖品类型名称”')
-        if self.gift_type == 'redpack' and not self.redpack:
-            raise ValidationError(u'赠送类型为“优惠券”时，必须填写“优惠券活动ID”')
+        if (self.gift_type == 'redpack' or self.gift_type == 'experience_gold') and not self.redpack:
+            raise ValidationError(u'赠送类型为“优惠券/体验金”时，必须填写“对应活动ID”')
         if self.gift_type == 'income' or self.gift_type == 'phonefare':
             if self.income <= 0:
                 raise ValidationError(u'选择送收益或手机话费时要填写“金额或比率”')
@@ -363,3 +364,105 @@ class WapActivityTemplates(models.Model):
 
     class Meta:
         verbose_name_plural = u'活动页跳转管理功能'
+
+
+class ActivityShow(models.Model):
+    """活动展示"""
+    ACTIVITY_CATEGORY = (
+        ('all', u'全部'),
+        ('purchase', u'投资有奖'),
+        ('holiday', u'节日热点'),
+        ('novice', u'新手福利'),
+    )
+
+    activity = models.ForeignKey(Activity, verbose_name=u'活动名称')
+    category = models.CharField(u'活动类型', max_length=20, choices=ACTIVITY_CATEGORY, default=u'全部')
+    is_pc = models.BooleanField(u'是否主站活动', default=False)
+    thumbnail = models.ImageField(u'卡片区域缩略图', null=True, blank=True, upload_to='activity')
+    pc_detail_link = models.CharField(u'PC-活动详情页链接*', null=True, blank=True, max_length=255)
+    pc_template = models.CharField(u'PC-活动详情页模板名称*', null=True, blank=True, max_length=255)
+    pc_description = models.TextField(u'PC-活动简介', null=True, blank=True)
+    is_app = models.BooleanField(u'是否APP活动', default=False)
+    app_banner = models.ImageField(u'APP-活动Banner', null=True, blank=True, upload_to='activity')
+    app_detail_link = models.CharField(u'APP-活动详情页链接*', null=True, blank=True, max_length=255)
+    app_template = models.CharField(u'APP-活动详情页模板名称*', null=True, blank=True, max_length=255)
+    app_description = models.TextField(u'APP-活动简介', null=True, blank=True)
+    start_at = models.DateTimeField(u"页面展示开始时间*", auto_now=False, default=timezone.now, null=False)
+    end_at = models.DateTimeField(u"页面展示结束时间*", auto_now=False, default=timezone.now, null=False)
+    created_at = models.DateTimeField(u'添加时间', auto_now=False, default=timezone.now, auto_now_add=True)
+    link_is_hide = models.BooleanField(verbose_name=u'是否隐藏活动页面', default=False)
+    priority = models.IntegerField(u'优先级', help_text=u'越大越优先', default=0, blank=False)
+
+    def activity_status(self):
+        now = timezone.now()
+        if self.activity.start_at > now:
+            return u'未开始'
+        elif now > self.activity.end_at:
+            return u'已结束'
+        elif self.activity.end_at - now <= timedelta(days=1):
+            return u'剩%s小时' % ((self.activity.end_at - now).seconds / 3600)
+        elif self.activity.end_at - now <= timedelta(days=7):
+            return u'剩%s天' % (self.activity.end_at - now).days
+        elif self.activity.end_at - now > timedelta(days=7):
+            return u'进行中'
+
+    activity_status.short_description = u'活动状态'
+    activity_status.allow_tags = True
+
+    def platform(self):
+        return self.activity.platform
+
+    platform.short_description = u'活动平台'
+    platform.allow_tags = True
+
+    def channel(self):
+        return self.activity.channel
+
+    channel.short_description = u'渠道'
+    channel.allow_tags = True
+
+    def save(self, *args, **kwargs):
+        if self.is_pc is False:
+            self.thumbnail = None
+            self.pc_detail_link = None
+            self.pc_template = None
+            self.pc_description = None
+
+        if self.is_app is False:
+            self.app_banner = None
+            self.app_detail_link = None
+            self.app_template = None
+            self.app_description = None
+
+        super(ActivityShow, self).save(*args, **kwargs)
+
+    def __unicode__(self):
+        return self.activity.name
+
+    class Meta:
+        verbose_name = u'活动页管理'
+        verbose_name_plural = u'活动页管理'
+        ordering = ['-priority', '-created_at']
+
+
+class ActivityBannerPosition(models.Model):
+    """PC-活动Banner展示位置"""
+    main = models.ForeignKey(ActivityShow, verbose_name=u'主推', related_name='act_banner_main')
+    main_banner = models.ImageField(u'主推Banner', null=True, blank=True, upload_to='activity')
+    second_left = models.ForeignKey(ActivityShow, verbose_name=u'副推左', related_name='act_banner_left')
+    left_banner = models.ImageField(u'副推左Banner', null=True, blank=True, upload_to='activity')
+    second_right = models.ForeignKey(ActivityShow, verbose_name=u'副推右', related_name='act_banner_right')
+    right_banner = models.ImageField(u'副推右Banner', null=True, blank=True, upload_to='activity')
+    priority = models.IntegerField(u'优先级', help_text=u'越大越优先', default=0, blank=False)
+    created_at = models.DateTimeField(u'创建时间', auto_now=False, default=timezone.now, auto_now_add=True)
+
+    class Meta:
+        verbose_name = u'活动Banner展示位置'
+        verbose_name_plural = u'活动Banner展示位置'
+        ordering = ['-priority', '-created_at']
+
+    def __unicode__(self):
+        return u'（主推）：%s——（副推左）：%s——（副推右）：%s' % (self.main.activity.name,
+                                                            self.second_left.activity.name,
+                                                            self.second_right.activity.name,
+                                                            )

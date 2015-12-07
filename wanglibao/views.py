@@ -15,13 +15,12 @@ from wanglibao_announcement.utility import AnnouncementHomepage, AnnouncementP2P
 from wanglibao_p2p.models import P2PEquity
 from django.core.urlresolvers import reverse
 import re
-import urlparse
-from wanglibao_redis.backend import redis_backend
-import json
-import pickle
-import datetime
-import hashlib
 from wanglibao import settings
+from wanglibao_rest import utils as rest_utils
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class IndexView(TemplateView):
     template_name = 'index_new.jade'
@@ -47,7 +46,7 @@ class IndexView(TemplateView):
 
         return p2p
 
-    def _full_product_payment(self, period, num, product_id=None):
+    def _full_product_payment(self, period, num, product_id=None, order_by='index'):
         """ 查询满表且已经还款中的标 """
         p2p = P2PProduct.objects.select_related(
             'warrant_company', 'activity'
@@ -58,9 +57,13 @@ class IndexView(TemplateView):
         )
         if product_id:
             p2p = p2p.exclude(id__in=product_id)
-        return self._filter_product_period(p2p, period).order_by('-soldout_time', '-priority')[:num]
 
-    def _full_product_nonpayment(self, period, num, product_id=None):
+        if order_by == 'index':
+            return self._filter_product_period(p2p, period).order_by('-soldout_time', '-priority')[:num]
+        else:
+            return self._filter_product_period(p2p, period).order_by('-expected_earning_rate', 'period')[:num]
+
+    def _full_product_nonpayment(self, period, num, product_id=None, order_by='index'):
         """ 查询满表但是非还款中的标 """
         p2p = P2PProduct.objects.select_related(
             'warrant_company', 'activity'
@@ -71,9 +74,12 @@ class IndexView(TemplateView):
         )
         if product_id:
             p2p = p2p.exclude(id__in=product_id)
-        return self._filter_product_period(p2p, period).order_by('-soldout_time', '-priority')[:num]
+        if order_by == 'index':
+            return self._filter_product_period(p2p, period).order_by('-soldout_time', '-priority')[:num]
+        else:
+            return self._filter_product_period(p2p, period).order_by('-expected_earning_rate', 'period')[:num]
 
-    def get_products(self, period, product_id=None):
+    def get_products(self, period, product_id=None, order_by='index'):
         """ 查询符合条件的标列表
         3:1-3个月（包含3月）
         6:4-6个月（包含6个月）
@@ -91,14 +97,22 @@ class IndexView(TemplateView):
         if product_id:
             p2p = p2p.exclude(id__in=product_id)
 
-        p2p = self._filter_product_period(p2p, period).order_by('-priority', '-total_amount')[:self.PRODUCT_LENGTH]
+        if order_by == 'index':
+            p2p = self._filter_product_period(p2p, period).order_by('-priority', '-total_amount')[:self.PRODUCT_LENGTH]
+        else:
+            p2p = self._filter_product_period(p2p, period).order_by('-expected_earning_rate', 'period')[:self.PRODUCT_LENGTH]
+
         p2p_list.extend(p2p)
         # 使用满标但是未还款的扩充
         if len(p2p_list) < self.PRODUCT_LENGTH:
-            p2p_list.extend(self._full_product_nonpayment(period=period, num=self.PRODUCT_LENGTH-len(p2p_list), product_id=product_id))
+            p2p_list.extend(self._full_product_nonpayment(period=period,
+                                                          num=self.PRODUCT_LENGTH-len(p2p_list),
+                                                          product_id=product_id, order_by=order_by))
         # 使用慢标且还款中的扩充
         if len(p2p_list) < self.PRODUCT_LENGTH:
-            p2p_list.extend(self._full_product_payment(period=period, num=self.PRODUCT_LENGTH-len(p2p_list), product_id=product_id))
+            p2p_list.extend(self._full_product_payment(period=period,
+                                                       num=self.PRODUCT_LENGTH-len(p2p_list),
+                                                       product_id=product_id, order_by=order_by))
         return p2p_list
 
     def get_context_data(self, **kwargs):
@@ -186,7 +200,7 @@ class IndexView(TemplateView):
             if fund_hold_info.exists():
                 for hold_info in fund_hold_info:
                     fund_total_asset += hold_info.current_remain_share + hold_info.unpaid_income
-            print partners
+
         return {
             "recommend_product": recommend_product,
             "p2p_lt_three": p2p_lt3,
@@ -204,13 +218,6 @@ class IndexView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         device_list = ['android', 'iphone']
-        referer = request.META.get("HTTP_REFERER", "")
-        if referer:
-            res = urlparse.urlparse(referer)
-            if "baidu.com" in res.netloc:
-                qs = urlparse.parse_qs(res.query)
-                if "wd" in qs:
-                    request.session["promo_source_word"] = "|".join(qs['wd'])
         user_agent = request.META.get('HTTP_USER_AGENT', "").lower()
         for device in device_list:
             match = re.search(device, user_agent)
@@ -263,32 +270,47 @@ def landpage_view(request):
     :param request:
     :return:
     """
-    channel_code = getattr(request, request.method).get('promo_token', None)
+    request_data = request.GET
+    channel_code = request_data.get('promo_token', None)
     url = reverse('index')
     if channel_code:
         activity_page = getattr(settings, '%s_ACTIVITY_PAGE' % channel_code.upper(), 'index')
         if channel_code == getattr(settings, '%s_CHANNEL_CODE' % channel_code.upper(), None):
-            # period 为结算周期，必须以天为单位
-            period = getattr(settings, '%s_PERIOD' % channel_code.upper())
-            # 设置tid默认值
-            default_tid = getattr(settings, '%s_DEFAULT_TID' % channel_code.upper(), '')
-            tid = getattr(request, request.method).get('tid', default_tid)
-            if not tid and default_tid:
-                tid = default_tid
-            sign = getattr(request, request.method).get('sign', None)
-            wlb_for_channel_key = getattr(settings, 'WLB_FOR_%s_KEY' % channel_code.upper())
-            # 确定渠道来源
-            if tid and sign == hashlib.md5(channel_code+str(wlb_for_channel_key)).hexdigest():
-                redis = redis_backend()
-                redis_channel_key = '%s_%s' % (channel_code, tid)
-                land_time_lately = redis._get(redis_channel_key)
-                current_time = datetime.datetime.now()
-                # 如果上次访问的时间是在30天前则不更新访问时间
-                if land_time_lately and tid != default_tid:
-                    land_time_lately = datetime.datetime.strptime(land_time_lately, '%Y-%m-%d %H:%M:%S')
-                    if land_time_lately + datetime.timedelta(days=int(period)) <= current_time:
-                        return HttpResponseRedirect(reverse(activity_page))
-                redis._set(redis_channel_key, current_time.strftime("%Y-%m-%d %H:%M:%S"))
+            coop_landpage_fun = getattr(rest_utils, 'process_for_%s_landpage' % channel_code.lower(), None)
+            if coop_landpage_fun:
+                try:
+                    coop_landpage_fun(request, channel_code)
+                except Exception, e:
+                    logger.exception('process for %s landpage error' % channel_code)
+                    logger.info(e)
 
         url = reverse(activity_page) + "?promo_token=" + channel_code
     return HttpResponseRedirect(url)
+
+
+class BaiduFinanceView(TemplateView):
+    template_name = "pc_baidu_finance.jade"
+
+    def get_context_data(self, **kwargs):
+        # 网站数据
+        m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
+        site_data = m.get_recommend_products()
+        if site_data:
+            site_data = site_data[MiscRecommendProduction.KEY_PC_DATA]
+        else:
+            site_data = pc_data_generator()
+            m.update_value(value={MiscRecommendProduction.KEY_PC_DATA: site_data})
+
+        today = timezone.datetime.now().strftime("%Y-%m-%d")
+
+        p2p_one = IndexView().get_products(period=3, product_id=None, order_by='expected_earning_rate')[:1]
+        p2p_two = IndexView().get_products(period=6, product_id=None, order_by='expected_earning_rate')[:1]
+        p2p_three = IndexView().get_products(period=9, product_id=None, order_by='expected_earning_rate')[:1]
+
+        return {
+            'site_data': site_data,
+            'p2p_one': p2p_one,
+            'p2p_two': p2p_two,
+            'p2p_three': p2p_three,
+            'today': today
+        }

@@ -2,6 +2,8 @@
 # encoding:utf-8
 
 import sys
+from wanglibao_account.cooperation import CoopRegister
+
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
@@ -17,7 +19,7 @@ from order.models import Order
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_sms.utils import validate_validation_code
 from marketing import tools
-
+from fee import WithdrawFee
 from wanglibao_rest.utils import split_ua
 
 from wanglibao_pay.kuai_pay import KuaiPay, KuaiShortPay
@@ -25,8 +27,6 @@ from wanglibao_pay.huifu_pay import HuifuShortPay
 from wanglibao_pay.yee_pay import YeePay, YeeShortPay
 
 logger = logging.getLogger(__name__)
-
-
 
 
 def add_bank_card(request):
@@ -145,6 +145,9 @@ def list_bank_new(request):
             obj.update(util.handle_kuai_bank_limit(bank.huifu_bind_limit))
         elif bank.channel == 'yeepay' and bank.yee_bind_limit:
             obj.update(util.handle_kuai_bank_limit(bank.yee_bind_limit))
+        else:
+            # 只返回已经有渠道的银行
+            continue
 
         rs.append(obj)
 
@@ -166,47 +169,79 @@ def list_bank_new(request):
 #        pass
 #    return obj
 
+
 @method_decorator(transaction.atomic)
 def withdraw(request):
     amount = request.DATA.get("amount", "").strip()
     card_id = request.DATA.get("card_id", "").strip()
     vcode = request.DATA.get("validate_code", "").strip()
-    if not amount or not card_id :
-        return {"ret_code":20061, "message":u"信息输入不完整"}
+    if not amount or not card_id:
+        return {"ret_code": 20061, "message": u"信息输入不完整"}
 
     user = request.user
     if not user.wanglibaouserprofile.id_is_valid:
-        return {"ret_code":20062, "message":u"请先进行实名认证"}
+        return {"ret_code": 20062, "message": u"请先进行实名认证"}
 
     try:
         float(amount)
     except:
-        return {"ret_code":20063, 'message':u'金额格式错误'}
+        return {"ret_code": 20063, 'message': u'金额格式错误'}
     amount = util.fmt_two_amount(amount)
     if len(str(amount)) > 20:
-        return {"ret_code":20068, 'message':'金额格式错误，大于100元且为100倍数'}
-    # Modify by hb on 2015-09-23 for 50000 => 100000
-    if not 0 <= amount <= 100000:
-        return {"ret_code":20064, 'message':u'提款金额在0～100000之间'}
+        return {"ret_code": 20064, 'message': u'金额格式错误，大于100元且为100倍数'}
 
     margin = user.margin.margin
     if amount > margin:
-        return {"ret_code":20065, 'message':u'余额不足'}
+        return {"ret_code": 20065, 'message': u'余额不足'}
 
     phone = user.wanglibaouserprofile.phone
     status, message = validate_validation_code(phone, vcode)
     if status != 200:
-        return {"ret_code":20066, "message":u"验证码输入错误"}
-    fee = amount * YeePay.FEE
-    #实际提现金额
-    actual_amount = amount - fee
+        # Modify by hb on 2015-12-02
+        #return {"ret_code": 20066, "message": u"验证码输入错误"}
+        return {"ret_code": 20066, "message": message}
+
     card = Card.objects.filter(pk=card_id).first()
     if not card or card.user != user:
-        return {"ret_code":20067, "message":u"请选择有效的银行卡"}
+        return {"ret_code": 20067, "message": u"请选择有效的银行卡"}
+
+    # 计算提现费用 手续费 + 资金管理费
+    bank = card.bank
+    uninvested = user.margin.uninvested  # 充值未投资金额
+
+    # 获取费率配置
+    fee_misc = WithdrawFee()
+    fee_config = fee_misc.get_withdraw_fee_config()
+
+    # 检测提现最大最小金额
+    if amount > fee_config.get('max_amount') or amount <= 0:
+        return {"ret_code": 20068, 'message': u'提现金额超出最大提现限额'}
+    if amount < fee_config.get('min_amount'):
+        if amount != margin:
+            return {"ret_code": 20069, 'message': u'账户余额小于{}时需要一次性提完'.format(fee_config.get('min_amount'))}
+
+    # 检测银行的单笔最大提现限额,如民生银行
+    if bank and bank.withdraw_limit:
+        bank_limit = util.handle_withdraw_limit(bank.withdraw_limit)
+        bank_max_amount = bank_limit.get('bank_max_amount', 0)
+
+        if bank_max_amount:
+            if amount > bank_max_amount:
+                return {"ret_code": 20070, 'message': u'提现金额超出银行最大提现限额'}
+
+    # 获取计算后的费率
+    fee, management_fee, management_amount = fee_misc.get_withdraw_fee(user, amount, margin, uninvested)
+
+    # 实际提现金额
+    actual_amount = amount - fee - management_fee
+    if actual_amount <= 0:
+        return {"ret_code": 20071, "message": u'实际到账金额为0,无法提现'}
 
     pay_info = PayInfo()
     pay_info.amount = actual_amount
     pay_info.fee = fee
+    pay_info.management_fee = management_fee
+    pay_info.management_amount = management_amount
     pay_info.total_amount = amount
     pay_info.type = PayInfo.WITHDRAW
     pay_info.user = user
@@ -222,16 +257,16 @@ def withdraw(request):
                                         pay_info=model_to_dict(pay_info))
         pay_info.order = order
         keeper = MarginKeeper(user, pay_info.order.pk)
-        margin_record = keeper.withdraw_pre_freeze(amount)
+        margin_record = keeper.withdraw_pre_freeze(amount, uninvested=management_amount)
         pay_info.margin_record = margin_record
 
         pay_info.save()
-        return {"ret_code":0, 'message':u'提现成功', "amount":amount, "phone":phone}
+        return {"ret_code": 0, 'message': u'提现成功', "amount": amount, "phone": phone, "bank_name":bank.name}
     except Exception, e:
         pay_info.error_message = str(e)
         pay_info.status = PayInfo.FAIL
         pay_info.save()
-        return {"ret_code":20065, 'message':u'余额不足'}
+        return {"ret_code": 20065, 'message': u'余额不足'}
 
 
 def card_bind_list(request):
@@ -250,9 +285,9 @@ def card_bind_list(request):
                 card = Card.objects.filter(user=user, no__startswith=car['card_top'], no__endswith=car['card_last']).first()
                 if card:
                     yee_card_no_list.append(card.no)
-            if yee_card_no_list:
-                Card.objects.filter(user=user, no__in=yee_card_no_list).update(is_bind_yee=True)
-                Card.objects.filter(user=user).exclude(no__in=yee_card_no_list).update(is_bind_yee=False)
+            # if yee_card_no_list:
+            #     Card.objects.filter(user=user, no__in=yee_card_no_list).update(is_bind_yee=True)
+            #     Card.objects.filter(user=user).exclude(no__in=yee_card_no_list).update(is_bind_yee=False)
 
         # 查询块钱已经绑定卡
         res = KuaiShortPay().query_bind_new(user.id)
@@ -268,11 +303,18 @@ def card_bind_list(request):
                 Card.objects.filter(user=user).exclude(no__in=kuai_card_no_list).update(is_bind_kuai=False)
 
         card_list = []
-        cards = Card.objects.filter(Q(user=user), Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True)).select_related('bank').order_by('-last_update')
+        cards = Card.objects.exclude(bank__name__in=[u'邮政储蓄银行', u'上海银行', u'北京银行']).filter(Q(user=user),
+                    Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True)).select_related('bank').order_by('-last_update')
         if cards.exists():
             # 排序
             bank_list = [card.bank.gate_id for card in cards]
             cards = sorted(cards, key=lambda x: bank_list.index(x.bank.gate_id))
+
+            # 获取提现费率配置
+            fee_misc = WithdrawFee()
+            fee_config = fee_misc.get_withdraw_fee_config()
+            min_amount = fee_config.get('min_amount')
+            max_amount = fee_config.get('max_amount')
 
             for card in cards:
                 base_dict = {
@@ -301,14 +343,32 @@ def card_bind_list(request):
                     if card.bank.kuai_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.kuai_limit))
 
+                # bank_limit = util.handle_withdraw_limit(card.bank.withdraw_limit)  # 银行提现最大最小限额
+                # bank_min_amount = bank_limit.get('bank_min_amount')
+                # bank_max_amount = bank_limit.get('bank_max_amount')
+                # bank_limit_amount = {
+                #     "bank_min_amount": bank_min_amount if bank_min_amount and bank_min_amount < min_amount else min_amount,
+                #     "bank_max_amount": bank_max_amount if bank_max_amount and bank_max_amount < max_amount else max_amount
+                # }
+                # tmp.update(bank_limit_amount)
                 if tmp:
+                    # 更新提现信息
+                    bank_limit = util.handle_withdraw_limit(card.bank.withdraw_limit)  # 银行提现最大最小限额
+                    bank_min_amount = bank_limit.get('bank_min_amount')
+                    bank_max_amount = bank_limit.get('bank_max_amount')
+                    bank_limit_amount = {
+                        "bank_min_amount": bank_min_amount if bank_min_amount and bank_min_amount < min_amount else min_amount,
+                        "bank_max_amount": bank_max_amount if bank_max_amount and bank_max_amount < max_amount else max_amount
+                    }
+                    tmp.update(bank_limit_amount)
+
                     card_list.append(tmp)
 
         return {"ret_code": 0, "message": "ok", "cards": card_list}
 
     except Exception, e:
         logger.error(e.message)
-        return {"ret_code": 20031, "message": "请添加银行卡"}
+        return {"ret_code": 20031, "message": u"请求失败"}
 
 
 def _unbind_huifu(request, card, bank=None):
@@ -373,15 +433,24 @@ def bind_pay_deposit(request):
 
     card_no = request.DATA.get("card_no", "").strip()
     gate_id = request.DATA.get("gate_id", "").strip()
+    input_phone = request.DATA.get("phone", "").strip()
+    device_type = split_ua(request)['device_type']
+    ip = util.get_client_ip(request)
+
+    user = request.user
+    if not user.wanglibaouserprofile.id_is_valid:
+        return {"ret_code":20111, "message":"请先进行实名认证"}
 
     if not card_no and not gate_id:
         return {"ret_code": 20001, 'message': '信息输入不完整'}
+
+    if len(card_no) > 10 and (not input_phone or not gate_id):
+        return {"ret_code":20112, 'message':'信息输入不完整'}
 
     if gate_id:
         bank = Bank.objects.filter(gate_id=gate_id).first()
 
     else:
-        user = request.user
         if len(card_no) == 10:
             card = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
         else:
@@ -397,19 +466,47 @@ def bind_pay_deposit(request):
     amount = request.DATA.get('amount', '').strip()
     try:
         amount = float(amount)
+        amount = util.fmt_two_amount(amount)
         if amount < 0:
             raise ValueError()
     except:
         return {"ret_code": 20114, 'message': '金额格式错误'}
 
     if bank.channel == 'huifu':
-        return HuifuShortPay().pre_pay(request)
+        result = HuifuShortPay().pre_pay(request)
+
+        # if result['ret_code'] == 0:
+        #     try:
+        #         # 处理第三方用户充值回调
+        #         CoopRegister(request).process_for_recharge(request.user)
+        #     except Exception, e:
+        #         logger.error(e)
+
+        return result
 
     elif bank.channel == 'yeepay':
-        return YeeShortPay().pre_pay(request)
+        result = YeeShortPay().pre_pay(request)
+
+        # if result['ret_code'] == 0:
+            # try:
+            #     # 处理第三方用户充值回调
+            #     CoopRegister(request).process_for_recharge(request.user)
+            # except Exception, e:
+            #     logger.error(e)
+
+        return result
 
     elif bank.channel == 'kuaipay':
-        return KuaiShortPay().pre_pay(request)
+        result = KuaiShortPay().pre_pay(user, amount, card_no, input_phone, gate_id, device_type, ip, request)
+
+        # if result['ret_code'] == 0:
+        #     try:
+        #         # 处理第三方用户充值回调
+        #         CoopRegister(request).process_for_recharge(request.user)
+        #     except Exception, e:
+        #         logger.error(e)
+
+        return result
 
     else:
         return {"ret_code": 20004, "message": "请选择支付渠道"}
@@ -423,7 +520,13 @@ def bind_pay_dynnum(request):
     user = request.user
     order_id = request.DATA.get("order_id", "").strip()
     token = request.DATA.get("token", "").strip()
+    vcode = request.DATA.get("vcode", "").strip()
+    input_phone = request.DATA.get("phone", "").strip()
+    device = split_ua(request)
+    ip = util.get_client_ip(request)
 
+    if not order_id.isdigit():
+        return {"ret_code":20125, "message":"订单号错误"}
     if not order_id or not token:
         return {"ret_code": 20120, "message": "请重新获取验证码"}
 
@@ -439,18 +542,26 @@ def bind_pay_dynnum(request):
         card = Card.objects.filter(no=card_no, user=user).first()
 
     if not card:
-        return {"ret_code": 20002, "message": "银行卡未绑定"}
+        res = {"ret_code": 20002, "message": "银行卡未绑定"}
 
     if card.bank.channel == 'huifu':
-        return {'ret_code': 20003, 'message': '汇付天下请选择快捷支付渠道'}
+        res = {'ret_code': 20003, 'message': '汇付天下请选择快捷支付渠道'}
 
     elif card.bank.channel == 'yeepay':
-        return YeeShortPay().dynnum_bind_pay(request)
+        res = YeeShortPay().dynnum_bind_pay(request)
 
     elif card.bank.channel == 'kuaipay':
-        return KuaiShortPay().dynnum_bind_pay(request)
+        res = KuaiShortPay().dynnum_bind_pay(user, vcode, order_id, token, input_phone, device, ip, request)
     else:
-        return {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
+        res = {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
+
+    if res.get('ret_code') == 0:
+        try:
+            CoopRegister(request).process_for_binding_card(user)
+        except:
+            logger.exception('bind_card_callback_failed for %s' % str(user))
+
+    return res
 
 
 def yee_callback(request):

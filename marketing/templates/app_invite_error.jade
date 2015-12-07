@@ -1,0 +1,33 @@
+- load formatters
+doctype html
+html(style="background:#fff")
+  head
+    title 邀请好友
+    meta(charset="utf-8")
+    meta(name="format-detection" content="telephone=no,email=no")
+    meta(content="telephone=no,email=no" ,name="format-detection")
+    meta(content="yes" ,name="apple-mobile-web-app-capable")
+    meta(name="viewport", content="initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, user-scalable=no")
+    link(href="/static/styles/mobile_activity/app_invite_result.css", rel="stylesheet")
+  body
+    input(type='hidden', name='url', value='{{url}}')
+    .invite-result-head.invite-error-head
+      img(src='/static/imgs/mobile_activity/app_invite/regist_alreay.png').ive-sign-icon
+      .ive-sign-text 您已注册网利宝
+      .ive-sign-phone 已是注册用户 {{phone}}
+    .tly-mod
+      .invite-result-touch
+        .invite-result-btn 分享赚取更多红包
+      .invite-error-erweima
+        .invite-mask-cont
+          .invite-mask-dec 长按二维码<br>关注网利宝微信公众号
+          img(src='/static/imgs/mobile_activity/app_invite/server_erweima.jpg').invite-mask-erweima
+          .invite-mask-dec-bot 您身边的互联网私人银行
+    img(src='/static/imgs/mobile_activity/app_invite/grep_logo.png').invite-bottom-logo
+
+    .invite-mask-share
+      .invite-icon-warp
+        img(src='/static/imgs/mobile_activity/app_invite/share_sign.png').invite-mask-icon
+      .invite-mask-dec 给好友发送580元新手红包<br>每一位好友成功领取<br>你最高可获得80元红包奖励<br>还能坐享好友投资收益
+    script(src="/static/src/mobile/lib/weixin/wx.js")
+    script(data-init='invite_error', src="/static/scripts/mobile_activity/dist/app_invite.js?v=20151124")

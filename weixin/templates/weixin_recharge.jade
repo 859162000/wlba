@@ -24,7 +24,7 @@ html
             .bank-txt-left 银行卡号
             input(type="tel", name="card_no", placeholder="输入银行卡号", disabled)#card-val.bank-input
             .bank-txt-right
-              img(src="/static/imgs/mobile/recharge/select_bank.png")
+              img(src="/static/imgs/mobile/recharge/select_bank.png?v=2015121")
             .bank-list-nav
               .bank-list-pub.bank-add 添加新卡
               .bank-list-pub.bank-card 已绑银行卡
@@ -73,6 +73,7 @@ html
               em.balance-sign
             a(href="/weixin/list/") 立即购买
     section.recharge-bank
-    script(data-init="recharge", src="/static/scripts/mobile/dist/mobile.js")
+    include include/confirm
+    script(data-init="recharge", src="/static/scripts/mobile/dist/mobile.js?v=20151120")
 
 

@@ -1,0 +1,54 @@
+- load formatters
+doctype html
+html(style="background:#fff")
+  head
+    title 邀请好友
+    meta(charset="utf-8")
+    meta(name="format-detection" content="telephone=no,email=no")
+    meta(content="telephone=no,email=no" ,name="format-detection")
+    meta(content="yes" ,name="apple-mobile-web-app-capable")
+    meta(name="viewport", content="initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, user-scalable=no")
+    link(href="/static/styles/mobile_activity/app_invite_result.css", rel="stylesheet")
+
+  body
+    input(type='hidden', name='url', value='{{url}}')
+    .invite-result-head
+      img(src='/static/imgs/mobile_activity/app_invite/regist_sucess.png').ive-sign-icon
+      .ive-sign-text 恭喜您注册成功
+      .ive-sign-phone 红包已放入 {{phone}}
+    .tly-mod
+      .invite-result-redpack
+        ul
+          mixin list(name, hight, date, num, aound)
+            li
+              .redpack-dec
+                .redpack-dec-name=name
+                .redpack-dec-hight=hight
+                .redpack-dec-date=date
+              .repack-amout
+                .redpack-amout-num=num
+                span.redpack-amout-aound=aound
+          +list('注册赠送20元红包', '100元起用', '有效期自领取日起3天内有效', '20元', '限P2P理财使用')
+          +list('首次充值送100元红包', '5000元起用', '有效期自领取日起7天内有效', '100元', '限P2P理财使用')
+          +list('首次投资最高送180元红包', '12000元起用', '有效期自领取日起15天内有效', '180元', '限P2P理财使用')
+
+      .invite-result-touch
+        a(href='/activity/experience/mobile/').invite-result-btn.invite-result-mg 立即体验
+        .invite-result-btn.invite-result-btn-dom 获取更多
+
+      .invite-result-erweima
+        img(src='/static/imgs/mobile_activity/app_invite/erweima.png').erweima-dom
+
+    .invite-result-mask
+      .invite-mask-cont
+        .invite-mask-dec 长按二维码<br>关注网利宝微信公众号
+        img(src='/static/imgs/mobile_activity/app_invite/server_erweima.jpg').invite-mask-erweima
+        .invite-mask-dec-bot 您身边的互联网私人银行
+        .mask-close
+    .invite-mask-share
+      .invite-icon-warp
+        img(src='/static/imgs/mobile_activity/app_invite/share_sign.png').invite-mask-icon
+      .invite-mask-dec 给好友发送580元新手红包<br>每一位好友成功领取<br>你最高可获得80元红包奖励<br>还能坐享好友投资收益
+    img(src='/static/imgs/mobile_activity/app_invite/grep_logo.png').invite-bottom-logo
+    script(src="/static/src/mobile/lib/weixin/wx.js")
+    script(data-init='invite_success', src="/static/scripts/mobile_activity/dist/app_invite.js?v=20151124")

@@ -28,7 +28,7 @@ from wanglibao_p2p.views import PurchaseP2P, PurchaseP2PMobile, P2PProductViewSe
 from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView, BankCardDelView, 
                             BankListAPIView, YeePayAppPayView, YeePayAppPayCallbackView,
                             YeePayAppPayCompleteView, WithdrawAPIView, FEEAPIView,
-                            BindPayView, BindPayCallbackView, BindPayQueryView,
+                            BindPayView, KuaiShortPayCallbackView, BindPayQueryView,
                             BindPayDelView, BindPayDynNumView, TradeRecordAPIView,
                             BindCardQueryView, UnbindCardView, BindPayDepositView, BindPayDynnumNewView,
                             BankCardDelNewView, BankListNewAPIView, YeeShortPayCallbackView)
@@ -44,17 +44,18 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
                             DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView,
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
-                            CaptchaValidationCodeView, TopsOfEaringView)
+                            CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI, InnerSysSaveChannel,
+                            InnerSysSendSMS, InnerSysValidateID)
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
 
 from marketing.play_list import InvestmentHistory
 from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView,
-                             ThousandRedPackCountAPIView, ThunderActivityRewardCounter, ThunderAwardAPIView,)
+                             ThousandRedPackCountAPIView, ThunderActivityRewardCounter, QuickApplyerAPIView, GiftOwnerInfoAPIView, RewardDistributeAPIView)
 from weixin.views import P2PListWeixin
-from wanglibao_account.views import ThirdOrdeApiView, ThirdOrderQueryApiView
+from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
-
+from wanglibao_reward.views import WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView
 
 router = DefaultRouter()
 
@@ -91,7 +92,7 @@ router.register(r'pre_orders', PreOrderViewSet)
 router.register(r'feedbacks', FeedbackViewSet)
 router.register(r'trade_info', TradeInfoViewSet)
 #router.register(r'banners', BannerViewSet)
-router.register(r'users', UserViewSet)
+# router.register(r'users', UserViewSet)
 
 router.register(r'daily_income', DailyIncomeViewSet)
 
@@ -116,6 +117,7 @@ urlpatterns = patterns(
 
     url(r'^test/register/(?P<phone>\d{11})/$', TestSendRegisterValidationCodeView.as_view()),
 
+    url(r'^user_login/$', UserHasLoginAPI.as_view()),
     url(r'^user_exists/(?P<identifier>[\w\.@]+)/$', UserExisting.as_view()),
     url(r'^profile/', ProfileView.as_view()),
     url(r'^total_income', TotalIncome.as_view()),
@@ -175,7 +177,7 @@ urlpatterns = patterns(
     url(r'^pay/cnp/yee/callback/$', YeeShortPayCallbackView.as_view(), name="yee-deposit-callback"),
 
     #url(r'^pay/deposit/callback/$', KuaiPayCallbackView.as_view(), name="kuai-deposit-callback"),
-    url(r'^pay/deposit/callback/$', BindPayCallbackView.as_view(), name="kuai-deposit-callback"),
+    url(r'^pay/deposit/callback/$', csrf_exempt(KuaiShortPayCallbackView.as_view()), name="kuai-deposit-callback"),
 
 
     url(r'^client_update/$', ClientUpdateAPIView.as_view()),
@@ -207,13 +209,18 @@ urlpatterns = patterns(
     url(r'^address/(?P<address_id>\d+)/$', AddressGetAPIView.as_view()),
     url(r'^address/delete/$', AddressDeleteAPIView.as_view()),
 
-    url(r'^repayment/$', RepaymentAPIView.as_view()),
+    url(r'^repayment/$', RepaymentAPIView.as_view()),  # 后台还款中标的接口
 
     url(r'^gesture/add/$', GestureAddView.as_view()),
     url(r'^gesture/update/$', GestureUpdateView.as_view()),
     url(r'^gesture/isenabled/$', GestureIsEnabledView.as_view()),
     url(r'^xunlei/8/check/$', GuestCheckView.as_view()),
     url(r'^trade_pwd/$', TradePasswordView.as_view()),
+    url(r'^wechat/attention/(?P<phone>\d+)/$', WeixinRedPackView.as_view()),
+    url(r'^distribute//(?P<phone>\d+)/$', DistributeRedpackView.as_view()),
+    url(r'^inner/send_sms/$', InnerSysSendSMS.as_view()),
+    url(r'^inner/validate_id/$', InnerSysValidateID.as_view()),
+    url(r'^inner/save_channel/$', InnerSysSaveChannel.as_view()),
 )
 
 urlpatterns += patterns('',
@@ -242,6 +249,12 @@ urlpatterns += patterns(
     url(r'^xunlei/award/records/$', 'marketing.views.ajax_get_activity_record'), #add by Yihen@20150825, 迅雷-网利宝 抽奖活动记录
     url(r'^celebrate/awards/$', 'marketing.views.celebrate_ajax'), #add by Yihen@20150828, 网利宝一周年大转盘活动
     url(r'^award/common_september/$', 'marketing.views.september_award_ajax'), #add by Yihen@20150907,9月PC常规
+    url(r'^quick/applyer/$', QuickApplyerAPIView.as_view()), #add by yihen@20151102 ,快速贷款人申请填写
+    url(r'^gift/owner/$', GiftOwnerInfoAPIView.as_view()), #add by yihen@20151102 ,聚橙网领取门票接口
+    url(r'^weixin/share/has_gift/$', WeixinShareTools.as_view()), #add by yihen@20151102 ,聚橙网领取门票接口
+    url(r'^weixin/distribute/redpack/$', RewardDistributeAPIView.as_view()), #add by yihen@20151102 ,聚橙网领取门票接口
+    url(r'^activity/reward/$', DistributeRewardAPIView.as_view()),
+
 )
 
 
@@ -254,7 +267,7 @@ urlpatterns += patterns(
 # 第三方渠道业务接口
 urlpatterns += patterns(
     '',
-    url(r'^coop/order/receive/(?P<channel_code>[a-z0-9A-Z_]*)/$', ThirdOrdeApiView.as_view()),
+    url(r'^coop/order/receive/(?P<channel_code>[a-z0-9A-Z_]*)/$', ThirdOrderApiView.as_view()),
     url(r'^coop/order/query/$', ThirdOrderQueryApiView.as_view()),
 )
 
@@ -262,4 +275,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^activity/joinInfo/$', UserActivityStatusAPIView.as_view()),
+)
+
+# 理财金接口
+urlpatterns += patterns(
+    '',
+    url(r'^experience/', include('experience_gold.urls')),
 )

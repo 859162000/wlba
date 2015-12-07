@@ -1,12 +1,14 @@
 # coding=utf-8
+
 import logging
 from django.conf import settings
 import requests
 from django.db.models import Sum
 from wanglibao_account.models import IdVerification, UserSource
 from wanglibao_redpack.models import Income
+from . import get_verify_result
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("wanglibao_account")
 
 
 def broker_invite_list(user):
@@ -52,12 +54,21 @@ def invite_earning(user):
 
 
 def set_source(request, user):
-    keyword = request.session.get("promo_source_word", "")
-    if keyword:
-        us = UserSource()
-        us.user = user
-        us.keyword = keyword
-        us.save()
+    # Add try-except by hb on 2015-11-20
+    try:
+        keyword = request.session.get("promo_source_keyword", "")
+        if keyword:
+            source = UserSource.objects.create(
+                user=user,
+                action='register',
+                keyword=keyword,
+                site_name=request.session.get("promo_source_site_name", ""),
+                website=request.session.get("promo_source_website", "")
+            )
+            logger.debug("注册行为已经完成，SEM统计参量入库,object value:{0}".format(source))
+    except Exception, reason:
+        logger.debug("SEM关键词统计，入库报异常；reason:%s" % reason)
+
 
 class TestIDVerifyBackEnd(object):
 
@@ -126,18 +137,49 @@ class ProductionIDVerifyBackEnd(object):
             logger.error("Failed to send request: status: %d, ", response.status_code)
             return None, "Failed to send request"
 
-        parsed_response = parse_id_verify_response(response.text)
-        result = bool(parsed_response['response_code'] == 100)
-
-        if not result:
-            logger.error("Failed to validate: %s" % response.text)
-
-        verify_result = True
-        if parsed_response['result'] != u'一致':
+        try:
             verify_result = False
-            logger.info("Identity not consistent %s" % response.text)
+            parsed_response = parse_id_verify_response(response.text)
+            if parsed_response['result'] == u'一致':
+                verify_result = True
+        except StopIteration:
+            pass
+
+        # result = bool(parsed_response['response_code'] == 100)
+        #
+        # if not result:
+        #     logger.error("Failed to validate: %s" % response.text)
+        #
+        # verify_result = True
+        # if parsed_response['result'] != u'一致':
+        #     verify_result = False
+        #     logger.info("Identity not consistent %s" % response.text)
 
         record = IdVerification(id_number=id_number, name=name, is_valid=verify_result)
+        record.save()
+
+        return record, None
+
+
+class ProductionIDVerifyV2BackEnd(object):
+
+    @classmethod
+    def verify(cls, name, id_number):
+        records = IdVerification.objects.filter(id_number=id_number, name=name)
+        if records.exists():
+            record = records.first()
+            return record, None
+
+        verify_result, id_photo = get_verify_result(id_number, name)
+
+        record = IdVerification()
+        record.id_number = id_number
+        record.name = name
+        record.is_valid = verify_result
+
+        if verify_result and id_photo:
+            record.id_photo.save('%s.jpg' % id_number, id_photo, save=True)
+
         record.save()
 
         return record, None

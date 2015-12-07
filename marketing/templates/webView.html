@@ -6,84 +6,14 @@
 		h1 { color:steelblue; font-size:24px; margin-top:24px; }
 		button { margin:0 3px 10px; font-size:12px; }
 		.logLine { border-bottom:1px solid #ccc; padding:4px 2px; font-family:courier; font-size:11px; }
+        #refresh,#buttons{background: #ccc; margin: 10px;padding: 10px}
 	</style>
 </head><body>
-	<h1>WebViewJavascriptBridge Demo</h1>
-    <button id="buttons">Send message to ObjC</button>
-    <button id="testObjcCallback">Fire testObjcCallback</button>
-	<script>
+	<h1>WebViewJavascriptBridge Demo </h1>
+    <div id='buttons'>testObjcCallback</div>
 
-    //api url
-    // https://github.com/marcuswestin/WebViewJavascriptBridge
+    <div id='refresh'>refresh</div>
+    <div id='log'></div>
+	<script src="/static/scripts/component/webview.js"></script>
 
-	window.onerror = function(err) {
-		log('window.onerror: ' + err)
-	}
-	function connectWebViewJavascriptBridge(callback) {
-		if (window.WebViewJavascriptBridge) {
-			callback(WebViewJavascriptBridge)
-		} else {
-			document.addEventListener('WebViewJavascriptBridgeReady', function() {
-				callback(WebViewJavascriptBridge)
-			}, false)
-		}
-	}
-	
-	connectWebViewJavascriptBridge(function(bridge) {
-		var uniqueId = 1
-		function log(message, data) {
-			var log = document.getElementById('log')
-			var el = document.createElement('div')
-			el.className = 'logLine'
-			el.innerHTML = uniqueId++ + '. ' + message + ':<br/>' + JSON.stringify(data)
-			if (log.children.length) { log.insertBefore(el, log.children[0]) }
-			else { log.appendChild(el) }
-		}
-
-        //初始化bridge
-		bridge.init(function(message, responseCallback) {
-			log('JS got a message', message)
-			var data = { 'Javascript Responds':'Wee!' }
-			log('JS responding with', data)
-			responseCallback(data)
-		})
-
-        // webview 侦听 testJavascriptHandler，ios触发testJavascriptHandler之后，webview响应该事件
-		//bridge.registerHandler('shareData', function(data, responseCallback) {
-		//	var responseData = { title:'this title', content: 'content' };
-			//push data
-        //    responseCallback(responseData)
-		//})
-
-        // push data for client
-        bridge.callHandler('firstLoadWebView',{ name: 'activity-name'}, function() {
-            log('succees push productid ');
-        });
-
-        var button = document.getElementById('buttons');
-		button.onclick = function(e) {
-			e.preventDefault()
-			var data = 'Hello from JS button';
-			log('JS sending message', data)
-			bridge.send(data, function(responseData) {
-				log('JS got response', responseData)
-			})
-		}
-
-        log('user-Agent', navigator.userAgent);
-		document.body.appendChild(document.createElement('br'))
-
-		var callbackButton = document.getElementById('testObjcCallback');
-		callbackButton.onclick = function(e) {
-			e.preventDefault()
-			log('JS calling handler "testObjcCallback"');
-
-            //webview调用 客户端事件
-			bridge.callHandler('jumpToManageMoney',  function(response) {
-				log('JS got response', response);
-			})
-		}
-	})
-	</script>
-	<div id='buttons'></div> <div id='log'></div>
 </body></html>

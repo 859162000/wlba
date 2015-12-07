@@ -1,0 +1,227 @@
+- load formatters
+doctype html
+html(style="background:#7c37e8")
+  head
+    title 感恩节
+    include include/app_head
+  body
+    .thanks-banner
+      img(src='/static/imgs/mobile_activity/app_thanksgiv/app-thanksgiving.jpg')
+    .thanks-main
+      p 单笔投资满5000元可参与抽奖一次，100%中奖
+      p 投资额越高中大奖几率越高。百万豪礼抽疯了，多投多抽不要停！
+    .thanks-jiang#lottery
+      table(border="0", cellpadding="0", cellspacing="0")
+        - csrf_token
+        tbody
+          tr
+            td.lottery-unit.lottery-unit-0
+              .active1
+              img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang1.png')
+            td.lottery-unit.lottery-unit-1
+              .active1
+              img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang2.png')
+            td.lottery-unit.lottery-unit-2
+              .active1
+              img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang3.png')
+            td.lottery-unit.lottery-unit-3
+              .active1
+              img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang4.png')
+            td.lottery-unit.lottery-unit-4
+              .active1
+              img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang5.png')
+          tr
+            td.lottery-unit.lottery-unit-13
+              .active1
+              img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang14.png')
+            td(colspan="3", rowspan="2").appprize-mingdan
+              if user.is_authenticated
+                a(href='javascript:void(0);').appjiang-button.appjiang-button2 立即抽奖
+              else
+                a(href='/weixin/login/?next=/activity/app_thanksgiv/').appjiang-button.appjiang-button1 立即抽奖
+              .appjiang-ri
+                if user.is_authenticated
+                  p
+                    |你还有
+                    span
+                    |次抽奖机会
+                else
+                  p
+                a(href='/weixin/list/', target="_blank").jiang-a 投资赢抽奖机会>>
+            td.lottery-unit.lottery-unit-5
+              .active1
+              img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang6.png')
+          tr
+            td.lottery-unit.lottery-unit-12
+              .active1
+              img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang13.png')
+            td.lottery-unit.lottery-unit-6
+              .active1
+              img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang7.png')
+          tr
+            td.lottery-unit.lottery-unit-11
+              .active1
+              img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang12.png')
+            td.lottery-unit.lottery-unit-10
+              .active1
+              img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang10.png')
+            td.lottery-unit.lottery-unit-9
+              .active1
+              img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang9.png')
+            td.lottery-unit.lottery-unit-8
+              .active1
+              img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang11.png')
+            td.lottery-unit.lottery-unit-7
+              .active1
+              img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang8.png')
+    .app-jiangshow
+      p
+        |恭喜您！获得
+        span#app-jiangli0
+    .appprize-le
+      h2 中奖用户名单
+      .setp-list
+        .long-p
+          p 恭喜130******77获得
+            span 感恩节10元现金红包
+          p 恭喜130******61获得
+            span 感恩节10元现金红包
+          p 恭喜130******51获得
+            span 霍尼韦尔空气净化器
+          p 恭喜158******71获得
+            span 感恩节10元现金红包
+          p 恭喜132******81获得
+            span 感恩节10元现金红包
+          p 恭喜130******31获得
+            span 感恩节1%加息券
+          p 恭喜132******71获得
+            span 感恩节1%加息券
+          p 恭喜130******71获得
+            span 感恩节1.5%加息券
+          p 恭喜130******71获得
+            span 感恩节1%加息券
+          p 恭喜132******71获得
+            span 感恩节1%加息券
+          p 恭喜130******66获得
+            span 感恩节1%加息券
+          p 恭喜158******71获得
+            span 霍尼韦尔空气净化器
+          p 恭喜133******45获得
+            span 感恩节1.5%加息券
+          p 恭喜130******44获得
+            span 感恩节1.5%加息券
+    .thanks-main
+      p 说明：新老用户均可参与，虚拟奖品抽完立即发放。
+      p
+        |立即
+        a(href='javascript:void(0);').title1-a 查看活动规则>>
+    .app-thanks-giv
+      h6 【加息券和红包规则】
+      ul
+        li 1、红包和加息券有效期：自领取日起10天内有效；
+        li 2、购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+        li 3、投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+        li 4、使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+        li 5、使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+    .thanks-yellow
+      img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiangyellow.png')
+    .yellow-main
+      .thanks-main1
+        p 活动期间，累计投资额最高的前30名，
+        p 可获得相对应的排名奖励。
+      .app-jiangtop
+        .app-jiangtop1
+          img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jixiang.png').app-jiangtop2
+          .jiangtop-left
+          .jiangtop-moddile
+            .jiangtitle
+              h1 第1名
+              p IPad Pro32G一台
+            img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang-pin1.png')
+          .jiangtop-right
+        .app-jiangtop1
+          .jiangtop-left
+            .jiangtitle
+              h1 第2~3名
+              p IPhone6s16G
+            img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang-pin2.png')
+          .jiangtop-moddile
+            .jiangtitle
+              h1 第4~6名
+              p 霍尼韦尔空气净化器
+            img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang-pin3.png')
+          .jiangtop-right
+            .jiangtitle
+              h1 第5~7名
+              p beats头戴式耳机
+            img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang-pin4.png')
+        .app-jiangtop1
+          .jiangtop-left
+            .jiangtitle
+              h1 第8~10名
+              p 苏泊尔厨具7件套
+            img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang-pin5.png')
+          .jiangtop-moddile
+            .jiangtitle
+              h1 第11~20名
+              p 车行者车载记录仪
+            img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang-pin6.png')
+          .jiangtop-right
+            .jiangtitle
+              h1 第21~30名
+              p 365谷五常大米
+            img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiang-pin7.png')
+      a(href='/weixin/list/', target="_blank").app-thanks 立即投资
+      .thanks-main1
+        p 说明：在活动结束后7个工作日内会有客服人员与您联系，奖品展示图片仅作参考，实际款式以通知为准。所有实物奖品均会在12月15日前发放完毕。
+        p
+          |立即
+          a(href='javascript:void(0);').title1-a 查看活动规则>>
+      .app-thanks-giv1
+        h6 【加息券和红包规则】
+        ul
+          li 1、红包和加息券有效期：自领取日起10天内有效；
+          li 2、购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+          li 3、投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+          li 4、使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+          li 5、使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+    .yellow1-main
+      .thanks-main1
+        p 单笔投资100元~4999元用户不用愁，100%获得阳光普照大奖，所有奖品随机发送。全民大福利，根本停不下来！
+      img(src='/static/imgs/mobile_activity/app_thanksgiv/app-jiangduo.png?v=123')
+      .appjiang-ri
+        if user.is_authenticated
+          p
+            |你还有
+            span
+            |次抽奖机会
+        else
+          p
+        if user.is_authenticated
+          a(href='javascript:void(0);').app-thanksbu.app-thanksbu2 领取奖品
+          .apphongxi
+            h5
+              |恭喜您！获得
+              span#thankgi-thanks2
+        else
+          a(href='/weixin/login/?next=/activity/app_thanksgiv/').app-thanksbu.app-thanksbu1 领取奖品
+        a(href='/weixin/list/', target="_blank").jiang-a 投资赢抽奖机会>>
+      .app-thanks-guizhe
+        h6 【加息券和红包规则】
+          ul
+            li 1、红包和加息券有效期：自领取日起10天内有效；
+            li 2、购标时，选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
+            li 3、投资一个项目时，加息券不可叠加使用，也不可与红包叠加使用；
+            li 4、使用加息券投资了一个项目，之后对同一项目再投资，无论投多少次，加息额度不变，也不用再次使用加息券；
+            li 5、使用加息券得到的加息收益，按照还款计划与基本利息一起发放，非在起息日时发放。
+          h6 【活动规则】
+          ul
+            li 1、活动时间：2015年11月23日-11月29日；
+            li 2、感恩节活动期间，新老用户不限渠道均可参与活动，单笔投资5000元即可获得大富翁转盘抽奖一次，多抽多送上不封顶；
+            li 3、用户需在用户中心里完善收货信息，中得实物奖品的用户，在活动结束后7个工作日内会有客服MM与您联系，
+              br
+              |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;15个工作日内完成奖品发放，请保持手机畅通；
+            li 4、所有奖品不兑换现金，不可替换。中得优惠券得用户，使用方法请登录品牌官网联系查询；
+            li 5、活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+            li 6、网利宝对此活动享有最终解释权。
+    script(src="/static/scripts/mobile_activity/app_thanksgivi.js?v=2066333")

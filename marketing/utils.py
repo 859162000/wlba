@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pytz
+import time
 from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -15,6 +16,7 @@ import logging
 
 logger = logging.getLogger('p2p')
 
+
 def get_channel_record(channel_code):
     record = Channels.objects.filter(code=channel_code).first()
     # if record:
@@ -24,9 +26,11 @@ def get_channel_record(channel_code):
     #         record = None
     return record
 
+
 def get_user_channel_record(user_id):
     channel = Channels.objects.filter(introducedby__user_id=user_id).first()
     return channel
+
 
 def set_promo_user(request, user, invitecode=''):
     if not user:
@@ -47,6 +51,7 @@ def set_promo_user(request, user, invitecode=''):
 
         request.session[settings.PROMO_TOKEN_QUERY_STRING] = None
 
+
 def save_introducedBy(user, introduced_by_user, product_id=0):
     record = IntroducedBy()
     record.introduced_by = introduced_by_user
@@ -58,17 +63,26 @@ def save_introducedBy(user, introduced_by_user, product_id=0):
     record.product_id=product_id
     record.save()
 
+
 def save_introducedBy_channel(user, channel):
     record = IntroducedBy()
     record.channel = channel
     record.user = user
     record.save()
 
-def log_clientinfo(device, atype, user_id=0, amount=0):
+
+def log_clientinfo(device, atype, user_id=0, order_id=0, amount=0):
+    # fix@chenweibi, add order_id
     if type(device) != dict:
         return
-    if "device_type" not in device or device['device_type'] == "pc":
+
+    if "device_type" not in device:
         return
+
+    app_version = device.get('app_version', '')
+    if device['device_type'] == "pc" and app_version != 'wlb_h5':
+        return
+
     ci = ClientData()
     if atype=="register": action='R'
     elif atype=="login": action='L'
@@ -79,6 +93,7 @@ def log_clientinfo(device, atype, user_id=0, amount=0):
 
     if device['device_type'] == "android":
         device['model'] = device['model'][:-8]
+
     ci.version = device['app_version']
     ci.userdevice = device['model']
     ci.os = device['device_type']
@@ -88,6 +103,7 @@ def log_clientinfo(device, atype, user_id=0, amount=0):
     ci.user_id = user_id
     ci.amount = amount
     ci.action = action
+    ci.order_id = order_id
     ci.save()
 
 
@@ -111,6 +127,8 @@ def local_to_utc(source_date, source_time='min'):
         source_time = source_date.min.time()
     elif source_time == 'max':
         source_time = source_date.max.time()
+    else:
+        source_time = source_date.time()
 
     # convert to utc time
     new = time_zone.localize(datetime.combine(source_date, source_time))

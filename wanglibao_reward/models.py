@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from wanglibao_activity.models import Activity
 from wanglibao_redpack.models import RedPackEvent
-
+from marketing.models import Reward
 class WanglibaoActivityGiftGlobalCfg(models.Model):
     """
         活动发奖全局配置
@@ -83,7 +83,7 @@ class WanglibaoUserGift(models.Model):
 
 class WanglibaoActivityGiftOrder(models.Model):
     valid_amount = models.IntegerField(default=0, verbose_name=u'此次分享剩余的抽奖机会')
-    order_id = models.IntegerField(default=0, verbose_name=u'订单号')
+    order_id = models.IntegerField(default=0, unique=True, verbose_name=u'订单号')
 
     class Meta:
         verbose_name = u'订单分享表'
@@ -98,7 +98,29 @@ class WanglibaoWeixinRelative(models.Model):
     nick_name = models.CharField(max_length=128, default=u'', verbose_name=u'微信昵称')
     openid = models.CharField(max_length=128, default=u'', verbose_name=u'')
     img = models.CharField(max_length=255, default=u'', verbose_name=u'微信头像')
+    phone_for_fencai = models.CharField(max_length=32, default="", verbose_name=u'电话号码')
 
     class Meta:
         verbose_name = u'微信网利宝关系表'
         verbose_name_plural = u'微信网利宝关系表'
+
+class WanglibaoActivityReward(models.Model):
+    order_id =models.IntegerField(default=0, verbose_name=u'订单ID')
+    user = models.ForeignKey(User, related_name='reward_owner', default=None, blank=True, null=True, on_delete=models.SET_NULL)
+    redpack_event = models.ForeignKey(RedPackEvent, default=None, blank=True, null=True, verbose_name=u'用户获得的红包')
+    reward = models.ForeignKey(Reward, default=None, blank=True, null=True, verbose_name=u'用户获得的奖品')
+    activity = models.CharField(default='', max_length=256, verbose_name=u'活动名称')
+    when_dist = models.IntegerField(default=0, verbose_name=u'什么时候发奖')
+    left_times = models.IntegerField(default=0, verbose_name=u'还剩几次抽奖机会')
+    join_times = models.IntegerField(default=0, verbose_name=u'用户参与抽奖的次数')
+    channel = models.CharField(default='', null=False, max_length=64, verbose_name=u'来自哪个渠道')
+    has_sent = models.BooleanField(default=False, null=False, verbose_name=u'奖品已经发送')
+    p2p_amount = models.IntegerField(default=0, null=False, verbose_name=u'购买的标量')
+    create_at = models.DateTimeField(auto_now_add=True, verbose_name=u'创建时间')
+    update_at = models.DateTimeField(auto_now_add=True, verbose_name=u'更新时间')
+
+    class Meta:
+        unique_together = (("user", "create_at"),)  # 联合唯一索引
+        verbose_name = u'发奖记录表'
+        verbose_name_plural = u'发奖记录表'
+

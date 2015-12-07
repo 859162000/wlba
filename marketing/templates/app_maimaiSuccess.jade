@@ -6,8 +6,8 @@ html(style='background: #2679b7')
     include include/app_head
   body
     .maimai-success
-      .maimai-title 成功领取
-      .maimai-money 价值120元红包
+      .maimai-title
+      .maimai-money
 
       .maimai-animate
         .maimai-at-head
@@ -36,9 +36,7 @@ html(style='background: #2679b7')
       .maimai-animate-sign 左右滑动查看说明
       .maimai-url-warp
         a(href='/activity/maimai_rules/').maimai-for-rule 红包详细规则>>
-      .maimai-use-btn 立即使用
+      a(href='javascript:void(0)').maimai-use-btn 立即使用
     script(src="/static/scripts/mobile/swiper/swiper.min.js")
-    script.
-      var mySwiper = new Swiper('.swiper-container', {
-        pagination: '.swiper-pagination-maimai',
-      })
+    script(data-init='success', src="/static/scripts/mobile_activity/dist/maimai.js?v=2015110621")
+

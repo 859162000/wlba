@@ -5,11 +5,12 @@ html
   head
     include include/weixin_head.jade
   body
+    include include/app_down
     .logo
-      img(src='/static/imgs/mobile/list/logo.jpg')
+      img(src='/static/imgs/mobile/list/logo.png')
       if user.is_authenticated
         .head-right
-          a(href="/accounts/logout?next=/weixin/list/") 退出登录
+          a(href="/weixin/account/") 我的账户
       else
         .head-right
           a(href="/weixin/regist/") 免费注册
@@ -29,9 +30,16 @@ html
         .swiper-pagination
     .list-body#list-body
       include include/ajax/ajax_list.jade
-    include include/weixin_loading
+    .list-load
+      .load-body
+        p.load-text 点击查看更多项目
+        p.load
+
+
+    - with 'list' as state
     include include/weixin_footer
-    include include/app_down
+    - endwith
+
     script(src="/static/scripts/mobile/swiper/swiper.min.js")
-    script(data-init='list', src="/static/scripts/mobile/dist/mobile.js?v=20150707")
+    script(data-init='list', src="/static/scripts/mobile/dist/mobile.js?v=20151202")
     script(type="text/javascript", name="baidu-tc-cerfication", data-appid="6548828", src="https://ss0.bdstatic.com/9_QWf8Sm1A5BphGlnYG/cloudaapi/lightapp.js")

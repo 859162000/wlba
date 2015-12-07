@@ -43,6 +43,8 @@ class PayMockGenerator(object):
             bank.name = name
             bank.gate_id = gate_id
             bank.code = code
+            bank.kuai_code = code
+            bank.channel = 'kuaipay'
             bank.logo = '/static/images/bank-logos/' + logo + '.png'
             bank.limit = u"""
                 <table>

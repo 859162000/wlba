@@ -1,12 +1,12 @@
 # encoding: utf-8
 import datetime
+from wanglibao_redpack.models import RedPackEvent
+from wanglibao_redpack import backends as redpack_backends
 import logging
 import json
 import math
-import copy
-import hashlib
+import random
 import urllib
-import urlparse
 
 from random import randint
 from decimal import Decimal
@@ -20,22 +20,20 @@ from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from django.core.urlresolvers import reverse
-from django.core import serializers
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed, Http404, HttpResponseRedirect
 from django.shortcuts import resolve_url, render_to_response
 from django.utils import timezone
-from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView, View
 from registration.views import RegistrationView
-from rest_framework import status
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from forms import EmailOrPhoneRegisterForm, ResetPasswordGetIdentifierForm, IdVerificationForm, verify_captcha
-from marketing.models import IntroducedBy, Reward, RewardRecord
+from forms import EmailOrPhoneRegisterForm, LoginAuthenticationNoCaptchaForm,\
+    ResetPasswordGetIdentifierForm, IdVerificationForm, TokenSecretSignAuthenticationForm
+from marketing.models import IntroducedBy, Channels, Reward, RewardRecord
 from marketing.utils import set_promo_user, local_to_utc, get_channel_record
 from marketing import tools
 from wanglibao_sms.tasks import send_messages
@@ -43,17 +41,15 @@ from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from wanglibao import settings
 from wanglibao_account.cooperation import CoopRegister
-from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract
+from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract, update_coop_order
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account import third_login, backends as account_backends, message as inside_message
-from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning, \
     AmortizationRecord, P2PProductContract, P2PProduct, P2PEquityJiuxian, AutomaticPlan, AutomaticManager
-from wanglibao_p2p.tasks import automatic_trade
 from wanglibao_pay.models import Card, Bank, PayInfo
-from wanglibao_sms.utils import validate_validation_code, send_validation_code
+from wanglibao_sms.utils import validate_validation_code, send_validation_code, send_rand_pass
 from wanglibao_account.models import VerifyCounter, Binding, Message, UserAddress
 from rest_framework.permissions import IsAuthenticated
 from wanglibao.const import ErrorNumber
@@ -67,18 +63,26 @@ from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityRecord
 from aes import Crypt_Aes
+from misc.models import Misc
+from wanglibao_activity.models import Activity
+from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from wanglibao.settings import AMORIZATION_AES_KEY
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_account.utils import get_client_ip
 from wanglibao_account.models import UserThreeOrder
-from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes, hex2bin
 import requests
+from wanglibao_margin.models import MarginRecord
+from experience_gold.models import ExperienceAmortization, ExperienceEventRecord, ExperienceProduct
+from wanglibao_pay.fee import WithdrawFee
+from wanglibao_account import utils as account_utils
+from wanglibao_rest.common import DecryptParmsAPIView
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
 
+
 class RegisterView(RegistrationView):
-    template_name = "register_test.jade"
+    template_name = "register_new.jade"
     form_class = EmailOrPhoneRegisterForm
 
     def register(self, request, **cleaned_data):
@@ -144,6 +148,115 @@ class RegisterView(RegistrationView):
         return context
 
 
+# AES 加解密
+# from Crypto.Cipher import AES
+# import base64
+#
+# BS = AES.block_size
+# pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
+# unpad = lambda s: s[0:-ord(s[-1])]
+#
+# result = 'bAqCOs5Ox10kmcKKn7n47lDqljwBmKbHAtuWf0pkLqu7XbNaJOCXVEVJ9PRqIC5LiiB0MsbvjOEU+eIFWRSmaw=='
+# all_the_text1 = base64.b64decode(result)
+#
+# cipher2 = AES.new(b'https://jrjia.cn')
+# decrypted2 = unpad(cipher2.decrypt(all_the_text1))
+# ecrypted = cipher2.encrypt(pad('{"src":"jrjia","reqId":"31646132","prodId":"1","mobile":"11811849324"}'))
+# sign = base64.b64encode(ecrypted)
+
+
+class JrjiaAutoRegisterView(APIView):
+    """
+    author： Zhoudong
+    金融加 自动注册， 保存到 introduceby 表里。 之前需要添加金融加渠道。
+    """
+
+    permission_classes = ()
+
+    def get_context_data(self):
+
+        # key = 'jrjia.cn'
+        key = 'https://jrjia.cn'
+        src = self.request.GET.get('src', None)
+        sign = self.request.GET.get('sign', None)
+
+        if ' ' in sign:
+            sign = sign.replace(' ', '+')
+
+        if src == 'jrjia':
+            # 解密
+            import base64
+            from Crypto.Cipher import AES
+
+            decryptor = AES.new(key, AES.MODE_ECB)
+            try:
+                base_str = base64.b64decode(sign)
+                sign_args = eval(decryptor.decrypt(base_str).split('}')[0] + '}')
+            except Exception, e:
+                sign = urllib.unquote(sign)
+                base_str = base64.b64decode(sign)
+                sign_args = eval(decryptor.decrypt(base_str).split('}')[0] + '}')
+
+            context = {}
+            context.update(sign_args)
+
+            host = self.request.get_host()
+            try:
+                next_url = 'http://' + '{}/p2p/detail/{}/'.format(host, sign_args['prodId'])
+            except Exception, e:
+                print 'args error: {}'.format(e)
+                next_url = '/'
+            context.update({
+                'next': next_url
+            })
+
+            return context
+
+    def get(self, request):
+        """
+        :param request:
+        :return:
+        """
+        args = self.get_context_data()
+        redirect_url = args['next']
+
+        try:
+            source = args['src']
+            password = str(random.randint(100000, 999999))
+            identifier = args['mobile']
+            req_id = args['reqId']
+            nickname = identifier
+        except Exception, e:
+            print 'args get error: {}'.format(e)
+            return HttpResponseRedirect(redirect_url)
+
+        # 用户已存在， 返回
+        if User.objects.filter(wanglibaouserprofile__phone=identifier).first():
+            return HttpResponseRedirect(redirect_url)
+
+        user = create_user(identifier, password, nickname)
+        channel = Channels.objects.get(code=source)
+
+        # 当用户不存在， 添加到binding 表（自带reqId）
+        Binding.objects.get_or_create(user=user, btype=source, bid=req_id)
+        # 邀请关系表
+        IntroducedBy.objects.get_or_create(user=user, channel=channel)
+
+        auth_user = authenticate(identifier=identifier, password=password)
+        auth.login(request, auth_user)
+
+        device = utils.split_ua(request)
+        if not AntiForAllClient(request).anti_delay_callback_time(user.id, device):
+            tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
+
+        # send message for the user.
+        send_rand_pass(identifier, password)
+
+        account_backends.set_source(request, auth_user)
+
+        return HttpResponseRedirect(redirect_url)
+
+
 class EmailSentView(TemplateView):
     template_name = 'email_sent.jade'
 
@@ -180,11 +293,13 @@ def password_change(request,
     # TODO find a proper status value and return error message
     return HttpResponse(status=400)
 
-class PasswordCheckView(APIView):
+class PasswordCheckView(DecryptParmsAPIView):
     permission_classes = ()
     def post(self, request, **kwargs):
-        identifier = request.DATA.get("identifier", "")
-        password = request.DATA.get("password", "")
+        identifier = self.params.get("identifier", "")
+        password = self.params.get("password", "")
+        # identifier = request.DATA.get("identifier", "")
+        # password = request.DATA.get("password", "")
 
         if not identifier or not password:
             return Response({"token":False, "message":u"登录密码错误，请重试"})
@@ -348,10 +463,8 @@ class AccountHome(TemplateView):
         user = self.request.user
 
         mode = 'p2p'
-        fund_hold_info = []
-        if self.request.path.rstrip('/').split('/')[-1] == 'fund':
-            mode = 'fund'
-            fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)
+        if self.request.path.rstrip('/').split('/')[-1] == 'experience':
+            mode = 'experience'
 
         p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
             u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
@@ -361,16 +474,6 @@ class AccountHome(TemplateView):
         earnings = Earning.objects.select_related('product__activity').filter(user=user)
 
         earning_map = {earning.product_id: earning for earning in earnings}
-        result = []
-        for equity in p2p_equities:
-            obj = {"equity": equity}
-            if earning_map.get(equity.product_id):
-                obj["earning"] = earning_map.get(equity.product_id)
-
-            result.append(obj)
-
-        amortizations = ProductAmortization.objects.filter(product__in=[e.product for e in p2p_equities],
-                                                           settled=False).prefetch_related("subs")
 
         unpayed_principle = 0
         for equity in p2p_equities:
@@ -379,39 +482,55 @@ class AccountHome(TemplateView):
 
         p2p_total_asset = user.margin.margin + user.margin.freeze + user.margin.withdrawing + unpayed_principle
 
-        p2p_product_amortization = {}
-        for amortization in amortizations:
-            if not amortization.product_id in p2p_product_amortization:
-                p2p_product_amortization[amortization.product_id] = amortization
-
         total_asset = p2p_total_asset
 
-        #xunlei_vip = Binding.objects.filter(user=user).filter(btype='xunlei').first()
+        result = []
+
+        if mode == 'p2p':
+            for equity in p2p_equities:
+                obj = {"equity": equity}
+                if earning_map.get(equity.product_id):
+                    obj["earning"] = earning_map.get(equity.product_id)
+
+                result.append(obj)
+
+        now = timezone.now()
+        experience_amount = 0
+        paid_interest = unpaid_interest = 0
+
+        experience_record = ExperienceEventRecord.objects.filter(user=user, apply=False, event__invalid=False)\
+            .filter(event__available_at__lt=now, event__unavailable_at__gt=now).aggregate(Sum('event__amount'))
+        if experience_record.get('event__amount__sum'):
+            experience_amount = experience_record.get('event__amount__sum')
+
+        experience_amortization = ExperienceAmortization.objects.filter(user=user).select_related('product')
+        if experience_amortization:
+            paid_interest = reduce(lambda x, y: x + y,
+                                   [e.interest for e in experience_amortization if e.settled is True], 0)
+            unpaid_interest = reduce(lambda x, y: x + y,
+                                     [e.interest for e in experience_amortization if e.settled is False], 0)
+
+        total_experience_amount = float(experience_amount) + float(paid_interest) + float(unpaid_interest)
+        experience_account = {
+            'total_experience_amount': total_experience_amount,
+            'experience_amount': float(experience_amount),
+            'paid_interest': paid_interest,
+            'unpaid_interest': unpaid_interest
+        }
 
         return {
             'message': message,
             'result': result,
-            'amortizations': amortizations,
-            'p2p_product_amortization': p2p_product_amortization,
             'p2p_unpay_principle': unpayed_principle,
             'margin_withdrawing': user.margin.withdrawing,
             'margin_freeze': user.margin.freeze,
-            'fund_hold_info': fund_hold_info,
             'p2p_total_asset': p2p_total_asset,
             'total_asset': total_asset,
             'mode': mode,
+            'experience_amortization': experience_amortization,
+            'experience_account': experience_account,
             'announcements': AnnouncementAccounts,
         }
-
-    # def post(self, request):
-    #     select_type = request.POST.get('select_type')
-    #     equity_jiuxian = P2PEquityJiuxian.objects.filter(user=self.request.user)\
-    #         .filter(product__category=u'酒仙众筹标').first()
-    #     if equity_jiuxian:
-    #         equity_jiuxian.selected_type = select_type
-    #         equity_jiuxian.selected_at = timezone.now()
-    #         equity_jiuxian.save()
-    #     return HttpResponseRedirect(reverse('accounts_address'))
 
 
 class AccountHomeAPIView(APIView):
@@ -425,6 +544,9 @@ class AccountHomeAPIView(APIView):
         ]).select_related('product')
 
         start_utc = local_to_utc(datetime.datetime.now(), 'min')
+        yesterday_start = start_utc - datetime.timedelta(days=1)
+        yesterday_end = yesterday_start + datetime.timedelta(hours=23, minutes=59, seconds=59)
+
         unpayed_principle = 0
         p2p_total_paid_interest = 0
         p2p_total_unpaid_interest = 0
@@ -434,6 +556,7 @@ class AccountHomeAPIView(APIView):
         p2p_total_paid_coupon_interest = 0
         p2p_total_unpaid_coupon_interest = 0
         p2p_income_today = 0
+        p2p_income_yesterday = 0
         for equity in p2p_equities:
             if equity.confirm:
                 unpayed_principle += equity.unpaid_principal  # 待收本金
@@ -445,10 +568,18 @@ class AccountHomeAPIView(APIView):
                 p2p_total_unpaid_coupon_interest += equity.unpaid_coupon_interest  # 加息券待收总收益
                 p2p_activity_interest += equity.activity_interest  # 活动收益
 
-                if equity.confirm_at >= start_utc:
-                    p2p_income_today += equity.pre_paid_interest
-                    p2p_income_today += equity.pre_paid_coupon_interest
-                    p2p_income_today += equity.activity_interest
+                # if equity.confirm_at >= start_utc:
+                #     p2p_income_today += equity.pre_paid_interest
+                #     p2p_income_today += equity.pre_paid_coupon_interest
+                #     p2p_income_today += equity.activity_interest
+
+        # 利息入账, 罚息入账, 活动赠送, 邀请赠送, 加息存入, 佣佣金存入, 全民淘金
+        p2p_income_yesterday_other = MarginRecord.objects.filter(user=user)\
+            .filter(create_time__gt=yesterday_start, create_time__lte=yesterday_end)\
+            .filter(catalog__in=[u'利息入账', u'罚息入账', u'加息存入', u'佣金存入', u'全民淘金']).aggregate(Sum('amount'))
+
+        if p2p_income_yesterday_other.get('amount__sum'):
+            p2p_income_yesterday += p2p_income_yesterday_other.get('amount__sum')
 
         p2p_margin = user.margin.margin  # P2P余额
         p2p_freeze = user.margin.freeze  # P2P投资中冻结金额
@@ -487,6 +618,7 @@ class AccountHomeAPIView(APIView):
             'fund_income_month': float(fund_income_month),  # 基金近一月收益(元)
 
             'p2p_income_today': float(p2p_income_today),  # 今日收益
+            'p2p_income_yesterday': float(p2p_income_yesterday),  # 昨日到账收益
 
         }
 
@@ -996,13 +1128,16 @@ class AccountBankCard(TemplateView):
         }
 
 
-class ResetPasswordAPI(APIView):
+class ResetPasswordAPI(DecryptParmsAPIView):
     permission_classes = ()
 
     def post(self, request):
-        password = request.DATA.get('new_password', "")
-        identifier = request.DATA.get('identifier', "")
-        validate_code = request.DATA.get('validate_code', "")
+        password = self.params.get('new_password', "")
+        identifier = self.params.get('identifier', "")
+        validate_code = self.params.get('validate_code', "")
+        # password = request.DATA.get('new_password', "")
+        # identifier = request.DATA.get('identifier', "")
+        # validate_code = request.DATA.get('validate_code', "")
 
         identifier = identifier.strip()
         password = password.strip()
@@ -1028,7 +1163,9 @@ class ResetPasswordAPI(APIView):
             user.save()
             return Response({'ret_code': 0, 'message': u'修改成功'})
         else:
-            return Response({'ret_code': 30004, 'message': u'验证码验证失败'})
+            # Modify by hb on 2015-12-02
+            #return Response({'ret_code': 30004, 'message': u'验证码验证失败'})
+            return Response({'ret_code': 30004, 'message': message})
 
 
 class Third_login(View):
@@ -1045,14 +1182,17 @@ class Third_login_back(APIView):
         return Response(result)
 
 
-class ChangePasswordAPIView(APIView):
+
+class ChangePasswordAPIView(DecryptParmsAPIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        new_password = request.DATA.get('new_password', "").strip()
-        old_password = request.DATA.get('old_password', "").strip()
-        validate_code = request.DATA.get('validate_code', "").strip()
-
+        # new_password = request.DATA.get('new_password', "").strip()
+        # old_password = request.DATA.get('old_password', "").strip()
+        # validate_code = request.DATA.get('validate_code', "").strip()
+        new_password = self.params.get('new_password', "").strip()
+        old_password = self.params.get('old_password', "").strip()
+        validate_code = self.params.get('validate_code', "").strip()
         if not old_password or not new_password or not validate_code:
             return Response({'ret_code': 30041, 'message': u'信息输入不完整'})
 
@@ -1065,7 +1205,9 @@ class ChangePasswordAPIView(APIView):
 
         status, message = validate_validation_code(user.wanglibaouserprofile.phone, validate_code)
         if status != 200:
-            return Response({"ret_code": 30044, "message": u"验证码输入错误"})
+            # Modify by hb 0n 2015-12-02
+            #return Response({"ret_code": 30044, "message": u"验证码输入错误"})
+            return Response({"ret_code": 30044, "message": message})
 
         user.set_password(new_password)
         user.save()
@@ -1137,7 +1279,7 @@ class MessageDetailAPIView(APIView):
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
-def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
+def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
     def messenger(message, user=None):
         res = dict()
         if user:
@@ -1163,6 +1305,35 @@ def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
             return HttpResponseForbidden('not valid ajax request')
     else:
         return HttpResponseNotAllowed(["GET"])
+
+from django import forms
+from django.shortcuts import redirect
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def ajax_token_login(request, authentication_form=TokenSecretSignAuthenticationForm):
+    def messenger(message, user=None):
+        res = dict()
+        if user:
+            res['nick_name'] = user.wanglibaouserprofile.nick_name
+        res['message'] = message
+        return json.dumps(res)
+
+    if request.method == "POST":
+
+        if request.is_ajax():
+            form = authentication_form(request, data=request.POST)
+            if form.is_valid():
+                auth_login(request, form.get_user())
+                request.session.set_expiry(1800)
+                return HttpResponse(messenger('done', user=request.user))
+            else:
+                return HttpResponseForbidden(messenger(form.errors))
+        else:
+            return HttpResponseForbidden('not valid ajax request')
+    else:
+        return HttpResponseNotAllowed(["GET"])
+
 
 
 @sensitive_post_parameters()
@@ -1190,12 +1361,12 @@ def ajax_register(request):
             raise Exception("生成随机密码的长度有误")
 
         random_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        password = list()
+        password = ""
         index = 0
         while index < length:
-            password.append(random_list[randint(0,len(random_list))])
+            password += str(random_list[randint(0,len(random_list)-1)])
             index += 1
-        return str(random_list)
+        return str(password)
 
     if request.method == "POST":
         channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")    #add by Yihen@20150818; reason:第三方渠道处理的时候，会更改request中的信息
@@ -1230,11 +1401,42 @@ def ajax_register(request):
                     tools.register_ok.apply_async(kwargs={"user_id": user.id, "device": device})
 
                 #  add by Yihen@20151020, 用户填写手机号不写密码即可完成注册, 给用户发短信,不要放到register_ok中去，保持原功能向前兼容
-                if request.POST.get('IGNORE_PWD', '') and not password:
+                if request.POST.get('IGNORE_PWD', ''):
                     send_messages.apply_async(kwargs={
                         "phones": [identifier, ],
-                        "messages": [password, ]
+                        "messages": [u'登录账户是：'+identifier+u'登录密码:'+password, ]
                     })
+
+                    if channel == 'maimai':
+                        dt = timezone.datetime.now()
+                        redpack_event = RedPackEvent.objects.filter(invalid=False, name='maimai_redpack', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                        if redpack_event:
+                            redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+
+                    if channel == 'weixin_attention':
+                        key = 'share_redpack'
+                        shareconfig = Misc.objects.filter(key=key).first()
+                        if shareconfig:
+                            shareconfig = json.loads(shareconfig.value)
+                            if type(shareconfig) == dict:
+                                is_attention = shareconfig.get('is_attention', '')
+                                attention_code = shareconfig.get('attention_code', '')
+
+                        if is_attention:
+                            activity = Activity.objects.filter(code=attention_code).first()
+                            redpack = WanglibaoUserGift.objects.create(
+                                identity=identifier,
+                                activity=activity,
+                                rules=WanglibaoActivityGift.objects.first(),#随机初始化一个值
+                                type=1,
+                                valid=0
+                            )
+                            dt = timezone.datetime.now()
+                            redpack_event = RedPackEvent.objects.filter(invalid=False, name='weixin_atten_interest', give_start_at__lte=dt, give_end_at__gte=dt).first()
+                            if redpack_event:
+                                redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
+                                redpack.valid = 1
+                                redpack.save()
 
                 account_backends.set_source(request, auth_user)
 
@@ -1689,7 +1891,7 @@ class AddressGetAPIView(APIView):
             return Response({'ret_code': 3002, 'message': u'ID错误'})
 
         try:
-            address = UserAddress.objects.get(id=address_id)
+            address = UserAddress.objects.get(id=address_id, user=request.user)
             if address:
                 address = {
                     'address_id': address.id,
@@ -1828,7 +2030,7 @@ class AutomaticApiView(APIView):
             return Response({'ret_code': 3009, 'message': u'用户设置自动投标计划失败'})
 
 
-class ThirdOrdeApiView(APIView):
+class ThirdOrderApiView(APIView):
     """
     记录来自第三方回调的订单状态
     """
@@ -1884,27 +2086,7 @@ class ThirdOrdeApiView(APIView):
                 msg = params.get('message', '')
                 json_response = self.check_params(request_no, result_code, msg)
                 if not json_response:
-                    order = UserThreeOrder.objects.filter(request_no=request_no, order_on__code=channel_code).first()
-                    if order:
-                        if not order.answer_at:
-                            order.request_no = request_no
-                            order.result_code = result_code
-                            order.msg = msg
-                            order.answer_at = datetime.datetime.now()
-                            if channel_code == 'zgdx':
-                                msg_id = params.get('msg_id', '')
-                                if len(msg_id) <= UserThreeOrder._meta.get_field_by_name('extra')[0].max_length:
-                                    order.extra = msg_id
-                            order.save()
-                        json_response = {
-                            'ret_code': 1,
-                            'message': 'sucess'
-                        }
-                    else:
-                        json_response = {
-                            'ret_code': 20002,
-                            'message': u'订单流水号不存在'
-                        }
+                    json_response = update_coop_order(request_no, channel_code, result_code, msg)
             else:
                 json_response = {
                     'ret_code': 10001,
@@ -1933,21 +2115,15 @@ class ThirdOrderQueryApiView(APIView):
         params = getattr(request, request.method)
         channel_code = params.get('promo_token', None)
         if channel_code:
-            url = getattr(settings, '%s_QUERY_URL' % channel_code.upper(), None)
-            if url:
-                order_query_fun = getattr(self, '%s_order_query' % channel_code.lower(), None)
-                if order_query_fun:
-                    json_response = order_query_fun(url, params)
-                else:
-                    json_response = {
-                        'ret_code': 50001,
-                        'message': 'api error'
-                    }
+            order_query_fun = getattr(account_utils, '%s_order_query' % channel_code.lower(), None)
+            if order_query_fun:
+                json_response = order_query_fun(params)
             else:
                 json_response = {
-                    'ret_code': 10001,
-                    'message': u'无效渠道码'
+                    'ret_code': 50001,
+                    'message': 'api error'
                 }
+                logger.error('%s_order_query not found' % channel_code.lower())
         else:
             json_response = {
                 'ret_code': 10002,
@@ -1956,49 +2132,4 @@ class ThirdOrderQueryApiView(APIView):
 
         return HttpResponse(json.dumps(json_response), content_type='application/json')
 
-    def zgdx_order_query(self, url, params):
-        """
-        中国电信业务查询
-        """
-        coop_key = getattr(settings, 'ZGDX_KEY', None)
-        iv = getattr(settings, 'ZGDX_IV', None)
-        if coop_key or iv:
-            code = {
-                'phone_id': params.get('phone_id', ''),
-                'service_code': params.get('service_code', ''),
-                'request_no': params.get('request_no', ''),
-                'start_time': params.get('start_time', ''),
-                'end_time': params.get('end_time', ''),
-            }
-            encrypt_str = encrypt_mode_cbc(json.dumps(code), coop_key, iv)
-            params = {
-                'code': encodeBytes(hex2bin(encrypt_str)),
-                'partner_no': params.get('partner_no', None),
-            }
-            try:
-                res = requests.post(url, data=json.dumps(params)).json()
-                res_code = res.get('result_code', '')
-                result = res.get('result', '')
-                if res_code == '00000':
-                    json_response = {
-                        'ret_code': 0,
-                        'message': 'sucess',
-                        'data': result
-                    }
-                else:
-                    json_response = {
-                        'ret_code': res_code,
-                        'message': result
-                    }
-            except Exception, e:
-                json_response = {
-                    'ret_code': 50001,
-                    'message': 'api error'
-                }
-        else:
-            json_response = {
-                'ret_code': 50001,
-                'message': 'api error'
-            }
 
-        return json_response

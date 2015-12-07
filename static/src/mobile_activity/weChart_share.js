@@ -47,6 +47,40 @@ var weChatShare = (function(org){
         })
 })(org);
 
+org.ui = (function(){
+    var lib = {
+        _alert: function(txt, callback){
+            if(document.getElementById("alert-cont")){
+                document.getElementById("alertTxt").innerHTML = txt;
+                document.getElementById("popubMask").style.display = "block";
+                document.getElementById("alert-cont").style.display = "block";
+            }else{
+                var shield = document.createElement("DIV");
+                shield.id = "popubMask";
+                shield.style.cssText="position:absolute;bottom:0;top:0;width:100%; background:rgba(0,0,0,0.5); z-index:1000000;";
+                var alertFram = document.createElement("DIV");
+                alertFram.id="alert-cont";
+                alertFram.style.cssText="position:absolute; top:35%;left:50%; width:14rem; margin:-2.75rem 0 0 -7rem; background:#fafafa; border-radius:.3rem;z-index:1000001;";
+                strHtml = "<div id='alertTxt' class='popub-txt' style='color:#333;font-size: .9rem!important;padding: 1.25rem .75rem;'>"+txt+"</div>";
+                strHtml += " <div class='popub-footer' style='width: 100%;padding: .5rem 0;font-size: .9rem;text-align: center;color: #4391da;border-top: 1px solid #d8d8d8;border-bottom-left-radius: .25rem;border-bottom-right-radius: .25rem;'>确认</div>";
+                alertFram.innerHTML = strHtml;
+                document.body.appendChild(alertFram);
+                document.body.appendChild(shield);
+
+                $('.popub-footer').on('click',function(){
+                    alertFram.style.display = "none";
+                    shield.style.display = "none";
+                    callback && callback();
+                })
+            }
+            document.body.onselectstart = function(){return false;};
+        }
+    }
+
+    return {
+        alert : lib._alert,
+    }
+})();
 org.weChatStart = (function(org){
     var lib = {
         init:function(){
@@ -55,9 +89,13 @@ org.weChatStart = (function(org){
         _fetchPack: function(){
             var
                 $submit  = $('.webpack-btn-red'),
-                phoneVal = $('input[name=phone]');
+                phoneVal = $('input[name=phone]'),
+                postDo = false;
 
             $submit.on('click', function(){
+                if(postDo) return
+
+                $submit.html('领取中...');
                 var ops = {
                     phone : phoneVal.val() * 1,
                     activity : $(this).attr('data-activity'),
@@ -66,8 +104,34 @@ org.weChatStart = (function(org){
                 }
 
                 if(!lib._checkPhone(ops.phone)) return ;
+                org.ajax({
+                    url: '/api/weixin/share/has_gift/',
+                    type: 'POST',
 
-                window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
+                    data: {
+                        'openid': ops.openid,
+                        'phone_num': ops.phone,
+                        'order_id': ops.orderid
+                    },
+                    dataType : 'json',
+                    success: function(data){
+                        if(data.has_gift == 'true'){
+                            org.ui.alert(data.message, function(){
+                                window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
+                            });
+                        }else if(data.has_gift == 'false'){
+                            window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
+                        }
+                    },
+                    error: function(data){
+                        org.ui.alert(data)
+                    },
+                    complete: function(){
+                        postDo = false;
+                        $submit.html('立即开奖');
+                    }
+                })
+
             });
 
         },
@@ -87,7 +151,11 @@ org.weChatStart = (function(org){
 org.weChatDetail = (function(org){
     var lib = {
         init:function(){
-            console.log('detail')
+            /*window.onload = function(){
+              if($('#amount').attr('data-hasgift') == 'true'){
+                 org.ui.alert('您已经领取过礼物了！');
+              }
+            }*/
         },
     }
     return {
@@ -98,7 +166,7 @@ org.weChatDetail = (function(org){
 org.weChatEnd = (function(org){
     var lib = {
         init:function(){
-            console.log('end')
+
         },
     }
     return {

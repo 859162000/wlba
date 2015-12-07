@@ -415,6 +415,17 @@ class UserAmortization(models.Model):
     def __unicode__(self):
         return u'分期%s 用户%s 本金%s 利息%s' % (self.product_amortization, self.user, self.principal, self.interest)
 
+    @property
+    def last_settlement_status(self):
+        re = AmortizationRecord.objects.filter(amortization__product=self.product_amortization.product.id)\
+            .values('catalog').order_by('-created_time').first()
+        catalog = re.get('catalog') if re and re.get('catalog') else ''
+        return catalog
+
+    @property
+    def terms(self):
+        return ProductAmortization.objects.filter(product=self.product_amortization.product).count()
+
 
 class P2PEquity(models.Model):
     version = IntegerVersionField()
@@ -599,6 +610,16 @@ class P2PEquity(models.Model):
     @property
     def amortizations(self):
         return self.__get_amortizations()
+
+    @property
+    def lasted_settlement_time(self):
+        amortizations = UserAmortization.objects.filter(user=self.user, settled=True,
+                                                        product_amortization__product=self.product)\
+            .order_by('-settlement_time').first()
+        if amortizations and amortizations.settlement_time:
+            return amortizations.settlement_time
+        else:
+            return None
 
     def __get_amortizations(self, settled_only=False):
         if settled_only:

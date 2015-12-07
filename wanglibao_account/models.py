@@ -9,6 +9,8 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.utils import timezone
 from marketing.models import Channels, ChannelsNew
+from . import get_verify_result
+from wanglibao.settings import ENV, ENV_PRODUCTION
 
 
 class IdVerification(models.Model):
@@ -19,11 +21,26 @@ class IdVerification(models.Model):
 
     id_number = models.CharField(u"身份证号", max_length=128, db_index=True)
     name = models.CharField(u"姓名", max_length=32)
+    id_photo = models.ImageField(upload_to='id_photos', blank=True, null=True,
+                                 verbose_name=u'身份证头像')
     is_valid = models.BooleanField(u"验证结果", default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    update_verify = models.BooleanField(u"更新", default=False)
 
     class Meta:
         verbose_name_plural = u'实名认证记录'
+
+    def save(self, *args, **kwargs):
+        if self.update_verify is True:
+            self.update_verify = False
+
+            # 只有生产环境可以实现更新操作
+            if ENV == ENV_PRODUCTION:
+                verify_result, _id_photo = get_verify_result(self.id_number, self.name)
+                if verify_result and _id_photo:
+                    self.id_photo.save('%s.jpg' % self.id_number, _id_photo, save=True)
+
+        super(IdVerification, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return u'%s %s %d' % (self.id_number, self.name, self.is_valid)
@@ -61,15 +78,25 @@ class UserPushId(models.Model):
         verbose_name_plural = u"推送信息"
 
 
+class UserThreeOrder(models.Model):
+    user = models.ForeignKey(User)
+    order_on = models.ForeignKey(Channels, verbose_name=u'订单渠道')
+    request_no = models.CharField(unique=True, max_length=30, verbose_name=u'请求流水号')
+    result_code = models.CharField(max_length=30, blank=True, verbose_name=u'受理结果编码')
+    msg = models.CharField(max_length=255, blank=True, verbose_name=u'受理结果消息')
+    created_at = models.DateTimeField(u'下单时间', auto_now_add=True)
+    answer_at = models.DateTimeField(u'订单反馈时间', blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = u'渠道订单记录'
+
+
 class Binding(models.Model):
     """
         third app bind table, store bind related
     """
     user = models.ForeignKey(User)
-    btype = models.CharField(max_length=20, choices=(
-        ('xunlei', 'xunlei'),
-        ('yiruite', 'yiruite')
-    ), verbose_name=u"类型")
+    btype = models.CharField(max_length=20, verbose_name=u"类型")
     bid = models.CharField(max_length=50, db_index=True, verbose_name=u"第三方用户id")
     bname = models.CharField(max_length=50, blank=True, verbose_name=u"第三方用户昵称")
     gender = models.CharField(max_length=5, choices=(
@@ -82,6 +109,7 @@ class Binding(models.Model):
     access_token = models.CharField(max_length=100, blank=True)
     refresh_token = models.CharField(max_length=100, blank=True)
     created_at = models.BigIntegerField(default=0, verbose_name=u'创建时间', blank=True)
+    detect_callback = models.BooleanField(u"回调检测", default=False)
 
     class Meta:
         verbose_name_plural = u'用户绑定'
@@ -173,9 +201,26 @@ class UserSource(models.Model):
     """
         user baidu source keyword
     """
+    ACTION = (
+        ('default', u'浏览'),
+        ('register', u'注册'),
+        ('login', u'登录'),
+        ('verified', u'实名'),
+        ('binding', u'绑卡'),
+        ('pay', u'充值'),
+        ('buy', u'投资'),
+        ('withdraw', u'提现')
+    )
     user = models.ForeignKey(User)
-    keyword = models.CharField(max_length=50, verbose_name=u"收件人姓名", blank=False, null=False, default="")
+    keyword = models.CharField(max_length=50, verbose_name=u"收件人姓名", blank=False, null=False,  default='')
+    website = models.CharField(max_length=256, verbose_name=u'网站地址', blank=False, null=False,  default='')
+    site_name = models.CharField(max_length=64, verbose_name=u'站点名称', blank=True, null=False, default='')
+    action = models.CharField(max_length=128, verbose_name=u'此次访问的最终行为', choices=ACTION, null=False, default='default')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=u"入库时间", default='2015-01-01 00:00:00')
 
+    class Meta:
+        verbose_name_plural = u'关键词统计'
+        verbose_name = u'关键词统计'
 
 class UserPhoneBook(models.Model):
     user = models.ForeignKey(User)
@@ -188,15 +233,6 @@ class UserPhoneBook(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, default=timezone.now())
     is_used = models.BooleanField(default=True, verbose_name=u"是否使用", help_text=u'默认使用')
 
-
-class UserThreeOrder(models.Model):
-    user = models.ForeignKey(User)
-    order_on = models.ForeignKey(Channels, verbose_name=u'订单渠道')
-    request_no = models.CharField(unique=True, max_length=30, verbose_name=u'请求流水号')
-    result_code = models.CharField(max_length=30, blank=True, verbose_name=u'受理结果编码')
-    msg = models.CharField(max_length=255, blank=True, verbose_name=u'受理结果消息')
-    created_at = models.DateTimeField(u'下单时间', auto_now_add=True)
-    answer_at = models.DateTimeField(u'订单反馈时间', blank=True, null=True)
 
 #发给所有人
 def send_public_message(sender, instance, **kwargs):

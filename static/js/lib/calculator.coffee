@@ -31,28 +31,103 @@ define ['jquery'], ($)->
       else
         $(earning_element).text "0.0"
 
-
-  $('input[data-role=fee-calculator]').keyup (e)->
-    target = $(e.target)
-    rate = target.attr 'data-rate'
+  $('input[data-role=fee-calculator]').keyup ()->
+    $('#withdraw-input').next().text('')
+  $('input[data-role=fee-calculator]').blur ()->
+    checkInput()
+  $('#card-select').change ()->
+    checkInput()
+  checkInput = () ->
+    target = $('#withdraw-input')
     amount = target.val()
-    fee_element = target.attr 'data-target-fee'
+    $.ajax
+      url: "/api/fee/"
+      type: "POST"
+      data: {
+        card_id : $('select[name=card_id]').val()
+        amount : amount
+      }
+    .success (xhr)->
+      target.next().text('')
+      $('#card-select').next().text('')
+      if xhr.ret_code > 0
+        if xhr.ret_code == 30137
+          $('#card-select').next().text(xhr.message)
+        else
+          target.next().text(xhr.message)
+          target.next().show()
+      else
+        if (xhr.fee == 0) && (xhr.management_fee == 0 || xhr.management_fee == '0')
+          strs = 0
+        else if(xhr.fee != 0 && (xhr.management_fee == 0 || xhr.management_fee == '0'))
+          strs = xhr.fee
+        else
+          strs = xhr.fee+'+'+xhr.management_fee
+
+        $('#poundage').text(strs)
+        $('#actual-amount').text(xhr.actual_amount)
+
+    ###fee_element = target.attr 'data-target-fee'
     actual_element = target.attr 'data-target-actual'
-    fee = (rate * amount).toFixed(2)
-    actual = (amount - fee).toFixed(2)
-    if fee and $.isNumeric(fee)
-      $(fee_element).text fee
-    else
-      $(fee_element).text "0.00"
+    fee_switch = target.attr 'data-switch'
+    fee_interval = target.attr 'data-interval'
+    fee_count = target.attr 'data-count'
+    fee_poundage = target.attr 'data-poundage'
+    data_balance = target.attr 'data-balance'
+    uninvested = $('input[name=uninvested]').val()
+    arrays = eval(fee_interval)
+    if fee_switch == 'on'
+      if amount != ''
+        if fee_count > 2
+          for array , i in arrays
+            if amount > arrays[i][0] && amount <= arrays[i][1]
+              sxf = arrays[i][2]
+          if sxf == undefined
+            sxf = 5
+        else
+          sxf = 0
+      else
+         sxf = 0
 
-    if actual and $.isNumeric(actual)
-      $(actual_element).text actual
-    else
-      $(actual_element).text "0.00"
+      m = data_balance - amount
+      if m >= uninvested
+        zjglf = 0
+      else
+        zjglf = Math.abs(uninvested - m)*rate
 
+      fee = (sxf+zjglf).toFixed(2)
+      actual = (amount - fee).toFixed(2)
+      if actual < 0
+        actual=0
+      if fee and $.isNumeric(fee)
+        $(fee_element).text fee
+      else
+        $(fee_element).text "0.00"
 
+      if actual and $.isNumeric(actual)
+        $(actual_element).text actual
+      else
+        $(actual_element).text "0.00"
 
-  $('input[data-role=fee-calculator]').keyup()
+      if sxf == 0 &&  zjglf == 0
+        str = '0'
+      else
+        if sxf == 0
+          sxf_str = '0'
+        else
+          sxf_str = sxf
+
+        if zjglf == 0
+          zjglf_str = ''
+        else
+          zjglf_str = zjglf.toFixed(2)
+        if zjglf_str == ''
+          str = sxf_str
+        else
+          str = sxf_str + '+' +zjglf_str
+      $(fee_poundage).text str###
+
+  ######$('input[data-role=fee-calculator]').keyup()
 
   p2pCalculate = () ->
     target = $('input[data-role=p2p-calculator]')

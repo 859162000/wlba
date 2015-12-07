@@ -1,0 +1,77 @@
+- load formatters
+doctype html
+html(style="background: #525193")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile_activity/app_xiaoher.css?v=201511171", rel="stylesheet")
+        - csrf_token
+    body
+        img.banner(src="/static/imgs/mobile_activity/app_xiaoher/banner.jpg")
+        img.title_img_1(src="/static/imgs/pc_activity/xiaoher/title_1.png")
+        .step_wrap
+            .step_box
+                dl
+                    dt Step1
+                    dd 注册网利宝帐号
+                img.step_img(src="/static/imgs/mobile_activity/app_xiaoher/step_1.png")
+            .step_box
+                dl
+                    dt Step2
+                    dd 充值资金到账户
+                img.step_img(src="/static/imgs/mobile_activity/app_xiaoher/step_2.png")
+            .step_box
+                dl
+                    dt Step3
+                    dd 选择投资标
+                img.step_img(src="/static/imgs/mobile_activity/app_xiaoher/step_3.png")
+            .step_box
+                dl
+                    dt Step4
+                    dd 投资1000元及以上
+                img.step_img(src="/static/imgs/mobile_activity/app_xiaoher/step_4.png")
+            .step_box
+                dl
+                    dt Step5
+                    dd 获得100元免单券
+                img.step_img(src="/static/imgs/mobile_activity/app_xiaoher/step_5.png")
+            .step_box
+                dl
+                    dt Step6
+                    dd 购物享免单
+                img.step_img(src="/static/imgs/mobile_activity/app_xiaoher/step_6.png")
+        img.title_img_2(src="/static/imgs/pc_activity/xiaoher/title_2.png")
+        .act_rule_wrap
+            dl
+                dt 1.
+                dd 手机号为网利宝唯一账户，通过小荷特卖电脑端官网、小荷特卖手机客户端用户参与活动均可享受活动红包福利；
+            dl
+                dt 2.
+                dd 新用户单笔首次投资1000元及以上得100元小荷特卖免单券，小荷特卖免单券统一以站内信形式通知，每个免单券仅限使用一次，不可叠加使用，使用后无论是否有余额均失效；
+            dl
+                dt 3.
+                dd 免单券限定自领取日起3月内购物有效； 
+            dl
+                dt 4.
+                dd 本活动可与网利宝其他优惠活动同时享用。
+            dl
+                dt 5.
+                dd 刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予兑现，网利宝对此活动享有最终解释权。
+            dl(style="display:none")#ios-show
+                dt 6.
+                dd 所有活动由网利宝提供，与苹果公司（Apple Inc.）无关。
+            .import_text
+                img.ico_img(src="/static/imgs/mobile_activity/app_xiaoher/ico.png")
+                span 本活动最终解释权在法律允许范围内归网利宝所有。
+        img.rule_img(src="/static/imgs/mobile_activity/app_xiaoher/rule_img.png")
+        .get_coupon
+            a(href='/weixin/regist/?promo_token=xiaohehd') 领取100元购物券
+    script(src='/static/src/mobile/lib/weixin/wx.js')
+    script(src="/static/scripts/mobile_activity/dist/app_xiaoher.js?v=201511176")
+    script.
+        var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+                iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+                ios = ipad || iphone;
+        if (ios) {
+            document.getElementById('ios-show').style.display = 'block';
+        }

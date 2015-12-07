@@ -7,7 +7,7 @@ from django.core.cache import cache
 from django.http import Http404, HttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser,IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
 from weixin.common.decorators import weixin_api_error
 from weixin.common.wx import get_host_url
@@ -43,7 +43,9 @@ class ManageAPISessionAuthentication(SessionAuthentication):
 
 
 class ManageAPIView(APIView, ManageAccountMixin):
-    permission_classes = (IsAdminUser,)
+
+    # permission_classes = (IsAdminUser,)
+    permission_classes = (IsAuthenticated,)
     authentication_classes = (ManageAPISessionAuthentication,)
 
 
@@ -73,6 +75,7 @@ class AccountView(ManageView):
         context = super(AccountView, self).get_context_data(**kwargs)
         self.request.session['account_key'] = kwargs.get('account_key')
         context['account'] = self.account
+        print self.account.__dict__
 
         return context
 

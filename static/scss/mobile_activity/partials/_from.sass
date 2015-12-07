@@ -1,0 +1,94 @@
+$border: 1px solid #E5E5E5
+
+@mixin btn($bg, $color)
+  display: block
+  width: 100%
+  height: 2.25rem
+  line-height: 2.25rem
+  text-align: center
+  font-size: .8rem
+  border-radius: .3rem
+  background: $bg
+  color: $color
+  margin: 0 auto
+  border: 0
+  -webkit-appearance: none
+
+.mod-form
+
+  .mod-check-body
+    height: 0
+    overflow: hidden
+    -webkit-transition: height 500ms
+
+  .mod-phone
+    width: 100%
+    background: url("/static/imgs/mobile_activity/app_maimai/phone.png") no-repeat left center
+    background-size: .9rem
+    background-position: .4rem center
+    background-color: #fff
+    font-size: .8rem
+    text-align: center
+    border-radius: .3rem
+    padding: .625rem .25rem .625rem 1.8rem
+    border: $border
+    -webkit-appearance: none
+
+  .mod-load
+    @extend .mod-phone
+    background: url("/static/imgs/mobile_activity/app_maimai/load.gif") no-repeat
+    background-size: .9rem
+    background-position: .4rem center
+    background-color: #fff
+
+  .mod-form-sign
+    text-align: center
+    color: #758794
+    font-size: .6rem
+    height: 0
+    line-height: 1.275rem
+    -webkit-transition: height 1s
+    overflow: hidden
+
+  .mod-form-margin
+    height: .7rem
+    width: 100%
+    -webkit-transition: height 1s
+    overflow: hidden
+
+  .phone-check
+    display: -webkit-box
+    .check-input
+      -webkit-box-flex: 1
+      border: $border
+      -webkit-appearance: none
+      font-size: .8rem
+      text-align: center
+      border-radius: .3rem
+      padding: .625rem .25rem
+      display: block
+
+    .check-submit
+      width: 5.4rem
+      height: 2.25rem
+      font-size: .8rem
+      color: #fff
+      background: #DB493F
+      border-radius: .3rem
+      margin-left: .25rem
+      border: 0
+
+    .mod-postValidation
+      background: #eda49f
+
+    .check-img
+      display: block
+      @extend .check-submit
+      background: url("/static/imgs/mobile_activity/app_maimai/load.gif") no-repeat center
+      background-size: .9rem
+
+  .mod-form-submit
+    +btn(#DB493F, #fff)
+
+    &:disabled
+      +btn(#EDA49F, #fff)

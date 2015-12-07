@@ -3,26 +3,30 @@
 
 from django.conf import settings
 from django.conf.urls import patterns, url, include
-from django.contrib.auth.decorators import login_required
+# from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, RedirectView
 from registration.backends.default.views import ActivationView
-from forms import EmailOrPhoneAuthenticationForm
+from forms import EmailOrPhoneAuthenticationForm, TokenSecretSignAuthenticationForm
 from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, EmailSentView, AccountHome,
                    AccountTransaction, AccountBankCard, AccountTransactionP2P, IdVerificationView,
                    AccountTransactionDeposit, AccountRedPacket, AccountCoupon,
                    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract,
                    Third_login, Third_login_back, MessageView, MessageDetailAPIView, MessageCountAPIView,
-                   MessageListAPIView, AccountRepayment, AddressView, AccountInviteView, user_product_contract_kf)#, CjdaoApiView)
+                   MessageListAPIView, AccountRepayment, AddressView, AccountInviteView, user_product_contract_kf,
+                   JrjiaAutoRegisterView)
 from django.contrib.auth import views as auth_views
 from views import AutomaticView
+from wanglibao_account.cooperation import JrjiaCPSView, JrjiaP2PStatusView, JrjiaP2PInvestView, JrjiaReportView, \
+    JrjiaUsStatusView
 from wanglibao_lottery.views import LotteryListTemplateView
+from wanglibao_account.decorators import login_required
 
 urlpatterns = patterns(
     '',
     url(r'^home/$', login_required(AccountHome.as_view(),
                                    login_url='/accounts/login/')),
-    url(r'^home/fund/$', login_required(AccountHome.as_view(),
-                                        login_url='/accounts/login/')),
+    url(r'^home/experience/$', login_required(AccountHome.as_view(),
+                                              login_url='/accounts/login/')),
     url(r'^home/jiuxian/$', login_required(AccountHome.as_view(),
                                            login_url='/accounts/login/'), name='accounts_jiuxian'),
     url(r'^p2p/amortization/(?P<product_id>\d+)', login_required(P2PAmortizationView.as_view(),
@@ -61,6 +65,7 @@ urlpatterns = patterns(
     #url(r'^add_introduce/$', login_required(IntroduceRelation.as_view(), login_url='/accounts/login/')),
 
     url(r'^invite/$', login_required(AccountInviteView.as_view(), login_url='/accounts/login/')),
+    url(r'^frozen/$', TemplateView.as_view(template_name="frozen.jade"), name='accounts_frozen'),
 
     url(r'^login/ajax/$', 'wanglibao_account.views.ajax_login'),
 
@@ -69,12 +74,25 @@ urlpatterns = patterns(
             "template_name": "login_test.jade",
             "authentication_form": EmailOrPhoneAuthenticationForm,
         }, name="auth_login"),
-
+    url(r'^token/login/ajax/$', 'wanglibao_account.views.ajax_token_login'),
+    url(r'^token_login/$', 'django.contrib.auth.views.login',
+        {
+            "template_name": "fetchtoken.jade",
+            "authentication_form": TokenSecretSignAuthenticationForm,
+        }, name="token_login"),
 
     url(r'^login/callback/$', login_required(Third_login_back.as_view())),
     url(r'^login/(?P<login_type>\w+)/$', login_required(Third_login.as_view())),
 
     url(r'^register/$', RegisterView.as_view(), name='auth_register'),
+    url(r'^register/first/$', TemplateView.as_view(template_name="register_first.jade")),
+    url(r'^register/three/$', TemplateView.as_view(template_name="register_three.jade")),
+    url(r'^api/register/jrjia/$', JrjiaAutoRegisterView.as_view(), name='auth_register_auto'),
+    url(r'^api/cps/$', JrjiaCPSView.as_view(), name='auth_register_auto'),
+    url(r'^api/pstatus/$', JrjiaP2PStatusView.as_view(), name='auth_register_auto'),
+    url(r'^api/pinvest/$', JrjiaP2PInvestView.as_view(), name='auth_register_auto'),
+    url(r'^api/report/$', JrjiaReportView.as_view(), name='auth_register_auto'),
+    url(r'^api/usstatus/$', JrjiaUsStatusView.as_view(), name='auth_register_auto'),
     url(r'^register/wap/$', RedirectView.as_view(url='/weixin/regist/', permanent=True), name='wap_register'),
     url(r'^register/ajax/$', 'wanglibao_account.views.ajax_register'),
 

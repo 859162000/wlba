@@ -22,6 +22,12 @@ from wanglibao_redpack import backends as redpack_backends
 from wanglibao_redpack.models import RedPackRecord
 from wanglibao_activity import backends as activity_backends
 import re
+import json
+
+from weixin.constant import PRODUCT_AMORTIZATION_TEMPLATE_ID
+from weixin.models import WeixinUser
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -359,7 +365,10 @@ class AmortizationKeeper(KeeperBaseMixin):
                 amortization.coupon_interest = term[4]
                 amortization.term = index + 1
                 amortization.user = equity.user
-                amortization.product_amortization = product_amortizations[index] 
+                try:
+                    amortization.product_amortization = product_amortizations[index]
+                except IndexError:
+                    logger.error('generate amortization for product %s failed' % self.product)
 
                 if len(term) == 7:
                     amortization.term_date = term[6]
@@ -486,6 +495,7 @@ class AmortizationKeeper(KeeperBaseMixin):
         return amos
 
     def amortize(self, amortization, savepoint=True):
+        from weixin.tasks import sentTemplate
         with transaction.atomic(savepoint=savepoint):
             if amortization.settled:
                 raise P2PException('amortization %s already settled.' % amortization)
@@ -514,22 +524,52 @@ class AmortizationKeeper(KeeperBaseMixin):
                 amo_amount = sub_amo.principal + sub_amo.interest + sub_amo.penal_interest + sub_amo.coupon_interest
 
                 phone_list.append(sub_amo.user.wanglibaouserprofile.phone)
-                message_list.append(messages.product_amortize(amortization.product, sub_amo.settlement_time, amo_amount))
+                message_list.append(messages.product_amortize(sub_amo.user.wanglibaouserprofile.name,
+                                                              amortization.product,
+                                                              # sub_amo.settlement_time,
+                                                              amo_amount))
+                try:
+                    weixin_user = WeixinUser.objects.filter(user=sub_amo.user).first()
+        #             您好，您投资的项目还款完成
+                    # 项目名称：宝马X5-HK20151112002
+                    # 还款金额：1000元
+                    # 还款时间：2015-11-12
+                    # 详情请登录平台会员中心查看
+        #             {{first.DATA}} 项目名称：{{keyword1.DATA}} 还款金额：{{keyword2.DATA}} 还款时间：{{keyword3.DATA}} {{remark.DATA}}
 
-                title, content = messages.msg_bid_amortize(pname, timezone.now(), amo_amount)
-                inside_message.send_one.apply_async(kwargs={
-                    "user_id": sub_amo.user.id,
-                    "title": title,
-                    "content": content,
-                    "mtype": "amortize"
-                })
+                    if weixin_user:
+                        now = datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
+                        sentTemplate.apply_async(kwargs={
+                                        "kwargs":json.dumps({
+                                                        "openid": weixin_user.openid,
+                                                        "template_id": PRODUCT_AMORTIZATION_TEMPLATE_ID,
+                                                        "keyword1": product.name,
+                                                        "keyword2": str(amo_amount),
+                                                        "keyword3": now,
+                                                            })},
+                                                        queue='celery02')
+
+                    title, content = messages.msg_bid_amortize(pname, timezone.now(), amo_amount)
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id": sub_amo.user.id,
+                        "title": title,
+                        "content": content,
+                        "mtype": "amortize"
+                    })
+                except Exception,e:
+                    pass
 
                 self.__tracer(catalog, sub_amo.user, sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
                               amortization, description, sub_amo.coupon_interest)
 
                 # 标的每一期还款完成后,检测该用户还款的本金是否有符合活动的规则,有的话触发活动规则
-                if sub_amo.principal > 0:
-                    activity_backends.check_activity(sub_amo.user, 'repaid', 'pc', sub_amo.principal, product.id)
+                try:
+                    if sub_amo.principal > 0:
+                        activity_backends.check_activity(sub_amo.user, 'repaid', 'pc', sub_amo.principal, product.id)
+                except Exception:
+                    logger.debug("check activity on repaid, user: {}, principal: {}, product_id: {}".format(
+                        sub_amo.user, sub_amo.principal, product.id
+                    ))
 
             amortization.settled = True
             amortization.save()
@@ -554,4 +594,3 @@ class AmortizationKeeper(KeeperBaseMixin):
 
 def check_amount(amount):
     pass
-
