@@ -497,6 +497,7 @@ class WeixinLogin(TemplateView):
             except WeChatException, e:
                 pass
         next = self.request.GET.get('next', '')
+        next = urllib.unquote(next.encode('utf-8'))
         return {
             'context': context,
             'next': next
@@ -522,9 +523,6 @@ class WeixinRegister(TemplateView):
             channel = None
         phone = self.request.GET.get('phone', 0)
         next = self.request.GET.get('next', '')
-        logger.debug("WeixinRegister-------------------------1111next:::%s"%next)
-        next = urllib.unquote(next)
-        logger.debug("WeixinRegister-------------------------2222next:::%s"%next)
         return {
             'token': token,
             'channel': channel,
@@ -1431,9 +1429,11 @@ class GenerateQRSceneTicket(APIView):
                 rs = client.qrcode.create(qrcode_data)
                 qrcode_url = client.qrcode.get_url(rs.get('ticket'))
             except WeChatException,e:
-                return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
+                logger.debug("'errcode':%s, 'errmsg':%s"%(e.errcode, e.errmsg))
+                return Response({'errcode':e.errcode, 'errmsg':e.errmsg, "qrcode_url":weixin_account.qrcode_url})
             return Response({'qrcode_url':qrcode_url})
-        return Response({'errcode':-2, 'errmsg':"code does not exist"})
+        logger.debug("code does not exist")
+        return Response({'errcode':-2, 'errmsg':"code does not exist", "qrcode_url":weixin_account.qrcode_url})
 
 
 
