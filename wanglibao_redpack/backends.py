@@ -96,7 +96,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                 obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
                         "id": x.id, "invest_amount": event.invest_amount,
                         "unavailable_at": stamp(end_time), "event_id": event.id,
-                        "period": event.period, "period_type": "月",
+                        "period": event.period, "period_type": event.period_type,
                         "p2p_types_id": p2p_types_id, "p2p_types_name": p2p_types_name,
                         "highest_amount": event.highest_amount, "order_by": 2}
                 if start_time < timezone.now() < end_time:
@@ -148,7 +148,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                     obj = {"name": event.name, "method": REDPACK_RULE[event.rtype], "amount": event.amount,
                            "id": coupon.id, "invest_amount": event.invest_amount,
                            "unavailable_at": stamp(end_time), "event_id": event.id,
-                           "period": event.period, "period_type": "月",
+                           "period": event.period, "period_type": event.period_type,
                            "p2p_types": p2p_types_id, "p2p_types_name": p2p_types_name,
                            "highest_amount": event.highest_amount, "order_by": 1}
 
@@ -193,7 +193,8 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                     "available_at": stamp(start_time), "unavailable_at": stamp(end_time),
                     "id": x.id, "invest_amount": event.invest_amount, "amount": event.amount, "event_id": event.id,
                     "highest_amount": event.highest_amount,
-                    "period": event.period, "p2p_types_id": p2p_types_id, "p2p_types_name": p2p_types_name,
+                    "period": event.period, "period_type": event.period_type,
+                    "p2p_types_id": p2p_types_id, "p2p_types_name": p2p_types_name,
                     "method": REDPACK_RULE[event.rtype], "order_by": order_by}
 
             if obj['method'] == REDPACK_RULE['percent'] or obj['method'] == REDPACK_RULE['interest_coupon']:
@@ -537,55 +538,6 @@ def deduct_calc(amount, redpack_amount):
         real_deduct = t5
     real_deduct = real_deduct.quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_HALF_DOWN)
     return {"ret_code": 0, "deduct": real_deduct}
-
-
-# def increase_hike(user, product_id):
-#     if not user or not product_id:
-#         return
-#     product = P2PProduct.objects.filter(id=product_id).first()
-#     if not product:
-#         return
-#     pr = P2PRecord.objects.filter(user=user, product=product).first()
-#     if not pr:
-#         return
-#     if (timezone.now() - pr.create_time).days > 10:
-#         return
-#     #InterestHike.objects.select_for_update().filter(user=user, product=product, invalid=False).first()
-#     record = InterestHike.objects.filter(user=user, product=product, invalid=False).first()
-#     if not record:
-#         record = InterestHike()
-#         record.user = user
-#         record.product = product
-#         record.rate = decimal.Decimal("0.001")
-#     record.intro_total += 1
-#     record.save()
-#     return {"ret_code":0, "message":"ok"}
-#
-# def settle_hike(product):
-#     if not product:
-#         return None
-#     if product.pay_method.startswith(u"日计息"):
-#         term = decimal.Decimal(product.period) / decimal.Decimal(360)
-#     else:
-#         term = decimal.Decimal(product.period) / decimal.Decimal(12)
-#
-#     hike_list = []
-#     #records = InterestHike.objects.filter(product=product, invalid=False, paid=False).first()
-#     records = InterestHike.objects.filter(product=product, invalid=False, paid=False)
-#     for x in records:
-#         equity = P2PEquity.objects.filter(user=x.user, product=product).first()
-#         if equity:
-#             intro_total = x.intro_total
-#             if x.intro_total > 20:
-#                 intro_total = 20
-#             amount = equity.equity * term * x.rate * intro_total
-#             amount = amount.quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_HALF_DOWN)
-#             x.amount = amount
-#             x.paid = True
-#             x.updated_at = timezone.now()
-#             x.save()
-#             hike_list.append({"user":x.user, "amount":amount})
-#     return hike_list
 
 
 def get_interest_coupon(user, product_id):
