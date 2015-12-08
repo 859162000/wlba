@@ -173,130 +173,50 @@ class AppRepaymentPlanAllAPIView(APIView):
 
     def post(self, request):
         user = request.user
-        page = request.DATA.get('page', 1)
-        pagesize = request.DATA.get('num', 10)
-        page = int(page)
-        pagesize = int(pagesize)
-
-        user_amortizations = UserAmortization.objects.filter(user=user).order_by('-term_date')
+        user_amortizations = UserAmortization.objects.filter(user=user).order_by('-term_date').all()
         if user_amortizations:
-            paginator = Paginator(user_amortizations, pagesize)
-
-            try:
-                user_amortizations = paginator.page(page)
-            except PageNotAnInteger:
-                user_amortizations = paginator.page(1)
-            except EmptyPage:
-                user_amortizations = []
-            except Exception:
-                user_amortizations = paginator.page(paginator.num_pages)
-
-            amo_list = _user_amortization_list(user_amortizations)
+            amo_list = []
+            for amo in user_amortizations:
+                if amo.settled:
+                    if amo.last_settlement_status == u'提前还款':
+                        status = u'提前回款'
+                    else:
+                        status = u'已回款'
+                else:
+                    status = u'待回款'
+                product = amo.product_amortization.product
+                amo_list.append({
+                    'product_name': product.name,
+                    'term': amo.term,
+                    'term_total': product.terms,
+                    'term_date': amo.term_date,
+                    'principal': amo.principal,
+                    'interest': amo.interest,
+                    'penal_interest': amo.penal_interest,
+                    'coupon_interest': amo.coupon_interest,
+                    'settled': amo.settled,
+                    'settlement_time': amo.settlement_time,
+                    'settlement_status': status
+                })
         else:
             amo_list = []
-        return Response({'ret_code': 0, 'data': amo_list, 'page': page, 'num': pagesize})
+        return Response({'ret_code': 0, 'data': amo_list})
+
+
+class AppRepaymentPlanMonthAllAPIView(APIView):
+    """
+     app 用户月份还款计划接口
+     返回当月的还款计划
+     返回所有月份及月份的回款总额/笔数
+    """
+
+    permission_classes = (IsAuthenticated, )
 
 
 class AppRepaymentPlanMonthAPIView(APIView):
     """ app 用户月份还款计划接口 """
 
     permission_classes = (IsAuthenticated, )
-
-    def post(self, request):
-        user = request.user
-        now = datetime.now()
-        request_year = request.DATA.get('year', '')
-        request_month = request.DATA.get('month', '')
-        year = request_year if request_year else now.year
-        month = request_month if request_month else now.month
-        current_month = '{}-{}'.format(now.year, now.month)
-
-        start = local_to_utc(datetime(int(year), int(month), 1), 'min')
-        if int(month) == 12:
-            end = local_to_utc(datetime(int(year) + 1, 1, 1) - timedelta(days=1), 'max')
-        else:
-            end = local_to_utc(datetime(int(year), int(month) + 1, 1) - timedelta(days=1), 'max')
-
-        # 月份/月还款金额/月还款期数
-        if request_year and request_month:
-            amos_group = UserAmortization.objects.filter(user=user)\
-                .filter(term_date__gt=start, term_date__lte=end).order_by('term_date')\
-                .extra({'term_date': "DATE_FORMAT(term_date,'%%Y-%%m')"}).values('term_date')\
-                .annotate(Count('term_date')).annotate(Sum('principal')).annotate(Sum('interest'))\
-                .annotate(Sum('penal_interest')).annotate(Sum('coupon_interest')).order_by('term_date')
-        else:
-            amos_group = UserAmortization.objects.filter(user=user)\
-                .extra({'term_date': "DATE_FORMAT(term_date,'%%Y-%%m')"}).values('term_date')\
-                .annotate(Count('term_date')).annotate(Sum('principal')).annotate(Sum('interest'))\
-                .annotate(Sum('penal_interest')).annotate(Sum('coupon_interest')).order_by('term_date')
-
-        month_group = [{
-            'term_date': amo.get('term_date'),
-            'term_date_count': amo.get('term_date__count'),
-            'total_sum': amo.get('principal__sum') + amo.get('interest__sum') +
-                         amo.get('penal_interest__sum') + amo.get('coupon_interest__sum'),
-            'principal_sum': amo.get('principal__sum'),
-            'interest_sum': amo.get('interest__sum'),
-            'penal_interest_sum': amo.get('penal_interest__sum'),
-            'coupon_interest_sum': amo.get('coupon_interest__sum'),
-        } for amo in amos_group]
-
-        # 当月的还款计划
-        user_amortizations = UserAmortization.objects.filter(user=user)\
-            .filter(term_date__gt=start, term_date__lte=end).order_by('term_date')
-        if user_amortizations:
-            amo_list = _user_amortization_list(user_amortizations)
-        else:
-            amo_list = []
-
-        if not amo_list:
-            custom_month_data = {
-                'term_date': current_month,
-                'term_date_count': 0,
-                'total_sum': 0.0,
-                'principal_sum': 0.0,
-                'interest_sum': 0.0,
-                'penal_interest_sum': 0.0,
-                'coupon_interest_sum': 0.0,
-            }
-            month_group.append(custom_month_data)
-            month_group.sort(key=lambda x: x['term_date'])
-
-        return Response({'ret_code': 0,
-                         'data': amo_list, 
-                         'month_group': month_group,
-                         'current_month': current_month,
-                         })
-
-
-def _user_amortization_list(user_amortizations):
-    amo_list = []
-    for amo in user_amortizations:
-        if amo.settled:
-            if amo.last_settlement_status == u'提前还款':
-                status = u'提前回款'
-            else:
-                status = u'已回款'
-        else:
-            status = u'待回款'
-        amo_list.append({
-            'user_amortization_id': amo.id,
-            'product_amortization_id': amo.product_amortization.id,
-            'product_id': amo.product_amortization.product.id,
-            'product_name': amo.product_amortization.product.name,
-            'term': amo.term,
-            'term_total': amo.terms,
-            'term_date': amo.term_date,
-            'principal': amo.principal,
-            'interest': amo.interest,
-            'penal_interest': amo.penal_interest,
-            'coupon_interest': amo.coupon_interest,
-            'total_interest': amo.interest + amo.penal_interest + amo.coupon_interest,  # 总利息
-            'settled': amo.settled,
-            'settlement_time': amo.settlement_time,
-            'settlement_status': status
-        })
-    return amo_list
 
 
 class AppDayListView(TemplateView):
