@@ -78,7 +78,7 @@ block main
                 if not coupon.p2p_types_name and not coupon.period
                   | 无
                 if coupon.period
-                  | {{coupon.period}}{{red_packet.period_type}}
+                  | {{coupon.period}}{{red_packet.period_type | period_format}}
               td {{coupon.available_at | milldate_format}} 至 {{coupon.unavailable_at | milldate_format}}
               if status == 'used'
                 td {{coupon.product}} <br/> {{coupon.apply_at | milltime_format }}
