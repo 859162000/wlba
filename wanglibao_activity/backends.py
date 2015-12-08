@@ -84,7 +84,7 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
         penny = Decimal(0.01).quantize(Decimal('.01'))
         with transaction.atomic():
             # 等待pay_info交易完成
-            pay_info_lock = PayInfo.objects.select_for_update().filter(order_id=order_id).all()
+            pay_info_lock = PayInfo.objects.select_for_update().get(order_id=order_id)
         if rule.is_in_date:
             first_pay = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
                                                update_time__gt=rule.activity.start_at,
