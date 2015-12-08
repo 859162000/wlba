@@ -4,8 +4,7 @@
 import time
 import logging
 import decimal
-from datetime import datetime, timedelta
-from django.db import transaction
+from django.db.models import Sum
 from django.utils import timezone
 from datetime import datetime, timedelta
 from rest_framework.response import Response
@@ -17,9 +16,6 @@ from models import ExperienceProduct, ExperienceEventRecord, ExperienceAmortizat
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.models import P2PRecord
 from wanglibao_account import message as inside_message
-from marketing.utils import local_to_utc
-from wanglibao.celery import app
-from wanglibao_margin.marginkeeper import MarginKeeper
 
 logger = logging.getLogger(__name__)
 
@@ -143,3 +139,55 @@ class GetExperienceAPIView(APIView):
         return Response({'ret_code': 30003, 'message': u'领取失败,请联系网利宝,客服电话:4008-588-066.'})
 
 
+class SendExperienceGold(object):
+    def __init__(self, user):
+        if not user:
+            raise Exception
+        self.user = user
+
+    def send(self, pk, give_mode=None):
+        now = timezone.now()
+
+        if pk:
+            # 根据pk发放理财金
+            query_object = ExperienceEvent.objects.filter(invalid=False, pk=pk,
+                                                          available_at__lt=now, unavailable_at__gt=now)
+            if give_mode:
+                #根据pk & give_mode发放理财金
+                query_object = query_object.filter(give_mode=give_mode)
+
+            experience_event = query_object.first()
+
+            if experience_event:
+                # 发放理财金
+                record = ExperienceEventRecord()
+                record.event = experience_event
+                record.user = self.user
+                record.save()
+
+                # 发放站内信
+                title = u'参加活动送体验金'
+                content = u"网利宝赠送的【{}】体验金已发放，体验金额度:{}元，请进入投资页面尽快投资赚收益吧！有效期至{}。" \
+                          u"<br/>感谢您对我们的支持与关注!" \
+                          u"<br>网利宝".format(experience_event.name,
+                                              decimal.Decimal(str(experience_event.amount)).quantize(decimal.Decimal('.01')),
+                                              experience_event.unavailable_at.strftime("%Y-%m-%d"))
+
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id": self.user.id,
+                    "title": title,
+                    "content": content,
+                    "mtype": "activity"
+                })
+
+    def get_amount(self):
+        now = timezone.now()
+        # 体验金可用余额
+        experience_record = ExperienceEventRecord.objects.filter(user=self.user, apply=False, event__invalid=False)\
+            .filter(event__available_at__lt=now, event__unavailable_at__gt=now).aggregate(Sum('event__amount'))
+        if experience_record.get('event__amount__sum'):
+            experience_amount = experience_record.get('event__amount__sum')
+        else:
+            experience_amount = 0
+
+        return experience_amount

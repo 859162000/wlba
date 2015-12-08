@@ -55,6 +55,7 @@ from fee import WithdrawFee
 import datetime
 from wanglibao_rest import utils as rest_utils
 from weixin.models import WeixinUser
+from wanglibao_rest.common import DecryptParmsAPIView
 from marketing.tools import withdraw_submit_ok
 
 logger = logging.getLogger(__name__)
@@ -830,7 +831,7 @@ class AdminTransactionDeposit(TemplateView):
 
 
 # 易宝支付创建订单接口
-class YeePayAppPayView(APIView):
+class YeePayAppPayView(DecryptParmsAPIView):
     permission_classes = (IsAuthenticated, )
 
     @require_trade_pwd
@@ -1092,7 +1093,7 @@ class TradeRecordAPIView(APIView):
         return Response(rs)
 
 
-class WithdrawAPIView(APIView):
+class WithdrawAPIView(DecryptParmsAPIView):
     permission_classes = (IsAuthenticated, )
 
     @require_trade_pwd
@@ -1129,7 +1130,7 @@ class UnbindCardView(APIView):
         result = third_pay.card_unbind(request)
         return Response(result)
 
-class BindPayDepositView(APIView):
+class BindPayDepositView(DecryptParmsAPIView):
     """ 获取验证码或快捷支付 """
     permission_classes = (IsAuthenticated, )
 
@@ -1139,7 +1140,7 @@ class BindPayDepositView(APIView):
 
         return Response(result)
 
-class BindPayDynnumNewView(APIView):
+class BindPayDynnumNewView(DecryptParmsAPIView):
     """ 确认支付 """
     permission_classes = (IsAuthenticated, )
 
