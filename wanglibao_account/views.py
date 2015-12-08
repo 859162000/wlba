@@ -2136,6 +2136,6 @@ class FirstPayResultView(TemplateView):
     template_name = 'register_three.jade'
 
     def get_context_data(self, **kwargs):
-        first_pay_succeed = PayInfo.objects.filter(status=PayInfo.SUCCESS).exists()
+        first_pay_succeed = PayInfo.objects.filter(user=self.request.user, status=PayInfo.SUCCESS).exists()
         return {'first_pay_succeed': first_pay_succeed}
 
