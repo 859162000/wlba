@@ -239,7 +239,9 @@ class PayOrder(object):
 
         try:
             CoopRegister(request).process_for_recharge(request.user, order_id)
-            tools.deposit_ok(request.user.id, amount, pay_info.device, order_id)
+            # tools.deposit_ok(request.user.id, amount, pay_info.device, order_id)
+            tools.deposit_ok.apply_async(kwargs={"user_id": request.user.id, "amount": amount,
+                                            "device": pay_info.device, "order_id": order_id})
         except:
             logger.exception('recharge_call_back faile for ' + str(request.user) + str(order_id))
 
