@@ -34,11 +34,13 @@ class RedPackEvent(models.Model):
     amount = models.FloatField(null=False, default=0.0, verbose_name=u'优惠券金额(百分比也为0-100)')
     invest_amount = models.IntegerField(null=False, default=0, verbose_name=u"投资门槛")
     p2p_types = models.ForeignKey(ProductType, verbose_name=u"限定P2P分类", blank=True, null=True, on_delete=models.SET_NULL)
-    period = models.CharField(default='', max_length=200, verbose_name=u'限定产品期限', blank=True,
-                              help_text=u"如果期限有多个,则用英文逗号 , 隔开")
-    period_type = models.CharField(default=u'月', max_length=20, verbose_name=u'产品期限类型', choices=(
-        (u'月', u'月'),
-        (u'日', u'日')
+    period = models.CharField(default=0, max_length=200, verbose_name=u'限定产品期限', blank=True,
+                              help_text=u"填写数字格式")
+    period_type = models.CharField(default='month', max_length=20, verbose_name=u'产品期限类型', choices=(
+        ('month', u'月'),
+        ('month_gte', u'月及以上'),
+        ('day', u'日'),
+        ('day_gte', u'日及以上'),
     ), blank=True)
     highest_amount = models.IntegerField(null=False, default=0, verbose_name=u"最高抵扣金额(百分比使用0无限制)")
     value = models.IntegerField(null=False, default=0, verbose_name=u"优惠券个数(不生成兑换码无需修改)")
