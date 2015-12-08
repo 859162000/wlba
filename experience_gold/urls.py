@@ -11,10 +11,10 @@ urlpatterns = patterns(
     '',
     url(r'^buy/$', ExperienceBuyAPIView.as_view()),
     url(r'^get_experience/$', GetExperienceAPIView.as_view()),
-    url(r'^experience/(?P<template>(account|redirect))/$',
+    url(r'^experience/(?P<template>(account))/$',
         login_required(ExperienceGoldView.as_view(),
                        login_url='/accounts/token_login/'), name="experience_token_login"
         ),
-    url(r'^experience/(?P<template>(mobile|gold))/$', ExperienceGoldView.as_view(), name="experience_gold"),
+    url(r'^experience/(?P<template>(mobile|gold|redirect|nologin))/$', ExperienceGoldView.as_view(), name="experience_gold"),
 )
 

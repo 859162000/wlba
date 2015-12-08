@@ -47,6 +47,23 @@ org.ui = (function(){
         alert : lib._alert
     }
 })();
+var login = false;
+wlb.ready({
+    app: function (mixins) {
+        mixins.sendUserInfo(function (data) {
+            if (data.ph == '') {
+                login = false;
+                $('#nologin').on('click',function(){
+                    mixins.registerApp();
+                })
+            } else {
+                login = true;
+            }
+        })
+    },
+    other: function(){
+    }
+})
 org.experience = (function(org){
     var lib = {
         init:function(){
@@ -56,6 +73,9 @@ org.experience = (function(org){
             lib._bannerEffect()
         },
         _lookMore:function(){
+             $('#nologin').on('click',function(){
+                window.location.href = '/weixin/regist/?next=/activity/experience/mobile/';
+            })
             $lookMore = $('#lookMore')
             $lookMore.on('click',function(){
                 var ele = $('.history-list');
@@ -106,8 +126,7 @@ org.experience = (function(org){
               });
             })
             //老用户
-            $oldUser = $('.investeds');
-            $oldUser.on('click',function(){
+            $('.investeds').on('click',function(){
                  org.ui.alert('','','3')
             })
         },
