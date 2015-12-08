@@ -222,13 +222,22 @@ class WeixinAccounts(object):
         'qrcode_url': '/static/imgs/admin/qrcode_for_gh_77c09ff2f3a3_258.jpg'
     }
     account_test = {
+        'id': 'gh_d3d05c71a967',
+        'name': 'staging测试号',
+        'app_id': 'wx406c0da365002254',
+        'app_secret': 'd4624c36b6795d1d99dcf0547af5443d',
+        'classify': '微信公众平台测试号',
+        'token': 'tgE3AdMS',
+        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_d3d05c71a967_258.jpg'
+    }
+    account_test_wxq = {
         'id': 'gh_32e9dc3fab8e',
         'name': 'wxq测试号',
         'app_id': 'wx83535d60d4476686',
         'app_secret': 'cc9f1b27fc4aea966cbada7f7dfec655',
         'classify': '微信公众平台测试号',
         'token': 'tgK2dBUn',
-        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_d852bc2cead2_258.jpg'
+        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_32e9dc3fab8e_258.jpg'
     }
     account_test_hmm = {
         'id': 'gh_3b82a2651647',
@@ -237,7 +246,7 @@ class WeixinAccounts(object):
         'app_secret': '7b30aec7477fb8eaed0673fca8f41044',
         'classify': '微信公众平台测试号',
         'token': 'CPIhRv8V',
-        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_d852bc2cead2_258.jpg'
+        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_3b82a2651647_258.jpeg'
     }
     account_test_yj = {
         'id': 'gh_9e8ff84237cd',
@@ -246,7 +255,7 @@ class WeixinAccounts(object):
         'app_secret': 'd4624c36b6795d1d99dcf0547af5443d',
         'classify': '微信公众平台测试号',
         'token': '7RvywP6u',
-        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_d852bc2cead2_258.jpg'
+        'qrcode_url': '/static/imgs/admin/qrcode_for_gh_9e8ff84237cd_258.jpg'
     }
 
     id = None
@@ -283,6 +292,7 @@ class WeixinAccounts(object):
             cls.data['test'] = cls.account_test
             cls.data['account_test_hmm']=cls.account_test_hmm
             cls.data['account_test_yj']=cls.account_test_yj
+            cls.data['account_test_wxq']=cls.account_test_wxq
 
     @classmethod
     def account_classify(cls):

@@ -18,7 +18,7 @@ from wanglibao_account.backends import TestIDVerifyBackEnd, ProductionIDVerifyBa
 import logging
 import hashlib
 import pytz
-from Crypto.Cipher import AES
+from M2Crypto.EVP import Cipher
 import urllib
 from .models import UserThreeOrder
 import requests
@@ -351,12 +351,18 @@ def encrypt_mode_cbc(data, key, iv):
     :param iv:
     :return:
     """
-    lenth = len(data)
-    num = lenth % 16
-    data = data.ljust(lenth + 16 - num,chr(16 - num))
-    obj = AES.new(key, AES.MODE_CBC, iv)
-    result = obj.encrypt(data)
-    return result.encode('hex')
+
+    cipher = Cipher(alg='aes_128_cbc', key=key, iv=iv, op=1)
+    buf = cipher.update(data)
+    buf = buf + cipher.final()
+    del cipher
+
+    # 将明文从字节流转为16进制
+    output = []
+    for i in buf:
+        output.append('%02X' % (ord(i)))
+
+    return output
 
 
 def hex2bin(string_num):
@@ -394,14 +400,19 @@ def dec2bin(string_num):
         mid.append(base[rem])
     return ''.join([str(x) for x in mid[::-1]])
 
-def encodeBytes(bytelist):
+
+def encodeBytes(hexlist):
     """
     2进制按电信规则16进制加密
     :param bytelist:
     :return:
     """
-    pieces = len(bytelist) / 8
-    in_list = [int(bytelist[i*8:(i+1)*8],2) for i in range(pieces)]
+    in_list = []
+    for h in hexlist:
+        h = int(hex2dec(h))
+        if h > 128:
+            h = ~h ^ 255
+        in_list.append(int(h))
 
     ret = []
     for byte in in_list:
@@ -469,14 +480,14 @@ def zgdx_order_query(params):
 
         encrypt_data = encrypt_mode_cbc(json.dumps(data), coop_key, iv)
         params = {
-            'code': encodeBytes(hex2bin(encrypt_data)),
+            'code': encodeBytes(encrypt_data),
             'partner_no': params.get('partner_no', None),
         }
 
         try:
             res = requests.post(url, data=json.dumps(params))
             if res.status_code == 200:
-                logger.info(">>>>>>>>>>>>>>>>>>>%s" % res.text)
+                logger.info("zgdx return:%s" % res.text)
                 res = res.json()
                 res_code = res.get('result_code', '')
                 result = res.get('result', '')

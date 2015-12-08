@@ -44,7 +44,7 @@
         });
       }
     });
-    $('#passwordChangeForm').validate({
+    return $('#passwordChangeForm').validate({
       rules: {
         'old-password': {
           required: true
@@ -70,19 +70,6 @@
           required: '不能为空',
           equalTo: '两次密码输入不一致'
         }
-      }
-    });
-
-    /*判断是否设置了交易密码 */
-    return $.ajax({
-      url: "/api/profile/",
-      type: "GET",
-      data: {}
-    }).success(function(date) {
-      if (date.trade_pwd_is_set) {
-        return $('.old').show();
-      } else {
-        return $('.new').show();
       }
     });
   });

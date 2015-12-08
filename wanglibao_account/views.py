@@ -1834,7 +1834,7 @@ class AddressAPIView(APIView):
 
         if address_id:
             try:
-                address = UserAddress.objects.get(id=address_id)
+                address = UserAddress.objects.get(id=address_id, user=self.request.user)
                 address.user = request.user
                 address.name = address_name
                 address.address = address_address
@@ -1873,7 +1873,7 @@ class AddressDeleteAPIView(APIView):
             return Response({'ret_code': 3002, 'message': u'ID错误'})
 
         try:
-            address = UserAddress.objects.get(id=address_id)
+            address = UserAddress.objects.get(id=address_id, user=self.request.user)
             address.delete()
             return Response({
                 'ret_code': 0,
@@ -1891,7 +1891,7 @@ class AddressGetAPIView(APIView):
             return Response({'ret_code': 3002, 'message': u'ID错误'})
 
         try:
-            address = UserAddress.objects.get(id=address_id, user=request.user)
+            address = UserAddress.objects.get(id=address_id, user=self.request.user)
             if address:
                 address = {
                     'address_id': address.id,
@@ -2132,4 +2132,10 @@ class ThirdOrderQueryApiView(APIView):
 
         return HttpResponse(json.dumps(json_response), content_type='application/json')
 
+class FirstPayResultView(TemplateView):
+    template_name = 'register_three.jade'
+
+    def get_context_data(self, **kwargs):
+        first_pay_succeed = PayInfo.objects.filter(user=self.request.user, status=PayInfo.SUCCESS).exists()
+        return {'first_pay_succeed': first_pay_succeed}
 

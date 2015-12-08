@@ -18,6 +18,7 @@ from django.contrib.auth import views as auth_views
 from views import AutomaticView
 from wanglibao_account.cooperation import JrjiaCPSView, JrjiaP2PStatusView, JrjiaP2PInvestView, JrjiaReportView, \
     JrjiaUsStatusView
+from wanglibao_account.views import FirstPayResultView
 from wanglibao_lottery.views import LotteryListTemplateView
 from wanglibao_account.decorators import login_required
 
@@ -53,14 +54,6 @@ urlpatterns = patterns(
                                        login_url='/accounts/login/')),
     url(r'^setting/$', login_required(TemplateView.as_view(template_name='account_setting.jade'),
                                       login_url='/accounts/login/')),
-    url(r'^update/$', login_required(TemplateView.as_view(template_name='login_pwd.jade'),
-                                      login_url='/accounts/login/')),
-    url(r'^trading/$', login_required(TemplateView.as_view(template_name='trading_pwd.jade'),
-                                      login_url='/accounts/login/')),
-    url(r'^trading/back/$', login_required(TemplateView.as_view(template_name='trading_back.jade'),
-                                      login_url='/accounts/login/')),
-    url(r'^trading/setting/$', login_required(TemplateView.as_view(template_name='trading_setting.jade'),
-                                      login_url='/accounts/login/')),
     url(r'^id_verify/$', login_required(IdVerificationView.as_view(), login_url='/accounts/login/')),
     #url(r'^add_introduce/$', login_required(IntroduceRelation.as_view(), login_url='/accounts/login/')),
 
@@ -86,7 +79,8 @@ urlpatterns = patterns(
 
     url(r'^register/$', RegisterView.as_view(), name='auth_register'),
     url(r'^register/first/$', TemplateView.as_view(template_name="register_first.jade")),
-    url(r'^register/three/$', TemplateView.as_view(template_name="register_three.jade")),
+    # url(r'^register/three/$', TemplateView.as_view(template_name="register_three.jade")),
+    url(r'^register/three/$', login_required(FirstPayResultView.as_view())),
     url(r'^api/register/jrjia/$', JrjiaAutoRegisterView.as_view(), name='auth_register_auto'),
     url(r'^api/cps/$', JrjiaCPSView.as_view(), name='auth_register_auto'),
     url(r'^api/pstatus/$', JrjiaP2PStatusView.as_view(), name='auth_register_auto'),

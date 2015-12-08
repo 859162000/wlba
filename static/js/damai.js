@@ -106,7 +106,7 @@
                 $('.labelone2').removeAttr('id')
                 $('.labelone2').prev().removeAttr('checked');
             }
-            
+
             return false
 
         });
