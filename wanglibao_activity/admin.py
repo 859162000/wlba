@@ -6,7 +6,8 @@ import datetime
 from django.utils import timezone
 from import_export import resources, fields
 from import_export.admin import ExportMixin
-from models import Activity, ActivityRule, ActivityRecord, ActivityTemplates, ActivityImages, WapActivityTemplates
+from models import Activity, ActivityRule, ActivityRecord, ActivityTemplates, \
+    ActivityImages, WapActivityTemplates, ActivityShow, ActivityBannerPosition
 import models as m
 
 
@@ -223,6 +224,113 @@ class WapActivityTemplatesAdmin(admin.ModelAdmin):
     search_fields = ('name', 'url', 'aim_template')
 
 
+class ActivityShowForm(forms.ModelForm):
+    is_pc = forms.BooleanField(label=u'是否主站活动', required=False)
+    is_app = forms.BooleanField(label=u'是否APP活动', required=False)
+    pc_detail_link = forms.CharField(label=u'PC-活动详情页链接*', max_length=255, required=False)
+    pc_template = forms.CharField(label=u'PC-活动详情页模板名称*', max_length=255, required=False)
+    app_detail_link = forms.CharField(label=u'APP-活动详情页链接*', max_length=255, required=False)
+    app_template = forms.CharField(label=u'APP-活动详情页模板名称*', max_length=255, required=False)
+
+    def clean_pc_detail_link(self):
+        is_pc = self.cleaned_data.get('is_pc')
+        pc_detail_link = self.cleaned_data.get('pc_detail_link')
+
+        if is_pc and not pc_detail_link:
+            raise forms.ValidationError(u'这个字段是必须的')
+
+        return pc_detail_link
+
+    def clean_pc_template(self):
+        is_pc = self.cleaned_data.get('is_pc')
+        pc_template = self.cleaned_data.get('pc_template')
+
+        if is_pc and not pc_template:
+            raise forms.ValidationError(u'这个字段是必须的')
+
+        return pc_template
+
+    def clean_app_detail_link(self):
+        is_app = self.cleaned_data.get('is_app')
+        app_detail_link = self.cleaned_data.get('app_detail_link')
+
+        if is_app and not app_detail_link:
+            raise forms.ValidationError(u'这个字段是必须的')
+
+        return app_detail_link
+
+    def clean_app_template(self):
+        is_app = self.cleaned_data.get('is_app')
+        app_template = self.cleaned_data.get('app_template')
+
+        if is_app and not app_template:
+            raise forms.ValidationError(u'这个字段是必须的')
+
+        return app_template
+
+    class Meta:
+        forms.model = ActivityShow
+
+
+class ActivityShowAdmin(admin.ModelAdmin):
+    actions = None
+    search_fields = ('activity', 'channel')
+    ordering = ('-priority', '-created_at')
+    raw_id_fields = ('activity',)
+    list_display = ('activity', 'activity_status', 'platform', 'priority')
+    form = ActivityShowForm
+
+
+class ActivityBannerPosForm(forms.ModelForm):
+    queryset = ActivityShow.objects.filter(is_pc=True, link_is_hide=False)
+    main = forms.ModelChoiceField(queryset=queryset, label=u'主推', required=True)
+    second_left = forms.ModelChoiceField(queryset=queryset, label=u'副推左', required=True)
+    second_right = forms.ModelChoiceField(queryset=queryset, label=u'副推右', required=True)
+
+    def clean_main(self):
+        main = self.cleaned_data.get('main')
+        second_left = self.cleaned_data.get('second_left')
+        second_right = self.cleaned_data.get('second_right')
+
+        act_list = [second_left, second_right]
+        if main in act_list:
+            raise forms.ValidationError(u'活动不能重复')
+
+        return main
+
+    def clean_second_left(self):
+        main = self.cleaned_data.get('main')
+        second_left = self.cleaned_data.get('second_left')
+        second_right = self.cleaned_data.get('second_right')
+
+        act_list = [main, second_right]
+        if second_left in act_list:
+            raise forms.ValidationError(u'活动不能重复')
+
+        return second_left
+
+    def clean_second_right(self):
+        main = self.cleaned_data.get('main')
+        second_left = self.cleaned_data.get('second_left')
+        second_right = self.cleaned_data.get('second_right')
+
+        act_list = [main, second_left]
+        if second_right in act_list:
+            raise forms.ValidationError(u'活动不能重复')
+
+        return second_right
+
+    class Meta:
+        forms.model = ActivityBannerPosition
+
+
+class ActivityBannerPosAdmin(admin.ModelAdmin):
+    actions = None
+    search_fields = ('main', 'second_left', 'second_right')
+    ordering = ('-priority', '-created_at',)
+    form = ActivityBannerPosForm
+
+
 admin.site.register(WapActivityTemplates, WapActivityTemplatesAdmin)
 admin.site.register(ActivityImages, ActivityImagesAdmin)
 admin.site.register(ActivityTemplates, ActivityTemplatesAdmin)
@@ -230,3 +338,6 @@ admin.site.register(ActivityTemplates, ActivityTemplatesAdmin)
 admin.site.register(Activity, ActivityAdmin)
 admin.site.register(ActivityRule, ActivityRuleAdmin)
 admin.site.register(ActivityRecord, ActivityRecordAdmin)
+
+admin.site.register(ActivityShow, ActivityShowAdmin)
+admin.site.register(ActivityBannerPosition, ActivityBannerPosAdmin)
