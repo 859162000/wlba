@@ -522,6 +522,9 @@ class WeixinRegister(TemplateView):
             channel = None
         phone = self.request.GET.get('phone', 0)
         next = self.request.GET.get('next', '')
+        logger.debug("WeixinRegister-------------------------1111next:::%s"%next)
+        next = urllib.unquote(next)
+        logger.debug("WeixinRegister-------------------------2222next:::%s"%next)
         return {
             'token': token,
             'channel': channel,
