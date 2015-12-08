@@ -10,6 +10,7 @@ from django.http import Http404
 from django.utils import timezone
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.models import P2PProduct, Warrant, Attachment
+from misc.models import Misc
 import json
 
 
@@ -28,9 +29,18 @@ class redis_backend(object):
     def _is_available(self):
         try:
             self.redis.ping()
+            redis_config = Misc.objects.filter(key='redis_server').first()
+            if redis_config:
+                data = json.loads(redis_config.value)
+                switch = data.get('switch')
+                if switch == 'on':
+                    return True
+                else:
+                    return False
+            else:
+                return False
         except:
             return False
-        return True
 
     def _exists(self, name):
         if self.redis:
