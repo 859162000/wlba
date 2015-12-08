@@ -8,8 +8,9 @@ from wanglibao_app.views import (AppActivateImageAPIView, AppRepaymentAPIView, A
                                  SendValidationCodeView, AppIncomeRateAPIView, AppPhoneBookUploadAPIView,
                                  AppPhoneBookQueryAPIView, AppPhoneBookAlertApiView, AppInviteAllGoldAPIView,
                                  AppAboutView, AppManagementView, AppLogoutAPIView, AppQuestionsView,
-                                 AppQuestionsResultView, AppCostView, SendValidationCodeNoCaptchaView, AppAreaView,
-                                 AppRepaymentPlanAllAPIView, AppRepaymentPlanMonthAPIView, AppActivityShowHomeView)
+                                 AppQuestionsResultView, AppCostView, SendValidationCodeNoCaptchaView,
+                                 AppRepaymentPlanAllAPIView, AppRepaymentPlanMonthAPIView, AppAreaView,
+                                 AppAreaApiView, AppMemorabiliaView)
 
 router = DefaultRouter()
 
@@ -42,6 +43,10 @@ urlpatterns = patterns(
     url(r'^questions/$', AppQuestionsView.as_view()),
     url(r'^questions/(?P<index>\w+)/$', AppQuestionsResultView.as_view()),
     url(r'^cost/$', AppCostView.as_view()),
+
     url(r'^area/$', AppAreaView.as_view()),
-    url(r'^activity/list/$', AppActivityShowHomeView.as_view()),
+    url(r'^area/fetch/$', AppAreaApiView.as_view()),
+
+    url(r'^app_memorabilia/$', AppMemorabiliaView.as_view(), name='app_memorabilia'),
 )
+

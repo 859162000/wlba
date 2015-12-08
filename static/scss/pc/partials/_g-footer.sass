@@ -26,7 +26,7 @@
     float: left
     margin-right: 40px
   .follow
-    color: $t-d14
+    color: #fff
     .follow-list
       float: left
       margin-left: 20px
@@ -35,16 +35,19 @@
       .icon
         font-size: $font-xxl
         margin-right: $space-s
+      .green
+        color: #aed372
     .follow-img
       display: block
       width: 110px
       height: 110px
-      +border-radius(4px)
       margin: 0
+    .ft-weibo-dingyue
+      @include footer-sprite(dingyue)
+    .ft-weibo-fuwu
+      @include footer-sprite(fuwu)
     .ft-weibo
-      @include footer-sprite(ftWeibo)
-    .ft-weixin
-      @include footer-sprite(ftErweima)
+      display: inline-block
 
   .footer-ex-warp
     float: right
@@ -83,7 +86,16 @@
   .atn-internet
     @include footer-sprite(internet)
   .atn-trust
-    @include footer-sprite(trust)
+    @include footer-sprite(trust_update)
 
+.line-mod1
+  padding-top: 12px
 
+.follow-weibo
+  +clearfix()
+  margin-top: 20px
 
+.erweima-dec
+  font-size: 12px
+  margin-bottom: 10px
+  color: #d4d5d6

@@ -1,3 +1,34 @@
+-load formatters
+-load mathfilters
+
+.i-mod-wrap.g-small-nav-warp
+
+  .g-small-nav
+    .g-samll-start
+      .samll-nav-hotline 客服热线 ： 400-858-8066
+
+      .samll-nav-wechat.samll-nav-animate 关注有惊喜
+        .samll-wechat-hover
+          .wechat-hover-body
+            .wechat-hover-san
+            img(src='/static/imgs/pc/nav/wechat_server.jpg')
+            .wechat-hover-dec 关注网利宝微信
+
+      .samll-nav-app.samll-nav-animate 网利宝APP
+        .samll-wechat-hover
+          .wechat-hover-body
+            .wechat-hover-san
+            img(src='/static/imgs/pc/nav/app_download_new.jpg')
+            .wechat-hover-dec 下载网利宝APP
+
+    .g-samll-end
+      a(href='/pc_guide/').samll-nav-guide 新手指引
+      if user.is_authenticated
+        a(href='/accounts/home/').samll-nav-user {{user | display_name}}
+        a(href='/accounts/logout?next=/').samll-nav-logout 退出
+      else
+        a(href='/accounts/login/').samll-nav-user 登录
+        a(href='/accounts/register/').samll-nav-logout 免费注册
 
 .g-nav-warp
   .g-nav
@@ -20,9 +51,7 @@
           +liItem('/pay/withdraw/', '我要提现')
           +liItem('/accounts/auto_tender/', '自动投标')
           +liItem('/accounts/transaction/p2p/', '交易记录')
-          if user.is_authenticated
-            li
-              a(href='/accounts/logout?next=/') 退出
+
     .g-nav-box
       mixin nav-item(name, link)
         if activeItem == name
@@ -34,5 +63,4 @@
       +nav-item('贷款专区', '/finance/')
       +nav-item('安全保障', '/security')
       +nav-item('帮助中心', '/help')
-
 

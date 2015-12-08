@@ -1074,7 +1074,7 @@ class KuaiShortPay:
             return {"ret_code": pay_info.error_code, "message": pay_info.error_message,
                     'order_id':order_id, 'pay_info_id':payinfo_id}
 
-    def pre_pay(self, user, amount, card_no, input_phone, gate_id, device, ip, request, exit_for_test=False):
+    def pre_pay(self, user, amount, card_no, input_phone, gate_id, device_type, ip, request, exit_for_test=False):
         # if not user.wanglibaouserprofile.id_is_valid:
         #     return {"ret_code":20111, "message":"请先进行实名认证"}
 
@@ -1133,7 +1133,7 @@ class KuaiShortPay:
 
         # pay_info.request_ip = util.get_client_ip(request)
         pay_info.request_ip = ip
-        pay_info.device = device
+        pay_info.device = device_type
         order = OrderHelper.place_order(user, Order.PAY_ORDER, pay_info.status,
                                         pay_info = model_to_dict(pay_info))
         pay_info.order = order
@@ -1191,7 +1191,7 @@ class KuaiShortPay:
                         raise ThirdPayError(201181, result['message'])
                 # device = split_ua(request)
                 ms = self.handle_margin(result['amount'], result['order_id'], result['user_id'], ip, res.content,
-                                        device, request)
+                                        device_type, request)
 
                 return ms
             else:
@@ -1208,7 +1208,7 @@ class KuaiShortPay:
         except Exception, e:
             return self._handle_third_pay_error(e, user.id, pay_info.id, order.id)
 
-    def dynnum_bind_pay(self, user, vcode, order_id, token, input_phone, device, ip, request):
+    def dynnum_bind_pay(self, user, vcode, order_id, token, input_phone, device_type, ip, request):
         # vcode = request.DATA.get("vcode", "").strip()
         # order_id = request.DATA.get("order_id", "").strip()
         # token = request.DATA.get("token", "").strip()
@@ -1258,14 +1258,14 @@ class KuaiShortPay:
                                     result['user_id'],
                                     ip,
                                     res.content,
-                                    device,
+                                    device_type,
                                     request)
             return ms
         except Exception, e:
             return self._handle_third_pay_error(e, user.id, pay_info.id, order_id)
 
     @method_decorator(transaction.atomic)
-    def handle_margin(self, amount, order_id, user_id, ip, response_content, device, request):
+    def handle_margin(self, amount, order_id, user_id, ip, response_content, device_type, request):
         # todo add test
         pay_info = PayInfo.objects.select_for_update().filter(order_id=order_id).first()
         if not pay_info:
@@ -1304,7 +1304,7 @@ class KuaiShortPay:
             try:
                 # fix@chenweibi, add order_id
                 tools.deposit_ok.apply_async(kwargs={"user_id": pay_info.user.id, "amount": pay_info.amount,
-                                                     "device": device, "order_id": order_id})
+                                                     "device": device_type, "order_id": order_id})
                 CoopRegister(request).process_for_recharge(pay_info.user, pay_info.order_id)
             except:
                 logger.exception('kuai_pay_deposit_call_back_failed')

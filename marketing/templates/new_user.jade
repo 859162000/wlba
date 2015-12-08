@@ -24,7 +24,7 @@ html
             if user.is_authenticated
               a(href="javascript:void(0);").red-btn.receive-red 实名领红包
             else
-              a(href="/accounts/register/?next=/accounts/id_verify/").red-btn.for-red 注册领红包
+              a(href="/accounts/register/?next=/accounts/register/first/").red-btn.for-red 注册领红包
         img(src="/static/imgs/pc_activity/new_user/welfare-img1.png").welfare-img
 
       .welfare2.clearfix
@@ -91,14 +91,14 @@ html
       span.alert-close
       .alert-cont.pt 实名认证后，奖励自动发放
       p.txt-center.mt1r
-        a(href="/accounts/id_verify/").alert-btn 去实名认证
+        a(href="/accounts/register/first/").alert-btn 去实名认证
 
     //充值后
     .alert-box.go-money
       span.alert-close
       .alert-cont.pt 充值后，奖励自动发放
       p.txt-center.mt1r
-        a(href="/pay/banks/").alert-btn 去充值
+        a(href="/pay/banks_for_register/").alert-btn 去充值
 
     //投资后
     .alert-box.to-invest

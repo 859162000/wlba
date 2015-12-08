@@ -4,7 +4,7 @@ from wanglibao_account.models import Binding
 from wanglibao_p2p.models import P2PRecord
 from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
-
+from wanglibao_profile.models import WanglibaoUserProfile
 # Create your tests here.
 from marketing.models import InviteCode, GiftOwnerGlobalInfo
 from wanglibao_sms.utils import send_validation_code
@@ -43,6 +43,13 @@ class TestMarketingAPI(TestCase):
             catalog=u'申购'
         )
 
+        WanglibaoUserProfile.objects.create(
+            user_id=3,
+            id_number=371322198606053816,
+            name='yihen',
+            id_is_valid=True
+        )
+
     def test_quick_applyer(self):
         response = self.client.post("/api/quick/applyer/",
                          {
@@ -64,4 +71,32 @@ class TestMarketingAPI(TestCase):
                             'name': 'Yihen',
                             'address': u"北京市朝阳区"
                         })
+        print response.content
+
+
+    def test_send_sms(self):
+        response = self.client.post("/api/inner/send_sms/",
+                                    {
+                                        'phone': 13521522035,
+                                        'message': "hello world"
+                                    })
+
+        print response.content
+
+
+    def test_validate_id(self):
+        response = self.client.post("/api/inner/validate_id/",
+                                    {
+                                        "id":371322198606063816,
+                                        'name':"yihen"
+                                    }
+                                    )
+
+        print response.content
+
+    def test_save_channel(self):
+        response = self.client.post("/api/inner/save_channel/",
+                                    {
+                                    })
+
         print response.content

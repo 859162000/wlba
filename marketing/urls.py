@@ -5,7 +5,7 @@ from marketing.views import AppShareView, AppShareRegView, NewYearView, Aggregat
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 from wanglibao.views import BaiduFinanceView
-from wanglibao_activity.views import PcActivityShowHomeView, ActivityListPC
+from wanglibao_activity.views import PcActivityAreaView, ActivityAreaApi
 
 urlpatterns = patterns(
     '',
@@ -62,10 +62,13 @@ urlpatterns = patterns(
     url(r'^two-eleven/$', TemplateView.as_view(template_name="two-eleven.jade")),
     url(r'^bid/$', TemplateView.as_view(template_name="bid.jade")),
     url(r'^365_gu/$', TemplateView.as_view(template_name="365_gu.jade")),
-    url(r'thanksgiving/$', TemplateView.as_view(template_name="thanksgiving.jade")),
+    #url(r'thanksgiving/$', TemplateView.as_view(template_name="thanksgiving.jade")),
     url(r'winter_brid/$', TemplateView.as_view(template_name="winter_bird.jade")),
     url(r'^xiaoher/$', TemplateView.as_view(template_name="xiaoher.jade")),
     url(r'fun_tuan/$', TemplateView.as_view(template_name="fun_tuan.jade")),
+    url(r'noviceDecember/$', TemplateView.as_view(template_name="noviceDecember.jade")),
+    url(r'^juchengtwo/$', TemplateView.as_view(template_name="juchengtwo.jade")),
+    url(r'^damai/$', TemplateView.as_view(template_name="damai.jade")),
 )
 
 # app URL
@@ -147,8 +150,12 @@ urlpatterns += patterns(
     url(r'^app-invite-success/$', TemplateView.as_view(template_name="app_invite_success.jade")),
     url(r'^app-invite-error/$', TemplateView.as_view(template_name="app_invite_error.jade")),
     url(r'^app-invite-server/$', TemplateView.as_view(template_name="app_invite_server.jade")),
+
     url(r'^app_thanksgiv/$', TemplateView.as_view(template_name="app_thanksgiv.jade")),
     url(r'^app_thanksgivin/$', TemplateView.as_view(template_name="app_thanksgivin.jade")),
+    url(r'^app_noviceDecember_h5/$', TemplateView.as_view(template_name="app_noviceDecember_h5.jade")),
+     url(r'^app_juchengtwo/$', TemplateView.as_view(template_name="app_juchengtwo.jade")),
+
 
     # url(r'^app_thanksgivin/$', login_required(TemplateView.as_view(template_name="app_thanksgivin.jade"), login_url='/accounts/token_login/')),
 
@@ -179,6 +186,6 @@ urlpatterns += patterns(
 
 urlpatterns += patterns(
     '',
-    url(r'^home/$', PcActivityShowHomeView.as_view()),
-    url(r'^list/$', ActivityListPC.as_view()),
+    url(r'^area/$', PcActivityAreaView.as_view()),
+    url(r'^area/filter/$', ActivityAreaApi.as_view()),
 )

@@ -47,7 +47,9 @@ class ExperienceEvent(models.Model):
         ('buy', u'投资'),
         ('pay', u'充值'),
         ('p2p_audit', u'满标审核'),
-        ('repaid', u'还款')), default=u"注册")
+        ('repaid', u'还款'),
+        ('weixin_sign_in', u'微信签到'),
+    ), default=u"注册")
     give_platform = models.CharField(max_length=10, verbose_name=u"发放平台", default=u"全平台", choices=PLATFORM)
     target_channel = models.CharField(max_length=500, verbose_name=u"渠道", blank=True, default="",
                                       help_text=u'不限渠道则留空即可,多个渠道用英文逗号间隔')

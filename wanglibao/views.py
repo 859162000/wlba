@@ -301,13 +301,14 @@ class BaiduFinanceView(TemplateView):
             site_data = pc_data_generator()
             m.update_value(value={MiscRecommendProduction.KEY_PC_DATA: site_data})
 
-        today = timezone.datetime.now().strftime("%Y年%m月%d日")
+        today = timezone.datetime.now().strftime("%Y-%m-%d")
 
         p2p_one = IndexView().get_products(period=3, product_id=None, order_by='expected_earning_rate')[:1]
         p2p_two = IndexView().get_products(period=6, product_id=None, order_by='expected_earning_rate')[:1]
         p2p_three = IndexView().get_products(period=9, product_id=None, order_by='expected_earning_rate')[:1]
-
+        token = self.request.GET.get('promo_token', '')
         return {
+            'token': token,
             'site_data': site_data,
             'p2p_one': p2p_one,
             'p2p_two': p2p_two,

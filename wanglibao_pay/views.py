@@ -4,6 +4,8 @@
 import logging
 import re
 import socket
+import json
+
 from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.contrib.auth.decorators import permission_required, login_required
@@ -52,12 +54,18 @@ from wanglibao_announcement.utility import AnnouncementAccounts
 from fee import WithdrawFee
 import datetime
 from wanglibao_rest import utils as rest_utils
+from weixin.models import WeixinUser
+from wanglibao_rest.common import DecryptParmsAPIView
+from marketing.tools import withdraw_submit_ok
 
 logger = logging.getLogger(__name__)
 TWO_PLACES = decimal.Decimal(10) ** -2
 
 
 class BankListView(TemplateView):
+    """
+    pc端使用的银行列表页
+    """
     template_name = 'pay_banks.jade'
 
     def get_context_data(self, **kwargs):
@@ -72,6 +80,13 @@ class BankListView(TemplateView):
             'announcements': AnnouncementAccounts
         })
         return context
+
+
+class BankListForRegisterView(BankListView):
+    """
+    pc端使用的银行列表页，新的用户注册流程需要用户在注册之后就充值，这个页面给注册时的充值使用
+    """
+    template_name = 'register_second.jade'
 
 
 class PayView(TemplateView):
@@ -206,6 +221,7 @@ class PayCallback(View):
     def dispatch(self, request, *args, **kwargs):
         return super(PayCallback, self).dispatch(request, *args, **kwargs)
 
+
 class YeeProxyPayCompleteView(TemplateView):
     template_name = 'pay_complete.jade'
 
@@ -226,7 +242,7 @@ class YeeProxyPayCompleteView(TemplateView):
         return result, amount
 
     @method_decorator(login_required(login_url='/accounts/login'))
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         # result = HuifuPay.handle_pay_result(request)
         # amount = request.POST.get('OrdAmt', '')
         #
@@ -242,7 +258,7 @@ class YeeProxyPayCompleteView(TemplateView):
             'amount': amount
             })
 
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         logger.info('web_pay_thirdpay_post_request_para'+str(request.POST))
         self._process(request)
         return HttpResponse('success')
@@ -250,7 +266,6 @@ class YeeProxyPayCompleteView(TemplateView):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super(YeeProxyPayCompleteView, self).dispatch(request, *args, **kwargs)
-
 
 
 class WithdrawView(TemplateView):
@@ -275,6 +290,11 @@ class WithdrawView(TemplateView):
             'announcements': AnnouncementAccounts
         }
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.wanglibaouserprofile.frozen:
+            return HttpResponseRedirect('/')
+        return super(WithdrawView, self).dispatch(request, *args, **kwargs)
+
 
 class WithdrawCompleteView(TemplateView):
     template_name = 'withdraw_complete.jade'
@@ -292,12 +312,18 @@ class WithdrawCompleteView(TemplateView):
             return self.render_to_response({
                 'result': u'请先进行实名认证'
             })
+        if user.wanglibaouserprofile.frozen:
+            return self.render_to_response({
+                'result': u'账户已冻结!请联系网利宝客服:4008-588-066'
+            })
         phone = user.wanglibaouserprofile.phone
         code = request.POST.get('validate_code', '')
         status, message = validate_validation_code(phone, code)
         if status != 200:
             return self.render_to_response({
-                'result': u'短信验证码输入错误'
+                # Modify by hb on 2015-12-02
+                #'result': u'短信验证码输入错误'
+                'result': message
             })
 
         result = PayResult.WITHDRAW_SUCCESS
@@ -360,21 +386,13 @@ class WithdrawCompleteView(TemplateView):
             pay_info.margin_record = margin_record
 
             pay_info.save()
-
-            # 短信通知添加用户名
             name = user.wanglibaouserprofile.name or u'用户'
-
-            send_messages.apply_async(kwargs={
-                'phones': [request.user.wanglibaouserprofile.phone],
-                # 'messages': [messages.withdraw_submitted(amount, timezone.now())]
-                'messages': [messages.withdraw_submitted(name)]
-            })
-            title, content = messages.msg_withdraw(timezone.now(), amount)
-            inside_message.send_one.apply_async(kwargs={
+            withdraw_submit_ok.apply_async(kwargs={
                 "user_id": user.id,
-                "title": title,
-                "content": content,
-                "mtype": "withdraw"
+                "user_name": name,
+                "phone": user.wanglibaouserprofile.phone,
+                "amount": amount,
+                "bank_name": card.bank.name
             })
         except decimal.DecimalException:
             result = u'提款金额在0～{}之间'.format(fee_config.get('max_amount'))
@@ -486,7 +504,7 @@ class CardViewSet(ModelViewSet):
 
     def destroy(self, request, pk=None):
         card_id = request.DATA.get('card_id', '')
-        card = Card.objects.filter(id=card_id)
+        card = Card.objects.filter(id=card_id, user=self.request.user)
         if card:
             card.delete()
             return Response({
@@ -611,6 +629,20 @@ class WithdrawTransactions(TemplateView):
                         "phones": [payinfo.user.wanglibaouserprofile.phone],
                         "messages": [messages.withdraw_confirmed(payinfo.user.wanglibaouserprofile.name, amount)]
                     })
+                    weixin_user = WeixinUser.objects.filter(user=payinfo.user).first()
+                    if weixin_user:
+                        pass
+                        # bank_name = result['bank_name']
+                        # sentTemplate.apply_async(kwargs={
+                        #     "kwargs":json.dumps({
+                        #                 "openid":weixin_user.openid,
+                        #                 "template_id":WITH_DRAW_SUCCESS_TEMPLATE_ID,
+                        #                 "first":u"亲爱的%s，您的提现申请已受理"%name,
+                        #                 "keyword1":result['amount'],
+                        #                 "keyword2":bank_name,
+                        #                 "keyword3":withdraw_ok_time,
+                        #                     })},
+                        #                 queue='celery02')
             return HttpResponse({
                 u"所有的取款请求已经处理完毕 %s" % uuids_param
             })
@@ -815,7 +847,7 @@ class AdminTransactionDeposit(TemplateView):
 
 
 # 易宝支付创建订单接口
-class YeePayAppPayView(APIView):
+class YeePayAppPayView(DecryptParmsAPIView):
     permission_classes = (IsAuthenticated, )
 
     @require_trade_pwd
@@ -922,6 +954,12 @@ class BankCardAddView(APIView):
 
     def post(self, request):
         result = third_pay.add_bank_card(request)
+
+        if result.get('ret_code') == 0:
+            try:
+                CoopRegister(request).process_for_binding_card(request.user)
+            except:
+                logger.exception('bind_card_callback_failed for %s' % str(request.user))
 
         return Response(result)
 
@@ -1071,7 +1109,7 @@ class TradeRecordAPIView(APIView):
         return Response(rs)
 
 
-class WithdrawAPIView(APIView):
+class WithdrawAPIView(DecryptParmsAPIView):
     permission_classes = (IsAuthenticated, )
 
     @require_trade_pwd
@@ -1081,22 +1119,15 @@ class WithdrawAPIView(APIView):
         # 短信通知添加用户名
         user = request.user
         name = user.wanglibaouserprofile.name or u'用户'
-
         if not result['ret_code']:
-            send_messages.apply_async(kwargs={
-                'phones': [result['phone']],
-                'messages': [messages.withdraw_submitted(name)]
-            })
-
-            title, content = messages.msg_withdraw(timezone.now(), result['amount'])
-            inside_message.send_one.apply_async(kwargs={
-                "user_id": request.user.id,
-                "title": title,
-                "content": content,
-                "mtype": "withdraw"
+            withdraw_submit_ok.apply_async(kwargs={
+                "user_id": user.id,
+                "user_name": name,
+                "phone": request.user.wanglibaouserprofile.phone,
+                "amount": result['amount'],
+                "bank_name": result['bank_name']
             })
         return Response(result)
-
 
 class BindCardQueryView(APIView):
     """ 查询用户绑定卡号列表接口 """
@@ -1115,7 +1146,7 @@ class UnbindCardView(APIView):
         result = third_pay.card_unbind(request)
         return Response(result)
 
-class BindPayDepositView(APIView):
+class BindPayDepositView(DecryptParmsAPIView):
     """ 获取验证码或快捷支付 """
     permission_classes = (IsAuthenticated, )
 
@@ -1125,7 +1156,7 @@ class BindPayDepositView(APIView):
 
         return Response(result)
 
-class BindPayDynnumNewView(APIView):
+class BindPayDynnumNewView(DecryptParmsAPIView):
     """ 确认支付 """
     permission_classes = (IsAuthenticated, )
 

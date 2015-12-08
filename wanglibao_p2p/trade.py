@@ -26,9 +26,14 @@ import logging
 # from wanglibao_account.tasks import cjdao_callback
 # from wanglibao.settings import CJDAOKEY, RETURN_PURCHARSE_URL
 import re
+import json, datetime
+
 from wanglibao_redis.backend import redis_backend
 
 from wanglibao_rest.utils import split_ua
+from weixin.models import WeixinUser
+from weixin.constant import PRODUCT_INVEST_SUCCESS_TEMPLATE_ID
+
 
 logger = logging.getLogger('wanglibao_account')
 
@@ -96,24 +101,38 @@ class P2PTrader(object):
                 is_full = True
 
         # fix@chenweibin, add order_id
-        tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount,
-                                               "device": self.device, "order_id": self.order_id,
-                                               "product_id": self.product.id, "is_full": is_full})
+        # Modify by hb on 2015-11-25 : add "try-except"
         try:
-            CoopRegister(self.request).process_for_purchase(self.user, self.order_id)
-        except:
+            logger.debug("=20151125= decide_first.apply_async : [%s], [%s], [%s], [%s], [%s], [%s]" % \
+                         (self.user.id, amount, self.device['device_type'], self.order_id, self.product.id, is_full) )
+            tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount,
+                                                   "device": self.device, "order_id": self.order_id,
+                                                   "product_id": self.product.id, "is_full": is_full})
+        except Exception, reason:
+            logger.debug("=20151125= decide_first.apply_async Except:{0}".format(reason))
             pass
+
         try:
+            logger.debug("=20151125= CoopRegister.process_for_purchase : [%s], [%s]" % (self.user.id, self.order_id) )
+            CoopRegister(self.request).process_for_purchase(self.user, self.order_id)
+        except Exception, reason:
+            logger.debug("=20151125= CoopRegister.process_for_purchase Except:{0}".format(reason) )
+            pass
+
+        try:
+            logger.debug("=20151125= RewardDistributer.processor_for_distribute : [%s], [%s]" % (self.user.id, self.order_id) )
             kwargs = {
                 'amount': amount,
-                'order_id': self.order_id,}
+                'order_id': self.order_id,
+                'user': self.user,}
 
             RewardDistributer(self.request, kwargs).processor_for_distribute()
         except Exception, reason:
-            logger.debug("购标异常 reason:{0}".format(reason))
+            logger.debug("=20151125= RewardDistributer.processor_for_distribute Except:{0}".format(reason) )
             pass
         else:
-            logger.debug("{0}购标成功".format(self.user))
+            logger.debug("=20151125= RewardDistributer.processor_for_distribute : {0}购标成功".format(self.user) )
+
         # 投标成功发站内信
         matches = re.search(u'日计息', self.product.pay_method)
         if matches and matches.group():
@@ -129,6 +148,7 @@ class P2PTrader(object):
             "mtype": "purchase"
 
         })
+        logger.debug("=20151125= inside_message.send_one : {0}购标站内信发成功".format(self.user) )
 
         # 满标给管理员发短信
         if is_full:
@@ -148,7 +168,29 @@ class P2PTrader(object):
 
                 # 将标写入redis list
                 cache_backend.push_p2p_products(self.product)
-
+        try:
+            weixin_user = WeixinUser.objects.filter(user=self.user).first()
+            now = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
+    #         投标成功通知
+    #         您好，您已投标成功。
+    #         标的编号：10023
+    #         投标金额：￥3000.00
+    #         投标时间：2015-09-12
+    #         投标成功,可在投标记录里查看.
+    # {{first.DATA}} 标的编号：{{keyword1.DATA}} 投标金额：{{keyword2.DATA}} 投标时间：{{keyword3.DATA}} {{remark.DATA}}
+            if weixin_user:
+                from weixin.tasks import sentTemplate
+                sentTemplate.apply_async(kwargs={
+                                "kwargs":json.dumps({
+                                                "openid": weixin_user.openid,
+                                                "template_id": PRODUCT_INVEST_SUCCESS_TEMPLATE_ID,
+                                                "keyword1": self.product.id,
+                                                "keyword2": str(amount),
+                                                "keyword3": now,
+                                                    })},
+                                                queue='celery02')
+        except Exception, e:
+            pass
         return product_record, margin_record, equity
 
 

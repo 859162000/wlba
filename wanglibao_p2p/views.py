@@ -55,7 +55,7 @@ import pickle
 from misc.models import Misc
 import json
 from wanglibao_activity import backends as activity_backends
-
+from wanglibao_rest.common import DecryptParmsAPIView
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -204,7 +204,7 @@ class PurchaseP2P(APIView):
                             }, status=status.HTTP_400_BAD_REQUEST)
 
 
-class PurchaseP2PMobile(APIView):
+class PurchaseP2PMobile(DecryptParmsAPIView):
     permission_classes = (IsAuthenticated,)
 
     @property
@@ -478,7 +478,7 @@ class P2PProductViewSet(PaginatedModelViewSet):
     model = P2PProduct
     permission_classes = (IsAdminUserOrReadOnly,)
     serializer_class = P2PProductSerializer
-    paginate_by = 10
+    # paginate_by = 10
 
     def get_queryset(self):
         qs = super(P2PProductViewSet, self).get_queryset()

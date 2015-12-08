@@ -19,7 +19,7 @@ block main
         span.verified 已实名认证
       else
         span
-          a#name-hight(href="/accounts/id_verify/") 立即进行实名认证
+          a#name-hight(href="/accounts/register/first/") 立即进行实名认证
 
     .card-panel
       .total-asset-money-card
@@ -68,7 +68,7 @@ block main
         a.pull-right.align-right.detail-view(href='/accounts/transaction/p2p/') 查看交易记录
       .clamp-xl
         .account-home-panel--action-bar
-          a.button-home-action(href="/pay/banks/") 充值
+          a.button-home-action(href="/pay/banks_for_register/") 充值
           a.button-home-action.margin-left-m(href="/pay/withdraw/") 取现
 
         .row
@@ -179,19 +179,19 @@ block main
               .row.tyjRow
                   .total-asset-money-card
                       p.align-center
-                          span.big_number {{experience_account.total_experience_amount}}
+                          span.big_number {{experience_account.total_experience_amount | money_format}}
                       p.align-center.desc 体验金总资产（元）
                   .total-asset-money-card
                       p.align-center
-                          span.big_number {{experience_account.experience_amount}}
+                          span.big_number {{experience_account.experience_amount | money_format}}
                       p.align-center.desc 体验金余额（元）
                   .total-asset-money-card
                       p.align-center
-                          span.big_number {{experience_account.paid_interest}}
+                          span.big_number {{experience_account.paid_interest | money_format}}
                       p.align-center.desc 到账收益（元）
                   .total-asset-money-card
                       p.align-center
-                          span.big_number {{experience_account.unpaid_interest}}
+                          span.big_number {{experience_account.unpaid_interest | money_format}}
                       p.align-center.desc 待收收益（元）
               p.tyjMark 注：体验金收益可以正常使用，每一笔到账收益会自动转至理财专区余额。
               table.table.tableNew
@@ -213,9 +213,9 @@ block main
                           td {{amo.product.expected_earning_rate}}%
                           td {{amo.product.period}}
                           if amo.settled
-                            td {{amo.interest}}/{{amo.interest}}（（元）
+                            td {{amo.interest | money_format}}/{{amo.interest | money_format}}（（元）
                           else
-                            td 0.00/{{amo.interest}}（元）
+                            td 0.00/{{amo.interest | money_format}}（元）
                     else
                         tr
                             td 暂无记录

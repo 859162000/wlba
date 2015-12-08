@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # encoding:utf-8
 
-from celery.utils.log import get_task_logger
 from wanglibao.celery import app
 from wanglibao_p2p.models import P2PProduct
 from django.contrib.auth.models import User
@@ -9,14 +8,51 @@ import re
 import json
 from django.conf import settings
 from django.utils import timezone
-
-from weixin.models import SubscribeRecord, SubscribeService, WeixinUser
-from weixin.constant import MessageTemplate, PRODUCT_ONLINE_TEMPLATE_ID
-from weixin.views import SendTemplateMessage
 from decimal import Decimal
 import datetime
 
+from weixin.models import SubscribeRecord, SubscribeService, WeixinUser
+from weixin.constant import MessageTemplate, PRODUCT_ONLINE_TEMPLATE_ID, BIND_SUCCESS_TEMPLATE_ID
+from weixin.views import SendTemplateMessage
+from wanglibao_redpack.models import RedPackRecord, RedPackEvent
+from wanglibao_redpack.backends import get_start_end_time, local_transform_str,stamp
 
+
+@app.task
+def bind_ok(openid, is_first_bind, redpack_record_id):
+    weixin_user = WeixinUser.objects.get(openid=openid)
+    now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
+    if is_first_bind and redpack_record_id:
+        redpack_record = RedPackRecord.objects.get(id=redpack_record_id)
+        if redpack_record and redpack_record.user == weixin_user.user:
+            # 获赠红包：20元
+            # 起投金额：2000元
+            # 有效期：**年**月**日（自领取之日起7天有效）
+            redpack_event = redpack_record.redpack.event
+            start_time, endtime = get_start_end_time(redpack_event.auto_extension, redpack_event.auto_extension_days,
+                                              redpack_record.created_at, redpack_event.available_at, redpack_event.unavailable_at)
+            remark = u"获赠红包：%s元\n起投金额：%s元\n有效期至：%s\n您可以使用下方微信菜单进行更多体验。"%(redpack_event.amount,
+                                                                         redpack_event.invest_amount, datetime.datetime.fromtimestamp(stamp(endtime)).strftime('%Y年%m月%d日'))
+            sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
+                                        "openid":weixin_user.openid,
+                                        "template_id":BIND_SUCCESS_TEMPLATE_ID,
+                                        "name1":"",
+                                        "name2":weixin_user.user.wanglibaouserprofile.phone,
+                                        "time":now_str+'\n',
+                                        "remark":remark
+                                            })},
+                                        queue='celery02'
+                                        )
+            return
+    sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
+                                "openid":weixin_user.openid,
+                                "template_id":BIND_SUCCESS_TEMPLATE_ID,
+                                "name1":"",
+                                "name2":weixin_user.user.wanglibaouserprofile.phone,
+                                "time":now_str,
+                                    })},
+                                queue='celery02'
+                                )
 
 @app.task
 def detect_product_biding(product_id):
@@ -51,7 +87,8 @@ def detect_product_biding(product_id):
                                 "period_desc": period_desc,
                                 "pay_method": product.pay_method,
                                 },
-                                                          eta= exec_time
+                                                          eta= exec_time,
+                                                          queue='celery02'
                                                           )
                     else:
                         sendUserProductOnLine.apply_async(kwargs={
@@ -62,7 +99,8 @@ def detect_product_biding(product_id):
                                 "rate_desc": rate_desc,
                                 "period_desc": period_desc,
                                 "pay_method": product.pay_method,
-                            })
+                            },
+                                                          queue='celery02')
 
 @app.task
 def sendUserProductOnLine(openid, service_desc, product_id, product_name, rate_desc, period_desc, pay_method):

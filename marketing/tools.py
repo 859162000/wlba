@@ -19,8 +19,13 @@ from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity import backends as activity_backends
 from wanglibao_redpack.models import Income, RedPackEvent, RedPack, RedPackRecord
 import datetime
+import json
 from django.db.models import Sum, Count, Q
 import logging
+from weixin.constant import DEPOSIT_SUCCESS_TEMPLATE_ID, WITH_DRAW_SUBMITTED_TEMPLATE_ID
+
+from weixin.models import WeixinUser
+
 
 # logger = logging.getLogger('wanglibao_reward')
 
@@ -40,25 +45,27 @@ def decide_first(user_id, amount, device, order_id, product_id=0, is_full=False)
         introduced_by.save()
 
     # 活动检测
-    activity_backends.check_activity(user, 'invest', device_type, amount, product_id, is_full, order_id)
+    activity_backends.check_activity(user, 'invest', device_type, amount, product_id, order_id, is_full)
     # fix@chenweibi, add order_id
-    utils.log_clientinfo(device, "buy", user_id, order_id, amount)
-
+    try:
+        utils.log_clientinfo(device, "buy", user_id, order_id, amount)
+    except Exception:
+        pass
     # 发送红包
     # send_lottery.apply_async((user_id,))
 
 
 def weixin_redpack_distribute(user):
     phone = user.wanglibaouserprofile.phone
-    logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
+    logger.info('通过weixin_redpack渠道注册,phone:%s' % (phone,))
     records = WanglibaoUserGift.objects.filter(valid=0, identity=phone)
     for record in records:
         try:
             redpack_backends.give_activity_redpack(user, record.rules.redpack, 'pc')
         except Exception, reason:
-            logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
+            logger.exception('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
         else:
-            logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (user, record.rules.redpack,))
+            logger.info('Success:发送红包完毕,user:%s, redpack:%s' % (user, record.rules.redpack,))
         record.user = user
         record.valid = 1
         record.save()
@@ -82,7 +89,10 @@ def register_ok(user_id, device):
     })
     # 活动检测
     activity_backends.check_activity(user, 'register', device_type)
-    utils.log_clientinfo(device, "register", user_id)
+    try:
+        utils.log_clientinfo(device, "register", user_id)
+    except Exception:
+        pass
 
 
 @app.task
@@ -92,14 +102,28 @@ def idvalidate_ok(user_id, device):
 
     # 活动检测
     activity_backends.check_activity(user, 'validation', device_type)
-    utils.log_clientinfo(device, "validation", user_id)
-
+    try:
+        utils.log_clientinfo(device, "validation", user_id)
+    except Exception:
+        pass
 
 @app.task
 def deposit_ok(user_id, amount, device, order_id):
     # fix@chenweibi, add order_id
     try:
-        device_type = device['device_type']
+        try:
+            # 支持通过字典传递完整的device信息或是通过str直接传device_type
+            if isinstance(device, dict):
+                device_type = device['device_type']
+            elif isinstance(device, str) or isinstance(device, unicode):
+                assert device in ['pc', 'ios', 'android']
+                device_type = device
+            else:
+                raise
+        except:
+            device_type = u'pc'
+            logger.exception("=deposit_ok= Failed to get device_type")
+
         title, content = messages.msg_pay_ok(amount)
         inside_message.send_one.apply_async(kwargs={
             "user_id": user_id,
@@ -107,18 +131,81 @@ def deposit_ok(user_id, amount, device, order_id):
             "content": content,
             "mtype": "activityintro"
         })
+
         user = User.objects.get(id=user_id)
         user_profile = user.wanglibaouserprofile
-        activity_backends.check_activity(user, 'recharge', device_type, amount, order_id)
-        utils.log_clientinfo(device, "deposit", user_id, order_id, amount)
+        activity_backends.check_activity(user, 'recharge', device_type,
+                                         amount, **{'order_id': order_id})
+        try:
+            utils.log_clientinfo(device, "deposit", user_id, order_id, amount)
+        except Exception:
+            pass
+
         send_messages.apply_async(kwargs={
             'phones': [user_profile.phone],
             'messages': [messages.deposit_succeed(user_profile.name, amount)]
         })
-        logger.debug('send messages 充值金额啊啊啊: %s' % amount)
+
+        weixin_user = WeixinUser.objects.filter(user=user).first()
+# 亲爱的满先生，您的充值已成功
+# {{first.DATA}} 充值时间：{{keyword1.DATA}} 充值金额：{{keyword2.DATA}} 可用余额：{{keyword3.DATA}} {{remark.DATA}}
+        if weixin_user:
+            from weixin.tasks import sentTemplate
+            deposit_ok_time = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
+            margin = Margin.objects.filter(user=user).first()
+            sentTemplate.apply_async(kwargs={
+                            "kwargs":json.dumps({
+                                            "openid":weixin_user.openid,
+                                            "template_id":DEPOSIT_SUCCESS_TEMPLATE_ID,
+                                            "first":u"亲爱的%s，您的充值已成功"%user_profile.name,
+                                            "keyword1":deposit_ok_time,
+                                            "keyword2":str(amount),
+                                            "keyword3":str(margin.margin),
+                                                })},
+                                            queue='celery02')
+
+        logger.info('=deposit_ok= Success: [%s], [%s], [%s]' % (user_profile.phone, order_id, amount))
     except Exception, e:
-        logger.debug('send messages 充值异常啊啊啊: %s' % str(e))
-        pass
+        logger.exception('=deposit_ok= Except: [%s]' % str(e))
+
+
+@app.task
+def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name):
+    user = User.objects.filter(id=user_id).first()
+    # 短信通知添加用户名
+
+
+    send_messages.apply_async(kwargs={
+        'phones': [phone],
+        # 'messages': [messages.withdraw_submitted(amount, timezone.now())]
+        'messages': [messages.withdraw_submitted(user_name)]
+    })
+    title, content = messages.msg_withdraw(timezone.now(), amount)
+    inside_message.send_one.apply_async(kwargs={
+        "user_id": user.id,
+        "title": title,
+        "content": content,
+        "mtype": "withdraw"
+    })
+    weixin_user = WeixinUser.objects.filter(user=user).first()
+    if weixin_user:
+        from weixin.tasks import sentTemplate
+        # 亲爱的{}，您的提现申请已受理，1-3个工作日内将处理完毕，请耐心等待。
+    # {{first.DATA}} 取现金额：{{keyword1.DATA}} 到账银行：{{keyword2.DATA}} 预计到账时间：{{keyword3.DATA}} {{remark.DATA}}
+        now = datetime.datetime.now()
+        withdraw_ok_time = "%s前处理完毕"%(now+datetime.timedelta(days=3)).strftime('%Y年%m月%d日')
+        sentTemplate.apply_async(kwargs={
+                        "kwargs":json.dumps({
+                                        "openid":weixin_user.openid,
+                                        "template_id":WITH_DRAW_SUBMITTED_TEMPLATE_ID,
+                                        "first":u"亲爱的%s，您的提现申请已受理"%user_name,
+                                        "keyword1":str(amount),
+                                        "keyword2":bank_name,
+                                        "keyword3":withdraw_ok_time,
+                                            })},
+                                        queue='celery02')
+
+
 
 
 @app.task

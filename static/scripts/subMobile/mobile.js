@@ -872,9 +872,9 @@ function onLoadClass(){
 function getCode(){//得到用户信息的二维码
     var phone = org.getQueryStringByName('phone');
     org.ajax({
-        type: "POST",
-        url: "/weixin/api/generate/qr_limit_scene_ticket/",
-        data: {"original_id":"gh_f758af6347b6"},//c:gh_32e9dc3fab8e
+        type: "GET",
+        url: "/weixin/api/generate/qr_scene_ticket/",
+        data: {"original_id":"gh_32e9dc3fab8e", "code": "test1"},//c:gh_32e9dc3fab8e, w:gh_f758af6347b6;code:微信关注渠道
         success: function (data) {
             $("#sub-code").html("<img src='"+ data.qrcode_url + "' />");
         },
@@ -928,6 +928,7 @@ function isAwards(k){//判断抽奖是第几项
     }
     return is;
 }
+
 var awardsNum = 0,
     goods = '';
 org.awardEvent = (function(org){ //微信抽奖
@@ -940,7 +941,6 @@ org.awardEvent = (function(org){ //微信抽奖
             success: function(data){
                 fn(data);
                 awardsNum = data.left;
-                //redPack_id = data.redpack;
                 goods = parseFloat(data.amount);
             },
             error: function(){}
