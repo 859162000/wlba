@@ -173,8 +173,8 @@ class AppRepaymentPlanAllAPIView(APIView):
 
     def post(self, request):
         user = request.user
-        page = request.GET.get('page', 1)
-        pagesize = request.GET.get('num', 10)
+        page = request.DATA.get('page', 1)
+        pagesize = request.DATA.get('num', 10)
         page = int(page)
         pagesize = int(pagesize)
 
@@ -186,6 +186,8 @@ class AppRepaymentPlanAllAPIView(APIView):
                 user_amortizations = paginator.page(page)
             except PageNotAnInteger:
                 user_amortizations = paginator.page(1)
+            except EmptyPage:
+                user_amortizations = []
             except Exception:
                 user_amortizations = paginator.page(paginator.num_pages)
 
@@ -209,11 +211,6 @@ class AppRepaymentPlanMonthAPIView(APIView):
         month = request_month if request_month else now.month
         current_month = '{}-{}'.format(now.year, now.month)
 
-        page = request.GET.get('page', 1)
-        pagesize = request.GET.get('num', 10)
-        page = int(page)
-        pagesize = int(pagesize)
-
         start = local_to_utc(datetime(int(year), int(month), 1), 'min')
         end = local_to_utc(datetime(int(year), int(month) + 1, 1) - timedelta(days=1), 'max')
 
@@ -222,40 +219,50 @@ class AppRepaymentPlanMonthAPIView(APIView):
             amos_group = UserAmortization.objects.filter(user=user)\
                 .filter(term_date__gt=start, term_date__lte=end).order_by('term_date')\
                 .extra({'term_date': "DATE_FORMAT(term_date,'%%Y-%%m')"}).values('term_date')\
-                .annotate(Count('term_date')).annotate(Sum('principal')).order_by('term_date')
+                .annotate(Count('term_date')).annotate(Sum('principal')).annotate(Sum('interest'))\
+                .annotate(Sum('penal_interest')).annotate(Sum('coupon_interest')).order_by('term_date')
         else:
             amos_group = UserAmortization.objects.filter(user=user)\
                 .extra({'term_date': "DATE_FORMAT(term_date,'%%Y-%%m')"}).values('term_date')\
-                .annotate(Count('term_date')).annotate(Sum('principal')).order_by('term_date')
+                .annotate(Count('term_date')).annotate(Sum('principal')).annotate(Sum('interest'))\
+                .annotate(Sum('penal_interest')).annotate(Sum('coupon_interest')).order_by('term_date')
 
         month_group = [{
             'term_date': amo.get('term_date'),
             'term_date_count': amo.get('term_date__count'),
-            'principal_sum': amo.get('principal__sum')
+            'total_sum': amo.get('principal__sum') + amo.get('interest__sum') +
+                         amo.get('penal_interest__sum') + amo.get('coupon_interest__sum'),
+            'principal_sum': amo.get('principal__sum'),
+            'interest_sum': amo.get('interest__sum'),
+            'penal_interest_sum': amo.get('penal_interest__sum'),
+            'coupon_interest_sum': amo.get('coupon_interest__sum'),
         } for amo in amos_group]
 
         # 当月的还款计划
         user_amortizations = UserAmortization.objects.filter(user=user)\
             .filter(term_date__gt=start, term_date__lte=end).order_by('term_date')
         if user_amortizations:
-            paginator = Paginator(user_amortizations, pagesize)
-
-            try:
-                user_amortizations = paginator.page(page)
-            except PageNotAnInteger:
-                user_amortizations = paginator.page(1)
-            except Exception:
-                user_amortizations = paginator.page(paginator.num_pages)
             amo_list = _user_amortization_list(user_amortizations)
         else:
             amo_list = []
+
+        if not amo_list:
+            custom_month_data = {
+                'term_date': current_month,
+                'term_date_count': 0,
+                'total_sum': 0.0,
+                'principal_sum': 0.0,
+                'interest_sum': 0.0,
+                'penal_interest_sum': 0.0,
+                'coupon_interest_sum': 0.0,
+            }
+            month_group.append(custom_month_data)
+            month_group.sort(key=lambda x: x['term_date'])
 
         return Response({'ret_code': 0,
                          'data': amo_list, 
                          'month_group': month_group,
                          'current_month': current_month,
-                         'page': page,
-                         'num': pagesize
                          })
 
 
@@ -281,6 +288,7 @@ def _user_amortization_list(user_amortizations):
             'interest': amo.interest,
             'penal_interest': amo.penal_interest,
             'coupon_interest': amo.coupon_interest,
+            'total_interest': amo.interest + amo.penal_interest + amo.coupon_interest,  # 总利息
             'settled': amo.settled,
             'settlement_time': amo.settlement_time,
             'settlement_status': status
