@@ -9,6 +9,7 @@ import pytz
 import time
 import datetime
 import json
+import re
 import logging
 import decimal
 from django.utils import timezone
@@ -23,7 +24,7 @@ from wanglibao_pay.util import fmt_two_amount
 from misc.models import Misc
 from wanglibao_margin.marginkeeper import MarginKeeper
 from marketing.models import IntroducedBy
-import json
+
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +54,7 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
         # if not product_id or product_id == 0:
         #     return {"ret_code": 30151, "message": u"产品ID错误"}
         try:
-            product = P2PProduct.objects.filter(pk=product_id).values('period', 'types_id').first()
+            product = P2PProduct.objects.filter(pk=product_id).values('period', 'types_id', 'pay_method').first()
         except Exception:
             product = None
 
@@ -77,12 +78,30 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                 p2p_types_id = 0
                 p2p_types_name = ''
                 if product:
-                    if event.period != '' or event.period != 0:
-                        redpack_period = event.period.split(',')
-                        redpack_period = [int(period) for period in redpack_period if period.strip() != ""]
+                    if event.period:
+                        event_period = int(event.period)
+                        period_type = event.period_type if event.period_type else 'month'
                         product_period = product['period']
-                        if redpack_period and redpack_period[0] != 0 and (product_period not in redpack_period):
-                            continue
+                        pay_method = product['pay_method']
+                        if period_type == 'month' or period_type == 'day':
+                            if product_period != event_period:
+                                continue
+                        else:
+                            matches = re.search(u'日计息', pay_method)
+                            if matches and matches.group():
+                                if period_type == 'month_gte':
+                                    if event_period * 30 > product_period:
+                                        continue
+                                else:
+                                    if event_period > product_period:
+                                        continue
+                            else:
+                                if period_type == 'month_gte':
+                                    if event_period > product_period:
+                                        continue
+                                else:
+                                    if event_period < pay_method * 30:
+                                        continue
                     if event.p2p_types:
                         p2p_types_id = int(event.p2p_types.id)
                         p2p_types_name = event.p2p_types.name
@@ -125,12 +144,30 @@ def list_redpack(user, status, device_type, product_id=0, rtype='redpack', app_v
                         continue
                     event = coupon.redpack.event
                     if product:
-                        if event.period != "" or event.period != 0:
-                            coupon_period = event.period.split(',')
-                            coupon_period = [int(period) for period in coupon_period if period.strip() != ""]
+                        if event.period:
+                            event_period = int(event.period)
+                            period_type = event.period_type if event.period_type else 'month'
                             product_period = product['period']
-                            if coupon_period and coupon_period[0] != 0 and (product_period not in coupon_period):
-                                continue
+                            pay_method = product['pay_method']
+                            if period_type == 'month' or period_type == 'day':
+                                if product_period != event_period:
+                                    continue
+                            else:
+                                matches = re.search(u'日计息', pay_method)
+                                if matches and matches.group():
+                                    if period_type == 'month_gte':
+                                        if event_period * 30 > product_period:
+                                            continue
+                                    else:
+                                        if event_period > product_period:
+                                            continue
+                                else:
+                                    if period_type == 'month_gte':
+                                        if event_period > product_period:
+                                            continue
+                                    else:
+                                        if event_period < pay_method * 30:
+                                            continue
 
                     if event.p2p_types:
                         p2p_types_id = int(event.p2p_types.id)

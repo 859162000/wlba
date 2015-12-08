@@ -53,7 +53,7 @@ block main
             th 使用次数
             th 使用限额
             th 投资门槛
-            th 使用范围<br/>期限(月/天)
+            th 使用范围/期限
             th(width='20%') 有效期
             if status == 'used'
               th 使用详情
@@ -78,7 +78,7 @@ block main
                 if not coupon.p2p_types_name and not coupon.period
                   | 无
                 if coupon.period
-                  | {{coupon.period}}
+                  | {{coupon.period}}{{red_packet.period_type}}
               td {{coupon.available_at | milldate_format}} 至 {{coupon.unavailable_at | milldate_format}}
               if status == 'used'
                 td {{coupon.product}} <br/> {{coupon.apply_at | milltime_format }}

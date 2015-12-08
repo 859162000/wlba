@@ -417,10 +417,14 @@ class UserAmortization(models.Model):
 
     @property
     def last_settlement_status(self):
-        re = AmortizationRecord.objects.filter(amortization__product=self.product_amortization.product)\
-            .order_by('-created_time').first()
-        catalog = re.catalog if re else ''
+        re = AmortizationRecord.objects.filter(amortization__product=self.product_amortization.product.id)\
+            .values('catalog').order_by('-created_time').first()
+        catalog = re.get('catalog') if re and re.get('catalog') else ''
         return catalog
+
+    @property
+    def terms(self):
+        return ProductAmortization.objects.filter(product=self.product_amortization).count()
 
 
 class P2PEquity(models.Model):
