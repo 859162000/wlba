@@ -173,12 +173,26 @@ class AppRepaymentPlanAllAPIView(APIView):
 
     def post(self, request):
         user = request.user
+        page = request.GET.get('page', 1)
+        pagesize = request.GET.get('num', 10)
+        page = int(page)
+        pagesize = int(pagesize)
+
         user_amortizations = UserAmortization.objects.filter(user=user).order_by('-term_date')
         if user_amortizations:
+            paginator = Paginator(user_amortizations, pagesize)
+
+            try:
+                user_amortizations = paginator.page(page)
+            except PageNotAnInteger:
+                user_amortizations = paginator.page(1)
+            except Exception:
+                user_amortizations = paginator.page(paginator.num_pages)
+
             amo_list = _user_amortization_list(user_amortizations)
         else:
             amo_list = []
-        return Response({'ret_code': 0, 'data': amo_list})
+        return Response({'ret_code': 0, 'data': amo_list, 'page': page, 'num': pagesize})
 
 
 class AppRepaymentPlanMonthAPIView(APIView):
@@ -193,6 +207,12 @@ class AppRepaymentPlanMonthAPIView(APIView):
         request_month = request.DATA.get('month', '')
         year = request_year if request_year else now.year
         month = request_month if request_month else now.month
+        current_month = '{}-{}'.format(now.year, now.month)
+
+        page = request.GET.get('page', 1)
+        pagesize = request.GET.get('num', 10)
+        page = int(page)
+        pagesize = int(pagesize)
 
         start = local_to_utc(datetime(int(year), int(month), 1), 'min')
         end = local_to_utc(datetime(int(year), int(month) + 1, 1) - timedelta(days=1), 'max')
@@ -218,11 +238,25 @@ class AppRepaymentPlanMonthAPIView(APIView):
         user_amortizations = UserAmortization.objects.filter(user=user)\
             .filter(term_date__gt=start, term_date__lte=end).order_by('term_date')
         if user_amortizations:
+            paginator = Paginator(user_amortizations, pagesize)
+
+            try:
+                user_amortizations = paginator.page(page)
+            except PageNotAnInteger:
+                user_amortizations = paginator.page(1)
+            except Exception:
+                user_amortizations = paginator.page(paginator.num_pages)
             amo_list = _user_amortization_list(user_amortizations)
         else:
             amo_list = []
 
-        return Response({'ret_code': 0, 'data': amo_list, 'month_group': month_group})
+        return Response({'ret_code': 0,
+                         'data': amo_list, 
+                         'month_group': month_group,
+                         'current_month': current_month,
+                         'page': page,
+                         'num': pagesize
+                         })
 
 
 def _user_amortization_list(user_amortizations):
@@ -235,11 +269,11 @@ def _user_amortization_list(user_amortizations):
                 status = u'已回款'
         else:
             status = u'待回款'
-        product = P2PProduct.objects.filter(id=amo.product_amortization.product.id).values('name').first()
         amo_list.append({
             'user_amortization_id': amo.id,
             'product_amortization_id': amo.product_amortization.id,
-            'product_name': product.get('name'),
+            'product_id': amo.product_amortization.product.id,
+            'product_name': amo.product_amortization.product.name,
             'term': amo.term,
             'term_total': amo.terms,
             'term_date': amo.term_date,
