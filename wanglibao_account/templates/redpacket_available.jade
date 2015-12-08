@@ -72,7 +72,8 @@ block main
               if red_packet.invest_amount == 0
                 td 无
               else
-                td {{red_packet.invest_amount}}元
+                td {{red_packet.invest_amount | period_format}}元
+
               td
                 if red_packet.p2p_types_name
                   | {{red_packet.p2p_types_name}}
