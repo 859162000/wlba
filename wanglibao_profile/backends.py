@@ -9,7 +9,9 @@ from wanglibao_pay.models import Card, PayInfo
 from wanglibao_profile.models import WanglibaoUserProfile
 import time
 import json
-# import logging
+import logging
+
+logger = logging.getLogger(__name__)
 
 #最多重试三次
 from wanglibao_rest.utils import split_ua
@@ -227,26 +229,31 @@ def require_trade_pwd(view_func):
     '''
     @wraps(view_func, assigned=available_attrs(view_func))
     def _wrapped_view(self, request, *args, **kwargs):
-        # logging.getLogger('django').error('trade request POST %s header %s'%(request.POST, request.META))
-        no_need_trade_pwd = False
-        #为了获取验证码
-        if request.path == reverse('deposit-new') and len(request.POST.get('card_no', '')) != 10:
-            no_need_trade_pwd = True
-        #为了绑卡进行的绑卡充值
-        if _is_just_bind_card(request):
-            no_need_trade_pwd = True
-        if not _is_version_satisfied(request):
-            no_need_trade_pwd = True
-        # logging.getLogger('django').error('trade request no_need_trade_pwd %s'%no_need_trade_pwd)
-        if no_need_trade_pwd:
-            return view_func(self, request, *args, **kwargs)
+        try:
+            # logging.getLogger('django').error('trade request POST %s header %s'%(request.POST, request.META))
+            no_need_trade_pwd = False
+            #为了获取验证码
+            if request.path == reverse('deposit-new') and len(request.POST.get('card_no', '')) != 10:
+                no_need_trade_pwd = True
+            #为了绑卡进行的绑卡充值
+            if _is_just_bind_card(request):
+                no_need_trade_pwd = True
+            if not _is_version_satisfied(request):
+                no_need_trade_pwd = True
+            # logging.getLogger('django').error('trade request no_need_trade_pwd %s'%no_need_trade_pwd)
+            if no_need_trade_pwd:
+                return view_func(self, request, *args, **kwargs)
 
-        # logging.getLogger('django').error('trade request user %s pwd %s %s'%(request.user.id, request.POST.get('trade_pwd'), len(request.POST.get('trade_pwd'))))
-        check_result = trade_pwd_check(request.user.id, request.POST.get('trade_pwd', ''))
-        if check_result.get('ret_code') == 0 :
-            return view_func(self, request, *args, **kwargs)
-        else:
-            return HttpResponse(json.dumps(check_result), content_type="application/json")
+            # logging.getLogger('django').error('trade request user %s pwd %s %s'%(request.user.id, request.POST.get('trade_pwd'), len(request.POST.get('trade_pwd'))))
+            # check_result = trade_pwd_check(request.user.id, request.POST.get('trade_pwd', ''))
+            check_result = trade_pwd_check(request.user.id, self.params.get('trade_pwd', ''))
+            if check_result.get('ret_code') == 0 :
+                return view_func(self, request, *args, **kwargs)
+            else:
+                return HttpResponse(json.dumps(check_result), content_type="application/json")
+        except ValueError:
+            logger.error('trade request POST %s header %s'%(request.POST, request.META))
+            return HttpResponse(json.dumps({'ret_code': 40002, 'message': '交易密码错误'}), content_type="application/json")
     
     return _wrapped_view
 

@@ -44,7 +44,6 @@ from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract, update_coop_order
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account import third_login, backends as account_backends, message as inside_message
-from wanglibao_account.forms import EmailOrPhoneAuthenticationForm, TokenSecretSignAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning, \
@@ -73,9 +72,10 @@ from wanglibao_account.utils import get_client_ip
 from wanglibao_account.models import UserThreeOrder
 import requests
 from wanglibao_margin.models import MarginRecord
+from experience_gold.models import ExperienceAmortization, ExperienceEventRecord, ExperienceProduct
 from wanglibao_pay.fee import WithdrawFee
 from wanglibao_account import utils as account_utils
-from experience_gold.models import ExperienceAmortization, ExperienceEventRecord, ExperienceProduct
+from wanglibao_rest.common import DecryptParmsAPIView
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
@@ -293,11 +293,13 @@ def password_change(request,
     # TODO find a proper status value and return error message
     return HttpResponse(status=400)
 
-class PasswordCheckView(APIView):
+class PasswordCheckView(DecryptParmsAPIView):
     permission_classes = ()
     def post(self, request, **kwargs):
-        identifier = request.DATA.get("identifier", "")
-        password = request.DATA.get("password", "")
+        identifier = self.params.get("identifier", "")
+        password = self.params.get("password", "")
+        # identifier = request.DATA.get("identifier", "")
+        # password = request.DATA.get("password", "")
 
         if not identifier or not password:
             return Response({"token":False, "message":u"登录密码错误，请重试"})
@@ -1126,13 +1128,16 @@ class AccountBankCard(TemplateView):
         }
 
 
-class ResetPasswordAPI(APIView):
+class ResetPasswordAPI(DecryptParmsAPIView):
     permission_classes = ()
 
     def post(self, request):
-        password = request.DATA.get('new_password', "")
-        identifier = request.DATA.get('identifier', "")
-        validate_code = request.DATA.get('validate_code', "")
+        password = self.params.get('new_password', "")
+        identifier = self.params.get('identifier', "")
+        validate_code = self.params.get('validate_code', "")
+        # password = request.DATA.get('new_password', "")
+        # identifier = request.DATA.get('identifier', "")
+        # validate_code = request.DATA.get('validate_code', "")
 
         identifier = identifier.strip()
         password = password.strip()
@@ -1177,14 +1182,17 @@ class Third_login_back(APIView):
         return Response(result)
 
 
-class ChangePasswordAPIView(APIView):
+
+class ChangePasswordAPIView(DecryptParmsAPIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        new_password = request.DATA.get('new_password', "").strip()
-        old_password = request.DATA.get('old_password', "").strip()
-        validate_code = request.DATA.get('validate_code', "").strip()
-
+        # new_password = request.DATA.get('new_password', "").strip()
+        # old_password = request.DATA.get('old_password', "").strip()
+        # validate_code = request.DATA.get('validate_code', "").strip()
+        new_password = self.params.get('new_password', "").strip()
+        old_password = self.params.get('old_password', "").strip()
+        validate_code = self.params.get('validate_code', "").strip()
         if not old_password or not new_password or not validate_code:
             return Response({'ret_code': 30041, 'message': u'信息输入不完整'})
 
@@ -2120,6 +2128,7 @@ class ThirdOrderQueryApiView(APIView):
                     'ret_code': 50001,
                     'message': 'api error'
                 }
+                logger.error('%s_order_query not found' % channel_code.lower())
         else:
             json_response = {
                 'ret_code': 10002,

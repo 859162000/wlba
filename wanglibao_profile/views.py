@@ -16,6 +16,7 @@ from django.db.models import F
 from wanglibao_redpack.backends import local_transform_str
 from django.contrib.auth.models import User
 from django.utils import timezone
+from wanglibao_rest.common import DecryptParmsAPIView
 
 class ProfileView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -99,7 +100,7 @@ class ProfileView(APIView):
         profile_serializer.save()
         return Response(profile_serializer.data, status=status.HTTP_200_OK)
 
-class TradePasswordView(APIView):
+class TradePasswordView(DecryptParmsAPIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
@@ -122,8 +123,10 @@ class TradePasswordView(APIView):
 
         result = trade_pwd_set(request.user.id,
                                int(request.DATA.get('action_type')),
-                               new_trade_pwd= request.DATA.get('new_trade_pwd'),
-                               old_trade_pwd=request.DATA.get('old_trade_pwd'),
+                               new_trade_pwd=self.params.get('new_trade_pwd'),
+                               old_trade_pwd=self.params.get('old_trade_pwd'),
+                               # new_trade_pwd= request.DATA.get('new_trade_pwd'),
+                               # old_trade_pwd=request.DATA.get('old_trade_pwd'),
                                card_id=request.DATA.get('card_id'),
                                citizen_id=request.DATA.get('citizen_id'),
                                only_requirement_check=requirement_check)

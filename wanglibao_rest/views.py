@@ -57,8 +57,10 @@ from wanglibao_account.models import Binding
 from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_redpack.models import Income
 from decimal import Decimal
+from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
+from common import DecryptParmsAPIView
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('wanglibao_rest')
 
 
 class UserPortfolioView(generics.ListCreateAPIView):
@@ -210,7 +212,7 @@ class WeixinSendRegisterValidationCodeView(APIView):
 
 
 
-class RegisterAPIView(APIView):
+class RegisterAPIView(DecryptParmsAPIView):
     permission_classes = ()
 
     def generate_random_password(self, length):
@@ -230,9 +232,12 @@ class RegisterAPIView(APIView):
             modified by: Yihen@20150812
             descrpition: if(line282~line283)的修改，针对特定的渠道延迟返积分、发红包等行为，防止被刷单
         """
-        identifier = request.DATA.get('identifier', "")
-        password = request.DATA.get('password', "")
-        validate_code = request.DATA.get('validate_code', "")
+        identifier = self.params.get('identifier', "")
+        password = self.params.get('password', "")
+        validate_code = self.params.get('validate_code', "")
+        # identifier = request.DATA.get('identifier', "")
+        # password = request.DATA.get('password', "")
+        # validate_code = request.DATA.get('validate_code', "")
         channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
 
         identifier = identifier.strip()
@@ -841,12 +846,12 @@ class AdminIdValidate(APIView):
                             "validate": True
                         }, status=200)
 
-class LoginAPIView(APIView):
+class LoginAPIView(DecryptParmsAPIView):
     permission_classes = ()
 
     def post(self, request, *args, **kwargs):
-        identifier = request.DATA.get("identifier", "")
-        password = request.DATA.get("password", "")
+        identifier = self.params.get("identifier", "")
+        password = self.params.get("password", "")
 
         if not identifier or not password:
             return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
@@ -880,6 +885,9 @@ class LoginAPIView(APIView):
                 pu.push_channel_id = push_channel_id
                 pu.save()
         token, created = Token.objects.get_or_create(user=user)
+        # if not created:
+        #     token.delete()
+        #     token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, "user_id":user.id}, status=status.HTTP_200_OK)
 
 class ObtainAuthTokenCustomized(ObtainAuthToken):
