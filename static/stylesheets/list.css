@@ -1,0 +1,31 @@
+#money-ul {
+    position: absolute;
+    top: 79px;
+    left: 71px;
+    width: 104px;
+    /*background: #fff*/
+    /*z-index: 11*/
+    /*box-shadow: 0 3px 6px rgba(0,0,0,0.2)*/
+    /*display: none*/
+}
+
+.money-ul li{
+    width: 100%
+}
+.money-ul li a{
+    display: block
+    width: 100%
+    text-align: center
+    +line-height(50)
+}
+
+.money-ul li a:hover{
+    background: #f2f2f2
+    color: #474e5e
+
+}
+.money-ul li a:active{
+    background: #f2f2f2
+    color: #474e5e
+
+}

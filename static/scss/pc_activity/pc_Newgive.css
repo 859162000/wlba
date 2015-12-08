@@ -5,6 +5,7 @@
   clear: both; }
 
 body .wrap {
+<<<<<<< HEAD
   height: 485px;
   overflow: hidden; }
 
@@ -42,6 +43,10 @@ body .wrap {
       text-indent: 9000em; }
     .g-banner-slide-baidu .g-slide-anchor .active {
       background: #fff; }
+=======
+  height: 475px;
+  background: url("/static/imgs/pc_activity/newgive/banner.jpg") no-repeat center center; }
+>>>>>>> link
 
 .biaoyu {
   font-size: 24px;
@@ -165,13 +170,21 @@ input.captcha {
 .gv_financing {
   width: 1100px;
   height: auto;
+<<<<<<< HEAD
   margin: 40px auto; }
+=======
+  margin: 40px auto 0 auto; }
+>>>>>>> link
 
 .gv_minbox {
   width: 352px;
   height: auto;
   border: 1px solid #ebebeb;
+<<<<<<< HEAD
   margin-right: 20px;
+=======
+  margin: 0 20px 38px 0;
+>>>>>>> link
   float: left; }
 
 .min11 {
@@ -210,10 +223,14 @@ input.captcha {
 .gv_entle {
   line-height: 68px;
   font-size: 17px;
+<<<<<<< HEAD
   margin-left: 18px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
+=======
+  margin-left: 18px; }
+>>>>>>> link
   .gv_entle span {
     width: 78px;
     height: 25px;
@@ -273,6 +290,7 @@ input.captcha {
   margin-right: 30px;
   line-height: 80px; }
   .gv_tzbtn a {
+<<<<<<< HEAD
     display: inline-block;
     position: relative;
     top: 0;
@@ -299,6 +317,18 @@ input.captcha {
     color: #fff;
     vertical-align: middle;
     zoom: 1; }
+=======
+    width: 98px;
+    height: 30px;
+    background: #DB493F;
+    display: inline-block;
+    border-radius: 2px;
+    font-size: 14px;
+    color: #ffffff;
+    line-height: 30px;
+    text-align: center;
+    box-shadow: 0 10px 10px #dadada; }
+>>>>>>> link
 
 .gv_felfare {
   width: 100%;
@@ -307,9 +337,15 @@ input.captcha {
 
 .gv_felbox {
   width: 1100px;
+<<<<<<< HEAD
   margin: 0 auto;
   position: relative;
   overflow: hidden; }
+=======
+  height: 540px;
+  margin: 0 auto;
+  position: relative; }
+>>>>>>> link
 
 .gv_feldls {
   width: 275px;
@@ -328,6 +364,7 @@ input.captcha {
       color: #DB493F; }
 
 .feldls1 {
+<<<<<<< HEAD
   margin-top: 100px; }
   .feldls1 img {
     width: 100%; }
@@ -352,6 +389,35 @@ input.captcha {
   font-size: 22px;
   color: #fff;
   margin: 40px auto; }
+=======
+  margin-top: 65px; }
+
+.feldls2 {
+  margin-top: 62px; }
+
+.feldls3 {
+  margin-top: 22px; }
+
+.feldls4 {
+  margin-top: 15px; }
+
+.gv_touzbtn {
+  width: 220px;
+  height: 48px;
+  background: #f5462e;
+  -webkit-border-radius: 25px;
+  -moz-border-radius: 25px;
+  border-radius: 25px;
+  text-align: center;
+  line-height: 48px;
+  display: inline-block;
+  font-size: 22px;
+  color: #ffffff;
+  position: absolute;
+  left: 50%;
+  bottom: 60px;
+  margin-left: -110px; }
+>>>>>>> link
 
 .gv_touzbtn:link {
   color: #ffffff; }
@@ -359,6 +425,7 @@ input.captcha {
 .gv_about {
   width: 1100px;
   height: auto;
+<<<<<<< HEAD
   margin: 40px auto 0 auto; }
 
 .gv_abdls {
@@ -367,6 +434,17 @@ input.captcha {
   margin-right: 190px; }
   .gv_abdls dt.about_dts {
     width: 100%;
+=======
+  margin: 0 auto; }
+
+.gv_abdls {
+  width: 275px;
+  height: 260px;
+  float: left;
+  margin-top: 40px; }
+  .gv_abdls dt.about_dts {
+    width: 130px;
+>>>>>>> link
     height: 130px;
     margin: 0 auto; }
   .gv_abdls .about_dts1 {
@@ -385,9 +463,12 @@ input.captcha {
       font-weight: bold;
       line-height: 46px; }
 
+<<<<<<< HEAD
 .unmargin {
   margin-right: 0; }
 
+=======
+>>>>>>> link
 .gv_focal {
   width: 875px;
   height: 320px;
@@ -420,18 +501,34 @@ input.captcha {
 
 .gv_explain {
   width: 100%;
+<<<<<<< HEAD
   background: #f5f5f5;
   overflow: hidden; }
+=======
+  margin-top: 55px;
+  background: #f5f5f5;
+  padding-top: 15px; }
+>>>>>>> link
 
 .explain {
   width: 1100px;
   height: auto;
+<<<<<<< HEAD
   margin: 0 auto;
   color: #999999; }
   .explain p {
     line-height: 24px; }
   .explain .gv-explain-decend {
     padding-bottom: 20px; }
+=======
+  margin: 0 auto; }
+  .explain p {
+    margin-top: 20px;
+    padding-bottom: 20px;
+    color: #999999; }
+    .explain p span {
+      line-height: 24px; }
+>>>>>>> link
 
 #ganjiwang-model {
   width: 320px;
@@ -445,6 +542,7 @@ input.captcha {
 .banner-form {
   margin-top: 100px; }
 
+<<<<<<< HEAD
 .bd-finance-data-warp {
   width: 100%;
   border-bottom: 1px solid #ccc; }
@@ -549,4 +647,6 @@ input.captcha {
       background: #f5462e;
       border-radius: 4px; }
 
+=======
+>>>>>>> link
 /*# sourceMappingURL=pc_Newgive.css.map */
