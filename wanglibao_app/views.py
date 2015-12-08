@@ -173,7 +173,7 @@ class AppRepaymentPlanAllAPIView(APIView):
 
     def post(self, request):
         user = request.user
-        user_amortizations = UserAmortization.objects.filter(user=user).order_by('-term_date').all()
+        user_amortizations = UserAmortization.objects.filter(user=user).order_by('-term_date')
         if user_amortizations:
             amo_list = []
             for amo in user_amortizations:
@@ -184,11 +184,11 @@ class AppRepaymentPlanAllAPIView(APIView):
                         status = u'已回款'
                 else:
                     status = u'待回款'
-                product = amo.product_amortization.product
+                product = P2PProduct.objects.filter(id=amo.product_amortization.product.id).values('name').first()
                 amo_list.append({
-                    'product_name': product.name,
+                    'product_name': product.get('name'),
                     'term': amo.term,
-                    'term_total': product.terms,
+                    'term_total': amo.terms,
                     'term_date': amo.term_date,
                     'principal': amo.principal,
                     'interest': amo.interest,
