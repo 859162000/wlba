@@ -526,7 +526,7 @@ class WeixinRegister(TemplateView):
             'token': token,
             'channel': channel,
             'phone': phone,
-            'next' : next
+            'next' : urllib.unquote(next)
         }
 
 class SendTemplateMessage(APIView):
