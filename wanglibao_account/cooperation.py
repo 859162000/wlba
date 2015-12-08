@@ -989,7 +989,7 @@ class ZGDXRegister(CoopRegister):
         }
         encrypt_str = encrypt_mode_cbc(json.dumps(code), self.coop_key, self.iv)
         params = {
-            'code': encodeBytes(hex2bin(encrypt_str)),
+            'code': encodeBytes(encrypt_str),
             'partner_no': self.partner_no,
         }
 
