@@ -246,6 +246,7 @@ class AppRepaymentPlanMonthAPIView(APIView):
         else:
             amo_list = []
 
+<<<<<<< HEAD
         if not amo_list:
             custom_month_data = {
                 'term_date': current_month,
@@ -264,6 +265,9 @@ class AppRepaymentPlanMonthAPIView(APIView):
                          'month_group': month_group,
                          'current_month': current_month,
                          })
+=======
+        return Response({'ret_code': 0, 'data': amo_list, 'month_group': month_group, 'current_month': current_month})
+>>>>>>> 67e1b3c... 增加当前月参数
 
 
 def _user_amortization_list(user_amortizations):
