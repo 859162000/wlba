@@ -273,7 +273,7 @@ wlb.ready({
             if (data.ph == '') {
                 login = false;
                 $('#nologin').on('click',function(){
-                    mixins.registerApp({refresh:0, url:'https://staging.wanglibao.com/activity/experience/redirect/'});
+                    mixins.registerApp({refresh:1, url:'https://staging.wanglibao.com/activity/experience/redirect/'});
                 })
             } else {
                 login = true;
