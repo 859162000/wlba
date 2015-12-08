@@ -1,0 +1,13 @@
+- load formatters
+doctype html
+html
+    head
+        meta(name="format-detection" content="telephone=no,email=no")
+        title 网利宝
+        meta(charset="utf-8")
+        meta(content="telephone=no,email=no" ,name="format-detection")
+        meta(content="yes" ,name="appbble-mobile-web-app-capable")
+    body(style="background:#efeff4")
+        - csrf_token
+    script(src="/static/scripts/component/webview.js")
+    script(data-init="experience",src="/static/scripts/mobile_activity/middle_page.js?v=55555666333")

@@ -146,6 +146,7 @@ class WeixinJoinView(View):
                 if w_user.subscribe != 0:
                     w_user.subscribe = 0
                 w_user.unsubscribe_time = int(time.time())
+                w_user.unbind_time = int(time.time())
                 w_user.user = None
                 w_user.save()
                 reply = create_reply(u'欢迎下次关注我们！', msg)
@@ -497,6 +498,7 @@ class WeixinLogin(TemplateView):
             except WeChatException, e:
                 pass
         next = self.request.GET.get('next', '')
+        next = urllib.unquote(next.encode('utf-8'))
         return {
             'context': context,
             'next': next
@@ -1428,9 +1430,11 @@ class GenerateQRSceneTicket(APIView):
                 rs = client.qrcode.create(qrcode_data)
                 qrcode_url = client.qrcode.get_url(rs.get('ticket'))
             except WeChatException,e:
-                return Response({'errcode':e.errcode, 'errmsg':e.errmsg})
+                logger.debug("'errcode':%s, 'errmsg':%s"%(e.errcode, e.errmsg))
+                return Response({'errcode':e.errcode, 'errmsg':e.errmsg, "qrcode_url":weixin_account.qrcode_url})
             return Response({'qrcode_url':qrcode_url})
-        return Response({'errcode':-2, 'errmsg':"code does not exist"})
+        logger.debug("code does not exist")
+        return Response({'errcode':-2, 'errmsg':"code does not exist", "qrcode_url":weixin_account.qrcode_url})
 
 
 
