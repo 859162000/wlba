@@ -246,24 +246,7 @@ class AppRepaymentPlanMonthAPIView(APIView):
         else:
             amo_list = []
 
-        if not amo_list:
-            custom_month_data = {
-                'term_date': current_month,
-                'term_date_count': 0,
-                'total_sum': 0.0,
-                'principal_sum': 0.0,
-                'interest_sum': 0.0,
-                'penal_interest_sum': 0.0,
-                'coupon_interest_sum': 0.0,
-            }
-            month_group.append(custom_month_data)
-            month_group.sort(key=lambda x: x['term_date'])
-
-        return Response({'ret_code': 0,
-                         'data': amo_list, 
-                         'month_group': month_group,
-                         'current_month': current_month,
-                         })
+        return Response({'ret_code': 0, 'data': amo_list, 'month_group': month_group, 'current_month': current_month})
 
 
 def _user_amortization_list(user_amortizations):
