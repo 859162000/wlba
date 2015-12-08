@@ -11,7 +11,7 @@ urlpatterns = patterns(
     '',
     url(r'^buy/$', ExperienceBuyAPIView.as_view()),
     url(r'^get_experience/$', GetExperienceAPIView.as_view()),
-    url(r'^experience/(?P<template>(account))/$',
+    url(r'^experience/(?P<template>(account|redirect))/$',
         login_required(ExperienceGoldView.as_view(),
                        login_url='/accounts/token_login/'), name="experience_token_login"
         ),
