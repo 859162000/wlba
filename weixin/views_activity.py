@@ -21,6 +21,7 @@ import base64
 from .models import WeixinUser
 from .views import JumpPageTemplate, redirectToJumpPage
 from misc.models import Misc
+from wanglibao_account.backends import invite_earning
 
 
 logger = logging.getLogger("weixin")
@@ -77,8 +78,14 @@ class InviteWeixinFriendTemplate(BaseWeixinTemplate):
     def get_context_data(self, **kwargs):
         openid = self.request.GET.get('openid')
         w_user = WeixinUser.objects.filter(openid=openid).first()
+        user = w_user.user
+        earning = 0
+        if user:
+            earning = invite_earning(user)
 
         return {
+            "earning":earning,
+            "callback_host":settings.CALLBACK_HOST,
             "url": base64.b64encode(w_user.user.wanglibaouserprofile.phone),
         }
     def dispatch(self, request, *args, **kwargs):

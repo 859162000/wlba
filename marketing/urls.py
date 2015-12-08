@@ -68,6 +68,7 @@ urlpatterns = patterns(
     url(r'fun_tuan/$', TemplateView.as_view(template_name="fun_tuan.jade")),
     url(r'noviceDecember/$', TemplateView.as_view(template_name="noviceDecember.jade")),
     url(r'^juchengtwo/$', TemplateView.as_view(template_name="juchengtwo.jade")),
+    url(r'^damai/$', TemplateView.as_view(template_name="damai.jade")),
 )
 
 # app URL
