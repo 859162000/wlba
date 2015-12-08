@@ -13,8 +13,12 @@ html
     .wrap#ganjiwang-banner
       .g-banner-slide-baidu
         .g-slide
-          .slide-banner(style="display:block; background-image:url('/static/imgs/pc_activity/newgive/banner1.jpg?v=20151203')")
-          .slide-banner(style="display:none; background-image:url('/static/imgs/pc_activity/newgive/banner2.jpg?v=20151203')")
+          if token == 'bdjr'
+            .slide-banner(style="display:block; background-image:url('/static/imgs/pc_activity/newgive/banner1_sign.jpg')")
+            .slide-banner(style="display:none; background-image:url('/static/imgs/pc_activity/newgive/banner2_sign.jpg')")
+          else
+            .slide-banner(style="display:block; background-image:url('/static/imgs/pc_activity/newgive/banner1_unsign.jpg')")
+            .slide-banner(style="display:none; background-image:url('/static/imgs/pc_activity/newgive/banner2_unsign.jpg')")
         .g-slide-anchor
             a.slide-anchor.active 0
             a.slide-anchor 1
@@ -28,16 +32,7 @@ html
               p 你的登录账户：{{user|display_name}}
               img(src='/static/imgs/pc_activity/newgive/erweima.jpg')
               a(href='/accounts/home/').regist-for-account 进入我的帐户
-          //.banner-form#ganjiwang-welcome
-            .space-vertical-m(style='text-align:center')
-              h1.banner-form--title 欢迎来网利宝投资理财
-              .space-vertical-s
-              p.banner-form--row.font-s 您的登录账户:
-                span {{user|display_name}}
-              img(src='/static/imgs/pc_activity/newgive/erweima.jpg')
-              .space-vertical-m
-              .banner-form--row.align-center
-                a.banner-form--button(href="/accounts/home",style="color:#fff") 进入我的账户
+
         else
           .denelu-form#denglu
             #aug-center
