@@ -273,7 +273,7 @@ wlb.ready({
             if (data.ph == '') {
                 login = false;
                 $('#nologin').on('click',function(){
-                    mixins.registerApp();
+                    mixins.registerApp({refresh:0, url: 'https://staging.wanglibao.com/activity/experience/mobile/'});
                 })
             } else {
                 login = true;
