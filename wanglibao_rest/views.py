@@ -1314,8 +1314,9 @@ class InnerSysSaveChannel(APIView, InnerSysHandler):
 
     def post(self, request):
         code = request.DATA.get("code", None)
-        if not code:
-            return Response({"code": 1000, "message": u'渠道号为空值'})
+        description = request.DATA.get("description", None)
+        if not code or not description:
+            return Response({"code": 1000, "message": u'渠道号或渠道描述为空值'})
 
         status, message = super(InnerSysSaveChannel, self).judge_valid(request)
         if not status:
@@ -1325,7 +1326,7 @@ class InnerSysSaveChannel(APIView, InnerSysHandler):
         if channel.exists():
             return Response({"code": 1002, "message": u'渠道号已经存在'})
         try:
-            Channels.objects.create(code=code)
+            Channels.objects.create(code=code, description=description)
         except Exception, reason:
             return Response({"code": 1003, "message": u'创建渠道报异常,reason:{0}'.format(reason)})
         else:
