@@ -1410,7 +1410,7 @@ class DataCubeApiView(APIView):
     def get(self, request):
         logger.info('data cupe Enter connect')
         try:
-            data = requests.get(url=self.request_url).text
+            data = requests.get(url=self.request_url).json()
             _response = {
                 'ret_code': 10000,
                 'message': 'success',
