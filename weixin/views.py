@@ -31,8 +31,6 @@ from constant import (ACCOUNT_INFO_TEMPLATE_ID, BIND_SUCCESS_TEMPLATE_ID, UNBIND
                       PRODUCT_ONLINE_TEMPLATE_ID, AWARD_COUPON_TEMPLATE_ID)
 from weixin.util import getAccountInfo
 from wanglibao_profile.models import WanglibaoUserProfile
-import weixin.tasks
-
 from wanglibao_pay.models import Bank
 from wechatpy import parse_message, create_reply, WeChatClient
 from wechatpy.replies import TransferCustomerServiceReply
@@ -66,8 +64,8 @@ from wanglibao_redpack.backends import give_first_bind_wx_redpack
 from experience_gold.models import ExperienceEvent, ExperienceEventRecord
 from experience_gold.backends import SendExperienceGold
 from marketing.utils import local_to_utc
-
-
+from weixin.tasks import bind_ok, detect_product_biding, sentTemplate
+from weixin.util import sendTemplate
 logger = logging.getLogger("weixin")
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
 
@@ -219,7 +217,7 @@ class WeixinJoinView(View):
             a = MessageTemplate(ACCOUNT_INFO_TEMPLATE_ID,
                     keyword1=now_str,
                     keyword2=infos)
-            SendTemplateMessage.sendTemplate(w_user, a)
+            sendTemplate(w_user, a)
             reply = -1
         if self.msg.key == 'customer_service':
             txt = self.getCSReply()
@@ -322,7 +320,7 @@ class WeixinJoinView(View):
                 if user:
                     rs, txt, is_first_bind, redpack_record_id = bindUser(w_user, user)
                     if rs == 0:
-                        weixin.tasks.bind_ok.apply_async(kwargs={
+                        bind_ok.apply_async(kwargs={
                             "openid": fromUserName,
                             "is_first_bind": is_first_bind,
                             "redpack_record_id": redpack_record_id,
@@ -531,30 +529,6 @@ class WeixinRegister(TemplateView):
             'next' : next
         }
 
-class SendTemplateMessage(APIView):
-    permission_classes = (IsAuthenticated,)
-    http_method_names = ['post']
-    BIND_SUCCESS = "bind_success"
-
-    @classmethod
-    def sendTemplate(cls, weixin_user, message_template):
-        weixin_account = WeixinAccounts.getByOriginalId(weixin_user.account_original_id)
-        # account = Account.objects.get(original_id=weixin_user.account_original_id)
-        client = WeChatClient(weixin_account.app_id, weixin_account.app_secret)
-        print message_template.url
-        client.message.send_template(weixin_user.openid, template_id=message_template.template_id,
-                                     top_color=message_template.top_color, data=message_template.data,
-                                     url=message_template.url)
-    def post(self, request):
-        openid = request.POST.get('openid')
-        if not openid:
-            return Response({'error':-1})
-        w_user = WeixinUser.objects.filter(openid=openid).first()
-        template_type = request.POST.get('template_type', '')
-        template = None
-
-        return Response({'message':'ok'})
-
 
 class JumpPageTemplate(TemplateView):
     template_name = 'sub_times.jade'
@@ -583,7 +557,7 @@ class WeixinBind(TemplateView):
             weixin_user = WeixinUser.objects.get(openid=openid)
             rs, txt, is_first_bind, redpack_record_id = bindUser(weixin_user, user)
             if rs == 0:
-                weixin.tasks.bind_ok.apply_async(kwargs={
+                bind_ok.apply_async(kwargs={
                     "openid": openid,
                     "is_first_bind": is_first_bind,
                     "redpack_record_id": redpack_record_id,
@@ -642,7 +616,7 @@ class UnBindWeiUserAPI(APIView):
             weixin_user.save()
             now_str = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M')
             logout(request)
-            weixin.tasks.sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
+            sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
                     "openid":weixin_user.openid,
                     "template_id":UNBIND_SUCCESS_TEMPLATE_ID,
                     "keyword1":user_phone,
@@ -1512,7 +1486,7 @@ def checkAndSendProductTemplate(sender, **kw):
                         template = MessageTemplate(PRODUCT_ONLINE_TEMPLATE_ID,
                             first=service.describe, keyword1=product.name, keyword2=rate_desc,
                             keyword3=period_desc, keyword4=product.pay_method, url=url)
-                        SendTemplateMessage.sendTemplate(sub_record.w_user, template)
+                        sendTemplate(sub_record.w_user, template)
 
 
 
@@ -1521,7 +1495,7 @@ def checkProduct(sender, **kw):
     product = kw["instance"]
     if getattr(product, "old_status", ""):
         if product.old_status == u'待审核' and product.status==u'正在招标':
-            weixin.tasks.detect_product_biding.apply_async(kwargs={
+            detect_product_biding.apply_async(kwargs={
                "product_id":product.id
             },
                                                            queue='celery01')

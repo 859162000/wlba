@@ -55,12 +55,22 @@
         a(href='https://www.instantssl.com/wildcard-ssl.html', class='atn-ssl', target='_blank')
         a(href='http://www.itrust.org.cn/Home/Index/itrust_certifi?wm=1091876832', class='atn-internet', target='_blank')
         a(href='https://credit.szfw.org/CX20150611010303010832.html', class='atn-trust', target='_blank')
+        a(key ="564e795befbfb0089e77490e",logo_size="124x47", logo_type="business", href="http://www.anquan.org", id='safes')
+          span#kx-mask-safes
+          script( src="http://static.anquan.org/static/outer/js/aq_auth.js")
         style.
           .kx-verify-warp{position: relative;display: inline-block;margin-left: -3px;}
           #kx_verify img{height: 50px;}
-          #kx-mask{position: absolute; top: 0; left: 0; display:inline-block; width:128px; height:50px;background: #000;opacity: 0.3;filter: alpha(opacity=70);z-index: 22;}
+          #kx-mask, #kx-mask-safes{position: absolute; top: 0; left: 0; display:inline-block; width:128px; height:50px;background: #000;opacity: 0.3;filter: alpha(opacity=70); cursor: pointer;z-index: 22;}
+          #safes {position: relative}
+          #kx-mask-safes{width: 140px}
+          #safes img{width: 100%;display: block;height:100%;}
         span.kx-verify-warp
           span#kx-mask
           span#kx_verify
           script.
+
             (function (){var _kxs = document.createElement('script');_kxs.id = 'kx_script';_kxs.async = true;_kxs.setAttribute('cid', 'kx_verify');_kxs.src = ('https:' == document.location.protocol ? 'https://ss.knet.cn' : 'http://rr.knet.cn')+'/static/js/icon3.js?sn=e151125110108615827egl000000&tp=icon3';_kxs.setAttribute('size', 0);var _kx = document.getElementById('kx_verify');_kx.parentNode.insertBefore(_kxs, _kx);})();
+            document.getElementById('kx-mask').onclick = function(){
+              document.getElementById("kx_verify_link").click()
+            };
