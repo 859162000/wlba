@@ -59,7 +59,9 @@ class RegisterUserSerializer(serializers.Serializer):
             else:
                 status, message = validate_validation_code(identifier, validate_code)
                 if status != 200:
-                    raise serializers.ValidationError(u"验证码输入错误")
+                    # Modify by hb ob 2015-12-02
+                    #raise serializers.ValidationError(u"验证码输入错误")
+                    raise serializers.ValidationError(message)
 
                 if User.objects.filter(wanglibaouserprofile__phone=identifier, wanglibaouserprofile__phone_verified=True).exists():
                     raise serializers.ValidationError(u"该手机号已经注册")
