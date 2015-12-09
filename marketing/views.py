@@ -2660,7 +2660,7 @@ class RockFinanceAPIView(APIView):
             得到整体的全部数据
         """
         records = WanglibaoVoteCounter.objects.filter(activity="rock_finance")
-        records = [{"count": record.count, "catalog": record.catalog, "item": record.item} for record in records]
+        records = [{record.item: record.count, "catalog": record.catalog} for record in records]
         return Response({"records": records, "message": u'整体的汇总数据', "code":0})
 
     def get(self, request):
