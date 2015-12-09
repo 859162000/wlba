@@ -8,7 +8,8 @@ from wanglibao_profile.models import WanglibaoUserProfile
 # Create your tests here.
 from marketing.models import InviteCode, GiftOwnerGlobalInfo
 from wanglibao_sms.utils import send_validation_code
-
+from misc.models import Misc
+from marketing.models import Reward
 
 class TestMarketingAPI(TestCase):
     def setUp(self):
@@ -17,6 +18,12 @@ class TestMarketingAPI(TestCase):
             is_used=False
         )
 
+
+        reward = Reward.objects.filter(type='金融摇滚夜').first()
+        Reward.objects.create(
+            type="金融摇滚夜",
+            content="abcdefg"
+        )
         GiftOwnerGlobalInfo.objects.create(
             description='jcw_ticket_80',
             amount=30,
@@ -34,11 +41,12 @@ class TestMarketingAPI(TestCase):
 
         Binding.objects.create(
             user_id=1,
-            access_token=u'xunlei'
+            access_token=u'rock'
         )
 
         P2PRecord.objects.create(
             user_id=1,
+            order_id=123456,
             amount=2000,
             catalog=u'申购'
         )
@@ -49,54 +57,20 @@ class TestMarketingAPI(TestCase):
             name='yihen',
             id_is_valid=True
         )
+        Misc.objects.create(
+            key="activities",
+            value='{"valid_activity":"thanks_given","rock_finance":{"amount":800, "start_time":"2015-12-09 12:00:00", "is_open":"true", "end_time":"2015-12-25 12:00:00"}}',
+        )
 
-    def test_quick_applyer(self):
-        response = self.client.post("/api/quick/applyer/",
-                         {
-                            'phone':13521522034,
-                             'name':'hello',
-                             'address': u'北京',
-                             'apply_way': 0,
-                             'amount': '10-30'
-                         }
-                         )
-        print response.content
-
-    def test_gift_owner(self):
+    def test_rock_finance(self):
         client = Client()
-        client.login(username="Tester", password='123456')
-        response = client.post("/api/gift/owner/?promo_token=jcw",
-                        {
-                            'phone': 13423444354,
-                            'name': 'Yihen',
-                            'address': u"北京市朝阳区"
-                        })
-        print response.content
-
-
-    def test_send_sms(self):
-        response = self.client.post("/api/inner/send_sms/",
+        client.login(username="Tester", password="123456")
+        responses = client.post("/api/rock/finance/vote/",
                                     {
-                                        'phone': 13521522035,
-                                        'message': "hello world"
+                                        "catalog":"chenkun",
+                                        "item": "alone"
                                     })
 
+        response = client.get("/api/rock/finance/vote/")
         print response.content
 
-
-    def test_validate_id(self):
-        response = self.client.post("/api/inner/validate_id/",
-                                    {
-                                        "id":371322198606063816,
-                                        'name':"yihen"
-                                    }
-                                    )
-
-        print response.content
-
-    def test_save_channel(self):
-        response = self.client.post("/api/inner/save_channel/",
-                                    {
-                                    })
-
-        print response.content
