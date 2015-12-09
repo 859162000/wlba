@@ -207,7 +207,9 @@ def withdraw(request):
     phone = user.wanglibaouserprofile.phone
     status, message = validate_validation_code(phone, vcode)
     if status != 200:
-        return {"ret_code": 20066, "message": u"验证码输入错误"}
+        # Modify by hb on 2015-12-02
+        #return {"ret_code": 20066, "message": u"验证码输入错误"}
+        return {"ret_code": 20066, "message": message}
 
     card = Card.objects.filter(pk=card_id).first()
     if not card or card.user != user:

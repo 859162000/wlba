@@ -2137,4 +2137,10 @@ class ThirdOrderQueryApiView(APIView):
 
         return HttpResponse(json.dumps(json_response), content_type='application/json')
 
+class FirstPayResultView(TemplateView):
+    template_name = 'register_three.jade'
+
+    def get_context_data(self, **kwargs):
+        first_pay_succeed = PayInfo.objects.filter(user=self.request.user, status=PayInfo.SUCCESS).exists()
+        return {'first_pay_succeed': first_pay_succeed}
 

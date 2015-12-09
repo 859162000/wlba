@@ -324,7 +324,9 @@ class WithdrawCompleteView(TemplateView):
         status, message = validate_validation_code(phone, code)
         if status != 200:
             return self.render_to_response({
-                'result': u'短信验证码输入错误'
+                # Modify by hb on 2015-12-02
+                #'result': u'短信验证码输入错误'
+                'result': message
             })
 
         result = PayResult.WITHDRAW_SUCCESS
