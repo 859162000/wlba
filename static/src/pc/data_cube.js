@@ -9,10 +9,11 @@ require.config({
 require(["jquery"],function($){
     $.ajax({
         type: "get",
-        url: "http://stat.wanglibao.com:10000/datacube/index",
-        dataType: "jsonp",
+        url: "/api/datacube/",
+        dataType: "json",
         success: function(data){
-            dataVal = data;
+            console.log(data.result);
+            dataVal = data.result;
             allFun();
         }
     });
@@ -75,6 +76,27 @@ function tabFun(n, c){ //tab切换
         }
     }
 }
+function getBeforeDate(t,n){//获取某时间的前n天,t：某时间
+  var d = new Date(t);
+  var year = d.getFullYear();
+  var mon = d.getMonth()+1;
+  var day = d.getDate();
+  var s;
+  if(day <= n){
+    if(mon > 1) {
+      mon = mon-1;
+    }else {
+      year = year-1;
+      mon = 12;
+    }
+  }
+  d.setDate(d.getDate()-n);
+  mon = d.getMonth()+1;
+  day = d.getDate();
+  s = year+"-"+(mon<10?('0'+mon):mon)+"-"+(day<10?('0'+day):day);
+  return s;
+}
+//console.log(getBeforeDate("2015-12-08",6).replace(/-/g,"."));
 function allFun(){
 // 使用
 require(
@@ -105,24 +127,6 @@ require(
         setNum(document.getElementById('expect-num'), dataVal.plat_total[2].Qty);
         setNum(document.getElementById('put-out-num'), dataVal.plat_total[3].Qty);
 
-        function getBeforeDate(t,n){//获取某时间的前n天,t：某时间
-          var d = new Date(t);
-          var year = d.getFullYear();
-          var mon = d.getMonth()+1;
-          var day = d.getDate();
-          var s;
-          if(day <= n){
-            if(mon > 1) {
-              mon = mon-1;
-            }else {
-              year = year-1;
-              mon = 12;
-            }
-          }
-          d.setDate(d.getDate()-n);
-          s = year+"-"+(mon<10?('0'+mon):mon)+"-"+(day<10?('0'+day):day);
-          return s;
-        }
         //平台7日数据
         document.getElementById('data-days7').innerHTML = "（"+ getBeforeDate(dataVal.plat_total[4].date,6).replace(/-/g,".") + " - " + dataVal.plat_total[4].date.replace(/-/g,".")  + ")";
         document.getElementById('match-num7').innerHTML = dataVal.plat_total[4].Qty;
@@ -209,7 +213,7 @@ require(
         myChart.setOption(option);
 
         //年龄 数据
-        var ageArr = typeData(0,5,dataVal.age_plan);
+        var ageArr = typeData(0,6,dataVal.age_plan);
         var ageTotal = ageArr.num.arrSum();
         //投资人年龄分布
         optiondb = {
@@ -226,7 +230,7 @@ require(
             xAxis : [
                 {
                     type : 'category',
-                    data : [ageArr.val[0],ageArr.val[1],ageArr.val[2],ageArr.val[3],ageArr.val[4],ageArr.val[5]],
+                    data : [ageArr.val[0],ageArr.val[1],ageArr.val[2],ageArr.val[3],ageArr.val[4],ageArr.val[5],ageArr.val[6]],
                     axisLine: {show:false},
                     splitLine: {
                         show: false
@@ -242,7 +246,7 @@ require(
                     axisLabel: {show:false},
                     splitArea: {show:false},
                     splitLine: {show:false},
-                    data : [ageArr.val[0],ageArr.val[1],ageArr.val[2],ageArr.val[3],ageArr.val[4],ageArr.val[5]]
+                    data : [ageArr.val[0],ageArr.val[1],ageArr.val[2],ageArr.val[3],ageArr.val[4],ageArr.val[5],ageArr.val[6]]
                 }
             ],
             yAxis : [
@@ -273,7 +277,7 @@ require(
                             barBorderRadius: [5,5,0,0]
                         }
                     },
-                    data:[percentNum(ageArr.num[0],ageTotal),percentNum(ageArr.num[1],ageTotal),percentNum(ageArr.num[2],ageTotal),percentNum(ageArr.num[3],ageTotal),percentNum(ageArr.num[4],ageTotal),percentNum(ageArr.num[5],ageTotal)]
+                    data:[percentNum(ageArr.num[0],ageTotal),percentNum(ageArr.num[1],ageTotal),percentNum(ageArr.num[2],ageTotal),percentNum(ageArr.num[3],ageTotal),percentNum(ageArr.num[4],ageTotal),percentNum(ageArr.num[5],ageTotal),percentNum(ageArr.num[6],ageTotal)]
                 },
                 {
                     name:'投资人年龄分布',
@@ -290,7 +294,7 @@ require(
                             barBorderRadius: [5,5,0,0]
                         }
                     },
-                    data:[100,100,100,100,100,100]
+                    data:[100,100,100,100,100,100,100]
                 }
             ]
         };
