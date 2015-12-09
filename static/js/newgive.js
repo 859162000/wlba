@@ -96,5 +96,24 @@
 
         })
 
+        $(function(){
+            ~function getCode(){//得到用户信息的二维码
+                var phone = org.getQueryStringByName('phone');
+                var original_id = document.getElementById("original_id").value;
+                var code = document.getElementById("weixin_code").value;
+                org.ajax({
+                    type: "GET",
+                    url: "/weixin/api/generate/qr_scene_ticket/",
+                    data: {"original_id":original_id, "code": code},//c:gh_32e9dc3fab8e, w:gh_f758af6347b6;code:微信关注渠道
+                    success: function (data) {
+                        $("#sub-code").html("<img src='"+ data.qrcode_url + "' />");
+                    },
+                    error: function(){
+                        window.location.href="/weixin/jump_page/?message=出错了";
+                    }
+                });
+            }();
+        })
+
     });
 }).call(this);
