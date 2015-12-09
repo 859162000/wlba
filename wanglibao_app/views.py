@@ -277,7 +277,7 @@ def _user_amortization_list(user_amortizations):
     amo_list = []
     for amo in user_amortizations:
         if amo.settled:
-            if amo.last_settlement_status == u'提前还款':
+            if amo.settlement_time < amo.term_date:
                 status = u'提前回款'
             else:
                 status = u'已回款'
