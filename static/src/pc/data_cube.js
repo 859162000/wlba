@@ -12,6 +12,7 @@ require(["jquery"],function($){
         url: "/api/datacube/",
         dataType: "json",
         success: function(data){
+            console.log(data.result);
             dataVal = data.result;
             allFun();
         }
@@ -212,7 +213,7 @@ require(
         myChart.setOption(option);
 
         //年龄 数据
-        var ageArr = typeData(0,5,dataVal.age_plan);
+        var ageArr = typeData(0,6,dataVal.age_plan);
         var ageTotal = ageArr.num.arrSum();
         //投资人年龄分布
         optiondb = {
@@ -229,7 +230,7 @@ require(
             xAxis : [
                 {
                     type : 'category',
-                    data : [ageArr.val[0],ageArr.val[1],ageArr.val[2],ageArr.val[3],ageArr.val[4],ageArr.val[5]],
+                    data : [ageArr.val[0],ageArr.val[1],ageArr.val[2],ageArr.val[3],ageArr.val[4],ageArr.val[5],ageArr.val[6]],
                     axisLine: {show:false},
                     splitLine: {
                         show: false
@@ -245,7 +246,7 @@ require(
                     axisLabel: {show:false},
                     splitArea: {show:false},
                     splitLine: {show:false},
-                    data : [ageArr.val[0],ageArr.val[1],ageArr.val[2],ageArr.val[3],ageArr.val[4],ageArr.val[5]]
+                    data : [ageArr.val[0],ageArr.val[1],ageArr.val[2],ageArr.val[3],ageArr.val[4],ageArr.val[5],ageArr.val[6]]
                 }
             ],
             yAxis : [
@@ -276,7 +277,7 @@ require(
                             barBorderRadius: [5,5,0,0]
                         }
                     },
-                    data:[percentNum(ageArr.num[0],ageTotal),percentNum(ageArr.num[1],ageTotal),percentNum(ageArr.num[2],ageTotal),percentNum(ageArr.num[3],ageTotal),percentNum(ageArr.num[4],ageTotal),percentNum(ageArr.num[5],ageTotal)]
+                    data:[percentNum(ageArr.num[0],ageTotal),percentNum(ageArr.num[1],ageTotal),percentNum(ageArr.num[2],ageTotal),percentNum(ageArr.num[3],ageTotal),percentNum(ageArr.num[4],ageTotal),percentNum(ageArr.num[5],ageTotal),percentNum(ageArr.num[6],ageTotal)]
                 },
                 {
                     name:'投资人年龄分布',
@@ -293,7 +294,7 @@ require(
                             barBorderRadius: [5,5,0,0]
                         }
                     },
-                    data:[100,100,100,100,100,100]
+                    data:[100,100,100,100,100,100,100]
                 }
             ]
         };
