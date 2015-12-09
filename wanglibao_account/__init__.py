@@ -84,10 +84,18 @@ def get_verify_result(id_number, name):
 
     s = requests.Session()
     s.mount('https://', MyHttpsAdapter())
-    response = s.post(url='https://api.nciic.com.cn/nciic_ws/services/NciicServices',
-                      headers=headers,
-                      data=encode_request,
-                      verify=False)
+
+    try:
+        response = s.post(url='https://api.nciic.com.cn/nciic_ws/services/NciicServices',
+                          headers=headers,
+                          data=encode_request,
+                          verify=False)
+    except ssl.SSLError, e:
+        logger.info('Failed to send request with error: %s' % e)
+        response = s.post(url='https://api.nciic.com.cn/nciic_ws/services/NciicServices',
+                          headers=headers,
+                          data=encode_request,
+                          verify=False)
 
     if response.status_code != 200:
         logger.error("Failed to send request: status: %d, ", response.status_code)
