@@ -83,7 +83,7 @@ def get_verify_result(id_number, name):
     }
 
     s = requests.Session()
-    s.mount('https://', MyHttpsAdapter)
+    s.mount('https://', MyHttpsAdapter())
     response = requests.post(url='https://api.nciic.com.cn/nciic_ws/services/NciicServices',
                              headers=headers,
                              data=encode_request,
