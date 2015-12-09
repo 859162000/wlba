@@ -163,11 +163,15 @@
                     type: "GET",
                     data: {}
                 }).done(function (damai) {
-                    console.log(damai);
-                    console.log(damai['records']);
-                     for(var i in damai['records']){
-                         console.log(i['item']);
-                     }
+                /*    console.log(damai);
+                    console.log(damai);*/
+                     /*for(var i in damai.records){
+                        console.log(damai.records[i]);
+                     }*/
+                    $.each(damai.records,function(i,o){
+                      console.log(o);
+                    })
+
                 })
             }
         });
