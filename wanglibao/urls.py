@@ -103,6 +103,7 @@ urlpatterns = patterns(
     url(r'^landpage/', landpage_view),
 
     url(r'^finance', TemplateView.as_view(template_name="financing.jade")),
+    url(r'^data_cube', TemplateView.as_view(template_name="data_cube.jade")),
 )
 
 urlpatterns += patterns(

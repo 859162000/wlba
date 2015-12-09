@@ -28,9 +28,10 @@ html
                         .welfare_ed_list
                             i
                             | 实名认证20元红包
-                        .welfare_ed_list
-                            i
-                            | 首次充值100元红包
+                        if first_pay_succeed
+                            .welfare_ed_list
+                                i
+                                | 首次充值100元红包
                         .my_reward
                             a(href='/accounts/coupon/unused/') 查看我的奖励
                                 i
