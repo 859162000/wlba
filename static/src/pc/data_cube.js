@@ -9,10 +9,10 @@ require.config({
 require(["jquery"],function($){
     $.ajax({
         type: "get",
-        url: "http://stat.wanglibao.com:10000/datacube/index",
-        dataType: "jsonp",
+        url: "/api/datacube/",
+        dataType: "json",
         success: function(data){
-            dataVal = data;
+            dataVal = data.result;
             allFun();
         }
     });
