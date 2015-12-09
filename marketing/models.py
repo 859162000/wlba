@@ -592,3 +592,18 @@ class GiftOwnerInfo(models.Model):
     class Meta:
         verbose_name = u'抽奖人信息表'
         verbose_name_plural = u'抽奖人信息表'
+
+class WanglibaoVoteCounter(models.Model):
+    """
+        网里宝投票记录表
+    """
+    catalog = models.CharField(verbose_name=u'大类别', max_length=256, default="", blank=True, null=True)
+    item = models.CharField(verbose_name=u'小条目', max_length=256, default="", blank=True, null=True)
+    activity = models.CharField(verbose_name=u'活动名称', max_length=246, default="", blank=True, null=True)
+    count = models.IntegerField(verbose_name=u'投票计数器', default=0, blank=True, null=True)
+    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    update_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+
+    class Meta:
+        verbose_name = u'投票记录表'
+        verbose_name_plural = u'投票记录表'

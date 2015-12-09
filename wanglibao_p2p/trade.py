@@ -184,7 +184,7 @@ class P2PTrader(object):
                                 "kwargs":json.dumps({
                                                 "openid": weixin_user.openid,
                                                 "template_id": PRODUCT_INVEST_SUCCESS_TEMPLATE_ID,
-                                                "keyword1": self.product.id,
+                                                "keyword1": self.product.name,
                                                 "keyword2": str(amount),
                                                 "keyword3": now,
                                                     })},

@@ -553,6 +553,12 @@ def _give_activity_experience_new(user, rtype, experience_id, device_type, rule,
     else:
         return
 
+    # 限制id为1的体验金重复发放
+    experience_count = ExperienceEventRecord.objects.filter(user=user).filter(event__id=1).count()
+    if experience_count:
+        logger.debug(">>>>用户id: {}, ID为1的体验金已经发放过,不允许重复领取".format(user.id))
+        return
+
     if len(experience_id_list) == 1:
         experience_event = ExperienceEvent.objects.filter(give_mode=rtype, invalid=False, id=experience_id_list[0],
                                                           available_at__lt=now, unavailable_at__gt=now).first()

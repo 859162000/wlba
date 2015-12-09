@@ -10,6 +10,7 @@ from django.http import Http404
 from django.utils import timezone
 from wanglibao_p2p.amortization_plan import get_amortization_plan
 from wanglibao_p2p.models import P2PProduct, Warrant, Attachment
+from misc.models import Misc
 import json
 
 
@@ -28,9 +29,18 @@ class redis_backend(object):
     def _is_available(self):
         try:
             self.redis.ping()
+            redis_config = Misc.objects.filter(key='redis_server').first()
+            if redis_config:
+                data = json.loads(redis_config.value)
+                switch = data.get('switch')
+                if switch == 'on':
+                    return True
+                else:
+                    return False
+            else:
+                return False
         except:
             return False
-        return True
 
     def _exists(self, name):
         if self.redis:
@@ -326,6 +336,66 @@ class redis_backend(object):
                 "is_taojin": p2p.is_taojin,
                 "is_app_exclusive": p2p.is_app_exclusive,
             } for p2p in p2p_products
+        ]
+
+        return p2p_list
+
+    # Add by hb on 2015-12-08
+    def get_p2p_list_from_objects_by_status(self, p2p_products, status_int):
+
+        if not p2p_products:
+            return []
+
+        p2p_list = [
+            {
+                "id": p2p.id,
+                "category": p2p.category,
+                "types_id": p2p.types.id if p2p.types else 0,
+                "types_name": p2p.types.name if p2p.types else '',
+                "hide": p2p.hide,
+                "name": p2p.name,
+                "short_name": p2p.short_name,
+                "serial_number": p2p.serial_number,
+                "contract_serial_number": p2p.contract_serial_number,
+                "status": p2p.status,
+                "priority": p2p.priority,
+                "period": p2p.period,
+                "brief": p2p.brief,
+                "expected_earning_rate": p2p.expected_earning_rate,
+                "excess_earning_rate": p2p.excess_earning_rate,
+                "excess_earning_description": p2p.excess_earning_description,
+                "pay_method": p2p.pay_method,
+                "amortization_count": p2p.amortization_count,
+                "repaying_source": p2p.repaying_source,
+                "total_amount": p2p.total_amount,
+                "ordered_amount": p2p.ordered_amount,
+                "publish_time": p2p.publish_time,
+                "end_time": p2p.soldout_time if p2p.soldout_time else p2p.end_time,
+                "soldout_time": p2p.soldout_time,
+                "make_loans_time": p2p.make_loans_time,
+                "limit_per_user": p2p.limit_per_user,
+                "warrant_company_name": p2p.warrant_company.name,
+                "usage": p2p.usage,
+                "short_usage": p2p.short_usage,
+                "display_status": p2p.display_status,
+                "display_payback_method": p2p.display_payback_method,
+                "activity": {
+                    "activity_name": p2p.activity.name,
+                    "activity_description": p2p.activity.description,
+                    "activity_rule_name": p2p.activity.rule.name,
+                    "activity_rule_description": p2p.activity.rule.description,
+                    "activity_rule_type": p2p.activity.rule.rule_type,
+                    "activity_rule_amount": p2p.activity.rule.rule_amount,
+                    "activity_rule_percent_text": p2p.activity.rule.percent_text,
+                } if p2p.activity else {},
+                "remain": p2p.remain,
+                "completion_rate": p2p.completion_rate,
+                "limit_amount_per_user": p2p.limit_amount_per_user,
+                "current_limit": p2p.current_limit,
+                "available_amount": p2p.available_amount,
+                "is_taojin": p2p.is_taojin,
+                "is_app_exclusive": p2p.is_app_exclusive,
+            } for p2p in p2p_products if p2p.status_int==status_int
         ]
 
         return p2p_list

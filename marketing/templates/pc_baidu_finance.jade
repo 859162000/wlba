@@ -10,6 +10,14 @@ html
   body(style="background:#fff")
     include global/g_nav
 
+
+    if user.is_authenticated
+      input(type='hidden', name='is_authenticated', value='true')
+      input( type="hidden", value="{{original_id}}", name="original_id")
+      input( type="hidden", value="{{code}}", name="weixin_code")
+    else
+      input(type='hidden', name='is_authenticated', value='false')
+
     .wrap#ganjiwang-banner
       .g-banner-slide-baidu
         .g-slide
@@ -30,7 +38,7 @@ html
             .regist-su-body
               h4 欢迎来到网利宝投资理财
               p 你的登录账户：{{user|display_name}}
-              img(src='/static/imgs/pc_activity/newgive/erweima.jpg')
+              div.erweima-img
               a(href='/accounts/home/').regist-for-account 进入我的帐户
 
         else

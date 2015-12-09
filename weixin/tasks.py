@@ -13,7 +13,7 @@ import datetime
 
 from weixin.models import SubscribeRecord, SubscribeService, WeixinUser
 from weixin.constant import MessageTemplate, PRODUCT_ONLINE_TEMPLATE_ID, BIND_SUCCESS_TEMPLATE_ID
-from weixin.views import SendTemplateMessage
+from weixin.util import sendTemplate
 from wanglibao_redpack.models import RedPackRecord, RedPackEvent
 from wanglibao_redpack.backends import get_start_end_time, local_transform_str,stamp
 
@@ -111,7 +111,7 @@ def sendUserProductOnLine(openid, service_desc, product_id, product_name, rate_d
         template = MessageTemplate(PRODUCT_ONLINE_TEMPLATE_ID,
             first=service_desc, keyword1=product_name, keyword2=rate_desc,
             keyword3=period_desc, keyword4=pay_method, url=url)
-        SendTemplateMessage.sendTemplate(w_user, template)
+        sendTemplate(w_user, template)
 
 @app.task
 def sentTemplate(kwargs):
@@ -126,4 +126,4 @@ def sentTemplate(kwargs):
     template = MessageTemplate(template_id, **template_args)
     w_user = WeixinUser.objects.filter(openid=openid).first()
     if w_user and template:
-        SendTemplateMessage.sendTemplate(w_user, template)
+        sendTemplate(w_user, template)
