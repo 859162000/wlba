@@ -25,7 +25,8 @@
     display: inline-block
     overflow: hidden
   .data-cube-part1
-    background: #346bd1
+    background: #346bd1 url("/static/imgs/pc/data_cube/banner-bg.png") repeat-x
+    background-size: auto 100%
     .cube-title
       color: #fff
       .cube-title-l
@@ -65,7 +66,6 @@
       color: #fff
       font-size: 16px
       text-align: center
-
   .data-cube-part2
     background: #fff
     .cube-title
@@ -101,10 +101,18 @@
         float: left
         overflow: hidden
         text-align: center
+        &:hover
+          .cube-icon1
+            background-position: 0 -120px
+          .cube-icon2
+            background-position: -140px -120px
+          .cube-icon3
+            background-position: 0 -400px
+          .cube-icon4
+            background-position: -140px -400px
       .num
         color: #828a99
         font-size: 28px
-        font-weight: bold
         line-height: 30px
         margin-top: 10px
       .s-tit
@@ -149,9 +157,9 @@
       width: 470px
       float: left
     .cube-age
-      width: 558px
+      width: 520px
       height: 280px
-      margin: -30px -40px
+      margin: -30px
     .sex-box
       width: 314px
       float: left
@@ -198,10 +206,11 @@
         padding-left: 65px
         font-size: 14px
         color: #666
+        margin-top: 30px
         .font-color9
           color: #999
         .map-list-item
-          margin-top: 10px
+          margin-top: 15px
         .map-num
           display: inline-block
           width: 16px

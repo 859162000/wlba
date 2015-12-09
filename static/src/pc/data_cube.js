@@ -12,7 +12,7 @@ require(["jquery"],function($){
         url: "/api/datacube/",
         dataType: "json",
         success: function(data){
-            console.log(data.result);
+            //console.log(data.result);
             dataVal = data.result;
             allFun();
         }
@@ -77,6 +77,7 @@ function tabFun(n, c){ //tab切换
     }
 }
 function getBeforeDate(t,n){//获取某时间的前n天,t：某时间
+  t = t.replace(/-/g,"/");
   var d = new Date(t);
   var year = d.getFullYear();
   var mon = d.getMonth()+1;
@@ -96,7 +97,7 @@ function getBeforeDate(t,n){//获取某时间的前n天,t：某时间
   s = year+"-"+(mon<10?('0'+mon):mon)+"-"+(day<10?('0'+day):day);
   return s;
 }
-//console.log(getBeforeDate("2015-12-08",6).replace(/-/g,"."));
+
 function allFun(){
 // 使用
 require(
@@ -195,7 +196,6 @@ require(
                 {
                     "type":"bar",
                     barWidth: 35,//柱形宽度
-                    //"data":[5, 20, 40, 10, 10, 20,5, 20, 40, 10, 10, 20],
                     "data": mouthVal,
                     itemStyle: {
                         normal : {
@@ -229,7 +229,7 @@ require(
             xAxis : [
                 {
                     type : 'category',
-                    data : [ageArr.val[0],ageArr.val[1],ageArr.val[2],ageArr.val[3],ageArr.val[4],ageArr.val[5],"其他"],
+                    data : [ageArr.val[0],ageArr.val[1],ageArr.val[2],ageArr.val[3],ageArr.val[4],ageArr.val[5]],
                     axisLine: {show:false},
                     splitLine: {
                         show: false
@@ -245,7 +245,7 @@ require(
                     axisLabel: {show:false},
                     splitArea: {show:false},
                     splitLine: {show:false},
-                    data : [ageArr.val[0],ageArr.val[1],ageArr.val[2],ageArr.val[3],ageArr.val[4],ageArr.val[5],"其他"]
+                    data : [ageArr.val[0],ageArr.val[1],ageArr.val[2],ageArr.val[3],ageArr.val[4],ageArr.val[5]]
                 }
             ],
             yAxis : [
@@ -276,7 +276,7 @@ require(
                             barBorderRadius: [5,5,0,0]
                         }
                     },
-                    data:[percentNum(ageArr.num[0],ageTotal),percentNum(ageArr.num[1],ageTotal),percentNum(ageArr.num[2],ageTotal),percentNum(ageArr.num[3],ageTotal),percentNum(ageArr.num[4],ageTotal),percentNum(ageArr.num[5],ageTotal),percentNum(ageArr.num[6],ageTotal)]
+                    data:[percentNum(ageArr.num[0],ageTotal),percentNum(ageArr.num[1],ageTotal),percentNum(ageArr.num[2],ageTotal),percentNum(ageArr.num[3],ageTotal),percentNum(ageArr.num[4],ageTotal),percentNum(ageArr.num[5],ageTotal)]
                 },
                 {
                     name:'投资人年龄分布',
@@ -453,7 +453,7 @@ require(['echarts','echarts/chart/map'],function(ec) {//地图
                         normal:{
                             borderWidth: 1,
                             borderColor:'#fff',
-                            label:{show:true,textStyle: {color: "#333"}},
+                            label:{show:true,textStyle: {color: "#999"}},
                             areaStyle:{color:'#dadee6'}
                         },
                         emphasis:{
@@ -556,10 +556,11 @@ require(['echarts','echarts/chart/map'],function(ec) {//地图
 						events.dom.style.left = (arr.marginLeft + i) + "px";
 					}else{
                         events.prve.style.display = "block";
+
 						events.dom.style.left = (arr.marginLeft - i) + "px";
 					}
 					i++;
-				},0.1);
+				},1);
 			}
         }
     }
