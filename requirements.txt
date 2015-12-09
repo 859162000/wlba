@@ -80,3 +80,4 @@ optionaldict>=0.1.0
 # 或者安装 PyCrypto
 #pycrypto>=2.6.1
 user_agents==1.0.0
+qrcode==5.1
