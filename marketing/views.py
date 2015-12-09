@@ -2664,7 +2664,7 @@ class RockFinanceAPIView(APIView):
         return Response({"records": records, "message": u'整体的汇总数据', "code":0})
 
     def get(self, request):
-        _type = request.DATA.get("type", None)
+        _type = request.GET.get("type", None)
         if not _type or _type not in ('qrcode', 'static'):
             return Response({"code": 1001, "message": u"请传入合理参数"})
 
@@ -2694,10 +2694,6 @@ class RockFinanceAPIView(APIView):
             musics.append(item[1])
 
         vote_counter = WanglibaoVoteCounter.objects.filter(activity="rock_finance", item__in=musics)
-
-        if not vote_counter:
-            logger.debug(u"查询投票情况报错, 歌曲名单：%s" % item)
-            return Response({"code": 1002, "message": u"查询投票报异常"})
 
         for music in musics:
             vote = vote_counter.filter(item=music).first()
