@@ -119,9 +119,7 @@
         //    }, 500);
         //    $(this).prev().html(parseInt($(this).prev().html()) + 1);
         //}
-
         $('.ww').on('click', function () {
-
             get_radio_value(point);
             get_radio_value(point1);
             get_radio_value(point2);
@@ -135,7 +133,9 @@
                     type: "POST",
                     data: {'items':vaq}
                 }).done(function (data) {
-                    console.log(data);
+                    if(data['code']==0){
+                        return;
+                    };
                 })
                 }
 
@@ -159,11 +159,15 @@
             redpack();
             function redpack() {
                 $.ajax({
-                    url: '/api/rock/finance/?_type=static',
+                    url: '/api/rock/finance/?type=static',
                     type: "GET",
                     data: {}
                 }).done(function (damai) {
                     console.log(damai);
+                    console.log(damai['records']);
+                     for(var i in damai['records']){
+                         console.log(i['item']);
+                     }
                 })
             }
         });
