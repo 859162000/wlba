@@ -174,7 +174,7 @@ require(
             ],
             yAxis : [
                 {
-                    name: "（单位：万元）",
+                    name: "（单位：元）",
                     type : 'value',
                     min: 0,
                     splitNumber: 5,
