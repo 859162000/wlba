@@ -1209,3 +1209,7 @@ TOKEN_CLIENTS = {
 }
 
 APP_DECRYPT_KEY = "31D21828CC9DA7CE527F08481E361A7E"
+
+
+# 数据魔方接口
+DATACUBE_URL = 'http://stat.wanglibao.com:10000/datacube/index'

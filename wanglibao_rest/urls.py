@@ -45,7 +45,7 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView,
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
                             CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI, InnerSysSaveChannel,
-                            InnerSysSendSMS, InnerSysValidateID)
+                            InnerSysSendSMS, InnerSysValidateID, DataCubeApiView)
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
 
@@ -281,4 +281,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^experience/', include('experience_gold.urls')),
+)
+
+# 数据魔方接口
+urlpatterns += patterns(
+    '',
+    url(r'^datacube/$', DataCubeApiView.as_view()),
 )
