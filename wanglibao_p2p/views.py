@@ -819,11 +819,7 @@ def get_p2p_list():
 
     p2p_all = P2PProduct.objects.select_related('warrant_company', 'activity__rule') \
         .filter(hide=False).filter(Q(status_int__gte=6)).filter(Q(publish_time__lte=timezone.now())) \
-        .order_by('-publish_time')
-
-    p2p_done = P2PProduct.objects.select_related('warrant_company', 'activity').filter(hide=False).filter(
-        Q(publish_time__lte=timezone.now())) \
-        .filter(status=u'').order_by('-publish_time', '-soldout_time', '-priority')
+        .order_by('-status_int', '-publish_time', '-soldout_time', '-priority')
 
     p2p_done_list = cache_backend.get_p2p_list_from_objects_by_status(p2p_all, 9)
     p2p_full_list = cache_backend.get_p2p_list_from_objects_by_status(p2p_all, 8)
