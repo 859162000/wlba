@@ -2674,26 +2674,44 @@ class RockFinanceAPIView(APIView):
             return self.get_vote_static()
 
     def post(self, request):
-        catalog = request.DATA.get("catalog", None)
-        item = request.DATA.get("catalog", None)
+        """
+        items 的数据格式为： "乐队-歌曲,乐队-歌曲,..."
+        """
+        items = request.DATA.get("items", None)
 
         try:
-            assert None not in (catalog, item)
+            assert None is not items
         except AssertionError:
             return Response({"code": 1000, "message": u'传入的参数不合法'})
+        else:
+            items = items.split(",")
 
-        vote_counter = WanglibaoVoteCounter.objects.filter(activity="rock_finance", catalog=catalog, item=item).first()
-        if not vote_counter:  # 如果之前没有，则创建该记录; 可能被恶意程序刷爆数据库
-            vote_counter = WanglibaoVoteCounter.objects.create(
-                activity="rock_finance",
-                catalog=catalog,
-                item=item,
-                count=0
-            )
+        musics = list()
+        teams = list()
+        for item in items:
+            item = item.split("-")
+            teams.append(item[0])
+            musics.append(item[1])
 
-        vote_counter.count += 1
-        vote_counter.save()
-        return Response({"code": 0, "message": u'投票成功', "count": vote_counter.count})
+        vote_counter = WanglibaoVoteCounter.objects.filter(activity="rock_finance", item__in=musics)
+
+        if not vote_counter:
+            logger.debug(u"查询投票情况报错, 歌曲名单：%s" % item)
+            return Response({"code": 1002, "message": u"查询投票报异常"})
+
+        for music in musics:
+            vote = vote_counter.filter(item=music).first()
+            if not vote:
+                vote = WanglibaoVoteCounter.objects.create(
+                    activity="rock_finance",
+                    catalog=teams[musics.index(music)],
+                    item=music,
+                    count=0
+                )
+
+            vote.count += 1
+            vote.save()
+        return Response({"code": 0, "message": u'投票成功'})
 
 
 class RockFinanceCheckAPIView(APIView):
