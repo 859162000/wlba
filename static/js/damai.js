@@ -130,45 +130,42 @@
                 alert('请选一个')
             } else {
                 console.log(vaq);
-                //redpack({
-                //    'action': '',
-                //    'activity': "damai_wang",
-                //    'vaq': "vaq"
-                //}, function (data) {
-                //
-                //
-                //});
-            }
-
-        })
-        var va = "";
-
-        function get_radio_value(field) {
-            if (field && field.length) {
-
-                for (var i = 0; i < field.length; i++) {
-                    if (field[i].checked) {
-                        va += field[i].value + ",";
-                        //+field[i].parent().prev().find('dd').text();
-                    }
+                $.ajax({
+                    url: '/api/rock/finance/',
+                    type: "POST",
+                    data: {'items':vaq}
+                }).done(function (data) {
+                    console.log(data);
+                })
                 }
-            } else {
-                return;
+
             }
-        }
+            )
+            var va = "";
 
-        //function redpack(data, callback) {
-        //    $.ajax({
-        //        url: '/api/activity/reward/',
-        //        type: "POST",
-        //        data: data,
-        //        async: false
-        //    }).done(function (data) {
-        //        change = data;
-        //        callback && callback(data);
-        //
-        //    });
-        //}
-    });
+            function get_radio_value(field) {
+                if (field && field.length) {
 
-})();
+                    for (var i = 0; i < field.length; i++) {
+                        if (field[i].checked) {
+                            va += field[i].value + ",";
+                            //+field[i].parent().prev().find('dd').text();
+                        }
+                    }
+                } else {
+                    return;
+                }
+            }
+            redpack();
+            function redpack() {
+                $.ajax({
+                    url: '/api/rock/finance/?_type=static',
+                    type: "GET",
+                    data: {}
+                }).done(function (damai) {
+                    console.log(damai);
+                })
+            }
+        });
+
+    })();
