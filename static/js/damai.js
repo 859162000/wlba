@@ -129,6 +129,7 @@
             if (vaq == '') {
                 alert('请选一个')
             } else {
+                console.log(vaq);
                 //redpack({
                 //    'action': '',
                 //    'activity': "damai_wang",
@@ -148,6 +149,7 @@
                 for (var i = 0; i < field.length; i++) {
                     if (field[i].checked) {
                         va += field[i].value + ",";
+                        //+field[i].parent().prev().find('dd').text();
                     }
                 }
             } else {
