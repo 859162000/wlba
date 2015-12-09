@@ -70,17 +70,17 @@
             }
 
         });
-         $("lable").click(function () {
-             if ($('lable').attr('id')) {
-                 alert(12)
-             }
-         });
+        //$("lable").click(function () {
+        //    if ($('lable').attr('id')) {
+        //        alert(12)
+        //    }
+        //});
 
         $('.labelone').click(function () {
-            if(!($(this).attr('id'))){
+            if (!($(this).attr('id'))) {
                 $('.labelone').removeAttr('id') && $(this).attr('id', 'checked1');
                 $('.labelone').prev().removeAttr('checked') && $(this).prev().attr('checked', 'checked');
-            }else{
+            } else {
                 $('.labelone').removeAttr('id')
                 $('.labelone').prev().removeAttr('checked');
             }
@@ -88,10 +88,10 @@
             return false
         });
         $('.labelone1').click(function () {
-            if(!($(this).attr('id'))){
+            if (!($(this).attr('id'))) {
                 $('.labelone1').removeAttr('id') && $(this).attr('id', 'checked2');
                 $('.labelone1').prev().removeAttr('checked') && $(this).prev().attr('checked', 'checked');
-            }else{
+            } else {
                 $('.labelone1').removeAttr('id')
                 $('.labelone1').prev().removeAttr('checked');
             }
@@ -99,10 +99,10 @@
             return false
         });
         $('.labelone2').click(function () {
-            if(!($(this).attr('id'))){
+            if (!($(this).attr('id'))) {
                 $('.labelone2').removeAttr('id') && $(this).attr('id', 'checked');
                 $('.labelone2').prev().removeAttr('checked') && $(this).prev().attr('checked', 'checked');
-            }else{
+            } else {
                 $('.labelone2').removeAttr('id')
                 $('.labelone2').prev().removeAttr('checked');
             }
@@ -113,17 +113,12 @@
 
 
         var point = $('.frm1'), point1 = $('.frm2'), point2 = $('.frm3');
-        //if($('.frm1').checked = false){
-        //    alert(123);
-        //}else{
-        //    alert(35)
+        //function piao() {
+        //    $(this).find('.tiao').animate({
+        //        width: '+=10px'
+        //    }, 500);
+        //    $(this).prev().html(parseInt($(this).prev().html()) + 1);
         //}
-        function piao() {
-            $(this).find('.tiao').animate({
-                width: '+=10px'
-            }, 500);
-            $(this).prev().html(parseInt($(this).prev().html()) + 1);
-        }
 
         $('.ww').on('click', function () {
 
@@ -134,7 +129,21 @@
             if (vaq == '') {
                 alert('请选一个')
             } else {
-                alert(vaq);
+                redpack({
+                    'action': '',
+                    'activity': "damai_wang",
+                    'vaq': "vaq"
+                }, function () {
+                    if (change['left'] == 0) {
+                        $('.thanks').removeClass("thanks2");
+                        $('.thanks').addClass("thanks1");
+                        $('.main-thank .prize-ri1 p').html('您没有抽奖机会');
+                    } else {
+                        $('.main-thank .prize-ri1 p span').text(change['left']);
+                    }
+
+
+                });
             }
 
         })
@@ -144,7 +153,6 @@
             if (field && field.length) {
 
                 for (var i = 0; i < field.length; i++) {
-                    //alert(field[i]);
                     if (field[i].checked) {
                         va += field[i].value + ",";
                     }
@@ -152,28 +160,20 @@
             } else {
                 return;
             }
-
-            //$.ajax({
-            //    url: "test.html",
-            //    context: document.body,
-            //    data: {vaq: vaq},
-            //    success: function (data) {
-            //        $(this).addClass("done");
-            //    }
-            //});
         }
 
-        //$('.xuan-song1').click(function () {
-        //    var $radio = $(this).find("input[type=radio]"),
-        //        $flag = $radio.is(":checked");
-        //    if (!$flag) {
-        //        $radio.prop("checked", true);
-        //    }else{
-        //        $radio.prop("checked", false);
-        //    }
-        //});
+        function redpack(data, callback) {
+            $.ajax({
+                url: '/api/activity/reward/',
+                type: "POST",
+                data: data,
+                async: false
+            }).done(function (data) {
+                change = data;
+                callback && callback(data);
 
-
+            });
+        }
     });
 
 })();
