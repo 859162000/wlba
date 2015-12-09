@@ -114,7 +114,6 @@ require(
         var mouthAmount = dataVal.month_amount;
         var mouthNum = []; //月份
         var mouthVal = []; //投资
-        console.log(mouthAmount.length);
         if(mouthAmount.length < 22){
             for(var i=4; i<mouthAmount.length; i++){
                 mouthNum.push(mouthAmount[i].date.replace(/-/g,"."));
