@@ -151,7 +151,6 @@ require(
             xAxis : [
                 {
                     type : 'category',
-                    //data : ["2014.12","2015.1","2015.2","2015.3","2015.4","2015.5","2015.6","2015.7","2015.8","2015.9","2015.10","2015.11"],
                     data: mouthNum,
                     splitLine: {
                         show: false
@@ -230,7 +229,7 @@ require(
             xAxis : [
                 {
                     type : 'category',
-                    data : [ageArr.val[0],ageArr.val[1],ageArr.val[2],ageArr.val[3],ageArr.val[4],ageArr.val[5],ageArr.val[6]],
+                    data : [ageArr.val[0],ageArr.val[1],ageArr.val[2],ageArr.val[3],ageArr.val[4],ageArr.val[5],"其他"],
                     axisLine: {show:false},
                     splitLine: {
                         show: false
@@ -246,7 +245,7 @@ require(
                     axisLabel: {show:false},
                     splitArea: {show:false},
                     splitLine: {show:false},
-                    data : [ageArr.val[0],ageArr.val[1],ageArr.val[2],ageArr.val[3],ageArr.val[4],ageArr.val[5],ageArr.val[6]]
+                    data : [ageArr.val[0],ageArr.val[1],ageArr.val[2],ageArr.val[3],ageArr.val[4],ageArr.val[5],"其他"]
                 }
             ],
             yAxis : [
@@ -366,19 +365,12 @@ require(['echarts','echarts/chart/pie'],function(ec){//饼形图
       return option;
     }
 
-    //var mouthAmount = dataVal.month_amount;
-    //var mouthNum = []; //月份
-    //var mouthVal = []; //投资
     pie1_data = typeData(0, 5, dataVal.product_type);
     pie2_data = typeData(6, 10, dataVal.product_type);
     pie3_data = typeData(11, 18, dataVal.product_type);
     pie4_data = typeData(19, 21, dataVal.product_type);
 
     // 为echarts对象加载数据
-    //pie1.setOption(setOpt({'name':'融资期限','legendData':['小于1个月','3个月    ','1个月       ','6个月','2个月       ','其它'],"itemDate":[335,310,234,135,1000,548]}));
-    //pie2.setOption(setOpt({'name':'融资金额','legendData':['5万以下     ','50-100万之间','5-20万之间','100万以上','20-50万之间'],"itemDate":[335,310,234,135,1548]}));
-    //pie3.setOption(setOpt({'name':'融资类型','legendData':['车辆抵押借款','房产抵押贷','车辆融资借款','艺品贷','企业资金周转','黄金宝'],"itemDate":[335,310,234,135,1000,548]}));
-    //pie4.setOption(setOpt({'name':'还款方式','legendData':['等额本息 ','按月付息，到期还本','一次性还本付息'],"itemDate":[335,310,234]}));
     pie1.setOption(setOpt({'name':'融资期限','legendData': pie1_data.val, "itemDate": pie1_data.num},"vertical"));
     pie2.setOption(setOpt({'name':'融资金额','legendData': pie2_data.val, "itemDate": pie2_data.num},"vertical"));
     pie3.setOption(setOpt({'name':'融资类型','legendData': pie3_data.val, "itemDate": pie3_data.num},"vertical"));
@@ -435,7 +427,7 @@ require(['echarts','echarts/chart/pie'],function(ec){//饼形图
     }
     sex_data = typeData(7,9,dataVal.age_plan);
     channel_data = typeData(10,11,dataVal.age_plan);
-    sexDom.setOption(setSex({"name":"投资人性别分布", "colorVal":['#4bb281','#d5dfdd','#e9534d'], "legend":[sex_data.val[0],sex_data.val[1],sex_data.val[2]], "value": [sex_data.num[0],sex_data.num[1],sex_data.num[2]]}));
+    sexDom.setOption(setSex({"name":"投资人性别分布", "colorVal":['#4bb281','#e9534d'], "legend":[sex_data.val[2], sex_data.val[0]], "value": [sex_data.num[2], (sex_data.num[0]+sex_data.num[1])]}));
     cDom.setOption(setSex({"name":"投资人渠道分布", "colorVal":['#4d7bd0','#ef8048'], "legend":['PC','APP'], "value": [(channel_data.num[1] - channel_data.num[0]),channel_data.num[0]]}));
 });
 require(['echarts','echarts/chart/map'],function(ec) {//地图
@@ -461,13 +453,13 @@ require(['echarts','echarts/chart/map'],function(ec) {//地图
                         normal:{
                             borderWidth: 1,
                             borderColor:'#fff',
-                            label:{show:false},
+                            label:{show:true,textStyle: {color: "#333"}},
                             areaStyle:{color:'#dadee6'}
                         },
                         emphasis:{
                             borderWidth: 1,
                             borderColor:'#fff',
-                            label:{show:false},
+                            label:{show:true,textStyle: {color: "#fff"}},
                             color:"#4d7bd0"
                         }
                     },
@@ -507,15 +499,15 @@ require(['echarts','echarts/chart/map'],function(ec) {//地图
     map1.setOption(setMap(map_data1));
     map2.setOption(setMap(map_data2));
 
-    function mapTop10(arr){
+    function mapTop10(arr,d){
         var str = "";
         for(var i = 0; i<10; i++){
-           str += '<p class="map-list-item"><span class="map-num map-num'+ (i+1) +'">'+ (i+1) +'</span>'+ arr[i].name + '： <span class="font-color9">'+ fmoney(arr[i].value, 2) +'元</span></span></p>'
+           str += '<p class="map-list-item"><span class="map-num map-num'+ (i+1) +'">'+ (i+1) +'</span>'+ arr[i].name + '： <span class="font-color9">'+ fmoney(arr[i].value, 2) + d + '</span></span></p>'
         }
         return str;
     }
-    document.getElementById("map1-list").innerHTML = mapTop10(map_data1);
-    document.getElementById("map2-list").innerHTML = mapTop10(map_data2);
+    document.getElementById("map1-list").innerHTML = mapTop10(map_data1,"元");
+    document.getElementById("map2-list").innerHTML = mapTop10(map_data2,"人");
 });
 }
 //大事记
