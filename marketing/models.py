@@ -392,6 +392,7 @@ class P2PReward(models.Model):
     channel = models.ForeignKey(Channels, verbose_name=u'奖品渠道')
     description = models.TextField(u'奖品描述', null=True)
     content = models.CharField(u'奖品内容', max_length=128)
+    price = models.FloatField(u'奖品额度', default=0, blank=False)
     is_used = models.BooleanField(u'是否使用', default=False)
     create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
     end_time = models.DateTimeField(u'结束时间', null=True, blank=True)
