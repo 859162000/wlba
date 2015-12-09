@@ -114,10 +114,23 @@ require(
         var mouthAmount = dataVal.month_amount;
         var mouthNum = []; //月份
         var mouthVal = []; //投资
-        for(var i=5; i<mouthAmount.length; i++){
-            mouthNum.push(mouthAmount[i].date);
-            mouthVal.push(mouthAmount[i].invest.replace(/,/g,""));
+        console.log(mouthAmount.length);
+        if(mouthAmount.length < 22){
+            for(var i=4; i<mouthAmount.length; i++){
+                mouthNum.push(mouthAmount[i].date.replace(/-/g,"."));
+                mouthVal.push(mouthAmount[i].invest.replace(/,/g,""));
+            }
+        }else{
+            for(var i=4; i<mouthAmount.length; i++){
+                var month = mouthAmount[i].date.substr(mouthAmount[i].date.length-2,2);
+                if(month == "01"){
+                    month = mouthAmount[i].date.replace(/-/g,".");
+                }
+                mouthNum.push(month);
+                mouthVal.push(mouthAmount[i].invest.replace(/,/g,""));
+            }
         }
+
         document.getElementById("close-date").innerText = dataVal.plat_total[0].date;//截止日期
         function setNum(id,v){ //设置平台数据总值
             var arr = v.split(".");
@@ -163,6 +176,7 @@ require(
                         }
                     },
                     axisLabel: {
+                        interval: 0,
                         textStyle: {
                             color: "#fff"
                         }
@@ -536,7 +550,7 @@ require(['echarts','echarts/chart/map'],function(ec) {//地图
 				return;
 			}
 			var arr = events.setVal();
-			var i = 1;
+			var i = 0;
 			if((h === "+" && arr.marginLeft >= val) || (h === "-" && arr.marginLeft <= val)){
 				return;
 			}else{
@@ -559,8 +573,8 @@ require(['echarts','echarts/chart/map'],function(ec) {//地图
 
 						events.dom.style.left = (arr.marginLeft - i) + "px";
 					}
-					i++;
-				},1);
+					i = i+40;
+				},10);
 			}
         }
     }
