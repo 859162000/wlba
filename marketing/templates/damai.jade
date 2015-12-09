@@ -9,7 +9,6 @@ html
     link(rel="stylesheet",href="/static/styles/pc_activity/damai.css?v=20151123")
   body(style="background:#1f1f1d")
     include global/g_nav
-    - csrf_token
     .damai-wrap
       .damaifu
       .damai-line
@@ -23,6 +22,7 @@ html
         a(href='/accounts/register/?promo_token=dmw', target="_blank").damai-button 立即参与抢门票
       .damai-main1
         .main1-song
+          - csrf_token
           .main1-song1
             dl
               dt.song1

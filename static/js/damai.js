@@ -129,21 +129,14 @@
             if (vaq == '') {
                 alert('请选一个')
             } else {
-                redpack({
-                    'action': '',
-                    'activity': "damai_wang",
-                    'vaq': "vaq"
-                }, function () {
-                    if (change['left'] == 0) {
-                        $('.thanks').removeClass("thanks2");
-                        $('.thanks').addClass("thanks1");
-                        $('.main-thank .prize-ri1 p').html('您没有抽奖机会');
-                    } else {
-                        $('.main-thank .prize-ri1 p span').text(change['left']);
-                    }
-
-
-                });
+                //redpack({
+                //    'action': '',
+                //    'activity': "damai_wang",
+                //    'vaq': "vaq"
+                //}, function (data) {
+                //
+                //
+                //});
             }
 
         })
@@ -162,18 +155,18 @@
             }
         }
 
-        function redpack(data, callback) {
-            $.ajax({
-                url: '/api/activity/reward/',
-                type: "POST",
-                data: data,
-                async: false
-            }).done(function (data) {
-                change = data;
-                callback && callback(data);
-
-            });
-        }
+        //function redpack(data, callback) {
+        //    $.ajax({
+        //        url: '/api/activity/reward/',
+        //        type: "POST",
+        //        data: data,
+        //        async: false
+        //    }).done(function (data) {
+        //        change = data;
+        //        callback && callback(data);
+        //
+        //    });
+        //}
     });
 
 })();
