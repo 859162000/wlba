@@ -3,9 +3,6 @@
 import requests
 import logging
 from django.conf import settings
-from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.poolmanager import PoolManager
-import ssl
 
 logger = logging.getLogger(__name__)
 
@@ -35,12 +32,6 @@ def parse_id_verify_response_v2(text):
         'id_photo': id_photo,
     }
 
-class MyHttpsAdapter(HTTPAdapter):
-    def init_poolmanager(self, connections, maxsize, block=False):
-        self.poolmanager = PoolManager(num_pools=connections,
-                                       maxsize=maxsize,
-                                       block=block,
-                                       ssl_version=ssl.PROTOCOL_TLSv1)
 
 def get_verify_result(id_number, name):
     import cgi
@@ -82,20 +73,10 @@ def get_verify_result(id_number, name):
         "Content-Length": len(encode_request),
     }
 
-    s = requests.Session()
-    s.mount('https://', MyHttpsAdapter())
-
-    try:
-        response = s.post(url='https://api.nciic.com.cn/nciic_ws/services/NciicServices',
-                          headers=headers,
-                          data=encode_request,
-                          verify=False)
-    except ssl.SSLError, e:
-        logger.info('Failed to send request with error: %s' % e)
-        response = s.post(url='https://api.nciic.com.cn/nciic_ws/services/NciicServices',
-                          headers=headers,
-                          data=encode_request,
-                          verify=False)
+    response = requests.post(url='https://api.nciic.com.cn/nciic_ws/services/NciicServices',
+                             headers=headers,
+                             data=encode_request,
+                             verify=False)
 
     if response.status_code != 200:
         logger.error("Failed to send request: status: %d, ", response.status_code)
