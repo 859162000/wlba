@@ -65,7 +65,7 @@ from experience_gold.models import ExperienceEvent, ExperienceEventRecord
 from experience_gold.backends import SendExperienceGold
 from marketing.utils import local_to_utc
 from weixin.tasks import bind_ok, detect_product_biding, sentTemplate
-
+from weixin.util import sendTemplate
 logger = logging.getLogger("weixin")
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
 
@@ -217,7 +217,7 @@ class WeixinJoinView(View):
             a = MessageTemplate(ACCOUNT_INFO_TEMPLATE_ID,
                     keyword1=now_str,
                     keyword2=infos)
-            SendTemplateMessage.sendTemplate(w_user, a)
+            sendTemplate(w_user, a)
             reply = -1
         if self.msg.key == 'customer_service':
             txt = self.getCSReply()
@@ -528,30 +528,6 @@ class WeixinRegister(TemplateView):
             'phone': phone,
             'next' : next
         }
-
-class SendTemplateMessage(APIView):
-    permission_classes = (IsAuthenticated,)
-    http_method_names = ['post']
-    BIND_SUCCESS = "bind_success"
-
-    @classmethod
-    def sendTemplate(cls, weixin_user, message_template):
-        weixin_account = WeixinAccounts.getByOriginalId(weixin_user.account_original_id)
-        # account = Account.objects.get(original_id=weixin_user.account_original_id)
-        client = WeChatClient(weixin_account.app_id, weixin_account.app_secret)
-        print message_template.url
-        client.message.send_template(weixin_user.openid, template_id=message_template.template_id,
-                                     top_color=message_template.top_color, data=message_template.data,
-                                     url=message_template.url)
-    def post(self, request):
-        openid = request.POST.get('openid')
-        if not openid:
-            return Response({'error':-1})
-        w_user = WeixinUser.objects.filter(openid=openid).first()
-        template_type = request.POST.get('template_type', '')
-        template = None
-
-        return Response({'message':'ok'})
 
 
 class JumpPageTemplate(TemplateView):
@@ -1510,7 +1486,7 @@ def checkAndSendProductTemplate(sender, **kw):
                         template = MessageTemplate(PRODUCT_ONLINE_TEMPLATE_ID,
                             first=service.describe, keyword1=product.name, keyword2=rate_desc,
                             keyword3=period_desc, keyword4=product.pay_method, url=url)
-                        SendTemplateMessage.sendTemplate(sub_record.w_user, template)
+                        sendTemplate(sub_record.w_user, template)
 
 
 
