@@ -75,6 +75,27 @@ function tabFun(n, c){ //tab切换
         }
     }
 }
+function getBeforeDate(t,n){//获取某时间的前n天,t：某时间
+  var d = new Date(t);
+  var year = d.getFullYear();
+  var mon = d.getMonth()+1;
+  var day = d.getDate();
+  var s;
+  if(day <= n){
+    if(mon > 1) {
+      mon = mon-1;
+    }else {
+      year = year-1;
+      mon = 12;
+    }
+  }
+  d.setDate(d.getDate()-n);
+  mon = d.getMonth()+1;
+  day = d.getDate();
+  s = year+"-"+(mon<10?('0'+mon):mon)+"-"+(day<10?('0'+day):day);
+  return s;
+}
+//console.log(getBeforeDate("2015-12-08",6).replace(/-/g,"."));
 function allFun(){
 // 使用
 require(
@@ -105,24 +126,6 @@ require(
         setNum(document.getElementById('expect-num'), dataVal.plat_total[2].Qty);
         setNum(document.getElementById('put-out-num'), dataVal.plat_total[3].Qty);
 
-        function getBeforeDate(t,n){//获取某时间的前n天,t：某时间
-          var d = new Date(t);
-          var year = d.getFullYear();
-          var mon = d.getMonth()+1;
-          var day = d.getDate();
-          var s;
-          if(day <= n){
-            if(mon > 1) {
-              mon = mon-1;
-            }else {
-              year = year-1;
-              mon = 12;
-            }
-          }
-          d.setDate(d.getDate()-n);
-          s = year+"-"+(mon<10?('0'+mon):mon)+"-"+(day<10?('0'+day):day);
-          return s;
-        }
         //平台7日数据
         document.getElementById('data-days7').innerHTML = "（"+ getBeforeDate(dataVal.plat_total[4].date,6).replace(/-/g,".") + " - " + dataVal.plat_total[4].date.replace(/-/g,".")  + ")";
         document.getElementById('match-num7').innerHTML = dataVal.plat_total[4].Qty;
