@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 from collections import OrderedDict
 import datetime
+import collections
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -12,6 +13,8 @@ from wechatpy.client.api.qrcode import WeChatQRCode
 import logging
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from wanglibao.fields import JSONFieldUtf8
+
 
 logger = logging.getLogger("weixin")
 
@@ -538,6 +541,20 @@ class ReplyRule(models.Model):
     pattern = models.IntegerField('回复规则', choices=PATTERN_CHOICES, default=PATTERN_CHOICES[0][0])
     account = models.ForeignKey(Account)
     created_at = models.DateTimeField('创建时间', auto_now_add=True)
+
+
+class WeiXinUserActionRecord(models.Model):
+    ACTION_TYPES = (
+        ('bind', u'绑定网利宝'),
+        ('unbind', u'解除绑定'),
+        ('sign_in', u'用户签到'),
+    )
+    w_user = models.ForeignKey(WeixinUser, null=True)
+    user = models.ForeignKey(User, null=True)
+    action_type = models.CharField(u'动作类型', choices=ACTION_TYPES, max_length=32)
+    action_describe = models.CharField(u'动作描述', max_length=64)
+    extra_data = JSONFieldUtf8(blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
+    create_time = models.IntegerField('创建时间', default=0)
 
 
 class ReplyKeyword(models.Model):

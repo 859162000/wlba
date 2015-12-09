@@ -17,6 +17,7 @@ PLATFORM = (
     ("android", "android"),
     ("pc", "pc"),
     ("app", "移动端"),
+    ("weixin", "微信"),
 )
 
 
