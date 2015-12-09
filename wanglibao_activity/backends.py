@@ -84,7 +84,7 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
         penny = Decimal(0.01).quantize(Decimal('.01'))
         with transaction.atomic():
             # 等待pay_info交易完成
-            pay_info_lock = PayInfo.objects.select_for_update().filter(order_id=order_id).all()
+            pay_info_lock = PayInfo.objects.select_for_update().get(order_id=order_id)
         if rule.is_in_date:
             first_pay = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
                                                update_time__gt=rule.activity.start_at,
@@ -551,6 +551,12 @@ def _give_activity_experience_new(user, rtype, experience_id, device_type, rule,
         experience_id_list = experience_id.split(',')
         experience_id_list = [int(rid) for rid in experience_id_list if rid.strip() != '']
     else:
+        return
+
+    # 限制id为1的体验金重复发放
+    experience_count = ExperienceEventRecord.objects.filter(user=user).filter(event__id=1).count()
+    if experience_count:
+        logger.debug(">>>>用户id: {}, ID为1的体验金已经发放过,不允许重复领取".format(user.id))
         return
 
     if len(experience_id_list) == 1:
