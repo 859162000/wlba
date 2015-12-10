@@ -12,7 +12,7 @@ require(["jquery"],function($){
         url: "/api/datacube/",
         dataType: "json",
         success: function(data){
-            console.log(data.result);
+            //console.log(data.result);
             dataVal = data.result;
             allFun();
         }
@@ -142,19 +142,24 @@ require(
         document.getElementById("close-date").innerText = dataVal.plat_total[0].date;//截止日期
         function setNum(id,v){ //设置平台数据总值
             var arr = v.split(".");
-            id.innerHTML = arr[0] + '<span class="font-l">.' + arr[1] + '</span>';
+            if(arr.length < 2){
+                id.innerHTML = arr[0];
+            }else{
+                id.innerHTML = arr[0] + '<span class="font-l">.' + arr[1] + '</span>';
+            }
         }
         //总数据
         var plat_total = dataVal.plat_total.sort(getSortFun('asc', "type"));
-        setNum(document.getElementById('match-num'), plat_total[0].Qty);
-        setNum(document.getElementById('paid-num'), plat_total[2].Qty);
-        setNum(document.getElementById('expect-num'), plat_total[4].Qty);
-        setNum(document.getElementById('put-out-num'), plat_total[6].Qty);
 
-        setNum(document.getElementById('match-num2'), "￥"+plat_total[0].Qty);
-        setNum(document.getElementById('paid-num2'), "￥"+plat_total[2].Qty);
-        setNum(document.getElementById('expect-num2'), "￥"+plat_total[4].Qty);
-        setNum(document.getElementById('put-out-num2'), "￥"+plat_total[6].Qty);
+        setNum(document.getElementById('match-num'), plat_total[9].Qty);
+        setNum(document.getElementById('paid-num'), plat_total[0].Qty);
+        setNum(document.getElementById('expect-num'), plat_total[8].Qty);
+        setNum(document.getElementById('put-out-num'), plat_total[10].Qty);
+
+        setNum(document.getElementById('match-num2'), "￥"+plat_total[2].Qty);
+        setNum(document.getElementById('paid-num2'), "￥"+plat_total[6].Qty);
+        setNum(document.getElementById('expect-num2'), "￥"+plat_total[11].Qty);
+        setNum(document.getElementById('put-out-num2'), "￥"+plat_total[4].Qty);
 
         //平台7日数据
         document.getElementById('data-days7').innerHTML = "（"+ getBeforeDate(dataVal.plat_total[4].date,6).replace(/-/g,".") + " - " + dataVal.plat_total[4].date.replace(/-/g,".")  + ")";
