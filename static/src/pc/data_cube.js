@@ -543,6 +543,13 @@ require(['echarts','echarts/chart/map'],function(ec) {//地图
         liDom: dom.getElementsByTagName("li"),
         setFun: "",
         animate: false,
+        setInit: function(){//初始化 设置left值
+            var initArr = events.setVal();
+            var domP = events.dom.parentNode;
+            var pw = domP.width || domP.offsetWidth;
+            events.next.style.display = "none";
+            dom.style.left = (pw - initArr.totalWidth) + "px";
+        },
         setVal: function(){
             var lft = events.dom.offsetLeft;
 			var liw = events.liDom[0].style.width || events.liDom[0].offsetWidth;
@@ -599,6 +606,5 @@ require(['echarts','echarts/chart/map'],function(ec) {//地图
         var pw = pDom.style.width || pDom.offsetWidth;
         events._scroll((-arr.totalWidth+pw),"-");
     }
-    var initArr = events.setVal();
-    dom.style.left = (dom.parentNode.width - initArr.totalWidth) + "px";
+    events.setInit();
 })();
