@@ -46,7 +46,6 @@ urlpatterns = patterns(
 
     url(r'^area/$', AppAreaView.as_view()),
     url(r'^area/fetch/$', AppAreaApiView.as_view()),
-
     url(r'^app_memorabilia/$', AppMemorabiliaView.as_view(), name='app_memorabilia'),
 )
 
