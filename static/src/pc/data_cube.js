@@ -139,7 +139,7 @@ require(
             }
         }
 
-        document.getElementById("close-date").innerText = dataVal.plat_total[0].date;//截止日期
+        document.getElementById("close-date").innerHTML = dataVal.plat_total[0].date;//截止日期
         function setNum(id,v){ //设置平台数据总值
             var arr = v.split(".");
             if(arr.length < 2){
