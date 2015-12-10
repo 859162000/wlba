@@ -1,0 +1,25 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+    head
+        - with '网利宝' as title
+        include include/common_head
+        - endwith
+        link(rel="stylesheet",href="/static/styles/pc_activity/double_dan.css?v=2015121001")
+        - csrf_token
+    body(style="background:#b10012")
+        include global/g_nav
+        #body_wrap.clear
+            .banner_1
+            .body_wrap
+                .banner_2
+                .main_box.main_box_1
+                    .main_top
+                    .main
+                    .main_footer
+
+        include global/g_footer
+script.
+    require(['/static/js/double_dan.js?v=2015120801'])
+                                                                    
