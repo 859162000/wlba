@@ -1,4 +1,5 @@
 # encoding:utf-8
+from wanglibao_reward.models import WanglibaoActivityReward as ActivityReward
 import base64
 import hashlib
 import os
@@ -58,7 +59,7 @@ from wanglibao.settings import XUNLEIVIP_REGISTER_KEY
 import urllib
 import hashlib
 import logging
-# import qrcode
+import qrcode
 from wanglibao_reward.models import WanglibaoActivityReward
 logger = logging.getLogger('marketing')
 TRIGGER_NODE = [i for i, j in TRIGGER_NODE]
@@ -2660,7 +2661,7 @@ class RockFinanceAPIView(APIView):
             得到整体的全部数据
         """
         records = WanglibaoVoteCounter.objects.filter(activity="rock_finance")
-        records = {record.item: record.count for record in records}
+        records = {"".join(['《', str(record.item), '》']): record.count for record in records}  #前端要求带书名号
         return Response({"records": records, "message": u'整体的汇总数据', "code":0})
 
     def get(self, request):
