@@ -55,7 +55,7 @@
         }
         //返回投票
         $('.damaifu').on('click', function () {
-            $('body,html').animate({scrollTop: 957}, 600);
+            $('body,html').animate({scrollTop: 1257}, 600);
             return false
         })
         //dianjiquxiao
@@ -70,17 +70,11 @@
             }
 
         });
-         $("lable").click(function () {
-             if ($('lable').attr('id')) {
-                 alert(12)
-             }
-         });
-
         $('.labelone').click(function () {
-            if(!($(this).attr('id'))){
+            if (!($(this).attr('id'))) {
                 $('.labelone').removeAttr('id') && $(this).attr('id', 'checked1');
                 $('.labelone').prev().removeAttr('checked') && $(this).prev().attr('checked', 'checked');
-            }else{
+            } else {
                 $('.labelone').removeAttr('id')
                 $('.labelone').prev().removeAttr('checked');
             }
@@ -88,10 +82,10 @@
             return false
         });
         $('.labelone1').click(function () {
-            if(!($(this).attr('id'))){
+            if (!($(this).attr('id'))) {
                 $('.labelone1').removeAttr('id') && $(this).attr('id', 'checked2');
                 $('.labelone1').prev().removeAttr('checked') && $(this).prev().attr('checked', 'checked');
-            }else{
+            } else {
                 $('.labelone1').removeAttr('id')
                 $('.labelone1').prev().removeAttr('checked');
             }
@@ -99,10 +93,10 @@
             return false
         });
         $('.labelone2').click(function () {
-            if(!($(this).attr('id'))){
+            if (!($(this).attr('id'))) {
                 $('.labelone2').removeAttr('id') && $(this).attr('id', 'checked');
                 $('.labelone2').prev().removeAttr('checked') && $(this).prev().attr('checked', 'checked');
-            }else{
+            } else {
                 $('.labelone2').removeAttr('id')
                 $('.labelone2').prev().removeAttr('checked');
             }
@@ -113,67 +107,84 @@
 
 
         var point = $('.frm1'), point1 = $('.frm2'), point2 = $('.frm3');
-        //if($('.frm1').checked = false){
-        //    alert(123);
-        //}else{
-        //    alert(35)
-        //}
-        function piao() {
-            $(this).find('.tiao').animate({
-                width: '+=10px'
-            }, 500);
-            $(this).prev().html(parseInt($(this).prev().html()) + 1);
-        }
+        $('.toupiao').on('click', function () {
+                if ($(this).hasClass('toupiao')) {
+                    get_radio_value(point);
+                    get_radio_value(point1);
+                    get_radio_value(point2);
+                    var vaq = va.substring(0, va.length - 1);
+                    if (vaq == '') {
+                        $('.tishi').html('请至少选一个');
+                    } else {
+                        $.ajax({
+                            url: '/api/rock/finance/',
+                            type: "POST",
+                            data: {'items': vaq}
+                        }).done(function (data) {
+                            redpack();
+                            if (data['code'] == 0) {
+                                $('.ww').removeClass('toupiao');
+                                $('.tishi').html('投票成功');
+                                $('.ww').click(function () {
+                                    $('.tishi').html('只能投一次');
+                                })
+                            }
+                            ;
+                        })
+                    }
 
-        $('.ww').on('click', function () {
-
-            get_radio_value(point);
-            get_radio_value(point1);
-            get_radio_value(point2);
-            var vaq = va.substring(0, va.length - 1);
-            if (vaq == '') {
-                alert('请选一个')
-            } else {
-                alert(vaq);
+                }
             }
-
-        })
+        )
         var va = "";
 
         function get_radio_value(field) {
             if (field && field.length) {
 
                 for (var i = 0; i < field.length; i++) {
-                    //alert(field[i]);
                     if (field[i].checked) {
                         va += field[i].value + ",";
+                        //+field[i].parent().prev().find('dd').text();
                     }
                 }
             } else {
                 return;
             }
-
-            //$.ajax({
-            //    url: "test.html",
-            //    context: document.body,
-            //    data: {vaq: vaq},
-            //    success: function (data) {
-            //        $(this).addClass("done");
-            //    }
-            //});
         }
 
-        //$('.xuan-song1').click(function () {
-        //    var $radio = $(this).find("input[type=radio]"),
-        //        $flag = $radio.is(":checked");
-        //    if (!$flag) {
-        //        $radio.prop("checked", true);
-        //    }else{
-        //        $radio.prop("checked", false);
-        //    }
-        //});
+        redpack();
+        function redpack() {
+            $.ajax({
+                url: '/api/rock/finance/?type=static',
+                type: "GET",
+                data: {}
+            }).done(function (damai) {
+                var htm = $('.one');
+                var vaw = '';
+                for (var i in damai['records']) {
+                    vaw += damai['records'][i] + ",";
+
+                }
+                ;
+                var vae = vaw.substring(0, vaw.length - 1);
+                var ss = vae.split(",");
+                var max=Math.max.apply(null, ss);
+                $.each(htm, function (i, o) {
+                    var paio = $(o).text();
+                    for (var i in damai['records']) {
+
+                        if (i == paio) {
+                            $(o).parent().find('span').html(damai['records'][i]);
+
+                            $(o).parent().find('.xuan-tiao1').html('<div class=tiao style="width:' + (damai['records'][i]) / max * 100 + '% "></div>');
+                        }
+                    }
+
+                })
 
 
+            })
+        }
     });
 
 })();

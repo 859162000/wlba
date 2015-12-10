@@ -1010,10 +1010,10 @@ class ZGDXRegister(CoopRegister):
         binding = Binding.objects.filter(user_id=user.id).first()
         # 判定是否首次绑卡
         if binding and binding.extra != '1':
-            if ENV == ENV_PRODUCTION:
-                plat_offer_id = '104369'
-            else:
-                plat_offer_id = '103050'
+            # if ENV == ENV_PRODUCTION:
+            plat_offer_id = '104369'
+            # else:
+            #     plat_offer_id = '103050'
             self.zgdx_call_back(user, plat_offer_id)
             binding.extra = '1'
             binding.save()
@@ -1027,13 +1027,13 @@ class ZGDXRegister(CoopRegister):
         if binding and p2p_record and p2p_record.order_id == int(order_id):
             p2p_amount = int(p2p_record.amount)
             if p2p_amount >= 1000:
-                if ENV == ENV_PRODUCTION:
-                    if 1000 <= p2p_amount < 2000:
-                        plat_offer_id = '104371'
-                    else:
-                        plat_offer_id = '104372'
+                # if ENV == ENV_PRODUCTION:
+                if 1000 <= p2p_amount < 2000:
+                    plat_offer_id = '104371'
                 else:
-                    plat_offer_id = '103050'
+                    plat_offer_id = '104372'
+                # else:
+                #     plat_offer_id = '103050'
                 self.zgdx_call_back(user, plat_offer_id)
 
 

@@ -1,0 +1,34 @@
+.clear {
+  clear: both; }
+
+.body_wrap {
+  width: 100%;
+  background: url("/static/imgs/pc_activity/double_dan/body_bg.png"); }
+
+.banner_1 {
+  width: 100%;
+  height: 797px;
+  background: url("/static/imgs/pc_activity/double_dan/banner_1.png") no-repeat center;
+  display: block; }
+
+.banner_2 {
+  width: 100%;
+  height: 179px;
+  background: url("/static/imgs/pc_activity/double_dan/banner_2.png") no-repeat center;
+  display: block; }
+
+.main_box {
+  width: 994px;
+  margin: 0 auto;
+  display: block; }
+
+.main_top {
+  width: 994px;
+  height: 158px; }
+
+.main_footer {
+  width: 994px;
+  height: 15px;
+  background: url("/static/imgs/pc_activity/double_dan/main_footer.png") no-repeat center; }
+
+/*# sourceMappingURL=double_dan.css.map */
