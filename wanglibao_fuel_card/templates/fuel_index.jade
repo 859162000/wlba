@@ -1,10 +1,55 @@
 doctype html
 html
   head
-    title 加油卡
+    title 购买
     include include/fuel_head.jade
   body
-    .test 哈哈
+    .fuel-section-head
+      .fuel-head-user
+        .fuel-head-left
+          .fuel-save-number
+            span.amount 3000
+            span.text 元
+          .fuel-save-text 累计节省
+        .fuel-head-right
+          .fuel-user 13021160575
+          .fuel-notice 一份理财加油卡卡生效中
 
-    script(src='/static/scripts/mobile_fuelcard/lib/zepto.js')
-    script(src='/static/scripts/mobile_fuelcard/index.js')
+      .fuel-nav-nav
+        .fuel-nav-list.fuel-nav-around
+          a(href='#').fuel-nac-buy 购买记录
+        .fuel-nav-list.fuel-nav-center
+          a(href='#').fuel-nac-take 兑换记录
+        .fuel-nav-list.fuel-nav-around
+          a(href='#').fuel-nac-about 关于我们
+    .fuel-section-product
+      .product-left-name 服务产品列表
+      .product-right-dec 产品说明
+
+    .fuel-product-item
+      mixin list(color)
+        .fuel-product-list
+          .fuel-pdt-title
+            .fuel-pdt-name(class=color) 初级理财加油卡
+            .fuel-pdt-fiter 适合12万以内车型
+          .fuel-pdt-cont
+            .fuel-pdt-term.fuel-pdt-section
+              .pdt-date
+                span.pdt-date-num 3
+                |个月
+              .pdt-name 期限
+            .fuel-pdt-amount.fuel-pdt-section
+              .pdt-date
+                span.pdt-date-num 150
+                |元
+              .pdt-name 每月加油卡
+            .fuel-pdt-buy
+              .fuel-buy-min 6000元即可获得
+              .fuel-buy-submit 立即选购
+
+      +list('fuel-pdt-green')
+      +list('fuel-pdt-yellow')
+      +list('fuel-pdt-red')
+
+    script(src='/static/scripts/mobile_fuelcard/dev/vendor.zepto.js')
+    script(src='/static/scripts/mobile_fuelcard/dev/index.js')

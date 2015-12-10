@@ -1,4 +1,4 @@
-import {pi} from "./mixin/ajax"
+import {pi} from "./mixins/ajax"
 
 
 $('.test').html(pi)

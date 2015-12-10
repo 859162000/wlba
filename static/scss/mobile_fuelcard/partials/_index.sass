@@ -1,0 +1,158 @@
+
+$index-red: #DB493F
+$index-blue: #5DB5F2
+$index-green: #50B143
+$index-yellow: #F5A623
+$index-border: #E5E5E5
+
+.display-box
+  display: -webkit-box
+
+.fuel-section-head
+  background: #fff
+  font-size: .6rem
+
+  .fuel-head-user
+    @extend .display-box
+    padding: rem(36) 0 rem(26) 0
+    border-bottom: 1px solid $index-border
+
+  .fuel-head-left
+    width: 50%
+    -webkit-box-flex: 1
+    border-right: 1px solid $index-border
+    padding-left: rem(58)
+
+  .fuel-save-number
+    padding-top: .5rem
+    .amount
+      color: $index-red
+      font-size: rem(64)
+    .text
+      color: #666
+  .fuel-save-text
+    color: #ccc
+
+  .fuel-head-right
+    width: 50%
+    -webkit-box-flex: 1
+    padding-left: 1rem
+    padding-top: .5rem
+  .fuel-user
+    color: $index-blue
+    background: url("/static/imgs/mobile_fuelcard/index/user_icon.png")  no-repeat left center
+    background-size: rem(24)
+    padding-left: 1rem
+    margin-bottom: 1rem
+  .fuel-notice
+    color: $index-red
+    background: url("/static/imgs/mobile_fuelcard/index/notice.png")  no-repeat left center
+    background-size: rem(30)
+    padding-left: 1rem
+    white-space: nowrap
+    text-overflow: ellipsis
+    overflow: hidden
+
+  .fuel-nav-nav
+    @extend .display-box
+    text-align: center
+    color: #666
+    padding: rem(32) 0 rem(27) 0
+    a
+      display: inline-block
+      width: rem(100)
+      padding-top: 2.7rem
+
+  .fuel-nav-around
+    width: rem(216)
+
+  .fuel-nav-center
+    -webkit-box-flex: 1
+
+  .fuel-nac-buy
+    background: url("/static/imgs/mobile_fuelcard/index/buy.png")  no-repeat top center
+    background-size: rem(100)
+
+  .fuel-nac-take
+    background: url("/static/imgs/mobile_fuelcard/index/take.png")  no-repeat top center
+    background-size: rem(100)
+
+  .fuel-nac-about
+    background: url("/static/imgs/mobile_fuelcard/index/about.png")  no-repeat top  center
+    background-size: rem(100)
+
+
+.fuel-section-product
+  @extend .display-box
+  font-size: .6rem
+  line-height: 2.5
+  padding: 0 .5rem
+
+  .product-left-name
+    -webkit-box-flex: 1
+    color: #ccc
+
+  .product-right-dec
+    background: url("/static/imgs/mobile_fuelcard/index/dec.png")  no-repeat left  center
+    background-size: rem(26)
+    color: $index-blue
+    padding-left: rem(36)
+
+.fuel-product-list
+  font-size: .6rem
+  background: #fff
+  margin-bottom: .5rem
+
+  .fuel-pdt-title
+    @extend .display-box
+    -webkit-box-align: end
+    padding: .425rem 0
+    border-bottom: 1px solid $index-border
+    .fuel-pdt-name
+      color: #999
+      font-size: rem(30)
+      margin: 0 rem(58) 0 .5rem
+    .fuel-pdt-fiter
+      color: #ccc
+
+    .fuel-pdt-green
+      color: $index-green
+    .fuel-pdt-yellow
+      color: $index-yellow
+    .fuel-pdt-red
+      color: $index-red
+
+  .fuel-pdt-cont
+    @extend .display-box
+    text-align: center
+
+  .fuel-pdt-term
+    margin: 0 rem(58)
+
+  .fuel-pdt-amount
+    -webkit-box-flex: 1
+
+  .fuel-pdt-buy
+    width: rem(250)
+    .fuel-buy-min
+      color: #666
+      border-bottom: 1px solid $index-border
+    .fuel-buy-submit
+      color: $index-blue
+    .fuel-buy-submit,.fuel-buy-min
+      height: rem(70)
+      line-height: rem(70)
+
+  .fuel-pdt-section
+    @extend .display-box
+    -webkit-box-orient: vertical
+    -webkit-box-pack: center
+    .pdt-date
+      color: #999
+      margin-bottom: .2rem
+    .pdt-date-num
+      color: #666
+      font-size: 1rem
+    .pdt-name
+      color: #ccc
+
