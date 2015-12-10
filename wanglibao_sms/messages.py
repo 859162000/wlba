@@ -458,10 +458,10 @@ def msg_redpack_give_percent(amount, highest_amount, name, dt):
 
 
 # 全民淘金短信站内信模板
-@suffix
+@suffix_td
 def sms_income(name, count, amount):
     return u"亲爱的{}，今日您共有{}个好友参与投资，为您产生的理财佣金为{}元已发放，" \
-           u"请进入我的账户－全民淘金中查询！感谢您对我们的支持与关注。".format(name, count, amount)
+           u"请进入我的账户－全民淘金中查询！感谢您的支持。".format(name, count, amount)
     # redis = redis_backend()
     # obj = redis._get('sms_income')
     # content = cPickle.loads(obj)['content']
@@ -478,7 +478,7 @@ def msg_give_income(count, amount):
 
 @suffix_td
 def sms_alert_invest(name):
-    return u"提醒投资：我（{}）在网利宝看到几个超棒的理财计划，你也赶紧去投资，不要再错失良机啦！".format(name)
+    return u"{}在网利宝看到几个超棒的理财计划，你也赶紧去投资，不要再错失良机啦！关注服务号wanglibao400每日惊喜，".format(name)
 
 
 @suffix_td
