@@ -716,7 +716,7 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
             _send_message_template(user, title, content)
             _save_activity_record(rule, user, 'message', content)
         if sms_template:
-            sms = Template(sms_template)
+            sms = Template(sms_template + u' 关注服务号wanglibao400每日惊喜，退订回TD【网利科技】')
             content = sms.render(context)
             _send_sms_template(mobile, content)
             _save_activity_record(rule, user, 'sms', content)
@@ -747,7 +747,8 @@ def _send_message_template(user, title, content):
 def _send_sms_template(phones, content):
     send_messages.apply_async(kwargs={
         "phones": [phones, ],
-        "messages": [content, ]
+        "messages": [content, ],
+        "ext": 666
     })
 
 def _send_wx_frist_bind_template(user, end_date, amount, invest_amount):

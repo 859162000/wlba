@@ -4,8 +4,6 @@ import requests
 import logging
 from django.conf import settings
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.poolmanager import PoolManager
-import ssl
 
 logger = logging.getLogger(__name__)
 
@@ -35,12 +33,6 @@ def parse_id_verify_response_v2(text):
         'id_photo': id_photo,
     }
 
-class MyHttpsAdapter(HTTPAdapter):
-    def init_poolmanager(self, connections, maxsize, block=False):
-        self.poolmanager = PoolManager(num_pools=connections,
-                                       maxsize=maxsize,
-                                       block=block,
-                                       ssl_version=ssl.PROTOCOL_TLSv1)
 
 def get_verify_result(id_number, name):
     import cgi
@@ -83,7 +75,7 @@ def get_verify_result(id_number, name):
     }
 
     s = requests.Session()
-    s.mount('https://', MyHttpsAdapter())
+    s.mount('https://', HTTPAdapter(max_retries=5))
     response = s.post(url='https://api.nciic.com.cn/nciic_ws/services/NciicServices',
                       headers=headers,
                       data=encode_request,
