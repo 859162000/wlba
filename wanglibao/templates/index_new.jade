@@ -91,7 +91,7 @@ html
               .ac-tg-bg
 
         .ex-rt-cont
-          .ex-dc.padding-l-r-sm
+          .ex-dc.padding-l-r-sm.data-statistics
             .dc-head
               .dc-title.font-l
                 i.icon.iconfont.icon-data
@@ -112,6 +112,8 @@ html
                   i.icon.iconfont.icon-data-makemoney
                   | 小伙伴们昨日共投资
                   span.num-space(data-number='{{site_data.p2p_amount_yesterday}}',data-type='amount')
+            .data-cube
+              a(href='/data_cube/',target="_blank").t-d7 更多数据
           .ex-download-app.mg-t-sm.padding-sm
             img(src='/static/imgs/pc/home/www_erweima.jpg', alt='p2p金融').dol-app.mg-r-sm.fl
             .dol-btn.fl
