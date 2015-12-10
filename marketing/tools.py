@@ -260,7 +260,8 @@ def send_income_message_sms():
         # 批量发送短信
         send_messages.apply_async(kwargs={
             "phones": phones_list,
-            "messages": messages_list
+            "messages": messages_list,
+            "ext": 666
         })
 
 
