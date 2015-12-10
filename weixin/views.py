@@ -50,7 +50,7 @@ import urllib
 import logging
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
-from wanglibao_p2p.views import get_p2p_list
+from wanglibao_p2p.common import get_p2p_list
 from wanglibao_redis.backend import redis_backend
 from rest_framework import renderers
 from misc.models import Misc
@@ -63,7 +63,7 @@ from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEven
 from experience_gold.models import ExperienceEvent, ExperienceEventRecord
 from experience_gold.backends import SendExperienceGold
 from marketing.utils import local_to_utc
-from weixin.tasks import bind_ok, detect_product_biding, sentTemplate
+from weixin.tasks import detect_product_biding, sentTemplate, bind_ok
 from weixin.util import sendTemplate
 logger = logging.getLogger("weixin")
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
@@ -331,14 +331,7 @@ class WeixinJoinView(View):
                 channel_digital_code = eventKey[-3:]
                 user = User.objects.filter(pk=int(user_id)).first()
                 if user:
-                    rs, txt, is_first_bind = bindUser(w_user, user)
-                    if rs == 0:
-                        bind_ok.apply_async(kwargs={
-                            "openid": fromUserName,
-                            "is_first_bind":is_first_bind,
-                        },
-                                            queue='celery01'
-                                            )
+                    rs, txt = bindUser(w_user, user)
                     channel = WeiXinChannel.objects.filter(digital_code=channel_digital_code).first()
                     if channel:
                         scene_id = channel.code
@@ -471,12 +464,12 @@ def bindUser(w_user, user):
     redpack_record_id = 0
     if w_user.user:
         if w_user.user.id==user.id:
-            return 1, u'你已经绑定, 请勿重复绑定',is_first_bind
-        return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone,is_first_bind
+            return 1, u'你已经绑定, 请勿重复绑定'
+        return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone
     other_w_user = WeixinUser.objects.filter(user=user).first()
     if other_w_user:
         msg = u"你的手机号%s已经绑定微信<span style='color:#173177;'>%s</span>"%(user.wanglibaouserprofile.phone, other_w_user.nickname)
-        return 3, msg, is_first_bind
+        return 3, msg
     w_user.user = user
     w_user.bind_time = int(time.time())
     w_user.save()
@@ -486,8 +479,13 @@ def bindUser(w_user, user):
         user.wanglibaouserprofile.first_bind_time = w_user.bind_time
         user.wanglibaouserprofile.save()
         is_first_bind = True
-
-    return 0, u'绑定成功',is_first_bind
+    bind_ok.apply_async(kwargs={
+        "openid": w_user.openid,
+        "is_first_bind":is_first_bind,
+    },
+                        queue='celery01'
+                        )
+    return 0, u'绑定成功'
 
 def unbindUser(w_user, user):
     w_user.user = None
@@ -580,14 +578,7 @@ class WeixinBind(TemplateView):
         try:
             openid = self.request.GET.get('openid')
             weixin_user = WeixinUser.objects.get(openid=openid)
-            rs, txt, is_first_bind = bindUser(weixin_user, user)
-            if rs == 0:
-                bind_ok.apply_async(kwargs={
-                    "openid": openid,
-                    "is_first_bind":is_first_bind,
-                },
-                                    queue='celery01'
-                                    )
+            rs, txt = bindUser(weixin_user, user)
         except WeixinUser.DoesNotExist, e:
             logger.debug("*************************"+e.message)
             pass
