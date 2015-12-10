@@ -12,7 +12,7 @@ require(["jquery"],function($){
         url: "/api/datacube/",
         dataType: "json",
         success: function(data){
-            //console.log(data.result);
+            console.log(data.result);
             dataVal = data.result;
             allFun();
         }
@@ -150,6 +150,11 @@ require(
         setNum(document.getElementById('paid-num'), plat_total[2].Qty);
         setNum(document.getElementById('expect-num'), plat_total[4].Qty);
         setNum(document.getElementById('put-out-num'), plat_total[6].Qty);
+
+        setNum(document.getElementById('match-num2'), "￥"+plat_total[0].Qty);
+        setNum(document.getElementById('paid-num2'), "￥"+plat_total[2].Qty);
+        setNum(document.getElementById('expect-num2'), "￥"+plat_total[4].Qty);
+        setNum(document.getElementById('put-out-num2'), "￥"+plat_total[6].Qty);
 
         //平台7日数据
         document.getElementById('data-days7').innerHTML = "（"+ getBeforeDate(dataVal.plat_total[4].date,6).replace(/-/g,".") + " - " + dataVal.plat_total[4].date.replace(/-/g,".")  + ")";
