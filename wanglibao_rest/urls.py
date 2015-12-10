@@ -236,7 +236,6 @@ urlpatterns += patterns('',
 urlpatterns += patterns('',
     url(r'^investment_history/', InvestmentHistory.as_view()),
 )
-from marketing.views import RockFinancesAPIView
 urlpatterns += patterns(
     '',
     url(r'^xunlei/join/$', ActivityJoinLogAPIView.as_view()),
