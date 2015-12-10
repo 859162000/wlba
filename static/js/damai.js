@@ -55,7 +55,7 @@
         }
         //返回投票
         $('.damaifu').on('click', function () {
-            $('body,html').animate({scrollTop: 957}, 600);
+            $('body,html').animate({scrollTop: 1257}, 600);
             return false
         })
         //dianjiquxiao
@@ -70,12 +70,6 @@
             }
 
         });
-        //$("lable").click(function () {
-        //    if ($('lable').attr('id')) {
-        //        alert(12)
-        //    }
-        //});
-
         $('.labelone').click(function () {
             if (!($(this).attr('id'))) {
                 $('.labelone').removeAttr('id') && $(this).attr('id', 'checked1');
@@ -113,67 +107,84 @@
 
 
         var point = $('.frm1'), point1 = $('.frm2'), point2 = $('.frm3');
-        //function piao() {
-        //    $(this).find('.tiao').animate({
-        //        width: '+=10px'
-        //    }, 500);
-        //    $(this).prev().html(parseInt($(this).prev().html()) + 1);
-        //}
-        $('.ww').on('click', function () {
-            get_radio_value(point);
-            get_radio_value(point1);
-            get_radio_value(point2);
-            var vaq = va.substring(0, va.length - 1);
-            if (vaq == '') {
-                alert('请选一个')
-            } else {
-                console.log(vaq);
-                $.ajax({
-                    url: '/api/rock/finance/',
-                    type: "POST",
-                    data: {'items':vaq}
-                }).done(function (data) {
-                    if(data['code']==0){
-                        return;
-                    };
-                })
+        $('.toupiao').on('click', function () {
+                if ($(this).hasClass('toupiao')) {
+                    get_radio_value(point);
+                    get_radio_value(point1);
+                    get_radio_value(point2);
+                    var vaq = va.substring(0, va.length - 1);
+                    if (vaq == '') {
+                        $('.tishi').html('请至少选一个');
+                    } else {
+                        $.ajax({
+                            url: '/api/rock/finance/',
+                            type: "POST",
+                            data: {'items': vaq}
+                        }).done(function (data) {
+                            redpack();
+                            if (data['code'] == 0) {
+                                $('.ww').removeClass('toupiao');
+                                $('.tishi').html('投票成功');
+                                $('.ww').click(function () {
+                                    $('.tishi').html('只能投一次');
+                                })
+                            }
+                            ;
+                        })
+                    }
+
                 }
-
             }
-            )
-            var va = "";
+        )
+        var va = "";
 
-            function get_radio_value(field) {
-                if (field && field.length) {
+        function get_radio_value(field) {
+            if (field && field.length) {
 
-                    for (var i = 0; i < field.length; i++) {
-                        if (field[i].checked) {
-                            va += field[i].value + ",";
-                            //+field[i].parent().prev().find('dd').text();
+                for (var i = 0; i < field.length; i++) {
+                    if (field[i].checked) {
+                        va += field[i].value + ",";
+                        //+field[i].parent().prev().find('dd').text();
+                    }
+                }
+            } else {
+                return;
+            }
+        }
+
+        redpack();
+        function redpack() {
+            $.ajax({
+                url: '/api/rock/finance/?type=static',
+                type: "GET",
+                data: {}
+            }).done(function (damai) {
+                var htm = $('.one');
+                var vaw = '';
+                for (var i in damai['records']) {
+                    vaw += damai['records'][i] + ",";
+
+                }
+                ;
+                var vae = vaw.substring(0, vaw.length - 1);
+                var ss = vae.split(",");
+                var max=Math.max.apply(null, ss);
+                $.each(htm, function (i, o) {
+                    var paio = $(o).text();
+                    for (var i in damai['records']) {
+
+                        if (i == paio) {
+                            $(o).parent().find('span').html(damai['records'][i]);
+
+                            $(o).parent().find('.xuan-tiao1').html('<div class=tiao style="width:' + (damai['records'][i]) / max * 100 + '% "></div>');
                         }
                     }
-                } else {
-                    return;
-                }
-            }
-            redpack();
-            function redpack() {
-                $.ajax({
-                    url: '/api/rock/finance/?type=static',
-                    type: "GET",
-                    data: {}
-                }).done(function (damai) {
-                /*    console.log(damai);
-                    console.log(damai);*/
-                     /*for(var i in damai.records){
-                        console.log(damai.records[i]);
-                     }*/
-                    $.each(damai.records,function(i,o){
-                      console.log(o);
-                    })
 
                 })
-            }
-        });
 
-    })();
+
+            })
+        }
+    });
+
+})();
