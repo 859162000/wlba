@@ -5,6 +5,7 @@ import time
 import logging
 import decimal
 from django.db.models import Sum
+from django.db import transaction
 from django.utils import timezone
 from datetime import datetime, timedelta
 from rest_framework.response import Response
@@ -44,49 +45,51 @@ class ExperienceBuyAPIView(APIView):
         total_amount = 0
 
         # 查询用户符合条件的理财金记录
-        experience_record = ExperienceEventRecord.objects.filter(user=user, apply=False) \
-            .filter(event__invalid=False, event__available_at__lt=now, event__unavailable_at__gt=now)
+        with transaction.atomic(savepoint=True):
+            experience_record = ExperienceEventRecord.objects.filter(user=user, apply=False) \
+                .filter(event__invalid=False, event__available_at__lt=now, event__unavailable_at__gt=now)\
+                .select_for_update()
 
-        if experience_record:
-            for record in experience_record:
-                event = record.event
-                total_amount += event.amount
+            if experience_record:
+                for record in experience_record:
+                    event = record.event
+                    total_amount += event.amount
 
-                record.apply = True
-                record.apply_amount = event.amount
-                record.apply_at = timezone.now()
-                record.apply_platform = device_type
-                record.save()
+                    record.apply = True
+                    record.apply_amount = event.amount
+                    record.apply_at = timezone.now()
+                    record.apply_platform = device_type
+                    record.save()
 
-            terms = get_amortization_plan(u'日计息一次性还本付息').generate(
-                total_amount,
-                experience_product.expected_earning_rate / 100.0,
-                timezone.now(),
-                experience_product.period
-            )
+                terms = get_amortization_plan(u'日计息一次性还本付息').generate(
+                    total_amount,
+                    experience_product.expected_earning_rate / 100.0,
+                    timezone.now(),
+                    experience_product.period
+                )
 
-            for index, term in enumerate(terms['terms']):
-                amortization = ExperienceAmortization()
-                amortization.product = experience_product
-                amortization.user = user
-                amortization.principal = term[1]  # 本金
-                amortization.interest = term[2]  # 利息
-                amortization.term = index + 1  # 期数
-                amortization.description = u'第%d期' % (index + 1)
-                amortization.term_date = term[6] - timedelta(days=1)
+                for index, term in enumerate(terms['terms']):
+                    amortization = ExperienceAmortization()
+                    amortization.product = experience_product
+                    amortization.user = user
+                    amortization.principal = term[1]  # 本金
+                    amortization.interest = term[2]  # 利息
+                    amortization.term = index + 1  # 期数
+                    amortization.description = u'第%d期' % (index + 1)
+                    amortization.term_date = term[6] - timedelta(days=1)
 
-                amortization.save()
+                    amortization.save()
 
-            term_date = amortization.term_date
-            interest = amortization.interest
+                term_date = amortization.term_date
+                interest = amortization.interest
 
-            return Response({
-                'ret_code': 0,
-                'data': {'amount': total_amount, 'term_date': term_date.strftime("%Y-%m-%d"), 'interest': interest}
-            })
+                return Response({
+                    'ret_code': 0,
+                    'data': {'amount': total_amount, 'term_date': term_date.strftime("%Y-%m-%d"), 'interest': interest}
+                })
 
-        else:
-            return Response({'ret_code': 30002, 'message': u'没有体验金记录,无法购买体验标'})
+            else:
+                return Response({'ret_code': 30002, 'message': u'没有体验金记录,无法购买体验标'})
 
 
 class GetExperienceAPIView(APIView):
