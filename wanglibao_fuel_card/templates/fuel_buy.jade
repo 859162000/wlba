@@ -1,0 +1,35 @@
+doctype html
+html
+  head
+    title 购买
+    include include/fuel_head.jade
+  body
+    .fuel-buy-title 产品详情
+
+    .fuel-product-detail
+      .fuel-detail-list
+        .fuel-list-name 期限
+        .fuel-list-value 130****0575
+
+      .fuel-detail-list
+        .fuel-list-name 使用范围
+        .fuel-list-value 中石化、中石油合作加油站
+
+      .fuel-detail-list
+        .fuel-list-name 使用范围
+        .fuel-list-value
+          span.reduce-num -
+          span.value-num 1
+          span.add-num +
+
+    .fuel-buy-title 支付信息
+
+    .fuel-product-detail
+      .fuel-detail-list
+        .fuel-list-name 帐户余额
+        .fuel-list-value 3000.00元
+      .fuel-detail-list
+        .fuel-list-name 待支付金额
+        .fuel-list-value.fuel-list-value-red 12000.00元
+
+    .fuel-post-sumit.fuel-buy 确认购买并支付

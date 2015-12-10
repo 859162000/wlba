@@ -8,5 +8,8 @@ urlpatterns = patterns(
     '',
     #test
     url(r'^index/$', TemplateView.as_view(template_name="fuel_index.jade")),
+    url(r'^buy/$', TemplateView.as_view(template_name="fuel_buy.jade")),
+    url(r'^recharge/$', TemplateView.as_view(template_name="fuel_recharge.jade")),
+    url(r'^account/$', TemplateView.as_view(template_name="fuel_account.jade")),
 
 )
