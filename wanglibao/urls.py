@@ -194,6 +194,12 @@ urlpatterns += patterns(
     url(r'weixin_activity/', include('wanglibao_reward.urls')),
 )
 
+# 加油卡
+urlpatterns += patterns(
+    '',
+    url(r'fuel/', include('wanglibao_fuel_card.urls')),
+)
+
 if settings.DEBUG:
     import debug_toolbar
 
