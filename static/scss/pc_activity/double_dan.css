@@ -23,6 +23,12 @@
   display: block; }
 
 .main_top {
-  width: 994px; }
+  width: 994px;
+  height: 158px; }
+
+.main_footer {
+  width: 994px;
+  height: 15px;
+  background: url("/static/imgs/pc_activity/double_dan/main_footer.png") no-repeat center; }
 
 /*# sourceMappingURL=double_dan.css.map */
