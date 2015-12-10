@@ -23,7 +23,6 @@ from weixin.constant import BIND_SUCCESS_TEMPLATE_ID
 
 @app.task
 def bind_ok(openid, is_first_bind):
-    print '---------------------------bind_ok:::%s'%is_first_bind
     weixin_user = WeixinUser.objects.get(openid=openid)
     now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
     if is_first_bind:
