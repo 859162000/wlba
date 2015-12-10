@@ -3,6 +3,7 @@
 import requests
 import logging
 from django.conf import settings
+from requests.adapters import HTTPAdapter
 
 logger = logging.getLogger(__name__)
 
@@ -73,10 +74,12 @@ def get_verify_result(id_number, name):
         "Content-Length": len(encode_request),
     }
 
-    response = requests.post(url='https://api.nciic.com.cn/nciic_ws/services/NciicServices',
-                             headers=headers,
-                             data=encode_request,
-                             verify=False)
+    s = requests.Session()
+    s.mount('https://', HTTPAdapter(max_retries=5))
+    response = s.post(url='https://api.nciic.com.cn/nciic_ws/services/NciicServices',
+                      headers=headers,
+                      data=encode_request,
+                      verify=False)
 
     if response.status_code != 200:
         logger.error("Failed to send request: status: %d, ", response.status_code)

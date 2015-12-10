@@ -40,7 +40,8 @@ TRIGGER_NODE = (
     ('first_buy', u'首次投资'),
     ('p2p_audit', u'满标审核'),
     ('repaid', u'还款'),
-    ('activity', u'活动奖励')
+    ('activity', u'活动奖励'),
+    ('first_bind_weixin', u'首次绑定微信')
 )
 GIFT_TYPE = (
     ('reward', u'奖品'),

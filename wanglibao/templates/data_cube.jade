@@ -12,19 +12,19 @@ html
           span.cube-title-l （数据截止日期:<span id="close-date"></span>）
         ul.data-item-box
           li.data-item.data-red
-            p.tit 撮合贷款额（元）
+            p.tit 线上贷款额（元）
             p.num#match-num
           li.data-item.data-blue
-            p.tit 已还本金（元）
+            p.tit 线上已还本金（元）
             p.num#paid-num
           li.data-item.data-green
-            p.tit 累计预期收益（元）
+            p.tit 线上累计预期收益（元）
             p.num#expect-num
           li.data-item.data-orange
-            p.tit 累计发放收益（元）
+            p.tit 线上累计发放收益（元）
             p.num#put-out-num
         .data-total#data-total
-        p.data-img-tit 网利宝月交易额
+        p.data-img-tit 网利宝线上月交易额
     .data-cube-part.data-cube-part2
       .w1100
         p.cube-title 平台7日数据
@@ -34,22 +34,22 @@ html
             p.txt-center
              a(href="javascrupt:void(0)").cube-icon.cube-icon1
             p.num#match-num7
-            p.s-tit 撮合贷款额（元）
+            p.s-tit 线上贷款额（元）
           li.cube-seven-item
             p.txt-center
              a(href="javascrupt:void(0)").cube-icon.cube-icon2
             p.num#paid-num7
-            p.s-tit 已还本金（元）
+            p.s-tit 已还线上本金（元）
           li.cube-seven-item
             p.txt-center
              a(href="javascrupt:void(0)").cube-icon.cube-icon3
             p.num#expect-num7
-            p.s-tit 累计预期收益（元）
+            p.s-tit 线上累计预期收益（元）
           li.cube-seven-item
             p.txt-center
              a(href="javascrupt:void(0)").cube-icon.cube-icon4
             p.num#put-out-num7
-            p.s-tit 累计发放收益（元）
+            p.s-tit 线上累计发放收益（元）
     .data-cube-part.data-cube-part3
       .w1100
         p.cube-title 融资概览
@@ -162,6 +162,6 @@ html
 
     include global/g_footer
     script.
-      require(["/static/src/pc/echarts/echarts.js","/static/src/pc/data_cube.js?20151208"])
+      require(["/static/src/pc/echarts/echarts.js","/static/src/pc/data_cube.js?201512093"])
 
     include include/tracking

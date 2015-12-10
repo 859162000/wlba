@@ -1,4 +1,5 @@
 # encoding:utf-8
+from wanglibao_reward.models import WanglibaoActivityReward as ActivityReward
 import base64
 import hashlib
 import os
@@ -2660,11 +2661,11 @@ class RockFinanceAPIView(APIView):
             得到整体的全部数据
         """
         records = WanglibaoVoteCounter.objects.filter(activity="rock_finance")
-        records = [{"count": record.count, "catalog": record.catalog, "item": record.item} for record in records]
+        records = {"".join(['《', str(record.item), '》']): record.count for record in records}  #前端要求带书名号
         return Response({"records": records, "message": u'整体的汇总数据', "code":0})
 
     def get(self, request):
-        _type = request.DATA.get("type", None)
+        _type = request.GET.get("type", None)
         if not _type or _type not in ('qrcode', 'static'):
             return Response({"code": 1001, "message": u"请传入合理参数"})
 
@@ -2674,26 +2675,40 @@ class RockFinanceAPIView(APIView):
             return self.get_vote_static()
 
     def post(self, request):
-        catalog = request.DATA.get("catalog", None)
-        item = request.DATA.get("catalog", None)
+        """
+        items 的数据格式为： "乐队-歌曲,乐队-歌曲,..."
+        """
+        items = request.DATA.get("items", None)
 
         try:
-            assert None not in (catalog, item)
+            assert None is not items
         except AssertionError:
             return Response({"code": 1000, "message": u'传入的参数不合法'})
+        else:
+            items = items.split(",")
 
-        vote_counter = WanglibaoVoteCounter.objects.filter(activity="rock_finance", catalog=catalog, item=item).first()
-        if not vote_counter:  # 如果之前没有，则创建该记录; 可能被恶意程序刷爆数据库
-            vote_counter = WanglibaoVoteCounter.objects.create(
-                activity="rock_finance",
-                catalog=catalog,
-                item=item,
-                count=0
-            )
+        musics = list()
+        teams = list()
+        for item in items:
+            item = item.split("-")
+            teams.append(item[0])
+            musics.append(item[1])
 
-        vote_counter.count += 1
-        vote_counter.save()
-        return Response({"code": 0, "message": u'投票成功', "count": vote_counter.count})
+        vote_counter = WanglibaoVoteCounter.objects.filter(activity="rock_finance", item__in=musics)
+
+        for music in musics:
+            vote = vote_counter.filter(item=music).first()
+            if not vote:
+                vote = WanglibaoVoteCounter.objects.create(
+                    activity="rock_finance",
+                    catalog=teams[musics.index(music)],
+                    item=music,
+                    count=0
+                )
+
+            vote.count += 1
+            vote.save()
+        return Response({"code": 0, "message": u'投票成功'})
 
 
 class RockFinanceCheckAPIView(APIView):

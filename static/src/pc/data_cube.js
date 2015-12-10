@@ -12,18 +12,22 @@ require(["jquery"],function($){
         url: "/api/datacube/",
         dataType: "json",
         success: function(data){
-            console.log(data.result);
+            //console.log(data.result);
             dataVal = data.result;
             allFun();
         }
     });
 });
-
+function getSortFun(order, sortBy){//json对象数组按对象属性排序
+    var ordAlpah = (order == 'asc') ? '>' : '<';
+    var sortFun = new Function('a', 'b', 'return a.' + sortBy + ordAlpah + 'b.' + sortBy + '?1:-1');
+    return sortFun;
+}
 //数据 type
-function typeData(s,e,amount){//s:开始索引值，e:结束索引值
+function typeData(amount){//s:开始索引值，e:结束索引值
     var val = []; //月份
     var num = []; //投资
-    for(var i=s; i<=e; i++){
+    for(var i=0; i<amount.length; i++){
         val.push(amount[i].type);
         num.push(parseFloat(amount[i].QTY.replace(/,/g,"")));
     }
@@ -77,6 +81,7 @@ function tabFun(n, c){ //tab切换
     }
 }
 function getBeforeDate(t,n){//获取某时间的前n天,t：某时间
+  t = t.replace(/-/g,"/");
   var d = new Date(t);
   var year = d.getFullYear();
   var mon = d.getMonth()+1;
@@ -96,7 +101,7 @@ function getBeforeDate(t,n){//获取某时间的前n天,t：某时间
   s = year+"-"+(mon<10?('0'+mon):mon)+"-"+(day<10?('0'+day):day);
   return s;
 }
-//console.log(getBeforeDate("2015-12-08",6).replace(/-/g,"."));
+
 function allFun(){
 // 使用
 require(
@@ -113,26 +118,40 @@ require(
         var mouthAmount = dataVal.month_amount;
         var mouthNum = []; //月份
         var mouthVal = []; //投资
-        for(var i=5; i<mouthAmount.length; i++){
-            mouthNum.push(mouthAmount[i].date);
-            mouthVal.push(mouthAmount[i].invest.replace(/,/g,""));
+        if(mouthAmount.length < 22){
+            for(var i=4; i<mouthAmount.length; i++){
+                mouthNum.push(mouthAmount[i].date.replace(/-/g,"."));
+                mouthVal.push(mouthAmount[i].invest.replace(/,/g,""));
+            }
+        }else{
+            for(var i=4; i<mouthAmount.length; i++){
+                var month = mouthAmount[i].date.substr(mouthAmount[i].date.length-2,2);
+                if(month == "01"){
+                    month = mouthAmount[i].date.replace(/-/g,".");
+                }
+                mouthNum.push(month);
+                mouthVal.push(mouthAmount[i].invest.replace(/,/g,""));
+            }
         }
+
         document.getElementById("close-date").innerText = dataVal.plat_total[0].date;//截止日期
         function setNum(id,v){ //设置平台数据总值
             var arr = v.split(".");
             id.innerHTML = arr[0] + '<span class="font-l">.' + arr[1] + '</span>';
         }
-        setNum(document.getElementById('match-num'), dataVal.plat_total[0].Qty);
-        setNum(document.getElementById('paid-num'), dataVal.plat_total[1].Qty);
-        setNum(document.getElementById('expect-num'), dataVal.plat_total[2].Qty);
-        setNum(document.getElementById('put-out-num'), dataVal.plat_total[3].Qty);
+        //总数据
+        var plat_total = dataVal.plat_total.sort(getSortFun('asc', "type"));
+        setNum(document.getElementById('match-num'), plat_total[0].Qty);
+        setNum(document.getElementById('paid-num'), plat_total[2].Qty);
+        setNum(document.getElementById('expect-num'), plat_total[4].Qty);
+        setNum(document.getElementById('put-out-num'), plat_total[6].Qty);
 
         //平台7日数据
         document.getElementById('data-days7').innerHTML = "（"+ getBeforeDate(dataVal.plat_total[4].date,6).replace(/-/g,".") + " - " + dataVal.plat_total[4].date.replace(/-/g,".")  + ")";
-        document.getElementById('match-num7').innerHTML = dataVal.plat_total[4].Qty;
-        document.getElementById('paid-num7').innerHTML = dataVal.plat_total[5].Qty;
-        document.getElementById('expect-num7').innerHTML = dataVal.plat_total[6].Qty;
-        document.getElementById('put-out-num7').innerHTML = dataVal.plat_total[7].Qty;
+        document.getElementById('match-num7').innerHTML = plat_total[1].Qty;
+        document.getElementById('paid-num7').innerHTML = plat_total[3].Qty;
+        document.getElementById('expect-num7').innerHTML = plat_total[5].Qty;
+        document.getElementById('put-out-num7').innerHTML = plat_total[7].Qty;
 
         var option = {
             color: ['#9ab5e8'],
@@ -162,6 +181,7 @@ require(
                         }
                     },
                     axisLabel: {
+                        interval: 0,
                         textStyle: {
                             color: "#fff"
                         }
@@ -173,7 +193,7 @@ require(
             ],
             yAxis : [
                 {
-                    name: "（单位：万元）",
+                    name: "（单位：元）",
                     type : 'value',
                     min: 0,
                     splitNumber: 5,
@@ -195,7 +215,6 @@ require(
                 {
                     "type":"bar",
                     barWidth: 35,//柱形宽度
-                    //"data":[5, 20, 40, 10, 10, 20,5, 20, 40, 10, 10, 20],
                     "data": mouthVal,
                     itemStyle: {
                         normal : {
@@ -212,7 +231,7 @@ require(
         myChart.setOption(option);
 
         //年龄 数据
-        var ageArr = typeData(0,6,dataVal.age_plan);
+        var ageArr = typeData(dataVal.age);
         var ageTotal = ageArr.num.arrSum();
         //投资人年龄分布
         optiondb = {
@@ -229,7 +248,7 @@ require(
             xAxis : [
                 {
                     type : 'category',
-                    data : [ageArr.val[0],ageArr.val[1],ageArr.val[2],ageArr.val[3],ageArr.val[4],ageArr.val[5],"其他"],
+                    data : [ageArr.val[0],ageArr.val[1],ageArr.val[2],ageArr.val[3],ageArr.val[4],ageArr.val[5]],
                     axisLine: {show:false},
                     splitLine: {
                         show: false
@@ -245,7 +264,7 @@ require(
                     axisLabel: {show:false},
                     splitArea: {show:false},
                     splitLine: {show:false},
-                    data : [ageArr.val[0],ageArr.val[1],ageArr.val[2],ageArr.val[3],ageArr.val[4],ageArr.val[5],"其他"]
+                    data : [ageArr.val[0],ageArr.val[1],ageArr.val[2],ageArr.val[3],ageArr.val[4],ageArr.val[5]]
                 }
             ],
             yAxis : [
@@ -276,7 +295,7 @@ require(
                             barBorderRadius: [5,5,0,0]
                         }
                     },
-                    data:[percentNum(ageArr.num[0],ageTotal),percentNum(ageArr.num[1],ageTotal),percentNum(ageArr.num[2],ageTotal),percentNum(ageArr.num[3],ageTotal),percentNum(ageArr.num[4],ageTotal),percentNum(ageArr.num[5],ageTotal),percentNum(ageArr.num[6],ageTotal)]
+                    data:[percentNum(ageArr.num[0],ageTotal),percentNum(ageArr.num[1],ageTotal),percentNum(ageArr.num[2],ageTotal),percentNum(ageArr.num[3],ageTotal),percentNum(ageArr.num[4],ageTotal),percentNum(ageArr.num[5],ageTotal)]
                 },
                 {
                     name:'投资人年龄分布',
@@ -312,7 +331,7 @@ require(['echarts','echarts/chart/pie'],function(ec){//饼形图
     var sexDom = ec.init(document.getElementById('cube-sex'));
     var cDom = ec.init(document.getElementById('cube-channel'));
 
-    function setOpt(cfg,or){//融资概览
+    function setOpt(cfg,or,x){//融资概览
         if(or == undefined){
             or = "horizontal";
         }
@@ -324,7 +343,8 @@ require(['echarts','echarts/chart/pie'],function(ec){//饼形图
         legend: {
             orient : or,
             y : 250,
-            x: 30,
+            x: x,
+            itemGap: 12,
             data:cfg.legendData
         },
         calculable : true,
@@ -365,16 +385,18 @@ require(['echarts','echarts/chart/pie'],function(ec){//饼形图
       return option;
     }
 
-    pie1_data = typeData(0, 5, dataVal.product_type);
-    pie2_data = typeData(6, 10, dataVal.product_type);
-    pie3_data = typeData(11, 18, dataVal.product_type);
-    pie4_data = typeData(19, 21, dataVal.product_type);
-
+    pie1_data = typeData(dataVal.times);//融资期限
+    pie2_data = typeData(dataVal.amount);//融资金额
+    pie3_data = typeData(dataVal.type);//融资类型
+    pie4_data = typeData(dataVal.way);//还款方式
+    //整理融资金额/融资类型的排序
+    var pie2_data_r = {"val": [pie2_data.val[4],pie2_data.val[2],pie2_data.val[1],pie2_data.val[3],pie2_data.val[0]], "num": [pie2_data.num[4],pie2_data.num[2],pie2_data.num[1],pie2_data.num[3],pie2_data.num[0]]};
+    var pie3_data_r = {"val": [pie3_data.val[0],pie3_data.val[2],pie3_data.val[3],pie3_data.val[4],pie3_data.val[5],pie3_data.val[6],pie3_data.val[7],pie3_data.val[1]], "num": [pie3_data.num[0],pie3_data.num[2],pie3_data.num[3],pie3_data.num[4],pie3_data.num[5],pie3_data.num[6],pie3_data.num[7],pie3_data.num[1]]};
     // 为echarts对象加载数据
-    pie1.setOption(setOpt({'name':'融资期限','legendData': pie1_data.val, "itemDate": pie1_data.num},"vertical"));
-    pie2.setOption(setOpt({'name':'融资金额','legendData': pie2_data.val, "itemDate": pie2_data.num},"vertical"));
-    pie3.setOption(setOpt({'name':'融资类型','legendData': pie3_data.val, "itemDate": pie3_data.num},"vertical"));
-    pie4.setOption(setOpt({'name':'还款方式','legendData': pie4_data.val, "itemDate": pie4_data.num},"vertical"));
+    pie1.setOption(setOpt({'name':'融资期限','legendData': pie1_data.val, "itemDate": pie1_data.num},"vertical",30));
+    pie2.setOption(setOpt({'name':'融资金额','legendData': pie2_data_r.val, "itemDate": pie2_data_r.num},"vertical",30));
+    pie3.setOption(setOpt({'name':'融资类型','legendData': pie3_data_r.val, "itemDate": pie3_data_r.num},"vertical",30));
+    pie4.setOption(setOpt({'name':'还款方式','legendData': pie4_data.val, "itemDate": pie4_data.num},"vertical","center"));
 
     function setSex(cfg){//投资人性别分布&投资渠道分布
         var opt = {
@@ -425,8 +447,8 @@ require(['echarts','echarts/chart/pie'],function(ec){//饼形图
         }
         return opt;
     }
-    sex_data = typeData(7,9,dataVal.age_plan);
-    channel_data = typeData(10,11,dataVal.age_plan);
+    sex_data = typeData(dataVal.sex);
+    channel_data = typeData(dataVal.invest_terminal);
     sexDom.setOption(setSex({"name":"投资人性别分布", "colorVal":['#4bb281','#e9534d'], "legend":[sex_data.val[2], sex_data.val[0]], "value": [sex_data.num[2], (sex_data.num[0]+sex_data.num[1])]}));
     cDom.setOption(setSex({"name":"投资人渠道分布", "colorVal":['#4d7bd0','#ef8048'], "legend":['PC','APP'], "value": [(channel_data.num[1] - channel_data.num[0]),channel_data.num[0]]}));
 });
@@ -453,7 +475,7 @@ require(['echarts','echarts/chart/map'],function(ec) {//地图
                         normal:{
                             borderWidth: 1,
                             borderColor:'#fff',
-                            label:{show:true,textStyle: {color: "#333"}},
+                            label:{show:true,textStyle: {color: "#999"}},
                             areaStyle:{color:'#dadee6'}
                         },
                         emphasis:{
@@ -488,11 +510,7 @@ require(['echarts','echarts/chart/map'],function(ec) {//地图
         }
         return {"price": mapPrice, "people": mapPeople};
     }
-    function getSortFun(order, sortBy) {//json对象数组按对象属性排序
-        var ordAlpah = (order == 'asc') ? '>' : '<';
-        var sortFun = new Function('a', 'b', 'return a.' + sortBy + ordAlpah + 'b.' + sortBy + '?1:-1');
-        return sortFun;
-    }
+
     var map_data = mapNum();
     var map_data1 = map_data.price.sort(getSortFun('desc', 'value'));
     var map_data2 = map_data.people.sort(getSortFun('desc', 'value'));
@@ -536,7 +554,7 @@ require(['echarts','echarts/chart/map'],function(ec) {//地图
 				return;
 			}
 			var arr = events.setVal();
-			var i = 1;
+			var i = 0;
 			if((h === "+" && arr.marginLeft >= val) || (h === "-" && arr.marginLeft <= val)){
 				return;
 			}else{
@@ -556,10 +574,11 @@ require(['echarts','echarts/chart/map'],function(ec) {//地图
 						events.dom.style.left = (arr.marginLeft + i) + "px";
 					}else{
                         events.prve.style.display = "block";
+
 						events.dom.style.left = (arr.marginLeft - i) + "px";
 					}
-					i++;
-				},0.1);
+					i = i+40;
+				},10);
 			}
         }
     }

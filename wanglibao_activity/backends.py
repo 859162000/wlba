@@ -22,11 +22,12 @@ from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_sms.tasks import send_messages
 from wanglibao_rest.utils import decide_device
 from experience_gold.models import ExperienceEvent, ExperienceEventRecord
+from weixin.models import WeixinUser, WeiXinUserActionRecord
 
 logger = logging.getLogger(__name__)
 
 
-def check_activity(user, trigger_node, device_type, amount=0, product_id=0, order_id=0, is_full=False):
+def check_activity(user, trigger_node, device_type, amount=0, product_id=0, order_id=0, is_full=False, is_first_bind=False):
     now = timezone.now()
     device_type = decide_device(device_type)
     if not trigger_node:
@@ -61,17 +62,17 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, orde
                         user_ib = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                         if user_ib:
                             _check_rules_trigger(user, rule, rule.trigger_node, device_type,
-                                                 amount, product_id, is_full, order_id, user_ib)
+                                                 amount, product_id, is_full, order_id, user_ib, is_first_bind)
                     else:
                         _check_rules_trigger(user, rule, rule.trigger_node, device_type,
-                                             amount, product_id, is_full, order_id)
+                                             amount, product_id, is_full, order_id, is_first_bind)
             else:
                 continue
     else:
         return
 
 
-def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, order_id, user_ib=None):
+def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, order_id, user_ib=None, is_first_bind=False):
     """ check the trigger node """
     product_id = int(product_id)
     order_id = int(order_id)
@@ -183,7 +184,9 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
                 is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
                 if is_amount:
                     _send_gift(user, rule, device_type, is_full, amount)
-
+    elif trigger_node == 'first_bind_weixin':
+        if is_first_bind:
+            _send_gift(user, rule, device_type, is_full)
     else:
         return
 
@@ -711,7 +714,7 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
             _send_message_template(user, title, content)
             _save_activity_record(rule, user, 'message', content)
         if sms_template:
-            sms = Template(sms_template)
+            sms = Template(sms_template + u' 关注服务号wanglibao400每日惊喜，退订回TD【网利科技】')
             content = sms.render(context)
             _send_sms_template(mobile, content)
             _save_activity_record(rule, user, 'sms', content)
@@ -739,6 +742,7 @@ def _send_message_template(user, title, content):
 def _send_sms_template(phones, content):
     send_messages.apply_async(kwargs={
         "phones": [phones, ],
-        "messages": [content, ]
+        "messages": [content, ],
+        "ext": 666
     })
 
