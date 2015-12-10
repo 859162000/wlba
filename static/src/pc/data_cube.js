@@ -43,15 +43,20 @@ Array.prototype.arrSum = function(){//数组求和
 function percentNum(n,t){//求百分比（不带%）
     return ((n/t)*100).toFixed(2);
 }
-function fmoney(s, n) {//数字格式化，保留n位小数，如10000格式化为10,000
-    n = n > 0 && n <= 20 ? n : 2;
+function fmoney(s, num) {//数字格式化，保留n位小数，如10000格式化为10,000
+    var n = num > 0 && num <= 20 ? num : 2;
     s = parseFloat((s + "").replace(/[^\d\.-]/g, "")).toFixed(n) + "";
     var l = s.split(".")[0].split("").reverse(), r = s.split(".")[1];
     var t = "";
     for (var i = 0; i < l.length; i++) {
         t += l[i] + ((i + 1) % 3 == 0 && (i + 1) != l.length ? "," : "");
     }
-    return t.split("").reverse().join("") + "." + r;
+    if(num === 0){
+        return t.split("").reverse().join("");
+    }else{
+        return t.split("").reverse().join("") + "." + r;
+    }
+
 }
 function tabChange(nav, cont, obj){
     for(var j = 0; j<nav.length; j++){
@@ -517,15 +522,15 @@ require(['echarts','echarts/chart/map'],function(ec) {//地图
     map1.setOption(setMap(map_data1));
     map2.setOption(setMap(map_data2));
 
-    function mapTop10(arr,d){
+    function mapTop10(arr, n, d){
         var str = "";
         for(var i = 0; i<10; i++){
-           str += '<p class="map-list-item"><span class="map-num map-num'+ (i+1) +'">'+ (i+1) +'</span>'+ arr[i].name + '： <span class="font-color9">'+ fmoney(arr[i].value, 2) + d + '</span></span></p>'
+            str += '<p class="map-list-item"><span class="map-num map-num'+ (i+1) +'">'+ (i+1) +'</span>'+ arr[i].name + '： <span class="font-color9">'+ fmoney(arr[i].value, n) + d + '</span></span></p>'
         }
         return str;
     }
-    document.getElementById("map1-list").innerHTML = mapTop10(map_data1,"元");
-    document.getElementById("map2-list").innerHTML = mapTop10(map_data2,"人");
+    document.getElementById("map1-list").innerHTML = mapTop10(map_data1,2,"元");
+    document.getElementById("map2-list").innerHTML = mapTop10(map_data2,0,"人");
 });
 }
 //大事记
@@ -574,7 +579,6 @@ require(['echarts','echarts/chart/map'],function(ec) {//地图
 						events.dom.style.left = (arr.marginLeft + i) + "px";
 					}else{
                         events.prve.style.display = "block";
-
 						events.dom.style.left = (arr.marginLeft - i) + "px";
 					}
 					i = i+40;
@@ -595,4 +599,6 @@ require(['echarts','echarts/chart/map'],function(ec) {//地图
         var pw = pDom.style.width || pDom.offsetWidth;
         events._scroll((-arr.totalWidth+pw),"-");
     }
+    var initArr = events.setVal();
+    dom.style.left = (dom.parentNode.width - initArr.totalWidth) + "px";
 })();
