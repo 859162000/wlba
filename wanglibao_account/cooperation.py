@@ -15,6 +15,7 @@ if __name__ == '__main__':
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wanglibao.settings')
 
+import qrcode
 import hashlib
 import datetime
 import time
@@ -1009,10 +1010,10 @@ class ZGDXRegister(CoopRegister):
         binding = Binding.objects.filter(user_id=user.id).first()
         # 判定是否首次绑卡
         if binding and binding.extra != '1':
-            if ENV == ENV_PRODUCTION:
-                plat_offer_id = '104369'
-            else:
-                plat_offer_id = '103050'
+            # if ENV == ENV_PRODUCTION:
+            plat_offer_id = '104369'
+            # else:
+            #     plat_offer_id = '103050'
             self.zgdx_call_back(user, plat_offer_id)
             binding.extra = '1'
             binding.save()
@@ -1026,13 +1027,13 @@ class ZGDXRegister(CoopRegister):
         if binding and p2p_record and p2p_record.order_id == int(order_id):
             p2p_amount = int(p2p_record.amount)
             if p2p_amount >= 1000:
-                if ENV == ENV_PRODUCTION:
-                    if 1000 <= p2p_amount < 2000:
-                        plat_offer_id = '104371'
-                    else:
-                        plat_offer_id = '104372'
+                # if ENV == ENV_PRODUCTION:
+                if 1000 <= p2p_amount < 2000:
+                    plat_offer_id = '104371'
                 else:
-                    plat_offer_id = '103050'
+                    plat_offer_id = '104372'
+                # else:
+                #     plat_offer_id = '103050'
                 self.zgdx_call_back(user, plat_offer_id)
 
 
@@ -1081,8 +1082,7 @@ class RockFinanceRegister(CoopRegister):
             # 3 :如果时间已经过了, 直接跳出; 如果活动时间还没有开始，也直接跳出
             now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             if now < start_time or now > end_time:
-                pass
-                #return
+                return
 
             # 4: 如果投资额度不够，直接跳出
             if p2p_record.amount < p2p_amount:
@@ -1095,7 +1095,7 @@ class RockFinanceRegister(CoopRegister):
             with transaction.atomic():
                 reward = Reward.objects.select_for_update().filter(content=reward.content).first()
                 try:
-                    ActivityReward.objects.create(
+                    activity_reward = ActivityReward.objects.create(
                         activity='rock_finance',
                         order_id=order_id,
                         user=user,
@@ -1109,6 +1109,10 @@ class RockFinanceRegister(CoopRegister):
                     logger.debug(u"生成获奖记录报异常, reason:%s" % reason)
                     raise Exception(u"生成获奖记录异常")
                 else:
+                    #不知道为什么create的时候，会报错
+                    img = qrcode.make("https://www.wanglibao.com/api/check/qrcode/?owner_id=%s&activity=rock_finance&content=%s"%(request.user.id, reward.content))
+                    activity_reward.qrcode = img
+
                     #将奖品通过站内信发出
                     inside_message.send_one.apply_async(kwargs={
                         "user_id": user.id,
