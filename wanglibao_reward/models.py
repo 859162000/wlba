@@ -110,6 +110,7 @@ class WanglibaoActivityReward(models.Model):
     redpack_event = models.ForeignKey(RedPackEvent, default=None, blank=True, null=True, verbose_name=u'用户获得的红包')
     reward = models.ForeignKey(Reward, default=None, blank=True, null=True, verbose_name=u'用户获得的奖品')
     activity = models.CharField(default='', max_length=256, verbose_name=u'活动名称')
+    qrcode = models.ImageField(upload_to='qrcode', null=True, blank=True, verbose_name=u'获奖请求二维码')
     when_dist = models.IntegerField(default=0, verbose_name=u'什么时候发奖')
     left_times = models.IntegerField(default=0, verbose_name=u'还剩几次抽奖机会')
     join_times = models.IntegerField(default=0, verbose_name=u'用户参与抽奖的次数')

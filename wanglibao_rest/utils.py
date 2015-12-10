@@ -75,6 +75,8 @@ def decide_device(device_type):
         return 'ios'
     elif device_type == 'android':
         return 'android'
+    elif device_type == 'weixin':
+        return 'weixin'
     else:
         return 'all'
 
