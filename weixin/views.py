@@ -404,7 +404,7 @@ class WeixinJoinView(View):
         start = datetime.datetime(now.year,now.month, now.day)
         end = datetime.datetime(now.year,now.month, now.day, 23, 59, 59)
 
-        war = WeiXinUserActionRecord.objects.filter(action_type='sign_in', create_time__lt=stamp(end), create_time__gt=stamp(start)).first()
+        war = WeiXinUserActionRecord.objects.filter(user=user, action_type='sign_in', create_time__lt=stamp(end), create_time__gt=stamp(start)).first()
 
         # experience_records = ExperienceEventRecord.objects.filter(user=user, event__give_mode='weixin_sign_in',
         #                                                   created_at__lt=end, created_at__gt=start).all()
