@@ -475,7 +475,7 @@ class CardViewSet(ModelViewSet):
 
         bank_id = request.DATA.get('bank', '')
 
-        exist_cards = Card.objects.filter(no=card.no, bank__id=bank_id, user__id=card.user.id)
+        exist_cards = Card.objects.filter(no=card.no)
         exist_cards1 = Card.objects.filter(user=card.user, no__startswith=card.no[:6], no__endswith=card.no[-4:]).first()
         if exist_cards or exist_cards1:
             return Response({
