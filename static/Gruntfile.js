@@ -1,15 +1,15 @@
+
 module.exports = function (grunt) {
     "use strict";
-    var webpack = require('webpack'),
-        webpackConfig = require('./webpack.dev.config.js');
     var config = {
         compass: {
             dist: {
                 options: {
-                    config: 'config_weixin.rb'
+                    config: 'config_fuel.rb'
                 }
             }
         },
+
         activityMod: ['src/mobile_activity/lib/zepto.util.js', 'src/mobile_activity/lib/activity.util.js'],
 
         concat: {
@@ -18,7 +18,8 @@ module.exports = function (grunt) {
             },
             basic: {
                 files: {
-                    'scripts/mobile/mobile.js': ['src/mobile/lib/zepto/zepto.js', 'src/mobile/mobile.js']
+                    'scripts/mobile/mobile.js': ['src/mobile/lib/zepto/zepto.js', 'src/mobile/mobile.js'],
+                    'scripts/subMobile/mobile.js': ['src/subMobile/lib/zepto/zepto.js', 'src/subMobile/mobile.js'],
                 }
             }
         },
@@ -48,23 +49,6 @@ module.exports = function (grunt) {
 
             }
         },
-        webpack: {
-            options: webpackConfig,
-            build: {
-				plugins: webpackConfig.plugins.concat(
-					new webpack.DefinePlugin({
-						"process.env": {
-							"NODE_ENV": JSON.stringify("production")
-						}
-					}),
-					new webpack.optimize.DedupePlugin(),
-					new webpack.optimize.UglifyJsPlugin()
-				)
-			},
-            "build-dev": {
-				debug: false
-			}
-        },
         watch: {
             css: {
                 files: [
@@ -77,46 +61,50 @@ module.exports = function (grunt) {
                 files: [
                     'src/mobile/mobile.js',
                     'src/mobile_activity/*.js',
+                    'src/subMobile/*.js',
                     'src/app/*.js',
                 ],
                 tasks: ['concat']
             },
-            webpack: {
-                files: ['test/**/*', 'webpack.config.js', 'Gruntfile.js'],
-                tasks: ['webpack:build-dev'],
+            grunt: {
+                files: ['Gruntfile.js', 'webpack.dev.config.js'],
                 options: {
-                    livereload: true,
-                    spawn: false
+                    livereload: true
                 }
             }
         }
-
     };
 
 
     grunt.file.recurse('src/mobile_activity/', function (abspath, rootdir, subdir, filename) {
         if (abspath.indexOf(subdir) < 0) {
-            var key = 'scripts/mobile_activity/' + filename
+            var key = 'scripts/mobile_activity/' + filename;
             config.concat.basic.files[key] = ['<%= activityMod %>', abspath]
         }
         return
-    })
+    });
 
     grunt.file.recurse('src/app/', function (abspath, rootdir, subdir, filename) {
         if (abspath.indexOf(subdir) < 0) {
-            var key = 'scripts/app/' + filename
+            var key = 'scripts/app/' + filename;
             config.concat.basic.files[key] = ['<%= activityMod %>', abspath]
         }
         return
-    })
+    });
 
     grunt.initConfig(config);
     require('load-grunt-tasks')(grunt);
+
     grunt.registerTask('default', ['watch', 'compass', 'concat', 'uglify']);
 
-    grunt.registerTask('build', ['uglify:build']);
+    grunt.registerTask( 'build', ['uglify:build'] );
 
-    // Webpack tasks
-    grunt.registerTask("dev", ['webpack:build-dev', 'watch:app']);   // Development build
-    grunt.registerTask("build", ["webpack:build"]);
+    //加油卡sass
+    grunt.registerTask("fuel-dev", function(){
+        grunt.task.run(['compass', 'watch']);
+        grunt.log.writeln('--------加油卡--------')
+
+    });
+
+
 };

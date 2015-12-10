@@ -1,3 +1,5 @@
-import {pi} from "./mixin/ajax";
+import {pi} from "./mixin/ajax"
 
-console.log(pi)
+
+$('.test').html(pi)
+$('.test').html('12312aa3')

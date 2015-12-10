@@ -20,8 +20,8 @@
     "library"
   ],
   "dependencies": {
+    "exports-loader": "^0.6.2",
     "expose-loader": "^0.7.1",
-    "grunt": "^0.4.5",
     "grunt-newer": "^1.1.1",
     "grunt-webpack": "^1.0.11",
     "grunt-webpack-server": "^0.1.0",
@@ -30,17 +30,23 @@
     "webpack-dev-server": "^1.14.0"
   },
   "devDependencies": {
+    "babel-core": "^6.3.15",
+    "babel-loader": "^6.2.0",
+    "babel-preset-es2015": "^6.3.13",
     "grunt": "^0.4.5",
     "grunt-cli": "0.1.13",
     "grunt-compare-size": "0.4.0",
     "grunt-contrib-compass": "^1.0.1",
     "grunt-contrib-concat": "^0.5.1",
+    "grunt-contrib-imagemin": "^0.9.4",
+    "grunt-contrib-jshint": "0.10.0",
     "grunt-contrib-uglify": "0.7.0",
-    "grunt-contrib-watch": "0.6.1"
+    "grunt-contrib-watch": "0.6.1",
+    "imagemin-mozjpeg": "^5.1.0"
   },
   "scripts": {
-    "build": "npm install && grunt",
-    "start": "grunt watch",
+    "dev": "NODE_ENV=dev webpack --watch --config ./webpack.fuel.config.js",
+    "pro": "NODE_ENV=pro webpack -p --config ./webpack.fuel.config.js",
     "test": "grunt && grunt test"
   }
 }
