@@ -1,0 +1,38 @@
+-load formatters
+doctype html
+html(style="background: #f5f5f5")
+  head
+    title 登录网利宝
+    include include/service_head.jade
+  body
+    header
+    section.login-logo
+      .login-logo-bg
+      .login-logo-icon
+          img(src="/static/imgs/sub_weixin/t-logo.png", alt="")
+    section.form-box
+      from(action="{% url 'weixin_login_api' %}")#login-form.login-farom
+        - csrf_token
+        input(name="openid", type="hidden", value="{{ context.openid }}")
+        input(name="captcha_0", type="hidden", value="")
+        .form-list
+          .form-icon.user-phone.identifier-icon
+          .form-input
+            input(type="tel", name="identifier", placeholder="请输入手机号",data-target2='identifier-icon', data-icon='user-phone', data-target="identifier-edit", data-empty='', data-val='input-clear')
+            .form-edit-icon.identifier-edit
+        .form-list
+          .form-icon.user-password.password-icon
+          .form-input
+            input(type="password", name="password", placeholder="请输入密码",data-target2='password-icon', data-icon='user-password')
+            .form-edit-icon.password-handle.hide-password
+        section.login-submit
+          button(type="submit", disabled=true) 登录并关联网利宝账号
+    section.login-for-regist
+      if next == ''
+        a(href="/weixin/sub_regist/") 免费注册
+      else
+        a(href="/weixin/sub_regist/?next={{next}}") 免费注册
+    section.bank-safe
+      span 账户资金安全由阳光保险承保
+    include include/tracking
+  script(data-init='login', src="/static/scripts/subMobile/mobile.js?201511065")
