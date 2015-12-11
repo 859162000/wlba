@@ -10,14 +10,12 @@ from django.shortcuts import redirect
 from django.db.models.signals import post_save, pre_save
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import renderers
 from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
 import functools
 import re
 import random
 
-from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
 from wanglibao_buy.models import FundHoldInfo
 from wanglibao_banner.models import Banner
@@ -27,10 +25,9 @@ from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from django.contrib.auth.models import User
 from constant import MessageTemplate
-from constant import (ACCOUNT_INFO_TEMPLATE_ID, BIND_SUCCESS_TEMPLATE_ID, UNBIND_SUCCESS_TEMPLATE_ID,
-                      PRODUCT_ONLINE_TEMPLATE_ID, AWARD_COUPON_TEMPLATE_ID)
+from constant import (ACCOUNT_INFO_TEMPLATE_ID, UNBIND_SUCCESS_TEMPLATE_ID,
+                      PRODUCT_ONLINE_TEMPLATE_ID)
 from weixin.util import getAccountInfo
-from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_pay.models import Bank
 from wechatpy import parse_message, create_reply, WeChatClient
 from wechatpy.replies import TransferCustomerServiceReply
@@ -60,9 +57,8 @@ import datetime, time
 from .util import _generate_ajax_template
 from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEvent, UnsubscribeEvent, SubscribeEvent,\
                              TemplateSendJobFinishEvent)
-from experience_gold.models import ExperienceEvent, ExperienceEventRecord
+from experience_gold.models import ExperienceEvent
 from experience_gold.backends import SendExperienceGold
-from marketing.utils import local_to_utc
 from weixin.tasks import detect_product_biding, sentTemplate, bind_ok
 from weixin.util import sendTemplate
 logger = logging.getLogger("weixin")
