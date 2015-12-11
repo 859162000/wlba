@@ -1,4 +1,5 @@
 # encoding:utf-8
+from wanglibao_margin.php_utils import get_php_redis_principle
 from wanglibao_p2p.models import P2PEquity
 from wanglibao_buy.models import FundHoldInfo
 from django.template import Template, Context
@@ -190,6 +191,10 @@ def getAccountInfo(user):
     p2p_freeze = user.margin.freeze  # P2P投资中冻结金额
     p2p_withdrawing = user.margin.withdrawing  # P2P提现中冻结金额
     p2p_unpayed_principle = unpayed_principle  # P2P待收本金
+
+    # 增加从PHP项目来的月利宝待收本金
+    php_principle = get_php_redis_principle(user.pk)
+    p2p_unpayed_principle += php_principle
 
     p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
 

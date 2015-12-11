@@ -1,9 +1,11 @@
 # encoding: utf-8
 #from django.contrib.auth import get_user_model
+import simplejson
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.utils import timezone
+
 from wanglibao_p2p.models import P2PRecord
 
 
@@ -75,9 +77,6 @@ def create_profile(sender, **kw):
         profile = WanglibaoUserProfile(user=user)
         profile.save()
 
-# post_save.connect(create_profile, sender=get_user_model(), dispatch_uid="users-profile-creation-signal")
-post_save.connect(create_profile, sender=User, dispatch_uid="users-profile-creation-signal")
-
 import decimal
 from datetime import date, datetime
 class Account2015(models.Model):
@@ -138,3 +137,36 @@ class Account2015(models.Model):
             return json.dumps(d)
         else:
             return d
+
+
+def save_to_redis(sender, **kw):
+    """
+    when userprofile saved, update the user info in redis.
+    """
+    from wanglibao_margin.php_utils import PhpRedisBackend
+    user_profile = kw["instance"]
+    user = user_profile.user
+    redis_obj = PhpRedisBackend()
+    redis_keys = redis_obj.redis.keys(pattern='python_{}_*'.format(user.pk))
+    try:
+        data = simplejson.loads(redis_obj.redis.get(redis_keys[0]))
+        data.update(
+            user_id=user.pk,
+            username=user_profile.phone,
+            realname=user.name,
+            is_disable=user_profile.frozen,
+            is_realname=1 if user_profile.id_is_valid else 0,
+            is_admin=user.is_superuser,
+            id_number=user.wanglibaouserprofile.id_number
+        )
+        for redis_key in redis_keys:
+            redis_obj.redis.set(redis_key, simplejson.dumps(data))
+    except Exception, e:
+        print e
+        for key in redis_keys:
+            redis_obj.redis.delete(key)
+
+
+# post_save.connect(create_profile, sender=get_user_model(), dispatch_uid="users-profile-creation-signal")
+post_save.connect(create_profile, sender=User, dispatch_uid="users-profile-creation-signal")
+post_save.connect(save_to_redis, sender=WanglibaoUserProfile, dispatch_uid="users-profile-save_to_redis-signal")

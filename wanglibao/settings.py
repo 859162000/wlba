@@ -1258,3 +1258,8 @@ APP_DECRYPT_KEY = "31D21828CC9DA7CE527F08481E361A7E"
 DATACUBE_URL = 'http://stat.wanglibao.com:10000/datacube/index'
 if ENV == ENV_PRODUCTION:
     DATACUBE_URL = 'http://10.171.37.235:10000/datacube/index'
+
+# settings for PHP
+PHP_UNPAID_PRINCIPLE = 'http://changshaojun.dev.wanglibao.com/py_interface.php?action=getPrincipal'
+if ENV == ENV_PRODUCTION:
+    PHP_UNPAID_PRINCIPLE = 'https://www.wanglibao.com'

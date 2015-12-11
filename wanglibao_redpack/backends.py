@@ -757,47 +757,6 @@ def commission(user, product, equity, start, end):
                 income.save()
 
 
-def php_commission_exist(product_id):
-    record = PhpIncome.objects.filter(product_id=product_id).first()
-    return record
-
-
-def php_commission(user, product_id, equity, start, end):
-    """
-    月利宝的表存的是php那边的流水.直接从这获取
-    :param user:
-    :param product_id:
-    :param equity:
-    :param start:
-    :param end:
-    :return:
-    """
-    _amount = MonthProduct.objects.filter(user=user, product_id=product_id, create_time__gt=start,
-                                          create_time__lt=end).aggregate(Sum('amount'))
-    if _amount['amount__sum'] and _amount['amount__sum'] <= equity:
-        commission = decimal.Decimal(_amount['amount__sum']) * decimal.Decimal("0.003")
-        commission = commission.quantize(decimal.Decimal('0.01'), rounding=decimal.ROUND_HALF_DOWN)
-        first_intro = IntroducedBy.objects.filter(user=user).first()
-        if first_intro and first_intro.introduced_by:
-            first = MarginKeeper(first_intro.introduced_by)
-            first.deposit(commission, catalog=u"全民淘金")
-
-            income = PhpIncome(user=first_intro.introduced_by, invite=user, level=1,
-                               product_id=product_id, amount=_amount['amount__sum'],
-                               earning=commission, order_id=first.order_id, paid=True, created_at=timezone.now())
-            income.save()
-
-            sec_intro = IntroducedBy.objects.filter(user=first_intro.introduced_by).first()
-            if sec_intro and sec_intro.introduced_by:
-                second = MarginKeeper(sec_intro.introduced_by)
-                second.deposit(commission, catalog=u"全民淘金")
-
-                income = PhpIncome(user=sec_intro.introduced_by, invite=user, level=2,
-                                   product_id=product_id, amount=_amount['amount__sum'],
-                                   earning=commission, order_id=second.order_id, paid=True, created_at=timezone.now())
-                income.save()
-
-
 def get_start_end_time(auto, auto_days, created_at, available_at, unavailable_at):
     if auto and auto_days > 0:
         start_tmp = created_at

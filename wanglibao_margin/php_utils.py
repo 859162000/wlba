@@ -294,6 +294,7 @@ def php_commission(user, product_id, start, end):
                 income.save()
 
 
+<<<<<<< HEAD
 # TODO 对月利宝进行全民淘金处理, 并加入短信发送统计.
 def calc_php_commission(product_id):
     """
@@ -317,6 +318,8 @@ def calc_php_commission(product_id):
             php_commission(user, product_id, start, end)
 
 
+=======
+>>>>>>> update user info in redis
 def get_php_redis_principle(user_id):
     """
     从redis 或者 api接口 得到用户的待收本金
@@ -328,10 +331,18 @@ def get_php_redis_principle(user_id):
         redis_key = 'unpayed_principle_{}'.format(user_id)
         php_unpaid_principle = redis_obj.redis.get(redis_key)
 
+<<<<<<< HEAD
         return decimal.Decimal(php_unpaid_principle) or 0
+=======
+        return php_unpaid_principle or 0
+>>>>>>> update user info in redis
 
     except:
         url = settings.PHP_UNPAID_PRINCIPLE
         response = requests.get(url, data={'user_id': user_id}).json()
 
+<<<<<<< HEAD
         return decimal.Decimal(response.get('total_amount')) or 0
+=======
+        return response.json()['php_unpayed_principle'] or 0
+>>>>>>> update user info in redis

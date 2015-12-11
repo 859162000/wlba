@@ -7,7 +7,8 @@ from wanglibao.celery import app
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db import transaction
-from wanglibao_margin.models import Margin
+from wanglibao_margin.models import Margin, MonthProduct
+from wanglibao_margin.php_utils import php_commission_exist
 from wanglibao_reward.models import WanglibaoUserGift
 from wanglibao_p2p.models import P2PProduct
 from wanglibao_account import message as inside_message
@@ -216,8 +217,6 @@ def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name, order_id):
                                         queue='celery02')
 
 
-
-
 @app.task
 def calc_broker_commission(product_id):
     if not product_id:
@@ -236,6 +235,23 @@ def calc_broker_commission(product_id):
     with transaction.atomic():
         for equity in product.equities.all():
             redpack_backends.commission(equity.user, product, equity.equity, start, end)
+
+
+#  TODO 对月利宝进行全民淘金处理, 并加入短信发送统计.
+@app.task
+def calc_php_commission(product_id):
+    if not product_id:
+        return
+
+    month_products = MonthProduct.objects.filter(product_id=product_id)
+    if php_commission_exist(product_id):
+        return
+
+    start = timezone.datetime(2015, 6, 22, 16, 0, 0, tzinfo=timezone.utc)
+    end = timezone.datetime(2016, 6, 30, 15, 59, 59, tzinfo=timezone.utc)
+    with transaction.atomic():
+        for product in month_products:
+            redpack_backends.commission(product.user, product, product.amount, start, end)
 
 
 @app.task

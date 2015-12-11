@@ -1,11 +1,18 @@
 # encoding: utf-8
 from decimal import Decimal
+
+import redis
+import simplejson
 from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 
 
 # Create your models here.
+from wanglibao import settings
+from wanglibao_margin.php_utils import get_php_redis_principle
+
+
 class Margin(models.Model):
     user = models.OneToOneField(User, primary_key=True)
     margin = models.DecimalField(verbose_name=u'用户余额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
@@ -141,4 +148,57 @@ def create_user_margin(sender, **kwargs):
         margin.save()
 
 
+def save_margin_to_redis(sender, **kwargs):
+    """
+    when margin saved, update the user info in redis.
+    """
+    margin = kwargs["instance"]
+    user = margin.user
+    host = settings.PHP_REDIS_HOST
+    port = settings.PHP_REDIS_PORT
+    db = settings.PHP_REDIS_DB
+    password = settings.PHP_REDIS_PASSWORD
+
+    redis_pool = redis.ConnectionPool(host=host, port=port, db=db, password=password)
+    redis_obj = redis.Redis(connection_pool=redis_pool)
+
+    redis_keys = redis_obj.keys(pattern='python_{}_*'.format(user.pk))
+
+    try:
+        from wanglibao_p2p.models import P2PEquity
+
+        data = simplejson.loads(redis_obj.get(redis_keys[0]))
+        p2p_equities = P2PEquity.objects.filter(user=user).filter(product__status__in=[
+                    u'已完成', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'正在招标',
+                ]).select_related('product')
+        unpayed_principle = 0
+
+        for equity in p2p_equities:
+            if equity.confirm:
+                unpayed_principle += equity.unpaid_principal  # 待收本金
+
+        # 增加从PHP项目来的月利宝待收本金
+        php_principle = get_php_redis_principle(user.pk)
+        unpayed_principle += php_principle
+
+        total_amount = unpayed_principle + margin.margin + margin.withdrawing + margin.freeze
+
+        data.update(
+             total_amount=total_amount,
+             avaliable_amount=margin.margin,
+             unpayed_principle=unpayed_principle,
+             margin_freeze=margin.freeze,
+             margin_withdrawing=margin.withdrawing,
+        )
+
+        for redis_key in redis_keys:
+            redis_obj.set(redis_key, simplejson.dumps(data))
+
+    except Exception, e:
+        print e
+        for key in redis_keys:
+            redis_obj.delete(key)
+
+
 post_save.connect(create_user_margin, sender=User, dispatch_uid='users-margin-creation-signal')
+post_save.connect(save_margin_to_redis, sender=Margin, dispatch_uid="users-margin-save_to_redis-signal")

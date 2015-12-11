@@ -486,6 +486,10 @@ class AccountHome(TemplateView):
             if equity.confirm:
                 unpayed_principle += equity.unpaid_principal
 
+        # 增加从PHP项目来的月利宝待收本金
+        php_principle = get_php_redis_principle(user.pk)
+        unpayed_principle += php_principle
+
         p2p_total_asset = user.margin.margin + user.margin.freeze + user.margin.withdrawing + unpayed_principle
 
         total_asset = p2p_total_asset
@@ -595,6 +599,10 @@ class AccountHomeAPIView(APIView):
         p2p_freeze = user.margin.freeze  # P2P投资中冻结金额
         p2p_withdrawing = user.margin.withdrawing  # P2P提现中冻结金额
         p2p_unpayed_principle = unpayed_principle  # P2P待收本金
+
+        # 增加从PHP项目来的月利宝待收本金
+        php_principle = get_php_redis_principle(user.pk)
+        p2p_unpayed_principle += php_principle
 
         p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
 
@@ -889,6 +897,9 @@ class AccountP2PAssetAPI(APIView):
         p2p_freeze = user.margin.freeze
         p2p_withdrawing = user.margin.withdrawing
         p2p_unpayed_principle = unpayed_principle
+        # 增加从PHP项目来的月利宝待收本金
+        php_principle = get_php_redis_principle(user.pk)
+        p2p_unpayed_principle += php_principle
 
         p2p_total_asset = p2p_margin + p2p_freeze + p2p_withdrawing + p2p_unpayed_principle
 

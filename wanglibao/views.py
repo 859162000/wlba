@@ -8,6 +8,7 @@ from marketing.models import NewsAndReport, TimelySiteData
 from marketing.utils import pc_data_generator
 from misc.views import MiscRecommendProduction
 from wanglibao_buy.models import FundHoldInfo
+from wanglibao_margin.php_utils import get_php_redis_principle
 from wanglibao_p2p.models import P2PProduct, P2PRecord
 from wanglibao_banner.models import Banner, Partner
 from itertools import chain
@@ -195,6 +196,11 @@ class IndexView(TemplateView):
             unpayed_principle = 0
             for equity in p2p_equities:
                 unpayed_principle += equity.unpaid_principal
+
+            # 增加从PHP项目来的月利宝待收本金
+            php_principle = get_php_redis_principle(user.pk)
+            unpayed_principle += php_principle
+
             p2p_total_asset = user.margin.margin + user.margin.freeze + user.margin.withdrawing + unpayed_principle
 
             fund_hold_info = FundHoldInfo.objects.filter(user__exact=user)

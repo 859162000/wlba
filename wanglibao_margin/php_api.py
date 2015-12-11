@@ -271,10 +271,13 @@ class YueLiBaoCheck(APIView):
                         if trace:
                             product.pay_status = True
                             product.save()
+<<<<<<< HEAD
 
                 # 进行全民淘金数据写入
                 calc_php_commission(product_id)
 
+=======
+>>>>>>> update user info in redis
                 ret.update(status=1,
                            msg='success')
         except Exception, e:
@@ -299,11 +302,11 @@ class YueLiBaoCancel(APIView):
         msg_list = []
         ret = dict()
 
-        tokens = eval(request.POST.get('tokens'))
+        product_id = eval(request.POST.get('product_id'))
 
         try:
             with transaction.atomic(savepoint=True):
-                month_products = MonthProduct.objects.filter(token__in=tokens)
+                month_products = MonthProduct.objects.filter(product_id=product_id)
                 for product in month_products:
                     user = product.user
                     product_id = product.product_id

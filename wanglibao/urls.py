@@ -200,7 +200,6 @@ urlpatterns += patterns(
 
     url(r'^php/assignment/buy/$', AssignmentOfClaimsBuy.as_view(), name='php_refund_yuelibao'),
 
-    url(r'^php/logout/$', logout_with_cookie, name='php_logout_cookie'),
 )
 
 # 短信
