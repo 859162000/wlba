@@ -23,6 +23,65 @@
       return $('#withdraw-form').find('img.captcha').attr('src', json.image_url);
     });
     $('input, textarea').placeholder();
+    $('#select_bank').focus(function() {
+      return $('#select_bank').addClass('selected');
+    });
+    $('#select_bank').blur(function() {
+      if ($(this).val() === '') {
+        return $('#select_bank').removeClass('selected');
+      }
+    });
+    $('#goPersonalInfo').click(function() {
+      var bank, card, re;
+      bank = $('#select_bank');
+      card = $('#cardId');
+      if (bank.val() === '') {
+        bank.next().html('<i class="cha"></i>请选择银行');
+        return;
+      } else {
+        bank.next().html('<i class="dui"></i>');
+      }
+      if (card.val() === '') {
+        card.next().html('<i class="cha"></i>请输入卡号');
+      } else {
+        re = /^\d{10,20}$/;
+        if (!re.test(card.val().replace(/[ ]/g, ""))) {
+          card.next().html('<i class="cha"></i>输入的卡号有误');
+        } else {
+          card.next().html('<i class="dui"></i>');
+          return $.ajax({
+            url: '/api/card/',
+            data: {
+              no: card.val().replace(/[ ]/g, ""),
+              bank: bank.val(),
+              is_default: false
+            },
+            type: 'post'
+          }).done(function() {
+            return console.log('11111');
+          }).fail(function(xhr) {
+            var result;
+            result = JSON.parse(xhr.responseText);
+            if (result.error_number === 5) {
+              tool.modalAlert({
+                title: '温馨提示',
+                msg: result.message
+              });
+              return;
+            }
+            return tool.modalAlert({
+              title: '温馨提示',
+              msg: '添加银行卡失败'
+            });
+          });
+        }
+      }
+    });
+    $("#cardId").keydown(function() {
+      var value;
+      value = $(this).val().replace(/\s/g, '').replace(/(\d{4})(?=\d)/g, "$1 ");
+      return $(this).val(value);
+    });
     $('.captcha-refresh').click(function() {
       var $form;
       $form = $(this).parents('form');
@@ -32,7 +91,7 @@
         return $form.find('img.captcha').attr('src', json.image_url);
       });
     });
-    $('.add-card-button').click(function(e) {
+    $('#add-card-button').click(function(e) {
       if ($('#id-is-valid').val() === 'False') {
         $('#id-validate').modal();
         return;

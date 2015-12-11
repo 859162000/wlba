@@ -20,6 +20,54 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
 
   $('input, textarea').placeholder()
 
+  $('#select_bank').focus ->
+      $('#select_bank').addClass('selected');
+  $('#select_bank').blur ->
+      if($(this).val() == '')
+        $('#select_bank').removeClass('selected');
+  $('#goPersonalInfo').click ->
+    bank = $('#select_bank')
+    card = $('#cardId')
+    if(bank.val() == '')
+      bank.next().html('<i class="cha"></i>请选择银行')
+      return
+    else
+      bank.next().html('<i class="dui"></i>')
+
+    if(card.val() == '')
+      card.next().html('<i class="cha"></i>请输入卡号')
+      return
+    else
+      re = /^\d{10,20}$/
+      if !re.test(card.val().replace(/[ ]/g,""))
+        card.next().html('<i class="cha"></i>输入的卡号有误')
+        return
+      else
+        card.next().html('<i class="dui"></i>')
+        $.ajax {
+          url: '/api/card/'
+          data: {
+            no: card.val().replace(/[ ]/g,"")
+            bank: bank.val()
+            is_default: false
+          }
+          type: 'post'
+        }
+        .done ()->
+          console.log('11111')
+        .fail (xhr)->
+          result = JSON.parse xhr.responseText
+          if result.error_number == 5
+            tool.modalAlert({title: '温馨提示', msg: result.message})
+            return
+          tool.modalAlert({title: '温馨提示', msg: '添加银行卡失败'})
+
+
+
+  $("#cardId").keydown ->
+       value = $(this).val().replace(/\s/g,'').replace(/(\d{4})(?=\d)/g,"$1 ");
+       $(this).val(value)
+
   $('.captcha-refresh').click ->
     $form = $(this).parents('form')
     url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v="+(+new Date())
@@ -28,7 +76,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
       $form.find('input[name="captcha_0"]').val(json.key)
       $form.find('img.captcha').attr('src', json.image_url)
 
-  $('.add-card-button').click (e)->
+  $('#add-card-button').click (e)->
     if $('#id-is-valid').val() == 'False'
       $('#id-validate').modal()
       return

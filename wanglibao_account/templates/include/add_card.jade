@@ -21,6 +21,46 @@ form#add-card-form.add-card-form(style="display:none")
     .form-row
       button#add-card.span12.button-primary(href="#", type="submit") 添加
 
+.binding-bank.clearfix(style="display:none")
+    .binding-box.clearfix
+        .binding-info.clearfix
+            label 发卡银行
+            select#select_bank
+                option(value='') 请选择银行
+                for bank in banks
+                  option(value='{{bank.id}}') {{bank.name}}
+            span
+        .binding-info.clearfix
+            label 储蓄卡卡号
+            input(type="text", placeholder="请输入银行卡号")#cardId
+            span
+        .binding-info.clearfix
+            a(href='javascript:void(0)').btns#goPersonalInfo 下一步
+.binding-bank.clearfix
+    .binding-box.binding-boxs.clearfix
+        p.info-title 银行卡信息
+        .binding-info.clearfix
+            label 发卡银行
+            .bank-detail 交通银行（储蓄卡）
+                a(href='javascript:void(0)').change-bank 更换银行卡信息
+        .binding-info.clearfix
+            label 储蓄卡卡号
+            .bank-detail 6222 5683 2600 0137 799
+        .binding-info.clearfix
+            label 开卡人姓名
+            .bank-detail {{user_profile.name}}
+        .binding-info.clearfix
+            label 银行预留手机号
+            input(type="text", placeholder="请填写银行开户时预留手机号")
+            span
+        .binding-info.clearfix
+            label 短信验证码
+            input(type="text", placeholder="填写短信验证码").sem-input
+            a(href='javascript:void(0)').get-code 获取验证码
+            span
+        .binding-info.clearfix
+            a(href='javascript:void(0)').btns#goPersonalInfo 下一步
+
 #id-validate(style='display: none')
   input#id-is-valid(type='hidden', value='{{user_profile.id_is_valid}}')
   .padding-xl.align-center

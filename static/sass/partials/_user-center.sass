@@ -222,7 +222,7 @@
   padding: 5px
 
 .bank-card
-  width: 239px
+  width: 240px
   border: 1px solid #d3d3d3
   border-radius: 5px
   overflow: hidden
@@ -232,7 +232,7 @@
 
 .add-bank-card
   @extend .bank-card
-  height: 146px
+  height: 160px
   background: #F5F5F5
   margin-right: 0px
 
@@ -255,6 +255,16 @@
 
 .bank-card--bank-name
   font-size: $font-m
+  color: #333333
+  span
+    color: #E8370D
+    font-size: 11px
+    width: 39px
+    height: 16px
+    border: 1px solid #E6340E
+    line-height: 16px
+    display: inline-block
+    margin-left: 5px
 
 .bank-card--icon
   display: inline-block
@@ -266,7 +276,7 @@
 .bank-card--info-row
   text-align: center
   font-size: $font-s
-  padding: 22.5px 0
+  padding: 24px 0
   +clearfix
 
 .bank-card--info-title
@@ -277,7 +287,7 @@
 
 .bank-card--info-value
   @extend .span8
-  color: #666
+  color: #333333
   text-align: left
   padding-left: 1em
 
@@ -587,3 +597,133 @@ $add-icon-large-width: 8px
   font-size: 12px
   color: #666666
   padding: 15px 0
+
+.binding-card
+  height: 36px
+  line-height: 36px
+  color: #1E8FDE
+  font-size: 16px
+  text-align: center
+  border-top: 1px solid #D3D3D3
+.bank-card-manage
+  color: #666666
+  font-size: 18px
+  margin-top: 40px
+  padding:  0 0 10px 26px
+  span
+    font-size: 12px
+    color: #FA9527
+    line-height: 20px
+    display: inline-block
+    margin-left: 10px
+.manage-pop
+  color: #FA9527
+  font-size: 12px
+  padding-left: 26px
+  line-height: 22px
+  a
+    color: #1e8fde
+    cursor: default
+.kindly-reminder
+  background: #F5F5F5
+  color: #666666
+  font-size: 12px
+  margin: 60px 26px
+  padding: 25px 0 15px
+  text-indent: 143px
+  line-height: 20px
+
+.binding-box
+  margin: 90px 0 90px 218px
+  .info-title
+    font-size: 18px
+    color: #666666
+    margin-bottom: 40px
+  .binding-info
+    padding-bottom: 13px
+    .bank-detail
+      height: 42px
+      line-height: 42px
+      float: left
+      font-size: 14px
+      color: #333333
+    label,span
+      float: left
+      width: 70px
+      height: 42px
+      line-height: 42px
+      display: inline-block
+      text-align: right
+      margin-right: 20px
+    select,input
+      float: left
+      width: 270px
+      height: 42px
+      line-height: 42px
+      background: #ffffff
+      border: 1px solid #EBEBEB
+      font-size: 14px
+    select
+      color: #b6b6b6
+    select.selected
+      color: #333333
+    input
+      text-indent: 5px
+    a.btns
+      width: 270px
+      height: 42px
+      line-height: 42px
+      color: #ffffff
+      background: #E4371F
+      text-align: center
+      display: inline-block
+      margin: 17px 0 0 90px
+      font-size: 16px
+      font-weight: bold
+    span
+      color: #E4371F
+      width: 110px
+      text-align: left
+      i
+        margin: 0 5px
+        display: inline-block
+      i.cha
+        @include account-sprite(cha)
+        width: 9px
+        height: 9px
+      i.dui
+        @include account-sprite(dui)
+        width: 12px
+        height: 9px
+.binding-boxs
+  margin: 60px 0 90px 176px
+  a.change-bank
+    color: #288CCA
+    font-size: 12px
+    margin-left: 15px
+  input.sem-input
+    width: 160px
+  a.get-code,a.go-get-code
+    width: 100px
+    color: #ffffff
+    background: #C7C7C7
+    font-size: 14px
+    display: inline-block
+    height: 42px
+    line-height: 42px
+    text-align: center
+    margin-left: 10px
+    float: left
+  a.go-get-code
+    background: #FA9527
+    &:hover
+      background: #E38922
+
+
+
+
+
+
+
+
+
