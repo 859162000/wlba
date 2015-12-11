@@ -119,8 +119,8 @@ def get_verify_result(id_number, name):
             id_photo = parsed_response['id_photo']
         else:
             logger.error("id_number==>[%s], result_xm==>[%s, %s], result_gmsfhm==>[%s, %s]"
-                         " validate faild") % (id_number, result_xm, type(result_xm),
-                                               result_gmsfhm, type(result_gmsfhm))
+                         " validate faild" % (id_number, result_xm, type(result_xm),
+                                              result_gmsfhm, type(result_gmsfhm)))
     except StopIteration, e:
         logger.error("reponse_text==>[%s]validate failed" % response.text)
         logger.error(e)
