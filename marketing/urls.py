@@ -54,7 +54,7 @@ urlpatterns = patterns(
     url(r'^national/$', TemplateView.as_view(template_name="national.jade")),
     url(r'^gold_two/$', TemplateView.as_view(template_name="gold_two.jade")),
 
-    url(r'^baidu_finance/$', BaiduFinanceView.as_view(), name="baidu_finance"),
+    url(r'^baidu_finance/$', BaiduFinanceView.as_view(wx_classify='fwh', wx_code='test1'), name="baidu_finance"),
     url(r'^seckill/$', TemplateView.as_view(template_name="seckill.jade")),
     url(r'^november_new/$', TemplateView.as_view(template_name="november_new.jade")),
     url(r'^jucheng/$', TemplateView.as_view(template_name="jucheng.jade")),
@@ -68,6 +68,8 @@ urlpatterns = patterns(
     url(r'fun_tuan/$', TemplateView.as_view(template_name="fun_tuan.jade")),
     url(r'noviceDecember/$', TemplateView.as_view(template_name="noviceDecember.jade")),
     url(r'^juchengtwo/$', TemplateView.as_view(template_name="juchengtwo.jade")),
+    url(r'^damai/$', TemplateView.as_view(template_name="damai.jade")),
+    url(r'^recharge_8000/$', TemplateView.as_view(template_name="recharge_8000.jade")),
 )
 
 # app URL
@@ -153,7 +155,8 @@ urlpatterns += patterns(
     url(r'^app_thanksgiv/$', TemplateView.as_view(template_name="app_thanksgiv.jade")),
     url(r'^app_thanksgivin/$', TemplateView.as_view(template_name="app_thanksgivin.jade")),
     url(r'^app_noviceDecember_h5/$', TemplateView.as_view(template_name="app_noviceDecember_h5.jade")),
-     url(r'^app_juchengtwo/$', TemplateView.as_view(template_name="app_juchengtwo.jade")),
+    url(r'^app_juchengtwo/$', TemplateView.as_view(template_name="app_juchengtwo.jade")),
+    url(r'^app_recharge_8000/$', TemplateView.as_view(template_name="app_recharge_8000.jade")),
 
 
     # url(r'^app_thanksgivin/$', login_required(TemplateView.as_view(template_name="app_thanksgivin.jade"), login_url='/accounts/token_login/')),

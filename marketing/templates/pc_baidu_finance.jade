@@ -10,26 +10,37 @@ html
   body(style="background:#fff")
     include global/g_nav
 
+
+    if user.is_authenticated
+      input(type='hidden', name='is_authenticated', value='true')
+      input( type="hidden", value="{{original_id}}", name="original_id")
+      input( type="hidden", value="{{code}}", name="weixin_code")
+    else
+      input(type='hidden', name='is_authenticated', value='false')
+
     .wrap#ganjiwang-banner
       .g-banner-slide-baidu
         .g-slide
-          .slide-banner(style="display:block; background-image:url('/static/imgs/pc_activity/newgive/banner1.jpg?v=20151203')")
-          .slide-banner(style="display:none; background-image:url('/static/imgs/pc_activity/newgive/banner2.jpg?v=20151203')")
+          if token == 'google1'
+            .slide-banner(style="display:block; background-image:url('/static/imgs/pc_activity/newgive/banner1_sign.jpg')")
+            .slide-banner(style="display:none; background-image:url('/static/imgs/pc_activity/newgive/banner2_sign.jpg')")
+          else
+            .slide-banner(style="display:block; background-image:url('/static/imgs/pc_activity/newgive/banner1_unsign.jpg')")
+            .slide-banner(style="display:none; background-image:url('/static/imgs/pc_activity/newgive/banner2_unsign.jpg')")
         .g-slide-anchor
             a.slide-anchor.active 0
             a.slide-anchor 1
       .gold2
         if user.is_authenticated
-          #ganjiwang-model
-          .banner-form#ganjiwang-welcome
-            .space-vertical-m(style='text-align:center')
-              h1.banner-form--title 欢迎来网利宝投资理财
-              .space-vertical-s
-              p.banner-form--row.font-s 您的登录账户:
-                span {{user|display_name}}
-              .space-vertical-m
-              .banner-form--row.align-center
-                a.banner-form--button(href="/accounts/home",style="color:#fff") 进入我的账户
+          //#ganjiwang-model
+          .regist-su-finance
+            .regist-su-mask
+            .regist-su-body
+              h4 欢迎来到网利宝投资理财
+              p 你的登录账户：{{user|display_name}}
+              div.erweima-img
+              a(href='/accounts/home/').regist-for-account 进入我的帐户
+
         else
           .denelu-form#denglu
             #aug-center
@@ -54,14 +65,14 @@ html
                 .form-row-error
               .form-row.voice
                 .span12-omega.hidden.show
-              没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
-              .form-control-group
-                .span6(style="width:49%")
-                  input#id_validate_code.com-tu.tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
-                .span6-omega
-                  button#button-get-validate-code-modal.button-orange.button-large.huoqu-ma.new-btn(type='button',style="display:none") 获取验证码
-                  button#img-code.button-orange.button-large.huoqu-ma.new-btn(type='button',style="top:-2px;margin-left:5px") 获取验证码
-              .form-row-error
+                  没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
+                .form-control-group
+                  .span6(style="width:49%")
+                    input#id_validate_code.com-tu.tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+                  .span6-omega
+                    button#button-get-validate-code-modal.button-orange.button-large.huoqu-ma.new-btn(type='button',style="display:none") 获取验证码
+                    button#img-code.button-orange.button-large.huoqu-ma.new-btn(type='button',style="top:-2px;margin-left:5px") 获取验证码
+                .form-row-error
               .form-row
                 input#reg_password.full-width.com-tu.tu3(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")
                 .form-row-error
@@ -78,7 +89,6 @@ html
               .space-vertical-s
             p.xun-p 已有账号,
               a#xun_login(href="/accounts/login/") 立即登录
-
 
     .bd-finance-data-warp
       .bd-finance-data.clear

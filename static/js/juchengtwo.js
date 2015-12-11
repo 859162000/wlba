@@ -19,7 +19,6 @@
                     data: {phone: '', address: '', name: '', action: 'ENTER_WEB_PAGE'}
                 }).done(function (json) {
                      award100 = json.award100
-                    console.log(json.award100);
                     if(json.award100>0){
                        $('.get_ticket').show();
                     }else{
@@ -48,7 +47,6 @@
             })
         }
         $('#button').click(function () {
-             console.log(award100);
             if (has_ticket) {
                 $('.register_wrap').show()
             } else {
@@ -60,7 +58,6 @@
                     }else{
                         $('.get_ticket1').show()
                     }
-                     console.log(is_user);
                     popup_bg_static = true
                 }
             }

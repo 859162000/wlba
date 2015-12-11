@@ -1,0 +1,167 @@
+doctype html
+html
+  head
+    - with '数据魔方' as title
+    include global/g_head
+    - endwith
+  body.data-cube
+    include global/g_nav
+    .data-cube-part.data-cube-part1
+      .w1100
+        p.cube-title 平台数据总览
+          span.cube-title-l （数据截止日期:<span id="close-date"></span>）
+        ul.data-item-box
+          li.data-item.data-red
+            p.tit 线上贷款额（元）
+            p.num#match-num
+          li.data-item.data-blue
+            p.tit 线上已还本金（元）
+            p.num#paid-num
+          li.data-item.data-green
+            p.tit 线上累计预期收益（元）
+            p.num#expect-num
+          li.data-item.data-orange
+            p.tit 线上累计发放收益（元）
+            p.num#put-out-num
+        .data-total#data-total
+        p.data-img-tit 网利宝线上月交易额
+    .data-cube-part.data-cube-part2
+      .w1100
+        p.cube-title 平台7日数据
+          span.cube-title-l#data-days7
+        ul.cube-seven
+          li.cube-seven-item
+            p.txt-center
+             a(href="javascrupt:void(0)").cube-icon.cube-icon1
+            p.num#match-num7
+            p.s-tit 线上贷款额（元）
+          li.cube-seven-item
+            p.txt-center
+             a(href="javascrupt:void(0)").cube-icon.cube-icon2
+            p.num#paid-num7
+            p.s-tit 已还线上本金（元）
+          li.cube-seven-item
+            p.txt-center
+             a(href="javascrupt:void(0)").cube-icon.cube-icon3
+            p.num#expect-num7
+            p.s-tit 线上累计预期收益（元）
+          li.cube-seven-item
+            p.txt-center
+             a(href="javascrupt:void(0)").cube-icon.cube-icon4
+            p.num#put-out-num7
+            p.s-tit 线上累计发放收益（元）
+    .data-cube-part.data-cube-part3
+      .w1100
+        p.cube-title 融资概览
+        .cube-survey.clearfix
+          ul
+             li.cube-survey-item
+               p.center-text 融资期限
+               .cube-survey-img#cube-survey-img1
+             li.cube-survey-item
+               p.center-text 融资金额
+               .cube-survey-img#cube-survey-img2
+             li.cube-survey-item
+               p.center-text 融资类型
+               .cube-survey-img#cube-survey-img3
+             li.cube-survey-item
+               p.center-text 还款方式
+               .cube-survey-img#cube-survey-img4
+    .data-cube-part.data-cube-part4
+      .w1100
+        p.cube-title 投资概况
+        .part4-mian
+          .age-box
+            p.part4-tit-l 投资人年龄分布
+            .cube-age#cube-age
+          .sex-box
+            p.part4-tit-l 投资人性别分布
+            .cube-sex#cube-sex
+          .sex-box
+            p.part4-tit-l 投资渠道分布
+            .cube-sex#cube-channel
+      .w1100.map-box
+        ul.map-tab.clearfix#map-tab-nav
+          li.tab1.active 投资金额
+          li.tab2 注册人数
+        ul#map-tab-cont
+          li.map-main.clearfix.active
+            .map-lft.map-list#map1-list
+
+            .map-rht
+              .map-img#map-img1
+          li.map-main.clearfix
+            .map-lft.map-list#map2-list
+
+            .map-rht
+              .map-img#map-img2
+    .data-cube-part.data-cube-part5
+      .w1100
+        p.cube-title 网利宝大事记
+        .event-box
+          a(href="javascript:;").handle-item#event-prve(style="display:none;")
+          a(href="javascript:;").handle-item#event-next
+          .event-main
+            .e-line
+            .event-mian-box
+              ul.event-main-list#event-list()
+                li.event-list-item.eitem-btm
+                  .center-circle
+                  .eitem
+                    .e-arr
+                    .eitem-cont 获得了IDG资本千万美元的A轮融资
+                  .eitem-time 2014年2月
+                li.event-list-item.eitem-top
+                  .center-circle
+                  .eitem
+                    .e-arr
+                    .eitem-cont 2014年6月底,网利金融交易额突破13亿元
+                  .eitem-time 2014年6月
+                li.event-list-item.eitem-btm
+                  .center-circle
+                  .eitem
+                    .e-arr
+                    .eitem-cont 网利宝与迅雷展开合作,向迅雷用户提供专项高收益理财产品以及额外收益
+                  .eitem-time 2014年11月
+                li.event-list-item.eitem-top
+                  .center-circle
+                  .eitem
+                    .e-arr
+                    .eitem-cont 网利宝荣获2014年度最具创新活力互联网金融企业奖
+                  .eitem-time 2014年12月
+                li.event-list-item.eitem-btm
+                  .center-circle
+                  .eitem
+                    .e-arr
+                    .eitem-cont 网利宝获鸿利光电拟共计4000万美元B轮融资
+                  .eitem-time 2015年5月
+                li.event-list-item.eitem-top
+                  .center-circle
+                  .eitem
+                    .e-arr
+                    .eitem-cont 网利宝荣获"中国互联网行业百强企业"权威认证
+                  .eitem-time 2015年7月
+                li.event-list-item.eitem-btm
+                  .center-circle
+                  .eitem
+                    .e-arr
+                    .eitem-cont 网利宝入围“北上广前十名P2P平台”，还以49.04的发展指数获得“发展速度排行榜”第九名
+                  .eitem-time 2015年8月
+                li.event-list-item.eitem-top
+                  .center-circle
+                  .eitem
+                    .e-arr
+                    .eitem-cont “网利宝”诞生一周年，精心准备四重豪礼答谢新老用户对平台的支持
+                  .eitem-time 2015年9月
+                li.event-list-item.eitem-btm
+                  .center-circle
+                  .eitem
+                    .e-arr
+                    .eitem-cont 网利宝亮相“第十一届北京国际金融博览会”。网利宝董事刘二飞首次公开露面，与CEO赵润龙一起先后接受多家媒体采访
+                  .eitem-time 2015年10月
+
+    include global/g_footer
+    script.
+      require(["/static/src/pc/echarts/echarts.js","/static/src/pc/data_cube.js?201512093"])
+
+    include include/tracking

@@ -259,7 +259,7 @@ org.ui = (function(){
                         disabledBg = options.submitStyle.disabledBg || 'rgba(219,73,63,.5)';
                         activeBg = options.submitStyle.activeBg || 'rgba(219,73,63,1)';
                     }
-                    canSubmit() ? $submit.css('background', activeBg).removeAttr('disabled') : $submit.css('background', disabledBg).attr('disabled')
+                    canSubmit() ? $submit.css('background', activeBg).removeAttr('disabled') : $submit.css('background', disabledBg).attr('disabled',true)
                 })
             })
 
@@ -961,7 +961,7 @@ org.buy=(function(org){
                             },
                             success: function(data){
                                if(data.data){
-                                   $('.balance-sign').text(balance - data.data + lib.redPackAmountNew);
+                                   $('.balance-sign').text(balance - data.data + lib.redPackAmountNew + '元');
                                    $(".sign-main").css("display","-webkit-box");
                                }
                             },
@@ -1544,7 +1544,16 @@ org.processFirst = (function(org){
                 },
                 error:function(xhr){
                     result = JSON.parse(xhr.responseText);
-                    return org.ui.alert(result.message);
+
+                    if(result.error_number == 8){
+                        org.ui.alert(result.message,function(){
+                           window.location.href = '/weixin/list/';
+                        });
+                    }else{
+                        return org.ui.alert(result.message);
+                    }
+
+
                 },
                 complete:function(){
                     lib.$submit.removeAttr('disabled').text("实名认证");

@@ -135,18 +135,18 @@ class P2PProduct(ProductBase):
     category = models.CharField(max_length=16, default=u'普通', choices=CATEGORY_CHOICES, verbose_name=u'产品类别*')
     types = models.ForeignKey(ProductType, verbose_name=u"产品分类(新)", null=True, on_delete=SET_NULL)
     is_app_exclusive = models.BooleanField(u'是否app专享', default=False, help_text=u'默认不是app专享')
-    hide = models.BooleanField(u'隐藏', default=False)
+    hide = models.BooleanField(u'隐藏', default=False, db_index=True)
 
     name = models.CharField(max_length=256, verbose_name=u'名字*', blank=False)
     short_name = models.CharField(verbose_name=u'短名字*', max_length=64, blank=False, help_text=u'短名字要求不超过13个字')
     serial_number = models.CharField(verbose_name=u'产品编号*', max_length=100, unique=True, blank=False, null=True)
     contract_serial_number = models.CharField(verbose_name=u'合同编号*', max_length=100, blank=False, null=True)
 
-    status = models.CharField(max_length=16, default=u'录标',
+    status = models.CharField(max_length=16, default=u'录标', db_index=True,
                               choices=STATUS_CHOICES,
                               verbose_name=u'产品状态*')
 
-    priority = models.IntegerField(verbose_name=u'优先级*', help_text=u'越大越优先', blank=False)
+    priority = models.IntegerField(verbose_name=u'优先级*', help_text=u'越大越优先', blank=False, db_index=True)
     period = models.IntegerField(default=0, verbose_name=u'产品期限(月/天)*', blank=False)
     brief = models.TextField(blank=True, verbose_name=u'产品备注')
     expected_earning_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)*', blank=False)
@@ -183,9 +183,9 @@ class P2PProduct(ProductBase):
 
     extra_data = JSONFieldUtf8(blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
 
-    publish_time = models.DateTimeField(default=lambda: timezone.now() + timezone.timedelta(days=10), verbose_name=u'发布时间*', blank=False)
+    publish_time = models.DateTimeField(default=lambda: timezone.now() + timezone.timedelta(days=10), verbose_name=u'发布时间*', blank=False, db_index=True)
     end_time = models.DateTimeField(default=lambda: timezone.now() + timezone.timedelta(days=20), verbose_name=u'终止时间*', blank=False)
-    soldout_time = models.DateTimeField(u'售完时间', null=True, blank=True)
+    soldout_time = models.DateTimeField(u'售完时间', null=True, blank=True, db_index=True)
 
     make_loans_time = models.DateTimeField(u'放款时间', null=True, blank=True)
 
@@ -199,6 +199,23 @@ class P2PProduct(ProductBase):
 
     #author: hetao; datetime: 2014.10.27; description: 活动是否参加活动
     activity = models.ForeignKey(Activity, on_delete=SET_NULL, null=True, blank=True, verbose_name=u'返现活动')
+
+    # Add by hb on 2015-12-08 : add new field "status_int", and **MUST** execute initial update-sql blow firstly:
+    # UPDATE wanglibao_p2p_p2pproduct set status_int=9 WHERE status="正在招标";
+    # UPDATE wanglibao_p2p_p2pproduct set status_int=8 WHERE status in ('满标待打款', '满标已打款', '满标待审核', '满标已审核');
+    # UPDATE wanglibao_p2p_p2pproduct set status_int=7 WHERE status="还款中";
+    # UPDATE wanglibao_p2p_p2pproduct set status_int=6 WHERE status="已完成";
+    #####
+    status_int = models.IntegerField(verbose_name=u'状态排序值', help_text=u'越大越优先', \
+                                     default=0, db_index=True, blank=True, editable=False)
+    # Override the original save method, for set status_int's value before save into database
+    def save(self, *args, **kwargs):
+        try:
+            status_dict = {u'正在招标':9, u'满标待打款':8, u'满标已打款':8, u'满标待审核':8, u'满标已审核':8, u'还款中':7, u'已完成':6}
+            self.status_int = status_dict.get(self.status, 0)
+        except:
+            pass
+        super(P2PProduct, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name_plural = u'P2P产品'
@@ -424,7 +441,7 @@ class UserAmortization(models.Model):
 
     @property
     def terms(self):
-        return ProductAmortization.objects.filter(product=self.product_amortization.product).count()
+        return ProductAmortization.objects.filter(product=self.product_amortization).count()
 
 
 class P2PEquity(models.Model):

@@ -18,7 +18,7 @@ from wanglibao_account.backends import TestIDVerifyBackEnd, ProductionIDVerifyBa
 import logging
 import hashlib
 import pytz
-from Crypto.Cipher import AES
+from M2Crypto.EVP import Cipher
 import urllib
 from .models import UserThreeOrder
 import requests
@@ -345,63 +345,33 @@ def str_to_float(time_str):
 
 def encrypt_mode_cbc(data, key, iv):
     """
-    aes加密得到16进制串
+    aes加密得到十进制串
     :param data:
     :param key:
     :param iv:
     :return:
     """
-    lenth = len(data)
-    num = lenth % 16
-    data = data.ljust(lenth + 16 - num,chr(16 - num))
-    obj = AES.new(key, AES.MODE_CBC, iv)
-    result = obj.encrypt(data)
-    return result.encode('hex')
+
+    cipher = Cipher(alg='aes_128_cbc', key=key, iv=iv, op=1)
+    buf = cipher.update(data)
+    buf += cipher.final()
+    del cipher
+
+    # 将明文从字节流转为十进制
+    des_list = [int('%02X' % (ord(i)), 16) for i in buf]
+
+    # 原码转补码
+    in_list = [~h ^ 255 if h > 128 else h for h in des_list]
+
+    return in_list
 
 
-def hex2bin(string_num):
+def encodeBytes(in_list):
     """
-    aes加密得到16进制串转2进制
-    :param string_num:
-    :return:
-    """
-    return dec2bin(hex2dec(string_num.upper()))
-
-
-def hex2dec(string_num):
-    """
-    十六进制 to 十进制
-    :param string_num:
-    :return:
-    """
-    return str(int(string_num.upper(), 16))
-
-
-base = [str(x) for x in range(10)] + [ chr(x) for x in range(ord('A'), ord('A')+6)]
-def dec2bin(string_num):
-    """
-    十进制转二进制
-    :param string_num:
-    :return:
-    """
-    global base
-    num = int(string_num)
-    mid = []
-    while True:
-        if num == 0:
-            break
-        num, rem = divmod(num, 2)
-        mid.append(base[rem])
-    return ''.join([str(x) for x in mid[::-1]])
-
-def encodeBytes(bytelist):
-    """
-    2进制按电信规则16进制加密
+    十进制按电信规则16进制加密
     :param bytelist:
     :return:
     """
-    pieces = len(bytelist) / 8
-    in_list = [int(bytelist[i*8:(i+1)*8],2) for i in range(pieces)]
 
     ret = []
     for byte in in_list:
@@ -469,14 +439,14 @@ def zgdx_order_query(params):
 
         encrypt_data = encrypt_mode_cbc(json.dumps(data), coop_key, iv)
         params = {
-            'code': encodeBytes(hex2bin(encrypt_data)),
+            'code': encodeBytes(encrypt_data),
             'partner_no': params.get('partner_no', None),
         }
 
         try:
             res = requests.post(url, data=json.dumps(params))
             if res.status_code == 200:
-                logger.info(">>>>>>>>>>>>>>>>>>>%s" % res.text)
+                logger.info("zgdx return:%s" % res.text)
                 res = res.json()
                 res_code = res.get('result_code', '')
                 result = res.get('result', '')

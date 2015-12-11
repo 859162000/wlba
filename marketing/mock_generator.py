@@ -38,7 +38,7 @@ class MockGenerator(object):
         logging.debug('code inserted has been done')
 
     @classmethod
-    def check_and_generate_codes(cls, check_counts=30000, item_counts=15000):
+    def check_and_generate_codes(cls, check_counts=50000, item_counts=20000):
         total_num = InviteCode.objects.filter(is_used=False).count()
         if total_num < check_counts:
             letters = 'abcdefghijkmnpqrstuvwxyz'

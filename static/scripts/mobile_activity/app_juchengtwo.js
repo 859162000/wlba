@@ -336,8 +336,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         action : 'ENTER_WEB_PAGE'
                     },
                     success: function(data){
-                        console.log(data);
-                        console.log(data.award100);
                         if(data.award100>0){
                             $('.get_ticket_wrap').show();
                         }else{

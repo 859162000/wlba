@@ -249,7 +249,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         app: function(mixins) {
             $('.code_wrap').hide();
             $('#take').click(function() {
-                //mixins.registerApp();
+                window.location.href = '/activity/experience/redirect/'
+                //体验金
             });
 
             $('#take_red').click(function() {
@@ -259,7 +260,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 if (data.ph == '') {
                     login = false;
                     $('#register').click(function() {
-                        mixins.registerApp();
+                       window.location.href = '/activity/experience/redirect/'
                     });
                     $('#go_user').on('click',
                     function() {
@@ -280,13 +281,13 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         other: function() {
             $('.code_wrap').show();
 
-            $('#register').on('click',
-            function() {
-                if (h5_user_static) {
-                    $('.title_wrap').show();
-                } else {
-                    window.location.href = '/weixin/regist/'
-                }
+            $('#take').click(function() {
+                window.location.href = '/activity/experience/mobile/';
+                //体验金
+            });
+
+            $('#register').click(function() {
+				window.location.href = '/activity/experience/mobile/';
             });
             $('#go_user').on('click',
             function() {
@@ -301,6 +302,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 }
             });
             //console.log('其他场景的业务逻辑');
+
         }
     });
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];

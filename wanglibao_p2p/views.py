@@ -478,7 +478,7 @@ class P2PProductViewSet(PaginatedModelViewSet):
     model = P2PProduct
     permission_classes = (IsAdminUserOrReadOnly,)
     serializer_class = P2PProductSerializer
-    paginate_by = 10
+    paginate_by = 20
 
     def get_queryset(self):
         qs = super(P2PProductViewSet, self).get_queryset()
@@ -763,8 +763,8 @@ def check_invalid_new_user_product(p2p, user):
     error_new_user = (p2p.category == '新手标' and user.wanglibaouserprofile.is_invested)
     return error_new_user
 
-
-def get_p2p_list():
+# Add by hb on 2015-12-08 : rename "get_p2p_list" to "get_p2p_list_slow", and add new "get_p2p_list"
+def get_p2p_list_slow():
 
     cache_backend = redis_backend()
 
@@ -810,5 +810,20 @@ def get_p2p_list():
             .filter(status=u'已完成').order_by('-soldout_time', '-priority')
 
         p2p_finished_list = cache_backend.get_p2p_list_from_objects(p2p_finished)
+
+    return p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list
+
+def get_p2p_list():
+
+    cache_backend = redis_backend()
+
+    p2p_all = P2PProduct.objects.select_related('warrant_company', 'activity__rule') \
+        .filter(hide=False).filter(Q(status_int__gte=6)).filter(Q(publish_time__lte=timezone.now())) \
+        .order_by('-status_int', '-publish_time', '-soldout_time', '-priority')
+
+    p2p_done_list = cache_backend.get_p2p_list_from_objects_by_status(p2p_all, 9)
+    p2p_full_list = cache_backend.get_p2p_list_from_objects_by_status(p2p_all, 8)
+    p2p_repayment_list = cache_backend.get_p2p_list_from_objects_by_status(p2p_all, 7)
+    p2p_finished_list = cache_backend.get_p2p_list_from_objects_by_status(p2p_all, 6)
 
     return p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list

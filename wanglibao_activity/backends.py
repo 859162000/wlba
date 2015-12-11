@@ -22,11 +22,12 @@ from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_sms.tasks import send_messages
 from wanglibao_rest.utils import decide_device
 from experience_gold.models import ExperienceEvent, ExperienceEventRecord
+from weixin.models import WeixinUser, WeiXinUserActionRecord
 
 logger = logging.getLogger(__name__)
 
 
-def check_activity(user, trigger_node, device_type, amount=0, product_id=0, order_id=0, is_full=False):
+def check_activity(user, trigger_node, device_type, amount=0, product_id=0, order_id=0, is_full=False, is_first_bind=False):
     now = timezone.now()
     device_type = decide_device(device_type)
     if not trigger_node:
@@ -61,19 +62,20 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, orde
                         user_ib = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                         if user_ib:
                             _check_rules_trigger(user, rule, rule.trigger_node, device_type,
-                                                 amount, product_id, is_full, order_id, user_ib)
+                                                 amount, product_id, is_full, order_id, user_ib, is_first_bind)
                     else:
                         _check_rules_trigger(user, rule, rule.trigger_node, device_type,
-                                             amount, product_id, is_full, order_id)
+                                             amount, product_id, is_full, order_id, is_first_bind)
             else:
                 continue
     else:
         return
 
 
-def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, order_id, user_ib=None):
+def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, order_id, user_ib=None, is_first_bind=False):
     """ check the trigger node """
     product_id = int(product_id)
+    order_id = int(order_id)
     # 注册 或 实名认证
     if trigger_node in ('register', 'validation'):
         _send_gift(user, rule, device_type, is_full)
@@ -81,6 +83,9 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
     elif trigger_node == 'first_pay':
         # check first pay
         penny = Decimal(0.01).quantize(Decimal('.01'))
+        with transaction.atomic():
+            # 等待pay_info交易完成
+            pay_info_lock = PayInfo.objects.select_for_update().get(order_id=order_id)
         if rule.is_in_date:
             first_pay = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
                                                update_time__gt=rule.activity.start_at,
@@ -179,7 +184,9 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
                 is_amount = _check_amount(rule.min_amount, rule.max_amount, amount)
                 if is_amount:
                     _send_gift(user, rule, device_type, is_full, amount)
-
+    elif trigger_node == 'first_bind_weixin':
+        if is_first_bind:
+            _send_gift(user, rule, device_type, is_full)
     else:
         return
 
@@ -549,6 +556,12 @@ def _give_activity_experience_new(user, rtype, experience_id, device_type, rule,
     else:
         return
 
+    # 限制id为1的体验金重复发放
+    experience_count = ExperienceEventRecord.objects.filter(user=user).filter(event__id=1).count()
+    if experience_count:
+        logger.debug(">>>>用户id: {}, ID为1的体验金已经发放过,不允许重复领取".format(user.id))
+        return
+
     if len(experience_id_list) == 1:
         experience_event = ExperienceEvent.objects.filter(give_mode=rtype, invalid=False, id=experience_id_list[0],
                                                           available_at__lt=now, unavailable_at__gt=now).first()
@@ -701,7 +714,7 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
             _send_message_template(user, title, content)
             _save_activity_record(rule, user, 'message', content)
         if sms_template:
-            sms = Template(sms_template)
+            sms = Template(sms_template + u' 退订回TD【网利科技】')
             content = sms.render(context)
             _send_sms_template(mobile, content)
             _save_activity_record(rule, user, 'sms', content)
@@ -729,6 +742,7 @@ def _send_message_template(user, title, content):
 def _send_sms_template(phones, content):
     send_messages.apply_async(kwargs={
         "phones": [phones, ],
-        "messages": [content, ]
+        "messages": [content, ],
+        "ext": 666
     })
 

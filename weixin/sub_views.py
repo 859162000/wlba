@@ -68,6 +68,29 @@ logger = logging.getLogger("weixin")
 class SubWeixinJoinView(WeixinJoinView):
     account = None
 
+    def check_signature(self, request, account_key):
+        # account = Account.objects.get(pk=account_key)#WeixinAccounts.get(account_key)
+        weixin_account = WeixinAccounts.getByOriginalId(account_key)
+        account = weixin_account.db_account
+        try:
+            check_signature(
+                account.token,
+                request.GET.get('signature'),
+                request.GET.get('timestamp'),
+                request.GET.get('nonce')
+            )
+        except InvalidSignatureException:
+            return False
+
+        return True
+
+    def get(self, request, account_key):
+        logger.debug("entering get =============================/weixin/join/%s"%account_key)
+        if not self.check_signature(request, account_key):
+            return HttpResponseForbidden()
+
+        return HttpResponse(request.GET.get('echostr'))
+
     def post(self, request, account_key):
         logger.debug("entering post=============================/weixin/join/%s"%account_key)
         if not self.check_signature(request, account_key):
@@ -81,13 +104,14 @@ class SubWeixinJoinView(WeixinJoinView):
         fromUserName = msg._data['FromUserName']
         createTime = msg._data['CreateTime']
         weixin_account = WeixinAccounts.getByOriginalId(toUserName)
+        w_user, old_subscribe = getOrCreateWeixinUser(fromUserName, weixin_account)
+        user = w_user.user
         if isinstance(msg, BaseEvent):
             if isinstance(msg, ClickEvent):
-                reply = self.process_click_event(msg)
+                reply = self.process_click_event(weixin_account, w_user=w_user, user=user)
             elif isinstance(msg, SubscribeEvent):
-                reply = self.process_subscribe(msg, toUserName)
+                reply = self.process_subscribe(old_subscribe, w_user=w_user, user=user)
             elif isinstance(msg, UnsubscribeEvent):
-                w_user = getOrCreateWeixinUser(fromUserName, weixin_account)
                 if w_user.subscribe != 0:
                     w_user.subscribe = 0
                 w_user.unsubscribe_time = int(time.time())
@@ -95,28 +119,25 @@ class SubWeixinJoinView(WeixinJoinView):
                 w_user.save()
                 reply = create_reply(u'欢迎下次关注我们！', msg)
             elif isinstance(msg, SubscribeScanEvent):
-                reply = self.process_subscribe(msg, toUserName)
+                reply = self.process_subscribe(old_subscribe, w_user=w_user, user=user)
             elif isinstance(msg, ScanEvent):
                 #如果eventkey为用户id则进行绑定
-                reply = self.process_subscribe(msg, toUserName)
+                reply = self.process_subscribe(old_subscribe, w_user=w_user, user=user)
             elif isinstance(msg, TemplateSendJobFinishEvent):
                 reply = -1
         elif isinstance(msg, BaseMessage):
             if isinstance(msg, TextMessage):
-                reply = self.check_service_subscribe(msg, weixin_account)
-                if not reply:
-                    # 多客服转接
-                    reply = TransferCustomerServiceReply(message=msg)
+                reply = TransferCustomerServiceReply(message=msg)
         if reply == -1 or not reply:
             return HttpResponse("")
         return HttpResponse(reply.render())
 
-    def process_click_event(self, msg):
+    def process_click_event(self, weixin_account, w_user=None, user=None):
         return -1
 
-    def process_subscribe(self, msg, toUserName):
-        replay = super(SubWeixinJoinView, self).process_subscribe(msg, toUserName)
+    def process_subscribe(self, old_subscribe, w_user=None, user=None):
+        replay = super(SubWeixinJoinView, self).process_subscribe(old_subscribe, w_user, user)
         return replay
 
-    def check_service_subscribe(self, msg, weixin_account):
+    def check_service_subscribe(self, w_user=None, user=None):
         return -1

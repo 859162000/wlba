@@ -178,7 +178,9 @@ class AppRepaymentPlanAllAPIView(APIView):
         page = int(page)
         pagesize = int(pagesize)
 
-        user_amortizations = UserAmortization.objects.filter(user=user).order_by('-term_date')
+        user_amortizations = UserAmortization.objects.filter(user=user)\
+            .select_related('product_amortization').select_related('product_amortization__product')\
+            .order_by('-term_date')
         if user_amortizations:
             paginator = Paginator(user_amortizations, pagesize)
 
@@ -243,7 +245,9 @@ class AppRepaymentPlanMonthAPIView(APIView):
 
         # 当月的还款计划
         user_amortizations = UserAmortization.objects.filter(user=user)\
-            .filter(term_date__gt=start, term_date__lte=end).order_by('term_date')
+            .filter(term_date__gt=start, term_date__lte=end)\
+            .select_related('product_amortization').select_related('product_amortization__product')\
+            .order_by('term_date')
         if user_amortizations:
             amo_list = _user_amortization_list(user_amortizations)
         else:
@@ -273,7 +277,7 @@ def _user_amortization_list(user_amortizations):
     amo_list = []
     for amo in user_amortizations:
         if amo.settled:
-            if amo.last_settlement_status == u'提前还款':
+            if amo.settlement_time.strftime('%Y-%m-%d') < amo.term_date.strftime('%Y-%m-%d'):
                 status = u'提前回款'
             else:
                 status = u'已回款'
@@ -285,7 +289,7 @@ def _user_amortization_list(user_amortizations):
             'product_id': amo.product_amortization.product.id,
             'product_name': amo.product_amortization.product.name,
             'term': amo.term,
-            'term_total': amo.terms,
+            'term_total': amo.product_amortization.product.amortization_count,
             'term_date': amo.term_date,
             'principal': amo.principal,
             'interest': amo.interest,

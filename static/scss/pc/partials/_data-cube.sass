@@ -1,0 +1,382 @@
+.data-cube
+  p
+    margin: 0
+    -webkit-margin-after: 0
+    -webkit-margin-before: 0
+  @mixin cube-animate
+    transition: background-position 0.5s
+    -moz-transition: background-position 0.5s
+    -webkit-transition: background-position 0.5s
+    -o-transition: background-position 0.5s
+  .w1100
+    width: 1100px
+    margin: 0 auto
+  .data-cube-part
+    width: 100%
+    padding: 45px 0 55px
+  .cube-title
+    text-align: center
+    font-size: 24px
+    line-height: 30px
+    .cube-title-l
+      font-size: 18px
+  @mixin cube-icon
+    background: url("/static/imgs/pc/data_cube/cube-icon.png") no-repeat
+    display: inline-block
+    overflow: hidden
+  .data-cube-part1
+    background: #346bd1 url("/static/imgs/pc/data_cube/banner-bg.png") repeat-x
+    background-size: auto 100%
+    .cube-title
+      color: #fff
+      .cube-title-l
+        color: #c2c6cc
+    .data-total
+      width: 1160px
+      height: 360px
+      margin: 0 -30px
+    .data-item-box
+      padding-left: 40px
+      overflow: hidden
+      margin-top: 40px
+    .data-item
+      width: 240px
+      height: 90px
+      padding: 15px 20px
+      line-height: 28px
+      color: #fff
+      margin-right: 20px
+      float: left
+      +border-radius
+      .tit
+        font-size: 14px
+      .num
+        font-size: 28px
+        text-shadow: 1px 1px rgba(0,0,0,0.5)
+      &.data-red
+        background: #ea544e
+      &.data-blue
+        background: #497ffb
+      &.data-green
+        background: #4bb281
+      &.data-orange
+        background: #f0871d
+    .data-img-tit
+      margin-top: -20px
+      color: #fff
+      font-size: 16px
+      text-align: center
+  .data-cube-part2
+    background: #fff
+    .cube-title
+      color: #333
+      .cube-title-l
+        color: #999
+    .cube-seven
+      overflow: hidden
+      margin-top: 60px
+      .cube-icon
+        +cube-icon
+        width: 120px
+        height: 120px
+        +cube-animate
+        &.cube-icon1
+          background-position: 0 0
+        &.cube-icon2
+          background-position: -140px 0
+        &.cube-icon3
+          background-position: 0 -280px
+        &.cube-icon4
+          background-position: -140px -280px
+        &.cube-icon1:hover
+          background-position: 0 -120px
+        &.cube-icon2:hover
+          background-position: -140px -120px
+        &.cube-icon3:hover
+          background-position: 0 -400px
+        &.cube-icon4:hover
+          background-position: -140px -400px
+      .cube-seven-item
+        width: 25%
+        float: left
+        overflow: hidden
+        text-align: center
+        &:hover
+          .cube-icon1
+            background-position: 0 -120px
+          .cube-icon2
+            background-position: -140px -120px
+          .cube-icon3
+            background-position: 0 -400px
+          .cube-icon4
+            background-position: -140px -400px
+      .num
+        color: #828a99
+        font-size: 28px
+        line-height: 30px
+        margin-top: 10px
+      .s-tit
+        font-size: 14px
+        line-height: 30px
+        color: #999
+  .data-cube-part3
+    .cube-survey
+      margin-top: 45px
+      overflow: hidden
+      ul
+        margin-right: -20px
+    .cube-survey-item
+      margin-right: 20px
+      width: 260px
+      height: 360px
+      border: 1px solid #e6e6e6
+      background: #fff
+      position: relative
+      float: left
+      +border-radius
+      .center-text
+        width: 100%
+        text-align: center
+        font-size: 16px
+        position: absolute
+        top: 115px
+        left: 0
+      .cube-survey-img
+        width: 100%
+        height: 360px
+  .data-cube-part4
+    background: #fff
+    .part4-mian
+      overflow: hidden
+      margin-top: 45px
+    .part4-tit-l
+      text-align: center
+      font-size: 16px
+      line-height: 30px
+    .age-box
+      width: 470px
+      float: left
+    .cube-age
+      width: 520px
+      height: 280px
+      margin: -30px
+    .sex-box
+      width: 314px
+      float: left
+      border-left: 1px dashed #e6e6e6
+      .cube-sex
+        width: 100%
+        height: 260px
+        margin-top: -30px
+    .map-box
+      margin-top: 60px
+      .map-tab
+        text-align: center
+        width: 280px
+        margin: 0 auto
+        li
+          display: inline-block
+          width: 140px
+          text-align: center
+          height: 40px
+          line-height: 40px
+          border: 1px solid #477ced
+          font-size: 16px
+          float: left
+          cursor: pointer
+          &.tab1
+            border-bottom-left-radius: 5px
+            border-top-left-radius: 5px
+          &.tab2
+            border-bottom-right-radius: 5px
+            border-top-right-radius: 5px
+          &:hover
+            color: #474e5e
+          &.active
+            color: #fff
+            background: #477ced
+      .map-main
+        margin-top: 45px
+        display: none
+        &.active
+          display: block
+      .map-lft
+        width: 365px
+        float: left
+        padding-left: 65px
+        font-size: 14px
+        color: #666
+        margin-top: 30px
+        .font-color9
+          color: #999
+        .map-list-item
+          margin-top: 15px
+        .map-num
+          display: inline-block
+          width: 16px
+          height: 16px
+          text-align: center
+          line-height: 16px
+          margin-right: 8px
+          color: #bfbfbf
+          &.map-num1
+            color: #fff
+            background: #e8403a
+          &.map-num2
+            color: #fff
+            background: #f06824
+          &.map-num3
+            color: #fff
+            background: #f2bf18
+      .map-rht
+        width: 735px
+        float: left
+        height: 430px
+        .map-img
+          width: 735px
+          height: 460px
+          margin: -15px
+  .data-cube-part5
+    background: url("/static/imgs/pc/data_cube/event-bg.jpg") no-repeat
+    background-size: cover
+    width: 100%
+    .cube-title
+      margin-top: 20px
+      color: #fff
+    .event-box
+      position: relative
+      width: 100%
+      height: 400px
+      .handle-item
+        position: absolute
+        display: inline-block
+        width: 32px
+        height: 32px
+        top: 50%
+        margin-top: -16px
+        &:before, &:after
+          display: block
+          content: ''
+          position: absolute
+        &:before
+          +opacity(0.4)
+          background: #000
+          height: 100%
+          width: 100%
+          top: 0
+          left: 0
+          +border-radius(20px)
+        &:after
+          +cube-icon
+          background-position: -280px -154px
+          top: 50%
+          left: 50%
+          height: 20px
+          width: 12px
+          margin: -10px 0 0 -6px
+        &#event-prve
+          left: -50px
+        &#event-next
+          right: -50px
+          &:after
+            background-position: -278px -192px
+      .event-main
+        width: 1100px
+        position: relative
+        height: 100%
+        overflow: hidden
+        .e-line
+          position: absolute
+          width: 100%
+          height: 1px
+          background: #477ced
+          top: 50%
+          left: 0
+          margin-top: -0.5px
+        .event-mian-box
+          width: 960px
+          margin: 0 auto
+          height: 100%
+          overflow: hidden
+          position: relative
+        .event-main-list
+          height: 100%
+          position: absolute
+          width: 100%
+          left: 0
+          top: 0
+          .center-circle
+            position: absolute
+            top: 50%
+            left: 50%
+            margin: -9px 0 0 -9px
+            width: 18px
+            height: 18px
+            border: 2px solid #477ced
+            background: #fff
+            +border-radius(10px)
+          .eitem
+            background: #fff
+            position: absolute
+            padding: 10px 20px
+            width: 240px
+            font-size: 13px
+            color: #999
+            line-height: 20px
+            +border-radius
+            .e-arr
+              position: absolute
+              left: 50%
+              margin-left: -8px
+              width: 0
+              height: 0
+              overflow: hidden
+              border: 8px dashed transparent
+          .eitem-time
+            text-align: center
+            width: 100%
+            font-size: 16px
+            color: #fff
+            line-height: 30px
+            position: absolute
+            left: 0
+          .event-list-item
+            position: relative
+            width: 240px
+            height: 100%
+            float: left
+            overflow: hidden
+            &:hover
+              .eitem
+                background: #477ced
+                color: #fff
+              .center-circle
+                border-width: 4px
+              &.eitem-btm
+                .e-arr
+                  border-top-color: #477ced
+              &.eitem-top
+                .e-arr
+                  border-bottom-color: #477ced
+            &.eitem-btm
+              .eitem
+                bottom: 235px
+              .eitem-time
+                bottom: 150px
+              .e-arr
+                border-top: 8px solid #fff
+                bottom: -16px
+            &.eitem-top
+              .eitem
+                top: 235px
+              .eitem-time
+                top: 150px
+              .e-arr
+                border-bottom: 8px solid #fff
+                top: -16px
+
+
+
+
+
+      

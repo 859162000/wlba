@@ -495,6 +495,7 @@ class AmortizationKeeper(KeeperBaseMixin):
         return amos
 
     def amortize(self, amortization, savepoint=True):
+        from weixin.tasks import sentTemplate
         with transaction.atomic(savepoint=savepoint):
             if amortization.settled:
                 raise P2PException('amortization %s already settled.' % amortization)
@@ -527,15 +528,28 @@ class AmortizationKeeper(KeeperBaseMixin):
                                                               amortization.product,
                                                               # sub_amo.settlement_time,
                                                               amo_amount))
+                title, content = messages.msg_bid_amortize(pname, timezone.now(), amo_amount)
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id": sub_amo.user.id,
+                    "title": title,
+                    "content": content,
+                    "mtype": "amortize"
+                })
+                self.__tracer(catalog, sub_amo.user, sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
+                              amortization, description, sub_amo.coupon_interest)
+
+                # 标的每一期还款完成后,检测该用户还款的本金是否有符合活动的规则,有的话触发活动规则
+                try:
+                    if sub_amo.principal > 0:
+                        activity_backends.check_activity(sub_amo.user, 'repaid', 'pc', sub_amo.principal, product.id)
+                except Exception:
+                    logger.debug("check activity on repaid, user: {}, principal: {}, product_id: {}".format(
+                        sub_amo.user, sub_amo.principal, product.id
+                    ))
                 try:
                     weixin_user = WeixinUser.objects.filter(user=sub_amo.user).first()
-        #             您好，您投资的项目还款完成
-                    # 项目名称：宝马X5-HK20151112002
-                    # 还款金额：1000元
-                    # 还款时间：2015-11-12
-                    # 详情请登录平台会员中心查看
         #             {{first.DATA}} 项目名称：{{keyword1.DATA}} 还款金额：{{keyword2.DATA}} 还款时间：{{keyword3.DATA}} {{remark.DATA}}
-                    from weixin.tasks import sentTemplate
+
                     if weixin_user:
                         now = datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
                         sentTemplate.apply_async(kwargs={
@@ -548,28 +562,8 @@ class AmortizationKeeper(KeeperBaseMixin):
                                                             })},
                                                         queue='celery02')
 
-                    title, content = messages.msg_bid_amortize(pname, timezone.now(), amo_amount)
-                    inside_message.send_one.apply_async(kwargs={
-                        "user_id": sub_amo.user.id,
-                        "title": title,
-                        "content": content,
-                        "mtype": "amortize"
-                    })
                 except Exception,e:
                     pass
-
-                self.__tracer(catalog, sub_amo.user, sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
-                              amortization, description, sub_amo.coupon_interest)
-
-                # 标的每一期还款完成后,检测该用户还款的本金是否有符合活动的规则,有的话触发活动规则
-                try:
-                    if sub_amo.principal > 0:
-                        activity_backends.check_activity(sub_amo.user, 'repaid', 'pc', sub_amo.principal, product.id)
-                except Exception:
-                    logger.debug("check activity on repaid, user: {}, principal: {}, product_id: {}".format(
-                        sub_amo.user, sub_amo.principal, product.id
-                    ))
-
             amortization.settled = True
             amortization.save()
             catalog = u'还款入账'

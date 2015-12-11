@@ -18,6 +18,7 @@ from django.contrib.auth import views as auth_views
 from views import AutomaticView
 from wanglibao_account.cooperation import JrjiaCPSView, JrjiaP2PStatusView, JrjiaP2PInvestView, JrjiaReportView, \
     JrjiaUsStatusView
+from wanglibao_account.views import FirstPayResultView
 from wanglibao_lottery.views import LotteryListTemplateView
 from wanglibao_account.decorators import login_required
 
@@ -78,7 +79,8 @@ urlpatterns = patterns(
 
     url(r'^register/$', RegisterView.as_view(), name='auth_register'),
     url(r'^register/first/$', TemplateView.as_view(template_name="register_first.jade")),
-    url(r'^register/three/$', TemplateView.as_view(template_name="register_three.jade")),
+    # url(r'^register/three/$', TemplateView.as_view(template_name="register_three.jade")),
+    url(r'^register/three/$', login_required(FirstPayResultView.as_view())),
     url(r'^api/register/jrjia/$', JrjiaAutoRegisterView.as_view(), name='auth_register_auto'),
     url(r'^api/cps/$', JrjiaCPSView.as_view(), name='auth_register_auto'),
     url(r'^api/pstatus/$', JrjiaP2PStatusView.as_view(), name='auth_register_auto'),

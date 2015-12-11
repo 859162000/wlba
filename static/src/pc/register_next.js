@@ -128,10 +128,10 @@ require(['jquery','jquery.placeholder',"tools"], function( $ ,placeholder, tool)
             amount.next().html('<i></i>请输入充值金额');
             return false;
         }else{
-            if($.trim(amount.val()) >= 100){
+            if($.trim(amount.val()) >= 0.01){
                 amount.next().html('');
             }else{
-                amount.next().html('<i></i>充值金额100元起');
+                amount.next().html('<i></i>充值金额不正确');
                 amount.val('');
                 return false;
             }
