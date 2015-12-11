@@ -28,9 +28,8 @@ class BaseWeixinTemplate(TemplateView):
             request.session['account_key'] = account.key
             oauth = WeChatOAuth(account.app_id, account.app_secret, )
             res = oauth.fetch_access_token(code)
-            openid = res.get('openid')
+            self.openid = res.get('openid')
             w_user = WeixinUser.objects.filter(openid=openid).first()
-
             if not w_user:
                 error_msg = "error"
             if not w_user.user:
@@ -48,10 +47,8 @@ class AwardIndexTemplate(BaseWeixinTemplate):
     template_name = "sub_award.jade"
 
     def get_context_data(self, **kwargs):
-        print self.request.__dict__
-        openid = self.request.GET.get('openid')
         return {
-            "openid": openid,
+            "openid": self.openid,
         }
     def dispatch(self, request, *args, **kwargs):
         self.url_name = 'award_index'
@@ -62,8 +59,7 @@ class InviteWeixinFriendTemplate(BaseWeixinTemplate):
     template_name = "sub_invite_server.jade"
 
     def get_context_data(self, **kwargs):
-        openid = self.request.GET.get('openid')
-        w_user = WeixinUser.objects.filter(openid=openid).first()
+        w_user = WeixinUser.objects.filter(openid=self.openid).first()
         user = w_user.user
         earning = 0
         if user:
