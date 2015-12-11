@@ -1110,14 +1110,16 @@ class RockFinanceRegister(CoopRegister):
                     raise Exception(u"生成获奖记录异常")
                 else:
                     #不知道为什么create的时候，会报错
-                    img = qrcode.make("https://www.wanglibao.com/api/check/qrcode/?owner_id=%s&activity=rock_finance&content=%s"%(request.user.id, reward.content))
+                    img = qrcode.make("https://www.wanglibao.com/api/check/qrcode/?owner_id=%s&activity=rock_finance&content=%s"%(user.id, reward.content))
                     activity_reward.qrcode = img
 
                     #将奖品通过站内信发出
+                    message_content = u"网里宝摇滚夜欢迎您的到来，点击<a href='https://www.wanglibao.com/api/rock/finance/?type=qrcode'>" \
+                                      u"获得入场二维码</a>查看，<br/> 感谢您对我们的支持与关注。<br/>网利宝"
                     inside_message.send_one.apply_async(kwargs={
                         "user_id": user.id,
                         "title": u"网利宝摇滚之夜门票",
-                        "content": u"摇滚之夜入场二维码链接如下:</br>https://www.wanglibao.com/api/rock/finance/</br>请于活动当日凭此二维码入场.",
+                        "content": message_content,
                         "mtype": "activity"
                     })
                     reward.is_used = True

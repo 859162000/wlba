@@ -96,50 +96,51 @@ class GetExperienceAPIView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        user = request.user
-        now = timezone.now()
-        device = split_ua(request)
-        device_type = decide_device(device['device_type'])
-
-        p2p_record_count = P2PRecord.objects.filter(user=user).count()
-        experience_count = ExperienceEventRecord.objects.filter(user=user).count()
-
-        if p2p_record_count > 0:
-            return Response({'ret_code': 30001, 'message': u'老用户暂时无法领取,请继续关注网利宝最新活动.'})
-        if experience_count > 0:
-            return Response({'ret_code': 30002, 'message': u'您已经领取过体验金,不能重复领取.'})
-
-        # 发放活动ID为 1 的理财金
-        experience_event = ExperienceEvent.objects.filter(invalid=False, pk=1,
-                                                          available_at__lt=now, unavailable_at__gt=now).first()
-        if experience_event:
-            # 发放理财金
-            record = ExperienceEventRecord()
-            record.event = experience_event
-            record.user = user
-            record.save()
-
-            # 发放站内信
-            title = u'参加活动送体验金'
-            content = u"网利宝赠送的【{}】体验金已发放，体验金额度:{}元，请进入投资页面尽快投资赚收益吧！有效期至{}。" \
-                      u"<br/>感谢您对我们的支持与关注!" \
-                      u"<br>网利宝".format(experience_event.name,
-                                          decimal.Decimal(str(experience_event.amount)).quantize(decimal.Decimal('.01')),
-                                          experience_event.unavailable_at.strftime("%Y-%m-%d"))
-
-            inside_message.send_one.apply_async(kwargs={
-                "user_id": user.id,
-                "title": title,
-                "content": content,
-                "mtype": "activity"
-            })
-
-            return Response({
-                'ret_code': 0,
-                'data': {'amount': experience_event.amount}
-            })
-
-        return Response({'ret_code': 30003, 'message': u'领取失败,请联系网利宝,客服电话:4008-588-066.'})
+        return Response({'ret_code': 30004, 'message': u'体验金将通过注册由系统自动发放'})
+        # user = request.user
+        # now = timezone.now()
+        # device = split_ua(request)
+        # device_type = decide_device(device['device_type'])
+        #
+        # p2p_record_count = P2PRecord.objects.filter(user=user).count()
+        # experience_count = ExperienceEventRecord.objects.filter(user=user).count()
+        #
+        # if p2p_record_count > 0:
+        #     return Response({'ret_code': 30001, 'message': u'老用户暂时无法领取,请继续关注网利宝最新活动.'})
+        # if experience_count > 0:
+        #     return Response({'ret_code': 30002, 'message': u'您已经领取过体验金,不能重复领取.'})
+        #
+        # # 发放活动ID为 1 的理财金
+        # experience_event = ExperienceEvent.objects.filter(invalid=False, pk=1,
+        #                                                   available_at__lt=now, unavailable_at__gt=now).first()
+        # if experience_event:
+        #     # 发放理财金
+        #     record = ExperienceEventRecord()
+        #     record.event = experience_event
+        #     record.user = user
+        #     record.save()
+        #
+        #     # 发放站内信
+        #     title = u'参加活动送体验金'
+        #     content = u"网利宝赠送的【{}】体验金已发放，体验金额度:{}元，请进入投资页面尽快投资赚收益吧！有效期至{}。" \
+        #               u"<br/>感谢您对我们的支持与关注!" \
+        #               u"<br>网利宝".format(experience_event.name,
+        #                                   decimal.Decimal(str(experience_event.amount)).quantize(decimal.Decimal('.01')),
+        #                                   experience_event.unavailable_at.strftime("%Y-%m-%d"))
+        #
+        #     inside_message.send_one.apply_async(kwargs={
+        #         "user_id": user.id,
+        #         "title": title,
+        #         "content": content,
+        #         "mtype": "activity"
+        #     })
+        #
+        #     return Response({
+        #         'ret_code': 0,
+        #         'data': {'amount': experience_event.amount}
+        #     })
+        #
+        # return Response({'ret_code': 30003, 'message': u'领取失败,请联系网利宝,客服电话:4008-588-066.'})
 
 
 class SendExperienceGold(object):
