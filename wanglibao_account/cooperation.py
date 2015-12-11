@@ -1064,8 +1064,8 @@ class RockFinanceRegister(CoopRegister):
         else:
             raise Exception(u"misc中没有配置activities杂项")
 
-        if settings.DEBUG:
-            logger.debug(u"user:%s, order_id:%s, 运行开关:%s, 开放时间:%s, 结束时间:%s, 总票数:%s" % (user, order_id, is_open, start_time, end_time, amount))
+        logger.debug(u"user:%s, order_id:%s, 运行开关:%s, 开放时间:%s, 结束时间:%s, 总票数:%s" % (user, order_id, is_open, start_time, end_time, amount))
+
         binding = Binding.objects.filter(user_id=user.id).first()
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
 
