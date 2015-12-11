@@ -11,7 +11,7 @@ from marketing.models import IntroducedBy
 from report.crypto import ReportCrypto
 from report.models import Report
 from wanglibao_p2p.models import UserAmortization, P2PProduct, ProductAmortization, P2PRecord, Earning, EquityRecord
-from wanglibao_pay.models import PayInfo
+from wanglibao_pay.models import PayInfo, Card
 from wanglibao_margin.models import MarginRecord
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -150,6 +150,10 @@ class WithDrawReportGenerator(ReportGeneratorBase):
                          u'提现总额', u'到账金额', u'手续费', u'提现时间', u'提现ip', u'状态', u'审核时间', u'编号', u'资金管理费', u'管理费计算金额'])
 
         for payinfo in payinfos:
+            # 增加银行卡号验证,卡号不存在的/卡号大于1张的,不导出
+            card = Card.objects.filter(no=payinfo.card_no).count()
+            if card == 0 or card > 1:
+                continue
             confirm_time = ""
             if payinfo.confirm_time:
                 confirm_time = timezone.localtime(payinfo.confirm_time).strftime("%Y-%m-%d %H:%M:%S")

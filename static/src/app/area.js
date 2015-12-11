@@ -42,13 +42,27 @@ org.area = (function (org) {
         },
 
         slide: function () {
-
-            var $slideLine = $('.slide-bottom'),
+            var milepost = false,
+                $milepostBtn = $('.area-milepost-btn'),
+                $milepostMore = $('.area-milepost-more'),
+                $milepostPush =$('.area-milepost-push'),
+                $slideLine = $('.slide-bottom'),
                 $milepostLoad = $('.area-milepost-loading'),
                 $milepost = $('.area-milepost'),
                 myswiper = new Swiper('.swiper-container', {
                     loop: false,
                     lazyLoading: false,
+                    onInit: function(swiper){
+                        if(location.hash == '' || location.hash == '#0'){
+                            swiper.slideTo(0, 0, true);
+                        }
+
+                        if(location.hash == '#1'){
+                            swiper.slideTo(1, 0, true);
+                        }
+
+                        $('.tab-nav li').eq(swiper.activeIndex).addClass('active').siblings().removeClass('active');
+                    },
                     onSliderMove: function (swiper) {
                         var translateX = -(swiper.getWrapperTranslate() / 2)
                         $slideLine.css('-webkit-transform', 'translate3d(' + translateX + 'px, 0, 0)')
@@ -60,7 +74,7 @@ org.area = (function (org) {
                     onSlideChangeStart: function (swiper) {
                         var translateX = 100 * swiper.activeIndex + '%';
                         $slideLine.css('-webkit-transform', 'translate3d(' + translateX + ', 0, 0)')
-
+                        location.hash = '#' + swiper.activeIndex;
                         if(swiper.activeIndex === 1 && $milepost.attr('data-active') != 'true'){
                             doing(1, function(){
                                 $milepostLoad.hide()
@@ -68,17 +82,14 @@ org.area = (function (org) {
                         }
                     }
                 });
-
             $('.tab-nav li').on('touchend click', function () {
                 var index = $(this).index();
-                $(this).addClass('active').siblings().removeClass('active')
+                $(this).addClass('active').siblings().removeClass('active');
+                location.hash = '#' + index;
                 myswiper.slideTo(index, 400, true);
             });
 
-            var milepost = false,
-                $milepostBtn = $('.area-milepost-btn'),
-                $milepostMore = $('.area-milepost-more'),
-                $milepostPush =$('.area-milepost-push');
+
 
 
             $milepostBtn.on('click', function(){
