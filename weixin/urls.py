@@ -61,6 +61,13 @@ urlpatterns = patterns(
     url(r'^award_rule/$', TemplateView.as_view(template_name="sub_award_rule.jade")),
     url(r'^sub_code/$', views_activity.ChannelBaseTemplate.as_view(template_name="sub_code.jade", wx_classify='fwh', wx_code='test1')),#wx_classify='dyh' or 'fwh'
     url(r'^sub_invite/$', views_activity.InviteWeixinFriendTemplate.as_view(template_name="sub_invite_server.jade"), name='sub_invite'),
+    #微站
+    url(r'^sub_login/$', TemplateView.as_view(template_name="service_login.jade")),
+    url(r'^sub_regist/$', TemplateView.as_view(template_name="service_regist.jade")),
+    url(r'^sub_regist_first/$', TemplateView.as_view(template_name="service_registProcess_first.jade")),
+    url(r'^sub_regist_second/$', TemplateView.as_view(template_name="service_registProcess_second.jade")),
+    url(r'^sub_regist_three/$', TemplateView.as_view(template_name="service_registProcess_three.jade")),
+    url(r'^sub_account/$', TemplateView.as_view(template_name="service_account.jade")),
 
 )
 
