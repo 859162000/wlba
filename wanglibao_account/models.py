@@ -38,6 +38,7 @@ class IdVerification(models.Model):
             if ENV == ENV_PRODUCTION:
                 verify_result, _id_photo = get_verify_result(self.id_number, self.name)
                 if verify_result and _id_photo:
+                    self.is_valid = True
                     self.id_photo.save('%s.jpg' % self.id_number, _id_photo, save=True)
 
         super(IdVerification, self).save(*args, **kwargs)
