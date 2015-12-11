@@ -3,48 +3,38 @@ from django.views.generic import View, TemplateView, RedirectView
 from django.http import  HttpResponseRedirect
 
 from django.core.urlresolvers import reverse
+from wechatpy.oauth import WeChatOAuth
 
 from django.conf import settings
 import json
 import logging
 import urllib
 import base64
-from .models import WeixinUser
+from .models import WeixinUser, WeixinAccounts
 from misc.models import Misc
 from wanglibao_account.backends import invite_earning
-
+from weixin.common.decorators import weixin_api_error
 
 logger = logging.getLogger("weixin")
-
+# https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx18689c393281241e&redirect_uri=http://2ea0ef54.ngrok.io/weixin/award_index/&response_type=code&scope=snsapi_base&state=1#wechat_redirect
 class BaseWeixinTemplate(TemplateView):
+    @weixin_api_error
     def dispatch(self, request, *args, **kwargs):
-        openid = self.request.GET.get('openid')
-        if not openid:
-            redirect_uri = settings.CALLBACK_HOST + reverse(self.url_name)
-            count = 0
-            for key in self.request.GET.keys():
-                if count == 0:
-                    redirect_uri += '?%s=%s'%(key, self.request.GET.get(key))
-                else:
-                    redirect_uri += "&%s=%s"%(key, self.request.GET.get(key))
-                count += 1
-            redirect_uri = urllib.quote(redirect_uri)
-            account_id = 3
-            key = 'share_redpack'
-            shareconfig = Misc.objects.filter(key=key).first()
-            if shareconfig:
-                shareconfig = json.loads(shareconfig.value)
-                if type(shareconfig) == dict:
-                    account_id = shareconfig['account_id']
-            redirect_url = reverse('weixin_authorize_code')+'?state=%s&redirect_uri=%s' % (account_id, redirect_uri)
-            # print redirect_url
-            return HttpResponseRedirect(redirect_url)
-        w_user = WeixinUser.objects.filter(openid=openid).first()
-        error_msg = ""
-        if not w_user:
-            error_msg = "error"
-        if not w_user.user:
-            error_msg = u"请先绑定网利宝账号"
+        code = request.GET.get('code')
+        state = request.GET.get('state')
+        error_msg = "code or state is None"
+        if code and state:
+            account = WeixinAccounts.getByOriginalId(state)
+            request.session['account_key'] = account.key
+            oauth = WeChatOAuth(account.app_id, account.app_secret, )
+            res = oauth.fetch_access_token(code)
+            openid = res.get('openid')
+            w_user = WeixinUser.objects.filter(openid=openid).first()
+
+            if not w_user:
+                error_msg = "error"
+            if not w_user.user:
+                error_msg = u"请先绑定网利宝账号"
         if error_msg:
             from .views import redirectToJumpPage
             return redirectToJumpPage(error_msg)
@@ -56,6 +46,7 @@ class AwardIndexTemplate(BaseWeixinTemplate):
     template_name = "sub_award.jade"
 
     def get_context_data(self, **kwargs):
+        print self.request.__dict__
         openid = self.request.GET.get('openid')
         return {
             "openid": openid,
