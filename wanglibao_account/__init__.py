@@ -105,8 +105,8 @@ def get_verify_result(id_number, name):
                       verify=False)
 
     if response.status_code != 200:
-        logger.error("Failed to send request: status: %d, ", response.status_code)
-        return None, "Failed to send request"
+        logger.error("validate failed to send request: status: %d, ", response.status_code)
+        return None, "validate failed to send request"
 
     verify_result = False
     id_photo = None
@@ -121,7 +121,8 @@ def get_verify_result(id_number, name):
             logger.error("id_number==>[%s], result_xm==>[%s, %s], result_gmsfhm==>[%s, %s]"
                          " validate faild") % (id_number, result_xm, type(result_xm),
                                                result_gmsfhm, type(result_gmsfhm))
-    except StopIteration:
-        pass
+    except StopIteration, e:
+        logger.error("reponse_text==>[%s]validate failed" % response.text)
+        logger.error(e)
 
     return verify_result, id_photo
