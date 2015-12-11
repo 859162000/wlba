@@ -1,3 +1,4 @@
+
 var path = require('path');
 var webpack = require('webpack');
 var outpath = 'scripts/mobile_fuelcard/dev';
@@ -9,7 +10,7 @@ if(process.env.NODE_ENV == 'pro'){
 module.exports = {
     entry: {
         /**
-         * 路径相对于webpack.config.js
+         * 路径相对于webpack.fuel.js
          */
         index: './src/mobile_fuelcard/index',
         vendor: ['./src/mobile_fuelcard/lib/zepto']

@@ -1,13 +1,50 @@
 
 
-@mixin submit($height: 2.5rem, $color: #fff, $background: #DB493F, $margin: 0 .5rem)
+
+@mixin submit($height: 2.5rem, $color: #fff, $background: #DB493F)
+  -webkit-appearance: none
+  width: 100%
   height: $height
   line-height: $height
   text-align: center
   color: $color
   background: $background
   border-radius: .2rem
-  margin: $margin
   font-size: rem(32)
+  border: 0
   &:active
     box-shadow: 0px 10px 200px rgba(0,0,0,0.2) inset
+  &:disabled
+    background: rgba(219, 73, 63, 0.498039)
+
+
+.fuel-input-public
+  display: -webkit-box
+  -webkit-box-align: center
+  font-size: rem(30)
+  padding:  0 1rem 0 .5rem
+  background: #fff
+  border-radius: .2rem
+
+  .fuel-input-name
+    color: #666
+
+  input.fuel-input-main
+    -webkit-appearance: none
+    -webkit-box-flex: 1
+    display: block
+    width: 100%
+    border: 0
+    padding: 0.8rem 0.2rem 0.8rem 0.9rem
+    &::-webkit-input-placeholder
+      color: #ccc
+
+  .fuel-operation-icon
+
+  .fuel-clear-input
+    width: 1rem
+    height: 1rem
+    background: url("/static/imgs/mobile_fuelcard/account/clear.png") no-repeat center
+    background-size: 100%
+
+
