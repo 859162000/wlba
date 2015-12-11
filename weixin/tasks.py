@@ -3,21 +3,15 @@
 
 from wanglibao.celery import app
 from wanglibao_p2p.models import P2PProduct
-from django.contrib.auth.models import User
 import re
 import json
 from django.conf import settings
 from django.utils import timezone
-from decimal import Decimal
 import datetime
 
 from weixin.models import SubscribeRecord, SubscribeService, WeixinUser
-from weixin.constant import MessageTemplate, PRODUCT_ONLINE_TEMPLATE_ID, BIND_SUCCESS_TEMPLATE_ID
+from weixin.constant import MessageTemplate, PRODUCT_ONLINE_TEMPLATE_ID
 from weixin.util import sendTemplate
-from wanglibao_redpack.models import RedPackRecord, RedPackEvent
-from wanglibao_redpack.backends import get_start_end_time,stamp
-
-from wanglibao_activity.models import ActivityRule
 from weixin.constant import BIND_SUCCESS_TEMPLATE_ID
 
 
