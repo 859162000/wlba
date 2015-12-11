@@ -29,7 +29,7 @@ class BaseWeixinTemplate(TemplateView):
             oauth = WeChatOAuth(account.app_id, account.app_secret, )
             res = oauth.fetch_access_token(code)
             self.openid = res.get('openid')
-            w_user = WeixinUser.objects.filter(openid=openid).first()
+            w_user = WeixinUser.objects.filter(openid=self.openid).first()
             if not w_user:
                 error_msg = "error"
             if not w_user.user:
