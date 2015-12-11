@@ -408,7 +408,7 @@ class WithdrawCompleteView(TemplateView):
         except Card.DoesNotExist:
             result = u'请选择有效的银行卡'
         except ManyCardException:
-            result = u'银行卡异常'
+            result = u'银行卡号存在异常，请尝试其他银行卡号码，如非本人操作请联系客服'
         except MarginLack as e:
             result = u'余额不足'
             pay_info.error_message = str(e)
@@ -487,7 +487,7 @@ class CardViewSet(ModelViewSet):
         exist_cards1 = Card.objects.filter(user=card.user, no__startswith=card.no[:6], no__endswith=card.no[-4:]).first()
         if exist_cards or exist_cards1:
             return Response({
-                                "message": u"该银行卡已经存在",
+                                "message": u"您输入的银行卡号已绑定，请尝试其他银行卡号码，如非本人操作请联系客服",
                                 'error_number': ErrorNumber.duplicate
                             }, status=status.HTTP_400_BAD_REQUEST)
 
