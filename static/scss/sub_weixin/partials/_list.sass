@@ -1,0 +1,255 @@
+
+header
+  position: relative
+  background: $head-backgroundColor
+  font-size: $header-fontSize
+  color: $head-fontColo
+  height: $header-height
+  hgroup
+    text-align: center
+    line-height: $header-height
+  a
+    position: absolute
+    left: 0
+    top: 0
+    padding: 0 .3rem
+    &:active
+      box-shadow: $active-shadow
+    span
+      padding-left: .8rem
+      line-height: $header-height
+      height: $header-height
+      background: url("/static/imgs/mobile/head_back.png") no-repeat left center
+      background-size: .5rem .975rem
+
+footer
+  position: fixed
+  left: 0
+  bottom: 0
+  width: 100%
+  height: 2.75rem
+  display: -webkit-box
+  text-align: center
+  background: #fff
+  border-top: 1px solid #dadada
+  font-size: $body-fontSize
+  color: #727272
+  a
+    display: -webkit-box
+    -webkit-box-align: center
+    -webkit-box-pack: center
+    color: #727272
+    span
+      width: 100%
+      height: 100%
+      display: block
+    .index
+
+      background: url("/static/imgs/mobile/footer/home.png") no-repeat center top
+      background-size: 1rem
+      padding-top: 1.3rem
+    .account
+      background: url("/static/imgs/mobile/footer/account.png") no-repeat center top
+      background-size: .95rem
+      padding-top: 1.3rem
+    .more
+      background: url("/static/imgs/mobile/footer/more.png") no-repeat center top
+      background-size: 1.125rem
+      background-position-y: .4rem
+      padding-top: 1.2rem
+  a.active
+    .index
+      background: url("/static/imgs/mobile/footer/home_active.png") no-repeat center top
+      background-size: 1rem
+    .account
+      background: url("/static/imgs/mobile/footer/account_active.png") no-repeat center top
+      background-size: .95rem
+    .more
+      background: url("/static/imgs/mobile/footer/more_active.png") no-repeat center top
+      background-size: 1.125rem
+      background-position-y: .4rem
+
+  .list-a
+    width: 25%
+  .account-a
+
+    -webkit-box-flex: 1
+  .more-a
+
+    width: 25%
+
+.logo
+  position: relative
+  display: -webkit-box
+  -webkit-box-align: center
+  -webkit-box-pack: center
+  background: #fff
+  height: 2.5rem
+  img
+    display: block
+    width: 3.45rem
+    margin-left: .75rem
+  .head-right
+    -webkit-box-flex: 1
+    text-align: right
+    color: #666666
+    font-size: $font-size16
+    padding: .4rem
+
+
+.list-banner
+  margin-bottom: $margin-bottom
+  width: 100%
+  height: 7.25rem
+  .swiper-container
+    width: 100%
+    height: 100%
+  a
+    display: block
+  img
+    width: 100%
+    display: block
+    height: 100%
+
+
+.list-body
+  //margin-bottom: 2.95rem
+.list-section
+  position: relative
+  margin-bottom: $margin-bottom
+  border-top: 1px solid #e8e8e8
+  background: #fff
+  &:last-child
+    margin-bottom: 0
+  &:active
+    background: $active-color
+.section-head
+  border-bottom: 1px solid #f0f0f0
+  text-align: left
+  height: 1.7rem
+  line-height: 1.7rem
+  padding-right: .55rem
+  font-size: $body-fontSize
+  display: block
+  white-space: nowrap
+  text-overflow: ellipsis
+  overflow: hidden
+  .head-prompt
+    color: #fff
+    background: #72bf64
+    padding: .05rem .45rem .05rem .75rem
+    border-bottom-right-radius: .75rem
+    border-top-right-radius: .75rem
+  .head-tit
+    margin-left: .55rem
+    color: $list-titColor
+.section-body
+  display: -webkit-box
+  font-size: $body-fontSize
+  border-bottom: 2px solid #e8e8e8
+  .body-left
+    -webkit-box-flex: 1
+    display: -webkit-box
+    -webkit-box-align: end
+    padding: 0.53rem 0 0.53rem 0.75rem
+  .body-Profit
+    -webkit-box-flex: 1
+  .profit-cont
+    position: relative
+    display: inline-block
+  .profit-math
+    position: relative
+    .profit-num
+      font-size: 1.275rem
+      line-height: 1.275rem
+    .profit-add, .profit-addNum
+      font-size: 1.05rem
+  //list页 datalist两种状态亮色和灰色  blue为抢购中 hui为其他状态
+  .profit-blue
+    .profit-num,.prpfit-add
+      color: #f26a6a
+    .profit-sign
+      color: #fac3c3
+    .profit-addNum
+      color: #4e7cda
+    .profit-addNumsign
+      color: #abccf7
+  .profit-hui
+    .profit-num,.prpfit-add,.profit-addNum
+      color: $list-titColor
+    .profit-sign,.profit-addNumsign
+      color: #989898
+
+
+  .profit-tit
+    position: relative
+    left: 50%
+    width: 2.6rem
+    margin-left: -1.3rem
+    line-height: .7rem
+    color: #b6b6b6
+  .time-tit
+    text-align: center
+    color: #b6b6b6
+    line-height: .7rem
+  .body-time
+    width: 4.86rem
+    .time-num
+      text-align: center
+      color: #989898
+      em
+        font-size: 1.05rem
+        font-style: normal
+        color: $list-titColor
+
+  .body-right
+    width: 4.685rem
+    padding: 0 .75rem .5rem 0
+    display: -webkit-box
+    -webkit-box-align: end
+    -webkit-box-pack: end
+    .btn-body
+      border-radius: 0.2rem
+      width: 3.5rem
+      height: 1.85rem
+      display: inline-block
+      line-height: 1.85rem
+      text-align: center
+    //list页按钮四种状态
+    .btn-blue
+      border: 1px solid $protucd-blue
+      color: #4e7cda
+    .btn-red
+      border: 1px solid $protucd-red
+      color: $protucd-red
+    .btn-lightblue
+      border: 1px solid $protucd-lightblue
+      color: $protucd-lightblue
+    .btn-grey
+      border: 1px solid $protucd-grey
+      color: $protucd-grey
+.progress-broderNormal
+  border-bottom: 1px solid #e8e8e8
+.section-progressd
+  height: 2px
+  background: #abccf7
+  position: absolute
+  bottom: 0
+  left: 0
+.list-load
+  text-align: center
+  font-size: $font-size12
+  color: #9B9B9B
+  margin: .5rem 0 3rem 0
+  .load-text
+    margin-bottom: .3rem
+  .load
+    height: .4rem
+    background: url("/static/imgs/mobile/list/list_down.png") no-repeat center
+    background-size: 1.1rem
+
+
+
+
+
+
