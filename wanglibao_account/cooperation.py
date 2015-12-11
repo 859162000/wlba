@@ -1066,10 +1066,9 @@ class RockFinanceRegister(CoopRegister):
 
         logger.debug(u"user:%s, order_id:%s, 运行开关:%s, 开放时间:%s, 结束时间:%s, 总票数:%s" % (user, order_id, is_open, start_time, end_time, amount))
 
-        binding = Binding.objects.filter(user_id=user.id).first()
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
 
-        if binding and p2p_record and p2p_record.order_id == int(order_id):
+        if p2p_record and p2p_record.order_id == int(order_id):
             # 1: 如果活动没有打开
             if is_open == "false":
                 logger.debug(u'开关没打开')
