@@ -46,7 +46,7 @@ def add_bank_card(request):
     if not bank:
         return {"ret_code":20025, "message":"不支持该银行"}
 
-    exist_cards = Card.objects.filter(no=card_no, user=user).first()
+    exist_cards = Card.objects.filter(no=card_no).first()
     if exist_cards:
         return {"ret_code":20024, "message":"该银行卡已经存在"}
     exist_cards = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
