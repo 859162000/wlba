@@ -20,10 +20,9 @@ logger = logging.getLogger("weixin")
 class BaseWeixinTemplate(TemplateView):
     @weixin_api_error
     def dispatch(self, request, *args, **kwargs):
-        logger.debug("-------------------request:::::%s"%request.__dict__)
         code = request.GET.get('code')
         state = request.GET.get('state')
-        error_msg = "code or state is None"
+        error_msg = ""
         if code and state:
             account = WeixinAccounts.getByOriginalId(state)
             request.session['account_key'] = account.key
@@ -36,6 +35,8 @@ class BaseWeixinTemplate(TemplateView):
                 error_msg = "error"
             if not w_user.user:
                 error_msg = u"请先绑定网利宝账号"
+        else:
+            error_msg = "code or state is None"
         if error_msg:
             from .views import redirectToJumpPage
             return redirectToJumpPage(error_msg)
