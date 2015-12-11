@@ -136,6 +136,10 @@
                 }
             }
         )
+        //var d = new Date()
+        //d.setFullYear(2016, 1, 5)
+        //document.write(d)
+
         var va = "";
 
         function get_radio_value(field) {
@@ -168,15 +172,19 @@
                 ;
                 var vae = vaw.substring(0, vaw.length - 1);
                 var ss = vae.split(",");
-                var max=Math.max.apply(null, ss);
+                var max = Math.max.apply(null, ss);
                 $.each(htm, function (i, o) {
                     var paio = $(o).text();
-                    for (var i in damai['records']) {
+                    var paioshu = damai['records']
+                    for (var i in paioshu) {
 
                         if (i == paio) {
-                            $(o).parent().find('span').html(damai['records'][i]);
+                            if (paioshu[i] < 10) {
+                                paioshu[i] = "0" + paioshu[i];
 
-                            $(o).parent().find('.xuan-tiao1').html('<div class=tiao style="width:' + (damai['records'][i]) / max * 100 + '% "></div>');
+                            }
+                            $(o).parent().find('span').html(paioshu[i]);
+                            $(o).parent().find('.xuan-tiao1').html('<div class=tiao style="width:' + (paioshu[i]) / max * 100 + '% "></div>');
                         }
                     }
 
