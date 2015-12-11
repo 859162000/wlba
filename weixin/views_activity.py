@@ -20,6 +20,7 @@ logger = logging.getLogger("weixin")
 class BaseWeixinTemplate(TemplateView):
     @weixin_api_error
     def dispatch(self, request, *args, **kwargs):
+        logger.debug("-------------------request:::::%s"%request.__dict__)
         code = request.GET.get('code')
         state = request.GET.get('state')
         error_msg = "code or state is None"
