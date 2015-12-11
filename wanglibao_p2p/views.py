@@ -30,7 +30,7 @@ from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, War
     P2PProductContract, InterestPrecisionBalance, P2PRecord, ContractTemplate
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
-from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags, AmortizationCalculator
+from wanglibao_p2p.utility import AmortizationCalculator
 from wanglibao.const import ErrorNumber
 from django.conf import settings
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
@@ -50,12 +50,14 @@ from exceptions import PrepaymentException
 from django.core.urlresolvers import reverse
 import re
 from celery.execute import send_task
-from wanglibao_redis.backend import redis_backend
+
 import pickle
 from misc.models import Misc
 import json
 from wanglibao_activity import backends as activity_backends
 from wanglibao_rest.common import DecryptParmsAPIView
+from wanglibao_redis.backend import redis_backend
+from .common import get_p2p_list
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -813,17 +815,3 @@ def get_p2p_list_slow():
 
     return p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list
 
-def get_p2p_list():
-
-    cache_backend = redis_backend()
-
-    p2p_all = P2PProduct.objects.select_related('warrant_company', 'activity__rule') \
-        .filter(hide=False).filter(Q(status_int__gte=6)).filter(Q(publish_time__lte=timezone.now())) \
-        .order_by('-status_int', '-publish_time', '-soldout_time', '-priority')
-
-    p2p_done_list = cache_backend.get_p2p_list_from_objects_by_status(p2p_all, 9)
-    p2p_full_list = cache_backend.get_p2p_list_from_objects_by_status(p2p_all, 8)
-    p2p_repayment_list = cache_backend.get_p2p_list_from_objects_by_status(p2p_all, 7)
-    p2p_finished_list = cache_backend.get_p2p_list_from_objects_by_status(p2p_all, 6)
-
-    return p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list

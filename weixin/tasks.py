@@ -3,74 +3,35 @@
 
 from wanglibao.celery import app
 from wanglibao_p2p.models import P2PProduct
-from django.contrib.auth.models import User
 import re
 import json
 from django.conf import settings
 from django.utils import timezone
-from decimal import Decimal
 import datetime
 
 from weixin.models import SubscribeRecord, SubscribeService, WeixinUser
-from weixin.constant import MessageTemplate, PRODUCT_ONLINE_TEMPLATE_ID, BIND_SUCCESS_TEMPLATE_ID
+from weixin.constant import MessageTemplate, PRODUCT_ONLINE_TEMPLATE_ID
 from weixin.util import sendTemplate
-from wanglibao_redpack.models import RedPackRecord, RedPackEvent
-from wanglibao_redpack.backends import get_start_end_time, local_transform_str,stamp
-from wanglibao_activity.backends import check_activity
-from wanglibao_activity.models import ActivityRule
+from weixin.constant import BIND_SUCCESS_TEMPLATE_ID
+
 
 @app.task
 def bind_ok(openid, is_first_bind):
-    # , is_first_bind, redpack_record_id
-#     [2015-12-09 19:43:00,436: ERROR/MainProcess] Task weixin.tasks.bind_ok[35fe1c18-6abb-4981-90ed-a2d15b945081] raised unexpected: AttributeError("'QuerySet' object has no attribute 'created_at'",)
-# Traceback (most recent call last):
-#   File "/usr/local/lib/python2.7/dist-packages/celery/app/trace.py", line 240, in trace_task
-#     R = retval = fun(*args, **kwargs)
-#   File "/usr/local/lib/python2.7/dist-packages/celery/app/trace.py", line 437, in __protected_call__
-#     return self.run(*args, **kwargs)
-#   File "/home/wanglibao-dev/wangli-backend/wanglibao-backend/weixin/tasks.py", line 40, in bind_ok
-#     redpack_record.created_at, redpack_event.available_at, redpack_event.unavailable_at)
-# AttributeError: 'QuerySet' object has no attribute 'created_at
-
     weixin_user = WeixinUser.objects.get(openid=openid)
     now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
-    check_activity(weixin_user.user, 'first_bind_weixin', "weixin")
-
     if is_first_bind:
-        rule = ActivityRule.objects.filter(trigger_node='first_bind_weixin').first()
-        if rule:
-            event_id = rule.redpack
-            redpack_event = RedPackEvent.objects.filter(id=event_id).first()
-            redpack_record = RedPackRecord.objects.filter(redpack__event=redpack_event, user=weixin_user.user).first()
-            if redpack_record:
-                # 获赠红包：20元
-                # 起投金额：2000元
-                # 有效期：**年**月**日（自领取之日起7天有效）
-                start_time, endtime = get_start_end_time(redpack_event.auto_extension, redpack_event.auto_extension_days,
-                                                  redpack_record.created_at, redpack_event.available_at, redpack_event.unavailable_at)
-                remark = u"获赠红包：%s元\n起投金额：%s元\n有效期至：%s\n您可以使用下方微信菜单进行更多体验。"%(redpack_event.amount,
-                                                                             redpack_event.invest_amount, datetime.datetime.fromtimestamp(stamp(endtime)).strftime('%Y年%m月%d日'))
-                sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
-                                            "openid":weixin_user.openid,
-                                            "template_id":BIND_SUCCESS_TEMPLATE_ID,
-                                            "name1":"",
-                                            "name2":weixin_user.user.wanglibaouserprofile.phone,
-                                            "time":now_str+'\n',
-                                            "remark":remark
-                                                })},
-                                            queue='celery02'
-                                            )
-                return
-    sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
-                                "openid":weixin_user.openid,
-                                "template_id":BIND_SUCCESS_TEMPLATE_ID,
-                                "name1":"",
-                                "name2":weixin_user.user.wanglibaouserprofile.phone,
-                                "time":now_str,
-                                    })},
-                                queue='celery02'
-                                )
-
+        from wanglibao_activity.backends import check_activity
+        check_activity(weixin_user.user, 'first_bind_weixin', "weixin", is_first_bind=is_first_bind)
+    else:
+        sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
+                                    "openid":weixin_user.openid,
+                                    "template_id":BIND_SUCCESS_TEMPLATE_ID,
+                                    "name1":"",
+                                    "name2":weixin_user.user.wanglibaouserprofile.phone,
+                                    "time":now_str,
+                                        })},
+                                    queue='celery02'
+                                    )
 @app.task
 def detect_product_biding(product_id):
     product = P2PProduct.objects.get(pk=product_id)
