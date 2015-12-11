@@ -67,8 +67,8 @@
                 } else {
                     inp.prop("checked", true);
                     self.attr('id', id);
-                }
-            }
+                };
+            };
 
             $('.labelone').click(function () {
                 setInp($(this), "checked1");
@@ -89,9 +89,8 @@
                             cur = inp.eq(i);
                             if (cur.is(":checked")) {
                                 chked += cur.val() + ',';
-                            }
-                        }
-
+                            };
+                        };
                         var vaq = chked.substring(0, chked.length - 1);
                         if (vaq == '') {
                             $('.tishi').html('请至少选一个');
@@ -108,14 +107,12 @@
                                     $('.tishi').html('投票成功');
                                     $('.ww').click(function () {
                                         $('.tishi').html('只能投一次');
-                                    })
-                                }
-                                ;
-                            })
-                        }
-                    }
-                }
-            )
+                                    });
+                                };
+                            });
+                        };
+                    };
+                });
             //投票截止日期
             function TimeTo(dd) {
                 var t = new Date(dd),//取得指定时间的总毫秒数
@@ -128,15 +125,15 @@
 
                     clearInterval(window['ttt']);//清除计时器
                     return;//结束执行
-                }
-            }
+                };
+            };
 
-            temer()
+            temer();
             function temer() {
                 window['ttt'] = setInterval(function () {
                     TimeTo('2016/1/6 00:00:00');//定义倒计时的结束时间，注意格式
                 }, 1000);//定义计时器，每隔1000毫秒 也就是1秒 计算并更新 div的显示
-            }
+            };
             //请求票数接口
             redpack();
             function redpack() {
@@ -149,8 +146,7 @@
                     var vaw = '';
                     for (var i in damai['records']) {
                         vaw += damai['records'][i] + ",";
-                    }
-                    ;
+                    };
                     var vae = vaw.substring(0, vaw.length - 1);
                     var ss = vae.split(",");//string变数组用逗号分割
                     var max = Math.max.apply(null, ss);//取数组最大值
@@ -166,13 +162,10 @@
                                 }
                                 $(o).parent().find('span').html(paioshu[i]);
                                 $(o).parent().find('.xuan-tiao1').html('<div class=tiao style="width:' + (paioshu[i]) / max * 100 + '% "></div>');
-                            }
-                        }
-                    })
-                })
-            }
-        }
-    )
-    ;
-
+                            };
+                        };
+                    });
+                });
+            };
+        });
 })();
