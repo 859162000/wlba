@@ -37,9 +37,10 @@ class IdVerification(models.Model):
             # 只有生产环境可以实现更新操作
             if ENV == ENV_PRODUCTION:
                 verify_result, _id_photo = get_verify_result(self.id_number, self.name)
-                if verify_result and _id_photo:
+                if verify_result:
                     self.is_valid = True
-                    self.id_photo.save('%s.jpg' % self.id_number, _id_photo, save=True)
+                    if _id_photo:
+                        self.id_photo.save('%s.jpg' % self.id_number, _id_photo, save=True)
 
         super(IdVerification, self).save(*args, **kwargs)
 
