@@ -67,7 +67,7 @@ class Bank(models.Model):
         return Bank.objects.all().exclude(channel__isnull=True).exclude(kuai_code__isnull=True).exclude(huifu_bind_code__isnull=True).exclude(yee_bind_code__isnull=True).select_related()
 
 class Card(models.Model):
-    no = models.CharField(max_length=25, verbose_name=u'卡号')
+    no = models.CharField(max_length=25, verbose_name=u'卡号', db_index=True)
     bank = models.ForeignKey(Bank, on_delete=models.PROTECT)
     user = models.ForeignKey(User)
     is_default = models.BooleanField(verbose_name=u'是否为默认', default=False)
