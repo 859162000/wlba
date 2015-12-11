@@ -1,0 +1,26 @@
+doctype html
+html
+  head
+    title 兑换记录
+    include include/fuel_head.jade
+  body
+    nav.records-nav
+      ul
+        li.active
+          a(href="/weixin/transaction/repaying/") 待收
+        li
+          a(href="/weixin/transaction/buying/") 已收到未领取
+    .records-exchange-item
+      mixin list()
+        .records-exchange-list
+          .records-card-date 15-10-11
+          .records-card-count 150元理财加油卡 x 1
+          //a(href='#').records-show-card 查看卡密
+
+      +list()
+      +list()
+      +list()
+      +list()
+      +list()
+      +list()
+      +list()

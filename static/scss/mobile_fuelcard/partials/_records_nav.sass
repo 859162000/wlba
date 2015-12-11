@@ -1,0 +1,36 @@
+.records-nav
+  position: relative
+  ul
+    display: -webkit-box
+    display: -ms-flexbox
+    li
+      position: relative
+      -webkit-box-flex: 1
+      -ms-flex: 1
+      font-size: .6rem
+      color: #666
+      text-align: center
+      background: #fff
+      &:after
+        content: ''
+        position: absolute
+        top: 50%
+        right: 0
+        width: 1px
+        height: .8rem
+        margin-top: -.4rem
+        background: #E5E5E5
+      &:last-child
+        border-right: 0
+        &:after
+          width: 0
+    a
+      display: block
+      height: 2.2rem
+      line-height: 2.2rem
+      text-align: center
+      border-bottom: 1px solid #e8e8e8
+    li.active
+      color: #5DB5F2
+      a
+        border-bottom: .2rem solid #5DB5F2
