@@ -1,0 +1,24 @@
+doctype html
+html
+  head
+    title 银行卡
+    include include/fuel_head.jade
+  body
+    .fuel-bank
+      .fuel-un-bank
+        .unbank-icon
+        .unbank-text 添加银行卡
+        .unbank-arrow
+
+      .fuel-true-bank
+        .bank-detail
+          .bank-company
+            img(src='/static/imgs/mobile_fuelcard/bank/nonghang.png').bank-company-icon
+            .bank-company-information
+              .bank-company-name 农业银行
+              .bank-company-type 储蓄卡
+
+          .bank-number 6234******12
+        .bank-dec 已绑定
+
+      .fuerl-dec-sign 绑定银行卡后，<br/>即可享受快捷支付、同卡进出等服务

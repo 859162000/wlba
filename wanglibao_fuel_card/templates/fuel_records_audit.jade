@@ -1,0 +1,32 @@
+doctype html
+html
+  head
+    title 购买记录
+    include include/fuel_head.jade
+  body
+    nav.records-nav
+      ul
+        li.active
+          a(href="/weixin/transaction/repaying/") 审核中
+        li
+          a(href="/weixin/transaction/buying/") 生效中
+        li
+          a(href="/weixin/transaction/finished/") 已完成
+
+
+    .records-item
+      mixin list()
+        .records-list.records-list-blue
+          .records-card-amount
+            span.amount 4000
+            |元
+          .records-card-detail
+            .records-name 初级理财加油卡
+            .records-dec
+              span.records-propress-text 已得150元理财加油卡
+              span.records-propress-num 2/3
+            .records-date 2015-11-10
+
+      +list()
+      +list()
+      +list()
