@@ -286,6 +286,27 @@ class YueLiBaoCheck(APIView):
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
+class YueLiBaoCommission(APIView):
+    """
+    author: Zhoudong
+    http请求方式: GET  根据用户ID 得到用户可用余额。
+    http://xxxxxx.com/php/commission/?product_id=11111
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    def get(self, request):
+        try:
+            product_id = self.request.REQUEST.get('product_id')
+            calc_php_commission(product_id)
+            ret = {'status': 1, 'msg': 'success'}
+        except Exception, e:
+            ret = {'status': 0, 'msg': str(e)}
+
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
 class YueLiBaoCancel(APIView):
     """
     author: Zhoudong
@@ -302,11 +323,11 @@ class YueLiBaoCancel(APIView):
         msg_list = []
         ret = dict()
 
-        product_id = eval(request.POST.get('product_id'))
+        tokens = eval(request.POST.get('tokens'))
 
         try:
             with transaction.atomic(savepoint=True):
-                month_products = MonthProduct.objects.filter(product_id=product_id)
+                month_products = MonthProduct.objects.filter(token__in=tokens)
                 for product in month_products:
                     user = product.user
                     product_id = product.product_id

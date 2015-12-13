@@ -7,8 +7,7 @@ from wanglibao.celery import app
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db import transaction
-from wanglibao_margin.models import Margin, MonthProduct
-from wanglibao_margin.php_utils import php_commission_exist
+from wanglibao_margin.models import Margin
 from wanglibao_reward.models import WanglibaoUserGift
 from wanglibao_p2p.models import P2PProduct
 from wanglibao_account import message as inside_message
@@ -19,7 +18,7 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_sms.send_php import PHPSendSMS
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_activity import backends as activity_backends
-from wanglibao_redpack.models import Income, RedPackEvent, RedPack, RedPackRecord
+from wanglibao_redpack.models import Income, RedPackEvent, RedPack, RedPackRecord, PhpIncome
 import datetime
 import json
 from django.db.models import Sum, Count, Q
@@ -237,23 +236,6 @@ def calc_broker_commission(product_id):
             redpack_backends.commission(equity.user, product, equity.equity, start, end)
 
 
-#  TODO 对月利宝进行全民淘金处理, 并加入短信发送统计.
-@app.task
-def calc_php_commission(product_id):
-    if not product_id:
-        return
-
-    month_products = MonthProduct.objects.filter(product_id=product_id)
-    if php_commission_exist(product_id):
-        return
-
-    start = timezone.datetime(2015, 6, 22, 16, 0, 0, tzinfo=timezone.utc)
-    end = timezone.datetime(2016, 6, 30, 15, 59, 59, tzinfo=timezone.utc)
-    with transaction.atomic():
-        for product in month_products:
-            redpack_backends.commission(product.user, product, product.amount, start, end)
-
-
 @app.task
 def send_income_message_sms():
     today = datetime.datetime.now()
@@ -307,6 +289,90 @@ def send_income_message_sms():
         send_messages.apply_async(kwargs={
             "phones": phones_list,
             "messages": messages_list,
+        })
+
+
+@app.task
+def send_commission_income_message_sms():
+    today = datetime.datetime.now()
+    yesterday = today - datetime.timedelta(days=1)
+    start = timezone.datetime(yesterday.year, yesterday.month, yesterday.day, 20, 0, 0)
+    end = timezone.datetime(today.year, today.month, today.day, 20, 0, 0)
+    incomes = Income.objects.filter(created_at__gte=start, created_at__lt=end)
+    php_incomes = PhpIncome.objects.filter(created_at__gte=start, created_at__lt=end)
+
+    python_users = set([income.user for income in incomes])
+    php_users = set([income.user for income in php_incomes])
+
+    # all_users = python_users.union(php_users)             # 所有主动邀请了投资的用户集合
+    same_users = python_users.intersection(php_users)       # 同时在python和php都有佣金收入的用户
+    php_only_users = php_users.difference(python_users)     # 只在php有佣金收入的用户
+
+    python_incomes = incomes.values('user').annotate(Count('invite', distinct=True)).annotate(Sum('earning'))
+
+    phones_list = []
+    messages_list = []
+    # 这个在老平台的基础上去处理php的用户佣金的计算方法, 肯定会慢好多, 看情况是否要进行紧急优化
+    if python_incomes:
+        for income in python_incomes:
+            user_info = User.objects.filter(id=income.get('user'))\
+                .select_related('user__wanglibaouserprofile').values('wanglibaouserprofile__phone')
+            phones_list.append(user_info[0].get('wanglibaouserprofile__phone'))
+            user = User.objects.get(id=income.get('user'))
+            earning = income.get('earning__sum')
+            invite_count = income.get('invite__count')
+
+            if user in same_users:
+                earning += php_incomes.filter(user=user).aggregate(Sum('earning'))['earning__sum'] or 0
+                invite_count += php_incomes.filter(user=user).\
+                    values('user').annotate(Count('invite', distinct=True))[0]['invite__count']
+
+            messages_list.append(messages.sms_income(user.wanglibaouserprofile.name,
+                                                     invite_count,
+                                                     earning
+                                                     )
+                                 )
+
+            # 站内信和短信内容都加上 月利宝的全民淘金
+            # 发送站内信
+            title, content = messages.msg_give_income(invite_count, earning)
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": income.get('user'),
+                "title": title,
+                "content": content,
+                "mtype": "invite"
+            })
+
+        # 批量发送短信
+        send_messages.apply_async(kwargs={
+            "phones": phones_list,
+            "messages": messages_list
+        })
+    if php_only_users:
+        php_incomes_only = php_incomes.filter(user__in=php_only_users).\
+            values('user').annotate(Count('invite', distinct=True)).annotate(Sum('earning'))
+        for income in php_incomes_only:
+            user_info = User.objects.filter(id=income.get('user'))\
+                .select_related('user__wanglibaouserprofile').values('wanglibaouserprofile__phone')
+            phones_list.append(user_info[0].get('wanglibaouserprofile__phone'))
+            user = User.objects.get(id=income.get('user'))
+            messages_list.append(messages.sms_income(user.wanglibaouserprofile.name,
+                                                     income.get('invite__count'),
+                                                     income.get('earning__sum')))
+
+            # 发送站内信
+            title, content = messages.msg_give_income(income.get('invite__count'), income.get('earning__sum'))
+            inside_message.send_one.apply_async(kwargs={
+                "user_id": income.get('user'),
+                "title": title,
+                "content": content,
+                "mtype": "invite"
+            })
+
+        # 批量发送短信
+        send_messages.apply_async(kwargs={
+            "phones": phones_list,
+            "messages": messages_list
         })
 
 

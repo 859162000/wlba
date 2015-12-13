@@ -17,7 +17,7 @@ from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsV
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_margin.php_api import GetUserInfo, GetMarginInfo, SendInsideMessage, CheckTradePassword, YueLiBaoBuy, \
-    YueLiBaoCheck, YueLiBaoCancel, YueLiBaoRefund, AssignmentOfClaimsBuy
+    YueLiBaoCheck, YueLiBaoCancel, YueLiBaoRefund, AssignmentOfClaimsBuy, YueLiBaoCommission, logout_with_cookie
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
@@ -195,6 +195,7 @@ urlpatterns += patterns(
 
     url(r'^php/yue/buy/$', YueLiBaoBuy.as_view(), name='php_buy_yuelibao'),
     url(r'^php/yue/check/$', YueLiBaoCheck.as_view(), name='php_check_yuelibao'),
+    url(r'^php/yue/commission/$', YueLiBaoCommission.as_view(), name='php_commission_for_yuelibao'),
     url(r'^php/yue/cancel/$', YueLiBaoCancel.as_view(), name='php_cancel_yuelibao'),
     url(r'^php/yue/refund/$', YueLiBaoRefund.as_view(), name='php_refund_yuelibao'),
 

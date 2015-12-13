@@ -295,6 +295,9 @@ def php_commission(user, product_id, start, end):
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> wrapper import error fixed
 # TODO 对月利宝进行全民淘金处理, 并加入短信发送统计.
 def calc_php_commission(product_id):
     """
@@ -318,8 +321,11 @@ def calc_php_commission(product_id):
             php_commission(user, product_id, start, end)
 
 
+<<<<<<< HEAD
 =======
 >>>>>>> update user info in redis
+=======
+>>>>>>> wrapper import error fixed
 def get_php_redis_principle(user_id):
     """
     从redis 或者 api接口 得到用户的待收本金
