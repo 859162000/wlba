@@ -47,7 +47,7 @@ from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import UserThreeOrder
 from wanglibao_redis.backend import redis_backend
 from dateutil.relativedelta import relativedelta
-from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes, hex2bin
+from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes
 from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift
 import re
@@ -1049,13 +1049,15 @@ class ZGDXRegister(CoopRegister):
     # def get_channel_user_from_session(self):
     #     return self.request.session.get(self.internal_channel_user_key, '00000')
 
-    def zgdx_call_back(self, plat_offer_id):
+    def zgdx_call_back(self, user, plat_offer_id, order_id=None):
         if datetime.datetime.now().day >= 28:
             effect_type = '1'
         else:
             effect_type = '0'
-        request_no = hashlib.md5(str(uuid.uuid1())).hexdigest()[1:-1]
-        phone_id = WanglibaoUserProfile.objects.get(user_id=self.user.id).phone
+
+        request_no_prefix = order_id or str(user.id) + timezone.now().strftime("%Y%m%d%H%M%S")
+        request_no = request_no_prefix + '_' + plat_offer_id
+        phone_id = WanglibaoUserProfile.objects.get(user_id=user.id).phone
         code = {
             'request_no': request_no,
             'phone_id': phone_id,
@@ -1068,7 +1070,7 @@ class ZGDXRegister(CoopRegister):
         }
         encrypt_str = encrypt_mode_cbc(json.dumps(code), self.coop_key, self.iv)
         params = {
-            'code': encodeBytes(hex2bin(encrypt_str)),
+            'code': encodeBytes(encrypt_str),
             'partner_no': self.partner_no,
         }
 
@@ -1107,7 +1109,7 @@ class ZGDXRegister(CoopRegister):
                         plat_offer_id = '104372'
                 else:
                     plat_offer_id = '103050'
-                self.zgdx_call_back(user, plat_offer_id)
+                self.zgdx_call_back(user, plat_offer_id, order_id)
 
 
 class JuChengRegister(CoopRegister):

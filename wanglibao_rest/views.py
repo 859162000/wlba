@@ -1192,3 +1192,34 @@ class DistributeRedpackView(APIView):
             if redpack_event:
                 redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
 
+
+class DataCubeApiView(APIView):
+    """
+    数据魔方查询接口
+    chenweibin@20151208
+    """
+    permission_classes = ()
+
+    def __init__(self):
+        super(DataCubeApiView, self).__init__()
+        self.request_url = settings.DATACUBE_URL
+
+    def get(self, request):
+        logger.info('data cupe Enter connect')
+        try:
+            data = requests.get(url=self.request_url).json()
+            _response = {
+                'ret_code': 10000,
+                'message': 'success',
+                'result': data,
+            }
+            logger.info('data cupe return:%s' % data)
+        except Exception, e:
+            logger.info('data cupe connect faild to %s' % self.request_url)
+            logger.info(e)
+            _response = {
+                'ret_code': 50001,
+                'message': 'api error',
+            }
+
+        return HttpResponse(json.dumps(_response), content_type='application/json')

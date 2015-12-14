@@ -5,6 +5,7 @@ from django.conf.urls import patterns, include, url
 
 from django.contrib import admin
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, RedirectView
 from wanglibao.views import IndexView, SecurityView, PartnerView
 # from wanglibao_account.cooperation import YiruiteQuery, TianmangRegisterQuery, TianmangIDVerificationQuery, \
@@ -102,6 +103,7 @@ urlpatterns = patterns(
     url(r'^landpage/', landpage_view),
 
     url(r'^finance', TemplateView.as_view(template_name="financing.jade")),
+    url(r'^data_cube', TemplateView.as_view(template_name="data_cube.jade")),
 )
 
 urlpatterns += patterns(
@@ -173,6 +175,10 @@ urlpatterns += patterns(
     url(r'^aws/$', AppShareViewShort.as_view(), name="app_invite"),
     url(r'^wst/(?P<phone>\w+)', AppShareViewSuccess.as_view(), name="app_invite_success"),
     url(r'^wsf/(?P<phone>\w+)', AppShareViewError.as_view(), name="app_invite_error"),
+    url(r'^app-invite-server/$', TemplateView.as_view(template_name="app_invite_server.jade")),
+
+    #url(r'^rock/finance/qrcode/$', TemplateView.as_view(template_name="qrcode.jade")),
+
 )
 
 # 短信
