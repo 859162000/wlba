@@ -220,8 +220,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 ;org.area = (function (org) {
     var lib = {
         init: function () {
-            lib.slide();
-
             var page = 2, pagesize = 6, latestPost = false;
 
             var $latest =$('.area-latest-btn'),
@@ -260,61 +258,34 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             })
         },
 
+
+    }
+    return {
+        init: lib.init
+    }
+})(org);
+
+org.milepost = (function (org) {
+    var lib = {
+        init: function () {
+            lib.slide();
+
+        },
+
         slide: function () {
             var milepost = false,
                 $milepostBtn = $('.area-milepost-btn'),
                 $milepostMore = $('.area-milepost-more'),
                 $milepostPush =$('.area-milepost-push'),
                 $slideLine = $('.slide-bottom'),
-                $milepostLoad = $('.area-milepost-loading'),
-                $milepost = $('.area-milepost'),
-                myswiper = new Swiper('.swiper-container', {
-                    loop: false,
-                    lazyLoading: false,
-                    onInit: function(swiper){
-                        if(location.hash == '' || location.hash == '#0'){
-                            swiper.slideTo(0, 0, true);
-                        }
-
-                        if(location.hash == '#1'){
-                            swiper.slideTo(1, 0, true);
-                        }
-
-                        $('.tab-nav li').eq(swiper.activeIndex).addClass('active').siblings().removeClass('active');
-                    },
-                    onSliderMove: function (swiper) {
-                        var translateX = -(swiper.getWrapperTranslate() / 2)
-                        $slideLine.css('-webkit-transform', 'translate3d(' + translateX + 'px, 0, 0)')
-                    },
-                    onTouchEnd: function (swiper) {
-                        var translateX = 100 * swiper.activeIndex + '%';
-                        $slideLine.css('-webkit-transform', 'translate3d(' + translateX + ', 0, 0)')
-                    },
-                    onSlideChangeStart: function (swiper) {
-                        var translateX = 100 * swiper.activeIndex + '%';
-                        $slideLine.css('-webkit-transform', 'translate3d(' + translateX + ', 0, 0)')
-                        location.hash = '#' + swiper.activeIndex;
-                        if(swiper.activeIndex === 1 && $milepost.attr('data-active') != 'true'){
-                            doing(1, function(){
-                                $milepostLoad.hide()
-                            })
-                        }
-                    }
-                });
-            $('.tab-nav li').on('touchend click', function () {
-                var index = $(this).index();
-                $(this).addClass('active').siblings().removeClass('active');
-                location.hash = '#' + index;
-                myswiper.slideTo(index, 400, true);
-            });
+                $milepost = $('.area-milepost');
 
 
-
-
+            var page = 1;
             $milepostBtn.on('click', function(){
                 if (milepost) return;
-                var page = parseInt($milepost.attr('data-page')) + 1;
-                doing(page)
+                page = page + 1;
+                doing(page);
             });
 
 
@@ -326,7 +297,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         pagesize: 6
                     },
                     beforeSend: function(){
-                        milepost = true
+                        milepost = true;
                         $milepostBtn.text('加载中...')
                     },
                     success: function(result){
@@ -358,7 +329,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }
 })(org);
 
-;
 (function (org) {
     $.each($('script'), function () {
         var src = $(this).attr('src');

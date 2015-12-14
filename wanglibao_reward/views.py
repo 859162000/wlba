@@ -235,8 +235,14 @@ class WeixinShareDetailView(TemplateView):
             logger.debug("生成发奖记录1:gift:%s, redpack:%s, redpack_amount:%s, redpack_describe:%s" %(gift, gift.redpack, gift.redpack.amount, gift.redpack.describe))
             if user_profile:
                 if gift.redpack:
-                    redpack_backends.give_activity_redpack(user_profile.user, gift.redpack, 'pc')
-                    logger.debug("给用户 %s 发了红包，红包大小：%s, 红包组合是:%s, 购标订单号：%s" % (phone_num,gift.redpack.amount, activity, product_id))
+                    # Modify by hb on 2015-12-14
+                    #redpack_backends.give_activity_redpack_new(user_profile.user, gift.redpack, 'pc')
+                    status, messege, redpack_record_id = redpack_backends.give_activity_redpack_new(user_profile.user, gift.redpack, 'pc')
+                    if status:
+                        logger.debug("=20151214= 给用户 %s 发了红包，红包大小：%s, 红包组合是:%s, 购标订单号：%s" % (phone_num, gift.redpack.amount, activity, product_id))
+                        sending_gift.redpack_record_id = redpack_record_id
+                    else:
+                        logger.debug("=20151214= 给用户 %s 发红包失败[%s]，红包大小：%s, 红包组合是:%s, 购标订单号：%s" % (phone_num, messege, gift.redpack.amount, activity, product_id))
                     sending_gift.valid = 1
                     sending_gift.save()
 
