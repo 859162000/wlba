@@ -1,5 +1,4 @@
 # encoding:utf-8
-
 from wanglibao_p2p.models import P2PEquity
 from wanglibao_buy.models import FundHoldInfo
 from django.template import Template, Context
@@ -7,6 +6,12 @@ from django.template.loader import get_template
 from .models import WeixinAccounts
 from wechatpy import WeChatClient
 
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
+
+def redirectToJumpPage(message):
+    url = reverse('jump_page')+'?message=%s'% message
+    return HttpResponseRedirect(url)
 
 def sendTemplate(weixin_user, message_template):
     weixin_account = WeixinAccounts.getByOriginalId(weixin_user.account_original_id)

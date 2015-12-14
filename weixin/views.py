@@ -60,7 +60,8 @@ from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEven
 from experience_gold.models import ExperienceEvent
 from experience_gold.backends import SendExperienceGold
 from weixin.tasks import detect_product_biding, sentTemplate, bind_ok
-from weixin.util import sendTemplate
+from weixin.util import sendTemplate, redirectToJumpPage
+
 logger = logging.getLogger("weixin")
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
 
@@ -438,8 +439,9 @@ def getOrCreateWeixinUser(openid, weixin_account):
     if not w_user.nickname or not w_user.subscribe or not w_user.subscribe_time:
         try:
             user_info = weixin_account.db_account.get_user_info(openid)
+            print user_info
             w_user.nickname = user_info.get('nickname', "")
-            w_user.sex = user_info.get('sex')
+            w_user.sex = user_info.get('sex', 0)
             w_user.city = user_info.get('city', "")
             w_user.country = user_info.get('country', "")
             w_user.headimgurl = user_info.get('headimgurl', "")
@@ -577,16 +579,13 @@ class WeixinBind(TemplateView):
             rs, txt = bindUser(weixin_user, user)
         except WeixinUser.DoesNotExist, e:
             logger.debug("*************************"+e.message)
-            pass
         context['message'] = txt
         return {
             'context': context,
             'next': next
             }
 
-def redirectToJumpPage(message):
-    url = reverse('jump_page')+'?message=%s'% message
-    return HttpResponseRedirect(url)
+
 
 class UnBindWeiUser(TemplateView):
     template_name = 'sub_is_bind.jade'
@@ -1341,7 +1340,7 @@ class GetAuthUserInfo(APIView):
                 w_user.auth_info.save()
             user_info = oauth.get_user_info(w_user.openid, w_user.auth_info.access_token)
             w_user.nickname = user_info.get('nickname', "")
-            w_user.sex = user_info.get('sex')
+            w_user.sex = user_info.get('sex', 0)
             w_user.city = user_info.get('city', "")
             w_user.country = user_info.get('country', "")
             w_user.headimgurl = user_info.get('headimgurl', "")
@@ -1372,7 +1371,7 @@ class GetUserInfo(APIView):
         try:
             if not w_user.nickname:
                 w_user.nickname = user_info.get('nickname', "")
-                w_user.sex = user_info.get('sex')
+                w_user.sex = user_info.get('sex', 0)
                 w_user.city = user_info.get('city', "")
                 w_user.country = user_info.get('country', "")
                 w_user.headimgurl = user_info.get('headimgurl', "")
