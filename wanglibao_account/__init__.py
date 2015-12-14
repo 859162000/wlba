@@ -6,6 +6,7 @@ from django.conf import settings
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.poolmanager import PoolManager
 import ssl
+import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -57,16 +58,33 @@ class MyHttpsAdapter(HTTPAdapter):
                                        ssl_version=ssl.PROTOCOL_TLSv1)
 
 
-def get_age_from_id(id_number):
+def is_ok_age_for_id(id_number):
+    """根据身份证计算年龄并判断"""
+
     id_number = str(id_number)
     if len(id_number) == 15:
         birth_date = '19' + id_number[6:12]
     else:
         birth_date = id_number[6:14]
 
+    # 判断该身份证用户年龄是否大于18岁并小于65岁
+    current_date = datetime.datetime.now()
+    birth_date = datetime.datetime.strptime(birth_date, '%Y%m%d')
+    birth_date.replace(year=current_date.year)
+
+    if birth_date < current_date:
+        age = current_date.year - birth_date.year
+        if 18 < age < 65:
+            return True
+
+    return False
+
 
 def get_verify_result(id_number, name):
     import cgi
+
+    if not is_ok_age_for_id(id_number):
+        return False, None
 
     inConditions = u"""<?xml version="1.0" encoding="UTF-8" ?>
         <ROWS>
