@@ -26,6 +26,7 @@ import json
 
 from weixin.constant import PRODUCT_AMORTIZATION_TEMPLATE_ID
 from weixin.models import WeixinUser
+from weixin.tasks import sentTemplate
 
 
 
@@ -492,7 +493,6 @@ class AmortizationKeeper(KeeperBaseMixin):
         return amos
 
     def amortize(self, amortization, savepoint=True):
-        from weixin.tasks import sentTemplate
         with transaction.atomic(savepoint=savepoint):
             if amortization.settled:
                 raise P2PException('amortization %s already settled.' % amortization)
@@ -517,7 +517,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                 sub_amo.settled = True
                 sub_amo.settlement_time = timezone.now()
                 sub_amo.save()
-
+                
                 amo_amount = sub_amo.principal + sub_amo.interest + sub_amo.penal_interest + sub_amo.coupon_interest
 
                 phone_list.append(sub_amo.user.wanglibaouserprofile.phone)
