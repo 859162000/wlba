@@ -1116,9 +1116,9 @@ class RockFinanceRegister(CoopRegister):
                     #不知道为什么create的时候，会报错
                     img = qrcode.make("https://www.wanglibao.com/api/check/qrcode/?owner_id=%s&activity=rock_finance&content=%s"%(user.id, reward.content))
                     activity_reward.qrcode = img
-
+                    logger.debug("before save: activity_reward.qrcode:%s" % activity_reward.qrcode)
                     #将奖品通过站内信发出
-                    message_content = u"网里宝摇滚夜欢迎您的到来，点击<a href='https://www.wanglibao.com/api/rock/finance/?type=qrcode'>" \
+                    message_content = u"网利宝摇滚夜欢迎您的到来，点击<a href='https://www.wanglibao.com/rock/finance/qrcode/>" \
                                       u"获得入场二维码</a>查看，<br/> 感谢您对我们的支持与关注。<br/>网利宝"
                     inside_message.send_one.apply_async(kwargs={
                         "user_id": user.id,
@@ -1128,6 +1128,7 @@ class RockFinanceRegister(CoopRegister):
                     })
                     reward.is_used = True
                     reward.save()
+                    logger.debug("after save:activity_reward.qrcode:%s" % activity_reward.qrcode)
 
                     logger.debug(u"user:%s, 站内信已经发出, 奖品内容:%s" % (user, reward.content))
 
