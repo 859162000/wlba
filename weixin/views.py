@@ -10,14 +10,12 @@ from django.shortcuts import redirect
 from django.db.models.signals import post_save, pre_save
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import renderers
 from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
 import functools
 import re
 import random
 
-from wanglibao_account.forms import EmailOrPhoneAuthenticationForm
 from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
 from wanglibao_buy.models import FundHoldInfo
 from wanglibao_banner.models import Banner
@@ -27,10 +25,9 @@ from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from django.contrib.auth.models import User
 from constant import MessageTemplate
-from constant import (ACCOUNT_INFO_TEMPLATE_ID, BIND_SUCCESS_TEMPLATE_ID, UNBIND_SUCCESS_TEMPLATE_ID,
-                      PRODUCT_ONLINE_TEMPLATE_ID, AWARD_COUPON_TEMPLATE_ID)
+from constant import (ACCOUNT_INFO_TEMPLATE_ID, UNBIND_SUCCESS_TEMPLATE_ID,
+                      PRODUCT_ONLINE_TEMPLATE_ID)
 from weixin.util import getAccountInfo
-from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_pay.models import Bank
 from wechatpy import parse_message, create_reply, WeChatClient
 from wechatpy.replies import TransferCustomerServiceReply
@@ -50,7 +47,7 @@ import urllib
 import logging
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
-from wanglibao_p2p.views import get_p2p_list
+from wanglibao_p2p.common import get_p2p_list
 from wanglibao_redis.backend import redis_backend
 from rest_framework import renderers
 from misc.models import Misc
@@ -60,11 +57,11 @@ import datetime, time
 from .util import _generate_ajax_template
 from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEvent, UnsubscribeEvent, SubscribeEvent,\
                              TemplateSendJobFinishEvent)
-from experience_gold.models import ExperienceEvent, ExperienceEventRecord
+from experience_gold.models import ExperienceEvent
 from experience_gold.backends import SendExperienceGold
-from marketing.utils import local_to_utc
-from weixin.tasks import bind_ok, detect_product_biding, sentTemplate
-from weixin.util import sendTemplate
+from weixin.tasks import detect_product_biding, sentTemplate, bind_ok
+from weixin.util import sendTemplate, redirectToJumpPage
+
 logger = logging.getLogger("weixin")
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
 
@@ -331,14 +328,7 @@ class WeixinJoinView(View):
                 channel_digital_code = eventKey[-3:]
                 user = User.objects.filter(pk=int(user_id)).first()
                 if user:
-                    rs, txt, is_first_bind = bindUser(w_user, user)
-                    if rs == 0:
-                        bind_ok.apply_async(kwargs={
-                            "openid": fromUserName,
-                            "is_first_bind":is_first_bind,
-                        },
-                                            queue='celery01'
-                                            )
+                    rs, txt = bindUser(w_user, user)
                     channel = WeiXinChannel.objects.filter(digital_code=channel_digital_code).first()
                     if channel:
                         scene_id = channel.code
@@ -387,12 +377,12 @@ class WeixinJoinView(View):
     def getCSReply(self):
         now = datetime.datetime.now()
         weekday = now.weekday() + 1
-        if now.hour<=20 and now.hour>=9 and weekday>=1 and weekday<=5:
+        if now.hour<=17 and now.hour>=10 and weekday>=1 and weekday<=5:
             txt = u"客官，想和网利菌天南海北的聊天还是正经的咨询？不要羞涩，放马过来吧！聊什么听你的，但是网利菌在线时间为\n" \
-                  u"【周一至周五9：00~20：00】"
+                  u"【周一至周五10：00~17：00】"
         else:
             txt = u"客官，网利菌在线时间为\n"\
-                    + u"【周一至周五9：00~20：00】，请在工作与我们联系哦~"
+                    + u"【周一至周五10：00~17：00】，请在工作与我们联系哦~"
         return txt
 
     def getSignExperience_gold(self):
@@ -411,7 +401,7 @@ class WeixinJoinView(View):
         start = datetime.datetime(now.year,now.month, now.day)
         end = datetime.datetime(now.year,now.month, now.day, 23, 59, 59)
 
-        war = WeiXinUserActionRecord.objects.filter(action_type='sign_in', create_time__lt=stamp(end), create_time__gt=stamp(start)).first()
+        war = WeiXinUserActionRecord.objects.filter(user=user, action_type='sign_in', create_time__lt=stamp(end), create_time__gt=stamp(start)).first()
 
         # experience_records = ExperienceEventRecord.objects.filter(user=user, event__give_mode='weixin_sign_in',
         #                                                   created_at__lt=end, created_at__gt=start).all()
@@ -449,8 +439,9 @@ def getOrCreateWeixinUser(openid, weixin_account):
     if not w_user.nickname or not w_user.subscribe or not w_user.subscribe_time:
         try:
             user_info = weixin_account.db_account.get_user_info(openid)
+            print user_info
             w_user.nickname = user_info.get('nickname', "")
-            w_user.sex = user_info.get('sex')
+            w_user.sex = user_info.get('sex', 0)
             w_user.city = user_info.get('city', "")
             w_user.country = user_info.get('country', "")
             w_user.headimgurl = user_info.get('headimgurl', "")
@@ -471,12 +462,12 @@ def bindUser(w_user, user):
     redpack_record_id = 0
     if w_user.user:
         if w_user.user.id==user.id:
-            return 1, u'你已经绑定, 请勿重复绑定',is_first_bind
-        return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone,is_first_bind
+            return 1, u'你已经绑定, 请勿重复绑定'
+        return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone
     other_w_user = WeixinUser.objects.filter(user=user).first()
     if other_w_user:
         msg = u"你的手机号%s已经绑定微信<span style='color:#173177;'>%s</span>"%(user.wanglibaouserprofile.phone, other_w_user.nickname)
-        return 3, msg, is_first_bind
+        return 3, msg
     w_user.user = user
     w_user.bind_time = int(time.time())
     w_user.save()
@@ -486,8 +477,13 @@ def bindUser(w_user, user):
         user.wanglibaouserprofile.first_bind_time = w_user.bind_time
         user.wanglibaouserprofile.save()
         is_first_bind = True
-
-    return 0, u'绑定成功',is_first_bind
+    bind_ok.apply_async(kwargs={
+        "openid": w_user.openid,
+        "is_first_bind":is_first_bind,
+    },
+                        queue='celery01'
+                        )
+    return 0, u'绑定成功'
 
 def unbindUser(w_user, user):
     w_user.user = None
@@ -580,26 +576,16 @@ class WeixinBind(TemplateView):
         try:
             openid = self.request.GET.get('openid')
             weixin_user = WeixinUser.objects.get(openid=openid)
-            rs, txt, is_first_bind = bindUser(weixin_user, user)
-            if rs == 0:
-                bind_ok.apply_async(kwargs={
-                    "openid": openid,
-                    "is_first_bind":is_first_bind,
-                },
-                                    queue='celery01'
-                                    )
+            rs, txt = bindUser(weixin_user, user)
         except WeixinUser.DoesNotExist, e:
             logger.debug("*************************"+e.message)
-            pass
         context['message'] = txt
         return {
             'context': context,
             'next': next
             }
 
-def redirectToJumpPage(message):
-    url = reverse('jump_page')+'?message=%s'% message
-    return HttpResponseRedirect(url)
+
 
 class UnBindWeiUser(TemplateView):
     template_name = 'sub_is_bind.jade'
@@ -1354,7 +1340,7 @@ class GetAuthUserInfo(APIView):
                 w_user.auth_info.save()
             user_info = oauth.get_user_info(w_user.openid, w_user.auth_info.access_token)
             w_user.nickname = user_info.get('nickname', "")
-            w_user.sex = user_info.get('sex')
+            w_user.sex = user_info.get('sex', 0)
             w_user.city = user_info.get('city', "")
             w_user.country = user_info.get('country', "")
             w_user.headimgurl = user_info.get('headimgurl', "")
@@ -1385,7 +1371,7 @@ class GetUserInfo(APIView):
         try:
             if not w_user.nickname:
                 w_user.nickname = user_info.get('nickname', "")
-                w_user.sex = user_info.get('sex')
+                w_user.sex = user_info.get('sex', 0)
                 w_user.city = user_info.get('city', "")
                 w_user.country = user_info.get('country', "")
                 w_user.headimgurl = user_info.get('headimgurl', "")

@@ -3,6 +3,9 @@
 import requests
 import logging
 from django.conf import settings
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.poolmanager import PoolManager
+import ssl
 
 logger = logging.getLogger(__name__)
 
@@ -15,9 +18,22 @@ def parse_id_verify_response_v2(text):
     html_parser = HTMLParser.HTMLParser()
     text = html_parser.unescape(text)
 
-    root = soupparser.fromstring(text)
-    result_xm = next(root.iter('result_xm')).text.encode('utf-8')
-    result_gmsfhm = next(root.iter('result_gmsfhm')).text.encode('utf-8')
+    root = soupparser.fromstring(text.encode('utf-8'))
+    result_xm = next(root.iter('result_xm')).text
+    result_gmsfhm = next(root.iter('result_gmsfhm')).text
+
+    try:
+        _root = soupparser.fromstring(text)
+        _result_xm = next(_root.iter('result_xm')).text.encode('utf-8')
+        _result_gmsfhm = next(_root.iter('result_gmsfhm')).text.encode('utf-8')
+
+        if not(_result_xm == u'一致' == _result_gmsfhm):
+            if _result_xm == '一致' == _result_gmsfhm:
+                logger.exception('=20151211= text==>[%s], result_xm==>[%s, %s], result_gmsfhm==>[%s, %s] '
+                                 'validate parse faild.' % (text, _result_xm, type(_result_xm),
+                                                            _result_gmsfhm, type(_result_gmsfhm)))
+    except Exception, e:
+        logger.error('validate faild with error： %s ' % e)
 
     try:
         # xp's value type is base64
@@ -31,6 +47,14 @@ def parse_id_verify_response_v2(text):
         'result_gmsfhm': result_gmsfhm,
         'id_photo': id_photo,
     }
+
+
+class MyHttpsAdapter(HTTPAdapter):
+    def init_poolmanager(self, connections, maxsize, block=False):
+        self.poolmanager = PoolManager(num_pools=connections,
+                                       maxsize=maxsize,
+                                       block=block,
+                                       ssl_version=ssl.PROTOCOL_TLSv1)
 
 
 def get_verify_result(id_number, name):
@@ -73,23 +97,32 @@ def get_verify_result(id_number, name):
         "Content-Length": len(encode_request),
     }
 
-    response = requests.post(url='https://api.nciic.com.cn/nciic_ws/services/NciicServices',
-                             headers=headers,
-                             data=encode_request,
-                             verify=False)
+    s = requests.Session()
+    s.mount('https://', MyHttpsAdapter(max_retries=5))
+    response = s.post(url='https://api.nciic.com.cn/nciic_ws/services/NciicServices',
+                      headers=headers,
+                      data=encode_request,
+                      verify=False)
 
     if response.status_code != 200:
-        logger.error("Failed to send request: status: %d, ", response.status_code)
-        return None, "Failed to send request"
+        logger.error("validate failed to send request: status: %d, ", response.status_code)
+        return None, "validate failed to send request"
 
     verify_result = False
     id_photo = None
     try:
         parsed_response = parse_id_verify_response_v2(response.text)
-        if parsed_response['result_xm'] == u'一致' == parsed_response['result_gmsfhm']:
+        result_xm = parsed_response['result_xm']
+        result_gmsfhm = parsed_response['result_gmsfhm']
+        if result_xm == u'一致' == result_gmsfhm:
             verify_result = True
             id_photo = parsed_response['id_photo']
-    except StopIteration:
-        pass
+        else:
+            logger.error("id_number==>[%s], result_xm==>[%s, %s], result_gmsfhm==>[%s, %s]"
+                         " validate faild" % (id_number, result_xm, type(result_xm),
+                                              result_gmsfhm, type(result_gmsfhm)))
+    except StopIteration, e:
+        logger.error("reponse_text==>[%s]validate failed" % response.text)
+        logger.error(e)
 
     return verify_result, id_photo

@@ -2645,16 +2645,10 @@ class RockFinanceAPIView(APIView):
         if not reward:
             return Response({"code": 1003, "message": u"您没有领到对应的入场二维码"})
 
-        try:
-            img = qrcode.make("https://www.wanglibao.com/api/check/qrcode/?owner_id=%s&activity=rock_finance&content=%s"%(request.user.id, reward.content))
-        except Exception, reason:
-            logger.debug(u"生成二维码报异常,reason:%s" % reason)
-            return Response({"code": 1004, "message": u'生成二维码报异常'})
-
         if reward.is_used:  # 二维码可能被重复使用
-            return Response({"code": -1, "img": img, "message": u"您的二维码已经被使用"})
+            return Response({"code": -1, "img": reward.qrcode, "message": u"您的二维码已经被使用"})
         else:
-            return Response({"code": 0, "img": img, "message": u"得到合法二维码"})
+            return Response({"code": 0, "img": reward.qrcode, "message": u"得到合法二维码"})
 
     def get_vote_static(self):
         """

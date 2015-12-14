@@ -1,8 +1,6 @@
 org.area = (function (org) {
     var lib = {
         init: function () {
-            lib.slide();
-
             var page = 2, pagesize = 6, latestPost = false;
 
             var $latest =$('.area-latest-btn'),
@@ -41,50 +39,34 @@ org.area = (function (org) {
             })
         },
 
+
+    }
+    return {
+        init: lib.init
+    }
+})(org);
+
+org.milepost = (function (org) {
+    var lib = {
+        init: function () {
+            lib.slide();
+
+        },
+
         slide: function () {
-
-            var $slideLine = $('.slide-bottom'),
-                $milepostLoad = $('.area-milepost-loading'),
-                $milepost = $('.area-milepost'),
-                myswiper = new Swiper('.swiper-container', {
-                    loop: false,
-                    lazyLoading: false,
-                    onSliderMove: function (swiper) {
-                        var translateX = -(swiper.getWrapperTranslate() / 2)
-                        $slideLine.css('-webkit-transform', 'translate3d(' + translateX + 'px, 0, 0)')
-                    },
-                    onTouchEnd: function (swiper) {
-                        var translateX = 100 * swiper.activeIndex + '%';
-                        $slideLine.css('-webkit-transform', 'translate3d(' + translateX + ', 0, 0)')
-                    },
-                    onSlideChangeStart: function (swiper) {
-                        var translateX = 100 * swiper.activeIndex + '%';
-                        $slideLine.css('-webkit-transform', 'translate3d(' + translateX + ', 0, 0)')
-
-                        if(swiper.activeIndex === 1 && $milepost.attr('data-active') != 'true'){
-                            doing(1, function(){
-                                $milepostLoad.hide()
-                            })
-                        }
-                    }
-                });
-
-            $('.tab-nav li').on('touchend click', function () {
-                var index = $(this).index();
-                $(this).addClass('active').siblings().removeClass('active')
-                myswiper.slideTo(index, 400, true);
-            });
-
             var milepost = false,
                 $milepostBtn = $('.area-milepost-btn'),
                 $milepostMore = $('.area-milepost-more'),
-                $milepostPush =$('.area-milepost-push');
+                $milepostPush =$('.area-milepost-push'),
+                $slideLine = $('.slide-bottom'),
+                $milepost = $('.area-milepost');
 
 
+            var page = 1;
             $milepostBtn.on('click', function(){
                 if (milepost) return;
-                var page = parseInt($milepost.attr('data-page')) + 1;
-                doing(page)
+                page = page + 1;
+                doing(page);
             });
 
 
@@ -96,7 +78,7 @@ org.area = (function (org) {
                         pagesize: 6
                     },
                     beforeSend: function(){
-                        milepost = true
+                        milepost = true;
                         $milepostBtn.text('加载中...')
                     },
                     success: function(result){
@@ -128,7 +110,6 @@ org.area = (function (org) {
     }
 })(org);
 
-;
 (function (org) {
     $.each($('script'), function () {
         var src = $(this).attr('src');

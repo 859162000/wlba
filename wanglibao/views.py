@@ -18,7 +18,7 @@ import re
 from wanglibao import settings
 from wanglibao_rest import utils as rest_utils
 import logging
-from weixin.views_activity import ChannelBaseTemplate
+from weixin.base import ChannelBaseTemplate
 
 logger = logging.getLogger(__name__)
 
