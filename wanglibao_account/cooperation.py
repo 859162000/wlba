@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # encoding:utf-8
 import decimal
+from wanglibao_account.utils import FileObject
+import cStringIO
 import json
 import urllib2
 from django.utils.http import urlencode
@@ -1115,7 +1117,14 @@ class RockFinanceRegister(CoopRegister):
                 else:
                     #不知道为什么create的时候，会报错
                     img = qrcode.make("https://www.wanglibao.com/api/check/qrcode/?owner_id=%s&activity=rock_finance&content=%s"%(user.id, reward.content))
+                    _img = img.tobytes()
+                    img_handle = cStringIO.StringIO()
+                    img.save(img_handle)
+                    img_handle.seek(0)
+                    _img = FileObject(img_handle, len(_img))
+                    activity_reward.qrcode.save("rock_finance.png", _img, save=True)
                     activity_reward.qrcode = img
+                    activity_reward.save()
                     logger.debug("before save: activity_reward.qrcode:%s" % activity_reward.qrcode)
                     #将奖品通过站内信发出
                     message_content = u"网利宝摇滚夜欢迎您的到来，点击<a href='https://www.wanglibao.com/rock/finance/qrcode/>" \

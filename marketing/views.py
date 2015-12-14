@@ -2634,6 +2634,24 @@ class RewardDistributeAPIView(APIView):
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
 
+class RockFinanceQRCodeView(TemplateView):
+    template_name = 'qrcode.jade'
+
+    def get_context_data(self, **kwargs):
+
+        if not self.request.user.is_authenticated():
+            return Response({"code": 1002, "message": u"请您先登录"})
+
+        reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='rock_finance').first()
+        if not reward:
+            return Response({"code": 1003, "message": u"您没有领到对应的入场二维码"})
+
+        if reward.is_used:  # 二维码可能被重复使用
+            return Response({"code": -1, "img": reward.qrcode, "message": u"您的二维码已经被使用"})
+        else:
+            return Response({"code": 0, "img": reward.qrcode, "message": u"得到合法二维码"})
+
+
 class RockFinanceAPIView(APIView):
     permission_classes = ()
 
