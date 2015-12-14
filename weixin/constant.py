@@ -12,16 +12,28 @@ if settings.ENV == settings.ENV_PRODUCTION:
     PRODUCT_AMORTIZATION_TEMPLATE_ID = "JlRMqfGNiPdeSjTrCR9w1OUgDEusr0e3YWwqyU89vQM"#项目还款通知
     PRODUCT_INVEST_SUCCESS_TEMPLATE_ID = "jcgCbkXDebiZPe0iNP4GWkH-SK4iM-gLWRdfRxzM9Ew"#投标成功通知
 else:
-    BIND_SUCCESS_TEMPLATE_ID = "ze8Mgao5wi5SJpfkQB_OQUTiX9NqnB0V6oLsm_GaTFI"
-    UNBIND_SUCCESS_TEMPLATE_ID = "TtmpZytSck7cULmFw2Oo-LK2N2VZ5A4wQ1JpXmaoo2s"
-    ACCOUNT_INFO_TEMPLATE_ID = "RVeDKzQxeuxBXuWeZAjIyuv0olTh0HOWttFfqLhwDlU"
-    PRODUCT_ONLINE_TEMPLATE_ID = "CBIMqm2GrhDTlilYE_jLJkFxkzzOsDItSsRTDoKtO-Q"
+    BIND_SUCCESS_TEMPLATE_ID = "v9Ol0oyYuaXK893W1pnMBAcncYu4a8TGKy4VQvsalJ4"
+    UNBIND_SUCCESS_TEMPLATE_ID = "U9Py2H6uah6goLfNBsZREDkakU1iz6y_Qmxw1XgktXg"
+    ACCOUNT_INFO_TEMPLATE_ID = "1mDbMYYEtpP1IJCEW-jwe-6yed_K3ug0TrOwkN5j2xo"
+    PRODUCT_ONLINE_TEMPLATE_ID = "pzUuV-Oy08k-uGdFbR54GQpSn_HUbxHib1hwFS4vZSQ"
     AWARD_COUPON_TEMPLATE_ID  = ""
-    WITH_DRAW_SUBMITTED_TEMPLATE_ID = "pr2ECl9m81b57IwhW2O4_PmW5GeMMWpGyUg-DymwsYg"#取现已受理通知
+    WITH_DRAW_SUBMITTED_TEMPLATE_ID = "JLRdicikDz4IRO7uEmvnVoDAKsw7k95MEjU3rxP0Lmo"#取现已受理通知
     WITH_DRAW_SUCCESS_TEMPLATE_ID = ""
-    DEPOSIT_SUCCESS_TEMPLATE_ID = "_T5Akr3kBKo4gr5joQQseKqCjmAbbkawEBeHS9P4AuU"   #充值到账通知
-    PRODUCT_AMORTIZATION_TEMPLATE_ID = "h9Fxr0BbHP20wfYJ5D44YUWHaSuURmDeqngeY7NIu8o"#项目还款通知
-    PRODUCT_INVEST_SUCCESS_TEMPLATE_ID = "wbV38-H2u0LkOZRGjB3fWMpj4CczgMdAP7aiTg4SM8A"#投标成功通知
+    DEPOSIT_SUCCESS_TEMPLATE_ID = "pp4ZxU9QdaAKUBvsR5z8JtGoNn3sYMliOH3HiaUUuGk"   #充值到账通知
+    PRODUCT_AMORTIZATION_TEMPLATE_ID = "VogmmLb01RLW6RQrn3l4zpFpSh29pJw9Ki1YhnG4iPw"#项目还款通知
+    PRODUCT_INVEST_SUCCESS_TEMPLATE_ID = "dHNrT8forqmVaGHZ3LCPIBPMU3jsnNXd6tykaWzQvRk"#投标成功通知
+
+# else:#wangxiaoqing
+#     BIND_SUCCESS_TEMPLATE_ID = "ze8Mgao5wi5SJpfkQB_OQUTiX9NqnB0V6oLsm_GaTFI"
+#     UNBIND_SUCCESS_TEMPLATE_ID = "TtmpZytSck7cULmFw2Oo-LK2N2VZ5A4wQ1JpXmaoo2s"
+#     ACCOUNT_INFO_TEMPLATE_ID = "RVeDKzQxeuxBXuWeZAjIyuv0olTh0HOWttFfqLhwDlU"
+#     PRODUCT_ONLINE_TEMPLATE_ID = "CBIMqm2GrhDTlilYE_jLJkFxkzzOsDItSsRTDoKtO-Q"
+#     AWARD_COUPON_TEMPLATE_ID  = ""
+#     WITH_DRAW_SUBMITTED_TEMPLATE_ID = "pr2ECl9m81b57IwhW2O4_PmW5GeMMWpGyUg-DymwsYg"#取现已受理通知
+#     WITH_DRAW_SUCCESS_TEMPLATE_ID = ""
+#     DEPOSIT_SUCCESS_TEMPLATE_ID = "_T5Akr3kBKo4gr5joQQseKqCjmAbbkawEBeHS9P4AuU"   #充值到账通知
+#     PRODUCT_AMORTIZATION_TEMPLATE_ID = "h9Fxr0BbHP20wfYJ5D44YUWHaSuURmDeqngeY7NIu8o"#项目还款通知
+#     PRODUCT_INVEST_SUCCESS_TEMPLATE_ID = "wbV38-H2u0LkOZRGjB3fWMpj4CczgMdAP7aiTg4SM8A"#投标成功通知
 
 # else:#hmm's
 #     BIND_SUCCESS_TEMPLATE_ID = "mxNfcoJ8lfpbL1gFdazCk1OFGBhm9wIGL21Q6ZeB5FI"
@@ -201,7 +213,7 @@ Message_template = {
         "top_color":'#88ffdd',
         "data": {
                 "first": {
-                    "value": "",
+                    "value": u"绑定通知",
                    "color": "#173177"
                 },
                 "name1": {
@@ -218,7 +230,7 @@ Message_template = {
                 },
                "remark":{
                    "value":u'您可以使用下方微信菜单进行更多体验。',
-                   "color":"#173177"
+                   "color":"#000000"
                }
         },
         "url": '',

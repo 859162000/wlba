@@ -3,20 +3,35 @@
 
 from wanglibao.celery import app
 from wanglibao_p2p.models import P2PProduct
-from django.contrib.auth.models import User
 import re
 import json
 from django.conf import settings
 from django.utils import timezone
+import datetime
 
 from weixin.models import SubscribeRecord, SubscribeService, WeixinUser
 from weixin.constant import MessageTemplate, PRODUCT_ONLINE_TEMPLATE_ID
-from weixin.views import SendTemplateMessage
-from decimal import Decimal
-import datetime
+from weixin.util import sendTemplate
+from weixin.constant import BIND_SUCCESS_TEMPLATE_ID
 
 
-
+@app.task
+def bind_ok(openid, is_first_bind):
+    weixin_user = WeixinUser.objects.get(openid=openid)
+    now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
+    if is_first_bind:
+        from wanglibao_activity.backends import check_activity
+        check_activity(weixin_user.user, 'first_bind_weixin', "weixin", is_first_bind=is_first_bind)
+    else:
+        sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
+                                    "openid":weixin_user.openid,
+                                    "template_id":BIND_SUCCESS_TEMPLATE_ID,
+                                    "name1":"",
+                                    "name2":weixin_user.user.wanglibaouserprofile.phone,
+                                    "time":now_str,
+                                        })},
+                                    queue='celery02'
+                                    )
 @app.task
 def detect_product_biding(product_id):
     product = P2PProduct.objects.get(pk=product_id)
@@ -74,7 +89,7 @@ def sendUserProductOnLine(openid, service_desc, product_id, product_name, rate_d
         template = MessageTemplate(PRODUCT_ONLINE_TEMPLATE_ID,
             first=service_desc, keyword1=product_name, keyword2=rate_desc,
             keyword3=period_desc, keyword4=pay_method, url=url)
-        SendTemplateMessage.sendTemplate(w_user, template)
+        sendTemplate(w_user, template)
 
 @app.task
 def sentTemplate(kwargs):
@@ -89,4 +104,4 @@ def sentTemplate(kwargs):
     template = MessageTemplate(template_id, **template_args)
     w_user = WeixinUser.objects.filter(openid=openid).first()
     if w_user and template:
-        SendTemplateMessage.sendTemplate(w_user, template)
+        sendTemplate(w_user, template)
