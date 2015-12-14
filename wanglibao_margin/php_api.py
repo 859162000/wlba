@@ -138,12 +138,9 @@ class SendMessages(APIView):
         messages = self.request.POST.get('messages')
         ext = request.POST.get('ext', False)
 
-<<<<<<< HEAD
         phones = phones.split('|')
         messages = messages.split('|')
 
-=======
->>>>>>> send message API, add php commission, restore refund method.
         try:
             from wanglibao_sms.tasks import send_messages
             if not ext:
@@ -274,19 +271,10 @@ class YueLiBaoCheck(APIView):
                         if trace:
                             product.pay_status = True
                             product.save()
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> send message API, add php commission, restore refund method.
 
                 # 进行全民淘金数据写入
                 calc_php_commission(product_id)
 
-<<<<<<< HEAD
-=======
->>>>>>> update user info in redis
-=======
->>>>>>> send message API, add php commission, restore refund method.
                 ret.update(status=1,
                            msg='success')
         except Exception, e:
@@ -337,10 +325,6 @@ class YueLiBaoRefund(APIView):
     author: Zhoudong
     http请求方式: POST  投资到期回款.
     http://xxxxxx.com/php/yuelibao/refund/
-<<<<<<< HEAD
-=======
-
->>>>>>> send message API, add php commission, restore refund method.
     refundId 还款记录ID 月利宝还款计划表id
     userId 用户ID
     productId 产品ID
@@ -352,10 +336,6 @@ class YueLiBaoRefund(APIView):
     tradeType 产品类型 0月利宝 1债转
     remark 备注 [{"refundId":1,"userId":78641,"amount":15,"tradeType":0,"remark":"string"},
                 {"refundId":2,"userId":78694,"amount":15,"tradeType":0,"remark":""}]
-<<<<<<< HEAD
-=======
-
->>>>>>> send message API, add php commission, restore refund method.
         # args = [{'refundId': 1, 'userId': 2, 'productId': 4, 'tradeType': 0, 'remark': 'string',
         #          'amount': 1018, 'principal': 1000, 'interest': 10, 'increase': 5, 'plusInterest': 3},
         #         {'refundId': 2, 'userId': 2, 'amount': 4, 'tradeType': 0, 'remark': 'string',
