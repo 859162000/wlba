@@ -189,7 +189,7 @@ urlpatterns += patterns(
 
     # urls for php api by zhoudong
     url(r'^php/get_user/$', GetUserInfo.as_view(), name='php_user_info'),
-    url(r'^php/margin/$', GetMarginInfo.as_view(), name='php_margin_info'),
+    # url(r'^php/margin/$', GetMarginInfo.as_view(), name='php_margin_info'),
     # 单条站内信
     url(r'^php/send_message/inside/$', SendInsideMessage.as_view(), name='php_send_inside_message'),
     # 发送短信, 是否是营销类传参数 ext 分开.
