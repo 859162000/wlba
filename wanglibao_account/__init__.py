@@ -57,6 +57,14 @@ class MyHttpsAdapter(HTTPAdapter):
                                        ssl_version=ssl.PROTOCOL_TLSv1)
 
 
+def get_age_from_id(id_number):
+    id_number = str(id_number)
+    if len(id_number) == 15:
+        birth_date = '19' + id_number[6:12]
+    else:
+        birth_date = id_number[6:14]
+
+
 def get_verify_result(id_number, name):
     import cgi
 
