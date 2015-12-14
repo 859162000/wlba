@@ -859,29 +859,6 @@ class AppAreaView(TemplateView):
             'page': page
         }
 
-class AppAreaMilepostView(TemplateView):
-    """ 大事件 """
-    template_name = 'client_milepost.jade'
-
-    def get_context_data(self, **kwargs):
-        mile_list = AppMemorabilia.objects.filter(hide_link=False,
-                                                     start_time__lte=timezone.now()
-                                                     ).order_by('-priority')
-
-        limit = 6
-        page = 1
-
-        #mile_list = get_sorts_for_activity_show(mile_list)
-
-        mile_list, all_page, data_count = get_queryset_paginator(mile_list, 1, limit)
-
-        return {
-            'results': mile_list[:limit],
-            'all_page': all_page,
-            'page': page
-        }
-
-
 class AppAreaApiView(APIView):
     permission_classes = ()
 

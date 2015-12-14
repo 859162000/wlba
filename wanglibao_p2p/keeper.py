@@ -550,7 +550,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                     weixin_user = WeixinUser.objects.filter(user=sub_amo.user).first()
         #             {{first.DATA}} 项目名称：{{keyword1.DATA}} 还款金额：{{keyword2.DATA}} 还款时间：{{keyword3.DATA}} {{remark.DATA}}
 
-                    if weixin_user:
+                    if weixin_user and weixin_user.subscribe:
                         now = datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
                         sentTemplate.apply_async(kwargs={
                                         "kwargs":json.dumps({

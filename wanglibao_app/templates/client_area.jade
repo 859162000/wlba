@@ -9,20 +9,26 @@ html(style='background:#f5f5f5;')
         nav.tab-nav
           ul
             li.active
-              a(href="/api/m/explore/") 最新活动
+              a(href="javascript:void(0)") 最新活动
             li
-              a(href="/api/m/milepost/") 大事记
-          //.slide-bottom
+              a(href="javascript:void(0)") 大事记
+          .slide-bottom
 
-      .swiper-container.area-container
-        .swiper-wrapper
-          .area-latest.swiper-slide.area-scroll
-            .area-item.area-latest-push
-              include include/ajax/ajax_area_latest
-            if page < all_page
-              .area-latest-more
-                .area-latest-btn 查看更多
+      .area-container
+        .area-latest.area-scroll
+          .area-item.area-latest-push
+            include include/ajax/ajax_area_latest
+          if page < all_page
+            .area-latest-more
+              .area-latest-btn 查看更多
+        .area-milepost.area-scroll(style='display:none;')
+          .area-item.area-milepost-push
+            .area-milepost-loading.unactivty 加载中..
+            //include include/ajax/ajax_area_milepost
+          .area-milepost-more(style='display:none')
+            .area-milepost-btn 查看更多
 
+    // banner javascript
+    script(src='/static/scripts/app/dist/area.js?v=201512141', data-init='area')
 
-    script(src='/static/scripts/app/dist/area.js?v=20151214', data-init='area')
 
