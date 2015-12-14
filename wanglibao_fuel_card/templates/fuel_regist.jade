@@ -4,4 +4,43 @@ html
     title 注册网利宝
     include include/fuel_head.jade
   body
+    .fuel-regist-warp
 
+      .fuel-input-public.fuel-input-space
+        .fuel-input-icon.regist-input-icon
+          .phone
+        input(type='text', name='password', placeholder= '请输入手机号').fuel-input-main
+
+      .fuel-input-double.fuel-input-space
+        .fuel-input-public
+          .fuel-input-icon.regist-input-icon
+            .captcha
+          input(type='text', name='password', placeholder= '请输入计算结果').fuel-input-main
+
+        .fuel-validation
+          img(src="", alt="", width="100%", height="100%")#captcha
+
+      .fuel-input-double.fuel-input-space
+        .fuel-input-public
+          .fuel-input-icon.regist-input-icon
+            .validation
+          input(type='text', name='password', placeholder= '请输入验证码').fuel-input-main
+
+        .fuel-validation
+          button(type="button") 获取验证码
+
+      .fuel-input-public.fuel-input-space
+        .fuel-input-icon.regist-input-icon
+          .password
+        input(type='text', name='password', placeholder= '请设置密码').fuel-input-main
+        .fuel-operation-icon.fuel-clear-input
+
+      .fuel-input-public
+        .fuel-input-icon.regist-input-icon
+          .token
+        input(type='text', name='password', placeholder= '请填写邀请码，若无，请忽略').fuel-input-main
+
+      .fuel-safe-green
+        span 账户资金安全由平安银行承保
+
+      button(type="button").fuel-regist-submit 立即注册｜ 领取奖励
