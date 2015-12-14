@@ -3,60 +3,273 @@
 .banner
   width: 100%
   display: block
-.red_wrap
-  width: 100%
-  display: inline-block
-  padding: 0 0.75rem
-  .red_box
+.body_wrap
+  .red_wrap
     width: 100%
     display: inline-block
+    padding: 0 0.75rem
+    .red_box
+      width: 100%
+      display: inline-block
+      .title
+        width: 100%
+        padding-top: 0.3rem
+        text-align: center
+        color: #018a5e
+        font-size: 0.65rem
+        height: 1.8rem
+        line-height: 1.5rem
+      .img
+        width: 39.2%
+        display: block
+        margin: 0 auto
+  .button
+    width: 5.5rem
+    height: 1.2rem
+    display: block
+    line-height: 1.2rem
+    color: #fff
+    font-size: 0.55rem
+    text-align: center
+    margin: 0.75rem auto 0.7rem
+    border-radius: 0.75rem
+    box-shadow: 0 0.075rem #cfebe2
+  .remarks
+    width: 100%
+    text-align: center
+    font-size: 0.6rem
+    color: #018a5e
+    line-height: 1.05rem
+    padding: 0 1rem 0px 1rem
+  .see_rule_button
+    width: 100%
+    text-align: center
+    font-size: 0.6rem
+    color: #e63a59
+    line-height: 1.05rem
+    height: 1.05rem
+    text-decoration: underline
+  .main_box
+    clear: both
+    width: 100%
+    display: inline-block
+    font-size: 0
+    margin-bottom: 1.3rem
+    .main_top
+      width: 100%
+      display: inline-block
+      position: relative
+      left: 0px
+      top: 0px
+      img
+        width: 100%
+        display: block
+      .text
+        position: absolute
+        left: 0
+        top: 50%
+        z-index: 2
+        color: #fff
+        font-size: 0.65rem
+        line-height: 1rem
+        margin-top: -1rem
+        font-weight: bold
+        width: 100%
+        padding-left: 3%
+        text-align: center
+      @media screen and (min-width: 320px)
+        .text
+          font-size: 0.55rem
+    .main
+      background: url("/static/imgs/mobile_activity/app_double_dan/main_line_bg.png") repeat top center
+      background-size: 100% auto
+      width: 100%
+      float: none
+      display: inline-block
+      padding-bottom: 0.85rem
+  .rule_title
+    width: 100%
+    text-align: center
+    line-height: 1.2rem
+    font-size: 0.75rem
+    padding-top: 0.4rem
+    color: #e63a59
+  .rule_text
+    width: 100%
+    padding: 0 1rem 0px 1rem
+    clear: both
+    color: #e63a59
+    dt
+      float: left
+      display: inline-block
+      width: 0.8rem
+      line-height: 1.05rem
+      font-size: 0.6rem
+    dd
+      float: left
+      display: inline-block
+      width: 90%
+      line-height: 1.05rem
+      font-size: 0.6rem
+      text-align: left
+  .main_footer
+    width: 100%
+    display: block
+  .main_box_1
+    .button
+      background: #119c6f
+      box-shadow: 0 3px #fad8de
+  .main_box_2
+    .main_top
+      .text
+        font-size: 0.65rem
+        line-height: 0.9rem
+        margin-top: -0.45rem
+      @media screen and (min-width: 320px)
+        .text
+          font-size: 0.55rem
+    .button
+      background: #e63a59
+      box-shadow: 0 3px #cfebe2
+    .remarks
+      color: #e63a59
+    .see_rule_button
+      color: #008e5f
+    .rule_title
+      color: #008e5f
+    .rule_text
+      color: #008e5f
+  .main_box_3
+    .red_wrap
+      .red_box
+        .title
+          color: #f8b044
+    .button
+      background: #f8b044
+      box-shadow: 0 3px #feefda
+    .remarks
+      color: #f8b044
+    .see_rule_button
+      color: #e63a59
+  .main_box_4
+    .prize_wrap
+      padding: 0.4rem 0 0 8%
+      width: 92%
+      display: inline-block
+      .prize_box
+        width: 48%
+        display: block
+        margin: 0.35rem 0 0 2%
+        float: left
+        .title
+          width: 100%
+          text-align: center
+          height: 1.6rem
+          font-size: 0.5rem
+          color: #fff
+          line-height: 1.6rem
+        img
+          width: 95%
+          display: block
+          margin: 0 auto
+        .text
+          width: 100%
+          text-align: center
+          height: 1.15rem
+          font-size: 0.45rem
+          color: #fff
+          line-height: 1.15rem
+      .prize_box_1
+        background: #d73d38
+        .text
+          font-size: 0.35rem
+      .prize_box_2
+        background: #e97e24
+      .prize_box_3
+        background: #f2cc50
+      .prize_box_4
+        background: #9dc85a
+      .prize_box_5
+        background: #4b79d3
+      .prize_box_6
+        img
+          width: 100%
+          height: 100%
+          display: block
+    .button
+      background: #119c6f
+      box-shadow: 0 3px #cfebe2
+    .remarks
+      color: #119c6f
+  .main_box_5
+    .main_top
+      .text
+        font-size: 0.65rem
+        line-height: 0.9rem
+        margin-top: -0.45rem
+      @media screen and (min-width: 320px)
+        .text
+          font-size: 0.5rem
+    .main
+      padding-bottom: 1.05rem
+      .text
+        width: 100%
+        text-align: center
+        padding: 0.7rem 0 0.4rem
+        line-height: 1.05rem
+        font-size: 0.6rem
+        color: #e63a59
+      .code
+        width: 38%
+        display: block
+        border: 0.375rem #f29cac solid
+        margin: 0 auto
+  .act_rule
+    width: 100%
+    padding: 0 0 0.275rem
+    display: inline-block
+    margin: 0 auto
     .title
       width: 100%
-      padding-top: 0.3rem
-      text-align: center
-      color: #018a5e
-      font-size: 0.65rem
-      height: 1.8rem
-      line-height: 1.5rem
-    .img
-      width: 39.2%
-      display: block
-      margin: 0 auto
-.main_box
-  clear: both
-  width: 100%
-  display: inline-block
-  font-size: 0
-  .main_top
-    width: 100%
-    display: inline-block
-    position: relative
-    left: 0px
-    top: 0px
-    img
-      width: 100%
-      display: block
-    .text
-      position: absolute
-      left: 0
-      top: 50%
-      z-index: 2
+      height: 1rem
+      line-height: 1rem
+      padding: 0
       color: #fff
       font-size: 0.65rem
-      line-height: 1rem
-      margin-top: -1rem
-      width: 100%
-      padding-left: 3%
       text-align: center
-    @media screen and (min-width: 320px)
-      .text
-        font-size: 0.55rem
-  .main
-    background: url("/static/imgs/mobile_activity/app_double_dan/main_line_bg.png") repeat top center
-    background-size: 100% auto
+    dl.rule_text
+      width: 100%
+      padding: 0 1rem
+      display: inline-block
+      clear: both
+      color: #fff
+      dt
+        line-height: 0.95rem
+      dd
+        width: 90%
+        line-height: 0.95rem
+.code_wrap
+  width: 100%
+  clear: both
+  position: relative
+  left: 0
+  top: 0
+  display: none
+  .bg
     width: 100%
-    float: none
-    display: inline-block
+    display: block
+  .img
+    position: absolute
+    top: 35.638%
+    right: 5.0666%
+    display: block
+    width: 14.666%
+  .text
+    position: absolute
+    top: 84.574%
+    right: 5.0666%
+    display: block
+    width: 14.666%
 
 
 
