@@ -22,5 +22,6 @@ urlpatterns = patterns(
     url(r'^records/product/$', TemplateView.as_view(template_name="fuel_records_audit.jade")),
     url(r'^records/exchange/$', TemplateView.as_view(template_name="fuel_records_exchange.jade")),
     url(r'^statistic/$', TemplateView.as_view(template_name="fuel_statistics.jade")),
+    url(r'^regist/$', TemplateView.as_view(template_name="fuel_regist.jade")),
 
 )

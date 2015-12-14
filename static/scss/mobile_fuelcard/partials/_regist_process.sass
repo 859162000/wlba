@@ -1,0 +1,39 @@
+
+@mixin regist-icons($height, $width, $iconName)
+  width: rem($height)
+  height: rem($width)
+  background: url('/static/imgs/mobile_fuelcard/input_icon/#{$iconName}.png') no-repeat center
+  background-size: 100%
+
+
+.fuel-regist-warp
+  padding: rem(46) .5rem
+
+.regist-input-icon
+  width: .9rem
+
+  .phone
+    +regist-icons(36, 45, 'phone')
+
+  .phone-active
+    +regist-icons(36, 45, 'phone_active')
+
+  .captcha, .validation
+    +regist-icons(37, 36, 'code')
+
+  .captcha-active, .validation-active
+    +regist-icons(37, 36, 'code_active')
+
+  .password
+    +regist-icons(36, 44, 'password')
+
+  .password-active
+    +regist-icons(36, 44, 'password_active')
+
+  .token
+    +regist-icons(36, 44, 'token')
+  .token-acitve
+    +regist-icons(36, 44, 'toekn_active')
+
+.fuel-regist-submit
+  +submit(rem(90), #fff, $buy-red)
