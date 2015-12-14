@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from wanglibao_p2p.models import P2PProduct
 from wanglibao.const import ErrorNumber
 from .forms import FuelCardBuyForm
+from .trade import P2PTrader
 
 
 class FuelCardBuyApi(APIView):
@@ -40,9 +41,9 @@ class FuelCardBuyApi(APIView):
                 try:
                     trader = P2PTrader(product=p2p_product, user=request.user, request=request)
                     product_info, margin_info, equity_info = trader.purchase(total_amount)
-                    return Response({
-                        'data': product_info.amount,
-                        'category': equity_info.product.category
+
+                    return render_to_response('fuel_buy.jade', {
+                        # FixMe
                     })
                 except Exception, e:
                     return Response({
