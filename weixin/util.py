@@ -3,11 +3,17 @@ from wanglibao_p2p.models import P2PEquity
 from wanglibao_buy.models import FundHoldInfo
 from django.template import Template, Context
 from django.template.loader import get_template
-from .models import WeixinAccounts
+from .models import WeixinAccounts, WeixinUser, WeiXinUserActionRecord
 from wechatpy import WeChatClient
+from wechatpy.exceptions import WeChatException
 
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+import logging
+import time
+from tasks import bind_ok
+
+logger = logging.getLogger("weixin")
 
 def redirectToJumpPage(message):
     url = reverse('jump_page')+'?message=%s'% message
@@ -20,6 +26,83 @@ def sendTemplate(weixin_user, message_template):
     client.message.send_template(weixin_user.openid, template_id=message_template.template_id,
                                  top_color=message_template.top_color, data=message_template.data,
                                  url=message_template.url)
+
+
+def getOrCreateWeixinUser(openid, weixin_account):
+    old_subscribe = 0
+    w_user = WeixinUser.objects.filter(openid=openid).first()
+    if w_user and w_user.subscribe:
+        old_subscribe = 1
+    if not w_user:
+        w_user = WeixinUser()
+        w_user.openid = openid
+        w_user.account_original_id = weixin_account.db_account.original_id
+        w_user.save()
+    if w_user.account_original_id != weixin_account.db_account.original_id:
+        w_user.account_original_id = weixin_account.db_account.original_id
+        w_user.save()
+    if not w_user.nickname or not w_user.subscribe or not w_user.subscribe_time:
+        try:
+            user_info = weixin_account.db_account.get_user_info(openid)
+            print user_info
+            w_user.nickname = user_info.get('nickname', "")
+            w_user.sex = user_info.get('sex', 0)
+            w_user.city = user_info.get('city', "")
+            w_user.country = user_info.get('country', "")
+            w_user.headimgurl = user_info.get('headimgurl', "")
+            w_user.unionid =  user_info.get('unionid', '')
+            w_user.province = user_info.get('province', '')
+            w_user.subscribe = user_info.get('subscribe', 0)
+            # if not w_user.subscribe_time:
+            w_user.subscribe_time = user_info.get('subscribe_time', 0)
+            w_user.save()
+        except WeChatException, e:
+            logger.debug(e.message)
+            pass
+    return w_user, old_subscribe
+
+def _process_record(w_user, user, type, describe):
+    war = WeiXinUserActionRecord()
+    war.w_user = w_user
+    war.user = user
+    war.action_type = type
+    war.action_describe = describe
+    war.create_time = int(time.time())
+    war.save()
+
+def bindUser(w_user, user):
+    is_first_bind = False
+    redpack_record_id = 0
+    if w_user.user:
+        if w_user.user.id==user.id:
+            return 1, u'你已经绑定, 请勿重复绑定'
+        return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone
+    other_w_user = WeixinUser.objects.filter(user=user).first()
+    if other_w_user:
+        msg = u"你的手机号%s已经绑定微信<span style='color:#173177;'>%s</span>"%(user.wanglibaouserprofile.phone, other_w_user.nickname)
+        return 3, msg
+    w_user.user = user
+    w_user.bind_time = int(time.time())
+    w_user.save()
+    _process_record(w_user, user, 'bind', "绑定网利宝")
+
+    if not user.wanglibaouserprofile.first_bind_time:
+        user.wanglibaouserprofile.first_bind_time = w_user.bind_time
+        user.wanglibaouserprofile.save()
+        is_first_bind = True
+    bind_ok.apply_async(kwargs={
+        "openid": w_user.openid,
+        "is_first_bind":is_first_bind,
+    },
+                        queue='celery01'
+                        )
+    return 0, u'绑定成功'
+
+def unbindUser(w_user, user):
+    w_user.user = None
+    w_user.unbind_time=int(time.time())
+    w_user.save()
+    _process_record(w_user, user, 'unbind', "解除绑定")
 
 def getAccountInfo(user):
 

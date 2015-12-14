@@ -28,7 +28,6 @@ class BaseWeixinTemplate(TemplateView):
         else:
             error_msg = u"code or state is None"
         if error_msg:
-
             return redirectToJumpPage(error_msg)
         return super(BaseWeixinTemplate, self).dispatch(request, *args, **kwargs)
 
