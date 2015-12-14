@@ -1123,7 +1123,6 @@ class RockFinanceRegister(CoopRegister):
                     img_handle.seek(0)
                     _img = FileObject(img_handle, len(_img))
                     activity_reward.qrcode.save("rock_finance.png", _img, save=True)
-                    activity_reward.qrcode = img
                     activity_reward.save()
                     logger.debug("before save: activity_reward.qrcode:%s" % activity_reward.qrcode)
                     #将奖品通过站内信发出
