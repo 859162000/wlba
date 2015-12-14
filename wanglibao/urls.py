@@ -17,7 +17,7 @@ from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsV
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_margin.php_api import GetUserInfo, GetMarginInfo, SendInsideMessage, CheckTradePassword, YueLiBaoBuy, \
-    YueLiBaoCheck, YueLiBaoCancel, YueLiBaoRefund, AssignmentOfClaimsBuy, YueLiBaoCommission, logout_with_cookie
+    YueLiBaoCheck, YueLiBaoCancel, YueLiBaoRefund, AssignmentOfClaimsBuy, YueLiBaoCommission, SendMessages
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
@@ -190,7 +190,11 @@ urlpatterns += patterns(
     # urls for php api by zhoudong
     url(r'^php/get_user/$', GetUserInfo.as_view(), name='php_user_info'),
     url(r'^php/margin/$', GetMarginInfo.as_view(), name='php_margin_info'),
-    url(r'^php/send_message/$', SendInsideMessage.as_view(), name='php_send_message'),
+    # 单条站内信
+    url(r'^php/send_message/inside/$', SendInsideMessage.as_view(), name='php_send_inside_message'),
+    # 发送短信, 是否是营销类传参数 ext 分开.
+    url(r'^php/send_messages/$', SendMessages.as_view(), name='php_send_messages'),
+
     url(r'^php/trade_password/$', CheckTradePassword.as_view(), name='php_trade_password'),
 
     url(r'^php/yue/buy/$', YueLiBaoBuy.as_view(), name='php_buy_yuelibao'),
@@ -201,6 +205,7 @@ urlpatterns += patterns(
 
     url(r'^php/assignment/buy/$', AssignmentOfClaimsBuy.as_view(), name='php_refund_yuelibao'),
 
+    # url(r'^php/logout/$', logout_with_cookie, name='php_logout_cookie'),
 )
 
 # 短信
