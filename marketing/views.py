@@ -1,4 +1,5 @@
 # encoding:utf-8
+from wanglibao_reward.models import WanglibaoActivityReward as ActivityReward
 import base64
 import hashlib
 import os
@@ -58,7 +59,7 @@ from wanglibao.settings import XUNLEIVIP_REGISTER_KEY
 import urllib
 import hashlib
 import logging
-# import qrcode
+import qrcode
 from wanglibao_reward.models import WanglibaoActivityReward
 logger = logging.getLogger('marketing')
 TRIGGER_NODE = [i for i, j in TRIGGER_NODE]
@@ -2644,23 +2645,17 @@ class RockFinanceAPIView(APIView):
         if not reward:
             return Response({"code": 1003, "message": u"您没有领到对应的入场二维码"})
 
-        try:
-            img = qrcode.make("https://www.wanglibao.com/api/check/qrcode/?owner_id=%s&activity=rock_finance&content=%s"%(request.user.id, reward.content))
-        except Exception, reason:
-            logger.debug(u"生成二维码报异常,reason:%s" % reason)
-            return Response({"code": 1004, "message": u'生成二维码报异常'})
-
         if reward.is_used:  # 二维码可能被重复使用
-            return Response({"code": -1, "img": img, "message": u"您的二维码已经被使用"})
+            return Response({"code": -1, "img": reward.qrcode, "message": u"您的二维码已经被使用"})
         else:
-            return Response({"code": 0, "img": img, "message": u"得到合法二维码"})
+            return Response({"code": 0, "img": reward.qrcode, "message": u"得到合法二维码"})
 
     def get_vote_static(self):
         """
             得到整体的全部数据
         """
         records = WanglibaoVoteCounter.objects.filter(activity="rock_finance")
-        records = {record.item: record.count for record in records}
+        records = {"".join(['《', str(record.item), '》']): record.count for record in records}  #前端要求带书名号
         return Response({"records": records, "message": u'整体的汇总数据', "code":0})
 
     def get(self, request):

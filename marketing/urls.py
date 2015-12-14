@@ -70,6 +70,7 @@ urlpatterns = patterns(
     url(r'^juchengtwo/$', TemplateView.as_view(template_name="juchengtwo.jade")),
     url(r'^damai/$', TemplateView.as_view(template_name="damai.jade")),
     url(r'^recharge_8000/$', TemplateView.as_view(template_name="recharge_8000.jade")),
+    url(r'^double_dan/$', TemplateView.as_view(template_name="double_dan.jade")),
 )
 
 # app URL
@@ -157,7 +158,8 @@ urlpatterns += patterns(
     url(r'^app_noviceDecember_h5/$', TemplateView.as_view(template_name="app_noviceDecember_h5.jade")),
     url(r'^app_juchengtwo/$', TemplateView.as_view(template_name="app_juchengtwo.jade")),
     url(r'^app_recharge_8000/$', TemplateView.as_view(template_name="app_recharge_8000.jade")),
-
+    url(r'^app_damai/$', TemplateView.as_view(template_name="app_damai.jade")),
+    url(r'^app_double_dan/$', TemplateView.as_view(template_name="app_double_dan.jade")),
 
     # url(r'^app_thanksgivin/$', login_required(TemplateView.as_view(template_name="app_thanksgivin.jade"), login_url='/accounts/token_login/')),
 

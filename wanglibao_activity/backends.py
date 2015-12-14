@@ -22,7 +22,9 @@ from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_sms.tasks import send_messages
 from wanglibao_rest.utils import decide_device
 from experience_gold.models import ExperienceEvent, ExperienceEventRecord
-from weixin.models import WeixinUser, WeiXinUserActionRecord
+from weixin.models import WeixinUser
+from weixin.constant import BIND_SUCCESS_TEMPLATE_ID
+from weixin.tasks import sentTemplate
 
 logger = logging.getLogger(__name__)
 
@@ -62,17 +64,17 @@ def check_activity(user, trigger_node, device_type, amount=0, product_id=0, orde
                         user_ib = _check_introduced_by(user, rule.activity.start_at, rule.is_invite_in_date)
                         if user_ib:
                             _check_rules_trigger(user, rule, rule.trigger_node, device_type,
-                                                 amount, product_id, is_full, order_id, user_ib, is_first_bind)
+                                                 amount, product_id, is_full, order_id, user_ib, is_first_bind_wx=is_first_bind)
                     else:
                         _check_rules_trigger(user, rule, rule.trigger_node, device_type,
-                                             amount, product_id, is_full, order_id, is_first_bind)
+                                             amount, product_id, is_full, order_id, is_first_bind_wx=is_first_bind)
             else:
                 continue
     else:
         return
 
 
-def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, order_id, user_ib=None, is_first_bind=False):
+def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_id, is_full, order_id, user_ib=None, is_first_bind_wx=False):
     """ check the trigger node """
     product_id = int(product_id)
     order_id = int(order_id)
@@ -185,11 +187,10 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
                 if is_amount:
                     _send_gift(user, rule, device_type, is_full, amount)
     elif trigger_node == 'first_bind_weixin':
-        if is_first_bind:
+        if is_first_bind_wx:
             _send_gift(user, rule, device_type, is_full)
     else:
         return
-
 
 def _send_gift(user, rule, device_type, is_full, amount=0):
     # rule_id = rule.id
@@ -631,7 +632,7 @@ def _save_activity_record(rule, user, msg_type, msg_content='', introduced_by=Fa
     record.save()
 
 
-def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0, redpack_event=None, created_at=None):
+def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0, redpack_event=None, created_at=None, is_first_bind_wx=False):
     """
         inviter: 邀请人
         invited： 被邀请人
@@ -700,6 +701,7 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
     else:
         msg_template = rule.msg_template
         sms_template = rule.sms_template
+        wx_template = rule.wx_template
         invited_phone = safe_phone_str(mobile)
         introduced_by = IntroducedBy.objects.filter(user=user).first()
         if introduced_by and introduced_by.introduced_by:
@@ -714,10 +716,13 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
             _send_message_template(user, title, content)
             _save_activity_record(rule, user, 'message', content)
         if sms_template:
-            sms = Template(sms_template + u' 退订回TD【网利科技】')
+            sms = Template(sms_template + u' 关注服务号wanglibao400每日惊喜，退订回TD【网利科技】')
             content = sms.render(context)
             _send_sms_template(mobile, content)
             _save_activity_record(rule, user, 'sms', content)
+        if wx_template:
+            if wx_template == "first_bind":
+                _send_wx_frist_bind_template(user, end_date, redpack_amount, invest_amount)
 
 
 def _keep_reward_record(user, reward, description=''):
@@ -745,4 +750,21 @@ def _send_sms_template(phones, content):
         "messages": [content, ],
         "ext": 666
     })
+
+def _send_wx_frist_bind_template(user, end_date, amount, invest_amount):
+    weixin_user = WeixinUser.objects.filter(user=user).first()
+    if weixin_user:
+        now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
+        remark = u"获赠红包：%s元\n起投金额：%s元\n有效期至：%s\n您可以使用下方微信菜单进行更多体验。"%(amount,
+                                                                     invest_amount, end_date)
+        sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
+                                    "openid":weixin_user.openid,
+                                    "template_id":BIND_SUCCESS_TEMPLATE_ID,
+                                    "name1":"",
+                                    "name2":user.wanglibaouserprofile.phone,
+                                    "time":now_str+'\n',
+                                    "remark":remark
+                                        })},
+                                    queue='celery02'
+                                    )
 

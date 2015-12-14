@@ -6,7 +6,7 @@ html
         - with '网利宝' as title
         include include/common_head
         - endwith
-        link(rel="stylesheet",href="/static/styles/pc_activity/recharge_8000.css?v=2015120801")
+        link(rel="stylesheet",href="/static/styles/pc_activity/recharge_8000.css?v=2015121001")
         - csrf_token
     body(style="background:#3c0972")
         include global/g_nav
@@ -16,26 +16,27 @@ html
             .body_main
                 .top_title 喜迎12月财神召唤日，充值就送高额红包！年度最强红包大赏火热来袭，红包有效仅2天，不容错过！新老用户均可参与哦。
                 .big_title 召唤红包攻略
-                .act_text 活动期间首次充值≥8000元，立送800元组合红包！
+                .act_text 活动期间单笔充值≥8000元，立送800元组合红包！多充多得，上不封顶！
                 .red_wrap
                     dl.red_box.first
                         dt!='50元<span>红包</span>'
-                        dd 单笔投资满X0000可用
+                        dd 单笔投资满10000可用
                     dl.red_box
-                        dt!='250元<span>红包</span>'
-                        dd 单笔投资满X0000可用
+                        dt!='150元<span>红包</span>'
+                        dd 单笔投资满25000可用
                     dl.red_box.last
-                        dt!='500元<span>红包</span>'
-                        dd 单笔投资满X0000可用
+                        dt!='600元<span>红包</span>'
+                        dd 单笔投资满85000可用
                 a.button(href='/pay/banks/') 立即充值领取
                 .button_text 红包统一以站内信形式通知，用户可在我的账户--理财券中的红包列表中查看。
                 dl.rule
                     dt 【红包使用规则】
-                    dd &nbsp;&nbsp;&nbsp;1、红包有效期：12月X日0:00-X日23:59；
-                    dd &nbsp;&nbsp;&nbsp;2、活动期间每位用户只有一次充值送红包机会，充值所赠红包限投3月以上标期。
-                    dd &nbsp;&nbsp;&nbsp;3、充值送所得红包，可在投资时直抵现金使用（例：投资X0000元，使用50元红包后实际投资金额为XXX0元）；
-                    dd &nbsp;&nbsp;&nbsp;4、红包不可与加息券同时使用，红包只限使用一次，使用后无论是否有余额均失效；
-                    dd &nbsp;&nbsp;&nbsp;5 、本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑。
+                    dd &nbsp;&nbsp;&nbsp;1、红包有效期：12月11日0:00-12日23:59；
+                    dd &nbsp;&nbsp;&nbsp;2、活动期间新老用户均可参与，满足投资条件多充多得，上不封顶！充值所赠红包限投3月以上标期；
+                    dd &nbsp;&nbsp;&nbsp;3、充值送所得红包，可在投资时直抵现金使用（例：投资10000元，使用50元红包后实际投资金额为9950元）；
+                    dd &nbsp;&nbsp;&nbsp;4、50红包满10000可用，150红包满25000可用，600红包满85000可用，限三月以上，每次充值8000都有800红包；
+                    dd &nbsp;&nbsp;&nbsp;5、红包不可与加息券同时使用，红包只限使用一次，使用后无论是否有余额均失效；
+                    dd &nbsp;&nbsp;&nbsp;6 、本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑。
         .code_wrap
             .code_main
                 img.code(src="/static/imgs/pc_activity/recharge_8000/code.jpg")

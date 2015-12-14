@@ -66,6 +66,9 @@ SHARE_TYPE = (
     ('both', u'邀请人和被邀请人双方共享'),
     ('inviter', u'邀请人独自获得'),
 )
+WX_TEMPLATE_CHOICE = (
+    ('first_bind', u'首次绑定微信'),
+)
 
 
 class Activity(models.Model):
@@ -166,6 +169,10 @@ class ActivityRule(models.Model):
                                               优惠券金额/百分比：{{redpack_amount}}，优惠券投资门槛：{{invest_amount}}”')
     sms_template = models.TextField(u'短信模板（不填则不发）', blank=True,
                                     help_text=u'短信模板不填写则触发该规则时不发手机短信，变量写在2个大括号之间，变量：同上')
+
+    wx_template = models.CharField(u'微信消息模板', blank=True,
+                                    choices=WX_TEMPLATE_CHOICE, default="", max_length=32)
+
     msg_template_introduce = models.TextField(u'邀请人站内信模板', blank=True,
                                               help_text=u'邀请人站内信模板不填写则不发送，变量写在2个大括号之间，变量：同上')
     sms_template_introduce = models.TextField(u'邀请人短信模板', blank=True,

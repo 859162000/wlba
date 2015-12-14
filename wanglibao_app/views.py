@@ -331,15 +331,37 @@ class AppSecureView(TemplateView):
 class AppExploreView(TemplateView):
     """ app发现页面 """
 
-    template_name = 'client_discover.jade'
+    # template_name = 'client_discover.jade'
+    #
+    # def get_context_data(self, **kwargs):
+    #     #banner = Banner.objects.filter(device='mobile', type='banner', is_used=True).order_by('-priority')
+    #     banner = Banner.objects.filter(Q(device='mobile'), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now()))).order_by('-priority')
+    #     return {
+    #         'banner': banner,
+    #     }
+
+
+    template_name = 'client_area.jade'
 
     def get_context_data(self, **kwargs):
-        #banner = Banner.objects.filter(device='mobile', type='banner', is_used=True).order_by('-priority')
-        banner = Banner.objects.filter(Q(device='mobile'), Q(is_used=True), Q(is_long_used=True) | (Q(is_long_used=False) & Q(start_at__lte=timezone.now()) & Q(end_at__gte=timezone.now()))).order_by('-priority')
-        return {
-            'banner': banner,
-        }
+        activity_list = ActivityShow.objects.filter(link_is_hide=False,
+                                                    is_app=True,
+                                                    start_at__lte=timezone.now(),
+                                                    end_at__gt=timezone.now()
+                                                    ).select_related('activity')
 
+        limit = 6
+        page = 1
+
+        activity_list = get_sorts_for_activity_show(activity_list)
+
+        activity_list, all_page, data_count = get_queryset_paginator(activity_list, 1, limit)
+
+        return {
+            'results': activity_list[:limit],
+            'all_page': all_page,
+            'page': page
+        }
 
 class AppManagementView(TemplateView):
     """ app管理团队 """
@@ -355,7 +377,7 @@ class AppP2PProductViewSet(PaginatedModelViewSet):
     model = P2PProduct
     permission_classes = (IsAdminUserOrReadOnly,)
     serializer_class = P2PProductSerializer
-    paginate_by = 10
+    paginate_by = 20
 
     def get_queryset(self):
         qs = super(AppP2PProductViewSet, self).get_queryset()

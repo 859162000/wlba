@@ -34,24 +34,24 @@ def add_bank_card(request):
     gate_id = request.DATA.get("gate_id", "")
 
     if not card_no or not gate_id:
-        return {"ret_code":20021, "message":"信息输入不完整"}
+        return {"ret_code": 20021, "message": u"信息输入不完整"}
 
     if len(card_no) > 25 or not card_no.isdigit():
-        return {"ret_code":20022, "message":"请输入正确的银行卡号"}
+        return {"ret_code": 20022, "message": u"请输入正确的银行卡号"}
     #if card_no[0] in ("3", "4", "5"):
     #    return {"ret_code":20023, "message":"不支持信用卡"}
 
     user = request.user
     bank = Bank.objects.filter(gate_id=gate_id).first()
     if not bank:
-        return {"ret_code":20025, "message":"不支持该银行"}
+        return {"ret_code": 20025, "message": u"不支持该银行"}
 
-    exist_cards = Card.objects.filter(no=card_no, user=user).first()
+    exist_cards = Card.objects.filter(no=card_no).first()
     if exist_cards:
-        return {"ret_code":20024, "message":"该银行卡已经存在"}
+        return {"ret_code": 20024, "message": u"您输入的银行卡号已绑定，请尝试其他银行卡号码，如非本人操作请联系客服"}
     exist_cards = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
     if exist_cards:
-        return {"ret_code":20026, "message":"该银行卡已经存在"}
+        return {"ret_code": 20026, "message": u"您输入的银行卡号已绑定，请尝试其他银行卡号码，如非本人操作请联系客服"}
 
     is_default = request.DATA.get("is_default", "false")
     if is_default.lower() in ("true", "1"):

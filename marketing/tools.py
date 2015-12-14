@@ -25,7 +25,7 @@ import logging
 from weixin.constant import DEPOSIT_SUCCESS_TEMPLATE_ID, WITH_DRAW_SUBMITTED_TEMPLATE_ID
 
 from weixin.models import WeixinUser
-
+from weixin.tasks import sentTemplate
 
 # logger = logging.getLogger('wanglibao_reward')
 
@@ -150,7 +150,7 @@ def deposit_ok(user_id, amount, device, order_id):
 # 亲爱的满先生，您的充值已成功
 # {{first.DATA}} 充值时间：{{keyword1.DATA}} 充值金额：{{keyword2.DATA}} 可用余额：{{keyword3.DATA}} {{remark.DATA}}
         if weixin_user:
-            from weixin.tasks import sentTemplate
+
             deposit_ok_time = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
             margin = Margin.objects.filter(user=user).first()
             sentTemplate.apply_async(kwargs={
@@ -189,7 +189,6 @@ def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name):
     })
     weixin_user = WeixinUser.objects.filter(user=user).first()
     if weixin_user:
-        from weixin.tasks import sentTemplate
         # 亲爱的{}，您的提现申请已受理，1-3个工作日内将处理完毕，请耐心等待。
     # {{first.DATA}} 取现金额：{{keyword1.DATA}} 到账银行：{{keyword2.DATA}} 预计到账时间：{{keyword3.DATA}} {{remark.DATA}}
         now = datetime.datetime.now()
@@ -260,7 +259,8 @@ def send_income_message_sms():
         # 批量发送短信
         send_messages.apply_async(kwargs={
             "phones": phones_list,
-            "messages": messages_list
+            "messages": messages_list,
+            "ext": 666
         })
 
 
