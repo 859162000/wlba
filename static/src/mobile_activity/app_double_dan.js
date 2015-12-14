@@ -69,7 +69,7 @@
 	wx.ready(function(){
 		var host = 'https://www.wanglibao.com/',
 			shareName = '网利宝用户专享福利',
-			shareImg = host + '/static/imgs/mobile_activity/app_recharge_8000/300x300.jpg',
+			shareImg = host + '/static/imgs/mobile_activity/app_double_dan/300x300.jpg',
 			shareLink = host + '/activity/app_recharge_8000/',
 			shareMainTit = '网利宝用户专享福利',
 			shareBody = '网利宝双旦来了，翻倍狂欢。跨年最强福利场！';
