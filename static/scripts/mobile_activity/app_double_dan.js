@@ -231,33 +231,54 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     wlb.ready({
         app: function(mixins) {
             mixins.sendUserInfo(function(data) {
+
+				$('.investment_button').click(function() {
+					mixins.jumpToManageMoney();
+				});
+
                 if (data.ph == '') {
                     login = false;
-                    $('.button').click(function() {
+					$('.recharge_button').click(function() {
                         mixins.loginApp();
-                    });
+                    })
                 } else {
                     login = true;
-                    $('.button').click(function() {
+                    $('.recharge_button').click(function() {
                         mixins.jumpToManageMoney();
                     })
                 }
-            })
+
+            });
+			$('.code_wrap').hide();
         },
         other: function() {
             if(h5_user_static){
-                $('.button').click(function() {
+                $('.recharge_button').click(function() {
                     window.location.href = '/weixin/recharge/?rechargeNext=/weixin/account/'
                 })
             }else{
-                $('.button').click(function() {
+                $('.recharge_button').click(function() {
                     window.location.href = '/weixin/login/?next=/weixin/recharge/'
                 })
             }
-
+			$('.investment_button').click(function() {
+				window.location.href = '/weixin/list/'
+			});
+			$('.code_wrap').show();
             //console.log('其他场景的业务逻辑');
         }
     });
+
+	var see_rule_button_index;
+	$('.see_rule_button').click(function(){
+		see_rule_button_index = $(this).next().hasClass('rule_wrap_show');
+		if(see_rule_button_index){
+			$(this).next().removeClass('rule_wrap_show').hide();
+		}else{
+			$(this).next().addClass('rule_wrap_show').show();
+		}
+	});
+
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({
 		type : 'GET',
@@ -278,10 +299,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	wx.ready(function(){
 		var host = 'https://www.wanglibao.com/',
 			shareName = '网利宝用户专享福利',
-			shareImg = host + '/static/imgs/mobile_activity/app_recharge_8000/300x300.jpg',
+			shareImg = host + '/static/imgs/mobile_activity/app_double_dan/300x300.jpg',
 			shareLink = host + '/activity/app_recharge_8000/',
 			shareMainTit = '网利宝用户专享福利',
-			shareBody = '网利宝充8000送800活动！';
+			shareBody = '网利宝双旦来了，翻倍狂欢。跨年最强福利场！';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,

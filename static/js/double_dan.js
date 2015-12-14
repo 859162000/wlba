@@ -56,13 +56,27 @@
 			}
 		})
 
-		$('.button').click(function(){
+		$('.recharge_button').click(function(){
 			if(h5_user_static){
 				window.location.href = '/pay/banks/'
 			}else{
 				window.location.href = '/accounts/login/?next=/pay/banks/'
 			}
 		});
+
+        $('.investment_button').click(function(){
+		    window.location.href = '/p2p/list/'
+		});
+
+        var see_rule_button_index;
+        $('.see_rule_button').click(function(){
+            see_rule_button_index = $(this).parent().next().hasClass('rule_wrap_show');
+            if(see_rule_button_index){
+                $(this).parent().next().removeClass('rule_wrap_show').hide();
+            }else{
+                $(this).parent().next().addClass('rule_wrap_show').show();
+            }
+        });
     })
 
 }).call(this);
