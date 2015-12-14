@@ -49,6 +49,17 @@
             //console.log('其他场景的业务逻辑');
         }
     });
+
+	var see_rule_button_index;
+	$('.see_rule_button').click(function(){
+		see_rule_button_index = $(this).next().hasClass('rule_wrap_show');
+		if(see_rule_button_index){
+			$(this).next().removeClass('rule_wrap_show').hide();
+		}else{
+			$(this).next().addClass('rule_wrap_show').show();
+		}
+	});
+
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({
 		type : 'GET',

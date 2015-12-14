@@ -55,7 +55,7 @@ org.area = (function (org) {
                 var index = $(this).index();
                 $(this).addClass('active').siblings().removeClass('active');
                 $('.area-scroll').eq(index).show().siblings().hide();
-                translateX = $slideWidth * index;
+                translateX = $slideWidth* index;
                 $slideLine.css('-webkit-transform', 'translate3d(' + translateX + 'px, 0, 0)')
                 location.hash = '#' + index;
                 if(index === 1 && $milepost.attr('data-active') != 'true'){
