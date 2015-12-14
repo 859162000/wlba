@@ -36,7 +36,7 @@ from wanglibao_pay.views import (CardViewSet, BankCardAddView, BankCardListView,
 from wanglibao_portfolio.views import PortfolioViewSet, ProductTypeViewSet
 from wanglibao_preorder.views import PreOrderViewSet
 from wanglibao_profile.views import ProfileView, TradePasswordView
-from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView, 
+from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidationCodeView,
                             UserExisting, RegisterAPIView, IdValidate, AdminIdValidate,
                             WeixinRegisterAPIView, IdValidateAPIView, ClientUpdateAPIView,
                             YTXVoiceCallbackAPIView, SendVoiceCodeAPIView, TestSendRegisterValidationCodeView,
@@ -44,7 +44,8 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
                             DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView,
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
-                            CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI)
+                            CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
+                            DataCubeApiView)
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
 
@@ -277,4 +278,10 @@ urlpatterns += patterns(
 urlpatterns += patterns(
     '',
     url(r'^experience/', include('experience_gold.urls')),
+)
+
+# 数据魔方接口
+urlpatterns += patterns(
+    '',
+    url(r'^datacube/$', DataCubeApiView.as_view()),
 )
