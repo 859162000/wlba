@@ -1,0 +1,38 @@
+- load formatters
+doctype html
+html(style="background: #b10012")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile_activity/app_double_dan.css?v=1201001", rel="stylesheet")
+        - csrf_token
+    body
+        .body_wrap
+            img.banner(src="/static/imgs/mobile_activity/app_double_dan/banner_1.jpg")
+            img.banner(src="/static/imgs/mobile_activity/app_double_dan/banner_2.png")
+            .main_box.main_box_1
+                img.main_title_img.banner(src="/static/imgs/mobile_activity/app_double_dan/main_title_1.png")
+                .main_top
+                    img(src="/static/imgs/mobile_activity/app_double_dan/main_top_1.png")
+                    .text 活动期间首次满额充值送翻倍理财金！<br>我出双倍本金你得收益，所得可直接提现！
+                .main
+                    .red_wrap
+                        .red_box
+                            .title 1. 2000≤活动期间首充＜5000
+                            img.img(src="/static/imgs/mobile_activity/app_double_dan/red_box_img_1.jpg")
+                        .red_box
+                            .title 2. 5000≤活动期间首充＜10000
+                            img.img(src="/static/imgs/mobile_activity/app_double_dan/red_box_img_2.jpg")
+                        .red_box
+                            .title 3. 10000≤活动期间首充＜100000
+                            img.img(src="/static/imgs/mobile_activity/app_double_dan/red_box_img_3.jpg")
+        script(src='/static/src/mobile/lib/weixin/wx.js')
+        script(src="/static/scripts/component/webview.js")
+        script(src="/static/scripts/mobile_activity/app_double_dan.js?v=120801")
+        script.
+            var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+                iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+                ios = ipad || iphone;
+            if (ios) {
+                document.getElementById('ios-show').style.display = 'block';
+            }

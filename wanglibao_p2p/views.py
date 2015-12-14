@@ -58,6 +58,7 @@ from wanglibao_activity import backends as activity_backends
 from wanglibao_rest.common import DecryptParmsAPIView
 from wanglibao_redis.backend import redis_backend
 from .common import get_p2p_list
+from wanglibao.templatetags.formatters import safe_phone_str
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -530,7 +531,7 @@ class RecordView(APIView):
 
         record = [{
                       "amount": float(eq.amount),
-                      "user": eq.user.wanglibaouserprofile.phone,
+                      "user": safe_phone_str(eq.user.wanglibaouserprofile.phone),
                       "create_time": timezone.localtime(eq.create_time).strftime("%Y-%m-%d %H:%M:%S")
                   } for eq in equities]
 
