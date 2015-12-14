@@ -2,7 +2,14 @@
 # encoding:utf-8
 
 import sys
+from django.http.response import Http404
+from rest_framework.exceptions import APIException
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.status import HTTP_200_OK
+from rest_framework.views import APIView
 from wanglibao_account.cooperation import CoopRegister
+from wanglibao_pay.serializers import CardSerializer
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -520,6 +527,7 @@ def bind_pay_dynnum(request):
     token = request.DATA.get("token", "").strip()
     vcode = request.DATA.get("vcode", "").strip()
     input_phone = request.DATA.get("phone", "").strip()
+    set_the_one_card = request.DATA.get('set_the_one_card', '').strip()
     device = split_ua(request)
     ip = util.get_client_ip(request)
 
@@ -554,6 +562,9 @@ def bind_pay_dynnum(request):
         res = {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
 
     if res.get('ret_code') == 0:
+        if set_the_one_card:
+            card.is_the_one_card = True
+            card.save()
         try:
             CoopRegister(request).process_for_binding_card(user)
         except:
@@ -564,3 +575,62 @@ def bind_pay_dynnum(request):
 
 def yee_callback(request):
     return YeeShortPay().pay_callback(request)
+
+
+
+#######################################同卡进出 start###############################
+class CardNotFoundException(APIException):
+    status_code = 404
+    default_detail = '未发现唯一绑定卡片'
+
+class CardExistException(APIException):
+    status_code = 405
+    default_detail = '不能重复绑卡'
+
+class TheOneCardAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def get_the_one_card(self, user):
+        try:
+            return Card.objects.get(user=user, is_the_one_card=True)
+        except:
+            raise CardNotFoundException
+
+    def get(self, request):
+        card = self.get_the_one_card(request.user)
+        serializer = CardSerializer(card)
+        return Response(serializer.data)
+
+    def put(self, request):
+        """
+        将一张现有的卡设置为唯一进出卡
+        :param request:
+        :param card_id:
+        :return:
+        """
+        try:
+            card_id = int(request.DATA.get('card_id'))
+            card = Card.objects.get(pk=card_id, user=request.user)
+        except:
+            raise CardNotFoundException
+        if card.is_the_one_card:
+            raise CardExistException
+
+
+        card.is_the_one_card = True
+        card.save()
+        return Response({'status_code': 0})
+
+    def delete(self, request):
+        """
+        这个接口提供给客服，用户通过客服解除绑定的唯一进出卡
+        :param request:
+        :param card_id:
+        :return:
+        """
+        card = self.get_the_one_card(request.user)
+        card.is_the_one_card = False
+        card.save()
+        return Response({'status_code': 0})
+
+#######################################同卡进出 end###############################
