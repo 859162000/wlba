@@ -220,6 +220,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 ;org.area = (function (org) {
     var lib = {
         init: function () {
+            lib.slide();
+
             var page = 2, pagesize = 6, latestPost = false;
 
             var $latest =$('.area-latest-btn'),
@@ -258,34 +260,37 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             })
         },
 
-
-    }
-    return {
-        init: lib.init
-    }
-})(org);
-
-org.milepost = (function (org) {
-    var lib = {
-        init: function () {
-            lib.slide();
-
-        },
-
         slide: function () {
             var milepost = false,
                 $milepostBtn = $('.area-milepost-btn'),
                 $milepostMore = $('.area-milepost-more'),
                 $milepostPush =$('.area-milepost-push'),
                 $slideLine = $('.slide-bottom'),
+                $slideWidth = $(window).width()/2,
+                $milepostLoad = $('.area-milepost-loading'),
                 $milepost = $('.area-milepost');
 
+            $('.tab-nav li').on('click', function () {
+                var index = $(this).index();
+                $(this).addClass('active').siblings().removeClass('active');
+                $('.area-scroll').eq(index).show().siblings().hide();
+                translateX = $slideWidth* index;
+                $slideLine.css('-webkit-transform', 'translate3d(' + translateX + 'px, 0, 0)')
+                location.hash = '#' + index;
+                if(index === 1 && $milepost.attr('data-active') != 'true'){
+                    doing(1, function(){
+                        $milepostLoad.hide()
+                    })
+                }
+            });
 
-            var page = 1;
+
+
+
             $milepostBtn.on('click', function(){
                 if (milepost) return;
-                page = page + 1;
-                doing(page);
+                var page = parseInt($milepost.attr('data-page')) + 1;
+                doing(page)
             });
 
 
@@ -297,7 +302,7 @@ org.milepost = (function (org) {
                         pagesize: 6
                     },
                     beforeSend: function(){
-                        milepost = true;
+                        milepost = true
                         $milepostBtn.text('加载中...')
                     },
                     success: function(result){
@@ -329,6 +334,7 @@ org.milepost = (function (org) {
     }
 })(org);
 
+;
 (function (org) {
     $.each($('script'), function () {
         var src = $(this).attr('src');

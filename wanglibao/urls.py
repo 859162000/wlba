@@ -179,6 +179,8 @@ urlpatterns += patterns(
     url(r'^wsf/(?P<phone>\w+)', AppShareViewError.as_view(), name="app_invite_error"),
     url(r'^app-invite-server/$', TemplateView.as_view(template_name="app_invite_server.jade")),
 
+    url(r'^rock/finance/qrcode/$', TemplateView.as_view(template_name="qrcode.jade")),
+
 )
 
 # 短信
