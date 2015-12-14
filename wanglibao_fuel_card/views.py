@@ -2,29 +2,58 @@
 
 from django.utils import timezone
 from django.views.generic import TemplateView
+from django.shortcuts import render_to_response
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from wanglibao_p2p.models import P2PProduct
+from wanglibao.const import ErrorNumber
 from .forms import FuelCardBuyForm
 
 
-class FuelCardBuyView(TemplateView):
+class FuelCardBuyApi(APIView):
     """
-    加油卡购买
+    加油卡购买接口
     :param
     :return
     :request_method POST
     :user.is_authenticated True
     """
 
-    template_name = ''
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request):
+        if not request.user.wanglibaouserprofile.id_is_valid:
+            return Response({
+                'message': u'请先进行实名认证',
+                'error_number': ErrorNumber.need_authentication
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         form = FuelCardBuyForm(data=request.POST)
         if form.is_valid():
             p2p_product = form.cleaned_data['p2p_product']
             p_parts = form.cleaned_data['p_parts']
             total_amount = form.cleaned_data['total_amount']
+            # 判断用户是否满足最低消费限额
             if p2p_product.limit_min_per_user * p_parts == total_amount:
-                pass
+                try:
+                    trader = P2PTrader(product=p2p_product, user=request.user, request=request)
+                    product_info, margin_info, equity_info = trader.purchase(total_amount)
+                    return Response({
+                        'data': product_info.amount,
+                        'category': equity_info.product.category
+                    })
+                except Exception, e:
+                    return Response({
+                        'message': e.message,
+                        'error_number': ErrorNumber.unknown_error
+                    }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({
+                "message": form.errors,
+                'error_number': ErrorNumber.form_error
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class FuelCardListViewForApp(TemplateView):
@@ -35,7 +64,7 @@ class FuelCardListViewForApp(TemplateView):
     :request_method GET
     """
 
-    template_name = ''
+    template_name = 'fuel_index.jade'
 
     def get_context_data(self, **kwargs):
         # 优先级越低排越前面
@@ -57,4 +86,3 @@ class FuelCardListViewForApp(TemplateView):
         return {
             'html_data': data,
         }
-
