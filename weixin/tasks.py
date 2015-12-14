@@ -13,47 +13,31 @@ import datetime
 
 from weixin.models import SubscribeRecord, SubscribeService, WeixinUser
 from weixin.constant import MessageTemplate, PRODUCT_ONLINE_TEMPLATE_ID, BIND_SUCCESS_TEMPLATE_ID
-from weixin.views import SendTemplateMessage
+from weixin.util import sendTemplate
 from wanglibao_redpack.models import RedPackRecord, RedPackEvent
-from wanglibao_redpack.backends import get_start_end_time, local_transform_str,stamp
+from wanglibao_redpack.backends import get_start_end_time,stamp
+
+from wanglibao_activity.models import ActivityRule
+from weixin.constant import BIND_SUCCESS_TEMPLATE_ID
 
 
 @app.task
-def bind_ok(openid, is_first_bind, redpack_record_id):
+def bind_ok(openid, is_first_bind):
     weixin_user = WeixinUser.objects.get(openid=openid)
     now_str = datetime.datetime.now().strftime('%Y年%m月%d日')
-    if is_first_bind and redpack_record_id:
-        redpack_record = RedPackRecord.objects.get(id=redpack_record_id)
-        if redpack_record and redpack_record.user == weixin_user.user:
-            # 获赠红包：20元
-            # 起投金额：2000元
-            # 有效期：**年**月**日（自领取之日起7天有效）
-            redpack_event = redpack_record.redpack.event
-            start_time, endtime = get_start_end_time(redpack_event.auto_extension, redpack_event.auto_extension_days,
-                                              redpack_record.created_at, redpack_event.available_at, redpack_event.unavailable_at)
-            remark = u"获赠红包：%s元\n起投金额：%s元\n有效期至：%s\n您可以使用下方微信菜单进行更多体验。"%(redpack_event.amount,
-                                                                         redpack_event.invest_amount, datetime.datetime.fromtimestamp(stamp(endtime)).strftime('%Y年%m月%d日'))
-            sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
-                                        "openid":weixin_user.openid,
-                                        "template_id":BIND_SUCCESS_TEMPLATE_ID,
-                                        "name1":"",
-                                        "name2":weixin_user.user.wanglibaouserprofile.phone,
-                                        "time":now_str+'\n',
-                                        "remark":remark
-                                            })},
-                                        queue='celery02'
-                                        )
-            return
-    sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
-                                "openid":weixin_user.openid,
-                                "template_id":BIND_SUCCESS_TEMPLATE_ID,
-                                "name1":"",
-                                "name2":weixin_user.user.wanglibaouserprofile.phone,
-                                "time":now_str,
-                                    })},
-                                queue='celery02'
-                                )
-
+    if is_first_bind:
+        from wanglibao_activity.backends import check_activity
+        check_activity(weixin_user.user, 'first_bind_weixin', "weixin", is_first_bind=is_first_bind)
+    else:
+        sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
+                                    "openid":weixin_user.openid,
+                                    "template_id":BIND_SUCCESS_TEMPLATE_ID,
+                                    "name1":"",
+                                    "name2":weixin_user.user.wanglibaouserprofile.phone,
+                                    "time":now_str,
+                                        })},
+                                    queue='celery02'
+                                    )
 @app.task
 def detect_product_biding(product_id):
     product = P2PProduct.objects.get(pk=product_id)
@@ -111,7 +95,7 @@ def sendUserProductOnLine(openid, service_desc, product_id, product_name, rate_d
         template = MessageTemplate(PRODUCT_ONLINE_TEMPLATE_ID,
             first=service_desc, keyword1=product_name, keyword2=rate_desc,
             keyword3=period_desc, keyword4=pay_method, url=url)
-        SendTemplateMessage.sendTemplate(w_user, template)
+        sendTemplate(w_user, template)
 
 @app.task
 def sentTemplate(kwargs):
@@ -126,4 +110,4 @@ def sentTemplate(kwargs):
     template = MessageTemplate(template_id, **template_args)
     w_user = WeixinUser.objects.filter(openid=openid).first()
     if w_user and template:
-        SendTemplateMessage.sendTemplate(w_user, template)
+        sendTemplate(w_user, template)

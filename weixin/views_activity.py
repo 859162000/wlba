@@ -1,25 +1,15 @@
 # encoding:utf-8
 from django.views.generic import View, TemplateView, RedirectView
-from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseRedirect
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
+from django.http import  HttpResponseRedirect
+
 from django.core.urlresolvers import reverse
-from django.contrib.auth import login as auth_login, logout
+
 from django.conf import settings
-from django.shortcuts import redirect
-from django.db.models.signals import post_save, pre_save
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import renderers
-from django.utils import timezone
-from rest_framework.permissions import IsAuthenticated
 import json
 import logging
 import urllib
 import base64
-
 from .models import WeixinUser
-from .views import JumpPageTemplate, redirectToJumpPage
 from misc.models import Misc
 from wanglibao_account.backends import invite_earning
 
@@ -50,11 +40,14 @@ class BaseWeixinTemplate(TemplateView):
             # print redirect_url
             return HttpResponseRedirect(redirect_url)
         w_user = WeixinUser.objects.filter(openid=openid).first()
+        error_msg = ""
         if not w_user:
-            return redirectToJumpPage("error")
+            error_msg = "error"
         if not w_user.user:
-            return redirectToJumpPage(u"请先绑定网利宝账号")
-
+            error_msg = u"请先绑定网利宝账号"
+        if error_msg:
+            from .views import redirectToJumpPage
+            return redirectToJumpPage(error_msg)
         return super(BaseWeixinTemplate, self).dispatch(request, *args, **kwargs)
 
 

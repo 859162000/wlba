@@ -31,8 +31,6 @@ from constant import (ACCOUNT_INFO_TEMPLATE_ID, BIND_SUCCESS_TEMPLATE_ID, UNBIND
                       PRODUCT_ONLINE_TEMPLATE_ID, AWARD_COUPON_TEMPLATE_ID)
 from weixin.util import getAccountInfo
 from wanglibao_profile.models import WanglibaoUserProfile
-import weixin.tasks
-
 from wanglibao_pay.models import Bank
 from wechatpy import parse_message, create_reply, WeChatClient
 from wechatpy.replies import TransferCustomerServiceReply
@@ -41,7 +39,7 @@ from wechatpy.exceptions import InvalidSignatureException, WeChatException
 from wechatpy.oauth import WeChatOAuth
 from weixin.common.decorators import weixin_api_error
 from weixin.common.wx import generate_js_wxpay
-from .models import Account, WeixinUser, WeixinAccounts, AuthorizeInfo, QrCode, SubscribeService, SubscribeRecord, WeiXinChannel
+from .models import Account, WeixinUser, WeixinAccounts, AuthorizeInfo, QrCode, SubscribeService, SubscribeRecord, WeiXinChannel, WeiXinUserActionRecord
 # from .common.wechat import tuling
 from decimal import Decimal
 from wanglibao_pay.models import Card
@@ -52,7 +50,7 @@ import urllib
 import logging
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
-from wanglibao_p2p.views import get_p2p_list
+from wanglibao_p2p.common import get_p2p_list
 from wanglibao_redis.backend import redis_backend
 from rest_framework import renderers
 from misc.models import Misc
@@ -62,14 +60,25 @@ import datetime, time
 from .util import _generate_ajax_template
 from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEvent, UnsubscribeEvent, SubscribeEvent,\
                              TemplateSendJobFinishEvent)
-from wanglibao_redpack.backends import give_first_bind_wx_redpack
 from experience_gold.models import ExperienceEvent, ExperienceEventRecord
 from experience_gold.backends import SendExperienceGold
 from marketing.utils import local_to_utc
-
-
+from weixin.tasks import detect_product_biding, sentTemplate, bind_ok
+from weixin.util import sendTemplate
 logger = logging.getLogger("weixin")
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
+
+def stamp(dt):
+    return long(time.mktime(dt.timetuple()))
+
+def _process_record(w_user, user, type, describe):
+    war = WeiXinUserActionRecord()
+    war.w_user = w_user
+    war.user = user
+    war.action_type = type
+    war.action_describe = describe
+    war.create_time = int(time.time())
+    war.save()
 
 def checkBindDeco(func):
     @functools.wraps(func)
@@ -137,6 +146,9 @@ class WeixinJoinView(View):
         weixin_account = WeixinAccounts.getByOriginalId(toUserName)
         w_user, old_subscribe = getOrCreateWeixinUser(fromUserName, weixin_account)
         user = w_user.user
+
+        self.w_user = w_user
+
         if isinstance(msg, BaseEvent):
             if isinstance(msg, ClickEvent):
                 reply = self.process_click_event(weixin_account, w_user=w_user, user=user)
@@ -146,9 +158,7 @@ class WeixinJoinView(View):
                 if w_user.subscribe != 0:
                     w_user.subscribe = 0
                 w_user.unsubscribe_time = int(time.time())
-                w_user.unbind_time = int(time.time())
-                w_user.user = None
-                w_user.save()
+                unbindUser(w_user, user)
                 reply = create_reply(u'欢迎下次关注我们！', msg)
             elif isinstance(msg, SubscribeScanEvent):
                 reply = self.process_subscribe(old_subscribe, w_user=w_user, user=user)
@@ -219,7 +229,7 @@ class WeixinJoinView(View):
             a = MessageTemplate(ACCOUNT_INFO_TEMPLATE_ID,
                     keyword1=now_str,
                     keyword2=infos)
-            SendTemplateMessage.sendTemplate(w_user, a)
+            sendTemplate(w_user, a)
             reply = -1
         if self.msg.key == 'customer_service':
             txt = self.getCSReply()
@@ -242,8 +252,8 @@ class WeixinJoinView(View):
             reply = create_reply(articles, self.msg)
 
         if self.msg.key == 'sign_in':
-            try:
-                if self.checkIsTodaySignIn(user):
+            # try:
+                if self.checkIsTodaySignIn(w_user, user):
                     txt = u"今日已经签到，明日再来"
                     reply = create_reply(txt, self.msg)
                 else:
@@ -259,9 +269,10 @@ class WeixinJoinView(View):
                     else:
                         reply = -1
                         logger.debug(u'用户签到没有领到体验金')
-            except Exception, e:
-                reply = -1
-                logger.debug(u"用户签到领体验金抛出异常")
+                    _process_record(w_user, user, 'sign_in', u"用户签到")
+            # except Exception, e:
+            #     reply = -1
+            #     logger.debug(u"用户签到领体验金抛出异常")
         if self.msg.key == 'my_experience_gold':
             seg = SendExperienceGold(user)
             amount = seg.get_amount()
@@ -320,15 +331,7 @@ class WeixinJoinView(View):
                 channel_digital_code = eventKey[-3:]
                 user = User.objects.filter(pk=int(user_id)).first()
                 if user:
-                    rs, txt, is_first_bind, redpack_record_id = bindUser(w_user, user)
-                    if rs == 0:
-                        weixin.tasks.bind_ok.apply_async(kwargs={
-                            "openid": fromUserName,
-                            "is_first_bind": is_first_bind,
-                            "redpack_record_id": redpack_record_id,
-                        },
-                                            queue='celery01'
-                                            )
+                    rs, txt = bindUser(w_user, user)
                     channel = WeiXinChannel.objects.filter(digital_code=channel_digital_code).first()
                     if channel:
                         scene_id = channel.code
@@ -377,12 +380,12 @@ class WeixinJoinView(View):
     def getCSReply(self):
         now = datetime.datetime.now()
         weekday = now.weekday() + 1
-        if now.hour<=20 and now.hour>=9 and weekday>=1 and weekday<=5:
+        if now.hour<=17 and now.hour>=10 and weekday>=1 and weekday<=5:
             txt = u"客官，想和网利菌天南海北的聊天还是正经的咨询？不要羞涩，放马过来吧！聊什么听你的，但是网利菌在线时间为\n" \
-                  u"【周一至周五9：00~20：00】"
+                  u"【周一至周五10：00~17：00】"
         else:
             txt = u"客官，网利菌在线时间为\n"\
-                    + u"【周一至周五9：00~20：00】，请在工作与我们联系哦~"
+                    + u"【周一至周五10：00~17：00】，请在工作与我们联系哦~"
         return txt
 
     def getSignExperience_gold(self):
@@ -395,15 +398,19 @@ class WeixinJoinView(View):
             random_int = random.randint(0, length-1)
             return experience_events[random_int]
         return None
-    def checkIsTodaySignIn(self, user):
+    def checkIsTodaySignIn(self, w_user, user):
         now = datetime.datetime.now()
 
-        start = local_to_utc(now, 'min')
-        end = local_to_utc(now, 'max')
-        experience_records = ExperienceEventRecord.objects.filter(user=user, event__give_mode='weixin_sign_in',
-                                                          created_at__lt=end, created_at__gt=start).all()
+        start = datetime.datetime(now.year,now.month, now.day)
+        end = datetime.datetime(now.year,now.month, now.day, 23, 59, 59)
+
+        war = WeiXinUserActionRecord.objects.filter(user=user, action_type='sign_in', create_time__lt=stamp(end), create_time__gt=stamp(start)).first()
+
+        # experience_records = ExperienceEventRecord.objects.filter(user=user, event__give_mode='weixin_sign_in',
+        #                                                   created_at__lt=end, created_at__gt=start).all()
+
         is_today_signin = False
-        if len(experience_records)>0:
+        if war:
             is_today_signin = True
         return is_today_signin
 
@@ -414,6 +421,8 @@ class WeixinJoinView(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super(WeixinJoinView, self).dispatch(request, *args, **kwargs)
+
+
 
 
 
@@ -455,22 +464,34 @@ def bindUser(w_user, user):
     redpack_record_id = 0
     if w_user.user:
         if w_user.user.id==user.id:
-            return 1, u'你已经绑定, 请勿重复绑定', is_first_bind, redpack_record_id
-        return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone, is_first_bind, redpack_record_id
+            return 1, u'你已经绑定, 请勿重复绑定'
+        return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone
     other_w_user = WeixinUser.objects.filter(user=user).first()
     if other_w_user:
         msg = u"你的手机号%s已经绑定微信<span style='color:#173177;'>%s</span>"%(user.wanglibaouserprofile.phone, other_w_user.nickname)
-        return 3, msg, is_first_bind, redpack_record_id
+        return 3, msg
     w_user.user = user
     w_user.bind_time = int(time.time())
     w_user.save()
+    _process_record(w_user, user, 'bind', "绑定网利宝")
+
     if not user.wanglibaouserprofile.first_bind_time:
         user.wanglibaouserprofile.first_bind_time = w_user.bind_time
         user.wanglibaouserprofile.save()
-        redpack_record_id = give_first_bind_wx_redpack(user, 'all')
         is_first_bind = True
+    bind_ok.apply_async(kwargs={
+        "openid": w_user.openid,
+        "is_first_bind":is_first_bind,
+    },
+                        queue='celery01'
+                        )
+    return 0, u'绑定成功'
 
-    return 0, u'绑定成功', is_first_bind, redpack_record_id
+def unbindUser(w_user, user):
+    w_user.user = None
+    w_user.unbind_time=int(time.time())
+    w_user.save()
+    _process_record(w_user, user, 'unbind', "解除绑定")
 
 class WeixinLogin(TemplateView):
     template_name = 'weixin_login_new.jade'
@@ -531,30 +552,6 @@ class WeixinRegister(TemplateView):
             'next' : next
         }
 
-class SendTemplateMessage(APIView):
-    permission_classes = (IsAuthenticated,)
-    http_method_names = ['post']
-    BIND_SUCCESS = "bind_success"
-
-    @classmethod
-    def sendTemplate(cls, weixin_user, message_template):
-        weixin_account = WeixinAccounts.getByOriginalId(weixin_user.account_original_id)
-        # account = Account.objects.get(original_id=weixin_user.account_original_id)
-        client = WeChatClient(weixin_account.app_id, weixin_account.app_secret)
-        print message_template.url
-        client.message.send_template(weixin_user.openid, template_id=message_template.template_id,
-                                     top_color=message_template.top_color, data=message_template.data,
-                                     url=message_template.url)
-    def post(self, request):
-        openid = request.POST.get('openid')
-        if not openid:
-            return Response({'error':-1})
-        w_user = WeixinUser.objects.filter(openid=openid).first()
-        template_type = request.POST.get('template_type', '')
-        template = None
-
-        return Response({'message':'ok'})
-
 
 class JumpPageTemplate(TemplateView):
     template_name = 'sub_times.jade'
@@ -581,17 +578,9 @@ class WeixinBind(TemplateView):
         try:
             openid = self.request.GET.get('openid')
             weixin_user = WeixinUser.objects.get(openid=openid)
-            rs, txt, is_first_bind, redpack_record_id = bindUser(weixin_user, user)
-            if rs == 0:
-                weixin.tasks.bind_ok.apply_async(kwargs={
-                    "openid": openid,
-                    "is_first_bind": is_first_bind,
-                    "redpack_record_id": redpack_record_id,
-                },
-                                    queue='celery01'
-                                    )
+            rs, txt = bindUser(weixin_user, user)
         except WeixinUser.DoesNotExist, e:
-            logger.debug(e.message)
+            logger.debug("*************************"+e.message)
             pass
         context['message'] = txt
         return {
@@ -636,13 +625,12 @@ class UnBindWeiUserAPI(APIView):
         openid = request.POST.get('openid')
         weixin_user = WeixinUser.objects.get(openid=openid)
         if weixin_user.user:
-            user_phone = weixin_user.user.wanglibaouserprofile.phone
-            weixin_user.user = None
-            weixin_user.unbind_time = int(time.time())
-            weixin_user.save()
+            user = weixin_user.user
+            user_phone = user.wanglibaouserprofile.phone
+            unbindUser(weixin_user, user)
             now_str = datetime.datetime.now().strftime('%Y年%m月%d日 %H:%M')
             logout(request)
-            weixin.tasks.sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
+            sentTemplate.apply_async(kwargs={"kwargs":json.dumps({
                     "openid":weixin_user.openid,
                     "template_id":UNBIND_SUCCESS_TEMPLATE_ID,
                     "keyword1":user_phone,
@@ -1512,7 +1500,7 @@ def checkAndSendProductTemplate(sender, **kw):
                         template = MessageTemplate(PRODUCT_ONLINE_TEMPLATE_ID,
                             first=service.describe, keyword1=product.name, keyword2=rate_desc,
                             keyword3=period_desc, keyword4=product.pay_method, url=url)
-                        SendTemplateMessage.sendTemplate(sub_record.w_user, template)
+                        sendTemplate(sub_record.w_user, template)
 
 
 
@@ -1521,7 +1509,7 @@ def checkProduct(sender, **kw):
     product = kw["instance"]
     if getattr(product, "old_status", ""):
         if product.old_status == u'待审核' and product.status==u'正在招标':
-            weixin.tasks.detect_product_biding.apply_async(kwargs={
+            detect_product_biding.apply_async(kwargs={
                "product_id":product.id
             },
                                                            queue='celery01')

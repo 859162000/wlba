@@ -1,4 +1,5 @@
 # encoding:utf-8
+from wanglibao_reward.models import WanglibaoActivityReward as ActivityReward
 import base64
 import hashlib
 import os
@@ -27,7 +28,7 @@ from wanglibao_sms.utils import send_validation_code, validate_validation_code
 from misc.models import Misc
 from wanglibao_sms.models import *
 from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, IntroducedBy, IntroducedByReward, \
-    Reward, ActivityJoinLog, QuickApplyInfo, GiftOwnerGlobalInfo, GiftOwnerInfo
+    Reward, ActivityJoinLog, QuickApplyInfo, GiftOwnerGlobalInfo, GiftOwnerInfo, WanglibaoVoteCounter
 from marketing.tops import Top
 from utils import local_to_utc
 from wanglibao_reward.models import WanglibaoWeixinRelative
@@ -58,6 +59,8 @@ from wanglibao.settings import XUNLEIVIP_REGISTER_KEY
 import urllib
 import hashlib
 import logging
+import qrcode
+from wanglibao_reward.models import WanglibaoActivityReward
 logger = logging.getLogger('marketing')
 TRIGGER_NODE = [i for i, j in TRIGGER_NODE]
 
@@ -2629,4 +2632,139 @@ class RewardDistributeAPIView(APIView):
                 'redpack': redpack_event.id
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+
+class RockFinanceAPIView(APIView):
+    permission_classes = ()
+
+    def get_qrcode(self, request):
+        if not request.user.is_authenticated():
+            return Response({"code": 1002, "message": u"请您先登录"})
+
+        reward = WanglibaoActivityReward.objects.filter(user=request.user, activity='rock_finance').first()
+        if not reward:
+            return Response({"code": 1003, "message": u"您没有领到对应的入场二维码"})
+
+        if reward.is_used:  # 二维码可能被重复使用
+            return Response({"code": -1, "img": reward.qrcode, "message": u"您的二维码已经被使用"})
+        else:
+            return Response({"code": 0, "img": reward.qrcode, "message": u"得到合法二维码"})
+
+    def get_vote_static(self):
+        """
+            得到整体的全部数据
+        """
+        records = WanglibaoVoteCounter.objects.filter(activity="rock_finance")
+        records = {"".join(['《', str(record.item), '》']): record.count for record in records}  #前端要求带书名号
+        return Response({"records": records, "message": u'整体的汇总数据', "code":0})
+
+    def get(self, request):
+        _type = request.GET.get("type", None)
+        if not _type or _type not in ('qrcode', 'static'):
+            return Response({"code": 1001, "message": u"请传入合理参数"})
+
+        if _type == 'qrcode':
+            return self.get_qrcode(request)
+        if _type == 'static':
+            return self.get_vote_static()
+
+    def post(self, request):
+        """
+        items 的数据格式为： "乐队-歌曲,乐队-歌曲,..."
+        """
+        items = request.DATA.get("items", None)
+
+        try:
+            assert None is not items
+        except AssertionError:
+            return Response({"code": 1000, "message": u'传入的参数不合法'})
+        else:
+            items = items.split(",")
+
+        musics = list()
+        teams = list()
+        for item in items:
+            item = item.split("-")
+            teams.append(item[0])
+            musics.append(item[1])
+
+        vote_counter = WanglibaoVoteCounter.objects.filter(activity="rock_finance", item__in=musics)
+
+        for music in musics:
+            vote = vote_counter.filter(item=music).first()
+            if not vote:
+                vote = WanglibaoVoteCounter.objects.create(
+                    activity="rock_finance",
+                    catalog=teams[musics.index(music)],
+                    item=music,
+                    count=0
+                )
+
+            vote.count += 1
+            vote.save()
+        return Response({"code": 0, "message": u'投票成功'})
+
+
+class RockFinanceCheckAPIView(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        key = 'activities'
+        activity_config = Misc.objects.filter(key=key).first()
+        if activity_config:
+            activity = json.loads(activity_config.value)
+            if type(activity) == dict:
+                try:
+                    rock_finance = activity['rock_finance']
+                    is_open = rock_finance["is_open"]
+                    start_scan = rock_finance["start_scan"]
+                    end_scan = rock_finance["end_scan"]
+                    openids = rock_finance["openids"]
+                except KeyError, reason:
+                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
+                    raise Exception(u'misc中activities配置错误，请检查。reason:%s'% reason)
+        else:
+            raise Exception(u"misc中没有配置activities杂项")
+
+        openid = request.DATA.get("openid", None)
+        #判断是否在扫描列表里
+        if openid not in openids:
+            return Response({"code": 1000, "message": u"您没有扫描权限"})
+
+        #判断活动是否开启
+        if is_open == "false":
+            return Response({"code": 1001, "message": u"活动还没有开启"})
+
+        #判断是否在扫描的时间段内
+        now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        if now < start_scan or now > end_scan:
+            return Response({"code": 1002, "message": u'扫描时间段不合理'})
+
+
+        owner_id = request.DATA.get("owner_id", None)
+        activity = request.DATA.get("activity", None)
+        content = request.DATA.get("content", None)
+
+        try:
+            assert None not in (owner_id, activity, content)
+        except AssertionError:
+            return Response({"code": 1005, "message": u"二维码链接的参数不对"})
+
+        with transaction.atomic():
+            reward_record = WanglibaoActivityReward.objects.select_for_update().filter(has_sent=False, user_id=owner_id, activity=activity, reward__content=content).first()
+            if not reward_record:
+                reward_record.save()
+                return Response({"code": 1003, "message": u'您的二维码不合法'})
+
+            if reward_record.has_sent:
+                reward_record.save()
+                return Response({"code": 1004, "message": u'每一个二维码只能被使用一次'})
+
+            reward_record.has_sent = True
+            reward_record.left_times = 0
+            reward_record.save()
+            return Response({"code": 0, "message": u'欢迎您参加网利宝金融摇滚夜'})
+
+    def dispatch(self, request, *args, **kwargs):
+        pass
 

@@ -15,6 +15,7 @@ if __name__ == '__main__':
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wanglibao.settings')
 
+import qrcode
 import hashlib
 import datetime
 import time
@@ -34,6 +35,9 @@ from marketing.models import Channels, IntroducedBy, PromotionToken, GiftOwnerIn
 from marketing.utils import set_promo_user, get_channel_record, get_user_channel_record
 from wanglibao import settings
 from wanglibao_redpack import backends as redpack_backends
+from misc.models import Misc
+from wanglibao_reward.models import WanglibaoActivityReward as ActivityReward
+from marketing.models import Reward
 from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      TIANMANG_CALL_BACK_URL, WLB_FOR_YIRUITE_KEY, YIRUITE_KEY, BENGBENG_KEY, \
      WLB_FOR_BENGBENG_KEY, BENGBENG_CALL_BACK_URL, BENGBENG_COOP_ID, JUXIANGYOU_COOP_ID, JUXIANGYOU_KEY, \
@@ -55,7 +59,7 @@ from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import UserThreeOrder
 from wanglibao_redis.backend import redis_backend
 from dateutil.relativedelta import relativedelta
-from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes, hex2bin
+from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes
 from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift
 from user_agents import parse
@@ -1006,10 +1010,10 @@ class ZGDXRegister(CoopRegister):
         binding = Binding.objects.filter(user_id=user.id).first()
         # 判定是否首次绑卡
         if binding and binding.extra != '1':
-            if ENV == ENV_PRODUCTION:
-                plat_offer_id = '104369'
-            else:
-                plat_offer_id = '103050'
+            # if ENV == ENV_PRODUCTION:
+            plat_offer_id = '104369'
+            # else:
+            #     plat_offer_id = '103050'
             self.zgdx_call_back(user, plat_offer_id)
             binding.extra = '1'
             binding.save()
@@ -1023,15 +1027,106 @@ class ZGDXRegister(CoopRegister):
         if binding and p2p_record and p2p_record.order_id == int(order_id):
             p2p_amount = int(p2p_record.amount)
             if p2p_amount >= 1000:
-                if ENV == ENV_PRODUCTION:
-                    if 1000 <= p2p_amount < 2000:
-                        plat_offer_id = '104371'
-                    else:
-                        plat_offer_id = '104372'
+                # if ENV == ENV_PRODUCTION:
+                if 1000 <= p2p_amount < 2000:
+                    plat_offer_id = '104371'
                 else:
-                    plat_offer_id = '103050'
+                    plat_offer_id = '104372'
+                # else:
+                #     plat_offer_id = '103050'
                 self.zgdx_call_back(user, plat_offer_id)
 
+
+class RockFinanceRegister(CoopRegister):
+    def __init__(self, request):
+        super(RockFinanceRegister, self).__init__(request)
+        self.c_code = 'dmw'
+        self.invite_code = 'dmw'
+
+    def purchase_call_back(self, user, order_id):
+        key = 'activities'
+        activity_config = Misc.objects.filter(key=key).first()
+        if activity_config:
+            activity = json.loads(activity_config.value)
+            if type(activity) == dict:
+                try:
+                    rock_finance = activity['rock_finance']
+                    is_open = rock_finance["is_open"]
+                    amount = rock_finance["amount"]
+                    p2p_amount = rock_finance["p2p_amount"]
+                    start_time = rock_finance["start_time"]
+                    end_time = rock_finance["end_time"]
+                except KeyError, reason:
+                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
+                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
+            else:
+                raise Exception(u"misc中activities的配置参数，应是字典类型")
+        else:
+            raise Exception(u"misc中没有配置activities杂项")
+
+        if settings.DEBUG:
+            logger.debug(u"user:%s, order_id:%s, 运行开关:%s, 开放时间:%s, 结束时间:%s, 总票数:%s" % (user, order_id, is_open, start_time, end_time, amount))
+        binding = Binding.objects.filter(user_id=user.id).first()
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+
+        if binding and p2p_record and p2p_record.order_id == int(order_id):
+            # 1: 如果活动没有打开
+            if is_open == "false":
+                return
+
+            # 2: 如果票数到800了，直接跳出
+            counts = ActivityReward.objects.filter(activity='rock_finance').count()
+            if counts >= amount:
+                return
+
+            # 3 :如果时间已经过了, 直接跳出; 如果活动时间还没有开始，也直接跳出
+            now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            if now < start_time or now > end_time:
+                return
+
+            # 4: 如果投资额度不够，直接跳出
+            if p2p_record.amount < p2p_amount:
+                return
+
+            reward = Reward.objects.filter(type='金融摇滚夜', is_used=False).first()
+            if not reward:
+                return
+
+            with transaction.atomic():
+                reward = Reward.objects.select_for_update().filter(content=reward.content).first()
+                try:
+                    activity_reward = ActivityReward.objects.create(
+                        activity='rock_finance',
+                        order_id=order_id,
+                        user=user,
+                        p2p_amount=p2p_record.amount,
+                        reward=reward,
+                        has_sent=False, #当被扫码后， has_sent变成true
+                        left_times=1,
+                        join_times=1,
+                    )
+                except Exception, reason:
+                    logger.debug(u"生成获奖记录报异常, reason:%s" % reason)
+                    raise Exception(u"生成获奖记录异常")
+                else:
+                    #不知道为什么create的时候，会报错
+                    img = qrcode.make("https://www.wanglibao.com/api/check/qrcode/?owner_id=%s&activity=rock_finance&content=%s"%(user.id, reward.content))
+                    activity_reward.qrcode = img
+
+                    #将奖品通过站内信发出
+                    message_content = u"网里宝摇滚夜欢迎您的到来，点击<a href='https://www.wanglibao.com/api/rock/finance/?type=qrcode'>" \
+                                      u"获得入场二维码</a>查看，<br/> 感谢您对我们的支持与关注。<br/>网利宝"
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id": user.id,
+                        "title": u"网利宝摇滚之夜门票",
+                        "content": message_content,
+                        "mtype": "activity"
+                    })
+                    reward.is_used = True
+                    reward.save()
+
+                    if settings.DEBUG:
+                        logger.debug(u"user:%s, 站内信已经发出, 奖品内容:%s" % (user, reward.content))
 
 class JuChengRegister(CoopRegister):
     def __init__(self, request):
@@ -1233,7 +1328,7 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
                           ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
-                          XunleiVipRegister, JuChengRegister, MaimaiRegister,]
+                          XunleiVipRegister, JuChengRegister, MaimaiRegister, RockFinanceRegister]
 
 
 #######################第三方用户查询#####################

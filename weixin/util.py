@@ -4,7 +4,17 @@ from wanglibao_p2p.models import P2PEquity
 from wanglibao_buy.models import FundHoldInfo
 from django.template import Template, Context
 from django.template.loader import get_template
+from .models import WeixinAccounts
+from wechatpy import WeChatClient
 
+
+def sendTemplate(weixin_user, message_template):
+    weixin_account = WeixinAccounts.getByOriginalId(weixin_user.account_original_id)
+    # account = Account.objects.get(original_id=weixin_user.account_original_id)
+    client = WeChatClient(weixin_account.app_id, weixin_account.app_secret)
+    client.message.send_template(weixin_user.openid, template_id=message_template.template_id,
+                                 top_color=message_template.top_color, data=message_template.data,
+                                 url=message_template.url)
 
 def getAccountInfo(user):
 

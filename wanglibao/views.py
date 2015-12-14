@@ -18,6 +18,7 @@ import re
 from wanglibao import settings
 from wanglibao_rest import utils as rest_utils
 import logging
+from weixin.views_activity import ChannelBaseTemplate
 
 logger = logging.getLogger(__name__)
 
@@ -288,10 +289,11 @@ def landpage_view(request):
     return HttpResponseRedirect(url)
 
 
-class BaiduFinanceView(TemplateView):
+class BaiduFinanceView(ChannelBaseTemplate):
     template_name = "pc_baidu_finance.jade"
 
     def get_context_data(self, **kwargs):
+        context = super(BaiduFinanceView, self).get_context_data(**kwargs)
         # 网站数据
         m = MiscRecommendProduction(key=MiscRecommendProduction.KEY_PC_DATA, desc=MiscRecommendProduction.DESC_PC_DATA)
         site_data = m.get_recommend_products()
@@ -307,11 +309,12 @@ class BaiduFinanceView(TemplateView):
         p2p_two = IndexView().get_products(period=6, product_id=None, order_by='expected_earning_rate')[:1]
         p2p_three = IndexView().get_products(period=9, product_id=None, order_by='expected_earning_rate')[:1]
         token = self.request.GET.get('promo_token', '')
-        return {
+        context.update({
             'token': token,
             'site_data': site_data,
             'p2p_one': p2p_one,
             'p2p_two': p2p_two,
             'p2p_three': p2p_three,
             'today': today
-        }
+        })
+        return context

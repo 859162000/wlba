@@ -30,7 +30,7 @@ from order.utils import OrderHelper
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper
-from wanglibao_pay.exceptions import ThirdPayError
+from wanglibao_pay.exceptions import ThirdPayError, ManyCardException
 from wanglibao_pay.models import Bank, Card, PayResult, PayInfo, WithdrawCard, WithdrawCardRecord
 from wanglibao_pay.huifu_pay import HuifuPay, SignException
 from wanglibao_pay import third_pay, trade_record
@@ -354,7 +354,13 @@ class WithdrawCompleteView(TemplateView):
                 raise decimal.DecimalException
 
             card_id = request.POST.get('card_id', '')
-            card = Card.objects.get(pk=card_id)
+            card = Card.objects.get(pk=card_id, user=user)
+
+            # 增加银行卡号检测功能
+            card_no = card.no
+            card_count = Card.objects.filter(no=card_no).count()
+            if card_count > 1:
+                raise ManyCardException
 
             # 检测个别银行的单笔提现限额,如民生银行
             bank_limit = util.handle_withdraw_limit(card.bank.withdraw_limit)
@@ -398,6 +404,8 @@ class WithdrawCompleteView(TemplateView):
             result = u'提款金额在0～{}之间'.format(fee_config.get('max_amount'))
         except Card.DoesNotExist:
             result = u'请选择有效的银行卡'
+        except ManyCardException:
+            result = u'银行卡异常'
         except MarginLack as e:
             result = u'余额不足'
             pay_info.error_message = str(e)
@@ -472,7 +480,7 @@ class CardViewSet(ModelViewSet):
 
         bank_id = request.DATA.get('bank', '')
 
-        exist_cards = Card.objects.filter(no=card.no, bank__id=bank_id, user__id=card.user.id)
+        exist_cards = Card.objects.filter(no=card.no)
         exist_cards1 = Card.objects.filter(user=card.user, no__startswith=card.no[:6], no__endswith=card.no[-4:]).first()
         if exist_cards or exist_cards1:
             return Response({

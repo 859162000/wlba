@@ -345,7 +345,7 @@ def str_to_float(time_str):
 
 def encrypt_mode_cbc(data, key, iv):
     """
-    aes加密得到16进制串
+    aes加密得到十进制串
     :param data:
     :param key:
     :param iv:
@@ -354,65 +354,24 @@ def encrypt_mode_cbc(data, key, iv):
 
     cipher = Cipher(alg='aes_128_cbc', key=key, iv=iv, op=1)
     buf = cipher.update(data)
-    buf = buf + cipher.final()
+    buf += cipher.final()
     del cipher
 
-    # 将明文从字节流转为16进制
-    output = []
-    for i in buf:
-        output.append('%02X' % (ord(i)))
+    # 将明文从字节流转为十进制
+    des_list = [int('%02X' % (ord(i)), 16) for i in buf]
 
-    return output
+    # 原码转补码
+    in_list = [~h ^ 255 if h > 128 else h for h in des_list]
+
+    return in_list
 
 
-def hex2bin(string_num):
+def encodeBytes(in_list):
     """
-    aes加密得到16进制串转2进制
-    :param string_num:
-    :return:
-    """
-    return dec2bin(hex2dec(string_num.upper()))
-
-
-def hex2dec(string_num):
-    """
-    十六进制 to 十进制
-    :param string_num:
-    :return:
-    """
-    return str(int(string_num.upper(), 16))
-
-
-base = [str(x) for x in range(10)] + [ chr(x) for x in range(ord('A'), ord('A')+6)]
-def dec2bin(string_num):
-    """
-    十进制转二进制
-    :param string_num:
-    :return:
-    """
-    global base
-    num = int(string_num)
-    mid = []
-    while True:
-        if num == 0:
-            break
-        num, rem = divmod(num, 2)
-        mid.append(base[rem])
-    return ''.join([str(x) for x in mid[::-1]])
-
-
-def encodeBytes(hexlist):
-    """
-    2进制按电信规则16进制加密
+    十进制按电信规则16进制加密
     :param bytelist:
     :return:
     """
-    in_list = []
-    for h in hexlist:
-        h = int(hex2dec(h))
-        if h > 128:
-            h = ~h ^ 255
-        in_list.append(int(h))
 
     ret = []
     for byte in in_list:

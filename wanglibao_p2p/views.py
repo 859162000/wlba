@@ -30,7 +30,7 @@ from wanglibao_p2p.models import P2PProduct, P2PEquity, ProductAmortization, War
     P2PProductContract, InterestPrecisionBalance, P2PRecord, ContractTemplate
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_p2p.trade import P2PTrader
-from wanglibao_p2p.utility import validate_date, validate_status, handler_paginator, strip_tags, AmortizationCalculator
+from wanglibao_p2p.utility import AmortizationCalculator
 from wanglibao.const import ErrorNumber
 from django.conf import settings
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
@@ -50,12 +50,14 @@ from exceptions import PrepaymentException
 from django.core.urlresolvers import reverse
 import re
 from celery.execute import send_task
-from wanglibao_redis.backend import redis_backend
+
 import pickle
 from misc.models import Misc
 import json
 from wanglibao_activity import backends as activity_backends
 from wanglibao_rest.common import DecryptParmsAPIView
+from wanglibao_redis.backend import redis_backend
+from .common import get_p2p_list
 
 class P2PDetailView(TemplateView):
     template_name = "p2p_detail.jade"
@@ -763,8 +765,8 @@ def check_invalid_new_user_product(p2p, user):
     error_new_user = (p2p.category == '新手标' and user.wanglibaouserprofile.is_invested)
     return error_new_user
 
-
-def get_p2p_list():
+# Add by hb on 2015-12-08 : rename "get_p2p_list" to "get_p2p_list_slow", and add new "get_p2p_list"
+def get_p2p_list_slow():
 
     cache_backend = redis_backend()
 
@@ -812,3 +814,4 @@ def get_p2p_list():
         p2p_finished_list = cache_backend.get_p2p_list_from_objects(p2p_finished)
 
     return p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list
+
