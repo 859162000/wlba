@@ -19,7 +19,7 @@ if results
 
         .area-ac-date.font-xs.es 活动日期：{{activity.activity.start_at | date:"Y年m月d日"}} - {{activity.activity.end_at | date:"Y年m月d日"}}
 
-      .area-ac-mask
+      a(href='{{activity.pc_detail_link}}').area-ac-mask
         .area-ac-bg
         .area-ac-body
           .area-mask-name.es.font-l {{activity.activity.name}}
@@ -27,6 +27,6 @@ if results
           .area-mask-line
           .area-mask-dec {{activity.pc_description}}
           .area-mask-link.font-s
-            a(href='{{activity.pc_detail_link}}') 立即查看
+            .btn-hide 立即查看
 else
   暂无活动
