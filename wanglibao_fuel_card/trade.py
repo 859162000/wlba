@@ -2,7 +2,11 @@
 # encoding: utf-8
 
 from django.db import transaction
+from order.utils import OrderHelper
+from order.models import Order
 from wanglibao_p2p.trade import P2PTrader as P2PTraderBase
+from wanglibao_p2p.exceptions import P2PException
+from wanglibao_redis.backend import redis_backend
 
 
 class P2PTrader(P2PTraderBase):
@@ -24,56 +28,8 @@ class P2PTrader(P2PTraderBase):
             if product_record.product_balance_after <= 0:
                 is_full = True
 
-        # fix@chenweibin, add order_id
-        # Modify by hb on 2015-11-25 : add "try-except"
-        try:
-            logger.debug("=20151125= decide_first.apply_async : [%s], [%s], [%s], [%s], [%s], [%s]" % \
-                         (self.user.id, amount, self.device['device_type'], self.order_id, self.product.id, is_full) )
-            tools.decide_first.apply_async(kwargs={"user_id": self.user.id, "amount": amount,
-                                                   "device": self.device, "order_id": self.order_id,
-                                                   "product_id": self.product.id, "is_full": is_full})
-        except Exception, reason:
-            logger.debug("=20151125= decide_first.apply_async Except:{0}".format(reason))
-            pass
-
-        try:
-            logger.debug("=20151125= CoopRegister.process_for_purchase : [%s], [%s]" % (self.user.id, self.order_id) )
-            CoopRegister(self.request).process_for_purchase(self.user, self.order_id)
-        except Exception, reason:
-            logger.debug("=20151125= CoopRegister.process_for_purchase Except:{0}".format(reason) )
-            pass
-
-        try:
-            logger.debug("=20151125= RewardDistributer.processor_for_distribute : [%s], [%s]" % (self.user.id, self.order_id) )
-            kwargs = {
-                'amount': amount,
-                'order_id': self.order_id,
-                'user': self.user,}
-
-            RewardDistributer(self.request, kwargs).processor_for_distribute()
-        except Exception, reason:
-            logger.debug("=20151125= RewardDistributer.processor_for_distribute Except:{0}".format(reason) )
-            pass
-        else:
-            logger.debug("=20151125= RewardDistributer.processor_for_distribute : {0}购标成功".format(self.user) )
-
-        # 投标成功发站内信
-        matches = re.search(u'日计息', self.product.pay_method)
-        if matches and matches.group():
-            pname = u"%s,期限%s天" % (self.product.name, self.product.period)
-        else:
-            pname = u"%s,期限%s个月" % (self.product.name, self.product.period)
-
-        title, content = messages.msg_bid_purchase(self.order_id, pname, amount)
-        inside_message.send_one.apply_async(kwargs={
-            "user_id": self.user.id,
-            "title": title,
-            "content": content,
-            "mtype": "purchase"
-
-        })
-        logger.debug("=20151125= inside_message.send_one : {0}购标站内信发成功".format(self.user) )
-
+        # 投标成功给用户内信
+        # FixMe
 
         # 满标给管理员发短信
         if is_full:
