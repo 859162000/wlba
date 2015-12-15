@@ -5,10 +5,10 @@ doctype html
 html
   head
     - with '购买P2P，送钱还送礼' as title
-      include include/common_head
-      meta(name="keywords", content="购买P2P,送钱还送礼,网利宝")
-      meta(name="description", content="购买P2P，送钱还送礼，11%年化收益 再贴1%，活动期间内，达到累计购买金额，即送“真爱大礼”")
+    - endwith
+    include include/common_head
+    meta(name="keywords", content="购买P2P,送钱还送礼,网利宝")
+    meta(name="description", content="购买P2P，送钱还送礼，11%年化收益 再贴1%，活动期间内，达到累计购买金额，即送“真爱大礼”")
 
   body.white-background
-   "hello world"
-   img(src="{{img}}")
+   img(src="/media/{{img}}")

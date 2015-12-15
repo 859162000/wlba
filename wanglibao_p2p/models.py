@@ -327,6 +327,235 @@ class P2PProduct(ProductBase):
     def get_absolute_url(self):
         return '/p2p/detail/%s' % self.id
 
+class P2PProductForList(ProductBase):
+    STATUS_CHOICES = (
+        (u'录标', u'录标'),
+        (u'录标完成', u'录标完成'),
+        (u'待审核', u'待审核'),
+        (u'正在招标', u'正在招标'),
+        (u'满标待打款', u'满标待打款'),
+        (u'满标已打款', u'满标已打款'),
+        (u'满标待审核', u'满标待审核'),
+        (u'满标已审核', u'满标已审核'),
+        (u'还款中', u'还款中'),
+        (u'流标', u'流标'),
+        (u'已完成', u'已完成')
+    )
+
+    CATEGORY_CHOICES = (
+        (u'普通', u'普通'),
+        (u'证大速贷', u'证大速贷'),
+        (u'票据', u'票据'),
+        (u'新手标', u'新手标'),
+        (u'酒仙众筹标', u'酒仙众筹标')
+    )
+
+    PAY_METHOD_CHOICES = (
+        (u'等额本息', u'等额本息'),
+        (u'按月付息', u'按月付息到期还本'),
+        (u'到期还本付息', u'到期还本付息'),
+        (u'日计息一次性还本付息', u'日计息一次性还本付息'),
+        (u'日计息月付息到期还本', u'日计息月付息到期还本'),
+        #(u'先息后本', u'先息后本'),
+        #(u'按日计息一次性还本付息T+N', u'按日计息一次性还本付息T+N'),
+        #(u'按季度付息', u'按季度付息'),
+    )
+    BANK_METHOD_CHOICES = (
+        (u'工商银行',u'工商银行'),
+        (u'农业银行',u'农业银行'),
+        (u'招商银行',u'招商银行'),
+        (u'建设银行',u'建设银行'),
+        (u'北京银行',u'北京银行'),
+        (u'北京农村商业银行', u'北京农村商业银行'),
+        (u'中国银行', u'中国银行'),
+        (u'交通银行', u'交通银行'),
+        (u'民生银行', u'民生银行'),
+        (u'上海银行', u'上海银行'),
+        (u'渤海银行', u'渤海银行'),
+        (u'光大银行', u'光大银行'),
+        (u'兴业银行', u'兴业银行'),
+        (u'中信银行', u'中信银行'),
+        (u'浙商银行', u'浙商银行'),
+        (u'广发银行', u'广发银行'),
+        (u'东亚银行', u'东亚银行'),
+        (u'华夏银行', u'华夏银行'),
+        (u'杭州银行', u'杭州银行'),
+        (u'南京银行', u'南京银行'),
+        (u'平安银行', u'平安银行'),
+        (u'邮政储蓄银行', u'邮政储蓄银行'),
+        (u'深圳发展银行', u'深圳发展银行'),
+        (u'上海浦东发展银行',u'上海浦东发展银行'),
+        (u'上海农村商业银行',u'上海农村商业银行'),
+        (u'汇付天下', u'汇付天下'),
+    )
+    BANK_TYPE_CHOICES = (
+        (u'对公', u'对公'),
+        (u'对私', u'对私'),
+    )
+
+    category = models.CharField(max_length=16, default=u'普通', choices=CATEGORY_CHOICES, verbose_name=u'产品类别*')
+    types = models.ForeignKey(ProductType, verbose_name=u"产品分类(新)", null=True, on_delete=SET_NULL)
+    hide = models.BooleanField(u'隐藏', default=False, db_index=True)
+    name = models.CharField(max_length=256, verbose_name=u'名字*', blank=False)
+    short_name = models.CharField(verbose_name=u'短名字*', max_length=64, blank=False, help_text=u'短名字要求不超过13个字')
+    serial_number = models.CharField(verbose_name=u'产品编号*', max_length=100, unique=True, blank=False, null=True)
+    contract_serial_number = models.CharField(verbose_name=u'合同编号*', max_length=100, blank=False, null=True)
+    status = models.CharField(max_length=16, default=u'录标', db_index=True,
+                              choices=STATUS_CHOICES,
+                              verbose_name=u'产品状态*')
+    priority = models.IntegerField(verbose_name=u'优先级*', help_text=u'越大越优先', blank=False, db_index=True)
+    period = models.IntegerField(default=0, verbose_name=u'产品期限(月/天)*', blank=False)
+    brief = models.TextField(blank=True, verbose_name=u'产品备注')
+    expected_earning_rate = models.FloatField(default=0, verbose_name=u'预期收益(%)*', blank=False)
+    excess_earning_rate = models.FloatField(default=0, verbose_name=u'超额收益(%)*')
+    excess_earning_description = models.CharField(u'超额收益描述', max_length=100, blank=True, null=True)
+    pay_method = models.CharField(verbose_name=u'还款方式*', max_length=32, blank=False, default=u'等额本息',
+                                  choices=PAY_METHOD_CHOICES)
+    amortization_count = models.IntegerField(u'还款期数', default=0)
+    repaying_source = models.TextField(verbose_name=u'还款资金来源(合同用)', blank=True)
+    total_amount = models.BigIntegerField(default=1, verbose_name=u'借款总额*', blank=False)
+    ordered_amount = models.BigIntegerField(default=0, verbose_name=u'已募集金额*')
+    publish_time = models.DateTimeField(default=lambda: timezone.now() + timezone.timedelta(days=10), verbose_name=u'发布时间*', blank=False, db_index=True)
+    end_time = models.DateTimeField(default=lambda: timezone.now() + timezone.timedelta(days=20), verbose_name=u'终止时间*', blank=False)
+    soldout_time = models.DateTimeField(u'售完时间', null=True, blank=True, db_index=True)
+    make_loans_time = models.DateTimeField(u'放款时间', null=True, blank=True)
+    limit_per_user = models.FloatField(verbose_name=u'单用户购买限额(0-1的系数)*', default=1)
+    warrant_company = models.ForeignKey(WarrantCompany, verbose_name=u'担保公司', blank=False)
+    usage = models.TextField(blank=False, verbose_name=u'借款用途(合同用)*')
+    short_usage = models.TextField(blank=False, verbose_name=u'借款用途*')
+    is_app_exclusive = models.BooleanField(u'是否app专享', default=False, help_text=u'默认不是app专享')
+
+    activity = models.ForeignKey(Activity, on_delete=SET_NULL, null=True, blank=True, verbose_name=u'返现活动')
+
+    # Add by hb on 2015-12-08 : add new field "status_int", and **MUST** execute initial update-sql blow firstly:
+    # UPDATE wanglibao_p2p_p2pproduct set status_int=9 WHERE status="正在招标";
+    # UPDATE wanglibao_p2p_p2pproduct set status_int=8 WHERE status in ('满标待打款', '满标已打款', '满标待审核', '满标已审核');
+    # UPDATE wanglibao_p2p_p2pproduct set status_int=7 WHERE status="还款中";
+    # UPDATE wanglibao_p2p_p2pproduct set status_int=6 WHERE status="已完成";
+    #####
+    status_int = models.IntegerField(verbose_name=u'状态排序值', help_text=u'越大越优先', \
+                                     default=0, db_index=True, blank=True, editable=False)
+    # Override the original save method, for set status_int's value before save into database
+    def save(self, *args, **kwargs):
+        try:
+            status_dict = {u'正在招标':9, u'满标待打款':8, u'满标已打款':8, u'满标待审核':8, u'满标已审核':8, u'还款中':7, u'已完成':6}
+            self.status_int = status_dict.get(self.status, 0)
+        except:
+            pass
+        super(P2PProduct, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name_plural = u'P2P产品'
+        managed = False
+        db_table = 'wanglibao_p2p_p2pproduct'
+
+    def __unicode__(self):
+        return u'%s<%s>' % (self.id,self.name)
+
+    @property
+    def remain(self):
+        return self.total_amount - self.ordered_amount
+
+    @property
+    def completion_rate(self):
+        if not self.total_amount > 0:
+            return 0
+        return float(self.ordered_amount) / float(self.total_amount) * 100
+
+    @property
+    def limit_amount_per_user(self):
+        return int(self.limit_per_user * self.total_amount)
+
+    @property
+    def current_limit(self):
+        return min(self.remain, self.limit_amount_per_user)
+
+    @property
+    def available_amount(self):
+        return self.total_amount - self.ordered_amount
+
+    @property
+    def available_amout(self):
+        return self.total_amount - self.ordered_amount
+
+    def has_amount(self, amount):
+        if amount <= self.remain:
+            return True
+        return False
+
+    def audit_link(self):
+        if self.status == u'满标待审核':
+            return u'<a href="/p2p/audit/%d/" class="link">审核</a>' % self.id
+        else:
+            return u'-'
+
+    audit_link.short_description = u'审核'
+    audit_link.allow_tags = True
+
+    def preview_link(self):
+        return u'<a href="/p2p/detail/%s" target="_blank">预览</a>' % str(self.id)
+    preview_link.short_description = u'预览'
+    preview_link.allow_tags = True
+
+    def copy_link(self):
+        return u'<a href="/p2p/copy/%s" target="_blank">复制</a>' % str(self.id)
+    copy_link.short_description = u'复制'
+    copy_link.allow_tags = True
+
+    display_status_mapping = {
+        u'录标': u'录标',
+        u'录标完成': u'录标完成',
+        u'待审核': u'待审核',
+        u'正在招标': u'抢购中',
+        u'满标待打款': u'满标审核',
+        u'满标已打款': u'满标审核',
+        u'满标待审核': u'满标审核',
+        u'满标已审核': u'满标审核',
+        u'还款中': u'还款中',
+        u'流标': u'流标',
+        u'已完成': u'已还款',
+    }
+
+    @property
+    def display_status(self):
+        return self.display_status_mapping[self.status]
+
+    @property
+    def terms(self):
+        return self.amortizations.all().count()
+
+    # Add by hb on 2015-08-27
+    @property
+    def is_taojin(self):
+        if self.pay_method.startswith(u"日计息") and self.period <= 61 or self.period <= 2:
+            return False
+        else:
+            return True
+
+    display_payback_mapping = {
+        u'等额本息': u'等额本息',
+        u'先息后本': u'先息后本',
+        u'按月付息': u'按月付息到期还本',
+        u'到期还本付息': u'一次性还本付息',
+        u'按季度付息': u'按季度付息',
+        u'日计息一次性还本付息': u'日计息一次性还本付息',
+        u'日计息月付息到期还本': u'日计息月付息到期还本',
+    }
+
+    @property
+    def display_payback_method(self):
+        if self.pay_method in self.display_payback_mapping:
+            return self.display_payback_mapping[self.pay_method]
+        return self.pay_method
+
+    def preview_contract(self):
+        return u'<a href="/p2p/contract_preview/%s" target="_blank">合同预览</a>' % str(self.id)
+    preview_contract.short_description = u'合同预览'
+    preview_contract.allow_tags = True
+
+    def get_absolute_url(self):
+        return '/p2p/detail/%s' % self.id
+
 reversion.register(P2PProduct)
 
 
