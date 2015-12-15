@@ -1251,7 +1251,7 @@ class InnerSysSendSMS(APIView, InnerSysHandler):
     def post(self, request):
         phone = request.DATA.get("phone", None)
         message = request.DATA.get("message", None)
-        print phone, message
+        logger.debug("phone:%s, message:%s" % phone, message)
         if phone is None or message is None:
             return Response({"code": 1000, "message": u'传入的phone或message不全'})
 

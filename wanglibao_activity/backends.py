@@ -632,7 +632,7 @@ def _save_activity_record(rule, user, msg_type, msg_content='', introduced_by=Fa
     record.save()
 
 
-def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0, redpack_event=None, created_at=None, is_first_bind_wx=False):
+def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0, redpack_event=None, created_at=None):
     """
         inviter: 邀请人
         invited： 被邀请人

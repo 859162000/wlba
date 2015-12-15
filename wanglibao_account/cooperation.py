@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # encoding:utf-8
 import decimal
+from wanglibao_account.utils import FileObject
+import cStringIO
 import json
 import urllib2
 from django.utils.http import urlencode
@@ -974,12 +976,14 @@ class ZGDXRegister(CoopRegister):
     def channel_user(self):
         return self.request.session.get(self.internal_channel_user_key, '00000')
 
-    def zgdx_call_back(self, user, plat_offer_id):
+    def zgdx_call_back(self, user, plat_offer_id, order_id=None):
         if datetime.datetime.now().day >= 28:
             effect_type = '1'
         else:
             effect_type = '0'
-        request_no = hashlib.md5(str(uuid.uuid1())).hexdigest()[1:-1]
+
+        request_no_prefix = order_id or str(user.id) + timezone.now().strftime("%Y%m%d%H%M%S")
+        request_no = request_no_prefix + '_' + plat_offer_id
         phone_id = WanglibaoUserProfile.objects.get(user_id=user.id).phone
         code = {
             'request_no': request_no,
@@ -1010,10 +1014,10 @@ class ZGDXRegister(CoopRegister):
         binding = Binding.objects.filter(user_id=user.id).first()
         # 判定是否首次绑卡
         if binding and binding.extra != '1':
-            # if ENV == ENV_PRODUCTION:
-            plat_offer_id = '104369'
-            # else:
-            #     plat_offer_id = '103050'
+            if ENV == ENV_PRODUCTION:
+                plat_offer_id = '104369'
+            else:
+                plat_offer_id = '103050'
             self.zgdx_call_back(user, plat_offer_id)
             binding.extra = '1'
             binding.save()
@@ -1027,14 +1031,14 @@ class ZGDXRegister(CoopRegister):
         if binding and p2p_record and p2p_record.order_id == int(order_id):
             p2p_amount = int(p2p_record.amount)
             if p2p_amount >= 1000:
-                # if ENV == ENV_PRODUCTION:
-                if 1000 <= p2p_amount < 2000:
-                    plat_offer_id = '104371'
+                if ENV == ENV_PRODUCTION:
+                    if 1000 <= p2p_amount < 2000:
+                        plat_offer_id = '104371'
+                    else:
+                        plat_offer_id = '104372'
                 else:
-                    plat_offer_id = '104372'
-                # else:
-                #     plat_offer_id = '103050'
-                self.zgdx_call_back(user, plat_offer_id)
+                    plat_offer_id = '103050'
+                self.zgdx_call_back(user, plat_offer_id, order_id)
 
 
 class RockFinanceRegister(CoopRegister):
@@ -1115,19 +1119,24 @@ class RockFinanceRegister(CoopRegister):
                 else:
                     #不知道为什么create的时候，会报错
                     img = qrcode.make("https://www.wanglibao.com/api/check/qrcode/?owner_id=%s&activity=rock_finance&content=%s"%(user.id, reward.content))
-                    activity_reward.qrcode = img
-
+                    _img = img.tobytes()
+                    img_handle = cStringIO.StringIO()
+                    img.save(img_handle)
+                    img_handle.seek(0)
+                    _img = FileObject(img_handle, len(_img))
+                    activity_reward.qrcode.save("rock_finance.png", _img, save=True)
+                    activity_reward.save()
+                    logger.debug("before save: activity_reward.qrcode:%s" % activity_reward.qrcode)
                     #将奖品通过站内信发出
-                    message_content = u"网里宝摇滚夜欢迎您的到来，点击<a href='https://www.wanglibao.com/api/rock/finance/?type=qrcode'>" \
-                                      u"获得入场二维码</a>查看，<br/> 感谢您对我们的支持与关注。<br/>网利宝"
                     inside_message.send_one.apply_async(kwargs={
                         "user_id": user.id,
                         "title": u"网利宝摇滚之夜门票",
-                        "content": message_content,
+                        "content": u"网利宝摇滚夜欢迎您的到来，点击<a href='https://www.wanglibao.com/rock/finance/qrcode/>获得入场二维码</a>查看，<br/> 感谢您对我们的支持与关注。<br/>网利宝",
                         "mtype": "activity"
                     })
                     reward.is_used = True
                     reward.save()
+                    logger.debug("after save:activity_reward.qrcode:%s" % activity_reward.qrcode)
 
                     logger.debug(u"user:%s, 站内信已经发出, 奖品内容:%s" % (user, reward.content))
 

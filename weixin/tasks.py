@@ -103,5 +103,5 @@ def sentTemplate(kwargs):
         template_args[k]=v
     template = MessageTemplate(template_id, **template_args)
     w_user = WeixinUser.objects.filter(openid=openid).first()
-    if w_user and template:
+    if w_user and template and w_user.subscribe:
         sendTemplate(w_user, template)

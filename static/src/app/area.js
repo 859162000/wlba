@@ -42,43 +42,30 @@ org.area = (function (org) {
         },
 
         slide: function () {
-
-            var $slideLine = $('.slide-bottom'),
-                $milepostLoad = $('.area-milepost-loading'),
-                $milepost = $('.area-milepost'),
-                myswiper = new Swiper('.swiper-container', {
-                    loop: false,
-                    lazyLoading: false,
-                    onSliderMove: function (swiper) {
-                        var translateX = -(swiper.getWrapperTranslate() / 2)
-                        $slideLine.css('-webkit-transform', 'translate3d(' + translateX + 'px, 0, 0)')
-                    },
-                    onTouchEnd: function (swiper) {
-                        var translateX = 100 * swiper.activeIndex + '%';
-                        $slideLine.css('-webkit-transform', 'translate3d(' + translateX + ', 0, 0)')
-                    },
-                    onSlideChangeStart: function (swiper) {
-                        var translateX = 100 * swiper.activeIndex + '%';
-                        $slideLine.css('-webkit-transform', 'translate3d(' + translateX + ', 0, 0)')
-
-                        if(swiper.activeIndex === 1 && $milepost.attr('data-active') != 'true'){
-                            doing(1, function(){
-                                $milepostLoad.hide()
-                            })
-                        }
-                    }
-                });
-
-            $('.tab-nav li').on('touchend click', function () {
-                var index = $(this).index();
-                $(this).addClass('active').siblings().removeClass('active')
-                myswiper.slideTo(index, 400, true);
-            });
-
             var milepost = false,
                 $milepostBtn = $('.area-milepost-btn'),
                 $milepostMore = $('.area-milepost-more'),
-                $milepostPush =$('.area-milepost-push');
+                $milepostPush =$('.area-milepost-push'),
+                $slideLine = $('.slide-bottom'),
+                $slideWidth = $(window).width()/2,
+                $milepostLoad = $('.area-milepost-loading'),
+                $milepost = $('.area-milepost');
+
+            $('.tab-nav li').on('click', function () {
+                var index = $(this).index();
+                $(this).addClass('active').siblings().removeClass('active');
+                $('.area-scroll').eq(index).show().siblings().hide();
+                translateX = $slideWidth* index;
+                $slideLine.css('-webkit-transform', 'translate3d(' + translateX + 'px, 0, 0)')
+                location.hash = '#' + index;
+                if(index === 1 && $milepost.attr('data-active') != 'true'){
+                    doing(1, function(){
+                        $milepostLoad.hide()
+                    })
+                }
+            });
+
+
 
 
             $milepostBtn.on('click', function(){

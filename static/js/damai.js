@@ -57,57 +57,42 @@
             $('.damaifu').on('click', function () {
                 $('body,html').animate({scrollTop: 1257}, 600);
                 return false
-            })
-            //radio点击选中在点击未选中
-            $("input:radio").click(function () {
-                var c = $(this).attr('c');
-                alert(this.c);
-                if (this.c == 1) {
-                    this.c = 0;
-                    this.checked = 0
-                } else {
-                    this.c = 1
-                }
             });
-            //labbel取代input=radio设置样式
-            $('.labelone').click(function () {
-                if (!($(this).attr('id'))) {
-                    $('.labelone').removeAttr('id') && $(this).attr('id', 'checked1');
-                    $('.labelone').prev().removeAttr('checked') && $(this).prev().attr('checked', 'checked');
+            //判断点击选上在点击不选
+            function setInp(self, id) {
+                var inp = self.prev();
+                if (inp.is(":checked")) {
+                    inp.prop("checked", false);
+                    self.removeAttr('id');
                 } else {
-                    $('.labelone').removeAttr('id')
-                    $('.labelone').prev().removeAttr('checked');
-                }
-                return false
+                    inp.prop("checked", true);
+                    self.attr('id', id);
+                    self.parents(".xuan-song1").siblings(".xuan-song1").find("label").removeAttr('id');
+                };
+            };
+
+            $('.labelone').click(function () {
+                setInp($(this), "checked1");
             });
             $('.labelone1').click(function () {
-                if (!($(this).attr('id'))) {
-                    $('.labelone1').removeAttr('id') && $(this).attr('id', 'checked2');
-                    $('.labelone1').prev().removeAttr('checked') && $(this).prev().attr('checked', 'checked');
-                } else {
-                    $('.labelone1').removeAttr('id')
-                    $('.labelone1').prev().removeAttr('checked');
-                }
-                return false
+                setInp($(this), "checked2");
             });
             $('.labelone2').click(function () {
-                if (!($(this).attr('id'))) {
-                    $('.labelone2').removeAttr('id') && $(this).attr('id', 'checked');
-                    $('.labelone2').prev().removeAttr('checked') && $(this).prev().attr('checked', 'checked');
-                } else {
-                    $('.labelone2').removeAttr('id')
-                    $('.labelone2').prev().removeAttr('checked');
-                }
-                return false
+                setInp($(this), "checked");
             });
             //点击投票传string给后台
-            var point = $('.frm1'), point1 = $('.frm2'), point2 = $('.frm3');
             $('.toupiao').on('click', function () {
                     if ($(this).hasClass('toupiao')) {
-                        get_radio_value(point);
-                        get_radio_value(point1);
-                        get_radio_value(point2);
-                        var vaq = va.substring(0, va.length - 1);
+                        var inp = $(".xuan-song1 input[type=radio]");
+                        var chked = '';
+                        var cur;
+                        for (var i = 0; i < inp.length; i++) {
+                            cur = inp.eq(i);
+                            if (cur.is(":checked")) {
+                                chked += cur.val() + ',';
+                            };
+                        };
+                        var vaq = chked.substring(0, chked.length - 1);
                         if (vaq == '') {
                             $('.tishi').html('请至少选一个');
                         } else {
@@ -123,13 +108,12 @@
                                     $('.tishi').html('投票成功');
                                     $('.ww').click(function () {
                                         $('.tishi').html('只能投一次');
-                                    })
+                                    });
                                 };
-                            })
-                        }
-                    }
-                }
-            )
+                            });
+                        };
+                    };
+                });
             //投票截止日期
             function TimeTo(dd) {
                 var t = new Date(dd),//取得指定时间的总毫秒数
@@ -142,30 +126,15 @@
 
                     clearInterval(window['ttt']);//清除计时器
                     return;//结束执行
-                }
-            }
-            temer()
+                };
+            };
+
+            temer();
             function temer() {
                 window['ttt'] = setInterval(function () {
                     TimeTo('2016/1/6 00:00:00');//定义倒计时的结束时间，注意格式
                 }, 1000);//定义计时器，每隔1000毫秒 也就是1秒 计算并更新 div的显示
-            }
-            //循环input
-            var va = "";
-
-            function get_radio_value(field) {
-                if (field && field.length) {
-
-                    for (var i = 0; i < field.length; i++) {
-                        if (field[i].checked) {
-                            va += field[i].value + ",";
-                            //+field[i].parent().prev().find('dd').text();
-                        }
-                    }
-                } else {
-                    return;
-                }
-            }
+            };
             //请求票数接口
             redpack();
             function redpack() {
@@ -194,13 +163,10 @@
                                 }
                                 $(o).parent().find('span').html(paioshu[i]);
                                 $(o).parent().find('.xuan-tiao1').html('<div class=tiao style="width:' + (paioshu[i]) / max * 100 + '% "></div>');
-                            }
-                        }
-                    })
-                })
-            }
-        }
-    )
-    ;
-
+                            };
+                        };
+                    });
+                });
+            };
+        });
 })();
