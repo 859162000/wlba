@@ -337,11 +337,11 @@ function initFun() {
                                 $('.receive_box').find('img').hide();
                                 $('.receive_box').find('#edT').show().text('已领取体验金' + data.data.amount + '元')
                             } else {
-                                org.ui.alert(data.data.message, '', '4')
+                                org.ui.alert(data.message, '', '4')
                             }
                         },
                         error: function (data) {
-                            org.ui.alert(data.data.message, '', '4')
+                            org.ui.alert(data.message, '', '4')
                         }
                     });
                 })
@@ -359,7 +359,7 @@ function initFun() {
                         data: {},
                         success: function (data) {
                             if (data.ret_code > 0) {
-                                org.ui.alert(data.data.message, '', '4')
+                                org.ui.alert(data.message, '', '4')
                             } else {
                                 org.ui.alert('', '', '2')
                                 setTimeout(function () {
@@ -371,7 +371,7 @@ function initFun() {
                             }
                         },
                         error: function (data) {
-                            org.ui.alert(data.data.message, '', '4')
+                            org.ui.alert(data.message, '', '4')
                         }
                     });
                 })
