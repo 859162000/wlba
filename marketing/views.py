@@ -2641,17 +2641,17 @@ class RockFinanceQRCodeView(TemplateView):
 
         logger.debug("rock finance qrcode view，开始准备渲染数据")
         if not self.request.user.is_authenticated():
-            return HttpResponse(json.dumps({"code": 1002, "message": u"请您先登录"}), content_type='application/json')
+            return {"code": 1002, "message": u"请您先登录"}
 
         reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='rock_finance').first()
         if not reward:
-            return HttpResponse(json.dumps({"code": 1003, "message": u"您没有领到对应的入场二维码"}), content_type='application/json')
+            return {"code": 1003, "message": u"您没有领到对应的入场二维码"}
 
         if reward.is_used:  # 二维码可能被重复使用
-            return HttpResponse(json.dumps({"code": -1, "img": reward.qrcode, "message": u"您的二维码已经被使用"}), content_type='application/json')
+            return {"code": -1, "img": reward.qrcode, "message": u"您的二维码已经被使用"}
         else:
             logger.debug("reward.qrcode img url:%s" % reward.qrcode)
-            return HttpResponse(json.dumps({"code": 0, "img": reward.qrcode, "message": u"得到合法二维码"}), content_type='application/json')
+            return {"code": 0, "img": reward.qrcode, "message": u"得到合法二维码"}
 
 
 class RockFinanceAPIView(APIView):
