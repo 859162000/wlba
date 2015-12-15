@@ -1,3 +1,4 @@
+link(href="/static/css/about_left.css", rel="stylesheet", type="text/css")
 mixin sidebar-item(name, link, expected_title)
   if title == expected_title
     li.sidebar-item.active
@@ -6,7 +7,7 @@ mixin sidebar-item(name, link, expected_title)
     li.sidebar-item
       a(href=link)= name
 
-ul.sidebar
+ul.sidebar#sidebar
   div
     +sidebar-item('关于我们', '/about', '关于我们')
     +sidebar-item('核心团队', '/team', '核心团队')
