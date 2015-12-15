@@ -100,7 +100,7 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
 
         if first_pay and int(first_pay.order_id) == int(order_id):
             # Add by hb only for debug
-            if first_pay.order_id <> order_id:
+            if first_pay.order_id != order_id:
                 logger.exception("=_check_rules_trigger= first_pay: type(%s)=[%s], type(%s)=[%s]" % (first_pay.order_id, type(first_pay.order_id), order_id, type(order_id)))
             _check_trade_amount(user, rule, device_type, amount, is_full)
         else:
@@ -127,7 +127,7 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
 
         if first_buy and int(first_buy.order_id) == int(order_id):
             # Add by hb only for debug
-            if first_buy.order_id <> order_id:
+            if first_buy.order_id != order_id:
                 logger.exception("=_check_rules_trigger= first_buy: type(%s)=[%s], type(%s)=[%s]" % (first_buy.order_id, type(first_buy.order_id), order_id, type(order_id)))
             # 判断当前购买产品id是否在活动设置的id中
             if product_id > 0 and rule.activity.product_ids:
@@ -716,7 +716,7 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
             _send_message_template(user, title, content)
             _save_activity_record(rule, user, 'message', content)
         if sms_template:
-            sms = Template(sms_template + u' 关注服务号wanglibao400每日惊喜，退订回TD【网利科技】')
+            sms = Template(sms_template + u' 关注服务号wanglibao400，每日签到抽大奖。退订回TD【网利科技】')
             content = sms.render(context)
             _send_sms_template(mobile, content)
             _save_activity_record(rule, user, 'sms', content)
