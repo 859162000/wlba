@@ -2649,7 +2649,7 @@ class RockFinanceQRCodeView(TemplateView):
             logger.debug(u"您没有领取到对应的入场二维码, user:%s" % self.request.user)
             return {"code": 1003, "message": u"您没有领到对应的入场二维码"}
 
-        if reward.is_used:  # 二维码可能被重复使用
+        if reward.has_sent:  # 二维码可能被重复使用
             logger.debug(u"您的二维码已经被使用过, img:%s, user:%s" % (reward.qrcode, self.request.user))
             return {"code": -1, "img": reward.qrcode, "message": u"您的二维码已经被使用"}
         else:
