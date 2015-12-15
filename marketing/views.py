@@ -2639,6 +2639,7 @@ class RockFinanceQRCodeView(TemplateView):
 
     def get_context_data(self, **kwargs):
 
+        logger.debug("rock finance qrcode view，开始准备渲染数据")
         if not self.request.user.is_authenticated():
             return HttpResponse(json.dumps({"code": 1002, "message": u"请您先登录"}), content_type='application/json')
 
