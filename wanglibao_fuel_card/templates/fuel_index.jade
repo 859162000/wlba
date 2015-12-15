@@ -12,19 +12,19 @@ html
             span.text 元
           .fuel-save-text 累计节省
         .fuel-head-right
-          .fuel-user 13021160575
+          a(href='/fuel/account/').fuel-user 13021160575
           .fuel-notice 一份理财加油卡卡生效中
 
       .fuel-nav-nav
         .fuel-nav-list.fuel-nav-around
-          a(href='#').fuel-nac-buy 购买记录
+          a(href='/fuel/records/product/').fuel-nac-buy 购买记录
         .fuel-nav-list.fuel-nav-center
-          a(href='#').fuel-nac-take 兑换记录
+          a(href='/fuel/records/exchange/').fuel-nac-take 兑换记录
         .fuel-nav-list.fuel-nav-around
-          a(href='#').fuel-nac-about 关于我们
+          a(href='/fuel/about/').fuel-nac-about 关于我们
     .fuel-section-product
       .product-left-name 服务产品列表
-      .product-right-dec 产品说明
+      a(href='/fuel/dec/').product-right-dec 产品说明
 
     .fuel-product-item
       mixin list(color)
@@ -45,7 +45,7 @@ html
               .pdt-name 每月加油卡
             .fuel-pdt-buy
               .fuel-buy-min 6000元即可获得
-              .fuel-buy-submit 立即选购
+              a(href='/fuel/buy/').fuel-buy-submit 立即选购
 
       +list('fuel-pdt-green')
       +list('fuel-pdt-yellow')
