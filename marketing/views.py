@@ -2766,9 +2766,9 @@ class RockFinanceCheckAPIView(BaseWeixinTemplate):
             return {"code": 1002, "message": u'扫描时间段不合理'}
 
 
-        owner_id = self.request.DATA.get("owner_id", None)
-        activity = self.request.DATA.get("activity", None)
-        content = self.request.DATA.get("content", None)
+        owner_id = self.request.GET.get("owner_id", None)
+        activity = self.request.GET.get("activity", None)
+        content = self.request.GET.get("content", None)
 
         try:
             assert None not in (owner_id, activity, content)
