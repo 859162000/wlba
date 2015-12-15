@@ -2653,7 +2653,7 @@ class RockFinanceQRCodeView(TemplateView):
             logger.debug(u"您的二维码已经被使用过, img:%s, user:%s" % (reward.qrcode, self.request.user))
             return {"code": -1, "img": reward.qrcode, "message": u"您的二维码已经被使用"}
         else:
-            logger.debug(u"reward.qrcode img url:%s, user:%s" % (reward.qrcode, self.requeuser))
+            logger.debug(u"reward.qrcode img url:%s, user:%s" % (reward.qrcode, self.request.user))
             return {"code": 0, "img": reward.qrcode, "message": u"得到合法二维码"}
 
 
