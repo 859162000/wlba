@@ -42,7 +42,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
         huge: false
         small: false
       card_id:
-        required: true
+        required: false
       validate_code:
         required: true
       captcha_1:
@@ -202,10 +202,14 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       dr.find('.tag1').hide()
       dr.find('.nextBtn').attr('tag','2')
     $('#setTradingPwd').modal();
+    $('.modal').css('width':'640px')
   ###判断提交表单###
   $('.withdraw-button').click ()->
     if(!$(this).hasClass('no-click'))
-      $('#withdraw-form').submit()
+      if $('.bindingCard').text() == ''
+        $('.bindingError').text('*请绑定银行卡')
+      else
+        $('#withdraw-form').submit()
   ###设置密码提交表单###
   $('#nextBtn').click ()->
     parent = $('.setTradingPwd1')
@@ -308,7 +312,6 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       action_type = '3'
     else
       action_type = '1'
-    alert(action_type)
     $.ajax
       url: "/api/trade_pwd/"
       type: "POST"
@@ -337,3 +340,19 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
         $('.bank-counts').show()
       else
         $('.bank-count').show()
+  ###获取绑卡状态###
+  $.ajax
+      url: "/api/pay/the_one_card/"
+      type: "POST"
+      data: {
+      }
+    .fail (xhr)->
+      console.log(xhr)
+    .success(xhr) ->
+       console.log(xhr)
+  ###绑定银行卡###
+#  $('#goBindingBtn').click ->
+#    $('#bindingBankBox').modal()
+#    $('.modal').css('width':'640px')
+
+
