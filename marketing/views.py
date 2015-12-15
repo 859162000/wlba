@@ -2789,7 +2789,3 @@ class RockFinanceCheckAPIView(BaseWeixinTemplate):
             reward_record.left_times = 0
             reward_record.save()
             return {"code": 0, "message": u'欢迎您参加网利宝金融摇滚夜'}
-
-    def dispatch(self, request, *args, **kwargs):
-        pass
-
