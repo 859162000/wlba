@@ -44,7 +44,6 @@ def getOrCreateWeixinUser(openid, weixin_account):
     if not w_user.nickname or not w_user.subscribe or not w_user.subscribe_time:
         try:
             user_info = weixin_account.db_account.get_user_info(openid)
-            print user_info
             w_user.nickname = user_info.get('nickname', "")
             w_user.sex = user_info.get('sex', 0)
             w_user.city = user_info.get('city', "")

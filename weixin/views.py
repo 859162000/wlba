@@ -60,7 +60,7 @@ from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEven
 from experience_gold.models import ExperienceEvent
 from experience_gold.backends import SendExperienceGold
 from weixin.tasks import detect_product_biding, sentTemplate
-from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser, bindUser, unbindUser
+from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser, bindUser, unbindUser, _process_record
 
 logger = logging.getLogger("weixin")
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
