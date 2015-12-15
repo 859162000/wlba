@@ -42,7 +42,7 @@
   .fuel-input-name
     color: #666
 
-  input.fuel-input-main
+  input.fuel-input-main, select
     -webkit-appearance: none
     -webkit-box-flex: 1
     display: block
@@ -51,6 +51,10 @@
     padding: 0.7rem 0.2rem 0.7rem 0.9rem
     &::-webkit-input-placeholder
       color: #ccc
+  select
+    background: url('/static/imgs/mobile_fuelcard/input_icon/arrow_down.png') no-repeat right center
+    background-size: rem(42)
+    color: #ccc
 
   .fuel-operation-icon
 

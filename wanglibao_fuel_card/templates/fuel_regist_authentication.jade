@@ -8,13 +8,17 @@ html
       img(src='/static/imgs/mobile_fuelcard/input_icon/first.png')
 
     .fuel-authentication-warp
+
       .fuel-input-public.fuel-input-space
-        .fuel-input-name.authentication-input-name 姓名
-        input(type='text', name='password', placeholder= '请输入姓名').fuel-input-main
+        .fuel-input-icon.regist-input-icon
+          .name
+        input(type='text', name='password', placeholder= '请设置密码').fuel-input-main
         .fuel-operation-icon.fuel-clear-input
-      .fuel-input-public
-        .fuel-input-name.authentication-input-name 身份证号
-        input(type='text', name='password', placeholder= '请输入身份证号').fuel-input-main
+
+      .fuel-input-public.fuel-input-space
+        .fuel-input-icon.regist-input-icon
+          .idcard
+        input(type='text', name='password', placeholder= '请设置密码').fuel-input-main
         .fuel-operation-icon.fuel-clear-input
 
 
