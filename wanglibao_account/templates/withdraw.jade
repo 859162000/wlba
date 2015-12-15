@@ -30,17 +30,12 @@ block main
             td {{user_profile.name}}
           tr
             th 提现至银行卡
-            td
-              .span5
-                select#card-select.withdraw-select(name='card_id')
-                  option(value='') 请选择银行卡
-                  for card in cards
-                    option(value='{{card.id}}') {{card | card_info}}
-                label.error
-                .space-vertical-s
-                a.add-card-button.blue.margin-top-m(href='#add-card-form')
-                 .add-icon
-                 添加提现银行卡
+            td.goBindingBtn
+                p
+                    label 您尚未绑卡，无法提现。请
+                    a(href='/accounts/bankcard/') 绑定银行卡
+                p.bindingCard
+                p.bindingError
           tr
             th 可用余额(元)
             td.red-text {{margin}}
@@ -194,7 +189,36 @@ block main
             li.mt28
                 label
                 a(href='javascript:void(0)').nextBtn#confirmBtn 确认
-
+  //#bindingBankBox(style="display:none")
+  //  .title-s 绑定银行卡
+  //      span 请先绑定银行卡，再进行提现操作
+  //  .binding-bank.withdrawM.clearfix
+  //      .binding-box.binding-boxs.withdrawBox.clearfix
+  //          .binding-info.clearfix
+  //              label 发卡银行
+  //              select.select_bank
+  //                  option(value='') 请选择银行
+  //                  for bank in banks
+  //                    option(value='{{bank.id}}') {{bank.name}}
+  //              span
+  //          .binding-info.clearfix
+  //              label 储蓄卡卡号
+  //              input(type="text", placeholder="请输入银行卡号").cardId
+  //              span
+  //          .binding-info.clearfix
+  //              label 开卡人姓名
+  //              .bank-detail {{user_profile.name}}
+  //          .binding-info.clearfix
+  //              label 银行预留手机号
+  //              input(type="text", placeholder="请填写银行开户时预留手机号").bankPhone
+  //              span
+  //          .binding-info.clearfix.codeBox
+  //              label 短信验证码
+  //              input(type="text", placeholder="填写短信验证码").sem-input.code
+  //              button(type='button', data-phone="{{user.wanglibaouserprofile.phone}}",tag="1").get-code.get-code 获取验证码
+  //              span
+  //          .binding-info.clearfix
+  //              a(href='javascript:void(0)').btns#withdrawBindingBtn 绑定银行卡
 block script
   include include/add_card
   script.
