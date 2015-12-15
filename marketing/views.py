@@ -26,7 +26,7 @@ from django.conf import settings
 from django.db.models.base import ModelState
 from wanglibao_sms.utils import send_validation_code, validate_validation_code
 from misc.models import Misc
-from weixin.base import OpenIdBaseAPIView
+from weixin.base import OpenIdBaseAPIView, BaseWeixinTemplate
 from wanglibao_sms.models import *
 from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, IntroducedBy, IntroducedByReward, \
     Reward, ActivityJoinLog, QuickApplyInfo, GiftOwnerGlobalInfo, GiftOwnerInfo, WanglibaoVoteCounter
@@ -2729,10 +2729,10 @@ class RockFinanceAPIView(APIView):
         return Response({"code": 0, "message": u'投票成功'})
 
 
-class RockFinanceCheckAPIView(OpenIdBaseAPIView):
-    permission_classes = ()
+class RockFinanceCheckAPIView(BaseWeixinTemplate):
+    template_name = 'rockfinance_checkresult.jade'
 
-    def get(self, request):
+    def get_context_data(self, **kwargs):
         key = 'activities'
         activity_config = Misc.objects.filter(key=key).first()
         if activity_config:
@@ -2750,45 +2750,45 @@ class RockFinanceCheckAPIView(OpenIdBaseAPIView):
         else:
             raise Exception(u"misc中没有配置activities杂项")
 
-        logger.debug("user:%s, is_open:%s, start_scan:%s, end_scan:%s openids:%s, scaner_openid:%s" % (request.user, is_open, start_scan, end_scan, openids, self.openid))
+        logger.debug("user:%s, is_open:%s, start_scan:%s, end_scan:%s openids:%s, scaner_openid:%s" % (self.request.user, is_open, start_scan, end_scan, openids, self.openid))
 
         #判断是否在扫描列表里
         if self.openid and self.openid not in openids:
-            return HttpResponse(json.dumps({"code": 1000, "message": u"您没有扫描权限"}), content_type='application/json')
+            return {"code": 1000, "message": u"您没有扫描权限"}
 
         #判断活动是否开启
         if is_open == "false":
-            return HttpResponse(json.dumps({"code": 1001, "message": u"活动还没有开启"}), content_type='application/json')
+            return {"code": 1001, "message": u"活动还没有开启"}
 
         #判断是否在扫描的时间段内
         now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         if now < start_scan or now > end_scan:
-            return HttpResponse(json.dumps({"code": 1002, "message": u'扫描时间段不合理'}), content_type='application/json')
+            return {"code": 1002, "message": u'扫描时间段不合理'}
 
 
-        owner_id = request.DATA.get("owner_id", None)
-        activity = request.DATA.get("activity", None)
-        content = request.DATA.get("content", None)
+        owner_id = self.request.DATA.get("owner_id", None)
+        activity = self.request.DATA.get("activity", None)
+        content = self.request.DATA.get("content", None)
 
         try:
             assert None not in (owner_id, activity, content)
         except AssertionError:
-            return HttpResponse(json.dumps({"code": 1005, "message": u"二维码链接的参数不对"}),content_type='application/json')
+            return {"code": 1005, "message": u"二维码链接的参数不对"}
 
         with transaction.atomic():
             reward_record = WanglibaoActivityReward.objects.select_for_update().filter(has_sent=False, user_id=owner_id, activity=activity, reward__content=content).first()
             if not reward_record:
                 reward_record.save()
-                return HttpResponse(json.dumps({"code": 1003, "message": u'您的二维码不合法'}), content_type='application/json')
+                return {"code": 1003, "message": u'您的二维码不合法'}
 
             if reward_record.has_sent:
                 reward_record.save()
-                return HttpResponse(json.dumps({"code": 1004, "message": u'每一个二维码只能被使用一次'}), content_type='application/json')
+                return {"code": 1004, "message": u'每一个二维码只能被使用一次'}
 
             reward_record.has_sent = True
             reward_record.left_times = 0
             reward_record.save()
-            return HttpResponse(json.dumps({"code": 0, "message": u'欢迎您参加网利宝金融摇滚夜'}), content_type='application/json')
+            return {"code": 0, "message": u'欢迎您参加网利宝金融摇滚夜'}
 
     def dispatch(self, request, *args, **kwargs):
         pass
