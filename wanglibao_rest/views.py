@@ -1308,7 +1308,6 @@ class DataCubeApiView(APIView):
         self.request_url = settings.DATACUBE_URL
 
     def get(self, request):
-        logger.info('data cupe Enter connect')
         try:
             data = requests.get(url=self.request_url).json()
             _response = {
@@ -1316,10 +1315,9 @@ class DataCubeApiView(APIView):
                 'message': 'success',
                 'result': data,
             }
-            logger.info('data cupe return:%s' % data)
         except Exception, e:
-            logger.info('data cupe connect faild to %s' % self.request_url)
-            logger.info(e)
+            logger.exception('data cupe connect faild to %s' % self.request_url)
+            logger.exception(e)
             _response = {
                 'ret_code': 50001,
                 'message': 'api error',
