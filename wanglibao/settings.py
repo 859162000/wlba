@@ -632,7 +632,7 @@ CELERYBEAT_SCHEDULE = {
 
     #add by lili: 全民佣金收入短信/站内信每日定时发送
     'all_invite_earning_data': {
-        'task': 'marketing.tools.send_income_message_sms',
+        'task': 'marketing.tools.send_commission_income_message_sms',
         'schedule': crontab(minute=0, hour=20)
     },
     #add by Guoya: 彩票PC版每天五点重置之前未中奖的用户

@@ -17,7 +17,8 @@ from wanglibao_bank_financing.views import FinancingHomeView, FinancingProductsV
 from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_margin.php_api import GetUserInfo, GetMarginInfo, SendInsideMessage, CheckTradePassword, YueLiBaoBuy, \
-    YueLiBaoCheck, YueLiBaoCancel, YueLiBaoRefund, AssignmentOfClaimsBuy, SendMessages
+    YueLiBaoCheck, YueLiBaoCancel, YueLiBaoRefund, AssignmentOfClaimsBuy, SendMessages, YueLiBaoBuyFail, \
+    AssignmentBuyFail
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
@@ -198,11 +199,13 @@ urlpatterns += patterns(
     url(r'^php/trade_password/$', CheckTradePassword.as_view(), name='php_trade_password'),
 
     url(r'^php/yue/buy/$', YueLiBaoBuy.as_view(), name='php_buy_yuelibao'),
+    url(r'^php/yue/fail/$', YueLiBaoBuyFail.as_view(), name='php_buy_yuelibao_fail'),
     url(r'^php/yue/check/$', YueLiBaoCheck.as_view(), name='php_check_yuelibao'),
     url(r'^php/yue/cancel/$', YueLiBaoCancel.as_view(), name='php_cancel_yuelibao'),
     url(r'^php/yue/refund/$', YueLiBaoRefund.as_view(), name='php_refund_yuelibao'),
 
-    url(r'^php/assignment/buy/$', AssignmentOfClaimsBuy.as_view(), name='php_refund_yuelibao'),
+    url(r'^php/assignment/buy/$', AssignmentOfClaimsBuy.as_view(), name='php_buy_assignment'),
+    url(r'^php/assignment/fail/$', AssignmentBuyFail.as_view(), name='php_buy_assignment_fail'),
 
     # url(r'^php/logout/$', logout_with_cookie, name='php_logout_cookie'),
 )

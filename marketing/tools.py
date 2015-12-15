@@ -238,6 +238,10 @@ def calc_broker_commission(product_id):
 
 @app.task
 def send_income_message_sms():
+    """
+    老平台的散标全民淘金
+    :return:
+    """
     today = datetime.datetime.now()
     yestoday = today - datetime.timedelta(days=1)
     start = timezone.datetime(yestoday.year, yestoday.month, yestoday.day, 20, 0, 0)
@@ -294,6 +298,10 @@ def send_income_message_sms():
 
 @app.task
 def send_commission_income_message_sms():
+    """
+    包含主站的全民淘金和新平台的全民淘金
+    :return:
+    """
     today = datetime.datetime.now()
     yesterday = today - datetime.timedelta(days=1)
     start = timezone.datetime(yesterday.year, yesterday.month, yesterday.day, 20, 0, 0)
