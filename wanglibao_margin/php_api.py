@@ -187,7 +187,7 @@ class YueLiBaoBuy(APIView):
     """
     author: Zhoudong
     http请求方式: POST  保存PHP的月利宝流水, 处理扣款, 加入冻结资金
-    http://xxxxxx.com/php/yuelibao/buy/
+    http://xxxxxx.com/php/yue/buy/
     返回数据格式：json
     :return:
     """
@@ -234,6 +234,41 @@ class YueLiBaoBuy(APIView):
             else:
                 ret.update(status=1,
                            msg='already saved!')
+        except Exception, e:
+            ret.update(status=0,
+                       msg=str(e))
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class YueLiBaoBuyFail(APIView):
+    """
+    author: Zhoudong
+    http请求方式: POST  当主站扣款成功, 新平台没接收到, 调用该接口说明购买失败
+    http://xxxxxx.com/php/yue/fail/
+    :return: status = 1  成功, status = 0 失败 .
+    """
+    permission_classes = ()
+
+    @csrf_exempt
+    def post(self, request):
+
+        ret = dict()
+
+        tokens = eval(request.POST.get('tokens'))
+
+        try:
+            with transaction.atomic(savepoint=True):
+                month_products = MonthProduct.objects.filter(token__in=tokens)
+                for product in month_products:
+                    user = product.user
+                    product_id = product.product_id
+                    buyer_keeper = PhpMarginKeeper(user, product_id)
+                    record = buyer_keeper.unfreeze(product.amount, description='')
+                    status = 1 if record else 0
+                    msg_list.append({'token': product.token, 'status': status})
+
+            ret.update(status=1,
+                       msg='success')
         except Exception, e:
             ret.update(status=0,
                        msg=str(e))
@@ -287,7 +322,7 @@ class YueLiBaoCancel(APIView):
     """
     author: Zhoudong
     http请求方式: POST  流标, 钱原路返回
-    http://xxxxxx.com/php/yuelibao/cancel/
+    http://xxxxxx.com/php/yue/cancel/
     返回数据格式：json 外层 status = 1 API 成功, 里层status = 1 当个订单返回成功.
     :return:
     """
@@ -324,7 +359,8 @@ class YueLiBaoRefund(APIView):
     """
     author: Zhoudong
     http请求方式: POST  投资到期回款.
-    http://xxxxxx.com/php/yuelibao/refund/
+    http://xxxxxx.com/php/yue/refund/
+
     refundId 还款记录ID 月利宝还款计划表id
     userId 用户ID
     productId 产品ID
@@ -378,7 +414,7 @@ class AssignmentOfClaimsBuy(APIView):
     """
     author: Zhoudong
     http请求方式: POST  保存PHP的债转流水, 处理扣款,
-    http://xxxxxx.com/php/trade_password/
+    http://xxxxxx.com/php/assignment/buy/
     返回数据格式：json
     :return:
     """
@@ -444,6 +480,42 @@ class AssignmentOfClaimsBuy(APIView):
             else:
                 ret.update(status=0,
                            msg='save error')
+        except Exception, e:
+            ret.update(status=0,
+                       msg=str(e))
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class AssignmentBuyFail(APIView):
+    """
+    author: Zhoudong
+    http请求方式: POST  当主站扣款成功, 新平台没接收到, 调用该接口说明购买失败
+    http://xxxxxx.com/php/assignment/fail/
+    :return: status = 1  成功, status = 0 失败 .
+    """
+    permission_classes = ()
+
+    @csrf_exempt
+    def post(self, request):
+
+        msg_list = []
+        ret = dict()
+
+        tokens = eval(request.POST.get('tokens'))
+
+        try:
+            with transaction.atomic(savepoint=True):
+                month_products = MonthProduct.objects.filter(token__in=tokens)
+                for product in month_products:
+                    user = product.user
+                    product_id = product.product_id
+                    buyer_keeper = PhpMarginKeeper(user, product_id)
+                    record = buyer_keeper.unfreeze(product.amount, description='')
+                    status = 1 if record else 0
+                    msg_list.append({'token': product.token, 'status': status})
+
+            ret.update(status=1,
+                       msg=msg_list)
         except Exception, e:
             ret.update(status=0,
                        msg=str(e))

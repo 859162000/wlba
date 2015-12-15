@@ -1260,6 +1260,4 @@ if ENV == ENV_PRODUCTION:
     DATACUBE_URL = 'http://10.171.37.235:10000/datacube/index'
 
 # settings for PHP
-PHP_UNPAID_PRINCIPLE = 'http://changshaojun.dev.wanglibao.com/py_interface.php?action=getPrincipal'
-if ENV == ENV_PRODUCTION:
-    PHP_UNPAID_PRINCIPLE = 'https://www.wanglibao.com'
+PHP_UNPAID_PRINCIPLE = 'http://source.wanglibao.com/py_interface.php?action=getPrincipal'

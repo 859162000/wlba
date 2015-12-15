@@ -119,6 +119,31 @@ class PhpMarginKeeper(MarginKeeper):
             record = self.tracer(catalog, amount, margin.margin, description)
             return record
 
+    # def yue_cancel(self, user, amount, description=u'', catalog=u'', savepoint=True):
+    #     """
+    #     # 这是直接对用户余额进行加减. 适用于债权转让的处理.
+    #     # 同时需要对用户的充值未投资金额进行处理.
+    #     :param user:    用户
+    #     :param status:  加钱还是扣钱 0 是加钱, 其他扣钱
+    #     :param amount:  金额
+    #     :param description: 描述
+    #     :param catalog: 分类
+    #     :param savepoint:   一个事务操作.
+    #     :return:
+    #     """
+    #     with transaction.atomic(savepoint=savepoint):
+    #         amount = Decimal(amount)
+    #         check_amount(amount)
+    #         margin = Margin.objects.get(user=user)
+    #             margin.margin += amount
+    #             margin_uninvested = margin.uninvested  # 初始未投资余额
+    #             uninvested = margin.uninvested - amount  # 未投资金额 - 投资金额 = 未投资余额计算结果
+    #             margin.uninvested = uninvested if uninvested >= 0 else Decimal('0.00')  # 未投资余额计算结果<0时,结果置0
+    #             margin.uninvested_freeze += amount if uninvested >= 0 else margin_uninvested  # 未投资余额计算结果<0时,未投资冻结金额等于+初始未投资余额
+    #         margin.save()
+    #         record = self.tracer(catalog, amount, margin.margin, description)
+    #         return record
+
     def deposit(self, amount, description=u'', savepoint=True, catalog=u"现金存入"):
         amount = Decimal(amount)
         check_amount(amount)
@@ -190,7 +215,6 @@ def get_user_info(request, session_id):
 
         margin_info = get_margin_info(user.id)
 
-        # account_info = getAccountInfo(user)
         user_info.update(user_id=user.pk,
                          username=user.wanglibaouserprofile.phone,
                          realname=user.wanglibaouserprofile.name,
@@ -323,15 +347,19 @@ def get_php_redis_principle(user_id):
     :param user_id:
     :return: 1000   代收本金
     """
-    try:
-        redis_obj = PhpRedisBackend()
-        redis_key = 'unpayed_principle_{}'.format(user_id)
-        php_unpaid_principle = redis_obj.redis.get(redis_key)
+    redis_obj = PhpRedisBackend()
+    redis_key = 'unpayed_principle_{}'.format(user_id)
+    php_unpaid_principle = redis_obj.redis.get(redis_key)
 
-        return decimal.Decimal(php_unpaid_principle) or 0
+    if php_unpaid_principle:
+        return decimal.Decimal(php_unpaid_principle).quantize(Decimal('0.01'))
 
-    except:
+    else:
         url = settings.PHP_UNPAID_PRINCIPLE
-        response = requests.get(url, data={'user_id': user_id}).json()
-
-        return decimal.Decimal(response.get('total_amount')) or 0
+        response = requests.post(url, data={'user_id': user_id}).json()
+        try:
+            if response.get('total_amount'):
+                return decimal.Decimal(response.get('total_amount')).quantize(Decimal('0.01'))
+        except Exception, e:
+            print e
+            return 0
