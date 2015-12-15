@@ -153,13 +153,13 @@ class IdVerificationAdmin(admin.ModelAdmin):
             obj.update_verify = False
 
             # 只有生产环境可以实现更新操作
-            if ENV == ENV_PRODUCTION:
-                verify_result, _id_photo, message = get_verify_result(obj.id_number, obj.name)
-                obj.description = message
-                if verify_result:
-                    obj.is_valid = True
-                    if _id_photo:
-                        obj.id_photo.save('%s.jpg' % obj.id_number, _id_photo, save=True)
+            # if ENV == ENV_PRODUCTION:
+            verify_result, _id_photo, message = get_verify_result(obj.id_number, obj.name)
+            obj.description = message
+            if verify_result:
+                obj.is_valid = True
+                if _id_photo:
+                    obj.id_photo.save('%s.jpg' % obj.id_number, _id_photo, save=True)
 
         obj.save()
 
