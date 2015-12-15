@@ -82,7 +82,7 @@ logger_anti = logging.getLogger('wanglibao_anti')
 
 
 class RegisterView(RegistrationView):
-    template_name = "register_test.jade"
+    template_name = "register_new.jade"
     form_class = EmailOrPhoneRegisterForm
 
     def register(self, request, **cleaned_data):
@@ -2059,7 +2059,7 @@ class ThirdOrderApiView(APIView):
                 'message': u'request_no长度超出'
             }
 
-        if result_code is None:
+        elif result_code is None:
             json_response = {
                 'ret_code': 20004,
                 'message': u'result_code参数缺失'
@@ -2070,7 +2070,7 @@ class ThirdOrderApiView(APIView):
                 'message': u'result_code长度超出'
             }
 
-        if not self.check_params_length(msg, 'msg'):
+        elif not self.check_params_length(msg, 'msg'):
             json_response = {
                 'ret_code': 20007,
                 'message': u'result_code长度超出'
@@ -2085,7 +2085,7 @@ class ThirdOrderApiView(APIView):
     def post(self, request, channel_code):
         if self.is_trust_ip(settings.TRUST_IP, request):
             if get_channel_record(channel_code):
-                params = request.POST
+                params = json.loads(request.POST)
                 request_no = params.get('request_no', None)
                 result_code = params.get('result_code', None)
                 msg = params.get('message', '')
