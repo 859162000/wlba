@@ -2,7 +2,6 @@
 
 {% block extrahead %}{{ block.super }}
 <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
-{{ media }}
 <script>
 var _is_pc;
 var _is_app;
@@ -37,7 +36,6 @@ $(document).ready(function (){
 
 {% block field_sets %}
 {% for fieldset in adminform %}
-{#    {% include "admin/includes/fieldset.html" %}#}
   {% include "./admin/wanglibao_activity/activityshow/fieldset.html" %}
 {% endfor %}
 {% endblock %}
