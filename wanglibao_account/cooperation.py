@@ -17,6 +17,7 @@ if __name__ == '__main__':
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wanglibao.settings')
 
+from weixin.models import WeixinAccounts
 import qrcode
 import hashlib
 import datetime
@@ -1118,7 +1119,15 @@ class RockFinanceRegister(CoopRegister):
                     raise Exception(u"生成获奖记录异常")
                 else:
                     #不知道为什么create的时候，会报错
-                    img = qrcode.make("https://www.wanglibao.com/api/check/qrcode/?owner_id=%s&activity=rock_finance&content=%s"%(user.id, reward.content))
+                    m = Misc.objects.filter(key='weixin_qrcode_info').first()
+                    if m and m.value:
+                        info = json.loads(m.value)
+                        if info.get(self.wx_classify):
+                            original_id = info.get('fwh')
+                            account = WeixinAccounts.getByOriginalId(original_id)
+                    encoding_str = urllib.quote("https://satging.wanglibao.com/api/check/qrcode/?owner_id=%s&activity=rock_finance&content=%s" % (user.id, reward.content))
+                    qrcode_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=1" % (account.app_id, encoding_str)
+                    img = qrcode.make(qrcode_url)
                     _img = img.tobytes()
                     img_handle = cStringIO.StringIO()
                     img.save(img_handle)

@@ -26,6 +26,7 @@ from django.conf import settings
 from django.db.models.base import ModelState
 from wanglibao_sms.utils import send_validation_code, validate_validation_code
 from misc.models import Misc
+from weixin.base import OpenIdBaseAPIView
 from wanglibao_sms.models import *
 from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, IntroducedBy, IntroducedByReward, \
     Reward, ActivityJoinLog, QuickApplyInfo, GiftOwnerGlobalInfo, GiftOwnerInfo, WanglibaoVoteCounter
@@ -2728,10 +2729,10 @@ class RockFinanceAPIView(APIView):
         return Response({"code": 0, "message": u'投票成功'})
 
 
-class RockFinanceCheckAPIView(APIView):
+class RockFinanceCheckAPIView(OpenIdBaseAPIView):
     permission_classes = ()
 
-    def post(self, request):
+    def get(self, request):
         key = 'activities'
         activity_config = Misc.objects.filter(key=key).first()
         if activity_config:
@@ -2749,9 +2750,9 @@ class RockFinanceCheckAPIView(APIView):
         else:
             raise Exception(u"misc中没有配置activities杂项")
 
-        openid = request.DATA.get("openid", None)
+        #openid = request.DATA.get("openid", None)
         #判断是否在扫描列表里
-        if openid not in openids:
+        if self.openid and self.openid not in openids:
             return Response({"code": 1000, "message": u"您没有扫描权限"})
 
         #判断活动是否开启
