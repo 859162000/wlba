@@ -1120,12 +1120,13 @@ class RockFinanceRegister(CoopRegister):
                 else:
                     #不知道为什么create的时候，会报错
                     m = Misc.objects.filter(key='weixin_qrcode_info').first()
+                    original_id = None
                     if m and m.value:
                         info = json.loads(m.value)
                         original_id = info.get('fwh')
                         account = WeixinAccounts.getByOriginalId(original_id)
                     encoding_str = urllib.quote("https://staging.wanglibao.com/api/check/qrcode/?owner_id=%s&activity=rock_finance&content=%s" % (user.id, reward.content))
-                    qrcode_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=1" % (account.app_id, encoding_str)
+                    qrcode_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=%s" % (account.app_id, encoding_str, original_id)
                     logger.debug("encoding_st:%s, qrcode_url:%s" % (encoding_str, qrcode_url))
                     img = qrcode.make(qrcode_url)
                     _img = img.tobytes()
