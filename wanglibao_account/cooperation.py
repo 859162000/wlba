@@ -1128,12 +1128,10 @@ class RockFinanceRegister(CoopRegister):
                     activity_reward.save()
                     logger.debug("before save: activity_reward.qrcode:%s" % activity_reward.qrcode)
                     #将奖品通过站内信发出
-                    message_content = u"网利宝摇滚夜欢迎您的到来，点击<a href='https://www.wanglibao.com/rock/finance/qrcode/>" \
-                                      u"获得入场二维码</a>查看，<br/> 感谢您对我们的支持与关注。<br/>网利宝"
                     inside_message.send_one.apply_async(kwargs={
                         "user_id": user.id,
                         "title": u"网利宝摇滚之夜门票",
-                        "content": message_content,
+                        "content": u"网利宝摇滚夜欢迎您的到来，点击<a href='https://www.wanglibao.com/rock/finance/qrcode/>获得入场二维码</a>查看，<br/> 感谢您对我们的支持与关注。<br/>网利宝",
                         "mtype": "activity"
                     })
                     reward.is_used = True
