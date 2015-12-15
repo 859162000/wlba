@@ -291,7 +291,6 @@ function initFun() {
                 lib._lookMore()
                 lib._goExperienceBtn()
                 lib._goInvest()
-                lib._bannerEffect()
             },
             _lookMore: function () {
                 $('#nologin').on('click', function () {
@@ -392,38 +391,6 @@ function initFun() {
                 } else {
                     return t.split("").reverse().join("") + "." + r;
                 }
-            },
-            _bannerEffect: function () {
-                /*效果*/
-                function snow(left, height, src) {
-                    var elem = $("<div />", {
-                        css: {
-                            left: left + "px",
-                            height: height + "px"
-                        }
-                    }).addClass('div').append($('<img />', {
-                        src: src
-                    }).addClass('roll'));
-                    $('#showMoney').append(elem);
-                    setTimeout(function () {
-                        $(elem).remove();
-                    }, 4000);
-                }
-
-                xg = setInterval(function () {
-                    var left = Math.random() * window.innerWidth;
-                    var height = Math.random() * window.innerHeight;
-                    var src = "/static/imgs/mobile_activity/app_experience/xg" + Math.floor(Math.random() * 7 + 1) + ".png";
-                    snow(left, height, src);
-                }, 300);
-
-                $(window).scroll(function () {
-                    if ($('body').scrollTop() > 0) {
-                        $('#showMoney').animate({opacity: 0}, 500);
-                    } else {
-                        $('#showMoney').animate({opacity: 1}, 500);
-                    }
-                });
             }
         }
         return {
@@ -458,4 +425,34 @@ function initFun() {
             }, 20);
         }
    })
+        /*效果*/
+    function snow(left, height, src) {
+        var elem = $("<div />", {
+            css: {
+                left: left + "px",
+                height: height + "px"
+            }
+        }).addClass('div').append($('<img />', {
+            src: src
+        }).addClass('roll'));
+        $('#showMoney').append(elem);
+        setTimeout(function () {
+            $(elem).remove();
+        }, 4000);
+    }
+
+    xg = setInterval(function () {
+        var left = Math.random() * window.innerWidth;
+        var height = Math.random() * window.innerHeight;
+        var src = "/static/imgs/mobile_activity/app_experience/xg" + Math.floor(Math.random() * 7 + 1) + ".png";
+        snow(left, height, src);
+    }, 300);
+
+    $(window).scroll(function () {
+        if ($('body').scrollTop() > 0) {
+            $('#showMoney').animate({opacity: 0}, 500);
+        } else {
+            $('#showMoney').animate({opacity: 1}, 500);
+        }
+    });
 })(org);
