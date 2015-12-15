@@ -2750,7 +2750,8 @@ class RockFinanceCheckAPIView(OpenIdBaseAPIView):
         else:
             raise Exception(u"misc中没有配置activities杂项")
 
-        #openid = request.DATA.get("openid", None)
+        logger.debug("user:%s, is_open:%s, start_scan:%s, end_scan:%s openids:%s, scaner_openid:%s" % (request.user, is_open, start_scan, end_scan, openids, self.openid))
+
         #判断是否在扫描列表里
         if self.openid and self.openid not in openids:
             return Response({"code": 1000, "message": u"您没有扫描权限"})
