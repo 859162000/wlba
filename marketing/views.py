@@ -2754,16 +2754,16 @@ class RockFinanceCheckAPIView(OpenIdBaseAPIView):
 
         #判断是否在扫描列表里
         if self.openid and self.openid not in openids:
-            return Response({"code": 1000, "message": u"您没有扫描权限"})
+            return HttpResponse(json.dumps({"code": 1000, "message": u"您没有扫描权限"}), content_type='application/json')
 
         #判断活动是否开启
         if is_open == "false":
-            return Response({"code": 1001, "message": u"活动还没有开启"})
+            return HttpResponse(json.dumps({"code": 1001, "message": u"活动还没有开启"}), content_type='application/json')
 
         #判断是否在扫描的时间段内
         now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         if now < start_scan or now > end_scan:
-            return Response({"code": 1002, "message": u'扫描时间段不合理'})
+            return HttpResponse(json.dumps({"code": 1002, "message": u'扫描时间段不合理'}), content_type='application/json')
 
 
         owner_id = request.DATA.get("owner_id", None)
@@ -2773,22 +2773,22 @@ class RockFinanceCheckAPIView(OpenIdBaseAPIView):
         try:
             assert None not in (owner_id, activity, content)
         except AssertionError:
-            return Response({"code": 1005, "message": u"二维码链接的参数不对"})
+            return HttpResponse(json.dumps({"code": 1005, "message": u"二维码链接的参数不对"}),content_type='application/json')
 
         with transaction.atomic():
             reward_record = WanglibaoActivityReward.objects.select_for_update().filter(has_sent=False, user_id=owner_id, activity=activity, reward__content=content).first()
             if not reward_record:
                 reward_record.save()
-                return Response({"code": 1003, "message": u'您的二维码不合法'})
+                return HttpResponse(json.dumps({"code": 1003, "message": u'您的二维码不合法'}), content_type='application/json')
 
             if reward_record.has_sent:
                 reward_record.save()
-                return Response({"code": 1004, "message": u'每一个二维码只能被使用一次'})
+                return HttpResponse(json.dumps({"code": 1004, "message": u'每一个二维码只能被使用一次'}), content_type='application/json')
 
             reward_record.has_sent = True
             reward_record.left_times = 0
             reward_record.save()
-            return Response({"code": 0, "message": u'欢迎您参加网利宝金融摇滚夜'})
+            return HttpResponse(json.dumps({"code": 0, "message": u'欢迎您参加网利宝金融摇滚夜'}), content_type='application/json')
 
     def dispatch(self, request, *args, **kwargs):
         pass
