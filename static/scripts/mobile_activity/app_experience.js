@@ -272,8 +272,8 @@ wlb.ready({
         mixins.sendUserInfo(function (data) {
             if (data.ph == '') {
                 login = false;
-                $('#nologin').on('click',function(){
-                    mixins.registerApp({refresh:1, url:'https://staging.wanglibao.com/activity/experience/redirect/'});
+                $('.receive_box').on('click', function(){
+                    mixins.registerApp({refresh:1, url:'https://staging.wanglibao.com/activity/experience/mobile/'});
                 })
             } else {
                 login = true;
@@ -285,6 +285,8 @@ wlb.ready({
         initFun();
     }
 })
+
+
 function initFun() {
     org.experience = (function (org) {
         var lib = {
@@ -294,9 +296,9 @@ function initFun() {
                 lib._goInvest()
             },
             _lookMore: function () {
-                $('#nologin').on('click', function () {
+               $('#nologin').on('click', function () {
                     window.location.href = '/weixin/regist/?next=/activity/experience/mobile/';
-                })
+               })
                 $lookMore = $('#lookMore')
                 $lookMore.on('click', function () {
                     var ele = $('.history-list');
