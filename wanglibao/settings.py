@@ -260,7 +260,7 @@ STATICFILES_DIRS = (
 
 # Media files path
 MEDIA_ROOT = '/var/media/wanglibao/'
-MEDIA_URL = '/media/'
+MEDIA_URL = ''
 # DEFAULT_FILE_STORAGE = 'file_storage.storages.DatabaseStorage'
 DEFAULT_FILE_STORAGE = 'file_storage.storages.AliOSSStorage'
 

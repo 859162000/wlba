@@ -1,11 +1,11 @@
 extends account_home_base
 
 block head
-  - with '密码管理' as title
+  - with '修改密码' as title
     include include/head
 
 block sidebar
-  - with '密码管理' as activeItem
+  - with '修改密码' as activeItem
     include include/user_center_sidebar
 
 block main
@@ -14,38 +14,23 @@ block main
       .panel-title-bar__no-border
         .panel-title 密码管理
     .pwd-management
-        input(type="hidden")#bankIsNoBind
-        - csrf_token
         .pwd-div.clearfix
             span.span1
             .info-fonts
                 p.p1 登录密码
                 p.p2 账户登录使用，定期修改可提升账户安全性
             a(href='/accounts/update/') 修改
-        .pwd-div.pwd-div2.clearfix
-            span.span2
-            .info-fonts
-                p.p1 交易密码
-                p.p2 6位数字，投资、提现时使用，保证账户资金安全
-            .btns
-                p.old(style='display:none')
-                    if user.wanglibaouserprofile.utype != '3'
-                        a(href='javascript:void(0)')#getBackTradingPwd 找回
-                    a(href='/accounts/trading') 修改
-                p.new(style='display:none')
-                    a(href='javascript:void(0)')#setPWDA.bg 设置
-  #goBindingBackWin.goBindingBackWin(style='display:none')
-    p.title 温馨提示
-    p 请先绑卡，再设置交易密码
-    p
-        a(href='javascript:void(0)').no#temporaryNot 暂不绑卡
-        a(href='/accounts/bankcard/').yes 去绑卡
-  #id-validate(style='display: none')
-      input#id-is-valid(type='hidden', value='')
-      .padding-xl.align-center
-          p 为保证您的资金安全，请先进行实名认证
-          .space-vertical-l
-          a.button.button-middle.button-l.button-red(href='/accounts/id_verify/') 去实名认证
+        //.pwd-div.pwd-div2.clearfix
+        //    span.span2
+        //    .info-fonts
+        //        p.p1 交易密码
+        //        p.p2 6位数字，投资、提现时使用，保证账户资金安全
+        //    .btns
+        //        p.old(style='display:none')
+        //            a(href='/accounts/trading/back/') 找回
+        //            a(href='/accounts/trading') 修改
+        //        p.new(style='display:none')
+        //            a(href='/accounts/trading/setting/').bg 设置
 block script
   script.
     require(['/static/js/account_setting.js'])

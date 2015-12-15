@@ -4,7 +4,6 @@ require.config(
     'jquery.modal': 'lib/jquery.modal.min'
     'jquery.placeholder': 'lib/jquery.placeholder'
     'jquery.validate': 'lib/jquery.validate.min'
-    'jquery.form': 'lib/jquery.form'
     tools: 'lib/modal.tools'
 
   urlArgs: 'v=20151118'
@@ -13,10 +12,9 @@ require.config(
     'jquery.modal': ['jquery']
     'jquery.placeholder': ['jquery']
     'jquery.validate': ['jquery']
-    'jquery.form':['jquery']
 )
 
-require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator', 'jquery.validate','jquery.form'], ($, modal, backend, tool, placeholder, validate, form)->
+require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator', 'jquery.validate'], ($, modal, backend, tool, placeholder, validate)->
   max_amount = parseInt($('input[name=fee]').attr('data-max_amount'))
   min_amount = parseInt($('input[name=fee]').attr('data-min_amount'))
   $.validator.addMethod "balance", (value, element)->
@@ -35,7 +33,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       return true
     return false
 
-  addFormValidateor = $("#withdraw-form").validate
+  $("#withdraw-form").validate
     rules:
       amount:
         required: true
@@ -44,18 +42,18 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
         huge: false
         small: false
       card_id:
-        required: false
+        required: true
       validate_code:
         required: true
       captcha_1:
         required: true
         minlength: 1
-      trade_pwd:
-        required: true
+      pwd:
+        required: false
 
     messages:
       amount:
-        required: '请输入金额'
+        required: '不能为空'
         money: '请输入正确的金额格式'
         balance: '余额不足'
         huge: '单笔提现金额不能超过' + max_amount + '万元'
@@ -67,20 +65,17 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       captcha_1:
         required: '不能为空'
         minlength: $.format("验证码至少输入1位")
-      trade_pwd:
+      pwd:
         required: '请输入交易密码'
+
+  if $('#id-is-valid').val() == 'False'
+    $('#id-validate').modal()
 
   $('.ispan4-omega').click () ->
     $('.code-img-error').html('')
     $('#img-code-div2').modal()
     $('#img-code-div2').find('#id_captcha_1').val('')
-    _refreshCode()
-
-  $('.captcha-refresh').click ->
-    _refreshCode()
-
-  _refreshCode = ()->
-    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/anti/captcha/refresh/"
+    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v="+(+new Date())
     $.getJSON url, {}, (json)->
       $('input[name="captcha_0"]').val(json.key)
       $('img.captcha').attr('src', json.image_url)
@@ -142,6 +137,10 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
     timerFunction()
     intervalId = setInterval timerFunction, 1000
 
+  $('.withdraw-button').click ()->
+    if(!$(this).hasClass('no-click'))
+      $('#withdraw-form').submit()
+
   $(".voice").on 'click', '.voice-validate', (e)->
     e.preventDefault()
 
@@ -192,39 +191,37 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       if xhr.status > 400
         tool.modalAlert({title: '温馨提示', msg: result.message})
 
-  $('.poundageF').click ()->
-    $('#poundageExplain').modal()
   ###显示设置密码弹框###
   $('.forget-pwd').click ()->
-    if $('#bankIsNoBind').val() == 'false'
-      $('#goBindingBackWin').modal();
-      $('#goBindingBackWin').find('.close-modal').hide()
+    tag = $(this).attr('tag')
+    dr = $('.setTradingPwd1')
+    if tag == '1'
+      dr.find('.tag1').show()
+      dr.find('.tag2').hide()
+      dr.find('.nextBtn').attr('tag','1')
     else
-      $('#setTradingPwd').modal();
-      $('.modal').css('width':'640px')
-  $('#temporaryNot').click ->
-    $.modal.close()
+      dr.find('.tag2').show()
+      dr.find('.tag1').hide()
+      dr.find('.nextBtn').attr('tag','2')
+    $('#setTradingPwd').modal();
   ###判断提交表单###
   $('.withdraw-button').click ()->
     if(!$(this).hasClass('no-click'))
-      if $('.bindingCard').text() == ''
-        $('.bindingError').text('*请绑定银行卡')
-      else
-        if addFormValidateor.form()
-          $('#withdraw-form').ajaxSubmit((data) ->
-            tool.modalAlert({title: '温馨提示', msg: data.message, callback_ok: _showModal})
-          )
-  _showModal = ()->
-    location.reload();
+      $('#withdraw-form').submit()
   ###设置密码提交表单###
   $('#nextBtn').click ()->
     parent = $('.setTradingPwd1')
     phone = $(this).attr('data-phone')
     id = $.trim(parent.find('.sfz').val())
-    yhkh = $('#bindingEdInfo').attr('data-no')
-    reg = new RegExp(/^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$|[a-zA-Z][a-zA-Z0-9]{1,}$/)
+    select = $('#card-select1').val()
+    yhkh = $.trim($('.yhkh').val())
+    reg = new RegExp(/^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/)
+    tag = $(this).attr('tag')
     $('.errorS').html('').hide()
     sfzError = parent.find('#sfzError')
+    yhkError = parent.find('#yhkError')
+    yhkhError = parent.find('#yhkhError')
+    res = /^\d{10,20}$/
     if(id == '')
       sfzError.show().addClass('errorS').html('<i></i>请输入身份证号码')
       return
@@ -234,6 +231,21 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
         return
       else
         sfzError.show().removeClass('errorS').html('<i></i>')
+    if(select == '')
+      yhkError.show().addClass('errorS').html('<i></i>请输选择银行卡')
+      return
+    else
+      yhkError.show().removeClass('errorS').html('<i></i>')
+    if(yhkh == '')
+      yhkhError.show().addClass('errorS').html('<i></i>请输入银行卡号')
+      return
+    else
+      if !res.test(yhkh)
+        yhkhError.show().addClass('errorS').html('<i></i>卡号无效')
+        return
+      else
+        yhkhError.show().removeClass('errorS').html('<i></i>')
+
     $.ajax
       url: "/api/trade_pwd/"
       type: "POST"
@@ -243,24 +255,32 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
         citizen_id : id
         requirement_check : 1
       }
-    .success (data)->
-      if data.ret_code == 5
-        $('#setTradingPwd2').modal()
-        $('.modal').css('width':'640px')
+    .success (date)->
+      if date.ret_code == 5
+        $.modal.close()
+        dr = $('.setTradingPwd2')
+        if tag == '1'
+          dr.find('.tag1').show()
+          dr.find('.tag2').hide()
+        else
+          dr.find('.tag2').show()
+          dr.find('.tag1').hide()
+        $('#backTradingPwd').modal()
+        $('#confirmBtn').attr('tag':tag)
       else
-         sfzError.show().addClass('errorS').html('<i></i>'+data.message)
+         tool.modalAlert({title: '温馨提示', msg: date.message})
 
   ###确认密码###
-  $('.confirmBtn').click ()->
-    par = $(this).parent().parent()
+  $('#confirmBtn').click ()->
+    par = $('.setTradingPwd2')
     pwd1 = $.trim(par.find('#pwd1').val())
     pwd2 = $.trim(par.find('#pwd2').val())
     erro1 = par.find('#sfzError')
     erro2 = par.find('#yzmError')
-    card_id = $.trim($('#bindingEdInfo').attr('data-no'))
+    card_id = $.trim($('.yhkh').val())
     citizen_id = $.trim($('#citizen_id').val())
-    tag = $(this).attr('tag')
     re = /^\d{6}$/
+    tag = $(this).attr('tag')
     $('.errorS').html('').hide()
     if pwd1 == ''
       erro1.show().addClass('errorS').html('<i></i>请输入密码')
@@ -287,83 +307,37 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
     else
         erro2.show().removeClass('errorS').html('<i></i>')
     if tag == '1'
-      dataStr = 'action_type=3&new_trade_pwd='+pwd1+'&card_id='+card_id+'&citizen_id='+citizen_id+'&requirement_check=0'
+      action_type = '3'
     else
-      dataStr = 'action_type=1&new_trade_pwd='+pwd1+'&requirement_check=0'
+      action_type = '1'
+    alert(action_type)
     $.ajax
       url: "/api/trade_pwd/"
       type: "POST"
-      data: dataStr
-    .success (xhr)->
-      tool.modalAlert({title: '温馨提示', msg: xhr.message, callback_ok: _showModal})
-  ###获取绑卡状态###
-  $.ajax
-      url: "/api/pay/the_one_card/"
-      type: "GET"
       data: {
+        action_type : action_type
+        card_id : card_id
+        citizen_id : citizen_id
+        new_trade_pwd : pwd1
+        requirement_check : 0
       }
-    .fail ()->
-      $('.noCard').show()
-      $('.bindingCard').hide()
-      $('#bankIsNoBind').val('false')
-    .done (xhr) ->
-      $('.noCard').hide()
-      str = xhr.bank.name + '&nbsp;&nbsp;' +xhr.no.substring(0,3)+'**** ****' +xhr.no.substr(xhr.no.length-4)
-      $('.bindingCard').show().html(str).attr('id',xhr.bank.id)
-      $('#bindingEdInfo').html(str).attr('data-no',xhr.no)
-      $('input[name="card_id"]').val(xhr.id)
+    .success ->
+      location.reload()
+
   ###判断是否设置了交易密码###
   $.ajax
     url: "/api/profile/"
     type: "GET"
     data: {
     }
-  .success (data) ->
-    if data.trade_pwd_is_set
+  .success (date) ->
+    if date.trade_pwd_is_set
       $('.trade_pwd_is_set').show()
     else
       $('.trade_pwd_is_set_no').show()
-      if $('#bankIsNoBind').val() == 'false'
-        $('.bank-count').show()
-      else
+      if date.cards_number > 0
         $('.bank-counts').show()
-
-  #账户余额
-  $.ajax
-    url: "/api/home/"
-    type: "GET"
-    data: {
-    }
-  .success (data) ->
-    $('.red-text').text(data.p2p_margin)
-
-  if $('#id-is-valid').attr('data-type') == 'qiye'
-    if $('#id-is-valid').val() == 'False'
-      $.ajax {
-        url: '/qiye/profile/exists/'
-        data: {
-        }
-        type: 'GET'
-      }
-      .done (data)->
-        if data.ret_code == 10000
-          $.ajax {
-            url: '/qiye/profile/get/'
-            data: {
-            }
-            type: 'GET'
-          }
-          .done (data)->
-            if data.data.status != '审核通过'
-              $('.verifyHref').attr('href','/qiye/profile/edit/')
-      .fail (data)->
-        $('.verifyHref').attr('href','/qiye/info/')
-
-      $('#id-validate').modal()
-      return
-  else
-    if $('#id-is-valid').val() == 'False'
-      $('#id-validate').modal()
-      return
-
-
+      else
+        $('.bank-count').show()
+  $('.poundageF').click ()->
+    $('#poundageExplain').modal()
