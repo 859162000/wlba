@@ -11,7 +11,7 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 import logging
 import time
-from tasks import bind_ok
+
 
 logger = logging.getLogger("weixin")
 
@@ -71,7 +71,6 @@ def _process_record(w_user, user, type, describe):
 
 def bindUser(w_user, user):
     is_first_bind = False
-    redpack_record_id = 0
     if w_user.user:
         if w_user.user.id==user.id:
             return 1, u'你已经绑定, 请勿重复绑定'
@@ -89,6 +88,7 @@ def bindUser(w_user, user):
         user.wanglibaouserprofile.first_bind_time = w_user.bind_time
         user.wanglibaouserprofile.save()
         is_first_bind = True
+    from tasks import bind_ok
     bind_ok.apply_async(kwargs={
         "openid": w_user.openid,
         "is_first_bind":is_first_bind,

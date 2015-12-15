@@ -7,6 +7,21 @@ from weixin.models import WeixinUser, WeixinAccounts
 from weixin.common.decorators import weixin_api_error
 from misc.models import Misc
 import json
+from weixin.util import getOrCreateWeixinUser
+from rest_framework.views import APIView
+class OpenIdBaseAPIView(APIView):
+    @weixin_api_error
+    def dispatch(self, request, *args, **kwargs):
+        code = request.GET.get('code')
+        state = request.GET.get('state')
+        self.openid = ""
+        if code and state:
+            account = WeixinAccounts.getByOriginalId(state)
+            request.session['account_key'] = account.key
+            oauth = WeChatOAuth(account.app_id, account.app_secret, )
+            res = oauth.fetch_access_token(code)
+            self.openid = res.get('openid')
+        return super(APIView, self).dispatch(request, *args, **kwargs)
 
 class BaseWeixinTemplate(TemplateView):
     @weixin_api_error
@@ -20,7 +35,7 @@ class BaseWeixinTemplate(TemplateView):
             oauth = WeChatOAuth(account.app_id, account.app_secret, )
             res = oauth.fetch_access_token(code)
             self.openid = res.get('openid')
-            w_user = WeixinUser.objects.filter(openid=self.openid).first()
+            w_user, old_subscribe = getOrCreateWeixinUser(self.openid, account)
             if not w_user:
                 error_msg = "error"
             if not w_user.user:

@@ -4,12 +4,16 @@ import urllib
 from django.contrib.auth import login as auth_login
 from wechatpy.oauth import WeChatOAuth
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from weixin.common.decorators import weixin_api_error
 from weixin.models import WeixinAccounts, WeixinUser
 from weixin.util import redirectToJumpPage, bindUser, unbindUser
+from marketing.utils import get_channel_record
 from util import getOrCreateWeixinUser
 from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
+from wanglibao import settings
+
 
 
 class WXLogin(TemplateView):
@@ -46,7 +50,7 @@ class WXLogin(TemplateView):
             return redirectToJumpPage(error_msg)
         return super(WXLogin, self).dispatch(request, *args, **kwargs)
 
-class WXLoginAPI():
+class WXLoginAPI(APIView):
     permission_classes = ()
     http_method_names = ['post']
 
@@ -63,11 +67,11 @@ class WXLoginAPI():
                 if openid:
                     weixin_user = WeixinUser.objects.get(openid=openid)
                     rs, txt = bindUser(weixin_user, user)
+                    if rs == 0:
+                        auth_login(request, user)
+                        request.session.set_expiry(1800)
             except WeixinUser.DoesNotExist:
                 pass
-
-            auth_login(request, user)
-            request.session.set_expiry(1800)
             data = {'nickname': user.wanglibaouserprofile.nick_name}
             return Response(data)
 
@@ -85,7 +89,7 @@ class WXRegister(TemplateView):
         elif token_session:
             token = token_session
         else:
-            token = 'weixin'
+            token = 'fwh'
 
         if token:
             channel = get_channel_record(token)
@@ -99,4 +103,9 @@ class WXRegister(TemplateView):
             'phone': phone,
             'next' : next
         }
+
+class WXRegisterAPI(APIView):
+
+    pass
+
 
