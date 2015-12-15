@@ -246,7 +246,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 strHtml+="<p class='p_left'>请继续关注网利宝最新活动。</p>";
                 strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo.png'/></p><p class='popub-footer'><div class='close_btn'>知道了！</div></p></div>";
             }else if(difference == 4){
-                strHtml+="<p class='p_left'>"+ txt +"</p>";
+                strHtml ="<p class='p_left'>"+ txt +"</p>";
                 strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo.png'/></p><p class='popub-footer'><div class='close_btn'>知道了！</div></p></div>";
             }
             alertFram.innerHTML = strHtml;
