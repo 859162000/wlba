@@ -67,14 +67,14 @@ def is_ok_age_for_id(id_number):
     else:
         birth_date = id_number[6:14]
 
-    # 判断该身份证用户年龄是否大于18岁并小于65岁
+    # 判断该身份证用户年龄是否大于或等于18岁
     current_date = datetime.datetime.now()
     birth_date = datetime.datetime.strptime(birth_date, '%Y%m%d')
     birth_date.replace(year=current_date.year)
 
     if birth_date < current_date:
         age = current_date.year - birth_date.year
-        if 18 < age < 65:
+        if age > 18:
             return True
 
     return False
