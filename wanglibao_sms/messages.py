@@ -287,9 +287,9 @@ def red_packet_get_alert(amount, rtype):
             return content.format(amount, rtype)
         except Exception, e:
             print e
-            return u'{}{}已经存入您的账户，登录网利宝账户进行查看。关注服务号wanglibao400，每日惊喜。'.format(amount, rtype)
+            return u'{}{}已经存入您的账户，登录网利宝账户进行查看。关注服务号wanglibao400，每日签到抽大奖。'.format(amount, rtype)
     else:
-        return u'{}{}已经存入您的账户，登录网利宝账户进行查看。关注服务号wanglibao400，每日惊喜。'.format(amount, rtype)
+        return u'{}{}已经存入您的账户，登录网利宝账户进行查看。关注服务号wanglibao400，每日签到抽大奖。'.format(amount, rtype)
 
 
 @suffix_td
@@ -478,7 +478,7 @@ def msg_give_income(count, amount):
 
 @suffix_td
 def sms_alert_invest(name):
-    return u"{}在网利宝看到几个超棒的理财计划，你也赶紧去投资，不要再错失良机啦！关注服务号wanglibao400，每日惊喜。".format(name)
+    return u"{}在网利宝看到几个超棒的理财计划，你也赶紧去投资，不要再错失良机啦！关注服务号wanglibao400，每日签到抽大奖。".format(name)
 
 
 @suffix_td
