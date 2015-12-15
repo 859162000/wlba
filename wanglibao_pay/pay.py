@@ -238,7 +238,7 @@ class PayOrder(object):
             self.add_card(pay_info.card_no, pay_info.bank, pay_info.user, pay_info.channel)
 
         try:
-            user = request.user if request.user else pay_info.user
+            user = pay_info.user
             CoopRegister(request).process_for_recharge(user, order_id)
             # tools.deposit_ok(request.user.id, amount, pay_info.device, order_id)
             tools.deposit_ok.apply_async(kwargs={"user_id": user.id, "amount": amount,
