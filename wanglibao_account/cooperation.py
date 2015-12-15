@@ -1126,6 +1126,7 @@ class RockFinanceRegister(CoopRegister):
                         account = WeixinAccounts.getByOriginalId(original_id)
                     encoding_str = urllib.quote("https://staging.wanglibao.com/api/check/qrcode/?owner_id=%s&activity=rock_finance&content=%s" % (user.id, reward.content))
                     qrcode_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=1" % (account.app_id, encoding_str)
+                    logger.debug("encoding_st:%s, qrcode_url:%s" % (encoding_str, qrcode_url))
                     img = qrcode.make(qrcode_url)
                     _img = img.tobytes()
                     img_handle = cStringIO.StringIO()
