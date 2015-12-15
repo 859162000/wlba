@@ -2778,8 +2778,7 @@ class RockFinanceCheckAPIView(BaseWeixinTemplate):
         with transaction.atomic():
             reward_record = WanglibaoActivityReward.objects.select_for_update().filter(has_sent=False, user_id=owner_id, activity=activity, reward__content=content).first()
             if not reward_record:
-                reward_record.save()
-                return {"code": 1003, "message": u'您的二维码不合法'}
+                return {"code": 1003, "message": u'您的二维码不合法, 可能已经被使用了'}
 
             if reward_record.has_sent:
                 reward_record.save()
