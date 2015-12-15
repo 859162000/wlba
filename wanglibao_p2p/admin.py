@@ -77,9 +77,10 @@ class AmortizationInline(admin.TabularInline):
     #     'term', 'principal', 'interest', 'penal_interest', 'description')
 
     def get_readonly_fields(self, request, obj=None):
-        read_only = ['term', 'principal', 'interest', 'penal_interest', 'description']
+        read_only = ['term', 'principal', 'interest', 'penal_interest', 'description',
+                     'settlement_time', 'is_auto_ready_for_settle']
         if obj and obj.status == u'已完成':
-            read_only.append('ready_for_settle')
+            read_only += ['ready_for_settle', 'term_date', 'settled']
         return tuple(read_only)
 
 
@@ -315,7 +316,7 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
     def get_readonly_fields(self, request, obj=None):
         if obj and obj.status in [u'正在招标', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核']:
             return ['period', 'expected_earning_rate', 'pay_method', 'total_amount', 'excess_earning_rate',
-                    'amortization_count', 'soldout_time', 'make_loans_time', 'ordered_amount', 'activity']
+                    'amortization_count', 'soldout_time', 'make_loans_time', 'ordered_amount']
 
         if obj and obj.status in [u'还款中', u'已完成', u'流标']:
             return [f.name for f in self.model._meta.fields]
