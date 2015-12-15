@@ -343,11 +343,11 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
   ###获取绑卡状态###
   $.ajax
       url: "/api/pay/the_one_card/"
-      type: "POST"
+      type: "GET"
       data: {
       }
-    .fail (xhr)->
-      console.log(xhr)
+    .fail ()->
+      $('.noCard').show()
     .success(xhr) ->
        console.log(xhr)
   ###绑定银行卡###

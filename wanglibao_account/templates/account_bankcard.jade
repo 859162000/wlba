@@ -37,8 +37,8 @@ block main
                   dl.bank-card--info-row
                     dt.bank-card--info-title 账号
                     dd.bank-card--info-value {{card.no | bank_card}}
-                .binding-card 绑定该卡
-              //a#del-card.pull-right.del-bank-card(card_id='{{card.id}}') 删除
+                .binding-card(data-card='{{card.no}}') 绑定该卡
+              a#del-card.pull-right.del-bank-card(card_id='{{card.id}}') 删除
 
             .add-bank-card#add-card-button
                 .add-icon-large
@@ -69,17 +69,5 @@ block main
     .binding-alert-btn
         a(href='javascript:void(0)').ok-btn 确定绑卡
         a(href='javascript:void(0)').no-btn 绑定其它卡片
-  #bindingNewCard.bindingOldCard(style='display:none')
-    .binding-alert-title 绑定银行卡
-    .binding-alert-content
-        p 您正在绑定
-            span.bankInfo 交通银行尾号2832
-            | 的银行卡，
-        p 绑定成功后，
-            label 该卡将做为您的唯一提现银行卡，
-        p 您在使用网利宝APP的时候，只能通过该卡进行充值以及提现。
-    .binding-alert-btn
-        a(href='javascript:void(0)').ok-btn 确定绑卡
-        a(href='javascript:void(0)').no-btn 取消绑卡
     script.
         require(['/static/js/add_card.js?v=1223333'])

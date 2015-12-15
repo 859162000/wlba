@@ -31,7 +31,7 @@ block main
           tr
             th 提现至银行卡
             td.goBindingBtn
-                p
+                p.noCard(style='display:none')
                     label 您尚未绑卡，无法提现。请
                     a(href='/accounts/bankcard/') 绑定银行卡
                 p.bindingCard

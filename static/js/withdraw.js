@@ -413,10 +413,10 @@
     /*获取绑卡状态 */
     return $.ajax({
       url: "/api/pay/the_one_card/",
-      type: "POST",
+      type: "GET",
       data: {}
-    }).fail(function(xhr) {
-      return console.log(xhr);
+    }).fail(function() {
+      return $('.noCard').show();
     }).success(xhr)(function() {
       return console.log(xhr);
     });
