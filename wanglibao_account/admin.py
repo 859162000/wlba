@@ -25,6 +25,8 @@ from .tasks import xunleivip_callback
 from decimal import Decimal
 from django.conf import settings
 from wanglibao_account.models import UserSource
+from wanglibao.settings import ENV, ENV_PRODUCTION
+from .backends import get_verify_result
 
 
 class ProfileInline(admin.StackedInline):
@@ -130,13 +132,13 @@ User.__unicode__ = user_unicode
 
 class IdVerificationAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ('id', 'name', 'id_number', 'is_valid', 'created_at')
+    list_display = ('id', 'name', 'id_number', 'is_valid', 'description', 'created_at',)
     search_fields = ('name', 'id_number')
     list_filter = ('is_valid', )
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.has_perm('wanglibao_account.view_idverification'):
-            return ( 'name', 'id_number', 'is_valid', 'created_at')
+            return ('name', 'id_number', 'is_valid', 'created_at',)
         return ()
 
     def has_delete_permission(self, request, obj=None):
@@ -144,6 +146,22 @@ class IdVerificationAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
+
+    def save_model(self, request, obj, form, change):
+        if obj.update_verify is True:
+            form.update_verify = False
+            obj.update_verify = False
+
+            # 只有生产环境可以实现更新操作
+            if ENV == ENV_PRODUCTION:
+                verify_result, _id_photo, message = get_verify_result(obj.id_number, obj.name)
+                obj.description = message
+                if verify_result:
+                    obj.is_valid = True
+                    if _id_photo:
+                        obj.id_photo.save('%s.jpg' % obj.id_number, _id_photo, save=True)
+
+        obj.save()
 
 
 class VerifyCounterAdmin(admin.ModelAdmin):
