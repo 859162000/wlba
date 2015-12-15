@@ -148,7 +148,7 @@
                 window.location.href = "/"
             }
             else if ($(this).hasClass('receiveg')) {
-                window.location.href = "/pay/banks_for_register/"
+                window.location.href = "/pay/banks/"
             } else if ($(this).hasClass('receiveh')) {
                 window.location.href = "/p2p/list/"
             } else {
