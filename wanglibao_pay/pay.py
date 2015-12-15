@@ -238,10 +238,14 @@ class PayOrder(object):
             self.add_card(pay_info.card_no, pay_info.bank, pay_info.user, pay_info.channel)
 
         try:
-            CoopRegister(request).process_for_recharge(request.user, order_id)
-            tools.deposit_ok(request.user.id, amount, pay_info.device, order_id)
+
+            user = request.user if request.user else pay_info.user
+            CoopRegister(request).process_for_recharge(user, order_id)
+            # tools.deposit_ok(request.user.id, amount, pay_info.device, order_id)
+            tools.deposit_ok.apply_async(kwargs={"user_id": user.id, "amount": amount,
+                                            "device": pay_info.device, "order_id": order_id})
         except:
-            logger.exception('recharge_call_back faile for ' + str(request.user) + str(order_id))
+            logger.exception('recharge_call_back faile for ' + str(user) + str(order_id))
 
         logger.critical("orderId:%s success" % order_id)
         rs = {"ret_code": 0, "message": "success", "amount": amount, "margin": margin_record.margin_current,
@@ -443,7 +447,7 @@ class YeeProxyPay(object):
 
     def proxy_pay_callback(self, pay_message, request):
         """
-
+        第三方和前段回调都会使用这个接口
         :type pay_message: PayMessage
         :return:
         """
