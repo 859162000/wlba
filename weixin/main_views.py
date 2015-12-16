@@ -83,9 +83,9 @@ class WXLoginAPI(APIView):
 class WXRegister(TemplateView):
     template_name = 'weixin_regist_new.jade'
 
-    def get_context_data(self, **kwargs):
-        token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
-        token_session = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+    def get_context_data(self, request, **kwargs):
+        token = request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+        token_session = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
         if token:
             token = token
         elif token_session:
@@ -97,9 +97,9 @@ class WXRegister(TemplateView):
             channel = get_channel_record(token)
         else:
             channel = None
-        phone = self.request.GET.get('phone', 0)
-        next = self.request.GET.get('next', '')
-        openid = self.request.GET.get('openid', '')
+        phone = request.GET.get('phone', 0)
+        next = request.GET.get('next', '')
+        openid = request.GET.get('openid', '')
         return {
             'token': token,
             'channel': channel,
