@@ -35,7 +35,7 @@
   font-size: $font-s
 
 .account-home-panel--title-bar__product
-  border-bottom: 1px solid $color-text-d5
+  //border-bottom: 1px solid $color-text-d5
   padding-top: 20px
   padding-bottom: 5px
   font-size: $font-m
@@ -61,7 +61,28 @@
     font-size: 18px
   .account-home-panel--title-bar__product
     margin-bottom: 20px
+.new-account-user
+  font-size: 12px
+  color: #999999
+  float: right
+  margin-top: -3px
 
+
+.new-account-span
+  position: absolute
+  font-size: 22px
+  color: #333333
+  display: inline-block
+  min-width: 150px
+  b
+    color: #333333
+    font-size: 36px
+  em
+    font-size: 13px
+    color: #999999
+    position: absolute
+    top: 44px
+    left: 5px
 
 .account-home-panel--action-bar
   @extend .row
@@ -69,14 +90,39 @@
   padding-top: 10px
   padding-bottom: 10px
 
+.new-account-bar
+  padding-top: 38px
+  width: 200px
+  position: relative
+  left: -61px
+  padding-bottom: 34px
+  margin-top: -17px
+  a
+    width: 80px
+    height: 36px
+    background: #F0F0F0
+    border-radius: 4px
+    font-size: 14px
+    padding: 0
+    line-height: 36px
+    color: #666666
+    border: 1px solid #C8C8C8
+    &:hover
+      background: #E4371F
+      color: #fff
+      border: 1px solid #E4371F
+
+
 .total-asset-money-card
   float: left
   width: 140px
   padding: 10px
+  background: #F5F5F5
+  margin-right: 10px
 
 .sign-money-card
   float: left
-  width: 30px
+  //width: 30px
   line-height: 70px
   font-size: $font-xl
   text-align: center
@@ -117,10 +163,13 @@
 .account-home-panel
   margin-top: 15px
 
+
 .title-bar--tabs
   display: inline-block
   list-style: none
   line-height: 28px
+
+
 
 .title-bar--tab
   display: inline-block
@@ -144,6 +193,13 @@
   .title-bar--tab--anchor
     +link-colors($color-text-d3)
 
+.new-bar-tab
+  width: 140px
+  height: 42px
+  line-height: 42px
+  font-size: 18px
+  background: #f0f0f0
+
 
 .p2p-asset--detail-container
   float: left
@@ -164,7 +220,7 @@
 .verified
   color: $color-sea-green
 #name-hight
-  font-size: 14px
+  font-size: 12px
   color: #0B83F9
   text-decoration: underline
 

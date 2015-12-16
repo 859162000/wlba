@@ -1,0 +1,142 @@
+.clear {
+  clear: both; }
+
+.banner {
+  width: 100%;
+  height: 1041px;
+  background: url("/static/imgs/pc_activity/recharge_8000/banner.jpg") no-repeat center center;
+  display: block;
+  position: relative; }
+  .banner span {
+    width: 100%;
+    position: absolute;
+    height: 28px;
+    line-height: 28px;
+    color: #fff;
+    font-size: 18px;
+    left: 0;
+    bottom: 54px;
+    text-align: center; }
+
+.body_main {
+  width: 1100px;
+  margin: 0 auto; }
+  .body_main .top_title {
+    width: 100%;
+    text-align: center;
+    font-size: 14px;
+    color: #ebc92c;
+    padding-bottom: 28px;
+    height: 54px;
+    line-height: 26px; }
+  .body_main .big_title {
+    width: 100%;
+    text-align: center;
+    font-size: 30px;
+    color: #1bfdea;
+    height: 48px;
+    line-height: 48px; }
+  .body_main .act_text {
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+    color: #ebc92c;
+    height: 74px;
+    padding-bottom: 36px;
+    line-height: 38px; }
+  .body_main .red_wrap {
+    width: 100%;
+    height: 210px;
+    padding-bottom: 46px; }
+    .body_main .red_wrap .red_box {
+      float: left;
+      width: 337px;
+      padding: 49px 26px 0 123px;
+      height: 164px;
+      background: url("/static/imgs/pc_activity/recharge_8000/red.png") no-repeat;
+      display: block;
+      text-align: center; }
+      .body_main .red_wrap .red_box dt {
+        font-size: 44px;
+        color: #fff;
+        height: 50px;
+        line-height: 50px; }
+        .body_main .red_wrap .red_box dt span {
+          color: #fff003;
+          font-size: 31px;
+          line-height: 50px; }
+      .body_main .red_wrap .red_box dd {
+        font-size: 12px;
+        color: #fff;
+        height: 22px;
+        line-height: 22px; }
+    .body_main .red_wrap .first {
+      margin-right: 44px; }
+    .body_main .red_wrap .last {
+      float: right; }
+  .body_main .button {
+    width: 260px;
+    height: 64px;
+    display: block;
+    margin: 0 auto;
+    color: #fff;
+    font-size: 18px;
+    text-align: center;
+    background: url("/static/imgs/pc_activity/recharge_8000/button.png") no-repeat;
+    line-height: 64px; }
+  .body_main .button:hover {
+    opacity: 0.9; }
+  .body_main .button_text {
+    width: 100%;
+    text-align: center;
+    font-size: 16px;
+    color: #fff;
+    height: 52px;
+    padding: 12px 0;
+    line-height: 26px; }
+  .body_main dl.rule {
+    padding-bottom: 56px;
+    width: 100%;
+    color: #ccc; }
+    .body_main dl.rule dt {
+      width: 100%;
+      font-size: 24px;
+      font-weight: bold;
+      height: 62px;
+      line-height: 62px; }
+    .body_main dl.rule dd {
+      width: 100%;
+      font-size: 16px;
+      height: 24px;
+      line-height: 24px; }
+
+.code_wrap {
+  width: 100%;
+  height: 247px;
+  background: #333; }
+  .code_wrap .code_main {
+    width: 1100px;
+    margin: 0 auto;
+    height: 247px;
+    display: block;
+    background: url("/static/imgs/pc_activity/recharge_8000/code_bg.jpg") no-repeat; }
+  .code_wrap .code {
+    width: 152px;
+    height: 188px;
+    display: block;
+    float: right;
+    margin-right: 10px;
+    padding-top: 36px; }
+  .code_wrap .text {
+    width: 100%;
+    height: 38px;
+    clear: both; }
+    .code_wrap .text span {
+      float: right;
+      color: #fff;
+      width: 172px;
+      text-align: center;
+      font-size: 14px;
+      line-height: 38px; }
+
+/*# sourceMappingURL=recharge_8000.css.map */
