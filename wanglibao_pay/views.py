@@ -11,6 +11,7 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from django.forms import model_to_dict
 from django.http import HttpResponse, HttpResponseRedirect
+from django.http.response import HttpResponseBadRequest
 from django.template.loader import get_template
 from django.core.urlresolvers import reverse
 from django.utils import timezone
@@ -36,6 +37,7 @@ from wanglibao_p2p.models import P2PRecord
 import decimal
 from wanglibao_pay.pay import YeeProxyPay, PayOrder, YeeProxyPayCallbackMessage
 from wanglibao_pay.serializers import CardSerializer
+from wanglibao_pay.third_pay import TheOneCard
 from wanglibao_pay.util import get_client_ip, fmt_two_amount
 from wanglibao_pay import util
 from wanglibao_profile.backends import require_trade_pwd
@@ -1164,3 +1166,26 @@ class YeeShortPayCallbackView(APIView):
         request.GET = request.DATA
         result = third_pay.yee_callback(request)
         return Response(result)
+
+class UnbindCardTemplateView(TemplateView):
+    """
+    同卡进出，提供给客服的解绑页面
+    """
+    template_name = ''
+
+    def get_context_data(self, **kwargs):
+        phone = self.request.GET.get('phone')
+        if not phone:
+            return HttpResponseBadRequest('<h1>错误的电话号码</h1>')
+
+        #解绑
+        profile = WanglibaoUserProfile.objects.get(phone=phone)
+        if self.request.GET.get('unbind'):
+            TheOneCard(profile.user).unbind()
+
+        #返回用户名，电话，身份证，卡号，有图像返回图像
+        return {'name': profile.name, 'phone': profile.phone, 'social_id': ''}
+
+
+
+

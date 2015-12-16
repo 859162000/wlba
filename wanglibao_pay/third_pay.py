@@ -563,8 +563,7 @@ def bind_pay_dynnum(request):
 
     if res.get('ret_code') == 0:
         if set_the_one_card:
-            card.is_the_one_card = True
-            card.save()
+            TheOneCard(request.user).set(card.id)
         try:
             CoopRegister(request).process_for_binding_card(user)
         except:
@@ -579,25 +578,66 @@ def yee_callback(request):
 
 
 #######################################同卡进出 start###############################
+class ParaException(APIException):
+    status_code = 401
+    default_detail = '参数错误'
+
 class CardNotFoundException(APIException):
-    status_code = 404
+    status_code = 403
     default_detail = '未发现唯一绑定卡片'
 
 class CardExistException(APIException):
     status_code = 405
     default_detail = '不能重复绑卡'
 
-class TheOneCardAPIView(APIView):
-    permission_classes = (IsAuthenticated, )
 
-    def get_the_one_card(self, user):
+class TheOneCard(object):
+    def __init__(self, user):
+        self.user = user
+
+    def get(self):
+        """
+        获取用户绑定的唯一进出卡
+        :return:
+        """
         try:
-            return Card.objects.get(user=user, is_the_one_card=True)
+            return Card.objects.get(user=self.user, is_the_one_card=True)
         except:
             raise CardNotFoundException
 
+    def set(self, card_id):
+        """
+        将一张已经绑定的卡设置为唯一进出卡
+        :param card_id: 卡在数据库中的ID，不是卡号
+        :return:
+        """
+        if Card.objects.filter(user=self.user, is_the_one_card=True).count() > 0:
+            raise CardExistException
+
+        try:
+            card = Card.objects.filter(Q(is_bind_kuai=True)|Q(is_bind_yee=True)).get(user=self.user, pk=card_id)
+        except:
+            raise CardNotFoundException
+
+        card.is_the_one_card = True
+        card.save()
+
+    def unbind(self):
+        """
+        这个接口提供给客服，用户通过客服解除绑定的唯一进出卡
+        :return:
+        """
+        card = self.get()
+        card.is_the_one_card = False
+        card.save()
+
+
+
+class TheOneCardAPIView(APIView):
+    permission_classes = (IsAuthenticated, )
+
     def get(self, request):
-        card = self.get_the_one_card(request.user)
+        card = TheOneCard(request.user).get()
         serializer = CardSerializer(card)
         return Response(serializer.data)
 
@@ -610,15 +650,10 @@ class TheOneCardAPIView(APIView):
         """
         try:
             card_id = int(request.DATA.get('card_id'))
-            card = Card.objects.get(pk=card_id, user=request.user)
         except:
-            raise CardNotFoundException
-        if card.is_the_one_card:
-            raise CardExistException
+            raise ParaException('卡号错误')
 
-
-        card.is_the_one_card = True
-        card.save()
+        TheOneCard(request.user).set(card_id)
         return Response({'status_code': 0})
 
     def delete(self, request):
@@ -628,9 +663,7 @@ class TheOneCardAPIView(APIView):
         :param card_id:
         :return:
         """
-        card = self.get_the_one_card(request.user)
-        card.is_the_one_card = False
-        card.save()
+        TheOneCard(request.user).unbind()
         return Response({'status_code': 0})
 
 #######################################同卡进出 end###############################
