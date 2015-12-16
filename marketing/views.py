@@ -2642,10 +2642,12 @@ class RockFinanceQRCodeView(TemplateView):
 
         logger.debug("rock finance qrcode view，开始准备渲染数据")
         if not self.request.user.is_authenticated():
-            logger.debug(u"请您先登录")
-            return {"code": 1002, "message": u"请您先登录"}
-
-        reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='rock_finance').first()
+            pass
+            #logger.debug(u"请您先登录")
+            #return {"code": 1002, "message": u"请您先登录"}
+        user_id = self.request.GET.get('owner_id', -1)
+        logger.debug("领奖用户user_id:%s" % user_id)
+        reward = WanglibaoActivityReward.objects.filter(user_id=user_id, activity='rock_finance').first()
         if not reward:
             logger.debug(u"您没有领取到对应的入场二维码, user:%s" % self.request.user)
             return {"code": 1003, "message": u"您没有领到对应的入场二维码"}
