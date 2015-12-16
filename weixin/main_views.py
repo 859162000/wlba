@@ -47,10 +47,10 @@ class WXLogin(TemplateView):
             oauth = WeChatOAuth(account.app_id, account.app_secret, )
             res = oauth.fetch_access_token(code)
             self.openid = res.get('openid')
-            form = OpenidAuthenticationForm(request)
+            form = OpenidAuthenticationForm(self.openid, data=request.GET)
             if form.is_valid():
                 auth_login(request, form.get_user())
-                return Response({'message':"login ok"})
+                return redirectToJumpPage("自动登录成功")
             else:
                 return super(WXLogin, self).dispatch(request, *args, **kwargs)
         else:

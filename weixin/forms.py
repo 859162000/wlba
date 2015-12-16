@@ -16,6 +16,7 @@ class OpenidAuthenticationForm(forms.Form):
         The 'request' parameter is set for custom auth use by subclasses.
         The form data comes in via the standard 'data' kwarg.
         """
+
         self.openid = openid
         self.user_cache = None
         super(OpenidAuthenticationForm, self).__init__(*args, **kwargs)
