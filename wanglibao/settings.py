@@ -885,7 +885,7 @@ YTX_BACK_RETURN_URL = CALLBACK_HOST + "/api/ytx/voice_back/"
 #ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
 ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
 if ENV == ENV_DEV:
-    ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
+    ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
     # Modify by hb on 2015-12-02
     #STATIC_FILE_HOST = 'http://localhost:8000'
     STATIC_FILE_HOST = ''
@@ -1213,3 +1213,5 @@ APP_DECRYPT_KEY = "31D21828CC9DA7CE527F08481E361A7E"
 
 # 数据魔方接口
 DATACUBE_URL = 'http://stat.wanglibao.com:10000/datacube/index'
+if ENV == ENV_PRODUCTION:
+    DATACUBE_URL = 'http://10.171.37.235:10000/datacube/index'

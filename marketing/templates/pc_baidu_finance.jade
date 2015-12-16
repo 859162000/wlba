@@ -6,7 +6,7 @@ html
     - with '网利宝' as title
     include include/pc_screen
     - endwith
-    link(rel="stylesheet", href="/static/styles/pc_activity/pc_Newgive.css?v=20151104")
+    link(rel="stylesheet", href="/static/styles/pc_activity/pc_Newgive.css?v=20151215")
   body(style="background:#fff")
     include global/g_nav
 
@@ -22,8 +22,8 @@ html
       .g-banner-slide-baidu
         .g-slide
           if token == 'google1'
-            .slide-banner(style="display:block; background-image:url('/static/imgs/pc_activity/newgive/banner1_sign.jpg')")
-            .slide-banner(style="display:none; background-image:url('/static/imgs/pc_activity/newgive/banner2_sign.jpg')")
+            .slide-banner(style="display:block; background-image:url('/static/imgs/pc_activity/newgive/banner1_signnew.jpg')")
+            .slide-banner(style="display:none; background-image:url('/static/imgs/pc_activity/newgive/banner2_signnew.jpg')")
           else
             .slide-banner(style="display:block; background-image:url('/static/imgs/pc_activity/newgive/banner1_unsign.jpg')")
             .slide-banner(style="display:none; background-image:url('/static/imgs/pc_activity/newgive/banner2_unsign.jpg')")
@@ -195,7 +195,9 @@ html
               img(src="/static/imgs/pc_activity/newgive/list4.png")
             dd
               span 新手投资理财最高送<b>180</b>元红包
-        a.gv_touzbtn.clear(href="javascript:void(0);", style="color:white") 立即投资
+        .gv_touzbtn-warp(style='text-align:center;margin:40px 0')
+          a.gv_touzbtn.clear(href="javascript:void(0);", style="color:white;display:inline-block;margin: 0;") 立即投资
+          div(style='font-size:20px;display:block;') 投资有风险，理财需谨慎
 
     .bd-finance-bodyimg
       img(src='/static/imgs/pc_activity/newgive/about.jpg')
@@ -225,3 +227,4 @@ html
     include global/g_footer
   script.
     require(["/static/js/newgive.js?v=20151020"])
+  include include/tracking
