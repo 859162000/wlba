@@ -155,7 +155,8 @@ class WeixinJoinView(View):
                 if w_user.subscribe != 0:
                     w_user.subscribe = 0
                 w_user.unsubscribe_time = int(time.time())
-                unbindUser(w_user, user)
+                if user:
+                    unbindUser(w_user, user)
                 reply = create_reply(u'欢迎下次关注我们！', msg)
             elif isinstance(msg, SubscribeScanEvent):
                 reply = self.process_subscribe(old_subscribe, w_user=w_user, user=user)
