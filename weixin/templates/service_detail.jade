@@ -1,0 +1,60 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    title 投资
+    include include/service_head.jade
+  body
+    .service-detail-part1
+      .service-detail-tit 车辆抵押贷款［卡雷拉 保时捷911］
+      .service-detail-info
+        .service-detail-lft
+          .gery 年化收益
+          .num
+            span.big 10.5
+            | %
+        .service-detail-rht
+          .gery 还款期限
+          .num
+            span.big 3
+            | 个月
+      .service-detail-line
+        .line-grey
+        .line-red(style="width:10%")
+      .service-detail-info
+        .service-detail-lft 已售61%
+        .service-detail-rht 剩余金额34000元
+      .service-detail-type
+        .type-item
+          span.grey 还款方式:
+          | 一次性还本付息
+        .type-item
+          span.grey 合作机构:
+          | 联信公司
+      .detail-price-box
+        .detail-recharge
+          .recharge-lft
+            span.recharge-tit 账户余额（元）
+            span.recharge-inp.grey 0.00
+          .recharge-rht
+            a(href="/weixin/sub_recharge/").red-btn 充值
+        .detail-item
+          span.recharge-tit 投资金额（元）
+          input(type="tel",value="",placeholder="输入100的整数倍金额",p2p-type="普通", activity-jiaxi='0', data-max="9168600",data-role="p2p-calculator",fee-target="",data-target="#expected_income", data-existing="0", data-rate="9.0", data-period="3", data-paymethod="按月付息", activity-rate="", maxlength="8").amount.balance-middle.recharge-inp
+    .service-detail-part2
+      .detail-item
+        .recharge-tit 理财券
+        select.detail-select
+          option 不使用理财券
+      .detail-item
+        .recharge-tit 预期收益（元）
+        .detail-item-num.grey
+          | 0.00+
+          span.blue 0.00
+      .detail-item
+        .recharge-tit 实际支付（元）
+        .detail-item-num.blue 0.00
+    .buy-snap-up
+      a(href="javascript:;").snap-up 立即投资
+    script(data-init='buy', src="/static/scripts/subMobile/mobile.js?201511065")

@@ -260,8 +260,8 @@ org.ui = (function(){
                             { target: $self.attr('data-target2'), addName : ($self.attr('data-icon')+"-active"), reMove : $self.attr('data-icon')}
                         ],$self);
                     }
-                    //canSubmit() ? $submit.css('background','rgba(219,73,63,1)').removeAttr('disabled') : $submit.css('background','rgba(219,73,63,.5)').attr('disabled')
-                    canSubmit() ? $submit.css('background','#50b143').removeAttr('disabled') : $submit.css('background','rgba(219,73,63,.5)').attr('disabled');
+                    canSubmit() ? $submit.css('background','rgba(219,73,63,1)').removeAttr('disabled') : $submit.css('background','rgba(219,73,63,.5)').attr('disabled')
+                    //canSubmit() ? $submit.css('background','#50b143').removeAttr('disabled') : $submit.css('background','rgba(219,73,63,.5)').attr('disabled');
                 })
             })
 
@@ -474,6 +474,7 @@ org.login = (function(org){
                         $submit.attr('disabled', true).text('登录中..');
                     },
                     success: function(res) {
+                        window.location.href = "/weixin/jump_page/?message=您已登录并绑定成功";
                         //org.ajax({
                         //   'type': 'post',
                         //    'url': '/weixin/api/bind/',
@@ -683,12 +684,13 @@ org.regist = (function(org){
                     },
                     success:function(data){
                         if(data.ret_code === 0){
-                            var next = org.getQueryStringByName('next') == '' ? '/weixin/sub_regist_first/?phone='+$identifier.val() : org.getQueryStringByName('next');
-                            next = org.getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ org.getQueryStringByName('mobile');
-                            next = org.getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ org.getQueryStringByName('serverId');
-                            //var next = '/weixin/sub_code/?phone='+$identifier.val();
-                            console.log(next);
-                            window.location.href = next;
+                            closePage();
+                            //var next = org.getQueryStringByName('next') == '' ? '/weixin/sub_regist_first/?phone='+$identifier.val() : org.getQueryStringByName('next');
+                            //next = org.getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ org.getQueryStringByName('mobile');
+                            //next = org.getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ org.getQueryStringByName('serverId');
+                            ////var next = '/weixin/sub_code/?phone='+$identifier.val();
+                            //console.log(next);
+                            //window.location.href = next;
                         }else if(data.ret_code > 0){
                             org.ui.showSign(data.message);
                             $submit.text('立即注册 ｜ 领取奖励');
@@ -1795,6 +1797,15 @@ org.processSecond = (function(org){
     }
 })(org);
 
+//关闭页面，返回微信
+function closePage(){
+    if(typeof (WeixinJSBridge) != 'undefined'){
+        WeixinJSBridge.call('closeWindow');
+    }else{
+        window.close();
+    }
+}
+
 ;(function(org){
     $.each($('script'), function(){//登录、注册
         var src = $(this).attr('src');
@@ -1805,15 +1816,6 @@ org.processSecond = (function(org){
         }
     });
     org.detail.init();//下载、微信分享
-
-    //关闭页面，返回微信
-    function closePage(){
-        if(typeof (WeixinJSBridge) != 'undefined'){
-            WeixinJSBridge.call('closeWindow');
-        }else{
-            window.close();
-        }
-    }
 
     $("#no-unbind,.back-weixin").addClass("clickOk").click(function(){
         closePage();
