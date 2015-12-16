@@ -70,8 +70,12 @@ class FuelCardBugRecordView(TemplateView):
             return HttpResponseForbidden(u'status参数不存在')
 
         if status == 'auditing':
-            UserAmortization.objects.filter(user=self.request.user, settled=False
-                                            ).select_related(depth=2).order_by('-term')
+            user_amotization = UserAmortization.objects.filter(user=self.request.user, settled=False
+                                                               ).select_related(depth=2)
+            user_amotization = user_amotization.order_by('product_amortization__product')
+            
+            user_amotization = user_amotization.order_by('cre',
+                                                         '-term')
         elif status == 'tack_effect':
             pass
         elif status == 'done':
