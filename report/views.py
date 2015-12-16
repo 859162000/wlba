@@ -9,13 +9,14 @@ from django.db.models import Sum
 from report.reports import DepositReportGenerator, WithDrawReportGenerator, ProductionRecordReportGenerator, \
     PaybackReportGenerator, ProductionAmortizationsReportGenerator, P2PAuditReportGenerator, \
     EearningReportGenerator, P2PstatusReportGenerator, ClientInfoGenerator, \
-    RedpackReportGenerator, ProductionAmortizationsReportAllGenerator
+    RedpackReportGenerator, ProductionAmortizationsReportAllGenerator, WithDrawReportGeneratorAbnormal
 from wanglibao_margin.models import Margin
 import wanglibao.settings as settings
 
 type = (
     (u'充值', 0),
     (u'提现', 1),
+    (u'提现(卡被删/多张卡)', 13),
     (u'产品流水', 2),
     (u'产品还款', 3),
     (u'用户还款', 4),
@@ -59,6 +60,8 @@ class AdminReportExport(TemplateView):
             self._generate_desposite(request, start_time, end_time)
         if type == '1':
             self._generate_withdraw(request, start_time, end_time)
+        if type == '13':
+            self._generate_withdraw_abnormal(request, start_time, end_time)
         if type == '2':
             self._generate_production_record(request, start_time, end_time)
         if type == '3':
@@ -89,6 +92,9 @@ class AdminReportExport(TemplateView):
 
     def _generate_withdraw(self, request, start_time, end_time):
         self._apply_generate(request, start_time, end_time, WithDrawReportGenerator, u'提现表格')
+
+    def _generate_withdraw_abnormal(self, request, start_time, end_time):
+        self._apply_generate(request, start_time, end_time, WithDrawReportGeneratorAbnormal, u'提现表格(卡被删/多张卡)')
 
     def _generate_production_record(self, request, start_time, end_time):
         self._apply_generate(request, start_time, end_time, ProductionRecordReportGenerator, u'产品流水')
