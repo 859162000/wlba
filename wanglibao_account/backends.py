@@ -305,8 +305,8 @@ def check_area_for_id(area_code):
 def check_id_card(id_number):
     """身份证合法性校验"""
 
-    Errors = [u'验证通过!', u'身份证号码位数不对!', u'身份证号码出生日期超出范围或含有非法字符!',
-              u'身份证号码校验错误!', u'身份证地区非法!']
+    Errors = [u'验证通过!', u'身份证号码位数不对!', u'身份证号码出生日期不合法!',
+              u'身份证号码校验错误!', u'身份证地区非法!', u'用户未满18周岁']
 
     _Wi = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2]
 
@@ -348,17 +348,21 @@ def check_id_card(id_number):
                               '(04|06|09|11)(0[1-9]|[1-2][0-9]|30)|02(0[1-9]|1[0-9]|2[0-8]))[0-9]{3}[0-9Xx]$')
 
         # 测试出生日期的合法性
-        if re.match(ereg, id_number) and check_age_for_id(id_number):
-            # 计算校验位
-            _sum = sum([int(id_number[i]) * _Wi[i] for i in range(17)])
-            Y = _sum % 11
-            JYM = "10X98765432"
-            M = JYM[Y]
-            # 检测ID的校验位
-            if M == id_number[17]:
-                return True, Errors[0]
+        if re.match(ereg, id_number):
+            # 测试用户是否大于或等于18周岁
+            if check_age_for_id(id_number):
+                # 计算校验位
+                _sum = sum([int(id_number[i]) * _Wi[i] for i in range(17)])
+                Y = _sum % 11
+                JYM = "10X98765432"
+                M = JYM[Y]
+                # 检测ID的校验位
+                if M == id_number[17]:
+                    return True, Errors[0]
+                else:
+                    return False, Errors[3]
             else:
-                return False, Errors[3]
+                return False, Errors[5]
         else:
             return False, Errors[2]
     else:
