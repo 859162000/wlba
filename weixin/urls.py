@@ -74,7 +74,6 @@ urlpatterns = patterns(
     url(r'^sub_account/$', TemplateView.as_view(template_name="service_account.jade")),
 
     url(r'^sub_recharge/$', TemplateView.as_view(template_name="service_recharge.jade")),
-    #url(r'^sub_list/$', TemplateView.as_view(template_name="service_list.jade")),
     url(r'^sub_list/$', TemplateView.as_view(template_name="service_list.jade")),
     url(r'^sub_detail/$', TemplateView.as_view(template_name="service_detail.jade")),
 
