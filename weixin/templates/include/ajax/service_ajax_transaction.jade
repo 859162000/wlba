@@ -1,0 +1,31 @@
+//-load formatters
+//-load mathfilters
+
+//length  = len(results)
+//if length > 0
+  //for record in results
+.transaction-list
+  .transaction-tit
+    .tit-name
+     .tit-name-div &nbsp&nbsp
+     | 企业资金周转
+    .tit-time 2015.09.12 15:09:00
+  .transaction-cont
+    .cont-money-left
+      p 100.00
+      p 投资金额（元）
+    .cont-money-center
+      p 0.0
+      p 已收金额（元）
+    .cont-money-right
+      p 0.75
+      p 待收金额（元）
+  //if record.has_link
+  .transaction-footer
+    a(href="") 合同
+//else
+  .none-data
+    img(src="/static/imgs/sub_weixin/transaction/{{status.english}}.png")
+    p hi,还没有{{status.chinese}}的项目，快去投资吧！
+
+

@@ -1,0 +1,37 @@
+//-load formatters
+//-load mathfilters
+
+.list-section
+  a(href="").section-head
+    //if product.category == '新手标'
+    //  span.head-prompt  新手福利
+    //else
+    //  if product.is_app_exclusive
+    span.head-prompt  APP专享
+    span.head-tit sdgsdfg
+  .section-body
+    a(href="").body-left
+      .body-Profit
+        span.profit-cont
+          .profit-math.profit-blue
+            span.profit-num 9
+            span.profit-sign %
+            //if product.activity
+            span.prpfit-add +
+            span.profit-addNum 2
+            span.profit-addNumsign %
+          .profit-tit 年化收益
+      .body-time
+        .time-num
+          em.section-hui 3
+          | 个月
+        .time-tit 投资期限
+      .body-time.body-price
+        .time-num
+          em.section-hui 300
+          | 万
+        .time-tit 融资金额
+    .body-line-box
+      .grey-line
+      .red-line(style="width:50%")
+
