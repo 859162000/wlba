@@ -12,7 +12,7 @@ from decimal import Decimal
 
 class Bank(models.Model):
     name = models.CharField(verbose_name=u'银行', max_length=32)
-    gate_id = models.CharField(max_length=8, verbose_name=u'gate id')
+    gate_id = models.CharField(max_length=8, unique=True, verbose_name=u'gate id')
     code = models.CharField(max_length=16, verbose_name=u'银行代码')
     limit = models.TextField(blank=True, verbose_name=u'汇付网银银行限额信息')
     logo = models.ImageField(upload_to='bank_logo', null=True, blank=True, help_text=u'银行图标')
