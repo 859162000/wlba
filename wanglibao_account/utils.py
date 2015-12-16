@@ -395,12 +395,16 @@ def get_client_ip(request):
 
 
 class FileObject(object):
+    """构造文件对象（file, size云存储所需）"""
+
     def __init__(self, content, size):
         self.file = content
         self.size = size
 
 
 def base64_to_image(base64_str):
+    """base64编码转图片流"""
+
     import base64
     import cStringIO
 

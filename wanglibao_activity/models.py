@@ -4,7 +4,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from wanglibao_redpack.models import RedPackEvent
-from ckeditor.fields import RichTextField
+from wanglibao_p2p.models import ProductType
 from datetime import timedelta
 
 PLATFORM = (
@@ -134,6 +134,14 @@ class ActivityRule(models.Model):
     rule_description = models.TextField(u'规则描述', null=True, blank=True)
     gift_type = models.CharField(u'赠送类型', max_length=20, choices=GIFT_TYPE)
     trigger_node = models.CharField(u'触发节点', max_length=20, choices=TRIGGER_NODE)
+    p2p_types = models.ForeignKey(ProductType, verbose_name=u"限定P2P分类", blank=True, null=True, on_delete=models.SET_NULL)
+    period = models.IntegerField(default=0, verbose_name=u'限定产品期限', blank=True, help_text=u"填写整数数字")
+    period_type = models.CharField(default='month', max_length=20, verbose_name=u'产品期限类型', choices=(
+        ('month', u'月'),
+        ('month_gte', u'月及以上'),
+        ('day', u'日'),
+        ('day_gte', u'日及以上'),
+    ), blank=True, help_text=u"产品限定只对[投资/首次投资]有效")
     is_in_date = models.BooleanField(u'判断首次充值（或首次投资）的时间是否在活动时间内', default=False,
                                      help_text=u'勾选此项，则会以活动的起止时间来判断首次投资或充值的动作，否则不做时间判断')
     is_introduced = models.BooleanField(u'邀请好友时才启用', default=False,

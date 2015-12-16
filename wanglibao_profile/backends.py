@@ -116,7 +116,7 @@ def trade_pwd_set(user_id,
         return {'ret_code':1, 'message': '旧交易密码错误，交易密码设置失败'}
     elif action_type == 3:
         is_card_right = Card.objects.filter(user__id=profile.user_id, no=card_id).exists()
-        is_id_right = (profile.id_number == citizen_id)
+        is_id_right = (profile.id_number.upper() == citizen_id.upper())
         if not (is_card_right and is_id_right):
             if only_requirement_check:
                 return {'ret_code':2, 'message': '银行卡或身份证信息有误'}

@@ -836,6 +836,7 @@ class AppCostView(TemplateView):
 
 
 class AppAreaView(TemplateView):
+    """ 最新活动 """
     template_name = 'client_area.jade'
 
     def get_context_data(self, **kwargs):
@@ -857,7 +858,6 @@ class AppAreaView(TemplateView):
             'all_page': all_page,
             'page': page
         }
-
 
 class AppAreaApiView(APIView):
     permission_classes = ()

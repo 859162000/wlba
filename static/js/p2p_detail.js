@@ -256,7 +256,7 @@
                   title: '温馨提示',
                   msg: result.message,
                   callback_ok: function() {
-                    return window.location.href = '/pay/banks_for_register/';
+                    return window.location.href = '/pay/banks/';
                   }
                 });
                 return;

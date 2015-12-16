@@ -67,6 +67,7 @@
                 } else {
                     inp.prop("checked", true);
                     self.attr('id', id);
+                    self.parents(".xuan-song1").siblings(".xuan-song1").find("label").removeAttr('id');
                 };
             };
 

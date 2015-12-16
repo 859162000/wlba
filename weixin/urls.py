@@ -2,7 +2,7 @@
 from django.conf.urls import patterns, url
 from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth.decorators import login_required
-import views, activity_views, manage_views, sub_views
+import views, activity_views, manage_views, sub_views, base, main_views
 
 
 urlpatterns = patterns(
@@ -54,20 +54,25 @@ urlpatterns = patterns(
     url(r'api/generate/qr_limit_scene_ticket/$', views.GenerateQRLimitSceneTicket.as_view(), name='generate_qr_limit_scene_ticket'),#生成永久二维码
     url(r'api/generate/qr_scene_ticket/$', views.GenerateQRSceneTicket.as_view(), name='generate_qr_scene_ticket'),#生成临时二维码
 
-    #test
+    #
     url(r'^jump_page/$', views.JumpPageTemplate.as_view(template_name="sub_times.jade"), name='jump_page'),
     url(r'^is_bind/$', TemplateView.as_view(template_name="sub_is_bind.jade")),
-    url(r'^award_index/$', activity_views.AwardIndexTemplate.as_view(template_name="sub_award.jade"), name='award_index'),
+    url(r'^award_index/$', login_required(activity_views.AwardIndexTemplate.as_view(template_name="sub_award.jade"),
+                                          login_url='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx18689c393281241e&redirect_uri=http://e717d495.ngrok.io/weixin/sub_login/&response_type=code&scope=snsapi_base&state=gh_3b82a2651647#wechat_redirect'
+                                          ),
+        name='award_index'),
     url(r'^award_rule/$', TemplateView.as_view(template_name="sub_award_rule.jade")),
-    url(r'^sub_code/$', activity_views.ChannelBaseTemplate.as_view(template_name="sub_code.jade", wx_classify='fwh', wx_code='test1')),#wx_classify='dyh' or 'fwh'
+    url(r'^sub_code/$', base.ChannelBaseTemplate.as_view(template_name="sub_code.jade", wx_classify='fwh', wx_code='test1')),#wx_classify='dyh' or 'fwh'
     url(r'^sub_invite/$', activity_views.InviteWeixinFriendTemplate.as_view(template_name="sub_invite_server.jade"), name='sub_invite'),
     #微站
-    url(r'^sub_login/$', TemplateView.as_view(template_name="service_login.jade")),
-    url(r'^sub_regist/$', TemplateView.as_view(template_name="service_regist.jade")),
+    url(r'^sub_login/$', main_views.WXLogin.as_view(template_name="service_login.jade")),
+    url(r'^sub_regist/$', main_views.WXRegister.as_view(template_name="service_regist.jade")),
+
     url(r'^sub_regist_first/$', TemplateView.as_view(template_name="service_registProcess_first.jade")),
     url(r'^sub_regist_second/$', TemplateView.as_view(template_name="service_registProcess_second.jade")),
     url(r'^sub_regist_three/$', TemplateView.as_view(template_name="service_registProcess_three.jade")),
     url(r'^sub_account/$', TemplateView.as_view(template_name="service_account.jade")),
+
     url(r'^sub_recharge/$', TemplateView.as_view(template_name="service_recharge.jade")),
     #url(r'^sub_list/$', TemplateView.as_view(template_name="service_list.jade")),
     url(r'^sub_list/$', TemplateView.as_view(template_name="service_list.jade")),
@@ -76,6 +81,9 @@ urlpatterns = patterns(
     url(r'^sub_transaction/repaying/$', TemplateView.as_view(template_name="service_transaction_repay.jade")),
     url(r'^sub_transaction/buying/$', TemplateView.as_view(template_name="service_transaction_buying.jade")),
     url(r'^sub_transaction/finished/$', TemplateView.as_view(template_name="service_transaction_finished.jade")),
+
+    #微站 api
+
 
 
 )
