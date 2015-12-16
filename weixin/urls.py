@@ -3,7 +3,7 @@ from django.conf.urls import patterns, url
 from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth.decorators import login_required
 import views, activity_views, manage_views, sub_views, base, main_views
-
+from .util import FWH_LOGIN_URL
 
 urlpatterns = patterns(
     '',
@@ -58,14 +58,14 @@ urlpatterns = patterns(
     url(r'^jump_page/$', views.JumpPageTemplate.as_view(template_name="sub_times.jade"), name='jump_page'),
     url(r'^is_bind/$', TemplateView.as_view(template_name="sub_is_bind.jade")),
     url(r'^award_index/$', login_required(activity_views.AwardIndexTemplate.as_view(template_name="sub_award.jade"),
-                                login_url='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx18689c393281241e&redirect_uri=http://e717d495.ngrok.io/weixin/sub_login/&response_type=code&scope=snsapi_base&state=gh_3b82a2651647#wechat_redirect'
+                                login_url=FWH_LOGIN_URL
                                           ),
         name='award_index'),
     url(r'^award_rule/$', TemplateView.as_view(template_name="sub_award_rule.jade")),
     url(r'^sub_code/$', base.ChannelBaseTemplate.as_view(template_name="sub_code.jade", wx_classify='fwh', wx_code='test1')),#wx_classify='dyh' or 'fwh'
     url(r'^sub_invite/$', activity_views.InviteWeixinFriendTemplate.as_view(template_name="sub_invite_server.jade"), name='sub_invite'),
     #微站
-    url(r'^sub_login/$', main_views.WXLogin.as_view(template_name="service_login.jade")),
+    url(r'^sub_login/$', main_views.WXLogin.as_view(template_name="service_login.jade"), name="fwh_login"),
     url(r'^sub_regist/$', main_views.WXRegister.as_view(template_name="service_regist.jade")),
 
     url(r'^sub_regist_first/$', TemplateView.as_view(template_name="service_registProcess_first.jade")),

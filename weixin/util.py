@@ -6,14 +6,33 @@ from django.template.loader import get_template
 from .models import WeixinAccounts, WeixinUser, WeiXinUserActionRecord
 from wechatpy import WeChatClient
 from wechatpy.exceptions import WeChatException
+from misc.models import Misc
+from django.conf import settings
 
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 import logging
 import time
+import json
 
 
 logger = logging.getLogger("weixin")
+
+BASE_WEIXIN_URL = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_base&state={state}#wechat_redirect"
+FWH_LOGIN_URL = ""
+def config_url():
+    m = Misc.objects.filter(key='weixin_qrcode_info').first()
+    if m and m.value:
+        info = json.loads(m.value)
+        if isinstance(info, dict) and info.get("fwh"):
+            original_id = info.get("fwh")
+            account = WeixinAccounts.getByOriginalId(original_id)
+            fwh_login_url = settings.CALLBACK_HOST + "/weixin/sub_login/" + "?promo_token=fwh"
+            global FWH_LOGIN_URL
+            FWH_LOGIN_URL = BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=fwh_login_url, state=original_id)
+            print "********************************************************",FWH_LOGIN_URL
+
+config_url()
 
 def redirectToJumpPage(message):
     url = reverse('jump_page')+'?message=%s'% message

@@ -65,6 +65,8 @@ from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser,
 logger = logging.getLogger("weixin")
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
 
+from util import FWH_LOGIN_URL
+
 def stamp(dt):
     return long(time.mktime(dt.timetuple()))
 
@@ -355,7 +357,7 @@ class WeixinJoinView(View):
                 {'image':B_img_url, 'url':B_url, 'description':'B轮4000万美元融资', 'title':'B轮4000万美元融资'},]
 
     def getBindTxt(self, fromUserName):
-        bind_url = settings.CALLBACK_HOST + reverse('weixin_bind') + "?openid=%s&promo_token=fwh"%(fromUserName)
+        bind_url = FWH_LOGIN_URL
         txt = u"终于等到你，还好我没放弃。绑定网利宝帐号，轻松投资、随时随地查看收益！\n" \
               u"<a href='%s'>【立即绑定】</a>"%(bind_url)
         return txt

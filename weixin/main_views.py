@@ -6,6 +6,8 @@ from wechatpy.oauth import WeChatOAuth
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.http import HttpResponse
+import json
+from django.core.urlresolvers import reverse
 
 from weixin.common.decorators import weixin_api_error
 from weixin.models import WeixinAccounts, WeixinUser
@@ -15,8 +17,9 @@ from util import getOrCreateWeixinUser
 from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
 from wanglibao import settings
 from wanglibao_account.views import ajax_register
-
-
+from misc.models import Misc
+from .forms import OpenidAuthenticationForm
+from django.conf import settings
 
 class WXLogin(TemplateView):
     template_name = 'weixin_login_new.jade'
@@ -33,6 +36,8 @@ class WXLogin(TemplateView):
 
     @weixin_api_error
     def dispatch(self, request, *args, **kwargs):
+
+
         code = request.GET.get('code')
         state = request.GET.get('state')
         error_msg = ""
@@ -42,15 +47,16 @@ class WXLogin(TemplateView):
             oauth = WeChatOAuth(account.app_id, account.app_secret, )
             res = oauth.fetch_access_token(code)
             self.openid = res.get('openid')
-            w_user, old_subscribe = getOrCreateWeixinUser(self.openid, account)
-            user = w_user.user
-            if user:
-                auth_login(request, user)
+            form = OpenidAuthenticationForm(request)
+            if form.is_valid():
+                auth_login(request, form.get_user())
+                return Response({'message':"login ok"})
+            else:
+                return super(WXLogin, self).dispatch(request, *args, **kwargs)
         else:
             error_msg = u"code or state is None"
         if error_msg:
             return redirectToJumpPage(error_msg)
-        return super(WXLogin, self).dispatch(request, *args, **kwargs)
 
 class WXLoginAPI(APIView):
     permission_classes = ()
