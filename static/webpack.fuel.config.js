@@ -24,12 +24,12 @@ module.exports = {
         loaders: [
             { test: /\.js$/, exclude: /(node_modules)/, loader: 'babel', query: { presets: ['es2015'] }},
             { test: /zepto(\.min)?\.js$/, loader: "exports?Zepto; delete window.$; delete window.Zepto;" },
-        ],
+        ]
     },
     resolve: {
         modulesDirectories: ['./src/mobile_fuelcard'],
         alias: {
-            zepto: './lib/zepto.js'
+            zepto: 'lib/zepto.js'
         },
         extensions: ['', '.js']
     },
