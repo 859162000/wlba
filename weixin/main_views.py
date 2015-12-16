@@ -5,6 +5,7 @@ from django.contrib.auth import login as auth_login
 from wechatpy.oauth import WeChatOAuth
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.http import HttpResponse
 
 from weixin.common.decorators import weixin_api_error
 from weixin.models import WeixinAccounts, WeixinUser
@@ -13,6 +14,7 @@ from marketing.utils import get_channel_record
 from util import getOrCreateWeixinUser
 from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
 from wanglibao import settings
+from wanglibao_account.views import ajax_register
 
 
 
@@ -40,10 +42,10 @@ class WXLogin(TemplateView):
             oauth = WeChatOAuth(account.app_id, account.app_secret, )
             res = oauth.fetch_access_token(code)
             self.openid = res.get('openid')
-            w_user = getOrCreateWeixinUser(self.openid, account)
+            w_user, old_subscribe = getOrCreateWeixinUser(self.openid, account)
             user = w_user.user
             if user:
-                error_msg = u"你已经绑定了网利宝账户:%s，请先解绑" % user.wanglibaouserprofile.phone
+                auth_login(request, user)
         else:
             error_msg = u"code or state is None"
         if error_msg:
@@ -97,15 +99,27 @@ class WXRegister(TemplateView):
             channel = None
         phone = self.request.GET.get('phone', 0)
         next = self.request.GET.get('next', '')
+        openid = self.request.GET.get('openid', '')
         return {
             'token': token,
             'channel': channel,
             'phone': phone,
-            'next' : next
+            'openid':openid,
+            'next': next
         }
 
 class WXRegisterAPI(APIView):
+    permission_classes = ()
+    http_method_names = ['post']
 
-    pass
-
+    def post(self, request):
+        openid = request.DATA.get('openid')
+        if openid:
+            w_user = WeixinUser.objects.get(openid=openid)
+            response = ajax_register(request)
+            if response.status_code==200:
+                bindUser(w_user, request.user)
+            return response
+        else:
+            return HttpResponse({"error_code":-1, 'message':"openid is null"})
 
