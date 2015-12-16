@@ -1,0 +1,29 @@
+doctype html
+html
+  head
+    title 实名认证
+    include include/fuel_head.jade
+  body
+    .fuel-process-img.fuel-process-imgspace-first
+      img(src='/static/imgs/mobile_fuelcard/input_icon/first.png')
+
+    .fuel-authentication-warp
+
+      .fuel-input-public.fuel-input-space
+        .fuel-input-icon.regist-input-icon
+          .name
+        input(type='text', name='password', placeholder= '请设置密码').fuel-input-main
+        .fuel-operation-icon.fuel-clear-input
+
+      .fuel-input-public.fuel-input-space
+        .fuel-input-icon.regist-input-icon
+          .idcard
+        input(type='text', name='password', placeholder= '请设置密码').fuel-input-main
+        .fuel-operation-icon.fuel-clear-input
+
+
+      .fuel-safe-green.fuel-process-safespace-first
+        span 账户资金安全由平安银行承保
+
+      .fuel-authentication-regist-warp
+        button(type='submit').fuel-password-submit 实名认证
