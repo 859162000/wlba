@@ -3,11 +3,13 @@
 from django.utils import timezone
 from django.views.generic import TemplateView
 from django.shortcuts import render_to_response
+from django.http import HttpResponseForbidden
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from wanglibao_p2p.models import P2PProduct
+from wanglibao_account.cooperation import get_phone_for_coop
+from wanglibao_p2p.models import P2PProduct, UserAmortization
 from wanglibao.const import ErrorNumber
 from .forms import FuelCardBuyForm
 from .trade import P2PTrader
@@ -42,7 +44,7 @@ class FuelCardBuyApi(APIView):
                     trader = P2PTrader(product=p2p_product, user=request.user, request=request)
                     product_info, margin_info, equity_info = trader.purchase(total_amount)
 
-                    return render_to_response('fuel_buy.jade', {
+                    return render_to_response('', {
                         # FixMe
                     })
                 except Exception, e:
@@ -55,6 +57,37 @@ class FuelCardBuyApi(APIView):
                 "message": form.errors,
                 'error_number': ErrorNumber.form_error
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FuelCardBugRecordView(TemplateView):
+    """加油卡购买记录视图"""
+
+    template_name = 'fuel_records_audit.jade'
+
+    def get_context_data(self, **kwargs):
+        status = self.request.GET.get('status', '').strip()
+        if not status:
+            return HttpResponseForbidden(u'status参数不存在')
+
+        if status == 'auditing':
+            UserAmortization.objects.filter(user=self.request.user, settled=False
+                                            ).select_related(depth=2).order_by('-term')
+        elif status == 'tack_effect':
+            pass
+        elif status == 'done':
+            pass
+        else:
+            return HttpResponseForbidden(u'无效参数status')
+
+
+# class FuelCardBuyView(TemplateView):
+#     """加油卡购买页面视图"""
+#
+#     template_name = 'fuel_buy.jade'
+#
+#     def get_context_data(self, **kwargs):
+#         phone = get_phone_for_coop(self.request.user.id)
+#         fuel_card_amount = ''
 
 
 class FuelCardListViewForApp(TemplateView):
