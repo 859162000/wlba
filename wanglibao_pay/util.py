@@ -86,8 +86,8 @@ def handle_withdraw_limit(limitstr):
     obj = {}
     try:
         first, second = limitstr.split(",")
-        obj['bank_min_amount'] = first.split("=")[1]
-        obj['bank_max_amount'] = second.split("=")[1]
+        obj['bank_min_amount'] = int(first.split("=")[1])
+        obj['bank_max_amount'] = int(second.split("=")[1])
     except:
         pass
     return obj
