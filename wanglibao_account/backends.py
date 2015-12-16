@@ -274,10 +274,10 @@ def check_age_for_id(id_number):
     # 判断该身份证用户年龄是否大于或等于18岁
     current_date = datetime.datetime.now()
     birth_date = datetime.datetime.strptime(birth_date, '%Y%m%d')
-    birth_date.replace(year=current_date.year)
 
     if birth_date < current_date:
-        age = current_date.year - birth_date.year
+        age_days = (current_date - birth_date).days
+        age = age_days / 365
         if age > 18:
             return True
 
@@ -376,9 +376,13 @@ def get_verify_result(id_number, name):
     id_photo = None
 
     # 身份证合法性校验
-    check_result, _error = check_id_card(id_number)
-    if not check_result:
-        return verify_result, id_photo, _error
+    # check_result, _error = check_id_card(id_number)
+    # if not check_result:
+    #     return verify_result, id_photo, _error
+
+    # 根据身份证号出生日期判断用户是否大于或等于18岁
+    if not check_age_for_id(id_number):
+        return verify_result, id_photo, u'用户未满18周岁'
 
     in_conditions = u"""<?xml version="1.0" encoding="UTF-8" ?>
         <ROWS>
