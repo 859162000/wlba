@@ -17,7 +17,7 @@ class WangliTask(Task):
     def apply_async(self, args=None, kwargs=None, task_id=None, producer=None,
                     link=None, link_error=None, **options):
         try:
-            super(WangliTask, self).apply_async(args=args, kwargs=kwargs, connect_timeout=30, task_id=task_id,
+            return super(WangliTask, self).apply_async(args=args, kwargs=kwargs, connect_timeout=30, task_id=task_id,
                                                 producer=producer, link=link, link_error=link_error, **options)
         except:
             logger.exception('send_task_failed_with_para:' + str(args) + str(kwargs))
