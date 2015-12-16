@@ -11,7 +11,7 @@ html(style="background: #f5f5f5")
       .login-logo-icon
           img(src="/static/imgs/sub_weixin/t-logo.png", alt="")
     section.form-box
-      from(action="{% url 'weixin_login_api' %}")#login-form.login-farom
+      from(action="/weixin/api/fwh_login/")#login-form.login-farom
         - csrf_token
         input(name="openid", type="hidden", value="{{ context.openid }}")
         input(name="captcha_0", type="hidden", value="")

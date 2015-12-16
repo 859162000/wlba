@@ -67,10 +67,21 @@ urlpatterns = patterns(
     #微站
     url(r'^sub_login/$', main_views.WXLogin.as_view(template_name="service_login.jade")),
     url(r'^sub_regist/$', main_views.WXRegister.as_view(template_name="service_regist.jade")),
+
     url(r'^sub_regist_first/$', TemplateView.as_view(template_name="service_registProcess_first.jade")),
     url(r'^sub_regist_second/$', TemplateView.as_view(template_name="service_registProcess_second.jade")),
     url(r'^sub_regist_three/$', TemplateView.as_view(template_name="service_registProcess_three.jade")),
     url(r'^sub_account/$', TemplateView.as_view(template_name="service_account.jade")),
+
+    url(r'^sub_recharge/$', TemplateView.as_view(template_name="service_recharge.jade")),
+    #url(r'^sub_list/$', TemplateView.as_view(template_name="service_list.jade")),
+    url(r'^sub_list/$', TemplateView.as_view(template_name="service_list.jade")),
+    url(r'^sub_detail/$', TemplateView.as_view(template_name="service_detail.jade")),
+
+    url(r'^sub_transaction/repaying/$', TemplateView.as_view(template_name="service_transaction_repay.jade")),
+    url(r'^sub_transaction/buying/$', TemplateView.as_view(template_name="service_transaction_buying.jade")),
+    url(r'^sub_transaction/finished/$', TemplateView.as_view(template_name="service_transaction_finished.jade")),
+
     #微站 api
     url(r'api/fwh_login/$', main_views.WXLoginAPI.as_view(), name='weixin_fwh_login'),
     url(r'api/fwh_register/$', main_views.WXRegisterAPI.as_view(), name='weixin_fwh_register'),

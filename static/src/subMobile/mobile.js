@@ -162,7 +162,13 @@ var org = (function(){
 
 org.ui = (function(){
     var lib = {
-        _alert: function(txt, callback){
+        _alert: function(txt, callback, btn){
+            if(typeof callback !="function"){
+                btn = callback;
+            }
+            if(!btn){
+                btn = "确认";
+            }
             if(document.getElementById("alert-cont")){
                 document.getElementById("alertTxt").innerHTML = txt;
                 document.getElementById("popubMask").style.display = "block";
@@ -175,7 +181,7 @@ org.ui = (function(){
                 alertFram.id="alert-cont";
                 alertFram.style.cssText="position:absolute; top:35%;left:50%; width:14rem; margin:-2.75rem 0 0 -7rem; background:#fafafa; border-radius:.3rem;z-index:1000001;";
                 strHtml = "<div id='alertTxt' class='popub-txt' style='color:#333;font-size: .9rem!important;padding: 1.25rem .75rem;'>"+txt+"</div>";
-                strHtml += " <div class='popub-footer' style='width: 100%;padding: .5rem 0;font-size: .9rem;text-align: center;color: #4391da;border-top: 1px solid #d8d8d8;border-bottom-left-radius: .25rem;border-bottom-right-radius: .25rem;'>确认</div>";
+                strHtml += " <div class='popub-footer' style='width: 100%;padding: .5rem 0;font-size: .9rem;text-align: center;color: #4391da;border-top: 1px solid #d8d8d8;border-bottom-left-radius: .25rem;border-bottom-right-radius: .25rem;'>"+ btn +"</div>";
                 alertFram.innerHTML = strHtml;
                 document.body.appendChild(alertFram);
                 document.body.appendChild(shield);
@@ -183,7 +189,7 @@ org.ui = (function(){
                 $('.popub-footer').on('click',function(){
                     alertFram.style.display = "none";
                     shield.style.display = "none";
-                    callback && callback();
+                    (typeof callback == "function") && callback();
                 })
             }
             document.body.onselectstart = function(){return false;};
@@ -660,7 +666,7 @@ org.regist = (function(org){
                 var tid = org.getQueryStringByName('tid');
                 var token = $invitation.val() === '' ?  $('input[name=token]').val() : $invitation.val();
                 org.ajax({
-                    url: '/api/register/',
+                    url: '/weixin/api/fwh_register/',
                     type: 'POST',
                     data: {
                             'identifier':       $identifier.val(),
@@ -716,27 +722,27 @@ org.list = (function(org){
         pageSize: 10, //每次请求的个数
         page: 2, //从第二页开始
         init :function(){
-            lib._swiper();
+            //lib._swiper();
             lib._scrollListen();
         },
-        _swiper:function(){
-            var autoplay = 5000, //焦点图切换时间
-                loop = true,  //是否无缝滚动
-                $swiperSlide = $('.swiper-slide');
-
-            if($swiperSlide.length/2 < 1){
-                autoplay= 0;
-                loop = false;
-            }
-            var myswiper = new Swiper('.swiper-container', {
-                pagination: '.swiper-pagination',
-                loop: loop,
-                lazyLoading: true,
-                autoplay: autoplay,
-                autoplayDisableOnInteraction: true,
-
-            });
-        },
+        //_swiper:function(){
+        //    var autoplay = 5000, //焦点图切换时间
+        //        loop = true,  //是否无缝滚动
+        //        $swiperSlide = $('.swiper-slide');
+        //
+        //    if($swiperSlide.length/2 < 1){
+        //        autoplay= 0;
+        //        loop = false;
+        //    }
+        //    var myswiper = new Swiper('.swiper-container', {
+        //        pagination: '.swiper-pagination',
+        //        loop: loop,
+        //        lazyLoading: true,
+        //        autoplay: autoplay,
+        //        autoplayDisableOnInteraction: true,
+        //
+        //    });
+        //},
         _scrollListen:function(){
             $('.load-body').on('click', function(){
                 lib.canGetPage && lib._getNextPage();
@@ -998,6 +1004,7 @@ org.recharge=(function(org){
             lib._getBankCardList();
             lib._rechargeStepFirst();
             lib._initBankNav();
+            lib._inputPwd();
         },
         /*
         * 充值nav动画及事件触发
@@ -1020,10 +1027,10 @@ org.recharge=(function(org){
                                     $cardNone.css("opacity",1)
                                 },50)
                             },50)
-                        })
+                        });
                         break;
                     case 'bank-card':
-                        $('.recharge-select-bank').css('display','-webkit-box');
+
                         closeNav();
                         break;
                     case 'bank-cancel':
@@ -1064,10 +1071,11 @@ org.recharge=(function(org){
                         }
                     }
                 }
-            })
+            });
             $(".bank-txt-right").on('click',function(){
-                    $(".bank-list-nav").css("-webkit-transform","translate3d(0,0,0)");
-            })
+                 //$(".bank-list-nav").css("-webkit-transform","translate3d(0,0,0)");
+                $('.recharge-select-bank').css('display','-webkit-box');
+            });
         },
         /*
         *  初始化默认银行卡，没有默认银行卡，现在为第一个，回调函数为银行卡列表
@@ -1083,25 +1091,101 @@ org.recharge=(function(org){
         _cradStyle:function(cardList){
             var str = '';
             for(var card in cardList){
-                str += "<div class= 'select-bank-list' data-storable="+cardList[card].storable_no+">";
-                str += "<div class='bank-cont'>";
-                str += "<p class='bank-name-alert'>" + cardList[card].bank_name + "</p>";
-                str += "<p>尾号 " + cardList[card].storable_no.slice(-4) + "</p>";
-                str += "<p>限额 200000</p>";
-                str += "</div>";
-                str += "<div class='bank-type'>储蓄卡</div>";
+                str += "<div class= 'select-bank-list' data-storable="+cardList[card].storable_no+" data-bankName="+ cardList[card].bank_name +">";
+                str += cardList[card].bank_name + "(" + cardList[card].storable_no.slice(-4) + ")";
                 str += "</div>";
             }
-            $(".select-bank-body").append(str);
+            $(".select-bank-cont").append(str);
 
             $('.select-bank-list').on('click',function(event){
                 var that = this;
                 $("#card-val").val($(that).attr("data-storable").slice(0,6) + '********'+ $(that).attr("data-storable").slice(-4)).attr('data-storable', $(that).attr("data-storable"));
-                $(".bank-txt-name").text($(this).find(".bank-name-alert").text());
+                $(".bank-txt-name").text($(that).attr("data-bankName"));
             });
             $(".recharge-select-bank").on('click',function(){
                  return $(this).hide();
             })
+        },
+        /*
+        * 交易密码
+         */
+        _pageSet: function(page,tit,cont){//设置密码弹出层 文本设置
+            page.find(".pwd-tit").html(tit);
+            page.find(".pwd-promote").html(cont);
+            page.show();
+            page.find(".js-pwd-inps").trigger("click touchstart");
+        },
+        _pwdAnimate: function(inp){
+            var startVal = '';
+            inp.on("input",function(){
+                var self = $(this);
+                var val = self.val();
+                var page = inp.parents("#page-pwd");
+                var frist = $("#secondBtn").data("frist");
+                var amount  = $("input[name='amount']").val() * 1;
+                if(val.length >= 6) {
+                    if(frist){
+                        if (page.data("num") !== 1) {
+                            page.data("num", 1).hide();
+                            startVal = val;
+                            self.val("");
+                            lib._pageSet(page, "设置交易密码", "请再次确认交易密码");
+                        } else {
+                            page.data("num", 2).hide();
+                            self.val("");
+                            if(val !== startVal){
+                                $("#page-error").show();
+                            }else{
+                                $("#page-net").show();
+                            }
+                        }
+                    }else{
+                        lib._inpPwdHide(self);
+                        //org.ui.confirm("交易密码输入不正确，您还可以输入2次", "重新输入", lib._inpPwdShow,amount);//密码错误
+                        org.ui.alert("<p class='lock-pwd'>交易密码已被锁定，请3小时后再试<br />如想找回密码，请通过网站或APP找回</p>", "知道了");
+                        //$("#page-ok").show().find("#total-money").text("11800");//密码正确
+                    }
+                }
+            });
+        },
+        _inpPwdShow: function(amount){//显示 输入交易密码
+            lib._pageSet($("#page-pwd"),"请输入交易密码","充值金额<br />￥"+amount);
+        },
+        _inpPwdHide: function(self){//隐藏 交易密码
+            var tp = self.parents(".page-alt");
+            var pwd = tp.find("input.pwd-input");
+            tp.hide();
+            pwd.length > 0 ? pwd.val(""): "";
+        },
+        _inpMoveEnd: function(obj){//input最后位置获取焦点
+            obj.focus();
+            var len = obj.val().length;
+            if (document.selection) {
+                var sel = obj.createTextRange();
+                sel.moveStart('character', len);
+                sel.collapse();
+                sel.select();
+            } else if (typeof obj.selectionStart == 'number'&& typeof obj.selectionEnd == 'number') {
+                obj.selectionStart = obj.selectionEnd = len;
+            }
+        },
+        _inputPwd: function(){
+            $(".js-pwd-inps").on("click touchstart",function(e){//点击弹出层输入框
+                e.stopPropagation();
+                e.preventDefault();
+                var self = $(this);
+                var inp = self.find("input.pwd-input");
+                //inp.focus();
+                lib._inpMoveEnd(inp);
+                lib._pwdAnimate(inp);
+            });
+            $(".page-close").on("click",function(){
+                lib._inpPwdHide($(this));
+            });
+            $(".continue-rechare").on("click",function(){
+                lib._inpPwdHide($(this));
+                $("input.count-input").val("");
+            });
         },
         /*
         *   $firstBtn 为首次充值 进到一下步
@@ -1126,6 +1210,7 @@ org.recharge=(function(org){
                 window.location.href = '/weixin/recharge/second/?rechargeNext='+$(this).attr('data-next')+'&card_no=' + card_no + '&gate_id=' + gate_id + '&amount=' + amount;
             });
             $secondBtn.on('click', function(){
+                var self = $(this);
                 card_no = $("input[name='card_no']").attr('data-storable'),
                 amount  = $("input[name='amount']").val() * 1,
                 maxamount = parseInt($("input[name='maxamount']").val());
@@ -1136,11 +1221,17 @@ org.recharge=(function(org){
                      return org.ui.alert('最高充值'+ maxamount +'元！')
                 }
                 if(lib.canRecharge){
-                    var postdata = {
-                        card_no: card_no,
-                        amount: amount
+                    if(self.data("first")){
+                        lib._pageSet($("#page-pwd"),"设置交易密码","为了您账户资金安全，请设置交易密码");
+                    }else{
+                        lib._inpPwdShow(amount);
                     }
-                    org.ui.confirm("充值金额为"+amount, '确认充值', lib._rechargeSingleStep, postdata)
+
+                    //var postdata = {
+                    //    card_no: card_no,
+                    //    amount: amount
+                    //};
+                    //org.ui.confirm("充值金额为"+amount, '确认充值', lib._rechargeSingleStep, postdata)
                 }else{
                     return org.ui.alert('充值中，请稍后');
                 }
@@ -1172,7 +1263,7 @@ org.recharge=(function(org){
                     }
                 },
                 complete:function(){
-                    $('#secondBtn').text("充值");
+                    $('#secondBtn').text("立即充值");
                     lib.canRecharge = true;
                 }
             })
