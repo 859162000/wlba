@@ -62,12 +62,21 @@ urlpatterns = patterns(
     url(r'^sub_code/$', activity_views.ChannelBaseTemplate.as_view(template_name="sub_code.jade", wx_classify='fwh', wx_code='test1')),#wx_classify='dyh' or 'fwh'
     url(r'^sub_invite/$', activity_views.InviteWeixinFriendTemplate.as_view(template_name="sub_invite_server.jade"), name='sub_invite'),
     #微站
-    # url(r'^sub_login/$', TemplateView.as_view(template_name="service_login.jade")),
-    # url(r'^sub_regist/$', TemplateView.as_view(template_name="service_regist.jade")),
-    # url(r'^sub_regist_first/$', TemplateView.as_view(template_name="service_registProcess_first.jade")),
-    # url(r'^sub_regist_second/$', TemplateView.as_view(template_name="service_registProcess_second.jade")),
-    # url(r'^sub_regist_three/$', TemplateView.as_view(template_name="service_registProcess_three.jade")),
-    # url(r'^sub_account/$', TemplateView.as_view(template_name="service_account.jade")),
+    url(r'^sub_login/$', TemplateView.as_view(template_name="service_login.jade")),
+    url(r'^sub_regist/$', TemplateView.as_view(template_name="service_regist.jade")),
+    url(r'^sub_regist_first/$', TemplateView.as_view(template_name="service_registProcess_first.jade")),
+    url(r'^sub_regist_second/$', TemplateView.as_view(template_name="service_registProcess_second.jade")),
+    url(r'^sub_regist_three/$', TemplateView.as_view(template_name="service_registProcess_three.jade")),
+    url(r'^sub_account/$', TemplateView.as_view(template_name="service_account.jade")),
+    url(r'^sub_recharge/$', TemplateView.as_view(template_name="service_recharge.jade")),
+    #url(r'^sub_list/$', TemplateView.as_view(template_name="service_list.jade")),
+    url(r'^sub_list/$', TemplateView.as_view(template_name="service_list.jade")),
+    url(r'^sub_detail/$', TemplateView.as_view(template_name="service_detail.jade")),
+
+    url(r'^sub_transaction/repaying/$', TemplateView.as_view(template_name="service_transaction_repay.jade")),
+    url(r'^sub_transaction/buying/$', TemplateView.as_view(template_name="service_transaction_buying.jade")),
+    url(r'^sub_transaction/finished/$', TemplateView.as_view(template_name="service_transaction_finished.jade")),
+
 
 )
 
