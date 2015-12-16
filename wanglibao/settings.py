@@ -885,7 +885,7 @@ YTX_BACK_RETURN_URL = CALLBACK_HOST + "/api/ytx/voice_back/"
 #ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
 ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
 if ENV == ENV_DEV:
-    ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
+    ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
     # Modify by hb on 2015-12-02
     #STATIC_FILE_HOST = 'http://localhost:8000'
     STATIC_FILE_HOST = ''
@@ -1109,22 +1109,22 @@ WLB_FOR_ZGDX_KEY = '2001'
 ZGDX_QUERY_URL = 'http://182.140.241.47:8080/fps/ESBFlowService.do'
 # ZGDX_QUERY_KEY = 'hwDmXQLqdzJ4wozz'
 # ZGDX_QUERY_IV = '7988680669963722'
-# if ENV == ENV_PRODUCTION:
-ZGDX_CALL_BACK_URL = 'http://182.140.241.47:8080/fps/flowService.do'
-ZGDX_PARTNER_NO = '102139887'
-ZGDX_SERVICE_CODE = 'FS0001'
-ZGDX_CONTRACT_ID = '101062'
-ZGDX_ACTIVITY_ID = '102292'
-ZGDX_KEY = 'hwDmXQLqdzJ4wozz'
-ZGDX_IV = '7988680669963722'
-# else:
-#     ZGDX_CALL_BACK_URL = 'http://118.123.170.72:8888/fps/flowService.do'
-#     ZGDX_PARTNER_NO = '100054374'
-#     ZGDX_SERVICE_CODE = 'FS0001'
-#     ZGDX_CONTRACT_ID = 'test20150901165440'
-#     ZGDX_ACTIVITY_ID = '100785'
-#     ZGDX_KEY = 'H5gOs1ZshKZ6WikN'
-#     ZGDX_IV = '8888159601152533'
+if ENV == ENV_PRODUCTION:
+    ZGDX_CALL_BACK_URL = 'http://182.140.241.47:8080/fps/flowService.do'
+    ZGDX_PARTNER_NO = '102139887'
+    ZGDX_SERVICE_CODE = 'FS0001'
+    ZGDX_CONTRACT_ID = '101062'
+    ZGDX_ACTIVITY_ID = '102292'
+    ZGDX_KEY = 'hwDmXQLqdzJ4wozz'
+    ZGDX_IV = '7988680669963722'
+else:
+    ZGDX_CALL_BACK_URL = 'http://118.123.170.72:8888/fps/flowService.do'
+    ZGDX_PARTNER_NO = '100054374'
+    ZGDX_SERVICE_CODE = 'FS0001'
+    ZGDX_CONTRACT_ID = 'test20150901165440'
+    ZGDX_ACTIVITY_ID = '100785'
+    ZGDX_KEY = 'H5gOs1ZshKZ6WikN'
+    ZGDX_IV = '8888159601152533'
 
 # 返利投
 WLB_FOR_FANLITOU_KEY = '2002'
@@ -1213,3 +1213,5 @@ APP_DECRYPT_KEY = "31D21828CC9DA7CE527F08481E361A7E"
 
 # 数据魔方接口
 DATACUBE_URL = 'http://stat.wanglibao.com:10000/datacube/index'
+if ENV == ENV_PRODUCTION:
+    DATACUBE_URL = 'http://10.171.37.235:10000/datacube/index'

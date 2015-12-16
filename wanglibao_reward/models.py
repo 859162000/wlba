@@ -76,6 +76,8 @@ class WanglibaoUserGift(models.Model):
     valid = models.IntegerField(default=1, choices=SEND, verbose_name=u'奖品是否已发')
     amount = models.FloatField(default=0, verbose_name=u'奖品额度')
     get_time = models.DateTimeField(auto_now_add=True, verbose_name=u'用户领奖的时间')
+    # add by hb on 2015-12-14
+    redpack_record_id = models.IntegerField(default=0, verbose_name=u'优惠券发放流水ID')
 
     class Meta:
         verbose_name = u'用户活动获奖记录'
