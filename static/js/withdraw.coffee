@@ -348,8 +348,10 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       }
     .fail ()->
       $('.noCard').show()
-    .success(xhr) ->
-       console.log(xhr)
+      $('.bindingCard').hide()
+    .done (xhr) ->
+      $('.noCard').hide()
+      $('.bindingCard').show().text(xhr.no)
   ###绑定银行卡###
 #  $('#goBindingBtn').click ->
 #    $('#bindingBankBox').modal()

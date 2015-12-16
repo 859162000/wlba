@@ -38,7 +38,8 @@ form#add-card-form.add-card-form(style="display:none")
             a(href='javascript:void(0)').btns#goPersonalInfo 下一步
 .binding-bank.clearfix#confirmInfo(style="display:none")
     .binding-box.binding-boxs.clearfix
-        input(type='hidden' id='bankId')
+        input(type='hidden' id='order_id')
+        input(type='hidden' id='token')
         p.info-title 银行卡信息
         .binding-info.clearfix
             label 发卡银行

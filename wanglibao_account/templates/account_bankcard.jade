@@ -16,38 +16,38 @@ block main
     .bank-card-manage.bankTitle(style='display:none') 绑定银行卡
         span 绑定的银行卡持卡人，需同身份认证的个人信息保持一致
     .banks-list
+        - csrf_token
         .manage-pop 为了您的资金安全，网利宝实行了新的
             a 银行卡管理制度
             | ，请您通过网页版再次对APP已绑定银行卡进行认证。
         .manage-pop 已经在APP绑定银行卡的用户，仍可通过APP进行充值、提现等操作。
         .row.padding-l-r-m
-          if p2p_cards
-            each card in p2p_cards
-              .bank-card
-                .bank-card--title-bar.row
-                  .bank-card--bank-name
-                    label.bankname(title='{{card.bank.name}}') {{card.bank.name}}
-                    span 待绑定
-                    //.bank-card--bank-name.span9 {{card.bank.name}}
-                    //    span 待绑定
-
-                  .bank-card--icon.span3-omega
-                    img(src='/static/images/bank_card.png')
-                .row
-                  dl.bank-card--info-row
-                    dt.bank-card--info-title 账号
-                    dd.bank-card--info-value {{card.no | bank_card}}
-                .binding-card(data-card='{{card.no}}') 绑定该卡
-              a#del-card.pull-right.del-bank-card(card_id='{{card.id}}') 删除
-
-            .add-bank-card#add-card-button
+          .add-bank-card#add-card-button
                 .add-icon-large
                 p.add-card-text 添加一张银行卡
-          else
-            a#add-card-button(href='#add-card-form')
-              .add-bank-card
-                .add-icon-large
-                p.add-card-text 添加一张银行卡
+          //if p2p_cards
+          //  each card in p2p_cards
+          //    .bank-card
+          //      .bank-card--title-bar.row
+          //        .bank-card--bank-name
+          //          label.bankname(title='{{card.bank.name}}') {{card.bank.name}}
+          //          span 待绑定
+          //          //.bank-card--bank-name.span9 {{card.bank.name}}
+          //          //    span 待绑定
+          //
+          //        .bank-card--icon.span3-omega
+          //          img(src='/static/images/bank_card.png')
+          //      .row
+          //        dl.bank-card--info-row
+          //          dt.bank-card--info-title 账号
+          //          dd.bank-card--info-value {{card.no | bank_card}}
+          //      .binding-card(data-card='{{card.no}}') 绑定该卡
+          //    a#del-card.pull-right.del-bank-card(card_id='{{card.id}}') 删除
+          //else
+          //  a#add-card-button(href='#add-card-form')
+          //    .add-bank-card
+          //      .add-icon-large
+          //      p.add-card-text 添加一张银行卡
         .kindly-reminder
             p
                 b 温馨提示
@@ -71,3 +71,4 @@ block main
         a(href='javascript:void(0)').no-btn 绑定其它卡片
     script.
         require(['/static/js/add_card.js?v=1223333'])
+        require(['/static/js/bank_list.js?v=1223333'])

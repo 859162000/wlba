@@ -79,16 +79,25 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
         return
       else
          code.parent().find('span').html('<i class="dui"></i>')
+         bankId = $('.bankId').text().replace(/[ ]/g,"")
          $.ajax {
-            url: ''
+            url: '/api/pay/cnp/dynnum_new/'
             data: {
+              Storable_no : bankId.substr(0, 4)+bankId.substr(bankId.length-4)
+              card_no : bankId
+              vcode : $('.sem-input').val()
+              order_id : $('#order_id').val()
+              token : $('#token').val()
+              phone : $('.get-code').attr('data-phone')
+              device_id :''
             }
             type: 'post'
           }
           .done ()->
-            console.log('11111')
+            location.reload()
           .fail (xhr)->
-            console.log('222222')
+            tool.modalAlert({title: '温馨提示', msg: xhr.message})
+            return
 
   $('#withdrawBindingBtn').click ->
     par = $(this).parent().parent()
@@ -147,11 +156,12 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
       $(element).text('重新获取')
       $(element).removeAttr 'disabled'
       $(element).addClass 'go-get-code'
-      result = JSON.parse xhr.responseText
-      tool.modalAlert({title: '温馨提示', msg: result.message})
-    .success ->
+      tool.modalAlert({title: '温馨提示', msg: xhr.message})
+    .success (xhr) ->
       element.attr 'disabled', 'disabled'
       element.removeClass 'go-get-code'
+      $('#order_id').val(xhr.order_id)
+      $('#token').val(xhr.token)
     intervalId
     count = 60
 
@@ -178,7 +188,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
     $('.modal').css('width':'560px')
     par = $(this).parent()
     card = par.find('.bank-card--info-value').text()
-    str = par.find('.bankname').attr('title')+'尾号'+card.substr(card.length-4)
+    str = par.find('.bank-card--bank-name').find('label').text()+'尾号'+card.substr(card.length-4)
     $('.bankInfo').html(str)
 
   ###确认绑定###

@@ -416,9 +416,11 @@
       type: "GET",
       data: {}
     }).fail(function() {
-      return $('.noCard').show();
-    }).success(xhr)(function() {
-      return console.log(xhr);
+      $('.noCard').show();
+      return $('.bindingCard').hide();
+    }).done(function(xhr) {
+      $('.noCard').hide();
+      return $('.bindingCard').show().text(xhr.no);
     });
 
     /*绑定银行卡 */

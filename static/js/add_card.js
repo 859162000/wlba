@@ -85,7 +85,7 @@
 
     /*验证个人信息 */
     _checkPerInfo = function(btns) {
-      var bankPhone, code;
+      var bankId, bankPhone, code;
       bankPhone = btns.parent().parent().find('.bankPhone');
       code = btns.parent().parent().find('.code');
       if (!_checkMobile(bankPhone)) {
@@ -95,14 +95,26 @@
           code.parent().find('span').html('<i class="cha"></i>请填写验证码');
         } else {
           code.parent().find('span').html('<i class="dui"></i>');
+          bankId = $('.bankId').text().replace(/[ ]/g, "");
           return $.ajax({
-            url: '',
-            data: {},
+            url: '/api/pay/cnp/dynnum_new/',
+            data: {
+              Storable_no: bankId.substr(0, 4) + bankId.substr(bankId.length - 4),
+              card_no: bankId,
+              vcode: $('.sem-input').val(),
+              order_id: $('#order_id').val(),
+              token: $('#token').val(),
+              phone: $('.get-code').attr('data-phone'),
+              device_id: ''
+            },
             type: 'post'
           }).done(function() {
-            return console.log('11111');
+            return location.reload();
           }).fail(function(xhr) {
-            return console.log('222222');
+            tool.modalAlert({
+              title: '温馨提示',
+              msg: xhr.message
+            });
           });
         }
       }
@@ -171,19 +183,19 @@
           device_id: ''
         }
       }).fail(function(xhr) {
-        var result;
         clearInterval(intervalId);
         $(element).text('重新获取');
         $(element).removeAttr('disabled');
         $(element).addClass('go-get-code');
-        result = JSON.parse(xhr.responseText);
         return tool.modalAlert({
           title: '温馨提示',
-          msg: result.message
+          msg: xhr.message
         });
-      }).success(function() {
+      }).success(function(xhr) {
         element.attr('disabled', 'disabled');
-        return element.removeClass('go-get-code');
+        element.removeClass('go-get-code');
+        $('#order_id').val(xhr.order_id);
+        return $('#token').val(xhr.token);
       });
       intervalId;
       count = 60;
@@ -215,7 +227,7 @@
       });
       par = $(this).parent();
       card = par.find('.bank-card--info-value').text();
-      str = par.find('.bankname').attr('title') + '尾号' + card.substr(card.length - 4);
+      str = par.find('.bank-card--bank-name').find('label').text() + '尾号' + card.substr(card.length - 4);
       return $('.bankInfo').html(str);
     });
 
