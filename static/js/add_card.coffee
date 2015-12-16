@@ -34,26 +34,10 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
     card = par.find('.cardId')
     if _checkBankCard(bank,card)
       card.next().html('<i class="dui"></i>')
-      $.ajax {
-        url: '/api/card/'
-        data: {
-          no: card.val().replace(/[ ]/g,"")
-          bank: bank.val()
-          is_default: false
-        }
-        type: 'post'
-      }
-      .done (data)->
-        par.find('.bankName').text(data.bank_name+'（储蓄卡）')
-        par.find('.bankId').text(data.no.replace(/\s/g,'').replace(/(\d{4})(?=\d)/g,"$1 "))
-        $('#confirmInfo').show()
-        $('#chooseBank,.bankTitle span').hide()
-      .fail (xhr)->
-        result = JSON.parse xhr.responseText
-        if result.error_number == 5
-          tool.modalAlert({title: '温馨提示', msg: result.message})
-          return
-        tool.modalAlert({title: '温馨提示', msg: '添加银行卡失败'})
+      $('.bankName').text(par.find('.select_bank option:selected').text()+'（储蓄卡）')
+      $('.bankId').text(card.val().replace(/\s/g,'').replace(/(\d{4})(?=\d)/g,"$1 "))
+      $('#confirmInfo').show()
+      $('#chooseBank,.bankTitle span').hide()
 
   ###验证银行卡信息###
   _checkBankCard = (bank,card)->
@@ -95,16 +79,25 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
         return
       else
          code.parent().find('span').html('<i class="dui"></i>')
+         bankId = $('.bankId').text().replace(/[ ]/g,"")
          $.ajax {
-            url: ''
+            url: '/api/pay/cnp/dynnum_new/'
             data: {
+              Storable_no : bankId.substr(0, 4)+bankId.substr(bankId.length-4)
+              card_no : bankId
+              vcode : $('.sem-input').val()
+              order_id : $('#order_id').val()
+              token : $('#token').val()
+              phone : $('.get-code').attr('data-phone')
+              device_id :''
             }
             type: 'post'
           }
           .done ()->
-            console.log('11111')
+            location.reload()
           .fail (xhr)->
-            console.log('222222')
+            tool.modalAlert({title: '温馨提示', msg: xhr.message})
+            return
 
   $('#withdrawBindingBtn').click ->
     par = $(this).parent().parent()
@@ -142,47 +135,33 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
        value = $(this).val().replace(/\s/g,'').replace(/(\d{4})(?=\d)/g,"$1 ");
        $(this).val(value)
 
-  ###图片验证码###
-  $('.codeBox').delegate('.go-get-code','click', ->
-    $('.code-img-error').html('')
-    $('#img-code-div2').modal()
-    $('#img-code-div2').find('#id_captcha_1').val('')
-    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v="+(+new Date())
-    $.getJSON url, {}, (json)->
-      $('input[name="captcha_0"]').val(json.key)
-      $('img.captcha').attr('src', json.image_url)
-  )
-
   ###短信验证码###
-  $("#submit-code-img4").click (e) ->
+  $('.codeBox').delegate('.go-get-code','click', ->
     element = $('.get-code')
     if $(element).attr 'disabled'
       return;
     phoneNumber = $(element).attr("data-phone")
-    captcha_0 = $(this).parents('form').find('#id_captcha_0').val()
-    captcha_1 = $(this).parents('form').find('.captcha').val()
     $.ajax
-      url: "/api/phone_validation_code/" + phoneNumber + "/"
+      url: "/api/pay/deposit_new/"
       type: "POST"
       data: {
-        captcha_0 : captcha_0
-        captcha_1 : captcha_1
+        card_no : $('.cardId').val().replace(/[ ]/g,"")
+        phone : phoneNumber
+        amount : 0.01
+        gate_id : $('.select_bank').val()
+        device_id :''
       }
     .fail (xhr)->
       clearInterval(intervalId)
       $(element).text('重新获取')
       $(element).removeAttr 'disabled'
       $(element).addClass 'go-get-code'
-      result = JSON.parse xhr.responseText
-      if result.type == 'captcha'
-        $("#submit-code-img4").parent().parent().find('.code-img-error').html(result.message)
-      else
-        if xhr.status >= 400
-          tool.modalAlert({title: '温馨提示', msg: result.message})
-    .success ->
+      tool.modalAlert({title: '温馨提示', msg: xhr.message})
+    .success (xhr) ->
       element.attr 'disabled', 'disabled'
       element.removeClass 'go-get-code'
-      $.modal.close()
+      $('#order_id').val(xhr.order_id)
+      $('#token').val(xhr.token)
     intervalId
     count = 60
 
@@ -199,26 +178,31 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
    # Fire now and future
     timerFunction()
     intervalId = setInterval timerFunction, 1000
+  )
+
   ###绑定银行卡###
   $('.binding-card').click ->
     $('#bindingOldCard').modal()
+    $('#bindingOldCard').find('.ok-btn').attr('data-card':$(this).attr('data-card'))
     $('#bindingOldCard').find('.close-modal').hide()
     $('.modal').css('width':'560px')
     par = $(this).parent()
     card = par.find('.bank-card--info-value').text()
-    str = par.find('.bankname').attr('title')+'尾号'+card.substr(card.length-4)
+    str = par.find('.bank-card--bank-name').find('label').text()+'尾号'+card.substr(card.length-4)
     $('.bankInfo').html(str)
 
   ###确认绑定###
   $('.ok-btn').click ->
     $.ajax {
-      url: ''
+      url: '/api/pay/the_one_card/'
       data: {
+        card_id : $(this).attr('data-card')
       }
-      type: 'post'
+      type: 'put'
     }
     .done ()->
-      location.reload()
+#      location.reload()
+      console.log('111111')
     .fail (xhr)->
       console.log('222222')
   ###取消绑定###

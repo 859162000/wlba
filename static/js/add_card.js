@@ -42,34 +42,10 @@
       card = par.find('.cardId');
       if (_checkBankCard(bank, card)) {
         card.next().html('<i class="dui"></i>');
-        return $.ajax({
-          url: '/api/card/',
-          data: {
-            no: card.val().replace(/[ ]/g, ""),
-            bank: bank.val(),
-            is_default: false
-          },
-          type: 'post'
-        }).done(function(data) {
-          par.find('.bankName').text(data.bank_name + '（储蓄卡）');
-          par.find('.bankId').text(data.no.replace(/\s/g, '').replace(/(\d{4})(?=\d)/g, "$1 "));
-          $('#confirmInfo').show();
-          return $('#chooseBank,.bankTitle span').hide();
-        }).fail(function(xhr) {
-          var result;
-          result = JSON.parse(xhr.responseText);
-          if (result.error_number === 5) {
-            tool.modalAlert({
-              title: '温馨提示',
-              msg: result.message
-            });
-            return;
-          }
-          return tool.modalAlert({
-            title: '温馨提示',
-            msg: '添加银行卡失败'
-          });
-        });
+        $('.bankName').text(par.find('.select_bank option:selected').text() + '（储蓄卡）');
+        $('.bankId').text(card.val().replace(/\s/g, '').replace(/(\d{4})(?=\d)/g, "$1 "));
+        $('#confirmInfo').show();
+        return $('#chooseBank,.bankTitle span').hide();
       }
     });
 
@@ -109,7 +85,7 @@
 
     /*验证个人信息 */
     _checkPerInfo = function(btns) {
-      var bankPhone, code;
+      var bankId, bankPhone, code;
       bankPhone = btns.parent().parent().find('.bankPhone');
       code = btns.parent().parent().find('.code');
       if (!_checkMobile(bankPhone)) {
@@ -119,14 +95,26 @@
           code.parent().find('span').html('<i class="cha"></i>请填写验证码');
         } else {
           code.parent().find('span').html('<i class="dui"></i>');
+          bankId = $('.bankId').text().replace(/[ ]/g, "");
           return $.ajax({
-            url: '',
-            data: {},
+            url: '/api/pay/cnp/dynnum_new/',
+            data: {
+              Storable_no: bankId.substr(0, 4) + bankId.substr(bankId.length - 4),
+              card_no: bankId,
+              vcode: $('.sem-input').val(),
+              order_id: $('#order_id').val(),
+              token: $('#token').val(),
+              phone: $('.get-code').attr('data-phone'),
+              device_id: ''
+            },
             type: 'post'
           }).done(function() {
-            return console.log('11111');
+            return location.reload();
           }).fail(function(xhr) {
-            return console.log('222222');
+            tool.modalAlert({
+              title: '温馨提示',
+              msg: xhr.message
+            });
           });
         }
       }
@@ -176,56 +164,38 @@
       return $(this).val(value);
     });
 
-    /*图片验证码 */
-    $('.codeBox').delegate('.go-get-code', 'click', function() {
-      $('.code-img-error').html('');
-      $('#img-code-div2').modal();
-      $('#img-code-div2').find('#id_captcha_1').val('');
-      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
-      return $.getJSON(url, {}, function(json) {
-        $('input[name="captcha_0"]').val(json.key);
-        return $('img.captcha').attr('src', json.image_url);
-      });
-    });
-
     /*短信验证码 */
-    $("#submit-code-img4").click(function(e) {
-      var captcha_0, captcha_1, count, element, intervalId, phoneNumber, timerFunction;
+    $('.codeBox').delegate('.go-get-code', 'click', function() {
+      var count, element, intervalId, phoneNumber, timerFunction;
       element = $('.get-code');
       if ($(element).attr('disabled')) {
         return;
       }
       phoneNumber = $(element).attr("data-phone");
-      captcha_0 = $(this).parents('form').find('#id_captcha_0').val();
-      captcha_1 = $(this).parents('form').find('.captcha').val();
       $.ajax({
-        url: "/api/phone_validation_code/" + phoneNumber + "/",
+        url: "/api/pay/deposit_new/",
         type: "POST",
         data: {
-          captcha_0: captcha_0,
-          captcha_1: captcha_1
+          card_no: $('.cardId').val().replace(/[ ]/g, ""),
+          phone: phoneNumber,
+          amount: 0.01,
+          gate_id: $('.select_bank').val(),
+          device_id: ''
         }
       }).fail(function(xhr) {
-        var result;
         clearInterval(intervalId);
         $(element).text('重新获取');
         $(element).removeAttr('disabled');
         $(element).addClass('go-get-code');
-        result = JSON.parse(xhr.responseText);
-        if (result.type === 'captcha') {
-          return $("#submit-code-img4").parent().parent().find('.code-img-error').html(result.message);
-        } else {
-          if (xhr.status >= 400) {
-            return tool.modalAlert({
-              title: '温馨提示',
-              msg: result.message
-            });
-          }
-        }
-      }).success(function() {
+        return tool.modalAlert({
+          title: '温馨提示',
+          msg: xhr.message
+        });
+      }).success(function(xhr) {
         element.attr('disabled', 'disabled');
         element.removeClass('go-get-code');
-        return $.modal.close();
+        $('#order_id').val(xhr.order_id);
+        return $('#token').val(xhr.token);
       });
       intervalId;
       count = 60;
@@ -248,24 +218,29 @@
     $('.binding-card').click(function() {
       var card, par, str;
       $('#bindingOldCard').modal();
+      $('#bindingOldCard').find('.ok-btn').attr({
+        'data-card': $(this).attr('data-card')
+      });
       $('#bindingOldCard').find('.close-modal').hide();
       $('.modal').css({
         'width': '560px'
       });
       par = $(this).parent();
       card = par.find('.bank-card--info-value').text();
-      str = par.find('.bankname').attr('title') + '尾号' + card.substr(card.length - 4);
+      str = par.find('.bank-card--bank-name').find('label').text() + '尾号' + card.substr(card.length - 4);
       return $('.bankInfo').html(str);
     });
 
     /*确认绑定 */
     $('.ok-btn').click(function() {
       return $.ajax({
-        url: '',
-        data: {},
-        type: 'post'
+        url: '/api/pay/the_one_card/',
+        data: {
+          card_id: $(this).attr('data-card')
+        },
+        type: 'put'
       }).done(function() {
-        return location.reload();
+        return console.log('111111');
       }).fail(function(xhr) {
         return console.log('222222');
       });

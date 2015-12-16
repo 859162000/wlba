@@ -28,7 +28,7 @@ form#add-card-form.add-card-form(style="display:none")
             select.select_bank
                 option(value='') 请选择银行
                 for bank in banks
-                  option(value='{{bank.id}}') {{bank.name}}
+                  option(value='{{bank.gate_id}}') {{bank.name}}
             span
         .binding-info.w70.clearfix
             label 储蓄卡卡号
@@ -38,6 +38,8 @@ form#add-card-form.add-card-form(style="display:none")
             a(href='javascript:void(0)').btns#goPersonalInfo 下一步
 .binding-bank.clearfix#confirmInfo(style="display:none")
     .binding-box.binding-boxs.clearfix
+        input(type='hidden' id='order_id')
+        input(type='hidden' id='token')
         p.info-title 银行卡信息
         .binding-info.clearfix
             label 发卡银行
@@ -68,15 +70,3 @@ form#add-card-form.add-card-form(style="display:none")
     p 为保证您的资金安全，请先进行实名认证
     .space-vertical-l
     a.button.button-middle.button-l.button-red(href='/accounts/id_verify/') 去实名认证
-
-#img-code-div2(style="display:none")
-    form#img-code-form.img-code-form(method='post', action='',tag='')
-        .form-row
-            label.img-code-label 请输入验证码：
-            input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
-            input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
-            img.captcha.captcha-img(alt="captcha", src="")
-            button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
-        .code-img-error
-        .clearfix.tc
-            span.submit-code-img#submit-code-img4 确定

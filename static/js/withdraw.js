@@ -413,12 +413,14 @@
     /*获取绑卡状态 */
     return $.ajax({
       url: "/api/pay/the_one_card/",
-      type: "POST",
+      type: "GET",
       data: {}
-    }).fail(function(xhr) {
-      return console.log(xhr);
-    }).success(xhr)(function() {
-      return console.log(xhr);
+    }).fail(function() {
+      $('.noCard').show();
+      return $('.bindingCard').hide();
+    }).done(function(xhr) {
+      $('.noCard').hide();
+      return $('.bindingCard').show().text(xhr.no);
     });
 
     /*绑定银行卡 */
