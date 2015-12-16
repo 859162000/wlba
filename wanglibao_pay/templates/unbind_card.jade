@@ -1,3 +1,38 @@
-//
-   Created by guoya on 16/12/15.
+- load formatters
+doctype html
+
+body
+   if not phone
+      // todo
+      form(method="GET" action='')
+         .form-row
+            .span3(style="line-height:40px")
+               label 手机号码
+            .span9-omega
+               input#id_id_number(type='text', name='phone', placeholder='手机号码')
+         .form-row
+            button#validate_id_button.button-primary.prefix3.span9-omega(type="submit") 查询
+   else
+      table
+         tr
+            td 用户名
+            td {{name}}
+         tr
+            td 电话
+            td {{phone}}
+         tr
+            td 身份证
+            td {{social_id}}
+         tr
+            td 卡号
+            if card_number
+               td {{card_number}}
+            else
+               td 用户未绑卡
+         tr
+            td 用户图像
+            td
+               img(src='{{avatar_url}}')
+      if card_number
+         a(href='?phone={{phone}}&unbind=True') 解绑
 
