@@ -21,10 +21,10 @@ from wanglibao_account.views import ajax_register
 class WXLogin(TemplateView):
     template_name = 'weixin_login_new.jade'
 
-    def get_context_data(self, request, *args, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         context = super(WXLogin, self).get_context_data(**kwargs)
         context['openid'] = self.openid
-        next = request.GET.get('next', '')
+        next = self.request.GET.get('next', '')
         next = urllib.unquote(next.encode('utf-8'))
         return {
             'context': context,
@@ -83,9 +83,9 @@ class WXLoginAPI(APIView):
 class WXRegister(TemplateView):
     template_name = 'weixin_regist_new.jade'
 
-    def get_context_data(self, request, **kwargs):
-        token = request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
-        token_session = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+    def get_context_data(self, **kwargs):
+        token = self.request.GET.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+        token_session = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
         if token:
             token = token
         elif token_session:
@@ -97,9 +97,9 @@ class WXRegister(TemplateView):
             channel = get_channel_record(token)
         else:
             channel = None
-        phone = request.GET.get('phone', 0)
-        next = request.GET.get('next', '')
-        openid = request.GET.get('openid', '')
+        phone = self.request.GET.get('phone', 0)
+        next = self.request.GET.get('next', '')
+        openid = self.request.GET.get('openid', '')
         return {
             'token': token,
             'channel': channel,
