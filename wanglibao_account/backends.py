@@ -282,7 +282,7 @@ def check_age_for_id(id_number):
         if int(current_date.strftime('%Y%m%d')[4:]) >= int(birth_date.strftime('%Y%m%d')[4:]):
             age -= 1
 
-        if age > 18:
+        if age >= 18:
             return True
 
     return False
