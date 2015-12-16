@@ -8,6 +8,7 @@ from weixin.common.decorators import weixin_api_error
 from misc.models import Misc
 import json
 from rest_framework.views import APIView
+from util import getOrCreateWeixinUser
 
 class OpenIdBaseAPIView(APIView):
     @weixin_api_error

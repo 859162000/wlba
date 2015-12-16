@@ -58,7 +58,7 @@ urlpatterns = patterns(
     url(r'^jump_page/$', views.JumpPageTemplate.as_view(template_name="sub_times.jade"), name='jump_page'),
     url(r'^is_bind/$', TemplateView.as_view(template_name="sub_is_bind.jade")),
     url(r'^award_index/$', login_required(activity_views.AwardIndexTemplate.as_view(template_name="sub_award.jade"),
-                                          login_url='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx18689c393281241e&redirect_uri=http://e717d495.ngrok.io/weixin/sub_login/&response_type=code&scope=snsapi_base&state=gh_3b82a2651647#wechat_redirect'
+                                login_url='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx18689c393281241e&redirect_uri=http://e717d495.ngrok.io/weixin/sub_login/&response_type=code&scope=snsapi_base&state=gh_3b82a2651647#wechat_redirect'
                                           ),
         name='award_index'),
     url(r'^award_rule/$', TemplateView.as_view(template_name="sub_award_rule.jade")),
@@ -83,7 +83,8 @@ urlpatterns = patterns(
     url(r'^sub_transaction/finished/$', TemplateView.as_view(template_name="service_transaction_finished.jade")),
 
     #微站 api
-
+    url(r'api/fwh_login/$', main_views.WXLoginAPI.as_view(), name='weixin_fwh_login'),
+    url(r'api/fwh_register/$', main_views.WXRegisterAPI.as_view(), name='weixin_fwh_register'),
 
 
 )

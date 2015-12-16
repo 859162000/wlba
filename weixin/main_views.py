@@ -21,10 +21,10 @@ from wanglibao_account.views import ajax_register
 class WXLogin(TemplateView):
     template_name = 'weixin_login_new.jade'
 
-    def get_context_data(self, request, *args, **kwargs):
+    def get_context_data(self, *args, **kwargs):
         context = super(WXLogin, self).get_context_data(**kwargs)
         context['openid'] = self.openid
-        next = request.GET.get('next', '')
+        next = self.request.GET.get('next', '')
         next = urllib.unquote(next.encode('utf-8'))
         return {
             'context': context,
