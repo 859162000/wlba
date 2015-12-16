@@ -96,12 +96,12 @@ class AntiForAllClient(AntiBase):
                 return False
 
             delay_channels = GlobalParamsSpace.DELAY_CHANNELS
-            print delay_channels, delay_channels
             if channel in delay_channels:
                 # Add by hb on 2015-12-16 : if can not get client_ip, then do nothing and renturn False
                 try:
-                    print "=== [%s]" % self.request
-                    client_ip = self.request.META['HTTP_X_FORWARD_FOR'] if self.request.META.get('HTTP_X_FORWAED_FOR', None) else self.request.META.get('REMOTE_ADDR', "")
+                    # Modify by hb on 2015-12-16 : for Nginx-Proxy, REMOTE_ADDR is unvalild, HTTP_X_REAL_IP may be work
+                    #client_ip = self.request.META['HTTP_X_FORWARDED_FOR'] if self.request.META.get('HTTP_X_FORWARDED_FOR', None) else self.request.META.get('REMOTE_ADDR', "")
+                    client_ip = self.request.META['HTTP_X_FORWARDED_FOR'] if self.request.META.get('HTTP_X_FORWARDED_FOR', None) else self.request.META.get('HTTP_X_REAL_IP', None)
                     if not client_ip:
                         raise Exception, u'client_ip is none'
                 except Exception, ex:
