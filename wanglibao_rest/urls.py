@@ -51,7 +51,7 @@ from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIVie
                                      RedPacketSelectAPIView)
 
 from marketing.play_list import InvestmentHistory
-from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView,
+from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView, RockFinanceAPIView, RockFinanceCheckAPIView,
                              ThousandRedPackCountAPIView, ThunderActivityRewardCounter, QuickApplyerAPIView, GiftOwnerInfoAPIView, RewardDistributeAPIView)
 from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
@@ -236,7 +236,6 @@ urlpatterns += patterns('',
 urlpatterns += patterns('',
     url(r'^investment_history/', InvestmentHistory.as_view()),
 )
-
 urlpatterns += patterns(
     '',
     url(r'^xunlei/join/$', ActivityJoinLogAPIView.as_view()),
@@ -254,7 +253,9 @@ urlpatterns += patterns(
     url(r'^weixin/share/has_gift/$', WeixinShareTools.as_view()), #add by yihen@20151102 ,聚橙网领取门票接口
     url(r'^weixin/distribute/redpack/$', RewardDistributeAPIView.as_view()), #add by yihen@20151102 ,聚橙网领取门票接口
     url(r'^activity/reward/$', DistributeRewardAPIView.as_view()),
-
+    #url(r'^rock/finance/$', RockFinanceAPIView.as_view()),  # 金融摇滚夜发送入场二维码 , 测试用，上线时去掉
+    url(r'^check/qrcode/$', RockFinanceCheckAPIView.as_view(), name='rockfinance_checkresult'),  # 金融摇滚夜扫描接口
+    url(r'^rock/finance/$', RockFinanceAPIView.as_view()),  # 金融摇滚夜投票的数据结果及获得入场二维码
 )
 
 

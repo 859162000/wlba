@@ -320,7 +320,11 @@ class RegisterAPIView(DecryptParmsAPIView):
         if request.DATA.get('IGNORE_PWD') and not password:
             send_messages.apply_async(kwargs={
                 "phones": [identifier,],
+<<<<<<< HEAD
                 "messages": [u'登录账户是：'+identifier+u'登录密码:'+password,]
+=======
+                "messages": [u'用户名为'+identifier+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
+>>>>>>> by yihen for damai-backend
             })
 
             if channel == 'momo':
