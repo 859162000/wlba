@@ -26,6 +26,7 @@ from django.conf import settings
 from django.db.models.base import ModelState
 from wanglibao_sms.utils import send_validation_code, validate_validation_code
 from misc.models import Misc
+from weixin.base import OpenIdBaseAPIView, BaseWeixinTemplate
 from wanglibao_sms.models import *
 from marketing.models import WanglibaoActivityReward, Channels, PromotionToken, IntroducedBy, IntroducedByReward, \
     Reward, ActivityJoinLog, QuickApplyInfo, GiftOwnerGlobalInfo, GiftOwnerInfo, WanglibaoVoteCounter
@@ -2639,17 +2640,20 @@ class RockFinanceQRCodeView(TemplateView):
 
     def get_context_data(self, **kwargs):
 
-        if not self.request.user.is_authenticated():
-            return Response({"code": 1002, "message": u"请您先登录"})
-
-        reward = WanglibaoActivityReward.objects.filter(user=self.request.user, activity='rock_finance').first()
+        logger.debug("rock finance qrcode view，开始准备渲染数据")
+        user_id = self.request.GET.get("user_id", -1)
+        logger.debug("二维码用户user_id:%s" % user_id)
+        reward = WanglibaoActivityReward.objects.filter(user_id=user_id, activity='rock_finance').first()
         if not reward:
-            return Response({"code": 1003, "message": u"您没有领到对应的入场二维码"})
+            logger.debug(u"您没有领取到对应的入场二维码, user:%s" % self.request.user)
+            return {"code": 1003, "message": u"您没有领到对应的入场二维码"}
 
-        if reward.is_used:  # 二维码可能被重复使用
-            return Response({"code": -1, "img": reward.qrcode, "message": u"您的二维码已经被使用"})
+        if reward.has_sent:  # 二维码可能被重复使用
+            logger.debug(u"您的二维码已经被使用过, img:%s, user:%s" % (reward.qrcode, self.request.user))
+            return {"code": -1, "img": reward.qrcode, "message": u"您的二维码已经被使用"}
         else:
-            return Response({"code": 0, "img": reward.qrcode, "message": u"得到合法二维码"})
+            logger.debug(u"reward.qrcode img url:%s, user:%s" % (reward.qrcode, self.request.user))
+            return {"code": 0, "img": reward.qrcode, "message": u"得到合法二维码"}
 
 
 class RockFinanceAPIView(APIView):
@@ -2723,10 +2727,10 @@ class RockFinanceAPIView(APIView):
         return Response({"code": 0, "message": u'投票成功'})
 
 
-class RockFinanceCheckAPIView(APIView):
-    permission_classes = ()
+class RockFinanceCheckAPIView(BaseWeixinTemplate):
+    template_name = 'rockfinance_checkresult.jade'
 
-    def post(self, request):
+    def get_context_data(self, **kwargs):
         key = 'activities'
         activity_config = Misc.objects.filter(key=key).first()
         if activity_config:
@@ -2744,45 +2748,41 @@ class RockFinanceCheckAPIView(APIView):
         else:
             raise Exception(u"misc中没有配置activities杂项")
 
-        openid = request.DATA.get("openid", None)
+        logger.debug("user:%s, is_open:%s, start_scan:%s, end_scan:%s openids:%s, scaner_openid:%s" % (self.request.user, is_open, start_scan, end_scan, openids, self.openid))
+
         #判断是否在扫描列表里
-        if openid not in openids:
-            return Response({"code": 1000, "message": u"您没有扫描权限"})
+        if self.openid and self.openid not in openids:
+            return {"code": 1000, "message": u"您没有扫描权限"}
 
         #判断活动是否开启
         if is_open == "false":
-            return Response({"code": 1001, "message": u"活动还没有开启"})
+            return {"code": 1001, "message": u"活动还没有开启"}
 
         #判断是否在扫描的时间段内
         now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         if now < start_scan or now > end_scan:
-            return Response({"code": 1002, "message": u'扫描时间段不合理'})
+            return {"code": 1002, "message": u'扫描时间段不合理'}
 
 
-        owner_id = request.DATA.get("owner_id", None)
-        activity = request.DATA.get("activity", None)
-        content = request.DATA.get("content", None)
+        owner_id = self.request.GET.get("owner_id", None)
+        activity = self.request.GET.get("activity", None)
+        content = self.request.GET.get("content", None)
 
         try:
             assert None not in (owner_id, activity, content)
         except AssertionError:
-            return Response({"code": 1005, "message": u"二维码链接的参数不对"})
+            return {"code": 1005, "message": u"二维码链接的参数不对"}
 
         with transaction.atomic():
             reward_record = WanglibaoActivityReward.objects.select_for_update().filter(has_sent=False, user_id=owner_id, activity=activity, reward__content=content).first()
             if not reward_record:
-                reward_record.save()
-                return Response({"code": 1003, "message": u'您的二维码不合法'})
+                return {"code": 1003, "message": u'您的二维码不合法, 可能已经被使用了'}
 
             if reward_record.has_sent:
                 reward_record.save()
-                return Response({"code": 1004, "message": u'每一个二维码只能被使用一次'})
+                return {"code": 1004, "message": u'每一个二维码只能被使用一次'}
 
             reward_record.has_sent = True
             reward_record.left_times = 0
             reward_record.save()
-            return Response({"code": 0, "message": u'欢迎您参加网利宝金融摇滚夜'})
-
-    def dispatch(self, request, *args, **kwargs):
-        pass
-
+            return {"code": 0, "message": u'欢迎您参加网利宝金融摇滚夜'}
