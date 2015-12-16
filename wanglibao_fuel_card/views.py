@@ -72,10 +72,17 @@ class FuelCardBugRecordView(TemplateView):
         if status == 'auditing':
             user_amotization = UserAmortization.objects.filter(user=self.request.user, settled=False
                                                                ).select_related(depth=2)
-            user_amotization = user_amotization.order_by('product_amortization__product')
-            
+            user_amotization = user_amotization.order_by('product_amortization__product', 'term')
+
+            ua_list = []
+            ua_tmp = user_amotization.first()
+            ua_list.append(ua_tmp)
+            for ua in user_amotization:
+                if ua.product_amortization.product != ua_tmp.product_amortization.product:
+                    ua_list.append(ua_tmp)
+                    ua_tmp = ua
             user_amotization = user_amotization.order_by('cre',
-                                                         '-term')
+                                                         'term')
         elif status == 'tack_effect':
             pass
         elif status == 'done':
