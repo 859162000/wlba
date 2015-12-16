@@ -232,6 +232,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         app: function(mixins) {
             mixins.sendUserInfo(function(data) {
 
+				$('.link_licai').click(function(){
+					mixins.jumpToManageMoney();
+				});
 				$('.investment_button').click(function() {
 					mixins.jumpToManageMoney();
 				});
@@ -262,6 +265,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 })
             }
 			$('.investment_button').click(function() {
+				window.location.href = '/weixin/list/'
+			});
+			$('.link_licai').click(function(){
 				window.location.href = '/weixin/list/'
 			});
 			$('.code_wrap').show();
