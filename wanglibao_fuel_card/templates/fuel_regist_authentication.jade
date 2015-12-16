@@ -12,13 +12,13 @@ html
       .fuel-input-public.fuel-input-space
         .fuel-input-icon.regist-input-icon
           .name
-        input(type='text', name='password', placeholder= '请设置密码').fuel-input-main
+        input(type='text', name='username', placeholder= '请输入姓名', data-icon='fuel-input-icon', data-operation='fuel-clear-input',autocomplete='off').fuel-input-main
         .fuel-operation-icon.fuel-clear-input
 
       .fuel-input-public.fuel-input-space
         .fuel-input-icon.regist-input-icon
           .idcard
-        input(type='text', name='password', placeholder= '请设置密码').fuel-input-main
+        input(type='text', name='idcard', placeholder= '请输入身份证号',data-icon='fuel-input-icon', data-operation='fuel-clear-input',autocomplete='off').fuel-input-main
         .fuel-operation-icon.fuel-clear-input
 
 
@@ -27,3 +27,6 @@ html
 
       .fuel-authentication-regist-warp
         button(type='submit').fuel-password-submit 实名认证
+
+    script(src='/static/scripts/mobile_fuelcard/dev/vendor.zepto.js')
+    script(src='/static/scripts/mobile_fuelcard/dev/index.js')

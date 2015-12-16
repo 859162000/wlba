@@ -1,5 +1,13 @@
-import {pi} from "./mixins/ajax"
+import { Automatic } from './mixins/automatic_detection.js'
 
 
-$('.test').html(pi)
-$('.test').html('12312aa3')
+const auto = new Automatic({
+                submit : $('button[type=submit]'),
+                checklist: [
+                    {target : $('input[name=username]'),  required:true},
+                    {target : $('input[name=idcard]'), required : true},
+                ]
+                });
+
+auto.check();
+
