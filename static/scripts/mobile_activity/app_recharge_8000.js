@@ -234,7 +234,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 if (data.ph == '') {
                     login = false;
                     $('.button').click(function() {
-                        mixins.loginApp({refresh:1, url:'https://staging.wanglibao.com/activity/app_recharge_8000/'});
+                        mixins.loginApp({refresh:1, url:'https://www.wanglibao.com/activity/app_recharge_8000/'});
                     });
                 } else {
                     login = true;
