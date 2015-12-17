@@ -1,4 +1,4 @@
-const ajax = function(options){
+export const ajax = function(options){
     $.ajax({
         url: options.url,
         type: options.type,
@@ -20,8 +20,13 @@ const ajax = function(options){
         complete () {  options.complete && options.complete(); }
     });
 };
+export const signView =function(sign){
+    $('.error-sign').html(sign).removeClass('moveDown').addClass('moveDown').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+      $(this).removeClass('moveDown');
+    });
+}
 
-const getCookie = function(name){
+export const getCookie = function(name){
 
     let cookie, cookies, i, cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -52,5 +57,5 @@ const _sameOrigin = function(url){
 
 
 
-export { ajax, getCookie }
+
 

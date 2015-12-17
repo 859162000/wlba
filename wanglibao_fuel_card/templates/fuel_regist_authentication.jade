@@ -12,7 +12,7 @@ html
       .fuel-input-public.fuel-input-space
         .fuel-input-icon.regist-input-icon
           .name
-        input(type='text', name='username', placeholder= '请输入姓名', data-icon='fuel-input-icon', data-operation='fuel-clear-input',autocomplete='off').fuel-input-main
+        input(type='text', name='username', placeholder= '请输入姓名', data-icon='fuel-input-icon', data-operation='fuel-clear-input', autocomplete='off').fuel-input-main
         .fuel-operation-icon.fuel-clear-input
 
       .fuel-input-public.fuel-input-space
@@ -26,7 +26,7 @@ html
         span 账户资金安全由平安银行承保
 
       .fuel-authentication-regist-warp
-        button(type='submit').fuel-password-submit 实名认证
+        button(type='submit', disabled=true).fuel-password-submit 实名认证
 
     script(src='/static/scripts/mobile_fuelcard/dev/vendor.zepto.js')
     script(src='/static/scripts/mobile_fuelcard/dev/index.js')
