@@ -13,6 +13,7 @@ module.exports = {
          * 路径相对于webpack.fuel.js
          */
         index: './src/mobile_fuelcard/index',
+        regist: './src/mobile_fuelcard/regist',
         vendor: ['./src/mobile_fuelcard/lib/zepto']
     },
     output: {
