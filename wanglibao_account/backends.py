@@ -10,8 +10,7 @@ from requests.packages.urllib3.poolmanager import PoolManager
 from django.conf import settings
 from django.db.models import Sum
 from wanglibao_account.models import IdVerification, UserSource
-from wanglibao_redpack.models import Income
-
+from wanglibao_redpack.models import Income, PhpIncome
 
 logger = logging.getLogger("wanglibao_account")
 
@@ -19,8 +18,9 @@ logger = logging.getLogger("wanglibao_account")
 def broker_invite_list(user):
     users = {}
     records = Income.objects.filter(user=user, paid=True).select_related('user__wanglibaouserprofile', 'invite__wanglibaouserprofile').all()
+    php_records = PhpIncome.objects.filter(user=user, paid=True).select_related('user__wanglibaouserprofile', 'invite__wanglibaouserprofile').all()
     first_amount = first_earning = second_amount = second_earning = first_count = second_count = 0
-    first_intro = [] 
+    first_intro = []
     commission = {} 
     for rd in records:
         isNew = False
@@ -43,6 +43,29 @@ def broker_invite_list(user):
             second_earning += rd.earning
             if isNew:
                 second_count += 1
+
+    for rd in php_records:
+        isNew = False
+        if rd.user_id not in users:
+            users[rd.user_id] = rd.user.wanglibaouserprofile
+        if rd.invite_id not in users:
+            isNew = True
+            users[rd.invite_id] = rd.invite.wanglibaouserprofile
+        if rd.invite_id not in commission:
+            commission[rd.invite_id] = {"amount":0, "earning":0}
+        if rd.level == 1:
+            first_amount += rd.amount
+            first_earning += rd.earning
+            if isNew:
+                first_count += 1
+            commission[rd.invite_id]["amount"] += rd.amount
+            commission[rd.invite_id]["earning"] += rd.earning
+        else:
+            second_amount += rd.amount
+            second_earning += rd.earning
+            if isNew:
+                second_count += 1
+
     return {"first_amount":first_amount, "first_earning":first_earning,
             "second_amount":second_amount, "second_earning":second_earning,
             "first_count":first_count, "second_count":second_count,

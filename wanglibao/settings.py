@@ -1209,6 +1209,11 @@ PHP_REDIS_PORT = 6379
 PHP_REDIS_DB = 0
 PHP_REDIS_PASSWORD = ''
 
+if ENV == ENV_PRODUCTION:
+    PHP_REDIS_HOST = '10.172.83.189'
+    PHP_REDIS_PORT = 6379
+    PHP_REDIS_DB = 0
+    PHP_REDIS_PASSWORD = 'wanglibao_ylb.com'
 
 # CACHES = {
 #     'default': {
