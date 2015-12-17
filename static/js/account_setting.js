@@ -74,7 +74,7 @@
     });
 
     /*判断是否设置了交易密码 */
-    return $.ajax({
+    $.ajax({
       url: "/api/profile/",
       type: "GET",
       data: {}
@@ -84,6 +84,27 @@
       } else {
         return $('.new').show();
       }
+    });
+    $.ajax({
+      url: "/api/pay/the_one_card/",
+      type: "GET",
+      data: {}
+    }).fail(function() {
+      return $('#bankIsNoBind').val('false');
+    }).done(function(xhr) {
+      return $('#bankIsNoBind').val('true');
+    });
+
+    /*找回交易密码 */
+    $('#getBackTradingPwd').click(function() {
+      if ($('#bankIsNoBind').val() === 'false') {
+        return $('#goBindingBackWin').modal();
+      } else {
+        return window.location.href = '/accounts/trading/back/';
+      }
+    });
+    return $('#temporaryNot').click(function() {
+      return $.modal.close();
     });
   });
 

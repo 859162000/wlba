@@ -46,9 +46,25 @@
             data: {},
             type: 'GET',
             success: function (data) {
-
+                var strHtml = '<div class="w100 clearfix">'
+                strHtml+='<div class="bank-card">'
+                     +'<div class="bank-card--title-bar row">';
+                if(data.bank.name.length > 14) {
+                  strHtml += '<div class="bank-card--bank-name"><label title="' + data.bank.name + '" class="bankname">' + data.bank.name + '</label>';
+                }else{
+                  strHtml += '<div class="bank-card--bank-name span9"><label>' + data.bank.name +'</label>';
+                }
+                strHtml +='<span class="bindingEd">已绑定</span>'
+                     +'</div><div class="bank-card--icon span3-omega"><img src="/static/images/bank_card.png">'
+                     +'</div></div><div class="row"><dl class="bank-card--info-row">'
+                     +'<dt class="bank-card--info-title">账号</dt>'
+                     +'<dd class="bank-card--info-value">'+ data.no.substring(0,3)+'**** ****' +data.no.substr(data.no.length-4)+'</dd>'
+                     +'</dl></div></div></div>';
+                $('#add-card-button').before(strHtml)
+                $('#add-card-button').hide()
             },
             error : function(){
+                $('#add-card-button').show()
                 $.ajax({
                     url: '/api/pay/cnp/list_new/',
                     data: {},

@@ -24,6 +24,7 @@ block main
         input(type="hidden", name="withdraw_count", value="{{withdraw_count}}")
         input(type="hidden", name="uninvested", value="{{uninvested}}")
         input(type="hidden", name="fee", data-max_amount="{{fee.max_amount}}", data-min_amount="{{fee.min_amount}}")
+        input(type="hidden", name="card_id")
         table.withdraw-table
           tr
             th 持卡人
@@ -82,7 +83,7 @@ block main
                         a(href='javascript:void(0)',tag='2').forget-pwd 设置交易密码
                         span.pop-msg 成功设置交易密码后，才能进行提现操作!
                     .bank-count(style='display:none')
-                        a.add-card-button.blue.margin-top-m(href='/accounts/bankcard/') 添加银行卡
+                        a.add-card-button.blue.margin-top-m(href='/accounts/bankcard/') 绑定银行卡
 
           tr
             td.opt(colspan=2)
@@ -98,7 +99,7 @@ block main
         p 2. 为防止信用卡套现、洗钱等违法行为，网站将针对异常提款（包括提取无消费充值资金）进行严格审核，审核时间在 15 个工作日之后。
         p 3. 提现银行账号的开户名必须与银行卡名一致， 否则提现失败。
         p 4. 提现最高限额：单笔限额50万（民生银行单笔限额5万），单日不限次数
-  #img-code-div2(style="display:none")
+    #img-code-div2(style="display:none")
         form#img-code-form.img-code-form(method='post', action='',tag='')
             .form-row
                 label.img-code-label 请输入验证码：
@@ -109,86 +110,99 @@ block main
             .code-img-error
             .clearfix.tc
                 span.submit-code-img#submit-code-img4 确定
-  #poundageExplain(style="display:none")
-    p.explainTitle 温馨提示
-    .poundageExplain.clearfix
-        p.p1 客户在网利宝提现，将收取一定比例的手续费，具体收取规则如下：
-        p.p2 提现手续费=基本手续费 + 额外手续费
-        p.clearfix
-            span 1、
-            label 基本手续费。每个月前2次提现免收基本手续费，超过2次后的提现基本手续费如下：
-        p.clearfix.pl 提现金额小于等于1万：2元/笔
-        p.clearfix.pl 提现金额大于1万，小于等于5万：3元/笔
-        p.clearfix.pl 提现金额大于5万，5元/笔
-        p.clearfix
-            span 2、
-            label 额外手续费。充值未投资的资金如需要提现，将额外收取提现金额的0.3%，此部分手续费不包含免费范围内。
-  #setTradingPwd(style='display:none')
-    .setTradingPwd.setTradingPwd1
-        .setTitle.tag1
-            span 找回交易密码
-        .setTitle.tag2
-            span 设置交易密码
-            label 为了您的资金安全，请设置交易密码
-        ul
-            li
-                label.label1 第1/2步:
-                span 身份认证
-            li.mt10
-                label 真实姓名
-                span {{user_profile.name}}
-            li
-                label 身份证号码
-                input(type='text',placeholder="请输入身份证号码",name='id').sfz#citizen_id
-                em(style='display:none')#sfzError
-                    i
-                    |
-            li
-                label 绑定银行卡
-                select#card-select1.withdraw-select(name='card_id1')
-                  option(value='') 请选择银行卡
-                  for card in cards
-                    option(value='{{card.id}}') {{card | card_info}}
-                em(style='display:none')#yhkError
+    #poundageExplain(style="display:none")
+        p.explainTitle 温馨提示
+        .poundageExplain.clearfix
+            p.p1 客户在网利宝提现，将收取一定比例的手续费，具体收取规则如下：
+            p.p2 提现手续费=基本手续费 + 额外手续费
+            p.clearfix
+                span 1、
+                label 基本手续费。每个月前2次提现免收基本手续费，超过2次后的提现基本手续费如下：
+            p.clearfix.pl 提现金额小于等于1万：2元/笔
+            p.clearfix.pl 提现金额大于1万，小于等于5万：3元/笔
+            p.clearfix.pl 提现金额大于5万，5元/笔
+            p.clearfix
+                span 2、
+                label 额外手续费。充值未投资的资金如需要提现，将额外收取提现金额的0.3%，此部分手续费不包含免费范围内。
+    #setTradingPwd(style='display:none')
+        .setTradingPwd.setTradingPwd1
+            .setTitle
+                span 找回交易密码
+            ul
+                li
+                    label.label1 第1/2步:
+                    span 身份认证
+                li.mt10
+                    label 真实姓名
+                    span {{user_profile.name}}
+                li
+                    label 身份证号码
+                    input(type='text',placeholder="请输入身份证号码",name='id').sfz#citizen_id
+                    em(style='display:none')#sfzError
                         i
-            li
-                .aa.clearfix
-                    label 银行卡号
-                    input(type='text',placeholder="请输入银行卡号").yhkh
-                    em(style='display:none')#yhkhError
-                        i
-            li.mt28
-                label
-                a(href='javascript:void(0)',data-phone="{{user.wanglibaouserprofile.phone}}").nextBtn#nextBtn 下一步
-  #backTradingPwd(style='display:none')
-    .setTradingPwd.setTradingPwd2
-        .setTitle.tag1
-            span 找回交易密码
-        .setTitle.tag2
-            span 设置交易密码
-            label 为了您的资金安全，请设置交易密码
-        ul
-            li
-                p
-                    label.label1 第2/2步:
-                    span.tag1 重置交易密码
-                    span.tag2 设置交易密码
-                p.textIn 请设置6位数字作为交易密码，如：246802
+                        |
+                li
+                    label 绑定银行卡
+                    span#bindingEdInfo
+                    input(type='hidden' id='bankIsNoBind')
+                li.mt28
+                    label
+                    a(href='javascript:void(0)',data-phone="{{user.wanglibaouserprofile.phone}}").nextBtn#nextBtn 下一步
+    #setTradingPwd2(style='display:none')
+        .setTradingPwd.setTradingPwd2
+            .setTitle
+                span 找回交易密码
+            ul
+                li
+                    p
+                        label.label1 第2/2步:
+                        span 重置交易密码
+                    p.textIn 请设置6位数字作为交易密码，如：246802
 
-            li
-                label 新交易密码
-                input(type='password',placeholder="请输入交易密码",name='new_trade_pwd').sfz#pwd1
-                em(style='display:none')#sfzError
-                    i
-                    |
-            li
-                label 确认交易密码
-                input(type='password',placeholder="请输入交易密码",name='new_trade_pwd').sfz#pwd2
-                em(style='display:none')#yzmError
-                    i
-            li.mt28
-                label
-                a(href='javascript:void(0)').nextBtn#confirmBtn 确认
+                li
+                    label 新交易密码
+                    input(type='password',placeholder="请输入交易密码",name='new_trade_pwd').sfz#pwd1
+                    em(style='display:none')#sfzError
+                        i
+                        |
+                li
+                    label 确认交易密码
+                    input(type='password',placeholder="请输入交易密码",name='new_trade_pwd').sfz#pwd2
+                    em(style='display:none')#yzmError
+                        i
+                li.mt28
+                    label
+                    a(href='javascript:void(0)',tag='1').nextBtn.confirmBtn 确认
+    #backTradingPwd(style='display:none')
+        .setTradingPwd.setTradingPwd2
+            .setTitle
+                span 设置交易密码
+                label 为了您的资金安全，请设置交易密码
+            ul
+                li
+                    p.mb20
+                        span.spanHL 设置交易密码
+                        span.spanHL.textIn 请设置6位数字作为交易密码，如：246802
+                li
+                    label 交易密码
+                    input(type='password',placeholder="请输入交易密码",name='new_trade_pwd').sfz#pwd1
+                    em(style='display:none')#sfzError
+                        i
+                        |
+                li
+                    label 确认交易密码
+                    input(type='password',placeholder="请输入交易密码",name='new_trade_pwd').sfz#pwd2
+                    em(style='display:none')#yzmError
+                        i
+                li.mt28
+                    label
+                    a(href='javascript:void(0)',tag='2').nextBtn.confirmBtn 确认
+    #goBindingBackWin.goBindingBackWin(style='display:none')
+        p.title 温馨提示
+        p 请先绑卡，再设置交易密码
+        p
+            a(href='javascript:void(0)').no#temporaryNot 暂不绑卡
+            a(href='/accounts/bankcard/').yes 去绑卡
   //#bindingBankBox(style="display:none")
   //  .title-s 绑定银行卡
   //      span 请先绑定银行卡，再进行提现操作
@@ -219,7 +233,5 @@ block main
   //              span
   //          .binding-info.clearfix
   //              a(href='javascript:void(0)').btns#withdrawBindingBtn 绑定银行卡
-block script
-  include include/add_card
   script.
-    require(['/static/js/withdraw.js?v=20151118', '/static/js/add_card.js'])
+    require(['/static/js/withdraw.js?v=20151118'])

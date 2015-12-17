@@ -14,6 +14,8 @@ block main
       .panel-title-bar__no-border
         .panel-title 密码管理
     .pwd-management
+        input(type="hidden")#bankIsNoBind
+        - csrf_token
         .pwd-div.clearfix
             span.span1
             .info-fonts
@@ -27,10 +29,16 @@ block main
                 p.p2 6位数字，投资、提现时使用，保证账户资金安全
             .btns
                 p.old(style='display:none')
-                    a(href='/accounts/trading/back/') 找回
+                    a(href='javascript:void(0)')#getBackTradingPwd 找回
                     a(href='/accounts/trading') 修改
                 p.new(style='display:none')
-                    a(href='/accounts/trading/setting/').bg 设置
+                    a(href='/accounts/back/').bg 设置
+  #goBindingBackWin.goBindingBackWin(style='display:none')
+    p.title 温馨提示
+    p 请先绑卡，再设置交易密码
+    p
+        a(href='javascript:void(0)').no#temporaryNot 暂不绑卡
+        a(href='/accounts/bankcard/').yes 去绑卡
 block script
   script.
     require(['/static/js/account_setting.js'])

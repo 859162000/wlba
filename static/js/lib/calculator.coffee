@@ -44,7 +44,7 @@ define ['jquery'], ($)->
       url: "/api/fee/"
       type: "POST"
       data: {
-        card_id : $('select[name=card_id]').val()
+        card_id : $('.bindingCard').attr('gate_id')
         amount : amount
       }
     .success (xhr)->

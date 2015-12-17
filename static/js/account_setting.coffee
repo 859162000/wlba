@@ -61,4 +61,22 @@ require ['jquery', 'jquery.validate', 'lib/backend', 'tools'], ($, validate, bac
       $('.old').show()
     else
       $('.new').show()
+  $.ajax
+      url: "/api/pay/the_one_card/"
+      type: "GET"
+      data: {}
+    .fail ()->
+      $('#bankIsNoBind').val('false')
+    .done (xhr) ->
+      $('#bankIsNoBind').val('true')
+
+  ###找回交易密码###
+  $('#getBackTradingPwd').click ->
+    if $('#bankIsNoBind').val() == 'false'
+      $('#goBindingBackWin').modal();
+    else
+      window.location.href = '/accounts/trading/back/'
+  $('#temporaryNot').click ->
+    $.modal.close()
+
 
