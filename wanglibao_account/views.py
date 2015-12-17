@@ -1382,7 +1382,12 @@ def ajax_register(request):
                     return HttpResponse(messenger('error'))
 
                 # 处理第三方渠道的用户信息
-                CoopRegister(request).all_processors_for_user_register(user, invitecode)
+                # CoopRegister(request).process_for_register(user, invitecode)
+                coop = CoopRegister(user)
+                channel_info = coop.get_channel_info(request)
+                coop.process_for_register(channel_info['invite_code'], channel_info['invite_phone'],
+                                          channel_info['channel_user'], channel_info['channel_extra'])
+
                 auth_user = authenticate(identifier=identifier, password=password)
 
                 auth.login(request, auth_user)
