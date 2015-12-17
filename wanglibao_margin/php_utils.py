@@ -415,23 +415,16 @@ def get_php_redis_principle(user_id):
     :return: 1000   代收本金
     """
     try:
-        redis_obj = PhpRedisBackend()
-        redis_key = 'unpayed_principle_{}'.format(user_id)
-        php_unpaid_principle = redis_obj.redis.get(redis_key)
-        if php_unpaid_principle:
-            return decimal.Decimal(php_unpaid_principle).quantize(Decimal('0.01'))
-
-        else:
-            url = settings.PHP_UNPAID_PRINCIPLE
-            response = requests.post(url, data={'user_id': user_id}).json()
-            try:
-                if response.get('total_amount'):
-                    return decimal.Decimal(response.get('total_amount')).quantize(Decimal('0.01'))
-                else:
-                    return 0
-            except Exception, e:
-                print e
+        url = settings.PHP_UNPAID_PRINCIPLE
+        response = requests.post(url, data={'user_id': user_id}).json()
+        try:
+            if response.get('total_amount'):
+                return decimal.Decimal(response.get('total_amount')).quantize(Decimal('0.01'))
+            else:
                 return 0
+        except Exception, e:
+            print e
+            return 0
     except Exception, e:
         print e
         return 0
