@@ -99,14 +99,6 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
             tool.modalAlert({title: '温馨提示', msg: xhr.message})
             return
 
-  $('#withdrawBindingBtn').click ->
-    par = $(this).parent().parent()
-    bank = par.find('.select_bank')
-    card = par.find('.cardId')
-    btn = $('#withdrawBindingBtn')
-    _checkBankCard(bank,card)
-    _checkPerInfo(btn)
-
   $('.bankPhone').blur ->
      if _checkMobile($(this))
        $('.get-code').addClass('go-get-code')

@@ -14,7 +14,6 @@
   });
 
   require(['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator'], function($, modal, backend, tool, placeholder) {
-<<<<<<< HEAD
     /*判断是否设置了交易密码 */
     $.ajax({
       url: "/api/profile/",
@@ -49,22 +48,6 @@
       reg = new RegExp(/^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/);
       $('.errorS').html('').hide();
       sfzError = parent.find('#sfzError');
-=======
-    /*设置密码提交表单 */
-    $('#nextBtn').click(function() {
-      var id, parent, phone, reg, res, select, sfzError, yhkError, yhkh, yhkhError;
-      parent = $('.setTradingPwd1');
-      phone = $(this).attr('data-phone');
-      id = $.trim(parent.find('.sfz').val());
-      select = $('#card-select1').val();
-      yhkh = $.trim($('.yhkh').val());
-      reg = new RegExp(/^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/);
-      $('.errorS').html('').hide();
-      sfzError = parent.find('#sfzError');
-      yhkError = parent.find('#yhkError');
-      yhkhError = parent.find('#yhkhError');
-      res = /^\d{10,20}$/;
->>>>>>> feature: cherry_pick交易密码 by qijinjin
       if (id === '') {
         sfzError.show().addClass('errorS').html('<i></i>请输入身份证号码');
         return;
@@ -76,7 +59,6 @@
           sfzError.show().removeClass('errorS').html('<i></i>');
         }
       }
-<<<<<<< HEAD
       return $.ajax({
         url: "/api/trade_pwd/",
         type: "POST",
@@ -151,42 +133,6 @@
           title: '温馨提示',
           msg: xhr.message
         });
-=======
-      if (select === '') {
-        yhkError.show().addClass('errorS').html('<i></i>请输选择银行卡');
-        return;
-      } else {
-        yhkError.show().removeClass('errorS').html('<i></i>');
-      }
-      if (yhkh === '') {
-        yhkhError.show().addClass('errorS').html('<i></i>请输入银行卡号');
-        return;
-      } else {
-        if (!res.test(yhkh)) {
-          yhkhError.show().addClass('errorS').html('<i></i>卡号无效');
-          return;
-        } else {
-          yhkhError.show().removeClass('errorS').html('<i></i>');
-        }
-      }
-      return $.ajax({
-        url: "/api/trade_pwd/",
-        type: "POST",
-        data: {
-          action_type: 3,
-          card_id: yhkh,
-          citizen_id: id,
-          requirement_check: 1
-        }
-      }).success(function(date) {
-        if (date.ret_code === 5) {
-        } else {
-          return tool.modalAlert({
-            title: '温馨提示',
-            msg: date.message
-          });
-        }
->>>>>>> feature: cherry_pick交易密码 by qijinjin
       });
     });
   });

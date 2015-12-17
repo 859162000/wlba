@@ -119,15 +119,6 @@
         }
       }
     };
-    $('#withdrawBindingBtn').click(function() {
-      var bank, btn, card, par;
-      par = $(this).parent().parent();
-      bank = par.find('.select_bank');
-      card = par.find('.cardId');
-      btn = $('#withdrawBindingBtn');
-      _checkBankCard(bank, card);
-      return _checkPerInfo(btn);
-    });
     $('.bankPhone').blur(function() {
       if (_checkMobile($(this))) {
         return $('.get-code').addClass('go-get-code');
