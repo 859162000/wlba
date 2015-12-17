@@ -1264,7 +1264,7 @@ class InnerSysSendSMS(APIView, InnerSysHandler):
                 "messages": [message, ]
             })
         except Exception, reason:
-            return Response({"code": 1002, "message": u"发送短信报异常,reason:{0}".format(reason)})
+            return Response({"code": 1002, "message": u"发送短信报异常,reason:%s, status:%s, content:%s" % (reason, status, content)})
         else:
             if status == 200:
                 return Response({"code": 0, "message": u"短信发送成功"})
