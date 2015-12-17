@@ -47,7 +47,7 @@ const validation = {
         }
         return [false, error]
     },
-    idCard(str){
+    bankCard(str){
         const error = '银行卡号不正确',
             re = new RegExp(/^\d{12,20}$/);
         if (re.test($.trim(str)) && !isNaN($.trim(str))) {
@@ -55,7 +55,7 @@ const validation = {
         }
         return [false, error]
     },
-    bankCard(str){
+    idCard(str){
         const error = '身份证号不正确',
             re = new RegExp(/^.{15,18}$/);
         if (re.test($.trim(str)) && !isNaN($.trim(str))) {
