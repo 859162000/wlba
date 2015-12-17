@@ -2,15 +2,9 @@
 # encoding: utf-8
 
 
-def _generate_ajax_template(content, template_name=None):
+def get_sorts_for_created_time(self, queryset, reverse=True):
+    """根据 created_time 对请求集排序（reverse=True降序, False升序）"""
 
-    context = Context({
-        'results': content,
-    })
+    data_list = sorted(queryset, key=lambda asd: asd.created_time, reverse=reverse)
 
-    if template_name:
-        template = get_template(template_name)
-    else:
-        template = Template('<div></div>')
-
-    return template.render(context)
+    return data_list

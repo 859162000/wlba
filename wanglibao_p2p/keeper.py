@@ -509,10 +509,15 @@ class AmortizationKeeper(KeeperBaseMixin):
 
             phone_list = list()
             message_list = list()
+            product_type = amortization.product.types
+            # Modify by ChenWeiBin_20151217
             for sub_amo in sub_amortizations:
-                user_margin_keeper = MarginKeeper(sub_amo.user)
-                user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
-                                            sub_amo.coupon_interest, savepoint=False, description=description)
+                if product_type == u'还款等额兑奖':
+                    pass
+                else:
+                    user_margin_keeper = MarginKeeper(sub_amo.user)
+                    user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
+                                                sub_amo.coupon_interest, savepoint=False, description=description)
 
                 sub_amo.settled = True
                 sub_amo.settlement_time = timezone.now()

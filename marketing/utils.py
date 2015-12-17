@@ -8,7 +8,8 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator, PageNotAnInteger
 from django.db import connection
 from django.db.models import Sum
-from marketing.models import IntroducedBy, PromotionToken, ClientData, Channels, ChannelsNew
+from marketing.models import (IntroducedBy, PromotionToken, ClientData, Channels,
+                              ChannelsNew, P2PReward, P2PRewardRecord)
 from wanglibao_p2p.models import AmortizationRecord, P2PRecord
 from wanglibao.settings import THREE_DEFAULT_CHANNEL_CODE
 import logging
@@ -191,3 +192,9 @@ def pc_data_generator():
         'p2p_register_number':p2p_register_number,
         "p2p_amount_yesterday":float(p2p_amount_yesterday)
     }
+
+
+def generate_p2p_reward_record(user, order_id=None):
+    """生成p2p奖品流水"""
+
+    P2PReward.objects.filter()
