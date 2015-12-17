@@ -458,7 +458,9 @@ webpackJsonp([1],[
 	    function chained(phone, captcha_0, captcha_1) {
 
 	        /**
-	         * 
+	         * 所有的逻辑在这里，获取短信验证码的时候，先检查手机号是否符合，
+	         * 成功后 fetchValidation（发送短信请求）
+	         * 成功后 timerFunction（倒计时）
 	         */
 	        checkOperation(phone).then(function () {
 	            return fetchValidation(phone, captcha_0, captcha_1);
@@ -467,7 +469,7 @@ webpackJsonp([1],[
 	            return timerFunction();
 	        }).catch(function (message) {
 	            (0, _functions.signView)(message);
-	        }).then(function () {}).catch(function (message) {
+	        }).catch(function (message) {
 	            clearInterval(intervalId);
 	            $('button[name=validate_operation]').text('重新获取').removeAttr('disabled');
 	            validation();

@@ -93,7 +93,9 @@ export const validation = ($phone, $captcha_0, $captcha_1, $captcha) => {
     function chained(phone, captcha_0, captcha_1) {
 
         /**
-         * 
+         * 所有的逻辑在这里，获取短信验证码的时候，先检查手机号是否符合，
+         * 成功后 fetchValidation（发送短信请求）
+         * 成功后 timerFunction（倒计时）
          */
         checkOperation(phone)
             .then(()=>{
@@ -105,9 +107,6 @@ export const validation = ($phone, $captcha_0, $captcha_1, $captcha) => {
             })
             .catch((message)=> {
                 signView(message)
-            })
-            .then(()=> {
-
             })
             .catch((message)=> {
                 clearInterval(intervalId);
