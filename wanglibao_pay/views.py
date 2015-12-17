@@ -27,6 +27,7 @@ from rest_framework.throttling import UserRateThrottle
 from order.models import Order
 from order.utils import OrderHelper
 from wanglibao_account.cooperation import CoopRegister
+from wanglibao_account.models import IdVerification
 from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper
 from wanglibao_pay.exceptions import ThirdPayError
@@ -1171,20 +1172,32 @@ class UnbindCardTemplateView(TemplateView):
     """
     同卡进出，提供给客服的解绑页面
     """
-    template_name = ''
+    template_name = 'unbind_card.jade'
 
     def get_context_data(self, **kwargs):
         phone = self.request.GET.get('phone')
         if not phone:
-            return HttpResponseBadRequest('<h1>错误的电话号码</h1>')
+            return {'phone': None}
 
         #解绑
         profile = WanglibaoUserProfile.objects.get(phone=phone)
+        the_one_card = TheOneCard(profile.user)
         if self.request.GET.get('unbind'):
-            TheOneCard(profile.user).unbind()
+            the_one_card.unbind()
 
         #返回用户名，电话，身份证，卡号，有图像返回图像
-        return {'name': profile.name, 'phone': profile.phone, 'social_id': ''}
+        try:
+            card_number = the_one_card.get().no
+        except:
+            card_number = None
+        try:
+            avatar_url = IdVerification.objects.filter(id_number=profile.id_number).first().id_photo.url
+        except:
+            avatar_url = None
+
+        print avatar_url
+        return {'name': profile.name, 'phone': profile.phone, 'social_id': profile.id_number,
+                'card_number': card_number, 'avatar_url': avatar_url}
 
 
 
