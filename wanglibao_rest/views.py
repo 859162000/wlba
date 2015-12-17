@@ -1258,18 +1258,13 @@ class InnerSysSendSMS(APIView, InnerSysHandler):
         status, invalid_msg = super(InnerSysSendSMS, self).judge_valid(request)
         if not status:
             return Response({"code": 1001, "message": invalid_msg})
-        try:
-            status, content = send_messages.apply_async(kwargs={
+
+        send_messages.apply_async(kwargs={
                 "phones": [phone, ],
                 "messages": [message, ]
             })
-        except Exception, reason:
-            return Response({"code": 1002, "message": u"发送短信报异常,reason:%s" % (reason,)})
-        else:
-            if status == 200:
-                return Response({"code": 0, "message": u"短信发送成功"})
-            else:
-                return Response({"code": 1003, "message": u"短信发送失败"})
+
+        return Response({"code": 0, "message": u"短信发送成功"})
 
 
 class InnerSysValidateID(APIView, InnerSysHandler):
