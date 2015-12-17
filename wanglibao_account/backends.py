@@ -279,7 +279,7 @@ def check_age_for_id(id_number):
     if birth_date < current_date:
         # 今年减去出生年得出周岁，如果今年的生日还没过周岁再减一
         age = current_date.year - birth_date.year
-        if int(current_date.strftime('%Y%m%d')[4:]) >= int(birth_date.strftime('%Y%m%d')[4:]):
+        if int(current_date.strftime('%Y%m%d')[4:]) < int(birth_date.strftime('%Y%m%d')[4:]):
             age -= 1
 
         if age >= 18:
