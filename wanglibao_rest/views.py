@@ -1255,16 +1255,16 @@ class InnerSysSendSMS(APIView, InnerSysHandler):
         if phone is None or message is None:
             return Response({"code": 1000, "message": u'传入的phone或message不全'})
 
-        status, message = super(InnerSysSendSMS, self).judge_valid(request)
+        status, invalid_msg = super(InnerSysSendSMS, self).judge_valid(request)
         if not status:
-            return Response({"code":1001, "message": message})
+            return Response({"code": 1001, "message": invalid_msg})
         try:
             status, content = send_messages.apply_async(kwargs={
                 "phones": [phone, ],
                 "messages": [message, ]
             })
         except Exception, reason:
-            return Response({"code": 1002, "message": u"发送短信报异常,reason:%s, status:%s, content:%s" % (reason, status, content)})
+            return Response({"code": 1002, "message": u"发送短信报异常,reason:%s" % (reason,)})
         else:
             if status == 200:
                 return Response({"code": 0, "message": u"短信发送成功"})
