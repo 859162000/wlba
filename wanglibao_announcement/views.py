@@ -1,10 +1,12 @@
 # encoding: utf8
+
 from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.views.generic import TemplateView
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from wanglibao_announcement.models import Announcement
+from django.utils import timezone
 
 
 class AnnouncementHomeView(TemplateView):

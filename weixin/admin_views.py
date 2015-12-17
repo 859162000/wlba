@@ -15,21 +15,28 @@ from .models import Account, Material, MaterialImage, MaterialNews
 from wechatpy.client import WeChatClient
 from wechatpy.exceptions import WeChatException
 from weixin.common.decorators import weixin_api_error
-
+from weixin.models import WeixinAccounts
 
 class AdminWeixinAccountMixin(object):
     account_cache = None
     client_cache = None
 
-    def get_account(self, account_id=None):
-        account_id = account_id or self.request.session.get('account_id')
-        if not account_id:
-            raise Http404()
+    # def get_account(self, account_id=None):
+    #     account_id = account_id or self.request.session.get('account_id')
+    #     if not account_id:
+    #         raise Http404()
+    #     try:
+    #         account = Account.objects.get(pk=int(account_id))
+    #     except Account.DoesNotExist:
+    #         raise Http404('page not found')
+    #     return account
+    def get_account(self, account_key=None):
         try:
-            account = Account.objects.get(pk=int(account_id))
-        except Account.DoesNotExist:
-            raise Http404('page not found')
-        return account
+            account_key = account_key or self.request.session.get('account_key')
+            account = WeixinAccounts.get(account_key)
+            return account
+        except:
+            raise Http404()
 
     @property
     def account(self):
@@ -90,6 +97,7 @@ class WeixinMassView(AdminWeixinTemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(WeixinMassView, self).get_context_data(**kwargs)
+        print self.account.__dict__
         context['account'] = self.account
         return context
 

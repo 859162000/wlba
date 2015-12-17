@@ -17,6 +17,7 @@ PLATFORM = (
     ("android", "android"),
     ("pc", "pc"),
     ("app", "移动端"),
+    ("weixin", "微信"),
 )
 
 
@@ -34,7 +35,14 @@ class RedPackEvent(models.Model):
     amount = models.FloatField(null=False, default=0.0, verbose_name=u'优惠券金额(百分比也为0-100)')
     invest_amount = models.IntegerField(null=False, default=0, verbose_name=u"投资门槛")
     p2p_types = models.ForeignKey(ProductType, verbose_name=u"限定P2P分类", blank=True, null=True, on_delete=models.SET_NULL)
-    period = models.CharField(default='',max_length=200, verbose_name=u'限定产品期限(月/天)', blank=True, help_text=u"如果期限有多个,则用英文逗号 , 隔开")
+    period = models.IntegerField(default=0, max_length=200, verbose_name=u'限定产品期限', blank=True,
+                                 help_text=u"填写整数数字")
+    period_type = models.CharField(default='month', max_length=20, verbose_name=u'产品期限类型', choices=(
+        ('month', u'月'),
+        ('month_gte', u'月及以上'),
+        ('day', u'日'),
+        ('day_gte', u'日及以上'),
+    ), blank=True)
     highest_amount = models.IntegerField(null=False, default=0, verbose_name=u"最高抵扣金额(百分比使用0无限制)")
     value = models.IntegerField(null=False, default=0, verbose_name=u"优惠券个数(不生成兑换码无需修改)")
     describe = models.CharField(max_length=20, verbose_name=u"标注渠道批次等信息", default="")
@@ -48,7 +56,8 @@ class RedPackEvent(models.Model):
                                 ('buy', u'投资'),
                                 ('pay', u'充值'),
                                 ('p2p_audit', u'满标审核'),
-                                ('repaid', u'还款')), default=u"注册")
+                                ('repaid', u'还款'),
+                                ('first_bind_weixin', u'首次绑定微信')), default=u"注册")
     give_platform = models.CharField(max_length=10, verbose_name=u"发放平台", default="全平台", choices=PLATFORM)
     apply_platform = models.CharField(max_length=10, verbose_name=u"使用平台", default="全平台", choices=PLATFORM)
     target_channel = models.CharField(max_length=1000, verbose_name=u"渠道(非邀请码)", blank=True, default="",
@@ -67,21 +76,6 @@ class RedPackEvent(models.Model):
     class Meta:
         verbose_name = u"优惠券活动"
         verbose_name_plural = u"优惠券活动"
-
-    def save(self, *args, **kwargs):
-
-        value = dict()
-        value['available_at'] = self.available_at
-        value['auto_extension'] = self.auto_extension
-        value['auto_extension_days'] = self.auto_extension_days
-        value['unavailable_at'] = self.unavailable_at
-
-        if value['auto_extension'] and \
-            value['available_at'] + timezone.timedelta(days=value['auto_extension_days']) > value['unavailable_at']:
-            value['unavailable_at'] = datetime.datetime.utcnow().replace(tzinfo=timezone.utc) + \
-                                      timezone.timedelta(days=value['auto_extension_days'])
-            self.unavailable_at = value['unavailable_at']
-        return super(RedPackEvent, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return u'%s <%s>' % (self.id, self.name)

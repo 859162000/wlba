@@ -1,0 +1,14 @@
+- load formatters
+doctype html
+html
+  head
+    title 网利宝金融摇滚夜
+    include include/app_head
+  body
+
+    if code == 0
+      .ww(style='font-size: 5rem;text-align: center;color: #20772C;margin-top: 7rem;') YES
+
+    else
+      .ww(style='font-size: 5rem;text-align: center;color: #E03D32;margin-top: 7rem;') NO
+      .oo(style='font-size: 1rem;text-align: center;') {{message}}

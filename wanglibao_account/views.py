@@ -44,7 +44,6 @@ from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import detect_identifier_type, create_user, generate_contract, update_coop_order
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_account import third_login, backends as account_backends, message as inside_message
-from wanglibao_account.forms import EmailOrPhoneAuthenticationForm, TokenSecretSignAuthenticationForm
 from wanglibao_account.serializers import UserSerializer
 from wanglibao_buy.models import TradeHistory, BindBank, FundHoldInfo, DailyIncome
 from wanglibao_p2p.models import P2PRecord, P2PEquity, ProductAmortization, UserAmortization, Earning, \
@@ -73,16 +72,17 @@ from wanglibao_account.utils import get_client_ip
 from wanglibao_account.models import UserThreeOrder
 import requests
 from wanglibao_margin.models import MarginRecord
+from experience_gold.models import ExperienceAmortization, ExperienceEventRecord, ExperienceProduct
 from wanglibao_pay.fee import WithdrawFee
 from wanglibao_account import utils as account_utils
-from experience_gold.models import ExperienceAmortization, ExperienceEventRecord, ExperienceProduct
+from wanglibao_rest.common import DecryptParmsAPIView
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
 
 
 class RegisterView(RegistrationView):
-    template_name = "register_test.jade"
+    template_name = "register_new.jade"
     form_class = EmailOrPhoneRegisterForm
 
     def register(self, request, **cleaned_data):
@@ -293,11 +293,13 @@ def password_change(request,
     # TODO find a proper status value and return error message
     return HttpResponse(status=400)
 
-class PasswordCheckView(APIView):
+class PasswordCheckView(DecryptParmsAPIView):
     permission_classes = ()
     def post(self, request, **kwargs):
-        identifier = request.DATA.get("identifier", "")
-        password = request.DATA.get("password", "")
+        identifier = self.params.get("identifier", "")
+        password = self.params.get("password", "")
+        # identifier = request.DATA.get("identifier", "")
+        # password = request.DATA.get("password", "")
 
         if not identifier or not password:
             return Response({"token":False, "message":u"登录密码错误，请重试"})
@@ -1126,13 +1128,16 @@ class AccountBankCard(TemplateView):
         }
 
 
-class ResetPasswordAPI(APIView):
+class ResetPasswordAPI(DecryptParmsAPIView):
     permission_classes = ()
 
     def post(self, request):
-        password = request.DATA.get('new_password', "")
-        identifier = request.DATA.get('identifier', "")
-        validate_code = request.DATA.get('validate_code', "")
+        password = self.params.get('new_password', "")
+        identifier = self.params.get('identifier', "")
+        validate_code = self.params.get('validate_code', "")
+        # password = request.DATA.get('new_password', "")
+        # identifier = request.DATA.get('identifier', "")
+        # validate_code = request.DATA.get('validate_code', "")
 
         identifier = identifier.strip()
         password = password.strip()
@@ -1158,7 +1163,9 @@ class ResetPasswordAPI(APIView):
             user.save()
             return Response({'ret_code': 0, 'message': u'修改成功'})
         else:
-            return Response({'ret_code': 30004, 'message': u'验证码验证失败'})
+            # Modify by hb on 2015-12-02
+            #return Response({'ret_code': 30004, 'message': u'验证码验证失败'})
+            return Response({'ret_code': 30004, 'message': message})
 
 
 class Third_login(View):
@@ -1175,14 +1182,17 @@ class Third_login_back(APIView):
         return Response(result)
 
 
-class ChangePasswordAPIView(APIView):
+
+class ChangePasswordAPIView(DecryptParmsAPIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        new_password = request.DATA.get('new_password', "").strip()
-        old_password = request.DATA.get('old_password', "").strip()
-        validate_code = request.DATA.get('validate_code', "").strip()
-
+        # new_password = request.DATA.get('new_password', "").strip()
+        # old_password = request.DATA.get('old_password', "").strip()
+        # validate_code = request.DATA.get('validate_code', "").strip()
+        new_password = self.params.get('new_password', "").strip()
+        old_password = self.params.get('old_password', "").strip()
+        validate_code = self.params.get('validate_code', "").strip()
         if not old_password or not new_password or not validate_code:
             return Response({'ret_code': 30041, 'message': u'信息输入不完整'})
 
@@ -1195,7 +1205,9 @@ class ChangePasswordAPIView(APIView):
 
         status, message = validate_validation_code(user.wanglibaouserprofile.phone, validate_code)
         if status != 200:
-            return Response({"ret_code": 30044, "message": u"验证码输入错误"})
+            # Modify by hb 0n 2015-12-02
+            #return Response({"ret_code": 30044, "message": u"验证码输入错误"})
+            return Response({"ret_code": 30044, "message": message})
 
         user.set_password(new_password)
         user.save()
@@ -1267,7 +1279,7 @@ class MessageDetailAPIView(APIView):
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
-def ajax_login(request, authentication_form=EmailOrPhoneAuthenticationForm):
+def ajax_login(request, authentication_form=LoginAuthenticationNoCaptchaForm):
     def messenger(message, user=None):
         res = dict()
         if user:
@@ -1822,7 +1834,7 @@ class AddressAPIView(APIView):
 
         if address_id:
             try:
-                address = UserAddress.objects.get(id=address_id)
+                address = UserAddress.objects.get(id=address_id, user=self.request.user)
                 address.user = request.user
                 address.name = address_name
                 address.address = address_address
@@ -1861,7 +1873,7 @@ class AddressDeleteAPIView(APIView):
             return Response({'ret_code': 3002, 'message': u'ID错误'})
 
         try:
-            address = UserAddress.objects.get(id=address_id)
+            address = UserAddress.objects.get(id=address_id, user=self.request.user)
             address.delete()
             return Response({
                 'ret_code': 0,
@@ -1879,7 +1891,7 @@ class AddressGetAPIView(APIView):
             return Response({'ret_code': 3002, 'message': u'ID错误'})
 
         try:
-            address = UserAddress.objects.get(id=address_id, user=request.user)
+            address = UserAddress.objects.get(id=address_id, user=self.request.user)
             if address:
                 address = {
                     'address_id': address.id,
@@ -2042,7 +2054,7 @@ class ThirdOrderApiView(APIView):
                 'message': u'request_no长度超出'
             }
 
-        if result_code is None:
+        elif result_code is None:
             json_response = {
                 'ret_code': 20004,
                 'message': u'result_code参数缺失'
@@ -2053,7 +2065,7 @@ class ThirdOrderApiView(APIView):
                 'message': u'result_code长度超出'
             }
 
-        if not self.check_params_length(msg, 'msg'):
+        elif not self.check_params_length(msg, 'msg'):
             json_response = {
                 'ret_code': 20007,
                 'message': u'result_code长度超出'
@@ -2068,7 +2080,7 @@ class ThirdOrderApiView(APIView):
     def post(self, request, channel_code):
         if self.is_trust_ip(settings.TRUST_IP, request):
             if get_channel_record(channel_code):
-                params = request.POST
+                params = json.loads(request.POST)
                 request_no = params.get('request_no', None)
                 result_code = params.get('result_code', None)
                 msg = params.get('message', '')
@@ -2111,6 +2123,7 @@ class ThirdOrderQueryApiView(APIView):
                     'ret_code': 50001,
                     'message': 'api error'
                 }
+                logger.error('%s_order_query not found' % channel_code.lower())
         else:
             json_response = {
                 'ret_code': 10002,
@@ -2119,4 +2132,10 @@ class ThirdOrderQueryApiView(APIView):
 
         return HttpResponse(json.dumps(json_response), content_type='application/json')
 
+class FirstPayResultView(TemplateView):
+    template_name = 'register_three.jade'
+
+    def get_context_data(self, **kwargs):
+        first_pay_succeed = PayInfo.objects.filter(user=self.request.user, status=PayInfo.SUCCESS).exists()
+        return {'first_pay_succeed': first_pay_succeed}
 

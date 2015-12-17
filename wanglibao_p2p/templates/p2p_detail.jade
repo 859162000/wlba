@@ -283,7 +283,7 @@ html
                                   .amount-sum ￥{{month.amount_sum|money_format_int}}
             else
               .panel_top_finish_detail
-                a(href="http://www.bj.xinhuanet.com/hbpd/jrpd/jrpd/2015-05/07/c_1115211539.htm", target="_blank")
+                a(href="javascript:void(0)", target="_blank", style='cursor:default ')
 
             if p2p.category != "票据"
               .p2p-detail-container.guarantee-company
@@ -385,7 +385,7 @@ html
             .space-vertical-s
 
     script.
-      require(['/static/js/p2p_detail.js?v=20151130'])
+      require(['/static/js/p2p_detail.js?v=201512011'])
     include global/g_footer
 
     include include/tracking

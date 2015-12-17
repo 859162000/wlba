@@ -15,7 +15,7 @@ from misc.views import MiscRecommendProduction
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib import auth
-from django.db.models import Q, Sum
+from django.db.models import Q, Sum, Count
 from django.shortcuts import redirect, render_to_response
 from django.template import RequestContext
 from django.views.generic import TemplateView
@@ -31,7 +31,8 @@ from wanglibao_account import backends as account_backends
 from wanglibao.permissions import IsAdminUserOrReadOnly
 from wanglibao.PaginatedModelViewSet import PaginatedModelViewSet
 from wanglibao_banner.models import AppActivate
-from wanglibao_p2p.models import ProductAmortization, P2PEquity, P2PProduct, P2PRecord
+from wanglibao_p2p.models import ProductAmortization, P2PEquity, P2PProduct, P2PRecord, \
+    UserAmortization, AmortizationRecord
 from wanglibao_p2p.serializers import P2PProductSerializer
 from wanglibao_rest.utils import split_ua, get_client_ip
 from wanglibao_banner.models import Banner
@@ -43,6 +44,12 @@ from wanglibao_account.forms import verify_captcha
 from wanglibao_app.questions import question_list
 from wanglibao_margin.models import MarginRecord
 from wanglibao_rest import utils
+from wanglibao_activity.models import ActivityShow
+from wanglibao_activity.utils import get_queryset_paginator, get_sorts_for_activity_show
+from wanglibao_announcement.models import AppMemorabilia
+from weixin.util import _generate_ajax_template
+from django.core.paginator import Paginator
+from django.core.paginator import PageNotAnInteger, EmptyPage
 
 logger = logging.getLogger(__name__)
 
@@ -157,6 +164,143 @@ class AppRepaymentAPIView(APIView):
         except Exception, e:
             logger.error(e.message)
             return Response({'ret_code': 20001, 'message': 'fail'})
+
+
+class AppRepaymentPlanAllAPIView(APIView):
+    """ app 用户所有还款计划接口 """
+
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+        page = request.DATA.get('page', 1)
+        pagesize = request.DATA.get('num', 10)
+        page = int(page)
+        pagesize = int(pagesize)
+
+        user_amortizations = UserAmortization.objects.filter(user=user)\
+            .select_related('product_amortization').select_related('product_amortization__product')\
+            .order_by('-term_date')
+        if user_amortizations:
+            paginator = Paginator(user_amortizations, pagesize)
+
+            try:
+                user_amortizations = paginator.page(page)
+            except PageNotAnInteger:
+                user_amortizations = paginator.page(1)
+            except EmptyPage:
+                user_amortizations = []
+            except Exception:
+                user_amortizations = paginator.page(paginator.num_pages)
+
+            amo_list = _user_amortization_list(user_amortizations)
+        else:
+            amo_list = []
+        return Response({'ret_code': 0, 'data': amo_list, 'page': page, 'num': pagesize})
+
+
+class AppRepaymentPlanMonthAPIView(APIView):
+    """ app 用户月份还款计划接口 """
+
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        user = request.user
+        now = datetime.now()
+        request_year = request.DATA.get('year', '')
+        request_month = request.DATA.get('month', '')
+        year = request_year if request_year else now.year
+        month = request_month if request_month else now.month
+        current_month = '{}-{}'.format(now.year, now.month)
+
+        start = local_to_utc(datetime(int(year), int(month), 1), 'min')
+        if int(month) == 12:
+            end = local_to_utc(datetime(int(year) + 1, 1, 1) - timedelta(days=1), 'max')
+        else:
+            end = local_to_utc(datetime(int(year), int(month) + 1, 1) - timedelta(days=1), 'max')
+
+        # 月份/月还款金额/月还款期数
+        if request_year and request_month:
+            amos_group = UserAmortization.objects.filter(user=user)\
+                .filter(term_date__gt=start, term_date__lte=end).order_by('term_date')\
+                .extra({'term_date': "DATE_FORMAT(term_date,'%%Y-%%m')"}).values('term_date')\
+                .annotate(Count('term_date')).annotate(Sum('principal')).annotate(Sum('interest'))\
+                .annotate(Sum('penal_interest')).annotate(Sum('coupon_interest')).order_by('term_date')
+        else:
+            amos_group = UserAmortization.objects.filter(user=user)\
+                .extra({'term_date': "DATE_FORMAT(term_date,'%%Y-%%m')"}).values('term_date')\
+                .annotate(Count('term_date')).annotate(Sum('principal')).annotate(Sum('interest'))\
+                .annotate(Sum('penal_interest')).annotate(Sum('coupon_interest')).order_by('term_date')
+
+        month_group = [{
+            'term_date': amo.get('term_date'),
+            'term_date_count': amo.get('term_date__count'),
+            'total_sum': amo.get('principal__sum') + amo.get('interest__sum') +
+                         amo.get('penal_interest__sum') + amo.get('coupon_interest__sum'),
+            'principal_sum': amo.get('principal__sum'),
+            'interest_sum': amo.get('interest__sum'),
+            'penal_interest_sum': amo.get('penal_interest__sum'),
+            'coupon_interest_sum': amo.get('coupon_interest__sum'),
+        } for amo in amos_group]
+
+        # 当月的还款计划
+        user_amortizations = UserAmortization.objects.filter(user=user)\
+            .filter(term_date__gt=start, term_date__lte=end)\
+            .select_related('product_amortization').select_related('product_amortization__product')\
+            .order_by('term_date')
+        if user_amortizations:
+            amo_list = _user_amortization_list(user_amortizations)
+        else:
+            amo_list = []
+
+        if not amo_list:
+            custom_month_data = {
+                'term_date': current_month,
+                'term_date_count': 0,
+                'total_sum': 0.0,
+                'principal_sum': 0.0,
+                'interest_sum': 0.0,
+                'penal_interest_sum': 0.0,
+                'coupon_interest_sum': 0.0,
+            }
+            month_group.append(custom_month_data)
+            month_group.sort(key=lambda x: x['term_date'])
+
+        return Response({'ret_code': 0,
+                         'data': amo_list,
+                         'month_group': month_group,
+                         'current_month': current_month,
+                         })
+
+
+def _user_amortization_list(user_amortizations):
+    amo_list = []
+    for amo in user_amortizations:
+        if amo.settled:
+            if amo.settlement_time.strftime('%Y-%m-%d') < amo.term_date.strftime('%Y-%m-%d'):
+                status = u'提前回款'
+            else:
+                status = u'已回款'
+        else:
+            status = u'待回款'
+        amo_list.append({
+            'user_amortization_id': amo.id,
+            'product_amortization_id': amo.product_amortization.id,
+            'product_id': amo.product_amortization.product.id,
+            'product_name': amo.product_amortization.product.name,
+            'term': amo.term,
+            'term_total': amo.product_amortization.product.amortization_count,
+            'term_date': amo.term_date,
+            'principal': amo.principal,
+            'interest': amo.interest,
+            'penal_interest': amo.penal_interest,
+            'coupon_interest': amo.coupon_interest,
+            'total_interest': amo.interest + amo.penal_interest + amo.coupon_interest,  # 总利息
+            'settled': amo.settled,
+            'settlement_time': amo.settlement_time,
+            'settlement_status': status
+        })
+    return amo_list
 
 
 class AppDayListView(TemplateView):
@@ -662,7 +806,142 @@ class AppQuestionsResultView(TemplateView):
             "list": result_list,
         }
 
+
 class AppCostView(TemplateView):
 
     """ 费用说明 """
     template_name = 'client_cost_description.jade'
+
+
+class AppAreaView(TemplateView):
+    template_name = 'client_area.jade'
+
+    def get_context_data(self, **kwargs):
+        activity_list = ActivityShow.objects.filter(link_is_hide=False,
+                                                    is_app=True,
+                                                    start_at__lte=timezone.now(),
+                                                    end_at__gt=timezone.now()
+                                                    ).select_related('activity')
+
+        limit = 6
+        page = 1
+
+        activity_list = get_sorts_for_activity_show(activity_list)
+
+        activity_list, all_page, data_count = get_queryset_paginator(activity_list, 1, limit)
+
+        return {
+            'results': activity_list[:limit],
+            'all_page': all_page,
+            'page': page
+        }
+
+
+class AppAreaApiView(APIView):
+    permission_classes = ()
+
+    @property
+    def allowed_methods(self):
+        return ['GET']
+
+    def get(self, request):
+
+        template_name = 'include/ajax/ajax_area_latest.jade'
+
+        activity_list = ActivityShow.objects.filter(link_is_hide=False,
+                                                    is_app=True,
+                                                    start_at__lte=timezone.now(),
+                                                    end_at__gt=timezone.now(),
+                                                    ).select_related('activity')
+
+        activity_list = get_sorts_for_activity_show(activity_list)
+
+        page = request.GET.get('page', 1)
+        pagesize = request.GET.get('pagesize', 6)
+        page = int(page)
+        pagesize = int(pagesize)
+
+        activity_list, all_page, data_count = get_queryset_paginator(activity_list,
+                                                                     page, pagesize)
+
+        html_data = _generate_ajax_template(activity_list, template_name)
+
+        return Response({
+            'html_data': html_data,
+            'page': page,
+            'all_page': all_page,
+        })
+
+
+class AppMemorabiliaView(APIView):
+    permission_classes = ()
+
+    @property
+    def allowed_methods(self):
+        return ['GET']
+
+    def get(self, request):
+        template_name = 'include/ajax/ajax_area_milepost.jade'
+
+        memorabilias = AppMemorabilia.objects.filter(hide_link=False,
+                                                     start_time__lte=timezone.now()
+                                                     ).order_by('-priority')
+
+        page = request.GET.get('page', 1)
+        pagesize = request.GET.get('pagesize', 5)
+        page = int(page)
+        pagesize = int(pagesize)
+
+        memorabilias, all_page, data_count = get_queryset_paginator(memorabilias,
+                                                                    page, pagesize)
+
+        html_data = _generate_ajax_template(memorabilias, template_name)
+
+        return Response({
+            'html_data': html_data,
+            'page': page,
+            'all_page': all_page,
+            'list_count': data_count
+        })
+
+
+# class AppMemorabiliaDetailView(TemplateView):
+#     template_name = 'memorabilia_detail.jade'
+#
+#     def get_context_data(self, id, **kwargs):
+#         context = super(AppMemorabiliaDetailView, self).get_context_data(**kwargs)
+#
+#         try:
+#             memorabilia = (AppMemorabilia.objects.get(pk=id,
+#                                                       hide_link=False,
+#                                                       start_time__lte=timezone.now()))
+#
+#         except AppMemorabilia.DoesNotExist:
+#             raise Http404(u'您查找的大事记不存在')
+#
+#         context.update({
+#             'memorabilia': memorabilia,
+#
+#         })
+#
+#         return context
+
+
+# class AppMemorabiliaPreviewView(TemplateView):
+#     template_name = 'app_memorabilia_preview.jade'
+#
+#     def get_context_data(self, id, **kwargs):
+#         context = super(AppMemorabiliaPreviewView, self).get_context_data(**kwargs)
+#
+#         try:
+#             memorabilia = AppMemorabilia.objects.get(pk=id)
+#
+#         except AppMemorabilia.DoesNotExist:
+#             raise Http404(u'您查找的大事记不存在')
+#
+#         context.update({
+#             'memorabilia': memorabilia,
+#
+#         })
+#
+#         return context

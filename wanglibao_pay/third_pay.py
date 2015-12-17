@@ -34,24 +34,24 @@ def add_bank_card(request):
     gate_id = request.DATA.get("gate_id", "")
 
     if not card_no or not gate_id:
-        return {"ret_code":20021, "message":"信息输入不完整"}
+        return {"ret_code": 20021, "message": u"信息输入不完整"}
 
     if len(card_no) > 25 or not card_no.isdigit():
-        return {"ret_code":20022, "message":"请输入正确的银行卡号"}
+        return {"ret_code": 20022, "message": u"请输入正确的银行卡号"}
     #if card_no[0] in ("3", "4", "5"):
     #    return {"ret_code":20023, "message":"不支持信用卡"}
 
     user = request.user
     bank = Bank.objects.filter(gate_id=gate_id).first()
     if not bank:
-        return {"ret_code":20025, "message":"不支持该银行"}
+        return {"ret_code": 20025, "message": u"不支持该银行"}
 
-    exist_cards = Card.objects.filter(no=card_no, user=user).first()
+    exist_cards = Card.objects.filter(no=card_no).first()
     if exist_cards:
-        return {"ret_code":20024, "message":"该银行卡已经存在"}
+        return {"ret_code": 20024, "message": u"您输入的银行卡号已绑定，请尝试其他银行卡号码，如非本人操作请联系客服"}
     exist_cards = Card.objects.filter(user=user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
     if exist_cards:
-        return {"ret_code":20026, "message":"该银行卡已经存在"}
+        return {"ret_code": 20026, "message": u"您输入的银行卡号已绑定，请尝试其他银行卡号码，如非本人操作请联系客服"}
 
     is_default = request.DATA.get("is_default", "false")
     if is_default.lower() in ("true", "1"):
@@ -182,6 +182,9 @@ def withdraw(request):
     if not user.wanglibaouserprofile.id_is_valid:
         return {"ret_code": 20062, "message": u"请先进行实名认证"}
 
+    if user.wanglibaouserprofile.frozen:
+        return {"ret_code": 20072, "message": u"用户账户已冻结,请联系客服"}
+
     try:
         float(amount)
     except:
@@ -197,7 +200,9 @@ def withdraw(request):
     phone = user.wanglibaouserprofile.phone
     status, message = validate_validation_code(phone, vcode)
     if status != 200:
-        return {"ret_code": 20066, "message": u"验证码输入错误"}
+        # Modify by hb on 2015-12-02
+        #return {"ret_code": 20066, "message": u"验证码输入错误"}
+        return {"ret_code": 20066, "message": message}
 
     card = Card.objects.filter(pk=card_id).first()
     if not card or card.user != user:
@@ -259,7 +264,7 @@ def withdraw(request):
         pay_info.margin_record = margin_record
 
         pay_info.save()
-        return {"ret_code": 0, 'message': u'提现成功', "amount": amount, "phone": phone}
+        return {"ret_code": 0, 'message': u'提现成功', "amount": amount, "phone": phone, "bank_name":bank.name}
     except Exception, e:
         pay_info.error_message = str(e)
         pay_info.status = PayInfo.FAIL
@@ -274,34 +279,35 @@ def card_bind_list(request):
         return {"ret_code": 20071, "message": "请先进行实名认证"}
 
     try:
-        # 查询易宝已经绑定卡
-        res = YeeShortPay().bind_card_query(user=user)
-        if res['ret_code'] not in (0, 20011): return res
-        if 'data' in res and 'cardlist' in res['data']:
-            yee_card_no_list = []
-            for car in res['data']['cardlist']:
-                card = Card.objects.filter(user=user, no__startswith=car['card_top'], no__endswith=car['card_last']).first()
-                if card:
-                    yee_card_no_list.append(card.no)
-            # if yee_card_no_list:
-            #     Card.objects.filter(user=user, no__in=yee_card_no_list).update(is_bind_yee=True)
-            #     Card.objects.filter(user=user).exclude(no__in=yee_card_no_list).update(is_bind_yee=False)
-
-        # 查询块钱已经绑定卡
-        res = KuaiShortPay().query_bind_new(user.id)
-        if res['ret_code'] != 0: return res
-        if 'cards' in res:
-            kuai_card_no_list = []
-            for car in res['cards']:
-                card = Card.objects.filter(user=user, no__startswith=car[:6], no__endswith=car[-4:]).first()
-                if card:
-                    kuai_card_no_list.append(card.no)
-            if kuai_card_no_list:
-                Card.objects.filter(user=user, no__in=kuai_card_no_list).update(is_bind_kuai=True)
-                Card.objects.filter(user=user).exclude(no__in=kuai_card_no_list).update(is_bind_kuai=False)
+        # # 查询易宝已经绑定卡
+        # res = YeeShortPay().bind_card_query(user=user)
+        # if res['ret_code'] not in (0, 20011): return res
+        # if 'data' in res and 'cardlist' in res['data']:
+        #     yee_card_no_list = []
+        #     for car in res['data']['cardlist']:
+        #         card = Card.objects.filter(user=user, no__startswith=car['card_top'], no__endswith=car['card_last']).first()
+        #         if card:
+        #             yee_card_no_list.append(card.no)
+        #     # if yee_card_no_list:
+        #     #     Card.objects.filter(user=user, no__in=yee_card_no_list).update(is_bind_yee=True)
+        #     #     Card.objects.filter(user=user).exclude(no__in=yee_card_no_list).update(is_bind_yee=False)
+        #
+        # # 查询块钱已经绑定卡
+        # res = KuaiShortPay().query_bind_new(user.id)
+        # if res['ret_code'] != 0: return res
+        # if 'cards' in res:
+        #     kuai_card_no_list = []
+        #     for car in res['cards']:
+        #         card = Card.objects.filter(user=user, no__startswith=car[:6], no__endswith=car[-4:]).first()
+        #         if card:
+        #             kuai_card_no_list.append(card.no)
+        #     if kuai_card_no_list:
+        #         Card.objects.filter(user=user, no__in=kuai_card_no_list).update(is_bind_kuai=True)
+        #         Card.objects.filter(user=user).exclude(no__in=kuai_card_no_list).update(is_bind_kuai=False)
 
         card_list = []
-        cards = Card.objects.filter(Q(user=user), Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True)).select_related('bank').order_by('-last_update')
+        cards = Card.objects.exclude(bank__name__in=[u'邮政储蓄银行', u'上海银行', u'北京银行']).filter(Q(user=user),
+                    Q(is_bind_huifu=True) | Q(is_bind_kuai=True) | Q(is_bind_yee=True)).select_related('bank').order_by('-last_update')
         if cards.exists():
             # 排序
             bank_list = [card.bank.gate_id for card in cards]
@@ -340,15 +346,25 @@ def card_bind_list(request):
                     if card.bank.kuai_limit:
                         tmp.update(util.handle_kuai_bank_limit(card.bank.kuai_limit))
 
-                bank_limit = util.handle_withdraw_limit(card.bank.withdraw_limit)  # 银行提现最大最小限额
-                bank_min_amount = bank_limit.get('bank_min_amount')
-                bank_max_amount = bank_limit.get('bank_max_amount')
-                bank_limit_amount = {
-                    "bank_min_amount": bank_min_amount if bank_min_amount and bank_min_amount < min_amount else min_amount,
-                    "bank_max_amount": bank_max_amount if bank_max_amount and bank_max_amount < max_amount else max_amount
-                }
-                tmp.update(bank_limit_amount)
+                # bank_limit = util.handle_withdraw_limit(card.bank.withdraw_limit)  # 银行提现最大最小限额
+                # bank_min_amount = bank_limit.get('bank_min_amount')
+                # bank_max_amount = bank_limit.get('bank_max_amount')
+                # bank_limit_amount = {
+                #     "bank_min_amount": bank_min_amount if bank_min_amount and bank_min_amount < min_amount else min_amount,
+                #     "bank_max_amount": bank_max_amount if bank_max_amount and bank_max_amount < max_amount else max_amount
+                # }
+                # tmp.update(bank_limit_amount)
                 if tmp:
+                    # 更新提现信息
+                    bank_limit = util.handle_withdraw_limit(card.bank.withdraw_limit)  # 银行提现最大最小限额
+                    bank_min_amount = bank_limit.get('bank_min_amount')
+                    bank_max_amount = bank_limit.get('bank_max_amount')
+                    bank_limit_amount = {
+                        "bank_min_amount": bank_min_amount if bank_min_amount and bank_min_amount < min_amount else min_amount,
+                        "bank_max_amount": bank_max_amount if bank_max_amount and bank_max_amount < max_amount else max_amount
+                    }
+                    tmp.update(bank_limit_amount)
+
                     card_list.append(tmp)
 
         return {"ret_code": 0, "message": "ok", "cards": card_list}

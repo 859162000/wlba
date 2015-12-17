@@ -52,7 +52,8 @@ block main
                   br
                   | {{ msg.message_text.content | safe }}
               td {{ msg.message_text.format_time | date:'Y-m-d' }}
-              td
+
+              td.msg-id(data-id='msg_{{msg.id}}')
                 span.icon-msg-arrow-down(id="icon_msg_{{msg.id}}")
       .space-vertical-l
       .row
@@ -63,4 +64,4 @@ block main
 
 block script
   script.
-    require(['/static/js/accounts_message.js'])
+    require(['/static/js/accounts_message.js?v=20151120'])

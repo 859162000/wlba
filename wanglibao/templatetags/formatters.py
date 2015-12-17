@@ -373,3 +373,15 @@ def period_unit(value):
         return u'天'
     else:
         return u'个月'
+
+
+@register.filter
+def period_format(value):
+    if value == 'month_gte':
+        return u'个月以上'
+    elif value == 'day_gte':
+        return u'天以上'
+    elif value == 'day':
+        return u'天'
+    else:
+        return u'个月'

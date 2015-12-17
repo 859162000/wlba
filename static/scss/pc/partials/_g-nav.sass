@@ -36,12 +36,19 @@ $g-nav-height-fixed: 60px
     float: right
     overflow: hidden
     a
+      position: relative
       float: left
       text-align: center
       font-size: $font-m
       padding: 0 20px
       line-height: $g-nav-height
       height: $g-nav-height
+    .nav-news
+      position: absolute
+      top: 14px
+      right: 2px
+      width: 29px
+      height: 17px
   .g-user-warp
     margin-left: 40px
     float: right
@@ -108,3 +115,93 @@ $g-nav-height-fixed: 60px
     height: $g-nav-height-fixed
   .g-nav-user-nav
     top: $g-nav-height-fixed - 1px
+
+.g-small-nav-warp
+  width: 100%
+  height: 35px
+  border-bottom: 1px solid #e3e3e3
+  background: #fff
+
+  .g-small-nav
+    width: 1102px
+    height: 100%
+    margin: 0 auto
+    +clearfix()
+    font-size: 12px
+    color: #282828
+
+  .g-samll-start
+    height: 100%
+    float: left
+    line-height: 34px
+
+  .g-samll-end
+    float: right
+    line-height: 34px
+
+  .samll-nav-hotline, .samll-nav-wechat, .samll-nav-app
+    position: relative
+    display: inline-block
+    margin-right: 30px
+  .samll-nav-hotline
+    background: url("/static/imgs/pc/nav/hotline.png") no-repeat left center
+    padding-left: 25px
+  .samll-nav-wechat
+    background: url("/static/imgs/pc/nav/wechat.png") no-repeat right center
+    padding-right: 28px
+    &:hover
+      background: url("/static/imgs/pc/nav/wechat_hover.png") no-repeat right center
+  .samll-nav-app
+    background: url("/static/imgs/pc/nav/app.png") no-repeat right center
+    padding-right: 28px
+    &:hover
+      background: url("/static/imgs/pc/nav/app_hover.png") no-repeat right center
+  .samll-nav-guide, .samll-nav-user, .samll-nav-logout
+    position: relative
+    display: inline-block
+    padding: 0 10px
+    &:hover
+      color: #fff
+      background: #4e7cda
+
+  .samll-nav-guide, .samll-nav-user
+    &:before
+      content: ''
+      position: absolute
+      top: 50%
+      right: -1px
+      width: 1px
+      height: 10px
+      background: #e3e3e3
+      margin-top: -5px
+
+  .samll-wechat-hover
+    display: none
+    position: absolute
+    top: 52px
+    right: -24px
+    z-index: 1000
+    background: #fff
+    .wechat-hover-body
+      position: relative
+      border: 1px solid #e3e3e3
+      padding: 5px
+      img
+        display: block
+
+    .wechat-hover-san
+      position: absolute
+      top: -11px
+      right: 25px
+      width: 15px
+      height: 11px
+      background: url('/static/imgs/pc/nav/sanjiao.png') no-repeat center
+    .wechat-hover-dec
+      line-height: 25px
+      text-align: center
+      color: #333333
+
+.samll-nav-animate
+  &:hover
+    .samll-wechat-hover
+      display: block

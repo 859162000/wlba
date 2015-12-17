@@ -95,7 +95,7 @@ html
             .dc-head
               .dc-title.font-l
                 i.icon.iconfont.icon-data
-                span 数据统计
+                a(href='/data_cube/',target="_blank") 数据统计
               .dc-time.t-d7.fr 截至 {{site_data.updated_at | milldate_format}}
             .ex-data
               ul
@@ -224,9 +224,10 @@ html
                   .media-time.t-d9 {{news.created_at | date:"Y-m-d"}}
     a.bonus-icon
     .bonus-img(style='display:none')
-        .close
+      a.weixin_btn(href="/activity/pc_caipiao/")
+      .close
     .page(style='display:none')
     include global/g_footer
     script.
-      require(["/static/src/pc/index.js?v=20151130"])
+      require(["/static/src/pc/index.js?v=201511301"])
     include include/tracking
