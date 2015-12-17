@@ -73,7 +73,7 @@ urlpatterns = patterns(
     #url(r'^double_eggs/$', TemplateView.as_view(template_name="double_eggs.jade")),
     url(r'^celebrity/$', TemplateView.as_view(template_name="celebrity.jade")),
     #url(r'^xunlei_one/$', TemplateView.as_view(template_name="xunlei_one.jade")),
-    #url(r'^broken_million/$', TemplateView.as_view(template_name="broken_million.jade")),
+    url(r'^broken_million/$', TemplateView.as_view(template_name="broken_million.jade")),
 )
 
 # app URL
