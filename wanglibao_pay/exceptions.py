@@ -28,4 +28,8 @@ class CardException(Exception):
 
 
 class ManyCardException(CardException):
+    message = u"银行卡数量重复"
+
+
+class AbnormalCardException(CardException):
     message = u"银行卡异常"

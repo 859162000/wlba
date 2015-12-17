@@ -206,3 +206,24 @@ class PayResult(object):
     WITHDRAW_FAIL = u'提现失败'
     RETRY = u'系统内部错误，请重试'
     EXCEPTION = u'系统内部错误，请联系客服'
+
+
+class WhiteListCard(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    card_no = models.CharField(max_length=25, verbose_name=u'银行卡号', db_index=True)
+    create_time = models.DateTimeField(u'添加时间', auto_now_add=True, db_index=True)
+    message = models.CharField(u'操作信息', max_length=100, blank=True)
+
+    class Meta:
+        verbose_name_plural = u'银行卡白名单'
+
+
+class BlackListCard(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    card_no = models.CharField(max_length=25, verbose_name=u'银行卡号', db_index=True)
+    create_time = models.DateTimeField(u'添加时间', auto_now_add=True, db_index=True)
+    message = models.CharField(u'操作信息', max_length=100, blank=True)
+    ip = models.CharField(u'IP地址', max_length=50, blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = u'银行卡黑名单'
