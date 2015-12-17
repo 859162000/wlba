@@ -57,11 +57,7 @@
 		})
 
 		$('.recharge_button').click(function(){
-			if(h5_user_static){
-				window.location.href = '/pay/banks/'
-			}else{
-				window.location.href = '/accounts/login/?next=/pay/banks/'
-			}
+			window.location.href = '/p2p/list/'
 		});
 
         $('.investment_button').click(function(){
