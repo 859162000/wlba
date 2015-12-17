@@ -216,7 +216,7 @@ require ['jquery', 'underscore', 'lib/backend', 'lib/calculator', 'lib/countdown
             return
           else if result.error_number == 4 && result.message == "余额不足"
             tool.modalAlert({btnText:"去充值", title: '温馨提示', msg: result.message, callback_ok: ()->
-              window.location.href = '/pay/banks_for_register/'
+              window.location.href = '/pay/banks/'
             })
             return
 

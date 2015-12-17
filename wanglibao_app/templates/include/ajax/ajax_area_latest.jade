@@ -1,14 +1,14 @@
 
 if results
   for activity in results
-    .area-list
+    a(href='{{activity.app_detail_link}}').area-list
       .area-ac-head {{activity.activity.name}}
       .area-ac-banner
         .area-ac-time {{activity.activity_status}}
         img(src='/media/{{activity.app_banner}}')
       .area-ac-dec {{activity.app_description}}
       .area-ac-line
-      a(href='{{activity.pc_detail_link}}').area-ac-footer 立即查看
+      .area-ac-footer 立即查看
 else
 
   .unactivty 暂无活动

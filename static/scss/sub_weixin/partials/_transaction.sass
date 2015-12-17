@@ -1,0 +1,76 @@
+.transaction-main
+  //display: none
+
+
+.transaction-list
+  background: #fff
+  font-size: $font-size12
+  margin-bottom: $margin-bottom
+  .transaction-tit
+    padding: .5rem
+    display: -webkit-box
+    display: -ms-flexbox
+    -webkit-box-align: center
+    .tit-name
+      text-align: left
+      color: $color-grey-6b6b6b
+      -webkit-box-flex: 1
+      -ms-flex: 1
+      white-space: nowrap
+      text-overflow: ellipsis
+      overflow: hidden
+      font-size: $font-size14
+      .tit-name-div
+        display: inline-block
+        font-size: $font-size14
+        background: #5DB5F2
+        margin-right: .2rem
+    .tit-time
+      text-align: right
+      color: #ccc
+      font-size: $font-size10
+  .transaction-cont
+    display: -webkit-box
+    display: -ms-flexbox
+    padding: .3rem 0 .7rem 0
+    .cont-money-left
+      -webkit-box-flex: 1
+      -ms-flex: 1
+      text-align: left
+      padding-left: 1rem
+      p:first-child
+        font-size: $font-size14
+        color: #666
+        margin-bottom: .35rem
+      p:last-child
+        font-size: $font-size12
+        color: #CCC
+    .cont-money-center
+      @extend  .cont-money-left
+      p:first-child
+        color: #FF4C2E
+    .cont-money-right
+      @extend  .cont-money-left
+  .transaction-footer
+    color: #5DB5F2
+    display: -webkit-box
+    display: -ms-flexbox
+    a
+      display: block
+      -webkit-box-flex: 1
+      -ms-flex: 1
+      text-align: center
+      border-top: 1px solid $color-grey-e8e8e8
+      padding: .5rem 0
+
+
+.none-data
+  text-align: center
+  font-size: $font-size12
+  color: $color-grey-989898
+  margin-top: 2rem
+  img
+    display: inline-block
+    width: 7rem
+    height: 7rem
+    margin: 1rem 0 .5rem 0

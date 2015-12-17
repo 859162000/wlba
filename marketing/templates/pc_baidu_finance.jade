@@ -6,16 +6,24 @@ html
     - with '网利宝' as title
     include include/pc_screen
     - endwith
-    link(rel="stylesheet", href="/static/styles/pc_activity/pc_Newgive.css?v=20151104")
+    link(rel="stylesheet", href="/static/styles/pc_activity/pc_Newgive.css?v=20151215")
   body(style="background:#fff")
     include global/g_nav
+
+
+    if user.is_authenticated
+      input(type='hidden', name='is_authenticated', value='true')
+      input( type="hidden", value="{{original_id}}", name="original_id")
+      input( type="hidden", value="{{code}}", name="weixin_code")
+    else
+      input(type='hidden', name='is_authenticated', value='false')
 
     .wrap#ganjiwang-banner
       .g-banner-slide-baidu
         .g-slide
-          if token == 'bdjr'
-            .slide-banner(style="display:block; background-image:url('/static/imgs/pc_activity/newgive/banner1_sign.jpg')")
-            .slide-banner(style="display:none; background-image:url('/static/imgs/pc_activity/newgive/banner2_sign.jpg')")
+          if token == 'google1'
+            .slide-banner(style="display:block; background-image:url('/static/imgs/pc_activity/newgive/banner1_signnew.jpg')")
+            .slide-banner(style="display:none; background-image:url('/static/imgs/pc_activity/newgive/banner2_signnew.jpg')")
           else
             .slide-banner(style="display:block; background-image:url('/static/imgs/pc_activity/newgive/banner1_unsign.jpg')")
             .slide-banner(style="display:none; background-image:url('/static/imgs/pc_activity/newgive/banner2_unsign.jpg')")
@@ -30,7 +38,7 @@ html
             .regist-su-body
               h4 欢迎来到网利宝投资理财
               p 你的登录账户：{{user|display_name}}
-              img(src='/static/imgs/pc_activity/newgive/erweima.jpg')
+              div.erweima-img
               a(href='/accounts/home/').regist-for-account 进入我的帐户
 
         else
@@ -187,7 +195,9 @@ html
               img(src="/static/imgs/pc_activity/newgive/list4.png")
             dd
               span 新手投资理财最高送<b>180</b>元红包
-        a.gv_touzbtn.clear(href="javascript:void(0);", style="color:white") 立即投资
+        .gv_touzbtn-warp(style='text-align:center;margin:40px 0')
+          a.gv_touzbtn.clear(href="javascript:void(0);", style="color:white;display:inline-block;margin: 0;") 立即投资
+          div(style='font-size:20px;display:block;') 投资有风险，理财需谨慎
 
     .bd-finance-bodyimg
       img(src='/static/imgs/pc_activity/newgive/about.jpg')
@@ -216,5 +226,5 @@ html
             p 3. 首投所赠50元红包单笔投资满5000元可直抵使用、100元红包单笔投资满8000元可直抵使用、180元红包单笔投资满12000元可直抵使用。有效期自领取日起15天内有效；
     include global/g_footer
   script.
-    var v = new Date().getTime()
     require(["/static/js/newgive.js?v=20151020"])
+  include include/tracking

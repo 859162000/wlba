@@ -96,5 +96,28 @@
 
         })
 
+        $(function(){
+
+            ~function getCode(){//得到用户信息的二维码
+                var $is_authenticated = $("input[name=is_authenticated]").val();
+                if($is_authenticated == 'false') return
+
+                var original_id = $("input[name=original_id]").val(),
+                    code = $('input[name=weixin_code]').val(),
+                    $erweima = $('.erweima-img');
+
+                $.ajax({
+                    url: "/weixin/api/generate/qr_scene_ticket/",
+                    data: {"original_id":original_id, "code": code}, //c:gh_32e9dc3fab8e, w:gh_f758af6347b6;code:微信关注渠道
+                    success: function (data) {
+                        $erweima.html('<img src="'+data.qrcode_url+'"/>');
+                    },
+                    error: function(){
+                        $erweima.html('<img src="'+data.qrcode_url+'"/>');
+                    }
+                });
+            }();
+        })
+
     });
 }).call(this);

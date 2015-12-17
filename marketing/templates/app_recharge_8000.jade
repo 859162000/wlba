@@ -1,0 +1,47 @@
+- load formatters
+doctype html
+html(style="background: #3c0972")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile_activity/app_recharge_8000.css?v=1201001", rel="stylesheet")
+        - csrf_token
+    body
+        img.banner(src="/static/imgs/mobile_activity/app_recharge_8000/banner_1.jpg")
+        img.banner(src="/static/imgs/mobile_activity/app_recharge_8000/banner_2.jpg")
+        .body_main
+            .top_title 喜迎12月财神召唤日，充值就送高额红包！年度最强红包大赏火热来袭，红包有效仅2天，不容错过！新老用户均可参与哦。
+            .big_title 召唤红包攻略
+            .act_text 活动期间单笔充值≥8000元，立送800元组合红包！多充多得，上不封顶！
+            .red_wrap
+                .red_box.first
+                    img.red_img(src="/static/imgs/mobile_activity/app_recharge_8000/red_img_1.png")
+                    .text 单笔投资满10000可用
+                .red_box.second
+                    img.red_img(src="/static/imgs/mobile_activity/app_recharge_8000/red_img_2.png")
+                    .text 单笔投资满25000可用
+                .red_box.last
+                    img.red_img(src="/static/imgs/mobile_activity/app_recharge_8000/red_img_3.png")
+                    .text 单笔投资满85000可用
+            .button(href='/pay/banks/')
+                img(src="/static/imgs/mobile_activity/app_recharge_8000/button.png")
+            .button_text 红包统一以站内信形式通知，用户可在我的账户--理财券中的红包列表中查看。
+            dl.rule
+                dt 【红包使用规则】
+                dd 1、红包有效期：12月11日0:00-12日23:59；
+                dd 2、活动期间新老用户均可参与，满足投资条件多充多得，上不封顶！充值所赠红包限投3月以上标期；
+                dd 3、充值送所得红包，可在投资时直抵现金使用（例：投资10000元，使用50元红包后实际投资金额为9950元）；
+                dd 4、50红包满10000可用，150红包满25000可用，600红包满85000可用，限三月以上，每次充值8000都有800红包；
+                dd 5、红包不可与加息券同时使用，红包只限使用一次，使用后无论是否有余额均失效；
+                dd 6 、本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑。
+                dd(style="display:none")#ios-show 7 、所有活动由网利宝提供，与苹果公司（Apple Inc.）无关。
+        script(src='/static/src/mobile/lib/weixin/wx.js')
+        script(src="/static/scripts/component/webview.js")
+        script(src="/static/scripts/mobile_activity/dist/app_recharge_8000.js?v=120801")
+        script.
+            var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+                iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+                ios = ipad || iphone;
+            if (ios) {
+                document.getElementById('ios-show').style.display = 'block';
+            }

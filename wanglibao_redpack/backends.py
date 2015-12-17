@@ -381,8 +381,8 @@ def give_first_pay_redpack(user, device_type):
 def give_first_buy_redpack(user, device_type):
     _give_redpack(user, "first_buy", device_type)
 
-def give_first_bind_wx_redpack(user, device_type):
-    return _give_one_redpack(user, 'first_bind_weixin', u'首次绑定微信红包', device_type)
+# def give_first_bind_wx_redpack(user, device_type):
+#     return _give_one_redpack(user, 'first_bind_weixin', u'首次绑定微信红包', device_type)
 
 
 def give_buy_redpack(user, device_type, give_mode='buy', describe=''):
@@ -425,37 +425,37 @@ def _give_redpack(user, give_mode, device_type):
                 _send_message(user, event, end_time)
 
 
-def _give_one_redpack(user, give_mode, describe, device_type):
-    now = timezone.now()
-    user_ch = helper.which_channel(user)
-    device_type = _decide_device(device_type)
-    rps = RedPackEvent.objects.filter(give_mode=give_mode, describe=describe, invalid=False, give_start_at__lt=now, give_end_at__gt=now).first()
-    if rps:
-        #if x.target_channel != "" and user_ch != x.target_channel:
-        if rps.target_channel != "":
-            chs = rps.target_channel.split(",")
-            chs = [m for m in chs if m.strip()!=""]
-            if user_ch not in chs:
-                return None
-        redpack = RedPack.objects.filter(event=rps, status="unused").first()
-        if redpack:
-            event = redpack.event
-            give_pf = event.give_platform
-            if give_pf == "all" or give_pf == device_type:
-                if redpack.token != "":
-                    redpack.status = "used"
-                    redpack.save()
-                record = RedPackRecord()
-                record.user = user
-                record.redpack = redpack
-                record.change_platform = device_type
-                record.save()
-
-                start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
-                                                          record.created_at, event.available_at, event.unavailable_at)
-                _send_message(user, event, end_time)
-                return record.id
-    return None
+# def _give_one_redpack(user, give_mode, describe, device_type):
+#     now = timezone.now()
+#     user_ch = helper.which_channel(user)
+#     device_type = _decide_device(device_type)
+#     rps = RedPackEvent.objects.filter(give_mode=give_mode, describe=describe, invalid=False, give_start_at__lt=now, give_end_at__gt=now).first()
+#     if rps:
+#         #if x.target_channel != "" and user_ch != x.target_channel:
+#         if rps.target_channel != "":
+#             chs = rps.target_channel.split(",")
+#             chs = [m for m in chs if m.strip()!=""]
+#             if user_ch not in chs:
+#                 return None
+#         redpack = RedPack.objects.filter(event=rps, status="unused").first()
+#         if redpack:
+#             event = redpack.event
+#             give_pf = event.give_platform
+#             if give_pf == "all" or give_pf == device_type:
+#                 if redpack.token != "":
+#                     redpack.status = "used"
+#                     redpack.save()
+#                 record = RedPackRecord()
+#                 record.user = user
+#                 record.redpack = redpack
+#                 record.change_platform = device_type
+#                 record.save()
+#
+#                 start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
+#                                                           record.created_at, event.available_at, event.unavailable_at)
+#                 _send_message(user, event, end_time)
+#                 return record.id
+#     return None
 
 
 #发放奖励类型的红包
@@ -499,6 +499,51 @@ def give_activity_redpack(user, event, device_type, just_one_packet=False, check
     _send_message(user, event, end_time)
     return True,""
 
+# Add by hb on 2015-12-14
+def give_activity_redpack_new(user, event, device_type, just_one_packet=False, check_issue_time=False):
+    """
+
+    :param user:
+    :param event: 支持RedPackEevent对象或是一个event的名字
+    :param device_type:
+    :param just_one_packet: 置为True，对于某个红包活动用户只能获得一个红包，不能获得多个
+    :param check_issue_time：检查发放时间，超期不发放
+    :return:
+    """
+    device_type = _decide_device(device_type)
+    # 后台设置必须保证红包的event不重名
+    if not isinstance(event, RedPackEvent):
+        try:
+            event = RedPackEvent.objects.get(name=event)
+        except:
+            return False, u"活动名称错误", 0
+    #检查红包发放时间
+    now = timezone.now()
+    if now < event.give_start_at or now > event.give_end_at:
+        return False, u'活动已过期', 0
+    redpack = RedPack.objects.filter(event=event, status="unused").first()
+    if not redpack:
+        return False, u"没有此优惠券", 0
+    if redpack.token != "":
+        redpack.status = "used"
+        redpack.save()
+    if just_one_packet and RedPackRecord.objects.filter(redpack=redpack, user=user).exists():
+        return False, u"限领一个红包", 0
+    record = RedPackRecord()
+    record.user = user
+    record.redpack = redpack
+    record.change_platform = device_type
+    record.save()
+
+    start_time, end_time = get_start_end_time(event.auto_extension, event.auto_extension_days,
+                                              record.created_at, event.available_at, event.unavailable_at)
+    _send_message(user, event, end_time)
+
+    redpack_record_id = 0
+    if record and record.id:
+        redpack_record_id = record.id
+
+    return True, "", redpack_record_id
 
 def consume(redpack, amount, user, order_id, device_type, product_id):
     amount = fmt_two_amount(amount)

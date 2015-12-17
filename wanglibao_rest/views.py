@@ -59,6 +59,8 @@ from wanglibao_redpack.models import Income
 from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from common import DecryptParmsAPIView
+import requests
+
 
 logger = logging.getLogger('wanglibao_rest')
 
@@ -319,7 +321,7 @@ class RegisterAPIView(DecryptParmsAPIView):
         if request.DATA.get('IGNORE_PWD'):
             send_messages.apply_async(kwargs={
                 "phones": [identifier,],
-                "messages": [u'【网利科技】用户名： '+identifier+u'; 登录密码:'+password,]
+                "messages": [u'您已成功注册网里宝,用户名为'+identifier+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
             })
 
             logger.debug("此次 channel:%s" %(channel))
@@ -1249,7 +1251,7 @@ class InnerSysSendSMS(APIView, InnerSysHandler):
     def post(self, request):
         phone = request.DATA.get("phone", None)
         message = request.DATA.get("message", None)
-        print phone, message
+        logger.debug("phone:%s, message:%s" % phone, message)
         if phone is None or message is None:
             return Response({"code": 1000, "message": u'传入的phone或message不全'})
 
@@ -1314,8 +1316,9 @@ class InnerSysSaveChannel(APIView, InnerSysHandler):
 
     def post(self, request):
         code = request.DATA.get("code", None)
-        if not code:
-            return Response({"code": 1000, "message": u'渠道号为空值'})
+        description = request.DATA.get("description", None)
+        if not code or not description:
+            return Response({"code": 1000, "message": u'渠道号或渠道描述为空值'})
 
         status, message = super(InnerSysSaveChannel, self).judge_valid(request)
         if not status:
@@ -1325,7 +1328,7 @@ class InnerSysSaveChannel(APIView, InnerSysHandler):
         if channel.exists():
             return Response({"code": 1002, "message": u'渠道号已经存在'})
         try:
-            Channels.objects.create(code=code)
+            Channels.objects.create(code=code, description=description)
         except Exception, reason:
             return Response({"code": 1003, "message": u'创建渠道报异常,reason:{0}'.format(reason)})
         else:
@@ -1392,3 +1395,32 @@ class DistributeRedpackView(APIView):
                         }
                         return HttpResponse(json.dumps(data), content_type='application/json')
 
+
+class DataCubeApiView(APIView):
+    """
+    数据魔方查询接口
+    chenweibin@20151208
+    """
+    permission_classes = ()
+
+    def __init__(self):
+        super(DataCubeApiView, self).__init__()
+        self.request_url = settings.DATACUBE_URL
+
+    def get(self, request):
+        try:
+            data = requests.get(url=self.request_url).json()
+            _response = {
+                'ret_code': 10000,
+                'message': 'success',
+                'result': data,
+            }
+        except Exception, e:
+            logger.exception('data cupe connect faild to %s' % self.request_url)
+            logger.exception(e)
+            _response = {
+                'ret_code': 50001,
+                'message': 'api error',
+            }
+
+        return HttpResponse(json.dumps(_response), content_type='application/json')

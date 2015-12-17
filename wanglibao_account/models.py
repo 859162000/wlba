@@ -9,8 +9,6 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.utils import timezone
 from marketing.models import Channels, ChannelsNew
-from . import get_verify_result
-from wanglibao.settings import ENV, ENV_PRODUCTION
 
 
 class IdVerification(models.Model):
@@ -24,27 +22,15 @@ class IdVerification(models.Model):
     id_photo = models.ImageField(upload_to='id_photos', blank=True, null=True,
                                  verbose_name=u'身份证头像')
     is_valid = models.BooleanField(u"验证结果", default=False)
+    description = models.CharField(u"验证结果描述", max_length=100, blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     update_verify = models.BooleanField(u"更新", default=False)
 
     class Meta:
         verbose_name_plural = u'实名认证记录'
 
-    def save(self, *args, **kwargs):
-        if self.update_verify is True:
-            self.update_verify = False
-
-            # 只有生产环境可以实现更新操作
-            if ENV == ENV_PRODUCTION:
-                verify_result, _id_photo = get_verify_result(self.id_number, self.name)
-                if verify_result and _id_photo:
-                    self.id_photo.save('%s.jpg' % self.id_number, _id_photo, save=True)
-
-        super(IdVerification, self).save(*args, **kwargs)
-
     def __unicode__(self):
         return u'%s %s %d' % (self.id_number, self.name, self.is_valid)
-
 
 
 class VerifyCounter(models.Model):
