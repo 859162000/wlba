@@ -9,10 +9,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from wanglibao_account.cooperation import get_phone_for_coop
-from wanglibao_p2p.models import P2PProduct, UserAmortization
+from wanglibao_p2p.models import P2PProduct, UserAmortization, AmortizationRecord
 from wanglibao.const import ErrorNumber
 from .forms import FuelCardBuyForm
 from .trade import P2PTrader
+from .utils import get_sorts_for_created_time
 
 
 class FuelCardBuyApi(APIView):
@@ -70,17 +71,11 @@ class FuelCardBugRecordView(TemplateView):
 
     template_name = 'fuel_records_audit.jade'
 
-    def get_sorts_for_created_time(self, queryset):
-        """根据 created_time 对请求集排序（降序）"""
-
-        data_list = sorted(queryset, key=lambda asd: asd.created_time, reverse=True)
-
-        return data_list
-
     def get_user_amortizations(self, settled):
         """获取用户还款计划"""
 
-        user_amotization = UserAmortization.objects.filter(user=self.request.user, settled=settled
+        user_amotization = UserAmortization.objects.filter(user=self.request.user, settled=settled,
+                                                           product_amortization__product_category=u'加油卡'
                                                            ).select_related(depth=2)
         user_amotization = user_amotization.order_by('product_amortization__product_id', 'term')
 
@@ -92,7 +87,7 @@ class FuelCardBugRecordView(TemplateView):
                 ua_list.append(ua_tmp)
                 ua_tmp = ua
 
-        return self.get_sorts_for_created_time(ua_list)
+        return get_sorts_for_created_time(ua_list)
 
     def get_context_data(self, **kwargs):
         _status = self.request.GET.get('status', '').strip()
@@ -122,29 +117,15 @@ class FuelCardExchangeRecordView(TemplateView):
 
     template_name = 'fuel_records_exchange.jade'
 
-    def get_sorts_for_created_time(self, queryset):
-        """根据 created_time 对请求集排序（降序）"""
-
-        data_list = sorted(queryset, key=lambda asd: asd.created_time, reverse=True)
-
-        return data_list
-
     def get_user_amortizations(self, settled):
         """获取用户还款计划"""
 
-        user_amotization = UserAmortization.objects.filter(user=self.request.user, settled=settled
-                                                           ).select_related(depth=2)
-        user_amotization = user_amotization.order_by('product_amortization__product_id', 'term')
+        amotization_record = AmortizationRecord.objects.filter(user=self.request.user,
+                                                               product_amortization__product_category=u'加油卡'
+                                                               ).select_related(depth=2)
+        user_amotization = amotization_record.order_by('c', 'term')
 
-        ua_list = []
-        ua_tmp = user_amotization.first()
-        ua_list.append(ua_tmp)
-        for ua in user_amotization:
-            if ua.product_amortization.product != ua_tmp.product_amortization.product:
-                ua_list.append(ua_tmp)
-                ua_tmp = ua
-
-        return self.get_sorts_for_created_time(ua_list)
+        return get_sorts_for_created_time(user_amotization)
 
     def get_context_data(self, **kwargs):
         _status = self.request.GET.get('status', '').strip()
