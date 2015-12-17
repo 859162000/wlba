@@ -30,8 +30,9 @@ from order.utils import OrderHelper
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper
-from wanglibao_pay.exceptions import ThirdPayError, ManyCardException
-from wanglibao_pay.models import Bank, Card, PayResult, PayInfo, WithdrawCard, WithdrawCardRecord
+from wanglibao_pay.exceptions import ThirdPayError, ManyCardException, AbnormalCardException
+from wanglibao_pay.models import Bank, Card, PayResult, PayInfo, WithdrawCard, WithdrawCardRecord, \
+    WhiteListCard, BlackListCard
 from wanglibao_pay.huifu_pay import HuifuPay, SignException
 from wanglibao_pay import third_pay, trade_record
 from wanglibao_p2p.models import P2PRecord
@@ -328,16 +329,39 @@ class WithdrawCompleteView(TemplateView):
 
         result = PayResult.WITHDRAW_SUCCESS
 
-        # 获取费率配置
-        fee_misc = WithdrawFee()
-        fee_config = fee_misc.get_withdraw_fee_config()
-
         try:
+            card_id = request.POST.get('card_id', '')
+            card = Card.objects.get(pk=card_id, user=user)
+            card_no = card.no
+
+            # 检测银行卡是否在黑名单中
+            black_list = BlackListCard.objects.filter(card_no=card_no).first()
+            if black_list and black_list.user != user:
+                raise AbnormalCardException
+
+            # 检查白名单
+            white_list = WhiteListCard.objects.filter(user=user, card_no=card_no).first()
+            if not white_list:
+                # 增加银行卡号检测功能,检测多张卡
+                card_count = Card.objects.filter(no=card_no).count()
+                if card_count > 1:
+                    raise ManyCardException
+
+                # 检测银行卡在以前的提现记录中是否为同一个用户
+                payinfo_record = PayInfo.objects.filter(card_no=card_no).order_by('-create_time').first()
+                if payinfo_record:
+                    if payinfo_record.user != user:
+                        raise AbnormalCardException
+
             amount_str = request.POST.get('amount', '')
             amount = decimal.Decimal(amount_str). \
                 quantize(TWO_PLACES, context=decimal.Context(traps=[decimal.Inexact]))
             margin = user.margin.margin  # 账户余额
             uninvested = user.margin.uninvested  # 充值未投资金额
+
+            # 获取费率配置
+            fee_misc = WithdrawFee()
+            fee_config = fee_misc.get_withdraw_fee_config()
 
             # 计算提现费用 手续费 + 资金管理费
             # 提现最大最小金额判断
@@ -352,15 +376,6 @@ class WithdrawCompleteView(TemplateView):
             actual_amount = amount - fee - management_fee  # 实际到账金额
             if actual_amount <= 0:
                 raise decimal.DecimalException
-
-            card_id = request.POST.get('card_id', '')
-            card = Card.objects.get(pk=card_id, user=user)
-
-            # 增加银行卡号检测功能
-            card_no = card.no
-            card_count = Card.objects.filter(no=card_no).count()
-            if card_count > 1:
-                raise ManyCardException
 
             # 检测个别银行的单笔提现限额,如民生银行
             bank_limit = util.handle_withdraw_limit(card.bank.withdraw_limit)
@@ -405,7 +420,9 @@ class WithdrawCompleteView(TemplateView):
         except Card.DoesNotExist:
             result = u'请选择有效的银行卡'
         except ManyCardException:
-            result = u'银行卡号存在异常，请尝试其他银行卡号码，如非本人操作请联系客服'
+            result = u'银行卡号存在重复，请尝试其他银行卡号码，如非本人操作请联系客服'
+        except AbnormalCardException:
+            result = u'银行卡号与身份信息存在异常, 如非本人操作请联系客服'
         except MarginLack as e:
             result = u'余额不足'
             pay_info.error_message = str(e)
@@ -512,8 +529,17 @@ class CardViewSet(ModelViewSet):
 
     def destroy(self, request, pk=None):
         card_id = request.DATA.get('card_id', '')
-        card = Card.objects.filter(id=card_id, user=self.request.user)
+        card = Card.objects.filter(id=card_id, user=self.request.user).first()
         if card:
+            # 将删除的银行卡添加到异常银行卡名单中
+            black_list = BlackListCard()
+            black_list.user = self.request.user
+            black_list.card_no = card.no
+            black_list.message = u'删除银行卡,手机号:{}'.format(self.request.user.wanglibaouserprofile.phone)
+            black_list.ip = get_client_ip(request)
+            black_list.save()
+
+            # 删除银行卡
             card.delete()
             return Response({
                 'id': card_id
