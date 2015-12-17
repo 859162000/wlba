@@ -1,0 +1,37 @@
+doctype html
+html
+  head
+    title 购买记录
+    include include/fuel_head.jade
+  body
+    .fuel-login-logos
+      .fuel-head-red-space
+      .fuel-head-logo
+        img(src="/static/imgs/mobile/logo.png")
+
+    .fuel-login-warp
+      .fuel-input-public.fuel-input-space
+        .fuel-input-icon.regist-input-icon
+          .phone
+        input(type='tel', name='identifier', placeholder= '请输入手机号', data-icon='fuel-input-icon', data-operation='fuel-clear-input', autocomplete='off').fuel-input-main
+        .fuel-operation-icon.fuel-clear-input
+
+      .fuel-input-public.fuel-input-space
+        .fuel-input-icon.regist-input-icon
+          .password
+        input(type='password', name='password', placeholder= '请设置密码',data-icon='fuel-input-icon',  autocomplete='off').fuel-input-main
+        .fuel-operation-icon.fuel-hide-password.fuel-password-operation
+
+      button(type="submit", disabled=true).fuel-regist-submit 登录网利宝
+
+      .fuel-for-regist-warp
+        a(href='/fuel/regist/').fuel-for-regist 免费注册
+
+      .fuel-safe-green
+        span 账户资金安全由平安银行承保
+
+    include include/fuel_errorsign
+    script(src='/static/scripts/mobile_fuelcard/dev/vendor.zepto.js')
+    script(src='/static/scripts/mobile_fuelcard/dev/login.js')
+
+
