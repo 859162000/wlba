@@ -1125,7 +1125,7 @@ class RockFinanceRegister(CoopRegister):
                         info = json.loads(m.value)
                         original_id = info.get('fwh')
                         account = WeixinAccounts.getByOriginalId(original_id)
-                    encoding_str = urllib.quote("https://staging.wanglibao.com/api/check/qrcode/?owner_id=%s&activity=rock_finance&content=%s" % (user.id, reward.content))
+                    encoding_str = urllib.quote("https://www.wanglibao.com/api/check/qrcode/?owner_id=%s&activity=rock_finance&content=%s" % (user.id, reward.content))
                     qrcode_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=%s" % (account.app_id, encoding_str, original_id)
                     logger.debug("encoding_st:%s, qrcode_url:%s" % (encoding_str, qrcode_url))
                     img = qrcode.make(qrcode_url)
@@ -1141,7 +1141,7 @@ class RockFinanceRegister(CoopRegister):
                     inside_message.send_one.apply_async(kwargs={
                         "user_id": user.id,
                         "title": u"网利宝摇滚之夜门票",
-                        "content": u"网利宝摇滚夜欢迎您的到来，点击<a href='https://staging.wanglibao.com/rock/finance/qrcode/?user_id=%s'>获得入场二维码</a>查看，<br/> 感谢您对我们的支持与关注。<br/>网利宝" % user.id,
+                        "content": u"网利宝摇滚夜欢迎您的到来，点击<a href='https://www.wanglibao.com/rock/finance/qrcode/?user_id=%s'>获得入场二维码</a>查看，<br/> 感谢您对我们的支持与关注。<br/>网利宝" % user.id,
                         "mtype": "activity"
                     })
                     reward.is_used = True
