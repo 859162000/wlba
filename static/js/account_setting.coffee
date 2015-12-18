@@ -75,7 +75,7 @@ require ['jquery', 'jquery.validate', 'lib/backend', 'tools'], ($, validate, bac
     if $('#bankIsNoBind').val() == 'false'
       $('#goBindingBackWin').modal();
     else
-      window.location.href = '/accounts/trading/back/'
+      window.location.href = '/accounts/back/'
   $('#temporaryNot').click ->
     $.modal.close()
 

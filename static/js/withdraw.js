@@ -6,18 +6,20 @@
       'jquery.modal': 'lib/jquery.modal.min',
       'jquery.placeholder': 'lib/jquery.placeholder',
       'jquery.validate': 'lib/jquery.validate.min',
+      'jquery.form': 'lib/jquery.form',
       tools: 'lib/modal.tools'
     },
     urlArgs: 'v=20151118',
     shim: {
       'jquery.modal': ['jquery'],
       'jquery.placeholder': ['jquery'],
-      'jquery.validate': ['jquery']
+      'jquery.validate': ['jquery'],
+      'jquery.form': ['jquery']
     }
   });
 
-  require(['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator', 'jquery.validate'], function($, modal, backend, tool, placeholder, validate) {
-    var max_amount, min_amount;
+  require(['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator', 'jquery.validate', 'jquery.form'], function($, modal, backend, tool, placeholder, validate, form) {
+    var addFormValidateor, max_amount, min_amount;
     max_amount = parseInt($('input[name=fee]').attr('data-max_amount'));
     min_amount = parseInt($('input[name=fee]').attr('data-min_amount'));
     $.validator.addMethod("balance", function(value, element) {
@@ -42,7 +44,7 @@
       }
       return false;
     });
-    $("#withdraw-form").validate({
+    addFormValidateor = $("#withdraw-form").validate({
       rules: {
         amount: {
           required: true,
@@ -61,13 +63,13 @@
           required: true,
           minlength: 1
         },
-        pwd: {
+        trade_pwd: {
           required: true
         }
       },
       messages: {
         amount: {
-          required: '不能为空',
+          required: '请输入金额',
           money: '请输入正确的金额格式',
           balance: '余额不足',
           huge: '单笔提现金额不能超过' + max_amount + '万元',
@@ -83,23 +85,29 @@
           required: '不能为空',
           minlength: $.format("验证码至少输入1位")
         },
-        pwd: {
+        trade_pwd: {
           required: '请输入交易密码'
         }
       }
     });
-    if ($('#id-is-valid').val() === 'False') {
-      $('#id-validate').modal();
-    }
     $('.ispan4-omega').click(function() {
       var url;
       $('.code-img-error').html('');
       $('#img-code-div2').modal();
       $('#img-code-div2').find('#id_captcha_1').val('');
-      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
+      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/anti/captcha/refresh/";
       return $.getJSON(url, {}, function(json) {
         $('input[name="captcha_0"]').val(json.key);
         return $('img.captcha').attr('src', json.image_url);
+      });
+    });
+    $('.captcha-refresh').click(function() {
+      var $form, url;
+      $form = $(this).parents('form');
+      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/anti/captcha/refresh/";
+      return $.getJSON(url, {}, function(json) {
+        $form.find('input[name="captcha_0"]').val(json.key);
+        return $form.find('img.captcha').attr('src', json.image_url);
       });
     });
     $("#submit-code-img4").click(function(e) {
@@ -245,7 +253,9 @@
         if ($('.bindingCard').text() === '') {
           return $('.bindingError').text('*请绑定银行卡');
         } else {
-          return $('#withdraw-form').submit();
+          if (addFormValidateor.form()) {
+            return $('#withdraw-form').ajaxSubmit();
+          }
         }
       }
     });
@@ -365,16 +375,16 @@
       str = xhr.bank.name + '&nbsp;&nbsp;' + xhr.no.substring(0, 3) + '**** ****' + xhr.no.substr(xhr.no.length - 4);
       $('.bindingCard').show().html(str).attr('gate_id', xhr.bank.gate_id);
       $('#bindingEdInfo').html(str).attr('data-no', xhr.no);
-      return $('input[name="card_id"]').val(xhr.no);
+      return $('input[name="card_id"]').val(xhr.id);
     });
 
     /*判断是否设置了交易密码 */
-    return $.ajax({
+    $.ajax({
       url: "/api/profile/",
       type: "GET",
       data: {}
-    }).success(function(date) {
-      if (date.trade_pwd_is_set) {
+    }).success(function(data) {
+      if (data.trade_pwd_is_set) {
         return $('.trade_pwd_is_set').show();
       } else {
         $('.trade_pwd_is_set_no').show();
@@ -385,8 +395,13 @@
         }
       }
     });
-
-    /*绑定银行卡 */
+    return $.ajax({
+      url: "/api/home",
+      type: "GET",
+      data: {}
+    }).success(function(data) {
+      return $('.red-text').text(data.p2p_margin);
+    });
   });
 
 }).call(this);

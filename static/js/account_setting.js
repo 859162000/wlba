@@ -100,7 +100,7 @@
       if ($('#bankIsNoBind').val() === 'false') {
         return $('#goBindingBackWin').modal();
       } else {
-        return window.location.href = '/accounts/trading/back/';
+        return window.location.href = '/accounts/back/';
       }
     });
     return $('#temporaryNot').click(function() {

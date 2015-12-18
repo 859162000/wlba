@@ -4,6 +4,7 @@ require.config(
     'jquery.modal': 'lib/jquery.modal.min'
     'jquery.placeholder': 'lib/jquery.placeholder'
     'jquery.validate': 'lib/jquery.validate.min'
+    'jquery.form': 'lib/jquery.form'
     tools: 'lib/modal.tools'
 
   urlArgs: 'v=20151118'
@@ -12,9 +13,10 @@ require.config(
     'jquery.modal': ['jquery']
     'jquery.placeholder': ['jquery']
     'jquery.validate': ['jquery']
+    'jquery.form':['jquery']
 )
 
-require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator', 'jquery.validate'], ($, modal, backend, tool, placeholder, validate)->
+require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator', 'jquery.validate','jquery.form'], ($, modal, backend, tool, placeholder, validate, form)->
   max_amount = parseInt($('input[name=fee]').attr('data-max_amount'))
   min_amount = parseInt($('input[name=fee]').attr('data-min_amount'))
   $.validator.addMethod "balance", (value, element)->
@@ -33,7 +35,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       return true
     return false
 
-  $("#withdraw-form").validate
+  addFormValidateor = $("#withdraw-form").validate
     rules:
       amount:
         required: true
@@ -48,12 +50,12 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       captcha_1:
         required: true
         minlength: 1
-      pwd:
+      trade_pwd:
         required: true
 
     messages:
       amount:
-        required: '不能为空'
+        required: '请输入金额'
         money: '请输入正确的金额格式'
         balance: '余额不足'
         huge: '单笔提现金额不能超过' + max_amount + '万元'
@@ -65,20 +67,26 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       captcha_1:
         required: '不能为空'
         minlength: $.format("验证码至少输入1位")
-      pwd:
+      trade_pwd:
         required: '请输入交易密码'
 
-  if $('#id-is-valid').val() == 'False'
-    $('#id-validate').modal()
 
   $('.ispan4-omega').click () ->
     $('.code-img-error').html('')
     $('#img-code-div2').modal()
     $('#img-code-div2').find('#id_captcha_1').val('')
-    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v="+(+new Date())
+    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/anti/captcha/refresh/"
     $.getJSON url, {}, (json)->
       $('input[name="captcha_0"]').val(json.key)
       $('img.captcha').attr('src', json.image_url)
+
+  $('.captcha-refresh').click ->
+    $form = $(this).parents('form')
+    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/anti/captcha/refresh/"
+
+    $.getJSON url, {}, (json)->
+      $form.find('input[name="captcha_0"]').val(json.key)
+      $form.find('img.captcha').attr('src', json.image_url)
 
   $("#submit-code-img4").click (e) ->
     element = $('#button-get-code-btn')
@@ -205,7 +213,8 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       if $('.bindingCard').text() == ''
         $('.bindingError').text('*请绑定银行卡')
       else
-        $('#withdraw-form').submit()
+        if addFormValidateor.form()
+          $('#withdraw-form').ajaxSubmit()
   ###设置密码提交表单###
   $('#nextBtn').click ()->
     parent = $('.setTradingPwd1')
@@ -301,15 +310,15 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       str = xhr.bank.name + '&nbsp;&nbsp;' +xhr.no.substring(0,3)+'**** ****' +xhr.no.substr(xhr.no.length-4)
       $('.bindingCard').show().html(str).attr('gate_id',xhr.bank.gate_id)
       $('#bindingEdInfo').html(str).attr('data-no',xhr.no)
-      $('input[name="card_id"]').val(xhr.no)
+      $('input[name="card_id"]').val(xhr.id)
   ###判断是否设置了交易密码###
   $.ajax
     url: "/api/profile/"
     type: "GET"
     data: {
     }
-  .success (date) ->
-    if date.trade_pwd_is_set
+  .success (data) ->
+    if data.trade_pwd_is_set
       $('.trade_pwd_is_set').show()
     else
       $('.trade_pwd_is_set_no').show()
@@ -318,9 +327,13 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       else
         $('.bank-count').show()
 
-  ###绑定银行卡###
-#  $('#goBindingBtn').click ->
-#    $('#bindingBankBox').modal()
-#    $('.modal').css('width':'640px')
+  #账户余额
+  $.ajax
+    url: "/api/home"
+    type: "GET"
+    data: {
+    }
+  .success (data) ->
+    $('.red-text').text(data.p2p_margin)
 
 

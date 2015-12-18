@@ -22,8 +22,11 @@
     }).success(function(data) {
       if (data.trade_pwd_is_set) {
         $('#backOne').show()
+        $('#confirmBtn').attr('tag','1')
+        $('#name').text(data.name)
       } else {
         $('#backTwo').show()
+        $('#confirmBtn').attr('tag','1')
       }
     });
     /*获取绑卡状态 */
@@ -70,7 +73,7 @@
         }
       }).success(function(data) {
         if (data.ret_code === 5) {
-            $('#backTwo').show()
+            $('#backTwo,.twoStep').show()
             $('#backOne').hide()
         } else {
           return sfzError.show().addClass('errorS').html('<i></i>' + data.message);

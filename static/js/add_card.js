@@ -248,7 +248,7 @@
     $('.captcha-refresh').click(function() {
       var $form;
       $form = $(this).parents('form');
-      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
+      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "captcha-refresh";
       return $.getJSON(url, {}, function(json) {
         $form.find('input[name="captcha_0"]').val(json.key);
         return $form.find('img.captcha').attr('src', json.image_url);

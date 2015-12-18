@@ -19,12 +19,9 @@ block main
     .well
       .withdraw-title.padding-l-r-m 提现
 
-      form#withdraw-form.padding-l-r-m(action="/pay/withdraw/complete/", method='post')
+      form#withdraw-form.padding-l-r-m(action="/api/withdraw/", method='post')
         - csrf_token
-        input(type="hidden", name="withdraw_count", value="{{withdraw_count}}")
-        input(type="hidden", name="uninvested", value="{{uninvested}}")
-        input(type="hidden", name="fee", data-max_amount="{{fee.max_amount}}", data-min_amount="{{fee.min_amount}}")
-        input(type="hidden", name="card_id")
+        input(type="hidden",name="card_id")
         table.withdraw-table
           tr
             th 持卡人
@@ -39,7 +36,7 @@ block main
                 p.bindingError
           tr
             th 可用余额(元)
-            td.red-text {{margin}}
+            td.red-text
           tr
             th 提现金额(元)
             td
@@ -76,7 +73,7 @@ block main
               .row
                 .aa.trade_pwd_is_set(style='display:none')
                     .span5
-                      input.withdraw-input(type='text', name='pwd', placeholder='请输入交易密码')
+                      input.withdraw-input(type='text', name='trade_pwd', placeholder='请输入交易密码')
                     a(href='javascript:void(0)',tag='1').forget-pwd 忘记交易密码？
                 .bb.trade_pwd_is_set_no(style='display:none')
                     .bank-counts(style='display:none')

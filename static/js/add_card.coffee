@@ -208,7 +208,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
 
   $('.captcha-refresh').click ->
     $form = $(this).parents('form')
-    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v="+(+new Date())
+    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "captcha-refresh"
 
     $.getJSON url, {}, (json)->
       $form.find('input[name="captcha_0"]').val(json.key)
