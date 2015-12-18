@@ -108,8 +108,10 @@ class PrepaymentHistory(object):
 
             AmortizationRecord.objects.bulk_create(amortization_records)
 
-            ProductAmortization.objects.filter(product=self.product, settled=False).update(settled=True)
-            UserAmortization.objects.filter(product_amortization__product=self.product, settled=False).update(settled=True)
+            ProductAmortization.objects.filter(product=self.product, settled=False)\
+                .update(settled=True, settlement_time=timezone.now())
+            UserAmortization.objects.filter(product_amortization__product=self.product, settled=False)\
+                .update(settled=True, settlement_time=timezone.now())
             ProductKeeper(self.product).finish(None)
 
             #发短信

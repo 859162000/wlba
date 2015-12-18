@@ -171,7 +171,9 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
                     status, message = validate_validation_code(phone, validate_code)
                     if status != 200:
                         raise forms.ValidationError(
-                            self.error_messages['validate code not match'],
+                            # Modify by hb on 2015-12-02
+                            #self.error_messages['validate code not match'],
+                            message,
                             code='validate_code_error',
                         )
                 else:

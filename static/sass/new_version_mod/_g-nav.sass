@@ -12,7 +12,7 @@ $g-nav-height-fixed: 60px
   color: #474e5e
   .g-nav
     width: 1102px
-    margin: 0 auto
+    margin: 0px auto
     +clearfix()
     a
       &:link, &:visited
@@ -36,12 +36,19 @@ $g-nav-height-fixed: 60px
     float: right
     overflow: hidden
     a
+      position: relative
       float: left
       text-align: center
       font-size: $font-m
       padding: 0 20px
       line-height: $g-nav-height
       height: $g-nav-height
+    .nav-news
+      position: absolute
+      top: 14px
+      right: 2px
+      width: 29px
+      height: 17px
   .g-user-warp
     margin-left: 40px
     float: right

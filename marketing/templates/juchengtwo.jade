@@ -1,0 +1,172 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    - with '网利宝' as title
+    include include/common_head
+    - endwith
+    link(rel="stylesheet",href="/static/styles/pc_activity/juchengtwo.css?v=20151201")
+  body(style="background:#000000")
+    //include global/g_nav
+    .g-nav-warp
+      .g-nav
+        a(href="/").g-logo-box
+          img(src="/static/imgs/pc/logo/logo_80.jpg", alt='logo', class='logo_l')
+          img(src="/static/imgs/pc/logo/logo_60.jpg", alt='logo', class='logo_s')
+        .g-user-warp
+          .g-user
+            if activeItem == "我的账户"
+              myacount = 'highlight'
+            a(href="/accounts/home", class='{{myacount}}').user-nav
+              i.icon.iconfont.icon-user
+              span.user-text 我的账户
+              i.icon.iconfont.icon-down
+            ul.g-nav-user-nav
+              mixin liItem(url, text)
+                li
+                  a(href=url)=text
+              +liItem('/pay/banks/', '我要充值')
+              +liItem('/pay/withdraw/', '我要提现')
+              +liItem('/accounts/auto_tender/', '自动投标')
+              +liItem('/accounts/transaction/p2p/', '交易记录')
+              if user.is_authenticated
+                li
+                  a(href='/accounts/logout?next=/activity/juchengtwo/?promo_token=jcw') 退出
+        .g-nav-box
+          mixin nav-item(name, link)
+            if activeItem == name
+                a.highlight(href=link)= name
+            else
+                a(href=link)= name
+          +nav-item('首页', '/')
+          +nav-item('理财专区', '/p2p/list/')
+          +nav-item('贷款专区', '/finance/')
+          +nav-item('安全保障', '/security')
+          +nav-item('帮助中心', '/help')
+    .banner
+      .main
+        .button#button 我要抢票
+    .wrap_main0
+      .wrap_main
+        .discount
+          .box.one
+            .title 惊喜一
+            p.text 注册为网利宝用户并且完成实名认证，<br>即有20元现金红包
+          .box.two
+            .title 惊喜二
+            p.text 成功投资2000元即可获得价值180元的<br>布拉格施特劳斯交响乐团门票，送完为止
+    .wrap_main9
+      .wrap_main11
+        .rule
+          .jucheng-jixiang
+          p.title 活动规则
+          ul
+            li!='<span class="space">1.</span> 活动时间：12月7日－12月28日；'
+            li!='<span class="space">2.</span> 注册为网利宝用户并且完成实名认证即得20元现金红包（投资2000元可抵扣使用）；'
+            li!='<span class="space">3.</span> 用户通过网利宝单笔首次投资2000元即可获得180元交响会门票，数量有限，送完为止；'
+            li!='<span class="space">4.</span> 获得门票的用户请留意网利宝站内信及短信，并凭领票短信及手机号码领取；'
+            li!='<span class="space">5.</span> 本次活动仅限于布拉格施特劳斯交响乐团抢票活动；'
+            li!='<span class="space">6.</span> 现场取票地址：<br><span class="space"></span>演出当天到中山音乐堂音乐厅票务兑换处咨询电话：13581710219 ，<br><span class="space"></span>上门取票地址：<br><span class="space"></span>北京市东城区东四北大街107号科林大厦A座710,<br><span class="space"></span>咨询电话：13581710219；'
+            li!='<span class="space">7.</span>网利宝对此次活动有最终解释权。'
+    .wrap_main8
+      .wrap_main12
+        .advantage
+          .box.one
+            .img
+              img(src='/static/imgs/pc_activity/jucheng/advantage_img1.png')
+            .main
+              .title 安全保障
+              .text 阳光保险承保<br>IT风控数据系统把关<br>合作机构全额担保<br>四重身份认证
+          .box.two
+            .img
+              img(src='/static/imgs/pc_activity/jucheng/advantage_img2.png')
+            .main
+              .title 高收益
+              .text 年化高达10-16%<br>30余倍银行活期理财<br>打通传统金融行业中间环节<br>让利给投资者
+          .box.three
+            .img
+              img(src='/static/imgs/pc_activity/jucheng/advantage_img3.png')
+            .main
+              .title 专业
+              .text 独创IT风控数据系统<br>汇聚华尔街精英金融团队<br>专注于垂直细分领域<br>打造金融服务新蓝海
+          .box.four
+            .img
+              img(src='/static/imgs/pc_activity/jucheng/advantage_img4.png')
+            .main
+              .title 服务
+              .text 360度贴心服务<br>理财需求快速反应<br>客户问题即时解决<br>客服服务全年无休
+
+    .popup_bg
+    .register_wrap.popup
+        .close_ico
+        if user.is_authenticated
+          #ganjiwang-model
+          .banner-form#ganjiwang-welcome
+            .space-vertical-m
+              h1.banner-form--title 欢迎来网利宝投资理财
+              .space-vertical-s
+              p.banner-form--row.font-s 您的登录账户:
+                span {{user|display_name}}
+              .space-vertical-m
+              .banner-form--row.align-center
+                a.banner-form--button(href="/accounts/home",style="color:#fff") 进入我的账户
+        else
+            .denelu-form#denglu
+                #aug-center
+                    .off-form#off-form ×
+                    form#img-code-form.img-code-form.aut-form(method='post', action='')
+                        .form-row
+                            input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
+                            input#id_captcha_1.captcha.aut-captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
+                            img.captcha.captcha-img(alt="captcha", src="")
+                            button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
+                        .code-img-error.aut-error
+                        .clearfix.tc
+                            span.submit-code-img#submit-code-img1 确定
+                #aug-code
+                h1.biaoyu
+                form#register-modal-form.login-form.dale(method='post', action='')
+                  - csrf_token
+                  .form-row
+                    .form-control-group
+                      .span12
+                        input#reg_identifier.com-tu.tu1(type="text", name="identifier", placeholder="请输入手机号")
+                    .form-row-error
+                  .form-row.voice
+                    .span12-omega.hidden.show
+                      没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/" class="voice-validate">语音验证</a>
+                    .form-control-group
+                      .span6(style="width:49%")
+                        input#id_validate_code.com-tu.tu2(type="text", name="validate_code", placeholder="请输入验证码", autocomplete='off', title="请输入验证码")
+                      .span6-omega
+                        button#button-get-validate-code-modal.button-orange.button-large.huoqu-ma.new-btn(type='button',style="display:none") 获取验证码
+                        button#img-code.button-orange.button-large.huoqu-ma.new-btn(type='button',style="top:-2px;margin-left:5px") 获取验证码
+                    .form-row-error
+                  .form-row
+                    input#reg_password.full-width.com-tu.tu3(type="password", name="password", placeholder="请输入密码", autocomplete="off", maxlength="20")
+                    .form-row-error
+                  .form-row
+                    input#reg_password2.com-tu.tu3(type="password", name="password2", placeholder="请再次输入密码", autocomplete='off', title="请确认密码", maxlength="20")
+                    .form-row-error#aug-form-row-eroor
+                  .form-row.form-bottom-bar
+                    .agreement(style="padding:0 0 10px 10px;text-align:left")
+                      label(for="agreement")
+                        input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree",style="position: relative;top: 2px;margin-right: 0px;width: 16px;")
+                      | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
+                      .form-row-error
+                    button#register_submit.button-account.span10.xun-zhuce(type='button')
+                  .space-vertical-s
+                p.xun-p 已有账号,
+                  a(href="/accounts/login/?next=/accounts/home/") 立即登录
+    .get_ticket.popup
+      .title 恭喜！<br>您已成功注册网利宝<br>立即投资抢门票吧
+      a.button#get_ticket_button(href="/accounts/home/?promo_token=jcw") 立即抢门票
+    .get_ticket1.popup1
+      .title 哎呀，来晚了<br>门票已经被抢光了<br>来网利宝发现更多惊喜吧
+      a.button#get_ticket_button(href="/accounts/home/?promo_token=jcw") 去看看
+    include global/g_footer
+    script.
+      var v = new Date().getTime()
+      require(['/static/js/juchengtwo.js?v=201511065'])
+

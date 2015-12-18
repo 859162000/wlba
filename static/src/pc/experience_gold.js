@@ -68,6 +68,8 @@
                 $('.rzje').text(rzje+'元');
                 $('.invest_ed').removeClass('invest_ed').addClass('investBtn');
                 $('.no_invest').removeClass('no_invest').addClass('draw_btn_ed').text('已领取体验金'+ xhr.data.amount  +'元');
+            }else{
+                tool.modalAlert({ title: '温馨提示', msg: '<p>体验金由系统自动发放，</p><p>请继续关注网利宝最新活动。</p>'})
             }
          })
       })

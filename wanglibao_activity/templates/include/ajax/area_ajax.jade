@@ -1,0 +1,32 @@
+-load formatters
+-load mathfilters
+if results
+  resultsEn =enumerate(results)
+  for idx, activity in resultsEn
+    values = (idx + 1) % 3
+    if values == 0
+      ismarg = "margin-right: 0"
+    else
+      ismarg = ""
+    .area-active-list.font-m(style='{{ismarg}}')
+      .area-ac-ehn
+        .area-ehn-name.es {{activity.activity.name}}
+        .area-ehn-banner
+          img(src='/media/{{activity.thumbnail}}')
+          .area-ac-time.font-xs
+            .area-tiem-body {{activity.activity_status}}
+            .area-tiem-bg
+
+        .area-ac-date.font-xs.es 活动日期：{{activity.activity.start_at | date:"Y年m月d日"}} - {{activity.activity.end_at | date:"Y年m月d日"}}
+
+      a(href='{{activity.pc_detail_link}}').area-ac-mask
+        .area-ac-bg
+        .area-ac-body
+          .area-mask-name.es.font-l {{activity.activity.name}}
+          .area-mask-date.font-xs.es 活动日期：{{activity.activity.start_at | date:"Y年m月d日"}} - {{activity.activity.end_at | date:"Y年m月d日"}}
+          .area-mask-line
+          .area-mask-dec {{activity.pc_description}}
+          .area-mask-link.font-s
+            .btn-hide 立即查看
+else
+  暂无活动

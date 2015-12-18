@@ -89,6 +89,59 @@ html
         .well
           form(method="POST", action="{{request.url}}").pull-left
             -csrf_token
-            button.button-primary(type="submit") 审核通过
+            button.button-audit(type="submit", style="width:220px; height:40px; font-size:16px;") 审核通过
 
-          a.button-primary.margin-left-m(href='/{{ "" | admin_address}}/wanglibao_p2p/p2pproduct/') 返回
+          a.button-default.margin-left-m(href='/{{ "" | admin_address}}/wanglibao_p2p/p2pproduct/') 返回
+      script(src="/static/js/lib/jquery.min.js")
+      script.
+        var  csrfSafeMethod, getCookie,sameOrigin,
+        getCookie = function(name) {
+            var cookie, cookieValue, cookies, i;
+            cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                cookies = document.cookie.split(";");
+                i = 0;
+                while (i < cookies.length) {
+                  cookie = $.trim(cookies[i]);
+                  if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                  }
+                  i++;
+                }
+            }
+            return cookieValue;
+        };
+        csrfSafeMethod = function(method) {
+            return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+        };
+        sameOrigin = function(url) {
+            var host, origin, protocol, sr_origin;
+            host = document.location.host;
+            protocol = document.location.protocol;
+            sr_origin = "//" + host;
+            origin = protocol + sr_origin;
+            return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
+        };
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                console.log(settings)
+                if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+                  xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+                }
+            }
+        });
+
+        var url = $('.pull-left').attr('data-url');
+
+        $('.button-audit').on('click', function(){
+            $(this).text('审核中......请勿重复点击').prop('disabled', true);
+
+            $.ajax({
+              url: url,
+              type: "POST",
+              complete: function(){
+                window.location.href = "/{{ '' | admin_address}}/wanglibao_p2p/p2pproduct/";
+              }
+            });
+        })

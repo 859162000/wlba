@@ -11,12 +11,13 @@ import time
 import logging
 from wanglibao import settings
 from wanglibao_anti.models import AntiDelayCallback
+from marketing.utils import get_user_channel_record
 
 logger = logging.getLogger('wanglibao_anti')
 
 
 class GlobalParamsSpace(object):
-    DELAY_CHANNELS = []
+    DELAY_CHANNELS = [u'365gu',]
     ANTI_DEBUG = True
 
 class AntiBase(object):
@@ -58,6 +59,7 @@ class AntiForAllClient(AntiBase):
 
         '''
         try:
+            # TODO: open file but not close it, will make a big trouble ?
             handler = open("/var/log/wanglibao/anti_special_channel.log", "a")
             handler.write("%s\t%s\n" % (channel, time.strftime('%Y%m%d%H%M%S', time.gmtime())))
         except Exception, reason:
@@ -68,43 +70,59 @@ class AntiForAllClient(AntiBase):
         '''
             针对特定渠道进行反作弊打击
         '''
-        invite_code = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
-        if invite_code in ("eleme", "xingmei"):
-            self._write_to_hard_disk(invite_code)
-            return self.check_verified_code(self.request)
-
         return True
+        # comment by hb on 2015-12-16
+        # invite_code = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, '')
+        # if invite_code in ("eleme", "xingmei"):
+        #     self._write_to_hard_disk(invite_code)
+        #     return self.check_verified_code(self.request)
+        #
+        # return True
 
     def anti_delay_callback_time(self, uid, device, where=None):
         '''
            针对特定的渠道，进行积分反馈延迟处理, 180s
         '''
+        try:
+            if where:
+               channel = where
+            else:
+                # Modify by hb on 2015-12-16 : get user's channel from IntroducedBy
+                #channel = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
+                channel = get_user_channel_record(uid)
+                if channel:
+                    channel = channel.code
+            if not channel:
+                return False
 
-        if where:
-           channel = where
-        else:
-           channel = self.request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
+            delay_channels = GlobalParamsSpace.DELAY_CHANNELS
+            if channel in delay_channels:
+                # Add by hb on 2015-12-16 : if can not get client_ip, then do nothing and renturn False
+                try:
+                    # Modify by hb on 2015-12-16 : for Nginx-Proxy, REMOTE_ADDR is unvalild, HTTP_X_REAL_IP may be work
+                    #client_ip = self.request.META['HTTP_X_FORWARDED_FOR'] if self.request.META.get('HTTP_X_FORWARDED_FOR', None) else self.request.META.get('REMOTE_ADDR', "")
+                    client_ip = self.request.META['HTTP_X_FORWARDED_FOR'] if self.request.META.get('HTTP_X_FORWARDED_FOR', None) else self.request.META.get('HTTP_X_REAL_IP', None)
+                    if not client_ip:
+                        raise Exception, u'client_ip is none'
+                except Exception, ex:
+                    logger.exception("=20151216= Failed to get client ip: [%s] [%s] [%s] [%s]" % (uid, device, channel, ex))
+                    return False
 
-        delay_channels = GlobalParamsSpace.DELAY_CHANNELS
-        if GlobalParamsSpace.ANTI_DEBUG:
-			logger.debug("request.channel: %s;\n" % (channel,))
+                record = AntiDelayCallback()
+                record.channel = channel
+                record.device = JSONEncoder().encode(device)
+                record.uid = uid
+                record.createtime = int(time.time())
+                record.status = 0
+                record.updatetime = 0
+                record.ip = client_ip
+                record.save()
 
-        if channel in delay_channels:
-            record = AntiDelayCallback()
-            record.channel = channel
-            record.device = JSONEncoder().encode(device)
-            record.uid = uid
-            record.createtime = int(time.time())
-            record.status = 0
-            record.updatetime = 0
-            record.ip = self.request.META['HTTP_X_FORWARD_FOR'] if self.request.META.get('HTTP_X_FORWAED_FOR', None) else self.request.META.get('REMOTE_ADDR', "")
-            record.save()
-            if GlobalParamsSpace.ANTI_DEBUG:
-                logger.debug("xingmei: save success")
-            return True
-        else:
-            if GlobalParamsSpace.ANTI_DEBUG:
-                logger.debug("xingmei: save failed, this channel is not in the anti scope")
+                logger.debug("=20151216= AntiDelay Success: [%s] [%s] [%s] [%s]" % (uid, device, channel, client_ip))
+
+                return True
+        except Exception, ex:
+            logger.exception("=20151216= [%s]" % (ex))
             return False
 
     def anti_run(self):
