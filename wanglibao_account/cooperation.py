@@ -1288,6 +1288,9 @@ class XunleiVipRegister(CoopRegister):
             # logger.debug('save user %s to binding'%user)
             return True
 
+        logger.info("xunlei9 binding faild with user[%s], channel_user[%s], channel_name[%s]" %
+                    (user.id, channel_user, channel_name))
+
     def process_for_register(self, user, invite_code):
         """
         用户可以在从渠道跳转后的注册页使用邀请码，优先考虑邀请码
