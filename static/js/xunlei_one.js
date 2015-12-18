@@ -284,16 +284,17 @@
         timer =  getQueryString('time'),
         sig =  getQueryString('sign'),
         name =  getQueryString('nickname');
-    alert(xunlei9+','+xunlei+','+xun+','+pp+','+ss);
-    $.ajax({
+    //alert(token+','+xid+','+timer+','+sig+','+name);
+    if($('.denelu-form').hasClass('dengruhou')){
+        $.ajax({
         type: "POST",
         url: "/activity/thunder/binding/",
         data: {
-            'promo_token': 'token',
-            'xluserid': 'xid',
-            'time': 'timer',
-            'sign': 'sig',
-            'nickname': 'name'
+            'promo_token': token,
+            'xluserid': xid,
+            'time': timer,
+            'sign': sig,
+            'nickname': name
 
         },
         success: function (data) {
@@ -303,6 +304,9 @@
 
         }
     });
+
+    }
+
     function getCode() {//得到用户信息的二维码
         var original_id = document.getElementById("original_id").value;
         var code = document.getElementById("weixin_code").value;
