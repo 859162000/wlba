@@ -137,8 +137,12 @@ def deposit_ok(user_id, amount, device, order_id):
         activity_backends.check_activity(user, 'recharge', device_type,
                                          amount, **{'order_id': order_id})
         try:
-            utils.log_clientinfo(device, "deposit", user_id, order_id, amount)
-        except Exception:
+            # Add by hb on 2015-12-18 : add return value
+            flag = utils.log_clientinfo(device, "deposit", user_id, order_id, amount)
+            if not flag:
+                raise Exception("Failed to log_clientinfo")
+        except Exception, ex:
+            logger.exception("=20151218= [%s] [%s] [%s] [%s] [%s]" % (ex, device, user_id, order_id, amount))
             pass
 
         send_messages.apply_async(kwargs={
