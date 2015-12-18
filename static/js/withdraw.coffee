@@ -75,18 +75,16 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
     $('.code-img-error').html('')
     $('#img-code-div2').modal()
     $('#img-code-div2').find('#id_captcha_1').val('')
+    _refreshCode()
+
+  $('.captcha-refresh').click ->
+    _refreshCode()
+
+  _refreshCode = ()->
     url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/anti/captcha/refresh/"
     $.getJSON url, {}, (json)->
       $('input[name="captcha_0"]').val(json.key)
       $('img.captcha').attr('src', json.image_url)
-
-  $('.captcha-refresh').click ->
-    $form = $(this).parents('form')
-    url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/anti/captcha/refresh/"
-
-    $.getJSON url, {}, (json)->
-      $form.find('input[name="captcha_0"]').val(json.key)
-      $form.find('img.captcha').attr('src', json.image_url)
 
   $("#submit-code-img4").click (e) ->
     element = $('#button-get-code-btn')

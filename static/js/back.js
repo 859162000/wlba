@@ -134,7 +134,10 @@
       }).success(function(xhr) {
         return tool.modalAlert({
           title: '温馨提示',
-          msg: xhr.message
+          msg: xhr.message,
+          callback_ok:function(){
+              window.location.href='/accounts/setting/';
+          }
         });
       });
     });
