@@ -63,9 +63,9 @@ html(style="background: #f5f5f5")
           input(type='checkbox',name='agreement', checked=true)
         span.xieyi-btn 同意网利宝注册协议
         if next == ''
-          a(href="/weixin/login/").regist-for-login 立即登录
+          a(href="/weixin/sub_login/").regist-for-login 立即登录
         else
-          a(href="/weixin/login/?next={{next}}").regist-for-login 立即登录
+          a(href="/weixin/sub_login/?next={{next}}").regist-for-login 立即登录
 
 
     //协议内容
