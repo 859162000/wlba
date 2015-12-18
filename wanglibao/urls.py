@@ -18,7 +18,7 @@ from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_margin.php_api import GetUserInfo, GetMarginInfo, SendInsideMessage, CheckTradePassword, YueLiBaoBuy, \
     YueLiBaoCheck, YueLiBaoCancel, YueLiBaoRefund, AssignmentOfClaimsBuy, SendMessages, YueLiBaoBuyFail, \
-    AssignmentBuyFail
+    AssignmentBuyFail, GetUnreadMgsNum
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
@@ -193,6 +193,7 @@ urlpatterns += patterns(
     # url(r'^php/margin/$', GetMarginInfo.as_view(), name='php_margin_info'),
     # 单条站内信
     url(r'^php/send_message/inside/$', SendInsideMessage.as_view(), name='php_send_inside_message'),
+    url(r'^php/unread_messages/$', GetUnreadMgsNum.as_view(), name='php_unread_messages'),
     # 发送短信, 是否是营销类传参数 ext 分开.
     url(r'^php/send_messages/$', SendMessages.as_view(), name='php_send_messages'),
 

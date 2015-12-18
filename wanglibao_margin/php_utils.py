@@ -14,6 +14,7 @@ from user_agents import parse
 
 from marketing.models import IntroducedBy
 from wanglibao import settings
+from wanglibao_account.models import Message
 from wanglibao_margin.exceptions import MarginLack
 from wanglibao_margin.marginkeeper import MarginKeeper, check_amount
 from wanglibao_margin.models import Margin, MarginRecord, MonthProduct, PhpRefundRecord
@@ -289,7 +290,8 @@ def get_user_info(request, session_id):
                          is_realname=1 if user.wanglibaouserprofile.id_is_valid else 0,
                          total_amount=margin_info.get('total_amount'),
                          avaliable_amount=margin_info.get('margin'),
-                         unpayed_principle=margin_info.get('unpayed_principle'),
+                         unpayed_principle=decimal.Decimal(margin_info.get(
+                             'unpayed_principle')).quantize(Decimal('0.01')),
                          margin_freeze=margin_info.get('margin_freeze'),
                          margin_withdrawing=margin_info.get('margin_withdrawing'),
                          from_channel=ua_string,
@@ -354,7 +356,6 @@ def php_commission(user, product_id, start, end):
     月利宝的表存的是php那边的流水.直接从这获取
     :param user:
     :param product_id:
-    :param equity:
     :param start:
     :param end:
     :return:
@@ -385,7 +386,6 @@ def php_commission(user, product_id, start, end):
                 income.save()
 
 
-# TODO 对月利宝进行全民淘金处理, 并加入短信发送统计.
 def calc_php_commission(product_id):
     """
     这里每次处理一个满标审核后的标, 只写入记录. 短信发送的时候去统计 散标和月利宝的佣金
@@ -428,3 +428,19 @@ def get_php_redis_principle(user_id):
     except Exception, e:
         print e
         return 0
+
+
+def get_unread_msgs(user_id):
+    """
+        获取用户的未读站内信数量
+    :param user_id:
+    :return:
+    """
+    ret = dict()
+    try:
+        unread_num = Message.objects.filter(target_user=user_id, read_status=False, notice=True).count()
+        ret.update(status=1, unread_num=unread_num)
+    except Exception, e:
+        ret.update(status=0, msg=str(e))
+
+    return ret

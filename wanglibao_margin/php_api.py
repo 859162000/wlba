@@ -11,7 +11,8 @@ from rest_framework.views import APIView
 
 from wanglibao_account.auth_backends import User
 from wanglibao_margin.models import AssignmentOfClaims, MonthProduct, MarginRecord
-from wanglibao_margin.php_utils import get_user_info, get_margin_info, PhpMarginKeeper, set_cookie, calc_php_commission
+from wanglibao_margin.php_utils import get_user_info, get_margin_info, PhpMarginKeeper, set_cookie, calc_php_commission, \
+    get_unread_msgs
 from wanglibao_account import message as inside_message
 from wanglibao_profile.backends import trade_pwd_check
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -90,6 +91,24 @@ class GetMarginInfo(APIView):
         margin = get_margin_info(user_id)
 
         return HttpResponse(renderers.JSONRenderer().render(margin, 'application/json'))
+
+
+class GetUnreadMgsNum(APIView):
+    """
+    author: Zhoudong
+    http请求方式: GET  根据用户ID 得到用户可用余额。
+    http://xxxxxx.com/php/margin/?user_id=11111
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    def post(self, request):
+        user_id = self.request.REQUEST.get('userId')
+
+        ret = get_unread_msgs(user_id)
+
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
 class SendInsideMessage(APIView):
@@ -577,3 +596,4 @@ class AssignmentBuyFail(APIView):
             ret.update(status=0,
                        msg=str(e))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
