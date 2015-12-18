@@ -2824,6 +2824,7 @@ class ThunderBindingApi(APIView):
                 response_data = {
                     'ret_code': '10002',
                     'message': u'该用户已绑定过',
+                    'nickname': nick_name,
                 }
         else:
             response_data = {
