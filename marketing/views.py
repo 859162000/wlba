@@ -1990,7 +1990,7 @@ class CommonAward(object):
 
 
 class ThunderTenAcvitityTemplate(TemplateView):
-    template_name = 'xunlei_ten.jade'
+    template_name = 'xunlei_one.jade'
 
     def generate_sign(self, data, key):
         sorted_data = sorted(data.iteritems(), key=lambda asd:asd[0], reverse=False)
@@ -2797,10 +2797,11 @@ class ThunderBindingApi(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        channel_code = request.GET.get('promo_token', '').strip()
-        channel_user = request.GET.get('xluserid', '').strip()
-        channel_time = request.GET.get('time', '').strip()
-        channel_sign = request.GET.get('sign', '').strip()
+        channel_code = request.POST.get('promo_token', '').strip()
+        channel_user = request.POST.get('xluserid', '').strip()
+        channel_time = request.POST.get('time', '').strip()
+        channel_sign = request.POST.get('sign', '').strip()
+        nick_name = request.POST.get('nickname', '').strip()
         if channel_code and channel_code == 'xunlei9' and channel_user and channel_time and channel_sign:
             user = self.request.user
             binding = Binding.objects.filter(user_id=user.id).first()
