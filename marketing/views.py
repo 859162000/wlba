@@ -2813,6 +2813,7 @@ class ThunderBindingApi(APIView):
                     response_data = {
                         'ret_code': '10000',
                         'message': u'绑定成功',
+                        'nickname': nick_name,
                     }
                 else:
                     response_data = {
