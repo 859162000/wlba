@@ -6,6 +6,9 @@ import cStringIO
 import json
 import urllib2
 from django.utils.http import urlencode
+import pytz
+
+from wanglibao_account.oauth2_utils import check_token, create_token
 from wanglibao_account.utils import str_to_float
 
 if __name__ == '__main__':
@@ -20,15 +23,19 @@ import hashlib
 import datetime
 import time
 import logging
+from django.db import transaction
+from django.utils.decorators import method_decorator
 from django.contrib.auth.models import User
 from django.db.models import Sum, Q, Count
 from django.http import HttpResponse
 from django.utils import timezone
+from wanglibao_account import message as inside_message
+from wanglibao_sms.tasks import send_messages
 import requests
 from rest_framework import renderers
 from rest_framework.views import APIView
-from marketing.models import Channels, IntroducedBy, PromotionToken
-from marketing.utils import set_promo_user, get_channel_record, get_user_channel_record, save_introduce
+from marketing.models import Channels, IntroducedBy, PromotionToken, GiftOwnerInfo, GiftOwnerGlobalInfo
+from marketing.utils import set_promo_user, get_channel_record, get_user_channel_record
 from wanglibao import settings
 from wanglibao_redpack import backends as redpack_backends
 from misc.models import Misc
@@ -44,11 +51,12 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      YICHE_KEY, YICHE_CALL_BACK_URL, WLB_FOR_ZHITUI1_KEY, ZHITUI_COOP_ID, ZHITUI_CALL_BACK_URL, \
      WLB_FOR_ZGDX_KEY, ZGDX_CALL_BACK_URL, ZGDX_PARTNER_NO, ZGDX_SERVICE_CODE, ZGDX_CONTRACT_ID, \
      ZGDX_ACTIVITY_ID, ZGDX_KEY, ZGDX_IV, WLB_FOR_NJWH_KEY, ENV, ENV_PRODUCTION, WLB_FOR_FANLITOU_KEY, \
-     WLB_FOR_XUNLEIVIP_KEY, XUNLEIVIP_CALL_BACK_URL, XUNLEIVIP_KEY, XUNLEIVIP_REGISTER_CALL_BACK_URL, \
-     XUNLEIVIP_REGISTER_KEY
+     WLB_FOR_XUNLEI9_KEY, XUNLEIVIP_CALL_BACK_URL, XUNLEIVIP_KEY, XUNLEIVIP_REGISTER_CALL_BACK_URL, \
+     XUNLEIVIP_REGISTER_KEY, MAIMAI1_CHANNEL_CODE, MAIMAI_CALL_BACK_URL
 from wanglibao_account.models import Binding, IdVerification
-from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback
-from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization
+from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback, \
+                                    xunleivip_callback
+from wanglibao_p2p.models import P2PEquity, P2PRecord, P2PProduct, ProductAmortization, AutomaticPlan
 from wanglibao_pay.models import Card, PayInfo
 from wanglibao_profile.models import WanglibaoUserProfile
 from wanglibao_account.models import UserThreeOrder
@@ -57,11 +65,12 @@ from dateutil.relativedelta import relativedelta
 from wanglibao_account.utils import encrypt_mode_cbc, encodeBytes
 from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift
-import re
+from user_agents import parse
 import uuid
 import urllib
+from .utils import xunleivip_generate_sign
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('wanglibao_cooperation')
 
 
 def get_uid_for_coop(user_id):
@@ -140,133 +149,60 @@ def get_binding_time_for_coop(user_id):
         return None
 
 
-# def save_to_binding(user, request):
-#     try:
-#         coop = CoopRegister(request)
-#         for processor in coop.processors:
-#             if processor.c_code == processor.channel_code:
-#                 processor.save_to_binding(user)
-#     except:
-#         pass
-
-
-# def check_mobile(request):
-#     """
-#     demo :
-#         def is_from_mobile():
-#             if check_mobile(request):
-#                 return 'mobile'
-#             else:
-#                 return 'pc'
-#     :param request:
-#     :return:
-#     """
-#     user_agent = request.META.get('HTTP_USER_AGENT', None)
-#     _long_matches = r'googlebot-mobile|android|avantgo|blackberry|blazer|elaine' \
-#                     r'|hiptop|ip(hone|od)|kindle|midp|mmp|mobile|o2|opera mini|' \
-#                     r'palm( os)?|pda|plucker|pocket|psp|smartphone|symbian|treo|' \
-#                     r'up\.(browser|link)|vodafone|wap|windows ce; (iemobile|ppc)|' \
-#                     r'xiino|maemo|fennec'
-#     _long_matches = re.compile(_long_matches, re.IGNORECASE)
-#     _short_matches = r'1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|' \
-#                      r'ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|' \
-#                      r'aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|' \
-#                      r'be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|' \
-#                      r'c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|' \
-#                      r'da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|' \
-#                      r'el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|' \
-#                      r'fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|' \
-#                      r'haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-|' \
-#                      r' |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|' \
-#                      r'ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|' \
-#                      r'kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|' \
-#                      r'\/(k|l|u)|50|54|e\-|e\/|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|' \
-#                      r'ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(di|rc|ri)|mi(o8|oa|ts)|' \
-#                      r'mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|' \
-#                      r'n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|' \
-#                      r'on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|' \
-#                      r'pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|' \
-#                      r'po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|' \
-#                      r'i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|' \
-#                      r'ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|' \
-#                      r'shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|' \
-#                      r'sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|' \
-#                      r'tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|' \
-#                      r'tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|' \
-#                      r'\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|' \
-#                      r'webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|xda(\-|2|g)|yas\-|your|zeto|zte\-'
-#     _short_matches = re.compile(_short_matches, re.IGNORECASE)
-#
-#     if _long_matches.search(user_agent) != None:
-#         return True
-#     user_agent = user_agent[0:4]
-#     if _short_matches.search(user_agent) != None:
-#         return True
-#     return False
-
-
 #######################第三方用户注册#####################
 
 class CoopRegister(object):
     """
     第三方用户注册api
-    在全局变量coop_processor_classes中注册一个渠道以开启该渠道
-    process_for_*: 用于从主系统接受用户完成各个阶段的信息，并分发到相应的渠道
-    *_call_back: 子类继承这几个方法，来定制化渠道不同的处理策略。session_call_back需要处理session不要用celery处理，其他可以。
     """
-    def __init__(self, user):
-        """
-        user: 可以为None，在session中使用时因为无user，可以将user设为None，None将调度到CoopRegister。
-        """
-        # 本渠道的名称，默认的处理渠道
+    def __init__(self, request):
+        # 本渠道的名称
         self.c_code = None
-        self.user = user
-        # self.request = request
+        self.request = request
         # 传递渠道邀请码时使用的变量名
         self.external_channel_key = settings.PROMO_TOKEN_QUERY_STRING
         self.internal_channel_key = 'channel_code'
         # 传递渠道用户时使用的变量名
         self.external_channel_user_key = settings.PROMO_TOKEN_USER_KEY
         self.internal_channel_user_key = 'channel_user'
-        self.extra_key = 'extra'
         # 渠道提供给我们的秘钥
         self.coop_key = None
         self.call_back_url = None
 
-    # @property
-    # def channel_code(self):
-    #     """
-    #     从GET请求中获取的渠道邀请码
-    #     """
-    #     return self.request.session.get(self.internal_channel_key, None)
+    @property
+    def channel_code(self):
+        """
+        从GET请求中获取的渠道邀请码
+        """
+        return self.request.session.get(self.internal_channel_key, None)
 
-    def get_channel_code_from_session(self, session):
-        return session.get(self.internal_channel_key, None)
+    def get_channel_code_from_request(self):
+        return self.request.GET.get(self.external_channel_key, None)
 
     @property
-    def get_channel_name_from_db(self, channel_code):
+    def channel_name(self):
         """
-        从数据库获取渠道名
+        渠道名
         """
-        channel = get_channel_record(channel_code)
+        channel = get_channel_record(self.channel_code)
         if channel:
             channel_name = channel.name
         else:
             channel_name = None
         return channel_name
 
-    # @property
-    # def get_channel_user_from_session(self, chnnal_user, session):
-    #     return session.get(self.internal_channel_user_key, None)
-    #
-    # @property
-    # def channel_extra(self):
-    #     """
-    #     渠道扩展参数
-    #     """
-    #     return self.request.session.get(self.extra_key, 'wlb_extra')
+    @property
+    def channel_user(self):
+        return self.request.session.get(self.internal_channel_user_key, None)
 
-    def get_channel_user_from_db(self, user):
+    @property
+    def channel_extra(self):
+        """
+        渠道扩展参数
+        """
+        return self.request.session.get(self.extra_key, 'wlb_extra')
+
+    def channel_user_from_db(self, user):
         """
         从binding中获取用户在渠道中的id
         :param user:
@@ -277,62 +213,65 @@ class CoopRegister(object):
         except:
             return None
 
+    def save_to_session(self):
+        channel_code = self.get_channel_code_from_request()
+        channel_user = self.request.GET.get(self.external_channel_user_key, None)
+        if channel_code:
+            self.request.session[self.internal_channel_key] = channel_code
+            # logger.debug('save to session %s:%s'%(self.internal_channel_key, channel_code))
+        if channel_user:
+            self.request.session[self.internal_channel_user_key] = channel_user
+            # logger.debug('save to session %s:%s'%(self.internal_channel_user_key, channel_user))
 
-    #
-    # def clear_session(self, session):
-    #     session.pop(self.internal_channel_key, None)
-    #     session.pop(self.internal_channel_user_key, None)
-    #     session.pop(self.channel_extra_key, None)
+    def clear_session(self):
+        self.request.session.pop(self.internal_channel_key, None)
+        self.request.session.pop(self.internal_channel_user_key, None)
 
-    def save_to_introduceby(self, invite_code):
+    def save_to_introduceby(self, user, invite_code):
         """
         处理使用邀请码注册的用户
         """
-        # set_promo_user(request, user, invite_code)
-        save_introduce(self.user, invite_code)
+        set_promo_user(self.request, user, invite_code)
+        # try:
+        #    channel = Channels.objects.filter(code=invite_code).get()
+        #    introduced_by_record = IntroducedBy()
+        #    introduced_by_record.channel = channel
+        #    introduced_by_record.user = user
+        #    introduced_by_record.save()
+        #    logger.debug('save user %s introduced by channel to introducedby ' %user)
+        # except:
+        #    pass
+        #
+        # try:
+        #    user_promote_token = PromotionToken.objects.filter(token=invite_code).get()
+        #    #使用user_id查询
+        #    introduced_by_user = User.objects.get(pk=user_promote_token.pk)
+        #    introduced_by_record = IntroducedBy()
+        #    introduced_by_record.introduced_by = introduced_by_user
+        #    introduced_by_record.user = user
+        #    introduced_by_record.save()
+        #    logger.debug('save user %s introduced by user to introducedby ' %user)
+        # except:
+        #    pass
 
-    def save_to_binding(self, invite_code, channel_user, channel_extra):
+    def save_to_binding(self, user):
         """
         处理从url获得的渠道参数
         :param user:
         :return:
         """
-        # channel_user = self.channel_user
-        # channel_name = self.channel_name
-        channel_name = self.get_channel_name_from_db(invite_code)
-
+        channel_user = self.channel_user
+        channel_name = self.channel_name
         bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
         if channel_name and channel_user and len(channel_user) <= bid_len:
             binding = Binding()
-            binding.user = self.user
+            binding.user = user
             binding.btype = channel_name
             binding.bid = channel_user
-            binding.extra = channel_extra
             binding.save()
             # logger.debug('save user %s to binding'%user)
 
-    def session_call_back(self, session, channel_code, channel_user, channel_extra):
-        """
-        将第三方信息记录到session
-        :param session:
-        :param channel_code:
-        :param channel_user:
-        :param channel_extra:
-        :return:
-        """
-        # channel_code = self.get_channel_code_from_request(request)
-        # channel_user = self.get_channel_code_from_request(request)
-        if channel_code:
-            session[self.internal_channel_key] = channel_code
-            # logger.debug('save to session %s:%s'%(self.internal_channel_key, channel_code))
-        if channel_user:
-            session[self.internal_channel_user_key] = channel_user
-            # logger.debug('save to session %s:%s'%(self.internal_channel_user_key, channel_user))
-            #     channel_extra = self.request.GET.get(self.extra_key, 'wlb_extra')
-        if channel_extra:
-            session[self.extra_key] = channel_extra
-
-    def register_call_back(self):
+    def register_call_back(self, user):
         """
         用户注册成功后的回调
         :param user:
@@ -340,7 +279,7 @@ class CoopRegister(object):
         """
         pass
 
-    def validate_call_back(self):
+    def validate_call_back(self, user):
         """
         用户实名验证后的回调
         :param user:
@@ -348,7 +287,7 @@ class CoopRegister(object):
         """
         pass
 
-    def binding_card_call_back(self):
+    def binding_card_call_back(self, user):
         """
         用户绑定银行卡之后的回调
         :param user:
@@ -356,192 +295,157 @@ class CoopRegister(object):
         """
         pass
 
-    def purchase_call_back(self, device):
+    def purchase_call_back(self, user, order_id):
         """
         用户购买后回调，一般用于用于用户首次投资之后回调第三方接口
-        :param device:
+        :param order_id:
         :param user:
         :return:
         """
         pass
 
-    def recharge_call_back(self):
+    def recharge_call_back(self, user, order_id):
         """
         用户充值后回调，一般用于用户首次充值之后回调第三方接口
+        :param order_id:
         :param user:
         :return:
         """
         pass
 
-    def register_save_channel_info_and_callback(self, invite_code, channel_user, channel_extra):
+    def click_call_back(self):
+        """
+        用户点击投放页后回调第三方接口
+        :param:
+        :return:
+        """
+        pass
+
+    def process_for_register(self, user, invite_code):
         """
         用户可以在从渠道跳转后的注册页使用邀请码，优先考虑邀请码
         """
-        self.save_to_introduceby(self.user, invite_code)
-        self.save_to_binding(self.user, invite_code, channel_user, channel_extra)
-        self.register_call_back(self.user)
+        self.save_to_introduceby(user, invite_code)
+        self.save_to_binding(user)
+        self.register_call_back(user)
+        self.clear_session()
 
+    @property
+    def processors(self):
+        return [processor_class(self.request) for processor_class in coop_processor_classes]
 
-    def weixin_redpack_distribute(self):
-        phone = self.user.wanglibaouserprofile.phone
+    def all_processors_for_session(self):
+        for processor in self.processors:
+            channel_code = processor.get_channel_code_from_request()
+            if processor.c_code == channel_code:
+                processor.save_to_session()
+                return
+        self.save_to_session()
+
+    def weixin_redpack_distribute(self, user):
+        phone = user.wanglibaouserprofile.phone
         logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
         records = WanglibaoUserGift.objects.filter(valid=0, identity=phone)
         for record in records:
             try:
-                redpack_backends.give_activity_redpack(self.user, record.rules.redpack, 'pc')
+                redpack_backends.give_activity_redpack(user, record.rules.redpack, 'pc')
             except Exception, reason:
                 logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
             else:
-                logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (self.user, record.rules.redpack,))
-            record.user = self.user
+                logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (self.request.user, record.rules.redpack,))
+            record.user = user
             record.valid = 1
             record.save()
 
-    @property
-    def processors(self):
-        return [processor_class(self.user) for processor_class in coop_processor_classes]
-
-    def get_user_channel_processor(self, channel_code=None):
-        """
-        根据用户或是渠道码返回渠道处理器
-        """
-        if channel_code:
-            channel_code = channel_code
-        else:
-            try:
-                channel_code = get_user_channel_record(self.user.id).code
-            except:
-                channel_code = None
-
-        for channel_processor in self.processors:
-            if channel_processor.c_code == channel_code:
-                return channel_processor
-        #    没有渠道走默认处理
-        return self
-
-    @staticmethod
-    def get_channel_info(request):
-        # 处理 channel_code, channel_user, channel_extra
-        channel_info = {}
-        for key in ['channel_code', 'channel_user', 'channel_extra']:
-            for data_source in [request.GET, request.POST, request.session]:
-                value = data_source.get(key)
-                if value:
-                    channel_info[key] = value
-                    break
-                else:
-                    channel_info[key] = None
-
-        return channel_info
-
-    # todo all_processors_for_session
-    @staticmethod
-    def process_for_session(self, session, channel_code, channel_user, channel_extra):
-        processor = self.get_user_channel_processor(channel_code)
-        processor.session_call_back(session, channel_code, channel_user, channel_extra)
-
-
-    # todo  all_processors_for_user_register
-    # todo 除去session
-    def process_for_register(self, invite_code, invite_phone, channel_user, channel_extra):
-        """
-        invite_code:可能是用户邀请码或是渠道码
-        """
+    def all_processors_for_user_register(self, user, invite_code):
         try:
-            self.weixin_redpack_distribute()
+            self.weixin_redpack_distribute(user)
         except Exception, reason:
             pass
 
-        # 允许用户在invite_code中传入channel_code, 或是在channel_code中传入invite_code,在内部把他们都并入invite_code 变量
-        # Modify by hb on 2015-09-21
-        # if not invite_code:
-        #     # invite_code = session.get(settings.PROMO_TOKEN_QUERY_STRING, None)
-        #     invite_code = self.get_channel_code_from_session(session)
-
-        if (not invite_code or invite_code == u'weixin') and invite_phone:
-            # invite_phone = request.DATA.get('invite_phone', "")
-            invite_code = PromotionToken.objects.filter(user__wanglibaouserprofile__phone=invite_phone).first().token
-            logger.error("invite_phone=[%s], invite_code=[%s]" % (invite_phone, invite_code))
-
-
-        # if invite_code:
-        #     # try:
-        #     record = get_channel_record(invite_code)
-        #     if not record:
-        #         p = PromotionToken.objects.filter(token=invite_code).first()
-        #         if not p:
-        #             raise
-        #     # except:
-        #     #     return Response({"ret_code": 30016, "message": "邀请码错误"})
-
-        if invite_code and not get_channel_record(invite_code) and not PromotionToken.objects.filter(
-                token=invite_code).first():
-            raise ValueError('invalide invite_code:' + str(invite_code))
-
         try:
+            if not invite_code:
+                invite_code = self.channel_code
             # logger.debug('get invite code %s'%(invite_code))
             if invite_code:
-                processor = self.get_user_channel_processor(channel_code=invite_code)
-                processor.register_save_channel_info_and_callback(self.user, invite_code,  channel_user, channel_extra)
-
-            # self.clear_session(session)
-                # # 通过渠道注册
-                # for processor in self.processors:
-                #     if processor.c_code == processor.channel_code:
-                #         processor.process_for_register(self.user, invite_code, channel_user, channel_extra)
-                #         return
-                # # 默认注册
-                # self.process_for_register(self.user, invite_code,  channel_user, channel_extra)
+                # 通过渠道注册
+                for processor in self.processors:
+                    if processor.c_code == processor.channel_code:
+                        processor.process_for_register(user, invite_code)
+                        return
+                # 默认注册
+                self.process_for_register(user, invite_code)
         except:
-            # todo 完善报错信息
-            logger.exception('channel register process error for channel %s and user %s'%(invite_code, self.user.id))
+            logger.exception('channel register process error for channel %s and user %s'%(invite_code, user.id))
 
-    def process_for_validate(self):
-        try:
-            channel_processor = self.get_user_channel_processor(self.user)
-            # logger.debug('channel processor %s'%channel_processor)
-            channel_processor.validate_call_back(self.user)
-        except:
-            logger.exception('channel validate process error for user %s'%(self.user.id))
+    def get_user_channel_processor(self, user):
+        """
+        返回该用户的渠道处理器
+        """
+        channel = get_user_channel_record(user.id)
+        if channel:
+            channel_code = channel.code
+            for channel_processor in self.processors:
+                if channel_processor.c_code == channel_code:
+                    return channel_processor
 
-    def process_for_binding_card(self):
-        try:
-            channel_processor = self.get_user_channel_processor(self.user)
-            # logger.debug('channel processor %s'%channel_processor)
-            channel_processor.binding_card_call_back(self.user)
-        except:
-            logger.exception('channel bind card process error for user %s'%(self.user.id))
-
-    def process_for_purchase(self, device=None):
-        try:
-            channel_processor = self.get_user_channel_processor(self.user)
-            if channel_processor:
-                channel_processor.purchase_call_back()
-        except:
-            logger.exception('channel bind purchase process error for user %s'%(self.user.id))
-
-    def process_for_deposit(self, user):
+    def process_for_validate(self, user):
         try:
             channel_processor = self.get_user_channel_processor(user)
-            channel_processor.recharge_call_back(user)
+            # logger.debug('channel processor %s'%channel_processor)
+            if channel_processor:
+                channel_processor.validate_call_back(user)
+        except:
+            logger.exception('channel validate process error for user %s'%(user.id))
+
+    def process_for_binding_card(self, user):
+        try:
+            channel_processor = self.get_user_channel_processor(user)
+            # logger.debug('channel processor %s'%channel_processor)
+            if channel_processor:
+                channel_processor.binding_card_call_back(user)
+        except:
+            logger.exception('channel bind card process error for user %s'%(user.id))
+
+    def process_for_purchase(self, user, order_id):
+        try:
+            channel_processor = self.get_user_channel_processor(user)
+            if channel_processor:
+                channel_processor.purchase_call_back(user, order_id)
+        except:
+            logger.exception('channel bind purchase process error for user %s'%(user.id))
+
+    def process_for_recharge(self, user, order_id):
+        try:
+            channel_processor = self.get_user_channel_processor(user)
+            if channel_processor:
+                channel_processor.recharge_call_back(user, order_id)
         except:
             logger.exception('channel recharge process error for user %s'%(user.id))
 
+    def process_for_click(self, channel_code):
+        try:
+            for processor in self.processors:
+                if processor.c_code == processor.channel_code:
+                    processor.click_call_back()
+                    return
+        except Exception, e:
+            logger.exception('%s click process error' % channel_code)
+            logger.info(e)
 
 class TianMangRegister(CoopRegister):
-    def __init__(self, user):
-        super(TianMangRegister, self).__init__(user)
+    def __init__(self, request):
+        super(TianMangRegister, self).__init__(request)
         self.c_code = 'tianmang'
         self.coop_key = TINMANG_KEY
         self.call_back_url = TIANMANG_CALL_BACK_URL
 
-    def register_call_back(self):
-        channel_user = self.get_channel_user_from_db(self.user)
+    def register_call_back(self, user):
         params={
             "oid": self.coop_key,
-            "sn" : channel_user,
-            "uid": get_uid_for_coop(self.user.id),
-            "uname": get_username_for_coop(self.user.id),
+            "sn" : self.channel_user,
+            "uid": get_uid_for_coop(user.id),
+            "uname": get_username_for_coop(user.id),
             "method": "json"
         }
         common_callback.apply_async(
@@ -549,18 +453,17 @@ class TianMangRegister(CoopRegister):
 
 
 class YiRuiTeRegister(CoopRegister):
-    def __init__(self, user):
-        super(YiRuiTeRegister, self).__init__(user)
+    def __init__(self, request):
+        super(YiRuiTeRegister, self).__init__(request)
         self.c_code = 'yiruite'
         self.coop_key = YIRUITE_KEY
         self.call_back_url = YIRUITE_CALL_BACK_URL
 
-    def register_call_back(self):
-        channel_user = self.get_channel_user_from_db(self.user)
-        uid_for_coop = get_uid_for_coop(self.user.id)
-        sign = hashlib.md5(channel_user + uid_for_coop + self.coop_key).hexdigest()
+    def register_call_back(self, user):
+        uid_for_coop = get_uid_for_coop(user.id)
+        sign = hashlib.md5(self.channel_user + uid_for_coop + self.coop_key).hexdigest()
         params = {
-            "tid": channel_user,
+            "tid": self.channel_user,
             "uid": uid_for_coop,
             'ip': 'https://www.wanglibao.com',
             "sign": sign
@@ -571,114 +474,117 @@ class YiRuiTeRegister(CoopRegister):
 
 
 class BengbengRegister(CoopRegister):
-    def __init__(self, user):
-        super(BengbengRegister, self).__init__(user)
+    def __init__(self, request):
+        super(BengbengRegister, self).__init__(request)
         self.c_code = 'bengbeng'
         self.coop_id = BENGBENG_COOP_ID
         self.coop_key = BENGBENG_KEY
         self.call_back_url = BENGBENG_CALL_BACK_URL
 
-    def binding_card_call_back(self):
-        uid_for_coop = get_uid_for_coop(self.user.id)
-        channel_user = self.get_channel_user_from_db(self.user)
+    def binding_card_call_back(self, user):
+        uid_for_coop = get_uid_for_coop(user.id)
+        channel_user = self.channel_user_from_db(user)
         sign = hashlib.md5(self.coop_id + channel_user + uid_for_coop + self.coop_key).hexdigest()
         params = {
             'adID': self.coop_id,
             'annalID': channel_user,
             'idCode': uid_for_coop,
             'doukey': sign,
-            'idName': get_username_for_coop(self.user.id)
+            'idName': get_username_for_coop(user.id)
         }
         common_callback.apply_async(
             kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
 
 class JuxiangyouRegister(CoopRegister):
-    def __init__(self, user):
-        super(JuxiangyouRegister, self).__init__(user)
+    def __init__(self, request):
+        super(JuxiangyouRegister, self).__init__(request)
         self.c_code = 'juxiangyou'
         self.coop_id = JUXIANGYOU_COOP_ID
         self.coop_key = JUXIANGYOU_KEY
         self.call_back_url = JUXIANGYOU_CALL_BACK_URL
 
-    def register_call_back(self):
-        channel_user = self.get_channel_user_from_db(self.user)
-        uid_for_coop = get_uid_for_coop(self.user.id)
-        sign = hashlib.md5(self.coop_id + channel_user + uid_for_coop + self.coop_key).hexdigest()
+    def register_call_back(self, user):
+        uid_for_coop = get_uid_for_coop(user.id)
+        sign = hashlib.md5(self.coop_id + self.channel_user + uid_for_coop + self.coop_key).hexdigest()
         params = {
-            'tokenID': self.coop_id,
-            'recordID': channel_user,
-            'accessCode': uid_for_coop,
-            'accessKey': sign
+            'tokenID' : self.coop_id,
+            'recordID' : self.channel_user,
+            'accessCode' : uid_for_coop,
+            'accessKey' : sign
         }
         common_callback.apply_async(
             kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
 
 class DouwanRegister(CoopRegister):
-    def __init__(self, user):
-        super(DouwanRegister, self).__init__(user)
+    def __init__(self, request):
+        super(DouwanRegister, self).__init__(request)
         self.c_code = 'douwanwang'
         self.call_back_url = DOUWANWANG_CALL_BACK_URL
 
-    def douwan_callback(self, step):
+    def douwan_callback(self, user, step):
         params = {
-            'tid': get_tid_for_coop(self.user.id),
-            step: get_uid_for_coop(self.user.id)
+            'tid': get_tid_for_coop(user.id),
+            step: get_uid_for_coop(user.id)
         }
         common_callback.apply_async(
             kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
 
-    def register_call_back(self):
-        self.douwan_callback(self.user, 'step1')
+    def register_call_back(self, user):
+        self.douwan_callback(user, 'step1')
 
-    def validate_call_back(self):
-        self.douwan_callback(self.user, 'step2')
+    def validate_call_back(self, user):
+        self.douwan_callback(user, 'step2')
 
-    def binding_card_call_back(self):
-        self.douwan_callback(self.user, 'step3')
+    def binding_card_call_back(self, user):
+        self.douwan_callback(user, 'step3')
 
 
 class JinShanRegister(CoopRegister):
-    def __init__(self, user):
-        super(JinShanRegister, self).__init__(user)
+    def __init__(self, request):
+        super(JinShanRegister, self).__init__(request)
         self.c_code = 'jinshan'
         self.extra_key = 'extra'
         self.call_back_url = JINSHAN_CALL_BACK_URL
 
-    # @property
-    # def channel_extra(self):
-    #     """
-    #     渠道扩展参数
-    #     """
-    #     return self.request.session.get(self.extra_key, None)
+    @property
+    def channel_extra(self):
+        """
+        渠道扩展参数
+        """
+        return self.request.session.get(self.extra_key, None)
 
-    # def save_to_session(self):
-    #     super(JinShanRegister, self).save_to_session()
-    #     channel_extra = self.request.GET.get(self.extra_key, 'wlb_extra')
-    #     if channel_extra:
-    #         self.request.session[self.extra_key] = channel_extra
-    #         # logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
-    #
-    # def save_to_binding(self, user, channel_name, channel_user):
-    #     """
-    #     处理从url获得的渠道参数
-    #     :param user:
-    #     :return:
-    #     """
-    #     # channel_user = self.channel_user
-    #     channel_extra = self.channel_extra
-    #     # channel_name = self.get_channel_name_from_db
-    #     bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
-    #     extra_len = Binding._meta.get_field_by_name('extra')[0].max_length
-    #     if channel_name and channel_user and len(channel_user) <= bid_len and len(channel_extra) <= extra_len:
-    #         binding = Binding()
-    #         binding.user = user
-    #         binding.btype = channel_name
-    #         binding.bid = channel_user
-    #         binding.extra = channel_extra
-    #         binding.save()
-    #         # logger.debug('save user %s to binding'%user)
+    def save_to_session(self):
+        super(JinShanRegister, self).save_to_session()
+        channel_extra = self.request.GET.get(self.extra_key, 'wlb_extra')
+        if channel_extra:
+            self.request.session[self.extra_key] = channel_extra
+            # logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
+
+    def clear_session(self):
+        super(JinShanRegister, self).clear_session()
+        self.request.session.pop(self.extra_key, None)
+
+    def save_to_binding(self, user):
+        """
+        处理从url获得的渠道参数
+        :param user:
+        :return:
+        """
+        channel_user = self.channel_user
+        channel_extra = self.channel_extra
+        channel_name = self.channel_name
+        bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
+        extra_len = Binding._meta.get_field_by_name('extra')[0].max_length
+        if channel_name and channel_user and len(channel_user) <= bid_len and len(channel_extra) <= extra_len:
+            binding = Binding()
+            binding.user = user
+            binding.btype = channel_name
+            binding.bid = channel_user
+            binding.extra = channel_extra
+            binding.save()
+            # logger.debug('save user %s to binding'%user)
 
     def jinshan_call_back(self, user, offer_type, key):
         # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
@@ -702,70 +608,77 @@ class JinShanRegister(CoopRegister):
     def validate_call_back(self, user):
         self.jinshan_call_back(user, 'wangli_regist_reward', 'Cp9AhO2o9BQTDhbUBnHxmY0X4Kbg')
 
-    def purchase_call_back(self, device):
-        p2p_record = P2PRecord.objects.filter(user_id=self.user.id, catalog=u'申购')
-        if p2p_record.count() == 1:
-            p2p_amount = int(p2p_record.first().amount)
-            if p2p_amount >= 100:
+    def purchase_call_back(self, user, order_id):
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+
+        # 判断是否首次投资
+        if p2p_record and p2p_record.order_id == int(order_id):
+            p2p_amount = int(p2p_record.amount)
+            if p2p_amount >= 500:
                 if p2p_amount <= 999:
-                    self.jinshan_call_back(self.user, 'wangli_invest_reward', 'pA71ZhBf4DDeet7SLiLlGsT1qTYu')
+                    self.jinshan_call_back(user, 'wangli_invest_reward', 'pA71ZhBf4DDeet7SLiLlGsT1qTYu')
                 elif p2p_amount <= 1999:
-                    self.jinshan_call_back(self.user, 'wangli_invest1000_reward', '4ss7mIRAjsqgOuLp5ezzDVp4Xu5x')
+                    self.jinshan_call_back(user, 'wangli_invest1000_reward', '4ss7mIRAjsqgOuLp5ezzDVp4Xu5x')
                 else:
-                    self.jinshan_call_back(self.user, 'wangli_invest2000_reward', 'uRfzjHGGpxfIZFZN9JbfYLPBGdGC')
+                    self.jinshan_call_back(user, 'wangli_invest2000_reward', 'uRfzjHGGpxfIZFZN9JbfYLPBGdGC')
 
 
 class ShanghaiWaihuRegister(CoopRegister):
-    def __init__(self, user):
-        super(ShanghaiWaihuRegister, self).__init__(user)
+    def __init__(self, request):
+        super(ShanghaiWaihuRegister, self).__init__(request)
         self.c_code = 'shls'
 
 class NanjingWaihuRegister(CoopRegister):
-    def __init__(self, user):
-        super(NanjingWaihuRegister, self).__init__(user)
+    def __init__(self, request):
+        super(NanjingWaihuRegister, self).__init__(request)
         self.c_code = 'njwh'
 
+
 class ShiTouCunRegister(CoopRegister):
-    def __init__(self, user):
-        super(ShiTouCunRegister, self).__init__(user)
+    def __init__(self, request):
+        super(ShiTouCunRegister, self).__init__(request)
         self.extra_key = 'extra'
         self.c_code = 'shitoucun'
         self.call_back_url = SHITOUCUN_CALL_BACK_URL
-    #
-    # def save_to_session(self):
-    #     super(ShiTouCunRegister, self).save_to_session()
-    #     channel_extra = self.request.GET.get(self.extra_key, 'wlb_extra')
-    #     if channel_extra:
-    #         self.request.session[self.extra_key] = channel_extra
-    #         # logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
-    #
-    # def save_to_binding(self, user, channel_name, channel_user):
-    #     """
-    #     处理从url获得的渠道参数
-    #     :param user:
-    #     :return:
-    #     """
-    #     # channel_user = self.channel_user
-    #     # channel_name = self.get_channel_name_from_db
-    #     channel_extra = self.channel_extra
-    #     bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
-    #     extra_len = Binding._meta.get_field_by_name('extra')[0].max_length
-    #     if channel_name and channel_user and len(channel_user) <= bid_len and len(channel_extra) <= extra_len:
-    #         binding = Binding()
-    #         binding.user = user
-    #         binding.btype = channel_name
-    #         binding.bid = channel_user
-    #         binding.extra = channel_extra
-    #         binding.save()
-    #         # logger.debug('save user %s to binding'%user)
 
-    def shitoucun_call_back(self):
+    def save_to_session(self):
+        super(ShiTouCunRegister, self).save_to_session()
+        channel_extra = self.request.GET.get(self.extra_key, 'wlb_extra')
+        if channel_extra:
+            self.request.session[self.extra_key] = channel_extra
+            # logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
+
+    def clear_session(self):
+        super(ShiTouCunRegister, self).clear_session()
+        self.request.session.pop(self.extra_key, None)
+
+    def save_to_binding(self, user):
+        """
+        处理从url获得的渠道参数
+        :param user:
+        :return:
+        """
+        channel_user = self.channel_user
+        channel_name = self.channel_name
+        channel_extra = self.channel_extra
+        bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
+        extra_len = Binding._meta.get_field_by_name('extra')[0].max_length
+        if channel_name and channel_user and len(channel_user) <= bid_len and len(channel_extra) <= extra_len:
+            binding = Binding()
+            binding.user = user
+            binding.btype = channel_name
+            binding.bid = channel_user
+            binding.extra = channel_extra
+            binding.save()
+            # logger.debug('save user %s to binding'%user)
+
+    def shitoucun_call_back(self, user):
         # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
-        binding = Binding.objects.filter(user_id=self.user.id).first()
+        binding = Binding.objects.filter(user_id=user.id).first()
         if binding:
             logo = binding.extra
             uid = binding.bid
-            uid_for_coop = get_uid_for_coop(self.user.id)
+            uid_for_coop = get_uid_for_coop(user.id)
             params = {
                 'logo': logo,
                 'uid': uid,
@@ -775,88 +688,88 @@ class ShiTouCunRegister(CoopRegister):
             common_callback.apply_async(
                 kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
-    def purchase_call_back(self, device):
-        # 判断是否是首次投资
-        if P2PRecord.objects.filter(user_id=self.user.id, catalog=u'申购').count() == 1:
-            self.shitoucun_call_back(self.user)
+    def purchase_call_back(self, user, order_id):
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+
+        # 判断是否首次投资
+        if p2p_record and p2p_record.order_id == int(order_id):
+            self.shitoucun_call_back(user)
 
 
 class FUBARegister(CoopRegister):
-    def __init__(self, user):
-        super(FUBARegister, self).__init__(user)
+    def __init__(self, request):
+        super(FUBARegister, self).__init__(request)
         self.c_code = FUBA_CHANNEL_CODE
         self.call_back_url = FUBA_CALL_BACK_URL
         self.coop_id = FUBA_COOP_ID
         self.coop_key = FUBA_KEY
-    #
-    # @property
-    # def get_channel_user_from_session(self):
-    #     # 富爸爸需求，如果uid为空，uid设置为FUBA_DEFAULT_TID
-    #     channel_user = self.request.session.get(self.internal_channel_user_key)
-    #     if not channel_user:
-    #         channel_user = FUBA_DEFAULT_TID
-    #     return channel_user
 
-    # todo
-    def register_save_channel_info_and_callback(self, invite_code, channel_user, channel_extra, session):
-                # 富爸爸需求，如果uid为空，uid设置为FUBA_DEFAULT_TID
-        #         todo
+    @property
+    def channel_user(self):
+        # 富爸爸需求，如果uid为空，uid设置为FUBA_DEFAULT_TID
         channel_user = self.request.session.get(self.internal_channel_user_key)
         if not channel_user:
             channel_user = FUBA_DEFAULT_TID
-        super(FUBARegister, self).register_save_channel_info_and_callback(invite_code, channel_user, channel_extra, session)
+        return channel_user
 
-    def purchase_call_back(self, device):
+    def purchase_call_back(self, user, order_id):
         """
         投资回调
-        :param device:
+        :param order_id:
         """
         # Binding.objects.get(user_id=user.id),使用get如果查询不到会抛异常
-        binding = Binding.objects.filter(user_id=self.user.id).first()
-        p2p_record_set = P2PRecord.objects.filter(user_id=self.user.id, catalog=u'申购')
-        if binding and p2p_record_set.count() == 1:
-            p2p_record = p2p_record_set.first()
-            p2p_amount = int(p2p_record.amount)
-            if p2p_amount >= 1000:
-                # 如果结算时间过期了则不执行回调
-                earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
-                if earliest_settlement_time:
-                    earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
-                    current_time = datetime.datetime.now()
-                    # 如果上次访问的时间是在30天前则不更新访问时间
-                    if earliest_settlement_time + datetime.timedelta(days=int(FUBA_PERIOD)) <= current_time:
-                        return
+        binding = Binding.objects.filter(user_id=user.id).first()
+        p2p_record_set = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time')
+        if binding and p2p_record_set.exists():
+            # 判断是否首次投资
+            if p2p_record_set.first().order_id == order_id:
+                p2p_record = p2p_record_set.first()
+                goodmark = '1'
+                order_act = u'首单'
+            else:
+                p2p_record = p2p_record_set.last()
+                goodmark = '2'
+                order_act = u'复投'
 
-                order_id = p2p_record.id
-                goodsprice = 80
-                # goodsname 提供固定值，固定值自定义，但不能为空
-                goodsname = u"名称:网利宝,类型:产品标,周期:1月"
-                sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
-                status = u"首单【%s元：已付款】" % p2p_amount
-                params = {
-                    'action': 'create',
-                    'planid': self.coop_id,
-                    'order': order_id,
-                    'goodsmark': '1',
-                    'goodsprice': goodsprice,
-                    'goodsname': goodsname,
-                    'sig': sig,
-                    'status': status,
-                    'uid': binding.bid,
-                }
-                common_callback.apply_async(
-                    kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
-                # 记录开始结算时间
-                if not binding.extra:
-                    # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
-                    if earliest_settlement_time:
-                        binding.extra = earliest_settlement_time
-                        binding.save()
+            # 如果结算时间过期了则不执行回调
+            earliest_settlement_time = redis_backend()._get('%s_%s' % (self.c_code, binding.bid))
+            if earliest_settlement_time:
+                earliest_settlement_time = datetime.datetime.strptime(earliest_settlement_time, '%Y-%m-%d %H:%M:%S')
+                current_time = datetime.datetime.now()
+                # 如果上次访问的时间是在30天前则不更新访问时间
+                if earliest_settlement_time + datetime.timedelta(days=int(FUBA_PERIOD)) <= current_time:
+                    return
+
+            order_id = p2p_record.id
+            goodsprice = int(p2p_record.amount)
+            # goodsname 提供固定值，固定值自定义，但不能为空
+            goodsname = u"名称:网利宝,类型:产品标,周期:1月"
+            sig = hashlib.md5(str(order_id)+str(self.coop_key)).hexdigest()
+            status = u"%s【%s元：已付款】" % (order_act, goodsprice)
+            params = {
+                'action': 'create',
+                'planid': self.coop_id,
+                'order': order_id,
+                'goodsmark': goodmark,
+                'goodsprice': goodsprice,
+                'goodsname': goodsname,
+                'sig': sig,
+                'status': status,
+                'uid': binding.bid,
+            }
+            common_callback.apply_async(
+                kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
+            # 记录开始结算时间
+            if not binding.extra:
+                # earliest_settlement_time 为最近一次访问着陆页（跳转页）的时间
+                if earliest_settlement_time:
+                    binding.extra = earliest_settlement_time
+                    binding.save()
 
 
 class YunDuanRegister(CoopRegister):
-    def __init__(self, user):
-        super(YunDuanRegister, self).__init__(user)
+    def __init__(self, request):
+        super(YunDuanRegister, self).__init__(request)
         self.c_code = 'yunduan'
         self.coop_id = YUNDUAN_COOP_ID
         self.call_back_url = YUNDUAN_CALL_BACK_URL
@@ -875,22 +788,24 @@ class YunDuanRegister(CoopRegister):
         common_callback.apply_async(
             kwargs={'url': self.call_back_url, 'params': params, 'channel':self.c_code})
 
-    def validate_call_back(self):
-        binding = Binding.objects.filter(user_id=self.user.id).first()
+    def validate_call_back(self, user):
+        binding = Binding.objects.filter(user_id=user.id).first()
         if binding:
             self.yunduan_call_back()
 
-    def purchase_call_back(self, device):
+    def purchase_call_back(self, user, order_id):
         # 判断是否是首次投资
-        binding = Binding.objects.filter(user_id=self.user.id).first()
-        p2p_record = P2PRecord.objects.filter(user_id=self.user.id, catalog=u'申购')
-        if binding and p2p_record.count() == 1:
+        binding = Binding.objects.filter(user_id=user.id).first()
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+
+        # 判断是否首次投资
+        if binding and p2p_record and p2p_record.order_id == int(order_id):
             self.yunduan_call_back()
 
 
 class YiCheRegister(CoopRegister):
-    def __init__(self, user):
-        super(YiCheRegister, self).__init__(user)
+    def __init__(self, request):
+        super(YiCheRegister, self).__init__(request)
         self.c_code = 'yiche'
         self.call_back_url = YICHE_CALL_BACK_URL
         self.coop_id = YICHE_COOP_ID
@@ -933,14 +848,14 @@ class YiCheRegister(CoopRegister):
             }
             self.yiche_call_back(url, params)
 
-    def purchase_call_back(self, device):
-        introduced_by = IntroducedBy.objects.filter(user_id=self.user.id).first()
-        p2p_record = get_last_investment_for_coop(self.user.id)
+    def purchase_call_back(self, user, order_id):
+        introduced_by = IntroducedBy.objects.filter(user_id=user.id).first()
+        p2p_record = get_last_investment_for_coop(user.id)
         if introduced_by and p2p_record:
             url = self.call_back_url + '?method=AddPlatFormFinanceOrder'
             invest_time = p2p_record.create_time
             params = {
-                'userId': get_uid_for_coop(self.user.id),
+                'userId': get_uid_for_coop(user.id),
                 'orderNo': p2p_record.id,
                 'invest': str(p2p_record.amount),
                 'investTime': invest_time.strftime('%Y-%m-%d %H:%M:%S'),
@@ -966,50 +881,54 @@ class YiCheRegister(CoopRegister):
 
 
 class ZhiTuiRegister(CoopRegister):
-    def __init__(self, user):
-        super(ZhiTuiRegister, self).__init__(user)
+    def __init__(self, request):
+        super(ZhiTuiRegister, self).__init__(request)
         self.c_code = 'zhitui1'
         self.extra_key = 'extra'
         self.coop_id = ZHITUI_COOP_ID
         self.call_back_url = ZHITUI_CALL_BACK_URL
 
-    # @property
-    # def channel_extra(self):
-    #     """
-    #     渠道扩展参数
-    #     """
-    #     return self.request.session.get(self.extra_key, '')
-    #
-    # def save_to_session(self):
-    #     super(ZhiTuiRegister, self).save_to_session()
-    #     channel_extra = self.request.GET.get(self.extra_key, None)
-    #     if channel_extra:
-    #         self.request.session[self.extra_key] = channel_extra
-    #         # logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
-    #
-    # def save_to_binding(self, user, channel_name, channel_user):
-    #     """
-    #     处理从url获得的渠道参数
-    #     :param user:
-    #     :return:
-    #     """
-    #     # channel_user = self.channel_user
-    #     # channel_name = self.get_channel_name_from_db
-    #     channel_extra = self.channel_extra
-    #     bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
-    #     extra_len = Binding._meta.get_field_by_name('extra')[0].max_length
-    #     if channel_name and channel_user and len(channel_user) <= bid_len and len(channel_extra) <= extra_len:
-    #         binding = Binding()
-    #         binding.user = user
-    #         binding.btype = channel_name
-    #         binding.bid = channel_user
-    #         binding.extra = channel_extra
-    #         binding.save()
-    #         # logger.debug('save user %s to binding'%user)
+    @property
+    def channel_extra(self):
+        """
+        渠道扩展参数
+        """
+        return self.request.session.get(self.extra_key, '')
 
-    def purchase_call_back(self, device):
-        binding = Binding.objects.filter(user_id=self.user.id).first()
-        p2p_record = get_last_investment_for_coop(self.user.id)
+    def save_to_session(self):
+        super(ZhiTuiRegister, self).save_to_session()
+        channel_extra = self.request.GET.get(self.extra_key, None)
+        if channel_extra:
+            self.request.session[self.extra_key] = channel_extra
+            # logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
+
+    def clear_session(self):
+        super(ZhiTuiRegister, self).clear_session()
+        self.request.session.pop(self.extra_key, None)
+
+    def save_to_binding(self, user):
+        """
+        处理从url获得的渠道参数
+        :param user:
+        :return:
+        """
+        channel_user = self.channel_user
+        channel_name = self.channel_name
+        channel_extra = self.channel_extra
+        bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
+        extra_len = Binding._meta.get_field_by_name('extra')[0].max_length
+        if channel_name and channel_user and len(channel_user) <= bid_len and len(channel_extra) <= extra_len:
+            binding = Binding()
+            binding.user = user
+            binding.btype = channel_name
+            binding.bid = channel_user
+            binding.extra = channel_extra
+            binding.save()
+            # logger.debug('save user %s to binding'%user)
+
+    def purchase_call_back(self, user, order_id):
+        binding = Binding.objects.filter(user_id=user.id).first()
+        p2p_record = get_last_investment_for_coop(user.id)
         if binding and p2p_record:
             invest_time = p2p_record.create_time
             invest_amount = p2p_record.amount
@@ -1018,8 +937,10 @@ class ZhiTuiRegister(CoopRegister):
             # 根据支付方式判定标周期的单位（天/月）,如果是单位为月则转换为天
             if pay_method in [u'等额本息', u'按月付息', u'到期还本付息']:
                 period = (invest_time + relativedelta(months=period) - invest_time).days
-            # todo
-            if check_mobile(self.request):
+
+            ua_string = self.request.META.get('HTTP_USER_AGENT', '')
+            user_agent = parse(ua_string)
+            if user_agent.is_mobile:
                 note = 'wap'
             else:
                 note = 'pc'
@@ -1041,8 +962,8 @@ class ZhiTuiRegister(CoopRegister):
 
 
 class ZGDXRegister(CoopRegister):
-    def __init__(self, user):
-        super(ZGDXRegister, self).__init__(user)
+    def __init__(self, request):
+        super(ZGDXRegister, self).__init__(request)
         self.c_code = 'zgdx'
         self.call_back_url = ZGDX_CALL_BACK_URL
         self.partner_no = ZGDX_PARTNER_NO
@@ -1052,9 +973,9 @@ class ZGDXRegister(CoopRegister):
         self.coop_key = ZGDX_KEY
         self.iv = ZGDX_IV
 
-    # @property
-    # def get_channel_user_from_session(self):
-    #     return self.request.session.get(self.internal_channel_user_key, '00000')
+    @property
+    def channel_user(self):
+        return self.request.session.get(self.internal_channel_user_key, '00000')
 
     def zgdx_call_back(self, user, plat_offer_id, order_id=None):
         if datetime.datetime.now().day >= 28:
@@ -1082,32 +1003,34 @@ class ZGDXRegister(CoopRegister):
         }
 
         # 创建渠道订单记录
-        channel_recode = get_user_channel_record(self.user.id)
-        order = UserThreeOrder(user=self.user, order_on=channel_recode, request_no=request_no)
+        channel_recode = get_user_channel_record(user.id)
+        order = UserThreeOrder(user=user, order_on=channel_recode, request_no=request_no)
         order.save()
 
         # 异步回调
         zgdx_callback.apply_async(
             kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
-    def binding_card_call_back(self):
-        binding = Binding.objects.filter(user_id=self.user.id).first()
+    def binding_card_call_back(self, user):
+        binding = Binding.objects.filter(user_id=user.id).first()
         # 判定是否首次绑卡
         if binding and binding.extra != '1':
             if ENV == ENV_PRODUCTION:
                 plat_offer_id = '104369'
             else:
                 plat_offer_id = '103050'
-            self.zgdx_call_back(self.user, plat_offer_id)
+            self.zgdx_call_back(user, plat_offer_id)
             binding.extra = '1'
             binding.save()
 
-    def purchase_call_back(self, device):
+    def purchase_call_back(self, user, order_id):
         # 判断是否是首次投资
-        binding = Binding.objects.filter(user_id=self.user.id).first()
-        p2p_record = P2PRecord.objects.filter(user_id=self.user.id, catalog=u'申购')
-        if binding and p2p_record.count() == 1:
-            p2p_amount = int(p2p_record.first().amount)
+        binding = Binding.objects.filter(user_id=user.id).first()
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+
+        # 判断是否首次投资
+        if binding and p2p_record and p2p_record.order_id == int(order_id):
+            p2p_amount = int(p2p_record.amount)
             if p2p_amount >= 1000:
                 if ENV == ENV_PRODUCTION:
                     if 1000 <= p2p_amount < 2000:
@@ -1242,7 +1165,7 @@ class JuChengRegister(CoopRegister):
         # 判断是否首次投资
         if p2p_record and p2p_record.order_id == int(order_id):
             p2p_amount = int(p2p_record.amount)
-            if p2p_amount>=500 and p2p_amount<1000 and False:
+            if p2p_amount>=500 and p2p_amount<1000:
                 try:
                     logger.debug(u"80门票，我要申请锁")
                     config = GiftOwnerGlobalInfo.objects.select_for_update().filter(description=u'jcw_ticket_80').first()
@@ -1258,7 +1181,7 @@ class JuChengRegister(CoopRegister):
                     logger.debug(u"用户 %s 获得80门票一张, 剩余：%s" % (user, config.amount))
                     SEND_SUCCESS = True
 
-            if p2p_amount>=2000:
+            if p2p_amount>=1000:
                 try:
                     logger.debug(u"180门票，我要申请锁")
                     config = GiftOwnerGlobalInfo.objects.select_for_update().filter(description=u'jcw_ticket_188').first()
@@ -1281,35 +1204,35 @@ class JuChengRegister(CoopRegister):
                 inside_message.send_one.apply_async(kwargs={
                     "user_id": user.id,
                     "title": u"演出门票赠送",
-                    "content": u'【网利科技】您已成功获得%s元门票，请于演出当天到北京音乐厅一楼大厅票务兑换处领取，咨询电话:13581710219' % (ticket,),
+                    "content": u'[网利科技]您已成功获得%s元门票，请于演出当天到北京音乐铁一楼大厅票务兑换处领取，咨询电话:13581710219' % (ticket,),
                     "mtype": "activity"
                 })
 
 
 class WeixinRedpackRegister(CoopRegister):
-    def __init__(self, user):
-        super(WeixinRedpackRegister, self).__init__(user)
+    def __init__(self, request):
+        super(WeixinRedpackRegister, self).__init__(request)
         self.c_code = 'weixin_redpack'
         #self.channel_code = 'weixin_redpack'
         self.invite_code = 'weixin_redpack'
 
-    def register_call_back(self):
-        phone = self.user.wanglibaouserprofile.phone
+    def register_call_back(self, user):
+        phone = user.wanglibaouserprofile.phone
         logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
         record = WanglibaoUserGift.objects.filter(valid=0, identity=phone).first()
         try:
-            redpack_backends.give_activity_redpack(self.user, record.rules.redpack, 'pc')
+            redpack_backends.give_activity_redpack(user, record.rules.redpack, 'pc')
         except Exception, reason:
             logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
         else:
-            logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (self.user, record.rules.redpack,))
+            logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (self.request.user, record.rules.redpack,))
         record.valid = 1
         record.save()
 
 
 class XunleiVipRegister(CoopRegister):
-    def __init__(self, user):
-        super(XunleiVipRegister, self).__init__(user)
+    def __init__(self, request):
+        super(XunleiVipRegister, self).__init__(request)
         self.c_code = 'xunlei9'
         self.call_back_url = XUNLEIVIP_CALL_BACK_URL
         self.register_call_back_url = XUNLEIVIP_REGISTER_CALL_BACK_URL
@@ -1317,73 +1240,109 @@ class XunleiVipRegister(CoopRegister):
         self.coop_register_key = XUNLEIVIP_REGISTER_KEY
         self.external_channel_user_key = 'xluserid'
 
-    def generate_sign(self, data, key):
-        sorted_data = sorted(data.iteritems(), key=lambda asd:asd[0], reverse=False)
-        encode_data = urllib.urlencode(sorted_data)
-        sign = hashlib.md5(encode_data+str(key)).hexdigest()
-        return sign
-
-    def xunlei_call_back(self,  tid, data, url):
-        order_id = datetime.datetime.now().strftime('%Y%m%d%H%M%S')+'_'+str(data['act'])
+    def xunlei_call_back(self, user, tid, data, url, order_id):
+        order_id = '%s_%s' % (order_id, data['act'])
         data['uid'] = tid
         data['orderid'] = order_id
         data['type'] = 'baijin'
-        sign = self.generate_sign(data, self.coop_key)
+        sign = xunleivip_generate_sign(data, self.coop_key)
         params = dict({'sign': sign}, **data)
 
         # 创建渠道订单记录
-        channel_recode = get_user_channel_record(self.user.id)
-        order = UserThreeOrder(user=self.user, order_on=channel_recode, request_no=order_id)
+        channel_recode = get_user_channel_record(user.id)
+        order = UserThreeOrder(user=user, order_on=channel_recode, request_no=order_id)
         order.save()
 
         # 异步回调
-        common_callback.apply_async(
-            kwargs={'url': url, 'params': params, 'channel': self.c_code})
+        xunleivip_callback.apply_async(
+            kwargs={'url': url, 'params': params,
+                    'channel': self.c_code, 'order_id': order_id})
 
-    def register_call_back(self):
+    def register_call_back(self, user):
         # 判断用户是否绑定
-        binding = Binding.objects.filter(user_id=self.user.id).first()
+        binding = Binding.objects.filter(user_id=user.id).first()
         if binding:
             data = {
                 'coop': 'wanglibao',
                 'xluserid': binding.bid,
-                'regtime': int(time.mktime(self.user.date_joined.date().timetuple()))
+                'regtime': int(time.mktime(user.date_joined.date().timetuple()))
             }
-            sign = self.generate_sign(data, self.coop_register_key)
+
+            sign = xunleivip_generate_sign(data, self.coop_register_key)
             params = dict({'sign': sign}, **data)
+
             # 异步回调
             common_callback.apply_async(
                 kwargs={'url': self.register_call_back_url, 'params': params, 'channel': self.c_code})
 
-    def recharge_call_back(self):
+    def recharge_call_back(self, user, order_id):
+        logger.info("XunleiVip-Enter recharge_call_back for xunlei9: [%s], [%s]" % (user.id, order_id))
         # 判断用户是否绑定和首次充值
-        binding = Binding.objects.filter(user_id=self.user.id).first()
-        pay_info = PayInfo.objects.filter(user_id=self.user.id).order_by('create_time')
-        if binding and pay_info.count() == 1:
+        binding = Binding.objects.filter(user_id=user.id).first()
+        penny = Decimal(0.01).quantize(Decimal('.01'))
+        pay_info = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
+                                          status=PayInfo.SUCCESS).order_by('create_time').first()
+
+        if binding and pay_info and pay_info.order_id == int(order_id):
+            logger.info("XunleiVip-If amount for xunlei9: [%s], [%s], [%s]" % (order_id, binding.bid, pay_info.amount))
             # 判断充值金额是否大于100
-            pay_amount = int(pay_info.first().amount)
+            pay_amount = int(pay_info.amount)
             if pay_amount >= 100:
                 data = {
-                    'send_type': 1,
+                    'sendtype': '1',
                     'num1': 7,
                     'act': 5171
                 }
-                self.xunlei_call_back(self.user, binding.bid, data, self.call_back_url)
+                self.xunlei_call_back(user, binding.bid, data,
+                                      self.call_back_url, pay_info.order_id)
 
-    def purchase_call_back(self, device):
+    def purchase_call_back(self, user, order_id):
+        logger.info("XunleiVip-Enter purchase_call_back for xunlei9: [%s], [%s]" % (user.id, order_id))
         # 判断用户是否绑定和首次投资
-        binding = Binding.objects.filter(user_id=self.user.id).first()
-        p2p_record = P2PRecord.objects.filter(user_id=self.user.id, catalog=u'申购')
-        if binding and p2p_record.count() == 1:
+        binding = Binding.objects.filter(user_id=user.id).first()
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+
+        # 判断是否首次投资
+        if binding and p2p_record and p2p_record.order_id == int(order_id):
             # 判断投资金额是否大于100
-            pay_amount = int(p2p_record.first().amount)
-            if pay_amount >= 100:
+            pay_amount = int(p2p_record.amount)
+            if pay_amount >= 1000:
                 data = {
-                    'send_type': '0',
+                    'sendtype': '0',
                     'num1': 12,
                     'act': 5170
                 }
-                self.xunlei_call_back(self.user, binding.bid, data, self.call_back_url)
+                self.xunlei_call_back(user, binding.bid, data,
+                                      self.call_back_url, p2p_record.order_id)
+
+
+class MaimaiRegister(CoopRegister):
+    def __init__(self, request):
+        super(MaimaiRegister, self).__init__(request)
+        self.c_code = MAIMAI1_CHANNEL_CODE
+        self.call_back_url = MAIMAI_CALL_BACK_URL
+        self.extra_key = 'mmtoken'
+
+    def save_to_session(self):
+        super(MaimaiRegister, self).save_to_session()
+        channel_extra = self.request.GET.get(self.extra_key, None)
+        if channel_extra:
+            self.request.session[self.extra_key] = channel_extra
+            # logger.debug('save to session %s:%s'%(self.extra_key, channel_extra))
+
+    def clear_session(self):
+        super(MaimaiRegister, self).clear_session()
+        self.request.session.pop(self.extra_key, None)
+
+    def register_call_back(self, user):
+        introduced_by = IntroducedBy.objects.filter(user_id=user.id).first()
+        mm_token = self.channel_extra
+        if introduced_by:
+            params = {'mmtoken': mm_token}
+            # 异步回调
+            common_callback.apply_async(
+                kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
+
 
 # 注册第三方通道
 coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
@@ -1391,7 +1350,6 @@ coop_processor_classes = [TianMangRegister, YiRuiTeRegister, BengbengRegister,
                           ShiTouCunRegister, FUBARegister, YunDuanRegister,
                           YiCheRegister, ZhiTuiRegister, ShanghaiWaihuRegister,
                           ZGDXRegister, NanjingWaihuRegister, WeixinRedpackRegister,
-
                           XunleiVipRegister, JuChengRegister, MaimaiRegister, RockFinanceRegister]
 
 
@@ -1537,9 +1495,6 @@ class CoopInvestmentQuery(APIView):
     # 每一页用户数
     PAGE_LENGTH = 20
 
-    def is_invested_user(self, user_id):
-        return P2PRecord.objects.filter(user_id=user_id, catalog=u'申购').exists()
-
     def get_phone_for_coop(self, user_id):
         try:
             phone_number = WanglibaoUserProfile.objects.get(user_id=user_id).phone
@@ -1547,29 +1502,28 @@ class CoopInvestmentQuery(APIView):
         except:
             return None
 
-    def get_promo_user(self, channel_code, startday, endday):
+    def get_promo_user(self, channel_code, p2p_record):
         """
         :param channel_code: like "tianmang"
         :param startday: 日期格式20050606
         :param endday:
         :return:
         """
-        startday = datetime.datetime.strptime(startday, "%Y%m%d")
-        endday = datetime.datetime.strptime(endday, "%Y%m%d")
-        if startday > endday:
-            endday, startday = startday, endday
 
-        # daydelta = datetime.timedelta(days=1)
-        daydelta = datetime.timedelta(hours=23, minutes=59, seconds=59, milliseconds=59)
-        endday += daydelta
-        promo_list = IntroducedBy.objects.filter(channel__code=channel_code, created_at__gte=startday, created_at__lte=endday)
+        promo_list = IntroducedBy.objects.filter(channel__code=channel_code)
+        p2p_count_for_user = p2p_record.values('user').annotate(Count('user'))
+        p2p_user_list = [p_info['user'] for p_info in p2p_count_for_user]
+
+        promo_list = [p.user_id for p in promo_list if p.user_id in p2p_user_list]
+
         # logger.debug("promo user:%s"%[promo_user.user for promo_user in promo_list])
         return promo_list
 
-    def check_sign(self, channel_code, startday, endday, sign):
+    def check_sign(self, channel_code, p_id, sign):
         m = hashlib.md5()
-        key = getattr(settings, 'WLB_FOR_%s_KEY' % channel_code.upper())
-        m.update(startday+endday+key)
+        # key = getattr(settings, 'WLB_FOR_%s_KEY' % channel_code.upper())
+        key = getattr(settings, 'WLB_FOR_FANLITOU_KEY')
+        m.update(str(p_id)+key)
         local_sign = m.hexdigest()
         if sign != local_sign:
             # logger.debug('正确的渠道校验参数%s'%local_sign)
@@ -1577,7 +1531,7 @@ class CoopInvestmentQuery(APIView):
             return False
         return True
 
-    def get_user_info_for_coop(self, user_id):
+    def get_user_info_for_coop(self, user_id, p2p_record):
         user_info = {
             'uid': get_uid_for_coop(user_id),
             'uname': get_username_for_coop(user_id),
@@ -1586,12 +1540,12 @@ class CoopInvestmentQuery(APIView):
         }
 
         user_info_set = []
-        p2p_record_set = P2PRecord.objects.filter(user_id=user_id, catalog=u'申购').order_by('create_time')
-        for p2p_record in p2p_record_set:
+        p2p_record_set = p2p_record.filter(user_id=user_id)
+        for _p2p_record in p2p_record_set:
             user_p2p_info = {
-                'investment': p2p_record.amount,
-                'time': p2p_record.create_time,
-                'pid': p2p_record.product_id
+                'investment': _p2p_record.amount,
+                'time': _p2p_record.create_time,
+                'pid': _p2p_record.product_id
             }
 
             if user_p2p_info['time']:
@@ -1601,36 +1555,37 @@ class CoopInvestmentQuery(APIView):
 
         return user_info_set
 
-    def get_all_user_info_for_coop(self, channel_code, start_day, end_day, sign, page):
-        if not self.check_sign(channel_code, start_day, end_day, sign):
+    def get_all_user_info_for_coop(self, channel_code, p_id, sign, page):
+        if not self.check_sign(channel_code, p_id, sign):
             raise ValueError('wrong signature.')
 
-        coop_users = self.get_promo_user(channel_code, start_day, end_day)
-        coop_users = [u for u in coop_users if self.is_invested_user(u.user_id)]
+        p2p_record = P2PRecord.objects.filter(product_id=p_id, catalog=u'申购').order_by('user' ,'create_time')
+
+        coop_users = self.get_promo_user(channel_code, p2p_record)
+
+        user_info = []
+        for user_id in coop_users:
+            try:
+                user_info += self.get_user_info_for_coop(user_id, p2p_record)
+            except Exception, e:
+                logger.exception(e)
+                logging.debug('get user %s error:%s' % (user_id, e))
 
         # 处理分页
         if page:
             page = int(page)
             start = page * self.PAGE_LENGTH
             end = start + self.PAGE_LENGTH
-            coop_users = coop_users[start:end]
-
-        user_info = []
-        for coop_user in coop_users:
-            try:
-                user_info += self.get_user_info_for_coop(coop_user.user_id)
-            except Exception, e:
-                logger.exception(e)
-                logging.debug('get user %s error:%s' % (coop_user.user_id, e))
+            user_info = user_info[start:end]
 
         return user_info
 
-    def get(self, request, channel_code, start_day, end_day, sign, page=None):
+    def get(self, request, channel_code, p_id, sign, page=None):
         try:
             result = {
                 'errorcode': 0,
                 'errormsg': 'sucess',
-                'info': self.get_all_user_info_for_coop(channel_code, start_day, end_day, sign, page)
+                'info': self.get_all_user_info_for_coop(channel_code, p_id, sign, page)
             }
         except ValueError, e:
             result = {
@@ -1659,7 +1614,7 @@ def get_rate(product_id_or_instance):
     if isinstance(product_id_or_instance, P2PProduct):
         if product_id_or_instance.activity and product_id_or_instance.activity.rule:
             return product_id_or_instance.activity.rule.rule_amount + \
-                   decimal.Decimal(product_id_or_instance.expected_earning_rate)
+                   Decimal(product_id_or_instance.expected_earning_rate)
         else:
             return product_id_or_instance.expected_earning_rate
 
@@ -2546,3 +2501,1129 @@ def zhongjin_list_p2p():
     url = zhongjin_get_sign(args_dict)
 
     return url
+
+
+# 金融加渠道
+# 自动注册登录在 wanglibao_account/views.py JrjiaAutoRegisterView
+class JrjiaCPSView(APIView):
+    """
+    接口示例：http://api.xxx.com/cps?src=jsrjia&time=14233469890
+    """
+
+    permission_classes = ()
+
+    def get(self, request):
+        """
+        """
+        source = self.request.GET.get('src', None)
+        start = self.request.GET.get('time', None)
+        ret = dict()
+        data = []
+
+        if source == 'jrjia' and int(start) > 0:
+            timeArray = time.localtime(int(start))
+            check_time = timezone.datetime(year=timeArray.tm_year,
+                                           month=timeArray.tm_mon,
+                                           day=timeArray.tm_mday,
+                                           hour=timeArray.tm_hour,
+                                           minute=timeArray.tm_min,
+                                           second=timeArray.tm_sec).replace(tzinfo=pytz.UTC)
+            jrjia_bindings = Binding.objects.filter(btype='jrjia')
+            jrjia_users = [binding.user for binding in jrjia_bindings]
+            equities = P2PEquity.objects.filter(user__in=jrjia_users, created_at__gte=check_time)
+
+            for equity in equities:
+                data_dic = dict()
+                data_dic['reqId'] = Binding.objects.get(user=equity.user).bid
+                data_dic['prodIdAct'] = str(equity.product.pk)
+                data_dic['purchaseTime'] = int(time.mktime(equity.created_at.timetuple()))
+                data_dic['investAmount'] = equity.equity
+                data_dic['investDuration'] = equity.product.period
+                data_dic['investDurationUnit'] = 1 if equity.product.pay_method.startswith(u"日计息") else 2
+                data_dic['returnRate'] = equity.product.expected_earning_rate
+                try:
+                    data_dic['startDate'] = int(time.mktime(equity.product.make_loans_time.timetuple()))
+                except Exception, e:
+                    print 'get startDate error: {}'.format(e)
+                    data_dic['startDate'] = ''
+
+                data.append(data_dic)
+
+            ret['data'] = data
+            ret['result'] = 'ok'
+            ret['errMsg'] = None
+            return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+        else:
+            ret['result'] = 'error'
+            ret['errMsg'] = u'参数错误'
+            ret['data'] = data
+
+            return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class JrjiaP2PStatusView(APIView):
+    """
+    author: Zhoudong
+    http请求方式: GET  P2P标的的售卖进度
+    http://api.xxx.com/pstatus?src=jrjia&prodId=123
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    def get(self, request):
+
+        source = self.request.GET.get('src', None)
+        pid = self.request.GET.get('prodId', None)
+        ret = dict()
+
+        if source == u'jrjia' and int(pid) > 0:
+            try:
+                product = P2PProduct.objects.get(pk=pid)
+            except Exception, e:
+                ret['result'] = 'err'
+                ret['errMsg'] = u'未找到该标： {}'.format(e)
+                return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+            if product:
+                ret['result'] = 'ok'
+                ret['errMsg'] = None
+                data = dict()
+
+                data['prodId'] = str(product.pk)
+                data['totalAmount'] = product.total_amount
+                data['soldAmount'] = product.ordered_amount
+                data['userCount'] = len(product.equities.all().values('user').annotate(Count('user')))
+
+                ret['data'] = data
+        elif int(pid) <= 0:
+            ret = {
+                'result': 'err',
+                'errMsg': u"标id错误"
+            }
+        else:
+            ret = {
+                'result': 'err',
+                'errMsg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class JrjiaP2PInvestView(APIView):
+    """
+    author: Zhoudong
+    http请求方式: GET  P2P标的的售卖进度
+    http://api.xxx.com/pinvest?src=jrjia&prodId=123&time=1423469890
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    def get(self, request):
+        ret = dict()
+
+        source = self.request.GET.get('src', None)
+        pid = self.request.GET.get('prodId', None)
+        start = self.request.GET.get('time', None)
+
+        if source == u'jrjia' and int(pid) > 0 and int(start) > 0:
+            timeArray = time.localtime(int(start))
+            check_time = timezone.datetime(year=timeArray.tm_year,
+                                           month=timeArray.tm_mon,
+                                           day=timeArray.tm_mday,
+                                           hour=timeArray.tm_hour,
+                                           minute=timeArray.tm_min,
+                                           second=timeArray.tm_sec).replace(tzinfo=pytz.UTC)
+            try:
+                data = []
+                jrjia_bindings = Binding.objects.filter(btype='jrjia')
+                jrjia_users = [binding.user for binding in jrjia_bindings]
+                product = P2PProduct.objects.get(pk=pid)
+                equities = P2PEquity.objects.filter(created_at__gte=check_time, user__in=jrjia_users)
+                for equity in equities:
+                    dic = dict()
+                    dic['prodId'] = str(product.id)
+                    dic['username'] = equity.user.wanglibaouserprofile.name
+                    dic['investTime'] = (equity.created_at - datetime.datetime(1970, 1, 1).
+                                         replace(tzinfo=timezone.utc)).total_seconds()
+                    dic['investAmount'] = equity.equity
+                    dic['reqId'] = Binding.objects.get(user=equity.user).bid
+                    data.append(dic)
+
+                ret['data'] = data
+                ret['result'] = 'ok'
+                ret['errMsg'] = None
+
+            except Exception, e:
+                ret['result'] = 'err'
+                ret['errMsg'] = u'未找到该标： {}'.format(e)
+                return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+        elif int(pid) <= 0:
+            ret = {
+                'result': 'err',
+                'errMsg': u"标id错误"
+            }
+        else:
+            ret = {
+                'result': 'err',
+                'errMsg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class JrjiaReportView(APIView):
+    """
+    author: Zhoudong
+    http请求方式: GET  该接口返回指定日期的数据日报，包括成交金额、成交笔数、参与人数和年化收益率等指标
+    http://api.xxx.com/report?src=jrjia&date=20150825
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    def get(self, request):
+        ret = dict()
+
+        source = self.request.GET.get('src', None)
+        time_str = self.request.GET.get('date', None)
+
+        if source == u'jrjia':
+            try:
+                data = dict()
+                start_date = datetime.datetime.strptime(time_str, "%Y%m%d")
+
+                time_zone = settings.TIME_ZONE
+                local = pytz.timezone(time_zone)
+                local_dt = local.localize(start_date, is_dst=None)
+                start = local_dt.astimezone(pytz.utc)
+
+                equities = P2PEquity.objects.filter(created_at__gt=start,
+                                                    created_at__lte=(start + timezone.timedelta(days=1)))
+
+                data['statDate'] = start_date.strftime("%Y-%m-%d")
+                data['investAmount'] = equities.aggregate(Sum('equity'))['equity__sum']
+                data['investCount'] = equities.count()
+                data['investUser'] = equities.values_list('user', flat=True).distinct().count()
+                products = P2PProduct.objects.filter(publish_time__gt=start,
+                                                     publish_time__lte=(start + timezone.timedelta(days=1)))
+                data['returnRate'] = round(products.aggregate(Sum('expected_earning_rate'))
+                                           ['expected_earning_rate__sum'] / products.count(), 2)
+
+                ret['data'] = data
+                ret['result'] = 'ok'
+                ret['errMsg'] = None
+
+            except Exception, e:
+                ret['result'] = 'err'
+                ret['errMsg'] = u'数据错误： {}'.format(e)
+                return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+        else:
+            ret = {
+                'result': 'err',
+                'errMsg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class JrjiaUsStatusView(APIView):
+    """
+    http请求方式: GET  返回指定时间以后的所有从”金融加”带来的用户的最终状态（状态包括：注册、实名认证、绑卡、充值）
+                        按照注册、实名认证、绑卡、充值的顺序
+    http://api.xxx.com/ustatus?src=jrjia&time=14233469890
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    def get(self, request):
+        ret = dict()
+
+        source = self.request.GET.get('src', None)
+        start = self.request.GET.get('time', None)
+
+        if source == u'jrjia' and int(start) > 0:
+            try:
+                data = []
+
+                # bindings = Binding.objects.filter(btype='jrjia', created_at__gt=int(start))
+                bindings = Binding.objects.all()
+                jrjia_users = set([b.user for b in bindings])
+
+                # equities = P2PEquity.objects.filter(user__in=jrjia_users, equity__gt=100)
+                deposits = PayInfo.objects.filter(user__in=jrjia_users, type=u'D')
+                cards = Card.objects.filter(user__in=jrjia_users)
+                identifies = WanglibaoUserProfile.objects.filter(user__in=jrjia_users, id_is_valid=True)
+
+                # invested_users = set([equity.user for equity in equities])
+                deposited_users = set([deposit.user for deposit in deposits])
+                binding_users = set([card.user for card in cards])
+                identify_users = set([identify.user for identify in identifies])
+
+                for user in jrjia_users:
+                    dic = dict()
+                    dic['reqId'] = Binding.objects.get(user=user).bid
+                    if user in deposited_users:
+                        status = 4
+                        action_datetime = PayInfo.objects.filter(user=user).first().create_time
+                    elif user in binding_users:
+                        status = 3
+                        action_datetime = Card.objects.filter(user=user).last().add_at
+                    elif user in identify_users:
+                        status = 2
+                        action_datetime = WanglibaoUserProfile.objects.get(user=user).id_valid_time
+
+                    else:
+                        status = 1
+                        action_datetime = user.date_joined
+
+                    action_time = (action_datetime - datetime.datetime(1970, 1, 1).
+                                   replace(tzinfo=timezone.utc)).total_seconds()
+
+                    dic['userStatus '] = status
+                    dic['actionTime'] = action_time
+                    dic['payAmount'] = Binding.objects.get(user=user).bid
+                    try:
+                        dic['userAccount'] = user.wanglibaouserprofile.phone
+                    except Exception, e:
+                        print 'user {} profile error: {}'.format(user.id, e)
+
+                    data.append(dic)
+
+                ret['data'] = data
+                ret['result'] = 'ok'
+                ret['errMsg'] = None
+
+            except Exception, e:
+                ret['result'] = 'err'
+                ret['errMsg'] = u'数据错误： {}'.format(e)
+                return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+        else:
+            ret = {
+                'result': 'err',
+                'errMsg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class ZOP2PListView(APIView):
+    """
+    """
+    permission_classes = ()
+
+    def check_sign(self):
+        visit_key = str(self.request.GET.get('visit_key', None))
+        sign = str(self.request.GET.get('sign', None))
+
+        if visit_key and sign:
+            full_path = self.request.get_full_path()
+            full_path = urllib.unquote(full_path)
+            # TODO 进行校验
+            from hashlib import md5
+            check_sign = md5(settings.ZO_SECRET + '&' + full_path.split('?')[1].split('&sign')[0]).hexdigest()
+            if sign == check_sign.upper():
+                return True
+
+    def get(self, request):
+
+        if self.check_sign():
+            try:
+                status = int(self.request.GET.get('status', None))
+                time_from = self.request.GET.get('time_from', None)
+                time_to = self.request.GET.get('time_to', None).strip()
+                page_size = int(self.request.GET.get('page_size', 100))
+                page_index = int(self.request.GET.get('page_index', 1))
+
+                p2p_list = []
+                ret = dict()
+
+                # page = page_index
+
+                p2p_status = []
+                if status == 0:
+                    p2p_status = [u'正在招标']
+                if status == 1:
+                    p2p_status = [u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'已完成']
+                if status == 2:
+                    p2p_status = [u'流标']
+
+                time_zone = settings.TIME_ZONE
+                local = pytz.timezone(time_zone)
+                time_from2 = datetime.datetime.strptime(time_from, "%Y-%m-%d %H:%M:%S")
+                time_to2 = datetime.datetime.strptime(time_to, "%Y-%m-%d %H:%M:%S")
+                time_from3 = local.localize(time_from2, is_dst=None)
+                time_to3 = local.localize(time_to2, is_dst=None)
+                time_from4 = time_from3.astimezone(pytz.utc)
+                time_to4 = time_to3.astimezone(pytz.utc)
+                p2ps = P2PProduct.objects.filter(status__in=p2p_status,
+                                                 publish_time__gt=time_from4,
+                                                 publish_time__lte=time_to4)
+
+                ret['total'] = p2ps.count()
+
+                # 获取总页数, 和页数不对处理
+                com_page = len(p2ps) / page_size + 1
+
+                if page_index > com_page:
+                    page = com_page
+                elif page_index < 1:
+                    page = 1
+                else:
+                    page = page_index
+
+                # 获取到对应的页数的所有用户
+                if p2ps.count() / page_size >= page:
+                    p2ps = p2ps[(page - 1) * page_size: page * page_size]
+                else:
+                    p2ps = p2ps[(page - 1) * page_size:]
+
+                for product in p2ps:
+
+                    try:
+                        p2p_dict = dict()
+                        p2p_dict['id'] = product.id
+                        p2p_dict['link'] = '/p2p/detail/{}'.format(product.id)
+                        p2p_dict['title'] = product.name
+                        p2p_dict['username'] = product.borrower_name
+                        # 借款用户没有uid, 渠道说用用户名
+                        p2p_dict['userd'] = product.borrower_name
+                        p2p_dict['asset_type'] = u'抵押标'
+                        p2p_dict['borrow_type'] = product.category
+                        p2p_dict['product_type'] = u'散标'
+                        p2p_dict['amount'] = product.total_amount
+                        p2p_dict['interest'] = (product.expected_earning_rate/100)
+                        p2p_dict['borrow_period'] = (str(product.period) + u'天') \
+                            if product.pay_method.startswith(u'日计息') else (str(product.period) + u'个月')
+
+                        if product.pay_method == u'等额本息':
+                            pay_method = u'等额本息'
+                        elif product.pay_method == u'按月付息':
+                            pay_method = u'月付息到期还本'
+                        elif product.pay_method == u'到期还本付息':
+                            pay_method = product.pay_method
+                        elif product.pay_method == u'日计息一次性还本付息':
+                            pay_method = product.pay_method
+                        elif product.pay_method == u'日计息月付息到期还本':
+                            pay_method = u'月付息到期还本'
+                        else:
+                            pay_method = product.pay_method
+                        p2p_dict['repay_type'] = pay_method
+                        p2p_dict['percentage'] = product.completion_rate/100
+                        p2p_dict['reward'] = 0
+                        p2p_dict['guarantee'] = 0
+                        p2p_dict['credit'] = ''
+                        p2p_dict['verify_time'] = timezone.localtime(product.publish_time).strftime('%Y-%m-%d %H:%M:%S')
+                        p2p_dict['reverify_time'] = timezone.localtime(product.soldout_time).strftime('%Y-%m-%d %H:%M:%S')
+                        p2p_dict['invest_count'] = P2PEquity.objects.filter(product=product).count()
+                        p2p_dict['borrow_detail'] = product.usage
+                        p2p_dict['attribute1'] = ''
+                        p2p_dict['attribute2'] = ''
+                        p2p_dict['attribute3'] = ''
+
+                        p2p_list.append(p2p_dict)
+
+                    except Exception, e:
+                        print 'product{} error: {}'.format(product.pk, e)
+
+                ret['data'] = p2p_list
+                ret['page_count'] = com_page
+                ret['page_index'] = page_index
+                ret['result_code'] = 1
+                ret['result_msg'] = u'获取数据成功'
+            except Exception, e:
+                print e
+                ret = {
+                    'page_count': 1,
+                    'page_index': 1,
+                    'result_code': 0,
+                    'result_msg': u"数据出错: {}".format(e)
+                }
+        else:
+            ret = {
+                'page_count': 1,
+                'page_index': 1,
+                'result_code': 0,
+                'result_msg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class ZORecordView(APIView):
+    """
+    获取借款列表
+    """
+    permission_classes = ()
+
+    def check_sign(self):
+        visit_key = str(self.request.GET.get('visit_key', None))
+        sign = str(self.request.GET.get('sign', None))
+
+        if visit_key and sign:
+            full_path = self.request.get_full_path()
+            full_path = urllib.unquote(full_path)
+            # TODO 进行校验
+            from hashlib import md5
+            check_sign = md5(settings.ZO_SECRET + '&' + full_path.split('?')[1].split('&sign')[0]).hexdigest()
+            if sign == check_sign.upper():
+                return True
+
+    def get(self, request):
+
+        if self.check_sign():
+            pid = int(self.request.GET.get('id', -1))
+            page_size = int(self.request.GET.get('page_size', 100))
+            page = int(self.request.GET.get('page_index', 1))
+
+            p2p_list = []
+            ret = dict()
+
+            try:
+                product = P2PProduct.objects.get(pk=pid)
+                equities = P2PEquity.objects.filter(product=product)
+                # 获取总页数, 和页数不对处理
+                com_page = len(equities) / page_size + 1
+
+                if page > com_page:
+                    page = com_page
+                if page < 1:
+                    page = 1
+
+                # 获取到对应的页数的所有投资记录
+                if equities.count() / page_size >= page:
+                    equities = equities[(page - 1) * page_size: page * page_size]
+                else:
+                    equities = equities[(page - 1) * page_size:]
+
+                for equity in equities:
+                    p2p_dict = dict()
+
+                    p2p_dict['id'] = product.id
+                    p2p_dict['invest_id'] = equity.id
+                    p2p_dict['link'] = '/p2p/detail/{}'.format(product.id)
+                    # p2p_dict['title'] = product.name
+                    p2p_dict['username'] = equity.user.wanglibaouserprofile.name
+                    p2p_dict['userid'] = equity.user.pk
+                    try:
+                        may_auto = AutomaticPlan.objects.get(user=equity.user)
+                        if may_auto.amounts_auto == equity.equity \
+                                and may_auto.rate_min > product.expected_earning_rate \
+                                and may_auto.is_used:
+                            p2p_dict['type'] = u'自动'
+                        else:
+                            p2p_dict['type'] = u'手动'
+                    except Exception, e:
+                        print 'Except: {}'.format(e)
+                        p2p_dict['type'] = u'手动'
+                    p2p_dict['money'] = equity.equity
+                    p2p_dict['account'] = equity.equity
+                    p2p_dict['status'] = u'成功' if equity.equity else u'失败'
+                    p2p_dict['add_time'] = timezone.localtime(equity.created_at).strftime('%Y-%m-%d %H:%M:%S')
+
+                    p2p_list.append(p2p_dict)
+
+                ret['data'] = p2p_list
+                ret['page_count'] = com_page
+                ret['page_index'] = page
+                ret['result_code'] = 1
+                ret['result_msg'] = u'获取数据成功'
+
+            except Exception, e:
+                ret = {
+                    'page_count': 1,
+                    'page_index': 1,
+                    'result_code': 0,
+                    'result_msg': u"数据出错: {}".format(e)
+                }
+
+        else:
+            ret = {
+                'page_count': 1,
+                'page_index': 1,
+                'result_code': 0,
+                'result_msg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class ZOCountView(APIView):
+    """
+    数据验证
+    """
+    permission_classes = ()
+
+    def check_sign(self):
+        visit_key = str(self.request.GET.get('visit_key', None))
+        sign = str(self.request.GET.get('sign', None))
+
+        if visit_key and sign:
+            full_path = self.request.get_full_path()
+            full_path = urllib.unquote(full_path)
+            # TODO 进行校验
+            from hashlib import md5
+            check_sign = md5(settings.ZO_SECRET + '&' + full_path.split('?')[1].split('&sign')[0]).hexdigest()
+            if sign == check_sign.upper():
+                return True
+
+    def get(self, request):
+
+        if self.check_sign():
+            try:
+                status = int(self.request.GET.get('status', None))
+                time_from = self.request.GET.get('time_from', None)
+                time_to = self.request.GET.get('time_to', None)
+
+                ret = dict()
+                data = []
+                data_dic = dict()
+
+                p2p_status = []
+                if status == 0:
+                    p2p_status = [u'正在招标']
+                if status == 1:
+                    p2p_status = [u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核', u'还款中', u'已完成']
+                if status == 2:
+                    p2p_status = [u'流标']
+
+                p2ps = P2PProduct.objects.filter(status__in=p2p_status,
+                                                 publish_time__gt=time_from,
+                                                 publish_time__lte=time_to)
+                buyers = []
+                investor_count = 0
+                for product in p2ps:
+                    equities = P2PEquity.objects.filter(product=product)
+                    buyers.extend([equity.user for equity in equities])
+                    investor_count += equities.count()
+
+                data_dic['amount_total'] = p2ps.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+                data_dic['volume_count'] = p2ps.count()
+                borrowers = [product.borrower_name for product in p2ps]
+                data_dic['borrower_count'] = len(set(borrowers))
+                data_dic['investor_count'] = investor_count
+                data_dic['investment_num'] = len(set(buyers))
+                data.append(data_dic)
+
+                ret['result_code'] = 1
+                ret['result_msg'] = u'获取数据成功'
+                ret['data'] = data
+
+            except Exception, e:
+                ret = {
+                    'result_code': 0,
+                    'result_msg': u"数据出错: {}".format(e)
+                }
+
+        else:
+            ret = {
+                'result_code': 0,
+                'result_msg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class MidaiSuccessView(APIView):
+    """
+    每日成交标的列表 或者 每日新增标的列表
+    """
+    permission_classes = ()
+
+    def check_sign(self):
+        username = str(self.request.GET.get('username', None))
+        password = str(self.request.GET.get('password', None))
+
+        if username == settings.MIDAI_USERNAME and password == settings.MIDAI_PASSWORD:
+            return True
+
+        return False
+
+    def get(self, request):
+
+        time_str = str(self.request.GET.get('date', None))
+        time_zone = settings.TIME_ZONE
+        local = pytz.timezone(time_zone)
+        naive = datetime.datetime.strptime(time_str, "%Y%m%d")
+
+        date = str(naive.year) + '-' + str(naive.month) + '-' + str(naive.day)
+
+        if self.check_sign():
+            try:
+                local_dt = local.localize(naive, is_dst=None)
+                start = local_dt.astimezone(pytz.utc)
+                end = start + timezone.timedelta(days=1)
+
+                ret = dict()
+                loans = []
+                data_dic = dict()
+
+                products = P2PProduct.objects.filter(make_loans_time__gt=start,
+                                                     make_loans_time__lte=end)
+
+                for product in products:
+
+                    data_dic['id'] = product.pk
+                    data_dic['title'] = product.name
+                    data_dic['desc'] = product.usage
+                    data_dic['borrower'] = product.borrower_name
+                    data_dic['amount'] = product.total_amount
+                    data_dic['interest'] = product.expected_earning_rate
+                    data_dic['bidnum'] = P2PEquity.objects.filter(product=product).count()
+                    data_dic['time_0'] = product.publish_time
+                    data_dic['time_1'] = product.soldout_time
+                    data_dic['time_2'] = product.make_loans_time
+                    data_dic['url'] = "http://{}/p2p/detail/{}".format(request.get_host(), product.id),
+                    data_dic['months'] = product.period if not product.pay_method.startswith(u"日计息") else 0
+                    data_dic['days'] = product.period if product.pay_method.startswith(u"日计息") else 0
+                    if product.pay_method == u'等额本息':
+                        pay_method = u'等额本息'
+                    if product.pay_method == u'按月付息':
+                        pay_method = u'先息后本'
+                    if product.pay_method == u'到期还本付息':
+                        pay_method = u'一次性还款'
+                    if product.pay_method == u'日计息一次性还本付息':
+                        pay_method = u'一次性还款'
+                    if product.pay_method == u'日计息月付息到期还本':
+                        pay_method = u'先息后本'
+                    data_dic['repaytype'] = pay_method
+                    data_dic['progress'] = product.completion_rate
+                    data_dic['reward'] = ''
+                    data_dic['type'] = u'diya'
+
+                    loans.append(data_dic)
+
+                ret['date'] = date
+                ret['total'] = products.count()
+                ret['loans'] = loans
+
+            except Exception, e:
+                print 'MidaiSuccessView exception: {}'.format(e)
+                ret = {
+                    'date': date,
+                    'total': 0,
+                    'loans': []
+                }
+
+        else:
+            ret = {
+                'date': date,
+                'total': 0,
+                'loans': []
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class MidaiNewView(APIView):
+    """
+    每日成交标的列表 或者 每日新增标的列表
+    """
+    permission_classes = ()
+
+    def check_sign(self):
+        username = str(self.request.GET.get('username', None))
+        password = str(self.request.GET.get('password', None))
+
+        if username == settings.MIDAI_USERNAME and password == settings.MIDAI_PASSWORD:
+            return True
+
+        return False
+
+    def get(self, request):
+
+        time_str = str(self.request.GET.get('date', None))
+        time_zone = settings.TIME_ZONE
+        local = pytz.timezone(time_zone)
+        naive = datetime.datetime.strptime(time_str, "%Y%m%d")
+
+        date = str(naive.year) + '-' + str(naive.month) + '-' + str(naive.day)
+
+        if self.check_sign():
+            try:
+                local_dt = local.localize(naive, is_dst=None)
+                start = local_dt.astimezone(pytz.utc)
+                end = start + timezone.timedelta(days=1)
+
+                ret = dict()
+                loans = []
+                data_dic = dict()
+
+                products = P2PProduct.objects.filter(status=u'正在招标',
+                                                     publish_time__gt=start,
+                                                     publish_time__lte=end)
+
+                for product in products:
+
+                    data_dic['id'] = product.pk
+                    data_dic['title'] = product.name
+                    data_dic['desc'] = product.usage
+                    data_dic['borrower'] = product.borrower_name
+                    data_dic['amount'] = product.total_amount
+                    data_dic['interest'] = product.expected_earning_rate
+                    data_dic['bidnum'] = P2PEquity.objects.filter(product=product).count()
+                    data_dic['time_0'] = product.publish_time
+                    data_dic['time_1'] = product.soldout_time
+                    data_dic['time_2'] = product.make_loans_time
+                    data_dic['url'] = "http://{}/p2p/detail/{}".format(request.get_host(), product.id),
+                    data_dic['months'] = product.period if not product.pay_method.startswith(u"日计息") else 0
+                    data_dic['days'] = product.period if product.pay_method.startswith(u"日计息") else 0
+                    if product.pay_method == u'等额本息':
+                        pay_method = u'等额本息'
+                    if product.pay_method == u'按月付息':
+                        pay_method = u'先息后本'
+                    if product.pay_method == u'到期还本付息':
+                        pay_method = u'一次性还款'
+                    if product.pay_method == u'日计息一次性还本付息':
+                        pay_method = u'一次性还款'
+                    if product.pay_method == u'日计息月付息到期还本':
+                        pay_method = u'先息后本'
+                    data_dic['repaytype'] = pay_method
+                    data_dic['progress'] = product.completion_rate
+                    data_dic['reward'] = ''
+                    data_dic['type'] = u'diya'
+
+                    loans.append(data_dic)
+
+                ret['date'] = date
+                ret['total'] = products.count()
+                ret['loans'] = loans
+
+            except Exception, e:
+                print 'MidaiSuccessView exception: {}'.format(e)
+                ret = {
+                    'date': date,
+                    'total': 0,
+                    'loans': []
+                }
+
+        else:
+            ret = {
+                'date': date,
+                'total': 0,
+                'loans': []
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+def get_rongtu_borrow():
+    """
+    author: Zhoudong
+    http请求方式: GET  返回正在招标但是没有投满的标
+    :return:
+    """
+    ret = dict()
+    ret['borrow'] = []
+    try:
+        products = P2PProduct.objects.filter(status=u'正在招标')
+    except Exception, e:
+        print 'Exception : {}'.format(e)
+        return
+
+    for product in products:
+        data = dict()
+        data['borrowid'] = product.pk
+        data['name'] = product.name
+        data['url'] = "https://www.wanglibao.com/p2p/detail/{}".format(product.id)
+        data['isday'] = 1 if product.pay_method.startswith(u"日计息") else 0
+        data['timelimit'] = 0 if product.pay_method.startswith(u"日计息") else product.period
+        data['timelimitday'] = product.period if product.pay_method.startswith(u"日计息") else 0
+        data['account'] = product.total_amount
+        data['owner'] = product.borrower_name
+        data['apr'] = product.expected_earning_rate
+        data['award'] = 1 if product.activity else 0
+        data['partaccount'] = str(round(product.activity.rule.rule_amount, 2)) if product.activity else ''
+        data['funds'] = 0
+
+        if product.pay_method in [u'等额本息']:
+            pay_method = 0
+        elif product.pay_method in [u'日计息一次性还本付息', u'到期还本付息']:
+            pay_method = 1
+        else:
+            pay_method = 3
+        data['repaymentType'] = pay_method
+        data['type'] = 1
+        data['addtime'] = time.mktime(time.strptime(
+            product.publish_time.strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S'))
+        data['sumTender'] = product.completion_rate
+        data['startmoney'] = float(100)
+        data['tenderTimes'] = P2PEquity.objects.filter(product=product).count()
+
+        ret['borrow'].append(data)
+
+    return json.dumps(ret['borrow'])
+
+
+def get_rongtu_list():
+    """
+    author: Zhoudong
+    http请求方式: GET  30天内每天的平均年利率
+    :return:
+    """
+    ret = dict()
+    today = timezone.now()
+    today_start = today.replace(hour=0, minute=0, second=0, microsecond=0)
+    ret['apr_data'] = {}
+    ret['count_data'] = {}
+    ret['dcount_data'] = {}
+    try:
+        for i in range(29, -1, -1):
+            check_date = today_start - timezone.timedelta(days=i)
+
+            products = P2PProduct.objects.filter(publish_time__gte=check_date,
+                                                 publish_time__lt=(check_date + timezone.timedelta(days=1)))
+
+            try:
+                avg_rate = round(products.aggregate(Sum('expected_earning_rate'))
+                                 ['expected_earning_rate__sum'] / products.count(), 2) or 0
+                if avg_rate <= 0:
+                    avg_rate = round(P2PProduct.objects.all().aggregate(Sum('expected_earning_rate'))
+                                     ['expected_earning_rate__sum'] / products.count(), 2) or 15
+            except Exception, e:
+                avg_rate = round(P2PProduct.objects.all().aggregate(Sum('expected_earning_rate'))
+                                 ['expected_earning_rate__sum'] / P2PProduct.objects.count(), 2) or 15
+                print 'avg_rate error: {}'.format(e)
+                print avg_rate
+
+            try:
+                avg_amount = products.aggregate(Sum('total_amount'))['total_amount__sum'] / 10000 or 0
+            except Exception, e:
+                print 'avg_amount error: {}'.format(e)
+                avg_amount = 0
+
+            p2p_equities = P2PEquity.objects.filter(created_at__gte=check_date,
+                                                    created_at__lt=(check_date + timezone.timedelta(days=1)))
+            try:
+                day_amount = (p2p_equities.aggregate(Sum('equity'))['equity__sum'] / 10000) or 0
+            except Exception, e:
+                print 'day_amount error: {}'.format(e)
+                day_amount = 0
+            # 需要返回的数据进行字符串处理
+            # date_str += "'" + str(check_date).split()[0][5:] + "'" + ','
+            date_str = str(check_date).split()[0][5:]
+
+            ret['apr_data'].update({date_str: avg_rate})
+            ret['count_data'].update({date_str: avg_amount})
+            ret['dcount_data'].update({date_str: day_amount})
+
+    except Exception, e:
+        print 'apr_data error: {}'.format(e)
+
+    try:
+        time_delta = timezone.timedelta(days=365)
+        products = P2PProduct.objects.filter(publish_time__gte=today-time_delta)
+
+        day_count = products.filter(pay_method__contains=u'日计息')
+        month_count = products.filter().exclude(pay_method__contains=u'日计息')
+
+        p2p_1to3 = month_count.filter(period__gte=1, period__lte=3)
+        p2p_4to6 = month_count.filter(period__gte=4, period__lte=6)
+        p2p_7to12 = month_count.filter(period__gte=7, period__lte=12)
+        p2p_gt_12 = month_count.filter(period__gt=12)
+
+        amount_p2p_1to3 = (day_count.aggregate(Sum('total_amount'))['total_amount__sum'] +
+                           p2p_1to3.aggregate(Sum('total_amount'))['total_amount__sum']) / 10000 or 0
+        amount_p2p_4to6 = p2p_4to6.aggregate(Sum('total_amount'))['total_amount__sum'] / 10000 or 0
+        amount_p2p_7to12 = p2p_7to12.aggregate(Sum('total_amount'))['total_amount__sum'] / 10000 or 0
+        amount_p2p_gt_12 = p2p_gt_12.aggregate(Sum('total_amount'))['total_amount__sum'] / 10000 or 0
+
+        ret['time_data'] = u"[u'1-3个月',{}],[u'4-6个月',{}],[u'7-12个月',{}],[u'12个月以上',{}]".format(
+            amount_p2p_1to3, amount_p2p_4to6, amount_p2p_7to12, amount_p2p_gt_12)
+    except Exception, e:
+        print 'time_data error: {}'.format(e)
+        ret['time_data'] = u"[u'1-3个月',?],[u'4-6个月',?],[u'7-12个月',?],[u'12个月以上',?]"
+
+    try:
+        # 平台交易总量
+        ret['cj_data'] = P2PEquity.objects.all().aggregate(Sum('equity'))['equity__sum'] / 10000 or 0
+        # 平台待还金额
+        ret['dh_data'] = P2PProduct.objects.filter(status__in=[u'还款中']).aggregate(
+            Sum('total_amount'))['total_amount__sum'] / 10000 or 0
+        # 当天平均年利率
+        today_products = P2PProduct.objects.filter(publish_time__gte=today_start,
+                                                   publish_time__lt=today_start + timezone.timedelta(days=1))
+        try:
+            ret['avg_apr'] = round(today_products.aggregate(Sum('expected_earning_rate'))
+                                   ['expected_earning_rate__sum'] / today_products.count(), 2) or 0
+        except Exception, e:
+            print 'avg_apr error: {}'.format(e)
+            ret['avg_apr'] = round(P2PProduct.objects.all().aggregate(Sum('expected_earning_rate'))
+                                   ['expected_earning_rate__sum'] / P2PProduct.objects.count(), 2) or 0
+    except Exception, e:
+        print 'error: {}'.format(e)
+
+    return json.dumps(ret)
+
+
+def rongtu_post_data():
+
+    url = settings.RONGTU_URL_TEST
+    if settings.ENV == settings.ENV_PRODUCTION:
+        url = settings.RONGTU_URL
+
+    dangan_id = settings.RONGTU_ID
+    borrow = get_rongtu_borrow()
+    arg_list = get_rongtu_list()
+
+    args = dict()
+    args.update(dangan_id=dangan_id, borrow=borrow, list=arg_list)
+
+    ret = requests.post(url, data=args)
+    print ret.text
+    return ret.text
+
+
+class Rong360TokenView(APIView):
+    """
+    get token from us.
+    """
+    permission_classes = ()
+
+    def get(self, request):
+        rong_ret = dict()
+        ret = create_token(request)
+        # {'state': True, 'data': token}
+        if ret['state']:
+            rong_ret = {'data': {'token': ret['data']}}
+        return HttpResponse(renderers.JSONRenderer().render(rong_ret, 'application/json'))
+
+
+class Rong360P2PListView(APIView):
+    """
+    """
+    permission_classes = ()
+
+    def check_token(self):
+        token = str(self.request.GET.get('token', None))
+        return check_token(token)
+
+    def get(self, request):
+
+        if self.check_token():
+            try:
+                time_str = self.request.GET.get('date', None)
+                page_size = int(self.request.GET.get('page_size', 20))
+                page_index = int(self.request.GET.get('page', 1))
+
+                time_zone = settings.TIME_ZONE
+                local = pytz.timezone(time_zone)
+                naive = datetime.datetime.strptime(time_str, "%Y-%m-%d")
+
+                local_dt = local.localize(naive, is_dst=None)
+                start = local_dt.astimezone(pytz.utc)
+                end = start + timezone.timedelta(days=1)
+
+                p2p_list = []
+                ret = dict()
+
+                p2ps = P2PProduct.objects.filter(publish_time__gte=start,
+                                                 publish_time__lt=end).exclude(status=u'流标')
+
+                # 获取总页数, 和页数不对处理
+                com_page = len(p2ps) / page_size + 1
+
+                if page_index > com_page:
+                    page = com_page
+                elif page_index < 1:
+                    page = 1
+                else:
+                    page = page_index
+
+                # 获取到对应的页数的所有用户
+                total = p2ps.count()
+                total_amount = p2ps.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+                if total / page_size >= page:
+                    p2ps = p2ps[(page - 1) * page_size: page * page_size]
+                else:
+                    p2ps = p2ps[(page - 1) * page_size:]
+
+                for product in p2ps:
+
+                    try:
+                        p2p_dict = dict()
+                        p2p_dict['projectId'] = str(product.id)
+                        p2p_dict['title'] = product.name
+                        p2p_dict['amount'] = Decimal(product.total_amount)
+                        p2p_dict['schedule'] = str(Decimal(product.completion_rate).quantize(Decimal('0.00')))
+                        p2p_dict['interestRate'] = str(product.expected_earning_rate) + '%'
+                        p2p_dict['deadline'] = product.period
+                        p2p_dict['deadlineUnit'] = u'天' if product.pay_method.startswith(u'日计息') else u'月'
+                        p2p_dict['reward'] = 0
+                        p2p_dict['type'] = u'抵押标'
+
+                        pay_method = 6
+                        if product.pay_method == u'等额本息':
+                            pay_method = 6
+                        if product.pay_method == u'按月付息':
+                            pay_method = 5
+                        if product.pay_method == u'到期还本付息':
+                            pay_method = 1
+                        if product.pay_method == u'日计息一次性还本付息':
+                            pay_method = 1
+                        if product.pay_method == u'日计息月付息到期还本':
+                            pay_method = 5
+                        p2p_dict['repaymentType'] = pay_method
+
+                        p2p_dict['province'] = None
+                        p2p_dict['city'] = None
+                        p2p_dict['userName'] = product.borrower_name
+                        p2p_dict['userAvatarUrl'] = None
+                        p2p_dict['amountUsedDesc'] = product.usage
+                        p2p_dict['revenue'] = None
+                        p2p_dict['loanUrl'] = 'https://{}/p2p/detail/{}'.format(request.get_host(), product.id)
+                        p2p_dict['successTime'] = timezone.localtime(product.soldout_time).\
+                            strftime('%Y-%m-%d %H:%M:%S') if product.soldout_time else ''
+                        p2p_dict['publishTime'] = timezone.localtime(product.publish_time).\
+                            strftime('%Y-%m-%d %H:%M:%S') if product.publish_time else ''
+
+                        subscribes = []
+                        equities = P2PEquity.objects.filter(product=product)
+                        for equity in equities:
+                            data_dic = dict()
+                            data_dic['subscribeUserName'] = str(equity.user.pk)
+                            data_dic['amount'] = Decimal(equity.equity)
+                            data_dic['validAmount'] = Decimal(equity.equity)
+                            data_dic['addDate'] = equity.confirm_at or equity.created_at
+                            data_dic['status'] = 1 if equity.confirm else 2
+
+                            # 标识手动或自动投标 0:手动 1:自动
+                            try:
+                                may_auto = AutomaticPlan.objects.get(user=equity.user)
+                                if may_auto.amounts_auto == equity.equity \
+                                        and may_auto.rate_min > product.expected_earning_rate \
+                                        and may_auto.is_used:
+                                    data_dic['type'] = 1
+                                else:
+                                    data_dic['type'] = 0
+                            except Exception, e:
+                                print 'Except: {}'.format(e)
+                                data_dic['type'] = 0
+
+                            subscribes.append(data_dic)
+
+                        p2p_dict['subscribes'] = subscribes
+
+                        p2p_list.append(p2p_dict)
+
+                    except Exception, e:
+                        print 'product{} error: {}'.format(product.pk, e)
+
+                ret['borrowList'] = p2p_list
+                ret['totalPage'] = com_page
+                ret['currentPage'] = page_index
+                ret['totalCount'] = total
+                ret['totalAmount'] = Decimal(total_amount)
+
+                return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+            except Exception, e:
+                ret = {
+                    'page_count': 1,
+                    'page_index': 1,
+                    'result_msg': e
+                }
+        else:
+            ret = {
+                'page_count': 1,
+                'page_index': 1,
+                'result_code': 0,
+                'result_msg': u"没有权限访问"
+            }
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))

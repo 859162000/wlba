@@ -299,13 +299,13 @@ class CooperationTestCase(TestCase):
         self.request.GET = {'promo_token':'yiruite', 'tid':'123456'}
         self.request.session = {}
         coop_reg = CoopRegister(self.request)
-        coop_reg.process_for_session()
+        coop_reg.all_processors_for_session()
         assert self.request.session == {'channel_code':'yiruite', 'channel_user':'123456'}
         #for default
         self.request.GET = {'promo_token': 'pptv'}
         self.request.session = {}
         coop_reg = CoopRegister(self.request)
-        coop_reg.process_for_session()
+        coop_reg.all_processors_for_session()
         assert self.request.session == {'channel_code': 'pptv'}
 
 
@@ -313,14 +313,14 @@ class CooperationTestCase(TestCase):
         self.request.GET = {'promo_token':'pptv'}
         self.request.session = {}
         coop_reg = CoopRegister(self.request)
-        coop_reg.process_for_session()
+        coop_reg.all_processors_for_session()
 
         #prepare user data
         prepare_user()
         #prepare channel data
         Channels(code='pptv',name='pptv').save()
 
-        coop_reg.process_for_register(get_user(),None)
+        coop_reg.all_processors_for_user_register(get_user(),None)
 
         introduced_by = IntroducedBy.objects.filter(user = get_user()).get()
 
@@ -330,14 +330,14 @@ class CooperationTestCase(TestCase):
         self.request.GET = {'promo_token':'yiruite', 'tid':'123456'}
         self.request.session = {}
         coop_reg = CoopRegister(self.request)
-        coop_reg.process_for_session()
+        coop_reg.all_processors_for_session()
 
         #prepare user data
         prepare_user()
         #prepare channel data
         Channels(code='yiruite',name='yiruite').save()
 
-        coop_reg.process_for_register(get_user(),None)
+        coop_reg.all_processors_for_user_register(get_user(),None)
 
         today = date.today()
         start_day = (today - timedelta(days=1)).strftime('%Y%m%d')
@@ -354,14 +354,14 @@ class CooperationTestCase(TestCase):
         self.request.GET = {'promo_token':'yiruite', 'tid':'123456'}
         self.request.session = {}
         coop_reg = CoopRegister(self.request)
-        coop_reg.process_for_session()
+        coop_reg.all_processors_for_session()
 
         #prepare user data
         prepare_user()
         #prepare channel data
         Channels(code='yiruite',name='yiruite').save()
 
-        coop_reg.process_for_register(get_user(),None)
+        coop_reg.all_processors_for_user_register(get_user(),None)
         assert coop_reg.get_user_channel_processor(get_user()).c_code == 'yiruite'
 
         clear_db(Channels, User, IntroducedBy)
