@@ -22,11 +22,11 @@
     }).success(function(data) {
       if (data.trade_pwd_is_set) {
         $('#backOne').show()
-        $('#confirmBtn').attr('tag','1')
+        $('.confirmBtn').attr('tag','1')
         $('#name').text(data.name)
       } else {
         $('#backTwo').show()
-        $('#confirmBtn').attr('tag','1')
+        $('.confirmBtn').attr('tag','2')
       }
     });
     /*获取绑卡状态 */
