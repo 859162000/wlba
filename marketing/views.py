@@ -2802,7 +2802,8 @@ class ThunderBindingApi(APIView):
         channel_time = request.POST.get('time', '').strip()
         channel_sign = request.POST.get('sign', '').strip()
         nick_name = request.POST.get('nickname', '').strip()
-        if channel_code and channel_code == 'xunlei9' and channel_user and channel_time and channel_sign:
+        if channel_code and (channel_code == 'xunlei9' and channel_user
+                             and channel_time and channel_sign and nick_name):
             user = self.request.user
             binding = Binding.objects.filter(user_id=user.id).first()
             if not binding:
@@ -2812,6 +2813,7 @@ class ThunderBindingApi(APIView):
                     response_data = {
                         'ret_code': '10000',
                         'message': u'绑定成功',
+                        'nickname': nick_name,
                     }
                 else:
                     response_data = {
