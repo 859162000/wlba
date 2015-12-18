@@ -70,18 +70,18 @@ def save_introducedBy_channel(user, channel):
     record.user = user
     record.save()
 
-
+# Modify by hb on 2015-12-18 : add return value
 def log_clientinfo(device, atype, user_id=0, order_id=0, amount=0):
     # fix@chenweibi, add order_id
     if type(device) != dict:
-        return
+        return False
 
     if "device_type" not in device:
-        return
+        return False
 
     app_version = device.get('app_version', '')
     if device['device_type'] == "pc" and app_version != 'wlb_h5':
-        return
+        return False
 
     ci = ClientData()
     if atype=="register": action='R'
@@ -105,6 +105,8 @@ def log_clientinfo(device, atype, user_id=0, order_id=0, amount=0):
     ci.action = action
     ci.order_id = order_id
     ci.save()
+
+    return True
 
 
 def local_to_utc(source_date, source_time='min'):

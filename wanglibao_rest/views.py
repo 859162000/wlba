@@ -321,7 +321,7 @@ class RegisterAPIView(DecryptParmsAPIView):
         if request.DATA.get('IGNORE_PWD'):
             send_messages.apply_async(kwargs={
                 "phones": [identifier,],
-                "messages": [u'用户名为'+identifier+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
+                "messages": [u'您已成功注册网里宝,用户名为'+identifier+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
             })
 
             logger.debug("此次 channel:%s" %(channel))
@@ -1251,25 +1251,20 @@ class InnerSysSendSMS(APIView, InnerSysHandler):
     def post(self, request):
         phone = request.DATA.get("phone", None)
         message = request.DATA.get("message", None)
-        logger.debug("phone:%s, message:%s" % phone, message)
+        logger.debug("phone:%s, message:%s" % (phone, message))
         if phone is None or message is None:
             return Response({"code": 1000, "message": u'传入的phone或message不全'})
 
-        status, message = super(InnerSysSendSMS, self).judge_valid(request)
+        status, invalid_msg = super(InnerSysSendSMS, self).judge_valid(request)
         if not status:
-            return Response({"code":1001, "message": message})
-        try:
-            status, content = send_messages.apply_async(kwargs={
+            return Response({"code": 1001, "message": invalid_msg})
+
+        send_messages.apply_async(kwargs={
                 "phones": [phone, ],
                 "messages": [message, ]
             })
-        except Exception, reason:
-            return Response({"code": 1002, "message": u"发送短信报异常,reason:{0}".format(reason)})
-        else:
-            if status == 200:
-                return Response({"code": 0, "message": u"短信发送成功"})
-            else:
-                return Response({"code": 1003, "message": u"短信发送失败"})
+
+        return Response({"code": 0, "message": u"短信发送成功"})
 
 
 class InnerSysValidateID(APIView, InnerSysHandler):
