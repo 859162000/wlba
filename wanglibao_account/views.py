@@ -1685,17 +1685,18 @@ class AdminSendMessageView(TemplateView):
             if flag == 'different_batch':
                 from django.template import Template, Context
                 code = codes_list[index]
-                context = Context({
-                    'code': code
-                })
                 tmp_template = Template(content)
-                content = tmp_template.render(context)
+                content_result = tmp_template.render(Context({
+                    'code': code
+                }))
+            else:
+                content_result = content
 
             try:
                 inside_message.send_one.apply_async(kwargs={
                     "user_id": user.id,
                     "title": title,
-                    "content": content,
+                    "content": content_result,
                     "mtype": mtype
                 })
 

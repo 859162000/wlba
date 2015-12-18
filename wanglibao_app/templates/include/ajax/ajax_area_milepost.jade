@@ -4,7 +4,7 @@ if results
     a(href="{{activity.detail_link}}").area-list
       .area-ac-head {{activity.title}}
       .area-ac-banner
-        img(src='/media/{{activity.banner}}')
+        div( class="lazy img-responsive", data-original="/media/{{activity.banner}}")
       .area-ac-milepost-footer
         .area-milepost-time {{activity.done_date}}
         .area-milepost-link 立即查看
