@@ -269,6 +269,40 @@
             });
         }
     });
+    //登入框穿参数
+    function getQueryString(name) {
+        var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) {
+            return unescape(r[2]);
+        }
+        return null;
+    }
+    getQueryString('promo_token')
+    var token = getQueryString('promo_token'),
+        xid = getQueryString('xluserid'),
+        timer =  getQueryString('time'),
+        sig =  getQueryString('sign'),
+        name =  getQueryString('nickname');
+    alert(xunlei9+','+xunlei+','+xun+','+pp+','+ss);
+    $.ajax({
+        type: "POST",
+        url: "/activity/thunder/binding/",
+        data: {
+            'promo_token': 'token',
+            'xluserid': 'xid',
+            'time': 'timer',
+            'sign': 'sig',
+            'nickname': 'name'
+
+        },
+        success: function (data) {
+
+        },
+        error: function () {
+
+        }
+    });
     function getCode() {//得到用户信息的二维码
         var original_id = document.getElementById("original_id").value;
         var code = document.getElementById("weixin_code").value;
@@ -284,5 +318,6 @@
             }
         });
     }
+
     getCode();
 }).call(this);
