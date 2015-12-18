@@ -75,6 +75,7 @@ from rest_framework import renderers
 from django.core.urlresolvers import reverse
 from misc.views import MiscRecommendProduction
 from marketing.utils import pc_data_generator
+from wanglibao_account.cooperation import CoopRegister
 reload(sys)
 
 class YaoView(TemplateView):
@@ -2786,3 +2787,48 @@ class RockFinanceCheckAPIView(BaseWeixinTemplate):
             reward_record.left_times = 0
             reward_record.save()
             return {"code": 0, "message": u'欢迎您参加网利宝金融摇滚夜'}
+
+
+class ThunderBindingApi(APIView):
+    """
+    迅雷用户绑定接口
+    """
+
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        channel_code = request.GET.get('promo_token', '').strip()
+        channel_user = request.GET.get('xluserid', '').strip()
+        channel_time = request.GET.get('time', '').strip()
+        channel_sign = request.GET.get('sign', '').strip()
+        if channel_code and channel_code == 'xunlei9' and channel_user and channel_time and channel_sign:
+            user = self.request.user
+            binding = Binding.objects.filter(user_id=user.id).first()
+            if not binding:
+                CoopRegister(request).all_processors_for_user_register(user, channel_code)
+                binding = Binding.objects.filter(user_id=user.id).first()
+                if binding:
+                    response_data = {
+                        'ret_code': '10000',
+                        'message': u'绑定成功',
+                    }
+                else:
+                    response_data = {
+                        'ret_code': '10003',
+                        'message': u'绑定失败',
+                    }
+            else:
+                response_data = {
+                    'ret_code': '10002',
+                    'message': u'该用户已绑定过',
+                }
+        else:
+            response_data = {
+                'ret_code': '10001',
+                'message': u'非法请求',
+            }
+
+        logger.info("Thunder binding promo_token[%s], xluserid[%s], time[%s], sign[%s], result[%s]"
+                    % (channel_code, channel_user, channel_time, channel_sign, response_data))
+
+        return HttpResponse(json.dumps(response_data), content_type='application/json')
