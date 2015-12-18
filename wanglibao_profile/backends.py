@@ -210,6 +210,8 @@ def _is_version_satisfied(request):
     if device['device_type'] == 'android' and _above_version(device['app_version'], '2.6.0'):
         #2.6.0版本起，支持交易密码
         return True
+    if device['device_type'] == 'pc':
+        return True
     return False
 
 def _is_just_bind_card(request):
