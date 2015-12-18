@@ -214,7 +214,9 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
         $('.bindingError').text('*请绑定银行卡')
       else
         if addFormValidateor.form()
-          $('#withdraw-form').ajaxSubmit()
+          $('#withdraw-form').ajaxSubmit((data) ->
+            tool.modalAlert({title: '温馨提示', msg: data.message})
+          )
   ###设置密码提交表单###
   $('#nextBtn').click ()->
     parent = $('.setTradingPwd1')

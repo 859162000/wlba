@@ -254,7 +254,12 @@
           return $('.bindingError').text('*请绑定银行卡');
         } else {
           if (addFormValidateor.form()) {
-            return $('#withdraw-form').ajaxSubmit();
+            return $('#withdraw-form').ajaxSubmit(function(data) {
+              return tool.modalAlert({
+                title: '温馨提示',
+                msg: data.message
+              });
+            });
           }
         }
       }
