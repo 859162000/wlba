@@ -205,7 +205,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+# USE_TZ = True
 
 LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'local')
@@ -1266,3 +1266,4 @@ if ENV == ENV_PRODUCTION:
 
 # settings for PHP
 PHP_UNPAID_PRINCIPLE = 'http://source.wanglibao.com/py_interface.php?action=getPrincipal'
+PHP_SQS_HOST = 'http://192.168.1.36:1218/'
