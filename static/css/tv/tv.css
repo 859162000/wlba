@@ -32,3 +32,6 @@ body {
     text-align: right;
     font-size: 2em;
 }
+.disp {
+    display: none;
+}

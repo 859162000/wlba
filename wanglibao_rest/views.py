@@ -999,7 +999,7 @@ class Statistics(APIView):
 
         today_user = User.objects.filter(date_joined__gte=today_start).aggregate(Count('id'))
         today_amount = P2PRecord.objects.filter(create_time__gte=today_start, catalog='申购').aggregate(Sum('amount'))
-        today_amount_yesterday = P2PRecord.objects.filter(create_time__gte=yesterday_start, create_time__lt=today_start)\
+        yesterday_amount = P2PRecord.objects.filter(create_time__gte=yesterday_start, create_time__lt=today_start)\
             .filter(catalog='申购').aggregate(Sum('amount'))
         today_num = P2PRecord.objects.filter(create_time__gte=today_start, catalog='申购').values('id').count()
 
@@ -1007,7 +1007,7 @@ class Statistics(APIView):
             .filter(settlement_time__gte=yesterday_start, settlement_time__lt=today_start)\
             .aggregate(Sum('principal'), Sum('interest'))
 
-        amount_sum_yesterday = today_amount_yesterday['amount__sum'] if today_amount_yesterday['amount__sum'] else Decimal('0')
+        amount_sum_yesterday = yesterday_amount['amount__sum'] if yesterday_amount['amount__sum'] else Decimal('0')
         principal_sum = today_repayment['principal__sum'] if today_repayment['principal__sum'] else Decimal('0')
         interest_sum = today_repayment['interest__sum'] if today_repayment['interest__sum'] else Decimal('0')
 
