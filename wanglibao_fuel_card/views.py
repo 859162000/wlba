@@ -115,21 +115,20 @@ class FuelCardExchangeRecordView(TemplateView):
     :request_method GET
     """
 
-    template_name = 'fuel_records_exchange.jade'
-
     TYPES = {
-        'fuel_card': u'加油卡',
+        'fuel_card': (u'加油卡', 'fuel_records_exchange.jade'),
     }
 
-    def get_user_reward_record(self, settled_status, l_type):
+    template_name = ''
+
+    def get_user_amortizations(self, user, settled_status, _type):
         """获取用户还款计划"""
 
-        amotization_record = AmortizationRecord.objects.filter(user=self.request.user, settled=settled_status,
-                                                               product_amortization__product_category=l_type
-                                                               ).select_related(depth=2)
-        user_amotization = amotization_record.order_by('c', 'term')
+        user_amortizations = UserAmortization.objects.filter(user=user, settled=settled_status,
+                                                             product_amortization__product_category=_type
+                                                             ).select_related(depth=2).order_by('-term_date')
 
-        return get_sorts_for_created_time(user_amotization)
+        return user_amortizations
 
     def get_context_data(self, **kwargs):
         _status = self.request.GET.get('status', '').strip()
@@ -137,14 +136,20 @@ class FuelCardExchangeRecordView(TemplateView):
         if not _status:
             return HttpResponseForbidden(u'status参数是必须的')
 
-        l_type = self.TYPES.get(_type, None)
+        l_type, template_name = self.TYPES.get(_type, None)
         if not _type or not l_type:
             return HttpResponseForbidden(u'type参数不存在')
+
+        self.template_name = template_name
 
         status_list = ['wait_receive', 'receive']
         if _status in status_list:
             settled_status = False if _status == 'wait_receive' else True
-            data = self.get_user_reward_record(settled_status, l_type)
+            user_amortizations = self.get_user_amortizations(self.request.user, settled_status, l_type)
+            data = []
+            if user_amortizations:
+                for ua in user_amortizations:
+                    order_id = ua.product_amortization.order_id
 
 
 class FuelCardBuyView(TemplateView):
