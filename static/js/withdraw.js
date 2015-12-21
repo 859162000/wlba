@@ -19,7 +19,7 @@
   });
 
   require(['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator', 'jquery.validate', 'jquery.form'], function($, modal, backend, tool, placeholder, validate, form) {
-    var addFormValidateor, max_amount, min_amount;
+    var addFormValidateor, max_amount, min_amount, _refreshCode;
     max_amount = parseInt($('input[name=fee]').attr('data-max_amount'));
     min_amount = parseInt($('input[name=fee]').attr('data-min_amount'));
     $.validator.addMethod("balance", function(value, element) {
@@ -91,25 +91,22 @@
       }
     });
     $('.ispan4-omega').click(function() {
-      var url;
       $('.code-img-error').html('');
       $('#img-code-div2').modal();
       $('#img-code-div2').find('#id_captcha_1').val('');
+      return _refreshCode();
+    });
+    $('.captcha-refresh').click(function() {
+      return _refreshCode();
+    });
+    _refreshCode = function() {
+      var url;
       url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/anti/captcha/refresh/";
       return $.getJSON(url, {}, function(json) {
         $('input[name="captcha_0"]').val(json.key);
         return $('img.captcha').attr('src', json.image_url);
       });
-    });
-    $('.captcha-refresh').click(function() {
-      var $form, url;
-      $form = $(this).parents('form');
-      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/anti/captcha/refresh/";
-      return $.getJSON(url, {}, function(json) {
-        $form.find('input[name="captcha_0"]').val(json.key);
-        return $form.find('img.captcha').attr('src', json.image_url);
-      });
-    });
+    };
     $("#submit-code-img4").click(function(e) {
       var captcha_0, captcha_1, count, element, intervalId, phoneNumber, timerFunction;
       element = $('#button-get-code-btn');
@@ -254,7 +251,12 @@
           return $('.bindingError').text('*请绑定银行卡');
         } else {
           if (addFormValidateor.form()) {
-            return $('#withdraw-form').ajaxSubmit();
+            return $('#withdraw-form').ajaxSubmit(function(data) {
+              return tool.modalAlert({
+                title: '温馨提示',
+                msg: data.message
+              });
+            });
           }
         }
       }

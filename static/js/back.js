@@ -22,11 +22,11 @@
     }).success(function(data) {
       if (data.trade_pwd_is_set) {
         $('#backOne').show()
-        $('#confirmBtn').attr('tag','1')
+        $('.confirmBtn').attr('tag','1')
         $('#name').text(data.name)
       } else {
         $('#backTwo').show()
-        $('#confirmBtn').attr('tag','1')
+        $('.confirmBtn').attr('tag','2')
       }
     });
     /*获取绑卡状态 */
@@ -134,7 +134,10 @@
       }).success(function(xhr) {
         return tool.modalAlert({
           title: '温馨提示',
-          msg: xhr.message
+          msg: xhr.message,
+          callback_ok:function(){
+              window.location.href='/accounts/setting/';
+          }
         });
       });
     });
