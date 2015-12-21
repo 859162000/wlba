@@ -1022,7 +1022,7 @@ class Statistics(APIView):
             'all_user': all_user['id__count'],
             'all_amount': all_amount['amount__sum'],
 
-            'today_inflow': today_inflow
+            'today_inflow': today_inflow if today_inflow > 0 else 0
         }
 
         return Response(data, status=status.HTTP_200_OK)
