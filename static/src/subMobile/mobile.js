@@ -467,8 +467,8 @@ org.login = (function(org){
             $submit.on('click', function() {
                 var data = {
                     'identifier': $.trim($form.find('input[name=identifier]').val()),
-                    'password': $.trim($form.find('input[name=password]').val()),
-                    'openid': $.trim($form.find('input[name=openid]').val())
+                    'password': $.trim($form.find('input[name=password]').val())
+                    //'openid': $.trim($form.find('input[name=openid]').val())
                 };
                 org.ajax({
                     'type': 'post',
@@ -592,12 +592,11 @@ org.regist = (function(org){
                 $(this).toggleClass('agreement');
                 $(this).hasClass('agreement') ?  $(this).find('input').attr('checked','checked') : $(this).find('input').removeAttr('checked');
                 $identifier.trigger('input')
-            })
+            });
             //刷新验证码
             lib.$captcha_img.on('click', function() {
                 lib._captcha_refresh();
             });
-
 
             //手机验证码
             $('.request-check').on('click',function(){
@@ -1018,7 +1017,7 @@ org.setInputPwd = (function(org){//交易密码
             page.find(".pwd-tit").html(tit);
             page.find(".pwd-promote").html(cont);
             page.show();
-            lib._inputPwd();
+            lib._inputPwd();//弹层js
             page.find(".js-pwd-inps").trigger("click touchstart");
         },
         _pwdAnimate: function(inp){
@@ -1791,7 +1790,7 @@ org.processSecond = (function(org){
                         $validationBtn.text('重新获取').removeAttr('disabled').css('background','#50b143');
                         return org.ui.alert(data);
                     }
-                })
+                });
                 timerFunction();
                 return intervalId = setInterval(timerFunction, 1000);
             })
