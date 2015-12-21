@@ -6,6 +6,7 @@ from wechatpy.oauth import WeChatOAuth
 from rest_framework.response import Response
 from rest_framework.views import APIView
 import logging
+import json
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
@@ -123,9 +124,11 @@ def ajax_wx_register(request):
     openid = request.session.get('openid')
     response = ajax_register(request)
     if response.status_code==200 and openid:
+        r_data = json.loads(response.content)
         try:
-            w_user = WeixinUser.objects.get(openid=openid)
-            bindUser(w_user, request.user)
+            if r_data['message'] == 'done':
+                w_user = WeixinUser.objects.get(openid=openid)
+                bindUser(w_user, request.user)
         except Exception, e:
             logger.debug("fwh register bind error, error_message:::%s"%e.message)
     return response
