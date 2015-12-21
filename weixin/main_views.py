@@ -20,24 +20,25 @@ from wanglibao_account.views import ajax_register
 from misc.models import Misc
 from .forms import OpenidAuthenticationForm
 from django.conf import settings
+from .util import FWH_REGISTER_URL, FWH_LOGIN_URL
 
 class WXLogin(TemplateView):
     template_name = 'weixin_login_new.jade'
 
     def get_context_data(self, *args, **kwargs):
         context = super(WXLogin, self).get_context_data(**kwargs)
-        context['openid'] = self.openid
+        self.request.session['openid'] = self.openid
         next = self.request.GET.get('next', '')
         next = urllib.unquote(next.encode('utf-8'))
+
         return {
             'context': context,
-            'next': next
+            'next': next,
+            'register_url': FWH_REGISTER_URL
             }
 
     @weixin_api_error
     def dispatch(self, request, *args, **kwargs):
-
-
         code = request.GET.get('code')
         state = request.GET.get('state')
         error_msg = ""
@@ -71,7 +72,7 @@ class WXLoginAPI(APIView):
         if form.is_valid():
             user = form.get_user()
             try:
-                openid = request.POST.get('openid')
+                openid = request.session.get('openid')
                 if openid:
                     weixin_user = WeixinUser.objects.get(openid=openid)
                     rs, txt = bindUser(weixin_user, user)
@@ -97,7 +98,7 @@ class WXRegister(TemplateView):
         elif token_session:
             token = token_session
         else:
-            token = 'fwh'
+            token = 'weixin'
 
         if token:
             channel = get_channel_record(token)
@@ -105,21 +106,44 @@ class WXRegister(TemplateView):
             channel = None
         phone = self.request.GET.get('phone', 0)
         next = self.request.GET.get('next', '')
-        openid = self.request.GET.get('openid', '')
+        print '-----------------------------', self.request.session.get('openid')
         return {
             'token': token,
             'channel': channel,
             'phone': phone,
-            'openid':openid,
-            'next': next
+            'next': next,
+            'login_url': FWH_LOGIN_URL,
         }
+
+    @weixin_api_error
+    def dispatch(self, request, *args, **kwargs):
+        code = request.GET.get('code')
+        state = request.GET.get('state')
+        error_msg = ""
+        if code and state:
+            account = WeixinAccounts.getByOriginalId(state)
+            request.session['account_key'] = account.key
+            oauth = WeChatOAuth(account.app_id, account.app_secret, )
+            res = oauth.fetch_access_token(code)
+            self.openid = res.get('openid')
+            form = OpenidAuthenticationForm(self.openid, data=request.GET)
+            if form.is_valid():
+                auth_login(request, form.get_user())
+                return redirectToJumpPage("自动登录成功")
+            else:
+                return super(WXRegister, self).dispatch(request, *args, **kwargs)
+        else:
+            error_msg = u"code or state is None"
+        if error_msg:
+            return redirectToJumpPage(error_msg)
+
 
 class WXRegisterAPI(APIView):
     permission_classes = ()
     http_method_names = ['post']
 
     def post(self, request):
-        openid = request.DATA.get('openid')
+        openid = self.request.session.get('openid')
         if openid:
             w_user = WeixinUser.objects.get(openid=openid)
             response = ajax_register(request)
