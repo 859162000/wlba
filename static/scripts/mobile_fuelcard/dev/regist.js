@@ -6,13 +6,13 @@ webpackJsonp([2],[
 
 	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
 
-	__webpack_require__(3);
+	__webpack_require__(5);
 
 	var _automatic_detection = __webpack_require__(2);
 
-	var _functions = __webpack_require__(4);
+	var _functions = __webpack_require__(3);
 
-	var _check = __webpack_require__(5);
+	var _check = __webpack_require__(4);
 
 	var _validation = __webpack_require__(6);
 
@@ -136,34 +136,6 @@ webpackJsonp([2],[
 /* 1 */,
 /* 2 */,
 /* 3 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Promise.prototype.done = function (onFulfilled, onRejected) {
-	  this.then(onFulfilled, onRejected).catch(function (reason) {
-	    // 抛出一个全局错误
-	    setTimeout(function () {
-	      throw reason;
-	    }, 0);
-	  });
-	};
-
-	Promise.prototype.finally = function (callback) {
-	  var P = this.constructor;
-	  return this.then(function (value) {
-	    return P.resolve(callback()).then(function () {
-	      return value;
-	    });
-	  }, function (reason) {
-	    return P.resolve(callback()).then(function () {
-	      throw reason;
-	    });
-	  });
-	};
-
-/***/ },
-/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
@@ -242,7 +214,7 @@ webpackJsonp([2],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
@@ -345,6 +317,34 @@ webpackJsonp([2],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Promise.prototype.done = function (onFulfilled, onRejected) {
+	  this.then(onFulfilled, onRejected).catch(function (reason) {
+	    // 抛出一个全局错误
+	    setTimeout(function () {
+	      throw reason;
+	    }, 0);
+	  });
+	};
+
+	Promise.prototype.finally = function (callback) {
+	  var P = this.constructor;
+	  return this.then(function (value) {
+	    return P.resolve(callback()).then(function () {
+	      return value;
+	    });
+	  }, function (reason) {
+	    return P.resolve(callback()).then(function () {
+	      throw reason;
+	    });
+	  });
+	};
+
+/***/ },
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -357,9 +357,9 @@ webpackJsonp([2],[
 	});
 	exports.validation = undefined;
 
-	var _functions = __webpack_require__(4);
+	var _functions = __webpack_require__(3);
 
-	var _check = __webpack_require__(5);
+	var _check = __webpack_require__(4);
 
 	var validation = exports.validation = function validation($phone, $captcha_0, $captcha_1, $captcha) {
 

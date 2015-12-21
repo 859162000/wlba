@@ -8,9 +8,9 @@ webpackJsonp([4],[
 
 	var _automatic_detection = __webpack_require__(2);
 
-	var _functions = __webpack_require__(4);
+	var _functions = __webpack_require__(3);
 
-	var _check = __webpack_require__(5);
+	var _check = __webpack_require__(4);
 
 	var _validation = __webpack_require__(6);
 
@@ -245,8 +245,7 @@ webpackJsonp([4],[
 /***/ },
 /* 1 */,
 /* 2 */,
-/* 3 */,
-/* 4 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
@@ -325,7 +324,7 @@ webpackJsonp([4],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
@@ -428,6 +427,7 @@ webpackJsonp([4],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
+/* 5 */,
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -440,9 +440,9 @@ webpackJsonp([4],[
 	});
 	exports.validation = undefined;
 
-	var _functions = __webpack_require__(4);
+	var _functions = __webpack_require__(3);
 
-	var _check = __webpack_require__(5);
+	var _check = __webpack_require__(4);
 
 	var validation = exports.validation = function validation($phone, $captcha_0, $captcha_1, $captcha) {
 
