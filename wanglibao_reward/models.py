@@ -123,7 +123,6 @@ class WanglibaoActivityReward(models.Model):
     update_at = models.DateTimeField(auto_now_add=True, verbose_name=u'更新时间')
 
     class Meta:
-        unique_together = (("user", "create_at"),)  # 联合唯一索引
         verbose_name = u'发奖记录表'
         verbose_name_plural = u'发奖记录表'
 

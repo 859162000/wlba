@@ -250,7 +250,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         mixins.jumpToManageMoney();
                     })
                 }
-
+				$('#tiyanjin').click(function(){
+					window.location.href = '/activity/experience/redirect/'
+				});
             });
 			$('.code_wrap').hide();
         },
@@ -269,6 +271,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			});
 			$('.link_licai').click(function(){
 				window.location.href = '/weixin/list/'
+			});
+			$('#tiyanjin').click(function(){
+				window.location.href = '/activity/experience/mobile/';
 			});
 			$('.code_wrap').show();
             //console.log('其他场景的业务逻辑');
