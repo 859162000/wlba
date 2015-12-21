@@ -70,7 +70,7 @@ def buy_month_product(trade_id, user_id, product_id, token, amount, amount_sourc
     data.update(data=ret)
 
     data = simplejson.dumps(data)
-    url = settings.PHP_SQS_HOST + '?opt=put&name=interfaces'
+    url = settings.PHP_SQS_HOST
     ret = save_to_sqs(url, data)
 
     print ret.text
@@ -132,6 +132,8 @@ def assignment_buy(buyer_id, seller_id, product_id, buy_order_id, sell_order_id,
                     assignment.status = True
                     assignment.save()
                     ret.update(status=1,
+                               buyer_token=buyer_token,
+                               seller_token=seller_token,
                                msg='success')
             except Exception, e:
                 ret.update(status=0,
@@ -145,9 +147,10 @@ def assignment_buy(buyer_id, seller_id, product_id, buy_order_id, sell_order_id,
 
     # 写入 sqs
     data = dict()
+    data.update(tag='purchaseZhaiZhuan')
     data.update(data=ret)
     data = simplejson.dumps(data)
-    url = settings.PHP_SQS_HOST + '?opt=put&name=interfaces'
+    url = settings.PHP_SQS_HOST
     ret = save_to_sqs(url, data)
 
     print ret.text

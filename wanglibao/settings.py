@@ -205,7 +205,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-# USE_TZ = True
+USE_TZ = True
 
 LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'local')
@@ -707,6 +707,20 @@ CELERYBEAT_SCHEDULE = {
     'march_top10_rank_awards': {
         'task': 'wanglibao_reward.tasks.sendYesterdayTopRankAward',
         'schedule': crontab(minute=0, hour=1),
+    },
+    # # by Zhoudong 定期检查用户优惠券没使用,发送提醒
+    # 'redpack_status_task_check': {
+    #     'task': 'marketing.tools.check_redpack_status',
+    #     'schedule': crontab(minute=0, hour=11),
+    # },
+    # by Zhoudong 定期检查用户优惠券没使用,发送提醒
+    'month_product_buy_task_check': {
+        'task': 'wanglibao_margin.tasks.buy_month_product',
+        'schedule': timedelta(minutes=1),
+    },
+    'assignment_buy_task_check': {
+        'task': 'wanglibao_margin.tasks.assignment_buy',
+        'schedule': timedelta(minutes=1),
     },
 }
 
@@ -1265,5 +1279,8 @@ if ENV == ENV_PRODUCTION:
     DATACUBE_URL = 'http://10.171.37.235:10000/datacube/index'
 
 # settings for PHP
-PHP_UNPAID_PRINCIPLE = 'http://source.wanglibao.com/py_interface.php?action=getPrincipal'
-PHP_SQS_HOST = 'http://192.168.1.36:1218/'
+PHP_UNPAID_PRINCIPLE = 'http://wltest.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
+PHP_SQS_HOST = 'http://192.168.20.241:1218/?opt=put&name=interfaces&auth=wlb_ylb.sqs'
+if ENV == ENV_PRODUCTION:
+    PHP_UNPAID_PRINCIPLE = 'http://wlpython.wanglibao.com/ylb/py_interface.php?action=getPrincipal'
+    PHP_SQS_HOST = 'http://ms.wanglibao.com:1218/?opt=put&name=interfaces&auth=wlb_ylb.ms'

@@ -112,6 +112,24 @@ class GetUnreadMgsNum(APIView):
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
+class GetUserUnreadMgsNum(APIView):
+    """
+    author: Zhoudong
+    http请求方式: GET  根据用户ID 得到用户可用余额。
+    http://xxxxxx.com/php/margin/?user_id=11111
+    返回数据格式：json
+    :return:
+    """
+    permission_classes = ()
+
+    def get(self, request):
+        user_id = self.request.user.pk
+
+        ret = get_unread_msgs(user_id)
+
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
 class SendInsideMessage(APIView):
     """
     author: Zhoudong
@@ -292,6 +310,34 @@ class YueLiBaoBuyFail(APIView):
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
+class YueLiBaoBuyStatus(APIView):
+    """
+    author: Zhoudong
+    http请求方式: POST
+    http://xxxxxx.com/php/yue/status/
+    :return: status = 1  成功, status = 0 失败 .
+    """
+    permission_classes = ()
+
+    @csrf_exempt
+    def post(self, request):
+
+        ret = dict()
+
+        token = request.POST.get('token')
+
+        product = MonthProduct.objects.filter(token=token).first()
+
+        if not product:
+            ret.update(status=-1, msg='trade does not exist!')
+        elif product.pay_status:
+            ret.update(status=1, msg='trade success!')
+        else:
+            ret.update(status=0,
+                       msg='pay failed!')
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
 class YueLiBaoCheck(APIView):
     """
     author: Zhoudong
@@ -440,6 +486,9 @@ class YueLiBaoRefund(APIView):
 
                         except Exception, e:
                             print e
+                            ret.update(status=0,
+                                       msg=str(e))
+                            return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
                 ret.update(status=1,
                            msg=msg_list)
@@ -479,7 +528,8 @@ class AssignmentOfClaimsBuy(APIView):
         sell_price_source = request.POST.get('sellPriceSource')
 
         if buyer_id and seller_id and product_id and buy_order_id and sell_order_id and buyer_token and seller_token\
-                and fee and premium_fee and trading_fee and buy_price and sell_price and buy_price_source and sell_price_source:
+                and fee and premium_fee and trading_fee and buy_price and sell_price and buy_price_source \
+                and sell_price_source:
 
             assignment_buy.apply_async(
                 kwargs={'buyer_id': buyer_id, 'seller_id': seller_id, 'product_id': product_id,
@@ -493,6 +543,35 @@ class AssignmentOfClaimsBuy(APIView):
         else:
             return HttpResponse(renderers.JSONRenderer().render(
                 {'status': '0', 'msg': 'args error!'}, 'application/json'))
+
+
+class AssignmentBuyStatus(APIView):
+    """
+    author: Zhoudong
+    http请求方式: POST
+    http://xxxxxx.com/php/yue/status/
+    :return: status = 1  成功, status = 0 失败 .
+    """
+    permission_classes = ()
+
+    @csrf_exempt
+    def post(self, request):
+
+        ret = dict()
+
+        buyer_token = request.POST.get('buyToken')
+        seller_token = request.POST.get('sellToken')
+
+        assignment = AssignmentOfClaims.objects.filter(buyer_token=buyer_token, seller_token=seller_token).first()
+
+        if not assignment:
+            ret.update(status=-1, msg='trade does not exist!')
+        elif assignment.status:
+            ret.update(status=1, msg='trade success!')
+        else:
+            ret.update(status=0,
+                       msg='assignment pay failed!')
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
 class AssignmentBuyFail(APIView):

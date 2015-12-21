@@ -18,7 +18,7 @@ from wanglibao_cash.views import CashHomeView, CashDetailView
 from wanglibao_fund.views import FundDetailView, FundProductsView
 from wanglibao_margin.php_api import GetUserInfo, GetMarginInfo, SendInsideMessage, CheckTradePassword, YueLiBaoBuy, \
     YueLiBaoCheck, YueLiBaoCancel, YueLiBaoRefund, AssignmentOfClaimsBuy, SendMessages, YueLiBaoBuyFail, \
-    AssignmentBuyFail, GetUnreadMgsNum
+    AssignmentBuyFail, GetUnreadMgsNum, YueLiBaoBuyStatus, AssignmentBuyStatus, GetUserUnreadMgsNum
 from wanglibao_portfolio.views import PortfolioHomeView
 from wanglibao_pay.views import AdminTransactionWithdraw, AdminTransactionP2P, AdminTransactionDeposit
 from wanglibao_p2p.views import AdminP2PUserRecord
@@ -194,6 +194,7 @@ urlpatterns += patterns(
     # 单条站内信
     url(r'^php/send_message/inside/$', SendInsideMessage.as_view(), name='php_send_inside_message'),
     url(r'^php/unread_messages/$', GetUnreadMgsNum.as_view(), name='php_unread_messages'),
+    url(r'^api/php/unread_messages/$', GetUserUnreadMgsNum.as_view(), name='php_self_unread_messages'),
     # 发送短信, 是否是营销类传参数 ext 分开.
     url(r'^php/send_messages/$', SendMessages.as_view(), name='php_send_messages'),
 
@@ -201,11 +202,13 @@ urlpatterns += patterns(
 
     url(r'^php/yue/buy/$', YueLiBaoBuy.as_view(), name='php_buy_yuelibao'),
     url(r'^php/yue/fail/$', YueLiBaoBuyFail.as_view(), name='php_buy_yuelibao_fail'),
+    url(r'^php/yue/status/$', YueLiBaoBuyStatus.as_view(), name='php_buy_yuelibao_status'),
     url(r'^php/yue/check/$', YueLiBaoCheck.as_view(), name='php_check_yuelibao'),
     url(r'^php/yue/cancel/$', YueLiBaoCancel.as_view(), name='php_cancel_yuelibao'),
     url(r'^php/yue/refund/$', YueLiBaoRefund.as_view(), name='php_refund_yuelibao'),
 
     url(r'^php/assignment/buy/$', AssignmentOfClaimsBuy.as_view(), name='php_buy_assignment'),
+    url(r'^php/assignment/status/$', AssignmentBuyStatus.as_view(), name='php_buy_assignment_status'),
     url(r'^php/assignment/fail/$', AssignmentBuyFail.as_view(), name='php_buy_assignment_fail'),
 
     # url(r'^php/logout/$', logout_with_cookie, name='php_logout_cookie'),
