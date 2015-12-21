@@ -4,7 +4,7 @@ html(style="background: #b10012")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_double_eggs.css?v=121403", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_double_eggs.css?v=122101", rel="stylesheet")
         - csrf_token
     body
         .body_wrap
@@ -14,17 +14,17 @@ html(style="background: #b10012")
                 img.main_title_img.banner(src="/static/imgs/mobile_activity/app_double_eggs/main_title_1.png")
                 .main_top
                     img(src="/static/imgs/mobile_activity/app_double_eggs/main_top_1.png")
-                    .text 活动期间首次满额投资送10倍理财金！<br>我出10倍本金你得收益，所得可直接提现！
+                    .text 活动期间单笔投资送翻倍理财金！<br>我出翻倍本金你得收益，所得可直接提现！
                 .main
                     .red_wrap
                         .red_box
-                            .title 1. 2000≤活动期间首投＜5000
+                            .title 1. 2000≤活动期间单笔投资＜5000
                             img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_1.jpg")
                         .red_box
-                            .title 2. 5000≤活动期间首投＜8000
+                            .title 2. 5000≤活动期间单笔投资＜8000
                             img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_2.jpg")
                         .red_box
-                            .title 3. 8000≤活动期间首投＜10000
+                            .title 3. 8000≤活动期间单笔投资＜10000
                             img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_3.jpg")
                     .button.link_licai 立即投资领取
                     .remarks 备注：所有体验金10%年化、1天期限计算发放收益到账户余额。
@@ -33,14 +33,14 @@ html(style="background: #b10012")
                         .rule_title 【理财金领取和使用规则】
                         dl.rule_text
                             dt 1.
-                            dd 活动期间内首次满额投资即可获得定额翻倍理财金，理财金自动发放到相应账户并站内信通知；
+                            dd 活动期间内单笔投资满额即可获得定额翻倍理财金，理财金自动发放到相应账户并站内信通知；
                         dl.rule_text
                             dt 2.
                             dd 理财金只能在相关活动页投体验标使用，投标时不能使用其他理财券，理财金自发放日起15日内有效；
                         dl.rule_text
                             dt 3.
                             dd 理财金需用户手动投资，投资时系统将自动按理财金总额一次性投标完成，
-                                span.link_licai 立即进入理财金投标页面；
+                                span#tiyanjin 立即进入理财金投标页面；
                         dl.rule_text
                             dt 4.
                             dd 理财金投资完毕后，当日开始计算利息，到期日16点回款。还款本金系统自动回收，利息收益系统自动发放到用户账户；
@@ -111,7 +111,7 @@ html(style="background: #b10012")
                             dd 红包有效期：2015年12月22日-2015年1月3日23:59；
                         dl.rule_text
                             dt 2.
-                            dd 红包翻倍专场所赠红包限投3月（含）以上标期，活动多充多送上不封顶；
+                            dd 红包翻倍专场所赠红包限投6月（含）以上标期，活动多充多送上不封顶；
                         dl.rule_text
                             dt 3.
                             dd 红包为直抵现金红包，统一以站内信形式通知，完成一次投资回款后即可取现，每个红包仅限使用一次，不可叠加使用，使用后无论是否有余额均失效；
@@ -167,7 +167,7 @@ html(style="background: #b10012")
                     dd 活动时间：2015年12月22日-2016年1月3日；
                 dl.rule_text
                     dt 2.
-                    dd 活动期间，新老用户均可参加活动；
+                    dd 活动期间，新老用户均可参加活动，红包限投散标使用，不可用于债转或月利宝标期；
                 dl.rule_text
                     dt 3.
                     dd 符合累计排名送大奖的中奖客户，在活动结束后7个工作日内会有客服MM与您联系，具体沟通您的收货信息。奖品会在1月15日前完成奖品发放，请保持手机畅通；
@@ -183,7 +183,7 @@ html(style="background: #b10012")
                 img.text(src="/static/imgs/mobile_activity/app_double_eggs/code_text.png")
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src="/static/scripts/component/webview.js?v=20151215")
-        script(src="/static/scripts/mobile_activity/dist/app_double_eggs.js?v=121601")
+        script(src="/static/scripts/mobile_activity/dist/app_double_eggs.js?v=122101")
         script.
             var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
                 iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
