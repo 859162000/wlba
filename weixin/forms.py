@@ -9,6 +9,7 @@ class OpenidAuthenticationForm(forms.Form):
 
     error_messages = {
         'param_is_null': '1',
+        'user_not_exist': '2',
     }
 
     def __init__(self, openid, *args, **kwargs):
@@ -24,6 +25,7 @@ class OpenidAuthenticationForm(forms.Form):
         self._errors = None
 
     def clean(self):
+        print 'self.openid==%s'%self.openid
         self.user_cache = authenticate(openid=self.openid)
         if self.user_cache is None:
             raise forms.ValidationError(
