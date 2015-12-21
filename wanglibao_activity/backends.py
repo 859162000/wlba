@@ -1,6 +1,6 @@
 # encoding:utf-8
 
-import time
+import re
 import datetime
 import json
 import logging
@@ -16,7 +16,7 @@ from marketing.models import IntroducedBy, Reward, RewardRecord
 from wanglibao_redpack import backends as redpack_backends
 from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
 from wanglibao_pay.models import PayInfo
-from wanglibao_p2p.models import P2PRecord, P2PEquity
+from wanglibao_p2p.models import P2PRecord, P2PEquity, P2PProduct
 from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_sms.tasks import send_messages
@@ -294,6 +294,67 @@ def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
                         _send_gift(record.user, rule, device_type, is_full)
                 except Exception:
                     pass
+
+    # 根据标ID判断相关的类型,期限等信息
+    if product_id:
+        try:
+            product = P2PProduct.objects.filter(pk=product_id, hide=False)\
+                .values('period', 'pay_method', 'types_id').first()
+        except P2PProduct.DoesNotExist:
+            logger.error("==== 标不存在,ID:%s ====".format(product_id))
+            return
+        if rule.period and rule.p2p_types:
+            rule_period = int(rule.period)
+            rule_period_type = rule.period_type
+            product_period = product['period']
+            pay_method = product['pay_method']
+            p2p_types_id = int(rule.p2p_types.id)
+            if product['types_id']:
+                if product['types_id'] == p2p_types_id:
+                    is_send_gift = _check_period(pay_method, product_period, rule_period, rule_period_type)
+                    if is_send_gift:
+                        _send_gift(user, rule, device_type, is_full, amount)
+        elif rule.p2p_types:
+            p2p_types_id = int(rule.p2p_types.id)
+            if product['types_id']:
+                if product['types_id'] == p2p_types_id:
+                    _send_gift(user, rule, device_type, is_full, amount)
+        elif rule.period:
+            if product['types_id']:
+                rule_period = int(rule.period)
+                rule_period_type = rule.period_type
+                product_period = product['period']
+                pay_method = product['pay_method']
+                is_send_gift = _check_period(pay_method, product_period, rule_period, rule_period_type)
+                if is_send_gift:
+                    _send_gift(user, rule, device_type, is_full, amount)
+
+
+def _check_period(pay_method, product_period, rule_period, rule_period_type):
+    if rule_period_type == 'month' or rule_period_type == 'day':
+        if product_period == rule_period:
+            return True
+    else:
+        matches = re.search(u'日计息', pay_method)
+        if matches and matches.group():
+            if rule_period_type == 'month_gte':
+                # 当"规则的月数*30 < 产品的天数"时符合规则
+                if rule_period * 30 < product_period:
+                    return True
+            elif rule_period_type == 'day_gte':
+                # 当"规则的天数 < 产品的天数"时符合规则
+                if rule_period < product_period:
+                    return True
+        else:
+            if rule_period_type == 'month_gte':
+                # 当"规则的月数 < 产品的月数"时符合规则
+                if rule_period < product_period:
+                    return True
+            elif rule_period_type == 'day_gte':
+                # 当"规则的天数 < 产品的月数*30"时符合规则
+                if rule_period < pay_method * 30:
+                    return True
+    return False
 
 
 def _check_trade_amount(user, rule, device_type, amount, is_full):
