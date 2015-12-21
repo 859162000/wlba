@@ -1134,7 +1134,7 @@ class XunleiActivityAPIView(APIView):
                 if record.experience:
                     json_to_response = {
                         'code': 0,
-                        'lefts': sum_left["amount_sum"],
+                        'lefts': sum_left["amount_sum"]-1,
                         'amount': str(record.experience.amount),
                         'message': u'用户抽到奖品'
                     }
@@ -1143,7 +1143,7 @@ class XunleiActivityAPIView(APIView):
                 else:
                     json_to_response = {
                         'code': 1,
-                        'lefts': sum_left["amount_sum"],
+                        'lefts': sum_left["amount_sum"]-1,
                         'message': u'此次没有得到奖品'
                     }
 
