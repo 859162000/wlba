@@ -273,7 +273,7 @@ def check_birth_date_for_id(id_number):
 
     _month = birth_date[4:6]
     _day = birth_date[6:]
-    if 0 < int(_month) <= 12 and 0 < _day <= 31:
+    if 0 < int(_month) <= 12 and 0 < int(_day) <= 31:
         return True
     return False
 
