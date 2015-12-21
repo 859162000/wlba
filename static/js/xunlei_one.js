@@ -62,7 +62,12 @@
             buttonFont: '立即注册',
             hasCallBack: true,
             callBack: function () {
-                window.location.href = "http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao"
+                if ($('#register_submit').hasClass('buttom-mm')) {
+                     window.location.href = "http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao"
+                } else{
+                     history.go(0);
+                }
+
 
             }
         });
