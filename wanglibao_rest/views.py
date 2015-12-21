@@ -322,7 +322,7 @@ class RegisterAPIView(DecryptParmsAPIView):
         if request.DATA.get('IGNORE_PWD'):
             send_messages.apply_async(kwargs={
                 "phones": [identifier,],
-                "messages": [u'您已成功注册网里宝,用户名为'+identifier+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
+                "messages": [u'您已成功注册网利宝,用户名为'+identifier+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
             })
 
             logger.debug("此次 channel:%s" %(channel))
