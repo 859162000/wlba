@@ -1134,8 +1134,8 @@ class XunleiActivityAPIView(APIView):
                 if record.experience:
                     json_to_response = {
                         'code': 0,
-                        'lefts': sum_left["amount_sum"],
-                        'amount': str(record.experience.amount),
+                        'lefts': sum_left["amount_sum"]-1,
+                        'amount': "%04d" % (record.experience.amount,),
                         'message': u'用户抽到奖品'
                     }
                     redpack_backends.give_activity_redpack(request.user, record.experience, 'pc')
@@ -1143,7 +1143,7 @@ class XunleiActivityAPIView(APIView):
                 else:
                     json_to_response = {
                         'code': 1,
-                        'lefts': sum_left["amount_sum"],
+                        'lefts': sum_left["amount_sum"]-1,
                         'message': u'此次没有得到奖品'
                     }
 
