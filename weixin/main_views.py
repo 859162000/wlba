@@ -5,9 +5,10 @@ from django.contrib.auth import login as auth_login
 from wechatpy.oauth import WeChatOAuth
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.http import HttpResponse
-import json
-from django.core.urlresolvers import reverse
+import logging
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.debug import sensitive_post_parameters
+from django.views.decorators.cache import never_cache
 
 from weixin.common.decorators import weixin_api_error
 from weixin.models import WeixinAccounts, WeixinUser
@@ -20,6 +21,9 @@ from wanglibao_account.views import ajax_register
 from misc.models import Misc
 from .forms import OpenidAuthenticationForm
 from django.conf import settings
+
+
+logger = logging.getLogger("weixin")
 
 class WXLogin(TemplateView):
     template_name = 'weixin_login_new.jade'
@@ -96,7 +100,7 @@ class WXRegister(TemplateView):
         elif token_session:
             token = token_session
         else:
-            token = 'weixin'
+            token = 'fwh'
 
         if token:
             channel = get_channel_record(token)
@@ -112,23 +116,6 @@ class WXRegister(TemplateView):
             'next': next,
         }
 
-    @weixin_api_error
-    def dispatch(self, request, *args, **kwargs):
-        self.openid = self.request.session.get('openid', "")
-        if self.openid:
-            form = OpenidAuthenticationForm(self.openid, data=request.GET)
-            if form.is_valid():
-                auth_login(request, form.get_user())
-                return redirectToJumpPage("自动登录成功")
-            else:
-                return super(WXRegister, self).dispatch(request, *args, **kwargs)
-        else:
-            super(WXRegister, self).dispatch(request, *args, **kwargs)
-
-from django.views.decorators.csrf import csrf_protect
-from django.views.decorators.debug import sensitive_post_parameters
-from django.views.decorators.cache import never_cache
-
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
@@ -136,19 +123,11 @@ def ajax_wx_register(request):
     openid = request.session.get('openid')
     response = ajax_register(request)
     if response.status_code==200 and openid:
-        w_user = WeixinUser.objects.get(openid=openid)
-        bindUser(w_user, request.user)
+        try:
+            w_user = WeixinUser.objects.get(openid=openid)
+            bindUser(w_user, request.user)
+        except Exception, e:
+            logger.debug("fwh register bind error, error_message:::%s"%e.message)
     return response
 
-# class WXRegisterAPI(APIView):
-#     permission_classes = ()
-#     http_method_names = ['post']
-#
-#     def post(self, request):
-#         openid = self.request.session.get('openid')
-#         response = ajax_register(request)
-#         if response.status_code==200 and openid:
-#             w_user = WeixinUser.objects.get(openid=openid)
-#             bindUser(w_user, request.user)
-#         return response
 
