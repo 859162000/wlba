@@ -10,9 +10,9 @@ webpackJsonp([3],[
 
 	var _automatic_detection = __webpack_require__(2);
 
-	var _functions = __webpack_require__(4);
+	var _functions = __webpack_require__(3);
 
-	var _check = __webpack_require__(5);
+	var _check = __webpack_require__(4);
 
 	(function () {
 
@@ -100,8 +100,7 @@ webpackJsonp([3],[
 /***/ },
 /* 1 */,
 /* 2 */,
-/* 3 */,
-/* 4 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
@@ -180,7 +179,7 @@ webpackJsonp([3],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
@@ -283,6 +282,7 @@ webpackJsonp([3],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
+/* 5 */,
 /* 6 */,
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
