@@ -387,7 +387,8 @@ class P2PReward(models.Model):
         (u'加油卡', u'加油卡'),
     )
 
-    type = models.CharField(u'奖品类型', max_length=40, default=u'加油卡', choices=REWARD_TYPE)
+    type = models.CharField(u'奖品类型', max_length=40, default=u'加油卡', choices=REWARD_TYPE,
+                            help_text=u"*必须与产品表类别名称一致")
     channel = models.ForeignKey(Channels, verbose_name=u'奖品渠道')
     price = models.FloatField(u'面值（元）', default=0, blank=False)
     create_time = models.DateTimeField(u'录入时间', auto_now_add=True)
