@@ -52,6 +52,7 @@ from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
 from marketing.tops import Top
 from marketing import tools
 from marketing.models import PromotionToken
+from marketing.utils import local_to_utc
 from django.conf import settings
 from wanglibao_account.models import Binding
 from wanglibao_anti.anti.anti import AntiForAllClient
@@ -989,17 +990,24 @@ class Statistics(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        today = datetime.now().date()
-        tomorrow = today + timedelta(1)
-        today_start = datetime.combine(today, time())
-        today_end = datetime.combine(tomorrow, time())
+        today = datetime.now()
+        # tomorrow = today + timedelta(1)
+        today_start = local_to_utc(datetime(today.year, today.month, today.day), 'min')
+        # today_end = datetime.combine(tomorrow, time())
 
-        today_user = User.objects.filter(date_joined__range=(today_start, today_end)).aggregate(Count('id'))
-        today_amount = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购').aggregate(
-            Sum('amount'))
+        today_user = User.objects.filter(date_joined__gte=today_start).aggregate(Count('id'))
+        today_amount = P2PRecord.objects.filter(create_time__gte=today_start, catalog='申购').aggregate(Sum('amount'))
+        today_num = P2PRecord.objects.filter(create_time__gte=today_start, catalog='申购').values('id').count()
 
-        today_num = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购') \
-            .values('id').count()
+        today_repayment = ProductAmortization.objects.filter(settled=True)\
+            .filter(settlement_time__gte=today_start).aggregate(Sum('principal'), Sum('interest'))
+
+        amount_sum = today_amount['amount__sum'] if today_amount['amount__sum'] else Decimal('0')
+        principal_sum = today_repayment['principal__sum'] if today_repayment['principal__sum'] else Decimal('0')
+        interest_sum = today_repayment['interest__sum'] if today_repayment['interest__sum'] else Decimal('0')
+
+        # 每日资金净流入
+        today_inflow = amount_sum - principal_sum - interest_sum
 
         all_user = User.objects.all().aggregate(Count('id'))
         all_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))
@@ -1008,11 +1016,13 @@ class Statistics(APIView):
         data = {
             'today_num': today_num,
             'today_user': today_user['id__count'],
-            'today_amount': today_amount['amount__sum'],
+            'today_amount': amount_sum,
 
             'all_num': all_num,
             'all_user': all_user['id__count'],
             'all_amount': all_amount['amount__sum'],
+
+            'today_inflow': today_inflow
         }
 
         return Response(data, status=status.HTTP_200_OK)
