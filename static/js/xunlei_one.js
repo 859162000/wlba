@@ -220,13 +220,13 @@
                 async: false
             }).done(function (data) {
                 console.log(data);
-                if (data.lefts) {
-                    $('#chance').text(' ' + data['lefts'] + ' ');
-                } else if (change['left'] == 0) {
-                    $('#chance').text(' ' + data.lefts + ' ');
-                } else {
-                    $('#chance').text(' ' + 3 + ' ');
-                }
+                //if (data['lefts']) {
+                $('#chance').text(' ' + data['lefts'] + ' ');
+                //} else if (data['left'] == 0) {
+                    //$('#chance').text(' ' + data['lefts'] + ' ');
+                //} else {
+                    //$('#chance').text(' ' + 3 + ' ');
+                //}
             });
 
         }
@@ -258,7 +258,7 @@
                         $('#xl-aug-fail p').text('Sorry~您的抽奖次数已用完')
                         $('#xl-aug-fail').show();
                     } else if (data['code'] == 0 || data['code'] == 1) {
-                        game();
+                        game(data);
                         //$('body,html').animate({scrollTop: 0}, 600);
                         //$('#small-zc').show();
                         //$('#xl-aug-login').show();
@@ -266,11 +266,12 @@
                 }
 
             })
-            chances()
+            chances();
 
             //})
         })
         function game(isGet) {
+            console.log(isGet);
             $('.go-game').addClass('noClick');
             //按钮按下样式
             //手柄的样式
@@ -281,12 +282,9 @@
                 }, 50)
                 if (isGet) {
                     //成功调用
-                    //redpack('GET_AWARD');
-                    star('0' + change['amount']);
-                    ;
+                    star('0' + isGet['amount']);
                 } else {
                     //失败调用
-                    //redpack('IGNORE_AWARD');
                     star('0000');
                 }
             }, 10)
