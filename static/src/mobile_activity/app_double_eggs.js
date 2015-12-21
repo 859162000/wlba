@@ -31,7 +31,9 @@
                         mixins.jumpToManageMoney();
                     })
                 }
-
+				$('#tiyanjin').click(function(){
+					window.location.href = '/activity/experience/redirect/'
+				});
             });
 			$('.code_wrap').hide();
         },
@@ -50,6 +52,9 @@
 			});
 			$('.link_licai').click(function(){
 				window.location.href = '/weixin/list/'
+			});
+			$('#tiyanjin').click(function(){
+				window.location.href = '/activity/experience/mobile/';
 			});
 			$('.code_wrap').show();
             //console.log('其他场景的业务逻辑');
