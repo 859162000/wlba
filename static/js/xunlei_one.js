@@ -132,7 +132,7 @@
 
 
         var change = [];
-        redpack('ENTER_WEB_PAGE');
+        redpack();
         //领取会员提示
         $('.setp-btn').on('click', function () {
 
