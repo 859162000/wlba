@@ -1005,14 +1005,13 @@ class Statistics(APIView):
 
         today_repayment = ProductAmortization.objects.filter(settled=True)\
             .filter(settlement_time__gte=yesterday_start, settlement_time__lt=today_start)\
-            .aggregate(Sum('principal'), Sum('interest'))
+            .aggregate(Sum('principal'))
 
         amount_sum_yesterday = yesterday_amount['amount__sum'] if yesterday_amount['amount__sum'] else Decimal('0')
         principal_sum = today_repayment['principal__sum'] if today_repayment['principal__sum'] else Decimal('0')
-        interest_sum = today_repayment['interest__sum'] if today_repayment['interest__sum'] else Decimal('0')
 
         # 昨日资金净流入
-        today_inflow = amount_sum_yesterday - principal_sum - interest_sum
+        today_inflow = amount_sum_yesterday - principal_sum
 
         all_user = User.objects.all().aggregate(Count('id'))
         all_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))
