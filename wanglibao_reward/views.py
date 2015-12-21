@@ -1093,7 +1093,7 @@ class XunleiActivityAPIView(APIView):
             sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, user=request.user, has_sent=False).aggregate(amount_sum=Sum('left_times'))
             to_json_response = {
                 'ret_code': 1005,
-                'data': sum_left,
+                'lefts': str(sum_left["amount_sum"]),
                 'message': u'获得剩余抽奖次数',
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -1128,11 +1128,11 @@ class XunleiActivityAPIView(APIView):
             with transaction.atomic():
                 record = WanglibaoActivityReward.objects.select_for_update().filter(pk=activity_record.first().id, has_sent=False).first()
                 sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, user=request.user, has_sent=False).aggregate(amount_sum=Sum('left_times'))
-                if record and record.redpack_event:
+                if record and record.experience:
                     json_to_response = {
                         'code': 0,
-                        'lefts': sum_left,
-                        'amount': record.redpack_event.amount,
+                        'lefts': sum_left["amount_sum"],
+                        'amount': str(record.experience.amount),
                         'message': u'用户抽到奖品'
                     }
                     redpack_backends.give_activity_redpack(request.user, record.experience, 'pc')
@@ -1142,7 +1142,7 @@ class XunleiActivityAPIView(APIView):
                 else:
                     json_to_response = {
                         'code': 1,
-                        'lefts': sum_left,
+                        'lefts': sum_left["amount_sum"],
                         'message': u'此次没有得到奖品'
                     }
 
