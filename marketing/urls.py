@@ -38,7 +38,6 @@ urlpatterns = patterns(
     url(r'^xunlei_setp/$', ThunderTenAcvitityTemplate.as_view(template_name="xunlei_ten.jade")),
     url(r'^mid_autumn/$', TemplateView.as_view(template_name="mid-autumn.jade")),
     # url(r'^xunlei_ten/$', TemplateView.as_view(template_name="xunlei_ten.jade")),
-     url(r'^xunlei_qq/$', ThunderTenAcvitityTemplate.as_view(template_name="xunlei_setp.jade")),
 
     url(r'^anniversary/$', TemplateView.as_view(template_name="anniversary.jade")),
     url(r'^app_anniversary/$', TemplateView.as_view(template_name="app_anniversary.jade")),
@@ -73,7 +72,8 @@ urlpatterns = patterns(
     url(r'^recharge_8000/$', TemplateView.as_view(template_name="recharge_8000.jade")),
     url(r'^double_eggs/$', TemplateView.as_view(template_name="double_eggs.jade")),
     url(r'^celebrity/$', TemplateView.as_view(template_name="celebrity.jade")),
-
+    url(r'^xunlei_one/$', TemplateView.as_view(template_name="xunlei_one.jade")),
+    url(r'^broken_million/$', TemplateView.as_view(template_name="broken_million.jade")),
 )
 
 # app URL

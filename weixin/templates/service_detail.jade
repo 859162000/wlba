@@ -7,7 +7,7 @@ html
     include include/service_head.jade
   body
     .service-detail-part1
-      .service-detail-tit 车辆抵押贷款［卡雷拉 保时捷911］
+      .service-detail-tit.invest-one(data-protuctid="2436") 车辆抵押贷款［卡雷拉 保时捷911］
       .service-detail-info
         .service-detail-lft
           .gery 年化收益
@@ -36,25 +36,110 @@ html
         .detail-recharge
           .recharge-lft
             span.recharge-tit 账户余额（元）
-            span.recharge-inp.grey 0.00
+            span.recharge-inp.grey.balance-middle(data-value="30000.00")#balance 30000.00
           .recharge-rht
             a(href="/weixin/sub_recharge/").red-btn 充值
         .detail-item
           span.recharge-tit 投资金额（元）
-          input(type="tel",value="",placeholder="输入100的整数倍金额",p2p-type="普通", activity-jiaxi='0', data-max="9168600",data-role="p2p-calculator",fee-target="",data-target="#expected_income", data-existing="0", data-rate="9.0", data-period="3", data-paymethod="按月付息", activity-rate="", maxlength="8").amount.balance-middle.recharge-inp
+          input(type="tel",value="",placeholder="输入100的整数倍金额",p2p-type="普通", activity-jiaxi='0', jiaxi-type="+", data-max="9168600",data-role="p2p-calculator",fee-target="",data-target="#expected_income", data-existing="0", data-rate="9.0", data-period="3", data-paymethod="按月付息", activity-rate="", maxlength="8").amount.balance-middle.recharge-inp
     .service-detail-part2
       .detail-item
         .recharge-tit 理财券
-        select.detail-select
-          option 不使用理财券
+        select(name="redpack", type='select')#gifts-package.balance-middle-select-select.detail-select
+          //amount 金额（可能百分比） ，method（红包类型  “-” 直抵 /  “*”  百分比）
+          //投资门槛investamount
+          //百分比有个最高抵扣金额highest_amount
+          //if redpacks
+          //  option(value = '')  不使用理财券
+          //  redpack_num = len(redpacks)
+          //  each redpack in redpacks
+          //    if redpack.method == "-"
+          //      pack_unit = '元'
+          //      red_amountSet = redpack['amount']
+          //    else
+          //      red_amountSet = redpack['amount'] * 100
+          //      pack_unit = '%'
+          //    option(value="{{redpack.id}}", data-amount="{{redpack.amount}}", data-method="{{redpack.method}}", data-investamount='{{redpack.invest_amount}}', data-highest_amount="{{redpack.highest_amount}}") {{redpack.name}}/{{red_amountSet}}{{pack_unit}}/{{redpack.invest_amount}}元起投
+          //else
+          //  option(value = '')  无可用理财券
+          option(value = '') 不使用理财券
+          option(value = '1757339', data-amount="6.0",data-method="-", data-investamount="2000", data-highest_amount="0") 微信抽奖6元红包/6.0元/2000元起投
+          option(value="1648195", data-amount="0.01", data-method="~", data-investamount="100", data-highest_amount="0") 分享活动加息券/1.0%/100元起投
+          option(value="1617916" data-amount="0.003", data-method="~", data-investamount="100", data-highest_amount="0") 分享活动加息券/0.3%/100元起投
+          option(value="1757275", data-amount="0.002", data-method="~", data-investamount="100", data-highest_amount="0") 分享活动加息券/0.2%/100元起投
       .detail-item
         .recharge-tit 预期收益（元）
-        .detail-item-num.grey
+        .detail-item-num.grey#expected_income
           | 0.00+
           span.blue 0.00
       .detail-item
         .recharge-tit 实际支付（元）
-        .detail-item-num.blue 0.00
+        .detail-item-num.blue.need-amount 0.00
+    .buy-earnings
+      p.redpack-already *您已使用过
+        span.already-amount
+        |加息券，继续享有加息，不可使用其他理财券
+      p.redpack-investamount * 未达到红包使用门槛
+      p.redpack-for-amount * 请输入投资金额
+    //if user.is_authenticated and p2p.category == '新手标' and user.wanglibaouserprofile.is_invested
+    //  .buy-snap-up
+    //      P.invested-btn 立即投资
+    //  .is_invested-sign 只有未进行投资的用户才可以购买
+    //else
+    //  .buy-snap-up
+    //      a(href="javascript:;").snap-up 立即投资
     .buy-snap-up
-      a(href="javascript:;").snap-up 立即投资
+      button(disabled="true").snap-up#secondBtn(data-first="true") 立即投资
+    .buy-sufficient
+      p
+       |余额不足，
+       a(href="/weixin/sub_recharge/?rechargeNext=/weixin/view/buy/{{p2p.id}}/") 立即充值
+    .sign-main
+      .sign-body
+        img(src="/static/imgs/mobile/sign/sign_icon.png")
+        p.sign-tit 恭喜您，购买成功！
+        p.balance-tit 您目前账户余额：
+          em.balance-sign
+        .callban-url
+          a(href="/weixin/list/") 返回首页
+          a(href="/weixin/account/") 查看账户
+
+    .page-alt#page-pwd(style="display:none")
+      .account-pwd
+        .pwd-tit 设置交易密码
+        .pwd-close.page-close &times;
+        .pwd-promote 为了您账户资金安全，请设置交易密码
+        .pwd-inps.js-pwd-inps
+          .inp-item
+          .inp-item
+          .inp-item
+          .inp-item
+          .inp-item
+          .inp-item
+          input(type="password",maxlength=6).pwd-input
+    .page-alt#page-error(style="display:none")
+      .account-pwd
+        .pwd-tit 设置交易密码
+        .pwd-close.page-close &times;
+        .pwd-img
+          img(src="/static/imgs/sub_weixin/recharge/pwd-error.png")
+        .pwd-promote 两次交易密码输入不正确，请重新输入
+        .page-btn.page-close 知道了
+    .page-alt#page-net(style="display:none")
+      .account-pwd
+        .pwd-tit 设置交易密码
+        .pwd-close.page-close &times;
+        .pwd-img
+          img(src="/static/imgs/sub_weixin/recharge/pwd-net.png")
+        .pwd-promote 您的网络已断开连接，请稍后再试！
+        .page-btn.page-close 知道了
+    .page-alt#page-ok(style="display:none")
+      .account-pwd
+        .recharge-ok-img
+          img(src="/static/imgs/sub_weixin/recharge/alt-ok.png")
+        .recharge-ok-tit 恭喜您购买成功
+        .total-money 您已成功投资，项目融资成功后就开始计算收益
+        .page-btn.page-close 知道了
+    include include/confirm
+    include include/tracking
     script(data-init='buy', src="/static/scripts/subMobile/mobile.js?201511065")

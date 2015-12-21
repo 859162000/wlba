@@ -40,14 +40,14 @@ html
         .recharge-all-show.card-hide.card-none.card-have
           .recharge-count
             .count-txt-left 充值金额
-            input(type="tel", name="amount", placeholder="请输入100的整数金额",value='').count-input //该银行单笔限额5万元
+            input(type="tel", name="amount", placeholder="该银行单笔限额5万元",value='').count-input
             input(type="hidden", name="maxamount", value="200000")
             .count-txt-right 元
-          p.recharge-max 最高充值200000元
+          //p.recharge-max 最高充值200000元
           //.binding-bank-href 查看支持银行及限额
 
         .recharge-btn#firstBtn.card-none.card-hide(data-next="{{next}}") 立即充值
-        .recharge-btn#secondBtn.card-have.card-hide(data-frist=false) 立即充值
+        .recharge-btn#secondBtn.card-have.card-hide(data-first='false') 立即充值
 
         .recharge-select-bank(style="display:none")
           .select-bank-body

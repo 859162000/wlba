@@ -48,7 +48,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
             });
 
             function _inputCallback(){
-                var earning, earning_element, earning_elements, fee_earning;
+                var earning, earning_element, earning_elements, fee_earning, jiaxi_type;
                 var target = $('input[data-role=p2p-calculator]'),
                     existing = parseFloat(target.attr('data-existing')),
                     period = target.attr('data-period'),
@@ -71,13 +71,17 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                     earning = 0;
                 }
                 earning_elements = (target.attr('data-target')).split(',');
-
+                jiaxi_type = target.attr('jiaxi-type');
                 for (var i = 0; i < earning_elements.length; i ++) {
                     earning_element = earning_elements[i];
                     if (earning) {
                         fee_earning = fee_earning ? fee_earning : 0;
-                        earning += fee_earning;
-                        $(earning_element).text(earning.toFixed(2));
+                        if(jiaxi_type === "+"){
+                            $(earning_element).html(earning+'+<span class="blue">'+fee_earning+'</span>').data("val",(earning + fee_earning));
+                        }else{
+                            earning += fee_earning;
+                            $(earning_element).text(earning.toFixed(2)).data("val",(earning + fee_earning));
+                        }
                     } else {
                         $(earning_element).text("0.00");
                     }
@@ -649,7 +653,7 @@ org.regist = (function(org){
                    }
                    return true
                 }
-            }
+            };
             var checkList = [$identifier, $password],
                 isSubmit = true;
 
@@ -725,27 +729,8 @@ org.list = (function(org){
         pageSize: 10, //每次请求的个数
         page: 2, //从第二页开始
         init :function(){
-            //lib._swiper();
             lib._scrollListen();
         },
-        //_swiper:function(){
-        //    var autoplay = 5000, //焦点图切换时间
-        //        loop = true,  //是否无缝滚动
-        //        $swiperSlide = $('.swiper-slide');
-        //
-        //    if($swiperSlide.length/2 < 1){
-        //        autoplay= 0;
-        //        loop = false;
-        //    }
-        //    var myswiper = new Swiper('.swiper-container', {
-        //        pagination: '.swiper-pagination',
-        //        loop: loop,
-        //        lazyLoading: true,
-        //        autoplay: autoplay,
-        //        autoplayDisableOnInteraction: true,
-        //
-        //    });
-        //},
         _scrollListen:function(){
             $('.load-body').on('click', function(){
                 lib.canGetPage && lib._getNextPage();
@@ -795,6 +780,20 @@ org.buy=(function(org){
             lib._checkRedpack();
             lib._calculate();
             lib._buy();
+            lib._amountInp();
+        },
+        _amountInp: function(){ //金额输入
+            lib.amountInout.on("input",function(){
+                var self = $(this),
+                    val = self.val();
+                if(val != ""){
+                    $(".snap-up").removeAttr("disabled").css("opacity",1);
+                }else{
+                    $(".snap-up").attr("disabled",true).css("opacity",0.5);
+                }
+                lib._setRedpack();
+                //lib.showAmount.text(val);
+            });
         },
         _checkRedpack: function(){
             var productID = $(".invest-one").attr('data-protuctid');
@@ -829,19 +828,22 @@ org.buy=(function(org){
          */
         _setRedpack:function(){
             var redPack = lib.redPackSelect.find('option').eq(lib.redPackSelect.get(0).selectedIndex),//选择的select项
-                redPackVal = parseFloat(lib.redPackSelect.find('option').eq(lib.redPackSelect.get(0).selectedIndex).attr('data-amount'))
+                redPackVal = parseFloat(lib.redPackSelect.find('option').eq(lib.redPackSelect.get(0).selectedIndex).attr('data-amount'));
                 inputAmount  =parseInt(lib.amountInout.val()), //输入框金额
                 redPackAmount = redPack.attr("data-amount"), //红包金额
                 redPackMethod = redPack.attr("data-method"), //红包类型
                 redPackInvestamount = parseInt(redPack.attr("data-investamount")),//红包门槛
                 redPackHighest_amount = parseInt(redPack.attr("data-highest_amount")),//红包最高抵扣（百分比红包才有）
                 repPackDikou = 0,
-                senderAmount = 0; //实际支付金额;
+                senderAmount = inputAmount; //实际支付金额;
+
             lib.redPackAmountNew = 0 ;
+            inputAmount = isNaN(inputAmount) ? "0.00" : inputAmount;
             if(redPackVal){ //如果选择了红包
                 if(!inputAmount){
                     $(".redpack-investamount").hide();//未达到红包使用门槛
-                    lib.$redpackSign.hide();//红包直抵提示
+                    //lib.$redpackSign.hide();//红包直抵提示
+                    lib.showAmount.text(inputAmount);//实际支付
                     return
                 }
 
@@ -869,7 +871,6 @@ org.buy=(function(org){
                     lib.redPackAmountNew = repPackDikou;
                     if(redPackMethod != '~'){
                         lib.showredPackAmount.text(repPackDikou);//红包抵扣金额
-                        lib.showAmount.text(senderAmount);//实际支付金额
                         lib.$redpackSign.show();//红包直抵提示
                     }
                     $(".redpack-investamount").hide();//未达到红包使用门槛
@@ -877,8 +878,9 @@ org.buy=(function(org){
             }else{
                 lib.$redpackSign.hide();//红包直抵提示
             }
+            lib.showAmount.text(senderAmount);//实际支付金额
             lib.$redpackForAmount.hide();//请输入投资金额
-
+            //income.html((rate * dataRate) +'+<span class="blue">'+ (rate * jiaxi) +'</span>');
         },
         _buy:function(){
             var $buyButton = $('.snap-up'),
@@ -900,7 +902,9 @@ org.buy=(function(org){
                     balance = parseFloat($("#balance").attr("data-value")),
                     amount = $('.amount').val() *1,
                     productID = $(".invest-one").attr('data-protuctid');
+                var self = $(this);
                 if(amount){
+                    //console.log(amount > balance, amount, balance, $buySufficient.length);
                     if(amount % 100 !== 0) return org.ui.alert('请输入100的倍数金额');
                     if(amount > balance)  return $buySufficient.show();
                 }else{
@@ -912,9 +916,12 @@ org.buy=(function(org){
                 }
 
                 if(lib.isBuy){
-
-                   org.ui.confirm("购买金额为" + amount, '确认投资', gobuy);
-
+                   //org.ui.confirm("购买金额为" + amount, '确认投资', gobuy);
+                    if(self.data("first")){
+                        org.setInputPwd.pageSet($("#page-pwd"),"设置交易密码","为了您账户资金安全，请设置交易密码","投资",true, amount);
+                    }else{
+                        org.setInputPwd.inputPwd("投资",amount);
+                    }
                    function gobuy(){
                        org.ajax({
                             type: 'POST',
@@ -974,7 +981,7 @@ org.buy=(function(org){
 org.calculator=(function(org){
     var lib = {
         init :function(){
-            org.calculate($('input[data-role=p2p-calculator]'))
+            org.calculate($('input[data-role=p2p-calculator]'));
             lib._addEvenList();
         },
         _addEvenList:function(){
@@ -993,13 +1000,113 @@ org.calculator=(function(org){
                 }
             })
         }
-
-    }
+    };
     return {
         init : lib.init
     }
 })(org);
+org.setInputPwd = (function(org){//交易密码
+    var lib = {
+        type: "充值",//充值or投资
+        isFirst: true, //true:设置交易密码，false:输入交易密码
+        /*
+        * 交易密码
+         */
+        _pageSet: function(page,tit,cont,type,isFirst,amount){//设置密码弹出层 文本设置
+            lib.type = type;//充值or投资
+            lib.isFirst = isFirst;//是否是第一次
+            lib.amount = amount; //金额
+            page.find(".pwd-tit").html(tit);
+            page.find(".pwd-promote").html(cont);
+            page.show();
+            lib._inputPwd();
+            page.find(".js-pwd-inps").trigger("click touchstart");
+        },
+        _pwdAnimate: function(inp){
+            var startVal = '';
+            inp.on("input",function(){
+                var self = $(this);
+                var val = self.val();
+                var page = inp.parents("#page-pwd");
+                if(val.length >= 6) {
+                    if(lib.isFirst){
+                        if (page.data("num") !== 1) {
+                            page.data("num", 1).hide();
+                            startVal = val;
+                            self.val("");
+                            lib._pageSet(page, "设置交易密码", "请再次确认交易密码", lib.type, true);
+                        } else {
+                            page.data("num", 2).hide();
+                            self.val("");
+                            if(val !== startVal){
+                                $("#page-error").show();//密码两次输入不一致
+                            }else{
+                                //------------此处密码输入后的函数-------------//
+                                $("#page-net").show();//网络断开
+                            }
+                        }
+                    }else{
+                        lib._inpPwdHide(self);
+                        //------------此处密码输入后的函数-------------//
+                        //org.ui.confirm("交易密码输入不正确，您还可以输入2次", "重新输入", lib._inpPwdShow, lib.amount);//密码错误
+                        //org.ui.alert("<p class='lock-pwd'>交易密码已被锁定，请3小时后再试<br />如想找回密码，请通过网站或APP找回</p>", closePage,  "知道了");
+                        if(lib.type === "充值"){
+                            $("#page-ok").show().find("#total-money").text("11800");//密码正确
+                        }else{
+                            $("#page-ok").show();
+                        }
 
+                    }
+                }
+            });
+        },
+        _inpPwdShow: function(type,amount){//显示 输入交易密码
+            lib._pageSet($("#page-pwd"),"请输入交易密码",type+"金额<br />￥"+amount);
+        },
+        _inpPwdHide: function(self){//隐藏 交易密码
+            var tp = self.parents(".page-alt");
+            var pwd = tp.find("input.pwd-input");
+            tp.hide();
+            pwd.length > 0 ? pwd.val(""): "";
+        },
+        _inpMoveEnd: function(obj){//input最后位置获取焦点
+            obj.focus();
+            var len = obj.val().length;
+            if (document.selection) {
+                var sel = obj.createTextRange();
+                sel.moveStart('character', len);
+                sel.collapse();
+                sel.select();
+            } else if (typeof obj.selectionStart == 'number'&& typeof obj.selectionEnd == 'number') {
+                obj.selectionStart = obj.selectionEnd = len;
+            }
+        },
+        _inputPwd: function(){
+            $(".js-pwd-inps").on("click touchstart",function(e){//点击弹出层输入框
+                e.stopPropagation();
+                e.preventDefault();
+                var self = $(this);
+                var inp = self.find("input.pwd-input");
+                //inp.focus();
+                lib._inpMoveEnd(inp);
+                lib._pwdAnimate(inp);
+            });
+            $(".page-close").on("click",function(){
+                lib._inpPwdHide($(this));
+            });
+            $(".continue-rechare").on("click",function(){
+                lib._inpPwdHide($(this));
+                $("input.count-input").val("");
+            });
+        }
+    };
+
+    return {
+        //init: lib.init,
+        pageSet: lib._pageSet,
+        inputPwd: lib._inpPwdShow
+    }
+})(org);
 org.recharge=(function(org){
     var lib = {
         canRecharge: true,
@@ -1007,7 +1114,7 @@ org.recharge=(function(org){
             lib._getBankCardList();
             lib._rechargeStepFirst();
             lib._initBankNav();
-            lib._inputPwd();
+            //lib._inputPwd();
         },
         /*
         * 充值nav动画及事件触发
@@ -1110,87 +1217,6 @@ org.recharge=(function(org){
             })
         },
         /*
-        * 交易密码
-         */
-        _pageSet: function(page,tit,cont){//设置密码弹出层 文本设置
-            page.find(".pwd-tit").html(tit);
-            page.find(".pwd-promote").html(cont);
-            page.show();
-            page.find(".js-pwd-inps").trigger("click touchstart");
-        },
-        _pwdAnimate: function(inp){
-            var startVal = '';
-            inp.on("input",function(){
-                var self = $(this);
-                var val = self.val();
-                var page = inp.parents("#page-pwd");
-                var frist = $("#secondBtn").data("frist");
-                var amount  = $("input[name='amount']").val() * 1;
-                if(val.length >= 6) {
-                    if(frist){
-                        if (page.data("num") !== 1) {
-                            page.data("num", 1).hide();
-                            startVal = val;
-                            self.val("");
-                            lib._pageSet(page, "设置交易密码", "请再次确认交易密码");
-                        } else {
-                            page.data("num", 2).hide();
-                            self.val("");
-                            if(val !== startVal){
-                                $("#page-error").show();
-                            }else{
-                                $("#page-net").show();
-                            }
-                        }
-                    }else{
-                        lib._inpPwdHide(self);
-                        //org.ui.confirm("交易密码输入不正确，您还可以输入2次", "重新输入", lib._inpPwdShow,amount);//密码错误
-                        org.ui.alert("<p class='lock-pwd'>交易密码已被锁定，请3小时后再试<br />如想找回密码，请通过网站或APP找回</p>", "知道了");
-                        //$("#page-ok").show().find("#total-money").text("11800");//密码正确
-                    }
-                }
-            });
-        },
-        _inpPwdShow: function(amount){//显示 输入交易密码
-            lib._pageSet($("#page-pwd"),"请输入交易密码","充值金额<br />￥"+amount);
-        },
-        _inpPwdHide: function(self){//隐藏 交易密码
-            var tp = self.parents(".page-alt");
-            var pwd = tp.find("input.pwd-input");
-            tp.hide();
-            pwd.length > 0 ? pwd.val(""): "";
-        },
-        _inpMoveEnd: function(obj){//input最后位置获取焦点
-            obj.focus();
-            var len = obj.val().length;
-            if (document.selection) {
-                var sel = obj.createTextRange();
-                sel.moveStart('character', len);
-                sel.collapse();
-                sel.select();
-            } else if (typeof obj.selectionStart == 'number'&& typeof obj.selectionEnd == 'number') {
-                obj.selectionStart = obj.selectionEnd = len;
-            }
-        },
-        _inputPwd: function(){
-            $(".js-pwd-inps").on("click touchstart",function(e){//点击弹出层输入框
-                e.stopPropagation();
-                e.preventDefault();
-                var self = $(this);
-                var inp = self.find("input.pwd-input");
-                //inp.focus();
-                lib._inpMoveEnd(inp);
-                lib._pwdAnimate(inp);
-            });
-            $(".page-close").on("click",function(){
-                lib._inpPwdHide($(this));
-            });
-            $(".continue-rechare").on("click",function(){
-                lib._inpPwdHide($(this));
-                $("input.count-input").val("");
-            });
-        },
-        /*
         *   $firstBtn 为首次充值 进到一下步
         *   $secondBtn 为快捷充值
          */
@@ -1220,14 +1246,19 @@ org.recharge=(function(org){
                 if(!card_no || amount <= 0 || !amount) {
                     return org.ui.alert('信息输入不完整');
                 }
+                if(amount < 10){
+                    return org.ui.alert('充值金额不得少于10元');
+                }
                 if(amount > maxamount){
-                     return org.ui.alert('最高充值'+ maxamount +'元！')
+                     return org.ui.alert('最高充值'+ maxamount +'元！');
                 }
                 if(lib.canRecharge){
                     if(self.data("first")){
-                        lib._pageSet($("#page-pwd"),"设置交易密码","为了您账户资金安全，请设置交易密码");
+                        //lib._pageSet($("#page-pwd"),"设置交易密码","为了您账户资金安全，请设置交易密码");
+                        org.setInputPwd.pageSet($("#page-pwd"),"设置交易密码","为了您账户资金安全，请设置交易密码","充值",true, amount);
                     }else{
-                        lib._inpPwdShow(amount);
+                        //lib._inpPwdShow(amount);
+                        org.setInputPwd.inputPwd("充值",amount);
                     }
 
                     //var postdata = {
@@ -1314,7 +1345,7 @@ org.recharge_second=(function(org){
                     } else {
                         clearInterval(intervalId);
                         getValidateBtn.text('重新获取').removeAttr('disabled').removeClass('alreay-request');
-                        return
+                        return;
                     }
                 };
 
@@ -1336,7 +1367,7 @@ org.recharge_second=(function(org){
                     error:function(data){
                         console.log(data)
                     }
-                })
+                });
                 timerFunction();
                 return intervalId = setInterval(timerFunction, 1000);
             })
@@ -1426,7 +1457,7 @@ org.authentication = (function(org){
                         }
                     }
                     data[formName[i]] = $(this).val();
-                })
+                });
                 isFor && lib._forAuthentication(data)
             });
         },
@@ -1531,8 +1562,8 @@ org.processFirst = (function(org){
         $name : $('input[name=name]'),
         $idcard : $('input[name=idcard]'),
         init:function(){
-            lib._form_logic()
-            lib._postData()
+            lib._form_logic();
+            lib._postData();
         },
         _form_logic: function(){
             var _self = this;
@@ -1565,11 +1596,11 @@ org.processFirst = (function(org){
 
             checklist.each(function(i){
                 if($(this).val() == ''){
-                    org.ui.showSign($(this).attr('placeholder'))
+                    org.ui.showSign($(this).attr('placeholder'));
                     return check = false;
                 }else{
                     if(i === 1 && !reg.test($(this).val())){
-                        org.ui.showSign('请输入正确的身份证号')
+                        org.ui.showSign('请输入正确的身份证号');
                         return check =false;
                     }
                 }
@@ -1630,6 +1661,14 @@ org.processSecond = (function(org){
             lib._submit();
         },
         _init_select: function(){
+            lib.$bank.on("change",function(){
+                var self = $(this);
+                if(self.val()!=""){
+                    self.removeClass("default-val");
+                }else{
+                    self.addClass("default-val");
+                }
+            });
             if(localStorage.getItem('bank')){
                 var content = JSON.parse(localStorage.getItem('bank'));
                 return lib.$bank.append(appendBanks(content));
@@ -1649,7 +1688,7 @@ org.processSecond = (function(org){
                 error:function(data){
                     console.log(data)
                 }
-            })
+            });
 
             function appendBanks(banks){
                 var str = ''
@@ -1658,6 +1697,7 @@ org.processSecond = (function(org){
                 }
                 return str
             }
+
         },
         form_logic: function(){
             var _self = this;
@@ -1716,7 +1756,7 @@ org.processSecond = (function(org){
                     return org.ui.alert('请填写正确手机号');
                 }
 
-                $(this).attr('disabled', 'disabled').css('background','#ccc')
+                $(this).attr('disabled', 'disabled').css('background','#ccc');
                 //倒计时
                 var timerFunction = function() {
                     if (count >= 1) {
@@ -1724,8 +1764,8 @@ org.processSecond = (function(org){
                         return $validationBtn.text( count + '秒后可重发');
                     } else {
                         clearInterval(intervalId);
-                        $validationBtn.text('重新获取').removeAttr('disabled').css('background','#50b143')
-                        return
+                        $validationBtn.text('重新获取').removeAttr('disabled').css('background','#50b143');
+                        return;
                     }
                 };
                 org.ajax({
@@ -1740,7 +1780,7 @@ org.processSecond = (function(org){
                     success: function(data) {
                         if(data.ret_code > 0) {
                             clearInterval(intervalId);
-                            $validationBtn.text('重新获取').removeAttr('disabled').css('background','#50b143')
+                            $validationBtn.text('重新获取').removeAttr('disabled').css('background','#50b143');
                             return org.ui.alert(data.message);
                         }else {
                             $("input[name='order_id']").val(data.order_id);
@@ -1749,7 +1789,7 @@ org.processSecond = (function(org){
                     },
                     error:function(data){
                         clearInterval(intervalId);
-                        $validationBtn.text('重新获取').removeAttr('disabled').css('background','#50b143')
+                        $validationBtn.text('重新获取').removeAttr('disabled').css('background','#50b143');
                         return org.ui.alert(data);
                     }
                 })

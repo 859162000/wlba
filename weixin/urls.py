@@ -81,6 +81,10 @@ urlpatterns = patterns(
     url(r'^sub_transaction/buying/$', TemplateView.as_view(template_name="service_transaction_buying.jade")),
     url(r'^sub_transaction/finished/$', TemplateView.as_view(template_name="service_transaction_finished.jade")),
 
+    url(r'^sub_reward/unused/$', TemplateView.as_view(template_name="service_reward.jade")),
+    url(r'^sub_reward/used/$', TemplateView.as_view(template_name="service_reward_used.jade")),
+    url(r'^sub_reward/expires/$', TemplateView.as_view(template_name="service_reward_expires.jade")),
+
     #微站 api
     url(r'api/fwh_login/$', main_views.WXLoginAPI.as_view(), name='weixin_fwh_login'),
     url(r'api/fwh_register/$', main_views.WXRegisterAPI.as_view(), name='weixin_fwh_register'),
