@@ -11,9 +11,9 @@ from rest_framework.views import APIView
 
 from wanglibao_account.auth_backends import User
 from wanglibao_margin.models import AssignmentOfClaims, MonthProduct, MarginRecord
-from wanglibao_margin.tasks import buy_month_product, month_product_buy_fail, month_product_check, month_product_cancel, \
-    month_product_refund
-from wanglibao_margin.php_utils import get_user_info, get_margin_info, PhpMarginKeeper, set_cookie, get_unread_msgs
+from wanglibao_margin.tasks import buy_month_product, assignment_buy
+from wanglibao_margin.php_utils import get_user_info, get_margin_info, PhpMarginKeeper, set_cookie, get_unread_msgs, \
+    calc_php_commission
 from wanglibao_account import message as inside_message
 from wanglibao_profile.backends import trade_pwd_check
 from wanglibao_profile.models import WanglibaoUserProfile
@@ -255,16 +255,41 @@ class YueLiBaoBuyFail(APIView):
     @csrf_exempt
     def post(self, request):
 
+        ret = dict()
+
         user_id = request.POST.get('userId')
         token = request.POST.get('token')
 
-        if user_id and token:
-            month_product_buy_fail.apply_async(
-                    kwargs={'user_id': user_id, 'token': token})
-            return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
-        else:
-            return HttpResponse(renderers.JSONRenderer().render(
-                {'status': '0', 'msg': 'args error!'}, 'application/json'))
+        user = User.objects.get(pk=user_id)
+        product = MonthProduct.objects.filter(token=token).first()
+
+        # if user != request.user:
+        #     ret.update(status=0, msg='user authenticate error')
+        #     return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+        if not product:
+            ret.update(status=2, msg='success')
+            return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+        if product.cancel_status:
+            ret.update(status=1, msg='success')
+            return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+        try:
+            with transaction.atomic(savepoint=True):
+                product_id = product.product_id
+                buyer_keeper = PhpMarginKeeper(user, product_id)
+                record = buyer_keeper.yue_cancel(user, product.amount)
+
+                if record:
+                    # 状态置为已退款, 这个记录丢弃
+                    product.cancel_status = True
+                    product.save()
+
+            ret.update(status=1,
+                       msg='success')
+        except Exception, e:
+            ret.update(status=0,
+                       msg=str(e))
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
 class YueLiBaoCheck(APIView):
@@ -280,18 +305,35 @@ class YueLiBaoCheck(APIView):
     @csrf_exempt
     def post(self, request):
 
+        ret = dict()
+
         product_id = request.POST.get('productId')
 
-        if product_id:
+        try:
+            with transaction.atomic(savepoint=True):
+                month_products = MonthProduct.objects.filter(
+                    product_id=product_id, cancel_status=False, pay_status=False)
 
-            month_product_check.apply_async(
-                kwargs={'product_id': product_id})
+                for product in month_products:
+                    # 已支付, 直接返回成功
+                    if not product.pay_status:
+                        user = product.user
+                        product_id = product.product_id
+                        buyer_keeper = PhpMarginKeeper(user, product_id)
+                        trace = buyer_keeper.settle(product.amount, description='')
+                        if trace:
+                            product.pay_status = True
+                            product.save()
 
-            return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
+                # 进行全民淘金数据写入
+                calc_php_commission(product_id)
 
-        else:
-            return HttpResponse(renderers.JSONRenderer().render(
-                {'status': '0', 'msg': 'args error!'}, 'application/json'))
+                ret.update(status=1,
+                           msg='success')
+        except Exception, e:
+            ret.update(status=0,
+                       msg=str(e))
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
 class YueLiBaoCancel(APIView):
@@ -307,18 +349,34 @@ class YueLiBaoCancel(APIView):
     @csrf_exempt
     def post(self, request):
 
+        msg_list = []
+        ret = dict()
+
         tokens = request.POST.get('tokens')
         tokens = tokens.split('|')
 
-        if tokens:
-            month_product_cancel.apply_async(
-                kwargs={'tokens': tokens})
+        try:
+            with transaction.atomic(savepoint=True):
+                month_products = MonthProduct.objects.filter(token__in=tokens)
+                for product in month_products:
+                    user = product.user
+                    product_id = product.product_id
+                    buyer_keeper = PhpMarginKeeper(user, product_id)
+                    record = buyer_keeper.unfreeze(product.amount, description='')
 
-            return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
+                    # 状态置为已退款, 这个记录丢弃
+                    product.cancel_status = True
+                    product.save()
 
-        else:
-            return HttpResponse(renderers.JSONRenderer().render(
-                {'status': '0', 'msg': 'args error!'}, 'application/json'))
+                    status = 1 if record else 0
+                    msg_list.append({'token': product.token, 'status': status})
+
+            ret.update(status=1,
+                       msg=msg_list)
+        except Exception, e:
+            ret.update(status=0,
+                       msg=str(e))
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
 class YueLiBaoRefund(APIView):
@@ -350,16 +408,46 @@ class YueLiBaoRefund(APIView):
     @csrf_exempt
     def post(self, request):
 
+        msg_list = list()
+        ret = dict()
+
         args = request.POST.get('args')
-        if args:
-            month_product_refund.apply_async(
-                kwargs={'args': args})
 
-            return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
+        try:
+            with transaction.atomic(savepoint=True):
+                for arg in eval(args):
+                    user = User.objects.get(pk=arg['userId'])
 
-        else:
-            return HttpResponse(renderers.JSONRenderer().render(
-                {'status': '0', 'msg': 'args error!'}, 'application/json'))
+                    margin_record = MarginRecord.objects.filter(
+                        # (Q(catalog=u'月礼包本金入账') | Q(catalog=u'债转本金入账')) &
+                        (Q(catalog=u'\u6708\u5229\u5b9d\u672c\u91d1\u5165\u8d26') |
+                         Q(catalog=u'\u503a\u8f6c\u672c\u91d1\u5165\u8d26')) &
+                        Q(order_id=arg['refundId']) & Q(user=user)
+                    ).first()
+
+                    if margin_record:
+                        msg_list.append({'refundId': arg['refundId'], 'status': 1})
+
+                    else:
+                        buyer_keeper = PhpMarginKeeper(user, arg['refundId'])
+
+                        try:
+                            buyer_keeper.php_amortize_detail(
+                                arg['tradeType'], arg['principal'], arg['interest'], 0, arg['increase'],
+                                arg['plusInterest'], arg['refundId']
+                            )
+                            msg_list.append({'refundId': arg['refundId'], 'status': 1})
+
+                        except Exception, e:
+                            print e
+
+                ret.update(status=1,
+                           msg=msg_list)
+
+        except Exception, e:
+            ret.update(status=0,
+                       msg=str(e))
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
 class AssignmentOfClaimsBuy(APIView):
@@ -374,8 +462,6 @@ class AssignmentOfClaimsBuy(APIView):
 
     @csrf_exempt
     def post(self, request):
-
-        ret = dict()
 
         buyer_id = request.POST.get('buyerId')
         seller_id = request.POST.get('sellerId')
@@ -392,50 +478,21 @@ class AssignmentOfClaimsBuy(APIView):
         buy_price_source = request.POST.get('buyPriceSource')
         sell_price_source = request.POST.get('sellPriceSource')
 
-        try:
-            buyer = User.objects.get(pk=buyer_id)
-            seller = User.objects.get(pk=seller_id)
-            assignment, status = AssignmentOfClaims.objects.get_or_create(
-                product_id=product_id,
-                buyer=buyer,
-                seller=seller,
-                buyer_order_id=buy_order_id,
-                seller_order_id=sell_order_id,
-                buyer_token=buyer_token,
-                seller_token=seller_token,
-                fee=fee,
-                premium_fee=premium_fee,
-                trading_fee=trading_fee,
-                buy_price=buy_price,
-                sell_price=sell_price,
-                buy_price_source=buy_price_source,
-                sell_price_source=sell_price_source
-            )
-            # 状态成功, 对买家扣款, 卖家回款.
-            if status:
-                try:
-                    with transaction.atomic(savepoint=True):
-                        # status == 0 加钱, 其他减钱. 这直接对买家余额减钱, 卖家余额加钱
-                        buyer_keeper = PhpMarginKeeper(buyer, )
-                        seller_keeper = PhpMarginKeeper(seller, )
-                        buyer_keeper.margin_process(buyer, 1, buy_price, description=u'', catalog=u"买债转")
-                        seller_keeper.margin_process(seller, 0, sell_price, description=u'', catalog=u"卖债转")
+        if buyer_id and seller_id and product_id and buy_order_id and sell_order_id and buyer_token and seller_token\
+                and fee and premium_fee and trading_fee and buy_price and sell_price and buy_price_source and sell_price_source:
 
-                        # 如果加减钱成功后, 更新债转的表的状态为成功
-                        assignment.status = True
-                        assignment.save()
-                        ret.update(status=1,
-                                   msg='success')
-                except Exception, e:
-                    ret.update(status=0,
-                               msg=str(e))
-            else:
-                ret.update(status=0,
-                           msg='save error')
-        except Exception, e:
-            ret.update(status=0,
-                       msg=str(e))
-        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+            assignment_buy.apply_async(
+                kwargs={'buyer_id': buyer_id, 'seller_id': seller_id, 'product_id': product_id,
+                        'buy_order_id': buy_order_id, 'sell_order_id': sell_order_id, 'buyer_token': buyer_token,
+                        'seller_token': seller_token, 'fee': fee, 'premium_fee': premium_fee,
+                        'trading_fee': trading_fee, 'buy_price': buy_price, 'sell_price': sell_price,
+                        'buy_price_source': buy_price_source, 'sell_price_source': sell_price_source})
+
+            return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
+
+        else:
+            return HttpResponse(renderers.JSONRenderer().render(
+                {'status': '0', 'msg': 'args error!'}, 'application/json'))
 
 
 class AssignmentBuyFail(APIView):
@@ -490,4 +547,3 @@ class AssignmentBuyFail(APIView):
             ret.update(status=0,
                        msg=str(e))
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
-
