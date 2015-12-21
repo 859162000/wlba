@@ -435,6 +435,10 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG'
         },
+        'wanglibao': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+        },
         'wanglibao_pay': {
             'handlers': ['file', 'console'],
             'level': 'DEBUG',
@@ -498,7 +502,11 @@ LOGGING = {
         'experience_gold': {
             'handlers': ['file', 'console'],
             'level': 'DEBUG'
-        }
+        },
+        'wanglibao_profile': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG'
+        },
     }
 }
 
@@ -516,9 +524,6 @@ if ENV != ENV_DEV:
 
     # session expire at browser close
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
-    # set session for cross domain.
-    SESSION_COOKIE_DOMAIN = '.wanglibao.com'
 
     # wsgi scheme
     os.environ['wsgi.url_scheme'] = 'https'
@@ -569,6 +574,15 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+
+CELERY_QUEUES = {
+                "celery":  {"exchange": "celery",
+                              "routing_key": "celery"},
+                "celery01": {"exchange": "celery01",
+                              "routing_key": "celery01"},
+                "celery02": {"exchange": "celery02",
+                              "routing_key": "celery02"},
+                }
 
 from datetime import timedelta, datetime
 
@@ -874,7 +888,9 @@ YTX_BACK_RETURN_URL = CALLBACK_HOST + "/api/ytx/voice_back/"
 ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
 if ENV == ENV_DEV:
     ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
-    STATIC_FILE_HOST = 'http://localhost:8000'
+    # Modify by hb on 2015-12-02
+    #STATIC_FILE_HOST = 'http://localhost:8000'
+    STATIC_FILE_HOST = ''
 
 PROMO_TOKEN_USER_SESSION_KEY = 'promo_token_user_id'
 PROMO_TOKEN_QUERY_STRING = 'promo_token'
@@ -1092,7 +1108,9 @@ ZHITUI_CALL_BACK_URL = 'http://api.zhitui.com/wanglibao/recive.php'
 
 # 中国电信
 WLB_FOR_ZGDX_KEY = '2001'
-ZGDX_QUERY_URL = 'http://182.140.241.47:8080/ESB/flowService.do'
+ZGDX_QUERY_URL = 'http://182.140.241.47:8080/fps/ESBFlowService.do'
+# ZGDX_QUERY_KEY = 'hwDmXQLqdzJ4wozz'
+# ZGDX_QUERY_IV = '7988680669963722'
 if ENV == ENV_PRODUCTION:
     ZGDX_CALL_BACK_URL = 'http://182.140.241.47:8080/fps/flowService.do'
     ZGDX_PARTNER_NO = '102139887'
@@ -1191,3 +1209,11 @@ WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'
 TOKEN_CLIENTS = {
     'rong360': 'wanglibao_1116',
 }
+
+APP_DECRYPT_KEY = "31D21828CC9DA7CE527F08481E361A7E"
+
+
+# 数据魔方接口
+DATACUBE_URL = 'http://stat.wanglibao.com:10000/datacube/index'
+if ENV == ENV_PRODUCTION:
+    DATACUBE_URL = 'http://10.171.37.235:10000/datacube/index'

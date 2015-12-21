@@ -28,7 +28,7 @@ html
 
     .fuel-product-item
       mixin list(color)
-        .fuel-product-list
+        a(href='/fuel/buy/').fuel-product-list
           .fuel-pdt-title
             .fuel-pdt-name(class=color) 初级理财加油卡
             .fuel-pdt-fiter 适合12万以内车型
@@ -45,7 +45,7 @@ html
               .pdt-name 每月加油卡
             .fuel-pdt-buy
               .fuel-buy-min 6000元即可获得
-              a(href='/fuel/buy/').fuel-buy-submit 立即选购
+              .fuel-buy-submit 立即选购
 
       +list('fuel-pdt-green')
       +list('fuel-pdt-yellow')

@@ -10,6 +10,7 @@
 //按钮统一
 
 @mixin submit($height: 2.5rem, $color: #fff, $background: #DB493F)
+  display: block
   -webkit-appearance: none
   width: 100%
   height: $height
@@ -55,16 +56,21 @@
     background: url('/static/imgs/mobile_fuelcard/input_icon/arrow_down.png') no-repeat right center
     background-size: rem(42)
     color: #ccc
-
-  .fuel-operation-icon
-
   .fuel-clear-input
+    display: none
     width: 1rem
     height: 1rem
     background: url("/static/imgs/mobile_fuelcard/account/clear.png") no-repeat center
     background-size: 100%
 
-
+  .fuel-show-password, .fuel-hide-password
+    width: 1rem
+    height: 1rem
+    background: url("/static/imgs/mobile_fuelcard/input_icon/eyes_active.png") no-repeat center
+    background-size: 100%
+  .fuel-hide-password
+    background: url("/static/imgs/mobile_fuelcard/input_icon/eyes.png") no-repeat center
+    background-size: 100%
 .fuel-validation
   color: #fff
   margin-left: 0.5rem

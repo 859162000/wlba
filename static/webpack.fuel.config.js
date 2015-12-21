@@ -13,6 +13,11 @@ module.exports = {
          * 路径相对于webpack.fuel.js
          */
         index: './src/mobile_fuelcard/index',
+        login: './src/mobile_fuelcard/login',
+        regist: './src/mobile_fuelcard/regist',
+        regist_authentication: './src/mobile_fuelcard/regist_authentication',
+        regist_bank: './src/mobile_fuelcard/regist_bank',
+        reset_password: './src/mobile_fuelcard/reset_password',
         vendor: ['./src/mobile_fuelcard/lib/zepto']
     },
     output: {
@@ -24,12 +29,12 @@ module.exports = {
         loaders: [
             { test: /\.js$/, exclude: /(node_modules)/, loader: 'babel', query: { presets: ['es2015'] }},
             { test: /zepto(\.min)?\.js$/, loader: "exports?Zepto; delete window.$; delete window.Zepto;" },
-        ],
+        ]
     },
     resolve: {
         modulesDirectories: ['./src/mobile_fuelcard'],
         alias: {
-            zepto: './lib/zepto.js'
+            zepto: 'lib/zepto.js'
         },
         extensions: ['', '.js']
     },

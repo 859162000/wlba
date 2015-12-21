@@ -58,6 +58,10 @@ from wanglibao_anti.anti.anti import AntiForAllClient
 from wanglibao_redpack.models import Income
 from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
+from common import DecryptParmsAPIView
+import requests
+
+
 logger = logging.getLogger('wanglibao_rest')
 
 
@@ -210,7 +214,7 @@ class WeixinSendRegisterValidationCodeView(APIView):
 
 
 
-class RegisterAPIView(APIView):
+class RegisterAPIView(DecryptParmsAPIView):
     permission_classes = ()
 
     def generate_random_password(self, length):
@@ -230,9 +234,12 @@ class RegisterAPIView(APIView):
             modified by: Yihen@20150812
             descrpition: if(line282~line283)的修改，针对特定的渠道延迟返积分、发红包等行为，防止被刷单
         """
-        identifier = request.DATA.get('identifier', "")
-        password = request.DATA.get('password', "")
-        validate_code = request.DATA.get('validate_code', "")
+        identifier = self.params.get('identifier', "")
+        password = self.params.get('password', "")
+        validate_code = self.params.get('validate_code', "")
+        # identifier = request.DATA.get('identifier', "")
+        # password = request.DATA.get('password', "")
+        # validate_code = request.DATA.get('validate_code', "")
         channel = request.session.get(settings.PROMO_TOKEN_QUERY_STRING, "")
 
         identifier = identifier.strip()
@@ -314,7 +321,7 @@ class RegisterAPIView(APIView):
         if request.DATA.get('IGNORE_PWD'):
             send_messages.apply_async(kwargs={
                 "phones": [identifier,],
-                "messages": [u'[网利科技]用户名： '+identifier+u'; 登录密码:'+password,]
+                "messages": [u'用户名为'+identifier+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
             })
 
             logger.debug("此次 channel:%s" %(channel))
@@ -388,7 +395,9 @@ class WeixinRegisterAPIView(APIView):
 
         status, message = validate_validation_code(identifier, validate_code)
         if status != 200:
-            return Response({"ret_code": 30023, "message": "验证码输入错误"})
+            # Modify by hb on 2015-12-02
+            #return Response({"ret_code": 30023, "message": "验证码输入错误"})
+            return Response({"ret_code": 30023, "message": message})
 
         #if User.objects.filter(wanglibaouserprofile__phone=identifier,
         #                       wanglibaouserprofile__phone_verified=True).exists():
@@ -779,6 +788,18 @@ class UserExisting(APIView):
         #                    }, status=400)
 
 
+class UserHasLoginAPI(APIView):
+    """
+        判断用户是否已经登录
+    """
+    permission_classes = ()
+
+    def post(self, request):
+        if not request.user.is_authenticated():
+            return Response({"login": False})
+        else:
+            return Response({"login": True})
+
 class IdValidate(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -884,12 +905,12 @@ class AdminIdValidate(APIView):
                             "validate": True
                         }, status=200)
 
-class LoginAPIView(APIView):
+class LoginAPIView(DecryptParmsAPIView):
     permission_classes = ()
 
     def post(self, request, *args, **kwargs):
-        identifier = request.DATA.get("identifier", "")
-        password = request.DATA.get("password", "")
+        identifier = self.params.get("identifier", "")
+        password = self.params.get("password", "")
 
         if not identifier or not password:
             return Response({"token":"false", "message":u"用户名或密码错误"}, status=400)
@@ -923,6 +944,9 @@ class LoginAPIView(APIView):
                 pu.push_channel_id = push_channel_id
                 pu.save()
         token, created = Token.objects.get_or_create(user=user)
+        # if not created:
+        #     token.delete()
+        #     token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, "user_id":user.id}, status=status.HTTP_200_OK)
 
 class ObtainAuthTokenCustomized(ObtainAuthToken):
@@ -1271,3 +1295,32 @@ class DistributeRedpackView(APIView):
                         }
                         return HttpResponse(json.dumps(data), content_type='application/json')
 
+
+class DataCubeApiView(APIView):
+    """
+    数据魔方查询接口
+    chenweibin@20151208
+    """
+    permission_classes = ()
+
+    def __init__(self):
+        super(DataCubeApiView, self).__init__()
+        self.request_url = settings.DATACUBE_URL
+
+    def get(self, request):
+        try:
+            data = requests.get(url=self.request_url).json()
+            _response = {
+                'ret_code': 10000,
+                'message': 'success',
+                'result': data,
+            }
+        except Exception, e:
+            logger.exception('data cupe connect faild to %s' % self.request_url)
+            logger.exception(e)
+            _response = {
+                'ret_code': 50001,
+                'message': 'api error',
+            }
+
+        return HttpResponse(json.dumps(_response), content_type='application/json')

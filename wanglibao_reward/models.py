@@ -76,6 +76,8 @@ class WanglibaoUserGift(models.Model):
     valid = models.IntegerField(default=1, choices=SEND, verbose_name=u'奖品是否已发')
     amount = models.FloatField(default=0, verbose_name=u'奖品额度')
     get_time = models.DateTimeField(auto_now_add=True, verbose_name=u'用户领奖的时间')
+    # add by hb on 2015-12-14
+    redpack_record_id = models.IntegerField(default=0, verbose_name=u'优惠券发放流水ID')
 
     class Meta:
         verbose_name = u'用户活动获奖记录'
@@ -110,6 +112,7 @@ class WanglibaoActivityReward(models.Model):
     redpack_event = models.ForeignKey(RedPackEvent, default=None, blank=True, null=True, verbose_name=u'用户获得的红包')
     reward = models.ForeignKey(Reward, default=None, blank=True, null=True, verbose_name=u'用户获得的奖品')
     activity = models.CharField(default='', max_length=256, verbose_name=u'活动名称')
+    qrcode = models.ImageField(upload_to='qrcode', null=True, blank=True, verbose_name=u'获奖请求二维码')
     when_dist = models.IntegerField(default=0, verbose_name=u'什么时候发奖')
     left_times = models.IntegerField(default=0, verbose_name=u'还剩几次抽奖机会')
     join_times = models.IntegerField(default=0, verbose_name=u'用户参与抽奖的次数')

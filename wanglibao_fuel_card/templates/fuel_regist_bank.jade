@@ -7,35 +7,41 @@ html
     .fuel-process-img.fuel-process-imgspace-second
       img(src='/static/imgs/mobile_fuelcard/input_icon/second.png')
 
-
+    input(type='hidden', name='order_id')
+    input(type='hidden', name='token')
     .fuel-authentication-warp
       .fuel-input-public.fuel-input-space
         .fuel-input-icon.regist-input-icon
           .bank
-        select(name="bank", type='select')
+        select(name="bank", type='select',data-icon='fuel-input-icon')
           option(value = '')  请选择银行
-
+          option(value = '1')  中国银行
 
       .fuel-input-public.fuel-input-space
         .fuel-input-icon.regist-input-icon
           .card
-        input(type='text', name='password', placeholder= '请设置密码').fuel-input-main
+        input(type='text', name='bankcard', placeholder= '请输入银行卡号', data-icon='fuel-input-icon', data-operation='fuel-clear-input', autocomplete='off').fuel-input-main
         .fuel-operation-icon.fuel-clear-input
 
       .fuel-input-public.fuel-input-space
         .fuel-input-icon.regist-input-icon
           .phone
-        input(type='text', name='password', placeholder= '请输入手机号').fuel-input-main
+        input(type='tel', name='bankphone', placeholder= '请输入手机号',data-icon='fuel-input-icon', data-operation='fuel-clear-input', data-other='fuel-validation-btn', autocomplete='off').fuel-input-main
+        .fuel-operation-icon.fuel-clear-input
 
       .fuel-input-double.fuel-input-space
         .fuel-input-public
           .fuel-input-icon.regist-input-icon
             .validation
-          input(type='text', name='password', placeholder= '请输入验证码').fuel-input-main
+          input(type='tel', name='validation', placeholder= '请输入验证码', data-icon='fuel-input-icon', autocomplete='off').fuel-input-main
 
         .fuel-validation
-          button(type="button") 获取验证码
+          button(type="button", name='validate_operation',disabled=true).fuel-validation-btn 获取验证码
 
       .fuel-process-safespace-second 绑定银行卡后，该卡将作为您唯一充值提现的银行卡
       .fuel-authentication-regist-warp
-        button(type='submit').fuel-password-submit 绑定银行卡
+        button(type='submit',disabled=true).fuel-password-submit 绑定银行卡
+    include include/fuel_errorsign
+    include include/fuel_alert
+    script(src='/static/scripts/mobile_fuelcard/dev/vendor.zepto.js')
+    script(src='/static/scripts/mobile_fuelcard/dev/regist_bank.js')

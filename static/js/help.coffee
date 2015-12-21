@@ -12,6 +12,7 @@ require ['jquery'], ($) ->
 
     $('.list-item').removeClass('active')
     item.addClass('active')
+
     return
 
   #查看锚点
@@ -21,9 +22,6 @@ require ['jquery'], ($) ->
       location.hash = '#' + item.attr('data-source')
       return
 
-    $('.list-item').removeClass('active')
-    item.addClass('active')
-    return
 
   $('.help-menu').on 'click', 'li', (e) ->
     e.preventDefault()

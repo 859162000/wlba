@@ -23,8 +23,8 @@ org.ui = (function(){
                 strHtml = "<div id='alertTxt' class='popub-txt investWin'><p><img src='/static/imgs/mobile_activity/app_experience/right.png'/></p>";
                 strHtml+="<p class='successFonts'>恭喜您投资成功！</p><p>到期后体验金自动收回</p><p>收益自动发放</p></div>";
             }else if(difference == 3){
-                strHtml = "<div id='alertTxt' class='popub-txt oldUserWin'><p class='p_left'>您是老用户，</p>";
-                strHtml+="<p class='p_left'>关注网利宝最新活动，</p><p class='p_left'>赢取老用户专享体验金。</p>";
+                strHtml = "<div id='alertTxt' class='popub-txt oldUserWin'><p class='p_left'>体验金由系统自动发放，</p>";
+                strHtml+="<p class='p_left'>请继续关注网利宝最新活动。</p>";
                 strHtml+="<p><img src='/static/imgs/mobile_activity/app_experience/logo.png'/></p><p class='popub-footer'><div class='close_btn'>知道了！</div></p></div>";
             }else if(difference == 4){
                 strHtml+="<p class='p_left'>"+ txt +"</p>";
@@ -47,6 +47,23 @@ org.ui = (function(){
         alert : lib._alert
     }
 })();
+var login = false;
+wlb.ready({
+    app: function (mixins) {
+        mixins.sendUserInfo(function (data) {
+            if (data.ph == '') {
+                login = false;
+                $('#nologin').on('click',function(){
+                    mixins.registerApp({refresh:1, url:'https://staging.wanglibao.com/activity/experience/redirect/'});
+                })
+            } else {
+                login = true;
+            }
+        })
+    },
+    other: function(){
+    }
+})
 org.experience = (function(org){
     var lib = {
         init:function(){
@@ -56,6 +73,9 @@ org.experience = (function(org){
             lib._bannerEffect()
         },
         _lookMore:function(){
+             $('#nologin').on('click',function(){
+                window.location.href = '/weixin/regist/?next=/activity/experience/mobile/';
+            })
             $lookMore = $('#lookMore')
             $lookMore.on('click',function(){
                 var ele = $('.history-list');
@@ -106,8 +126,7 @@ org.experience = (function(org){
               });
             })
             //老用户
-            $oldUser = $('.investeds');
-            $oldUser.on('click',function(){
+            $('.investeds').on('click',function(){
                  org.ui.alert('','','3')
             })
         },

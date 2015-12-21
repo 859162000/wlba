@@ -1,0 +1,155 @@
+@charset "utf-8"
+@import susy
+@import variables
+
+// Susy configuration
+$total-columns: 12
+$column-width: 4rem
+$gutter-width: 0rem
+$grid-padding: 0
+
+$container-style: static
+$container-width: 1104px
+
+$container-style: magic
+
+@for $i from 1 to $total-columns + 1
+  .wl-column#{$i}
+    +span-columns($i, $total-columns)
+  .wl-column#{$i}-omega
+    +span-columns($i omega, $total-columns)
+  .prefix#{$i}
+    +pre($i)
+
+// Susy configuration
+
+$total-columns: 12
+$column-width: 4rem
+$gutter-width: 1rem
+$grid-padding: 0
+
+$container-style: static
+$container-width: 1104px
+
+$container-style: magic
+
+.l-activity-panel
+  +container
+
+.full-container
+  width: 100%
+
+.container
+  +container
+  width: $content-width
+  clear: both
+  margin: 0 auto
+
+.white-container
+  @extend .container
+  background-color: white
+
+.container-hidden
+  @extend .container
+  display: none
+
+.row
+  +container
+  +pie-clearfix
+
+@for $i from 1 to $total-columns + 1
+  .span#{$i}
+    +span-columns($i, $total-columns)
+  .span#{$i}-omega
+    +span-columns($i omega, $total-columns)
+  .prefix#{$i}
+    +pre($i)
+
+@for $i from 1 to $total-columns + 1
+  .ispan#{$i}
+    display: inline-block
+    width: percentage($i/$total-columns)
+
+@mixin full-height
+  height: 100%
+  min-height: 100%
+
+@mixin box
+  +full-height
+
+.relative-pos
+  position: relative
+
+.absolute-pos
+  position: absolute
+
+.pos-r-s
+  right: $space-s
+
+.pos-b-10px
+  bottom: 10px
+
+.pos-t-s
+  top: $space-s
+
+.callback-container
+  @extend .white-container
+  margin: 10px auto
+
+.callback-content
+  background: $color-white
+  padding: $space-xxl 0
+  line-height: $space-l
+  font-size: $font-s
+  width: 600px
+  margin: 0 auto
+  +clearfix
+
+.callback-description
+  float: left
+  margin-left: 15px
+  margin-top: 5px
+
+  h1
+    font-size: $font-xl
+    line-height: 35px
+    vertical-align: middle
+    font-weight: bold
+
+.success-icon
+  background: url("/static/images/success_failed.png") 0 0
+  width: 84px
+  height: 84px
+  display: inline-block
+  overflow: hidden
+  float: left
+
+.error-icon
+  width: 35px
+  height: 35px
+  margin-top: 6px
+  display: inline-block
+  overflow: hidden
+  float: left
+  background: url("/static/images/notice.png") no-repeat
+
+.star
+  +inline-block
+  width: 17px
+  height: 16px
+  background: url("/static/images/star.png")
+  margin-right: $space-xs
+  position: relative
+  top: -2px
+
+.favorite
+  font-size: $font-xs
+
+.make-money
+  padding-top: $space-l
+  text-align: center
+
+  a.button
+    margin-bottom: $space-s
+    +inline-block
+    width: 200px

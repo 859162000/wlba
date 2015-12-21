@@ -4,23 +4,27 @@ webpackJsonp([0],[
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
 
-	var _ajax = __webpack_require__(2);
+	var _automatic_detection = __webpack_require__(2);
 
-	$('.test').html(_ajax.pi);
-	$('.test').html('12312aa3');
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
-
-/***/ },
-/* 1 */,
-/* 2 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
+	var auto = new _automatic_detection.Automatic({
+	    submit: $('button[type=submit]'),
+	    checklist: [{ target: $('input[name=password]'), required: true }, { target: $('input[name=phone]'), required: true }, { target: $('input[name=validation]'), required: true }],
+	    otherlist: [{ target: $('select[name=bank]'), required: true }]
 	});
-	var pi = exports.pi = 3.12222211;
+
+	auto.check();
+	auto.operation();
+
+	$('select[name=bank]').change(function () {
+	    var icon = $(this).attr('data-icon');
+	    if ($(this).val() == '') {
+	        $(this).siblings('.' + icon).removeClass('active');
+	    } else {
+	        $(this).siblings('.' + icon).addClass('active');
+	    }
+	    $('input[name=password]').trigger('input');
+	});
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }
 ]);

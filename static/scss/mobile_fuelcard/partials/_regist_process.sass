@@ -1,4 +1,60 @@
 
+
+.error-sign
+  position: fixed
+  left: 0
+  top: 0
+  width: 100%
+  height: 2.2rem
+  line-height: 2.2rem
+  text-align: center
+  background: rgba(93,181,242,0.8)
+  color: #fff
+  font-size: 0.7rem
+  -webkit-transform: translateY(-100%)
+  transform: translateY(-100%)
+
+.moveDown
+  animation-name: moveDown
+  -webkit-animation-name: moveDown
+  animation-duration: 1500ms
+  -webkit-animation-duration: 1500ms
+  animation-timing-function: ease
+  -webkit-animation-timing-function: ease
+  animation-fill-mode: both
+  -webkit-animation-fill-mode: both
+
+@keyframes moveDown
+  0%
+    transform: translateY(-100%)
+  20%
+    transform: translateY(0%)
+  90%
+    transform: translateY(0%)
+  100%
+    transform: translateY(-100%)
+
+@-webkit-keyframes moveDown
+  0%
+    -webkit-transform: translateY(-100%)
+  20%
+    -webkit-transform: translateY(0%)
+  90%
+    -webkit-transform: translateY(0%)
+  100%
+    -webkit-transform: translateY(-100%)
+@keyframes fadeIn
+  0%
+    opacity: 0
+    display: block
+  20%
+    opacity: 1
+  90%
+    opacity: 1
+  100%
+    opacity: 0
+    display: none
+
 @mixin regist-icons($height, $width, $iconName)
   width: rem($height)
   height: rem($width)
@@ -15,47 +71,53 @@
   .phone
     +regist-icons(36, 45, 'phone')
 
-  .phone-active
-    +regist-icons(36, 45, 'phone_active')
-
   .captcha, .validation
     +regist-icons(37, 36, 'code')
-
-  .captcha-active, .validation-active
-    +regist-icons(37, 36, 'code_active')
 
   .password
     +regist-icons(36, 44, 'password')
 
-  .password-active
-    +regist-icons(36, 44, 'password_active')
-
   .token
     +regist-icons(36, 44, 'token')
 
-  .token-acitve
-    +regist-icons(36, 44, 'toekn_active')
-
   .name
     +regist-icons(36, 45, 'name')
-  .name-active
-    +regist-icons(36, 45, 'name_active')
 
   .idcard
     +regist-icons(36, 50, 'idcard')
-  .idcard-active
-    +regist-icons(36, 50, 'idcard_active')
 
   .bank
     +regist-icons(37, 36, 'bank')
-  .bank-active
-    +regist-icons(37, 36, 'bank_active')
+
 
   .card
     +regist-icons(36, 30, 'card')
-  .card-active
-    +regist-icons(36, 30, 'card_active')
 
+
+.active
+  .phone
+    +regist-icons(36, 45, 'phone_active')
+
+  .captcha, .validation
+    +regist-icons(37, 36, 'code_active')
+
+  .password
+    +regist-icons(36, 44, 'password_active')
+
+  .token
+    +regist-icons(36, 44, 'token_active')
+
+  .name
+    +regist-icons(36, 45, 'name_active')
+
+  .idcard
+    +regist-icons(36, 50, 'idcard_active')
+
+  .bank
+    +regist-icons(37, 36, 'bank_active')
+
+  .card
+    +regist-icons(36, 30, 'card_active')
 
 .fuel-regist-submit
   +submit(rem(90), #fff, $buy-red)
@@ -73,6 +135,16 @@
     border: 1px solid #5DB5F2
     background: #fff
     margin-right: .5rem
+    overflow: hidden
+    &:before
+      top: 1rem
+
+    input
+      display: block
+      width: 100%
+      height: 100%
+      opacity: 0
+  .agreement
     &:before
       content: ''
       position: absolute
@@ -84,6 +156,7 @@
       width: 0.25rem
       height: 0.5rem
       -webkit-transform: rotateZ(45deg)
+
 
   .fuel-regist-agreement
     -webkit-box-flex: 1

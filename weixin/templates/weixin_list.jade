@@ -5,6 +5,7 @@ html
   head
     include include/weixin_head.jade
   body
+    include include/app_down
     .logo
       img(src='/static/imgs/mobile/list/logo.png')
       if user.is_authenticated
@@ -38,7 +39,7 @@ html
     - with 'list' as state
     include include/weixin_footer
     - endwith
-    include include/app_down
+
     script(src="/static/scripts/mobile/swiper/swiper.min.js")
-    script(data-init='list', src="/static/scripts/mobile/dist/mobile.js?v=20151106")
+    script(data-init='list', src="/static/scripts/mobile/dist/mobile.js?v=20151202")
     script(type="text/javascript", name="baidu-tc-cerfication", data-appid="6548828", src="https://ss0.bdstatic.com/9_QWf8Sm1A5BphGlnYG/cloudaapi/lightapp.js")

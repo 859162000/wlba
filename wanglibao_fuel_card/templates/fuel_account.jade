@@ -4,13 +4,6 @@ html
     title 购买
     include include/fuel_head.jade
   body
-    //.fuel-account-list
-      .fuel-list-icon.account-phone
-      .fuel-list-name 手机号
-      .fuel-list-authen 已认证
-      .fuel-list-text 130****0575
-      .fuel-list-recharge 充值
-      .fuel-list-arrow
 
     .fuel-account-list
       .fuel-list-icon.account-phone
@@ -49,15 +42,16 @@ html
       .fuel-list-arrow
     .fuel-account-space-1
 
-    a(href='/fuel/change/trans-psw/').fuel-account-list
+    //a(href='/fuel/change/trans-psw/').fuel-account-list
       .fuel-list-icon.account-transaction-password
       .fuel-list-name 修改交易密码
       .fuel-list-arrow
-    .fuel-account-space-1
+    //.fuel-account-space-1
 
-    a(href='/fuel/set/trans-psw/').fuel-account-list
+    //a(href='/fuel/set/trans-psw/').fuel-account-list
       .fuel-list-icon.account-forget-password
       .fuel-list-name 找回交易密码
       .fuel-list-arrow
-
+    .fuel-logout-warp
+      a(href='/accounts/logout?next=/fuel/index/').fuel-logout-submit 安全退出
     .fuel-account-sign 本账户余额可同时投资于网利宝平台产品

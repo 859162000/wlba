@@ -77,14 +77,21 @@ class AmortizationInline(admin.TabularInline):
     #     'term', 'principal', 'interest', 'penal_interest', 'description')
 
     def get_readonly_fields(self, request, obj=None):
-        read_only = ['term', 'principal', 'interest', 'penal_interest', 'description']
+        read_only = ['term', 'principal', 'interest', 'penal_interest', 'description',
+                     'settlement_time', 'is_auto_ready_for_settle']
         if obj and obj.status == u'已完成':
-            read_only.append('ready_for_settle')
+            read_only += ['ready_for_settle', 'term_date', 'settled']
         return tuple(read_only)
 
 
 class WarrantInline(admin.TabularInline):
     model = Warrant
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj and obj.status in [u'还款中', u'已完成', u'流标']:
+            return ['name', 'warranted_at', 'created_at']
+
+        return self.readonly_fields
 
 
 class P2PProductContractInline(admin.StackedInline):
@@ -93,9 +100,23 @@ class P2PProductContractInline(admin.StackedInline):
     max_num = 1
     formset = RequiredInlineFormSet
 
+    def get_readonly_fields(self, request, obj=None):
+        if obj and obj.status in [u'还款中', u'已完成', u'流标']:
+            return ['signing_date', 'party_b_type', 'party_b', 'party_b_name', 'party_c', 'party_c_name',
+                    'party_c_id_number', 'party_c_address', 'bill_drawer_bank', 'bill_accepting_bank',
+                    'bill_number', 'bill_amount', 'created_at', 'bill_due_date']
+
+        return self.readonly_fields
+
 
 class AttachementInline(admin.TabularInline):
     model = Attachment
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj and obj.status in [u'还款中', u'已完成', u'流标']:
+            return ['name', 'file', 'type', 'description', 'created_at']
+
+        return self.readonly_fields
 
 
 class P2PEquityInline(admin.TabularInline):
@@ -293,9 +314,17 @@ class P2PProductAdmin(ReadPermissionModelAdmin, ImportExportModelAdmin, Concurre
     form = P2PProductForm
 
     def get_readonly_fields(self, request, obj=None):
+        if obj and obj.status in [u'正在招标', u'满标待打款', u'满标已打款', u'满标待审核', u'满标已审核']:
+            return ['period', 'expected_earning_rate', 'pay_method', 'total_amount', 'excess_earning_rate',
+                    'amortization_count', 'soldout_time', 'make_loans_time', 'ordered_amount']
+
+        if obj and obj.status in [u'还款中', u'已完成', u'流标']:
+            return [f.name for f in self.model._meta.fields]
+
         if not request.user.has_perm('wanglibao_p2p.view_p2pproduct'):
             return [f.name for f in self.model._meta.fields]
-        return ('amortization_count',)
+
+        return ['amortization_count', 'soldout_time', 'make_loans_time']
 
     def save_model(self, request, obj, form, change):
         # if obj.status == u'正在招标':
