@@ -238,7 +238,7 @@
         });
         $('.game-btn').on('mouseup', function () {
             //redpack( function (data) {
-            chances()
+
             $.ajax({
                 url: "/api/xunlei/2016/1/",
                 type: "POST",
@@ -246,34 +246,27 @@
                 async: false
             }).done(function (data) {
                 console.log(data);
-                //if (!$('.go-game').hasClass('noClick')) {
-                //    $('.game-btn').removeClass('game-btn-down');
-                //    if (data['ret_code'] == 4000) {
-                //        $('#small-zc').show();
-                //        $('#xl-aug-fail p').text('Sorry~您不符合抽奖条件');
-                //        $('#xl-aug-fail').show();
-                //    } else if (data['ret_code'] == 3003) {
-                //        if (change['left'] <= 0) {
-                //            $('#small-zc').show();
-                //            $('#xl-aug-fail p').text('Sorry~您的抽奖次数已用完')
-                //            $('#xl-aug-fail').show();
-                //        } else {
-                //            if (data['left'] == data['get_time']) {
-                //                game(data['get_time']);
-                //            } else {
-                //                game();
-                //            }
-                //
-                //        }
-                //    } else if (data['ret_code'] == 3000) {
-                //        $('body,html').animate({scrollTop: 0}, 600);
-                //        //$('#small-zc').show();
-                //        //$('#xl-aug-login').show();
-                //    }
-                //}
+
+                if (!$('.go-game').hasClass('noClick')) {
+                    $('.game-btn').removeClass('game-btn-down');
+                    if (data['code'] == 1001) {
+                        $('#small-zc').show();
+                        $('#xl-aug-fail p').text('Sorry~您不符合抽奖条件');
+                        $('#xl-aug-fail').show();
+                    } else if (data['code'] == 1002) {
+                        $('#small-zc').show();
+                        $('#xl-aug-fail p').text('Sorry~您的抽奖次数已用完')
+                        $('#xl-aug-fail').show();
+                    } else if (data['code'] == 0 || data['code'] == 1) {
+                        game();
+                        //$('body,html').animate({scrollTop: 0}, 600);
+                        //$('#small-zc').show();
+                        //$('#xl-aug-login').show();
+                    }
+                }
 
             })
-
+            chances()
 
             //})
         })
@@ -288,12 +281,12 @@
                 }, 50)
                 if (isGet) {
                     //成功调用
-                    redpack('GET_AWARD');
-                    //star('0' + change['amount']);
-                    star(0088);
+                    //redpack('GET_AWARD');
+                    star('0' + change['amount']);
+                    ;
                 } else {
                     //失败调用
-                    redpack('IGNORE_AWARD');
+                    //redpack('IGNORE_AWARD');
                     star('0000');
                 }
             }, 10)
