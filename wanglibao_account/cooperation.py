@@ -1270,6 +1270,27 @@ class XunleiVipRegister(CoopRegister):
         self.request.session.pop(self.coop_time_key, None)
         self.request.session.pop(self.coop_sign_key, None)
 
+    def save_to_binding(self, user):
+        """
+        处理从url获得的渠道参数
+        :param user:
+        :return:
+        """
+        channel_user = self.channel_user
+        channel_name = self.channel_name
+        bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
+        if channel_name and channel_user and len(channel_user) <= bid_len:
+            binding = Binding()
+            binding.user = user
+            binding.btype = channel_name
+            binding.bid = channel_user
+            binding.save()
+            # logger.debug('save user %s to binding'%user)
+            return True
+
+        logger.info("xunlei9 binding faild with user[%s], channel_user[%s], channel_name[%s]" %
+                    (user.id, channel_user, channel_name))
+
     def process_for_register(self, user, invite_code):
         """
         用户可以在从渠道跳转后的注册页使用邀请码，优先考虑邀请码
@@ -1289,24 +1310,25 @@ class XunleiVipRegister(CoopRegister):
         if not (binding and introduced_by):
             # 处理新用户注册
             self.save_to_introduceby(user, invite_code)
-            if self.is_xunlei_user:
-                self.save_to_binding(user)
-            self.register_call_back(user)
+            if self.is_xunlei_user and self.save_to_binding(user):
+                self.register_call_back(user)
         elif not binding and self.is_xunlei_user and introduced_by and introduced_by.channel.code == invite_code:
             # 处理老用户绑定状态
-            self.save_to_binding(user)
+            if self.save_to_binding(user):
+                # 处理渠道用户注册回调
+                self.register_call_back(user)
 
-            # 处理渠道用户充值回调补发
-            penny = Decimal(0.01).quantize(Decimal('.01'))
-            pay_info = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
-                                              status=PayInfo.SUCCESS).order_by('create_time').first()
-            if pay_info and int(pay_info.amount) >= 100:
-                self.recharge_call_back(user, pay_info.order_id)
+                # 处理渠道用户充值回调补发
+                penny = Decimal(0.01).quantize(Decimal('.01'))
+                pay_info = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
+                                                  status=PayInfo.SUCCESS).order_by('create_time').first()
+                if pay_info and int(pay_info.amount) >= 100:
+                    self.recharge_call_back(user, pay_info.order_id)
 
-            # 处理渠道用户投资回调补发
-            p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
-            if p2p_record and int(p2p_record.amount) >= 1000:
-                self.purchase_call_back(user, p2p_record.order_id)
+                # 处理渠道用户投资回调补发
+                p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+                if p2p_record and int(p2p_record.amount) >= 1000:
+                    self.purchase_call_back(user, p2p_record.order_id)
 
         self.clear_session()
 
