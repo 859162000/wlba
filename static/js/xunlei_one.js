@@ -11,14 +11,58 @@
     });
 
     require(['jquery', 'activityRegister'], function ($, re) {
+        var csrfSafeMethod, getCookie, sameOrigin,
+            getCookie = function (name) {
+                var cookie, cookieValue, cookies, i;
+                cookieValue = null;
+                if (document.cookie && document.cookie !== "") {
+                    cookies = document.cookie.split(";");
+                    i = 0;
+                    while (i < cookies.length) {
+                        cookie = $.trim(cookies[i]);
+                        if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                        i++;
+                    }
+                }
+                return cookieValue;
+            };
+        csrfSafeMethod = function (method) {
+            return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+        };
+        sameOrigin = function (url) {
+            var host, origin, protocol, sr_origin;
+            host = document.location.host;
+            protocol = document.location.protocol;
+            sr_origin = "//" + host;
+            origin = protocol + sr_origin;
+            return (url === origin || url.slice(0, origin.length + 1) === origin + "/") || (url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + "/") || !(/^(\/\/|http:|https:).*/.test(url));
+        };
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+                    xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+                }
+            }
+        });
+
+        _getQueryStringByName = function (name) {
+            var result = location.search.match(new RegExp('[\?\&]' + name + '=([^\&]+)', 'i'));
+            if (result == null || result.length < 1) {
+                return '';
+            }
+            return result[1];
+        }
         //注册
         re.activityRegister.activityRegisterInit({
             registerTitle: '领取迅雷会员+现金红包',    //注册框标语
             isNOShow: '1',
             buttonFont: '立即注册',
-            hasCallBack:true,
-            callBack: function(){
-                window.location.href="http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao"
+            hasCallBack: true,
+            callBack: function () {
+                window.location.href = "http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao"
 
             }
         });
@@ -261,15 +305,16 @@
         //抽奖请求
         function redpack(sum, callback) {
             $.ajax({
-                url: "/api/xunlei/award/",
+                url: "/api/xunlei/2016/1/",
                 type: "POST",
-                data: {action: sum},
+                //data: {action: sum},
                 async: false
             }).done(function (data) {
                 change = data;
-                $('#chance').text(change['left']);
+                //$('#chance').text(change['left']);
 
                 callback && callback(data);
+                console.log(change)
 
             });
         }
@@ -283,32 +328,45 @@
         }
         return null;
     }
+
     getQueryString('promo_token')
     var token = getQueryString('promo_token'),
         xid = getQueryString('xluserid'),
-        timer =  getQueryString('time'),
-        sig =  getQueryString('sign'),
-        name =  getQueryString('nickname');
+        timer = getQueryString('time'),
+        sig = getQueryString('sign'),
+        name = getQueryString('nickname');
     //alert(token+','+xid+','+timer+','+sig+','+name);
-    if($('.denelu-form').hasClass('dengruhou')){
+    if ($('.denelu-form').hasClass('dengruhou')) {
         $.ajax({
-        type: "POST",
-        url: "/activity/thunder/binding/",
-        data: {
-            'promo_token': token,
-            'xluserid': xid,
-            'time': timer,
-            'sign': sig,
-            'nickname': name
+            type: "POST",
+            url: "/activity/thunder/binding/",
+            data: {
+                'promo_token': token,
+                'xluserid': xid,
+                'time': timer,
+                'sign': sig,
+                'nickname': name
 
-        },
-        success: function (data) {
+            },
+            success: function (data) {
+                console.log(data.ret_code);
+                if (data.ret_code == 10002 || data.ret_code == 10000) {
+                    $('.xunshang1').text('恭喜已完成网利宝注册');
+                    $('.xunshang2').text('并与您的迅雷账号绑定成功');
+                    $('.xunleiten1').css({display: 'block'});
+                    $('.xunleiten2').css({display: 'block'});
+                } else {
+                    $('.xunshang1').text('恭喜已完成网利宝注册');
+                    $('.xunleiten2').css({display: 'block'});
 
-        },
-        error: function () {
+                }
 
-        }
-    });
+            },
+            error: function () {
+
+            }
+        });
+        getCode();
 
     }
 
@@ -328,5 +386,5 @@
         });
     }
 
-    getCode();
+
 }).call(this);

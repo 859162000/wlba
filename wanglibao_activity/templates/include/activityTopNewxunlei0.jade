@@ -5,11 +5,11 @@ include include/activityTop2
     if user.is_authenticated
       //#ganjiwang-model
       .denelu-form.dengruhou
-        p.xunshang(style="margin-top: 12px") 恭喜已完成网利宝注册
-        p.xunshang 并与您的迅雷账号绑定成功
+        p.xunshang.xunshang1(style="margin-top: 12px")
+        p.xunshang.xunshang2
         .xunleierwei
-          p.xunleiten &nbsp;&nbsp;&nbsp;迅雷账号：{{nickname}}
-          p.xunleiten 网利宝账号：
+          p.xunleiten.xunleiten1(style="display: none") &nbsp;&nbsp;&nbsp;迅雷账号：{{nickname}}
+          p.xunleiten.xunleiten2(style="display: none") 网利宝账号：
             span {{user|display_name}}
           input(type="hidden", value="{{original_id}}")#original_id
           input(type="hidden" value="{{code}}")#weixin_code
