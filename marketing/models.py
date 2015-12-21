@@ -381,35 +381,37 @@ class Reward(models.Model):
 
 
 class P2PReward(models.Model):
-    """ P2P奖品存储
-    """
+    """ P2P奖品存储"""
 
     REWARD_TYPE = (
         (u'加油卡', u'加油卡'),
     )
 
-    type = models.CharField(u'奖品类型', max_length=40, default=u'加油卡', choices=REWARD_TYPE)
+    type = models.CharField(u'奖品类型', max_length=40, default=u'加油卡', choices=REWARD_TYPE,
+                            help_text=u"*必须与产品表类别名称一致")
     channel = models.ForeignKey(Channels, verbose_name=u'奖品渠道')
-    description = models.TextField(u'奖品描述', null=True)
-    content = models.CharField(u'奖品内容', max_length=128)
-    is_used = models.BooleanField(u'是否使用', default=False)
-    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
-    end_time = models.DateTimeField(u'结束时间', null=True, blank=True)
+    price = models.FloatField(u'面值（元）', default=0, blank=False)
+    using_range = models.CharField(u'使用范围', max_length=50)
+    create_time = models.DateTimeField(u'录入时间', auto_now_add=True)
+    end_time = models.DateTimeField(u'过期时间', null=True, blank=True)
+    is_used = models.BooleanField(u'是否发放', default=False)
+    conversion_code = models.CharField(u'兑换码', max_length=50)
+    description = models.TextField(u'备注', max_length=255, blank=True, null=True)
 
     class Meta:
         ordering = ['-create_time']
         verbose_name_plural = u'P2P奖品'
 
     def __unicode__(self):
-        return u'<%s>' % self.type
+        return u'%s%s' % (self.type, self.price)
 
 
 class P2PRewardRecord(models.Model):
-    """ P2P奖品发放流水
-    """
+    """ P2P奖品发放流水"""
+
     user = models.ForeignKey(User)
-    reward = models.ForeignKey(P2PReward)
-    description = models.TextField(u'发放奖品流水说明', null=True)
+    reward = models.ForeignKey(P2PReward, verbose_name=u'奖品', related_name='fk_reward')
+    description = models.TextField(u'发放奖品流水说明', max_length=255, blank=True, null=True)
     create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
     order_id = models.IntegerField(u'关联订单编号', null=True)
 
@@ -418,7 +420,7 @@ class P2PRewardRecord(models.Model):
         verbose_name_plural = u'P2P奖品发放流水'
 
     def __unicode__(self):
-        return u'<%s>' % self.user
+        return u'%s' % self.user
 
 
 class RewardRecord(models.Model):

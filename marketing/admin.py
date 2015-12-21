@@ -297,7 +297,8 @@ class P2PRewardResource(resources.ModelResource):
 
     class Meta:
         model = Reward
-        fields = ('id', 'type', 'channel', 'content', 'description', 'is_used', 'end_time', 'create_time')
+        fields = ('id', 'type', 'channel', 'price', 'using_range', 'create_time',
+                  'end_time', 'is_used', 'conversion_code', 'description')
 
     def import_obj(self, instance, row, False):
         super(P2PRewardResource, self).import_obj(instance, row, False)
@@ -305,8 +306,9 @@ class P2PRewardResource(resources.ModelResource):
 
 class P2PRewardAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     actions = None
-    list_display = ('id', 'type', 'channel', 'content', 'description', 'is_used', 'end_time', 'create_time')
-    search_fields = ('type', 'content', 'channel')
+    list_display = ('id', 'type', 'channel', 'price', 'using_range', 'create_time',
+                    'end_time', 'is_used', 'conversion_code', 'description')
+    search_fields = ('type', 'channel', 'price', 'conversion_code')
     list_filter = ('is_used', 'type')
     raw_id_fields = ('channel',)
     resource_class = P2PRewardResource
@@ -318,7 +320,7 @@ class P2PRewardAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 class P2PRewardRecordAdmin(admin.ModelAdmin):
     actions = None
     list_display = ('id', 'user', 'reward', 'order_id', 'description', 'create_time')
-    search_fields = ('user__wanglibaouserprofile__phone', 'order_id', 'description', "reward__type")
+    search_fields = ('user__wanglibaouserprofile__phone', 'order_id', "reward__channel__code", "reward__type", "reward__price")
     raw_id_fields = ('user', 'reward')
 
     def has_delete_permission(self, request, obj=None):

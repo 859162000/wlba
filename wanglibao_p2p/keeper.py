@@ -28,9 +28,11 @@ from weixin.constant import PRODUCT_AMORTIZATION_TEMPLATE_ID
 from weixin.models import WeixinUser
 from weixin.tasks import sentTemplate
 
+from marketing.utils import generate_p2p_reward_record
 
 
 logger = logging.getLogger(__name__)
+
 
 class ProductKeeper(KeeperBaseMixin):
 
@@ -509,10 +511,15 @@ class AmortizationKeeper(KeeperBaseMixin):
 
             phone_list = list()
             message_list = list()
+            product_type = amortization.product.types
+            # Modify by ChenWeiBin_20151217
             for sub_amo in sub_amortizations:
-                user_margin_keeper = MarginKeeper(sub_amo.user)
-                user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
-                                            sub_amo.coupon_interest, savepoint=False, description=description)
+                if product_type == u'还款等额兑奖':
+                    generate_p2p_reward_record(sub_amo.user, product, self.order_id, sub_amo.description)
+                else:
+                    user_margin_keeper = MarginKeeper(sub_amo.user)
+                    user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
+                                                sub_amo.coupon_interest, savepoint=False, description=description)
 
                 sub_amo.settled = True
                 sub_amo.settlement_time = timezone.now()
@@ -520,11 +527,18 @@ class AmortizationKeeper(KeeperBaseMixin):
                 
                 amo_amount = sub_amo.principal + sub_amo.interest + sub_amo.penal_interest + sub_amo.coupon_interest
 
+                # 生成还款短信消息通知群发-用户手机号列表及短信内容
                 phone_list.append(sub_amo.user.wanglibaouserprofile.phone)
-                message_list.append(messages.product_amortize(sub_amo.user.wanglibaouserprofile.name,
-                                                              amortization.product,
-                                                              # sub_amo.settlement_time,
-                                                              amo_amount))
+                if product_type == u'还款等额兑奖':
+                    # FixMe, 修改短信通知内容
+                    pass
+                else:
+                    message_list.append(messages.product_amortize(sub_amo.user.wanglibaouserprofile.name,
+                                                                  amortization.product,
+                                                                  # sub_amo.settlement_time,
+                                                                  amo_amount))
+
+                # FixMe, 发送站内信
                 title, content = messages.msg_bid_amortize(pname, timezone.now(), amo_amount)
                 inside_message.send_one.apply_async(kwargs={
                     "user_id": sub_amo.user.id,
