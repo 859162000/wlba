@@ -5,7 +5,8 @@ if results
       .area-ac-head {{activity.activity.name}}
       .area-ac-banner
         .area-ac-time {{activity.activity_status}}
-        img(src='/media/{{activity.app_banner}}')
+        //img(src='/media/{{activity.app_banner}}', onerror="this.src='/static/imgs/app/area/default.jpg'", )
+        div( class="lazy img-responsive", data-original="/media/{{activity.app_banner}}")
       .area-ac-dec {{activity.app_description}}
       .area-ac-line
       .area-ac-footer 立即查看

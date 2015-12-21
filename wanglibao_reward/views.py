@@ -1011,3 +1011,117 @@ class ThanksGivingDistribute(ActivityRewardDistribute):
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
+
+class XunleiActivityAPIView(APIView):
+    permission_classes = ()
+
+    def __init__(self):
+        super(XunleiActivityAPIView, self).__init__()
+        self.activity_name = 'xunlei_laba'
+
+    def introduced_by_with(self, user_id, promo_token, register_time=None):
+        """
+            register_time:为None表示不需要关注用户的注册时间
+        """
+        introduced_by = IntroducedBy.objects.filter(user_id=user_id, channel__code=promo_token).first()
+        if not register_time:
+            return True if introduced_by else False
+        else:
+            _register_time = time.strftime("%Y-%m-%d", time.localtime())
+            return True if introduced_by and _register_time >= register_time else False
+
+    def has_generate_reward_activity(self, user_id, activity):
+        activitys = WanglibaoActivityReward.objects.filter(user_id=user_id, activity=activity)
+        return  activitys if activitys else None
+
+    def generate_reward_activity(self, user):
+        """这个函数必须被不断重写
+            三次摇奖必中两次，中将金额 分别为88(60%), 188(30%), 888(10%)
+        """
+        points = {
+            "0-1-3-5-7-9": "xunlei_laba_88",
+            "4-6-8": "xunlei_laba_188",
+            "2": "xunlei_laba_888"
+        }
+
+        for index in xrange(2):
+            records = WanglibaoActivityReward.objects.filter(activity=self.activity_name)
+            counter = (records.count()+1) % 10
+            for key, value in points.items():
+                if str(counter) in key:
+                    WanglibaoActivityReward.objects.create(
+                    user=user,
+                    redpack_event=RedPackEvent.objects.filter(name=value).first(),
+                    activity=self.activity_name,
+                    when_dist=1,
+                    left_times=1,
+                    join_times=1,
+                    channel='xunlei9',
+                    has_sent=False,
+                    )
+                    break
+
+        WanglibaoActivityReward.objects.create(
+            user=user,
+            redpack_event=None,
+            activity=self.activity_name,
+            when_dist=1,
+            left_times=1,
+            join_times=1,
+            channel='xunlei9',
+            has_sent=False,
+        )
+
+        return WanglibaoActivityReward.objects.filter(user=user, activity=self.activity_name)
+
+    def post(self, request):
+        if not request.user.is_authenticated():
+            json_to_response = {
+                'code': 1000,
+                'message': u'用户没有登录'
+            }
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
+        if not self.introduced_by_with(request.user.id, 'xunlei9', "2015-11-29"):
+            json_to_response = {
+                'code': 1001,
+                'message': u'用户不是在活动期内从迅雷渠道过来的用户'
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='applicaton/json')
+
+        _activitys = self.has_generate_reward_activity(request.user.id, self.activity_name)
+        activitys = _activitys if _activitys else self.generate_reward_activity(request.user)
+        activity_record = activitys.filter(left_times__gt=0)
+
+        print ">>>>>>>>>>>>>>", activity_record.count()
+        for item in activity_record:
+            if item.redpack_event:
+                print "yes has redpack"
+
+        if activity_record.count() == 0:
+            json_to_response = {
+                'code': 1002,
+                'messge': u'用户的抽奖机会已经用完了',
+            }
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+        else:
+            record = WanglibaoActivityReward.objects.select_for_update().filter(pk=activity_record.first().id).first()
+            if record.redpack_event:
+                json_to_response = {
+                    'code': 0,
+                    'amount': record.redpack_event.amount,
+                    'message': u'用户抽到奖品'
+                }
+                redpack_backends.give_activity_redpack(request.user, record.redpack_event, 'pc')
+            else:
+                json_to_response = {
+                    'code': 1,
+                    'message': u'此次没有得到奖品'
+                }
+
+            record.left_times = 0
+            record.has_sent = True
+            record.save()
+
+            return HttpResponse(json.dumps(json_to_response), content_type='application/json')

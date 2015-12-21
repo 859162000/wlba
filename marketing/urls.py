@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url, include
 from django.views.generic import TemplateView, RedirectView
 from marketing.views import AppShareView, AppShareRegView, NewYearView, AggregateView, IntroducedAwardTemplate, \
-                            ThunderTenAcvitityTemplate, AppLotteryTemplate, OpenidPhoneForFencai
+                            ThunderTenAcvitityTemplate, AppLotteryTemplate, OpenidPhoneForFencai, ThunderBindingApi
 from play_list import Investment, InvestmentHistory, InvestmentRewardView
 from django.contrib.auth.decorators import login_required
 from wanglibao.views import BaiduFinanceView
@@ -34,8 +34,7 @@ urlpatterns = patterns(
     url(r'^advance/$', TemplateView.as_view(template_name="advance.jade")),
     url(r'^gold/$', TemplateView.as_view(template_name="gold.jade"), name='marketing_gold'),
     url(r'^qixi/$', TemplateView.as_view(template_name="qixi.jade")),
-    # url(r'^xunlei_setp/$', TemplateView.as_view(template_name="xunlei_setp.jade"), name='marketing_xunlei_setp'),
-    url(r'^xunlei_setp/$', ThunderTenAcvitityTemplate.as_view(template_name="xunlei_ten.jade")),
+    # url(r'^xunlei_setp/$', ThunderTenAcvitityTemplate.as_view(template_name="xunlei_ten.jade"), name='xunlei_setp'),
     url(r'^mid_autumn/$', TemplateView.as_view(template_name="mid-autumn.jade")),
     # url(r'^xunlei_ten/$', TemplateView.as_view(template_name="xunlei_ten.jade")),
 
@@ -72,7 +71,7 @@ urlpatterns = patterns(
     url(r'^recharge_8000/$', TemplateView.as_view(template_name="recharge_8000.jade")),
     url(r'^double_eggs/$', TemplateView.as_view(template_name="double_eggs.jade")),
     url(r'^celebrity/$', TemplateView.as_view(template_name="celebrity.jade")),
-    url(r'^xunlei_one/$', TemplateView.as_view(template_name="xunlei_one.jade")),
+    url(r'^xunlei_one/$', ThunderTenAcvitityTemplate.as_view(template_name="xunlei_one.jade")),
     url(r'^broken_million/$', TemplateView.as_view(template_name="broken_million.jade")),
 )
 
@@ -195,4 +194,9 @@ urlpatterns += patterns(
     '',
     url(r'^area/$', PcActivityAreaView.as_view()),
     url(r'^area/filter/$', ActivityAreaApi.as_view()),
+)
+
+urlpatterns += patterns(
+    '',
+    url(r'^thunder/binding/$', ThunderBindingApi.as_view()),
 )

@@ -75,6 +75,8 @@ from rest_framework import renderers
 from django.core.urlresolvers import reverse
 from misc.views import MiscRecommendProduction
 from marketing.utils import pc_data_generator
+from wanglibao_account.cooperation import CoopRegister
+from wanglibao_account.utils import xunleivip_generate_sign
 reload(sys)
 
 class YaoView(TemplateView):
@@ -1989,32 +1991,31 @@ class CommonAward(object):
 
 
 class ThunderTenAcvitityTemplate(TemplateView):
-    template_name = 'xunlei_ten.jade'
+    template_name = 'xunlei_one.jade'
 
-    def generate_sign(self, data, key):
-        sorted_data = sorted(data.iteritems(), key=lambda asd:asd[0], reverse=False)
-        encode_data = urllib.urlencode(sorted_data)
-        sign = hashlib.md5(encode_data+str(key)).hexdigest()
-        return sign
-
-    def check_params(self, sign, _time, nickname, user_id):
+    def check_params(self, channel_code, sign, _time, nickname, user_id):
         response_data = {}
-        if sign is None:
+        if not channel_code or channel_code != 'xunlei9':
+            response_data = {
+                'ret_code': '20001',
+                'message': u'非法请求',
+            }
+        elif not sign:
             response_data = {
                 'ret_code': '10001',
                 'message': u'签名不存在',
             }
-        elif nickname is None:
+        elif not nickname:
             response_data = {
                 'ret_code': '10003',
                 'message': u'用户昵称不存在',
             }
-        elif _time is None:
+        elif not _time:
             response_data = {
                 'ret_code': '10005',
                 'message': u'时间戳不存在',
             }
-        elif user_id is None:
+        elif not user_id:
             response_data = {
                 'ret_code': '10007',
                 'message': u'用户ID不存在',
@@ -2024,11 +2025,12 @@ class ThunderTenAcvitityTemplate(TemplateView):
 
     def get_context_data(self, **kwargs):
         params = self.request.GET
-        sign = params.get('sign')
-        _time = params.get('time')
-        nickname = params.get('nickname')
-        user_id = params.get('xluserid')
-        response_data = self.check_params(sign, _time, nickname, user_id)
+        channel_code = params.get('promo_token', '').strip()
+        sign = params.get('sign', '').strip()
+        _time = params.get('time', '').strip()
+        nickname = params.get('nickname', '').strip()
+        user_id = params.get('xluserid', '').strip()
+        response_data = self.check_params(channel_code, sign, _time, nickname, user_id)
 
         if not response_data:
             check_data = {
@@ -2039,7 +2041,7 @@ class ThunderTenAcvitityTemplate(TemplateView):
             if len(nickname) > 3:
                 nickname = nickname[:3]+'...'
 
-            if self.generate_sign(check_data, XUNLEIVIP_REGISTER_KEY) == sign:
+            if xunleivip_generate_sign(check_data, XUNLEIVIP_REGISTER_KEY) == sign:
                 response_data = {
                     'ret_code': '10000',
                     'message': 'success',
@@ -2786,3 +2788,52 @@ class RockFinanceCheckAPIView(BaseWeixinTemplate):
             reward_record.left_times = 0
             reward_record.save()
             return {"code": 0, "message": u'欢迎您参加网利宝金融摇滚夜'}
+
+
+class ThunderBindingApi(APIView):
+    """
+    迅雷用户绑定接口
+    """
+
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        channel_code = request.POST.get('promo_token', '').strip()
+        channel_user = request.POST.get('xluserid', '').strip()
+        channel_time = request.POST.get('time', '').strip()
+        channel_sign = request.POST.get('sign', '').strip()
+        nick_name = request.POST.get('nickname', '').strip()
+        if channel_code and (channel_code == 'xunlei9' and channel_user
+                             and channel_time and channel_sign and nick_name):
+            user = self.request.user
+            binding = Binding.objects.filter(user_id=user.id).first()
+            if not binding:
+                CoopRegister(request).all_processors_for_user_register(user, channel_code)
+                binding = Binding.objects.filter(user_id=user.id).first()
+                if binding:
+                    response_data = {
+                        'ret_code': '10000',
+                        'message': u'绑定成功',
+                        'nickname': nick_name,
+                    }
+                else:
+                    response_data = {
+                        'ret_code': '10003',
+                        'message': u'绑定失败',
+                    }
+            else:
+                response_data = {
+                    'ret_code': '10002',
+                    'message': u'该用户已绑定过',
+                    'nickname': nick_name,
+                }
+        else:
+            response_data = {
+                'ret_code': '10001',
+                'message': u'非法请求',
+            }
+
+        logger.info("Thunder binding promo_token[%s], xluserid[%s], time[%s], sign[%s], result[%s]"
+                    % (channel_code, channel_user, channel_time, channel_sign, response_data))
+
+        return HttpResponse(json.dumps(response_data), content_type='application/json')
