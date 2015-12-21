@@ -46,7 +46,7 @@ class FuelCardBuyApi(APIView):
                     product_info, margin_info, equity_info = trader.purchase(total_amount)
 
                     return render_to_response('', {
-                        # FixMe
+                        # FixMe, 返回内容协商, 给用户发送投资成功短信通知
                     })
                 except Exception, e:
                     return Response({
@@ -71,10 +71,10 @@ class FuelCardBugRecordView(TemplateView):
 
     template_name = 'fuel_records_audit.jade'
 
-    def get_user_amortizations(self, settled):
+    def get_user_amortizations(self, settled_status):
         """获取用户还款计划"""
 
-        user_amotization = UserAmortization.objects.filter(user=self.request.user, settled=settled,
+        user_amotization = UserAmortization.objects.filter(user=self.request.user, settled=settled_status,
                                                            product_amortization__product_category=u'加油卡'
                                                            ).select_related(depth=2)
         user_amotization = user_amotization.order_by('product_amortization__product_id', 'term')
@@ -96,8 +96,8 @@ class FuelCardBugRecordView(TemplateView):
 
         status_list = ['auditing', 'done']
         if _status in status_list:
-            settled = False if _status == 'auditing' else True
-            data = self.get_user_amortizations(settled)
+            settled_status = False if _status == 'auditing' else True
+            data = self.get_user_amortizations(settled_status)
 
             return {
                 'data': data,
@@ -117,11 +117,15 @@ class FuelCardExchangeRecordView(TemplateView):
 
     template_name = 'fuel_records_exchange.jade'
 
-    def get_user_amortizations(self, settled):
+    TYPES = {
+        'fuel_card': u'加油卡',
+    }
+
+    def get_user_reward_record(self, settled_status, l_type):
         """获取用户还款计划"""
 
-        amotization_record = AmortizationRecord.objects.filter(user=self.request.user,
-                                                               product_amortization__product_category=u'加油卡'
+        amotization_record = AmortizationRecord.objects.filter(user=self.request.user, settled=settled_status,
+                                                               product_amortization__product_category=l_type
                                                                ).select_related(depth=2)
         user_amotization = amotization_record.order_by('c', 'term')
 
@@ -129,13 +133,18 @@ class FuelCardExchangeRecordView(TemplateView):
 
     def get_context_data(self, **kwargs):
         _status = self.request.GET.get('status', '').strip()
+        _type = self.request.GET.get('type', '').strip()
         if not _status:
-            return HttpResponseForbidden(u'status参数不存在')
+            return HttpResponseForbidden(u'status参数是必须的')
+
+        l_type = self.TYPES.get(_type, None)
+        if not _type or not l_type:
+            return HttpResponseForbidden(u'type参数不存在')
 
         status_list = ['wait_receive', 'receive']
         if _status in status_list:
-            settled = False if _status == 'wait_receive' else True
-            data = self.get_user_amortizations(settled)
+            settled_status = False if _status == 'wait_receive' else True
+            data = self.get_user_reward_record(settled_status, l_type)
 
 
 class FuelCardBuyView(TemplateView):
