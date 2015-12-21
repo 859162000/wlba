@@ -219,26 +219,26 @@
                 type: "GET",
                 async: false
             }).done(function (data) {
-                console.log(data.lefts);
-                $('#chance').text(' ' + data.lefts + ' ');
+                console.log(data);
+                if (data.lefts) {
+                    $('#chance').text(' ' + data['lefts'] + ' ');
+                } else if (change['left'] == 0) {
+                    $('#chance').text(' ' + data.lefts + ' ');
+                } else {
+                    $('#chance').text(' ' + 3 + ' ');
+                }
             });
 
         }
 
 
-        //if (data.lefts['amount_sum']) {
-        //    $('#chance').text(' ' + data.lefts['amount_sum'] + ' ');
-        //} else if (change['left'] == 0) {
-        //    $('#chance').text(' ' + data.lefts['amount_sum'] + ' ');
-        //} else {
-        //    $('#chance').text(' ' + 3 + ' ');
-        //}
         //按钮
         $('.game-btn').on('mousedown', function () {
             $('.game-btn').addClass('game-btn-down')
         });
         $('.game-btn').on('mouseup', function () {
             //redpack( function (data) {
+            chances()
             $.ajax({
                 url: "/api/xunlei/2016/1/",
                 type: "POST",
