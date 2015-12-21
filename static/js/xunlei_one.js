@@ -63,9 +63,9 @@
             hasCallBack: true,
             callBack: function () {
                 if ($('#register_submit').hasClass('buttom-mm')) {
-                     window.location.href = "http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao"
-                } else{
-                     history.go(0);
+                    window.location.href = "http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao"
+                } else {
+                    history.go(0);
                 }
 
 
@@ -167,7 +167,7 @@
         var str = '';
         $.ajax({
             url: "/api/xunlei/2016/1/?type=orders",
-            type: "POST",
+            type: "GET",
             async: false
         }).done(function (result) {
             console.log(result);
@@ -210,54 +210,72 @@
             }, 250)
         }, 500)
 
-        //按钮
-        $.ajax({
-            url: "/api/xunlei/2016/1/?type=chances",
-            type: "POST",
-            async: false
-        }).done(function (data) {
-            console.log(data);
-        });
 
-        //if (change['left']) {
-        //    $('#chance').text(' ' + change['left'] + ' ');
+        //抽奖次数
+        chances();
+        function chances() {
+            $.ajax({
+                url: "/api/xunlei/2016/1/?type=chances",
+                type: "GET",
+                async: false
+            }).done(function (data) {
+                console.log(data.lefts);
+                $('#chance').text(' ' + data.lefts + ' ');
+            });
+
+        }
+
+
+        //if (data.lefts['amount_sum']) {
+        //    $('#chance').text(' ' + data.lefts['amount_sum'] + ' ');
         //} else if (change['left'] == 0) {
-        //    $('#chance').text(' ' + change['left'] + ' ');
+        //    $('#chance').text(' ' + data.lefts['amount_sum'] + ' ');
         //} else {
         //    $('#chance').text(' ' + 3 + ' ');
         //}
+        //按钮
         $('.game-btn').on('mousedown', function () {
             $('.game-btn').addClass('game-btn-down')
         });
         $('.game-btn').on('mouseup', function () {
-            redpack('ENTER_WEB_PAGE', function (data) {
+            //redpack( function (data) {
+            $.ajax({
+                url: "/api/xunlei/2016/1/",
+                type: "POST",
+                data: {},
+                async: false
+            }).done(function (data) {
+                console.log(data);
+                //if (!$('.go-game').hasClass('noClick')) {
+                //    $('.game-btn').removeClass('game-btn-down');
+                //    if (data['ret_code'] == 4000) {
+                //        $('#small-zc').show();
+                //        $('#xl-aug-fail p').text('Sorry~您不符合抽奖条件');
+                //        $('#xl-aug-fail').show();
+                //    } else if (data['ret_code'] == 3003) {
+                //        if (change['left'] <= 0) {
+                //            $('#small-zc').show();
+                //            $('#xl-aug-fail p').text('Sorry~您的抽奖次数已用完')
+                //            $('#xl-aug-fail').show();
+                //        } else {
+                //            if (data['left'] == data['get_time']) {
+                //                game(data['get_time']);
+                //            } else {
+                //                game();
+                //            }
+                //
+                //        }
+                //    } else if (data['ret_code'] == 3000) {
+                //        $('body,html').animate({scrollTop: 0}, 600);
+                //        //$('#small-zc').show();
+                //        //$('#xl-aug-login').show();
+                //    }
+                //}
 
-                if (!$('.go-game').hasClass('noClick')) {
-                    $('.game-btn').removeClass('game-btn-down');
-                    if (data['ret_code'] == 4000) {
-                        $('#small-zc').show();
-                        $('#xl-aug-fail p').text('Sorry~您不符合抽奖条件');
-                        $('#xl-aug-fail').show();
-                    } else if (data['ret_code'] == 3003) {
-                        if (change['left'] <= 0) {
-                            $('#small-zc').show();
-                            $('#xl-aug-fail p').text('Sorry~您的抽奖次数已用完')
-                            $('#xl-aug-fail').show();
-                        } else {
-                            if (data['left'] == data['get_time']) {
-                                game(data['get_time']);
-                            } else {
-                                game();
-                            }
-
-                        }
-                    } else if (data['ret_code'] == 3000) {
-                        $('body,html').animate({scrollTop: 0}, 600);
-                        //$('#small-zc').show();
-                        //$('#xl-aug-login').show();
-                    }
-                }
             })
+
+
+            //})
         })
         function game(isGet) {
             $('.go-game').addClass('noClick');
@@ -332,73 +350,72 @@
         //    });
         //}
         //登入框穿参数
-    function getQueryString(name) {
-        var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
-        var r = window.location.search.substr(1).match(reg);
-        if (r != null) {
-            return unescape(r[2]);
+        function getQueryString(name) {
+            var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) {
+                return unescape(r[2]);
+            }
+            return null;
         }
-        return null;
-    }
 
-    getQueryString('promo_token')
-    var token = getQueryString('promo_token'),
-        xid = getQueryString('xluserid'),
-        timer = getQueryString('time'),
-        sig = getQueryString('sign'),
-        name = getQueryString('nickname');
-    //alert(token+','+xid+','+timer+','+sig+','+name);
-    if ($('.denelu-form').hasClass('dengruhou')) {
-        $.ajax({
-            type: "POST",
-            url: "/activity/thunder/binding/",
-            data: {
-                'promo_token': token,
-                'xluserid': xid,
-                'time': timer,
-                'sign': sig,
-                'nickname': name
+        getQueryString('promo_token')
+        var token = getQueryString('promo_token'),
+            xid = getQueryString('xluserid'),
+            timer = getQueryString('time'),
+            sig = getQueryString('sign'),
+            name = getQueryString('nickname');
+        //alert(token+','+xid+','+timer+','+sig+','+name);
+        if ($('.denelu-form').hasClass('dengruhou')) {
+            $.ajax({
+                type: "POST",
+                url: "/activity/thunder/binding/",
+                data: {
+                    'promo_token': token,
+                    'xluserid': xid,
+                    'time': timer,
+                    'sign': sig,
+                    'nickname': name
 
-            },
-            success: function (data) {
-                console.log(data.ret_code);
-                if (data.ret_code == 10002 || data.ret_code == 10000) {
-                    $('.xunshang1').text('恭喜已完成网利宝注册');
-                    $('.xunshang2').text('并与您的迅雷账号绑定成功');
-                    $('.xunleiten1').css({display: 'block'});
-                    $('.xunleiten2').css({display: 'block'});
-                } else {
-                    $('.xunshang1').text('恭喜已完成网利宝注册');
-                    $('.xunleiten2').css({display: 'block'});
+                },
+                success: function (data) {
+                    console.log(data.ret_code);
+                    if (data.ret_code == 10002 || data.ret_code == 10000) {
+                        $('.xunshang1').text('恭喜已完成网利宝注册');
+                        $('.xunshang2').text('并与您的迅雷账号绑定成功');
+                        $('.xunleiten1').css({display: 'block'});
+                        $('.xunleiten2').css({display: 'block'});
+                    } else {
+                        $('.xunshang1').text('恭喜已完成网利宝注册');
+                        $('.xunleiten2').css({display: 'block'});
+
+                    }
+
+                },
+                error: function () {
 
                 }
+            });
+            getCode();
 
-            },
-            error: function () {
+        }
 
-            }
-        });
-        getCode();
-
-    }
-
-    function getCode() {//得到用户信息的二维码
-        var original_id = document.getElementById("original_id").value;
-        var code = document.getElementById("weixin_code").value;
-        $.ajax({
-            type: "GET",
-            url: "/weixin/api/generate/qr_scene_ticket/",
-            data: {"original_id": original_id, "code": code},//c:gh_32e9dc3fab8e, w:gh_f758af6347b6;code:微信关注渠道
-            success: function (data) {
-                $("#erweimaxunlei11").html("<img src='" + data.qrcode_url + "' />");
-            },
-            error: function () {
-                window.location.href = "/weixin/jump_page/?message=出错了";
-            }
-        });
-    }
+        function getCode() {//得到用户信息的二维码
+            var original_id = document.getElementById("original_id").value;
+            var code = document.getElementById("weixin_code").value;
+            $.ajax({
+                type: "GET",
+                url: "/weixin/api/generate/qr_scene_ticket/",
+                data: {"original_id": original_id, "code": code},//c:gh_32e9dc3fab8e, w:gh_f758af6347b6;code:微信关注渠道
+                success: function (data) {
+                    $("#erweimaxunlei11").html("<img src='" + data.qrcode_url + "' />");
+                },
+                error: function () {
+                    window.location.href = "/weixin/jump_page/?message=出错了";
+                }
+            });
+        }
     });
-
 
 
 }).call(this);
