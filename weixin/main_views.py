@@ -20,7 +20,6 @@ from wanglibao_account.views import ajax_register
 from misc.models import Misc
 from .forms import OpenidAuthenticationForm
 from django.conf import settings
-from .util import FWH_REGISTER_URL, FWH_LOGIN_URL
 
 class WXLogin(TemplateView):
     template_name = 'weixin_login_new.jade'
@@ -34,7 +33,6 @@ class WXLogin(TemplateView):
         return {
             'context': context,
             'next': next,
-            'register_url': FWH_REGISTER_URL
             }
 
     @weixin_api_error
@@ -112,20 +110,12 @@ class WXRegister(TemplateView):
             'channel': channel,
             'phone': phone,
             'next': next,
-            'login_url': FWH_LOGIN_URL,
         }
 
     @weixin_api_error
     def dispatch(self, request, *args, **kwargs):
-        code = request.GET.get('code')
-        state = request.GET.get('state')
-        error_msg = ""
-        if code and state:
-            account = WeixinAccounts.getByOriginalId(state)
-            request.session['account_key'] = account.key
-            oauth = WeChatOAuth(account.app_id, account.app_secret, )
-            res = oauth.fetch_access_token(code)
-            self.openid = res.get('openid')
+        self.openid = self.request.session.get('openid', "")
+        if self.openid:
             form = OpenidAuthenticationForm(self.openid, data=request.GET)
             if form.is_valid():
                 auth_login(request, form.get_user())
@@ -133,23 +123,32 @@ class WXRegister(TemplateView):
             else:
                 return super(WXRegister, self).dispatch(request, *args, **kwargs)
         else:
-            error_msg = u"code or state is None"
-        if error_msg:
-            return redirectToJumpPage(error_msg)
+            super(WXRegister, self).dispatch(request, *args, **kwargs)
 
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.debug import sensitive_post_parameters
+from django.views.decorators.cache import never_cache
 
-class WXRegisterAPI(APIView):
-    permission_classes = ()
-    http_method_names = ['post']
+@sensitive_post_parameters()
+@csrf_protect
+@never_cache
+def ajax_wx_register(request):
+    openid = request.session.get('openid')
+    response = ajax_register(request)
+    if response.status_code==200 and openid:
+        w_user = WeixinUser.objects.get(openid=openid)
+        bindUser(w_user, request.user)
+    return response
 
-    def post(self, request):
-        openid = self.request.session.get('openid')
-        if openid:
-            w_user = WeixinUser.objects.get(openid=openid)
-            response = ajax_register(request)
-            if response.status_code==200:
-                bindUser(w_user, request.user)
-            return response
-        else:
-            return HttpResponse({"error_code":-1, 'message':"openid is null"})
+# class WXRegisterAPI(APIView):
+#     permission_classes = ()
+#     http_method_names = ['post']
+#
+#     def post(self, request):
+#         openid = self.request.session.get('openid')
+#         response = ajax_register(request)
+#         if response.status_code==200 and openid:
+#             w_user = WeixinUser.objects.get(openid=openid)
+#             bindUser(w_user, request.user)
+#         return response
 
