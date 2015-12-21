@@ -60,6 +60,8 @@ from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from common import DecryptParmsAPIView
 import requests
+from weixin.models import WeixinUser
+from weixin.util import bindUser
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -364,7 +366,13 @@ class RegisterAPIView(DecryptParmsAPIView):
                         redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
                         redpack.valid = 1
                         redpack.save()
-
+        try:
+            openid = request.session.get('openid')
+            if openid:
+                w_user = WeixinUser.objects.get(openid=openid)
+                bindUser(w_user, request.user)
+        except Exception, e:
+            logger.debug("fwh register bind error, error_message:::%s"%e.message)
         if channel in ('weixin_attention', 'maimai1'):
             return Response({"ret_code": 0, 'amount': 120, "message": u"注册成功"})
         else:

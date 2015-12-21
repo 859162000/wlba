@@ -87,7 +87,6 @@ urlpatterns = patterns(
 
     #微站 api
     url(r'api/fwh_login/$', main_views.WXLoginAPI.as_view(), name='weixin_fwh_login'),
-    url(r'api/fwh_register/$', main_views.ajax_wx_register),
 
 
 )

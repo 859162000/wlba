@@ -109,28 +109,11 @@ class WXRegister(TemplateView):
             channel = None
         phone = self.request.GET.get('phone', 0)
         next = self.request.GET.get('next', '')
-        print '-----------------------------', self.request.session.get('openid')
         return {
             'token': token,
             'channel': channel,
             'phone': phone,
             'next': next,
         }
-
-@sensitive_post_parameters()
-@csrf_protect
-@never_cache
-def ajax_wx_register(request):
-    openid = request.session.get('openid')
-    response = ajax_register(request)
-    if response.status_code==200 and openid:
-        r_data = json.loads(response.content)
-        try:
-            if r_data['message'] == 'done':
-                w_user = WeixinUser.objects.get(openid=openid)
-                bindUser(w_user, request.user)
-        except Exception, e:
-            logger.debug("fwh register bind error, error_message:::%s"%e.message)
-    return response
 
 
