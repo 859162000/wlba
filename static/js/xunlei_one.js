@@ -15,13 +15,18 @@
         re.activityRegister.activityRegisterInit({
             registerTitle: '领取迅雷会员+现金红包',    //注册框标语
             isNOShow: '1',
-            buttonFont: '立即注册'
+            buttonFont: '立即注册',
+            hasCallBack:true,
+            callBack: function(){
+                window.location.href="http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao"
+
+            }
         });
         //未登录时点击登入是状态
-        $('.xunlei11dengru').on('click', function () {
-            $('.denruxunlei').show();
-            $('.dengxun11').hide();
-        })
+        //$('.xun-zhuce').on('click', function () {
+        //    //window.location.href = "http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao";
+        //
+        //})
         //回到顶部开始
         //固定回到顶部,
         function backtop(box) {

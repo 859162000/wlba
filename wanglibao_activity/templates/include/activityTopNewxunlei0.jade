@@ -65,8 +65,12 @@ include include/activityTop2
                     input(type="checkbox", name="agreement", checked="checked", id="agreement", data-value="agree",style="position: relative;top: 3px;margin-right: 10px;width: 16px;")
                   | 我同意<a href="/agreement/" target="_blank">《网利宝注册协议》</a>
                   .form-row-error
-                button#register_submit.button-account.span10.xun-zhuce(type='button')
+                if ret_code == '10000'
+                  button#register_submit.button-account.span10.xun-zhuce(type='button')
+                else
+                  button#register_submit.button-account.span10.xun-zhuce(type='button').buttom-mm
               .space-vertical-s
+            p.xunleiten {{ret_code}}
             if ret_code == '10000'
               p.xun-p 注册后直接与您的迅雷账号{{nickname}}绑定
             else
