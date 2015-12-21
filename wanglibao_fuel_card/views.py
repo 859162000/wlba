@@ -9,11 +9,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from wanglibao_account.cooperation import get_phone_for_coop
-from wanglibao_p2p.models import P2PProduct, UserAmortization, AmortizationRecord
+from wanglibao_p2p.models import P2PProduct, UserAmortization, P2PRecord
 from wanglibao.const import ErrorNumber
+from marketing.models import P2PRewardRecord
 from .forms import FuelCardBuyForm
 from .trade import P2PTrader
-from .utils import get_sorts_for_created_time
+from .utils import get_sorts_for_created_time, get_p2p_reward_using_range
 
 
 class FuelCardBuyApi(APIView):
@@ -144,12 +145,23 @@ class FuelCardExchangeRecordView(TemplateView):
 
         status_list = ['wait_receive', 'receive']
         if _status in status_list:
+            data = []
             settled_status = False if _status == 'wait_receive' else True
             user_amortizations = self.get_user_amortizations(self.request.user, settled_status, l_type)
-            data = []
-            if user_amortizations:
+            if _status == 'receive':
                 for ua in user_amortizations:
-                    order_id = ua.product_amortization.order_id
+                    p2p_reward_record = P2PRewardRecord.objects.get(user=self.request.user,
+                                                                    order_id=ua.product_amortization.order_id)
+                    data.append((ua, p2p_reward_record.reward,))
+            else:
+                data = user_amortizations or []
+
+            return {
+                'data': data,
+                'status': _status,
+            }
+        else:
+            return HttpResponseForbidden(u'无效参数status')
 
 
 class FuelCardBuyView(TemplateView):
@@ -169,9 +181,13 @@ class FuelCardBuyView(TemplateView):
         except P2PProduct.DoesNotExist:
             return HttpResponseForbidden(u'无效产品ID')
 
+        using_range = get_p2p_reward_using_range(self.request.user.id, p2p_product.category,
+                                                 p2p_product.equality_prize_amount)
+
         return {
             'p2p_product': p2p_product,
             'phone': phone,
+            'using_range': using_range,
         }
 
 
@@ -204,4 +220,58 @@ class FuelCardListViewForApp(TemplateView):
 
         return {
             'html_data': data,
+        }
+
+
+class FualCardAccountView(TemplateView):
+    """加油卡资金统计"""
+
+    template_name = ''
+
+    TYPES = {
+        'fuel_card': (u'加油卡', 'fuel_account.jade'),
+    }
+
+    def get_user_amortizations(self):
+        """获取用户还款计划"""
+
+        user_amotization = UserAmortization.objects.filter(user=self.request.user, settled=True,
+                                                           product_amortization__product_category=u'加油卡'
+                                                           ).select_related(depth=2)
+        user_amotization = user_amotization.order_by('product_amortization__product_id', '-term')
+
+        ua_list = []
+        ua_tmp = user_amotization.first()
+        ua_list.append(ua_tmp)
+        for ua in user_amotization:
+            if ua.product_amortization.product != ua_tmp.product_amortization.product:
+                ua_list.append(ua_tmp)
+                ua_tmp = ua
+
+        return get_sorts_for_created_time(ua_list)
+
+    def get_context_data(self, **kwargs):
+        _type = self.request.GET.get('type', '').strip()
+
+        l_type, template_name = self.TYPES.get(_type)
+        if not _type or not l_type:
+            return HttpResponseForbidden(u'type参数不存在')
+
+        self.template_name = template_name
+        user = self.request.user
+
+        total_revenue = 0
+        register_time = user.date_joined
+        user_amortizations = self.get_user_amortizations()
+        for ua in user_amortizations:
+            product = ua.product_amortization.product
+            p2p_parts = product.amount / product.limit_min_per_user
+            p2p_offset_amount = product.equality_prize_amount - product.limit_min_per_user
+            per_p2p_revenue = p2p_parts * p2p_offset_amount
+            total_revenue += per_p2p_revenue
+
+        return {
+            'data': user_amortizations or [],
+            'count': total_revenue,
+            'register_time': register_time,
         }

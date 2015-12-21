@@ -297,8 +297,8 @@ class P2PRewardResource(resources.ModelResource):
 
     class Meta:
         model = Reward
-        fields = ('id', 'type', 'channel', 'price', 'create_time', 'end_time',
-                  'is_used', 'conversion_code', 'description')
+        fields = ('id', 'type', 'channel', 'price', 'using_range', 'create_time',
+                  'end_time', 'is_used', 'conversion_code', 'description')
 
     def import_obj(self, instance, row, False):
         super(P2PRewardResource, self).import_obj(instance, row, False)
@@ -306,8 +306,8 @@ class P2PRewardResource(resources.ModelResource):
 
 class P2PRewardAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     actions = None
-    list_display = ('id', 'type', 'channel', 'price', 'create_time', 'end_time',
-                    'is_used', 'conversion_code', 'description')
+    list_display = ('id', 'type', 'channel', 'price', 'using_range', 'create_time',
+                    'end_time', 'is_used', 'conversion_code', 'description')
     search_fields = ('type', 'channel', 'price', 'conversion_code')
     list_filter = ('is_used', 'type')
     raw_id_fields = ('channel',)

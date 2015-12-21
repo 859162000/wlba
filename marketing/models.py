@@ -391,6 +391,7 @@ class P2PReward(models.Model):
                             help_text=u"*必须与产品表类别名称一致")
     channel = models.ForeignKey(Channels, verbose_name=u'奖品渠道')
     price = models.FloatField(u'面值（元）', default=0, blank=False)
+    using_range = models.CharField(u'使用范围', max_length=50)
     create_time = models.DateTimeField(u'录入时间', auto_now_add=True)
     end_time = models.DateTimeField(u'过期时间', null=True, blank=True)
     is_used = models.BooleanField(u'是否发放', default=False)
