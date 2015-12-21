@@ -132,7 +132,7 @@
 
 
         var change = [];
-        redpack();
+        //redpack();
         //领取会员提示
         $('.setp-btn').on('click', function () {
 
@@ -161,16 +161,17 @@
         //抽奖名单
         var str = '';
         $.ajax({
-            url: "/api/xunlei/award/records/",
+            url: "/api/xunlei/2016/1/?type=orders",
             type: "POST",
             async: false
         }).done(function (result) {
-            for (var k = 0, len2 = result['data'].length; k < len2; k++) {
-                var tel = result['data'][k]['phone'].substring(0, 3) + "******" + result['data'][k]['phone'].substring(9, 11);
-                str += '<p>恭喜' + tel + '获得<span>' + result['data'][k]['awards'] + '元</span>红包</p>'
-            }
-            $('.long-p').append(str);
-            $('.long-p p:odd').addClass('hight');
+            console.log(result);
+            //for (var k = 0, len2 = result['data'].length; k < len2; k++) {
+            //    var tel = result['data'][k]['phone'].substring(0, 3) + "******" + result['data'][k]['phone'].substring(9, 11);
+            //    str += '<p>恭喜' + tel + '获得<span>' + result['data'][k]['awards'] + '元</span>红包</p>'
+            //}
+            //$('.long-p').append(str);
+            //$('.long-p p:odd').addClass('hight');
         });
 
         //无线滚动
@@ -205,14 +206,21 @@
         }, 500)
 
         //按钮
+        $.ajax({
+            url: "/api/xunlei/2016/1/?type=chances",
+            type: "POST",
+            async: false
+        }).done(function (data) {
+            console.log(data);
+        });
 
-        if (change['left']) {
-            $('#chance').text(' ' + change['left'] + ' ');
-        } else if (change['left'] == 0) {
-            $('#chance').text(' ' + change['left'] + ' ');
-        } else {
-            $('#chance').text(' ' + 3 + ' ');
-        }
+        //if (change['left']) {
+        //    $('#chance').text(' ' + change['left'] + ' ');
+        //} else if (change['left'] == 0) {
+        //    $('#chance').text(' ' + change['left'] + ' ');
+        //} else {
+        //    $('#chance').text(' ' + 3 + ' ');
+        //}
         $('.game-btn').on('mousedown', function () {
             $('.game-btn').addClass('game-btn-down')
         });
@@ -303,23 +311,22 @@
 
 
         //抽奖请求
-        function redpack(sum, callback) {
-            $.ajax({
-                url: "/api/xunlei/2016/1/",
-                type: "POST",
-                //data: {action: sum},
-                async: false
-            }).done(function (data) {
-                change = data;
-                //$('#chance').text(change['left']);
-
-                callback && callback(data);
-                console.log(change)
-
-            });
-        }
-    });
-    //登入框穿参数
+        //function redpack(sum, callback) {
+        //    $.ajax({
+        //        url: "/api/xunlei/2016/1/",
+        //        type: "POST",
+        //        //data: {action: sum},
+        //        async: false
+        //    }).done(function (data) {
+        //        change = data;
+        //        //$('#chance').text(change['left']);
+        //
+        //        callback && callback(data);
+        //        console.log(change)
+        //
+        //    });
+        //}
+        //登入框穿参数
     function getQueryString(name) {
         var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
         var r = window.location.search.substr(1).match(reg);
@@ -385,6 +392,8 @@
             }
         });
     }
+    });
+
 
 
 }).call(this);
