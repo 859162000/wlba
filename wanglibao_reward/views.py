@@ -1090,13 +1090,21 @@ class XunleiActivityAPIView(APIView):
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
         if _type == "chances":
+            if not request.user.is_authenticated():
+                json_to_response = {
+                    'code': 1000,
+                    'message': u'用户没有登录'
+                }
+
+                return HttpResponse(json.dumps(json_to_response), content_type='application/json')
+
             if not self.has_generate_reward_activity(request.user.id, self.activity_name):
                 self.generate_reward_activity(request.user)
 
             sum_left = WanglibaoActivityReward.objects.filter(activity=self.activity_name, user=request.user).aggregate(amount_sum=Sum('left_times'))
             to_json_response = {
                 'ret_code': 1005,
-                'lefts': str(sum_left["amount_sum"]),
+                'lefts': str(sum_left["amount_sum"]) if sum_left else 0,
                 'message': u'获得剩余抽奖次数',
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
