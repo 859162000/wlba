@@ -46,11 +46,24 @@ def get_activity_show_status_num(activity_show):
 
 def get_sorts_for_activity_show(queryset):
     activity_list = []
-    for q in queryset:
-        index = get_activity_show_status_num(q)
-        activity_list.append((index, q))
+    if queryset:
+        sub_activity_list = []
+        unique_priority = queryset.first()
+        for q in queryset:
+            index = get_activity_show_status_num(q)
+            if q.priority != unique_priority:
+                unique_priority = q.priority
+                sub_activity_list = sorted(sub_activity_list,
+                                           key=lambda asd: asd[0], reverse=False)
+                activity_list.extend(sub_activity_list)
+                sub_activity_list = []
 
-    activity_list = sorted(activity_list, key=lambda asd:asd[0], reverse=False)
-    activity_list = (q[1] for q in activity_list)
+            sub_activity_list.append((index, q))
+        else:
+            sub_activity_list = sorted(sub_activity_list,
+                                       key=lambda asd: asd[0], reverse=False)
+            activity_list.extend(sub_activity_list)
+
+        activity_list = (q[1] for q in activity_list)
 
     return activity_list
