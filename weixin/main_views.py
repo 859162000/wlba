@@ -6,16 +6,13 @@ from wechatpy.oauth import WeChatOAuth
 from rest_framework.response import Response
 from rest_framework.views import APIView
 import logging
-import json
-from django.views.decorators.csrf import csrf_protect
-from django.views.decorators.debug import sensitive_post_parameters
-from django.views.decorators.cache import never_cache
+from django.http import HttpResponseRedirect
 
 from weixin.common.decorators import weixin_api_error
 from weixin.models import WeixinAccounts, WeixinUser
 from weixin.util import redirectToJumpPage, bindUser, unbindUser
 from marketing.utils import get_channel_record
-from util import getOrCreateWeixinUser
+from util import getAccountInfo, get_fwh_login_url
 from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
 from wanglibao import settings
 from wanglibao_account.views import ajax_register
@@ -25,6 +22,15 @@ from django.conf import settings
 
 
 logger = logging.getLogger("weixin")
+
+
+class WXLoginRedirect(TemplateView):
+    def dispatch(self, request, *args, **kwargs):
+        next = request.GET.get('next')
+        login_url = get_fwh_login_url(next=next)
+        print '---------', login_url
+        return HttpResponseRedirect(login_url)
+
 
 class WXLogin(TemplateView):
     template_name = 'weixin_login_new.jade'
@@ -54,7 +60,9 @@ class WXLogin(TemplateView):
             form = OpenidAuthenticationForm(self.openid, data=request.GET)
             if form.is_valid():
                 auth_login(request, form.get_user())
-                return redirectToJumpPage("自动登录成功")
+                next = self.request.GET.get('next', '')
+                next = urllib.unquote(next.encode('utf-8'))
+                return redirectToJumpPage("自动登录成功", next=next)
             else:
                 return super(WXLogin, self).dispatch(request, *args, **kwargs)
         else:
@@ -115,5 +123,21 @@ class WXRegister(TemplateView):
             'phone': phone,
             'next': next,
         }
+
+class AccountTemplate(TemplateView):
+
+    def get_context_data(self, **kwargs):
+        account_info = getAccountInfo(self.request.user)
+        print account_info
+        return {
+            'total_asset': account_info['total_asset'],
+            'total_unpaid_interest': account_info['p2p_total_unpaid_interest'],
+            'total_paid_interest': account_info['p2p_total_paid_interest'],
+            'margin': account_info['p2p_margin'],
+        }
+
+
+
+
 
 

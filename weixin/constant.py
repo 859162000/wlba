@@ -268,7 +268,7 @@ Message_template = {
                    "color":"#173177"
                }
         },
-        "url": settings.CALLBACK_HOST + '/weixin/account/?promo_token=fwh',
+        "url": settings.CALLBACK_HOST + '/weixin/sub_account/?promo_token=fwh',
     },
     UNBIND_SUCCESS_TEMPLATE_ID:{
         "top_color":'#88ffdd',

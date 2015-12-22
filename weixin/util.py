@@ -14,6 +14,7 @@ from django.core.urlresolvers import reverse
 import logging
 import time
 import json
+import urllib
 
 
 logger = logging.getLogger("weixin")
@@ -21,25 +22,29 @@ logger = logging.getLogger("weixin")
 BASE_WEIXIN_URL = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_base&state={state}#wechat_redirect"
 FWH_LOGIN_URL = ""
 FWH_REGISTER_URL = ""
-def config_url():
+def get_fwh_login_url(next=None):
     m = Misc.objects.filter(key='weixin_qrcode_info').first()
     if m and m.value:
         info = json.loads(m.value)
         if isinstance(info, dict) and info.get("fwh"):
             original_id = info.get("fwh")
             account = WeixinAccounts.getByOriginalId(original_id)
-            fwh_login_url = settings.CALLBACK_HOST + "/weixin/sub_login/?promo_token=fwh"
-            fwh_register_url = settings.CALLBACK_HOST + "/weixin/sub_regist/?promo_token=fwh"
+            fwh_login_url = settings.CALLBACK_HOST + "/weixin/sub_login/"
+            if next:
+                fwh_login_url += "?next=%s"%urllib.quote(next)
+                return BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=fwh_login_url, state=original_id)
             global FWH_LOGIN_URL
-            global FWH_REGISTER_URL
             FWH_LOGIN_URL = BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=fwh_login_url, state=original_id)
-            FWH_REGISTER_URL = BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=fwh_login_url, state=original_id)
             print "********************************************************",FWH_LOGIN_URL
 
-config_url()
+get_fwh_login_url()
 
-def redirectToJumpPage(message):
+
+def redirectToJumpPage(message, next=None):
     url = reverse('jump_page')+'?message=%s'% message
+    if next:
+        return HttpResponseRedirect(next)
+        # url = reverse('jump_page')+'?message=%s&next=%s'% (message, next)
     return HttpResponseRedirect(url)
 
 def sendTemplate(weixin_user, message_template):
