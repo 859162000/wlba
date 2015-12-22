@@ -70,11 +70,9 @@ include include/activityTop2
                 else
                   button#register_submit.button-account.span10.xun-zhuce(type='button').buttom-mm
               .space-vertical-s
-            p.xunleiten {{ret_code}}
             if ret_code == '10000'
               p.xun-p 注册后直接与您的迅雷账号{{nickname}}绑定
             else
               p.xun-p
-                a(href="http://act.vip.xunlei.com/vip/2014/wanglibao/") 未获取到您的迅雷账号,请返回登录迅雷账号
             p.xun-p 已有账号,
               a(href="/accounts/login/") 立即登录
