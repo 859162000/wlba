@@ -93,7 +93,7 @@
 		var host = 'https://www.wanglibao.com/',
 			shareName = '双旦来了，翻倍狂欢',
 			shareImg = host + '/static/imgs/mobile_activity/app_double_dan/300x300.jpg',
-			shareLink = host + '/activity/app_recharge_8000/',
+			shareLink = host + '/activity/app_double_dan/',
 			shareMainTit = '双旦来了，翻倍狂欢',
 			shareBody = '红包、加息券、体验金全部翻倍送、实物大奖同台登场，年底倾囊N重回馈。';
 		//分享给微信好友
@@ -118,4 +118,5 @@
 		})
 	})
 })(org);
+
 
