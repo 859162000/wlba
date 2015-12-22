@@ -83,13 +83,17 @@ org.ui = (function(){
 })();
 org.weChatStart = (function(org){
     var lib = {
+        $captcha_img : $('#captcha'),
+        $captcha_key : $('input[name=captcha_0]'),
         init:function(){
             lib._fetchPack()
+            lib._captcha_refresh()
         },
         _fetchPack: function(){
             var
                 $submit  = $('.webpack-btn-red'),
                 phoneVal = $('input[name=phone]'),
+                code = $('input[name=code]'),
                 postDo = false;
 
             $submit.on('click', function(){
@@ -101,9 +105,21 @@ org.weChatStart = (function(org){
                     activity : $(this).attr('data-activity'),
                     orderid : $(this).attr('data-orderid'),
                     openid : $(this).attr('data-openid'),
+                    code : code.val()
                 }
 
                 if(!lib._checkPhone(ops.phone)) return ;
+                //var ele = $('.code');
+                //var curHeight = ele.height();
+                //var autoHeight = ele.css('height', 'auto').height();
+                //ele.height(curHeight).animate({height: autoHeight},500);
+
+                if(ops.code =='') {
+                    $('.code-sign').show();
+                    return;
+                }else{
+                    $('.code-sign').hide();
+                }
                 org.ajax({
                     url: '/api/weixin/share/has_gift/',
                     type: 'POST',
@@ -111,7 +127,8 @@ org.weChatStart = (function(org){
                     data: {
                         'openid': ops.openid,
                         'phone_num': ops.phone,
-                        'order_id': ops.orderid
+                        'order_id': ops.orderid,
+                        'code': ops.code
                     },
                     dataType : 'json',
                     success: function(data){
@@ -128,7 +145,7 @@ org.weChatStart = (function(org){
                     },
                     complete: function(){
                         postDo = false;
-                        $submit.html('立即开奖');
+                        $submit.html('立即领取');
                     }
                 })
 
@@ -141,6 +158,13 @@ org.weChatStart = (function(org){
                 re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
             re.test($.trim(val)) ? ($sign.hide(), isRight = true) : ($sign.show(),isRight = false);
             return isRight;
+        },
+        _captcha_refresh :function(){
+            var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
+            $.get(captcha_refresh_url, function(res) {
+                lib.$captcha_img.attr('src', res['image_url']);
+                lib.$captcha_key.val(res['key']);
+            });
         }
     }
     return {
