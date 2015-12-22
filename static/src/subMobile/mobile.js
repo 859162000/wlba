@@ -149,7 +149,7 @@ var org = (function(){
         _onMenuShareQQ:function(){
             wx.onMenuShareQQ(lib._setShareData(ops,suFn,canFn));
         }
-    }
+    };
     return {
         scriptName             : lib.scriptName,
         ajax                   : lib._ajax,
@@ -206,7 +206,7 @@ org.ui = (function(){
 
                 $('.confirm-cancel').on('click', function(e){
                     $('.confirm-warp').hide();
-                })
+                });
                 $('.confirm-certain').on('click', function(e){
                     $('.confirm-warp').hide();
 
@@ -264,15 +264,15 @@ org.ui = (function(){
                             { target: $self.attr('data-target2'), addName : ($self.attr('data-icon')+"-active"), reMove : $self.attr('data-icon')}
                         ],$self);
                     }
-                    canSubmit() ? $submit.css('background','rgba(219,73,63,1)').removeAttr('disabled') : $submit.css('background','rgba(219,73,63,.5)').attr('disabled')
+                    canSubmit() ? $submit.css('background','rgba(219,73,63,1)').removeAttr('disabled') : $submit.css('background','rgba(219,73,63,.5)').attr('disabled');
                     //canSubmit() ? $submit.css('background','#50b143').removeAttr('disabled') : $submit.css('background','rgba(219,73,63,.5)').attr('disabled');
                 })
-            })
+            });
 
             //用户名一键清空
             $('.identifier-edit').on('click', function(e){
                 $(this).siblings().val('').trigger('input');
-            })
+            });
             //密码隐藏显示
             $('.password-handle').on('click',function(){
                 if($(this).hasClass('hide-password')){
@@ -282,7 +282,7 @@ org.ui = (function(){
                     $(this).addClass('hide-password').removeClass('show-password');
                     $(this).siblings().attr('type','password');
                 }
-            })
+            });
 
             var inputForClass = function(ops,t){
                 if(!typeof(ops) === 'object') return ;
@@ -295,7 +295,7 @@ org.ui = (function(){
                     }
                     targetDom.addClass(ops[i].addName).removeClass(ops[i].reMove);
                 })
-            }
+            };
             var returnCheckArr = function(){
                 var returnArr = [];
                 for(var i = 0; i < arguments.length; i++){
@@ -305,7 +305,7 @@ org.ui = (function(){
                     }
                 }
                 return returnArr
-            }
+            };
             var canSubmit = function(){
                 var isPost = true, newArr = [];
 
@@ -322,7 +322,7 @@ org.ui = (function(){
                 return isPost
             }
         },
-    }
+    };
     return {
         focusInput: lib._inputStyle,
         showSign : lib._showSign,
@@ -428,7 +428,7 @@ org.detail = (function(org){
             }
           })
         }
-    }
+    };
     return {
         init : lib.init,
         share: lib._share
@@ -510,7 +510,7 @@ org.login = (function(org){
                 return false;
             });
         }
-    }
+    };
     return {
         init : lib.init
     }
@@ -605,7 +605,7 @@ org.regist = (function(org){
                     count = 60,  //60秒倒计时
                     intervalId ; //定时器
 
-                if(!check['identifier'](phoneNumber, 'phone')) return  //号码不符合退出
+                if(!check['identifier'](phoneNumber, 'phone')) return;  //号码不符合退出
                 $that.attr('disabled', 'disabled').addClass('regist-alreay-request');
                 org.ajax({
                     url : '/api/phone_validation_code/register/' + phoneNumber + '/',
@@ -646,7 +646,7 @@ org.regist = (function(org){
                 },
                 password:function(val){
                    if(6 > $.trim(val).length || $.trim(val).length > 20 ){
-                       org.ui.showSign('密码为6-20位数字/字母/符号/区分大小写')
+                       org.ui.showSign('密码为6-20位数字/字母/符号/区分大小写');
                        return false
                    }
                    return true
@@ -670,31 +670,31 @@ org.regist = (function(org){
                 var tid = org.getQueryStringByName('tid');
                 var token = $invitation.val() === '' ?  $('input[name=token]').val() : $invitation.val();
                 org.ajax({
-                    url: '/weixin/api/fwh_register/',
+                    url: '/api/register/',
                     type: 'POST',
                     data: {
-                            'identifier':       $identifier.val(),
-                            'password':         $password.val(),
-                            'captcha_0':        $captcha_0.val(),
-                            'captcha_1':        $captcha_1.val(),
-                            'validate_code':    $validation.val(),
-                            'invite_code':      token,
-                            'tid' : tid,
-                            'invite_phone' : invite_phone
+                        'identifier':       $identifier.val(),
+                        'password':         $password.val(),
+                        'captcha_0':        $captcha_0.val(),
+                        'captcha_1':        $captcha_1.val(),
+                        'validate_code':    $validation.val(),
+                        'invite_code':      token,
+                        'tid' : tid,
+                        'invite_phone' : invite_phone
                     },
                     beforeSend: function() {
                         $submit.text('注册中,请稍等...');
                     },
                     success:function(data){
                         if(data.ret_code === 0){
-                            closePage();
-                            //var next = org.getQueryStringByName('next') == '' ? '/weixin/sub_regist_first/?phone='+$identifier.val() : org.getQueryStringByName('next');
-                            //next = org.getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ org.getQueryStringByName('mobile');
-                            //next = org.getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ org.getQueryStringByName('serverId');
-                            ////var next = '/weixin/sub_code/?phone='+$identifier.val();
+                            var next = org.getQueryStringByName('next') == '' ? '/weixin/sub_regist_first/?phone='+$identifier.val() : org.getQueryStringByName('next');
+                            next = org.getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ org.getQueryStringByName('mobile');
+                            next = org.getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ org.getQueryStringByName('serverId');
+                            //var next = '/weixin/sub_code/?phone='+$identifier.val();
                             //console.log(next);
-                            //window.location.href = next;
+                            window.location.href = next;
                         }else if(data.ret_code > 0){
+                            org.ui.alert(data.ret_code);
                             org.ui.showSign(data.message);
                             $submit.text('立即注册 ｜ 领取奖励');
                         }
@@ -713,7 +713,7 @@ org.regist = (function(org){
                 });
             })
         }
-    }
+    };
     return {
         init : lib.init
     }
@@ -740,7 +740,7 @@ org.list = (function(org){
                 url: '/api/p2ps/wx/',
                 data: {page: lib.page, 'pagesize': lib.pageSize},
                 beforeSend:function(){
-                    lib.canGetPage =false
+                    lib.canGetPage =false;
                     $('.load-text').html('加载中...');
                 },
                 success: function(data){
@@ -947,7 +947,7 @@ org.buy=(function(org){
                                         return org.ui.alert('必须实名认证！');
                                     } else if (result.error_number === 4 && result.message === "余额不足") {
                                         $(".buy-sufficient").show();
-                                        return;
+
                                     }else{
                                         return org.ui.alert(result.message);
                                     }
@@ -970,7 +970,7 @@ org.buy=(function(org){
                 }
             })
         }
-    }
+    };
     return {
         init : lib.init
     }
@@ -1108,6 +1108,12 @@ org.setInputPwd = (function(org){//交易密码
 org.recharge=(function(org){
     var lib = {
         canRecharge: true,
+        cardInput: $("#card-val"),
+        bankName: $(".bank-txt-name"),
+        amountInput: $("input.count-input"),
+        maxamount: $("input[name=maxamount]"),
+        firstBtn: $('#firstBtn'),
+        secondBtn: $('#secondBtn'),
         init :function(){
             lib._getBankCardList();
             lib._rechargeStepFirst();
@@ -1129,7 +1135,7 @@ org.recharge=(function(org){
                         closeNav(function(){
                             $cardHave.hide();
                             setTimeout(function(){
-                                $cardHave.css("opacity",0)
+                                $cardHave.css("opacity",0);
                                 $cardNone.show();
                                 setTimeout(function(){
                                     $cardNone.css("opacity",1)
@@ -1162,7 +1168,7 @@ org.recharge=(function(org){
                 type: 'POST',
                 url: '/api/pay/cnp/list/',
                 success: function(data) {
-                      //如果支付接口有返回已绑定的银行列表，将银行列表写入网页，银行卡：data.cards
+                    //如果支付接口有返回已绑定的银行列表，将银行列表写入网页，银行卡：data.cards
                     if(data.ret_code == 0){
                         $(".recharge-loding").hide();
                         if(data.cards.length === 0){
@@ -1175,7 +1181,7 @@ org.recharge=(function(org){
                             $cardHave.show();
                             setTimeout(function(){
                                 $cardHave.css("opacity",1)
-                            },50)
+                            },50);
                         }
                     }
                 }
@@ -1189,8 +1195,16 @@ org.recharge=(function(org){
         *  初始化默认银行卡，没有默认银行卡，现在为第一个，回调函数为银行卡列表
          */
         _initCard:function(data, callback){
-            $("#card-val").val(data[0]['storable_no'].slice(0,6) + '********'+ data[0]['storable_no'].slice(-4)).attr('data-storable', data[0]['storable_no']);
-            $(".bank-txt-name").text(data[0]['bank_name']);
+            var oneMax = 50000;
+            lib.cardInput.val(data[0]['storable_no'].slice(0,6) + '********'+ data[0]['storable_no'].slice(-4)).attr('data-storable', data[0]['storable_no']);
+            lib.bankName.text(data[0]['bank_name']);
+            if(lib.firstBtn.css("display") != "none"){
+                oneMax = data[0].first_one;
+            }else{
+                oneMax = data[0].second_one;
+            }
+            lib.amountInput.attr({"placeholder":"该银行单笔限额"+ oneMax/10000 +"万元"});
+            lib.maxamount.val(oneMax);
             callback && callback();
         },
         /*
@@ -1198,17 +1212,22 @@ org.recharge=(function(org){
          */
         _cradStyle:function(cardList){
             var str = '';
+            if(cardList.length === 1){
+                $(".js-bank-img").hide();
+            }
             for(var card in cardList){
-                str += "<div class= 'select-bank-list' data-storable="+cardList[card].storable_no+" data-bankName="+ cardList[card].bank_name +">";
+                str += "<div class= 'select-bank-list' data-storable="+cardList[card].storable_no+" data-bankName="+ cardList[card].bank_name +" data-maxNum="+ cardList[card].second_one +">";
                 str += cardList[card].bank_name + "(" + cardList[card].storable_no.slice(-4) + ")";
                 str += "</div>";
             }
             $(".select-bank-cont").append(str);
-
             $('.select-bank-list').on('click',function(event){
                 var that = this;
-                $("#card-val").val($(that).attr("data-storable").slice(0,6) + '********'+ $(that).attr("data-storable").slice(-4)).attr('data-storable', $(that).attr("data-storable"));
-                $(".bank-txt-name").text($(that).attr("data-bankName"));
+                var oneMax = $(that).attr("data-maxNum");
+                lib.cardInput.val($(that).attr("data-storable").slice(0,6) + '********'+ $(that).attr("data-storable").slice(-4)).attr('data-storable', $(that).attr("data-storable"));
+                lib.bankName.text($(that).attr("data-bankName"));
+                lib.amountInput.attr({"placeholder":"该银行单笔限额"+ oneMax/10000 +"万元"});
+                lib.maxamount.val(oneMax);
             });
             $(".recharge-select-bank").on('click',function(){
                  return $(this).hide();
@@ -1220,8 +1239,8 @@ org.recharge=(function(org){
          */
         _rechargeStepFirst:function(){
             var card_no, gate_id, amount, maxamount,
-                $firstBtn = $('#firstBtn'),
-                $secondBtn = $('#secondBtn');
+                $firstBtn = lib.firstBtn,
+                $secondBtn = lib.secondBtn;
 
             $firstBtn.on('click', function(){
                 card_no = $("input[name='card_none_card']").val(),
@@ -1244,20 +1263,32 @@ org.recharge=(function(org){
                 if(!card_no || amount <= 0 || !amount) {
                     return org.ui.alert('信息输入不完整');
                 }
-                if(amount < 10){
-                    return org.ui.alert('充值金额不得少于10元');
-                }
+                //if(amount < 10){
+                //    return org.ui.alert('充值金额不得少于10元');
+                //}
                 if(amount > maxamount){
                      return org.ui.alert('最高充值'+ maxamount +'元！');
                 }
                 if(lib.canRecharge){
-                    if(self.data("first")){
-                        //lib._pageSet($("#page-pwd"),"设置交易密码","为了您账户资金安全，请设置交易密码");
-                        org.setInputPwd.pageSet($("#page-pwd"),"设置交易密码","为了您账户资金安全，请设置交易密码","充值",true, amount);
-                    }else{
-                        //lib._inpPwdShow(amount);
-                        org.setInputPwd.inputPwd("充值",amount);
-                    }
+                    org.ajax({
+                        url: '/api/profile/',
+                        type: 'POST',
+                        //data: options.data,
+                        //dataType : 'json',
+                        success:function(data){
+                            console.log(data);
+                        },
+                        error: function (xhr) {
+                            console.log("充值失败",xhr);
+                        }
+                    });
+                    //if(self.data("first")){
+                    //    //lib._pageSet($("#page-pwd"),"设置交易密码","为了您账户资金安全，请设置交易密码");
+                    //    org.setInputPwd.pageSet($("#page-pwd"),"设置交易密码","为了您账户资金安全，请设置交易密码","充值",true, amount);
+                    //}else{
+                    //    //lib._inpPwdShow(amount);
+                    //    org.setInputPwd.inputPwd("充值",amount);
+                    //}
 
                     //var postdata = {
                     //    card_no: card_no,
@@ -1300,7 +1331,7 @@ org.recharge=(function(org){
                 }
             })
         }
-    }
+    };
     return {
         init : lib.init
     }
@@ -1343,7 +1374,7 @@ org.recharge_second=(function(org){
                     } else {
                         clearInterval(intervalId);
                         getValidateBtn.text('重新获取').removeAttr('disabled').removeClass('alreay-request');
-                        return;
+
                     }
                 };
 
@@ -1421,7 +1452,7 @@ org.recharge_second=(function(org){
                 }
             })
         }
-    }
+    };
     return {
         init : lib.init
     }
@@ -1513,7 +1544,7 @@ org.bankcardAdd = (function(org){
                   card_number: card_number,
                   gate_id : gate_id,
                   is_default : is_default
-                }
+                };
 
                 lib._forAddbank(data);
             });
@@ -1548,7 +1579,7 @@ org.bankcardAdd = (function(org){
 
             })
         }
-    }
+    };
     return {
         init : lib.init
     }
@@ -1602,7 +1633,7 @@ org.processFirst = (function(org){
                         return check =false;
                     }
                 }
-            })
+            });
 
             return check
         },
@@ -1638,7 +1669,7 @@ org.processFirst = (function(org){
                 }
             })
         }
-    }
+    };
     return {
         init : lib.init
     }
@@ -1689,7 +1720,7 @@ org.processSecond = (function(org){
             });
 
             function appendBanks(banks){
-                var str = ''
+                var str = '';
                 for(var bank in banks){
                     str += "<option value ="+banks[bank].gate_id+" > " + banks[bank].name + "</option>"
                 }
@@ -1763,7 +1794,7 @@ org.processSecond = (function(org){
                     } else {
                         clearInterval(intervalId);
                         $validationBtn.text('重新获取').removeAttr('disabled').css('background','#50b143');
-                        return;
+
                     }
                 };
                 org.ajax({
@@ -1830,7 +1861,7 @@ org.processSecond = (function(org){
             }
 
         }
-    }
+    };
     return {
         init : lib.init
     }
@@ -1845,7 +1876,7 @@ function closePage(){
     }
 }
 
-;(function(org){
+(function (org) {
     $.each($('script'), function(){//登录、注册
         var src = $(this).attr('src');
         if(src && src.indexOf(org.scriptName) > 0){
@@ -1876,7 +1907,7 @@ function closePage(){
     window.onload = function(){
         timeFun();
         $("#unbind").addClass("clickOk");
-    }
+    };
 
     var unbindf = false;
     function unbingFun(){
