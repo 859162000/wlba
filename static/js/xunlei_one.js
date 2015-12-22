@@ -136,15 +136,14 @@
             $('.game-btn').removeClass('game-btn-down');
         })
 
-        //领取会员提示
-
         //回到banner注册
-        $('.setplogin').on('click', function () {
-            $('#small-zc').hide();
-            $('#xl-aug-login').hide();
+        $('.receive1').click(function () {
+
             $('body,html').animate({scrollTop: 0}, 600);
             return false
+
         })
+
         //抽奖名单
         var str = '';
         $.ajax({
@@ -202,7 +201,7 @@
                 async: false
             }).done(function (data) {
                 console.log(data);
-                $('#chance').text(' ' + data['lefts'] + ' ');
+                $('.chance').text(' ' + data['lefts'] + ' ');
 
             });
 
@@ -238,11 +237,14 @@
                     $('#small-zc').show();
                     $('#xl-aug-fail p').text('Sorry~您的抽奖次数已用完');
                     $('#xl-aug-fail').show();
-                     onclick = false;
+                    onclick = false;
+                } else if (data['code'] == 1000) {
+                    $('body,html').animate({scrollTop: 0}, 600);
+                    onclick = false;
+
                 } else if (data['code'] == 0 || data['code'] == 1) {
                     game(data);
                 }
-
 
 
             });
@@ -317,22 +319,6 @@
         }
 
         chances();
-        //抽奖请求
-        //function redpack(sum, callback) {
-        //    $.ajax({
-        //        url: "/api/xunlei/2016/1/",
-        //        type: "POST",
-        //        //data: {action: sum},
-        //        async: false
-        //    }).done(function (data) {
-        //        change = data;
-        //        //$('#chance').text(change['left']);
-        //
-        //        callback && callback(data);
-        //        console.log(change)
-        //
-        //    });
-        //}
         //登入框穿参数
         function getQueryString(name) {
             var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
