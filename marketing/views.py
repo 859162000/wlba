@@ -77,6 +77,7 @@ from misc.views import MiscRecommendProduction
 from marketing.utils import pc_data_generator
 from wanglibao_account.cooperation import CoopRegister
 from wanglibao_account.utils import xunleivip_generate_sign
+from weixin.base import ChannelBaseTemplate
 reload(sys)
 
 class YaoView(TemplateView):
@@ -1990,7 +1991,7 @@ class CommonAward(object):
         return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
 
-class ThunderTenAcvitityTemplate(TemplateView):
+class ThunderTenAcvitityTemplate(ChannelBaseTemplate):
     template_name = 'xunlei_one.jade'
 
     def check_params(self, channel_code, sign, _time, nickname, user_id):
@@ -2024,6 +2025,8 @@ class ThunderTenAcvitityTemplate(TemplateView):
         return response_data
 
     def get_context_data(self, **kwargs):
+        context = super(ThunderTenAcvitityTemplate, self).get_context_data(**kwargs)
+
         params = self.request.GET
         channel_code = params.get('promo_token', '').strip()
         sign = params.get('sign', '').strip()
@@ -2053,7 +2056,8 @@ class ThunderTenAcvitityTemplate(TemplateView):
                     'message': u'签名错误',
                 }
 
-        return response_data
+        context.update(response_data)
+        return context
 
 class QuickApplyerAPIView(APIView):
     permission_classes = ()
