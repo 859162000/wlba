@@ -78,7 +78,7 @@ org.ui = (function(){
     }
 
     return {
-        alert : lib._alert,
+        alert : lib._alert
     }
 })();
 org.weChatStart = (function(org){
@@ -88,6 +88,10 @@ org.weChatStart = (function(org){
         init:function(){
             lib._fetchPack()
             lib._captcha_refresh()
+            //刷新验证码
+            lib.$captcha_img.on('click', function() {
+                lib._captcha_refresh();
+            });
         },
         _fetchPack: function(){
             var
@@ -180,7 +184,7 @@ org.weChatDetail = (function(org){
                  org.ui.alert('您已经领取过礼物了！');
               }
             }*/
-        },
+        }
     }
     return {
         init : lib.init
@@ -191,7 +195,7 @@ org.weChatEnd = (function(org){
     var lib = {
         init:function(){
 
-        },
+        }
     }
     return {
         init : lib.init
