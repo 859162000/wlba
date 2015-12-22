@@ -133,28 +133,10 @@
             $('#xl-aug-success').hide();
             $('#xl-aug-prize').hide();
             $('#xl-aug-fail').hide();
+            $('.game-btn').removeClass('game-btn-down');
         })
 
-
-        var change = [];
-        //redpack();
         //领取会员提示
-        $('.setp-btn').on('click', function () {
-
-            if (change['ret_code'] == 4000) {
-                $('#small-zc').show();
-                $('#xl-aug-fail p').text('Sorry~您不符合领奖条件');
-                $('#xl-aug-fail').show();
-            } else if ($(this).hasClass('receive')) {
-                //window.location.href = "/"
-                $('body,html').animate({scrollTop: 0}, 600);
-            } else {
-                $('body,html').animate({scrollTop: 0}, 600);
-                //$('#small-zc').show();
-                //$('#xl-aug-login').show();
-            }
-
-        })
 
         //回到banner注册
         $('.setplogin').on('click', function () {
@@ -171,12 +153,12 @@
             async: false
         }).done(function (result) {
             console.log(result);
-            //for (var k = 0, len2 = result['data'].length; k < len2; k++) {
-            //    var tel = result['data'][k]['phone'].substring(0, 3) + "******" + result['data'][k]['phone'].substring(9, 11);
-            //    str += '<p>恭喜' + tel + '获得<span>' + result['data'][k]['awards'] + '元</span>红包</p>'
-            //}
-            //$('.long-p').append(str);
-            //$('.long-p p:odd').addClass('hight');
+            for (var k = 0, len2 = result['data'].length; k < len2; k++) {
+                var tel = result['data'][k]['phone'].substring(0, 3) + "******" + result['data'][k]['phone'].substring(9, 11);
+                str += '<p>恭喜' + tel + '获得<span>' + result['data'][k]['awards'] + '元</span>红包</p>'
+            }
+            $('.long-p').append(str);
+            $('.long-p p:odd').addClass('hight');
         });
 
         //无线滚动
@@ -212,7 +194,7 @@
 
 
         //抽奖次数
-        chances();
+
         function chances() {
             $.ajax({
                 url: "/api/xunlei/2016/1/?type=chances",
@@ -220,13 +202,8 @@
                 async: false
             }).done(function (data) {
                 console.log(data);
-                //if (data['lefts']) {
                 $('#chance').text(' ' + data['lefts'] + ' ');
-                //} else if (data['left'] == 0) {
-                    //$('#chance').text(' ' + data['lefts'] + ' ');
-                //} else {
-                    //$('#chance').text(' ' + 3 + ' ');
-                //}
+
             });
 
         }
@@ -236,40 +213,41 @@
         $('.game-btn').on('mousedown', function () {
             $('.game-btn').addClass('game-btn-down')
         });
+        var onclick = false;
         $('.game-btn').on('mouseup', function () {
-            //redpack( function (data) {
-
+            //alert(onclick);
+            if (onclick) {
+                return false;
+            } else {
+                onclick = true;
+            }
             $.ajax({
                 url: "/api/xunlei/2016/1/",
                 type: "POST",
-                data: {},
-                async: false
+                data: {}
             }).done(function (data) {
                 console.log(data);
 
-                if (!$('.go-game').hasClass('noClick')) {
-                    $('.game-btn').removeClass('game-btn-down');
-                    if (data['code'] == 1001) {
-                        $('#small-zc').show();
-                        $('#xl-aug-fail p').text('Sorry~您不符合抽奖条件');
-                        $('#xl-aug-fail').show();
-                    } else if (data['code'] == 1002) {
-                        $('#small-zc').show();
-                        $('#xl-aug-fail p').text('Sorry~您的抽奖次数已用完')
-                        $('#xl-aug-fail').show();
-                    } else if (data['code'] == 0 || data['code'] == 1) {
-                        game(data);
-                        //$('body,html').animate({scrollTop: 0}, 600);
-                        //$('#small-zc').show();
-                        //$('#xl-aug-login').show();
-                    }
+                $('.game-btn').removeClass('game-btn-down');
+                if (data['code'] == 1001) {
+                    $('#small-zc').show();
+                    $('#xl-aug-fail p').text('Sorry~您不符合抽奖条件');
+                    $('#xl-aug-fail').show();
+                    onclick = false;
+                } else if (data['code'] == 1002) {
+                    $('#small-zc').show();
+                    $('#xl-aug-fail p').text('Sorry~您的抽奖次数已用完');
+                    $('#xl-aug-fail').show();
+                     onclick = false;
+                } else if (data['code'] == 0 || data['code'] == 1) {
+                    game(data);
                 }
 
-            })
-            chances();
 
-            //})
-        })
+
+            });
+
+        });
         function game(isGet) {
             console.log(isGet);
             $('.go-game').addClass('noClick');
@@ -282,17 +260,24 @@
                 }, 50)
                 if (isGet) {
                     //成功调用
-                    star('0' + isGet['amount']);
+                    if (isGet['amount']) {
+                        star(isGet['amount']);
+                    } else {
+                        star('0000');
+                    }
+
                 } else {
                     //失败调用
                     star('0000');
                 }
+                chances();
             }, 10)
         }
 
 
         //开始转动
         function star(a) {
+            console.log('>>' + a);
             var time;
             time = setInterval(function () {
                 $('.long-sum').animate({'bottom': '-1062px'}, 100, function () {
@@ -306,7 +291,14 @@
                 }
                 clearInterval(time);
                 $('.go-game').removeClass('noClick');
-                $('#rmb').text(parseInt(change['amount']));
+                if (a == '0088') {
+                    $('#rmb').text('88');
+                } else if (a == '0888') {
+                    $('#rmb').text('888');
+                } else if (a == '0188') {
+                    $('#rmb').text('188');
+                }
+
                 $('#small-zc').show();
                 if (a == '0000') {
                     var txt = ['你和大奖只是一根头发的距离', '天苍苍，野茫茫，中奖的希望太渺茫', '太可惜了，你竟然与红包擦肩而过'];
@@ -317,13 +309,14 @@
                 } else {
                     $('#xl-aug-prize').hide();
                     $('#xl-aug-success').show();
+
                 }
-            }, 3000)
+                onclick = false;
+            }, 3000);
             $('.long-sum').css({'top': ''});
-            $('#chance').text(' ' + change['left'] + ' ')
         }
 
-
+        chances();
         //抽奖请求
         //function redpack(sum, callback) {
         //    $.ajax({
@@ -350,7 +343,6 @@
             return null;
         }
 
-        getQueryString('promo_token')
         var token = getQueryString('promo_token'),
             xid = getQueryString('xluserid'),
             timer = getQueryString('time'),
