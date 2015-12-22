@@ -11,17 +11,18 @@ block content
         input(type='tel', name='phone' ,placeholder='请输入手机号', value="{{phone}}").webchat-input
         .phone-sign-warp
             p.phone-sign 请输入正确的手机号
-        .code.clearfix
-            input(type="tel", name="captcha_1", placeholder="请输入计算结果", data-target2='captcha_1-icon', data-icon='user-validation', data-target="regist-validation", data-empty='regist-validation-disable', data-val='').webchat-input-code
-            input(name="captcha_0", type="hidden", value="")
-            img(src="", alt="", width="100%", height="100%")#captcha.captcha
-        .phone-sign-warp.code-status
-            p.code-sign 请输入正确的验证码
-        .code.clearfix
-            input(type='text', name='code' ,placeholder='请输入短信验证码', value="{{code}}").webchat-input-code
-            button(type="button").webchat-button.webchat-button-disable.webchat-button-right 获取
-        .phone-sign-warp.code-status
-            p.code-sign 请输入正确的验证码
+        .code-content.clearfix
+            .code.clearfix
+                input(type="tel", name="captcha_1", placeholder="请输入计算结果", data-target2='captcha_1-icon', data-icon='user-validation', data-target="regist-validation", data-empty='regist-validation-disable', data-val='').webchat-input-code
+                input(name="captcha_0", type="hidden", value="")
+                img(src="", alt="", width="100%", height="100%")#captcha.captcha
+            .phone-sign-warp.code-status
+                p.code-sign 请输入正确的验证码
+            .code.clearfix
+                input(type='text', name='code' ,placeholder='请输入短信验证码', value="{{code}}").webchat-input-code
+                button(type="button").webchat-button.webchat-button-disable 获取
+            .phone-sign-warp.code-status
+                p.code-sign 请输入正确的验证码
         a(href="javascript:void(0)",data-openid="{{openid}}",data-activity="share", data-orderid="{{order_id}}").webpack-btn-red 立即领取
 
 

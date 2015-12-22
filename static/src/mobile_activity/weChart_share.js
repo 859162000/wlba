@@ -86,11 +86,62 @@ org.weChatStart = (function(org){
         $captcha_img : $('#captcha'),
         $captcha_key : $('input[name=captcha_0]'),
         init:function(){
-            lib._fetchPack()
-            lib._captcha_refresh()
+            lib._fetchPack();
+            lib._captcha_refresh();
             //刷新验证码
             lib.$captcha_img.on('click', function() {
                 lib._captcha_refresh();
+            });
+            lib._iphoneInputKeyUp();
+        },
+        _iphoneInputKeyUp: function(){
+            var $phone = $('input[name=phone]')
+            $phone.on('keyup',function(){
+                if(!lib._checkPhone($phone.val())) return ;
+                var ele = $('.code-content');
+                var curHeight = ele.height();
+                var autoHeight = ele.css('height', 'auto').height();
+                ele.height(curHeight).animate({height: autoHeight},500);
+                lib._getCodeFun();
+            })
+        },
+        _getCodeFun: function(){
+            $('.request-check').on('click',function(){
+                var phoneNumber = $identifier.val(),
+                    $that = $(this), //保存指针
+                    count = 60,  //60秒倒计时
+                    intervalId ; //定时器
+
+                if(!check['identifier'](phoneNumber, 'phone')) return  //号码不符合退出
+                $that.attr('disabled', 'disabled').addClass('regist-alreay-request');
+                org.ajax({
+                    url : '/api/phone_validation_code/register/' + phoneNumber + '/',
+                    data: {
+                        captcha_0 : $captcha_0.val(),
+                        captcha_1 : $captcha_1.val(),
+                    },
+                    type : 'POST',
+                    error :function(xhr){
+                        clearInterval(intervalId);
+                        var result = JSON.parse(xhr.responseText);
+                        org.ui.showSign(result.message);
+                        $that.text('获取验证码').removeAttr('disabled').removeClass('regist-alreay-request');
+                        lib._captcha_refresh();
+                    }
+                });
+                //倒计时
+                var timerFunction = function() {
+                    if (count >= 1) {
+                        count--;
+                        return $that.text( count + '秒后可重发');
+                    } else {
+                        clearInterval(intervalId);
+                        $that.text('重新获取').removeAttr('disabled').removeClass('regist-alreay-request');
+                        return lib._captcha_refresh();
+                    }
+                };
+                timerFunction();
+                return intervalId = setInterval(timerFunction, 1000);
             });
         },
         _fetchPack: function(){
@@ -111,12 +162,6 @@ org.weChatStart = (function(org){
                     openid : $(this).attr('data-openid'),
                     code : code.val()
                 }
-
-                if(!lib._checkPhone(ops.phone)) return ;
-                //var ele = $('.code');
-                //var curHeight = ele.height();
-                //var autoHeight = ele.css('height', 'auto').height();
-                //ele.height(curHeight).animate({height: autoHeight},500);
 
                 if(ops.code =='') {
                     $('.code-sign').show();
@@ -160,7 +205,11 @@ org.weChatStart = (function(org){
             var isRight = false,
                 $sign = $('.phone-sign'),
                 re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
-            re.test($.trim(val)) ? ($sign.hide(), isRight = true) : ($sign.show(),isRight = false);
+            if(re.test($.trim(val))) {
+                $sign.hide(); $('.webchat-button').addClass('webchat-button-right'); isRight = true;
+            }else{
+                $sign.show(); $('.webchat-button').removeClass('webchat-button-right'); isRight = false;
+            }
             return isRight;
         },
         _captcha_refresh :function(){
