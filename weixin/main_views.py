@@ -136,6 +136,14 @@ class AccountTemplate(TemplateView):
             'margin': account_info['p2p_margin'],
         }
 
+class RechargeTemplate(TemplateView):
+    def get_context_data(self, **kwargs):
+        return {
+            'margin': self.request.user.margin.margin
+        }
+
+
+
 
 
 

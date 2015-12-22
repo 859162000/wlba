@@ -73,7 +73,7 @@ urlpatterns = patterns(
     url(r'^sub_regist_three/$', TemplateView.as_view(template_name="service_registProcess_three.jade")),
     url(r'^sub_account/$', login_required(main_views.AccountTemplate.as_view(template_name="service_account.jade"), login_url="/weixin/sub_login_redirect/"), name='sub_account'),
 
-    url(r'^sub_recharge/$', TemplateView.as_view(template_name="service_recharge.jade")),
+    url(r'^sub_recharge/$', login_required(main_views.RechargeTemplate.as_view(template_name="service_recharge.jade"), login_url="/weixin/sub_login_redirect/"), name="sub_recharge"),
     url(r'^sub_list/$', TemplateView.as_view(template_name="service_list.jade")),
     url(r'^sub_detail/$', TemplateView.as_view(template_name="service_detail.jade")),
 
