@@ -230,8 +230,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     var login = false;
     wlb.ready({
         app: function(mixins) {
+			//mixins.shareData({title: '双旦来了，翻倍狂欢', content: '红包、加息券、体验金全部翻倍送、实物大奖同台登场，年底倾囊N重回馈。'});
+			
             mixins.sendUserInfo(function(data) {
-
 				$('.link_licai').click(function(){
 					mixins.jumpToManageMoney();
 				});
@@ -250,7 +251,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                         mixins.jumpToManageMoney();
                     })
                 }
-
+				$('#tiyanjin').click(function(){
+					window.location.href = '/activity/experience/redirect/'
+				});
             });
 			$('.code_wrap').hide();
         },
@@ -269,6 +272,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			});
 			$('.link_licai').click(function(){
 				window.location.href = '/weixin/list/'
+			});
+			$('#tiyanjin').click(function(){
+				window.location.href = '/activity/experience/mobile/';
 			});
 			$('.code_wrap').show();
             //console.log('其他场景的业务逻辑');
@@ -304,11 +310,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	});
 	wx.ready(function(){
 		var host = 'https://www.wanglibao.com/',
-			shareName = '网利宝用户专享福利',
+			shareName = '双旦来了，翻倍狂欢',
 			shareImg = host + '/static/imgs/mobile_activity/app_double_dan/300x300.jpg',
-			shareLink = host + '/activity/app_recharge_8000/',
-			shareMainTit = '网利宝用户专享福利',
-			shareBody = '网利宝双旦来了，翻倍狂欢。跨年最强福利场！';
+			shareLink = host + '/activity/app_double_dan/',
+			shareMainTit = '双旦来了，翻倍狂欢',
+			shareBody = '红包、加息券、体验金全部翻倍送、实物大奖同台登场，年底倾囊N重回馈。';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -318,7 +324,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '网利宝用户专享福利',
+			title: '双旦来了，翻倍狂欢',
 			link : shareLink,
 			imgUrl: shareImg
 		})
@@ -331,3 +337,5 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		})
 	})
 })(org);
+
+

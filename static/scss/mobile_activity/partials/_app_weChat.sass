@@ -1,24 +1,9 @@
 
-
 .weChat-head
   position: relative
-  background: #4E92E4
-  padding-left: .25rem
   img
     display: block
-  .super
-    width: 9rem
-    @media screen and (max-device-width: 320px)
-      width: 8rem
-    padding-bottom: .5rem
-  .secure
-    position: absolute
-    right: .5rem
-    top: .5rem
-    width: 6.5rem
-    @media screen and (max-device-width: 320px)
-      top: .65rem
-      width: 5.5rem
+    width: 100%
 $submit-height: 2.25rem
 .public-style
   display: block
@@ -28,20 +13,29 @@ $submit-height: 2.25rem
   font-size: .75rem
   text-align: center
   border-radius: .2rem
-.webchat-input
+.webchat-input,.webchat-input-code
   @extend .public-style
   border: 1px solid #BF9551
   background: #fff
   -webkit-appearance: none
   padding: .3rem
   line-height: normal
+  text-align: left
   &::-webkit-input-placeholder
     color: #5C5C5C
+.code
+  padding-top: .5rem
+  .webchat-input-code
+    width: 63%
+    @media screen and (max-device-width: 320px)
+      width: 66%
+    float: left
 .webpack-btn-red
   @extend .public-style
   border: 1px solid #FF4A33
   background: #FF4A33
   color: #fff
+  margin: .5rem 0
   &:link, &:visited
     color: #fff
   &:active
@@ -54,12 +48,23 @@ $submit-height: 2.25rem
   margin-top: .875rem
   &:link, &:visited
     color: #5DB5F2
-
+.webchat-button
+  width: 5rem
+  height: 2.25rem
+  float: right
+  border: 0 none
+  font-size: .75rem
+  color: #ffffff
+  border-radius: .2rem
+.webchat-button-disable
+  background: #cccccc
+.webchat-button-right
+  background: #50B143
 //start page
 .default-user
   display: -webkit-box
   -webkit-box-align: center
-  padding: .45rem .8rem
+  padding: .65rem .8rem
 
   .default-img
     display: block
@@ -73,9 +78,9 @@ $submit-height: 2.25rem
 
     .message-icon
       position: absolute
-      bottom: .8rem
+      top: 1rem
       left: 0
-      width: 2.2rem
+      width: .275rem
       height: .75rem
       background: url("/static/imgs/mobile_activity/app_wechat/message_bg.png") no-repeat center
       background-size: 100%
@@ -87,7 +92,7 @@ $submit-height: 2.25rem
       font-size: .6rem
       color: #FF7500
       line-height: 1rem
-      margin-left: 1.4rem
+      margin-left: .275rem
       padding: .5rem  .6rem
       border-radius: .3rem
 
@@ -99,13 +104,18 @@ $submit-height: 2.25rem
     background-size: 100%
     margin: 0 auto
 .phone-sign-warp
-  height: .875rem
-.phone-sign
+  height: .5rem
+.phone-sign,.code-sign
   font-size: .6rem
   color: #ff7500
   display: none
 .webchat-submit
-  padding: .5rem 1.95rem 2rem 1.95rem
+  padding: 3rem 1.95rem 2rem 1.95rem
+  @media screen and (max-device-width: 320px)
+    padding: .5rem 1.95rem 2rem 1.95rem
+.code
+  height: 0
+  overflow: hidden
 
 
 //detail page
@@ -206,3 +216,15 @@ $submit-height: 2.25rem
     background: url("/static/imgs/mobile_activity/app_wechat/enddault.png") no-repeat
     background-size: 100%
     margin: 0px auto
+
+.weChat-footer
+  width: 100%
+  text-align: center
+  img
+    width: 3.3rem
+    height: 1rem
+    margin: 0 auto
+.captcha
+  width: 5rem
+  float: right
+  height: 2.2rem

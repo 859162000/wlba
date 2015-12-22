@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from wanglibao_activity.models import Activity
 from wanglibao_redpack.models import RedPackEvent
+from experience_gold.models import ExperienceEvent
 from marketing.models import Reward
 class WanglibaoActivityGiftGlobalCfg(models.Model):
     """
@@ -111,6 +112,7 @@ class WanglibaoActivityReward(models.Model):
     user = models.ForeignKey(User, related_name='reward_owner', default=None, blank=True, null=True, on_delete=models.SET_NULL)
     redpack_event = models.ForeignKey(RedPackEvent, default=None, blank=True, null=True, verbose_name=u'用户获得的红包')
     reward = models.ForeignKey(Reward, default=None, blank=True, null=True, verbose_name=u'用户获得的奖品')
+    experience = models.ForeignKey(ExperienceEvent, default=None, blank=True, null=True, verbose_name=u'用户获得的体验金')
     activity = models.CharField(default='', max_length=256, verbose_name=u'活动名称')
     qrcode = models.ImageField(upload_to='qrcode', null=True, blank=True, verbose_name=u'获奖请求二维码')
     when_dist = models.IntegerField(default=0, verbose_name=u'什么时候发奖')
@@ -123,7 +125,6 @@ class WanglibaoActivityReward(models.Model):
     update_at = models.DateTimeField(auto_now_add=True, verbose_name=u'更新时间')
 
     class Meta:
-        unique_together = (("user", "create_at"),)  # 联合唯一索引
         verbose_name = u'发奖记录表'
         verbose_name_plural = u'发奖记录表'
 
