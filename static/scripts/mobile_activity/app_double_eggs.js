@@ -231,13 +231,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     wlb.ready({
         app: function(mixins) {
 			//mixins.shareData({title: '双旦来了，翻倍狂欢', content: '红包、加息券、体验金全部翻倍送、实物大奖同台登场，年底倾囊N重回馈。'});
-			mixins.registerHandler('shareData', function(data, responseCallback) {
-				  $('#id_ceshi').text('123');
-                  var app_share_text = { title:'双旦来了，翻倍狂欢', content: '红包、加息券、体验金全部翻倍送、实物大奖同台登场，年底倾囊N重回馈。' };
-                  responseCallback(app_share_text);
-			      $('#id_ceshi').text('345');
-
-			});
+			
             mixins.sendUserInfo(function(data) {
 				$('.link_licai').click(function(){
 					mixins.jumpToManageMoney();
