@@ -31,7 +31,7 @@
 
 .form-icon
   width: .9rem
-  background-image: url('/static/imgs/mobile/login/login_icons.png')
+  background-image: url('/static/imgs/sub_weixin/login/login_icons.png')
   background-repeat: no-repeat
   background-size: 100%
 
@@ -159,7 +159,7 @@
 .bank-safe
   text-align: center
   span
-    background: url("/static/imgs/mobile/login/bank_safe.png") no-repeat left center
+    background: url("/static/imgs/sub_weixin/login/bank_safe.png") no-repeat left center
     font-size: $font-size12
     color: #50B143
     background-size: 1.1rem
@@ -178,6 +178,10 @@
 .regist-safe
   @extend .bank-safe
   margin: .5rem 0
+  &.grey-safe
+    span
+      background-image: url("/static/imgs/sub_weixin/login/bank_safe.png")
+      color: #ccc
 
 .regist-validation
   -webkit-appearance: none
@@ -199,7 +203,7 @@ $checkbox-width: .8rem
   font-size: $font-size14
   line-height: 1.1rem
   padding-left: .4rem
-  margin-top: 1rem
+  margin: 1rem 0
   .xieyi-btn
     padding-left: 1.2rem
   .checkbox
