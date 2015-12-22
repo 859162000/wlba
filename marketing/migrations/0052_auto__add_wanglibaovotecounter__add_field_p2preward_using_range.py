@@ -9,16 +9,16 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding model 'WanglibaoVoteCounter'
-        db.create_table(u'marketing_wanglibaovotecounter', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('catalog', self.gf('django.db.models.fields.CharField')(default='', max_length=256, null=True, blank=True)),
-            ('item', self.gf('django.db.models.fields.CharField')(default='', max_length=256, null=True, blank=True)),
-            ('activity', self.gf('django.db.models.fields.CharField')(default='', max_length=246, null=True, blank=True)),
-            ('count', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
-            ('create_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('update_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal(u'marketing', ['WanglibaoVoteCounter'])
+        # db.create_table(u'marketing_wanglibaovotecounter', (
+        #     (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+        #     ('catalog', self.gf('django.db.models.fields.CharField')(default='', max_length=256, null=True, blank=True)),
+        #     ('item', self.gf('django.db.models.fields.CharField')(default='', max_length=256, null=True, blank=True)),
+        #     ('activity', self.gf('django.db.models.fields.CharField')(default='', max_length=246, null=True, blank=True)),
+        #     ('count', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
+        #     ('create_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+        #     ('update_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+        # ))
+        # db.send_create_signal(u'marketing', ['WanglibaoVoteCounter'])
 
         # Adding field 'P2PReward.using_range'
         db.add_column(u'marketing_p2preward', 'using_range',
