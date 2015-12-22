@@ -7,6 +7,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 import logging
 from django.http import HttpResponseRedirect
+from django.core.paginator import Paginator
+from django.core.paginator import PageNotAnInteger
+from django.conf import settings
 
 from weixin.common.decorators import weixin_api_error
 from weixin.models import WeixinAccounts, WeixinUser
@@ -14,11 +17,9 @@ from weixin.util import redirectToJumpPage, bindUser, unbindUser
 from marketing.utils import get_channel_record
 from util import getAccountInfo, get_fwh_login_url
 from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
-from wanglibao import settings
-from wanglibao_account.views import ajax_register
-from misc.models import Misc
+from wanglibao.templatetags.formatters import safe_phone_str
 from .forms import OpenidAuthenticationForm
-from django.conf import settings
+from wanglibao_p2p.common import get_p2p_list
 
 
 logger = logging.getLogger("weixin")
@@ -144,6 +145,33 @@ class RechargeTemplate(TemplateView):
         }
 
 
+class FwhP2PlistTemplate(TemplateView):
+    def get_context_data(self, **kwargs):
+        p2p_products = []
+        p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list = get_p2p_list()
+        p2p_products.extend(p2p_done_list)
+        p2p_products.extend(p2p_full_list)
+        p2p_products.extend(p2p_repayment_list)
+        p2p_products.extend(p2p_finished_list)
+
+        limit = 10
+        paginator = Paginator(p2p_products, limit)
+        page = self.request.GET.get('page')
+
+        try:
+            p2p_products = paginator.page(page)
+        except PageNotAnInteger:
+            p2p_products = paginator.page(1)
+        except Exception:
+            p2p_products = paginator.page(paginator.num_pages)
+
+        phone = self.request.user.wanglibaouserprofile.phone
+        margin = self.request.user.margin.margin
+        return {
+            'results': p2p_products[:10],
+            'phone': safe_phone_str(phone),
+            'margin': margin
+        }
 
 
 

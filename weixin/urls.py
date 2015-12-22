@@ -7,7 +7,7 @@ import views, activity_views, manage_views, sub_views, base, main_views
 urlpatterns = patterns(
     '',
     url(r'^join/(?P<account_key>\w+)/$', views.WeixinJoinView.as_view(), name='weixin_join'),
-    url(r'^list/$', views.P2PListView.as_view(), name='weixin_p2p_list'),
+    url(r'^list/$', views.P2PListView.as_view(template_name='weixin_list.jade'), name='weixin_p2p_list'),
     url(r'^account/$', login_required(views.WeixinAccountHome.as_view(), login_url='/weixin/login/'), name='weixin_account'),
     url(r'^view/(?P<template>\w+)/(?P<id>\w+)/$', views.P2PDetailView.as_view(), name='weixin_p2p_detail'),
     url(r'^account/bankcard/$', login_required(views.WeixinAccountBankCard.as_view(), login_url='/weixin/login/'), name='weixin_bankcard'),
@@ -74,7 +74,7 @@ urlpatterns = patterns(
     url(r'^sub_account/$', login_required(main_views.AccountTemplate.as_view(template_name="service_account.jade"), login_url="/weixin/sub_login_redirect/"), name='sub_account'),
 
     url(r'^sub_recharge/$', login_required(main_views.RechargeTemplate.as_view(template_name="service_recharge.jade"), login_url="/weixin/sub_login_redirect/"), name="sub_recharge"),
-    url(r'^sub_list/$', TemplateView.as_view(template_name="service_list.jade")),
+    url(r'^sub_list/$', login_required(main_views.FwhP2PlistTemplate.as_view(template_name="service_list.jade"), login_url="/weixin/sub_login_redirect/")),
     url(r'^sub_detail/$', TemplateView.as_view(template_name="service_detail.jade")),
 
     url(r'^sub_transaction/repaying/$', TemplateView.as_view(template_name="service_transaction_repay.jade")),
