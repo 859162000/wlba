@@ -138,8 +138,9 @@ class AccountTemplate(TemplateView):
 
 class RechargeTemplate(TemplateView):
     def get_context_data(self, **kwargs):
+        margin = self.request.user.margin.margin
         return {
-            'margin': self.request.user.margin.margin
+            'margin': margin if margin else 0.0
         }
 
 
