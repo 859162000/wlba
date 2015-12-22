@@ -28,7 +28,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
       $form.find('input[name="captcha_0"]').val(json.key)
       $form.find('img.captcha').attr('src', json.image_url)
 
-  $('#add-card-button').click (e)->
+  $('.add-card-button').click (e)->
     if $('#id-is-valid').val() == 'False'
       $('#id-validate').modal()
       return
