@@ -278,7 +278,7 @@ org.ui = (function () {
                         disabledBg = options.submitStyle.disabledBg || 'rgba(219,73,63,.5)';
                         activeBg = options.submitStyle.activeBg || 'rgba(219,73,63,1)';
                     }
-                    canSubmit() ? $submit.css('background', activeBg).removeAttr('disabled') : $submit.css('background', disabledBg).attr('disabled', true)
+                    canSubmit() ? $submit.css('background', activeBg).removeAttr('disabled') : $submit.css('background', disabledBg).attr('disabled',true)
                 })
             })
 
@@ -593,11 +593,11 @@ org.regist = (function (org) {
                     beforeSend: function () {
                         $submit.text('注册中,请稍等...');
                     },
-                    success: function (data) {
-                        if (data.ret_code === 0) {
+                    success:function(data){
+                        if(data.ret_code === 0){
                             var next = org.getQueryStringByName('next') == '' ? '/weixin/regist/first/' : org.getQueryStringByName('next');
-                            next = org.getQueryStringByName('mobile') == '' ? next : next + '&mobile=' + org.getQueryStringByName('mobile');
-                            next = org.getQueryStringByName('serverId') == '' ? next : next + '&serverId=' + org.getQueryStringByName('serverId');
+                            next = org.getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ org.getQueryStringByName('mobile');
+                            next = org.getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ org.getQueryStringByName('serverId');
                             window.location.href = next;
                         } else if (data.ret_code > 0) {
                             org.ui.showSign(data.message)
@@ -979,11 +979,11 @@ org.buy = (function (org) {
                                 $buyButton.text("抢购中...");
                                 lib.isBuy = false;
                             },
-                            success: function (data) {
-                                if (data.data) {
-                                    $('.balance-sign').text(balance - data.data + lib.redPackAmountNew + '元');
-                                    $(".sign-main").css("display", "-webkit-box");
-                                }
+                            success: function(data){
+                               if(data.data){
+                                   $('.balance-sign').text(balance - data.data + lib.redPackAmountNew + '元');
+                                   $(".sign-main").css("display","-webkit-box");
+                               }
                             },
                             error: function (xhr) {
                                 var result;
@@ -1671,11 +1671,11 @@ org.processFirst = (function (org) {
                 error: function (xhr) {
                     result = JSON.parse(xhr.responseText);
 
-                    if (result.error_number == 8) {
-                        org.ui.alert(result.message, function () {
-                            window.location.href = '/weixin/list/';
+                    if(result.error_number == 8){
+                        org.ui.alert(result.message,function(){
+                           window.location.href = '/weixin/list/';
                         });
-                    } else {
+                    }else{
                         return org.ui.alert(result.message);
                     }
 

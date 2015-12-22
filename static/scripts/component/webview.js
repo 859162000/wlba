@@ -1,6 +1,5 @@
 // author wangxiaoqing
 // last update 2015-11-20
-
 var wlb = (function () {
 
     function Mixin(bridge) {
@@ -137,17 +136,26 @@ var wlb = (function () {
 
 
     function ready(dics) {
-
-        if (window.WebViewJavascriptBridge) {
-            run({callback: 'app', data: WebViewJavascriptBridge})
-
-        } else {
-            document.addEventListener('WebViewJavascriptBridgeReady', function () {
-                run({callback: 'app', data: WebViewJavascriptBridge})
-            }, false)
-
-            run({callback: 'other', data: null})
+        /**
+         * 临时处理webview初始化问题
+         */
+        window.onload = function(){
+            setTimeout(function(){
+                listen();
+            },200);
         }
+
+        function listen(){
+            if (window.WebViewJavascriptBridge) {
+                run({callback: 'app', data: WebViewJavascriptBridge});
+            } else {
+                document.addEventListener('WebViewJavascriptBridgeReady', function () {
+                    run({callback: 'app', data: WebViewJavascriptBridge})
+                }, false)
+                run({callback: 'other', data: null})
+            }
+        }
+
 
         function run(target) {
             var mixins;
@@ -170,8 +178,6 @@ var wlb = (function () {
     }
 
 })();
-
-
 
  //wlb.ready({
  //    app: function(mixins){

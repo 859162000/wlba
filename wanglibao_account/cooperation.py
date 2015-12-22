@@ -1165,7 +1165,7 @@ class JuChengRegister(CoopRegister):
         # 判断是否首次投资
         if p2p_record and p2p_record.order_id == int(order_id):
             p2p_amount = int(p2p_record.amount)
-            if p2p_amount>=500 and p2p_amount<1000:
+            if p2p_amount>=500 and p2p_amount<1000 and False:
                 try:
                     logger.debug(u"80门票，我要申请锁")
                     config = GiftOwnerGlobalInfo.objects.select_for_update().filter(description=u'jcw_ticket_80').first()
@@ -1181,7 +1181,7 @@ class JuChengRegister(CoopRegister):
                     logger.debug(u"用户 %s 获得80门票一张, 剩余：%s" % (user, config.amount))
                     SEND_SUCCESS = True
 
-            if p2p_amount>=1000:
+            if p2p_amount>=2000:
                 try:
                     logger.debug(u"180门票，我要申请锁")
                     config = GiftOwnerGlobalInfo.objects.select_for_update().filter(description=u'jcw_ticket_188').first()
@@ -1204,7 +1204,7 @@ class JuChengRegister(CoopRegister):
                 inside_message.send_one.apply_async(kwargs={
                     "user_id": user.id,
                     "title": u"演出门票赠送",
-                    "content": u'[网利科技]您已成功获得%s元门票，请于演出当天到北京音乐铁一楼大厅票务兑换处领取，咨询电话:13581710219' % (ticket,),
+                    "content": u'【网利科技】您已成功获得%s元门票，请于演出当天到北京音乐厅一楼大厅票务兑换处领取，咨询电话:13581710219' % (ticket,),
                     "mtype": "activity"
                 })
 
