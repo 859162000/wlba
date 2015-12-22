@@ -8,6 +8,7 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+<<<<<<< HEAD:marketing/migrations/0050_auto__add_p2prewardrecord__add_p2preward.py
         # Adding model 'P2PRewardRecord'
         db.create_table(u'marketing_p2prewardrecord', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -18,6 +19,19 @@ class Migration(SchemaMigration):
             ('order_id', self.gf('django.db.models.fields.IntegerField')(null=True)),
         ))
         db.send_create_signal(u'marketing', ['P2PRewardRecord'])
+=======
+        # Adding model 'WanglibaoVoteCounter'
+        # db.create_table(u'marketing_wanglibaovotecounter', (
+        #     (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+        #     ('catalog', self.gf('django.db.models.fields.CharField')(default='', max_length=256, null=True, blank=True)),
+        #     ('item', self.gf('django.db.models.fields.CharField')(default='', max_length=256, null=True, blank=True)),
+        #     ('activity', self.gf('django.db.models.fields.CharField')(default='', max_length=246, null=True, blank=True)),
+        #     ('count', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
+        #     ('create_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+        #     ('update_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+        # ))
+        # db.send_create_signal(u'marketing', ['WanglibaoVoteCounter'])
+>>>>>>> save:marketing/migrations/0052_auto__add_wanglibaovotecounter__add_field_p2preward_using_range.py
 
         # Adding model 'P2PReward'
         db.create_table(u'marketing_p2preward', (

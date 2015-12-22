@@ -208,18 +208,18 @@ class FuelCardListViewForApp(TemplateView):
                                                              u'满标已审核', u'还款中', u'正在招标'
                                                              ]).order_by('priority', '-publish_time')
 
-        data = []
+        product_data = []
         if p2p_products:
             # 根据优先级排序，并获取每种优先级的第一条记录
-            data.append(p2p_products[0])
+            product_data.append(p2p_products[0])
             unique_priority = p2p_products[0].priority
             for p2p_product in p2p_products[1:]:
                 if p2p_product.priority != unique_priority:
-                    data.append(p2p_product)
+                    product_data.append(p2p_product)
                     unique_priority = p2p_product.priority
-
+        print len(product_data)
         return {
-            'html_data': data,
+            'products': product_data,
         }
 
 
