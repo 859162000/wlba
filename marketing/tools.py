@@ -244,10 +244,15 @@ def send_income_message_sms():
     if incomes:
         for income in incomes:
             user_info = User.objects.filter(id=income.get('user'))\
-                .select_related('user__wanglibaouserprofile').values('wanglibaouserprofile__phone')
-            phones_list.append(user_info[0].get('wanglibaouserprofile__phone'))
-            user = User.objects.get(id=income.get('user'))
-            messages_list.append(messages.sms_income(user.wanglibaouserprofile.name,
+                .select_related('user__wanglibaouserprofile')\
+                .values('wanglibaouserprofile__phone', 'wanglibaouserprofile__name').first()
+            phone = user_info.get('wanglibaouserprofile__phone')
+            name = user_info.get('wanglibaouserprofile__name')
+            if not name:
+                from wanglibao.templatetags.formatters import safe_phone_str
+                name = safe_phone_str(phone)
+            phones_list.append(phone)
+            messages_list.append(messages.sms_income(name,
                                                      income.get('invite__count'),
                                                      income.get('earning__sum')))
 
