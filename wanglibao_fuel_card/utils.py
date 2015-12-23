@@ -13,13 +13,9 @@ def get_sorts_for_created_time(queryset, reverse=True):
     return data_list
 
 
-def get_p2p_reward_using_range(user_id, _type, price):
+def get_p2p_reward_using_range(_type):
     """获取p2p奖品使用范围"""
 
-    channel = get_user_channel_record(user_id)
-    if channel:
-        using_range = P2PReward.objects.values('using_range').filter(channel=channel,
-                                                                     type=_type, is_used=False,
-                                                                     price=price).first().distinct()
+    using_range = P2PReward.GET_REWARD_RANGE.get(_type)
 
-        return (ur['using_range'] for ur in using_range)
+    return using_range
