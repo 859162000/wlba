@@ -885,9 +885,60 @@ org.buy=(function(org){
             lib.$redpackForAmount.hide();//请输入投资金额
             //income.html((rate * dataRate) +'+<span class="blue">'+ (rate * jiaxi) +'</span>');
         },
+        _goBuy: function(cfg){
+            var $buyButton = $('.snap-up');
+            var productID = cfg.productID,
+                amount = cfg.amount,
+                redpackValue = cfg.redpackValue,
+                balance = cfg.balance;
+            org.ajax({
+                type: 'POST',
+                url: '/api/p2p/purchase/',
+                data: {product: productID, amount: amount, redpack: redpackValue},
+                beforeSend:function(){
+                    $buyButton.text("抢购中...");
+                    lib.isBuy = false;
+                },
+                success: function(data){
+                   if(data.data){
+                       //$('.balance-sign').text(balance - data.data + lib.redPackAmountNew + '元');
+                       //$(".sign-main").css("display","-webkit-box");
+                       $("#page-ok").css('display','-webkit-box');
+                   }
+                },
+                error: function(xhr){
+                    var result;
+                    result = JSON.parse(xhr.responseText);
+                    if(xhr.status === 400){
+                        if (result.error_number === 1) {
+                            org.ui.alert("登录超时，请重新登录！",function(){
+                                return window.location.href= '/weixin/sub_login/?next=/weixin/view/buy/'+productID+'/';
+                            });
+                        } else if (result.error_number === 2) {
+                            return org.ui.alert('必须实名认证！');
+                        } else if (result.error_number === 4 && result.message === "余额不足") {
+                            //$(".buy-sufficient").show();
+                            $("#page-onMoney").show();
+                        }else{
+                            return org.ui.alert(result.message);
+                        }
+                    }else if(xhr.status === 403){
+                        if (result.detail) {
+                            org.ui.alert("登录超时，请重新登录！",function(){
+                                return window.location.href = '/weixin/sub_login/?next=/weixin/view/buy/' + productID + '/';
+                            });
+                        }
+                    }
+                },
+                complete:function(){
+                    $buyButton.text("立即投资");
+                    lib.isBuy = true;
+                }
+            })
+        },
         _buy:function(){
             var $buyButton = $('.snap-up'),
-                $redpack = $("#gifts-package");
+                $redpack = $("#gifts-package");//红包
             //红包select事件
             $redpack.on("change",function(){
                 if($(this).val() != ''){
@@ -902,10 +953,10 @@ org.buy=(function(org){
 
             $buyButton.on('click',function(){
                 var $buySufficient = $('.buy-sufficient'),
-                    balance = parseFloat($("#balance").attr("data-value")),
-                    amount = $('.amount').val() *1,
-                    productID = $(".invest-one").attr('data-protuctid');
-                var self = $(this);
+                    balance = parseFloat($("#balance").attr("data-value")),//当前余额
+                    amount = $('.amount').val() *1,//投资金额
+                    productID = $(".invest-one").attr('data-protuctid');//投资项目id
+                //var self = $(this);
                 if(amount){
                     //console.log(amount > balance, amount, balance, $buySufficient.length);
                     if(amount % 100 !== 0) return org.ui.alert('请输入100的倍数金额');
@@ -917,59 +968,53 @@ org.buy=(function(org){
                 if(!redpackValue || redpackValue == ''){
                     redpackValue = null;
                 }
-
+                var postdata = {
+                    productID: productID,
+                    amount: amount,
+                    redpackValue: redpackValue,
+                    balance: balance
+                };
+                var pageOption = {//设置交易密码 参数
+                    page: $("#page-pwd"),
+                    title: "设置交易密码",
+                    cont: "为了您账户资金安全，请设置交易密码",
+                    type: "投资",
+                    amount: amount,
+                    callBack: setTradePwd,
+                    callBackOpt: postdata
+                };
+                var inputOption = { //输入交易密码 参数
+                    type: "投资",
+                    amount: amount,
+                    callBack: "none",
+                    callBackOpt: postdata
+                };
                 if(lib.isBuy){
-                   //org.ui.confirm("购买金额为" + amount, '确认投资', gobuy);
-                    if(self.data("first")){
-                        org.setInputPwd.pageSet($("#page-pwd"),"设置交易密码","为了您账户资金安全，请设置交易密码","投资",true, amount);
-                    }else{
-                        org.setInputPwd.inputPwd("投资",amount);
-                    }
-                   function gobuy(){
-                       org.ajax({
-                            type: 'POST',
-                            url: '/api/p2p/purchase/',
-                            data: {product: productID, amount: amount, redpack: redpackValue},
-                            beforeSend:function(){
-                                $buyButton.text("抢购中...");
-                                lib.isBuy = false;
-                            },
-                            success: function(data){
-                               if(data.data){
-                                   $('.balance-sign').text(balance - data.data + lib.redPackAmountNew + '元');
-                                   $(".sign-main").css("display","-webkit-box");
-                               }
-                            },
-                            error: function(xhr){
-                                var  result;
-                                result = JSON.parse(xhr.responseText);
-                                if(xhr.status === 400){
-                                    if (result.error_number === 1) {
-                                        org.ui.alert("登录超时，请重新登录！",function(){
-                                            return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
-                                        });
-                                    } else if (result.error_number === 2) {
-                                        return org.ui.alert('必须实名认证！');
-                                    } else if (result.error_number === 4 && result.message === "余额不足") {
-                                        $(".buy-sufficient").show();
-
-                                    }else{
-                                        return org.ui.alert(result.message);
-                                    }
-                                }else if(xhr.status === 403){
-                                    if (result.detail) {
-                                        org.ui.alert("登录超时，请重新登录！",function(){
-                                            return window.location.href = '/weixin/login/?next=/weixin/view/buy/' + productID + '/';
-                                        });
-                                    }
-                                }
-                            },
-                            complete:function(){
-                               $buyButton.text("立即投资");
-                                lib.isBuy = true;
+                    //org.ui.confirm("购买金额为" + amount, '确认投资', gobuy);
+                    org.ajax({
+                        url: '/api/profile/',
+                        type: 'GET',
+                        success:function(data){
+                            if(data.trade_pwd_is_set){
+                                //org.setInputPwd.inputPwd("充值",amount);
+                                isFirstPwd = false;
+                                org.setInputPwd.inputPwd(inputOption);//投资
+                            }else{
+                                isFirstPwd = true;
+                                org.setInputPwd.pageSet(pageOption);//首次交易
                             }
-                        })
-                   }
+                        },
+                        error: function (xhr) {
+                            console.log("标记用用户是否已经设置交易密码失败",xhr);
+                        }
+                    });
+
+                    //if(self.data("first")){
+                    //    org.setInputPwd.pageSet($("#page-pwd"),"设置交易密码","为了您账户资金安全，请设置交易密码","投资",true, amount);
+                    //}else{
+                    //    org.setInputPwd.inputPwd("投资",amount);
+                    //}
+
                 }else{
                     org.ui.alert("购买中，请稍后")
                 }
@@ -977,7 +1022,8 @@ org.buy=(function(org){
         }
     };
     return {
-        init : lib.init
+        init : lib.init,
+        goBuy: lib._goBuy
     }
 })(org);
 
@@ -1056,7 +1102,7 @@ org.setInputPwd = (function(org){//交易密码
                                 $("#page-error").show();//密码两次输入不一致
                             }else{
                                 //------------此处密码输入后的函数-------------//
-                                callBack && callBack(val,postdata);
+                                callBack && callBack(val,postdata,lib.type);
                                 //if(callBack && callBack(val)){
                                 //    console.log(2,postdata);
                                 //    org.recharge.rechargeSingleStep(postdata,val);
@@ -1068,7 +1114,12 @@ org.setInputPwd = (function(org){//交易密码
                         lib._inpPwdHide(self);
                         //------------此处密码输入后的函数-------------//
                         //if(callBack === "none"){
-                        org.recharge.rechargeSingleStep(postdata,val);
+                        if(lib.type === "投资"){
+                            org.buy.goBuy(postdata);
+                        }else{
+                            org.recharge.rechargeSingleStep(postdata,val);
+                        }
+
                         //}
                         //org.ui.confirm("交易密码输入不正确，您还可以输入2次", "重新输入", lib._inpPwdShow, lib.amount);//密码错误
                         //org.ui.alert("<p class='lock-pwd'>交易密码已被锁定，请3小时后再试<br />如想找回密码，请通过网站或APP找回</p>", closePage,  "知道了");
@@ -1139,17 +1190,25 @@ org.setInputPwd = (function(org){//交易密码
         inputPwd: lib._inpPwdShow
     }
 })(org);
-function setTradePwd(pwd,postdata){
+function setTradePwd(pwd,postdata,type){
+    if(typeof postdata != "object"){
+        type = postdata;
+        postdata = {};
+    }
     org.ajax({
         url: '/api/trade_pwd/',
         type: 'post',
         data: {"action_type":1,"new_trade_pwd":pwd},
         dataType : 'json',
-        success:function(data){
-            org.recharge.rechargeSingleStep(postdata,pwd);
+        success:function(){
+            if(type === "投资"){
+                org.buy.goBuy(postdata);
+            }else{
+                org.recharge.rechargeSingleStep(postdata,pwd);
+            }
         },
         error: function (xhr) {
-            console.log("充值失败",xhr);
+            console.log("设置交易密码失败",xhr);
             //code = data.ret_code;
         }
     });
@@ -1352,7 +1411,7 @@ org.recharge=(function(org){
                             }
                         },
                         error: function (xhr) {
-                            console.log("充值失败",xhr);
+                            console.log("标记用用户是否已经设置交易密码失败",xhr);
                         }
                     });
 

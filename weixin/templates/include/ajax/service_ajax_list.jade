@@ -4,7 +4,7 @@ for product in results
   status = product['display_status']
   if status == '抢购中'
     .list-section
-      a(href="/weixin/sub_detail/{{product.id}}/").section-head
+      a(href="/weixin/sub_detail/detail/{{product.id}}/").section-head
         if product.category == '新手标'
           span.head-prompt  新手福利
         else
@@ -12,7 +12,7 @@ for product in results
               span.head-prompt  APP专享
         span.head-tit {{product.name}}
       .section-body
-        a(href="/weixin/sub_detail/{{product.id}}/").body-left
+        a(href="/weixin/sub_detail/detail/{{product.id}}/").body-left
           .body-Profit
             span.profit-cont
               .profit-math.profit-blue
