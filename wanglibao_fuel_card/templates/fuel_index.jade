@@ -1,3 +1,4 @@
+-load formatters
 doctype html
 html
   head
@@ -27,29 +28,30 @@ html
       a(href='/fuel/dec/').product-right-dec 产品说明
 
     .fuel-product-item
-      mixin list(color)
-        a(href='/fuel/buy/').fuel-product-list
-          .fuel-pdt-title
-            .fuel-pdt-name(class=color) 初级理财加油卡
-            .fuel-pdt-fiter 适合12万以内车型
-          .fuel-pdt-cont
-            .fuel-pdt-term.fuel-pdt-section
-              .pdt-date
-                span.pdt-date-num 3
-                |个月
-              .pdt-name 期限
-            .fuel-pdt-amount.fuel-pdt-section
-              .pdt-date
-                span.pdt-date-num 150
-                |元
-              .pdt-name 每月加油卡
-            .fuel-pdt-buy
-              .fuel-buy-min 6000元即可获得
-              .fuel-buy-submit 立即选购
+      if products
+        each product in products
+          if product
+            a(href='/fuel/buy/{{product.id}}').fuel-product-list
+              .fuel-pdt-title
+                .fuel-pdt-name(class='fuel-pdt-green') {{product.name}}
+                .fuel-pdt-fiter 适合12万以内车型{{products}}
+              .fuel-pdt-cont
+                .fuel-pdt-term.fuel-pdt-section
+                  .pdt-date
+                    span.pdt-date-num {{product.period}}
+                    |{{product.pay_method | period_unit}}
+                  .pdt-name 期限
+                .fuel-pdt-amount.fuel-pdt-section
+                  .pdt-date
+                    amount = int(product.equality_prize_amount)
+                    span.pdt-date-num {{amount }}
+                    |元
+                  .pdt-name 每月加油卡
+                .fuel-pdt-buy
+                  per = int(product.limit_min_per_user)
+                  .fuel-buy-min {{per}}元即可获得
+                  .fuel-buy-submit 立即选购
 
-      +list('fuel-pdt-green')
-      +list('fuel-pdt-yellow')
-      +list('fuel-pdt-red')
 
     script(src='/static/scripts/mobile_fuelcard/dev/vendor.zepto.js')
     script(src='/static/scripts/mobile_fuelcard/dev/index.js')
