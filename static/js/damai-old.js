@@ -59,17 +59,28 @@
             return false
         });
         //请求票数接口
-        redpack();
+        $('.damai-buttonold').click(function () {
+            redpack();
+        })
+
         function redpack() {
             $.ajax({
                 url: '/api/rock/finance/old_user/',
                 type: "POST",
                 data: {}
             }).done(function (damai) {
-
-
-
-
+                console.log(damai);
+                if (damai['ret_code'] == 0) {
+                    alert('获奖');
+                } else if (damai['ret_code'] == 1005) {
+                    alert('奖品发没了');
+                } else if (damai['ret_code'] == 1004) {
+                    alert('没有在预定的时间内购标');
+                } else if (damai['ret_code'] == 1003) {
+                    alert('票已经发完了');
+                } else if (damai['ret_code'] == 1001) {
+                    alert('没有投资满5000');
+                }
 
 
             });
