@@ -12,6 +12,7 @@ class FuelCardBuyForm(forms.ModelForm):
     p_id = forms.IntegerField(required=True)
     p_parts = forms.IntegerField(required=True)
     total_amount = forms.FloatField(required=True)
+    using_range = forms.CharField(required=True)
 
     def clean_p_id(self):
         p_id = self.cleaned_data['p_id'].strip()
@@ -32,3 +33,6 @@ class FuelCardBuyForm(forms.ModelForm):
 
     def clean_total_amount(self):
         return self.cleaned_data['total_amount'].strip()
+
+    def clean_using_range(self):
+        return self.cleaned_data['using_range'].strip()

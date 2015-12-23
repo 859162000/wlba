@@ -11,10 +11,12 @@ from rest_framework.permissions import IsAuthenticated
 from wanglibao_account.cooperation import get_phone_for_coop
 from wanglibao_p2p.models import P2PProduct, UserAmortization, P2PRecord
 from wanglibao.const import ErrorNumber
+from wanglibao_sms.tasks import send_messages
 from marketing.models import P2PRewardRecord
 from .forms import FuelCardBuyForm
 from .trade import P2PTrader
 from .utils import get_sorts_for_created_time, get_p2p_reward_using_range
+from wanglibao_pay.models import Card
 
 
 def get_user_revenue_count(user, product_type):
@@ -101,11 +103,13 @@ class FuelCardBuyView(TemplateView):
     :param
     :return
     :request_method GET
+    :user.is_authenticated True
     """
 
     template_name = 'fuel_buy.jade'
 
     def get_context_data(self, p_id, **kwargs):
+        user = self.request.user
 
         try:
             p2p_product = P2PProduct.objects.get(pk=p_id)
@@ -114,17 +118,34 @@ class FuelCardBuyView(TemplateView):
 
         # 获取产品期限
         product_period = p2p_product.period
-        print '======='
         # 获取奖品使用范围
         # FixMe, 优化设计==>修改奖品使用范围设计，建议单独分离到一张表中
         using_range = get_p2p_reward_using_range(p2p_product.category)
-
+        p2p_margin = user.margin.margin  # P2P余额
         return {
             'product': p2p_product,
             'period': product_period,
             'using_range': using_range,
+            'p2p_margin': p2p_margin
         }
+class FuelCardAccountView(TemplateView):
+    """
+    加油卡个人中心
+    :param
+    :return
+    :request_method GET
+    :user.is_authenticated True
+    """
+    template_name = 'fuel_account.jade'
 
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        p2p_margin = user.margin.margin  # P2P余额
+        p2p_cards_count = Card.objects.filter(user__exact=user).count()
+        return {
+            'p2p_margin': p2p_margin,
+            'p2p_cards_count': p2p_cards_count
+        }
 
 class FuelCardBuyApi(APIView):
     """
@@ -155,8 +176,17 @@ class FuelCardBuyApi(APIView):
                     trader = P2PTrader(product=p2p_product, user=request.user, request=request)
                     product_info, margin_info, equity_info = trader.purchase(total_amount)
 
-                    return render_to_response('', {
-                        # FixMe, 返回内容协商, 给用户发送投资成功短信通知
+                    # FixMe, 补充短信内容，给用户发送投资成功短信通知
+                    message = ''
+                    messages_list = [message]
+                    send_messages.apply_async(kwargs={
+                        "phones": [request.user.wanglibaouserprofile.phone],
+                        "messages": messages_list
+                    })
+
+                    return Response({
+                        'data': product_info.amount,
+                        'category': equity_info.product.category
                     })
                 except Exception, e:
                     return Response({
@@ -271,33 +301,6 @@ class FuelCardExchangeRecordView(TemplateView):
             }
         else:
             return HttpResponseForbidden(u'无效参数status')
-
-
-class FuelCardBuyView(TemplateView):
-    """
-    加油卡购买页面视图
-    :param
-    :return
-    :request_method GET
-    """
-
-    template_name = 'fuel_buy.jade'
-
-    def get_context_data(self, p_id, **kwargs):
-        phone = get_phone_for_coop(self.request.user.id)
-        try:
-            p2p_product = P2PProduct.objects.get(pk=p_id)
-        except P2PProduct.DoesNotExist:
-            return HttpResponseForbidden(u'无效产品ID')
-
-        using_range = get_p2p_reward_using_range(self.request.user.id, p2p_product.category,
-                                                 p2p_product.equality_prize_amount)
-
-        return {
-            'p2p_product': p2p_product,
-            'phone': phone,
-            'using_range': using_range,
-        }
 
 
 class FualCardAccountView(TemplateView):
