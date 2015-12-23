@@ -34,6 +34,9 @@ from marketing.tops import Top
 from utils import local_to_utc
 from wanglibao_reward.models import WanglibaoWeixinRelative
 # used for reward
+from weixin.models import WeixinAccounts
+import cStringIO
+from wanglibao_account.utils import FileObject
 from django.forms import model_to_dict
 from django.db.models import Q
 from marketing.models import RewardRecord, NewsAndReport
@@ -2660,6 +2663,141 @@ class RockFinanceQRCodeView(TemplateView):
         else:
             logger.debug(u"reward.qrcode img url:%s, user:%s" % (reward.qrcode, self.request.user))
             return {"code": 0, "img": reward.qrcode, "message": u"得到合法二维码"}
+
+
+class RockFinanceForOldUserAPIView(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        key = 'activities'
+        activity_config = Misc.objects.filter(key=key).first()
+        if activity_config:
+            activity = json.loads(activity_config.value)
+            if type(activity) == dict:
+                try:
+                    rock_finance = activity['rock_finance']
+                    is_open = rock_finance["is_open"]
+                    amount = rock_finance["amount"]
+                    start_time = rock_finance["start_time"]
+                    end_time = rock_finance["end_time"]
+                except KeyError, reason:
+                    logger.debug(u"misc中activities配置错误，请检查,reason:%s" % reason)
+                    raise Exception(u"misc中activities配置错误，请检查，reason:%s" % reason)
+            else:
+                raise Exception(u"misc中activities的配置参数，应是字典类型")
+        else:
+            raise Exception(u"misc中没有配置activities杂项")
+
+        logger.debug(u"user:%s, 运行开关:%s, 开放时间:%s, 结束时间:%s, 总票数:%s" % (request.user, is_open, start_time, end_time, amount))
+
+        # 是否是登录用户
+        if not request.user.is_authenticated():
+            to_json_response = {
+                'ret_code': 1000,
+                'message': u'用户没有登录',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        p2p_record = P2PRecord.objects.filter(amount__gte=5000, user_id=request.user.id, catalog=u'申购', create_time__gte=start_time, create_time__lte=end_time).first()
+
+        if not p2p_record:
+            to_json_response = {
+                'ret_code': 1000,
+                'message': u'没有投资满5000',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        # 1: 如果活动没有打开
+        if is_open == "false":
+            logger.debug(u'开关没打开')
+            to_json_response = {
+                'ret_code': 1001,
+                'message': u'活动开关没打开',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        # 2: 如果票数到800了，直接跳出
+        counts = ActivityReward.objects.filter(activity='rock_finance').count()
+        if counts >= amount:
+            logger.debug(u'票已经发完了, %s' % (counts))
+            to_json_response = {
+                'ret_code': 1002,
+                'message': u'票已经发完了',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        # 3 :如果时间已经过了, 直接跳出; 如果活动时间还没有开始，也直接跳出
+        now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        if now < start_time or now > end_time:
+            logger.debug("start_time:%s, end_time:%s, now:%s" % (start_time, end_time, now))
+            to_json_response = {
+                'ret_code': 1003,
+                'message': u'没有在预定的时间内购标',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        reward = Reward.objects.filter(type='金融摇滚夜', is_used=False).first()
+        if not reward:
+            logger.debug(u"奖品没有了")
+            to_json_response = {
+                'ret_code': 1004,
+                'message': u'小子你来晚了，奖品发光了',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        with transaction.atomic():
+            reward = Reward.objects.select_for_update().filter(content=reward.content).first()
+            try:
+                activity_reward = ActivityReward.objects.create(
+                    activity='rock_finance',
+                    order_id=p2p_record.order_id,
+                    user=request.user,
+                    p2p_amount=p2p_record.amount,
+                    reward=reward,
+                    has_sent=False, #当被扫码后， has_sent变成true
+                    left_times=1,
+                    join_times=1,
+                )
+            except Exception, reason:
+                logger.debug(u"生成获奖记录报异常, reason:%s" % reason)
+                raise Exception(u"生成获奖记录异常")
+            else:
+                #不知道为什么create的时候，会报错
+                m = Misc.objects.filter(key='weixin_qrcode_info').first()
+                original_id = None
+                if m and m.value:
+                    info = json.loads(m.value)
+                    original_id = info.get('fwh')
+                    account = WeixinAccounts.getByOriginalId(original_id)
+                encoding_str = urllib.quote("%s/api/check/qrcode/?owner_id=%s&activity=rock_finance&content=%s" % (settings.WEIXIN_CALLBACK_URL, request.user.id, reward.content))
+                qrcode_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=%s" % (account.app_id, encoding_str, original_id)
+                logger.debug("encoding_st:%s, qrcode_url:%s" % (encoding_str, qrcode_url))
+                img = qrcode.make(qrcode_url)
+                _img = img.tobytes()
+                img_handle = cStringIO.StringIO()
+                img.save(img_handle)
+                img_handle.seek(0)
+                _img = FileObject(img_handle, len(_img))
+                activity_reward.qrcode.save("rock_finance.png", _img, save=True)
+                activity_reward.save()
+                logger.debug("before save: activity_reward.qrcode:%s" % activity_reward.qrcode)
+                #将奖品通过站内信发出
+                inside_message.send_one.apply_async(kwargs={
+                    "user_id": request.user.id,
+                    "title": u"网利宝摇滚之夜门票",
+                    "content": u"网利宝摇滚夜欢迎您的到来，点击<a href='%s/rock/finance/qrcode/?user_id=%s'>获得入场二维码</a>查看，<br/> 感谢您对我们的支持与关注。<br/>网利宝" % (settings.WEIXIN_CALLBACK_URL, request.user.id),
+                    "mtype": "activity"
+                })
+                reward.is_used = True
+                reward.save()
+                logger.debug("after save:activity_reward.qrcode:%s" % activity_reward.qrcode)
+
+                logger.debug(u"user:%s, 站内信已经发出, 奖品内容:%s" % (request.user, reward.content))
+                to_json_response = {
+                    'ret_code': 0,
+                    'message': u'用户的站内信已经发出',
+                }
+                return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
 
 class RockFinanceAPIView(APIView):
