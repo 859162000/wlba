@@ -783,7 +783,7 @@ class P2PListWeixin(APIView):
 
 
 class P2PDetailView(TemplateView):
-
+    source = ""
     def get_template_names(self):
         template = self.kwargs['template']
         if template == 'calculator':
@@ -792,6 +792,8 @@ class P2PDetailView(TemplateView):
             template_name = 'weixin_buy.jade'
         else:
             template_name = 'weixin_detail.jade'
+            if self.source=='fwh':
+                template_name = 'service_detail.jade'
 
         return template_name
 

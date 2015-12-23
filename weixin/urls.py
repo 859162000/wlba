@@ -75,7 +75,7 @@ urlpatterns = patterns(
 
     url(r'^sub_recharge/$', login_required(main_views.RechargeTemplate.as_view(template_name="service_recharge.jade"), login_url="/weixin/sub_login_redirect/"), name="sub_recharge"),
     url(r'^sub_list/$', login_required(main_views.FwhP2PlistTemplate.as_view(template_name="service_list.jade"), login_url="/weixin/sub_login_redirect/")),
-    url(r'^sub_detail/(?P<template>\w+)/(?P<id>\w+)/$', login_required(views.P2PDetailView.as_view(template_name="service_detail.jade"), login_url="/weixin/sub_login_redirect/")),
+    url(r'^sub_detail/(?P<template>\w+)/(?P<id>\w+)/$', login_required(views.P2PDetailView.as_view(source='fwh'), login_url="/weixin/sub_login_redirect/")),
 
     url(r'^sub_transaction/(?P<status>\w+)/$', login_required(views.WeixinTransaction.as_view(template_name="service_transaction_repay.jade", source='fwh'), login_url="/weixin/sub_login_redirect/")),
 
