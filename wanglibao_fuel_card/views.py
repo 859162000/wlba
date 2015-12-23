@@ -3,14 +3,12 @@
 import logging
 from django.utils import timezone
 from django.views.generic import TemplateView
-from django.shortcuts import render_to_response
 from django.http import HttpResponseForbidden
 from django.db.models import Sum
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from wanglibao_account.cooperation import get_phone_for_coop
 from wanglibao_p2p.models import P2PProduct, UserAmortization, P2PRecord
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.tasks import send_messages
@@ -18,6 +16,7 @@ from marketing.models import P2PRewardRecord
 from .forms import FuelCardBuyForm
 from .trade import P2PTrader
 from .utils import get_sorts_for_created_time, get_p2p_reward_using_range
+from wanglibao_pay.models import Card
 
 logger = logging.getLogger(__name__)
 
@@ -77,6 +76,13 @@ FUEL_CARD_CLASS = {
     'C': u'高级理财加油卡',
 }
 
+# 加油卡类别对应车型
+FUEL_CARD_CAR_CLASS = {
+    'A': u'适合12万以内车型',
+    'B': u'适合12～25万以内车型',
+    'C': u'适合25万以上车型',
+}
+
 
 class FuelCardIndexView(TemplateView):
     """
@@ -88,7 +94,6 @@ class FuelCardIndexView(TemplateView):
     """
 
     template_name = 'fuel_index.jade'
-
 
     def get_context_data(self, **kwargs):
         user = self.request.user
@@ -109,10 +114,8 @@ class FuelCardIndexView(TemplateView):
             # 按产品期限分类（初级-中级-高级）
             for p in data:
                 product_class = classes_product_for_period(p.period) or 'C'
-                p.class_name = FUEL_CARD_CLASS[product_class]
-
-        # 获取用户手机号(屏蔽)
-        phone = get_phone_for_coop(user.id)
+                p.card_class_name = FUEL_CARD_CLASS[product_class]
+                p.car_class_name = FUEL_CARD_CAR_CLASS[product_class]
 
         # 获取用户至今总收益
         revenue_count = get_user_revenue_count_for_type(user, u'加油卡')
@@ -121,7 +124,6 @@ class FuelCardIndexView(TemplateView):
 
         return {
             'products': data,
-            'phone': phone,
             'revenue_count': revenue_count,
             'effect_count': effect_count,
         }
@@ -148,19 +150,35 @@ class FuelCardBuyView(TemplateView):
 
         # 获取产品期限
         product_period = p2p_product.period
-
         # 获取奖品使用范围
         # FixMe, 优化设计==>修改奖品使用范围设计，建议单独分离到一张表中
         using_range = get_p2p_reward_using_range(p2p_product.category)
-
-        # 获取用户手机号(屏蔽)
-        phone = get_phone_for_coop(user.id)
-
+        p2p_margin = user.margin.margin  # P2P余额
         return {
             'product': p2p_product,
             'period': product_period,
             'using_range': using_range,
-            'phone': phone,
+            'p2p_margin': p2p_margin
+        }
+
+
+class FuelCardAccountView(TemplateView):
+    """
+    加油卡个人中心
+    :param
+    :return
+    :request_method GET
+    :user.is_authenticated True
+    """
+    template_name = 'fuel_account.jade'
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        p2p_margin = user.margin.margin  # P2P余额
+        p2p_cards_count = Card.objects.filter(user__exact=user).count()
+        return {
+            'p2p_margin': p2p_margin,
+            'p2p_cards_count': p2p_cards_count
         }
 
 
@@ -191,6 +209,7 @@ class FuelCardBuyApi(APIView):
             # 判断用户是否满足最低消费限额
             if p2p_product.limit_min_per_user * p_parts == amount:
                 try:
+                    p2p_product.reward_range = reward_range
                     trader = P2PTrader(product=p2p_product, user=request.user, request=request)
                     product_info, margin_info, equity_info = trader.purchase(amount)
 
