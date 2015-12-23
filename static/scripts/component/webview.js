@@ -104,7 +104,6 @@ var wlb = (function () {
         authenticated: function (data, callback) {
             var options = this._setData(data, callback);
             this.bridge.callHandler('authenticated', options.post, function (response) {
-
                 var responseData  = Mixin.filterJSON(response);
                 options.callback && options.callback(responseData);
             });
@@ -114,7 +113,7 @@ var wlb = (function () {
          * @param data {title: 活动标题, content: 活动描述}
          */
         shareData: function (data) {
-            this.bridge.registerHandler('shareData', function (data, responseCallback) {
+            this.bridge.registerHandler('shareData', function (backdata, responseCallback) {
                 responseCallback(data);
             });
         },
