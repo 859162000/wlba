@@ -735,19 +735,23 @@ org.list = (function(org){
             })
         },
         _getNextPage :function(){
+            var loadDom = $(".list-load .load-body");
             org.ajax({
                 type: 'GET',
-                url: '/api/p2ps/wx/',
+                url: '/weixin/api/fwh/p2p_ajax_list/',
                 data: {page: lib.page, 'pagesize': lib.pageSize},
                 beforeSend:function(){
                     lib.canGetPage =false;
-                    $('.load-text').html('加载中...');
+                    loadDom.find('.load-text').html('加载中...');
                 },
                 success: function(data){
-                   $('#list-body').append(data.html_data);
+                    if(data.html_data === ""){
+                        loadDom.hide();
+                    }else{
+                        $('#list-body').append(data.html_data);
+                    }
                     lib.page++;
                     lib.canGetPage = true;
-
                 },
                 error: function(){
                     org.ui.alert('Ajax error!')
@@ -1141,7 +1145,6 @@ function setTradePwd(pwd,postdata){
         data: {"action_type":1,"new_trade_pwd":pwd},
         dataType : 'json',
         success:function(data){
-            console.log(data);
             org.recharge.rechargeSingleStep(postdata,pwd);
         },
         error: function (xhr) {
