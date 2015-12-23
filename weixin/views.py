@@ -1170,26 +1170,39 @@ class WeixinAccountSecurity(TemplateView):
     template_name = 'weixin_security.jade'
 
     def get_context_data(self, **kwargs):
-        p2p_cards = len(card_bind_list(self.request))
-        return {
-            'p2p_cards': p2p_cards,
-        }
+        is_one = ''
+        try:
+            p2p_cards = card_bind_list(self.request)['cards']
+            for card in p2p_cards:
+                if card['is_the_one_card']:
+                    is_one = True
+            if is_one:
+                card_count = 1
+            else:
+                card_count = len(p2p_cards)
+        except:
+            card_count = 0
 
+        return {
+            'p2p_cards': card_count,
+            'is_one': is_one
+        }
 
 class WeixinAccountBankCard(TemplateView):
     template_name = 'weixin_bankcard.jade'
 
-    # def get_context_data(self, **kwargs):
-    #     p2p_cards = Card.objects.filter(user__exact=self.request.user)
-    #     return {
-    #         'p2p_cards': p2p_cards,
-    #     }
     def get_context_data(self, **kwargs):
-        result = card_bind_list(self.request)
-
-        print result['cards'][0]
+        is_one = ''
+        try:
+            p2p_cards = card_bind_list(self.request)['cards']
+            for card in p2p_cards:
+                if card['is_the_one_card']:
+                    is_one = True
+        except:
+            result = ''
         return {
-            'p2p_cards': result['cards']
+            'p2p_cards': p2p_cards,
+            'is_one': is_one
         }
 
 

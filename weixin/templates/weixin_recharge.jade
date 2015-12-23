@@ -44,13 +44,29 @@ html
           .value-submit
               button(type="submit", name='submit')#recharge.value-submit-body 确认充值
 
-      .no-authentication-sign.bankcard(style='display:none;') 为保证您的资金安全，请先进行绑卡
-          a(href="/weixin/account/bankcard/").authentication-sign-btn 立即去绑卡
+
+      .no-authentication-sign.bankcard(style='display:none;') 为保证您的资金安全，请先选择进行绑卡
+        .take-dec-list(style='text-align:left;')
+          p 温馨提示
+          p 1. 绑卡成功后，将自动为您开通快捷支付功能，方便您进行快速充值。
+          p 2. 绑卡成功后，您的提现资金将统一打到该银行卡。
+          p 3. 出于账号安全性考虑，每个账户，只能绑定一张银行卡，实行同卡进出原则。
+          p 4. 如需取消绑卡或者更换银行卡，可通过线上申请，或联系客服4008-588-066进行咨询。
+        a(href="/weixin/account/bankcard/").authentication-sign-btn 立即去绑卡
+
+
+      .no-authentication-sign.unbankcard(style='display:none;') 你还没有绑定银行卡。
+        .take-dec-list(style='text-align:left;')
+          p 温馨提示
+          p 1. 绑卡成功后，将自动为您开通快捷支付功能，方便您进行快速充值。
+          p 2. 绑卡成功后，您的提现资金将统一打到该银行卡。
+          p 3. 出于账号安全性考虑，每个账户，只能绑定一张银行卡，实行同卡进出原则。
+          p 4. 如需取消绑卡或者更换银行卡，可通过线上申请，或联系客服4008-588-066进行咨询。
+        a(href="/weixin/regist/second/").authentication-sign-btn 立即去绑卡
 
     else
       .no-authentication-sign 为保证您的资金安全，请先进行实名认证
           a(href="/weixin/regist/first/").authentication-sign-btn 去实名认证
-
 
     .sign-main
         .sign-body

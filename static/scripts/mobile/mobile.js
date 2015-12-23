@@ -1112,20 +1112,12 @@ org.recharge = (function (org) {
                 type: 'POST',
                 success: function (data) {
                     if (data.ret_code === 0) {
-                        switch (data.cards.length) {
-                            case 0:
-                                //没有卡
-                                window.location.href = '/weixin/regist/second/';
-                                break;
-                            default:
-                                _self.$load.hide();
-                                $('.bankcard').show()
-                        }
+                        _self.$load.hide();
+                        data.cards.length === 0 ? $('.unbankcard').show() : $('.bankcard').show();
                     }
-                    if (data.ret_code > 0) {
+                    if (data.ret_code > 0 && data.ret_code != 20071) {
                         return org.ui.alert(data.message);
                     }
-
                 },
                 error: function (data) {
                     return org.ui.alert('系统异常，请稍后再试');
@@ -1281,7 +1273,6 @@ org.bankOneCard = (function(){
     var lib = {
         init : function(){
             lib.listen()
-            lib.one_card()
         },
         listen: function(){
             var $set_bank = $('.set-bank'),
@@ -1310,15 +1301,6 @@ org.bankOneCard = (function(){
             $bank_confirm.on('click', function(){
                 var id = $(this).attr('data-id')
                 lib.putBank(id)
-            })
-        },
-        one_card: function(){
-            org.ajax({
-                type: 'get',
-                url: '/api/pay/the_one_card/',
-                error: function(){
-                    $('.bank-add-btn').show()
-                }
             })
         },
         putBank: function(id){
