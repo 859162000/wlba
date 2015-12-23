@@ -21,7 +21,10 @@ html
         h2.maitop 门票限800张，送完为止！
         h2 来现场，更有乐队签名CD，签名t-shirt相送！
         h1 网利宝，好收益，开启多彩生活！
-        a(href='javascript:void(0);').damai-button 立即参与抢门票
+        if user.is_authenticated
+          a(href='javascript:void(0);').damai-button.damai-buttonold 立即参与抢门票
+        else
+          a(href='javascript:void(0);').damai-button 立即参与抢门票
       .damai-main1.damai-main1-old
         .main1-song.main1-song-old
           .main1-song1.old
