@@ -72,6 +72,8 @@
                 console.log(damai);
                 if (damai['ret_code'] == 0) {
                     console.log('获奖');
+                } else if (damai['ret_code'] == 1006) {
+                    console.log('领过');
                 } else if (damai['ret_code'] == 1005) {
                     console.log('奖品发没了');
                 } else if (damai['ret_code'] == 1004) {
