@@ -6,7 +6,8 @@ from wechatpy.oauth import WeChatOAuth
 from rest_framework.response import Response
 from rest_framework.views import APIView
 import logging
-from django.http import HttpResponseRedirect
+from decimal import Decimal
+from django.http import HttpResponseRedirect, Http404
 from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger
 from django.conf import settings
@@ -20,8 +21,10 @@ from wanglibao_account.forms import LoginAuthenticationNoCaptchaForm
 from wanglibao.templatetags.formatters import safe_phone_str
 from .forms import OpenidAuthenticationForm
 from wanglibao_p2p.common import get_p2p_list
-
-
+from wanglibao_redis.backend import redis_backend
+from wanglibao_rest import utils
+from wanglibao_redpack import backends
+from .util import _generate_ajax_template
 logger = logging.getLogger("weixin")
 
 
@@ -153,7 +156,7 @@ class FwhP2PlistTemplate(TemplateView):
         p2p_products.extend(p2p_full_list)
         p2p_products.extend(p2p_repayment_list)
         p2p_products.extend(p2p_finished_list)
-
+        print '############################', p2p_products
         limit = 10
         paginator = Paginator(p2p_products, limit)
         page = self.request.GET.get('page')
@@ -167,12 +170,84 @@ class FwhP2PlistTemplate(TemplateView):
 
         phone = self.request.user.wanglibaouserprofile.phone
         margin = self.request.user.margin.margin
+
         return {
             'results': p2p_products[:10],
             'phone': safe_phone_str(phone),
             'margin': margin
         }
 
+class FWHP2PDetail(TemplateView):
+
+    def get_context_data(self, **kwargs):
+        context = super(FWHP2PDetail, self).get_context_data(**kwargs)
+
+        # try:
+        #     p2p = P2PProduct.objects.select_related('activity').exclude(status=u'流标').exclude(status=u'录标')\
+        #         .get(pk=id, hide=False)
+        #
+        #     if p2p.soldout_time:
+        #         end_time = p2p.soldout_time
+        #     else:
+        #         end_time = p2p.end_time
+        # except P2PProduct.DoesNotExist:
+        #     raise Http404(u'您查找的产品不存在')
+        cache_backend = redis_backend()
+        p2p = cache_backend.get_cache_p2p_detail(id)
+        if not p2p:
+            raise Http404(u'您查找的产品不存在')
+
+        user = self.request.user
+
+        device = utils.split_ua(self.request)
+        result = backends.list_redpack(user, 'available', device['device_type'], p2p['id'])
+        redpacks = result['packages'].get('available', [])
+        context.update({
+            "p2p":p2p,
+            "redpacks":redpacks,
+        })
+        return context
+
+
+class P2PListFWH(APIView):
+    permission_classes = ()
+
+    @property
+    def allowed_methods(self):
+        return ['GET', 'POST']
+
+    def get(self, request):
+
+        p2p_products = []
+
+        p2p_done_list, p2p_full_list, p2p_repayment_list, p2p_finished_list = get_p2p_list()
+
+        p2p_products.extend(p2p_done_list)
+        p2p_products.extend(p2p_full_list)
+        p2p_products.extend(p2p_repayment_list)
+        p2p_products.extend(p2p_finished_list)
+
+        page = request.GET.get('page', 1)
+        pagesize = request.GET.get('pagesize', 10)
+        page = int(page)
+        pagesize = int(pagesize)
+
+        paginator = Paginator(p2p_products, pagesize)
+
+        try:
+            p2p_products = paginator.page(page)
+        except PageNotAnInteger:
+            p2p_products = paginator.page(1)
+        except Exception:
+            p2p_products = paginator.page(paginator.num_pages)
+
+        html_data = _generate_ajax_template(p2p_products, 'include/ajax/service_ajax_list.jade')
+
+        return Response({
+            'html_data': html_data,
+            'page': page,
+            'pagesize': pagesize,
+        })
 
 
 
