@@ -14,14 +14,13 @@ html
         for card in p2p_cards
           .bank-list
             .bank-warp
-              p.bank-name {{card.bank.name}}
-              p.bank-num {{card.no | bank_card}}
+              p.bank-name {{card.bank_name}}
+              p.bank-num {{card.storable_no | bank_card}}
 
             if card.is_the_one_card
               .set-bank-true 已绑定
             else
-              card_no = (card.no)[-4:]
-              .set-bank(data-id='{{card.id}}', data-name='{{card.bank.name}}', data-no='{{card_no}}') 待绑定
+              .set-bank(data-id='{{card.card_id}}', data-name='{{card.bank_name}}', data-no='{{card.storable_no}}') 待绑定
 
     if user.wanglibaouserprofile.id_is_valid
         .bank-add-btn(style='display:none')

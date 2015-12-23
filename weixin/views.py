@@ -1170,7 +1170,7 @@ class WeixinAccountSecurity(TemplateView):
     template_name = 'weixin_security.jade'
 
     def get_context_data(self, **kwargs):
-        p2p_cards = Card.objects.filter(user__exact=self.request.user).count()
+        p2p_cards = len(card_bind_list(self.request))
         return {
             'p2p_cards': p2p_cards,
         }
@@ -1186,6 +1186,8 @@ class WeixinAccountBankCard(TemplateView):
     #     }
     def get_context_data(self, **kwargs):
         result = card_bind_list(self.request)
+
+        print result['cards'][0]
         return {
             'p2p_cards': result['cards']
         }
