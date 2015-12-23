@@ -2705,7 +2705,7 @@ class RockFinanceForOldUserAPIView(APIView):
         if is_open == "false":
             logger.debug(u'开关没打开')
             to_json_response = {
-                'ret_code': 1001,
+                'ret_code': 1002,
                 'message': u'活动开关没打开',
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -2715,7 +2715,7 @@ class RockFinanceForOldUserAPIView(APIView):
         if counts >= amount:
             logger.debug(u'票已经发完了, %s' % (counts))
             to_json_response = {
-                'ret_code': 1002,
+                'ret_code': 1003,
                 'message': u'票已经发完了',
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -2725,7 +2725,7 @@ class RockFinanceForOldUserAPIView(APIView):
         if now < start_time or now > end_time:
             logger.debug("start_time:%s, end_time:%s, now:%s" % (start_time, end_time, now))
             to_json_response = {
-                'ret_code': 1003,
+                'ret_code': 1004,
                 'message': u'没有在预定的时间内购标',
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
@@ -2734,8 +2734,17 @@ class RockFinanceForOldUserAPIView(APIView):
         if not reward:
             logger.debug(u"奖品没有了")
             to_json_response = {
-                'ret_code': 1004,
+                'ret_code': 1005,
                 'message': u'小子你来晚了，奖品发光了',
+            }
+            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+
+        activity_record = ActivityReward.objects.filter(user=request.user, activity='rock_finance').first()
+        if activity_record:
+            logger.debug(u'已经领过奖品了')
+            to_json_response = {
+                'ret_code': 1006,
+                'message': u'已经领过奖品了',
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
