@@ -524,7 +524,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                 sub_amo.settled = True
                 sub_amo.settlement_time = timezone.now()
                 sub_amo.save()
-                
+
                 amo_amount = sub_amo.principal + sub_amo.interest + sub_amo.penal_interest + sub_amo.coupon_interest
 
                 # 生成还款短信消息通知群发-用户手机号列表及短信内容
@@ -549,32 +549,33 @@ class AmortizationKeeper(KeeperBaseMixin):
                     self.__tracer(catalog, sub_amo.user, sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
                                   amortization, description, sub_amo.coupon_interest)
 
-                # 标的每一期还款完成后,检测该用户还款的本金是否有符合活动的规则,有的话触发活动规则
-                try:
-                    if sub_amo.principal > 0:
-                        activity_backends.check_activity(sub_amo.user, 'repaid', 'pc', sub_amo.principal, product.id)
-                except Exception:
-                    logger.debug("check activity on repaid, user: {}, principal: {}, product_id: {}".format(
-                        sub_amo.user, sub_amo.principal, product.id
-                    ))
-                try:
-                    weixin_user = WeixinUser.objects.filter(user=sub_amo.user).first()
-        #             {{first.DATA}} 项目名称：{{keyword1.DATA}} 还款金额：{{keyword2.DATA}} 还款时间：{{keyword3.DATA}} {{remark.DATA}}
+                if product_type != u'还款等额兑奖':
+                    # 标的每一期还款完成后,检测该用户还款的本金是否有符合活动的规则,有的话触发活动规则
+                    try:
+                        if sub_amo.principal > 0:
+                            activity_backends.check_activity(sub_amo.user, 'repaid', 'pc', sub_amo.principal, product.id)
+                    except Exception:
+                        logger.debug("check activity on repaid, user: {}, principal: {}, product_id: {}".format(
+                            sub_amo.user, sub_amo.principal, product.id
+                        ))
+                    try:
+                        weixin_user = WeixinUser.objects.filter(user=sub_amo.user).first()
+            #             {{first.DATA}} 项目名称：{{keyword1.DATA}} 还款金额：{{keyword2.DATA}} 还款时间：{{keyword3.DATA}} {{remark.DATA}}
 
-                    if weixin_user:
-                        now = datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
-                        sentTemplate.apply_async(kwargs={
-                                        "kwargs":json.dumps({
-                                                        "openid": weixin_user.openid,
-                                                        "template_id": PRODUCT_AMORTIZATION_TEMPLATE_ID,
-                                                        "keyword1": product.name,
-                                                        "keyword2": str(amo_amount),
-                                                        "keyword3": now,
-                                                            })},
-                                                        queue='celery02')
+                        if weixin_user:
+                            now = datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
+                            sentTemplate.apply_async(kwargs={
+                                            "kwargs":json.dumps({
+                                                            "openid": weixin_user.openid,
+                                                            "template_id": PRODUCT_AMORTIZATION_TEMPLATE_ID,
+                                                            "keyword1": product.name,
+                                                            "keyword2": str(amo_amount),
+                                                            "keyword3": now,
+                                                                })},
+                                                            queue='celery02')
 
-                except Exception,e:
-                    pass
+                    except Exception,e:
+                        pass
             amortization.settled = True
             amortization.save()
             catalog = u'还款入账'
