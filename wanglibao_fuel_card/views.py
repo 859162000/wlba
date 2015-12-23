@@ -1,9 +1,11 @@
 # coding=utf-8
 
+import logging
 from django.utils import timezone
 from django.views.generic import TemplateView
 from django.shortcuts import render_to_response
 from django.http import HttpResponseForbidden
+from django.db.models import Sum
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -17,9 +19,11 @@ from .forms import FuelCardBuyForm
 from .trade import P2PTrader
 from .utils import get_sorts_for_created_time, get_p2p_reward_using_range
 
+logger = logging.getLogger(__name__)
 
-def get_user_revenue_count(user, product_type):
-    """获取用户自注册起至今总收益"""
+
+def get_user_revenue_count_for_type(user, product_type):
+    """根据产品类型获取用户自注册起至今总收益"""
 
     revenue_count = 0
     p2p_record_list = P2PRecord.objects.filter(user=user, product__category=product_type)
@@ -43,6 +47,37 @@ def get_user_amortizations(user, product_type, settled_status):
     return user_amortizations
 
 
+def get_p2p_product_amounts(user, product_type):
+    """获取用户购买的每个产品的投资额"""
+
+    p2p_record = P2PRecord.objects.filter(user=user, product__category=product_type)
+    p2p_amounts = p2p_record.values('product').annotate(Sum('amount'))
+    return p2p_amounts
+
+
+def classes_product_for_period(p_period):
+    """根据产品期限分级"""
+
+    class_name = None
+
+    if p_period in range(1, 6):
+        class_name = 'A'
+    elif p_period == 6:
+        class_name = 'B'
+    elif p_period == 12:
+        class_name = 'C'
+
+    return class_name
+
+
+# 加油卡类别名称
+FUEL_CARD_CLASS = {
+    'A': u'初级理财加油卡',
+    'B': u'中极理财加油卡',
+    'C': u'高级理财加油卡',
+}
+
+
 class FuelCardIndexView(TemplateView):
     """
     APP加油卡产品购买列表展示
@@ -53,6 +88,7 @@ class FuelCardIndexView(TemplateView):
     """
 
     template_name = 'fuel_index.jade'
+
 
     def get_context_data(self, **kwargs):
         user = self.request.user
@@ -72,23 +108,19 @@ class FuelCardIndexView(TemplateView):
 
             # 按产品期限分类（初级-中级-高级）
             for p in data:
-                if p.period in range(1, 6):
-                    product_1 = p
-                elif p.period == 6:
-                    product_2 = p
-                elif p.period == 12:
-                    product_3 = p
+                product_class = classes_product_for_period(p.period) or 'C'
+                p.class_name = FUEL_CARD_CLASS[product_class]
 
         # 获取用户手机号(屏蔽)
         phone = get_phone_for_coop(user.id)
 
         # 获取用户至今总收益
-        revenue_count = get_user_revenue_count(user, u'加油卡')
+        revenue_count = get_user_revenue_count_for_type(user, u'加油卡')
 
         effect_count = get_user_amortizations(user, u'加油卡', False).count()
 
         return {
-            'products': [product_3, product_2, product_1],
+            'products': data,
             'phone': phone,
             'revenue_count': revenue_count,
             'effect_count': effect_count,
@@ -239,10 +271,15 @@ class FuelCardBugRecordView(TemplateView):
                 settled_status = True
                 sorted_term = '-term'
 
-            data = self._get_user_amortizations(self.request.user, l_type, settled_status, sorted_term)
+            user_amortizations = self._get_user_amortizations(self.request.user, l_type, settled_status, sorted_term)
+
+            # 按产品期限分类（初级-中级-高级）
+            for ua in user_amortizations:
+                product_class = classes_product_for_period(ua.product_amortization.product.period) or 'C'
+                ua.class_name = FUEL_CARD_CLASS[product_class]
 
             return {
-                'data': data,
+                'data': user_amortizations,
                 'status': _status,
             }
         else:
@@ -278,7 +315,6 @@ class FuelCardExchangeRecordView(TemplateView):
 
         status_list = ['wait_receive', 'receive']
         if _status in status_list:
-            data = []
             settled_status = False if _status == 'wait_receive' else True
             user_amortizations = get_user_amortizations(self.request.ser,
                                                         settled_status,
@@ -288,12 +324,14 @@ class FuelCardExchangeRecordView(TemplateView):
                     p2p_reward_record = P2PRewardRecord.objects.get(user=self.request.user,
                                                                     order_id=ua.product_amortization.order_id)
                     ua.reward = p2p_reward_record.reward
-                    data.append(ua)
-            else:
-                data = user_amortizations or []
+
+            # 按产品期限分类（初级-中级-高级）
+            for ua in user_amortizations:
+                product_class = classes_product_for_period(ua.product_amortization.product.period) or 'C'
+                ua.class_name = FUEL_CARD_CLASS[product_class]
 
             return {
-                'data': data,
+                'data': user_amortizations,
                 'status': _status,
             }
         else:
@@ -315,23 +353,14 @@ class FualCardStatisticsView(TemplateView):
         'fuel_card': (u'加油卡', 'fuel_statistics.jade'),
     }
 
-    def get_user_amortizations(self):
+    def get_user_amortizations(self, user, product, settled_status):
         """获取用户还款计划"""
 
-        user_amotization = UserAmortization.objects.filter(user=self.request.user, settled=True,
-                                                           product_amortization__product_category=u'加油卡'
-                                                           ).select_related(depth=2)
-        user_amotization = user_amotization.order_by('product_amortization__product_id', '-term')
+        user_amortizations = UserAmortization.objects.filter(user=user, settled=settled_status,
+                                                             product_amortization__product=product
+                                                             ).select_related(depth=2)
 
-        ua_list = []
-        ua_tmp = user_amotization.first()
-        ua_list.append(ua_tmp)
-        for ua in user_amotization:
-            if ua.product_amortization.product != ua_tmp.product_amortization.product:
-                ua_list.append(ua_tmp)
-                ua_tmp = ua
-
-        return get_sorts_for_created_time(ua_list)
+        return user_amortizations
 
     def get_context_data(self, **kwargs):
         _type = self.request.GET.get('type', '').strip()
@@ -344,16 +373,44 @@ class FualCardStatisticsView(TemplateView):
         user = self.request.user
 
         # 获取用户购标至今节省总金额
-        total_revenue = get_user_revenue_count(user, l_type)
+        total_revenue = get_user_revenue_count_for_type(user, l_type)
 
         # 获取用户注册时间
         register_time = user.date_joined
 
-        # 获取用户还款计划
-        user_amortizations = self.get_user_amortizations()
+        # 获取用户资金统计
+        data = []
+        user_amounts = get_p2p_product_amounts(user, l_type).order_by('-create_time')
+        for ua in user_amounts:
+            try:
+                p2p_product = P2PProduct.objects.get(pk=ua['product'])
+            except P2PProduct.DoesNotExist:
+                logger.error('user[%s] amount count faild product[%s] does not exists' % (user.id, ua['product']))
+                return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+            # 获取用户每产品购买份数
+            p2p_parts = float(ua['amount__sum']) / p2p_product.limit_min_per_user
+
+            # 获取用户每产品收益金额
+            offset_revenue = p2p_product.limit_min_per_user - p2p_product.equality_prize_amount
+            revenue = p2p_parts * offset_revenue
+
+            # 获取用户每产品已结算还款计划期数统计
+            settled_count = get_user_amortizations(user, p2p_product, True).count()
+
+            p2p_product.parts = p2p_parts
+            p2p_product.revenue = revenue
+            p2p_product.settled_count = settled_count
+
+            data.append(p2p_product)
+
+        # 按产品期限分类(初级-中级-高级)
+        for p2p_product in data:
+            product_class = classes_product_for_period(p2p_product.period) or 'C'
+            p2p_product.class_name = FUEL_CARD_CLASS[product_class]
 
         return {
-            'data': user_amortizations or [],
+            'data': data,
             'count': total_revenue,
             'register_time': register_time,
         }
