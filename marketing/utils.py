@@ -215,10 +215,12 @@ def generate_p2p_reward_record(user, product, order_id=None, description=None):
                 p2p_reward.save()
                 return True
             else:
-                logger.warning("unfounded p2p_reward for user[%s], channel[%s], type[%s], price[%s]" %
-                               (user_id, channel.name, _type, _price))
                 # FixMe, 如果是线上环境就给管理员发短信
                 # if ENV == ENV_PRODUCTION:
+
+                logger.warning("unfounded p2p_reward for user[%s], channel[%s], type[%s], price[%s]" %
+                               (user_id, channel.name, _type, _price))
+
         else:
             logger.info("generate p2p_reward_record failed, %s not channel user." % user_id)
     except Exception, e:

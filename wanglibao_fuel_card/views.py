@@ -161,7 +161,7 @@ class FuelCardBuyApi(APIView):
                     trader = P2PTrader(product=p2p_product, user=request.user, request=request)
                     product_info, margin_info, equity_info = trader.purchase(total_amount)
 
-                    # 给用户发送投资成功短信通知
+                    # FixMe, 补充短信内容，给用户发送投资成功短信通知
                     message = ''
                     messages_list = [message]
                     send_messages.apply_async(kwargs={
@@ -286,65 +286,6 @@ class FuelCardExchangeRecordView(TemplateView):
             }
         else:
             return HttpResponseForbidden(u'无效参数status')
-
-
-class FuelCardBuyView(TemplateView):
-    """
-    加油卡购买页面视图
-    :param
-    :return
-    :request_method GET
-    """
-
-    template_name = 'fuel_buy.jade'
-
-    def get_context_data(self, p_id, **kwargs):
-        phone = get_phone_for_coop(self.request.user.id)
-        try:
-            p2p_product = P2PProduct.objects.get(pk=p_id)
-        except P2PProduct.DoesNotExist:
-            return HttpResponseForbidden(u'无效产品ID')
-
-        using_range = get_p2p_reward_using_range(self.request.user.id, p2p_product.category,
-                                                 p2p_product.equality_prize_amount)
-
-        return {
-            'p2p_product': p2p_product,
-            'phone': phone,
-            'using_range': using_range,
-        }
-
-
-# class FuelCardListViewForApp(TemplateView):
-#     """
-#     APP加油卡产品购买列表展示
-#     :param
-#     :return
-#     :request_method GET
-#     """
-#
-#     template_name = 'fuel_index.jade'
-#
-#     def get_context_data(self, **kwargs):
-#         # 优先级越低排越前面
-#         p2p_products = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now(), category=u'加油卡',
-#                                                  status__in=[u'已完成', u'满标待打款', u'满标已打款', u'满标待审核',
-#                                                              u'满标已审核', u'还款中', u'正在招标'
-#                                                              ]).order_by('priority', '-publish_time')
-#
-#         product_data = []
-#         if p2p_products:
-#             # 根据优先级排序，并获取每种优先级的第一条记录
-#             product_data.append(p2p_products[0])
-#             unique_priority = p2p_products[0].priority
-#             for p2p_product in p2p_products[1:]:
-#                 if p2p_product.priority != unique_priority:
-#                     product_data.append(p2p_product)
-#                     unique_priority = p2p_product.priority
-#         print len(product_data)
-#         return {
-#             'products': product_data,
-#         }
 
 
 class FualCardAccountView(TemplateView):
