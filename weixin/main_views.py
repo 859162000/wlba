@@ -240,6 +240,8 @@ class P2PListFWH(APIView):
             p2p_products = paginator.page(page)
         except PageNotAnInteger:
             p2p_products = paginator.page(1)
+        except EmptyPage:
+            p2p_products = []
         except Exception:
             p2p_products = paginator.page(paginator.num_pages)
 
