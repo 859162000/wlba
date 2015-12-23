@@ -118,8 +118,8 @@ class FuelCardBuyView(TemplateView):
         product_period = p2p_product.period
 
         # 获取奖品使用范围
-        using_range = get_p2p_reward_using_range(self.request.user.id, p2p_product.category,
-                                                 p2p_product.equality_prize_amount)
+        # FixMe, 优化设计==>修改奖品使用范围设计，建议单独分离到一张表中
+        using_range = get_p2p_reward_using_range(p2p_product.category)
 
         # 获取用户手机号(屏蔽)
         phone = get_phone_for_coop(user.id)
