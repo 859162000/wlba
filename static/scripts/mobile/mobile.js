@@ -1061,13 +1061,14 @@ org.recharge = (function (org) {
         $phone: $("input[name='phone']"),
         $amount: $("input[name='amount']"),
         $vcode: $('input[name=vcode]'),
-        $card_no: null,
+        $card_no: $("input[name='card_no']"),
         $recharge_body: $('.recharge-main'),
         $load: $(".recharge-loding"),
         $validationBody: $('.validation-warp'),
         re: new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/),
         $card_warp: $('.card-warp'),
         $bank_name: $(".bank-txt-name"),
+        data: null,
         init: function () {
             lib.the_one_card();
 
@@ -1082,23 +1083,27 @@ org.recharge = (function (org) {
                 url: '/api/pay/the_one_card/',
                 success: function (data) {
                     //同卡进出
-                    _self.$load.hide();
-                    _self.$recharge_body.show();
-                    var push = {
-                        no: data.no,
-                        name: data.bank.name,
-                        gate_id: data.bank.gate_id
-                    }
-                    lib._initCard(push);
-                    lib._rechargeThe_one_card();
+                   _self.on_card_operation(data);
                 },
                 error: function (data) {
                     //没有同卡进出
                     if (data.status === 403) {
-                        lib.fetchBankList()
+                        _self.fetchBankList()
                     }
                 }
             })
+        },
+        on_card_operation: function(data){
+            var _self = this,
+            card = data.no.slice(0, 6) + '********' + data.no.slice(-4);
+
+            _self.$load.hide();
+            _self.$recharge_body.show();
+            _self.data = data;
+
+            _self.$card_no.val(card);
+            _self.$bank_name.text(data.bank.name);
+            lib._rechargeThe_one_card();
         },
         fetchBankList: function () {
             var _self = this;
@@ -1110,33 +1115,13 @@ org.recharge = (function (org) {
                         switch (data.cards.length) {
                             case 0:
                                 //没有卡
-                                window.location.href = '/weixin/regist/second/'
+                                window.location.href = '/weixin/regist/second/';
                                 break;
                             default:
-
-                                window.location.href= '/weixin/account/bankcard/';
                                 _self.$load.hide();
-                                _self.$validationBody.show();
-                                _self.$recharge_body.show();
-
-                                if( data.cards.length === 1 ){
-                                    var push = {
-                                        no: data.cards[0].storable_no,
-                                        name: data.cards[0].bank_name,
-                                        gate_id: data.cards[0].gate_id
-                                    };
-                                    lib._initCard(push);
-                                }
-
-                                if( data.cards.length > 1  ){
-                                    _self._initMoreCard(data.cards);
-                                }
-                                //显示验证码，有多张卡 不是同卡进出
-                                _self.fetchValidation()
-                                _self._rechargeNoOne()
+                                $('.bankcard').show()
                         }
                     }
-
                     if (data.ret_code > 0) {
                         return org.ui.alert(data.message);
                     }
@@ -1148,47 +1133,6 @@ org.recharge = (function (org) {
             })
         },
         /**
-         * 初始话银行卡号样式
-         * @param data
-         * @private
-         */
-        _initCard: function (data, is_one_card) {
-            var _self = this;
-            var card = data.no.slice(0, 6) + '********' + data.no.slice(-4);
-            var str = "<input type='tel' data-no='" + data.no + "'  name='card_no' value = " + card + " data-id='" + data.gate_id + "'disabled class='bank-input'>"
-            _self.$card_warp.html(str)
-            _self.$card_no = $("input[name='card_no']");
-            _self.$bank_name.text(data.name);
-        },
-        /**
-         * 初始化多张银行卡号的样式
-         * @param data
-         * @private
-         */
-        _initMoreCard: function (data) {
-            var
-                _self = this,
-                card = '',
-                str = "<select name='card_no' type='select'>";
-
-            for (var i = 0; i < data.length; i++) {
-                card = data[i].storable_no.slice(0, 6) + '********' + data[i].storable_no.slice(-4);
-                str += "<option data-no='" + data[i].storable_no + "' data-bank='" + data[i].bank_name + "' value='" + data[i].gate_id + "'>" + card + "</option>"
-            }
-
-            str += "</select>";
-
-            _self.$card_warp.html(str)
-            _self.$bank_name.text(data[0].bank_name);
-            _self.$card_no = $("select[name='card_no']");
-
-            _self.$card_no.change(function () {
-                var index = $(this)[0].selectedIndex,
-                    name = $(this).find('option').eq(index).attr('data-bank');
-                _self.$bank_name.text(name);
-            })
-        },
-        /**
          * 绑定同卡进出的卡充值
          * @private
          */
@@ -1197,8 +1141,8 @@ org.recharge = (function (org) {
 
             _self.$recharge.on('click', function () {
                 var phone = _self.$phone.val() * 1,
-                    card_no = _self.$card_no.attr('data-no') * 1,
-                    gate_id = _self.$card_no.attr('data-id') * 1,
+                    card_no = _self.data.no,
+                    gate_id = _self.data.bank.gate_id,
                     amount = _self.$amount.val() * 1;
 
                 if (!_self.re.test(phone)) {
@@ -1240,82 +1184,7 @@ org.recharge = (function (org) {
 
             });
         },
-        /**
-         * 没有绑定同卡进出获取短信
-         */
-        fetchValidation: function () {
-            var
-                _self = this,
-                $fetchValidation = $('button[name=validation]');
 
-            $fetchValidation.on('click', function () {
-                var
-                    card_no = null ,
-                    gate_id = null ,
-                    phone = _self.$phone.val() * 1,
-                    amount = _self.$amount.val() * 1,
-                    count = 60,
-                    intervalId;
-
-                if(_self.$card_no[0].nodeName == 'INPUT'){
-                    card_no = _self.$card_no.attr('data-no');
-                    gate_id = _self.$card_no.attr('data-id');
-                }
-                if(_self.$card_no[0].nodeName == 'SELECT'){
-                    card_no = _self.$card_no.find('option').eq(_self.$card_no[0].selectedIndex).attr('data-no') * 1;
-                    gate_id = _self.$card_no.val() * 1;
-                }
-
-                if (!_self.re.test(phone)) {
-                    return org.ui.showSign('请输入正确的手机号')
-                }
-                if (amount <= 0 || !amount) {
-                    return org.ui.showSign('请输入充值金额');
-                }
-
-                //倒计时
-                var timerFunction = function () {
-                    if (count > 1) {
-                        count--;
-                        return $fetchValidation.text(count + '秒后可重发');
-                    } else {
-                        clearInterval(intervalId);
-                        $fetchValidation.text('重新获取').removeAttr('disabled')
-                        return
-                    }
-                };
-
-                var data = {
-                    data: {
-                        phone: phone,
-                        card_no: card_no,
-                        amount: amount,
-                        gate_id: gate_id,
-                    },
-                    beforeSend: function () {
-                        $fetchValidation.attr('disabled', true).text("发送中..");
-                    },
-                    success: function (data) {
-                        if (data.ret_code > 0) {
-                            org.ui.showSign(data.message);
-                            return $fetchValidation.attr('disabled', true).text("获取短信码");
-                        } else {
-                            $("input[name='order_id']").val(data.order_id);
-                            $("input[name='token']").val(data.token);
-                            timerFunction();
-                            return intervalId = setInterval(timerFunction, 1000);
-                        }
-                    },
-                    error: function (data) {
-                        org.ui.showSign('系统出错');
-                        return $fetchValidation.attr('disabled', true).text("获取短信码");
-                    }
-
-                }
-                lib._rechargeSingleStep(data)
-
-            });
-        },
         /**
          * 快捷充值接口/短信验证码
          */
@@ -1338,59 +1207,6 @@ org.recharge = (function (org) {
                 }
             })
         },
-        /**
-         * 没有绑定同卡进出的卡充值，并进行绑定同卡
-         */
-        _rechargeNoOne: function () {
-            var _self = this,
-                $order_id = $('input[name=order_id]'),
-                $token = $('input[name=token]');
-
-            _self.$recharge.on('click', function () {
-                var vcode = _self.$vcode.val() * 1,
-                    amount = _self.$amount.val() * 1,
-                    phone = _self.$phone.val() * 1;
-
-                if (!_self.re.test(phone)) {
-                    return org.ui.showSign('请输入正确的手机号')
-                }
-
-                if (amount <= 0 || !amount) {
-                    return org.ui.showSign('请输入充值金额');
-                }
-                if (vcode === 0) {
-                    return org.ui.showSign('请输入短信验证码');
-                }
-
-                org.ui.confirm("充值金额为" + amount, '确认充值', pushRequest);
-                function pushRequest() {
-                    org.ajax({
-                        type: 'POST',
-                        url: '/api/pay/cnp/dynnum_new/',
-                        data: {
-                            phone: phone,
-                            vcode: vcode,
-                            order_id: $order_id.val(),
-                            token: $token.val(),
-                            set_the_one_card: true
-                        },
-                        beforeSend: function () {
-                            _self.$recharge.text("充值中...");
-                        },
-                        success: function (data) {
-                            if (data.ret_code > 0) {
-                                return org.ui.showSign(data.message);
-                            } else {
-                                $('.sign-main').css('display', '-webkit-box').find(".balance-sign").text(data.amount);
-                            }
-                        },
-                        complete: function () {
-                            _self.$recharge.text("确认充值");
-                        }
-                    })
-                }
-            });
-        }
     }
     return {
         init: lib.init
@@ -1541,69 +1357,6 @@ org.bankOneCard = (function(){
         init: lib.init
     }
 })()
-
-org.bankcardAdd = (function (org) {
-    var lib = {
-        init: function () {
-            lib._checkForm();
-        },
-        _checkForm: function () {
-            var reg = /^\d{10,20}$/;
-            $(".addBank-btn").on('click', function () {
-                var gate_id = $('#bank-select').val(),
-                    card_number = $('#card-no').val(),
-                    is_default = $('#default-checkbox').prop('checked');
-
-                if (!gate_id) {
-                    return org.ui.alert('请选择银行');
-                }
-                if (!reg.test(card_number)) {
-                    return org.ui.alert('请输入有效的银行卡号')
-                }
-                var data = {
-                    card_number: card_number,
-                    gate_id: gate_id,
-                    is_default: is_default
-                }
-
-                lib._forAddbank(data);
-            });
-        },
-        _forAddbank: function (data) {
-            org.ajax({
-                type: "POST",
-                url: '/api/bank_card/add/',
-                data: data,
-                beforeSend: function () {
-                    $(".addBank-btn").attr("disabled", "true").text("添加中...");
-                },
-                success: function (result) {
-                    if (result.ret_code === 0) {
-                        org.ui.alert("添加成功！", function () {
-                            window.location.href = '/weixin/account/bankcard/';
-                        });
-                    } else if (result.ret_code > 0) {
-                        org.ui.alert(result.message);
-                    }
-                },
-                error: function (result) {
-                    if (result.error_number === 6) {
-                        return org.ui.alert(result.message);
-                    } else {
-                        return org.ui.alert("添加银行卡失败");
-                    }
-                },
-                complete: function () {
-                    $(".addBank-btn").removeAttr("disabled").text("添加银行卡");
-                }
-
-            })
-        }
-    }
-    return {
-        init: lib.init
-    }
-})(org);
 
 org.processFirst = (function (org) {
     var lib = {
