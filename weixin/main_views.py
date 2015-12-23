@@ -179,37 +179,6 @@ class FwhP2PlistTemplate(TemplateView):
             'margin': margin
         }
 
-class FWHP2PDetail(TemplateView):
-
-    def get_context_data(self, id, **kwargs):
-        context = super(FWHP2PDetail, self).get_context_data(**kwargs)
-
-        # try:
-        #     p2p = P2PProduct.objects.select_related('activity').exclude(status=u'流标').exclude(status=u'录标')\
-        #         .get(pk=id, hide=False)
-        #
-        #     if p2p.soldout_time:
-        #         end_time = p2p.soldout_time
-        #     else:
-        #         end_time = p2p.end_time
-        # except P2PProduct.DoesNotExist:
-        #     raise Http404(u'您查找的产品不存在')
-        cache_backend = redis_backend()
-        p2p = cache_backend.get_cache_p2p_detail(id)
-        if not p2p:
-            raise Http404(u'您查找的产品不存在')
-
-        user = self.request.user
-
-        device = utils.split_ua(self.request)
-        result = backends.list_redpack(user, 'available', device['device_type'], p2p['id'])
-        redpacks = result['packages'].get('available', [])
-        context.update({
-            "p2p":p2p,
-            "redpacks":redpacks,
-        })
-        return context
-
 
 class P2PListFWH(APIView):
     permission_classes = ()
