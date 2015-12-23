@@ -1004,36 +1004,47 @@ org.calculator=(function(org){
         init : lib.init
     }
 })(org);
+var isFirstPwd = true;//true:设置交易密码，false:输入交易密码
 org.setInputPwd = (function(org){//交易密码
     var lib = {
         type: "充值",//充值or投资
-        isFirst: true, //true:设置交易密码，false:输入交易密码
+        amount: 0,
         /*
         * 交易密码
          */
-        _pageSet: function(page,tit,cont,type,isFirst,amount){//设置密码弹出层 文本设置
-            lib.type = type;//充值or投资
-            lib.isFirst = isFirst;//是否是第一次
-            lib.amount = amount; //金额
-            page.find(".pwd-tit").html(tit);
-            page.find(".pwd-promote").html(cont);
-            page.show();
-            lib._inputPwd();//弹层js
-            page.find(".js-pwd-inps").trigger("click touchstart");
+        _pageSet: function(cfg){//设置密码弹出层 文本设置
+            lib.type = cfg.type;//充值or投资
+            //lib.isFirst = cfg.isFirst;//是否是第一次
+            lib.amount = cfg.amount; //金额
+            cfg.page.find(".pwd-tit").html(cfg.title);
+            cfg.page.find(".pwd-promote").html(cfg.cont);
+            cfg.page.show();
+            lib._inputPwd(cfg.callBack,cfg.callBackOpt);//弹层js
+            cfg.page.find(".js-pwd-inps").trigger("click touchstart");
         },
-        _pwdAnimate: function(inp){
+        _pwdAnimate: function(inp,callBack,postdata){//交易密码弹出层 显示
             var startVal = '';
+            var page = inp.parents("#page-pwd");
+            var pageOption = {
+                page: page,
+                title: "设置交易密码",
+                cont: "请再次确认交易密码",
+                type: lib.type,
+                amount: lib.amount,
+                callBack: callBack,
+                callBackOpt: postdata
+            };
             inp.on("input",function(){
                 var self = $(this);
                 var val = self.val();
-                var page = inp.parents("#page-pwd");
                 if(val.length >= 6) {
-                    if(lib.isFirst){
+                    if(isFirstPwd){
                         if (page.data("num") !== 1) {
                             page.data("num", 1).hide();
                             startVal = val;
                             self.val("");
-                            lib._pageSet(page, "设置交易密码", "请再次确认交易密码", lib.type, true);
+                            //lib._pageSet(page, "设置交易密码", "请再次确认交易密码", lib.type, true, callBack);
+                            lib._pageSet(pageOption);
                         } else {
                             page.data("num", 2).hide();
                             self.val("");
@@ -1041,26 +1052,44 @@ org.setInputPwd = (function(org){//交易密码
                                 $("#page-error").show();//密码两次输入不一致
                             }else{
                                 //------------此处密码输入后的函数-------------//
-                                $("#page-net").show();//网络断开
+                                callBack && callBack(val,postdata);
+                                //if(callBack && callBack(val)){
+                                //    console.log(2,postdata);
+                                //    org.recharge.rechargeSingleStep(postdata,val);
+                                //}
+                                //$("#page-net").show();//网络断开
                             }
                         }
                     }else{
                         lib._inpPwdHide(self);
                         //------------此处密码输入后的函数-------------//
+                        //if(callBack === "none"){
+                        org.recharge.rechargeSingleStep(postdata,val);
+                        //}
                         //org.ui.confirm("交易密码输入不正确，您还可以输入2次", "重新输入", lib._inpPwdShow, lib.amount);//密码错误
                         //org.ui.alert("<p class='lock-pwd'>交易密码已被锁定，请3小时后再试<br />如想找回密码，请通过网站或APP找回</p>", closePage,  "知道了");
-                        if(lib.type === "充值"){
-                            $("#page-ok").show().find("#total-money").text("11800");//密码正确
-                        }else{
-                            $("#page-ok").show();
-                        }
+                        //if(lib.type === "充值"){
+                        //    $("#page-ok").show().find("#total-money").text("11800");//密码正确
+                        //}else{
+                        //    $("#page-ok").show();
+                        //}
 
                     }
                 }
             });
         },
-        _inpPwdShow: function(type,amount){//显示 输入交易密码
-            lib._pageSet($("#page-pwd"),"请输入交易密码",type+"金额<br />￥"+amount);
+        _inpPwdShow: function(opt){//显示 输入交易密码
+            //lib._pageSet($("#page-pwd"),"请输入交易密码",type+"金额<br />￥"+amount,type,false,amount,callBack);
+            var pageOption = {
+                page: $("#page-pwd"),
+                title: "请输入交易密码",
+                cont: opt.type + "金额<br />￥" + opt.amount,
+                type: opt.type,
+                amount: opt.amount,
+                callBack: opt.callBack,
+                callBackOpt: opt.callBackOpt
+            };
+            lib._pageSet(pageOption);
         },
         _inpPwdHide: function(self){//隐藏 交易密码
             var tp = self.parents(".page-alt");
@@ -1080,16 +1109,16 @@ org.setInputPwd = (function(org){//交易密码
                 obj.selectionStart = obj.selectionEnd = len;
             }
         },
-        _inputPwd: function(){
-            $(".js-pwd-inps").on("click touchstart",function(e){//点击弹出层输入框
+        _inputPwd: function(callBack,postdata){
+            var inpDom = $(".js-pwd-inps");
+            var inp = inpDom.find("input.pwd-input");
+            inpDom.on("click touchstart",function(e){//点击弹出层输入框
                 e.stopPropagation();
                 e.preventDefault();
-                var self = $(this);
-                var inp = self.find("input.pwd-input");
-                //inp.focus();
+                inp.focus();
                 lib._inpMoveEnd(inp);
-                lib._pwdAnimate(inp);
             });
+            lib._pwdAnimate(inp,callBack,postdata);
             $(".page-close").on("click",function(){
                 lib._inpPwdHide($(this));
             });
@@ -1106,6 +1135,22 @@ org.setInputPwd = (function(org){//交易密码
         inputPwd: lib._inpPwdShow
     }
 })(org);
+function setTradePwd(pwd,postdata){
+    org.ajax({
+        url: '/api/trade_pwd/',
+        type: 'post',
+        data: {"action_type":1,"new_trade_pwd":pwd},
+        dataType : 'json',
+        success:function(data){
+            console.log(data);
+            org.recharge.rechargeSingleStep(postdata,pwd);
+        },
+        error: function (xhr) {
+            console.log("充值失败",xhr);
+            //code = data.ret_code;
+        }
+    });
+}
 org.recharge=(function(org){
     var lib = {
         canRecharge: true,
@@ -1271,54 +1316,68 @@ org.recharge=(function(org){
                      return org.ui.alert('最高充值'+ maxamount +'元！');
                 }
                 if(lib.canRecharge){
+                    var postdata = {
+                        card_no: card_no,
+                        amount: amount
+                    };
+                    var pageOption = {//设置交易密码 参数
+                        page: $("#page-pwd"),
+                        title: "设置交易密码",
+                        cont: "为了您账户资金安全，请设置交易密码",
+                        type: "充值",
+                        amount: amount,
+                        callBack: setTradePwd,
+                        callBackOpt: postdata
+                    };
+                    var inputOption = { //输入交易密码 参数
+                        type: "充值",
+                        amount: amount,
+                        callBack: "none",
+                        callBackOpt: postdata
+                    };
                     org.ajax({
                         url: '/api/profile/',
-                        type: 'POST',
-                        //data: options.data,
-                        //dataType : 'json',
+                        type: 'GET',
                         success:function(data){
-                            console.log(data);
+                            if(data.trade_pwd_is_set){
+                                //org.setInputPwd.inputPwd("充值",amount);
+                                isFirstPwd = false;
+                                org.setInputPwd.inputPwd(inputOption);//充值
+                            }else{
+                                isFirstPwd = true;
+                                org.setInputPwd.pageSet(pageOption);//首次充值
+                            }
                         },
                         error: function (xhr) {
                             console.log("充值失败",xhr);
                         }
                     });
-                    //if(self.data("first")){
-                    //    //lib._pageSet($("#page-pwd"),"设置交易密码","为了您账户资金安全，请设置交易密码");
-                    //    org.setInputPwd.pageSet($("#page-pwd"),"设置交易密码","为了您账户资金安全，请设置交易密码","充值",true, amount);
-                    //}else{
-                    //    //lib._inpPwdShow(amount);
-                    //    org.setInputPwd.inputPwd("充值",amount);
-                    //}
 
-                    //var postdata = {
-                    //    card_no: card_no,
-                    //    amount: amount
-                    //};
                     //org.ui.confirm("充值金额为"+amount, '确认充值', lib._rechargeSingleStep, postdata)
                 }else{
                     return org.ui.alert('充值中，请稍后');
                 }
-
             });
         },
         /*
         * 快捷充值接口业务
          */
-        _rechargeSingleStep: function(getdata) {
+        _rechargeSingleStep: function(getdata,pwd) {
             org.ajax({
                 type: 'POST',
-                url: '/api/pay/deposit/',
-                data: {card_no: getdata.card_no, amount: getdata.amount},
+                url: '/api/pay/deposit_new/',
+                data: {card_no: getdata.card_no, amount: getdata.amount, trade_pwd: pwd},
                 beforeSend:function(){
                     lib.canRecharge = false;
                     $('#secondBtn').text("充值中..");
                 },
                 success: function(data) {
+                    console.log(data);
                     if(data.ret_code > 0) {
                         return org.ui.alert(data.message);
                     } else {
-                         $('.sign-main').css('display','-webkit-box').find(".balance-sign").text(data.amount);
+                        $('#page-ok').css('display','-webkit-box').find("#total-money").text(data.margin);
+                        $(".bank-account-num span.num").text(data.margin);
                     }
                 },
                 error:function(data){
@@ -1334,7 +1393,8 @@ org.recharge=(function(org){
         }
     };
     return {
-        init : lib.init
+        init : lib.init,
+        rechargeSingleStep: lib._rechargeSingleStep
     }
 })(org);
 /*
