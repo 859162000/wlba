@@ -538,16 +538,16 @@ class AmortizationKeeper(KeeperBaseMixin):
                                                                   # sub_amo.settlement_time,
                                                                   amo_amount))
 
-                # FixMe, 发送站内信
-                title, content = messages.msg_bid_amortize(pname, timezone.now(), amo_amount)
-                inside_message.send_one.apply_async(kwargs={
-                    "user_id": sub_amo.user.id,
-                    "title": title,
-                    "content": content,
-                    "mtype": "amortize"
-                })
-                self.__tracer(catalog, sub_amo.user, sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
-                              amortization, description, sub_amo.coupon_interest)
+                    # 发送站内信
+                    title, content = messages.msg_bid_amortize(pname, timezone.now(), amo_amount)
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id": sub_amo.user.id,
+                        "title": title,
+                        "content": content,
+                        "mtype": "amortize"
+                    })
+                    self.__tracer(catalog, sub_amo.user, sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
+                                  amortization, description, sub_amo.coupon_interest)
 
                 # 标的每一期还款完成后,检测该用户还款的本金是否有符合活动的规则,有的话触发活动规则
                 try:
