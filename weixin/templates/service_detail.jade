@@ -7,12 +7,15 @@ html
     include include/service_head.jade
   body
     .service-detail-part1
-      .service-detail-tit.invest-one(data-protuctid="2436") 车辆抵押贷款［卡雷拉 保时捷911］
+      .service-detail-tit.invest-one(data-protuctid="{{p2p.id}}") {{p2p.name}}
+      earning_rate = float(p2p['expected_earning_rate'])
+      if p2p.activity
+        earning_rate = earning_rate + float(p2p['activity']['activity_rule_percent_text'])
       .service-detail-info
         .service-detail-lft
           .gery 年化收益
           .num
-            span.big 10.5
+            span.big {{earning_rate}}
             | %
         .service-detail-rht
           .gery 还款期限

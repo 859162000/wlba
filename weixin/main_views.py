@@ -181,7 +181,7 @@ class FwhP2PlistTemplate(TemplateView):
 
 class FWHP2PDetail(TemplateView):
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, id, **kwargs):
         context = super(FWHP2PDetail, self).get_context_data(**kwargs)
 
         # try:
