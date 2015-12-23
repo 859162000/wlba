@@ -28,9 +28,6 @@ class P2PTrader(P2PTraderBase):
             if product_record.product_balance_after <= 0:
                 is_full = True
 
-        # 投标成功给用户内信
-        # FixMe
-
         # 满标给管理员发短信
         if is_full:
             from wanglibao_p2p.tasks import full_send_message
