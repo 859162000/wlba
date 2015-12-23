@@ -163,7 +163,7 @@ class FuelCardBuyApi(APIView):
                     trader = P2PTrader(product=p2p_product, user=request.user, request=request)
                     product_info, margin_info, equity_info = trader.purchase(total_amount)
 
-                    # 给用户发送投资成功短信通知
+                    # FixMe, 补充短信内容，给用户发送投资成功短信通知
                     message = ''
                     messages_list = [message]
                     send_messages.apply_async(kwargs={
