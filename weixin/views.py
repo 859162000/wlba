@@ -976,16 +976,21 @@ class WeixinRechargeSecond(TemplateView):
 
 class WeixinTransaction(TemplateView):
     template_name = 'weixin_transaction.jade'
-
+    source = 'weixin'
     def get_template_names(self):
         status = self.kwargs['status']
         if status == 'buying':
             template_name = 'weixin_transaction_buying.jade'
+            if self.source=='fwh':
+                template_name = 'service_transaction_buying.jade'
         elif status == 'finished':
             template_name = 'weixin_transaction_finished.jade'
+            if self.source=='fwh':
+                template_name = 'service_transaction_finished.jade'
         else:
             template_name = 'weixin_transaction.jade'
-
+            if self.source=='fwh':
+                template_name = 'service_transaction_repay.jade'
         return template_name
 
     def get_context_data(self, status, **kwargs):
