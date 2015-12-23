@@ -62,8 +62,8 @@
         redpack();
         function redpack() {
             $.ajax({
-                url: '/api/rock/finance/old/user/',
-                type: "GET",
+                url: '/api/rock/finance/old_user/',
+                type: "POST",
                 data: {}
             }).done(function (damai) {
 
