@@ -21,6 +21,7 @@ from wanglibao_buy.models import FundHoldInfo
 from wanglibao_banner.models import Banner
 from wanglibao_p2p.models import P2PEquity, P2PProduct
 from wanglibao_p2p.amortization_plan import get_amortization_plan
+from wanglibao_pay.third_pay import card_bind_list
 from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from django.contrib.auth.models import User
@@ -1178,10 +1179,15 @@ class WeixinAccountSecurity(TemplateView):
 class WeixinAccountBankCard(TemplateView):
     template_name = 'weixin_bankcard.jade'
 
+    # def get_context_data(self, **kwargs):
+    #     p2p_cards = Card.objects.filter(user__exact=self.request.user)
+    #     return {
+    #         'p2p_cards': p2p_cards,
+    #     }
     def get_context_data(self, **kwargs):
-        p2p_cards = Card.objects.filter(user__exact=self.request.user)
+        result = card_bind_list(self.request)
         return {
-            'p2p_cards': p2p_cards,
+            'p2p_cards': result['cards']
         }
 
 

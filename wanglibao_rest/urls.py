@@ -180,7 +180,7 @@ urlpatterns = patterns(
     #url(r'^pay/deposit/callback/$', KuaiPayCallbackView.as_view(), name="kuai-deposit-callback"),
     url(r'^pay/deposit/callback/$', csrf_exempt(KuaiShortPayCallbackView.as_view()), name="kuai-deposit-callback"),
     # 同卡进出
-    url(r'^pay/the_one_card', TheOneCardAPIView.as_view()),
+    url(r'^pay/the_one_card/$', TheOneCardAPIView.as_view()),
 
 
     url(r'^client_update/$', ClientUpdateAPIView.as_view()),
