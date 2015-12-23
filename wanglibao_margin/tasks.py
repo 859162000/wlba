@@ -5,7 +5,6 @@ from django.db import transaction
 
 from wanglibao import settings
 from wanglibao.celery import app
-from django.contrib.auth.models import User
 
 from wanglibao_margin.models import MonthProduct, AssignmentOfClaims
 from wanglibao_margin.php_utils import PhpMarginKeeper
@@ -19,131 +18,96 @@ def save_to_sqs(url, data):
 
 
 @app.task
-def buy_month_product(trade_id, user_id, product_id, token, amount, amount_source, red_packet, red_packet_type):
+def buy_month_product(token=None):
+    """
+    对这个购买的月利宝记录进行扣款冻结操作.
+    :param token: month_product's unique token.
+    ###  :param product: pass a month_product object error!
+    :return:
+    """
+    product = MonthProduct.objects.filter(token=token).first()
+    if not product:
+        return
 
     ret = dict()
 
-    try:
-        user = User.objects.get(pk=user_id)
-        assignment, status = MonthProduct.objects.get_or_create(
-            user=user,
-            product_id=product_id,
-            trade_id=trade_id,
-            token=token,
-            amount=amount,
-            amount_source=amount_source,
-            red_packet=red_packet,
-            red_packet_type=red_packet_type,
-        )
+    if product.trade_status != 'NEW':
+        ret.update(status=1,
+                   token=product.token,
+                   msg='already saved!')
+    else:
         # 状态成功, 对买家扣款, 加入冻结资金
-        if status:
-            try:
-                buyer_keeper = PhpMarginKeeper(user, product_id)
-                buyer_keeper.freeze(amount, description='')
-                assignment.pay_status = True
-                assignment.save()
-                ret.update(status=1,
-                           token=token,
-                           msg='success')
-            except Exception, e:
-                ret.update(status=0,
-                           token=token,
-                           msg=str(e))
-        else:
-            if assignment.pay_status:
-                ret.update(status=1,
-                           token=token,
-                           msg='already saved!')
-            else:
-                ret.update(status=0,
-                           token=token,
-                           msg='pay failed!')
-
-    except Exception, e:
-        ret.update(status=0,
-                   token=token,
-                   msg=str(e))
+        try:
+            buyer_keeper = PhpMarginKeeper(product.user, product.product_id)
+            buyer_keeper.freeze(product.amount, description='')
+            product.trade_status = 'PAID'
+            product.save()
+            ret.update(status=1,
+                       token=product.token,
+                       msg='success')
+        except Exception, e:
+            product.trade_status = 'FAILED'
+            product.save()
+            ret.update(status=0,
+                       token=product.token,
+                       msg='pay failed!' + str(e))
 
     # 写入 sqs
-    data = dict()
-    data.update(tag='purchaseYueLiBao')
-    data.update(data=ret)
+    args_data = dict()
+    args_data.update(tag='purchaseYueLiBao')
+    args_data.update(data=ret)
 
-    data = simplejson.dumps(data)
-    url = settings.PHP_SQS_HOST
-    ret = save_to_sqs(url, data)
+    args = simplejson.dumps(args_data)
+    request_url = settings.PHP_SQS_HOST
+    res = save_to_sqs(request_url, args)
 
-    print ret.text
+    print res.text
 
 
 @app.task
-def assignment_buy(buyer_id, seller_id, product_id, buy_order_id, sell_order_id, buyer_token, seller_token,
-                   fee, premium_fee, trading_fee, buy_price, sell_price, buy_price_source, sell_price_source):
+def assignment_buy(buyer_token=None, seller_token=None):
     """
-
-    :param buyer_id:
-    :param seller_id:
-    :param product_id:
-    :param buy_order_id:
-    :param sell_order_id:
     :param buyer_token:
     :param seller_token:
-    :param fee:
-    :param premium_fee:
-    :param trading_fee:
-    :param buy_price:
-    :param sell_price:
-    :param buy_price_source:
-    :param sell_price_source:
     :return:
     """
+    assignment = AssignmentOfClaims.objects.filter(buyer_token=buyer_token, seller_token=seller_token).first()
+    if not assignment:
+        return
+
     ret = dict()
 
-    try:
-        buyer = User.objects.get(pk=buyer_id)
-        seller = User.objects.get(pk=seller_id)
-        assignment, status = AssignmentOfClaims.objects.get_or_create(
-            product_id=product_id,
-            buyer=buyer,
-            seller=seller,
-            buyer_order_id=buy_order_id,
-            seller_order_id=sell_order_id,
-            buyer_token=buyer_token,
-            seller_token=seller_token,
-            fee=fee,
-            premium_fee=premium_fee,
-            trading_fee=trading_fee,
-            buy_price=buy_price,
-            sell_price=sell_price,
-            buy_price_source=buy_price_source,
-            sell_price_source=sell_price_source
-        )
-        # 状态成功, 对买家扣款, 卖家回款.
-        if status:
-            try:
-                with transaction.atomic(savepoint=True):
-                    # status == 0 加钱, 其他减钱. 这直接对买家余额减钱, 卖家余额加钱
-                    buyer_keeper = PhpMarginKeeper(buyer, )
-                    seller_keeper = PhpMarginKeeper(seller, )
-                    buyer_keeper.margin_process(buyer, 1, buy_price, description=u'', catalog=u"买债转")
-                    seller_keeper.margin_process(seller, 0, sell_price, description=u'', catalog=u"卖债转")
+    if assignment.trade_status != 'NEW':
+        ret.update(status=1,
+                   buyToken=assignment.buyer_token,
+                   sellToken=assignment.seller_token,
+                   msg='already saved!')
 
-                    # 如果加减钱成功后, 更新债转的表的状态为成功
-                    assignment.status = True
-                    assignment.save()
-                    ret.update(status=1,
-                               buyer_token=buyer_token,
-                               seller_token=seller_token,
-                               msg='success')
-            except Exception, e:
-                ret.update(status=0,
-                           msg=str(e))
-        else:
+    else:
+        # 状态成功, 对买家扣款, 卖家回款.
+        try:
+            with transaction.atomic(savepoint=True):
+                # status == 0 加钱, 其他减钱. 这直接对买家余额减钱, 卖家余额加钱
+                buyer_keeper = PhpMarginKeeper(assignment.buyer, )
+                seller_keeper = PhpMarginKeeper(assignment.seller, )
+                buyer_keeper.margin_process(
+                    assignment.buyer, 1, assignment.buy_price, description=u'', catalog=u"买债转")
+                seller_keeper.margin_process(
+                    assignment.seller, 0, assignment.sell_price, description=u'', catalog=u"卖债转")
+
+                # 如果加减钱成功后, 更新债转的表的状态为成功
+                assignment.trade_status = 'PAID'
+                assignment.save()
+                ret.update(status=1,
+                           buyToken=assignment.buyer_token,
+                           sellToken=assignment.seller_token,
+                           msg='success')
+        except Exception, e:
+            assignment.trade_status = 'FAILED'
             ret.update(status=0,
-                       msg='save error')
-    except Exception, e:
-        ret.update(status=0,
-                   msg=str(e))
+                       buyToken=assignment.buyer_token,
+                       sellToken=assignment.seller_token,
+                       msg=str(e))
 
     # 写入 sqs
     data = dict()

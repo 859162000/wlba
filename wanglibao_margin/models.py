@@ -78,10 +78,16 @@ class MonthProduct(models.Model):
     月利宝model, 记录主要字段.
     """
     RED_PACKET_TYPE = (
-        ("-1", "加息不存在"),
-        ("0", "加息券加息"),
-        ("1", "红包加息"),
+        ("-1", u"加息不存在"),
+        ("0", u"加息券加息"),
+        ("1", u"红包加息"),
     )
+    TRADE_STATUS = (
+        ('New', u'未处理'),
+        ('PAID', u'支付成功'),
+        ('FAILED', u'支付失败'),
+    )
+
     user = models.ForeignKey(User, related_name='month_product_buyer', verbose_name=u'买家')
     product_id = models.CharField(verbose_name=u'月利宝产品ID', max_length=100)
     trade_id = models.CharField(verbose_name=u'交易ID', max_length=100)
@@ -93,7 +99,7 @@ class MonthProduct(models.Model):
                                        choices=RED_PACKET_TYPE, default='-1', max_length=32)
 
     cancel_status = models.BooleanField(default=False, verbose_name=u'是否已取消')   # 流标, 用户冻结金额恢复状态
-    pay_status = models.BooleanField(default=False, verbose_name=u'是否已支付')      # 满标审核后用户支付状态
+    trade_status = models.CharField(choices=TRADE_STATUS, default='NEW', max_length=8, verbose_name=u'交易状态')
 
     created_at = models.DateTimeField(verbose_name=u'月利宝生效时间', auto_now_add=True)
 
@@ -107,6 +113,12 @@ class AssignmentOfClaims(models.Model):
     buy_price = buy_price_source + 手续费
     sell_price = sell_price_source + premium_fee + fee
     """
+    TRADE_STATUS = (
+        ('New', u'未处理'),
+        ('PAID', u'支付成功'),
+        ('FAILED', u'支付失败'),
+    )
+
     product_id = models.CharField(verbose_name=u'债权产品ID', max_length=100)
     buyer = models.ForeignKey(User, related_name='assignment_buyer', verbose_name=u'买家')
     seller = models.ForeignKey(User, related_name='assignment_seller', verbose_name=u'卖家')
@@ -123,8 +135,10 @@ class AssignmentOfClaims(models.Model):
     sell_price = models.DecimalField(verbose_name=u'( 售方 ) 实收金额', max_digits=12, decimal_places=2)
     buy_price_source = models.DecimalField(verbose_name=u'( 买方 )原始交易价格', max_digits=12, decimal_places=2)
     sell_price_source = models.DecimalField(verbose_name=u'( 售方 )原始交易价格', max_digits=12, decimal_places=2)
+
     # 只有在买卖双方的钱处理完毕之后才把状态置为True
     status = models.BooleanField(default=False, verbose_name=u'是否标记')
+    trade_status = models.CharField(choices=TRADE_STATUS, default='NEW', max_length=8, verbose_name=u'交易状态')
     created_at = models.DateTimeField(verbose_name=u'债转生效时间', auto_now_add=True)
 
     def get_status(self):

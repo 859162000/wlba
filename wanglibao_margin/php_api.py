@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # encoding:utf-8
-import datetime
+
 from django.contrib import auth
 from django.db import transaction
 from django.db.models import Q
@@ -78,7 +78,6 @@ def logout_with_cookie(request, next_page='/'):
 
 class GetMarginInfo(APIView):
     """
-    author: Zhoudong
     http请求方式: GET  根据用户ID 得到用户可用余额。
     http://xxxxxx.com/php/margin/?user_id=11111
     返回数据格式：json
@@ -96,7 +95,6 @@ class GetMarginInfo(APIView):
 
 class GetUnreadMgsNum(APIView):
     """
-    author: Zhoudong
     http请求方式: GET  根据用户ID 得到用户可用余额。
     http://xxxxxx.com/php/margin/?user_id=11111
     返回数据格式：json
@@ -114,7 +112,6 @@ class GetUnreadMgsNum(APIView):
 
 class GetUserUnreadMgsNum(APIView):
     """
-    author: Zhoudong
     http请求方式: GET  根据用户ID 得到用户可用余额。
     http://xxxxxx.com/php/margin/?user_id=11111
     返回数据格式：json
@@ -132,7 +129,6 @@ class GetUserUnreadMgsNum(APIView):
 
 class SendInsideMessage(APIView):
     """
-    author: Zhoudong
     http请求方式: POST  发送站内信。
     http://xxxxxx.com/php/send_message/inside/
     返回数据格式：json
@@ -164,7 +160,6 @@ class SendInsideMessage(APIView):
 
 class SendMessages(APIView):
     """
-    author: Zhoudong
     http请求方式: POST  短信。
     http://xxxxxx.com/php/send_messages/
     返回数据格式：json
@@ -203,7 +198,6 @@ class SendMessages(APIView):
 
 class CheckTradePassword(APIView):
     """
-    author: Zhoudong
     http请求方式: POST  检查交易密码。
     http://xxxxxx.com/php/trade_password/
     返回数据格式：json
@@ -225,7 +219,6 @@ class CheckTradePassword(APIView):
 
 class YueLiBaoBuy(APIView):
     """
-    author: Zhoudong
     http请求方式: POST  保存PHP的月利宝流水, 处理扣款, 加入冻结资金
     http://xxxxxx.com/php/yue/buy/
     返回数据格式：json
@@ -245,25 +238,29 @@ class YueLiBaoBuy(APIView):
         red_packet = request.POST.get('redPacketAmount')
         red_packet_type = request.POST.get('isRedPacket')
 
-        if trade_id and user_id and product_id and token and amount\
-                and amount_source and red_packet and red_packet_type:
-            try:
-                buy_month_product.apply_async(
-                    kwargs={'trade_id': trade_id, 'user_id': user_id, 'product_id': product_id,
-                            'token': token, 'amount': amount, 'amount_source': amount_source,
-                            'red_packet': red_packet, 'red_packet_type': red_packet_type})
-            except Exception, e:
-                print e
+        try:
+            user = User.objects.get(pk=user_id)
+            product, status = MonthProduct.objects.get_or_create(
+                user=user,
+                product_id=product_id,
+                trade_id=trade_id,
+                token=token,
+                amount=amount,
+                amount_source=amount_source,
+                red_packet=red_packet,
+                red_packet_type=red_packet_type,
+            )
 
+            buy_month_product.apply_async(kwargs={'token': token})
             return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
-        else:
+
+        except Exception, e:
             return HttpResponse(renderers.JSONRenderer().render(
-                {'status': '0', 'msg': 'args error!'}, 'application/json'))
+                {'status': '0', 'msg': 'args error! ' + str(e)}, 'application/json'))
 
 
 class YueLiBaoBuyFail(APIView):
     """
-    author: Zhoudong
     http请求方式: POST  当主站扣款成功, 新平台没接收到, 调用该接口说明购买失败
     http://xxxxxx.com/php/yue/fail/
     :return: status = 1  成功, status = 0 失败 .
@@ -312,7 +309,6 @@ class YueLiBaoBuyFail(APIView):
 
 class YueLiBaoBuyStatus(APIView):
     """
-    author: Zhoudong
     http请求方式: POST
     http://xxxxxx.com/php/yue/status/
     :return: status = 1  成功, status = 0 失败 .
@@ -330,8 +326,10 @@ class YueLiBaoBuyStatus(APIView):
 
         if not product:
             ret.update(status=-1, msg='trade does not exist!')
-        elif product.pay_status:
-            ret.update(status=1, msg='trade success!')
+        elif product.trade_status == 'NEW':
+            ret.update(status=1, msg='processing!')
+        elif product.trade_status == 'PAID':
+            ret.update(status=2, msg='success!')
         else:
             ret.update(status=0,
                        msg='pay failed!')
@@ -340,7 +338,6 @@ class YueLiBaoBuyStatus(APIView):
 
 class YueLiBaoCheck(APIView):
     """
-    author: Zhoudong
     http请求方式: POST  满标审核完毕, 减去冻结资金
     http://xxxxxx.com/php/yue/check/
     返回数据格式：json
@@ -358,18 +355,14 @@ class YueLiBaoCheck(APIView):
         try:
             with transaction.atomic(savepoint=True):
                 month_products = MonthProduct.objects.filter(
-                    product_id=product_id, cancel_status=False, pay_status=False)
+                    product_id=product_id, cancel_status=False, trade_status='PAID')
 
                 for product in month_products:
                     # 已支付, 直接返回成功
-                    if not product.pay_status:
-                        user = product.user
-                        product_id = product.product_id
-                        buyer_keeper = PhpMarginKeeper(user, product_id)
-                        trace = buyer_keeper.settle(product.amount, description='')
-                        if trace:
-                            product.pay_status = True
-                            product.save()
+                    user = product.user
+                    product_id = product.product_id
+                    buyer_keeper = PhpMarginKeeper(user, product_id)
+                    buyer_keeper.settle(product.amount, description='')
 
                 # 进行全民淘金数据写入
                 calc_php_commission(product_id)
@@ -384,7 +377,6 @@ class YueLiBaoCheck(APIView):
 
 class YueLiBaoCancel(APIView):
     """
-    author: Zhoudong
     http请求方式: POST  流标, 钱原路返回
     http://xxxxxx.com/php/yue/cancel/
     返回数据格式：json 外层 status = 1 API 成功, 里层status = 1 当个订单返回成功.
@@ -427,7 +419,6 @@ class YueLiBaoCancel(APIView):
 
 class YueLiBaoRefund(APIView):
     """
-    author: Zhoudong
     http请求方式: POST  投资到期回款.
     http://xxxxxx.com/php/yue/refund/
     refundId 还款记录ID 月利宝还款计划表id
@@ -501,7 +492,6 @@ class YueLiBaoRefund(APIView):
 
 class AssignmentOfClaimsBuy(APIView):
     """
-    author: Zhoudong
     http请求方式: POST  保存PHP的债转流水, 处理扣款,
     http://xxxxxx.com/php/assignment/buy/
     返回数据格式：json
@@ -527,27 +517,38 @@ class AssignmentOfClaimsBuy(APIView):
         buy_price_source = request.POST.get('buyPriceSource')
         sell_price_source = request.POST.get('sellPriceSource')
 
-        if buyer_id and seller_id and product_id and buy_order_id and sell_order_id and buyer_token and seller_token\
-                and fee and premium_fee and trading_fee and buy_price and sell_price and buy_price_source \
-                and sell_price_source:
+        try:
+            buyer = User.objects.get(pk=buyer_id)
+            seller = User.objects.get(pk=seller_id)
+            assignment, status = AssignmentOfClaims.objects.get_or_create(
+                product_id=product_id,
+                buyer=buyer,
+                seller=seller,
+                buyer_order_id=buy_order_id,
+                seller_order_id=sell_order_id,
+                buyer_token=buyer_token,
+                seller_token=seller_token,
+                fee=fee,
+                premium_fee=premium_fee,
+                trading_fee=trading_fee,
+                buy_price=buy_price,
+                sell_price=sell_price,
+                buy_price_source=buy_price_source,
+                sell_price_source=sell_price_source
+            )
 
             assignment_buy.apply_async(
-                kwargs={'buyer_id': buyer_id, 'seller_id': seller_id, 'product_id': product_id,
-                        'buy_order_id': buy_order_id, 'sell_order_id': sell_order_id, 'buyer_token': buyer_token,
-                        'seller_token': seller_token, 'fee': fee, 'premium_fee': premium_fee,
-                        'trading_fee': trading_fee, 'buy_price': buy_price, 'sell_price': sell_price,
-                        'buy_price_source': buy_price_source, 'sell_price_source': sell_price_source})
+                kwargs={'buyer_token': buyer_token, 'seller_token': seller_token})
 
             return HttpResponse(renderers.JSONRenderer().render({'status': '1'}, 'application/json'))
 
-        else:
+        except Exception, e:
             return HttpResponse(renderers.JSONRenderer().render(
-                {'status': '0', 'msg': 'args error!'}, 'application/json'))
+                {'status': '0', 'msg': 'args error! ' + str(e)}, 'application/json'))
 
 
 class AssignmentBuyStatus(APIView):
     """
-    author: Zhoudong
     http请求方式: POST
     http://xxxxxx.com/php/yue/status/
     :return: status = 1  成功, status = 0 失败 .
@@ -566,17 +567,19 @@ class AssignmentBuyStatus(APIView):
 
         if not assignment:
             ret.update(status=-1, msg='trade does not exist!')
-        elif assignment.status:
-            ret.update(status=1, msg='trade success!')
+        elif assignment.trade_status == 'NEW':
+            ret.update(status=1, msg='processing!')
+        elif assignment.trade_status == 'PAID':
+            ret.update(status=2, msg='success!')
         else:
             ret.update(status=0,
-                       msg='assignment pay failed!')
+                       msg='pay failed!')
+
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
 
 
 class AssignmentBuyFail(APIView):
     """
-    author: Zhoudong
     http请求方式: POST  当主站扣款成功, 新平台没接收到, 调用该接口说明购买失败
     http://xxxxxx.com/php/assignment/fail/
     :return: status = 1  成功, status = 0 失败 .
