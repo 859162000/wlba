@@ -9,7 +9,7 @@ import logging
 from decimal import Decimal
 from django.http import HttpResponseRedirect, Http404
 from django.core.paginator import Paginator
-from django.core.paginator import PageNotAnInteger
+from django.core.paginator import PageNotAnInteger, EmptyPage
 from django.conf import settings
 
 from weixin.common.decorators import weixin_api_error
@@ -165,6 +165,8 @@ class FwhP2PlistTemplate(TemplateView):
             p2p_products = paginator.page(page)
         except PageNotAnInteger:
             p2p_products = paginator.page(1)
+        except EmptyPage:
+            p2p_products = []
         except Exception:
             p2p_products = paginator.page(paginator.num_pages)
 
