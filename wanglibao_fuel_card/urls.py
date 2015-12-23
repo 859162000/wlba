@@ -10,7 +10,8 @@ urlpatterns = patterns(
     #test
     url(r'^index/$', views.FuelCardIndexView.as_view(), name='index'),
     url(r'^login/$', TemplateView.as_view(template_name="fuel_login.jade")),
-    url(r'^buy/$', TemplateView.as_view(template_name="fuel_buy.jade")),
+    url(r'^buy/(?P<p_id>\w+)/$', login_required(views.FuelCardBuyView.as_view(), login_url='/fuel/login/'), name='fuel_buy'),
+
     url(r'^recharge/$', TemplateView.as_view(template_name="fuel_recharge.jade")),
     url(r'^account/$', TemplateView.as_view(template_name="fuel_account.jade")),
     url(r'^change/login-psw/$', TemplateView.as_view(template_name="fuel_changePSW.jade")),

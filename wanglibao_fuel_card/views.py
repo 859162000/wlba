@@ -73,22 +73,23 @@ class FuelCardIndexView(TemplateView):
             for p in data:
                 if p.period in range(1, 6):
                     product_1 = p
+                    product_1.car = '适合12万以内车型'
                 elif p.period == 6:
                     product_2 = p
+                    product_2.car = '适合12～25万以内车型'
                 elif p.period == 12:
                     product_3 = p
+                    product_3.car = '适合25万以上车型'
 
         # 获取用户手机号(屏蔽)
-        phone = get_phone_for_coop(user.id)
+        #phone = get_phone_for_coop(user.id)
 
         # 获取用户至今总收益
         revenue_count = get_user_revenue_count(user, u'加油卡')
 
         effect_count = get_user_amortizations(user, u'加油卡', False).count()
-
         return {
-            'products': [product_3, product_2, product_1],
-            'phone': phone,
+            'products': [product_1, product_2, product_3],
             'revenue_count': revenue_count,
             'effect_count': effect_count,
         }
@@ -105,7 +106,6 @@ class FuelCardBuyView(TemplateView):
     template_name = 'fuel_buy.jade'
 
     def get_context_data(self, p_id, **kwargs):
-        user = self.request.user
 
         try:
             p2p_product = P2PProduct.objects.get(pk=p_id)
@@ -114,19 +114,15 @@ class FuelCardBuyView(TemplateView):
 
         # 获取产品期限
         product_period = p2p_product.period
-
+        print '======='
         # 获取奖品使用范围
         # FixMe, 优化设计==>修改奖品使用范围设计，建议单独分离到一张表中
         using_range = get_p2p_reward_using_range(p2p_product.category)
-
-        # 获取用户手机号(屏蔽)
-        phone = get_phone_for_coop(user.id)
 
         return {
             'product': p2p_product,
             'period': product_period,
             'using_range': using_range,
-            'phone': phone,
         }
 
 
@@ -302,38 +298,6 @@ class FuelCardBuyView(TemplateView):
             'phone': phone,
             'using_range': using_range,
         }
-
-
-# class FuelCardListViewForApp(TemplateView):
-#     """
-#     APP加油卡产品购买列表展示
-#     :param
-#     :return
-#     :request_method GET
-#     """
-#
-#     template_name = 'fuel_index.jade'
-#
-#     def get_context_data(self, **kwargs):
-#         # 优先级越低排越前面
-#         p2p_products = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now(), category=u'加油卡',
-#                                                  status__in=[u'已完成', u'满标待打款', u'满标已打款', u'满标待审核',
-#                                                              u'满标已审核', u'还款中', u'正在招标'
-#                                                              ]).order_by('priority', '-publish_time')
-#
-#         product_data = []
-#         if p2p_products:
-#             # 根据优先级排序，并获取每种优先级的第一条记录
-#             product_data.append(p2p_products[0])
-#             unique_priority = p2p_products[0].priority
-#             for p2p_product in p2p_products[1:]:
-#                 if p2p_product.priority != unique_priority:
-#                     product_data.append(p2p_product)
-#                     unique_priority = p2p_product.priority
-#         print len(product_data)
-#         return {
-#             'products': product_data,
-#         }
 
 
 class FualCardAccountView(TemplateView):

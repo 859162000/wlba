@@ -9,12 +9,16 @@ html
       .fuel-head-user
         .fuel-head-left
           .fuel-save-number
-            span.amount 3000
+            revenue = int(revenue_count)
+            span.amount {{revenue}}
             span.text 元
           .fuel-save-text 累计节省
         .fuel-head-right
-          a(href='/fuel/account/').fuel-user 13021160575
-          .fuel-notice 一份理财加油卡卡生效中
+          if user.is_authenticated
+            a(href='/fuel/account/').fuel-user {{user | display_name}}
+          else
+            a(href='/fuel/account/').fuel-user 立即登录
+          .fuel-notice {{effect_count}}份理财加油卡卡生效中
 
       .fuel-nav-nav
         .fuel-nav-list.fuel-nav-around
@@ -34,7 +38,7 @@ html
             a(href='/fuel/buy/{{product.id}}').fuel-product-list
               .fuel-pdt-title
                 .fuel-pdt-name(class='fuel-pdt-green') {{product.name}}
-                .fuel-pdt-fiter 适合12万以内车型{{products}}
+                .fuel-pdt-fiter {{product.car}}
               .fuel-pdt-cont
                 .fuel-pdt-term.fuel-pdt-section
                   .pdt-date
