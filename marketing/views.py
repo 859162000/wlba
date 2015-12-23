@@ -2702,7 +2702,7 @@ class RockFinanceForOldUserAPIView(APIView):
 
         if not p2p_record:
             to_json_response = {
-                'ret_code': 1000,
+                'ret_code': 1001,
                 'message': u'没有投资满5000',
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
