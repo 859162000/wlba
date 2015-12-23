@@ -135,7 +135,7 @@ class FuelCardBuyView(TemplateView):
 class FuelCardBuyApi(APIView):
     """
     加油卡购买接口
-    :param
+    :param 'p_id', 'p_parts', 'amount', 'reward_range'
     :return
     :request_method POST
     :user.is_authenticated True
@@ -154,12 +154,13 @@ class FuelCardBuyApi(APIView):
         if form.is_valid():
             p2p_product = form.cleaned_data['p2p_product']
             p_parts = form.cleaned_data['p_parts']
-            total_amount = form.cleaned_data['total_amount']
+            amount = form.cleaned_data['amount']
+            reward_range = form.cleaned_data['reward_range']
             # 判断用户是否满足最低消费限额
-            if p2p_product.limit_min_per_user * p_parts == total_amount:
+            if p2p_product.limit_min_per_user * p_parts == amount:
                 try:
                     trader = P2PTrader(product=p2p_product, user=request.user, request=request)
-                    product_info, margin_info, equity_info = trader.purchase(total_amount)
+                    product_info, margin_info, equity_info = trader.purchase(amount)
 
                     # FixMe, 补充短信内容，给用户发送投资成功短信通知
                     message = ''
@@ -194,15 +195,17 @@ class FuelCardBugRecordView(TemplateView):
     :user.is_authenticated True
     """
 
-    template_name = 'fuel_records_audit.jade'
+    TYPES = {
+        'fuel_card': (u'加油卡', 'fuel_records_audit.jade'),
+    }
 
-    def get_user_amortizations(self, settled_status):
+    template_name = ''
+
+    def _get_user_amortizations(self, user, product_type, settled_status, sorted_term):
         """获取用户还款计划"""
 
-        user_amotization = UserAmortization.objects.filter(user=self.request.user, settled=settled_status,
-                                                           product_amortization__product_category=u'加油卡'
-                                                           ).select_related(depth=2)
-        user_amotization = user_amotization.order_by('product_amortization__product_id', 'term')
+        user_amotization = get_user_amortizations(user, product_type, settled_status)
+        user_amotization = user_amotization.order_by('product_amortization__product__id', sorted_term)
 
         ua_list = []
         ua_tmp = user_amotization.first()
@@ -216,13 +219,27 @@ class FuelCardBugRecordView(TemplateView):
 
     def get_context_data(self, **kwargs):
         _status = self.request.GET.get('status', '').strip()
+        _type = self.request.GET.get('type', '').strip()
+
         if not _status:
-            return HttpResponseForbidden(u'status参数不存在')
+            return HttpResponseForbidden(u'status参数是必须的')
+
+        l_type, template_name = self.TYPES.get(_type, None)
+        if not _type or not l_type:
+            return HttpResponseForbidden(u'type参数不存在')
+
+        self.template_name = template_name
 
         status_list = ['auditing', 'done']
         if _status in status_list:
-            settled_status = False if _status == 'auditing' else True
-            data = self.get_user_amortizations(settled_status)
+            if _status == 'auditing':
+                settled_status = False
+                sorted_term = 'term'
+            else:
+                settled_status = True
+                sorted_term = '-term'
+
+            data = self._get_user_amortizations(self.request.user, l_type, settled_status, sorted_term)
 
             return {
                 'data': data,
@@ -238,6 +255,7 @@ class FuelCardExchangeRecordView(TemplateView):
     :param
     :return
     :request_method GET
+    :user.is_authenticated True
     """
 
     TYPES = {
@@ -245,15 +263,6 @@ class FuelCardExchangeRecordView(TemplateView):
     }
 
     template_name = ''
-
-    def get_user_amortizations(self, user, settled_status, _type):
-        """获取用户还款计划"""
-
-        user_amortizations = UserAmortization.objects.filter(user=user, settled=settled_status,
-                                                             product_amortization__product_category=_type
-                                                             ).select_related(depth=2).order_by('-term_date')
-
-        return user_amortizations
 
     def get_context_data(self, **kwargs):
         _status = self.request.GET.get('status', '').strip()
@@ -271,12 +280,15 @@ class FuelCardExchangeRecordView(TemplateView):
         if _status in status_list:
             data = []
             settled_status = False if _status == 'wait_receive' else True
-            user_amortizations = self.get_user_amortizations(self.request.user, settled_status, l_type)
+            user_amortizations = get_user_amortizations(self.request.ser,
+                                                        settled_status,
+                                                        _type).order_by('-term_date')
             if _status == 'receive':
                 for ua in user_amortizations:
                     p2p_reward_record = P2PRewardRecord.objects.get(user=self.request.user,
                                                                     order_id=ua.product_amortization.order_id)
-                    data.append((ua, p2p_reward_record.reward,))
+                    ua.reward = p2p_reward_record.reward
+                    data.append(ua)
             else:
                 data = user_amortizations or []
 
@@ -288,13 +300,19 @@ class FuelCardExchangeRecordView(TemplateView):
             return HttpResponseForbidden(u'无效参数status')
 
 
-class FualCardAccountView(TemplateView):
-    """加油卡资金统计"""
+class FualCardStatisticsView(TemplateView):
+    """
+    加油卡资金统计
+    :param
+    :return
+    :request_method GET
+    :user.is_authenticated True
+    """
 
     template_name = ''
 
     TYPES = {
-        'fuel_card': (u'加油卡', 'fuel_account.jade'),
+        'fuel_card': (u'加油卡', 'fuel_statistics.jade'),
     }
 
     def get_user_amortizations(self):
@@ -325,15 +343,14 @@ class FualCardAccountView(TemplateView):
         self.template_name = template_name
         user = self.request.user
 
-        total_revenue = 0
+        # 获取用户购标至今节省总金额
+        total_revenue = get_user_revenue_count(user, l_type)
+
+        # 获取用户注册时间
         register_time = user.date_joined
+
+        # 获取用户还款计划
         user_amortizations = self.get_user_amortizations()
-        for ua in user_amortizations:
-            product = ua.product_amortization.product
-            p2p_parts = product.amount / product.limit_min_per_user
-            p2p_offset_amount = product.equality_prize_amount - product.limit_min_per_user
-            per_p2p_revenue = p2p_parts * p2p_offset_amount
-            total_revenue += per_p2p_revenue
 
         return {
             'data': user_amortizations or [],
