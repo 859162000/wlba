@@ -1113,6 +1113,8 @@ org.recharge = (function (org) {
                                 window.location.href = '/weixin/regist/second/'
                                 break;
                             default:
+
+                                window.location.href= '/weixin/account/bankcard/';
                                 _self.$load.hide();
                                 _self.$validationBody.show();
                                 _self.$recharge_body.show();
