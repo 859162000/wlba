@@ -20,6 +20,11 @@ $padding: 0.5rem 1rem
     line-height: 1.3rem
     .big
       font-size: $font-size18
+    .blue
+      color: #2196f3
+      font-size: $font-size12
+      .big
+        font-size: $font-size16
   .service-detail-lft, .service-detail-rht
     -webkit-box-flex: 1
     text-align: left
@@ -54,7 +59,11 @@ $padding: 0.5rem 1rem
   display: -webkit-box
   font-size: $font-size13
   .type-item
-    -webkit-box-flex: 1
+    display: inline-block
+    margin-right: 1rem
+    line-height: 1rem
+    .red
+      color: $color-db493f
 .detail-price-box
   border-top: 0.05rem dashed #ccc
   overflow: hidden
@@ -140,21 +149,13 @@ $padding: 0.5rem 1rem
     opacity: 0.5
     &:active
       box-shadow: $active-shadow
-.buy-sufficient
-  display: none
-  position: fixed
-  height: 2.2rem
-  width: 100%
-  left: 0
-  top: 0
+  &.new-user
+    margin-bottom: 0.5rem
+.is_invested-sign
+  font-size: $font-size12
   text-align: center
-  background: rgba(62, 62, 62, 0.9)
-  font-size: 0.8rem
-  p
-    color: #FFFFFF
-    line-height: 2.2rem
-    a
-      color: #68a45c
+  margin-bottom: 2rem
+  color: $color-grey-989898
 .buy-earnings
   width: 100%
   padding: 0 1rem
