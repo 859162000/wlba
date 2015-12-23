@@ -41,11 +41,12 @@ $submit-height: 2.25rem
   &:active
     background: #F73C25
 .webpack-btn-blue
-  @extend .public-style
-  border: 1px solid #5DB5F2
   background: none
   color: #5DB5F2
-  margin-top: .875rem
+  text-align: center
+  width: 100%
+  display: inline-block
+  font-size: .6rem
   &:link, &:visited
     color: #5DB5F2
 .webchat-button
@@ -104,15 +105,17 @@ $submit-height: 2.25rem
     background-size: 100%
     margin: 0 auto
 .phone-sign-warp
-  height: .5rem
-.phone-sign,.code-sign
+  height: .8rem
+.phone-sign,.code-sign,.phone-code-sign
   font-size: .6rem
   color: #ff7500
   display: none
+  height: .8rem
+  line-height: .5rem
 .webchat-submit
-  padding: 3rem 1.95rem 2rem 1.95rem
+  padding: 1.5rem 1.95rem 1rem 1.95rem
   @media screen and (max-device-width: 320px)
-    padding: .5rem 1.95rem 2rem 1.95rem
+    padding: .5rem 1.95rem 1rem 1.95rem
 .code-content
   height: 0
   overflow: hidden
@@ -120,43 +123,50 @@ $submit-height: 2.25rem
 
 //detail page
 .webchat-redpack-detail
-  position: relative
   width: 100%
-  .detail-redpack
-    display: block
-    width: 100%
-    height: auto
-  .redpack-message
-    position: absolute
-    left: 50%
-    top: 50%
-    margin: -1.825rem 0 0 -1.825rem
-    color: #fff
-    text-align: center
-    width: 3.65rem
-    height: 3.65rem
-    transform: rotate(-5deg)
-    em
-      font-style: normal
-    #amount
-      font-size: 1.9rem
-    .baifen
-      font-size: .9rem
-    .amount-name
-      font-size: 1.175rem
+  .webchat-bg,.webchat-tyj-bg
+    position: relative
+    background: url(/static/imgs/mobile_activity/app_wechat/jiaxiquan.png) no-repeat center center
+    background-size: 100% 100%
+    width: 14.5rem
+    height: 4.7rem
+    margin: 2rem auto 1rem
+    .redpack-message
+      position: absolute
+      left: 4.4rem
+      top: 0
+      color: #fff
+      text-align: center
+      width: 10rem
+      height: 4.7rem
+      em
+        font-style: normal
+        color: #DB493F
+        line-height: 4.7rem
+      #amount
+        font-size: 2.5rem
+      .baifen
+        font-size: 1.5rem
+  .webchat-tyj-bg
+    background: url(/static/imgs/mobile_activity/app_wechat/tiyanjin.png) no-repeat center center
 
 .webchat-submit-end
-  padding: 2rem 1.95rem 3rem 1.95rem
+  padding: 1.65rem 1.95rem 1.875rem 1.95rem
+.receive-peoples
+  font-size: .75rem
+  color: #F5A623
+  text-align: center
+  margin-bottom: 1.875rem
 .webchat-redpack-result
   color: #FF7500
   text-align: center
   .result-amount
-    font-size: .8rem
+    font-size: .75rem
     margin-bottom: .25rem
   .result-phone
     font-size: .6rem
 .webchar-friend-list
-  color: #FF751C
+  color: #F5A623
   padding: 0 .75rem
   overflow: hidden
   .webchar-list-head
@@ -209,14 +219,16 @@ $submit-height: 2.25rem
     width: 100%
 //end page
 .webchat-redpack-end
-  margin-bottom: 2rem
   .redpack-bg
-    width: 7.8rem
-    height: 7.8rem
-    background: url("/static/imgs/mobile_activity/app_wechat/enddault.png") no-repeat
+    width: 5rem
+    height: 5rem
+    background: url("/static/imgs/mobile_activity/app_wechat/people.png") no-repeat
     background-size: 100%
-    margin: 0px auto
-
+    margin: 1rem auto .4rem
+.void
+  color: #F5A623
+  font-size: .6rem
+  text-align: center
 .weChat-footer
   width: 100%
   text-align: center
@@ -228,3 +240,21 @@ $submit-height: 2.25rem
   width: 5rem
   float: right
   height: 2.2rem
+
+.error-sign
+  position: fixed
+  left: 0
+  top: 2.2rem
+  width: 100%
+  height: 2.2rem
+  line-height: 2.2rem
+  text-align: center
+  background: rgba(93,181,242,.8)
+  color: #fff
+  font-size: $font-size14
+  display: none
+  opacity : 0
+  -webkit-transition: opacity 300ms ease-out
+  -webkit-transform: translateZ(0)
+
+
