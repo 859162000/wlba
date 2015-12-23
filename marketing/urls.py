@@ -73,6 +73,7 @@ urlpatterns = patterns(
     url(r'^celebrity/$', TemplateView.as_view(template_name="celebrity.jade")),
     url(r'^xunlei_one/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='xunlei9')),
     url(r'^broken_million/$', TemplateView.as_view(template_name="broken_million.jade")),
+    url(r'^damai-old/$', TemplateView.as_view(template_name="damai-old.jade")),
 )
 
 # app URL
