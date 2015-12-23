@@ -350,7 +350,8 @@ def card_bind_list(request):
                     'bank_id': card.bank.code,
                     'bank_name': card.bank.name,
                     'gate_id': card.bank.gate_id,
-                    'storable_no': card.no[:6] + card.no[-4:]
+                    'storable_no': card.no[:6] + card.no[-4:],
+                    'is_the_one_card': card.is_the_one_card,
                 }
 
                 # 将银行卡对应银行的绑定的支付通道限额信息返回
