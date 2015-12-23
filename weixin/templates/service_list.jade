@@ -19,9 +19,11 @@ html
       .list-body#list-body
         include include/ajax/service_ajax_list.jade
       .list-load
-        .load-body
-          p.load-text 点击查看更多项目
-          p.load
+        results_length = len(results)
+        if results_length > 10
+          .load-body
+            p.load-text 点击查看更多项目
+            p.load
     else
       //无投资列表
       .list-body-none
