@@ -16,24 +16,25 @@ html
       .damai-banner
       .damai-main
         p 网利宝新用户注册获赠20元现金红包，单笔首次投资1000元送价值280元门票一张
+        p 网利宝老用户活动期间单笔投资5000元送价值280元门票一张
         p 投资满额用户请留意网利宝站内信以及短信，每个注册号码仅有一次参与资格
         h2.maitop 门票限800张，送完为止！
         h2 来现场，更有乐队签名CD，签名t-shirt相送！
         h1 网利宝，好收益，开启多彩生活！
-        a(href='/accounts/register/?promo_token=dmw', target="_blank").damai-button 立即参与抢门票
-      .damai-main1
-        .main1-song
-          .main1-song1
+        a(href='javascript:void(0);').damai-button 立即参与抢门票
+      .damai-main1.damai-main1-old
+        .main1-song.main1-song-old
+          .main1-song1.old
             dl
-              dt.song1
+              dt.song1.song1-old
               dd 简迷离乐队
-          .main1-song2
+          .main1-song2.old
             dl
-              dt.song1.song2
+              dt.song1.song2.song1-old
               dd 反光镜乐队
-          .main1-song3
+          .main1-song3.old
             dl
-              dt.song1.song3
+              dt.song1.song3.song1-old
               dd 小老虎/Soulspeak
       .damai-main2
         .fot
@@ -42,10 +43,11 @@ html
             li 2. 演出时间：2016年1月16日 19:30（请于19：00前入场）
             li 3. 活动地点：愚公移山（北京市东城区张自忠路3-2号段祺瑞执政府旧址西院）
             li 4. 新用户注册送20元直抵红包，投资满1000元可抵扣使用，单笔首次投资满1000元加送价值280元门票一张；
-            li 5. 新用户仅有一次参与活动机会，多次投资不可重复参与领票；
-            li 6. 用户请留意网利宝站内信以及短信通知，打开站内信链接保存二维码，活动当天凭二维码扫码入场；
-            li 7. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
-            li 8. 此活动仅限当前页面参与有效，最终解释权在法律允许范围内归网利宝所有。
+            li 5.  网利宝老用户活动期间单笔投资5000元送价值280元门票一张
+            li 6. 新用户仅有一次参与活动机会，多次投资不可重复参与领票；
+            li 7. 用户请留意网利宝站内信以及短信通知，打开站内信链接保存二维码，活动当天凭二维码扫码入场；
+            li 8. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+            li 9. 此活动仅限当前页面参与有效，最终解释权在法律允许范围内归网利宝所有。
           p.damai-lianhe
            label.label1 主办方：
            label.label2
@@ -59,4 +61,4 @@ html
     include include/tracking
   script.
       var v = new Date().getTime()
-      require(['/static/js/damai.js?v='+v])
+      require(['/static/js/damai-old.js?v='+v])
