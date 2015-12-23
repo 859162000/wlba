@@ -8,30 +8,39 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'WanglibaoVoteCounter'
-        # db.create_table(u'marketing_wanglibaovotecounter', (
-        #     (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-        #     ('catalog', self.gf('django.db.models.fields.CharField')(default='', max_length=256, null=True, blank=True)),
-        #     ('item', self.gf('django.db.models.fields.CharField')(default='', max_length=256, null=True, blank=True)),
-        #     ('activity', self.gf('django.db.models.fields.CharField')(default='', max_length=246, null=True, blank=True)),
-        #     ('count', self.gf('django.db.models.fields.IntegerField')(default=0, null=True, blank=True)),
-        #     ('create_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        #     ('update_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        # ))
-        # db.send_create_signal(u'marketing', ['WanglibaoVoteCounter'])
+        # Adding model 'P2PRewardRecord'
+        db.create_table(u'marketing_p2prewardrecord', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('reward', self.gf('django.db.models.fields.related.ForeignKey')(related_name='fk_reward', to=orm['marketing.P2PReward'])),
+            ('description', self.gf('django.db.models.fields.TextField')(max_length=255, null=True, blank=True)),
+            ('create_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('order_id', self.gf('django.db.models.fields.IntegerField')(null=True)),
+        ))
+        db.send_create_signal(u'marketing', ['P2PRewardRecord'])
 
-        # Adding field 'P2PReward.using_range'
-        db.add_column(u'marketing_p2preward', 'using_range',
-                      self.gf('django.db.models.fields.CharField')(default='', max_length=50),
-                      keep_default=False)
+        # Adding model 'P2PReward'
+        db.create_table(u'marketing_p2preward', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('type', self.gf('django.db.models.fields.CharField')(default=u'\u52a0\u6cb9\u5361', max_length=40)),
+            ('channel', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['marketing.Channels'])),
+            ('price', self.gf('django.db.models.fields.FloatField')(default=0)),
+            ('using_range', self.gf('django.db.models.fields.CharField')(max_length=50)),
+            ('create_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('end_time', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
+            ('is_used', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('conversion_code', self.gf('django.db.models.fields.CharField')(max_length=50)),
+            ('description', self.gf('django.db.models.fields.TextField')(max_length=255, null=True, blank=True)),
+        ))
+        db.send_create_signal(u'marketing', ['P2PReward'])
 
 
     def backwards(self, orm):
-        # Deleting model 'WanglibaoVoteCounter'
-        db.delete_table(u'marketing_wanglibaovotecounter')
+        # Deleting model 'P2PRewardRecord'
+        db.delete_table(u'marketing_p2prewardrecord')
 
-        # Deleting field 'P2PReward.using_range'
-        db.delete_column(u'marketing_p2preward', 'using_range')
+        # Deleting model 'P2PReward'
+        db.delete_table(u'marketing_p2preward')
 
 
     models = {
@@ -276,7 +285,7 @@ class Migration(SchemaMigration):
         },
         u'marketing.promotiontoken': {
             'Meta': {'object_name': 'PromotionToken'},
-            'token': ('django.db.models.fields.CharField', [], {'default': "'SM-ak09OSp-4ZaqISFMlsQ'", 'max_length': '64', 'db_index': 'True'}),
+            'token': ('django.db.models.fields.CharField', [], {'default': "'UNF5NRw1T1-pKjPh4fagTg'", 'max_length': '64', 'db_index': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
         },
         u'marketing.quickapplyinfo': {

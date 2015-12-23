@@ -8,7 +8,7 @@ import views
 urlpatterns = patterns(
     '',
     #test
-    url(r'^index/$', views.FuelCardListViewForApp.as_view(), name='index'),
+    url(r'^index/$', views.FuelCardIndexView.as_view(), name='index'),
     url(r'^login/$', TemplateView.as_view(template_name="fuel_login.jade")),
     url(r'^buy/$', TemplateView.as_view(template_name="fuel_buy.jade")),
     url(r'^recharge/$', TemplateView.as_view(template_name="fuel_recharge.jade")),

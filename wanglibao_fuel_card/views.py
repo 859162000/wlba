@@ -17,6 +17,119 @@ from .trade import P2PTrader
 from .utils import get_sorts_for_created_time, get_p2p_reward_using_range
 
 
+def get_user_revenue_count(user, product_type):
+    """获取用户自注册起至今总收益"""
+
+    revenue_count = 0
+    p2p_record_list = P2PRecord.objects.filter(user=user, product__category=product_type)
+    for p2p_record in p2p_record_list:
+        p2p_amount = float(p2p_record.amount)
+        p2p_parts = p2p_amount / p2p_record.product.limit_min_per_user
+        p2p_reward_count = p2p_parts * p2p_record.product.equality_prize_amount
+        p2p_revenue = p2p_reward_count - p2p_amount
+        revenue_count += p2p_revenue
+
+    return revenue_count
+
+
+def get_user_amortizations(user, product_type, settled_status):
+    """获取用户还款计划"""
+
+    user_amortizations = UserAmortization.objects.filter(user=user, settled=settled_status,
+                                                         product_amortization__product__category=product_type
+                                                         ).select_related(depth=2)
+
+    return user_amortizations
+
+
+class FuelCardIndexView(TemplateView):
+    """
+    APP加油卡产品购买列表展示
+    :param
+    :return
+    :request_method GET
+    :user.is_authenticated True
+    """
+
+    template_name = 'fuel_index.jade'
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        p2p_products = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now(), category=u'加油卡',
+                                                 status=u'正在招标').order_by('period', '-priority')
+
+        data = []
+        product_1 = product_2 = product_3 = None
+        if p2p_products:
+            # 根据产品期限及优先级排序，然后获取每种期限的第一条记录
+            data.append(p2p_products[0])
+            unique_period = p2p_products[0].period
+            for p2p_product in p2p_products[1:]:
+                if p2p_product.period != unique_period:
+                    data.append(p2p_product)
+                    unique_period = p2p_product.period
+
+            # 按产品期限分类（初级-中级-高级）
+            for p in data:
+                if p.period in range(1, 6):
+                    product_1 = p
+                elif p.period == 6:
+                    product_2 = p
+                elif p.period == 12:
+                    product_3 = p
+
+        # 获取用户手机号(屏蔽)
+        phone = get_phone_for_coop(user.id)
+
+        # 获取用户至今总收益
+        revenue_count = get_user_revenue_count(user, u'加油卡')
+
+        effect_count = get_user_amortizations(user, u'加油卡', False).count()
+
+        return {
+            'products': [product_3, product_2, product_1],
+            'phone': phone,
+            'revenue_count': revenue_count,
+            'effect_count': effect_count,
+        }
+
+
+class FuelCardBuyView(TemplateView):
+    """
+    加油卡购买页面视图
+    :param
+    :return
+    :request_method GET
+    """
+
+    template_name = 'fuel_buy.jade'
+
+    def get_context_data(self, p_id, **kwargs):
+        user = self.request.user
+
+        try:
+            p2p_product = P2PProduct.objects.get(pk=p_id)
+        except P2PProduct.DoesNotExist:
+            return HttpResponseForbidden(u'无效产品ID')
+
+        # 获取产品期限
+        product_period = p2p_product.period
+
+        # 获取奖品使用范围
+        # FixMe, 优化设计==>修改奖品使用范围设计，建议单独分离到一张表中
+        using_range = get_p2p_reward_using_range(p2p_product.category)
+
+        # 获取用户手机号(屏蔽)
+        phone = get_phone_for_coop(user.id)
+
+        return {
+            'product': p2p_product,
+            'period': product_period,
+            'using_range': using_range,
+            'phone': phone,
+        }
+
+
 class FuelCardBuyApi(APIView):
     """
     加油卡购买接口
@@ -191,36 +304,36 @@ class FuelCardBuyView(TemplateView):
         }
 
 
-class FuelCardListViewForApp(TemplateView):
-    """
-    APP加油卡产品购买列表展示
-    :param
-    :return
-    :request_method GET
-    """
-
-    template_name = 'fuel_index.jade'
-
-    def get_context_data(self, **kwargs):
-        # 优先级越低排越前面
-        p2p_products = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now(), category=u'加油卡',
-                                                 status__in=[u'已完成', u'满标待打款', u'满标已打款', u'满标待审核',
-                                                             u'满标已审核', u'还款中', u'正在招标'
-                                                             ]).order_by('priority', '-publish_time')
-
-        product_data = []
-        if p2p_products:
-            # 根据优先级排序，并获取每种优先级的第一条记录
-            product_data.append(p2p_products[0])
-            unique_priority = p2p_products[0].priority
-            for p2p_product in p2p_products[1:]:
-                if p2p_product.priority != unique_priority:
-                    product_data.append(p2p_product)
-                    unique_priority = p2p_product.priority
-        print len(product_data)
-        return {
-            'products': product_data,
-        }
+# class FuelCardListViewForApp(TemplateView):
+#     """
+#     APP加油卡产品购买列表展示
+#     :param
+#     :return
+#     :request_method GET
+#     """
+#
+#     template_name = 'fuel_index.jade'
+#
+#     def get_context_data(self, **kwargs):
+#         # 优先级越低排越前面
+#         p2p_products = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now(), category=u'加油卡',
+#                                                  status__in=[u'已完成', u'满标待打款', u'满标已打款', u'满标待审核',
+#                                                              u'满标已审核', u'还款中', u'正在招标'
+#                                                              ]).order_by('priority', '-publish_time')
+#
+#         product_data = []
+#         if p2p_products:
+#             # 根据优先级排序，并获取每种优先级的第一条记录
+#             product_data.append(p2p_products[0])
+#             unique_priority = p2p_products[0].priority
+#             for p2p_product in p2p_products[1:]:
+#                 if p2p_product.priority != unique_priority:
+#                     product_data.append(p2p_product)
+#                     unique_priority = p2p_product.priority
+#         print len(product_data)
+#         return {
+#             'products': product_data,
+#         }
 
 
 class FualCardAccountView(TemplateView):
