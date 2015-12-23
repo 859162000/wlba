@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from wanglibao_account.cooperation import get_phone_for_coop
 from wanglibao_p2p.models import P2PProduct, UserAmortization, P2PRecord
 from wanglibao.const import ErrorNumber
+from wanglibao_sms.tasks import send_messages
 from marketing.models import P2PRewardRecord
 from .forms import FuelCardBuyForm
 from .trade import P2PTrader
@@ -102,6 +103,7 @@ class FuelCardBuyView(TemplateView):
     :param
     :return
     :request_method GET
+    :user.is_authenticated True
     """
 
     template_name = 'fuel_buy.jade'
@@ -161,8 +163,17 @@ class FuelCardBuyApi(APIView):
                     trader = P2PTrader(product=p2p_product, user=request.user, request=request)
                     product_info, margin_info, equity_info = trader.purchase(total_amount)
 
-                    return render_to_response('', {
-                        # FixMe, 返回内容协商, 给用户发送投资成功短信通知
+                    # 给用户发送投资成功短信通知
+                    message = ''
+                    messages_list = [message]
+                    send_messages.apply_async(kwargs={
+                        "phones": [request.user.wanglibaouserprofile.phone],
+                        "messages": messages_list
+                    })
+
+                    return Response({
+                        'data': product_info.amount,
+                        'category': equity_info.product.category
                     })
                 except Exception, e:
                     return Response({
