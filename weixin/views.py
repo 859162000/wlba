@@ -835,6 +835,7 @@ class P2PDetailView(TemplateView):
         current_equity = 0
         redpacks = []
         user = self.request.user
+        id_is_valid = False
         if user.is_authenticated():
             user_margin = user.margin.margin
             equity_record = P2PEquity.objects.filter(product=p2p['id']).filter(user=user).first()
@@ -844,6 +845,7 @@ class P2PDetailView(TemplateView):
             device = utils.split_ua(self.request)
             result = backends.list_redpack(user, 'available', device['device_type'], p2p['id'])
             redpacks = result['packages'].get('available', [])
+            id_is_valid = user.wanglibaouserprofile.id_is_valid,
 
         orderable_amount = min(p2p['limit_amount_per_user'] - current_equity, p2p['remain'])
         total_buy_user = P2PEquity.objects.filter(product=p2p['id']).count()
@@ -865,7 +867,7 @@ class P2PDetailView(TemplateView):
             'redpacks': redpacks,
             'next': next,
             'amount_profit': amount_profit,
-            'id_is_valid':self.request.user.wanglibaouserprofile.id_is_valid,
+            'id_is_valid':id_is_valid,
         })
 
         return context
