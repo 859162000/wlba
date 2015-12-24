@@ -6,66 +6,75 @@ html
     include include/service_head.jade
   body
     nav.tab-nav
-      //ul
-      //  if status == 'unused'
-      //    li.active
-      //      a(href="/weixin/sub_reward/unused/") 未使用
-      //  else
-      //    li
-      //      a(href="/weixin/sub_reward/unused/") 未使用
-      //
-      //  if status == 'used'
-      //    li.active
-      //      a(href="/weixin/sub_reward/used/") 已使用
-      //  else
-      //    li
-      //      a(href="/weixin/sub_reward/used/") 已使用
-      //
-      //  if status == 'expires'
-      //    li.active
-      //      a(href="/weixin/sub_reward/expires/") 已过期
-      //  else
-      //    li
-      //      a(href="/weixin/sub_reward/expires/") 已过期
       ul
-        li.active
-          a(href="/weixin/sub_reward/unused/") 未使用
-        li
-          a(href="/weixin/sub_reward/used/") 已使用
-        li
-          a(href="/weixin/sub_reward/expires/") 已过期
+        if status == 'unused'
+          li.active
+            a(href="/weixin/sub_reward/unused/") 未使用
+        else
+          li
+            a(href="/weixin/sub_reward/unused/") 未使用
+
+        if status == 'used'
+          li.active
+            a(href="/weixin/sub_reward/used/") 已使用
+        else
+          li
+            a(href="/weixin/sub_reward/used/") 已使用
+
+        if status == 'expires'
+          li.active
+            a(href="/weixin/sub_reward/expires/") 已过期
+        else
+          li
+            a(href="/weixin/sub_reward/expires/") 已过期
+
     section#reward-used.reward-main
       .reward-card-warp
-        //加息券
-        .reward-card-list
-          .reward-card-parent(class='unused')
-            .reward-explain
-              .reward-name 双旦活动0.8%加息券
-              .reward-scope 100元起用
-              .reward-period 2015-12-14 至 2015-12-31
-            .reward-amount 0.8<em>%</em>
-        //红包
-        .reward-card-list
-          .reward-card-parent(class='unused red-packet')
-            .reward-explain
-              .reward-name 充值8000送800红包150元
-              .reward-scope 25000元起用
-              .reward-period 2015-12-14 至 2015-12-31
-            .reward-amount 150<em>元</em>
-        //无 理财券
-        .reward-default
-          img(src='/static/imgs/sub_weixin/reward/reward_default.png')
-          //if status == 'unused'
-          .reward-default-sign 你还没有加息券
-            br
-            | 积极参与网利宝各类活动即可获得加息券
-          //elif status == 'used'
-          //  .reward-default-sign 你还没有使用过加息券
-          //    br
-          //    | 积极参与网利宝各类活动即可获得加息券
-          //else
-          //  .reward-default-sign 加息券还没有过期哦
-          //    br
-          //    | 赶快去理财吧！
+          if packages
+            each pack in packages
+              .reward-card-list
+                if pack.method == '~'
+                  .reward-card-parent(class='{{status}}')
+                else
+                  .reward-card-parent(class='{{status}} red-packet')
+                  .reward-explain
+                    .reward-name {{pack.name}}
+
+                    if pack.method == '*'
+                      .reward-scope 抵扣投资额{{pack.amount | percentage_number_two}}%
+                    else
+                      if pack.invest_amount == 0
+                        .reward-scope 无门槛
+                      else
+                        .reward-scope {{pack.invest_amount}}元起用
+
+                    .reward-period {{pack.available_at | milldate_format}} 至 {{pack.unavailable_at | milldate_format}}
+
+                  if pack.method == '-'
+                    amount = int(pack['amount'])
+                    .reward-amount {{amount }}
+                      em 元
+                  elif pack.method == '*'
+                    highest = int(pack['highest_amount'])
+                    .reward-amount {{highest }}
+                      em 元
+                  else
+                    .reward-amount {{pack.amount | percentage_number_two}}
+                      em %
+          else
+            .reward-default
+              img(src='/static/imgs/mobile/reward/reward_default.png')
+              if status == 'unused'
+                .reward-default-sign 你还没有加息券
+                  br
+                  | 积极参与网利宝各类活动即可获得加息券
+              elif status == 'used'
+                .reward-default-sign 你还没有使用过加息券
+                  br
+                  | 积极参与网利宝各类活动即可获得加息券
+              else
+                .reward-default-sign 加息券还没有过期哦
+                  br
+                  | 赶快去理财吧！
 
     include include/tracking

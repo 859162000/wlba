@@ -79,10 +79,7 @@ urlpatterns = patterns(
 
     url(r'^sub_transaction/(?P<status>\w+)/$', login_required(views.WeixinTransaction.as_view(template_name="service_transaction_repay.jade", source='fwh'), login_url="/weixin/sub_login_redirect/")),
 
-    url(r'^sub_reward/unused/$', TemplateView.as_view(template_name="service_reward.jade")),
-    url(r'^sub_reward/used/$', TemplateView.as_view(template_name="service_reward_used.jade")),
-    url(r'^sub_reward/expires/$', TemplateView.as_view(template_name="service_reward_expires.jade")),
-
+    url(r'^sub_reward/(?P<status>\w+)/$', login_required(views.WeixinCouponList.as_view(template_name="service_reward.jade"), login_url="/weixin/sub_login_redirect/")),
     #微站 api
     url(r'api/fwh_login/$', main_views.WXLoginAPI.as_view(), name='weixin_fwh_login'),
     url(r'api/fwh/p2p_ajax_list/$', main_views.P2PListFWH.as_view(), name='fwh_p2p_ajax_list'),
