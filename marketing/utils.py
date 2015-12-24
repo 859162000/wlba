@@ -202,7 +202,8 @@ def generate_p2p_reward_record(user, product, order_id=None, description=None):
         if channel:
             _type = product.category
             _price = product.equality_prize_amount
-            p2p_reward = P2PReward.objects.filter(channel=channel, type=_type, is_used=False, price=_price).first()
+            p2p_reward = P2PReward.objects.filter(channel=channel, type=_type, is_used=False,
+                                                  price=_price).first()
             if p2p_reward:
                 p2p_reward_record = P2PRewardRecord()
                 p2p_reward_record.user = user

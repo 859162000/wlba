@@ -12,7 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from wanglibao_p2p.models import P2PProduct, UserAmortization, P2PRecord
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.tasks import send_messages
-from marketing.models import P2PRewardRecord
+from marketing.models import RevenueExchangeRecord
 from .forms import FuelCardBuyForm
 from .trade import P2PTrader
 from .utils import get_sorts_for_created_time, get_p2p_reward_using_range
@@ -209,7 +209,6 @@ class FuelCardBuyApi(APIView):
             # 判断用户是否满足最低消费限额
             if p2p_product.limit_min_per_user * p_parts == amount:
                 try:
-                    p2p_product.reward_range = reward_range
                     trader = P2PTrader(product=p2p_product, user=request.user, request=request)
                     product_info, margin_info, equity_info = trader.purchase(amount)
 
@@ -340,8 +339,7 @@ class FuelCardExchangeRecordView(TemplateView):
                                                         _type).order_by('-term_date')
             if _status == 'receive':
                 for ua in user_amortizations:
-                    p2p_reward_record = P2PRewardRecord.objects.get(user=self.request.user,
-                                                                    order_id=ua.product_amortization.order_id)
+                    p2p_reward_record = RevenueExchangeRecord.objects.get(user=self.request.user, order_id=ua.id)
                     ua.reward = p2p_reward_record.reward
 
             # 按产品期限分类（初级-中级-高级）

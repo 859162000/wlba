@@ -191,8 +191,6 @@ class P2PProduct(ProductBase):
     make_loans_time = models.DateTimeField(u'放款时间', null=True, blank=True)
 
     limit_per_user = models.FloatField(verbose_name=u'单用户购买限额(0-1的系数)*', default=1)
-    limit_min_per_user = models.FloatField(u'单用户购买最低额度', default=0, help_text=u'加油卡，默认0')
-    equality_prize_amount = models.FloatField(u'等额奖品面值（元）', default=0, blank=False, help_text=u'加油卡，默认0')
 
     warrant_company = models.ForeignKey(WarrantCompany, verbose_name=u'担保公司', blank=False)
     usage = models.TextField(blank=False, verbose_name=u'借款用途(合同用)*')
