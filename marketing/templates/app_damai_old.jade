@@ -5,6 +5,7 @@ html(style="background:#1f1f1d")
     title 网利宝金融摇滚夜
     include include/app_head
   body
+    - csrf_token
     .appdamai-banner
       img(src="/static/imgs/mobile_activity/app_damai/app_damai-banner.jpg")
       img(src="/static/imgs/mobile_activity/app_damai/app-damai-banner1.jpg")
@@ -51,9 +52,9 @@ html(style="background:#1f1f1d")
         li
           |3.活动地点：愚公移山
           br
-          |（北京市东城区张自忠路3 -2号段祺瑞执政府旧址西院）。
+          |（北京市东城区张自忠路3 -2号段祺瑞执政府旧址西院）；
 
-        li 4. 网利宝用户活动期间单笔投资1000元送价值280元门票一张
+        li 4. 网利宝用户活动期间单笔投资1000元送价值280元门票一张；
         li 5. 每个用户仅有一次参与活动机会，多次投资不可重复参与领票；
         li 6. 用户请留意网利宝站内信以及短信通知，打开站内信链接保存二维码，活动当天凭二维码扫码入场；
         li 7. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
