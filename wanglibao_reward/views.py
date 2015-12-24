@@ -1024,12 +1024,11 @@ class XunleiActivityAPIView(APIView):
         """
             register_time:为None表示不需要关注用户的注册时间
         """
-        introduced_by = IntroducedBy.objects.filter(user_id=user_id, channel__code=promo_token).first()
         if not register_time:
-            return True if introduced_by else False
+            introduced_by = IntroducedBy.objects.filter(user_id=user_id, channel__code=promo_token).first()
         else:
-            _register_time = time.strftime("%Y-%m-%d", time.localtime())
-            return True if introduced_by and _register_time >= register_time else False
+            introduced_by = IntroducedBy.objects.filter(user_id=user_id, channel__code=promo_token, created_at__gte=register_time).first()
+        return True if introduced_by else False
 
     def has_generate_reward_activity(self, user_id, activity):
         activitys = WanglibaoActivityReward.objects.filter(user_id=user_id, activity=activity)
