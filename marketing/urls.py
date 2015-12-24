@@ -74,6 +74,7 @@ urlpatterns = patterns(
     url(r'^xunlei_one/$', ThunderTenAcvitityTemplate.as_view(wx_classify='fwh', wx_code='xunlei9')),
     url(r'^broken_million/$', TemplateView.as_view(template_name="broken_million.jade")),
     url(r'^damai-old/$', TemplateView.as_view(template_name="damai-old.jade")),
+    url(r'^app_damai_old/$', TemplateView.as_view(template_name="app_damai_old.jade")),
 )
 
 # app URL
