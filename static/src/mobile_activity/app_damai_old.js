@@ -20,7 +20,7 @@ function redpack() {
             } else if (damai['ret_code'] == 1003) {
                 $('.tishiyu').text('很抱歉，门票已经发完了');
             } else if (damai['ret_code'] == 1001) {
-                $('.tishiyu').text('很抱歉，您投资没有满1000元');
+                $('.tishiyu').text('很抱歉，您不满足领取资格');
             }
         }
 
