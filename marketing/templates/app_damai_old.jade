@@ -22,7 +22,7 @@ html(style="background:#1f1f1d")
     .appdamai-main1
       h1 网利宝，好收益，开启多彩生活！
       if user.is_authenticated
-        a(href='javascript:void(0);').appdamai-button 立即参与抢门票
+        a(href='javascript:void(0);').appdamai-button.damai-buttonold 立即参与抢门票
       else
         a(href='/weixin/login/?next=/activity/app_damai_old').appdamai-button 立即参与抢门票
       img(src="/static/imgs/mobile_activity/app_damai/app-damai-title.jpg")
@@ -58,5 +58,5 @@ html(style="background:#1f1f1d")
         li 7. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
         li 8. 此活动仅限当前页面参与有效，最终解释权在法律允许范围内归网利宝所有。
 
-
+    script(src="/static/scripts/mobile_activity/app_damai_old.js")
 
