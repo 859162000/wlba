@@ -991,30 +991,71 @@ org.buy=(function(org){
                     callBackOpt: postdata
                 };
                 if(lib.isBuy){
-                    //org.ui.confirm("购买金额为" + amount, '确认投资', gobuy);
-                    org.ajax({
-                        url: '/api/profile/',
-                        type: 'GET',
-                        success:function(data){
-                            if(data.trade_pwd_is_set){
-                                //org.setInputPwd.inputPwd("充值",amount);
-                                isFirstPwd = false;
-                                org.setInputPwd.inputPwd(inputOption);//投资
-                            }else{
-                                isFirstPwd = true;
-                                org.setInputPwd.pageSet(pageOption);//首次交易
+                    function gobuy(){//使用交易密码时删除
+                        org.ajax({
+                            type: 'POST',
+                            url: '/api/p2p/purchase/',
+                            data: {product: productID, amount: amount, redpack: redpackValue},
+                            beforeSend:function(){
+                                $buyButton.text("抢购中...");
+                                lib.isBuy = false;
+                            },
+                            success: function(data){
+                               if(data.data){
+                                   //$('.balance-sign').text(balance - data.data + lib.redPackAmountNew + '元');
+                                   //$(".sign-main").css("display","-webkit-box");
+                                   $("#page-ok").css('display','-webkit-box');
+                               }
+                            },
+                            error: function(xhr){
+                                var  result;
+                                result = JSON.parse(xhr.responseText);
+                                if(xhr.status === 400){
+                                    if (result.error_number === 1) {
+                                        org.ui.alert("登录超时，请重新登录！",function(){
+                                            return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
+                                        });
+                                    } else if (result.error_number === 2) {
+                                        return org.ui.alert('必须实名认证！');
+                                    } else if (result.error_number === 4 && result.message === "余额不足") {
+                                        $(".buy-sufficient").show();
+                                        return;
+                                    }else{
+                                        return org.ui.alert(result.message);
+                                    }
+                                }else if(xhr.status === 403){
+                                    if (result.detail) {
+                                        org.ui.alert("登录超时，请重新登录！",function(){
+                                            return window.location.href = '/weixin/login/?next=/weixin/view/buy/' + productID + '/';
+                                        });
+                                    }
+                                }
+                            },
+                            complete:function(){
+                               $buyButton.text("立即投资");
+                                lib.isBuy = true;
                             }
-                        },
-                        error: function (xhr) {
-                            console.log("标记用用户是否已经设置交易密码失败",xhr);
-                        }
-                    });
+                        })
+                    }
+                    org.ui.confirm("购买金额为" + amount, '确认投资', gobuy);//使用交易密码时删除
 
-                    //if(self.data("first")){
-                    //    org.setInputPwd.pageSet($("#page-pwd"),"设置交易密码","为了您账户资金安全，请设置交易密码","投资",true, amount);
-                    //}else{
-                    //    org.setInputPwd.inputPwd("投资",amount);
-                    //}
+                    //org.ajax({ //交易密码，使用时去掉注释
+                    //    url: '/api/profile/',
+                    //    type: 'GET',
+                    //    success:function(data){
+                    //        if(data.trade_pwd_is_set){
+                    //            //org.setInputPwd.inputPwd("充值",amount);
+                    //            isFirstPwd = false;
+                    //            org.setInputPwd.inputPwd(inputOption);//投资
+                    //        }else{
+                    //            isFirstPwd = true;
+                    //            org.setInputPwd.pageSet(pageOption);//首次交易
+                    //        }
+                    //    },
+                    //    error: function (xhr) {
+                    //        console.log("标记用用户是否已经设置交易密码失败",xhr);
+                    //    }
+                    //});
 
                 }else{
                     org.ui.alert("购买中，请稍后")
@@ -1114,14 +1155,11 @@ org.setInputPwd = (function(org){//交易密码
                     }else{
                         lib._inpPwdHide(self);
                         //------------此处密码输入后的函数-------------//
-                        //if(callBack === "none"){
                         if(lib.type === "投资"){
                             org.buy.goBuy(postdata);
                         }else{
                             org.recharge.rechargeSingleStep(postdata,val);
                         }
-
-                        //}
                         //org.ui.confirm("交易密码输入不正确，您还可以输入2次", "重新输入", lib._inpPwdShow, lib.amount);//密码错误
                         //org.ui.alert("<p class='lock-pwd'>交易密码已被锁定，请3小时后再试<br />如想找回密码，请通过网站或APP找回</p>", closePage,  "知道了");
                         //if(lib.type === "充值"){
@@ -1135,7 +1173,6 @@ org.setInputPwd = (function(org){//交易密码
             });
         },
         _inpPwdShow: function(opt){//显示 输入交易密码
-            //lib._pageSet($("#page-pwd"),"请输入交易密码",type+"金额<br />￥"+amount,type,false,amount,callBack);
             var pageOption = {
                 page: $("#page-pwd"),
                 title: "请输入交易密码",
@@ -1218,6 +1255,25 @@ function setTradePwd(pwd,postdata,type){
         }
     });
 }
+;(function(){ //关闭弹出层，待交易密码上的时候删除此函数
+    function inpPwdHide(self){//隐藏 交易密码
+        var tp = self.parents(".page-alt");
+        var pwd = tp.find("input.pwd-input");
+        tp.hide();
+        pwd.length > 0 ? pwd.val(""): "";
+    }
+    $(".page-close").on("click",function(){//关闭弹出层
+        inpPwdHide($(this));
+    });
+    $(".back-fwh").on("click",function(){
+        inpPwdHide($(this));
+        closePage();
+    });
+    $(".continue-rechare").on("click",function(){//继续充值
+        inpPwdHide($(this));
+        $("input.count-input").val("");
+    });
+})(org);
 org.recharge=(function(org){
     var lib = {
         canRecharge: true,
@@ -1369,16 +1425,15 @@ org.recharge=(function(org){
                 window.location.href = '/weixin/recharge/second/?rechargeNext='+$(this).attr('data-next')+'&card_no=' + card_no + '&gate_id=' + gate_id + '&amount=' + amount;
             });
             $secondBtn.on('click', function(){
-                var self = $(this);
                 card_no = $("input[name='card_no']").attr('data-storable'),
                 amount  = $("input[name='amount']").val() * 1,
                 maxamount = parseInt($("input[name='maxamount']").val());
                 if(!card_no || amount <= 0 || !amount) {
                     return org.ui.alert('信息输入不完整');
                 }
-                //if(amount < 10){
-                //    return org.ui.alert('充值金额不得少于10元');
-                //}
+                if(amount < 10){
+                    return org.ui.alert('充值金额不得少于10元');
+                }
                 if(amount > maxamount){
                      return org.ui.alert('最高充值'+ maxamount +'元！');
                 }
@@ -1402,25 +1457,24 @@ org.recharge=(function(org){
                         callBack: "none",
                         callBackOpt: postdata
                     };
-                    org.ajax({
-                        url: '/api/profile/',
-                        type: 'GET',
-                        success:function(data){
-                            if(data.trade_pwd_is_set){
-                                //org.setInputPwd.inputPwd("充值",amount);
-                                isFirstPwd = false;
-                                org.setInputPwd.inputPwd(inputOption);//充值
-                            }else{
-                                isFirstPwd = true;
-                                org.setInputPwd.pageSet(pageOption);//首次充值
-                            }
-                        },
-                        error: function (xhr) {
-                            console.log("标记用用户是否已经设置交易密码失败",xhr);
-                        }
-                    });
+                    //org.ajax({ //用用户是否已经设置交易密码
+                    //    url: '/api/profile/',
+                    //    type: 'GET',
+                    //    success:function(data){
+                    //        if(data.trade_pwd_is_set){
+                    //            isFirstPwd = false;
+                    //            org.setInputPwd.inputPwd(inputOption);//充值
+                    //        }else{
+                    //            isFirstPwd = true;
+                    //            org.setInputPwd.pageSet(pageOption);//首次充值
+                    //        }
+                    //    },
+                    //    error: function (xhr) {
+                    //        console.log("标记用用户是否已经设置交易密码失败",xhr);
+                    //    }
+                    //});
+                    org.ui.confirm("充值金额为"+amount, '确认充值', lib._rechargeSingleStep, postdata);//使用交易密码时删除
 
-                    //org.ui.confirm("充值金额为"+amount, '确认充值', lib._rechargeSingleStep, postdata)
                 }else{
                     return org.ui.alert('充值中，请稍后');
                 }
@@ -1429,17 +1483,19 @@ org.recharge=(function(org){
         /*
         * 快捷充值接口业务
          */
-        _rechargeSingleStep: function(getdata,pwd) {
+        //_rechargeSingleStep: function(getdata,pwd) {//有交易密码
+        _rechargeSingleStep: function(getdata) {
             org.ajax({
                 type: 'POST',
-                url: '/api/pay/deposit_new/',
-                data: {card_no: getdata.card_no, amount: getdata.amount, trade_pwd: pwd},
+                //url: '/api/pay/deposit_new/',//有交易密码
+                //data: {card_no: getdata.card_no, amount: getdata.amount, trade_pwd: pwd},
+                url: '/api/pay/deposit/',
+                data: {card_no: getdata.card_no, amount: getdata.amount},
                 beforeSend:function(){
                     lib.canRecharge = false;
                     $('#secondBtn').text("充值中..");
                 },
                 success: function(data) {
-                    console.log(data);
                     if(data.ret_code > 0) {
                         return org.ui.alert(data.message);
                     } else {
