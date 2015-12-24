@@ -2692,7 +2692,7 @@ class RockFinanceForOldUserAPIView(APIView):
             }
             return HttpResponse(json.dumps(to_json_response), content_type='application/json')
 
-        p2p_record = P2PRecord.objects.filter(amount__gte=5000, user_id=request.user.id, catalog=u'申购', create_time__gte=start_time, create_time__lte=end_time).first()
+        p2p_record = P2PRecord.objects.filter(amount__gte=1000, user_id=request.user.id, catalog=u'申购', create_time__gte=start_time, create_time__lte=end_time).first()
 
         if not p2p_record:
             to_json_response = {
