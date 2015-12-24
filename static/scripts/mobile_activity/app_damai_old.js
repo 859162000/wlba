@@ -228,7 +228,6 @@ function redpack() {
         type: "POST",
         data: {},
         success: function (damai) {
-            console.log(damai);
             if (damai['ret_code'] == 0) {
                 $('.tishiyu').text('恭喜！您已获得网利宝摇滚之夜门票');
             } else if (damai['ret_code'] == 1006) {
