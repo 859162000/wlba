@@ -615,6 +615,9 @@ class YeeShortPay:
         if len(str(amount)) > 20:
             return {"ret_code": 20115, 'message': '充值金额太大'}
 
+        if amount < 0.01:
+            return {"ret_code": 20115, 'message': '充值金额太小（至少0.01元）'}
+
         user = request.user
         profile = user.wanglibaouserprofile
         card, bank = None, None
@@ -740,9 +743,7 @@ class YeeShortPay:
                 pay_info.response = res['data']
             pay_info.save()
             return res
-        # 绑定银行卡成功
-        card.is_bind_yee = True
-        card.save()
+
 
         res = self._pay_request(request, order_id, card, pay_info)
         if res['ret_code'] != 0:
@@ -753,6 +754,10 @@ class YeeShortPay:
                 pay_info.response = res['data']
             pay_info.save()
             return res
+
+        # 绑定银行卡成功
+        card.is_bind_yee = True
+        card.save()
 
         margin = Margin.objects.filter(user=user).first()
         return {"ret_code": 22000, "message": u"充值申请已提交，请稍候查询余额。", "amount": pay_info.amount, "margin": margin.margin}
