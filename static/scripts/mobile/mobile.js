@@ -1132,9 +1132,11 @@ org.recharge = (function (org) {
 
             _self.$recharge.on('click', function () {
                 var
-                    card_no = _self.data.no,
+                    card_no = _self.data.no,  
                     gate_id = _self.data.bank.gate_id,
                     amount = _self.$amount.val() * 1;
+
+                var sort_card = card_no.no.slice(0, 6) + card_no.no.slice(-4);
 
                 if (amount == 0 || !amount) {
                     return org.ui.showSign('请输入充值金额')
@@ -1143,7 +1145,7 @@ org.recharge = (function (org) {
                 var data = {
                     data: {
                         phone: '',
-                        card_no: card_no,
+                        card_no: sort_card,
                         amount: amount,
                         gate_id: gate_id,
                     },
