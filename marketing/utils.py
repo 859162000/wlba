@@ -9,7 +9,8 @@ from django.core.paginator import Paginator, PageNotAnInteger
 from django.db import connection
 from django.db.models import Sum
 from marketing.models import (IntroducedBy, PromotionToken, ClientData, Channels,
-                              ChannelsNew, P2PReward, P2PRewardRecord)
+                              ChannelsNew, RevenueExchangeRepertory, RevenueExchangeRecord,
+                              RevenueExchangePlan, RevenueExchangeOrder)
 from wanglibao_p2p.models import AmortizationRecord, P2PRecord
 from wanglibao.settings import THREE_DEFAULT_CHANNEL_CODE
 from wanglibao.settings import ENV, ENV_PRODUCTION
@@ -195,37 +196,38 @@ def pc_data_generator():
     }
 
 
-def generate_p2p_reward_record(user, product, order_id=None, description=None):
+def generate_revenue_exchange_record(user, product, order_id=None, description=None):
     """生成p2p奖品流水"""
 
     try:
-        user_id = user.id
-        channel = get_user_channel_record(user_id)
-        if channel:
-            _type = product.category
-            _price = product.equality_prize_amount
-            p2p_reward = P2PReward.objects.filter(channel=channel, type=_type, is_used=False,
-                                                  price=_price).first()
-            if p2p_reward:
-                p2p_reward_record = P2PRewardRecord()
-                p2p_reward_record.user = user
-                p2p_reward_record.reward = p2p_reward
-                p2p_reward_record.order_id = order_id
-                p2p_reward_record.description = description
-                p2p_reward_record.save()
+        # 查询收益兑换计划
+        exchange_plan = RevenueExchangePlan.objects.get(product=product)
+        reward_type = exchange_plan.reward_name
+        price = product.equality_prize_amount
 
-                p2p_reward.is_used = True
-                p2p_reward.save()
-                return True
-            else:
-                # FixMe, 如果是线上环境就给管理员发短信
-                # if ENV == ENV_PRODUCTION:
+        # 查询收益兑换订单
+        p2p_record = P2PRecord.objects.filter()
+        exchange_order = RevenueExchangeOrder.objects.get(user, order_id=)
 
-                logger.warning("unfounded p2p_reward for user[%s], channel[%s], type[%s], price[%s]" %
-                               (user_id, channel.name, _type, _price))
+        p2p_reward = RevenueExchangeRepertory.objects.filter(type=reward_type, is_used=False,
+                                                             price=price).first()
+        if p2p_reward:
+            p2p_reward_record = RevenueExchangeRecord()
+            p2p_reward_record.user = user
+            p2p_reward_record.reward = p2p_reward
+            p2p_reward_record.order_id = order_id
+            p2p_reward_record.description = description
+            p2p_reward_record.save()
 
+            p2p_reward.is_used = True
+            p2p_reward.save()
+            return True
         else:
-            logger.info("generate p2p_reward_record failed, %s not channel user." % user_id)
+            # FixMe, 如果是线上环境就给管理员发短信
+            # if ENV == ENV_PRODUCTION:
+
+            logger.warning("unfounded p2p_reward for user[%s], type[%s], price[%s]" %
+                           (user_id, _type, _price))
     except Exception, e:
         logger.info("generate p2p_reward_record failed")
         logger.error(e)

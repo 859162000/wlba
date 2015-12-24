@@ -642,7 +642,7 @@ class RevenueExchangeRepertory(models.Model):
 
     class Meta:
         ordering = ['-create_time']
-        verbose_name_plural = u'P2P奖品'
+        verbose_name_plural = u'收益兑换品仓库'
 
     def __unicode__(self):
         return u'%s%s' % (self.type, self.price)
@@ -651,7 +651,7 @@ class RevenueExchangeRepertory(models.Model):
 class RevenueExchangeAmortization(models.Model):
     """
     modify by ChenWeiBin@20151223
-    P2P奖品发放流水
+    用户收益兑换计划
     """
 
     user = models.ForeignKey(User)
@@ -662,10 +662,53 @@ class RevenueExchangeAmortization(models.Model):
 
     class Meta:
         ordering = ['-create_time']
-        verbose_name_plural = u'P2P奖品发放流水'
+        verbose_name_plural = u'收益兑换计划'
 
     def __unicode__(self):
         return u'%s' % self.user
+
+
+class RevenueExchangeRecord(models.Model):
+    """
+    modify by ChenWeiBin@20151223
+    收益兑换流水
+    """
+
+    user = models.ForeignKey(User)
+    reward = models.ForeignKey(RevenueExchangeRepertory, verbose_name=u'奖品', related_name='fk_reward')
+    description = models.TextField(u'发放兑换品流水说明', max_length=255, blank=True, null=True)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+    order_id = models.IntegerField(u'关联订单编号', null=True)
+
+    class Meta:
+        ordering = ['-create_time']
+        verbose_name_plural = u'收益兑换流水'
+
+    def __unicode__(self):
+        return u'%s' % self.user
+
+
+class RevenueExchangeRule(models.Model):
+    """
+        add by ChenWeiBin@20151223
+       收益兑换规则表
+    """
+
+    from wanglibao_p2p.models import P2PProduct
+
+    reward_name = models.CharField(u'兑换品名称', max_length=40, choices=RevenueExchangeRepertory.REWARD_TYPE)
+    limit_min_per_user = models.FloatField(u'单用户购买最低额度', default=100)
+    equality_prize_amount = models.FloatField(u'等额兑换品面值（元）', default=0, blank=False)
+    product = models.ForeignKey(P2PProduct, unique=True, verbose_name=u'产品')
+    reward_options = models.CharField(u'兑换品可选类型', null=True, blank=True, max_length=80)
+    created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_time']
+        verbose_name_plural = u'收益兑换规则表'
+
+    def __unicode__(self):
+        return u'%s' % self.reward_name
 
 
 class RevenueExchangeOrder(models.Model):
@@ -675,23 +718,17 @@ class RevenueExchangeOrder(models.Model):
     """
 
     user = models.ForeignKey(User)
-    reward_name = models.CharField(u'奖品名称', max_length=40)
+    reward_name = models.CharField(u'兑换品名称', max_length=40)
     reward_option = models.CharField(u'使用范围', max_length=50)
+    parts = models.IntegerField(u'购买份额')
+    reward_rule = models.ForeignKey(RevenueExchangeRule, u'兑换规则')
     order_id = models.IntegerField(u'关联订单编号', null=True)
     product_id = models.IntegerField(u'产品ID', null=True)
     created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
 
+    class Meta:
+        ordering = ['-created_time']
+        verbose_name_plural = u'收益兑换订单'
 
-class RevenueExchangePlan(models.Model):
-    """
-        add by ChenWeiBin@20151223
-       收益兑换计划表
-    """
-
-    from wanglibao_p2p.models import P2PProduct
-
-    reward_name = models.CharField(u'奖品名称', max_length=40, choices=RevenueExchangeRepertory.REWARD_TYPE)
-    limit_min_per_user = models.FloatField(u'单用户购买最低额度', default=100)
-    equality_prize_amount = models.FloatField(u'等额奖品面值（元）', default=0, blank=False)
-    product = models.ForeignKey(P2PProduct, verbose_name=u'产品')
-    reward_options = models.CharField(u'奖品可选类型', null=True, blank=True, max_length=80)
+    def __unicode__(self):
+        return u'%s' % self.order_id

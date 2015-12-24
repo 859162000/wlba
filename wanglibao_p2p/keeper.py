@@ -519,7 +519,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                                             sub_amo.coupon_interest, savepoint=False, description=description)
                 if product_type == u'还款等额兑奖':
                     # FixMe, 用户余额扣款
-                    generate_p2p_reward_record(sub_amo.user, product, sub_amo.id, sub_amo.description)
+                    generate_p2p_reward_record(sub_amo.user, product.category, sub_amo.id, sub_amo.description)
                 sub_amo.settled = True
                 sub_amo.settlement_time = timezone.now()
                 sub_amo.save()
