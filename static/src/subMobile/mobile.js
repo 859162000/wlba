@@ -952,7 +952,7 @@ org.buy=(function(org){
             });
 
             $buyButton.on('click',function(){
-                var $buySufficient = $('.buy-sufficient'),
+                var $buySufficient = $('#page-onMoney'),
                     balance = parseFloat($("#balance").attr("data-value")),//当前余额
                     amount = $('.amount').val() *1,//投资金额
                     productID = $(".invest-one").attr('data-protuctid');//投资项目id
@@ -1831,20 +1831,18 @@ org.processFirst = (function(org){
                 success:function(data){
                     if(!data.validate == 'true') return org.ui.alert('认证失败，请重试');
                     org.ui.alert("实名认证成功!",function(){
-                       return window.location.href = '/weixin/sub_regist_second/';
+                        return window.location.href = '/weixin/sub_regist_second/';
                     });
                 },
                 error:function(xhr){
                     result = JSON.parse(xhr.responseText);
-
                     if(result.error_number == 8){
                         org.ui.alert(result.message,function(){
-                           window.location.href = '/weixin/list/';
+                           window.location.href = '/weixin/sub_list/';
                         });
                     }else{
                         return org.ui.alert(result.message);
                     }
-
 
                 },
                 complete:function(){

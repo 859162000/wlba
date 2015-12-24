@@ -155,7 +155,7 @@ html
         .recharge-ok-tit 恭喜您购买成功
         .total-money 您已成功投资，项目融资成功后就开始计算收益
         .page-btn.back-fwh 知道了
-    .page-alt#page-onMoney(style="display:none")
+    .page-alt.page-errorAlt#page-onMoney(style="display:none")
       .account-pwd
         .recharge-ok-img
           img(src="/static/imgs/sub_weixin/recharge/alt-error.png")
@@ -163,6 +163,18 @@ html
         .page-btn
           a(href="javascript:;").page-close 关闭
           a(href="/weixin/sub_recharge/?rechargeNext=/weixin/view/buy/{{p2p.id}}/") 立即充值
+    id_is_valid = id_is_valid[0]
+    if id_is_valid
+      .page-alt.page-errorAlt#page-onRegister(style="display:none")
+    else
+      .page-alt.page-errorAlt#page-onRegister
+        .account-pwd
+          .recharge-ok-img
+            img(src="/static/imgs/sub_weixin/recharge/alt-error.png")
+          .recharge-ok-tit 对不起，您尚未实名认证
+          .total-money 请先完成实名认证，才可以投资哦
+          .page-btn
+            a(href="/weixin/sub_regist_second/") 去实名认证
     include include/confirm
     include include/tracking
     script(data-init='buy', src="/static/scripts/subMobile/mobile.js?201511065")
