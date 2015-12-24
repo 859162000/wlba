@@ -6,6 +6,7 @@
 # Description: 策划活动中的红包、奖品、加息券等用户奖励行为，独立在这个文件中
 #########################################################################
 from django.utils import timezone
+from experience_gold.backends import SendExperienceGold
 from django.db import transaction
 from django.db import IntegrityError
 from django.db.models import Sum
@@ -1145,7 +1146,7 @@ class XunleiActivityAPIView(APIView):
                         'amount': "%04d" % (record.experience.amount,),
                         'message': u'用户抽到奖品'
                     }
-                    redpack_backends.give_activity_redpack(request.user, record.experience, 'pc')
+                    SendExperienceGold(request.user).send(record.experience.id)
 
                 else:
                     json_to_response = {
