@@ -716,7 +716,7 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
             _send_message_template(user, title, content)
             _save_activity_record(rule, user, 'message', content)
         if sms_template:
-            sms = Template(sms_template + u' 关注服务号wanglibao400，每日签到抽大奖。退订回TD【网利科技】')
+            sms = Template(sms_template + u' 关注网利宝服务号，每日签到抽大奖。退订回TD【网利科技】')
             content = sms.render(context)
             _send_sms_template(mobile, content)
             _save_activity_record(rule, user, 'sms', content)
