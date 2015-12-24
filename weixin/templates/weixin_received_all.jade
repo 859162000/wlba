@@ -1,0 +1,60 @@
+-load formatters
+doctype html
+html(style="background: #f5f5f5")
+  head
+    include include/weixin_head.jade
+  body
+    header
+      hgroup 回款计划
+      a(href="javascript:history.back()")
+       span 返回
+      a(href="/weixin/received/month/").right 全部
+
+
+    .received-switch
+      .swiper-container
+        .swiper-wrapper(style='text-align:center')
+          mixin list ()
+            .swiper-slide.received-slide
+              .received-slide-date 2015年10月
+              .received-slide-data
+                .received-data-list.received-left-center
+                  .data-name 回款总额(元)
+                  .data-value 10000.00
+                .received-data-list.received-right-center
+                  .data-name 回款笔数
+                  .data-value 4
+
+          +list()
+          +list()
+          +list()
+          +list()
+          +list()
+
+    .received-item
+      mixin item()
+        a(href='/weixin/received/detail/').received-list
+          .list-head-warp
+            .list-head.arrow
+               .head-space &nbsp&nbsp
+               span.head-name 企业资金周转企业资金周
+               span.head-process 2/3
+          .list-cont
+            .list-flex
+              .cont-grey-2 2015-10-01
+              .cont-grey-1 回款日期
+            .list-flex
+              .cont-red 100000.00
+              .cont-grey-1 本（元）
+            .list-flex
+              .cont-red 100000.00
+              .cont-grey-1 息（元）
+            .list-flex
+              .cont-grey-2 提前回款
+              .cont-grey-1 2015-10-01
+      +item()
+      +item()
+      +item()
+      +item()
+    script(src="/static/scripts/mobile/swiper/swiper.min.js")
+    script(data-init='received', src="/static/scripts/mobile/mobile.js?v=20151202")

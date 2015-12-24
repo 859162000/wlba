@@ -34,6 +34,9 @@ urlpatterns = patterns(
     url(r'^more/contactus/$', TemplateView.as_view(template_name="weixin_contactus.jade")),
     url(r'^more/aboutus/$', TemplateView.as_view(template_name="weixin_aboutus.jade")),
     url(r'^bind/$', login_required(views.WeixinBind.as_view(), login_url='/weixin/login/'), name='weixin_bind'),
+    url(r'^received/all/$', TemplateView.as_view(template_name="weixin_received_all.jade")),
+    url(r'^received/month/$', TemplateView.as_view(template_name="weixin_received_month.jade")),
+    url(r'^received/detail/$', TemplateView.as_view(template_name="weixin_received_detail.jade")),
 
 
     url(r'^unbind/$', views.UnBindWeiUser.as_view(), name='weixin_unbind'),

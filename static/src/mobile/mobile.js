@@ -1748,6 +1748,30 @@ org.processSecond = (function(org){
         init : lib.init
     }
 })(org);
+
+org.received = (function(){
+    var lib = {
+        init: function(){
+            var swiper = new Swiper ('.swiper-container', {
+                direction: 'horizontal',
+                loop: false,
+                slidesPerView: 1.21,
+                centeredSlides: true,
+                paginationClickable: true,
+                spaceBetween: 30,
+              })
+            swiper.appendSlide([
+
+            ])
+
+        }
+    }
+
+    return {
+        init : lib.init
+    }
+})()
+
 ;(function(org){
     $.each($('script'), function(){
         var src = $(this).attr('src');
