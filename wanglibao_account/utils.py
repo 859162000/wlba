@@ -26,7 +26,6 @@ import pytz
 from M2Crypto.EVP import Cipher
 import urllib
 from .models import UserThreeOrder
-from .tasks import xunleivip_callback, zgdx_callback
 import requests
 import json
 
@@ -580,7 +579,7 @@ def str_to_dict(s):
 
 
 class Xunlei9AdminCallback(object):
-    """迅雷9后台回调"""
+    """迅雷9管理后台回调"""
 
     def xunlei_call_back(self, user, tid, data, url, order_id):
         order_id = '%s_%s' % (order_id, data['act'])
@@ -596,6 +595,7 @@ class Xunlei9AdminCallback(object):
         order.save()
 
         # 异步回调
+        from .tasks import xunleivip_callback
         xunleivip_callback.apply_async(
             kwargs={'url': url, 'params': params,
                     'channel': channel_recode.code, 'order_id': order_id})
@@ -664,7 +664,7 @@ class Xunlei9AdminCallback(object):
 
 
 class ZGDXAdminCallback(object):
-    """迅雷9后台回调"""
+    """迅雷9管理后台回调"""
 
     def __init__(self):
         self.c_code = 'zgdx'
@@ -677,6 +677,9 @@ class ZGDXAdminCallback(object):
         self.iv = settings.ZGDX_IV
 
     def zgdx_call_back(self, user, plat_offer_id, order_id=None):
+        logger.info("ZGDX-Enter zgdx_call_back for zgdx: user[%s], order_id[%s], plat_offer_id[%s]" % (user.id,
+                                                                                                       order_id,
+                                                                                                       plat_offer_id))
         if datetime.datetime.now().day >= 28:
             effect_type = '1'
         else:
@@ -703,40 +706,39 @@ class ZGDXAdminCallback(object):
 
         # 创建渠道订单记录
         channel_recode = get_user_channel_record(user.id)
-        order = UserThreeOrder(user=user, order_on=channel_recode, request_no=request_no)
+        order = UserThreeOrder.objects.get_or_create(user=user, order_on=channel_recode, request_no=request_no)[0]
         order.save()
 
         # 异步回调
+        from .tasks import zgdx_callback
         zgdx_callback.apply_async(
             kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
     def binding_card_call_back(self, obj, order_prefix=''):
         logger.info("ZGDX-Enter recharge_call_back for zgdx: user[%s], order_prefix[%s]" % (obj.user.id, order_prefix))
-        self.zgdx_call_back(obj.user, order_prefix, '104369')
-        obj.extra = '1'
-        obj.save()
+        self.zgdx_call_back(obj.user, '104369', order_prefix)
+        if obj.extra != '1':
+            obj.extra = '1'
+            obj.save()
 
     def purchase_call_back(self, obj, order_prefix=''):
         logger.info("ZGDX-Enter purchase_call_back for zgdx: user[%s], order_prefix[%s]" % obj.user.id, order_prefix)
-        # 判断是否是首次投资
-        p2p_record = P2PRecord.objects.filter(user_id=obj.user.id, catalog=u'申购').order_by('create_time').first()
 
-        # 判断是否首次投资
-        if binding and p2p_record and p2p_record.order_id == int(order_id):
+        p2p_record = P2PRecord.objects.filter(user_id=obj.user.id, catalog=u'申购').order_by('create_time').first()
+        if p2p_record:
+            order_prefix = order_prefix or p2p_record.order_id
             p2p_amount = int(p2p_record.amount)
             if p2p_amount >= 1000:
-                if ENV == ENV_PRODUCTION:
-                    if 1000 <= p2p_amount < 2000:
-                        plat_offer_id = '104371'
-                    else:
-                        plat_offer_id = '104372'
+                if 1000 <= p2p_amount < 2000:
+                    plat_offer_id = '104371'
                 else:
-                    plat_offer_id = '103050'
-                self.zgdx_call_back(user, plat_offer_id, order_id)
+                    plat_offer_id = '104372'
+                self.zgdx_call_back(obj.user, plat_offer_id, order_prefix)
 
     def process_callback(self, obj, order_list):
         if ENV != ENV_PRODUCTION:
-            return
+            pass
+            # return
         if order_list.exists():
             if order_list.count() == 1:
                 order_prefix, order_suffix = order_list.first().request_no.split('_')
