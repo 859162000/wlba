@@ -37,7 +37,8 @@ def get_fwh_login_url(next=None):
             FWH_LOGIN_URL = BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=fwh_login_url, state=original_id)
             print "********************************************************",FWH_LOGIN_URL
 
-get_fwh_login_url()
+if FWH_LOGIN_URL:
+    get_fwh_login_url()
 
 
 def redirectToJumpPage(message, next=None):

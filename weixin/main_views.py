@@ -158,7 +158,6 @@ class FwhP2PlistTemplate(TemplateView):
         p2p_products.extend(p2p_full_list)
         p2p_products.extend(p2p_repayment_list)
         p2p_products.extend(p2p_finished_list)
-        print '############################', p2p_products
         limit = 10
         paginator = Paginator(p2p_products, limit)
         page = self.request.GET.get('page')
