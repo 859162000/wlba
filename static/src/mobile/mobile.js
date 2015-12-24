@@ -1057,7 +1057,6 @@ org.calculator = (function (org) {
 org.recharge = (function (org) {
     var lib = {
         $recharge: $('button[name=submit]'),
-        $phone: $("input[name='phone']"),
         $amount: $("input[name='amount']"),
         $vcode: $('input[name=vcode]'),
         $card_no: $("input[name='card_no']"),
@@ -1131,14 +1130,10 @@ org.recharge = (function (org) {
             var _self = this;
 
             _self.$recharge.on('click', function () {
-                var phone = _self.$phone.val() * 1,
+                var
                     card_no = _self.data.no,
                     gate_id = _self.data.bank.gate_id,
                     amount = _self.$amount.val() * 1;
-
-                if (!_self.re.test(phone)) {
-                    return org.ui.showSign('请输入正确的手机号')
-                }
 
                 if (amount == 0 || !amount) {
                     return org.ui.showSign('请输入充值金额')
@@ -1146,7 +1141,7 @@ org.recharge = (function (org) {
 
                 var data = {
                     data: {
-                        phone: phone,
+                        phone: '',
                         card_no: card_no,
                         amount: amount,
                         gate_id: gate_id,
