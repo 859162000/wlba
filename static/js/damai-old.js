@@ -69,10 +69,8 @@
                 type: "POST",
                 data: {}
             }).done(function (damai) {
-                console.log(damai);
                 if (damai['ret_code'] == 0) {
                    $('.tishiyu').text('恭喜！您已获得网利宝摇滚之夜门票');
-                   alert('恭喜！您已获得网利宝摇滚之夜门票');
                 } else if (damai['ret_code'] == 1006) {
                     $('.tishiyu').text('您已领过网利宝摇滚之夜门票');
                 } else if (damai['ret_code'] == 1005) {
