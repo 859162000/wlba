@@ -576,11 +576,20 @@ def bind_pay_dynnum(request):
     else:
         res = {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
 
-    if res.get('ret_code') == 0:
-        try:
+    # Modify by hb on 2015-12-24 : 如果ret_code返回非0, 还需进一步判断card是否有绑定记录, 因为有可能出现充值失败但绑卡成功的情况
+    try:
+        bind_flag = 0;
+        if res.get('ret_code') == 0:
+            bind_flag = 1;
+        else:
+            card = Card.objects.filter(user=user, id=card.id).first()
+            if card and (card.is_bind_huifu or card.is_bind_kuai or card.is_bind_yee):
+                logger.error('=20151224= deposit failed but binding success: [%s] [%s]' % (card.user, card.no))
+                bind_flag = 1;
+        if bind_flag == 1:
             CoopRegister(request).process_for_binding_card(user)
-        except:
-            logger.exception('bind_card_callback_failed for %s' % str(user))
+    except Exception, ex:
+        logger.exception('=20151224= bind_card_callback_failed: [%s] [%s] [%s]' % (user, card_no, ex))
 
     return res
 
