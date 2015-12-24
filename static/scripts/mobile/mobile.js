@@ -1287,7 +1287,7 @@ org.bankOneCard = (function(){
 
                 $set_bank_sig.show()
                 $name.text(name)
-                $no.text(no)
+                $no.text(no.slice(-4))
                 $bank_confirm.attr('data-id', id)
             })
 
