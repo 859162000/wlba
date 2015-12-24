@@ -12,7 +12,7 @@ from django.core.paginator import Paginator
 from django.core.paginator import PageNotAnInteger, EmptyPage
 from django.conf import settings
 
-from weixin.common.decorators import weixin_api_error
+from weixin.common.decorators import weixin_api_error, is_check_id_verify
 from weixin.models import WeixinAccounts, WeixinUser
 from weixin.util import redirectToJumpPage, bindUser, unbindUser
 from marketing.utils import get_channel_record
@@ -131,7 +131,6 @@ class WXRegister(TemplateView):
         }
 
 class AccountTemplate(TemplateView):
-
     def get_context_data(self, **kwargs):
         account_info = getAccountInfo(self.request.user)
         print account_info
@@ -148,6 +147,10 @@ class RechargeTemplate(TemplateView):
         return {
             'margin': margin if margin else 0.0
         }
+    @is_check_id_verify(True)
+    def dispatch(self, request, *args, **kwargs):
+        return super(RechargeTemplate, self).dispatch(request, *args, **kwargs)
+
 
 
 class FwhP2PlistTemplate(TemplateView):
@@ -224,6 +227,15 @@ class P2PListFWH(APIView):
         })
 
 
+class FWHIdValidate(TemplateView):
+    def get_context_data(self, **kwargs):
+
+        return {
+
+        }
+
+    def dispatch(self, request, *args, **kwargs):
+        return super(FWHIdValidate, self).dispatch(request, *args, **kwargs)
 
 
 
