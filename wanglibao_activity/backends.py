@@ -130,21 +130,25 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
             if first_buy.order_id != order_id:
                 logger.exception("=_check_rules_trigger= first_buy: type(%s)=[%s], type(%s)=[%s]" % (first_buy.order_id, type(first_buy.order_id), order_id, type(order_id)))
             # 判断当前购买产品id是否在活动设置的id中
+            is_product_type_period = _check_product_type_period(product_id, rule)
             if product_id > 0 and rule.activity.product_ids:
                 is_product = _check_product_id(product_id, rule.activity.product_ids)
-                if is_product:
+                if is_product and is_product_type_period:
                     _check_buy_product(user, rule, device_type, amount, product_id, is_full)
             else:
-                _check_buy_product(user, rule, device_type, amount, product_id, is_full)
+                if is_product_type_period:
+                    _check_buy_product(user, rule, device_type, amount, product_id, is_full)
 
     # 购买
     elif trigger_node == 'buy':
+        is_product_type_period = _check_product_type_period(product_id, rule)
         if product_id > 0 and rule.activity.product_ids:
             is_product = _check_product_id(product_id, rule.activity.product_ids)
-            if is_product:
+            if is_product and is_product_type_period:
                 _check_buy_product(user, rule, device_type, amount, product_id, is_full)
         else:
-            _check_buy_product(user, rule, device_type, amount, product_id, is_full)
+            if is_product_type_period:
+                _check_buy_product(user, rule, device_type, amount, product_id, is_full)
     # 满标审核
 
     # 满标审核时,是给所有的持仓用户发放奖励,金额为持仓金额
@@ -191,6 +195,7 @@ def _check_rules_trigger(user, rule, trigger_node, device_type, amount, product_
             _send_gift(user, rule, device_type, is_full)
     else:
         return
+
 
 def _send_gift(user, rule, device_type, is_full, amount=0):
     # rule_id = rule.id
@@ -244,90 +249,97 @@ def _check_introduced_by_product(user):
 
 
 def _check_buy_product(user, rule, device_type, amount, product_id, is_full):
-    # 检查单标投资顺序是否设置数字
-    ranking_num = int(rule.ranking)
-    if not rule.is_total_invest:
-        if ranking_num > 0 and not is_full:
-            # 查询单标投资顺序
-            records = P2PRecord.objects.filter(product=product_id, catalog=u'申购') \
-                                       .order_by('create_time')
-            print records.query
-            if records and records.count() <= ranking_num:
-                try:
-                    this_record = records[ranking_num-1]
-                    if this_record.user.id == user.id:
-                        _check_trade_amount(user, rule, device_type, amount, is_full)
-                        # _send_gift(user, rule, device_type, is_full)
-                except Exception:
-                    pass
-        if ranking_num > 0 and is_full is True:
-            # 符合抢标顺序且满标
-            records = P2PRecord.objects.filter(product=product_id, catalog=u'申购') \
-                                       .order_by('create_time')
-            # print records.query
-            if records and records.count() <= ranking_num:
-                try:
-                    this_record = records[ranking_num-1]
-                    if this_record.user.id == user.id:
-                        _check_trade_amount(user, rule, device_type, amount, is_full)
-                except Exception:
-                    pass
-        elif ranking_num == -1 and is_full is True:
-            # 查询是否满标，满标时不再考虑最小/最大金额，直接发送
-            _check_trade_amount(user, rule, device_type, amount, is_full)
-            # _send_gift(user, rule, device_type, is_full)
-        elif ranking_num == 0 and not is_full:
-            _check_trade_amount(user, rule, device_type, amount, is_full)
-
-    # 判断单标累计投资名次
-    if rule.is_total_invest and is_full is True:
-        total_invest_order = int(rule.total_invest_order)
-        if total_invest_order > 0:
-            # 按用户查询单标投资的总金额
-            records = P2PEquity.objects.filter(product=product_id, product__status=u'满标待打款').order_by('-equity')
-            if records:
-                try:
-                    record = records[total_invest_order-1]
-                    # 如果设置了最小金额，则判断用户的投资总额是否在最大最小金额区间
-                    is_amount = _check_amount(rule.min_amount, rule.max_amount, record.equity)
-                    if is_amount:
-                        _send_gift(record.user, rule, device_type, is_full)
-                except Exception:
-                    pass
-
-    # 根据标ID判断相关的类型,期限等信息
     if product_id:
-        try:
-            product = P2PProduct.objects.filter(pk=product_id, hide=False)\
-                .values('period', 'pay_method', 'types_id').first()
-        except P2PProduct.DoesNotExist:
-            logger.error("==== 标不存在,ID:%s ====".format(product_id))
-            return
-        if rule.period and rule.p2p_types:
+        # 检查单标投资顺序是否设置数字
+        ranking_num = int(rule.ranking)
+        if not rule.is_total_invest:
+            if ranking_num > 0 and not is_full:
+                # 查询单标投资顺序
+                records = P2PRecord.objects.filter(product=product_id, catalog=u'申购') \
+                                           .order_by('create_time')
+                print records.query
+                if records and records.count() <= ranking_num:
+                    try:
+                        this_record = records[ranking_num-1]
+                        if this_record.user.id == user.id:
+                            _check_trade_amount(user, rule, device_type, amount, is_full)
+                            # _send_gift(user, rule, device_type, is_full)
+                    except Exception:
+                        pass
+            if ranking_num > 0 and is_full is True:
+                # 符合抢标顺序且满标
+                records = P2PRecord.objects.filter(product=product_id, catalog=u'申购') \
+                                           .order_by('create_time')
+                # print records.query
+                if records and records.count() <= ranking_num:
+                    try:
+                        this_record = records[ranking_num-1]
+                        if this_record.user.id == user.id:
+                            _check_trade_amount(user, rule, device_type, amount, is_full)
+                    except Exception:
+                        pass
+            elif ranking_num == -1 and is_full is True:
+                # 查询是否满标，满标时不再考虑最小/最大金额，直接发送
+                _check_trade_amount(user, rule, device_type, amount, is_full)
+                # _send_gift(user, rule, device_type, is_full)
+            elif ranking_num == 0 and not is_full:
+                _check_trade_amount(user, rule, device_type, amount, is_full)
+
+        # 判断单标累计投资名次
+        if rule.is_total_invest and is_full is True:
+            total_invest_order = int(rule.total_invest_order)
+            if total_invest_order > 0:
+                # 按用户查询单标投资的总金额
+                records = P2PEquity.objects.filter(product=product_id, product__status=u'满标待打款').order_by('-equity')
+                if records:
+                    try:
+                        record = records[total_invest_order-1]
+                        # 如果设置了最小金额，则判断用户的投资总额是否在最大最小金额区间
+                        is_amount = _check_amount(rule.min_amount, rule.max_amount, record.equity)
+                        if is_amount:
+                            _send_gift(record.user, rule, device_type, is_full)
+                    except Exception:
+                        pass
+
+
+def _check_product_type_period(product_id, rule):
+    # 根据标ID判断相关的类型,期限等信息
+    try:
+        product = P2PProduct.objects.filter(pk=product_id, hide=False)\
+            .values('period', 'pay_method', 'types_id').first()
+    except P2PProduct.DoesNotExist:
+        logger.error("==== 标不存在,ID:%s ====".format(product_id))
+        return False
+
+    if not rule.period and not rule.p2p_types:
+        return True
+    elif rule.period and rule.p2p_types:
+        rule_period = int(rule.period)
+        rule_period_type = rule.period_type
+        product_period = product['period']
+        pay_method = product['pay_method']
+        p2p_types_id = int(rule.p2p_types.id)
+        if product['types_id']:
+            if product['types_id'] == p2p_types_id:
+                is_send_gift = _check_period(pay_method, product_period, rule_period, rule_period_type)
+                if is_send_gift:
+                    return True
+    elif rule.p2p_types:
+        p2p_types_id = int(rule.p2p_types.id)
+        if product['types_id']:
+            if product['types_id'] == p2p_types_id:
+                return True
+    elif rule.period:
+        if product['types_id']:
             rule_period = int(rule.period)
             rule_period_type = rule.period_type
             product_period = product['period']
             pay_method = product['pay_method']
-            p2p_types_id = int(rule.p2p_types.id)
-            if product['types_id']:
-                if product['types_id'] == p2p_types_id:
-                    is_send_gift = _check_period(pay_method, product_period, rule_period, rule_period_type)
-                    if is_send_gift:
-                        _send_gift(user, rule, device_type, is_full, amount)
-        elif rule.p2p_types:
-            p2p_types_id = int(rule.p2p_types.id)
-            if product['types_id']:
-                if product['types_id'] == p2p_types_id:
-                    _send_gift(user, rule, device_type, is_full, amount)
-        elif rule.period:
-            if product['types_id']:
-                rule_period = int(rule.period)
-                rule_period_type = rule.period_type
-                product_period = product['period']
-                pay_method = product['pay_method']
-                is_send_gift = _check_period(pay_method, product_period, rule_period, rule_period_type)
-                if is_send_gift:
-                    _send_gift(user, rule, device_type, is_full, amount)
+            is_send_gift = _check_period(pay_method, product_period, rule_period, rule_period_type)
+            if is_send_gift:
+                return True
+
+    return False
 
 
 def _check_period(pay_method, product_period, rule_period, rule_period_type):
