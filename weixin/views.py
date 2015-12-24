@@ -865,6 +865,7 @@ class P2PDetailView(TemplateView):
             'redpacks': redpacks,
             'next': next,
             'amount_profit': amount_profit,
+            'id_is_valid':self.request.user.wanglibaouserprofile.id_is_valid,
         })
 
         return context
