@@ -7,8 +7,8 @@ function redpack() {
     org.ajax({
         url: '/api/rock/finance/old_user/',
         type: "POST",
-        data: {}
-    }).done(function (damai) {
+        data: {},
+    success: function (damai) {
         console.log(damai);
         if (damai['ret_code'] == 0) {
            $('.tishiyu').text('您已获得门票');
@@ -24,7 +24,9 @@ function redpack() {
             $('.tishiyu').text('很抱歉，您投资没有满5000元');
             console.log('没有投资满5000');
         }
+    }
 
 
-    });
+
+    })
 };
