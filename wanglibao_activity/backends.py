@@ -343,6 +343,9 @@ def _check_product_type_period(product_id, rule):
 
 
 def _check_period(pay_method, product_period, rule_period, rule_period_type):
+    if not rule_period_type:
+        rule_period_type = 'month'
+
     if rule_period_type == 'month' or rule_period_type == 'day':
         if product_period == rule_period:
             return True
