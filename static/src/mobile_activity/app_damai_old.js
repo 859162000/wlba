@@ -21,7 +21,7 @@ function redpack() {
             } else if (damai['ret_code'] == 1003) {
                 $('.tishiyu').text('很抱歉，票已经发完了');
             } else if (damai['ret_code'] == 1001) {
-                $('.tishiyu').text('很抱歉，您投资没有满5000元');
+                $('.tishiyu').text('很抱歉，您投资没有满1000元');
                 console.log('没有投资满1000');
             }
         }
