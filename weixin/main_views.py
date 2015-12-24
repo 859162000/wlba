@@ -24,7 +24,7 @@ from wanglibao_p2p.common import get_p2p_list
 from wanglibao_redis.backend import redis_backend
 from wanglibao_rest import utils
 from wanglibao_redpack import backends
-from .util import _generate_ajax_template
+from .util import _generate_ajax_template, FWH_LOGIN_URL
 logger = logging.getLogger("weixin")
 
 
@@ -121,11 +121,13 @@ class WXRegister(TemplateView):
             channel = None
         phone = self.request.GET.get('phone', 0)
         next = self.request.GET.get('next', '')
+
         return {
             'token': token,
             'channel': channel,
             'phone': phone,
             'next': next,
+            'login_url': FWH_LOGIN_URL,
         }
 
 class AccountTemplate(TemplateView):
