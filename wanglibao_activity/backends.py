@@ -346,29 +346,37 @@ def _check_period(pay_method, product_period, rule_period, rule_period_type):
     if not rule_period_type:
         rule_period_type = 'month'
 
-    if rule_period_type == 'month' or rule_period_type == 'day':
-        if product_period == rule_period:
-            return True
+    matches = re.search(u'日计息', pay_method)
+    if matches and matches.group():
+        if rule_period_type == 'month_gte':
+            # 当"规则的月数*30 < 产品的天数"时符合规则
+            if rule_period * 30 <= product_period:
+                return True
+        elif rule_period_type == 'day_gte':
+            # 当"规则的天数 < 产品的天数"时符合规则
+            if rule_period <= product_period:
+                return True
+        elif rule_period_type == 'day':
+            if rule_period == product_period:
+                return True
+        elif rule_period_type == 'month':
+            if rule_period * 30 == product_period:
+                return True
     else:
-        matches = re.search(u'日计息', pay_method)
-        if matches and matches.group():
-            if rule_period_type == 'month_gte':
-                # 当"规则的月数*30 < 产品的天数"时符合规则
-                if rule_period * 30 <= product_period:
-                    return True
-            elif rule_period_type == 'day_gte':
-                # 当"规则的天数 < 产品的天数"时符合规则
-                if rule_period <= product_period:
-                    return True
-        else:
-            if rule_period_type == 'month_gte':
-                # 当"规则的月数 < 产品的月数"时符合规则
-                if rule_period <= product_period:
-                    return True
-            elif rule_period_type == 'day_gte':
-                # 当"规则的天数 < 产品的月数*30"时符合规则
-                if rule_period <= pay_method * 30:
-                    return True
+        if rule_period_type == 'month_gte':
+            # 当"规则的月数 < 产品的月数"时符合规则
+            if rule_period <= product_period:
+                return True
+        elif rule_period_type == 'day_gte':
+            # 当"规则的天数 < 产品的月数*30"时符合规则
+            if rule_period <= product_period * 30:
+                return True
+        elif rule_period_type == 'day':
+            if rule_period == product_period * 30:
+                return True
+        elif rule_period_type == 'month':
+            if rule_period == product_period:
+                return True
     return False
 
 
