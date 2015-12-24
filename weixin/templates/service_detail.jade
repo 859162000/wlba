@@ -1,5 +1,6 @@
 -load formatters
 -load mathfilters
+-load widget_tweaks
 doctype html
 html
   head
@@ -9,6 +10,7 @@ html
     .service-detail-part1
       .service-detail-tit.invest-one(data-protuctid="{{p2p.id}}") {{p2p.name}}
       earning_rate = float(p2p['expected_earning_rate'])
+      percent = float(p2p['ordered_amount']) / p2p['total_amount'] * 100
       if p2p.activity
         earning_rate = earning_rate + float(p2p['activity']['activity_rule_percent_text'])
       .service-detail-info
@@ -17,11 +19,11 @@ html
           .num.profit-txt(data-earn="{{earning_rate}}")
             span.big {{earning_rate}}
             | %
-            if percent
-              span +
-              span.blue.progress-body
-                span.big.percent-txt.progress-percent(data-percent='{{percent}}') {{percent | percentage}}
-                | %
+            //if percent
+            //  span +
+            //  span.blue.progress-body
+            //    span.big.percent-txt.progress-percent(data-percent='{{percent}}') {{percent | percentage}}
+            //    | %
         .service-detail-rht
           .gery 还款期限
           .num
@@ -29,9 +31,9 @@ html
             | {{p2p.pay_method|period_unit}}
       .service-detail-line
         .line-grey
-        .line-red(style="width:10%")
+        .line-red(style="width:{{percent | percentage}}")
       .service-detail-info
-        .service-detail-lft 已售61%
+        .service-detail-lft 已售{{percent | percentage}}
         amount = p2p['total_amount'] - p2p['ordered_amount']
         .service-detail-rht 剩余金额{{amount | money_format_int}}元
       .service-detail-type
@@ -60,7 +62,7 @@ html
           .recharge-lft
             span.recharge-tit 账户余额 (元)
             //span.recharge-inp.grey.balance-middle(data-value="30000.00")#balance 30000.00
-            .balance-middle(data-value="{{margin}}")#balance {{margin|money_format}}
+            .recharge-inp.grey.balance-middle(data-value="{{margin}}")#balance {{margin|money_format}}
           .recharge-rht
             a(href="/weixin/sub_recharge/?rechargeNext=/weixin/sub_buy/{{p2p.id}}/").red-btn 充值
         .detail-item
@@ -68,7 +70,7 @@ html
           amount = int(amount)
           if amount == 0
             amount = ''
-          input(type="tel",value="{{amount}}",placeholder="输入100的整数倍金额",p2p-type="{{p2p.category}}", activity-jiaxi='0', data-max="{{orderable_amount}}",data-role="p2p-calculator",fee-target="",data-target="#expected_income", data-existing="0", data-rate="{{p2p.expected_earning_rate}}", data-period="{{p2p.period}}", data-paymethod="{{p2p.pay_method}}", activity-rate="{{p2p.activity.rule.percent_text}}", maxlength="8").amount.balance-middle
+          input(type="tel",value="",placeholder="输入100的整数倍金额",p2p-type="{{p2p.category}}", activity-jiaxi='0', data-max="{{orderable_amount}}",data-role="p2p-calculator",fee-target="",data-target="#expected_income", data-existing="0", data-rate="{{p2p.expected_earning_rate}}", data-period="{{p2p.period}}", data-paymethod="{{p2p.pay_method}}", activity-rate="{{p2p.activity.rule.percent_text}}", maxlength="8").amount.balance-middle.recharge-inp
           //input(type="tel",value="",placeholder="输入100的整数倍金额",p2p-type="普通", activity-jiaxi='0', jiaxi-type="+", data-max="9168600",data-role="p2p-calculator",fee-target="",data-target="#expected_income", data-existing="0", data-rate="9.0", data-period="3", data-paymethod="按月付息", activity-rate="", maxlength="8").amount.balance-middle.recharge-inp
     .service-detail-part2
       .detail-item
@@ -152,7 +154,7 @@ html
           img(src="/static/imgs/sub_weixin/recharge/alt-ok.png")
         .recharge-ok-tit 恭喜您购买成功
         .total-money 您已成功投资，项目融资成功后就开始计算收益
-        .page-btn.page-close 知道了
+        .page-btn.back-fwh 知道了
     .page-alt#page-onMoney(style="display:none")
       .account-pwd
         .recharge-ok-img

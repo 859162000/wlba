@@ -880,6 +880,7 @@ org.buy=(function(org){
             }else{
                 lib.$redpackSign.hide();//红包直抵提示
             }
+            senderAmount = isNaN(senderAmount) ? "0.00" : senderAmount;
             lib.showAmount.text(senderAmount);//实际支付金额
             lib.$redpackForAmount.hide();//请输入投资金额
             //income.html((rate * dataRate) +'+<span class="blue">'+ (rate * jiaxi) +'</span>');
@@ -1173,10 +1174,14 @@ org.setInputPwd = (function(org){//交易密码
                 lib._inpMoveEnd(inp);
             });
             lib._pwdAnimate(inp,callBack,postdata);
-            $(".page-close").on("click",function(){
+            $(".page-close").on("click",function(){//关闭弹出层
                 lib._inpPwdHide($(this));
             });
-            $(".continue-rechare").on("click",function(){
+            $(".back-fwh").on("click",function(){
+                lib._inpPwdHide($(this));
+                closePage();
+            });
+            $(".continue-rechare").on("click",function(){//继续充值
                 lib._inpPwdHide($(this));
                 $("input.count-input").val("");
             });
