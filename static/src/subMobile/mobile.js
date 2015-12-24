@@ -1831,7 +1831,6 @@ org.processFirst = (function(org){
                 success:function(data){
                     if(!data.validate == 'true') return org.ui.alert('认证失败，请重试');
                     org.ui.alert("实名认证成功!",function(){
-                        org.ui.alert(1);
                         return window.location.href = '/weixin/sub_regist_second/';
                     });
                 },
