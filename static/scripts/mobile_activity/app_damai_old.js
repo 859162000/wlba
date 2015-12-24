@@ -230,9 +230,9 @@ function redpack() {
         success: function (damai) {
             console.log(damai);
             if (damai['ret_code'] == 0) {
-                $('.tishiyu').text('您已获得门票');
+                $('.tishiyu').text('恭喜！您已获得网利宝摇滚之夜门票');
             } else if (damai['ret_code'] == 1006) {
-                $('.tishiyu').text('您已领过门票');
+                $('.tishiyu').text('您已领过网利宝摇滚之夜门票');
             } else if (damai['ret_code'] == 1005) {
                 $('.tishiyu').text('很抱歉，奖品发没了');
             } else if (damai['ret_code'] == 1004) {
