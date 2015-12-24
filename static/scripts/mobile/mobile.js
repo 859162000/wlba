@@ -1544,7 +1544,8 @@ org.processSecond = (function (org) {
                         card_no: _self.$bankcard.val(),
                         gate_id: _self.$bank.val(),
                         phone: _self.$bankphone.val(),
-                        amount: _self.$money.val()
+                        amount: _self.$money.val(),
+
                     },
                     success: function (data) {
                         if (data.ret_code > 0) {
@@ -1583,7 +1584,7 @@ org.processSecond = (function (org) {
                         vcode: _self.$validation.val(),
                         order_id: $('input[name=order_id]').val(),
                         token: $('input[name=token]').val(),
-                        is_the_one_card: true
+                        set_the_one_card: true
                     },
                     beforeSend: function () {
                         _self.$submit.attr('disabled', 'disabled').text('充值中...');
