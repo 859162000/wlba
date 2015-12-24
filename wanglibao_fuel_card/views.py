@@ -14,7 +14,7 @@ from wanglibao_account.cooperation import get_phone_for_coop
 from wanglibao_p2p.models import P2PProduct, UserAmortization, P2PRecord
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.tasks import send_messages
-from marketing.models import P2PRewardRecord
+from marketing.models import RevenueExchangeRecord
 from .forms import FuelCardBuyForm
 from .trade import P2PTrader
 from .utils import get_sorts_for_created_time, get_p2p_reward_using_range
@@ -321,8 +321,7 @@ class FuelCardExchangeRecordView(TemplateView):
                                                         _type).order_by('-term_date')
             if _status == 'receive':
                 for ua in user_amortizations:
-                    p2p_reward_record = P2PRewardRecord.objects.get(user=self.request.user,
-                                                                    order_id=ua.product_amortization.order_id)
+                    p2p_reward_record = RevenueExchangeRecord.objects.get(user=self.request.user, order_id=ua.id)
                     ua.reward = p2p_reward_record.reward
 
             # 按产品期限分类（初级-中级-高级）
