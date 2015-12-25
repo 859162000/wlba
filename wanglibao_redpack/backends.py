@@ -736,7 +736,11 @@ def get_start_end_time(auto, auto_days, created_at, available_at, unavailable_at
     else:
         start_time = available_at
         end_time = unavailable_at
+    from marketing.utils import local_to_utc
+    start_time = local_to_utc(datetime.datetime(start_time.year, start_time.month, start_time.day), 'min')
+    end_time = local_to_utc(datetime.datetime(end_time.year, end_time.month, end_time.day), 'max')
     return start_time, end_time
+
 
 def get_app_version():
     misc = Misc.objects.filter(key='android_update').first()
