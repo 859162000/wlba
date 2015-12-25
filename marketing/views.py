@@ -2546,24 +2546,24 @@ class RewardDistributeAPIView(APIView):
         self.get_redpacks()
 
     def post(self, request):
-        openid = request.DATA.get("openid", "")
-        if None == openid:
-            to_json_response = {
-                'ret_code': 3010,
-                'message': u'openid 没有传入',
-            }
-            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-
-        w_user = WeixinUser.objects.filter(openid=openid)
-        if not w_user.exists() or not w_user.first().user:
-            to_json_response = {
-                'ret_code': 3011,
-                'message': u'weixin info No saved',
-            }
-            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-        else:
-            user = w_user.first().user
-
+        # openid = request.DATA.get("openid", "")
+        # if None == openid:
+        #     to_json_response = {
+        #         'ret_code': 3010,
+        #         'message': u'openid 没有传入',
+        #     }
+        #     return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+        #
+        # w_user = WeixinUser.objects.filter(openid=openid)
+        # if not w_user.exists() or not w_user.first().user:
+        #     to_json_response = {
+        #         'ret_code': 3011,
+        #         'message': u'weixin info No saved',
+        #     }
+        #     return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+        # else:
+        #     user = w_user.first().user
+        user = request.user
         today = time.strftime("%Y-%m-%d", time.localtime())
         join_log = ActivityJoinLog.objects.filter(user=user, create_time__gte=today, action_name=self.action_name).first()
 

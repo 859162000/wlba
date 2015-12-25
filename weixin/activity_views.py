@@ -11,24 +11,11 @@ from .base import BaseWeixinTemplate
 logger = logging.getLogger("weixin")
 # https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx18689c393281241e&redirect_uri=http://2ea0ef54.ngrok.io/weixin/award_index/&response_type=code&scope=snsapi_base&state=1#wechat_redirect
 
-class AwardIndexTemplate(BaseWeixinTemplate):
-    template_name = "sub_award.jade"
-
-    def get_context_data(self, **kwargs):
-        return {
-            "openid": self.openid,
-        }
-    def dispatch(self, request, *args, **kwargs):
-        self.url_name = 'award_index'
-        return super(AwardIndexTemplate, self).dispatch(request, *args, **kwargs)
-
-
-class InviteWeixinFriendTemplate(BaseWeixinTemplate):
+class InviteWeixinFriendTemplate(TemplateView):
     template_name = "sub_invite_server.jade"
 
     def get_context_data(self, **kwargs):
-        w_user = WeixinUser.objects.filter(openid=self.openid).first()
-        user = w_user.user
+        user = self.request.user
         earning = 0
         if user:
             earning = invite_earning(user)
@@ -36,7 +23,7 @@ class InviteWeixinFriendTemplate(BaseWeixinTemplate):
         return {
             "earning":earning,
             "callback_host":settings.CALLBACK_HOST,
-            "url": base64.b64encode(w_user.user.wanglibaouserprofile.phone),
+            "url": base64.b64encode(user.wanglibaouserprofile.phone),
         }
     def dispatch(self, request, *args, **kwargs):
         self.url_name = 'sub_invite'

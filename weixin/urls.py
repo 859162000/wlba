@@ -56,17 +56,21 @@ urlpatterns = patterns(
     #
     url(r'^jump_page/$', views.JumpPageTemplate.as_view(template_name="sub_times.jade"), name='jump_page'),
     url(r'^is_bind/$', TemplateView.as_view(template_name="sub_is_bind.jade")),
-    url(r'^award_index/$', login_required(activity_views.AwardIndexTemplate.as_view(template_name="sub_award.jade"),
-                                login_url='/weixin/sub_login_redirect/'
-                                          ),
-        name='award_index'),
-    url(r'^award_rule/$', TemplateView.as_view(template_name="sub_award_rule.jade")),
-    url(r'^sub_code/$', base.ChannelBaseTemplate.as_view(template_name="sub_code.jade", wx_classify='fwh', wx_code='test1')),#wx_classify='dyh' or 'fwh'
-    url(r'^sub_invite/$', activity_views.InviteWeixinFriendTemplate.as_view(template_name="sub_invite_server.jade"), name='sub_invite'),
+
+
+    # url(r'^sub_code/$', base.ChannelBaseTemplate.as_view(template_name="sub_code.jade", wx_classify='fwh', wx_code='test1')),#wx_classify='dyh' or 'fwh'
+
+
     #微站
     url(r'^sub_login_redirect/$', main_views.WXLoginRedirect.as_view(), name="sub_login_redirect"),
     url(r'^sub_login/$', main_views.WXLogin.as_view(template_name="service_login.jade"), name="fwh_login"),
     url(r'^sub_regist/$', main_views.WXRegister.as_view(template_name="service_regist.jade")),
+
+    url(r'^sub_invite/$', login_required(activity_views.InviteWeixinFriendTemplate.as_view(template_name="sub_invite_server.jade"),login_url='/weixin/sub_login_redirect/'),
+                                                                                            name='sub_invite'),
+    url(r'^award_index/$', login_required(TemplateView.as_view(template_name="sub_award.jade"),login_url='/weixin/sub_login_redirect/'
+                                          ),name='award_index'),
+    url(r'^award_rule/$', TemplateView.as_view(template_name="sub_award_rule.jade")),
 
     url(r'^sub_regist_first/$', login_required(TemplateView.as_view(template_name="service_registProcess_first.jade"), login_url="/weixin/sub_login_redirect/")),
     url(r'^sub_regist_second/$', login_required(TemplateView.as_view(template_name="service_registProcess_second.jade"), login_url="/weixin/sub_login_redirect/")),
