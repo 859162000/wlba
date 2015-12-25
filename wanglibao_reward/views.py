@@ -174,6 +174,44 @@ class WeixinShareDetailView(TemplateView):
             self.exception_msg(reason, u'判断用户领奖，数据库查询出错')
             return None
 
+    def distribute_experience_glod(self, user, phone_num, openid, product_id, ex_event):
+        gift_order = WanglibaoActivityGiftOrder.objects.select_for_update().filter(order_id=product_id).first()
+        if gift_order.valid_amount <= 0:
+            return "No Reward"
+        else:
+            gift = WanglibaoActivityGift.objects.create(
+                gift_id=product_id,
+                activity=self.activity,
+                valid=True,
+                type=3,
+                cfg_id=1
+            )
+            logger.debug("在activity_gift表中增加了一条记录：体验金；product_id:%s, user_id:%s" % (product_id, user.id))
+
+            send_gift = WanglibaoUserGift.objects.create(
+                rules=gift,
+                user=user if user else None,
+                identity=phone_num,
+                activity=self.activity,
+                amount=ex_event.amount,
+                type=gift.type,
+                valid=0,
+            )
+            logger.debug("基于用户手机号的获奖记录已经生成; phone:%s, activity:%s, user_id:%s" % (phone_num, self.activity, user.id))
+
+            WanglibaoUserGift.objects.create(
+                rules=gift,
+                user=user if user else None,
+                identity=openid,
+                activity=self.activity,
+                amount=ex_event.amount,
+                type=gift.type,
+                valid=2,
+            )
+            logger.debug("基于用户微信openid的获奖记录已经生成了; phone:%s, activity:%s, user_id:%s" % (phone_num, self.activity, user.id))
+
+            return send_gift
+
     @method_decorator(transaction.atomic)
     def distribute_redpack(self, phone_num, openid, activity, product_id):
         """
@@ -181,6 +219,11 @@ class WeixinShareDetailView(TemplateView):
         """
         if not self.activity:
             self.get_activity_by_id(activity)
+
+        user = WanglibaoUserProfile.objects.filter(phone=phone_num).first()
+        activity_record = WanglibaoActivityReward.objects.filter(order_id=product_id, user_id=user.id, activity='weixin_experience_glod').first()
+        if activity_record:
+            return self.distribute_experience_glod(user, phone_num, openid, activity, product_id, activity_record.experience)
 
         try:
             #TODO: 增加分享记录表，用于计数和加锁

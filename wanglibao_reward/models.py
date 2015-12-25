@@ -33,6 +33,7 @@ class WanglibaoActivityGift(models.Model):
         (0, u'红包'),
         (1, u'加息券'),
         (2, u'百分比红包'),
+        (3, u'体验金'),
     )
     gift_id = models.IntegerField(default=0, verbose_name=u'奖品编号')
     activity = models.ForeignKey(Activity, default=None)
@@ -61,6 +62,7 @@ class WanglibaoUserGift(models.Model):
         (0, u'红包'),
         (1, u'加息券'),
         (2, u'优惠券'),
+        (3, u'体验金'),
     )
     SEND = (
         (0, u'YES'),

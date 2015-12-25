@@ -17,6 +17,8 @@ if __name__ == '__main__':
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wanglibao.settings')
 
+from wanglibao_reward.models import WanglibaoActivityReward
+from experience_gold.models import ExperienceEvent
 from weixin.models import WeixinAccounts
 import qrcode
 import hashlib
@@ -1213,22 +1215,24 @@ class WeixinRedpackRegister(CoopRegister):
     def __init__(self, request):
         super(WeixinRedpackRegister, self).__init__(request)
         self.c_code = 'weixin_redpack'
-        #self.channel_code = 'weixin_redpack'
         self.invite_code = 'weixin_redpack'
+        self.order_id = request.GET.get("order_id", None)
 
     def register_call_back(self, user):
         phone = user.wanglibaouserprofile.phone
         logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
-        record = WanglibaoUserGift.objects.filter(valid=0, identity=phone).first()
         try:
-            redpack_backends.give_activity_redpack(user, record.rules.redpack, 'pc')
+            ex_event = ExperienceEvent.objects.filter(name=u'新手体验金', invalid=False).first()
+            WanglibaoActivityReward.objects.create(
+                order_id=self.order_id,
+                activity='weixin_experience_glod',
+                experience=ex_event,
+                user_id=user.id,
+            )
         except Exception, reason:
-            logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
+            logger.debug("微信分享，生成体验金报异常; reason:%s" % (reason,))
         else:
-            logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (self.request.user, record.rules.redpack,))
-        record.valid = 1
-        record.save()
-
+            pass
 
 class XunleiVipRegister(CoopRegister):
     def __init__(self, request):
