@@ -1829,6 +1829,8 @@ org.received_all = (function(){
                 url: '/api/m/repayment_plan/month/',
                 type: 'POST',
                 data: {
+                    year: 2015,
+                    month: 11
 
                 },
                 success:function(data){
