@@ -1,20 +1,21 @@
 # coding=utf-8
 
 import logging
+from decimal import Decimal
 from django.utils import timezone
 from django.views.generic import TemplateView
-from django.shortcuts import render_to_response
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, Http404
 from django.db.models import Sum
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from wanglibao_account.cooperation import get_phone_for_coop
 from wanglibao_p2p.models import P2PProduct, UserAmortization, P2PRecord
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.tasks import send_messages
-from marketing.models import RevenueExchangeRecord
+from marketing.models import (RevenueExchangeAmortization as ExchangeAmo, RevenueExchangeRule,
+                              RevenueExchangeRepertory)
+from marketing.utils import generate_revenue_exchange_order
 from .forms import FuelCardBuyForm
 from .trade import P2PTrader
 from .utils import get_sorts_for_created_time, get_p2p_reward_using_range
@@ -25,14 +26,11 @@ logger = logging.getLogger(__name__)
 def get_user_revenue_count_for_type(user, product_type):
     """根据产品类型获取用户自注册起至今总收益"""
 
-    revenue_count = 0
-    p2p_record_list = P2PRecord.objects.filter(user=user, product__category=product_type)
-    for p2p_record in p2p_record_list:
-        p2p_amount = float(p2p_record.amount)
-        p2p_parts = p2p_amount / p2p_record.product.limit_min_per_user
-        p2p_reward_count = p2p_parts * p2p_record.product.equality_prize_amount
-        p2p_revenue = p2p_reward_count - p2p_amount
-        revenue_count += p2p_revenue
+    revenue_count = Decimal('0.00')
+    exchange_amos = ExchangeAmo.objects.filter(user=user,
+                                               product_amortization__product__category=product_type)
+    for exchange_amo in exchange_amos:
+        revenue_count += exchange_amo.revenue_amount
 
     return revenue_count
 
@@ -70,33 +68,52 @@ def classes_product_for_period(p_period):
     return class_name
 
 
-# 加油卡类别名称
-FUEL_CARD_CLASS = {
-    'A': u'初级理财加油卡',
-    'B': u'中极理财加油卡',
-    'C': u'高级理财加油卡',
+# 类别名称
+_CLASS = {
+    'A': u'初级理财',
+    'B': u'中极理财',
+    'C': u'高级理财',
 }
 
 
-class FuelCardIndexView(TemplateView):
+def get_class_name(p_class, l_type=None):
+    """获取产品级别描述"""
+
+    if l_type:
+        class_name = _CLASS[p_class] + l_type
+    else:
+        class_name = _CLASS[p_class]
+
+    return class_name
+
+
+class RevenueExchangeIndexView(TemplateView):
     """
-    APP加油卡产品购买列表展示
-    :param
+    理财收益兑换-产品视图
+    :param 'type'
     :return
     :request_method GET
     :user.is_authenticated True
     """
 
-    template_name = 'fuel_index.jade'
+    TYPES = {
+        'fuel_card': (u'加油卡', 'fuel_index.jade'),
+    }
 
+    template_name = ''
 
     def get_context_data(self, **kwargs):
+        _type = self.request.GET.get('type', '').strip()
+        l_type, template_name = self.TYPES.get(_type, None)
+        if not _type or not l_type:
+            return HttpResponseForbidden(u'type参数不存在')
+
+        self.template_name = template_name
         user = self.request.user
-        p2p_products = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now(), category=u'加油卡',
+        p2p_products = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now(), category=l_type,
                                                  status=u'正在招标').order_by('period', '-priority')
 
         data = []
-        product_1 = product_2 = product_3 = None
         if p2p_products:
             # 根据产品期限及优先级排序，然后获取每种期限的第一条记录
             data.append(p2p_products[0])
@@ -109,65 +126,68 @@ class FuelCardIndexView(TemplateView):
             # 按产品期限分类（初级-中级-高级）
             for p in data:
                 product_class = classes_product_for_period(p.period) or 'C'
-                p.class_name = FUEL_CARD_CLASS[product_class]
+                p.class_name = get_class_name(product_class, l_type)
 
-        # 获取用户手机号(屏蔽)
-        phone = get_phone_for_coop(user.id)
+        # 统计用户至今购买理财产品总收益
+        revenue_count = get_user_revenue_count_for_type(user, l_type)
 
-        # 获取用户至今总收益
-        revenue_count = get_user_revenue_count_for_type(user, u'加油卡')
-
-        effect_count = get_user_amortizations(user, u'加油卡', False).count()
+        # 统计生效中的理财产品份数
+        effect_count = UserAmortization.objects.filter(user=user, settled=False,
+                                                       product_amortization__product__category=l_type
+                                                       ).count()
 
         return {
             'products': data,
-            'phone': phone,
             'revenue_count': revenue_count,
             'effect_count': effect_count,
         }
 
 
-class FuelCardBuyView(TemplateView):
+class RevenueExchangeBuyView(TemplateView):
     """
-    加油卡购买页面视图
-    :param
+    理财收益兑换-产品购买页面视图
+    :param 'p_id', 'type'
     :return
     :request_method GET
     :user.is_authenticated True
     """
 
-    template_name = 'fuel_buy.jade'
+    TYPES = {
+        'fuel_card': (u'加油卡', 'fuel_buy.jade'),
+    }
+
+    template_name = ''
 
     def get_context_data(self, p_id, **kwargs):
-        user = self.request.user
-
         try:
             p2p_product = P2PProduct.objects.get(pk=p_id)
         except P2PProduct.DoesNotExist:
-            return HttpResponseForbidden(u'无效产品ID')
+            return Http404(u'页面不存在')
+
+        _type = self.request.GET.get('type', '').strip()
+        l_type, template_name = self.TYPES.get(_type, None)
+        if not _type or not l_type:
+            return HttpResponseForbidden(u'type参数不存在')
+
+        self.template_name = template_name
 
         # 获取产品期限
         product_period = p2p_product.period
 
         # 获取奖品使用范围
-        # FixMe, 优化设计==>修改奖品使用范围设计，建议单独分离到一张表中
         using_range = get_p2p_reward_using_range(p2p_product.category)
-
-        # 获取用户手机号(屏蔽)
-        phone = get_phone_for_coop(user.id)
 
         return {
             'product': p2p_product,
             'period': product_period,
             'using_range': using_range,
-            'phone': phone,
         }
 
 
-class FuelCardBuyApi(APIView):
+class RevenueExchangeBuyApi(APIView):
     """
-    加油卡购买接口
-    :param 'p_id', 'p_parts', 'amount', 'reward_range'
+    理财收益兑换-产品购买接口
+    :param 'p_id', 'p_parts', 'amount'
     :return
     :request_method POST
     :user.is_authenticated True
@@ -187,12 +207,17 @@ class FuelCardBuyApi(APIView):
             p2p_product = form.cleaned_data['p2p_product']
             p_parts = form.cleaned_data['p_parts']
             amount = form.cleaned_data['amount']
-            reward_range = form.cleaned_data['reward_range']
+            exchange_rule = RevenueExchangeRule.objects.filter(product=p2p_product).first()
+
             # 判断用户是否满足最低消费限额
-            if p2p_product.limit_min_per_user * p_parts == amount:
+            if exchange_rule and exchange_rule.limit_min_per_user * p_parts == amount:
                 try:
                     trader = P2PTrader(product=p2p_product, user=request.user, request=request)
                     product_info, margin_info, equity_info = trader.purchase(amount)
+
+                    # 生成收益兑换订单
+                    generate_revenue_exchange_order(request.user, p2p_product,
+                                                    product_info.order_id, p_parts)
 
                     # FixMe, 补充短信内容，给用户发送投资成功短信通知
                     message = ''
@@ -218,10 +243,10 @@ class FuelCardBuyApi(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
-class FuelCardBugRecordView(TemplateView):
+class RevenueExchangeBuyRecordView(TemplateView):
     """
-    加油卡购买记录视图
-    :param
+    理财收益兑换-产品购买记录视图
+    :param 'status', 'type'
     :return
     :request_method GET
     :user.is_authenticated True
@@ -276,7 +301,7 @@ class FuelCardBugRecordView(TemplateView):
             # 按产品期限分类（初级-中级-高级）
             for ua in user_amortizations:
                 product_class = classes_product_for_period(ua.product_amortization.product.period) or 'C'
-                ua.class_name = FUEL_CARD_CLASS[product_class]
+                ua.class_name = get_class_name(product_class, l_type)
 
             return {
                 'data': user_amortizations,
@@ -286,10 +311,10 @@ class FuelCardBugRecordView(TemplateView):
             return HttpResponseForbidden(u'无效参数status')
 
 
-class FuelCardExchangeRecordView(TemplateView):
+class RevenueExchangeRecordView(TemplateView):
     """
-    加油卡兑换记录视图
-    :param
+    理财收益兑换-产品兑换记录视图
+    :param 'status', 'type'
     :return
     :request_method GET
     :user.is_authenticated True
@@ -313,34 +338,39 @@ class FuelCardExchangeRecordView(TemplateView):
 
         self.template_name = template_name
 
-        status_list = ['wait_receive', 'receive']
+        status_list = ['receiving', 'changing']
         if _status in status_list:
-            settled_status = False if _status == 'wait_receive' else True
-            user_amortizations = get_user_amortizations(self.request.ser,
-                                                        settled_status,
-                                                        _type).order_by('-term_date')
-            if _status == 'receive':
-                for ua in user_amortizations:
-                    p2p_reward_record = RevenueExchangeRecord.objects.get(user=self.request.user, order_id=ua.id)
-                    ua.reward = p2p_reward_record.reward
+            exchang_status = False if _status == 'receiving' else True
+            settled_status = False if _status == 'receiving' else True
+            exchange_amos = ExchangeAmo.objects.filter(user=self.request.user, exchanged=exchang_status,
+                                                       settled=settled_status,
+                                                       product_amortization__product__category
+                                                       =l_type).order_by('-term_date')
+            if _status == 'changing':
+                for ea in exchange_amos:
+                    rewards = RevenueExchangeRepertory.objects.filter(user=self.request.user,
+                                                                      order_id=ea.order_id,
+                                                                      exchange_id=ea.exchange_id,
+                                                                      is_used=False)
+                    ea.reward = rewards
 
             # 按产品期限分类（初级-中级-高级）
-            for ua in user_amortizations:
-                product_class = classes_product_for_period(ua.product_amortization.product.period) or 'C'
-                ua.class_name = FUEL_CARD_CLASS[product_class]
+            for ea in exchange_amos:
+                product_class = classes_product_for_period(ea.product_amortization.product.period) or 'C'
+                ea.class_name = get_class_name(product_class, l_type)
 
             return {
-                'data': user_amortizations,
+                'data': exchange_amos,
                 'status': _status,
             }
         else:
             return HttpResponseForbidden(u'无效参数status')
 
 
-class FualCardStatisticsView(TemplateView):
+class RevenueExchangeStatisticsView(TemplateView):
     """
-    加油卡资金统计
-    :param
+    理财收益兑换-用户资金统计视图
+    :param 'type'
     :return
     :request_method GET
     :user.is_authenticated True
@@ -352,14 +382,8 @@ class FualCardStatisticsView(TemplateView):
         'fuel_card': (u'加油卡', 'fuel_statistics.jade'),
     }
 
-    def get_user_amortizations(self, user, product, settled_status):
-        """获取用户还款计划"""
-
-        user_amortizations = UserAmortization.objects.filter(user=user, settled=settled_status,
-                                                             product_amortization__product=product
-                                                             ).select_related(depth=2)
-
-        return user_amortizations
+    class MyObject(object):
+        pass
 
     def get_context_data(self, **kwargs):
         _type = self.request.GET.get('type', '').strip()
@@ -370,46 +394,44 @@ class FualCardStatisticsView(TemplateView):
 
         self.template_name = template_name
         user = self.request.user
-
-        # 获取用户购标至今节省总金额
-        total_revenue = get_user_revenue_count_for_type(user, l_type)
+        data = []
 
         # 获取用户注册时间
         register_time = user.date_joined
 
-        # 获取用户资金统计
-        data = []
-        user_amounts = get_p2p_product_amounts(user, l_type).order_by('-create_time')
-        for ua in user_amounts:
-            try:
-                p2p_product = P2PProduct.objects.get(pk=ua['product'])
-            except P2PProduct.DoesNotExist:
-                logger.error('user[%s] amount count faild product[%s] does not exists' % (user.id, ua['product']))
-                return Response({}, status=status.HTTP_400_BAD_REQUEST)
+        revenue_count = Decimal('0.00')
+        exchange_amos = ExchangeAmo.objects.filter(product_amortization__product__category=l_type,
+                                                   user=user).order_by('product_amortization__product_period')
+        if exchange_amos:
+            unique_period = None
+            for exchange_amo in exchange_amos:
+                # 统计用户购标至今收益总额
+                revenue_count += exchange_amo.revenue_amount
 
-            # 获取用户每产品购买份数
-            p2p_parts = float(ua['amount__sum']) / p2p_product.limit_min_per_user
+                # 获取用户每种等级产品的消费统计
+                if exchange_amo.period != unique_period:
+                    sub_exchange_amos = exchange_amos.filter(period=exchange_amo.period)
+                    # 获取用户每产品购买份数
+                    amo_count = sub_exchange_amos.count()
+                    # 获取用户每产品已结算还款计划期数统计
+                    exchanged_count = sub_exchange_amos.filter(exchanged=False).count()
+                    # 获取用户每产品收益金额
+                    revenue = exchange_amos.values('period').annotate(Sum('revenue_amount')).first()
+                    revenue = revenue['revenue_amount__sum']
 
-            # 获取用户每产品收益金额
-            offset_revenue = p2p_product.limit_min_per_user - p2p_product.equality_prize_amount
-            revenue = p2p_parts * offset_revenue
+                    unique_period = exchange_amo
+                    exchange_amo.total_revenue = revenue
+                    exchange_amo.exchanged_count = exchanged_count
+                    exchange_amo.buy_count = amo_count
+                    data.append(exchange_amo)
 
-            # 获取用户每产品已结算还款计划期数统计
-            settled_count = get_user_amortizations(user, p2p_product, True).count()
-
-            p2p_product.parts = p2p_parts
-            p2p_product.revenue = revenue
-            p2p_product.settled_count = settled_count
-
-            data.append(p2p_product)
-
-        # 按产品期限分类(初级-中级-高级)
-        for p2p_product in data:
-            product_class = classes_product_for_period(p2p_product.period) or 'C'
-            p2p_product.class_name = FUEL_CARD_CLASS[product_class]
+            # 按产品期限分类(初级-中级-高级)
+            for p2p_product in data:
+                product_class = classes_product_for_period(p2p_product.period) or 'C'
+                p2p_product.class_name = get_class_name(product_class, l_type)
 
         return {
             'data': data,
-            'count': total_revenue,
+            'count': revenue_count,
             'register_time': register_time,
         }

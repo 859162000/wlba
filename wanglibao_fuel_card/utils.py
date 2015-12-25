@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from marketing.models import RevenueExchangeRepertory
+from marketing.models import RevenueExchangeRule
 
 
 def get_sorts_for_created_time(queryset, reverse=True):
@@ -12,9 +12,12 @@ def get_sorts_for_created_time(queryset, reverse=True):
     return data_list
 
 
-def get_p2p_reward_using_range(_type):
+def get_p2p_reward_using_range(product_id):
     """获取p2p奖品使用范围"""
 
-    using_range = RevenueExchangeRepertory.GET_REWARD_RANGE.get(_type)
+    try:
+        using_range = RevenueExchangeRule.objects.get(product_id=product_id)
+    except RevenueExchangeRule.DoesNotExist:
+        using_range = ''
 
     return using_range

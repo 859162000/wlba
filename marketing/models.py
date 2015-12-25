@@ -622,23 +622,25 @@ class RevenueExchangeRepertory(models.Model):
 
     # 奖品使用范围
     REWARD_RANGE = (
-        (u'中石化', u'中石化'),
-        (u'中石油合作加油站', u'中石油合作加油站'),
+        ('CPDC', u'中石化'),
+        ('CNPC', u'中石油合作加油站'),
     )
 
-    GET_REWARD_RANGE = {
+    REWARD_RANGE_SELECT = {
         u'加油卡': (u'中石化', u'中石油合作加油站'),
     }
 
     type = models.CharField(u'奖品类型', max_length=40, default=u'加油卡', choices=REWARD_TYPE,
                             help_text=u"*必须与产品表类别名称一致")
     price = models.FloatField(u'面值（元）', default=0, blank=False)
+    channel = models.ForeignKey(Channels, verbose_name=u'渠道')
     using_range = models.CharField(u'使用范围', max_length=50, choices=REWARD_RANGE)
     create_time = models.DateTimeField(u'录入时间', auto_now_add=True)
     end_time = models.DateTimeField(u'过期时间', null=True, blank=True)
     is_used = models.BooleanField(u'是否发放', default=False)
-    conversion_code = models.CharField(u'兑换码', max_length=50)
+    conversion_code = models.CharField(u'兑换码', max_length=50, null=True, blank=True)
     description = models.TextField(u'备注', max_length=255, blank=True, null=True)
+    exchange_id = models.IntegerField(u'兑换流水号', max_length=20, blank=True, null=True)
 
     class Meta:
         ordering = ['-create_time']
@@ -646,46 +648,6 @@ class RevenueExchangeRepertory(models.Model):
 
     def __unicode__(self):
         return u'%s%s' % (self.type, self.price)
-
-
-class RevenueExchangeAmortization(models.Model):
-    """
-    modify by ChenWeiBin@20151223
-    用户收益兑换计划
-    """
-
-    user = models.ForeignKey(User)
-    reward = models.ForeignKey(RevenueExchangeRepertory, verbose_name=u'奖品', related_name='fk_reward')
-    description = models.TextField(u'发放奖品流水说明', max_length=255, blank=True, null=True)
-    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
-    order_id = models.IntegerField(u'关联订单编号', null=True)
-
-    class Meta:
-        ordering = ['-create_time']
-        verbose_name_plural = u'收益兑换计划'
-
-    def __unicode__(self):
-        return u'%s' % self.user
-
-
-class RevenueExchangeRecord(models.Model):
-    """
-    modify by ChenWeiBin@20151223
-    收益兑换流水
-    """
-
-    user = models.ForeignKey(User)
-    reward = models.ForeignKey(RevenueExchangeRepertory, verbose_name=u'奖品', related_name='fk_reward')
-    description = models.TextField(u'发放兑换品流水说明', max_length=255, blank=True, null=True)
-    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
-    order_id = models.IntegerField(u'关联订单编号', null=True)
-
-    class Meta:
-        ordering = ['-create_time']
-        verbose_name_plural = u'收益兑换流水'
-
-    def __unicode__(self):
-        return u'%s' % self.user
 
 
 class RevenueExchangeRule(models.Model):
@@ -696,10 +658,22 @@ class RevenueExchangeRule(models.Model):
 
     from wanglibao_p2p.models import P2PProduct
 
+    EXCHANGE_METHOD = (
+        ('recharge', u'直充'),
+        ('reward', u'奖品'),
+        ('recharge&reward', u'直充和奖品'),
+    )
+
+    REWARD_RANGE_DESCRIPTION = (
+        (u'中石化、中石油合作加油站', u'加油卡'),
+    )
+
     reward_name = models.CharField(u'兑换品名称', max_length=40, choices=RevenueExchangeRepertory.REWARD_TYPE)
     limit_min_per_user = models.FloatField(u'单用户购买最低额度', default=100)
     equality_prize_amount = models.FloatField(u'等额兑换品面值（元）', default=0, blank=False)
+    exchange_method = models.CharField(u'兑换方式', max_length=10, choices=EXCHANGE_METHOD, default=u'直充')
     product = models.ForeignKey(P2PProduct, unique=True, verbose_name=u'产品')
+    reward_range = models.CharField(u'使用范围', max_length=50, choices=REWARD_RANGE_DESCRIPTION)
     reward_options = models.CharField(u'兑换品可选类型', null=True, blank=True, max_length=80)
     created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
 
@@ -719,11 +693,10 @@ class RevenueExchangeOrder(models.Model):
 
     user = models.ForeignKey(User)
     reward_name = models.CharField(u'兑换品名称', max_length=40)
-    reward_option = models.CharField(u'使用范围', max_length=50)
-    parts = models.IntegerField(u'购买份额')
+    parts = models.IntegerField(u'购买份额', null=True)
     reward_rule = models.ForeignKey(RevenueExchangeRule, u'兑换规则')
-    order_id = models.IntegerField(u'关联订单编号', null=True)
-    product_id = models.IntegerField(u'产品ID', null=True)
+    order_id = models.IntegerField(u'关联订单编号', unique=True, db_index=True)
+    product_id = models.IntegerField(u'产品ID')
     created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
 
     class Meta:
@@ -732,3 +705,40 @@ class RevenueExchangeOrder(models.Model):
 
     def __unicode__(self):
         return u'%s' % self.order_id
+
+
+class RevenueExchangeAmortization(models.Model):
+    """
+    modify by ChenWeiBin@20151223
+    用户收益兑换计划
+    """
+
+    from wanglibao_p2p.models import ProductAmortization
+
+    user = models.ForeignKey(User)
+    product_amortization = models.ForeignKey(ProductAmortization, related_name='reward_subs')
+    term = models.IntegerField(u'兑换期数')
+    term_date = models.DateTimeField(u'兑换生效时间')
+    term_amount = models.DecimalField(u'返还金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
+    revenue_amount = models.DecimalField(u'收益金额', max_digits=20, decimal_places=2, default=Decimal('0.00'))
+
+    settled = models.BooleanField(u'已结算', default=False)
+    settlement_time = models.DateTimeField(u'结算时间', auto_now=True)
+
+    exchanged = models.BooleanField(u'已兑换', default=False)
+    exchange_id = models.IntegerField(u'兑换流水号', max_length=20, blank=True, null=True)
+    exchange_parts = models.IntegerField(u'兑换份数', blank=True, null=True)
+    exchange_result = models.CharField(u'兑换结果', max_length=50, null=True, blank=True)
+    exchange_method = models.CharField(u'兑换方式', max_length=10)
+    exchange_time = models.DateTimeField(u'兑换时间', auto_now=True)
+
+    order_id = models.CharField(u'关联订单流水', null=True)
+    description = models.TextField(u'兑换流水说明', max_length=255, blank=True, null=True)
+    create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+
+    class Meta:
+        ordering = ['-create_time']
+        verbose_name_plural = u'收益兑换计划'
+
+    def __unicode__(self):
+        return u'%s' % self.user

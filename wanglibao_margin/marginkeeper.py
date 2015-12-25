@@ -219,6 +219,34 @@ class MarginKeeper(KeeperBaseMixin):
         trace.save()
         return trace
 
+    def exchanging(self, amount, description=u'', savepoint=True):
+        amount = Decimal(amount)
+        check_amount(amount)
+        with transaction.atomic(savepoint=savepoint):
+            margin = Margin.objects.select_for_update().filter(user=self.user).first()
+            if amount > margin.margin:
+                # TODO, check why 201? Magic number sucks, unless its famous, like 404 or 500
+                raise MarginLack(u'201')
+            margin.margin -= amount
+            margin.exchanging += amount
+            margin.save()
+            catalog = u'兑换冻结'
+            record = self.__tracer(catalog, amount, margin.margin, description)
+            return record
+
+    def unexchanging(self, amount, description=u'', savepoint=True):
+        amount = Decimal(amount)
+        check_amount(amount)
+        with transaction.atomic(savepoint=savepoint):
+            margin = Margin.objects.select_for_update().filter(user=self.user).first()
+            if amount > margin.freeze:
+                raise MarginLack(u'202')
+            margin.exchanging -= amount
+            margin.save()
+            catalog = u'兑换解冻'
+            record = self.__tracer(catalog, amount, margin.margin, description)
+            return record
+
 
 def check_amount(amount):
     if amount < 0:

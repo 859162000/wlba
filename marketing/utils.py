@@ -9,8 +9,8 @@ from django.core.paginator import Paginator, PageNotAnInteger
 from django.db import connection
 from django.db.models import Sum
 from marketing.models import (IntroducedBy, PromotionToken, ClientData, Channels,
-                              ChannelsNew, RevenueExchangeRepertory, RevenueExchangeRecord,
-                              RevenueExchangePlan, RevenueExchangeOrder)
+                              ChannelsNew, RevenueExchangeRepertory, RevenueExchangeAmortization,
+                              RevenueExchangeRule, RevenueExchangeOrder)
 from wanglibao_p2p.models import AmortizationRecord, P2PRecord
 from wanglibao.settings import THREE_DEFAULT_CHANNEL_CODE
 from wanglibao.settings import ENV, ENV_PRODUCTION
@@ -196,38 +196,25 @@ def pc_data_generator():
     }
 
 
-def generate_revenue_exchange_record(user, product, order_id=None, description=None):
-    """生成p2p奖品流水"""
+def generate_revenue_exchange_order(user, product, order_id, p_parts=None):
+    """生成收益兑换订单"""
 
     try:
-        # 查询收益兑换计划
-        exchange_plan = RevenueExchangePlan.objects.get(product=product)
-        reward_type = exchange_plan.reward_name
-        price = product.equality_prize_amount
+        # 查询收益兑换规则
+        exchange_rule = RevenueExchangeRule.objects.get(product=product)
+        reward_type = exchange_rule.reward_name
 
-        # 查询收益兑换订单
-        p2p_record = P2PRecord.objects.filter()
-        exchange_order = RevenueExchangeOrder.objects.get(user, order_id=)
-
-        p2p_reward = RevenueExchangeRepertory.objects.filter(type=reward_type, is_used=False,
-                                                             price=price).first()
-        if p2p_reward:
-            p2p_reward_record = RevenueExchangeRecord()
-            p2p_reward_record.user = user
-            p2p_reward_record.reward = p2p_reward
-            p2p_reward_record.order_id = order_id
-            p2p_reward_record.description = description
-            p2p_reward_record.save()
-
-            p2p_reward.is_used = True
-            p2p_reward.save()
-            return True
-        else:
-            # FixMe, 如果是线上环境就给管理员发短信
-            # if ENV == ENV_PRODUCTION:
-
-            logger.warning("unfounded p2p_reward for user[%s], type[%s], price[%s]" %
-                           (user_id, _type, _price))
+        # 生成收益兑换订单
+        order = RevenueExchangeOrder()
+        order.user = user
+        order.reward_name = reward_type
+        order.parts = p_parts
+        order.reward_rule = exchange_rule
+        order.order_id = order_id
+        order.product_id = product.id
+        order.save()
+        return True
     except Exception, e:
-        logger.info("generate p2p_reward_record failed")
+        logger.info("generate p2p_reward_record failed for user[%s] product[%s]" % (user.id, product.id))
         logger.error(e)
+        return False

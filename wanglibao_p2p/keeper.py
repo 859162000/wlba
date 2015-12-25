@@ -267,7 +267,10 @@ class AmortizationKeeper(KeeperBaseMixin):
 
     def __init__(self, product, order_id=None):
         super(AmortizationKeeper, self).__init__(product=product, order_id=order_id)
+        from marketing.models import RevenueExchangeAmortization, RevenueExchangeOrder
         self.product = product
+        self.RevenueExchangeAmortization = RevenueExchangeAmortization
+        self.RevenueExchangeOrder = RevenueExchangeOrder
 
     def generate_amortization_plan(self, savepoint=True):
         if self.product.status != u'满标已打款':
@@ -332,6 +335,7 @@ class AmortizationKeeper(KeeperBaseMixin):
     def __generate_user_amortization(self, equities):
 
         product = self.product
+        product_type = product.types
 
         product_amortizations = []
         interest_precisions = list()
@@ -340,6 +344,7 @@ class AmortizationKeeper(KeeperBaseMixin):
             product_amortizations.append(product_amortization)
 
         user_amos = list()
+        exchange_amos = list()
 
         amortization_cls = get_amortization_plan(product.pay_method)
         product_interest_start = timezone.now()
@@ -349,11 +354,15 @@ class AmortizationKeeper(KeeperBaseMixin):
         product_interest = Decimal(0)
 
         for equity in equities:
-            # 查询用户是否使用加息券
-            coupon = RedPackRecord.objects.filter(user=equity.user, product_id=product.id)\
-                .filter(redpack__event__rtype='interest_coupon').first()
-            if coupon:
-                coupon_year_rate = coupon.redpack.event.amount
+            # modify by ChenWeiBin@20151224
+            if product_type != u'还款等额兑奖':
+                # 查询用户是否使用加息券
+                coupon = RedPackRecord.objects.filter(user=equity.user, product_id=product.id)\
+                    .filter(redpack__event__rtype='interest_coupon').first()
+                if coupon:
+                    coupon_year_rate = coupon.redpack.event.amount
+                else:
+                    coupon_year_rate = 0
             else:
                 coupon_year_rate = 0
 
@@ -375,6 +384,9 @@ class AmortizationKeeper(KeeperBaseMixin):
                 else:
                     amortization.term_date = timezone.now()
 
+                if product_type == u'还款等额兑奖':
+                    self.__generate_exchange_amortization(amortization)
+
                 user_amos.append(amortization)
 
             if terms['interest_arguments']:
@@ -385,6 +397,30 @@ class AmortizationKeeper(KeeperBaseMixin):
 
         UserAmortization.objects.bulk_create(user_amos)
         InterestPrecisionBalance.objects.bulk_create(interest_precisions)
+
+    def __generate_exchange_amortization(self, user_amo):
+        # modify by ChenWeiBin@20151224
+        try:
+            exchange_order = self.RevenueExchangeOrder.objects.filter(user=user_amo.user,
+                                                                      product_id=self.product.id).first()
+
+            amortization = self.RevenueExchangeAmortization()
+            amortization.description = user_amo.description
+            amortization.principal = user_amo.principal
+            amortization.interest = user_amo.interest
+            amortization.coupon_interest = user_amo.coupon_interest
+            amortization.term = user_amo.term
+            amortization.user = user_amo.user
+            amortization.product_amortization = user_amo.product_amortization
+            amortization.term_date = user_amo.term_date
+            amortization.revenue_amount = user_amo.principal.interest + user_amo.coupon_interest
+            amortization.revenue_amount -= user_amo.penal_interest
+            amortization.term_amount = user_amo.principal + amortization.revenue_amount
+            amortization.order_id = exchange_order.order_id
+            amortization.save()
+        except Exception, e:
+            logger.error('generate exchange amortization failed for user_amo[%s]' % user_amo)
+            logger.error(e)
 
     # def __generate_useramortization(self, equities):
     #     """
@@ -518,8 +554,9 @@ class AmortizationKeeper(KeeperBaseMixin):
                 user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
                                             sub_amo.coupon_interest, savepoint=False, description=description)
                 if product_type == u'还款等额兑奖':
-                    # FixMe, 用户余额扣款
-                    generate_p2p_reward_record(sub_amo.user, product.category, sub_amo.id, sub_amo.description)
+                    # FixMe, 冻结金额计算
+                    margin_record = user_margin_keeper.exchanging(amount, description=description, savepoint=False)
+
                 sub_amo.settled = True
                 sub_amo.settlement_time = timezone.now()
                 sub_amo.save()
