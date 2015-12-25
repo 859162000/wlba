@@ -69,7 +69,6 @@
                 type: "POST",
                 data: {}
             }).done(function (damai) {
-                console.log(damai.ret_code);
                 if (damai['ret_code'] == 0) {
                    $('.tishiyu').text('恭喜！您已获得网利宝摇滚之夜门票');
                 } else if (damai['ret_code'] == 1006) {
