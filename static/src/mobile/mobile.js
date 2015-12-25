@@ -1749,21 +1749,103 @@ org.processSecond = (function(org){
     }
 })(org);
 
-org.received = (function(){
+org.received_ui = (function(){
+    var slide = function(data){
+        var slide = "<div class='swiper-slide received-slide'>"
+            slide += "<div class='received-slide-date'>"+data.date+"</div>"
+            slide += "<div class='received-slide-data'>";
+            slide += "<div class='received-data-list'>";
+            slide += "<span class='received-left-center'>"
+            slide += "<div class='data-name'>"+data.name+"</div>"
+            slide += "<div class='data-value'>"+data.value+"</div>"
+            slide += "</span>"
+            slide += "</div>"
+            slide += "<div class='received-data-list'>";
+            slide += "<span class='received-left-center'>"
+            slide += "<div class='data-name'>"+data.name+"</div>"
+            slide += "<div class='data-value'>"+data.value+"</div>"
+            slide += "</span>"
+            slide += "</div>"
+            slide += "</div>"
+            slide += "</div>"
+    }
+
+    var list = function(data){
+        var list = "<a href='"+data.url+"' class='received-list'>";
+            list += "<div class='list-head-warp'>";
+            list += "<div class='list-head arrow'>";
+            list += "<div class='head-space'>&nbsp&nbsp</div>"
+            list += "<span class='head-name'>"+data.name+"</span>"
+            list += "<span class='head-process'>"+data.process+"</span>"
+            list += "</div>";
+            list += "<div class='list-cont'>";
+            list += "<div class='list-flex'>";
+            list += "<div class='cont-grey-2'>"+data.received_date+"</div>";
+            list += "<div class='cont-grey-1'>回款日期</div>";
+            list += "</div>";
+            list += "<div class='list-flex'>";
+            list += "<div class='cont-red'>"+data.amount+"</div>";
+            list += "<div class='cont-grey-1'>本(元)</div>";
+            list += "</div>";
+
+            list += "<div class='list-flex'>";
+            list += "<div class='cont-red'>"+data.amount+"</div>";
+            list += "<div class='cont-grey-1'>息(元)</div>";
+            list += "</div>";
+
+            list += "<div class='list-flex'>";
+            list += "<div class='cont-grey-2'>"+data.text+"</div>";
+            list += "<div class='cont-grey-1'>+data.text_date+</div>";
+            list += "</div>";
+            list += "</div>";
+
+            list += "</div></a>"
+
+    }
+    return {
+
+    }
+})()
+org.received_all = (function(){
     var lib = {
         init: function(){
-            var swiper = new Swiper ('.swiper-container', {
-                direction: 'horizontal',
-                loop: false,
-                slidesPerView: 1.21,
-                centeredSlides: true,
-                paginationClickable: true,
-                spaceBetween: 30,
-              })
-            swiper.appendSlide([
+            lib.fetch()
+            //var swiper = new Swiper ('.swiper-container', {
+            //    direction: 'horizontal',
+            //    loop: false,
+            //    slidesPerView: 1.21,
+            //    centeredSlides: true,
+            //    paginationClickable: true,
+            //    spaceBetween: 30,
+            //  })
+            //swiper.appendSlide([
+            //
+            //])
 
-            ])
+        },
+        fetch: function(data){
+            org.ajax({
+                url: '/api/m/repayment_plan/month/',
+                type: 'POST',
+                data: {
 
+                },
+                success:function(data){
+                    console.log(data)
+                }
+            })
+        }
+
+    }
+
+    return {
+        init : lib.init
+    }
+})()
+
+org.received_month = (function(){
+    var lib = {
+        init: function(){
         }
     }
 

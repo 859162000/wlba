@@ -1,4 +1,18 @@
 
+.received-loding
+  position: fixed
+  width: 100%
+  top: 0
+  bottom: 0
+  height: 100%
+  display: -webkit-box
+  -webkit-box-align: center
+  -webkit-box-pack: center
+  z-index: 11
+  background: rgba(0,0,0,.2)
+  display: none
+  .spinner
+    width: 2.25rem
 
 .received-switch
   padding: .75rem 0 .5rem 0
@@ -9,12 +23,11 @@
   overflow: hidden
   .received-data-list
     -webkit-box-flex: 1
+    text-align: center
   .received-left-center
+    display: inline-block
     text-align: left
-    padding-left: rem(70)
-  .received-right-center
-    text-align: left
-    padding-left: rem(150)
+
   .received-slide-date
     position: relative
     color: #fff

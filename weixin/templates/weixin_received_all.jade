@@ -10,7 +10,8 @@ html(style="background: #f5f5f5")
        span 返回
       a(href="/weixin/received/month/").right 全部
 
-
+    .received-loding
+      include  include/weixin_loading
     .received-switch
       .swiper-container
         .swiper-wrapper(style='text-align:center')
@@ -18,13 +19,14 @@ html(style="background: #f5f5f5")
             .swiper-slide.received-slide
               .received-slide-date 2015年10月
               .received-slide-data
-                .received-data-list.received-left-center
-                  .data-name 回款总额(元)
-                  .data-value 10000.00
-                .received-data-list.received-right-center
-                  .data-name 回款笔数
-                  .data-value 4
-
+                .received-data-list
+                  span.received-left-center
+                    .data-name 回款总额(元)
+                    .data-value 10000.00
+                .received-data-list
+                  span.received-left-center
+                    .data-name 回款笔数
+                    .data-value 4
           +list()
           +list()
           +list()
@@ -57,4 +59,4 @@ html(style="background: #f5f5f5")
       +item()
       +item()
     script(src="/static/scripts/mobile/swiper/swiper.min.js")
-    script(data-init='received', src="/static/scripts/mobile/mobile.js?v=20151202")
+    script(data-init='received_all', src="/static/scripts/mobile/mobile.js?v=20151202")
