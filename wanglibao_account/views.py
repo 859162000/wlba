@@ -1717,11 +1717,11 @@ class AdminSendMessageView(TemplateView):
                                     record.redpack = redpack
                                     record.change_platform = 'pc'
                                     record.save()
-                                    msg += u'id:{},成功;'
+                                    msg += u'id:{},成功;'.format(coupon_id)
                                 else:
-                                    msg += u'id:{},失败;'
+                                    msg += u'id:{},失败;'.format(coupon_id)
                         else:
-                            msg += u'id:{},失败;'
+                            msg += u'id:{},失败;'.format(coupon_id)
 
             # 发送短信
             content_sms = request.POST.get("content_sms", "")
