@@ -8,32 +8,15 @@ html(style="background: #f5f5f5")
       hgroup 回款计划
       a(href="javascript:history.back()")
         span 返回
-      a(href="javascript:history.back()").right 月份
-
+      a(href="/weixin/received/all/").right 月份
+    .received-loding
+      include  include/weixin_loading
     .received-item.month-space
-      mixin item()
-        a(href='/weixin/received/detail/').received-list
-          .list-head-warp
-            .list-head.arrow
-              .head-space &nbsp&nbsp
-              span.head-name 企业资金周转企业资金周
-              span.head-process 2/3
-          .list-cont
-            .list-flex
-              .cont-grey-2 2015-10-01
-              .cont-grey-1 回款日期
-            .list-flex
-              .cont-red 100000.00
-              .cont-grey-1 本（元）
-            .list-flex
-              .cont-red 100000.00
-              .cont-grey-1 息（元）
-            .list-flex
-              .cont-grey-2 提前回款
-              .cont-grey-1 2015-10-01
-      +item()
-      +item()
-      +item()
-      +item()
+      .received-default
+        img(src='/static/imgs/mobile/reveived/default.png')
+        .defualt-sign 您还没有回款记录，快去投资吧！
+
+
+    button(type='submit', name='load_more').received-more(style='display:none') 加载更多
     script(src="/static/scripts/mobile/swiper/swiper.min.js")
-    script(data-init='received', src="/static/scripts/mobile/mobile.js?v=20151202")
+    script(data-init='received_month', src="/static/scripts/mobile/mobile.js?v=20151202")

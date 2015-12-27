@@ -1753,88 +1753,168 @@ org.processSecond = (function(org){
 org.received_ui = (function(){
     var slide = function(data){
         var slide = "<div class='swiper-slide received-slide'>"
-            slide += "<div class='received-slide-date'>"+data.date+"</div>"
+            slide += "<div class='received-slide-date'>"+data.term_date+"</div>"
             slide += "<div class='received-slide-data'>";
             slide += "<div class='received-data-list'>";
             slide += "<span class='received-left-center'>"
-            slide += "<div class='data-name'>"+data.name+"</div>"
-            slide += "<div class='data-value'>"+data.value+"</div>"
+            slide += "<div class='data-name'>回款总额(元)</div>"
+            slide += "<div class='data-value'>"+data.total_sum+"</div>"
             slide += "</span>"
             slide += "</div>"
             slide += "<div class='received-data-list'>";
             slide += "<span class='received-left-center'>"
-            slide += "<div class='data-name'>"+data.name+"</div>"
-            slide += "<div class='data-value'>"+data.value+"</div>"
+            slide += "<div class='data-name'>回款笔数</div>"
+            slide += "<div class='data-value'>"+data.term_date_count+"</div>"
             slide += "</span>"
             slide += "</div>"
             slide += "</div>"
             slide += "</div>"
+
+        return slide
     }
 
     var list = function(data){
-        var list = "<a href='"+data.url+"' class='received-list'>";
+        var list = "<a href='/weixin/received/detail/?productId="+data.product_id+"' class='received-list'>";
             list += "<div class='list-head-warp'>";
             list += "<div class='list-head arrow'>";
             list += "<div class='head-space'>&nbsp&nbsp</div>"
-            list += "<span class='head-name'>"+data.name+"</span>"
-            list += "<span class='head-process'>"+data.process+"</span>"
-            list += "</div>";
+            list += "<span class='head-name'>"+data.product_name+"</span>"
+            list += "<span class='head-process'>"+data.term+"/"+data.term_total+"</span>"
+            list += "</div></div>";
+
             list += "<div class='list-cont'>";
             list += "<div class='list-flex'>";
-            list += "<div class='cont-grey-2'>"+data.received_date+"</div>";
+            list += "<div class='cont-grey-2'>"+data.term_date.slice(0,10)+"</div>";
             list += "<div class='cont-grey-1'>回款日期</div>";
             list += "</div>";
             list += "<div class='list-flex'>";
-            list += "<div class='cont-red'>"+data.amount+"</div>";
+            list += "<div class='cont-red'>"+data.principal+"</div>";
             list += "<div class='cont-grey-1'>本(元)</div>";
             list += "</div>";
 
             list += "<div class='list-flex'>";
-            list += "<div class='cont-red'>"+data.amount+"</div>";
+            list += "<div class='cont-red'>"+data.interest+"</div>";
             list += "<div class='cont-grey-1'>息(元)</div>";
             list += "</div>";
 
             list += "<div class='list-flex'>";
-            list += "<div class='cont-grey-2'>"+data.text+"</div>";
-            list += "<div class='cont-grey-1'>+data.text_date+</div>";
+            list += "<div class='cont-grey-2'>"+data.settlement_status+"</div>";
+            if(data.settlement_status != '待回款'){
+                list += "<div class='cont-grey-1'>"+data.settlement_time.slice(0,10)+"</div>";
+            }
             list += "</div>";
             list += "</div>";
 
             list += "</div></a>"
 
-    }
-    return {
+        return list
 
+    }
+
+    var detail = function(data){
+        var detail = "<div class='list-head-warp'>";
+            detail += "<div class='list-head'>";
+            detail += "<div class='head-space'>&nbsp&nbsp</div>";
+            detail += "<span class='head-name head-allshow'>"+data.equity_product_short_name+"</span>";
+            detail += "</div></div>";
+
+            detail += "<div class='list-nav'>";
+            detail += "<ul><li class='item-date'>时间</li><li>本金(元)</li><li>利息(元)</li><li class='item-count'>总计(元)</li></ul>";
+            detail += "</div>";
+            detail += "<div class='detail-space-grep'></div>";
+
+            for(var i=0; i< data.amortization_record.length;i++){
+
+                detail += "<div class='detail-list'>";
+                detail += "<div class='detail-item item-date'>"+data.amortization_record[i].amortization_term_date.slice(0,10)+"</div>";
+                detail += "<div class='detail-item'>"+data.amortization_record[i].amortization_principal+"</div>";
+                detail += "<div class='detail-item'>" + data.amortization_record[i].amortization_amount_interest;
+                if(data.amortization_record[i].amortization_coupon_interest > 0){
+                    detail += "<span>+</span><span class='blue-text'>"+data.amortization_record[i].amortization_coupon_interest+"</span><span class='blue-sign'>加息</span>";
+                }
+                detail += "</div>";
+                detail += "<div class= 'detail-item item-count'>"+data.amortization_record[i].amortization_amount+"</div>>";
+                detail += "<div class= 'repayment-icon'></div>>";
+                detail += "</div>";
+            }
+
+
+        return detail;
+    }
+
+    return {
+        slide: slide,
+        list: list,
+        detail: detail
     }
 })()
 org.received_all = (function(){
     var lib = {
         init: function(){
-            lib.fetch()
-            //var swiper = new Swiper ('.swiper-container', {
-            //    direction: 'horizontal',
-            //    loop: false,
-            //    slidesPerView: 1.21,
-            //    centeredSlides: true,
-            //    paginationClickable: true,
-            //    spaceBetween: 30,
-            //  })
-            //swiper.appendSlide([
-            //
-            //])
+            lib.init_operation()
 
         },
-        fetch: function(data){
+        init_operation:function(){
+            var _self = this;
+
+            function style(data){
+                var slide = [], INDEX = null;
+                for(var i =0; i< data.month_group.length; i++){
+                    if(data.current_month == data.month_group[i].term_date){
+                        INDEX = i;
+                    }
+                    slide.push(org.received_ui.slide(data.month_group[i]))
+                }
+                swiper_m.appendSlide(slide);
+                swiper_m.slideTo(INDEX, 150, false);
+                 _self.list_style(data)
+                $('.received-loding').hide()
+            }
+
+            var swiper_m = new Swiper('.swiper-container', {
+                direction: 'horizontal',
+                loop: false,
+                slidesPerView: 1.21,
+                centeredSlides: true,
+                paginationClickable: true,
+                spaceBetween: 30,
+                onSlideChangeStart:function(swiper){
+                    var slide_index = swiper.activeIndex;
+                    var target = $('.swiper-slide').eq(slide_index).find('.received-slide-date').text();
+                    var year = target.slice(0,4);
+                    var month = target.slice(-2);
+                    $('.received-loading-warp').show()
+                    _self.fetch({ year: year,  month: month}, _self.list_style)
+                }
+            });
+
+            _self.fetch({ year: '',  month: ''}, style);
+
+        },
+        list_style: function(data){
+            var slide = [],
+                $item = $('.receive-body'),
+                $default =$('.received-default');
+            if(data.data.length === 0){
+                $item.html('');
+                $default.show();
+                return
+            }
+            for(var i =0; i< data.data.length; i++){
+                slide.push(org.received_ui.list(data.data[i]))
+            }
+            $default.hide();
+            $item.html(slide.join(''))
+            $('.received-loading-warp').hide()
+
+        },
+        fetch: function(data, callback){
             org.ajax({
                 url: '/api/m/repayment_plan/month/',
                 type: 'POST',
-                data: {
-                    year: 2015,
-                    month: 11
-
-                },
+                data: data,
                 success:function(data){
-                    console.log(data)
+                    callback && callback(data)
                 }
             })
         }
@@ -1848,7 +1928,64 @@ org.received_all = (function(){
 
 org.received_month = (function(){
     var lib = {
+        page: 1,
+        num: 10,
         init: function(){
+            var
+                _self = lib;
+
+            var get_data = function(callback){
+                _self.fetch({
+                    page: _self.page,
+                    num: _self.num
+                },callback)
+            }
+
+            get_data(function(){
+                $('.received-loding').hide()
+            });
+
+            $('.received-more').on('click', function(){
+               get_data()
+            })
+        },
+        init_style:function(data){
+            var slide = [],
+                $item = $('.received-item');
+            for(var i =0; i< data.data.length; i++){
+                slide.push(org.received_ui.list(data.data[i]))
+            }
+            $item.append(slide.join(''))
+        },
+        fetch: function(data, callback){
+            var _self = this;
+            org.ajax({
+                url: '/api/m/repayment_plan/all/',
+                type: 'POST',
+                data: data,
+                beforeSend: function(){
+                    $('.received-more').attr('disabled',true).html('加载中，请稍后...')
+                },
+                success:function(data){
+                    if(data.count === 0 ){
+                        $('.received-default').show()
+                    }
+                    if(data.count - data.page > 0 ){
+                        $('.received-more').show()
+                    }else{
+                        $('.received-more').hide()
+                    }
+                    _self.page = _self.page + 1;
+
+                    _self.init_style(data)
+                    callback && callback(data)
+
+                },
+                complete: function(){
+                    $('.received-more').removeAttr('disabled').html('加载更多')
+                }
+
+            })
         }
     }
 
@@ -1856,6 +1993,42 @@ org.received_month = (function(){
         init : lib.init
     }
 })()
+
+
+
+org.received_detail = (function(){
+    var lib = {
+        init: function(){
+            var
+                _self = lib;
+            var product_id  = org.getQueryStringByName('productId')
+            _self.fetch(product_id);
+        },
+        init_style:function(data){
+            var slide = [],
+                $item = $('.received-list');
+            slide.push(org.received_ui.detail(data));
+            $item.append(slide.join(''))
+            $('.received-loding').hide()
+        },
+        fetch: function(product_id){
+            var _self = this;
+
+            org.ajax({
+                url: '/api/home/p2p/amortization/'+product_id,
+                type: 'get',
+                success:function(data){
+                    _self.init_style(data);
+                }
+            })
+        }
+    }
+
+    return {
+        init : lib.init
+    }
+})()
+
 
 ;(function(org){
     $.each($('script'), function(){
