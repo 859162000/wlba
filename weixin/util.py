@@ -3,7 +3,7 @@ from wanglibao_p2p.models import P2PEquity
 from wanglibao_buy.models import FundHoldInfo
 from django.template import Template, Context
 from django.template.loader import get_template
-from .models import WeixinAccounts, WeixinUser, WeiXinUserActionRecord
+from .models import WeixinAccounts, WeixinUser, WeiXinUserActionRecord, SceneRecord
 from wechatpy import WeChatClient
 from wechatpy.exceptions import WeChatException
 from misc.models import Misc
@@ -97,6 +97,13 @@ def _process_record(w_user, user, type, describe):
     war.action_describe = describe
     war.create_time = int(time.time())
     war.save()
+
+def _process_scene_record(w_user, scene_str):
+    sr = SceneRecord()
+    sr.openid = w_user.openid
+    sr.scene_str=scene_str
+    sr.create_time = int(time.time())
+    sr.save()
 
 def bindUser(w_user, user):
     is_first_bind = False
