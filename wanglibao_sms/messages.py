@@ -496,6 +496,22 @@ def msg_give_coupon(name, amount, end_time):
     return title, content
 
 
+@suffix
+def exchange_product_settled(name, equity, product, parts, settled_time, settled_amount):
+    """
+    投资成功
+    """
+    if product.pay_method.startswith(u"日计息"):
+        stand = u'天'
+    else:
+        stand = u'个月'
+
+    return u'亲爱的{}，您已成功购买{}理财产品 {}份，共支付 {}元，您将在接下来的{}{}累计获得价值{}元的加油卡，感谢您的支持！'.format(
+        name, product.category, parts, equity.equity,
+        product.period, stand, settled_amount
+    )
+
+
 if __name__ == "__main__":
     print sms_alert_invest('test')
     print sms_alert_invite('test', '15038038823')
