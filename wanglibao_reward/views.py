@@ -304,8 +304,10 @@ class WeixinShareDetailView(TemplateView):
 
             try:
                 # modify by hb on 2015-10-15 : 只查询微信号关联记录
-                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity, valid=2).all()
-                return gifts
+                gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity, valid=2)
+                exp_glods = gifts.filter(amount__gte=100)  #此处做了一个假设：加息券不可能大于100, 体验金不可能小于100
+                counts = exp_glods.count() if exp_glods else 0
+                return gifts.filter(amount__lt=10).all(), counts
             except Exception, reason:
                 self.exception_msg(reason, u'获取已领奖用户信息失败')
                 return None
@@ -404,9 +406,10 @@ class WeixinShareDetailView(TemplateView):
             if "No Reward" == user_gift:
                 self.debug_msg('奖品已经发完了，用户:%s 没有领到奖品' %(phone_num,))
                 self.template_name = 'app_weChatEnd.jade'
-                gifts = self.get_distribute_status(order_id, activity)
+                counts, gifts = self.get_distribute_status(order_id, activity)
                 share_title, share_content, url = get_share_infos(order_id)
                 return {
+                    "count": counts,
                     "share": {'content': share_content, 'title': share_title, 'url': url},
                     "all_gift": self.format_response_data(gifts, openid, 'gifts'),
                 }
@@ -416,10 +419,11 @@ class WeixinShareDetailView(TemplateView):
             else:
                 has_gift = 'true'
             self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s' %(openid, user_gift.identity, user_gift, ))
-        gifts = self.get_distribute_status(order_id, activity)
+        counts, gifts = self.get_distribute_status(order_id, activity)
         share_title, share_content, url = get_share_infos(order_id)
         return {
             "ret_code": 0,
+            "count": counts,
             "has_gift": has_gift,
             "self_gift": self.format_response_data(user_gift, openid, 'alone'),
             "all_gift": self.format_response_data(gifts, openid, 'gifts'),
@@ -567,8 +571,10 @@ class WeixinShareEndView(TemplateView):
             获得用户领奖信息
         """
         try:
-            gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, valid=2).all()
-            return gifts
+            gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, valid=2)
+            exp_glods = gifts.filter(amount__gte=100)  #此处做了一个假设：加息券不可能大于100, 体验金不可能小于100
+            counts = exp_glods.count() if exp_glods else 0
+            return gifts.filter(amount__lt=10).all(), counts
         except Exception, reason:
             logger.debug(reason, u'获取已领奖用户信息失败')
             return None
@@ -600,9 +606,10 @@ class WeixinShareEndView(TemplateView):
     def get_context_data(self, **kwargs):
         order_id = self.request.GET.get('url_id')
         share_title, share_content, url = get_share_infos(order_id)
-        gifts = self.get_distribute_status(order_id)
+        counts, gifts = self.get_distribute_status(order_id)
         logger.debug("抵达End页面，order_id:%s, URL:%s" %(order_id, url))
         return {
+         "count": counts,
          "all_gift": self.format_response_data(gifts),
          "share": {'content': share_content, 'title': share_title, 'url': url}
         }
