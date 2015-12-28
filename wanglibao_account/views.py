@@ -1487,6 +1487,8 @@ class P2PAmortizationAPI(APIView):
             'amortization_amount_interest': float(amortization.interest),  # 利息
             'amortization_amount': float(amortization.principal + amortization.interest + amortization.coupon_interest),  # 本息总和
             'amortization_coupon_interest': float(amortization.coupon_interest),  # 加息券利息
+            'amortization_status':
+                u'待回款' if amortization.settled else u'提前回款' if amortization.settlement_time.strftime('%Y-%m-%d') < amortization.term_date.strftime('%Y-%m-%d') else u'已回款',
         } for amortization in amortizations]
 
         res = {
