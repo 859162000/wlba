@@ -928,6 +928,10 @@ class AppMemorabiliaView(APIView):
             'list_count': data_count
         })
 
+class AppDataModuleView(TemplateView):
+
+    """ 数据魔方 """
+    template_name = 'client_data_cube.jade'
 
 # class AppMemorabiliaDetailView(TemplateView):
 #     template_name = 'memorabilia_detail.jade'
