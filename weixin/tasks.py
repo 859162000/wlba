@@ -32,53 +32,53 @@ def bind_ok(openid, is_first_bind):
                                         })},
                                     queue='celery02'
                                     )
+
 @app.task
 def detect_product_biding(product_id):
-    product = P2PProduct.objects.get(pk=product_id)
-    matches = re.search(u'日计息', product.pay_method)
-    period = product.period
-    period_desc = "%s个月"%product.period
-    if matches and matches.group():
-        period = period/30.0   # 天
-        period_desc = '%s天'%product.period
-    if product.activity:
-        rate_desc = "%s%% + %s%%"%(product.expected_earning_rate, product.activity.rule.percent_text)
-    else:
-        rate_desc = "%s%%"%product.expected_earning_rate
 
-    services = SubscribeService.objects.filter(channel='weixin', is_open=True, type=0).all()
-    for service in services:
-        if period == service.num_limit:
-            sub_records = SubscribeRecord.objects.filter(service=service, status=True).all()
+    def _sendProductToUser(openid, service_desc, product_id, product_name, rate_desc, period_desc, pay_method):
+            sendUserProductOnLine.apply_async(kwargs={
+                    "openid": openid,
+                    "service_desc": service_desc,
+                    "product_id": product_id,
+                    "product_name": product_name,
+                    "rate_desc": rate_desc,
+                    "period_desc": period_desc,
+                    "pay_method": pay_method,
+                },
+                                              queue='celery02')
+
+    product = P2PProduct.objects.get(pk=product_id)
+    utc_now = timezone.now()
+    if product.status == u'正在招标' and utc_now >= product.publish_time:
+        matches = re.search(u'日计息', product.pay_method)
+        period = product.period
+        period_desc = "%s个月"%product.period
+        is_day_product = False
+        if matches and matches.group():
+            is_day_product = True
+            period_desc = '%s天'%product.period
+        if product.activity:
+            rate_desc = "%s%% + %s%%"%(product.expected_earning_rate, product.activity.rule.percent_text)
+        else:
+            rate_desc = "%s%%"%product.expected_earning_rate
+        if is_day_product:
+            day_service = SubscribeService.objects.filter(channel='weixin', is_open=True, type=1).first()
+
+            sub_records = SubscribeRecord.objects.filter(service=day_service, status=True).all()
             for sub_record in sub_records:
                 if sub_record.w_user and sub_record.w_user.subscribe==1 and sub_record.w_user.user:
-                    publish_time = product.publish_time
-                    utc_now = timezone.now()
-                    if utc_now <= publish_time:
-                        exec_time = publish_time + datetime.timedelta(minutes=1)
-                        sendUserProductOnLine.apply_async(kwargs={
-                                "openid": sub_record.w_user.openid,
-                                "service_desc": service.describe,
-                                "product_id": product.id,
-                                "product_name": product.name,
-                                "rate_desc": rate_desc,
-                                "period_desc": period_desc,
-                                "pay_method": product.pay_method,
-                                },
-                                                          eta= exec_time,
-                                                          queue='celery02'
-                                                          )
-                    else:
-                        sendUserProductOnLine.apply_async(kwargs={
-                                "openid": sub_record.w_user.openid,
-                                "service_desc": service.describe,
-                                "product_id": product.id,
-                                "product_name": product.name,
-                                "rate_desc": rate_desc,
-                                "period_desc": period_desc,
-                                "pay_method": product.pay_method,
-                            },
-                                                          queue='celery02')
+                    _sendProductToUser(sub_record.w_user.openid, day_service.describe, product.id, product.name, rate_desc, period_desc, product.pay_method)
+
+        else:
+            services = SubscribeService.objects.filter(channel='weixin', is_open=True, type=0).all()
+            for service in services:
+                if period == service.num_limit:
+                    sub_records = SubscribeRecord.objects.filter(service=service, status=True).all()
+                    for sub_record in sub_records:
+                        if sub_record.w_user and sub_record.w_user.subscribe==1 and sub_record.w_user.user:
+                            _sendProductToUser(sub_record.w_user.openid, service.describe, product.id, product.name, rate_desc, period_desc, product.pay_method)
+
 
 @app.task
 def sendUserProductOnLine(openid, service_desc, product_id, product_name, rate_desc, period_desc, pay_method):
