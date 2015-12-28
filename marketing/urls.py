@@ -164,6 +164,7 @@ urlpatterns += patterns(
     url(r'^app_recharge_8000/$', TemplateView.as_view(template_name="app_recharge_8000.jade")),
     url(r'^app_damai/$', TemplateView.as_view(template_name="app_damai.jade")),
     url(r'^app_double_eggs/$', TemplateView.as_view(template_name="app_double_eggs.jade")),
+    url(r'^app_praise_reward/$', TemplateView.as_view(template_name="app_praise_reward.jade")),
 
     # url(r'^app_thanksgivin/$', login_required(TemplateView.as_view(template_name="app_thanksgivin.jade"), login_url='/accounts/token_login/')),
 
