@@ -10,6 +10,8 @@ block loginFormPage
         a(href='/accounts/register/?next={{next}}').font-l.padding-l-r-s.fl.minNavRight 十秒注册
     form#loginForm.login-form(method='post', action='/accounts/login/ajax/')
         - csrf_token
+        <input id="next" name="next"  type="hidden" value="{{next}}" />
+
         .logonFormDiv
             ul.loginForm.padding-top-xl.clearfix
                 li
