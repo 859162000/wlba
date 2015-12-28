@@ -112,7 +112,7 @@
         });
 
         /*确认绑定 */
-        $('#bindingOldCard').delegate('.ok-bt','click',function() {
+        $('#bindingOldCard').delegate('.ok-btn','click',function() {
           return $.ajax({
             url: '/api/pay/the_one_card/',
             data: {
