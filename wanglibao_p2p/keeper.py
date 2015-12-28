@@ -28,8 +28,6 @@ from weixin.constant import PRODUCT_AMORTIZATION_TEMPLATE_ID
 from weixin.models import WeixinUser
 from weixin.tasks import sentTemplate
 
-from .tasks import p2p_revenue_exchange
-
 
 logger = logging.getLogger(__name__)
 
@@ -268,11 +266,13 @@ class AmortizationKeeper(KeeperBaseMixin):
     def __init__(self, product, order_id=None):
         super(AmortizationKeeper, self).__init__(product=product, order_id=order_id)
         from marketing.models import RevenueExchangeAmortization, RevenueExchangeOrder, RevenueExchangeRule
+        from .tasks import p2p_revenue_exchange
         self.product = product
         self.RevenueExchangeAmortization = RevenueExchangeAmortization
         self.RevenueExchangeOrder = RevenueExchangeOrder
         self.RevenueExchangeRule = RevenueExchangeRule
         self.RevenueExchangeType = u'还款等额兑奖'
+        self.p2p_revenue_exchange = p2p_revenue_exchange
 
     def generate_amortization_plan(self, savepoint=True):
         if self.product.status != u'满标已打款':
@@ -632,7 +632,7 @@ class AmortizationKeeper(KeeperBaseMixin):
             })
 
             if product_type == self.RevenueExchangeType:
-                p2p_revenue_exchange.apply_async(kwargs={
+                self.p2p_revenue_exchange.apply_async(kwargs={
                     "user_amos": sub_amortizations,
                     "exchange_amos": exchange_amortizations,
                     "exchange_rule": exchange_rule,
