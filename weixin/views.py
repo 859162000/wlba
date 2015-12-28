@@ -1521,3 +1521,14 @@ def recordProduct(sender, **kw):
 
 pre_save.connect(recordProduct, sender=P2PProduct, dispatch_uid="product-pre-save-signal")
 post_save.connect(checkProduct, sender=P2PProduct, dispatch_uid="product-post-save-signal")
+
+
+class WeiXinReceivedAll(TemplateView):
+    """ 回款计划所有 """
+    template_name = 'weixin_received_all.jade'
+class WeiXinReceivedMonth(TemplateView):
+    """ 回款计划月 """
+    template_name = 'weixin_received_month.jade'
+class WeiXinReceivedDetail(TemplateView):
+    """ 回款计划详细 """
+    template_name = 'weixin_received_detail.jade'
