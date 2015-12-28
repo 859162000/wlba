@@ -1258,7 +1258,7 @@ class InnerSysHandler(object):
         return True if client_ip in INNER_IP else False
 
     def judge_valid(self, request):
-        if self.ip_valid(request):
+        if not self.ip_valid(request):
             return False, u'IP没有通过验证'
 
         return True, u'通过验证'
