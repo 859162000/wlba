@@ -23,10 +23,12 @@
         $('.confirmBtn').attr('tag','1')
         $('#name').text(data.name)
         $('.panel-title[tag="1"]').show()
+        $('.panel-title[tag="2"]').hide()
       } else {
         $('#backTwo').show()
         $('.confirmBtn').attr('tag','2')
         $('.panel-title[tag="2"]').show()
+        $('.panel-title[tag="1"]').hide()
       }
     });
     /*获取绑卡状态 */
