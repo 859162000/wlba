@@ -1858,9 +1858,9 @@ org.received_ui = (function(){
                     detail += "<span>+</span><span class='blue-text'>"+data.amortization_record[i].amortization_coupon_interest+"</span><span class='blue-sign'>加息</span>";
                 }
                 detail += "</div>";
-                detail += "<div class= 'detail-item item-count'>"+data.amortization_record[i].amortization_amount+"</div>>";
+                detail += "<div class= 'detail-item item-count'>"+data.amortization_record[i].amortization_amount+"</div>";
                 if(data.amortization_record[i].amortization_status == "已回款" || data.amortization_record[i].amortization_status== '提前回款'){
-                    detail += "<div class= 'repayment-icon'></div>>";
+                    detail += "<div class= 'repayment-icon'></div>";
                 }
                 detail += "</div>";
             }
