@@ -20,6 +20,7 @@ from wanglibao_p2p.models import P2PRecord, P2PEquity, P2PProduct
 from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import safe_phone_str
 from wanglibao_sms.tasks import send_messages
+from wanglibao_sms import messages as sms_messages
 from wanglibao_rest.utils import decide_device
 from experience_gold.models import ExperienceEvent, ExperienceEventRecord
 from weixin.models import WeixinUser
@@ -800,7 +801,7 @@ def _send_message_sms(user, rule, user_introduced_by=None, reward=None, amount=0
             _send_message_template(user, title, content)
             _save_activity_record(rule, user, 'message', content)
         if sms_template:
-            sms = Template(sms_template + u' 关注网利宝服务号，每日签到抽大奖。退订回TD【网利科技】')
+            sms = Template(sms_template + sms_messages.SMS_STR_WX + sms_messages.SMS_SIGN_TD)
             content = sms.render(context)
             _send_sms_template(mobile, content)
             _save_activity_record(rule, user, 'sms', content)
@@ -834,6 +835,7 @@ def _send_sms_template(phones, content):
         "messages": [content, ],
         "ext": 666
     })
+
 
 def _send_wx_frist_bind_template(user, end_date, amount, invest_amount):
     weixin_user = WeixinUser.objects.filter(user=user).first()

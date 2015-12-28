@@ -1,6 +1,6 @@
 # encoding: utf-8
 import datetime
-from wanglibao_redpack.models import RedPackEvent
+from wanglibao_redpack.models import RedPackEvent, RedPack, RedPackRecord
 from wanglibao_redpack import backends as redpack_backends
 import logging
 import json
@@ -37,6 +37,7 @@ from marketing.models import IntroducedBy, Channels, Reward, RewardRecord
 from marketing.utils import set_promo_user, local_to_utc, get_channel_record
 from marketing import tools
 from wanglibao_sms.tasks import send_messages
+from wanglibao_sms import messages as sms_messages
 from shumi_backend.exception import FetchException, AccessException
 from shumi_backend.fetch import UserInfoFetcher
 from wanglibao import settings
@@ -59,7 +60,6 @@ from wanglibao_announcement.utility import AnnouncementAccounts
 from django.template.defaulttags import register
 from wanglibao_p2p.keeper import EquityKeeperDecorator
 from order.utils import OrderHelper
-from wanglibao_redpack import backends
 from wanglibao_rest import utils
 from wanglibao_activity.models import ActivityRecord
 from aes import Crypt_Aes
@@ -725,8 +725,8 @@ class AccountInviteHikeAPIView(APIView):
     def post(self, request, **kwargs):
         nums = IntroducedBy.objects.filter(introduced_by=request.user).count()
 
-        hikes = backends.get_hike_nums(request.user)
-        amount = backends.get_hike_amount(request.user)
+        hikes = redpack_backends.get_hike_nums(request.user)
+        amount = redpack_backends.get_hike_amount(request.user)
         thity = ActivityRecord.objects.filter(user=request.user, gift_type='phonefare', msg_type='message').aggregate(Sum('income'))
         if thity['income__sum']:
             callfee = thity['income__sum']
@@ -1023,7 +1023,7 @@ class AccountRedPacket(TemplateView):
 
         user = self.request.user
         device = utils.split_ua(self.request)
-        result = backends.list_redpack(user, 'all', device['device_type'], 0)
+        result = redpack_backends.list_redpack(user, 'all', device['device_type'], 0)
         red_packets = result['packages'].get(status, [])
 
         return {
@@ -1043,7 +1043,7 @@ class AccountCoupon(TemplateView):
 
         user = self.request.user
         device = utils.split_ua(self.request)
-        result = backends.list_redpack(user, 'all', device['device_type'], 0, 'coupon')
+        result = redpack_backends.list_redpack(user, 'all', device['device_type'], 0, 'coupon')
         coupons = result['packages'].get(status, [])
 
         return {
@@ -1487,6 +1487,8 @@ class P2PAmortizationAPI(APIView):
             'amortization_amount_interest': float(amortization.interest),  # 利息
             'amortization_amount': float(amortization.principal + amortization.interest + amortization.coupon_interest),  # 本息总和
             'amortization_coupon_interest': float(amortization.coupon_interest),  # 加息券利息
+            'amortization_status':
+                u'待回款' if amortization.settled else u'提前回款' if amortization.settlement_time.strftime('%Y-%m-%d') < amortization.term_date.strftime('%Y-%m-%d') else u'已回款',
         } for amortization in amortizations]
 
         res = {
@@ -1677,7 +1679,8 @@ class AdminSendMessageView(TemplateView):
             if not user:
                 result = {
                     'phone': phone,
-                    'status': "not exist"
+                    'status': 'not exist',
+                    'message': u"用户不存在"
                 }
                 send_result.append(result)
                 continue
@@ -1692,6 +1695,47 @@ class AdminSendMessageView(TemplateView):
             else:
                 content_result = content
 
+            msg = msg_sms = ''
+            # 发送理财券
+            coupon_ids = request.POST.get("coupon_ids", "")
+            if coupon_ids:
+                now = timezone.now()
+                coupon_ids_list = coupon_ids.split(",")
+                coupon_ids_list = [cid for cid in coupon_ids_list if cid.strip() != ""]
+                if coupon_ids_list:
+                    for coupon_id in coupon_ids_list:
+                        red_pack_event = RedPackEvent.objects.filter(invalid=False, id=coupon_id)\
+                            .filter(give_start_at__lt=now, give_end_at__gt=now).first()
+                        if red_pack_event:
+                            redpack = RedPack.objects.filter(event=red_pack_event, status="unused").first()
+                            if redpack:
+                                give_pf = red_pack_event.give_platform
+                                if give_pf == "all" or give_pf == 'pc':
+                                    if redpack.token != "":
+                                        redpack.status = "used"
+                                        redpack.save()
+                                    record = RedPackRecord()
+                                    record.user = user
+                                    record.redpack = redpack
+                                    record.change_platform = 'pc'
+                                    record.save()
+                                    msg += u'id:{},成功;'.format(coupon_id)
+                                else:
+                                    msg += u'id:{},失败;'.format(coupon_id)
+                        else:
+                            msg += u'id:{},失败;'.format(coupon_id)
+
+            # 发送短信
+            content_sms = request.POST.get("content_sms", "")
+            if content_sms:
+                send_messages.apply_async(kwargs={
+                    'phones': [phone],
+                    'messages': [content_sms + sms_messages.SMS_STR_WX + sms_messages.SMS_SIGN_TD],
+                    'ext': 666,  # 营销类短信发送必须增加ext参数,值为666
+                })
+                msg_sms += u'短信发送成功'
+
+            # 发送站内信
             try:
                 inside_message.send_one.apply_async(kwargs={
                     "user_id": user.id,
@@ -1702,12 +1746,14 @@ class AdminSendMessageView(TemplateView):
 
                 result = {
                     'phone': "{}, {}".format(phone, code),
-                    'status': 'success'
+                    'status': 'success',
+                    'message': u'站内信发送成功;' + msg + msg_sms
                 }
             except False:
                 result = {
                     'phone': phone,
-                    'status': 'fail'
+                    'status': 'fail',
+                    'message': u'站内信发送失败;' + msg + msg_sms
                 }
 
             send_result.append(result)

@@ -80,7 +80,7 @@
                 } else if (damai['ret_code'] == 1003) {
                     $('.tishiyu').text('很抱歉，门票已经发完了');
                 } else if (damai['ret_code'] == 1001) {
-                    $('.tishiyu').text('很抱歉，您不满足领取资格');
+                    $('.tishiyu').text('很抱歉，您不满足领取资格，投资后再来领取吧亲');
                 }
 
 

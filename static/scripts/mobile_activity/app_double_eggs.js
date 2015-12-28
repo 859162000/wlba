@@ -243,8 +243,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 if (data.ph == '') {
                     login = false;
 					$('.recharge_button').click(function() {
-                        mixins.loginApp();
+                        mixins.loginApp({refresh:1, url:'https://www.wanglibao.com/activity/app_double_eggs'});
                     })
+
                 } else {
                     login = true;
                     $('.recharge_button').click(function() {
