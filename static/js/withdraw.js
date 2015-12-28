@@ -19,7 +19,7 @@
   });
 
   require(['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator', 'jquery.validate', 'jquery.form'], function($, modal, backend, tool, placeholder, validate, form) {
-    var addFormValidateor, max_amount, min_amount, _refreshCode;
+    var addFormValidateor, max_amount, min_amount, _refreshCode, _showModal;
     max_amount = parseInt($('input[name=fee]').attr('data-max_amount'));
     min_amount = parseInt($('input[name=fee]').attr('data-min_amount'));
     $.validator.addMethod("balance", function(value, element) {
@@ -254,13 +254,17 @@
             return $('#withdraw-form').ajaxSubmit(function(data) {
               return tool.modalAlert({
                 title: '温馨提示',
-                msg: data.message
+                msg: data.message,
+                callback_ok: _showModal
               });
             });
           }
         }
       }
     });
+    _showModal = function() {
+      return location.reload();
+    };
 
     /*设置密码提交表单 */
     $('#nextBtn').click(function() {

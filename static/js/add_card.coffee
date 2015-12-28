@@ -180,6 +180,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
         clearInterval(intervalId)
         $(element).text('重新获取')
         $(element).removeAttr 'disabled'
+        $(element).addClass 'go-get-code'
 
    # Fire now and future
     timerFunction()

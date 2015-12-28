@@ -213,8 +213,10 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       else
         if addFormValidateor.form()
           $('#withdraw-form').ajaxSubmit((data) ->
-            tool.modalAlert({title: '温馨提示', msg: data.message})
+            tool.modalAlert({title: '温馨提示', msg: data.message, callback_ok: _showModal})
           )
+  _showModal = ()->
+    location.reload();
   ###设置密码提交表单###
   $('#nextBtn').click ()->
     parent = $('.setTradingPwd1')

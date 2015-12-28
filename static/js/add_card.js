@@ -223,7 +223,8 @@
         } else {
           clearInterval(intervalId);
           $(element).text('重新获取');
-          return $(element).removeAttr('disabled');
+          $(element).removeAttr('disabled');
+          return $(element).addClass('go-get-code');
         }
       };
       timerFunction();
