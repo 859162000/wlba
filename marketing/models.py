@@ -694,7 +694,7 @@ class RevenueExchangeOrder(models.Model):
     user = models.ForeignKey(User)
     reward_name = models.CharField(u'兑换品名称', max_length=40)
     parts = models.IntegerField(u'购买份额', null=True)
-    reward_rule = models.ForeignKey(RevenueExchangeRule, u'兑换规则')
+    reward_rule = models.ForeignKey(RevenueExchangeRule, verbose_name=u'兑换规则')
     order_id = models.IntegerField(u'关联订单编号', unique=True, db_index=True)
     product_id = models.IntegerField(u'产品ID')
     created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
@@ -732,7 +732,7 @@ class RevenueExchangeAmortization(models.Model):
     exchange_method = models.CharField(u'兑换方式', max_length=10)
     exchange_time = models.DateTimeField(u'兑换时间', auto_now=True)
 
-    order_id = models.CharField(u'关联订单流水', null=True)
+    order_id = models.CharField(u'关联订单流水', max_length=30, null=True)
     description = models.TextField(u'兑换流水说明', max_length=255, blank=True, null=True)
     create_time = models.DateTimeField(u'创建时间', auto_now_add=True)
 
