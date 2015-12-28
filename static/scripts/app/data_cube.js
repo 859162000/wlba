@@ -359,15 +359,15 @@ function setMap(){//设置地图
                 dataRange: {
                     show: false,
                     splitList: [
-                        {start:cfg[0].value, end:cfg[0].value, label: cfg[0].name, color: '#e8403a'}, //1
-                        {start:cfg[1].value, end:cfg[1].value, label: cfg[1].name, color: '#f06824'}, //2
-                        {start:cfg[2].value, end:cfg[2].value, label: cfg[2].name, color: '#f2bf18'}, //3
-                        {start:cfg[3].value, end:cfg[3].value, label: cfg[3].name, color: '#e8403a'}, //4
-                        {start:cfg[4].value, end:cfg[4].value, label: cfg[4].name, color: '#f06824'}, //5
-                        {start:cfg[5].value, end:cfg[5].value, label: cfg[5].name, color: '#f2bf18'}, //6
-                        {start:cfg[6].value, end:cfg[6].value, label: cfg[6].name, color: '#e8403a'}, //7
-                        {start:cfg[7].value, end:cfg[7].value, label: cfg[7].name, color: '#f06824'}, //8
-                        {start:cfg[8].value, end:cfg[8].value, label: cfg[8].name, color: '#f2bf18'} //9
+                        {start:cfg[0].value, end:cfg[0].value, label: cfg[0].name, color: '#ff3a1a'}, //1
+                        {start:cfg[1].value, end:cfg[1].value, label: cfg[1].name, color: '#ff581a'}, //2
+                        {start:cfg[2].value, end:cfg[2].value, label: cfg[2].name, color: '#ffab1a'}, //3
+                        {start:cfg[3].value, end:cfg[3].value, label: cfg[3].name, color: '#16b86a'}, //4
+                        {start:cfg[4].value, end:cfg[4].value, label: cfg[4].name, color: '#762ffa'}, //5
+                        {start:cfg[5].value, end:cfg[5].value, label: cfg[5].name, color: '#ff7a66'}, //6
+                        {start:cfg[6].value, end:cfg[6].value, label: cfg[6].name, color: '#ffc766'}, //7
+                        {start:cfg[7].value, end:cfg[7].value, label: cfg[7].name, color: '#5cb88b'}, //8
+                        {start:cfg[8].value, end:cfg[8].value, label: cfg[8].name, color: '#b996fa'} //9
                     ]
                 }
             };
@@ -405,7 +405,7 @@ function setMap(){//设置地图
                 //str += '<p class="map-list-item"><span class="map-num map-num'+ (i+1) +'">'+ (i+1) +'</span>'+ arr[i].name + '： <span class="font-color9">'+ fmoney(arr[i].value, n) + d + '</span></span></p>'
             }
             str += '<div class="map-item map-item10">';
-            str += '<div class="map-name tit18">'+ arr[i].name +'：</div>';
+            str += '<div class="map-name tit18">其他：</div>';
             str += '<div class="map-bar"><div class="map-bar-box has-an"><img src="/static/imgs/app/data_cube/map-other.png" /></div></div>';
             str += '<div class="map-num tit20">'+ percentNum(arrSum(map_data1,9),totalNum) +'%</div>';
             str += '</div>';
@@ -456,10 +456,7 @@ function allFun(){
 
     //平台7日数据
     $(".seven-time").html("（"+ getBeforeDate(dataVal.plat_total[4].date,6).replace(/-/g,".") + " - " + dataVal.plat_total[4].date.replace(/-/g,".")  + ")");
-    $(".seven-money1").text(plat_total[1].Qty);
-    $(".seven-money2").text(plat_total[3].Qty);
-    $(".seven-money3").text(plat_total[5].Qty);
-    $(".seven-money4").text(plat_total[7].Qty);
+
     var mySwiper = new Swiper ('#page-swipe', {
       direction: 'vertical',
       loop: false,
@@ -476,21 +473,28 @@ function allFun(){
           switch (nowDom){
               case "page2":
                   numAnimate($(".data-money1"),numDivision(plat_total[9].Qty,10000));
-                  numAnimate($(".data-money2"),numDivision(plat_total[0].Qty,10000));
-                  numAnimate($(".data-money3"),numDivision(plat_total[8].Qty,10000));
-                  numAnimate($(".data-money4"),numDivision(plat_total[10].Qty,1),0);
+                  setTimeout(function(){numAnimate($(".data-money2"),numDivision(plat_total[0].Qty,10000));},500);
+                  setTimeout(function(){numAnimate($(".data-money3"),numDivision(plat_total[8].Qty,10000));},1000);
+                  setTimeout(function(){numAnimate($(".data-money4"),numDivision(plat_total[10].Qty,1),0);},1500);
+                  //numAnimate($(".data-money2"),numDivision(plat_total[0].Qty,10000));
+                  //numAnimate($(".data-money3"),numDivision(plat_total[8].Qty,10000));
+                  //numAnimate($(".data-money4"),numDivision(plat_total[10].Qty,1),0);
                   break;
               case "page3":
                   numAnimate($(".data-money5"),numDivision(plat_total[2].Qty,10000));
-                  numAnimate($(".data-money6"),numDivision(plat_total[6].Qty,10000));
-                  numAnimate($(".data-money7"),numDivision(plat_total[11].Qty,10000));
-                  numAnimate($(".data-money8"),numDivision(plat_total[4].Qty,10000));
+                  //numAnimate($(".data-money6"),numDivision(plat_total[6].Qty,10000));
+                  //numAnimate($(".data-money7"),numDivision(plat_total[11].Qty,10000));
+                  //numAnimate($(".data-money8"),numDivision(plat_total[4].Qty,10000));
+                  setTimeout(function(){numAnimate($(".data-money6"),numDivision(plat_total[6].Qty,10000));},500);
+                  setTimeout(function(){numAnimate($(".data-money7"),numDivision(plat_total[11].Qty,10000));},1000);
+                  setTimeout(function(){numAnimate($(".data-money8"),numDivision(plat_total[4].Qty,10000));},1500);
+
                   break;
               case "page5":
-                  numAnimate($(".seven-money1"),numDivision(plat_total[1].Qty,1),2);
-                  numAnimate($(".seven-money2"),numDivision(plat_total[3].Qty,1),2);
-                  numAnimate($(".seven-money3"),numDivision(plat_total[5].Qty,1),2);
-                  numAnimate($(".seven-money4"),numDivision(plat_total[7].Qty,1),2);
+                  numAnimate($(".seven-money1"),numDivision(plat_total[1].Qty,10000),2);
+                  numAnimate($(".seven-money2"),numDivision(plat_total[3].Qty,10000),2);
+                  numAnimate($(".seven-money3"),numDivision(plat_total[5].Qty,10000),2);
+                  numAnimate($(".seven-money4"),numDivision(plat_total[7].Qty,10000),2);
                   break;
           }
       }
@@ -504,8 +508,7 @@ function allFun(){
         var month = self.attr("data-month");
         self.addClass("active").siblings("div.bar-item").removeClass("active");
         page.find(".page4-month").text(month);
-        page.find(".page4-month-num").text(num);
-        console.log("herer");
+        page.find(".page4-month-num").text(num+"元");
     });
     //tab
     $("ul.page-tab-nav").on("click","li.nav-item",function(){
@@ -518,7 +521,7 @@ function allFun(){
         self.addClass("active").siblings("li").removeClass("active");
         contLi.addClass("active").siblings("li.cont-item").removeClass("active");
         page4.find(".page4-month").text(barItem.attr('data-month'));
-        page4.find(".page4-month-num").text(barItem.attr('data-num'));
+        page4.find(".page4-month-num").text(barItem.attr('data-num')+"元");
     });
 
     function page4(){
@@ -559,7 +562,7 @@ function allFun(){
                 if(m === (tmpYearDate.length-1)){
                     liActive = " active";
                     page4.find(".page4-month").text(liMonth);
-                    page4.find(".page4-month-num").text(liData.invest);
+                    page4.find(".page4-month-num").text(liData.invest+"元");
                 }else{
                    liActive = '';
                 }
