@@ -1581,10 +1581,34 @@ org.processSecond = (function(org){
             lib._validation();
             lib._submit();
         },
+        _format_limit: function(amount){
+            var money = amount, reg = /^\d{5,}$/, reg2 = /^\d{4}$/;
+            if(reg.test(amount)){
+                 return money = amount.replace('0000','') + '万'
+            }
+            if(reg2.test(amount)){
+                return money = amount.replace('000','') + '千'
+            }
+        },
+        _limit_style: function(data){
+            var _self = this, $limitItem = $('.limit-bank-item'), list = '';
+
+            for(var i =0; i< data.length;i++){
+                list += "<div class='limit-bank-list'>"
+                list += "<div class='limit-list-dec'> "
+                list += "<div class='bank-name'>"+data[i].name+"</div>";
+                list += "<div class='bank-limit'>首次限额"+_self._format_limit(data[i].first_one)+"/单笔限额"+_self._format_limit(data[i].first_one)+"/日限额"+_self._format_limit(data[i].second_day)+"</div>";
+                list += "</div>"
+                list += "<div class='limit-list-icon "+data[i].bank_id+"'></div>"
+                list += "</div>"
+            }
+            $limitItem.html(list)
+        },
         _init_select: function(){
             if(localStorage.getItem('bank')){
                 var content = JSON.parse(localStorage.getItem('bank'));
-                return lib.$bank.append(appendBanks(content));
+                lib.$bank.append(appendBanks(content));
+                lib._limit_style(content)
             }
             org.ajax({
                 type: 'POST',
@@ -1592,8 +1616,10 @@ org.processSecond = (function(org){
                 success: function(results) {
                     if(results.ret_code === 0){
                         lib.$bank.append(appendBanks(results.banks));
+                        console.log(results)
                         var content = JSON.stringify(results.banks);
                         window.localStorage.setItem('bank', content);
+
                     }else{
                         return org.ui.alert(results.message);
                     }
@@ -1834,7 +1860,9 @@ org.received_ui = (function(){
                 }
                 detail += "</div>";
                 detail += "<div class= 'detail-item item-count'>"+data.amortization_record[i].amortization_amount+"</div>>";
-                detail += "<div class= 'repayment-icon'></div>>";
+                if(data.amortization_record[i].amortization_status == "已回款" || data.amortization_record[i].amortization_status== '提前回款'){
+                    detail += "<div class= 'repayment-icon'></div>>";
+                }
                 detail += "</div>";
             }
 
