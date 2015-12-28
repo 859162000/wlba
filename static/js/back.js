@@ -4,16 +4,14 @@
     paths: {
       jquery: 'lib/jquery.min',
       'jquery.modal': 'lib/jquery.modal.min',
-      'jquery.placeholder': 'lib/jquery.placeholder',
       tools: 'lib/modal.tools'
     },
     shim: {
-      'jquery.modal': ['jquery'],
-      'jquery.placeholder': ['jquery']
+      'jquery.modal': ['jquery']
     }
   });
 
-  require(['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'lib/calculator'], function($, modal, backend, tool, placeholder) {
+  require(['jquery', 'lib/modal', 'lib/backend', 'tools', 'lib/calculator'], function($, modal, backend, tool) {
     /*判断是否设置了交易密码 */
     $.ajax({
       url: "/api/profile/",
@@ -24,9 +22,11 @@
         $('#backOne').show()
         $('.confirmBtn').attr('tag','1')
         $('#name').text(data.name)
+        $('.panel-title[tag="1"]').show()
       } else {
         $('#backTwo').show()
         $('.confirmBtn').attr('tag','2')
+        $('.panel-title[tag="2"]').show()    
       }
     });
     /*获取绑卡状态 */
