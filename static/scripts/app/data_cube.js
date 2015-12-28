@@ -606,7 +606,6 @@ function allFun(){
             ageDom.eq(j).find(".age-tit").text(perTotal).css("bottom",(perMax+3)+"%");
             ageDom.eq(j).find(".age-bar").css("height",perMax+"%");
         }
-
     })();
 
     setTimeout(function(){
