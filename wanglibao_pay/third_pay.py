@@ -579,7 +579,8 @@ def bind_pay_dynnum(request):
     # Modify by hb on 2015-12-24 : 如果ret_code返回非0, 还需进一步判断card是否有绑定记录, 因为有可能出现充值失败但绑卡成功的情况
     try:
         bind_flag = 0;
-        if res.get('ret_code') == 0:
+        if (card.bank.channel == 'kuaipay' and res.get('ret_code') == 0) or (
+                        card.bank.channel == 'yeepay' and res.get('ret_code') == 22000):
             bind_flag = 1;
         else:
             card = Card.objects.filter(user=user, id=card.id).first()
