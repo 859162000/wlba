@@ -1249,6 +1249,101 @@ class GuestCheckView(APIView):
         else:
             return Response({"ret_code": 2, "message": u"抱歉，不符合活动标准！"})
 
+
+class InnerSysHandler(object):
+    def ip_valid(self, request):
+        client_ip = get_client_ip(request)
+
+
+    def judge_valid(self, request):
+        return True, u'通过验证'
+
+
+class InnerSysSendSMS(APIView, InnerSysHandler):
+    permission_classes = ()
+
+    def post(self, request):
+        phone = request.DATA.get("phone", None)
+        message = request.DATA.get("message", None)
+        logger.debug("phone:%s, message:%s" % (phone, message))
+        if phone is None or message is None:
+            return Response({"code": 1000, "message": u'传入的phone或message不全'})
+
+        status, invalid_msg = super(InnerSysSendSMS, self).judge_valid(request)
+        if not status:
+            return Response({"code": 1001, "message": invalid_msg})
+
+        send_messages.apply_async(kwargs={
+                "phones": [phone, ],
+                "messages": [message, ]
+            })
+
+        return Response({"code": 0, "message": u"短信发送成功"})
+
+
+class InnerSysValidateID(APIView, InnerSysHandler):
+    permission_classes = ()
+
+    def param_is_valid(self, name, id):
+        id_pattern = '\d{17}[0-9Xx]'
+        return True if id and len(id) == 18 and re.match(id_pattern, id).group() else False
+
+    def post(self, request):
+        """
+            要考虑已经做过验证的用户
+        """
+        name = request.DATA.get("name", None)
+        id = request.DATA.get("id", None)
+
+        if name is None or id is None:
+            return Response({"code": 1000, "message": u'请发送完整的姓名及身份证号'})
+
+        if not self.param_is_valid(name, id):
+            return Response({"code": 1001, "message": u'传递的参数不合法'})
+
+        status, message = self.judge_valid(request)
+        if not status:  # 此步目前跳过
+            return Response({"code": 1002, "message": message})
+
+        profile = WanglibaoUserProfile.objects.filter(name=name, id_number=id, id_is_valid=True)
+        if profile.exists():
+            return Response({"code": 0, "message": u'用户以前已经验证过且验证通过'})
+
+        try:
+            verify_record, error = verify_id(name, id)
+        except:
+            return Response({"code": 1003, "message": u"验证失败，拨打客服电话进行人工验证"})
+        else:
+            if error:
+                return Response({"code": 1003, "message": u"验证失败，拨打客服电话进行人工验证"})
+            else:
+                return Response({"code": 0, "message": u"验证通过"})
+
+
+class InnerSysSaveChannel(APIView, InnerSysHandler):
+    permission_classes = ()
+
+    def post(self, request):
+        code = request.DATA.get("code", None)
+        description = request.DATA.get("description", None)
+        if not code or not description:
+            return Response({"code": 1000, "message": u'渠道号或渠道描述为空值'})
+
+        status, message = super(InnerSysSaveChannel, self).judge_valid(request)
+        if not status:
+            return Response({"code": 1001, "message": message})
+
+        channel = Channels.objects.filter(code=code)
+        if channel.exists():
+            return Response({"code": 1002, "message": u'渠道号已经存在'})
+        try:
+            Channels.objects.create(code=code, description=description)
+        except Exception, reason:
+            return Response({"code": 1003, "message": u'创建渠道报异常,reason:{0}'.format(reason)})
+        else:
+            return Response({"code": 0, "message": u'创建渠道成功'})
+
+
 class DistributeRedpackView(APIView):
     permission_classes = ()
     def post(self, request, phone):
