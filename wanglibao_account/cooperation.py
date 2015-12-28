@@ -984,7 +984,7 @@ class ZGDXRegister(CoopRegister):
             effect_type = '0'
 
         request_no_prefix = order_id or str(user.id) + timezone.now().strftime("%Y%m%d%H%M%S")
-        request_no = request_no_prefix + '_' + plat_offer_id
+        request_no = str(request_no_prefix) + '_' + plat_offer_id
         phone_id = WanglibaoUserProfile.objects.get(user_id=user.id).phone
         code = {
             'request_no': request_no,
