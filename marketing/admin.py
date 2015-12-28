@@ -332,6 +332,26 @@ class RevenueExchangeAmortizationAdmin(admin.ModelAdmin):
         return self.list_display
 
 
+class RevenueExchangeRuleAdmin(admin.ModelAdmin):
+    actions = None
+    list_display = ('id', 'reward_name', 'exchange_method', 'reward_range', 'created_time')
+    search_fields = ('reward_name',)
+
+
+class RevenueExchangeOrderAdmin(admin.ModelAdmin):
+    actions = None
+    list_display = ('id', 'user', 'reward_name', 'parts', 'created_time')
+    search_fields = ('user__wanglibaouserprofile__phone', 'order_id', 'exchange_id')
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
+        return False
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.list_display
+
 admin.site.register(QuickApplyInfo, QuickApplyInfoAdmin) #add by Yihen@20151103
 admin.site.register(GiftOwnerGlobalInfo, GiftOwnerGlobalInfoAdmin) #add by Yihen@20151103
 admin.site.register(GiftOwnerInfo, GiftOwnerInfoAdmin) #add by Yihen@20151103
@@ -347,6 +367,8 @@ admin.site.register(Reward, RewardAdmin)
 admin.site.register(RewardRecord, RewardRecordAdmin)
 admin.site.register(RevenueExchangeRepertory, RevenueExchangeRepertoryAdmin)
 admin.site.register(RevenueExchangeAmortization, RevenueExchangeAmortizationAdmin)
+admin.site.register(RevenueExchangeRule, RevenueExchangeRuleAdmin)
+admin.site.register(RevenueExchangeOrder, RevenueExchangeOrderAdmin)
 #admin.site.register(ClientData, ClientDataAdmin)
 admin.site.register(Channels, ChannelsAdmin)
 ##admin.site.register(ChannelsNew, ChannelsNewAdmin)
