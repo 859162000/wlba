@@ -293,8 +293,9 @@ org.area = (function (org) {
                 }
             });
 
-
-
+            if(location.hash == '#1'){
+                $('.tab-nav li').eq(1).click()
+            }
 
             $milepostBtn.on('click', function(){
                 if (milepost) return;
