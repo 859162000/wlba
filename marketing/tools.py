@@ -163,7 +163,7 @@ def deposit_ok(user_id, amount, device, order_id):
                                             "template_id":DEPOSIT_SUCCESS_TEMPLATE_ID,
                                             "first":u"亲爱的%s，您的充值已成功"%user_profile.name,
                                             "keyword1":deposit_ok_time,
-                                            "keyword2":str(amount),
+                                            "keyword2":"%s 元"%str(amount),
                                             "keyword3":str(margin.margin),
                                                 })},
                                             queue='celery02')
@@ -202,7 +202,7 @@ def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name):
                                         "openid":weixin_user.openid,
                                         "template_id":WITH_DRAW_SUBMITTED_TEMPLATE_ID,
                                         "first":u"亲爱的%s，您的提现申请已受理"%user_name,
-                                        "keyword1":str(amount),
+                                        "keyword1":"%s 元"%str(amount),
                                         "keyword2":bank_name,
                                         "keyword3":withdraw_ok_time,
                                             })},
