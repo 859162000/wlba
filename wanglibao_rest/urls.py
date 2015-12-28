@@ -50,12 +50,12 @@ from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIVie
                                      RedPacketSelectAPIView)
 
 from marketing.play_list import InvestmentHistory
-from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView, RockFinanceAPIView, RockFinanceCheckAPIView,
+from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView, RockFinanceAPIView, RockFinanceForOldUserAPIView, RockFinanceCheckAPIView,
                              ThousandRedPackCountAPIView, ThunderActivityRewardCounter, QuickApplyerAPIView, GiftOwnerInfoAPIView, RewardDistributeAPIView)
 from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
-from wanglibao_reward.views import WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView
+from wanglibao_reward.views import WeixinRedPackView, WeixinShareTools, DistributeRewardAPIView, XunleiActivityAPIView
 
 router = DefaultRouter()
 
@@ -256,6 +256,8 @@ urlpatterns += patterns(
     #url(r'^rock/finance/$', RockFinanceAPIView.as_view()),  # 金融摇滚夜发送入场二维码 , 测试用，上线时去掉
     url(r'^check/qrcode/$', RockFinanceCheckAPIView.as_view(), name='rockfinance_checkresult'),  # 金融摇滚夜扫描接口
     url(r'^rock/finance/$', RockFinanceAPIView.as_view()),  # 金融摇滚夜投票的数据结果及获得入场二维码
+    url(r'^rock/finance/old_user/$', RockFinanceForOldUserAPIView.as_view()),  # 金融摇滚夜投票的数据结果及获得入场二维码
+    url(r'^xunlei/2016/1/$', XunleiActivityAPIView.as_view()),  # 迅雷1月接口
 )
 
 

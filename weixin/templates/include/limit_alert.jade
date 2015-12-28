@@ -1,0 +1,24 @@
+.form-bank-limit#limit-text 限额说明
+.limit-sign-warp#limit-alert
+  .limit-mask
+    .limit-body
+      .limit-head 限额说明
+      .limit-bank-item
+        //mixin list()
+          .limit-bank-list
+            .limit-list-dec
+              .bank-name 工商银行
+              .bank-limit 首次限额5万/单笔限额5万/日限额5万
+            .limit-list-icon
+
+      .limit-close#limit-close 知道了
+script.
+  window.onload = function(){
+    var limitAlert = document.getElementById('limit-alert');
+    document.getElementById('limit-text').onclick = function(){
+      limitAlert.style.display = 'block'
+    }
+    document.getElementById('limit-close').onclick = function(){
+      limitAlert.style.display = 'none'
+    }
+  }

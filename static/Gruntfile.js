@@ -19,7 +19,7 @@ module.exports = function( grunt ) {
                 files: {
                     'scripts/mobile/mobile.js': ['src/mobile/lib/zepto/zepto.js', 'src/mobile/mobile.js'],
                     'scripts/subMobile/mobile.js': ['src/subMobile/lib/zepto/zepto.js', 'src/subMobile/mobile.js'],
-                    'scripts/app/data_cube.js': ['src/app/lib/zepto/zepto.js','src/app/echarts/echarts.js', 'src/app/data_cube.js'],
+                    'scripts/app/lib/jquery.num.js': ['src/app/lib/jquery.min.js', 'src/app/lib/jquery.animateNumber.min.js'],
                 }
             }
         },

@@ -17,6 +17,8 @@ if __name__ == '__main__':
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'wanglibao.settings')
 
+from wanglibao_reward.models import WanglibaoActivityReward
+from experience_gold.models import ExperienceEvent
 from weixin.models import WeixinAccounts
 import qrcode
 import hashlib
@@ -984,7 +986,7 @@ class ZGDXRegister(CoopRegister):
             effect_type = '0'
 
         request_no_prefix = order_id or str(user.id) + timezone.now().strftime("%Y%m%d%H%M%S")
-        request_no = request_no_prefix + '_' + plat_offer_id
+        request_no = str(request_no_prefix) + '_' + plat_offer_id
         phone_id = WanglibaoUserProfile.objects.get(user_id=user.id).phone
         code = {
             'request_no': request_no,
@@ -1125,7 +1127,7 @@ class RockFinanceRegister(CoopRegister):
                         info = json.loads(m.value)
                         original_id = info.get('fwh')
                         account = WeixinAccounts.getByOriginalId(original_id)
-                    encoding_str = urllib.quote("https://staging.wanglibao.com/api/check/qrcode/?owner_id=%s&activity=rock_finance&content=%s" % (user.id, reward.content))
+                    encoding_str = urllib.quote("https://www.wanglibao.com/api/check/qrcode/?owner_id=%s&activity=rock_finance&content=%s" % (user.id, reward.content))
                     qrcode_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_base&state=%s" % (account.app_id, encoding_str, original_id)
                     logger.debug("encoding_st:%s, qrcode_url:%s" % (encoding_str, qrcode_url))
                     img = qrcode.make(qrcode_url)
@@ -1141,7 +1143,7 @@ class RockFinanceRegister(CoopRegister):
                     inside_message.send_one.apply_async(kwargs={
                         "user_id": user.id,
                         "title": u"网利宝摇滚之夜门票",
-                        "content": u"网利宝摇滚夜欢迎您的到来，点击<a href='https://staging.wanglibao.com/rock/finance/qrcode/?user_id=%s'>获得入场二维码</a>查看，<br/> 感谢您对我们的支持与关注。<br/>网利宝" % user.id,
+                        "content": u"网利宝摇滚夜欢迎您的到来，点击<a href='https://www.wanglibao.com/rock/finance/qrcode/?user_id=%s'>获得入场二维码</a>查看，<br/> 感谢您对我们的支持与关注。<br/>网利宝" % user.id,
                         "mtype": "activity"
                     })
                     reward.is_used = True
@@ -1213,22 +1215,24 @@ class WeixinRedpackRegister(CoopRegister):
     def __init__(self, request):
         super(WeixinRedpackRegister, self).__init__(request)
         self.c_code = 'weixin_redpack'
-        #self.channel_code = 'weixin_redpack'
         self.invite_code = 'weixin_redpack'
+        self.order_id = request.GET.get("order_id", None)
 
     def register_call_back(self, user):
         phone = user.wanglibaouserprofile.phone
         logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
-        record = WanglibaoUserGift.objects.filter(valid=0, identity=phone).first()
         try:
-            redpack_backends.give_activity_redpack(user, record.rules.redpack, 'pc')
+            ex_event = ExperienceEvent.objects.filter(name=u'新手体验金', invalid=False).first()
+            WanglibaoActivityReward.objects.create(
+                order_id=self.order_id,
+                activity='weixin_experience_glod',
+                experience=ex_event,
+                user_id=user.id,
+            )
         except Exception, reason:
-            logger.debug('Fail:注册的时候发送加息券失败, reason:%s' % (reason,))
+            logger.debug("微信分享，生成体验金报异常; reason:%s" % (reason,))
         else:
-            logger.debug('Success:发送红包完毕,user:%s, redpack:%s' % (self.request.user, record.rules.redpack,))
-        record.valid = 1
-        record.save()
-
+            pass
 
 class XunleiVipRegister(CoopRegister):
     def __init__(self, request):
@@ -1239,6 +1243,98 @@ class XunleiVipRegister(CoopRegister):
         self.coop_key = XUNLEIVIP_KEY
         self.coop_register_key = XUNLEIVIP_REGISTER_KEY
         self.external_channel_user_key = 'xluserid'
+        self.coop_time_key = 'time'
+        self.coop_sign_key = 'sign'
+        self.is_xunlei_user = False
+
+    @property
+    def channel_user(self):
+        return self.request.session.get(self.internal_channel_user_key, '').strip()
+
+    @property
+    def channel_time(self):
+        return self.request.session.get(self.coop_time_key, '').strip()
+
+    @property
+    def channel_sign(self):
+        return self.request.session.get(self.coop_sign_key, '').strip()
+
+    def save_to_session(self):
+        super(XunleiVipRegister, self).save_to_session()
+        coop_time = self.request.GET.get(self.coop_time_key, None)
+        coop_sign = self.request.GET.get(self.coop_sign_key, None)
+        if coop_time:
+            self.request.session[self.coop_time_key] = coop_time
+
+        if coop_sign:
+            self.request.session[self.coop_sign_key] = coop_sign
+
+    def clear_session(self):
+        super(XunleiVipRegister, self).clear_session()
+        self.request.session.pop(self.coop_time_key, None)
+        self.request.session.pop(self.coop_sign_key, None)
+
+    def save_to_binding(self, user):
+        """
+        处理从url获得的渠道参数
+        :param user:
+        :return:
+        """
+        channel_user = self.channel_user
+        channel_name = self.channel_name
+        bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
+        if channel_name and channel_user and len(channel_user) <= bid_len:
+            binding = Binding()
+            binding.user = user
+            binding.btype = channel_name
+            binding.bid = channel_user
+            binding.save()
+            # logger.debug('save user %s to binding'%user)
+            return True
+
+        logger.info("xunlei9 binding faild with user[%s], channel_user[%s], channel_name[%s]" %
+                    (user.id, channel_user, channel_name))
+
+    def process_for_register(self, user, invite_code):
+        """
+        用户可以在从渠道跳转后的注册页使用邀请码，优先考虑邀请码
+        """
+        # 校验迅雷用户有效性
+        data = {
+            self.coop_time_key: self.channel_time,
+            self.external_channel_user_key: self.channel_user,
+        }
+
+        if xunleivip_generate_sign(data, self.coop_register_key) == self.channel_sign:
+            self.is_xunlei_user = True
+
+        # 处理渠道用户注册或更新渠道用户绑定状态
+        binding = Binding.objects.filter(user_id=user.id).first()
+        introduced_by = IntroducedBy.objects.filter(user_id=user.id).select_related('channel').first()
+        if not (binding and introduced_by):
+            # 处理新用户注册
+            self.save_to_introduceby(user, invite_code)
+            if self.is_xunlei_user and self.save_to_binding(user):
+                self.register_call_back(user)
+        elif not binding and self.is_xunlei_user and introduced_by and introduced_by.channel.code == invite_code:
+            # 处理老用户绑定状态
+            if self.save_to_binding(user):
+                # 处理渠道用户注册回调
+                self.register_call_back(user)
+
+                # 处理渠道用户充值回调补发
+                penny = Decimal(0.01).quantize(Decimal('.01'))
+                pay_info = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
+                                                  status=PayInfo.SUCCESS).order_by('create_time').first()
+                if pay_info and int(pay_info.amount) >= 100:
+                    self.recharge_call_back(user, pay_info.order_id)
+
+                # 处理渠道用户投资回调补发
+                p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+                if p2p_record and int(p2p_record.amount) >= 1000:
+                    self.purchase_call_back(user, p2p_record.order_id)
+
+        self.clear_session()
 
     def xunlei_call_back(self, user, tid, data, url, order_id):
         order_id = '%s_%s' % (order_id, data['act'])
@@ -1277,43 +1373,61 @@ class XunleiVipRegister(CoopRegister):
 
     def recharge_call_back(self, user, order_id):
         logger.info("XunleiVip-Enter recharge_call_back for xunlei9: [%s], [%s]" % (user.id, order_id))
-        # 判断用户是否绑定和首次充值
-        binding = Binding.objects.filter(user_id=user.id).first()
+        # 判断用户是否首次充值
         penny = Decimal(0.01).quantize(Decimal('.01'))
         pay_info = PayInfo.objects.filter(user=user, type='D', amount__gt=penny,
                                           status=PayInfo.SUCCESS).order_by('create_time').first()
 
-        if binding and pay_info and pay_info.order_id == int(order_id):
-            logger.info("XunleiVip-If amount for xunlei9: [%s], [%s], [%s]" % (order_id, binding.bid, pay_info.amount))
+        if pay_info and pay_info.order_id == int(order_id):
+            logger.info("XunleiVip-If amount for xunlei9: [%s], [%s]" % (order_id, pay_info.amount))
             # 判断充值金额是否大于100
             pay_amount = int(pay_info.amount)
             if pay_amount >= 100:
-                data = {
-                    'sendtype': '1',
-                    'num1': 7,
-                    'act': 5171
-                }
-                self.xunlei_call_back(user, binding.bid, data,
-                                      self.call_back_url, pay_info.order_id)
+                # 判断用户是否绑定
+                binding = Binding.objects.filter(user_id=user.id).first()
+                if binding:
+                    data = {
+                        'sendtype': '1',
+                        'num1': 7,
+                        'act': 5171
+                    }
+                    self.xunlei_call_back(user, binding.bid, data,
+                                          self.call_back_url, pay_info.order_id)
+                else:
+                    message_content = u"呦西！"
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id": user.id,
+                        "title": u"首次充值送7天迅雷白金会员",
+                        "content": message_content,
+                        "mtype": "activity"
+                    })
 
     def purchase_call_back(self, user, order_id):
         logger.info("XunleiVip-Enter purchase_call_back for xunlei9: [%s], [%s]" % (user.id, order_id))
-        # 判断用户是否绑定和首次投资
-        binding = Binding.objects.filter(user_id=user.id).first()
-        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
-
         # 判断是否首次投资
-        if binding and p2p_record and p2p_record.order_id == int(order_id):
+        p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
+        if p2p_record and p2p_record.order_id == int(order_id):
             # 判断投资金额是否大于100
             pay_amount = int(p2p_record.amount)
             if pay_amount >= 1000:
-                data = {
-                    'sendtype': '0',
-                    'num1': 12,
-                    'act': 5170
-                }
-                self.xunlei_call_back(user, binding.bid, data,
-                                      self.call_back_url, p2p_record.order_id)
+                # 判断用户是否绑定
+                binding = Binding.objects.filter(user_id=user.id).first()
+                if binding:
+                    data = {
+                        'sendtype': '0',
+                        'num1': 12,
+                        'act': 5170
+                    }
+                    self.xunlei_call_back(user, binding.bid, data,
+                                          self.call_back_url, p2p_record.order_id)
+                else:
+                    message_content = u"呦西！"
+                    inside_message.send_one.apply_async(kwargs={
+                        "user_id": user.id,
+                        "title": u"首次投资送1年迅雷白金会员",
+                        "content": message_content,
+                        "mtype": "activity"
+                    })
 
 
 class MaimaiRegister(CoopRegister):

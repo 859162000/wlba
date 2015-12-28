@@ -13,7 +13,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils.decorators import method_decorator
 from wanglibao_pay import util
-from wanglibao_pay.models import PayInfo, Bank, Card
+from wanglibao_pay.models import PayInfo, Bank, Card, BlackListCard, WhiteListCard
 from order.utils import OrderHelper
 from order.models import Order
 from wanglibao_margin.marginkeeper import MarginKeeper
@@ -207,6 +207,24 @@ def withdraw(request):
     card = Card.objects.filter(pk=card_id).first()
     if not card or card.user != user:
         return {"ret_code": 20067, "message": u"请选择有效的银行卡"}
+    # 检测银行卡是否在黑名单中
+    black_list = BlackListCard.objects.filter(card_no=card.no).first()
+    if black_list and black_list.user != user:
+        return {"ret_code": 20072, "message": u'银行卡号异常,请联系客服'}
+
+    # 检查白名单
+    white_list = WhiteListCard.objects.filter(user=user, card_no=card.no).first()
+    if not white_list:
+        # 增加银行卡号检测功能,检测多张卡
+        card_count = Card.objects.filter(no=card.no).count()
+        if card_count > 1:
+            return {"ret_code": 20073, "message": u'银行卡号有多张重复,请联系客服'}
+
+        # 检测银行卡在以前的提现记录中是否为同一个用户
+        payinfo_record = PayInfo.objects.filter(card_no=card.no).order_by('-create_time').first()
+        if payinfo_record:
+            if payinfo_record.user != user:
+                return {"ret_code": 20074, "message": u'银行卡号与身份信息不符,请联系客服'}
 
     # 计算提现费用 手续费 + 资金管理费
     bank = card.bank
@@ -558,11 +576,20 @@ def bind_pay_dynnum(request):
     else:
         res = {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
 
-    if res.get('ret_code') == 0:
-        try:
+    # Modify by hb on 2015-12-24 : 如果ret_code返回非0, 还需进一步判断card是否有绑定记录, 因为有可能出现充值失败但绑卡成功的情况
+    try:
+        bind_flag = 0;
+        if res.get('ret_code') == 0:
+            bind_flag = 1;
+        else:
+            card = Card.objects.filter(user=user, id=card.id).first()
+            if card and (card.is_bind_huifu or card.is_bind_kuai or card.is_bind_yee):
+                logger.error('=20151224= deposit failed but binding success: [%s] [%s]' % (card.user, card.no))
+                bind_flag = 1;
+        if bind_flag == 1:
             CoopRegister(request).process_for_binding_card(user)
-        except:
-            logger.exception('bind_card_callback_failed for %s' % str(user))
+    except Exception, ex:
+        logger.exception('=20151224= bind_card_callback_failed: [%s] [%s] [%s]' % (user, card_no, ex))
 
     return res
 

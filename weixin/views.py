@@ -60,7 +60,7 @@ from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEven
 from experience_gold.models import ExperienceEvent
 from experience_gold.backends import SendExperienceGold
 from weixin.tasks import detect_product_biding, sentTemplate
-from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser, bindUser, unbindUser, _process_record
+from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser, bindUser, unbindUser, _process_record, _process_scene_record
 
 logger = logging.getLogger("weixin")
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
@@ -331,6 +331,9 @@ class WeixinJoinView(View):
         if not old_subscribe and w_user.subscribe:
             w_user.scene_id = scene_id
             w_user.save()
+            if scene_id:
+                _process_scene_record(w_user, scene_id)
+
         if not reply and not user:
             txt = self.getBindTxt(fromUserName)
             reply = create_reply(txt, self.msg)
@@ -1438,10 +1441,20 @@ def checkProduct(sender, **kw):
     product = kw["instance"]
     if getattr(product, "old_status", ""):
         if product.old_status == u'待审核' and product.status==u'正在招标':
-            detect_product_biding.apply_async(kwargs={
-               "product_id":product.id
-            },
-                                                           queue='celery01')
+            publish_time = product.publish_time
+            utc_now = timezone.now()
+            if utc_now <= publish_time:
+                exec_time = publish_time + datetime.timedelta(minutes=1)
+                detect_product_biding.apply_async(kwargs={
+                   "product_id":product.id
+                },
+                                                  eta= exec_time,
+                                                  queue='celery01')
+            else:
+                detect_product_biding.apply_async(kwargs={
+                   "product_id":product.id
+                },
+                                                  queue='celery01')
 
 def recordProduct(sender, **kw):
     try:
@@ -1454,3 +1467,14 @@ def recordProduct(sender, **kw):
 
 pre_save.connect(recordProduct, sender=P2PProduct, dispatch_uid="product-pre-save-signal")
 post_save.connect(checkProduct, sender=P2PProduct, dispatch_uid="product-post-save-signal")
+
+
+class WeiXinReceivedAll(TemplateView):
+    """ 回款计划所有 """
+    template_name = 'weixin_received_all.jade'
+class WeiXinReceivedMonth(TemplateView):
+    """ 回款计划月 """
+    template_name = 'weixin_received_month.jade'
+class WeiXinReceivedDetail(TemplateView):
+    """ 回款计划详细 """
+    template_name = 'weixin_received_detail.jade'

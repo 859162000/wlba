@@ -194,9 +194,11 @@ class AppRepaymentPlanAllAPIView(APIView):
                 user_amortizations = paginator.page(paginator.num_pages)
 
             amo_list = _user_amortization_list(user_amortizations)
+            count = paginator.num_pages
         else:
             amo_list = []
-        return Response({'ret_code': 0, 'data': amo_list, 'page': page, 'num': pagesize})
+            count = 0
+        return Response({'ret_code': 0, 'data': amo_list, 'page': page, 'num': pagesize, 'count': count})
 
 
 class AppRepaymentPlanMonthAPIView(APIView):

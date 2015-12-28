@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.utils import timezone
 # Register your models here.
-from wanglibao_pay.models import Bank, PayInfo, Card, WithdrawCard, WithdrawCardRecord
+from wanglibao_pay.models import Bank, PayInfo, Card, WithdrawCard, WithdrawCardRecord, WhiteListCard, BlackListCard
 from wanglibao_pay.views import WithdrawTransactions, WithdrawRollback, \
     AdminTransaction
 # , 'channel', 'type'
@@ -151,11 +151,25 @@ class WithdrawCardRecordAdmin(admin.ModelAdmin):
         return [f.name for f in self.model._meta.fields]
 
 
+class WhiteListCardAdmin(admin.ModelAdmin):
+    list_display = ('user', 'card_no', 'message', 'create_time')
+    raw_id_fields = ('user', )
+    search_fields = ('=user__wanglibaouserprofile__phone', '=card_no')
+
+
+class BlackListCardAdmin(admin.ModelAdmin):
+    list_display = ('user', 'card_no', 'message', 'ip', 'create_time')
+    raw_id_fields = ('user', )
+    search_fields = ('=user__wanglibaouserprofile__phone', '=card_no')
+
+
 admin.site.register(Bank, BankAdmin)
 admin.site.register(Card, CardAdmin)
 admin.site.register(PayInfo, PayInfoAdmin)
 admin.site.register(WithdrawCard, WithdrawCardAdmin)
 admin.site.register(WithdrawCardRecord, WithdrawCardRecordAdmin)
+admin.site.register(WhiteListCard, WhiteListCardAdmin)
+admin.site.register(BlackListCard, BlackListCardAdmin)
 
 
 admin.site.register_view('pay/withdraw/audit', view=WithdrawTransactions.as_view(), name=u'提现申请审核页面')
