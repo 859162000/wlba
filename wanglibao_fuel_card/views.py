@@ -90,7 +90,7 @@ def get_class_name(p_class, l_type=None):
 class RevenueExchangeIndexView(TemplateView):
     """
     理财收益兑换-产品视图
-    :param 'type'
+    :param 'e_type'
     :return
     :request_method GET
     :user.is_authenticated True
@@ -154,7 +154,7 @@ class RevenueExchangeIndexView(TemplateView):
 class RevenueExchangeBuyView(TemplateView):
     """
     理财收益兑换-产品购买页面视图
-    :param 'p_id', 'type'
+    :param 'p_id', 'e_type'
     :return
     :request_method GET
     :user.is_authenticated True
@@ -166,15 +166,14 @@ class RevenueExchangeBuyView(TemplateView):
 
     template_name = ''
 
-    def get_context_data(self, p_id, **kwargs):
+    def get_context_data(self, e_type, p_id, **kwargs):
         try:
             p2p_product = P2PProduct.objects.get(pk=p_id)
         except P2PProduct.DoesNotExist:
             return Http404(u'页面不存在')
 
-        _type = self.request.GET.get('type', '').strip()
-        l_type, template_name = self.TYPES.get(_type, None)
-        if not _type or not l_type:
+        l_type, template_name = self.TYPES.get(e_type, None)
+        if not e_type or not l_type:
             return HttpResponseForbidden(u'type参数不存在')
 
         self.template_name = template_name
@@ -254,7 +253,7 @@ class RevenueExchangeBuyApi(APIView):
 class RevenueExchangeBuyRecordView(TemplateView):
     """
     理财收益兑换-产品购买记录视图
-    :param 'status', 'type'
+    :param 'e_type', 'p_status'
     :return
     :request_method GET
     :user.is_authenticated True
@@ -282,22 +281,16 @@ class RevenueExchangeBuyRecordView(TemplateView):
 
         return get_sorts_for_created_time(ua_list)
 
-    def get_context_data(self, **kwargs):
-        _status = self.request.GET.get('status', '').strip()
-        _type = self.request.GET.get('type', '').strip()
-
-        if not _status:
-            return HttpResponseForbidden(u'status参数是必须的')
-
-        l_type, template_name = self.TYPES.get(_type, None)
-        if not _type or not l_type:
+    def get_context_data(self, e_type, p_status, **kwargs):
+        l_type, template_name = self.TYPES.get(e_type, None)
+        if not e_type or not l_type:
             return HttpResponseForbidden(u'type参数不存在')
 
         self.template_name = template_name
 
         status_list = ['auditing', 'done']
-        if _status in status_list:
-            if _status == 'auditing':
+        if p_status in status_list:
+            if p_status == 'auditing':
                 settled_status = False
                 sorted_term = 'term'
             else:
@@ -313,7 +306,7 @@ class RevenueExchangeBuyRecordView(TemplateView):
 
             return {
                 'data': user_amortizations,
-                'status': _status,
+                'status': p_status,
             }
         else:
             return HttpResponseForbidden(u'无效参数status')
@@ -322,7 +315,7 @@ class RevenueExchangeBuyRecordView(TemplateView):
 class RevenueExchangeRecordView(TemplateView):
     """
     理财收益兑换-产品兑换记录视图
-    :param 'status', 'type'
+    :param 'e_type', 'p_status'
     :return
     :request_method GET
     :user.is_authenticated True
@@ -334,27 +327,22 @@ class RevenueExchangeRecordView(TemplateView):
 
     template_name = ''
 
-    def get_context_data(self, **kwargs):
-        _status = self.request.GET.get('status', '').strip()
-        _type = self.request.GET.get('type', '').strip()
-        if not _status:
-            return HttpResponseForbidden(u'status参数是必须的')
-
-        l_type, template_name = self.TYPES.get(_type, None)
-        if not _type or not l_type:
+    def get_context_data(self, e_type, p_status, **kwargs):
+        l_type, template_name = self.TYPES.get(e_type, None)
+        if not e_type or not l_type:
             return HttpResponseForbidden(u'type参数不存在')
 
         self.template_name = template_name
 
         status_list = ['receiving', 'changing']
-        if _status in status_list:
-            exchang_status = False if _status == 'receiving' else True
-            settled_status = False if _status == 'receiving' else True
+        if p_status in status_list:
+            exchang_status = False if p_status == 'receiving' else True
+            settled_status = False if p_status == 'receiving' else True
             exchange_amos = ExchangeAmo.objects.filter(user=self.request.user, exchanged=exchang_status,
                                                        settled=settled_status,
                                                        product_amortization__product__category
                                                        =l_type).order_by('-term_date')
-            if _status == 'changing':
+            if p_status == 'changing':
                 for ea in exchange_amos:
                     rewards = RevenueExchangeRepertory.objects.filter(user=self.request.user,
                                                                       order_id=ea.order_id,
@@ -369,7 +357,7 @@ class RevenueExchangeRecordView(TemplateView):
 
             return {
                 'data': exchange_amos,
-                'status': _status,
+                'status': p_status,
             }
         else:
             return HttpResponseForbidden(u'无效参数status')
@@ -378,7 +366,7 @@ class RevenueExchangeRecordView(TemplateView):
 class RevenueExchangeStatisticsView(TemplateView):
     """
     理财收益兑换-用户资金统计视图
-    :param 'type'
+    :param 'e_type'
     :return
     :request_method GET
     :user.is_authenticated True
@@ -393,11 +381,9 @@ class RevenueExchangeStatisticsView(TemplateView):
     class MyObject(object):
         pass
 
-    def get_context_data(self, **kwargs):
-        _type = self.request.GET.get('type', '').strip()
-
-        l_type, template_name = self.TYPES.get(_type)
-        if not _type or not l_type:
+    def get_context_data(self, e_type, **kwargs):
+        l_type, template_name = self.TYPES.get(e_type)
+        if not e_type or not l_type:
             return HttpResponseForbidden(u'type参数不存在')
 
         self.template_name = template_name
