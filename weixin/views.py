@@ -1505,10 +1505,20 @@ def checkProduct(sender, **kw):
     product = kw["instance"]
     if getattr(product, "old_status", ""):
         if product.old_status == u'待审核' and product.status==u'正在招标':
-            detect_product_biding.apply_async(kwargs={
-               "product_id":product.id
-            },
-                                                           queue='celery01')
+            publish_time = product.publish_time
+            utc_now = timezone.now()
+            if utc_now <= publish_time:
+                exec_time = publish_time + datetime.timedelta(minutes=1)
+                detect_product_biding.apply_async(kwargs={
+                   "product_id":product.id
+                },
+                                                  eta= exec_time,
+                                                  queue='celery01')
+            else:
+                detect_product_biding.apply_async(kwargs={
+                   "product_id":product.id
+                },
+                                                  queue='celery01')
 
 def recordProduct(sender, **kw):
     try:
