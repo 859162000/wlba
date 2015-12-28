@@ -132,6 +132,7 @@ class RevenueExchangeIndexView(TemplateView):
                 try:
                     exchange_rule = RevenueExchangeRule.objects.get(product=p)
                     p.equality_prize_amount = exchange_rule.equality_prize_amount
+                    p.limit_min_per_user = exchange_rule.limit_min_per_user
                 except RevenueExchangeRule.DoesNotExist:
                     return HttpResponseForbidden("not found match for rule with product")
 
