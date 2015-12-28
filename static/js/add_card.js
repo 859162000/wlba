@@ -108,8 +108,15 @@
               device_id: ''
             },
             type: 'post'
-          }).done(function() {
-            return location.reload();
+          }).done(function(xhr) {
+            if (xhr.ret_code === 0) {
+              location.reload();
+            } else {
+              tool.modalAlert({
+                title: '温馨提示',
+                msg: xhr.message
+              });
+            }
           }).fail(function(xhr) {
             tool.modalAlert({
               title: '温馨提示',
@@ -183,10 +190,21 @@
           msg: xhr.message
         });
       }).success(function(xhr) {
-        element.attr('disabled', 'disabled');
-        element.removeClass('go-get-code');
-        $('#order_id').val(xhr.order_id);
-        return $('#token').val(xhr.token);
+        if (xhr.ret_code === 0) {
+          element.attr('disabled', 'disabled');
+          element.removeClass('go-get-code');
+          $('#order_id').val(xhr.order_id);
+          return $('#token').val(xhr.token);
+        } else {
+          clearInterval(intervalId);
+          $(element).text('重新获取');
+          $(element).removeAttr('disabled');
+          $(element).addClass('go-get-code');
+          return tool.modalAlert({
+            title: '温馨提示',
+            msg: xhr.message
+          });
+        }
       });
       intervalId;
       count = 60;
@@ -231,9 +249,12 @@
         },
         type: 'put'
       }).done(function() {
-        return console.log('111111');
+        return location.reload();
       }).fail(function(xhr) {
-        return console.log('222222');
+        return tool.modalAlert({
+          title: '温馨提示',
+          msg: xhr.message
+        });
       });
     });
 

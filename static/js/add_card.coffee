@@ -93,8 +93,13 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
             }
             type: 'post'
           }
-          .done ()->
-            location.reload()
+          .done (xhr)->
+#            location.reload()
+            if xhr.ret_code == 0
+              location.reload()
+            else
+             tool.modalAlert({title: '温馨提示', msg: xhr.message})
+            return
           .fail (xhr)->
             tool.modalAlert({title: '温馨提示', msg: xhr.message})
             return
@@ -150,10 +155,17 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
       $(element).addClass 'go-get-code'
       tool.modalAlert({title: '温馨提示', msg: xhr.message})
     .success (xhr) ->
-      element.attr 'disabled', 'disabled'
-      element.removeClass 'go-get-code'
-      $('#order_id').val(xhr.order_id)
-      $('#token').val(xhr.token)
+      if xhr.ret_code == 0
+        element.attr 'disabled', 'disabled'
+        element.removeClass 'go-get-code'
+        $('#order_id').val(xhr.order_id)
+        $('#token').val(xhr.token)
+      else
+        clearInterval(intervalId)
+        $(element).text('重新获取')
+        $(element).removeAttr 'disabled'
+        $(element).addClass 'go-get-code'
+        tool.modalAlert({title: '温馨提示', msg: xhr.message})
     intervalId
     count = 60
 
@@ -193,10 +205,9 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
       type: 'put'
     }
     .done ()->
-#      location.reload()
-      console.log('111111')
+      location.reload()
     .fail (xhr)->
-      console.log('222222')
+      tool.modalAlert({title: '温馨提示', msg: xhr.message})
   ###取消绑定###
   $('.no-btn').click ->
     $.modal.close()

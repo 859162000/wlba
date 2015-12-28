@@ -398,7 +398,7 @@
       }
     });
     return $.ajax({
-      url: "/api/home",
+      url: "/api/home/",
       type: "GET",
       data: {}
     }).success(function(data) {

@@ -329,7 +329,7 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
 
   #账户余额
   $.ajax
-    url: "/api/home"
+    url: "/api/home/"
     type: "GET"
     data: {
     }
