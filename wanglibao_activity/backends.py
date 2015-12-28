@@ -643,14 +643,16 @@ def _give_activity_experience_new(user, rtype, experience_id, device_type, rule,
 
     # 限制id为1的体验金重复发放
     experience_count = ExperienceEventRecord.objects.filter(user=user).filter(event__id=1).count()
-    if experience_count:
-        logger.debug(">>>>用户id: {}, ID为1的体验金已经发放过,不允许重复领取".format(user.id))
-        return
 
     if len(experience_id_list) == 1:
         experience_event = ExperienceEvent.objects.filter(give_mode=rtype, invalid=False, id=experience_id_list[0],
                                                           available_at__lt=now, unavailable_at__gt=now).first()
         if experience_event:
+
+            if experience_count and experience_event.id == 1:
+                logger.debug(">>>>用户id: {}, ID为1 的体验金已经发放过,不允许重复领取".format(user.id))
+                return
+
             if experience_event.target_channel != "":
                 chs = experience_event.target_channel.split(",")
                 chs = [m for m in chs if m.strip() != ""]
@@ -672,6 +674,12 @@ def _give_activity_experience_new(user, rtype, experience_id, device_type, rule,
             experience_event = ExperienceEvent.objects.filter(give_mode=rtype, invalid=False, id=e_id,
                                                               available_at__lt=now, unavailable_at__gt=now).first()
             if experience_event:
+
+                # 限制ID:1体验金重复发放
+                if experience_count and experience_event.id == 1:
+                    logger.debug(">>>>用户id: {}, ID为1 的体验金已经发放过,不允许重复领取".format(user.id))
+                    continue
+
                 if experience_event.target_channel != "":
                     chs = experience_event.target_channel.split(",")
                     chs = [m for m in chs if m.strip() != ""]
