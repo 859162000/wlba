@@ -85,7 +85,7 @@
                                      +'</div></div><div class="row"><dl class="bank-card--info-row">'
                                      +'<dt class="bank-card--info-title">账号</dt>'
                                      +'<dd class="bank-card--info-value">'+ o.storable_no.substring(0,3)+'**** ****' +o.storable_no.substr(o.storable_no.length-4)+'</dd>'
-                                     +'</dl></div><div data-card="'+ o.storable_no +'" class="binding-card">绑定该卡</div></div>';
+                                     +'</dl></div><div data-card="'+ o.gate_id +'" class="binding-card">绑定该卡</div></div>';
                             })
                             $('#add-card-button').before(strHtml)
                         }

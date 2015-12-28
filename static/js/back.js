@@ -26,7 +26,7 @@
       } else {
         $('#backTwo').show()
         $('.confirmBtn').attr('tag','2')
-        $('.panel-title[tag="2"]').show()    
+        $('.panel-title[tag="2"]').show()
       }
     });
     /*获取绑卡状态 */
