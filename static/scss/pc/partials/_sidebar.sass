@@ -1,0 +1,103 @@
+.row
+  max-width: 1104px
+  margin: 0 auto
+.aside
+  width: 220px
+  float: left
+  margin-right: 15px
+.main
+  float: left
+  width: 865px
+.panel
+  max-width: 1104px
+  min-height: 100px
+  padding-bottom: 1em
+  background: #ffffff
+  margin: 15px 0
+.sidebar
+  background: white
+  margin-top: 15px
+
+.sidebar-title
+  padding: 10px 20px
+  color: #9d9d9d
+  font-size: 16px
+
+.sidebar-item
+  font-size: 16px
+  line-height: 45px
+  border-top: 1px dotted lightgray
+  padding: 0 20px
+  text-align: left
+  position: relative
+
+  &:first-child
+    border-top: 0
+
+  &.active
+    border-left: 3px solid #e7350d
+    background: #F9FAF9
+
+    >a
+      +link-colors(#e7350d, #e7350d)
+      cursor: pointer
+
+  a
+    +unstyled-link
+    +link-colors(#666, #333)
+    display: block
+    text-align: center
+    cursor: pointer
+
+.sidebar-secondary
+  .sidebar-item
+    a
+      color: #666
+  .sidebar-item
+    &.active
+      a
+        +link-colors(#e7350d, #e7350d)
+.sidebar-item span.newGif
+  background: url(/static/images/NEW.gif) no-repeat center
+  position: absolute
+  left: 2px
+  right: 3px
+  width: 30px
+  height: 30px
+  display: inline-block
+  left: 42px
+  top: 7px
+.sidebar-anchor
+  +unstyled-link
+
+.siderbar-div
+  width: 24%
+  float: left
+  overflow: visible
+
+  &:after
+    content: " " /* Older browser do not support empty content */
+    visibility: hidden
+    display: block
+    height: 0
+    clear: both
+
+.sidebar-secondary
+  margin: 0 auto
+  display: none
+
+  .sidebar-item.active
+    border-width: 0px
+    a
+      border-width: 0px
+
+  .sidebar-item
+    border-width: 0px
+    a
+      border-width: 0px
+
+  a
+    +unstyled-link
+    +link-colors(#666, #e7350d)
+    cursor: pointer
+
