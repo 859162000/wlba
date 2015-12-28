@@ -9,7 +9,7 @@ from play_list import InvestmentRewardView
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, \
     Activity, ActivityRule, Reward, RewardRecord, Channels, ChannelsNew, IntroducedByReward, PlayList, \
     ActivityJoinLog, WanglibaoActivityReward, GiftOwnerGlobalInfo, GiftOwnerInfo, QuickApplyInfo, \
-    RevenueExchangeRepertory, RevenueExchangeRecord
+    RevenueExchangeRepertory, RevenueExchangeRule, RevenueExchangeOrder, RevenueExchangeAmortization
 from marketing.views import GennaeratorCode
 
 from import_export import resources
@@ -297,8 +297,8 @@ class RevenueExchangeRepertoryResource(resources.ModelResource):
 
     class Meta:
         model = Reward
-        fields = ('id', 'type', 'price', 'using_range', 'create_time',
-                  'end_time', 'is_used', 'conversion_code', 'description')
+        fields = ('id', 'type', 'price', 'channel', 'using_range', 'create_time',
+                  'end_time', 'is_used', 'conversion_code', 'description', 'exchange_id')
 
     def import_obj(self, instance, row, False):
         super(RevenueExchangeRepertoryResource, self).import_obj(instance, row, False)
@@ -316,11 +316,11 @@ class RevenueExchangeRepertoryAdmin(ImportExportModelAdmin, admin.ModelAdmin):
         return False
 
 
-class RevenueExchangeRecorddAdmin(admin.ModelAdmin):
+class RevenueExchangeAmortizationAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ('id', 'user', 'reward', 'order_id', 'description', 'create_time')
-    search_fields = ('user__wanglibaouserprofile__phone', 'order_id', "reward__type", "reward__price")
-    raw_id_fields = ('user', 'reward')
+    list_display = ('id', 'user', 'exchange_id', 'order_id', 'description', 'create_time')
+    search_fields = ('user__wanglibaouserprofile__phone', 'order_id')
+    raw_id_fields = ('user',)
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -346,7 +346,7 @@ admin.site.register(ActivityRule, ActivityRuleAdmin)
 admin.site.register(Reward, RewardAdmin)
 admin.site.register(RewardRecord, RewardRecordAdmin)
 admin.site.register(RevenueExchangeRepertory, RevenueExchangeRepertoryAdmin)
-admin.site.register(RevenueExchangeRecord, RevenueExchangeRecorddAdmin)
+admin.site.register(RevenueExchangeAmortization, RevenueExchangeAmortizationAdmin)
 #admin.site.register(ClientData, ClientDataAdmin)
 admin.site.register(Channels, ChannelsAdmin)
 ##admin.site.register(ChannelsNew, ChannelsNewAdmin)

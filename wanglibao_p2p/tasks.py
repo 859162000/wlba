@@ -21,6 +21,10 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import period_unit
 import time, datetime
+from marketing.utils import get_user_channel_record
+from marketing.models import RevenueExchangeRepertory
+
+logger = get_task_logger(__name__)
 
 
 @app.task
@@ -207,4 +211,40 @@ def p2p_auto_ready_for_settle():
 @app.task
 def p2p_revenue_exchange(user_amos, exchange_amos, exchange_rule):
     for amo in user_amos:
-        exchange_amos.get(user=amo.user)
+        try:
+            exchange_amo = exchange_amos.get(user=amo.user, term=amo.term, exchanged=False)
+        except Exception, e:
+            logger.info("exchange amortization not found with user amortization [%s]" % amo.id)
+            logger.info(e)
+            exchange_amo = None
+
+        if exchange_amo:
+            channel = get_user_channel_record(amo.user)
+            reward_parts = exchange_amo.term_amount / exchange_rule.equality_prize_amount
+            if exchange_rule.exchange_method != 'recharge':
+                rewards = RevenueExchangeRepertory.objects.filter(type=exchange_rule.reward_name,
+                                                                  price=exchange_rule.equality_prize_amount,
+                                                                  channel=channel,
+                                                                  using_range=exchange_rule.reward_range,
+                                                                  is_used=False)
+                try:
+                    for i in range(reward_parts):
+                        reward = rewards[i]
+                        exchange_amo.settled = amo.settled
+                        exchange_amo.settlement_time = amo.settlement_time
+                        exchange_amo.exchange_id = exchange_amo.id
+                        exchange_amo.exchange_parts = reward_parts
+                        exchange_amo.exchange_time = timezone.now()
+                        exchange_amo.exchanged = True
+                        exchange_amo.save()
+
+                        reward.exchange_id = exchange_amo.id
+                        reward.is_used = True
+                        reward.save()
+                except Exception, e:
+                    logger.error(e)
+                # reward&recharge
+                # FixMe,短信通知
+            else:
+                # recharge
+                pass
