@@ -127,6 +127,14 @@ class RevenueExchangeIndexView(TemplateView):
                 product_class = classes_product_for_period(p.period) or 'C'
                 p.class_name = get_class_name(product_class, l_type)
 
+            # 按收益兑换产品奖品的面额
+            for p in data:
+                try:
+                    exchange_rule = RevenueExchangeRule.objects.get(product=p)
+                    p.equality_prize_amount = exchange_rule.equality_prize_amount
+                except RevenueExchangeRule.DoesNotExist:
+                    return HttpResponseForbidden("not found match for rule with product")
+
         # 统计用户至今购买理财产品总收益
         revenue_count = get_user_revenue_count_for_type(user, l_type)
 
