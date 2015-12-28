@@ -28,6 +28,8 @@ from weixin.constant import PRODUCT_AMORTIZATION_TEMPLATE_ID
 from weixin.models import WeixinUser
 from weixin.tasks import sentTemplate
 
+from .tasks import p2p_revenue_exchange
+
 
 logger = logging.getLogger(__name__)
 
@@ -270,6 +272,7 @@ class AmortizationKeeper(KeeperBaseMixin):
         self.RevenueExchangeAmortization = RevenueExchangeAmortization
         self.RevenueExchangeOrder = RevenueExchangeOrder
         self.RevenueExchangeRule = RevenueExchangeRule
+        self.RevenueExchangeType = u'还款等额兑奖'
 
     def generate_amortization_plan(self, savepoint=True):
         if self.product.status != u'满标已打款':
@@ -354,7 +357,7 @@ class AmortizationKeeper(KeeperBaseMixin):
 
         for equity in equities:
             # modify by ChenWeiBin@20151224
-            if product_type != u'还款等额兑奖':
+            if product_type != self.RevenueExchangeType:
                 # 查询用户是否使用加息券
                 coupon = RedPackRecord.objects.filter(user=equity.user, product_id=product.id)\
                     .filter(redpack__event__rtype='interest_coupon').first()
@@ -383,7 +386,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                 else:
                     amortization.term_date = timezone.now()
 
-                if product_type == u'还款等额兑奖':
+                if product_type == self.RevenueExchangeType:
                     self.__generate_exchange_amortization(amortization)
 
                 user_amos.append(amortization)
@@ -533,15 +536,13 @@ class AmortizationKeeper(KeeperBaseMixin):
         with transaction.atomic(savepoint=savepoint):
             if amortization.settled:
                 raise P2PException('amortization %s already settled.' % amortization)
-            sub_amortizations = amortization.subs.all()
-            description = unicode(amortization)
-            catalog = u'分期还款'
+
             product = amortization.product
             product_type = amortization.product.types
-            if product_type == u'还款等额兑奖':
+            if product_type == self.RevenueExchangeType:
                 exchange_rule = self.RevenueExchangeRule.objects.filter(product=product).first()
                 if not exchange_rule:
-                     raise P2PException("Revenue Exhchange Product[%s] rule not found" % product.id)
+                     raise P2PException("revenue exhchange product[%s] rule not found" % product.id)
 
             matches = re.search(u'日计息', product.pay_method)
             if matches and matches.group():
@@ -552,38 +553,23 @@ class AmortizationKeeper(KeeperBaseMixin):
             exchange_rule = None
             phone_list = list()
             message_list = list()
+            catalog = u'分期还款'
+            description = unicode(amortization)
+            sub_amortizations = amortization.subs.all()
+            exchange_amortizations = amortization.reward_subs.all()
             # Modify by ChenWeiBin_20151217
             for sub_amo in sub_amortizations:
                 user_margin_keeper = MarginKeeper(sub_amo.user)
-                user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
-                                            sub_amo.coupon_interest, savepoint=False, description=description)
-                if product_type == u'还款等额兑奖':
-                    # FixMe, 冻结金额计算
-                    # 如果兑换方式不为recharge则使用奖品兑换方式
-                    if exchange_rule.exchange_method == 'reward':
-                        exchange_amount = sub_amo.principal + sub_amo.interest + sub_amo.penal_interest
-                        exchange_amount += sub_amo.coupon_interest
-                    # exchange_result = pass
-                    # 如果充值不成功则判断充值方法是否为u‘直充和奖品’,如果是则切换到奖品的
-                    # if exchange_result
-                        margin_record = user_margin_keeper.exchanging(exchange_amount, description=description, savepoint=False)
-
-                sub_amo.settled = True
-                sub_amo.settlement_time = timezone.now()
-                sub_amo.save()
-
                 amo_amount = sub_amo.principal + sub_amo.interest + sub_amo.penal_interest + sub_amo.coupon_interest
-
-                # 生成还款短信消息通知群发-用户手机号列表及短信内容
-                phone_list.append(sub_amo.user.wanglibaouserprofile.phone)
-                if product_type == u'还款等额兑奖':
-                    # FixMe, 修改短信通知内容
-                    pass
+                if product_type == self.RevenueExchangeType:
+                    # FixMe, 冻结金额计算
+                    user_margin_keeper.amortize_and_freeze(sub_amo.principal, sub_amo.interest,
+                                                           sub_amo.penal_interest, sub_amo.coupon_interest,
+                                                           savepoint=False, description=description,
+                                                           freeze_amount=amo_amount)
                 else:
-                    message_list.append(messages.product_amortize(sub_amo.user.wanglibaouserprofile.name,
-                                                                  amortization.product,
-                                                                  # sub_amo.settlement_time,
-                                                                  amo_amount))
+                    user_margin_keeper.amortize(sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
+                                                sub_amo.coupon_interest, savepoint=False, description=description)
 
                     # 发送站内信
                     title, content = messages.msg_bid_amortize(pname, timezone.now(), amo_amount)
@@ -593,10 +579,22 @@ class AmortizationKeeper(KeeperBaseMixin):
                         "content": content,
                         "mtype": "amortize"
                     })
-                    self.__tracer(catalog, sub_amo.user, sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
-                                  amortization, description, sub_amo.coupon_interest)
 
-                if product_type != u'还款等额兑奖':
+                sub_amo.settled = True
+                sub_amo.settlement_time = timezone.now()
+                sub_amo.save()
+
+                # 生成还款短信消息通知群发,FixMe==>短信内容
+                phone_list.append(sub_amo.user.wanglibaouserprofile.phone)
+                message_list.append(messages.product_amortize(sub_amo.user.wanglibaouserprofile.name,
+                                                              amortization.product,
+                                                              # sub_amo.settlement_time,
+                                                              amo_amount))
+
+                self.__tracer(catalog, sub_amo.user, sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
+                              amortization, description, sub_amo.coupon_interest)
+
+                if product_type != self.RevenueExchangeType:
                     # 标的每一期还款完成后,检测该用户还款的本金是否有符合活动的规则,有的话触发活动规则
                     try:
                         if sub_amo.principal > 0:
@@ -623,6 +621,7 @@ class AmortizationKeeper(KeeperBaseMixin):
 
                     except Exception,e:
                         pass
+
             amortization.settled = True
             amortization.save()
             catalog = u'还款入账'
@@ -631,6 +630,13 @@ class AmortizationKeeper(KeeperBaseMixin):
                 "phones": phone_list,
                 "messages": message_list
             })
+
+            if product_type == self.RevenueExchangeType:
+                p2p_revenue_exchange.apply_async(kwargs={
+                    "user_amos": sub_amortizations,
+                    "exchange_amos": exchange_amortizations,
+                    "exchange_rule": exchange_rule,
+                })
 
             self.__tracer(catalog, None, amortization.principal, amortization.interest, amortization.penal_interest, amortization)
 

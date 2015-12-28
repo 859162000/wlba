@@ -204,6 +204,7 @@ def p2p_auto_ready_for_settle():
         amort.save()
 
 
-
-
-
+@app.task
+def p2p_revenue_exchange(user_amos, exchange_amos, exchange_rule):
+    for amo in user_amos:
+        exchange_amos.get(user=amo.user)

@@ -219,6 +219,47 @@ class MarginKeeper(KeeperBaseMixin):
         trace.save()
         return trace
 
+    def amortize_and_freeze(self, principal, interest, penal_interest, coupon_interest,
+                            freeze_amount, description=u'', savepoint=True):
+        check_amount(principal)
+        check_amount(interest)
+        check_amount(penal_interest)
+        check_amount(freeze_amount)
+        principal = Decimal(principal)
+        interest = Decimal(interest)
+        penal_interest = Decimal(penal_interest)
+        coupon_interest = Decimal(coupon_interest)
+        freeze_amount = Decimal(freeze_amount)
+        amortize_amount = principal + interest + penal_interest + coupon_interest
+        if amortize_amount < freeze_amount:
+            raise ValueError('freeze amount can not greater than amortize amount')
+        with transaction.atomic(savepoint=savepoint):
+            margin = Margin.objects.select_for_update().filter(user=self.user).first()
+            catalog = u'还款入账'
+            margin.margin += principal
+            self.__tracer(u'本金入账', principal, margin.margin, u'本金入账')
+            margin.margin += interest
+            self.__tracer(u'利息入账', interest, margin.margin, u'利息入账')
+            if penal_interest > 0:
+                margin.margin += penal_interest
+                self.__tracer(u'罚息入账', penal_interest, margin.margin, u'罚息入账')
+            if coupon_interest > 0:
+                margin.margin += coupon_interest
+                description = u"加息存入{}元".format(coupon_interest)
+                order_id = OrderHelper.place_order(self.user, order_type=Order.INTEREST_COUPON,
+                                                   status=u'新建', amount=coupon_interest).id
+                # self.hike_deposit(coupon_interest, u"加息存入{}元".format(coupon_interest), order_id, savepoint=False)
+                self.__tracer(u"加息存入", coupon_interest, margin.margin, description, order_id)
+                OrderHelper.update_order(Order.objects.get(pk=order_id), user=self.user,
+                                         status=u'成功', amount=coupon_interest)
+            # 冻结
+            margin.margin -= freeze_amount
+            margin.exchanging += freeze_amount
+            catalog = u'兑换冻结'
+            record = self.__tracer(catalog, freeze_amount, margin.margin, description)
+            margin.save()
+            return record
+
     def exchanging(self, amount, description=u'', savepoint=True):
         amount = Decimal(amount)
         check_amount(amount)
