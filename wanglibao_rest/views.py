@@ -1259,9 +1259,10 @@ class InnerSysHandler(object):
 
     def judge_valid(self, request):
         if self.ip_valid(request):
-            return True, u'IP通过验证'
-        else:
             return False, u'IP没有通过验证'
+
+        return True, u'通过验证'
+
 
 class InnerSysSendSMS(APIView, InnerSysHandler):
     permission_classes = ()
