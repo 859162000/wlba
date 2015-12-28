@@ -462,12 +462,17 @@ function allFun(){
     $(".seven-money4").text(plat_total[7].Qty);
     var mySwiper = new Swiper ('#page-swipe', {
       direction: 'vertical',
-      loop: true,
+      loop: false,
       onSlideChangeEnd: function(swiper){
           var self = $(".swiper-slide-active");
           var cname = self.attr("class");
           var inx = cname.indexOf("page");
           var nowDom = cname.substr(inx,5);
+          if(nowDom == "page9"){
+              $("#next-box").hide();
+          }else{
+              $("#next-box").show();
+          }
           switch (nowDom){
               case "page2":
                   numAnimate($(".data-money1"),numDivision(plat_total[9].Qty,10000));
