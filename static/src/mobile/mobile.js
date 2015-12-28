@@ -1824,7 +1824,7 @@ org.received_ui = (function(){
 
             list += "<div class='list-flex'>";
             list += "<div class='cont-grey-2'>"+data.settlement_status+"</div>";
-            if(data.settlement_status != '待回款'){
+            if(data.settlement_status == '提前回款'){
                 list += "<div class='cont-grey-1'>"+data.settlement_time.slice(0,10)+"</div>";
             }
             list += "</div>";
@@ -1859,7 +1859,7 @@ org.received_ui = (function(){
                 }
                 detail += "</div>";
                 detail += "<div class= 'detail-item item-count'>"+data.amortization_record[i].amortization_amount+"</div>";
-                if(data.amortization_record[i].amortization_status == "已回款" || data.amortization_record[i].amortization_status== '提前回款'){
+                if(data.amortization_record[i].amortization_status== '提前回款'){
                     detail += "<div class= 'repayment-icon'></div>";
                 }
                 detail += "</div>";
