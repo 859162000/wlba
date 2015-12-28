@@ -77,32 +77,34 @@ require ['jquery', 'lib/modal', 'lib/backend', 'jquery.placeholder', 'jquery.val
       if(code.val() == '')
         code.parent().find('span').html('<i class="cha"></i>请填写验证码')
         return
-      else
-         code.parent().find('span').html('<i class="dui"></i>')
-         bankId = $('.bankId').text().replace(/[ ]/g,"")
-         $.ajax {
-            url: '/api/pay/cnp/dynnum_new/'
-            data: {
-              Storable_no : bankId.substr(0, 4)+bankId.substr(bankId.length-4)
-              card_no : bankId
-              vcode : $('.sem-input').val()
-              order_id : $('#order_id').val()
-              token : $('#token').val()
-              phone : $('.get-code').attr('data-phone')
-              device_id :''
-            }
-            type: 'post'
-          }
-          .done (xhr)->
-#            location.reload()
-            if xhr.ret_code == 0
-              location.reload()
-            else
-             tool.modalAlert({title: '温馨提示', msg: xhr.message})
-            return
-          .fail (xhr)->
-            tool.modalAlert({title: '温馨提示', msg: xhr.message})
-            return
+      if($('#order_id').val() == '')
+        tool.modalAlert({title: '温馨提示', msg: '请发送验证码'})
+        return
+      code.parent().find('span').html('<i class="dui"></i>')
+      bankId = $('.bankId').text().replace(/[ ]/g,"")
+      $.ajax {
+        url: '/api/pay/cnp/dynnum_new/'
+        data: {
+          Storable_no : bankId.substr(0, 4)+bankId.substr(bankId.length-4)
+          card_no : bankId
+          vcode : $('.sem-input').val()
+          order_id : $('#order_id').val()
+          token : $('#token').val()
+          phone : $('.get-code').attr('data-phone')
+          device_id :''
+        }
+        type: 'post'
+      }
+      .done (xhr)->
+      #            location.reload()
+        if xhr.ret_code == 0
+          location.reload()
+        else
+         tool.modalAlert({title: '温馨提示', msg: xhr.message})
+        return
+      .fail (xhr)->
+        tool.modalAlert({title: '温馨提示', msg: xhr.message})
+        return
 
   $('.bankPhone').blur ->
      if _checkMobile($(this))

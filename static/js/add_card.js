@@ -93,37 +93,44 @@
       } else {
         if (code.val() === '') {
           code.parent().find('span').html('<i class="cha"></i>请填写验证码');
-        } else {
-          code.parent().find('span').html('<i class="dui"></i>');
-          bankId = $('.bankId').text().replace(/[ ]/g, "");
-          return $.ajax({
-            url: '/api/pay/cnp/dynnum_new/',
-            data: {
-              Storable_no: bankId.substr(0, 4) + bankId.substr(bankId.length - 4),
-              card_no: bankId,
-              vcode: $('.sem-input').val(),
-              order_id: $('#order_id').val(),
-              token: $('#token').val(),
-              phone: $('.get-code').attr('data-phone'),
-              device_id: ''
-            },
-            type: 'post'
-          }).done(function(xhr) {
-            if (xhr.ret_code === 0) {
-              location.reload();
-            } else {
-              tool.modalAlert({
-                title: '温馨提示',
-                msg: xhr.message
-              });
-            }
-          }).fail(function(xhr) {
+          return;
+        }
+        if ($('#order_id').val() === '') {
+          tool.modalAlert({
+            title: '温馨提示',
+            msg: '请发送验证码'
+          });
+          return;
+        }
+        code.parent().find('span').html('<i class="dui"></i>');
+        bankId = $('.bankId').text().replace(/[ ]/g, "");
+        return $.ajax({
+          url: '/api/pay/cnp/dynnum_new/',
+          data: {
+            Storable_no: bankId.substr(0, 4) + bankId.substr(bankId.length - 4),
+            card_no: bankId,
+            vcode: $('.sem-input').val(),
+            order_id: $('#order_id').val(),
+            token: $('#token').val(),
+            phone: $('.get-code').attr('data-phone'),
+            device_id: ''
+          },
+          type: 'post'
+        }).done(function(xhr) {
+          if (xhr.ret_code === 0) {
+            location.reload();
+          } else {
             tool.modalAlert({
               title: '温馨提示',
               msg: xhr.message
             });
+          }
+        }).fail(function(xhr) {
+          tool.modalAlert({
+            title: '温馨提示',
+            msg: xhr.message
           });
-        }
+        });
       }
     };
     $('.bankPhone').blur(function() {
@@ -221,6 +228,46 @@
       };
       timerFunction();
       return intervalId = setInterval(timerFunction, 1000);
+    });
+
+    /*绑定银行卡 */
+    $('.binding-card').click(function() {
+      var card, par, str;
+      $('#bindingOldCard').modal();
+      $('#bindingOldCard').find('.ok-btn').attr({
+        'data-card': $(this).attr('data-card')
+      });
+      $('#bindingOldCard').find('.close-modal').hide();
+      $('.modal').css({
+        'width': '560px'
+      });
+      par = $(this).parent();
+      card = par.find('.bank-card--info-value').text();
+      str = par.find('.bank-card--bank-name').find('label').text() + '尾号' + card.substr(card.length - 4);
+      return $('.bankInfo').html(str);
+    });
+
+    /*确认绑定 */
+    $('.ok-btn').click(function() {
+      return $.ajax({
+        url: '/api/pay/the_one_card/',
+        data: {
+          card_id: $(this).attr('data-card')
+        },
+        type: 'put'
+      }).done(function() {
+        return location.reload();
+      }).fail(function(xhr) {
+        return tool.modalAlert({
+          title: '温馨提示',
+          msg: xhr.message
+        });
+      });
+    });
+
+    /*取消绑定 */
+    $('.no-btn').click(function() {
+      return $.modal.close();
     });
     $('.change-bank').click(function() {
       $('#confirmInfo').hide();
