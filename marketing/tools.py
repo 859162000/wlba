@@ -137,8 +137,12 @@ def deposit_ok(user_id, amount, device, order_id):
         activity_backends.check_activity(user, 'recharge', device_type,
                                          amount, **{'order_id': order_id})
         try:
-            utils.log_clientinfo(device, "deposit", user_id, order_id, amount)
-        except Exception:
+            # Add by hb on 2015-12-18 : add return value
+            flag = utils.log_clientinfo(device, "deposit", user_id, order_id, amount)
+            if not flag:
+                raise Exception("Failed to log_clientinfo")
+        except Exception, ex:
+            logger.exception("=20151218= [%s] [%s] [%s] [%s] [%s]" % (ex, device, user_id, order_id, amount))
             pass
 
         send_messages.apply_async(kwargs={
@@ -159,7 +163,7 @@ def deposit_ok(user_id, amount, device, order_id):
                                             "template_id":DEPOSIT_SUCCESS_TEMPLATE_ID,
                                             "first":u"亲爱的%s，您的充值已成功"%user_profile.name,
                                             "keyword1":deposit_ok_time,
-                                            "keyword2":str(amount),
+                                            "keyword2":"%s 元"%str(amount),
                                             "keyword3":str(margin.margin),
                                                 })},
                                             queue='celery02')
@@ -198,7 +202,7 @@ def withdraw_submit_ok(user_id,user_name, phone, amount, bank_name):
                                         "openid":weixin_user.openid,
                                         "template_id":WITH_DRAW_SUBMITTED_TEMPLATE_ID,
                                         "first":u"亲爱的%s，您的提现申请已受理"%user_name,
-                                        "keyword1":str(amount),
+                                        "keyword1":"%s 元"%str(amount),
                                         "keyword2":bank_name,
                                         "keyword3":withdraw_ok_time,
                                             })},
@@ -240,10 +244,15 @@ def send_income_message_sms():
     if incomes:
         for income in incomes:
             user_info = User.objects.filter(id=income.get('user'))\
-                .select_related('user__wanglibaouserprofile').values('wanglibaouserprofile__phone')
-            phones_list.append(user_info[0].get('wanglibaouserprofile__phone'))
-            user = User.objects.get(id=income.get('user'))
-            messages_list.append(messages.sms_income(user.wanglibaouserprofile.name,
+                .select_related('user__wanglibaouserprofile')\
+                .values('wanglibaouserprofile__phone', 'wanglibaouserprofile__name').first()
+            phone = user_info.get('wanglibaouserprofile__phone')
+            name = user_info.get('wanglibaouserprofile__name')
+            if not name:
+                from wanglibao.templatetags.formatters import safe_phone_str
+                name = safe_phone_str(phone)
+            phones_list.append(phone)
+            messages_list.append(messages.sms_income(name,
                                                      income.get('invite__count'),
                                                      income.get('earning__sum')))
 

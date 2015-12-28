@@ -4,28 +4,28 @@ html(style="background: #b10012")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_double_eggs.css?v=121403", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_double_eggs.css?v=122102", rel="stylesheet")
         - csrf_token
     body
         .body_wrap
-            img.banner(src="/static/imgs/mobile_activity/app_double_eggs/banner_1.jpg")
+            img.banner(src="/static/imgs/mobile_activity/app_double_eggs/banner_1.jpg?v=15")
             img.banner(src="/static/imgs/mobile_activity/app_double_eggs/banner_2.png")
             .main_box.main_box_1
                 img.main_title_img.banner(src="/static/imgs/mobile_activity/app_double_eggs/main_title_1.png")
                 .main_top
                     img(src="/static/imgs/mobile_activity/app_double_eggs/main_top_1.png")
-                    .text 活动期间首次满额投资送10倍理财金！<br>我出10倍本金你得收益，所得可直接提现！
+                    .text 活动期间单笔投资送10倍理财金！<br>我出10倍本金你得收益，所得可直接提现！
                 .main
                     .red_wrap
                         .red_box
-                            .title 1. 2000≤活动期间首投＜5000
-                            img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_1.jpg")
+                            .title 1. 2000≤活动期间单笔投资＜5000
+                            img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_1.jpg?v=15")
                         .red_box
-                            .title 2. 5000≤活动期间首投＜8000
-                            img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_2.jpg")
+                            .title 2. 5000≤活动期间单笔投资＜8000
+                            img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_2.jpg?v=15")
                         .red_box
-                            .title 3. 8000≤活动期间首投＜10000
-                            img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_3.jpg")
+                            .title 3. 8000≤活动期间单笔投资＜10000
+                            img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_3.jpg?v=15")
                     .button.link_licai 立即投资领取
                     .remarks 备注：所有体验金10%年化、1天期限计算发放收益到账户余额。
                     .see_rule_button 点击查看理财金规则>>
@@ -33,17 +33,17 @@ html(style="background: #b10012")
                         .rule_title 【理财金领取和使用规则】
                         dl.rule_text
                             dt 1.
-                            dd 活动期间内首次满额投资即可获得定额翻倍理财金，理财金自动发放到相应账户并站内信通知；
+                            dd 活动期间内单笔投资满额即可获得定额翻倍理财金，理财金自动发放到相应账户并站内信通知；
                         dl.rule_text
                             dt 2.
                             dd 理财金只能在相关活动页投体验标使用，投标时不能使用其他理财券，理财金自发放日起15日内有效；
                         dl.rule_text
                             dt 3.
                             dd 理财金需用户手动投资，投资时系统将自动按理财金总额一次性投标完成，
-                                span.link_licai 立即进入理财金投标页面；
+                                span#tiyanjin 立即进入理财金投标页面；
                         dl.rule_text
                             dt 4.
-                            dd 理财金投资完毕后，当日开始计算利息，到期日16点回款。还款本金系统自动回收，利息收益系统自动发放到用户账户；
+                            dd 理财金投资完毕后，当日开始计算利息，到期日17点回款。还款本金系统自动回收，利息收益系统自动发放到用户账户；
                         dl.rule_text
                             dt 5.
                             dd 理财金利息收益和正常账户余额一样，可正常投资和提现。
@@ -57,13 +57,13 @@ html(style="background: #b10012")
                     .red_wrap
                         .red_box
                             .title 1万元≤单笔投资＜ 3万元
-                            img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_4.jpg")
+                            img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_4.jpg?v=15")
                         .red_box
                             .title 3万元≤单笔投资＜6万元
-                            img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_5.jpg")
+                            img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_5.jpg?v=15")
                         .red_box
                             .title 6万元≤单笔投资＜10万元
-                            img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_6.jpg")
+                            img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_6.jpg?v=15")
                     .button.investment_button 立即投资领取
                     .remarks 备注：加息券不限标期均可使用，多投多得，上不封顶！
                     .see_rule_button 点击查看加息券规则>>
@@ -71,7 +71,7 @@ html(style="background: #b10012")
                         .rule_title 【加息券规则】
                         dl.rule_text
                             dt 1.
-                            dd 加息券有效期：2015年12月22日-2015年1月3日23:59；
+                            dd 加息券有效期：2015年12月24日-2016年1月3日23:59；
                         dl.rule_text
                             dt 2.
                             dd 加息券在电脑端和手机端均可使用，一券一标永久加息。投标时选择加息券才会进行加息，没有选择则无法加息。请在购买时勾选相应的加息券，才能获得相应的加息；
@@ -89,18 +89,18 @@ html(style="background: #b10012")
                 img.main_title_img.banner(src="/static/imgs/mobile_activity/app_double_eggs/main_title_3.png")
                 .main_top
                     img(src="/static/imgs/mobile_activity/app_double_eggs/main_top_3.png")
-                    .text 充8500元直送8500元组合红包！<br>多充多得多投多赚，年度仅此一次！组合如下：
+                    .text 充10000直送15000元组合红包！<br>多充多得多投多赚，年度仅此一次！组合如下：
                 .main
                     .red_wrap
                         .red_box
                             .title 1. 单笔投满10万元可直抵现金使用
-                            img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_7.jpg")
+                            img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_7.jpg?v=15")
                         .red_box
                             .title 2. 单笔投满30万元可直抵现金使用
-                            img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_8.jpg")
+                            img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_8.jpg?v=15")
                         .red_box
                             .title 3. 单笔投满50万元可直抵现金使用
-                            img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_9.jpg")
+                            img.img(src="/static/imgs/mobile_activity/app_double_eggs/red_box_img_9.jpg?v=15")
                     .button.recharge_button 立即充值领取
                     .remarks 备注：多充多送上不封顶、翻倍充翻倍送！
                     .see_rule_button 立即查看红包规则>>
@@ -108,7 +108,7 @@ html(style="background: #b10012")
                         .rule_title 【红包规则】
                         dl.rule_text
                             dt 1.
-                            dd 红包有效期：2015年12月22日-2015年1月3日23:59；
+                            dd 红包有效期：2015年12月24日-2016年1月3日23:59；
                         dl.rule_text
                             dt 2.
                             dd 红包翻倍专场所赠红包限投3月（含）以上标期，活动多充多送上不封顶；
@@ -135,13 +135,13 @@ html(style="background: #b10012")
                             img(src="/static/imgs/pc_activity/double_eggs/prize_img_2.jpg")
                             .text 12.9英寸&nbsp;&nbsp;4G+128G
                         .prize_box.prize_box_3
-                            .title 第4~5名：iPhone 6 Plus
+                            .title 第4~5名：iPhone 6s Plus
                             img(src="/static/imgs/pc_activity/double_eggs/prize_img_3.jpg")
-                            .text (A1524)&nbsp;&nbsp;16GB
+                            .text 16GB
                         .prize_box.prize_box_4
                             .title 第6~7名： iPad Air 2
                             img(src="/static/imgs/pc_activity/double_eggs/prize_img_4.jpg")
-                            .text (A1524)&nbsp;&nbsp;16GB
+                            .text 16GB
                         .prize_box.prize_box_5
                             .title 第8~10名：Apple Watch Sport
                             img(src="/static/imgs/pc_activity/double_eggs/prize_img_5.jpg")
@@ -164,10 +164,10 @@ html(style="background: #b10012")
                 .title 【活动规则】
                 dl.rule_text
                     dt 1.
-                    dd 活动时间：2015年12月22日-2016年1月3日；
+                    dd 活动时间：2015年12月24日-2016年1月3日；
                 dl.rule_text
                     dt 2.
-                    dd 活动期间，新老用户均可参加活动；
+                    dd 活动期间，新老用户均可参加活动，加息劵和红包限投散标使用，不可用于债转或月利宝标期；
                 dl.rule_text
                     dt 3.
                     dd 符合累计排名送大奖的中奖客户，在活动结束后7个工作日内会有客服MM与您联系，具体沟通您的收货信息。奖品会在1月15日前完成奖品发放，请保持手机畅通；
@@ -183,7 +183,7 @@ html(style="background: #b10012")
                 img.text(src="/static/imgs/mobile_activity/app_double_eggs/code_text.png")
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src="/static/scripts/component/webview.js?v=20151215")
-        script(src="/static/scripts/mobile_activity/dist/app_double_eggs.js?v=121601")
+        script(src="/static/scripts/mobile_activity/dist/app_double_eggs.js?v=122807")
         script.
             var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
                 iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,

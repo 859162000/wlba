@@ -886,7 +886,7 @@ YTX_BACK_RETURN_URL = CALLBACK_HOST + "/api/ytx/voice_back/"
 #ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyBackEnd'
 ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
 if ENV == ENV_DEV:
-    ID_VERIFY_BACKEND = 'wanglibao_account.backends.ProductionIDVerifyV2BackEnd'
+    ID_VERIFY_BACKEND = 'wanglibao_account.backends.TestIDVerifyBackEnd'
     # Modify by hb on 2015-12-02
     #STATIC_FILE_HOST = 'http://localhost:8000'
     STATIC_FILE_HOST = ''

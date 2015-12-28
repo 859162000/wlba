@@ -425,6 +425,7 @@ class SubscribeService(models.Model):
     )
     SERVICE_TYPES = (
         (0, u'月标上线通知'),
+        (1, u'天标上线通知'),
     )
     key = models.CharField(u'服务快捷键', max_length=128, unique=True, db_index=True)
     describe = models.CharField(u'服务描述', max_length=256)

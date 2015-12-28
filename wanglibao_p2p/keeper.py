@@ -557,7 +557,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                                                         "openid": weixin_user.openid,
                                                         "template_id": PRODUCT_AMORTIZATION_TEMPLATE_ID,
                                                         "keyword1": product.name,
-                                                        "keyword2": str(amo_amount),
+                                                        "keyword2": "%s 元"%str(amo_amount),
                                                         "keyword3": now,
                                                             })},
                                                         queue='celery02')

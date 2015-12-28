@@ -5,6 +5,11 @@ from django.utils import timezone
 from misc.models import Misc
 from wanglibao_redis.backend import redis_backend
 
+SMS_SIGN = u'【网利科技】'
+SMS_SIGN_TD = u'退订回TD【网利科技】'
+SMS_STR_WX = u' 关注网利宝服务号，每日签到抽大奖。'
+SMS_STR_400 = u'如有疑问请致电网利宝客服电话：4008-588-066'
+
 
 # zhoudong 重写该模块 2015/10/
 
@@ -20,13 +25,13 @@ def format_datetime(time, fmt):
 
 def suffix(f):
     def wrapper(*args, **kwargs):
-        return unicode(f(*args, **kwargs)) + u'【网利科技】'
+        return unicode(f(*args, **kwargs)) + SMS_SIGN
     return wrapper
 
 
 def suffix_td(f):
     def wrapper(*args, **kwargs):
-        return unicode(f(*args, **kwargs)) + u'退订回TD【网利科技】'
+        return unicode(f(*args, **kwargs)) + SMS_SIGN_TD
     return wrapper
 
 
@@ -66,12 +71,12 @@ def withdraw_failed(name, error_message=None):
         except Exception, e:
             print e
             if len(error_message) < 1:
-                return u'亲爱的{}，您的提现失败，请重新尝试。如有疑问请致电网利宝客服电话：4008-588-066'.format(name)
-            return u'亲爱的{}，您的提现失败，原因如下：{}。如有疑问请致电网利宝客服电话：4008-588-066'.format(name, error_message)
+                return u'亲爱的{}，您的提现失败，请重新尝试。{}'.format(name, SMS_STR_400)
+            return u'亲爱的{}，您的提现失败，原因如下：{}。{}'.format(name, error_message, SMS_STR_400)
     else:
         if len(error_message) < 1:
-            return u'亲爱的{}，您的提现失败，请重新尝试。如有疑问请致电网利宝客服电话：4008-588-066'.format(name)
-        return u'亲爱的{}，您的提现失败，原因如下：{}。如有疑问请致电网利宝客服电话：4008-588-066'.format(name, error_message)
+            return u'亲爱的{}，您的提现失败，请重新尝试。{}'.format(name, SMS_STR_400)
+        return u'亲爱的{}，您的提现失败，原因如下：{}。{}'.format(name, error_message, SMS_STR_400)
 
 
 @suffix
@@ -287,9 +292,9 @@ def red_packet_get_alert(amount, rtype):
             return content.format(amount, rtype)
         except Exception, e:
             print e
-            return u'{}{}已经存入您的账户，登录网利宝账户进行查看。关注服务号wanglibao400，每日签到抽大奖。'.format(amount, rtype)
+            return u'{}{}已经存入您的账户，登录网利宝账户进行查看。{}'.format(amount, rtype, SMS_STR_WX)
     else:
-        return u'{}{}已经存入您的账户，登录网利宝账户进行查看。关注服务号wanglibao400，每日签到抽大奖。'.format(amount, rtype)
+        return u'{}{}已经存入您的账户，登录网利宝账户进行查看。{}'.format(amount, rtype, SMS_STR_WX)
 
 
 @suffix_td
@@ -478,7 +483,7 @@ def msg_give_income(count, amount):
 
 @suffix_td
 def sms_alert_invest(name):
-    return u"{}在网利宝看到几个超棒的理财计划，你也赶紧去投资，不要再错失良机啦！关注服务号wanglibao400，每日签到抽大奖。".format(name)
+    return u"{}在网利宝看到几个超棒的理财计划，你也赶紧去投资，不要再错失良机啦！{}".format(name, SMS_STR_WX)
 
 
 @suffix_td

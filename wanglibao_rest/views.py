@@ -52,6 +52,7 @@ from wanglibao.templatetags.formatters import safe_phone_str, safe_phone_str1
 from marketing.tops import Top
 from marketing import tools
 from marketing.models import PromotionToken
+from marketing.utils import local_to_utc
 from django.conf import settings
 from wanglibao_account.models import Binding
 from wanglibao_anti.anti.anti import AntiForAllClient
@@ -323,7 +324,7 @@ class RegisterAPIView(DecryptParmsAPIView):
         if request.DATA.get('IGNORE_PWD'):
             send_messages.apply_async(kwargs={
                 "phones": [identifier,],
-                "messages": [u'您已成功注册网里宝,用户名为'+identifier+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
+                "messages": [u'您已成功注册网利宝,用户名为'+identifier+u';默认登录密码为'+password+u',赶紧登录领取福利！【网利科技】',]
             })
 
             logger.debug("此次 channel:%s" %(channel))
@@ -997,17 +998,29 @@ class Statistics(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        today = datetime.now().date()
-        tomorrow = today + timedelta(1)
-        today_start = datetime.combine(today, time())
-        today_end = datetime.combine(tomorrow, time())
+        today = datetime.now()
+        # tomorrow = today + timedelta(1)
+        yesterday = today - timedelta(days=1)
+        today_start = local_to_utc(datetime(today.year, today.month, today.day), 'min')
+        yesterday_start = local_to_utc(datetime(yesterday.year, yesterday.month, yesterday.day), 'min')
+        # today_end = datetime.combine(tomorrow, time())
 
-        today_user = User.objects.filter(date_joined__range=(today_start, today_end)).aggregate(Count('id'))
-        today_amount = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购').aggregate(
-            Sum('amount'))
+        today_user = User.objects.filter(date_joined__gte=today_start).aggregate(Count('id'))
+        today_amount = P2PRecord.objects.filter(create_time__gte=today_start, catalog='申购').aggregate(Sum('amount'))
+        yesterday_amount = P2PRecord.objects.filter(create_time__gte=yesterday_start, create_time__lt=today_start)\
+            .filter(catalog='申购').aggregate(Sum('amount'))
+        today_num = P2PRecord.objects.filter(create_time__gte=today_start, catalog='申购').values('id').count()
 
-        today_num = P2PRecord.objects.filter(create_time__range=(today_start, today_end), catalog='申购') \
-            .values('id').count()
+        today_repayment = ProductAmortization.objects.filter(settled=True)\
+            .filter(settlement_time__gte=yesterday_start, settlement_time__lt=today_start)\
+            .aggregate(Sum('principal'), Sum('interest'))
+
+        amount_sum_yesterday = yesterday_amount['amount__sum'] if yesterday_amount['amount__sum'] else Decimal('0')
+        principal_sum = today_repayment['principal__sum'] if today_repayment['principal__sum'] else Decimal('0')
+        interest_sum = today_repayment['interest__sum'] if today_repayment['interest__sum'] else Decimal('0')
+
+        # 昨日资金净流入
+        today_inflow = amount_sum_yesterday - principal_sum - interest_sum
 
         all_user = User.objects.all().aggregate(Count('id'))
         all_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))
@@ -1021,6 +1034,8 @@ class Statistics(APIView):
             'all_num': all_num,
             'all_user': all_user['id__count'],
             'all_amount': all_amount['amount__sum'],
+
+            'today_inflow': today_inflow
         }
 
         return Response(data, status=status.HTTP_200_OK)
@@ -1259,25 +1274,20 @@ class InnerSysSendSMS(APIView, InnerSysHandler):
     def post(self, request):
         phone = request.DATA.get("phone", None)
         message = request.DATA.get("message", None)
-        logger.debug("phone:%s, message:%s" % phone, message)
+        logger.debug("phone:%s, message:%s" % (phone, message))
         if phone is None or message is None:
             return Response({"code": 1000, "message": u'传入的phone或message不全'})
 
-        status, message = super(InnerSysSendSMS, self).judge_valid(request)
+        status, invalid_msg = super(InnerSysSendSMS, self).judge_valid(request)
         if not status:
-            return Response({"code":1001, "message": message})
-        try:
-            status, content = send_messages.apply_async(kwargs={
+            return Response({"code": 1001, "message": invalid_msg})
+
+        send_messages.apply_async(kwargs={
                 "phones": [phone, ],
                 "messages": [message, ]
             })
-        except Exception, reason:
-            return Response({"code": 1002, "message": u"发送短信报异常,reason:{0}".format(reason)})
-        else:
-            if status == 200:
-                return Response({"code": 0, "message": u"短信发送成功"})
-            else:
-                return Response({"code": 1003, "message": u"短信发送失败"})
+
+        return Response({"code": 0, "message": u"短信发送成功"})
 
 
 class InnerSysValidateID(APIView, InnerSysHandler):

@@ -18,7 +18,7 @@ class OpenIdBaseAPIView(APIView):
         self.openid = ""
         if code and state:
             account = WeixinAccounts.getByOriginalId(state)
-            request.session['account_key'] = account.key
+            request.session['account_key'] = account.account_key
             oauth = WeChatOAuth(account.app_id, account.app_secret, )
             res = oauth.fetch_access_token(code)
             self.openid = res.get('openid')
@@ -31,7 +31,7 @@ class BaseWeixinTemplate(TemplateView):
         error_msg = ""
         if code and state:
             account = WeixinAccounts.getByOriginalId(state)
-            request.session['account_key'] = account.key
+            request.session['account_key'] = account.account_key
             oauth = WeChatOAuth(account.app_id, account.app_secret, )
             res = oauth.fetch_access_token(code)
             self.openid = res.get('openid')
