@@ -19,16 +19,12 @@
       data: {}
     }).success(function(data) {
       if (data.trade_pwd_is_set) {
-        $('#backOne').show()
+        $('#backOne,.zhma').show()
         $('.confirmBtn').attr('tag','1')
         $('#name').text(data.name)
-        $('.panel-title[tag="1"]').show()
-        $('.panel-title[tag="2"]').hide()
       } else {
-        $('#backTwo').show()
+        $('#backTwo,.szma').show()
         $('.confirmBtn').attr('tag','2')
-        $('.panel-title[tag="2"]').show()
-        $('.panel-title[tag="1"]').hide()
       }
     });
     /*获取绑卡状态 */
