@@ -1,7 +1,7 @@
 @mixin hasBg
   background: -webkit-linear-gradient(top,#3d3973,#364e99)
   background: linear-gradient(top,#3d3973,#364e99)
-  padding-top: 1.5rem
+
 //光
 @keyframes light
   0%
@@ -171,6 +171,8 @@
     font-size: 0.95rem
   .tit40
     font-size: 1rem
+  .tit48
+    font-size: 1.2rem
   .tit96
     font-size: 2.4rem
   .page-tit, .page-ltit
@@ -213,18 +215,22 @@
       color: #fff
       border-radius: 0.25rem
       line-height: 1.2rem
+      opacity: 0
+      box-shadow: 0 0 0.2rem rgba(0,0,0,0.5)
       *
         text-align: left
       &.page-item1
         background: #ffab1a
+        +toBig-animate
       &.page-item2
         background: #762ffa
+        +toBig-animate(0.5s)
       &.page-item3
         background: #ff581a
+        +toBig-animate(1s)
       &.page-item4
         background: #04b35e
-      .tit96
-        text-shadow: 0 0 0.1rem rgba(0,0,0,0.5)
+        +toBig-animate(1.5s)
   .page3
     +hasBg
     color: #fff
@@ -235,6 +241,7 @@
       line-height: 1.2rem
       position: relative
       padding-left: 3rem
+      opacity: 0
       .page-icon
         width: 2.6rem
         height: 2.6rem
@@ -246,6 +253,14 @@
           height: 100%
       *
         text-align: left
+      &.page-item1
+        +toBig-animate
+      &.page-item2
+        +toBig-animate(0.5s)
+      &.page-item3
+        +toBig-animate(1s)
+      &.page-item4
+        +toBig-animate(1.5s)
   .page4
     +hasBg
     color: #fff
@@ -353,6 +368,8 @@
   .page5
     +hasBg
     color: #fff
+    .seven-time
+      margin-bottom: 3rem
     .page-item-box
       overflow: hidden
       text-align: center
@@ -385,6 +402,8 @@
         background: linear-gradient(top,#1877f4,#1ccc82)
         opacity: 0
         +toBig-animate(0.5s)
+      .tit96
+        text-shadow: 0 0 0.1rem rgba(0,0,0,0.5)
   .page7
     +hasBg
     color: #fff
