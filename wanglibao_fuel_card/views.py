@@ -102,10 +102,9 @@ class RevenueExchangeIndexView(TemplateView):
 
     template_name = ''
 
-    def get_context_data(self, **kwargs):
-        _type = self.request.GET.get('type', '').strip()
-        l_type, template_name = self.TYPES.get(_type, None)
-        if not _type or not l_type:
+    def get_context_data(self, e_type, **kwargs):
+        l_type, template_name = self.TYPES.get(e_type, None)
+        if not e_type or not l_type:
             return HttpResponseForbidden(u'type参数不存在')
 
         self.template_name = template_name

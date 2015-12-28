@@ -8,7 +8,7 @@ import views
 urlpatterns = patterns(
     '',
     #test
-    url(r'^index/$', views.RevenueExchangeIndexView.as_view(), name='index'),
+    url(r'^index/(?P<e_type>\w+)/$', views.RevenueExchangeIndexView.as_view(), name='index'),
     url(r'^login/$', TemplateView.as_view(template_name="fuel_login.jade")),
     url(r'^buy/(?P<p_id>\w+)/$', login_required(views.RevenueExchangeBuyView.as_view(), login_url='/fuel/login/'), name='fuel_buy'),
 
