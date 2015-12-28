@@ -13,8 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 from wanglibao_p2p.models import P2PProduct, UserAmortization, P2PRecord
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.tasks import send_messages
-from marketing.models import (RevenueExchangeAmortization as ExchangeAmo, RevenueExchangeRule,
-                              RevenueExchangeRepertory)
+from marketing.models import RevenueExchangeAmortization as ExchangeAmo, RevenueExchangeRule, RevenueExchangeRepertory
 from marketing.utils import generate_revenue_exchange_order
 from .forms import FuelCardBuyForm
 from .trade import P2PTrader
@@ -182,7 +181,7 @@ class RevenueExchangeBuyView(TemplateView):
         product_period = p2p_product.period
 
         # 获取奖品使用范围
-        using_range = get_p2p_reward_using_range(p2p_product.category)
+        using_range = get_p2p_reward_using_range(p2p_product.id)
 
         return {
             'product': p2p_product,
@@ -395,7 +394,7 @@ class RevenueExchangeStatisticsView(TemplateView):
 
         revenue_count = Decimal('0.00')
         exchange_amos = ExchangeAmo.objects.filter(product_amortization__product__category=l_type,
-                                                   user=user).order_by('product_amortization__product_period')
+                                                   user=user).order_by('product_amortization__product__period')
         if exchange_amos:
             unique_period = None
             for exchange_amo in exchange_amos:
