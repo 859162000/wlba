@@ -28,8 +28,6 @@ from weixin.constant import PRODUCT_AMORTIZATION_TEMPLATE_ID
 from weixin.models import WeixinUser
 from weixin.tasks import sentTemplate
 
-from marketing.utils import generate_p2p_reward_record
-
 
 logger = logging.getLogger(__name__)
 
@@ -267,10 +265,11 @@ class AmortizationKeeper(KeeperBaseMixin):
 
     def __init__(self, product, order_id=None):
         super(AmortizationKeeper, self).__init__(product=product, order_id=order_id)
-        from marketing.models import RevenueExchangeAmortization, RevenueExchangeOrder
+        from marketing.models import RevenueExchangeAmortization, RevenueExchangeOrder, RevenueExchangeRule
         self.product = product
         self.RevenueExchangeAmortization = RevenueExchangeAmortization
         self.RevenueExchangeOrder = RevenueExchangeOrder
+        self.RevenueExchangeRule = RevenueExchangeRule
 
     def generate_amortization_plan(self, savepoint=True):
         if self.product.status != u'满标已打款':
@@ -399,7 +398,7 @@ class AmortizationKeeper(KeeperBaseMixin):
         InterestPrecisionBalance.objects.bulk_create(interest_precisions)
 
     def __generate_exchange_amortization(self, user_amo):
-        # modify by ChenWeiBin@20151224
+        # add by ChenWeiBin@20151224
         try:
             exchange_order = self.RevenueExchangeOrder.objects.filter(user=user_amo.user,
                                                                       product_id=self.product.id).first()
@@ -414,7 +413,7 @@ class AmortizationKeeper(KeeperBaseMixin):
             amortization.product_amortization = user_amo.product_amortization
             amortization.term_date = user_amo.term_date
             amortization.revenue_amount = user_amo.principal.interest + user_amo.coupon_interest
-            amortization.revenue_amount -= user_amo.penal_interest
+            amortization.revenue_amount += user_amo.penal_interest
             amortization.term_amount = user_amo.principal + amortization.revenue_amount
             amortization.order_id = exchange_order.order_id
             amortization.save()
@@ -538,6 +537,11 @@ class AmortizationKeeper(KeeperBaseMixin):
             description = unicode(amortization)
             catalog = u'分期还款'
             product = amortization.product
+            product_type = amortization.product.types
+            if product_type == u'还款等额兑奖':
+                exchange_rule = self.RevenueExchangeRule.objects.filter(product=product).first()
+                if not exchange_rule:
+                     raise P2PException("Revenue Exhchange Product[%s] rule not found" % product.id)
 
             matches = re.search(u'日计息', product.pay_method)
             if matches and matches.group():
@@ -545,9 +549,9 @@ class AmortizationKeeper(KeeperBaseMixin):
             else:
                 pname = u"%s,期限%s个月" % (product.name, product.period)
 
+            exchange_rule = None
             phone_list = list()
             message_list = list()
-            product_type = amortization.product.types
             # Modify by ChenWeiBin_20151217
             for sub_amo in sub_amortizations:
                 user_margin_keeper = MarginKeeper(sub_amo.user)
@@ -555,7 +559,14 @@ class AmortizationKeeper(KeeperBaseMixin):
                                             sub_amo.coupon_interest, savepoint=False, description=description)
                 if product_type == u'还款等额兑奖':
                     # FixMe, 冻结金额计算
-                    margin_record = user_margin_keeper.exchanging(amount, description=description, savepoint=False)
+                    # 如果兑换方式不为recharge则使用奖品兑换方式
+                    if exchange_rule.exchange_method == 'reward':
+                        exchange_amount = sub_amo.principal + sub_amo.interest + sub_amo.penal_interest
+                        exchange_amount += sub_amo.coupon_interest
+                    # exchange_result = pass
+                    # 如果充值不成功则判断充值方法是否为u‘直充和奖品’,如果是则切换到奖品的
+                    # if exchange_result
+                        margin_record = user_margin_keeper.exchanging(exchange_amount, description=description, savepoint=False)
 
                 sub_amo.settled = True
                 sub_amo.settlement_time = timezone.now()
