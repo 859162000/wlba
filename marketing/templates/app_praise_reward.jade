@@ -1,0 +1,26 @@
+- load formatters
+doctype html
+html(style="background: #3a2741")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=122102", rel="stylesheet")
+        - csrf_token
+    body
+        .body_wrap
+            .praise_wrap
+                img.top_light(src="/static/imgs/mobile_activity/app_praise_reward/top_light.png")
+                .i_want_reward
+                    img(src="/static/imgs/mobile_activity/app_praise_reward/i_want_reward.png")
+                    .text 集赞多少拿多少
+                img.group_bg(src="/static/imgs/mobile_activity/app_praise_reward/group.png")
+                input.phone(type='number')
+        script(src="/static/scripts/component/webview.js?v=20151215")
+        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=122209")
+        script.
+            var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
+                iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
+                ios = ipad || iphone;
+            if (ios) {
+                document.getElementById('ios-show').style.display = 'block';
+            }
