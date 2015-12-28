@@ -7,6 +7,7 @@ from views import QiYeIndex
 
 urlpatterns = patterns(
     '',
-    url(r'^index/', QiYeIndex.as_view(), name='qiye index'),
+    url(r'^login/', QiYeIndex.as_view(), name='qiye index'),
+    url(r'^info/', QiYeIndex.as_view(), name='qiye index'),
 )
 

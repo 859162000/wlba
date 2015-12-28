@@ -16,7 +16,7 @@ import re
 # Create your views here.
 
 class QiYeIndex(TemplateView):
-    template_name = 'qiye_index.jade'
+    template_name = 'qiye_login.jade'
 
     PRODUCT_LENGTH = 3
 
@@ -211,3 +211,7 @@ class QiYeIndex(TemplateView):
                 return HttpResponseRedirect(reverse('weixin_p2p_list'))
 
         return super(QiYeIndex, self).get(request, *args, **kwargs)
+
+
+class QiYeIndex(TemplateView):
+    template_name = 'info.jade'
