@@ -1,0 +1,548 @@
+@mixin hasBg
+  background: -webkit-linear-gradient(top,#3d3973,#364e99)
+  background: linear-gradient(top,#3d3973,#364e99)
+
+//光
+@keyframes light
+  0%
+    transform: scale(1)
+    opacity: 1
+  100%
+    transform: scale(2)
+    opacity: 0
+@-webkit-keyframes light
+  0%
+    -webkit-transform: scale(1)
+    opacity: 1
+  100%
+    -webkit-transform: scale(2)
+    opacity: 0
+@mixin light-animate($t:0s)
+  animation: light 0.5s linear $t infinite
+  -webkit-animation: light 0.5s linear $t infinite
+//由小->大
+@keyframes toBig
+  0%
+    transform: scale(0)
+    opacity: 0
+  100%
+    transform: scale(1)
+    opacity: 1
+@-webkit-keyframes toBig
+  0%
+    -webkit-transform: scale(0)
+    opacity: 0
+  100%
+    -webkit-transform: scale(1)
+    opacity: 1
+@mixin toBig-animate($t:0s)
+  animation: toBig 0.5s ease-in-out $t forwards
+  -webkit-animation: toBig 0.5s ease-in-out $t forwards
+//由小->大&由下->上
+@keyframes bigAtop
+  0%
+    transform: scale(0) translate(0,0)
+    opacity: 0
+  100%
+    transform: scale(1) translate(0,-2rem)
+    opacity: 1
+@-webkit-keyframes bigAtop
+  0%
+    -webkit-transform: scale(0) translate(0,0)
+    opacity: 0
+  100%
+    -webkit-transform: scale(1) translate(0,-2rem)
+    opacity: 1
+@mixin bigAtop-animate($t:0s)
+  animation: bigAtop 0.5s ease-in-out $t forwards
+  -webkit-animation: bigAtop 0.5s ease-in-out $t forwards
+//高由0-100%
+@keyframes height100
+  0%
+    height: 0
+  100%
+    height: 100%
+@-webkit-keyframes height100
+  0%
+    height: 0
+  100%
+    height: 100%
+@mixin height-animate($t:0s)
+  animation: height100 0.5s ease-in-out $t forwards
+  -webkit-animation: height100 0.5s ease-in-out $t forwards
+//宽由0-100%
+@keyframes width100
+  0%
+    width: 0
+  100%
+    width: 100%
+@-webkit-keyframes width100
+  0%
+    width: 0
+  100%
+    width: 100%
+@mixin width-animate($t:0s)
+  animation: width100 0.5s ease-in-out $t forwards
+  -webkit-animation: width100 0.5s ease-in-out $t forwards
+
+//箭头
+@keyframes topAbtm
+  0%,100%
+    transform: translate(0,0.5rem)
+    opacity: 1
+  60%
+    transform: translate(0,0rem)
+    opacity: 0
+@-webkit-keyframes topAbtm
+  0%,100%
+    -webkit-transform: translate(0,0.5rem)
+    opacity: 1
+  60%
+    -webkit-transform: translate(0,0rem)
+    opacity: 0
+    opacity: 0
+@mixin pageArr-animate($t:0s)
+  animation: topAbtm 1s ease-in-out $t infinite
+  -webkit-animation: topAbtm 1s ease-in-out $t infinite
+//掉落
+@-webkit-keyframes pullDown
+  0%
+    -webkit-transform: scaleY(0.1)
+    opacity: 0
+  40%
+    -webkit-transform: scaleY(1.02)
+  60%
+    -webkit-transform: scaleY(0.98)
+  80%
+    -webkit-transform: scaleY(1.01)
+  100%
+    -webkit-transform: scaleY(1)
+    opacity: 1
+@keyframes pullDown
+  0%
+    transform: scaleY(0.1)
+    opacity: 0
+  40%
+    transform: scaleY(1.02)
+  60%
+    transform: scaleY(0.98)
+  80%
+    transform: scaleY(1.01)
+  100%
+    transform: scaleY(1)
+    opacity: 1
+@mixin pullDown
+  animation: pullDown 1s ease-out backwards
+  transform-origin: 50% 0
+  -webkit-animation: pullDown 1s ease-out backwards
+  -webkit-transform-origin: 50% 0
+.data-cube
+  height: 100%
+  body
+    height: 100%
+    position: relative
+    overflow: hidden
+  .page-swipe
+    width: 100%
+    height: 100%
+    overflow: hidden
+  .swiper-slide
+    position: relative
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    display: -webkit-box
+    -webkit-box-align: center
+    -webkit-box-pack: center
+  .mb1
+    margin-bottom: 1rem
+  .mb2
+    margin-bottom: 2rem
+  .tit18
+    font-size: 0.45rem
+  .tit20
+    font-size: 0.5rem
+  .tit24
+    font-size: 0.6rem
+  .tit36
+    font-size: 0.9rem
+  .tit38
+    font-size: 0.95rem
+  .tit40
+    font-size: 1rem
+  .tit48
+    font-size: 1.2rem
+  .tit96
+    font-size: 2.4rem
+  .page-tit, .page-ltit
+    text-align: center
+  .page-tit
+    font-size: 1.2rem
+  .page-ltit
+    font-size: 0.7rem
+  .page-main
+    width: 100%
+    height: 24rem
+    position: relative
+    //position: absolute
+    //left: 0
+    //top: 50%
+    //margin-top: -12rem
+  .page1
+    background: #ebebeb
+    text-align: center
+    color: #db493f
+    .logo-box
+      margin-top: 2rem
+      height: 6.8rem
+      img
+        +pullDown
+        margin: 0 auto
+    .page-btm
+      width: 100%
+      position: absolute
+      bottom: 2rem
+    .page-tit
+      margin-top: 0.5rem
+  .page2
+    +hasBg
+    color: #fff
+    .page-item
+      width: 10rem
+      margin: 1rem auto
+      padding: 0.5rem 1.5rem
+      color: #fff
+      border-radius: 0.25rem
+      line-height: 1.2rem
+      opacity: 0
+      box-shadow: 0 0 0.2rem rgba(0,0,0,0.5)
+      *
+        text-align: left
+      &.page-item1
+        background: #ffab1a
+        +toBig-animate
+      &.page-item2
+        background: #762ffa
+        +toBig-animate(0.5s)
+      &.page-item3
+        background: #ff581a
+        +toBig-animate(1s)
+      &.page-item4
+        background: #04b35e
+        +toBig-animate(1.5s)
+  .page3
+    +hasBg
+    color: #fff
+    .page-item
+      width: 10rem
+      margin: 2rem auto
+      color: #fff
+      line-height: 1.2rem
+      position: relative
+      padding-left: 3rem
+      opacity: 0
+      .page-icon
+        width: 2.6rem
+        height: 2.6rem
+        position: absolute
+        top: 0
+        left: 0
+        img
+          width: 100%
+          height: 100%
+      *
+        text-align: left
+      &.page-item1
+        +toBig-animate
+      &.page-item2
+        +toBig-animate(0.5s)
+      &.page-item3
+        +toBig-animate(1s)
+      &.page-item4
+        +toBig-animate(1.5s)
+  .page4
+    +hasBg
+    color: #fff
+    ul.page-tab-nav
+      text-align: center
+      .nav-item
+        display: inline-block
+        border-radius: 0.2rem
+        padding: 0.25rem 0.5rem
+        border: 1px solid #ff581a
+        color: #ff581a
+        margin: 0 0.2rem
+        font-size: 0.7rem
+        &.active
+          background: #ff581a
+          color: #fff
+    .page-cont
+      color: #ffab1a
+      margin: 1.5rem auto
+      width: 8.2rem
+    .cont-item
+      position: relative
+      height: 11.5rem
+      width: 16rem
+      margin: 0 auto
+      display: none
+      &.active
+        display: block
+    .tab-cont-bg
+      position: absolute
+      background: url("/static/imgs/app/data_cube/page4-bg.png") no-repeat
+      background-size: 100% auto
+      height: 10.675rem
+      width: 13.8rem
+      left: 1.5rem
+      top: 0
+    .line-unit
+      font-size: 0.35rem
+      position: absolute
+      top: 0
+      left: 1.85rem
+    .line-y
+      height: 10.675rem
+      padding-top: 1rem
+      width: 1.2rem
+      text-align: right
+    .line-money
+      font-size: 0.3rem
+      height: 1.87rem
+    .line-bar
+      position: absolute
+      top: 1.065rem
+      left: 1.65rem
+      height: 9.5rem
+      width: 13.5rem
+      display: -webkit-box
+      .bar-item
+        -webkit-box-flex: 1
+        height: 100%
+        position: relative
+        .year-bar
+          position: absolute
+          bottom: 0
+          width: 100%
+          +height-animate
+        &.active
+          color: #ffab1a
+          .bar-img
+            background: #ffab1a
+          .bar-top-item
+            display: block
+      .bar-top
+        width: 0.4rem
+        height: 0.4rem
+        position: absolute
+        left: 50%
+        margin-left: -0.2rem
+        .bar-top-item
+          display: none
+          width: 0.4rem
+          height: 0.4rem
+          border-radius: 0.4rem
+          background: rgba(255, 255, 255, 0.5)
+          position: absolute
+          top: 0
+          left: 0
+          &:first-child
+            +light-animate
+          &:nth-child(1)
+            +light-animate(0.25s)
+      .bar-img
+        position: absolute
+        left: 50%
+        margin-left: -0.315rem
+        bottom: 0
+        border-radius: 0.2rem 0.2rem 0 0
+        background: #fff
+        width: 0.625rem
+      .line-month
+        width: 100%
+        position: absolute
+        bottom: -0.7rem
+        font-size: 0.35rem
+        text-align: center
+  .page5
+    +hasBg
+    color: #fff
+    .seven-time
+      margin-bottom: 3rem
+    .page-item-box
+      overflow: hidden
+      text-align: center
+      margin: 2rem 1rem
+      .page-item
+        width: 50%
+        float: left
+      .page-img
+        margin-bottom: 0.5rem
+  .page6
+    +hasBg
+    color: #fff
+    .page-tit
+      margin-bottom: 3rem
+    .page-item
+      width: 6.5rem
+      height: 6.5rem
+      border-radius: 6rem
+      border: 0.1rem solid #1f1f3e
+      box-shadow: 0 0 0.2rem #1f1f3e
+      margin: 3rem auto
+      text-align: center
+      padding: 1rem 0
+      &.page-item1
+        background: -webkit-linear-gradient(top,#ff581a,#ffc11a)
+        background: linear-gradient(top,#ff581a,#ffc11a)
+        +toBig-animate
+      &.page-item2
+        background: -webkit-linear-gradient(top,#1877f4,#1ccc82)
+        background: linear-gradient(top,#1877f4,#1ccc82)
+        opacity: 0
+        +toBig-animate(0.5s)
+      .tit96
+        text-shadow: 0 0 0.1rem rgba(0,0,0,0.5)
+  .page7
+    +hasBg
+    color: #fff
+    .page-sex
+      display: -webkit-box
+      margin: 1.5rem 2rem
+      .sex-item
+        -webkit-box-flex: 1
+        text-align: center
+    .page-age
+      height: 9rem
+      margin: 0 0.5rem
+      border-bottom: 1px solid #fff
+      padding-top: 1rem
+      display: -webkit-box
+      .page-age-item
+        -webkit-box-flex: 1
+        text-align: center
+        position: relative
+        height: 100%
+        .age-bar-box
+          position: absolute
+          bottom: 0
+          width: 100%
+          +height-animate
+      .age-bar
+        width: 1.26rem
+        background: #ffab1a
+        border-radius: 0.3rem 0.3rem 0 0
+        position: absolute
+        bottom: 0
+        left: 50%
+        margin-left: -0.63rem
+      .age-tit, .age-promote
+        position: absolute
+        width: 100%
+      .age-promote
+        bottom: -2.5rem
+  .page8
+    +hasBg
+    color: #fff
+    .map-top10
+      .map-item
+        margin: 0.35rem 2rem
+        overflow: hidden
+        display: -webkit-box
+        -webkit-box-align: center
+        -webkit-box-pack: center
+        .map-name
+          width: 1.8rem
+          text-align: right
+        .map-bar
+          width: 7.5rem
+          height: 0.35rem
+          margin: 0 0.2rem 0 0.1rem
+          position: relative
+          .bar-box
+            border-radius: 0.2rem
+            height: 100%
+          img
+            position: absolute
+            left: 0
+            top: 0
+            width: 7.5rem
+            height: 100%
+        .map-bar-box
+          position: relative
+          height: 100%
+          overflow: hidden
+          +width-animate(0.1s)
+        .map-num
+          width: 1.8rem
+        &.map-item1
+          .bar-box
+            background: #ff3a1a
+            width: 100%
+        &.map-item2
+          .bar-box
+            background: #ff581a
+        &.map-item3
+          .bar-box
+            background: #ffab1a
+        &.map-item4
+          .bar-box
+            background: #16b86a
+        &.map-item5
+          .bar-box
+            background: #762ffa
+        &.map-item6
+          .bar-box
+            background: #ff7a66
+        &.map-item7
+          .bar-box
+            background: #ffc766
+        &.map-item8
+          .bar-box
+            background: #5cb88b
+        &.map-item9
+          .bar-box
+            background: #b996fa
+    .map-main
+      height: 11rem
+      margin: 1rem 0 -0.5rem
+      width: 100%
+      text-align: center
+  .page9
+    background: #ebebeb
+    text-align: center
+    .page-main
+      display: -webkit-box
+      -webkit-box-align: center
+      -webkit-box-pack: center
+    .page-leo
+      margin-top: -1rem
+      +toBig-animate
+    .page-word
+      opacity: 0
+      +bigAtop-animate(0.5s)
+  .has-an
+    display: none
+  .swiper-slide-active
+    .has-an
+      display: block
+  .page-loading
+    height: 100%
+    width: 100%
+    position: absolute
+    top: 0
+    left: 0
+    z-index: 999
+    background: #ebebeb
+    display: -webkit-box
+    -webkit-box-align: center
+    -webkit-box-pack: center
+  .page-next-box
+    position: absolute
+    width: 100%
+    text-align: center
+    bottom: 1rem
+    z-index: 9
+    display: none
+    +pageArr-animate

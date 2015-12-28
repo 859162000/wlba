@@ -1,0 +1,343 @@
+doctype html
+html(style='background:#f5f5f5;').data-cube
+  head
+    title 数据魔方
+    include include/app_header.jade
+  body
+    .page-loading#page-loading
+      img(src="/static/imgs/app/data_cube/loading.gif",style="height:4rem")
+    .page-next-box#next-box
+      img(src="/static/imgs/app/data_cube/arr-btm.png",style="height:0.6rem")
+    .page-swipe#page-swipe
+      .swiper-wrapper
+        .swiper-slide.page1
+          .page-main
+            .logo-box
+              img(src="/static/imgs/app/data_cube/logo1.png",style="width:4.5rem").has-an
+            .page-tit 平台数据
+            .page-ltit.data-totalTime 2015-12-20
+            .page-btm
+              img(src="/static/imgs/app/data_cube/page1-btm.png",style="width:7.15rem")
+        .swiper-slide.page2
+          .page-main
+            .page-tit 数据总览
+            .page-ltit.mb2 (截至<span class="data-totalTime">2015-12-20</span>)
+            .page-item.page-item1.has-an
+              .page-ltit 累计投资金额
+              .page-tit
+                span.data-money1 210,272.8
+                span.page-ltit 万元
+            .page-item.page-item2.has-an
+              .page-ltit 线上投资金额
+              .page-tit
+                span.data-money2 210,272.8
+                span.page-ltit 万元
+            .page-item.page-item3.has-an
+              .page-ltit 线下投资金额
+              .page-tit
+                span.data-money3 210,272.8
+                span.page-ltit 万元
+            .page-item.page-item4.has-an
+              .page-ltit 智慧投资人
+              .page-tit
+                span.data-money4 210,272.8
+                span.page-ltit 人
+        .swiper-slide.page3
+          .page-main
+            .page-tit 回款及收益情况
+            .page-ltit.mb2 (截至<span class="data-totalTime">2015-12-20</span>)
+            .page-item.page-item1.has-an
+              .page-icon
+                img(src="/static/imgs/app/data_cube/page3-icon1.png")
+              .page-ltit 线上已还本金
+              .page-tit
+                span.data-money5 210,272.8
+                span.page-ltit 万元
+            .page-item.page-item2.has-an
+              .page-icon
+                img(src="/static/imgs/app/data_cube/page3-icon2.png")
+              .page-ltit 线上已发放收益
+              .page-tit
+                span.data-money6 210,272.8
+                span.page-ltit 万元
+            .page-item.page-item3.has-an
+              .page-icon
+                img(src="/static/imgs/app/data_cube/page3-icon3.png")
+              .page-ltit 线上未还本金
+              .page-tit
+                span.data-money7 210,272.8
+                span.page-ltit 万元
+            .page-item.page-item4.has-an
+              .page-icon
+                img(src="/static/imgs/app/data_cube/page3-icon4.png")
+              .page-ltit 线上未发放收益
+              .page-tit
+                span.data-money8 210,272.8
+                span.page-ltit 万元
+        .swiper-slide.page4
+          .page-main
+            .page-tit 线上月交易额
+            .page-ltit.mb2 (截至<span class="data-totalTime">2015-12-20</span>)
+            ul.page-tab-nav
+              li.nav-item 2014年
+              li.nav-item.active 2015年
+              li.nav-item 2016年
+            .page-cont
+              p.tit18 <span class="page4-month">11</span>月线上交易额：
+              p.tit38.page4-month-num 210,210,272.00元
+            ul.page-tab-cont
+              li.cont-item.active
+                .tab-cont-bg
+                .line-y
+                  .line-money 50
+                  .line-money 40
+                  .line-money 30
+                  .line-money 20
+                  .line-money 10
+                .line-bar
+                  .bar-item
+                    btm = 10+5
+                    .bar-top(style="bottom: {{btm}}%")
+                      .bar-top-item
+                      .bar-top-item
+                    .bar-img(style="height:10%")
+                    .line-month 1月
+                  .bar-item
+                    btm = 20+5
+                    .bar-top(style="bottom: {{btm}}%")
+                      .bar-top-item
+                      .bar-top-item
+                    .bar-img(style="height:20%")
+                    .line-month 2月
+                  .bar-item
+                    btm = 30+5
+                    .bar-top(style="bottom: {{btm}}%")
+                      .bar-top-item
+                      .bar-top-item
+                    .bar-img(style="height:30%")
+                    .line-month 3月
+                  .bar-item
+                    btm = 40+5
+                    .bar-top(style="bottom: {{btm}}%")
+                      .bar-top-item
+                      .bar-top-item
+                    .bar-img(style="height:40%")
+                    .line-month 4月
+                  .bar-item
+                    btm = 60+5
+                    .bar-top(style="bottom: {{btm}}%")
+                      .bar-top-item
+                      .bar-top-item
+                    .bar-img(style="height:60%")
+                    .line-month 5月
+                  .bar-item
+                    btm = 70+5
+                    .bar-top(style="bottom: {{btm}}%")
+                      .bar-top-item
+                      .bar-top-item
+                    .bar-img(style="height:70%")
+                    .line-month 6月
+                  .bar-item
+                    btm = 80+5
+                    .bar-top(style="bottom: {{btm}}%")
+                      .bar-top-item
+                      .bar-top-item
+                    .bar-img(style="height:80%")
+                    .line-month 7月
+                  .bar-item.active
+                    btm = 90+5
+                    .bar-top(style="bottom: {{btm}}%")
+                      .bar-top-item
+                      .bar-top-item
+                    .bar-img(style="height:90%")
+                    .line-month 8月
+                  .bar-item
+                    btm = 70+5
+                    .bar-top(style="bottom: {{btm}}%")
+                      .bar-top-item
+                      .bar-top-item
+                    .bar-img(style="height:70%")
+                    .line-month 9月
+                  .bar-item
+                    btm = 80+5
+                    .bar-top(style="bottom: {{btm}}%")
+                      .bar-top-item
+                      .bar-top-item
+                    .bar-img(style="height:80%")
+                    .line-month 10月
+                  .bar-item
+                    btm = 80+5
+                    .bar-top(style="bottom: {{btm}}%")
+                      .bar-top-item
+                      .bar-top-item
+                    .bar-img(style="height:80%")
+                    .line-month 11月
+                  .bar-item
+                    btm = 88+5
+                    .bar-top(style="bottom: {{btm}}%")
+                      .bar-top-item
+                      .bar-top-item
+                    .bar-img(style="height:88%")
+                    .line-month 12月
+        .swiper-slide.page5
+          .page-main
+            .page-tit 平台七日数据
+            .page-ltit.seven-time (2015.12.9-2015.12.15)
+            .page-item-box
+              .page-item
+                .page-img
+                  img(src="/static/imgs/app/data_cube/page4-icon1.png",style="width:3.7rem")
+                .tit40.seven-money1 0.00
+                .tit18 线上累计投资额(万元)
+              .page-item
+                .page-img
+                  img(src="/static/imgs/app/data_cube/page4-icon2.png",style="width:3.7rem")
+                .tit40.seven-money2 0.00
+                .tit18 线上累计已还本金（万元）
+            .page-item-box
+              .page-item
+                .page-img
+                  img(src="/static/imgs/app/data_cube/page4-icon3.png",style="width:3.7rem")
+                .tit40.seven-money3 0.00
+                .tit18 线上累计预期收益(万元)
+              .page-item
+                .page-img
+                  img(src="/static/imgs/app/data_cube/page4-icon4.png",style="width:3.7rem")
+                .tit40.seven-money4 0.00
+                .tit18 线上累计发放收益(万元)
+        .swiper-slide.page6
+          .page-main
+            .page-tit 平台风险承受能力
+            .page-item.page-item1.has-an
+              p.tit96 0
+              p.tit24 坏账笔数
+            .page-item.page-item2.has-an
+              p.tit96 0<span class="tit48">%</span>
+              p.tit24 坏账率
+        .swiper-slide.page7
+          .page-main
+            .page-tit 投资人性别<br />年龄分布
+            .page-sex
+              .sex-item
+                img(src="/static/imgs/app/data_cube/sex-w.png",style="width:1.5rem")
+                p.tit40.sex-women 38.9%
+              .sex-item
+                img(src="/static/imgs/app/data_cube/sex-m.png",style="width:1.5rem")
+                p.tit40.sex-man 38.9%
+            .page-age
+              .page-age-item
+                ageBtm = (20+3)
+                .age-tit.tit24(style="bottom:{{ageBtm}}%") 20%
+                .age-bar-box.has-an
+                  .age-bar(style="height:20%")
+                .age-promote
+                  img(src="/static/imgs/app/data_cube/age1.png",style="width:1.17rem") <br />
+                  p.tit18 0～19岁
+              .page-age-item
+                ageBtm = (20+3)
+                .age-tit.tit24(style="bottom:{{ageBtm}}%") 20%
+                .age-bar-box.has-an
+                  .age-bar(style="height:20%")
+                .age-promote
+                  img(src="/static/imgs/app/data_cube/age2.png",style="width:1.17rem") <br />
+                  p.tit18 20～29岁
+              .page-age-item
+                ageBtm = (20+3)
+                .age-tit.tit24(style="bottom:{{ageBtm}}%") 20%
+                .age-bar-box.has-an
+                  .age-bar(style="height:20%")
+                .age-promote
+                  img(src="/static/imgs/app/data_cube/age3.png",style="width:1.17rem") <br />
+                  p.tit18 30～39岁
+              .page-age-item
+                ageBtm = (100+3)
+                .age-tit.tit24(style="bottom:{{ageBtm}}%") 50%
+                .age-bar-box.has-an
+                  .age-bar(style="height:20%")
+                .age-promote
+                  img(src="/static/imgs/app/data_cube/age4.png",style="width:1.17rem") <br />
+                  p.tit18 40～49岁
+              .page-age-item
+                ageBtm = (20+3)
+                .age-tit.tit24(style="bottom:{{ageBtm}}%") 20%
+                .age-bar-box.has-an
+                  .age-bar(style="height:20%")
+                .age-promote
+                  img(src="/static/imgs/app/data_cube/age5.png",style="width:1.17rem") <br />
+                  p.tit18 50～59岁
+              .page-age-item
+                ageBtm = (20+3)
+                .age-tit.tit24(style="bottom:{{ageBtm}}%") 20%
+                .age-bar-box.has-an
+                  .age-bar(style="height:20%")
+                .age-promote
+                  img(src="/static/imgs/app/data_cube/age6.png",style="width:1.17rem") <br />
+                  p.tit18 60岁以上
+        .swiper-slide.page8
+          .page-main
+            .page-tit.mb1 用户地域分布
+            .map-top10#map-top10
+              .map-item.map-item1
+                .map-name.tit18 广东：
+                .map-bar
+                  .map-baer-box
+                    .bar-box
+                .map-num.tit20 10.80%
+              .map-item.map-item2
+                .map-name.tit18 广东：
+                .map-bar
+                  .bar-box(style="width:80%")
+                .map-num.tit20 8.80%
+              .map-item.map-item3
+                .map-name.tit18 广东：
+                .map-bar
+                  .bar-box(style="width:70%")
+                .map-num.tit20 7.80%
+              .map-item.map-item4
+                .map-name.tit18 广东：
+                .map-bar
+                  .bar-box(style="width:60%")
+                .map-num.tit20 6.80%
+              .map-item.map-item5
+                .map-name.tit18 广东：
+                .map-bar
+                  .bar-box(style="width:60%")
+                .map-num.tit20 6.80%
+              .map-item.map-item6
+                .map-name.tit18 广东：
+                .map-bar
+                  .bar-box(style="width:40%")
+                .map-num.tit20 4.80%
+              .map-item.map-item7
+                .map-name.tit18 广东：
+                .map-bar
+                  .bar-box(style="width:30%")
+                .map-num.tit20 8.80%
+              .map-item.map-item8
+                .map-name.tit18 广东：
+                .map-bar
+                  .bar-box(style="width:20%")
+                .map-num.tit20 2.80%
+              .map-item.map-item9
+                .map-name.tit18 广东：
+                .map-bar
+                  .bar-box(style="width:10%")
+                .map-num.tit20 1.80%
+              .map-item.map-item10
+                .map-name.tit18 广东：
+                .map-bar
+                  img(src="/static/imgs/app/data_cube/map-other.png")
+                .map-num.tit20 1.80%
+            .map-main
+
+        .swiper-slide.page9
+          .page-main
+            .page-box
+              .page-word.has-an
+                img(src="/static/imgs/app/data_cube/page9-top.png",style="width:7rem;")
+              .page-leo.has-an
+                img(src="/static/imgs/app/data_cube/page9-leo.png",style="width:5.25rem;")
+    script(src='/static/scripts/app/lib/jquery.num.js?v=20151218')
+    script(src='/static/scripts/app/swiper/swiper.min.js?v=20151218')
+    script(src='/static/scripts/app/echarts/echarts.js')
+    script(src='/static/scripts/app/data_cube.js?v=201512281')
