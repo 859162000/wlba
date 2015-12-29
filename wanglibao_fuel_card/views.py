@@ -433,15 +433,47 @@ class FuelBankCard(TemplateView):
     template_name = 'fuel_bank.jade'
 
     def get_context_data(self, **kwargs):
+
         is_one = ''
+        p2p_cards = ''
         try:
+
             p2p_cards = card_bind_list(self.request)['cards']
+            print p2p_cards
             for card in p2p_cards:
                 if card['is_the_one_card']:
                     is_one = True
         except:
             result = ''
+
         return {
             'p2p_cards': p2p_cards,
             'is_one': is_one
         }
+
+class FuelAccount(TemplateView):
+    template_name = 'fuel_account.jade'
+
+    def get_context_data(self, **kwargs):
+        is_one = ''
+
+        try:
+            p2p_cards = card_bind_list(self.request)['cards']
+            for card in p2p_cards:
+                if card['is_the_one_card']:
+                    is_one = True
+            if is_one:
+                card_count = 1
+            else:
+                card_count = len(p2p_cards)
+        except:
+            card_count = 0
+
+        return {
+            'card_count': card_count,
+            'is_one': is_one
+        }
+
+class FuelRecharge(TemplateView):
+    template_name = 'fuel_recharge.jade'
+

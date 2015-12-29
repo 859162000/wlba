@@ -1,4 +1,4 @@
-webpackJsonp([2],[
+webpackJsonp([3],[
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -112,10 +112,14 @@ webpackJsonp([2],[
 	        //无同卡
 	        return banl_list();
 	    }).then(function (result) {
-	        //有银行卡
+	        //有无银行卡
 	        result.length === 0 ? $('.unbankcard').show() : $('.bankcard').show();
 	    }).catch(function (result) {
-	        return (0, _functions.signView)(result);
+	        //banl_list 异常捕捉
+	        if (result) {
+	            return (0, _functions.signView)(result);
+	        }
+	        return (0, _functions.signView)('系统异常');
 	    });
 
 	    $submit.on('click', function () {

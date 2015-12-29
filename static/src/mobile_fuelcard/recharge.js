@@ -107,11 +107,17 @@ import { ajax, signView } from './mixins/functions'
             return banl_list()
         })
         .then((result)=>{
-            //有银行卡
+            //有无银行卡
             result.length === 0 ? $('.unbankcard').show() : $('.bankcard').show();
         })
         .catch((result)=>{
-            return signView(result)
+            //banl_list 异常捕捉
+            if(result){
+                return signView(result)
+            }
+            return signView('系统异常')
+
+
 
         })
 

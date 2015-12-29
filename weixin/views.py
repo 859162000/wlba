@@ -1193,6 +1193,7 @@ class WeixinAccountBankCard(TemplateView):
 
     def get_context_data(self, **kwargs):
         is_one = ''
+        p2p_cards = ''
         try:
             p2p_cards = card_bind_list(self.request)['cards']
             for card in p2p_cards:

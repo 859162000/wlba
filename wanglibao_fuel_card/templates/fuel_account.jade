@@ -38,7 +38,7 @@ html
     a(href='/fuel_card/bank/').fuel-account-list
       .fuel-list-icon.account-card
       .fuel-list-name 银行卡
-      .fuel-list-text.fuel-magin-right-4 {{p2p_cards_count}}张
+      .fuel-list-text.fuel-magin-right-4 {{card_count}}张
       .fuel-list-arrow
 
     .fuel-account-space-10
@@ -50,5 +50,5 @@ html
     .fuel-account-space-1
 
     .fuel-logout-warp
-      a(href='/accounts/logout?next=/fuel/index/').fuel-logout-submit 安全退出
+      a(href='/accounts/logout?next=/fuel_card/index/').fuel-logout-submit 安全退出
     .fuel-account-sign 本账户余额可同时投资于网利宝平台产品

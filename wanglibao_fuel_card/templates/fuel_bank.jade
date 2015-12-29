@@ -1,24 +1,62 @@
+-load formatters
 doctype html
 html
   head
     title 银行卡
     include include/fuel_head.jade
   body
-    .fuel-bank
-      a(href='/fuel_card/regist/bank/').fuel-un-bank
-        .unbank-icon
-        .unbank-text 添加银行卡
-        .unbank-arrow
+    if user.wanglibaouserprofile.id_is_valid
+      .fuel-bank
+        if not is_one
+          a(href='/fuel_card/regist/bank/').fuel-un-bank
+            .unbank-icon
+            .unbank-text 添加银行卡
+            .unbank-arrow
 
-      .fuel-true-bank
-        .bank-detail
-          .bank-company
-            img(src='/static/imgs/mobile_fuelcard/bank/nonghang.png').bank-company-icon
-            .bank-company-information
-              .bank-company-name 农业银行
-              .bank-company-type 储蓄卡
+        if p2p_cards
+          for card in p2p_cards
+            if is_one
+              if card.is_the_one_card
+                .fuel-true-bank
+                  .bank-detail
+                    .bank-company
+                      img(src='/static/imgs/mobile/bank/{{card.bank_id}}.png').bank-company-icon
+                      .bank-company-information
+                        .bank-company-name {{card.bank_name}}
+                        .bank-company-type 储蓄卡
 
-          .bank-number 6234******12
-        .bank-dec 已绑定
+                    .bank-number {{card.storable_no | bank_card}}
+                  .bank-dec 已绑定
+            else
+              .fuel-true-bank
+                .bank-detail
+                  .bank-company
+                    img(src='/static/imgs/mobile/bank/{{card.bank_id}}.png').bank-company-icon
+                    .bank-company-information
+                      .bank-company-name {{card.bank_name}}
+                      .bank-company-type 储蓄卡
+                  .bank-number {{card.storable_no | bank_card}}
 
-      .fuerl-dec-sign 绑定银行卡后，<br/>即可享受快捷支付、同卡进出等服务
+                storable_no =  card['storable_no'][-4:]
+                .bank-dec.set-bank(data-id='{{card.card_id}}', data-name='{{card.bank_name}}', data-no='{{storable_no}}') 未绑定
+
+        .set-bank-sign
+          .set-body-mask
+            .set-body
+              .bank-card-dec 您正在绑定<br><span class='name'></span>尾号<span class='no'></span>的银行卡，</br>如果确认绑定该卡，则 该卡将作为您的唯一提现银行卡。
+              .sign-operation
+                .bank-cancel 取消
+                button(type='submit').bank-confirm 立即绑定
+
+        .fuerl-dec-sign 绑定银行卡后，<br/>即可享受快捷支付、同卡进出等服务
+
+        include  include/fuel_errorsign
+        include include/fuel_alert
+    else
+      .fuel-rechage-sumit-warp
+        p 为保证您的资金安全，请先进行实名认证
+        a(href="/weixin/regist/first/").fuel-rechage-sumit 去实名认证
+
+
+  script(src='/static/scripts/mobile_fuelcard/dev/vendor.zepto.js')
+  script(src='/static/scripts/mobile_fuelcard/dev/put_bank.js')
