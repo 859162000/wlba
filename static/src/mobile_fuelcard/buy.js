@@ -18,6 +18,7 @@ import { check } from './mixins/check'
         constructor(count, amount) {
             this.count = count;
             this.amount = amount;
+            this.count_amount = amount;
             this.style = this.style.bind(this);
         }
 
@@ -33,11 +34,12 @@ import { check } from './mixins/check'
         }
 
         get_proerty() {
-            return [this.count, this.amount]
+            return [this.count, this.count_amount]
         }
 
         style() {
             $count.text(this.count);
+            this.count_amount = this.count * this.amount;
             $per.text(this.count * this.amount)
             this.count <= 1 ? $reduce.addClass('num-disabled') : $reduce.removeClass('num-disabled')
         }
@@ -51,11 +53,22 @@ import { check } from './mixins/check'
             url: '/fuel_card/buy/',
             data: data,
             beforeSend(){
-
+                $submit.attr('disabled', true).html('购买中...')
             },
-            success(){
-
+            success(result){
+                return alert(`成功购买加油卡${result.data}元`, function(){
+                    const url  = window.location.href;
+                    window.location.href = url;
+                })
+            },
+            error(result){
+                const data = JSON.parse(result.responseText);
+                return signView(data.message)
+            },
+            complete(){
+                $submit.removeAttr('disabled').html('确认购买并支付')
             }
+
         })
     }
 

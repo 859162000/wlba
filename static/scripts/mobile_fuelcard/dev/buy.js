@@ -32,6 +32,7 @@ webpackJsonp([0],[
 
 	            this.count = count;
 	            this.amount = amount;
+	            this.count_amount = amount;
 	            this.style = this.style.bind(this);
 	        }
 
@@ -51,12 +52,13 @@ webpackJsonp([0],[
 	        }, {
 	            key: 'get_proerty',
 	            value: function get_proerty() {
-	                return [this.count, this.amount];
+	                return [this.count, this.count_amount];
 	            }
 	        }, {
 	            key: 'style',
 	            value: function style() {
 	                $count.text(this.count);
+	                this.count_amount = this.count * this.amount;
 	                $per.text(this.count * this.amount);
 	                this.count <= 1 ? $reduce.addClass('num-disabled') : $reduce.removeClass('num-disabled');
 	            }
@@ -71,8 +73,22 @@ webpackJsonp([0],[
 	            type: 'POST',
 	            url: '/fuel_card/buy/',
 	            data: data,
-	            beforeSend: function beforeSend() {},
-	            success: function success() {}
+	            beforeSend: function beforeSend() {
+	                $submit.attr('disabled', true).html('购买中...');
+	            },
+	            success: function success(result) {
+	                return alert('成功购买加油卡' + result.data + '元', function () {
+	                    var url = window.location.href;
+	                    window.location.href = url;
+	                });
+	            },
+	            error: function error(result) {
+	                var data = JSON.parse(result.responseText);
+	                return (0, _functions.signView)(data.message);
+	            },
+	            complete: function complete() {
+	                $submit.removeAttr('disabled').html('确认购买并支付');
+	            }
 	        });
 	    };
 
