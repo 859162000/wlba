@@ -194,9 +194,11 @@ class AppRepaymentPlanAllAPIView(APIView):
                 user_amortizations = paginator.page(paginator.num_pages)
 
             amo_list = _user_amortization_list(user_amortizations)
+            count = paginator.num_pages
         else:
             amo_list = []
-        return Response({'ret_code': 0, 'data': amo_list, 'page': page, 'num': pagesize})
+            count = 0
+        return Response({'ret_code': 0, 'data': amo_list, 'page': page, 'num': pagesize, 'count': count})
 
 
 class AppRepaymentPlanMonthAPIView(APIView):
@@ -926,6 +928,10 @@ class AppMemorabiliaView(APIView):
             'list_count': data_count
         })
 
+class AppDataModuleView(TemplateView):
+
+    """ 数据魔方 """
+    template_name = 'client_data_cube.jade'
 
 # class AppMemorabiliaDetailView(TemplateView):
 #     template_name = 'memorabilia_detail.jade'
