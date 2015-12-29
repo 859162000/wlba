@@ -195,7 +195,6 @@ def pc_data_generator():
         "p2p_amount_yesterday":float(p2p_amount_yesterday)
     }
 
-
 def generate_revenue_exchange_order(user, product, order_id, p_parts=None):
     """生成收益兑换订单"""
 

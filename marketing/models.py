@@ -649,7 +649,6 @@ class RevenueExchangeRepertory(models.Model):
     def __unicode__(self):
         return u'%s%s' % (self.type, self.price)
 
-
 class RevenueExchangeRule(models.Model):
     """
         add by ChenWeiBin@20151223
@@ -742,3 +741,4 @@ class RevenueExchangeAmortization(models.Model):
 
     def __unicode__(self):
         return u'%s' % self.user
+
