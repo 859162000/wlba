@@ -19,6 +19,7 @@ from hashlib import md5
 from rest_framework.authtoken.models import Token
 from marketing.models import LoginAccessToken
 from django.conf import settings
+from wanglibao_profile.models import USER_TYPE
 
 User = get_user_model()
 
@@ -43,6 +44,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     invitecode = forms.CharField(label="Invitecode", required=False)
     validate_code = forms.CharField(label="Validate code for phone", required=True)
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
+    user_type = forms.IntegerField(label="User type", required=False)
 
     MlGb = forms.CharField(label='MlGb', required=False)
     _flag = False
@@ -182,6 +184,13 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
                             code='validate_code_error',
                         )
         return self.cleaned_data
+
+    def clean_user_type(self):
+        user_type = self.cleaned_data.get('user_type') or '0'
+        if user_type.isdigit():
+            if user_type in [i for i, j in USER_TYPE]:
+                self.cleaned_data['user_type'] = user_type
+                return self.cleaned_data
 
 
 def verify_captcha(dic, keep=False):
@@ -422,4 +431,21 @@ class TokenSecretSignAuthenticationForm(forms.Form):
 
     def get_user(self):
         return self.user_cache
+
+
+class EnterpriseUserProfileForm(forms.Form):
+    """企业用户认证资料验证表单"""
+
+    company_name = forms.CharField(label="Company name", max_length=30, error_messages={'required': u'请输入公司名称'})
+    business_license = forms.ImageField(label="Business license", error_messages={'required': u'请选择营业执照'})
+    registration_cert = forms.ImageField(label="Registration cert", error_messages={'required': u'请选择税务登记证'})
+    certigier_name = forms.CharField(label="Certigier name", max_length=12, error_messages={'required': u'请输入授权人姓名'})
+    certigier_phone = forms.IntegerField(label="Certigier phone", max_length=64,
+                                         error_messages={'required': u'请输入授权人手机号'})
+    company_address = forms.CharField(label="Company address", max_length=255,
+                                      error_messages={'required': u'请输入公司地址'})
+    company_account = forms.CharField(label="Company address", max_length=255,
+                                      error_messages={'required': u'请输入公司地址'})
+
+
 

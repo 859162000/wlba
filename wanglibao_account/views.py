@@ -1378,6 +1378,7 @@ def ajax_register(request):
                 password = form.cleaned_data['password']
                 identifier = form.cleaned_data['identifier']
                 invitecode = form.cleaned_data['invitecode']
+                user_type = form.cleaned_data.get('user_type', '0')
 
                 if request.POST.get('IGNORE_PWD', '') and not password:
                     password = generate_random_password(6)
@@ -1385,7 +1386,7 @@ def ajax_register(request):
                 if User.objects.filter(wanglibaouserprofile__phone=identifier).values("id"):
                     return HttpResponse(messenger('error'))
 
-                user = create_user(identifier, password, nickname)
+                user = create_user(identifier, password, nickname, user_type)
                 if not user:
                     return HttpResponse(messenger('error'))
 
@@ -2179,10 +2180,33 @@ class ThirdOrderQueryApiView(APIView):
 
         return HttpResponse(json.dumps(json_response), content_type='application/json')
 
+
 class FirstPayResultView(TemplateView):
     template_name = 'register_three.jade'
 
     def get_context_data(self, **kwargs):
         first_pay_succeed = PayInfo.objects.filter(user=self.request.user, status=PayInfo.SUCCESS).exists()
         return {'first_pay_succeed': first_pay_succeed}
+
+
+class GetRequestUserType(APIView):
+    """获取认证用户的用户类型"""
+
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        json_response = {
+            'data': request.user.wanglibaouserprofile.utype,
+            'message': 'ok'
+        }
+
+        return HttpResponse(json.dumps(json_response), content_type='application/json')
+
+
+class EnterpriseUserProfile(APIView):
+    """企业用户认证资料接收接口"""
+
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
 

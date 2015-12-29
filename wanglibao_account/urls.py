@@ -18,7 +18,7 @@ from django.contrib.auth import views as auth_views
 from views import AutomaticView
 from wanglibao_account.cooperation import JrjiaCPSView, JrjiaP2PStatusView, JrjiaP2PInvestView, JrjiaReportView, \
     JrjiaUsStatusView
-from wanglibao_account.views import FirstPayResultView
+from wanglibao_account.views import FirstPayResultView, GetRequestUserType
 from wanglibao_lottery.views import LotteryListTemplateView
 from wanglibao_account.decorators import login_required
 
@@ -127,6 +127,7 @@ urlpatterns = patterns(
 
     url(r'^auto_tender/$', login_required(AutomaticView.as_view(), login_url='/accounts/login/')),
     url(r'^caipiao/$', login_required(LotteryListTemplateView.as_view(), login_url='/accounts/login/')),
+    url(r'^user_type/$', GetRequestUserType.as_view())
 )
 
 if settings.DEBUG:
