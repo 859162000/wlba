@@ -6,7 +6,7 @@ webpackJsonp([2],[
 
 	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
 
-	__webpack_require__(6);
+	__webpack_require__(2);
 
 	var _automatic_detection = __webpack_require__(5);
 
@@ -111,9 +111,8 @@ webpackJsonp([2],[
 	        }).then(function (result) {
 	            console.log('register success');
 	            if (result.ret_code === 0) {
-	                alert('success');
-	                alert('实名认证成功', function () {
-	                    window.location.href = '/fuel/regist/bank/';
+	                alert('注册成功', function () {
+	                    window.location.href = '/fuel/regist/authentication/';
 	                });
 	            }
 	            if (result.ret_code > 0) {
@@ -134,7 +133,62 @@ webpackJsonp([2],[
 
 /***/ },
 /* 1 */,
-/* 2 */,
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {'use strict';
+
+	/**
+	 *
+	 * 引入fuel_alert.jade
+	 * @param text 文字说明
+	 * @param callback 回调函数
+	 */
+	window.alert = function (text, callback) {
+
+	    var $alert = $('.fuel-alert'),
+	        $button = $('.fuel-submit');
+
+	    $alert.css('display', '-webkit-box').find('.fuel-text').text(text);
+
+	    $button.on('click', function () {
+	        $alert.hide();
+	        callback && callback();
+	    });
+	};
+
+	/**
+	 * 引入fuel_alert.jade
+	 * @param title confim文字说明
+	 * @param certainName 左边按钮文字
+	 * @param callback  回调函数
+	 * @param callbackData 回调函数的数据
+	 */
+	window.confirm = function (title) {
+	    var certainName = arguments.length <= 1 || arguments[1] === undefined ? '确定' : arguments[1];
+	    var callback = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+	    var callbackData = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
+
+	    var $confirm = $('.confirm-warp');
+	    if ($confirm.length <= 0) return;
+	    $confirm.show();
+	    $confirm.find('.confirm-text').text(title);
+	    $confirm.find('.confirm-certain').text(certainName);
+
+	    $confirm.find('.confirm-cancel').on('click', function () {
+	        $confirm.hide();
+	    });
+
+	    $confirm.find('.confirm-certain').on('click', function () {
+	        $confirm.hide();
+	        if (callback) {
+	            callbackData ? callback(callbackData) : callback();
+	        }
+	    });
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ },
 /* 3 */,
 /* 4 */,
 /* 5 */
@@ -289,34 +343,7 @@ webpackJsonp([2],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 6 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	Promise.prototype.done = function (onFulfilled, onRejected) {
-	  this.then(onFulfilled, onRejected).catch(function (reason) {
-	    // 抛出一个全局错误
-	    setTimeout(function () {
-	      throw reason;
-	    }, 0);
-	  });
-	};
-
-	Promise.prototype.finally = function (callback) {
-	  var P = this.constructor;
-	  return this.then(function (value) {
-	    return P.resolve(callback()).then(function () {
-	      return value;
-	    });
-	  }, function (reason) {
-	    return P.resolve(callback()).then(function () {
-	      throw reason;
-	    });
-	  });
-	};
-
-/***/ },
+/* 6 */,
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 

@@ -86,7 +86,7 @@ webpackJsonp([1],{
 	            return login('/weixin/api/login/');
 	        }).then(function (result) {
 	            console.log('login success');
-	            window.location.href = '/fuel/index/';
+	            window.location.href = '/fuel/fuel_card/index/';
 	        }).catch(function (res) {
 	            if (res['status'] == 403) {
 	                (0, _functions.signView)('请勿重复提交');

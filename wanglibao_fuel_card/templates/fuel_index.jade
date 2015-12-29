@@ -35,7 +35,7 @@ html
       if products
         each product in products
           if product
-            a(href='/fuel/buy/{{product.id}}').fuel-product-list
+            a(href='/fuel/buy/fuel_card/{{product.id}}').fuel-product-list
               .fuel-pdt-title
                 .fuel-pdt-name(class='fuel-pdt-green') {{product.name}}
                 .fuel-pdt-fiter {{product.car}}

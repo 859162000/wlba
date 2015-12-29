@@ -1,4 +1,4 @@
-import './mixins/promise.js'
+import './mixins/ui'
 import { Automatic } from './mixins/automatic_detection'
 import { ajax, signView } from './mixins/functions'
 import { check } from './mixins/check'
@@ -109,9 +109,8 @@ import { validation } from './mixins/validation'
             .then((result)=> {
                 console.log('register success');
                 if (result.ret_code === 0) {
-                    alert('success')
-                    alert('实名认证成功', ()=> {
-                        window.location.href= '/fuel/regist/bank/';
+                    alert('注册成功', ()=> {
+                        window.location.href= '/fuel/regist/authentication/';
                     });
                 }
                 if (result.ret_code > 0) {

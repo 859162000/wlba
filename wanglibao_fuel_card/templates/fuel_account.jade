@@ -1,4 +1,5 @@
 -load formatters
+-load mathfilters
 doctype html
 html
   head
@@ -30,7 +31,7 @@ html
     .fuel-account-list
       .fuel-list-icon.account-balance
       .fuel-list-name 账户余额
-      .fuel-list-text.fuel-magin-right-15 {{p2p_margin | money_format}}元
+      .fuel-list-text.fuel-magin-right-15 {{user.margin.margin | money_format}}元
       a(href='/fuel/recharge/').fuel-list-recharge 充值
     .fuel-account-space-1
 
