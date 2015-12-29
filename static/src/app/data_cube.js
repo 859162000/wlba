@@ -9,12 +9,16 @@ $.ajax({
         allFun();
     }
 });
+var startX = 0;
+document.addEventListener('touchstart', function(e) {//禁止左右滑动
+    startX = e.touches[0].pageX;
+});
 document.addEventListener('touchmove', function(e) {//禁止左右滑动
     var tmpX = e.touches[0].pageX;
-    if(tmpX > 0){
+    if(Math.abs(tmpX - startX) > 0){
         e.preventDefault();
     }
-}, false);
+});
 //高度
 var bHeight = (48*window.screen.width)/320;//48dp = *px
 var wHeight = $(window).height();
