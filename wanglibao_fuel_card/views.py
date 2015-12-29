@@ -340,7 +340,7 @@ class RevenueExchangeRecordView(TemplateView):
     template_name = ''
 
     def get_context_data(self, e_type, p_status, **kwargs):
-        status_list = ['receiving', 'changing']
+        status_list = ['receiving', 'exchanging']
         if e_type not in self.TYPES or p_status not in status_list:
             raise Http404(u'页面不存在')
 
@@ -353,7 +353,7 @@ class RevenueExchangeRecordView(TemplateView):
                                                    settled=settled_status,
                                                    product_amortization__product__category
                                                    =l_type).order_by('-term_date')
-        if p_status == 'changing':
+        if p_status == 'exchanging':
             for ea in exchange_amos:
                 rewards = RevenueExchangeRepertory.objects.filter(user=self.request.user,
                                                                   order_id=ea.order_id,
