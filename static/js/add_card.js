@@ -64,7 +64,7 @@
         card.next().html('<i class="cha"></i>请输入卡号');
         checkIsOrNo = false;
       } else {
-        re = /^\d{10,20}$/;
+        re = /^\d{11,20}$/;
         if (!re.test(card.val().replace(/[ ]/g, ""))) {
           card.next().html('<i class="cha"></i>输入的卡号有误');
           checkIsOrNo = false;
