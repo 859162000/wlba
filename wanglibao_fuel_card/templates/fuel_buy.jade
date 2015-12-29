@@ -11,7 +11,7 @@ html
       .fuel-detail-list
         .fuel-list-name 期限
 
-        .fuel-list-value {{period}}{{product.pay_method | period_unit}}
+        .fuel-list-value {{product.period}}{{product.pay_method | period_unit}}
 
       .fuel-detail-list
         .fuel-list-name 每月获得
@@ -35,7 +35,7 @@ html
     .fuel-product-detail
       .fuel-detail-list
         .fuel-list-name 帐户余额
-        .fuel-list-value.fuel-balance(data-balance='{{p2p_margin}}') {{p2p_margin | money_format}}元
+        .fuel-list-value.fuel-balance(data-balance='{{user.margin.margin}}') {{user.margin.margin | money_format}}元
       .fuel-detail-list
         .fuel-list-name 待支付金额
         per = int(product.limit_min_per_user)

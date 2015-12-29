@@ -197,7 +197,7 @@ urlpatterns += patterns(
 # 加油卡
 urlpatterns += patterns(
     '',
-    url(r'fuel/', include('wanglibao_fuel_card.urls')),
+    url(r'(?P<e_type>fuel_card)/', include('wanglibao_fuel_card.urls')),
 )
 
 if settings.DEBUG:
