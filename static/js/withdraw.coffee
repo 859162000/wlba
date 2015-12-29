@@ -324,10 +324,10 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
       $('.trade_pwd_is_set').show()
     else
       $('.trade_pwd_is_set_no').show()
-      if !$('#bankIsNoBind').val() == 'false'
-        $('.bank-counts').show()
-      else
+      if $('#bankIsNoBind').val() == 'false'
         $('.bank-count').show()
+      else
+        $('.bank-counts').show()
 
   #账户余额
   $.ajax

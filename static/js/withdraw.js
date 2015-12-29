@@ -394,10 +394,10 @@
         return $('.trade_pwd_is_set').show();
       } else {
         $('.trade_pwd_is_set_no').show();
-        if (!$('#bankIsNoBind').val() === 'false') {
-          return $('.bank-counts').show();
-        } else {
+        if ($('#bankIsNoBind').val() === 'false') {
           return $('.bank-count').show();
+        } else {
+          return $('.bank-counts').show();
         }
       }
     });
