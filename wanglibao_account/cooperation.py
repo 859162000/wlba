@@ -1014,6 +1014,7 @@ class ZGDXRegister(CoopRegister):
             kwargs={'url': self.call_back_url, 'params': params, 'channel': self.c_code})
 
     def binding_card_call_back(self, user):
+        logger.info("ZGDX-Enter recharge_call_back for zgdx: [%s]" % user.id)
         binding = Binding.objects.filter(user_id=user.id).first()
         # 判定是否首次绑卡
         if binding and binding.extra != '1':
@@ -1026,6 +1027,7 @@ class ZGDXRegister(CoopRegister):
             binding.save()
 
     def purchase_call_back(self, user, order_id):
+        logger.info("ZGDX-Enter purchase_call_back for zgdx: user[%s], order[%s]" % (user.id, order_id))
         # 判断是否是首次投资
         binding = Binding.objects.filter(user_id=user.id).first()
         p2p_record = P2PRecord.objects.filter(user_id=user.id, catalog=u'申购').order_by('create_time').first()
