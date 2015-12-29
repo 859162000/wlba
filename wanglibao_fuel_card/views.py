@@ -286,12 +286,13 @@ class RevenueExchangeBuyRecordView(TemplateView):
         user_amotization = user_amotization.order_by('product_amortization__product__id', sorted_term)
 
         ua_list = []
-        ua_tmp = user_amotization.first()
-        ua_list.append(ua_tmp)
-        for ua in user_amotization:
-            if ua.product_amortization.product != ua_tmp.product_amortization.product:
-                ua_list.append(ua_tmp)
-                ua_tmp = ua
+        if user_amotization:
+            ua_tmp = user_amotization.first()
+            ua_list.append(ua_tmp)
+            for ua in user_amotization:
+                if ua.product_amortization.product != ua_tmp.product_amortization.product:
+                    ua_list.append(ua_tmp)
+                    ua_tmp = ua
 
         return get_sorts_for_created_time(ua_list)
 
