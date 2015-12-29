@@ -240,7 +240,7 @@ function allFun(){
                   floored_number = floored_number.toFixed(decimal_places);
                 }
                 target.text(fmoney(floored_number,decimal_places));
-              }
+            }
         });
     }
 

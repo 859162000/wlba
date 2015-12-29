@@ -23,21 +23,21 @@
 //由小->大
 @keyframes toBig
   0%
-    transform: scale(0)
+    transform: scale(0.1)
     opacity: 0
   100%
     transform: scale(1)
     opacity: 1
 @-webkit-keyframes toBig
   0%
-    -webkit-transform: scale(0)
+    -webkit-transform: scale(0.1)
     opacity: 0
   100%
     -webkit-transform: scale(1)
     opacity: 1
 @mixin toBig-animate($t:0s)
-  animation: toBig 0.5s ease-in-out $t forwards
-  -webkit-animation: toBig 0.5s ease-in-out $t forwards
+  animation: toBig 0.5s ease-in-out $t both
+  -webkit-animation: toBig 0.5s ease-in-out $t both
 //由小->大&由下->上
 @keyframes bigAtop
   0%
@@ -219,7 +219,8 @@
       color: #fff
       border-radius: 0.25rem
       line-height: 1.2rem
-      opacity: 0
+      display: none
+      //opacity: 0
       box-shadow: 0 0 0.2rem rgba(0,0,0,0.5)
       *
         text-align: left
