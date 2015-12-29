@@ -30,9 +30,6 @@ html(style='background:#f5f5f5')
               p.item-time=time
           if overdue == 'close'
             img(src='/static/imgs/app/discover/overdue.png').mask
-
-      +item('http://www.yinker.com/static/billionawp.shtml?from=timeline&isappinstalled=0', '/static/imgs/app/discover/discover_p_gold.jpg', '全民淘金季', '邀请好友获3‰的奖金，好友再邀请他人，同样获3‰的双重奖金。', '2015.06.23 至 2016.06.30', 'open')
-
       +item('/activity/app_gold_season/', '/static/imgs/app/discover/discover_p_gold.jpg', '全民淘金季', '邀请好友获3‰的奖金，好友再邀请他人，同样获3‰的双重奖金。', '2015.06.23 至 2016.06.30', 'open')
       +item('/activity/wx_november_new/', '/static/imgs/app/discover/discover_xinshou580.jpg', '新手专享580红包', '11月福利大升级，新用户最高可获得580元红包 。', '2015.11.1 至 2015.11.30', 'close')
       +item('/activity/app_thanksgivin/', '/static/imgs/app/discover/discover_ganen.jpg', '感恩节·幸福里', '投资抽奖100%中，满额抽6S;投资额排名直送ipad pro等实物大奖。', '2015.11.23 至 2015.11.29', 'close')
