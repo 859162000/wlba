@@ -172,15 +172,16 @@ class RevenueExchangeBuyView(TemplateView):
         l_type, template_name = self.TYPES[e_type]
         self.template_name = template_name
 
-        # 获取产品期限
-        product_period = p2p_product.period
+        # 获取产品的奖品面额及产品最低购买限额
+        exchange_rule = get_object_or_404(RevenueExchangeRule, product=p2p_product)
+        p2p_product.equality_prize_amount = float(exchange_rule.equality_prize_amount)
+        p2p_product.limit_min_per_user = float(exchange_rule.limit_min_per_user)
 
         # 获取奖品使用范围
         using_range = get_p2p_reward_using_range(p2p_product.id)
 
         return {
             'product': p2p_product,
-            'period': product_period,
             'using_range': using_range,
         }
 
