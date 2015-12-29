@@ -572,3 +572,11 @@ def str_to_dict(s):
         result[urllib.unquote_plus(key)] = urllib.unquote_plus(value)
 
     return result
+
+
+def detect_phone_for_identifier(identifier):
+    mobile_regex = re.compile('^1\d{10}$')
+    if mobile_regex.match(identifier) is not None:
+        return True
+    else:
+        False

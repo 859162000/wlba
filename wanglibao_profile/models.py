@@ -73,9 +73,9 @@ class EnterpriseUserProfile(models.Model):
     company_address = models.TextField(u'公司地址', max_length=255)
     company_account = models.CharField(u'公司账户账号', max_length=64)
     company_account_name = models.CharField(u'公司账户名称', max_length=30)
-    deposit_bank_province = models.CharField(u'公司开户行省份', max_length=10)
-    deposit_bank_city = models.CharField(u'公司开户行市县', max_length=10)
-    bank_branch_address = models.CharField(u'开户行支行', max_length=100)
+    deposit_bank_province = models.CharField(u'公司开户行所在省份', max_length=10)
+    deposit_bank_city = models.CharField(u'公司开户行所在市县', max_length=10)
+    bank_branch_address = models.CharField(u'开户行支行所在地', max_length=100)
     modify_time = models.DateTimeField(u'最近修改时间', auto_now_add=True)
     created_time = models.DateTimeField(u'创建时间', auto_now=True)
 

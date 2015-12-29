@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model, authenticate
 from django.core.exceptions import ValidationError
 from django.db.models import F
 
-from utils import detect_identifier_type, verify_id
+from utils import detect_identifier_type, verify_id, detect_phone_for_identifier
 from wanglibao_account.models import VerifyCounter, IdVerification
 from wanglibao_sms.utils import validate_validation_code
 from marketing.models import InviteCode, PromotionToken, Channels
@@ -444,8 +444,18 @@ class EnterpriseUserProfileForm(forms.Form):
                                          error_messages={'required': u'请输入授权人手机号'})
     company_address = forms.CharField(label="Company address", max_length=255,
                                       error_messages={'required': u'请输入公司地址'})
-    company_account = forms.CharField(label="Company address", max_length=255,
-                                      error_messages={'required': u'请输入公司地址'})
+    company_account = forms.CharField(label="Company account", max_length=64,
+                                      error_messages={'required': u'请输入公司账户账号'})
+    company_account_name = forms.CharField(label="Company account name", max_length=30,
+                                           error_messages={'required': u'请输入公司账户名称'})
+    deposit_bank_province = forms.CharField(label="Deposit bank province", max_length=10,
+                                            error_messages={'required': u'请输入公司开户行所在省份'})
+    deposit_bank_city = forms.CharField(label="Deposit bank city", max_length=10,
+                                        error_messages={'required': u'请输入公司开户行所在市县'})
+    bank_branch_address = forms.CharField(label="Bank branch address", max_length=100,
+                                          error_messages={'required': u'请输入开户行支行所在地'})
 
-
+    def clean_certigier_phone(self):
+        certigier_phone = self.cleaned_data['certigier_phone']
+        detect_phone_for_identifier(certigier_phone)
 
