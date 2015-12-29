@@ -79,7 +79,7 @@ import { check } from './mixins/check'
             })
             .then((result)=> {
                 console.log('login success');
-                window.location.href = '/fuel_card/fuel_card/index/';
+                window.location.href = '/fuel_card/index/';
             })
             .catch((res) => {
                 if (res['status'] == 403) {
