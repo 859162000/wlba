@@ -374,7 +374,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                     amortization.term_date = timezone.now()
 
                 user_amos.append(amortization)
-
+            
             if terms['interest_arguments']:
                 args = terms['interest_arguments'].update({"equity":equity})
                 args = terms['interest_arguments']
@@ -547,14 +547,14 @@ class AmortizationKeeper(KeeperBaseMixin):
                     weixin_user = WeixinUser.objects.filter(user=sub_amo.user).first()
         #             {{first.DATA}} 项目名称：{{keyword1.DATA}} 还款金额：{{keyword2.DATA}} 还款时间：{{keyword3.DATA}} {{remark.DATA}}
 
-                    if weixin_user:
+                    if weixin_user and weixin_user.subscribe:
                         now = datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')
                         sentTemplate.apply_async(kwargs={
                                         "kwargs":json.dumps({
                                                         "openid": weixin_user.openid,
                                                         "template_id": PRODUCT_AMORTIZATION_TEMPLATE_ID,
                                                         "keyword1": product.name,
-                                                        "keyword2": str(amo_amount),
+                                                        "keyword2": "%s 元"%str(amo_amount),
                                                         "keyword3": now,
                                                             })},
                                                         queue='celery02')
