@@ -1231,11 +1231,14 @@ class UnbindCardTemplateView(TemplateView):
         if self.request.GET.get('unbind'):
             the_one_card.unbind()
 
-        #返回用户名，电话，身份证，卡号，有图像返回图像
+        #返回用户名，电话，身份证，发卡行，卡号，有图像返回图像
         try:
-            card_number = the_one_card.get().no
+            card = the_one_card.get()
+            card_number = card.no
+            bank_name = card.bank.name
         except:
             card_number = None
+            bank_name = None
         try:
             avatar_url = IdVerification.objects.filter(id_number=profile.id_number).first().id_photo.url
         except:
@@ -1243,7 +1246,7 @@ class UnbindCardTemplateView(TemplateView):
 
         print avatar_url
         return {'name': profile.name, 'phone': profile.phone, 'social_id': profile.id_number,
-                'card_number': card_number, 'avatar_url': avatar_url}
+                'bank_name': bank_name, 'card_number': card_number, 'avatar_url': avatar_url}
 
 
 
