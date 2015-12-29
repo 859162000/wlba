@@ -25,7 +25,10 @@ body
             td {{social_id}}
          tr
             td 发卡行
-            td {{bank_name}}
+            if bank_name
+               td {{bank_name}}
+            else
+               td 无发卡行
          tr
             td 卡号
             if card_number
