@@ -406,7 +406,7 @@ class WeixinShareDetailView(TemplateView):
             if "No Reward" == user_gift:
                 self.debug_msg('奖品已经发完了，用户:%s 没有领到奖品' %(phone_num,))
                 self.template_name = 'app_weChatEnd.jade'
-                counts, gifts = self.get_distribute_status(order_id, activity)
+                gifts, counts = self.get_distribute_status(order_id, activity)
                 share_title, share_content, url = get_share_infos(order_id)
                 return {
                     "count": counts,
@@ -419,7 +419,7 @@ class WeixinShareDetailView(TemplateView):
             else:
                 has_gift = 'true'
             self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s' %(openid, user_gift.identity, user_gift, ))
-        counts, gifts = self.get_distribute_status(order_id, activity)
+        gifts, counts = self.get_distribute_status(order_id, activity)
         share_title, share_content, url = get_share_infos(order_id)
         return {
             "ret_code": 0,
@@ -606,7 +606,7 @@ class WeixinShareEndView(TemplateView):
     def get_context_data(self, **kwargs):
         order_id = self.request.GET.get('url_id')
         share_title, share_content, url = get_share_infos(order_id)
-        counts, gifts = self.get_distribute_status(order_id)
+        gifts, counts = self.get_distribute_status(order_id)
         logger.debug("抵达End页面，order_id:%s, URL:%s" %(order_id, url))
         return {
          "count": counts,
