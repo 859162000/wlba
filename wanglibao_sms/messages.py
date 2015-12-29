@@ -125,17 +125,17 @@ def product_settled(name, equity, product, settled_time):
             obj = redis._get('product_settled')
             content = cPickle.loads(obj)['content']
             return content.format(
-                name, product.serial_number, equity.equity,
+                name, product.name, equity.equity,
                 format_datetime(settled_time, u'%Y年%m月%d日'), product.period, stand)
         except Exception, e:
             print e
             return u'亲爱的{}，您已成功投资{}项目 {}元，并于{}开始计息，期限{}{}，感谢您的支持！'.format(
-                name, product.serial_number, equity.equity,
+                name, product.name, equity.equity,
                 format_datetime(settled_time, u'%Y年%m月%d日'), product.period, stand
             )
     else:
         return u'亲爱的{}，您已成功投资{}项目 {}元，并于{}开始计息，期限{}{}，感谢您的支持！'.format(
-            name, product.serial_number, equity.equity,
+            name, product.name, equity.equity,
             format_datetime(settled_time, u'%Y年%m月%d日'), product.period, stand
         )
 
@@ -151,17 +151,17 @@ def product_failed(name, product):
             obj = redis._get('product_failed')
             content = cPickle.loads(obj)['content']
             return content.format(name,
-                                  product.serial_number,
+                                  product.name,
                                   format_datetime(product.end_time, u'%Y年%m月%d日'))
         except Exception, e:
             print e
             return u'亲爱的{}，您投标的{}项目在{}之前未满标，投标失败。投标账款已退回到您的网利宝平台账户中。'.format(
-                name, product.serial_number, format_datetime(product.end_time, u'%Y年%m月%d日')
+                name, product.name, format_datetime(product.end_time, u'%Y年%m月%d日')
             )
 
     else:
         return u'亲爱的{}，您投标的{}项目在{}之前未满标，投标失败。投标账款已退回到您的网利宝平台账户中。'.format(
-            name, product.serial_number, format_datetime(product.end_time, u'%Y年%m月%d日')
+            name, product.name, format_datetime(product.end_time, u'%Y年%m月%d日')
         )
 
     # return u'%s[%s]在%s之前未满标，投标失败。投标账款已退回到您的网利宝平台账户中。' \
