@@ -346,7 +346,6 @@ class AmortizationKeeper(KeeperBaseMixin):
             product_amortizations.append(product_amortization)
 
         user_amos = list()
-        exchange_amos = list()
 
         amortization_cls = get_amortization_plan(product.pay_method)
         product_interest_start = timezone.now()

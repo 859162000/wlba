@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.views.generic import TemplateView
 from django.http import HttpResponseForbidden, Http404
 from django.db.models import Sum
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -13,8 +14,8 @@ from rest_framework.permissions import IsAuthenticated
 from wanglibao_p2p.models import P2PProduct, UserAmortization, P2PRecord
 from wanglibao.const import ErrorNumber
 from wanglibao_sms.tasks import send_messages
-from marketing.models import (RevenueExchangeAmortization as ExchangeAmo, RevenueExchangeRule,
-                              RevenueExchangeRepertory)
+from wanglibao_sms.messages import exchange_product_settled
+from marketing.models import RevenueExchangeAmortization as ExchangeAmo, RevenueExchangeRule, RevenueExchangeRepertory
 from marketing.utils import generate_revenue_exchange_order
 from .forms import FuelCardBuyForm
 from .trade import P2PTrader
@@ -103,10 +104,10 @@ class RevenueExchangeIndexView(TemplateView):
     template_name = ''
 
     def get_context_data(self, e_type, **kwargs):
-        l_type, template_name = self.TYPES.get(e_type, None)
-        if not e_type or not l_type:
-            return HttpResponseForbidden(u'type参数不存在')
+        if e_type not in self.TYPES:
+            raise Http404(u'页面不存在')
 
+        l_type, template_name = self.TYPES[e_type]
         self.template_name = template_name
         user = self.request.user
         p2p_products = P2PProduct.objects.filter(hide=False, publish_time__lte=timezone.now(), category=l_type,
@@ -127,14 +128,11 @@ class RevenueExchangeIndexView(TemplateView):
                 product_class = classes_product_for_period(p.period) or 'C'
                 p.class_name = get_class_name(product_class, l_type)
 
-            # 按收益兑换产品奖品的面额
+            # 获取产品的奖品面额及产品最低购买限额
             for p in data:
-                try:
-                    exchange_rule = RevenueExchangeRule.objects.get(product=p)
-                    p.equality_prize_amount = exchange_rule.equality_prize_amount
-                    p.limit_min_per_user = exchange_rule.limit_min_per_user
-                except RevenueExchangeRule.DoesNotExist:
-                    return HttpResponseForbidden("not found match for rule with product")
+                exchange_rule = get_object_or_404(RevenueExchangeRule, product=p)
+                p.equality_prize_amount = exchange_rule.equality_prize_amount
+                p.limit_min_per_user = exchange_rule.limit_min_per_user
 
         # 统计用户至今购买理财产品总收益
         revenue_count = get_user_revenue_count_for_type(user, l_type)
@@ -154,7 +152,7 @@ class RevenueExchangeIndexView(TemplateView):
 class RevenueExchangeBuyView(TemplateView):
     """
     理财收益兑换-产品购买页面视图
-    :param 'p_id', 'e_type'
+    :param 'e_type', 'p_id'
     :return
     :request_method GET
     :user.is_authenticated True
@@ -167,22 +165,18 @@ class RevenueExchangeBuyView(TemplateView):
     template_name = ''
 
     def get_context_data(self, e_type, p_id, **kwargs):
-        try:
-            p2p_product = P2PProduct.objects.get(pk=p_id)
-        except P2PProduct.DoesNotExist:
-            return Http404(u'页面不存在')
+        if e_type not in self.TYPES:
+            raise Http404(u'页面不存在')
 
-        l_type, template_name = self.TYPES.get(e_type, None)
-        if not e_type or not l_type:
-            return HttpResponseForbidden(u'type参数不存在')
-
+        p2p_product = get_object_or_404(P2PProduct, pk=p_id)
+        l_type, template_name = self.TYPES[e_type]
         self.template_name = template_name
 
         # 获取产品期限
         product_period = p2p_product.period
 
         # 获取奖品使用范围
-        using_range = get_p2p_reward_using_range(p2p_product.category)
+        using_range = get_p2p_reward_using_range(p2p_product.id)
 
         return {
             'product': p2p_product,
@@ -217,32 +211,43 @@ class RevenueExchangeBuyApi(APIView):
             exchange_rule = RevenueExchangeRule.objects.filter(product=p2p_product).first()
 
             # 判断用户是否满足最低消费限额
-            if exchange_rule and exchange_rule.limit_min_per_user * p_parts == amount:
-                try:
-                    trader = P2PTrader(product=p2p_product, user=request.user, request=request)
-                    product_info, margin_info, equity_info = trader.purchase(amount)
+            if exchange_rule:
+                if exchange_rule.limit_min_per_user * p_parts == amount:
+                    try:
+                        trader = P2PTrader(product=p2p_product, user=request.user, request=request)
+                        product_info, margin_info, equity_info = trader.purchase(amount)
 
-                    # 生成收益兑换订单
-                    generate_revenue_exchange_order(request.user, p2p_product,
-                                                    product_info.order_id, p_parts)
+                        # 生成收益兑换订单
+                        generate_revenue_exchange_order(request.user, p2p_product,
+                                                        product_info.order_id, p_parts)
 
-                    # FixMe, 补充短信内容，给用户发送投资成功短信通知
-                    message = ''
-                    messages_list = [message]
-                    send_messages.apply_async(kwargs={
-                        "phones": [request.user.wanglibaouserprofile.phone],
-                        "messages": messages_list
-                    })
+                        # 发送短信通知
+                        message = exchange_product_settled()
+                        messages_list = [message]
+                        send_messages.apply_async(kwargs={
+                            "phones": [request.user.wanglibaouserprofile.phone],
+                            "messages": messages_list
+                        })
 
+                        return Response({
+                            'data': product_info.amount,
+                            'category': equity_info.product.category
+                        })
+                    except Exception, e:
+                        return Response({
+                            'message': e.message,
+                            'error_number': ErrorNumber.unknown_error
+                        }, status=status.HTTP_400_BAD_REQUEST)
+                else:
                     return Response({
-                        'data': product_info.amount,
-                        'category': equity_info.product.category
-                    })
-                except Exception, e:
-                    return Response({
-                        'message': e.message,
+                        'message': "Invalid amount",
                         'error_number': ErrorNumber.unknown_error
                     }, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({
+                    'message': "No product matches the exchange rule.",
+                    'error_number': ErrorNumber.unknown_error
+                }, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({
                 "message": form.errors,
@@ -282,34 +287,31 @@ class RevenueExchangeBuyRecordView(TemplateView):
         return get_sorts_for_created_time(ua_list)
 
     def get_context_data(self, e_type, p_status, **kwargs):
-        l_type, template_name = self.TYPES.get(e_type, None)
-        if not e_type or not l_type:
-            return HttpResponseForbidden(u'type参数不存在')
+        status_list = ['auditing', 'done']
+        if e_type not in self.TYPES or p_status not in status_list:
+            raise Http404(u'页面不存在')
 
+        l_type, template_name = self.TYPES[e_type]
         self.template_name = template_name
 
-        status_list = ['auditing', 'done']
-        if p_status in status_list:
-            if p_status == 'auditing':
-                settled_status = False
-                sorted_term = 'term'
-            else:
-                settled_status = True
-                sorted_term = '-term'
-
-            user_amortizations = self._get_user_amortizations(self.request.user, l_type, settled_status, sorted_term)
-
-            # 按产品期限分类（初级-中级-高级）
-            for ua in user_amortizations:
-                product_class = classes_product_for_period(ua.product_amortization.product.period) or 'C'
-                ua.class_name = get_class_name(product_class, l_type)
-
-            return {
-                'data': user_amortizations,
-                'status': p_status,
-            }
+        if p_status == 'auditing':
+            settled_status = False
+            sorted_term = 'term'
         else:
-            return HttpResponseForbidden(u'无效参数status')
+            settled_status = True
+            sorted_term = '-term'
+
+        user_amortizations = self._get_user_amortizations(self.request.user, l_type, settled_status, sorted_term)
+
+        # 按产品期限分类（初级-中级-高级）
+        for ua in user_amortizations:
+            product_class = classes_product_for_period(ua.product_amortization.product.period) or 'C'
+            ua.class_name = get_class_name(product_class, l_type)
+
+        return {
+            'data': user_amortizations,
+            'status': p_status,
+        }
 
 
 class RevenueExchangeRecordView(TemplateView):
@@ -328,39 +330,36 @@ class RevenueExchangeRecordView(TemplateView):
     template_name = ''
 
     def get_context_data(self, e_type, p_status, **kwargs):
-        l_type, template_name = self.TYPES.get(e_type, None)
-        if not e_type or not l_type:
-            return HttpResponseForbidden(u'type参数不存在')
+        status_list = ['receiving', 'changing']
+        if e_type not in self.TYPES or p_status not in status_list:
+            raise Http404(u'页面不存在')
 
+        l_type, template_name = self.TYPES[e_type]
         self.template_name = template_name
 
-        status_list = ['receiving', 'changing']
-        if p_status in status_list:
-            exchang_status = False if p_status == 'receiving' else True
-            settled_status = False if p_status == 'receiving' else True
-            exchange_amos = ExchangeAmo.objects.filter(user=self.request.user, exchanged=exchang_status,
-                                                       settled=settled_status,
-                                                       product_amortization__product__category
-                                                       =l_type).order_by('-term_date')
-            if p_status == 'changing':
-                for ea in exchange_amos:
-                    rewards = RevenueExchangeRepertory.objects.filter(user=self.request.user,
-                                                                      order_id=ea.order_id,
-                                                                      exchange_id=ea.exchange_id,
-                                                                      is_used=False)
-                    ea.reward = rewards
-
-            # 按产品期限分类（初级-中级-高级）
+        exchang_status = False if p_status == 'receiving' else True
+        settled_status = False if p_status == 'receiving' else True
+        exchange_amos = ExchangeAmo.objects.filter(user=self.request.user, exchanged=exchang_status,
+                                                   settled=settled_status,
+                                                   product_amortization__product__category
+                                                   =l_type).order_by('-term_date')
+        if p_status == 'changing':
             for ea in exchange_amos:
-                product_class = classes_product_for_period(ea.product_amortization.product.period) or 'C'
-                ea.class_name = get_class_name(product_class, l_type)
+                rewards = RevenueExchangeRepertory.objects.filter(user=self.request.user,
+                                                                  order_id=ea.order_id,
+                                                                  exchange_id=ea.exchange_id,
+                                                                  is_used=False)
+                ea.reward = rewards
 
-            return {
-                'data': exchange_amos,
-                'status': p_status,
-            }
-        else:
-            return HttpResponseForbidden(u'无效参数status')
+        # 按产品期限分类（初级-中级-高级）
+        for ea in exchange_amos:
+            product_class = classes_product_for_period(ea.product_amortization.product.period) or 'C'
+            ea.class_name = get_class_name(product_class, l_type)
+
+        return {
+            'data': exchange_amos,
+            'status': p_status,
+        }
 
 
 class RevenueExchangeStatisticsView(TemplateView):
@@ -378,14 +377,11 @@ class RevenueExchangeStatisticsView(TemplateView):
         'fuel_card': (u'加油卡', 'fuel_statistics.jade'),
     }
 
-    class MyObject(object):
-        pass
-
     def get_context_data(self, e_type, **kwargs):
-        l_type, template_name = self.TYPES.get(e_type)
-        if not e_type or not l_type:
-            return HttpResponseForbidden(u'type参数不存在')
+        if e_type not in self.TYPES:
+            raise Http404(u'页面不存在')
 
+        l_type, template_name = self.TYPES[e_type]
         self.template_name = template_name
         user = self.request.user
         data = []
@@ -395,7 +391,7 @@ class RevenueExchangeStatisticsView(TemplateView):
 
         revenue_count = Decimal('0.00')
         exchange_amos = ExchangeAmo.objects.filter(product_amortization__product__category=l_type,
-                                                   user=user).order_by('product_amortization__product_period')
+                                                   user=user).order_by('product_amortization__product__period')
         if exchange_amos:
             unique_period = None
             for exchange_amo in exchange_amos:

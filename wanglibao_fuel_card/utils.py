@@ -16,7 +16,8 @@ def get_p2p_reward_using_range(product_id):
     """获取p2p奖品使用范围"""
 
     try:
-        using_range = RevenueExchangeRule.objects.get(product_id=product_id)
+        exchange_rule = RevenueExchangeRule.objects.get(product_id=product_id)
+        using_range = exchange_rule.reward_range
     except RevenueExchangeRule.DoesNotExist:
         using_range = ''
 
