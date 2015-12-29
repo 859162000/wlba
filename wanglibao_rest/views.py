@@ -1315,6 +1315,7 @@ class InnerSysValidateID(APIView, InnerSysHandler):
             return Response({"code": 0, "message": u'用户以前已经验证过且验证通过'})
 
         try:
+            logger.debug('name:%s, id:%s' % (name, id))
             verify_record, error = verify_id(name, id)
         except:
             return Response({"code": 1003, "message": u"验证失败，拨打客服电话进行人工验证"})
@@ -1331,6 +1332,7 @@ class InnerSysSaveChannel(APIView, InnerSysHandler):
     def post(self, request):
         code = request.DATA.get("code", None)
         description = request.DATA.get("description", None)
+        name = request.DATA.get("name", None)
         if not code or not description:
             return Response({"code": 1000, "message": u'渠道号或渠道描述为空值'})
 
@@ -1342,7 +1344,7 @@ class InnerSysSaveChannel(APIView, InnerSysHandler):
         if channel.exists():
             return Response({"code": 1002, "message": u'渠道号已经存在'})
         try:
-            Channels.objects.create(code=code, description=description)
+            Channels.objects.create(name=name, code=code, description=description)
         except Exception, reason:
             return Response({"code": 1003, "message": u'创建渠道报异常,reason:{0}'.format(reason)})
         else:
