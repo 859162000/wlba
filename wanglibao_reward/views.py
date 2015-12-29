@@ -501,7 +501,7 @@ class WeixinShareTools(APIView):
                     logger.debug("开奖页面，已经从数据库里查到用户(%s)的领奖记录, openid:%s, order_id:%s" %(award_user_gift.identity, openid, order_id))
             return award_user_gift
         except Exception, reason:
-            self.exception_msg(reason, u'判断用户领奖，数据库查询出错')
+            logger.debug(u'判断用户领奖，数据库查询出错, reason:%s' % reason)
             return None
 
     def post(self, request):
