@@ -12,7 +12,7 @@ module.exports = {
         /**
          * 路径相对于webpack.fuel.js
          */
-        index: './src/mobile_fuelcard/index',
+        buy: './src/mobile_fuelcard/buy',
         login: './src/mobile_fuelcard/login',
         regist: './src/mobile_fuelcard/regist',
         regist_authentication: './src/mobile_fuelcard/regist_authentication',

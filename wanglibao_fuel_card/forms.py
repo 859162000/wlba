@@ -32,3 +32,4 @@ class FuelCardBuyForm(forms.ModelForm):
 
     def clean_amount(self):
         return self.cleaned_data['amount'].strip()
+

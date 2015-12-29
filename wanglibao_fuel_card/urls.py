@@ -17,6 +17,7 @@ urlpatterns = patterns(
 
     url(r'^recharge/$', TemplateView.as_view(template_name="fuel_recharge.jade")),
     url(r'^account/$', TemplateView.as_view(template_name="fuel_account.jade")),
+
     url(r'^change/login-psw/$', TemplateView.as_view(template_name="fuel_changePSW.jade")),
     url(r'^change/trans-psw/$', TemplateView.as_view(template_name="fuel_change_transactionPSW.jade")),
     url(r'^set/trans-psw/$', TemplateView.as_view(template_name="fuel_set_transactionPSW.jade")),

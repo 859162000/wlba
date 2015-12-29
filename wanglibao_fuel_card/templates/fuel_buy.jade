@@ -1,3 +1,4 @@
+-load formatters
 doctype html
 html
   head
@@ -9,16 +10,23 @@ html
     .fuel-product-detail
       .fuel-detail-list
         .fuel-list-name 期限
-        .fuel-list-value 130****0575
+
+        .fuel-list-value {{period}}{{product.pay_method | period_unit}}
 
       .fuel-detail-list
-        .fuel-list-name 使用范围
-        .fuel-list-value 中石化、中石油合作加油站
-
+        .fuel-list-name 每月获得
+        amount = int(product.equality_prize_amount)
+        .fuel-list-value {{amount}}元
       .fuel-detail-list
         .fuel-list-name 使用范围
+        select(type='select',name='range').fuel-list-value
+          each val in using_range
+            option(value='') {{val}}
+
+      .fuel-detail-list
+        .fuel-list-name 购买分数
         .fuel-list-value
-          span.reduce-num -
+          span.reduce-num.num-disabled -
           span.value-num 1
           span.add-num +
 
@@ -27,10 +35,17 @@ html
     .fuel-product-detail
       .fuel-detail-list
         .fuel-list-name 帐户余额
-        .fuel-list-value 3000.00元
+        .fuel-list-value.fuel-balance(data-balance='{{p2p_margin}}') {{p2p_margin | money_format}}元
       .fuel-detail-list
         .fuel-list-name 待支付金额
-        .fuel-list-value.fuel-list-value-red 12000.00元
+        per = int(product.limit_min_per_user)
+        .fuel-list-value.fuel-list-value-red
+         span.fuel-per(data-per='{{per}}') {{per}}
+         |元
 
     .fuel-post-sumit-warp
       button(type='submit').fuel-post-sumit.fuel-buy 确认购买并支付
+    include include/fuel_errorsign
+    include include/fuel_confirm
+    script(src='/static/scripts/mobile_fuelcard/dev/vendor.zepto.js')
+    script(src='/static/scripts/mobile_fuelcard/dev/buy.js')
