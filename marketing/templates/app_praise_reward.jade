@@ -41,9 +41,13 @@ html(style="background: #3a2741")
                             img.bg(src="/static/imgs/mobile_activity/app_praise_reward/praise_button.png")
                             img.zan(src="/static/imgs/mobile_activity/app_praise_reward/cai.png")
                             .text 差评
-                    .title 不能够给自己点赞哦
-                    .share_button 分享集赞
-                    .now_use 立即使用
+                    .step_me
+                        .title 不能够给自己点赞哦
+                        .share_button 分享集赞
+                        .now_use 立即使用
+                    .take_mine_reward
+                        input.phone(type='text' placeholder='请输入手机号')
+                        .take_mine_button 领取我的年终奖
                     .line 以下好友肯定了TA
                     .tab_wrap
                         img.prev_button(src="/static/imgs/mobile_activity/app_praise_reward/prev.png")
@@ -81,6 +85,8 @@ html(style="background: #3a2741")
                 img.close(src="/static/imgs/mobile_activity/app_praise_reward/close.png")
                 .title 助力好友年终奖，你也可以领
                 .text 够努力，够会赚 ，赞TA<br>还需要继续努力，差评
+            .friend_top
+                span.text 您的朋友已获取全额年终奖
 
         script(src="/static/scripts/component/webview.js?v=20151215")
         script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=122209")
