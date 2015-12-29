@@ -198,7 +198,7 @@ class RevenueExchangeBuyApi(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    def post(self, request):
+    def post(self, request, **kwargs):
         if not request.user.wanglibaouserprofile.id_is_valid:
             return Response({
                 'message': u'请先进行实名认证',

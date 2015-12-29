@@ -4,7 +4,7 @@ from django import forms
 from wanglibao_p2p.models import P2PProduct
 
 
-class FuelCardBuyForm(forms.ModelForm):
+class FuelCardBuyForm(forms.Form):
     """
     加油卡购买参数验证表单
     """

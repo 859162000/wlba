@@ -19,9 +19,7 @@ html
         .fuel-list-value {{amount}}元
       .fuel-detail-list
         .fuel-list-name 使用范围
-        select(type='select',name='range').fuel-list-value
-          each val in using_range
-            option(value='') {{val}}
+        .fuel-list-value {{using_range}}
 
       .fuel-detail-list
         .fuel-list-name 购买分数
@@ -44,7 +42,7 @@ html
          |元
 
     .fuel-post-sumit-warp
-      button(type='submit').fuel-post-sumit.fuel-buy 确认购买并支付
+      button(type='submit',data-id='{{product.id}}', ).fuel-post-sumit.fuel-buy 确认购买并支付
     include include/fuel_errorsign
     include include/fuel_confirm
     script(src='/static/scripts/mobile_fuelcard/dev/vendor.zepto.js')

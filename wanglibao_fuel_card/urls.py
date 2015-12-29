@@ -37,4 +37,6 @@ urlpatterns = patterns(
     url(r'^activity/', TemplateView.as_view(template_name="fuel_activity.jade")),
     url(r'^dec/', TemplateView.as_view(template_name="fuel_product_dec.jade")),
 
+    url(r'^buy/$', views.RevenueExchangeBuyApi.as_view(), name='fuel_card_buy_api'),
+
 )
