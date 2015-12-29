@@ -1317,10 +1317,11 @@ class InnerSysValidateID(APIView, InnerSysHandler):
         try:
             logger.debug('name:%s, id:%s' % (name, id))
             verify_record, error = verify_id(name, id)
+            logger.debug('name:%s, id:%s, verifiy_record:%s, error:%s' % (name, id, verify_record, error))
         except:
             return Response({"code": 1003, "message": u"验证失败，拨打客服电话进行人工验证"})
         else:
-            if error:
+            if error or not verify_record.is_valid:
                 return Response({"code": 1003, "message": u"验证失败，拨打客服电话进行人工验证"})
             else:
                 return Response({"code": 0, "message": u"验证通过"})
