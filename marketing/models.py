@@ -622,12 +622,12 @@ class RevenueExchangeRepertory(models.Model):
 
     # 奖品使用范围
     REWARD_RANGE = (
-        ('CPDC', u'中石化'),
+        ('CPDC', u'中石化合作加油站'),
         ('CNPC', u'中石油合作加油站'),
     )
 
     REWARD_RANGE_SELECT = {
-        u'加油卡': (u'中石化', u'中石油合作加油站'),
+        u'加油卡': (u'中石化合作加油站', u'中石油合作加油站'),
     }
 
     type = models.CharField(u'奖品类型', max_length=40, default=u'加油卡', choices=REWARD_TYPE,

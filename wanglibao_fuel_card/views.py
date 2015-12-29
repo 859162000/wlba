@@ -200,6 +200,7 @@ class RevenueExchangeBuyApi(APIView):
 
     def post(self, request, **kwargs):
         if not request.user.wanglibaouserprofile.id_is_valid:
+            logger.info('purchase faild user[%s] unauthentication.' % request.user.id)
             return Response({
                 'message': u'请先进行实名认证',
                 'error_number': ErrorNumber.need_authentication
@@ -224,7 +225,7 @@ class RevenueExchangeBuyApi(APIView):
                                                         product_info.order_id, p_parts)
 
                         # 发送短信通知
-                        message = exchange_product_settled()
+                        message = 'aaa'
                         messages_list = [message]
                         send_messages.apply_async(kwargs={
                             "phones": [request.user.wanglibaouserprofile.phone],
@@ -236,21 +237,27 @@ class RevenueExchangeBuyApi(APIView):
                             'category': equity_info.product.category
                         })
                     except Exception, e:
+                        logger.info('purchase faild user[%s].' % request.user.id)
+                        logger.info(e)
                         return Response({
                             'message': e.message,
                             'error_number': ErrorNumber.unknown_error
                         }, status=status.HTTP_400_BAD_REQUEST)
                 else:
+                    logger.info('purchase faild Invalid amount[%s] user[%s].' % (amount, request.user.id))
                     return Response({
                         'message': "Invalid amount",
                         'error_number': ErrorNumber.unknown_error
                     }, status=status.HTTP_400_BAD_REQUEST)
             else:
+                logger.info('purchase faild No product[%s] matches the exchange rule user[%s]' %
+                            (p2p_product.id, request.user.id))
                 return Response({
                     'message': "No product matches the exchange rule.",
                     'error_number': ErrorNumber.unknown_error
                 }, status=status.HTTP_400_BAD_REQUEST)
         else:
+            logger.info('purchase faild with error: %s' % form.errors)
             return Response({
                 "message": form.errors,
                 'error_number': ErrorNumber.form_error

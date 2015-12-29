@@ -14,7 +14,7 @@ class FuelCardBuyForm(forms.Form):
     amount = forms.FloatField(required=True)
 
     def clean_p_id(self):
-        p_id = self.cleaned_data['p_id'].strip()
+        p_id = self.cleaned_data['p_id']
         try:
             p2p_product = P2PProduct.objects.get(pk=p_id)
         except P2PProduct.DoesNotExist:
@@ -28,8 +28,8 @@ class FuelCardBuyForm(forms.Form):
         return p_id
 
     def clean_p_parts(self):
-        return self.cleaned_data['p_parts'].strip()
+        return self.cleaned_data['p_parts']
 
     def clean_amount(self):
-        return self.cleaned_data['amount'].strip()
+        return self.cleaned_data['amount']
 
