@@ -4,27 +4,35 @@ extends ./app_weChatBase
 block content
 
   .webchat-redpack-detail
-    //加息券
-    .webchat-bg
-        .redpack-message
-          em#amount {{self_gift.amount}}
-          em.baifen %
-    //体验金
-    .webchat-tyj-bg
-        .redpack-message
-          em#amount {{self_gift.amount}}
-          em.baifen 元
-
-  .webchat-redpack-result
-    p.result-amount 恭喜您抽到了
-      span {{self_gift.amount}}%
-      |的加息券
-    p.result-phone 加息券已存入
-      span {{self_gift.phone}}
-      |的账户下，注册登录后可查看
+    if self_gift.amount > 10
+        //体验金
+        .webchat-tyj-bg
+            .redpack-message
+              em#amount {{self_gift.amount}}
+              em.baifen 元
+        .webchat-redpack-result
+            p.result-amount 恭喜您抽到了
+              span {{self_gift.amount}}
+              |的体验金
+            p.result-phone 体验金已存入
+              span {{self_gift.phone}}
+              |的账户下，注册登录后可查看
+    else
+        //加息券
+        .webchat-bg
+            .redpack-message
+              em#amount {{self_gift.amount}}
+              em.baifen %
+        .webchat-redpack-result
+            p.result-amount 恭喜您抽到了
+              span {{self_gift.amount}}%
+              |的加息券
+            p.result-phone 加息券已存入
+              span {{self_gift.phone}}
+              |的账户下，注册登录后可查看
   .webchat-submit-end
     a(href="/activity/app_pc_download/").webpack-btn-red 立即使用
-  .receive-peoples 已有 XX 人领取 28888 元体验金
+  .receive-peoples 已有 {{count}} 人领取 28888 元体验金
   .webchar-friend-list
     .webchar-list-head
       span 看朋友们手气如何
@@ -42,7 +50,11 @@ block content
 
             dd.item-right
               em#amount.friend-list {{gift.amount}}%
-              span.jiaxi-text 加息券
+              if gift.amount > 10
+                span.jiaxi-text 体验金
+              else
+                span.jiaxi-text 加息券
+
   script(src="/static/src/mobile/lib/weixin/wx.js")
   script(data-init='weChatDetail', src='/static/scripts/mobile_activity/dist/weChart_share.js?v=20151113')
 
