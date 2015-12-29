@@ -7,7 +7,7 @@ import views
 
 urlpatterns = patterns(
     '',
-    #test
+    #fuel_card
     url(r'^login/$', TemplateView.as_view(template_name="fuel_login.jade")),
     url(r'^index/$', login_required(views.RevenueExchangeIndexView.as_view(), login_url='/fuel/login/'), name='index'),
     url(r'^buy/(?P<p_id>\d+)/$', login_required(views.RevenueExchangeBuyView.as_view(), login_url='/fuel/login/'), name='fuel_buy'),
@@ -15,6 +15,7 @@ urlpatterns = patterns(
     url(r'^exchange-record/(?P<p_status>\w+)/$', login_required(views.RevenueExchangeRecordView.as_view(), login_url='/fuel/login/'), name='fuel_exchange_record'),
     url(r'^statistics/$', login_required(views.RevenueExchangeStatisticsView.as_view(), login_url='/fuel/login/'), name='fuel_statistics'),
 
+    url(r'^bank/$', login_required(views.WeixinAccountBankCard.as_view(), login_url='/weixin/login/'), name='weixin_bankcard'),
     url(r'^recharge/$', TemplateView.as_view(template_name="fuel_recharge.jade")),
     url(r'^account/$', TemplateView.as_view(template_name="fuel_account.jade")),
 

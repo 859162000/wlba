@@ -24,7 +24,8 @@ import { validation } from './mixins/validation'
     ~function () {
         if (localStorage.getItem('bank')) {
             const content = JSON.parse(localStorage.getItem('bank'));
-            return $bank.append(appendBanks(content));
+            _appendLimit(content)
+            return $bank.append(_appendBanks(content));
         }
         ajax({
             type: 'POST',
@@ -32,8 +33,8 @@ import { validation } from './mixins/validation'
             success: function (results) {
                 if (results.ret_code === 0) {
                     const content = JSON.stringify(results.banks);
-
-                    $bank.append(appendBanks(results.banks));
+                    _appendLimit(content)
+                    $bank.append(_appendBanks(results.banks));
                     window.localStorage.setItem('bank', content);
                 } else {
                     return signView(results.message);
@@ -43,7 +44,33 @@ import { validation } from './mixins/validation'
                 console.log(data)
             }
         })
-        function appendBanks(banks) {
+
+        function _format_limit(amount) {
+            const reg = /^\d{5,}$/, reg2 = /^\d{4}$/;
+            if (reg.test(amount)) {
+                return amount.replace('0000', '') + '万'
+            }
+            if (reg2.test(amount)) {
+                return amount.replace('000', '') + '千'
+            }
+        }
+
+        function _appendLimit(data) {
+            const $limitItem = $('.limit-bank-item');
+            let list = '';
+            for (let i = 0; i < data.length; i++) {
+                list += "<div class='limit-bank-list'>"
+                list += "<div class='limit-list-dec'> "
+                list += "<div class='bank-name'>" + data[i].name + "</div>";
+                list += "<div class='bank-limit'>首次限额" + _format_limit(data[i].first_one) + "/单笔限额" + _format_limit(data[i].first_one) + "/日限额" + _format_limit(data[i].second_day) + "</div>";
+                list += "</div>"
+                list += "<div class='limit-list-icon " + data[i].bank_id + "'></div>"
+                list += "</div>"
+            }
+            $limitItem.html(list)
+        }
+
+        function _appendBanks(banks) {
             let str = '';
             for (let bank in banks) {
                 str += `<option value = '${banks[bank].gate_id}' >${banks[bank].name}</option>`;
@@ -207,7 +234,7 @@ import { validation } from './mixins/validation'
                     $submit.text('绑定中,请稍等...').attr('disabled', 'true');
                 },
                 success(data){
-                    if(data.ret_code > 0) {
+                    if (data.ret_code > 0) {
                         reject(data.message)
                         return signView(data.message);
                     } else {

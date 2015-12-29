@@ -1,23 +1,61 @@
+-load formatters
+-load mathfilters
 doctype html
 html
   head
     title 充值
     include include/fuel_head.jade
   body
-    .fuel-product-detail
-      .fuel-detail-list
-        .fuel-list-name 帐户余额
-        .fuel-list-value 130****0575
-      .fuel-detail-list
-        .fuel-list-name 开户银行
-        .fuel-list-value 招商银行
-      .fuel-detail-list
-        .fuel-list-name 银行卡号
-        .fuel-list-value 6243*****4787
+    if user.wanglibaouserprofile.id_is_valid
+      .recharge-loding
+        p 正在加载...
+        include  include/weixin_loading
+      .fuel-recharge-warp(style='display:none')
+        .fuel-product-detail
+          .fuel-detail-list
+            .fuel-list-name 帐户余额
+            .fuel-list-value {{user.margin.margin | money_format}}元
+          .fuel-detail-list
+            .fuel-list-name 开户银行
+            .fuel-list-value.recharge-bank
+          .fuel-detail-list
+            .fuel-list-name 银行卡号
+            .fuel-list-value.recharge-card
 
-    .fuel-input-public.fuel-rechage-space
-      .fuel-input-name 充值金额
-      input(type='tel', name='recharge', placeholder= '请输入100的整数倍数金额').fuel-input-main
+        .fuel-input-public.fuel-rechage-space
+          .fuel-input-name 充值金额
+          input(type='tel', name='amount', placeholder= '请输入100的整数倍数金额',data-operation='fuel-clear-input',autocomplete='off').fuel-input-main
+          .fuel-operation-icon.fuel-clear-input
 
-    .fuel-rechage-sumit-warp
-      button(type='submit').fuel-rechage-sumit 立即充值
+        .fuel-rechage-sumit-warp
+          button(type='submit', disabled).fuel-rechage-sumit 立即充值
+
+
+      .no-bank-sign.bankcard(style='display:none;')
+        .take-title 为保证您的资金安全，请先选择进行绑卡
+        .take-dec-list
+          p 温馨提示
+          p 1. 绑卡成功后，将自动为您开通快捷支付功能，方便您进行快速充值。
+          p 2. 绑卡成功后，您的提现资金将统一打到该银行卡。
+          p 3. 出于账号安全性考虑，每个账户，只能绑定一张银行卡，实行同卡进出原则。
+          p 4. 如需取消绑卡或者更换银行卡，可通过线上申请，或联系客服4008-588-066进行咨询。
+        a(href="/fuel_card/bank/").fuel-rechage-sumit 立即去绑卡
+
+      .no-bank-sign.unbankcard(style='display:none;')
+        .take-title 你还没有绑定过银行卡。
+        .take-dec-list
+          p 温馨提示
+          p 1. 绑卡成功后，将自动为您开通快捷支付功能，方便您进行快速充值。
+          p 2. 绑卡成功后，您的提现资金将统一打到该银行卡。
+          p 3. 出于账号安全性考虑，每个账户，只能绑定一张银行卡，实行同卡进出原则。
+          p 4. 如需取消绑卡或者更换银行卡，可通过线上申请，或联系客服4008-588-066进行咨询。
+        a(href="/fuel_card/regist/bank/").fuel-rechage-sumit 立即去绑卡
+    else
+
+      .fuel-rechage-sumit-warp
+        p 为保证您的资金安全，请先进行实名认证
+        a(href="/weixin/regist/first/").fuel-rechage-sumit 去实名认证
+    include include/fuel_confirm
+    include include/fuel_errorsign
+    script(src='/static/scripts/mobile_fuelcard/dev/vendor.zepto.js')
+    script(src='/static/scripts/mobile_fuelcard/dev/recharge.js')

@@ -15,27 +15,27 @@ html
           .fuel-save-text 累计节省
         .fuel-head-right
           if user.is_authenticated
-            a(href='/fuel/account/').fuel-user {{user | display_name}}
+            a(href='/fuel_card/account/').fuel-user {{user | display_name}}
           else
-            a(href='/fuel/account/').fuel-user 立即登录
+            a(href='/fuel_card/account/').fuel-user 立即登录
           .fuel-notice {{effect_count}}份理财加油卡生效中
 
       .fuel-nav-nav
         .fuel-nav-list.fuel-nav-around
-          a(href='/fuel/records/product/').fuel-nac-buy 购买记录
+          a(href='/fuel_card/records/product/').fuel-nac-buy 购买记录
         .fuel-nav-list.fuel-nav-center
-          a(href='/fuel/records/exchange/').fuel-nac-take 兑换记录
+          a(href='/fuel_card/records/exchange/').fuel-nac-take 兑换记录
         .fuel-nav-list.fuel-nav-around
-          a(href='/fuel/about/').fuel-nac-about 关于我们
+          a(href='/fuel_card/about/').fuel-nac-about 关于我们
     .fuel-section-product
       .product-left-name 服务产品列表
-      a(href='/fuel/dec/').product-right-dec 产品说明
+      a(href='/fuel_card/dec/').product-right-dec 产品说明
 
     .fuel-product-item
       if products
         each product in products
           if product
-            a(href='/fuel/buy/fuel_card/{{product.id}}').fuel-product-list
+            a(href='/fuel_card/buy/{{product.id}}').fuel-product-list
               .fuel-pdt-title
                 .fuel-pdt-name(class='fuel-pdt-green') {{product.name}}
                 .fuel-pdt-fiter {{product.car}}

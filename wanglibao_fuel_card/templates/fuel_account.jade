@@ -20,7 +20,7 @@ html
         .fuel-list-name 实名认证
         .fuel-list-authen 已认证
     else
-      a(href='/fuel/bank/').fuel-account-list
+      a(href='/fuel_card/regist/authentication/').fuel-account-list
         .fuel-list-icon.account-authen
         .fuel-list-name 实名认证
         .fuel-list-unauthen 未认证
@@ -32,10 +32,10 @@ html
       .fuel-list-icon.account-balance
       .fuel-list-name 账户余额
       .fuel-list-text.fuel-magin-right-15 {{user.margin.margin | money_format}}元
-      a(href='/fuel/recharge/').fuel-list-recharge 充值
+      a(href='/fuel_card/recharge/').fuel-list-recharge 充值
     .fuel-account-space-1
 
-    a(href='/fuel/bank/').fuel-account-list
+    a(href='/fuel_card/bank/').fuel-account-list
       .fuel-list-icon.account-card
       .fuel-list-name 银行卡
       .fuel-list-text.fuel-magin-right-4 {{p2p_cards_count}}张
@@ -43,7 +43,7 @@ html
 
     .fuel-account-space-10
 
-    a(href='/fuel/change/login-psw/').fuel-account-list
+    a(href='/fuel_card/change/login-psw/').fuel-account-list
       .fuel-list-icon.account-login-password
       .fuel-list-name 修改登录密码
       .fuel-list-arrow

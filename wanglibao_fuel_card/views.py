@@ -20,6 +20,7 @@ from marketing.utils import generate_revenue_exchange_order
 from .forms import FuelCardBuyForm
 from .trade import P2PTrader
 from .utils import get_sorts_for_created_time, get_p2p_reward_using_range
+from wanglibao_pay.third_pay import card_bind_list
 
 logger = logging.getLogger(__name__)
 
@@ -425,4 +426,22 @@ class RevenueExchangeStatisticsView(TemplateView):
             'data': data,
             'count': revenue_count,
             'register_time': register_time,
+        }
+
+
+class FuelBankCard(TemplateView):
+    template_name = 'fuel_bank.jade'
+
+    def get_context_data(self, **kwargs):
+        is_one = ''
+        try:
+            p2p_cards = card_bind_list(self.request)['cards']
+            for card in p2p_cards:
+                if card['is_the_one_card']:
+                    is_one = True
+        except:
+            result = ''
+        return {
+            'p2p_cards': p2p_cards,
+            'is_one': is_one
         }

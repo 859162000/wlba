@@ -18,6 +18,7 @@ module.exports = {
         regist_authentication: './src/mobile_fuelcard/regist_authentication',
         regist_bank: './src/mobile_fuelcard/regist_bank',
         reset_password: './src/mobile_fuelcard/reset_password',
+        recharge: './src/mobile_fuelcard/recharge',
         vendor: ['./src/mobile_fuelcard/lib/zepto']
     },
     output: {
