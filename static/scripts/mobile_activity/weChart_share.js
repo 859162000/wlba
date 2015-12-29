@@ -409,7 +409,7 @@ org.weChatStart = (function(org){
             var
                 $submit  = $('.webpack-btn-red'),
                 phoneVal = $('input[name=phone]'),
-                code = $('input[name=code]'),
+                code = $('input[name=validate_code]'),
                 postDo = false;
 
             $submit.on('click', function(){
@@ -419,7 +419,7 @@ org.weChatStart = (function(org){
                     activity : $(this).attr('data-activity'),
                     orderid : $(this).attr('data-orderid'),
                     openid : $(this).attr('data-openid'),
-                    code : code.val()
+                    validate_code : code.val()
                 }
                 if(ops.phone =='') {
                     $('.phone-sign').show();
@@ -441,36 +441,68 @@ org.weChatStart = (function(org){
                     }else{
                         $('.phone-code-sign').hide();
                     }
-                }
-                org.ajax({
-                    url: '/api/weixin/share/has_gift/',
-                    type: 'POST',
-                    beforeSend: function(){$submit.html('领取中...')},
-                    data: {
-                        'openid': ops.openid,
-                        'phone_num': ops.phone,
-                        'order_id': ops.orderid,
-                        'code': ops.code
-                    },
-                    dataType : 'json',
-                    success: function(data){
-                        if(data.has_gift == 'true'){
-                            org.ui.alert(data.message, function(){
-                                window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
-                            });
-                        }else if(data.has_gift == 'false'){
-                            window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
+                    org.ajax({
+                        url: '/api/register/?promo_token=wrp',
+                        type: 'POST',
+                        beforeSend: function(){$submit.html('领取中...')},
+                        data: {
+                            'identifier': ops.phone,
+                            'validate_code': ops.validate_code,
+                            'IGNORE_PWD': 'true',
+                            'captcha_0' :  lib.$captcha_0.val(),
+                            'captcha_1' :  lib.$captcha_1.val() 
+                        },
+                        dataType : 'json',
+                        success: function(data){
+                            if(data.ret_code > 0){
+                                org.ui.showSign(data.message);
+                            }else {
+                                if (data.has_gift == 'true') {
+                                    org.ui.alert(data.message, function () {
+                                        window.location.href = '/weixin_activity/share/' + ops.phone + '/' + ops.openid + '/' + ops.orderid + '/' + ops.activity + '/';
+                                    });
+                                } else if (data.has_gift == 'false') {
+                                    window.location.href = '/weixin_activity/share/' + ops.phone + '/' + ops.openid + '/' + ops.orderid + '/' + ops.activity + '/';
+                                }
+                            }
+                        },
+                        error: function(data){
+                            org.ui.alert(data)
+                        },
+                        complete: function(){
+                            postDo = false;
+                            $submit.html('立即领取');
                         }
-                    },
-                    error: function(data){
-                        org.ui.alert(data)
-                    },
-                    complete: function(){
-                        postDo = false;
-                        $submit.html('立即领取');
-                    }
-                })
-
+                    })
+                }else{
+                    org.ajax({
+                        url: '/api/weixin/share/has_gift/',
+                        type: 'POST',
+                        beforeSend: function(){$submit.html('领取中...')},
+                        data: {
+                            'openid': ops.openid,
+                            'phone_num': ops.phone,
+                            'order_id': ops.orderid
+                        },
+                        dataType : 'json',
+                        success: function(data){
+                            if(data.has_gift == 'true'){
+                                org.ui.alert(data.message, function(){
+                                    window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
+                                });
+                            }else if(data.has_gift == 'false'){
+                                window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
+                            }
+                        },
+                        error: function(data){
+                            org.ui.alert(data)
+                        },
+                        complete: function(){
+                            postDo = false;
+                            $submit.html('立即领取');
+                        }
+                    })
+                }
             });
 
         },
