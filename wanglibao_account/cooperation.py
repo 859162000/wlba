@@ -54,7 +54,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_ZGDX_KEY, ZGDX_CALL_BACK_URL, ZGDX_PARTNER_NO, ZGDX_SERVICE_CODE, ZGDX_CONTRACT_ID, \
      ZGDX_ACTIVITY_ID, ZGDX_KEY, ZGDX_IV, WLB_FOR_NJWH_KEY, ENV, ENV_PRODUCTION, WLB_FOR_FANLITOU_KEY, \
      WLB_FOR_XUNLEI9_KEY, XUNLEIVIP_CALL_BACK_URL, XUNLEIVIP_KEY, XUNLEIVIP_REGISTER_CALL_BACK_URL, \
-     XUNLEIVIP_REGISTER_KEY, MAIMAI1_CHANNEL_CODE, MAIMAI_CALL_BACK_URL
+     XUNLEIVIP_REGISTER_KEY, MAIMAI1_CHANNEL_CODE, MAIMAI_CALL_BACK_URL, XUNLEIVIP_LOGIN_URL
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback, \
                                     xunleivip_callback
@@ -71,6 +71,7 @@ from user_agents import parse
 import uuid
 import urllib
 from .utils import xunleivip_generate_sign
+from wanglibao_sms.messages import sms_alert_unbanding_xunlei
 
 logger = logging.getLogger('wanglibao_cooperation')
 
@@ -1406,7 +1407,7 @@ class XunleiVipRegister(CoopRegister):
                     self.xunlei_call_back(user, binding.bid, data,
                                           self.call_back_url, pay_info.order_id)
                 else:
-                    message_content = u"呦西！"
+                    message_content = sms_alert_unbanding_xunlei(u"7天白金会员", XUNLEIVIP_LOGIN_URL)
                     inside_message.send_one.apply_async(kwargs={
                         "user_id": user.id,
                         "title": u"首次充值送7天迅雷白金会员",
@@ -1433,7 +1434,7 @@ class XunleiVipRegister(CoopRegister):
                     self.xunlei_call_back(user, binding.bid, data,
                                           self.call_back_url, p2p_record.order_id)
                 else:
-                    message_content = u"呦西！"
+                    message_content = sms_alert_unbanding_xunlei(u"1年白金会员", XUNLEIVIP_LOGIN_URL)
                     inside_message.send_one.apply_async(kwargs={
                         "user_id": user.id,
                         "title": u"首次投资送1年迅雷白金会员",
