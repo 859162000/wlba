@@ -1,6 +1,6 @@
 (function(org) {
 
-	alert($(window).width());
+	//alert($(window).width());
 
 	/*滚动图*/
 	function mycarousel_initCallback(carousel) {
@@ -31,6 +31,7 @@
 		});
 	})
 	/*滚动图结束*/
+
 
 
 
