@@ -519,8 +519,6 @@ class UnBindWeiUser(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(UnBindWeiUser, self).get_context_data(**kwargs)
-        openid = self.request.GET.get('openid', '')
-        context['openid'] = openid
         next = self.request.GET.get('next', '')
         return {
             'context': context,
@@ -559,7 +557,9 @@ class UnBindWeiUserAPI(APIView):
     http_method_names = ['post']
 
     def post(self, request):
-        openid = request.POST.get('openid')
+        openid = request.session.get('openid')
+        if not openid:
+            return Response({'message':'openid not in session'})
         weixin_user = WeixinUser.objects.get(openid=openid)
         if weixin_user.user:
             user = weixin_user.user
