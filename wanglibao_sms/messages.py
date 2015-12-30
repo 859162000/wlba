@@ -501,6 +501,13 @@ def msg_give_coupon(name, amount, end_time):
     return title, content
 
 
+def sms_alert_unbanding_xunlei(reward_dsct, url):
+    content = u"由于您之前没有完成迅雷帐号登录，无法关联，导致会员奖励无法到帐。" \
+              u"请先到以下页面完成迅雷帐号登录，即可获得{}奖励" \
+              u"<br/>" \
+              u"<a href='{}'>领取奖励>></a><br/>"
+    return content.format(reward_dsct, url)
+
 if __name__ == "__main__":
     print sms_alert_invest('test')
     print sms_alert_invite('test', '15038038823')
