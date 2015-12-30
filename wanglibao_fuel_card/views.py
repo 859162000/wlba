@@ -313,8 +313,14 @@ class RevenueExchangeBuyRecordView(TemplateView):
 
         user_amortizations = self._get_user_amortizations(self.request.user, l_type, settled_status, sorted_term)
 
-        # 按产品期限分类（初级-中级-高级）
         for ua in user_amortizations:
+            # 获取产品的奖品面额及产品最低购买限额
+            product = ua.product_amortization.product
+            exchange_rule = get_object_or_404(RevenueExchangeRule, product=product)
+            ua.equality_prize_amount = float(exchange_rule.equality_prize_amount)
+            ua.limit_min_per_user = float(exchange_rule.limit_min_per_user)
+
+            # 按产品期限分类（初级-中级-高级）
             product_class = classes_product_for_period(ua.product_amortization.product.period) or 'C'
             ua.class_name = get_class_name(product_class, l_type)
 
