@@ -221,7 +221,7 @@ class WeixinShareDetailView(TemplateView):
             self.get_activity_by_id(activity)
 
         user = WanglibaoUserProfile.objects.filter(phone=phone_num).first()
-        activity_record = WanglibaoActivityReward.objects.filter(order_id=product_id, user_id=user.user_id, activity='weixin_experience_glod').first()
+        activity_record = WanglibaoActivityReward.objects.filter(order_id=product_id, user_id=user.id, activity='weixin_experience_glod').first()
         if activity_record:
             return self.distribute_experience_glod(user, phone_num, openid, activity, product_id, activity_record.experience)
 
