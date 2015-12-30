@@ -1168,7 +1168,7 @@ class XunleiActivityAPIView(APIView):
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        if not self.introduced_by_with(request.user.id, 'xunlei9', "2015-11-29"):
+        if not self.introduced_by_with(request.user.id, 'xunlei9', "2015-12-29"):
             json_to_response = {
                 'code': 1001,
                 'message': u'用户不是在活动期内从迅雷渠道过来的用户'
