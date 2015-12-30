@@ -14,16 +14,22 @@ html
 
     .records-item
       if data
+        if status == 'auditing'
+          redpackname  = 'records-list-blue'
+        else
+          redpackname  = 'records-list-grey'
         for list in data
-          .records-list.records-list-blue
+
+          .records-list(class='{{redpackname}}')
             .records-card-amount
-              principal = int(list.principal)
+              principal = int(list.limit_min_per_user)
               span.amount {{principal}}
               |元
             .records-card-detail
               .records-name {{list.product_amortization.product.name}}
               .records-dec
-                span.records-propress-text 已得150元理财加油卡
+                equality = int(list.equality_prize_amount)
+                span.records-propress-text 已得{{equality}}元理财加油卡
                 span.records-propress-num {{list.term}}/{{list.product_amortization.product.amortization_count}}
               .records-date {{list.term_date | date:"Y-m-d"}}
 

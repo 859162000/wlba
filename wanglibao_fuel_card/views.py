@@ -289,9 +289,11 @@ class RevenueExchangeBuyRecordView(TemplateView):
         if user_amotization:
             ua_tmp = user_amotization.first()
             ua_list.append(ua_tmp)
+            print ua_tmp.id
             for ua in user_amotization:
                 if ua.product_amortization.product != ua_tmp.product_amortization.product:
-                    ua_list.append(ua_tmp)
+                    print ua.id
+                    ua_list.append(ua)
                     ua_tmp = ua
 
         return get_sorts_for_created_time(ua_list)
@@ -312,7 +314,6 @@ class RevenueExchangeBuyRecordView(TemplateView):
             sorted_term = '-term'
 
         user_amortizations = self._get_user_amortizations(self.request.user, l_type, settled_status, sorted_term)
-
         for ua in user_amortizations:
             # 获取产品的奖品面额及产品最低购买限额
             product = ua.product_amortization.product
