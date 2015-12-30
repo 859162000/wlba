@@ -223,7 +223,7 @@ org.weChatStart = (function(org){
                         $('.phone-code-sign').hide();
                     }
                     org.ajax({
-                        url: '/api/distribute/redpack/' + _self.$phone.val()+'/?promo_token=weixin_redpack',
+                        url: '/api/register/?promo_token=wrp',
                         type: 'POST',
                         beforeSend: function(){$submit.html('领取中...')},
                         data: {
@@ -231,16 +231,20 @@ org.weChatStart = (function(org){
                             'validate_code': ops.validate_code,
                             'IGNORE_PWD': 'true',
                             'captcha_0' :  lib.$captcha_0.val(),
-                            'captcha_1' :  lib.$captcha_1.val()
+                            'captcha_1' :  lib.$captcha_1.val() 
                         },
                         dataType : 'json',
                         success: function(data){
-                            if(data.has_gift == 'true'){
-                                org.ui.alert(data.message, function(){
-                                    window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
-                                });
-                            }else if(data.has_gift == 'false'){
-                                window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
+                            if(data.ret_code > 0){
+                                org.ui.showSign(data.message);
+                            }else {
+                                if (data.has_gift == 'true') {
+                                    org.ui.alert(data.message, function () {
+                                        window.location.href = '/weixin_activity/share/' + ops.phone + '/' + ops.openid + '/' + ops.orderid + '/' + ops.activity + '/';
+                                    });
+                                } else if (data.has_gift == 'false') {
+                                    window.location.href = '/weixin_activity/share/' + ops.phone + '/' + ops.openid + '/' + ops.orderid + '/' + ops.activity + '/';
+                                }
                             }
                         },
                         error: function(data){

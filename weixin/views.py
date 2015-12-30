@@ -1451,9 +1451,11 @@ def checkProduct(sender, **kw):
                                                   eta= exec_time,
                                                   queue='celery01')
             else:
+                exec_time = utc_now + datetime.timedelta(minutes=1)
                 detect_product_biding.apply_async(kwargs={
                    "product_id":product.id
                 },
+                                                  eta=exec_time,
                                                   queue='celery01')
 
 def recordProduct(sender, **kw):
