@@ -543,6 +543,8 @@ webpackJsonp([6],[
 	});
 	exports.validation = undefined;
 
+	var _ui = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./mixins/ui\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+
 	var _functions = __webpack_require__(3);
 
 	var _check = __webpack_require__(4);
@@ -655,12 +657,12 @@ webpackJsonp([6],[
 	            console.log('验证成功');
 	            return fetchValidation(phone, captcha_0, captcha_1);
 	        }).then(function (message) {
-	            (0, _functions.signView)(message);
+	            (0, _ui.ui_signError)(message);
 	            console.log('短信发送成功');
 	            var count = 60;
 	            return timerFunction(count);
 	        }).catch(function (message) {
-	            (0, _functions.signView)(message);
+	            (0, _ui.ui_signError)(message);
 	        });
 	    }
 	};

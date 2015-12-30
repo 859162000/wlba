@@ -1,4 +1,5 @@
-import {ajax, signView} from './functions'
+import { ui_signError} from './mixins/ui'
+import {ajax} from './functions'
 import {check} from './check'
 
 export const validation = ($phone, $captcha_0, $captcha_1, $captcha) => {
@@ -107,13 +108,13 @@ export const validation = ($phone, $captcha_0, $captcha_1, $captcha) => {
                 return fetchValidation(phone, captcha_0, captcha_1)
             })
             .then((message)=> {
-                signView(message)
+                ui_signError(message)
                 console.log('短信发送成功');
                 let count = 60;
                 return timerFunction(count)
             })
             .catch((message)=> {
-                signView(message)
+                ui_signError(message)
             })
     }
 

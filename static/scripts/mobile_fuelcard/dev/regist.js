@@ -112,7 +112,7 @@ webpackJsonp([4],[
 	            console.log('register success');
 	            if (result.ret_code === 0) {
 	                (0, _ui.ui_alert)('注册成功', function () {
-	                    window.location.href = '/fuel/regist/authentication/';
+	                    window.location.href = '/fuel_card/regist/authentication/';
 	                });
 	            }
 	            if (result.ret_code > 0) {
@@ -402,6 +402,8 @@ webpackJsonp([4],[
 	});
 	exports.validation = undefined;
 
+	var _ui = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./mixins/ui\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+
 	var _functions = __webpack_require__(3);
 
 	var _check = __webpack_require__(4);
@@ -514,12 +516,12 @@ webpackJsonp([4],[
 	            console.log('验证成功');
 	            return fetchValidation(phone, captcha_0, captcha_1);
 	        }).then(function (message) {
-	            (0, _functions.signView)(message);
+	            (0, _ui.ui_signError)(message);
 	            console.log('短信发送成功');
 	            var count = 60;
 	            return timerFunction(count);
 	        }).catch(function (message) {
-	            (0, _functions.signView)(message);
+	            (0, _ui.ui_signError)(message);
 	        });
 	    }
 	};

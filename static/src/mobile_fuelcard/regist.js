@@ -110,7 +110,7 @@ import { validation } from './mixins/validation'
                 console.log('register success');
                 if (result.ret_code === 0) {
                     ui_alert('注册成功', ()=> {
-                        window.location.href= '/fuel/regist/authentication/';
+                        window.location.href= '/fuel_card/regist/authentication/';
                     });
                 }
                 if (result.ret_code > 0) {
