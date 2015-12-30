@@ -543,7 +543,7 @@ webpackJsonp([6],[
 	});
 	exports.validation = undefined;
 
-	var _ui = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"./mixins/ui\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+	var _ui = __webpack_require__(2);
 
 	var _functions = __webpack_require__(3);
 

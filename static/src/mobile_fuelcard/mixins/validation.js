@@ -1,4 +1,4 @@
-import { ui_signError} from './mixins/ui'
+import { ui_signError} from './ui'
 import {ajax} from './functions'
 import {check} from './check'
 
