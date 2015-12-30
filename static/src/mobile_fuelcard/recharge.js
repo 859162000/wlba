@@ -52,7 +52,7 @@ import { ajax } from './mixins/functions'
             success(result){
                 $('.recharge-loding').hide()
                 if(result.ret_code === 0 ){
-                    result.length === 0 ? $('.unbankcard').show() : $('.bankcard').show();
+                    result.cards.length === 0 ? $('.unbankcard').show() : $('.bankcard').show();
                 }
 
                 if (result.ret_code > 0 && result.ret_code != 20071) {

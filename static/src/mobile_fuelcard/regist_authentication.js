@@ -79,7 +79,7 @@ import { check } from './mixins/check'
             })
             .then((result)=> {
                 ui_alert('实名认证成功', ()=> {
-                    window.location.href= '/fuel/regist/bank/';
+                    window.location.href= '/fuel_card/regist/bank/';
                 });
             })
             .catch((xhr) => {

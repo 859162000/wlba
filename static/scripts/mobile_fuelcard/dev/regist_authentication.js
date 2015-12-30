@@ -86,7 +86,7 @@ webpackJsonp([5],[
 	            return authentication('/api/id_validate/');
 	        }).then(function (result) {
 	            (0, _ui.ui_alert)('实名认证成功', function () {
-	                window.location.href = '/fuel/regist/bank/';
+	                window.location.href = '/fuel_card/regist/bank/';
 	            });
 	        }).catch(function (xhr) {
 	            result = JSON.parse(xhr.responseText);
