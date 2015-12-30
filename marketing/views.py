@@ -2949,6 +2949,21 @@ class ThunderBindingApi(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
+        user = self.request.user
+        user_channel = get_user_channel_record(user)
+        if not user_channel:
+            response_data = {
+                'ret_code': '10001',
+                'message': u'非迅雷渠道用户',
+            }
+            return HttpResponse(json.dumps(response_data), content_type='application/json')
+        if user_channel.code != 'xunlei9':
+            response_data = {
+                'ret_code': '10001',
+                'message': u'非迅雷渠道用户',
+            }
+            return HttpResponse(json.dumps(response_data), content_type='application/json')
+
         channel_code = request.POST.get('promo_token', '').strip()
         channel_user = request.POST.get('xluserid', '').strip()
         channel_time = request.POST.get('time', '').strip()
@@ -2956,7 +2971,6 @@ class ThunderBindingApi(APIView):
         nick_name = request.POST.get('nickname', '').strip()
         if channel_code and (channel_code == 'xunlei9' and channel_user
                              and channel_time and channel_sign and nick_name):
-            user = self.request.user
             binding = Binding.objects.filter(user_id=user.id).first()
             if not binding:
                 CoopRegister(request).all_processors_for_user_register(user, channel_code)
