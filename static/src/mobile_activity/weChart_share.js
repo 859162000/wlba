@@ -232,7 +232,7 @@ org.weChatStart = (function(org){
                             'IGNORE_PWD': 'true',
                             'captcha_0' :  lib.$captcha_0.val(),
                             'captcha_1' :  lib.$captcha_1.val(),
-                            'openid': ops.openid
+                            'order_id': ops.orderid
                         },
                         dataType : 'json',
                         success: function(data){
