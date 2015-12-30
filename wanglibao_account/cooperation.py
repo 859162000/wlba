@@ -1266,7 +1266,6 @@ class XunleiVipRegister(CoopRegister):
         self.external_channel_user_key = 'xluserid'
         self.coop_time_key = 'time'
         self.coop_sign_key = 'sign'
-        self.is_xunlei_user = False
 
     @property
     def channel_user(self):
@@ -1279,6 +1278,19 @@ class XunleiVipRegister(CoopRegister):
     @property
     def channel_sign(self):
         return self.request.session.get(self.coop_sign_key, '').strip()
+
+    @property
+    def is_xunlei_user(self):
+        # 校验迅雷用户有效性
+        data = {
+            self.coop_time_key: self.channel_time,
+            self.external_channel_user_key: self.channel_user,
+        }
+
+        if xunleivip_generate_sign(data, self.coop_register_key) == self.channel_sign:
+            return True
+        else:
+            return False
 
     def save_to_session(self):
         super(XunleiVipRegister, self).save_to_session()
@@ -1301,34 +1313,29 @@ class XunleiVipRegister(CoopRegister):
         :param user:
         :return:
         """
-        channel_user = self.channel_user
-        channel_name = self.channel_name
-        bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
-        if channel_name and channel_user and len(channel_user) <= bid_len:
-            binding = Binding()
-            binding.user = user
-            binding.btype = channel_name
-            binding.bid = channel_user
-            binding.save()
-            # logger.debug('save user %s to binding'%user)
-            return True
 
-        logger.info("xunlei9 binding faild with user[%s], channel_user[%s], channel_name[%s]" %
-                    (user.id, channel_user, channel_name))
+        if self.is_xunlei_user:
+            channel_user = self.channel_user
+            channel_name = self.channel_name
+            bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
+            if channel_name and channel_user and len(channel_user) <= bid_len:
+                binding = Binding()
+                binding.user = user
+                binding.btype = channel_name
+                binding.bid = channel_user
+                binding.save()
+                # logger.debug('save user %s to binding'%user)
+                return True
+
+            logger.info("xunlei9 binding faild with user[%s], channel_user[%s], channel_name[%s]" %
+                        (user.id, channel_user, channel_name))
+        else:
+            logger.info("xunlei9 binding faild with user[%s] not xunlei user" % user.id)
 
     def binding_for_after_register(self, user):
         """
         用户可以在从渠道跳转后的注册页使用邀请码，优先考虑邀请码
         """
-        # 校验迅雷用户有效性
-        data = {
-            self.coop_time_key: self.channel_time,
-            self.external_channel_user_key: self.channel_user,
-        }
-
-        if xunleivip_generate_sign(data, self.coop_register_key) == self.channel_sign:
-            self.is_xunlei_user = True
-
         # 处理渠道用户绑定状态
         channel = get_user_channel_record(user.id)
         if self.is_xunlei_user and channel and channel.code == self.c_code:
