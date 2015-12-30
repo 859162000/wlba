@@ -9,7 +9,7 @@ urlpatterns = patterns(
     '',
     #fuel_card
     url(r'^login/$', TemplateView.as_view(template_name="fuel_login.jade")),
-    url(r'^index/$', login_required(views.RevenueExchangeIndexView.as_view(), login_url='/fuel_card/login/'), name='index'),
+    url(r'^index/$', login_required(views.RevenueExchangeIndexView.as_view(), login_url='/fuel_card/login/'), name='fuel_index'),
     url(r'^buy/(?P<p_id>\d+)/$', login_required(views.RevenueExchangeBuyView.as_view(), login_url='/fuel_card/login/'), name='fuel_buy'),
     url(r'^buy-record/(?P<p_status>\w+)/$', login_required(views.RevenueExchangeBuyRecordView.as_view(), login_url='/fuel_card/login/'), name='fuel_buy_record'),
     url(r'^exchange-record/(?P<p_status>\w+)/$', login_required(views.RevenueExchangeRecordView.as_view(), login_url='/fuel_card/login/'), name='fuel_exchange_record'),
