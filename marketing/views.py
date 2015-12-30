@@ -2949,6 +2949,23 @@ class ThunderBindingApi(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
+        # Add by hb on 2015-12-30
+        user = self.request.user
+        user_channel = get_user_channel_record(user)
+        if not user_channel:
+            response_data = {
+                'ret_code': '10001',
+                'message': u'非迅雷渠道用户',
+            }
+            return HttpResponse(json.dumps(response_data), content_type='application/json')
+        if user_channel.code != 'xunlei9':
+            response_data = {
+                'ret_code': '10001',
+                'message': u'非迅雷渠道用户',
+            }
+            return HttpResponse(json.dumps(response_data), content_type='application/json')
+
+
         channel_code = request.POST.get('promo_token', '').strip()
         channel_user = request.POST.get('xluserid', '').strip()
         channel_time = request.POST.get('time', '').strip()
