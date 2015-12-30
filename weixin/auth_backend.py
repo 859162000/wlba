@@ -9,7 +9,7 @@ class OpenidAuthBackend(object):
         openid = kwargs.get('openid')
         active_user = None
         if openid:
-            w_user = WeixinUser.objects.filer(openid=openid).first()
+            w_user = WeixinUser.objects.filter(openid=openid).first()
             if w_user:
                 user = w_user.user
                 active_user = user if user else None
