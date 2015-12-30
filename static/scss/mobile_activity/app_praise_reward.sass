@@ -232,33 +232,25 @@
       margin: 0.375rem 0
       display: inline-block
       position: relative
-      .prev_button
+      #mycarousel-prev
         width: 0.9rem
         display: block
         position: absolute
         top: 50%
         left: 0rem
         padding-left: 0.45rem
-        margin-top: -15px
+        margin-top: -0.6rem
         z-index: 99
-      .next_button
+      #mycarousel-next
         width: 0.9rem
         display: block
         position: absolute
         top: 50%
         right: 0rem
         padding-right: 0.45rem
-        margin-top: -15px
+        margin-top: -0.6rem
         z-index: 99
-      .user_wrap
-        width: 88%
-        display: inline-block
-        margin-left: 6%
-        .user
-          width: 13.5%
-          margin: 0 1.58%
-          float: left
-          display: block
+
     .line_bottom
       width: 100%
       height: 1px
@@ -464,6 +456,62 @@
       height: 1rem
       font-size: 0.75rem
       line-height: 1rem
+
+.jcarousel-skin-tango .jcarousel-clip-horizontal
+  display: block
+  overflow: hidden
+  position: relative
+  width: 88%
+  display: inline-block
+  margin-left: 6%
+  height: 2rem
+  @media screen and (max-device-width: 1025px)
+    height: 5.83rem
+  @media screen and (max-device-width: 769px)
+    height: 5rem
+  @media screen and (max-device-width: 415px)
+    height: 2.45rem
+  @media screen and (max-device-width: 376px)
+    height: 2.16rem
+.user_wrap
+  width: 100%
+  display: inline-block
+  margin-left: 6%
+  li
+    width: 1.8rem
+    margin: 0 0.3rem 0 0.3rem
+    height: 1.8rem
+    float: left
+    display: block
+    @media screen and (max-device-width: 1025px)
+      width: 5.83rem
+      height: 5.83rem
+    @media screen and (max-device-width: 769px)
+      width: 5rem
+      height: 5rem
+    @media screen and (max-device-width: 415px)
+      width: 2.45rem
+      height: 2.45rem
+    @media screen and (max-device-width: 376px)
+      width: 2.16rem
+      height: 2.16rem
+    @media screen and (max-device-width: 361px)
+      width: 2.05rem
+      margin: 0 0.3rem 0
+    @media screen and (max-device-width: 351px)
+      width: 1.95rem
+      margin: 0 0.3rem 0
+    @media screen and (max-device-width: 341px)
+      width: 1.95rem
+      margin: 0 0.27rem 0
+    @media screen and (max-device-width: 331px)
+      width: 1.8rem
+      margin: 0 0.27rem 0
+    .user
+      width: 100%
+      display: block
+
+
 
 
 
