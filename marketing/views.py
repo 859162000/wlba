@@ -2950,6 +2950,7 @@ class ThunderBindingApi(APIView):
 
     def post(self, request):
         # Add by hb on 2015-12-30
+        # Modify by cwb@20151230
         user = self.request.user
         user_channel = get_user_channel_record(user)
         if not user_channel or user_channel.code != 'xunlei9':
