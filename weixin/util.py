@@ -22,6 +22,8 @@ logger = logging.getLogger("weixin")
 BASE_WEIXIN_URL = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_base&state={state}#wechat_redirect"
 FWH_LOGIN_URL = ""
 FWH_REGISTER_URL = ""
+FWH_UNBIND_URL = ""
+
 def get_fwh_login_url(next=None):
     m = Misc.objects.filter(key='weixin_qrcode_info').first()
     if m and m.value:
@@ -33,9 +35,12 @@ def get_fwh_login_url(next=None):
             if next:
                 fwh_login_url += "?next=%s"%urllib.quote(next)
                 return BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=fwh_login_url, state=original_id)
+            fwh_unbind_url = settings.CALLBACK_HOST + "/weixin/unbind/"
             global FWH_LOGIN_URL
             FWH_LOGIN_URL = BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=fwh_login_url, state=original_id)
-            print "********************************************************",FWH_LOGIN_URL
+            global FWH_UNBIND_URL
+            FWH_UNBIND_URL = BASE_WEIXIN_URL.format(appid=account.app_id, redirect_uri=fwh_unbind_url, state=original_id)
+
 
 if not FWH_LOGIN_URL:
     get_fwh_login_url()
@@ -111,7 +116,7 @@ def bindUser(w_user, user):
         if w_user.user.id==user.id:
             return 1, u'你已经绑定, 请勿重复绑定'
         return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone
-    other_w_user = WeixinUser.objects.filter(user=user).first()
+    other_w_user = WeixinUser.objects.filter(user=user, account_original_id=w_user.account_original_id).first()
     if other_w_user:
         msg = u"你的手机号%s已经绑定微信<span style='color:#173177;'>%s</span>"%(user.wanglibaouserprofile.phone, other_w_user.nickname)
         return 3, msg

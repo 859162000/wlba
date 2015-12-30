@@ -94,9 +94,12 @@ class WXLoginAPI(APIView):
                     if rs == 0:
                         auth_login(request, user)
                         request.session.set_expiry(1800)
+                        data = {'re_code':0,'nickname': user.wanglibaouserprofile.nick_name}
+                    else:
+                        data = {'re_code':rs, 'errmessage':txt}
             except WeixinUser.DoesNotExist:
                 pass
-            data = {'nickname': user.wanglibaouserprofile.nick_name}
+
             return Response(data)
 
         return Response(form.errors, status=400)
