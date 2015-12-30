@@ -1779,18 +1779,26 @@ org.processSecond = (function(org){
 org.received_ui = (function(){
     var slide = function(data){
         var slide = "<div class='swiper-slide received-slide'>"
-            slide += "<div class='received-slide-date'>"+data.term_date+"</div>"
+            slide += "<div class='received-slide-date'>"+data.term_date.slice(0,4)+"年"+data.term_date.slice(5,7)+"月</div>"
             slide += "<div class='received-slide-data'>";
             slide += "<div class='received-data-list'>";
             slide += "<span class='received-left-center'>"
             slide += "<div class='data-name'>回款总额(元)</div>"
-            slide += "<div class='data-value'>"+data.total_sum+"</div>"
+            if(data.total_sum == 0){
+                slide += "<div class='data-value'>0.00</div>"
+            }else{
+                slide += "<div class='data-value'>"+data.total_sum +"</div>"
+            }
             slide += "</span>"
             slide += "</div>"
             slide += "<div class='received-data-list'>";
             slide += "<span class='received-left-center'>"
             slide += "<div class='data-name'>回款笔数</div>"
-            slide += "<div class='data-value'>"+data.term_date_count+"</div>"
+            if(data.term_date_count == 0){
+                slide += "<div class='data-value'>0.00</div>"
+            }else{
+                slide += "<div class='data-value'>"+data.term_date_count +"</div>"
+            }
             slide += "</span>"
             slide += "</div>"
             slide += "</div>"
@@ -1819,7 +1827,7 @@ org.received_ui = (function(){
             list += "</div>";
 
             list += "<div class='list-flex'>";
-            list += "<div class='cont-red'>"+data.interest+"</div>";
+            list += "<div class='cont-red'>"+data.total_interest+"</div>";
             list += "<div class='cont-grey-1'>息(元)</div>";
             list += "</div>";
 
