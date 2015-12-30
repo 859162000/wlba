@@ -61,6 +61,8 @@ from decimal import Decimal
 from wanglibao_reward.models import WanglibaoUserGift, WanglibaoActivityGift
 from common import DecryptParmsAPIView
 import requests
+from weixin.models import WeixinUser
+from weixin.util import bindUser
 
 
 logger = logging.getLogger('wanglibao_rest')
@@ -365,7 +367,13 @@ class RegisterAPIView(DecryptParmsAPIView):
                         redpack_backends.give_activity_redpack(user, redpack_event, 'pc')
                         redpack.valid = 1
                         redpack.save()
-
+        try:
+            openid = request.session.get('openid')
+            if openid:
+                w_user = WeixinUser.objects.get(openid=openid)
+                bindUser(w_user, request.user)
+        except Exception, e:
+            logger.debug("fwh register bind error, error_message:::%s"%e.message)
         if channel in ('weixin_attention', 'maimai1'):
             return Response({"ret_code": 0, 'amount': 120, "message": u"注册成功"})
         else:
@@ -992,27 +1000,27 @@ class Statistics(APIView):
     def post(self, request, *args, **kwargs):
         today = datetime.now()
         # tomorrow = today + timedelta(1)
-        yesterday = today - timedelta(days=1)
+        # yesterday = today - timedelta(days=1)
         today_start = local_to_utc(datetime(today.year, today.month, today.day), 'min')
-        yesterday_start = local_to_utc(datetime(yesterday.year, yesterday.month, yesterday.day), 'min')
+        # yesterday_start = local_to_utc(datetime(yesterday.year, yesterday.month, yesterday.day), 'min')
         # today_end = datetime.combine(tomorrow, time())
 
         today_user = User.objects.filter(date_joined__gte=today_start).aggregate(Count('id'))
         today_amount = P2PRecord.objects.filter(create_time__gte=today_start, catalog='申购').aggregate(Sum('amount'))
-        yesterday_amount = P2PRecord.objects.filter(create_time__gte=yesterday_start, create_time__lt=today_start)\
-            .filter(catalog='申购').aggregate(Sum('amount'))
+        # yesterday_amount = P2PRecord.objects.filter(create_time__gte=yesterday_start, create_time__lt=today_start)\
+        #     .filter(catalog='申购').aggregate(Sum('amount'))
         today_num = P2PRecord.objects.filter(create_time__gte=today_start, catalog='申购').values('id').count()
 
-        today_repayment = ProductAmortization.objects.filter(settled=True)\
-            .filter(settlement_time__gte=yesterday_start, settlement_time__lt=today_start)\
-            .aggregate(Sum('principal'), Sum('interest'))
+        # today_repayment = ProductAmortization.objects.filter(settled=True)\
+        #     .filter(settlement_time__gte=yesterday_start, settlement_time__lt=today_start)\
+        #     .aggregate(Sum('principal'), Sum('interest'))
 
-        amount_sum_yesterday = yesterday_amount['amount__sum'] if yesterday_amount['amount__sum'] else Decimal('0')
-        principal_sum = today_repayment['principal__sum'] if today_repayment['principal__sum'] else Decimal('0')
-        interest_sum = today_repayment['interest__sum'] if today_repayment['interest__sum'] else Decimal('0')
+        # amount_sum_yesterday = yesterday_amount['amount__sum'] if yesterday_amount['amount__sum'] else Decimal('0')
+        # principal_sum = today_repayment['principal__sum'] if today_repayment['principal__sum'] else Decimal('0')
+        # interest_sum = today_repayment['interest__sum'] if today_repayment['interest__sum'] else Decimal('0')
 
         # 昨日资金净流入
-        today_inflow = amount_sum_yesterday - principal_sum - interest_sum
+        # today_inflow = amount_sum_yesterday - principal_sum - interest_sum
 
         all_user = User.objects.all().aggregate(Count('id'))
         all_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))
@@ -1027,7 +1035,7 @@ class Statistics(APIView):
             'all_user': all_user['id__count'],
             'all_amount': all_amount['amount__sum'],
 
-            'today_inflow': today_inflow
+            # 'today_inflow': today_inflow
         }
 
         return Response(data, status=status.HTTP_200_OK)
@@ -1315,11 +1323,13 @@ class InnerSysValidateID(APIView, InnerSysHandler):
             return Response({"code": 0, "message": u'用户以前已经验证过且验证通过'})
 
         try:
+            logger.debug('name:%s, id:%s' % (name, id))
             verify_record, error = verify_id(name, id)
+            logger.debug('name:%s, id:%s, verifiy_record:%s, error:%s' % (name, id, verify_record, error))
         except:
             return Response({"code": 1003, "message": u"验证失败，拨打客服电话进行人工验证"})
         else:
-            if error:
+            if error or not verify_record.is_valid:
                 return Response({"code": 1003, "message": u"验证失败，拨打客服电话进行人工验证"})
             else:
                 return Response({"code": 0, "message": u"验证通过"})
@@ -1331,6 +1341,7 @@ class InnerSysSaveChannel(APIView, InnerSysHandler):
     def post(self, request):
         code = request.DATA.get("code", None)
         description = request.DATA.get("description", None)
+        name = request.DATA.get("name", None)
         if not code or not description:
             return Response({"code": 1000, "message": u'渠道号或渠道描述为空值'})
 
@@ -1342,7 +1353,7 @@ class InnerSysSaveChannel(APIView, InnerSysHandler):
         if channel.exists():
             return Response({"code": 1002, "message": u'渠道号已经存在'})
         try:
-            Channels.objects.create(code=code, description=description)
+            Channels.objects.create(name=name, code=code, description=description)
         except Exception, reason:
             return Response({"code": 1003, "message": u'创建渠道报异常,reason:{0}'.format(reason)})
         else:

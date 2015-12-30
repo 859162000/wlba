@@ -2555,24 +2555,24 @@ class RewardDistributeAPIView(APIView):
         self.get_redpacks()
 
     def post(self, request):
-        openid = request.DATA.get("openid", "")
-        if None == openid:
-            to_json_response = {
-                'ret_code': 3010,
-                'message': u'openid 没有传入',
-            }
-            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-
-        w_user = WeixinUser.objects.filter(openid=openid)
-        if not w_user.exists() or not w_user.first().user:
-            to_json_response = {
-                'ret_code': 3011,
-                'message': u'weixin info No saved',
-            }
-            return HttpResponse(json.dumps(to_json_response), content_type='application/json')
-        else:
-            user = w_user.first().user
-
+        # openid = request.DATA.get("openid", "")
+        # if None == openid:
+        #     to_json_response = {
+        #         'ret_code': 3010,
+        #         'message': u'openid 没有传入',
+        #     }
+        #     return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+        #
+        # w_user = WeixinUser.objects.filter(openid=openid)
+        # if not w_user.exists() or not w_user.first().user:
+        #     to_json_response = {
+        #         'ret_code': 3011,
+        #         'message': u'weixin info No saved',
+        #     }
+        #     return HttpResponse(json.dumps(to_json_response), content_type='application/json')
+        # else:
+        #     user = w_user.first().user
+        user = request.user
         today = time.strftime("%Y-%m-%d", time.localtime())
         join_log = ActivityJoinLog.objects.filter(user=user, create_time__gte=today, action_name=self.action_name).first()
 
@@ -2949,6 +2949,17 @@ class ThunderBindingApi(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
+        # Add by hb on 2015-12-30
+        # Modify by cwb@20151230
+        user = self.request.user
+        user_channel = get_user_channel_record(user)
+        if not user_channel or user_channel.code != 'xunlei9':
+            response_data = {
+                'ret_code': '10004',
+                'message': u'非迅雷渠道用户',
+            }
+            return HttpResponse(json.dumps(response_data), content_type='application/json')
+
         channel_code = request.POST.get('promo_token', '').strip()
         channel_user = request.POST.get('xluserid', '').strip()
         channel_time = request.POST.get('time', '').strip()
@@ -2959,7 +2970,7 @@ class ThunderBindingApi(APIView):
             user = self.request.user
             binding = Binding.objects.filter(user_id=user.id).first()
             if not binding:
-                CoopRegister(request).all_processors_for_user_register(user, channel_code)
+                CoopRegister(request).process_after_binding(user)
                 binding = Binding.objects.filter(user_id=user.id).first()
                 if binding:
                     response_data = {

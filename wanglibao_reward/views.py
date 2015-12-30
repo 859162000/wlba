@@ -221,7 +221,7 @@ class WeixinShareDetailView(TemplateView):
             self.get_activity_by_id(activity)
 
         user = WanglibaoUserProfile.objects.filter(phone=phone_num).first()
-        activity_record = WanglibaoActivityReward.objects.filter(order_id=product_id, user_id=user.id, activity='weixin_experience_glod').first()
+        activity_record = WanglibaoActivityReward.objects.filter(order_id=product_id, user_id=user.user_id, activity='weixin_experience_glod').first()
         if activity_record:
             return self.distribute_experience_glod(user, phone_num, openid, activity, product_id, activity_record.experience)
 
@@ -406,7 +406,7 @@ class WeixinShareDetailView(TemplateView):
             if "No Reward" == user_gift:
                 self.debug_msg('奖品已经发完了，用户:%s 没有领到奖品' %(phone_num,))
                 self.template_name = 'app_weChatEnd.jade'
-                counts, gifts = self.get_distribute_status(order_id, activity)
+                gifts, counts = self.get_distribute_status(order_id, activity)
                 share_title, share_content, url = get_share_infos(order_id)
                 return {
                     "count": counts,
@@ -419,7 +419,7 @@ class WeixinShareDetailView(TemplateView):
             else:
                 has_gift = 'true'
             self.debug_msg('openid:%s (phone:%s) 已经领取过奖品, gift:%s' %(openid, user_gift.identity, user_gift, ))
-        counts, gifts = self.get_distribute_status(order_id, activity)
+        gifts, counts = self.get_distribute_status(order_id, activity)
         share_title, share_content, url = get_share_infos(order_id)
         return {
             "ret_code": 0,
@@ -606,7 +606,7 @@ class WeixinShareEndView(TemplateView):
     def get_context_data(self, **kwargs):
         order_id = self.request.GET.get('url_id')
         share_title, share_content, url = get_share_infos(order_id)
-        counts, gifts = self.get_distribute_status(order_id)
+        gifts, counts = self.get_distribute_status(order_id)
         logger.debug("抵达End页面，order_id:%s, URL:%s" %(order_id, url))
         return {
          "count": counts,
@@ -1148,6 +1148,14 @@ class XunleiActivityAPIView(APIView):
 
                 return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
+            if not self.introduced_by_with(request.user.id, 'xunlei9', "2015-12-29"):
+                json_to_response = {
+                    'code': 1005,
+                    'lefts': 0,
+                    'message': u'用户不是在活动期内从迅雷渠道过来的用户'
+                }
+                return HttpResponse(json.dumps(json_to_response), content_type='applicaton/json')
+
             if not self.has_generate_reward_activity(request.user.id, self.activity_name):
                 self.generate_reward_activity(request.user)
 
@@ -1168,7 +1176,7 @@ class XunleiActivityAPIView(APIView):
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        if not self.introduced_by_with(request.user.id, 'xunlei9', "2015-11-29"):
+        if not self.introduced_by_with(request.user.id, 'xunlei9', "2015-12-29"):
             json_to_response = {
                 'code': 1001,
                 'message': u'用户不是在活动期内从迅雷渠道过来的用户'

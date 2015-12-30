@@ -450,7 +450,8 @@ org.weChatStart = (function(org){
                             'validate_code': ops.validate_code,
                             'IGNORE_PWD': 'true',
                             'captcha_0' :  lib.$captcha_0.val(),
-                            'captcha_1' :  lib.$captcha_1.val()
+                            'captcha_1' :  lib.$captcha_1.val(),
+                            'order_id': ops.orderid
                         },
                         dataType : 'json',
                         success: function(data){

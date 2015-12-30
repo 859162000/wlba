@@ -3,9 +3,11 @@ from __future__ import unicode_literals
 from functools import wraps
 
 from rest_framework.response import Response
+from django.http import HttpResponseRedirect
 
 from wechatpy.exceptions import WeChatException
 from weixin.models import WeixinAccounts
+from wanglibao_pay.models import Card
 import logging
 logger = logging.getLogger("weixin")
 def weixin_api_error(f):
@@ -36,3 +38,21 @@ def weixin_api_error(f):
             return Response({'errcode':e.errcode, 'errmsg':e.errmsg}, status=400)
         return res
     return decoration
+
+def is_check_id_verify(is_check):
+    def check_id_Verify(f):
+        @wraps(f)
+        def check(self, request, *args, **kwargs):
+            if is_check:
+
+                wanglibaoprofile = self.request.user.wanglibaouserprofile
+                if not wanglibaoprofile.id_is_valid:
+                    return HttpResponseRedirect("/weixin/sub_regist_first/")
+                cards = Card.objects.filter(user=self.request.user)
+                if not cards.exists():
+                    return HttpResponseRedirect("/weixin/sub_regist_second/")
+            res = f(self, request, *args, **kwargs)
+            return res
+        return check
+    return check_id_Verify
+
