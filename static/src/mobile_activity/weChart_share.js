@@ -202,7 +202,7 @@ org.weChatStart = (function(org){
                     openid : $(this).attr('data-openid'),
                     validate_code : code.val()
                 }
-                if(ops.phone =='') {
+                if(ops.phone =='' || !lib._checkPhone(phoneVal.val())) {
                     $('.phone-sign').show();
                     return;
                 }else{
@@ -290,6 +290,9 @@ org.weChatStart = (function(org){
                 $sign.hide(); $('.webchat-button').addClass('webchat-button-right'); isRight = true;
             }else{
                 $sign.show(); $('.webchat-button').removeClass('webchat-button-right'); isRight = false;
+                var ele = $('.code-content'),
+                    curHeight = ele.height();
+                ele.height(curHeight).animate({height: 0},500);
             }
             return isRight;
         },
