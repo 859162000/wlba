@@ -1,10 +1,11 @@
-webpackJsonp([3],[
-/* 0 */
+webpackJsonp([3],{
+
+/***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
 
-	__webpack_require__(2);
+	var _ui = __webpack_require__(2);
 
 	var _automatic_detection = __webpack_require__(5);
 
@@ -55,24 +56,22 @@ webpackJsonp([3],[
 	    };
 
 	    var banl_list = function banl_list() {
-	        return new Promise(function (resolve, reject) {
-	            (0, _functions.ajax)({
-	                url: '/api/pay/cnp/list_new/',
-	                type: 'POST',
-	                success: function success(result) {
-	                    $('.recharge-loding').hide();
-	                    if (result.ret_code === 0) {
-	                        resolve(result.cards);
-	                    }
-
-	                    if (result.ret_code > 0 && result.ret_code != 20071) {
-	                        return reject(data.message);
-	                    }
-	                },
-	                error: function error(result) {
-	                    reject('系统异常，请稍后再试');
+	        (0, _functions.ajax)({
+	            url: '/api/pay/cnp/list_new/',
+	            type: 'POST',
+	            success: function success(result) {
+	                $('.recharge-loding').hide();
+	                if (result.ret_code === 0) {
+	                    result.length === 0 ? $('.unbankcard').show() : $('.bankcard').show();
 	                }
-	            });
+
+	                if (result.ret_code > 0 && result.ret_code != 20071) {
+	                    return (0, _ui.ui_signError)(data.message);
+	                }
+	            },
+	            error: function error(result) {
+	                (0, _ui.ui_signError)('系统异常，请稍后再试');
+	            }
 	        });
 	    };
 
@@ -86,14 +85,14 @@ webpackJsonp([3],[
 	            },
 	            success: function success(results) {
 	                if (results.ret_code > 0) {
-	                    return (0, _functions.signView)(results.message);
+	                    return (0, _ui.ui_signError)(results.message);
 	                } else {
-	                    return (0, _functions.signView)('充值成功');
+	                    return (0, _ui.ui_signError)('充值成功');
 	                }
 	            },
 	            error: function error(results) {
 	                if (results.status >= 403) {
-	                    (0, _functions.signView)('服务器繁忙，请稍后再试');
+	                    (0, _ui.ui_signError)('服务器繁忙，请稍后再试');
 	                }
 	            },
 	            complete: function complete() {
@@ -103,30 +102,21 @@ webpackJsonp([3],[
 	    };
 
 	    /**
-	     * 判断有无同卡进出卡，有的话充值，没有做相应跳转
+	     * 判断有无同卡进出卡，有的话充值，没有做相应处理
 	     */
 	    on_card().then(function (result) {
 	        //有同卡
 	        on_card_operation(result);
-	    }).catch(function (result) {
+	    }).catch(function () {
 	        //无同卡
 	        return banl_list();
-	    }).then(function (result) {
-	        //有无银行卡
-	        result.length === 0 ? $('.unbankcard').show() : $('.bankcard').show();
-	    }).catch(function (result) {
-	        //banl_list 异常捕捉
-	        if (result) {
-	            return (0, _functions.signView)(result);
-	        }
-	        return (0, _functions.signView)('系统异常');
 	    });
 
 	    $submit.on('click', function () {
 	        var AMOUNT = $amount.val() * 1;
 
 	        if (AMOUNT == 0 || !AMOUNT) {
-	            return (0, _functions.signView)('请输入充值金额');
+	            return (0, _ui.ui_signError)('请输入充值金额');
 	        }
 	        var push_data = {
 	            phone: '',
@@ -134,72 +124,14 @@ webpackJsonp([3],[
 	            amount: AMOUNT,
 	            gate_id: g_GATE_ID
 	        };
-	        confirm("充值金额为" + AMOUNT, '确认充值', recharge, push_data);
+	        (0, _ui.ui_confirm)("充值金额为" + AMOUNT, '确认充值', recharge, push_data);
 	    });
 	})();
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ },
-/* 1 */,
-/* 2 */
-/***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function($) {'use strict';
-
-	/**
-	 *
-	 * 引入fuel_alert.jade
-	 * @param text 文字说明
-	 * @param callback 回调函数
-	 */
-	window.alert = function (text, callback) {
-
-	    var $alert = $('.fuel-alert'),
-	        $button = $('.fuel-submit');
-
-	    $alert.css('display', '-webkit-box').find('.fuel-text').text(text);
-
-	    $button.on('click', function () {
-	        $alert.hide();
-	        callback && callback();
-	    });
-	};
-
-	/**
-	 * 引入fuel_alert.jade
-	 * @param title confim文字说明
-	 * @param certainName 左边按钮文字
-	 * @param callback  回调函数
-	 * @param callbackData 回调函数的数据
-	 */
-	window.confirm = function (title) {
-	    var certainName = arguments.length <= 1 || arguments[1] === undefined ? '确定' : arguments[1];
-	    var callback = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
-	    var callbackData = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
-
-	    var $confirm = $('.confirm-warp');
-	    if ($confirm.length <= 0) return;
-	    $confirm.show();
-	    $confirm.find('.confirm-text').text(title);
-	    $confirm.find('.confirm-certain').text(certainName);
-
-	    $confirm.find('.confirm-cancel').on('click', function () {
-	        $confirm.hide();
-	    });
-
-	    $confirm.find('.confirm-certain').on('click', function () {
-	        $confirm.hide();
-	        if (callback) {
-	            callbackData ? callback(callbackData) : callback();
-	        }
-	    });
-	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
-
-/***/ },
-/* 3 */,
-/* 4 */,
-/* 5 */
+/***/ 5:
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function($) {'use strict';
@@ -351,4 +283,5 @@ webpackJsonp([3],[
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }
-]);
+
+});

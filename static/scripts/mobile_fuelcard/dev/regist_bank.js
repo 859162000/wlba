@@ -6,6 +6,8 @@ webpackJsonp([6],[
 
 	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
 
+	var _ui = __webpack_require__(2);
+
 	var _automatic_detection = __webpack_require__(5);
 
 	var _functions = __webpack_require__(3);
@@ -41,7 +43,7 @@ webpackJsonp([6],[
 	                    $bank.append(_appendBanks(results.banks));
 	                    window.localStorage.setItem('bank', content);
 	                } else {
-	                    return (0, _functions.signView)(results.message);
+	                    return (0, _ui.ui_signError)(results.message);
 	                }
 	            },
 	            error: function error(data) {
@@ -121,7 +123,7 @@ webpackJsonp([6],[
 
 	            if (isThrough) return resolve('验证成功');
 
-	            (0, _functions.signView)(sign);
+	            (0, _ui.ui_signError)(sign);
 	            return console.log('验证失败');
 	        });
 	    };
@@ -142,14 +144,14 @@ webpackJsonp([6],[
 	                },
 	                success: function success(results) {
 	                    if (results.ret_code === 0) {
-	                        (0, _functions.signView)(results.message);
+	                        (0, _ui.ui_signError)(results.message);
 	                        $("input[name='order_id']").val(results.order_id);
 	                        $("input[name='token']").val(results.token);
 	                        return resolve('短信已发送，请注意查收！');
 	                    }
 
 	                    if (results.ret_code > 0) {
-	                        (0, _functions.signView)(results.message);
+	                        (0, _ui.ui_signError)(results.message);
 	                        return reject('获取短信验证码错误');
 	                    }
 	                },
@@ -173,7 +175,7 @@ webpackJsonp([6],[
 	                } else {
 	                    clearInterval(intervalId);
 	                    $validate_operation.text('重新获取').removeAttr('disabled');
-	                    (0, _functions.signView)('倒计时失效，请重新获取');
+	                    (0, _ui.ui_signError)('倒计时失效，请重新获取');
 	                    return reject('倒计时失效，请重新获取');
 	                }
 	            };
@@ -214,7 +216,7 @@ webpackJsonp([6],[
 
 	            if (isThrough) return resolve('验证成功');
 
-	            (0, _functions.signView)(sign);
+	            (0, _ui.ui_signError)(sign);
 	            return console.log('验证失败');
 	        });
 	    };
@@ -238,9 +240,9 @@ webpackJsonp([6],[
 	                success: function success(data) {
 	                    if (data.ret_code > 0) {
 	                        reject(data.message);
-	                        return (0, _functions.signView)(data.message);
+	                        return (0, _ui.ui_signError)(data.message);
 	                    } else {
-	                        return alert('恭喜你，绑卡成功！', function () {
+	                        return (0, _ui.ui_alert)('恭喜你，绑卡成功！', function () {
 	                            resolve(data.message);
 	                            window.location.href = '/fuel/regist/end/';
 	                        });

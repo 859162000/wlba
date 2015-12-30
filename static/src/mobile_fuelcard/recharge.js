@@ -1,6 +1,6 @@
-import './mixins/ui'
+import { ui_alert, ui_signError, ui_confirm} from './mixins/ui'
 import { Automatic } from './mixins/automatic_detection'
-import { ajax, signView } from './mixins/functions'
+import { ajax } from './mixins/functions'
 
 (()=>{
     const
@@ -43,28 +43,25 @@ import { ajax, signView } from './mixins/functions'
         $item.show();
         $bankCard.text(card)
         $bankName.text(name)
-
     }
 
     const banl_list = () => {
-        return new Promise((resolve, reject)=>{
-            ajax({
-                url:'/api/pay/cnp/list_new/',
-                type: 'POST',
-                success(result){
-                    $('.recharge-loding').hide()
-                    if(result.ret_code === 0 ){
-                        resolve(result.cards)
-                    }
-
-                    if (result.ret_code > 0 && result.ret_code != 20071) {
-                        return reject(data.message);
-                    }
-                },
-                error(result){
-                    reject('系统异常，请稍后再试')
+        ajax({
+            url:'/api/pay/cnp/list_new/',
+            type: 'POST',
+            success(result){
+                $('.recharge-loding').hide()
+                if(result.ret_code === 0 ){
+                    result.length === 0 ? $('.unbankcard').show() : $('.bankcard').show();
                 }
-            })
+
+                if (result.ret_code > 0 && result.ret_code != 20071) {
+                    return ui_signError(data.message);
+                }
+            },
+            error(result){
+                ui_signError('系统异常，请稍后再试')
+            }
         })
     }
 
@@ -78,14 +75,14 @@ import { ajax, signView } from './mixins/functions'
             },
             success: function (results) {
                 if (results.ret_code > 0) {
-                    return signView(results.message);
+                    return ui_signError(results.message);
                 } else {
-                   return signView('充值成功')
+                   return ui_signError('充值成功')
                 }
             },
             error: function (results) {
                 if (results.status >= 403) {
-                    signView('服务器繁忙，请稍后再试');
+                    ui_signError('服务器繁忙，请稍后再试');
                 }
             },
             complete: function () {
@@ -95,38 +92,25 @@ import { ajax, signView } from './mixins/functions'
     }
 
     /**
-     * 判断有无同卡进出卡，有的话充值，没有做相应跳转
+     * 判断有无同卡进出卡，有的话充值，没有做相应处理
      */
     on_card()
         .then((result)=>{
             //有同卡
             on_card_operation(result);
         })
-        .catch((result)=>{
+        .catch(()=>{
             //无同卡
             return banl_list()
         })
-        .then((result)=>{
-            //有无银行卡
-            result.length === 0 ? $('.unbankcard').show() : $('.bankcard').show();
-        })
-        .catch((result)=>{
-            //banl_list 异常捕捉
-            if(result){
-                return signView(result)
-            }
-            return signView('系统异常')
 
-
-
-        })
 
     $submit.on('click', ()=> {
         var
             AMOUNT = $amount.val() * 1;
 
         if (AMOUNT == 0 || !AMOUNT) {
-            return signView('请输入充值金额')
+            return ui_signError('请输入充值金额')
         }
         const push_data = {
             phone: '',
@@ -134,7 +118,7 @@ import { ajax, signView } from './mixins/functions'
             amount: AMOUNT,
             gate_id: g_GATE_ID,
         }
-        confirm("充值金额为" + AMOUNT, '确认充值', recharge, push_data)
+        ui_confirm("充值金额为" + AMOUNT, '确认充值', recharge, push_data)
     })
 
 })()

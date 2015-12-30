@@ -4,7 +4,8 @@
  * @param text 文字说明
  * @param callback 回调函数
  */
-window.alert = function(text, callback){
+
+export const ui_alert = function(text, callback){
 
     const $alert =$('.fuel-alert'), $button =$('.fuel-submit');
 
@@ -23,7 +24,7 @@ window.alert = function(text, callback){
  * @param callback  回调函数
  * @param callbackData 回调函数的数据
  */
-window.confirm = function(title, certainName = '确定', callback = null, callbackData = null){
+export const ui_confirm = function(title, certainName = '确定', callback = null, callbackData = null){
     const $confirm = $('.confirm-warp')
     if($confirm.length <= 0 ) return
     $confirm.show();
@@ -42,4 +43,8 @@ window.confirm = function(title, certainName = '确定', callback = null, callba
     })
 }
 
-
+export const ui_signError = function (sign) {
+    $('.error-sign').html(sign).removeClass('moveDown').addClass('moveDown').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+        $(this).removeClass('moveDown');
+    });
+}

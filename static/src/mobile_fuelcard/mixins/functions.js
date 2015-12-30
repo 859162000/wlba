@@ -24,11 +24,7 @@ export const ajax = function (options) {
     });
 };
 
-export const signView = function (sign) {
-    $('.error-sign').html(sign).removeClass('moveDown').addClass('moveDown').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
-        $(this).removeClass('moveDown');
-    });
-}
+
 
 export const getCookie = function (name) {
     let cookie, cookies, i, cookieValue = null;

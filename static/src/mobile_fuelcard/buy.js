@@ -1,5 +1,5 @@
-import './mixins/ui'
-import { ajax, signView } from './mixins/functions'
+import {ui_alert, ui_confirm, ui_signError} from './mixins/ui'
+import { ajax } from './mixins/functions'
 import { check } from './mixins/check'
 
 
@@ -56,14 +56,14 @@ import { check } from './mixins/check'
                 $submit.attr('disabled', true).html('购买中...')
             },
             success(result){
-                return alert(`成功购买加油卡${result.data}元`, function(){
+                return ui_alert(`成功购买加油卡${result.data}元`, function(){
                     const url  = window.location.href;
                     window.location.href = url;
                 })
             },
             error(result){
                 const data = JSON.parse(result.responseText);
-                return signView(data.message)
+                return ui_signError(data.message)
             },
             complete(){
                 $submit.removeAttr('disabled').html('确认购买并支付')
@@ -81,17 +81,16 @@ import { check } from './mixins/check'
 
     $submit.on('click', function () {
         const
-            p_id = $(this).attr('data-id'),
-            [p_parts, amount] = math.get_proerty();
+            p_id = $(this).attr('data-id'), [p_parts, amount] = math.get_proerty();
 
-        if (balance < amount) return signView('余额不足！')
+        if (balance < amount) return ui_signError('余额不足！')
 
         const push_data = {
             'p_id': p_id,
             'p_parts': p_parts,
             'amount': amount
         }
-        confirm("购买金额为" + amount, '确认购买', but_operation, push_data)
+        ui_confirm("购买金额为" + amount, '确认购买', but_operation, push_data)
     })
 
 })()

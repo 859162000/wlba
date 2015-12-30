@@ -6,6 +6,8 @@ webpackJsonp([1],[
 
 	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
 
+	var _ui = __webpack_require__(2);
+
 	var _automatic_detection = __webpack_require__(5);
 
 	var _functions = __webpack_require__(3);
@@ -48,7 +50,7 @@ webpackJsonp([1],[
 
 	            if (isThrough) return resolve('验证成功');
 
-	            (0, _functions.signView)(sign);
+	            (0, _ui.ui_signError)(sign);
 	            return console.log('验证失败');
 	        });
 	    };
@@ -88,12 +90,12 @@ webpackJsonp([1],[
 	            window.location.href = '/fuel_card/index/';
 	        }).catch(function (res) {
 	            if (res['status'] == 403) {
-	                (0, _functions.signView)('请勿重复提交');
+	                (0, _ui.ui_signError)('请勿重复提交');
 	                return false;
 	            }
 	            var data = JSON.parse(res.responseText);
 	            for (var key in data) {
-	                data['__all__'] ? (0, _functions.signView)(data['__all__'][0]) : (0, _functions.signView)(data[key][0]);
+	                data['__all__'] ? (0, _ui.ui_signError)(data['__all__'][0]) : (0, _ui.ui_signError)(data[key][0]);
 	            }
 	        });
 	    });

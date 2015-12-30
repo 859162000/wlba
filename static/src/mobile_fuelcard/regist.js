@@ -1,6 +1,6 @@
-import './mixins/ui'
+import { ui_alert, ui_signError, ui_confirm} from './mixins/ui'
 import { Automatic } from './mixins/automatic_detection'
-import { ajax, signView } from './mixins/functions'
+import { ajax } from './mixins/functions'
 import { check } from './mixins/check'
 import { validation } from './mixins/validation'
 
@@ -64,7 +64,7 @@ import { validation } from './mixins/validation'
             const [isThrough, sign]  = checkOperation();
             if (isThrough) return resolve('验证成功');
 
-            signView(sign);
+            ui_signError(sign);
             return console.log('验证失败');
         })
     }
@@ -109,20 +109,20 @@ import { validation } from './mixins/validation'
             .then((result)=> {
                 console.log('register success');
                 if (result.ret_code === 0) {
-                    alert('注册成功', ()=> {
+                    ui_alert('注册成功', ()=> {
                         window.location.href= '/fuel/regist/authentication/';
                     });
                 }
                 if (result.ret_code > 0) {
-                    signView(result.message)
+                    ui_signError(result.message)
                 }
             })
             .catch((xhr) => {
                 var result = JSON.parse(xhr.responseText);
                 if (xhr.status === 429) {
-                    signView('系统繁忙，请稍候重试')
+                    ui_signError('系统繁忙，请稍候重试')
                 } else {
-                    signView(result.message);
+                    ui_signError(result.message);
                 }
             })
     });

@@ -1,5 +1,6 @@
+import { ui_alert, ui_signError, ui_confirm} from './mixins/ui'
 import { Automatic } from './mixins/automatic_detection'
-import { ajax, signView } from './mixins/functions'
+import { ajax } from './mixins/functions'
 import { check } from './mixins/check'
 import { validation } from './mixins/validation'
 
@@ -37,7 +38,7 @@ import { validation } from './mixins/validation'
                     $bank.append(_appendBanks(results.banks));
                     window.localStorage.setItem('bank', content);
                 } else {
-                    return signView(results.message);
+                    return ui_signError(results.message);
                 }
             },
             error: function (data) {
@@ -116,7 +117,7 @@ import { validation } from './mixins/validation'
             const [isThrough, sign]  = checkOperation();
             if (isThrough) return resolve('验证成功');
 
-            signView(sign);
+            ui_signError(sign);
             return console.log('验证失败');
         })
     }
@@ -137,14 +138,14 @@ import { validation } from './mixins/validation'
                 },
                 success(results){
                     if (results.ret_code === 0) {
-                        signView(results.message)
+                        ui_signError(results.message)
                         $("input[name='order_id']").val(results.order_id);
                         $("input[name='token']").val(results.token);
                         return resolve('短信已发送，请注意查收！');
                     }
 
                     if (results.ret_code > 0) {
-                        signView(results.message)
+                        ui_signError(results.message)
                         return reject('获取短信验证码错误');
                     }
 
@@ -169,7 +170,7 @@ import { validation } from './mixins/validation'
                 } else {
                     clearInterval(intervalId);
                     $validate_operation.text('重新获取').removeAttr('disabled');
-                    signView('倒计时失效，请重新获取')
+                    ui_signError('倒计时失效，请重新获取')
                     return reject('倒计时失效，请重新获取')
                 }
             };
@@ -212,7 +213,7 @@ import { validation } from './mixins/validation'
             const [isThrough, sign]  = checkOperation();
             if (isThrough) return resolve('验证成功');
 
-            signView(sign);
+            ui_signError(sign);
             return console.log('验证失败');
         })
     }
@@ -236,9 +237,9 @@ import { validation } from './mixins/validation'
                 success(data){
                     if (data.ret_code > 0) {
                         reject(data.message)
-                        return signView(data.message);
+                        return ui_signError(data.message);
                     } else {
-                        return alert('恭喜你，绑卡成功！', () => {
+                        return ui_alert('恭喜你，绑卡成功！', () => {
                             resolve(data.message)
                             window.location.href = '/fuel/regist/end/';
                         });

@@ -7,9 +7,12 @@ html
     .fuel-activity-banner
       img(src='/static/imgs/mobile_fuelcard/activity/banner.png')
 
-    .fuel-activity-submit-warp
-      button(type='submit').fuel-password-submit 理财得加油卡｜立即获取
-
+    if user.is_authenticated
+      .fuel-activity-submit-warp
+        a(href="/fuel_card/index/").fuel-password-submit 理财得加油卡｜立即获取
+    else
+      .fuel-activity-submit-warp
+        a(href="/fuel_card/login/?next=/fuel_card/index/").fuel-password-submit 理财得加油卡｜立即获取
     .fuel-safe-green
       span 账户资金安全由平安银行承保
 
