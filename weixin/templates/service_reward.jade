@@ -33,33 +33,34 @@ html
           if packages
             each pack in packages
               .reward-card-list
+                className = status
                 if pack.method == '~'
-                  .reward-card-parent(class='{{status}}')
+                  className = status
                 else
-                  .reward-card-parent(class='{{status}} red-packet')
-                    .reward-explain
-                      .reward-name {{pack.name}}
-                      if pack.method == '*'
-                        .reward-scope 抵扣投资额{{pack.amount | percentage_number_two}}%
-                      else
-                        if pack.invest_amount == 0
-                          .reward-scope 无门槛
-                        else
-                          .reward-scope {{pack.invest_amount}}元起用
-
-                      .reward-period {{pack.available_at | milldate_format}} 至 {{pack.unavailable_at | milldate_format}}
-
-                    if pack.method == '-'
-                      amount = int(pack['amount'])
-                      .reward-amount {{amount }}
-                        em 元
-                    elif pack.method == '*'
-                      highest = int(pack['highest_amount'])
-                      .reward-amount {{highest }}
-                        em 元
+                  className = status+" red-packet"
+                .reward-card-parent(class='{{className}}')
+                  .reward-explain
+                    .reward-name {{pack.name}}
+                    if pack.method == '*'
+                      .reward-scope 抵扣投资额{{pack.amount | percentage_number_two}}%
                     else
-                      .reward-amount {{pack.amount | percentage_number_two}}
-                        em %
+                      if pack.invest_amount == 0
+                        .reward-scope 无门槛
+                      else
+                        .reward-scope {{pack.invest_amount}}元起用
+
+                    .reward-period {{pack.available_at | milldate_format}} 至 {{pack.unavailable_at | milldate_format}}
+                  if pack.method == '-'
+                    amount = int(pack['amount'])
+                    .reward-amount {{amount }}
+                      em 元
+                  elif pack.method == '*'
+                    highest = int(pack['highest_amount'])
+                    .reward-amount {{highest }}
+                      em 元
+                  else
+                    .reward-amount {{pack.amount | percentage_number_two}}
+                      em %
           else
             .reward-default
               img(src='/static/imgs/mobile/reward/reward_default.png')
