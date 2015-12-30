@@ -291,7 +291,7 @@ class RevenueExchangeBuyRecordView(TemplateView):
             ua_list.append(ua_tmp)
             for ua in user_amotization:
                 if ua.product_amortization.product != ua_tmp.product_amortization.product:
-                    ua_list.append(ua_tmp)
+                    ua_list.append(ua)
                     ua_tmp = ua
 
         return get_sorts_for_created_time(ua_list)
