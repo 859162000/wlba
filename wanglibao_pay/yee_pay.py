@@ -615,7 +615,8 @@ class YeeShortPay:
         if len(str(amount)) > 20:
             return {"ret_code": 20115, 'message': '充值金额太大'}
 
-        if amount < 0.01:
+        if amount < 0.009:
+            # 涉及到小数精度，不能用0.01
             return {"ret_code": 20115, 'message': '充值金额太小（至少0.01元）'}
 
         user = request.user
