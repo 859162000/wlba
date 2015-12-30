@@ -2094,11 +2094,11 @@ function closePage(){
     var unbindf = false;
     function unbingFun(){
         unbindf = true;
-        var openid = $("#openid").val();
+        //var openid = $("#openid").val();
         org.ajax({
             type: "post",
             url: "/weixin/api/unbind/",
-            data: {"openid":openid},
+            //data: {"openid":openid},
             dataType: "json",
             success: function (data) {
                 //console.log(data);
