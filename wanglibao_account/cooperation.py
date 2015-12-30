@@ -435,6 +435,24 @@ class CoopRegister(object):
             logger.exception('%s click process error' % channel_code)
             logger.info(e)
 
+    def binding_for_after_register(self, user):
+        """
+        处理注册之后的第三方用户渠道绑定关系
+        :param user:
+        :return:
+        """
+        pass
+
+    def process_after_binding(self, user):
+        try:
+            channel_processor = self.get_user_channel_processor(user)
+            if channel_processor:
+                channel_processor.binding_for_after_register(user)
+                return
+        except:
+            logger.exception('process after binding error for user %s' % user.id)
+
+
 class TianMangRegister(CoopRegister):
     def __init__(self, request):
         super(TianMangRegister, self).__init__(request)
@@ -1297,7 +1315,7 @@ class XunleiVipRegister(CoopRegister):
         logger.info("xunlei9 binding faild with user[%s], channel_user[%s], channel_name[%s]" %
                     (user.id, channel_user, channel_name))
 
-    def process_for_register(self, user, invite_code):
+    def binding_for_after_register(self, user):
         """
         用户可以在从渠道跳转后的注册页使用邀请码，优先考虑邀请码
         """
@@ -1310,17 +1328,11 @@ class XunleiVipRegister(CoopRegister):
         if xunleivip_generate_sign(data, self.coop_register_key) == self.channel_sign:
             self.is_xunlei_user = True
 
-        # 处理渠道用户注册或更新渠道用户绑定状态
-        binding = Binding.objects.filter(user_id=user.id).first()
-        introduced_by = IntroducedBy.objects.filter(user_id=user.id).select_related('channel').first()
-        if not (binding and introduced_by):
-            # 处理新用户注册
-            self.save_to_introduceby(user, invite_code)
-            if self.is_xunlei_user and self.save_to_binding(user):
-                self.register_call_back(user)
-        elif not binding and self.is_xunlei_user and introduced_by and introduced_by.channel.code == invite_code:
-            # 处理老用户绑定状态
-            if self.save_to_binding(user):
+        # 处理渠道用户绑定状态
+        channel = get_user_channel_record(user.id)
+        if self.is_xunlei_user and channel and channel.code == self.c_code:
+            binding = Binding.objects.filter(user_id=user.id).first()
+            if not binding and self.save_to_binding(user):
                 # 处理渠道用户注册回调
                 self.register_call_back(user)
 
