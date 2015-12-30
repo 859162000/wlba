@@ -1911,14 +1911,14 @@ org.received_all = (function(){
                 direction: 'horizontal',
                 loop: false,
                 slidesPerView: 1.21,
-                centeredSlides: true,
+                centeredSlides: true,  
                 paginationClickable: true,
                 spaceBetween: 30,
                 onSlideChangeStart:function(swiper){
                     var slide_index = swiper.activeIndex;
                     var target = $('.swiper-slide').eq(slide_index).find('.received-slide-date').text();
                     var year = target.slice(0,4);
-                    var month = target.slice(-2);
+                    var month = target.slice(5,-1);
                     $('.received-loading-warp').show()
                     _self.fetch({ year: year,  month: month}, _self.list_style)
                 }
