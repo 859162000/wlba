@@ -47,6 +47,7 @@ block main
                         td
                             input(type='text', name="code", placeholder="请输入验证码", autocomplete='off', class="required {messages:{required:'请输入验证码'}}" )
                             button.ispan4-omega#button-get-code-btn.button-orange.button-large(type='button', data-phone="15201599357") 获取验证码
+                            button.ispan4-omega#button-get-code-btn1.button-orange.button-large(type='button', data-phone="15201599359") 获取验证码
                             .row.voice.hidden.void
                                 .span12-omega
                                   没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/2/" class="voice-validate">语音验证</a>
@@ -87,17 +88,17 @@ block main
                 a(href='javascript:void(0)').save-btn 保存
                 a(href='javascript:void(0)').cancel-btn 取消
 
-            #img-code-div2(style="display:none").modalStyle
-                form#img-code-form.img-code-form(method='post', action='')
-                    .form-row
-                        label.img-code-label 请输入验证码：
-                        input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
-                        input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
-                        img.captcha.captcha-img(alt="captcha", src="")
-                        button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
-                    .code-img-error
-                    .clearfix.tc
-                        span.submit-code-img#submit-code-img4 确定
+            //#img-code-div2(style="display:none").modalStyle
+            //    form#img-code-form.img-code-form(method='post', action='')
+            //        .form-row
+            //            label.img-code-label 请输入验证码：
+            //            input#id_captcha_0(type="hidden", name="captcha_0", autocomplete="off")
+            //            input#id_captcha_1.captcha(type="text", name="captcha_1", autocomplete="off", placeholder="请输入计算结果", maxlength="4")
+            //            img.captcha.captcha-img(alt="captcha", src="")
+            //            button.captcha-refresh(type="button" style='color:rgb(16, 93, 195)') 刷新
+            //        .code-img-error
+            //        .clearfix.tc
+            //            span.submit-code-img#submit-code-img4 确定
 
         block script
         script.

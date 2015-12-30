@@ -1,4 +1,4 @@
- define(['jquery'], function ($) {
+ define(['jquery', 'tools'], function ($, tool) {
     var sendSMSCode ={}
     jQuery.extend(sendSMSCode, {
         defaults :{
@@ -7,7 +7,8 @@
         },
         initFun : function(){
             //获取图片验证码弹框
-            var alertSter = '<div id="img-code-div" class="modalStyle modal">'
+            if($('#img-code-div').length == 0){
+                var alertSter = '<div id="img-code-div" class="modalStyle modal">'
                           +'<div class="form-row">'
                           +'<label class="img-code-label">请输入验证码：</label>'
                           +'<input type="hidden" id="id_captcha_0" name="captcha_0" autocomplete="off" value="">'
@@ -15,19 +16,20 @@
                           +'<img alt="captcha" src="" class="captcha captcha-img">'
                           +'<button type="button" style="color:rgb(16, 93, 195)" class="captcha-refresh">刷新</button>'
                           +'</div><div class="code-img-error"></div><div class="clearfix tc"><span id="submit-code-img" class="submit-code-img">确定</span></div></div>'
-            $('body').append(alertSter);
+                $('body').append(alertSter);
+            }
         },
         sendImgCode : function(){  //弹框
             $submit = $('#'+this.defaults.sendCodeBtn);
             $submit.on('click',function(){
                 $('#img-code-div').modal();
                 $('#img-code-div').find('#id_captcha_1').val('');
-                this.captchaRefresh();
+                sendSMSCode.captchaRefresh();
             })
         },
         captchaRefreshClick : function(){
             $('#img-code-div').delegate('.captcha-refresh','click',function() {
-                this.captchaRefresh();
+                sendSMSCode.captchaRefresh();
             })
         },
         captchaRefresh : function(){         //刷新验证码
@@ -38,6 +40,7 @@
             });
         },
         sendValidateCode : function(){
+            var self = this;
             $('#submit-code-img').on('click',function(){
                 var captcha_0, captcha_1, count, element, intervalId, phoneNumber, timerFunction, par;
                 element = $('#'+self.defaults.sendCodeBtn);
@@ -63,7 +66,7 @@
                       $("#submit-code-img").parent().parent().find('.code-img-error').html(result.message);
                     } else {
                       if (xhr.status >= 400) {
-                        return tool.modalAlert({
+                        tool.modalAlert({
                           title: '温馨提示',
                           msg: result.message
                         });
@@ -95,7 +98,12 @@
             })
         },
         setup : function(options){  //初始化
-            this.sendCodeBtn = options.sendCodeBtn;
+            var self = this;
+            if(typeof(options)!='undefined'){
+                self.sendSMSCodeInit = $.extend(self.sendSMSCodeInit,options);
+                self.defaults = $.extend(self.defaults,options);
+            }
+
             this.initFun();
             this.sendImgCode();
             this.captchaRefreshClick();
@@ -106,7 +114,7 @@
         }
     })
     return {
-
+        sendSMSCode : sendSMSCode
     }
 
 

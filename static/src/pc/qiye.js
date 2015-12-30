@@ -19,7 +19,15 @@ require.config({
     }
 });
 
-require(['jquery', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/modal', 'tools', 'jquery.webuploader' ,'upload', 'csrf', 'code'], function ($, form ,validate, placeholder, modal, tool, webuploader) {
+require(['jquery', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/modal', 'tools', 'jquery.webuploader' ,'code', 'upload', 'csrf'], function ($, form ,validate, placeholder, modal, tool, webuploader, code) {
+
+    code.sendSMSCode.sendSMSCodeInit({
+        sendCodeBtn :'button-get-code-btn'
+    })
+
+    code.sendSMSCode.sendSMSCodeInit({
+        sendCodeBtn :'button-get-code-btn1'
+    })
 
     //提交表单
     var qiyeFormValidate = $('#qiyeForm').validate({});
