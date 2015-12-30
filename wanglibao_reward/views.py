@@ -1148,6 +1148,14 @@ class XunleiActivityAPIView(APIView):
 
                 return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
+            if not self.introduced_by_with(request.user.id, 'xunlei9', "2015-12-29"):
+                json_to_response = {
+                    'code': 1005,
+                    'lefts': 0,
+                    'message': u'用户不是在活动期内从迅雷渠道过来的用户'
+                }
+                return HttpResponse(json.dumps(json_to_response), content_type='applicaton/json')
+
             if not self.has_generate_reward_activity(request.user.id, self.activity_name):
                 self.generate_reward_activity(request.user)
 
