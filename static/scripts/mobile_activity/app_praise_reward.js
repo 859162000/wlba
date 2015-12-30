@@ -219,7 +219,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 })();
 ;(function(org) {
 
-	alert($(window).width());
+	//alert($(window).width());
 
 	/*滚动图*/
 	function mycarousel_initCallback(carousel) {
@@ -250,6 +250,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		});
 	})
 	/*滚动图结束*/
+
 
 
 
