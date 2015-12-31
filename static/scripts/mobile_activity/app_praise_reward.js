@@ -286,6 +286,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		$(this).hide();
 	});
 
+	$('.renovate').click(function(){
+		$(this).addClass('')
+	});
+
 
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({
