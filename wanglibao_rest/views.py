@@ -993,6 +993,30 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response({'token': "false"}, status=status.HTTP_200_OK)
 
+def get_public_statistics():
+    today = datetime.now()
+    today_start = local_to_utc(datetime(today.year, today.month, today.day), 'min')
+
+    today_user = User.objects.filter(date_joined__gte=today_start).aggregate(Count('id'))
+    today_amount = P2PRecord.objects.filter(create_time__gte=today_start, catalog='申购').aggregate(Sum('amount'))
+    today_num = P2PRecord.objects.filter(create_time__gte=today_start, catalog='申购').values('id').count()
+
+    all_user = User.objects.all().aggregate(Count('id'))
+    all_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))
+    all_num = P2PRecord.objects.filter(catalog='申购').values('id').count()
+
+    data = {
+        'today_num': today_num,
+        'today_user': today_user['id__count'],
+        'today_amount': today_amount['amount__sum'],
+
+        'all_num': all_num,
+        'all_user': all_user['id__count'],
+        'all_amount': all_amount['amount__sum'],
+    }
+
+    return data
+
 
 class Statistics(APIView):
     """
@@ -1001,26 +1025,7 @@ class Statistics(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        today = datetime.now()
-        today_start = local_to_utc(datetime(today.year, today.month, today.day), 'min')
-
-        today_user = User.objects.filter(date_joined__gte=today_start).aggregate(Count('id'))
-        today_amount = P2PRecord.objects.filter(create_time__gte=today_start, catalog='申购').aggregate(Sum('amount'))
-        today_num = P2PRecord.objects.filter(create_time__gte=today_start, catalog='申购').values('id').count()
-
-        all_user = User.objects.all().aggregate(Count('id'))
-        all_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))
-        all_num = P2PRecord.objects.filter(catalog='申购').values('id').count()
-
-        data = {
-            'today_num': today_num,
-            'today_user': today_user['id__count'],
-            'today_amount': today_amount['amount__sum'],
-
-            'all_num': all_num,
-            'all_user': all_user['id__count'],
-            'all_amount': all_amount['amount__sum'],
-        }
+        data = get_public_statistics()
 
         return Response(data, status=status.HTTP_200_OK)
 
@@ -1079,9 +1084,10 @@ class StatisticsInside(APIView):
               "AND a.catalog='申购';".format(start_fmt, end_fmt, start_fmt, end_fmt)
         cursor.execute(sql)
         fetchone = cursor.fetchone()
-        print fetchone
 
         yesterday_new_amount = fetchone[0] if fetchone[0] else 0
+
+        # 公共数据
 
         data = {
             'today_repayment_total': today_repayment_total,  # 今日还款额
@@ -1089,6 +1095,8 @@ class StatisticsInside(APIView):
             'yesterday_repayment_total': yesterday_repayment_total,  # 昨日还款额
             'yesterday_new_amount': yesterday_new_amount  # 昨日新用户投资金额
         }
+
+        data.update(get_public_statistics())
 
         return Response(data, status=status.HTTP_200_OK)
 
