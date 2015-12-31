@@ -14,7 +14,6 @@ html
       .fuel-save-date {{register_time | date:"Y-m-d" }} 注册至今累计节省
 
     .fuel-statistics-item
-
       if data
         each product in data
           .fuel-statistics-list
@@ -26,26 +25,4 @@ html
               .product-dec 生效/购买
             .product-save
               .product-save-amount {{product.total_revenue}}
-              .product-dec 节省(元)
-
-          //.fuel-statistics-list
-            .product-type
-              .product-type-name.product-yellow 中级理财加油卡
-              .product-dec 产品类型
-            .product-buy
-              .product-buy-number 2/3
-              .product-dec 产品类型
-            .product-save
-              .product-save-amount 200
-              .product-dec 节省(元)
-
-          //.fuel-statistics-list
-            .product-type
-              .product-type-name.product-red 高级理财加油卡
-              .product-dec 产品类型
-            .product-buy
-              .product-buy-number 2/3
-              .product-dec 产品类型
-            .product-save
-              .product-save-amount 200
               .product-dec 节省(元)
