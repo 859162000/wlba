@@ -4,7 +4,7 @@ html(style="background: #3a2741")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=123005", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=123006", rel="stylesheet")
         - csrf_token
     body
         .body_wrap
@@ -18,8 +18,11 @@ html(style="background: #3a2741")
                     .reward_wrap
                         img.gold(src="/static/imgs/mobile_activity/app_praise_reward/gold.png")
                         .text 年终奖
-                        input(type='text' value='{{wx_user.annual_bonus}}')
+                        .input_wrap
+                            input#praise_num(type='text' readonly='readonly' value='{{wx_user.annual_bonus}}')
+                            span.num_top 已封顶
                         img.renovate.renovate_rotate(src="/static/imgs/mobile_activity/app_praise_reward/renovate.png")
+
                     .praise_wrap
                         .praise.praise_left
                             img.bg(src="/static/imgs/mobile_activity/app_praise_reward/praise_button.png")
@@ -36,7 +39,7 @@ html(style="background: #3a2741")
                             .now_use 立即使用
                     else
                         .take_mine_reward
-                            input.phone(type='text' placeholder='请输入手机号')
+                            input.phone#phone_number(type='text' placeholder='请输入手机号')
                             .take_mine_button 领取我的年终奖
                     .checkbox_wrap
                         span.checkbox.checkbox_select 我
@@ -83,10 +86,11 @@ html(style="background: #3a2741")
                 .title 助力好友年终奖，你也可以领
                 .text 够努力，够会赚 ，赞TA<br>还需要继续努力，差评
             .friend_top
-                span.text 您的朋友已获取全额年终奖
+                .main
+                    .text 您的朋友已获取全额年终奖
+                        img.close(src="/static/imgs/mobile_activity/app_praise_reward/close.png")
 
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/jquery.min.js')
         script(src='/static/js/lib/jquery.jcarousel.min.js')
         script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=123001")
-        script.
