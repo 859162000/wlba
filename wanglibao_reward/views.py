@@ -1211,9 +1211,14 @@ class XunleiActivityAPIView(APIView):
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
 from wanglibao_reward.models import WeixinAnnualBonus, WeixinAnnulBonusVote
-class WeixinAnnualBonusView(LowBaseWeixinTemplate):
+class WeixinAnnualBonusView(TemplateView):
+    openid = ''
+    nick_name = ''
+    head_img = ''
+    url_name = ''
+    wx_classify = 'fwh'
     url_name = "weixin_annual_bonus"
-    template_name = 'app_praise_reward_go.jade'
+    template_name = 'app_praise_reward.jade'
 
     def __init__(self):
         self.from_openid = ''
@@ -1230,14 +1235,17 @@ class WeixinAnnualBonusView(LowBaseWeixinTemplate):
         self.vote_fileds_filter = [ 'from_nickname', 'from_headimgurl', 'is_good_vote', 'create_time' ]
 
     def dispatch(self, request, *args, **kwargs):
-        self.openid = "333222111"
-        self.openid = self.request.GET.get('wxid', "333222111")
+        #self.openid = "333222111"
+        wxid = self.request.GET.get('wxid')
+        if wxid:
+            self.openid = wxid
         if not self.openid:
-            super(WeixinAnnualBonusView, self).getOpenid(request, *args, **kwargs)
+            #super(WeixinAnnualBonusView, self).getOpenid(request, *args, **kwargs)
+            self.openid = self.getOpenid(request, *args, **kwargs)
         self.from_openid = self.openid
         if not self.from_openid:
             #TODO: 转错误页面
-            pass
+            return super(WeixinAnnualBonusView, self).dispatch(request, *args, **kwargs)
 
         self.to_openid = self.request.GET.get('uid', None)
         if not self.to_openid:
@@ -1263,6 +1271,7 @@ class WeixinAnnualBonusView(LowBaseWeixinTemplate):
 
     def get_context_data(self, **kwargs):
         if not self.to_openid:
+            self.template_name = 'app_praise_reward.jade'
             return { 'err_code':101, 'err_messege':u'获取受评用户失败' }
         wx_user = WeixinAnnualBonus.objects.filter(openid=self.to_openid).first()
         #wx_user = None
@@ -1420,4 +1429,43 @@ class WeixinAnnualBonusView(LowBaseWeixinTemplate):
     def visit_bonus(self):
         pass
 
+    def getAccountid(self):
+        m = Misc.objects.filter(key='weixin_qrcode_info').first()
+        if m and m.value:
+            info = json.loads(m.value)
+            if info.get(self.wx_classify):
+                return info.get(self.wx_classify)
+
+    def getOpenid(self, request, *args, **kwargs):
+        account_id = self.getAccountid()
+        redirect_uri = settings.CALLBACK_HOST + reverse(self.url_name)
+        self.openid = self.request.session.get('WECHAT_OPEN_ID', None)
+        if not self.openid:
+            self.openid = self.request.GET.get('openid', None)
+            if self.openid:
+                self.request.session['WECHAT_OPEN_ID'] = self.openid
+            else:
+                redirect_url = reverse('weixin_authorize_code')+'?state=%s&redirect_uri=%s' % (account_id, redirect_uri)
+                return HttpResponseRedirect(redirect_url)
+
+        w_user = WeixinUser.objects.filter(openid=self.openid).first()
+        if not w_user:
+            #TODO:
+            pass
+
+        if not w_user.nickname or not w_user.headimgurl :
+            res = requests.request(
+                method='get',
+                url=settings.CALLBACK_HOST + reverse('weixin_get_user_info')+'?openid=%s'%self.openid,
+            )
+            result = res.json()
+            if result.get('errcode'):
+                redirect_url = reverse('weixin_authorize_code')+'?state=%s&auth=1&redirect_uri=%s' % (account_id, redirect_uri)
+                return HttpResponseRedirect(redirect_url)
+
+        self.nick_name = w_user.nickname
+        self.head_img = w_user.headimgurl
+
+        return self.openid
+        #return super(LowBaseWeixinTemplate, self).dispatch(request, *args, **kwargs)
 
