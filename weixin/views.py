@@ -11,6 +11,7 @@ from django.db.models.signals import post_save, pre_save
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils import timezone
+from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated
 import functools
 import re
@@ -871,6 +872,7 @@ class P2PDetailView(TemplateView):
         amount = self.request.GET.get('amount', 0)
         amount_profit = self.request.GET.get('amount_profit', 0)
         next = self.request.GET.get('next', '')
+        cards = Card.objects.filter(user=self.request.user).filter(Q(is_bind_huifu=True)|Q(is_bind_kuai=True)|Q(is_bind_yee=True))# Q(is_bind_huifu=True)|)
         context.update({
             'p2p': p2p,
             'end_time': end_time,
@@ -886,6 +888,7 @@ class P2PDetailView(TemplateView):
             'next': next,
             'amount_profit': amount_profit,
             'id_is_valid':id_is_valid,
+            'card_is_bind':cards.exists()
         })
 
         return context
