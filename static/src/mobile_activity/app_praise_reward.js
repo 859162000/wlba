@@ -67,6 +67,10 @@
 		$(this).hide();
 	});
 
+	$('.renovate').click(function(){
+		$(this).addClass('')
+	});
+
 
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({

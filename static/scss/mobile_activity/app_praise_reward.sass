@@ -164,6 +164,27 @@
           display: block
           float: right
           margin: 0.7rem 3.3% 0 0
+        .renovate_rotate
+          -webkit-animation-name: rotate_ico
+          animation-name: rotate_ico
+          -webkit-animation-timing-function: linear
+          animation-timing-function: linear
+          -webkit-animation-fill-mode: both
+          animation-fill-mode: both
+        @keyframes rotate_ico
+          0%
+            transfrom: rotate(0deg)
+          50%
+            transform: rotate(180deg)
+          100%
+            transform: rotate(360deg)
+        @-webkit-keyframes rotate_ico
+          0%
+            -webkit-transfrom: rotate(0deg)
+          50%
+            -webkit-transform: rotate(180deg)
+          100%
+            -webkit-transform: rotate(360deg)
     .praise_wrap
       clear: both
       width: 92%
