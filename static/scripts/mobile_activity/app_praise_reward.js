@@ -252,6 +252,39 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	/*滚动图结束*/
 
 
+	//$.ajax({
+	//	url: 'weixin_activity/weixin/bonus/?uid=',
+	//	type: "POST",
+	//	data: {
+	//		//action : 'AWARD_DONE'
+	//	}
+	//}).done(function (xhr) {
+	//
+	//});
+
+	$('#get_phone').val();
+	//得到手机号
+
+	var is_myself = false;
+
+	$('#go_receive').click(function(){
+		$('.praise_wrap').hide();
+		$('.invitation_page').show();
+		if(is_myself){
+			$('.take_mine_reward').show();
+
+		}else{
+			$('.step_me').show();
+		}
+	});
+	//去领取按钮
+
+	$('.share_button').click(function(){
+		$('.share_wrap').show();
+	});
+	$('.share_wrap').click(function(){
+		$(this).hide();
+	});
 
 
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
@@ -274,8 +307,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	wx.ready(function(){
 		var host = 'https://www.wanglibao.com/',
 			shareName = '双旦来了，翻倍狂欢',
-			shareImg = host + '/static/imgs/mobile_activity/app_double_dan/300x300.jpg',
-			shareLink = host + '/activity/app_double_dan/',
+			shareImg = host + '/static/imgs/mobile_activity/app_praise_reward/300*300.jpg',
+			shareLink = host + '/activity/app_praise_reward/',
 			shareMainTit = '双旦来了，翻倍狂欢',
 			shareBody = '红包、加息券、体验金全部翻倍送、实物大奖同台登场，年底倾囊N重回馈。';
 		//分享给微信好友

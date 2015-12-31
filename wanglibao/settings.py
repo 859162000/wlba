@@ -688,11 +688,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'experience_gold.tasks.experience_repayment_plan',
         'schedule': timedelta(minutes=5),
     },
-    # # by Zhoudong 定期检查用户优惠券没使用,发送提醒
-    # 'redpack_status_task_check': {
-    #     'task': 'marketing.tools.check_redpack_status',
-    #     'schedule': crontab(minute=0, hour=11),
-    # },
+    # 定期检查还有3天到期的用户优惠券,发送提醒
+    'redpack_status_task_check': {
+        'task': 'marketing.tools.check_unavailable_3_days',
+        'schedule': crontab(minute=0, hour=11),
+    },
 }
 
 # CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
