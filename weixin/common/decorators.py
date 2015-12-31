@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect
 from wechatpy.exceptions import WeChatException
 from weixin.models import WeixinAccounts
 from wanglibao_pay.models import Card
+from django.db.models import Q
 import logging
 logger = logging.getLogger("weixin")
 def weixin_api_error(f):
@@ -48,7 +49,8 @@ def is_check_id_verify(is_check):
                 wanglibaoprofile = self.request.user.wanglibaouserprofile
                 if not wanglibaoprofile.id_is_valid:
                     return HttpResponseRedirect("/weixin/sub_regist_first/")
-                cards = Card.objects.filter(user=self.request.user)
+
+                cards = Card.objects.filter(user=self.request.user).filter(Q(is_bind_huifu=True)|Q(is_bind_kuai=True)|Q(is_bind_yee=True))# Q(is_bind_huifu=True)|)
                 if not cards.exists():
                     return HttpResponseRedirect("/weixin/sub_regist_second/")
             res = f(self, request, *args, **kwargs)

@@ -148,12 +148,10 @@ class AccountTemplate(TemplateView):
 class RechargeTemplate(TemplateView):
     def get_context_data(self, **kwargs):
         margin = self.request.user.margin.margin
-        banks = Bank.get_kuai_deposit_banks()
         return {
             'margin': margin if margin else 0.0,
-            'banks':banks
         }
-    
+
     @is_check_id_verify(True)
     def dispatch(self, request, *args, **kwargs):
         return super(RechargeTemplate, self).dispatch(request, *args, **kwargs)
