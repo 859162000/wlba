@@ -384,8 +384,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                     amortization.term_date = term[6]
                 else:
                     amortization.term_date = timezone.now()
-                print ">>>>>>>>>>>>>>>>", product_type.name, type(product_type.name)
-                print self.RevenueExchangeType, type(self.RevenueExchangeType)
+
                 if product_type.name == self.RevenueExchangeType:
                     self.__generate_exchange_amortization(amortization)
 
@@ -402,7 +401,6 @@ class AmortizationKeeper(KeeperBaseMixin):
 
     def __generate_exchange_amortization(self, user_amo):
         # add by ChenWeiBin@20151224
-        print ">>>>>>>>>>>>>>>>>>>>>>>b"
         try:
             exchange_order = self.RevenueExchangeOrder.objects.filter(user=user_amo.user,
                                                                       product_id=self.product.id).first()
