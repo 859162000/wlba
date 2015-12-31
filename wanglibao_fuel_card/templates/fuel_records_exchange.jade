@@ -6,15 +6,21 @@ html
   body
     nav.records-nav
       ul
-        li.active
-          a(href="/fuel_card/exchange-record/receiving/") 待收
-        li
-          a(href="/fuel_card/exchange-record/exchanging/") 已收到未领取
+        if status  == 'receiving'
+          li.active
+            a(href="/fuel_card/exchange-record/receiving/") 待收
+          li
+            a(href="/fuel_card/exchange-record/exchanging/") 已收到未领取
+        else
+          li
+            a(href="/fuel_card/exchange-record/receiving/") 待收
+          li.active
+            a(href="/fuel_card/exchange-record/exchanging/") 已收到未领取
     .records-exchange-item
-      if exchange_amos
-        for list in exchange_amos
+      if data
+        for list in data
           .records-exchange-list
-            .records-card-date {{list.term_date | date:"Y-m-d"}}
-            .records-card-count 150元理财加油卡 x 1
+            .records-card-date {{list.exchange_time | date:"Y-m-d"}}
+            .records-card-count 150元理财加油卡 x {{list.exchange_parts}}
             //a(href='#').records-show-card 查看卡密
 

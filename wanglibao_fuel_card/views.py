@@ -376,6 +376,7 @@ class RevenueExchangeRecordView(TemplateView):
             product_class = classes_product_for_period(ea.product_amortization.product.period) or 'C'
             ea.class_name = get_class_name(product_class, l_type)
 
+        print  exchange_amos
         return {
             'data': exchange_amos,
             'status': p_status,
