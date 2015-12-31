@@ -1213,6 +1213,7 @@ class XunleiActivityAPIView(APIView):
 from wanglibao_reward.models import WeixinAnnualBonus, WeixinAnnulBonusVote
 class WeixinAnnualBonusView(LowBaseWeixinTemplate):
     url_name = "weixin_annual_bonus"
+    template_name = 'app_praise_reward_go.jade'
 
     def __init__(self):
         self.from_openid = ''
