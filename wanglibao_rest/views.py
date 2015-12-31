@@ -995,32 +995,18 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
 
 
 class Statistics(APIView):
+    """
+        数据统计,今日注册,投资等,总计注册,投资等
+    """
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
         today = datetime.now()
-        # tomorrow = today + timedelta(1)
-        # yesterday = today - timedelta(days=1)
         today_start = local_to_utc(datetime(today.year, today.month, today.day), 'min')
-        # yesterday_start = local_to_utc(datetime(yesterday.year, yesterday.month, yesterday.day), 'min')
-        # today_end = datetime.combine(tomorrow, time())
 
         today_user = User.objects.filter(date_joined__gte=today_start).aggregate(Count('id'))
         today_amount = P2PRecord.objects.filter(create_time__gte=today_start, catalog='申购').aggregate(Sum('amount'))
-        # yesterday_amount = P2PRecord.objects.filter(create_time__gte=yesterday_start, create_time__lt=today_start)\
-        #     .filter(catalog='申购').aggregate(Sum('amount'))
         today_num = P2PRecord.objects.filter(create_time__gte=today_start, catalog='申购').values('id').count()
-
-        # today_repayment = ProductAmortization.objects.filter(settled=True)\
-        #     .filter(settlement_time__gte=yesterday_start, settlement_time__lt=today_start)\
-        #     .aggregate(Sum('principal'), Sum('interest'))
-
-        # amount_sum_yesterday = yesterday_amount['amount__sum'] if yesterday_amount['amount__sum'] else Decimal('0')
-        # principal_sum = today_repayment['principal__sum'] if today_repayment['principal__sum'] else Decimal('0')
-        # interest_sum = today_repayment['interest__sum'] if today_repayment['interest__sum'] else Decimal('0')
-
-        # 昨日资金净流入
-        # today_inflow = amount_sum_yesterday - principal_sum - interest_sum
 
         all_user = User.objects.all().aggregate(Count('id'))
         all_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))
@@ -1034,8 +1020,70 @@ class Statistics(APIView):
             'all_num': all_num,
             'all_user': all_user['id__count'],
             'all_amount': all_amount['amount__sum'],
+        }
 
-            # 'today_inflow': today_inflow
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class StatisticsInside(APIView):
+    """
+        昨日还款额 = 昨日还款本金 + 昨日还款利息
+        昨日资金净流入 = 昨日投资额 - 昨日还款本金
+        昨日新用户投资金额 = 昨日首次投资用户的全天投资总额
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        today = datetime.now()
+        yesterday = today - timedelta(days=1)
+        today_start = local_to_utc(datetime(today.year, today.month, today.day), 'min')
+        yesterday_start = local_to_utc(datetime(yesterday.year, yesterday.month, yesterday.day), 'min')
+        start_fmt = yesterday_start.strftime('%Y-%m-%d %H:%M:%S')
+        end_fmt = today_start.strftime('%Y-%m-%d %H:%M:%S')
+
+        # 昨日申购总额
+        yesterday_amount = P2PRecord.objects.filter(create_time__gte=yesterday_start, create_time__lt=today_start)\
+            .filter(catalog='申购').aggregate(Sum('amount'))
+
+        # 昨日还款
+        today_repayment = ProductAmortization.objects.filter(settled=True)\
+            .filter(settlement_time__gte=today_start).aggregate(Sum('principal'), Sum('interest'))
+
+        # 今日还款
+        yesterday_repayment = ProductAmortization.objects.filter(settled=True)\
+            .filter(settlement_time__gte=yesterday_start, settlement_time__lt=today_start)\
+            .aggregate(Sum('principal'), Sum('interest'))
+
+        amount_sum_yesterday = yesterday_amount['amount__sum'] if yesterday_amount['amount__sum'] else Decimal('0')
+        principal_sum = yesterday_repayment['principal__sum'] if yesterday_repayment['principal__sum'] else Decimal('0')
+        interest_sum = yesterday_repayment['interest__sum'] if yesterday_repayment['interest__sum'] else Decimal('0')
+
+        # 昨日资金净流入
+        yesterday_inflow = amount_sum_yesterday - principal_sum - interest_sum
+
+        # 今日还款额
+        today_repayment_total = today_repayment['principal__sum'] + today_repayment['interest__sum']
+        # 昨日还款额
+        yesterday_repayment_total = yesterday_repayment['principal__sum'] + yesterday_repayment['interest__sum']
+
+        # 昨日首投用户
+        from django.db import connection
+        cursor = connection.cursor()
+        sql = "select sum(p.amount) as amount_sum " \
+              "from wanglibao_p2p_p2precord p, marketing_introducedby i " \
+              "where p.user_id = i.user_id " \
+              "and i.bought_at > '{}' and i.bought_at <= '{}' " \
+              "and p.create_time > '{}' and p.create_time <= '{}';".format(start_fmt, end_fmt, start_fmt, end_fmt)
+        cursor.execute(sql)
+        fetchone = cursor.fetchone()
+
+        yesterday_new_amount = fetchone['amount_sum'] if fetchone['amount_sum'] else 0
+
+        data = {
+            'today_repayment_total': today_repayment_total,  # 今日还款额
+            'yesterday_inflow': yesterday_inflow,  # 昨日资金净流入
+            'yesterday_repayment_total': yesterday_repayment_total,  # 昨日还款额
+            'yesterday_new_amount': yesterday_new_amount  # 昨日新用户投资金额
         }
 
         return Response(data, status=status.HTTP_200_OK)
