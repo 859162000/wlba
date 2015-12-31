@@ -23,13 +23,7 @@ $submit-height: 2.25rem
   text-align: left
   &::-webkit-input-placeholder
     color: #5C5C5C
-.code
-  padding-top: .5rem
-  .webchat-input-code
-    width: 63%
-    @media screen and (max-device-width: 320px)
-      width: 66%
-    float: left
+
 .webpack-btn-red
   @extend .public-style
   border: 1px solid #FF4A33
@@ -119,6 +113,20 @@ $submit-height: 2.25rem
 .code-content
   height: 0
   overflow: hidden
+
+.code
+  padding-top: .5rem
+  display: -webkit-box
+  .webchat-input-code
+    -webkit-box-flex: 2
+    width: auto
+    float: none
+  .webchat-button,.captcha
+    -webkit-box-flex: 1
+    width: 4rem
+    float: none
+    margin-left: .5rem
+
 
 
 //detail page
