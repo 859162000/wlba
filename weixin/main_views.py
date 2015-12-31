@@ -25,6 +25,7 @@ from wanglibao_redis.backend import redis_backend
 from wanglibao_rest import utils
 from wanglibao_redpack import backends
 from .util import _generate_ajax_template, FWH_LOGIN_URL
+from wanglibao_pay.models import Bank
 logger = logging.getLogger("weixin")
 
 
@@ -147,9 +148,12 @@ class AccountTemplate(TemplateView):
 class RechargeTemplate(TemplateView):
     def get_context_data(self, **kwargs):
         margin = self.request.user.margin.margin
+        banks = Bank.get_kuai_deposit_banks()
         return {
-            'margin': margin if margin else 0.0
+            'margin': margin if margin else 0.0,
+            'banks':banks
         }
+    
     @is_check_id_verify(True)
     def dispatch(self, request, *args, **kwargs):
         return super(RechargeTemplate, self).dispatch(request, *args, **kwargs)
