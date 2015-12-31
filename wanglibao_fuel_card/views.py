@@ -410,7 +410,9 @@ class RevenueExchangeStatisticsView(TemplateView):
 
         revenue_count = Decimal('0.00')
         exchange_amos = ExchangeAmo.objects.filter(product_amortization__product__category=l_type,
-                                                   user=user).order_by('product_amortization__product__period')
+                                                   user=user
+                                                   ).order_by('product_amortization__product__period'
+                                                              ).select_related(depth=2)
         if exchange_amos:
             unique_period = None
             for exchange_amo in exchange_amos:
@@ -418,26 +420,38 @@ class RevenueExchangeStatisticsView(TemplateView):
                 revenue_count += exchange_amo.revenue_amount
 
                 # 获取用户每种等级产品的消费统计
-                if exchange_amo.period != unique_period:
-                    sub_exchange_amos = exchange_amos.filter(period=exchange_amo.period)
+                product_period = exchange_amo.product_amortization.product.period
+                if product_period != unique_period:
+                    sub_exchange_amos = exchange_amos.filter(product_amortization__product__period=product_period)
                     # 获取用户每产品购买份数
                     amo_count = sub_exchange_amos.count()
                     # 获取用户每产品已结算还款计划期数统计
-                    exchanged_count = sub_exchange_amos.filter(exchanged=False).count()
+                    exchanged_count = sub_exchange_amos.filter(exchanged=True).count()
                     # 获取用户每产品收益金额
-                    revenue = exchange_amos.values('period').annotate(Sum('revenue_amount')).first()
+                    revenue = exchange_amos.values('product_amortization__product__period').annotate(Sum('revenue_amount')).first()
                     revenue = revenue['revenue_amount__sum']
 
-                    unique_period = exchange_amo
+                    unique_period = product_period
                     exchange_amo.total_revenue = revenue
                     exchange_amo.exchanged_count = exchanged_count
                     exchange_amo.buy_count = amo_count
                     data.append(exchange_amo)
 
+            # 获取产品的奖品面额及产品最低购买限额
+            for p in data:
+                try:
+                    exchange_rule = RevenueExchangeRule.objects.get(product=p.product_amortization.product)
+                except RevenueExchangeRule.DoesNotExist:
+                    logger.info('exchange index faild No product[%s] matches the exchange rule user[%s]' %
+                                (p.id, user.id))
+                    raise Http404(u'页面不存在')
+                p.equality_prize_amount = exchange_rule.equality_prize_amount
+                p.limit_min_per_user = exchange_rule.limit_min_per_user
+
             # 按产品期限分类(初级-中级-高级)
-            for p2p_product in data:
-                product_class = classes_product_for_period(p2p_product.period) or 'C'
-                p2p_product.class_name = get_class_name(product_class, l_type)
+            for exchange_amo in data:
+                product_class = classes_product_for_period(exchange_amo.product_amortization.product.period) or 'C'
+                exchange_amo.class_name = get_class_name(product_class, l_type)
 
         return {
             'data': data,
