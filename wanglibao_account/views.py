@@ -32,7 +32,8 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from forms import EmailOrPhoneRegisterForm, LoginAuthenticationNoCaptchaForm,\
-    ResetPasswordGetIdentifierForm, IdVerificationForm, TokenSecretSignAuthenticationForm
+    ResetPasswordGetIdentifierForm, IdVerificationForm, TokenSecretSignAuthenticationForm,\
+    EnterpriseUserProfileForm
 from marketing.models import IntroducedBy, Channels, Reward, RewardRecord
 from marketing.utils import set_promo_user, local_to_utc, get_channel_record
 from marketing import tools
@@ -76,6 +77,7 @@ from experience_gold.models import ExperienceAmortization, ExperienceEventRecord
 from wanglibao_pay.fee import WithdrawFee
 from wanglibao_account import utils as account_utils
 from wanglibao_rest.common import DecryptParmsAPIView
+from wanglibao_profile.models import EnterpriseUserProfile
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
@@ -2209,4 +2211,7 @@ class EnterpriseUserProfile(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
+        form = EnterpriseUserProfileForm(request.POST)
+        if form.is_valid():
+            EnterpriseUserProfile.objects.get_or_create()
 

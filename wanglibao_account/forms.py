@@ -455,7 +455,13 @@ class EnterpriseUserProfileForm(forms.Form):
     bank_branch_address = forms.CharField(label="Bank branch address", max_length=100,
                                           error_messages={'required': u'请输入开户行支行所在地'})
 
-    def clean_certigier_phone(self):
+    def clean(self):
         certigier_phone = self.cleaned_data['certigier_phone']
-        detect_phone_for_identifier(certigier_phone)
+        if not detect_phone_for_identifier(certigier_phone):
+            raise forms.ValidationError(
+                message='invalid phone number',
+                code="10001",
+            )
+
+        return self.cleaned_data
 
