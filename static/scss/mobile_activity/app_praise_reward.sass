@@ -3,8 +3,6 @@
   .praise_wrap
     width: 100%
     position: relative
-    display: inline-block
-    display: none
     .top_light
       width: 100%
       display: block
@@ -67,14 +65,24 @@
         .footer_bg
           width: 100%
           display: block
+          position: fixed
+          left: 0
+          bottom: 0
+          z-index: 2
+          @media screen and (max-height: 569px)
+            position: relative
         .footer_logo
-          position: absolute
+          position: fixed
           bottom: 0.8rem
           left: 41.2%
           width: 17.6%
           display: block
+          z-index: 3
+          @media screen and (max-height: 569px)
+            position: absolute
   .invitation_page
     width: 100%
+    display: none
     .top_wrap
       width: 100%
       display: block
@@ -157,16 +165,16 @@
           float: right
           margin: 0.7rem 3.3% 0 0
         .renovate_rotate
-          -webkit-animation-name: rotation_music
-          animation-name: rotation_music
-          -webkit-animation-duration: 0s
-          animation-duration: 0s
+          -webkit-animation-name: renovate_ico
+          animation-name: renovate_ico
+          -webkit-animation-duration: 3s
+          animation-duration: 3s
           -webkit-animation-timing-function: linear
           animation-timing-function: linear
           -webkit-animation-fill-mode: both
           animation-fill-mode: both
-          -webkit-animation-iteration-count: 1
-          animation-iteration-count: 1
+          -webkit-animation-iteration-count: infinite
+          animation-iteration-count: infinite
 
     .praise_wrap
       clear: both
@@ -428,7 +436,7 @@
   .take_mine_reward
     width: 79.3%
     margin: 1rem auto
-    display: block
+    display: none
     .phone
       width: 100%
       height: 2.5rem
@@ -538,7 +546,25 @@
     .user
       width: 100%
       display: block
+@-webkit-keyframes renovate_ico
+  0%
+    -webkit-transfrom: rotate(0deg)
 
+  50%
+    -webkit-transform: rotate(180deg)
+
+  100%
+    -webkit-transform: rotate(360deg)
+
+@keyframes renovate_ico
+  0%
+    transfrom: rotate(0deg)
+
+  50%
+    transform: rotate(180deg)
+
+  100%
+    transform: rotate(360deg)
 
 
 

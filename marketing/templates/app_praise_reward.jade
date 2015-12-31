@@ -16,8 +16,8 @@ html(style="background: #3a2741")
                 .group_bg
                     .main_wrap
                         img.bg(src="/static/imgs/mobile_activity/app_praise_reward/group.png")
-                        input.phone(type='text' placeholder="请输入手机号")
-                        .button 立即领取
+                        input.phone#get_phone(type='text' placeholder="请输入手机号")
+                        .button#go_receive 立即领取
                         img.footer_bg(src="/static/imgs/mobile_activity/app_praise_reward/praise_wrap_footer.png")
                         img.footer_logo(src="/static/imgs/mobile_activity/app_praise_reward/footer_logo.png")
             .invitation_page
@@ -31,7 +31,7 @@ html(style="background: #3a2741")
                         img.gold(src="/static/imgs/mobile_activity/app_praise_reward/gold.png")
                         .text 年终奖
                         input(type='text' value='1000')
-                        img.renovate(src="/static/imgs/mobile_activity/app_praise_reward/renovate.png")
+                        img.renovate.renovate_rotate(src="/static/imgs/mobile_activity/app_praise_reward/renovate.png")
                     .praise_wrap
                         .praise.praise_left
                             img.bg(src="/static/imgs/mobile_activity/app_praise_reward/praise_button.png")
