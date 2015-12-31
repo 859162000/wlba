@@ -298,7 +298,7 @@ def red_packet_get_alert(amount, rtype):
 
 
 @suffix_td
-def red_packet_invalid_alert(count):
+def red_packet_invalid_alert(count, days):
     """
     红包、加息券快过期前3天提醒
     """
@@ -310,9 +310,9 @@ def red_packet_invalid_alert(count):
             return content.format(count)
         except Exception, e:
             print e
-            return u'您有{}张理财券再过3天就要过期了，请尽快登录网利宝官网或者app使用！'.format(count)
+            return u'您有{}张理财券再过{}天就要过期了，请尽快登录网利宝官网或者app使用！'.format(count, days)
     else:
-        return u'您有{}张理财券再过3天就要过期了，请尽快登录网利宝官网或者app使用！'.format(count)
+        return u'您有{}张理财券再过{}天就要过期了，请尽快登录网利宝官网或者app使用！'.format(count, days)
 
 
 @suffix_td
