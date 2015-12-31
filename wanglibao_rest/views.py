@@ -1079,8 +1079,9 @@ class StatisticsInside(APIView):
               "AND a.catalog='申购';".format(start_fmt, end_fmt, start_fmt, end_fmt)
         cursor.execute(sql)
         fetchone = cursor.fetchone()
+        print fetchone
 
-        yesterday_new_amount = fetchone['amount_sum'] if fetchone['amount_sum'] else 0
+        yesterday_new_amount = fetchone[0] if fetchone[0] else 0
 
         data = {
             'today_repayment_total': today_repayment_total,  # 今日还款额
