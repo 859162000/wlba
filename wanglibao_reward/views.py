@@ -1261,25 +1261,17 @@ class WeixinAnnualBonusView(LowBaseWeixinTemplate):
 
     def get_context_data(self, **kwargs):
         if not self.to_openid:
-            return { 'err_code':1001, 'err_messege':u'获取受评用户失败' }
+            return { 'err_code':101, 'err_messege':u'获取受评用户失败' }
         wx_user = WeixinAnnualBonus.objects.filter(openid=self.to_openid).first()
         #wx_user = None
         if wx_user:
             if self.is_myself:
-                self.template_name = 'self_view.jade'
-            else:
-                self.template_name = 'self_view.jade'
-#                self.template_name = 'others_view.jade'
-            return { 'err_code':0, 'err_messege':u'', 'is_myself':self.is_myself, 'wx_user':wx_user, }
+                self.template_name = 'app_praise_reward.jade'
+                return { 'err_code':0, 'err_messege':u'', 'is_myself':self.is_myself, 'wx_user':wx_user, }
         else:
             if self.is_myself:
-                self.template_name = 'self_view.jade'
-#                self.template_name = "self_apply.jade"
-                return { 'err_code':0, 'err_messege':u'', 'is_myself':self.is_myself }
-            else:
-                self.template_name = 'self_view.jade'
-#                self.template_name = "error.jade"
-                return { 'err_code':2001, 'err_messege':u'用户还未申领年终奖', 'is_myself':self.is_myself,  }
+                self.template_name = 'app_praise_reward.jade'
+                return { 'err_code':102, 'err_messege':u'用户还未申领年终奖', 'is_myself':self.is_myself,  }
 
     def apply_bonus(self):
         phone = self.request.GET.get('phone')
