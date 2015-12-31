@@ -1271,7 +1271,7 @@ class WeixinAnnualBonusView(LowBaseWeixinTemplate):
                 return { 'err_code':0, 'err_messege':u'', 'is_myself':self.is_myself, 'wx_user':wx_user, }
         else:
             if self.is_myself:
-                self.template_name = 'app_praise_reward.jade'
+                self.template_name = 'app_praise_reward_go.jade'
                 return { 'err_code':102, 'err_messege':u'用户还未申领年终奖', 'is_myself':self.is_myself,  }
             else:
                 self.template_name = 'app_praise_reward.jade'
