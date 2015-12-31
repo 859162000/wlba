@@ -694,7 +694,6 @@ org.regist = (function(org){
                             //console.log(next);
                             window.location.href = next;
                         }else if(data.ret_code > 0){
-                            org.ui.alert(data.ret_code);
                             org.ui.showSign(data.message);
                             $submit.text('立即注册 ｜ 领取奖励');
                         }
