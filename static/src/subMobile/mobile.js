@@ -191,9 +191,9 @@ org.ui = (function(){
                 document.body.appendChild(shield);
 
                 $('.popub-footer').on('click',function(){
-                    (typeof callback == "function") && callback();
                     alertFram.style.display = "none";
                     shield.style.display = "none";
+                    (typeof callback == "function") && callback();
                 })
             }
             document.body.onselectstart = function(){return false;};
@@ -1830,7 +1830,7 @@ org.processFirst = (function(org){
                 success:function(data){
                     if(!data.validate == 'true') return org.ui.alert('认证失败，请重试');
                     org.ui.alert("实名认证成功!",function(){
-                        return window.location.href = '/weixin/sub_regist_second/';
+                        window.location.href = '/weixin/sub_regist_second/';
                     });
                 },
                 error:function(xhr){
