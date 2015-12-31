@@ -1307,7 +1307,7 @@ class WeixinAnnualBonusView(TemplateView):
         user_profile = WanglibaoUserProfile.objects.filter(phone=phone).first()
         if not user_profile:
             is_new = True
-        if not user_profile.user:
+        elif not user_profile.user:
             rep = { 'err_code':203, 'err_messege':u'用户信息获取错误，请联系客服', }
             return HttpResponse(json.dumps(rep), content_type='application/json')
 
