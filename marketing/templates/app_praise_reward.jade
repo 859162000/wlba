@@ -46,30 +46,9 @@ html(style="background: #3a2741")
                     #mycarousel.tab_wrap.jcarousel-skin-tango
 
                         ul.user_wrap
-                            li
-                                img.user(src="{{follow.from_headimgurl}}")
-                            li
-                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_2.png")
-                            li
-                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_3.png")
-                            li
-                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_4.png")
-                            li
-                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_5.png")
-                            li
-                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_6.png")
-                            li
-                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_1.png")
-                            li
-                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_2.png")
-                            li
-                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_3.png")
-                            li
-                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_4.png")
-                            li
-                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_5.png")
-                            li
-                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_6.png")
+                            for p2p in follow
+                                li
+                                    img.user(src="{{p2p.from_headimgurl}}")
                         .jcarousel-scroll
                             form(action="")
                                 a#mycarousel-prev(href="#")
@@ -77,11 +56,11 @@ html(style="background: #3a2741")
                                 a#mycarousel-next(href="#")
                                     img.next_button(src="/static/imgs/mobile_activity/app_praise_reward/next.png")
                     if is_myself.self == is_myself
-                    .step_me
-                        .line_bottom
-                        .title_text1 每天签到拿网利宝体验金<br>随时查看账户收益
-                        img.code_img(src="/static/imgs/mobile_activity/app_praise_reward/wechat_server.jpg")
-                        .title_text2 长按二维码关注
+                        .step_me
+                            .line_bottom
+                            .title_text1 每天签到拿网利宝体验金<br>随时查看账户收益
+                            img.code_img(src="/static/imgs/mobile_activity/app_praise_reward/wechat_server.jpg")
+                            .title_text2 长按二维码关注
                     img.footer_logo(src="/static/imgs/mobile_activity/app_praise_reward/footer_logo.png")
             .share_wrap
                 .share_text
