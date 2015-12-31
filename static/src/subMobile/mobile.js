@@ -191,9 +191,9 @@ org.ui = (function(){
                 document.body.appendChild(shield);
 
                 $('.popub-footer').on('click',function(){
+                    (typeof callback == "function") && callback();
                     alertFram.style.display = "none";
                     shield.style.display = "none";
-                    (typeof callback == "function") && callback();
                 })
             }
             document.body.onselectstart = function(){return false;};
