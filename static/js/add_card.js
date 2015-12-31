@@ -112,7 +112,7 @@
             vcode: $('.sem-input').val(),
             order_id: $('#order_id').val(),
             token: $('#token').val(),
-            phone: $('.get-code').attr('data-phone'),
+            phone: $('.bankPhone').val(),
             device_id: ''
           },
           type: 'post'
@@ -176,7 +176,7 @@
       if ($(element).attr('disabled')) {
         return;
       }
-      phoneNumber = $(element).attr("data-phone");
+      phoneNumber = $('.bankPhone').val();
       $.ajax({
         url: "/api/pay/deposit_new/",
         type: "POST",

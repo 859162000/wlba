@@ -15,6 +15,13 @@
   });
 
   require(['jquery', 'jquery.validate', 'lib/backend', 'tools'], function($, validate, backend, tool) {
+    $('#setPWDA').click(function() {
+      if ($('#id-is-valid').val() === 'False') {
+        $('#id-validate').modal();
+      } else {
+        return window.location.href = '/accounts/back/';
+      }
+    });
     $('#passwordChangeButton').click(function(e) {
       var params;
       e.preventDefault();

@@ -11,6 +11,12 @@ require.config
     "tools": ['jquery.modal']
 
 require ['jquery', 'jquery.validate', 'lib/backend', 'tools'], ($, validate, backend, tool)->
+  $('#setPWDA').click ()->
+    if $('#id-is-valid').val() == 'False'
+      $('#id-validate').modal()
+      return
+    else
+       window.location.href = '/accounts/back/'
   $('#passwordChangeButton').click (e)->
     e.preventDefault()
 
