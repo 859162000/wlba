@@ -238,7 +238,7 @@ var weChatShare = (function(org){
             }
         });
         wx.ready(function(){
-            var host = 'https://www.wanglibao.com',
+            var host = 'https://staging.wanglibao.com',
                 shareImg = host + '/static/imgs/mobile/weChat_logo.png',
                 shareLink = $('input[name=url]').val(),
                 shareMainTit = $('input[name=title]').val(),
@@ -512,6 +512,9 @@ org.weChatStart = (function(org){
                 var ele = $('.code-content'),
                     curHeight = ele.height();
                 ele.height(curHeight).animate({height: 0},500);
+                $('input[name=validate_code]').val('');
+                $('input[name=captcha_1]').val('');
+
             }
             return isRight;
         },

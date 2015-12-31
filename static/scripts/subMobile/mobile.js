@@ -192,9 +192,9 @@ org.ui = (function(){
                 document.body.appendChild(shield);
 
                 $('.popub-footer').on('click',function(){
+                    (typeof callback == "function") && callback();
                     alertFram.style.display = "none";
                     shield.style.display = "none";
-                    (typeof callback == "function") && callback();
                 })
             }
             document.body.onselectstart = function(){return false;};
@@ -695,7 +695,6 @@ org.regist = (function(org){
                             //console.log(next);
                             window.location.href = next;
                         }else if(data.ret_code > 0){
-                            org.ui.alert(data.ret_code);
                             org.ui.showSign(data.message);
                             $submit.text('立即注册 ｜ 领取奖励');
                         }

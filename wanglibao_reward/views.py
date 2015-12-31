@@ -182,6 +182,7 @@ class WeixinShareDetailView(TemplateView):
             gift = WanglibaoActivityGift.objects.create(
                 gift_id=product_id,
                 activity=self.activity,
+                redpack_id=2,
                 valid=True,
                 type=3,
                 cfg_id=1
@@ -220,10 +221,10 @@ class WeixinShareDetailView(TemplateView):
         if not self.activity:
             self.get_activity_by_id(activity)
 
-        user = WanglibaoUserProfile.objects.filter(phone=phone_num).first()
-        activity_record = WanglibaoActivityReward.objects.filter(order_id=product_id, user_id=user.id, activity='weixin_experience_glod').first()
+        profile = WanglibaoUserProfile.objects.filter(phone=phone_num).first()
+        activity_record = WanglibaoActivityReward.objects.filter(order_id=product_id, user_id=profile.user.id, activity='weixin_experience_glod').first()
         if activity_record:
-            return self.distribute_experience_glod(user, phone_num, openid, activity, product_id, activity_record.experience)
+            return self.distribute_experience_glod(profile.user, phone_num, openid, product_id, activity_record.experience)
 
         try:
             #TODO: 增加分享记录表，用于计数和加锁

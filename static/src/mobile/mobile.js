@@ -1867,7 +1867,7 @@ org.received_ui = (function(){
                 }
                 detail += "</div>";
                 detail += "<div class= 'detail-item item-count'>"+data.amortization_record[i].amortization_amount+"</div>";
-                if(data.amortization_record[i].amortization_status== '提前回款'){
+                if(data.amortization_record[i].amortization_status== '提前回款' || data.amortization_record[i].amortization_status== '已回款'){
                     detail += "<div class= 'repayment-icon'></div>";
                 }
                 detail += "</div>";

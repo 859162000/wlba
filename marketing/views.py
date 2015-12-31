@@ -188,6 +188,14 @@ class GennaeratorCode(TemplateView):
 
 class TvView(TemplateView):
     template_name = 'tv.jade'
+
+    def get_context_data(self, **kwargs):
+        return {}
+
+
+class TvViewInside(TemplateView):
+    template_name = 'tv_inside.jade'
+
     def get_context_data(self, **kwargs):
         return {}
 

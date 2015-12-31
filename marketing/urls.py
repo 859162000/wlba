@@ -75,6 +75,7 @@ urlpatterns = patterns(
     url(r'^broken_million/$', TemplateView.as_view(template_name="broken_million.jade")),
     url(r'^damai-old/$', TemplateView.as_view(template_name="damai-old.jade")),
     url(r'^app_damai_old/$', TemplateView.as_view(template_name="app_damai_old.jade")),
+    url(r'^send_reward/$', TemplateView.as_view(template_name="send_reward.jade")),
 )
 
 # app URL
