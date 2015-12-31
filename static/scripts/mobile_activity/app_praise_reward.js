@@ -223,6 +223,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 	var is_myself;
 
+	/*得到初始数据*/
 	$.ajax({
 		url: 'weixin_activity/weixin/bonus/?uid=1001&wxid=1002',
 		type: "POST",
@@ -236,7 +237,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			alert('信息错误')
 		}
 	});
-
+	/*得到初始数据结束*/
 
 	/*滚动图*/
 	function mycarousel_initCallback(carousel) {
@@ -268,14 +269,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	})
 	/*滚动图结束*/
 
-
-
-
 	$('#get_phone').val();
 	//得到手机号
 
 	var is_myself = false;
 
+	/*去领取按钮*/
 	$('#go_receive').click(function(){
 		$('.praise_wrap').hide();
 		$('.invitation_page').show();
@@ -286,15 +285,45 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			$('.step_me').show();
 		}
 	});
-	//去领取按钮
+	/*去领取按钮*/
 
+	/*分享*/
 	$('.share_button').click(function(){
 		$('.share_wrap').show();
 	});
 	$('.share_wrap').click(function(){
 		$(this).hide();
 	});
+	/*结束分享*/
 
+	/*刷新数据*/
+	$('.renovate').click(function(){
+		$(this).addClass('renovate_rotate');
+		$.ajax({
+			url: 'weixin_activity/weixin/bonus/?uid=1001&wxid=1002',
+			type: "POST",
+			data: {
+
+			}
+		}).done(function (xhr) {
+			if(xhr.err_code==0){
+				$(this).removeClass('renovate_rotate');
+			}else if(xhr.err_code==0){
+				alert('信息错误')
+			}
+		});
+	})
+	/*刷新数据结束*/
+
+	/*同意活动规则按钮*/
+	$('.checkbox').click(function(){
+		if($(this).hasClass('checkbox_select')){
+			$(this).removeClass('checkbox_select');
+		}else{
+			$(this).addClass('checkbox_select');
+		}
+	});
+	/*同意活动规则按钮结束*/
 
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({
