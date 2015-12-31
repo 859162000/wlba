@@ -77,7 +77,7 @@ import { ajax } from './mixins/functions'
                 if (results.ret_code > 0) {
                     return ui_signError(results.message);
                 } else {
-                   return ui_signError('充值成功')
+                   return ui_alert('充值成功')
                 }
             },
             error: function (results) {

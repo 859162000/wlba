@@ -87,7 +87,7 @@ webpackJsonp([3],{
 	                if (results.ret_code > 0) {
 	                    return (0, _ui.ui_signError)(results.message);
 	                } else {
-	                    return (0, _ui.ui_signError)('充值成功');
+	                    return (0, _ui.ui_alert)('充值成功');
 	                }
 	            },
 	            error: function error(results) {

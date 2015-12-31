@@ -144,7 +144,7 @@ webpackJsonp([6],[
 	                },
 	                success: function success(results) {
 	                    if (results.ret_code === 0) {
-	                        (0, _ui.ui_signError)(results.message);
+	                        (0, _ui.ui_signError)('短信已发送，请注意查收！');
 	                        $("input[name='order_id']").val(results.order_id);
 	                        $("input[name='token']").val(results.token);
 	                        return resolve('短信已发送，请注意查收！');
@@ -244,7 +244,7 @@ webpackJsonp([6],[
 	                    } else {
 	                        return (0, _ui.ui_alert)('恭喜你，绑卡成功！', function () {
 	                            resolve(data.message);
-	                            window.location.href = '/fuel/regist/end/';
+	                            window.location.href = '/fuel_card/regist/end/';
 	                        });
 	                    }
 	                },

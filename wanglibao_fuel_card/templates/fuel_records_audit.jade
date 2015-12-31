@@ -6,10 +6,16 @@ html
   body
     nav.records-nav
       ul
-        li.active
-          a(href="/fuel_card/buy-record/auditing/") 审核中
-        li
-          a(href="/fuel_card/buy-record/done/") 已完成
+        if status == 'auditing'
+          li.active
+            a(href="/fuel_card/buy-record/auditing/") 审核中
+          li
+            a(href="/fuel_card/buy-record/done/") 已完成
+        else
+          li
+            a(href="/fuel_card/buy-record/auditing/") 审核中
+          li.active
+            a(href="/fuel_card/buy-record/done/") 已完成
 
 
     .records-item
@@ -19,7 +25,6 @@ html
         else
           redpackname  = 'records-list-grey'
         for list in data
-
           .records-list(class='{{redpackname}}')
             .records-card-amount
               principal = int(list.limit_min_per_user)
