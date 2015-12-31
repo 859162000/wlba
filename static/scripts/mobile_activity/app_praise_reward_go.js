@@ -219,99 +219,26 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 })();
 ;(function(org) {
 
-	//alert($(window).width());
-
 	var is_myself;
+	var phone_num;
 
-	/*得到初始数据*/
-
-	/*得到初始数据结束*/
-
-	/*滚动图*/
-	function mycarousel_initCallback(carousel) {
-		jQuery('.jcarousel-control a').bind('click', function() {
-			carousel.scroll(jQuery.jcarousel.intval(jQuery(this).text()));
-			return false;
-		});
-		jQuery('.jcarousel-scroll select').bind('change', function() {
-			carousel.options.scroll = jQuery.jcarousel.intval(this.options[this.selectedIndex].value);
-			return false;
-		});
-		jQuery('#mycarousel-next').bind('click', function() {
-			carousel.next();
-			return false;
-		});
-		jQuery('#mycarousel-prev').bind('click', function() {
-			carousel.prev();
-			return false;
-		});
-	};
-	jQuery(document).ready(function() {
-		jQuery("#mycarousel").jcarousel({
-		wrap: 'circular',
-		scroll: 1,
-		initCallback: mycarousel_initCallback,
-		buttonNextHTML: null,
-		buttonPrevHTML: null
-		});
-	})
-	/*滚动图结束*/
-
-	$('#get_phone').val();
-	//得到手机号
-
-	var is_myself = false;
-
-	/*去领取按钮*/
 	$('#go_receive').click(function(){
-		$('.praise_wrap').hide();
-		$('.invitation_page').show();
-		if(is_myself){
-			$('.take_mine_reward').show();
 
-		}else{
-			$('.step_me').show();
-		}
-	});
-	/*去领取按钮*/
-
-	/*分享*/
-	$('.share_button').click(function(){
-		$('.share_wrap').show();
-	});
-	$('.share_wrap').click(function(){
-		$(this).hide();
-	});
-	/*结束分享*/
-
-	/*刷新数据*/
-	$('.renovate').click(function(){
-		$(this).addClass('renovate_rotate');
+		phone_num = $('#get_phone').val();
+		/*申请领取*/
 		$.ajax({
-			url: 'weixin_activity/weixin/bonus/?uid=1001&wxid=1002',
-			type: "POST",
-			data: {
-
-			}
+			url: '/weixin_activity/weixin/bonus/?act=apply&phone='+phone_num+'&wxid=1001',
+			type: "GET",
 		}).done(function (xhr) {
 			if(xhr.err_code==0){
-				$(this).removeClass('renovate_rotate');
-			}else if(xhr.err_code==0){
-				alert('信息错误')
+				window.location.href = '/weixin_activity/weixin/bonus/?wxid=1001'
+			}else{
+				alert(xhr.err_messege);
 			}
 		});
-	})
-	/*刷新数据结束*/
-
-	/*同意活动规则按钮*/
-	$('.checkbox').click(function(){
-		if($(this).hasClass('checkbox_select')){
-			$(this).removeClass('checkbox_select');
-		}else{
-			$(this).addClass('checkbox_select');
-		}
 	});
-	/*同意活动规则按钮结束*/
+	/*申请领取*/
+
 
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({
