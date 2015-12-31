@@ -2205,7 +2205,7 @@ class GetRequestUserType(APIView):
         return HttpResponse(json.dumps(json_response), content_type='application/json')
 
 
-class EnterpriseUserProfile(APIView):
+class EnterpriseUserProfileApi(APIView):
     """企业用户认证资料接收接口"""
 
     permission_classes = (IsAuthenticated,)
@@ -2213,5 +2213,5 @@ class EnterpriseUserProfile(APIView):
     def post(self, request):
         form = EnterpriseUserProfileForm(request.POST)
         if form.is_valid():
-            EnterpriseUserProfile.objects.get_or_create()
+            e_profile = EnterpriseUserProfile.objects.get_or_create(user=request.user)
 
