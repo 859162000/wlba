@@ -20,6 +20,7 @@ module.exports = {
         put_bank: './src/mobile_fuelcard/put_bank',
         reset_password: './src/mobile_fuelcard/reset_password',
         recharge: './src/mobile_fuelcard/recharge',
+        records: './src/mobile_fuelcard/records',
         vendor: ['./src/mobile_fuelcard/lib/zepto']
     },
     output: {
