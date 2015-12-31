@@ -217,7 +217,7 @@ def p2p_revenue_exchange(user_amos, exchange_amos, exchange_rule):
             exchange_amo = None
 
         if exchange_amo:
-            reward_parts = int(float(exchange_amo.term_amount) / exchange_rule.equality_prize_amount)
+            reward_parts = exchange_amo.exchange_parts
             if exchange_rule.exchange_method != 'recharge':
                 exchange_channel = exchange_rule.exchange_channel
                 rewards = RevenueExchangeRepertory.objects.filter(type=exchange_rule.reward_name,
@@ -239,7 +239,6 @@ def p2p_revenue_exchange(user_amos, exchange_amos, exchange_rule):
                         exchange_amo.settled = amo.settled
                         exchange_amo.settlement_time = amo.settlement_time
                         exchange_amo.exchange_id = exchange_amo.id
-                        exchange_amo.exchange_parts = reward_parts
                         exchange_amo.exchange_time = timezone.now()
                         exchange_amo.exchanged = True
                         exchange_amo.save()

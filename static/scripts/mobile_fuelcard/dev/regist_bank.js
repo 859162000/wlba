@@ -1,4 +1,4 @@
-webpackJsonp([6],[
+webpackJsonp([7],[
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -144,7 +144,7 @@ webpackJsonp([6],[
 	                },
 	                success: function success(results) {
 	                    if (results.ret_code === 0) {
-	                        (0, _ui.ui_signError)(results.message);
+	                        (0, _ui.ui_signError)('短信已发送，请注意查收！');
 	                        $("input[name='order_id']").val(results.order_id);
 	                        $("input[name='token']").val(results.token);
 	                        return resolve('短信已发送，请注意查收！');
@@ -244,7 +244,7 @@ webpackJsonp([6],[
 	                    } else {
 	                        return (0, _ui.ui_alert)('恭喜你，绑卡成功！', function () {
 	                            resolve(data.message);
-	                            window.location.href = '/fuel/regist/end/';
+	                            window.location.href = '/fuel_card/regist/end/';
 	                        });
 	                    }
 	                },
@@ -274,8 +274,145 @@ webpackJsonp([6],[
 
 /***/ },
 /* 1 */,
-/* 2 */,
-/* 3 */,
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	/**
+	 *
+	 * 引入fuel_alert.jade
+	 * @param text 文字说明
+	 * @param callback 回调函数
+	 */
+
+	var ui_alert = exports.ui_alert = function ui_alert(text, callback) {
+
+	    var $alert = $('.fuel-alert'),
+	        $button = $('.fuel-submit');
+
+	    $alert.css('display', '-webkit-box').find('.fuel-text').text(text);
+
+	    $button.on('click', function () {
+	        $alert.hide();
+	        callback && callback();
+	    });
+	};
+
+	/**
+	 * 引入fuel_alert.jade
+	 * @param title confim文字说明
+	 * @param certainName 左边按钮文字
+	 * @param callback  回调函数
+	 * @param callbackData 回调函数的数据
+	 */
+	var ui_confirm = exports.ui_confirm = function ui_confirm(title) {
+	    var certainName = arguments.length <= 1 || arguments[1] === undefined ? '确定' : arguments[1];
+	    var callback = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+	    var callbackData = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
+
+	    var $confirm = $('.confirm-warp');
+	    if ($confirm.length <= 0) return;
+	    $confirm.show();
+	    $confirm.find('.confirm-text').text(title);
+	    $confirm.find('.confirm-certain').text(certainName);
+
+	    $confirm.find('.confirm-cancel').on('click', function () {
+	        $confirm.hide();
+	    });
+
+	    $confirm.find('.confirm-certain').on('click', function () {
+	        $confirm.hide();
+	        if (callback) {
+	            callbackData ? callback(callbackData) : callback();
+	        }
+	    });
+	};
+
+	var ui_signError = exports.ui_signError = function ui_signError(sign) {
+	    $('.error-sign').html(sign).removeClass('moveDown').addClass('moveDown').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+	        $(this).removeClass('moveDown');
+	    });
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var ajax = exports.ajax = function ajax(options) {
+	    $.ajax({
+	        url: options.url,
+	        type: options.type,
+	        data: options.data,
+	        dataType: options.dataType,
+	        async: options.async || true,
+	        beforeSend: function beforeSend(xhr, settings) {
+	            options.beforeSend && options.beforeSend(xhr);
+	            //django配置post请求
+	            if (!_csrfSafeMethod(settings.type) && _sameOrigin(settings.url)) {
+	                xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+	            }
+	        },
+	        success: function success(data) {
+	            options.success && options.success(data);
+	        },
+	        error: function error(xhr) {
+	            options.error && options.error(xhr);
+	        },
+	        complete: function complete() {
+	            options.complete && options.complete();
+	        }
+	    });
+	};
+
+	var getCookie = exports.getCookie = function getCookie(name) {
+	    var cookie = undefined,
+	        cookies = undefined,
+	        i = undefined,
+	        cookieValue = null;
+	    if (document.cookie && document.cookie !== '') {
+	        cookies = document.cookie.split(';');
+	        i = 0;
+	        while (i < cookies.length) {
+	            cookie = $.trim(cookies[i]);
+	            if (cookie.substring(0, name.length + 1) === name + '=') {
+	                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+	                break;
+	            }
+	            i++;
+	        }
+	    }
+	    return cookieValue;
+	};
+
+	var _csrfSafeMethod = function _csrfSafeMethod(method) {
+	    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method)
+	    );
+	};
+
+	var _sameOrigin = function _sameOrigin(url) {
+	    var host = undefined,
+	        origin = undefined,
+	        protocol = undefined,
+	        sr_origin = undefined;
+	    host = document.location.host;
+	    protocol = document.location.protocol;
+	    sr_origin = '//' + host;
+	    origin = protocol + sr_origin;
+	    return url === origin || url.slice(0, origin.length + 1) === origin + '/' || url === sr_origin || url.slice(0, sr_origin.length + 1) === sr_origin + '/' || !/^(\/\/|http:|https:).*/.test(url);
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ },
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 

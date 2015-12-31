@@ -138,7 +138,7 @@ import { validation } from './mixins/validation'
                 },
                 success(results){
                     if (results.ret_code === 0) {
-                        ui_signError(results.message)
+                        ui_signError('短信已发送，请注意查收！')
                         $("input[name='order_id']").val(results.order_id);
                         $("input[name='token']").val(results.token);
                         return resolve('短信已发送，请注意查收！');
@@ -241,7 +241,7 @@ import { validation } from './mixins/validation'
                     } else {
                         return ui_alert('恭喜你，绑卡成功！', () => {
                             resolve(data.message)
-                            window.location.href = '/fuel/regist/end/';
+                            window.location.href = '/fuel_card/regist/end/';
                         });
                     }
 

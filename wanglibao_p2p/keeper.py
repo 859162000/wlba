@@ -353,6 +353,10 @@ class AmortizationKeeper(KeeperBaseMixin):
         pay_method = product.pay_method
         subscription_date = None
         product_interest = Decimal(0)
+        if product_type.name == self.RevenueExchangeType:
+            exchange_rule = self.RevenueExchangeRule.objects.filter(product=product).first()
+            if not exchange_rule:
+                 raise P2PException("revenue exhchange product[%s] rule not found" % product.id)
 
         for equity in equities:
             # modify by ChenWeiBin@20151224
@@ -386,7 +390,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                     amortization.term_date = timezone.now()
 
                 if product_type.name == self.RevenueExchangeType:
-                    self.__generate_exchange_amortization(amortization)
+                    self.__generate_exchange_amortization(amortization, exchange_rule)
 
                 user_amos.append(amortization)
 
@@ -399,7 +403,7 @@ class AmortizationKeeper(KeeperBaseMixin):
         UserAmortization.objects.bulk_create(user_amos)
         InterestPrecisionBalance.objects.bulk_create(interest_precisions)
 
-    def __generate_exchange_amortization(self, user_amo):
+    def __generate_exchange_amortization(self, user_amo, exchange_rule):
         # add by ChenWeiBin@20151224
         try:
             exchange_order = self.RevenueExchangeOrder.objects.filter(user=user_amo.user,
@@ -418,6 +422,7 @@ class AmortizationKeeper(KeeperBaseMixin):
             amortization.revenue_amount += user_amo.penal_interest
             amortization.term_amount = user_amo.principal + amortization.revenue_amount
             amortization.order_id = exchange_order.order_id
+            amortization.exchange_parts = int(float(amortization.term_amount) / exchange_rule.equality_prize_amount)
             amortization.save()
         except Exception, e:
             logger.error('generate exchange amortization failed for user_amo[%s]' % user_amo)
