@@ -16,7 +16,7 @@
 
   require(['jquery', 'jquery.validate', 'lib/backend', 'tools'], function($, validate, backend, tool) {
     $('#setPWDA').click(function() {
-      if ($('#id-is-valid').val() === 'False') {
+      if ($('#id-is-valid').val() === 'false') {
         $('#id-validate').modal();
       } else {
         return window.location.href = '/accounts/back/';
@@ -85,8 +85,9 @@
       url: "/api/profile/",
       type: "GET",
       data: {}
-    }).success(function(date) {
-      if (date.trade_pwd_is_set) {
+    }).success(function(data) {
+      $('#id-is-valid').val(data.id_is_valid);
+      if (data.trade_pwd_is_set) {
         return $('.old').show();
       } else {
         return $('.new').show();

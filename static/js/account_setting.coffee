@@ -12,7 +12,7 @@ require.config
 
 require ['jquery', 'jquery.validate', 'lib/backend', 'tools'], ($, validate, backend, tool)->
   $('#setPWDA').click ()->
-    if $('#id-is-valid').val() == 'False'
+    if $('#id-is-valid').val() == 'false'
       $('#id-validate').modal()
       return
     else
@@ -62,8 +62,9 @@ require ['jquery', 'jquery.validate', 'lib/backend', 'tools'], ($, validate, bac
     type: "GET"
     data: {
     }
-  .success (date) ->
-    if date.trade_pwd_is_set
+  .success (data) ->
+    $('#id-is-valid').val(data.id_is_valid);
+    if data.trade_pwd_is_set
       $('.old').show()
     else
       $('.new').show()
