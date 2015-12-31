@@ -94,6 +94,29 @@
 	});
 	/*同意活动规则按钮结束*/
 
+	/*邀请好友弹窗关闭*/
+	$('.share_wrap .close').click(function(){
+		$('.share_wrap').hide();
+	});
+	/*邀请好友弹窗关闭结束*/
+
+	/*投票*/
+	$('.praise').click(function(){
+		$.ajax({
+			url: '/weixin_activity/weixin/bonus/?act=vote&uid=1001&wxid=1002',
+			type: "GET",
+		}).done(function (xhr) {
+			if(xhr.err_code==0){
+				$('.friend_top .text').text(xhr.err_messege);
+				$('.friend_top').fadeIn();
+			}else{
+				$('.friend_top .text').text(xhr.err_messege);
+				$('.friend_top').fadeIn();
+			}
+		});
+	});
+	/*投票结束*/
+
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({
 		type : 'GET',
