@@ -164,6 +164,18 @@
           display: block
           float: right
           margin: 0.7rem 3.3% 0 0
+        .renovate_rotate
+          -webkit-animation-name: renovate_ico
+          animation-name: renovate_ico
+          -webkit-animation-duration: 3s
+          animation-duration: 3s
+          -webkit-animation-timing-function: linear
+          animation-timing-function: linear
+          -webkit-animation-fill-mode: both
+          animation-fill-mode: both
+          -webkit-animation-iteration-count: infinite
+          animation-iteration-count: infinite
+
     .praise_wrap
       clear: both
       width: 92%
@@ -534,7 +546,25 @@
     .user
       width: 100%
       display: block
+@-webkit-keyframes renovate_ico
+  0%
+    -webkit-transfrom: rotate(0deg)
 
+  50%
+    -webkit-transform: rotate(180deg)
+
+  100%
+    -webkit-transform: rotate(360deg)
+
+@keyframes renovate_ico
+  0%
+    transfrom: rotate(0deg)
+
+  50%
+    transform: rotate(180deg)
+
+  100%
+    transform: rotate(360deg)
 
 
 
