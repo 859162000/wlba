@@ -1237,7 +1237,7 @@ class WeixinRedpackRegister(CoopRegister):
         super(WeixinRedpackRegister, self).__init__(request)
         self.c_code = 'wrp'
         self.invite_code = 'wrp'
-        self.order_id = request.GET.get("order_id", None)
+        self.order_id = request.POST.get("order_id", None)
 
     def register_call_back(self, user):
         phone = user.wanglibaouserprofile.phone
