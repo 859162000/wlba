@@ -21,12 +21,18 @@ require.config({
 
 require(['jquery', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/modal', 'tools', 'jquery.webuploader' ,'code', 'upload', 'csrf'], function ($, form ,validate, placeholder, modal, tool, webuploader, code) {
 
-    code.sendSMSCode.sendSMSCodeInit({
-        sendCodeBtn :'button-get-code-btn'
+    $('#button-get-code-btn').on('click',function(){
+        code.sendSMSCode.sendSMSCodeInit({
+            sendCodeBtn : 'button-get-code-btn',
+            voiceCodeBox: 'voiceCodeBox'
+        })
     })
 
-    code.sendSMSCode.sendSMSCodeInit({
-        sendCodeBtn :'button-get-code-btn1'
+    $('#button-get-code-btn1').on('click',function(){
+        code.sendSMSCode.sendSMSCodeInit({
+            sendCodeBtn :'button-get-code-btn1',
+            voiceCodeBox: 'voiceCodeBox1'
+        })
     })
 
     //提交表单
