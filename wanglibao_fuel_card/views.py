@@ -131,7 +131,12 @@ class RevenueExchangeIndexView(TemplateView):
 
             # 获取产品的奖品面额及产品最低购买限额
             for p in data:
-                exchange_rule = get_object_or_404(RevenueExchangeRule, product=p)
+                try:
+                    exchange_rule = RevenueExchangeRule.objects.get(product=p)
+                except RevenueExchangeRule.DoesNotExist:
+                    logger.info('exchange index faild No product[%s] matches the exchange rule user[%s]' %
+                                (p.id, user.id))
+                    raise Http404(u'页面不存在')
                 p.equality_prize_amount = exchange_rule.equality_prize_amount
                 p.limit_min_per_user = exchange_rule.limit_min_per_user
 
