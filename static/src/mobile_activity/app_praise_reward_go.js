@@ -8,11 +8,11 @@
 		phone_num = $('#get_phone').val();
 
 		$.ajax({
-			url: '/weixin_activity/weixin/bonus/?act=apply&phone='+phone_num+'&wxid=1001',
+			url: '/weixin_activity/weixin/bonus/?act=apply&phone='+phone_num+'&wxid=1002',
 			type: "GET",
 		}).done(function (xhr) {
 			if(xhr.err_code==0){
-				window.location.href = '/weixin_activity/weixin/bonus/?wxid=1001'
+				window.location.href = '/weixin_activity/weixin/bonus/?wxid=1002'
 			}else{
 				alert(xhr.err_messege);
 			}
