@@ -1236,12 +1236,14 @@ class WeixinAnnualBonusView(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         #self.openid = "333222111"
-        wxid = self.request.GET.get('wxid')
+        wxid = self.request.GET.get('wxid111')
         if wxid:
             self.openid = wxid
+        self.openid = self.request.session.get('WECHAT_OPEN_ID', None)
         if not self.openid:
             #super(WeixinAnnualBonusView, self).getOpenid(request, *args, **kwargs)
-            self.openid = self.getOpenid(request, *args, **kwargs)
+            return self.getOpenid(request, *args, **kwargs)
+
         self.from_openid = self.openid
         if not self.from_openid:
             #TODO: 转错误页面
@@ -1273,12 +1275,13 @@ class WeixinAnnualBonusView(TemplateView):
         if not self.to_openid:
             self.template_name = 'app_praise_reward.jade'
             return { 'err_code':101, 'err_messege':u'获取受评用户失败' }
-        wx_user = WeixinAnnualBonus.objects.filter(openid=self.to_openid).first()
-        #wx_user = None
-        if wx_user:
+        wx_bonus = WeixinAnnualBonus.objects.filter(openid=self.to_openid).first()
+        #wx_bonus = None
+        wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
+        if wx_bonus:
             if self.is_myself:
                 self.template_name = 'app_praise_reward.jade'
-                return { 'err_code':0, 'err_messege':u'', 'is_myself':self.is_myself, 'wx_user':wx_user, }
+                return { 'err_code':0, 'err_messege':u'用户', 'is_myself':self.is_myself, 'wx_user':wx_bonus, }
         else:
             if self.is_myself:
                 self.template_name = 'app_praise_reward_go.jade'
@@ -1466,6 +1469,5 @@ class WeixinAnnualBonusView(TemplateView):
         self.nick_name = w_user.nickname
         self.head_img = w_user.headimgurl
 
-        return self.openid
-        #return super(LowBaseWeixinTemplate, self).dispatch(request, *args, **kwargs)
+        return self.dispatch(request, *args, **kwargs)
 
