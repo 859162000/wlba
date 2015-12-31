@@ -6,7 +6,7 @@ webpackJsonp([7],[
 
 	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
 
-	__webpack_require__(2);
+	var _ui = __webpack_require__(2);
 
 	var _automatic_detection = __webpack_require__(5);
 
@@ -53,35 +53,35 @@ webpackJsonp([7],[
 
 	            if (isThrough) return resolve('验证成功');
 
-	            (0, _functions.signView)(sign);
+	            (0, _ui.ui_signError)(sign);
 	            return console.log('验证失败');
 	        });
 	    };
 
 	    //修改密码
 	    function reset_password(url) {
-	        return new Promise(function (resolve, reject) {
-	            (0, _functions.ajax)({
-	                url: url,
-	                type: 'POST',
-	                data: {
-	                    'old_password': $oldPassword.val(),
-	                    'new_password1': $newPassword1.val(),
-	                    'new_password2': $newPassword2.val()
-	                },
-	                beforeSend: function beforeSend() {
-	                    $submit.text('修改中,请稍等...').attr('disabled', 'true');
-	                },
-	                success: function success(data) {
-	                    resolve(data);
-	                },
-	                error: function error(xhr) {
-	                    reject(xhr);
-	                },
-	                complete: function complete() {
-	                    $submit.text('修改登录密码').removeAttr('disabled');
-	                }
-	            });
+	        (0, _functions.ajax)({
+	            url: url,
+	            type: 'POST',
+	            data: {
+	                'old_password': $oldPassword.val(),
+	                'new_password1': $newPassword1.val(),
+	                'new_password2': $newPassword2.val()
+	            },
+	            beforeSend: function beforeSend() {
+	                $submit.text('修改中,请稍等...').attr('disabled', 'true');
+	            },
+	            success: function success(data) {
+	                (0, _ui.ui_alert)('密码修改成功，请重新登录', function () {
+	                    window.location.href = '/fuel_card/login/';
+	                });
+	            },
+	            error: function error(xhr) {
+	                (0, _ui.ui_signError)('系统出错，请稍后再试');
+	            },
+	            complete: function complete() {
+	                $submit.text('修改登录密码').removeAttr('disabled');
+	            }
 	        });
 	    }
 
@@ -89,12 +89,8 @@ webpackJsonp([7],[
 	        checkOperation().then(function (result) {
 	            console.log(result); //check success
 	            return reset_password('/accounts/password/change/');
-	        }).then(function (result) {
-	            alert('密码修改成功，请重新登录', function () {
-	                window.location.href = '/fuel/login/';
-	            });
 	        }).catch(function (xhr) {
-	            return (0, _functions.signView)('系统出错，请稍后再试');
+	            return (0, _ui.ui_signError)('系统出错，请稍后再试');
 	        });
 	    });
 	    //---------------注册操作end---------
@@ -103,62 +99,7 @@ webpackJsonp([7],[
 
 /***/ },
 /* 1 */,
-/* 2 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function($) {'use strict';
-
-	/**
-	 *
-	 * 引入fuel_alert.jade
-	 * @param text 文字说明
-	 * @param callback 回调函数
-	 */
-	window.alert = function (text, callback) {
-
-	    var $alert = $('.fuel-alert'),
-	        $button = $('.fuel-submit');
-
-	    $alert.css('display', '-webkit-box').find('.fuel-text').text(text);
-
-	    $button.on('click', function () {
-	        $alert.hide();
-	        callback && callback();
-	    });
-	};
-
-	/**
-	 * 引入fuel_alert.jade
-	 * @param title confim文字说明
-	 * @param certainName 左边按钮文字
-	 * @param callback  回调函数
-	 * @param callbackData 回调函数的数据
-	 */
-	window.confirm = function (title) {
-	    var certainName = arguments.length <= 1 || arguments[1] === undefined ? '确定' : arguments[1];
-	    var callback = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
-	    var callbackData = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
-
-	    var $confirm = $('.confirm-warp');
-	    if ($confirm.length <= 0) return;
-	    $confirm.show();
-	    $confirm.find('.confirm-text').text(title);
-	    $confirm.find('.confirm-certain').text(certainName);
-
-	    $confirm.find('.confirm-cancel').on('click', function () {
-	        $confirm.hide();
-	    });
-
-	    $confirm.find('.confirm-certain').on('click', function () {
-	        $confirm.hide();
-	        if (callback) {
-	            callbackData ? callback(callbackData) : callback();
-	        }
-	    });
-	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
-
-/***/ },
+/* 2 */,
 /* 3 */,
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {

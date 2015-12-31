@@ -317,7 +317,6 @@ class RevenueExchangeBuyRecordView(TemplateView):
             sorted_term = '-term'
 
         user_amortizations = self._get_user_amortizations(self.request.user, l_type, settled_status, sorted_term)
-
         for ua in user_amortizations:
             # 获取产品的奖品面额及产品最低购买限额
             product = ua.product_amortization.product
@@ -458,7 +457,6 @@ class FuelBankCard(TemplateView):
         try:
 
             p2p_cards = card_bind_list(self.request)['cards']
-            print p2p_cards
             for card in p2p_cards:
                 if card['is_the_one_card']:
                     is_one = True

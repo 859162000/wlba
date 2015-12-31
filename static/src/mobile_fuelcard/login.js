@@ -1,5 +1,6 @@
+import { ui_alert, ui_signError} from './mixins/ui'
 import { Automatic } from './mixins/automatic_detection'
-import { ajax, signView } from './mixins/functions'
+import { ajax } from './mixins/functions'
 import { check } from './mixins/check'
 
 (() => {
@@ -40,7 +41,7 @@ import { check } from './mixins/check'
             const [isThrough, sign]  = checkOperation();
             if (isThrough) return resolve('验证成功');
 
-            signView(sign);
+            ui_signError(sign);
             return console.log('验证失败');
         })
     }
@@ -83,12 +84,12 @@ import { check } from './mixins/check'
             })
             .catch((res) => {
                 if (res['status'] == 403) {
-                    signView('请勿重复提交')
+                    ui_signError('请勿重复提交')
                     return false;
                 }
                 let data = JSON.parse(res.responseText);
                 for (let key in data) {
-                    data['__all__'] ?  signView(data['__all__'][0]) : signView(data[key][0]);
+                    data['__all__'] ?  ui_signError(data['__all__'][0]) : ui_signError(data[key][0]);
                 }
             })
     });

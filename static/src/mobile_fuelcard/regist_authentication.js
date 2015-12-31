@@ -1,6 +1,6 @@
-import './mixins/ui'
+import { ui_alert, ui_signError, ui_confirm} from './mixins/ui'
 import { Automatic } from './mixins/automatic_detection'
-import { ajax, signView } from './mixins/functions'
+import { ajax } from './mixins/functions'
 import { check } from './mixins/check'
 
 (() => {
@@ -40,7 +40,7 @@ import { check } from './mixins/check'
             const [isThrough, sign]  = checkOperation();
             if (isThrough) return resolve('验证成功');
 
-            signView(sign);
+            ui_signError(sign);
             return console.log('验证失败');
         })
     }
@@ -78,13 +78,13 @@ import { check } from './mixins/check'
                 return authentication('/api/id_validate/');
             })
             .then((result)=> {
-                alert('实名认证成功', ()=> {
-                    window.location.href= '/fuel/regist/bank/';
+                ui_alert('实名认证成功', ()=> {
+                    window.location.href= '/fuel_card/regist/bank/';
                 });
             })
             .catch((xhr) => {
                 result = JSON.parse(xhr.responseText);
-                return signView(result.message);
+                return ui_signError(result.message);
             })
     });
 //---------------注册操作end---------

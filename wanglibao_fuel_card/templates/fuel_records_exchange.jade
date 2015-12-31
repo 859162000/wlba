@@ -7,20 +7,14 @@ html
     nav.records-nav
       ul
         li.active
-          a(href="/weixin/transaction/repaying/") 待收
+          a(href="/fuel_card/exchange-record/receiving/") 待收
         li
-          a(href="/weixin/transaction/buying/") 已收到未领取
+          a(href="/fuel_card/exchange-record/exchanging/") 已收到未领取
     .records-exchange-item
-      mixin list()
-        .records-exchange-list
-          .records-card-date 15-10-11
-          .records-card-count 150元理财加油卡 x 1
-          //a(href='#').records-show-card 查看卡密
+      if exchange_amos
+        for list in exchange_amos
+          .records-exchange-list
+            .records-card-date {{list.term_date | date:"Y-m-d"}}
+            .records-card-count 150元理财加油卡 x 1
+            //a(href='#').records-show-card 查看卡密
 
-      +list()
-      +list()
-      +list()
-      +list()
-      +list()
-      +list()
-      +list()

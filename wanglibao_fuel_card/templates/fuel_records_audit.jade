@@ -7,24 +7,34 @@ html
     nav.records-nav
       ul
         li.active
-          a(href="/weixin/transaction/repaying/") 审核中
+          a(href="/fuel_card/buy-record/auditing/") 审核中
         li
-          a(href="/weixin/transaction/finished/") 已完成
+          a(href="/fuel_card/buy-record/done/") 已完成
 
 
     .records-item
-      mixin list()
-        .records-list.records-list-blue
-          .records-card-amount
-            span.amount 4000
-            |元
-          .records-card-detail
-            .records-name 初级理财加油卡
-            .records-dec
-              span.records-propress-text 已得150元理财加油卡
-              span.records-propress-num 2/3
-            .records-date 2015-11-10
+      if data
+        if status == 'auditing'
+          redpackname  = 'records-list-blue'
+        else
+          redpackname  = 'records-list-grey'
+        for list in data
 
-      +list()
-      +list()
-      +list()
+          .records-list(class='{{redpackname}}')
+            .records-card-amount
+              principal = int(list.limit_min_per_user)
+              span.amount {{principal}}
+              |元
+            .records-card-detail
+              .records-name {{list.product_amortization.product.name}}
+              .records-dec
+                equality = int(list.equality_prize_amount)
+                span.records-propress-text 已得{{equality}}元理财加油卡
+                span.records-propress-num {{list.term}}/{{list.product_amortization.product.amortization_count}}
+              .records-date {{list.term_date | date:"Y-m-d"}}
+
+      else
+        .records-default
+          img(src='/static/imgs/mobile_fuelcard/public/default.png')
+          p 暂无记录，快去投资吧！
+

@@ -1,5 +1,5 @@
-import './mixins/ui'
-import { ajax, signView } from './mixins/functions'
+import { ui_alert, ui_signError} from './mixins/ui'
+import { ajax } from './mixins/functions'
 
 
 (()=>{
@@ -22,7 +22,7 @@ import { ajax, signView } from './mixins/functions'
             success: function (data) {
                 if(data.status_code === 0 ){
                     $signItem.hide()
-                    return alert('绑定成功', function(){
+                    return ui_alert('绑定成功', function(){
                         var url  = window.location.href;
                         window.location.href = url;
                     })
@@ -31,7 +31,7 @@ import { ajax, signView } from './mixins/functions'
             error: function (xhr) {
                 $signItem.hide()
                 var result = JSON.parse(xhr.responseText);
-                return signView(result.detail+ '，一个账号只能绑定一张卡')
+                return ui_signError(result.detail+ '，一个账号只能绑定一张卡')
             },
             complete: function(){
                 $confirm.text('立即绑定').removeAttr('disabled');
