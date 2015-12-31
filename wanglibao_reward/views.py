@@ -182,6 +182,7 @@ class WeixinShareDetailView(TemplateView):
             gift = WanglibaoActivityGift.objects.create(
                 gift_id=product_id,
                 activity=self.activity,
+                redpack_id=-1,
                 valid=True,
                 type=3,
                 cfg_id=1
