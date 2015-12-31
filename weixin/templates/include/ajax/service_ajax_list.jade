@@ -31,9 +31,13 @@ for product in results
             .time-tit 投资期限
           .body-time.body-price
             .time-num
-              total = product['total_amount']/10000
-              em.section-hui {{total}}
-              | 万
+              if product.total_amount < 10000
+                em.section-hui {{product.total_amount}}
+                | 元
+              else
+                total = product['total_amount']/10000
+                em.section-hui {{total}}
+                | 万
             .time-tit 融资金额
         .body-line-box
           .grey-line
