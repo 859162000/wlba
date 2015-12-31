@@ -65,21 +65,25 @@
         .footer_bg
           width: 100%
           display: block
-          position: fixed
+          //position: fixed
+          position: relative
           left: 0
           bottom: 0
           z-index: 2
-          @media screen and (max-height: 569px)
+          @media screen and (max-device-height: 481px)
             position: relative
+
         .footer_logo
-          position: fixed
+          //position: fixed
+          position: absolute
           bottom: 0.8rem
           left: 41.2%
           width: 17.6%
           display: block
           z-index: 3
-          @media screen and (max-height: 569px)
+          @media screen and (max-device-height: 481px)
             position: absolute
+            bottom: 0.8rem
   .invitation_page
     width: 100%
     .top_wrap
