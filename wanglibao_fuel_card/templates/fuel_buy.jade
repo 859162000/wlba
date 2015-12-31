@@ -46,5 +46,7 @@ html
     include include/fuel_errorsign
     include include/fuel_confirm
     include include/fuel_alert
-    script(src='/static/scripts/mobile_fuelcard/dev/vendor.zepto.js')
-    script(src='/static/scripts/mobile_fuelcard/dev/buy.js')
+    - with 'pro' as DEBUG
+    include include/fuel_zepto
+    - endwith
+    script(src='/static/scripts/mobile_fuelcard/pro/buy.js')

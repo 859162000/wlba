@@ -123,7 +123,7 @@ webpackJsonp([3],[
 	            amount: AMOUNT,
 	            gate_id: g_GATE_ID
 	        };
-	        (0, _ui.ui_confirm)("充值金额为" + AMOUNT, '确认充值', recharge, push_data);
+	        (0, _ui.ui_confirm)('充值金额为' + AMOUNT, '确认充值', recharge, push_data);
 	    });
 	})();
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))

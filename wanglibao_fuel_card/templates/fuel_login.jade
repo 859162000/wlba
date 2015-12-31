@@ -31,7 +31,9 @@ html
         span 账户资金安全由平安银行承保
 
     include include/fuel_errorsign
-    script(src='/static/scripts/mobile_fuelcard/dev/vendor.zepto.js')
-    script(src='/static/scripts/mobile_fuelcard/dev/login.js')
+    - with 'pro' as DEBUG
+    include include/fuel_zepto
+    - endwith
+    script(src='/static/scripts/mobile_fuelcard/pro/login.js')
 
 

@@ -320,6 +320,7 @@ class RevenueExchangeBuyRecordView(TemplateView):
         for ua in user_amortizations:
             # 获取产品的奖品面额及产品最低购买限额
             product = ua.product_amortization.product
+            print product.id,'=============='
             exchange_rule = get_object_or_404(RevenueExchangeRule, product=product)
             ua.equality_prize_amount = float(exchange_rule.equality_prize_amount)
             ua.limit_min_per_user = float(exchange_rule.limit_min_per_user)

@@ -31,6 +31,8 @@ html
                 for val in list.reward
                   li 兑换号为: {{val.conversion_code}}
 
-    script(src='/static/scripts/mobile_fuelcard/dev/vendor.zepto.js')
-    script(src='/static/scripts/mobile_fuelcard/dev/records.js')
+    - with 'pro' as DEBUG
+    include include/fuel_zepto
+    - endwith
+    script(src='/static/scripts/mobile_fuelcard/pro/records.js')
 

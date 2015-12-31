@@ -43,5 +43,7 @@ html
         button(type='submit',disabled=true).fuel-password-submit 绑定银行卡
     include include/fuel_errorsign
     include include/fuel_alert
-    script(src='/static/scripts/mobile_fuelcard/dev/vendor.zepto.js')
-    script(src='/static/scripts/mobile_fuelcard/dev/regist_bank.js')
+    - with 'pro' as DEBUG
+    include include/fuel_zepto
+    - endwith
+    script(src='/static/scripts/mobile_fuelcard/pro/regist_bank.js')

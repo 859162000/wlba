@@ -58,5 +58,7 @@ html
         a(href="/weixin/regist/first/").fuel-rechage-sumit 去实名认证
 
 
-  script(src='/static/scripts/mobile_fuelcard/dev/vendor.zepto.js')
-  script(src='/static/scripts/mobile_fuelcard/dev/put_bank.js')
+  - with 'pro' as DEBUG
+  include include/fuel_zepto
+  - endwith
+  script(src='/static/scripts/mobile_fuelcard/pro/put_bank.js')

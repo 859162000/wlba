@@ -31,7 +31,7 @@ import { ajax } from './mixins/functions'
             error: function (xhr) {
                 $signItem.hide()
                 var result = JSON.parse(xhr.responseText);
-                return ui_signError(result.detail+ '，一个账号只能绑定一张卡')
+                return ui_signError( `${result.detail}，一个账号只能绑定一张卡`)
             },
             complete: function(){
                 $confirm.text('立即绑定').removeAttr('disabled');

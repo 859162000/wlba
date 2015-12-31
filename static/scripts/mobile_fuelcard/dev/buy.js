@@ -115,7 +115,7 @@ webpackJsonp([0],[
 	            'p_parts': p_parts,
 	            'amount': amount
 	        };
-	        (0, _ui.ui_confirm)("购买金额为" + amount, '确认购买', but_operation, push_data);
+	        (0, _ui.ui_confirm)('购买金额为' + amount, '确认购买', but_operation, push_data);
 	    });
 	})();
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))

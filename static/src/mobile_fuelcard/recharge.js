@@ -118,7 +118,7 @@ import { ajax } from './mixins/functions'
             amount: AMOUNT,
             gate_id: g_GATE_ID,
         }
-        ui_confirm("充值金额为" + AMOUNT, '确认充值', recharge, push_data)
+        ui_confirm(`充值金额为${AMOUNT}`, '确认充值', recharge, push_data)
     })
 
 })()

@@ -49,10 +49,10 @@ import { validation } from './mixins/validation'
         function _format_limit(amount) {
             const reg = /^\d{5,}$/, reg2 = /^\d{4}$/;
             if (reg.test(amount)) {
-                return amount.replace('0000', '') + '万'
+                return `${amount.replace('0000', '')}万`
             }
             if (reg2.test(amount)) {
-                return amount.replace('000', '') + '千'
+                return `${amount.replace('000', '')}千`
             }
         }
 
@@ -60,13 +60,14 @@ import { validation } from './mixins/validation'
             const $limitItem = $('.limit-bank-item');
             let list = '';
             for (let i = 0; i < data.length; i++) {
-                list += "<div class='limit-bank-list'>"
-                list += "<div class='limit-list-dec'> "
-                list += "<div class='bank-name'>" + data[i].name + "</div>";
-                list += "<div class='bank-limit'>首次限额" + _format_limit(data[i].first_one) + "/单笔限额" + _format_limit(data[i].first_one) + "/日限额" + _format_limit(data[i].second_day) + "</div>";
-                list += "</div>"
-                list += "<div class='limit-list-icon " + data[i].bank_id + "'></div>"
-                list += "</div>"
+                list += `
+                        <div class='limit-bank-list'>
+                            <div class='limit-list-dec'>
+                                <div class='bank-name'>${data[i].name}</div>
+                                <div class='bank-limit'>首次限额${_format_limit(data[i].first_one)}/单笔限额${_format_limit(data[i].first_one)}/日限额${_format_limit(data[i].second_day)}</div>
+                            </div>
+                            <div class='limit-list-icon ${data[i].bank_id}'></div>
+                        </div>`;
             }
             $limitItem.html(list)
         }

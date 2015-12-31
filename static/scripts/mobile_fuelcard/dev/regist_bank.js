@@ -66,13 +66,7 @@ webpackJsonp([7],[
 	            var $limitItem = $('.limit-bank-item');
 	            var list = '';
 	            for (var i = 0; i < data.length; i++) {
-	                list += "<div class='limit-bank-list'>";
-	                list += "<div class='limit-list-dec'> ";
-	                list += "<div class='bank-name'>" + data[i].name + "</div>";
-	                list += "<div class='bank-limit'>首次限额" + _format_limit(data[i].first_one) + "/单笔限额" + _format_limit(data[i].first_one) + "/日限额" + _format_limit(data[i].second_day) + "</div>";
-	                list += "</div>";
-	                list += "<div class='limit-list-icon " + data[i].bank_id + "'></div>";
-	                list += "</div>";
+	                list += '\n                        <div class=\'limit-bank-list\'>\n                            <div class=\'limit-list-dec\'>\n                                <div class=\'bank-name\'>' + data[i].name + '</div>\n                                <div class=\'bank-limit\'>首次限额' + _format_limit(data[i].first_one) + '/单笔限额' + _format_limit(data[i].first_one) + '/日限额' + _format_limit(data[i].second_day) + '</div>\n                            </div>\n                            <div class=\'limit-list-icon ' + data[i].bank_id + '\'></div>\n                        </div>';
 	            }
 	            $limitItem.html(list);
 	        }

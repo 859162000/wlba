@@ -90,7 +90,7 @@ import { check } from './mixins/check'
             'p_parts': p_parts,
             'amount': amount
         }
-        ui_confirm("购买金额为" + amount, '确认购买', but_operation, push_data)
+        ui_confirm(`购买金额为${amount}` , '确认购买', but_operation, push_data)
     })
 
 })()
