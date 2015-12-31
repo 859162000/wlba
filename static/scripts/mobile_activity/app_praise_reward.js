@@ -379,9 +379,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			$('.friend_top .text').text('请点击，我同意网利宝年终奖活动规则');
 			$('.friend_top').fadeIn();
 		}
-
 	});
 	/*领取我的年终奖结束*/
+
+	$('.friend_top .close').click(function(){
+		$('.friend_top').hide();
+	})
 
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({
