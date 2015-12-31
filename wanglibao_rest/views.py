@@ -1061,11 +1061,12 @@ class StatisticsInside(APIView):
         # 昨日首投用户
         from django.db import connection
         cursor = connection.cursor()
-        sql = "select sum(p.amount) as amount_sum " \
-              "from wanglibao_p2p_p2precord p, marketing_introducedby i " \
-              "where p.user_id = i.user_id " \
-              "and i.bought_at > '{}' and i.bought_at <= '{}' " \
-              "and p.create_time > '{}' and p.create_time <= '{}';".format(start_fmt, end_fmt, start_fmt, end_fmt)
+        sql = "SELECT SUM(a.amount) as amount_sum FROM wanglibao_p2p_p2precord a, " \
+              "(SELECT user_id, create_time FROM wanglibao_p2p_p2precord WHERE catalog='申购' GROUP BY user_id) b " \
+              "WHERE a.user_id = b.user_id " \
+              "AND b.create_time >= '{}' AND b.create_time < '{}' " \
+              "AND a.create_time >= '{}' AND a.create_time < '{}' " \
+              "AND a.catalog='申购';".format(start_fmt, end_fmt, start_fmt, end_fmt)
         cursor.execute(sql)
         fetchone = cursor.fetchone()
 
