@@ -1,0 +1,26 @@
+- load formatters
+doctype html
+html(style="background: #3a2741")
+    head
+        title 网利宝
+        include include/app_head
+        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=123004", rel="stylesheet")
+        - csrf_token
+    body
+        .body_wrap
+            .praise_wrap
+                img.top_light(src="/static/imgs/mobile_activity/app_praise_reward/top_light.png")
+                .i_want_reward
+                    img(src="/static/imgs/mobile_activity/app_praise_reward/i_want_reward.png")
+                    .text 集赞多少拿多少
+                .group_bg
+                    .main_wrap
+                        img.bg(src="/static/imgs/mobile_activity/app_praise_reward/group.png")
+                        input.phone#get_phone(type='text' placeholder="请输入手机号")
+                        .button#go_receive 立即领取===={{err_code}}
+                        img.footer_bg(src="/static/imgs/mobile_activity/app_praise_reward/praise_wrap_footer.png")
+                        img.footer_logo(src="/static/imgs/mobile_activity/app_praise_reward/footer_logo.png")
+        script(src='/static/src/mobile/lib/weixin/wx.js')
+        script(src='/static/js/lib/jquery.min.js')
+        script(src="/static/scripts/mobile_activity/app_praise_reward_go.js?v=123101")
+        script.

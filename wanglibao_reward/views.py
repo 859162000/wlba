@@ -1230,6 +1230,7 @@ class WeixinAnnualBonusView(LowBaseWeixinTemplate):
 
     def dispatch(self, request, *args, **kwargs):
         self.openid = "333222111"
+        self.openid = self.request.GET.get('wxid', "333222111")
         if not self.openid:
             super(WeixinAnnualBonusView, self).getOpenid(request, *args, **kwargs)
         self.from_openid = self.openid
@@ -1272,6 +1273,9 @@ class WeixinAnnualBonusView(LowBaseWeixinTemplate):
             if self.is_myself:
                 self.template_name = 'app_praise_reward.jade'
                 return { 'err_code':102, 'err_messege':u'用户还未申领年终奖', 'is_myself':self.is_myself,  }
+            else:
+                self.template_name = 'app_praise_reward.jade'
+                return { 'err_code':103, 'err_messege':u'异常请求', 'is_myself':self.is_myself,  }
 
     def apply_bonus(self):
         phone = self.request.GET.get('phone')

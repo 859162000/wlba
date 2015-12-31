@@ -5,19 +5,7 @@
 	var is_myself;
 
 	/*得到初始数据*/
-	$.ajax({
-		url: 'weixin_activity/weixin/bonus/?uid=1001&wxid=1002',
-		type: "POST",
-		data: {
 
-		}
-	}).done(function (xhr) {
-		if(xhr.err_code==0){
-
-		}else if(xhr.err_code==0){
-			alert('信息错误')
-		}
-	});
 	/*得到初始数据结束*/
 
 	/*滚动图*/
