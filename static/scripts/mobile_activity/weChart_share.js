@@ -512,6 +512,9 @@ org.weChatStart = (function(org){
                 var ele = $('.code-content'),
                     curHeight = ele.height();
                 ele.height(curHeight).animate({height: 0},500);
+                $('input[name=validate_code]').val('');
+                $('input[name=captcha_1]').val('');
+
             }
             return isRight;
         },
