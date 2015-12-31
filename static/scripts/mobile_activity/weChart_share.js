@@ -238,7 +238,7 @@ var weChatShare = (function(org){
             }
         });
         wx.ready(function(){
-            var host = 'https://www.wanglibao.com',
+            var host = 'https://staging.wanglibao.com',
                 shareImg = host + '/static/imgs/mobile/weChat_logo.png',
                 shareLink = $('input[name=url]').val(),
                 shareMainTit = $('input[name=title]').val(),
