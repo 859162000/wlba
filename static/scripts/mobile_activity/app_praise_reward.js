@@ -221,6 +221,23 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 	//alert($(window).width());
 
+	var is_myself;
+
+	$.ajax({
+		url: 'weixin_activity/weixin/bonus/?uid=1001&wxid=1002',
+		type: "POST",
+		data: {
+
+		}
+	}).done(function (xhr) {
+		if(xhr.err_code==0){
+
+		}else if(xhr.err_code==0){
+			alert('信息错误')
+		}
+	});
+
+
 	/*滚动图*/
 	function mycarousel_initCallback(carousel) {
 		jQuery('.jcarousel-control a').bind('click', function() {
@@ -252,15 +269,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	/*滚动图结束*/
 
 
-	//$.ajax({
-	//	url: 'weixin_activity/weixin/bonus/?uid=',
-	//	type: "POST",
-	//	data: {
-	//		//action : 'AWARD_DONE'
-	//	}
-	//}).done(function (xhr) {
-	//
-	//});
+
 
 	$('#get_phone').val();
 	//得到手机号
