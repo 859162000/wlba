@@ -1236,10 +1236,11 @@ class WeixinAnnualBonusView(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         #self.openid = "333222111"
-        wxid = self.request.GET.get('wxid111')
+        wxid = self.request.GET.get('wxid')
         if wxid:
             self.openid = wxid
-        self.openid = self.request.session.get('WECHAT_OPEN_ID', None)
+        if not self.openid:
+            self.openid = self.request.session.get('WECHAT_OPEN_ID', None)
         if not self.openid:
             #super(WeixinAnnualBonusView, self).getOpenid(request, *args, **kwargs)
             return self.getOpenid(request, *args, **kwargs)
@@ -1277,8 +1278,8 @@ class WeixinAnnualBonusView(TemplateView):
             return { 'err_code':101, 'err_messege':u'获取受评用户失败' }
         wx_bonus = WeixinAnnualBonus.objects.filter(openid=self.to_openid).first()
         #wx_bonus = None
-        wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
         if wx_bonus:
+            wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
             if self.is_myself:
                 self.template_name = 'app_praise_reward.jade'
                 return { 'err_code':0, 'err_messege':u'用户', 'is_myself':self.is_myself, 'wx_user':wx_bonus, }
