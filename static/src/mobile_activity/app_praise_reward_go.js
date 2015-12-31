@@ -2,11 +2,11 @@
 
 	var is_myself;
 	var phone_num;
-
+	/*申请领取*/
 	$('#go_receive').click(function(){
 
 		phone_num = $('#get_phone').val();
-		/*申请领取*/
+
 		$.ajax({
 			url: '/weixin_activity/weixin/bonus/?act=apply&phone='+phone_num+'&wxid=1001',
 			type: "GET",
