@@ -1244,7 +1244,7 @@ class WeixinRedpackRegister(CoopRegister):
         logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
         try:
             ex_event = ExperienceEvent.objects.filter(name=u'新手体验金', invalid=False).first()
-            WanglibaoActivityReward.objects.create(
+            ActivityReward.objects.create(
                 order_id=self.order_id,
                 activity='weixin_experience_glod',
                 experience=ex_event,
