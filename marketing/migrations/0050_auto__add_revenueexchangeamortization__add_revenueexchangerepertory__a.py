@@ -47,6 +47,21 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'marketing', ['RevenueExchangeRepertory'])
 
+        # Adding model 'RevenueExchangeRule'
+        db.create_table(u'marketing_revenueexchangerule', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('reward_name', self.gf('django.db.models.fields.CharField')(max_length=40)),
+            ('limit_min_per_user', self.gf('django.db.models.fields.FloatField')(default=100)),
+            ('equality_prize_amount', self.gf('django.db.models.fields.FloatField')(default=0)),
+            ('exchange_method', self.gf('django.db.models.fields.CharField')(default=u'\u76f4\u5145', max_length=10)),
+            ('product', self.gf('django.db.models.fields.related.ForeignKey')(related_name='reward_rule', unique=True, to=orm['wanglibao_p2p.P2PProduct'])),
+            ('reward_range', self.gf('django.db.models.fields.CharField')(max_length=50)),
+            ('reward_options', self.gf('django.db.models.fields.CharField')(max_length=80, null=True, blank=True)),
+            ('created_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('exchange_channel', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['marketing.Channels'])),
+        ))
+        db.send_create_signal(u'marketing', ['RevenueExchangeRule'])
+
         # Adding model 'RevenueExchangeOrder'
         db.create_table(u'marketing_revenueexchangeorder', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -60,20 +75,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'marketing', ['RevenueExchangeOrder'])
 
-        # Adding model 'RevenueExchangeRule'
-        db.create_table(u'marketing_revenueexchangerule', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('reward_name', self.gf('django.db.models.fields.CharField')(max_length=40)),
-            ('limit_min_per_user', self.gf('django.db.models.fields.FloatField')(default=100)),
-            ('equality_prize_amount', self.gf('django.db.models.fields.FloatField')(default=0)),
-            ('exchange_method', self.gf('django.db.models.fields.CharField')(default=u'\u76f4\u5145', max_length=10)),
-            ('product', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_p2p.P2PProduct'], unique=True)),
-            ('reward_range', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('reward_options', self.gf('django.db.models.fields.CharField')(max_length=80, null=True, blank=True)),
-            ('created_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal(u'marketing', ['RevenueExchangeRule'])
-
 
     def backwards(self, orm):
         # Deleting model 'RevenueExchangeAmortization'
@@ -82,11 +83,11 @@ class Migration(SchemaMigration):
         # Deleting model 'RevenueExchangeRepertory'
         db.delete_table(u'marketing_revenueexchangerepertory')
 
-        # Deleting model 'RevenueExchangeOrder'
-        db.delete_table(u'marketing_revenueexchangeorder')
-
         # Deleting model 'RevenueExchangeRule'
         db.delete_table(u'marketing_revenueexchangerule')
+
+        # Deleting model 'RevenueExchangeOrder'
+        db.delete_table(u'marketing_revenueexchangeorder')
 
 
     models = {
@@ -309,7 +310,7 @@ class Migration(SchemaMigration):
         },
         u'marketing.promotiontoken': {
             'Meta': {'object_name': 'PromotionToken'},
-            'token': ('django.db.models.fields.CharField', [], {'default': "'yT6GRnyjTQKwHUywD6aRzQ'", 'max_length': '64', 'db_index': 'True'}),
+            'token': ('django.db.models.fields.CharField', [], {'default': "'8SiRtqTHRcyGZPxh9bcjVA'", 'max_length': '64', 'db_index': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
         },
         u'marketing.quickapplyinfo': {
@@ -374,10 +375,11 @@ class Migration(SchemaMigration):
             'Meta': {'ordering': "['-created_time']", 'object_name': 'RevenueExchangeRule'},
             'created_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'equality_prize_amount': ('django.db.models.fields.FloatField', [], {'default': '0'}),
+            'exchange_channel': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['marketing.Channels']"}),
             'exchange_method': ('django.db.models.fields.CharField', [], {'default': "u'\\u76f4\\u5145'", 'max_length': '10'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'limit_min_per_user': ('django.db.models.fields.FloatField', [], {'default': '100'}),
-            'product': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.P2PProduct']", 'unique': 'True'}),
+            'product': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'reward_rule'", 'unique': 'True', 'to': u"orm['wanglibao_p2p.P2PProduct']"}),
             'reward_name': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
             'reward_options': ('django.db.models.fields.CharField', [], {'max_length': '80', 'null': 'True', 'blank': 'True'}),
             'reward_range': ('django.db.models.fields.CharField', [], {'max_length': '50'})
@@ -476,7 +478,7 @@ class Migration(SchemaMigration):
             'category': ('django.db.models.fields.CharField', [], {'default': "u'\\u666e\\u901a'", 'max_length': '16'}),
             'contract_serial_number': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True'}),
             'contract_template': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_p2p.ContractTemplate']", 'null': 'True', 'on_delete': 'models.SET_NULL'}),
-            'end_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2016, 1, 17, 0, 0)'}),
+            'end_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2016, 1, 20, 0, 0)'}),
             'excess_earning_description': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'excess_earning_rate': ('django.db.models.fields.FloatField', [], {'default': '0'}),
             'expected_earning_rate': ('django.db.models.fields.FloatField', [], {'default': '0'}),
@@ -491,7 +493,7 @@ class Migration(SchemaMigration):
             'pay_method': ('django.db.models.fields.CharField', [], {'default': "u'\\u7b49\\u989d\\u672c\\u606f'", 'max_length': '32'}),
             'period': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'priority': ('django.db.models.fields.IntegerField', [], {'db_index': 'True'}),
-            'publish_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2016, 1, 7, 0, 0)', 'db_index': 'True'}),
+            'publish_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2016, 1, 10, 0, 0)', 'db_index': 'True'}),
             'repaying_source': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'serial_number': ('django.db.models.fields.CharField', [], {'max_length': '100', 'unique': 'True', 'null': 'True'}),
             'short_name': ('django.db.models.fields.CharField', [], {'max_length': '64'}),

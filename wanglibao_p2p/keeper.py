@@ -536,6 +536,7 @@ class AmortizationKeeper(KeeperBaseMixin):
             if amortization.settled:
                 raise P2PException('amortization %s already settled.' % amortization)
 
+            exchange_rule = None
             product = amortization.product
             product_type = amortization.product.types
             if product_type.name == self.RevenueExchangeType:
@@ -549,7 +550,6 @@ class AmortizationKeeper(KeeperBaseMixin):
             else:
                 pname = u"%s,期限%s个月" % (product.name, product.period)
 
-            exchange_rule = None
             phone_list = list()
             message_list = list()
             catalog = u'分期还款'
@@ -631,11 +631,12 @@ class AmortizationKeeper(KeeperBaseMixin):
             })
 
             if product_type.name == self.RevenueExchangeType:
-                self.p2p_revenue_exchange.apply_async(kwargs={
-                    "user_amos": sub_amortizations,
-                    "exchange_amos": exchange_amortizations,
-                    "exchange_rule": exchange_rule,
-                })
+                self.p2p_revenue_exchange(sub_amortizations, exchange_amortizations, exchange_rule)
+                # self.p2p_revenue_exchange.apply_async(kwargs={
+                #     "user_amos": sub_amortizations,
+                #     "exchange_amos": exchange_amortizations,
+                #     "exchange_rule": exchange_rule,
+                # })
 
             self.__tracer(catalog, None, amortization.principal, amortization.interest, amortization.penal_interest, amortization)
 

@@ -649,6 +649,7 @@ class RevenueExchangeRepertory(models.Model):
     def __unicode__(self):
         return u'%s%s' % (self.type, self.price)
 
+
 class RevenueExchangeRule(models.Model):
     """
         add by ChenWeiBin@20151223
@@ -663,18 +664,18 @@ class RevenueExchangeRule(models.Model):
         ('recharge&reward', u'直充和奖品'),
     )
 
-    REWARD_RANGE_DESCRIPTION = (
-        (u'中石化、中石油合作加油站', u'加油卡'),
-    )
+    REWARD_RANGE_DESCRIPTION = {
+        u'加油卡': u'中石化、中石油合作加油站',}
 
     reward_name = models.CharField(u'兑换品名称', max_length=40, choices=RevenueExchangeRepertory.REWARD_TYPE)
     limit_min_per_user = models.FloatField(u'单用户购买最低额度', default=100)
     equality_prize_amount = models.FloatField(u'等额兑换品面值（元）', default=0, blank=False)
     exchange_method = models.CharField(u'兑换方式', max_length=10, choices=EXCHANGE_METHOD, default=u'直充')
-    product = models.ForeignKey(P2PProduct, unique=True, verbose_name=u'产品')
-    reward_range = models.CharField(u'使用范围', max_length=50, choices=REWARD_RANGE_DESCRIPTION)
+    product = models.ForeignKey(P2PProduct, unique=True, verbose_name=u'产品', related_name='reward_rule')
+    reward_range = models.CharField(u'使用范围', max_length=50, choices=RevenueExchangeRepertory.REWARD_RANGE)
     reward_options = models.CharField(u'兑换品可选类型', null=True, blank=True, max_length=80)
     created_time = models.DateTimeField(u'创建时间', auto_now_add=True)
+    exchange_channel = models.ForeignKey(Channels, verbose_name=u'兑换渠道')
 
     class Meta:
         ordering = ['-created_time']

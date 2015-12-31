@@ -184,7 +184,7 @@ class RevenueExchangeBuyView(TemplateView):
         p2p_product.limit_min_per_user = float(exchange_rule.limit_min_per_user)
 
         # 获取奖品使用范围
-        using_range = get_p2p_reward_using_range(p2p_product.id)
+        using_range = get_p2p_reward_using_range(l_type)
 
         return {
             'product': p2p_product,
@@ -357,18 +357,16 @@ class RevenueExchangeRecordView(TemplateView):
         l_type, template_name = self.TYPES[e_type]
         self.template_name = template_name
 
-        exchang_status = False if p_status == 'receiving' else True
-        settled_status = False if p_status == 'receiving' else True
+        settled_status = exchang_status = False if p_status == 'receiving' else True
+
         exchange_amos = ExchangeAmo.objects.filter(user=self.request.user, exchanged=exchang_status,
                                                    settled=settled_status,
                                                    product_amortization__product__category
                                                    =l_type).order_by('-term_date')
         if p_status == 'exchanging':
             for ea in exchange_amos:
-                rewards = RevenueExchangeRepertory.objects.filter(user=self.request.user,
-                                                                  order_id=ea.order_id,
-                                                                  exchange_id=ea.exchange_id,
-                                                                  is_used=False)
+                rewards = RevenueExchangeRepertory.objects.filter(exchange_id=ea.exchange_id,
+                                                                  is_used=True)
                 ea.reward = rewards
 
         # 按产品期限分类（初级-中级-高级）

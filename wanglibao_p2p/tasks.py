@@ -21,7 +21,6 @@ from wanglibao_sms.tasks import send_messages
 from wanglibao_account import message as inside_message
 from wanglibao.templatetags.formatters import period_unit
 import time, datetime
-from marketing.utils import get_user_channel_record
 from marketing.models import RevenueExchangeRepertory
 
 logger = get_task_logger(__name__)
@@ -208,7 +207,6 @@ def p2p_auto_ready_for_settle():
         amort.save()
 
 
-@app.task
 def p2p_revenue_exchange(user_amos, exchange_amos, exchange_rule):
     for amo in user_amos:
         try:
@@ -219,14 +217,22 @@ def p2p_revenue_exchange(user_amos, exchange_amos, exchange_rule):
             exchange_amo = None
 
         if exchange_amo:
-            channel = get_user_channel_record(amo.user)
-            reward_parts = exchange_amo.term_amount / exchange_rule.equality_prize_amount
+            reward_parts = int(float(exchange_amo.term_amount) / exchange_rule.equality_prize_amount)
             if exchange_rule.exchange_method != 'recharge':
+                exchange_channel = exchange_rule.exchange_channel
                 rewards = RevenueExchangeRepertory.objects.filter(type=exchange_rule.reward_name,
                                                                   price=exchange_rule.equality_prize_amount,
-                                                                  channel=channel,
+                                                                  channel=exchange_channel,
                                                                   using_range=exchange_rule.reward_range,
                                                                   is_used=False)
+                if not rewards:
+                    logger.error("No matchs reward for type[%s] price[%s] "
+                                 "channel[%s] using_range[%s] is_used[%s]" % (exchange_rule.reward_name,
+                                                                              exchange_rule.equality_prize_amount,
+                                                                              exchange_channel.code,
+                                                                              exchange_rule.reward_range,
+                                                                              False))
+                    return
                 try:
                     for i in range(reward_parts):
                         reward = rewards[i]

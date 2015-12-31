@@ -11,10 +11,13 @@ html
         li
           a(href="/fuel_card/exchange-record/exchanging/") 已收到未领取
     .records-exchange-item
-      if exchange_amos
-        for list in exchange_amos
+      if data
+        for list in data
           .records-exchange-list
-            .records-card-date {{list.term_date | date:"Y-m-d"}}
-            .records-card-count 150元理财加油卡 x 1
-            //a(href='#').records-show-card 查看卡密
+            .records-card-date {{list.exchange_time | date:"Y-m-d"}}
+            .records-card-count {{list.term_amount}}元{{list.class_name}} x {{list.exchange_parts}}
+            if status == 'exchanging'
+              a(href='#').records-show-card 查看卡密
+              for val in list.reward
+                .val {{val.conversion_code}}
 
