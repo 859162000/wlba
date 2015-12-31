@@ -131,7 +131,12 @@ class RevenueExchangeIndexView(TemplateView):
 
             # 获取产品的奖品面额及产品最低购买限额
             for p in data:
-                exchange_rule = get_object_or_404(RevenueExchangeRule, product=p)
+                try:
+                    exchange_rule = RevenueExchangeRule.objects.get(product=p)
+                except RevenueExchangeRule.DoesNotExist:
+                    logger.info('exchange index faild No product[%s] matches the exchange rule user[%s]' %
+                                (p.id, user.id))
+                    raise Http404(u'页面不存在')
                 p.equality_prize_amount = exchange_rule.equality_prize_amount
                 p.limit_min_per_user = exchange_rule.limit_min_per_user
 
@@ -289,10 +294,8 @@ class RevenueExchangeBuyRecordView(TemplateView):
         if user_amotization:
             ua_tmp = user_amotization.first()
             ua_list.append(ua_tmp)
-            print ua_tmp.id
             for ua in user_amotization:
                 if ua.product_amortization.product != ua_tmp.product_amortization.product:
-                    print ua.id
                     ua_list.append(ua)
                     ua_tmp = ua
 
@@ -454,7 +457,6 @@ class FuelBankCard(TemplateView):
         try:
 
             p2p_cards = card_bind_list(self.request)['cards']
-            print p2p_cards
             for card in p2p_cards:
                 if card['is_the_one_card']:
                     is_one = True

@@ -356,7 +356,7 @@ class AmortizationKeeper(KeeperBaseMixin):
 
         for equity in equities:
             # modify by ChenWeiBin@20151224
-            if product_type != self.RevenueExchangeType:
+            if product_type.name != self.RevenueExchangeType:
                 # 查询用户是否使用加息券
                 coupon = RedPackRecord.objects.filter(user=equity.user, product_id=product.id)\
                     .filter(redpack__event__rtype='interest_coupon').first()
@@ -385,7 +385,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                 else:
                     amortization.term_date = timezone.now()
 
-                if product_type == self.RevenueExchangeType:
+                if product_type.name == self.RevenueExchangeType:
                     self.__generate_exchange_amortization(amortization)
 
                 user_amos.append(amortization)
@@ -414,7 +414,7 @@ class AmortizationKeeper(KeeperBaseMixin):
             amortization.user = user_amo.user
             amortization.product_amortization = user_amo.product_amortization
             amortization.term_date = user_amo.term_date
-            amortization.revenue_amount = user_amo.principal.interest + user_amo.coupon_interest
+            amortization.revenue_amount = user_amo.interest + user_amo.coupon_interest
             amortization.revenue_amount += user_amo.penal_interest
             amortization.term_amount = user_amo.principal + amortization.revenue_amount
             amortization.order_id = exchange_order.order_id
@@ -538,7 +538,7 @@ class AmortizationKeeper(KeeperBaseMixin):
 
             product = amortization.product
             product_type = amortization.product.types
-            if product_type == self.RevenueExchangeType:
+            if product_type.name == self.RevenueExchangeType:
                 exchange_rule = self.RevenueExchangeRule.objects.filter(product=product).first()
                 if not exchange_rule:
                      raise P2PException("revenue exhchange product[%s] rule not found" % product.id)
@@ -560,7 +560,7 @@ class AmortizationKeeper(KeeperBaseMixin):
             for sub_amo in sub_amortizations:
                 user_margin_keeper = MarginKeeper(sub_amo.user)
                 amo_amount = sub_amo.principal + sub_amo.interest + sub_amo.penal_interest + sub_amo.coupon_interest
-                if product_type == self.RevenueExchangeType:
+                if product_type.name == self.RevenueExchangeType:
                     # FixMe, 冻结金额计算
                     user_margin_keeper.amortize_and_freeze(sub_amo.principal, sub_amo.interest,
                                                            sub_amo.penal_interest, sub_amo.coupon_interest,
@@ -593,7 +593,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                 self.__tracer(catalog, sub_amo.user, sub_amo.principal, sub_amo.interest, sub_amo.penal_interest,
                               amortization, description, sub_amo.coupon_interest)
 
-                if product_type != self.RevenueExchangeType:
+                if product_type.name != self.RevenueExchangeType:
                     # 标的每一期还款完成后,检测该用户还款的本金是否有符合活动的规则,有的话触发活动规则
                     try:
                         if sub_amo.principal > 0:
@@ -630,7 +630,7 @@ class AmortizationKeeper(KeeperBaseMixin):
                 "messages": message_list
             })
 
-            if product_type == self.RevenueExchangeType:
+            if product_type.name == self.RevenueExchangeType:
                 self.p2p_revenue_exchange.apply_async(kwargs={
                     "user_amos": sub_amortizations,
                     "exchange_amos": exchange_amortizations,
