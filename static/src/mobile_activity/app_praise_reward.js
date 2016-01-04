@@ -60,7 +60,9 @@
 			$('#mycarousel-prev,#mycarousel-next').hide();
 		}
 		/*朋友个数结束*/
-	})
+
+
+	});
 	/*滚动图结束*/
 
 	var is_myself = false;
@@ -84,6 +86,7 @@
 			if(xhr.err_code==0){
 				$('.renovate').removeClass('renovate_rotate');
 				$('#praise_num').val(xhr.wx_user.annual_bonus);
+				$('.user_wrap').html('');
 				for(var i=0; i=xhr.follow.length; i++){
 					follow_one = xhr.follow[i];
 					$('.user_wrap').push(['<li><img class="user" src="follow_one.headimgurl"/></li>'].join(''));
