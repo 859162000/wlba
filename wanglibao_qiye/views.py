@@ -376,17 +376,17 @@ class EnterpriseProfileUpdateApi(APIView):
                     })
 
                 src_data = (e_profile.company_name, e_profile.business_license,
-                             e_profile.registration_cert, e_profile.certigier_name,
-                             e_profile.certigier_phone, e_profile.company_address,
-                             e_profile.company_account, e_profile.company_account_name,
-                             e_profile.deposit_bank_province, e_profile.deposit_bank_city,
-                             e_profile.bank_branch_address)
+                            e_profile.registration_cert, e_profile.certigier_name,
+                            e_profile.certigier_phone, e_profile.company_address,
+                            e_profile.company_account, e_profile.company_account_name,
+                            e_profile.deposit_bank_province, e_profile.deposit_bank_city,
+                            e_profile.bank_branch_address)
                 src_data_str = ''.join(src_data)
                 src_md5 = hashlib.md5(src_data_str).hexdigest()
 
                 dst_data = (form.cleaned_data['company_name'], form.cleaned_data['business_license'],
-                             e_profile.registration_cert, e_profile.certigier_name,
-                             e_profile.certigier_phone, e_profile.company_address,
+                            form.cleaned_data['registration_cert'], form.cleaned_data['certigier_name'],
+                            form.cleaned_data['company_address'], e_profile.company_address,
                              e_profile.company_account, e_profile.company_account_name,
                              e_profile.deposit_bank_province, e_profile.deposit_bank_city,
                              e_profile.bank_branch_address)
