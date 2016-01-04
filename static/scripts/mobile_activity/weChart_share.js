@@ -388,6 +388,7 @@ org.weChatStart = (function(org){
                         org.ui.showSign(result.message);
                         $that.text('获取验证码').removeAttr('disabled').addClass('webchat-button-right');
                         lib._captcha_refresh();
+                        return
                     }
                 });
                 //倒计时
@@ -457,12 +458,18 @@ org.weChatStart = (function(org){
                         success: function(data){
                             if(data.ret_code > 0){
                                 org.ui.showSign(data.message);
+                                clearInterval(intervalId);
+                                $('.webchat-button').text('获取验证码').removeAttr('disabled').addClass('webchat-button-right');
+                                lib._captcha_refresh();
                             }else {
                                 window.location.href = '/weixin_activity/share/' + ops.phone + '/' + ops.openid + '/' + ops.orderid + '/' + ops.activity + '/';
                             }
                         },
                         error: function(data){
                             org.ui.alert(data)
+                            clearInterval(intervalId);
+                            $('.webchat-button').text('获取验证码').removeAttr('disabled').addClass('webchat-button-right');
+                            lib._captcha_refresh();
                         },
                         complete: function(){
                             postDo = false;

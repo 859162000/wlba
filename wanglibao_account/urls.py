@@ -13,12 +13,12 @@ from views import (RegisterView, PasswordResetGetIdentifierView, ResetPassword, 
                    AccountTransactionWithdraw, P2PAmortizationView, user_product_contract, test_contract,
                    Third_login, Third_login_back, MessageView, MessageDetailAPIView, MessageCountAPIView,
                    MessageListAPIView, AccountRepayment, AddressView, AccountInviteView, user_product_contract_kf,
-                   JrjiaAutoRegisterView)
+                   JrjiaAutoRegisterView, EnterpriseUserProfileExtraApi, EnterpriseUserProfileApi)
 from django.contrib.auth import views as auth_views
 from views import AutomaticView
 from wanglibao_account.cooperation import JrjiaCPSView, JrjiaP2PStatusView, JrjiaP2PInvestView, JrjiaReportView, \
     JrjiaUsStatusView
-from wanglibao_account.views import FirstPayResultView
+from wanglibao_account.views import FirstPayResultView, GetRequestUserType, EnterpriseUserProfileApi
 from wanglibao_lottery.views import LotteryListTemplateView
 from wanglibao_account.decorators import login_required
 
@@ -127,6 +127,12 @@ urlpatterns = patterns(
 
     url(r'^auto_tender/$', login_required(AutomaticView.as_view(), login_url='/accounts/login/')),
     url(r'^caipiao/$', login_required(LotteryListTemplateView.as_view(), login_url='/accounts/login/')),
+    url(r'^user_type/$', GetRequestUserType.as_view()),
+
+    # 企业理财
+    url(r'enterprise/extra/$', EnterpriseUserProfileExtraApi.as_view()),
+    url(r'enterprise/$', EnterpriseUserProfileApi.as_view()),
+
 )
 
 if settings.DEBUG:

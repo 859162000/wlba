@@ -82,7 +82,7 @@ def detect_identifier_type(identifier):
 
 
 @method_decorator(transaction.atomic)
-def create_user(identifier, password, nickname):
+def create_user(identifier, password, nickname, user_type='0'):
     username = generate_username(identifier)
     identifier_type = detect_identifier_type(identifier)
     if identifier_type =="unknown":
@@ -93,6 +93,7 @@ def create_user(identifier, password, nickname):
     user.save()
 
     user.wanglibaouserprofile.nick_name = nickname
+    user.wanglibaouserprofile.utype = user_type
     user.wanglibaouserprofile.save()
     if identifier_type == 'email':
         user.email = identifier
@@ -578,6 +579,19 @@ def str_to_dict(s):
     return result
 
 
+def detect_phone_for_identifier(identifier):
+    """
+    检测手机号有效性
+    :param identifier:
+    :return:
+    """
+    mobile_regex = re.compile('^1\d{10}$')
+    if mobile_regex.match(identifier) is not None:
+        return True
+    else:
+        return False
+
+
 class Xunlei9AdminCallback(object):
     """迅雷9管理后台回调"""
 
@@ -765,4 +779,3 @@ class ZGDXAdminCallback(object):
         else:
             self.binding_card_call_back(obj)
             self.purchase_call_back(obj)
-
