@@ -29,7 +29,10 @@ urlpatterns = patterns(
     url(r'^regist/authentication/', TemplateView.as_view(template_name="fuel_regist_authentication.jade")),
     url(r'^regist/bank/', TemplateView.as_view(template_name="fuel_regist_bank.jade")),
     url(r'^regist/end/', TemplateView.as_view(template_name="fuel_regist_end.jade")),
+    url(r'^regist/rules/$', TemplateView.as_view(template_name="fuel_regist_rules.jade")),
     url(r'^activity/', TemplateView.as_view(template_name="fuel_activity.jade")),
+
+
     url(r'^dec/', TemplateView.as_view(template_name="fuel_product_dec.jade")),
 
     url(r'^buy/$', views.RevenueExchangeBuyApi.as_view(), name='fuel_card_buy_api'),
