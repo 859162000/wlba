@@ -1,6 +1,5 @@
 (function(org) {
 
-	//alert($(window).width());
 	window.onload = function() {
 		$('.fix_wrap').hide();
 	};
@@ -79,16 +78,16 @@
 	$('.renovate').click(function(){
 		$(this).addClass('renovate_rotate');
 		$.ajax({
-			url: 'weixin_activity/weixin/bonus/?uid='+uid+'&wxid='+wxid,
-			type: "POST",
-			data: {
-
-			}
+			url: 'weixin_activity/weixin/bonus/?act=query&uid='+uid+'&wxid='+wxid,
+			type: "GET",
 		}).done(function (xhr) {
 			if(xhr.err_code==0){
-				$(this).removeClass('renovate_rotate');
-			}else if(xhr.err_code==0){
-				alert('信息错误')
+				$('.renovate').removeClass('renovate_rotate');
+				$('#praise_num').val(xhr.wx_user.annual_bonus);
+			}else{
+				$('.renovate').removeClass('renovate_rotate');
+				$('.friend_top span').text(xhr.err_messege);
+				$('.friend_top').fadeIn();
 			}
 		});
 	})
@@ -232,12 +231,6 @@
 		}
 	});
 	wx.ready(function(){
-		//var host = 'https://www.wanglibao.com/',
-		//	shareName = '我的努力需要你的一个肯定，谢谢你',
-		//	shareImg = host + '/static/imgs/mobile_activity/app_praise_reward/300*300.jpg',
-		//	shareLink = host + '/activity/app_praise_reward/',
-		//	shareMainTit = '我的努力需要你的一个肯定，谢谢你',
-		//	shareBody = '您的好友正在领取他的年终奖，随手一赞，祝他多拿100！';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
