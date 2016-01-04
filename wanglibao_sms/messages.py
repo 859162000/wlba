@@ -298,7 +298,7 @@ def red_packet_get_alert(amount, rtype):
 
 
 @suffix_td
-def red_packet_invalid_alert(count):
+def red_packet_invalid_alert(count, days):
     """
     红包、加息券快过期前3天提醒
     """
@@ -310,9 +310,9 @@ def red_packet_invalid_alert(count):
             return content.format(count)
         except Exception, e:
             print e
-            return u'您有{}张理财券再过3天就要过期了，请尽快登录网利宝官网或者app使用！'.format(count)
+            return u'您有{}张理财券再过{}天就要过期了，请尽快登录网利宝官网或者app使用！'.format(count, days)
     else:
-        return u'您有{}张理财券再过3天就要过期了，请尽快登录网利宝官网或者app使用！'.format(count)
+        return u'您有{}张理财券再过{}天就要过期了，请尽快登录网利宝官网或者app使用！'.format(count, days)
 
 
 @suffix_td
@@ -500,6 +500,13 @@ def msg_give_coupon(name, amount, end_time):
               u"感谢您对我们的支持与关注！<br/>网利宝".format(name, amount, end_time)
     return title, content
 
+
+def sms_alert_unbanding_xunlei(reward_dsct, url):
+    content = u"由于您之前没有完成迅雷帐号登录，无法关联，导致会员奖励无法到帐。" \
+              u"请先到以下页面完成迅雷帐号登录，即可获得{}奖励" \
+              u"<br/>" \
+              u"<a href='{}'>领取奖励>></a><br/>"
+    return content.format(reward_dsct, url)
 
 if __name__ == "__main__":
     print sms_alert_invest('test')

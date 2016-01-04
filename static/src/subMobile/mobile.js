@@ -694,7 +694,6 @@ org.regist = (function(org){
                             //console.log(next);
                             window.location.href = next;
                         }else if(data.ret_code > 0){
-                            org.ui.alert(data.ret_code);
                             org.ui.showSign(data.message);
                             $submit.text('立即注册 ｜ 领取奖励');
                         }
@@ -1831,7 +1830,7 @@ org.processFirst = (function(org){
                 success:function(data){
                     if(!data.validate == 'true') return org.ui.alert('认证失败，请重试');
                     org.ui.alert("实名认证成功!",function(){
-                        return window.location.href = '/weixin/sub_regist_second/';
+                        window.location.href = '/weixin/sub_regist_second/';
                     });
                 },
                 error:function(xhr){
@@ -2093,11 +2092,11 @@ function closePage(){
     var unbindf = false;
     function unbingFun(){
         unbindf = true;
-        var openid = $("#openid").val();
+        //var openid = $("#openid").val();
         org.ajax({
             type: "post",
             url: "/weixin/api/unbind/",
-            data: {"openid":openid},
+            //data: {"openid":openid},
             dataType: "json",
             success: function (data) {
                 //console.log(data);

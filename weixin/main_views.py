@@ -25,6 +25,7 @@ from wanglibao_redis.backend import redis_backend
 from wanglibao_rest import utils
 from wanglibao_redpack import backends
 from .util import _generate_ajax_template, FWH_LOGIN_URL
+from wanglibao_pay.models import Bank
 logger = logging.getLogger("weixin")
 
 
@@ -94,9 +95,12 @@ class WXLoginAPI(APIView):
                     if rs == 0:
                         auth_login(request, user)
                         request.session.set_expiry(1800)
+                        data = {'re_code':0,'nickname': user.wanglibaouserprofile.nick_name}
+                    else:
+                        data = {'re_code':rs, 'errmessage':txt}
             except WeixinUser.DoesNotExist:
                 pass
-            data = {'nickname': user.wanglibaouserprofile.nick_name}
+
             return Response(data)
 
         return Response(form.errors, status=400)
@@ -145,8 +149,9 @@ class RechargeTemplate(TemplateView):
     def get_context_data(self, **kwargs):
         margin = self.request.user.margin.margin
         return {
-            'margin': margin if margin else 0.0
+            'margin': margin if margin else 0.0,
         }
+
     @is_check_id_verify(True)
     def dispatch(self, request, *args, **kwargs):
         return super(RechargeTemplate, self).dispatch(request, *args, **kwargs)

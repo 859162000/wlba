@@ -44,14 +44,16 @@ from wanglibao_rest.views import (SendValidationCodeView, SendRegisterValidation
                             LatestDataAPIView, ShareUrlAPIView, TopsOfDayView, TopsOfWeekView, InvestRecord,
                             DepositGateAPIView, PushTestView, WeixinSendRegisterValidationCodeView,
                             GestureAddView, GestureUpdateView, GestureIsEnabledView, LoginAPIView, GuestCheckView,
-                            CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI, InnerSysSaveChannel,
-                            InnerSysSendSMS, InnerSysValidateID, DataCubeApiView)
+                            CaptchaValidationCodeView, TopsOfEaringView, DistributeRedpackView, UserHasLoginAPI,
+                            InnerSysSaveChannel, InnerSysSendSMS, InnerSysValidateID, DataCubeApiView, StatisticsInside)
 from wanglibao_redpack.views import (RedPacketListAPIView, RedPacketChangeAPIView, RedPacketDeductAPIView,
                                      RedPacketSelectAPIView)
 
 from marketing.play_list import InvestmentHistory
-from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView, RockFinanceAPIView, RockFinanceForOldUserAPIView, RockFinanceCheckAPIView,
-                             ThousandRedPackCountAPIView, ThunderActivityRewardCounter, QuickApplyerAPIView, GiftOwnerInfoAPIView, RewardDistributeAPIView)
+from marketing.views import (ActivityJoinLogAPIView, ActivityJoinLogCountAPIView, ThousandRedPackAPIView,
+                             RockFinanceAPIView, RockFinanceForOldUserAPIView, RockFinanceCheckAPIView,
+                             ThousandRedPackCountAPIView, ThunderActivityRewardCounter, QuickApplyerAPIView,
+                             GiftOwnerInfoAPIView, RewardDistributeAPIView)
 from weixin.views import P2PListWeixin
 from wanglibao_account.views import ThirdOrderApiView, ThirdOrderQueryApiView
 from marketing.views import UserActivityStatusAPIView
@@ -185,7 +187,8 @@ urlpatterns = patterns(
     url(r'^ytx/voice_back', YTXVoiceCallbackAPIView.as_view()),
     url(r'^ytx/send_voice_code/$', SendVoiceCodeAPIView.as_view()),
     url(r'^ytx/send_voice_code/2/$', SendVoiceCodeTwoAPIView.as_view()),
-    url(r'^marketing/tv', Statistics.as_view()),
+    url(r'^marketing/tv/$', Statistics.as_view()),
+    url(r'^marketing/tv_inside/$', StatisticsInside.as_view()),
     url(r'^p2p/investrecord', InvestRecord.as_view()),
     url(r'^mobiledownload/$', MobileDownloadAPIView.as_view()),
     url(r'^kuaipan/purchaselist/$', KuaipanPurchaseListAPIView.as_view()),

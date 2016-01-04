@@ -188,6 +188,14 @@ class GennaeratorCode(TemplateView):
 
 class TvView(TemplateView):
     template_name = 'tv.jade'
+
+    def get_context_data(self, **kwargs):
+        return {}
+
+
+class TvViewInside(TemplateView):
+    template_name = 'tv_inside.jade'
+
     def get_context_data(self, **kwargs):
         return {}
 
@@ -2949,6 +2957,17 @@ class ThunderBindingApi(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
+        # Add by hb on 2015-12-30
+        # Modify by cwb@20151230
+        user = self.request.user
+        user_channel = get_user_channel_record(user)
+        if not user_channel or user_channel.code != 'xunlei9':
+            response_data = {
+                'ret_code': '10004',
+                'message': u'非迅雷渠道用户',
+            }
+            return HttpResponse(json.dumps(response_data), content_type='application/json')
+
         channel_code = request.POST.get('promo_token', '').strip()
         channel_user = request.POST.get('xluserid', '').strip()
         channel_time = request.POST.get('time', '').strip()
@@ -2959,7 +2978,7 @@ class ThunderBindingApi(APIView):
             user = self.request.user
             binding = Binding.objects.filter(user_id=user.id).first()
             if not binding:
-                CoopRegister(request).all_processors_for_user_register(user, channel_code)
+                CoopRegister(request).process_after_binding(user)
                 binding = Binding.objects.filter(user_id=user.id).first()
                 if binding:
                     response_data = {

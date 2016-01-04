@@ -993,50 +993,110 @@ class ObtainAuthTokenCustomized(ObtainAuthToken):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response({'token': "false"}, status=status.HTTP_200_OK)
 
+def get_public_statistics():
+    today = datetime.now()
+    today_start = local_to_utc(datetime(today.year, today.month, today.day), 'min')
+
+    today_user = User.objects.filter(date_joined__gte=today_start).aggregate(Count('id'))
+    today_amount = P2PRecord.objects.filter(create_time__gte=today_start, catalog='申购').aggregate(Sum('amount'))
+    today_num = P2PRecord.objects.filter(create_time__gte=today_start, catalog='申购').values('id').count()
+
+    all_user = User.objects.all().aggregate(Count('id'))
+    all_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))
+    all_num = P2PRecord.objects.filter(catalog='申购').values('id').count()
+
+    data = {
+        'today_num': today_num,
+        'today_user': today_user['id__count'],
+        'today_amount': today_amount['amount__sum'],
+
+        'all_num': all_num,
+        'all_user': all_user['id__count'],
+        'all_amount': all_amount['amount__sum'],
+    }
+
+    return data
+
 
 class Statistics(APIView):
+    """
+        数据统计,今日注册,投资等,总计注册,投资等
+    """
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        data = get_public_statistics()
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class StatisticsInside(APIView):
+    """
+        昨日还款额 = 昨日还款本金 + 昨日还款利息
+        昨日资金净流入 = 昨日投资额 - 昨日还款本金
+        昨日新用户投资金额 = 昨日首次投资用户的全天投资总额
+    """
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
         today = datetime.now()
-        # tomorrow = today + timedelta(1)
         yesterday = today - timedelta(days=1)
         today_start = local_to_utc(datetime(today.year, today.month, today.day), 'min')
         yesterday_start = local_to_utc(datetime(yesterday.year, yesterday.month, yesterday.day), 'min')
-        # today_end = datetime.combine(tomorrow, time())
+        start_fmt = yesterday_start.strftime('%Y-%m-%d %H:%M:%S')
+        end_fmt = today_start.strftime('%Y-%m-%d %H:%M:%S')
 
-        today_user = User.objects.filter(date_joined__gte=today_start).aggregate(Count('id'))
-        today_amount = P2PRecord.objects.filter(create_time__gte=today_start, catalog='申购').aggregate(Sum('amount'))
+        # 昨日申购总额
         yesterday_amount = P2PRecord.objects.filter(create_time__gte=yesterday_start, create_time__lt=today_start)\
             .filter(catalog='申购').aggregate(Sum('amount'))
-        today_num = P2PRecord.objects.filter(create_time__gte=today_start, catalog='申购').values('id').count()
 
+        # 昨日还款
         today_repayment = ProductAmortization.objects.filter(settled=True)\
+            .filter(settlement_time__gte=today_start).aggregate(Sum('principal'), Sum('interest'))
+
+        # 今日还款
+        yesterday_repayment = ProductAmortization.objects.filter(settled=True)\
             .filter(settlement_time__gte=yesterday_start, settlement_time__lt=today_start)\
             .aggregate(Sum('principal'), Sum('interest'))
 
         amount_sum_yesterday = yesterday_amount['amount__sum'] if yesterday_amount['amount__sum'] else Decimal('0')
-        principal_sum = today_repayment['principal__sum'] if today_repayment['principal__sum'] else Decimal('0')
-        interest_sum = today_repayment['interest__sum'] if today_repayment['interest__sum'] else Decimal('0')
+        principal_sum = yesterday_repayment['principal__sum'] if yesterday_repayment['principal__sum'] else Decimal('0')
+        interest_sum = yesterday_repayment['interest__sum'] if yesterday_repayment['interest__sum'] else Decimal('0')
 
         # 昨日资金净流入
-        today_inflow = amount_sum_yesterday - principal_sum - interest_sum
+        yesterday_inflow = amount_sum_yesterday - principal_sum - interest_sum
 
-        all_user = User.objects.all().aggregate(Count('id'))
-        all_amount = P2PRecord.objects.filter(catalog='申购').aggregate(Sum('amount'))
-        all_num = P2PRecord.objects.filter(catalog='申购').values('id').count()
+        # 今日还款额
+        today_repayment_total = (today_repayment['principal__sum'] if today_repayment['principal__sum'] else 0) + \
+                                (today_repayment['interest__sum'] if today_repayment['interest__sum'] else 0)
+        # 昨日还款额
+        yesterday_repayment_total = (yesterday_repayment['principal__sum'] if yesterday_repayment['principal__sum'] else 0) \
+                + (yesterday_repayment['interest__sum'] if yesterday_repayment['interest__sum'] else 0)
+
+        # 昨日首投用户
+        from django.db import connection
+        cursor = connection.cursor()
+        sql = "SELECT SUM(a.amount) as amount_sum FROM wanglibao_p2p_p2precord a, " \
+              "(SELECT user_id, create_time FROM wanglibao_p2p_p2precord WHERE catalog='申购' GROUP BY user_id) b " \
+              "WHERE a.user_id = b.user_id " \
+              "AND b.create_time >= '{}' AND b.create_time < '{}' " \
+              "AND a.create_time >= '{}' AND a.create_time < '{}' " \
+              "AND a.catalog='申购';".format(start_fmt, end_fmt, start_fmt, end_fmt)
+        cursor.execute(sql)
+        fetchone = cursor.fetchone()
+
+        yesterday_new_amount = fetchone[0] if fetchone[0] else 0
+
+        # 公共数据
 
         data = {
-            'today_num': today_num,
-            'today_user': today_user['id__count'],
-            'today_amount': today_amount['amount__sum'],
-
-            'all_num': all_num,
-            'all_user': all_user['id__count'],
-            'all_amount': all_amount['amount__sum'],
-
-            'today_inflow': today_inflow
+            'today_repayment_total': today_repayment_total,  # 今日还款额
+            'yesterday_inflow': yesterday_inflow,  # 昨日资金净流入
+            'yesterday_repayment_total': yesterday_repayment_total,  # 昨日还款额
+            'yesterday_new_amount': yesterday_new_amount  # 昨日新用户投资金额
         }
+
+        data.update(get_public_statistics())
 
         return Response(data, status=status.HTTP_200_OK)
 

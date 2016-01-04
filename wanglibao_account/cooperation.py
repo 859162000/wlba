@@ -54,7 +54,7 @@ from wanglibao.settings import YIRUITE_CALL_BACK_URL, \
      WLB_FOR_ZGDX_KEY, ZGDX_CALL_BACK_URL, ZGDX_PARTNER_NO, ZGDX_SERVICE_CODE, ZGDX_CONTRACT_ID, \
      ZGDX_ACTIVITY_ID, ZGDX_KEY, ZGDX_IV, WLB_FOR_NJWH_KEY, ENV, ENV_PRODUCTION, WLB_FOR_FANLITOU_KEY, \
      WLB_FOR_XUNLEI9_KEY, XUNLEIVIP_CALL_BACK_URL, XUNLEIVIP_KEY, XUNLEIVIP_REGISTER_CALL_BACK_URL, \
-     XUNLEIVIP_REGISTER_KEY, MAIMAI1_CHANNEL_CODE, MAIMAI_CALL_BACK_URL
+     XUNLEIVIP_REGISTER_KEY, MAIMAI1_CHANNEL_CODE, MAIMAI_CALL_BACK_URL, XUNLEIVIP_LOGIN_URL
 from wanglibao_account.models import Binding, IdVerification
 from wanglibao_account.tasks import common_callback, jinshan_callback, yiche_callback, zgdx_callback, \
                                     xunleivip_callback
@@ -71,6 +71,7 @@ from user_agents import parse
 import uuid
 import urllib
 from .utils import xunleivip_generate_sign
+from wanglibao_sms.messages import sms_alert_unbanding_xunlei
 
 logger = logging.getLogger('wanglibao_cooperation')
 
@@ -434,6 +435,24 @@ class CoopRegister(object):
         except Exception, e:
             logger.exception('%s click process error' % channel_code)
             logger.info(e)
+
+    def binding_for_after_register(self, user):
+        """
+        处理注册之后的第三方用户渠道绑定关系
+        :param user:
+        :return:
+        """
+        pass
+
+    def process_after_binding(self, user):
+        try:
+            channel_processor = self.get_user_channel_processor(user)
+            if channel_processor:
+                channel_processor.binding_for_after_register(user)
+                return
+        except:
+            logger.exception('process after binding error for user %s' % user.id)
+
 
 class TianMangRegister(CoopRegister):
     def __init__(self, request):
@@ -1218,14 +1237,14 @@ class WeixinRedpackRegister(CoopRegister):
         super(WeixinRedpackRegister, self).__init__(request)
         self.c_code = 'wrp'
         self.invite_code = 'wrp'
-        self.order_id = request.GET.get("order_id", None)
+        self.order_id = request.POST.get("order_id", None)
 
     def register_call_back(self, user):
         phone = user.wanglibaouserprofile.phone
         logger.debug('通过weixin_redpack渠道注册,phone:%s' % (phone,))
         try:
             ex_event = ExperienceEvent.objects.filter(name=u'新手体验金', invalid=False).first()
-            WanglibaoActivityReward.objects.create(
+            ActivityReward.objects.create(
                 order_id=self.order_id,
                 activity='weixin_experience_glod',
                 experience=ex_event,
@@ -1247,7 +1266,6 @@ class XunleiVipRegister(CoopRegister):
         self.external_channel_user_key = 'xluserid'
         self.coop_time_key = 'time'
         self.coop_sign_key = 'sign'
-        self.is_xunlei_user = False
 
     @property
     def channel_user(self):
@@ -1260,6 +1278,19 @@ class XunleiVipRegister(CoopRegister):
     @property
     def channel_sign(self):
         return self.request.session.get(self.coop_sign_key, '').strip()
+
+    @property
+    def is_xunlei_user(self):
+        # 校验迅雷用户有效性
+        data = {
+            self.coop_time_key: self.channel_time,
+            self.external_channel_user_key: self.channel_user,
+        }
+
+        if xunleivip_generate_sign(data, self.coop_register_key) == self.channel_sign:
+            return True
+        else:
+            return False
 
     def save_to_session(self):
         super(XunleiVipRegister, self).save_to_session()
@@ -1282,45 +1313,34 @@ class XunleiVipRegister(CoopRegister):
         :param user:
         :return:
         """
-        channel_user = self.channel_user
-        channel_name = self.channel_name
-        bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
-        if channel_name and channel_user and len(channel_user) <= bid_len:
-            binding = Binding()
-            binding.user = user
-            binding.btype = channel_name
-            binding.bid = channel_user
-            binding.save()
-            # logger.debug('save user %s to binding'%user)
-            return True
 
-        logger.info("xunlei9 binding faild with user[%s], channel_user[%s], channel_name[%s]" %
-                    (user.id, channel_user, channel_name))
+        if self.is_xunlei_user:
+            channel_user = self.channel_user
+            channel_name = self.channel_name
+            bid_len = Binding._meta.get_field_by_name('bid')[0].max_length
+            if channel_name and channel_user and len(channel_user) <= bid_len:
+                binding = Binding()
+                binding.user = user
+                binding.btype = channel_name
+                binding.bid = channel_user
+                binding.save()
+                # logger.debug('save user %s to binding'%user)
+                return True
 
-    def process_for_register(self, user, invite_code):
+            logger.info("xunlei9 binding faild with user[%s], channel_user[%s], channel_name[%s]" %
+                        (user.id, channel_user, channel_name))
+        else:
+            logger.info("xunlei9 binding faild with user[%s] not xunlei user" % user.id)
+
+    def binding_for_after_register(self, user):
         """
         用户可以在从渠道跳转后的注册页使用邀请码，优先考虑邀请码
         """
-        # 校验迅雷用户有效性
-        data = {
-            self.coop_time_key: self.channel_time,
-            self.external_channel_user_key: self.channel_user,
-        }
-
-        if xunleivip_generate_sign(data, self.coop_register_key) == self.channel_sign:
-            self.is_xunlei_user = True
-
-        # 处理渠道用户注册或更新渠道用户绑定状态
-        binding = Binding.objects.filter(user_id=user.id).first()
-        introduced_by = IntroducedBy.objects.filter(user_id=user.id).select_related('channel').first()
-        if not (binding and introduced_by):
-            # 处理新用户注册
-            self.save_to_introduceby(user, invite_code)
-            if self.is_xunlei_user and self.save_to_binding(user):
-                self.register_call_back(user)
-        elif not binding and self.is_xunlei_user and introduced_by and introduced_by.channel.code == invite_code:
-            # 处理老用户绑定状态
-            if self.save_to_binding(user):
+        # 处理渠道用户绑定状态
+        channel = get_user_channel_record(user.id)
+        if self.is_xunlei_user and channel and channel.code == self.c_code:
+            binding = Binding.objects.filter(user_id=user.id).first()
+            if not binding and self.save_to_binding(user):
                 # 处理渠道用户注册回调
                 self.register_call_back(user)
 
@@ -1396,7 +1416,7 @@ class XunleiVipRegister(CoopRegister):
                     self.xunlei_call_back(user, binding.bid, data,
                                           self.call_back_url, pay_info.order_id)
                 else:
-                    message_content = u"呦西！"
+                    message_content = sms_alert_unbanding_xunlei(u"7天白金会员", XUNLEIVIP_LOGIN_URL)
                     inside_message.send_one.apply_async(kwargs={
                         "user_id": user.id,
                         "title": u"首次充值送7天迅雷白金会员",
@@ -1423,7 +1443,7 @@ class XunleiVipRegister(CoopRegister):
                     self.xunlei_call_back(user, binding.bid, data,
                                           self.call_back_url, p2p_record.order_id)
                 else:
-                    message_content = u"呦西！"
+                    message_content = sms_alert_unbanding_xunlei(u"1年白金会员", XUNLEIVIP_LOGIN_URL)
                     inside_message.send_one.apply_async(kwargs={
                         "user_id": user.id,
                         "title": u"首次投资送1年迅雷白金会员",

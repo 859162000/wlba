@@ -15,13 +15,13 @@ block content
         .code-content.clearfix
             input(type='hidden')#exists
             .code.clearfix
-                input(type="tel", name="captcha_1", placeholder="请输入计算结果", data-target2='captcha_1-icon', data-icon='user-validation', data-target="regist-validation", data-empty='regist-validation-disable', data-val='').webchat-input-code
-                input(name="captcha_0", type="hidden", value="")
+                input(type="tel", tabindex="-1" ,name="captcha_1", placeholder="请输入计算结果", data-target2='captcha_1-icon', data-icon='user-validation', data-target="regist-validation", data-empty='regist-validation-disable', data-val='').webchat-input-code
+                input(name="captcha_0", type="hidden", value="", tabindex="-1" )
                 img(src="", alt="", width="100%", height="100%")#captcha.captcha
             .phone-sign-warp.code-status
                 p.code-sign 请输入正确的验证码
             .code.clearfix
-                input(type='text', name='validate_code' ,placeholder='请输入短信验证码', value="{{validate_code}}").webchat-input-code
+                input(type='text', name='validate_code' ,placeholder='请输入短信验证码', value="{{validate_code}}" ,tabindex="-1" ).webchat-input-code
                 button(type="button").webchat-button.webchat-button-disable 获取
             .phone-sign-warp.code-status
                 p.phone-code-sign 请输入正确的验证码

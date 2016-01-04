@@ -19,7 +19,7 @@ var weChatShare = (function(org){
             }
         });
         wx.ready(function(){
-            var host = 'https://www.wanglibao.com',
+            var host = 'https://staging.wanglibao.com',
                 shareImg = host + '/static/imgs/mobile/weChat_logo.png',
                 shareLink = $('input[name=url]').val(),
                 shareMainTit = $('input[name=title]').val(),
@@ -202,7 +202,7 @@ org.weChatStart = (function(org){
                     openid : $(this).attr('data-openid'),
                     validate_code : code.val()
                 }
-                if(ops.phone =='') {
+                if(ops.phone =='' || !lib._checkPhone(phoneVal.val())) {
                     $('.phone-sign').show();
                     return;
                 }else{
@@ -232,7 +232,7 @@ org.weChatStart = (function(org){
                             'IGNORE_PWD': 'true',
                             'captcha_0' :  lib.$captcha_0.val(),
                             'captcha_1' :  lib.$captcha_1.val(),
-                            'openid': ops.openid
+                            'order_id': ops.orderid
                         },
                         dataType : 'json',
                         success: function(data){
@@ -290,6 +290,12 @@ org.weChatStart = (function(org){
                 $sign.hide(); $('.webchat-button').addClass('webchat-button-right'); isRight = true;
             }else{
                 $sign.show(); $('.webchat-button').removeClass('webchat-button-right'); isRight = false;
+                var ele = $('.code-content'),
+                    curHeight = ele.height();
+                ele.height(curHeight).animate({height: 0},500);
+                $('input[name=validate_code]').val('');
+                $('input[name=captcha_1]').val('');
+
             }
             return isRight;
         },

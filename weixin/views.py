@@ -11,6 +11,7 @@ from django.db.models.signals import post_save, pre_save
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils import timezone
+from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated
 import functools
 import re
@@ -61,6 +62,7 @@ from experience_gold.models import ExperienceEvent
 from experience_gold.backends import SendExperienceGold
 from weixin.tasks import detect_product_biding, sentTemplate
 from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser, bindUser, unbindUser, _process_record, _process_scene_record
+from weixin.util import FWH_UNBIND_URL
 
 logger = logging.getLogger("weixin")
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
@@ -367,9 +369,8 @@ class WeixinJoinView(View):
         return txt
 
     def getUnBindTxt(self, fromUserName, userPhone):
-        unbind_url = settings.CALLBACK_HOST + reverse('weixin_unbind') + "?openid=%s&promo_token=fwh"%(fromUserName)
         txt = u"您的微信绑定帐号为：%s\n"%userPhone\
-            +u"如需解绑当前帐号，请点击<a href='%s'>【立即解绑】</a>"%unbind_url
+            +u"如需解绑当前帐号，请点击<a href='%s'>【立即解绑】</a>"%FWH_UNBIND_URL
         return txt
 
     def getCSReply(self):
@@ -519,8 +520,6 @@ class UnBindWeiUser(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(UnBindWeiUser, self).get_context_data(**kwargs)
-        openid = self.request.GET.get('openid', '')
-        context['openid'] = openid
         next = self.request.GET.get('next', '')
         return {
             'context': context,
@@ -528,23 +527,40 @@ class UnBindWeiUser(TemplateView):
             }
 
     def dispatch(self, request, *args, **kwargs):
-        openid = self.request.GET.get('openid', '')
-        if not openid:
-            return redirectToJumpPage("error:-1")
-        w_user = WeixinUser.objects.filter(openid=openid).first()
-        if not w_user:
-            message = u"请从[服务中心]点击[绑定微信]进行绑定"
-            return redirectToJumpPage(message)
-        if not w_user.user:
-            return redirectToJumpPage(u"您没有绑定的网利宝帐号")
-        return super(UnBindWeiUser, self).dispatch(request, *args, **kwargs)
+        code = request.GET.get('code')
+        state = request.GET.get('state')
+        error_msg = ""
+        try:
+            if code and state:
+                account = WeixinAccounts.getByOriginalId(state)
+                request.session['account_key'] = account.key
+                oauth = WeChatOAuth(account.app_id, account.app_secret, )
+                res = oauth.fetch_access_token(code)
+                self.openid = res.get('openid')
+                request.session['openid'] = self.openid
+                w_user = WeixinUser.objects.filter(openid=self.openid).first()
+                if not w_user:
+                    message = u"请从[服务中心]点击[账号关联]进行绑定"
+                    return redirectToJumpPage(message)
+                if not w_user.user:
+                    return redirectToJumpPage(u"您没有绑定的网利宝帐号")
+            else:
+                error_msg='code or state not in request'
+        except WeChatException, e:
+            error_msg = e.message
+        if error_msg:
+            return redirectToJumpPage(error_msg)
+        else:
+            return super(UnBindWeiUser, self).dispatch(request, *args, **kwargs)
 
 class UnBindWeiUserAPI(APIView):
     permission_classes = ()
     http_method_names = ['post']
 
     def post(self, request):
-        openid = request.POST.get('openid')
+        openid = request.session.get('openid')
+        if not openid:
+            return Response({'message':'openid not in session'})
         weixin_user = WeixinUser.objects.get(openid=openid)
         if weixin_user.user:
             user = weixin_user.user
@@ -856,6 +872,7 @@ class P2PDetailView(TemplateView):
         amount = self.request.GET.get('amount', 0)
         amount_profit = self.request.GET.get('amount_profit', 0)
         next = self.request.GET.get('next', '')
+        cards = Card.objects.filter(user=self.request.user).filter(Q(is_bind_huifu=True)|Q(is_bind_kuai=True)|Q(is_bind_yee=True))# Q(is_bind_huifu=True)|)
         context.update({
             'p2p': p2p,
             'end_time': end_time,
@@ -871,6 +888,7 @@ class P2PDetailView(TemplateView):
             'next': next,
             'amount_profit': amount_profit,
             'id_is_valid':id_is_valid,
+            'card_is_bind':cards.exists()
         })
 
         return context
