@@ -1328,7 +1328,8 @@ class XunleiVipRegister(CoopRegister):
             logger.info("xunlei9 binding faild with user[%s], channel_user[%s], channel_name[%s]" %
                         (user.id, channel_user, channel_name))
         else:
-            logger.info("xunlei9 binding faild with user[%s] not xunlei user" % user.id)
+            logger.info("xunlei9 binding faild with user[%s] not xunlei user, xluserid[%s] timestamp[%s] sgin[%s]" %
+                        (user.id, self.channel_user, self.channel_time, self.channel_sign))
 
     def binding_for_after_register(self, user):
         """
