@@ -1254,7 +1254,7 @@ class WeixinAnnualBonusView(TemplateView):
             return super(WeixinAnnualBonusView, self).dispatch(request, *args, **kwargs)
 
         self.to_openid = self.request.GET.get('uid', None)
-        if not self.to_openid:
+        if not self.to_openid or self.to_openid=='undefined':
             self.to_openid = self.from_openid
 
         if self.to_openid==self.from_openid:
@@ -1311,7 +1311,7 @@ class WeixinAnnualBonusView(TemplateView):
     def apply_bonus(self):
         phone = self.request.GET.get('phone')
         #TODO: 手机号码有效性检查
-        if not phone:
+        if not phone or phone=='undefined':
             rep = { 'err_code':201, 'err_messege':u'请填写有效的手机号', }
             return HttpResponse(json.dumps(rep), content_type='application/json')
 
