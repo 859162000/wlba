@@ -46,7 +46,7 @@ block main
                         td.td-left 手机验证码
                         td
                             input(type='text', name="code", placeholder="请输入验证码", autocomplete='off', class="required {messages:{required:'请输入验证码'}}" )
-                            button.ispan4-omega#button-get-code-btn.button-orange.button-large(type='button', data-phone="15201599357") 获取验证码
+                            button.ispan4-omega#button-get-code-btn.button-orange.button-large(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
                             .row.voice.void.hidden
                                 .span12-omega
                     tr

@@ -7,7 +7,7 @@ require.config({
         'jquery.webuploader': 'lib/webuploader.min',
         tools: 'lib/modal.tools',
         upload: 'upload',
-        'csrf' : 'model/csrf',
+        'csrf' : 'model/csrf'
     },
     shim: {
         'jquery.placeholder': ['jquery'],
@@ -131,7 +131,7 @@ require(['jquery', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/
         return $.modal.close();
       });
       intervalId;
-      count = 5;
+      count = 60;
       $(element).attr('disabled', 'disabled').addClass('disabled');
       $('.voice-validate').attr('disabled', 'disabled');
       timerFunction = function() {
@@ -167,7 +167,7 @@ require(['jquery', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/
         var button, count, intervalId, timerFunction;
         if (json.ret_code === 0) {
           intervalId;
-          count = 5;
+          count = 60;
           button = $("#button-get-code-btn");
           button.attr('disabled', 'disabled').addClass('button-gray');
           $('.voice').addClass('tip');
