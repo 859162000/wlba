@@ -298,16 +298,14 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	$('.renovate').click(function(){
 		$(this).addClass('renovate_rotate');
 		$.ajax({
-			url: 'weixin_activity/weixin/bonus/?uid='+uid+'&wxid='+wxid,
-			type: "POST",
-			data: {
-
-			}
+			url: 'weixin_activity/weixin/bonus/?act=query&uid='+uid+'&wxid='+wxid,
+			type: "GET",
 		}).done(function (xhr) {
 			if(xhr.err_code==0){
 				$(this).removeClass('renovate_rotate');
+				$('#praise_num').val(xhr.wx_user.annual_bonus);
 			}else if(xhr.err_code==0){
-				alert('信息错误')
+				alert('信息错误');
 			}
 		});
 	})
