@@ -19,8 +19,61 @@ require.config({
 });
 
 require(['jquery', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/modal', 'tools', 'jquery.webuploader' , 'upload', 'csrf'], function ($, form ,validate, placeholder, modal, tool, webuploader) {
+    //提交表单
+    var qiyeFormValidate = $('#qiyeForm').validate({});
+    $('.save-btn').on('click',function(){
+        if(qiyeFormValidate.form()){
+            $('#qiyeForm').ajaxSubmit(function(data){
+
+            })
+        }
+    })
+    //营业执照
+   $('#yezz').diyUpload({
+        url:'/accounts/enterprise/extra/',
+        success:function( data ) {
+            console.info( data );
+        },
+        error:function( err ) {
+            console.info( err );
+        },
+        buttonText : '营业执照',
+        chunked:true,
+        // 分片大小
+        chunkSize:512 * 1024,
+        //最大上传的文件数量, 总文件大小,单个文件大小(单位字节);
+        fileNumLimit:1,
+        fileSizeLimit:500000 * 1024,
+        fileSingleSizeLimit:50000 * 1024,
+        accept: {},
+        fileVal: 'business_license'
+    });
+    //登记证
+    $('#swdjz').diyUpload({
+        url:'/accounts/enterprise/extra/',
+        success:function( data ) {
+            console.info( data );
+        },
+        error:function( err ) {
+            console.info( err );
+        },
+        buttonText : '登记证',
+        chunked:true,
+        // 分片大小
+        chunkSize:512 * 1024,
+        //最大上传的文件数量, 总文件大小,单个文件大小(单位字节);
+        fileNumLimit:1,
+        fileSizeLimit:500000 * 1024,
+        fileSingleSizeLimit:50000 * 1024,
+        accept: {},
+        fileVal:'registration_cert'
+    });
+    //输入框
+    $('input, textarea').placeholder();
 
 
+
+    /*----------------------验证码-----------------*/
     //图片验证码
     $('#button-get-code-btn').click(function() {
       var url;
@@ -60,10 +113,7 @@ require(['jquery', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/
       }).fail(function(xhr) {
         var result;
         clearInterval(intervalId);
-        $(element).text('重新获取');
-        $(element).removeAttr('disabled');
-        $(element).addClass('button-red');
-        $(element).removeClass('button-gray');
+        $(element).text('重新获取').removeAttr('disabled').addClass('button-red').removeClass('button-gray');
         result = JSON.parse(xhr.responseText);
         if (result.type === 'captcha') {
           return $("#submit-code-img4").parent().parent().find('.code-img-error').html(result.message);
@@ -76,16 +126,13 @@ require(['jquery', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/
           }
         }
       }).success(function() {
-        element.attr('disabled', 'disabled');
-        element.removeClass('button-red');
-        element.addClass('button-gray');
+        element.attr('disabled', 'disabled').removeClass('button-red').addClass('button-gray');
         $('.voice-validate').attr('disabled', 'disabled');
         return $.modal.close();
       });
       intervalId;
       count = 5;
-      $(element).attr('disabled', 'disabled');
-      $(element).addClass('disabled');
+      $(element).attr('disabled', 'disabled').addClass('disabled');
       $('.voice-validate').attr('disabled', 'disabled');
       timerFunction = function() {
         if (count >= 1) {
@@ -93,10 +140,7 @@ require(['jquery', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/
           return $(element).text('重新获取(' + count + ')');
         } else {
           clearInterval(intervalId);
-          $(element).text('重新获取');
-          $(element).removeAttr('disabled');
-          $(element).removeClass('disabled');
-          $(element).removeClass('button-gray');
+          $(element).text('重新获取').removeAttr('disabled').removeClass('disabled').removeClass('button-gray');
           $('.voice').removeClass('hidden');
           $('.voice-validate').removeAttr('disabled');
           return $('.voice  .span12-omega').html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/2/" class="voice-validate">语音验证</a>');
@@ -125,8 +169,7 @@ require(['jquery', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/
           intervalId;
           count = 5;
           button = $("#button-get-code-btn");
-          button.attr('disabled', 'disabled');
-          button.addClass('button-gray');
+          button.attr('disabled', 'disabled').addClass('button-gray');
           $('.voice').addClass('tip');
           timerFunction = function() {
             if (count >= 1) {
@@ -136,9 +179,7 @@ require(['jquery', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/
               clearInterval(intervalId);
               element.html('没有收到验证码？请尝试<a href="/api/ytx/send_voice_code/2/" class="voice-validate">语音验证</a>');
               element.removeAttr('disabled');
-              button.removeAttr('disabled');
-              button.addClass('button-red');
-              button.removeClass('button-gray');
+              button.removeAttr('disabled').addClass('button-red').removeClass('button-gray');
               return $('.voice').removeClass('tip');
             }
           };
@@ -156,55 +197,5 @@ require(['jquery', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/
         }
       });
     });
-
-    //提交表单
-    var qiyeFormValidate = $('#qiyeForm').validate({});
-    $('.save-btn').on('click',function(){
-        if(qiyeFormValidate.form()){
-            $('#qiyeForm').ajaxSubmit(function(data){
-
-            })
-        }
-    })
-
-   $('#yezz').diyUpload({
-        url:'/accounts/enterprise/extra/',
-        success:function( data ) {
-            console.info( data );
-        },
-        error:function( err ) {
-            console.info( err );
-        },
-        buttonText : '营业执照',
-        chunked:true,
-        // 分片大小
-        chunkSize:512 * 1024,
-        //最大上传的文件数量, 总文件大小,单个文件大小(单位字节);
-        fileNumLimit:1,
-        fileSizeLimit:500000 * 1024,
-        fileSingleSizeLimit:50000 * 1024,
-        accept: {},
-        fileVal: 'business_license'
-    });
-    $('#swdjz').diyUpload({
-        url:'/accounts/enterprise/extra/',
-        success:function( data ) {
-            console.info( data );
-        },
-        error:function( err ) {
-            console.info( err );
-        },
-        buttonText : '登记证',
-        chunked:true,
-        // 分片大小
-        chunkSize:512 * 1024,
-        //最大上传的文件数量, 总文件大小,单个文件大小(单位字节);
-        fileNumLimit:1,
-        fileSizeLimit:500000 * 1024,
-        fileSingleSizeLimit:50000 * 1024,
-        accept: {},
-        fileVal:'registration_cert'
-    });
-    //输入框
-    $('input, textarea').placeholder();
+     /*----------------------验证码-----------------*/
 });
