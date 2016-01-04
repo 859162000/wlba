@@ -47,17 +47,18 @@ html(style="background: #3a2741")
                         span 已同意网利宝年终奖
                         span.rule 活动规则
                     .line.friends 以下好友肯定了TA
-                    #mycarousel.tab_wrap.friends.jcarousel-skin-tango
-                        ul.user_wrap
-                            for p2p in follow
-                                li
-                                    img.user(src="{{p2p.from_headimgurl}}")
-                        .jcarousel-scroll
-                            form(action="")
-                                a#mycarousel-prev(href="#")
-                                    img.prev_button(src="/static/imgs/mobile_activity/app_praise_reward/prev.png")
-                                a#mycarousel-next(href="#")
-                                    img.next_button(src="/static/imgs/mobile_activity/app_praise_reward/next.png")
+                    .gundong
+                        #mycarousel.tab_wrap.friends.jcarousel-skin-tango
+                            ul.user_wrap
+                                for p2p in follow
+                                    li
+                                        img.user(src="{{p2p.from_headimgurl}}")
+                            .jcarousel-scroll
+                                form(action="")
+                                    a#mycarousel-prev(href="#")
+                                        img.prev_button(src="/static/imgs/mobile_activity/app_praise_reward/prev.png")
+                                    a#mycarousel-next(href="#")
+                                        img.next_button(src="/static/imgs/mobile_activity/app_praise_reward/next.png")
                     if is_myself
                         .step_me
                             .line_bottom
@@ -123,4 +124,4 @@ html(style="background: #3a2741")
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/jquery.min.js')
         script(src='/static/js/lib/jquery.jcarousel.min.js')
-        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=010412")
+        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=010413")
