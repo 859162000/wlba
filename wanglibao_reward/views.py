@@ -1287,12 +1287,23 @@ class WeixinAnnualBonusView(TemplateView):
             #wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
             follows = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid)
             self.template_name = 'app_praise_reward.jade'
-            return { 'err_code':0, 'err_messege':u'用户', 'is_myself':self.is_myself, 'wx_user':wx_bonus, 'follow':follows, \
-                     'share_url':settings.CALLBACK_HOST + reverse(self.url_name) + "?uid=" + self.to_openid, 'share_img':''}
+            return { 'err_code':0, 'err_messege':u'用户', 'is_myself':self.is_myself, 'wx_user':wx_bonus, 'follow':follows,
+                     'share_name':u'我的努力需要你的一个肯定，谢谢你',
+                     'share_img':settings.CALLBACK_HOST + '/static/imgs/mobile_activity/app_praise_reward/300*300.jpg',
+                     'share_link':settings.CALLBACK_HOST + reverse(self.url_name) + "?uid=" + self.to_openid,
+                     'share_title':u'我的努力需要你的一个肯定，谢谢你',
+                     'share_body':u'您的好友正在领取他的年终奖，随手一赞，助他多拿500！'
+                    }
         else:
             if self.is_myself:
                 self.template_name = 'app_praise_reward_go.jade'
-                return { 'err_code':102, 'err_messege':u'用户还未申领年终奖', 'is_myself':self.is_myself, }
+                return { 'err_code':102, 'err_messege':u'用户还未申领年终奖', 'is_myself':self.is_myself,
+                        'share_name':u'您的好友邀请您参加分享领取年终奖活动',
+                        'share_img':settings.CALLBACK_HOST + '/static/imgs/mobile_activity/app_praise_reward/300*300.jpg',
+                        'share_link':settings.CALLBACK_HOST + reverse(self.url_name),
+                        'share_title':u'您的好友邀请您参加分享领取年终奖活动',
+                        'share_body':u'您的好友邀请您参加分享领取年终奖活动，分享得赞，得赞越多，奖金越高！'
+                        }
             else:
                 self.template_name = 'app_praise_reward.jade'
                 return { 'err_code':103, 'err_messege':u'异常请求', 'is_myself':self.is_myself,  }
