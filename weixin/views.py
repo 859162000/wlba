@@ -11,6 +11,7 @@ from django.db.models.signals import post_save, pre_save
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils import timezone
+from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated
 import functools
 import re
@@ -59,23 +60,18 @@ from wechatpy.events import (BaseEvent, ClickEvent, SubscribeScanEvent, ScanEven
                              TemplateSendJobFinishEvent)
 from experience_gold.models import ExperienceEvent
 from experience_gold.backends import SendExperienceGold
-from weixin.tasks import detect_product_biding, sentTemplate, bind_ok
-from weixin.util import sendTemplate, redirectToJumpPage
+from weixin.tasks import detect_product_biding, sentTemplate
+from weixin.util import sendTemplate, redirectToJumpPage, getOrCreateWeixinUser, bindUser, unbindUser, _process_record, _process_scene_record
+from weixin.util import FWH_UNBIND_URL
 
 logger = logging.getLogger("weixin")
 CHECK_BIND_CLICK_EVENT = ['subscribe_service', 'my_account', 'sign_in', "my_experience_gold"]
 
+from util import FWH_LOGIN_URL
+
 def stamp(dt):
     return long(time.mktime(dt.timetuple()))
 
-def _process_record(w_user, user, type, describe):
-    war = WeiXinUserActionRecord()
-    war.w_user = w_user
-    war.user = user
-    war.action_type = type
-    war.action_describe = describe
-    war.create_time = int(time.time())
-    war.save()
 
 def checkBindDeco(func):
     @functools.wraps(func)
@@ -337,6 +333,9 @@ class WeixinJoinView(View):
         if not old_subscribe and w_user.subscribe:
             w_user.scene_id = scene_id
             w_user.save()
+            if scene_id:
+                _process_scene_record(w_user, scene_id)
+
         if not reply and not user:
             txt = self.getBindTxt(fromUserName)
             reply = create_reply(txt, self.msg)
@@ -364,15 +363,14 @@ class WeixinJoinView(View):
                 {'image':B_img_url, 'url':B_url, 'description':'B轮4000万美元融资', 'title':'B轮4000万美元融资'},]
 
     def getBindTxt(self, fromUserName):
-        bind_url = settings.CALLBACK_HOST + reverse('weixin_bind') + "?openid=%s&promo_token=fwh"%(fromUserName)
+        bind_url = FWH_LOGIN_URL
         txt = u"终于等到你，还好我没放弃。绑定网利宝帐号，轻松投资、随时随地查看收益！\n" \
               u"<a href='%s'>【立即绑定】</a>"%(bind_url)
         return txt
 
     def getUnBindTxt(self, fromUserName, userPhone):
-        unbind_url = settings.CALLBACK_HOST + reverse('weixin_unbind') + "?openid=%s&promo_token=fwh"%(fromUserName)
         txt = u"您的微信绑定帐号为：%s\n"%userPhone\
-            +u"如需解绑当前帐号，请点击<a href='%s'>【立即解绑】</a>"%unbind_url
+            +u"如需解绑当前帐号，请点击<a href='%s'>【立即解绑】</a>"%FWH_UNBIND_URL
         return txt
 
     def getCSReply(self):
@@ -420,77 +418,6 @@ class WeixinJoinView(View):
     def dispatch(self, request, *args, **kwargs):
         return super(WeixinJoinView, self).dispatch(request, *args, **kwargs)
 
-
-
-
-
-def getOrCreateWeixinUser(openid, weixin_account):
-    old_subscribe = 0
-    w_user = WeixinUser.objects.filter(openid=openid).first()
-    if w_user and w_user.subscribe:
-        old_subscribe = 1
-    if not w_user:
-        w_user = WeixinUser()
-        w_user.openid = openid
-        w_user.account_original_id = weixin_account.db_account.original_id
-        w_user.save()
-    if w_user.account_original_id != weixin_account.db_account.original_id:
-        w_user.account_original_id = weixin_account.db_account.original_id
-        w_user.save()
-    if not w_user.nickname or not w_user.subscribe or not w_user.subscribe_time:
-        try:
-            user_info = weixin_account.db_account.get_user_info(openid)
-            print user_info
-            w_user.nickname = user_info.get('nickname', "")
-            w_user.sex = user_info.get('sex', 0)
-            w_user.city = user_info.get('city', "")
-            w_user.country = user_info.get('country', "")
-            w_user.headimgurl = user_info.get('headimgurl', "")
-            w_user.unionid =  user_info.get('unionid', '')
-            w_user.province = user_info.get('province', '')
-            w_user.subscribe = user_info.get('subscribe', 0)
-            # if not w_user.subscribe_time:
-            w_user.subscribe_time = user_info.get('subscribe_time', 0)
-            w_user.save()
-        except WeChatException, e:
-            logger.debug(e.message)
-            pass
-    return w_user, old_subscribe
-
-
-def bindUser(w_user, user):
-    is_first_bind = False
-    redpack_record_id = 0
-    if w_user.user:
-        if w_user.user.id==user.id:
-            return 1, u'你已经绑定, 请勿重复绑定'
-        return 2, u'你微信已经绑定%s'%w_user.user.wanglibaouserprofile.phone
-    other_w_user = WeixinUser.objects.filter(user=user).first()
-    if other_w_user:
-        msg = u"你的手机号%s已经绑定微信<span style='color:#173177;'>%s</span>"%(user.wanglibaouserprofile.phone, other_w_user.nickname)
-        return 3, msg
-    w_user.user = user
-    w_user.bind_time = int(time.time())
-    w_user.save()
-    _process_record(w_user, user, 'bind', "绑定网利宝")
-
-    if not user.wanglibaouserprofile.first_bind_time:
-        user.wanglibaouserprofile.first_bind_time = w_user.bind_time
-        user.wanglibaouserprofile.save()
-        is_first_bind = True
-    bind_ok.apply_async(kwargs={
-        "openid": w_user.openid,
-        "is_first_bind":is_first_bind,
-    },
-                        queue='celery01'
-                        )
-    return 0, u'绑定成功'
-
-def unbindUser(w_user, user):
-    w_user.user = None
-    w_user.unbind_time=int(time.time())
-    w_user.save()
-    _process_record(w_user, user, 'unbind', "解除绑定")
 
 class WeixinLogin(TemplateView):
     template_name = 'weixin_login_new.jade'
@@ -593,8 +520,6 @@ class UnBindWeiUser(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(UnBindWeiUser, self).get_context_data(**kwargs)
-        openid = self.request.GET.get('openid', '')
-        context['openid'] = openid
         next = self.request.GET.get('next', '')
         return {
             'context': context,
@@ -602,23 +527,40 @@ class UnBindWeiUser(TemplateView):
             }
 
     def dispatch(self, request, *args, **kwargs):
-        openid = self.request.GET.get('openid', '')
-        if not openid:
-            return redirectToJumpPage("error:-1")
-        w_user = WeixinUser.objects.filter(openid=openid).first()
-        if not w_user:
-            message = u"请从[服务中心]点击[绑定微信]进行绑定"
-            return redirectToJumpPage(message)
-        if not w_user.user:
-            return redirectToJumpPage(u"您没有绑定的网利宝帐号")
-        return super(UnBindWeiUser, self).dispatch(request, *args, **kwargs)
+        code = request.GET.get('code')
+        state = request.GET.get('state')
+        error_msg = ""
+        try:
+            if code and state:
+                account = WeixinAccounts.getByOriginalId(state)
+                request.session['account_key'] = account.key
+                oauth = WeChatOAuth(account.app_id, account.app_secret, )
+                res = oauth.fetch_access_token(code)
+                self.openid = res.get('openid')
+                request.session['openid'] = self.openid
+                w_user = WeixinUser.objects.filter(openid=self.openid).first()
+                if not w_user:
+                    message = u"请从[服务中心]点击[账号关联]进行绑定"
+                    return redirectToJumpPage(message)
+                if not w_user.user:
+                    return redirectToJumpPage(u"您没有绑定的网利宝帐号")
+            else:
+                error_msg='code or state not in request'
+        except WeChatException, e:
+            error_msg = e.message
+        if error_msg:
+            return redirectToJumpPage(error_msg)
+        else:
+            return super(UnBindWeiUser, self).dispatch(request, *args, **kwargs)
 
 class UnBindWeiUserAPI(APIView):
     permission_classes = ()
     http_method_names = ['post']
 
     def post(self, request):
-        openid = request.POST.get('openid')
+        openid = request.session.get('openid')
+        if not openid:
+            return Response({'message':'openid not in session'})
         weixin_user = WeixinUser.objects.get(openid=openid)
         if weixin_user.user:
             user = weixin_user.user
@@ -646,8 +588,8 @@ class WeixinJsapiConfig(APIView):
             request.session['account_key'] = 'sub_1'
             account = WeixinAccounts.get('sub_1')
         else:
-            request.session['account_key'] = 'account_test_hmm'
-            account = WeixinAccounts.get('account_test_hmm')
+            request.session['account_key'] = 'test'
+            account = WeixinAccounts.get('test')
 
         noncestr = uuid.uuid1().hex
         timestamp = str(int(time.time()))
@@ -860,7 +802,7 @@ class P2PListWeixin(APIView):
 
 
 class P2PDetailView(TemplateView):
-
+    source = ""
     def get_template_names(self):
         template = self.kwargs['template']
         if template == 'calculator':
@@ -869,6 +811,8 @@ class P2PDetailView(TemplateView):
             template_name = 'weixin_buy.jade'
         else:
             template_name = 'weixin_detail.jade'
+            if self.source=='fwh':
+                template_name = 'service_detail.jade'
 
         return template_name
 
@@ -910,6 +854,7 @@ class P2PDetailView(TemplateView):
         current_equity = 0
         redpacks = []
         user = self.request.user
+        id_is_valid = False
         if user.is_authenticated():
             user_margin = user.margin.margin
             equity_record = P2PEquity.objects.filter(product=p2p['id']).filter(user=user).first()
@@ -919,6 +864,7 @@ class P2PDetailView(TemplateView):
             device = utils.split_ua(self.request)
             result = backends.list_redpack(user, 'available', device['device_type'], p2p['id'])
             redpacks = result['packages'].get('available', [])
+            id_is_valid = user.wanglibaouserprofile.id_is_valid,
 
         orderable_amount = min(p2p['limit_amount_per_user'] - current_equity, p2p['remain'])
         total_buy_user = P2PEquity.objects.filter(product=p2p['id']).count()
@@ -926,6 +872,7 @@ class P2PDetailView(TemplateView):
         amount = self.request.GET.get('amount', 0)
         amount_profit = self.request.GET.get('amount_profit', 0)
         next = self.request.GET.get('next', '')
+        cards = Card.objects.filter(user=self.request.user).filter(Q(is_bind_huifu=True)|Q(is_bind_kuai=True)|Q(is_bind_yee=True))# Q(is_bind_huifu=True)|)
         context.update({
             'p2p': p2p,
             'end_time': end_time,
@@ -940,6 +887,8 @@ class P2PDetailView(TemplateView):
             'redpacks': redpacks,
             'next': next,
             'amount_profit': amount_profit,
+            'id_is_valid':id_is_valid,
+            'card_is_bind':cards.exists()
         })
 
         return context
@@ -1053,16 +1002,21 @@ class WeixinRechargeSecond(TemplateView):
 
 class WeixinTransaction(TemplateView):
     template_name = 'weixin_transaction.jade'
-
+    source = 'weixin'
     def get_template_names(self):
         status = self.kwargs['status']
         if status == 'buying':
             template_name = 'weixin_transaction_buying.jade'
+            if self.source=='fwh':
+                template_name = 'service_transaction_buying.jade'
         elif status == 'finished':
             template_name = 'weixin_transaction_finished.jade'
+            if self.source=='fwh':
+                template_name = 'service_transaction_finished.jade'
         else:
             template_name = 'weixin_transaction.jade'
-
+            if self.source=='fwh':
+                template_name = 'service_transaction_repay.jade'
         return template_name
 
     def get_context_data(self, status, **kwargs):
@@ -1347,7 +1301,7 @@ class GetAuthUserInfo(APIView):
             w_user.headimgurl = user_info.get('headimgurl', "")
             w_user.unionid = user_info.get('unionid', "")
             w_user.province = user_info.get('province', "")
-            w_user.subscribe = user_info.get('subscribe')
+            w_user.subscribe = user_info.get('subscribe', 0)
             w_user.subscribe_time = user_info.get('subscribe_time', 0)
             w_user.save()
             return Response(user_info)
@@ -1378,7 +1332,7 @@ class GetUserInfo(APIView):
                 w_user.headimgurl = user_info.get('headimgurl', "")
                 w_user.unionid = user_info.get('unionid', "")
                 w_user.province = user_info.get('province', "")
-                w_user.subscribe = user_info.get('subscribe')
+                w_user.subscribe = user_info.get('subscribe', 0)
                 w_user.subscribe_time = user_info.get('subscribe_time', 0)
                 w_user.save()
         except Exception, e:
