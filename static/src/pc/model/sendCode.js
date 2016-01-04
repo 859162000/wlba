@@ -80,7 +80,7 @@
                         $('#'+voiceCodeBox).find('.voice-validate').attr('disabled', 'disabled');
                     }
                     intervalId;
-                    count = 60;
+                    count = 5;
                     timerFunction = function() {
                         if (count >= 1) {
                           count--;
@@ -91,7 +91,7 @@
                           if(voiceCodeBox && ($('#'+voiceCodeBox).find('.span12-omega').length == 0)) {
                               $('#'+voiceCodeBox).find('.voice-validate').removeAttr('disabled');
                               var voiceDiv = $('<div class="span12-omega">没有收到验证码？请尝试</div>');
-                              $('<a href="/api/ytx/send_voice_code/2/" class="voice-validate" onclick="sendSMSCode.voiceCode(this,\''+phoneNumber+'\',\''+element+'\')">语音验证</a>').appendTo(voiceDiv);
+                              $('<a href="javascript:void()" class="voice-validate" onclick="self.voiceCode(this,\''+phoneNumber+'\',\''+element+'\')">语音验证</a>').appendTo(voiceDiv);
                               $('#'+voiceCodeBox).append(voiceDiv).show()
                           }
                         }
@@ -102,13 +102,12 @@
             })
         },
         voiceCode : function(obj,phoneNumber,btn){
-          var element = $(obj).parent(),
-              url = $(obj).attr('href');
+          var element = $(obj).parent()
           if ($(obj).attr('disabled') && $(obj).attr('disabled') === 'disabled') {
             return;
           }
           return $.ajax({
-            url: url,
+            url: '/api/ytx/send_voice_code/2/',
             type: "POST",
             data: {
               phone: phoneNumber
@@ -117,7 +116,7 @@
             var button, count, intervalId, timerFunction;
             if (json.ret_code === 0) {
               intervalId;
-              count = 60;
+              count = 5;
               button = $("#"+btn);
               button.attr('disabled', 'disabled').addClass('button-gray');
               $('.voice').addClass('tip');
@@ -229,7 +228,7 @@
     //    return $.modal.close();
     //  });
     //  intervalId;
-    //  count = 60;
+    //  count = 5;
     //  $(element).attr('disabled', 'disabled');
     //  $(element).addClass('disabled');
     //  $('.voice-validate').attr('disabled', 'disabled');
@@ -269,7 +268,7 @@
     //    var button, count, intervalId, timerFunction;
     //    if (json.ret_code === 0) {
     //      intervalId;
-    //      count = 60;
+    //      count = 5;
     //      button = $("#button-get-code-btn");
     //      button.attr('disabled', 'disabled');
     //      button.addClass('button-gray');
