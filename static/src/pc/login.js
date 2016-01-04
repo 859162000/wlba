@@ -402,7 +402,8 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                     captcha_0: captcha_0,
                     captcha_1: captcha_1,
                     password: password,
-                    validate_code: validate_code
+                    validate_code: validate_code,
+                    user_type: '3'
                 }
             }).done(function () {
                 var next = _getQueryStringByName('next') == '' ? '/accounts/register/first/' : _getQueryStringByName('next');
