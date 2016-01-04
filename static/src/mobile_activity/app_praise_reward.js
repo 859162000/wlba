@@ -76,7 +76,7 @@
 	$('.renovate').click(function(){
 		$(this).addClass('renovate_rotate');
 		$.ajax({
-			url: 'weixin_activity/weixin/bonus/?uid=1001&wxid=1002',
+			url: 'weixin_activity/weixin/bonus/?uid='+uid+'&wxid='+wxid,
 			type: "POST",
 			data: {
 
@@ -112,18 +112,18 @@
 	$('.praise_left').click(function(){
 		$('#praise_num').val();
 		if(praise_num>=30000){
-			$('.friend_top .text').text('您的朋友已获取全额年终奖');
+			$('.friend_top span').text('您的朋友已获取全额年终奖');
 			$('.friend_top').fadeIn();
 		}else{
 			$.ajax({
-				url: '/weixin_activity/weixin/bonus/?act=vote&type=1&uid=1001&wxid=1002',
+				url: '/weixin_activity/weixin/bonus/?act=vote&type=1&uid='+uid+'&wxid='+wxid,
 				type: "GET",
 			}).done(function (xhr) {
 				if(xhr.err_code==0){
-					$('.friend_top .text').text(xhr.err_messege);
+					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 				}else{
-					$('.friend_top .text').text(xhr.err_messege);
+					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 				}
 			});
@@ -132,18 +132,18 @@
 
 	$('.praise_right').click(function(){
 		if(praise_num<=100){
-			$('.friend_top .text').text('给您的朋友留点年终奖吧');
+			$('.friend_top span').text('给您的朋友留点年终奖吧');
 			$('.friend_top').fadeIn();
 		}else{
 			$.ajax({
-				url: '/weixin_activity/weixin/bonus/?act=vote&type=2&uid=1001&wxid=1002',
+				url: '/weixin_activity/weixin/bonus/?act=vote&type=2&uid='+uid+'&wxid='+wxid,
 				type: "GET",
 			}).done(function (xhr) {
 				if(xhr.err_code==0){
-					$('.friend_top .text').text(xhr.err_messege);
+					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 				}else{
-					$('.friend_top .text').text(xhr.err_messege);
+					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 				}
 			});
@@ -157,17 +157,18 @@
 		phone_number = $('#phone_number').val();
 		if($('.checkbox').hasClass('checkbox_select')){
 			$.ajax({
-				url: '/weixin_activity/weixin/bonus/?act=apply&phone='+phone_number+'&wxid=1002',
+				url: '/weixin_activity/weixin/bonus/?act=apply&phone='+phone_number+'&wxid='+wxid,
 				type: "GET",
 			}).done(function (xhr) {
 				if(xhr.err_code==0){
 					window.location.href = '/weixin_activity/weixin/bonus/?wxid=1002'
 				}else{
-					alert(xhr.err_messege);
+					$('.friend_top span').text(xhr.err_messege);
+					$('.friend_top').fadeIn();
 				}
 			});
 		}else{
-			$('.friend_top .text').text('请点击，我同意网利宝年终奖活动规则');
+			$('.friend_top span').text('请点击，我同意网利宝年终奖活动规则');
 			$('.friend_top').fadeIn();
 		}
 	});
