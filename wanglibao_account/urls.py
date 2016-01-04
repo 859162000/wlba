@@ -130,7 +130,7 @@ urlpatterns = patterns(
     url(r'^user_type/$', GetRequestUserType.as_view()),
 
     # 企业理财
-    url(r'enterprise/extra$', EnterpriseUserProfileExtraApi.as_view()),
+    url(r'enterprise/extra/$', EnterpriseUserProfileExtraApi.as_view()),
     url(r'enterprise/$', EnterpriseUserProfileApi.as_view()),
 
 )
