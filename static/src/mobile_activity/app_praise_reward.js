@@ -55,6 +55,9 @@
 		if(user_num!=0){
 			$('.friends,.jcarousel-skin-tango').show();
 		}
+		if(user_num<=6){
+			$('#mycarousel-prev,#mycarousel-next').hide();
+		}
 		/*朋友个数结束*/
 	})
 	/*滚动图结束*/
