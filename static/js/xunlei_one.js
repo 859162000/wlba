@@ -145,7 +145,6 @@
             type: "GET",
             async: false
         }).done(function (result) {
-            console.log(result);
             for (var k = 0, len2 = result['data'].length; k < len2; k++) {
                 var tel = result['data'][k]['phone'].substring(0, 3) + "******" + result['data'][k]['phone'].substring(9, 11);
                 str += '<p>恭喜' + tel + '获得<span>' + result['data'][k]['awards'] + '元</span>红包</p>'
@@ -194,7 +193,6 @@
                 type: "GET",
                 async: false
             }).done(function (data) {
-                console.log(data);
                 $('.chance').text(' ' + data['lefts'] + ' ');
 
             });
@@ -219,7 +217,6 @@
                 type: "POST",
                 data: {}
             }).done(function (data) {
-                console.log(data);
 
                 $('.game-btn').removeClass('game-btn-down');
                 if (data['code'] == 1001) {
@@ -245,7 +242,6 @@
 
         });
         function game(isGet) {
-            console.log(isGet);
             $('.go-game').addClass('noClick');
             //按钮按下样式
             //手柄的样式
@@ -273,7 +269,6 @@
 
         //开始转动
         function star(a) {
-            console.log('>>' + a);
             var time;
             time = setInterval(function () {
                 $('.long-sum').animate({'bottom': '-1062px'}, 100, function () {
@@ -342,7 +337,6 @@
 
                 },
                 success: function (data) {
-                    console.log(data.ret_code);
                     if (data.ret_code == 10002 || data.ret_code == 10000) {
                         $('.xunshang1').text('恭喜已完成网利宝注册');
                         $('.xunshang2').text('并与您的迅雷账号绑定成功');
