@@ -48,9 +48,10 @@ script.
           }
       }
       if (ua.match(/MicroMessenger/i) != "micromessenger") {
-        setTimeout(function(){
-          window.location.href = 'wanglibao://';
-        }, 0)
+        window.setTimeout(function(){
+          window.location.href = 'wanglibao://'
+        },0)
+
       }
   })();
 
