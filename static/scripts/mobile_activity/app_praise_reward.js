@@ -237,6 +237,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		}
 	}
 
+	if(wxid!=undefined){
+		$('.shine_wrap').show();
+	}
+
 	/*滚动图*/
 	function mycarousel_initCallback(carousel) {
 		jQuery('.jcarousel-control a').bind('click', function() {
@@ -266,6 +270,13 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		});
 	})
 	/*滚动图结束*/
+
+	/*朋友个数*/
+	var user_num = $('.user_wrap li').length;
+	if(user_num!=0){
+		$('.friends,.jcarousel-skin-tango').show();
+	}
+	/*朋友个数结束*/
 
 	var is_myself = false;
 
@@ -390,6 +401,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		$('.friend_top').hide();
 	});
 
+	$('.shine_wrap .close').click(function(){
+		$('.shine_wrap').hide();
+	});
 
 
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
@@ -411,11 +425,11 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	});
 	wx.ready(function(){
 		var host = 'https://www.wanglibao.com/',
-			shareName = '双旦来了，翻倍狂欢',
+			shareName = '我的努力需要你的一个肯定，谢谢你',
 			shareImg = host + '/static/imgs/mobile_activity/app_praise_reward/300*300.jpg',
 			shareLink = host + '/activity/app_praise_reward/',
-			shareMainTit = '双旦来了，翻倍狂欢',
-			shareBody = '红包、加息券、体验金全部翻倍送、实物大奖同台登场，年底倾囊N重回馈。';
+			shareMainTit = '我的努力需要你的一个肯定，谢谢你',
+			shareBody = '您的好友正在领取他的年终奖，随手一赞，祝他多拿100！';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -425,7 +439,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '双旦来了，翻倍狂欢',
+			title: '我领到一份年终奖，XXX元噢！你也为自己一年的努力另一份吧！，',
 			link : shareLink,
 			imgUrl: shareImg
 		})
