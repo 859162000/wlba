@@ -8,16 +8,6 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'EnterpriseUserProfileExtra'
-        db.create_table(u'wanglibao_qiye_enterpriseuserprofileextra', (
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], primary_key=True)),
-            ('business_license', self.gf('django.db.models.fields.files.ImageField')(max_length=100, blank=True)),
-            ('registration_cert', self.gf('django.db.models.fields.files.ImageField')(max_length=100, blank=True)),
-            ('modify_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('created_time', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-        ))
-        db.send_create_signal(u'wanglibao_qiye', ['EnterpriseUserProfileExtra'])
-
         # Adding model 'EnterpriseUserProfile'
         db.create_table(u'wanglibao_qiye_enterpriseuserprofile', (
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], primary_key=True)),
@@ -39,9 +29,6 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        # Deleting model 'EnterpriseUserProfileExtra'
-        db.delete_table(u'wanglibao_qiye_enterpriseuserprofileextra')
-
         # Deleting model 'EnterpriseUserProfile'
         db.delete_table(u'wanglibao_qiye_enterpriseuserprofile')
 
@@ -98,14 +85,6 @@ class Migration(SchemaMigration):
             'deposit_bank_province': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
             'modify_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'registration_cert': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'primary_key': 'True'})
-        },
-        u'wanglibao_qiye.enterpriseuserprofileextra': {
-            'Meta': {'object_name': 'EnterpriseUserProfileExtra'},
-            'business_license': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'blank': 'True'}),
-            'created_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'modify_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'registration_cert': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'primary_key': 'True'})
         }
     }

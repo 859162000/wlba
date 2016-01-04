@@ -8,6 +8,10 @@ class EnterpriseUserProfileForm(forms.Form):
     """企业用户认证资料验证表单"""
 
     company_name = forms.CharField(label="Company name", max_length=30, error_messages={'required': u'请输入公司名称'})
+    business_license = forms.CharField(label="Business license", max_length=255,
+                                       error_messages={'required': u'请选择营业执照'})
+    registration_cert = forms.CharField(label="Registration cert", max_length=255,
+                                        error_messages={'required': u'请选择税务登记证'})
     certigier_name = forms.CharField(label="Certigier name", max_length=12, error_messages={'required': u'请输入授权人姓名'})
     certigier_phone = forms.IntegerField(label="Certigier phone", error_messages={'required': u'请输入授权人手机号'})
     company_address = forms.CharField(label="Company address", max_length=255,
@@ -26,6 +30,18 @@ class EnterpriseUserProfileForm(forms.Form):
     def clean_company_name(self):
         company_name = self.cleaned_data.get('company_name', '').strip()
         self.cleaned_data['company_name'] = company_name
+
+        return self.cleaned_data
+
+    def clean_business_license(self):
+        business_license = self.cleaned_data.get('business_license', '').strip()
+        self.cleaned_data['business_license'] = business_license
+
+        return self.cleaned_data
+
+    def clean_registration_cert(self):
+        registration_cert = self.cleaned_data.get('registration_cert', '').strip()
+        self.cleaned_data['registration_cert'] = registration_cert
 
         return self.cleaned_data
 
