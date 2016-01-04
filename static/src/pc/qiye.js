@@ -30,7 +30,7 @@ require(['jquery', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/
     })
     //营业执照
    $('#yezz').diyUpload({
-        url:'/accounts/enterprise/extra/',
+        url:'/qiye/profile/extra/',
         success:function( data ) {
             console.info( data );
         },
