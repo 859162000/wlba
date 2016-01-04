@@ -57,11 +57,11 @@
 	});
 	wx.ready(function(){
 		var host = 'https://www.wanglibao.com/',
-			shareName = '双旦来了，翻倍狂欢',
+			shareName = '我的努力需要你的一个肯定，谢谢你',
 			shareImg = host + '/static/imgs/mobile_activity/app_praise_reward/300*300.jpg',
-			shareLink = host + '/activity/app_praise_reward/',
-			shareMainTit = '双旦来了，翻倍狂欢',
-			shareBody = '红包、加息券、体验金全部翻倍送、实物大奖同台登场，年底倾囊N重回馈。';
+			shareLink = host + '/activity/app_praise_reward_go/',
+			shareMainTit = '我的努力需要你的一个肯定，谢谢你',
+			shareBody = '您的好友正在领取他的年终奖，随手一赞，祝他多拿100！';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -71,7 +71,7 @@
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '双旦来了，翻倍狂欢',
+			title: '我领到一份年终奖，XXX元噢！你也为自己一年的努力另一份吧！，',
 			link : shareLink,
 			imgUrl: shareImg
 		})
