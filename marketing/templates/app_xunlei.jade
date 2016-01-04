@@ -1,0 +1,104 @@
+- load formatters
+doctype html
+html(style="background: #f6f6f6")
+  head
+    title 网利宝
+    include include/app_head
+    link(href="/static/styles/mobile_activity/app_xunlei.css?v=2022251444", rel="stylesheet")
+    - csrf_token
+  body
+    .xunmeng
+      .xunjiang-zong
+        span
+        h2 如何领取1年会员
+        .xunjiang
+          .xushu
+            .xushu-left
+              p 注册网利宝
+              p 账号
+            .xushu-right
+              p 送50元红包
+              p 28888体验金
+          .xushu
+            .xushu-left
+              p 注册网利宝
+              p 账号
+            .xushu-right
+              p 送50元红包
+              p 28888体验金
+          .xushu
+            .xushu-left
+              p 注册网利宝
+              p 账号
+            .xushu-right
+              p 送50元红包
+              p 28888体验金
+    .xunmeng2
+      .xunmeng2-top
+        p 迅雷会员&网利宝
+      .xunmeng2-moidle
+        p 您已成功注册网利宝
+        p 并且与迅雷账号绑定成功
+      .xunmeng2-moidle2
+        p 迅雷账号：xxx
+        p 网利宝账号：xxx
+      .xunmeng2-bottom
+        a(href='javascript:void(0);').xunleiwangli 前往网利宝
+        p 迅雷会员奖励将直接发送到此迅雷账号上
+    .banner
+      img(src='/static/imgs/mobile_activity/app_xunlei/xunleibanner.jpg')
+      a(href='javascript:void(0);').xinlei-rule 如何领取1年会员
+    .main
+      .maimai-form
+        input(type='tel', name='phone', placeholder='输入手机号',data-type='Phone',data-message='请输入正确的手机号', autocomplete = 'off').maimai-phone
+        .maimai-check-body
+          .maimai-form-margin
+          .phone-check
+            input(type='tel', name='codeimg',data-type='Val',data-message='请输入图形验证码',  placeholder='输入验证码').check-input
+            input(type='hidden', name='codeimg_key',value='')
+            img(src='').check-img
+          .maimai-form-margin
+          .phone-check
+            input(type='tel', name='codenum',data-type='Val',data-message='请输入短信码', placeholder='输入短信码').check-input
+            button(type="button").check-submit 短信验证码
+        .maimai-form-sign 请输入正确的手机号
+        .maimai-form-margin.maimai-sign-margin
+        p.xunleibangding 注册后将与您的迅雷账号：xxx绑定
+        input(type='button',name='submit' ,value="马上注册领取红包",disabled=true).maimai-form-btn2.maimai-form-btn1
+        p.xunleipeople
+          |已有网利宝账号？
+          a(href='/weixin/login/') 请登录
+    .main.mian1
+      .xunlei-main
+        p 活动规则
+          span &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      ul
+        li 1. 活动时间；
+        li 2. 手机号为网利宝唯一账户，本期迅雷活动仅限于迅雷渠道新注册用户参与；
+        li 3. 活动期间新用户注册即送28888元体验金，体验金专享1天10%年化收益；
+        li 4. 新用户首次充值不低于100元即可获赠50元直抵红包和7天迅雷会员，直抵红包投资2000元即可抵扣使用，有效期自领取日起7天有效；
+        li 5. 新用户首次投资即可获得100元直抵红包，投资8000元即可抵扣使用，有效期自领取日起7天有效；
+        li 6. 单笔首次投资不低于1000元附加获赠1年迅雷会员
+        li 7. 红包统一以站内信形式通知，完成一次投资回款后即可取现，每个红包仅限使用一次且仅限散标使用，不可叠加使用，使用后无论是否有余额均失效；
+        li 8. 本活动不收取任何费用，谨防上当受骗；刷奖、冒用他人身份证及其他信息者一经核实，取消活动资格，活动奖励不予承兑；
+        li 9. 本活动最终解释权在法律允许范围内归网利宝所有。
+    //宣传文案
+    section.regist-propagate
+      ul
+        mixin li(imgName, title, bodyTxt1, bodyTxt2)
+          li
+            span(class=imgName)
+            h4.title1=title
+            p.bodyTxt5=bodyTxt1
+            p.bodyTxt5=bodyTxt2
+
+
+        +li('trust', '信赖', 'IDG资本投资A轮融资', '鸿利光电投资B轮融资')
+        +li('safe', '安全', '第三方资金托管', '阳光保险承保资金安全')
+        +li('authority', '权威', '华尔街精英金融团队', 'IT数据风控系统')
+        +li('profit', '高收益', '30余倍银行活期收益', '100元起投')
+    .erwei
+      img(src='/static/imgs/mobile_activity/app_xunlei/xunerwei.jpg')
+      p 立即关注网利宝微信服务号
+      p 抢标投标不用愁，快来扫一扫！
+    script(data-init='xunlei', src="/static/scripts/mobile_activity/app_xunlei.js?v=201511061")
