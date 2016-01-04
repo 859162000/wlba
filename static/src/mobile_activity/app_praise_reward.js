@@ -110,6 +110,7 @@
 	var praise_num;
 	/*投票*/
 	$('.praise_left').click(function(){
+
 		$('#praise_num').val();
 		if(praise_num>=30000){
 			$('.friend_top span').text('您的朋友已获取全额年终奖');
@@ -122,6 +123,7 @@
 				if(xhr.err_code==0){
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
+					$('.float').show().addClass('float_animate');
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
@@ -142,6 +144,7 @@
 				if(xhr.err_code==0){
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
+					$('.float').show().addClass('float_animate');
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
@@ -176,7 +179,9 @@
 
 	$('.friend_top .close').click(function(){
 		$('.friend_top').hide();
-	})
+	});
+
+
 
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({
