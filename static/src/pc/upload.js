@@ -88,6 +88,9 @@ define(['jquery', 'jquery.webuploader', 'csrf'], function ($, WebUploader, csrf)
                 //if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
 
                     //console.log(csrf)
+                    $.extend(data, {
+                        'field_name' : opt.fileVal
+                    });
                     $.extend(headers, {
                         'X-CSRFToken' : csrf("csrftoken")
                     });

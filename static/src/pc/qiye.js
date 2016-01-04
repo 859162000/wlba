@@ -47,10 +47,11 @@ require(['jquery','csrf', 'jquery.form', 'jquery.validate', 'jquery.placeholder'
         fileSingleSizeLimit:50000 * 1024,
         accept: {},
         fileVal: 'business_license'
+        //sendAsBinary : true
     });
     //登记证
     $('#swdjz').diyUpload({
-        url:'/accounts/enterprise/extra/',
+        url: '/qiye/profile/extra/',
         success:function( data ) {
             console.info( data );
         },
@@ -65,8 +66,13 @@ require(['jquery','csrf', 'jquery.form', 'jquery.validate', 'jquery.placeholder'
         fileNumLimit:1,
         fileSizeLimit:500000 * 1024,
         fileSingleSizeLimit:50000 * 1024,
-        accept: {},
+        accept: {
+            title:"Images",
+            extensions:"gif,jpg,jpeg,bmp,png",
+            mimeTypes:"image/*"
+        },
         fileVal:'registration_cert'
+        //sendAsBinary : true
     });
     //输入框
     $('input, textarea').placeholder();

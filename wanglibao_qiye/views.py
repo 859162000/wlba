@@ -229,14 +229,14 @@ logger = logging.getLogger(__name__)
 
 
 class QiYeIndex(TemplateView):
-    template_name = 'info.jade'
+    template_name = 'qiye_login.jade'
 
 
 class QiYeInfo(TemplateView):
     template_name = 'info.jade'
 
 
-class EnterpriseProfileUploaApi(APIView):
+class EnterpriseProfileUploadApi(APIView):
     """企业用户认证扩展资料接收接口"""
 
     permission_classes = (IsAuthenticated,)
@@ -244,9 +244,10 @@ class EnterpriseProfileUploaApi(APIView):
     def post(self, request):
         user = request.user
         if user.wanglibaouserprofile.utype == '3':
-            field_name = request.POST.get('name')
+            field_name = request.POST.get('field_name')
             if field_name in ('business_license', 'registration_cert'):
-                img_data = request.POST.get('img_file')
+                file_size = request.POST.get('size')
+                file_name = request.POST.get('name')
                 filename = 'enterprise/images/%s_%s' % (user.id, field_name)
                 file_content = ''
                 try:
