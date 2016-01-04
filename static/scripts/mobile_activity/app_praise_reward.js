@@ -305,11 +305,13 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			if(xhr.err_code==0){
 				$('.renovate').removeClass('renovate_rotate');
 				$('#praise_num').val(xhr.wx_user.annual_bonus);
-				$('.user_wrap').html('');
-				for(var i=0; i=xhr.follow.length; i++){
+				$('.gundong').html('');
+				$('.gundong').append('<div id="mycarousel" class="tab_wrap friends jcarousel-skin-tango"><ul class="user_wrap">');
+				for(var i=0; i<=xhr.follow.length; i++){
 					follow_one = xhr.follow[i];
-					$('.user_wrap').push(['<li><img class="user" src="follow_one.headimgurl"/></li>'].join(''));
+					$('.user_wrap').append('<li><img class="user" src="'+follow_one.headimgurl+'"/></li>');
 				}
+				$('.gundong').append('</ul></div>');
 				jQuery("#mycarousel").jcarousel({
 					wrap: 'circular',
 					scroll: 1,
@@ -355,18 +357,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					$('.friend_top').fadeIn();
 					$('.float').text('+100').show().addClass('float_animate');
 					$('#praise_num').val(xhr.wx_user.annual_bonus);
-					$('.user_wrap').html('');
-					for(var i=0; i=xhr.follow.length; i++){
-						follow_one = xhr.follow[i];
-						$('.user_wrap').push(['<li><img class="user" src="follow_one.headimgurl"/></li>'].join(''));
-					}
-					jQuery("#mycarousel").jcarousel({
-						wrap: 'circular',
-						scroll: 1,
-						initCallback: mycarousel_initCallback,
-						buttonNextHTML: null,
-						buttonPrevHTML: null
-					});
+
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
@@ -384,17 +375,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					$('.friend_top').fadeIn();
 					$('.float').text('-100').show().addClass('float_animate');
 					$('#praise_num').val(xhr.wx_user.annual_bonus);
-					for(var i=0; i=xhr.follow.length; i++){
-						follow_one = xhr.follow[i];
-						$('.user_wrap').push(['<li><img class="user" src="follow_one.headimgurl"/></li>'].join(''));
-					}
-					jQuery("#mycarousel").jcarousel({
-						wrap: 'circular',
-						scroll: 1,
-						initCallback: mycarousel_initCallback,
-						buttonNextHTML: null,
-						buttonPrevHTML: null
-					});
+
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
