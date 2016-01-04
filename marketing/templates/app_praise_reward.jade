@@ -19,8 +19,9 @@ html(style="background: #3a2741")
                         img.gold(src="/static/imgs/mobile_activity/app_praise_reward/gold.png")
                         .text 年终奖 - is_myself=[{{is_myself}}] - follow=[{{follow[0].from_openid}}]
                         .input_wrap
-                            input#praise_num(type='text' value='{{wx_user.annual_bonus}}')
+                            input#praise_num(type='text' disabled value='{{wx_user.annual_bonus}}')
                             span.num_top 已封顶
+                            span.float +100
                         img.renovate.renovate_rotate(src="/static/imgs/mobile_activity/app_praise_reward/renovate.png")
 
                     .praise_wrap
@@ -44,7 +45,7 @@ html(style="background: #3a2741")
                     .checkbox_wrap
                         span.checkbox.checkbox_select 我
                         span 已同意网利宝年终奖
-                        a 活动规则
+                        span.rule 活动规则
                     .line 以下好友肯定了TA
                     #mycarousel.tab_wrap.jcarousel-skin-tango
                         ul.user_wrap
