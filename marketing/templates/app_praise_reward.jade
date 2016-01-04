@@ -4,7 +4,7 @@ html(style="background: #3a2741")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=123107", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=010401", rel="stylesheet")
         - csrf_token
     body
         .body_wrap
@@ -19,7 +19,7 @@ html(style="background: #3a2741")
                         img.gold(src="/static/imgs/mobile_activity/app_praise_reward/gold.png")
                         .text 年终奖
                         .input_wrap
-                            input#praise_num(type='text' readonly='readonly' value='{{wx_user.annual_bonus}}')
+                            input#praise_num(type='text' value='{{wx_user.annual_bonus}}')
                             span.num_top 已封顶
                         img.renovate.renovate_rotate(src="/static/imgs/mobile_activity/app_praise_reward/renovate.png")
 
@@ -93,4 +93,4 @@ html(style="background: #3a2741")
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/jquery.min.js')
         script(src='/static/js/lib/jquery.jcarousel.min.js')
-        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=123101")
+        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=010401")

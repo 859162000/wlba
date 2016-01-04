@@ -223,9 +223,19 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 	var is_myself;
 
-	/*得到初始数据*/
-
-	/*得到初始数据结束*/
+	var url_search = window.location.search;
+	var searchArray = url_search.substring(1).split("&");
+	var wxid;
+	var uid;
+	for (var i = 0; i < searchArray.length; i++) {
+		var temp = searchArray[i].split('=');
+		if (temp[0] == 'wxid') {
+			wxid = temp[1] ? temp[1] : '';
+		}
+		if (temp[0] == 'uid') {
+			uid = temp[1] ? temp[1] : '';
+		}
+	}
 
 	/*滚动图*/
 	function mycarousel_initCallback(carousel) {
