@@ -1218,6 +1218,7 @@ class WeixinAnnualBonusView(TemplateView):
     url_name = ''
     wx_classify = 'fwh'
     url_name = "weixin_annual_bonus"
+    url_query = ""
     template_name = 'app_praise_reward.jade'
 
     def __init__(self):
@@ -1235,18 +1236,19 @@ class WeixinAnnualBonusView(TemplateView):
         self.vote_fileds_filter = [ 'from_nickname', 'from_headimgurl', 'is_good_vote', 'create_time' ]
 
     def dispatch(self, request, *args, **kwargs):
-        #self.openid = "333222111"
-        #self.request.session['WECHAT_OPEN_ID'] = None
+        # === Only for test ===
         wxid = self.request.GET.get('wxid')
         if wxid and wxid!='undefined':
-            self.openid = wxid
+            self.from_openid = wxid
             self.nick_name = wxid
             self.head_img = 'http://wx.qlogo.cn/mmopen/O6tvnibicEYV8ibOLhhDAWK9X4FwBlGJzYoBNAlp2nfoDGC74NXFTEP7j4Qm2Bjx7G3STzJ3cRqxbJFjFiaf19knwRGxnOIfZwx8/0'
-        if not self.openid:
+
+        self.url_query = self.request.META.get('QUERY_STRING', None)
+
+        if not self.from_openid:
             #super(WeixinAnnualBonusView, self).getOpenid(request, *args, **kwargs)
             return self.getOpenid(request, *args, **kwargs)
 
-        self.from_openid = self.openid
         if not self.from_openid:
             #TODO: 转错误页面
             return super(WeixinAnnualBonusView, self).dispatch(request, *args, **kwargs)
@@ -1468,7 +1470,8 @@ class WeixinAnnualBonusView(TemplateView):
 
     def getOpenid(self, request, *args, **kwargs):
         account_id = self.getAccountid()
-        redirect_uri = settings.CALLBACK_HOST + reverse(self.url_name)
+        redirect_uri = settings.CALLBACK_HOST + reverse(self.url_name) + "?" + self.url_query
+        #self.request.session['WECHAT_OPEN_ID'] = None
         self.openid = self.request.session.get('WECHAT_OPEN_ID', None)
         if not self.openid:
             self.openid = self.request.GET.get('openid', None)
@@ -1497,5 +1500,7 @@ class WeixinAnnualBonusView(TemplateView):
 
         self.nick_name = w_user.nickname
         self.head_img = w_user.headimgurl
+
+        self.from_openid = self.openid
 
         return self.dispatch(request, *args, **kwargs)
