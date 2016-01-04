@@ -1,4 +1,4 @@
-define(['jquery', 'jquery.webuploader'], function ($, WebUploader) {
+define(['jquery', 'jquery.webuploader', 'csrf'], function ($, WebUploader, csrf) {
     $.fn.extend({
 		/*
 		*	上传方法 opt为参数配置;
@@ -82,6 +82,19 @@ define(['jquery', 'jquery.webuploader'], function ($, WebUploader) {
 				if ( successCallBack ) {
 					successCallBack( response );
 				}
+			});
+
+            webUploader.on('uploadBeforeSend', function(obj, data, headers) {
+                //if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+
+                    //console.log(csrf)
+                    $.extend(headers, {
+                        'X-CSRFToken' : csrf("csrftoken")
+                    });
+                //}
+            });
+
+            webUploader.on('uploadSuccess',function( file, response ){
 			});
 
 			//上传失败后触发事件;

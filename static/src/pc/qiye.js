@@ -46,12 +46,7 @@ require(['jquery','csrf', 'jquery.form', 'jquery.validate', 'jquery.placeholder'
         fileSizeLimit:500000 * 1024,
         fileSingleSizeLimit:50000 * 1024,
         accept: {},
-        fileVal: 'business_license',
-        uploadBeforeSend: function(xhr, settings){
-            if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
-              xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
-            }
-        }
+        fileVal: 'business_license'
     });
     //登记证
     $('#swdjz').diyUpload({
