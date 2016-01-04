@@ -1287,7 +1287,8 @@ class WeixinAnnualBonusView(TemplateView):
             #wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
             follows = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid)
             self.template_name = 'app_praise_reward.jade'
-            return { 'err_code':0, 'err_messege':u'用户', 'is_myself':self.is_myself, 'wx_user':wx_bonus, 'follow':follows, 'uid':self.to_openid}
+            return { 'err_code':0, 'err_messege':u'用户', 'is_myself':self.is_myself, 'wx_user':wx_bonus, 'follow':follows, \
+                     'share_url':settings.CALLBACK_HOST + reverse(self.url_name) + "?uid=" + self.to_openid, 'share_img':''}
         else:
             if self.is_myself:
                 self.template_name = 'app_praise_reward_go.jade'
