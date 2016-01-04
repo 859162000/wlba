@@ -335,7 +335,7 @@ class WeixinShareDetailView(TemplateView):
             logger.debug("整理用户的数据返回前端，phone:%s" %(gifts.identity,))
             QSet = WeixinUser.objects.filter(openid=openid).values("nickname", "headimgurl", "openid").first()
             if QSet:
-                ret_val = {"amount": gifts.amount, "name": QSet["nickname"], "img": QSet["headimgurl"], "phone": gifts.identity}
+                ret_val = {"amount": gifts.amount if gifts.amount < 10 else int(gifts.amount), "name": QSet["nickname"], "img": QSet["headimgurl"], "phone": gifts.identity}
             else:
                 ret_val = {"amount": 0, "name": "", "img": "", "phone": ""}
             self.debug_msg('个人获奖信息返回前端:%s' % (ret_val,))
