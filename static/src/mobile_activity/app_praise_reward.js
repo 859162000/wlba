@@ -18,7 +18,7 @@
 		}
 	}
 
-	if(wxid!=undefined){
+	if(uid!=undefined){
 		$('.shine_wrap').show();
 	}
 

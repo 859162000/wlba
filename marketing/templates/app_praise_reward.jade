@@ -4,14 +4,15 @@ html(style="background: #3a2741")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=010404", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=010405", rel="stylesheet")
         - csrf_token
     body
         .body_wrap
             .invitation_page
                 .top_wrap
                     img.fly_img(src="/static/imgs/mobile_activity/app_praise_reward/work_bg.png")
-                    img.man(src='{{wx_user.headimgurl}}')
+                    .man(style='background:url({{wx_user.headimgurl}}); background-size:cover;')
+                        img(src='{{wx_user.headimgurl}}')
                     .worker
                         .text 年终考核进行中……
                 .operation_wrap
@@ -90,8 +91,8 @@ html(style="background: #3a2741")
                     .text
                         span 您的朋友已获取全额年终奖
                         img.close(src="/static/imgs/mobile_activity/app_praise_reward/close.png")
-
+            .share_link {{wx_user.share_url}}
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/jquery.min.js')
         script(src='/static/js/lib/jquery.jcarousel.min.js')
-        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=010404")
+        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=010405")
