@@ -170,8 +170,9 @@ class WeixinAnnualBonus(models.Model):
         for attr in fields:
             d[attr] = getattr(self, attr)
 
-        import json
-        return json.dumps(d)
+        #import json
+        #return json.dumps(d)
+        return d
 
 class WeixinAnnulBonusVote(models.Model):
     to_openid = models.CharField(u'受评微信用户标识', max_length=128, null=False, db_index=True)
