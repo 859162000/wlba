@@ -213,5 +213,5 @@ class QiYeIndex(TemplateView):
         return super(QiYeIndex, self).get(request, *args, **kwargs)
 
 
-class QiYeIndex(TemplateView):
+class QiYeInfo(TemplateView):
     template_name = 'info.jade'
