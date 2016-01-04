@@ -237,7 +237,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		}
 	}
 
-	if(wxid!=undefined){
+	if(uid!=undefined){
 		$('.shine_wrap').show();
 	}
 
@@ -268,30 +268,19 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		buttonNextHTML: null,
 		buttonPrevHTML: null
 		});
+
+		/*朋友个数*/
+		var user_num = $('.user_wrap li').length;
+		if(user_num!=0){
+			$('.friends,.jcarousel-skin-tango').show();
+		}
+		/*朋友个数结束*/
 	})
 	/*滚动图结束*/
 
-	/*朋友个数*/
-	var user_num = $('.user_wrap li').length;
-	if(user_num!=0){
-		$('.friends,.jcarousel-skin-tango').show();
-	}
-	/*朋友个数结束*/
+
 
 	var is_myself = false;
-
-	/*去领取按钮*/
-	$('#go_receive').click(function(){
-		$('.praise_wrap').hide();
-		$('.invitation_page').show();
-		if(is_myself){
-			$('.take_mine_reward').show();
-
-		}else{
-			$('.step_me').show();
-		}
-	});
-	/*去领取按钮*/
 
 	/*分享*/
 	$('.share_button').click(function(){
@@ -340,7 +329,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	var praise_num;
 	/*投票*/
 	$('.praise_left').click(function(){
-		$('#praise_num').val();
+		praise_num = $('#praise_num').val()+100;
 			$.ajax({
 				url: '/weixin_activity/weixin/bonus/?act=vote&type=1&uid='+uid+'&wxid='+wxid,
 				type: "GET",
@@ -349,6 +338,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 					$('.float').text('+100').show().addClass('float_animate');
+					$('#praise_num').val(praise_num);
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
@@ -357,6 +347,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	});
 
 	$('.praise_right').click(function(){
+		praise_num = $('#praise_num').val()-100;
 			$.ajax({
 				url: '/weixin_activity/weixin/bonus/?act=vote&type=2&uid='+uid+'&wxid='+wxid,
 				type: "GET",
@@ -364,8 +355,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 				if(xhr.err_code==0){
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
-
 					$('.float').text('-100').show().addClass('float_animate');
+					$('#praise_num').val(praise_num);
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
@@ -374,9 +365,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	});
 	/*投票结束*/
 
-	/*领取我的年终奖*/
+	/*申请我的年终奖*/
 	var phone_number;
-	$('.take_mine_button,.now_use').click(function(){
+	$('.take_mine_button').click(function(){
 		phone_number = $('#phone_number').val();
 		if($('.checkbox').hasClass('checkbox_select')){
 			$.ajax({
@@ -385,6 +376,28 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			}).done(function (xhr) {
 				if(xhr.err_code==0){
 					window.location.href = '/weixin_activity/weixin/bonus/?wxid='+wxid;
+				}else{
+					$('.friend_top span').text(xhr.err_messege);
+					$('.friend_top').fadeIn();
+				}
+			});
+		}else{
+			$('.friend_top span').text('请点击，我同意网利宝年终奖活动规则');
+			$('.friend_top').fadeIn();
+		}
+	});
+	/*领取我的年终奖结束*/
+
+	/*申请我的年终奖*/
+	$('.now_use').click(function(){
+		if($('.checkbox').hasClass('checkbox_select')){
+			$.ajax({
+				url: '/weixin_activity/weixin/bonus/?act=pay&wxid='+wxid,
+				type: "GET",
+			}).done(function (xhr) {
+				if(xhr.err_code==0){
+					$('.friend_top span').text(xhr.err_messege);
+					$('.friend_top').fadeIn();
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
