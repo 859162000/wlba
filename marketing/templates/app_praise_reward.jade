@@ -4,9 +4,10 @@ html(style="background: #3a2741")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=010407", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=010408", rel="stylesheet")
         - csrf_token
     body
+        .fix_wrap(style='width: 100%;height: 100%;background: #3a2741;position: fixed;left: 0;top: 0;z-index: 9999')
         .body_wrap
             .invitation_page
                 .top_wrap
@@ -93,9 +94,27 @@ html(style="background: #3a2741")
             .rule_wrap
                 .main
                     .text
-                        p.title 活动规则
-                        p.text 活动规则活动规则活动规则活动规则活动规则
-                        img.close(src="/static/imgs/mobile_activity/app_praise_reward/close.png")
+                        .text_wrap
+                            p.title 活动规则
+                            div.info
+                                dl
+                                    dt 如何领取年终奖？
+                                    dd 输入手机号领取，可获得由网利宝发出的28888（8888）元年终奖，可通过分享集赞，拿更多年终奖，一个好友点赞，将多得500。
+                                dl
+                                    dt 本次活动的年终奖为网利宝的理财体验金，未注册过网利宝的用户，最高可拿36888，已注册的老用户最高可拿8888。年终奖封顶后，赞和损可以继续点，但是年终奖金额将不再升高（变化）。
+                                dl
+                                    dt 年终奖如何使用？
+                                    dd 领到的年终奖（网利宝理财体验金），可用在网利宝上投资使用，需投在指定的理财标，享受10%年化收益。
+                                dl
+                                    dt 年终奖有效期？
+                                    dd 有效期自领取成功起15天内有效。
+                                dl
+                                    dt 年终奖是否可提现？
+                                    dd 用年终奖（网利宝理财体验金）投资完成后，一天后，获得的现金收益可提现，也可继续投资。
+                                    dd 如果是17点后投资的，两天后，方可提现。
+                                dl
+                                    dt 网利宝对此活动享有最终解释权。
+                    img.close(src="/static/imgs/mobile_activity/app_praise_reward/close.png")
             .share_info.share_name {{share_name}}
             .share_info.share_img {{share_img}}
             .share_info.share_link {{share_link}}
@@ -104,4 +123,4 @@ html(style="background: #3a2741")
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/jquery.min.js')
         script(src='/static/js/lib/jquery.jcarousel.min.js')
-        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=010407")
+        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=010408")

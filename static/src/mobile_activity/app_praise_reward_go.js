@@ -1,4 +1,8 @@
 (function(org) {
+	window.onload = function() {
+		$('.fix_wrap').hide();
+	};
+
 	var url_search = window.location.search;
 	var searchArray = url_search.substring(1).split("&");
 	var wxid;

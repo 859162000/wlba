@@ -1,3 +1,11 @@
+.fix_wrap
+  width: 100%
+  height: 100%
+  background: #3a2741
+  position: fixed
+  left: 0
+  top: 0
+  z-index: 9999
 .body_wrap
   width: 100%
   .praise_wrap
@@ -365,7 +373,7 @@
     left: 0
     top: 0
     z-index: 99
-    background: rgba(0,0,0,0.5)
+    background: rgba(0,0,0,0.6)
     display: none
     .share_text
       position: absolute
@@ -436,7 +444,7 @@
     z-index: 99
     width: 100%
     height: 100%
-    background: rgba(0,0,0,0.5)
+    background: rgba(0,0,0,0.6)
     display: none
     .bg
       width: 100%
@@ -477,13 +485,13 @@
     width: 100%
     display: none
     height: 100%
-    background: rgba(0,0,0,0.5)
+    background: rgba(0,0,0,0.6)
     .main
       position: absolute
       left: 0
       top: 50%
       width: 100%
-      margin: -1.6rem 0 0 0
+      margin: -3.2rem 0 0 0
       text-align: center
       .text
         padding: 1rem
@@ -626,6 +634,7 @@
     .user
       width: 100%
       display: block
+      border-radius: 50%
 @-webkit-keyframes renovate_ico
   0%
     -webkit-transfrom: rotate(0deg)
@@ -686,11 +695,11 @@
   width: 100%
   display: none
   height: 100%
-  background: rgba(0,0,0,0.5)
+  background: rgba(0,0,0,0.6)
   .main
     position: absolute
     left: 0
-    top: 20%
+    top: 15%
     width: 100%
     height: 100%
     .text
@@ -701,29 +710,42 @@
       font-size: 0.9rem
       border-radius: 10px
       width: 85%
-      height: 60%
+      height: 70%
       display: block
       margin: 0 auto
       position: relative
-      p.title
+      .text_wrap
+        overflow-y: auto
         width: 100%
-        text-align: center
-        line-height: 1.2rem
-        font-size: 0.9rem
-        padding-top: 0.5rem
-      p.text
-        padding-top: 0.5rem
-        width: 100%
-        font-size: 0.7rem
-        line-height: 0.9rem
-      .close
-        position: absolute
-        right: -0.6rem
-        top: -0.6rem
-        z-index: 100
-        width: 1.2rem
-        display: block
-
+        margin-top: 0.2rem
+        height: 100%
+        p.title
+          width: 100%
+          text-align: center
+          line-height: 1.2rem
+          font-size: 0.9rem
+          padding: 0.5rem 0
+        .info
+          width: 100%
+          font-size: 0.7rem
+          line-height: 0.9rem
+          dl
+            width: 100%
+            padding: 0.5rem
+            dt
+              font-size: 0.7rem
+              line-height: 0.9rem
+            dd
+              font-size: 0.7rem
+              line-height: 0.9rem
+    .close
+      position: absolute
+      right: 5%
+      top: -0.6rem
+      z-index: 100
+      width: 1.2rem
+      display: block
+      margin-left: 0.6rem
 
 
 

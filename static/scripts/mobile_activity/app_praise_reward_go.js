@@ -218,6 +218,10 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }
 })();
 ;(function(org) {
+	window.onload = function() {
+		$('.fix_wrap').hide();
+	};
+
 	var url_search = window.location.search;
 	var searchArray = url_search.substring(1).split("&");
 	var wxid;

@@ -220,7 +220,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 ;(function(org) {
 
 	//alert($(window).width());
-
+	window.onload = function() {
+		$('.fix_wrap').hide();
+	};
 	var is_myself;
 
 	var url_search = window.location.search;
@@ -274,11 +276,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		if(user_num!=0){
 			$('.friends,.jcarousel-skin-tango').show();
 		}
+		if(user_num<=6){
+			$('#mycarousel-prev,#mycarousel-next').hide();
+		}
 		/*朋友个数结束*/
 	})
 	/*滚动图结束*/
-
-
 
 	var is_myself = false;
 
@@ -386,9 +389,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			$('.friend_top').fadeIn();
 		}
 	});
-	/*领取我的年终奖结束*/
+	/*申请我的年终奖结束*/
 
-	/*申请我的年终奖*/
+	/*领取我的年终奖*/
 	$('.now_use').click(function(){
 		if($('.checkbox').hasClass('checkbox_select')){
 			$.ajax({
