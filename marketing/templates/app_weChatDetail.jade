@@ -31,8 +31,11 @@ block content
               span {{self_gift.phone}}
               |的账户下，注册登录后可查看
   .webchat-submit-end
-    a(href="/activity/app_pc_download/").webpack-btn-red 立即使用
-  .receive-peoples 已有 XX 人领取 28888 元体验金
+    if self_gift.amount > 10
+        a(href="/activity/experience/mobile/").webpack-btn-red 立即使用
+    else
+        a(href="/activity/app_pc_download/").webpack-btn-red 立即使用
+  .receive-peoples 已有 {{count}} 人领取 28888 元体验金
   .webchar-friend-list
     .webchar-list-head
       span 看朋友们手气如何

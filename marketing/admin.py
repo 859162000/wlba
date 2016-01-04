@@ -4,7 +4,7 @@ from django.contrib import admin
 from django import forms
 from django.utils import timezone
 
-from views import AggregateView, MarketingView, TvView, TopsView, IntroducedAwardTemplate, YaoView
+from views import AggregateView, MarketingView, TvView, TvViewInside, IntroducedAwardTemplate, YaoView
 from play_list import InvestmentRewardView
 from marketing.models import NewsAndReport, SiteData, PromotionToken, IntroducedBy, TimelySiteData, InviteCode, \
     Activity, ActivityRule, Reward, RewardRecord, Channels, ChannelsNew, IntroducedByReward, PlayList, \
@@ -314,6 +314,7 @@ admin.site.register(PlayList, PlayListAdmin)
 admin.site.register_view('statistics/diary', view=MarketingView.as_view(), name=u'日明细数据')
 # admin.site.register_view('statistics/tops', view=TopsView.as_view(), name=u'日周月榜名单')
 admin.site.register_view('statistics/tv', view=TvView.as_view(), name=u'统计数据汇总')
+admin.site.register_view('statistics/tv_1', view=TvViewInside.as_view(), name=u'统计数据汇总(内部)')
 admin.site.register(InviteCode, InviteCodeAdmin)
 
 admin.site.register_view('marketing/generatorcode', view=GennaeratorCode.as_view(),name=u'生成邀请码')

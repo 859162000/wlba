@@ -214,6 +214,7 @@ AUTHENTICATION_BACKENDS = (
     'wanglibao_account.auth_backends.EmailPhoneUsernameAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
     'wanglibao_account.auth_backends.TokenSecretSignAuthBackend',
+    'weixin.auth_backend.OpenidAuthBackend',
 )
 import django.contrib.auth.backends
 
@@ -687,11 +688,11 @@ CELERYBEAT_SCHEDULE = {
         'task': 'experience_gold.tasks.experience_repayment_plan',
         'schedule': timedelta(minutes=5),
     },
-    # # by Zhoudong 定期检查用户优惠券没使用,发送提醒
-    # 'redpack_status_task_check': {
-    #     'task': 'marketing.tools.check_redpack_status',
-    #     'schedule': crontab(minute=0, hour=11),
-    # },
+    # 定期检查还有3天到期的用户优惠券,发送提醒
+    'redpack_status_task_check': {
+        'task': 'marketing.tools.check_unavailable_3_days',
+        'schedule': crontab(minute=0, hour=11),
+    },
 }
 
 # CELERYBEAT_SCHEDULE_FILENAME = "/var/log/wanglibao/celerybeat-schedule"
@@ -1134,6 +1135,7 @@ WLB_FOR_XUNLEI9_KEY = '2003'
 XUNLEIVIP_QUERY_URL = 'http://dynamic.vip.xunlei.com/xljinku/checkOrder'
 XUNLEIVIP_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/xljinku/sendvip/'
 XUNLEIVIP_REGISTER_CALL_BACK_URL = 'http://dynamic.vip.xunlei.com/script/act/coop_report.php'
+XUNLEIVIP_LOGIN_URL = 'http://act.vip.xunlei.com/vip/cooplogin/?coop=wanglibao'
 XUNLEIVIP_REGISTER_KEY = 'wpg8fijoah3qkb'
 XUNLEIVIP_KEY = 'wgvjfe9ogh8b6b'
 XUNLEI9_ACTIVITY_PAGE = 'marketing_xunlei_setp'
@@ -1198,7 +1200,7 @@ if ENV == ENV_PRODUCTION:
     WEIXIN_CALLBACK_URL = 'https://www.wanglibao.com'
 else:
     WEIXIN_CALLBACK_URL = 'https://staging.wanglibao.com'
-    CALLBACK_HOST='https://staging.wanglibao.com'
+    CALLBACK_HOST = 'https://staging.wanglibao.com'
 # 短信到达率统计时间间隔
 MESSAGE_TIME_DELTA = timedelta(minutes=10)
 WANGLIBAO_ACCESS_TOKEN_KEY = '31D21828CC9DA7CE527F08481E361A7E'
