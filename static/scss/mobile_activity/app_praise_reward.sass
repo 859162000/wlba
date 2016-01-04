@@ -161,6 +161,29 @@
             font-size: 0.35rem
             line-height: 1.125rem
             display: none
+          span.float
+            position: absolute
+            left: 0.55rem
+            top: -0.125rem
+            color: #fcdc3d
+            font-size: 0.7rem
+            line-height: 1.125rem
+            width: 100%
+            text-align: center
+            opacity: 0
+            -webkit-transform: translateY(0)
+            transform: translateY(0)
+          .float_animate
+            -webkit-animation-name: float
+            animation-name: float
+            -webkit-animation-duration: 1s
+            animation-duration: 1s
+            -webkit-animation-timing-function: linear
+            animation-timing-function: linear
+            -webkit-animation-fill-mode: both
+            animation-fill-mode: both
+            -webkit-animation-iteration-count: 1
+            animation-iteration-count: 1
         input
           width: 100%
           color: #fcdc3d
@@ -464,7 +487,7 @@
           color: #483153
         img
           position: absolute
-          left: -0.6rem
+          right: -0.6rem
           top: -0.6rem
           z-index: 100
           width: 1.2rem
@@ -515,7 +538,8 @@
       height: 1rem
       line-height: 1rem
       font-size: 0.75rem
-    a
+    .rule
+      color: #02b4f6
       height: 1rem
       font-size: 0.75rem
       line-height: 1rem
@@ -608,7 +632,29 @@
 
   100%
     transform: rotate(360deg)
+@-webkit-keyframes float
+  0%
+    -webkit-transform: translateY(0)
+    opacity: 0
+  30%
+    opacity: 1
+  80%
+    opacity: 1
+  100%
+    -webkit-transform: translateY(-1rem)
+    opacity: 0
 
+@keyframes float
+  0%
+    transform: translateY(0)
+    opacity: 0
+  30%
+    opacity: 1
+  80%
+    opacity: 1
+  100%
+    transform: translateY(-1rem)
+    opacity: 0
 
 
 
