@@ -168,7 +168,7 @@ require(['jquery', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/
     })
 
    $('#yezz').diyUpload({
-        url:'server/fileupload.php',
+        url:'/accounts/enterprise/extra/',
         success:function( data ) {
             console.info( data );
         },
@@ -183,10 +183,11 @@ require(['jquery', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/
         fileNumLimit:1,
         fileSizeLimit:500000 * 1024,
         fileSingleSizeLimit:50000 * 1024,
-        accept: {}
+        accept: {},
+        fileVal: 'business_license'
     });
     $('#swdjz').diyUpload({
-        url:'server/fileupload.php',
+        url:'/accounts/enterprise/extra/',
         success:function( data ) {
             console.info( data );
         },
@@ -201,7 +202,8 @@ require(['jquery', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/
         fileNumLimit:1,
         fileSizeLimit:500000 * 1024,
         fileSingleSizeLimit:50000 * 1024,
-        accept: {}
+        accept: {},
+        fileVal:'registration_cert'
     });
     //输入框
     $('input, textarea').placeholder();
