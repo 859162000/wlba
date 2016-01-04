@@ -19,7 +19,7 @@ var weChatShare = (function(org){
             }
         });
         wx.ready(function(){
-            var host = 'https://www.wanglibao.com',
+            var host = 'https://staging.wanglibao.com',
                 shareImg = host + '/static/imgs/mobile/weChat_logo.png',
                 shareLink = $('input[name=url]').val(),
                 shareMainTit = $('input[name=title]').val(),
@@ -169,6 +169,7 @@ org.weChatStart = (function(org){
                         org.ui.showSign(result.message);
                         $that.text('获取验证码').removeAttr('disabled').addClass('webchat-button-right');
                         lib._captcha_refresh();
+                        return
                     }
                 });
                 //倒计时
@@ -202,7 +203,7 @@ org.weChatStart = (function(org){
                     openid : $(this).attr('data-openid'),
                     validate_code : code.val()
                 }
-                if(ops.phone =='') {
+                if(ops.phone =='' || !lib._checkPhone(phoneVal.val())) {
                     $('.phone-sign').show();
                     return;
                 }else{
@@ -231,18 +232,25 @@ org.weChatStart = (function(org){
                             'validate_code': ops.validate_code,
                             'IGNORE_PWD': 'true',
                             'captcha_0' :  lib.$captcha_0.val(),
-                            'captcha_1' :  lib.$captcha_1.val()
+                            'captcha_1' :  lib.$captcha_1.val(),
+                            'order_id': ops.orderid
                         },
                         dataType : 'json',
                         success: function(data){
                             if(data.ret_code > 0){
                                 org.ui.showSign(data.message);
+                                clearInterval(intervalId);
+                                $('.webchat-button').text('获取验证码').removeAttr('disabled').addClass('webchat-button-right');
+                                lib._captcha_refresh();
                             }else {
                                 window.location.href = '/weixin_activity/share/' + ops.phone + '/' + ops.openid + '/' + ops.orderid + '/' + ops.activity + '/';
                             }
                         },
                         error: function(data){
                             org.ui.alert(data)
+                            clearInterval(intervalId);
+                            $('.webchat-button').text('获取验证码').removeAttr('disabled').addClass('webchat-button-right');
+                            lib._captcha_refresh();
                         },
                         complete: function(){
                             postDo = false;
@@ -289,6 +297,12 @@ org.weChatStart = (function(org){
                 $sign.hide(); $('.webchat-button').addClass('webchat-button-right'); isRight = true;
             }else{
                 $sign.show(); $('.webchat-button').removeClass('webchat-button-right'); isRight = false;
+                var ele = $('.code-content'),
+                    curHeight = ele.height();
+                ele.height(curHeight).animate({height: 0},500);
+                $('input[name=validate_code]').val('');
+                $('input[name=captcha_1]').val('');
+
             }
             return isRight;
         },
