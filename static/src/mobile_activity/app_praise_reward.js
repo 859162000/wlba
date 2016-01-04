@@ -113,7 +113,6 @@
 	var praise_num = $('#praise_num').val();
 	/*投票*/
 	$('.praise_left').click(function(){
-		praise_num = $('#praise_num').val()+100;
 			$.ajax({
 				url: '/weixin_activity/weixin/bonus/?act=vote&type=1&uid='+uid+'&wxid='+wxid,
 				type: "GET",
@@ -122,7 +121,7 @@
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 					$('.float').text('+100').show().addClass('float_animate');
-					$('#praise_num').val(praise_num);
+					$('#praise_num').val(xhr.wx_user.annual_bonus);
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
@@ -131,7 +130,6 @@
 	});
 
 	$('.praise_right').click(function(){
-		praise_num = $('#praise_num').val()-100;
 			$.ajax({
 				url: '/weixin_activity/weixin/bonus/?act=vote&type=2&uid='+uid+'&wxid='+wxid,
 				type: "GET",
@@ -140,7 +138,7 @@
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 					$('.float').text('-100').show().addClass('float_animate');
-					$('#praise_num').val(praise_num);
+					$('#praise_num').val(xhr.wx_user.annual_bonus);
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
@@ -234,7 +232,6 @@
 		}
 	});
 	wx.ready(function(){
-
 		//var host = 'https://www.wanglibao.com/',
 		//	shareName = '我的努力需要你的一个肯定，谢谢你',
 		//	shareImg = host + '/static/imgs/mobile_activity/app_praise_reward/300*300.jpg',
