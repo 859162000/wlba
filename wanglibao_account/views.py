@@ -1573,7 +1573,7 @@ def login_for_redirect(request, template_name='registration/login.html',
     """
     redirect_to = request.REQUEST.get(redirect_field_name, '')
     if redirect_to.startswith('base64'):
-        redirect_to = base64.b64decode(redirect_to[7:])
+        redirect_to = base64.b64decode(redirect_to[6:])
 
     if request.method == "POST":
         form = authentication_form(request, data=request.POST)

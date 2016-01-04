@@ -101,7 +101,8 @@ def send_validation_code(phone, validate_code=None, ip="", ext=''):
     """
     if validate_code is None:
         validate_code = generate_validate_code()
-    if not check_rate(ip):
+    if not check_rate(ip.split(',')[0]):
+        #return 403, u"已达到最大发送限制"
         return 403, u"操作太频繁了，休息一下"
 
     now = timezone.now()

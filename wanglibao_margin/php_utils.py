@@ -220,7 +220,7 @@ class PhpMarginKeeper(MarginKeeper):
 
             margin = Margin.objects.select_for_update().filter(user=self.user).first()
 
-            if category == '0':
+            if str(category) == '0':
                 margin.margin += principal
                 self.tracer(u'月利宝本金入账', principal, margin.margin, u'月利宝本金入账', refund_id)
                 margin.margin += interest
@@ -237,7 +237,7 @@ class PhpMarginKeeper(MarginKeeper):
                     # self.hike_deposit(coupon_interest, u"加息存入{}元".format(coupon_interest), order_id, savepoint=False)
                     self.tracer(u"月利宝加息存入", coupon_interest, margin.margin, description, refund_id)
 
-            if category == '1':
+            if str(category) == '1':
                 margin.margin += principal
                 self.tracer(u'债转本金入账', principal, margin.margin, u'债转本金入账', refund_id)
                 margin.margin += interest

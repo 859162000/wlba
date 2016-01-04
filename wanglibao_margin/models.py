@@ -46,6 +46,7 @@ class MarginRecord(models.Model):
 
     class Meta:
         ordering = ['-create_time']
+        unique_together = ('catalog', 'order_id', 'user')
 
 
 class PhpRefundRecord(models.Model):

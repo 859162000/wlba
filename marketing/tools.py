@@ -304,8 +304,8 @@ def send_commission_income_message_sms():
     """
     today = datetime.datetime.now()
     yesterday = today - datetime.timedelta(days=1)
-    start = timezone.datetime(yesterday.year, yesterday.month, yesterday.day, 20, 0, 0)
-    end = timezone.datetime(today.year, today.month, today.day, 20, 0, 0)
+    start = timezone.datetime(yesterday.year, yesterday.month, yesterday.day, 20, 0, 0, tzinfo=timezone.utc)
+    end = timezone.datetime(today.year, today.month, today.day, 20, 0, 0, tzinfo=timezone.utc)
     incomes = Income.objects.filter(created_at__gte=start, created_at__lt=end)
     php_incomes = PhpIncome.objects.filter(created_at__gte=start, created_at__lt=end)
 

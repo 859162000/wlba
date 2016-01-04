@@ -456,7 +456,7 @@ class YueLiBaoRefund(APIView):
                     user = User.objects.get(pk=arg['userId'])
 
                     margin_record = MarginRecord.objects.filter(
-                        # (Q(catalog=u'月礼包本金入账') | Q(catalog=u'债转本金入账')) &
+                        # (Q(catalog=u'月利宝本金入账') | Q(catalog=u'债转本金入账')) &
                         (Q(catalog=u'\u6708\u5229\u5b9d\u672c\u91d1\u5165\u8d26') |
                          Q(catalog=u'\u503a\u8f6c\u672c\u91d1\u5165\u8d26')) &
                         Q(order_id=arg['refundId']) & Q(user=user)
