@@ -2254,7 +2254,7 @@ class EnterpriseUserProfileExtraApi(APIView):
                 }
         else:
             response_data = {
-                'message': 'unknow error',
+                'message': 'invalid field name',
                 'ret_code': 50001,
             }
 
@@ -2270,19 +2270,19 @@ class GetEnterpriseUserProfileApi(APIView):
         user = request.user
         try:
             e_profile = EnterpriseUserProfile.objects.get(user=user)
+            response_data = {
+                'data': e_profile,
+                'message': 'success',
+                'ret_code': 10000
+            }
         except EnterpriseUserProfile.DoesNotExist:
-            e_profile = None
+            response_data = {
+                'data': None,
+                'message': u'用户企业资料不存在',
+                'ret_code': 10001
+            }
 
-        try:
-            e_profile_extra = EnterpriseUserProfileExtra.objects.get(user=user)
-        except EnterpriseUserProfileExtra.DoesNotExist:
-            e_profile_extra = None
-
-        return {
-            'profile': e_profile,
-            'extra': e_profile_extra,
-            'ret_code': 10000
-        }
+        return Response(response_data)
 
 
 class EnterpriseUserProfileApi(APIView):
@@ -2294,16 +2294,11 @@ class EnterpriseUserProfileApi(APIView):
         form = EnterpriseUserProfileForm(request.POST)
         if form.is_valid():
             user = request.user
-            e_profile = EnterpriseUserProfile.objects.get(user=user)
-            if e_profile:
-                response_data = {
-                    'message': 'user[%s] enterprise profile has been exists',
-                    'ret_code': 10001,
-                }
-                return HttpResponse(json.dumps(response_data), content_type='application/json')
+            try:
+                e_profile = EnterpriseUserProfile.objects.get(user=user)
+            except EnterpriseUserProfile.DoesNotExist:
+                e_profile = EnterpriseUserProfile
 
-            e_profile = EnterpriseUserProfile()
-            e_profile.user = user
             e_profile.company_name = form.cleaned_data['company_name']
             e_profile.business_license = form.cleaned_data['business_license']
             e_profile.registration_cert = form.cleaned_data['registration_cert']
