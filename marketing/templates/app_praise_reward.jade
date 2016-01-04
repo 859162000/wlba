@@ -4,15 +4,14 @@ html(style="background: #3a2741")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=010405", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=010407", rel="stylesheet")
         - csrf_token
     body
         .body_wrap
             .invitation_page
                 .top_wrap
                     img.fly_img(src="/static/imgs/mobile_activity/app_praise_reward/work_bg.png")
-                    .man(style='background:url({{wx_user.headimgurl}}); background-size:cover;')
-                        img(src='{{wx_user.headimgurl}}')
+                    img.man(src='{{wx_user.headimgurl}}')
                     .worker
                         .text 年终考核进行中……
                 .operation_wrap
@@ -91,8 +90,18 @@ html(style="background: #3a2741")
                     .text
                         span 您的朋友已获取全额年终奖
                         img.close(src="/static/imgs/mobile_activity/app_praise_reward/close.png")
-            .share_link {{wx_user.share_url}}
+            .rule_wrap
+                .main
+                    .text
+                        p.title 活动规则
+                        p.text 活动规则活动规则活动规则活动规则活动规则
+                        img.close(src="/static/imgs/mobile_activity/app_praise_reward/close.png")
+            .share_info.share_name {{share_name}}
+            .share_info.share_img {{share_img}}
+            .share_info.share_link {{share_link}}
+            .share_info.share_title {{share_title}}
+            .share_info.share_body {{share_body}}
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/jquery.min.js')
         script(src='/static/js/lib/jquery.jcarousel.min.js')
-        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=010405")
+        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=010407")
