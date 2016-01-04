@@ -438,8 +438,7 @@ class EnterpriseUserProfileForm(forms.Form):
 
     company_name = forms.CharField(label="Company name", max_length=30, error_messages={'required': u'请输入公司名称'})
     certigier_name = forms.CharField(label="Certigier name", max_length=12, error_messages={'required': u'请输入授权人姓名'})
-    certigier_phone = forms.IntegerField(label="Certigier phone", max_length=64,
-                                         error_messages={'required': u'请输入授权人手机号'})
+    certigier_phone = forms.IntegerField(label="Certigier phone", error_messages={'required': u'请输入授权人手机号'})
     company_address = forms.CharField(label="Company address", max_length=255,
                                       error_messages={'required': u'请输入公司地址'})
     company_account = forms.CharField(label="Company account", max_length=64,
