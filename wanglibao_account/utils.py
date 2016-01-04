@@ -579,19 +579,6 @@ def str_to_dict(s):
     return result
 
 
-def detect_phone_for_identifier(identifier):
-    """
-    检测手机号有效性
-    :param identifier:
-    :return:
-    """
-    mobile_regex = re.compile('^1\d{10}$')
-    if mobile_regex.match(identifier) is not None:
-        return True
-    else:
-        return False
-
-
 class Xunlei9AdminCallback(object):
     """迅雷9管理后台回调"""
 
