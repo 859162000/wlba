@@ -32,8 +32,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from forms import EmailOrPhoneRegisterForm, LoginAuthenticationNoCaptchaForm,\
-    ResetPasswordGetIdentifierForm, IdVerificationForm, TokenSecretSignAuthenticationForm,\
-    EnterpriseUserProfileForm
+    ResetPasswordGetIdentifierForm, IdVerificationForm, TokenSecretSignAuthenticationForm
 from marketing.models import IntroducedBy, Channels, Reward, RewardRecord
 from marketing.utils import set_promo_user, local_to_utc, get_channel_record
 from marketing import tools
