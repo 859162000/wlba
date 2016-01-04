@@ -646,8 +646,8 @@ class WeixinJsapiConfig(APIView):
             request.session['account_key'] = 'sub_1'
             account = WeixinAccounts.get('sub_1')
         else:
-            request.session['account_key'] = 'test'
-            account = WeixinAccounts.get('test')
+            request.session['account_key'] = 'account_test_hmm'
+            account = WeixinAccounts.get('account_test_hmm')
 
         noncestr = uuid.uuid1().hex
         timestamp = str(int(time.time()))
