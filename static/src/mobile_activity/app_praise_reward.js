@@ -110,12 +110,7 @@
 	var praise_num;
 	/*投票*/
 	$('.praise_left').click(function(){
-
 		$('#praise_num').val();
-		if(praise_num>=30000){
-			$('.friend_top span').text('您的朋友已获取全额年终奖');
-			$('.friend_top').fadeIn();
-		}else{
 			$.ajax({
 				url: '/weixin_activity/weixin/bonus/?act=vote&type=1&uid='+uid+'&wxid='+wxid,
 				type: "GET",
@@ -123,20 +118,15 @@
 				if(xhr.err_code==0){
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
-					$('.float').show().addClass('float_animate');
+					$('.float').text('+100').show().addClass('float_animate');
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 				}
 			});
-		}
 	});
 
 	$('.praise_right').click(function(){
-		if(praise_num<=100){
-			$('.friend_top span').text('给您的朋友留点年终奖吧');
-			$('.friend_top').fadeIn();
-		}else{
 			$.ajax({
 				url: '/weixin_activity/weixin/bonus/?act=vote&type=2&uid='+uid+'&wxid='+wxid,
 				type: "GET",
@@ -144,19 +134,19 @@
 				if(xhr.err_code==0){
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
-					$('.float').show().addClass('float_animate');
+
+					$('.float').text('-100').show().addClass('float_animate');
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 				}
 			});
-		}
 	});
 	/*投票结束*/
 
 	/*领取我的年终奖*/
 	var phone_number;
-	$('.take_mine_button').click(function(){
+	$('.take_mine_button,.now_use').click(function(){
 		phone_number = $('#phone_number').val();
 		if($('.checkbox').hasClass('checkbox_select')){
 			$.ajax({
@@ -164,7 +154,7 @@
 				type: "GET",
 			}).done(function (xhr) {
 				if(xhr.err_code==0){
-					window.location.href = '/weixin_activity/weixin/bonus/?wxid=1002'
+					window.location.href = '/weixin_activity/weixin/bonus/?wxid='+wxid;
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
