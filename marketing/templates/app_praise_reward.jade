@@ -4,7 +4,7 @@ html(style="background: #3a2741")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=122102", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=123004", rel="stylesheet")
         - csrf_token
     body
         .body_wrap
@@ -16,8 +16,8 @@ html(style="background: #3a2741")
                 .group_bg
                     .main_wrap
                         img.bg(src="/static/imgs/mobile_activity/app_praise_reward/group.png")
-                        input.phone(type='text' placeholder="请输入手机号")
-                        .button 立即领取
+                        input.phone#get_phone(type='text' placeholder="请输入手机号")
+                        .button#go_receive 立即领取
                         img.footer_bg(src="/static/imgs/mobile_activity/app_praise_reward/praise_wrap_footer.png")
                         img.footer_logo(src="/static/imgs/mobile_activity/app_praise_reward/footer_logo.png")
             .invitation_page
@@ -31,7 +31,7 @@ html(style="background: #3a2741")
                         img.gold(src="/static/imgs/mobile_activity/app_praise_reward/gold.png")
                         .text 年终奖
                         input(type='text' value='1000')
-                        img.renovate(src="/static/imgs/mobile_activity/app_praise_reward/renovate.png")
+                        img.renovate.renovate_rotate(src="/static/imgs/mobile_activity/app_praise_reward/renovate.png")
                     .praise_wrap
                         .praise.praise_left
                             img.bg(src="/static/imgs/mobile_activity/app_praise_reward/praise_button.png")
@@ -48,21 +48,50 @@ html(style="background: #3a2741")
                     .take_mine_reward
                         input.phone(type='text' placeholder='请输入手机号')
                         .take_mine_button 领取我的年终奖
+                    .checkbox_wrap
+                        span.checkbox.checkbox_select 我
+                        span 已同意网利宝年终奖
+                        a 活动规则
                     .line 以下好友肯定了TA
-                    .tab_wrap
-                        img.prev_button(src="/static/imgs/mobile_activity/app_praise_reward/prev.png")
-                        .user_wrap
-                            img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_1.png")
-                            img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_1.png")
-                            img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_1.png")
-                            img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_1.png")
-                            img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_1.png")
-                            img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_1.png")
-                        img.next_button(src="/static/imgs/mobile_activity/app_praise_reward/next.png")
-                    .line_bottom
-                    .title_text1 每天签到拿网利宝体验金<br>随时查看账户收益
-                    img.code_img(src="/static/imgs/mobile_activity/app_praise_reward/wechat_server.jpg")
-                    .title_text2 长按二维码关注
+                    #mycarousel.tab_wrap.jcarousel-skin-tango
+
+
+                        ul.user_wrap
+                            li
+                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_1.png")
+                            li
+                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_2.png")
+                            li
+                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_3.png")
+                            li
+                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_4.png")
+                            li
+                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_5.png")
+                            li
+                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_6.png")
+                            li
+                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_1.png")
+                            li
+                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_2.png")
+                            li
+                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_3.png")
+                            li
+                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_4.png")
+                            li
+                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_5.png")
+                            li
+                                img.user(src="/static/imgs/mobile_activity/app_praise_reward/people_6.png")
+                        .jcarousel-scroll
+                            form(action="")
+                                a#mycarousel-prev(href="#")
+                                    img.prev_button(src="/static/imgs/mobile_activity/app_praise_reward/prev.png")
+                                a#mycarousel-next(href="#")
+                                    img.next_button(src="/static/imgs/mobile_activity/app_praise_reward/next.png")
+                    .step_me
+                        .line_bottom
+                        .title_text1 每天签到拿网利宝体验金<br>随时查看账户收益
+                        img.code_img(src="/static/imgs/mobile_activity/app_praise_reward/wechat_server.jpg")
+                        .title_text2 长按二维码关注
                     img.footer_logo(src="/static/imgs/mobile_activity/app_praise_reward/footer_logo.png")
             .share_wrap
                 .share_text
@@ -74,11 +103,11 @@ html(style="background: #3a2741")
                 ul
                     li
                         span.img
-                            img(src="/static/imgs/mobile_activity/app_praise_reward/share_ico.png")
+                            img(src="/static/imgs/mobile_activity/app_praise_reward/friend_ico.png")
                         span.text 分享到朋友圈
                     li
                         span.img
-                            img(src="/static/imgs/mobile_activity/app_praise_reward/friend_ico.png")
+                            img(src="/static/imgs/mobile_activity/app_praise_reward/share_ico.png")
                         span.text 发送给朋友
             .shine_wrap
                 img.bg(src="/static/imgs/mobile_activity/app_praise_reward/shine.png")
@@ -88,12 +117,8 @@ html(style="background: #3a2741")
             .friend_top
                 span.text 您的朋友已获取全额年终奖
 
-        script(src="/static/scripts/component/webview.js?v=20151215")
-        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=122209")
+        script(src='/static/src/mobile/lib/weixin/wx.js')
+        script(src='/static/js/lib/jquery.min.js')
+        script(src='/static/js/lib/jquery.jcarousel.min.js')
+        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=123001")
         script.
-            var ipad = navigator.userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false,
-                iphone = !ipad && navigator.userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false,
-                ios = ipad || iphone;
-            if (ios) {
-                document.getElementById('ios-show').style.display = 'block';
-            }

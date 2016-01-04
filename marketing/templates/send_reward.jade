@@ -1,0 +1,108 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+    head
+        - with '网利宝' as title
+        include include/common_head
+        - endwith
+        link(rel="stylesheet",href="/static/styles/pc_activity/send_reward.css?v=201512")
+        - csrf_token
+    body(style="background:#27053d")
+        include global/g_nav
+        #body_wrap.clear
+            .banner
+                .main
+                    .title_1 全民福利100%投资领奖，怎能错过？
+                    .step_wrap
+                        dl
+                            dt.one
+                            dd 投资完成
+                        .arrow
+                        dl
+                            dt.two
+                            dd 选择奖品
+                        .arrow
+                        dl
+                            dt.three
+                            dd 领取成功
+                        .arrow
+                        dl
+                            dt.four
+                            dd 兑换使用
+                    .title_2 超值礼品全民送
+                    .text_1 网利宝现推出“全民投资有奖”新年重磅活动，活动期间小额投资100%投资有奖，新老用户均可参与，多投多得~
+                    .text_2
+                        .text!='您已登录,您有<span>1</span>次一档领奖机会；<span>2</span>次二档领奖机会；<span>1</span>次三档领奖机会；<span>4</span>次四档领奖机会。<span class="line">|</span><span class="see_info">查看领取详情</span>'
+                    .title_3 注：奖品先投先得，领完为止，如个别奖品发放完请选择同档其他奖品。
+            .main_wrap.main_wrap_1
+                .body_main
+                    .line_bg_1
+                    .title!='<span>第一档</span>100元≤单笔投资＜ 2000，以下奖品三选一：'
+                    .box_wrap
+                        .box
+                            dl
+                                dt.one
+                                dd 7天迅雷会员
+                            .button 点击领取
+                        .box
+                            dl
+                                dt.two
+                                dd 7天爱奇艺会员
+                            .button 点击领取
+                        .box.box_three
+                            dl
+                                dt.three
+                                dd 30元代金券
+                            .button 点击领取
+            .main_wrap.main_wrap_2
+                .body_main
+                    .line_bg_2
+                    .title!='<span>第二档</span>2000元≤单笔投资＜5000，以下奖品三选一：'
+                    .box_wrap
+                        .box
+                            dl
+                                dt.four
+                                dd 30元代金券
+                            .button 点击领取
+                        .box
+                            dl
+                                dt.five
+                                dd 30元代金券
+                            .button 点击领取
+                        .box.box_three
+                            dl
+                                dt.six
+                                dd 30元代金券
+                            .button 点击领取
+            .main_wrap.main_wrap_1
+                .body_main
+                    .line_bg_1
+                    .title!='<span>第三档</span>5000元≤单笔投资＜10000，以下奖品三选一：'
+                    .box_wrap
+                        .box
+                            dl
+                                dt.seven
+                                dd 一个月迅雷会员
+                            .button 点击领取
+                        .box
+                            dl
+                                dt.eight
+                                dd 一个月爱奇艺会员
+                            .button 点击领取
+                        .box.box_three
+                            dl
+                                dt.nine
+                                dd 2D电影券
+                            .button 点击领取
+
+            .code_wrap
+                .bg
+                .main
+                    img.code(src="/static/imgs/pc_activity/double_eggs/code.jpg")
+                    .text 手机扫一下也许就能赚钱
+
+        include global/g_footer
+script.
+    require(['/static/js/send_reward.js?v=2015122101'])
+                                                                    

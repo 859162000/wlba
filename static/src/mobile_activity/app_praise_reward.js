@@ -1,76 +1,76 @@
 (function(org) {
 
-    var h5_user_static;
-    org.ajax({
-        url: '/api/user_login/',
-        type: 'post',
-        success: function(data1) {
-            h5_user_static = data1.login;
-        }
-    });
-    var login = false;
-    wlb.ready({
-        app: function(mixins) {
-			//mixins.shareData({title: '双旦来了，翻倍狂欢', content: '红包、加息券、体验金全部翻倍送、实物大奖同台登场，年底倾囊N重回馈。'});
+	//alert($(window).width());
 
-            mixins.sendUserInfo(function(data) {
-				$('.link_licai').click(function(){
-					mixins.jumpToManageMoney();
-				});
-				$('.investment_button').click(function() {
-					mixins.jumpToManageMoney();
-				});
+	/*滚动图*/
+	function mycarousel_initCallback(carousel) {
+		jQuery('.jcarousel-control a').bind('click', function() {
+			carousel.scroll(jQuery.jcarousel.intval(jQuery(this).text()));
+			return false;
+		});
+		jQuery('.jcarousel-scroll select').bind('change', function() {
+			carousel.options.scroll = jQuery.jcarousel.intval(this.options[this.selectedIndex].value);
+			return false;
+		});
+		jQuery('#mycarousel-next').bind('click', function() {
+			carousel.next();
+			return false;
+		});
+		jQuery('#mycarousel-prev').bind('click', function() {
+			carousel.prev();
+			return false;
+		});
+	};
+	jQuery(document).ready(function() {
+		jQuery("#mycarousel").jcarousel({
+		wrap: 'circular',
+		scroll: 1,
+		initCallback: mycarousel_initCallback,
+		buttonNextHTML: null,
+		buttonPrevHTML: null
+		});
+	})
+	/*滚动图结束*/
 
-                if (data.ph == '') {
-                    login = false;
-					$('.recharge_button').click(function() {
-                        mixins.loginApp();
-                    })
-                } else {
-                    login = true;
-                    $('.recharge_button').click(function() {
-                        mixins.jumpToManageMoney();
-                    })
-                }
-				$('#tiyanjin').click(function(){
-					window.location.href = '/activity/experience/redirect/'
-				});
-            });
-			$('.code_wrap').hide();
-        },
-        other: function() {
-            if(h5_user_static){
-                $('.recharge_button').click(function() {
-                    window.location.href = '/weixin/recharge/?rechargeNext=/weixin/account/'
-                })
-            }else{
-                $('.recharge_button').click(function() {
-                    window.location.href = '/weixin/login/?next=/weixin/recharge/'
-                })
-            }
-			$('.investment_button').click(function() {
-				window.location.href = '/weixin/list/'
-			});
-			$('.link_licai').click(function(){
-				window.location.href = '/weixin/list/'
-			});
-			$('#tiyanjin').click(function(){
-				window.location.href = '/activity/experience/mobile/';
-			});
-			$('.code_wrap').show();
-            //console.log('其他场景的业务逻辑');
-        }
-    });
 
-	var see_rule_button_index;
-	$('.see_rule_button').click(function(){
-		see_rule_button_index = $(this).next().hasClass('rule_wrap_show');
-		if(see_rule_button_index){
-			$(this).next().removeClass('rule_wrap_show').hide();
+	//$.ajax({
+	//	url: 'weixin_activity/weixin/bonus/?uid=',
+	//	type: "POST",
+	//	data: {
+	//		//action : 'AWARD_DONE'
+	//	}
+	//}).done(function (xhr) {
+	//
+	//});
+
+	$('#get_phone').val();
+	//得到手机号
+
+	var is_myself = false;
+
+	$('#go_receive').click(function(){
+		$('.praise_wrap').hide();
+		$('.invitation_page').show();
+		if(is_myself){
+			$('.take_mine_reward').show();
+
 		}else{
-			$(this).next().addClass('rule_wrap_show').show();
+			$('.step_me').show();
 		}
 	});
+	//去领取按钮
+
+	$('.share_button').click(function(){
+		$('.share_wrap').show();
+	});
+	$('.share_wrap').click(function(){
+		$(this).hide();
+	});
+
+	$('.renovate').click(function(){
+		$(this).addClass('')
+	});
+
 
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({
@@ -92,8 +92,8 @@
 	wx.ready(function(){
 		var host = 'https://www.wanglibao.com/',
 			shareName = '双旦来了，翻倍狂欢',
-			shareImg = host + '/static/imgs/mobile_activity/app_double_dan/300x300.jpg',
-			shareLink = host + '/activity/app_double_dan/',
+			shareImg = host + '/static/imgs/mobile_activity/app_praise_reward/300*300.jpg',
+			shareLink = host + '/activity/app_praise_reward/',
 			shareMainTit = '双旦来了，翻倍狂欢',
 			shareBody = '红包、加息券、体验金全部翻倍送、实物大奖同台登场，年底倾囊N重回馈。';
 		//分享给微信好友

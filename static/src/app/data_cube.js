@@ -9,6 +9,26 @@ $.ajax({
         allFun();
     }
 });
+var startX = 0;
+document.addEventListener('touchstart', function(e) {//禁止左右滑动
+    startX = e.touches[0].pageX;
+});
+document.addEventListener('touchmove', function(e) {//禁止左右滑动
+    var tmpX = e.touches[0].pageX;
+    if(Math.abs(tmpX - startX) > 0){
+        e.preventDefault();
+    }
+});
+//高度
+var bHeight = (48*window.screen.width)/320;//48dp = *px
+var wHeight = $(window).height();
+//alert($(document).height() +","+ screen.availHeight +","+window.screen.height+",screen.width:"+window.screen.width);
+if(!wHeight){
+    $("body").height(window.screen.height-bHeight);
+}else{
+    $("body").height(wHeight);
+}
+
 
 // 路径配置
 require.config({
@@ -220,7 +240,7 @@ function allFun(){
                   floored_number = floored_number.toFixed(decimal_places);
                 }
                 target.text(fmoney(floored_number,decimal_places));
-              }
+            }
         });
     }
 

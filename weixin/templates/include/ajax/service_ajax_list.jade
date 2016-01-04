@@ -1,0 +1,46 @@
+-load formatters
+-load mathfilters
+for product in results
+  status = product['display_status']
+  if status == '抢购中'
+    .list-section
+      a(href="/weixin/sub_detail/detail/{{product.id}}/").section-head
+        if product.category == '新手标'
+          span.head-prompt  新手福利
+        else
+            if product.is_app_exclusive
+              span.head-prompt  APP专享
+        span.head-tit {{product.name}}
+      .section-body
+        a(href="/weixin/sub_detail/detail/{{product.id}}/").body-left
+          .body-Profit
+            span.profit-cont
+              .profit-math.profit-blue
+                earning_rate = str(product['expected_earning_rate'])
+                span.profit-num {{earning_rate}}
+                span.profit-sign %
+                if product.activity
+                  span.prpfit-add +
+                  span.profit-addNum {{product.activity.activity_rule_percent_text}}
+                  span.profit-addNumsign %
+              .profit-tit 年化收益
+          .body-time
+            .time-num
+              em.section-hui {{product.period}}
+              | {{product.pay_method|period_unit}}
+            .time-tit 投资期限
+          .body-time.body-price
+            .time-num
+              if product.total_amount < 10000
+                em.section-hui {{product.total_amount}}
+                | 元
+              else
+                total = product['total_amount']/10000
+                em.section-hui {{total}}
+                | 万
+            .time-tit 融资金额
+        .body-line-box
+          .grey-line
+          percent = float(product['ordered_amount']) / product['total_amount'] * 100
+          .red-line(style="width:{{percent | percentage}}")
+

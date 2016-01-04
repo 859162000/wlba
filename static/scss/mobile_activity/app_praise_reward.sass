@@ -3,8 +3,6 @@
   .praise_wrap
     width: 100%
     position: relative
-    display: inline-block
-    display: none
     .top_light
       width: 100%
       display: block
@@ -67,14 +65,24 @@
         .footer_bg
           width: 100%
           display: block
+          position: fixed
+          left: 0
+          bottom: 0
+          z-index: 2
+          @media screen and (max-height: 569px)
+            position: relative
         .footer_logo
-          position: absolute
+          position: fixed
           bottom: 0.8rem
           left: 41.2%
           width: 17.6%
           display: block
+          z-index: 3
+          @media screen and (max-height: 569px)
+            position: absolute
   .invitation_page
     width: 100%
+    display: none
     .top_wrap
       width: 100%
       display: block
@@ -156,6 +164,27 @@
           display: block
           float: right
           margin: 0.7rem 3.3% 0 0
+        .renovate_rotate
+          -webkit-animation-name: rotate_ico
+          animation-name: rotate_ico
+          -webkit-animation-timing-function: linear
+          animation-timing-function: linear
+          -webkit-animation-fill-mode: both
+          animation-fill-mode: both
+        @keyframes rotate_ico
+          0%
+            transfrom: rotate(0deg)
+          50%
+            transform: rotate(180deg)
+          100%
+            transform: rotate(360deg)
+        @-webkit-keyframes rotate_ico
+          0%
+            -webkit-transfrom: rotate(0deg)
+          50%
+            -webkit-transform: rotate(180deg)
+          100%
+            -webkit-transform: rotate(360deg)
     .praise_wrap
       clear: both
       width: 92%
@@ -222,7 +251,7 @@
       width: 100%
       text-align: center
       height: 1rem
-      font-size: 0.75rem
+      font-size: 0.65rem
       line-height: 1rem
       color: #2A1B30
       background: url("/static/imgs/mobile_activity/app_praise_reward/line.jpg") no-repeat center center
@@ -232,31 +261,30 @@
       margin: 0.375rem 0
       display: inline-block
       position: relative
-      .prev_button
+      #mycarousel-prev
         width: 0.9rem
         display: block
         position: absolute
         top: 50%
         left: 0rem
         padding-left: 0.45rem
-        margin-top: -15px
-      .next_button
+        margin-top: -0.3875rem
+        z-index: 99
+        img
+          display: block
+          width: 100%
+      #mycarousel-next
         width: 0.9rem
         display: block
         position: absolute
         top: 50%
         right: 0rem
         padding-right: 0.45rem
-        margin-top: -15px
-      .user_wrap
-        width: 88%
-        display: inline-block
-        margin-left: 6%
-        .user
-          width: 13.5%
-          margin: 0 1.58%
-          float: left
+        margin-top: -0.3875rem
+        z-index: 99
+        img
           display: block
+          width: 100%
     .line_bottom
       width: 100%
       height: 1px
@@ -277,13 +305,13 @@
       width: 100%
       color: #EEBBFF
       font-size: 0.75rem
-      margin: 0.85rem 0
+      margin: 0.85rem 0 0
       line-height: 0.8rem
       text-align: center
     .footer_logo
       width: 17.6%
       display: block
-      margin: 0 auto
+      margin: 0.85rem auto
       padding-bottom: 0.75rem
   .share_wrap
     width: 100%
@@ -335,9 +363,10 @@
     ul
       position: absolute
       left: 52%
-      top: 28%
+      top: 18%
       z-index: 2
       color: #fff
+      padding-top: 2.5rem
       li
         height: 1.75rem
         line-height: 1.25rem
@@ -411,10 +440,12 @@
       line-height: 1rem
       font-size: 0.9rem
       border-radius: 10px
+  .step_me
+    display: none
   .take_mine_reward
     width: 79.3%
-    marign: 0 auto
-    display: block
+    margin: 1rem auto
+    display: none
     .phone
       width: 100%
       height: 2.5rem
@@ -423,16 +454,108 @@
       color: #fff
       font-size: 0.75rem
       line-height: 2.5rem
+      border: none
+      border-radius: 1.4rem
+      display: block
+      margin: 0 auto 0.875rem
     .take_mine_button
       width: 100%
       height: 2.5rem
       text-align: center
-      color: #fff
+      color: #F976F6
       font-size: 0.75rem
       line-height: 2.3rem
       background: url("/static/imgs/mobile_activity/app_praise_reward/input_bg.png") no-repeat center center
       display: block
       background-size: 100% 100%
+  .checkbox_wrap
+    width: 100%
+    height: 2rem
+    text-align: center
+    line-height: 1rem
+    padding-bottom: 1rem
+    .checkbox
+      background: url("/static/imgs/mobile_activity/app_praise_reward/no_checkbox.jpg") no-repeat center left
+      height: 1rem
+      background-size: auto 100%
+      padding-left: 1.2rem
+    .checkbox_select
+      background: url("/static/imgs/mobile_activity/app_praise_reward/checkbox.jpg") no-repeat center left
+      background-size: auto 100%
+    span
+      height: 1rem
+      line-height: 1rem
+      font-size: 0.75rem
+    a
+      height: 1rem
+      font-size: 0.75rem
+      line-height: 1rem
+
+.jcarousel-skin-tango .jcarousel-clip-horizontal
+  display: block
+  overflow: hidden
+  position: relative
+  width: 88%
+  display: inline-block
+  margin-left: 6%
+  height: 2rem
+  @media screen and (max-width: 1025px)
+    height: 5.83rem
+  @media screen and (max-width: 769px)
+    height: 5rem
+  @media screen and (max-width: 415px)
+    height: 2.45rem
+  @media screen and (max-width: 396px)
+    height: 2.3rem
+  @media screen and (max-width: 376px)
+    height: 2.16rem
+  @media screen and (max-width: 361px)
+    height: 2.05rem
+  @media screen and (max-width: 351px)
+    height: 1.95rem
+  @media screen and (max-width: 331px)
+    height: 1.8rem
+.user_wrap
+  width: 100%
+  display: inline-block
+  margin-left: 6%
+  li
+    width: 1.8rem
+    margin: 0 0.3rem 0 0.3rem
+    height: 1.8rem
+    float: left
+    display: block
+    @media screen and (max-width: 1025px)
+      width: 5.83rem
+      height: 5.83rem
+    @media screen and (max-width: 769px)
+      width: 5rem
+      height: 5rem
+    @media screen and (max-width: 415px)
+      width: 2.45rem
+      height: 2.45rem
+    @media screen and (max-width: 396px)
+      width: 2.3rem
+      height: 2.3rem
+    @media screen and (max-width: 376px)
+      width: 2.16rem
+      height: 2.16rem
+    @media screen and (max-width: 361px)
+      width: 2.05rem
+      margin: 0 0.3rem 0
+    @media screen and (max-width: 351px)
+      width: 1.95rem
+      margin: 0 0.3rem 0
+    @media screen and (max-width: 341px)
+      width: 1.95rem
+      margin: 0 0.27rem 0
+    @media screen and (max-width: 331px)
+      width: 1.8rem
+      margin: 0 0.27rem 0
+    .user
+      width: 100%
+      display: block
+
 
 
 
