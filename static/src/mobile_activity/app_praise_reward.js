@@ -78,7 +78,7 @@
 	$('.renovate').click(function(){
 		$(this).addClass('renovate_rotate');
 		$.ajax({
-			url: 'weixin_activity/weixin/bonus/?act=query&uid='+uid+'&wxid='+wxid,
+			url: '/weixin_activity/weixin/bonus/?act=query&uid='+uid+'&wxid='+wxid,
 			type: "GET",
 		}).done(function (xhr) {
 			if(xhr.err_code==0){
