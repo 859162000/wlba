@@ -1287,11 +1287,11 @@ class WeixinAnnualBonusView(TemplateView):
             #wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
             follows = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid)
             self.template_name = 'app_praise_reward.jade'
-            return { 'err_code':0, 'err_messege':u'用户', 'is_myself':self.is_myself, 'wx_user':wx_bonus, 'follow':follows}
+            return { 'err_code':0, 'err_messege':u'用户', 'is_myself':self.is_myself, 'wx_user':wx_bonus, 'follow':follows, 'uid':self.to_openid}
         else:
             if self.is_myself:
                 self.template_name = 'app_praise_reward_go.jade'
-                return { 'err_code':102, 'err_messege':u'用户还未申领年终奖', 'is_myself':self.is_myself,  }
+                return { 'err_code':102, 'err_messege':u'用户还未申领年终奖', 'is_myself':self.is_myself, }
             else:
                 self.template_name = 'app_praise_reward.jade'
                 return { 'err_code':103, 'err_messege':u'异常请求', 'is_myself':self.is_myself,  }
