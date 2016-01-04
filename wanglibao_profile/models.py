@@ -63,11 +63,23 @@ class WanglibaoUserProfile(models.Model):
         return is_invested
 
 
+class EnterpriseUserProfileExtra(models.Model):
+    user = models.ForeignKey(User, primary_key=True)
+    business_license = models.ImageField(u'营业执照', upload_to='enterprise/license', blank=True)
+    registration_cert = models.ImageField(u'税务登记证', upload_to='enterprise/certificate', blank=True)
+    modify_time = models.DateTimeField(u'最近修改时间', auto_now_add=True)
+    created_time = models.DateTimeField(u'创建时间', auto_now=True)
+
+    def save(self, *args, **kwargs):
+        self.user.wanglibaouserprofile.id_is_valid = False
+        super(EnterpriseUserProfileExtra, self).save(*args, **kwargs)
+
+
 class EnterpriseUserProfile(models.Model):
-    user = models.OneToOneField(User, primary_key=True)
+    user = models.ForeignKey(User, primary_key=True)
     company_name = models.CharField(u'公司名称', max_length=30)
-    business_license = models.ImageField(u'营业执照', upload_to='enterprise/license')
-    registration_cert = models.ImageField(u'税务登记证', upload_to='enterprise/certificate')
+    business_license = models.ImageField(u'营业执照', upload_to='enterprise/license', blank=True)
+    registration_cert = models.ImageField(u'税务登记证', upload_to='enterprise/certificate', blank=True)
     certigier_name = models.CharField(u'授权人姓名', max_length=12)
     certigier_phone = models.IntegerField(u'授权人手机号', max_length=64)
     company_address = models.TextField(u'公司地址', max_length=255)
