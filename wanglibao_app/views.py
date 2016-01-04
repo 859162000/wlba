@@ -214,7 +214,7 @@ class AppRepaymentPlanMonthAPIView(APIView):
         year = request_year if request_year else now.year
         month = request_month if request_month else now.month
         # current_month = '{}-{}'.format(now.year, now.month)
-        current_month = now.strftime('%Y%m')
+        current_month = now.strftime('%Y-%m')
 
 
         start = local_to_utc(datetime(int(year), int(month), 1), 'min')
