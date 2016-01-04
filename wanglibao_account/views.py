@@ -2220,42 +2220,48 @@ class EnterpriseUserProfileExtraApi(APIView):
 
     def post(self, request):
         user = request.user
-        field_name = request.POST.get('field_name')
-        e_profile, created = EnterpriseUserProfileExtra.objects.get_or_create(user=user)
-        if field_name == 'business_license':
-            business_license = request.POST.get('business_license')
-            # FixMe, 添加图片校验
-            if business_license:
-                e_profile.business_license = business_license
-                e_profile.save()
-                response_data = {
-                    'message': 'ok',
-                    'ret_code': 10000,
-                }
+        if user.wanglibaouserprofile.utype == '3':
+            field_name = request.POST.get('field_name')
+            e_profile, created = EnterpriseUserProfileExtra.objects.get_or_create(user=user)
+            if field_name == 'business_license':
+                business_license = request.POST.get('business_license')
+                # FixMe, 添加图片校验
+                if business_license:
+                    e_profile.business_license = business_license
+                    e_profile.save()
+                    response_data = {
+                        'message': 'ok',
+                        'ret_code': 10000,
+                    }
+                else:
+                    response_data = {
+                        'message': u'请选择营业执照',
+                        'ret_code': 10001,
+                    }
+            elif field_name == 'registration_cert':
+                registration_cert = request.POST.get('registration_cert')
+                # FixMe, 添加图片校验
+                if registration_cert:
+                    e_profile.registration_cert = registration_cert
+                    e_profile.save()
+                    response_data = {
+                        'message': 'ok',
+                        'ret_code': 10000,
+                    }
+                else:
+                    response_data = {
+                        'message': u'请选择税务登记证',
+                        'ret_code': 10001,
+                    }
             else:
                 response_data = {
-                    'message': u'请选择营业执照',
-                    'ret_code': 10001,
-                }
-        elif field_name == 'registration_cert':
-            registration_cert = request.POST.get('registration_cert')
-            # FixMe, 添加图片校验
-            if registration_cert:
-                e_profile.registration_cert = registration_cert
-                e_profile.save()
-                response_data = {
-                    'message': 'ok',
-                    'ret_code': 10000,
-                }
-            else:
-                response_data = {
-                    'message': u'请选择税务登记证',
-                    'ret_code': 10001,
+                    'message': 'invalid field name',
+                    'ret_code': 50001,
                 }
         else:
             response_data = {
-                'message': 'unknow error',
-                'ret_code': 50001,
+                'message': u'非企业用户',
+                'ret_code': 20001,
             }
 
         return HttpResponse(json.dumps(response_data), content_type='application/json')
@@ -2268,21 +2274,28 @@ class GetEnterpriseUserProfileApi(APIView):
 
     def get(self, request):
         user = request.user
-        try:
-            e_profile = EnterpriseUserProfile.objects.get(user=user)
-        except EnterpriseUserProfile.DoesNotExist:
-            e_profile = None
+        if user.wanglibaouserprofile.utype == '3':
+            try:
+                e_profile = EnterpriseUserProfile.objects.get(user=user)
+                response_data = {
+                    'data': e_profile,
+                    'message': 'success',
+                    'ret_code': 10000
+                }
+            except EnterpriseUserProfile.DoesNotExist:
+                response_data = {
+                    'data': None,
+                    'message': u'用户企业资料不存在',
+                    'ret_code': 10001
+                }
+        else:
+            response_data = {
+                'data': None,
+                'message': u'非企业用户',
+                'ret_code': 20001,
+            }
 
-        try:
-            e_profile_extra = EnterpriseUserProfileExtra.objects.get(user=user)
-        except EnterpriseUserProfileExtra.DoesNotExist:
-            e_profile_extra = None
-
-        return {
-            'profile': e_profile,
-            'extra': e_profile_extra,
-            'ret_code': 10000
-        }
+        return Response(response_data)
 
 
 class EnterpriseUserProfileApi(APIView):
@@ -2291,27 +2304,30 @@ class EnterpriseUserProfileApi(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
-        form = EnterpriseUserProfileForm(request.POST)
-        if form.is_valid():
-            user = request.user
-            e_profile = EnterpriseUserProfile.objects.get(user=user)
-            if e_profile:
-                response_data = {
-                    'message': 'user[%s] enterprise profile has been exists',
-                    'ret_code': 10001,
-                }
-                return HttpResponse(json.dumps(response_data), content_type='application/json')
+        user = request.user
+        if user.wanglibaouserprofile.utype == '3':
+            form = EnterpriseUserProfileForm(request.POST)
+            if form.is_valid():
+                user = request.user
+                try:
+                    e_profile = EnterpriseUserProfile.objects.get(user=user)
+                except EnterpriseUserProfile.DoesNotExist:
+                    e_profile = EnterpriseUserProfile
 
-            e_profile = EnterpriseUserProfile()
-            e_profile.user = user
-            e_profile.company_name = form.cleaned_data['company_name']
-            e_profile.business_license = form.cleaned_data['business_license']
-            e_profile.registration_cert = form.cleaned_data['registration_cert']
-            e_profile.certigier_name = form.cleaned_data['certigier_name']
-            e_profile.certigier_phone = form.cleaned_data['certigier_phone']
-            e_profile.company_address = form.cleaned_data['company_address']
-            e_profile.company_account = form.cleaned_data['company_account']
-            e_profile.company_account_name = form.cleaned_data['company_account_name']
-            e_profile.deposit_bank_province = form.cleaned_data['deposit_bank_province']
-            e_profile.deposit_bank_city = form.cleaned_data['deposit_bank_city']
-            e_profile.bank_branch_address = form.cleaned_data['bank_branch_address']
+                e_profile.company_name = form.cleaned_data['company_name']
+                e_profile.business_license = form.cleaned_data['business_license']
+                e_profile.registration_cert = form.cleaned_data['registration_cert']
+                e_profile.certigier_name = form.cleaned_data['certigier_name']
+                e_profile.certigier_phone = form.cleaned_data['certigier_phone']
+                e_profile.company_address = form.cleaned_data['company_address']
+                e_profile.company_account = form.cleaned_data['company_account']
+                e_profile.company_account_name = form.cleaned_data['company_account_name']
+                e_profile.deposit_bank_province = form.cleaned_data['deposit_bank_province']
+                e_profile.deposit_bank_city = form.cleaned_data['deposit_bank_city']
+                e_profile.bank_branch_address = form.cleaned_data['bank_branch_address']
+        else:
+            response_data = {
+                'data': None,
+                'message': u'非企业用户',
+                'ret_code': 20001,
+            }
