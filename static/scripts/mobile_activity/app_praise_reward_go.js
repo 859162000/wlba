@@ -274,13 +274,21 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			});
 		}
 	});
+
+	var shareName = $('.share_name').text(),
+		shareImg = $('.share_img').text(),
+		shareLink = $('.share_link').text(),
+		shareMainTit = $('.share_title').text(),
+		shareBody = $('.share_body').text(),
+		share_friends = '我领到一份年终奖，'+praise_num+'元噢！你也为自己一年的努力另一份吧！，';
+
 	wx.ready(function(){
-		var host = 'https://www.wanglibao.com/',
-			shareName = '我的努力需要你的一个肯定，谢谢你',
-			shareImg = host + '/static/imgs/mobile_activity/app_praise_reward/300*300.jpg',
-			shareLink = host + '/activity/app_praise_reward_go/',
-			shareMainTit = '我的努力需要你的一个肯定，谢谢你',
-			shareBody = '您的好友正在领取他的年终奖，随手一赞，祝他多拿100！';
+		//var host = 'https://www.wanglibao.com/',
+		//	shareName = '我的努力需要你的一个肯定，谢谢你',
+		//	shareImg = host + '/static/imgs/mobile_activity/app_praise_reward/300*300.jpg',
+		//	shareLink = host + '/activity/app_praise_reward_go/',
+		//	shareMainTit = '我的努力需要你的一个肯定，谢谢你',
+		//	shareBody = '您的好友正在领取他的年终奖，随手一赞，祝他多拿100！';
 		//分享给微信好友
 		org.onMenuShareAppMessage({
 			title: shareMainTit,
@@ -290,7 +298,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		});
 		//分享给微信朋友圈
 		org.onMenuShareTimeline({
-			title: '我领到一份年终奖，XXX元噢！你也为自己一年的努力另一份吧！，',
+			title: shareMainTit,
 			link : shareLink,
 			imgUrl: shareImg
 		})
