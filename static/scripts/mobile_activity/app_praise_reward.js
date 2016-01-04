@@ -303,6 +303,17 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			if(xhr.err_code==0){
 				$('.renovate').removeClass('renovate_rotate');
 				$('#praise_num').val(xhr.wx_user.annual_bonus);
+				for(var i=0; i=xhr.follow.length; i++){
+					follow_one = xhr.follow[i];
+					$('.user_wrap').push(['<li><img class="user" src="follow_one.headimgurl"/></li>'].join(''));
+				}
+				jQuery("#mycarousel").jcarousel({
+					wrap: 'circular',
+					scroll: 1,
+					initCallback: mycarousel_initCallback,
+					buttonNextHTML: null,
+					buttonPrevHTML: null
+				});
 			}else{
 				$('.renovate').removeClass('renovate_rotate');
 				$('.friend_top span').text(xhr.err_messege);
@@ -331,6 +342,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	var praise_num = $('#praise_num').val();
 	/*投票*/
 	$('.praise_left').click(function(){
+
 			$.ajax({
 				url: '/weixin_activity/weixin/bonus/?act=vote&type=1&uid='+uid+'&wxid='+wxid,
 				type: "GET",
@@ -340,6 +352,18 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					$('.friend_top').fadeIn();
 					$('.float').text('+100').show().addClass('float_animate');
 					$('#praise_num').val(xhr.wx_user.annual_bonus);
+					$('.user_wrap').html('');
+					for(var i=0; i=xhr.follow.length; i++){
+						follow_one = xhr.follow[i];
+						$('.user_wrap').push(['<li><img class="user" src="follow_one.headimgurl"/></li>'].join(''));
+					}
+					jQuery("#mycarousel").jcarousel({
+						wrap: 'circular',
+						scroll: 1,
+						initCallback: mycarousel_initCallback,
+						buttonNextHTML: null,
+						buttonPrevHTML: null
+					});
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
@@ -357,6 +381,17 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					$('.friend_top').fadeIn();
 					$('.float').text('-100').show().addClass('float_animate');
 					$('#praise_num').val(xhr.wx_user.annual_bonus);
+					for(var i=0; i=xhr.follow.length; i++){
+						follow_one = xhr.follow[i];
+						$('.user_wrap').push(['<li><img class="user" src="follow_one.headimgurl"/></li>'].join(''));
+					}
+					jQuery("#mycarousel").jcarousel({
+						wrap: 'circular',
+						scroll: 1,
+						initCallback: mycarousel_initCallback,
+						buttonNextHTML: null,
+						buttonPrevHTML: null
+					});
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
