@@ -2966,6 +2966,7 @@ class ThunderBindingApi(APIView):
                 'ret_code': '10004',
                 'message': u'非迅雷渠道用户',
             }
+            logger.info("=20160104= [%s] : 非迅雷渠道用户" % (user.id))
             return HttpResponse(json.dumps(response_data), content_type='application/json')
 
         channel_code = request.POST.get('promo_token', '').strip()
@@ -3003,7 +3004,7 @@ class ThunderBindingApi(APIView):
                 'message': u'非法请求',
             }
 
-        logger.info("Thunder binding promo_token[%s], xluserid[%s], time[%s], sign[%s], result[%s]"
-                    % (channel_code, channel_user, channel_time, channel_sign, response_data))
+        logger.info("Thunder binding userid[%s] promo_token[%s], xluserid[%s], time[%s], sign[%s], result[%s]"
+                    % (user.id, channel_code, channel_user, channel_time, channel_sign, response_data))
 
         return HttpResponse(json.dumps(response_data), content_type='application/json')
