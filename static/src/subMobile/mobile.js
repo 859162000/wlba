@@ -74,7 +74,7 @@ var org = (function(){
                 for (var i = 0; i < earning_elements.length; i ++) {
                     earning_element = earning_elements[i];
                     if (earning) {
-                        fee_earning = fee_earning ? fee_earning : 0;
+                        fee_earning = fee_earning ? fee_earning : 0.00;
                         if(jiaxi_type === "+"){
                             $(earning_element).html(earning+'+<span class="blue">'+fee_earning+'</span>').data("val",(earning + fee_earning));
                         }else{
@@ -82,7 +82,8 @@ var org = (function(){
                             $(earning_element).text(earning.toFixed(2)).data("val",(earning + fee_earning));
                         }
                     } else {
-                        $(earning_element).text("0.00");
+                        //$(earning_element).text("0.00");
+                        $(earning_element).html('0+<span class="blue">0.00</span>').data("val",0);
                     }
                 }
                 callback && callback();
@@ -1085,7 +1086,7 @@ org.calculator=(function(org){
                 if(amount % 100 !== 0 || amount == ''){
                     return org.ui.alert("请输入100的整数倍")
                 }else{
-                    window.location.href = '/weixin/view/buy/' + productId + '/?amount='+ amount + '&amount_profit=' + amount_profit;
+                    //window.location.href = '/weixin/view/buy/' + productId + '/?amount='+ amount + '&amount_profit=' + amount_profit;
                 }
             })
         }
