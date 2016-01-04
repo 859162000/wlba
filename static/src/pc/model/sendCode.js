@@ -90,9 +90,8 @@
                           $(element).text('重新获取').removeAttr('disabled').removeClass('button-gray');
                           if(voiceCodeBox && ($('#'+voiceCodeBox).find('.span12-omega').length == 0)) {
                               $('#'+voiceCodeBox).find('.voice-validate').removeAttr('disabled');
-                              var voiceDiv = $('<div class="span12-omega">没有收到验证码？请尝试</div>');
-                              $('<a href="javascript:void()" class="voice-validate" onclick="self.voiceCode(this,\''+phoneNumber+'\',\''+element+'\')">语音验证</a>').appendTo(voiceDiv);
-                              $('#'+voiceCodeBox).append(voiceDiv).show()
+                              var voiceDiv = $('<div class="span12-omega">没有收到验证码？请尝试<a href="javascript:void(0)" class="voice-validate" data-phone="'+ phoneNumber +'" data-btn="'+ element +'">语音验证</a></div>');
+                              $('#'+voiceCodeBox).append(voiceDiv).show();
                           }
                         }
                     };
@@ -101,49 +100,55 @@
                 });
             })
         },
-        voiceCode : function(obj,phoneNumber,btn){
-          var element = $(obj).parent()
-          if ($(obj).attr('disabled') && $(obj).attr('disabled') === 'disabled') {
-            return;
-          }
-          return $.ajax({
-            url: '/api/ytx/send_voice_code/2/',
-            type: "POST",
-            data: {
-              phone: phoneNumber
-            }
-          }).success(function(json) {
-            var button, count, intervalId, timerFunction;
-            if (json.ret_code === 0) {
-              intervalId;
-              count = 5;
-              button = $("#"+btn);
-              button.attr('disabled', 'disabled').addClass('button-gray');
-              $('.voice').addClass('tip');
-              timerFunction = function() {
-                if (count >= 1) {
-                  count--;
-                  return element.text('语音验证码已经发送，请注意接听（' + count + '）');
-                } else {
-                  clearInterval(intervalId);
-                  $('<a href="/api/ytx/send_voice_code/2/" class="voice-validate" onclick="sendSMSCode.voiceCode(this,\''+phoneNumber+'\',\''+element+'\')">语音验证</a>').appendTo(element);
-                  button.removeAttr('disabled').addClass('button-red').removeClass('button-gray');
-                  return $('.voice').removeClass('tip');
+        voiceCode : function(){
+            $('.span12-omega').delegate('.voice-validate','click',function() {
+                var obj = $(this),
+                    phoneNumber = obj.attr('data-phone'),
+                    element =  obj.attr('data-btn'),
+                    par = $('#'+element).parent();
+                var element = $(obj).parent()
+                if (obj.attr('disabled') && obj.attr('disabled') === 'disabled') {
+                    return;
                 }
-              };
-              timerFunction();
-              intervalId = setInterval(timerFunction, 1000);
-            } else {
-              return element.html('系统繁忙请尝试短信验证码');
-            }
-          }).fail(function(xhr) {
-            if (xhr.status > 400) {
-              return tool.modalAlert({
-                title: '温馨提示',
-                msg: result.message
-              });
-            }
-          });
+                return $.ajax({
+                    url: '/api/ytx/send_voice_code/2/',
+                    type: "POST",
+                    data: {
+                        phone: phoneNumber
+                    }
+                }).success(function (json) {
+                    var button, count, intervalId, timerFunction;
+                    if (json.ret_code === 0) {
+                        intervalId;
+                        count = 5;
+                        button = $("#" + element);
+                        button.attr('disabled', 'disabled').addClass('button-gray');
+                        $('.voice').addClass('tip');
+                        timerFunction = function () {
+                            if (count >= 1) {
+                                count--;
+                                return par.text('语音验证码已经发送，请注意接听（' + count + '）');
+                            } else {
+                                clearInterval(intervalId);
+                                $('<div class="span12-omega">没有收到验证码？请尝试<a href="javascript:void(0)" class="voice-validate" data-phone="'+ phoneNumber +'" data-btn="'+ element +'">语音验证</a></div>').append(par);
+                                button.removeAttr('disabled').addClass('button-red').removeClass('button-gray');
+                                return $('.voice').removeClass('tip');
+                            }
+                        };
+                        timerFunction();
+                        intervalId = setInterval(timerFunction, 1000);
+                    } else {
+                        return par.html('系统繁忙请尝试短信验证码');
+                    }
+                }).fail(function (xhr) {
+                    if (xhr.status > 400) {
+                        return tool.modalAlert({
+                            title: '温馨提示',
+                            msg: result.message
+                        });
+                    }
+                });
+            })
         },
         setup : function(options){  //初始化
             var self = this;
@@ -156,6 +161,10 @@
             this.sendImgCode();
             this.captchaRefreshClick();
             this.sendValidateCode();
+
+            if(options.voiceCodeBox){
+                this.voiceCode();
+            }
         },
         sendSMSCodeInit : function(options) {
             sendSMSCode.setup(options);
