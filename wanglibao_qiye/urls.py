@@ -2,7 +2,7 @@
 from django.conf.urls import patterns, url
 from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth.decorators import login_required
-from .views import EnterpriseUserProfileApi, EnterpriseUserProfileExtraApi, QiYeIndex, QiYeInfo
+from .views import EnterpriseUserProfileApi, QiYeIndex, QiYeInfo, EnterpriseProfileUploadApi
 
 
 urlpatterns = patterns(
@@ -11,7 +11,7 @@ urlpatterns = patterns(
     url(r'^info/', QiYeInfo.as_view(), name='qiye info'),
 
     # 企业理财
-    url(r'profile/extra/$', EnterpriseUserProfileExtraApi.as_view()),
+    url(r'profile/extra/$', EnterpriseProfileUploadApi.as_view()),
     url(r'profile/$', EnterpriseUserProfileApi.as_view()),
 )
 

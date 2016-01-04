@@ -44,7 +44,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
     invitecode = forms.CharField(label="Invitecode", required=False)
     validate_code = forms.CharField(label="Validate code for phone", required=True)
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
-    user_type = forms.IntegerField(label="User type", required=False)
+    user_type = forms.CharField(label="User type", required=False)
 
     MlGb = forms.CharField(label='MlGb', required=False)
     _flag = False
@@ -189,8 +189,7 @@ class EmailOrPhoneRegisterForm(forms.ModelForm):
         user_type = self.cleaned_data.get('user_type') or '0'
         if user_type.isdigit():
             if user_type in [i for i, j in USER_TYPE]:
-                self.cleaned_data['user_type'] = user_type
-                return self.cleaned_data
+                return user_type
 
 
 def verify_captcha(dic, keep=False):
