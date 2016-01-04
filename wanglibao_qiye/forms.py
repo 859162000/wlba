@@ -29,25 +29,21 @@ class EnterpriseUserProfileForm(forms.Form):
 
     def clean_company_name(self):
         company_name = self.cleaned_data.get('company_name', '').strip()
-        self.cleaned_data['company_name'] = company_name
 
-        return self.cleaned_data
+        return company_name
 
     def clean_business_license(self):
         business_license = self.cleaned_data.get('business_license', '').strip()
-        self.cleaned_data['business_license'] = business_license
 
-        return self.cleaned_data
+        return business_license
 
     def clean_registration_cert(self):
         registration_cert = self.cleaned_data.get('registration_cert', '').strip()
-        self.cleaned_data['registration_cert'] = registration_cert
 
-        return self.cleaned_data
+        return registration_cert
 
     def clean_certigier_name(self):
         certigier_name = self.cleaned_data.get('certigier_name', '').strip()
-        self.cleaned_data['certigier_name'] = certigier_name
 
         return certigier_name
 
@@ -65,36 +61,30 @@ class EnterpriseUserProfileForm(forms.Form):
 
     def clean_company_address(self):
         company_address = self.cleaned_data.get('company_address', '').strip()
-        self.cleaned_data['company_address'] = company_address
 
-        return self.cleaned_data
+        return company_address
 
     def clean_company_account(self):
         company_account = self.cleaned_data.get('company_account', '').strip()
-        self.cleaned_data['company_account'] = company_account
 
-        return self.cleaned_data
+        return company_account
 
     def clean_company_account_name(self):
         company_account_name = self.cleaned_data.get('company_account_name', '').strip()
-        self.cleaned_data['company_account_name'] = company_account_name
 
-        return self.cleaned_data
+        return company_account_name
 
     def clean_deposit_bank_province(self):
         deposit_bank_province = self.cleaned_data.get('deposit_bank_province', '').strip()
-        self.cleaned_data['deposit_bank_province'] = deposit_bank_province
 
-        return self.cleaned_data
+        return deposit_bank_province
 
     def clean_deposit_bank_city(self):
         deposit_bank_city = self.cleaned_data.get('deposit_bank_city', '').strip()
-        self.cleaned_data['deposit_bank_city'] = deposit_bank_city
 
-        return self.cleaned_data
+        return deposit_bank_city
 
     def clean_bank_branch_address(self):
         bank_branch_address = self.cleaned_data.get('bank_branch_address', '').strip()
-        self.cleaned_data['bank_branch_address'] = bank_branch_address
 
-        return self.cleaned_data
+        return bank_branch_address
