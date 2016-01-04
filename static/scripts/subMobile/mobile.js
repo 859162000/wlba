@@ -853,7 +853,8 @@ org.buy=(function(org){
                 if(inputAmount < redPackInvestamount){
                     lib.$redpackSign.hide();//红包直抵提示
                     lib.$redpackForAmount.hide();//请输入投资金额
-                    return $(".redpack-investamount").show();//未达到红包使用门槛
+                    //lib.showAmount.text(senderAmount);//实际支付金额
+                    $(".redpack-investamount").show();//未达到红包使用门槛
                 }else{
                     lib.amountInout.attr('activity-jiaxi', 0);
                     if(redPackMethod == '*'){ //百分比红包
