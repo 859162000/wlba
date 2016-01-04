@@ -217,358 +217,369 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
         onMenuShareQQ          : lib._onMenuShareQQ,
     }
 })();
-;
+;var boy = $(document.body).height();
+$('.xunmeng').css({'height': boy});
+$('.xunmeng2 ').css({'height': boy});
+$('.xinlei-rule').click(function () {
+    $('.xunmeng').show();
+});
+$('.xunjiang-zong span').click(function () {
+    $('.xunmeng').hide();
+});
+org.xunlei = (function (org) {
 
-var weChatShare = (function(org){
-    var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ',];
-        org.ajax({
-            type : 'GET',
-            url : '/weixin/api/jsapi_config/',
-            dataType : 'json',
-            success : function(data) {
-                //请求成功，通过config注入配置信息,
-                wx.config({
-                    debug: false,
-                    appId: data.appId,
-                    timestamp: data.timestamp,
-                    nonceStr: data.nonceStr,
-                    signature: data.signature,
-                    jsApiList: jsApiList
-                });
-            }
-        });
-        wx.ready(function(){
-            var host = 'https://staging.wanglibao.com',
-                shareImg = host + '/static/imgs/mobile/weChat_logo.png',
-                shareLink = $('input[name=url]').val(),
-                shareMainTit = $('input[name=title]').val(),
-                shareBody = $('input[name=content]').val();
-            //分享给微信好友
-            org.onMenuShareAppMessage({
-                title: shareMainTit,
-                desc: shareBody,
-                link: shareLink,
-                imgUrl: shareImg
-            });
-            //分享给微信朋友圈
-            org.onMenuShareTimeline({
-                title: shareMainTit,
-                link : shareLink,
-                imgUrl: shareImg
-            })
-            //分享给QQ
-            org.onMenuShareQQ({
-                title: shareMainTit,
-                desc: shareBody,
-                link : shareLink,
-                imgUrl: shareImg
-            })
-        })
-})(org);
-
-org.ui = (function(){
     var lib = {
-        _alert: function(txt, callback){
-            if(document.getElementById("alert-cont")){
-                document.getElementById("alertTxt").innerHTML = txt;
-                document.getElementById("popubMask").style.display = "block";
-                document.getElementById("alert-cont").style.display = "block";
-            }else{
-                var shield = document.createElement("DIV");
-                shield.id = "popubMask";
-                shield.style.cssText="position:absolute;bottom:0;top:0;width:100%; background:rgba(0,0,0,0.5); z-index:1000000;";
-                var alertFram = document.createElement("DIV");
-                alertFram.id="alert-cont";
-                alertFram.style.cssText="position:absolute; top:35%;left:50%; width:14rem; margin:-2.75rem 0 0 -7rem; background:#fafafa; border-radius:.3rem;z-index:1000001;";
-                strHtml = "<div id='alertTxt' class='popub-txt' style='color:#333;font-size: .9rem!important;padding: 1.25rem .75rem;'>"+txt+"</div>";
-                strHtml += " <div class='popub-footer' style='width: 100%;padding: .5rem 0;font-size: .9rem;text-align: center;color: #4391da;border-top: 1px solid #d8d8d8;border-bottom-left-radius: .25rem;border-bottom-right-radius: .25rem;'>确认</div>";
-                alertFram.innerHTML = strHtml;
-                document.body.appendChild(alertFram);
-                document.body.appendChild(shield);
-
-                $('.popub-footer').on('click',function(){
-                    alertFram.style.display = "none";
-                    shield.style.display = "none";
-                    callback && callback();
-                })
-            }
-            document.body.onselectstart = function(){return false;};
+        $body_h: $('.maimai-check-body'),
+        $submit: $('.maimai-form-btn1'),
+        $phone: $('input[name=phone]'),
+        $codeimg: $('input[name=codeimg]'),
+        $codenum: $('input[name=codenum]'),
+        $sign: $('.maimai-form-sign'),
+        $nbsp: $('.maimai-sign-margin'),
+        $validation: $('.check-submit'),
+        checkState: null,
+        intervalId: null,
+        $act_explain_button: $('#explain_button'),
+        $explain_wrap: $('.explain_wrap'),
+        init: function () {
+            lib._submit();
+            lib.listen();
+            lib._addEvent();
+            $(document.body).trigger('from:captcha');
         },
-        _showSign:function(signTxt, callback){
-            var $sign = $('.error-sign');
-            if($sign.length == 0){
-                $('body').append("<section class='error-sign'>" + signTxt + "</section>");
-                $sign = $('.error-sign');
-            }else{
-                $sign.text(signTxt)
-            }
-            ~function animate(){
-                $sign.css('display','block');
-                setTimeout(function(){
-                    $sign.css('opacity', 1);
-                    setTimeout(function(){
-                        $sign.css('opacity', 0);
-                        setTimeout(function(){
-                            $sign.hide();
-                            return callback && callback();
-                        },300)
-                    },1000)
-                },0)
-            }()
-        }
-    }
-
-    return {
-        alert : lib._alert,
-        showSign : lib._showSign
-    }
-})();
-org.weChatStart = (function(org){
-    var lib = {
-        $captcha_img : $('#captcha'),
-        $captcha_0 :  $('input[name=captcha_0]'),
-        $captcha_1 :  $('input[name=captcha_1]'),
-        init:function(){
-            lib._fetchPack();
-            lib._captcha_refresh();
-            //刷新验证码
-            lib.$captcha_img.on('click', function() {
-                lib._captcha_refresh();
+        _addEvent: function () {
+            $('#explain_button').click(function () {
+                $('.explain_wrap').show();
             });
-            lib._iphoneInputKeyUp();
-        },
-        _iphoneInputKeyUp: function(){
-            var $phone = $('input[name=phone]');
-            $phone.on('keyup',function(){
-                if(!lib._checkPhone($phone.val())) return ;
-                lib._userExists($phone.val());
-            })
-        },
-        _userExists: function(phoneNumber){
-            org.ajax({
-                url : '/api/user_exists/' + phoneNumber + '/',
-                data: {
-                },
-                type : 'GET',
-                success :function(data){
-                    var ele = $('.code-content'),
-                        curHeight = ele.height(),
-                        autoHeight = ele.css('height', 'auto').height();
-                    if(data.existing){
-                        $('#exists').val('true');
-                        ele.height(curHeight).animate({height: 0},500);
-                    }else{
-                        ele.height(curHeight).animate({height: autoHeight},500);
-                        $('#exists').val('false');
-                        lib._getCodeFun();
-                    }
-                },
-                error :function(xhr){
-                }
+            $('.explain_wrap').click(function () {
+                $(this).hide();
             });
         },
-        _getCodeFun: function(){
-            $('.webchat-button').on('click',function(){
-                var phoneNumber = $('input[name=phone]').val(),
-                    $that = $(this), //保存指针
-                    count = 60; //60秒倒计时
-
-                if(!lib._checkPhone(phoneNumber)) return;  //号码不符合退出
-                $that.attr('disabled', 'disabled').removeClass('webchat-button-right');
-                org.ajax({
-                    url : '/api/phone_validation_code/register/' + phoneNumber + '/',
-                    data: {
-                        captcha_0 : lib.$captcha_0.val(),
-                        captcha_1 : lib.$captcha_1.val()
-                    },
-                    type : 'POST',
-                    error :function(xhr){
-                        clearInterval(intervalId);
-                        var result = JSON.parse(xhr.responseText);
-                        org.ui.showSign(result.message);
-                        $that.text('获取验证码').removeAttr('disabled').addClass('webchat-button-right');
-                        lib._captcha_refresh();
-                        return
-                    }
-                });
-                //倒计时
-                var timerFunction = function() {
-                    if (count >= 1) {
-                        count--;
-                        return $that.text( count + '秒后可重发');
-                    } else {
-                        clearInterval(intervalId);
-                        $that.text('重新获取').removeAttr('disabled').addClass('webchat-button-right');
-                        return lib._captcha_refresh();
-                    }
-                };
-                timerFunction();
-                return intervalId = setInterval(timerFunction, 1000);
-            });
-        },
-        _fetchPack: function(){
+        checkfilter: function (num) {
             var
-                $submit  = $('.webpack-btn-red'),
-                phoneVal = $('input[name=phone]'),
-                code = $('input[name=validate_code]'),
-                postDo = false;
-
-            $submit.on('click', function(){
-                if(postDo) return
-                var ops = {
-                    phone : phoneVal.val() * 1,
-                    activity : $(this).attr('data-activity'),
-                    orderid : $(this).attr('data-orderid'),
-                    openid : $(this).attr('data-openid'),
-                    validate_code : code.val()
-                }
-                if(ops.phone =='' || !lib._checkPhone(phoneVal.val())) {
-                    $('.phone-sign').show();
-                    return;
-                }else{
-                    $('.phone-sign').hide();
-                }
-
-                if($('#exists').val() == 'false'){
-                    if(lib.$captcha_1.val() == ''){
-                        $('.code-sign').show();
-                        return;
-                    }else{
-                        $('.code-sign').hide();
+                _self = this,
+                checkAll = [
+                    {
+                        type: _self.$phone.attr('data-type'),
+                        dom: _self.$phone,
+                        message: _self.$phone.attr('data-message')
+                    },
+                    {
+                        type: _self.$codeimg.attr('data-type'),
+                        dom: _self.$codeimg,
+                        message: _self.$codeimg.attr('data-message')
+                    },
+                    {
+                        type: _self.$codenum.attr('data-type'),
+                        dom: _self.$codenum,
+                        message: _self.$codenum.attr('data-message')
                     }
-                    if(code.val() == ''){
-                        $('.phone-code-sign').show();
-                        return;
-                    }else{
-                        $('.phone-code-sign').hide();
-                    }
-                    org.ajax({
-                        url: '/api/register/?promo_token=wrp',
-                        type: 'POST',
-                        beforeSend: function(){$submit.html('领取中...')},
-                        data: {
-                            'identifier': ops.phone,
-                            'validate_code': ops.validate_code,
-                            'IGNORE_PWD': 'true',
-                            'captcha_0' :  lib.$captcha_0.val(),
-                            'captcha_1' :  lib.$captcha_1.val(),
-                            'order_id': ops.orderid
-                        },
-                        dataType : 'json',
-                        success: function(data){
-                            if(data.ret_code > 0){
-                                org.ui.showSign(data.message);
-                                clearInterval(intervalId);
-                                $('.webchat-button').text('获取验证码').removeAttr('disabled').addClass('webchat-button-right');
-                                lib._captcha_refresh();
-                            }else {
-                                window.location.href = '/weixin_activity/share/' + ops.phone + '/' + ops.openid + '/' + ops.orderid + '/' + ops.activity + '/';
-                            }
-                        },
-                        error: function(data){
-                            org.ui.alert(data)
-                            clearInterval(intervalId);
-                            $('.webchat-button').text('获取验证码').removeAttr('disabled').addClass('webchat-button-right');
-                            lib._captcha_refresh();
-                        },
-                        complete: function(){
-                            postDo = false;
-                            $submit.html('立即领取');
-                        }
-                    })
-                }else{
-                    org.ajax({
-                        url: '/api/weixin/share/has_gift/',
-                        type: 'POST',
-                        beforeSend: function(){$submit.html('领取中...')},
-                        data: {
-                            'openid': ops.openid,
-                            'phone_num': ops.phone,
-                            'order_id': ops.orderid
-                        },
-                        dataType : 'json',
-                        success: function(data){
-                            if(data.has_gift == 'true'){
-                                org.ui.alert(data.message, function(){
-                                    window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
-                                });
-                            }else if(data.has_gift == 'false'){
-                                window.location.href = '/weixin_activity/share/'+ops.phone+'/'+ops.openid+'/'+ops.orderid+'/'+ops.activity+'/';
-                            }
-                        },
-                        error: function(data){
-                            org.ui.alert(data)
-                        },
-                        complete: function(){
-                            postDo = false;
-                            $submit.html('立即领取');
-                        }
-                    })
-                }
-            });
+                ];
+            checkAll.splice(num, 10)
+            return checkAll
 
         },
-        _checkPhone : function(val){
+        listen: function () {
+            var _self = this;
+
+            $(document).on('from:captcha', function () {
+                _self._fetchcode();
+            });
+
+            $(document).on('from:validation', function () {
+                _self._fetchValidation();
+            });
+
+            // arrry {checklist} 验证列表
+            // bool {post} 是否验证手机号已存在
+            // bool {state} 错误提醒是否显示
+            // bool {other} 其他验证不参与disabled逻辑
+            $(document).on('from:check', function (e, checklist, post, state, other) {
+                _self._check(checklist, post, state, other)
+            });
+
+            /*
+             * bool {post} 是否验证手机号已存在
+             * bool {other} 其他验证不参与disabled逻辑
+             */
+            $(document).on('from:success', function (e, post, other) {
+                _self._success(post, other);
+            });
+            /*
+             * string {message} 错误提醒
+             * bool {state} 错误提醒是否显示
+             */
+            $(document).on('from:error', function (e, message, state, other) {
+                _self._error(message, state, other)
+            });
+
+            var
+                list = [_self.$phone, _self.$codeimg, _self.$codenum],
+                checkOps = {};
+            $.each(list, function (i, dom) {
+                dom.on('input', _self._debounce(function () {
+                    checkOps = i === 0 ? {filter: 1, post: true, state: true} : {filter: 3, post: false, state: false};
+
+                    $(document.body).trigger('from:check', [_self.checkfilter(checkOps.filter), checkOps.post, checkOps.state]);
+                }, 400));
+            });
+
+            //刷新验证码
+            $('.check-img').on('click', function () {
+                $(document.body).trigger('from:captcha')
+            });
+            //短信验证码
+            $('.check-submit').on('click', function () {
+                $(document.body).trigger('from:validation');
+            });
+        },
+        _submit: function () {
+            var _self = this;
+
+            //提交按钮
+            _self.$submit.on('click', function () {
+                if (_self.$phone.attr('data-existing') === 'true') {
+                    $(document.body).trigger('from:check', [_self.checkfilter(1), false]);
+                } else {
+                    $(document.body).trigger('from:check', [_self.checkfilter(3), false]);
+                }
+
+                if (!lib.checkState) return
+                function getQueryString(name) {
+                    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+                    var r = window.location.search.substr(1).match(reg);
+                    if (r != null) {
+                        return unescape(r[2]);
+                    }
+                    return null;
+                }
+
+                var token = getQueryString('promo_token'),
+                    xid = getQueryString('xluserid'),
+                    timer = getQueryString('time'),
+                    sig = getQueryString('sign'),
+                    name = getQueryString('nickname');
+
+                var get_ticket_ajax = {};
+                get_ticket_ajax = {
+                    url: '/activity/thunder/binding/',
+                    type: 'POST',
+                    data: {
+                        'promo_token': token,
+                        'xluserid': xid,
+                        'time': timer,
+                        'sign': sig,
+                        'nickname': name
+                    },
+                    success: function (data) {
+                        console.log(data)
+                        if (data.ret_code == 10002 || data.ret_code == 10000) {
+                            $('.xunmeng2').show();
+                        } else {
+                            //$('.get_ticket_wrap1').show();
+                        }
+                    }
+                }
+
+                //_self.$submit.attr('disabled',true).html('领取中，请稍后...');
+
+                ops = {
+                    url: '/api/register/?promo_token=xunlei9',
+                    type: 'POST',
+                    data: {
+                        'identifier': _self.$phone.val(),
+                        'validate_code': _self.$codenum.val(),
+                        'IGNORE_PWD': 'true',
+                        'captcha_0': $('input[name=codeimg_key]').val(),
+                        'captcha_1': _self.$codeimg.val(),
+                    },
+                    success: function (data) {
+                        //console.log('11111')
+                        if (data.ret_code == 0) {
+
+                            org.ajax(get_ticket_ajax);
+                        } else {
+                            $(document.body).trigger('from:error', [data.message, true]);
+                            clearInterval(_self.intervalId);
+                            $('.check-submit').text('短信验证码').removeAttr('disabled').removeClass('postValidation');
+                            return $(document.body).trigger('from:captcha');
+                        }
+                    },
+                    error: function (data) {
+                        alert(data)
+                    },
+                    complete: function () {
+                        //lib.$submit.removeAttr('disabled').html('领 取');
+                    }
+                }
+
+                org.ajax(ops);
+            });
+        },
+
+        _debounce: function (fn, delay) {
+            var timer = null;
+            return function () {
+                var
+                    context = this,
+                    args = arguments;
+                clearTimeout(timer);
+
+                timer = setTimeout(function () {
+                    fn.apply(context, args);
+                }, delay);
+            };
+        },
+        _check: function (checklist, post, state, other) {
+
+            var check = {};
+
+            $.each(checklist, function (i, hash) {
+                check.checkback = lib['_check' + hash.type]($(hash.dom).val());
+                check.message = hash.message;
+                if (!check.checkback) return false
+            });
+
+            if (check.checkback) {
+                lib.checkState = true;
+                $(document).trigger('from:success', [post, other]);
+            } else {
+                lib.checkState = false;
+                $(document).trigger('from:error', [check.message, state, other])
+            }
+        },
+        _error: function (message, state, other) {
+            if (state) {
+                lib.$sign.css('height', '1.275rem').html(message);
+                lib.$nbsp.css('height', '0');
+            }
+            if (!other) lib.$submit.attr('disabled', true);
+        },
+        _success: function (post, other) {
+            var _self = this;
+
+            _self.$sign.css('height', '0');  //隐藏提示
+            _self.$nbsp.css('height', '.7rem');
+
+            // post 为ture 进行用户验证
+            //post 为false 说明为展开场景,check三个按钮，按钮可点击
+            if (post) {
+                lib.user_exists(callback);
+            } else {
+                if (!other) lib.$submit.removeAttr('disabled');
+            }
+
+            function callback(data) {
+                if (data.existing) {
+                    //lib.$submit.removeAttr('disabled');
+                    _self.$body_h.css({'height': '0'});
+                    _self.$phone.attr('data-existing', true);
+                    _self.$nbsp.css('height', '0rem');
+                    lib.$sign.css('height', '1.275rem').html('该用户已注册');
+                } else {
+                    lib.$submit.attr('disabled', true);
+                    _self.$body_h.css({'height': '5.6rem'});
+                    _self.$phone.attr('data-existing', false);
+                    _self.$nbsp.css('height', '.7rem');
+                    $(document.body).trigger('from:check', [_self.checkfilter(3), false, false]);
+                }
+            }
+        },
+        _checkPhone: function (val) {
             var isRight = false,
                 $sign = $('.phone-sign'),
                 re = new RegExp(/^(12[0-9]|13[0-9]|15[0123456789]|18[0123456789]|14[57]|17[0678])[0-9]{8}$/);
-            if(re.test($.trim(val))) {
-                $sign.hide(); $('.webchat-button').addClass('webchat-button-right'); isRight = true;
-            }else{
-                $sign.show(); $('.webchat-button').removeClass('webchat-button-right'); isRight = false;
-                var ele = $('.code-content'),
-                    curHeight = ele.height();
-                ele.height(curHeight).animate({height: 0},500);
-                $('input[name=validate_code]').val('');
-                $('input[name=captcha_1]').val('');
-
-            }
+            re.test($.trim(val)) ? ($sign.hide(), isRight = true) : ($sign.show(), isRight = false);
             return isRight;
         },
-        _captcha_refresh :function(){
+        _checkVal: function (val) {
+
+            if (val == '') return false
+            return true
+        },
+        _fetchcode: function () {
             var captcha_refresh_url = '/captcha/refresh/?v=' + new Date().getTime();
-            $.get(captcha_refresh_url, function(res) {
-                lib.$captcha_img.attr('src', res['image_url']);
-                lib.$captcha_0.val(res['key']);
+            $.get(captcha_refresh_url, function (res) {
+                $('.check-img').attr('src', res['image_url']);
+                $('input[name=codeimg_key]').val(res['key']);
             });
-        }
+        },
+        _fetchValidation: function () {
+            var
+                _self = this,
+                count = 60;  //60秒倒计时
+
+            $(document.body).trigger('from:check', [lib.checkfilter(2), false, true, true]);
+
+            if (!_self.checkState) return;
+
+            $('.check-submit').attr('disabled', 'disabled').addClass('postValidation');
+            org.ajax({
+                url: '/api/phone_validation_code/' + _self.$phone.val() + '/',
+                data: {
+                    captcha_0: $('input[name=codeimg_key]').val(),
+                    captcha_1: _self.$codeimg.val(),
+                },
+                type: 'POST',
+                error: function (xhr) {
+                    clearInterval(_self.intervalId);
+                    var result = JSON.parse(xhr.responseText);
+                    $('.check-submit').text('短信验证码').removeAttr('disabled').removeClass('postValidation');
+                    $(document.body).trigger('from:error', [result.message, true]);
+                    $(document.body).trigger('from:captcha')
+                }
+            });
+            //倒计时
+            var timerFunction = function () {
+                if (count >= 1) {
+                    count--;
+                    return $('.check-submit').text(count + '秒后可重发');
+                } else {
+                    clearInterval(_self.intervalId);
+                    $('.check-submit').text('重新获取').removeAttr('disabled').removeClass('postValidation')
+                    return $(document.body).trigger('from:captcha');
+                }
+            };
+            timerFunction();
+            return _self.intervalId = setInterval(timerFunction, 1000);
+
+        },
+        /*
+         * 判断账号接口
+         */
+        user_exists: function (callback) {
+            var _self = this;
+            phone = _self.$phone.val();
+            //判断是否注册过
+            org.ajax({
+                url: '/api/user_exists/' + phone + '/',
+                beforeSend: function () {
+                    //lib.$phone.addClass('maimai-load'); //显示加载动画
+                },
+                success: function (data) {
+                    callback && callback(data);
+                },
+                error: function (data) {
+                    //console.log(data)
+                },
+                complete: function () {
+                    //_self.$phone.removeClass('maimai-load');
+                }
+            })
+        },
     }
     return {
-        init : lib.init
+        init: lib.init
     }
 })(org);
 
-org.weChatDetail = (function(org){
-    var lib = {
-        init:function(){
-            /*window.onload = function(){
-              if($('#amount').attr('data-hasgift') == 'true'){
-                 org.ui.alert('您已经领取过礼物了！');
-              }
-            }*/
-        }
-    }
-    return {
-        init : lib.init
-    }
-})(org);
 
-org.weChatEnd = (function(org){
-    var lib = {
-        init:function(){
-
-        }
-    }
-    return {
-        init : lib.init
-    }
-})(org);
-
-;(function(org){
-    $.each($('script'), function(){
+;
+(function (org) {
+    $.each($('script'), function () {
         var src = $(this).attr('src');
-        if(src){
-            if($(this).attr('data-init') && org[$(this).attr('data-init')]){
+        if (src) {
+            if ($(this).attr('data-init') && org[$(this).attr('data-init')]) {
                 org[$(this).attr('data-init')].init();
             }
         }

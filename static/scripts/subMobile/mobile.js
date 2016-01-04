@@ -75,7 +75,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                 for (var i = 0; i < earning_elements.length; i ++) {
                     earning_element = earning_elements[i];
                     if (earning) {
-                        fee_earning = fee_earning ? fee_earning : 0;
+                        fee_earning = fee_earning ? fee_earning : 0.00;
                         if(jiaxi_type === "+"){
                             $(earning_element).html(earning+'+<span class="blue">'+fee_earning+'</span>').data("val",(earning + fee_earning));
                         }else{
@@ -83,7 +83,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
                             $(earning_element).text(earning.toFixed(2)).data("val",(earning + fee_earning));
                         }
                     } else {
-                        $(earning_element).text("0.00");
+                        //$(earning_element).text("0.00");
+                        $(earning_element).html('0+<span class="blue">0.00</span>').data("val",0);
                     }
                 }
                 callback && callback();
@@ -192,9 +193,9 @@ org.ui = (function(){
                 document.body.appendChild(shield);
 
                 $('.popub-footer').on('click',function(){
-                    (typeof callback == "function") && callback();
                     alertFram.style.display = "none";
                     shield.style.display = "none";
+                    (typeof callback == "function") && callback();
                 })
             }
             document.body.onselectstart = function(){return false;};
@@ -852,7 +853,8 @@ org.buy=(function(org){
                 if(inputAmount < redPackInvestamount){
                     lib.$redpackSign.hide();//红包直抵提示
                     lib.$redpackForAmount.hide();//请输入投资金额
-                    return $(".redpack-investamount").show();//未达到红包使用门槛
+                    //lib.showAmount.text(senderAmount);//实际支付金额
+                    $(".redpack-investamount").show();//未达到红包使用门槛
                 }else{
                     lib.amountInout.attr('activity-jiaxi', 0);
                     if(redPackMethod == '*'){ //百分比红包
@@ -1086,7 +1088,7 @@ org.calculator=(function(org){
                 if(amount % 100 !== 0 || amount == ''){
                     return org.ui.alert("请输入100的整数倍")
                 }else{
-                    window.location.href = '/weixin/view/buy/' + productId + '/?amount='+ amount + '&amount_profit=' + amount_profit;
+                    //window.location.href = '/weixin/view/buy/' + productId + '/?amount='+ amount + '&amount_profit=' + amount_profit;
                 }
             })
         }
@@ -1831,7 +1833,7 @@ org.processFirst = (function(org){
                 success:function(data){
                     if(!data.validate == 'true') return org.ui.alert('认证失败，请重试');
                     org.ui.alert("实名认证成功!",function(){
-                        return window.location.href = '/weixin/sub_regist_second/';
+                        window.location.href = '/weixin/sub_regist_second/';
                     });
                 },
                 error:function(xhr){
