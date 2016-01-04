@@ -4,10 +4,10 @@ require.config({
         'jquery.form': 'lib/jquery.form',
         'jquery.validate': 'lib/jquery.validate',
         'jquery.modal': 'lib/jquery.modal.min',
+        'csrf' : 'model/csrf',
         'jquery.webuploader': 'lib/webuploader.min',
         tools: 'lib/modal.tools',
-        upload: 'upload',
-        'csrf' : 'model/csrf'
+        upload: 'upload'
     },
     shim: {
         'jquery.placeholder': ['jquery'],
@@ -18,7 +18,7 @@ require.config({
     }
 });
 
-require(['jquery', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/modal', 'tools', 'jquery.webuploader' , 'upload', 'csrf'], function ($, form ,validate, placeholder, modal, tool, webuploader) {
+require(['jquery','csrf', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/modal', 'tools', 'jquery.webuploader' , 'upload'], function ($, form ,validate, placeholder, modal, tool, webuploader) {
     //提交表单
     var qiyeFormValidate = $('#qiyeForm').validate({});
     $('.save-btn').on('click',function(){

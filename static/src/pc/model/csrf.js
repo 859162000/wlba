@@ -45,4 +45,6 @@
              }
              return result[1];
     }
+
+     return getCookie
  });
