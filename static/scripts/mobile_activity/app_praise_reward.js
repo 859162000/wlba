@@ -305,20 +305,21 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			if(xhr.err_code==0){
 				$('.renovate').removeClass('renovate_rotate');
 				$('#praise_num').val(xhr.wx_user.annual_bonus);
-				$('.gundong').html('');
-				$('.gundong').append('<div id="mycarousel" class="tab_wrap friends jcarousel-skin-tango"><ul class="user_wrap">');
-				for(var i=0; i<=xhr.follow.length; i++){
-					follow_one = xhr.follow[i];
-					$('.user_wrap').append('<li><img class="user" src="'+follow_one.headimgurl+'"/></li>');
-				}
-				$('.gundong').append('</ul></div>');
-				jQuery("#mycarousel").jcarousel({
-					wrap: 'circular',
-					scroll: 1,
-					initCallback: mycarousel_initCallback,
-					buttonNextHTML: null,
-					buttonPrevHTML: null
-				});
+				//$('.gundong').html('');
+				//$('.gundong').append('<div id="mycarousel" class="tab_wrap friends jcarousel-skin-tango"><ul class="user_wrap">');
+				//for(var i=0; i<=xhr.follow.length; i++){
+				//	follow_one = xhr.follow[i];
+				//	$('.user_wrap').append('<li><img class="user" src="'+follow_one.headimgurl+'"/></li>');
+				//}
+				//$('.gundong').append('</ul></div>');
+				//jQuery("#mycarousel").jcarousel({
+				//	wrap: 'circular',
+				//	scroll: 1,
+				//	initCallback: mycarousel_initCallback,
+				//	buttonNextHTML: null,
+				//	buttonPrevHTML: null
+				//});
+				renovate_friends(xhr.follow.length,xhr.follow);
 			}else{
 				$('.renovate').removeClass('renovate_rotate');
 				$('.friend_top span').text(xhr.err_messege);
@@ -328,6 +329,24 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	})
 	/*刷新数据结束*/
 
+	/*刷新朋友圈*/
+	function renovate_friends(friends_length,friends_img){
+		$('.gundong').html('');
+		$('.gundong').append('<div id="mycarousel" class="tab_wrap friends jcarousel-skin-tango"><ul class="user_wrap">');
+		for(var i=0; i<=friends_length; i++){
+			follow_one = friends_img[i];
+			$('.user_wrap').append('<li><img class="user" src="'+friends_img.from_headimgurl+'"/></li>');
+		}
+		$('.gundong').append('</ul></div>');
+		jQuery("#mycarousel").jcarousel({
+			wrap: 'circular',
+			scroll: 1,
+			initCallback: mycarousel_initCallback,
+			buttonNextHTML: null,
+			buttonPrevHTML: null
+		});
+	}
+	/*刷新朋友圈结束*/
 	/*同意活动规则按钮*/
 	$('.checkbox').click(function(){
 		if($(this).hasClass('checkbox_select')){
@@ -357,7 +376,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					$('.friend_top').fadeIn();
 					$('.float').text('+100').show().addClass('float_animate');
 					$('#praise_num').val(xhr.wx_user.annual_bonus);
-
+					renovate_friends(xhr.follow.length,xhr.follow);
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
@@ -375,7 +394,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 					$('.friend_top').fadeIn();
 					$('.float').text('-100').show().addClass('float_animate');
 					$('#praise_num').val(xhr.wx_user.annual_bonus);
-
+					renovate_friends(xhr.follow.length,xhr.follow);
 				}else{
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
