@@ -274,6 +274,9 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		if(user_num!=0){
 			$('.friends,.jcarousel-skin-tango').show();
 		}
+		if(user_num<=6){
+			$('#mycarousel-prev,#mycarousel-next').hide();
+		}
 		/*朋友个数结束*/
 	})
 	/*滚动图结束*/
