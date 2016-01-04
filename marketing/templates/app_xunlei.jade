@@ -7,6 +7,44 @@ html(style="background: #f6f6f6")
     link(href="/static/styles/mobile_activity/app_xunlei.css?v=2022251444", rel="stylesheet")
     - csrf_token
   body
+    .xunmeng
+      .xunjiang-zong
+        span
+        h2 如何领取1年会员
+        .xunjiang
+          .xushu
+            .xushu-left
+              p 注册网利宝
+              p 账号
+            .xushu-right
+              p 送50元红包
+              p 28888体验金
+          .xushu
+            .xushu-left
+              p 注册网利宝
+              p 账号
+            .xushu-right
+              p 送50元红包
+              p 28888体验金
+          .xushu
+            .xushu-left
+              p 注册网利宝
+              p 账号
+            .xushu-right
+              p 送50元红包
+              p 28888体验金
+    .xunmeng2
+      .xunmeng2-top
+        p 迅雷会员&网利宝
+      .xunmeng2-moidle
+        p 您已成功注册网利宝
+        p 并且与迅雷账号绑定成功
+      .xunmeng2-moidle2
+        p 迅雷账号：xxx
+        p 网利宝账号：xxx
+      .xunmeng2-bottom
+        a(href='javascript:void(0);').xunleiwangli 前往网利宝
+        p 迅雷会员奖励将直接发送到此迅雷账号上
     .banner
       img(src='/static/imgs/mobile_activity/app_xunlei/xunleibanner.jpg')
       a(href='javascript:void(0);').xinlei-rule 如何领取1年会员
@@ -30,9 +68,10 @@ html(style="background: #f6f6f6")
         p.xunleipeople
           |已有网利宝账号？
           a(href='/weixin/login/') 请登录
-    .main
+    .main.mian1
       .xunlei-main
         p 活动规则
+          span &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       ul
         li 1. 活动时间；
         li 2. 手机号为网利宝唯一账户，本期迅雷活动仅限于迅雷渠道新注册用户参与；
@@ -49,14 +88,17 @@ html(style="background: #f6f6f6")
         mixin li(imgName, title, bodyTxt1, bodyTxt2)
           li
             span(class=imgName)
-            h4=title
-            p=bodyTxt1
-            p=bodyTxt2
+            h4.title1=title
+            p.bodyTxt5=bodyTxt1
+            p.bodyTxt5=bodyTxt2
 
 
         +li('trust', '信赖', 'IDG资本投资A轮融资', '鸿利光电投资B轮融资')
         +li('safe', '安全', '第三方资金托管', '阳光保险承保资金安全')
         +li('authority', '权威', '华尔街精英金融团队', 'IT数据风控系统')
         +li('profit', '高收益', '30余倍银行活期收益', '100元起投')
-
+    .erwei
+      img(src='/static/imgs/mobile_activity/app_xunlei/xunerwei.jpg')
+      p 立即关注网利宝微信服务号
+      p 抢标投标不用愁，快来扫一扫！
     script(data-init='xunlei', src="/static/scripts/mobile_activity/app_xunlei.js?v=201511061")
