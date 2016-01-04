@@ -1236,11 +1236,12 @@ class WeixinAnnualBonusView(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         #self.openid = "333222111"
+        #self.request.session['WECHAT_OPEN_ID'] = None
         wxid = self.request.GET.get('wxid')
-        if wxid:
+        if wxid and wxid!='undefined':
             self.openid = wxid
-        if not self.openid:
-            self.openid = self.request.session.get('WECHAT_OPEN_ID', None)
+            self.nick_name = wxid
+            self.head_img = 'http://wx.qlogo.cn/mmopen/O6tvnibicEYV8ibOLhhDAWK9X4FwBlGJzYoBNAlp2nfoDGC74NXFTEP7j4Qm2Bjx7G3STzJ3cRqxbJFjFiaf19knwRGxnOIfZwx8/0'
         if not self.openid:
             #super(WeixinAnnualBonusView, self).getOpenid(request, *args, **kwargs)
             return self.getOpenid(request, *args, **kwargs)
@@ -1263,6 +1264,8 @@ class WeixinAnnualBonusView(TemplateView):
         self.action = self.request.GET.get('act', 'view')
         if self.action=='view':
             return super(WeixinAnnualBonusView, self).dispatch(request, *args, **kwargs)
+        elif self.action=='query' :
+            return self.query_bonus()
         elif self.action=='apply' :
             return self.apply_bonus()
         elif self.action=='share' :
@@ -1320,7 +1323,8 @@ class WeixinAnnualBonusView(TemplateView):
 #               'user_id' : user_profile.user.id if user_profile else None,
                 'user' : user_profile.user if user_profile else None,
                 'is_new' : is_new,
-                'max_annual_bonus' : 20000 if is_new else 8000,
+                'min_annual_bonus' : 28888 if is_new else 1000,
+                'max_annual_bonus' : 36888 if is_new else 8000,
             })
         except Exception, ex :
             logger.Exception("[%s] [%s] : [%s]" % (self.to_openid, phone, ex))
@@ -1356,15 +1360,16 @@ class WeixinAnnualBonusView(TemplateView):
                 wx_bonus.is_max = False
                 if vote_type:
                     wx_bonus.good_vote += 1
-                    wx_bonus.annual_bonus += 100
+                    wx_bonus.annual_bonus += 500
                     if wx_bonus.annual_bonus > wx_bonus.max_annual_bonus:
                         wx_bonus.annual_bonus = wx_bonus.max_annual_bonus
                         wx_bonus.is_max = True
                 else:
                     wx_bonus.bad_vode += 1
-                    wx_bonus.annual_bonus -= 100
-                    if wx_bonus.annual_bonus < wx_bonus.min_annual_bonus:
-                        wx_bonus.annual_bonus = wx_bonus.min_annual_bonus
+                    if not wx_bonus.is_max:
+                        wx_bonus.annual_bonus -= 500
+                        if wx_bonus.annual_bonus < wx_bonus.min_annual_bonus:
+                            wx_bonus.annual_bonus = wx_bonus.min_annual_bonus
                 wx_bonus.update_time = timezone.now()
 
                 wx_vote = WeixinAnnulBonusVote.objects.create(
@@ -1427,6 +1432,27 @@ class WeixinAnnualBonusView(TemplateView):
             rep = { 'err_code':0, 'err_messege':u'年终奖领取成功', 'wx_user':wx_bonus, }
             return HttpResponse(json.dumps(rep), content_type='application/json')
 
+    def query_bonus(self):
+        if not self.to_openid:
+            rep = { 'err_code':501, 'err_messege':u'缺少参数' }
+            return HttpResponse(json.dumps(rep), content_type='application/json')
+
+        wx_bonus = WeixinAnnualBonus.objects.filter(openid=self.to_openid).first()
+        wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
+
+        wx_votes = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid).order_by('-create_time')
+        vote_list = [
+            {
+                "from_nickname": vote.from_nickname,
+                "from_headimgurl": vote.from_headimgurl,
+                "is_good_vote": vote.is_good_vote,
+                "create_time": str(vote.create_time),
+            } for vote in wx_votes
+        ]
+
+        rep = { 'err_code':0, 'err_messege':'', 'wx_user':wx_bonus, 'follow':vote_list }
+        return HttpResponse(json.dumps(rep), content_type='application/json')
+
     def share_bonus(self):
         pass
 
@@ -1446,16 +1472,14 @@ class WeixinAnnualBonusView(TemplateView):
         self.openid = self.request.session.get('WECHAT_OPEN_ID', None)
         if not self.openid:
             self.openid = self.request.GET.get('openid', None)
-            if self.openid:
-                self.request.session['WECHAT_OPEN_ID'] = self.openid
-            else:
+            if not self.openid:
                 redirect_url = reverse('weixin_authorize_code')+'?state=%s&redirect_uri=%s' % (account_id, redirect_uri)
                 return HttpResponseRedirect(redirect_url)
 
         w_user = WeixinUser.objects.filter(openid=self.openid).first()
         if not w_user:
-            #TODO:
-            pass
+            redirect_url = reverse('weixin_authorize_code')+'?state=%s&redirect_uri=%s' % (account_id, redirect_uri)
+            return HttpResponseRedirect(redirect_url)
 
         if not w_user.nickname or not w_user.headimgurl :
             res = requests.request(
@@ -1467,8 +1491,11 @@ class WeixinAnnualBonusView(TemplateView):
                 redirect_url = reverse('weixin_authorize_code')+'?state=%s&auth=1&redirect_uri=%s' % (account_id, redirect_uri)
                 return HttpResponseRedirect(redirect_url)
 
+        self.request.session['WECHAT_OPEN_ID'] = self.openid
+        self.request.session['WECHAT_NICKNAME'] = w_user.nickname
+        self.request.session['WECHAT_HEADIMG'] = w_user.headimgurl
+
         self.nick_name = w_user.nickname
         self.head_img = w_user.headimgurl
 
         return self.dispatch(request, *args, **kwargs)
-
