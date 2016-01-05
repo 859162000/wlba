@@ -1609,6 +1609,71 @@ org.processSecond = (function (org) {
         init: lib.init
     }
 })(org);
+
+
+org.password_operation = (function (org) {
+    var lib = {
+        $input: $('input[name=password]'),
+        $digt : $('.six-digt-password'),
+        $blue : $('.blue'),
+        blue_width : Math.floor($('.blue').width()),
+        init: function () {
+            lib._listen()
+        },
+        _listen: function(){
+            var _self = this;
+
+            _self.$digt.on('click', function(e){
+                e.stopPropagation();
+                _self.$input.focus()
+                _self.decide()
+            })
+
+            _self.$input.on('input', function(){
+                $('.circle').hide()
+                _self.decide()
+            })
+           $(document).on('click', function(){
+               _self.$input.blur();
+               _self.$digt.find('i').removeClass('active')
+               _self.$blue.hide()
+               _self.$blue.css('visibility', 'hidden')
+           })
+        },
+        decide: function(){
+            var _self = this;
+            var value_num = _self.$input.val().length;
+
+            for(var i = 0; i< value_num; i++){
+                $('.six-digt-password i ').eq(i).find('.circle').show()
+            }
+            _self.move_blue(value_num)
+
+        },
+        move_blue: function(index){
+            var _self  = this;
+            _self.$blue.css('visibility', 'visible')
+            var move_space = _self.blue_width * index;
+
+            if(index == 6){
+                move_space = _self.blue_width * 5 ;
+            }
+            _self.$blue.on('webkitAnimationEnd', function(){
+                _self.$blue.animate({
+                    'translate3d': move_space + "px, 0 , 0"
+                },100)
+            })
+
+            if(index ==6) {
+                return _self.$digt.find('i').removeClass('active')
+            }
+            _self.$digt.find('i').eq(index).addClass('active').siblings('i').removeClass('active')
+        }
+    }
+    return {
+        init: lib.init
+    }
+})(org);
 ;
 (function (org) {
     $.each($('script'), function () {
