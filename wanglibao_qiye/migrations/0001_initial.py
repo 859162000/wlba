@@ -25,6 +25,7 @@ class Migration(SchemaMigration):
             ('modify_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('created_time', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
             ('description', self.gf('django.db.models.fields.TextField')(max_length=255, null=True, blank=True)),
+            ('status', self.gf('django.db.models.fields.CharField')(default=u'\u5f85\u5ba1\u6838', max_length=10)),
         ))
         db.send_create_signal(u'wanglibao_qiye', ['EnterpriseUserProfile'])
 
@@ -87,6 +88,7 @@ class Migration(SchemaMigration):
             'description': ('django.db.models.fields.TextField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'modify_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'registration_cert': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
+            'status': ('django.db.models.fields.CharField', [], {'default': "u'\\u5f85\\u5ba1\\u6838'", 'max_length': '10'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'primary_key': 'True'})
         }
     }

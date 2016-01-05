@@ -6,6 +6,17 @@ User = get_user_model()
 
 
 class EnterpriseUserProfile(models.Model):
+    """
+    企业用户信息
+    """
+
+    STATUS = (
+        (u'待审核', u'待审核'),
+        (u'审核中', u'审核中'),
+        (u'审核失败', u'审核失败'),
+        (u'审核通过', u'审核通过'),
+    )
+
     user = models.ForeignKey(User, primary_key=True)
     company_name = models.CharField(u'公司名称', max_length=30)
     business_license = models.ImageField(u'营业执照', upload_to='enterprise/images')
@@ -21,3 +32,4 @@ class EnterpriseUserProfile(models.Model):
     modify_time = models.DateTimeField(u'最近修改时间', auto_now_add=True)
     created_time = models.DateTimeField(u'创建时间', auto_now=True)
     description = models.TextField(u'创建时间', max_length=255, null=True, blank=True)
+    status = models.CharField(u'审核状态', max_length=10, default=u'待审核', choices=STATUS)
