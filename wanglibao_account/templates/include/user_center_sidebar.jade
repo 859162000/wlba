@@ -14,24 +14,35 @@ mixin sidebar-item(name, link, target, mark)
       if mark == '1'
           span.newGif
 
-ul.sidebar
-  +sidebar-item('账户总览', '/accounts/home/')  {{user.wanglibaouserprofile.utype}}
-  +sidebar-item('充值', '/pay/banks/')
-  +sidebar-item('理财券', '/accounts/coupon/unused/')
-  //+sidebar-item('彩票', '/accounts/caipiao')
-  +sidebar-item('提现', '/pay/withdraw/')
+if user.wanglibaouserprofile.utype == '3'
+    ul.sidebar
+        +sidebar-item('账户总览', '/accounts/home/')
+        +sidebar-item('充值', '/pay/banks/')
+        +sidebar-item('提现', '/pay/withdraw/')
+        +sidebar-item('交易记录', '/accounts/transaction/p2p/')
+        +sidebar-item('银行卡', '/accounts/bankcard/')
+        +sidebar-item('站内信', '/accounts/message/')
+        +sidebar-item('资料修改', '/qiye/info/')
+        +sidebar-item('修改密码', '/accounts/setting/')
+else
+    ul.sidebar
+      +sidebar-item('账户总览', '/accounts/home/')
+      +sidebar-item('充值', '/pay/banks/')
+      +sidebar-item('理财券', '/accounts/coupon/unused/')
+      //+sidebar-item('彩票', '/accounts/caipiao')
+      +sidebar-item('提现', '/pay/withdraw/')
 
-  +sidebar-item('交易记录', '/accounts/transaction/p2p/')
-  +sidebar-item('银行卡', '/accounts/bankcard/')
-  +sidebar-item('自动投标', '/accounts/auto_tender/', '_self', '1')
+      +sidebar-item('交易记录', '/accounts/transaction/p2p/')
+      +sidebar-item('银行卡', '/accounts/bankcard/')
+      +sidebar-item('自动投标', '/accounts/auto_tender/', '_self', '1')
 
-ul.sidebar
-  +sidebar-item('全民淘金', '/accounts/invite/')
-  +sidebar-item('实名认证', '/accounts/id_verify/')
-  +sidebar-item('站内信', '/accounts/message/')
-  +sidebar-item('我的收藏', '/accounts/favorite/')
-  +sidebar-item('资料修改', '/qiye/info/')
-  +sidebar-item('修改密码', '/accounts/setting/')
-  +sidebar-item('激活迅雷会员', 'http://act.vip.xunlei.com/vip/2014/xlhyk/', '_blank')
-  +sidebar-item('收货地址', '/accounts/address/')
+    ul.sidebar
+      +sidebar-item('全民淘金', '/accounts/invite/')
+      +sidebar-item('实名认证', '/accounts/id_verify/')
+      +sidebar-item('站内信', '/accounts/message/')
+      +sidebar-item('我的收藏', '/accounts/favorite/')
+      +sidebar-item('资料修改', '/qiye/info/')
+      +sidebar-item('修改密码', '/accounts/setting/')
+      +sidebar-item('激活迅雷会员', 'http://act.vip.xunlei.com/vip/2014/xlhyk/', '_blank')
+      +sidebar-item('收货地址', '/accounts/address/')
 
