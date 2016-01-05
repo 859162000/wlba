@@ -219,29 +219,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 })();
 ;(function(org) {
 
-	window.onload = function() {
-		$('.fix_wrap').hide();
-		var user_num = $('.swiper-slide').length;
-		if(user_num>6){
-			var swiper = new Swiper('.swiper-container', {
-				slidesPerView: 6,
-				nextButton: '.swiper-button-next',
-				prevButton: '.swiper-button-prev',
-				loop: true
-   			});
-		}else{
-			$('.swiper-slide').addClass('friends_length');
-		}
-
-		/*朋友个数*/
-
-		if(user_num!=0){
-			$('.friends,.gundong').show();
-		}
-		/*朋友个数结束*/
-	};
-	var is_myself;
-
 	var url_search = window.location.search;
 	var searchArray = url_search.substring(1).split("&");
 	var wxid;
@@ -256,9 +233,34 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		}
 	}
 
+	$.ajax({
+		url: '/weixin_activity/weixin/bonus/?act=query&uid='+uid+'&wxid='+wxid,
+		type: "GET",
+	}).done(function (xhr) {
+		if(xhr.err_code==0){
+			renovate_friends(xhr.follow.length,xhr.follow);
+		}else{
+			//$('.friend_top span').text(xhr.err_messege);
+			//$('.friend_top').fadeIn();
+		}
+	});
+
 	if(uid!=undefined){
 		$('.shine_wrap').show();
 	}
+
+	window.onload = function() {
+		$('.fix_wrap').hide();
+		var user_num = $('.swiper-slide').length;
+
+		/*朋友个数*/
+
+		if(user_num!=0){
+			$('.friends,.gundong').show();
+		}
+		/*朋友个数结束*/
+	};
+
 	var is_myself = false;
 
 	/*分享*/
