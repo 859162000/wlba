@@ -140,7 +140,6 @@ def verify_id(name, id_number):
 def generate_contract(equity, template_name=None, equities=None):
     """
     Generate the contract file for the equity.
-
     :param equity: Equity param, which links the product and user
     :return: The string representation of the contract
     """
@@ -165,7 +164,6 @@ def generate_contract(equity, template_name=None, equities=None):
 def generate_contract_preview(productAmortizations, product, template_name=None):
     """
     Generate the contract file for the equity.
-
     :param equity: Equity param, which links the product and user
     :return: The string representation of the contract
     """
@@ -342,7 +340,6 @@ def str_to_utc(time_str):
 
 def str_to_float(time_str):
     """
-
     :param time_str:
     :return:
     """
