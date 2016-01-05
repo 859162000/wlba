@@ -4,7 +4,8 @@ html(style="background: #3a2741")
     head
         title 网利宝
         include include/app_head
-        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=010411", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/swiper.min.css", rel="stylesheet")
+        link(href="/static/styles/mobile_activity/app_praise_reward.css?v=010501", rel="stylesheet")
         - csrf_token
     body
         .fix_wrap(style='width: 100%;height: 100%;background: #3a2741;position: fixed;left: 0;top: 0;z-index: 9999')
@@ -48,17 +49,13 @@ html(style="background: #3a2741")
                         span.rule 活动规则
                     .line.friends 以下好友肯定了TA
                     .gundong
-                        #mycarousel.tab_wrap.friends.jcarousel-skin-tango
-                            ul.user_wrap
+                        .swiper-container
+                            .swiper-wrapper
                                 for p2p in follow
-                                    li
+                                    .swiper-slide
                                         img.user(src="{{p2p.from_headimgurl}}")
-                            .jcarousel-scroll
-                                form(action="")
-                                    a#mycarousel-prev(href="#")
-                                        img.prev_button(src="/static/imgs/mobile_activity/app_praise_reward/prev.png")
-                                    a#mycarousel-next(href="#")
-                                        img.next_button(src="/static/imgs/mobile_activity/app_praise_reward/next.png")
+                        img.swiper-button-next(src="/static/imgs/mobile_activity/app_praise_reward/next.png")
+                        img.swiper-button-prev(src="/static/imgs/mobile_activity/app_praise_reward/prev.png")
                     if is_myself
                         .step_me
                             .line_bottom
@@ -123,5 +120,5 @@ html(style="background: #3a2741")
             .share_info.share_body {{share_body}}
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/jquery.min.js')
-        script(src='/static/js/lib/jquery.jcarousel.min.js')
-        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=010414")
+        script(src='/static/js/lib/swiper.min.js')
+        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=010501")

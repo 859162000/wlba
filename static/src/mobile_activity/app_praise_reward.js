@@ -24,40 +24,20 @@
 	}
 
 	/*滚动图*/
-	function mycarousel_initCallback(carousel) {
-		jQuery('.jcarousel-control a').bind('click', function() {
-			carousel.scroll(jQuery.jcarousel.intval(jQuery(this).text()));
-			return false;
-		});
-		jQuery('.jcarousel-scroll select').bind('change', function() {
-			carousel.options.scroll = jQuery.jcarousel.intval(this.options[this.selectedIndex].value);
-			return false;
-		});
-		jQuery('#mycarousel-next').bind('click', function() {
-			carousel.next();
-			return false;
-		});
-		jQuery('#mycarousel-prev').bind('click', function() {
-			carousel.prev();
-			return false;
-		});
-	};
-	jQuery(document).ready(function() {
-		jQuery("#mycarousel").jcarousel({
-		wrap: 'circular',
-		scroll: 1,
-		initCallback: mycarousel_initCallback,
-		buttonNextHTML: null,
-		buttonPrevHTML: null
-		});
 
+
+	jQuery(document).ready(function() {
+		var swiper = new Swiper('.swiper-container', {
+			pagination: '.swiper-pagination',
+			slidesPerView: 6,
+			nextButton: '.swiper-button-next',
+			prevButton: '.swiper-button-prev',
+			loop: true
+   		});
 		/*朋友个数*/
-		var user_num = $('.user_wrap li').length;
+		var user_num = $('.swiper-slide').length;
 		if(user_num!=0){
-			$('.friends,.jcarousel-skin-tango').show();
-		}
-		if(user_num<=6){
-			$('#mycarousel-prev,#mycarousel-next').hide();
+			$('.friends,.gundong').show();
 		}
 		/*朋友个数结束*/
 
@@ -86,20 +66,6 @@
 			if(xhr.err_code==0){
 				$('.renovate').removeClass('renovate_rotate');
 				$('#praise_num').val(xhr.wx_user.annual_bonus);
-				//$('.gundong').html('');
-				//$('.gundong').append('<div id="mycarousel" class="tab_wrap friends jcarousel-skin-tango"><ul class="user_wrap">');
-				//for(var i=0; i<=xhr.follow.length; i++){
-				//	follow_one = xhr.follow[i];
-				//	$('.user_wrap').append('<li><img class="user" src="'+follow_one.headimgurl+'"/></li>');
-				//}
-				//$('.gundong').append('</ul></div>');
-				//jQuery("#mycarousel").jcarousel({
-				//	wrap: 'circular',
-				//	scroll: 1,
-				//	initCallback: mycarousel_initCallback,
-				//	buttonNextHTML: null,
-				//	buttonPrevHTML: null
-				//});
 				renovate_friends(xhr.follow.length,xhr.follow);
 			}else{
 				$('.renovate').removeClass('renovate_rotate');
@@ -113,19 +79,20 @@
 	/*刷新朋友圈*/
 	function renovate_friends(friends_length,friends_img){
 		$('.gundong').html('');
-		$('.gundong').append('<div id="mycarousel" class="tab_wrap friends jcarousel-skin-tango"><ul class="user_wrap">');
+		$('.gundong').append('<div class="swiper-container"><div class="swiper-wrapper">');
 		for(var i=0; i<=friends_length; i++){
 			follow_one = friends_img[i];
-			$('.user_wrap').append('<li><img class="user" src="'+friends_img.from_headimgurl+'"/></li>');
+			$('.swiper-wrapper').append('<div class="swiper-slide"><img class="user" src="'+follow_one.from_headimgurl+'"/></div>');
 		}
-		$('.gundong').append('</ul></div>');
-		jQuery("#mycarousel").jcarousel({
-			wrap: 'circular',
-			scroll: 1,
-			initCallback: mycarousel_initCallback,
-			buttonNextHTML: null,
-			buttonPrevHTML: null
-		});
+		$('.gundong').append('</div></div>');
+		var swiper = new Swiper('.swiper-container', {
+			pagination: '.swiper-pagination',
+			slidesPerView: 6,
+			nextButton: '.swiper-button-next',
+			prevButton: '.swiper-button-prev',
+			loop: true
+   		});
+		$('.friends,.gundong').show();
 	}
 	/*刷新朋友圈结束*/
 	/*同意活动规则按钮*/
