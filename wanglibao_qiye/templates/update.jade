@@ -43,22 +43,22 @@ block main
                     tr
                         td.td-left 授权负责人
                         td
-                            input(type='text', name="certigier_name", placeholder="请输入负责人", autocomplete='off', class="required {messages:{required:'请输入负责人'}}" )
+                            input(type='text', name="certigier_name", placeholder="请输入负责人", autocomplete='off', class="required {messages:{required:'请输入负责人'}}", value="{{data.certigier_name}}")
                     tr
                         td.td-left 负责人电话
                         td
-                            input(type='text', name="certigier_phone", placeholder="请输入负责人电话", autocomplete='off', class="required isMobileTel {messages:{required:'请输入负责人电话'}}" )
+                            input(type='text', name="certigier_phone", placeholder="请输入负责人电话", autocomplete='off', class="required isMobileTel {messages:{required:'请输入负责人电话'}}", value="{{data.certigier_phone}}" )
                     tr
                         td.td-left 手机验证码
                         td
-                            input(type='text', name="validate_code", placeholder="请输入验证码", autocomplete='off', class="required {messages:{required:'请输入验证码'}}" )
+                            input(type='text', name="validate_code", placeholder="请输入验证码", autocomplete='off', class="required {messages:{required:'请输入验证码'}}")
                             button.ispan4-omega#button-get-code-btn.button-orange.button-large(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
                             .row.voice.void.hidden
                                 .span12-omega
                     tr
                         td.td-left 公司地址
                         td
-                            input(type='text', name="company_address", placeholder="请输入公司地址", autocomplete='off', class="required {messages:{required:'请输入公司地址'}}" )
+                            input(type='text', name="company_address", placeholder="请输入公司地址", autocomplete='off', class="required {messages:{required:'请输入公司地址'}}" , value="{{data.company_address}}")
 
             .qiye-h.qiye-bank-info 提现银行账户信息
             table
@@ -66,11 +66,11 @@ block main
                     tr
                         td.td-left 公司账户名称
                         td
-                            input(type='text', name="company_account_name", placeholder="请输入账户名称", autocomplete='off', class="required {messages:{required:'请输入账户名称'}}" )
+                            input(type='text', name="company_account_name", placeholder="请输入账户名称", autocomplete='off', class="required {messages:{required:'请输入账户名称'}}", value="{{data.company_account_name}}")
                     tr
                         td.td-left 公司账户账号
                         td
-                            input(type='text', name="company_account", placeholder="请输入帐号", autocomplete='off', class="required isNumber {messages:{required:'请输入帐号'}}" )
+                            input(type='text', name="company_account", placeholder="请输入帐号", autocomplete='off', class="required isNumber {messages:{required:'请输入帐号'}}", value="{{data.company_account}}" )
                     tr
                         td.td-left 公司开户行
                         td
@@ -79,11 +79,18 @@ block main
                     tr
                         td.td-left 开户行支行
                         td
-                            input(type='text', name="bank_branch_address", placeholder="请输入开户支行名称", autocomplete='off', class="required {messages:{required:'请输入开户支行名称'}}" )
+                            input(type='text', name="bank_branch_address", placeholder="请输入开户支行名称", autocomplete='off', class="required {messages:{required:'请输入开户支行名称'}}", value="{{data.bank_branch_address}}" )
+                    tr
+                        td.td-left 所属银行
+                        td
+                            select(name='bank',class="required {messages:{required:'请选择所属银行'}}")
+                                option(value='') 请选择银行卡
+                                for bank in banks
+                                    option(value='{{bank.id}}') {{bank.name}}
                     tr
                         td.td-left 交易密码
                         td
-                            input(type='text', name="trade_pwd", placeholder="请输入交易密码", autocomplete='off', class="required isNumber {maxlength:6,messages:{required:'请输入交易密码',maxlength:'不能超过{0}个字符'}}" )
+                            input(type='text', name="trade_pwd", placeholder="请输入交易密码", autocomplete='off', class="required isNumber {maxlength:6,messages:{required:'请输入交易密码',maxlength:'不能超过{0}个字符'}}", value="{{data.trade_pwd}}")
             .qiye-btns
                 if data.status == '审核通过'
                     a(href='javascript:void(0)').save-btn 保存
