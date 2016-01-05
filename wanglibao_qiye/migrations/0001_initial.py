@@ -26,7 +26,7 @@ class Migration(SchemaMigration):
             ('created_time', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
             ('description', self.gf('django.db.models.fields.TextField')(max_length=255, null=True, blank=True)),
             ('status', self.gf('django.db.models.fields.CharField')(default=u'\u5f85\u5ba1\u6838', max_length=10)),
-            ('bank', self.gf('django.db.models.fields.CharField')(max_length=20)),
+            ('bank', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['wanglibao_pay.Bank'])),
         ))
         db.send_create_signal(u'wanglibao_qiye', ['EnterpriseUserProfile'])
 
@@ -73,9 +73,29 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
+        u'wanglibao_pay.bank': {
+            'Meta': {'ordering': "('-sort_order',)", 'object_name': 'Bank'},
+            'channel': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
+            'code': ('django.db.models.fields.CharField', [], {'max_length': '16'}),
+            'gate_id': ('django.db.models.fields.CharField', [], {'max_length': '8'}),
+            'have_company_channel': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'huifu_bind_code': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '20', 'blank': 'True'}),
+            'huifu_bind_limit': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '500', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'kuai_code': ('django.db.models.fields.CharField', [], {'max_length': '16', 'null': 'True', 'blank': 'True'}),
+            'kuai_limit': ('django.db.models.fields.CharField', [], {'max_length': '500', 'blank': 'True'}),
+            'limit': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'logo': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
+            'pc_channel': ('django.db.models.fields.CharField', [], {'default': "'huifu'", 'max_length': '20'}),
+            'sort_order': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'withdraw_limit': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '500', 'blank': 'True'}),
+            'yee_bind_code': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '20', 'blank': 'True'}),
+            'yee_bind_limit': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '500', 'blank': 'True'})
+        },
         u'wanglibao_qiye.enterpriseuserprofile': {
             'Meta': {'object_name': 'EnterpriseUserProfile'},
-            'bank': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
+            'bank': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['wanglibao_pay.Bank']"}),
             'bank_account_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'bank_branch_address': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'bank_card_no': ('django.db.models.fields.CharField', [], {'max_length': '64'}),

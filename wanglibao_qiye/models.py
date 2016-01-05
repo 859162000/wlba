@@ -20,19 +20,6 @@ class EnterpriseUserProfile(models.Model):
         (u'审核通过', u'审核通过'),
     )
 
-    BANK = (
-        (u'中国银行', u'中国银行'),
-        (u'交通银行', u'交通银行'),
-        (u'中国建设银行', u'中国建设银行'),
-        (u'光大银行', u'光大银行'),
-        (u'民生银行', u'民生银行'),
-        (u'招商银行', u'招商银行'),
-        (u'工商银行', u'工商银行'),
-        (u'深发银行', u'深发银行'),
-        (u'上海浦东发展银行', u'上海浦东发展银行'),
-        (u'中国农业银行', u'中国农业银行'),
-    )
-
     user = models.ForeignKey(User, primary_key=True)
     company_name = models.CharField(u'公司名称', max_length=30)
     business_license = models.ImageField(u'营业执照', upload_to='enterprise/images')
@@ -49,16 +36,15 @@ class EnterpriseUserProfile(models.Model):
     created_time = models.DateTimeField(u'创建时间', auto_now=True)
     description = models.TextField(u'创建时间', max_length=255, null=True, blank=True)
     status = models.CharField(u'审核状态', max_length=10, default=u'待审核', choices=STATUS)
-    bank = models.CharField(u'所属银行', max_length=20)
+    bank = models.ForeignKey(Bank, verbose_name=u'所属银行')
 
     def save(self, *args, **kwargs):
-        user_profile = self.user.wanglibaoprofile
+        user_profile = self.user.wanglibaouserprofile
         if self.status == u'审核通过':
             user_profile.id_is_valid = True
             user_profile.id_valid_time = timezone.now()
-            bank = Bank.objects.get(name=self.bank)
             card = Card()
-            card.bank = bank
+            card.bank = self.bank
             card.no = self.bank_card_no
             card.user = self.user
             card.is_default = True

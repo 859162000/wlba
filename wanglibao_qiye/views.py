@@ -7,10 +7,15 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.views.generic import TemplateView
 from file_storage.storages import AliOSSStorageForCover
+from wanglibao_pay.models import Bank
 from .models import EnterpriseUserProfile
 from .forms import EnterpriseUserProfileForm
 
 logger = logging.getLogger(__name__)
+
+
+def get_have_company_channel_banks():
+    return Bank.objects.filter(have_company_channel=True)
 
 
 class QiYeIndex(TemplateView):
@@ -22,7 +27,7 @@ class QiYeInfo(TemplateView):
 
     def get_context_data(self, **kwargs):
         return {
-            'banks': (i for i, j in EnterpriseUserProfile.BANK),
+            'banks': get_have_company_channel_banks(),
         }
 
 
@@ -107,7 +112,7 @@ class GetEnterpriseUserProfileApi(APIView):
             except EnterpriseUserProfile.DoesNotExist:
                 response_data = {
                     'data': None,
-                    'message': u'企业用户信息为完善',
+                    'message': u'企业用户信息未完善',
                     'ret_code': 10001
                 }
         else:
@@ -184,7 +189,7 @@ class EnterpriseProfileEditView(TemplateView):
         if user.wanglibaouserprofile.utype == '3':
             try:
                 e_profile = EnterpriseUserProfile.objects.get(user=user)
-                e_profile.banks = [i for i, j in EnterpriseUserProfile.BANK]
+                e_profile.banks = get_have_company_channel_banks()
                 response_data = {
                     'data': e_profile,
                     'message': 'success',
@@ -193,7 +198,7 @@ class EnterpriseProfileEditView(TemplateView):
             except EnterpriseUserProfile.DoesNotExist:
                 response_data = {
                     'data': None,
-                    'message': u'企业用户信息为完善',
+                    'message': u'企业用户信息未完善',
                     'ret_code': 10001
                 }
         else:
@@ -263,6 +268,7 @@ class EnterpriseProfileUpdateApi(APIView):
                     e_profile.deposit_bank_city = form.cleaned_data['deposit_bank_city']
                     e_profile.bank_branch_address = form.cleaned_data['bank_branch_address']
                     e_profile.description = u'审核中'
+                    e_profile.status = u'待审核'
                     e_profile.save()
 
                     user.wanglibaouserprofile.trade_pwd = form.cleaned_data['trade_code']

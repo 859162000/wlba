@@ -3,6 +3,7 @@
 from django import forms
 from .utils import detect_phone_for_identifier
 from wanglibao_sms.utils import validate_validation_code
+from wanglibao_pay.models import Bank
 from .models import EnterpriseUserProfile
 
 
@@ -122,8 +123,10 @@ class EnterpriseUserProfileForm(forms.Form):
         return self.cleaned_data
 
     def clean_bank(self):
-        bank = self.cleaned_data.get('bank', '').strip()
-        if bank not in [i for i, j in EnterpriseUserProfile.BANK]:
+        bank_id = self.cleaned_data.get('bank', '').strip()
+        try:
+            bank = Bank.objects.get(pk=bank_id)
+        except Bank.DoesNotExist:
             raise forms.ValidationError(
                 u'无效所属银行',
                 code='10003',
