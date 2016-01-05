@@ -576,11 +576,32 @@ def bind_pay_dynnum(request):
     else:
         res = {"ret_code": 20004, "message": "请对银行绑定支付渠道"}
 
-    # Modify by hb on 2015-12-24 : 如果ret_code返回非0, 还需进一步判断card是否有绑定记录, 因为有可能出现充值失败但绑卡成功的情况
+    # # Modify by hb on 2015-12-24 : 如果ret_code返回非0, 还需进一步判断card是否有绑定记录, 因为有可能出现充值失败但绑卡成功的情况
+    # try:
+    #     bind_flag = 0
+    #     if (card.bank.channel == 'kuaipay' and res.get('ret_code') == 0) or (
+    #                     card.bank.channel == 'yeepay' and res.get('ret_code') == 22000):
+    #         bind_flag = 1;
+    #     else:
+    #         card = Card.objects.filter(user=user, id=card.id).first()
+    #         if card and (card.is_bind_huifu or card.is_bind_kuai or card.is_bind_yee):
+    #             logger.error('=20151224= deposit failed but binding success: [%s] [%s]' % (card.user, card.no))
+    #             bind_flag = 1;
+    #     if bind_flag == 1:
+    #         CoopRegister(request).process_for_binding_card(user)
+    # except Exception, ex:
+    #     logger.exception('=20151224= bind_card_callback_failed: [%s] [%s] [%s]' % (user, card_no, ex))
+    process_for_bind_card(user, card, res, request)
+
+    return res
+
+
+def process_for_bind_card(user, card, req_res, request):
+        # Modify by hb on 2015-12-24 : 如果ret_code返回非0, 还需进一步判断card是否有绑定记录, 因为有可能出现充值失败但绑卡成功的情况
     try:
-        bind_flag = 0;
-        if (card.bank.channel == 'kuaipay' and res.get('ret_code') == 0) or (
-                        card.bank.channel == 'yeepay' and res.get('ret_code') == 22000):
+        bind_flag = 0
+        if (card.bank.channel == 'kuaipay' and req_res.get('ret_code') == 0) or (
+                        card.bank.channel == 'yeepay' and req_res.get('ret_code') == 22000):
             bind_flag = 1;
         else:
             card = Card.objects.filter(user=user, id=card.id).first()
@@ -590,9 +611,7 @@ def bind_pay_dynnum(request):
         if bind_flag == 1:
             CoopRegister(request).process_for_binding_card(user)
     except Exception, ex:
-        logger.exception('=20151224= bind_card_callback_failed: [%s] [%s] [%s]' % (user, card_no, ex))
-
-    return res
+        logger.exception('=20151224= bind_card_callback_failed: [%s] [%s] [%s]' % (user, card.no, ex))
 
 
 def yee_callback(request):

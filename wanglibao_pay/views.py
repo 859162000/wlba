@@ -39,6 +39,7 @@ from wanglibao_p2p.models import P2PRecord
 import decimal
 from wanglibao_pay.pay import YeeProxyPay, PayOrder, YeeProxyPayCallbackMessage
 from wanglibao_pay.serializers import CardSerializer
+from wanglibao_pay.third_pay import process_for_bind_card
 from wanglibao_pay.util import get_client_ip, fmt_two_amount
 from wanglibao_pay import util
 from wanglibao_profile.backends import require_trade_pwd
@@ -966,6 +967,18 @@ class BindPayDynNumView(APIView):
     def post(self, request):
         pay = third_pay.KuaiPay()
         result = pay.dynnum_bind_pay(request)
+        try:
+            order_id = request.DATA.get("order_id", "").strip()
+            pay_info = PayInfo.objects.filter(order_id=order_id).first()
+            card_no = pay_info.card_no
+
+            if len(card_no) == 10:
+                card = Card.objects.filter(user=request.user, no__startswith=card_no[:6], no__endswith=card_no[-4:]).first()
+            else:
+                card = Card.objects.filter(no=card_no, user=request.user).first()
+            process_for_bind_card(request.user, card, result, request)
+        except:
+            logger.error('failed to send bind card message' + str(request.POST))
         return Response(result)
 
 
