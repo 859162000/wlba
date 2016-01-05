@@ -17,8 +17,8 @@ class Migration(SchemaMigration):
             ('certigier_name', self.gf('django.db.models.fields.CharField')(max_length=12)),
             ('certigier_phone', self.gf('django.db.models.fields.IntegerField')(max_length=64)),
             ('company_address', self.gf('django.db.models.fields.TextField')(max_length=255)),
-            ('company_account', self.gf('django.db.models.fields.CharField')(max_length=64)),
-            ('company_account_name', self.gf('django.db.models.fields.CharField')(max_length=30)),
+            ('bank_card_no', self.gf('django.db.models.fields.CharField')(max_length=64)),
+            ('bank_account_name', self.gf('django.db.models.fields.CharField')(max_length=30)),
             ('deposit_bank_province', self.gf('django.db.models.fields.CharField')(max_length=10)),
             ('deposit_bank_city', self.gf('django.db.models.fields.CharField')(max_length=10)),
             ('bank_branch_address', self.gf('django.db.models.fields.CharField')(max_length=100)),
@@ -26,6 +26,7 @@ class Migration(SchemaMigration):
             ('created_time', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
             ('description', self.gf('django.db.models.fields.TextField')(max_length=255, null=True, blank=True)),
             ('status', self.gf('django.db.models.fields.CharField')(default=u'\u5f85\u5ba1\u6838', max_length=10)),
+            ('bank', self.gf('django.db.models.fields.CharField')(max_length=20)),
         ))
         db.send_create_signal(u'wanglibao_qiye', ['EnterpriseUserProfile'])
 
@@ -74,12 +75,13 @@ class Migration(SchemaMigration):
         },
         u'wanglibao_qiye.enterpriseuserprofile': {
             'Meta': {'object_name': 'EnterpriseUserProfile'},
+            'bank': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
+            'bank_account_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'bank_branch_address': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'bank_card_no': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
             'business_license': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
             'certigier_name': ('django.db.models.fields.CharField', [], {'max_length': '12'}),
             'certigier_phone': ('django.db.models.fields.IntegerField', [], {'max_length': '64'}),
-            'company_account': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
-            'company_account_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'company_address': ('django.db.models.fields.TextField', [], {'max_length': '255'}),
             'company_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
             'created_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),

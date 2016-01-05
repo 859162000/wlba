@@ -1612,6 +1612,9 @@ class IdVerificationView(TemplateView):
 
     def form_valid(self, form):
         user = self.request.user
+        # add by ChenWeiBin@2010105
+        if user.wanglibaouserprofile.utype == '3':
+            return {"ret_code": 30056, "message": u"企业用户无法通过此方式认证"}
 
         user.wanglibaouserprofile.id_number = form.cleaned_data.get('id_number')
         user.wanglibaouserprofile.name = form.cleaned_data.get('name')

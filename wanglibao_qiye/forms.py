@@ -3,6 +3,7 @@
 from django import forms
 from .utils import detect_phone_for_identifier
 from wanglibao_sms.utils import validate_validation_code
+from .models import EnterpriseUserProfile
 
 
 class EnterpriseUserProfileForm(forms.Form):
@@ -28,7 +29,8 @@ class EnterpriseUserProfileForm(forms.Form):
     bank_branch_address = forms.CharField(label="Bank branch address", max_length=100,
                                           error_messages={'required': u'请输入开户行支行所在地'})
     trade_pwd = forms.CharField(label="Trade pwd", max_length=50, error_messages={'required': u'请输入交易密码'})
-    validate_code = forms.CharField(label="Validate code for phone", required=True)
+    validate_code = forms.CharField(label="Validate code for phone", error_messages={'required': u'请输入短信验证码'})
+    bank = forms.CharField(label="Bank", error_messages={'required': u'请输入所属银行'})
 
     def clean_company_name(self):
         company_name = self.cleaned_data.get('company_name', '').strip()
@@ -114,7 +116,17 @@ class EnterpriseUserProfileForm(forms.Form):
                 else:
                     raise forms.ValidationError(
                         self.error_messages['validate must not be null'],
-                        code='validate_code_error',
+                        code='10002',
                     )
 
         return self.cleaned_data
+
+    def clean_bank(self):
+        bank = self.cleaned_data.get('bank', '').strip()
+        if bank not in [i for i, j in EnterpriseUserProfile.BANK]:
+            raise forms.ValidationError(
+                u'无效所属银行',
+                code='10003',
+            )
+
+        return bank

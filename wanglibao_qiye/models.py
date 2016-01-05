@@ -1,6 +1,9 @@
 # encoding: utf-8
+
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.utils import timezone
+from wanglibao_pay.models import Bank, Card
 
 User = get_user_model()
 
@@ -17,6 +20,19 @@ class EnterpriseUserProfile(models.Model):
         (u'审核通过', u'审核通过'),
     )
 
+    BANK = (
+        (u'中国银行', u'中国银行'),
+        (u'交通银行', u'交通银行'),
+        (u'中国建设银行', u'中国建设银行'),
+        (u'光大银行', u'光大银行'),
+        (u'民生银行', u'民生银行'),
+        (u'招商银行', u'招商银行'),
+        (u'工商银行', u'工商银行'),
+        (u'深发银行', u'深发银行'),
+        (u'上海浦东发展银行', u'上海浦东发展银行'),
+        (u'中国农业银行', u'中国农业银行'),
+    )
+
     user = models.ForeignKey(User, primary_key=True)
     company_name = models.CharField(u'公司名称', max_length=30)
     business_license = models.ImageField(u'营业执照', upload_to='enterprise/images')
@@ -24,8 +40,8 @@ class EnterpriseUserProfile(models.Model):
     certigier_name = models.CharField(u'授权人姓名', max_length=12)
     certigier_phone = models.IntegerField(u'授权人手机号', max_length=64)
     company_address = models.TextField(u'公司地址', max_length=255)
-    company_account = models.CharField(u'公司账户账号', max_length=64)
-    company_account_name = models.CharField(u'公司账户名称', max_length=30)
+    bank_card_no = models.CharField(u'公司账户账号', max_length=64)
+    bank_account_name = models.CharField(u'公司账户名称', max_length=30)
     deposit_bank_province = models.CharField(u'公司开户行所在省份', max_length=10)
     deposit_bank_city = models.CharField(u'公司开户行所在市县', max_length=10)
     bank_branch_address = models.CharField(u'开户行支行所在地', max_length=100)
@@ -33,3 +49,25 @@ class EnterpriseUserProfile(models.Model):
     created_time = models.DateTimeField(u'创建时间', auto_now=True)
     description = models.TextField(u'创建时间', max_length=255, null=True, blank=True)
     status = models.CharField(u'审核状态', max_length=10, default=u'待审核', choices=STATUS)
+    bank = models.CharField(u'所属银行', max_length=20)
+
+    def save(self, *args, **kwargs):
+        user_profile = self.user.wanglibaoprofile
+        if self.status == u'审核通过':
+            user_profile.id_is_valid = True
+            user_profile.id_valid_time = timezone.now()
+            bank = Bank.objects.get(name=self.bank)
+            card = Card()
+            card.bank = bank
+            card.no = self.bank_card_no
+            card.user = self.user
+            card.is_default = True
+            card.is_bind_huifu = True
+            # FixMe, 同卡进出
+            # card.is_the_one_card = True
+            card.save()
+        else:
+            user_profile.id_is_valid = False
+
+        user_profile.save()
+        super(EnterpriseUserProfile, self).save(*args, **kwargs)

@@ -893,6 +893,13 @@ class AdminIdValidate(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
+        # add by ChenWeiBin@2010105
+        if request.user.wanglibaouserprofile.utype == '3':
+            return Response({
+                "message": u"企业用户无法通过此方式认证",
+                "error_number": 30056,
+            }, status=400)
+
         phone = request.DATA.get("phone", "")
         name = request.DATA.get("name", "")
         id_number = request.DATA.get("id_number", "")
