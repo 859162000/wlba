@@ -289,29 +289,25 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 	/*刷新朋友圈*/
 	function renovate_friends(friends_length,friends_img){
-		var str = '';
+		var str='';
 		var follow_one='';
 		for(var i=0; i<friends_length; i++){
 			follow_one = friends_img[i];
 			str +='<div class="swiper-slide"><img class="user" src="'+follow_one.from_headimgurl+'"/></div>'
 		}
-		var user_num = $('.swiper-slide').length;
-		if(user_num>6){
-			var swiper = new Swiper('.swiper-container', {
-				initialSlide : 0,
-				slidesPerView: 6,
-				nextButton: '.swiper-button-next',
-				prevButton: '.swiper-button-prev',
-				loop: false
-   			});
-			swiper.removeAllSlides();
-			swiper.appendSlide(str);
-			swiper.update();
-			swiper.slideTo(0, 100, false);
-		}else{
-			$('.swiper-slide').addClass('friends_length');
-		}
-		$('.friends,.gundong').show();
+
+		var swiper = new Swiper('.swiper-container', {
+			initialSlide : 0,
+			slidesPerView: 6,
+			nextButton: '.swiper-button-next',
+			prevButton: '.swiper-button-prev',
+			loop: false
+		});
+		swiper.removeAllSlides();
+		swiper.appendSlide(str);
+		swiper.update();
+		swiper.slideTo(0, 100, false);
+
 	}
 	/*刷新朋友圈结束*/
 	/*同意活动规则按钮*/
