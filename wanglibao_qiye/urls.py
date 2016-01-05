@@ -3,7 +3,7 @@ from django.conf.urls import patterns, url
 from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth.decorators import login_required
 from .views import (EnterpriseProfileCreateApi, QiYeIndex, QiYeInfo, EnterpriseProfileUploadApi,
-                    EnterpriseProfileUpdateApi)
+                    EnterpriseProfileUpdateApi, GetEnterpriseUserProfileApi)
 
 
 urlpatterns = patterns(
@@ -15,5 +15,6 @@ urlpatterns = patterns(
     url(r'profile/extra/$', EnterpriseProfileUploadApi.as_view()),
     url(r'profile/create/$', EnterpriseProfileCreateApi.as_view()),
     url(r'profile/modify/$', EnterpriseProfileUpdateApi.as_view()),
+    url(r'profile/get/$', GetEnterpriseUserProfileApi.as_view()),
 )
 

@@ -20,3 +20,4 @@ class EnterpriseUserProfile(models.Model):
     bank_branch_address = models.CharField(u'开户行支行所在地', max_length=100)
     modify_time = models.DateTimeField(u'最近修改时间', auto_now_add=True)
     created_time = models.DateTimeField(u'创建时间', auto_now=True)
+    description = models.TextField(u'创建时间', max_length=255, null=True, blank=True)

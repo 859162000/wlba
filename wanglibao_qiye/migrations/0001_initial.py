@@ -24,6 +24,7 @@ class Migration(SchemaMigration):
             ('bank_branch_address', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('modify_time', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('created_time', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+            ('description', self.gf('django.db.models.fields.TextField')(max_length=255, null=True, blank=True)),
         ))
         db.send_create_signal(u'wanglibao_qiye', ['EnterpriseUserProfile'])
 
@@ -83,6 +84,7 @@ class Migration(SchemaMigration):
             'created_time': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'deposit_bank_city': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
             'deposit_bank_province': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
+            'description': ('django.db.models.fields.TextField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'modify_time': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'registration_cert': ('django.db.models.fields.files.ImageField', [], {'max_length': '100'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'primary_key': 'True'})

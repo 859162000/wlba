@@ -22,6 +22,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from file_storage.storages import AliOSSStorageForCover
+from file_storage.models import File
 
 from .models import EnterpriseUserProfile
 from .forms import EnterpriseUserProfileForm
@@ -246,6 +247,15 @@ class EnterpriseProfileUploadApi(APIView):
         if user.wanglibaouserprofile.utype == '3':
             field_name = request.POST.get('field_name')
             if field_name in ('business_license', 'registration_cert') and field_name in request.FILES:
+                e_profile = EnterpriseUserProfile.objects.filter(user=user).first()
+                # 判断企业信息是否审核中，如果是则不允许修改
+                if e_profile and not user.wanglibaouserprofile.id_is_valid:
+                    return Response({
+                        'filename': None,
+                        'message': e_profile.description,
+                        'ret_code': 30002,
+                    })
+
                 file_name = request.POST.get('name', '')
                 file_suffix = file_name.split('.')[-1] or 'png'
                 filename = 'enterprise/images/%s_%s.%s' % (user.id, field_name, file_suffix)
@@ -262,10 +272,13 @@ class EnterpriseProfileUploadApi(APIView):
                         'ret_code': 40001,
                     })
 
+                user.wanglibaouserprofile.id_is_valid = False
+                user.save()
+
                 return Response({
-                    'filename': None,
-                    'message': 'invalid field name',
-                    'ret_code': 50001,
+                    'filename': filename,
+                    'message': 'success',
+                    'ret_code': 10000,
                 })
             else:
                 response_data = {
@@ -343,8 +356,10 @@ class EnterpriseProfileCreateApi(APIView):
                     e_profile.deposit_bank_province = form.cleaned_data['deposit_bank_province']
                     e_profile.deposit_bank_city = form.cleaned_data['deposit_bank_city']
                     e_profile.bank_branch_address = form.cleaned_data['bank_branch_address']
+                    e_profile.description = u'审核中'
                     e_profile.save()
 
+                    user.wanglibaouserprofile.id_is_valid = False
                     user.wanglibaouserprofile.trade_pwd = form.cleaned_data['trade_code']
                     user.save()
 
@@ -384,6 +399,13 @@ class EnterpriseProfileUpdateApi(APIView):
                         'ret_code': 10001,
                     })
 
+                # 判断企业信息是否审核中，如果是则不允许修改
+                if not user.wanglibaouserprofile.id_is_valid:
+                    return Response({
+                        'message': e_profile.description,
+                        'ret_code': 30002,
+                    })
+
                 src_data = (e_profile.company_name, e_profile.business_license,
                             e_profile.registration_cert, e_profile.certigier_name,
                             e_profile.certigier_phone, e_profile.company_address,
@@ -415,6 +437,7 @@ class EnterpriseProfileUpdateApi(APIView):
                     e_profile.deposit_bank_province = form.cleaned_data['deposit_bank_province']
                     e_profile.deposit_bank_city = form.cleaned_data['deposit_bank_city']
                     e_profile.bank_branch_address = form.cleaned_data['bank_branch_address']
+                    e_profile.description = u'审核中'
                     e_profile.save()
 
                     user.wanglibaouserprofile.id_is_valid = False
