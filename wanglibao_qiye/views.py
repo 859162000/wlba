@@ -245,11 +245,12 @@ class EnterpriseProfileUploadApi(APIView):
         user = request.user
         if user.wanglibaouserprofile.utype == '3':
             field_name = request.POST.get('field_name')
-            if field_name in ('business_license', 'registration_cert'):
-                file_size = request.POST.get('size')
-                file_name = request.POST.get('name')
-                filename = 'enterprise/images/%s_%s' % (user.id, field_name)
-                file_content = ''
+            if field_name in ('business_license', 'registration_cert') and field_name in request.FILES:
+                file_name = request.POST.get('name', '')
+                file_suffix = file_name.split('.')[-1] or 'png'
+                filename = 'enterprise/images/%s_%s.%s' % (user.id, field_name, file_suffix)
+                file_content = request.FILES[field_name]
+
                 try:
                     AliOSSStorageForCover().save(filename, file_content)
                 except Exception, e:
@@ -313,7 +314,7 @@ class GetEnterpriseUserProfileApi(APIView):
         return Response(response_data)
 
 
-class EnterpriseUserProfileApi(APIView):
+class EnterpriseProfileCreateApi(APIView):
     """企业用户认证资料接收接口"""
 
     permission_classes = (IsAuthenticated,)
@@ -323,29 +324,34 @@ class EnterpriseUserProfileApi(APIView):
         if user.wanglibaouserprofile.utype == '3':
             form = EnterpriseUserProfileForm(request.POST)
             if form.is_valid():
-                try:
-                    e_profile = EnterpriseUserProfile.objects.get(user=user)
-                except EnterpriseUserProfile.DoesNotExist:
-                    e_profile = EnterpriseUserProfile
+                if EnterpriseUserProfile.objects.filter(user=user).first():
+                    response_data = {
+                        'message': u'user enterprise profile has been exists',
+                        'ret_code': 10002,
+                    }
+                else:
+                    e_profile = EnterpriseUserProfile()
                     e_profile.user = user
+                    e_profile.company_name = form.cleaned_data['company_name']
+                    e_profile.business_license = form.cleaned_data['business_license']
+                    e_profile.registration_cert = form.cleaned_data['registration_cert']
+                    e_profile.certigier_name = form.cleaned_data['certigier_name']
+                    e_profile.certigier_phone = form.cleaned_data['certigier_phone']
+                    e_profile.company_address = form.cleaned_data['company_address']
+                    e_profile.company_account = form.cleaned_data['company_account']
+                    e_profile.company_account_name = form.cleaned_data['company_account_name']
+                    e_profile.deposit_bank_province = form.cleaned_data['deposit_bank_province']
+                    e_profile.deposit_bank_city = form.cleaned_data['deposit_bank_city']
+                    e_profile.bank_branch_address = form.cleaned_data['bank_branch_address']
+                    e_profile.save()
 
-                e_profile.company_name = form.cleaned_data['company_name']
-                e_profile.business_license = form.cleaned_data['business_license']
-                e_profile.registration_cert = form.cleaned_data['registration_cert']
-                e_profile.certigier_name = form.cleaned_data['certigier_name']
-                e_profile.certigier_phone = form.cleaned_data['certigier_phone']
-                e_profile.company_address = form.cleaned_data['company_address']
-                e_profile.company_account = form.cleaned_data['company_account']
-                e_profile.company_account_name = form.cleaned_data['company_account_name']
-                e_profile.deposit_bank_province = form.cleaned_data['deposit_bank_province']
-                e_profile.deposit_bank_city = form.cleaned_data['deposit_bank_city']
-                e_profile.bank_branch_address = form.cleaned_data['bank_branch_address']
-                e_profile.save()
+                    user.wanglibaouserprofile.trade_pwd = form.cleaned_data['trade_code']
+                    user.save()
 
-                response_data = {
-                    'message': u'success',
-                    'ret_code': 10000,
-                }
+                    response_data = {
+                        'message': u'success',
+                        'ret_code': 10000,
+                    }
             else:
                 response_data = {
                     'message': form.errors,
@@ -356,6 +362,8 @@ class EnterpriseUserProfileApi(APIView):
                 'message': u'非企业用户',
                 'ret_code': 20001,
             }
+
+        return Response(response_data)
 
 
 class EnterpriseProfileUpdateApi(APIView):
@@ -381,29 +389,37 @@ class EnterpriseProfileUpdateApi(APIView):
                             e_profile.certigier_phone, e_profile.company_address,
                             e_profile.company_account, e_profile.company_account_name,
                             e_profile.deposit_bank_province, e_profile.deposit_bank_city,
-                            e_profile.bank_branch_address)
+                            e_profile.bank_branch_address, e_profile.trade_pwd)
                 src_data_str = ''.join(src_data)
                 src_md5 = hashlib.md5(src_data_str).hexdigest()
 
                 dst_data = (form.cleaned_data['company_name'], form.cleaned_data['business_license'],
                             form.cleaned_data['registration_cert'], form.cleaned_data['certigier_name'],
-                            form.cleaned_data['company_address'], e_profile.company_address,
-                             e_profile.company_account, e_profile.company_account_name,
-                             e_profile.deposit_bank_province, e_profile.deposit_bank_city,
-                             e_profile.bank_branch_address)
+                            form.cleaned_data['certigier_phone'], form.cleaned_data['company_address'],
+                            form.cleaned_data['company_account'], form.cleaned_data['company_account_name'],
+                            form.cleaned_data['deposit_bank_province'], form.cleaned_data['deposit_bank_city'],
+                            form.cleaned_data['bank_branch_address'], form.cleaned_data['trade_code'])
 
-                e_profile.company_name = form.cleaned_data['company_name']
-                e_profile.business_license = form.cleaned_data['business_license']
-                e_profile.registration_cert = form.cleaned_data['registration_cert']
-                e_profile.certigier_name = form.cleaned_data['certigier_name']
-                e_profile.certigier_phone = form.cleaned_data['certigier_phone']
-                e_profile.company_address = form.cleaned_data['company_address']
-                e_profile.company_account = form.cleaned_data['company_account']
-                e_profile.company_account_name = form.cleaned_data['company_account_name']
-                e_profile.deposit_bank_province = form.cleaned_data['deposit_bank_province']
-                e_profile.deposit_bank_city = form.cleaned_data['deposit_bank_city']
-                e_profile.bank_branch_address = form.cleaned_data['bank_branch_address']
-                e_profile.save()
+                new_data_str = ''.join(dst_data)
+                new_md5 = hashlib.md5(new_data_str).hexdigest()
+
+                if src_md5 != new_md5:
+                    e_profile.company_name = form.cleaned_data['company_name']
+                    e_profile.business_license = form.cleaned_data['business_license']
+                    e_profile.registration_cert = form.cleaned_data['registration_cert']
+                    e_profile.certigier_name = form.cleaned_data['certigier_name']
+                    e_profile.certigier_phone = form.cleaned_data['certigier_phone']
+                    e_profile.company_address = form.cleaned_data['company_address']
+                    e_profile.company_account = form.cleaned_data['company_account']
+                    e_profile.company_account_name = form.cleaned_data['company_account_name']
+                    e_profile.deposit_bank_province = form.cleaned_data['deposit_bank_province']
+                    e_profile.deposit_bank_city = form.cleaned_data['deposit_bank_city']
+                    e_profile.bank_branch_address = form.cleaned_data['bank_branch_address']
+                    e_profile.save()
+
+                    user.wanglibaouserprofile.id_is_valid = False
+                    user.wanglibaouserprofile.trade_pwd = form.cleaned_data['trade_code']
+                    user.save()
 
                 response_data = {
                     'message': u'success',
@@ -419,3 +435,5 @@ class EnterpriseProfileUpdateApi(APIView):
                 'message': u'非企业用户',
                 'ret_code': 20001,
             }
+
+        return Response(response_data)
