@@ -10,7 +10,7 @@
     }
   });
 
-  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/templateLoader', 'model/portfolio', 'tools', 'lib/jquery.number.min', 'lib/modal'], function($, _, ko, backend, templateLoader, portfolio, tool, modal) {
+  require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/templateLoader', 'model/portfolio', 'tools', 'lib/modal'], function($, _, ko, backend, templateLoader, portfolio, tool, modal) {
     var DataViewModel, isXunleiBindSuccess, viewModel;
     $.ajax({
       url: "/qiye/profile/get/",
@@ -21,8 +21,14 @@
         title: '温馨提示',
         msg: xhr.message
       });
-    }).success()(function() {
-      return console.log(1);
+    }).success(function(data) {
+      $('#tyjzq').hide();
+      if (data.ret_code === 10000) {
+        $('#qiyeUser i').text('1111');
+      }
+      if (data.ret_code === 20001) {
+        return $('#tyjzq').show();
+      }
     });
     DataViewModel = (function() {
       function DataViewModel() {
