@@ -1337,11 +1337,12 @@ class WeixinAnnualBonusView(TemplateView):
 #               'user_id' : user_profile.user.id if user_profile else None,
                 'user' : user_profile.user if user_profile else None,
                 'is_new' : is_new,
+                'annual_bonus' : 28888 if is_new else 1000,
                 'min_annual_bonus' : 28888 if is_new else 1000,
                 'max_annual_bonus' : 36888 if is_new else 8000,
             })
         except Exception, ex :
-            logger.Exception("[%s] [%s] : [%s]" % (self.to_openid, phone, ex))
+            logger.exception("[%s] [%s] : [%s]" % (self.to_openid, phone, ex))
             rep = { 'err_code':204, 'err_messege':u'系统繁忙，请稍后重试', }
             return HttpResponse(json.dumps(rep), content_type='application/json')
 
