@@ -828,8 +828,8 @@ class IdValidate(APIView):
                                     "error_number": ErrorNumber.id_verify_times_error
                                 }, status=200)
 
-            name = form.cleaned_data['name']
-            id_number = form.cleaned_data['id_number']
+            name = form.cleaned_data['name'].strip()
+            id_number = form.cleaned_data['id_number'].strip()
 
             verify_counter, created = VerifyCounter.objects.get_or_create(user=user)
 
@@ -882,9 +882,9 @@ class AdminIdValidate(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        phone = request.DATA.get("phone", "")
-        name = request.DATA.get("name", "")
-        id_number = request.DATA.get("id_number", "")
+        phone = request.DATA.get("phone", "").strip()
+        name = request.DATA.get("name", "").strip()
+        id_number = request.DATA.get("id_number", "").strip()
 
         verify_record, error = verify_id(name, id_number)
 

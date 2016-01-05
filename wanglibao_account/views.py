@@ -1612,8 +1612,8 @@ class IdVerificationView(TemplateView):
     def form_valid(self, form):
         user = self.request.user
 
-        user.wanglibaouserprofile.id_number = form.cleaned_data.get('id_number')
-        user.wanglibaouserprofile.name = form.cleaned_data.get('name')
+        user.wanglibaouserprofile.id_number = form.cleaned_data.get('id_number').strip()
+        user.wanglibaouserprofile.name = form.cleaned_data.get('name').strip()
         user.wanglibaouserprofile.id_is_valid = True
         user.wanglibaouserprofile.id_valid_time = timezone.now()
         user.wanglibaouserprofile.save()
