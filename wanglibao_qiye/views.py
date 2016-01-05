@@ -236,6 +236,9 @@ class QiYeIndex(TemplateView):
 class QiYeInfo(TemplateView):
     template_name = 'info.jade'
 
+class QiYeUpdate(TemplateView):
+    template_name = 'update.jade'
+
 
 class EnterpriseProfileUploadApi(APIView):
     """企业用户认证扩展资料接收接口"""
