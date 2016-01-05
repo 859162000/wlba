@@ -294,7 +294,7 @@ def check_unavailable_3_days():
           "wanglibao_profile_wanglibaouserprofile p " \
           "where c.redpack_id = r.id and r.event_id = e.id and c.user_id = p.user_id " \
           "and date_format(e.unavailable_at, '%Y-%m-%d') = '{}' " \
-          "and e.auto_extension = 0 and c.order_id = 0 " \
+          "and e.auto_extension = 0 and c.order_id is NULL " \
           "group by c.user_id;".format(date_fmt)
 
     cursor.execute(sql)
