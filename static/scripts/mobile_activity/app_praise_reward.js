@@ -289,19 +289,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 	/*刷新朋友圈*/
 	function renovate_friends(friends_length,friends_img){
-		$('.gundong').html('');
-		$('.gundong').append('<div class="swiper-container"><div class="swiper-wrapper">');
 		var str = '';
-		var follow_one;
+		var follow_one='';
 		for(var i=0; i<friends_length; i++){
 			follow_one = friends_img[i];
 			str +='<div class="swiper-slide"><img class="user" src="'+follow_one.from_headimgurl+'"/></div>'
-			//$('.swiper-wrapper').append('<div class="swiper-slide"><img class="user" src="'+follow_one.from_headimgurl+'"/></div>');
-
 		}
-		$('.swiper-wrapper').append(str)
-		$('.gundong').append('</div></div>');
-		$('.gundong').append('<img class="swiper-button-next" src="/static/imgs/mobile_activity/app_praise_reward/next.png"><img class="swiper-button-prev" src="/static/imgs/mobile_activity/app_praise_reward/prev.png">');
 		var user_num = $('.swiper-slide').length;
 		if(user_num>6){
 			var swiper = new Swiper('.swiper-container', {
@@ -309,8 +302,12 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 				slidesPerView: 6,
 				nextButton: '.swiper-button-next',
 				prevButton: '.swiper-button-prev',
-				loop: true
+				loop: false
    			});
+			swiper.removeAllSlides();
+			swiper.appendSlide(str);
+			swiper.update();
+			swiper.slideTo(0, 100, false);
 		}else{
 			$('.swiper-slide').addClass('friends_length');
 		}

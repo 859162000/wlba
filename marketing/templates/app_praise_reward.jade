@@ -49,7 +49,10 @@ html(style="background: #3a2741")
                         span.rule 活动规则
                     .line.friends 以下好友肯定了TA
                     .gundong
-
+                        .swiper-container
+                            .swiper-wrapper
+                            img.swiper-button-next(src="/static/imgs/mobile_activity/app_praise_reward/next.png")
+                            img.swiper-button-prev(src="/static/imgs/mobile_activity/app_praise_reward/prev.png")
                     if is_myself
                         .step_me
                             .line_bottom
@@ -115,4 +118,4 @@ html(style="background: #3a2741")
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src='/static/js/lib/jquery.min.js')
         script(src='/static/js/lib/swiper.min.js')
-        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=010506")
+        script(src="/static/scripts/mobile_activity/app_praise_reward.js?v=010508")
