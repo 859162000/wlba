@@ -478,7 +478,6 @@ org.login = (function(org){
                         $submit.attr('disabled', true).text('登录中..');
                     },
                     success: function(res) {
-                        alert(res.errmessage);
                         if(res.re_code != 0){
                             window.location.href = "/weixin/jump_page/?message="+res.errmessage;
                         }else{
