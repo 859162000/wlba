@@ -83,7 +83,7 @@
 				slidesPerView: 6,
 				nextButton: '.swiper-button-next',
 				prevButton: '.swiper-button-prev',
-				loop: true
+				loop: false
    			});
 			swiper.removeAllSlides();
 			swiper.appendSlide(str);

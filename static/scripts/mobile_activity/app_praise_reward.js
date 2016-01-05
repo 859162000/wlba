@@ -302,7 +302,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 				slidesPerView: 6,
 				nextButton: '.swiper-button-next',
 				prevButton: '.swiper-button-prev',
-				loop: true
+				loop: false
    			});
 			swiper.removeAllSlides();
 			swiper.appendSlide(str);
