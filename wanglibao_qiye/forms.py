@@ -13,7 +13,7 @@ class EnterpriseUserProfileForm(forms.Form):
     registration_cert = forms.CharField(label="Registration cert", max_length=255,
                                         error_messages={'required': u'请选择税务登记证'})
     certigier_name = forms.CharField(label="Certigier name", max_length=12, error_messages={'required': u'请输入授权人姓名'})
-    certigier_phone = forms.IntegerField(label="Certigier phone", error_messages={'required': u'请输入授权人手机号'})
+    certigier_phone = forms.CharField(label="Certigier phone", error_messages={'required': u'请输入授权人手机号'})
     company_address = forms.CharField(label="Company address", max_length=255,
                                       error_messages={'required': u'请输入公司地址'})
     company_account = forms.CharField(label="Company account", max_length=64,
@@ -27,27 +27,26 @@ class EnterpriseUserProfileForm(forms.Form):
     bank_branch_address = forms.CharField(label="Bank branch address", max_length=100,
                                           error_messages={'required': u'请输入开户行支行所在地'})
 
+    trade_pwd = forms.CharField(label="Trade pwd", max_length=50,
+                                error_messages={'required': u'请输入交易密码'})
+
     def clean_company_name(self):
         company_name = self.cleaned_data.get('company_name', '').strip()
-        self.cleaned_data['company_name'] = company_name
 
-        return self.cleaned_data
+        return company_name
 
     def clean_business_license(self):
         business_license = self.cleaned_data.get('business_license', '').strip()
-        self.cleaned_data['business_license'] = business_license
 
-        return self.cleaned_data
+        return business_license
 
     def clean_registration_cert(self):
         registration_cert = self.cleaned_data.get('registration_cert', '').strip()
-        self.cleaned_data['registration_cert'] = registration_cert
 
-        return self.cleaned_data
+        return registration_cert
 
     def clean_certigier_name(self):
         certigier_name = self.cleaned_data.get('certigier_name', '').strip()
-        self.cleaned_data['certigier_name'] = certigier_name
 
         return certigier_name
 
@@ -65,36 +64,35 @@ class EnterpriseUserProfileForm(forms.Form):
 
     def clean_company_address(self):
         company_address = self.cleaned_data.get('company_address', '').strip()
-        self.cleaned_data['company_address'] = company_address
 
-        return self.cleaned_data
+        return company_address
 
     def clean_company_account(self):
         company_account = self.cleaned_data.get('company_account', '').strip()
-        self.cleaned_data['company_account'] = company_account
 
-        return self.cleaned_data
+        return company_account
 
     def clean_company_account_name(self):
         company_account_name = self.cleaned_data.get('company_account_name', '').strip()
-        self.cleaned_data['company_account_name'] = company_account_name
 
-        return self.cleaned_data
+        return company_account_name
 
     def clean_deposit_bank_province(self):
         deposit_bank_province = self.cleaned_data.get('deposit_bank_province', '').strip()
-        self.cleaned_data['deposit_bank_province'] = deposit_bank_province
 
-        return self.cleaned_data
+        return deposit_bank_province
 
     def clean_deposit_bank_city(self):
         deposit_bank_city = self.cleaned_data.get('deposit_bank_city', '').strip()
-        self.cleaned_data['deposit_bank_city'] = deposit_bank_city
 
-        return self.cleaned_data
+        return deposit_bank_city
 
     def clean_bank_branch_address(self):
         bank_branch_address = self.cleaned_data.get('bank_branch_address', '').strip()
-        self.cleaned_data['bank_branch_address'] = bank_branch_address
 
-        return self.cleaned_data
+        return bank_branch_address
+
+    def clean_trade_pwd(self):
+        trade_pwd = self.cleaned_data.get('trade_pwd', '').strip()
+
+        return trade_pwd
