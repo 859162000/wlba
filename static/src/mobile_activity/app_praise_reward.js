@@ -170,14 +170,28 @@
 	});
 	/*申请我的年终奖结束*/
 
+	var shareName = $('.share_name').text(),
+		shareImg = $('.share_img').text(),
+		shareLink = $('.share_link').text(),
+		shareMainTit = $('.share_title').text(),
+		shareBody = $('.share_body').text(),
+		share_friends = '我领到一份年终奖，'+praise_num+'元噢！你也为自己一年的努力另一份吧！，';
+
 	/*领取我的年终奖*/
 	$('.now_use').click(function(){
+
+
+
 		if($('.checkbox').hasClass('checkbox_select')){
 			$.ajax({
 				url: '/weixin_activity/weixin/bonus/?act=pay&wxid='+wxid,
 				type: "GET",
 			}).done(function (xhr) {
 				if(xhr.err_code==0){
+					$('.friend_top span').text(xhr.err_messege);
+					$('.friend_top').fadeIn();
+				}else if(xhr.err_code==404){
+					$('.regist_button').css('display','block');
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 				}else{
@@ -189,6 +203,10 @@
 			$('.friend_top span').text('请点击，我同意网利宝年终奖活动规则');
 			$('.friend_top').fadeIn();
 		}
+	});
+	$('.regist_button').hide();
+	$('.regist_button').click(function(){
+		window.location.href = '/weixin/regist/?next="'+shareLink+'"';
 	});
 	/*领取我的年终奖结束*/
 
@@ -207,12 +225,7 @@
 		$('.rule_wrap').hide();
 	});
 
-	var shareName = $('.share_name').text(),
-		shareImg = $('.share_img').text(),
-		shareLink = $('.share_link').text(),
-		shareMainTit = $('.share_title').text(),
-		shareBody = $('.share_body').text(),
-		share_friends = '我领到一份年终奖，'+praise_num+'元噢！你也为自己一年的努力另一份吧！，';
+
 
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({
