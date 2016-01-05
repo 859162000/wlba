@@ -459,6 +459,9 @@ def bind_pay_deposit(request):
     ip = util.get_client_ip(request)
 
     user = request.user
+    if user.wanglibaouserprofile.utype == '3':
+        return {"ret_code": 30059, "message": u"企业用户无法请求该接口"}
+
     if not user.wanglibaouserprofile.id_is_valid:
         return {"ret_code":20111, "message":"请先进行实名认证"}
 

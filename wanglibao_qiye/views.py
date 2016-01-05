@@ -217,7 +217,7 @@ class EnterpriseProfileUpdateApi(APIView):
             form = EnterpriseUserProfileForm(request.POST)
             if form.is_valid():
                 try:
-                    e_profile = EnterpriseUserProfile.objects.filter(user=user).first()
+                    e_profile = EnterpriseUserProfile.objects.get(user=user)
                 except EnterpriseUserProfile.DoesNotExist:
                     return Response({
                         'message': u'企业用户信息未完善',
@@ -277,6 +277,37 @@ class EnterpriseProfileUpdateApi(APIView):
                     'message': form.errors,
                     'ret_code': 10001,
                 }
+        else:
+            response_data = {
+                'message': u'非企业用户',
+                'ret_code': 20001,
+            }
+
+        return Response(response_data)
+
+
+class EnterpriseProfileIsExistsApi(APIView):
+    """
+    判断企业用户是否已经完善企业信息
+    """
+
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        user = request.user
+        if user.wanglibaouserprofile.utype == '3':
+            try:
+                EnterpriseUserProfile.objects.get(user=user)
+            except EnterpriseUserProfile.DoesNotExist:
+                return Response({
+                    'message': u'企业用户信息未完善',
+                    'ret_code': 10001,
+                })
+
+            response_data = {
+                'message': u'企业用户信息已完善',
+                'ret_code': 10000,
+            }
         else:
             response_data = {
                 'message': u'非企业用户',
