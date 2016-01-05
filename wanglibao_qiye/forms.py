@@ -2,6 +2,7 @@
 
 from django import forms
 from .utils import detect_phone_for_identifier
+from wanglibao_sms.utils import validate_validation_code
 
 
 class EnterpriseUserProfileForm(forms.Form):
@@ -26,9 +27,8 @@ class EnterpriseUserProfileForm(forms.Form):
                                         error_messages={'required': u'请输入公司开户行所在市县'})
     bank_branch_address = forms.CharField(label="Bank branch address", max_length=100,
                                           error_messages={'required': u'请输入开户行支行所在地'})
-
-    trade_pwd = forms.CharField(label="Trade pwd", max_length=50,
-                                error_messages={'required': u'请输入交易密码'})
+    trade_pwd = forms.CharField(label="Trade pwd", max_length=50, error_messages={'required': u'请输入交易密码'})
+    validate_code = forms.CharField(label="Validate code for phone", required=True)
 
     def clean_company_name(self):
         company_name = self.cleaned_data.get('company_name', '').strip()
@@ -50,7 +50,7 @@ class EnterpriseUserProfileForm(forms.Form):
 
         return certigier_name
 
-    def clean_phone(self):
+    def clean_certigier_phone(self):
         certigier_phone = self.cleaned_data.get('certigier_phone', '').strip()
         if not detect_phone_for_identifier(certigier_phone):
             raise forms.ValidationError(
@@ -96,3 +96,25 @@ class EnterpriseUserProfileForm(forms.Form):
         trade_pwd = self.cleaned_data.get('trade_pwd', '').strip()
 
         return trade_pwd
+
+    def clean_validate_code(self):
+        if 'certigier_phone' in self.cleaned_data:
+            certigier_phone = self.cleaned_data["certigier_phone"].strip()
+            if detect_phone_for_identifier(certigier_phone):
+                validate_code = self.cleaned_data.get('validate_code', '')
+                if validate_code:
+                    status, message = validate_validation_code(certigier_phone, validate_code)
+                    if status != 200:
+                        raise forms.ValidationError(
+                            # Modify by hb on 2015-12-02
+                            # self.error_messages['validate code not match'],
+                            message,
+                            code='validate_code_error',
+                        )
+                else:
+                    raise forms.ValidationError(
+                        self.error_messages['validate must not be null'],
+                        code='validate_code_error',
+                    )
+
+        return self.cleaned_data
