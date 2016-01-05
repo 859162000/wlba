@@ -182,6 +182,7 @@ class WeixinShareDetailView(TemplateView):
             gift = WanglibaoActivityGift.objects.create(
                 gift_id=product_id,
                 activity=self.activity,
+                redpack_id=2,
                 valid=True,
                 type=3,
                 cfg_id=1
@@ -220,10 +221,10 @@ class WeixinShareDetailView(TemplateView):
         if not self.activity:
             self.get_activity_by_id(activity)
 
-        user = WanglibaoUserProfile.objects.filter(phone=phone_num).first()
-        activity_record = WanglibaoActivityReward.objects.filter(order_id=product_id, user_id=user.user_id, activity='weixin_experience_glod').first()
+        profile = WanglibaoUserProfile.objects.filter(phone=phone_num).first()
+        activity_record = WanglibaoActivityReward.objects.filter(order_id=product_id, user_id=profile.user.id, activity='weixin_experience_glod').first()
         if activity_record:
-            return self.distribute_experience_glod(user, phone_num, openid, activity, product_id, activity_record.experience)
+            return self.distribute_experience_glod(profile.user, phone_num, openid, product_id, activity_record.experience)
 
         try:
             #TODO: 增加分享记录表，用于计数和加锁
@@ -334,7 +335,7 @@ class WeixinShareDetailView(TemplateView):
             logger.debug("整理用户的数据返回前端，phone:%s" %(gifts.identity,))
             QSet = WeixinUser.objects.filter(openid=openid).values("nickname", "headimgurl", "openid").first()
             if QSet:
-                ret_val = {"amount": gifts.amount, "name": QSet["nickname"], "img": QSet["headimgurl"], "phone": gifts.identity}
+                ret_val = {"amount": gifts.amount if gifts.amount < 10 else int(gifts.amount), "name": QSet["nickname"], "img": QSet["headimgurl"], "phone": gifts.identity}
             else:
                 ret_val = {"amount": 0, "name": "", "img": "", "phone": ""}
             self.debug_msg('个人获奖信息返回前端:%s' % (ret_val,))
@@ -1148,6 +1149,14 @@ class XunleiActivityAPIView(APIView):
 
                 return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
+            if not self.introduced_by_with(request.user.id, 'xunlei9', "2015-12-29"):
+                json_to_response = {
+                    'code': 1005,
+                    'lefts': 0,
+                    'message': u'用户不是在活动期内从迅雷渠道过来的用户'
+                }
+                return HttpResponse(json.dumps(json_to_response), content_type='applicaton/json')
+
             if not self.has_generate_reward_activity(request.user.id, self.activity_name):
                 self.generate_reward_activity(request.user)
 
@@ -1168,7 +1177,7 @@ class XunleiActivityAPIView(APIView):
 
             return HttpResponse(json.dumps(json_to_response), content_type='application/json')
 
-        if not self.introduced_by_with(request.user.id, 'xunlei9', "2015-11-29"):
+        if not self.introduced_by_with(request.user.id, 'xunlei9', "2015-12-29"):
             json_to_response = {
                 'code': 1001,
                 'message': u'用户不是在活动期内从迅雷渠道过来的用户'

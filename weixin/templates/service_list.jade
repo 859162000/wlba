@@ -1,0 +1,37 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+  head
+    title 网利宝
+    include include/service_head.jade
+  body
+    .top-account
+      .top-account-box
+        .tel-box {{phone}}
+        .money-box 余额：
+          span.red {{margin}}
+          | 元
+        .rechare-btn-box
+          a(href="/weixin/sub_recharge/").red-btn 充值
+    //有投资列表
+    if results
+      .list-body#list-body
+        include include/ajax/service_ajax_list.jade
+      .list-load
+        results_length = len(results)
+        if results_length > 10
+          .load-body
+            p.load-text 点击查看更多项目
+            p.load
+    else
+      //无投资列表
+      .list-body-none
+        .none-img-box
+          img(src="/static/imgs/sub_weixin/list/project-null.png")
+        .none-tit 项目都被抢空了<br />设置个性化消息推送，第一时间获取项目上线通知
+        .none-btn-box
+          a(href="javascript:;").white-btn 关闭页面
+          a(href="javascript:;").red-btn 消息设置
+    script(data-init='list', src="/static/scripts/subMobile/mobile.js?201511065")
+    //script(type="text/javascript", name="baidu-tc-cerfication", data-appid="6548828", src="https://ss0.bdstatic.com/9_QWf8Sm1A5BphGlnYG/cloudaapi/lightapp.js")

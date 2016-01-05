@@ -7,6 +7,9 @@ html(style="background:#FFF6B7;").wechat-html
         title 网利宝福袋
         include include/app_head
     body
+        input(type="hidden",name="url",value="{{ share.url }}")
+        input(type="hidden",name="title",value="{{ share.title }}")
+        input(type="hidden",name="content",value="{{ share.content }}")
         section.weChat-head
             img(src='/static/imgs/mobile_activity/app_wechat/banner.png')
 

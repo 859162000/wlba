@@ -121,9 +121,6 @@ urlpatterns += patterns(
     url(r'^share/code/$', TemplateView.as_view(template_name="share_code.jade")),
     url(r'^share/old/$', TemplateView.as_view(template_name="share_old_user.jade")),
     url(r'^share/new/$', TemplateView.as_view(template_name="share_new_user.jade")),
-    url(r'^app_wechatstart/$', TemplateView.as_view(template_name="app_weChatStart.jade")),
-    url(r'^app_wechatdetail/$', TemplateView.as_view(template_name="app_weChatDetail.jade")),
-    url(r'^app_wechatend/$', TemplateView.as_view(template_name="app_weChatEnd.jade")),
     url(r'^h5_mid_autumn/$', TemplateView.as_view(template_name="h5_mid_autumn.jade")),
     url(r'^app_mid_autumn/$', TemplateView.as_view(template_name="app_mid_autumn.jade")),
     url(r'^app_ten_year/$', TemplateView.as_view(template_name="app_ten_year.jade")),
@@ -166,7 +163,7 @@ urlpatterns += patterns(
     url(r'^app_damai/$', TemplateView.as_view(template_name="app_damai.jade")),
     url(r'^app_double_eggs/$', TemplateView.as_view(template_name="app_double_eggs.jade")),
     url(r'^app_praise_reward/$', TemplateView.as_view(template_name="app_praise_reward.jade")),
-
+    url(r'^app_xunlei/$', TemplateView.as_view(template_name="app_xunlei.jade")),
     # url(r'^app_thanksgivin/$', login_required(TemplateView.as_view(template_name="app_thanksgivin.jade"), login_url='/accounts/token_login/')),
 
 )
