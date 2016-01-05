@@ -218,8 +218,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
     }
 })();
 ;var boy = $(document.body).height();
-$('.xunmeng').css({'height': boy});
-$('.xunmeng2 ').css({'height': boy});
+$('.xunmeng,.xunmeng2,.xunmeng3').css({'height': boy});
 $('.xinlei-rule').click(function () {
     $('.xunmeng').show();
 });
@@ -380,9 +379,6 @@ org.xunlei = (function (org) {
                         }
                     }
                 }
-
-                //_self.$submit.attr('disabled',true).html('领取中，请稍后...');
-
                 ops = {
                     url: '/api/register/?promo_token=xunlei9',
                     type: 'POST',
@@ -394,7 +390,6 @@ org.xunlei = (function (org) {
                         'captcha_1': _self.$codeimg.val(),
                     },
                     success: function (data) {
-                        //console.log('11111')
                         if (data.ret_code == 0) {
 
                             org.ajax(get_ticket_ajax);
@@ -567,14 +562,11 @@ org.xunlei = (function (org) {
                 }
             })
         },
-    }
+    };
     return {
         init: lib.init
     }
 })(org);
-
-
-;
 (function (org) {
     $.each($('script'), function () {
         var src = $(this).attr('src');
