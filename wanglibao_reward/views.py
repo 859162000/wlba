@@ -1431,15 +1431,18 @@ class WeixinAnnualBonusView(TemplateView):
         with transaction.atomic():
             wx_bonus = WeixinAnnualBonus.objects.select_for_update().filter(openid=self.to_openid).first()
             if not wx_bonus:
-                return { 'err_code':402, 'err_messege':u'查询受评用户出错' }
+                rep = { 'err_code':402, 'err_messege':u'查询受评用户出错' }
+                return HttpResponse(json.dumps(rep), content_type='application/json')
 
             if wx_bonus.is_pay:
-                return { 'err_code':403, 'err_messege':u'您已经领取过了' }
+                rep = { 'err_code':403, 'err_messege':u'您已经领取过了' }
+                return HttpResponse(json.dumps(rep), content_type='application/json')
 
             # 如果用户未注册，引导用户前去注册
-            user = WanglibaoUserProfile.objects.filter(phone=wx_bonus.phone).first()
-            if not user:
-                return { 'err_code':404, 'err_messege':u'请注册后再领取' }
+            user_profile = WanglibaoUserProfile.objects.filter(phone=wx_bonus.phone).first()
+            if not user_profile:
+                rep = { 'err_code':404, 'err_messege':u'请注册后再领取' }
+                return HttpResponse(json.dumps(rep), content_type='application/json')
 
             # 以体验金形式发放年终奖
             bonus = wx_bonus.annual_bonus
@@ -1447,13 +1450,15 @@ class WeixinAnnualBonusView(TemplateView):
                 bonus = wx_bonus.annual_bonus - wx_bonus.min_annual_bonus
             event = ExperienceEvent.objects.filter(description=u'2015年终奖体验金').filter(amount=bonus).first()
             if not event:
-                return { 'err_code':405, 'err_messege':u'领取失败，请联系客服(405)' }
+                rep = { 'err_code':405, 'err_messege':u'领取失败，请联系客服(405)' }
+                return HttpResponse(json.dumps(rep), content_type='application/json')
 
             try:
-                SendExperienceGold(user).send(pk=event.id)
+                SendExperienceGold(user_profile.user).send(pk=event.id)
             except Exception, ex:
-                logger.exception("SendExperienceGold [%s, %s] Except: [%s]" % (user, event, ex))
-                return { 'err_code':406, 'err_messege':u'领取失败，请联系客服(406)' }
+                logger.exception("SendExperienceGold [%s, %s] Except: [%s]" % (user_profile.user, event, ex))
+                rep = { 'err_code':406, 'err_messege':u'领取失败，请联系客服(406)' }
+                return HttpResponse(json.dumps(rep), content_type='application/json')
 
             wx_bonus.is_pay = True
             wx_bonus.pay_time = timezone.now()
