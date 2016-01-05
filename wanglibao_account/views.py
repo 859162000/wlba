@@ -32,8 +32,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from forms import EmailOrPhoneRegisterForm, LoginAuthenticationNoCaptchaForm,\
-    ResetPasswordGetIdentifierForm, IdVerificationForm, TokenSecretSignAuthenticationForm,\
-    EnterpriseUserProfileForm
+    ResetPasswordGetIdentifierForm, IdVerificationForm, TokenSecretSignAuthenticationForm
 from marketing.models import IntroducedBy, Channels, Reward, RewardRecord
 from marketing.utils import set_promo_user, local_to_utc, get_channel_record
 from marketing import tools
@@ -77,7 +76,6 @@ from experience_gold.models import ExperienceAmortization, ExperienceEventRecord
 from wanglibao_pay.fee import WithdrawFee
 from wanglibao_account import utils as account_utils
 from wanglibao_rest.common import DecryptParmsAPIView
-from wanglibao_profile.models import EnterpriseUserProfile, EnterpriseUserProfileExtra
 
 logger = logging.getLogger(__name__)
 logger_anti = logging.getLogger('wanglibao_anti')
@@ -2197,137 +2195,3 @@ class FirstPayResultView(TemplateView):
     def get_context_data(self, **kwargs):
         first_pay_succeed = PayInfo.objects.filter(user=self.request.user, status=PayInfo.SUCCESS).exists()
         return {'first_pay_succeed': first_pay_succeed}
-
-
-class GetRequestUserType(APIView):
-    """获取认证用户的用户类型"""
-
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request):
-        json_response = {
-            'data': request.user.wanglibaouserprofile.utype,
-            'message': 'ok'
-        }
-
-        return HttpResponse(json.dumps(json_response), content_type='application/json')
-
-
-class EnterpriseUserProfileExtraApi(APIView):
-    """企业用户认证扩展资料接收接口"""
-
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request):
-        user = request.user
-        if user.wanglibaouserprofile.utype == '3':
-            field_name = request.POST.get('field_name')
-            e_profile, created = EnterpriseUserProfileExtra.objects.get_or_create(user=user)
-            if field_name == 'business_license':
-                business_license = request.POST.get('business_license')
-                # FixMe, 添加图片校验
-                if business_license:
-                    e_profile.business_license = business_license
-                    e_profile.save()
-                    response_data = {
-                        'message': 'ok',
-                        'ret_code': 10000,
-                    }
-                else:
-                    response_data = {
-                        'message': u'请选择营业执照',
-                        'ret_code': 10001,
-                    }
-            elif field_name == 'registration_cert':
-                registration_cert = request.POST.get('registration_cert')
-                # FixMe, 添加图片校验
-                if registration_cert:
-                    e_profile.registration_cert = registration_cert
-                    e_profile.save()
-                    response_data = {
-                        'message': 'ok',
-                        'ret_code': 10000,
-                    }
-                else:
-                    response_data = {
-                        'message': u'请选择税务登记证',
-                        'ret_code': 10001,
-                    }
-            else:
-                response_data = {
-                    'message': 'invalid field name',
-                    'ret_code': 50001,
-                }
-        else:
-            response_data = {
-                'message': u'非企业用户',
-                'ret_code': 20001,
-            }
-
-        return HttpResponse(json.dumps(response_data), content_type='application/json')
-
-
-class GetEnterpriseUserProfileApi(APIView):
-    """企业用户认证资料获取接口"""
-
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request):
-        user = request.user
-        if user.wanglibaouserprofile.utype == '3':
-            try:
-                e_profile = EnterpriseUserProfile.objects.get(user=user)
-                response_data = {
-                    'data': e_profile,
-                    'message': 'success',
-                    'ret_code': 10000
-                }
-            except EnterpriseUserProfile.DoesNotExist:
-                response_data = {
-                    'data': None,
-                    'message': u'用户企业资料不存在',
-                    'ret_code': 10001
-                }
-        else:
-            response_data = {
-                'data': None,
-                'message': u'非企业用户',
-                'ret_code': 20001,
-            }
-
-        return Response(response_data)
-
-
-class EnterpriseUserProfileApi(APIView):
-    """企业用户认证资料接收接口"""
-
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request):
-        user = request.user
-        if user.wanglibaouserprofile.utype == '3':
-            form = EnterpriseUserProfileForm(request.POST)
-            if form.is_valid():
-                user = request.user
-                try:
-                    e_profile = EnterpriseUserProfile.objects.get(user=user)
-                except EnterpriseUserProfile.DoesNotExist:
-                    e_profile = EnterpriseUserProfile
-
-                e_profile.company_name = form.cleaned_data['company_name']
-                e_profile.business_license = form.cleaned_data['business_license']
-                e_profile.registration_cert = form.cleaned_data['registration_cert']
-                e_profile.certigier_name = form.cleaned_data['certigier_name']
-                e_profile.certigier_phone = form.cleaned_data['certigier_phone']
-                e_profile.company_address = form.cleaned_data['company_address']
-                e_profile.company_account = form.cleaned_data['company_account']
-                e_profile.company_account_name = form.cleaned_data['company_account_name']
-                e_profile.deposit_bank_province = form.cleaned_data['deposit_bank_province']
-                e_profile.deposit_bank_city = form.cleaned_data['deposit_bank_city']
-                e_profile.bank_branch_address = form.cleaned_data['bank_branch_address']
-        else:
-            response_data = {
-                'data': None,
-                'message': u'非企业用户',
-                'ret_code': 20001,
-            }
