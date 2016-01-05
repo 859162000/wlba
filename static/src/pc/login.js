@@ -172,8 +172,22 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                       remember_me : remember_me
                   }
                 }).done(function() {
-                  var next = _getQueryStringByName('next') == '' ? '/' : _getQueryStringByName('next');
-                  window.location.href = next;
+                    $.ajax({
+                      url: '/qiye/profile/get/',
+                      type: "GET",
+                      data: {
+                      }
+                    }).done(function(data) {
+                        if(data.ret_code == 10000){
+                            window.location.href = '/accounts/home/';
+                        }else if(data.ret_code == 20001){
+                            var next = _getQueryStringByName('next') == '' ? '/' : _getQueryStringByName('next');
+                            window.location.href = next;
+                        }else{
+                            window.location.href = '/qiye/info/';
+                        }
+                    })
+
                 }).fail(function(xhr) {
                     var result = JSON.parse(xhr.responseText);
                     if(result.message.__all__ != undefined){
