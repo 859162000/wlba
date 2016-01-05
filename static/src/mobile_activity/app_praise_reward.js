@@ -180,7 +180,7 @@
 	/*领取我的年终奖*/
 	$('.now_use').click(function(){
 
-		window.location.href = '/weixin/regist/?next="'+shareLink+'"';
+
 
 		if($('.checkbox').hasClass('checkbox_select')){
 			$.ajax({
@@ -188,6 +188,10 @@
 				type: "GET",
 			}).done(function (xhr) {
 				if(xhr.err_code==0){
+					$('.friend_top span').text(xhr.err_messege);
+					$('.friend_top').fadeIn();
+				}else if(xhr.err_code==404){
+					$('.regist_button').css('display','block');
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 				}else{
@@ -199,6 +203,10 @@
 			$('.friend_top span').text('请点击，我同意网利宝年终奖活动规则');
 			$('.friend_top').fadeIn();
 		}
+	});
+	$('.regist_button').hide();
+	$('.regist_button').click(function(){
+		window.location.href = '/weixin/regist/?next="'+shareLink+'"';
 	});
 	/*领取我的年终奖结束*/
 
