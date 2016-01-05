@@ -48,7 +48,7 @@ define(['jquery', 'jquery.webuploader', 'csrf'], function ($, WebUploader, csrf)
 
 			//绑定文件加入队列事件;
 			webUploader.on('fileQueued', function( file ) {
-				createBox( $fileInput, file ,webUploader);
+				createBox( $fileInput, file ,webUploader ,opt.fileVal);
 
 			});
 
@@ -218,7 +218,7 @@ define(['jquery', 'jquery.webuploader', 'csrf'], function ($, WebUploader, csrf)
 	}
 
 	//创建文件操作div;
-	function createBox( $fileInput, file, webUploader ) {
+	function createBox( $fileInput, file, webUploader, fileVal) {
 
 		var file_id = file.id;
 		var $parentFileBox = $fileInput.next('.parentFileBox');
@@ -262,9 +262,12 @@ define(['jquery', 'jquery.webuploader', 'csrf'], function ($, WebUploader, csrf)
 			//绑定取消全部按钮;
 			$cancelButton.bind('click',function(){
 				var fileArr = webUploader.getFiles( 'queued' );
+                console.log(fileArr)
 				$.each( fileArr ,function( i, v ){
 					removeLi( $('#fileBox_'+v.id), v.id, webUploader );
 				});
+                $('input[name="'+ fileVal +'"]').val('');
+                $fileInput.parent().find('.parentFileBox').remove();
                 $fileInput.parent().find('.webuploader-pick').show();
 			});
 

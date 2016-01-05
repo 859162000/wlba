@@ -18,12 +18,16 @@ block main
             - csrf_token
             input(type='hidden',name="business_license")
             input(type='hidden',name="registration_cert")
+            if data.status == '审核通过'
+                .div 审核通过
+            else
+                .div 审核未通过，不可修改
             table
                 tbody
                     tr
                         td.td-left 公司名称
                         td
-                            input(type='text', name="company_name", placeholder="请输入公司名称", autocomplete='off', class="required {messages:{required:'请输入公司名称'}}")
+                            input(type='text', name="company_name", placeholder="请输入公司名称", autocomplete='off', class="required {messages:{required:'请输入公司名称'}}", value="{{data.company_name}}")
                     tr
                         td.td-left 营业执照
                         td#yezz
@@ -81,7 +85,8 @@ block main
                         td
                             input(type='text', name="trade_pwd", placeholder="请输入交易密码", autocomplete='off', class="required isNumber {maxlength:6,messages:{required:'请输入交易密码',maxlength:'不能超过{0}个字符'}}" )
             .qiye-btns
-                a(href='javascript:void(0)').save-btn 保存
+                if data.status == '审核通过'
+                    a(href='javascript:void(0)').save-btn 保存
                 a(href='javascript:void(0)').cancel-btn 取消
 
             #img-code-div2(style="display:none").modalStyle

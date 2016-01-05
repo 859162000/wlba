@@ -34,6 +34,7 @@ require(['jquery','jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/m
         success:function( data ) {
             $('input[name="business_license"]').val(data.filename);
             $('#yezz').find('input[type="file"]').remove()
+            $('#yezz').find('.diyButton').hide()
         },
         error:function( data ) {
             return tool.modalAlert({
@@ -59,6 +60,7 @@ require(['jquery','jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/m
         success:function( data ) {
             $('input[name="registration_cert"]').val(data.filename);
             $('#swdjz').find('input[type="file"]').remove()
+            $('#swdjz').find('.diyButton').hide()
         },
         error:function( data ) {
             return tool.modalAlert({
