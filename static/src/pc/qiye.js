@@ -14,11 +14,11 @@ require.config({
         'jquery.form': ['jquery'],
         'jquery.validate': ['jquery'],
         'jquery.modal': ['jquery'],
-        'jquery.webuploader': ['jquery']
+        'jquery.webuploader': ['jquery'],
     }
 });
 
-require(['jquery','csrf', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/modal', 'tools', 'jquery.webuploader' , 'upload'], function ($, form ,validate, placeholder, modal, tool, webuploader) {
+require(['jquery','csrf', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/modal', 'tools', 'jquery.webuploader', 'upload'], function ($, form ,validate, placeholder, modal, tool, webuploader) {
     //提交表单
     var qiyeFormValidate = $('#qiyeForm').validate({});
     $('.save-btn').on('click',function(){
@@ -76,6 +76,8 @@ require(['jquery','csrf', 'jquery.form', 'jquery.validate', 'jquery.placeholder'
     });
     //输入框
     $('input, textarea').placeholder();
+
+    new PCAS("deposit_bank_province","deposit_bank_city");
 
 
 

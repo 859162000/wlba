@@ -69,11 +69,7 @@ block main
                         td.td-left 公司开户行
                         td
                             select(name='deposit_bank_province', class="required {messages:{required:'请选择省份'}}" )
-                                option(value='') 请选择省份
-                                option(value='1') 黑龙江
                             select(name='deposit_bank_city', class="required {messages:{required:'请选择市'}}" )
-                                option(value='') 请选择市
-                                option(value='1') 哈尔滨
                     tr
                         td.td-left 开户行支行
                         td
@@ -100,5 +96,5 @@ block main
 
         block script
         script.
-            require(['/static/src/pc/qiye.js?v=20151120'])
+            require(['/static/src/pc/lib/PCASClass.js','/static/src/pc/qiye.js?v=20151120'])
 
