@@ -81,7 +81,7 @@ class EnterpriseProfileUploadApi(APIView):
             else:
                 response_data = {
                     'filename': None,
-                    'message': u'无效参数field＿name',
+                    'message': u'无效参数field_name',
                     'ret_code': 30001,
                 }
         else:
@@ -103,9 +103,9 @@ class GetEnterpriseUserProfileApi(APIView):
         user = request.user
         if user.wanglibaouserprofile.utype == '3':
             try:
-                e_profile = EnterpriseUserProfile.objects.get(user=user)
+                e_profile = EnterpriseUserProfile.objects.values().filter(user=user).first()
                 response_data = {
-                    'data': e_profile.company_name,
+                    'data': e_profile,
                     'message': 'success',
                     'ret_code': 10000
                 }

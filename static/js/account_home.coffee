@@ -21,7 +21,7 @@ require ['jquery', 'underscore', 'knockout',
   .success (data) ->
     $('#tyjzq').hide()
     if data.ret_code == 10000
-      $('#qiyeUser i').text(data.data)
+      $('#qiyeUser i').text(data.data.company_name)
     if data.ret_code == 20001
       $('#tyjzq').show()
 

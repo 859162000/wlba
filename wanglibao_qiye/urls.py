@@ -11,15 +11,16 @@ from .views import (EnterpriseProfileCreateApi, QiYeIndex, QiYeInfo, EnterpriseP
 urlpatterns = patterns(
     '',
     url(r'^login/', QiYeIndex.as_view(), name='qiye index'),
-    url(r'^info/', QiYeInfo.as_view(), name='qiye info'),
+    url(r'^info/', login_required(QiYeInfo.as_view(),
+                                  login_url='/qiye/login/'), name='qiye info'),
 
     # 企业理财
-    url(r'profile/extra/$', EnterpriseProfileUploadApi.as_view()),
-    url(r'profile/create/$', EnterpriseProfileCreateApi.as_view()),
-    url(r'profile/update/$', EnterpriseProfileUpdateApi.as_view()),
-    url(r'profile/get/$', GetEnterpriseUserProfileApi.as_view()),
+    url(r'profile/extra/$', login_required(EnterpriseProfileUploadApi.as_view(), login_url='/qiye/login/')),
+    url(r'profile/create/$', login_required(EnterpriseProfileCreateApi.as_view(), login_url='/qiye/login/')),
+    url(r'profile/update/$', login_required(EnterpriseProfileUpdateApi.as_view(), login_url='/qiye/login/')),
+    url(r'profile/get/$', login_required(GetEnterpriseUserProfileApi.as_view(), login_url='/qiye/login/')),
     url(r'profile/edit/$', login_required(EnterpriseProfileEditView.as_view(),
                                           login_url='/qiye/login/'), name='qiye update'),
-    url(r'profile/exists/$', EnterpriseProfileIsExistsApi.as_view()),
+    url(r'profile/exists/$', login_required(EnterpriseProfileIsExistsApi.as_view(), login_url='/qiye/login/')),
 )
 
