@@ -206,7 +206,7 @@
 	});
 	$('.regist_button').hide();
 	$('.regist_button').click(function(){
-		window.location.href = '/weixin/regist/?next="'+shareLink+'"';
+		window.location.href = '/weixin/regist/?next="'+shareLink+'"&promo_token=h5dianzan';
 	});
 	/*领取我的年终奖结束*/
 
