@@ -158,7 +158,7 @@ class EnterpriseProfileCreateApi(APIView):
                     e_profile.description = u'审核中'
                     e_profile.save()
 
-                    user.wanglibaouserprofile.trade_pwd = form.cleaned_data['trade_code']
+                    user.wanglibaouserprofile.trade_pwd = form.cleaned_data['trade_pwd']
                     user.save()
 
                     response_data = {
@@ -271,7 +271,7 @@ class EnterpriseProfileUpdateApi(APIView):
                     e_profile.status = u'待审核'
                     e_profile.save()
 
-                    user.wanglibaouserprofile.trade_pwd = form.cleaned_data['trade_code']
+                    user.wanglibaouserprofile.trade_pwd = form.cleaned_data['trade_pwd']
                     user.save()
 
                 response_data = {
