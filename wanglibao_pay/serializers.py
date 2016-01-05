@@ -4,7 +4,7 @@ from wanglibao_pay.models import Card, Bank
 class BankSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bank
-        fields = ['name', 'gate_id', ]
+        fields = ['id', 'name', 'gate_id', ]
 
 class CardSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(required=True, read_only=False)
