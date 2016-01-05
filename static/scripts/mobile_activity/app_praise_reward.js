@@ -254,12 +254,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		$('.fix_wrap').hide();
 		var user_num = $('.swiper-slide').length;
 
-		/*朋友个数*/
-
-		if(user_num!=0){
-			$('.friends,.gundong').show();
-		}
-		/*朋友个数结束*/
 	};
 
 	var is_myself = false;
