@@ -14,11 +14,11 @@ require.config({
         'jquery.form': ['jquery'],
         'jquery.validate': ['jquery'],
         'jquery.modal': ['jquery'],
-        'jquery.webuploader': ['jquery'],
+        'jquery.webuploader': ['jquery']
     }
 });
 
-require(['jquery','csrf', 'jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/modal', 'tools', 'jquery.webuploader', 'upload'], function ($, form ,validate, placeholder, modal, tool, webuploader) {
+require(['jquery','jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/modal', 'tools', 'jquery.webuploader', 'upload', 'csrf'], function ($, form ,validate, placeholder, modal, tool, webuploader) {
     //提交表单
     var qiyeFormValidate = $('#qiyeForm').validate({});
     $('.save-btn').on('click',function(){
@@ -32,10 +32,14 @@ require(['jquery','csrf', 'jquery.form', 'jquery.validate', 'jquery.placeholder'
    $('#yezz').diyUpload({
         url:'/qiye/profile/extra/',
         success:function( data ) {
-            console.info( data );
+            $('input[name="business_license"]').val(data.filename);
+            $('#yezz').find('input[type="file"]').remove()
         },
-        error:function( err ) {
-            console.info( err );
+        error:function( data ) {
+            return tool.modalAlert({
+              title: '温馨提示',
+              msg: data.message
+            });
         },
         buttonText : '营业执照',
         chunked:true,
@@ -53,10 +57,14 @@ require(['jquery','csrf', 'jquery.form', 'jquery.validate', 'jquery.placeholder'
     $('#swdjz').diyUpload({
         url: '/qiye/profile/extra/',
         success:function( data ) {
-            console.info( data );
+            $('input[name="registration_cert"]').val(data.filename);
+            $('#swdjz').find('input[type="file"]').remove()
         },
-        error:function( err ) {
-            console.info( err );
+        error:function( data ) {
+            return tool.modalAlert({
+              title: '温馨提示',
+              msg: data.message
+            });
         },
         buttonText : '登记证',
         chunked:true,
@@ -84,14 +92,18 @@ require(['jquery','csrf', 'jquery.form', 'jquery.validate', 'jquery.placeholder'
     /*----------------------验证码-----------------*/
     //图片验证码
     $('#button-get-code-btn').click(function() {
-      var url;
-      $('#img-code-div2').modal();
-      $('#img-code-div2').find('#id_captcha_1').val('');
-      url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
-      return $.getJSON(url, {}, function(json) {
-        $('input[name="captcha_0"]').val(json.key);
-        return $('img.captcha').attr('src', json.image_url);
-      });
+      var re = /^1\d{10}$/;
+      if(re.test($('input[name="certigier_phone"]').val())){
+        $('#img-code-div2').modal();
+        $('#img-code-div2').find('#id_captcha_1').val('');
+        var url = location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/?v=" + (+new Date());
+        return $.getJSON(url, {}, function(json) {
+            $('input[name="captcha_0"]').val(json.key);
+            return $('img.captcha').attr('src', json.image_url);
+        });
+      }else{
+        tool.modalAlert({title: '温馨提示',msg: '手机号格式不正确'});
+      }
     });
     //刷新验证码
     $('.captcha-refresh').on('click',function(){
@@ -108,7 +120,7 @@ require(['jquery','csrf', 'jquery.form', 'jquery.validate', 'jquery.placeholder'
       if ($(element).attr('disabled')) {
         return;
       }
-      phoneNumber = $(element).attr("data-phone");
+      phoneNumber = $('input[name="certigier_phone"]').val();
       captcha_0 = $(this).parents('form').find('#id_captcha_0').val();
       captcha_1 = $(this).parents('form').find('.captcha').val();
       $.ajax({

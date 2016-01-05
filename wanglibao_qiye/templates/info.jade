@@ -16,12 +16,14 @@ block main
         .qiye-h 企业账户注册
         form#qiyeForm(action="/qiye/profile/create/", method='post')
             - csrf_token
+            input(type='hidden',name="business_license")
+            input(type='hidden',name="registration_cert")
             table
                 tbody
                     tr
                         td.td-left 公司名称
                         td
-                            input(type='text', name="company_name", placeholder="请输入公司名称", autocomplete='off', class="required {messages:{required:'请输入公司名称'}}" )
+                            input(type='text', name="company_name", placeholder="请输入公司名称", autocomplete='off', class="required {messages:{required:'请输入公司名称'}}")
                     tr
                         td.td-left 营业执照
                         td#yezz
@@ -45,7 +47,7 @@ block main
                     tr
                         td.td-left 手机验证码
                         td
-                            input(type='text', name="code", placeholder="请输入验证码", autocomplete='off', class="required {messages:{required:'请输入验证码'}}" )
+                            input(type='text', name="validate_code", placeholder="请输入验证码", autocomplete='off', class="required {messages:{required:'请输入验证码'}}" )
                             button.ispan4-omega#button-get-code-btn.button-orange.button-large(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
                             .row.voice.void.hidden
                                 .span12-omega

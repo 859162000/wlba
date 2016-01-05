@@ -9,17 +9,21 @@ require.config(
 
 require ['jquery', 'underscore', 'knockout',
          'lib/backend', 'lib/templateLoader',
-         'model/portfolio', 'tools', 'lib/jquery.number.min',
+         'model/portfolio', 'tools',
          'lib/modal'], ($, _, ko, backend, templateLoader, portfolio, tool, modal)->
   #  判断是否是企业用户
   $.ajax
     url: "/qiye/profile/get/"
     type: "GET"
     data: {}
-  .fail (xhr)->
+  .fail (xhr) ->
     tool.modalAlert({title: '温馨提示', msg: xhr.message})
-  .success() ->
-    console.log(1)
+  .success (data) ->
+    $('#tyjzq').hide()
+    if data.ret_code == 10000
+      $('#qiyeUser i').text('1111')
+    if data.ret_code == 20001
+      $('#tyjzq').show()
 
   class DataViewModel
     constructor: ->
