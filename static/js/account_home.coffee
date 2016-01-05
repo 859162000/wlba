@@ -13,7 +13,7 @@ require ['jquery', 'underscore', 'knockout',
          'lib/modal'], ($, _, ko, backend, templateLoader, portfolio, tool, modal)->
   #  判断是否是企业用户
   $.ajax
-    url: "/qiye/profile/exists/"
+    url: "/qiye/profile/get/"
     type: "GET"
     data: {}
   .fail (xhr) ->
@@ -21,7 +21,7 @@ require ['jquery', 'underscore', 'knockout',
   .success (data) ->
     $('#tyjzq').hide()
     if data.ret_code == 10000
-      $('#qiyeUser i').text(data.company_name)
+      $('#qiyeUser i').text(data.data)
     if data.ret_code == 20001
       $('#tyjzq').show()
 

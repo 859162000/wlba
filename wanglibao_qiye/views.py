@@ -105,7 +105,7 @@ class GetEnterpriseUserProfileApi(APIView):
             try:
                 e_profile = EnterpriseUserProfile.objects.get(user=user)
                 response_data = {
-                    'data': e_profile.to_json_filter(),
+                    'data': e_profile.company_name,
                     'message': 'success',
                     'ret_code': 10000
                 }
