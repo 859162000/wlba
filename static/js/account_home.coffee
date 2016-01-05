@@ -11,6 +11,16 @@ require ['jquery', 'underscore', 'knockout',
          'lib/backend', 'lib/templateLoader',
          'model/portfolio', 'tools', 'lib/jquery.number.min',
          'lib/modal'], ($, _, ko, backend, templateLoader, portfolio, tool, modal)->
+  #  判断是否是企业用户
+  $.ajax
+    url: "/qiye/profile/get/"
+    type: "GET"
+    data: {}
+  .fail (xhr)->
+    tool.modalAlert({title: '温馨提示', msg: xhr.message})
+  .success() ->
+    console.log(1)
+
   class DataViewModel
     constructor: ->
       self = this
@@ -76,7 +86,7 @@ require ['jquery', 'underscore', 'knockout',
   viewModel = new DataViewModel()
   ko.applyBindings viewModel
 
-###  backend.fundInfo()
+  ###  backend.fundInfo()
   .done (data)->
     totalAsset = parseFloat($("#total_asset").attr("data-p2p")) + parseFloat(data["fund_total_asset"])
     $("#total_asset").text($.number(totalAsset, 2))

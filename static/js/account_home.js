@@ -12,6 +12,18 @@
 
   require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/templateLoader', 'model/portfolio', 'tools', 'lib/jquery.number.min', 'lib/modal'], function($, _, ko, backend, templateLoader, portfolio, tool, modal) {
     var DataViewModel, isXunleiBindSuccess, viewModel;
+    $.ajax({
+      url: "/qiye/profile/get/",
+      type: "GET",
+      data: {}
+    }).fail(function(xhr) {
+      return tool.modalAlert({
+        title: '温馨提示',
+        msg: xhr.message
+      });
+    }).success()(function() {
+      return console.log(1);
+    });
     DataViewModel = (function() {
       function DataViewModel() {
         var self;
@@ -88,24 +100,23 @@
     })();
     viewModel = new DataViewModel();
     ko.applyBindings(viewModel);
-    backend.fundInfo().done(function(data) {
-      var totalAsset;
-      totalAsset = parseFloat($("#total_asset").attr("data-p2p")) + parseFloat(data["fund_total_asset"]);
-      $("#total_asset").text($.number(totalAsset, 2));
-      $("#fund_total_asset").text($.number(data["fund_total_asset"], 2));
-      $("#fund_total_asset_title").text($.number(data["fund_total_asset"], 2));
-      $("#total_income").text($.number(data["total_income"], 2));
-      $("#fund_income_week").text($.number(data["fund_income_week"], 2));
-      $("#fund_income_month").text($.number(data["fund_income_month"], 2));
-    }).fail(function(data) {
-      tool.modalAlert({
-        title: '温馨提示',
-        msg: '基金获取失败，请刷新重试！',
-        callback_ok: function() {
-          return location.reload();
-        }
-      });
-    });
+
+    /*  backend.fundInfo()
+    .done (data)->
+      totalAsset = parseFloat($("#total_asset").attr("data-p2p")) + parseFloat(data["fund_total_asset"])
+      $("#total_asset").text($.number(totalAsset, 2))
+      $("#fund_total_asset").text($.number(data["fund_total_asset"], 2))
+      $("#fund_total_asset_title").text($.number(data["fund_total_asset"], 2))
+      $("#total_income").text($.number(data["total_income"], 2))
+      $("#fund_income_week").text($.number(data["fund_income_week"], 2))
+      $("#fund_income_month").text($.number(data["fund_income_month"], 2))
+      return
+    .fail (data)->
+      tool.modalAlert({title: '温馨提示', msg: '基金获取失败，请刷新重试！', callback_ok: ()->
+                location.reload()
+            })
+      return
+     */
     $(".xunlei-binding-modal").click(function() {
       return $('#xunlei-binding-modal').modal();
     });
@@ -164,3 +175,5 @@
   });
 
 }).call(this);
+
+//# sourceMappingURL=account_home.js.map

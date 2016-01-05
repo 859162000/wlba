@@ -406,7 +406,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                     user_type: '3'
                 }
             }).done(function () {
-                var next = _getQueryStringByName('next') == '' ? '/accounts/register/first/' : _getQueryStringByName('next');
+                var next = _getQueryStringByName('next') == '' ? '/qiye/info/' : _getQueryStringByName('next');
                 window.location.href = next;
 
             }).fail(function (xhr) {

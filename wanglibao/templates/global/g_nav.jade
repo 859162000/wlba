@@ -51,7 +51,8 @@
               a(href=url)=text
           +liItem('/pay/banks/', '我要充值')
           +liItem('/pay/withdraw/', '我要提现')
-          +liItem('/accounts/auto_tender/', '自动投标')
+          if user.wanglibaouserprofile.utype != '3'
+            +liItem('/accounts/auto_tender/', '自动投标')
           +liItem('/accounts/transaction/p2p/', '交易记录')
 
     .g-nav-box
