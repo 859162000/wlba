@@ -303,7 +303,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		$('.gundong').append('</div></div>');
 		$('.gundong').append('<img class="swiper-button-next" src="/static/imgs/mobile_activity/app_praise_reward/next.png"><img class="swiper-button-prev" src="/static/imgs/mobile_activity/app_praise_reward/prev.png">');
 		var user_num = $('.swiper-slide').length;
-		alert(user_num);
 		if(user_num>6){
 			var swiper = new Swiper('.swiper-container', {
 				initialSlide : 0,
