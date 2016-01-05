@@ -147,7 +147,7 @@ class EnterpriseProfileCreateApi(APIView):
                     e_profile.business_license = form.cleaned_data['business_license']
                     e_profile.registration_cert = form.cleaned_data['registration_cert']
                     e_profile.certigier_name = form.cleaned_data['certigier_name']
-                    e_profile.certigier_phone = form.cleaned_data['certigier_phone']
+                    e_profile.certigier_phone = int(form.cleaned_data['certigier_phone'])
                     e_profile.company_address = form.cleaned_data['company_address']
                     e_profile.company_account = form.cleaned_data['company_account']
                     e_profile.company_account_name = form.cleaned_data['company_account_name']
@@ -260,7 +260,7 @@ class EnterpriseProfileUpdateApi(APIView):
                     e_profile.business_license = form.cleaned_data['business_license']
                     e_profile.registration_cert = form.cleaned_data['registration_cert']
                     e_profile.certigier_name = form.cleaned_data['certigier_name']
-                    e_profile.certigier_phone = form.cleaned_data['certigier_phone']
+                    e_profile.certigier_phone = int(form.cleaned_data['certigier_phone'])
                     e_profile.company_address = form.cleaned_data['company_address']
                     e_profile.company_account = form.cleaned_data['company_account']
                     e_profile.company_account_name = form.cleaned_data['company_account_name']

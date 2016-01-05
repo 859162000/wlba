@@ -82,7 +82,7 @@ block main
                             select(name='bank',class="required {messages:{required:'请选择所属银行'}}")
                                 option(value='') 请选择银行卡
                                 for bank in banks
-                                    option(value='{{bank}}') {{bank}}
+                                    option(value='{{bank.id}}') {{bank.name}}
                     tr
                         td.td-left 交易密码
                         td

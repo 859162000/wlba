@@ -61,7 +61,7 @@ class EnterpriseUserProfileForm(forms.Form):
                 code="10001",
             )
 
-        return certigier_phone
+        return int(certigier_phone)
 
     def clean_company_address(self):
         company_address = self.cleaned_data.get('company_address', '').strip()
@@ -100,7 +100,7 @@ class EnterpriseUserProfileForm(forms.Form):
 
     def clean_validate_code(self):
         if 'certigier_phone' in self.cleaned_data:
-            certigier_phone = self.cleaned_data["certigier_phone"].strip()
+            certigier_phone = self.cleaned_data["certigier_phone"]
             if detect_phone_for_identifier(certigier_phone):
                 validate_code = self.cleaned_data.get('validate_code', '')
                 if validate_code:
