@@ -221,6 +221,24 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 
 	window.onload = function() {
 		$('.fix_wrap').hide();
+		var user_num = $('.swiper-slide').length;
+		if(user_num>6){
+			var swiper = new Swiper('.swiper-container', {
+				slidesPerView: 6,
+				nextButton: '.swiper-button-next',
+				prevButton: '.swiper-button-prev',
+				loop: true
+   			});
+		}else{
+			$('.swiper-slide').addClass('friends_length');
+		}
+
+		/*朋友个数*/
+
+		if(user_num!=0){
+			$('.friends,.gundong').show();
+		}
+		/*朋友个数结束*/
 	};
 	var is_myself;
 
@@ -241,34 +259,6 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	if(uid!=undefined){
 		$('.shine_wrap').show();
 	}
-
-	/*滚动图*/
-
-
-	jQuery(document).ready(function() {
-		var user_num = $('.swiper-slide').length;
-		if(user_num>6){
-			var swiper = new Swiper('.swiper-container', {
-				slidesPerView: 6,
-				nextButton: '.swiper-button-next',
-				prevButton: '.swiper-button-prev',
-				loop: true
-   			});
-		}else{
-			$('.swiper-slide').addClass('friends_length');
-		}
-
-		/*朋友个数*/
-
-		if(user_num!=0){
-			$('.friends,.gundong').show();
-		}
-		/*朋友个数结束*/
-
-
-	});
-	/*滚动图结束*/
-
 	var is_myself = false;
 
 	/*分享*/
@@ -311,6 +301,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		$('.gundong').append('</div></div>');
 		$('.gundong').append('<img class="swiper-button-next" src="/static/imgs/mobile_activity/app_praise_reward/next.png"><img class="swiper-button-prev" src="/static/imgs/mobile_activity/app_praise_reward/prev.png">');
 		var user_num = $('.swiper-slide').length;
+		alert(user_num);
 		if(user_num>6){
 			var swiper = new Swiper('.swiper-container', {
 				slidesPerView: 6,
