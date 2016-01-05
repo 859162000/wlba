@@ -77,16 +77,16 @@
 	function renovate_friends(friends_length,friends_img){
 		$('.gundong').html('');
 		$('.gundong').append('<div class="swiper-container"><div class="swiper-wrapper">');
-		for(var i=0; i<=friends_length; i++){
+		for(var i=0; i<friends_length; i++){
 			follow_one = friends_img[i];
 			$('.swiper-wrapper').append('<div class="swiper-slide"><img class="user" src="'+follow_one.from_headimgurl+'"/></div>');
 		}
 		$('.gundong').append('</div></div>');
 		$('.gundong').append('<img class="swiper-button-next" src="/static/imgs/mobile_activity/app_praise_reward/next.png"><img class="swiper-button-prev" src="/static/imgs/mobile_activity/app_praise_reward/prev.png">');
 		var user_num = $('.swiper-slide').length;
-		alert(user_num);
 		if(user_num>6){
 			var swiper = new Swiper('.swiper-container', {
+				initialSlide : 0,
 				slidesPerView: 6,
 				nextButton: '.swiper-button-next',
 				prevButton: '.swiper-button-prev',
