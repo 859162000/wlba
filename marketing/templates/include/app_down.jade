@@ -37,7 +37,6 @@ script.
           if (ua.match(/MicroMessenger/i) == "micromessenger") {
             window.location.href = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.wljr.wanglibao&g_f=991653';
           }else{
-
             if(isiOS){
               window.location.href = 'https://itunes.apple.com/cn/app/wang-li-bao/id881326898?mt=8';
             }else if(isAndroid) {
@@ -47,11 +46,28 @@ script.
             }
           }
       }
-      if (ua.match(/MicroMessenger/i) != "micromessenger") {
-        window.setTimeout(function(){
-          window.location.href = 'wanglibao://'
-        },0)
 
+      if (ua.match(/MicroMessenger/i) != "micromessenger"){
+        setTimeout(function(){
+          openAppByFrame('wanglibao://')
+        },0)
+      }
+
+      function openAppByFrame(url) {
+        var frm = getOpenAppProxyFrame();
+        var src = '\<script\>window.location="' + url + '";\</script\>';
+        frm.contentDocument.write(src);
+      }
+
+      var _openAppProxyFrame;
+      function getOpenAppProxyFrame() {
+        if (_openAppProxyFrame) {
+          return _openAppProxyFrame;
+        }
+        _openAppProxyFrame = document.createElement('iframe');
+        document.body.appendChild(_openAppProxyFrame);
+        _openAppProxyFrame.style.display = 'none';
+        return _openAppProxyFrame;
       }
   })();
 
