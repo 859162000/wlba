@@ -239,7 +239,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	}).done(function (xhr) {
 		if(xhr.err_code==0){
 			renovate_friends(xhr.follow.length,xhr.follow);
-			$('.renovate').click();
+			//$('.renovate').click();
 		}else{
 			//$('.friend_top span').text(xhr.err_messege);
 			//$('.friend_top').fadeIn();
