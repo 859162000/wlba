@@ -389,8 +389,18 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	});
 	/*申请我的年终奖结束*/
 
+	var shareName = $('.share_name').text(),
+		shareImg = $('.share_img').text(),
+		shareLink = $('.share_link').text(),
+		shareMainTit = $('.share_title').text(),
+		shareBody = $('.share_body').text(),
+		share_friends = '我领到一份年终奖，'+praise_num+'元噢！你也为自己一年的努力另一份吧！，';
+
 	/*领取我的年终奖*/
 	$('.now_use').click(function(){
+
+		window.location.href = '/weixin/regist/?next="'+shareLink+'"';
+
 		if($('.checkbox').hasClass('checkbox_select')){
 			$.ajax({
 				url: '/weixin_activity/weixin/bonus/?act=pay&wxid='+wxid,
@@ -426,12 +436,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 		$('.rule_wrap').hide();
 	});
 
-	var shareName = $('.share_name').text(),
-		shareImg = $('.share_img').text(),
-		shareLink = $('.share_link').text(),
-		shareMainTit = $('.share_title').text(),
-		shareBody = $('.share_body').text(),
-		share_friends = '我领到一份年终奖，'+praise_num+'元噢！你也为自己一年的努力另一份吧！，';
+
 
     var jsApiList = ['scanQRCode', 'onMenuShareAppMessage','onMenuShareTimeline','onMenuShareQQ'];
 	org.ajax({
