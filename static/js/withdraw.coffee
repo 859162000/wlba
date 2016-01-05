@@ -310,9 +310,9 @@ require ['jquery', 'lib/modal', 'lib/backend', 'tools', 'jquery.placeholder', 'l
     .done (xhr) ->
       $('.noCard').hide()
       str = xhr.bank.name + '&nbsp;&nbsp;' +xhr.no.substring(0,3)+'**** ****' +xhr.no.substr(xhr.no.length-4)
-      $('.bindingCard').show().html(str).attr('gate_id',xhr.bank.gate_id)
+      $('.bindingCard').show().html(str).attr('id',xhr.bank.id)
       $('#bindingEdInfo').html(str).attr('data-no',xhr.no)
-      $('input[name="card_id"]').val(xhr.id)
+      $('input[name="card_id"]').val(xhr.bank.id)
   ###判断是否设置了交易密码###
   $.ajax
     url: "/api/profile/"
