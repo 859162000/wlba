@@ -13,7 +13,7 @@
   require(['jquery', 'underscore', 'knockout', 'lib/backend', 'lib/templateLoader', 'model/portfolio', 'tools', 'lib/modal'], function($, _, ko, backend, templateLoader, portfolio, tool, modal) {
     var DataViewModel, isXunleiBindSuccess, viewModel;
     $.ajax({
-      url: "/qiye/profile/get/",
+      url: "/qiye/profile/exists/",
       type: "GET",
       data: {}
     }).fail(function(xhr) {
@@ -24,7 +24,7 @@
     }).success(function(data) {
       $('#tyjzq').hide();
       if (data.ret_code === 10000) {
-        $('#qiyeUser i').text('1111');
+        $('#qiyeUser i').text(data.company_name);
       }
       if (data.ret_code === 20001) {
         return $('#tyjzq').show();
