@@ -285,6 +285,8 @@ def check_unavailable_3_days():
     days = 3
     check_date = timezone.now() + timezone.timedelta(days=days)
     date_fmt = check_date.strftime('%Y-%m-%d')
+    start_date = utils.local_to_utc(check_date, 'min').strftime('%Y-%m-%d %H:%M:%S')
+    end_date = utils.local_to_utc(check_date, 'max').strftime('%Y-%m-%d %H:%M:%S')
 
     cursor = connection.cursor()
     sql = "select COUNT(c.user_id), c.user_id, p.phone " \
@@ -293,9 +295,9 @@ def check_unavailable_3_days():
           "wanglibao_redpack_redpackevent e, " \
           "wanglibao_profile_wanglibaouserprofile p " \
           "where c.redpack_id = r.id and r.event_id = e.id and c.user_id = p.user_id " \
-          "and date_format(e.unavailable_at, '%Y-%m-%d') = '{}' " \
+          "and e.unavailable_at > '{}' and e.unavailable_at <= '{}' " \
           "and e.auto_extension = 0 and c.order_id is NULL " \
-          "group by c.user_id;".format(date_fmt)
+          "group by c.user_id;".format(start_date, end_date)
 
     cursor.execute(sql)
     fetchall = cursor.fetchall()
