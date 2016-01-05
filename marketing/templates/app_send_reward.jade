@@ -1,6 +1,6 @@
 - load formatters
 doctype html
-html(style="background: #fff2d5")
+html(style="background: #27053d")
     head
         title 网利宝
         include include/app_head
@@ -9,7 +9,34 @@ html(style="background: #fff2d5")
     body
         #body_wrap
             img.banner(src="/static/imgs/mobile_activity/app_send_reward/banner.jpg")
-
+            .top_wrap
+                .title_1 超值礼品全民送
+                .text_1 网利宝现推出“全民投资有奖”新年重磅活动，活动期间小额投资100%投资有奖，新老用户均可参与，多投多得~
+                .link_wrap
+                    span 您已登录,您没有领奖机会～
+                    span.yellow |
+                    a(href='＃') 立即投资
+                .title_2 注：奖品先投先得，领完为止，如个别奖品发放完请选择同档其他奖品。
+            .main_wrap.main_wrap_1
+                .body_main
+                    .title!='<span>第一档</span>100元≤单笔投资＜ 2000，以下奖品三选一：'
+                    .box_wrap
+                        .box
+                            dl
+                                dt.one
+                                    img(src="/static/imgs/mobile_activity/app_send_reward/reward_1.png")
+                                dd 7天迅雷会员
+                            .button 点击领取
+                        .box
+                            dl
+                                dt.two
+                                dd 7天爱奇艺会员
+                            .button 点击领取
+                        .box.box_three
+                            dl
+                                dt.three
+                                dd 30元代金券
+                            .button 点击领取
         script(src='/static/src/mobile/lib/weixin/wx.js')
         script(src="/static/scripts/mobile_activity/app_send_reward.js?v=120801")
         script.
