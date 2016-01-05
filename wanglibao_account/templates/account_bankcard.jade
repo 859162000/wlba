@@ -27,17 +27,20 @@ block main
               dl.bank-card--info-row
                 dt.bank-card--info-title 账号
                 dd.bank-card--info-value {{card.no | bank_card}}
-            .row
-              a#del-card.pull-right.del-bank-card(card_id='{{card.id}}') 删除
-        a#add-card-button(href='#add-card-form')
-          .add-bank-card
-            .add-icon-large
-            p.add-card-text 添加一张银行卡
+            if user.wanglibaouserprofile.utype != '3'
+              .row
+                a#del-card.pull-right.del-bank-card(card_id='{{card.id}}') 删除
+        if user.wanglibaouserprofile.utype != '3'
+          a#add-card-button(href='#add-card-form')
+            .add-bank-card
+              .add-icon-large
+              p.add-card-text 添加一张银行卡
       else
-        a#add-card-button(href='#add-card-form')
-          .add-bank-card
-            .add-icon-large
-            p.add-card-text 添加一张银行卡
+        if user.wanglibaouserprofile.utype != '3'
+          a#add-card-button(href='#add-card-form')
+            .add-bank-card
+              .add-icon-large
+              p.add-card-text 添加一张银行卡
 
     .space-vertical-l
     .bar.padding-l-r-m

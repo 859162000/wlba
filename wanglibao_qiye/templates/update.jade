@@ -14,10 +14,11 @@ block sidebar
 block main
     .panel.p2p-record.qiye
         .qiye-h 企业账户注册
-        form#qiyeForm(action="/qiye/profile/create/", method='post')
+        form#qiyeForm(action="/qiye/profile/update/", method='post')
             - csrf_token
-            input(type='hidden',name="business_license")
-            input(type='hidden',name="registration_cert")
+            input(type='hidden',name="business_license", value="{{data.business_license}}")
+            input(type='hidden',name="registration_cert",value="{{data.registration_cert}}")
+            input(type='hidden',name="pageType", value="edit")
             if data.status == '审核通过'
                 .div 审核通过
             else
@@ -30,13 +31,17 @@ block main
                             input(type='text', name="company_name", placeholder="请输入公司名称", autocomplete='off', class="required {messages:{required:'请输入公司名称'}}", value="{{data.company_name}}")
                     tr
                         td.td-left 营业执照
-                        td#yezz
+                        td
+                            img(src="/media/{{data.business_license}}",style="width:148px;height:98px;float:left;margin-right:10px")
+                            .div#yezz
                             //span 营业执照
                             //a(href='javascript:void(0)').upload 上传
                             //a(href='javascript:void(0)').del 删除
                     tr
                         td.td-left 税务登记证
-                        td#swdjz
+                        td
+                            img(src="/media/{{data.registration_cert}}",style="width:148px;height:98px;float:left;margin-right:10px")
+                            .div#swdjz
                             //span 登记证
                             //a(href='javascript:void(0)').upload 上传
                             //a(href='javascript:void(0)').del 删除
@@ -47,7 +52,7 @@ block main
                     tr
                         td.td-left 负责人电话
                         td
-                            input(type='text', name="certigier_phone", placeholder="请输入负责人电话", autocomplete='off', class="required isMobileTel {messages:{required:'请输入负责人电话'}}", value="{{data.certigier_phone}}" )
+                            input(type='text', name="certigier_phone", placeholder="请输入负责人电话", autocomplete='off', class="required isMobileTel {messages:{required:'请输入负责人电话'}}", value="{{data.certigier_phone}}")
                     tr
                         td.td-left 手机验证码
                         td
@@ -58,7 +63,7 @@ block main
                     tr
                         td.td-left 公司地址
                         td
-                            input(type='text', name="company_address", placeholder="请输入公司地址", autocomplete='off', class="required {messages:{required:'请输入公司地址'}}" , value="{{data.company_address}}")
+                            input(type='text', name="company_address", placeholder="请输入公司地址", autocomplete='off', class="required {messages:{required:'请输入公司地址'}}", value="{{data.company_address}}")
 
             .qiye-h.qiye-bank-info 提现银行账户信息
             table
@@ -66,34 +71,30 @@ block main
                     tr
                         td.td-left 公司账户名称
                         td
-                            input(type='text', name="company_account_name", placeholder="请输入账户名称", autocomplete='off', class="required {messages:{required:'请输入账户名称'}}", value="{{data.company_account_name}}")
+                            input(type='text', name="company_account_name", readonly="readonly", placeholder="请输入账户名称", autocomplete='off', class="required {messages:{required:'请输入账户名称'}}", value="{{data.bank_account_name}}")
                     tr
                         td.td-left 公司账户账号
                         td
-                            input(type='text', name="company_account", placeholder="请输入帐号", autocomplete='off', class="required isNumber {messages:{required:'请输入帐号'}}", value="{{data.company_account}}" )
+                            input(type='text', name="company_account", readonly="readonly", placeholder="请输入帐号", autocomplete='off', class="required isNumber {messages:{required:'请输入帐号'}}", value="{{data.bank_card_no}}")
                     tr
                         td.td-left 公司开户行
-                        td
-                            select(name='deposit_bank_province', class="required {messages:{required:'请选择省份'}}" )
-                            select(name='deposit_bank_city', class="required {messages:{required:'请选择市'}}" )
+                        td  {{data.deposit_bank_province}} - {{data.deposit_bank_city}}
+                            input(name='deposit_bank_province',value='{{data.deposit_bank_province}}',type="hidden")
+                            input(name='deposit_bank_city',value='{{data.deposit_bank_city}}',type="hidden")
                     tr
                         td.td-left 开户行支行
                         td
-                            input(type='text', name="bank_branch_address", placeholder="请输入开户支行名称", autocomplete='off', class="required {messages:{required:'请输入开户支行名称'}}", value="{{data.bank_branch_address}}" )
+                            input(type='text', name="bank_branch_address", readonly="readonly", placeholder="请输入开户支行名称", autocomplete='off', class="required {messages:{required:'请输入开户支行名称'}}", value="{{data.bank_branch_address}}")
                     tr
                         td.td-left 所属银行
-                        td
-                            select(name='bank',class="required {messages:{required:'请选择所属银行'}}")
-                                option(value='') 请选择银行卡
-                                for bank in banks
-                                    option(value='{{bank.id}}') {{bank.name}}
+                        td {{data.bank}}
+                            input(name='bank',value='{{data.bank.id}}',type="hidden")
                     tr
                         td.td-left 交易密码
                         td
                             input(type='text', name="trade_pwd", placeholder="请输入交易密码", autocomplete='off', class="required isNumber {maxlength:6,messages:{required:'请输入交易密码',maxlength:'不能超过{0}个字符'}}", value="{{data.trade_pwd}}")
             .qiye-btns
-                if data.status == '审核通过'
-                    a(href='javascript:void(0)').save-btn 保存
+                a(href='javascript:void(0)').save-btn 保存
                 a(href='javascript:void(0)').cancel-btn 取消
 
             #img-code-div2(style="display:none").modalStyle

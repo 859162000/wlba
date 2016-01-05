@@ -24,7 +24,7 @@ require(['jquery','jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/m
     $('.save-btn').on('click',function(){
         if(qiyeFormValidate.form()){
             $('#qiyeForm').ajaxSubmit(function(data){
-
+                window.location.href = '/accounts/home/';
             })
         }
     })
@@ -35,6 +35,7 @@ require(['jquery','jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/m
             $('input[name="business_license"]').val(data.filename);
             $('#yezz').find('input[type="file"]').remove()
             $('#yezz').find('.diyButton').hide()
+            $('#yezz').parent().find('img').remove();
         },
         error:function( data ) {
             return tool.modalAlert({
@@ -61,6 +62,7 @@ require(['jquery','jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/m
             $('input[name="registration_cert"]').val(data.filename);
             $('#swdjz').find('input[type="file"]').remove()
             $('#swdjz').find('.diyButton').hide()
+            $('#swdjz').parent().find('img').remove();
         },
         error:function( data ) {
             return tool.modalAlert({
@@ -87,8 +89,9 @@ require(['jquery','jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/m
     //输入框
     $('input, textarea').placeholder();
 
-    new PCAS("deposit_bank_province","deposit_bank_city");
-
+    if($('input[name="pageType"]').val() != 'edit'){
+        new PCAS("deposit_bank_province","deposit_bank_city");
+    }
 
 
     /*----------------------验证码-----------------*/

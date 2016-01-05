@@ -173,7 +173,7 @@ require(['jquery','jquery.placeholder'], function( $ ,placeholder) {
                   }
                 }).done(function() {
                     $.ajax({
-                      url: '/qiye/profile/get/',
+                      url: '/qiye/profile/exists/',
                       type: "GET",
                       data: {
                       }
