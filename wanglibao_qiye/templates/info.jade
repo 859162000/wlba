@@ -14,14 +14,14 @@ block sidebar
 block main
     .panel.p2p-record.qiye
         .qiye-h 企业账户注册
-        form#qiyeForm(action="", method='post')
+        form#qiyeForm(action="/qiye/profile/create/", method='post')
             - csrf_token
             table
                 tbody
                     tr
                         td.td-left 公司名称
                         td
-                            input(type='text', name="name", placeholder="请输入公司名称", autocomplete='off', class="required {messages:{required:'请输入公司名称'}}" )
+                            input(type='text', name="company_name", placeholder="请输入公司名称", autocomplete='off', class="required {messages:{required:'请输入公司名称'}}" )
                     tr
                         td.td-left 营业执照
                         td#yezz
@@ -37,11 +37,11 @@ block main
                     tr
                         td.td-left 授权负责人
                         td
-                            input(type='text', name="people", placeholder="请输入负责人", autocomplete='off', class="required {messages:{required:'请输入负责人'}}" )
+                            input(type='text', name="certigier_name", placeholder="请输入负责人", autocomplete='off', class="required {messages:{required:'请输入负责人'}}" )
                     tr
                         td.td-left 负责人电话
                         td
-                            input(type='text', name="phone", placeholder="请输入负责人电话", autocomplete='off', class="required isMobileTel {messages:{required:'请输入负责人电话'}}" )
+                            input(type='text', name="certigier_phone", placeholder="请输入负责人电话", autocomplete='off', class="required isMobileTel {messages:{required:'请输入负责人电话'}}" )
                     tr
                         td.td-left 手机验证码
                         td
@@ -52,7 +52,7 @@ block main
                     tr
                         td.td-left 公司地址
                         td
-                            input(type='text', name="address", placeholder="请输入公司地址", autocomplete='off', class="required {messages:{required:'请输入公司地址'}}" )
+                            input(type='text', name="company_address", placeholder="请输入公司地址", autocomplete='off', class="required {messages:{required:'请输入公司地址'}}" )
 
             .qiye-h.qiye-bank-info 提现银行账户信息
             table
@@ -60,28 +60,28 @@ block main
                     tr
                         td.td-left 公司账户名称
                         td
-                            input(type='text', name="username", placeholder="请输入账户名称", autocomplete='off', class="required {messages:{required:'请输入账户名称'}}" )
+                            input(type='text', name="company_account_name", placeholder="请输入账户名称", autocomplete='off', class="required {messages:{required:'请输入账户名称'}}" )
                     tr
                         td.td-left 公司账户账号
                         td
-                            input(type='text', name="id", placeholder="请输入帐号", autocomplete='off', class="required isNumber {messages:{required:'请输入帐号'}}" )
+                            input(type='text', name="company_account", placeholder="请输入帐号", autocomplete='off', class="required isNumber {messages:{required:'请输入帐号'}}" )
                     tr
                         td.td-left 公司开户行
                         td
-                            select(name='shengfen', class="required {messages:{required:'请选择省份'}}" )
+                            select(name='deposit_bank_province', class="required {messages:{required:'请选择省份'}}" )
                                 option(value='') 请选择省份
                                 option(value='1') 黑龙江
-                            select(name='shi', class="required {messages:{required:'请选择市'}}" )
+                            select(name='deposit_bank_city', class="required {messages:{required:'请选择市'}}" )
                                 option(value='') 请选择市
                                 option(value='1') 哈尔滨
                     tr
                         td.td-left 开户行支行
                         td
-                            input(type='text', name="bank", placeholder="请输入开户支行名称", autocomplete='off', class="required {messages:{required:'请输入开户支行名称'}}" )
+                            input(type='text', name="bank_branch_address", placeholder="请输入开户支行名称", autocomplete='off', class="required {messages:{required:'请输入开户支行名称'}}" )
                     tr
                         td.td-left 交易密码
                         td
-                            input(type='text', name="pwd", placeholder="请输入交易密码", autocomplete='off', class="required isNumber {maxlength:6,messages:{required:'请输入交易密码',maxlength:'不能超过{0}个字符'}}" )
+                            input(type='text', name="trade_pwd", placeholder="请输入交易密码", autocomplete='off', class="required isNumber {maxlength:6,messages:{required:'请输入交易密码',maxlength:'不能超过{0}个字符'}}" )
             .qiye-btns
                 a(href='javascript:void(0)').save-btn 保存
                 a(href='javascript:void(0)').cancel-btn 取消
