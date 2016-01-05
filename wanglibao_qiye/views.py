@@ -177,7 +177,7 @@ class EnterpriseProfileCreateApi(APIView):
 class EnterpriseProfileEditView(TemplateView):
     """企业用户认证资料修改视图"""
 
-    template_name = ''
+    template_name = 'update.jade'
 
     def get_context_data(self, **kwargs):
         user = self.request.user

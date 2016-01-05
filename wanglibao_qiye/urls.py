@@ -7,6 +7,7 @@ from .views import (EnterpriseProfileCreateApi, QiYeIndex, QiYeInfo, EnterpriseP
                     EnterpriseProfileIsExistsApi)
 
 
+
 urlpatterns = patterns(
     '',
     url(r'^login/', QiYeIndex.as_view(), name='qiye index'),
@@ -18,7 +19,7 @@ urlpatterns = patterns(
     url(r'profile/update/$', EnterpriseProfileUpdateApi.as_view()),
     url(r'profile/get/$', GetEnterpriseUserProfileApi.as_view()),
     url(r'profile/edit/$', login_required(EnterpriseProfileEditView.as_view(),
-                                          login_url='/qiye/login/')),
+                                          login_url='/qiye/login/'), name='qiye update'),
     url(r'profile/exists/$', EnterpriseProfileIsExistsApi.as_view()),
 )
 
