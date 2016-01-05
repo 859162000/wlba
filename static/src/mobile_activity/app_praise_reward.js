@@ -20,7 +20,7 @@
 	}).done(function (xhr) {
 		if(xhr.err_code==0){
 			renovate_friends(xhr.follow.length,xhr.follow);
-			//$('.renovate').click();
+			$('.renovate').click();
 		}else{
 			//$('.friend_top span').text(xhr.err_messege);
 			//$('.friend_top').fadeIn();
@@ -70,19 +70,12 @@
 
 	/*刷新朋友圈*/
 	function renovate_friends(friends_length,friends_img){
-		$('.gundong').html('');
-		$('.gundong').append('<div class="swiper-container"><div class="swiper-wrapper">');
 		var str = '';
-		var follow_one;
+		var follow_one='';
 		for(var i=0; i<friends_length; i++){
 			follow_one = friends_img[i];
 			str +='<div class="swiper-slide"><img class="user" src="'+follow_one.from_headimgurl+'"/></div>'
-			//$('.swiper-wrapper').append('<div class="swiper-slide"><img class="user" src="'+follow_one.from_headimgurl+'"/></div>');
-
 		}
-		$('.swiper-wrapper').append(str)
-		$('.gundong').append('</div></div>');
-		$('.gundong').append('<img class="swiper-button-next" src="/static/imgs/mobile_activity/app_praise_reward/next.png"><img class="swiper-button-prev" src="/static/imgs/mobile_activity/app_praise_reward/prev.png">');
 		var user_num = $('.swiper-slide').length;
 		if(user_num>6){
 			var swiper = new Swiper('.swiper-container', {
@@ -92,6 +85,10 @@
 				prevButton: '.swiper-button-prev',
 				loop: true
    			});
+			swiper.removeAllSlides();
+			swiper.appendSlide(str);
+			swiper.update();
+			swiper.slideTo(0, 100, false);
 		}else{
 			$('.swiper-slide').addClass('friends_length');
 		}
