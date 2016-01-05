@@ -262,6 +262,7 @@ define(['jquery', 'jquery.webuploader', 'csrf'], function ($, WebUploader, csrf)
 			//绑定取消全部按钮;
 			$cancelButton.bind('click',function(){
 				var fileArr = webUploader.getFiles( 'queued' );
+                console.log(fileArr)
 				$.each( fileArr ,function( i, v ){
 					removeLi( $('#fileBox_'+v.id), v.id, webUploader );
 				});

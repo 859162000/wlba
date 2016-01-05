@@ -293,7 +293,7 @@ class EnterpriseProfileIsExistsApi(APIView):
 
     permission_classes = (IsAuthenticated,)
 
-    def post(self, request):
+    def get(self, request):
         user = request.user
         if user.wanglibaouserprofile.utype == '3':
             try:

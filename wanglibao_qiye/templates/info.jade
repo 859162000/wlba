@@ -77,6 +77,13 @@ block main
                         td
                             input(type='text', name="bank_branch_address", placeholder="请输入开户支行名称", autocomplete='off', class="required {messages:{required:'请输入开户支行名称'}}" )
                     tr
+                        td.td-left 所属银行
+                        td
+                            select(name='bank',class="required {messages:{required:'请选择所属银行'}}")
+                                option(value='') 请选择银行卡
+                                for bank in banks
+                                    option(value='{{bank}}') {{bank}}
+                    tr
                         td.td-left 交易密码
                         td
                             input(type='text', name="trade_pwd", placeholder="请输入交易密码", autocomplete='off', class="required isNumber {maxlength:6,messages:{required:'请输入交易密码',maxlength:'不能超过{0}个字符'}}" )

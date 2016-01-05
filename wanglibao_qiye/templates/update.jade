@@ -23,7 +23,7 @@ block main
                     tr
                         td.td-left 公司名称
                         td
-                            input(type='text', name="company_name", placeholder="请输入公司名称", autocomplete='off', class="required {messages:{required:'请输入公司名称'}}")
+                            input(type='text', name="company_name", placeholder="请输入公司名称", autocomplete='off', class="required {messages:{required:'请输入公司名称'}}", value="{{data.company_name}}")
                     tr
                         td.td-left 营业执照
                         td#yezz
