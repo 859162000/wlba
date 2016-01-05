@@ -1240,8 +1240,8 @@ class WeixinAnnualBonusView(TemplateView):
         wxid = self.request.GET.get('wxid')
         if wxid and wxid!='undefined':
             self.from_openid = wxid
-            self.nick_name = wxid
-            self.head_img = 'http://wx.qlogo.cn/mmopen/O6tvnibicEYV8ibOLhhDAWK9X4FwBlGJzYoBNAlp2nfoDGC74NXFTEP7j4Qm2Bjx7G3STzJ3cRqxbJFjFiaf19knwRGxnOIfZwx8/0'
+            #self.nick_name = wxid
+            #self.head_img = 'http://wx.qlogo.cn/mmopen/O6tvnibicEYV8ibOLhhDAWK9X4FwBlGJzYoBNAlp2nfoDGC74NXFTEP7j4Qm2Bjx7G3STzJ3cRqxbJFjFiaf19knwRGxnOIfZwx8/0'
 
         self.url_query = self.request.META.get('QUERY_STRING', None)
 
