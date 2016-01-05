@@ -1301,7 +1301,7 @@ class GetAuthUserInfo(APIView):
             w_user.headimgurl = user_info.get('headimgurl', "")
             w_user.unionid = user_info.get('unionid', "")
             w_user.province = user_info.get('province', "")
-            w_user.subscribe = user_info.get('subscribe')
+            w_user.subscribe = user_info.get('subscribe', 0)
             w_user.subscribe_time = user_info.get('subscribe_time', 0)
             w_user.save()
             return Response(user_info)
@@ -1332,7 +1332,7 @@ class GetUserInfo(APIView):
                 w_user.headimgurl = user_info.get('headimgurl', "")
                 w_user.unionid = user_info.get('unionid', "")
                 w_user.province = user_info.get('province', "")
-                w_user.subscribe = user_info.get('subscribe')
+                w_user.subscribe = user_info.get('subscribe', 0)
                 w_user.subscribe_time = user_info.get('subscribe_time', 0)
                 w_user.save()
         except Exception, e:
