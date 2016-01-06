@@ -1,10 +1,8 @@
 # encoding:utf-8
 
 import json
-import hashlib
 import logging
 from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.views.generic import TemplateView
 from django.http import HttpResponse
@@ -141,7 +139,7 @@ class EnterpriseProfileCreateApi(APIView):
     def post(self, request):
         user = request.user
         if user.wanglibaouserprofile.utype == '3':
-            form = EnterpriseUserProfileForm(request.POST)
+            form = EnterpriseUserProfileForm('create', request.POST)
             if form.is_valid():
                 if EnterpriseUserProfile.objects.filter(user=user).first():
                     response_data = {
@@ -228,7 +226,7 @@ class EnterpriseProfileUpdateApi(APIView):
     def post(self, request):
         user = request.user
         if user.wanglibaouserprofile.utype == '3':
-            form = EnterpriseUserProfileForm(request.POST)
+            form = EnterpriseUserProfileForm('update', request.POST)
             if form.is_valid():
                 try:
                     e_profile = EnterpriseUserProfile.objects.get(user=user)

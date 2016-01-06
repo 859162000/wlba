@@ -43,7 +43,7 @@ class EnterpriseUserProfile(models.Model):
         if self.status == u'审核通过':
             user_profile.id_is_valid = True
             user_profile.id_valid_time = timezone.now()
-            if Card.objects.filter(no=self.bank_card_no).first():
+            if not Card.objects.filter(no=self.bank_card_no).first():
                 card = Card()
                 card.bank = self.bank
                 card.no = self.bank_card_no
