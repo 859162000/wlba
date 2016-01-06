@@ -51,42 +51,38 @@ class EnterpriseProfileUploadApi(APIView):
                         'message': e_profile.description,
                         'ret_code': 30002,
                     }
+                else:
+                    file_name = request.POST.get('name', '')
+                    file_suffix = file_name.split('.')[-1] or 'png'
+                    filename = 'enterprise/images/%s_%s.%s' % (user.id, field_name, file_suffix)
+                    file_content = request.FILES[field_name]
 
-                    return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
+                    try:
+                        AliOSSStorageForCover().save(filename, file_content)
+                    except Exception, e:
+                        logger.info('aliyun save faild with user[%s], fieldname[%s]' % (user.id, filename))
+                        logger.info(e)
 
-                file_name = request.POST.get('name', '')
-                file_suffix = file_name.split('.')[-1] or 'png'
-                filename = 'enterprise/images/%s_%s.%s' % (user.id, field_name, file_suffix)
-                file_content = request.FILES[field_name]
+                        response_data = {
+                            'filename': None,
+                            'message': u'上传失败',
+                            'ret_code': 40001,
+                        }
+                    else:
+                        if e_profile:
+                            e_profile.status = u'待审核'
+                            e_profile.save()
 
-                try:
-                    AliOSSStorageForCover().save(filename, file_content)
-                except Exception, e:
-                    logger.info('aliyun save faild with user[%s], fieldname[%s]' % (user.id, filename))
-                    logger.info(e)
+                        user.wanglibaouserprofile.id_is_valid = False
+                        user.wanglibaouserprofile.save()
 
-                    response_data = {
-                        'filename': None,
-                        'message': u'上传失败',
-                        'ret_code': 40001,
-                    }
+                        response_data = {
+                            'filename': filename,
+                            'message': 'success',
+                            'ret_code': 10000,
+                        }
 
-                    return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
-
-                if e_profile:
-                    e_profile.status = u'待审核'
-                    e_profile.save()
-
-                user.wanglibaouserprofile.id_is_valid = False
-                user.wanglibaouserprofile.save()
-
-                response_data = {
-                    'filename': filename,
-                    'message': 'success',
-                    'ret_code': 10000,
-                }
-
-                return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
+                        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
             else:
                 response_data = {
                     'filename': None,
@@ -113,11 +109,14 @@ class GetEnterpriseUserProfileApi(APIView):
         if user.wanglibaouserprofile.utype == '3':
             try:
                 e_profile = EnterpriseUserProfile.objects.values().filter(user=user).first()
+                del e_profile['modify_time']
+                del e_profile['created_time']
                 response_data = {
                     'data': e_profile,
                     'message': 'success',
                     'ret_code': 10000
                 }
+                return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
             except EnterpriseUserProfile.DoesNotExist:
                 response_data = {
                     'data': None,
@@ -131,7 +130,7 @@ class GetEnterpriseUserProfileApi(APIView):
                 'ret_code': 20001,
             }
 
-        return Response(response_data)
+        return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
 
 
 class EnterpriseProfileCreateApi(APIView):
@@ -174,6 +173,7 @@ class EnterpriseProfileCreateApi(APIView):
                         'message': u'success',
                         'ret_code': 10000,
                     }
+                    return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
             else:
                 response_data = {
                     'message': form.errors,
@@ -185,7 +185,7 @@ class EnterpriseProfileCreateApi(APIView):
                 'ret_code': 20001,
             }
 
-        return Response(response_data)
+        return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
 
 
 class EnterpriseProfileEditView(TemplateView):
@@ -234,60 +234,62 @@ class EnterpriseProfileUpdateApi(APIView):
                 try:
                     e_profile = EnterpriseUserProfile.objects.get(user=user)
                 except EnterpriseUserProfile.DoesNotExist:
-                    return Response({
+                    response_data = {
                         'message': u'企业用户信息未完善',
                         'ret_code': 10001,
-                    })
+                    }
+                else:
+                    # 判断企业信息是否审核中，如果是则不允许修改
+                    if not user.wanglibaouserprofile.id_is_valid:
+                        response_data = {
+                            'message': e_profile.description,
+                            'ret_code': 30002,
+                        }
+                    else:
+                        #
+                        # src_data = (e_profile.company_name, e_profile.business_license,
+                        #             e_profile.registration_cert, e_profile.certigier_name,
+                        #             e_profile.certigier_phone, e_profile.company_address,
+                        #             e_profile.bank_card_no, e_profile.bank_account_name,
+                        #             e_profile.deposit_bank_province, e_profile.deposit_bank_city,
+                        #             e_profile.bank_branch_address, user.wanglibaouserprofile.trade_pwd)
+                        # src_data_str = ''.join(src_data)
+                        # src_md5 = hashlib.md5(src_data_str).hexdigest()
+                        #
+                        # dst_data = (form.cleaned_data['company_name'], form.cleaned_data['business_license'],
+                        #             form.cleaned_data['registration_cert'], form.cleaned_data['certigier_name'],
+                        #             form.cleaned_data['certigier_phone'], form.cleaned_data['company_address'],
+                        #             form.cleaned_data['company_account'], form.cleaned_data['company_account_name'],
+                        #             form.cleaned_data['deposit_bank_province'], form.cleaned_data['deposit_bank_city'],
+                        #             form.cleaned_data['bank_branch_address'], form.cleaned_data['trade_code'])
+                        #
+                        # new_data_str = ''.join(dst_data)
+                        # new_md5 = hashlib.md5(new_data_str).hexdigest()
+                        # print ">>>>>>>>>>>>>>>>>b"
+                        # if src_md5 != new_md5:
+                        e_profile.company_name = form.cleaned_data['company_name']
+                        e_profile.business_license = form.cleaned_data['business_license']
+                        e_profile.registration_cert = form.cleaned_data['registration_cert']
+                        e_profile.certigier_name = form.cleaned_data['certigier_name']
+                        e_profile.certigier_phone = form.cleaned_data['certigier_phone']
+                        e_profile.company_address = form.cleaned_data['company_address']
+                        e_profile.bank_card_no = form.cleaned_data['company_account']
+                        e_profile.bank_account_name = form.cleaned_data['company_account_name']
+                        e_profile.deposit_bank_province = form.cleaned_data['deposit_bank_province']
+                        e_profile.deposit_bank_city = form.cleaned_data['deposit_bank_city']
+                        e_profile.bank_branch_address = form.cleaned_data['bank_branch_address']
+                        e_profile.description = u'审核中'
+                        e_profile.status = u'待审核'
+                        e_profile.save()
 
-                # 判断企业信息是否审核中，如果是则不允许修改
-                if not user.wanglibaouserprofile.id_is_valid:
-                    return Response({
-                        'message': e_profile.description,
-                        'ret_code': 30002,
-                    })
-                #
-                # src_data = (e_profile.company_name, e_profile.business_license,
-                #             e_profile.registration_cert, e_profile.certigier_name,
-                #             e_profile.certigier_phone, e_profile.company_address,
-                #             e_profile.bank_card_no, e_profile.bank_account_name,
-                #             e_profile.deposit_bank_province, e_profile.deposit_bank_city,
-                #             e_profile.bank_branch_address, user.wanglibaouserprofile.trade_pwd)
-                # src_data_str = ''.join(src_data)
-                # src_md5 = hashlib.md5(src_data_str).hexdigest()
-                #
-                # dst_data = (form.cleaned_data['company_name'], form.cleaned_data['business_license'],
-                #             form.cleaned_data['registration_cert'], form.cleaned_data['certigier_name'],
-                #             form.cleaned_data['certigier_phone'], form.cleaned_data['company_address'],
-                #             form.cleaned_data['company_account'], form.cleaned_data['company_account_name'],
-                #             form.cleaned_data['deposit_bank_province'], form.cleaned_data['deposit_bank_city'],
-                #             form.cleaned_data['bank_branch_address'], form.cleaned_data['trade_code'])
-                #
-                # new_data_str = ''.join(dst_data)
-                # new_md5 = hashlib.md5(new_data_str).hexdigest()
-                # print ">>>>>>>>>>>>>>>>>b"
-                # if src_md5 != new_md5:
-                e_profile.company_name = form.cleaned_data['company_name']
-                e_profile.business_license = form.cleaned_data['business_license']
-                e_profile.registration_cert = form.cleaned_data['registration_cert']
-                e_profile.certigier_name = form.cleaned_data['certigier_name']
-                e_profile.certigier_phone = form.cleaned_data['certigier_phone']
-                e_profile.company_address = form.cleaned_data['company_address']
-                e_profile.bank_card_no = form.cleaned_data['company_account']
-                e_profile.bank_account_name = form.cleaned_data['company_account_name']
-                e_profile.deposit_bank_province = form.cleaned_data['deposit_bank_province']
-                e_profile.deposit_bank_city = form.cleaned_data['deposit_bank_city']
-                e_profile.bank_branch_address = form.cleaned_data['bank_branch_address']
-                e_profile.description = u'审核中'
-                e_profile.status = u'待审核'
-                e_profile.save()
+                        user.wanglibaouserprofile.trade_pwd = form.cleaned_data['trade_pwd']
+                        user.wanglibaouserprofile.save()
 
-                user.wanglibaouserprofile.trade_pwd = form.cleaned_data['trade_pwd']
-                user.wanglibaouserprofile.save()
-
-                response_data = {
-                    'message': 'success',
-                    'ret_code': 10000,
-                }
+                        response_data = {
+                            'message': 'success',
+                            'ret_code': 10000,
+                        }
+                        return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
             else:
                 response_data = {
                     'message': form.errors,
@@ -299,7 +301,7 @@ class EnterpriseProfileUpdateApi(APIView):
                 'ret_code': 20001,
             }
 
-        return Response(response_data)
+        return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
 
 
 class EnterpriseProfileIsExistsApi(APIView):
@@ -315,19 +317,21 @@ class EnterpriseProfileIsExistsApi(APIView):
             try:
                 EnterpriseUserProfile.objects.get(user=user)
             except EnterpriseUserProfile.DoesNotExist:
-                return Response({
+                response_data = {
                     'message': u'企业用户信息未完善',
                     'ret_code': 10001,
-                })
+                }
+            else:
+                response_data = {
+                    'message': u'企业用户信息已完善',
+                    'ret_code': 10000,
+                }
 
-            response_data = {
-                'message': u'企业用户信息已完善',
-                'ret_code': 10000,
-            }
+                return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
         else:
             response_data = {
                 'message': u'非企业用户',
                 'ret_code': 20001,
             }
 
-        return Response(response_data)
+        return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
