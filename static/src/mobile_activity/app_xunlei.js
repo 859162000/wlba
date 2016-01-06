@@ -1,5 +1,6 @@
 var boy = $(document.body).height();
-$('.xunmeng,.xunmeng2,.xunmeng3').css({'height': boy});
+console.log(boy);
+$('.xunmeng,.xunmeng2').css({'height': boy});
 $('.xinlei-rule').click(function () {
     $('.xunmeng').show();
 });
