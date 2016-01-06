@@ -1,11 +1,13 @@
 # encoding:utf-8
 
+import json
 import hashlib
 import logging
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.views.generic import TemplateView
+from django.http import HttpResponse
 from file_storage.storages import AliOSSStorageForCover
 from wanglibao_pay.models import Bank
 from .models import EnterpriseUserProfile
@@ -44,11 +46,13 @@ class EnterpriseProfileUploadApi(APIView):
                 e_profile = EnterpriseUserProfile.objects.filter(user=user).first()
                 # 判断企业信息是否审核中，如果是则不允许修改
                 if e_profile and not user.wanglibaouserprofile.id_is_valid:
-                    return Response({
+                    response_data = {
                         'filename': None,
                         'message': e_profile.description,
                         'ret_code': 30002,
-                    })
+                    }
+
+                    return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
 
                 file_name = request.POST.get('name', '')
                 file_suffix = file_name.split('.')[-1] or 'png'
@@ -60,11 +64,14 @@ class EnterpriseProfileUploadApi(APIView):
                 except Exception, e:
                     logger.info('aliyun save faild with user[%s], fieldname[%s]' % (user.id, filename))
                     logger.info(e)
-                    return Response({
+
+                    response_data = {
                         'filename': None,
                         'message': u'上传失败',
                         'ret_code': 40001,
-                    })
+                    }
+
+                    return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
 
                 if e_profile:
                     e_profile.status = u'待审核'
@@ -73,11 +80,13 @@ class EnterpriseProfileUploadApi(APIView):
                 user.wanglibaouserprofile.id_is_valid = False
                 user.wanglibaouserprofile.save()
 
-                return Response({
+                response_data = {
                     'filename': filename,
                     'message': 'success',
                     'ret_code': 10000,
-                })
+                }
+
+                return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
             else:
                 response_data = {
                     'filename': None,
@@ -91,7 +100,7 @@ class EnterpriseProfileUploadApi(APIView):
                 'ret_code': 20001,
             }
 
-        return Response(response_data)
+        return HttpResponse(json.dumps(response_data), status=400, content_type='application/json')
 
 
 class GetEnterpriseUserProfileApi(APIView):
