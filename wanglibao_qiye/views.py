@@ -163,7 +163,6 @@ class EnterpriseProfileCreateApi(APIView):
                     e_profile.deposit_bank_city = form.cleaned_data['deposit_bank_city']
                     e_profile.bank_branch_address = form.cleaned_data['bank_branch_address']
                     e_profile.bank = form.cleaned_data['bank']
-                    e_profile.description = u'审核中'
                     e_profile.save()
 
                     user.wanglibaouserprofile.trade_pwd = form.cleaned_data['trade_pwd']
@@ -246,44 +245,34 @@ class EnterpriseProfileUpdateApi(APIView):
                             'ret_code': 30002,
                         }
                     else:
-                        #
-                        # src_data = (e_profile.company_name, e_profile.business_license,
-                        #             e_profile.registration_cert, e_profile.certigier_name,
-                        #             e_profile.certigier_phone, e_profile.company_address,
-                        #             e_profile.bank_card_no, e_profile.bank_account_name,
-                        #             e_profile.deposit_bank_province, e_profile.deposit_bank_city,
-                        #             e_profile.bank_branch_address, user.wanglibaouserprofile.trade_pwd)
-                        # src_data_str = ''.join(src_data)
-                        # src_md5 = hashlib.md5(src_data_str).hexdigest()
-                        #
-                        # dst_data = (form.cleaned_data['company_name'], form.cleaned_data['business_license'],
-                        #             form.cleaned_data['registration_cert'], form.cleaned_data['certigier_name'],
-                        #             form.cleaned_data['certigier_phone'], form.cleaned_data['company_address'],
-                        #             form.cleaned_data['company_account'], form.cleaned_data['company_account_name'],
-                        #             form.cleaned_data['deposit_bank_province'], form.cleaned_data['deposit_bank_city'],
-                        #             form.cleaned_data['bank_branch_address'], form.cleaned_data['trade_code'])
-                        #
-                        # new_data_str = ''.join(dst_data)
-                        # new_md5 = hashlib.md5(new_data_str).hexdigest()
-                        # print ">>>>>>>>>>>>>>>>>b"
-                        # if src_md5 != new_md5:
-                        e_profile.company_name = form.cleaned_data['company_name']
-                        e_profile.business_license = form.cleaned_data['business_license']
-                        e_profile.registration_cert = form.cleaned_data['registration_cert']
-                        e_profile.certigier_name = form.cleaned_data['certigier_name']
-                        e_profile.certigier_phone = form.cleaned_data['certigier_phone']
-                        e_profile.company_address = form.cleaned_data['company_address']
-                        e_profile.bank_card_no = form.cleaned_data['company_account']
-                        e_profile.bank_account_name = form.cleaned_data['company_account_name']
-                        e_profile.deposit_bank_province = form.cleaned_data['deposit_bank_province']
-                        e_profile.deposit_bank_city = form.cleaned_data['deposit_bank_city']
-                        e_profile.bank_branch_address = form.cleaned_data['bank_branch_address']
-                        e_profile.description = u'审核中'
-                        e_profile.status = u'待审核'
-                        e_profile.save()
+                        form_data = form.cleaned_data
+                        profile_has_changed = False
+                        change_list = []
+                        ignore_change_profiles = ('bank_card_no', 'bank_account_name',
+                                                  'deposit_bank_province', 'deposit_bank_city',
+                                                  'bank_branch_address', 'bank')
+                        for db_profile in e_profile:
+                            profile_name = db_profile.name
+                            if profile_name in form_data and profile_name not in ignore_change_profiles:
+                                req_profile = form_data[profile_name]
+                                if db_profile != req_profile:
+                                    db_profile = req_profile
+                                    change_list.append(db_profile.verbose_name)
+                                    profile_has_changed = True
 
-                        user.wanglibaouserprofile.trade_pwd = form.cleaned_data['trade_pwd']
-                        user.wanglibaouserprofile.save()
+                        db_trade_pwd = user.wanglibaouserprofile.trade_pwd
+                        req_trade_pwd = form_data[db_trade_pwd.name]
+                        if db_trade_pwd != req_trade_pwd:
+                            db_trade_pwd = req_trade_pwd
+                            change_list.append(db_trade_pwd.verbose_name)
+                            user.wanglibaouserprofile.save()
+                            profile_has_changed = True
+
+                        # FixMe,交易码变更是否需要重新审核
+                        if profile_has_changed:
+                            e_profile.description = u'最近修改:'.join(change_list)
+                            e_profile.status = u'待审核'
+                            e_profile.save()
 
                         response_data = {
                             'message': 'success',

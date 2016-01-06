@@ -3,8 +3,7 @@
 from django import forms
 from .utils import detect_phone_for_identifier
 from wanglibao_sms.utils import validate_validation_code
-from wanglibao_pay.models import Bank
-from .models import EnterpriseUserProfile
+from wanglibao_pay.models import Bank, Card
 
 
 class EnterpriseUserProfileForm(forms.Form):
@@ -57,7 +56,7 @@ class EnterpriseUserProfileForm(forms.Form):
         certigier_phone = self.cleaned_data.get('certigier_phone', '').strip()
         if not detect_phone_for_identifier(certigier_phone):
             raise forms.ValidationError(
-                message='invalid phone number',
+                message=u'无效手机号',
                 code="10001",
             )
 
@@ -70,6 +69,11 @@ class EnterpriseUserProfileForm(forms.Form):
 
     def clean_company_account(self):
         company_account = self.cleaned_data.get('company_account', '').strip()
+        if Card.objects.filter(no=company_account).first():
+            raise forms.ValidationError(
+                message=u'该卡已被绑定',
+                code="10004",
+            )
 
         return company_account
 
