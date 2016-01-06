@@ -1390,6 +1390,9 @@ def ajax_register(request):
                 if not user:
                     return HttpResponse(messenger('error'))
 
+                if user_type == '3':
+                    invitecode = 'qyzh'
+
                 # 处理第三方渠道的用户信息
                 CoopRegister(request).all_processors_for_user_register(user, invitecode)
                 auth_user = authenticate(identifier=identifier, password=password)
