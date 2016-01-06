@@ -169,7 +169,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 org.ui = (function(){
     var lib = {
         _alert: function(txt, callback, btn){
-            if(typeof callback !="function"){
+            if(typeof callback !="function" && typeof callback !="object"){
                 btn = callback;
             }
             if(!btn){
@@ -191,12 +191,16 @@ org.ui = (function(){
                 alertFram.innerHTML = strHtml;
                 document.body.appendChild(alertFram);
                 document.body.appendChild(shield);
+                if(typeof callback == "object") {
+                    $('.popub-footer').html('<a href="'+callback.url+'" style="display:block;">'+btn+'</a>');
+                }else{
+                   $('.popub-footer').on('click',function(){
+                        alertFram.style.display = "none";
+                        shield.style.display = "none";
+                        (typeof callback == "function") && callback();
+                    });
+                }
 
-                $('.popub-footer').on('click',function(){
-                    alertFram.style.display = "none";
-                    shield.style.display = "none";
-                    (typeof callback == "function") && callback();
-                })
             }
             document.body.onselectstart = function(){return false;};
         },
@@ -1649,9 +1653,10 @@ org.authentication = (function(org){
                         lib.$fromComplete.text("认证中，请等待...");
                     },
                     success:function(){
-                        org.ui.alert("实名认证成功!",function(){
-                           return window.location.href = '/weixin/account/';
-                        });
+                        //org.ui.alert("实名认证成功!",function(){
+                        //   return window.location.href = '/weixin/account/';
+                        //});
+                        org.ui.alert("实名认证成功!",{url:'/weixin/sub_account/'});
                     },
                     error:function(xhr){
                         result = JSON.parse(xhr.responseText);
@@ -1795,16 +1800,18 @@ org.processFirst = (function(org){
                 },
                 success:function(data){
                     if(!data.validate == 'true') return org.ui.alert('认证失败，请重试');
-                    org.ui.alert("实名认证成功!",function(){
-                        window.location.href = '/weixin/sub_regist_second/';
-                    });
+                    //org.ui.alert("实名认证成功!",function(){
+                    //    window.location.href = '/weixin/sub_regist_second/';
+                    //});
+                    org.ui.alert("实名认证成功!",{url:'/weixin/sub_regist_second/'});
                 },
                 error:function(xhr){
                     result = JSON.parse(xhr.responseText);
                     if(result.error_number == 8){
-                        org.ui.alert(result.message,function(){
-                           window.location.href = '/weixin/sub_list/';
-                        });
+                        //org.ui.alert(result.message,function(){
+                        //   window.location.href = '/weixin/sub_list/';
+                        //});
+                        org.ui.alert(result.message,{url:'/weixin/sub_list/'});
                     }else{
                         return org.ui.alert(result.message);
                     }
