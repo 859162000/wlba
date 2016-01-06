@@ -32,14 +32,14 @@ form#add-card-form.add-card-form(style="display:none")
             span
         .binding-info.w70.clearfix
             label 储蓄卡卡号
-            input(type="text", placeholder="请输入银行卡号").cardId
+            input(type="text", placeholder="请输入银行卡号" ,autocomplete='off').cardId
             span
         .binding-info.clearfix
             a(href='javascript:void(0)').btns#goPersonalInfo 下一步
 .binding-bank.clearfix#confirmInfo(style="display:none")
     .binding-box.binding-boxs.clearfix
-        input(type='hidden' id='order_id')
-        input(type='hidden' id='token')
+        input(type='hidden', id='order_id',autocomplete='off')
+        input(type='hidden', id='token',autocomplete='off')
         p.info-title 银行卡信息
         .binding-info.clearfix
             label 发卡银行
@@ -54,11 +54,11 @@ form#add-card-form.add-card-form(style="display:none")
             .bank-detail {{user_profile.name}}
         .binding-info.clearfix
             label 银行预留手机号
-            input(type="text", placeholder="请填写银行开户时预留手机号").bankPhone
+            input(type="text", placeholder="请填写银行开户时预留手机号", autocomplete='off').bankPhone
             span
         .binding-info.clearfix.codeBox
             label 短信验证码
-            input(type="text", placeholder="填写短信验证码").sem-input.code
+            input(type="text", placeholder="填写短信验证码", autocomplete='off').sem-input.code
             button(type='button', data-phone="{{user.wanglibaouserprofile.phone}}",tag="1").get-code.get-code 获取验证码
             span
         .binding-info.clearfix
