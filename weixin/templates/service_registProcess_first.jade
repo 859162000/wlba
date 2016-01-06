@@ -25,8 +25,19 @@ html(style='background:#f5f5f5;')
       .form-mg-first
       section#shiming.login-submit
         button(type="submit", disabled=true) 实名认证
+
+    section.sign-main
+      .sign-body
+        img(src="/static/imgs/sub_weixin/recharge/alt-ok.png")
+        p.sign-tit 恭喜您，实名认证成功！
+        a(href="/weixin/sub_regist_second/").next-btn 下一步
+    section.sign-main-error
+      .sign-body
+        img(src="/static/imgs/sub_weixin/recharge/alt-error.png")
+        p.sign-tit 错误
+        a(href="/weixin/sub_list/").next-btn 确定
     //账户安全
     section.regist-safe.regist-process-safe
       span 账户资金安全由阳光保险承保
 
-    script(data-init='processFirst', src="/static/scripts/subMobile/mobile.js?20150105")
+    script(data-init='processFirst', src="/static/scripts/subMobile/mobile.js?201501062")
