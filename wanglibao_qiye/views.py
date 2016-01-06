@@ -21,7 +21,7 @@ def get_have_company_channel_banks():
 
 
 class QiYeIndex(TemplateView):
-    template_name = 'qiye_login.jade'
+    template_name = 'qiye_register.jade'
 
 
 class QiYeInfo(TemplateView):

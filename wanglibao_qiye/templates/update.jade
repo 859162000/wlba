@@ -20,20 +20,24 @@ block main
             input(type='hidden',name="registration_cert",value="{{data.registration_cert}}")
             input(type='hidden',name="pageType", value="edit")
             if data.status == '审核通过'
-                .div 审核通过
+                readonly = ''
             else
-                .div 审核未通过，不可修改
+                .notThrough 对不起，您的资料未通过审核，请仔细核查后重新填写，若有疑问请及时与我们的工作人员联系。
+                readonly = 'readonly'
             table
                 tbody
                     tr
                         td.td-left 公司名称
                         td
-                            input(type='text', name="company_name", placeholder="请输入公司名称", autocomplete='off', class="required {messages:{required:'请输入公司名称'}}", value="{{data.company_name}}")
+                            input(type='text', name="company_name", placeholder="请输入公司名称", autocomplete='off', readonly='{{readonly}}', class="required {messages:{required:'请输入公司名称'}}", value="{{data.company_name}}")
                     tr
                         td.td-left 营业执照
                         td
                             img(src="/media/{{data.business_license}}",style="width:148px;height:98px;float:left;margin-right:10px")
-                            .div#yezz
+                            if data.status == '审核通过'
+                                .div#yezz
+                            else
+                                .div
                             //span 营业执照
                             //a(href='javascript:void(0)').upload 上传
                             //a(href='javascript:void(0)').del 删除
@@ -41,29 +45,35 @@ block main
                         td.td-left 税务登记证
                         td
                             img(src="/media/{{data.registration_cert}}",style="width:148px;height:98px;float:left;margin-right:10px")
-                            .div#swdjz
+                            if data.status == '审核通过'
+                                .div#swdjz
+                            else
+                                .div
                             //span 登记证
                             //a(href='javascript:void(0)').upload 上传
                             //a(href='javascript:void(0)').del 删除
                     tr
                         td.td-left 授权负责人
                         td
-                            input(type='text', name="certigier_name", placeholder="请输入负责人", autocomplete='off', class="required {messages:{required:'请输入负责人'}}", value="{{data.certigier_name}}")
+                            input(type='text', name="certigier_name", placeholder="请输入负责人", autocomplete='off', readonly='{{readonly}}', class="required {messages:{required:'请输入负责人'}}", value="{{data.certigier_name}}")
                     tr
                         td.td-left 负责人电话
                         td
-                            input(type='text', name="certigier_phone", placeholder="请输入负责人电话", autocomplete='off', class="required isMobileTel {messages:{required:'请输入负责人电话'}}", value="{{data.certigier_phone}}")
+                            input(type='text', name="certigier_phone", placeholder="请输入负责人电话", autocomplete='off', readonly='{{readonly}}', class="required isMobileTel {messages:{required:'请输入负责人电话'}}", value="{{data.certigier_phone}}")
                     tr
                         td.td-left 手机验证码
                         td
-                            input(type='text', name="validate_code", placeholder="请输入验证码", autocomplete='off', class="required {messages:{required:'请输入验证码'}}")
-                            button.ispan4-omega#button-get-code-btn.button-orange.button-large(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
+                            input(type='text', name="validate_code", placeholder="请输入验证码", autocomplete='off', readonly='{{readonly}}', class="required {messages:{required:'请输入验证码'}}")
+                            if data.status == '审核通过'
+                                button.ispan4-omega#button-get-code-btn.button-orange.button-large(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
+                            else
+                                button.ispan4-omega.button-orange.button-large.button-gray(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
                             .row.voice.void.hidden
                                 .span12-omega
                     tr
                         td.td-left 公司地址
                         td
-                            input(type='text', name="company_address", placeholder="请输入公司地址", autocomplete='off', class="required {messages:{required:'请输入公司地址'}}", value="{{data.company_address}}")
+                            input(type='text', name="company_address", placeholder="请输入公司地址", autocomplete='off', readonly='{{readonly}}', class="required {messages:{required:'请输入公司地址'}}", value="{{data.company_address}}")
 
             .qiye-h.qiye-bank-info 提现银行账户信息
             table
@@ -94,7 +104,8 @@ block main
                         td
                             input(type='text', name="trade_pwd", placeholder="请输入交易密码", autocomplete='off', class="required isNumber {maxlength:6,messages:{required:'请输入交易密码',maxlength:'不能超过{0}个字符'}}", value="{{data.trade_pwd}}")
             .qiye-btns
-                a(href='javascript:void(0)').save-btn 保存
+                if data.status == '审核通过'
+                    a(href='javascript:void(0)').save-btn 保存
                 a(href='javascript:void(0)').cancel-btn 取消
 
             #img-code-div2(style="display:none").modalStyle
