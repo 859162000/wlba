@@ -35,10 +35,6 @@ html(style="background:#efeff4")
                                 .tit_name
                                     .tit_name_div &nbsp&nbsp
                                     | {{amo.product.name}}
-                                .icon
-                                    i
-                                    em {{amo.product.period}}天
-                                .tit_time {{amo.created_time}}
                             .transaction_cont
                                 .cont_money
                                     p {{amo.principal | money_format_int}}
@@ -55,8 +51,9 @@ html(style="background:#efeff4")
                                     else
                                         p 0.00
                                     p 待收金额（元）
+                            .investment_btn 立即投资
             if user.is_authenticated and experience_amortization
-              .account_list
+              .account_list.investment_list
                 section.project_box
                   for amo in experience_amortization
                     .transaction_list
