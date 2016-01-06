@@ -11,6 +11,10 @@ require ['jquery', 'underscore', 'knockout',
          'lib/backend', 'lib/templateLoader',
          'model/portfolio', 'tools', 'lib/jquery.number.min',
          'lib/modal'], ($, _, ko, backend, templateLoader, portfolio, tool, modal)->
+
+  $('.more_btn').click () ->
+    $('.tableNew').slideToggle()
+
   class DataViewModel
     constructor: ->
       self = this
