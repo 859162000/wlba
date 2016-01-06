@@ -34,7 +34,6 @@ class WXLoginRedirect(TemplateView):
     def dispatch(self, request, *args, **kwargs):
         next = request.GET.get('next')
         login_url = get_fwh_login_url(next=next)
-        print '---------', login_url
         return HttpResponseRedirect(login_url)
 
 
@@ -53,7 +52,8 @@ class WXLogin(TemplateView):
             }
 
     def dispatch(self, request, *args, **kwargs):
-        self.openid = self.request.session['openid']
+        self.openid = self.request.session.get('openid')
+        error_msg = ""
         if not self.openid:
             code = request.GET.get('code')
             state = request.GET.get('state')
