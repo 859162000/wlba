@@ -156,8 +156,8 @@ class SendExperienceGold(object):
             # 根据pk发放理财金
             query_object = ExperienceEvent.objects.filter(invalid=False, pk=pk,
                                                           available_at__lt=now, unavailable_at__gt=now)
-            if give_mode:
-                #根据pk & give_mode发放理财金
+            if query_object and give_mode:
+                # 根据pk & give_mode发放理财金
                 query_object = query_object.filter(give_mode=give_mode)
 
             experience_event = query_object.first()
