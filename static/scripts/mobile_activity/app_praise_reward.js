@@ -425,7 +425,7 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 	});
 	$('.regist_button').hide();
 	$('.regist_button').click(function(){
-		window.location.href = '/weixin/regist/?next='+shareLink+'&promo_token=h5dianzan';
+		window.location.href = '/weixin/regist/?promo_token=h5dianzan&next='+shareLink;
 	});
 	/*领取我的年终奖结束*/
 
