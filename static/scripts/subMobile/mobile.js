@@ -192,6 +192,7 @@ org.ui = (function(){
                 document.body.appendChild(alertFram);
                 document.body.appendChild(shield);
                 if(typeof callback == "object") {
+                    //alert(callback.url);
                     $('.popub-footer').html('<a href="'+callback.url+'" style="display:block;">'+btn+'</a>');
                 }else{
                    $('.popub-footer').on('click',function(){
@@ -1803,7 +1804,8 @@ org.processFirst = (function(org){
                     //org.ui.alert("实名认证成功!",function(){
                     //    window.location.href = '/weixin/sub_regist_second/';
                     //});
-                    org.ui.alert("实名认证成功!",{url:'/weixin/sub_regist_second/'});
+                    //org.ui.alert("实名认证成功!",{url:'/weixin/sub_regist_second/'});
+                    $('.sign-main').css('display','-webkit-box');
                 },
                 error:function(xhr){
                     result = JSON.parse(xhr.responseText);
@@ -1811,7 +1813,7 @@ org.processFirst = (function(org){
                         //org.ui.alert(result.message,function(){
                         //   window.location.href = '/weixin/sub_list/';
                         //});
-                        org.ui.alert(result.message,{url:'/weixin/sub_list/'});
+                        $('.sign-main-error').css('display','-webkit-box').find(".sign-tit").html(result.message);
                     }else{
                         return org.ui.alert(result.message);
                     }
