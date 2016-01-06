@@ -82,6 +82,11 @@ define(['jquery', 'jquery.webuploader', 'csrf'], function ($, WebUploader, csrf)
 				if ( successCallBack ) {
 					successCallBack( response );
 				}
+                webUploader.makeThumb( file, function( error, dataSrc ) {
+                    if ( !error ) {
+                        $fileBox.find('.viewThumb').append('<img src="'+dataSrc+'" >');
+                    }
+                });
 			});
 
             webUploader.on('uploadBeforeSend', function(obj, data, headers) {
