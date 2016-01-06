@@ -205,12 +205,11 @@ org.ui = (function(){
                 $('.confirm-certain').text(certainName);
                 $('.confirm-warp').show();
 
-                $('.confirm-cancel').on('click', function(e){
+                $('.confirm-cancel').unbind('click').on('click', function(e){
                     $('.confirm-warp').hide();
                 });
-                $('.confirm-certain').on('click', function(e){
+                $('.confirm-certain').unbind('click').on('click', function(e){
                     $('.confirm-warp').hide();
-
                     if(callback){
                         callbackData ? callback(callbackData): callback();
                     }
@@ -479,7 +478,11 @@ org.login = (function(org){
                         $submit.attr('disabled', true).text('登录中..');
                     },
                     success: function(res) {
-                        window.location.href = "/weixin/jump_page/?message=您已登录并绑定成功";
+                        if(res.re_code != 0){
+                            window.location.href = "/weixin/jump_page/?message="+res.errmessage;
+                        }else{
+                            window.location.href = "/weixin/jump_page/?message=您已登录并绑定成功";
+                        }
                         //org.ajax({
                         //   'type': 'post',
                         //    'url': '/weixin/api/bind/',
@@ -894,7 +897,7 @@ org.buy=(function(org){
                 balance = cfg.balance;
             org.ajax({
                 type: 'POST',
-                url: '/api/p2p/purchase/',
+                url: '/api/p2p/purchase/?v='+Math.random(),
                 data: {product: productID, amount: amount, redpack: redpackValue},
                 beforeSend:function(){
                     $buyButton.text("抢购中...");
@@ -913,7 +916,7 @@ org.buy=(function(org){
                     if(xhr.status === 400){
                         if (result.error_number === 1) {
                             org.ui.alert("登录超时，请重新登录！",function(){
-                                return window.location.href= '/weixin/sub_login/?next=/weixin/view/buy/'+productID+'/';
+                                //return window.location.href= '/weixin/sub_login/?next=/weixin/sub_detail/detail/'+productID+'/';
                             });
                         } else if (result.error_number === 2) {
                             return org.ui.alert('必须实名认证！');
@@ -926,7 +929,7 @@ org.buy=(function(org){
                     }else if(xhr.status === 403){
                         if (result.detail) {
                             org.ui.alert("登录超时，请重新登录！",function(){
-                                return window.location.href = '/weixin/sub_login/?next=/weixin/view/buy/' + productID + '/';
+                                return window.location.href = '/weixin/sub_login/?next=/weixin/sub_detail/detail/' + productID + '/';
                             });
                         }
                     }
@@ -965,7 +968,12 @@ org.buy=(function(org){
                 }else{
                      return org.ui.alert('请输入正确的金额');
                 }
-                var redpackValue = $redpack[0].options[$redpack[0].options.selectedIndex].value;
+                var redpackDom = $redpack[0].options[$redpack[0].options.selectedIndex],
+                    minAmount = $(redpackDom).attr("data-investamount"),
+                    redpackValue = redpackDom.value;
+                if(minAmount && amount<minAmount){
+                    return org.ui.alert('未达到红包使用门槛');
+                }
                 if(!redpackValue || redpackValue == ''){
                     redpackValue = null;
                 }
@@ -991,53 +999,8 @@ org.buy=(function(org){
                     callBackOpt: postdata
                 };
                 if(lib.isBuy){
-                    function gobuy(){//使用交易密码时删除
-                        org.ajax({
-                            type: 'POST',
-                            url: '/api/p2p/purchase/',
-                            data: {product: productID, amount: amount, redpack: redpackValue},
-                            beforeSend:function(){
-                                $buyButton.text("抢购中...");
-                                lib.isBuy = false;
-                            },
-                            success: function(data){
-                               if(data.data){
-                                   //$('.balance-sign').text(balance - data.data + lib.redPackAmountNew + '元');
-                                   //$(".sign-main").css("display","-webkit-box");
-                                   $("#page-ok").css('display','-webkit-box');
-                               }
-                            },
-                            error: function(xhr){
-                                var  result;
-                                result = JSON.parse(xhr.responseText);
-                                if(xhr.status === 400){
-                                    if (result.error_number === 1) {
-                                        org.ui.alert("登录超时，请重新登录！",function(){
-                                            return window.location.href= '/weixin/login/?next=/weixin/view/buy/'+productID+'/';
-                                        });
-                                    } else if (result.error_number === 2) {
-                                        return org.ui.alert('必须实名认证！');
-                                    } else if (result.error_number === 4 && result.message === "余额不足") {
-                                        $(".buy-sufficient").show();
-                                        return;
-                                    }else{
-                                        return org.ui.alert(result.message);
-                                    }
-                                }else if(xhr.status === 403){
-                                    if (result.detail) {
-                                        org.ui.alert("登录超时，请重新登录！",function(){
-                                            return window.location.href = '/weixin/login/?next=/weixin/view/buy/' + productID + '/';
-                                        });
-                                    }
-                                }
-                            },
-                            complete:function(){
-                               $buyButton.text("立即投资");
-                                lib.isBuy = true;
-                            }
-                        })
-                    }
-                    org.ui.confirm("购买金额为" + amount, '确认投资', gobuy);//使用交易密码时删除
+
+                    org.ui.confirm("购买金额为" + amount, '确认投资', lib._goBuy, postdata);//使用交易密码时删除
 
                     //org.ajax({ //交易密码，使用时去掉注释
                     //    url: '/api/profile/',
