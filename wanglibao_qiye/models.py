@@ -57,3 +57,9 @@ class EnterpriseUserProfile(models.Model):
 
         user_profile.save()
         super(EnterpriseUserProfile, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name_plural = u'企业资料'
+
+    def __unicode__(self):
+        return u'%s %s' % (self.user, self.company_name)
