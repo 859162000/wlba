@@ -10,7 +10,7 @@ from .views import (EnterpriseProfileCreateApi, QiYeIndex, QiYeInfo, EnterpriseP
 
 urlpatterns = patterns(
     '',
-    url(r'^login/', QiYeIndex.as_view(), name='qiye index'),
+    url(r'^register/', QiYeIndex.as_view(), name='qiye index'),
     url(r'^info/', login_required(QiYeInfo.as_view(),
                                   login_url='/qiye/login/'), name='qiye info'),
 
