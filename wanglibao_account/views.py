@@ -2195,3 +2195,18 @@ class FirstPayResultView(TemplateView):
     def get_context_data(self, **kwargs):
         first_pay_succeed = PayInfo.objects.filter(user=self.request.user, status=PayInfo.SUCCESS).exists()
         return {'first_pay_succeed': first_pay_succeed}
+
+
+class ManualModifyPhoneTemplate(TemplateView):
+    template_name = ''
+
+    def get_context_data(self, **kwargs):
+
+        return {}
+
+
+class ManualModifyPhoneAPI(APIView):
+    permission_classes = ()
+
+    def post(self, request):
+        return Response({'ret_code':0})
