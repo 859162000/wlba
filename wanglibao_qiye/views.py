@@ -250,43 +250,43 @@ class EnterpriseProfileUpdateApi(APIView):
 
                         if e_profile.company_name != form_data['company_name']:
                             e_profile.company_name = form_data['company_name']
-                            change_list.append(u'公司名称')
+                            change_list.append(u'[公司名称]')
                             profile_has_changed = True
 
                         if e_profile.business_license != form_data['business_license']:
                             e_profile.business_license = form_data['business_license']
-                            change_list.append(u'公司营业执照')
+                            change_list.append(u'[公司营业执照]')
                             profile_has_changed = True
 
                         if e_profile.registration_cert != form_data['registration_cert']:
                             e_profile.registration_cert = form_data['registration_cert']
-                            change_list.append(u'公司税务登记证')
+                            change_list.append(u'[公司税务登记证]')
                             profile_has_changed = True
 
                         if e_profile.certigier_name != form_data['certigier_name']:
                             e_profile.certigier_name = form_data['certigier_name']
-                            change_list.append(u'授权人姓名')
+                            change_list.append(u'[授权人姓名]')
                             profile_has_changed = True
 
                         if e_profile.certigier_phone != form_data['certigier_phone']:
                             e_profile.certigier_phone = form_data['certigier_phone']
-                            change_list.append(u'授权人手机号')
+                            change_list.append(u'[授权人手机号]')
                             profile_has_changed = True
 
                         if e_profile.company_address != form_data['company_address']:
                             e_profile.company_address = form_data['company_address']
-                            change_list.append(u'公司地址')
+                            change_list.append(u'[公司地址]')
                             profile_has_changed = True
 
                         if user.wanglibaouserprofile.trade_pwd != form_data['trade_pwd']:
                             user.wanglibaouserprofile.trade_pwd = form_data['trade_pwd']
                             user.wanglibaouserprofile.save()
-                            change_list.append(u'交易密码')
+                            change_list.append(u'[交易密码]')
                             profile_has_changed = True
 
                         # FixMe,交易码变更是否需要重新审核
                         if profile_has_changed:
-                            e_profile.description = u'待审核字段:'.join(change_list)
+                            e_profile.description = u'待审核字段:' + u'、'.join(change_list)
                             e_profile.status = u'待审核'
                             e_profile.save()
                             user.wanglibaouserprofile.save()
