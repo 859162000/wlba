@@ -45,10 +45,10 @@ class EnterpriseProfileUploadApi(APIView):
             if field_name in ('business_license', 'registration_cert') and field_name in request.FILES:
                 e_profile = EnterpriseUserProfile.objects.filter(user=user).first()
                 # 判断企业信息是否审核中，如果是则不允许修改
-                if e_profile and not user.wanglibaouserprofile.id_is_valid:
+                if e_profile and e_profile.status in (u'审核中', u'待审核'):
                     response_data = {
                         'filename': None,
-                        'message': e_profile.description,
+                        'message': u'企业信息审核中，不能更改',
                         'ret_code': 30002,
                     }
                 else:
@@ -239,40 +239,59 @@ class EnterpriseProfileUpdateApi(APIView):
                     }
                 else:
                     # 判断企业信息是否审核中，如果是则不允许修改
-                    if not user.wanglibaouserprofile.id_is_valid:
+                    if e_profile.status in (u'审核中', u'待审核'):
                         response_data = {
-                            'message': e_profile.description,
+                            'filename': None,
+                            'message': u'企业信息审核中，不能更改',
                             'ret_code': 30002,
                         }
                     else:
                         form_data = form.cleaned_data
                         profile_has_changed = False
                         change_list = []
-                        ignore_change_profiles = ('bank_card_no', 'bank_account_name',
-                                                  'deposit_bank_province', 'deposit_bank_city',
-                                                  'bank_branch_address', 'bank')
-                        for db_profile in e_profile:
-                            profile_name = db_profile.name
-                            if profile_name in form_data and profile_name not in ignore_change_profiles:
-                                req_profile = form_data[profile_name]
-                                if db_profile != req_profile:
-                                    db_profile = req_profile
-                                    change_list.append(db_profile.verbose_name)
-                                    profile_has_changed = True
 
-                        db_trade_pwd = user.wanglibaouserprofile.trade_pwd
-                        req_trade_pwd = form_data[db_trade_pwd.name]
-                        if db_trade_pwd != req_trade_pwd:
-                            db_trade_pwd = req_trade_pwd
-                            change_list.append(db_trade_pwd.verbose_name)
+                        if e_profile.company_name != form_data['company_name']:
+                            e_profile.company_name = form_data['company_name']
+                            change_list.append(u'公司名称')
+                            profile_has_changed = True
+
+                        if e_profile.business_license != form_data['business_license']:
+                            e_profile.business_license = form_data['business_license']
+                            change_list.append(u'公司营业执照')
+                            profile_has_changed = True
+
+                        if e_profile.registration_cert != form_data['registration_cert']:
+                            e_profile.registration_cert = form_data['registration_cert']
+                            change_list.append(u'公司税务登记证')
+                            profile_has_changed = True
+
+                        if e_profile.certigier_name != form_data['certigier_name']:
+                            e_profile.certigier_name = form_data['certigier_name']
+                            change_list.append(u'授权人姓名')
+                            profile_has_changed = True
+
+                        if e_profile.certigier_phone != form_data['certigier_phone']:
+                            e_profile.certigier_phone = form_data['certigier_phone']
+                            change_list.append(u'授权人手机号')
+                            profile_has_changed = True
+
+                        if e_profile.company_address != form_data['company_address']:
+                            e_profile.company_address = form_data['company_address']
+                            change_list.append(u'公司地址')
+                            profile_has_changed = True
+
+                        if user.wanglibaouserprofile.trade_pwd != form_data['trade_pwd']:
+                            user.wanglibaouserprofile.trade_pwd = form_data['trade_pwd']
                             user.wanglibaouserprofile.save()
+                            change_list.append(u'交易密码')
                             profile_has_changed = True
 
                         # FixMe,交易码变更是否需要重新审核
                         if profile_has_changed:
-                            e_profile.description = u'最近修改:'.join(change_list)
+                            e_profile.description = u'待审核字段:'.join(change_list)
                             e_profile.status = u'待审核'
                             e_profile.save()
+                            user.wanglibaouserprofile.save()
 
                         response_data = {
                             'message': 'success',
