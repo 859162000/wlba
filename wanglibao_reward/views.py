@@ -306,9 +306,15 @@ class WeixinShareDetailView(TemplateView):
             try:
                 # modify by hb on 2015-10-15 : 只查询微信号关联记录
                 gifts = WanglibaoUserGift.objects.filter(rules__gift_id__exact=order_id, activity=self.activity, valid=2)
+                logger.debug("=======即将被处理的gifts======")
+                for gift in gifts:
+                    logger.debug(gift)
                 exp_glods = gifts.filter(amount__gte=100)  #此处做了一个假设：加息券不可能大于100, 体验金不可能小于100
                 counts = exp_glods.count() if exp_glods else 0
-                return gifts.filter(amount__lt=10).all(), counts
+                gifts = gifts.filter(amount__lt=10).all()
+                logger.debug("========处理后的gifts=========")
+                return gifts, counts
+                #return gifts.filter(amount__lt=10).all(), counts
             except Exception, reason:
                 self.exception_msg(reason, u'获取已领奖用户信息失败')
                 return None
