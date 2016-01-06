@@ -37,7 +37,7 @@
       #body_wrap .top_wrap .link_wrap a {
         color: #fcd812; }
     #body_wrap .top_wrap .title_2 {
-      padding-top: 0.3rem;
+      padding: 0.3rem 0 1.9rem;
       width: 100%;
       text-align: center;
       line-height: 0.65rem;
@@ -56,7 +56,7 @@
     display: inline-block;
     margin: 0 2.75%;
     position: relative;
-    padding-top: 1rem; }
+    padding: 1rem 0; }
     .main_wrap .body_main .title {
       font-size: 0.6rem;
       color: #bfa1f1;
@@ -95,15 +95,76 @@
               display: block; }
           .main_wrap .body_main .box_wrap .box dl dt.one {
             background: #4e7cda; }
-            .main_wrap .body_main .box_wrap .box dl dt.one dd {
-              background: #fff;
-              text-align: center;
-              font-size: 19px;
+          .main_wrap .body_main .box_wrap .box dl dt.two {
+            background-color: #a3bd1b; }
+          .main_wrap .body_main .box_wrap .box dl dt.three {
+            background-color: #f835a6; }
+          .main_wrap .body_main .box_wrap .box dl dt.four {
+            background-color: #3548d1; }
+          .main_wrap .body_main .box_wrap .box dl dt.five {
+            background-color: #2cb776; }
+          .main_wrap .body_main .box_wrap .box dl dt.six {
+            background-color: #ff7a73; }
+          .main_wrap .body_main .box_wrap .box dl dt.seven {
+            background-color: #d86713; }
+          .main_wrap .body_main .box_wrap .box dl dt.eight {
+            background-color: #2b9525; }
+          .main_wrap .body_main .box_wrap .box dl dt.nine {
+            background-color: #f77eab; }
+          .main_wrap .body_main .box_wrap .box dl dd {
+            background: #fff;
+            text-align: center;
+            font-size: 0.45rem;
+            color: #27053d;
+            line-height: 1.55rem;
+            height: 1.55rem; }
+            .main_wrap .body_main .box_wrap .box dl dd img {
+              height: 100%;
+              display: inline-block; }
+            .main_wrap .body_main .box_wrap .box dl dd span {
+              display: inline-block;
+              font-size: 0.45rem;
               color: #27053d;
-              line-height: 24px;
-              padding-top: 20px;
-              height: 77px; }
+              line-height: 1.55rem; }
+        .main_wrap .body_main .box_wrap .box .button {
+          width: 79.5%;
+          display: block;
+          margin: 0.5rem auto 0.375rem; }
       .main_wrap .body_main .box_wrap .box_three {
         margin-right: 0%; }
+
+.rule_reward_list {
+  width: 94.5%;
+  margin: 0 2.75%;
+  border: 2px #8b62af solid;
+  display: inline-block; }
+  .rule_reward_list .nav_left {
+    width: 100%;
+    height: 2.15rem;
+    display: block; }
+    .rule_reward_list .nav_left .nav_button {
+      width: 50%;
+      height: 2.15rem;
+      display: block;
+      background: #350e4d;
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.75rem;
+      line-height: 2.15rem;
+      float: left;
+      text-align: center; }
+    .rule_reward_list .nav_left .select {
+      background: #27053d; }
+  .rule_reward_list .rule_wrap {
+    width: 773px;
+    float: left;
+    height: 296px;
+    padding: 27px 24px 0 64px;
+    display: block;
+    display: none; }
+    .rule_reward_list .rule_wrap p {
+      color: #bfa1f1;
+      font-size: 14px;
+      line-height: 30px; }
 
 /*# sourceMappingURL=app_send_reward.css.map */
