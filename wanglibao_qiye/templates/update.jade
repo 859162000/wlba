@@ -21,12 +21,16 @@ block main
             input(type='hidden',name="pageType", value="edit")
             if data.status == '审核通过'
                 readonly = false
+                test = 'yes'
             else
-                readonly = 'readonly'
-                .notThrough 对不起，您的资料正在审核中，请在审核通过再执行更改操作。
-            if data.status == '审核失败'
-                readonly = false
-                .notThrough 对不起，您的资料未通过审核，请仔细核查后重新填写，若有疑问请及时与我们的工作人员联系。
+                if data.status == '审核失败'
+                    test = 'yes'
+                    readonly = false
+                    .notThrough 对不起，您的资料未通过审核，请仔细核查后重新填写，若有疑问请及时与我们的工作人员联系。
+                else
+                    test = 'no'
+                    readonly = 'readonly'
+                    .notThrough 对不起，您的资料正在审核中，请在审核通过再执行更改操作。
             table
                 tbody
                     tr
@@ -67,7 +71,7 @@ block main
                         td.td-left 手机验证码
                         td
                             input(type='text', name="validate_code", placeholder="请输入验证码", autocomplete='off', readonly=readonly, class="required {messages:{required:'请输入验证码'}}")
-                            if data.status == '审核通过'
+                            if test == 'yes'
                                 button.ispan4-omega#button-get-code-btn.button-orange.button-large(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
                             else
                                 button.ispan4-omega.button-orange.button-large.button-gray(type='button', data-phone="{{user.wanglibaouserprofile.phone}}") 获取验证码
@@ -107,7 +111,7 @@ block main
                         td
                             input(type='text', name="trade_pwd", placeholder="请输入交易密码", autocomplete='off', readonly=readonly, class="required isNumber {maxlength:6,messages:{required:'请输入交易密码',maxlength:'不能超过{0}个字符'}}", value="{{data.trade_pwd}}")
             .qiye-btns
-                if data.status == '审核通过'
+                if test == 'yes'
                     a(href='javascript:void(0)').save-btn 保存
                 a(href='/').cancel-btn 取消
 
