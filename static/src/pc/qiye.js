@@ -42,7 +42,7 @@ require(['jquery','jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/m
                     return tool.modalAlert({
                       title: '温馨提示',
                       msg: data.message
-                    });    
+                    });
                 }
 
             })
