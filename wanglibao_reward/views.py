@@ -1459,8 +1459,9 @@ class WeixinAnnualBonusView(TemplateView):
 
             # 以体验金形式发放年终奖
             bonus = wx_bonus.annual_bonus
-            if wx_bonus.is_new:
-                bonus = wx_bonus.annual_bonus - wx_bonus.min_annual_bonus
+            ## by hb : remove 28888 from bonus
+            ##if wx_bonus.is_new:
+            ##    bonus = wx_bonus.annual_bonus - wx_bonus.min_annual_bonus
             event = ExperienceEvent.objects.filter(description=u'2015年终奖体验金').filter(amount=bonus).first()
             if not event:
                 rep = { 'err_code':405, 'err_messege':u'领取失败，请联系客服(405)' }
