@@ -1516,9 +1516,9 @@ class BidHasBindingForChannel(APIView):
     根据bid（第三方用户ID）判断该用户是否已经绑定指定渠道
     """
 
-    permission_classes = (IsAuthenticated,)
+    permission_classes = ()
 
-    def get(self, request, bid, channel_code):
+    def get(self, request, channel_code, bid):
         binding = Binding.objects.filter(btype=channel_code, bid=bid).first()
         if binding:
             response_data = {
