@@ -65,7 +65,7 @@ class EnterpriseUserProfileForm(forms.Form):
                 code="10001",
             )
 
-        return int(certigier_phone)
+        return certigier_phone
 
     def clean_company_address(self):
         company_address = self.cleaned_data.get('company_address', '').strip()
