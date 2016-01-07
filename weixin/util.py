@@ -9,6 +9,8 @@ from wechatpy import WeChatClient
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
+import re
+
 def redirectToJumpPage(message):
     url = reverse('jump_page')+'?message=%s'% message
     return HttpResponseRedirect(url)
