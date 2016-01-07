@@ -696,10 +696,10 @@ org.regist = (function(org){
                     },
                     success:function(data){
                         if(data.ret_code === 0){
-                            var next = org.getQueryStringByName('next') == '' ? '/weixin/sub_regist_first/?phone='+$identifier.val() : org.getQueryStringByName('next');
+                            //var next = org.getQueryStringByName('next') == '' ? '/weixin/sub_regist_first/?phone='+$identifier.val() : org.getQueryStringByName('next');
+                            var next = '/weixin/sub_regist_first/?phone='+$identifier.val();
                             next = org.getQueryStringByName('mobile') == '' ? next : next + '&mobile='+ org.getQueryStringByName('mobile');
                             next = org.getQueryStringByName('serverId') == '' ? next : next + '&serverId='+ org.getQueryStringByName('serverId');
-                            //var next = '/weixin/sub_code/?phone='+$identifier.val();
                             //console.log(next);
                             window.location.href = next;
                         }else if(data.ret_code > 0){
