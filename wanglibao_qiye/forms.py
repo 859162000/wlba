@@ -84,12 +84,12 @@ class EnterpriseUserProfileForm(forms.Form):
                     return company_account
                 else:
                     raise forms.ValidationError(
-                        message=u'该卡已被绑定',
+                        message=u'银行卡卡号已被绑定',
                         code="10004",
                     )
             elif self.operation == 'create':
                 raise forms.ValidationError(
-                    message=u'该卡已被绑定',
+                    message=u'银行卡卡号已被绑定',
                     code="10004",
                 )
 
