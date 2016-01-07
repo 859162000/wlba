@@ -84,26 +84,14 @@
                 });
             }
         })
-
-
-
-		$('.recharge_button').click(function(){
-			window.location.href = '/p2p/list/'
-		});
-
-        $('.investment_button').click(function(){
-		    window.location.href = '/p2p/list/'
-		});
-
-        var see_rule_index_1;
-        $('#see_rule_1').click(function(){
-            see_rule_index_1 = $('.rule_wrap_1').hasClass('rule_wrap_show');
-            if(see_rule_index_1){
-                $('.rule_wrap_1').removeClass('rule_wrap_show').hide();
+		$('#go_experience').click(function(){
+            if(h5_user_static){
+                window.location.href = '/activity/experience/gold/'
             }else{
-                $('.rule_wrap_1').addClass('rule_wrap_show').show();
+                window.location.href = '/accounts/login/?next=/activity/experience/gold/'
             }
-        });
+
+		});
     })
 
 }).call(this);
