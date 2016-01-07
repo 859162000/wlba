@@ -111,8 +111,8 @@ def filter_emoji(desstr,restr=''):
 
 def _process_record(w_user, user, type, describe):
     war = WeiXinUserActionRecord()
-    war.w_user = w_user
-    war.user = user
+    war.w_user_id = w_user.id
+    war.user_id = user.id
     war.action_type = type
     war.action_describe = describe
     war.create_time = int(time.time())
