@@ -84,7 +84,7 @@ block main
                     tr
                         td.td-left 交易密码
                         td
-                            input(type='password', name="trade_pwd", placeholder="请输入交易密码", autocomplete='off', class="required isNumber {maxlength:6,messages:{required:'请输入交易密码',maxlength:'不能超过{0}个字符'}}")
+                            input(type='text',onfocus="this.type='password'", name="trade_pwd", placeholder="请输入交易密码", autocomplete='off', class="required isNumber {strLength:6,messages:{required:'请输入交易密码',strLength:'请输入{0}个字符'}}")
             .qiye-btns
                 a(href='javascript:void(0)').save-btn 保存
                 a(href='/').cancel-btn 取消
