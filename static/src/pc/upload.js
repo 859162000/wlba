@@ -87,6 +87,7 @@ define(['jquery', 'jquery.webuploader', 'csrf'], function ($, WebUploader, csrf)
                         $fileBox.find('.viewThumb').append('<img src="'+dataSrc+'" >');
                     }
                 });
+                $fileInput.parent().find('.errorImg').hide()
 			});
 
             webUploader.on('uploadBeforeSend', function(obj, data, headers) {
