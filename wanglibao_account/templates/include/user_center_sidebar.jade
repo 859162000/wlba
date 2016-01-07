@@ -16,14 +16,18 @@ mixin sidebar-item(name, link, target, mark)
 
 if user.wanglibaouserprofile.utype == '3'
     ul.sidebar
-        +sidebar-item('账户总览', '/accounts/home/')
-        +sidebar-item('充值', '/pay/banks/')
-        +sidebar-item('提现', '/pay/withdraw/')
-        +sidebar-item('交易记录', '/accounts/transaction/p2p/')
-        +sidebar-item('银行卡', '/accounts/bankcard/')
-        +sidebar-item('站内信', '/accounts/message/')
-        +sidebar-item('资料修改', '/qiye/profile/edit/')
-        +sidebar-item('修改密码', '/accounts/setting/')
+        .finishEd(style="display:none")
+            +sidebar-item('账户总览', '/accounts/home/')
+            +sidebar-item('充值', '/pay/banks/')
+            +sidebar-item('提现', '/pay/withdraw/')
+            +sidebar-item('交易记录', '/accounts/transaction/p2p/')
+            +sidebar-item('银行卡', '/accounts/bankcard/')
+            +sidebar-item('站内信', '/accounts/message/')
+            +sidebar-item('资料修改', '/qiye/profile/edit/')
+            +sidebar-item('修改密码', '/accounts/setting/')
+        .finishing(style="display:none")
+            +sidebar-item('资料完善', '/qiye/info/')
+        
 else
     ul.sidebar
       +sidebar-item('账户总览', '/accounts/home/')
