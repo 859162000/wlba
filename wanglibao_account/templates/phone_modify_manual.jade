@@ -1,0 +1,18 @@
+- load widget_tweaks
+doctype html
+html
+    head
+        - with '网利宝' as title
+        include include/common_head
+        - endwith
+        link(rel="stylesheet",href="/static/styles/pc_activity/fileinput.css?v=201512")
+        - csrf_token
+    body(style="background: #ffe6a6")
+        include global/g_nav
+        .form-group
+            input#file_1.file(type="file" multiple="true")
+
+        include global/g_footer
+        script.
+            require(["/static/js/phone_modify_manual.js"])
+        include include/tracking
