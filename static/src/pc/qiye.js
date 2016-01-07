@@ -35,16 +35,23 @@ require(['jquery','jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/m
             }else{
                 $('.swdjzImg').hide()
             }
-            $('#qiyeForm').ajaxSubmit(function(data){
-                if(data.ret_code == 10000){
-                    window.location.href = '/accounts/home/';
-                }else{
+            $('#qiyeForm').ajaxSubmit({
+                success: function (data) {
+                    if (data.ret_code == 10000) {
+                        window.location.href = '/accounts/home/';
+                    } else {
+                        return tool.modalAlert({
+                            title: '温馨提示',
+                            msg: data.message
+                        });
+                    }
+                },
+                error :function(data){
                     return tool.modalAlert({
-                      title: '温馨提示',
-                      msg: data.message
+                        title: '温馨提示',
+                        msg: data.message
                     });
                 }
-
             })
         }
     })
