@@ -1342,9 +1342,9 @@ class WeixinAnnualBonusView(TemplateView):
 #               'user_id' : user_profile.user.id if user_profile else None,
                 'user' : user_profile.user if user_profile else None,
                 'is_new' : is_new,
-                'annual_bonus' : 28888 if is_new else 1000,
-                'min_annual_bonus' : 28888 if is_new else 1000,
-                'max_annual_bonus' : 36888 if is_new else 8000,
+                'annual_bonus' : 500 if is_new else 500,
+                'min_annual_bonus' : 500 if is_new else 500,
+                'max_annual_bonus' : 8000 if is_new else 8000,
             })
         except Exception, ex :
             logger.exception("[%s] [%s] : [%s]" % (self.to_openid, phone, ex))
