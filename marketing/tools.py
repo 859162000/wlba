@@ -289,16 +289,30 @@ def check_unavailable_3_days():
     end_date = utils.local_to_utc(check_date, 'max').strftime('%Y-%m-%d %H:%M:%S')
 
     cursor = connection.cursor()
-    sql = "select COUNT(c.user_id), c.user_id, p.phone " \
-          "from wanglibao_redpack_redpackrecord c, " \
-          "wanglibao_redpack_redpack r, " \
-          "wanglibao_redpack_redpackevent e, " \
-          "wanglibao_profile_wanglibaouserprofile p " \
-          "where c.redpack_id = r.id and r.event_id = e.id and c.user_id = p.user_id " \
-          "and e.unavailable_at > '{}' and e.unavailable_at <= '{}' " \
-          "and e.auto_extension = 0 and c.order_id is NULL " \
-          "group by c.user_id;".format(start_date, end_date)
+    # sql = "select COUNT(c.user_id), c.user_id, p.phone " \
+    #       "from wanglibao_redpack_redpackrecord c, " \
+    #       "wanglibao_redpack_redpack r, " \
+    #       "wanglibao_redpack_redpackevent e, " \
+    #       "wanglibao_profile_wanglibaouserprofile p " \
+    #       "where c.redpack_id = r.id and r.event_id = e.id and c.user_id = p.user_id " \
+    #       "and e.unavailable_at > '{}' and e.unavailable_at <= '{}' " \
+    #       "and e.auto_extension = 0 and c.order_id is NULL " \
+    #       "group by c.user_id;".format(start_date, end_date)
 
+    sql = "SELECT COUNT(a.user_id), a.user_id, b.phone FROM " \
+          "(SELECT r.user_id, e.auto_extension AS is_auto, e.unavailable_at, " \
+          "DATE_ADD(r.created_at, INTERVAL e.auto_extension_days day) end_date " \
+          "FROM wanglibao_redpack_redpackrecord AS r, " \
+          "wanglibao_redpack_redpack AS p, " \
+          "wanglibao_redpack_redpackevent AS e " \
+          "WHERE r.redpack_id = p.id AND p.event_id = e.id and r.order_id is NULL) AS a, " \
+          "wanglibao_profile_wanglibaouserprofile AS b " \
+          "WHERE a.user_id = b.user_id " \
+          "AND ((a.is_auto = 0 AND a.unavailable_at > '{}' AND a.unavailable_at <= '{}') " \
+          "OR (a.is_auto = 1 AND a.end_date > '{}' AND a.end_date <= '{}')) " \
+          "GROUP BY a.user_id;".format(start_date, end_date, start_date, end_date)
+
+    print(sql)
     cursor.execute(sql)
     fetchall = cursor.fetchall()
 
