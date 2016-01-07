@@ -3764,3 +3764,92 @@ class Rong360P2PListView(APIView):
                 'result_msg': u"没有权限访问"
             }
         return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class XiguaP2PListView(APIView):
+    """
+    """
+    permission_classes = ()
+
+    def get(self, request):
+
+        data_list = []
+        ret = dict()
+
+        p2ps = P2PProduct.objects.filter(status=u'正在招标')
+
+        ret['recordCount'] = p2ps.count()
+        ret['apiCorp'] = u'网利宝'
+        ret['transferTime'] = timezone.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        for product in p2ps:
+
+            try:
+                p2p_dict = dict()
+                p2p_dict['creditSeriesName'] = u'散标'
+                p2p_dict['productName'] = product.name
+                p2p_dict['productCode'] = str(product.id)
+                p2p_dict['totalInvestment'] = Decimal(product.total_amount)
+                p2p_dict['annualRevenueRate'] = product.expected_earning_rate/100
+                p2p_dict['loanLifeType'] = u'天' if product.pay_method.startswith(u'日计息') else u'月'
+                p2p_dict['loanLifePeriod'] = product.period
+                p2p_dict['interestPaymentType'] = product.pay_method
+                p2p_dict['guaranteeInsitutions'] = product.warrant_company.name
+                p2p_dict['onlineState'] = u'在售'
+                p2p_dict['scale'] = str(Decimal(product.completion_rate).quantize(Decimal('0.00')))
+                p2p_dict['publishDate'] = timezone.localtime(product.publish_time).\
+                    strftime('%Y-%m-%d %H:%M:%S') if product.publish_time else ''
+                p2p_dict['fixedRepaymentDate'] = 0
+                p2p_dict['rewardRate'] = 0
+                p2p_dict['investTimes'] = P2PEquity.objects.filter(product=product).count()
+                p2p_dict['productURL'] = 'https://{}/p2p/detail/{}'.format(request.get_host(), product.id)
+                p2p_dict['isFirstBuy'] = True if product.category == u'新手标' else False
+
+                data_list.append(p2p_dict)
+
+            except Exception, e:
+                print 'product{} error: {}'.format(product.pk, e)
+
+            ret['dataList'] = data_list
+
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
+
+
+class XiguaP2PQueryView(APIView):
+    """
+    """
+    permission_classes = ()
+
+    def get(self, request):
+
+        args = request.GET.get('queryProductIdList', None)
+        args_list = args.split(',')
+
+        data_list = []
+        ret = dict()
+
+        p2ps = P2PProduct.objects.filter(pk__in=args_list)
+
+        ret['recordCount'] = p2ps.count()
+        ret['apiCorp'] = u'网利宝'
+        ret['transferTime'] = timezone.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        for product in p2ps:
+
+            try:
+                p2p_dict = dict()
+                p2p_dict['productCode'] = str(product.id)
+                p2p_dict['onlineState'] = u'在售'
+                p2p_dict['scale'] = Decimal(product.completion_rate).quantize(Decimal('0.00'))
+                p2p_dict['productURL'] = 'https://{}/p2p/detail/{}'.format(request.get_host(), product.id)
+                p2p_dict['establishmentDate'] = timezone.localtime(product.soldout_time).\
+                    strftime('%Y-%m-%d %H:%M:%S') if product.soldout_time else ''
+
+                data_list.append(p2p_dict)
+
+            except Exception, e:
+                print 'product{} error: {}'.format(product.pk, e)
+
+            ret['dataList'] = data_list
+
+        return HttpResponse(renderers.JSONRenderer().render(ret, 'application/json'))
