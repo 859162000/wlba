@@ -294,3 +294,5 @@ urlpatterns += patterns(
     '',
     url(r'^datacube/$', DataCubeApiView.as_view()),
 )
+
+# 判断bid是否已经绑定渠道
