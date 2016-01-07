@@ -1359,13 +1359,13 @@ class WeixinAnnualBonusView(TemplateView):
         return HttpResponse(json.dumps(rep), content_type='application/json')
 
     def vote_bonus(self):
-        vote_type = self.request.GET.get('type', None)
-        if not self.to_openid or not vote_type:
+        str_vote_type = self.request.GET.get('type', None)
+        if not self.to_openid or not str_vote_type:
             rep = { 'err_code':301, 'err_messege':u'缺少参数' }
             return HttpResponse(json.dumps(rep), content_type='application/json')
-        if vote_type==u'1':
-            vote_type = 1
-        else:
+
+        vote_type = 1
+        if str_vote_type==u'0':
             vote_type = 0
 
         if self.to_openid==self.from_openid:
@@ -1381,6 +1381,20 @@ class WeixinAnnualBonusView(TemplateView):
                 #if wx_bonus.is_pay:
                 #    rep = { 'err_code':304, 'err_messege':u'受评用户已领取年终奖，不能再进行评价了' }
                 #    return HttpResponse(json.dumps(rep), content_type='application/json')
+
+                if vote_type==1:
+                    wx_bonus.good_vote += 1
+                    if not wx_bonus.is_pay and not wx_bonus.is_max:
+                        wx_bonus.annual_bonus += 500
+                        if wx_bonus.annual_bonus > wx_bonus.max_annual_bonus:
+                            wx_bonus.annual_bonus = wx_bonus.max_annual_bonus
+                            wx_bonus.is_max = True
+                else:
+                    wx_bonus.bad_vote += 1
+                    if not wx_bonus.is_pay and not wx_bonus.is_max:
+                        wx_bonus.annual_bonus -= 500
+                        if wx_bonus.annual_bonus < wx_bonus.min_annual_bonus:
+                            wx_bonus.annual_bonus = wx_bonus.min_annual_bonus
 
                 wx_vote, flag = WeixinAnnulBonusVote.objects.get_or_create(from_openid=self.from_openid, to_openid=self.to_openid,
                     defaults={
@@ -1401,27 +1415,13 @@ class WeixinAnnualBonusView(TemplateView):
                     rep = { 'err_code':305, 'err_messege':'您已经评价过了，不能重复评价', }
                     return HttpResponse(json.dumps(rep), content_type='application/json')
 
-                if vote_type=="1":
-                    wx_bonus.good_vote += 1
-                    if not wx_bonus.is_pay and not wx_bonus.is_max:
-                        wx_bonus.annual_bonus += 500
-                        if wx_bonus.annual_bonus > wx_bonus.max_annual_bonus:
-                            wx_bonus.annual_bonus = wx_bonus.max_annual_bonus
-                            wx_bonus.is_max = True
-                else:
-                    wx_bonus.bad_vote += 1
-                    if not wx_bonus.is_pay and not wx_bonus.is_max:
-                        wx_bonus.annual_bonus -= 500
-                        if wx_bonus.annual_bonus < wx_bonus.min_annual_bonus:
-                            wx_bonus.annual_bonus = wx_bonus.min_annual_bonus
-
                 wx_bonus.update_time = timezone.now()
                 wx_bonus.save()
 
-            except IntegrityError, ex:
-                logger.exception("[%s] vote to [%s] : [%s]" % (self.from_openid, self.to_openid, ex))
-                rep = { 'err_code':305, 'err_messege':'您已经评价过了，不能重复评价(305)', }
-                return HttpResponse(json.dumps(rep), content_type='application/json')
+            #except IntegrityError, ex:
+            #    logger.exception("[%s] vote to [%s] : [%s]" % (self.from_openid, self.to_openid, ex))
+            #    rep = { 'err_code':305, 'err_messege':'您已经评价过了，不能重复评价(305)', }
+            #    return HttpResponse(json.dumps(rep), content_type='application/json')
             except Exception, ex:
                 logger.exception("[%s] vote to [%s] : [%s]" % (self.from_openid, self.to_openid, ex))
                 rep = { 'err_code':306, 'err_messege':'系统繁忙，请稍后重试', }
