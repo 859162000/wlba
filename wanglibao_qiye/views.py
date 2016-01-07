@@ -139,7 +139,7 @@ class EnterpriseProfileCreateApi(APIView):
     def post(self, request):
         user = request.user
         if user.wanglibaouserprofile.utype == '3':
-            form = EnterpriseUserProfileForm('create', request.POST)
+            form = EnterpriseUserProfileForm('create', request.user, request.POST)
             if form.is_valid():
                 if EnterpriseUserProfile.objects.filter(user=user).first():
                     response_data = {
@@ -226,7 +226,7 @@ class EnterpriseProfileUpdateApi(APIView):
     def post(self, request):
         user = request.user
         if user.wanglibaouserprofile.utype == '3':
-            form = EnterpriseUserProfileForm('update', request.POST)
+            form = EnterpriseUserProfileForm('update', request.user, request.POST)
             if form.is_valid():
                 try:
                     e_profile = EnterpriseUserProfile.objects.get(user=user)
@@ -283,6 +283,37 @@ class EnterpriseProfileUpdateApi(APIView):
                             user.wanglibaouserprofile.save()
                             change_list.append(u'[交易密码]')
                             profile_has_changed = True
+
+                        if e_profile.status == u'审核失败' and not user.wanglibaouserprofile.id_valid_time:
+                            if e_profile.bank_card_no != form_data['company_account']:
+                                e_profile.bank_card_no = form_data['company_account']
+                                change_list.append(u'[公司账户账号]')
+                                profile_has_changed = True
+
+                            if e_profile.bank_account_name != form_data['company_account_name']:
+                                e_profile.bank_account_name = form_data['company_account_name']
+                                change_list.append(u'[公司账户名称]')
+                                profile_has_changed = True
+
+                            if e_profile.deposit_bank_province != form_data['deposit_bank_province']:
+                                e_profile.deposit_bank_province = form_data['deposit_bank_province']
+                                change_list.append(u'[公司开户行所在省份]')
+                                profile_has_changed = True
+
+                            if e_profile.deposit_bank_city != form_data['deposit_bank_city']:
+                                e_profile.deposit_bank_city = form_data['deposit_bank_city']
+                                change_list.append(u'[公司开户行所在市县]')
+                                profile_has_changed = True
+
+                            if e_profile.bank_branch_address != form_data['bank_branch_address']:
+                                e_profile.bank_branch_address = form_data['bank_branch_address']
+                                change_list.append(u'[开户行支行所在地]')
+                                profile_has_changed = True
+
+                            if e_profile.bank != form_data['bank']:
+                                e_profile.bank = form_data['bank']
+                                change_list.append(u'[所属银行]')
+                                profile_has_changed = True
 
                         # FixMe,交易码变更是否需要重新审核
                         if profile_has_changed:
