@@ -1,4 +1,4 @@
-js(function() {
+(function() {
     require.config({
         paths: {
             jquery: 'lib/jquery.min',
