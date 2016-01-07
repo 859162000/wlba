@@ -40,8 +40,10 @@ html(style="background: #f6f6f6")
         p 您已成功注册网利宝
         p 并且与迅雷账号绑定成功
       .xunmeng2-moidle2
-        p 迅雷账号：{{nickname}}
-        p 网利宝账号：{{user|display_name}}
+        if ret_code == '10000'
+          p 迅雷账号：{{nickname}}
+        p 网利宝账号：
+          span.va
       .xunmeng2-bottom
         a(href='/weixin/list/').xunleiwangli 前往网利宝
         p 迅雷会员奖励将直接发送到此迅雷账号上
