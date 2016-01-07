@@ -1,6 +1,7 @@
 # encoding:utf-8
 
 import json
+import time
 import logging
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -67,15 +68,8 @@ class EnterpriseProfileUploadApi(APIView):
                             'ret_code': 40001,
                         }
                     else:
-                        if e_profile:
-                            e_profile.status = u'待审核'
-                            e_profile.save()
-
-                        user.wanglibaouserprofile.id_is_valid = False
-                        user.wanglibaouserprofile.save()
-
                         response_data = {
-                            'filename': filename,
+                            'filename': filename + '?' + str(time.time()),
                             'message': 'success',
                             'ret_code': 10000,
                         }
@@ -105,8 +99,8 @@ class GetEnterpriseUserProfileApi(APIView):
     def get(self, request):
         user = request.user
         if user.wanglibaouserprofile.utype == '3':
-            try:
-                e_profile = EnterpriseUserProfile.objects.values().filter(user=user).first()
+            e_profile = EnterpriseUserProfile.objects.values().filter(user=user).first()
+            if e_profile:
                 del e_profile['modify_time']
                 del e_profile['created_time']
                 response_data = {
@@ -115,7 +109,7 @@ class GetEnterpriseUserProfileApi(APIView):
                     'ret_code': 10000
                 }
                 return HttpResponse(json.dumps(response_data), status=200, content_type='application/json')
-            except EnterpriseUserProfile.DoesNotExist:
+            else:
                 response_data = {
                     'data': None,
                     'message': u'企业用户信息未完善',
