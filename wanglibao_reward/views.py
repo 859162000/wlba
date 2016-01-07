@@ -1378,7 +1378,7 @@ class WeixinAnnualBonusView(TemplateView):
                     rep = { 'err_code':304, 'err_messege':u'受评用户已领取年终奖，不能再进行评价了' }
                     return HttpResponse(json.dumps(rep), content_type='application/json')
                 wx_bonus.is_max = False
-                if vote_type:
+                if vote_type!="0":
                     wx_bonus.good_vote += 1
                     wx_bonus.annual_bonus += 500
                     if wx_bonus.annual_bonus > wx_bonus.max_annual_bonus:
