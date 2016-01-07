@@ -73,7 +73,10 @@ html(style="background: #f6f6f6")
             button(type="button").check-submit 短信验证码
         .maimai-form-sign 请输入正确的手机号
         .maimai-form-margin.maimai-sign-margin
-        p.xunleibangding 注册后将与您的迅雷账号：xxx绑定
+        if ret_code == '10000'
+          p.xunleibangding 注册后将与您的迅雷账号：{{nickname}}绑定
+        else
+          p.xunleibangding
         input(type='button',name='submit' ,value="马上注册领取红包",disabled=true).maimai-form-btn2.maimai-form-btn1
         p.xunleipeople
           |已有网利宝账号？
