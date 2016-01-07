@@ -3,12 +3,12 @@ extends account_home_base
 -load formatters
 
 block head
-  - with '资料' as title
+  - with '资料完善' as title
     include global/g_head
     link(href="/static/styles/pc/pc.css", rel="stylesheet", type="text/css")
     link(href="/static/styles/pc/upload.css", rel="stylesheet", type="text/css")
 block sidebar
-  - with '资料' as activeItem
+  - with '资料完善' as activeItem
     include include/user_center_sidebar
 
 block main

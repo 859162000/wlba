@@ -36,7 +36,15 @@ require(['jquery','jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/m
                 $('.swdjzImg').hide()
             }
             $('#qiyeForm').ajaxSubmit(function(data){
-                window.location.href = '/accounts/home/';
+                if(data.ret_code == 10000){
+                    window.location.href = '/accounts/home/';
+                }else{
+                    return tool.modalAlert({
+                      title: '温馨提示',
+                      msg: data.message
+                    });
+                }
+
             })
         }
     })
@@ -103,6 +111,17 @@ require(['jquery','jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/m
 
     if($('input[name="pageType"]').val() != 'edit'){
         new PCAS("deposit_bank_province","deposit_bank_city");
+    }else{
+        $.ajax({
+          url: '/qiye/profile/exists/',
+          type: "GET",
+          data: {
+          }
+        }).done(function(data) {
+
+        }).fail(function(data){
+            $('.notThrough').text('请完善信息')
+        })
     }
 
 
