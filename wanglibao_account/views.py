@@ -2198,7 +2198,7 @@ class FirstPayResultView(TemplateView):
 
 
 class ManualModifyPhoneTemplate(TemplateView):
-    template_name = ''
+    template_name = 'phone_modify_manual.jade'
 
     def get_context_data(self, **kwargs):
 
@@ -2206,7 +2206,9 @@ class ManualModifyPhoneTemplate(TemplateView):
 
 
 class ManualModifyPhoneAPI(APIView):
+    # permission_classes = (IsAuthenticated, )
     permission_classes = ()
 
     def post(self, request):
-        return Response({'ret_code':0})
+
+        return Response({'ret_code': 0})
