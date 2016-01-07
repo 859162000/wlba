@@ -225,6 +225,7 @@ $('.xinlei-rule').click(function () {
 $('.xunjiang-zong span').click(function () {
     $('.xunmeng').hide();
 });
+
 function getQueryString(name) {
     var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
     var r = window.location.search.substr(1).match(reg);
@@ -367,15 +368,6 @@ org.xunlei = (function (org) {
                 }
 
                 if (!lib.checkState) return
-                //function getQueryString(name) {
-                //    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
-                //    var r = window.location.search.substr(1).match(reg);
-                //    if (r != null) {
-                //        return unescape(r[2]);
-                //    }
-                //    return null;
-                //}
-
                 var token = getQueryString('promo_token'),
                     xid = getQueryString('xluserid'),
                     timer = getQueryString('time'),
@@ -396,6 +388,9 @@ org.xunlei = (function (org) {
                     success: function (data) {
                         console.log(data)
                         if (data.ret_code == 10002 || data.ret_code == 10000) {
+                            var va=$('input[name=phone]').val();
+
+                            $('.va').html(va.substring(0, 3) + "******"+va.substring(9, 11));
                             $('.xunmeng2').show();
                         } else {
                             //$('.get_ticket_wrap1').show();
