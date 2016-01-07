@@ -36,7 +36,15 @@ require(['jquery','jquery.form', 'jquery.validate', 'jquery.placeholder', 'lib/m
                 $('.swdjzImg').hide()
             }
             $('#qiyeForm').ajaxSubmit(function(data){
-                window.location.href = '/accounts/home/';
+                if(data.ret_code == 10000){
+                    window.location.href = '/accounts/home/';
+                }else{
+                    return tool.modalAlert({
+                      title: '温馨提示',
+                      msg: data.message
+                    });    
+                }
+
             })
         }
     })
