@@ -381,7 +381,8 @@ var Zepto=function(){function L(t){return null==t?String(t):j[S.call(t)]||"objec
 			}).done(function (xhr) {
 				if(xhr.err_code==0){
 					window.location.href = '/weixin_activity/weixin/bonus/?wxid='+wxid;
-				}else if(xhr.err_code==202){
+				}else if(xhr.err_code==205){
+					
 					$('.friend_top span').text(xhr.err_messege);
 					$('.friend_top').fadeIn();
 					$('.apply_button').show();
