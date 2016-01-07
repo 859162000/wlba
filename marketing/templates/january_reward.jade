@@ -1,0 +1,49 @@
+-load formatters
+-load mathfilters
+doctype html
+html
+    head
+        - with '网利宝' as title
+        include include/common_head
+        - endwith
+        link(rel="stylesheet",href="/static/styles/pc_activity/january_reward.css?v=201512")
+        - csrf_token
+    body(style="background: url('/static/imgs/pc_activity/january_reward/body_bg.jpg')")
+        include global/g_nav
+        .body_wrap.clear
+            .banner
+                .title 50万理财金满额送，更有千万红包加息券猛撒
+                .text 10倍理财金年终奖专场
+            .main_wrap.main_wrap_1
+                .title_top 单笔投资满额就送10倍理财金年终奖，多投多得上不封顶.年终福利靠自己！
+                .red_wrap
+                    .red_box
+                        .title 5000元≤单笔投资＜ 1万元
+                        .ico 送
+                        dl.red
+                            dt!='50,000<span>元</span>'
+                            dd 体验金
+                    .red_box
+                        .title 1万元≤单笔投资＜ 3万元
+                        .ico 送
+                        dl.red
+                            dt!='100,000<span>元</span>'
+                            dd 体验金
+                    .red_box.no_margin
+                        .title 3万元≤单笔投资＜ 5万元
+                        .ico 送
+                        dl.red
+                            dt!='300,000<span>元</span>'
+                            dd 体验金
+                .button 立即投资
+                .title_bottom!='备注：所有体验金10%年化、1天期限计算发放收益到账户余额。<span>点击查看理财金规则>></span>'
+
+                //.code_wrap
+                //    .bg
+                //    .main
+                //        img.code(src="/static/imgs/pc_activity/double_eggs/code.jpg")
+                //        .text 手机扫一下也许就能赚钱
+        include global/g_footer
+script.
+    require(['/static/js/january_reward.js?v=2015122101'])
+                                                                    
