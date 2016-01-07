@@ -1285,7 +1285,7 @@ class WeixinAnnualBonusView(TemplateView):
         #wx_bonus = None
         if wx_bonus:
             #wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
-            follows = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid)
+            follows = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid, is_good_vote=True).order_by('-create_time')
             self.template_name = 'app_praise_reward.jade'
             return { 'err_code':0, 'err_messege':u'用户', 'is_myself':self.is_myself, 'wx_user':wx_bonus, 'follow':follows,
                      'share_name':u'我的努力需要你的一个肯定，谢谢你',
@@ -1417,7 +1417,7 @@ class WeixinAnnualBonusView(TemplateView):
                 return HttpResponse(json.dumps(rep), content_type='application/json')
 
         wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
-        wx_votes = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid).order_by('-create_time')
+        wx_votes = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid, is_good_vote=True).order_by('-create_time')
         vote_list = [
             {
                 "from_nickname": vote.from_nickname,
@@ -1483,7 +1483,7 @@ class WeixinAnnualBonusView(TemplateView):
         wx_bonus = WeixinAnnualBonus.objects.filter(openid=self.to_openid).first()
         wx_bonus = wx_bonus.toJSON_filter(self.bonus_fileds_filter)
 
-        wx_votes = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid).order_by('-create_time')
+        wx_votes = WeixinAnnulBonusVote.objects.filter(to_openid=self.to_openid, is_good_vote=True).order_by('-create_time')
         vote_list = [
             {
                 "from_nickname": vote.from_nickname,
